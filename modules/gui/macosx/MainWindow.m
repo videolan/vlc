@@ -122,6 +122,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
+    BOOL b_splitviewShouldBeHidden = NO;
     /* setup the styled interface */
     b_nativeFullscreenMode = NO;
 #ifdef MAC_OS_X_VERSION_10_7
@@ -244,6 +245,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_volume_up_btn setEnabled: b_mute];
 
     /* interface builder action */
+    if ([self frame].size.height < 100)
+        b_splitviewShouldBeHidden = YES;
     [self setDelegate: self];
     [self setExcludedFromWindowsMenu: YES];
     [self setAcceptsMouseMovedEvents: YES];
@@ -430,10 +433,14 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         [o_titlebar_view setFrame: NSMakeRect( 0, winrect.size.height - f_titleBarHeight,
                                               winrect.size.width, f_titleBarHeight )];
-        [[self contentView] addSubview: o_titlebar_view];
+        [[self contentView] addSubview: o_titlebar_view positioned: NSWindowAbove relativeTo: o_split_view];
 
-        [self setFrame: winrect display:YES animate:YES];
-        previousSavedFrame = winrect;
+        if (winrect.size.height > 100)
+        {
+            [self setFrame: winrect display:YES animate:YES];
+            previousSavedFrame = winrect;
+        }
+
         winrect = [o_split_view frame];
         winrect.size.height = winrect.size.height - f_titleBarHeight;
         [o_split_view setFrame: winrect];
@@ -469,6 +476,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(someWindowWillMiniaturize:) name: NSWindowWillMiniaturizeNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
     [[VLCMain sharedInstance] playbackModeUpdated];
+
+    if (b_splitviewShouldBeHidden)
+    {
+        i_lastSplitViewHeight = [o_split_view frame].size.height;
+        [self hideSplitView];
+    }
 }
 
 #pragma mark -
@@ -566,7 +579,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     NSRect plrect;
     plrect = [[o_playlist_table animator] frame];
-    plrect.size.height = i_lastSplitViewHeight - 22.0; // actual pl top bar height, which differs from its frame
+    plrect.size.height = i_lastSplitViewHeight - 19.0; // actual pl top bar height, which differs from its frame
     [[o_playlist_table animator] setFrame: plrect];
 }
 
@@ -574,31 +587,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     if ((([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0) && !b_splitview_removed)
     {
-        NSRect winrect = [self frame];
-        i_lastSplitViewHeight = [o_split_view frame].size.height;
-        winrect.size.height = winrect.size.height - i_lastSplitViewHeight;
-        winrect.origin.y = winrect.origin.y + i_lastSplitViewHeight;
-        [self setFrame: winrect display: YES animate: YES];
-        [self performSelector:@selector(hideDropZone) withObject:nil afterDelay:0.1];
-        b_splitview_removed = YES;
+        [self hideSplitView];
     }
     else
     {
         if (b_splitview_removed)
         {
-            NSRect winrect;
-
-            winrect = [self frame];
-            winrect.size.height = winrect.size.height + i_lastSplitViewHeight;
-            winrect.origin.y = winrect.origin.y - i_lastSplitViewHeight;
-            [self setFrame: winrect display: YES animate: YES];
-
-            [self performSelector:@selector(resizePlaylistAfterCollapse) withObject: nil afterDelay:0.75];
-            if (b_dropzone_active)
-                [self performSelector:@selector(showDropZone) withObject: nil afterDelay:0.3];
-
-            b_splitview_removed = NO;
-            return;
+            [self showSplitView];
         }
 
         if (b_dropzone_active && ![[VLCMain sharedInstance] activeVideoPlayback])
@@ -990,6 +985,49 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     [o_dropzone_view removeFromSuperview];
     [[o_playlist_table animator] setHidden: NO];
+}
+
+- (void)hideSplitView
+{
+    NSRect winrect = [self frame];
+    i_lastSplitViewHeight = [o_split_view frame].size.height;
+    winrect.size.height = winrect.size.height - i_lastSplitViewHeight;
+    winrect.origin.y = winrect.origin.y + i_lastSplitViewHeight;
+    [self setFrame: winrect display: YES animate: YES];
+    [self performSelector:@selector(hideDropZone) withObject:nil afterDelay:0.1];
+    if (b_dark_interface)
+    {
+        [self setContentMinSize: NSMakeSize( 604., [o_bottombar_view frame].size.height + [o_titlebar_view frame].size.height )];
+        [self setContentMaxSize: NSMakeSize( FLT_MAX, [o_bottombar_view frame].size.height + [o_titlebar_view frame].size.height )];
+    }
+    else
+    {
+        [self setContentMinSize: NSMakeSize( 604., [o_bottombar_view frame].size.height )];
+        [self setContentMaxSize: NSMakeSize( FLT_MAX, [o_bottombar_view frame].size.height )];
+    }
+    if (i_lastSplitViewHeight < 100)
+        i_lastSplitViewHeight = 300; // random reasonable size
+    b_splitview_removed = YES;
+}
+
+- (void)showSplitView
+{
+    if (b_dark_interface)
+        [self setContentMinSize:NSMakeSize( 604., 288. + [o_titlebar_view frame].size.height )];
+    else
+        [self setContentMinSize:NSMakeSize( 604., 288. )];
+    [self setContentMaxSize: NSMakeSize( FLT_MAX, FLT_MAX )];
+
+    NSRect winrect;
+    winrect = [self frame];
+    winrect.size.height = winrect.size.height + i_lastSplitViewHeight;
+    winrect.origin.y = winrect.origin.y - i_lastSplitViewHeight;
+    [self setFrame: winrect display: YES animate: YES];
+
+    [self performSelector:@selector(resizePlaylistAfterCollapse) withObject: nil afterDelay:0.75];
+    [self performSelector:@selector(updateWindow) withObject: nil afterDelay:0.3];
+
+    b_splitview_removed = NO;
 }
 
 - (void)updateTimeSlider

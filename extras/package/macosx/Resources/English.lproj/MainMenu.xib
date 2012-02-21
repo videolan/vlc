@@ -21,16 +21,16 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="4722"/>
-      <integer value="4850"/>
-      <integer value="1617"/>
-      <integer value="283"/>
-      <integer value="4596"/>
-      <integer value="2730"/>
-      <integer value="29"/>
       <integer value="2770"/>
-      <integer value="4682"/>
+      <integer value="21"/>
+      <integer value="283"/>
+      <integer value="4722"/>
       <integer value="915"/>
+      <integer value="29"/>
+      <integer value="4596"/>
+      <integer value="1617"/>
+      <integer value="2730"/>
+      <integer value="4850"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -62,7 +62,6 @@
         <nil key="NSViewClass"/>
         <nil key="NSUserInterfaceItemIdentifier"/>
         <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
-        <string key="NSWindowContentMinSize">{604, 310}</string>
         <object class="NSView" key="NSWindowView" id="429932428">
           <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
@@ -342,6 +341,39 @@
                         <int key="NSMaximumRecents">10</int>
                       </object>
                     </object>
+                    <object class="NSImageView" id="447614808">
+                      <reference key="NSNextResponder" ref="440594360"/>
+                      <int key="NSvFlags">266</int>
+                      <object class="NSMutableSet" key="NSDragTypes">
+                        <bool key="EncodedWithXMLCoder">YES</bool>
+                        <object class="NSArray" key="set.sortedObjects">
+                          <bool key="EncodedWithXMLCoder">YES</bool>
+                          <string>Apple PDF pasteboard type</string>
+                          <string>Apple PICT pasteboard type</string>
+                          <string>Apple PNG pasteboard type</string>
+                          <string>NSFilenamesPboardType</string>
+                          <string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
+                          <string>NeXT TIFF v4.0 pasteboard type</string>
+                        </object>
+                      </object>
+                      <string key="NSFrame">{{0, 251}, {403, 23}}</string>
+                      <reference key="NSSuperview" ref="440594360"/>
+                      <int key="NSViewLayerContentsRedrawPolicy">2</int>
+                      <bool key="NSEnabled">YES</bool>
+                      <object class="NSImageCell" key="NSCell" id="660513772">
+                        <int key="NSCellFlags">130560</int>
+                        <int key="NSCellFlags2">33554432</int>
+                        <object class="NSCustomResource" key="NSContents">
+                          <string key="NSClassName">NSImage</string>
+                          <string key="NSResourceName">topbar_background</string>
+                        </object>
+                        <int key="NSAlign">0</int>
+                        <int key="NSScale">1</int>
+                        <int key="NSStyle">0</int>
+                        <bool key="NSAnimates">NO</bool>
+                      </object>
+                      <bool key="NSEditable">YES</bool>
+                    </object>
                     <object class="NSScrollView" id="915491793">
                       <reference key="NSNextResponder" ref="440594360"/>
                       <int key="NSvFlags">4370</int>
@@ -558,39 +590,6 @@
                       <reference key="NSContentView" ref="343242432"/>
                       <reference key="NSHeaderClipView" ref="576307303"/>
                       <bytes key="NSScrollAmts">QSAAAEEgAABBiAAAQYgAAA</bytes>
-                    </object>
-                    <object class="NSImageView" id="447614808">
-                      <reference key="NSNextResponder" ref="440594360"/>
-                      <int key="NSvFlags">266</int>
-                      <object class="NSMutableSet" key="NSDragTypes">
-                        <bool key="EncodedWithXMLCoder">YES</bool>
-                        <object class="NSArray" key="set.sortedObjects">
-                          <bool key="EncodedWithXMLCoder">YES</bool>
-                          <string>Apple PDF pasteboard type</string>
-                          <string>Apple PICT pasteboard type</string>
-                          <string>Apple PNG pasteboard type</string>
-                          <string>NSFilenamesPboardType</string>
-                          <string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
-                          <string>NeXT TIFF v4.0 pasteboard type</string>
-                        </object>
-                      </object>
-                      <string key="NSFrame">{{0, 251}, {403, 23}}</string>
-                      <reference key="NSSuperview" ref="440594360"/>
-                      <int key="NSViewLayerContentsRedrawPolicy">2</int>
-                      <bool key="NSEnabled">YES</bool>
-                      <object class="NSImageCell" key="NSCell" id="660513772">
-                        <int key="NSCellFlags">130560</int>
-                        <int key="NSCellFlags2">33554432</int>
-                        <object class="NSCustomResource" key="NSContents">
-                          <string key="NSClassName">NSImage</string>
-                          <string key="NSResourceName">topbar_background</string>
-                        </object>
-                        <int key="NSAlign">0</int>
-                        <int key="NSScale">1</int>
-                        <int key="NSStyle">0</int>
-                        <bool key="NSAnimates">NO</bool>
-                      </object>
-                      <bool key="NSEditable">YES</bool>
                     </object>
                   </object>
                   <string key="NSFrame">{{201, 0}, {403, 274}}</string>
@@ -1151,7 +1150,6 @@
           <int key="NSViewLayerContentsRedrawPolicy">2</int>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
-        <string key="NSMinSize">{604, 332}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <string key="NSFrameAutosaveName">mainwindow</string>
         <bool key="NSWindowIsRestorable">YES</bool>
@@ -11207,8 +11205,8 @@ LCAuLi4</string>
           <string>{{364, 446}, {604, 310}}</string>
           <boolean value="YES"/>
           <boolean value="NO"/>
-          <boolean value="YES"/>
-          <string>{604, 310}</string>
+          <boolean value="NO"/>
+          <string>{604, 36}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>{{816, 490}, {64, 6}}</string>

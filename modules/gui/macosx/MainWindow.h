@@ -142,6 +142,8 @@
 
 - (void)showDropZone;
 - (void)hideDropZone;
+- (void)showSplitView;
+- (void)hideSplitView;
 - (void)updateTimeSlider;
 - (void)updateVolumeSlider;
 - (void)updateWindow;
