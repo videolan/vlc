@@ -275,7 +275,7 @@ void AspectRatioComboBox::updateRatios() {
     vout_thread_t* p_vout = THEMIM->getVout();
     /* Disable if there is no vout */
     if( p_vout == NULL ) {
-        addItem("Aspect Ratio");
+        addItem( qtr("Aspect Ratio") );
         setDisabled( true );
         return;
     }
