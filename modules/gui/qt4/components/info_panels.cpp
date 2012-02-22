@@ -33,6 +33,7 @@
 #include "qt4.hpp"
 #include "components/info_panels.hpp"
 #include "components/interface_widgets.hpp"
+#include "info_widgets.hpp"
 
 #include <assert.h>
 #include <vlc_url.h>
@@ -491,7 +492,7 @@ void InfoPanel::saveCodecsInfo()
  */
 InputStatsPanel::InputStatsPanel( QWidget *parent ): QWidget( parent )
 {
-     QGridLayout *layout = new QGridLayout(this);
+     QVBoxLayout *layout = new QVBoxLayout(this);
 
      QLabel *topLabel = new QLabel( qtr( "Current"
                  " media / stream " "statistics") );
@@ -526,6 +527,8 @@ InputStatsPanel::InputStatsPanel( QWidget *parent ): QWidget( parent )
                            "0", input , "KiB" );
     CREATE_AND_ADD_TO_CAT( input_bitrate_stat, qtr("Input bitrate"),
                            "0", input, "kb/s" );
+    input_bitrate_graph = new QTreeWidgetItem();
+    input_bitrate_stat->addChild( input_bitrate_graph );
     CREATE_AND_ADD_TO_CAT( demuxed_stat, qtr("Demuxed data size"), "0", input, "KiB") ;
     CREATE_AND_ADD_TO_CAT( stream_bitrate_stat, qtr("Content bitrate"),
                            "0", input, "kb/s" );
@@ -565,7 +568,19 @@ InputStatsPanel::InputStatsPanel( QWidget *parent ): QWidget( parent )
     StatsTree->resizeColumnToContents( 0 );
     StatsTree->setColumnWidth( 1 , 200 );
 
-    layout->addWidget(StatsTree, 1, 0 );
+    layout->addWidget(StatsTree, 4, 0 );
+
+    statsView = new VLCStatsView( this );
+    statsView->setFrameStyle( QFrame::NoFrame );
+    statsView->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
+    input_bitrate_graph->setSizeHint( 1, QSize(0, 100) );
+    StatsTree->setItemWidget( input_bitrate_graph, 1, statsView );
+}
+
+void InputStatsPanel::hideEvent( QHideEvent * event )
+{
+    statsView->reset();
+    QWidget::hideEvent( event );
 }
 
 /**
@@ -584,11 +599,13 @@ void InputStatsPanel::update( input_item_t *p_item )
     { QString str; widget->setText( 1 , str.sprintf( format, ## calc ) );  }
 
     UPDATE_INT( read_media_stat, (p_item->p_stats->i_read_bytes / 1024 ) );
-    UPDATE_FLOAT( input_bitrate_stat,  "%6.0f", (float)(p_item->p_stats->f_input_bitrate *  8000  ));
+    UPDATE_FLOAT( input_bitrate_stat,  "%6.0f", (float)(p_item->p_stats->f_input_bitrate *  8000 ));
     UPDATE_INT( demuxed_stat,    (p_item->p_stats->i_demux_read_bytes / 1024 ) );
-    UPDATE_FLOAT( stream_bitrate_stat, "%6.0f", (float)(p_item->p_stats->f_demux_bitrate *  8000  ));
+    UPDATE_FLOAT( stream_bitrate_stat, "%6.0f", (float)(p_item->p_stats->f_demux_bitrate *  8000 ));
     UPDATE_INT( corrupted_stat,      p_item->p_stats->i_demux_corrupted );
     UPDATE_INT( discontinuity_stat,  p_item->p_stats->i_demux_discontinuity );
+
+    statsView->addValue( p_item->p_stats->f_input_bitrate * 8000 );
 
     /* Video */
     UPDATE_INT( vdecoded_stat,     p_item->p_stats->i_decoded_video );
@@ -614,4 +631,3 @@ void InputStatsPanel::update( input_item_t *p_item )
 void InputStatsPanel::clear()
 {
 }
-

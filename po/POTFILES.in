@@ -605,6 +605,8 @@ modules/gui/qt4/components/extended_panels.cpp
 modules/gui/qt4/components/extended_panels.hpp
 modules/gui/qt4/components/info_panels.cpp
 modules/gui/qt4/components/info_panels.hpp
+modules/gui/qt4/components/info_widgets.cpp
+modules/gui/qt4/components/info_widgets.hpp
 modules/gui/qt4/components/interface_widgets.cpp
 modules/gui/qt4/components/interface_widgets.hpp
 modules/gui/qt4/components/open_panels.cpp

@@ -51,6 +51,7 @@ class QLineEdit;
 class CoverArtLabel;
 class QTextEdit;
 class QLabel;
+class VLCStatsView;
 
 class MetaPanel: public QWidget
 {
@@ -116,11 +117,14 @@ class InputStatsPanel: public QWidget
     Q_OBJECT
 public:
     InputStatsPanel( QWidget * );
+protected:
+    virtual void hideEvent( QHideEvent * );
 private:
     QTreeWidget *StatsTree;
     QTreeWidgetItem *input;
     QTreeWidgetItem *read_media_stat;
     QTreeWidgetItem *input_bitrate_stat;
+    QTreeWidgetItem *input_bitrate_graph;
     QTreeWidgetItem *demuxed_stat;
     QTreeWidgetItem *stream_bitrate_stat;
     QTreeWidgetItem *corrupted_stat;
@@ -142,6 +146,7 @@ private:
     QTreeWidgetItem *aplayed_stat;
     QTreeWidgetItem *alost_stat;
 
+    VLCStatsView *statsView;
 public slots:
     void update( input_item_t * );
     void clear();
