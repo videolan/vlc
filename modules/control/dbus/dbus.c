@@ -556,7 +556,8 @@ static void ProcessEvents( intf_thread_t *p_intf,
                 vlc_dictionary_insert( &player_properties, "CanPlay", NULL );
             }
 
-            vlc_dictionary_insert( &tracklist_properties, "Tracks", NULL );
+            if( !vlc_dictionary_has_key( &tracklist_properties, "Tracks" ) )
+                vlc_dictionary_insert( &tracklist_properties, "Tracks", NULL );
             break;
         case SIGNAL_VOLUME_MUTED:
         case SIGNAL_VOLUME_CHANGE:
