@@ -346,7 +346,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case INPUT_SLIDER: {
-        SeekSlider *slider = new SeekSlider( Qt::Horizontal, NULL );
+        SeekSlider *slider = new SeekSlider( Qt::Horizontal, NULL, !b_shiny );
         SeekPoints *chapters = new SeekPoints( this, p_intf );
         CONNECT( THEMIM->getIM(), titleChanged( bool ), chapters, update() );
         slider->setChapters( chapters );
