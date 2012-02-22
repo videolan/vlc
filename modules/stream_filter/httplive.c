@@ -314,7 +314,7 @@ static hls_stream_t *hls_Find(vlc_array_t *hls_stream, hls_stream_t *hls_new)
         {
             /* compare */
             if ((hls->id == hls_new->id) &&
-                (hls->bandwidth == hls_new->bandwidth))
+                ((hls->bandwidth == hls_new->bandwidth)||(hls_new->bandwidth==0)))
                 return hls;
         }
     }
