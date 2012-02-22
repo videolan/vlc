@@ -62,6 +62,7 @@ namespace dash
                 std::string             url;
                 std::string             hostname;
                 std::string             path;
+                int                     port;
                 std::string             request;
                 stream_t                *stream;
                 Chunk                   *chunk;

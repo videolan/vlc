@@ -26,6 +26,7 @@
 #endif
 
 #include "HTTPConnection.h"
+#include <vlc_url.h>
 
 using namespace dash::http;
 
@@ -74,22 +75,15 @@ int             HTTPConnection::peek            (const uint8_t **pp_peek, size_t
 }
 void            HTTPConnection::parseURL        ()
 {
+    vlc_url_t url_components;
+    vlc_UrlParse(&url_components, this->url.c_str(), 0);
+    this->path = url_components.psz_path;
+    this->port = url_components.i_port ? url_components.i_port : 80;
+
     if(this->url.compare(0, 4, "http"))
-    {
         this->hostname = Helper::combinePaths(Helper::getDirectoryPath(stream->psz_path), this->url);
-    }
     else
-    {
-        this->hostname = this->url;
-        this->hostname.erase(0, 7);
-    }
-
-    this->path = this->hostname;
-
-    size_t pos = this->hostname.find("/");
-
-    this->hostname  = this->hostname.substr(0, pos);
-    this->path      = this->path.substr(pos, this->path.size());
+        this->hostname = url_components.psz_host;
 
     this->request = "GET " + this->path + " HTTP/1.1\r\n" +
                     "Host: " + this->hostname + "\r\nConnection: close\r\n\r\n";
@@ -118,7 +112,7 @@ bool            HTTPConnection::init            ()
     this->parseURL();
     this->prepareRequest();
 
-    this->httpSocket = net_ConnectTCP(this->stream, this->hostname.c_str(), 80);
+    this->httpSocket = net_ConnectTCP(this->stream, this->hostname.c_str(), this->port);
 
     if(this->sendData(this->request))
         return this->parseHeader();
