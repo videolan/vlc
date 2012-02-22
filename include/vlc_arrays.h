@@ -451,7 +451,15 @@ static inline void vlc_dictionary_clear( vlc_dictionary_t * p_dict,
     p_dict->i_size = 0;
 }
 
+static inline int
+vlc_dictionary_has_key( const vlc_dictionary_t * p_dict, const char * psz_key )
+{
+    if( !p_dict->p_entries )
+        return 0;
 
+    int i_pos = DictHash( psz_key, p_dict->i_size );
+    return p_dict->p_entries[i_pos] != NULL;
+}
 
 static inline void *
 vlc_dictionary_value_for_key( const vlc_dictionary_t * p_dict, const char * psz_key )
