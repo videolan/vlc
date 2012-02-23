@@ -1396,7 +1396,7 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
 
 #define CURVAL val_list.p_list->p_values[i]
 #define CURTEXT text_list.p_list->p_values[i].psz_string
-#define RADIO_OR_COMMAND  ( i_type & VLC_VAR_ISCOMMAND ) ? ITEM_NORMAL : ITEM_RADIO
+#define RADIO_OR_COMMAND  ( i_type & VLC_VAR_ISCOMMAND ) ? ITEM_RADIO : ITEM_NORMAL
 
     for( i = 0; i < val_list.p_list->i_count; i++ )
     {
