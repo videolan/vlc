@@ -1964,7 +1964,8 @@ static void StreamClose( void *p_private )
     p_sys->event_rtsp = 0xff;
     p_sys->event_data = 0xff;
 
-    es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->p_es, false );
+    if( tk->p_es )
+        es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->p_es, false );
 
     int nb_tracks = 0;
     for( int i = 0; i < p_sys->i_track; i++ )
