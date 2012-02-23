@@ -569,6 +569,7 @@ InputStatsPanel::InputStatsPanel( QWidget *parent,
  **/
 void InputStatsPanel::update( input_item_t *p_item )
 {
+    if ( !isVisible() ) return;
     assert( p_item );
     vlc_mutex_lock( &p_item->p_stats->lock );
 
