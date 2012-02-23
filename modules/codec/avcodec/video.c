@@ -355,6 +355,9 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
         i_thread_count = vlc_GetCPUCount();
         if( i_thread_count > 1 )
             i_thread_count++;
+
+        //FIXME: take in count the decoding time
+        i_thread_count = __MIN( i_thread_count, 4 );
     }
     i_thread_count = __MIN( i_thread_count, 16 );
     msg_Dbg( p_dec, "allowing %d thread(s) for decoding", i_thread_count );
