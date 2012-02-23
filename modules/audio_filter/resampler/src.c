@@ -53,7 +53,7 @@ vlc_module_begin ()
     add_integer ("src-converter-type", SRC_SINC_MEDIUM_QUALITY,
                  SRC_CONV_TYPE_TEXT, SRC_CONV_TYPE_LONGTEXT, true)
         change_integer_list (conv_type_values, conv_type_texts)
-    set_capability ("audio filter", 60)
+    set_capability ("audio filter", 50)
     set_callbacks (Open, Close)
 vlc_module_end ()
 

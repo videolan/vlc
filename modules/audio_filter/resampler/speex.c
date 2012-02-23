@@ -44,7 +44,7 @@ vlc_module_begin ()
     add_integer ("speex-resampler-quality", 4,
                  QUALITY_TEXT, QUALITY_LONGTEXT, true)
         change_integer_range (0, 10)
-    set_capability ("audio filter", 50)
+    set_capability ("audio filter", 60)
     set_callbacks (Open, Close)
 vlc_module_end ()
 
