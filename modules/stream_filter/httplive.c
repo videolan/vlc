@@ -274,6 +274,7 @@ static hls_stream_t *hls_Copy(hls_stream_t *src, const bool b_cp_segments)
         return NULL;
     }
     vlc_UrlParse(&dst->url, uri, 0);
+    free( uri );
     if (!b_cp_segments)
         dst->segments = vlc_array_new();
     vlc_mutex_init(&dst->lock);
