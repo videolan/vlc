@@ -421,9 +421,12 @@
 
 @end
 
+
 @implementation VLCCustomWindowFullscreenButton
+#ifdef MAC_OS_X_VERSION_10_7
 - (id)extendedAccessibilityAttributeValue: (NSString*)theAttributeName {
     return ([theAttributeName isEqualToString: NSAccessibilitySubroleAttribute] ? NSAccessibilityFullScreenButtonAttribute : nil);
 }
+#endif
 
 @end
