@@ -157,6 +157,9 @@ void    IsoffMainParser::setInitSegment     (dash::xml::Node *segBaseNode, Segme
 {
     std::vector<Node *> initSeg = DOMHelper::getElementByTagName(segBaseNode, "Initialisation", false);
 
+    if(initSeg.size() == 0)
+        initSeg = DOMHelper::getElementByTagName(segBaseNode, "Initialization", false);
+
     if(initSeg.size() > 0)
     {
         Segment *seg = new Segment( this->currentRepresentation );
