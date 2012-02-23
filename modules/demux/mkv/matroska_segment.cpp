@@ -774,7 +774,8 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
 
     /* now parse until key frame */
     const int es[3] = { VIDEO_ES, AUDIO_ES, SPU_ES };
-    for( int i = 0, i_cat = es[0]; i < 2; i_cat = es[++i] )
+    i_cat = es[0];
+    for( int i = 0; i < 2; i_cat = es[++i] )
     {
         for( i_track = 0; i_track < tracks.size(); i_track++ )
         {
