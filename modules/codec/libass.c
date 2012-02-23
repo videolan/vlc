@@ -220,8 +220,6 @@ static int Create( vlc_object_t *p_this )
                                _("Building font cache"),
                                _( "Please wait while your font cache is rebuilt.\n"
                                   "This should take less than a minute." ), NULL );
-    if( p_dialog )
-        dialog_ProgressSet( p_dialog, NULL, 0.2 );
 #endif
     ass_set_fonts( p_renderer, psz_font, psz_family, true, NULL, 1 );  // setup default font/family
 #ifdef WIN32
