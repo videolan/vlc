@@ -583,7 +583,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     if (OSX_LION)
     {
-        if ([NSApp currentSystemPresentationOptions] == NSApplicationPresentationFullScreen)
+        if ([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen)
             var_SetBool( p_playlist, "fullscreen", YES );
     }
 

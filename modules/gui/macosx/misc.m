@@ -144,15 +144,12 @@ static NSMutableArray *blackoutWindows = NULL;
         [blackoutWindows addObject: blackoutWindow];
         [blackoutWindow release];
 
-        if( [screen isMainScreen ] )
+        if( [screen isMainScreen] )
         {
-            if ([screen isMainScreen])
-            {
-                if (OSX_LEOPARD)
-                    SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
-                else
-                    [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
-            }
+            if (OSX_LEOPARD)
+                SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
+            else
+                [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
         }
     }
 }

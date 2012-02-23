@@ -1335,7 +1335,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)resizeWindow
 {
-    if ( b_fullscreen || (OSX_LION && [NSApp presentationOptions] == NSApplicationPresentationFullScreen && b_nativeFullscreenMode) )
+    if ( b_fullscreen || (OSX_LION && [NSApp presentationOptions] & NSApplicationPresentationFullScreen && b_nativeFullscreenMode) )
         return;
 
     NSPoint topleftbase = NSMakePoint(0, [self frame].size.height);
