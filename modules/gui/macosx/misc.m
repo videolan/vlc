@@ -770,6 +770,7 @@ void _drawFrameInRect(NSRect frameRect)
 {
     [o_string_shadow release];
     [o_string_attributes_dict release];
+    [super dealloc];
 }
 
 - (void)setStringValue:(NSString *)string
