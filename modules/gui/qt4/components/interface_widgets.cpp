@@ -395,6 +395,7 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i, QWidget *_parent )
     speedSlider->setSizePolicy( sizePolicy );
     speedSlider->setMinimumSize( QSize( 140, 20 ) );
     speedSlider->setOrientation( Qt::Horizontal );
+    speedSlider->setTickPosition( QSlider::TicksBelow );
 
     speedSlider->setRange( -34, 34 );
     speedSlider->setSingleStep( 1 );
