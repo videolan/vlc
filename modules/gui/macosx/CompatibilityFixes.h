@@ -72,6 +72,7 @@ extern OSErr UpdateSystemActivity(UInt8 activity);
 @interface NSApplication (IntroducedInSnowLeopard)
 - (NSApplicationPresentationOptions)presentationOptions;
 - (void)setPresentationOptions:(NSApplicationPresentationOptions)newOptions;
+- (NSApplicationPresentationOptions)currentSystemPresentationOptions;
 @end
 #endif
 
