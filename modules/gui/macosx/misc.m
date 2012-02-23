@@ -672,6 +672,9 @@ void _drawFrameInRect(NSRect frameRect)
 
 - (void)drawRect:(NSRect)rect
 {
+    [(VLCMainWindow *)[self window] drawFancyGradientEffectForTimeSlider];
+    msleep( 10000 ); //wait for the gradient to draw completely
+
     /* Draw default to make sure the slider behaves correctly */
     [[NSGraphicsContext currentContext] saveGraphicsState];
     NSRectClip(NSZeroRect);
@@ -681,8 +684,6 @@ void _drawFrameInRect(NSRect frameRect)
     NSRect knobRect = [[self cell] knobRectFlipped:NO];
     knobRect.origin.y+=1;
     [self drawKnobInRect: knobRect];
-
-    [(VLCMainWindow *)[self window] drawFancyGradientEffectForTimeSlider];
 }
 
 @end

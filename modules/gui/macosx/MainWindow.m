@@ -463,6 +463,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_sidebar_scrollview setBorderType: NSNoBorder];
     }
 
+    NSRect frame;
+    frame = [o_time_sld_fancygradient_view frame];
+    frame.size.width = 0;
+    [o_time_sld_fancygradient_view setFrame: frame];
+
     if (OSX_LION)
         [o_resize_view setImage: NULL];
 
@@ -1240,9 +1245,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
         NSRect oldFrame = [o_time_sld_fancygradient_view frame];
         if (f_value != oldFrame.size.width)
         {
-            [o_time_sld_fancygradient_view setHidden: NO];
+            if ([o_time_sld_fancygradient_view isHidden])
+                [o_time_sld_fancygradient_view setHidden: NO];
             [o_time_sld_fancygradient_view setFrame: NSMakeRect( oldFrame.origin.x, oldFrame.origin.y, f_value, oldFrame.size.height )];
-            [o_time_sld_fancygradient_view setNeedsDisplay:YES];
         }
     }
     else

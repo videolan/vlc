@@ -26,7 +26,7 @@
       <integer value="4722"/>
       <integer value="4850"/>
       <integer value="2770"/>
-      <integer value="21"/>
+      <integer value="4756"/>
       <integer value="29"/>
       <integer value="2730"/>
       <integer value="283"/>
@@ -672,7 +672,6 @@
                   <string key="NSFrame">{{218, 11}, {60, 12}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
-                  <bool key="NSViewCanDrawConcurrently">YES</bool>
                   <string key="NSClassName">VLCThreePartImageView</string>
                 </object>
                 <object class="NSButton" id="707945673">
@@ -1141,7 +1140,6 @@
               <string key="NSFrame">{{-1, 0}, {605, 36}}</string>
               <reference key="NSSuperview" ref="429932428"/>
               <int key="NSViewLayerContentsRedrawPolicy">2</int>
-              <bool key="NSViewCanDrawConcurrently">YES</bool>
               <string key="NSClassName">VLCThreePartDropView</string>
             </object>
           </object>
