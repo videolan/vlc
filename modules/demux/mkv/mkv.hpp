@@ -180,6 +180,7 @@ struct mkv_track_t
 
     bool         b_default;
     bool         b_enabled;
+    bool         b_forced;
     unsigned int i_number;
 
     unsigned int i_extra_data;

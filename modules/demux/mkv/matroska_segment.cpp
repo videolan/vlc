@@ -922,16 +922,41 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
     /* add all es */
     msg_Dbg( &sys.demuxer, "found %d es", (int)tracks.size() );
 
+    bool b_has_default_video = false;
+    bool b_has_default_audio = false;
+    /* check for default */
+    for(size_t i_track = 0; i_track < tracks.size(); i_track++)
+    {
+        mkv_track_t *p_tk = tracks[i_track];
+        es_format_t *p_fmt = &p_tk->fmt;
+        if( p_fmt->i_cat == VIDEO_ES )
+            b_has_default_video |=
+                p_tk->b_enabled && ( p_tk->b_default || p_tk->b_forced );
+        else if( p_fmt->i_cat == AUDIO_ES )
+            b_has_default_audio |=
+                p_tk->b_enabled && ( p_tk->b_default || p_tk->b_forced );
+    }
+
     for( size_t i_track = 0; i_track < tracks.size(); i_track++ )
     {
         mkv_track_t *p_tk = tracks[i_track];
         es_format_t *p_fmt = &p_tk->fmt;
 
-        if( p_fmt->i_cat == UNKNOWN_ES || !p_tk->psz_codec )
+        if( unlikely( p_fmt->i_cat == UNKNOWN_ES || !p_tk->psz_codec ) )
         {
             msg_Warn( &sys.demuxer, "invalid track[%d, n=%d]", (int)i_track, p_tk->i_number );
             p_tk->p_es = NULL;
             continue;
+        }
+        else if( unlikely( !b_has_default_video && p_fmt->i_cat == VIDEO_ES ) )
+        {
+            p_tk->b_default = true;
+            b_has_default_video = true;
+        }
+        else if( unlikely( !b_has_default_audio &&  p_fmt->i_cat == AUDIO_ES ) )
+        {
+            p_tk->b_default = true;
+            b_has_default_audio = true;
         }
 
         if( !strcmp( p_tk->psz_codec, "V_MS/VFW/FOURCC" ) )
@@ -1334,10 +1359,14 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             msg_Err( &sys.demuxer, "unknown codec id=`%s'", p_tk->psz_codec );
             p_tk->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
         }
-        if( p_tk->b_default )
-        {
-            p_tk->fmt.i_priority = 1000;
-        }
+        if( unlikely( !p_tk->b_enabled ) )
+            p_tk->fmt.i_priority = -2;
+        else if( p_tk->b_forced )
+            p_tk->fmt.i_priority = 1;
+        else if( p_tk->b_default )
+            p_tk->fmt.i_priority = 0;
+        else
+            p_tk->fmt.i_priority = -1;
 
         p_tk->p_es = es_out_Add( sys.demuxer.out, &p_tk->fmt );
 

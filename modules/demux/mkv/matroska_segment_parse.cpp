@@ -179,6 +179,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 
     tk->b_default              = true;
     tk->b_enabled              = true;
+    tk->b_forced               = false;
     tk->b_silent               = false;
     tk->i_number               = tracks.size() - 1;
     tk->i_extra_data           = 0;
@@ -254,7 +255,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
         {
             KaxTrackFlagEnabled &fenb = *(KaxTrackFlagEnabled*)l;
 
-            // tk->b_enabled = uint32( fenb );
+            tk->b_enabled = uint32( fenb );
             msg_Dbg( &sys.demuxer, "|   |   |   + Track Enabled=%u", uint32( fenb ) );
         }
         else  if( MKV_IS_ID( l, KaxTrackFlagDefault ) )
@@ -267,6 +268,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
         else  if( MKV_IS_ID( l, KaxTrackFlagForced ) ) // UNUSED
         {
             KaxTrackFlagForced &ffor = *(KaxTrackFlagForced*)l;
+            tk->b_forced = uint32( ffor );
 
             msg_Dbg( &sys.demuxer, "|   |   |   + Track Forced=%u", uint32( ffor ) );
         }
