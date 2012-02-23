@@ -750,10 +750,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     else if (sender == o_volume_down_btn)
     {
         [[VLCCoreInteraction sharedInstance] mute];
-        [o_volume_sld setIntValue: 0];
-        BOOL b_mute = ![[VLCCoreInteraction sharedInstance] isMuted];
-        [o_volume_sld setEnabled: b_mute];
-        [o_volume_up_btn setEnabled: b_mute];
     }
     else
         [[VLCCoreInteraction sharedInstance] setVolume: AOUT_VOLUME_MAX];
@@ -1096,13 +1092,19 @@ static VLCMainWindow *_o_sharedInstance = nil;
     playlist_t * p_playlist = pl_Get( VLCIntf );
 
     i_volume = aout_VolumeGet( p_playlist );
+    BOOL b_muted = [[VLCCoreInteraction sharedInstance] isMuted];
 
-    if( i_volume != i_lastShownVolume )
+    if( !b_muted )
     {
         i_lastShownVolume = i_volume;
         [o_volume_sld setIntValue: i_volume];
         [o_fspanel setVolumeLevel: i_volume];
     }
+    else
+        [o_volume_sld setIntValue: 0];
+
+    [o_volume_sld setEnabled: !b_muted];
+    [o_volume_up_btn setEnabled: !b_muted];
 }
 
 - (void)updateName
