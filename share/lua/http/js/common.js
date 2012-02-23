@@ -1,7 +1,23 @@
 var intv = 0;
 var ccmd = "";
-var video_types = ['avi', 'mp4', 'wmv', 'mov', 'swf', 'vob', 'mkv', 'mpg'];
-var audio_types = ['mp3', 'wav'];
+var video_types = [
+           "asf", "avi", "divx", "drc", "dv", "f4v", "flv", "gxf", "iso",
+           "m1v", "m2v", "m2t", "m2ts", "m4v", "mkv", "mov",
+           "mp2", "mp4", "mpeg", "mpeg1",
+           "mpeg2", "mpeg4", "mpg", "mts", "mtv", "mxf", "mxg", "nuv",
+           "ogg", "ogm", "ogv", "ogx", "ps",
+           "rec", "rm", "rmvb", "ts", "vob", "wmv" ];
+var audio_types = [
+        "3ga", "a52", "aac", "ac3", "ape", "awb", "dts", "flac", "it",
+        "m4a", "m4p", "mka", "mlp", "mod", "mp1", "mp2", "mp3",
+        "oga", "ogg", "oma", "s3m", "spx", "thd", "tta",
+        "wav", "wma", "wv", "xm"
+];
+var playlist_types = [
+        "asx", "b4s", "cue", "ifo", "m3u", "m3u8", "pls", "ram", "rar",
+        "sdp", "vlc", "xspf", "zip", "conf",
+];
+
 var stream_server = window.location.hostname;
 
 function format_time(s) {
@@ -59,7 +75,7 @@ function isMobile() {
 }
 
 function createElementLi(name, type, dir, ext) {
-    var icon = type == "dir" && name == '..' ? 'Back-48.png' : (type == 'dir' ? "Folder-48.png" : ($.inArray(ext, video_types) != -1 ? "Video-48.png" : ($.inArray(ext, audio_types) != -1 ? "Audio-48.png" : "Other-48.png")));
+    var icon = type == "dir" && name == '..' ? 'Back-48.png' : (type == 'dir' ? "Folder-48.png" : ($.inArray(ext, video_types) != -1 ? "Video-48.png" : ($.inArray(ext, audio_types) != -1 ? "Audio-48.png" : ($.inArray(ext, playlist_types) != -1 ? "Other-48.png")));
     var open = type == "dir" ? "opendir='" + dir + "'" : (type == "file" ? "openfile='" + dir + "'" : "opendev='" + dir + "'");
     var str = "<li class='system_icon ui-widget-content' " + open + " ><img src='images/" + icon + "' width='48px' height='48px' title='" + name + "' alt='" + name + "' style='border: none;background:none;'/><div style='font-size:10px;border:none;background:none;'>" + name + "</div></li>";
     return str;
