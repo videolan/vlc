@@ -1084,6 +1084,9 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>$V</emphasis>: Value of the volume (from 0 to 100 --> useful for a percentage).
   </para></listitem>
   <listitem><para>
+    <emphasis>$R</emphasis>: Value of the playback speed rate. Available from VLC 2.0
+  </para></listitem>
+  <listitem><para>
     <emphasis>$T</emphasis>: Current time (the output format is H:MM:SS).
   </para></listitem>
   <listitem><para>
