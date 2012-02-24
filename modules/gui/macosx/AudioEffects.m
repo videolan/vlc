@@ -55,7 +55,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
         p_intf = VLCIntf;
         _o_sharedInstance = [super init];
     }
-    
+
     return _o_sharedInstance;
 }
 
@@ -83,7 +83,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     [o_comp_band5_lbl setStringValue:_NS("Ratio")];
     [o_comp_band6_lbl setStringValue:_NS("Knee radius")];
     [o_comp_band7_lbl setStringValue:_NS("Makeup gain")];
-    
+
     /* Spatializer */
     [o_spat_enable_ckb setTitle:_NS("Enable Spatializer")];
     [o_spat_reset_btn setTitle:_NS("Reset")];
@@ -92,12 +92,12 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     [o_spat_band3_lbl setStringValue:_NS("Wet")];
     [o_spat_band4_lbl setStringValue:_NS("Dry")];
     [o_spat_band5_lbl setStringValue:_NS("Dump")];
-    
+
     /* Filter */
     [o_filter_headPhone_ckb setTitle:_NS("Headphone virtualization")];
     [o_filter_normLevel_ckb setTitle:_NS("Volume normalization")];
     [o_filter_normLevel_lbl setStringValue:_NS("Maximum level")];
-    
+
     /* generic */
     [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"equalizer"]] setLabel:_NS("Equalizer")];
     [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"compressor"]] setLabel:_NS("Compressor")];
@@ -129,8 +129,8 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     if( p_aout )
         psz_tmp = var_GetNonEmptyString( p_aout, "audio-filter" );
     else
-        psz_tmp = config_GetPsz( p_intf, "audio-filter" );        
-    
+        psz_tmp = config_GetPsz( p_intf, "audio-filter" );
+
     if( b_on )
     {
         if(! psz_tmp)
@@ -165,20 +165,20 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
     vlc_object_t *p_object = VLC_OBJECT(getAout());
     if( p_object == NULL )
         p_object = vlc_object_hold(pl_Get( p_custom_intf ));
-    
+
     psz_string = config_GetPsz( p_custom_intf, "audio-filter" );
-    
+
     if(! psz_string )
         psz_string = var_GetNonEmptyString( p_object, "audio-filter" );
-    
+
     vlc_object_release( p_object );
-    
+
     if( !psz_string ) return false;
-    
+
     psz_parser = strstr( psz_string, psz_name );
-    
+
     free( psz_string );
-    
+
     if ( psz_parser )
         return true;
     else
@@ -225,7 +225,7 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
                          eqz_preset_10b[i].f_amp[7],
                          eqz_preset_10b[i].f_amp[8],
                          eqz_preset_10b[i].f_amp[9] );
-                
+
                 var_Create( p_object, "equalizer-preamp", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
                 var_Create( p_object, "equalizer-bands", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
                 var_SetFloat( p_object, "equalizer-preamp", eqz_preset_10b[i].f_preamp );
@@ -245,17 +245,17 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
     bool b_2p;
     bool b_enabled = GetEqualizerStatus( p_intf, (char *)"equalizer" );
     vlc_object_t *p_object = VLC_OBJECT(getAout());
-    
+
     if( p_object == NULL )
         p_object = vlc_object_hold(pl_Get( p_intf ));
-    
+
     var_Create( p_object, "equalizer-preamp", VLC_VAR_FLOAT |
                VLC_VAR_DOINHERIT );
     var_Create( p_object, "equalizer-bands", VLC_VAR_STRING |
                VLC_VAR_DOINHERIT );
-    
+
     psz_bands = var_GetNonEmptyString( p_object, "equalizer-bands" );
-    
+
     if( psz_bands == NULL )
         psz_bands = strdup( "0 0 0 0 0 0 0 0 0 0" );
 
@@ -263,25 +263,25 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
     f_preamp = config_GetFloat( p_object, "equalizer-preamp" );
 
     vlc_object_release( p_object );
-    
+
     /* Set the preamp slider */
     [o_eq_preamp_sld setFloatValue: f_preamp];
 
     /* Set the bands slider */
     psz_bands_init = psz_bands;
-    
+
     for( int i = 0; i < 10; i++ )
     {
         /* Read dB -20/20 */
         f_band[i] = strtof( psz_bands, &p_next );
         if( !p_next || p_next == psz_bands ) break; /* strtof() failed */
-        
+
         if( !*psz_bands ) break; /* end of line */
         psz_bands = p_next+1;
     }
     free( psz_bands_init );
     [self setBandSlidersValues:f_band];
-    
+
     /* Set the the checkboxes */
     [o_eq_enable_ckb setState: b_enabled];
     [o_eq_twopass_ckb setState: b_2p];
@@ -320,7 +320,7 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
 - (void)setValue:(float)value forSlider:(int)index
 {
     id slider = [self sliderByIndex:index];
-    
+
     if (slider != nil)
         [slider setFloatValue:value];
 }
@@ -333,10 +333,10 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
 - (IBAction)eq_bandSliderUpdated:(id)sender
 {
     vlc_object_t *p_object = VLC_OBJECT(getAout());
-    
+
     if( p_object == NULL )
         p_object = vlc_object_hold(pl_Get( p_intf ));
-    
+
     const char *psz_values;
     NSString *preset = [NSString stringWithFormat:@"%.1f ", [o_eq_band1_sld floatValue] ];
     preset = [preset stringByAppendingFormat:@"%.1f ", [o_eq_band2_sld floatValue] ];
@@ -529,7 +529,7 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
     } 
     else
         [o_spat_enable_ckb setState: NSOffState];
-    
+
     [o_spat_band1_sld setFloatValue: config_GetFloat( p_intf, "spatializer-roomsize" )];
     [o_spat_band1_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [o_spat_band1_sld floatValue]]];
     [o_spat_band2_sld setFloatValue: config_GetFloat( p_intf, "spatializer-width" )];
@@ -564,7 +564,7 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
 
 - (IBAction)spat_enable:(id)sender
 {
-    [self setAudioFilter:"spatializer" on:[sender state]];    
+    [self setAudioFilter:"spatializer" on:[sender state]];
 }
 
 - (IBAction)spat_sliderUpdated:(id)sender
@@ -581,13 +581,13 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
         value = "spatializer-dry";
     else if( sender == o_spat_band5_sld )
         value = "spatializer-damp";
-    
+
     if( p_aout ) {
         var_SetFloat( p_aout, value, [sender floatValue] );
         vlc_object_release( p_aout );
     }
     config_PutFloat( p_intf, value, [sender floatValue] );
-    
+
     if( sender == o_spat_band1_sld )
         [o_spat_band1_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
     else if( sender == o_spat_band2_sld )
@@ -625,7 +625,7 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
 
 - (IBAction)filter_enableVolumeNorm:(id)sender
 {
-    [self setAudioFilter: "normvol" on:[sender state]];    
+    [self setAudioFilter: "normvol" on:[sender state]];
 }
 
 - (IBAction)filter_volNormSliderUpdated:(id)sender

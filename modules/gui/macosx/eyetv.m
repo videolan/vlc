@@ -51,7 +51,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
                          object: @"VLCEyeTVSupport"
              suspensionBehavior: NSNotificationSuspensionBehaviorDeliverImmediately];
     }
-    
+
     return _o_sharedInstance;
 }
 
@@ -142,7 +142,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
                      "end tell"];
         NSLog( @"telling eyetv to switch 1 channel down" );
     }
-    
+
     descriptor = [script executeAndReturnError:&errorDict];
     if( nil == descriptor ) 
     {

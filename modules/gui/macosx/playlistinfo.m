@@ -54,7 +54,7 @@ static VLCInfo *_o_sharedInstance = nil;
     else
     {
         _o_sharedInstance = [super init];
-        
+
         if( _o_sharedInstance != nil )
         {
             p_item = NULL;
@@ -156,7 +156,7 @@ static VLCInfo *_o_sharedInstance = nil;
     [o_input_bitrate_txt setStringValue: [NSString stringWithFormat:@"%6.0f kb/s", (float)0]];
     [o_demux_bytes_txt setStringValue: [NSString stringWithFormat:@"%8.0f KiB", (float)0]];
     [o_demux_bitrate_txt setStringValue: [NSString stringWithFormat:@"%6.0f kb/s", (float)0]];
-    
+
     //Initializing Video Variables
     [o_video_decoded_txt setIntValue:0];
     [o_displayed_txt setIntValue:0];

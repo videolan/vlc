@@ -105,7 +105,7 @@ static VLAboutBox *_o_sharedInstance = nil;
 
         /* Setup the nameversion field */
         [o_name_version_field setStringValue: [NSString stringWithFormat:@"Version %s (%s)", VERSION_MESSAGE, PLATFORM]];
-        
+
         NSMutableArray *tmpArray = [NSMutableArray arrayWithArray: [[NSString stringWithUTF8String: psz_authors]componentsSeparatedByString:@"\n\n"]];
         NSUInteger count = [tmpArray count];
         for( NSUInteger i = 0; i < count; i++ )
@@ -196,7 +196,7 @@ static VLAboutBox *_o_sharedInstance = nil;
 {
     [o_gpl_window setTitle: _NS("License")];
     [o_gpl_field setString: [NSString stringWithUTF8String: psz_license]];
-    
+
     [o_gpl_window center];
     [o_gpl_window makeKeyAndOrderFront: sender];
 }
@@ -213,7 +213,7 @@ static VLAboutBox *_o_sharedInstance = nil;
     [o_help_home_btn setToolTip: _NS("Index")];
 
     [o_help_window makeKeyAndOrderFront: self];
-    
+
     [[o_help_web_view mainFrame] loadHTMLString: _NS(I_LONGHELP)
                                         baseURL: [NSURL URLWithString:@"http://videolan.org"]];
 }

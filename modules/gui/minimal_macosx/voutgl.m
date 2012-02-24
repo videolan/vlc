@@ -81,14 +81,14 @@ int OpenVideoGL  ( vlc_object_t * p_this )
         p_vout->pf_unlock = cocoaglvoutviewUnlock;
     }
 #else
-	/* Let's use the VLCOpenGLVoutView.m class */
-	p_vout->pf_init   = cocoaglvoutviewInit;
-	p_vout->pf_end    = cocoaglvoutviewEnd;
-	p_vout->pf_manage = cocoaglvoutviewManage;
-	p_vout->pf_control= cocoaglvoutviewControl;
-	p_vout->pf_swap   = cocoaglvoutviewSwap;
-	p_vout->pf_lock   = cocoaglvoutviewLock;
-	p_vout->pf_unlock = cocoaglvoutviewUnlock;
+    /* Let's use the VLCOpenGLVoutView.m class */
+    p_vout->pf_init   = cocoaglvoutviewInit;
+    p_vout->pf_end    = cocoaglvoutviewEnd;
+    p_vout->pf_manage = cocoaglvoutviewManage;
+    p_vout->pf_control= cocoaglvoutviewControl;
+    p_vout->pf_swap   = cocoaglvoutviewSwap;
+    p_vout->pf_lock   = cocoaglvoutviewLock;
+    p_vout->pf_unlock = cocoaglvoutviewUnlock;
 #endif
     p_vout->p_sys->b_got_frame = false;
 

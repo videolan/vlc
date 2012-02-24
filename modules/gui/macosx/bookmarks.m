@@ -119,10 +119,10 @@ static VLCBookmarks *_o_sharedInstance = nil;
     seekpoint_t bookmark;
 
     if( !input_Control( p_input, INPUT_GET_BOOKMARK, &bookmark ) )
-	{
-		bookmark.psz_name = _("Untitled");
-		input_Control( p_input, INPUT_ADD_BOOKMARK, &bookmark );
-	}
+    {
+        bookmark.psz_name = _("Untitled");
+        input_Control( p_input, INPUT_ADD_BOOKMARK, &bookmark );
+    }
  
     vlc_object_release( p_input );
  

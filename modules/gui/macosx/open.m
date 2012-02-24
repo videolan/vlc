@@ -186,9 +186,11 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     [o_capture_mode_pop removeAllItems];
     [o_capture_mode_pop addItemWithTitle: _NS("Capture Device")];
-	// our screen capture module isn't Lion-compatible, so let's hide it from the user if needed (trac #4799)
-	if( NSAppKitVersionNumber < 1115.2 )
-		[o_capture_mode_pop addItemWithTitle: _NS("Screen")];
+
+    // our screen capture module isn't Lion-compatible, so let's hide it from the user if needed (trac #4799)
+    if( NSAppKitVersionNumber < 1115.2 )
+        [o_capture_mode_pop addItemWithTitle: _NS("Screen")];
+
     [o_capture_mode_pop addItemWithTitle: @"EyeTV"];
     [o_screen_long_lbl setStringValue: _NS("This input allows you to save, stream or display your current screen contents.")];
     [o_screen_fps_lbl setStringValue: _NS("Frames per Second:")];
@@ -212,8 +214,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [self qtkvideoDevices];
     [o_qtk_device_pop removeAllItems];
     msg_Dbg( VLCIntf, "Found %lu capture devices", [qtkvideoDevices count] );
-	if([qtkvideoDevices count] >= 1)
-		{
+    
+    if([qtkvideoDevices count] >= 1)
+    {
         if (!qtk_currdevice_uid) {
             qtk_currdevice_uid = [[[QTCaptureDevice defaultInputDeviceWithMediaType: QTMediaTypeVideo] uniqueID]
                                                                 stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
@@ -228,12 +231,11 @@ static VLCOpen *_o_sharedMainInstance = nil;
             }
         }
     }
-	else
-	{
-		[o_qtk_device_pop addItemWithTitle: _NS("None")];
+    else
+    {
+        [o_qtk_device_pop addItemWithTitle: _NS("None")];
         [qtk_currdevice_uid release];
-	}
-
+    }
 
     [self setSubPanel];
 
@@ -275,8 +277,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
     o_specialMediaFolders = [[NSMutableArray alloc] init];
     o_opticalDevices = [[NSMutableArray alloc] init];
     NSWorkspace *sharedWorkspace = [NSWorkspace sharedWorkspace];
-	[[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidMountNotification object:nil];
-	[[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidUnmountNotification object:nil];
+
+    [[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidMountNotification object:nil];
+    [[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidUnmountNotification object:nil];
     [self performSelector:@selector(scanOpticalMedia:) withObject:nil afterDelay:2.0];
     [self performSelector:@selector(qtkChanged:) withObject:nil afterDelay:2.5];
 
@@ -454,19 +457,19 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (IBAction)qtkChanged:(id)sender
 {
-	NSInteger i_selectedDevice = [o_qtk_device_pop indexOfSelectedItem];
-	if (i_selectedDevice >= ([qtkvideoDevices count] - 1))
-	{
-		NSValue *sizes = [[[[qtkvideoDevices objectAtIndex:i_selectedDevice] formatDescriptions] objectAtIndex: 0] attributeForKey: QTFormatDescriptionVideoEncodedPixelsSizeAttribute];
+    NSInteger i_selectedDevice = [o_qtk_device_pop indexOfSelectedItem];
 
-		[o_capture_width_fld setIntValue: [sizes sizeValue].width];
-		[o_capture_height_fld setIntValue: [sizes sizeValue].height];
-		[o_capture_width_stp setIntValue: [o_capture_width_fld intValue]];
-		[o_capture_height_stp setIntValue: [o_capture_height_fld intValue]];
-		qtk_currdevice_uid = [[(QTCaptureDevice *)[qtkvideoDevices objectAtIndex:i_selectedDevice] uniqueID]
-							  stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-		[self setMRL:[NSString stringWithFormat:@"qtcapture://%@", qtk_currdevice_uid]];
-	}
+    if (i_selectedDevice >= ([qtkvideoDevices count] - 1))
+    {
+        NSValue *sizes = [[[[qtkvideoDevices objectAtIndex:i_selectedDevice] formatDescriptions] objectAtIndex: 0] attributeForKey: QTFormatDescriptionVideoEncodedPixelsSizeAttribute];
+        [o_capture_width_fld setIntValue: [sizes sizeValue].width];
+        [o_capture_height_fld setIntValue: [sizes sizeValue].height];
+        [o_capture_width_stp setIntValue: [o_capture_width_fld intValue]];
+        [o_capture_height_stp setIntValue: [o_capture_height_fld intValue]];
+        qtk_currdevice_uid = [[(QTCaptureDevice *)[qtkvideoDevices objectAtIndex:i_selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+
+        [self setMRL:[NSString stringWithFormat:@"qtcapture://%@", qtk_currdevice_uid]];
+    }
 }
 
 - (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)o_tvi
@@ -749,8 +752,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
     GetVolParmsInfoBuffer volumeParms;
     err = FSGetVolumeParms( actualVolume, &volumeParms, sizeof(volumeParms) );
 
-    CFMutableDictionaryRef	matchingDict;
-    io_service_t			service;
+    CFMutableDictionaryRef matchingDict;
+    io_service_t service;
 
     matchingDict = IOBSDNameMatching(kIOMasterPortDefault, 0, volumeParms.vMDeviceID);
     service = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict);
@@ -806,7 +809,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
         return;
 
     unsigned int index = [n_index intValue];
-	id o_currentOpticalDevice = [o_opticalDevices objectAtIndex: index];
+
+id o_currentOpticalDevice = [o_opticalDevices objectAtIndex: index];
     char *diskType = [self getVolumeTypeFromMountPath:o_currentOpticalDevice];
 
     if (diskType == kVLCMediaDVD || diskType == kVLCMediaVideoTSFolder)
@@ -1078,7 +1082,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         if( [[[o_net_mode selectedCell] title] isEqualToString: _NS("Unicast")] )
         {
             int i_port = [o_net_udp_port intValue];
-            
+
             if( [[o_net_udp_protocol_mat selectedCell] tag] == 0 )
                 o_mrl_string = [NSString stringWithString: @"udp://"];
             else
@@ -1094,7 +1098,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         {
             NSString *o_addr = [o_net_udpm_addr stringValue];
             int i_port = [o_net_udpm_port intValue];
-            
+
             if( [[o_net_udp_protocol_mat selectedCell] tag] == 0 )
                 o_mrl_string = [NSString stringWithFormat: @"udp://@%@", o_addr];
             else
@@ -1112,7 +1116,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [NSApp endSheet: o_net_udp_panel];
     }
 }
-    
+
 - (void)openFile
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
@@ -1292,7 +1296,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         msg_Dbg( VLCIntf, "eyetv was launched, no device yet" );
         setEyeTVUnconnected;
     }
-}    
+}
 
 /* little helper method, since this code needs to be run by multiple objects */
 - (void)setupChannelInfo
@@ -1367,7 +1371,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_file_sub_sheet orderOut:sender];
     [NSApp endSheet: o_file_sub_sheet];
 }
-    
+
 - (IBAction)subFileBrowse:(id)sender
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];

@@ -22,20 +22,26 @@
   - SourceListItem *child1;
   - SourceListItem *child2;
      - SourceListItem *childOfChild2;
-	 - SourceListItem *anotherChildOfChild2;
+
+ - SourceListItem *anotherChildOfChild2;
   - SourceListItem *child3;
  
  */
 
 @interface SideBarItem : NSObject {
-	NSString *title;
-	NSString *identifier;
+
+NSString *title;
+
+NSString *identifier;
     NSString *untranslatedTitle;
-	NSImage *icon;
-	NSInteger badgeValue;
+
+NSImage *icon;
+
+NSInteger badgeValue;
     NSInteger sdtype;
 
-	NSArray *children;
+
+NSArray *children;
 }
 
 @property (nonatomic, copy) NSString *title;

@@ -55,7 +55,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
         _o_sharedInstance = [super init];
         b_lockAspectRatio = YES;
     }
-    
+
     return _o_sharedInstance;
 }
 
@@ -80,14 +80,14 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 {
     playlist_t * p_playlist = pl_Get( VLCIntf );
     bool empty;
-    
+
     PL_LOCK;
     empty = playlist_IsEmpty( p_playlist );
     PL_UNLOCK;
-    
+
     if( empty )
         [[[VLCMain sharedInstance] open] openFileGeneric];
-    
+
     var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
 }
 

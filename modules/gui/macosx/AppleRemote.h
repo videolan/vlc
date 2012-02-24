@@ -74,8 +74,11 @@ enum AppleRemoteEventIdentifier
     kRemoteControl_Switched         =1<<11,
     kRemoteButtonVolume_Plus_Hold   =1<<12,
     kRemoteButtonVolume_Minus_Hold  =1<<13,
-    k2009RemoteButtonPlay			=1<<14,
-    k2009RemoteButtonFullscreen		=1<<15
+    k2009RemoteButtonPlay
+
+   =1<<14,
+    k2009RemoteButtonFullscreen
+ =1<<15
 };
 typedef enum AppleRemoteEventIdentifier AppleRemoteEventIdentifier;
 

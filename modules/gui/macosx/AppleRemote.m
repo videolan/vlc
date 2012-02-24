@@ -116,7 +116,7 @@ static AppleRemote *_o_sharedInstance = nil;
             [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Sleep]     forKey:@"37_33_21_20_2_37_33_21_20_2_"];
             [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]     forKey:@"42_33_23_21_20_2_33_23_21_20_2_"];
             [cookieToButtonMapping setObject:[NSNumber numberWithInt:k2009RemoteButtonPlay]       forKey:@"33_21_20_8_2_33_21_20_8_2_"];
-            [cookieToButtonMapping setObject:[NSNumber numberWithInt:k2009RemoteButtonFullscreen] forKey:@"33_21_20_3_2_33_21_20_3_2_"];            
+            [cookieToButtonMapping setObject:[NSNumber numberWithInt:k2009RemoteButtonFullscreen] forKey:@"33_21_20_3_2_33_21_20_3_2_"];
         }
         else
         {
@@ -480,7 +480,7 @@ static AppleRemote* sharedInstance=nil;
         cookieString = [previousRemainingCookieString stringByAppendingString: cookieString];
         NSLog(@"New cookie string is %@", cookieString);
         [previousRemainingCookieString release], previousRemainingCookieString=nil;
-	}*/
+    }*/
     if (cookieString == nil || [cookieString length] == 0) return;
     NSNumber* buttonId = [[self cookieToButtonMapping] objectForKey: cookieString];
     if (buttonId != nil) {

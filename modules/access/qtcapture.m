@@ -141,7 +141,8 @@ vlc_module_end ()
 {
     CVImageBufferRef imageBuffer;
     mtime_t pts;
-	void * pixels;
+
+void * pixels;
 
     if(!currentImageBuffer || currentPts == previousPts )
         return 0;
@@ -157,14 +158,14 @@ vlc_module_end ()
                 memcpy( buffer, pixels, CVPixelBufferGetBytesPerRow(imageBuffer) * CVPixelBufferGetHeight(imageBuffer));
             CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
         }
-            
+
     }
     CVBufferRelease(imageBuffer);
 
-	if(pixels)
-		return currentPts;
-	else
-		return 0;
+    if(pixels)
+        return currentPts;
+    else
+        return 0;
 }
 
 @end

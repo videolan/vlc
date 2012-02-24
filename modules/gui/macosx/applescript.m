@@ -197,7 +197,7 @@
  *****************************************************************************/
 @implementation NSApplication(ScriptSupport)
 
-- (BOOL) scriptFullscreenMode {    
+- (BOOL) scriptFullscreenMode {
     vout_thread_t * p_vout = getVout();
     if( !p_vout )
         return NO;

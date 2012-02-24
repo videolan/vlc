@@ -46,7 +46,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         p_intf = VLCIntf;
         _o_sharedInstance = [super init];
     }
-    
+
     return _o_sharedInstance;
 }
 

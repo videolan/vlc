@@ -45,7 +45,7 @@
     NSTimeInterval i_start;
     BOOL b_restart;
     BOOL b_isSetUp;
-    
+
     /* generic help window */
     IBOutlet id o_help_window;
     IBOutlet WebView *o_help_web_view; //we may _not_ use id here because of method name collisions

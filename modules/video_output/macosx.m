@@ -208,8 +208,8 @@ static int Open(vlc_object_t *this)
     const vlc_fourcc_t *subpicture_chromas;
     video_format_t fmt = vd->fmt;
 
-	sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas, &sys->gl);
-	if (!sys->vgl)
+    sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas, &sys->gl);
+    if (!sys->vgl)
     {
         sys->gl.sys = NULL;
         goto error;
@@ -301,7 +301,8 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *sub
     [sys->glView setVoutFlushing:NO];
     picture_Release (pic);
     sys->has_first_frame = true;
-	(void)subpicture;
+
+    (void)subpicture;
 }
 
 static int Control (vout_display_t *vd, int query, va_list ap)
@@ -697,8 +698,8 @@ static void OpenglSwap(vlc_gl_t *gl)
     NSWindow *window = [self window];
 
     // Remove flashes with splitter view.
-	if ([window respondsToSelector:@selector(disableScreenUpdatesUntilFlush)])
-		[window disableScreenUpdatesUntilFlush];
+    if ([window respondsToSelector:@selector(disableScreenUpdatesUntilFlush)])
+        [window disableScreenUpdatesUntilFlush];
 
     [super renewGState];
 }

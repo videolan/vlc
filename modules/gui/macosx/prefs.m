@@ -184,7 +184,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     [o_prefs_view setHasVerticalScroller: YES];
     [o_prefs_view setDrawsBackground: NO];
     [o_prefs_view setDocumentView: o_empty_view];
-	[o_tree selectRowIndexes: [NSIndexSet indexSetWithIndex: 0] byExtendingSelection: NO];
+    [o_tree selectRowIndexes: [NSIndexSet indexSetWithIndex: 0] byExtendingSelection: NO];
 }
 
 - (void)setTitle: (NSString *) o_title_name
@@ -383,7 +383,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
                     }
                 }
             }
-            
+
             if( module_is_main( p_module) && CONFIG_ITEM(configType) )
             {
                 if( categoryItem && [self isSubCategoryGeneral:lastsubcat] )
@@ -600,7 +600,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     }
 
     assert(view);
-    
+
     int i_lastItem = 0;
     int i_yPos = -2;
     int i_max_label = 0;

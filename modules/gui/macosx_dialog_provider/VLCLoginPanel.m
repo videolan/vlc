@@ -71,7 +71,7 @@
     [_okayButton setAction:@selector(buttonAction:)];
     [_okayButton setKeyEquivalent:@"\r"] ; // enter key
     [ourContentView addSubview:_okayButton];
-    
+
     s_rc.origin.x = 94;
     s_rc.origin.y = 170;
     s_rc.size.height = 14;
@@ -117,7 +117,7 @@
     [_passwordField setEditable:YES];
     [_passwordField setImportsGraphics:NO];
     [ourContentView addSubview:_passwordField];
-    
+
     s_rc.origin.x = 94;
     s_rc.origin.y = 238;
     s_rc.size.height = 17;

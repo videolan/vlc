@@ -107,7 +107,7 @@ static NSMutableArray *blackoutWindows = NULL;
 
 - (CGDirectDisplayID)displayID
 {
-	return (CGDirectDisplayID)[[[self deviceDescription] objectForKey: @"NSScreenNumber"] intValue];
+    return (CGDirectDisplayID)[[[self deviceDescription] objectForKey: @"NSScreenNumber"] intValue];
 }
 
 - (void)blackoutOtherScreens

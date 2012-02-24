@@ -132,7 +132,7 @@
             o_yellow_on_img = [[NSImage imageNamed:@"lion-window-minimize-on-graphite"] retain];
             o_green_img = [[NSImage imageNamed:@"lion-window-zoom-graphite"] retain];
             o_green_over_img = [[NSImage imageNamed:@"lion-window-zoom-over-graphite"] retain];
-            o_green_on_img = [[NSImage imageNamed:@"lion-window-zoom-on-graphite"] retain];            
+            o_green_on_img = [[NSImage imageNamed:@"lion-window-zoom-on-graphite"] retain];
         }
     } else {
         if( [NSColor currentControlTint] == NSBlueControlTint )
@@ -155,7 +155,7 @@
             o_yellow_on_img = [[NSImage imageNamed:@"snowleo-window-minimize-on-graphite"] retain];
             o_green_img = [[NSImage imageNamed:@"snowleo-window-zoom-graphite"] retain];
             o_green_over_img = [[NSImage imageNamed:@"snowleo-window-zoom-over-graphite"] retain];
-            o_green_on_img = [[NSImage imageNamed:@"snowleo-window-zoom-on-graphite"] retain];            
+            o_green_on_img = [[NSImage imageNamed:@"snowleo-window-zoom-on-graphite"] retain];
         }
     }
 }
@@ -262,7 +262,7 @@
 - (NSArray*)accessibilityAttributeNames {
     NSArray *theAttributeNames = [super accessibilityAttributeNames];
     id theControlView = [self controlView];
-    return ([theControlView respondsToSelector: @selector(extendedAccessibilityAttributeNames:)] ? [theControlView extendedAccessibilityAttributeNames: theAttributeNames] : theAttributeNames);	// ask the cell's control view (i.e., the button) for additional attribute values
+    return ([theControlView respondsToSelector: @selector(extendedAccessibilityAttributeNames:)] ? [theControlView extendedAccessibilityAttributeNames: theAttributeNames] : theAttributeNames); // ask the cell's control view (i.e., the button) for additional attribute values
 }
 
 - (id)accessibilityAttributeValue: (NSString*)theAttributeName {
@@ -270,7 +270,7 @@
     if ([theControlView respondsToSelector: @selector(extendedAccessibilityAttributeValue:)]) {
         id theValue = [theControlView extendedAccessibilityAttributeValue: theAttributeName];
         if (theValue) {
-            return theValue;	// if this is an extended attribute value we added, return that -- otherwise, fall back to super's implementation
+            return theValue; // if this is an extended attribute value we added, return that -- otherwise, fall back to super's implementation
         }
     }
     return [super accessibilityAttributeValue: theAttributeName];
@@ -281,7 +281,7 @@
     if ([theControlView respondsToSelector: @selector(extendedAccessibilityIsAttributeSettable:)]) {
         NSNumber *theValue = [theControlView extendedAccessibilityIsAttributeSettable: theAttributeName];
         if (theValue) {
-            return [theValue boolValue];	// same basic strategy we use in -accessibilityAttributeValue:
+            return [theValue boolValue]; // same basic strategy we use in -accessibilityAttributeValue:
         }
     }
     return [super accessibilityIsAttributeSettable: theAttributeName];
@@ -375,7 +375,7 @@
 }
 
 - (NSArray*)extendedAccessibilityAttributeNames: (NSArray*)theAttributeNames {
-    return ([theAttributeNames containsObject: NSAccessibilitySubroleAttribute] ? theAttributeNames : [theAttributeNames arrayByAddingObject: NSAccessibilitySubroleAttribute]);	// run-of-the-mill button cells don't usually have a Subrole attribute, so we add that attribute
+    return ([theAttributeNames containsObject: NSAccessibilitySubroleAttribute] ? theAttributeNames : [theAttributeNames arrayByAddingObject: NSAccessibilitySubroleAttribute]); // run-of-the-mill button cells don't usually have a Subrole attribute, so we add that attribute
 }
 
 - (id)extendedAccessibilityAttributeValue: (NSString*)theAttributeName {
@@ -383,7 +383,7 @@
 }
 
 - (NSNumber*)extendedAccessibilityIsAttributeSettable: (NSString*)theAttributeName {
-    return ([theAttributeName isEqualToString: NSAccessibilitySubroleAttribute] ? [NSNumber numberWithBool: NO] : nil);	// make the Subrole attribute we added non-settable
+    return ([theAttributeName isEqualToString: NSAccessibilitySubroleAttribute] ? [NSNumber numberWithBool: NO] : nil); // make the Subrole attribute we added non-settable
 }
 
 - (void)accessibilityPerformAction: (NSString*)theActionName {

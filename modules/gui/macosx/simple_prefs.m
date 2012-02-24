@@ -272,8 +272,10 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_intf_fspanel_ckb setTitle: _NS("Show Fullscreen Controller")];
     [o_intf_lang_txt setStringValue: _NS("Language")];
     [o_intf_network_box setTitle: _NS("Privacy / Network Interaction")];
-	[o_intf_appleremote_ckb setTitle: _NS("Control playback with the Apple Remote")];
-	[o_intf_mediakeys_ckb setTitle: _NS("Control playback with media keys")];
+
+    [o_intf_appleremote_ckb setTitle: _NS("Control playback with the Apple Remote")];
+
+    [o_intf_mediakeys_ckb setTitle: _NS("Control playback with media keys")];
     [o_intf_update_ckb setTitle: _NS("Automatically check for updates")];
     [o_intf_last_update_lbl setStringValue: @""];
     [o_intf_enableGrowl_ckb setTitle: _NS("Enable Growl notifications (on playlist item change)")];
@@ -464,8 +466,10 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     [self setupButton: o_intf_fspanel_ckb forBoolValue: "macosx-fspanel"];
     [self setupButton: o_intf_nativefullscreen_ckb forBoolValue: "macosx-nativefullscreenmode"];
     [self setupButton: o_intf_embedded_ckb forBoolValue: "embedded-video"];
-	[self setupButton: o_intf_appleremote_ckb forBoolValue: "macosx-appleremote"];
-	[self setupButton: o_intf_mediakeys_ckb forBoolValue: "macosx-mediakeys"];
+
+[self setupButton: o_intf_appleremote_ckb forBoolValue: "macosx-appleremote"];
+
+[self setupButton: o_intf_mediakeys_ckb forBoolValue: "macosx-mediakeys"];
     if( [[SUUpdater sharedUpdater] lastUpdateCheckDate] != NULL )
         [o_intf_last_update_lbl setStringValue: [NSString stringWithFormat: _NS("Last check on: %@"), [[[SUUpdater sharedUpdater] lastUpdateCheckDate] descriptionWithLocale: [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]]]];
     else
@@ -662,9 +666,9 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     assert( p_main );
     unsigned confsize;
     module_config_t *p_config;
-    
+
     p_config = module_config_get (p_main, &confsize);
-    
+
     for (size_t i = 0; i < confsize; i++)
     {
         module_config_t *p_item = p_config + i;
@@ -815,7 +819,8 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
         config_PutInt( p_intf, "macosx-fspanel", [o_intf_fspanel_ckb state] );
         config_PutInt( p_intf, "embedded-video", [o_intf_embedded_ckb state] );
-		config_PutInt( p_intf, "macosx-appleremote", [o_intf_appleremote_ckb state] );
+
+        config_PutInt( p_intf, "macosx-appleremote", [o_intf_appleremote_ckb state] );
         config_PutInt( p_intf, "macosx-mediakeys", [o_intf_mediakeys_ckb state] );
         config_PutInt( p_intf, "macosx-interfacestyle", [o_intf_style_dark_bcell state] );
         config_PutInt( p_intf, "macosx-nativefullscreenmode", [o_intf_nativefullscreen_ckb state] );
@@ -845,11 +850,11 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             }
         }
 
-		/* activate stuff without restart */
-		if( [o_intf_appleremote_ckb state] == YES )
-			[[[VLCMain sharedInstance] appleRemoteController] startListening: [VLCMain sharedInstance]];
-		else
-			[[[VLCMain sharedInstance] appleRemoteController] stopListening: [VLCMain sharedInstance]];
+        /* activate stuff without restart */
+        if( [o_intf_appleremote_ckb state] == YES )
+            [[[VLCMain sharedInstance] appleRemoteController] startListening: [VLCMain sharedInstance]];
+        else
+            [[[VLCMain sharedInstance] appleRemoteController] stopListening: [VLCMain sharedInstance]];
         b_intfSettingChanged = NO;
     }
 
@@ -1320,7 +1325,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             [o_hotkeys_change_taken_lbl setStringValue: [NSString stringWithFormat:
                                                          _NS("This combination is already taken by \"%@\"."),
                                                          [o_hotkeyDescriptions objectAtIndex: i_returnValue2]]];
-        
         else
             [o_hotkeys_change_taken_lbl setStringValue: @""];
 
@@ -1360,7 +1364,8 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 {
     NSMutableString *tempString = [[[NSMutableString alloc] init] autorelease];
     NSString *keyString = [o_theEvent characters];
-	unichar key = [keyString characterAtIndex:0];
+
+    unichar key = [keyString characterAtIndex:0];
 
     /* modifiers */
     if( [o_theEvent modifierFlags] & NSControlKeyMask )

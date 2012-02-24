@@ -28,53 +28,54 @@
 
 - (id)init
 {
-	if(self=[super init])
-	{
-		badgeValue = -1;	//We don't want a badge value by default
+    if(self=[super init])
+    {
+        badgeValue = -1; //We don't want a badge value by default
         sdtype = -1; //no sd type set
-	}
+    }
 
-	return self;
+    return self;
 }
 
 
 + (id)itemWithTitle:(NSString*)aTitle identifier:(NSString*)anIdentifier
 {
-	SideBarItem *item = [SideBarItem itemWithTitle:aTitle identifier:anIdentifier icon:nil];
+    SideBarItem *item = [SideBarItem itemWithTitle:aTitle identifier:anIdentifier icon:nil];
 
-	return item;
+    return item;
 }
 
 
 + (id)itemWithTitle:(NSString*)aTitle identifier:(NSString*)anIdentifier icon:(NSImage*)anIcon
 {
-	SideBarItem *item = [[[SideBarItem alloc] init] autorelease];
 
-	[item setTitle:aTitle];
-	[item setIdentifier:anIdentifier];
-	[item setIcon:anIcon];
+    SideBarItem *item = [[[SideBarItem alloc] init] autorelease];
 
-	return item;
+    [item setTitle:aTitle];
+    [item setIdentifier:anIdentifier];
+    [item setIcon:anIcon];
+
+    return item;
 }
 
 - (void)dealloc
 {
-	[title release];
-	[identifier release];
-	[icon release];
-	[children release];
+    [title release];
+    [identifier release];
+    [icon release];
+    [children release];
 
-	[super dealloc];
+    [super dealloc];
 }
 
 - (void)finalize
 {
-	title = nil;
-	identifier = nil;
-	icon = nil;
-	children = nil;
+    title = nil;
+    identifier = nil;
+    icon = nil;
+    children = nil;
 
-	[super finalize];
+    [super finalize];
 }
 
 #pragma mark -
@@ -82,17 +83,17 @@
 
 - (BOOL)hasBadge
 {
-	return badgeValue!=-1;
+    return badgeValue!=-1;
 }
 
 - (BOOL)hasChildren
 {
-	return [children count]>0;
+    return [children count]>0;
 }
 
 - (BOOL)hasIcon
 {
-	return icon!=nil;
+    return icon!=nil;
 }
 
 @end

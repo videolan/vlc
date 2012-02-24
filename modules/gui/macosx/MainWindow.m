@@ -228,7 +228,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         else
         {
             [o_effects_btn setImage: [NSImage imageNamed:@"effects-double-buttons_dark"]];
-            [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-double-buttons-pressed_dark"]];            
+            [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-double-buttons-pressed_dark"]];
         }
         [o_fullscreen_btn setImage: [NSImage imageNamed:@"fullscreen-double-buttons_dark"]];
         [o_fullscreen_btn setAlternateImage: [NSImage imageNamed:@"fullscreen-double-buttons-pressed_dark"]];
@@ -682,7 +682,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     bool b_value;
     playlist_t *p_playlist = pl_Get( VLCIntf );
     b_value = var_GetBool( p_playlist, "random" );
-	if(b_value) {
+
+    if(b_value) {
         [o_shuffle_btn setImage: o_shuffle_on_img];
         [o_shuffle_btn setAlternateImage: o_shuffle_on_pressed_img];
     }
@@ -779,16 +780,18 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-	SEL s_menuAction = [menuItem action];
-	if ((s_menuAction == @selector(performClose:)) || (s_menuAction == @selector(performMiniaturize:)) || (s_menuAction == @selector(performZoom:)))
-        return YES;
+    SEL s_menuAction = [menuItem action];
 
-	return [super validateMenuItem:menuItem];
+    if ((s_menuAction == @selector(performClose:)) || (s_menuAction == @selector(performMiniaturize:)) || (s_menuAction == @selector(performZoom:)))
+            return YES;
+
+    return [super validateMenuItem:menuItem];
 }
 
 - (BOOL)isMainWindow
 {
-	return YES;
+
+return YES;
 }
 
 - (void)setTitle:(NSString *)title
@@ -1531,7 +1534,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [o_nonembedded_window orderOut: self];
         else
             [super orderOut: self];
-        
+
         [self unlockFullscreenAnimation];
         return;
     }
@@ -1934,11 +1937,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
         NSRect winrect;
         CGFloat f_titleBarHeight = [o_titlebar_view frame].size.height;
         winrect = [self frame];
-        
+
         [o_titlebar_view setFrame: NSMakeRect( 0, winrect.size.height - f_titleBarHeight,
                                               winrect.size.width, f_titleBarHeight )];
         [[self contentView] addSubview: o_titlebar_view];
-        
+
         winrect.size.height = winrect.size.height + f_titleBarHeight;
         [self setFrame: winrect display:NO animate:NO];
         winrect = [o_split_view frame];
@@ -1974,41 +1977,37 @@ static VLCMainWindow *_o_sharedInstance = nil;
 /* taken under BSD-new from the PXSourceList sample project, adapted for VLC */
 - (NSUInteger)sourceList:(PXSourceList*)sourceList numberOfChildrenOfItem:(id)item
 {
-	//Works the same way as the NSOutlineView data source: `nil` means a parent item
-	if(item==nil) {
-		return [o_sidebaritems count];
-	}
-	else {
-		return [[item children] count];
-	}
+    //Works the same way as the NSOutlineView data source: `nil` means a parent item
+    if(item==nil)
+        return [o_sidebaritems count];
+    else
+        return [[item children] count];
 }
 
 
 - (id)sourceList:(PXSourceList*)aSourceList child:(NSUInteger)index ofItem:(id)item
 {
     //Works the same way as the NSOutlineView data source: `nil` means a parent item
-	if(item==nil) {
-		return [o_sidebaritems objectAtIndex:index];
-	}
-	else {
-		return [[item children] objectAtIndex:index];
-	}
+    if(item==nil)
+        return [o_sidebaritems objectAtIndex:index];
+    else
+        return [[item children] objectAtIndex:index];
 }
 
 
 - (id)sourceList:(PXSourceList*)aSourceList objectValueForItem:(id)item
 {
-	return [item title];
+    return [item title];
 }
 
 - (void)sourceList:(PXSourceList*)aSourceList setObjectValue:(id)object forItem:(id)item
 {
-	[item setTitle:object];
+    [item setTitle:object];
 }
 
 - (BOOL)sourceList:(PXSourceList*)aSourceList isItemExpandable:(id)item
 {
-	return [item hasChildren];
+    return [item hasChildren];
 }
 
 
@@ -2017,7 +2016,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if ([[item identifier] isEqualToString: @"playlist"] || [[item identifier] isEqualToString: @"medialibrary"])
         return YES;
 
-	return [item hasBadge];
+    return [item hasBadge];
 }
 
 
@@ -2042,25 +2041,27 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         return i_playlist_size;
     }
-	return [item badgeValue];
+
+    return [item badgeValue];
 }
 
 
 - (BOOL)sourceList:(PXSourceList*)aSourceList itemHasIcon:(id)item
 {
-	return [item hasIcon];
+    return [item hasIcon];
 }
 
 
 - (NSImage*)sourceList:(PXSourceList*)aSourceList iconForItem:(id)item
 {
-	return [item icon];
+    return [item icon];
 }
 
 - (NSMenu*)sourceList:(PXSourceList*)aSourceList menuForEvent:(NSEvent*)theEvent item:(id)item
 {
-	if ([theEvent type] == NSRightMouseDown || ([theEvent type] == NSLeftMouseDown && ([theEvent modifierFlags] & NSControlKeyMask) == NSControlKeyMask)) {
-		if (item != nil)
+    if ([theEvent type] == NSRightMouseDown || ([theEvent type] == NSLeftMouseDown && ([theEvent modifierFlags] & NSControlKeyMask) == NSControlKeyMask))
+    {
+        if (item != nil)
         {
             NSMenu * m;
             if ([item sdtype] > 0)
@@ -2076,8 +2077,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
             }
             return [m autorelease];
         }
-	}
-	return nil;
+    }
+
+    return nil;
 }
 
 - (IBAction)sdmenuhandler:(id)sender
@@ -2109,10 +2111,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)sourceListSelectionDidChange:(NSNotification *)notification
 {
     playlist_t * p_playlist = pl_Get( VLCIntf );
-	NSIndexSet *selectedIndexes = [o_sidebar_view selectedRowIndexes];
+
+    NSIndexSet *selectedIndexes = [o_sidebar_view selectedRowIndexes];
     id item = [o_sidebar_view itemAtRow:[selectedIndexes firstIndex]];
 
-	//Set the label text to represent the new selection
+
+    //Set the label text to represent the new selection
     if ([item sdtype] > -1 && [[item identifier] length] > 0)
     {
         BOOL sd_loaded = playlist_IsServicesDiscoveryLoaded( p_playlist, [[item identifier] UTF8String] );

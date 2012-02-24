@@ -18,15 +18,24 @@
 #define SPSystemDefinedEventMediaKeys 8
 
 @interface SPMediaKeyTap : NSObject {
-	EventHandlerRef _app_switching_ref;
-	EventHandlerRef _app_terminating_ref;
-	CFMachPortRef _eventPort;
-	CFRunLoopSourceRef _eventPortSource;
-	CFRunLoopRef _tapThreadRL;
-	BOOL _shouldInterceptMediaKeyEvents;
-	id _delegate;
-	// The app that is frontmost in this list owns media keys
-	NSMutableArray *_mediaKeyAppList;
+
+EventHandlerRef _app_switching_ref;
+
+EventHandlerRef _app_terminating_ref;
+
+CFMachPortRef _eventPort;
+
+CFRunLoopSourceRef _eventPortSource;
+
+CFRunLoopRef _tapThreadRL;
+
+BOOL _shouldInterceptMediaKeyEvents;
+
+id _delegate;
+
+// The app that is frontmost in this list owns media keys
+
+NSMutableArray *_mediaKeyAppList;
 }
 + (NSArray*)defaultMediaKeyUserBundleIdentifiers;
 

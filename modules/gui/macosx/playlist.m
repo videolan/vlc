@@ -128,7 +128,7 @@
     [o_outline_view setAllowsEmptySelection: NO];
     [o_outline_view expandItem: [o_outline_view itemAtRow:0]];
 
-	[o_outline_view_other setTarget: self];
+    [o_outline_view_other setTarget: self];
     [o_outline_view_other setDelegate: self];
     [o_outline_view_other setDataSource: self];
     [o_outline_view_other setAllowsEmptySelection: NO];
@@ -142,7 +142,7 @@
     [[o_tc_author headerCell] setStringValue:_NS("Author")];
     [[o_tc_duration headerCell] setStringValue:_NS("Duration")];
 
-	[[o_tc_name_other headerCell] setStringValue:_NS("Name")];
+    [[o_tc_name_other headerCell] setStringValue:_NS("Name")];
     [[o_tc_author_other headerCell] setStringValue:_NS("Author")];
     [[o_tc_duration_other headerCell] setStringValue:_NS("Duration")];
 }
@@ -161,21 +161,21 @@
 
 - (void)swapPlaylists:(id)newList
 {
-	if(newList != o_outline_view)
-	{
-		id o_outline_view_temp = o_outline_view;
-		id o_tc_author_temp = o_tc_author;
-		id o_tc_duration_temp = o_tc_duration;
-		id o_tc_name_temp = o_tc_name;
-		o_outline_view = o_outline_view_other;
-		o_tc_author = o_tc_author_other;
-		o_tc_duration = o_tc_duration_other;
-		o_tc_name = o_tc_name_other;
-		o_outline_view_other = o_outline_view_temp;
-		o_tc_author_other = o_tc_author_temp;
-		o_tc_duration_other = o_tc_duration_temp;
-		o_tc_name_other = o_tc_name_temp;
-	}
+    if(newList != o_outline_view)
+    {
+        id o_outline_view_temp = o_outline_view;
+        id o_tc_author_temp = o_tc_author;
+        id o_tc_duration_temp = o_tc_duration;
+        id o_tc_name_temp = o_tc_name;
+        o_outline_view = o_outline_view_other;
+        o_tc_author = o_tc_author_other;
+        o_tc_duration = o_tc_duration_other;
+        o_tc_name = o_tc_name_other;
+        o_outline_view_other = o_outline_view_temp;
+        o_tc_author_other = o_tc_author_temp;
+        o_tc_duration_other = o_tc_duration_temp;
+        o_tc_name_other = o_tc_name_temp;
+    }
 }
 
 - (NSOutlineView *)outlineView
@@ -510,14 +510,14 @@
 
 - (void)swapPlaylists:(id)newList
 {
-	if(newList != o_outline_view)
-	{
-		id o_search_field_temp = o_search_field;
-		o_search_field = o_search_field_other;
-		o_search_field_other = o_search_field_temp;
-		[super swapPlaylists:newList];
-		[self playlistUpdated];
-	}
+    if(newList != o_outline_view)
+    {
+        id o_search_field_temp = o_search_field;
+        o_search_field = o_search_field_other;
+        o_search_field_other = o_search_field_temp;
+        [super swapPlaylists:newList];
+        [self playlistUpdated];
+    }
 }
 
 - (void)playlistUpdated
@@ -1285,7 +1285,7 @@
     }
     if( i_row > -1 )
     {
-		[o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:i_row] byExtendingSelection:NO];
+        [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:i_row] byExtendingSelection:NO];
         [o_outline_view scrollRowToVisible: i_row];
     }
 }
