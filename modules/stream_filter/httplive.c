@@ -40,7 +40,6 @@
 #include <vlc_threads.h>
 #include <vlc_arrays.h>
 #include <vlc_stream.h>
-#include <vlc_url.h>
 #include <vlc_memory.h>
 #include <vlc_gcrypt.h>
 
@@ -69,7 +68,7 @@ typedef struct segment_s
     uint64_t    size;       /* segment size in bytes */
     uint64_t    bandwidth;  /* bandwidth usage of segments (bits per second)*/
 
-    vlc_url_t   url;
+    char        *url;
     char       *psz_key_path;         /* url key path */
     uint8_t     psz_AES_key[16];      /* AES-128 */
     bool        b_key_loaded;
@@ -89,7 +88,7 @@ typedef struct hls_stream_s
                                foreach segment of (segment->duration * hls->bandwidth/8) */
 
     vlc_array_t *segments;  /* list of segments */
-    vlc_url_t   url;        /* uri to m3u8 */
+    char        *url;        /* uri to m3u8 */
     vlc_mutex_t lock;
     bool        b_cache;    /* allow caching */
 
@@ -100,7 +99,7 @@ typedef struct hls_stream_s
 
 struct stream_sys_t
 {
-    vlc_url_t     m3u8;         /* M3U8 url */
+    char         *m3u8;         /* M3U8 url */
     vlc_thread_t  reload;       /* HLS m3u8 reload thread */
     vlc_thread_t  thread;       /* HLS segment download thread */
 
@@ -152,7 +151,7 @@ static int  Peek   (stream_t *, const uint8_t **pp_peek, unsigned int i_peek);
 static int  Control(stream_t *, int i_query, va_list);
 
 static ssize_t read_M3U8_from_stream(stream_t *s, uint8_t **buffer);
-static ssize_t read_M3U8_from_url(stream_t *s, vlc_url_t *url, uint8_t **buffer);
+static ssize_t read_M3U8_from_url(stream_t *s, const char *psz_url, uint8_t **buffer);
 static char *ReadLine(uint8_t *buffer, uint8_t **pos, size_t len);
 
 static int hls_Download(stream_t *s, segment_t *segment);
@@ -162,8 +161,6 @@ static void* hls_Reload(void *);
 
 static segment_t *segment_GetSegment(hls_stream_t *hls, int wanted);
 static void segment_Free(segment_t *segment);
-
-static char *ConstructUrl(vlc_url_t *url);
 
 /****************************************************************************
  *
@@ -224,7 +221,12 @@ static hls_stream_t *hls_New(vlc_array_t *hls_stream, const int id, const uint64
     hls->sequence = 0; /* default is 0 */
     hls->version = 1;  /* default protocol version */
     hls->b_cache = true;
-    vlc_UrlParse(&hls->url, uri, 0);
+    hls->url = strdup(uri);
+    if (hls->url == NULL)
+    {
+        free(hls);
+        return NULL;
+    }
     hls->psz_current_key_path = NULL;
     hls->segments = vlc_array_new();
     vlc_array_append(hls_stream, hls);
@@ -245,7 +247,7 @@ static void hls_Free(hls_stream_t *hls)
         }
         vlc_array_destroy(hls->segments);
     }
-    vlc_UrlClean(&hls->url);
+    free(hls->url);
     free(hls->psz_current_key_path);
     free(hls);
 }
@@ -267,14 +269,12 @@ static hls_stream_t *hls_Copy(hls_stream_t *src, const bool b_cp_segments)
     dst->b_cache = src->b_cache;
     dst->psz_current_key_path = src->psz_current_key_path ?
                 strdup( src->psz_current_key_path ) : NULL;
-    char *uri = ConstructUrl(&src->url);
-    if (uri == NULL)
+    dst->url = strdup(src->url);
+    if (dst->url == NULL)
     {
         free(dst);
         return NULL;
     }
-    vlc_UrlParse(&dst->url, uri, 0);
-    free( uri );
     if (!b_cp_segments)
         dst->segments = vlc_array_new();
     vlc_mutex_init(&dst->lock);
@@ -358,7 +358,12 @@ static segment_t *segment_New(hls_stream_t* hls, const int duration, const char 
     segment->size = 0; /* bytes */
     segment->sequence = 0;
     segment->bandwidth = 0;
-    vlc_UrlParse(&segment->url, uri, 0);
+    segment->url = strdup(uri);
+    if (segment->url == NULL)
+    {
+        free(segment);
+        return NULL;
+    }
     segment->data = NULL;
     vlc_array_append(hls->segments, segment);
     vlc_mutex_init(&segment->lock);
@@ -373,7 +378,7 @@ static void segment_Free(segment_t *segment)
 {
     vlc_mutex_destroy(&segment->lock);
 
-    vlc_UrlClean(&segment->url);
+    free(segment->url);
     free(segment->psz_key_path);
     if (segment->data)
         block_Release(segment->data);
@@ -517,124 +522,22 @@ static int string_to_IV(const char *string_hexa, uint8_t iv[AES_BLOCK_SIZE])
     return VLC_SUCCESS;
 }
 
-static char *relative_URI(stream_t *s, const char *uri, const vlc_url_t *url)
+static char *relative_URI(const char *psz_url, const char *psz_path)
 {
-    stream_sys_t *p_sys = s->p_sys;
-    char *psz_password = NULL;
-    char *psz_username = NULL;
-    char *psz_protocol = NULL;
-    char *psz_path = NULL;
-    char *psz_host = NULL;
-    char *psz_uri = NULL;
-    int  i_port = -1;
-
-    char *p = strchr(uri, ':');
-    if (p != NULL)
+    assert(psz_url != NULL && psz_path != NULL);
+    //If the path is actually an absolute URL, don't do anything.
+    if (strncmp(psz_path, "http", 4) == 0)
         return NULL;
 
-    /* Determine protocol to use */
-    if (url && url->psz_protocol)
-    {
-        psz_protocol = strdup(url->psz_protocol);
-        i_port = url->i_port;
-    }
-    else if (p_sys->m3u8.psz_protocol)
-    {
-        psz_protocol = strdup(p_sys->m3u8.psz_protocol);
-        i_port = p_sys->m3u8.i_port;
-    }
-
-    /* Determine host to use */
-    if (url && url->psz_host)
-        psz_host = strdup(url->psz_host);
-    else if (p_sys->m3u8.psz_host)
-        psz_host = strdup(p_sys->m3u8.psz_host);
-
-    /* Determine path to use */
-    if (url && url->psz_path != NULL)
-        psz_path = strdup(url->psz_path);
-    else if (p_sys->m3u8.psz_path != NULL)
-        psz_path = strdup(p_sys->m3u8.psz_path);
-
-    if ((psz_protocol == NULL) ||
-        (psz_path == NULL) ||
-        (psz_host == NULL))
-        goto fail;
-
-    p = strrchr(psz_path, '/');
-    if (p) *p = '\0';
-
-    /* Determine credentials to use */
-    if (url && url->psz_username)
-        psz_username = strdup(url->psz_username);
-    else if (p_sys->m3u8.psz_username)
-        psz_username = strdup(p_sys->m3u8.psz_username);
-
-    if (url && url->psz_password)
-        psz_password = strdup(url->psz_password);
-    else if (p_sys->m3u8.psz_password)
-        psz_password = strdup(p_sys->m3u8.psz_password);
-
-    /* */
-    if (psz_password || psz_username)
-    {
-        if (asprintf(&psz_uri, "%s://%s:%s@%s:%d%s/%s",
-                     psz_protocol,
-                     psz_username ? psz_username : "",
-                     psz_password ? psz_password : "",
-                     psz_host, i_port,
-                     psz_path, uri) < 0)
-            goto fail;
-    }
-    else
-    {
-        if (asprintf(&psz_uri, "%s://%s:%d%s/%s",
-                     psz_protocol, psz_host, i_port,
-                     psz_path, uri) < 0)
-           goto fail;
-    }
-
-fail:
-    free(psz_password);
-    free(psz_username);
-    free(psz_protocol);
-    free(psz_path);
-    free(psz_host);
-    return psz_uri;
-}
-
-static char *ConstructUrl(vlc_url_t *url)
-{
-    if ((url->psz_protocol == NULL) ||
-        (url->psz_path == NULL))
+    char    *path_end = strrchr(psz_url, '/');
+    if (path_end == NULL)
         return NULL;
-
-    if (url->i_port <= 0)
-    {
-        if (strncmp(url->psz_protocol, "https", 5) == 0)
-            url->i_port = 443;
-        else
-            url->i_port = 80;
-    }
-
-    char *psz_url = NULL;
-    if (url->psz_password || url->psz_username)
-    {
-        if (asprintf(&psz_url, "%s://%s:%s@%s:%d%s",
-                     url->psz_protocol,
-                     url->psz_username, url->psz_password,
-                     url->psz_host, url->i_port, url->psz_path) < 0)
-            return NULL;
-    }
-    else
-    {
-        if (asprintf(&psz_url, "%s://%s:%d%s",
-                     url->psz_protocol,
-                     url->psz_host, url->i_port, url->psz_path) < 0)
-            return NULL;
-    }
-
-    return psz_url;
+    unsigned int    url_length = path_end - psz_url + 1;
+    char    *psz_res = malloc(url_length + strlen(psz_path) + 1);
+    strncpy(psz_res, psz_url, url_length);
+    psz_res[url_length] = 0;
+    strcat(psz_res, psz_path);
+    return psz_res;
 }
 
 static int parse_SegmentInformation(hls_stream_t *hls, char *p_read, int *duration)
@@ -690,7 +593,7 @@ static int parse_AddSegment(stream_t *s, hls_stream_t *hls, const int duration, 
     /* Store segment information */
     vlc_mutex_lock(&hls->lock);
 
-    char *psz_uri = relative_URI(s, uri, &hls->url);
+    char *psz_uri = relative_URI(hls->url, uri);
 
     segment_t *segment = segment_New(hls, duration, psz_uri ? psz_uri : uri);
     if (segment)
@@ -753,7 +656,7 @@ static int parse_StreamInformation(stream_t *s, vlc_array_t **hls_stream,
 
     msg_Info(s, "bandwidth adaptation detected (program-id=%d, bandwidth=%"PRIu64").", id, bw);
 
-    char *psz_uri = relative_URI(s, uri, NULL);
+    char *psz_uri = relative_URI(s->p_sys->m3u8, uri);
 
     *hls = hls_New(*hls_stream, id, bw, psz_uri ? psz_uri : uri);
 
@@ -1054,7 +957,7 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
 
                         /* Download playlist file from server */
                         uint8_t *buf = NULL;
-                        ssize_t len = read_M3U8_from_url(s, &hls->url, &buf);
+                        ssize_t len = read_M3U8_from_url(s, hls->url, &buf);
                         if (len < 0)
                             err = VLC_EGENERIC;
                         else
@@ -1094,11 +997,7 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
         else
         {
             /* No Meta playlist used */
-            char* uri = ConstructUrl( &s->p_sys->m3u8 );
-            if (uri == NULL)
-                return VLC_EGENERIC;
-            hls = hls_New(streams, 0, 0, uri);
-            free( uri );
+            hls = hls_New(streams, 0, 0, p_sys->m3u8);
             if (hls)
             {
                 /* Get TARGET-DURATION first */
@@ -1341,7 +1240,7 @@ static int get_HTTPLiveMetaPlaylist(stream_t *s, vlc_array_t **streams)
 
         /* Download playlist file from server */
         uint8_t *buf = NULL;
-        ssize_t len = read_M3U8_from_url(s, &dst->url, &buf);
+        ssize_t len = read_M3U8_from_url(s, dst->url, &buf);
         if (len < 0)
             err = VLC_EGENERIC;
         else
@@ -1373,33 +1272,32 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
         {
             vlc_mutex_lock(&segment->lock);
 
-            assert(p->url.psz_path);
-            assert(segment->url.psz_path);
+            assert(p->url);
+            assert(segment->url);
 
             /* they should be the same */
             if ((p->sequence != segment->sequence) ||
                 (p->duration != segment->duration) ||
-                (strcmp(p->url.psz_path, segment->url.psz_path) != 0))
+                (strcmp(p->url, segment->url) != 0))
             {
                 msg_Warn(s, "existing segment found with different content - resetting");
                 msg_Warn(s, "- sequence: new=%d, old=%d", p->sequence, segment->sequence);
                 msg_Warn(s, "- duration: new=%d, old=%d", p->duration, segment->duration);
-                msg_Warn(s, "- file: new=%s", p->url.psz_path);
-                msg_Warn(s, "        old=%s", segment->url.psz_path);
+                msg_Warn(s, "- file: new=%s", p->url);
+                msg_Warn(s, "        old=%s", segment->url);
 
                 /* Resetting content */
-                char *psz_url = ConstructUrl(&p->url);
-                if (psz_url == NULL)
+                segment->sequence = p->sequence;
+                segment->duration = p->duration;
+                free(segment->url);
+                segment->url = strdup(p->url);
+                if ( segment->url == NULL )
                 {
                     msg_Err(s, "Failed updating segment %d - skipping it",  p->sequence);
                     segment_Free(p);
                     vlc_mutex_unlock(&segment->lock);
                     continue;
                 }
-                segment->sequence = p->sequence;
-                segment->duration = p->duration;
-                vlc_UrlClean(&segment->url);
-                vlc_UrlParse(&segment->url, psz_url, 0);
                 /* We must free the content, because if the key was not downloaded, content can't be decrypted */
                 if (segment->data)
                 {
@@ -1409,7 +1307,6 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
                 free(segment->psz_key_path);
                 segment->psz_key_path = p->psz_key_path ? strdup(p->psz_key_path) : NULL;
                 segment_Free(p);
-                free(psz_url);
             }
             vlc_mutex_unlock(&segment->lock);
         }
@@ -1782,13 +1679,7 @@ static int hls_Download(stream_t *s, segment_t *segment)
 {
     assert(segment);
 
-    /* Construct URL */
-    char *psz_url = ConstructUrl(&segment->url);
-    if (psz_url == NULL)
-           return VLC_ENOMEM;
-
-    stream_t *p_ts = stream_UrlNew(s, psz_url);
-    free(psz_url);
+    stream_t *p_ts = stream_UrlNew(s, segment->url);
     if (p_ts == NULL)
         return VLC_EGENERIC;
 
@@ -1878,17 +1769,12 @@ static ssize_t read_M3U8_from_stream(stream_t *s, uint8_t **buffer)
     return total_bytes;
 }
 
-static ssize_t read_M3U8_from_url(stream_t *s, vlc_url_t *url, uint8_t **buffer)
+static ssize_t read_M3U8_from_url(stream_t *s, const char* psz_url, uint8_t **buffer)
 {
     assert(*buffer == NULL);
 
     /* Construct URL */
-    char *psz_url = ConstructUrl(url);
-    if (psz_url == NULL)
-           return VLC_ENOMEM;
-
     stream_t *p_m3u8 = stream_UrlNew(s, psz_url);
-    free(psz_url);
     if (p_m3u8 == NULL)
         return VLC_EGENERIC;
 
@@ -1956,8 +1842,7 @@ static int Open(vlc_object_t *p_this)
         free(p_sys);
         return VLC_ENOMEM;
     }
-    vlc_UrlParse(&p_sys->m3u8, psz_uri, 0);
-    free(psz_uri);
+    p_sys->m3u8 = psz_uri;
 
     p_sys->bandwidth = 0;
     p_sys->b_live = true;
@@ -1967,7 +1852,7 @@ static int Open(vlc_object_t *p_this)
     p_sys->hls_stream = vlc_array_new();
     if (p_sys->hls_stream == NULL)
     {
-        vlc_UrlClean(&p_sys->m3u8);
+        free(p_sys->m3u8);
         free(p_sys);
         return VLC_ENOMEM;
     }
@@ -2055,7 +1940,7 @@ fail:
     vlc_array_destroy(p_sys->hls_stream);
 
     /* */
-    vlc_UrlClean(&p_sys->m3u8);
+    free(p_sys->m3u8);
     free(p_sys);
     return VLC_EGENERIC;
 }
@@ -2091,7 +1976,7 @@ static void Close(vlc_object_t *p_this)
     vlc_array_destroy(p_sys->hls_stream);
 
     /* */
-    vlc_UrlClean(&p_sys->m3u8);
+    free(p_sys->m3u8);
     if (p_sys->peeked)
         block_Release (p_sys->peeked);
     free(p_sys);
