@@ -1,6 +1,6 @@
 # SDL
 
-SDL_VERSION := 1.2.14
+SDL_VERSION := 1.2.15
 SDL_URL := http://www.libsdl.org/release/SDL-$(SDL_VERSION).tar.gz
 
 #PKGS += sdl
