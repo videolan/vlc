@@ -30,6 +30,10 @@
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
+#include <vlc_input.h>
+#include <vlc_vout.h>
+#include <vlc_plugin.h>
+#include <vlc_playlist.h>
 
 #include <unistd.h>
 #include <limits.h>
@@ -90,6 +94,87 @@ DBUS_METHOD( Identity )
 
     if( !dbus_message_iter_close_container( &args, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
+    REPLY_SEND;
+}
+
+static int
+MarshalCanSetFullscreen( intf_thread_t *p_intf, DBusMessageIter *container )
+{
+    const dbus_bool_t b_ret = (p_intf->p_sys->p_playlist) ? TRUE : FALSE;
+
+    dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN, &b_ret );
+    return VLC_SUCCESS;
+}
+
+DBUS_METHOD( CanSetFullscreen )
+{
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+
+    DBusMessageIter v;
+    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "b", &v );
+
+    MarshalCanSetFullscreen( p_this, &v );
+
+    if( !dbus_message_iter_close_container( &args, &v ) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
+    REPLY_SEND;
+}
+
+static void
+MarshalFullscreen( intf_thread_t *p_intf, DBusMessageIter *container )
+{
+    dbus_bool_t b_fullscreen;
+
+    if ( p_intf->p_sys->p_playlist )
+        b_fullscreen = var_GetBool( p_intf->p_sys->p_playlist , "fullscreen" );
+    else
+        b_fullscreen = FALSE;
+
+    dbus_message_iter_append_basic( container,
+            DBUS_TYPE_BOOLEAN, &b_fullscreen );
+}
+
+DBUS_METHOD( FullscreenGet )
+{
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+
+    DBusMessageIter v;
+
+    if( !dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "b", &v ) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
+    MarshalFullscreen( p_this, &v );
+
+    if( !dbus_message_iter_close_container( &args, &v ) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
+    REPLY_SEND;
+}
+
+DBUS_METHOD( FullscreenSet )
+{
+    REPLY_INIT;
+    dbus_bool_t b_fullscreen;
+    input_thread_t *p_input = NULL;
+
+    if( VLC_SUCCESS != DemarshalSetPropertyValue( p_from, &b_fullscreen ) )
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+
+    if (INTF->p_sys->p_input)
+    {
+        p_input = (input_thread_t*) vlc_object_hold( INTF->p_sys->p_input );
+        vout_thread_t* p_vout = input_GetVout( p_input );
+        vlc_object_release( p_input );
+
+        if ( p_vout )
+            var_SetBool( p_vout, "fullscreen", ( b_fullscreen == TRUE ) );
+        if ( PL )
+            var_SetBool( PL , "fullscreen", ( b_fullscreen == TRUE ) );
+    }
 
     REPLY_SEND;
 }
@@ -343,7 +428,35 @@ DBUS_METHOD( GetProperty )
     PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "SupportedUriSchemes", SupportedUriSchemes )
     PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "HasTrackList",        HasTrackList )
     PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "CanQuit",             CanQuit )
+    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "CanSetFullscreen",    CanSetFullscreen )
+    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "Fullscreen",          FullscreenGet )
     PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "CanRaise",            CanRaise )
+    PROPERTY_MAPPING_END
+}
+
+DBUS_METHOD( SetProperty )
+{
+    DBusError error;
+
+    char *psz_interface_name = NULL;
+    char *psz_property_name  = NULL;
+
+    dbus_error_init( &error );
+    dbus_message_get_args( p_from, &error,
+            DBUS_TYPE_STRING, &psz_interface_name,
+            DBUS_TYPE_STRING, &psz_property_name,
+            DBUS_TYPE_INVALID );
+
+    if( dbus_error_is_set( &error ) )
+    {
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s",
+                                        error.message );
+        dbus_error_free( &error );
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+
+    PROPERTY_MAPPING_BEGIN
+    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "Fullscreen",    FullscreenSet )
     PROPERTY_MAPPING_END
 }
 
@@ -425,6 +538,7 @@ DBUS_METHOD( GetAllProperties )
     ADD_PROPERTY( SupportedUriSchemes, "as" );
     ADD_PROPERTY( HasTrackList,        "b"  );
     ADD_PROPERTY( CanQuit,             "b"  );
+    ADD_PROPERTY( CanSetFullscreen,    "b"  );
     ADD_PROPERTY( CanRaise,            "b"  );
 
     dbus_message_iter_close_container( &args, &dict );
@@ -444,6 +558,7 @@ handle_root ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this )
 {
     METHOD_MAPPING_BEGIN
     METHOD_FUNC( DBUS_INTERFACE_PROPERTIES, "Get",          GetProperty );
+    METHOD_FUNC( DBUS_INTERFACE_PROPERTIES, "Set",          SetProperty );
     METHOD_FUNC( DBUS_INTERFACE_PROPERTIES, "GetAll",       GetAllProperties );
     METHOD_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "Quit",         Quit );
     METHOD_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "Raise",        Raise );
@@ -453,3 +568,75 @@ handle_root ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this )
 #undef METHOD_MAPPING_BEGIN
 #undef METHOD_FUNC
 #undef METHOD_MAPPING_END
+/**
+ * PropertiesChangedSignal() synthetizes and sends the
+ * org.freedesktop.DBus.Properties.PropertiesChanged signal
+ */
+
+static DBusHandlerResult
+PropertiesChangedSignal( intf_thread_t    *p_intf,
+                         vlc_dictionary_t *p_changed_properties )
+{
+    DBusConnection  *p_conn = p_intf->p_sys->p_conn;
+    DBusMessageIter changed_properties, invalidated_properties, entry, variant;
+    const char *psz_interface_name = DBUS_MPRIS_ROOT_INTERFACE;
+    char **ppsz_properties = NULL;
+    int i_properties = 0;
+
+    SIGNAL_INIT( DBUS_INTERFACE_PROPERTIES,
+                 DBUS_MPRIS_OBJECT_PATH,
+                 "PropertiesChanged" );
+
+    OUT_ARGUMENTS;
+    ADD_STRING( &psz_interface_name );
+    dbus_message_iter_open_container( &args, DBUS_TYPE_ARRAY, "{sv}",
+                                      &changed_properties );
+
+    i_properties = vlc_dictionary_keys_count( p_changed_properties );
+    ppsz_properties = vlc_dictionary_all_keys( p_changed_properties );
+
+    for( int i = 0; i < i_properties; i++ )
+    {
+        dbus_message_iter_open_container( &changed_properties,
+                                          DBUS_TYPE_DICT_ENTRY, NULL,
+                                          &entry );
+
+        dbus_message_iter_append_basic( &entry, DBUS_TYPE_STRING,
+                                        &ppsz_properties[i] );
+
+        if( !strcmp( ppsz_properties[i], "Fullscreen" ) )
+        {
+            dbus_message_iter_open_container( &entry,
+                                              DBUS_TYPE_VARIANT, "b",
+                                              &variant );
+            MarshalFullscreen( p_intf, &variant );
+            dbus_message_iter_close_container( &entry, &variant );
+        }
+
+        dbus_message_iter_close_container( &changed_properties, &entry );
+        free( ppsz_properties[i] );
+    }
+
+    dbus_message_iter_close_container( &args, &changed_properties );
+
+    dbus_message_iter_open_container( &args, DBUS_TYPE_ARRAY, "s",
+                                      &invalidated_properties );
+
+    dbus_message_iter_close_container( &args, &invalidated_properties );
+    free( ppsz_properties );
+
+    SIGNAL_SEND;
+}
+
+/*****************************************************************************
+ * RootPropertiesChangedEmit: Emits the Seeked signal
+ *****************************************************************************/
+int RootPropertiesChangedEmit( intf_thread_t    *p_intf,
+                               vlc_dictionary_t *p_changed_properties )
+{
+    if( p_intf->p_sys->b_dead )
+        return VLC_SUCCESS;
+
+    PropertiesChangedSignal( p_intf, p_changed_properties );
+    return VLC_SUCCESS;
+}

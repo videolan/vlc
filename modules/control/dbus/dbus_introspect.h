@@ -63,6 +63,8 @@ static const char* psz_introspection_xml =
 "    <property name=\"SupportedUriSchemes\" type=\"as\" access=\"read\" />\n"
 "    <property name=\"HasTrackList\" type=\"b\" access=\"read\" />\n"
 "    <property name=\"CanQuit\" type=\"b\" access=\"read\" />\n"
+"    <property name=\"CanSetFullscreen\" type=\"b\" access=\"read\" />\n"
+"    <property name=\"Fullscreen\" type=\"b\" access=\"readwrite\" />\n"
 "    <property name=\"CanRaise\" type=\"b\" access=\"read\" />\n"
 "    <method name=\"Quit\" />\n"
 "    <method name=\"Raise\" />\n"

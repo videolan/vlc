@@ -36,5 +36,7 @@
 DBusHandlerResult handle_root ( DBusConnection *p_conn,
                                 DBusMessage *p_from,
                                 void *p_this );
+int RootPropertiesChangedEmit ( intf_thread_t *,
+                                vlc_dictionary_t * );
 
 #endif //dbus-root.h
