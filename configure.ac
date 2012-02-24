@@ -618,7 +618,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua chorus_flanger freetype avcodec avformat access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate freetype mod mpc dmo mp4 quicktime realvideo qt4 compressor headphone_channel_mixer normvol audiobargraph_a speex mono colorthres extract ball access_imem hotkeys mosaic gaussianblur dbus x264 hqdn3d anaglyph],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua chorus_flanger freetype avcodec avformat access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate freetype mod mpc dmo mp4 quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a speex mono colorthres extract ball access_imem hotkeys mosaic gaussianblur dbus x264 hqdn3d anaglyph],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -660,7 +660,7 @@ AS_IF([test "${have_dynamic_objects}" != "no"], [
 AM_CONDITIONAL(HAVE_DYNAMIC_PLUGINS, [test "${have_dynamic_objects}" != "no"])
 
 AC_SUBST(LIBDL)
-VLC_ADD_LIBS([realvideo lua],[$LIBDL])
+VLC_ADD_LIBS([lua],[$LIBDL])
 
 dnl Check for thread library
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
@@ -2603,15 +2603,6 @@ if test "${enable_quicktime}" = "yes"; then
 fi
 
 dnl
-dnl  Real plugin
-dnl
-AC_ARG_ENABLE(real,
-  [  --enable-real           Real video decoder module (default disabled)])
-if test "${enable_real}" = "yes"; then
-  VLC_ADD_PLUGIN([realvideo])
-fi
-
-dnl
 dnl A52/AC3 decoder plugin
 dnl
 AC_ARG_ENABLE(a52,
@@ -4072,9 +4063,8 @@ AC_ARG_ENABLE(loader,
 AM_CONDITIONAL(LOADER, [test "${enable_loader}" = "yes"])
 AS_IF([test "${enable_loader}" = "yes"],
   [ VLC_ADD_PLUGIN([dmo])
-    VLC_ADD_CPPFLAGS([dmo quicktime realvideo],[-I\\\${top_srcdir}/modules/codec/loader])
-    VLC_ADD_LIBS([dmo quicktime realvideo],[\\\${top_builddir}/modules/codec/loader/libloader.la])
-    VLC_ADD_CPPFLAGS([realvideo], [-DLOADER])
+    VLC_ADD_CPPFLAGS([dmo quicktime ],[-I\\\${top_srcdir}/modules/codec/loader])
+    VLC_ADD_LIBS([dmo quicktime ],[\\\${top_builddir}/modules/codec/loader/libloader.la])
     VLC_ADD_LIBS([dmo quicktime], [-lpthread])
   ])
 

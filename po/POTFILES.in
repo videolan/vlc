@@ -383,7 +383,6 @@ modules/codec/omxil/utils.c
 modules/codec/png.c
 modules/codec/quicktime.c
 modules/codec/rawvideo.c
-modules/codec/realvideo.c
 modules/codec/schroedinger.c
 modules/codec/sdl_image.c
 modules/codec/shine/shine_mod.c
