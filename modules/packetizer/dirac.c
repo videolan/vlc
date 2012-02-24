@@ -297,7 +297,7 @@ static int block_ChainToArray( block_t *p_block, block_t ***ppp_array)
 
 /**
  * Destructively find and recover the earliest timestamp from start of
- * bytestream, upto i_length.
+ * bytestream, up to i_length.
  */
 static void dirac_RecoverTimestamps ( decoder_t *p_dec, size_t i_length )
 {
@@ -520,7 +520,7 @@ static bool dirac_UnpackSeqHdr( struct seq_hdr_t *p_sh, block_t *p_block )
     uint32_t u_video_format = dirac_uint( &bs ); /* index */
     if( u_video_format > 20 )
     {
-        /* dont know how to parse this header */
+        /* don't know how to parse this header */
         return false;
     }
 
@@ -791,7 +791,7 @@ sync_fail:
     /* recover any timestamps from the data that is about to be flushed */
     dirac_RecoverTimestamps( p_dec, p_sys->i_offset );
 
-    /* flush everything upto the start of the DU */
+    /* flush everything up to the start of the DU */
     block_SkipBytes( &p_sys->bytestream, p_sys->i_offset );
     block_BytestreamFlush( &p_sys->bytestream );
     p_sys->i_offset = 0;
@@ -1038,7 +1038,7 @@ static block_t *dirac_BuildEncapsulationUnit( decoder_t *p_dec, block_t *p_block
  *
  * Returns:
  *  0: everything ok
- *  1: EOS occured, please flush and reset
+ *  1: EOS occurred, please flush and reset
  *  2: picture number discontinuity, please flush and reset
  */
 static int dirac_TimeGenPush( decoder_t *p_dec, block_t *p_block_in )

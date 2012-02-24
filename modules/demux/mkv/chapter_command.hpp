@@ -61,7 +61,7 @@ public:
 
     void AddCommand( const KaxChapterProcessCommand & command );
 
-    /// \return wether the codec has seeked in the files or not
+    /// \return whether the codec has seeked in the files or not
     virtual bool Enter() { return false; }
     virtual bool Leave() { return false; }
     virtual std::string GetCodecName( bool ) const { return ""; }
@@ -190,7 +190,7 @@ protected:
     // DVD command IDs
 
     // Tests
-    // wether it's a comparison on the value or register
+    // whether it's a comparison on the value or register
     static const uint16 CMD_DVD_TEST_VALUE          = 0x80;
     static const uint16 CMD_DVD_IF_GPREG_AND        = (1 << 4);
     static const uint16 CMD_DVD_IF_GPREG_EQUAL      = (2 << 4);

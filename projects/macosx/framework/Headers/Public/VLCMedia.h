@@ -64,7 +64,7 @@ typedef enum VLCMediaState
     VLCMediaStateNothingSpecial,        //< Nothing
     VLCMediaStateBuffering,             //< Stream is buffering
     VLCMediaStatePlaying,               //< Stream is playing
-    VLCMediaStateError,                 //< Can't be played because an error occured
+    VLCMediaStateError,                 //< Can't be played because an error occurred
 } VLCMediaState;
 
 /**

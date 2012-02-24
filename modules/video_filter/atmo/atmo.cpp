@@ -2062,7 +2062,7 @@ static void ExtractMiniImage_YUV(filter_sys_t *p_sys,
 
     /*  these two ugly loops extract the small image - goes it faster? how?
     the loops are so designed that there is a small border around the extracted
-    image so we wont get column and row - zero from the frame, and not the most
+    image so we won't get column and row - zero from the frame, and not the most
     right and bottom pixels --- which may be clipped on computers useing TV out
     - through overscan!
 

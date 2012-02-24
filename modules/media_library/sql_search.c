@@ -70,7 +70,7 @@ int FindVa( media_library_t *p_ml,
     if( Query( p_ml, &pp_results, &i_rows, &i_cols, "%s", psz_query )
         != VLC_SUCCESS )
     {
-        msg_Err( p_ml, "Error occured while making the query to the database" );
+        msg_Err( p_ml, "Error occurred while making the query to the database" );
         return VLC_EGENERIC;
     }
 
@@ -114,7 +114,7 @@ int FindAdv( media_library_t *p_ml, vlc_array_t *p_result_array,
     if( Query( p_ml, &pp_results, &i_rows, &i_cols, "%s", psz_query )
         != VLC_SUCCESS )
     {
-        msg_Err( p_ml, "Error occured while making the query to the database" );
+        msg_Err( p_ml, "Error occurred while making the query to the database" );
         return VLC_EGENERIC;
     }
 
@@ -861,7 +861,7 @@ exit:
     free( ppsz_frompersons );
 
     if( i_ret != VLC_SUCCESS )
-        msg_Warn( p_ml, "an unknown error occured (%d)", i_ret );
+        msg_Warn( p_ml, "an unknown error occurred (%d)", i_ret );
 
     return i_ret;
 }

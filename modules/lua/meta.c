@@ -192,7 +192,7 @@ static int read_meta( vlc_object_t *p_this, const char * psz_filename,
     int i_ret = run(p_this, psz_filename, L, "read_meta");
     lua_close( L );
 
-    // Continue even if an error occured: all "meta reader" are always run.
+    // Continue even if an error occurred: all "meta reader" are always run.
     return i_ret == VLC_SUCCESS ? VLC_EGENERIC : i_ret;
 }
 

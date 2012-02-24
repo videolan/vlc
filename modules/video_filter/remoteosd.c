@@ -652,7 +652,7 @@ static void* vnc_worker_thread( void *obj )
 
     if( !handshaking ( p_filter ) )
     {
-        msg_Err( p_filter, "Error occured while handshaking vnc host" );
+        msg_Err( p_filter, "Error occurred while handshaking vnc host" );
         goto exit;
     }
 

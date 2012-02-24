@@ -500,7 +500,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)resetPreviousButton
 {
     if (([NSDate timeIntervalSinceReferenceDate] - last_bwd_event) >= 0.35) {
-        // seems like no further event occured, so let's switch the playback item
+        // seems like no further event occurred, so let's switch the playback item
         [[VLCCoreInteraction sharedInstance] previous];
         just_triggered_previous = NO;
     }
@@ -539,7 +539,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)resetNextButton
 {
     if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) >= 0.35) {
-        // seems like no further event occured, so let's switch the playback item
+        // seems like no further event occurred, so let's switch the playback item
         [[VLCCoreInteraction sharedInstance] next];
         just_triggered_next = NO;
     }

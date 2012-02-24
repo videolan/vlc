@@ -731,7 +731,7 @@ static void Run(intf_thread_t *p_intf)
                     return;
 
                 case VLC_SUCCESS:
-                    msg_Dbg(p_intf, "Handshake successfull :)");
+                    msg_Dbg(p_intf, "Handshake successful :)");
                     b_handshaked = true;
                     i_interval = 0;
                     next_exchange = mdate();

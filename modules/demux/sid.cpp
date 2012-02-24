@@ -174,7 +174,7 @@ static int Open (vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
-    msg_Err (demux, "An error occured during sid demuxing" );
+    msg_Err (demux, "An error occurred during sid demuxing" );
     delete player;
     delete builder;
     delete tune;

@@ -289,13 +289,13 @@ vlc_module_begin()
     change_integer_range(-1, 4);
 
     /* advanced option only */
-    /* NB, unforunately vlc doesn't have a concept of 'dont care' */
+    /* NB, unforunately vlc doesn't have a concept of 'don't care' */
     add_integer( ENC_CFG_PREFIX ENC_MULTIQUANT, -1,
                  ENC_MULTIQUANT_TEXT, ENC_MULTIQUANT_LONGTEXT, true )
     change_integer_range(-1, 1);
 
     /* advanced option only */
-    /* NB, unforunately vlc doesn't have a concept of 'dont care' */
+    /* NB, unforunately vlc doesn't have a concept of 'don't care' */
     add_integer( ENC_CFG_PREFIX ENC_SPARTITION, -1,
                  ENC_SPARTITION_TEXT, ENC_SPARTITION_LONGTEXT, true )
     change_integer_range(-1, 1);

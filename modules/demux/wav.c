@@ -388,7 +388,7 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
-    msg_Err( p_demux, "An error occured during wav demuxing" );
+    msg_Err( p_demux, "An error occurred during wav demuxing" );
     free( p_wf );
     free( p_sys );
     return VLC_EGENERIC;

@@ -304,7 +304,7 @@ static inline void sql_RollbackTransaction( sql_t *p_sql )
  * @param p_sql The SQL object
  * @param p_fmt SQL query string
  * @param i_length length of the string. If negative, length will be
- * considered upto the first \0 character equivalent to strlen(p_fmt).
+ * considered up to the first \0 character equivalent to strlen(p_fmt).
  * Otherwise the first i_length bytes will be used
  * @return a sql_stmt_t pointer or NULL on failure
  */
@@ -384,7 +384,7 @@ static inline int sql_BindDouble( sql_t *p_sql, sql_stmt_t* p_stmt,
  * @param p_stmt Statement Object
  * @param i_pos Position at which the parameter should be bound
  * @param p_fmt Value to be bound
- * @param i_length Length of text. If -ve text upto the first null char
+ * @param i_length Length of text. If -ve text up to the first null char
  * will be selected.
  * @return VLC_SUCCESS or VLC_EGENERIC
  */

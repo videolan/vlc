@@ -90,7 +90,7 @@ int RemoveDirToMonitor( media_library_t *p_ml, const char *psz_dir )
                           psz_dir );
         if( i_ret != VLC_SUCCESS )
         {
-            msg_Err( p_ml, "Error occured while making a query to the database" );
+            msg_Err( p_ml, "Error occurred while making a query to the database" );
             return i_ret;
         }
         QuerySimple( p_ml, "DELETE FROM directories WHERE uri LIKE '%q%%'",
@@ -105,7 +105,7 @@ int RemoveDirToMonitor( media_library_t *p_ml, const char *psz_dir )
                           psz_dir );
         if( i_ret != VLC_SUCCESS )
         {
-            msg_Err( p_ml, "Error occured while making a query to the database" );
+            msg_Err( p_ml, "Error occurred while making a query to the database" );
             return i_ret;
         }
         QuerySimple( p_ml, "DELETE FROM directories WHERE uri = %Q",

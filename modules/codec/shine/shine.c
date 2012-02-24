@@ -1372,7 +1372,7 @@ static int quantize_int(int *xr, short *ix, side_info_t *si)
       ix[i] = int2idx[(xr[i] * s + 0x8000) >> 16];
   }
   else
-  { /* check each index wether it fits the table */
+  { /* check each index whether it fits the table */
     for(i=SAMPL2; i--; )
     {
       idx = (xr[i] * s + 0x08000) >> 16;

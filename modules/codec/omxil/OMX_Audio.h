@@ -310,7 +310,7 @@ typedef struct OMX_AUDIO_PARAM_VORBISTYPE {
     OMX_U32 nAudioBandWidth;  /**< Audio band width (in Hz) to which an encoder should
                                    limit the audio signal. Use 0 to let encoder decide */
     OMX_S32 nQuality;		  /**< Sets encoding quality to n, between -1 (low) and 10 (high).
-                                   In the default mode of operation, teh quality level is 3.
+                                   In the default mode of operation, the quality level is 3.
                                    Normal quality range is 0 - 10. */
     OMX_BOOL bManaged;		  /**< Set  bitrate  management  mode. This turns off the
                                    normal VBR encoding, but allows hard or soft bitrate

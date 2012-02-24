@@ -179,7 +179,7 @@ void CommonManage(vout_display_t *vd)
              * with the associated window (hvideownd)
              *
              * For directx, it is still important to call UpdateRects
-             * on a move of the parent window, even if no resize occured
+             * on a move of the parent window, even if no resize occurred
              */
             SetWindowPos(sys->hwnd, 0, 0, 0,
                          rect_parent.right - rect_parent.left,

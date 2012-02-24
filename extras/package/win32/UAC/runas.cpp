@@ -267,7 +267,7 @@ DWORD MyRunAs(HINSTANCE hInstDll,SHELLEXECUTEINFO&sei) {
 
 
 #ifdef BUILD_DBG
-// RunDll exports are __stdcall, we dont care about that for this debug export, rundll32.exe is able to handle this mistake
+// RunDll exports are __stdcall, we don't care about that for this debug export, rundll32.exe is able to handle this mistake
 extern "C" void __declspec(dllexport) __cdecl DBGRDMyRunAs(HWND hwnd,HINSTANCE hinst,LPTSTR lpCmdLine,int nCmdShow) {
 	SHELLEXECUTEINFO sei={sizeof(sei)};
 	sei.lpFile=_T("Notepad.exe");//sei.lpParameters=_T("param1");

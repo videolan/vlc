@@ -1280,7 +1280,7 @@ out:
   Decodes a duration as defined by ISO 8601
   http://en.wikipedia.org/wiki/ISO_8601#Durations
   @param str A null-terminated string to convert
-  @return: The duration in seconds. -1 if an error occured.
+  @return: The duration in seconds. -1 if an error occurred.
 
   Exemple input string: "PT0H9M56.46S"
  */

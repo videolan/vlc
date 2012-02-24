@@ -175,7 +175,7 @@ void MessagesDialog::sinkMessage( const MsgEvent *msg )
 
     QTextEdit *messages = ui.messages;
     /* Only scroll if the viewport is at the end.
-       Don't bug user by auto-changing/loosing viewport on insert(). */
+       Don't bug user by auto-changing/losing viewport on insert(). */
     bool b_autoscroll = ( messages->verticalScrollBar()->value()
                           + messages->verticalScrollBar()->pageStep()
                           >= messages->verticalScrollBar()->maximum() );

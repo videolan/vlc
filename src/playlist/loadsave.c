@@ -133,7 +133,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
     if( psz_file == NULL )
         return VLC_ENOMEM;
 
-    /* loosy check for media library file */
+    /* lousy check for media library file */
     struct stat st;
     if( vlc_stat( psz_file, &st ) )
     {

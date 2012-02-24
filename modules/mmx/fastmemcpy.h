@@ -98,9 +98,9 @@ If you have questions please contact with me: Nick Kurshev: nickols_k@mail.ru.
 #undef HAVE_MMX1
 #if defined(HAVE_MMX) && !defined(HAVE_MMX2) && !defined(HAVE_3DNOW) && !defined(HAVE_SSE)
 /*  means: mmx v.1. Note: Since we added alignment of destinition it speedups
-    of memory copying on PentMMX, Celeron-1 and P2 upto 12% versus
+    of memory copying on PentMMX, Celeron-1 and P2 up to 12% versus
     standard (non MMX-optimized) version.
-    Note: on K6-2+ it speedups memory copying upto 25% and
+    Note: on K6-2+ it speedups memory copying up to 25% and
           on K7 and P3 about 500% (5 times). */
 #define HAVE_MMX1
 #endif

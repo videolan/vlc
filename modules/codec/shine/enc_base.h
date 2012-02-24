@@ -166,7 +166,7 @@ struct encoder_config
                                       a new file could start anytime       */
 #define CHUNKF_ABORT      0x0020ul /* Encoder should not finish this
                                       chunk                                */
-#define CHUNKF_ERROR    (~0ul ^ (~0ul >> 1)) /* An error has occured
+#define CHUNKF_ERROR    (~0ul ^ (~0ul >> 1)) /* An error has occurred
                                       (passed to/from encoder). Use the
                                       sign bit to check (long)flags < 0.   */
 #define CHUNKF_ALLFLAGS (0x0033ul | CHUNKF_ERROR)

@@ -186,7 +186,7 @@ static int Open( vlc_object_t * p_this )
                         if (!s_filename.compare(s_filename.length() - 3, 3, "mkv") ||
                             !s_filename.compare(s_filename.length() - 3, 3, "mka"))
                         {
-                            // test wether this file belongs to our family
+                            // test whether this file belongs to our family
                             const uint8_t *p_peek;
                             bool          file_ok = false;
                             std::string   s_url = make_URI( s_filename.c_str(), "file" );

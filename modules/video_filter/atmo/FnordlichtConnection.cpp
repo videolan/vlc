@@ -237,7 +237,7 @@ int CFnordlichtConnection::getAmountFnordlichter()
 
 /*
     def sync(addr = 0)
-       1.upto(15) do
+       1.up to(15) do
           $dev.write "\e"
        end
        $dev.write addr.chr

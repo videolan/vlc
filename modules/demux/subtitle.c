@@ -713,7 +713,7 @@ static void Fix( demux_t *p_demux )
 
     /* *** fix order (to be sure...) *** */
     /* We suppose that there are near in order and this durty bubble sort
-     * wont take too much time
+     * would not take too much time
      */
     do
     {

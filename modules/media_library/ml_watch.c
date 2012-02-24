@@ -412,7 +412,7 @@ static int watch_PlaylistItemCurrent( vlc_object_t *p_this, char const *psz_var,
 }
 
 /**
- * @brief Update informations in the DB for an input item
+ * @brief Update information in the DB for an input item
  *
  * @param p_ml this media library instance
  * @param i_media_id may be 0 (but not recommended)
