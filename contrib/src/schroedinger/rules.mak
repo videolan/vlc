@@ -1,6 +1,6 @@
 # schroedinger
 
-SCHROEDINGER_VERSION := 1.0.10
+SCHROEDINGER_VERSION := 1.0.11
 SCHROEDINGER_URL := http://diracvideo.org/download/schroedinger/schroedinger-$(SCHROEDINGER_VERSION).tar.gz
 
 PKGS += schroedinger
