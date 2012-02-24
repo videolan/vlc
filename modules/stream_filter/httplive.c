@@ -585,7 +585,7 @@ static int parse_SegmentInformation(hls_stream_t *hls, char *p_read, int *durati
     return VLC_SUCCESS;
 }
 
-static int parse_AddSegment(stream_t *s, hls_stream_t *hls, const int duration, const char *uri)
+static int parse_AddSegment(hls_stream_t *hls, const int duration, const char *uri)
 {
     assert(hls);
     assert(uri);
@@ -1050,7 +1050,7 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
                 err = parse_EndList(s, hls);
             else if ((strncmp(line, "#", 1) != 0) && (*line != '\0') )
             {
-                err = parse_AddSegment(s, hls, segment_duration, line);
+                err = parse_AddSegment(hls, segment_duration, line);
                 segment_duration = -1; /* reset duration */
             }
 
