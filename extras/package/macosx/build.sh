@@ -138,7 +138,8 @@ if [ "${vlcroot}/configure" -nt Makefile ]; then
   ${vlcroot}/extras/package/macosx/configure.sh \
       --build=$TRIPLET \
       --host=$TRIPLET \
-      --with-macosx-version-min=$OSX_VERSION > $out
+      --with-macosx-version-min=$OSX_VERSION \
+      --with-macosx-sdk=/Developer/SDKs/MacOSX$OSX_VERSION.sdk > $out
 fi
 
 
