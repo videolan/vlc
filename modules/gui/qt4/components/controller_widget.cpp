@@ -213,7 +213,7 @@ bool SoundWidget::eventFilter( QObject *obj, QEvent *e )
     if( e->type() == QEvent::MouseButtonPress )
     {
         QMouseEvent *event = static_cast<QMouseEvent*>(e);
-        if( event->button() != Qt::RightButton )
+        if( event->button() == Qt::LeftButton )
         {
             if( volumeSlider->orientation() ==  Qt::Vertical )
             {
