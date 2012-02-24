@@ -936,6 +936,17 @@
     p_playlist = pl_Get( p_intf );
 
     NSUInteger indexes[i_count];
+    if (i_count == [o_outline_view numberOfRows])
+    {
+#ifndef NDEBUG
+        msg_Dbg( p_intf, "user selected entire list, deleting current playlist root instead of individual items" );
+#endif
+        PL_LOCK;
+        playlist_NodeDelete( p_playlist, [self currentPlaylistRoot], true, false );
+        PL_UNLOCK;
+        [self playlistUpdated];
+        return;
+    }
     [o_selected_indexes getIndexes:indexes maxCount:i_count inIndexRange:nil];
     for (int i = 0; i < i_count; i++)
     {
@@ -958,7 +969,7 @@
                 // if current item is in selected node and is playing then stop playlist
                 playlist_Control(p_playlist, PLAYLIST_STOP, pl_Locked );
 
-            playlist_NodeDelete( p_playlist, p_item, true, false );
+                playlist_NodeDelete( p_playlist, p_item, true, false );
         }
         else
             playlist_DeleteFromInput( p_playlist, p_item->p_input, pl_Locked );
