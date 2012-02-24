@@ -72,7 +72,8 @@ static inline void vout_SendEventMousePressed(vout_thread_t *vout, int button)
     }
     case MOUSE_BUTTON_CENTER:
         var_ToggleBool(vout->p_libvlc, "intf-toggle-fscontrol");
-        return;
+        key = KEY_MOUSEBUTTON_MID;
+        break;
     case MOUSE_BUTTON_RIGHT:
         var_SetBool(vout->p_libvlc, "intf-popupmenu", true);
         return;
@@ -80,6 +81,8 @@ static inline void vout_SendEventMousePressed(vout_thread_t *vout, int button)
     case MOUSE_BUTTON_WHEEL_DOWN:  key = KEY_MOUSEWHEELDOWN;  break;
     case MOUSE_BUTTON_WHEEL_LEFT:  key = KEY_MOUSEWHEELLEFT;  break;
     case MOUSE_BUTTON_WHEEL_RIGHT: key = KEY_MOUSEWHEELRIGHT; break;
+    case MOUSE_BUTTON_X1:          key = KEY_MOUSEBUTTON_X1; break;
+    case MOUSE_BUTTON_X2:          key = KEY_MOUSEBUTTON_X2; break;
     }
     vout_SendEventKey(vout, key);
 }
