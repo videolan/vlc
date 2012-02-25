@@ -427,6 +427,11 @@ static const char *const direct_pred_list[] =
 static const char *const direct_pred_list_text[] =
   { N_("none"), N_("spatial"), N_("temporal"), N_("auto") };
 
+static const int const framepacking_list[] =
+  { -1, 0, 1, 2, 3, 4, 5 };
+static const char *const framepacking_list_text[] =
+  { "", N_("checkerboard"), N_("column alternation"), N_("row alternation"), N_("side by side"), N_("top bottom"), N_("frame alternation") };
+
 vlc_module_begin ()
     set_description( N_("H.264/MPEG4 AVC encoder (x264)"))
     set_capability( "encoder", 200 )
@@ -510,6 +515,7 @@ vlc_module_begin ()
 
 #if X264_BUILD >= 111
     add_integer( SOUT_CFG_PREFIX "frame-packing", -1, FRAMEPACKING_TEXT, FRAMEPACKING_LONGTEXT, true )
+        change_integer_list( framepacking_list, framepacking_list_text )
         change_integer_range( -1, 5)
 #endif
 
