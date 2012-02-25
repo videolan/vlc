@@ -1,6 +1,6 @@
 # Kate
 
-KATE_VERSION := 0.3.8
+KATE_VERSION := 0.4.1
 KATE_URL := http://libkate.googlecode.com/files/libkate-$(KATE_VERSION).tar.gz
 
 PKGS += kate
