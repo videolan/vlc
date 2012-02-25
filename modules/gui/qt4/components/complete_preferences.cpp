@@ -131,6 +131,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             current_item->setData( 0, Qt::UserRole,
                                    qVariantFromValue( data ) );
             addTopLevelItem( current_item );
+            expandItem( current_item );
             break;
 
         /* This is a subcategory */
