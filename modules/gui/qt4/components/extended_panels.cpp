@@ -1369,11 +1369,16 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
             spatCtrl[i]->setMaximum( 10 );
             spatCtrl[i]->setValue( 2 );
         }
-        else
+        else if( i < 4 )
         {
             spatCtrl[i]->setMaximum( 10 );
-            spatCtrl[i]->setValue( 0 );
+            spatCtrl[i]->setValue( 2 );
             spatCtrl[i]->setMinimum( -10 );
+        }
+        else
+        {
+            spatCtrl[i]->setMaximum( 4 );
+            spatCtrl[i]->setValue( 1 );
         }
 
         oldControlVars[i] = spatCtrl[i]->value();
