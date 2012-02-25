@@ -1,9 +1,9 @@
---- schroedinger/schroedinger/schroorc-dist.c.orig	2011-12-28 10:22:01.620224002 -0500
-+++ schroedinger/schroedinger/schroorc-dist.c	2011-12-28 10:22:12.880224003 -0500
-@@ -200,7 +200,7 @@
- #define ORC_ISNAN(x) ((((x)&0x7f800000) == 0x7f800000) && (((x)&0x007fffff) != 0))
- #define ORC_DENORMAL_DOUBLE(x) ((x) & ((((x)&ORC_UINT64_C(0x7ff0000000000000)) == 0) ? ORC_UINT64_C(0xfff0000000000000) : ORC_UINT64_C(0xffffffffffffffff)))
- #define ORC_ISNAN_DOUBLE(x) ((((x)&ORC_UINT64_C(0x7ff0000000000000)) == ORC_UINT64_C(0x7ff0000000000000)) && (((x)&ORC_UINT64_C(0x000fffffffffffff)) != 0))
+--- schroedinger/schroedinger/schroorc-dist.c.orig	2012-01-23 01:44:05.000000000 +0100
++++ schroedinger/schroedinger/schroorc-dist.c	2012-02-25 16:21:34.387026910 +0100
+@@ -52,7 +52,7 @@
+ typedef union { orc_int64 i; double f; orc_int32 x2[2]; float x2f[2]; orc_int16 x4[4]; } orc_union64;
+ #endif
+ #ifndef ORC_RESTRICT
 -#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 +#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L && !defined(__ANDROID__)
  #define ORC_RESTRICT restrict
