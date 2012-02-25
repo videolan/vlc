@@ -396,8 +396,12 @@ getbrowsetable = function ()
                 local path, name =  df, f
                 local element={}
 
-                for k,v in pairs(s) do
-                    element[k]=v
+                if (s) then
+                    for k,v in pairs(s) do
+                        element[k]=v
+                    end
+                else
+                    element["type"]="unknown"
                 end
                 element["path"]=path
                 element["name"]=name
