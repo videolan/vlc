@@ -1366,19 +1366,19 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
         spatCtrl[i] = new QSlider( Qt::Vertical );
         if( i < 2 )
         {
-            spatCtrl[i]->setMaximum( 10 );
-            spatCtrl[i]->setValue( 2 );
+            spatCtrl[i]->setMaximum( 100 );
+            spatCtrl[i]->setValue( 20 );
         }
         else if( i < 4 )
         {
-            spatCtrl[i]->setMaximum( 10 );
-            spatCtrl[i]->setValue( 2 );
-            spatCtrl[i]->setMinimum( -10 );
+            spatCtrl[i]->setMaximum( 100 );
+            spatCtrl[i]->setValue( 20 );
+            spatCtrl[i]->setMinimum( -100 );
         }
         else
         {
-            spatCtrl[i]->setMaximum( 4 );
-            spatCtrl[i]->setValue( 1 );
+            spatCtrl[i]->setMaximum( 40 );
+            spatCtrl[i]->setValue( 10 );
         }
 
         oldControlVars[i] = spatCtrl[i]->value();
@@ -1453,20 +1453,20 @@ void Spatializer::setValues()
 
     for( int i = 0 ; i < NUM_SP_CTRL ; i++ )
     {
-        float f = (float)(  spatCtrl[i]->value() );
+        float f = (float)( spatCtrl[i]->value() ) / 10;
         ctrl_readout[i]->setText( QString::number( f, 'f',  1 ) );
     }
+
     if( p_aout )
     {
         for( int i = 0 ; i < NUM_SP_CTRL ; i++ )
         {
+            float f = (float)( spatCtrl[i]->value() ) / 10 ;
             if( oldControlVars[i] != spatCtrl[i]->value() )
             {
-                var_SetFloat( p_aout, spat_controls[i].psz_name,
-                        ( float )spatCtrl[i]->value() );
-                config_PutFloat( p_intf, spat_controls[i].psz_name,
-                        ( float ) spatCtrl[i]->value() );
-                oldControlVars[i] = ( float ) spatCtrl[i]->value();
+                var_SetFloat( p_aout, spat_controls[i].psz_name, f );
+                config_PutFloat( p_intf, spat_controls[i].psz_name, f );
+                oldControlVars[i] = spatCtrl[i]->value();
             }
         }
         vlc_object_release( p_aout );
