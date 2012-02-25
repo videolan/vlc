@@ -182,6 +182,7 @@ vlc_module_begin ()
                ENC_QSCALE_TEXT, ENC_QSCALE_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "strict", 0,
                  ENC_STRICT_TEXT, ENC_STRICT_LONGTEXT, true )
+        change_integer_range( -2, 2 )
     add_float( ENC_CFG_PREFIX "lumi-masking", 0.0,
                ENC_LUMI_MASKING_TEXT, ENC_LUMI_MASKING_LONGTEXT, true )
     add_float( ENC_CFG_PREFIX "dark-masking", 0.0,

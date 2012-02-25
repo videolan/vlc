@@ -382,9 +382,7 @@ int OpenEncoder( vlc_object_t *p_this )
     p_sys->i_qmax = var_GetInteger( p_enc, ENC_CFG_PREFIX "qmax" );
     p_sys->b_trellis = var_GetBool( p_enc, ENC_CFG_PREFIX "trellis" );
 
-    i_val = var_GetInteger( p_enc, ENC_CFG_PREFIX "strict" );
-    if( i_val < - 1 || i_val > 1 ) i_val = 0;
-    p_context->strict_std_compliance = i_val;
+    p_context->strict_std_compliance = var_GetInteger( p_enc, ENC_CFG_PREFIX "strict" );
 
     p_sys->f_lumi_masking = var_GetFloat( p_enc, ENC_CFG_PREFIX "lumi-masking" );
     p_sys->f_dark_masking = var_GetFloat( p_enc, ENC_CFG_PREFIX "dark-masking" );

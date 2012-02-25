@@ -226,7 +226,7 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 
 #define ENC_STRICT_TEXT N_( "Strict standard compliance" )
 #define ENC_STRICT_LONGTEXT N_( "Force a strict standard " \
-  "compliance when encoding (accepted values: -1, 0, 1)." )
+  "compliance when encoding (accepted values: -2 to 2)." )
 
 #define ENC_LUMI_MASKING_TEXT N_( "Luminance masking" )
 #define ENC_LUMI_MASKING_LONGTEXT N_( "Raise the quantizer for " \
