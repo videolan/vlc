@@ -81,7 +81,7 @@ vlc_module_begin ()
     add_float( "spatializer-width", 10., WIDTH_TEXT,WIDTH_LONGTEXT, true )
     add_float( "spatializer-wet", 3., WET_TEXT,WET_LONGTEXT, true )
     add_float( "spatializer-dry", 2., DRY_TEXT,DRY_LONGTEXT, true )
-    add_float( "spatializer-damp", 1., DAMP_TEXT,DAMP_LONGTEXT, true )
+    add_float_with_range( "spatializer-damp", 1., 0., 4., DAMP_TEXT,DAMP_LONGTEXT, true )
 vlc_module_end ()
 
 /*****************************************************************************
