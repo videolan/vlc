@@ -973,6 +973,7 @@ static const entry_t p_list_audio[] = {
     /* MPEG Audio layer 1/2/3 */
     B(VLC_CODEC_MPGA, "MPEG Audio layer 1/2/3"),
         A("mpga"),
+        A("mp2a"),
         A(".mp1"),
         A(".mp2"),
         A("mp3 "),
