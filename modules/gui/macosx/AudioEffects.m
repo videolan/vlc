@@ -91,7 +91,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     [o_spat_band2_lbl setStringValue:_NS("Width")];
     [o_spat_band3_lbl setStringValue:_NS("Wet")];
     [o_spat_band4_lbl setStringValue:_NS("Dry")];
-    [o_spat_band5_lbl setStringValue:_NS("Dump")];
+    [o_spat_band5_lbl setStringValue:_NS("Damp")];
 
     /* Filter */
     [o_filter_headPhone_ckb setTitle:_NS("Headphone virtualization")];
