@@ -1257,6 +1257,13 @@ return YES;
     }
     else
     {
+        NSRect frame;
+        frame = [o_time_sld_fancygradient_view frame];
+        if (frame.size.width > 0)
+        {
+            frame.size.width = 0;
+            [o_time_sld_fancygradient_view setFrame: frame];
+        }
         [o_time_sld_fancygradient_view setHidden: YES];
     }
     [o_pool release];
