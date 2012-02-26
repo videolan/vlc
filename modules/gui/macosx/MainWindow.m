@@ -524,10 +524,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
     else
     {
-        if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) > 0.12 )
+        if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) > 0.16 )
         {
-            // we just skipped 3 "continous" events, otherwise we are too fast
-            [[VLCCoreInteraction sharedInstance] backward];
+            // we just skipped 4 "continous" events, otherwise we are too fast
+            [[VLCCoreInteraction sharedInstance] backwardExtraShort];
             last_bwd_event = [NSDate timeIntervalSinceReferenceDate];
             [self performSelector:@selector(resetBackwardSkip)
                        withObject: NULL
@@ -563,10 +563,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
     else
     {
-        if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) > 0.12 )
+        if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) > 0.16 )
         {
-            // we just skipped 3 "continous" events, otherwise we are too fast
-            [[VLCCoreInteraction sharedInstance] forward];
+            // we just skipped 4 "continous" events, otherwise we are too fast
+            [[VLCCoreInteraction sharedInstance] forwardExtraShort];
             last_fwd_event = [NSDate timeIntervalSinceReferenceDate];
             [self performSelector:@selector(resetForwardSkip)
                        withObject: NULL
