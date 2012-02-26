@@ -770,7 +770,7 @@ MPRISEntryPoint ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this )
 
     DBusError error;
 
-    if( strcmp( psz_interface, DBUS_INTERFACE_PROPERTIES ) )
+    if( psz_interface && strcmp( psz_interface, DBUS_INTERFACE_PROPERTIES ) )
         psz_target_interface = psz_interface;
 
     else
