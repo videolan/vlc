@@ -1339,8 +1339,11 @@ return YES;
     else
         [self makeFirstResponder: nil];
 
-    if (!b_videoPlayback && b_fullscreen && !b_nativeFullscreenMode)
-        [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+    if (!b_videoPlayback && b_fullscreen)
+    {
+        if (!b_nativeFullscreenMode || !OSX_LION)
+            [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+    }
 }
 
 - (void)resizeWindow
