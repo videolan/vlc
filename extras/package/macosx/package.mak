@@ -48,7 +48,7 @@ VLC-tmp: vlc
 	mkdir -p $@/Contents/Frameworks && cp -R -L $(CONTRIB_DIR)/Growl.framework $@/Contents/Frameworks/
 	mkdir -p $@/Contents/MacOS/share/locale/
 	cp -r "$(prefix)/lib/vlc/lua" "$(prefix)/share/vlc/lua" $@/Contents/MacOS/share/
-	mkdir -p $@Contents/MacOS/include/
+	mkdir -p $@/Contents/MacOS/include/
 	cp -r "$(srcdir)/include/vlc" $@/Contents/MacOS/include/
 	$(INSTALL) -m 644 $(srcdir)/share/vlc512x512.png $@/Contents/MacOS/share/vlc512x512.png
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
