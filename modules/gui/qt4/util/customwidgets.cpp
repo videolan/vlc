@@ -286,6 +286,26 @@ int qtWheelEventToVLCKey( QWheelEvent *e )
     return i_vlck;
 }
 
+int qtMouseEventToVLCKey( QMouseEvent *e )
+{
+    int i_vlck = 0;
+    switch( e->button() )
+    {
+    case Qt::MidButton:
+        i_vlck |= KEY_MOUSEBUTTON_MID;
+        break;
+    case Qt::XButton1:
+        i_vlck |= KEY_MOUSEBUTTON_X1;
+        break;
+    case Qt::XButton2:
+        i_vlck |= KEY_MOUSEBUTTON_X2;
+    default:
+        break;
+    }
+    if ( i_vlck > 0 ) i_vlck |= qtKeyModifiersToVLC( e );
+    return i_vlck;
+}
+
 QString VLCKeyToString( unsigned val )
 {
     char *base = vlc_keycode2str (val);
