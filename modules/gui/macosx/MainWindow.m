@@ -598,7 +598,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     {
         if (b_splitview_removed)
         {
-            [self showSplitView];
+            if( !b_nonembedded ||( sender != nil && b_nonembedded))
+                [self showSplitView];
         }
 
         if (b_dropzone_active && ![[VLCMain sharedInstance] activeVideoPlayback])
