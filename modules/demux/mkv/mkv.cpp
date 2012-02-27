@@ -331,9 +331,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
-            f = (double)va_arg( args, double );
-            Seek( p_demux, -1, f, NULL );
-            return VLC_SUCCESS;
+            if( p_sys->f_duration > 0.0 )
+            {
+                f = (double)va_arg( args, double );
+                Seek( p_demux, -1, f, NULL );
+                return VLC_SUCCESS;
+            }
+            return VLC_EGENERIC;
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
