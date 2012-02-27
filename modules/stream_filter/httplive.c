@@ -2339,7 +2339,7 @@ static int segment_Seek(stream_t *s, const uint64_t pos)
         length += segment->duration * (hls->bandwidth/8);
         vlc_mutex_unlock(&segment->lock);
 
-        if (!b_found && (pos <= length))
+        if (pos <= length)
         {
             if (count - n >= 3)
             {
