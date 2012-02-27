@@ -904,6 +904,24 @@ static const entry_t p_list_video[] = {
     B(VLC_CODEC_MXPEG, "Mxpeg"),
         A("MXPG"),
 
+    B(VLC_CODEC_CDXL, "Commodore CDXL video format"),
+        A("CDXL"),
+
+    B(VLC_CODEC_BMVVIDEO, "Discworld II BMV video"),
+        A("BMVV"),
+
+    B(VLC_CODEC_UTVIDEO, "Ut Video"),
+        A("ULRA"),
+        A("ULRG"),
+        A("ULY0"),
+        A("ULY2"),
+
+    B(VLC_CODEC_VBLE, "VBLE Lossless Codec"),
+        A("VBLE"),
+
+    B(VLC_CODEC_DXTORY, "Dxtory capture format"),
+        A("xtor"),
+
     B(0, "")
 };
 static const entry_t p_list_audio[] = {
@@ -1250,6 +1268,9 @@ static const entry_t p_list_audio[] = {
 
     B(VLC_CODEC_TWINVQ, "TwinVQ"),
         A("TWIN"),
+
+    B(VLC_CODEC_BMVAUDIO, "Discworld II BMV audio"),
+        A("BMVA"),
 
     B(0, "")
 };
