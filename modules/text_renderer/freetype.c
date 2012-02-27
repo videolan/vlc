@@ -46,8 +46,8 @@
 
 /* Default fonts */
 #ifdef __APPLE__
-# define DEFAULT_FONT_FILE "/Library/Fonts/Arial Black.ttf"
-# define DEFAULT_FAMILY "Arial Black"
+# define DEFAULT_FONT_FILE "/Library/Fonts/Arial Unicode.ttf"
+# define DEFAULT_FAMILY "Arial Unicode MS"
 #elif defined( WIN32 )
 # define DEFAULT_FONT_FILE "arial.ttf" /* Default path font found at run-time */
 # define DEFAULT_FAMILY "Arial"
