@@ -94,7 +94,8 @@ public:
         ACTION_ALWAYS_ENABLED = 0x1,
         ACTION_MANAGED = 0x2, /* managed using EnableStatic(bool)? */
         ACTION_NO_CLEANUP = 0x4,
-        ACTION_STATIC = 0x6 /* legacy shortcut */
+        ACTION_STATIC = 0x6, /* legacy shortcut */
+        ACTION_DELETE_ON_REBUILD = 0x8
     };
     Q_DECLARE_FLAGS(actionflags, actionflag)
 
