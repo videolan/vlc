@@ -13,6 +13,9 @@ Encoders:
 Audio Filters:
  * new remapping channel filter
 
+Codecs:
+ * Support for CDXL, Ut Video, VBLE, Dxtory codecs via libavcodec.
+
 Video Filters:
  * new anaglyph video filter which transforms side by side 3D video streams in
    anaglyph glasses (aka red/blue) compatible images.
