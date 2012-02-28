@@ -74,6 +74,15 @@
     "capture." )
 #endif
 
+#ifdef SCREEN_DISPLAY_ID
+#define DISPLAY_ID_TEXT N_( "Display ID" )
+#define DISPLAY_ID_LONGTEXT N_( \
+    "Display ID. If not specified, main display ID is used. " )
+#define INDEX_TEXT N_( "Screen index" )
+#define INDEX_LONGTEXT N_( \
+    "Index of screen (1, 2, 3, ...). Alternative to Display ID." )
+#endif
+
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -107,6 +116,11 @@ vlc_module_begin ()
 
 #ifdef WIN32
     add_integer( "screen-fragment-size", 0, FRAGS_TEXT, FRAGS_LONGTEXT, true )
+#endif
+
+#ifdef SCREEN_DISPLAY_ID
+    add_integer( "screen-display-id", 0, DISPLAY_ID_TEXT, DISPLAY_ID_LONGTEXT, true )
+    add_integer( "screen-index", 0, INDEX_TEXT, INDEX_LONGTEXT, true )
 #endif
 
     set_capability( "access_demux", 0 )
@@ -153,6 +167,11 @@ static int Open( vlc_object_t *p_this )
                           p_sys->i_height );
 #endif
 
+#ifdef SCREEN_DISPLAY_ID
+    p_sys->i_display_id = var_CreateGetInteger( p_demux, "screen-display-id" );
+    p_sys->i_screen_index = var_CreateGetInteger( p_demux, "screen-index" );
+#endif
+
     if( screen_InitCapture( p_demux ) != VLC_SUCCESS )
     {
         free( p_sys );
@@ -181,7 +200,7 @@ static int Open( vlc_object_t *p_this )
             p_sys->fmt.video.i_width = p_sys->i_width;
             p_sys->fmt.video.i_visible_height =
             p_sys->fmt.video.i_height = p_sys->i_height;
-            p_sys->b_follow_mouse = var_CreateGetInteger( p_demux,
+            p_sys->b_follow_mouse = var_CreateGetBool( p_demux,
                                                 "screen-follow-mouse" );
             if( p_sys->b_follow_mouse )
                 msg_Dbg( p_demux, "mouse following enabled" );

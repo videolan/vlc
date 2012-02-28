@@ -26,10 +26,12 @@
 #include <vlc_access.h>
 #include <vlc_demux.h>
 
-#if !defined( HAVE_DARWIN )
-#   define SCREEN_SUBSCREEN
-#   define SCREEN_MOUSE
+#ifdef __APPLE__
+#   define SCREEN_DISPLAY_ID
 #endif
+
+#define SCREEN_SUBSCREEN
+#define SCREEN_MOUSE
 
 #ifdef SCREEN_MOUSE
 #   include <vlc_image.h>
@@ -61,6 +63,11 @@ struct demux_sys_t
     picture_t *p_mouse;
     filter_t *p_blend;
     picture_t dst;
+#endif
+
+#ifdef SCREEN_DISPLAY_ID
+  unsigned int i_display_id;
+  unsigned int i_screen_index;
 #endif
 
     screen_data_t *p_data;
