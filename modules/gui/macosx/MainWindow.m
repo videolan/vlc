@@ -789,12 +789,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     return [super validateMenuItem:menuItem];
 }
 
-- (BOOL)isMainWindow
-{
-
-return YES;
-}
-
 - (void)setTitle:(NSString *)title
 {
     if (b_dark_interface)
