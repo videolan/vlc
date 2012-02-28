@@ -11801,7 +11801,7 @@ msgstr "Αποκωδικοποιητής υπότιτλων USF"
 #. languages using the Latin alphabet.
 #: modules/codec/subsdec.c:94
 msgid "Default (Windows-1252)"
-msgstr "Προεπιλεγμένη (Windows-1252)"
+msgstr "Προεπιλεγμένη (Windows-1253)"
 
 #: modules/codec/subsdec.c:95
 #, fuzzy
@@ -12019,7 +12019,7 @@ msgstr "Αποκωδικοποιητής κειμένου υπότιτλων"
 #: modules/codec/subsdec.c:290 modules/demux/avi/avi.c:96
 msgctxt "GetACP"
 msgid "CP1252"
-msgstr "CP1252"
+msgstr "CP1253"
 
 #: modules/codec/subsusf.c:46
 msgid "USFSubs"
