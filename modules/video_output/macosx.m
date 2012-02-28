@@ -302,7 +302,8 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *sub
     picture_Release (pic);
     sys->has_first_frame = true;
 
-    (void)subpicture;
+    if (subpicture)
+        subpicture_Delete(subpicture);
 }
 
 static int Control (vout_display_t *vd, int query, va_list ap)
