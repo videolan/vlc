@@ -55,9 +55,7 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QSignalMapper>
-#include <QSystemTrayIcon>
 #include <QStatusBar>
-#include <QFontMetrics>
 
 /*
   This file defines the main menus and the pop-up menu (right-click menu)
