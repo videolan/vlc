@@ -64,7 +64,7 @@ echo "generating modules/**/Makefile.am"
 find modules/ -name Modules.am | \
 sed -ne 's,modules/\(.*\)/Modules.am,\1,p' | \
 while read d; do
-	sh modules/genmf "$d"
+	${CONFIG_SHELL-sh} modules/genmf "$d"
 	printf "."
 done
 printf "\n"
