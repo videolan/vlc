@@ -74,14 +74,14 @@ error:
     return (path != NULL) ? path : strdup (PKGLIBDIR);
 }
 
-#if defined(__GLIBC__) && !defined(__UCLIBC__)
+#ifdef __GLIBC__
 # include <gnu/libc-version.h>
 # include <stdlib.h>
 #endif
 
 void system_Init (void)
 {
-#if defined(__GLIBC__) && !defined(__UCLIBC__)
+#ifdef __GLIBC__
     const char *glcv = gnu_get_libc_version ();
 
     /* gettext in glibc 2.5-2.7 is not thread-safe. LibVLC keeps crashing,
