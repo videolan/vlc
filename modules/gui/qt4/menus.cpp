@@ -733,8 +733,7 @@ QMenu *VLCMenuBar::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu, bool b_
                 delete actions[i];
     }
 
-    PopupPlayEntries( menu, p_intf, p_object );
-    PopupMenuPlaylistControlEntries( menu, p_intf );
+    PopupMenuPlaylistEntries( menu, p_intf, p_object );
 
     /* */
     EnableStaticEntries( menu, (p_object != NULL ) );
@@ -776,7 +775,7 @@ QMenu *VLCMenuBar::HelpMenu( QWidget *parent )
     Populate( p_intf, menu, varnames, objects ); \
     menu->popup( QCursor::pos() ); \
 
-void VLCMenuBar::PopupPlayEntries( QMenu *menu,
+void VLCMenuBar::PopupMenuPlaylistEntries( QMenu *menu,
                                         intf_thread_t *p_intf,
                                         input_thread_t *p_input )
 {
@@ -793,9 +792,31 @@ void VLCMenuBar::PopupPlayEntries( QMenu *menu,
     }
     else
     {
-         addMIMStaticEntry( p_intf, menu, qtr( "Pause" ),
-                    ":/menu/pause", SLOT( togglePlayPause() ) );
+        addMIMStaticEntry( p_intf, menu, qtr( "Pause" ),
+                ":/menu/pause", SLOT( togglePlayPause() ) );
     }
+
+    /* Stop */
+    action = addMIMStaticEntry( p_intf, menu, qtr( "&Stop" ),
+            ":/menu/stop", SLOT( stop() ), true );
+    if( !p_input )
+        action->setEnabled( false );
+
+    /* Next / Previous */
+    bool bPlaylistEmpty = THEMIM->hasEmptyPlaylist();
+    action = addMIMStaticEntry( p_intf, menu, qtr( "Pre&vious" ),
+            ":/menu/previous", SLOT( prev() ), true );
+    action->setEnabled( !bPlaylistEmpty );
+    action->setData( ACTION_NO_CLEANUP );
+    CONNECT( THEMIM, playlistNotEmpty(bool), action, setEnabled(bool) );
+
+    action = addMIMStaticEntry( p_intf, menu, qtr( "Ne&xt" ),
+            ":/menu/next", SLOT( next() ), true );
+    action->setEnabled( !bPlaylistEmpty );
+    action->setData( ACTION_NO_CLEANUP );
+    CONNECT( THEMIM, playlistNotEmpty(bool), action, setEnabled(bool) );
+
+    menu->addSeparator();
 }
 
 void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
@@ -860,33 +881,6 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
     action->setData( ACTION_STATIC );
     addDPStaticEntry( menu, qtr( I_MENU_GOTOTIME ),"",
                       SLOT( gotoTimeDialog() ), "Ctrl+T" );
-    menu->addSeparator();
-}
-
-void VLCMenuBar::PopupMenuPlaylistControlEntries( QMenu *menu,
-                                                intf_thread_t *p_intf )
-{
-    bool bEnable = THEMIM->getInput() != NULL;
-    bool bPlaylistEmpty = THEMIM->hasEmptyPlaylist();
-    QAction *action = addMIMStaticEntry( p_intf, menu, qtr( "&Stop" ),
-                                         ":/menu/stop", SLOT( stop() ), true );
-    /* Disable Stop in the right-click popup menu */
-    if( !bEnable )
-        action->setEnabled( false );
-
-    /* Next / Previous */
-    action = addMIMStaticEntry( p_intf, menu, qtr( "Pre&vious" ),
-        ":/menu/previous", SLOT( prev() ), true );
-    action->setEnabled( !bPlaylistEmpty );
-    action->setData( ACTION_NO_CLEANUP );
-    CONNECT( THEMIM, playlistNotEmpty(bool), action, setEnabled(bool) );
-
-    action = addMIMStaticEntry( p_intf, menu, qtr( "Ne&xt" ),
-        ":/menu/next", SLOT( next() ), true );
-    action->setEnabled( !bPlaylistEmpty );
-    action->setData( ACTION_NO_CLEANUP );
-    CONNECT( THEMIM, playlistNotEmpty(bool), action, setEnabled(bool) );
-
     menu->addSeparator();
 }
 
@@ -962,8 +956,7 @@ void VLCMenuBar::MiscPopupMenu( intf_thread_t *p_intf, bool show )
     Populate( p_intf, menu, varnames, objects );
 
     menu->addSeparator();
-    PopupPlayEntries( menu, p_intf, p_input );
-    PopupMenuPlaylistControlEntries( menu, p_intf);
+    PopupMenuPlaylistEntries( menu, p_intf, p_input );
 
     menu->addSeparator();
     PopupMenuControlEntries( menu, p_intf );
@@ -985,8 +978,7 @@ void VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
     bool b_isFullscreen = false;
     MainInterface *mi = p_intf->p_sys->p_mi;
 
-    PopupPlayEntries( menu, p_intf, p_input );
-    PopupMenuPlaylistControlEntries( menu, p_intf );
+    PopupMenuPlaylistEntries( menu, p_intf, p_input );
     menu->addSeparator();
 
     if( p_input )
@@ -1130,8 +1122,7 @@ void VLCMenuBar::updateSystrayMenu( MainInterface *mi,
     sysMenu->addSeparator();
 #endif
 
-    PopupPlayEntries( sysMenu, p_intf, p_input );
-    PopupMenuPlaylistControlEntries( sysMenu, p_intf);
+    PopupMenuPlaylistEntries( sysMenu, p_intf, p_input );
     PopupMenuControlEntries( sysMenu, p_intf, false );
 
     VolumeEntries( p_intf, sysMenu );

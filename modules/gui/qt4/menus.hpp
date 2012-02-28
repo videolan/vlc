@@ -131,10 +131,10 @@ private:
 
     /* Popups Menus */
     static void PopupMenuStaticEntries( QMenu *menu );
-    static void PopupPlayEntries( QMenu *menu, intf_thread_t *p_intf,
-                                         input_thread_t *p_input );
-    static void PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf, bool b = true );
+    static void PopupMenuPlaylistEntries( QMenu *menu, intf_thread_t *p_intf,
+                                          input_thread_t *p_input );
     static void PopupMenuPlaylistControlEntries( QMenu *menu, intf_thread_t *p_intf );
+    static void PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf, bool b = true );
 
     /* Generic automenu methods */
     static QMenu * Populate( intf_thread_t *, QMenu *current,
