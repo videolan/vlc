@@ -806,14 +806,21 @@ return YES;
 
 - (void)performClose:(id)sender
 {
+    NSWindow *o_key_window = [NSApp keyWindow];
+
     if (b_dark_interface)
     {
-        [self orderOut: sender];
-        if ([[VLCMain sharedInstance] activeVideoPlayback] && !b_nonembedded)
+        [o_key_window orderOut: sender];
+        if ( [[VLCMain sharedInstance] activeVideoPlayback] && ( !b_nonembedded || o_key_window != self ))
             [[VLCCoreInteraction sharedInstance] stop];
     }
     else
-        [super performClose: sender];
+    {
+        if( b_nonembedded && o_key_window != self )
+            [o_nonembedded_window performClose: sender];
+        else
+            [super performClose: sender];
+    }
 }
 
 - (void)performMiniaturize:(id)sender
