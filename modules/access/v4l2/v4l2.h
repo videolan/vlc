@@ -40,8 +40,11 @@
 # define V4L2_STD_MTS (V4L2_STD_NTSC_M|V4L2_STD_PAL_M|V4L2_STD_PAL_N|\
                        V4L2_STD_PAL_Nc)
 #endif
-#ifndef V4L2_CTRL_TYPE_BITMASK /* 3.1 */
-# define V4L2_CTRL_TYPE_BITMASK 8
+#ifdef __linux__
+# include <linux/version.h>
+# if LINUX_VERSION_CODE < KERNEL_VERSION(3,1,0)
+#  define V4L2_CTRL_TYPE_BITMASK 8
+# endif
 #endif
 #ifndef V4L2_CID_ILLUMINATORS_1 /* 2.6.37 */
 # define V4L2_CID_ILLUMINATORS_1 (V4L2_CID_BASE+38)
