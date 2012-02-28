@@ -609,12 +609,19 @@ NetOpenPanel::~NetOpenPanel()
     /* Create the list with the current items */
     QStringList mrlList;
     for( int i = 0; i < ui.urlComboBox->count(); i++ )
+    {
         mrlList << ui.urlComboBox->itemText( i );
+        msg_Err( p_intf, "%s" , qtu( ui.urlComboBox->itemText( i ) ) );
 
-    /* Clean the list... */
-    mrlList.removeDuplicates();
-    /* ...and save the 8 last entries */
-    getSettings()->setValue( "OpenDialog/netMRL", mrlList );
+    }
+
+    if( mrlList.count() > 0 )
+    {
+        /* Clean the list... */
+        mrlList.removeDuplicates();
+        /* ...and save the 8 last entries */
+        getSettings()->setValue( "OpenDialog/netMRL", mrlList );
+    }
 }
 
 void NetOpenPanel::clear()
