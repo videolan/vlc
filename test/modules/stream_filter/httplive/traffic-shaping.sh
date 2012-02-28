@@ -34,7 +34,7 @@ function traffic_shaping() {
 # tc qdisc add dev eth2 root tbf rate 50kbit burst 2kbit latency 70ms peakrate 52kbit mtu 1500
 
 traffic_shaping
-if ! test "${RESULT}" = "0"; then
+if test "${RESULT}" != "0"; then
     exit 1
 fi
 exit 0

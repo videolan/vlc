@@ -174,7 +174,7 @@ case "${host_os}" in
       [AS_HELP_STRING([--with-macosx-sdk=DIR],
         [compile using the SDK in DIR])])
     test "${with_macosx_sdk}" = "" && with_macosx_sdk=/Developer/SDKs/MacOSX10.6.sdk
-    ! test -d "${with_macosx_sdk}" && AC_MSG_ERROR([SDK "${with_macosx_sdk}" not found])
+    test ! -d "${with_macosx_sdk}" && AC_MSG_ERROR([SDK "${with_macosx_sdk}" not found])
     AC_ARG_WITH(macosx-version-min,
       [AS_HELP_STRING([--with-macosx-version-min=VERSION],
         [compile for MacOS X VERSION and above])])
@@ -3693,14 +3693,14 @@ then
 
   VLC_ADD_LIBS([macosx], [-Wl,-framework,QTKit -Wl,-framework,IOKit -Wl,-framework,AddressBook -Wl,-framework,WebKit])
 
-  if ! test -d ${CONTRIB_DIR}/Sparkle.framework
+  if test ! -d ${CONTRIB_DIR}/Sparkle.framework
   then
     AC_MSG_ERROR([Sparkle framework is required and was not found in ${CONTRIB_DIR}])
   fi
   VLC_ADD_LIBS([macosx], [-F${CONTRIB_DIR} -Wl,-framework,Sparkle])
   VLC_ADD_OBJCFLAGS([macosx], [-F${CONTRIB_DIR}])
 
-  if ! test -d ${CONTRIB_DIR}/BGHUDAppKit.framework
+  if test ! -d ${CONTRIB_DIR}/BGHUDAppKit.framework
   then
     AC_MSG_ERROR([BGHUDAppKit framework is required and was not found in ${CONTRIB_DIR}])
   fi

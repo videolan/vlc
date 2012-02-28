@@ -88,11 +88,11 @@ vlc_install_object() {
         local lib_install_prefix="@loader_path/../lib"
     fi
 
-    if ! test -e ${src_lib}; then
+    if test ! -e ${src_lib}; then
         return
     fi
 
-    if ( (! test -e ${lib_dest}) || test ${src_lib} -nt ${lib_dest} ); then
+    if ( (test ! -e ${lib_dest}) || test ${src_lib} -nt ${lib_dest} ); then
 
         mkdir -p ${dest_dir}
 
