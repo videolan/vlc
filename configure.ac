@@ -490,7 +490,7 @@ need_libc=false
 
 dnl Check for usual libc functions
 AC_CHECK_DECLS([nanosleep],,,[#include <time.h>])
-AC_CHECK_FUNCS([daemon fcntl fstatvfs fork getenv getpwuid_r if_nameindex if_nametoindex isatty lstat memalign mmap openat pread posix_fadvise posix_madvise setlocale stricmp strnicmp strptime uselocale])
+AC_CHECK_FUNCS([daemon fcntl fstatvfs fork getenv getpwuid_r isatty lstat memalign mmap openat pread posix_fadvise posix_madvise setlocale stricmp strnicmp strptime uselocale])
 AC_REPLACE_FUNCS([atof atoll dirfd fdopendir flockfile fsync getdelim getpid gmtime_r inet_pton lldiv localtime_r nrand48 poll posix_memalign rewind setenv strcasecmp strcasestr strdup strlcpy strncasecmp strndup strnlen strsep strtof strtok_r strtoll swab tdestroy strverscmp])
 AC_CHECK_FUNCS(fdatasync,,
   [AC_DEFINE(fdatasync, fsync, [Alias fdatasync() to fsync() if missing.])
@@ -543,7 +543,7 @@ AC_CHECK_TYPES([struct pollfd],,,
 #endif
 ])
 
-dnl Check for connect
+dnl Checks for socket stuff
 VLC_SAVE_FLAGS
 SOCKET_LIBS=""
 AC_SEARCH_LIBS(connect, [socket], [
@@ -558,7 +558,16 @@ AC_SEARCH_LIBS(connect, [socket], [
     SOCKET_LIBS="-lws2"
   ])
 ])
+
+AC_SEARCH_LIBS([getaddrinfo], [nsl], [
+ AS_IF([test "$ac_cv_search_getaddrinfo" != "none required"], [
+    SOCKET_LIBS="$ac_cv_search_getaddrinfo $SOCKET_LIBS"
+  ])
+],, [${SOCKET_LIBS}])
+
+AC_CHECK_FUNCS([if_nameindex if_nametoindex])
 VLC_RESTORE_FLAGS
+
 AS_IF([test -n "$SOCKET_LIBS"], [
   VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout sap stream_out_select stream_out_standard stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp oldrc netsync gnutls flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a netsync stream_filter_dash],[${SOCKET_LIBS}])
 ])
@@ -600,13 +609,6 @@ AS_IF([test "${ac_cv_struct_sockaddr_storage}" = no], [
   AC_DEFINE(sockaddr_storage, sockaddr)
   AC_DEFINE(ss_family, sa_family)
 ])
-
-dnl getaddrinfo, getnameinfo and gai_strerror check
-dnl  -lnsl and -lsocket are needed on Solaris;
-dnl  we purposedly make the test fail on Windows
-VLC_SAVE_FLAGS
-AC_SEARCH_LIBS([getaddrinfo], [nsl],,, [${SOCKET_LIBS}])
-VLC_RESTORE_FLAGS
 
 dnl FreeBSD has a gnugetopt library for this:
 GNUGETOPT_LIBS=""
