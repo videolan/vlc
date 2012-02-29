@@ -59,7 +59,7 @@ vlc_win32_rc.rc: $(top_builddir)/config.status vlc_win32_rc.rc.in
 vlc_win32_rc.$(OBJEXT): vlc_win32_rc.rc
 	$(WINDRES) --include-dir $(top_srcdir)/share/icons -i $< -o $@
 
-vlc_cache_gen_SOURCES = cachegen.c
+vlc_cache_gen_SOURCES = cachegen.c dummy.cpp
 vlc_cache_gen_LDADD = \
 	$(GNUGETOPT_LIBS) \
 	../compat/libcompat.la \
