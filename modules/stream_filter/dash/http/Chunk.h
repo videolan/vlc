@@ -27,6 +27,7 @@
 
 #include <vector>
 #include <string>
+#include <stdint.h>
 
 namespace dash
 {
@@ -46,7 +47,7 @@ namespace dash
                 void                addOptionalUrl  (const std::string& url);
                 bool                useByteRange    ();
                 void                setUseByteRange (bool value);
-                void                setBitrate      (int bitrate);
+                void                setBitrate      (uint64_t bitrate);
                 int                 getBitrate      ();
 
             private:

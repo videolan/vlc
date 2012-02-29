@@ -59,8 +59,8 @@ namespace dash
                 std::map<Chunk *, HTTPConnection *>                 chunkMap;
                 std::map<std::string, HTTPConnection *>             urlMap;
                 std::vector<dash::logic::IDownloadRateObserver *>   rateObservers;
-                long                                                bpsAvg;
-                long                                                bpsLastChunk;
+                uint64_t                                            bpsAvg;
+                uint64_t                                            bpsLastChunk;
                 long                                                bytesReadSession;
                 double                                              timeSecSession;
                 long                                                bytesReadChunk;

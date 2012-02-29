@@ -114,10 +114,10 @@ int                 HTTPConnectionManager::read( Chunk *chunk, void *p_buffer, s
         if(this->timeSecChunk > 0)
             this->bpsLastChunk = (this->bytesReadChunk / this->timeSecChunk) * 8;
 
-        if(this->bpsAvg < 0 || this->chunkCount < 2)
+        if(this->chunkCount < 2)
             this->bpsAvg = 0;
 
-        if(this->bpsLastChunk < 0 || this->chunkCount < 2)
+        if(this->chunkCount < 2)
             this->bpsLastChunk = 0;
 
         this->notify();
@@ -150,7 +150,7 @@ void                HTTPConnectionManager::attach                   (IDownloadRa
 }
 void                HTTPConnectionManager::notify                   ()
 {
-    if ( this->bpsAvg <= 0 )
+    if ( this->bpsAvg == 0 )
         return ;
     for(size_t i = 0; i < this->rateObservers.size(); i++)
         this->rateObservers.at(i)->downloadRateChanged(this->bpsAvg, this->bpsLastChunk);

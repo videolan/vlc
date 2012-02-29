@@ -47,11 +47,11 @@ namespace dash
                 AbstractAdaptationLogic             (dash::mpd::IMPDManager *mpdManager, stream_t *stream);
                 virtual ~AbstractAdaptationLogic    ();
 
-                virtual void                downloadRateChanged     (long bpsAvg, long bpsLastChunk);
+                virtual void                downloadRateChanged     (uint64_t bpsAvg, uint64_t bpsLastChunk);
                 virtual void                bufferLevelChanged      (mtime_t bufferedMicroSec, int bufferedPercent);
 
-                long                        getBpsAvg               () const;
-                long                        getBpsLastChunk         () const;
+                uint64_t                    getBpsAvg               () const;
+                uint64_t                    getBpsLastChunk         () const;
                 int                         getBufferPercent        () const;
 
             private:

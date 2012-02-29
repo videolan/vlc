@@ -33,7 +33,7 @@ using namespace dash::mpd;
 using namespace dash::exception;
 
 AbstractAdaptationLogic::AbstractAdaptationLogic    (IMPDManager *mpdManager, stream_t *stream) :
-                         bpsAvg                     (-1),
+                         bpsAvg                     (0),
                          bpsLastChunk               (0),
                          mpdManager                 (mpdManager),
                          stream                     (stream),
@@ -51,16 +51,16 @@ void AbstractAdaptationLogic::bufferLevelChanged     (mtime_t bufferedMicroSec, 
     this->bufferedMicroSec = bufferedMicroSec;
     this->bufferedPercent  = bufferedPercent;
 }
-void AbstractAdaptationLogic::downloadRateChanged    (long bpsAvg, long bpsLastChunk)
+void AbstractAdaptationLogic::downloadRateChanged    (uint64_t bpsAvg, uint64_t bpsLastChunk)
 {
     this->bpsAvg        = bpsAvg;
     this->bpsLastChunk  = bpsLastChunk;
 }
-long AbstractAdaptationLogic::getBpsAvg              () const
+uint64_t AbstractAdaptationLogic::getBpsAvg          () const
 {
     return this->bpsAvg;
 }
-long AbstractAdaptationLogic::getBpsLastChunk        () const
+uint64_t AbstractAdaptationLogic::getBpsLastChunk    () const
 {
     return this->bpsLastChunk;
 }

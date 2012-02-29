@@ -52,8 +52,8 @@ namespace dash
                 /**
                  *  \return     The average bitrate in bits per second.
                  */
-                virtual long                    getBpsAvg               () const = 0;
-                virtual long                    getBpsLastChunk         () const = 0;
+                virtual uint64_t                getBpsAvg               () const = 0;
+                virtual uint64_t                getBpsLastChunk         () const = 0;
         };
     }
 }

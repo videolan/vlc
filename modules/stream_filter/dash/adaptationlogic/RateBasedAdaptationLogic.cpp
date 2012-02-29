@@ -53,7 +53,7 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk() throw(EOFException)
     if(this->currentPeriod == NULL)
         throw EOFException();
 
-    long bitrate = this->getBpsAvg();
+    uint64_t bitrate = this->getBpsAvg();
 
     if(this->getBufferPercent() < MINBUFFER)
         bitrate = 0;

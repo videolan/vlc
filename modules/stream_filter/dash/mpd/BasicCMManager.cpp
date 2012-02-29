@@ -91,7 +91,7 @@ Period*                 BasicCMManager::getFirstPeriod          ()
     return periods.at(0);
 }
 
-Representation*         BasicCMManager::getRepresentation(Period *period, int bitrate ) const
+Representation*         BasicCMManager::getRepresentation(Period *period, uint64_t bitrate ) const
 {
     std::vector<Group *>    groups = period->getGroups();
 
@@ -134,7 +134,7 @@ const MPD*      BasicCMManager::getMPD() const
 {
     return this->mpd;
 }
-Representation*         BasicCMManager::getRepresentation (Period *period, int bitrate, int, int ) const
+Representation*         BasicCMManager::getRepresentation (Period *period, uint64_t bitrate, int, int ) const
 {
     return this->getRepresentation(period, bitrate);
 }

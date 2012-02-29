@@ -25,6 +25,8 @@
 #ifndef IDOWNLOADRATEOBSERVER_H_
 #define IDOWNLOADRATEOBSERVER_H_
 
+#include <stdint.h>
+
 namespace dash
 {
     namespace logic
@@ -32,7 +34,7 @@ namespace dash
         class IDownloadRateObserver
         {
             public:
-                virtual void downloadRateChanged(long bpsAvg, long bpsLastChunk) = 0;
+                virtual void downloadRateChanged(uint64_t bpsAvg, uint64_t bpsLastChunk) = 0;
                 virtual ~IDownloadRateObserver(){}
         };
     }

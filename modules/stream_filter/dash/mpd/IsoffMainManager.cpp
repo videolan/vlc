@@ -87,7 +87,7 @@ Period*                     IsoffMainManager::getFirstPeriod        ()
 
     return periods.at(0);
 }
-Representation*             IsoffMainManager::getRepresentation     (Period *period, int bitrate) const
+Representation*             IsoffMainManager::getRepresentation     (Period *period, uint64_t bitrate) const
 {
     if(period == NULL)
         return NULL;
@@ -129,7 +129,7 @@ const MPD*                  IsoffMainManager::getMPD                () const
 {
     return this->mpd;
 }
-Representation*             IsoffMainManager::getRepresentation     (Period *period, int bitrate, int width, int height) const
+Representation*             IsoffMainManager::getRepresentation     (Period *period, uint64_t bitrate, int width, int height) const
 {
     if(period == NULL)
         return NULL;
