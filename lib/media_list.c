@@ -166,8 +166,6 @@ libvlc_media_list_new( libvlc_instance_t * p_inst )
         return NULL;
     }
 
-    /* Code for that one should be handled in flat_media_list.c */
-    p_mlist->p_flat_mlist = NULL;
     p_mlist->b_read_only = false;
 
     libvlc_event_manager_register_event_type( p_mlist->p_event_manager,

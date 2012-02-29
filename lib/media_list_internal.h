@@ -46,10 +46,6 @@ struct libvlc_media_list_t
                                        * mlist comes, if any. */
     vlc_array_t                items;
 
-    /* Other way to see that media list */
-    /* Used in flat_media_list.c */
-    libvlc_media_list_t *       p_flat_mlist;
-
     /* This indicates if this media list is read-only
      * from a user point of view */
     bool                  b_read_only;
