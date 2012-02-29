@@ -48,7 +48,8 @@ typedef struct
 # include <stdio.h> /* FILE */
 #endif
 
-#if !defined (HAVE_STRLCPY) || \
+#if !defined (HAVE_POSIX_MEMALIGN) || \
+    !defined (HAVE_STRLCPY) || \
     !defined (HAVE_STRNDUP) || \
     !defined (HAVE_STRNLEN)
 # include <stddef.h> /* size_t */
@@ -210,6 +211,10 @@ static inline char *getenv (const char *name)
 #ifndef HAVE_SETENV
 int setenv (const char *, const char *, int);
 int unsetenv (const char *);
+#endif
+
+#ifndef HAVE_POSIX_MEMALIGN
+int posix_memalign (void **, size_t, size_t);
 #endif
 
 /* locale.h */
