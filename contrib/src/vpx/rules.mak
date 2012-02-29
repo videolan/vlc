@@ -40,7 +40,7 @@ VPX_ARCH := ppc32
 else ifeq ($(ARCH),ppc64)
 VPX_ARCH := ppc64
 else ifeq ($(ARCH),sparc)
-VPX_ARCH := sparch
+VPX_ARCH := sparc
 else ifeq ($(ARCH),x86_64)
 VPX_ARCH := x86_64
 endif
