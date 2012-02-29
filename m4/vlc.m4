@@ -7,7 +7,6 @@ m4_pattern_allow([^PKG_CONFIG(_LIBDIR)?$])
 
 AC_DEFUN([VLC_ADD_PLUGIN], [
   m4_foreach_w([element], [$1], [
-    [PLUGINS="${PLUGINS} ]element["]
     AC_SUBST([LTLIB]element, [lib]element[_plugin.la])
   ])
 ])
