@@ -28,6 +28,13 @@ function descriptor()
 end
 
 function main()
+    add_top_tracks( "ratingweek_desc", "rock", 100 )
+    add_top_tracks( "ratingweek_desc", "pop", 100 )
+    add_top_tracks( "ratingweek_desc", "jazz", 100 )
+    add_top_tracks( "ratingweek_desc", "dance", 100 )
+    add_top_tracks( "ratingweek_desc", "hipop+rap", 100 )
+    add_top_tracks( "ratingweek_desc", "world+reggae", 100 )
+    add_top_tracks( "ratingweek_desc", "lounge+ambient", 100 )
     add_top_tracks( "ratingweek_desc", nil, 100 )
     add_top_albums( "ratingweek_desc", nil, 20 )
     add_radio_from_id( "9", 20 )
@@ -37,6 +44,7 @@ function main()
     add_radio_from_id( "7", 20 )
     add_radio_from_id( "4", 20 )
 end
+
 
 function add_top_albums( album_order, tag, max_results )
     local url = "http://api.jamendo.com/get2/id+name+artist_name+album_image/album/xml/?imagesize=500&order=" .. album_order .. "&n=" .. max_results
@@ -69,10 +77,11 @@ function add_top_albums( album_order, tag, max_results )
 end
 
 function add_top_tracks( track_order, tag, max_results )
-    local url = "http://api.jamendo.com/get2/id+name+duration+artist_name+album_name+album_genre+album_image+album_dates/track/xml/track_album+album_artist/?imagesize=500&order=" .. track_order .. "&n=" .. max_results
+    local url = "http://api.jamendo.com/get2/id+name+duration+artist_name+album_name+genre+album_image+album_dates/track/xml/track_album+album_artist/?imagesize=500&order=" .. track_order .. "&n=" .. max_results
     if tag ~= nil then
-        url = url .. "&tag_idstr=" .. tag
+        url = url .. "&tag_minweight=0.35&tag_idstr=" .. tag
     end
+
     local tree = simplexml.parse_url( url )
     local node_name = "Top " .. max_results
     if track_order == "rating_desc" then node_name = node_name .. " most popular tracks"
@@ -86,16 +95,16 @@ function add_top_tracks( track_order, tag, max_results )
     elseif track_order == "needreviews_desc" then node_name = node_name .. " tracks requiring review"
     end
     if tag ~= nil then
-        node_name = tag .. " - " .. node_name
+        node_name = string.upper(tag) .. " - " .. node_name
     end
     local node = vlc.sd.add_node( {title=node_name} )
     for _, track in ipairs( tree.children ) do
         simplexml.add_name_maps( track )
         node:add_subitem( {path="http://api.jamendo.com/get2/stream/track/redirect/?id=" .. track.children_map["id"][1].children[1],
-                           title=track.children_map["name"][1].children[1],
+                           title=track.children_map["artist_name"][1].children[1].." - "..track.children_map["name"][1].children[1],
                            artist=track.children_map["artist_name"][1].children[1],
                            album=track.children_map["album_name"][1].children[1],
-                           genre=track.children_map["album_genre"][1].children[1],
+                           genre=track.children_map["genre"][1].children[1],
                            date=track.children_map["album_dates"][1].children_map["year"][1].children[1],
                            arturl=track.children_map["album_image"][1].children[1],
                            duration=track.children_map["duration"][1].children[1]} )
