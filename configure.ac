@@ -4257,7 +4257,7 @@ echo "#! $SHELL
 rm -f .error\$\$
 ERROR=0
 export PATH=\"$PATH\" LANG=C
-($MAKE V=1 \$@ 2>&1 || touch .error\$\$)| `sed -ne "s/^top_srcdir *= *//p" < Makefile`/extras/buildsystem/make.pl
+($MAKE V=1 \$@ 2>&1 || touch .error\$\$)| `sed -ne \"s/^top_srcdir *= *//p\" < Makefile`/extras/buildsystem/make.pl
 test -f .error\$\$ && ERROR=1
 rm -f .error\$\$
 exit \$ERROR" >compile
