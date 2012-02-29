@@ -75,4 +75,4 @@ pkgconfig_DATA = libvlc.pc
 	$(SHELL) ./config.status --file="lib/$@"
 
 check-local:
-	$(top_srcdir)/src/check_headers $(pkginclude_HEADERS)
+	$(SHELL) $(top_srcdir)/src/check_headers $(pkginclude_HEADERS)
