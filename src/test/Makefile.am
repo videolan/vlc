@@ -15,7 +15,8 @@ TESTS = $(check_PROGRAMS)
 
 AM_CFLAGS = $(CFLAGS_libvlccore)
 AM_LDFLAGS = -no-install
-LDADD = ../libvlccore.la
+LDADD = ../libvlccore.la \
+	../../compat/libcompat.la
 
 test_block_SOURCES = block_test.c ../misc/block.c
 test_block_LDADD = $(LDADD) $(LIBS_libvlccore)
