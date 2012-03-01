@@ -246,7 +246,7 @@ struct demux_sys_t
     static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp );
     static int ParseSAP( services_discovery_t *p_sd, const uint8_t *p_buffer, size_t i_read );
     static sdp_t *ParseSDP (vlc_object_t *p_sd, const char *psz_sdp);
-    static sap_announce_t *CreateAnnounce( services_discovery_t *, uint16_t, sdp_t * );
+    static sap_announce_t *CreateAnnounce( services_discovery_t *, uint32_t *, uint16_t, sdp_t * );
     static int RemoveAnnounce( services_discovery_t *p_sd, sap_announce_t *p_announce );
 
 /* Helper functions */
@@ -256,7 +256,6 @@ struct demux_sys_t
     static const char *FindAttribute (const sdp_t *sdp, unsigned media,
                                       const char *name);
 
-    static bool IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 );
     static int InitSocket( services_discovery_t *p_sd, const char *psz_address, int i_port );
     static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i_len );
     static void FreeSDP( sdp_t *p_sdp );
@@ -664,6 +663,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
     const char          *psz_sdp;
     const uint8_t *end = buf + len;
     sdp_t               *p_sdp;
+    uint32_t            i_source[4];
 
     assert (buf[len] == '\0');
 
@@ -671,6 +671,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         return VLC_EGENERIC;
 
     uint8_t flags = buf[0];
+    uint8_t auth_len = buf[1];
 
     /* First, check the sap announce is correct */
     if ((flags >> 5) != 1)
@@ -695,8 +696,20 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         return VLC_EGENERIC;
     }
 
-    // Skips source address and auth data
-    buf += 4 + (b_ipv6 ? 16 : 4) + buf[1];
+    buf += 4;
+    if( b_ipv6 )
+    {
+        for( int i = 0; i < 4; i++,buf+=4)
+            i_source[i] = U32_AT(buf);
+    }
+    else
+    {
+        memset(i_source, 0, sizeof(i_source));
+        i_source[3] = U32_AT(buf);
+        buf+=4;
+    }
+    // Skips auth data
+    buf += auth_len;
     if (buf > end)
         return VLC_EGENERIC;
 
@@ -775,8 +788,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
     {
         sap_announce_t * p_announce = p_sd->p_sys->pp_announces[i];
         /* FIXME: slow */
-        /* FIXME: we create a new announce each time the sdp changes */
-        if( IsSameSession( p_announce->p_sdp, p_sdp ) )
+        if( p_announce->i_hash == i_hash && !memcmp(p_announce->i_source, i_source, sizeof(i_source)) )
         {
             /* We don't support delete announcement as they can easily
              * Be used to highjack an announcement by a third party.
@@ -804,13 +816,13 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         }
     }
 
-    CreateAnnounce( p_sd, i_hash, p_sdp );
+    CreateAnnounce( p_sd, i_source, i_hash, p_sdp );
 
     FREENULL (decomp);
     return VLC_SUCCESS;
 }
 
-sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
+sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint32_t *i_source, uint16_t i_hash,
                                 sdp_t *p_sdp )
 {
     input_item_t *p_input;
@@ -827,6 +839,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     p_sap->i_period = 0;
     p_sap->i_period_trust = 0;
     p_sap->i_hash = i_hash;
+    memcpy (p_sap->i_source, i_source, sizeof(p_sap->i_source));
     p_sap->p_sdp = p_sdp;
 
     /* Released in RemoveAnnounce */
@@ -1529,25 +1542,6 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
 
     return VLC_SUCCESS;
 }
-
-static bool IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 )
-{
-    /* A session is identified by
-     * - username,
-     * - session_id,
-     * - network type (which is always IN),
-     * - address type (currently, this means IP version),
-     * - and hostname.
-     */
-    if (strcmp (p_sdp1->username, p_sdp2->username)
-     || (p_sdp1->session_id != p_sdp2->session_id)
-     || (p_sdp1->orig_ip_version != p_sdp2->orig_ip_version)
-     || strcmp (p_sdp1->orig_host, p_sdp2->orig_host))
-        return false;
-
-    return true;
-}
-
 
 static inline attribute_t *MakeAttribute (const char *str)
 {
