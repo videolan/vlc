@@ -73,35 +73,3 @@ char *config_GetLibDir (void)
 error:
     return (path != NULL) ? path : strdup (PKGLIBDIR);
 }
-
-#ifdef __GLIBC__
-# include <gnu/libc-version.h>
-# include <stdlib.h>
-#endif
-
-void system_Init (void)
-{
-#ifdef __GLIBC__
-    const char *glcv = gnu_get_libc_version ();
-
-    /* gettext in glibc 2.5-2.7 is not thread-safe. LibVLC keeps crashing,
-     * especially in sterror_r(). Even if we have NLS disabled, the calling
-     * process might have called setlocale(). */
-    if (strverscmp (glcv, "2.5") >= 0 && strverscmp (glcv, "2.8") < 0)
-    {
-        fputs ("LibVLC has detected an unusable buggy GNU/libc version.\n"
-               "Please update to version 2.8 or newer.\n", stderr);
-        fflush (stderr);
-    }
-#endif
-}
-
-void system_Configure (libvlc_int_t *libvlc,
-                       int argc, const char *const argv[])
-{
-    (void)libvlc; (void)argc; (void)argv;
-}
-
-void system_End (void)
-{
-}

@@ -256,6 +256,7 @@ SOURCES_libvlc_linux = \
 	posix/thread.c \
 	posix/linux_cpu.c \
 	posix/linux_specific.c \
+	posix/specific.c \
 	posix/rand.c \
 	$(NULL)
 
