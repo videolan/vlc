@@ -590,7 +590,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (IBAction)togglePlaylist:(id)sender
 {
-    if ( ((([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0) && !b_splitview_removed) || (b_nonembedded && [[VLCMain sharedInstance] activeVideoPlayback] && sender != nil) )
+    if ( ((([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0) && !b_splitview_removed && ![[VLCMain sharedInstance] activeVideoPlayback]) || (b_nonembedded && [[VLCMain sharedInstance] activeVideoPlayback] && sender != nil) )
     {
         [self hideSplitView];
     }
