@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">11C74</string>
+    <string key="IBDocument.SystemVersion">11D50</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1138.23</string>
-    <string key="IBDocument.HIToolboxVersion">567.00</string>
+    <string key="IBDocument.AppKitVersion">1138.32</string>
+    <string key="IBDocument.HIToolboxVersion">568.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <object class="NSArray" key="dict.sortedKeys">
@@ -21,7 +21,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="2"/>
+      <integer value="5"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -112,52 +112,35 @@
                       <reference key="NSSuperview" ref="103010271"/>
                       <bool key="NSEnabled">YES</bool>
                       <object class="BGHUDTextFieldCell" key="NSCell" id="339403913">
-                        <int key="NSCellFlags">-1804468671</int>
-                        <int key="NSCellFlags2">-2076048384</int>
-                        <string key="NSContents">0.000 s</string>
+                        <int key="NSCellFlags">-1803944383</int>
+                        <int key="NSCellFlags2">71439424</int>
                         <reference key="NSSupport" ref="26"/>
-                        <object class="NSNumberFormatter" key="NSFormatter" id="1072523057">
+                        <object class="NSNumberFormatter" key="NSFormatter" id="172589828">
                           <object class="NSMutableDictionary" key="NS.attributes">
                             <bool key="EncodedWithXMLCoder">YES</bool>
                             <object class="NSArray" key="dict.sortedKeys">
                               <bool key="EncodedWithXMLCoder">YES</bool>
                               <string>allowsFloats</string>
-                              <string>alwaysShowsDecimalSeparator</string>
-                              <string>formatWidth</string>
                               <string>formatterBehavior</string>
-                              <string>generatesDecimalNumbers</string>
-                              <string>locale</string>
-                              <string>negativeFormat</string>
+                              <string>lenient</string>
                               <string>negativeInfinitySymbol</string>
                               <string>nilSymbol</string>
                               <string>numberStyle</string>
-                              <string>paddingCharacter</string>
-                              <string>paddingPosition</string>
-                              <string>positiveFormat</string>
                               <string>positiveInfinitySymbol</string>
                             </object>
                             <object class="NSMutableArray" key="dict.values">
                               <bool key="EncodedWithXMLCoder">YES</bool>
                               <boolean value="YES"/>
-                              <boolean value="YES"/>
-                              <integer value="0"/>
                               <integer value="1040"/>
-                              <boolean value="NO"/>
-                              <object class="NSLocale" id="507609089">
-                                <string key="NS.identifier"/>
-                              </object>
-                              <string>#0.000 s</string>
+                              <boolean value="YES"/>
                               <string>-∞</string>
                               <string/>
                               <integer value="1"/>
-                              <string/>
-                              <integer value="2"/>
-                              <string>#0.000 s</string>
                               <string>+∞</string>
                             </object>
                           </object>
-                          <string key="NS.positiveformat">#0.000 s</string>
-                          <string key="NS.negativeformat">#0.000 s</string>
+                          <string key="NS.positiveformat">#,##0.###</string>
+                          <string key="NS.negativeformat">#,##0.###</string>
                           <nil key="NS.positiveattrs"/>
                           <nil key="NS.negativeattrs"/>
                           <nil key="NS.zero"/>
@@ -166,7 +149,7 @@
                           </object>
                           <object class="NSAttributedString" key="NS.nan">
                             <string key="NSString">NaN</string>
-                            <object class="NSDictionary" key="NSAttributes" id="286888026">
+                            <object class="NSDictionary" key="NSAttributes" id="911952491">
                               <bool key="EncodedWithXMLCoder">YES</bool>
                               <reference key="dict.sortedKeys" ref="0"/>
                               <object class="NSMutableArray" key="dict.values">
@@ -174,7 +157,7 @@
                               </object>
                             </object>
                           </object>
-                          <object class="NSDecimalNumberPlaceholder" key="NS.min" id="626826107">
+                          <object class="NSDecimalNumberPlaceholder" key="NS.min" id="192957843">
                             <int key="NS.exponent">0</int>
                             <int key="NS.length">0</int>
                             <bool key="NS.negative">YES</bool>
@@ -182,17 +165,17 @@
                             <int key="NS.mantissa.bo">1</int>
                             <bytes key="NS.mantissa">AAAAAAAAAAAAAAAAAAAAAA</bytes>
                           </object>
-                          <reference key="NS.max" ref="626826107"/>
+                          <reference key="NS.max" ref="192957843"/>
                           <object class="NSDecimalNumberHandler" key="NS.rounding">
                             <int key="NS.roundingmode">3</int>
                             <bool key="NS.raise.overflow">YES</bool>
                             <bool key="NS.raise.underflow">YES</bool>
                             <bool key="NS.raise.dividebyzero">YES</bool>
                           </object>
-                          <string key="NS.decimal">.</string>
-                          <string key="NS.thousand">,</string>
-                          <bool key="NS.hasthousands">NO</bool>
-                          <bool key="NS.localized">NO</bool>
+                          <string key="NS.decimal">,</string>
+                          <string key="NS.thousand">.</string>
+                          <bool key="NS.hasthousands">YES</bool>
+                          <bool key="NS.localized">YES</bool>
                           <bool key="NS.allowsfloats">YES</bool>
                         </object>
                         <object class="NSAttributedString" key="NSPlaceholderString">
@@ -225,6 +208,10 @@
                           <reference key="NSColor" ref="967773458"/>
                         </object>
                         <reference key="NSTextColor" ref="967773458"/>
+                        <object class="NSArray" key="NSAllowedInputLocales">
+                          <bool key="EncodedWithXMLCoder">YES</bool>
+                          <string>NSAllRomanInputSourcesLocaleIdentifier</string>
+                        </object>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                     </object>
@@ -354,46 +341,45 @@
                       <reference key="NSSuperview" ref="327003328"/>
                       <bool key="NSEnabled">YES</bool>
                       <object class="BGHUDTextFieldCell" key="NSCell" id="843835699">
-                        <int key="NSCellFlags">-1804468671</int>
-                        <int key="NSCellFlags2">71435264</int>
-                        <real value="0.0" key="NSContents"/>
+                        <int key="NSCellFlags">-1803944383</int>
+                        <int key="NSCellFlags2">71439424</int>
                         <reference key="NSSupport" ref="26"/>
-                        <object class="NSNumberFormatter" key="NSFormatter" id="563781141">
+                        <object class="NSNumberFormatter" key="NSFormatter" id="548152202">
                           <object class="NSMutableDictionary" key="NS.attributes">
                             <bool key="EncodedWithXMLCoder">YES</bool>
                             <object class="NSArray" key="dict.sortedKeys">
                               <bool key="EncodedWithXMLCoder">YES</bool>
                               <string>allowsFloats</string>
-                              <string>alwaysShowsDecimalSeparator</string>
-                              <string>formatWidth</string>
                               <string>formatterBehavior</string>
+                              <string>generatesDecimalNumbers</string>
+                              <string>lenient</string>
                               <string>locale</string>
-                              <string>negativeFormat</string>
                               <string>negativeInfinitySymbol</string>
+                              <string>negativeSuffix</string>
                               <string>nilSymbol</string>
                               <string>numberStyle</string>
-                              <string>paddingCharacter</string>
-                              <string>positiveFormat</string>
                               <string>positiveInfinitySymbol</string>
+                              <string>positiveSuffix</string>
                             </object>
                             <object class="NSMutableArray" key="dict.values">
                               <bool key="EncodedWithXMLCoder">YES</bool>
                               <boolean value="YES"/>
-                              <boolean value="YES"/>
-                              <integer value="0"/>
                               <integer value="1040"/>
-                              <reference ref="507609089"/>
-                              <string>#,##0.000 s</string>
+                              <boolean value="YES"/>
+                              <boolean value="YES"/>
+                              <object class="NSLocale" id="507609089">
+                                <string key="NS.identifier"/>
+                              </object>
                               <string>-∞</string>
+                              <string> s</string>
                               <string/>
                               <integer value="1"/>
-                              <string/>
-                              <string>#,##0.000 s</string>
                               <string>+∞</string>
+                              <string> s</string>
                             </object>
                           </object>
-                          <string key="NS.positiveformat">#,##0.000 s</string>
-                          <string key="NS.negativeformat">#,##0.000 s</string>
+                          <string key="NS.positiveformat">#,##0.### s</string>
+                          <string key="NS.negativeformat">#,##0.### s</string>
                           <nil key="NS.positiveattrs"/>
                           <nil key="NS.negativeattrs"/>
                           <nil key="NS.zero"/>
@@ -402,10 +388,10 @@
                           </object>
                           <object class="NSAttributedString" key="NS.nan">
                             <string key="NSString">NaN</string>
-                            <reference key="NSAttributes" ref="286888026"/>
+                            <reference key="NSAttributes" ref="911952491"/>
                           </object>
-                          <reference key="NS.min" ref="626826107"/>
-                          <reference key="NS.max" ref="626826107"/>
+                          <reference key="NS.min" ref="192957843"/>
+                          <reference key="NS.max" ref="192957843"/>
                           <object class="NSDecimalNumberHandler" key="NS.rounding">
                             <int key="NS.roundingmode">3</int>
                             <bool key="NS.raise.overflow">YES</bool>
@@ -421,6 +407,10 @@
                         <reference key="NSControlView" ref="217063425"/>
                         <reference key="NSBackgroundColor" ref="122079537"/>
                         <reference key="NSTextColor" ref="967773458"/>
+                        <object class="NSArray" key="NSAllowedInputLocales">
+                          <bool key="EncodedWithXMLCoder">YES</bool>
+                          <string>NSAllRomanInputSourcesLocaleIdentifier</string>
+                        </object>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                     </object>
@@ -511,48 +501,43 @@
                       <reference key="NSSuperview" ref="327003328"/>
                       <bool key="NSEnabled">YES</bool>
                       <object class="BGHUDTextFieldCell" key="NSCell" id="646109661">
-                        <int key="NSCellFlags">-1804468671</int>
-                        <int key="NSCellFlags2">71435264</int>
-                        <real value="1" key="NSContents"/>
+                        <int key="NSCellFlags">-1803944383</int>
+                        <int key="NSCellFlags2">71439424</int>
                         <reference key="NSSupport" ref="26"/>
-                        <object class="NSNumberFormatter" key="NSFormatter" id="863172086">
+                        <object class="NSNumberFormatter" key="NSFormatter" id="36332554">
                           <object class="NSMutableDictionary" key="NS.attributes">
                             <bool key="EncodedWithXMLCoder">YES</bool>
                             <object class="NSArray" key="dict.sortedKeys">
                               <bool key="EncodedWithXMLCoder">YES</bool>
                               <string>allowsFloats</string>
                               <string>alwaysShowsDecimalSeparator</string>
-                              <string>formatWidth</string>
                               <string>formatterBehavior</string>
+                              <string>lenient</string>
                               <string>locale</string>
-                              <string>negativeFormat</string>
                               <string>negativeInfinitySymbol</string>
+                              <string>negativeSuffix</string>
                               <string>nilSymbol</string>
                               <string>numberStyle</string>
-                              <string>paddingCharacter</string>
-                              <string>paddingPosition</string>
-                              <string>positiveFormat</string>
                               <string>positiveInfinitySymbol</string>
+                              <string>positiveSuffix</string>
                             </object>
                             <object class="NSMutableArray" key="dict.values">
                               <bool key="EncodedWithXMLCoder">YES</bool>
                               <boolean value="YES"/>
-                              <boolean value="YES"/>
-                              <integer value="0"/>
+                              <boolean value="NO"/>
                               <integer value="1040"/>
+                              <boolean value="YES"/>
                               <reference ref="507609089"/>
-                              <string>#,##0.000 fps</string>
                               <string>-∞</string>
+                              <string> s</string>
                               <string/>
                               <integer value="1"/>
-                              <string/>
-                              <integer value="2"/>
-                              <string>#,##0.000 fps</string>
                               <string>+∞</string>
+                              <string> s</string>
                             </object>
                           </object>
-                          <string key="NS.positiveformat">#,##0.000 fps</string>
-                          <string key="NS.negativeformat">#,##0.000 fps</string>
+                          <string key="NS.positiveformat">#,##0.### s</string>
+                          <string key="NS.negativeformat">#,##0.### s</string>
                           <nil key="NS.positiveattrs"/>
                           <nil key="NS.negativeattrs"/>
                           <nil key="NS.zero"/>
@@ -561,10 +546,10 @@
                           </object>
                           <object class="NSAttributedString" key="NS.nan">
                             <string key="NSString">NaN</string>
-                            <reference key="NSAttributes" ref="286888026"/>
+                            <reference key="NSAttributes" ref="911952491"/>
                           </object>
-                          <reference key="NS.min" ref="626826107"/>
-                          <reference key="NS.max" ref="626826107"/>
+                          <reference key="NS.min" ref="192957843"/>
+                          <reference key="NS.max" ref="192957843"/>
                           <object class="NSDecimalNumberHandler" key="NS.rounding">
                             <int key="NS.roundingmode">3</int>
                             <bool key="NS.raise.overflow">YES</bool>
@@ -580,6 +565,10 @@
                         <reference key="NSControlView" ref="23746054"/>
                         <reference key="NSBackgroundColor" ref="122079537"/>
                         <reference key="NSTextColor" ref="967773458"/>
+                        <object class="NSArray" key="NSAllowedInputLocales">
+                          <bool key="EncodedWithXMLCoder">YES</bool>
+                          <string>NSAllRomanInputSourcesLocaleIdentifier</string>
+                        </object>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                     </object>
@@ -794,38 +783,6 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
       <object class="NSMutableArray" key="connectionRecords">
         <bool key="EncodedWithXMLCoder">YES</bool>
         <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">takeFloatValueFrom:</string>
-            <reference key="source" ref="498497333"/>
-            <reference key="destination" ref="251177671"/>
-          </object>
-          <int key="connectionID">44</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">takeFloatValueFrom:</string>
-            <reference key="source" ref="217063425"/>
-            <reference key="destination" ref="200523684"/>
-          </object>
-          <int key="connectionID">47</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">takeFloatValueFrom:</string>
-            <reference key="source" ref="488437164"/>
-            <reference key="destination" ref="217063425"/>
-          </object>
-          <int key="connectionID">48</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">takeFloatValueFrom:</string>
-            <reference key="source" ref="23746054"/>
-            <reference key="destination" ref="914650403"/>
-          </object>
-          <int key="connectionID">50</int>
-        </object>
-        <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_reset_btn</string>
             <reference key="source" ref="104752597"/>
@@ -1010,22 +967,6 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
           <int key="connectionID">79</int>
         </object>
         <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">takeFloatValueFrom:</string>
-            <reference key="source" ref="88930968"/>
-            <reference key="destination" ref="23746054"/>
-          </object>
-          <int key="connectionID">80</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">takeFloatValueFrom:</string>
-            <reference key="source" ref="483165134"/>
-            <reference key="destination" ref="498497333"/>
-          </object>
-          <int key="connectionID">81</int>
-        </object>
-        <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">delegate</string>
             <reference key="source" ref="498497333"/>
@@ -1048,6 +989,78 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
             <reference key="destination" ref="104752597"/>
           </object>
           <int key="connectionID">84</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">avValueChanged:</string>
+            <reference key="source" ref="104752597"/>
+            <reference key="destination" ref="483165134"/>
+          </object>
+          <int key="connectionID">85</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">avValueChanged:</string>
+            <reference key="source" ref="104752597"/>
+            <reference key="destination" ref="498497333"/>
+          </object>
+          <int key="connectionID">86</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_av_stp</string>
+            <reference key="source" ref="104752597"/>
+            <reference key="destination" ref="483165134"/>
+          </object>
+          <int key="connectionID">87</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_sv_advance_stp</string>
+            <reference key="source" ref="104752597"/>
+            <reference key="destination" ref="488437164"/>
+          </object>
+          <int key="connectionID">88</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_sv_speed_stp</string>
+            <reference key="source" ref="104752597"/>
+            <reference key="destination" ref="88930968"/>
+          </object>
+          <int key="connectionID">89</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">svAdvanceValueChanged:</string>
+            <reference key="source" ref="104752597"/>
+            <reference key="destination" ref="217063425"/>
+          </object>
+          <int key="connectionID">90</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">svSpeedValueChanged:</string>
+            <reference key="source" ref="104752597"/>
+            <reference key="destination" ref="23746054"/>
+          </object>
+          <int key="connectionID">91</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">svAdvanceValueChanged:</string>
+            <reference key="source" ref="104752597"/>
+            <reference key="destination" ref="488437164"/>
+          </object>
+          <int key="connectionID">92</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">svSpeedValueChanged:</string>
+            <reference key="source" ref="104752597"/>
+            <reference key="destination" ref="88930968"/>
+          </object>
+          <int key="connectionID">93</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -1140,7 +1153,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
             <reference key="object" ref="339403913"/>
             <object class="NSMutableArray" key="children">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="1072523057"/>
+              <reference ref="172589828"/>
             </object>
             <reference key="parent" ref="498497333"/>
           </object>
@@ -1259,7 +1272,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
             <reference key="object" ref="843835699"/>
             <object class="NSMutableArray" key="children">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="563781141"/>
+              <reference ref="548152202"/>
             </object>
             <reference key="parent" ref="217063425"/>
           </object>
@@ -1343,7 +1356,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
             <reference key="object" ref="646109661"/>
             <object class="NSMutableArray" key="children">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="863172086"/>
+              <reference ref="36332554"/>
             </object>
             <reference key="parent" ref="23746054"/>
           </object>
@@ -1395,24 +1408,24 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
             <reference key="parent" ref="857991618"/>
           </object>
           <object class="IBObjectRecord">
-            <int key="objectID">43</int>
-            <reference key="object" ref="1072523057"/>
-            <reference key="parent" ref="339403913"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">46</int>
-            <reference key="object" ref="563781141"/>
-            <reference key="parent" ref="843835699"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">51</int>
-            <reference key="object" ref="863172086"/>
-            <reference key="parent" ref="646109661"/>
-          </object>
-          <object class="IBObjectRecord">
             <int key="objectID">52</int>
             <reference key="object" ref="104752597"/>
             <reference key="parent" ref="0"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">95</int>
+            <reference key="object" ref="548152202"/>
+            <reference key="parent" ref="843835699"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">96</int>
+            <reference key="object" ref="36332554"/>
+            <reference key="parent" ref="646109661"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">97</int>
+            <reference key="object" ref="172589828"/>
+            <reference key="parent" ref="339403913"/>
           </object>
         </object>
       </object>
@@ -1480,17 +1493,8 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
           <string>41.IBPluginDependency</string>
           <string>41.IBViewBoundsToFrameTransform</string>
           <string>42.IBPluginDependency</string>
-          <string>43.IBNumberFormatterBehaviorMetadataKey</string>
-          <string>43.IBNumberFormatterLocalizesFormatMetadataKey</string>
-          <string>43.IBPluginDependency</string>
-          <string>46.IBNumberFormatterBehaviorMetadataKey</string>
-          <string>46.IBNumberFormatterLocalizesFormatMetadataKey</string>
-          <string>46.IBPluginDependency</string>
           <string>5.IBPluginDependency</string>
           <string>5.IBViewBoundsToFrameTransform</string>
-          <string>51.IBNumberFormatterBehaviorMetadataKey</string>
-          <string>51.IBNumberFormatterLocalizesFormatMetadataKey</string>
-          <string>51.IBPluginDependency</string>
           <string>52.IBPluginDependency</string>
           <string>6.IBPluginDependency</string>
           <string>6.IBViewBoundsToFrameTransform</string>
@@ -1498,15 +1502,25 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
           <string>8.IBPluginDependency</string>
           <string>8.IBViewBoundsToFrameTransform</string>
           <string>9.IBPluginDependency</string>
+          <string>95.IBNumberFormatterBehaviorMetadataKey</string>
+          <string>95.IBNumberFormatterLocalizesFormatMetadataKey</string>
+          <string>95.IBPluginDependency</string>
+          <string>96.IBNumberFormatterBehaviorMetadataKey</string>
+          <string>96.IBNumberFormatterLocalizesFormatMetadataKey</string>
+          <string>96.IBPluginDependency</string>
+          <string>97.IBNumberFormatterBehaviorMetadataKey</string>
+          <string>97.IBNumberFormatterLocalizesFormatMetadataKey</string>
+          <string>97.IBNumberFormatterSampleNumberKey</string>
+          <string>97.IBPluginDependency</string>
         </object>
         <object class="NSMutableArray" key="dict.values">
           <bool key="EncodedWithXMLCoder">YES</bool>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{430, 505}, {408, 193}}</string>
+          <string>{{409, 177}, {408, 193}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{430, 505}, {408, 193}}</string>
+          <string>{{409, 177}, {408, 193}}</string>
           <boolean value="NO"/>
           <string>{196, 240}</string>
           <string>{{357, 418}, {480, 270}}</string>
@@ -1595,19 +1609,10 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
             <bytes key="NSTransformStruct">P4AAAL+AAABDFAAAwdgAAA</bytes>
           </object>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
-          <integer value="1040"/>
-          <boolean value="YES"/>
-          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <integer value="1040"/>
-          <boolean value="YES"/>
-          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">AUGIAABC8gAAA</bytes>
           </object>
-          <integer value="1040"/>
-          <boolean value="YES"/>
-          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <object class="NSAffineTransform">
@@ -1619,6 +1624,16 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
             <bytes key="NSTransformStruct">P4AAAL+AAABDVQAAwgAAAA</bytes>
           </object>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <integer value="1040"/>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <integer value="1040"/>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <integer value="1041"/>
+          <boolean value="YES"/>
+          <real value="35.299999999999997"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
         </object>
       </object>
       <object class="NSMutableDictionary" key="unlocalizedProperties">
@@ -1637,7 +1652,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">84</int>
+      <int key="maxID">97</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
@@ -1706,21 +1721,27 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
               <string>o_av_lbl</string>
               <string>o_av_minus_btn</string>
               <string>o_av_plus_btn</string>
+              <string>o_av_stp</string>
               <string>o_av_value_fld</string>
               <string>o_reset_btn</string>
               <string>o_sv_advance_lbl</string>
               <string>o_sv_advance_minus_btn</string>
               <string>o_sv_advance_plus_btn</string>
+              <string>o_sv_advance_stp</string>
               <string>o_sv_advance_value_fld</string>
               <string>o_sv_lbl</string>
               <string>o_sv_speed_lbl</string>
               <string>o_sv_speed_minus_btn</string>
               <string>o_sv_speed_plus_btn</string>
+              <string>o_sv_speed_stp</string>
               <string>o_sv_speed_value_fld</string>
               <string>o_window</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -1747,16 +1768,19 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
               <string>o_av_lbl</string>
               <string>o_av_minus_btn</string>
               <string>o_av_plus_btn</string>
+              <string>o_av_stp</string>
               <string>o_av_value_fld</string>
               <string>o_reset_btn</string>
               <string>o_sv_advance_lbl</string>
               <string>o_sv_advance_minus_btn</string>
               <string>o_sv_advance_plus_btn</string>
+              <string>o_sv_advance_stp</string>
               <string>o_sv_advance_value_fld</string>
               <string>o_sv_lbl</string>
               <string>o_sv_speed_lbl</string>
               <string>o_sv_speed_minus_btn</string>
               <string>o_sv_speed_plus_btn</string>
+              <string>o_sv_speed_stp</string>
               <string>o_sv_speed_value_fld</string>
               <string>o_window</string>
             </object>
@@ -1776,6 +1800,10 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_av_plus_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_av_stp</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
@@ -1799,6 +1827,10 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
+                <string key="name">o_sv_advance_stp</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
                 <string key="name">o_sv_advance_value_fld</string>
                 <string key="candidateClassName">id</string>
               </object>
@@ -1816,6 +1848,10 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_sv_speed_plus_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_sv_speed_stp</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">

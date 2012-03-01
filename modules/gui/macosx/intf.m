@@ -1412,6 +1412,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
     [o_playlist updateRowSelection];
     [o_mainwindow updateWindow];
+    [self updateDelays];
     [self updateMainMenu];
 }
 

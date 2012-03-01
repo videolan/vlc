@@ -1,8 +1,8 @@
 /*****************************************************************************
  * TrackSynchronization.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011 VLC authors and VideoLAN
- * Copyright (C) 2011 Felix Paul Kühne
+ * Copyright (C) 2011-2012 VLC authors and VideoLAN
+ * Copyright (C) 2011-2012 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -37,6 +37,7 @@
     IBOutlet id o_av_minus_btn;
     IBOutlet id o_av_plus_btn;
     IBOutlet id o_av_value_fld;
+    IBOutlet id o_av_stp;
 
     /* Subtitles / Video */
     IBOutlet id o_sv_lbl;
@@ -44,10 +45,12 @@
     IBOutlet id o_sv_advance_minus_btn;
     IBOutlet id o_sv_advance_plus_btn;
     IBOutlet id o_sv_advance_value_fld;
+    IBOutlet id o_sv_advance_stp;
     IBOutlet id o_sv_speed_lbl;
     IBOutlet id o_sv_speed_minus_btn;
     IBOutlet id o_sv_speed_plus_btn;
     IBOutlet id o_sv_speed_value_fld;
+    IBOutlet id o_sv_speed_stp;
 }
 
 /* generic */

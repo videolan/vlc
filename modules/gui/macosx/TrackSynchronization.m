@@ -1,8 +1,8 @@
 /*****************************************************************************
  * TrackSynchronization.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011 VLC authors and VideoLAN
- * Copyright (C) 2011 Felix Paul Kühne
+ * Copyright (C) 2011-2012 VLC authors and VideoLAN
+ * Copyright (C) 2011-2012 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -81,6 +81,9 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
     [o_av_value_fld setFloatValue:0.0];
     [o_sv_advance_value_fld setFloatValue:0.0];
     [o_sv_speed_value_fld setFloatValue:1.0];
+    [o_av_stp setFloatValue:0.0];
+    [o_sv_advance_stp setFloatValue:0.0];
+    [o_sv_speed_stp setFloatValue:1.0];
 
     input_thread_t * p_input = pl_CurrentInput( p_intf );
 
@@ -99,27 +102,35 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
 
     if( p_input )
     {
-        [o_av_value_fld setFloatValue: var_GetTime( p_input, "audio-delay" ) / 1000000];
-        [o_sv_advance_value_fld setFloatValue: var_GetTime( p_input, "spu-delay" ) / 1000000];
+        NSLog( @"new audio delay: %lld", var_GetTime( p_input, "audio-delay" ) );
+        [o_av_value_fld setDoubleValue: var_GetTime( p_input, "audio-delay" ) / 1000000.];
+        [o_sv_advance_value_fld setDoubleValue: var_GetTime( p_input, "spu-delay" ) / 1000000.];
         [o_sv_speed_value_fld setFloatValue: var_GetFloat( p_input, "sub-fps" )];
         vlc_object_release( p_input );
     }
+    [o_av_stp setDoubleValue: [o_av_value_fld doubleValue]];
+    [o_sv_advance_stp setDoubleValue: [o_sv_advance_value_fld doubleValue]];
+    [o_sv_speed_stp setDoubleValue: [o_sv_speed_value_fld doubleValue]];
 }
 
 - (IBAction)avValueChanged:(id)sender
 {
     if( sender == o_av_minus_btn )
-        [o_av_value_fld setFloatValue: [o_av_value_fld floatValue] - 0.5];
+        [o_av_value_fld setDoubleValue: [o_av_value_fld doubleValue] - 0.5];
 
     if( sender == o_av_plus_btn )
-        [o_av_value_fld setFloatValue: [o_av_value_fld floatValue] + 0.5];
+        [o_av_value_fld setDoubleValue: [o_av_value_fld doubleValue] + 0.5];
+
+    if( sender == o_av_stp )
+        [o_av_value_fld setDoubleValue: [o_av_stp doubleValue]];
+    else
+        [o_av_stp setDoubleValue: [o_av_value_fld doubleValue]];
 
     input_thread_t * p_input = pl_CurrentInput( p_intf );
 
     if( p_input )
     {
-        int64_t i_delay = [o_av_value_fld floatValue] * 1000000;
-        var_SetTime( p_input, "audio-delay", i_delay );
+        var_SetTime( p_input, "audio-delay", [o_av_value_fld doubleValue] * 1000000. );
 
         vlc_object_release( p_input );
     }
@@ -128,17 +139,21 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
 - (IBAction)svAdvanceValueChanged:(id)sender
 {
     if( sender == o_sv_advance_minus_btn )
-        [o_sv_advance_value_fld setFloatValue: [o_sv_advance_value_fld floatValue] - 0.5];
+        [o_sv_advance_value_fld setDoubleValue: [o_sv_advance_value_fld doubleValue] - 0.5];
 
     if( sender == o_sv_advance_plus_btn )
-        [o_sv_advance_value_fld setFloatValue: [o_sv_advance_value_fld floatValue] + 0.5];
+        [o_sv_advance_value_fld setDoubleValue: [o_sv_advance_value_fld doubleValue] + 0.5];
+
+    if( sender == o_sv_advance_stp )
+        [o_sv_advance_value_fld setDoubleValue: [o_sv_advance_stp doubleValue]];
+    else
+        [o_sv_advance_stp setDoubleValue: [o_sv_advance_value_fld doubleValue]];
 
     input_thread_t * p_input = pl_CurrentInput( p_intf );
 
     if( p_input )
     {
-        int64_t i_delay = [o_sv_advance_value_fld floatValue] * 1000000;
-        var_SetTime( p_input, "spu-delay", i_delay );
+        var_SetTime( p_input, "spu-delay", [o_sv_advance_value_fld doubleValue] * 1000000. );
 
         vlc_object_release( p_input );
     }
@@ -152,24 +167,19 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
     if( sender == o_sv_speed_plus_btn )
         [o_sv_speed_value_fld setFloatValue: [o_sv_speed_value_fld floatValue] + 0.5];
 
+    if( sender == o_sv_speed_stp )
+        [o_sv_speed_value_fld setFloatValue: [o_sv_speed_stp floatValue]];
+    else
+        [o_sv_speed_stp setFloatValue: [o_sv_speed_value_fld floatValue]];
+
     input_thread_t * p_input = pl_CurrentInput( p_intf );
 
     if( p_input )
     {
-        var_SetFloat( p_input, "sub-fps", [o_av_value_fld floatValue] );
+        var_SetFloat( p_input, "sub-fps", [o_sv_speed_value_fld floatValue] );
 
         vlc_object_release( p_input );
     }
-}
-
-- (void)controlTextDidChange:(NSNotification *)aNotification
-{
-    if( [aNotification object] == o_av_value_fld )
-        [self avValueChanged:self];
-    else if( [aNotification object] == o_sv_advance_value_fld )
-        [self svAdvanceValueChanged:self];
-    else if( [aNotification object] == o_sv_speed_value_fld )
-        [self svSpeedValueChanged:self];
 }
 
 @end
