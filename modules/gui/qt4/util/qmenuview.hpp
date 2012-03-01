@@ -29,7 +29,7 @@
 
 class QMenuView : public QMenu
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     QMenuView( QWidget * parent = 0, int iMaxVisibleCount = 0 );
