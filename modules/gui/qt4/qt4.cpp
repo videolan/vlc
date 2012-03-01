@@ -183,6 +183,12 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define ICONCHANGE_LONGTEXT N_( \
     "This option allows the interface to change its icon on various occasions.")
 
+static const int i_notification_list[] =
+    { NOTIFICATION_NEVER, NOTIFICATION_MINIMIZED, NOTIFICATION_ALWAYS };
+
+static const char *const psz_notification_list_text[] =
+    { N_("Never"), N_("When minimized"), N_("Always") };
+
 /**********************************************************************/
 vlc_module_begin ()
     set_shortname( "Qt" )
@@ -204,12 +210,6 @@ vlc_module_begin ()
             true,
 #endif
             SYSTRAY_TEXT, SYSTRAY_LONGTEXT, false)
-
-    static const int i_notification_list[] =
-        { NOTIFICATION_NEVER, NOTIFICATION_MINIMIZED, NOTIFICATION_ALWAYS };
-
-    static const char *const psz_notification_list_text[] =
-        { N_("Never"), N_("When minimized"), N_("Always") };
 
     add_integer( "qt-notification", NOTIFICATION_MINIMIZED,
                  NOTIFICATION_TEXT,
