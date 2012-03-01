@@ -161,7 +161,7 @@ static void Close(vlc_object_t *object)
 
     var_DelCallback(filter, CFG_PREFIX "radius",   Callback, NULL);
     var_DelCallback(filter, CFG_PREFIX "strength", Callback, NULL);
-    free(sys->cfg.buf);
+    vlc_free(sys->cfg.buf);
     vlc_mutex_destroy(&sys->lock);
     free(sys);
 }
