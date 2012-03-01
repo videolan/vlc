@@ -25,9 +25,6 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#ifndef WIN32
-#include <malloc.h>
-
 static int check_align (size_t align)
 {
     for (size_t i = sizeof (void *); i != 0; i *= 2)
@@ -35,6 +32,9 @@ static int check_align (size_t align)
             return 0;
     return EINVAL;
 }
+
+#if !defined (WIN32) && !defined (__APPLE__)
+#include <malloc.h>
 
 int posix_memalign (void **ptr, size_t align, size_t size)
 {
@@ -52,4 +52,16 @@ int posix_memalign (void **ptr, size_t align, size_t size)
     *ptr = p;
     return 0;
 }
+
+#else
+
+int posix_memalign (void **ptr, size_t align, size_t size)
+{
+    if (check_align (align))
+        return EINVAL;
+
+    *ptr = NULL;
+    return size ? ENOMEM : 0;
+}
+
 #endif
