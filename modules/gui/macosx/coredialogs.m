@@ -79,7 +79,7 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     else if( [o_type isEqualToString: @"dialog-login"] )
         [self performSelectorOnMainThread:@selector(showLoginDialog:) withObject:o_value waitUntilDone:YES];
     else if( [o_type isEqualToString: @"dialog-progress-bar"] )
-        [self performSelector:@selector(showProgressDialogOnMainThread:) withObject: o_value afterDelay:3.00];
+        [self performSelectorOnMainThread:@selector(showProgressDialogOnMainThread:) withObject: o_value waitUntilDone:YES];
     else
         msg_Err( VLCIntf, "unhandled dialog type: '%s'", type );
 }
@@ -166,12 +166,15 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     /* we work-around a Cocoa limitation here, since you cannot delay an execution
      * on the main thread within a single call */
     if (VLCIntf)
-        [self performSelectorOnMainThread:@selector(showProgressDialog:) withObject:o_value waitUntilDone:YES];
+        [self performSelector:@selector(showProgressDialog:) withObject: o_value afterDelay:3.00];
 }
 
 -(void)showProgressDialog: (NSValue *)o_value
 {
     dialog_progress_bar_t *p_dialog = [o_value pointerValue];
+
+    if (!p_dialog)
+        return;
 
     if( p_dialog->title != NULL )
     {
