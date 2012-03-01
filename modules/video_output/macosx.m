@@ -356,6 +356,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             NSRect windowFrame = [o_window frame];
             NSRect glViewFrame = [sys->glView frame];
             NSSize windowMinSize = [o_window minSize];
+            NSSize windowMaxSize = [o_window constrainFrameRect: windowFrame toScreen: [o_window screen]].size;
 
             topleftbase.x = 0;
             topleftbase.y = windowFrame.size.height;
@@ -369,6 +370,12 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 i_width = windowMinSize.width;
             if (i_height < windowMinSize.height)
                 i_height = windowMinSize.height;
+
+            /* don't make the window than its screen */
+            if (i_width > windowMaxSize.width)
+                i_width = windowMaxSize.width;
+            if (i_height > windowMaxSize.height)
+                i_height = windowMaxSize.height;
 
             if( i_height != glViewFrame.size.height || i_width != glViewFrame.size.width )
             {
