@@ -194,8 +194,8 @@ void    IsoffMainParser::setSegments        (dash::xml::Node *segListNode, Segme
             seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos + 1, range.size()).c_str()));
         }
 
-        for(size_t i = 0; i < this->mpd->getBaseUrls().size(); i++)
-            seg->addBaseUrl(this->mpd->getBaseUrls().at(i));
+        for(size_t j = 0; j < this->mpd->getBaseUrls().size(); j++)
+            seg->addBaseUrl(this->mpd->getBaseUrls().at(j));
 
         list->addSegment(seg);
     }
