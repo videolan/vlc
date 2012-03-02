@@ -422,7 +422,7 @@ char *convert_xml_special_chars (const char *str)
         }
 
         if ((cp & ~0x0080) < 32 /* C0/C1 control codes */
-         && strchr ("\x09\x0A\x0D\x85", cp) == NULL)
+         && memchr ("\x09\x0A\x0D\x85", cp, 4) == NULL)
             ptr += sprintf (ptr, "&#%"PRIu32";", cp);
         else
         switch (cp)
