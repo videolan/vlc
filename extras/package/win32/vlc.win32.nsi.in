@@ -288,6 +288,7 @@ FunctionEnd
   !insertmacro ${_action} ".mpc"
   !insertmacro ${_action} ".oma"
   !insertmacro ${_action} ".oga"
+  !insertmacro ${_action} ".qcp"
   !insertmacro ${_action} ".rmi"
   !insertmacro ${_action} ".snd"
   !insertmacro ${_action} ".s3m"
