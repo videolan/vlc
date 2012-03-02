@@ -699,7 +699,7 @@ void SoundSlider::mouseMoveEvent( QMouseEvent *event )
     {
         int i = ( ( event->x() - paddingL ) * maximum() + 40 ) / WLENGTH;
         i = __MIN( __MAX( 0, i ), maximum() );
-        setToolTip( QString("%1  \%" ).arg( i ) );
+        setToolTip( QString("%1  %" ).arg( i ) );
     }
 }
 
