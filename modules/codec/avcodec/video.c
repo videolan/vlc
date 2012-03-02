@@ -237,10 +237,10 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
         var_InheritInteger( p_dec, "ffmpeg-workaround-bugs" );
 #if LIBAVCODEC_VERSION_MAJOR < 54
     p_sys->p_context->error_recognition =
-        var_InheritInteger( p_dec, "ffmpeg-error-resilience" );
 #else
-# warning FIXME (moved to AVFormat)
+    p_sys->p_context->err_recognition =
 #endif
+        var_InheritInteger( p_dec, "ffmpeg-error-resilience" );
 
     if( var_CreateGetBool( p_dec, "grayscale" ) )
         p_sys->p_context->flags |= CODEC_FLAG_GRAY;
