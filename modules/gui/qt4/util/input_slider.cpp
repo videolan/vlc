@@ -717,16 +717,16 @@ void SoundSlider::setMuted( bool m )
 void SoundSlider::paintEvent( QPaintEvent *e )
 {
     QPainter painter( this );
-    QPixmap *pixGradient;
+    QPixmap *paintGradient;
     if (b_isMuted)
-        pixGradient = &this->pixGradient2;
+        paintGradient = &this->pixGradient2;
     else
-        pixGradient = &this->pixGradient;
+        paintGradient = &this->pixGradient;
 
     const int offset = int( ( WLENGTH * value() + 100 ) / maximum() ) + paddingL;
 
-    const QRectF boundsG( 0, 0, offset , pixGradient->height() );
-    painter.drawPixmap( boundsG, *pixGradient, boundsG );
+    const QRectF boundsG( 0, 0, offset , paintGradient->height() );
+    painter.drawPixmap( boundsG, *paintGradient, boundsG );
 
     const QRectF boundsO( 0, 0, pixOutside.width(), pixOutside.height() );
     painter.drawPixmap( boundsO, pixOutside, boundsO );
