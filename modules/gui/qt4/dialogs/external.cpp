@@ -38,12 +38,12 @@
 #include <QPushButton>
 #include <QTimer>
 
-DialogHandler::DialogHandler (intf_thread_t *intf, QObject *_parent)
-    : QObject( _parent ), intf (intf),
-      critical (VLC_OBJECT(intf), "dialog-critical"),
-      login (VLC_OBJECT(intf), "dialog-login"),
-      question (VLC_OBJECT(intf), "dialog-question"),
-      progressBar (VLC_OBJECT(intf), "dialog-progress-bar")
+DialogHandler::DialogHandler (intf_thread_t *p_intf, QObject *_parent)
+    : QObject( _parent ), intf (p_intf),
+      critical (VLC_OBJECT(p_intf), "dialog-critical"),
+      login (VLC_OBJECT(p_intf), "dialog-login"),
+      question (VLC_OBJECT(p_intf), "dialog-question"),
+      progressBar (VLC_OBJECT(p_intf), "dialog-progress-bar")
 {
     var_Create (intf, "dialog-error", VLC_VAR_ADDRESS);
     var_AddCallback (intf, "dialog-error", error, this);

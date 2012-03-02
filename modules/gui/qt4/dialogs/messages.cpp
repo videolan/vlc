@@ -86,9 +86,9 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     /* Buttons and general layout */
     ui.saveLogButton->setToolTip( qtr( "Saves all the displayed logs to a file" ) );
 
-    int verbosity = var_InheritInteger( p_intf, "verbose" );
-    vlc_atomic_set( &this->verbosity, verbosity );
-    ui.verbosityBox->setValue( verbosity );
+    int i_verbosity = var_InheritInteger( p_intf, "verbose" );
+    changeVerbosity( i_verbosity );
+    ui.verbosityBox->setValue( i_verbosity );
 
     char *objs = var_InheritString( p_intf, "verbose-objects" );
     if( objs != NULL )
@@ -130,9 +130,9 @@ MessagesDialog::~MessagesDialog()
     vlc_Unsubscribe( sub );
 };
 
-void MessagesDialog::changeVerbosity( int verbosity )
+void MessagesDialog::changeVerbosity( int i_verbosity )
 {
-    vlc_atomic_set( &this->verbosity, verbosity );
+    vlc_atomic_set( &this->verbosity, i_verbosity );
 }
 
 void MessagesDialog::updateConfig()
