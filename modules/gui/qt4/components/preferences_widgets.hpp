@@ -139,8 +139,8 @@ public:
     IntegerConfigControl( vlc_object_t *, module_config_t *,
                           QLabel*, QSlider* );
     virtual int getValue() const;
-    virtual void show() const { spin->show(); if( label ) label->show(); }
-    virtual void hide() const { spin->hide(); if( label ) label->hide(); }
+    virtual void show() { spin->show(); if( label ) label->show(); }
+    virtual void hide() { spin->hide(); if( label ) label->hide(); }
 
 protected:
     QSpinBox *spin;
