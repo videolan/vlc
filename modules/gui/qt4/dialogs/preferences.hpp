@@ -54,8 +54,6 @@ public:
 #endif
 
 private:
-    QGridLayout *main_layout;
-
     QWidget *main_panel;
     QHBoxLayout *main_panel_l;
 
