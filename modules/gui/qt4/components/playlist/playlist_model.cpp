@@ -233,7 +233,10 @@ void PLModel::dropMove( const PlMimeData * plMimeData, PLItem *target, int row )
 {
     QList<input_item_t*> inputItems = plMimeData->inputItems();
     QList<PLItem*> model_items;
-    playlist_item_t *pp_items[inputItems.count()];
+    playlist_item_t **pp_items;
+    pp_items = (playlist_item_t **)
+               calloc( inputItems.count(), sizeof( playlist_item_t* ) );
+    if ( !pp_items ) return;
 
     PL_LOCK;
 
@@ -242,7 +245,9 @@ void PLModel::dropMove( const PlMimeData * plMimeData, PLItem *target, int row )
 
     if( !p_parent || row > p_parent->i_children )
     {
-        PL_UNLOCK; return;
+        PL_UNLOCK;
+        free( pp_items );
+        return;
     }
 
     int new_pos = row == -1 ? p_parent->i_children : row;
@@ -265,7 +270,9 @@ void PLModel::dropMove( const PlMimeData * plMimeData, PLItem *target, int row )
         {
             if( climber == item )
             {
-                PL_UNLOCK; return;
+                PL_UNLOCK;
+                free( pp_items );
+                return;
             }
             climber = climber->parent();
         }
@@ -281,7 +288,9 @@ void PLModel::dropMove( const PlMimeData * plMimeData, PLItem *target, int row )
 
     if( model_items.isEmpty() )
     {
-        PL_UNLOCK; return;
+        PL_UNLOCK;
+        free( pp_items );
+        return;
     }
 
     playlist_TreeMoveMany( p_playlist, i, pp_items, p_parent, new_pos );
@@ -292,6 +301,7 @@ void PLModel::dropMove( const PlMimeData * plMimeData, PLItem *target, int row )
         takeItem( item );
 
     insertChildren( target, model_items, model_pos );
+    free( pp_items );
 }
 
 /* remove item with its id */
