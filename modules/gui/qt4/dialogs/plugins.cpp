@@ -187,8 +187,8 @@ bool PluginTreeItem::operator< ( const QTreeWidgetItem & other ) const
 }
 
 /* Extensions tab */
-ExtensionTab::ExtensionTab( intf_thread_t *p_intf )
-        : QVLCFrame( p_intf )
+ExtensionTab::ExtensionTab( intf_thread_t *p_intf_ )
+        : QVLCFrame( p_intf_ )
 {
     // Layout
     QVBoxLayout *layout = new QVBoxLayout( this );
@@ -491,8 +491,7 @@ QSize ExtensionItemDelegate::sizeHint( const QStyleOptionViewItem &option,
 ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
                                           intf_thread_t *p_intf,
                                           QWidget *parent )
-       : QVLCDialog( parent, p_intf ),
-         extension( new ExtensionCopy( extension ) )
+       : QVLCDialog( parent, p_intf )
 {
     // Let's be a modal dialog
     setWindowModality( Qt::WindowModal );
@@ -574,11 +573,6 @@ ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
     layout->setColumnStretch( 2, 1 );
     layout->setRowStretch( 4, 1 );
     setMinimumSize( 450, 350 );
-}
-
-ExtensionInfoDialog::~ExtensionInfoDialog()
-{
-    delete extension;
 }
 
 static QPixmap *loadPixmapFromData( char *data, int size )

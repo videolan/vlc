@@ -163,10 +163,6 @@ class ExtensionInfoDialog : public QVLCDialog
 public:
     ExtensionInfoDialog( const ExtensionCopy& extension,
                          intf_thread_t *p_intf, QWidget *parent );
-    virtual ~ExtensionInfoDialog();
-
-private:
-    ExtensionCopy *extension;
 };
 
 #endif
