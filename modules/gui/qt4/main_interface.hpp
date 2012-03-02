@@ -101,7 +101,6 @@ protected:
     virtual void closeEvent( QCloseEvent *);
     virtual void keyPressEvent( QKeyEvent *);
     virtual void wheelEvent( QWheelEvent * );
-    virtual void mousePressEvent( QMouseEvent * );
 
 private:
     /* Main Widgets Creation */

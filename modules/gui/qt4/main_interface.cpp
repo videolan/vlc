@@ -1314,18 +1314,6 @@ void MainInterface::wheelEvent( QWheelEvent *e )
     e->accept();
 }
 
-void MainInterface::mousePressEvent( QMouseEvent *e )
-{
-    int i_vlckey = qtMouseEventToVLCKey( e );
-    if( i_vlckey > 0 )
-    {
-        var_SetInteger( p_intf->p_libvlc, "key-pressed", i_vlckey );
-        e->accept();
-    }
-    else
-        e->ignore();
-}
-
 void MainInterface::closeEvent( QCloseEvent *e )
 {
 //  hide();

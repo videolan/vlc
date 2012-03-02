@@ -1614,11 +1614,3 @@ void KeyInputDialog::wheelEvent( QWheelEvent *e )
     keyValue = i_vlck;
 }
 
-void KeyInputDialog::mousePressEvent( QMouseEvent *e )
-{
-    int i_vlck = qtMouseEventToVLCKey( e );
-    selected->setText( qtr( "Key: " ) + VLCKeyToString( i_vlck ) );
-    checkForConflicts( i_vlck );
-    keyValue = i_vlck;
-}
-

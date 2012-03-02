@@ -485,7 +485,6 @@ private:
     void checkForConflicts( int i_vlckey );
     void keyPressEvent( QKeyEvent *);
     void wheelEvent( QWheelEvent *);
-    void mousePressEvent( QMouseEvent * );
     bool b_global;
 };
 #endif
