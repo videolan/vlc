@@ -48,7 +48,7 @@ private:
     friend class    Singleton<EpgDialog>;
 
 private slots:
-    void showEvent( EPGItem * );
+    void displayEvent( EPGItem * );
     void updateInfos();
 };
 

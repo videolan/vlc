@@ -73,7 +73,7 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     layout->addWidget( epg, 10 );
     layout->addWidget( descBox );
 
-    CONNECT( epg, itemSelectionChanged( EPGItem *), this, showEvent( EPGItem *) );
+    CONNECT( epg, itemSelectionChanged( EPGItem *), this, displayEvent( EPGItem *) );
     CONNECT( THEMIM->getIM(), epgChanged(), this, updateInfos() );
     CONNECT( THEMIM, inputChanged( input_thread_t * ), this, updateInfos() );
 
@@ -104,7 +104,7 @@ EpgDialog::~EpgDialog()
     writeSettings( "EPGDialog" );
 }
 
-void EpgDialog::showEvent( EPGItem *epgItem )
+void EpgDialog::displayEvent( EPGItem *epgItem )
 {
     if( !epgItem ) return;
 
