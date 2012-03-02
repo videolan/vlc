@@ -46,8 +46,9 @@ class QPixmap;
 class QLabel;
 
 class QGridLayout;
-class QHBoxLayout;
 class QBoxLayout;
+class QHBoxLayout;
+class QVBoxLayout;
 
 class QAbstractSlider;
 class QAbstractButton;
@@ -165,7 +166,7 @@ protected:
     intf_thread_t       *p_intf;
 
     QSignalMapper       *toolbarActionsMapper;
-    QHBoxLayout         *controlLayout;
+    QBoxLayout          *controlLayout;
     /* Change to BoxLayout if both dir are needed */
 
     AdvControlsWidget   *advControls;

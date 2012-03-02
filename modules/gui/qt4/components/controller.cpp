@@ -109,7 +109,7 @@ void AbstractController::setupButton( QAbstractButton *aButton )
 /* Open the generic config line for the toolbar, parse it
  * and create the widgets accordingly */
 void AbstractController::parseAndCreate( const QString& config,
-                                         QBoxLayout *controlLayout )
+                                         QBoxLayout *newControlLayout )
 {
     QStringList list = config.split( ";", QString::SkipEmptyParts ) ;
     for( int i = 0; i < list.count(); i++ )
@@ -140,12 +140,12 @@ void AbstractController::parseAndCreate( const QString& config,
             }
         }
 
-        createAndAddWidget( controlLayout, -1, i_type, i_option );
+        createAndAddWidget( newControlLayout, -1, i_type, i_option );
     }
 
     if( buttonGroupLayout )
     {
-        controlLayout->addLayout( buttonGroupLayout );
+        newControlLayout->addLayout( buttonGroupLayout );
         buttonGroupLayout = NULL;
     }
 }
@@ -648,7 +648,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     setStyleSheet( "background: red ");
 #endif
     setAttribute( Qt::WA_MacBrushedMetal);
-    QVBoxLayout *controlLayout = new QVBoxLayout( this );
+    controlLayout = new QVBoxLayout( this );
     controlLayout->setContentsMargins( 3, 1, 0, 1 );
     controlLayout->setSpacing( 0 );
     QHBoxLayout *controlLayout1 = new QHBoxLayout;
