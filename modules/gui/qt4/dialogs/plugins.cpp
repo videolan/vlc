@@ -85,8 +85,8 @@ PluginDialog::~PluginDialog()
 
 /* Plugins tab */
 
-PluginTab::PluginTab( intf_thread_t *p_intf )
-        : QVLCFrame( p_intf )
+PluginTab::PluginTab( intf_thread_t *p_intf_ )
+        : QVLCFrame( p_intf_ )
 {
     QGridLayout *layout = new QGridLayout( this );
 

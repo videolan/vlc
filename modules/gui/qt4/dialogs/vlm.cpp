@@ -606,12 +606,12 @@ void VLMBroadcast::stop()
 /****************
  * VLMSchedule
  ****************/
-VLMSchedule::VLMSchedule( const QString& name, const QString& input,
+VLMSchedule::VLMSchedule( const QString& name_, const QString& input,
                           const QString& inputOptions,
                           const QString& output, QDateTime _schetime,
                           QDateTime _schedate, int _scherepeatnumber,
                           int _repeatDays, bool enabled, VLMDialog *parent )
-            : VLMAWidget( name, input, inputOptions, output, enabled, parent,
+            : VLMAWidget( name_, input, inputOptions, output, enabled, parent,
                           QVLM_Schedule )
 {
     nameLabel->setText( qtr("Schedule: ") + name );
@@ -632,10 +632,10 @@ void VLMSchedule::update()
 /****************
  * VLMVOD
  ****************/
-VLMVod::VLMVod( const QString& name, const QString& input,
+VLMVod::VLMVod( const QString& name_, const QString& input,
                 const QString& inputOptions, const QString& output,
                 bool enabled, const QString& _mux, VLMDialog *parent)
-       : VLMAWidget( name, input, inputOptions, output, enabled, parent,
+       : VLMAWidget( name_, input, inputOptions, output, enabled, parent,
                      QVLM_VOD )
 {
     nameLabel->setText( qtr("VOD: ") + name );

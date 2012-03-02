@@ -544,7 +544,7 @@ void DroppingController::resetLine( const QString& line )
 
 /* Overloading the AbstractController one, because we don't manage the
    Spacing items in the same ways */
-void DroppingController::createAndAddWidget( QBoxLayout *controlLayout,
+void DroppingController::createAndAddWidget( QBoxLayout *newControlLayout,
                                              int i_index,
                                              buttonType_e i_type,
                                              int i_option )
@@ -574,7 +574,7 @@ void DroppingController::createAndAddWidget( QBoxLayout *controlLayout,
 
         /* Install event Filter for drag'n drop */
         label->installEventFilter( this );
-        controlLayout->insertWidget( i_index, label );
+        newControlLayout->insertWidget( i_index, label );
     }
 
     /* Normal Widgets */
@@ -616,11 +616,11 @@ void DroppingController::createAndAddWidget( QBoxLayout *controlLayout,
         /* Some Widgets are deactivated at creation */
         widg->setEnabled( true );
         widg->show();
-        controlLayout->insertWidget( i_index, widg );
+        newControlLayout->insertWidget( i_index, widg );
     }
 
     /* QList and QBoxLayout don't act the same with insert() */
-    if( i_index < 0 ) i_index = controlLayout->count() - 1;
+    if( i_index < 0 ) i_index = newControlLayout->count() - 1;
 
     widgetList.insert( i_index, value );
 }

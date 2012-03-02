@@ -1365,12 +1365,12 @@ void KeySelectorControl::finish()
     QMap<QString, QString> global_keys;
     for (size_t i = 0; i < confsize; i++)
     {
-        module_config_t *p_item = p_config + i;
+        module_config_t *p_config_item = p_config + i;
 
         /* If we are a (non-global) key option not empty */
-        if( CONFIG_ITEM(p_item->i_type) && p_item->psz_name != NULL
-         && !strncmp( p_item->psz_name , "key-", 4 )
-         && !EMPTY_STR( p_item->psz_text ) )
+        if( CONFIG_ITEM(p_config_item->i_type) && p_config_item->psz_name != NULL
+         && !strncmp( p_config_item->psz_name , "key-", 4 )
+         && !EMPTY_STR( p_config_item->psz_text ) )
         {
             /*
                Each tree item has:
@@ -1379,11 +1379,11 @@ void KeySelectorControl::finish()
                 - KeyValue in String in column 1
              */
             QTreeWidgetItem *treeItem = new QTreeWidgetItem();
-            treeItem->setText( 0, qtr( p_item->psz_text ) );
+            treeItem->setText( 0, qtr( p_config_item->psz_text ) );
             treeItem->setData( 0, Qt::UserRole,
-                               QVariant( qfu( p_item->psz_name ) ) );
+                               QVariant( qfu( p_config_item->psz_name ) ) );
 
-            QString keys = qfu( p_item->value.psz );
+            QString keys = qfu( p_config_item->value.psz );
             treeItem->setText( 1, keys );
             treeItem->setToolTip( 1, qtr("Double click to change") );
             treeItem->setToolTip( 2, qtr("Double click to change") );
@@ -1392,12 +1392,12 @@ void KeySelectorControl::finish()
             continue;
         }
 
-        if( CONFIG_ITEM(p_item->i_type) && p_item->psz_name != NULL
-         && !strncmp( p_item->psz_name , "global-key", 10 )
-         && !EMPTY_STR( p_item->psz_text )
-         && !EMPTY_STR( p_item->value.psz ) )
+        if( CONFIG_ITEM(p_config_item->i_type) && p_config_item->psz_name != NULL
+         && !strncmp( p_config_item->psz_name , "global-key", 10 )
+         && !EMPTY_STR( p_config_item->psz_text )
+         && !EMPTY_STR( p_config_item->value.psz ) )
         {
-            global_keys.insertMulti( qtr( p_item->psz_text ), qfu( p_item->value.psz ) );
+            global_keys.insertMulti( qtr( p_config_item->psz_text ), qfu( p_config_item->value.psz ) );
         }
     }
 

@@ -365,7 +365,7 @@ void MainInterface::reloadPrefs()
     }
 }
 
-void MainInterface::createMainWidget( QSettings *settings )
+void MainInterface::createMainWidget( QSettings *creationSettings )
 {
     /* Create the main Widget and the mainLayout */
     QWidget *main = new QWidget;
@@ -394,18 +394,20 @@ void MainInterface::createMainWidget( QSettings *settings )
     }
     mainLayout->insertWidget( 1, stackCentralW );
 
-    stackWidgetsSizes[bgWidget] = settings->value( "MainWindow/bgSize", QSize( 600, 0 ) ).toSize();
+    stackWidgetsSizes[bgWidget] =
+        creationSettings->value( "MainWindow/bgSize", QSize( 600, 0 ) ).toSize();
     /* Resize even if no-auto-resize, because we are at creation */
     resizeStack( stackWidgetsSizes[bgWidget].width(), stackWidgetsSizes[bgWidget].height() );
 
     /* Create the CONTROLS Widget */
     controls = new ControlsWidget( p_intf,
-                   settings->value( "MainWindow/adv-controls", false ).toBool(), this );
+        creationSettings->value( "MainWindow/adv-controls", false ).toBool(), this );
     inputC = new InputControlsWidget( p_intf, this );
 
     mainLayout->insertWidget( 2, inputC );
-    mainLayout->insertWidget( settings->value( "MainWindow/ToolbarPos", 0 ).toInt() ? 0: 3,
-                              controls );
+    mainLayout->insertWidget(
+        creationSettings->value( "MainWindow/ToolbarPos", 0 ).toInt() ? 0: 3,
+        controls );
 
     /* Visualisation, disabled for now, they SUCK */
     #if 0

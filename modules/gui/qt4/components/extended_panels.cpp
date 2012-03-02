@@ -1290,14 +1290,14 @@ void Compressor::enable( bool en )
     }
 }
 
-void Compressor::updateSliders( float * controlVars )
+void Compressor::updateSliders( float * p_controlVars )
 {
     for( int i = 0 ; i < NUM_CP_CTRL ; i++ )
     {
-        if( oldControlVars[i] != controlVars[i] )
+        if( oldControlVars[i] != p_controlVars[i] )
         {
             compCtrl[i]->setValue(
-                    (int)( controlVars[i] / comp_controls[i].f_resolution ) );
+                    (int)( p_controlVars[i] / comp_controls[i].f_resolution ) );
         }
     }
 }

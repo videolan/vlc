@@ -690,9 +690,9 @@ inline void InputManager::UpdateStats()
     emit statisticsUpdated( input_GetItem( p_input ) );
 }
 
-inline void InputManager::UpdateMeta( input_item_t *p_item )
+inline void InputManager::UpdateMeta( input_item_t *p_item_ )
 {
-    emit metaChanged( p_item );
+    emit metaChanged( p_item_ );
 }
 
 inline void InputManager::UpdateMeta()
@@ -832,8 +832,8 @@ void InputManager::reverse()
 {
     if( hasInput() )
     {
-        float f_rate = var_GetFloat( p_input, "rate" );
-        var_SetFloat( p_input, "rate", -f_rate );
+        float f_rate_ = var_GetFloat( p_input, "rate" );
+        var_SetFloat( p_input, "rate", -f_rate_ );
     }
 }
 
