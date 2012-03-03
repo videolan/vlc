@@ -34,6 +34,7 @@
 #include "timetooltip.hpp"
 
 #include <QSlider>
+#include <QPainter>
 
 #define MSTRTIME_MAX_SIZE 22
 
@@ -133,6 +134,11 @@ private:
     QPixmap pixGradient; /* Gradient pix storage */
     QPixmap pixGradient2; /* Muted Gradient pix storage */
     QPixmap pixOutside; /* OutLine pix storage */
+    QPainter painter;
+    QColor background;
+    QColor foreground;
+    QFont textfont;
+    QRect textrect;
 
     void changeValue( int x ); /* Function to modify the value from pixel x() */
 };

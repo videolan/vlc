@@ -600,6 +600,15 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
         for( int i = colorList.count(); i < 12; i++)
             colorList.append( "255" );
 
+    background = palette().color( QPalette::Active, QPalette::Background );
+    foreground = palette().color( QPalette::Active, QPalette::WindowText );
+    foreground.setHsv( foreground.hue(),
+                    ( background.saturation() + foreground.saturation() ) / 2,
+                    ( background.value() + foreground.value() ) / 2 );
+
+    textfont.setPixelSize( 9 );
+    textrect.setRect( 0, 0, 34, 15 );
+
     /* Regular colors */
 #define c(i) colorList.at(i).toInt()
 #define add_color(gradient, range, c1, c2, c3) \
@@ -623,7 +632,7 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
     add_colors( gradient, gradient2, 0.55, 6, 7, 8 );
     add_colors( gradient, gradient2, 1.0, 9, 10, 11 );
 
-    QPainter painter( &pixGradient );
+    painter.begin( &pixGradient );
     painter.setPen( Qt::NoPen );
     painter.setBrush( gradient );
     painter.drawRect( pixGradient.rect() );
@@ -716,12 +725,13 @@ void SoundSlider::setMuted( bool m )
 
 void SoundSlider::paintEvent( QPaintEvent *e )
 {
-    QPainter painter( this );
     QPixmap *paintGradient;
     if (b_isMuted)
         paintGradient = &this->pixGradient2;
     else
         paintGradient = &this->pixGradient;
+
+    painter.begin( this );
 
     const int offset = int( ( WLENGTH * value() + 100 ) / maximum() ) + paddingL;
 
@@ -731,16 +741,9 @@ void SoundSlider::paintEvent( QPaintEvent *e )
     const QRectF boundsO( 0, 0, pixOutside.width(), pixOutside.height() );
     painter.drawPixmap( boundsO, pixOutside, boundsO );
 
-    QColor background = palette().color( QPalette::Active, QPalette::Background );
-    QColor foreground = palette().color( QPalette::Active, QPalette::WindowText );
-    foreground.setHsv( foreground.hue(),
-                    ( background.saturation() + foreground.saturation() ) / 2,
-                    ( background.value() + foreground.value() ) / 2 );
     painter.setPen( foreground );
-    QFont font; font.setPixelSize( 9 );
-    painter.setFont( font );
-    const QRect rect( 0, 0, 34, 15 );
-    painter.drawText( rect, Qt::AlignRight | Qt::AlignVCenter,
+    painter.setFont( textfont );
+    painter.drawText( textrect, Qt::AlignRight | Qt::AlignVCenter,
                       QString::number( value() ) + '%' );
 
     painter.end();
