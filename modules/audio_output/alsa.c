@@ -43,6 +43,7 @@
 struct aout_sys_t
 {
     snd_pcm_t *pcm;
+    void (*reorder) (void *, size_t, unsigned);
 };
 
 #define A52_FRAME_NB 1536
@@ -68,11 +69,11 @@ static const char *const devices_text[] = {
     "This parameter is ignored when digital pass-through is active.")
 static const int channels[] = {
     AOUT_CHAN_CENTER, AOUT_CHANS_STEREO, AOUT_CHANS_4_0, AOUT_CHANS_4_1,
-    AOUT_CHANS_5_0, AOUT_CHANS_5_1,
+    AOUT_CHANS_5_0, AOUT_CHANS_5_1, AOUT_CHANS_7_1,
 };
 static const char *const channels_text[] = {
     N_("Mono"), N_("Stereo"), N_("Surround 4.0"), N_("Surround 4.1"),
-    N_("Surround 5.0"), N_("Surround 5.1"),
+    N_("Surround 5.0"), N_("Surround 5.1"), N_("Surround 7.1"),
 };
 
 vlc_module_begin ()
@@ -169,6 +170,7 @@ static void Play  (audio_output_t *, block_t *);
 static void Pause (audio_output_t *, bool, mtime_t);
 static void PauseDummy (audio_output_t *, bool, mtime_t);
 static void Flush (audio_output_t *, bool);
+static void Reorder71 (void *, size_t, unsigned);
 
 /** Initializes an ALSA playback stream */
 static int Open (vlc_object_t *obj)
@@ -504,6 +506,15 @@ static int Open (vlc_object_t *obj)
     {
         aout->format.i_original_channels =
         aout->format.i_physical_channels = map;
+        switch (popcount (map))
+        {
+            case 8:
+                sys->reorder = Reorder71;
+                break;
+            default:
+                sys->reorder = NULL;
+        }
+
         aout_VolumeSoftInit (aout);
     }
 
@@ -534,6 +545,11 @@ error:
 static void Play (audio_output_t *aout, block_t *block)
 {
     aout_sys_t *sys = aout->sys;
+
+    if (sys->reorder != NULL)
+        sys->reorder (block->p_buffer, block->i_nb_samples,
+                      aout->format.i_bitspersample / 8);
+
     snd_pcm_t *pcm = sys->pcm;
     snd_pcm_sframes_t frames;
     snd_pcm_state_t state = snd_pcm_state (pcm);
@@ -649,6 +665,47 @@ static void Close (vlc_object_t *obj)
     snd_pcm_close (pcm);
     free (sys);
 }
+
+/**
+ * Converts from VLC to ALSA order for 7.1.
+ * VLC has middle channels in position 2 and 3, ALSA in position 6 and 7.
+ */
+static void Reorder71 (void *p, size_t n, unsigned size)
+{
+    switch (size)
+    {
+        case 4:
+            for (uint64_t *ptr = p; n > 0; ptr += 4, n--)
+            {
+                uint64_t middle = ptr[1], c_lfe = ptr[2], rear = ptr[3];
+                ptr[1] = c_lfe; ptr[2] = rear; ptr[3] = middle;
+            }
+            break;
+        case 2:
+            for (uint32_t *ptr = p; n > 0; ptr += 4, n--)
+            {
+                uint32_t middle = ptr[1], c_lfe = ptr[2], rear = ptr[3];
+                ptr[1] = c_lfe; ptr[2] = rear; ptr[3] = middle;
+            }
+            break;
+
+        default:
+            for (uint16_t *ptr = p; n > 0; n--)
+            {
+                uint16_t middle[size];
+                memcpy (middle, ptr + size, size * 2);
+                ptr += size;
+                memcpy (ptr, ptr + size, size * 2);
+                ptr += size;
+                memcpy (ptr, ptr + size, size * 2);
+                ptr += size;
+                memcpy (ptr, middle, size * 2);
+                ptr += size;
+            }
+            break;
+    }
+}
+
 
 /*****************************************************************************
  * config variable callback
