@@ -553,8 +553,6 @@ static int Open (vlc_object_t *obj)
     /* Setup audio_output_t */
     aout->format.i_format = fourcc;
     aout->format.i_rate = rate;
-    aout->format.i_original_channels =
-    aout->format.i_physical_channels = chans;
     if (spdif)
     {
         aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
@@ -562,7 +560,11 @@ static int Open (vlc_object_t *obj)
         aout_VolumeNoneInit (aout);
     }
     else
+    {
+        aout->format.i_original_channels =
+        aout->format.i_physical_channels = chans;
         aout_VolumeSoftInit (aout);
+    }
 
     aout->pf_play = Play;
     if (snd_pcm_hw_params_can_pause (hw))
