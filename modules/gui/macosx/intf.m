@@ -514,6 +514,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         _o_sharedMainInstance = [super init];
 
     p_intf = NULL;
+    p_current_input = NULL;
 
     o_msg_lock = [[NSLock alloc] init];
     o_msg_arr = [[NSMutableArray arrayWithCapacity: 600] retain];
@@ -732,11 +733,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_DelCallback(p_intf->p_libvlc, "intf-toggle-fscontrol", ShowController, self);
     var_DelCallback(p_intf->p_libvlc, "intf-show", ShowController, self);
 
-    input_thread_t * p_input = playlist_CurrentInput( p_playlist );
-    if( p_input )
+    if( p_current_input )
     {
-        var_DelCallback( p_input, "intf-event", InputEvent, [VLCMain sharedInstance] );
-        vlc_object_release( p_input );
+        var_DelCallback( p_current_input, "intf-event", InputEvent, [VLCMain sharedInstance] );
+        vlc_object_release( p_current_input );
+        p_current_input = NULL;
     }
 
     /* remove global observer watching for vout device changes correctly */
@@ -1394,21 +1395,27 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
 - (void)PlaylistItemChanged
 {
-    input_thread_t * p_input;
-
-    p_input = playlist_CurrentInput( pl_Get(VLCIntf) );
-    if( p_input && !( p_input->b_dead || !vlc_object_alive(p_input) ) )
+    if( p_current_input && ( p_current_input->b_dead || !vlc_object_alive( p_current_input ) ))
     {
-        var_AddCallback( p_input, "intf-event", InputEvent, [VLCMain sharedInstance] );
-        [o_mainmenu setRateControlsEnabled: YES];
-        if ([self activeVideoPlayback] && [[o_mainwindow videoView] isHidden])
-            [o_mainwindow performSelectorOnMainThread:@selector(togglePlaylist:) withObject: nil waitUntilDone:NO];
-    }
-    else
-        [o_mainmenu setRateControlsEnabled: NO];
+        var_DelCallback( p_current_input, "intf-event", InputEvent, [VLCMain sharedInstance] );
+        vlc_object_release( p_current_input );
+        p_current_input = NULL;
 
-    if (p_input)
-        vlc_object_release( p_input );
+        [o_mainmenu setRateControlsEnabled: NO];
+    }
+    else if( !p_current_input )
+    {
+        // object is hold here and released then it is dead
+        p_current_input = playlist_CurrentInput( pl_Get( VLCIntf ));
+        if( p_current_input )
+        {
+            var_AddCallback( p_current_input, "intf-event", InputEvent, [VLCMain sharedInstance] );
+
+            [o_mainmenu setRateControlsEnabled: YES];
+            if ( [self activeVideoPlayback] && [[o_mainwindow videoView] isHidden] )
+                [o_mainwindow performSelectorOnMainThread:@selector(togglePlaylist:) withObject: nil waitUntilDone:NO];
+        }
+    }
 
     [o_playlist updateRowSelection];
     [o_mainwindow updateWindow];

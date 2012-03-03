@@ -89,6 +89,7 @@ struct intf_sys_t
 @interface VLCMain : NSObject <NSWindowDelegate>
 {
     intf_thread_t *p_intf;      /* The main intf object */
+    input_thread_t *p_current_input;
     id o_mainmenu;              /* VLCMainMenu */
     id o_prefs;                 /* VLCPrefs       */
     id o_sprefs;                /* VLCSimplePrefs */
