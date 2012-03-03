@@ -2931,12 +2931,9 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
     case AUDIO_ES:
         info_category_AddInfo( p_cat, _("Type"), _("Audio") );
 
-        if( fmt->audio.i_physical_channels & AOUT_CHAN_PHYSMASK )
+        if( fmt->audio.i_physical_channels )
             info_category_AddInfo( p_cat, _("Channels"), "%s",
                                    _( aout_FormatPrintChannels( &fmt->audio ) ) );
-        else if( fmt->audio.i_channels > 0 )
-            info_category_AddInfo( p_cat, _("Channels"), "%u",
-                                   fmt->audio.i_channels );
 
         if( fmt->audio.i_rate > 0 )
         {
