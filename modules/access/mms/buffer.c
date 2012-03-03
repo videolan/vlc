@@ -30,6 +30,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_access.h>
 #include <vlc_charset.h>
 
 #include "asf.h"
@@ -106,7 +107,7 @@ void var_buffer_addmemory( var_buffer_t *p_buf, void *p_mem, int i_mem )
     p_buf->i_data += i_mem;
 }
 
-void var_buffer_addUTF16( var_buffer_t *p_buf, const char *p_str )
+void var_buffer_addUTF16( access_t  *p_access, var_buffer_t *p_buf, const char *p_str )
 {
     uint16_t *p_out;
     size_t i_out;
@@ -120,7 +121,10 @@ void var_buffer_addUTF16( var_buffer_t *p_buf, const char *p_str )
     else
         p_out = NULL;
     if( p_out == NULL )
+    {
+        msg_Err( p_access, "UTF-16 conversion failed" );
         i_out = 0;
+    }
 
     i_out /= 2;
     for( size_t i = 0; i < i_out; i ++ )

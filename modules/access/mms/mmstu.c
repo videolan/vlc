@@ -536,7 +536,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
              "NSPlayer/7.0.0.1956; {"GUID_FMT"}; Host: %s",
              GUID_PRINT( p_sys->guid ),
              p_url->psz_host );
-    var_buffer_addUTF16( &buffer, tmp );
+    var_buffer_addUTF16( p_access, &buffer, tmp );
 
     mms_CommandSend( p_access,
                      0x01,          /* connexion request */
@@ -598,7 +598,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     {
         sprintf( tmp, "\\\\192.168.0.1\\TCP\\1242"  );
     }
-    var_buffer_addUTF16( &buffer, tmp );
+    var_buffer_addUTF16( p_access, &buffer, tmp );
     var_buffer_add16( &buffer, '0' );
 
     mms_CommandSend( p_access,
@@ -633,7 +633,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     {
         mediapath++;
     }
-    var_buffer_addUTF16( &buffer, mediapath );
+    var_buffer_addUTF16( p_access, &buffer, mediapath );
 
     mms_CommandSend( p_access,
                      0x05,
