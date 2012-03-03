@@ -19,7 +19,7 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/gnutls/gnutls-win32.patch
 endif
 ifdef HAVE_ANDROID
-	$(APPLY) $(SRC)/gnutls/no-gl.patch
+	$(APPLY) $(SRC)/gnutls/no-create-time-h.patch
 endif
 	$(APPLY) $(SRC)/gnutls/gnutls-no-egd.patch
 	$(APPLY) $(SRC)/gnutls/read-file-limits.h.patch
@@ -46,6 +46,9 @@ endif
 ifdef HAVE_MACOSX
 USE_GCRYPT=1
 endif
+ifdef HAVE_ANDROID
+USE_GCRYPT=1
+endif
 
 ifeq (1,$(USE_GCRYPT))
 GNUTLS_CONF += --with-libgcrypt
@@ -57,7 +60,9 @@ endif
 .gnutls: gnutls
 ifdef HAVE_ANDROID
 	$(RECONF)
-endif
+	cd $< && $(HOSTVARS) gl_cv_header_working_stdint_h=yes ./configure $(GNUTLS_CONF)
+else
 	cd $< && $(HOSTVARS) ./configure $(GNUTLS_CONF)
+endif
 	cd $</lib && $(MAKE) install
 	touch $@
