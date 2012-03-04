@@ -381,7 +381,9 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
 int net_Subscribe (vlc_object_t *obj, int fd,
                    const struct sockaddr *grp, socklen_t grplen)
 {
-#ifdef MCAST_JOIN_GROUP
+/* MCAST_JOIN_GROUP was introduced to OS X in v10.7, but it doesn't work,
+ * so ignore it to use the same code as on 10.5 or 10.6 */
+#if defined (MCAST_JOIN_GROUP) && !defined (__APPLE__)
     /* Agnostic SSM multicast join */
     int level;
     struct group_req gr;
@@ -417,6 +419,7 @@ int net_Subscribe (vlc_object_t *obj, int fd,
         return 0;
 
 #else
+    VLC_UNUSED( grplen );
     switch (grp->sa_family)
     {
 # ifdef IPV6_JOIN_GROUP
