@@ -1844,6 +1844,16 @@ static int Open(vlc_object_t *p_this)
     }
     p_sys->m3u8 = psz_uri;
 
+    char *new_path;
+    if (asprintf(&new_path, "%s.ts", s->psz_path) < 0)
+    {
+        free(p_sys->m3u8);
+        free(p_sys);
+        return VLC_ENOMEM;
+    }
+    free(s->psz_path);
+    s->psz_path = new_path;
+
     p_sys->bandwidth = 0;
     p_sys->b_live = true;
     p_sys->b_meta = false;
