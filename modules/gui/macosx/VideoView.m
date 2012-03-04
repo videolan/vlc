@@ -120,6 +120,9 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
              if( var_GetBool( p_playlist, "fullscreen") )
                  [[VLCCoreInteraction sharedInstance] toggleFullscreen];
         }
+        /* handle Lion's default key combo for fullscreen-toggle in addition to our own hotkeys */
+        else if( key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask )
+            [[VLCCoreInteraction sharedInstance] toggleFullscreen];
         else if ( p_vout )
         {
             if( key == ' ' )
