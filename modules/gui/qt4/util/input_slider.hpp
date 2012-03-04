@@ -85,6 +85,14 @@ private:
     SeekPoints* chapters;
     bool b_classic;
 
+    /* Colors & gradients */
+    QSize gradientsTargetSize;
+    QLinearGradient backgroundGradient;
+    QLinearGradient foregroundGradient;
+    QLinearGradient handleGradient;
+    QColor tickpointForeground;
+    QColor shadowDark;
+    QColor shadowLight;
     /* Handle's animation */
     qreal mHandleOpacity;
     QPropertyAnimation *animHandle;

@@ -63,6 +63,36 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
     mHandleOpacity = 1.0;
     chapters = NULL;
 
+    // prepare some static colors
+    QPalette p = palette();
+    QColor background = p.color( QPalette::Active, QPalette::Background );
+    tickpointForeground = p.color( QPalette::Active, QPalette::WindowText );
+    tickpointForeground.setHsv( tickpointForeground.hue(),
+            ( background.saturation() + tickpointForeground.saturation() ) / 2,
+            ( background.value() + tickpointForeground.value() ) / 2 );
+
+    // set the background color and gradient
+    QColor backgroundBase( p.window().color() );
+    backgroundGradient.setColorAt( 0.0, backgroundBase.darker( 140 ) );
+    backgroundGradient.setColorAt( 1.0, backgroundBase );
+
+    // set the foreground color and gradient
+    QColor foregroundBase( 50, 156, 255 );
+    foregroundGradient.setColorAt( 0.0,  foregroundBase );
+    foregroundGradient.setColorAt( 1.0,  foregroundBase.darker( 140 ) );
+
+    // prepare the handle's gradient
+    handleGradient.setColorAt( 0.0, p.window().color().lighter( 120 ) );
+    handleGradient.setColorAt( 0.9, p.window().color().darker( 120 ) );
+
+    // prepare the handle's shadow gradient
+    QColor shadowBase = p.shadow().color();
+    if( shadowBase.lightness() > 100 )
+        shadowBase = QColor( 60, 60, 60 ); // Palette's shadow is too bright
+    shadowDark = shadowBase.darker( 150 );
+    shadowLight = shadowBase.lighter( 180 );
+    shadowLight.setAlpha( 50 );
+
     /* Timer used to fire intermediate updatePos() when sliding */
     seekLimitTimer = new QTimer( this );
     seekLimitTimer->setSingleShot( true );
@@ -394,17 +424,17 @@ void SeekSlider::paintEvent( QPaintEvent *event )
 
     barRect.moveCenter( rect().center() );
 
-    // set the background color and gradient
-    QColor backgroundBase( palette().window().color() );
-    QLinearGradient backgroundGradient( 0, 0, 0, height() );
-    backgroundGradient.setColorAt( 0.0, backgroundBase.darker( 140 ) );
-    backgroundGradient.setColorAt( 1.0, backgroundBase );
+    QSize hSize( handleSize() - QSize( 6, 6 ) );
+    QSize sSize( handleSize() - QSize( 2, 2 ) );
 
-    // set the foreground color and gradient
-    QColor foregroundBase( 50, 156, 255 );
-    QLinearGradient foregroundGradient( 0, 0, 0, height() );
-    foregroundGradient.setColorAt( 0.0,  foregroundBase );
-    foregroundGradient.setColorAt( 1.0,  foregroundBase.darker( 140 ) );
+    if ( gradientsTargetSize != size() )
+    {
+        /* Need to fix gradients */
+        gradientsTargetSize = size();
+        backgroundGradient.setFinalStop( 0, height() );
+        foregroundGradient.setFinalStop( 0, height() );
+        handleGradient.setFinalStop( 0, hSize.height() );
+    }
 
     // draw a slight 3d effect on the bottom
     painter.setPen( QColor( 230, 230, 230 ) );
@@ -454,19 +484,14 @@ void SeekSlider::paintEvent( QPaintEvent *event )
         /* draw chapters tickpoints */
         if ( chapters && inputLength && size().width() )
         {
-            QColor background = palette().color( QPalette::Active, QPalette::Background );
-            QColor foreground = palette().color( QPalette::Active, QPalette::WindowText );
-            foreground.setHsv( foreground.hue(),
-                            ( background.saturation() + foreground.saturation() ) / 2,
-                            ( background.value() + foreground.value() ) / 2 );
             if ( orientation() == Qt::Horizontal ) /* TODO: vertical */
             {
                 QList<SeekPoint> points = chapters->getPoints();
+                painter.setPen( tickpointForeground );
+                painter.setBrush( Qt::NoBrush );
                 foreach( SeekPoint point, points )
                 {
                     int x = point.time / 1000000.0 / inputLength * size().width();
-                    painter.setPen( foreground );
-                    painter.setBrush( Qt::NoBrush );
                     painter.drawLine( x, height(), x, height() - CHAPTERSSPOTSIZE );
                 }
             }
@@ -476,7 +501,6 @@ void SeekSlider::paintEvent( QPaintEvent *event )
         if ( sliderPos != -1 )
         {
             const int margin = 0;
-            QSize hSize = handleSize() - QSize( 6, 6 );
             QPoint pos;
 
             switch ( orientation() )
@@ -493,23 +517,9 @@ void SeekSlider::paintEvent( QPaintEvent *event )
                     break;
             }
 
-            QPalette p;
             QPoint shadowPos( pos - QPoint( 2, 2 ) );
-            QSize sSize( handleSize() - QSize( 2, 2 ) );
 
-            // prepare the handle's gradient
-            QLinearGradient handleGradient( 0, 0, 0, hSize.height() );
-            handleGradient.setColorAt( 0.0, p.window().color().lighter( 120 ) );
-            handleGradient.setColorAt( 0.9, p.window().color().darker( 120 ) );
-
-            // prepare the handle's shadow gradient
-            QColor shadowBase = p.shadow().color();
-            if( shadowBase.lightness() > 100 )
-                shadowBase = QColor( 60, 60, 60 ); // Palette's shadow is too bright
-            QColor shadowDark( shadowBase.darker( 150 ) );
-            QColor shadowLight( shadowBase.lighter( 180 ) );
-            shadowLight.setAlpha( 50 );
-
+            /* FIXME: precompute gradient. Anim Compatible ? */
             QRadialGradient shadowGradient( shadowPos.x() + ( sSize.width() / 2 ),
                                             shadowPos.y() + ( sSize.height() / 2 ),
                                             qMax( sSize.width(), sSize.height() ) / 2 );
