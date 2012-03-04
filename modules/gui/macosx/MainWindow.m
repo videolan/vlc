@@ -1975,7 +1975,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (CGFloat)splitView:(NSSplitView *)splitView constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)dividerIndex
 {
     if (dividerIndex == 0)
-        return ([self frame].size.width - 300.0);
+        return ([self frame].size.width - 400.0);
     else
         return proposedMax;
 }
