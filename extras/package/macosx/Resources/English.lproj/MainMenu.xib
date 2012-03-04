@@ -21,16 +21,16 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="4596"/>
+      <integer value="1617"/>
+      <integer value="283"/>
       <integer value="915"/>
-      <integer value="4722"/>
+      <integer value="4596"/>
       <integer value="4850"/>
+      <integer value="4739"/>
       <integer value="2770"/>
+      <integer value="2730"/>
       <integer value="4756"/>
       <integer value="29"/>
-      <integer value="2730"/>
-      <integer value="283"/>
-      <integer value="1617"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -4281,7 +4281,7 @@ LCAuLi4</string>
           <bool key="EncodedWithXMLCoder">YES</bool>
           <object class="NSBox" id="83235998">
             <reference key="NSNextResponder" ref="256817023"/>
-            <int key="NSvFlags">45</int>
+            <int key="NSvFlags">42</int>
             <object class="NSMutableArray" key="NSSubviews">
               <bool key="EncodedWithXMLCoder">YES</bool>
               <object class="NSView" id="457727486">
@@ -4291,8 +4291,8 @@ LCAuLi4</string>
                   <bool key="EncodedWithXMLCoder">YES</bool>
                   <object class="NSTextField" id="551534796">
                     <reference key="NSNextResponder" ref="457727486"/>
-                    <int key="NSvFlags">301</int>
-                    <string key="NSFrame">{{0, 69}, {416, 22}}</string>
+                    <int key="NSvFlags">303</int>
+                    <string key="NSFrame">{{16, 69}, {370, 22}}</string>
                     <reference key="NSSuperview" ref="457727486"/>
                     <int key="NSViewLayerContentsRedrawPolicy">2</int>
                     <bool key="NSEnabled">YES</bool>
@@ -4346,7 +4346,7 @@ LCAuLi4</string>
                   <object class="NSButton" id="959811945">
                     <reference key="NSNextResponder" ref="457727486"/>
                     <int key="NSvFlags">301</int>
-                    <string key="NSFrame">{{125, 14}, {153, 25}}</string>
+                    <string key="NSFrame">{{124, 14}, {153, 25}}</string>
                     <reference key="NSSuperview" ref="457727486"/>
                     <int key="NSViewLayerContentsRedrawPolicy">2</int>
                     <bool key="NSEnabled">YES</bool>
