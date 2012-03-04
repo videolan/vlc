@@ -42,6 +42,14 @@ if HAVE_WIN32
 libvlc_LTLIBRARIES += libwindrive_plugin.la
 endif
 
+libos2drive_plugin_la_SOURCES = os2drive.c
+libos2drive_plugin_la_CFLAGS = $(AM_CFLAGS)
+libos2drive_plugin_la_LIBADD = $(AM_LIBADD)
+libos2drive_plugin_la_DEPENDENCIES =
+if HAVE_OS2
+libvlc_LTLIBRARIES += libos2drive_plugin.la
+endif
+
 EXTRA_LTLIBRARIES += \
 	libudev_plugin.la
 libvlc_LTLIBRARIES += \
