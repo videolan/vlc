@@ -355,7 +355,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 return VLC_SUCCESS; // this is okay, since the event will occur again when we have a window
             NSRect windowFrame = [o_window frame];
             NSRect glViewFrame = [sys->glView frame];
-            NSRect screenFrame = [[o_window screen] visibleFrame];
+            NSSize screenSize = [[o_window screen] visibleFrame].size;
             NSSize windowMinSize = [o_window minSize];
 
             topleftbase.x = 0;
@@ -372,11 +372,10 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 i_height = windowMinSize.height;
 
             /* make sure the window doesn't exceed the screen size the window is on */
-            if (i_width > screenFrame.size.width)
-            {
-                topleftscreen.x = screenFrame.origin.x;
-                i_width = screenFrame.size.width;
-            }
+            if (i_width > screenSize.width)
+                i_width = screenSize.width;
+            if (i_height > screenSize.height)
+                i_height = screenSize.height;
 
             if( i_height != glViewFrame.size.height || i_width != glViewFrame.size.width )
             {
@@ -385,12 +384,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
                 new_frame.origin.x = topleftscreen.x;
                 new_frame.origin.y = topleftscreen.y - new_frame.size.height;
-
-                if( new_frame.size.height > screenFrame.size.height )
-                {
-                    new_frame.size.height = screenFrame.size.height;
-                    new_frame.origin.y = screenFrame.origin.y;
-                }
 
                 [sys->glView performSelectorOnMainThread:@selector(setWindowFrameWithValue:) withObject:[NSValue valueWithRect:new_frame] waitUntilDone:NO];
             }
