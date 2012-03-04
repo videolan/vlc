@@ -917,13 +917,11 @@ static int ReadICYMeta( access_t *p_access )
     for( i_read = 0; i_read < i_size; )
     {
         int i_tmp;
-        if( ReadData( p_access, &i_tmp, (uint8_t *)&psz_meta[i_read], i_size - i_read ) )
+        if( ReadData( p_access, &i_tmp, (uint8_t *)&psz_meta[i_read], i_size - i_read ) || i_tmp <= 0 )
         {
             free( psz_meta );
             return VLC_EGENERIC;
         }
-        if( i_tmp <= 0 )
-            return VLC_EGENERIC;
         i_read += i_tmp;
     }
     psz_meta[i_read] = '\0'; /* Just in case */
