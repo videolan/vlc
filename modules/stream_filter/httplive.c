@@ -2392,14 +2392,12 @@ static int segment_Seek(stream_t *s, const uint64_t pos)
         vlc_mutex_lock(&p_sys->download.lock_wait);
         p_sys->download.seek = p_sys->playback.segment;
         vlc_cond_signal(&p_sys->download.wait);
-        vlc_mutex_unlock(&p_sys->download.lock_wait);
 
         /* Wait for download to be finished */
-        vlc_mutex_lock(&p_sys->download.lock_wait);
         msg_Info(s, "seek to segment %d", p_sys->playback.segment);
-        while (((p_sys->download.seek != -1) ||
-                (p_sys->download.segment - p_sys->playback.segment < 3)) &&
-                (p_sys->download.segment < (count - 6)))
+        while ((p_sys->download.seek != -1) ||
+	       ((p_sys->download.segment - p_sys->playback.segment < 3) &&
+                (p_sys->download.segment < count)))
         {
             vlc_cond_wait(&p_sys->download.wait, &p_sys->download.lock_wait);
             if (!vlc_object_alive(s) || s->b_error) break;
