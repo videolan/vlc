@@ -1458,10 +1458,10 @@ static int hls_DownloadSegmentData(stream_t *s, hls_stream_t *hls, segment_t *se
         return VLC_EGENERIC;
     }
     mtime_t duration = mdate() - start;
-    if (hls->bandwidth == 0)
+    if (hls->bandwidth == 0 && segment->duration > 0)
     {
         /* Try to estimate the bandwidth for this stream */
-        hls->bandwidth = (uint64_t)((double)segment->size / ((double)duration / 1000000.0));
+        hls->bandwidth = (uint64_t)(((double)segment->size * 8) / ((double)segment->duration));
     }
 
     /* If the segment is encrypted, decode it */
