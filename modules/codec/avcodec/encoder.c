@@ -201,7 +201,6 @@ int OpenEncoder( vlc_object_t *p_this )
     const char *psz_namecodec;
     float f_val;
     char *psz_val;
-    int i_val;
 
     if( p_enc->fmt_out.i_codec == VLC_CODEC_MP3 )
     {
