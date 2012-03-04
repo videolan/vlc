@@ -1273,8 +1273,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 #pragma mark -
 #pragma mark Video Output handling
-
 - (id)videoView
+{
+    return o_video_view;
+}
+
+- (id)setupVideoView
 {
     vout_thread_t *p_vout = getVout();
     if (config_GetInt( VLCIntf, "embedded-video" ))
