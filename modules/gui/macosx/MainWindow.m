@@ -1972,14 +1972,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 #pragma mark -
 #pragma mark split view delegate
-- (CGFloat)splitView:(NSSplitView *)splitView constrainMinCoordinate:(CGFloat)proposedMin ofSubviewAt:(NSInteger)dividerIndex
-{
-    if (dividerIndex == 0)
-        return 200.0;
-    else
-        return proposedMin;
-}
-
 - (CGFloat)splitView:(NSSplitView *)splitView constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)dividerIndex
 {
     if (dividerIndex == 0)
