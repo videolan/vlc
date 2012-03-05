@@ -553,6 +553,11 @@ void DiscOpenPanel::updateMRL()
         if( ui.titleSpin->value() > 0 )
             opts += QString(" :cdda-track=%1").arg( ui.titleSpin->value() );
     }
+    else if ( ui.bdRadioButton->isChecked() )
+    {
+        if ( ui.dvdsimple->isChecked() == false )
+            opts += " :bluray-menu";
+    }
     emit mrlUpdated( fileList, opts );
 }
 
