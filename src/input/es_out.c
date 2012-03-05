@@ -227,7 +227,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     if( !out )
         return NULL;
 
-    es_out_sys_t *p_sys = malloc( sizeof( *p_sys ) );
+    es_out_sys_t *p_sys = calloc( 1, sizeof( *p_sys ) );
     if( !p_sys )
     {
         free( out );
@@ -249,21 +249,12 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
 
 
     TAB_INIT( p_sys->i_pgrm, p_sys->pgrm );
-    p_sys->p_pgrm   = NULL;
-
-    p_sys->i_id    = 0;
 
     TAB_INIT( p_sys->i_es, p_sys->es );
 
-    p_sys->i_audio = 0;
-    p_sys->i_video = 0;
-    p_sys->i_sub   = 0;
-
     /* */
     p_sys->i_group_id = var_GetInteger( p_input, "program" );
-
     p_sys->i_audio_last = var_GetInteger( p_input, "audio-track" );
-
     p_sys->i_sub_last = var_GetInteger( p_input, "sub-track" );
 
     p_sys->i_default_sub_id   = -1;
@@ -292,38 +283,17 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
         }
         free( psz_string );
     }
-    else
-    {
-        p_sys->ppsz_sub_language = NULL;
-        p_sys->ppsz_audio_language = NULL;
-    }
 
     p_sys->i_audio_id = var_GetInteger( p_input, "audio-track-id" );
 
     p_sys->i_sub_id = var_GetInteger( p_input, "sub-track-id" );
 
-    p_sys->p_es_audio = NULL;
-    p_sys->p_es_video = NULL;
-    p_sys->p_es_sub   = NULL;
-
-    p_sys->i_audio_delay= 0;
-    p_sys->i_spu_delay  = 0;
-
-    p_sys->b_paused = false;
     p_sys->i_pause_date = -1;
 
     p_sys->i_rate = i_rate;
-    p_sys->i_pts_delay = 0;
-    p_sys->i_pts_jitter = 0;
-    p_sys->i_cr_average = 0;
 
     p_sys->b_buffering = true;
-    p_sys->i_buffering_extra_initial = 0;
-    p_sys->i_buffering_extra_stream = 0;
-    p_sys->i_buffering_extra_system = 0;
     p_sys->i_preroll_end = -1;
-
-    p_sys->p_sout_record = NULL;
 
     return out;
 }
