@@ -620,6 +620,7 @@
     id o_item = [o_outline_dict objectForKey:[NSString stringWithFormat: @"%p", p_item]];
     NSInteger i_index = [o_outline_view rowForItem:o_item];
     [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:i_index] byExtendingSelection:NO];
+    [o_outline_view setNeedsDisplay:YES];
 }
 
 /* Check if p_item is a child of p_node recursively. We need to check the item
