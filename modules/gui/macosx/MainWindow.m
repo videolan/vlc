@@ -1946,49 +1946,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     /* fullscreenAnimation will be unlocked when animation ends */
 }
 
-/* Make sure setFrame gets executed on main thread especially if we are animating.
- * (Thus we won't block the video output thread) */
-- (void)setFrame:(NSRect)frame display:(BOOL)display animate:(BOOL)animate
-{
-    struct { NSRect frame; BOOL display; BOOL animate;} args;
-    NSData *packedargs;
-
-    args.frame = frame;
-    args.display = display;
-    args.animate = animate;
-
-    packedargs = [NSData dataWithBytes:&args length:sizeof(args)];
-
-    [self performSelectorOnMainThread:@selector(setFrameOnMainThread:)
-                           withObject: packedargs waitUntilDone: YES];
-}
-
-- (void)setFrameOnMainThread:(NSData*)packedargs
-{
-    struct args { NSRect frame; BOOL display; BOOL animate; } * args = (struct args*)[packedargs bytes];
-
-    if( args->animate )
-    {
-        /* Make sure we don't block too long and set up a non blocking animation */
-        NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys:
-                               self, NSViewAnimationTargetKey,
-                               [NSValue valueWithRect:[self frame]], NSViewAnimationStartFrameKey,
-                               [NSValue valueWithRect:args->frame], NSViewAnimationEndFrameKey, nil];
-
-        NSViewAnimation * anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict]];
-
-        [anim setAnimationBlockingMode: NSAnimationNonblocking];
-        [anim setDuration: 0.4];
-        [anim setFrameRate: 30];
-        [anim startAnimation];
-
-        [anim release];
-    }
-    else {
-        [super setFrame:args->frame display:args->display animate:args->animate];
-    }
-}
-
 #pragma mark -
 #pragma mark Lion's native fullscreen handling
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
