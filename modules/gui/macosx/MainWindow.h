@@ -189,7 +189,6 @@
 - (void)leaveFullscreenAndFadeOut: (BOOL)fadeout;
 - (void)hasEndedFullscreen;
 - (void)hasBecomeFullscreen;
-- (void)setFrameOnMainThread:(NSData*)packedargs;
 
 /* lion's native fullscreen handling */
 - (void)windowWillEnterFullScreen:(NSNotification *)notification;
