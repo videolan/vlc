@@ -417,14 +417,13 @@ static mtime_t EsOutGetWakeup( es_out_t *out )
 
 static es_out_id_t *EsOutGetFromID( es_out_t *out, int i_id )
 {
-    int i;
     if( i_id < 0 )
     {
         /* Special HACK, -i_id is the cat of the stream */
         return (es_out_id_t*)((uint8_t*)NULL-i_id);
     }
 
-    for( i = 0; i < out->p_sys->i_es; i++ )
+    for( int i = 0; i < out->p_sys->i_es; i++ )
     {
         if( out->p_sys->es[i]->i_id == i_id )
             return out->p_sys->es[i];
@@ -435,7 +434,6 @@ static es_out_id_t *EsOutGetFromID( es_out_t *out, int i_id )
 static bool EsOutDecodersIsEmpty( es_out_t *out )
 {
     es_out_sys_t      *p_sys = out->p_sys;
-    int i;
 
     if( p_sys->b_buffering && p_sys->p_pgrm )
     {
@@ -444,7 +442,7 @@ static bool EsOutDecodersIsEmpty( es_out_t *out )
             return true;
     }
 
-    for( i = 0; i < p_sys->i_es; i++ )
+    for( int i = 0; i < p_sys->i_es; i++ )
     {
         es_out_id_t *es = p_sys->es[i];
 
@@ -2840,11 +2838,10 @@ static char **LanguageSplit( const char *psz_langs, bool b_default_any )
 
 static int LanguageArrayIndex( char **ppsz_langs, char *psz_lang )
 {
-    int i;
+    if( !ppsz_langs || !psz_lang )
+        return -1;
 
-    if( !ppsz_langs || !psz_lang ) return -1;
-
-    for( i = 0; ppsz_langs[i]; i++ )
+    for( int i = 0; ppsz_langs[i]; i++ )
     {
         if( !strcasecmp( ppsz_langs[i], psz_lang ) ||
             !strcasecmp( ppsz_langs[i], "any" ) )
