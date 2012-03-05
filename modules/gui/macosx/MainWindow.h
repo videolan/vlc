@@ -70,6 +70,7 @@
     IBOutlet VLCFSPanel *o_fspanel;
     IBOutlet id o_titlebar_view;
     IBOutlet id o_resize_view;
+    IBOutlet id o_detached_resize_view;
 
     IBOutlet id o_detached_play_btn;
     IBOutlet id o_detached_fwd_btn;
@@ -196,8 +197,10 @@
 
 @end
 
-@interface VLCDetachedVideoWindow : NSWindow 
+@interface VLCDetachedVideoWindow : NSWindow
 {
+    BOOL b_dark_interface;
+    NSRect previousSavedFrame;
 }
 
 - (BOOL)isFullscreen;
