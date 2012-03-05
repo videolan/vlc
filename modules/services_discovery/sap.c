@@ -256,6 +256,7 @@ struct demux_sys_t
     static const char *FindAttribute (const sdp_t *sdp, unsigned media,
                                       const char *name);
 
+    static bool IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 );
     static int InitSocket( services_discovery_t *p_sd, const char *psz_address, int i_port );
     static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i_len );
     static void FreeSDP( sdp_t *p_sdp );
@@ -788,7 +789,9 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
     {
         sap_announce_t * p_announce = p_sd->p_sys->pp_announces[i];
         /* FIXME: slow */
-        if( p_announce->i_hash == i_hash && !memcmp(p_announce->i_source, i_source, sizeof(i_source)) )
+        if( ( !i_hash && IsSameSession( p_announce->p_sdp, p_sdp ) )
+            || ( i_hash && p_announce->i_hash == i_hash
+                 && !memcmp(p_announce->i_source, i_source, sizeof(i_source)) ) )
         {
             /* We don't support delete announcement as they can easily
              * Be used to highjack an announcement by a third party.
@@ -1541,6 +1544,27 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
     free( p_announce );
 
     return VLC_SUCCESS;
+}
+
+/*
+ * Compare two sessions, when hash is not set (SAP v0)
+ */
+static bool IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 )
+{
+    /* A session is identified by
+     * - username,
+     * - session_id,
+     * - network type (which is always IN),
+     * - address type (currently, this means IP version),
+     * - and hostname.
+     */
+    if (strcmp (p_sdp1->username, p_sdp2->username)
+     || (p_sdp1->session_id != p_sdp2->session_id)
+     || (p_sdp1->orig_ip_version != p_sdp2->orig_ip_version)
+     || strcmp (p_sdp1->orig_host, p_sdp2->orig_host))
+        return false;
+
+    return true;
 }
 
 static inline attribute_t *MakeAttribute (const char *str)
