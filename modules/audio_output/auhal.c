@@ -119,6 +119,8 @@ static OSStatus StreamListener          ( AudioObjectID, UInt32, const AudioObje
 static int      AudioDeviceCallback     ( vlc_object_t *, const char *,
                                           vlc_value_t, vlc_value_t, void * );
 
+static int      VolumeSet               ( audio_output_t *, float, bool );
+
 
 /*****************************************************************************
  * Module descriptor
@@ -557,7 +559,7 @@ static int OpenAnalog( audio_output_t *p_aout )
     /* Do the last VLC aout setups */
     aout_FormatPrepare( &p_aout->format );
     aout_PacketInit( p_aout, &p_sys->packet, FRAMESIZE );
-    aout_VolumeSoftInit( p_aout );
+    aout_VolumeHardInit (p_aout, VolumeSet);
 
     /* set the IOproc callback */
     input.inputProc = (AURenderCallback) RenderCallbackAnalog;
@@ -1448,3 +1450,27 @@ static int AudioDeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     return aout_ChannelsRestart( p_this, psz_variable, old_val, new_val, param );
 }
 
+
+/*****************************************************************************
+ * VolumeSet: Implements pf_volume_set(). Update the CoreAudio AU volume immediately.
+ *****************************************************************************/
+static int VolumeSet( audio_output_t * p_aout, float volume, bool mute )
+{
+    struct   aout_sys_t *p_sys = p_aout->sys;
+    OSStatus ostatus;
+
+    if( mute )
+        volume = 0.0;
+    else
+        volume = volume * volume * volume; // cubic mapping from output.c
+
+    /* Set volume for output unit */
+    ostatus = AudioUnitSetParameter( p_sys->au_unit,
+                                     kHALOutputParam_Volume,
+                                     kAudioUnitScope_Global,
+                                     0,
+                                     volume,
+                                     0 );
+
+    return ostatus;
+}
