@@ -2276,6 +2276,18 @@ static VLCMainWindow *_o_sharedInstance = nil;
     return self;
 }
 
+- (void)awakeFromNib
+{
+    if (b_dark_interface)
+    {
+        [self setBackgroundColor: [NSColor clearColor]];
+        [self setOpaque: NO];
+        [self display];
+        [self setHasShadow:NO];
+        [self setHasShadow:YES];
+    }
+}
+
 - (BOOL)isFullscreen
 {
     return [[VLCMainWindow sharedInstance] isFullscreen];
