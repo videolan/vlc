@@ -102,7 +102,6 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
 
     if( p_input )
     {
-        NSLog( @"new audio delay: %lld", var_GetTime( p_input, "audio-delay" ) );
         [o_av_value_fld setDoubleValue: var_GetTime( p_input, "audio-delay" ) / 1000000.];
         [o_sv_advance_value_fld setDoubleValue: var_GetTime( p_input, "spu-delay" ) / 1000000.];
         [o_sv_speed_value_fld setFloatValue: var_GetFloat( p_input, "sub-fps" )];
