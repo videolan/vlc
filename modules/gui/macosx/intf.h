@@ -154,6 +154,7 @@ struct intf_sys_t
 - (void)setIntf:(intf_thread_t *)p_mainintf;
 
 - (id)mainMenu;
+- (id)mainWindow;
 - (id)controls;
 - (id)bookmarks;
 - (id)open;

@@ -669,7 +669,7 @@ void _drawFrameInRect(NSRect frameRect)
 
 - (void)drawRect:(NSRect)rect
 {
-    [(VLCMainWindow *)[self window] drawFancyGradientEffectForTimeSlider];
+    [[[VLCMain sharedInstance] mainWindow] drawFancyGradientEffectForTimeSlider];
     msleep( 10000 ); //wait for the gradient to draw completely
 
     /* Draw default to make sure the slider behaves correctly */

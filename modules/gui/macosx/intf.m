@@ -1563,6 +1563,11 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     return o_mainmenu;
 }
 
+- (id)mainWindow
+{
+    return o_mainwindow;
+}
+
 - (id)controls
 {
     if( o_controls )
