@@ -62,7 +62,7 @@
 # include <dvbpsi/tot.h>
 
 #undef TS_DEBUG
-static void ts_debug(const char *format, ...)
+VLC_FORMAT(1, 2) static void ts_debug(const char *format, ...)
 {
 #ifdef TS_DEBUG
     va_list ap;
