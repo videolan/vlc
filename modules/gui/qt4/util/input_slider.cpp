@@ -636,10 +636,11 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
     add_color( gradient1, range, c1, c2, c3 ); \
     add_desaturated_color( gradient2, range, c1, c2, c3 );
 
+    float f_mid_point = ( 100.0 / maximum() );
     QColor * foo;
     add_colors( gradient, gradient2, 0.0, 0, 1, 2 );
-    add_colors( gradient, gradient2, 0.45, 3, 4, 5 );
-    add_colors( gradient, gradient2, 0.55, 6, 7, 8 );
+    add_colors( gradient, gradient2, f_mid_point - 0.05, 3, 4, 5 );
+    add_colors( gradient, gradient2, f_mid_point + 0.05, 6, 7, 8 );
     add_colors( gradient, gradient2, 1.0, 9, 10, 11 );
 
     painter.begin( &pixGradient );
