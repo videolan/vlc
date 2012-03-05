@@ -165,45 +165,57 @@ static void segment_Free(segment_t *segment);
 /****************************************************************************
  *
  ****************************************************************************/
-static const char *const ext[] = {
-    "#EXT-X-TARGETDURATION",
-    "#EXT-X-MEDIA-SEQUENCE",
-    "#EXT-X-KEY",
-    "#EXT-X-ALLOW-CACHE",
-    "#EXT-X-ENDLIST",
-    "#EXT-X-STREAM-INF",
-    "#EXT-X-DISCONTINUITY",
-    "#EXT-X-VERSION"
-};
-
 static bool isHTTPLiveStreaming(stream_t *s)
 {
-    const uint8_t *peek, *peek_end;
+    const uint8_t *peek;
 
-    int64_t i_size = stream_Peek(s->p_source, &peek, 46);
-    if (i_size < 1)
+    int size = stream_Peek(s->p_source, &peek, 46);
+    if (size < 7)
         return false;
 
-    if (strncasecmp((const char*)peek, "#EXTM3U", 7) != 0)
+    if (memcmp(peek, "#EXTM3U", 7) != 0)
         return false;
+
+    peek += 7;
+    size -= 7;
 
     /* Parse stream and search for
      * EXT-X-TARGETDURATION or EXT-X-STREAM-INF tag, see
      * http://tools.ietf.org/html/draft-pantos-http-live-streaming-04#page-8 */
-    peek_end = peek + i_size;
-    while(peek <= peek_end)
+    while (size--)
     {
-        if (*peek == '#')
+        static const char *const ext[] = {
+            "TARGETDURATION",
+            "MEDIA-SEQUENCE",
+            "KEY",
+            "ALLOW-CACHE",
+            "ENDLIST",
+            "STREAM-INF",
+            "DISCONTINUITY",
+            "VERSION"
+        };
+
+        if (*peek++ != '#')
+            continue;
+
+        if (size < 6)
+            continue;
+
+        if (memcmp(peek, "EXT-X-", 6))
+            continue;
+
+        peek += 6;
+        size -= 6;
+
+        for (size_t i = 0; i < ARRAY_SIZE(ext); i++)
         {
-            for (unsigned int i = 0; i < ARRAY_SIZE(ext); i++)
-            {
-                char *p = strstr((const char*)peek, ext[i]);
-                if (p != NULL)
-                    return true;
-            }
+            size_t len = strlen(ext[i]);
+            if (size < len)
+                continue;
+            if (!memcmp(peek, ext[i], len))
+                return true;
         }
-        peek++;
-    };
+    }
 
     return false;
 }
