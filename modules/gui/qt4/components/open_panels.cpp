@@ -548,7 +548,7 @@ void DiscOpenPanel::updateMRL()
             opts += " :sub-track=" +
                 QString("%1").arg( ui.subtitlesSpin->value() );
     }
-    if( ui.audioCDRadioButton->isChecked() )
+    else if( ui.audioCDRadioButton->isChecked() )
     {
         if( ui.titleSpin->value() > 0 )
             opts += QString(" :cdda-track=%1").arg( ui.titleSpin->value() );
