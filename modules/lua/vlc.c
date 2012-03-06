@@ -37,7 +37,6 @@
 #include <vlc_meta.h>
 #include <vlc_charset.h>
 #include <vlc_fs.h>
-#include <vlc_aout.h>
 #include <vlc_services_discovery.h>
 #include <vlc_stream.h>
 

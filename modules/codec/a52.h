@@ -27,7 +27,6 @@
 #ifndef _VLC_A52_H
 #define _VLC_A52_H 1
 
-#include <vlc_aout.h>
 #include <vlc_bits.h>
 
 typedef struct

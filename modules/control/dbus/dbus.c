@@ -59,7 +59,6 @@
 #include <vlc_meta.h>
 #include <vlc_mtime.h>
 #include <vlc_fs.h>
-#include <vlc_aout.h>
 
 #include <assert.h>
 #include <string.h>

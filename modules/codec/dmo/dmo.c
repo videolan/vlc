@@ -33,7 +33,6 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_codecs.h>
-#include <vlc_aout.h>
 
 #ifndef WIN32
 #    define LOADER

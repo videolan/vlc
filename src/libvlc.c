@@ -66,9 +66,6 @@
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
 
-#include <vlc_aout.h>
-#include "audio_output/aout_internal.h"
-
 #include <vlc_charset.h>
 #include <vlc_fs.h>
 #include <vlc_cpu.h>

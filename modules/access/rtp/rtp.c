@@ -33,7 +33,6 @@
 #include <vlc_network.h>
 #include <vlc_plugin.h>
 #include <vlc_dialog.h>
-#include <vlc_aout.h>
 
 #include "rtp.h"
 #ifdef HAVE_SRTP
