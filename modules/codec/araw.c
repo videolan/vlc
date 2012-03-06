@@ -76,16 +76,6 @@ typedef struct
     date_t end_date;
 } decoder_sys_t;
 
-static const uint16_t pi_channels_maps[] =
-{
-    0,
-    AOUT_CHAN_CENTER, AOUT_CHANS_2_0, AOUT_CHANS_3_0,
-    AOUT_CHANS_4_0,   AOUT_CHANS_5_0, AOUT_CHANS_5_1,
-    AOUT_CHANS_7_0,   AOUT_CHANS_7_1, AOUT_CHANS_8_1,
-};
-static_assert( ARRAY_SIZE( pi_channels_maps ) - 1 <= AOUT_CHAN_MAX,
-               "channel count mismatch" );
-
 static void S8Decode( void *, const uint8_t *, unsigned );
 static void U16BDecode( void *, const uint8_t *, unsigned );
 static void U16LDecode( void *, const uint8_t *, unsigned );
@@ -277,14 +267,14 @@ static int DecoderOpen( vlc_object_t *p_this )
     p_dec->fmt_out.audio.channel_type = p_dec->fmt_in.audio.channel_type;
     p_dec->fmt_out.audio.i_format = format;
     p_dec->fmt_out.audio.i_rate = p_dec->fmt_in.audio.i_rate;
-    if( p_dec->fmt_in.audio.i_channels <= ARRAY_SIZE( pi_channels_maps ) - 1 )
+    if( p_dec->fmt_in.audio.i_channels < ARRAY_SIZE(vlc_chan_maps) )
     {
         if( p_dec->fmt_in.audio.i_physical_channels )
             p_dec->fmt_out.audio.i_physical_channels =
                                            p_dec->fmt_in.audio.i_physical_channels;
         else
             p_dec->fmt_out.audio.i_physical_channels =
-                                  pi_channels_maps[p_dec->fmt_in.audio.i_channels];
+                vlc_chan_maps[p_dec->fmt_in.audio.i_channels];
     }
     else
     {

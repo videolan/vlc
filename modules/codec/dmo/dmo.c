@@ -57,20 +57,6 @@
 
 typedef long (STDCALL *GETCLASS) ( const GUID*, const GUID*, void** );
 
-static const int pi_channels_maps[7] =
-{
-    0,
-    AOUT_CHAN_CENTER,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-    AOUT_CHAN_CENTER | AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
-     | AOUT_CHAN_REARRIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE
-};
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -461,7 +447,7 @@ static int DecOpen( decoder_t *p_dec )
         if( p_dec->fmt_in.audio.i_channels > 8 )
             goto error;
         p_dec->fmt_out.audio.i_physical_channels =
-            pi_channels_maps[p_dec->fmt_out.audio.i_channels];
+            vlc_chan_maps[p_dec->fmt_out.audio.i_channels];
 
         p_wf->wFormatTag = WAVE_FORMAT_PCM;
         p_wf->nSamplesPerSec = p_dec->fmt_out.audio.i_rate;

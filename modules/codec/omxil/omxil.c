@@ -595,27 +595,8 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
                     omx_error, ErrorToString(omx_error));
 
         if(p_fmt->audio.i_channels < 9)
-        {
-            static const int pi_channels_maps[9] =
-            {
-                0, AOUT_CHAN_CENTER, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-                AOUT_CHAN_CENTER | AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
-                | AOUT_CHAN_REARRIGHT,
-                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
-                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE,
-                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT
-                | AOUT_CHAN_MIDDLERIGHT,
-                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT
-                | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT
-                | AOUT_CHAN_LFE
-            };
             p_fmt->audio.i_physical_channels =
-                pi_channels_maps[p_fmt->audio.i_channels];
-        }
+                vlc_chan_maps[p_fmt->audio.i_channels];
 
         date_Init( &p_sys->end_date, p_fmt->audio.i_rate, 1 );
 

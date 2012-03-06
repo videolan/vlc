@@ -154,6 +154,20 @@ struct audio_format_t
 /* Maximum number of unmapped channels */
 #define INPUT_CHAN_MAX              64
 
+static const uint16_t vlc_chan_maps[] =
+{
+    0,
+    AOUT_CHAN_CENTER,
+    AOUT_CHANS_2_0,
+    AOUT_CHANS_3_0,
+    AOUT_CHANS_4_0,
+    AOUT_CHANS_5_0,
+    AOUT_CHANS_5_1,
+    AOUT_CHANS_7_0,
+    AOUT_CHANS_7_1,
+    AOUT_CHANS_8_1,
+};
+
 /* Values available for i_chan_mode only */
 #define AOUT_CHANMODE_DUALMONO    0x1
 #define AOUT_CHANMODE_DOLBYSTEREO 0x2
