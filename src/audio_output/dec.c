@@ -50,7 +50,7 @@ int aout_DecNew( audio_output_t *p_aout,
                  const aout_request_vout_t *p_request_vout )
 {
     /* Sanitize audio format */
-    if( p_format->i_channels > 32 )
+    if( p_format->i_channels > AOUT_CHAN_MAX )
     {
         msg_Err( p_aout, "too many audio channels (%u)",
                  p_format->i_channels );
