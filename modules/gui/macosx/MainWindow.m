@@ -637,7 +637,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     BOOL b_activeVideo = [[VLCMain sharedInstance] activeVideoPlayback];
 
-    if ( ((([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0) && !b_splitview_removed && !b_activeVideo) || (b_nonembedded && b_activeVideo && sender != nil) )
+    if ( !b_splitview_removed && ( (([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0 && !b_activeVideo) || (b_nonembedded && b_activeVideo && sender != nil) ))
     {
         [self hideSplitView];
     }
