@@ -322,9 +322,7 @@ static int Open (vlc_object_t *obj)
     /* Open the device */
     snd_pcm_t *pcm;
     /* VLC always has a resampler. No need for ALSA's. */
-    const int mode = SND_PCM_NO_AUTO_RESAMPLE
-    /* VLC is currently unable to leverage ALSA softvol. No need for it. */
-                   | SND_PCM_NO_SOFTVOL;
+    const int mode = SND_PCM_NO_AUTO_RESAMPLE;
 
     int val = snd_pcm_open (&pcm, device, SND_PCM_STREAM_PLAYBACK, mode);
 #if (SND_LIB_VERSION <= 0x010015)
