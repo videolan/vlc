@@ -522,9 +522,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_detached_resize_view removeFromSuperviewWithoutNeedingDisplay];
     }
 
-    if (OSX_LEOPARD)
-        [o_time_sld_fancygradient_view removeFromSuperviewWithoutNeedingDisplay];
-
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(someWindowWillClose:) name: NSWindowWillCloseNotification object: nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(someWindowWillMiniaturize:) name: NSWindowWillMiniaturizeNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
