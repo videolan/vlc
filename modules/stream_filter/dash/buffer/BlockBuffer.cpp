@@ -103,7 +103,11 @@ int     BlockBuffer::get                  (void *p_data, unsigned int len)
 
     this->reduceBufferMilliSec(ret);
 
-    block_GetBytes(&this->buffer, (uint8_t *)p_data, ret);
+    if(p_data == NULL)
+        block_SkipBytes(&this->buffer, ret);
+    else
+        block_GetBytes(&this->buffer, (uint8_t *)p_data, ret);
+
     block_BytestreamFlush(&this->buffer);
     this->notify();
 
