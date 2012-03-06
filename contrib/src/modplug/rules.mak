@@ -16,6 +16,7 @@ $(TARBALLS)/libmodplug-$(MODPLUG_VERSION).tar.gz:
 libmodplug: libmodplug-$(MODPLUG_VERSION).tar.gz .sum-modplug
 	$(UNPACK)
 	$(UPDATE_AUTOCONFIG)
+	$(call pkg_static,"libmodplug.pc.in")
 	$(MOVE)
 
 .modplug: libmodplug
