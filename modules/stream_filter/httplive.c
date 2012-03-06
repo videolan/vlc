@@ -502,33 +502,38 @@ static char *parse_Attributes(const char *line, const char *attr)
     return NULL;
 }
 
-static int hex2int(char c)
+static int string_to_IV(char *string_hexa, uint8_t iv[AES_BLOCK_SIZE])
 {
-    if (c >= '0' && c <= '9')
-        return c - '0';
-    if (c >= 'A' && c <= 'F')
-        return c - 'A' + 10;
-    if (c >= 'a' && c <= 'f')
-        return c - 'a' + 10;
-    return -1;
-}
-
-static int string_to_IV(const char *string_hexa, uint8_t iv[AES_BLOCK_SIZE])
-{
-    const char *p = string_hexa;
-    uint8_t *d = iv;
-    unsigned int c;
-
-    if (*p++ != '0')
+    unsigned long long iv_hi, iv_lo;
+    char *end = NULL;
+    if (*string_hexa++ != '0')
         return VLC_EGENERIC;
-    if (*p++ != 'x')
+    if (*string_hexa != 'x' && *string_hexa != 'X')
         return VLC_EGENERIC;
 
-    while (*p && *(p+1))
-    {
-        c = hex2int(*p++) << 4;
-        c |= hex2int(*p++);
-        *d++ = c;
+    string_hexa++;
+
+    size_t len = strlen(string_hexa);
+    if (len <= 16) {
+        iv_hi = 0;
+        iv_lo = strtoull(string_hexa, &end, 16);
+        if (end)
+            return VLC_EGENERIC;
+    } else {
+        iv_lo = strtoull(&string_hexa[len-16], NULL, 16);
+        if (end)
+            return VLC_EGENERIC;
+        string_hexa[len-16] = '\0';
+        iv_hi = strtoull(string_hexa, NULL, 16);
+        if (end)
+            return VLC_EGENERIC;
+    }
+
+    for (int i = 8; i ; --i) {
+        iv[  i] = iv_hi & 0xff;
+        iv[8+i] = iv_lo & 0xff;
+        iv_hi >>= 8;
+        iv_lo >>= 8;
     }
 
     return VLC_SUCCESS;
@@ -790,7 +795,10 @@ static int parse_Key(stream_t *s, hls_stream_t *hls, char *p_read)
             */
 
             if (string_to_IV(iv, hls->psz_AES_IV) == VLC_EGENERIC)
+            {
+                msg_Err(s, "IV invalid");
                 err = VLC_EGENERIC;
+            }
             else
                 hls->b_iv_loaded = true;
             free(value);
