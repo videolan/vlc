@@ -2191,12 +2191,8 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     aout_buffer_t *p_buffer;
 
-    if( p_owner->p_aout &&
-        ( p_dec->fmt_out.audio.i_rate != p_owner->audio.i_rate ||
-          p_dec->fmt_out.audio.i_original_channels !=
-              p_owner->audio.i_original_channels ||
-          p_dec->fmt_out.audio.i_bytes_per_frame !=
-              p_owner->audio.i_bytes_per_frame ) )
+    if( p_owner->p_aout
+     && !AOUT_FMTS_IDENTICAL(&p_dec->fmt_out.audio, &p_owner->audio) )
     {
         audio_output_t *p_aout = p_owner->p_aout;
 
