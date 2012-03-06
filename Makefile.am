@@ -187,8 +187,6 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/back.png \
 	extras/package/macosx/Resources/mainwindow/bottom-background.png \
 	extras/package/macosx/Resources/mainwindow/bottombar-mini.png \
-	extras/package/macosx/Resources/mainwindow_dark/bottomdark-left.png \
-	extras/package/macosx/Resources/mainwindow_dark/bottomdark-right.png \
 	extras/package/macosx/Resources/mainwindow/dropzone-background.png \
 	extras/package/macosx/Resources/mainwindow/dropzone.png \
 	extras/package/macosx/Resources/mainwindow/effects-double-buttons-blue.png \
@@ -200,6 +198,8 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/forward.png \
 	extras/package/macosx/Resources/mainwindow/fullscreen-double-buttons-pressed.png \
 	extras/package/macosx/Resources/mainwindow/fullscreen-double-buttons.png \
+	extras/package/macosx/Resources/mainwindow/fullscreen-one-button-pressed.png \
+	extras/package/macosx/Resources/mainwindow/fullscreen-one-button.png \
 	extras/package/macosx/Resources/mainwindow/mini-progressbar-fill-left.png \
 	extras/package/macosx/Resources/mainwindow/mini-progressbar-fill-middle.png \
 	extras/package/macosx/Resources/mainwindow/mini-progressbar-fill-right.png \
@@ -233,6 +233,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/shuffle.png \
 	extras/package/macosx/Resources/mainwindow/stop-pressed.png \
 	extras/package/macosx/Resources/mainwindow/stop.png \
+	extras/package/macosx/Resources/mainwindow/topbar_background.png \
 	extras/package/macosx/Resources/mainwindow/volume-high.png \
 	extras/package/macosx/Resources/mainwindow/volume-low.png \
 	extras/package/macosx/Resources/mainwindow/volume-slider-knob.png \
@@ -241,6 +242,8 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/back_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottom-background_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottombar-mini.png \
+	extras/package/macosx/Resources/mainwindow_dark/bottomdark-left.png \
+	extras/package/macosx/Resources/mainwindow_dark/bottomdark-right.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-double-buttons-blue_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-double-buttons-pressed_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-double-buttons_dark.png \
@@ -250,6 +253,8 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/forward_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/fullscreen-double-buttons-pressed_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/fullscreen-double-buttons_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/fullscreen-one-button-pressed_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/fullscreen-one-button_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/pause-pressed_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/pause_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/play-pressed_dark.png \
@@ -286,8 +291,8 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize-graphite.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize-on-graphite.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize-on.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize-over.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize-over-graphite.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize-over.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-zoom-graphite.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-zoom-on-graphite.png \
@@ -301,11 +306,11 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-close-over-graphite.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-close-over.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-close.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-minimize-graphite.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-minimize-on-graphite.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-minimize-on.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-minimize-over-graphite.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-minimize-over.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-minimize-graphite.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-minimize.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-zoom-graphite.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-zoom-on-graphite.png \

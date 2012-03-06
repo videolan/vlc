@@ -156,6 +156,10 @@
 		CC0586BD14ACF7C000659A99 /* sidebar-pictures.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0586B714ACF7C000659A99 /* sidebar-pictures.png */; };
 		CC0586BE14ACF7C000659A99 /* sidebar-playlist.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0586B814ACF7C000659A99 /* sidebar-playlist.png */; };
 		CC0586BF14ACF7C000659A99 /* sidebar-podcast.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0586B914ACF7C000659A99 /* sidebar-podcast.png */; };
+		CC0F725215063C820086B6A0 /* fullscreen-one-button-pressed.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0F725015063C820086B6A0 /* fullscreen-one-button-pressed.png */; };
+		CC0F725315063C820086B6A0 /* fullscreen-one-button.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0F725115063C820086B6A0 /* fullscreen-one-button.png */; };
+		CC0F725715063C980086B6A0 /* fullscreen-one-button_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0F725515063C980086B6A0 /* fullscreen-one-button_dark.png */; };
+		CC0F725815063C980086B6A0 /* fullscreen-one-button-pressed_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0F725615063C980086B6A0 /* fullscreen-one-button-pressed_dark.png */; };
 		CC1655D314EEA1DE00FAA66F /* bottomdark-left.png in Resources */ = {isa = PBXBuildFile; fileRef = CC1655D114EEA1DE00FAA66F /* bottomdark-left.png */; };
 		CC1655D414EEA1DE00FAA66F /* bottomdark-right.png in Resources */ = {isa = PBXBuildFile; fileRef = CC1655D214EEA1DE00FAA66F /* bottomdark-right.png */; };
 		CC206B3814ACFEAC007935C6 /* lion-window-close-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B1314ACFEAC007935C6 /* lion-window-close-graphite.png */; };
@@ -475,6 +479,10 @@
 		CC0CD0E013DE0EAE00B0D90D /* PXSourceList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PXSourceList.m; path = ../../../modules/gui/macosx/PXSourceList.m; sourceTree = "<group>"; };
 		CC0CD0E113DE0EAE00B0D90D /* PXSourceListDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PXSourceListDataSource.h; path = ../../../modules/gui/macosx/PXSourceListDataSource.h; sourceTree = "<group>"; };
 		CC0CD0E213DE0EAE00B0D90D /* PXSourceListDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PXSourceListDelegate.h; path = ../../../modules/gui/macosx/PXSourceListDelegate.h; sourceTree = "<group>"; };
+		CC0F725015063C820086B6A0 /* fullscreen-one-button-pressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "fullscreen-one-button-pressed.png"; path = "Resources/mainwindow/fullscreen-one-button-pressed.png"; sourceTree = "<group>"; };
+		CC0F725115063C820086B6A0 /* fullscreen-one-button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "fullscreen-one-button.png"; path = "Resources/mainwindow/fullscreen-one-button.png"; sourceTree = "<group>"; };
+		CC0F725515063C980086B6A0 /* fullscreen-one-button_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "fullscreen-one-button_dark.png"; path = "Resources/mainwindow_dark/fullscreen-one-button_dark.png"; sourceTree = "<group>"; };
+		CC0F725615063C980086B6A0 /* fullscreen-one-button-pressed_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "fullscreen-one-button-pressed_dark.png"; path = "Resources/mainwindow_dark/fullscreen-one-button-pressed_dark.png"; sourceTree = "<group>"; };
 		CC1655D114EEA1DE00FAA66F /* bottomdark-left.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "bottomdark-left.png"; path = "Resources/mainwindow_dark/bottomdark-left.png"; sourceTree = "<group>"; };
 		CC1655D214EEA1DE00FAA66F /* bottomdark-right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "bottomdark-right.png"; path = "Resources/mainwindow_dark/bottomdark-right.png"; sourceTree = "<group>"; };
 		CC1941240B9C1F8400635F6B /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
@@ -867,6 +875,8 @@
 				CC04321913B246DF00D7D52E /* forward-pressed_dark.png */,
 				CC04321A13B246DF00D7D52E /* fullscreen-double-buttons_dark.png */,
 				CC04321B13B246DF00D7D52E /* fullscreen-double-buttons-pressed_dark.png */,
+				CC0F725515063C980086B6A0 /* fullscreen-one-button_dark.png */,
+				CC0F725615063C980086B6A0 /* fullscreen-one-button-pressed_dark.png */,
 				CC04321C13B246DF00D7D52E /* pause_dark.png */,
 				CC04321D13B246DF00D7D52E /* pause-pressed_dark.png */,
 				CC04321E13B246DF00D7D52E /* play_dark.png */,
@@ -922,6 +932,8 @@
 				CC04333613B28B8200D7D52E /* forward.png */,
 				CC04333713B28B8200D7D52E /* fullscreen-double-buttons-pressed.png */,
 				CC04333813B28B8200D7D52E /* fullscreen-double-buttons.png */,
+				CC0F725015063C820086B6A0 /* fullscreen-one-button-pressed.png */,
+				CC0F725115063C820086B6A0 /* fullscreen-one-button.png */,
 				CC04333913B28B8200D7D52E /* mini-progressbar-fill-left.png */,
 				CC04333A13B28B8200D7D52E /* mini-progressbar-fill-middle.png */,
 				CC04333B13B28B8200D7D52E /* mini-progressbar-fill-right.png */,
@@ -1521,6 +1533,10 @@
 				CC206B7014AD0A5D007935C6 /* window-fullscreen.png in Resources */,
 				CC1655D314EEA1DE00FAA66F /* bottomdark-left.png in Resources */,
 				CC1655D414EEA1DE00FAA66F /* bottomdark-right.png in Resources */,
+				CC0F725215063C820086B6A0 /* fullscreen-one-button-pressed.png in Resources */,
+				CC0F725315063C820086B6A0 /* fullscreen-one-button.png in Resources */,
+				CC0F725715063C980086B6A0 /* fullscreen-one-button_dark.png in Resources */,
+				CC0F725815063C980086B6A0 /* fullscreen-one-button-pressed_dark.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
