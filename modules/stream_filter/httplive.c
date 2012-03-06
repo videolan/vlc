@@ -70,7 +70,7 @@ typedef struct segment_s
 
     char        *url;
     char       *psz_key_path;         /* url key path */
-    uint8_t     psz_AES_key[16];      /* AES-128 */
+    uint8_t     aes_key[16];      /* AES-128 */
     bool        b_key_loaded;
 
     vlc_mutex_t lock;
@@ -1083,9 +1083,6 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
 
 static int hls_DownloadSegmentKey(stream_t *s, segment_t *seg)
 {
-    uint8_t         aeskey[32]; /* AES-512 can use up to 32 bytes */
-    ssize_t len;
-
     stream_t *p_m3u8 = stream_UrlNew(s, seg->psz_key_path);
     if (p_m3u8 == NULL)
     {
@@ -1093,17 +1090,13 @@ static int hls_DownloadSegmentKey(stream_t *s, segment_t *seg)
         return VLC_EGENERIC;
     }
 
-    len = stream_Read(p_m3u8, aeskey, sizeof(aeskey));
+    int len = stream_Read(p_m3u8, seg->aes_key, sizeof(seg->aes_key));
+    stream_Delete(p_m3u8);
     if (len != AES_BLOCK_SIZE)
     {
-        msg_Err(s, "The AES key loaded doesn't have the right size (%zd)", len);
-        stream_Delete(p_m3u8);
+        msg_Err(s, "The AES key loaded doesn't have the right size (%d)", len);
         return VLC_EGENERIC;
     }
-
-    memcpy(seg->psz_AES_key, aeskey, AES_BLOCK_SIZE);
-
-    stream_Delete(p_m3u8);
 
     return VLC_SUCCESS;
 }
@@ -1129,7 +1122,7 @@ static int hls_ManageSegmentKeys(stream_t *s, hls_stream_t *hls)
          * try to copy it, and don't load the key */
         if (prev_seg && prev_seg->b_key_loaded && strcmp(seg->psz_key_path, prev_seg->psz_key_path) == 0)
         {
-            memcpy(seg->psz_AES_key, prev_seg->psz_AES_key, AES_BLOCK_SIZE);
+            memcpy(seg->aes_key, prev_seg->aes_key, AES_BLOCK_SIZE);
             seg->b_key_loaded = true;
             continue;
         }
@@ -1168,8 +1161,8 @@ static int hls_DecodeSegmentData(stream_t *s, hls_stream_t *hls, segment_t *segm
     }
 
     /* Set key */
-    i_gcrypt_err = gcry_cipher_setkey(aes_ctx, segment->psz_AES_key,
-                                       sizeof(segment->psz_AES_key));
+    i_gcrypt_err = gcry_cipher_setkey(aes_ctx, segment->aes_key,
+                                       sizeof(segment->aes_key));
     if (i_gcrypt_err)
     {
         msg_Err(s, "gcry_cipher_setkey failed: %s", gpg_strerror(i_gcrypt_err));
