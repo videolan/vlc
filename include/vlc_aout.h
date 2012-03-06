@@ -105,40 +105,6 @@ typedef int32_t vlc_fixed_t;
 #define FIXED32_MAX ((vlc_fixed_t) +0x7fffffffL)
 #define FIXED32_ONE ((vlc_fixed_t) 0x10000000)
 
-/*
- * Channels descriptions
- */
-
-/* Values available for physical and original channels */
-#define AOUT_CHAN_CENTER            0x1
-#define AOUT_CHAN_LEFT              0x2
-#define AOUT_CHAN_RIGHT             0x4
-#define AOUT_CHAN_REARCENTER        0x10
-#define AOUT_CHAN_REARLEFT          0x20
-#define AOUT_CHAN_REARRIGHT         0x40
-#define AOUT_CHAN_MIDDLELEFT        0x100
-#define AOUT_CHAN_MIDDLERIGHT       0x200
-#define AOUT_CHAN_LFE               0x1000
-
-#define AOUT_CHANS_FRONT  (AOUT_CHAN_LEFT       | AOUT_CHAN_RIGHT)
-#define AOUT_CHANS_MIDDLE (AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT)
-#define AOUT_CHANS_REAR   (AOUT_CHAN_REARLEFT   | AOUT_CHAN_REARRIGHT)
-
-#define AOUT_CHANS_STEREO (AOUT_CHANS_FRONT)
-#define AOUT_CHANS_4_0    (AOUT_CHANS_FRONT | AOUT_CHANS_REAR)
-#define AOUT_CHANS_4_1    (AOUT_CHANS_4_0 | AOUT_CHAN_LFE)
-#define AOUT_CHANS_5_0    (AOUT_CHANS_4_0 | AOUT_CHAN_CENTER)
-#define AOUT_CHANS_5_1    (AOUT_CHANS_5_0 | AOUT_CHAN_LFE)
-#define AOUT_CHANS_7_1    (AOUT_CHANS_5_1 | AOUT_CHANS_MIDDLE)
-
-/* Values available for original channels only */
-#define AOUT_CHAN_DOLBYSTEREO       0x10000
-#define AOUT_CHAN_DUALMONO          0x20000
-#define AOUT_CHAN_REVERSESTEREO     0x40000
-
-#define AOUT_CHAN_PHYSMASK          0xFFFF
-#define AOUT_CHAN_MAX               9
-
 /* Values used for the audio-device and audio-channels object variables */
 #define AOUT_VAR_MONO               1
 #define AOUT_VAR_STEREO             2
