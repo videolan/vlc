@@ -54,7 +54,6 @@ sh $VLC_SOURCEDIR/configure --host=arm-linux-androideabi --build=x86_64-unknown-
                 --disable-vlm --disable-sout \
                 --disable-dbus \
                 --disable-lua \
-                --disable-libgcrypt \
                 --disable-vcd \
                 --disable-v4l2 \
                 --disable-gnomevfs \
@@ -78,7 +77,6 @@ sh $VLC_SOURCEDIR/configure --host=arm-linux-androideabi --build=x86_64-unknown-
                 --disable-jack \
                 --disable-pulse \
                 --disable-alsa \
-                --disable-portaudio \
                 --disable-samplerate \
                 --disable-sdl \
                 --disable-xcb \
