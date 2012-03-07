@@ -121,11 +121,9 @@ static inline block_t *block_BytestreamPop( block_bytestream_t *p_bytestream )
     while( p_block->p_next && p_block->p_next->p_next )
         p_block = p_block->p_next;
 
-    {
-        block_t *p_block_old = p_block;
-        p_block = p_block->p_next;
-        p_block_old->p_next = NULL;
-    }
+    block_t *p_block_old = p_block;
+    p_block = p_block->p_next;
+    p_block_old->p_next = NULL;
 
     return p_block;
 }
