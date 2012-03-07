@@ -22,6 +22,7 @@ ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/gnutls/no-gl.patch
 endif
 	$(APPLY) $(SRC)/gnutls/gnutls-no-egd.patch
+	$(APPLY) $(SRC)/gnutls/read-file-limits.h.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
