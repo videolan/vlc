@@ -97,7 +97,7 @@ int aout_DecNew( audio_output_t *p_aout,
         aout_Shutdown (p_aout);
     }
 #endif
-    int ret = -1;
+    int ret = 0;
 
     /* TODO: reduce lock scope depending on decoder's real need */
     aout_lock( p_aout );
@@ -110,7 +110,10 @@ int aout_DecNew( audio_output_t *p_aout,
     owner->input_format = *p_format;
     vlc_atomic_set (&owner->restart, 0);
     if( aout_OutputNew( p_aout, p_format ) < 0 )
+    {
+        ret = -1;
         goto error;
+    }
 
     /* Allocate a software mixer */
     assert (owner->volume.mixer == NULL);
@@ -129,9 +132,15 @@ int aout_DecNew( audio_output_t *p_aout,
     owner->input = aout_InputNew (p_aout, p_format, &owner->mixer_format,
                                   p_request_vout);
     if (owner->input == NULL)
+    {
+        struct audio_mixer *mixer = owner->volume.mixer;
+
+        owner->volume.mixer = NULL;
         aout_OutputDelete (p_aout);
-    else
-        ret = 0;
+        aout_unlock (p_aout);
+        aout_MixerDelete (mixer);
+        return -1;
+    }
 error:
     aout_unlock( p_aout );
     return ret;
