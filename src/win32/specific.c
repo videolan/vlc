@@ -291,8 +291,8 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
             ppsz_argv = (char **)malloc( i_argc * sizeof(char *) );
             for( i_opt = 0; i_opt < i_argc; i_opt++ )
             {
-                ppsz_argv[i_opt] = p_data->data + i_data + sizeof(int);
-                i_data += sizeof(int) + *((int *)(p_data->data + i_data));
+                ppsz_argv[i_opt] = p_data->data + i_data + sizeof(size_t);
+                i_data += sizeof(size_t) + *((size_t *)(p_data->data + i_data));
             }
 
             for( i_opt = 0; i_opt < i_argc; i_opt++ )
