@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_dialog.h>                   // dialog_Fatal
 #include <vlc_aout.h>                     // aout_*
+#include <vlc_aout_intf.h>
 
 #include <AudioUnit/AudioUnit.h>          // AudioUnit
 #include <CoreAudio/CoreAudio.h>      // AudioDeviceID
@@ -559,7 +560,12 @@ static int OpenAnalog( audio_output_t *p_aout )
     /* Do the last VLC aout setups */
     aout_FormatPrepare( &p_aout->format );
     aout_PacketInit( p_aout, &p_sys->packet, FRAMESIZE );
-    aout_VolumeHardInit (p_aout, VolumeSet);
+    aout_VolumeHardInit( p_aout, VolumeSet );
+
+    /* Initialize starting volume */
+    audio_volume_t volume = var_InheritInteger (p_aout, "volume");
+    bool mute = var_InheritBool (p_aout, "mute");
+    VolumeSet(p_aout, volume / (float)AOUT_VOLUME_DEFAULT, mute);
 
     /* set the IOproc callback */
     input.inputProc = (AURenderCallback) RenderCallbackAnalog;
