@@ -22,6 +22,7 @@ OPTIONS="
         --disable-skins2
         --disable-xcb
         --disable-sdl
+        --disable-samplerate
 "
 
 sh "$(dirname $0)"/../../../configure ${OPTIONS} $*
