@@ -109,9 +109,11 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 static subpicture_t *Decode( decoder_t *, block_t ** );
 
+#ifdef ENABLE_SOUT
 static int OpenEncoder  ( vlc_object_t * );
 static void CloseEncoder( vlc_object_t * );
 static block_t *Encode  ( encoder_t *, subpicture_t * );
+#endif
 
 vlc_module_begin ()
 #   define DVBSUB_CFG_PREFIX "dvbsub-"
@@ -127,6 +129,7 @@ vlc_module_begin ()
     add_integer( DVBSUB_CFG_PREFIX "x", -1, POSX_TEXT, POSX_LONGTEXT, false )
     add_integer( DVBSUB_CFG_PREFIX "y", -1, POSY_TEXT, POSY_LONGTEXT, false )
 
+#ifdef ENABLE_SOUT
 #   define ENC_CFG_PREFIX "sout-dvbsub-"
     add_submodule ()
     set_description( N_("DVB subtitles encoder") )
@@ -135,6 +138,7 @@ vlc_module_begin ()
 
     add_integer( ENC_CFG_PREFIX "x", -1, ENC_POSX_TEXT, ENC_POSX_LONGTEXT, false )
     add_integer( ENC_CFG_PREFIX "y", -1, ENC_POSY_TEXT, ENC_POSY_LONGTEXT, false )
+#endif
 vlc_module_end ()
 
 static const char *const ppsz_enc_options[] = { "x", "y", NULL };
@@ -1681,6 +1685,7 @@ struct encoder_sys_t
     int i_offset_y;
 };
 
+#ifdef ENABLE_SOUT
 static void encode_page_composition( encoder_t *, bs_t *, subpicture_t * );
 static void encode_clut( encoder_t *, bs_t *, subpicture_t * );
 static void encode_region_composition( encoder_t *, bs_t *, subpicture_t * );
@@ -2643,6 +2648,7 @@ static void encode_pixel_line_8bp( bs_t *s, subpicture_region_t *p_region,
     bs_align_0( s );
 }
 
+#endif
 
 static void default_dds_init( decoder_t * p_dec )
 {
