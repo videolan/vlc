@@ -373,19 +373,34 @@ static int Open (vlc_object_t *obj)
     Dump (aout, "initial hardware setup:\n", snd_pcm_hw_params_dump, hw);
 
     /* Set sample format */
-    val = snd_pcm_hw_params_set_format (pcm, hw, pcm_format);
-    if (val == 0)
+    if (snd_pcm_hw_params_test_format (pcm, hw, pcm_format) == 0)
         ;
-    else if (pcm_format != SND_PCM_FORMAT_FLOAT
-     && snd_pcm_hw_params_set_format (pcm, hw, SND_PCM_FORMAT_FLOAT) == 0)
-        fourcc = VLC_CODEC_FL32;
-    else if (pcm_format != SND_PCM_FORMAT_S32
-     && snd_pcm_hw_params_set_format (pcm, hw, SND_PCM_FORMAT_S32) == 0)
-        fourcc = VLC_CODEC_S32N;
-    else if (pcm_format != SND_PCM_FORMAT_S16
-     && snd_pcm_hw_params_set_format (pcm, hw, SND_PCM_FORMAT_S16) == 0)
-        fourcc = VLC_CODEC_S16N;
     else
+    if (snd_pcm_hw_params_test_format (pcm, hw, SND_PCM_FORMAT_FLOAT) == 0)
+    {
+        fourcc = VLC_CODEC_FL32;
+        pcm_format = SND_PCM_FORMAT_FLOAT;
+    }
+    else
+    if (snd_pcm_hw_params_test_format (pcm, hw, SND_PCM_FORMAT_S32) == 0)
+    {
+        fourcc = VLC_CODEC_S32N;
+        pcm_format = SND_PCM_FORMAT_S32;
+    }
+    else
+    if (snd_pcm_hw_params_test_format (pcm, hw, SND_PCM_FORMAT_S16) == 0)
+    {
+        fourcc = VLC_CODEC_S16N;
+        pcm_format = SND_PCM_FORMAT_S16;
+    }
+    else
+    {
+        msg_Err (aout, "no supported sample format");
+        goto error;
+    }
+
+    val = snd_pcm_hw_params_set_format (pcm, hw, pcm_format);
+    if (val)
     {
         msg_Err (aout, "cannot set sample format: %s", snd_strerror (val));
         goto error;
