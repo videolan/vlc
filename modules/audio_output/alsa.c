@@ -439,26 +439,32 @@ static int Open (vlc_object_t *obj)
         msg_Dbg (aout, "resampling from %d Hz to %d Hz",
                  aout->format.i_rate, rate);
 
-    /* Set buffer size */
-    param = AOUT_MAX_ADVANCE_TIME;
-    val = snd_pcm_hw_params_set_buffer_time_near (pcm, hw, &param, NULL);
-    if (val)
-        msg_Warn (aout, "cannot set buffer duration near %u us: %s",
-                  param, snd_strerror (val));
-    val = snd_pcm_hw_params_set_buffer_time_last (pcm, hw, &param, NULL);
-    if (val)
-        msg_Warn (aout, "cannot set buffer duration: %s", snd_strerror (val));
-
     /* Set number of periods (at least two) */
     param = 2;
     val = snd_pcm_hw_params_set_periods_min (pcm, hw, &param, NULL);
     if (val)
-        msg_Warn (aout, "cannot set minimum of %u periods: %s", param,
-                  snd_strerror (val));
+    {
+        msg_Err (aout, "cannot set minimum of %u periods: %s", param,
+                 snd_strerror (val));
+        goto error;
+    }
+
+    /* Set buffer size */
+    param = AOUT_MAX_ADVANCE_TIME;
+    val = snd_pcm_hw_params_set_buffer_time_near (pcm, hw, &param, NULL);
+    if (val)
+    {
+        msg_Err (aout, "cannot set buffer duration near %u us: %s",
+                 param, snd_strerror (val));
+        goto error;
+    }
+
     val = snd_pcm_hw_params_set_periods_first (pcm, hw, &param, NULL);
     if (val)
-        msg_Warn (aout, "cannot set periods count near %u: %s", param,
-                  snd_strerror (val));
+    {
+        msg_Err (aout, "cannot select periods: %s", snd_strerror (val));
+        goto error;
+    }
 
     /* Commit hardware parameters */
     val = snd_pcm_hw_params (pcm, hw);
