@@ -148,8 +148,6 @@ static int blurayOpen( vlc_object_t *object )
     demux_t *p_demux = (demux_t*)object;
     demux_sys_t *p_sys;
 
-    char *pos_title;
-    int i_title = -1;
     char bd_path[PATH_MAX] = { '\0' };
     const char *error_msg = NULL;
 
@@ -273,16 +271,9 @@ static int blurayOpen( vlc_object_t *object )
         /* Registering overlay event handler */
         bd_register_overlay_proc(p_sys->bluray, p_demux, blurayOverlayProc);
     } else {
-        /* get title request */
-        if ((pos_title = strrchr(bd_path, ':'))) {
-            /* found character ':' for title information */
-            *(pos_title++) = '\0';
-            i_title = atoi(pos_title);
-        }
-
         /* set start title number */
-        if (bluraySetTitle(p_demux, i_title) != VLC_SUCCESS) {
-            msg_Err( p_demux, "Could not set the title %d", i_title );
+        if (bluraySetTitle(p_demux, p_sys->i_longest_title) != VLC_SUCCESS) {
+            msg_Err( p_demux, "Could not set the title %d", p_sys->i_longest_title );
             goto error;
         }
     }
