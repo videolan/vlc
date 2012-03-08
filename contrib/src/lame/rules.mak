@@ -1,6 +1,6 @@
 # lame
 
-LAME_VERSION := 3.99.4
+LAME_VERSION := 3.99.5
 LAME_URL := $(SF)/lame/lame-$(LAME_VERSION).tar.gz
 
 $(TARBALLS)/lame-$(LAME_VERSION).tar.gz:
