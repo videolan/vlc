@@ -97,6 +97,8 @@ struct  demux_sys_t
     unsigned int        i_title;
     unsigned int        i_longest_title;
     input_title_t       **pp_title;
+    unsigned int        i_first_play;
+    unsigned int        i_top_menu;
 
     /* Meta informations */
     const META_DL       *p_meta;
@@ -739,6 +741,23 @@ static int blurayInitTitles(demux_t *p_demux )
         TAB_APPEND( p_sys->i_title, p_sys->pp_title, t );
         bd_free_title_info(title_info);
     }
+
+    /* Create titles for BLURAY_TITLE_FIRST_PLAY & BLURAY_TITLE_TOP_MENU */
+    input_title_t *p_first_play = vlc_input_title_New();
+    if (unlikely(!p_first_play))
+        return VLC_SUCCESS;
+
+    p_first_play->psz_name = strdup("First play");
+    p_sys->i_first_play = p_sys->i_title;
+    TAB_APPEND(p_sys->i_title, p_sys->pp_title, p_first_play);
+
+    input_title_t *p_top_menu = vlc_input_title_New();
+    if (unlikely(!p_top_menu))
+        return VLC_SUCCESS;
+
+    p_top_menu->psz_name = strdup("Top menu");
+    p_sys->i_top_menu = p_sys->i_title;
+    TAB_APPEND(p_sys->i_title, p_sys->pp_title, p_top_menu);
     return VLC_SUCCESS;
 }
 
@@ -759,11 +778,17 @@ static void blurayResetParser( demux_t *p_demux )
     }
 }
 
-static void blurayUpdateTitle( demux_t *p_demux, int i_title )
+static void blurayUpdateTitle(demux_t *p_demux, int i_title)
 {
     blurayResetParser(p_demux);
-    if (i_title >= p_demux->p_sys->i_title)
-        return;
+    if (i_title >= p_demux->p_sys->i_title) {
+        if (i_title == BLURAY_TITLE_FIRST_PLAY)
+            i_title = p_demux->p_sys->i_first_play;
+        else if (i_title == BLURAY_TITLE_TOP_MENU)
+            i_title = p_demux->p_sys->i_top_menu;
+        else
+            return;
+    }
 
     /* read title info and init some values */
     p_demux->info.i_title = i_title;
@@ -862,7 +887,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         case DEMUX_GET_LENGTH:
         {
             int64_t *pi_length = (int64_t*)va_arg(args, int64_t *);
-            *pi_length = p_demux->info.i_title < p_sys->i_title ? CUR_LENGTH : 0;
+            *pi_length = CUR_LENGTH;
             return VLC_SUCCESS;
         }
         case DEMUX_SET_TIME:
@@ -881,8 +906,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         case DEMUX_GET_POSITION:
         {
             double *pf_position = (double*)va_arg( args, double * );
-            *pf_position = p_demux->info.i_title < p_sys->i_title ?
-                        (double)FROM_TICKS(bd_tell_time(p_sys->bluray))/CUR_LENGTH : 0.0;
+            *pf_position = (double)FROM_TICKS(bd_tell_time(p_sys->bluray))/CUR_LENGTH;
             return VLC_SUCCESS;
         }
         case DEMUX_SET_POSITION:
