@@ -983,6 +983,15 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
 
     ASF_GetGUID( &p_ae->type, &p_data[0] );
     ASF_SKIP( 16 );
+#ifdef ASF_DEBUG
+    if( guidcmp( &p_ae->type, &asf_guid_mutex_language ) )
+        msg_Dbg( s, "Language exclusion" );
+    else if( guidcmp( &p_ae->type, &asf_guid_mutex_bitrate ) )
+        msg_Dbg( s, "Bitrate exclusion" );
+    else
+        msg_Warn(s, "Unknown exclusion type" );
+#endif
+
     p_ae->i_stream_number_count = ASF_READ2();
     p_ae->pi_stream_number = calloc( p_ae->i_stream_number_count, sizeof(int) );
 
