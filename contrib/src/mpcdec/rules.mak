@@ -6,19 +6,19 @@ PKGS += mpcdec
 #MUSE_URL := http://files.musepack.net/source/libmpcdec-$(MUSE_VERSION).tar.bz2
 #MUSE_URL := http://files2.musepack.net/source/libmpcdec-$(MUSE_VERSION).tar.bz2
 
-#MUSE_REV := 435
-#MUSE_URL := http://files.musepack.net/source/musepack_src_r$(MUSE_REV).tar.gz
-
-#$(TARBALLS)/musepack_src_r$(MUSE_REV).tar.gz:
-#	$(call download,$(MUSE_URL))
-
 MUSE_REV := 475
-MUSE_SVN := http://svn.musepack.net/libmpc/trunk/
+MUSE_URL := http://files.musepack.net/source/musepack_src_r$(MUSE_REV).tar.gz
 
 $(TARBALLS)/musepack_src_r$(MUSE_REV).tar.gz:
-	rm -Rf musepack_src_r$(MUSE_REV)
-	$(SVN) export $(MUSE_SVN) -r $(MUSE_REV) musepack_src_r$(MUSE_REV)
-	tar czv musepack_src_r$(MUSE_REV) > $@
+	$(call download,$(MUSE_URL))
+
+#MUSE_REV := 475
+#MUSE_SVN := http://svn.musepack.net/libmpc/trunk/
+#
+#$(TARBALLS)/musepack_src_r$(MUSE_REV).tar.gz:
+#	rm -Rf musepack_src_r$(MUSE_REV)
+#	$(SVN) export $(MUSE_SVN) -r $(MUSE_REV) musepack_src_r$(MUSE_REV)
+#	tar czv musepack_src_r$(MUSE_REV) > $@
 
 .sum-mpcdec: musepack_src_r$(MUSE_REV).tar.gz
 	$(warning $@ not implemented)
