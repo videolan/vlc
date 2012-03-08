@@ -46,7 +46,7 @@ static bool IsMxpeg(stream_t *s)
     int size = stream_Peek(s, &header, 256);
     int position = 0;
 
-    if (find_jpeg_marker(&position, header, size) != 0xd8)
+    if (find_jpeg_marker(&position, header, size) != 0xd8 || position > size-2)
         return false;
     if (find_jpeg_marker(&position, header, position + 2) != 0xe0)
         return false;
@@ -57,23 +57,27 @@ static bool IsMxpeg(stream_t *s)
     /* Skip this jpeg header */
     uint32_t header_size = GetWBE(&header[position]);
     position += header_size;
-    if (position + 4 > size)
+
+    /* Get enough data to analyse the next header */
+    if (position + 6 > size)
     {
-        size = position + 4;
+        size = position + 6;
         if( stream_Peek (s, &header, size) < size )
             return false;
     }
 
-    /* Skip the comment header */
     if ( !(header[position] == 0xFF && header[position+1] == 0xFE) )
         return false;
-
     position += 2;
     header_size = GetWBE (&header[position]);
 
-    /* Find the MXF header */
+    /* Check if this is a MXF header. We may have a jpeg comment first */
+    if (!memcmp (&header[position+2], "MXF\0", 4) )
+        return true;
+
+    /* Skip the jpeg comment and find the MXF header after that */
     size = position + header_size + 8; //8 = FF FE 00 00 M X F 00
-    if (stream_Peek(s, &header, position + header_size + 8 ) < size)
+    if (stream_Peek(s, &header, size ) < size)
         return false;
 
     position += header_size;
