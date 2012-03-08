@@ -98,6 +98,9 @@ struct  demux_sys_t
     unsigned int        i_longest_title;
     input_title_t       **pp_title;
 
+    /* Meta informations */
+    const META_DL       *p_meta;
+
     /* Menus */
     bluray_overlay_t    *p_overlays[MAX_OVERLAY];
     int                 current_overlay; // -1 if no current overlay;
@@ -242,6 +245,10 @@ static int blurayOpen( vlc_object_t *object )
     }
 
     /* Get titles and chapters */
+    p_sys->p_meta = bd_get_meta(p_sys->bluray);
+    if (!p_sys->p_meta)
+        goto error;
+
     if (blurayInitTitles(p_demux) != VLC_SUCCESS) {
         goto error;
     }
@@ -887,11 +894,8 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
 
         case DEMUX_GET_META:
         {
-            const struct meta_dl *meta = bd_get_meta(p_sys->bluray);
-            if(!meta)
-                return VLC_EGENERIC;
-
             vlc_meta_t *p_meta = (vlc_meta_t *) va_arg (args, vlc_meta_t*);
+            const META_DL *meta = p_sys->p_meta;
 
             if (!EMPTY_STR(meta->di_name)) vlc_meta_SetTitle(p_meta, meta->di_name);
 
