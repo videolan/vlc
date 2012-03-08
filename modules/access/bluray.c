@@ -44,6 +44,10 @@
  * Module descriptor
  *****************************************************************************/
 
+#define BD_MENU_TEXT        N_( "Bluray menus" )
+#define BD_MENU_LONGTEXT    N_( "Use bluray menus. If disabled, "\
+                                "the movie will start directly" )
+
 /* Callbacks */
 static int  blurayOpen ( vlc_object_t * );
 static void blurayClose( vlc_object_t * );
@@ -55,6 +59,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     set_capability( "access_demux", 200)
+    add_bool( "bluray-menu", false, BD_MENU_TEXT, BD_MENU_LONGTEXT, false )
 
     add_shortcut( "bluray", "file" )
 
@@ -71,6 +76,9 @@ struct demux_sys_t
     unsigned int    i_longest_title;
     input_title_t **pp_title;
 
+    /* Menus */
+    bool            b_menu;
+
     /* TS stream */
     stream_t       *p_parser;
 };
@@ -79,7 +87,7 @@ struct demux_sys_t
  * Local prototypes
  *****************************************************************************/
 static int     blurayControl(demux_t *, int, va_list);
-static int     blurayDemux  (demux_t *);
+static int     blurayDemux(demux_t *);
 
 static int     blurayInitTitles(demux_t *p_demux );
 static int     bluraySetTitle(demux_t *p_demux, int i_title);
@@ -198,17 +206,29 @@ static int blurayOpen( vlc_object_t *object )
      */
     bd_get_event(p_sys->bluray, NULL);
 
-    /* get title request */
-    if ((pos_title = strrchr(bd_path, ':'))) {
-        /* found character ':' for title information */
-        *(pos_title++) = '\0';
-        i_title = atoi(pos_title);
+    p_sys->b_menu = var_InheritBool( p_demux, "bluray-menu" );
+    if ( p_sys->b_menu )
+    {
+        /*
+         * libbluray will start playback from "First-Title" title
+         * Therefore, We don't have to select any title.
+         */
+        bd_play( p_sys->bluray );
     }
+    else
+    {
+        /* get title request */
+        if ((pos_title = strrchr(bd_path, ':'))) {
+            /* found character ':' for title information */
+            *(pos_title++) = '\0';
+            i_title = atoi(pos_title);
+        }
 
-    /* set start title number */
-    if (bluraySetTitle(p_demux, i_title) != VLC_SUCCESS) {
-        msg_Err( p_demux, "Could not set the title %d", i_title );
-        goto error;
+        /* set start title number */
+        if (bluraySetTitle(p_demux, i_title) != VLC_SUCCESS) {
+            msg_Err( p_demux, "Could not set the title %d", i_title );
+            goto error;
+        }
     }
 
     p_sys->p_parser   = stream_DemuxNew(p_demux, "ts", p_demux->out);
@@ -504,12 +524,28 @@ static int blurayDemux(demux_t *p_demux)
         return -1;
     }
 
-    blurayHandleEvents(p_demux);
-    int nread = bd_read(p_sys->bluray, p_block->p_buffer,
-                        NB_TS_PACKETS * BD_TS_PACKET_SIZE);
-    if (nread < 0) {
-        block_Release(p_block);
-        return nread;
+    int nread = -1;
+    if (p_sys->b_menu == false) {
+        blurayHandleEvents(p_demux);
+        nread = bd_read(p_sys->bluray, p_block->p_buffer,
+                NB_TS_PACKETS * BD_TS_PACKET_SIZE);
+        if (nread < 0) {
+            block_Release(p_block);
+            return nread;
+        }
+    }
+    else {
+        BD_EVENT e;
+        nread = bd_read_ext( p_sys->bluray, p_block->p_buffer,
+                NB_TS_PACKETS * BD_TS_PACKET_SIZE, &e );
+        if ( nread == 0 ) {
+            if ( e.event == BD_EVENT_NONE )
+                msg_Info( p_demux, "We reached the end of a title" );
+            else
+                blurayHandleEvent( p_demux, &e );
+            block_Release(p_block);
+            return 1;
+        }
     }
 
     p_block->i_buffer = nread;
