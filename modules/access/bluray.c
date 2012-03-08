@@ -115,6 +115,7 @@ struct  demux_sys_t
     /* TS stream */
     es_out_t            *p_out;
     vlc_array_t         es;
+    int                 i_audio_stream; /* Selected audio stream. -1 if default */
     stream_t            *p_parser;
 };
 
@@ -167,6 +168,7 @@ static int blurayOpen( vlc_object_t *object )
         return VLC_ENOMEM;
     }
     p_sys->current_overlay = -1;
+    p_sys->i_audio_stream = -1;
 
     /* init demux info fields */
     p_demux->info.i_update    = 0;
@@ -383,19 +385,37 @@ static int  findEsPairIndexByEs( demux_sys_t *p_sys, es_out_id_t *p_es )
 
 static es_out_id_t *esOutAdd( es_out_t *p_out, const es_format_t *p_fmt )
 {
-    es_out_id_t *p_es = es_out_Add( p_out->p_sys->p_demux->out, p_fmt );
+    demux_sys_t *p_sys = p_out->p_sys->p_demux->p_sys;
+    es_format_t fmt;
+
+    es_format_Copy(&fmt, p_fmt);
+    switch (fmt.i_cat)
+    {
+    case VIDEO_ES:
+        break ;
+    case AUDIO_ES:
+        if ( p_sys->i_audio_stream != -1 && p_sys->i_audio_stream != p_fmt->i_id )
+            fmt.i_priority = -2;
+        break ;
+    case SPU_ES:
+        break ;
+    }
+
+    es_out_id_t *p_es = es_out_Add( p_out->p_sys->p_demux->out, &fmt );
     if ( p_fmt->i_id >= 0 ) {
         /* Ensure we are not overriding anything */
-        int idx = findEsPairIndex(p_out->p_sys->p_demux->p_sys, p_fmt->i_id);
+        int idx = findEsPairIndex(p_sys, p_fmt->i_id);
         if ( idx == -1 ) {
             fmt_es_pair_t *p_pair = malloc( sizeof(*p_pair) );
             if ( likely(p_pair != NULL) ) {
                 p_pair->i_id = p_fmt->i_id;
                 p_pair->p_es = p_es;
-                vlc_array_append(&p_out->p_sys->p_demux->p_sys->es, p_pair);
+                msg_Err( p_out->p_sys->p_demux, "Adding ES %d", p_fmt->i_id );
+                vlc_array_append(&p_sys->es, p_pair);
             }
         }
     }
+    es_format_Clean(&fmt);
     return p_es;
 }
 
@@ -1051,7 +1071,24 @@ static void blurayHandleEvent( demux_t *p_demux, const BD_EVENT *e )
             p_sys->i_current_clip = e->param;
             break;
         case BD_EVENT_AUDIO_STREAM:
-            break;
+        {
+            if ( e->param == 0xFF )
+                break ;
+            BLURAY_TITLE_INFO   *info = bd_get_title_info(p_sys->bluray,
+                                       bd_get_current_title(p_sys->bluray), 0);
+            if ( info == NULL )
+                break ;
+            /* The param we get is the real stream id, not an index, ie. it starts from 1 */
+            int pid = info->clips[p_sys->i_current_clip].audio_streams[e->param - 1].pid;
+            int idx = findEsPairIndex( p_sys, pid );
+            if ( idx >= 0 ) {
+                es_out_id_t *p_es = vlc_array_item_at_index(&p_sys->es, idx);
+                es_out_Control( p_demux->out, ES_OUT_SET_ES, p_es );
+            }
+            bd_free_title_info( info );
+            p_sys->i_audio_stream = pid;
+            break ;
+        }
         case BD_EVENT_CHAPTER:
             p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
             p_demux->info.i_seekpoint = e->param;
