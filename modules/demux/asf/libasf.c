@@ -1307,10 +1307,13 @@ static int ASF_ReadObject( stream_t *s, asf_object_t *p_obj,
     }
     p_obj->common.i_type = ASF_Object_Function[i_index].i_type;
 
+    if( i_index == sizeof(ASF_Object_Function)/sizeof(ASF_Object_Function[0]) - 1 )
+        msg_Warn( s, "unknown asf object (not loaded): " GUID_FMT,
+                GUID_PRINT( p_obj->common.i_object_id ) );
+
     /* Now load this object */
     if( ASF_Object_Function[i_index].ASF_ReadObject_function == NULL )
     {
-        msg_Warn( s, "unknown asf object (not loaded)" );
         i_result = VLC_SUCCESS;
     }
     else
@@ -1368,13 +1371,7 @@ static void ASF_FreeObject( stream_t *s, asf_object_t *p_obj )
     }
 
     /* Now free this object */
-    if( ASF_Object_Function[i_index].ASF_FreeObject_function == NULL )
-    {
-        msg_Warn( s,
-                  "unknown asf object " GUID_FMT,
-                  GUID_PRINT( p_obj->common.i_object_id ) );
-    }
-    else
+    if( ASF_Object_Function[i_index].ASF_FreeObject_function != NULL )
     {
 #ifdef ASF_DEBUG
         msg_Dbg( s,
@@ -1506,7 +1503,8 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
                 p_root->p_index = (asf_object_index_t*)p_obj;
                 break;
             default:
-                msg_Warn( s, "unknow object found" );
+                msg_Warn( s, "unknown top-level object found: " GUID_FMT,
+                      GUID_PRINT( p_obj->common.i_object_id ) );
                 break;
         }
         if( p_obj->common.i_type == ASF_OBJECT_DATA &&
