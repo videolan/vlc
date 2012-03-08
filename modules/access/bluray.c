@@ -777,7 +777,7 @@ static void blurayResetParser( demux_t *p_demux )
     }
 }
 
-static void blurayUpdateTitle(demux_t *p_demux, int i_title)
+static void blurayUpdateTitle(demux_t *p_demux, unsigned i_title)
 {
     blurayResetParser(p_demux);
     if (i_title >= p_demux->p_sys->i_title) {
@@ -951,12 +951,10 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
 
 static void blurayHandleEvent( demux_t *p_demux, const BD_EVENT *e )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-
     switch (e->event)
     {
         case BD_EVENT_TITLE:
-            blurayUpdateTitle( p_demux, e->param );
+            blurayUpdateTitle(p_demux, e->param);
             break;
         case BD_EVENT_PLAYITEM:
             break;
