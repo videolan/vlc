@@ -51,20 +51,6 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-#define AOUT_CHANS_STEREO_FRONT  ( AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT )
-#define AOUT_CHANS_STEREO_REAR   ( AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT )
-#define AOUT_CHANS_STEREO_MIDDLE (AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT )
-
-#define AOUT_CHANS_2_0          AOUT_CHANS_STEREO_FRONT
-#define AOUT_CHANS_3_0          ( AOUT_CHANS_STEREO_FRONT | AOUT_CHAN_CENTER )
-#define AOUT_CHANS_4_0          ( AOUT_CHANS_STEREO_FRONT | AOUT_CHANS_STEREO_REAR )
-#define AOUT_CHANS_4_0_MIDDLE   ( AOUT_CHANS_STEREO_FRONT | AOUT_CHANS_STEREO_MIDDLE )
-#define AOUT_CHANS_4_CENTER_REAR (AOUT_CHANS_STEREO_FRONT | AOUT_CHAN_CENTER | AOUT_CHAN_REARCENTER)
-#define AOUT_CHANS_5_0          ( AOUT_CHANS_4_0 | AOUT_CHAN_CENTER )
-#define AOUT_CHANS_5_0_MIDDLE   ( AOUT_CHANS_4_0_MIDDLE | AOUT_CHAN_CENTER )
-#define AOUT_CHANS_6_0          ( AOUT_CHANS_STEREO_FRONT | AOUT_CHANS_STEREO_REAR | AOUT_CHANS_STEREO_MIDDLE )
-#define AOUT_CHANS_7_0          ( AOUT_CHANS_6_0 | AOUT_CHAN_CENTER )
-
 static bool IsSupported( const audio_format_t *p_input, const audio_format_t *p_output );
 
 static block_t *Filter( filter_t *, block_t * );
