@@ -113,6 +113,7 @@ struct  demux_sys_t
 
     /* TS stream */
     es_out_t            *p_out;
+    vlc_array_t         es;
     stream_t            *p_parser;
 };
 
@@ -285,6 +286,7 @@ static int blurayOpen( vlc_object_t *object )
         }
     }
 
+    vlc_array_init(&p_sys->es);
     p_sys->p_out = esOutNew( p_demux );
     if (unlikely(p_sys->p_out == NULL)) {
         goto error;
@@ -336,6 +338,9 @@ static void blurayClose( vlc_object_t *object )
         stream_Delete(p_sys->p_parser);
     if (p_sys->p_out != NULL)
         es_out_Delete(p_sys->p_out);
+    assert( vlc_array_count(&p_sys->es) == 0 );
+    vlc_array_clear( &p_sys->es );
+
     /* Titles */
     for (unsigned int i = 0; i < p_sys->i_title; i++)
         vlc_input_title_Delete(p_sys->pp_title[i]);
@@ -352,9 +357,45 @@ struct es_out_sys_t {
     demux_t *p_demux;
 };
 
+typedef struct  fmt_es_pair {
+    int         i_id;
+    es_out_id_t *p_es;
+}               fmt_es_pair_t;
+
+static int  findEsPairIndex( demux_sys_t *p_sys, int i_id )
+{
+    for ( int i = 0; i < vlc_array_count(&p_sys->es); ++i ) {
+        if ( ((fmt_es_pair_t*)vlc_array_item_at_index(&p_sys->es, i))->i_id == i_id )
+            return i;
+    }
+    return -1;
+}
+
+static int  findEsPairIndexByEs( demux_sys_t *p_sys, es_out_id_t *p_es )
+{
+    for ( int i = 0; i < vlc_array_count(&p_sys->es); ++i ) {
+        if ( ((fmt_es_pair_t*)vlc_array_item_at_index(&p_sys->es, i))->p_es == p_es )
+            return i;
+    }
+    return -1;
+}
+
 static es_out_id_t *esOutAdd( es_out_t *p_out, const es_format_t *p_fmt )
 {
-    return es_out_Add( p_out->p_sys->p_demux->out, p_fmt );
+    es_out_id_t *p_es = es_out_Add( p_out->p_sys->p_demux->out, p_fmt );
+    if ( p_fmt->i_id >= 0 ) {
+        /* Ensure we are not overriding anything */
+        int idx = findEsPairIndex(p_out->p_sys->p_demux->p_sys, p_fmt->i_id);
+        if ( idx == -1 ) {
+            fmt_es_pair_t *p_pair = malloc( sizeof(*p_pair) );
+            if ( likely(p_pair != NULL) ) {
+                p_pair->i_id = p_fmt->i_id;
+                p_pair->p_es = p_es;
+                vlc_array_append(&p_out->p_sys->p_demux->p_sys->es, p_pair);
+            }
+        }
+    }
+    return p_es;
 }
 
 static int esOutSend( es_out_t *p_out, es_out_id_t *p_es, block_t *p_block )
@@ -364,6 +405,12 @@ static int esOutSend( es_out_t *p_out, es_out_id_t *p_es, block_t *p_block )
 
 static void esOutDel( es_out_t *p_out, es_out_id_t *p_es )
 {
+    int idx = findEsPairIndexByEs( p_out->p_sys->p_demux->p_sys, p_es );
+    if (idx >= 0)
+    {
+        free( vlc_array_item_at_index( &p_out->p_sys->p_demux->p_sys->es, idx) );
+        vlc_array_remove(&p_out->p_sys->p_demux->p_sys->es, idx);
+    }
     es_out_Del( p_out->p_sys->p_demux->out, p_es );
 }
 
@@ -374,12 +421,16 @@ static int esOutControl( es_out_t *p_out, int i_query, va_list args )
 
 static void esOutDestroy( es_out_t *p_out )
 {
+    for ( int i = 0; i < vlc_array_count(&p_out->p_sys->p_demux->p_sys->es); ++i )
+        free( vlc_array_item_at_index(&p_out->p_sys->p_demux->p_sys->es, i) );
+    vlc_array_clear(&p_out->p_sys->p_demux->p_sys->es);
     free( p_out->p_sys );
     free( p_out );
 }
 
 static es_out_t *esOutNew( demux_t *p_demux )
 {
+    assert( vlc_array_count(&p_demux->p_sys->es) == 0 );
     es_out_t    *p_out = malloc( sizeof(*p_out) );
     if ( unlikely(p_out == NULL) )
         return NULL;
