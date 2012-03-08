@@ -112,6 +112,7 @@ struct  demux_sys_t
     vout_thread_t       *p_vout;
 
     /* TS stream */
+    es_out_t            *p_out;
     stream_t            *p_parser;
 };
 
@@ -123,6 +124,8 @@ struct subpicture_updater_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+static es_out_t *esOutNew( demux_t *p_demux );
+
 static int   blurayControl(demux_t *, int, va_list);
 static int   blurayDemux(demux_t *);
 
@@ -282,6 +285,11 @@ static int blurayOpen( vlc_object_t *object )
         }
     }
 
+    p_sys->p_out = esOutNew( p_demux );
+    if (unlikely(p_sys->p_out == NULL)) {
+        goto error;
+    }
+
     blurayResetParser( p_demux );
     if (!p_sys->p_parser) {
         msg_Err(p_demux, "Failed to create TS demuxer");
@@ -326,13 +334,69 @@ static void blurayClose( vlc_object_t *object )
         vlc_object_release(p_sys->p_input);
     if (p_sys->p_parser)
         stream_Delete(p_sys->p_parser);
-
+    if (p_sys->p_out != NULL)
+        es_out_Delete(p_sys->p_out);
     /* Titles */
     for (unsigned int i = 0; i < p_sys->i_title; i++)
         vlc_input_title_Delete(p_sys->pp_title[i]);
     TAB_CLEAN( p_sys->i_title, p_sys->pp_title );
 
     free(p_sys);
+}
+
+/*****************************************************************************
+ * Elementary streams handling
+ *****************************************************************************/
+
+struct es_out_sys_t {
+    demux_t *p_demux;
+};
+
+static es_out_id_t *esOutAdd( es_out_t *p_out, const es_format_t *p_fmt )
+{
+    return es_out_Add( p_out->p_sys->p_demux->out, p_fmt );
+}
+
+static int esOutSend( es_out_t *p_out, es_out_id_t *p_es, block_t *p_block )
+{
+    return es_out_Send( p_out->p_sys->p_demux->out, p_es, p_block );
+}
+
+static void esOutDel( es_out_t *p_out, es_out_id_t *p_es )
+{
+    es_out_Del( p_out->p_sys->p_demux->out, p_es );
+}
+
+static int esOutControl( es_out_t *p_out, int i_query, va_list args )
+{
+    return es_out_vaControl( p_out->p_sys->p_demux->out, i_query, args );
+}
+
+static void esOutDestroy( es_out_t *p_out )
+{
+    free( p_out->p_sys );
+    free( p_out );
+}
+
+static es_out_t *esOutNew( demux_t *p_demux )
+{
+    es_out_t    *p_out = malloc( sizeof(*p_out) );
+    if ( unlikely(p_out == NULL) )
+        return NULL;
+
+    p_out->pf_add       = &esOutAdd;
+    p_out->pf_control   = &esOutControl;
+    p_out->pf_del       = &esOutDel;
+    p_out->pf_destroy   = &esOutDestroy;
+    p_out->pf_send      = &esOutSend;
+
+    p_out->p_sys = malloc( sizeof(*p_out->p_sys) );
+    if ( unlikely( p_out->p_sys == NULL ) ) {
+        free( p_out );
+        return NULL;
+    }
+    p_out->p_sys->p_demux = p_demux;
+    return p_out;
 }
 
 /*****************************************************************************
@@ -747,7 +811,7 @@ static void blurayResetParser( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     if (p_sys->p_parser)
         stream_Delete(p_sys->p_parser);
-    p_sys->p_parser = stream_DemuxNew(p_demux, "ts", p_demux->out);
+    p_sys->p_parser = stream_DemuxNew(p_demux, "ts", p_sys->p_out);
     if (!p_sys->p_parser) {
         msg_Err(p_demux, "Failed to create TS demuxer");
     }
