@@ -518,8 +518,8 @@ static int InitAudio( demux_t *p_demux )
         es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC('a','r','a','w') );
         fmt.i_id = p_audio->i_id;
         fmt.audio.i_channels          = 2;
-        fmt.audio.i_physical_channels = 6;
-        fmt.audio.i_original_channels = 6;
+        fmt.audio.i_original_channels =
+        fmt.audio.i_physical_channels = AOUT_CHANS_STEREO;
         fmt.audio.i_rate              = p_sys->i_sample_rate;
         fmt.audio.i_bitspersample     = 16;
         fmt.audio.i_blockalign = fmt.audio.i_channels *
