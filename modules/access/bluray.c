@@ -116,6 +116,7 @@ struct  demux_sys_t
     es_out_t            *p_out;
     vlc_array_t         es;
     int                 i_audio_stream; /* Selected audio stream. -1 if default */
+    int                 i_video_stream;
     stream_t            *p_parser;
 };
 
@@ -169,6 +170,7 @@ static int blurayOpen( vlc_object_t *object )
     }
     p_sys->current_overlay = -1;
     p_sys->i_audio_stream = -1;
+    p_sys->i_video_stream = -1;
 
     /* init demux info fields */
     p_demux->info.i_update    = 0;
@@ -392,6 +394,8 @@ static es_out_id_t *esOutAdd( es_out_t *p_out, const es_format_t *p_fmt )
     switch (fmt.i_cat)
     {
     case VIDEO_ES:
+        if ( p_sys->i_video_stream != -1 && p_sys->i_video_stream != p_fmt->i_id )
+            fmt.i_priority = -2;
         break ;
     case AUDIO_ES:
         if ( p_sys->i_audio_stream != -1 && p_sys->i_audio_stream != p_fmt->i_id )
@@ -1058,6 +1062,25 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     return VLC_SUCCESS;
 }
 
+static void     blurayUpdateCurrentClip( demux_t *p_demux, uint32_t clip )
+{
+    if (clip == 0xFF)
+        return ;
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    p_sys->i_current_clip = clip;
+    BLURAY_TITLE_INFO   *info = bd_get_title_info(p_sys->bluray,
+                                        bd_get_current_title(p_sys->bluray), 0);
+    if ( info == NULL )
+        return ;
+    /* Let's assume a single video track for now.
+     * This may brake later, but it's enough for now.
+     */
+    assert(info->clips[p_sys->i_current_clip].video_stream_count >= 1);
+    p_sys->i_video_stream = info->clips[p_sys->i_current_clip].video_streams[0].pid;
+    bd_free_title_info(info);
+}
+
 static void blurayHandleEvent( demux_t *p_demux, const BD_EVENT *e )
 {
     demux_sys_t     *p_sys = p_demux->p_sys;
@@ -1068,7 +1091,7 @@ static void blurayHandleEvent( demux_t *p_demux, const BD_EVENT *e )
             blurayUpdateTitle(p_demux, e->param);
             break;
         case BD_EVENT_PLAYITEM:
-            p_sys->i_current_clip = e->param;
+            blurayUpdateCurrentClip(p_demux, e->param);
             break;
         case BD_EVENT_AUDIO_STREAM:
         {
