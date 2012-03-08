@@ -1,9 +1,10 @@
 /*****************************************************************************
  * bluray.c: Blu-ray disc support plugin
  *****************************************************************************
- * Copyright © 2010-2011 VideoLAN, VLC authors and libbluray AUTHORS
+ * Copyright © 2010-2012 VideoLAN, VLC authors and libbluray AUTHORS
  *
  * Authors: Jean-Baptiste Kempf <jb@videolan.org>
+ *          Hugo Beauzée-Luyssen <hugo@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -124,16 +125,16 @@ struct subpicture_updater_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int     blurayControl(demux_t *, int, va_list);
-static int     blurayDemux(demux_t *);
+static int   blurayControl(demux_t *, int, va_list);
+static int   blurayDemux(demux_t *);
 
-static int     blurayInitTitles(demux_t *p_demux );
-static int     bluraySetTitle(demux_t *p_demux, int i_title);
+static int   blurayInitTitles(demux_t *p_demux );
+static int   bluraySetTitle(demux_t *p_demux, int i_title);
 
-static void    blurayOverlayProc(void *ptr, const BD_OVERLAY * const overlay);
+static void  blurayOverlayProc(void *ptr, const BD_OVERLAY * const overlay);
 
-static int     onMouseEvent( vlc_object_t *p_vout, const char *psz_var,
-                             vlc_value_t old, vlc_value_t val, void *p_data );
+static int   onMouseEvent(vlc_object_t *p_vout, const char *psz_var,
+                          vlc_value_t old, vlc_value_t val, void *p_data);
 
 #define FROM_TICKS(a) (a*CLOCK_FREQ / INT64_C(90000))
 #define TO_TICKS(a)   (a*INT64_C(90000)/CLOCK_FREQ)
@@ -260,9 +261,8 @@ static int blurayOpen( vlc_object_t *object )
      */
     bd_get_event(p_sys->bluray, NULL);
 
-    p_sys->b_menu = var_InheritBool( p_demux, "bluray-menu" );
-    if ( p_sys->b_menu )
-    {
+    p_sys->b_menu = var_InheritBool(p_demux, "bluray-menu");
+    if (p_sys->b_menu) {
         p_sys->p_input = demux_GetParentInput(p_demux);
         if (unlikely(!p_sys->p_input))
             goto error;
@@ -272,9 +272,7 @@ static int blurayOpen( vlc_object_t *object )
 
         /* Registering overlay event handler */
         bd_register_overlay_proc(p_sys->bluray, p_demux, blurayOverlayProc);
-    }
-    else
-    {
+    } else {
         /* get title request */
         if ((pos_title = strrchr(bd_path, ':'))) {
             /* found character ':' for title information */
@@ -289,7 +287,7 @@ static int blurayOpen( vlc_object_t *object )
         }
     }
 
-    p_sys->p_parser   = stream_DemuxNew(p_demux, "ts", p_demux->out);
+    p_sys->p_parser = stream_DemuxNew(p_demux, "ts", p_demux->out);
     if (!p_sys->p_parser) {
         msg_Err(p_demux, "Failed to create TS demuxer");
         goto error;
@@ -420,7 +418,7 @@ static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
     while (p_src != NULL) {
         *p_dst = subpicture_region_Clone(p_src);
         if (*p_dst == NULL)
-            break ;
+            break;
         p_dst = &((*p_dst)->p_next);
         p_src = p_src->p_next;
     }
@@ -516,7 +514,7 @@ static void blurayActivateOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
             && p_sys->p_vout) {
         p_sys->p_overlays[ov->plane]->status = Outdated;
         vlc_mutex_unlock(&p_sys->p_overlays[ov->plane]->lock);
-        return ;
+        return;
     }
     /*
      * Mark the overlay as available, but don't display it right now.
@@ -695,7 +693,7 @@ static void bluraySendOverlayToVout(demux_t *p_demux)
         vout_RegisterSubpictureChannel(p_sys->p_vout);
     /*
      * After this point, the picture should not be accessed from the demux thread,
-     * as it's hold by the vout thread.
+     * as it is held by the vout thread.
      * This must be done only once per subpicture, ie. only once between each
      * blurayInitOverlay & blurayCloseOverlay call.
      */
@@ -771,6 +769,7 @@ static void blurayResetParser( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     if (!p_sys->p_parser)
         return;
+
     stream_Delete(p_sys->p_parser);
     p_sys->p_parser = stream_DemuxNew(p_demux, "ts", p_demux->out);
     if (!p_sys->p_parser) {
@@ -1001,26 +1000,24 @@ static int blurayDemux(demux_t *p_demux)
     if (p_sys->b_menu == false) {
         blurayHandleEvents(p_demux);
         nread = bd_read(p_sys->bluray, p_block->p_buffer,
-                NB_TS_PACKETS * BD_TS_PACKET_SIZE);
+                        NB_TS_PACKETS * BD_TS_PACKET_SIZE);
         if (nread < 0) {
             block_Release(p_block);
             return nread;
         }
-    }
-    else {
+    } else {
         BD_EVENT e;
-        nread = bd_read_ext( p_sys->bluray, p_block->p_buffer,
-                NB_TS_PACKETS * BD_TS_PACKET_SIZE, &e );
-        if ( nread == 0 ) {
-            if ( e.event == BD_EVENT_NONE )
-                msg_Info( p_demux, "We reached the end of a title" );
+        nread = bd_read_ext(p_sys->bluray, p_block->p_buffer,
+                            NB_TS_PACKETS * BD_TS_PACKET_SIZE, &e);
+        if (nread == 0) {
+            if (e.event == BD_EVENT_NONE)
+                msg_Info(p_demux, "We reached the end of a title");
             else
-                blurayHandleEvent( p_demux, &e );
+                blurayHandleEvent(p_demux, &e);
             block_Release(p_block);
             return 1;
         }
-        if (p_sys->current_overlay != -1)
-        {
+        if (p_sys->current_overlay != -1) {
             vlc_mutex_lock(&p_sys->p_overlays[p_sys->current_overlay]->lock);
             if (p_sys->p_overlays[p_sys->current_overlay]->status == ToDisplay) {
                 vlc_mutex_unlock(&p_sys->p_overlays[p_sys->current_overlay]->lock);
@@ -1038,7 +1035,7 @@ static int blurayDemux(demux_t *p_demux)
 
     p_block->i_buffer = nread;
 
-    stream_DemuxSend( p_sys->p_parser, p_block );
+    stream_DemuxSend(p_sys->p_parser, p_block);
 
     return 1;
 }
