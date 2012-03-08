@@ -310,8 +310,29 @@ static int blurayInitTitles(demux_t *p_demux )
     return VLC_SUCCESS;
 }
 
+static void blurayResetParser( demux_t *p_demux )
+{
+    /*
+     * This is a hack and will have to be removed.
+     * The parser should be flushed, and not destroy/created each time
+     * we are changing title.
+     */
+    demux_sys_t *p_sys = p_demux->p_sys;
+    if (!p_sys->p_parser)
+        return;
+    stream_Delete(p_sys->p_parser);
+    p_sys->p_parser = stream_DemuxNew(p_demux, "ts", p_demux->out);
+    if (!p_sys->p_parser) {
+        msg_Err(p_demux, "Failed to create TS demuxer");
+    }
+}
+
 static void blurayUpdateTitle( demux_t *p_demux, int i_title )
 {
+    blurayResetParser(p_demux);
+    if (i_title >= p_demux->p_sys->i_title)
+        return;
+
     /* read title info and init some values */
     p_demux->info.i_title = i_title;
     p_demux->info.i_seekpoint = 0;
@@ -483,8 +504,7 @@ static void blurayHandleEvent( demux_t *p_demux, const BD_EVENT *e )
     switch (e->event)
     {
         case BD_EVENT_TITLE:
-            if (e->param < p_sys->i_title)
-                blurayUpdateTitle( p_demux, e->param );
+            blurayUpdateTitle( p_demux, e->param );
             break;
         case BD_EVENT_PLAYITEM:
             break;
