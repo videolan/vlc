@@ -97,6 +97,7 @@ struct  demux_sys_t
     /* Titles */
     unsigned int        i_title;
     unsigned int        i_longest_title;
+    unsigned int        i_current_clip;
     input_title_t       **pp_title;
 
     /* Meta informations */
@@ -1039,12 +1040,15 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
 
 static void blurayHandleEvent( demux_t *p_demux, const BD_EVENT *e )
 {
+    demux_sys_t     *p_sys = p_demux->p_sys;
+
     switch (e->event)
     {
         case BD_EVENT_TITLE:
             blurayUpdateTitle(p_demux, e->param);
             break;
         case BD_EVENT_PLAYITEM:
+            p_sys->i_current_clip = e->param;
             break;
         case BD_EVENT_AUDIO_STREAM:
             break;
