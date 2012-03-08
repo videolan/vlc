@@ -136,6 +136,8 @@ static void  blurayOverlayProc(void *ptr, const BD_OVERLAY * const overlay);
 static int   onMouseEvent(vlc_object_t *p_vout, const char *psz_var,
                           vlc_value_t old, vlc_value_t val, void *p_data);
 
+static void  blurayResetParser(demux_t *p_demux);
+
 #define FROM_TICKS(a) (a*CLOCK_FREQ / INT64_C(90000))
 #define TO_TICKS(a)   (a*INT64_C(90000)/CLOCK_FREQ)
 #define CUR_LENGTH    p_sys->pp_title[p_demux->info.i_title]->i_length
@@ -278,7 +280,7 @@ static int blurayOpen( vlc_object_t *object )
         }
     }
 
-    p_sys->p_parser = stream_DemuxNew(p_demux, "ts", p_demux->out);
+    blurayResetParser( p_demux );
     if (!p_sys->p_parser) {
         msg_Err(p_demux, "Failed to create TS demuxer");
         goto error;
@@ -758,10 +760,8 @@ static void blurayResetParser( demux_t *p_demux )
      * we are changing title.
      */
     demux_sys_t *p_sys = p_demux->p_sys;
-    if (!p_sys->p_parser)
-        return;
-
-    stream_Delete(p_sys->p_parser);
+    if (p_sys->p_parser)
+        stream_Delete(p_sys->p_parser);
     p_sys->p_parser = stream_DemuxNew(p_demux, "ts", p_demux->out);
     if (!p_sys->p_parser) {
         msg_Err(p_demux, "Failed to create TS demuxer");
