@@ -39,6 +39,7 @@
 #include <vlc_vout.h>                       /* vout_PutSubpicture / subpicture_t */
 
 #include <libbluray/bluray.h>
+#include <libbluray/keys.h>
 #include <libbluray/meta_data.h>
 #include <libbluray/overlay.h>
 
@@ -125,6 +126,9 @@ static int     blurayInitTitles(demux_t *p_demux );
 static int     bluraySetTitle(demux_t *p_demux, int i_title);
 
 static void    blurayOverlayProc(void *ptr, const BD_OVERLAY * const overlay);
+
+static int     onMouseEvent( vlc_object_t *p_vout, const char *psz_var,
+                             vlc_value_t old, vlc_value_t val, void *p_data );
 
 #define FROM_TICKS(a) (a*CLOCK_FREQ / INT64_C(90000))
 #define TO_TICKS(a)   (a*INT64_C(90000)/CLOCK_FREQ)
@@ -304,8 +308,11 @@ static void blurayClose( vlc_object_t *object )
     assert(p_sys->bluray);
     bd_close(p_sys->bluray);
 
-    if (p_sys->p_vout != NULL)
+    if (p_sys->p_vout != NULL) {
+        var_DelCallback(p_sys->p_vout, "mouse-moved", &onMouseEvent, p_demux);
+        var_DelCallback(p_sys->p_vout, "mouse-clicked", &onMouseEvent, p_demux);
         vlc_object_release(p_sys->p_vout);
+    }
     if (p_sys->p_input != NULL)
         vlc_object_release(p_sys->p_input);
     if (p_sys->p_parser)
@@ -413,6 +420,29 @@ static void subpictureUpdaterDestroy(subpicture_t *p_subpic)
 }
 
 /*****************************************************************************
+ * User input events:
+ *****************************************************************************/
+static int onMouseEvent(vlc_object_t *p_vout, const char *psz_var, vlc_value_t old,
+                        vlc_value_t val, void *p_data)
+{
+    demux_t     *p_demux = (demux_t*)p_data;
+    demux_sys_t *p_sys   = p_demux->p_sys;
+    mtime_t     now      = mdate();
+    VLC_UNUSED(old);
+    VLC_UNUSED(p_vout);
+
+    if (psz_var[6] == 'm')   //Mouse moved
+        bd_mouse_select(p_sys->bluray, now, val.coords.x, val.coords.y);
+    else if (psz_var[6] == 'c') {
+        bd_mouse_select(p_sys->bluray, now, val.coords.x, val.coords.y);
+        bd_user_input(p_sys->bluray, now, BD_VK_MOUSE_ACTIVATE);
+    } else {
+        assert(0);
+    }
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
  * libbluray overlay handling:
  *****************************************************************************/
 static void blurayCleanOverayStruct(gc_object_t *p_gc)
@@ -442,6 +472,8 @@ static void blurayCloseAllOverlays(demux_t *p_demux)
                 p_sys->p_overlays[i] = NULL;
             }
         }
+        var_DelCallback(p_sys->p_vout, "mouse-moved", &onMouseEvent, p_demux);
+        var_DelCallback(p_sys->p_vout, "mouse-clicked", &onMouseEvent, p_demux);
         vlc_object_release(p_sys->p_vout);
         p_sys->p_vout = NULL;
     }
@@ -960,6 +992,8 @@ static int blurayDemux(demux_t *p_demux)
                 if (p_sys->p_vout == NULL)
                     p_sys->p_vout = input_GetVout(p_sys->p_input);
                 if (p_sys->p_vout != NULL) {
+                    var_AddCallback(p_sys->p_vout, "mouse-moved", &onMouseEvent, p_demux);
+                    var_AddCallback(p_sys->p_vout, "mouse-clicked", &onMouseEvent, p_demux);
                     bluraySendOverlayToVout(p_demux);
                 }
             } else
