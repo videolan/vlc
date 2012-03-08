@@ -200,6 +200,13 @@ static int blurayOpen( vlc_object_t *object )
 
     /* Warning the user about AACS/BD+ */
     const BLURAY_DISC_INFO *disc_info = bd_get_disc_info(p_sys->bluray);
+
+    /* Is it a bluray? */
+    if (!disc_info->bluray_detected) {
+        error_msg = "Path doesn't appear to be a bluray";
+        goto error;
+    }
+
     msg_Info(p_demux, "First play: %i, Top menu: %i\n"
                       "HDMV Titles: %i, BD-J Titles: %i, Other: %i",
              disc_info->first_play_supported, disc_info->top_menu_supported,
