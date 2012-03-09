@@ -41,14 +41,20 @@ namespace dash
             public:
                 Chunk           ();
 
-                int                 getEndByte      () const;
-                int                 getStartByte    () const;
-                const std::string&  getUrl          () const;
-                bool                hasHostname     () const;
-                const std::string&  getHostname     () const;
-                const std::string&  getPath         () const;
-                int                 getPort         () const;
+                int                 getEndByte              () const;
+                int                 getStartByte            () const;
+                const std::string&  getUrl                  () const;
+                bool                hasHostname             () const;
+                const std::string&  getHostname             () const;
+                const std::string&  getPath                 () const;
+                int                 getPort                 () const;
+                uint64_t            getLength               () const;
+                uint64_t            getBytesRead            () const;
+                uint64_t            getBytesToRead          () const;
+                size_t              getPercentDownloaded    () const;
 
+                void                setBytesRead    (uint64_t bytes);
+                void                setLength       (uint64_t length);
                 void                setEndByte      (int endByte);
                 void                setStartByte    (int startByte);
                 void                setUrl          (const std::string& url);
@@ -69,6 +75,8 @@ namespace dash
                 int                         bitrate;
                 int                         port;
                 bool                        isHostname;
+                size_t                      length;
+                uint64_t                    bytesRead;
         };
     }
 }

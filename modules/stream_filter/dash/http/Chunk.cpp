@@ -34,31 +34,33 @@ Chunk::Chunk        () :
        endByte      (0),
        hasByteRange (false),
        port         (0),
-       isHostname   (false)
+       isHostname   (false),
+       length       (0),
+       bytesRead    (0)
 {
 }
 
-int                 Chunk::getEndByte       () const
+int                 Chunk::getEndByte           () const
 {
     return endByte;
 }
-int                 Chunk::getStartByte     () const
+int                 Chunk::getStartByte         () const
 {
     return startByte;
 }
-const std::string&  Chunk::getUrl           () const
+const std::string&  Chunk::getUrl               () const
 {
     return url;
 }
-void                Chunk::setEndByte       (int endByte)
+void                Chunk::setEndByte           (int endByte)
 {
     this->endByte = endByte;
 }
-void                Chunk::setStartByte     (int startByte)
+void                Chunk::setStartByte         (int startByte)
 {
     this->startByte = startByte;
 }
-void                Chunk::setUrl           (const std::string& url )
+void                Chunk::setUrl               (const std::string& url )
 {
     this->url = url;
 
@@ -78,39 +80,63 @@ void                Chunk::setUrl           (const std::string& url )
 
     vlc_UrlClean(&url_components);
 }
-void                Chunk::addOptionalUrl   (const std::string& url)
+void                Chunk::addOptionalUrl       (const std::string& url)
 {
     this->optionalUrls.push_back(url);
 }
-bool                Chunk::useByteRange     ()
+bool                Chunk::useByteRange         ()
 {
     return this->hasByteRange;
 }
-void                Chunk::setUseByteRange  (bool value)
+void                Chunk::setUseByteRange      (bool value)
 {
     this->hasByteRange = value;
 }
-void                Chunk::setBitrate       (uint64_t bitrate)
+void                Chunk::setBitrate           (uint64_t bitrate)
 {
     this->bitrate = bitrate;
 }
-int                 Chunk::getBitrate       ()
+int                 Chunk::getBitrate           ()
 {
     return this->bitrate;
 }
-bool                Chunk::hasHostname     () const
+bool                Chunk::hasHostname          () const
 {
     return this->isHostname;
 }
-const std::string&  Chunk::getHostname     () const
+const std::string&  Chunk::getHostname          () const
 {
     return this->hostname;
 }
-const std::string&  Chunk::getPath         () const
+const std::string&  Chunk::getPath              () const
 {
     return this->path;
 }
-int                 Chunk::getPort         () const
+int                 Chunk::getPort              () const
 {
     return this->port;
+}
+uint64_t            Chunk::getLength            () const
+{
+    return this->length;
+}
+void                Chunk::setLength            (uint64_t length)
+{
+    this->length = length;
+}
+uint64_t            Chunk::getBytesRead         () const
+{
+    return this->bytesRead;
+}
+void                Chunk::setBytesRead         (uint64_t bytes)
+{
+    this->bytesRead = bytes;
+}
+uint64_t            Chunk::getBytesToRead       () const
+{
+    return this->length - this->bytesRead;
+}
+size_t              Chunk::getPercentDownloaded () const
+{
+    return (size_t)(((float)this->bytesRead / this->length) * 100);
 }
