@@ -31,7 +31,6 @@
 #include "mpd/IMPDManager.h"
 #include "mpd/Period.h"
 #include "mpd/Segment.h"
-#include "exceptions/EOFException.h"
 #include "mpd/BasicCMManager.h"
 #include <vector>
 
@@ -45,7 +44,7 @@ namespace dash
                 AlwaysBestAdaptationLogic           (dash::mpd::IMPDManager *mpdManager, stream_t *stream);
                 virtual ~AlwaysBestAdaptationLogic  ();
 
-                dash::http::Chunk* getNextChunk() throw(dash::exception::EOFException);
+                dash::http::Chunk* getNextChunk();
                 const mpd::Representation *getCurrentRepresentation() const;
 
             private:

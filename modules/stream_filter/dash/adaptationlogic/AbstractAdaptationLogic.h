@@ -33,7 +33,6 @@
 #include "mpd/Period.h"
 #include "mpd/Representation.h"
 #include "mpd/Segment.h"
-#include "exceptions/EOFException.h"
 
 struct stream_t;
 

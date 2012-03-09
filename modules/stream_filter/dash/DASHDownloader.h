@@ -27,7 +27,6 @@
 
 #include "http/HTTPConnectionManager.h"
 #include "adaptationlogic/IAdaptationLogic.h"
-#include "exceptions/EOFException.h"
 #include "buffer/BlockBuffer.h"
 
 #define BLOCKSIZE           32768

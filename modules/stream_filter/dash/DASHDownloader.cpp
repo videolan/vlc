@@ -30,7 +30,6 @@
 using namespace dash;
 using namespace dash::http;
 using namespace dash::logic;
-using namespace dash::exception;
 using namespace dash::buffer;
 
 DASHDownloader::DASHDownloader  (HTTPConnectionManager *conManager, IAdaptationLogic *adaptationLogic, BlockBuffer *buffer)
@@ -67,11 +66,8 @@ void*       DASHDownloader::download    (void *thread_sys)
     {
         if(currentChunk == NULL)
         {
-            try
-            {
-                currentChunk  = adaptationLogic->getNextChunk();
-            }
-            catch(EOFException &e)
+            currentChunk  = adaptationLogic->getNextChunk();
+            if(currentChunk == NULL)
             {
                 buffer->setEOF(true);
             }

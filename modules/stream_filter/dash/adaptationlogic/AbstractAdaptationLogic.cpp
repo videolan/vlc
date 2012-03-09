@@ -30,7 +30,6 @@
 using namespace dash::logic;
 using namespace dash::xml;
 using namespace dash::mpd;
-using namespace dash::exception;
 
 AbstractAdaptationLogic::AbstractAdaptationLogic    (IMPDManager *mpdManager, stream_t *stream) :
                          bpsAvg                     (0),

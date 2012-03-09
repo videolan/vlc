@@ -31,7 +31,6 @@ using namespace dash::logic;
 using namespace dash::xml;
 using namespace dash::http;
 using namespace dash::mpd;
-using namespace dash::exception;
 
 RateBasedAdaptationLogic::RateBasedAdaptationLogic  (IMPDManager *mpdManager, stream_t *stream) :
                           AbstractAdaptationLogic   (mpdManager, stream),
@@ -45,13 +44,13 @@ RateBasedAdaptationLogic::RateBasedAdaptationLogic  (IMPDManager *mpdManager, st
     this->height = var_InheritInteger(stream, "dash-prefheight");
 }
 
-Chunk*  RateBasedAdaptationLogic::getNextChunk() throw(EOFException)
+Chunk*  RateBasedAdaptationLogic::getNextChunk()
 {
     if(this->mpdManager == NULL)
-        throw EOFException();
+        return NULL;
 
     if(this->currentPeriod == NULL)
-        throw EOFException();
+        return NULL;
 
     uint64_t bitrate = this->getBpsAvg();
 
@@ -61,7 +60,7 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk() throw(EOFException)
     Representation *rep = this->mpdManager->getRepresentation(this->currentPeriod, bitrate, this->width, this->height);
 
     if ( rep == NULL )
-        throw EOFException();
+        return NULL;
 
     std::vector<Segment *> segments = this->mpdManager->getSegments(rep);
 

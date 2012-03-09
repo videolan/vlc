@@ -27,7 +27,6 @@
 
 #include <http/Chunk.h>
 #include <adaptationlogic/IDownloadRateObserver.h>
-#include <exceptions/EOFException.h>
 #include "mpd/Representation.h"
 #include "buffer/IBufferObserver.h"
 
@@ -47,8 +46,8 @@ namespace dash
                     RateBased
                 };
 
-                virtual dash::http::Chunk*  getNextChunk() throw(dash::exception::EOFException) = 0;
-                virtual const dash::mpd::Representation *getCurrentRepresentation() const = 0;
+                virtual dash::http::Chunk*                  getNextChunk            ()          = 0;
+                virtual const dash::mpd::Representation*    getCurrentRepresentation() const    = 0;
                 /**
                  *  \return     The average bitrate in bits per second.
                  */

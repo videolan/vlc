@@ -12,7 +12,6 @@ SOURCES_stream_filter_dash = \
     buffer/BlockBuffer.cpp \
     buffer/BlockBuffer.h \
     buffer/IBufferObserver.h \
-    exceptions/EOFException.h \
     http/Chunk.cpp \
     http/Chunk.h \
     http/HTTPConnection.cpp \

@@ -31,7 +31,6 @@ using namespace dash::logic;
 using namespace dash::xml;
 using namespace dash::http;
 using namespace dash::mpd;
-using namespace dash::exception;
 
 AlwaysBestAdaptationLogic::AlwaysBestAdaptationLogic    (IMPDManager *mpdManager, stream_t *stream) :
                            AbstractAdaptationLogic      (mpdManager, stream)
@@ -44,13 +43,13 @@ AlwaysBestAdaptationLogic::~AlwaysBestAdaptationLogic   ()
 {
 }
 
-Chunk*  AlwaysBestAdaptationLogic::getNextChunk() throw(EOFException)
+Chunk*  AlwaysBestAdaptationLogic::getNextChunk()
 {
     if(this->schedule.size() == 0)
-        throw EOFException();
+        return NULL;
 
     if(this->count == this->schedule.size())
-        throw EOFException();
+        return NULL;
 
     if ( this->count < this->schedule.size() )
     {

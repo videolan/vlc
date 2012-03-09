@@ -29,7 +29,6 @@
 #include "xml/Node.h"
 #include "mpd/IMPDManager.h"
 #include "http/Chunk.h"
-#include "exceptions/EOFException.h"
 #include "mpd/BasicCMManager.h"
 
 #include <vlc_common.h>
@@ -46,7 +45,7 @@ namespace dash
             public:
                 RateBasedAdaptationLogic            (dash::mpd::IMPDManager *mpdManager, stream_t *stream);
 
-                dash::http::Chunk*      getNextChunk() throw(dash::exception::EOFException);
+                dash::http::Chunk*      getNextChunk();
                 const dash::mpd::Representation *getCurrentRepresentation() const;
 
             private:

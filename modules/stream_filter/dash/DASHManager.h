@@ -33,7 +33,6 @@
 #include "mpd/MPDManagerFactory.h"
 #include "buffer/BlockBuffer.h"
 #include "DASHDownloader.h"
-#include "exceptions/EOFException.h"
 #include "mpd/MPD.h"
 
 namespace dash

@@ -33,7 +33,6 @@ using namespace dash::xml;
 using namespace dash::logic;
 using namespace dash::mpd;
 using namespace dash::buffer;
-using namespace dash::exception;
 
 DASHManager::DASHManager    ( HTTPConnectionManager *conManager, MPD *mpd,
                               IAdaptationLogic::LogicType type, stream_t *stream) :
