@@ -26,16 +26,14 @@
 #endif
 
 #include "HTTPConnection.h"
-#include <vlc_url.h>
 
 using namespace dash::http;
 
-HTTPConnection::HTTPConnection  (Chunk *chunk, stream_t *stream) :
+HTTPConnection::HTTPConnection  (stream_t *stream) :
                 stream          (stream),
-                chunk           (chunk),
-                peekBufferLen   (0)
+                peekBufferLen   (0),
+                contentLength   (0)
 {
-    this->url        = chunk->getUrl();
     this->peekBuffer = new uint8_t[PEEKBUFFER];
 }
 HTTPConnection::~HTTPConnection ()
@@ -73,48 +71,41 @@ int             HTTPConnection::peek            (const uint8_t **pp_peek, size_t
     *pp_peek = peek;
     return size;
 }
-void            HTTPConnection::parseURL        ()
+std::string     HTTPConnection::prepareRequest  (Chunk *chunk)
 {
-    vlc_url_t url_components;
-    vlc_UrlParse(&url_components, this->url.c_str(), 0);
-    this->path = url_components.psz_path;
-    this->port = url_components.i_port ? url_components.i_port : 80;
+    std::string request;
 
-    if(this->url.compare(0, 4, "http"))
-        this->hostname = Helper::combinePaths(Helper::getDirectoryPath(stream->psz_path), this->url);
-    else
-        this->hostname = url_components.psz_host;
-
-    this->request = "GET " + this->path + " HTTP/1.1\r\n" +
-                    "Host: " + this->hostname + "\r\nConnection: close\r\n\r\n";
-}
-void            HTTPConnection::prepareRequest  ()
-{
     if(!chunk->useByteRange())
     {
-        this->request = "GET "          + this->path     + " HTTP/1.1" + "\r\n" +
-                        "Host: "        + this->hostname + "\r\n" +
-                        "Connection: close\r\n\r\n";
+        request = "GET "    + chunk->getPath()    + " HTTP/1.1" + "\r\n" +
+                  "Host: "  + chunk->getHostname() + "\r\n" +
+                  "Connection: close\r\n\r\n";
     }
     else
     {
         std::stringstream req;
-        req << "GET " << this->path << " HTTP/1.1\r\n" <<
-               "Host: " << this->hostname << "\r\n" <<
-               "Range: bytes=" << this->chunk->getStartByte() << "-" << this->chunk->getEndByte() << "\r\n" <<
+        req << "GET " << chunk->getPath() << " HTTP/1.1\r\n" <<
+               "Host: " << chunk->getHostname() << "\r\n" <<
+               "Range: bytes=" << chunk->getStartByte() << "-" << chunk->getEndByte() << "\r\n" <<
                "Connection: close\r\n\r\n";
 
-        this->request = req.str();
+        request = req.str();
     }
+
+    return request;
 }
-bool            HTTPConnection::init            ()
+bool            HTTPConnection::init            (Chunk *chunk)
 {
-    this->parseURL();
-    this->prepareRequest();
+    if(!chunk->hasHostname())
+        if(!this->setUrlRelative(chunk))
+            return false;
 
-    this->httpSocket = net_ConnectTCP(this->stream, this->hostname.c_str(), this->port);
+    this->httpSocket = net_ConnectTCP(this->stream, chunk->getHostname().c_str(), chunk->getPort());
 
-    if(this->sendData(this->request))
+    if(this->httpSocket == -1)
+        return false;
+
+    if(this->sendData(this->prepareRequest(chunk)))
         return this->parseHeader();
 
     return false;
@@ -123,9 +114,18 @@ bool            HTTPConnection::parseHeader     ()
 {
     std::string line = this->readLine();
 
+    if(line.size() == 0)
+        return false;
+
     while(line.compare("\r\n"))
     {
+        if(!line.compare(0, 14, "Content-Length"))
+            this->contentLength = atoi(line.substr(15,line.size()).c_str());
+
         line = this->readLine();
+
+        if(line.size() == 0)
+            return false;
     }
 
     return true;
@@ -148,7 +148,7 @@ std::string     HTTPConnection::readLine        ()
     if(size > 0)
         return ss.str();
 
-    return "\r\n";
+    return "";
 }
 bool            HTTPConnection::sendData        (const std::string& data)
 {
@@ -167,4 +167,12 @@ bool            HTTPConnection::sendData        (const std::string& data)
 void            HTTPConnection::closeSocket     ()
 {
     net_Close(this->httpSocket);
+}
+bool            HTTPConnection::setUrlRelative  (Chunk *chunk)
+{
+    std::stringstream ss;
+    ss << stream->psz_access << "://" << Helper::combinePaths(Helper::getDirectoryPath(stream->psz_path), chunk->getUrl());
+    chunk->setUrl(ss.str());
+
+    return chunk->hasHostname();
 }

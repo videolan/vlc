@@ -137,8 +137,8 @@ int                 HTTPConnectionManager::peek                     (Chunk *chun
 
 IHTTPConnection*     HTTPConnectionManager::initConnection(Chunk *chunk)
 {
-    HTTPConnection *con = new HTTPConnection(chunk, this->stream);
-    if ( con->init() == false )
+    HTTPConnection *con = new HTTPConnection(this->stream);
+    if ( con->init(chunk) == false )
         return NULL;
     this->chunkMap[chunk] = con;
     this->chunkCount++;

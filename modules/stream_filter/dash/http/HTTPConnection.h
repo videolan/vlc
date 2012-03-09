@@ -48,32 +48,26 @@ namespace dash
         class HTTPConnection : public IHTTPConnection
         {
             public:
-                HTTPConnection          ( Chunk *chunk, stream_t *stream );
+                HTTPConnection          (stream_t *stream);
                 virtual ~HTTPConnection ();
 
-                bool        init            ();
-                void        closeSocket     ();
-
+                virtual bool    init        (Chunk *chunk);
+                void            closeSocket ();
                 virtual int     read        (void *p_buffer, size_t len);
                 virtual int     peek        (const uint8_t **pp_peek, size_t i_peek);
 
-            private:
-                int                     httpSocket;
-                std::string             url;
-                std::string             hostname;
-                std::string             path;
-                int                     port;
-                std::string             request;
-                stream_t                *stream;
-                Chunk                   *chunk;
-                uint8_t                 *peekBuffer;
-                size_t                  peekBufferLen;
+            protected:
+                int         httpSocket;
+                stream_t    *stream;
+                uint8_t     *peekBuffer;
+                size_t      peekBufferLen;
+                int         contentLength;
 
-                void            parseURL        ();
-                bool            sendData        (const std::string& data);
-                bool            parseHeader     ();
-                std::string     readLine        ();
-                void            prepareRequest  ();
+                bool                sendData        (const std::string& data);
+                bool                parseHeader     ();
+                std::string         readLine        ();
+                virtual std::string prepareRequest  (Chunk *chunk);
+                bool                setUrlRelative  (Chunk *chunk);
         };
     }
 }
