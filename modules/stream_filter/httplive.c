@@ -597,6 +597,7 @@ static int parse_SegmentInformation(hls_stream_t *hls, char *p_read, int *durati
             value = ((int)d) + 1;
         else
             value = ((int)d);
+        *duration = value;
     }
 
     /* Ignore the rest of the line */
