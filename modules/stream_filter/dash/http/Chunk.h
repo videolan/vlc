@@ -28,6 +28,8 @@
 #include <vlc_common.h>
 #include <vlc_url.h>
 
+#include "IHTTPConnection.h"
+
 #include <vector>
 #include <string>
 #include <stdint.h>
@@ -52,7 +54,9 @@ namespace dash
                 uint64_t            getBytesRead            () const;
                 uint64_t            getBytesToRead          () const;
                 size_t              getPercentDownloaded    () const;
+                IHTTPConnection*    getConnection           () const;
 
+                void                setConnection   (IHTTPConnection *connection);
                 void                setBytesRead    (uint64_t bytes);
                 void                setLength       (uint64_t length);
                 void                setEndByte      (int endByte);
@@ -77,6 +81,7 @@ namespace dash
                 bool                        isHostname;
                 size_t                      length;
                 uint64_t                    bytesRead;
+                IHTTPConnection             *connection;
         };
     }
 }

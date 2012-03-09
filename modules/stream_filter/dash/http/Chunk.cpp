@@ -36,7 +36,8 @@ Chunk::Chunk        () :
        port         (0),
        isHostname   (false),
        length       (0),
-       bytesRead    (0)
+       bytesRead    (0),
+       connection   (NULL)
 {
 }
 
@@ -139,4 +140,12 @@ uint64_t            Chunk::getBytesToRead       () const
 size_t              Chunk::getPercentDownloaded () const
 {
     return (size_t)(((float)this->bytesRead / this->length) * 100);
+}
+IHTTPConnection*    Chunk::getConnection           () const
+{
+    return this->connection;
+}
+void                Chunk::setConnection   (IHTTPConnection *connection)
+{
+    this->connection = connection;
 }
