@@ -1776,6 +1776,8 @@ static void StreamRead( void *p_private, unsigned int i_size,
         QuickTimeGenericRTPSource::QTState &qtState = qtRTPSource->qtState;
         uint8_t *sdAtom = (uint8_t*)&qtState.sdAtom[4];
 
+        /* Get codec informations from the quicktime atoms :
+         * http://developer.apple.com/quicktime/icefloe/dispatch026.html */
         if( tk->fmt.i_cat == VIDEO_ES ) {
             if( qtState.sdAtomSize < 16 + 32 )
             {
@@ -1816,7 +1818,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
             }
         }
         else {
-            if( qtState.sdAtomSize < 4 )
+            if( qtState.sdAtomSize < 24 )
             {
                 /* invalid */
                 p_sys->event_data = 0xff;
@@ -1824,6 +1826,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
                 return;
             }
             tk->fmt.i_codec = VLC_FOURCC(sdAtom[0],sdAtom[1],sdAtom[2],sdAtom[3]);
+            tk->fmt.audio.i_bitspersample = (sdAtom[22] << 8) | sdAtom[23];
         }
         tk->p_es = es_out_Add( p_demux->out, &tk->fmt );
     }
