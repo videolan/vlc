@@ -574,10 +574,11 @@ static int parse_SegmentInformation(hls_stream_t *hls, char *p_read, int *durati
         return VLC_EGENERIC;
 
     int value;
+    char *endptr;
     if (hls->version < 3)
     {
-       value = strtol(token, NULL, 10);
-       if (errno == ERANGE)
+       value = strtol(token, &endptr, 10);
+       if (token == endptr)
        {
            *duration = -1;
            return VLC_EGENERIC;
@@ -586,8 +587,8 @@ static int parse_SegmentInformation(hls_stream_t *hls, char *p_read, int *durati
     }
     else
     {
-        double d = strtod(token, (char **) NULL);
-        if (errno == ERANGE)
+        double d = strtof(token, &endptr);
+        if (token == endptr)
         {
             *duration = -1;
             return VLC_EGENERIC;
