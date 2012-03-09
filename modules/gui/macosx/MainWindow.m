@@ -635,6 +635,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (IBAction)togglePlaylist:(id)sender
 {
+    if (![self isVisible])
+    {
+        [self makeKeyAndOrderFront: sender];
+    }
+
     BOOL b_activeVideo = [[VLCMain sharedInstance] activeVideoPlayback];
 
     if ( !b_splitview_removed && ( (([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0 && !b_activeVideo) || (b_nonembedded && b_activeVideo && sender != nil) ))
@@ -2249,7 +2254,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)performClose:(id)sender
 {
-    [[VLCMainWindow sharedInstance] performClose: sender];
+    if (b_dark_interface)
+        [[VLCMainWindow sharedInstance] performClose: sender];
+    else
+        [super performClose: sender];
 }
 
 - (void)performMiniaturize:(id)sender
