@@ -810,7 +810,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     unsigned int index = [n_index intValue];
 
-id o_currentOpticalDevice = [o_opticalDevices objectAtIndex: index];
+    id o_currentOpticalDevice = [o_opticalDevices objectAtIndex: index];
     char *diskType = [self getVolumeTypeFromMountPath:o_currentOpticalDevice];
 
     if (diskType == kVLCMediaDVD || diskType == kVLCMediaVideoTSFolder)
@@ -945,7 +945,7 @@ id o_currentOpticalDevice = [o_opticalDevices objectAtIndex: index];
     if (sender == o_disc_dvdwomenus_chapter_stp)
         [o_disc_dvdwomenus_chapter setIntValue: [o_disc_dvdwomenus_chapter_stp intValue]];
 
-    [self setMRL: [NSString stringWithFormat: @"dvdread://%@@%i:%i-", [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: [o_disc_selector_pop indexOfSelectedItem]]], [o_disc_dvdwomenus_title intValue], [o_disc_dvdwomenus_chapter intValue]]];
+    [self setMRL: [NSString stringWithFormat: @"dvdread://%@#%i:%i-", [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: [o_disc_selector_pop indexOfSelectedItem]]], [o_disc_dvdwomenus_title intValue], [o_disc_dvdwomenus_chapter intValue]]];
 }
 
 - (IBAction)vcdOptionChanged:(id)sender
