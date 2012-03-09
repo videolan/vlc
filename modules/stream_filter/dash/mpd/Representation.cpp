@@ -32,6 +32,7 @@
 using namespace dash::mpd;
 
 Representation::Representation  () :
+                bandwidth       (0),
                 qualityRanking  ( -1 ),
                 segmentInfo     ( NULL ),
                 trickModeType   ( NULL ),
@@ -61,15 +62,14 @@ void    Representation::setId(const std::string &id)
         this->id = id;
 }
 
-int     Representation::getBandwidth            () const
+uint64_t     Representation::getBandwidth            () const
 {
     return this->bandwidth;
 }
 
-void    Representation::setBandwidth( int bandwidth )
+void    Representation::setBandwidth( uint64_t bandwidth )
 {
-    if ( bandwidth >= 0 )
-        this->bandwidth = bandwidth;
+    this->bandwidth = bandwidth;
 }
 
 SegmentInfo*        Representation::getSegmentInfo() const

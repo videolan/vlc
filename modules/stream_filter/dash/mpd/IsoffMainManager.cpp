@@ -102,7 +102,7 @@ Representation*             IsoffMainManager::getRepresentation     (Period *per
         std::vector<Representation *> reps = adaptationSets.at(i)->getRepresentations();
         for( size_t j = 0; j < reps.size(); j++ )
         {
-            int currentBitrate = reps.at(j)->getBandwidth();
+            uint64_t currentBitrate = reps.at(j)->getBandwidth();
 
             if(best == NULL || (currentBitrate > best->getBandwidth() && currentBitrate < bitrate))
             {
@@ -165,7 +165,7 @@ Representation*             IsoffMainManager::getRepresentation     (Period *per
     Representation  *best = NULL;
     for( size_t j = 0; j < resMatchReps.size(); j++ )
     {
-        int currentBitrate = resMatchReps.at(j)->getBandwidth();
+        uint64_t currentBitrate = resMatchReps.at(j)->getBandwidth();
 
         if(best == NULL || (currentBitrate > best->getBandwidth() && currentBitrate < bitrate))
         {

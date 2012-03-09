@@ -501,12 +501,6 @@ bool    BasicCMParser::resolveUrlTemplates( std::string &url, bool &containRunti
         }
         else if ( token == "$Bandwidth$" )
         {
-            if ( this->currentRepresentation->getBandwidth() < 0 )
-            {
-                std::cerr << "Representation doesn't have a valid bandwidth. "
-                             "Can't substitute tag $Bandwidth$" << std::endl;
-                return false;
-            }
             std::ostringstream  oss;
             oss << this->currentRepresentation->getBandwidth();
             url.replace( it, token.length(), oss.str() );

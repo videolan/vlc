@@ -103,7 +103,7 @@ Representation*         BasicCMManager::getRepresentation(Period *period, uint64
         std::vector<Representation *> reps = groups.at(i)->getRepresentations();
         for( size_t j = 0; j < reps.size(); j++ )
         {
-            int     currentBitrate = reps.at(j)->getBandwidth();
+            uint64_t currentBitrate = reps.at(j)->getBandwidth();
             assert( currentBitrate != -1 );
 
             if ( best == NULL ||

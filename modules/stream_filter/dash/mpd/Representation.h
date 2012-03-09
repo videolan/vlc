@@ -53,8 +53,8 @@ namespace dash
                  *          Will be a valid value, as the parser refuses Representation
                  *          without bandwidth.
                  */
-                int                 getBandwidth            () const;
-                void                setBandwidth            ( int bandwidth );
+                uint64_t            getBandwidth            () const;
+                void                setBandwidth            ( uint64_t bandwidth );
                 int                 getQualityRanking       () const;
                 void                setQualityRanking       ( int qualityRanking );
                 const std::list<const Representation*>&     getDependencies() const;
@@ -82,7 +82,7 @@ namespace dash
                 int                 getHeight               () const;
 
             private:
-                int                                 bandwidth;
+                uint64_t                            bandwidth;
                 std::string                         id;
                 int                                 qualityRanking;
                 std::list<const Representation*>    dependencies;
