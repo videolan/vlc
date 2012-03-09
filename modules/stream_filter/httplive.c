@@ -1808,21 +1808,27 @@ static char *ReadLine(uint8_t *buffer, uint8_t **pos, const size_t len)
 
     while (p < end)
     {
-        if ((*p == '\n') || (*p == '\0'))
+        if ((*p == '\r') || (*p == '\n') || (*p == '\0'))
             break;
         p++;
     }
 
-    /* copy line excluding \n or \0 */
+    /* copy line excluding \r \n or \0 */
     line = strndup((char *)begin, p - begin);
 
-    if (*p == '\0')
-        *pos = end;
-    else
+    while ((*p == '\r') || (*p == '\n') || (*p == '\0'))
     {
-        /* next pass start after \n */
-        p++;
-        *pos = p;
+        if (*p == '\0')
+        {
+            *pos = end;
+            break;
+        }
+        else
+        {
+            /* next pass start after \r and \n */
+            p++;
+            *pos = p;
+        }   
     }
 
     return line;
