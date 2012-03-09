@@ -25,6 +25,9 @@
 #ifndef CHUNK_H_
 #define CHUNK_H_
 
+#include <vlc_common.h>
+#include <vlc_url.h>
+
 #include <vector>
 #include <string>
 #include <stdint.h>
@@ -41,6 +44,11 @@ namespace dash
                 int                 getEndByte      () const;
                 int                 getStartByte    () const;
                 const std::string&  getUrl          () const;
+                bool                hasHostname     () const;
+                const std::string&  getHostname     () const;
+                const std::string&  getPath         () const;
+                int                 getPort         () const;
+
                 void                setEndByte      (int endByte);
                 void                setStartByte    (int startByte);
                 void                setUrl          (const std::string& url);
@@ -52,12 +60,15 @@ namespace dash
 
             private:
                 std::string                 url;
+                std::string                 path;
+                std::string                 hostname;
                 std::vector<std::string>    optionalUrls;
                 int                         startByte;
                 int                         endByte;
                 bool                        hasByteRange;
                 int                         bitrate;
-
+                int                         port;
+                bool                        isHostname;
         };
     }
 }

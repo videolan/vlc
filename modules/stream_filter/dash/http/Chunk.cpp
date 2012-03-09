@@ -32,7 +32,9 @@ using namespace dash::http;
 Chunk::Chunk        () :
        startByte    (0),
        endByte      (0),
-       hasByteRange (false)
+       hasByteRange (false),
+       port         (0),
+       isHostname   (false)
 {
 }
 
@@ -59,6 +61,22 @@ void                Chunk::setStartByte     (int startByte)
 void                Chunk::setUrl           (const std::string& url )
 {
     this->url = url;
+
+    if(this->url.compare(0, 4, "http"))
+    {
+        this->isHostname = false;
+        return;
+    }
+
+    vlc_url_t url_components;
+    vlc_UrlParse(&url_components, url.c_str(), 0);
+
+    this->path          = url_components.psz_path;
+    this->port          = url_components.i_port ? url_components.i_port : 80;
+    this->hostname      = url_components.psz_host;
+    this->isHostname    = true;
+
+    vlc_UrlClean(&url_components);
 }
 void                Chunk::addOptionalUrl   (const std::string& url)
 {
@@ -79,4 +97,20 @@ void                Chunk::setBitrate       (uint64_t bitrate)
 int                 Chunk::getBitrate       ()
 {
     return this->bitrate;
+}
+bool                Chunk::hasHostname     () const
+{
+    return this->isHostname;
+}
+const std::string&  Chunk::getHostname     () const
+{
+    return this->hostname;
+}
+const std::string&  Chunk::getPath         () const
+{
+    return this->path;
+}
+int                 Chunk::getPort         () const
+{
+    return this->port;
 }
