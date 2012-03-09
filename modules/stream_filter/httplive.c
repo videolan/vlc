@@ -29,7 +29,6 @@
 #endif
 
 #include <limits.h>
-#include <errno.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
