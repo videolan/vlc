@@ -90,6 +90,7 @@
     BOOL b_video_playback_enabled;
     BOOL b_dropzone_active;
     BOOL b_splitview_removed;
+    BOOL b_minimized_view;
     int i_lastSplitViewHeight;
     int i_lastShownVolume;
     input_state_e cachedInputState;

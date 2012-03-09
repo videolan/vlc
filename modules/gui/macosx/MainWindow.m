@@ -641,8 +641,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     BOOL b_activeVideo = [[VLCMain sharedInstance] activeVideoPlayback];
+    BOOL b_restored = NO;
 
-    if ( !b_splitview_removed && ( (([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0 && !b_activeVideo) || (b_nonembedded && b_activeVideo && sender != nil) ))
+    if ( !b_splitview_removed && ( (([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0 && b_activeVideo)
+                                  || (b_nonembedded && sender != nil)
+                                  || (!b_activeVideo && sender != nil)
+                                  || b_minimized_view ) )
     {
         [self hideSplitView];
     }
@@ -650,8 +654,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
     {
         if (b_splitview_removed)
         {
-            if( !b_nonembedded ||( sender != nil && b_nonembedded))
+            if( !b_nonembedded || ( sender != nil && b_nonembedded))
                 [self showSplitView];
+
+            if (sender == nil)
+                b_minimized_view = YES;
+            else
+                b_minimized_view = NO;
+
+            if (b_activeVideo)
+                b_restored = YES;
         }
 
         if (b_dropzone_active && !b_activeVideo)
@@ -662,7 +674,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         if (!b_nonembedded)
         {
-            if ([o_video_view isHidden] && b_activeVideo) {
+            if (([o_video_view isHidden] && b_activeVideo) || b_restored ) {
                 [o_split_view setHidden: YES];
                 [o_video_view setHidden: NO];
                 [self makeFirstResponder: o_video_view];
