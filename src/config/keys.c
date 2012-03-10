@@ -52,53 +52,53 @@ typedef struct key_descriptor_s
 
 static const struct key_descriptor_s vlc_keys[] =
 {   /* Alphabetical order */
-    { "Backspace",         KEY_BACKSPACE         },
-    { "Browser Back",      KEY_BROWSER_BACK      },
-    { "Browser Favorites", KEY_BROWSER_FAVORITES },
-    { "Browser Forward",   KEY_BROWSER_FORWARD   },
-    { "Browser Home",      KEY_BROWSER_HOME      },
-    { "Browser Refresh",   KEY_BROWSER_REFRESH   },
-    { "Browser Search",    KEY_BROWSER_SEARCH    },
-    { "Browser Stop",      KEY_BROWSER_STOP      },
-    { "Delete",            KEY_DELETE            },
-    { "Down",              KEY_DOWN              },
-    { "End",               KEY_END               },
-    { "Enter",             KEY_ENTER             },
-    { "Esc",               KEY_ESC               },
-    { "F1",                KEY_F1                },
-    { "F10",               KEY_F10               },
-    { "F11",               KEY_F11               },
-    { "F12",               KEY_F12               },
-    { "F2",                KEY_F2                },
-    { "F3",                KEY_F3                },
-    { "F4",                KEY_F4                },
-    { "F5",                KEY_F5                },
-    { "F6",                KEY_F6                },
-    { "F7",                KEY_F7                },
-    { "F8",                KEY_F8                },
-    { "F9",                KEY_F9                },
-    { "Home",              KEY_HOME              },
-    { "Insert",            KEY_INSERT            },
-    { "Left",              KEY_LEFT              },
-    { "Media Next Track",  KEY_MEDIA_NEXT_TRACK  },
-    { "Media Play Pause",  KEY_MEDIA_PLAY_PAUSE  },
-    { "Media Prev Track",  KEY_MEDIA_PREV_TRACK  },
-    { "Media Stop",        KEY_MEDIA_STOP        },
-    { "Menu",              KEY_MENU              },
-    { "Mouse Wheel Down",  KEY_MOUSEWHEELDOWN    },
-    { "Mouse Wheel Left",  KEY_MOUSEWHEELLEFT    },
-    { "Mouse Wheel Right", KEY_MOUSEWHEELRIGHT   },
-    { "Mouse Wheel Up",    KEY_MOUSEWHEELUP      },
-    { "Page Down",         KEY_PAGEDOWN          },
-    { "Page Up",           KEY_PAGEUP            },
-    { "Right",             KEY_RIGHT             },
-    { "Space",             ' '                   },
-    { "Tab",               KEY_TAB               },
-    { "Unset",             KEY_UNSET             },
-    { "Up",                KEY_UP                },
-    { "Volume Down",       KEY_VOLUME_DOWN       },
-    { "Volume Mute",       KEY_VOLUME_MUTE       },
-    { "Volume Up",         KEY_VOLUME_UP         },
+    { N_("Backspace"),         KEY_BACKSPACE         },
+    { N_("Browser Back"),      KEY_BROWSER_BACK      },
+    { N_("Browser Favorites"), KEY_BROWSER_FAVORITES },
+    { N_("Browser Forward"),   KEY_BROWSER_FORWARD   },
+    { N_("Browser Home"),      KEY_BROWSER_HOME      },
+    { N_("Browser Refresh"),   KEY_BROWSER_REFRESH   },
+    { N_("Browser Search"),    KEY_BROWSER_SEARCH    },
+    { N_("Browser Stop"),      KEY_BROWSER_STOP      },
+    { N_("Delete"),            KEY_DELETE            },
+    { N_("Down"),              KEY_DOWN              },
+    { N_("End"),               KEY_END               },
+    { N_("Enter"),             KEY_ENTER             },
+    { N_("Esc"),               KEY_ESC               },
+    { N_("F1"),                KEY_F1                },
+    { N_("F10"),               KEY_F10               },
+    { N_("F11"),               KEY_F11               },
+    { N_("F12"),               KEY_F12               },
+    { N_("F2"),                KEY_F2                },
+    { N_("F3"),                KEY_F3                },
+    { N_("F4"),                KEY_F4                },
+    { N_("F5"),                KEY_F5                },
+    { N_("F6"),                KEY_F6                },
+    { N_("F7"),                KEY_F7                },
+    { N_("F8"),                KEY_F8                },
+    { N_("F9"),                KEY_F9                },
+    { N_("Home"),              KEY_HOME              },
+    { N_("Insert"),            KEY_INSERT            },
+    { N_("Left"),              KEY_LEFT              },
+    { N_("Media Next Track"),  KEY_MEDIA_NEXT_TRACK  },
+    { N_("Media Play Pause"),  KEY_MEDIA_PLAY_PAUSE  },
+    { N_("Media Prev Track"),  KEY_MEDIA_PREV_TRACK  },
+    { N_("Media Stop"),        KEY_MEDIA_STOP        },
+    { N_("Menu"),              KEY_MENU              },
+    { N_("Mouse Wheel Down"),  KEY_MOUSEWHEELDOWN    },
+    { N_("Mouse Wheel Left"),  KEY_MOUSEWHEELLEFT    },
+    { N_("Mouse Wheel Right"), KEY_MOUSEWHEELRIGHT   },
+    { N_("Mouse Wheel Up"),    KEY_MOUSEWHEELUP      },
+    { N_("Page Down"),         KEY_PAGEDOWN          },
+    { N_("Page Up"),           KEY_PAGEUP            },
+    { N_("Right"),             KEY_RIGHT             },
+    { N_("Space"),             ' '                   },
+    { N_("Tab"),               KEY_TAB               },
+    { N_("Unset"),             KEY_UNSET             },
+    { N_("Up"),                KEY_UP                },
+    { N_("Volume Down"),       KEY_VOLUME_DOWN       },
+    { N_("Volume Mute"),       KEY_VOLUME_MUTE       },
+    { N_("Volume Up"),         KEY_VOLUME_UP         },
 };
 #define KEYS_COUNT (sizeof(vlc_keys)/sizeof(vlc_keys[0]))
 
@@ -150,6 +150,9 @@ static char *utf8_cp (uint_fast32_t cp, char *buf)
 
 /**
  * Parse a human-readable string representation of a VLC key code.
+ * @note This only works with the American English representation
+ * (a.k.a. C or POSIX), not with the local representation returned from
+ * vlc_keycode2str().
  * @return a VLC key code, or KEY_UNSET on failure.
  */
 uint_fast32_t vlc_str2keycode (const char *name)
@@ -190,13 +193,22 @@ uint_fast32_t vlc_str2keycode (const char *name)
     return code;
 }
 
+static char *nooptext (const char *txt)
+{
+    return (char *)txt;
+}
+
 /**
  * Format a human-readable and unique representation of a VLC key code
  * (including modifiers).
+ * @param code key code to translate to a string
+ * @param locale true to get a localized string,
+ *               false to get a C string suitable for 'vlcrc'
  * @return a heap-allocated string, or NULL on error.
  */
-char *vlc_keycode2str (uint_fast32_t code)
+char *vlc_keycode2str (uint_fast32_t code, bool locale)
 {
+    char *(*tr) (const char *) = locale ? vlc_gettext : nooptext;
     const char *name;
     char *str, buf[5];
     uintptr_t key = code & ~KEY_MODIFIER;
@@ -214,11 +226,12 @@ char *vlc_keycode2str (uint_fast32_t code)
 
 found:
     if (asprintf (&str, "%s%s%s%s%s%s",
-                  (code & KEY_MODIFIER_CTRL) ? "Ctrl+" : "",
-                  (code & KEY_MODIFIER_ALT) ? "Alt+" : "",
-                  (code & KEY_MODIFIER_SHIFT) ? "Shift+" : "",
-                  (code & KEY_MODIFIER_META) ? "Meta+" : "",
-                  (code & KEY_MODIFIER_COMMAND) ? "Command+" : "", name) == -1)
+                  (code & KEY_MODIFIER_CTRL) ? tr(N_("Ctrl+")) : "",
+                  (code & KEY_MODIFIER_ALT) ? tr(N_("Alt+")) : "",
+                  (code & KEY_MODIFIER_SHIFT) ? tr(N_("Shift+")) : "",
+                  (code & KEY_MODIFIER_META) ? tr(N_("Meta+")) : "",
+                  (code & KEY_MODIFIER_COMMAND) ? tr(N_("Command+")) : "",
+                  tr(name)) == -1)
         return NULL;
     return str;
 }

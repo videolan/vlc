@@ -39,7 +39,7 @@ const string EvtKey::getAsString() const
         msg_Warn( getIntf(), "Unknown action type" );
 
     // Add the key
-    char *keyName = vlc_keycode2str( m_key & ~KEY_MODIFIER );
+    char *keyName = vlc_keycode2str( m_key & ~KEY_MODIFIER, false );
     if( keyName )
     {
         event += (string)":" + keyName;
