@@ -464,12 +464,23 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     [self setupButton: o_intf_art_pop forIntList: "album-art"];
 
     [self setupButton: o_intf_fspanel_ckb forBoolValue: "macosx-fspanel"];
+
     [self setupButton: o_intf_nativefullscreen_ckb forBoolValue: "macosx-nativefullscreenmode"];
+    BOOL b_correct_sdk = NO;
+#ifdef MAC_OS_X_VERSION_10_7
+    b_correct_sdk = YES;
+#endif
+    if( !b_correct_sdk || !OSX_LION )
+    {
+        [o_intf_nativefullscreen_ckb setState: NSOffState];
+        [o_intf_nativefullscreen_ckb setEnabled: NO];
+    }
+
     [self setupButton: o_intf_embedded_ckb forBoolValue: "embedded-video"];
 
-[self setupButton: o_intf_appleremote_ckb forBoolValue: "macosx-appleremote"];
+    [self setupButton: o_intf_appleremote_ckb forBoolValue: "macosx-appleremote"];
 
-[self setupButton: o_intf_mediakeys_ckb forBoolValue: "macosx-mediakeys"];
+    [self setupButton: o_intf_mediakeys_ckb forBoolValue: "macosx-mediakeys"];
     if( [[SUUpdater sharedUpdater] lastUpdateCheckDate] != NULL )
         [o_intf_last_update_lbl setStringValue: [NSString stringWithFormat: _NS("Last check on: %@"), [[[SUUpdater sharedUpdater] lastUpdateCheckDate] descriptionWithLocale: [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]]]];
     else
