@@ -288,7 +288,7 @@ int qtWheelEventToVLCKey( QWheelEvent *e )
 
 QString VLCKeyToString( unsigned val )
 {
-    char *base = vlc_keycode2str (val, false);
+    char *base = vlc_keycode2str (val, true);
     if (base == NULL)
         return qtr( "Unset" );
 
