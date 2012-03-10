@@ -268,8 +268,10 @@ static int blurayOpen( vlc_object_t *object )
             goto error;
 
         /* libbluray will start playback from "First-Title" title */
-        bd_play(p_sys->bluray);
-
+        if (bd_play(p_sys->bluray) == 0) {
+            error_msg = "Failed to start bluray playback. Please try without menu support.";
+            goto error;
+        }
         /* Registering overlay event handler */
         bd_register_overlay_proc(p_sys->bluray, p_demux, blurayOverlayProc);
     } else {
