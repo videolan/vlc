@@ -2813,7 +2813,7 @@ AC_ARG_WITH(x26410b-tree,
           VLC_ADD_CFLAGS([x26410b], [-DPTW32_STATIC_LIB])
         fi
     ], [
-       if test "${enable_x26410b}" == "yes"; then
+       if test "${enable_x26410b}" = "yes"; then
         AC_MSG_ERROR([x26410b module doesn't work without staticly compiled libx264.a])
        fi
     ])
