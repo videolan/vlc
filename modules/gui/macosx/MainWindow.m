@@ -643,6 +643,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
     BOOL b_activeVideo = [[VLCMain sharedInstance] activeVideoPlayback];
     BOOL b_restored = NO;
 
+    if (b_dropzone_active && !b_activeVideo && ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0)
+    {
+        b_dropzone_active = NO;
+        [self hideDropZone];
+        return;
+    }
+
     if ( !b_splitview_removed && ( (([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0 && b_activeVideo)
                                   || (b_nonembedded && sender != nil)
                                   || (!b_activeVideo && sender != nil)
@@ -664,12 +671,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
             if (b_activeVideo)
                 b_restored = YES;
-        }
-
-        if (b_dropzone_active && !b_activeVideo)
-        {
-            b_dropzone_active = NO;
-            [self hideDropZone];
         }
 
         if (!b_nonembedded)
