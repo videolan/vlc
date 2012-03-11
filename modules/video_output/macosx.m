@@ -340,9 +340,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             if (!vd->sys)
                 return VLC_EGENERIC;
 
-            if (!config_GetInt( vd, "macosx-video-autoresize" ))
-                return VLC_SUCCESS;
-
             NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
             NSPoint topleftbase;
             NSPoint topleftscreen;
@@ -421,7 +418,8 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             // is needed in the case we do not an actual resize
             [sys->glView performSelectorOnMainThread:@selector(reshapeView:) withObject:nil waitUntilDone:NO];
 
-            if( i_height != glViewFrame.size.height || i_width != glViewFrame.size.width )
+            if (config_GetInt (vd, "macosx-video-autoresize") && query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE &&
+                (i_height != glViewFrame.size.height || i_width != glViewFrame.size.width))
             {
                 new_frame.size.width = windowFrame.size.width - glViewFrame.size.width + i_width;
                 new_frame.size.height = windowFrame.size.height - glViewFrame.size.height + i_height;
