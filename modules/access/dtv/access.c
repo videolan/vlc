@@ -589,25 +589,7 @@ static int Control (access_t *access, int query, va_list args)
 /** Determines which delivery system to use. */
 static const delsys_t *GuessSystem (const char *scheme, dvb_device_t *dev)
 {
-    /* NOTE: We should guess the delivery system for the "cable", "satellite"
-     * and "terrestrial" shortcuts (i.e. DVB, ISDB, ATSC...). But there is
-     * seemingly no sane way to do get the info with Linux DVB version 5.2.
-     * In particular, the frontend infos distinguish only the modulator class
-     * (QPSK, QAM, OFDM or ATSC).
-     *
-     * Furthermore, if the demodulator supports 2G, we cannot guess whether
-     * 1G or 2G is intended. For backward compatibility, 1G is assumed
-     * (this is not a limitation of Linux DVB). We will probably need something
-     * smarter when 2G (semi automatic) scanning is implemented. */
-    if (!strcasecmp (scheme, "cable"))
-        scheme = "dvb-c";
-    else
-    if (!strcasecmp (scheme, "satellite"))
-        scheme = "dvb-s";
-    else
-    if (!strcasecmp (scheme, "terrestrial"))
-        scheme = "dvb-t";
-
+    /* Specific delivery system is specified */
     if (!strcasecmp (scheme, "atsc"))
         return &atsc;
     if (!strcasecmp (scheme, "cqam"))
@@ -629,15 +611,48 @@ static const delsys_t *GuessSystem (const char *scheme, dvb_device_t *dev)
     if (!strcasecmp (scheme, "isdb-t"))
         return &isdbt;
 
+    /* If the demodulator supports 2G, we cannot guess whether
+     * 1G or 2G is intended. For backward compatibility, 1G is assumed
+     * (this is not a limitation of Linux DVB). We will probably need something
+     * smarter when 2G (semi automatic) scanning is implemented. */
     unsigned systems = dvb_enum_systems (dev);
-    if (systems & ATSC)
-        return &atsc;
+
+    /* Only wave carrier is specified */
+    if (!strcasecmp (scheme, "cable"))
+    {
+        if (systems & DVB_C)
+            return &dvbc;
+        if (systems & CQAM)
+            return &cqam;
+        if (systems & ISDB_C)
+            return &isdbc;
+    }
+    if (!strcasecmp (scheme, "satellite"))
+    {
+        if (systems & DVB_S)
+            return &dvbs;
+        if (systems & ISDB_S)
+            return &isdbs;
+    }
+    if (!strcasecmp (scheme, "terrestrial"))
+    {
+        if (systems & DVB_T)
+            return &dvbc;
+        if (systems & ATSC)
+            return &cqam;
+        if (systems & ISDB_T)
+            return &isdbt;
+    }
+
+    /* Only standards family or nothing is specified */
     if (systems & DVB_C)
         return &dvbc;
     if (systems & DVB_S)
         return &dvbc;
     if (systems & DVB_T)
         return &dvbt;
+    if (systems & ATSC)
+        return &atsc;
     return NULL;
 }
 
