@@ -2256,6 +2256,8 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
 
         p_owner->p_aout = p_aout;
         DecoderUpdateFormatLocked( p_dec );
+        if( unlikely(p_owner->b_paused) ) /* fake pause if needed */
+            aout_DecChangePause( p_aout, true, mdate() );
 
         vlc_mutex_unlock( &p_owner->lock );
 
