@@ -435,12 +435,13 @@ void dvb_remove_pid (dvb_device_t *d, uint16_t pid)
 static unsigned dvb_probe_frontend (dvb_device_t *d, int fd)
 {
 #if DVBv5(5)
-    struct dtv_property prop = {
-        .cmd = DTV_ENUM_DELSYS
+    struct dtv_property prop[2] = {
+        { .cmd = DTV_API_VERSION },
+        { .cmd = DTV_ENUM_DELSYS },
     };
     struct dtv_properties props = {
-        .num = 1,
-        .props = &prop
+        .num = 2,
+        .props = prop
     };
 
     if (ioctl (fd, FE_GET_PROPERTY, &props) < 0)
@@ -472,11 +473,13 @@ static unsigned dvb_probe_frontend (dvb_device_t *d, int fd)
     };
     unsigned systems = 0;
 
-    msg_Dbg (d->obj, "probing frontend");
+    msg_Dbg (d->obj, "probing frontend (kernel API v%u.%u, user API v%u.%u)",
+             prop[0].u.data >> 8, prop[0].u.data & 0xFF,
+             DVB_API_VERSION, DVB_API_VERSION_MINOR);
 
-    for (size_t i = 0; i < prop.u.buffer.len; i++)
+    for (size_t i = 0; i < prop[1].u.buffer.len; i++)
     {
-        unsigned sys = prop.u.buffer.data[i];
+        unsigned sys = prop[1].u.buffer.data[i];
 
         if (sys >= (sizeof (systab) / sizeof (systab[0])) || !systab[sys])
         {
@@ -487,15 +490,30 @@ static unsigned dvb_probe_frontend (dvb_device_t *d, int fd)
         systems |= systab[sys];
     }
 #else
-    struct dvb_frontend_info info;
+    struct dtv_property prop[1] = {
+        { .cmd = DTV_API_VERSION },
+    };
+    struct dtv_properties props = {
+        .num = 1,
+        .props = prop
+    };
 
+    if (ioctl (fd, FE_GET_PROPERTY, &props) < 0)
+    {
+        msg_Err (d->obj, "unsupported kernel DVB version 3 or older (%m)");
+        return 0;
+    }
+
+    msg_Dbg (d->obj, "probing frontend (kernel API v%u.%u, user API v%u.%u)",
+             prop[0].u.data >> 8, prop[0].u.data & 0xFF,
+             DVB_API_VERSION, DVB_API_VERSION_MINOR);
+    struct dvb_frontend_info info;
     if (ioctl (fd, FE_GET_INFO, &info) < 0)
     {
         msg_Err (d->obj, "cannot get frontend info: %m");
         return 0;
     }
-
-    msg_Dbg (d->obj, "probing frontend: %s", info.name);
+    msg_Dbg (d->obj, " name %s", info.name);
     msg_Dbg (d->obj, " type %u, capabilities 0x%08X", info.type, info.caps);
     msg_Dbg (d->obj, " frequencies %10"PRIu32" to %10"PRIu32,
              info.frequency_min, info.frequency_max);
