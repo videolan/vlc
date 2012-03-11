@@ -68,7 +68,7 @@ static int dvb_open_node (int dir, const char *type, unsigned dev, int flags)
     int fd;
     char path[strlen (type) + 4];
 
-    snprintf (path, sizeof (path), "%s%"PRIu8, type, dev);
+    snprintf (path, sizeof (path), "%s%u", type, dev);
     fd = vlc_openat (dir, path, flags);
     if (fd != -1)
         fcntl (fd, F_SETFL, fcntl (fd, F_GETFL) | O_NONBLOCK);
