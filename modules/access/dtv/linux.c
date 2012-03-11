@@ -185,7 +185,7 @@ struct dvb_device
 #ifdef HAVE_DVBPSI
     cam_t *cam;
 #endif
-    struct dvb_frontend_info info;
+    unsigned systems;
     bool budget;
     //size_t buffer_size;
 };
@@ -431,12 +431,66 @@ void dvb_remove_pid (dvb_device_t *d, uint16_t pid)
 #endif
 }
 
+/** Enumerates the systems supported by one frontend */
+static unsigned dvb_probe_frontend (dvb_device_t *d, int fd)
+{
+    struct dvb_frontend_info info;
+
+    if (ioctl (fd, FE_GET_INFO, &info) < 0)
+    {
+        msg_Err (d->obj, "cannot get frontend info: %m");
+        return 0;
+    }
+
+    msg_Dbg (d->obj, "probing frontend: %s", info.name);
+    msg_Dbg (d->obj, " type %u, capabilities 0x%08X", info.type, info.caps);
+    msg_Dbg (d->obj, " frequencies %10"PRIu32" to %10"PRIu32,
+             info.frequency_min, info.frequency_max);
+    msg_Dbg (d->obj, " (%"PRIu32" tolerance, %"PRIu32" per step)",
+             info.frequency_tolerance, info.frequency_stepsize);
+    msg_Dbg (d->obj, " bauds rates %10"PRIu32" to %10"PRIu32,
+             info.symbol_rate_min, info.symbol_rate_max);
+    msg_Dbg (d->obj, " (%"PRIu32" tolerance)", info.symbol_rate_tolerance);
+
+    unsigned systems;
+
+    /* DVB first generation and ATSC */
+    switch (info.type)
+    {
+        case FE_QPSK: systems = DVB_S; break;
+        case FE_QAM:  systems = DVB_C; break;
+        case FE_OFDM: systems = DVB_T; break;
+        case FE_ATSC: systems = ATSC;  break;
+        default:
+            systems = 0;
+            msg_Err (d->obj, "unknown frontend type %u", info.type);
+    }
+
+    /* DVB 2nd generation */
+    switch (info.type)
+    {
+        case FE_QPSK:
+        case FE_QAM:
+        case FE_OFDM:
+            if (info.caps & FE_CAN_2G_MODULATION)
+                systems |= systems << 1; /* DVB_foo -> DVB_foo|DVB_foo2 */
+        default:
+            break;
+    }
+
+    /* ISDB (only terrestrial before DVBv5.5)  */
+    if (info.type == FE_OFDM)
+        systems |= ISDB_T;
+
+    return systems;
+}
+
 /** Finds a frontend of the correct type */
-static int dvb_find_frontend (dvb_device_t *d, fe_type_t type, fe_caps_t caps)
+static int dvb_find_frontend (dvb_device_t *d, unsigned system)
 {
     if (d->frontend != -1)
     {
-        if (d->info.type == type || (d->info.caps & caps) == caps)
+        if (d->systems & system)
             return 0; /* already got an adequate frontend */
 
         close (d->frontend);
@@ -454,35 +508,15 @@ static int dvb_find_frontend (dvb_device_t *d, fe_type_t type, fe_caps_t caps)
             continue;
         }
 
-        if (ioctl (fd, FE_GET_INFO, &d->info) < 0)
+        d->systems = dvb_probe_frontend (d, fd);
+        if (d->systems & system)
         {
-            msg_Err (d->obj, "cannot get frontend %u info: %m", n);
-            goto skip;
+            msg_Dbg (d->obj, "selected frontend %u", n);
+            d->frontend = fd;
+            return 0;
         }
 
-        msg_Dbg (d->obj, "probing frontend %u: %s", n, d->info.name);
-        msg_Dbg (d->obj, " type %u, capabilities 0x%08X", d->info.type,
-                 d->info.caps);
-        msg_Dbg (d->obj, " frequencies %10"PRIu32" to %10"PRIu32,
-                 d->info.frequency_min, d->info.frequency_max);
-        msg_Dbg (d->obj, " (%"PRIu32" tolerance, %"PRIu32" per step)",
-                 d->info.frequency_tolerance, d->info.frequency_stepsize);
-        msg_Dbg (d->obj, " bauds rates %10"PRIu32" to %10"PRIu32,
-                 d->info.symbol_rate_min, d->info.symbol_rate_max);
-        msg_Dbg (d->obj, " (%"PRIu32" tolerance)",
-                 d->info.symbol_rate_tolerance);
-
-        if (d->info.type != type || (d->info.caps & caps) != caps)
-        {
-            msg_Dbg (d->obj, "skipping frontend %u: wrong type", n);
-            goto skip;
-        }
-
-        msg_Dbg (d->obj, "selected frontend %u", n);
-        d->frontend = fd;
-        return 0;
-
-    skip:
+        msg_Dbg (d->obj, "skipping frontend %u: wrong type", n);
         close (fd);
     }
 
@@ -509,33 +543,8 @@ unsigned dvb_enum_systems (dvb_device_t *d)
             continue;
         }
 
-        struct dvb_frontend_info info;
-        if (ioctl (fd, FE_GET_INFO, &info) < 0)
-        {
-            msg_Err (d->obj, "cannot get frontend %u info: %m", n);
-            close (fd);
-            continue;
-        }
+        systems |= dvb_probe_frontend (d, fd);
         close (fd);
-
-        /* Linux DVB lacks detection for non-DVB/non-ATSC demods */
-        static const unsigned types[] = {
-            [FE_QPSK] = DVB_S,
-            [FE_QAM] = DVB_C,
-            [FE_OFDM] = DVB_T,
-            [FE_ATSC] = ATSC,
-        };
-
-        if (((unsigned)info.type) >= sizeof (types) / sizeof (types[0]))
-        {
-            msg_Err (d->obj, "unknown frontend type %u", info.type);
-            continue;
-        }
-
-        unsigned sys = types[info.type];
-        if (info.caps & FE_CAN_2G_MODULATION)
-            sys |= sys << 1; /* DVB_foo -> DVB_foo|DVB_foo2 */
-        systems |= sys;
     }
     return systems;
 }
@@ -633,7 +642,7 @@ int dvb_set_dvbc (dvb_device_t *d, uint32_t freq, const char *modstr,
     unsigned mod = dvb_parse_modulation (modstr, QAM_AUTO);
     fec = dvb_parse_fec (fec);
 
-    if (dvb_find_frontend (d, FE_QAM, FE_IS_STUPID))
+    if (dvb_find_frontend (d, DVB_C))
         return -1;
     return dvb_set_props (d, 6, DTV_CLEAR, 0,
 #if DVBv5(5)
@@ -766,7 +775,7 @@ int dvb_set_dvbs (dvb_device_t *d, uint64_t freq_Hz,
     uint32_t freq = freq_Hz / 1000;
     fec = dvb_parse_fec (fec);
 
-    if (dvb_find_frontend (d, FE_QPSK, FE_IS_STUPID))
+    if (dvb_find_frontend (d, DVB_S))
         return -1;
     return dvb_set_props (d, 5, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_DVBS,
                           DTV_FREQUENCY, freq, DTV_SYMBOL_RATE, srate,
@@ -795,7 +804,7 @@ int dvb_set_dvbs2 (dvb_device_t *d, uint64_t freq_Hz, const char *modstr,
         default: rolloff = PILOT_AUTO; break;
     }
 
-    if (dvb_find_frontend (d, FE_QPSK, FE_CAN_2G_MODULATION))
+    if (dvb_find_frontend (d, DVB_S2))
         return -1;
     return dvb_set_props (d, 8, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_DVBS2,
                           DTV_FREQUENCY, freq, DTV_MODULATION, mod,
@@ -879,7 +888,7 @@ int dvb_set_dvbt (dvb_device_t *d, uint32_t freq, const char *modstr,
     guard = dvb_parse_guard (guard);
     hierarchy = dvb_parse_hierarchy (hierarchy);
 
-    if (dvb_find_frontend (d, FE_OFDM, FE_IS_STUPID))
+    if (dvb_find_frontend (d, DVB_T))
         return -1;
     return dvb_set_props (d, 10, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_DVBT,
                           DTV_FREQUENCY, freq, DTV_MODULATION, mod,
@@ -901,7 +910,7 @@ int dvb_set_dvbt2 (dvb_device_t *d, uint32_t freq, const char *modstr,
     transmit_mode = dvb_parse_transmit_mode (transmit_mode);
     guard = dvb_parse_guard (guard);
 
-    if (dvb_find_frontend (d, FE_OFDM, FE_CAN_2G_MODULATION))
+    if (dvb_find_frontend (d, DVB_T2))
         return -1;
     return dvb_set_props (d, 8, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_DVBT2,
                           DTV_FREQUENCY, freq, DTV_MODULATION, mod,
@@ -925,7 +934,7 @@ int dvb_set_isdbc (dvb_device_t *d, uint32_t freq, const char *modstr,
     unsigned mod = dvb_parse_modulation (modstr, QAM_AUTO);
     fec = dvb_parse_fec (fec);
 
-    if (dvb_find_frontend (d, FE_QAM, FE_IS_STUPID))
+    if (dvb_find_frontend (d, ISDB_C))
         return -1;
     return dvb_set_props (d, 6, DTV_CLEAR, 0,
 #if DVBv5(5)
@@ -945,7 +954,7 @@ int dvb_set_isdbs (dvb_device_t *d, uint64_t freq_Hz, uint16_t ts_id)
 #if DVBv5(1)
     uint32_t freq = freq_Hz / 1000;
 
-    if (dvb_find_frontend (d, FE_QPSK, FE_IS_STUPID))
+    if (dvb_find_frontend (d, ISDB_S))
         return -1;
     return dvb_set_props (d, 5, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_ISDBS,
                           DTV_FREQUENCY, freq,
@@ -988,7 +997,7 @@ int dvb_set_isdbt (dvb_device_t *d, uint32_t freq, uint32_t bandwidth,
     transmit_mode = dvb_parse_transmit_mode (transmit_mode);
     guard = dvb_parse_guard (guard);
 
-    if (dvb_find_frontend (d, FE_OFDM, FE_IS_STUPID))
+    if (dvb_find_frontend (d, ISDB_T))
         return -1;
     if (dvb_set_props (d, 5, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_ISDBT,
                        DTV_FREQUENCY, freq, DTV_BANDWIDTH_HZ, bandwidth,
@@ -1013,7 +1022,7 @@ int dvb_set_atsc (dvb_device_t *d, uint32_t freq, const char *modstr)
 {
     unsigned mod = dvb_parse_modulation (modstr, VSB_8);
 
-    if (dvb_find_frontend (d, FE_ATSC, FE_IS_STUPID))
+    if (dvb_find_frontend (d, ATSC))
         return -1;
     return dvb_set_props (d, 4, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_ATSC,
                           DTV_FREQUENCY, freq, DTV_MODULATION, mod);
@@ -1023,7 +1032,7 @@ int dvb_set_cqam (dvb_device_t *d, uint32_t freq, const char *modstr)
 {
     unsigned mod = dvb_parse_modulation (modstr, QAM_AUTO);
 
-    if (dvb_find_frontend (d, FE_QAM, FE_IS_STUPID))
+    if (dvb_find_frontend (d, ATSC))
         return -1;
     return dvb_set_props (d, 4, DTV_CLEAR, 0,
                           DTV_DELIVERY_SYSTEM, SYS_DVBC_ANNEX_B,
