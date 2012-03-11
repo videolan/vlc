@@ -460,7 +460,7 @@ static unsigned dvb_probe_frontend (dvb_device_t *d, int fd)
         case FE_QPSK: systems = DVB_S; break;
         case FE_QAM:  systems = DVB_C; break;
         case FE_OFDM: systems = DVB_T; break;
-        case FE_ATSC: systems = ATSC;  break;
+        case FE_ATSC: systems = ATSC | CQAM; break;
         default:
             systems = 0;
             msg_Err (d->obj, "unknown frontend type %u", info.type);
@@ -1032,7 +1032,7 @@ int dvb_set_cqam (dvb_device_t *d, uint32_t freq, const char *modstr)
 {
     unsigned mod = dvb_parse_modulation (modstr, QAM_AUTO);
 
-    if (dvb_find_frontend (d, ATSC))
+    if (dvb_find_frontend (d, CQAM))
         return -1;
     return dvb_set_props (d, 4, DTV_CLEAR, 0,
                           DTV_DELIVERY_SYSTEM, SYS_DVBC_ANNEX_B,

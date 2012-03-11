@@ -28,6 +28,7 @@ extern "C" {
 
 enum {
     ATSC   = 0x00000001,
+    CQAM   = 0x00000002,
 
     DVB_C  = 0x00000010,
     DVB_C2 = 0x00000020,
