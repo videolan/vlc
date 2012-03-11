@@ -335,11 +335,10 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_CHANGE_ZOOM:
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-            return VLC_SUCCESS;
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         {
-            // is needed in the case we do not an actual resize
-            [sys->glView performSelectorOnMainThread:@selector(reshapeView:) withObject:nil waitUntilDone:NO];
+            if (!vd->sys)
+                return VLC_EGENERIC;
 
             if (!config_GetInt( vd, "macosx-video-autoresize" ))
                 return VLC_SUCCESS;
@@ -349,6 +348,8 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             NSPoint topleftscreen;
             NSRect new_frame;
             const vout_display_cfg_t *cfg;
+            int i_width = 0;
+            int i_height = 0;
 
             id o_window = [sys->glView window];
             if (!o_window)
@@ -361,15 +362,64 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             topleftbase.x = 0;
             topleftbase.y = windowFrame.size.height;
             topleftscreen = [o_window convertBaseToScreen: topleftbase];
-            cfg = (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
-            int i_width = cfg->display.width;
-            int i_height = cfg->display.height;
+
+            if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP || query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT)
+            {
+                const video_format_t *source;
+
+                source = (const video_format_t *)va_arg (ap, const video_format_t *);
+                cfg = vd->cfg;
+
+                vout_display_place_t place;
+                vout_display_PlacePicture (&place, source, cfg, false);
+
+                vd->fmt.i_width  = vd->source.i_width  * place.width  / vd->source.i_visible_width;
+                vd->fmt.i_height = vd->source.i_height * place.height / vd->source.i_visible_height;
+                vd->fmt.i_visible_width  = vd->source.i_visible_width;
+                vd->fmt.i_visible_height = vd->source.i_visible_height;
+                vd->fmt.i_x_offset = vd->source.i_x_offset * place.width  / vd->source.i_visible_width;
+                vd->fmt.i_y_offset = vd->source.i_y_offset * place.height / vd->source.i_visible_height;
+
+                i_width = place.width;
+                i_height = place.height;
+
+                if (vd->fmt.i_x_offset > 0)
+                {
+                    if (vd->source.i_width / vd->fmt.i_x_offset <= 4)
+                    {
+                        /* hack and special case for the "Default" state
+                         * The 'Default' state tries to set the dimensions with a huge x offset and a weird
+                         * width / height ratio, which definitely isn't the default for the played media. 
+                         * That's why, we enforce the media's actual dimensions here.
+                         * The quotient of 4 is a stochastic value, which isn't reached by any other crop state. */
+                        vd->fmt.i_width  = vd->source.i_width;
+                        vd->fmt.i_height = vd->source.i_height;
+                        vd->fmt.i_visible_width  = vd->source.i_width;
+                        vd->fmt.i_visible_height = vd->source.i_height;
+                        vd->fmt.i_x_offset = 0;
+                        vd->fmt.i_y_offset = 0;
+                        i_width = vd->source.i_width;
+                        i_height = vd->source.i_height;
+                    }
+                }
+
+                glViewport (0, 0, i_width, i_height);
+            }
+            else
+            {
+                cfg = (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
+                i_width = cfg->display.width;
+                i_height = cfg->display.height;
+            }
 
             /* Calculate the window's new size, if it is larger than our minimal size */
             if (i_width < windowMinSize.width)
                 i_width = windowMinSize.width;
             if (i_height < windowMinSize.height)
                 i_height = windowMinSize.height;
+
+            // is needed in the case we do not an actual resize
+            [sys->glView performSelectorOnMainThread:@selector(reshapeView:) withObject:nil waitUntilDone:NO];
 
             if( i_height != glViewFrame.size.height || i_width != glViewFrame.size.width )
             {
