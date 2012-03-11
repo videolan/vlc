@@ -1042,7 +1042,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     {
         NSMenuItem * o_lmi_tmp;
         o_lmi_tmp = [o_menu addItemWithTitle: _NS("Open File...") action: @selector(addSubtitleFile:) keyEquivalent: @""];
-        [o_lmi_tmp setTarget: self];
+        [o_lmi_tmp setTarget: [[VLCMain sharedInstance] controls]];
         [o_lmi_tmp setEnabled: YES];
         [o_parent setEnabled: YES];
         [o_menu addItem: [NSMenuItem separatorItem]];
