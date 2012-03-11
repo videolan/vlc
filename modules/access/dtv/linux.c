@@ -450,7 +450,7 @@ static int dvb_find_frontend (dvb_device_t *d, fe_type_t type, fe_caps_t caps)
         {
             if (errno == ENOENT)
                 break; /* all frontends already enumerated */
-            msg_Err (d->obj, "cannot access frontend %u; %m", n);
+            msg_Err (d->obj, "cannot access frontend %u: %m", n);
             continue;
         }
 
