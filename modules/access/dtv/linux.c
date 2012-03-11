@@ -447,7 +447,7 @@ static unsigned dvb_probe_frontend (dvb_device_t *d, int fd)
     if (ioctl (fd, FE_GET_PROPERTY, &props) < 0)
     {
          msg_Err (d->obj, "cannot enumerate frontend systems: %m");
-         return 0;
+         goto legacy;
     }
 
     static const unsigned systab[] = {
@@ -489,6 +489,10 @@ static unsigned dvb_probe_frontend (dvb_device_t *d, int fd)
         msg_Dbg (d->obj, " system %u", sys);
         systems |= systab[sys];
     }
+
+    return systems;
+legacy:
+    props.num = 1;
 #else
     struct dtv_property prop[1] = {
         { .cmd = DTV_API_VERSION },
@@ -497,7 +501,8 @@ static unsigned dvb_probe_frontend (dvb_device_t *d, int fd)
         .num = 1,
         .props = prop
     };
-
+    unsigned systems = 0;
+#endif
     if (ioctl (fd, FE_GET_PROPERTY, &props) < 0)
     {
         msg_Err (d->obj, "unsupported kernel DVB version 3 or older (%m)");
@@ -507,6 +512,15 @@ static unsigned dvb_probe_frontend (dvb_device_t *d, int fd)
     msg_Dbg (d->obj, "probing frontend (kernel API v%u.%u, user API v%u.%u)",
              prop[0].u.data >> 8, prop[0].u.data & 0xFF,
              DVB_API_VERSION, DVB_API_VERSION_MINOR);
+#if !DVBv5(5)
+    /* Some delivery systems cannot be detected without the DVB API v5.5.
+     * To run correctly on recent kernels (Linux >= 3.3),
+     * VLC needs to be compiled with up-to-date kernel headers. */
+    if ((prop[0].u.data >> 8) > 5
+     || ((prop[0].u.data >> 8) == 5 && (prop[0].u.data & 0xFF) >= 5))
+        msg_Err (d->obj, "obsolete user API version running on a new kernel");
+        msg_Info (d->obj, "please recompile "PACKAGE_NAME" "PACKAGE_VERSION);
+#endif
     struct dvb_frontend_info info;
     if (ioctl (fd, FE_GET_INFO, &info) < 0)
     {
@@ -523,8 +537,6 @@ static unsigned dvb_probe_frontend (dvb_device_t *d, int fd)
              info.symbol_rate_min, info.symbol_rate_max);
     msg_Dbg (d->obj, " (%"PRIu32" tolerance)", info.symbol_rate_tolerance);
 
-    unsigned systems;
-
     /* DVB first generation and ATSC */
     switch (info.type)
     {
@@ -533,7 +545,6 @@ static unsigned dvb_probe_frontend (dvb_device_t *d, int fd)
         case FE_OFDM: systems = DVB_T; break;
         case FE_ATSC: systems = ATSC | CQAM; break;
         default:
-            systems = 0;
             msg_Err (d->obj, "unknown frontend type %u", info.type);
     }
 
@@ -552,7 +563,7 @@ static unsigned dvb_probe_frontend (dvb_device_t *d, int fd)
     /* ISDB (only terrestrial before DVBv5.5)  */
     if (info.type == FE_OFDM)
         systems |= ISDB_T;
-#endif
+
     return systems;
 }
 
