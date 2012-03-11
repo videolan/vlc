@@ -434,6 +434,59 @@ void dvb_remove_pid (dvb_device_t *d, uint16_t pid)
 /** Enumerates the systems supported by one frontend */
 static unsigned dvb_probe_frontend (dvb_device_t *d, int fd)
 {
+#if DVBv5(5)
+    struct dtv_property prop = {
+        .cmd = DTV_ENUM_DELSYS
+    };
+    struct dtv_properties props = {
+        .num = 1,
+        .props = &prop
+    };
+
+    if (ioctl (fd, FE_GET_PROPERTY, &props) < 0)
+    {
+         msg_Err (d->obj, "cannot enumerate frontend systems: %m");
+         return 0;
+    }
+
+    static const unsigned systab[] = {
+        [SYS_UNDEFINED]    = 0,
+        [SYS_DVBC_ANNEX_A] = DVB_C,
+        [SYS_DVBC_ANNEX_B] = CQAM,
+        [SYS_DVBT]         = DVB_T,
+        //[SYS_DSS]
+        [SYS_DVBS]         = DVB_S,
+        [SYS_DVBS2]        = DVB_S2,
+        //[SYS_DVBH]
+        [SYS_ISDBT]        = ISDB_T,
+        [SYS_ISDBS]        = ISDB_S,
+        [SYS_ISDBC]        = ISDB_C, // no drivers exist (as of 3.3-rc6)
+        [SYS_ATSC]         = ATSC,
+        //[SYS_ATSCMH]
+        //[SYS_DMBTH]
+        //[SYS_CMMB]
+        //[SYS_DAB]
+        [SYS_DVBT2]        = DVB_T2,
+        //[SYS_TURBO]
+        [SYS_DVBC_ANNEX_C] = ISDB_C, // another name for ISDB-C?
+    };
+    unsigned systems = 0;
+
+    msg_Dbg (d->obj, "probing frontend");
+
+    for (size_t i = 0; i < prop.u.buffer.len; i++)
+    {
+        unsigned sys = prop.u.buffer.data[i];
+
+        if (sys >= (sizeof (systab) / sizeof (systab[0])) || !systab[sys])
+        {
+            msg_Warn (d->obj, "unknown delivery system %u", sys);
+            continue;
+        }
+        msg_Dbg (d->obj, " system %u", sys);
+        systems |= systab[sys];
+    }
+#else
     struct dvb_frontend_info info;
 
     if (ioctl (fd, FE_GET_INFO, &info) < 0)
@@ -481,7 +534,7 @@ static unsigned dvb_probe_frontend (dvb_device_t *d, int fd)
     /* ISDB (only terrestrial before DVBv5.5)  */
     if (info.type == FE_OFDM)
         systems |= ISDB_T;
-
+#endif
     return systems;
 }
 
