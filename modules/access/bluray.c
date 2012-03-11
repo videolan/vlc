@@ -959,7 +959,7 @@ static void blurayHandleEvent( demux_t *p_demux, const BD_EVENT *e )
             break;
         case BD_EVENT_CHAPTER:
             p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
-            p_demux->info.i_seekpoint = 0;
+            p_demux->info.i_seekpoint = e->param;
             break;
         case BD_EVENT_ANGLE:
         case BD_EVENT_IG_STREAM:
