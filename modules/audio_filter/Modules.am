@@ -6,6 +6,7 @@ SOURCES_audiobargraph_a = audiobargraph_a.c
 SOURCES_param_eq = param_eq.c
 SOURCES_scaletempo = scaletempo.c
 SOURCES_chorus_flanger = chorus_flanger.c
+SOURCES_stereo_widen = stereo_widen.c
 SOURCES_spatializer = \
 	spatializer/allpass.cpp spatializer/allpass.hpp \
 	spatializer/comb.cpp spatializer/comb.hpp \
@@ -23,7 +24,8 @@ libvlc_LTLIBRARIES += \
 	libnormvol_plugin.la \
 	libparam_eq_plugin.la \
 	libscaletempo_plugin.la \
-	libspatializer_plugin.la
+	libspatializer_plugin.la \
+	libstereo_widen_plugin.la
 
 # Channel mixers
 SOURCES_trivial_channel_mixer = channel_mixer/trivial.c

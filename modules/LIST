@@ -304,6 +304,7 @@ $Id$
  * spudec: RLE DVD subtitles decoder
  * sqlite: manage an SQLite database
  * stats: Stats encoder function
+ * stereo_widen: Enhances stereo effect
  * stl: EBU STL decoder
  * stream_filter_dash: MPEG DASH playback
  * stream_filter_httplive: HTTP Live streaming for playback
