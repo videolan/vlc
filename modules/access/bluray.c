@@ -250,7 +250,7 @@ static int blurayOpen( vlc_object_t *object )
     /* Get titles and chapters */
     p_sys->p_meta = bd_get_meta(p_sys->bluray);
     if (!p_sys->p_meta)
-        goto error;
+        msg_Warn(p_demux, "Failed to get meta info." );
 
     if (blurayInitTitles(p_demux) != VLC_SUCCESS) {
         goto error;
@@ -912,6 +912,8 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         {
             vlc_meta_t *p_meta = (vlc_meta_t *) va_arg (args, vlc_meta_t*);
             const META_DL *meta = p_sys->p_meta;
+            if (meta == NULL)
+                return VLC_EGENERIC;
 
             if (!EMPTY_STR(meta->di_name)) vlc_meta_SetTitle(p_meta, meta->di_name);
 
