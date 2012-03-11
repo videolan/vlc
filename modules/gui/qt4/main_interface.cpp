@@ -348,6 +348,7 @@ void MainInterface::recreateToolbars()
         fullscreenControls = new FullscreenControllerWidget( p_intf, this );
         CONNECT( fullscreenControls, keyPressed( QKeyEvent * ),
                  this, handleKeyPress( QKeyEvent * ) );
+        THEMIM->requestVoutUpdate();
     }
 }
 
