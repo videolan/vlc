@@ -6,5 +6,5 @@ diff -ru libbluray/src/libbluray.pc.in libbluray2/src/libbluray.pc.in
  Description: library supporting Blu-ray playback
  Version: @PACKAGE_VERSION@
 -Libs: -L${libdir} -lbluray
-+Libs: -L${libdir} -lbluray @DLOPEN_LDFLAGS@
++Libs: -L${libdir} -lbluray @DLOPEN_LDFLAGS@ @LIBXML2_LIBS@
  Cflags: -I${includedir}
