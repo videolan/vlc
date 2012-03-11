@@ -264,8 +264,10 @@ static int blurayOpen( vlc_object_t *object )
     p_sys->b_menu = var_InheritBool(p_demux, "bluray-menu");
     if (p_sys->b_menu) {
         p_sys->p_input = demux_GetParentInput(p_demux);
-        if (unlikely(!p_sys->p_input))
+        if (unlikely(!p_sys->p_input)) {
+            error_msg = "Could not get parent input";
             goto error;
+        }
 
         /* libbluray will start playback from "First-Title" title */
         if (bd_play(p_sys->bluray) == 0) {
