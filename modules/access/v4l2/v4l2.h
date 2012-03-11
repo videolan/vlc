@@ -65,16 +65,13 @@
 # define V4L2_CID_ROTATE (V4L2_CID_BASE+34)
 #endif
 
-#ifdef HAVE_LIBV4L2
-#   include <libv4l2.h>
-#else
-#   define v4l2_close close
-#   define v4l2_dup dup
-#   define v4l2_ioctl ioctl
-#   define v4l2_read read
-#   define v4l2_mmap mmap
-#   define v4l2_munmap munmap
-#endif
+/* libv4l2 functions */
+extern int v4l2_fd_open (int, int);
+extern int (*v4l2_close) (int);
+extern int (*v4l2_ioctl) (int, unsigned long int, ...);
+extern ssize_t (*v4l2_read) (int, void *, size_t);
+extern void * (*v4l2_mmap) (void *, size_t, int, int, int, int64_t);
+extern int (*v4l2_munmap) (void *, size_t);
 
 #define CFG_PREFIX "v4l2-"
 
@@ -105,10 +102,6 @@ struct demux_sys_t
     es_out_id_t *p_es;
 
     vlc_v4l2_ctrl_t *controls;
-
-#ifdef HAVE_LIBV4L2
-    bool b_libv4l2;
-#endif
 };
 
 struct buffer_t

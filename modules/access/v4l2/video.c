@@ -82,12 +82,6 @@
 #define FPS_LONGTEXT N_( "Framerate to capture, if applicable " \
     "(0 for autodetect)." )
 
-#ifdef HAVE_LIBV4L2
-#define LIBV4L2_TEXT N_( "Use libv4l2" )
-#define LIBV4L2_LONGTEXT N_( \
-    "Force usage of the libv4l2 wrapper." )
-#endif
-
 #define CTRL_RESET_TEXT N_( "Reset controls" )
 #define CTRL_RESET_LONGTEXT N_( "Reset controls to defaults." )
 #define BRIGHTNESS_TEXT N_( "Brightness" )
@@ -340,9 +334,7 @@ vlc_module_begin ()
         change_safe()
     add_float( CFG_PREFIX "fps", 0, FPS_TEXT, FPS_LONGTEXT, true )
         change_safe()
-#ifdef HAVE_LIBV4L2
-    add_bool( CFG_PREFIX "use-libv4l2", false, LIBV4L2_TEXT, LIBV4L2_LONGTEXT, true );
-#endif
+    add_obsolete_bool( CFG_PREFIX "use-libv4l2" ) /* since 2.1.0 */
 
     set_section( N_( "Tuner" ), NULL )
     add_integer( CFG_PREFIX "tuner", 0, TUNER_TEXT, TUNER_LONGTEXT,
@@ -807,25 +799,12 @@ int OpenVideo( vlc_object_t *obj, demux_sys_t *sys, bool b_demux )
         return -1;
     }
     free( path );
-#ifdef HAVE_LIBV4L2
-    if( !var_InheritBool( obj, CFG_PREFIX "use-libv4l2" ) )
-    {
-        msg_Dbg( obj, "trying kernel V4L2" );
-        if( InitVideo( obj, fd, sys, b_demux ) == 0 )
-            return fd;
-    }
-    msg_Dbg( obj, "trying library V4L2" );
-    /* Note the v4l2_xxx functions are designed so that if they get passed an
-       unknown fd, the will behave exactly as their regular xxx counterparts,
-       so if v4l2_fd_open fails, we continue as normal (missing the libv4l2
-       custom cam format to normal formats conversion). Chances are big we will
-       still fail then though, as normally v4l2_fd_open only fails if the
-       device is not a v4l2 device. */
+
     int libfd = v4l2_fd_open( fd, 0 );
     if( libfd == -1 )
         goto error;
-    fd = libfd;
-#endif
+    libfd = fd;
+
     if( InitVideo( obj, fd, sys, b_demux ) )
         goto error;
 

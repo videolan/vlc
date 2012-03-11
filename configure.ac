@@ -1840,11 +1840,6 @@ AS_IF([test "$enable_v4l2" != "no"], [
   ])
 ])
 AS_IF([test "$have_v4l2" = "yes"], [
-  PKG_CHECK_MODULES(LIBV4L2, libv4l2, [
-    AC_DEFINE(HAVE_LIBV4L2, 1, [Define to 1 if libv4l2 is available])
-  ], [
-    AC_MSG_WARN([${LIBV4L2_PKG_ERRORS}.])
-  ])
   AS_IF([test "${enable_pvr}" = "yes"], [
     VLC_ADD_PLUGIN([pvr])
   ])
