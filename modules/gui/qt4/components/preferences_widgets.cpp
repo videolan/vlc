@@ -1315,7 +1315,8 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
     QGridLayout *gLayout = new QGridLayout( keyContainer );
 
     label = new QLabel(
-        qtr( "Select or double click an action to change the associated hotkey") );
+        qtr( "Select or double click an action to change the associated "
+             "hotkey. Use delete key to remove hotkeys") );
 
     QLabel *searchLabel = new QLabel( qtr( "Search" ) );
     SearchLineEdit *actionSearch = new SearchLineEdit( keyContainer );
