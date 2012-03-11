@@ -568,6 +568,8 @@ void dvb_set_ca_pmt (dvb_device_t *d, struct dvbpsi_pmt_s *pmt)
 
 static int dvb_vset_props (dvb_device_t *d, size_t n, va_list ap)
 {
+    assert (n <= DTV_IOCTL_MAX_MSGS);
+
     struct dtv_property buf[n], *prop = buf;
     struct dtv_properties props = { .num = n, .props = buf };
 
