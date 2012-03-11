@@ -243,7 +243,7 @@ function parse_url_request(request)
 end
 
 local function find_datadir(name)
-    local list = vlc.misc.datadir_list(name)
+    local list = vlc.config.datadir_list(name)
     for _, l in ipairs(list) do
         local s = vlc.net.stat(l)
         if s then

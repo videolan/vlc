@@ -380,7 +380,7 @@ getbrowsetable = function ()
     result.element._array={}
 
     if dir then
-        if dir == "~" or dir == "file://~" then dir = vlc.misc.homedir() end
+        if dir == "~" or dir == "file://~" then dir = vlc.config.homedir() end
         -- FIXME: hack for Win32 drive list
         if dir~="" then
             dir = common.realpath(dir.."/")

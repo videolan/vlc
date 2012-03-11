@@ -48,6 +48,14 @@ Configuration
 -------------
 config.get( name ): Get the VLC configuration option "name"'s value.
 config.set( name, value ): Set the VLC configuration option "name"'s value.
+config.datadir(): Get the VLC data directory.
+config.userdatadir(): Get the user's VLC data directory.
+config.homedir(): Get the user's home directory.
+config.configdir(): Get the user's VLC config directory.
+config.cachedir(): Get the user's VLC cache directory.
+
+config.datadir_list( name ): FIXME: write description ... or ditch function
+  if it isn't useful anymore, we have datadir and userdatadir :)
 
 Dialog
 ------
@@ -145,15 +153,6 @@ Misc
 misc.version(): Get the VLC version string.
 misc.copyright(): Get the VLC copyright statement.
 misc.license(): Get the VLC license.
-
-misc.datadir(): Get the VLC data directory.
-misc.userdatadir(): Get the user's VLC data directory.
-misc.homedir(): Get the user's home directory.
-misc.configdir(): Get the user's VLC config directory.
-misc.cachedir(): Get the user's VLC cache directory.
-
-misc.datadir_list( name ): FIXME: write description ... or ditch function
-  if it isn't useful anymore, we have datadir and userdatadir :)
 
 misc.action_id( name ): get the id of the given action.
 

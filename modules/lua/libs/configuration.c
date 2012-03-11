@@ -103,11 +103,80 @@ static int vlclua_config_set( lua_State *L )
 }
 
 /*****************************************************************************
+ * Directories configuration
+ *****************************************************************************/
+static int vlclua_datadir( lua_State *L )
+{
+    char *psz_data = config_GetDataDir( vlclua_get_this( L ) );
+    lua_pushstring( L, psz_data );
+    free( psz_data );
+    return 1;
+}
+
+static int vlclua_userdatadir( lua_State *L )
+{
+    char *dir = config_GetUserDir( VLC_DATA_DIR );
+    lua_pushstring( L, dir );
+    free( dir );
+    return 1;
+}
+
+static int vlclua_homedir( lua_State *L )
+{
+    char *home = config_GetUserDir( VLC_HOME_DIR );
+    lua_pushstring( L, home );
+    free( home );
+    return 1;
+}
+
+static int vlclua_configdir( lua_State *L )
+{
+    char *dir = config_GetUserDir( VLC_CONFIG_DIR );
+    lua_pushstring( L, dir );
+    free( dir );
+    return 1;
+}
+
+static int vlclua_cachedir( lua_State *L )
+{
+    char *dir = config_GetUserDir( VLC_CACHE_DIR );
+    lua_pushstring( L, dir );
+    free( dir );
+    return 1;
+}
+
+static int vlclua_datadir_list( lua_State *L )
+{
+    const char *psz_dirname = luaL_checkstring( L, 1 );
+    char **ppsz_dir_list = NULL;
+    int i = 1;
+
+    if( vlclua_dir_list( vlclua_get_this( L ), psz_dirname, &ppsz_dir_list )
+        != VLC_SUCCESS )
+        return 0;
+    lua_newtable( L );
+    for( char **ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
+    {
+        lua_pushstring( L, *ppsz_dir );
+        lua_rawseti( L, -2, i );
+        i ++;
+    }
+    vlclua_dir_list_free( ppsz_dir_list );
+    return 1;
+}
+
+/*****************************************************************************
  *
  *****************************************************************************/
 static const luaL_Reg vlclua_config_reg[] = {
     { "get", vlclua_config_get },
     { "set", vlclua_config_set },
+    { "datadir", vlclua_datadir },
+    { "userdatadir", vlclua_userdatadir },
+    { "homedir", vlclua_homedir },
+    { "configdir", vlclua_configdir },
+    { "cachedir", vlclua_cachedir },
+    { "datadir_list", vlclua_datadir_list },
     { NULL, NULL }
 };
 
