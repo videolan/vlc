@@ -36,7 +36,6 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include <QBitmap>
-#include <QPainter>
 #include <QStyleOptionSlider>
 #include <QLinearGradient>
 #include <QTimer>
@@ -62,6 +61,7 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
     f_buffering = 1.0;
     mHandleOpacity = 1.0;
     chapters = NULL;
+    mHandleLength = -1;
 
     // prepare some static colors
     QPalette p = palette();
@@ -108,6 +108,10 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
     setMouseTracking( true );
     setTracking( true );
     setFocusPolicy( Qt::NoFocus );
+
+    /* Use the new/classic style */
+    if( !b_classic )
+        setStyle( new SeekStyle );
 
     /* Init to 0 */
     setPosition( -1.0, 0, 0 );
@@ -253,7 +257,8 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
     }
 
     isSliding = true ;
-    setValue( QStyle::sliderValueFromPosition( MINIMUM, MAXIMUM, event->x(), width(), false ) );
+
+    setValue( QStyle::sliderValueFromPosition( MINIMUM, MAXIMUM, event->x() - handleLength() / 2, width() - handleLength(), false ) );
     emit sliderMoved( value() );
     event->accept();
 }
@@ -262,14 +267,15 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
 {
     if( isSliding )
     {
-        setValue( QStyle::sliderValueFromPosition( MINIMUM, MAXIMUM, event->x(), width(), false) );
+        setValue( QStyle::sliderValueFromPosition( MINIMUM, MAXIMUM, event->x() - handleLength() / 2, width() - handleLength(), false) );
         emit sliderMoved( value() );
     }
 
     /* Tooltip */
     if ( inputLength > 0 )
     {
-        int posX = qMax( rect().left(), qMin( rect().right(), event->x() ) );
+        int margin = handleLength() / 2;
+        int posX = qMax( rect().left() + margin, qMin( rect().right() - margin, event->x() ) );
 
         QString chapterLabel;
 
@@ -292,7 +298,7 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
 
         QPoint target( event->globalX() - ( event->x() - posX ),
                   QWidget::mapToGlobal( pos() ).y() );
-        secstotimestr( psz_length, ( posX * inputLength ) / size().width() );
+        secstotimestr( psz_length, ( ( posX - margin ) * inputLength ) / ( size().width() - handleLength() ) );
         mTimeTooltip->setTip( target, psz_length, chapterLabel );
     }
     event->accept();
@@ -368,176 +374,10 @@ bool SeekSlider::eventFilter( QObject *obj, QEvent *event )
 
 QSize SeekSlider::sizeHint() const
 {
+    if ( b_classic )
+        return QSlider::sizeHint();
     return ( orientation() == Qt::Horizontal ) ? QSize( 100, 18 )
                                                : QSize( 18, 100 );
-}
-
-QSize SeekSlider::handleSize() const
-{
-    const int size = ( orientation() == Qt::Horizontal ? height() : width() );
-    return QSize( size, size );
-}
-
-void SeekSlider::paintEvent( QPaintEvent *event )
-{
-    if( b_classic )
-        return QSlider::paintEvent( event );
-
-    QStyleOptionSlider option;
-    initStyleOption( &option );
-
-    /* */
-    QPainter painter( this );
-    painter.setRenderHints( QPainter::Antialiasing );
-
-    // draw bar
-    const int barCorner = 3;
-    qreal sliderPos     = -1;
-    int range           = MAXIMUM;
-    QRect barRect       = rect();
-
-    // adjust positions based on the current orientation
-    if ( option.sliderPosition != 0 )
-    {
-        switch ( orientation() )
-        {
-            case Qt::Horizontal:
-                sliderPos = ( ( (qreal)width() ) / (qreal)range )
-                        * (qreal)option.sliderPosition;
-                break;
-            case Qt::Vertical:
-                sliderPos = ( ( (qreal)height() ) / (qreal)range )
-                        * (qreal)option.sliderPosition;
-                break;
-        }
-    }
-
-    switch ( orientation() )
-    {
-        case Qt::Horizontal:
-            barRect.setHeight( height() /2 );
-            break;
-        case Qt::Vertical:
-            barRect.setWidth( width() /2 );
-            break;
-    }
-
-    barRect.moveCenter( rect().center() );
-
-    QSize hSize( handleSize() - QSize( 6, 6 ) );
-    QSize sSize( handleSize() - QSize( 2, 2 ) );
-
-    if ( gradientsTargetSize != size() )
-    {
-        /* Need to fix gradients */
-        gradientsTargetSize = size();
-        backgroundGradient.setFinalStop( 0, height() );
-        foregroundGradient.setFinalStop( 0, height() );
-        handleGradient.setFinalStop( 0, hSize.height() );
-    }
-
-    // draw a slight 3d effect on the bottom
-    painter.setPen( QColor( 230, 230, 230 ) );
-    painter.setBrush( Qt::NoBrush );
-    painter.drawRoundedRect( barRect.adjusted( 0, 2, 0, 0 ), barCorner, barCorner );
-
-    // draw background
-    painter.setPen( Qt::NoPen );
-    painter.setBrush( backgroundGradient );
-    painter.drawRoundedRect( barRect, barCorner, barCorner );
-
-    // adjusted foreground rectangle
-    QRect valueRect = barRect.adjusted( 1, 1, -1, 0 );
-
-    switch ( orientation() )
-    {
-        case Qt::Horizontal:
-            valueRect.setWidth( qMin( width(), int( sliderPos ) ) );
-            break;
-        case Qt::Vertical:
-            valueRect.setHeight( qMin( height(), int( sliderPos ) ) );
-            valueRect.moveBottom( rect().bottom() );
-            break;
-    }
-
-    if ( option.sliderPosition > minimum() && option.sliderPosition <= maximum() )
-    {
-        // draw foreground
-        painter.setPen( Qt::NoPen );
-        painter.setBrush( foregroundGradient );
-        painter.drawRoundedRect( valueRect, barCorner, barCorner );
-    }
-
-    // draw buffering overlay
-    if ( f_buffering < 1.0 )
-    {
-        QRect innerRect = barRect.adjusted( 1, 1,
-                            barRect.width() * ( -1.0 + f_buffering ) - 1, 0 );
-        QColor overlayColor = QColor( "Orange" );
-        overlayColor.setAlpha( 128 );
-        painter.setBrush( overlayColor );
-        painter.drawRoundedRect( innerRect, barCorner, barCorner );
-    }
-
-    if ( option.state & QStyle::State_MouseOver || isAnimationRunning() )
-    {
-        /* draw chapters tickpoints */
-        if ( chapters && inputLength && size().width() )
-        {
-            if ( orientation() == Qt::Horizontal ) /* TODO: vertical */
-            {
-                QList<SeekPoint> points = chapters->getPoints();
-                painter.setPen( tickpointForeground );
-                painter.setBrush( Qt::NoBrush );
-                foreach( SeekPoint point, points )
-                {
-                    int x = point.time / 1000000.0 / inputLength * size().width();
-                    painter.drawLine( x, height(), x, height() - CHAPTERSSPOTSIZE );
-                }
-            }
-        }
-
-        // draw handle
-        if ( sliderPos != -1 )
-        {
-            const int margin = 0;
-            QPoint pos;
-
-            switch ( orientation() )
-            {
-                case Qt::Horizontal:
-                    pos = QPoint( sliderPos - ( hSize.width() / 2 ), 2 );
-                    pos.rx() = qMax( margin, pos.x() );
-                    pos.rx() = qMin( width() - hSize.width() - margin, pos.x() );
-                    break;
-                case Qt::Vertical:
-                    pos = QPoint( 2, height() - ( sliderPos + ( hSize.height() / 2 ) ) );
-                    pos.ry() = qMax( margin, pos.y() );
-                    pos.ry() = qMin( height() - hSize.height() - margin, pos.y() );
-                    break;
-            }
-
-            QPoint shadowPos( pos - QPoint( 2, 2 ) );
-
-            /* FIXME: precompute gradient. Anim Compatible ? */
-            QRadialGradient shadowGradient( shadowPos.x() + ( sSize.width() / 2 ),
-                                            shadowPos.y() + ( sSize.height() / 2 ),
-                                            qMax( sSize.width(), sSize.height() ) / 2 );
-            shadowGradient.setColorAt( 0.4, shadowDark );
-            shadowGradient.setColorAt( 1.0, shadowLight );
-
-            painter.setPen( Qt::NoPen );
-            painter.setOpacity( mHandleOpacity );
-
-            // draw the handle's shadow
-            painter.setBrush( shadowGradient );
-            painter.drawEllipse( shadowPos.x(), shadowPos.y() + 1, sSize.width(), sSize.height() );
-
-            // finally draw the handle
-            painter.setBrush( handleGradient );
-            painter.drawEllipse( pos.x(), pos.y(), hSize.width(), hSize.height() );
-        }
-    }
 }
 
 qreal SeekSlider::handleOpacity() const
@@ -550,6 +390,18 @@ void SeekSlider::setHandleOpacity(qreal opacity)
     mHandleOpacity = opacity;
     /* Request a new paintevent */
     update();
+}
+
+inline int SeekSlider::handleLength()
+{
+    if ( mHandleLength > 0 )
+        return mHandleLength;
+
+    /* Ask for the length of the handle to the underlying style */
+    QStyleOptionSlider option;
+    initStyleOption( &option );
+    mHandleLength = style()->pixelMetric( QStyle::PM_SliderLength, &option );
+    return mHandleLength;
 }
 
 void SeekSlider::hideHandle()
@@ -567,6 +419,7 @@ bool SeekSlider::isAnimationRunning() const
     return animHandle->state() == QAbstractAnimation::Running
             || hideHandleTimer->isActive();
 }
+
 
 /* This work is derived from Amarok's work under GPLv2+
     - Mark Kretschmann

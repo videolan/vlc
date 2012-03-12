@@ -32,6 +32,7 @@
 
 #include <vlc_common.h>
 #include "timetooltip.hpp"
+#include "styles/seekstyle.hpp"
 
 #include <QSlider>
 #include <QPainter>
@@ -44,6 +45,7 @@ class QHideEvent;
 class QTimer;
 class SeekPoints;
 class QPropertyAnimation;
+class QStyleOption;
 
 /* Input Slider derived from QSlider */
 class SeekSlider : public QSlider
@@ -64,15 +66,14 @@ protected:
     virtual void leaveEvent( QEvent * );
     virtual void hideEvent( QHideEvent * );
 
-    virtual void paintEvent( QPaintEvent* event );
     virtual bool eventFilter( QObject *obj, QEvent *event );
 
-    QSize handleSize() const;
     virtual QSize sizeHint() const;
 
     bool isAnimationRunning() const;
     qreal handleOpacity() const;
     void setHandleOpacity( qreal opacity );
+    int handleLength();
 
 private:
     bool isSliding;        /* Whether we are currently sliding by user action */
@@ -84,6 +85,7 @@ private:
     float f_buffering;
     SeekPoints* chapters;
     bool b_classic;
+    int mHandleLength;
 
     /* Colors & gradients */
     QSize gradientsTargetSize;
@@ -109,8 +111,10 @@ private slots:
 
 signals:
     void sliderDragged( float );
-};
 
+
+    friend class SeekStyle;
+};
 
 /* Sound Slider inherited directly from QAbstractSlider */
 class QPaintEvent;

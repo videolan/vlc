@@ -96,6 +96,7 @@ nodist_SOURCES_qt4 = \
 		ui/messages_panel.h \
 		ui/about.h \
 		ui/update.h \
+		styles/seekstyle.moc.cpp \
 		dialogs/ml_configuration.moc.cpp \
 		components/playlist/ml_model.moc.cpp \
 		ui/sout.h
@@ -315,7 +316,8 @@ SOURCES_qt4 = 	qt4.cpp \
 		util/pictureflow.cpp \
 		util/buttons/BrowseButton.cpp \
 		util/buttons/DeckButtonsLayout.cpp \
-		util/buttons/RoundButton.cpp
+		util/buttons/RoundButton.cpp \
+		styles/seekstyle.cpp
 
 if HAVE_DARWIN
 SOURCES_qt4 +=  util/searchlineedit_mac.mm
@@ -398,7 +400,8 @@ noinst_HEADERS = \
 	util/singleton.hpp \
 	util/buttons/RoundButton.hpp \
 	util/buttons/DeckButtonsLayout.hpp \
-	util/buttons/BrowseButton.hpp
+	util/buttons/BrowseButton.hpp \
+	styles/seekstyle.hpp
 
 
 EXTRA_DIST += \
