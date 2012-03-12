@@ -577,20 +577,20 @@ static int parse_SegmentInformation(hls_stream_t *hls, char *p_read, int *durati
     char *endptr;
     if (hls->version < 3)
     {
-       errno = 0;
-       value = strtol(token, &endptr, 10);
-       if (token == endptr || errno == ERANGE )
-       {
-           *duration = -1;
-           return VLC_EGENERIC;
-       }
-       *duration = value;
+        errno = 0;
+        value = strtol(token, &endptr, 10);
+        if (token == endptr || errno == ERANGE)
+        {
+            *duration = -1;
+            return VLC_EGENERIC;
+        }
+        *duration = value;
     }
     else
     {
         errno = 0;
         double d = strtof(token, &endptr);
-        if (token == endptr || errno == ERANGE )
+        if (token == endptr || errno == ERANGE)
         {
             *duration = -1;
             return VLC_EGENERIC;
