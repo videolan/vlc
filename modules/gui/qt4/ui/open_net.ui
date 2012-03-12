@@ -60,6 +60,12 @@ p &gt; span { color: #838383; }
       </item>
       <item row="1" column="0">
        <widget class="QComboBox" name="urlComboBox">
+        <property name="maximumSize">
+         <size>
+          <width>600</width>
+          <height>16777215</height>
+         </size>
+        </property>
         <property name="editable">
          <bool>true</bool>
         </property>
