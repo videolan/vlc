@@ -116,7 +116,9 @@ void Playtree::onUpdateItem( int id )
             return;
         }
 
-        UString *pName = new UString( getIntf(), pNode->p_input->psz_name );
+        char *psz_name = input_item_GetTitleFbName( pNode->p_input );
+        UString *pName = new UString( getIntf(), psz_name );
+        free(psz_name);
         playlist_Unlock( m_pPlaylist );
 
         if( *pName != *(it->getString()) )
@@ -217,8 +219,9 @@ void Playtree::onAppend( playlist_add_t *p_add )
         for( pos = 0; pos < pItem->p_parent->i_children; pos++ )
             if( pItem->p_parent->pp_children[pos] == pItem ) break;
 
-        UString *pName = new UString( getIntf(),
-                                      pItem->p_input->psz_name );
+        char *psz_name = input_item_GetTitleFbName( pItem->p_input );
+        UString *pName = new UString( getIntf(), psz_name );
+        free( psz_name );
 
         playlist_item_t* current = playlist_CurrentPlayingItem( m_pPlaylist );
 
