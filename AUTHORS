@@ -1,5 +1,574 @@
-In alphabetical order, the VideoLAN team would like to acknowledge
-the following contributors:
+VideoLAN and the VLC team would like to acknowledge the following contributors:
+
+Programming:
+------------
+Rémi Denis-Courmont
+Jean-Baptiste Kempf
+Laurent Aimar
+Gildas Bazin
+Pierre d'Herbemont
+Rafaël Carré
+Felix Paul Kühne
+Rémi Duraffort
+Derk-Jan Hartman
+Antoine Cellerier
+Samuel Hocevar
+Jean-Paul Saman
+Christophe Mutricy
+Clément Stenac
+Christophe Massiot
+Ilkka Ollakka
+Pierre Ynard
+Damien Fouilleul
+Sigmund Augdal Helberg
+Erwan Tulou
+Olivier Teulière
+Cyril Deguet
+Eric Petit
+Filippo Carone
+Rocky Bernstein
+François Cartegnie
+Olivier Aubert
+Jakob Leben
+Benjamin Pracht
+Pavlov Konstantin
+Jean-Philippe André
+Hugo Beauzée-Luyssen
+Steve Lhomme
+Stéphane Borel
+JP Dinger
+Geoffroy Couprie
+Marian Ďurkovič
+Yoann Peronneau
+Jon Lech Johansen
+Sébastien Escudier
+Dennis van Amerongen
+Faustino Osuna
+Jérôme Decoodt
+Loïc Minier
+KO Myung-Hun
+David Flynn
+Mark Moriarty
+Ludovic Fauvet
+Fabio Ritrovato
+Tony Castley
+Mirsal Ennaime
+Kaarlo Raiha
+Srikanth Raju
+Michel Kaempf
+Jean-Marc Dressler
+Johan Bilien
+Vincent Seguin
+David Fuhrmann
+Martin Storsjö
+Simon Latapie
+Christopher Mueller
+Bernie Purcell
+Henri Fallon
+Emmanuel Puig
+Sebastien Zwickert
+Adrien Maglo
+Renaud Dartus
+Alexis de Lattre
+Vincent Penquerc'h
+Arnaud de Bossoreille de Ribou
+Denis Charmet
+Mohammed Adnène Trojette
+Boris Dorès
+Edward Wang
+Jai Menon
+Anil Daoud
+Daniel Mierswa
+Pierre Baillet
+Rob Jonson
+Dominique Leuenberger
+Andre Pang
+Akash Mehrotra
+André Weber
+Anthony Loiseau
+Lukas Durfina
+Xavier Marchesini
+Cyril Mathé
+Juho Vähä-Herttua
+Ken Self
+Juha Jeronen
+Richard Hosking
+Éric Lassauge
+Alexis Ballier
+Marc Ariberti
+Benoit Steiner
+Michel Lespinasse
+Tobias Güntner
+Carlo Calabrò
+Cheng Sun
+Nicolas Chauvet
+Dean Lee
+Naohiro Koriyama
+Alexey Sokolov
+Basos G
+Brad Smith
+Michał Trzebiatowski
+Philippe Morin
+Vicente Jimenez Aguilar
+Vincenzo Reale
+Yuval Tze
+Brendon Justin
+Yves Duret
+Frédéric Yhuel
+Michael Hanselmann
+Damien Erambert
+Damien Lucas
+Marián Hikaník
+Mihkel Kirjutas
+Richard Shepherd
+Sébastien Toque
+Gaël Hendryckx
+Grigori Goronzy
+Stephan Assmus
+Adrien Grand
+Colin Guthrie
+David Menestrina
+Dominique Martinet
+Fumio Nakayama
+Jason Luka
+Luc Saillard
+Pankaj Yadav
+Ramiro Polla
+Sidney Doria
+Steinar H. Gunderson
+Can Wu
+Christophe Courtaut
+Gonçalo Cordeiro
+Hannes Domani
+Ivo Ivanov
+Manol Manolov
+Mindaugas Baranauskas
+A S Alam
+Antoine Lejeune
+Arnaud Schauly
+Branko Kokanovic
+Christoph Miebach
+David González
+Dylan Yudaken
+Florian G. Pflug
+G Finch
+Gaëtan Rousseaux
+Keary Griffin
+Konstanty Bialkowski
+Myckel Habets
+Przemyslaw Fiala
+Tanguy Krotoff
+Thomas De Rocker
+Xabier Aramendi
+Benjamin Drung
+David Kaplan
+Devin Heitmueller
+Eugenio Jarosiewicz
+Guillaume Poussel
+Justus Piater
+Luca Barbato
+Martin T. H. Sandsmark
+Rune Botten
+Søren Bøg
+Toralf Niebuhr
+Austin Burrow
+Bill C. Riemers
+Cristian Maglie
+Elminster2031
+Fabian Keil
+Jakub Wieczorek
+Khoem Sokhem
+Mario Siegmann
+Martin Briza
+Mike Houben
+Romain Goyet
+Barry Wardell
+Ben Hutchings
+Besnard Jean-Baptiste
+Brian Weaver
+Casian Andrei
+Clement Chesnin
+Daniel Nylander
+Eirik U. Birkeland
+FUJISAWA Tooru
+Gabor Kelemen
+Jamil Ahmed
+Jonathan Rosser
+Joris van Rooij
+Kaloyan Kovachev
+Katsushi Kobayashi
+Kelly Anderson
+Loren Merritt
+Maciej Blizinski
+Mark Bidewell
+Miguel Angel Cabrera Moya
+Ming Hu
+Niles Bindel
+Otto Kekäläinen
+Pauline Castets
+Predrag Ljubenović
+Scott Caudle
+Simon Hailes
+Xavier Martin
+Yaron Shahrabani
+Adrian Yanes
+Alex Converse
+Alexander Bethke
+Alexander Law
+Andres Krapf
+Andri Pálsson
+Andy Chenee
+Anuradha Suraparaju
+Aurélien Nephtali
+Benjamin Poulain
+Brieuc Jeunhomme
+Chris Clayton
+Chris Smowton
+Colin Delacroix
+Cédric Cocquebert
+Danny Wood
+David K
+Denis Arnaud
+Edouard Gomez
+Emmanuel de Roux
+GBX
+Gaurav Narula
+Georgi Chorbadzhiyski
+Geraud CONTINSOUZAS
+Jan Winter
+Jean-François Massol
+Jean-Philippe Grimaldi
+Jon Stacey
+Kai Lauterbach
+Konstantin Bogdanov
+Kuan-Chung Chiu
+Mark Hassman
+Matthias Dahl
+Michael Feurstein
+Michael McEll
+Michael Ploujnikov
+Mike Schrag
+Niklas Hayer
+Olivier Gambier
+Paul Corke
+Praveen Illa
+Ron Frederick
+Ronald Wright
+Rov Juvano
+Sabourin Gilles
+Sasha Koruga
+Sergey Radionov
+Sreng Jean
+Sven Petai
+Thierry Reding
+Tomer Barletz
+Tristan Leteurtre
+Wang Bo
+maxime Ripard
+xxcv
+Adam Hoka
+Adrian Knoth
+Adrien Cunin
+Alan Fischer
+Alex Helfet
+Alexandre Ferreira
+Alina Friedrichsen
+An L. Ber
+Andreas Schlick
+Andrey Makhnutin
+Andrey Wolk
+Arnaud Vallat
+Ashok Bhat
+Austin English
+Baptiste Coudurier
+Benoit Calvez
+Björn Stenberg
+Blake Livingston
+Brandon Brooks
+Brian Johnson
+Brian Kurle
+Chris White
+Christian Masus
+Christoph Seibert
+Christopher Key
+Christopher Rath
+Claudio Ortelli
+Clement Lecigne
+Cody Russell
+Cristian Morales Vega
+Dan Rosenberg
+Daniel Dreibrodt
+Daniel Marth
+Daniel Tisza
+David Planella
+Detlef Schroeder
+Diego Fernando Nieto
+Dominic Spitaler
+Dominik 'Rathann' Mierzejewski
+Edward Sheldrake
+Elliot Murphy
+Eren Inan Canpolat
+Ernest E. Teem III
+Etienne Membrives
+Fargier Sylvain
+Fathi Boudra
+Felix Geyer
+Filipe Azevedo
+Florian Hubold
+Frank Enderle
+François Revol
+Frédéric Crozat
+Georg Seifert
+Gertjan Van Droogenbroeck
+Gilles Chanteperdrix
+Greg Farrell
+Gwenole Beauchesne
+Götz Waschk
+Hans-Kristian Arntzen
+Harry Sintonen
+Iain Wade
+Ibraheem Paredath
+Ismael Luceno
+James Bond
+James Turner
+Janne Kujanpää
+Jarmo Torvinen
+Jason Scheunemann
+Jeff Lu
+Jeroen Ost
+Johann Ransay
+Johannes Weißl
+John Hendrikx
+John Stebbins
+Jonas Gehring
+Joseph S. Atkinson
+Julien / Gellule
+Julien Humbert
+Kamil Baldyga
+Kamil Klimek
+Kevin Anthony
+Kevin DuBois
+Lari Natri
+Lorenzo Pistone
+Lucas C. Villa Real
+Lukáš Lalinský
+Mal Graty
+Malte Tancred
+Mark Lee
+Martin Pöhlmann
+Marton Balint
+Mathew King
+Mathieu Sonet
+Matthew A. Townsend
+Matthias Bauer
+Mika Tiainen
+Mike Cardillo
+Mounir Lamouri (volkmar)
+Nathan Phillip Brink
+Nick Briggs
+Nick Pope
+Pavol Babincak
+Pere Orga
+Peter Bak Nielsen
+Phil Roffe and David Grellscheid
+Pierre Souchay
+Pádraig Brady
+R.M
+Ralph Giles
+Ricardo Pérez López
+Robert Jedrzejczyk
+Robert Paciorek
+Rolf Ahrenberg
+Roman Pen
+Ruud Althuizen
+Sam Lade
+Samuel Pitoiset
+Samuli Suominen
+Scott Lyons
+Sebastian Birk
+Sergey Puzanov
+Sharad Dixit
+Stephan Krempel
+Steven Kramer
+Steven Sheehy
+Sukrit Sangwan
+Sveinn í Felli
+Sveinung Kvilhaugsvik
+Sylvain Cadhillac
+Theron Lewis
+Thijs Alkemade
+Timo Paulssen
+Tomasen
+Tony Vankrunkelsven
+Tristan Heaven
+Yannick Bréhon
+Yavor Doganov
+Yohann Martineau
+bbcallen
+dharani.prabhu.s
+suheaven
+wucan
+김정은
+Adam Sampson
+Alexander Gall
+Alex Antropoff
+Alexis Guillard
+Alex Izvorski
+Amir Gouini
+Andrea Guzzo
+Andrew Flintham
+Andrew Zaikin
+Andy Lindsay
+Arai/Fujisawa Tooru
+Arkadiusz Miskiewicz
+Arnaud Gomes-do-Vale
+Arwed v. Merkatz
+Barak Ori
+Basil Achermann
+Benjamin Mironer
+Bill
+Bob Maguire
+Brian C. Wiles
+Brian Raymond
+Brian Robb
+Carsten Gottbehüt
+Carsten Haitzler
+Charles Hordis
+Chris Clepper
+Christian Henz
+Christof Baumgaertner
+Christophe Burgalat
+Christopher Johnson
+Cian Duffy
+Colin Simmonds
+Damian Ivereigh
+Daniel Fischer
+Daniel Stränger
+Danko Dolch
+Dennis Lou
+Dermot McGahon
+Diego Petteno
+Douglas West
+Dugal Harris
+Emmanuel Blindauer
+Enrico Gueli
+Enrique Osuna
+Eren Türkay
+Eric Dudiak
+Espen Skoglund
+Ethan C. Baldridge
+François Seingier
+Frans van Veen
+Frédéric Ruget
+Gerald Hansink
+Gisle Vanem
+Glen Gray
+Goetz Waschk
+Gregory Hazel
+Gustaf Neumann
+Hang Su
+Hans Lambermont
+Hans-Peter Jansen
+Harris Dugal
+Heiko Panther
+Igor Helman
+Isaac Osunkunle
+Jan David Mol
+Jan Gerber
+Jan Van Boghout
+Jasper Alias
+Jean-Alexis Montignies
+Jean-Baptiste Le Stang
+Jeffrey Baker
+Jeroen Massar
+Jérôme Guilbaud
+Johannes Buchner
+Johen Michael Zorko
+Johnathan Rosser
+John Dalgliesh
+John Paul Lorenti
+Jörg
+Joseph Tulou
+Julien Blache
+Julien Plissonneau Duquène
+Julien Robert
+Kenneth Ostby
+Kenneth Self
+Kevin H. Patterson
+Koehler, Vitally
+K. Staring
+Lahiru Lakmal Priyadarshana
+Laurent Mutricy
+Leo Spalteholz
+Loox Thefuture
+Marc Nolette
+Marco Munderloh
+Mark Gritter
+Markus Kern
+Markus Kuespert
+Martin Hamrle
+Martin Kahr
+Mateus Krepsky Ludwich
+Mathias Kretschmer
+Mats Rojestal
+Matthias P. Nowak
+Matthieu Lochegnies
+Michael Mondragon
+Michael S. Feurstein
+Michel Lanners
+Mickael Hoerdt
+Miguel Angel Cabrera
+Mikko Hirvonen
+Moritz Bunkus
+Nilmoni Deb
+Olivier Houchard
+Olivier Pomel
+Ondrej Kuda aka Albert
+Øyvind Kolbu
+Pascal Levesque
+Patrick Horn
+Patrick McLean
+Paul Mackerras
+Peter Surda
+Petr Vacek
+Philippe Van Hecke
+Pierre-Luc Beaudoin
+Pierre Marc Dumuid
+Régis Duchesne
+Remco Poortinga
+Rene Gollent
+Rob Casey
+Robson Braga Araujo
+Roine Gustafsson
+Roman Bednarek
+Rudolf Cornelissen
+Sašo Kiselkov
+Sebastian Jenny
+Shane Harper
+Stefán Freyr Stefánsson
+Steve Brown
+Steven M. Schultz
+Tapio Hiltunen
+Thomas L. Wood
+Thomas Mühlgrabner
+Thomas Parmelan
+Tim 'O Callagha
+Tim Schuerewegen
+Tong Ka Man
+Torsten Spindler
+Udo Richter
+Vincent Dimar
+Vincent Penne
+Vitalijus Slavinskas
+Vitaly V. Bursov
+Vladimir Chernyshov
+Wade Majors
+Wallace Wadge
+Watanabe Go
+William Hawkins
+Xavier Maillard
+Ye zhang
+Yuehua Zhao
 
 Artwork
 -------
@@ -118,281 +687,3 @@ Xènia Albà Cantero - Catalan
 Xuacu Saturio - Asturian
 Yuksel Yildirim - Turkish
 Zhang Tong - Chinese
-
-Programming
------------
-Adam Sampson
-Adrien Grand
-Adrien Maglo
-Alexander Gall
-Alex Antropoff
-Alexis Ballier
-Alexis de Lattre
-Alexis Guillard
-Alex Izvorski
-Amir Gouini
-Andrea Guzzo
-Andre Pang
-Andres Krapf
-André Weber
-Andrew Flintham
-Andrew Zaikin
-Andy Lindsay
-Anthony Loiseau
-Antoine Cellerier
-Antoine Lejeune
-Arai/Fujisawa Tooru
-Arkadiusz Miskiewicz
-Arnaud de Bossoreille de Ribou
-Arnaud Gomes-do-Vale
-Arnaud Schauly
-Arwed v. Merkatz
-Aurélien Nephtali
-Barak Ori
-Barry Wardell
-Basil Achermann
-Benjamin Mironer
-Benjamin Pracht
-Benoit Steiner
-Bernie Purcell
-Bill
-Bill C. Riemers
-Bob Maguire
-Boris Dorès
-Branko Kokanovic
-Brian C. Wiles
-Brian Johnson
-Brian Raymond
-Brian Robb
-Brieuc Jeunhomme
-Carsten Gottbehüt
-Carsten Haitzler
-Cédric Cocquebert
-Charles Hordis
-Chris Clepper
-Christian Henz
-Christof Baumgaertner
-Christophe Burgalat
-Christophe Massiot
-Christophe Mutricy
-Christopher Johnson
-Cian Duffy
-Clément Stenac
-Colin Delacroix
-Colin Simmonds
-Cyril Deguet
-Cyril Mathé
-Damian Ivereigh
-Damien Fouilleul
-Daniel Fischer
-Daniel Stränger
-Danko Dolch
-Danny Wood
-David Flynn
-David Kennedy
-Dennis Lou
-Dennis van Amerongen
-Derk-Jan Hartman
-Dermot McGahon
-Diego Petteno
-Dominique Leuenberger
-Douglas West
-Dugal Harris
-Dylan Yudaken
-Emmanuel Blindauer
-Emmanuel Puig
-Enrico Gueli
-Enrique Osuna
-Eren Türkay
-Eric Dudiak
-Eric Petit
-Espen Skoglund
-Ethan C. Baldridge
-Eugenio Jarosiewicz
-Felix Paul Kühne
-Filippo Carone
-Florian G. Pflug
-François Cartegnie
-François Seingier
-Frans van Veen
-Frédéric Ruget
-Gaël Hendryckx
-Geoffroy Couprie
-Georgi Chorbadzhiyski
-Gerald Hansink
-Gildas Bazin
-Gisle Vanem
-Glen Gray
-Goetz Waschk
-Greg Farrell
-Gregory Hazel
-Gustaf Neumann
-Hang Su
-Hannes Domani
-Hans Lambermont
-Hans-Peter Jansen
-Harris Dugal
-Harry Sintonen
-Heiko Panther
-Henri Fallon
-Igor Helman
-Ilkka Ollakka
-Isaac Osunkunle
-Jan David Mol
-Jan Gerber
-Jan Van Boghout
-Jarmo Torvinen
-Jasper Alias
-Jean-Alexis Montignies
-Jean-Baptiste Kempf
-Jean-Baptiste Le Stang
-Jean-François Massol
-Jean-Marc Dressler
-Jean-Paul Saman
-Jean-Philippe André
-Jean-Philippe Grimaldi
-Jeffrey Baker
-Jeroen Massar
-Jérôme Guilbaud
-Johan Bilien
-Johannes Buchner
-Johen Michael Zorko
-Johnathan Rosser
-John Dalgliesh
-John Paul Lorenti
-Jon Lech Johansen
-Jörg
-Joseph S. Atkinson
-Joseph Tulou
-Juha Jeronen
-Julien Blache
-Julien Plissonneau Duquène
-Julien Robert
-Kai Lauterbach
-Kenneth Ostby
-Kenneth Self
-Kevin H. Patterson
-Koehler, Vitally
-Konstanty Bialkowski
-K. Staring
-Lahiru Lakmal Priyadarshana
-Laurent Aimar
-Laurent Mutricy
-Leo Spalteholz
-Loïc Minier
-Loox Thefuture
-Luca Barbato
-Ludovic Fauvet
-Lukas Durfina
-Malte Tancred
-Marc Ariberti
-Marc Nolette
-Marco Munderloh
-Marian Ďurkovič
-Mark Gritter
-Markus Kern
-Markus Kuespert
-Martin Hamrle
-Martin Kahr
-Mateus Krepsky Ludwich
-Mathias Kretschmer
-Mats Rojestal
-Matthias P. Nowak
-Matthieu Lochegnies
-Michael S. Feurstein
-Michael Hanselmann
-Michael Mondragon
-Michael Ploujnikov
-Michel Kaempf
-Michel Lanners
-Mickael Hoerdt
-Miguel Angel Cabrera
-Mike Schrag
-Mikko Hirvonen
-Mirsal Ennaime
-Moritz Bunkus
-Nilmoni Deb
-Olivier Aubert
-Olivier Houchard
-Olivier Pomel
-Olivier Teulière
-Ondrej Kuda aka Albert
-Øyvind Kolbu
-Pascal Levesque
-Patrick Horn
-Patrick McLean
-Paul Corke
-Pauline Castets
-Paul Mackerras
-Pavlov Konstantin
-Peter Surda
-Petr Vacek
-Philippe Van Hecke
-Pierre Baillet
-Pierre d'Herbemont
-Pierre-Luc Beaudoin
-Pierre Marc Dumuid
-Pierre Ynard
-Przemyslaw Fiala
-Rafaël Carré
-Régis Duchesne
-Remco Poortinga
-Rémi Denis-Courmont
-Rémi Duraffort
-Renaud Dartus
-Rene Gollent
-Richard Hosking
-Richard Shepherd
-Rob Casey
-Robson Braga Araujo
-Rocky Bernstein
-Roine Gustafsson
-Roman Bednarek
-Rudolf Cornelissen
-Samuel Hocevar
-Sašo Kiselkov
-Scott Caudle
-Sebastian Jenny
-Sebastien Zwickert (aka dilaroga)
-Shane Harper
-Sigmund Augdal Helberg
-Simon Latapie
-Søren Bøg
-Srikanth Raju
-Stefán Freyr Stefánsson
-Stephan Assmus
-Stéphane Borel
-Steve Brown
-Steve Lhomme
-Steven M. Schultz
-Steven Sheehy
-Tanguy Krotoff
-Tapio Hiltunen
-Thomas L. Wood
-Thomas Mühlgrabner
-Thomas Parmelan
-Tim 'O Callagha
-Tim Schuerewegen
-Tong Ka Man
-Tony Castley
-Torsten Spindler
-Udo Richter
-Vincent Dimar
-Vincent Penne
-Vincent Penquerc'h
-Vincent Seguin
-Vitalijus Slavinskas
-Vitaly V. Bursov
-Vladimir Chernyshov
-Wade Majors
-Wallace Wadge
-Wang Bo
-Watanabe Go
-William Hawkins
-Xavier Maillard
-Xavier Marchesini
-Yannick Bréhon
-Ye zhang
-Yuehua Zhao
-Yuval Tze
-Yves Duret
