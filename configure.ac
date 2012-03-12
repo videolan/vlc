@@ -1962,17 +1962,21 @@ fi
 dnl
 dnl Linux DVB
 dnl
-AC_CACHE_CHECK([for Linux DVB version 5], [ac_cv_linux_s2api], [
+AC_CACHE_CHECK([for Linux DVB version 5.1], [ac_cv_linux_dvb_5_1], [
   AC_PREPROC_IFELSE([AC_LANG_PROGRAM([
 [#include <linux/dvb/version.h>
 #if (DVB_API_VERSION < 5)
-EXPLODE
-#endif]])], [
-  ac_cv_linux_s2api=yes
+# error Linux DVB API v3.2 and older are not supported.
+#endif
+#if (DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR < 1)
+# error Linux DVB API v5.0 is unsupported. Please update.
+#endif
+]])], [
+  ac_cv_linux_dvb_5_1=yes
 ], [
-  ac_cv_linux_s2api=no
+  ac_cv_linux_dvb_5_1=no
 ])])
-AM_CONDITIONAL([HAVE_LINUX_DVB], [test "$ac_cv_linux_s2api" = "yes"])
+AM_CONDITIONAL([HAVE_LINUX_DVB], [test "$ac_cv_linux_dvb_5_1" = "yes"])
 
 dnl
 dnl  Screen capture module
