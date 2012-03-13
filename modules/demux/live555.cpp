@@ -163,7 +163,7 @@ typedef struct
     bool            b_rtcp_sync;
     char            waiting;
     int64_t         i_pts;
-    float           f_npt;
+    double          f_npt;
 
     bool            b_selected;
 
@@ -200,9 +200,9 @@ struct demux_sys_t
 
     /* */
     int64_t          i_pcr; /* The clock */
-    float            f_npt;
-    float            f_npt_length;
-    float            f_npt_start;
+    double           f_npt;
+    double           f_npt_length;
+    double           f_npt_start;
 
     /* timeout thread information */
     int              i_timeout;     /* session timeout value in seconds */
@@ -1350,7 +1350,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = (int64_t*)va_arg( args, int64_t * );
             if( p_sys->f_npt_length > 0 )
             {
-                *pi64 = (int64_t)((double)p_sys->f_npt_length * 1000000.0);
+                *pi64 = (int64_t)(p_sys->f_npt_length * 1000000.0);
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -1359,7 +1359,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pf = (double*)va_arg( args, double* );
             if( (p_sys->f_npt_length > 0) && (p_sys->f_npt > 0) )
             {
-                *pf = ( (double)p_sys->f_npt / (double)p_sys->f_npt_length );
+                *pf = p_sys->f_npt / p_sys->f_npt_length;
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -1374,14 +1374,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 if( (i_query == DEMUX_SET_TIME) && (p_sys->f_npt > 0) )
                 {
                     i64 = (int64_t)va_arg( args, int64_t );
-                    time = (float)((double)i64 / (double)1000000.0); /* in second */
+                    time = (float)(i64 / 1000000.0); /* in second */
                 }
                 else if( i_query == DEMUX_SET_TIME )
                     return VLC_EGENERIC;
                 else
                 {
                     f = (double)va_arg( args, double );
-                    time = f * (double)p_sys->f_npt_length;   /* in second */
+                    time = f * p_sys->f_npt_length;   /* in second */
                 }
 
                 if( p_sys->b_paused )
