@@ -36,7 +36,7 @@
 #define ADAPTER_TEXT N_("DVB adapter")
 #define ADAPTER_LONGTEXT N_( \
     "If there is more than one digital broadcasting adapter, " \
-    "the adapter number must be selected. Numbering start from zero.")
+    "the adapter number must be selected. Numbering starts from zero.")
 
 #define BUDGET_TEXT N_("Do not demultiplex")
 #define BUDGET_LONGTEXT N_( \
