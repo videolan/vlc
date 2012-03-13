@@ -12,10 +12,11 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="2311"/>
-      <integer value="2440"/>
-      <integer value="2562"/>
       <integer value="2265"/>
+      <integer value="2668"/>
+      <integer value="2440"/>
+      <integer value="2311"/>
+      <integer value="2562"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -3707,7 +3708,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         <string key="NSExtension">NSResponder</string>
       </object>
       <object class="NSCustomView" id="48286561">
-        <nil key="NSNextResponder"/>
+        <reference key="NSNextResponder"/>
         <int key="NSvFlags">256</int>
         <object class="NSMutableArray" key="NSSubviews">
           <bool key="EncodedWithXMLCoder">YES</bool>
@@ -3827,7 +3828,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                         </object>
                         <int key="NSResizingMask">3</int>
                         <bool key="NSIsResizeable">YES</bool>
-                        <bool key="NSIsEditable">YES</bool>
                         <reference key="NSTableView" ref="807091610"/>
                       </object>
                       <object class="NSTableColumn" id="804468624">
@@ -3853,7 +3853,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                         </object>
                         <int key="NSResizingMask">3</int>
                         <bool key="NSIsResizeable">YES</bool>
-                        <bool key="NSIsEditable">YES</bool>
                         <reference key="NSTableView" ref="807091610"/>
                       </object>
                     </object>
@@ -3935,6 +3934,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           </object>
         </object>
         <string key="NSFrameSize">{570, 415}</string>
+        <reference key="NSSuperview"/>
         <object class="NSMutableString" key="NSClassName">
           <characters key="NS.bytes">NSView</characters>
         </object>
@@ -9181,7 +9181,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{340, 947}, {570, 415}}</string>
+          <string>{{340, 591}, {570, 415}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>

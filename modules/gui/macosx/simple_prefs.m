@@ -141,6 +141,9 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_intf_nativefullscreen_ckb setEnabled:NO];
 #endif
 
+    [o_hotkeys_listbox setTarget:self];
+    [o_hotkeys_listbox setDoubleAction:@selector(hotkeyTableDoubleClick:)];
+
     /* setup useful stuff */
     o_hotkeysNonUseableKeys = [[NSArray arrayWithObjects: @"Command-c", @"Command-x", @"Command-v", @"Command-a", @"Command-," , @"Command-h", @"Command-Alt-h", @"Command-Shift-o", @"Command-o", @"Command-d", @"Command-n", @"Command-s", @"Command-z", @"Command-l", @"Command-r", @"Command-3", @"Command-m", @"Command-w", @"Command-Shift-w", @"Command-Shift-c", @"Command-Shift-p", @"Command-i", @"Command-e", @"Command-Shift-e", @"Command-b", @"Command-Shift-m", @"Command-Ctrl-m", @"Command-?", @"Command-Alt-?", nil] retain];
 }
@@ -1227,6 +1230,13 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 - (void)showInputSettings
 {
     [self showSettingsForCategory: o_input_view];
+}
+
+- (void)hotkeyTableDoubleClick:(id)object
+{
+    // -1 is header
+    if( [o_hotkeys_listbox clickedRow] >= 0 )
+        [self hotkeySettingChanged:o_hotkeys_listbox];
 }
 
 - (IBAction)hotkeySettingChanged:(id)sender
