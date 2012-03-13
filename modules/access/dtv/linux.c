@@ -632,7 +632,8 @@ float dvb_get_signal_strength (dvb_device_t *d)
 {
     uint16_t strength;
 
-    if (ioctl (d->frontend, FE_READ_SIGNAL_STRENGTH, &strength) < 0)
+    if (d->frontend == -1
+     || ioctl (d->frontend, FE_READ_SIGNAL_STRENGTH, &strength) < 0)
         return 0.;
     return strength / 65535.;
 }
@@ -641,7 +642,7 @@ float dvb_get_snr (dvb_device_t *d)
 {
     uint16_t snr;
 
-    if (ioctl (d->frontend, FE_READ_SNR, &snr) < 0)
+    if (d->frontend == -1 || ioctl (d->frontend, FE_READ_SNR, &snr) < 0)
         return 0.;
     return snr / 65535.;
 }
