@@ -233,17 +233,19 @@ static void Exchange( float * p_out, const float * p_in )
 }
 
 /*****************************************************************************
- * DoWork: decode a DTS frame.
+ * Convert: decode a DTS frame.
  *****************************************************************************/
-static void DoWork( filter_t * p_filter,
-                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+static block_t *Convert( filter_t *p_filter, block_t *p_in_buf )
 {
     filter_sys_t    *p_sys = p_filter->p_sys;
     sample_t        i_sample_level = 1;
     int             i_flags = p_sys->i_flags;
-    int             i_bytes_per_block = 256 * p_sys->i_nb_channels
+    size_t          i_bytes_per_block = 256 * p_sys->i_nb_channels
                       * sizeof(float);
-    int             i;
+
+    block_t *p_out_buf = block_Alloc( 6 * i_bytes_per_block );
+    if( unlikely(p_out_buf == NULL) )
+        goto out;
 
     /*
      * Do the actual decoding now.
@@ -257,7 +259,7 @@ static void DoWork( filter_t * p_filter,
     {
         msg_Warn( p_filter, "libdca couldn't sync on frame" );
         p_out_buf->i_nb_samples = p_out_buf->i_buffer = 0;
-        return;
+        goto out;
     }
 
     i_flags = p_sys->i_flags;
@@ -280,7 +282,7 @@ static void DoWork( filter_t * p_filter,
         dca_dynrng( p_sys->p_libdca, NULL, NULL );
     }
 
-    for ( i = 0; i < dca_blocks_num(p_sys->p_libdca); i++ )
+    for( int i = 0; i < dca_blocks_num(p_sys->p_libdca); i++ )
     {
         sample_t * p_samples;
 
@@ -314,7 +316,12 @@ static void DoWork( filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_buffer = i_bytes_per_block * i;
+    p_out_buf->i_dts = p_in_buf->i_dts;
+    p_out_buf->i_pts = p_in_buf->i_pts;
+    p_out_buf->i_length = p_in_buf->i_length;
+out:
+    block_Release( p_in_buf );
+    return p_out_buf;
 }
 
 /*****************************************************************************
@@ -354,37 +361,4 @@ static void CloseFilter( vlc_object_t *p_this )
 
     dca_free( p_sys->p_libdca );
     free( p_sys );
-}
-
-static block_t *Convert( filter_t *p_filter, block_t *p_block )
-{
-    if( !p_block || !p_block->i_nb_samples )
-    {
-        if( p_block )
-            block_Release( p_block );
-        return NULL;
-    }
-
-    size_t i_out_size = p_block->i_nb_samples *
-      p_filter->fmt_out.audio.i_bitspersample *
-        p_filter->fmt_out.audio.i_channels / 8;
-
-    block_t *p_out = block_Alloc( i_out_size );
-    if( !p_out )
-    {
-        msg_Warn( p_filter, "can't get output buffer" );
-        block_Release( p_block );
-        return NULL;
-    }
-
-    p_out->i_nb_samples = p_block->i_nb_samples;
-    p_out->i_dts = p_block->i_dts;
-    p_out->i_pts = p_block->i_pts;
-    p_out->i_length = p_block->i_length;
-
-    DoWork( p_filter, p_block, p_out );
-
-    block_Release( p_block );
-
-    return p_out;
 }
