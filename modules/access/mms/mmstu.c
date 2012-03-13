@@ -456,7 +456,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     int           b_udp = ( i_proto == MMS_PROTO_UDP ) ? 1 : 0;
 
     var_buffer_t buffer;
-    char         tmp[4096];
+    char         *tmp;
     uint16_t     *p;
     int          i_server_version;
     int          i_tool_version;
@@ -532,11 +532,18 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     var_buffer_initwrite( &buffer, 0 );
     var_buffer_add16( &buffer, 0x001c );
     var_buffer_add16( &buffer, 0x0003 );
-    sprintf( tmp,
+    if( asprintf( tmp,
              "NSPlayer/7.0.0.1956; {"GUID_FMT"}; Host: %s",
              GUID_PRINT( p_sys->guid ),
-             p_url->psz_host );
+             p_url->psz_host ) < 0 )
+    {
+        var_buffer_free( &buffer );
+        net_Close( p_sys->i_handle_tcp );
+        return VLC_ENOMEM;
+    }
+
     var_buffer_addUTF16( p_access, &buffer, tmp );
+    free( tmp );
 
     mms_CommandSend( p_access,
                      0x01,          /* connexion request */
@@ -589,17 +596,28 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     var_buffer_add32( &buffer, 0x00000002 );
     if( b_udp )
     {
-        sprintf( tmp,
-                 "\\\\%s\\UDP\\%d",
-                 p_sys->sz_bind_addr,
-                 7000 ); // FIXME
+        if( asprintf( tmp,
+                    "\\\\%s\\UDP\\%d",
+                    p_sys->sz_bind_addr,
+                    7000 ) < 0) // FIXME
+        {
+            var_buffer_free( &buffer );
+            MMSClose( p_access );
+            return VLC_EGENERIC;
+        }
     }
     else
     {
-        sprintf( tmp, "\\\\192.168.0.1\\TCP\\1242"  );
+        if( asprintf( tmp, "\\\\192.168.0.1\\TCP\\1242" ) < 0 )
+        {
+            var_buffer_free( &buffer );
+            MMSClose( p_access );
+            return VLC_EGENERIC;
+        }
     }
     var_buffer_addUTF16( p_access, &buffer, tmp );
     var_buffer_add16( &buffer, '0' );
+    free( tmp );
 
     mms_CommandSend( p_access,
                      0x02,          /* connexion request */
