@@ -417,7 +417,7 @@ static int Demux( demux_t *p_demux )
     /* parse the next chunk's record headers */
     if( p_sys->b_first_chunk || p_sys->i_cur_rec >= p_sys->i_num_recs )
     {
-        if( get_chunk_header(p_demux) == 0 )
+        if( get_chunk_header(p_demux) == 0 || p_sys->i_num_recs == 0 )
             return 0;
     }
 
