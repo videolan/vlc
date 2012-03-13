@@ -595,6 +595,7 @@ void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
 
     if( pos == -1.f )
     {
+        setMinimumSize( QSize( 0, 0 ) );
         if( displayType == TimeLabel::Both )
             setText( "--:--/--:--" );
         else
@@ -607,16 +608,40 @@ void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
     secstotimestr( psz_length, length );
     secstotimestr( psz_time, ( b_remainingTime && length ) ? length - time
                                                            : time );
+
+    // compute the minimum size that will be required for the psz_length
+    // and use it to enforce a minimal size to avoid "dancing" widgets
+    QSize minsize;
+    if ( length > 0 )
+    {
+        QMargins margins = contentsMargins();
+        minsize += QSize(
+                  fontMetrics().size( 0, QString( psz_length ), 0, 0 ).width(),
+                  sizeHint().height()
+                );
+        minsize += QSize( margins.left() + margins.right() + 8, 0 ); /* +padding */
+
+        if ( b_remainingTime )
+            minsize += QSize( fontMetrics().size( 0, "-", 0, 0 ).width(), 0 );
+    }
+
     switch( displayType )
     {
         case TimeLabel::Elapsed:
+            setMinimumSize( minsize );
             setText( QString( psz_time ) );
             break;
         case TimeLabel::Remaining:
             if( b_remainingTime )
+            {
+                setMinimumSize( minsize );
                 setText( QString("-") + QString( psz_time ) );
+            }
             else
+            {
+                setMinimumSize( QSize( 0, 0 ) );
                 setText( QString( psz_length ) );
+            }
             break;
         case TimeLabel::Both:
         default:
