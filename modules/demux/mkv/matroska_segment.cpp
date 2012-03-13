@@ -1362,11 +1362,15 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         if( unlikely( !p_tk->b_enabled ) )
             p_tk->fmt.i_priority = -2;
         else if( p_tk->b_forced )
-            p_tk->fmt.i_priority = 1;
+            p_tk->fmt.i_priority = 2;
         else if( p_tk->b_default )
-            p_tk->fmt.i_priority = 0;
+            p_tk->fmt.i_priority = 1;
         else
-            p_tk->fmt.i_priority = -1;
+            p_tk->fmt.i_priority = 0;
+
+        /* Avoid multivideo tracks when unnecessary */
+        if( p_tk->fmt.i_cat == VIDEO_ES )
+            p_tk->fmt.i_priority--;
 
         p_tk->p_es = es_out_Add( sys.demuxer.out, &p_tk->fmt );
 
