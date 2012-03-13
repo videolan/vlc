@@ -135,11 +135,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
     if (OSX_LION)
         [o_sprefs_win setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
-    else
-        [o_intf_nativefullscreen_ckb setEnabled:NO];
-#ifndef MAC_OS_X_VERSION_10_7
-    [o_intf_nativefullscreen_ckb setEnabled:NO];
-#endif
 
     [o_hotkeys_listbox setTarget:self];
     [o_hotkeys_listbox setDoubleAction:@selector(hotkeyTableDoubleClick:)];
@@ -473,7 +468,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
 #ifdef MAC_OS_X_VERSION_10_7
     b_correct_sdk = YES;
 #endif
-    if( !b_correct_sdk || !OSX_LION )
+    if( !( b_correct_sdk && OSX_LION ))
     {
         [o_intf_nativefullscreen_ckb setState: NSOffState];
         [o_intf_nativefullscreen_ckb setEnabled: NO];
