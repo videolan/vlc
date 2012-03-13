@@ -381,6 +381,7 @@
  </widget>
  <tabstops>
   <tabstop>dvdRadioButton</tabstop>
+  <tabstop>bdRadioButton</tabstop>
   <tabstop>audioCDRadioButton</tabstop>
   <tabstop>vcdRadioButton</tabstop>
   <tabstop>dvdsimple</tabstop>
@@ -389,8 +390,8 @@
   <tabstop>browseDiscButton</tabstop>
   <tabstop>titleSpin</tabstop>
   <tabstop>chapterSpin</tabstop>
-  <tabstop>subtitlesSpin</tabstop>
   <tabstop>audioSpin</tabstop>
+  <tabstop>subtitlesSpin</tabstop>
  </tabstops>
  <resources/>
  <connections/>
