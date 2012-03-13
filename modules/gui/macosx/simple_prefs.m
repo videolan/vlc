@@ -51,6 +51,8 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
 
 static VLCSimplePrefs *_o_sharedInstance = nil;
 
+#pragma mark Initialisation
+
 + (VLCSimplePrefs *)sharedInstance
 {
     return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
@@ -343,6 +345,9 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
 
     return NULL;
 }
+
+#pragma mark -
+#pragma mark Setup controls
 
 - (void)setupButton: (NSPopUpButton *)object forStringList: (const char *)name
 {
@@ -705,6 +710,9 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     [o_hotkeys_listbox reloadData];
 }
 
+#pragma mark -
+#pragma mark General actions
+
 - (void)showSimplePrefs
 {
     /* we want to show the interface settings, if no category was chosen */
@@ -1035,6 +1043,9 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     [o_currentlyShownCategoryView retain];
 }
 
+#pragma mark -
+#pragma mark Specific actions
+
 - (IBAction)interfaceSettingChanged:(id)sender
 {
     if( sender == o_intf_embedded_ckb && [o_intf_embedded_ckb state] == NSOffState )
@@ -1226,6 +1237,9 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 {
     [self showSettingsForCategory: o_input_view];
 }
+
+#pragma mark -
+#pragma mark Hotkey actions
 
 - (void)hotkeyTableDoubleClick:(id)object
 {
