@@ -47,6 +47,8 @@
 #define SOUNDFONT_LONGTEXT N_( \
     "A sound fonts file is required for software synthesis." )
 
+#define CHORUS_TEXT N_("Chorus")
+
 #define GAIN_TEXT N_("Synthesis gain")
 #define GAIN_LONGTEXT N_("This gain is applied to synthesis output. " \
     "High values may cause saturation when many notes are played at a time." )
@@ -55,6 +57,8 @@
 #define POLYPHONY_LONGTEXT N_( \
     "The polyphony defines how many voices can be played at a time. " \
     "Larger values require more processing power.")
+
+#define REVERB_TEXT N_("Reverb")
 
 #define SAMPLE_RATE_TEXT N_("Sample rate")
 
@@ -70,11 +74,13 @@ vlc_module_begin ()
     set_callbacks (Open, Close)
     add_loadfile ("soundfont", "",
                   SOUNDFONT_TEXT, SOUNDFONT_LONGTEXT, false)
+    add_bool ("synth-chorus", true, CHORUS_TEXT, CHORUS_TEXT, false)
     add_float ("synth-gain", 0.8, GAIN_TEXT, GAIN_LONGTEXT, false)
         change_float_range (0., 10.)
     add_integer ("synth-polyphony", 256,
                  POLYPHONY_TEXT, POLYPHONY_LONGTEXT, false)
         change_integer_range (1, 65535)
+    add_bool ("synth-reverb", true, REVERB_TEXT, REVERB_TEXT, true)
     add_integer ("synth-sample-rate", 44100,
                  SAMPLE_RATE_TEXT, SAMPLE_RATE_TEXT, true)
         change_integer_range (22050, 96000)
@@ -154,10 +160,14 @@ static int Open (vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 
+    fluid_synth_set_chorus_on (p_sys->synth,
+                               var_InheritBool (p_this, "synth-chorus"));
     fluid_synth_set_gain (p_sys->synth,
                           var_InheritFloat (p_this, "synth-gain"));
     fluid_synth_set_polyphony (p_sys->synth,
                                var_InheritInteger (p_this, "synth-polyphony"));
+    fluid_synth_set_reverb_on (p_sys->synth,
+                               var_InheritBool (p_this, "synth-reverb"));
 
     p_dec->fmt_out.i_cat = AUDIO_ES;
     p_dec->fmt_out.audio.i_rate =
