@@ -265,8 +265,6 @@ void PLSelector::setSource( QTreeWidgetItem *item )
     if( !item || item == curItem )
         return;
 
-    curItem = item;
-
     bool b_ok;
     int i_type = item->data( 0, TYPE_ROLE ).toInt( &b_ok );
     if( !b_ok || i_type == CATEGORY_TYPE )
@@ -279,7 +277,8 @@ void PLSelector::setSource( QTreeWidgetItem *item )
         sd_loaded = playlist_IsServicesDiscoveryLoaded( THEPL, qtu( qs ) );
         if( !sd_loaded )
         {
-            playlist_ServicesDiscoveryAdd( THEPL, qtu( qs ) );
+            if ( playlist_ServicesDiscoveryAdd( THEPL, qtu( qs ) ) != VLC_SUCCESS )
+                return ;
 
             services_discovery_descriptor_t *p_test = new services_discovery_descriptor_t;
             playlist_ServicesDiscoveryControl( THEPL, qtu( qs ), SD_CMD_DESCRIPTOR, p_test );
@@ -294,6 +293,8 @@ void PLSelector::setSource( QTreeWidgetItem *item )
         return;
     }
 #endif
+
+    curItem = item;
 
     /* */
     playlist_Lock( THEPL );
