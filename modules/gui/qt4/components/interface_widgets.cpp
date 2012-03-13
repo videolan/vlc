@@ -585,7 +585,7 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
               this, updateBuffering( float ) );
     CONNECT( bufTimer, timeout(), this, updateBuffering() );
 
-    this->setContentsMargins( 4, 0, 4, 0 );
+    setStyleSheet( "padding-left: 4px; padding-right: 4px;" );
 }
 
 void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
@@ -596,9 +596,9 @@ void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
     if( pos == -1.f )
     {
         if( displayType == TimeLabel::Both )
-            setText( " --:--/--:-- " );
+            setText( "--:--/--:--" );
         else
-            setText( " --:-- " );
+            setText( "--:--" );
         return;
     }
 
@@ -610,17 +610,17 @@ void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
     switch( displayType )
     {
         case TimeLabel::Elapsed:
-            setText( QString(" ") + QString( psz_time ) + QString(" ") );
+            setText( QString( psz_time ) );
             break;
         case TimeLabel::Remaining:
             if( b_remainingTime )
-                setText( QString(" -") + QString( psz_time ) + QString(" ") );
+                setText( QString("-") + QString( psz_time ) );
             else
-                setText( QString(" ") + QString( psz_length ) + QString(" ") );
+                setText( QString( psz_length ) );
             break;
         case TimeLabel::Both:
         default:
-            QString timestr = QString( " %1%2/%3 " )
+            QString timestr = QString( "%1%2/%3" )
             .arg( QString( (b_remainingTime && length) ? "-" : "" ) )
             .arg( QString( psz_time ) )
             .arg( QString( ( !length && time ) ? "--:--" : psz_length ) );
@@ -643,7 +643,7 @@ void TimeLabel::setDisplayPosition( float pos )
     secstotimestr( psz_time,
                    ( b_remainingTime && cachedLength ?
                    cachedLength - time : time ) );
-    QString timestr = QString( " %1%2/%3 " )
+    QString timestr = QString( "%1%2/%3" )
         .arg( QString( (b_remainingTime && cachedLength) ? "-" : "" ) )
         .arg( QString( psz_time ) )
         .arg( QString( ( !cachedLength && time ) ? "--:--" : psz_length ) );
