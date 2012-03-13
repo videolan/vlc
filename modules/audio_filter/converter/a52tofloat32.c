@@ -271,21 +271,23 @@ static void Exchange( sample_t * p_out, const sample_t * p_in )
 }
 
 /*****************************************************************************
- * DoWork: decode an ATSC A/52 frame.
+ * Convert: decode an ATSC A/52 frame.
  *****************************************************************************/
-static void DoWork( filter_t * p_filter,
-                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+
+static block_t *Convert( filter_t *p_filter, block_t *p_in_buf )
 {
-    filter_sys_t    *p_sys = p_filter->p_sys;
+    filter_sys_t *p_sys = p_filter->p_sys;
 #ifdef LIBA52_FIXED
-    sample_t        i_sample_level = (1 << 24);
+    sample_t i_sample_level = (1 << 24);
 #else
-    sample_t        i_sample_level = 1;
+    sample_t i_sample_level = 1;
 #endif
-    int             i_flags = p_sys->i_flags;
-    int             i_bytes_per_block = 256 * p_sys->i_nb_channels
-                      * sizeof(sample_t);
-    int             i;
+    int i_flags = p_sys->i_flags;
+    size_t i_bytes_per_block = 256 * p_sys->i_nb_channels * sizeof(sample_t);
+
+    block_t *p_out_buf = filter_NewAudioBuffer( p_filter, 6 * i_bytes_per_block );
+    if( unlikely(p_out_buf == NULL) )
+        goto out;
 
     /* Do the actual decoding now. */
     a52_frame( p_sys->p_liba52, p_in_buf->p_buffer,
@@ -307,7 +309,7 @@ static void DoWork( filter_t * p_filter,
         a52_dynrng( p_sys->p_liba52, NULL, NULL );
     }
 
-    for ( i = 0; i < 6; i++ )
+    for( unsigned i = 0; i < 6; i++ )
     {
         sample_t * p_samples;
 
@@ -342,7 +344,12 @@ static void DoWork( filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_buffer = i_bytes_per_block * 6;
+    p_out_buf->i_dts = p_in_buf->i_dts;
+    p_out_buf->i_pts = p_in_buf->i_pts;
+    p_out_buf->i_length = p_in_buf->i_length;
+out:
+    block_Release( p_in_buf );
+    return p_out_buf;
 }
 
 /*****************************************************************************
@@ -387,37 +394,4 @@ static void CloseFilter( vlc_object_t *p_this )
 
     a52_free( p_sys->p_liba52 );
     free( p_sys );
-}
-
-static block_t *Convert( filter_t *p_filter, block_t *p_block )
-{
-    if( !p_block || !p_block->i_nb_samples )
-    {
-        if( p_block )
-            block_Release( p_block );
-        return NULL;
-    }
-
-    size_t i_out_size = p_block->i_nb_samples *
-      p_filter->fmt_out.audio.i_bitspersample *
-        p_filter->fmt_out.audio.i_channels / 8;
-
-    block_t *p_out = filter_NewAudioBuffer( p_filter, i_out_size );
-    if( !p_out )
-    {
-        msg_Warn( p_filter, "can't get output buffer" );
-        block_Release( p_block );
-        return NULL;
-    }
-
-    p_out->i_nb_samples = p_block->i_nb_samples;
-    p_out->i_dts = p_block->i_dts;
-    p_out->i_pts = p_block->i_pts;
-    p_out->i_length = p_block->i_length;
-
-    DoWork( p_filter, p_block, p_out );
-
-    block_Release( p_block );
-
-    return p_out;
 }
