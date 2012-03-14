@@ -126,8 +126,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     /* setup the styled interface */
     b_nativeFullscreenMode = NO;
 #ifdef MAC_OS_X_VERSION_10_7
-    if( config_GetInt( VLCIntf, "embedded-video" ))
-        b_nativeFullscreenMode = config_GetInt( VLCIntf, "macosx-nativefullscreenmode" );
+    b_nativeFullscreenMode = config_GetInt( VLCIntf, "macosx-nativefullscreenmode" );
 #endif
     i_lastShownVolume = -1;
     t_hide_mouse_timer = nil;
@@ -1382,7 +1381,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (id)setupVideoView
 {
     vout_thread_t *p_vout = getVout();
-    if (config_GetInt( VLCIntf, "embedded-video" ))
+    if (config_GetInt( VLCIntf, "embedded-video" ) || (OSX_LION && b_nativeFullscreenMode))
     {
         if ([o_video_view window] != self)
         {
