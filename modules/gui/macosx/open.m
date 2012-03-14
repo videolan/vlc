@@ -186,7 +186,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_eyetv_chn_bgbar setUsesThreadedAnimation: YES];
 
     [o_capture_mode_pop removeAllItems];
-    [o_capture_mode_pop addItemWithTitle: _NS("Capture Device")];
     [o_capture_mode_pop addItemWithTitle: _NS("Video Device")];
     [o_capture_mode_pop addItemWithTitle: _NS("Audio Device")];
 
