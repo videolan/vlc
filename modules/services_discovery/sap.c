@@ -877,13 +877,27 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint32_t *i_source, 
                            p_sdp->username );
     }
 
-    /* Handle group */
-    if (p_sap->p_sdp->mediac >= 1)
-        psz_value = FindAttribute (p_sap->p_sdp, 0, "x-plgroup");
+    /* Handle category */
+    psz_value = GetAttribute(p_sap->p_sdp->pp_attributes,
+                             p_sap->p_sdp->i_attributes, "cat");
+    if (psz_value != NULL)
+    {
+        /* a=cat provides a dot-separated hierarchy.
+         * For the time being only replace dots with pipe. TODO: FIXME */
+        char *str = strdup(psz_value);
+        if (likely(str != NULL))
+            for (char *p = strchr(str, '.'); p != NULL; p = strchr(p, '.'))
+                *(p++) = '|';
+        services_discovery_AddItem(p_sd, p_input, str ? str : psz_value);
+        free(str);
+    }
     else
-        psz_value = GetAttribute( p_sap->p_sdp->pp_attributes, p_sap->p_sdp->i_attributes, "x-plgroup" );
-
-    services_discovery_AddItem( p_sd, p_input, psz_value /* category name */ );
+    {
+        /* backward compatibility with VLC 0.7.3-2.0.0 senders */
+        psz_value = GetAttribute(p_sap->p_sdp->pp_attributes,
+                                 p_sap->p_sdp->i_attributes, "x-plgroup");
+        services_discovery_AddItem(p_sd, p_input, psz_value);
+    }
 
     TAB_APPEND( p_sys->i_announces, p_sys->pp_announces, p_sap );
 
