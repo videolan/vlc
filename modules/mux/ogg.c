@@ -80,18 +80,12 @@ static block_t *OggCreateFooter( sout_mux_t * );
 #define PACKET_IS_SYNCPOINT  0x08
 
 typedef struct
-#ifdef HAVE_ATTRIBUTE_PACKED
-    __attribute__((__packed__))
-#endif
 {
     int32_t i_width;
     int32_t i_height;
 } oggds_header_video_t;
 
 typedef struct
-#ifdef HAVE_ATTRIBUTE_PACKED
-    __attribute__((__packed__))
-#endif
 {
     int16_t i_channels;
     int16_t i_block_align;
@@ -99,9 +93,6 @@ typedef struct
 } oggds_header_audio_t;
 
 typedef struct
-#ifdef HAVE_ATTRIBUTE_PACKED
-    __attribute__((__packed__))
-#endif
 {
     uint8_t i_packet_type;
 
@@ -341,19 +332,16 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 memcpy( p_stream->p_oggds_header->sub_type,
                         &p_stream->i_fourcc, 4 );
             }
-            SetDWLE( &p_stream->p_oggds_header->i_size,
-                     sizeof( oggds_header_t ) - 1 );
-            SetQWLE( &p_stream->p_oggds_header->i_time_unit,
+            p_stream->p_oggds_header->i_size = 0 ;
+            p_stream->p_oggds_header->i_time_unit =
                      INT64_C(10000000) * p_input->p_fmt->video.i_frame_rate_base /
-                     (int64_t)p_input->p_fmt->video.i_frame_rate );
-            SetQWLE( &p_stream->p_oggds_header->i_samples_per_unit, 1 );
-            SetDWLE( &p_stream->p_oggds_header->i_default_len, 1 ); /* ??? */
-            SetDWLE( &p_stream->p_oggds_header->i_buffer_size, 1024*1024 );
-            SetWLE( &p_stream->p_oggds_header->i_bits_per_sample, 0 );
-            SetDWLE( &p_stream->p_oggds_header->header.video.i_width,
-                     p_input->p_fmt->video.i_width );
-            SetDWLE( &p_stream->p_oggds_header->header.video.i_height,
-                     p_input->p_fmt->video.i_height );
+                     (int64_t)p_input->p_fmt->video.i_frame_rate;
+            p_stream->p_oggds_header->i_samples_per_unit = 1;
+            p_stream->p_oggds_header->i_default_len = 1 ; /* ??? */
+            p_stream->p_oggds_header->i_buffer_size = 1024*1024;
+            p_stream->p_oggds_header->i_bits_per_sample = 0;
+            p_stream->p_oggds_header->header.video.i_width = p_input->p_fmt->video.i_width;
+            p_stream->p_oggds_header->header.video.i_height = p_input->p_fmt->video.i_height;
             msg_Dbg( p_mux, "%4.4s stream", (char *)&p_stream->i_fourcc );
             break;
 
@@ -404,8 +392,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             memset( p_stream->p_oggds_header, 0, sizeof(oggds_header_t) );
             p_stream->p_oggds_header->i_packet_type = PACKET_TYPE_HEADER;
 
-            SetDWLE( &p_stream->p_oggds_header->i_size,
-                     sizeof( oggds_header_t ) - 1 + p_input->p_fmt->i_extra );
+            p_stream->p_oggds_header->i_size = p_input->p_fmt->i_extra;
 
             if( p_input->p_fmt->i_extra )
             {
@@ -420,19 +407,14 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             snprintf( buf, sizeof(buf), "%"PRIx16, i_tag );
             strncpy( p_stream->p_oggds_header->sub_type, buf, 4 );
 
-            SetQWLE( &p_stream->p_oggds_header->i_time_unit, INT64_C(10000000) );
-            SetDWLE( &p_stream->p_oggds_header->i_default_len, 1 );
-            SetDWLE( &p_stream->p_oggds_header->i_buffer_size, 30*1024 );
-            SetQWLE( &p_stream->p_oggds_header->i_samples_per_unit,
-                     p_input->p_fmt->audio.i_rate );
-            SetWLE( &p_stream->p_oggds_header->i_bits_per_sample,
-                    p_input->p_fmt->audio.i_bitspersample );
-            SetDWLE( &p_stream->p_oggds_header->header.audio.i_channels,
-                     p_input->p_fmt->audio.i_channels );
-            SetDWLE( &p_stream->p_oggds_header->header.audio.i_block_align,
-                     p_input->p_fmt->audio.i_blockalign );
-            SetDWLE( &p_stream->p_oggds_header->header.audio.i_avgbytespersec,
-                     p_input->p_fmt->i_bitrate / 8);
+            p_stream->p_oggds_header->i_time_unit = INT64_C(10000000);
+            p_stream->p_oggds_header->i_default_len = 1;
+            p_stream->p_oggds_header->i_buffer_size = 30*1024 ;
+            p_stream->p_oggds_header->i_samples_per_unit = p_input->p_fmt->audio.i_rate;
+            p_stream->p_oggds_header->i_bits_per_sample = p_input->p_fmt->audio.i_bitspersample;
+            p_stream->p_oggds_header->header.audio.i_channels = p_input->p_fmt->audio.i_channels;
+            p_stream->p_oggds_header->header.audio.i_block_align =  p_input->p_fmt->audio.i_blockalign;
+            p_stream->p_oggds_header->header.audio.i_avgbytespersec =  p_input->p_fmt->i_bitrate / 8;
             msg_Dbg( p_mux, "%4.4s stream", (char *)&p_stream->i_fourcc );
             break;
         }
@@ -562,6 +544,60 @@ static block_t *OggStreamPageOut( sout_mux_t *p_mux,
     return OggStreamGetPage( p_mux, p_os, i_pts, false );
 }
 
+static int32_t OggFillDsHeader( uint8_t *p_buffer, oggds_header_t *p_oggds_header, int i_cat )
+{
+    int index = 0;
+    p_buffer[index] = p_oggds_header->i_packet_type;
+    index++;
+    memcpy( &p_buffer[index], p_oggds_header->stream_type, sizeof(p_oggds_header->stream_type) );
+    index += sizeof(p_oggds_header->stream_type);
+    memcpy(&p_buffer[index], p_oggds_header->sub_type, sizeof(p_oggds_header->sub_type) );
+    index += sizeof(p_oggds_header->sub_type);
+
+    /* The size is filled at the end */
+    uint8_t *p_isize = &p_buffer[index];
+    index += 4;
+
+    SetQWLE( &p_buffer[index], p_oggds_header->i_time_unit );
+    index += 8;
+    SetQWLE( &p_buffer[index], p_oggds_header->i_samples_per_unit );
+    index += 8;
+    SetDWLE( &p_buffer[index], p_oggds_header->i_default_len );
+    index += 4;
+    SetDWLE( &p_buffer[index], p_oggds_header->i_buffer_size );
+    index += 4;
+    SetWLE( &p_buffer[index], p_oggds_header->i_bits_per_sample );
+    index += 2;
+    SetWLE( &p_buffer[index], p_oggds_header->i_padding_0 );
+    index += 2;
+    /* audio or video */
+    switch( i_cat )
+    {
+    case VIDEO_ES:
+        SetDWLE( &p_buffer[index], p_oggds_header->header.video.i_width );
+        SetDWLE( &p_buffer[index+4], p_oggds_header->header.video.i_height );
+        break;
+    case AUDIO_ES:
+        SetWLE( &p_buffer[index], p_oggds_header->header.audio.i_channels );
+        SetWLE( &p_buffer[index+2], p_oggds_header->header.audio.i_block_align );
+        SetDWLE( &p_buffer[index+4], p_oggds_header->header.audio.i_avgbytespersec );
+        break;
+    }
+    index += 8;
+    SetDWLE( &p_buffer[index], p_oggds_header->i_padding_1 );
+    index += 4;
+
+    /* extra header */
+    if( p_oggds_header->i_size > 0 )
+    {
+        memcpy( &p_buffer[index], p_oggds_header + sizeof(*p_oggds_header), p_oggds_header->i_size );
+        index += p_oggds_header->i_size;
+    }
+
+    SetDWLE( p_isize, index-1 );
+    return index;
+}
+
 static block_t *OggCreateHeader( sout_mux_t *p_mux )
 {
     block_t *p_hdr = NULL;
@@ -653,14 +689,17 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
             else if( p_stream->p_oggds_header )
             {
                 /* ds header */
-                op.packet = (uint8_t*)p_stream->p_oggds_header;
-                op.bytes  = p_stream->p_oggds_header->i_size + 1;
+                op.packet = malloc( sizeof(*p_stream->p_oggds_header) + p_stream->p_oggds_header->i_size );
+                if( !op.packet )
+                    return NULL;
+                op.bytes  = OggFillDsHeader( op.packet, p_stream->p_oggds_header, p_stream->i_cat );
                 op.b_o_s  = 1;
                 op.e_o_s  = 0;
                 op.granulepos = 0;
                 op.packetno = p_stream->i_packet_no++;
                 ogg_stream_packetin( &p_stream->os, &op );
                 p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
+                free( op.packet );
             }
 
             block_ChainAppend( &p_hdr, p_og );
@@ -892,7 +931,10 @@ static int Mux( sout_mux_t *p_mux )
         p_sys->i_streams = p_mux->i_nb_inputs;
         p_sys->i_del_streams = 0;
         p_sys->i_add_streams = 0;
-        block_ChainAppend( &p_og, OggCreateHeader( p_mux ) );
+        block_t *p_header = OggCreateHeader( p_mux );
+        if( !p_header )
+            return VLC_ENOMEM;
+        block_ChainAppend( &p_og, p_header );
 
         /* Write header and/or footer */
         OggSetDate( p_og, i_dts, 0 );
