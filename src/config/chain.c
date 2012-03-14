@@ -175,10 +175,55 @@ static char *ChainGetValue( const char **ppsz_string )
     return psz_value;
 }
 
+/* Parse all name=value[,] elements */
+const char *config_ChainParseOptions( config_chain_t **pp_cfg, const char *psz_opts )
+{
+    config_chain_t **pp_next = pp_cfg;
+    bool first = true;
+    do
+    {
+        if (!first)
+            psz_opts++; /* skip previous delimiter */
+        SKIPSPACE( psz_opts );
+
+        first = false;
+
+        /* Look for the end of the name (,={}_space_) */
+        size_t len = strcspn( psz_opts, "=,{} \t" );
+        if( len == 0 )
+            continue; /* ignore empty parameter */
+
+        /* Append the new parameter */
+        config_chain_t *p_cfg = malloc( sizeof(*p_cfg) );
+        if( !p_cfg )
+            break;
+        p_cfg->psz_name = strndup( psz_opts, len );
+        psz_opts += len;
+        p_cfg->psz_value = NULL;
+        p_cfg->p_next = NULL;
+
+        *pp_next = p_cfg;
+        pp_next = &p_cfg->p_next;
+
+        /* Extract the option value */
+        SKIPSPACE( psz_opts );
+        if( strchr( "={", *psz_opts ) )
+        {
+            p_cfg->psz_value = ChainGetValue( &psz_opts );
+            SKIPSPACE( psz_opts );
+        }
+    }
+    while( !memchr( "}", *psz_opts, 2 ) );
+
+    if( *psz_opts ) psz_opts++; /* skip '}' */;
+    SKIPSPACE( psz_opts );
+
+    return psz_opts;
+}
+
 char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg,
                           const char *psz_chain )
 {
-    config_chain_t **pp_next = pp_cfg;
     size_t len;
 
     *ppsz_name = NULL;
@@ -196,43 +241,7 @@ char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg,
     /* Parse the parameters */
     SKIPSPACE( psz_chain );
     if( *psz_chain == '{' )
-    {
-        /* Parse all name=value[,] elements */
-        do
-        {
-            psz_chain++; /* skip previous delimiter */
-            SKIPSPACE( psz_chain );
-
-            /* Look for the end of the name (,={}_space_) */
-            len = strcspn( psz_chain, "=,{} \t" );
-            if( len == 0 )
-                continue; /* ignore empty parameter */
-
-            /* Append the new parameter */
-            config_chain_t *p_cfg = malloc( sizeof(*p_cfg) );
-            if( !p_cfg )
-                break;
-            p_cfg->psz_name = strndup( psz_chain, len );
-            psz_chain += len;
-            p_cfg->psz_value = NULL;
-            p_cfg->p_next = NULL;
-
-            *pp_next = p_cfg;
-            pp_next = &p_cfg->p_next;
-
-            /* Extract the option value */
-            SKIPSPACE( psz_chain );
-            if( strchr( "={", *psz_chain ) )
-            {
-                p_cfg->psz_value = ChainGetValue( &psz_chain );
-                SKIPSPACE( psz_chain );
-            }
-        }
-        while( !memchr( "}", *psz_chain, 2 ) );
-
-        if( *psz_chain ) psz_chain++; /* skip '}' */;
-        SKIPSPACE( psz_chain );
-    }
+        psz_chain = config_ChainParseOptions( pp_cfg, psz_chain );
 
     if( *psz_chain == ':' )
         return strdup( psz_chain + 1 );

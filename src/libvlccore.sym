@@ -54,6 +54,7 @@ config_ChainCreate
 config_ChainDestroy
 config_ChainDuplicate
 config_ChainParse
+config_ChainParseOptions
 config_ExistIntf
 config_FindConfig
 config_GetConfDir

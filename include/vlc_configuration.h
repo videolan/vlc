@@ -256,6 +256,18 @@ VLC_API void config_ChainParse( vlc_object_t *, const char *psz_prefix, const ch
 #define config_ChainParse( a, b, c, d ) config_ChainParse( VLC_OBJECT(a), b, c, d )
 
 /**
+ * This function will parse a configuration string (psz_opts) and
+ * - set all options for this module in a chained list (*pp_cfg)
+ * - returns a pointer on the next module if any.
+ *
+ * The string format is
+ *   module{option=*,option=*}
+ *
+ * The options values are unescaped using config_StringUnescape.
+ */
+VLC_API const char *config_ChainParseOptions( config_chain_t **pp_cfg, const char *ppsz_opts );
+
+/**
  * This function will parse a configuration string (psz_string) and
  * - set the module name (*ppsz_name)
  * - set all options for this module in a chained list (*pp_cfg)
