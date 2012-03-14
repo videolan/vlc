@@ -216,7 +216,6 @@ int screen_InitCapture( demux_t *p_demux )
     p_data->clipped_image =
         ( char * )malloc( p_data->width * p_data->height * 4 );
 
-#warning FIXME: CGLSetOffScreen is no longer supported in the future!
     returnedError = CGLSetOffScreen( p_data->clipped, p_data->width, p_data->height, p_data->width * 4, p_data->clipped_image );
     if( returnedError )
         goto errorHandling;
