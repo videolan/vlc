@@ -68,6 +68,11 @@ NSArray *qtkaudioDevices;
 #define kVLCMediaBDMVFolder "BDMV"
 #define kVLCMediaUnknown "Unknown"
 
+struct display_info_t
+{
+    CGRect rect;
+    CGDirectDisplayID id;
+};
 
 /*****************************************************************************
  * VLCOpen implementation
@@ -104,6 +109,15 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [o_sub_path release];
     [o_currentOpticalMediaIconView release];
     [o_currentOpticalMediaView release];
+    int i;
+    for( i = 0; i < [o_displayInfos count]; i ++ )
+    {
+        NSValue *v = [o_displayInfos objectAtIndex:i];
+        free( [v pointerValue] );
+    }
+    [o_displayInfos removeAllObjects];
+    [o_displayInfos release];
+
     [super dealloc];
 }
 
@@ -188,14 +202,11 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_capture_mode_pop removeAllItems];
     [o_capture_mode_pop addItemWithTitle: _NS("Video Device")];
     [o_capture_mode_pop addItemWithTitle: _NS("Audio Device")];
-
-    // our screen capture module isn't Lion-compatible, so let's hide it from the user if needed (trac #4799)
-    if( NSAppKitVersionNumber < 1115.2 )
-        [o_capture_mode_pop addItemWithTitle: _NS("Screen")];
-
+    [o_capture_mode_pop addItemWithTitle: _NS("Screen")];
     [o_capture_mode_pop addItemWithTitle: @"EyeTV"];
     [o_screen_long_lbl setStringValue: _NS("This input allows you to save, stream or display your current screen contents.")];
     [o_screen_fps_lbl setStringValue: _NS("Frames per Second:")];
+    [o_screen_screen_lbl setStringValue: _NS("Screen:")];
     [o_screen_left_lbl setStringValue: _NS("Subscreen left:")];
     [o_screen_top_lbl setStringValue: _NS("Subscreen top:")];
     [o_screen_width_lbl setStringValue: _NS("Subscreen width:")];
@@ -304,6 +315,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     /* we want to be notified about removed or added media */
     o_specialMediaFolders = [[NSMutableArray alloc] init];
     o_opticalDevices = [[NSMutableArray alloc] init];
+    o_displayInfos = [[NSMutableArray alloc] init];
     NSWorkspace *sharedWorkspace = [NSWorkspace sharedWorkspace];
 
     [[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidMountNotification object:nil];
@@ -457,7 +469,12 @@ static VLCOpen *_o_sharedMainInstance = nil;
         {
             if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Screen")] )
             {
+                int selected_index = [o_screen_screen_pop indexOfSelectedItem];
+                NSValue *v = [o_displayInfos objectAtIndex:selected_index];
+                struct display_info_t *item = ( struct display_info_t * )[v pointerValue];
+
                 [o_options addObject: [NSString stringWithFormat: @"screen-fps=%f", [o_screen_fps_fld floatValue]]];
+                [o_options addObject: [NSString stringWithFormat: @"screen-display-id=%i", item->id]];
                 [o_options addObject: [NSString stringWithFormat: @"screen-left=%i", [o_screen_left_fld intValue]]];
                 [o_options addObject: [NSString stringWithFormat: @"screen-top=%i", [o_screen_top_fld intValue]]];
                 [o_options addObject: [NSString stringWithFormat: @"screen-width=%i", [o_screen_width_fld intValue]]];
@@ -481,6 +498,20 @@ static VLCOpen *_o_sharedMainInstance = nil;
         else
             [[[VLCMain sharedInstance] playlist] appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue:YES];
     }
+}
+
+- (IBAction)screenChanged:(id)sender
+{
+    int selected_index = [o_screen_screen_pop indexOfSelectedItem];
+    if( selected_index >= [o_displayInfos count] ) return;
+
+    NSValue *v = [o_displayInfos objectAtIndex:selected_index];
+    struct display_info_t *item = ( struct display_info_t * )[v pointerValue];
+
+    [o_screen_left_stp setMaxValue: item->rect.size.width];
+    [o_screen_top_stp setMaxValue: item->rect.size.height];
+    [o_screen_width_stp setMaxValue: item->rect.size.width];
+    [o_screen_height_stp setMaxValue: item->rect.size.height];
 }
 
 - (IBAction)qtkChanged:(id)sender
@@ -1239,6 +1270,49 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [o_screen_left_fld setIntValue: config_GetInt( p_intf, "screen-left" )];
         [o_screen_top_fld setIntValue: config_GetInt( p_intf, "screen-top" )];
         [o_screen_follow_mouse_ckb setIntValue: config_GetInt( p_intf, "screen-follow-mouse" )];
+
+        int screen_index = config_GetInt( p_intf, "screen-index" );
+        int display_id = config_GetInt( p_intf, "screen-display-id" );
+        unsigned int i, displayCount = 0;
+        CGLError returnedError;
+        struct display_info_t *item;
+        NSValue *v;
+
+        returnedError = CGGetOnlineDisplayList( 0, NULL, &displayCount );
+        if( !returnedError )
+        {
+            CGDirectDisplayID *ids;
+            ids = ( CGDirectDisplayID * )malloc( displayCount * sizeof( CGDirectDisplayID ) );
+            returnedError = CGGetOnlineDisplayList( displayCount, ids, &displayCount );
+            if( !returnedError )
+            {
+                for( i = 0; i < [o_displayInfos count]; i ++ )
+                {
+                    v = [o_displayInfos objectAtIndex:i];
+                    free( [v pointerValue] );
+                }
+                [o_displayInfos removeAllObjects];
+                [o_screen_screen_pop removeAllItems];
+                for( i = 0; i < displayCount; i ++ )
+                {
+                    item = ( struct display_info_t * )malloc( sizeof( struct display_info_t ) );
+                    item->id = ids[i];
+                    item->rect = CGDisplayBounds( item->id );
+                    [o_screen_screen_pop addItemWithTitle: [NSString stringWithFormat:@"Screen %d (%dx%d)", i + 1, (int)item->rect.size.width, (int)item->rect.size.height]];
+                    v = [NSValue valueWithPointer:item];
+                    [o_displayInfos addObject:v];
+                    if( i == 0 || display_id == item->id || screen_index - 1 == i )
+                    {
+                        [o_screen_screen_pop selectItemAtIndex: i];
+                        [o_screen_left_stp setMaxValue: item->rect.size.width];
+                        [o_screen_top_stp setMaxValue: item->rect.size.height];
+                        [o_screen_width_stp setMaxValue: item->rect.size.width];
+                        [o_screen_height_stp setMaxValue: item->rect.size.height];
+                    }
+                }
+            }
+            free( ids );
+        }
     }
     else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Video Device")] )
     {
@@ -1261,13 +1335,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
         else
             [self setMRL:[NSString stringWithFormat:@"qtsound://%@", qtkaudio_currdevice_uid]];
     }
-}
-
-- (IBAction)screenStepperChanged:(id)sender
-{
-    [o_screen_fps_fld setFloatValue: [o_screen_fps_stp floatValue]];
-    [o_panel makeFirstResponder: o_screen_fps_fld];
-    [self setMRL: @"screen://"];
 }
 
 - (void)screenFPSfieldChanged:(NSNotification *)o_notification

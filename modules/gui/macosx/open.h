@@ -181,6 +181,8 @@
     IBOutlet id o_screen_fps_fld;
     IBOutlet id o_screen_fps_lbl;
     IBOutlet id o_screen_fps_stp;
+    IBOutlet id o_screen_screen_lbl;
+    IBOutlet id o_screen_screen_pop;
     IBOutlet id o_screen_left_fld;
     IBOutlet id o_screen_left_lbl;
     IBOutlet id o_screen_left_stp;
@@ -227,6 +229,7 @@
     NSString *o_sub_path;
     NSString *o_mrl;
     intf_thread_t * p_intf;
+    NSMutableArray *o_displayInfos;
 }
 
 + (VLCOpen *)sharedInstance;
@@ -271,12 +274,12 @@
 - (IBAction)openCaptureModeChanged:(id)sender;
 - (IBAction)qtkChanged:(id)sender;
 - (IBAction)qtkAudioChanged:(id)sender;
+- (IBAction)screenChanged:(id)sender;
 - (IBAction)eyetvSwitchChannel:(id)sender;
 - (IBAction)eyetvLaunch:(id)sender;
 - (IBAction)eyetvGetPlugin:(id)sender;
 - (void)eyetvChanged:(NSNotification *)o_notification;
 - (void)setupChannelInfo;
-- (IBAction)screenStepperChanged:(id)sender;
 - (void)screenFPSfieldChanged:(NSNotification *)o_notification;
 
 - (IBAction)subsChanged:(id)sender;
