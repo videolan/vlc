@@ -292,13 +292,14 @@ char *vlc_sdp_Start (vlc_object_t *obj, const char *cfgpref,
     if (sdp == NULL)
         return NULL;
 
-    /* Totally non-standard */
-    strcpy (subvar, "group");
-    char *group = var_GetNonEmptyString (obj, varname);
-    if (group != NULL)
+    strcpy (subvar, "cat");
+    char *cat = var_GetNonEmptyString (obj, varname);
+    if (cat != NULL)
     {
-        sdp_AddAttribute (&sdp, "x-plgroup", "%s", group);
-        free (group);
+        sdp_AddAttribute (&sdp, "cat", "%s", cat);
+        /* Totally non-standard */
+        sdp_AddAttribute (&sdp, "x-plgroup", "%s", cat);
+        free (cat);
     }
 
     return sdp;
