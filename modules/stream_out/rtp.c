@@ -93,6 +93,10 @@
 #define NAME_LONGTEXT N_( \
     "This is the name of the session that will be announced in the SDP " \
     "(Session Descriptor)." )
+#define CAT_TEXT N_("Session category")
+#define CAT_LONGTEXT N_( \
+  "This allows you to specify a category for the session, " \
+  "that will be announced if you choose to use SAP." )
 #define DESC_TEXT N_("Session description")
 #define DESC_LONGTEXT N_( \
     "This allows you to give a short description with details about the stream, " \
@@ -202,6 +206,7 @@ vlc_module_begin ()
 
     add_string( SOUT_CFG_PREFIX "name", "", NAME_TEXT,
                 NAME_LONGTEXT, true )
+    add_string( SOUT_CFG_PREFIX "cat", "", CAT_TEXT, CAT_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "description", "", DESC_TEXT,
                 DESC_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "url", "", URL_TEXT,
@@ -261,8 +266,8 @@ vlc_module_end ()
  * Exported prototypes
  *****************************************************************************/
 static const char *const ppsz_sout_options[] = {
-    "dst", "name", "port", "port-audio", "port-video", "*sdp", "ttl", "mux",
-    "sap", "description", "url", "email", "phone",
+    "dst", "name", "cat", "port", "port-audio", "port-video", "*sdp", "ttl",
+    "mux", "sap", "description", "url", "email", "phone",
     "proto", "rtcp-mux", "caching",
 #ifdef HAVE_SRTP
     "key", "salt",
