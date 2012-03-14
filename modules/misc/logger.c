@@ -269,8 +269,8 @@ static int Open( vlc_object_t *p_this )
         if( !psz_file )
         {
 #ifdef __APPLE__
-# define LOG_DIR "Library/Logs/"
-            char *home = config_GetUserDir(VLC_DOCUMENTS_DIR);
+# define LOG_DIR "Library/Logs"
+            char *home = config_GetUserDir(VLC_HOME_DIR);
             if( home == NULL
              || asprintf( &psz_file, "%s/"LOG_DIR"/%s", home,
                           filename ) == -1 )
