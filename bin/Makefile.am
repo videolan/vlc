@@ -57,7 +57,7 @@ vlc_win32_rc.rc: $(top_builddir)/config.status vlc_win32_rc.rc.in
 	$(SHELL) ./config.status --file="bin/$@"
 
 vlc_win32_rc.$(OBJEXT): vlc_win32_rc.rc
-	$(WINDRES) --include-dir $(top_srcdir)/share/icons -i $< -o $@
+	$(WINDRES) --include-dir $(top_srcdir)/share/icons --include-dir $(top_srcdir)/extras/package/win32 -i $< -o $@
 
 vlc_cache_gen_SOURCES = cachegen.c
 vlc_cache_gen_LDADD = \

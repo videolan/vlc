@@ -30,3 +30,4 @@ BEGIN
   END
 END
 
+2 RT_MANIFEST "vlc.exe.manifest"

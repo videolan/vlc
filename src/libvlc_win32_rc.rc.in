@@ -26,3 +26,4 @@ BEGIN
   END
 END
 
+2 RT_MANIFEST "libvlc.dll.manifest"

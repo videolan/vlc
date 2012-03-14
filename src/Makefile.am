@@ -191,7 +191,7 @@ libvlccore_la_LDFLAGS += -Wl,libvlc_win32_rc.$(OBJEXT) -avoid-version
 endif
 
 libvlc_win32_rc.$(OBJEXT): libvlc_win32_rc.rc
-	$(WINDRES) --include-dir $(top_srcdir)/share -i $< -o $@
+	$(WINDRES) --include-dir $(top_srcdir)/share --include-dir $(top_srcdir)/extras/package/win32 -i $< -o $@
 
 EXTRA_libvlccore_la_SOURCES = \
 	$(SOURCES_libvlc_darwin) \
