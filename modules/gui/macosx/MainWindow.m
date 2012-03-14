@@ -634,9 +634,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (IBAction)togglePlaylist:(id)sender
 {
-    if (![self isVisible])
+    if (![self isVisible] && sender != nil)
     {
         [self makeKeyAndOrderFront: sender];
+        return;
     }
 
     BOOL b_activeVideo = [[VLCMain sharedInstance] activeVideoPlayback];
