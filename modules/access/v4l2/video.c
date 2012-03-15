@@ -541,6 +541,56 @@ void ParseMRL( vlc_object_t *obj, const char *mrl )
     }
 }
 
+int SetupAudio (vlc_object_t *obj, int fd,
+                const struct v4l2_input *restrict input)
+{
+    if (input->audioset == 0)
+    {
+        msg_Dbg (obj, "no audio input available");
+        return 0;
+    }
+    msg_Dbg (obj, "available audio inputs: 0x%08"PRIX32, input->audioset);
+
+    uint32_t idx = var_InheritInteger (obj, CFG_PREFIX"audio-input");
+    if (idx == (uint32_t)-1)
+    {
+        msg_Dbg (obj, "no audio input selected");
+        return 0;
+    }
+    if (((1 << idx) & input->audioset) == 0)
+    {
+        msg_Warn (obj, "skipped unavailable audio input %"PRIu32, idx);
+        return -1;
+    }
+
+    /* TODO: Enumerate other selectable audio inputs. How to expose them? */
+    struct v4l2_audio enumaudio = { .index = idx };
+
+    if (v4l2_ioctl (fd, VIDIOC_ENUMAUDIO, &enumaudio) < 0)
+    {
+        msg_Err (obj, "cannot get audio input %"PRIu32" properties: %m", idx);
+        return -1;
+    }
+
+    msg_Dbg (obj, "audio input %"PRIu32" (%s) is %s"
+             " (capabilities: 0x%08"PRIX32")", enumaudio.index, enumaudio.name,
+             (enumaudio.capability & V4L2_AUDCAP_STEREO) ? "Stereo" : "Mono",
+             enumaudio.capability);
+    if (enumaudio.capability & V4L2_AUDCAP_AVL)
+        msg_Dbg (obj, " supports Automatic Volume Level");
+
+    /* TODO: AVL mode */
+    struct v4l2_audio audio = { .index = idx };
+
+    if (v4l2_ioctl (fd, VIDIOC_S_AUDIO, &audio) < 0)
+    {
+        msg_Err (obj, "cannot select audio input %"PRIu32": %m", idx);
+        return -1;
+    }
+    msg_Dbg (obj, "selected audio input %"PRIu32, idx);
+    return 0;
+}
+
 /*****************************************************************************
  * GrabVideo: Grab a video frame
  *****************************************************************************/
@@ -888,37 +938,7 @@ int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
         bottom_first = false;
 
     /* Set audio input */
-    if( cap.capabilities & V4L2_CAP_AUDIO )
-    {
-        struct v4l2_audio audio = { .index = 0 };
-        uint32_t idx = var_InheritInteger( p_obj, CFG_PREFIX"audio-input" );
-
-        /* Probe audio inputs */
-        while( v4l2_ioctl( i_fd, VIDIOC_ENUMAUDIO, &audio ) >= 0 )
-        {
-            msg_Dbg( p_obj, "audio input %u (%s) is %s%s %c", audio.index,
-                     audio.name,
-                     audio.capability & V4L2_AUDCAP_STEREO ? "Stereo" : "Mono",
-                     audio.capability & V4L2_AUDCAP_AVL
-                         ? " (Automatic Volume Level supported)" : "",
-                     audio.index == idx );
-            audio.index++;
-        }
-
-        if( idx != (uint32_t)-1 )
-        {
-            memset( &audio, 0, sizeof(audio) );
-            audio.index = idx;
-            /* TODO: AVL support (audio.mode) */
-
-            if( v4l2_ioctl( i_fd, VIDIOC_S_AUDIO, &audio ) < 0 )
-            {
-                msg_Err( p_obj, "cannot set audio input %"PRIu32": %m", idx );
-                return -1;
-            }
-            msg_Dbg( p_obj, "audio input set to %"PRIu32, idx );
-        }
-    }
+    SetupAudio (p_obj, i_fd, &input);
 
     /* List tuner caps */
     if( cap.capabilities & V4L2_CAP_TUNER )
