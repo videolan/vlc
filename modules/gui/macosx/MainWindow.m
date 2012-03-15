@@ -974,7 +974,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
  *              Felipe A. Rodriguez <far@ix.netcom.com>, Richard Frith-Macdonald <richard@brainstorm.co.uk>
  *    Copyright (C) 1996 Free Software Foundation, Inc.
  */
-- (void) customZoom: (id)sender
+- (void)customZoom:(id)sender
 {
     NSRect maxRect = [[self screen] visibleFrame];
     NSRect currentFrame = [self frame];

@@ -151,7 +151,7 @@
 - (IBAction)dropzoneButtonAction:(id)sender;
 
 - (void)setTitle:(NSString *)title;
-- (void) customZoom: (id)sender;
+- (void) customZoom:(id)sender;
 - (void)windowResizedOrMoved:(NSNotification *)notification;
 
 - (void)showDropZone;
@@ -204,5 +204,6 @@
 }
 
 - (BOOL)isFullscreen;
+- (void)customZoom:(id)sender;
 
 @end
