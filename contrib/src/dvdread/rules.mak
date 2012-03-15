@@ -18,6 +18,7 @@ $(TARBALLS)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
 dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2 .sum-dvdread
 	$(UNPACK)
 	$(APPLY) $(SRC)/dvdread/dvdread-css-static.patch
+	$(APPLY) $(SRC)/dvdread/osx.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/dvdread/dvdread-win32.patch
 endif
