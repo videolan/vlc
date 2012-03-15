@@ -37,6 +37,7 @@ class TimeTooltip : public QWidget
 public:
     explicit TimeTooltip( QWidget *parent = 0 );
     void setTip( const QPoint& pos, const QString& time, const QString& text );
+    virtual void show();
 
 protected:
     virtual void paintEvent( QPaintEvent * );
@@ -53,6 +54,7 @@ private:
     QPainterPath mPainterPath;
     QBitmap mMask;
     int mTipX;
+    bool mInitialized;
 };
 
 #endif // TIMETOOLTIP_H
