@@ -611,7 +611,7 @@ void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
 
     // compute the minimum size that will be required for the psz_length
     // and use it to enforce a minimal size to avoid "dancing" widgets
-    QSize minsize;
+    QSize minsize( 0, 0 );
     if ( length > 0 )
     {
         QMargins margins = contentsMargins();
