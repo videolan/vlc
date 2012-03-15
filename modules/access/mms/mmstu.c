@@ -532,7 +532,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     var_buffer_initwrite( &buffer, 0 );
     var_buffer_add16( &buffer, 0x001c );
     var_buffer_add16( &buffer, 0x0003 );
-    if( asprintf( tmp,
+    if( asprintf( &tmp,
              "NSPlayer/7.0.0.1956; {"GUID_FMT"}; Host: %s",
              GUID_PRINT( p_sys->guid ),
              p_url->psz_host ) < 0 )
@@ -596,7 +596,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     var_buffer_add32( &buffer, 0x00000002 );
     if( b_udp )
     {
-        if( asprintf( tmp,
+        if( asprintf( &tmp,
                     "\\\\%s\\UDP\\%d",
                     p_sys->sz_bind_addr,
                     7000 ) < 0) // FIXME
@@ -608,7 +608,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     }
     else
     {
-        if( asprintf( tmp, "\\\\192.168.0.1\\TCP\\1242" ) < 0 )
+        if( asprintf( &tmp, "\\\\192.168.0.1\\TCP\\1242" ) < 0 )
         {
             var_buffer_free( &buffer );
             MMSClose( p_access );
