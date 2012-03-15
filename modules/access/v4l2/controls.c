@@ -27,10 +27,13 @@
 # include "config.h"
 #endif
 
-#include "v4l2.h"
 #include <ctype.h>
 #include <assert.h>
 #include <sys/ioctl.h>
+
+#include <vlc_common.h>
+
+#include "v4l2.h"
 
 typedef struct vlc_v4l2_ctrl_name
 {

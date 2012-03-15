@@ -27,14 +27,15 @@
 # include "config.h"
 #endif
 
-#include "v4l2.h"
-
 #include <errno.h>
 #include <fcntl.h>
 #include <poll.h>
 
+#include <vlc_common.h>
 #include <vlc_access.h>
 #include <vlc_fs.h>
+
+#include "v4l2.h"
 
 static block_t *AccessRead( access_t * );
 static ssize_t AccessReadStream( access_t *, uint8_t *, size_t );

@@ -27,15 +27,17 @@
 # include "config.h"
 #endif
 
-#include "v4l2.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <poll.h>
 
+#include <vlc_common.h>
 #include <vlc_demux.h>
 #include <vlc_fs.h>
+
+#include "v4l2.h"
 
 static int DemuxControl( demux_t *, int, va_list );
 static int Demux( demux_t * );

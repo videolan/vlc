@@ -27,6 +27,9 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+
+#include <vlc_common.h>
+
 #include "v4l2.h"
 
 static void *v4l2_handle = NULL;

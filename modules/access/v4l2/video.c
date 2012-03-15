@@ -37,16 +37,18 @@
 # include "config.h"
 #endif
 
-#include "v4l2.h"
-#include <vlc_plugin.h>
-#include <vlc_demux.h>
-
 #include <math.h>
 #include <assert.h>
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <poll.h>
+
+#include <vlc_common.h>
+#include <vlc_plugin.h>
+#include <vlc_demux.h>
+
+#include "v4l2.h"
 
 /*****************************************************************************
  * Module descriptior

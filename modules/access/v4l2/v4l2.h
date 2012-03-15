@@ -18,8 +18,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <vlc_common.h>
-
 #if defined(HAVE_LINUX_VIDEODEV2_H)
 #   include <linux/videodev2.h>
 #elif defined(HAVE_SYS_VIDEOIO_H)
