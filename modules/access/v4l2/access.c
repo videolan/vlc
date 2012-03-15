@@ -41,9 +41,6 @@ int AccessOpen( vlc_object_t *obj )
 {
     access_t *access = (access_t *)obj;
 
-    /* Only when selected */
-    if( *access->psz_access == '\0' ) return VLC_EGENERIC;
-
     access_InitFields( access );
 
     demux_sys_t *sys = calloc( 1, sizeof( demux_sys_t ));
