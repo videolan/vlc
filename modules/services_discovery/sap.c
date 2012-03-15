@@ -811,7 +811,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
 
                 /* Compute the average period */
                 mtime_t now = mdate();
-                p_announce->i_period = (p_announce->i_period + (now - p_announce->i_last)) / 2;
+                p_announce->i_period = ( p_announce->i_period * (p_announce->i_period_trust-1) + (now - p_announce->i_last) ) / p_announce->i_period_trust;
                 p_announce->i_last = now;
             }
             FreeSDP( p_sdp ); p_sdp = NULL;
