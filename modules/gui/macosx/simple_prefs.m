@@ -431,7 +431,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
         p_parser = p_list[i_index];
         if( module_provides( p_parser, p_item->psz_type ) )
         {
-            [object addItemWithTitle: [NSString stringWithUTF8String: module_GetLongName( p_parser ) ?: ""]];
+            [object addItemWithTitle: [NSString stringWithUTF8String: _(module_GetLongName( p_parser )) ?: ""]];
             if( p_item->value.psz && !strcmp( p_item->value.psz, module_get_object( p_parser ) ) )
                 [object selectItem: [object lastItem]];
         }
