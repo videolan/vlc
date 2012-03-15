@@ -273,17 +273,16 @@ static const char *const standards_user[] = { N_("Undefined"), N_("All"),
 };
 
 static const int i_tuner_audio_modes_list[] = {
-      -1, V4L2_TUNER_MODE_MONO, V4L2_TUNER_MODE_STEREO,
-      V4L2_TUNER_MODE_LANG1, V4L2_TUNER_MODE_LANG2,
-      V4L2_TUNER_MODE_SAP, V4L2_TUNER_MODE_LANG1_LANG2 };
+      V4L2_TUNER_MODE_MONO, V4L2_TUNER_MODE_STEREO,
+      V4L2_TUNER_MODE_LANG1, V4L2_TUNER_MODE_LANG2, V4L2_TUNER_MODE_LANG1_LANG2
+};
 static const char *const psz_tuner_audio_modes_list_text[] = {
-      N_("Unspecified"),
-      N_( "Mono" ),
-      N_( "Stereo" ),
-      N_( "Primary language (Analog TV tuners only)" ),
-      N_( "Secondary language (Analog TV tuners only)" ),
-      N_( "Second audio program (Analog TV tuners only)" ),
-      N_( "Primary language left, Secondary language right" ) };
+      N_("Mono"),
+      N_("Stereo"),
+      N_("Primary language"),
+      N_("Secondary language or program"),
+      N_("Dual mono" )
+};
 
 #define V4L2_DEFAULT "/dev/video0"
 
@@ -337,16 +336,13 @@ vlc_module_begin ()
     add_obsolete_bool( CFG_PREFIX "use-libv4l2" ) /* since 2.1.0 */
 
     set_section( N_( "Tuner" ), NULL )
-    add_integer( CFG_PREFIX "tuner", 0, TUNER_TEXT, TUNER_LONGTEXT,
-                 true )
-        change_integer_range( 0, 0xFFFFFFFE )
-        change_safe()
+    add_obsolete_integer( CFG_PREFIX "tuner" ) /* since 2.1.0 */
     add_integer( CFG_PREFIX "tuner-frequency", -1, FREQUENCY_TEXT,
                  FREQUENCY_LONGTEXT, true )
         change_integer_range( -1, 0xFFFFFFFE )
         change_safe()
-    add_integer( CFG_PREFIX "tuner-audio-mode", -1, TUNER_AUDIO_MODE_TEXT,
-                 TUNER_AUDIO_MODE_LONGTEXT, true )
+    add_integer( CFG_PREFIX "tuner-audio-mode", V4L2_TUNER_MODE_LANG1,
+                 TUNER_AUDIO_MODE_TEXT, TUNER_AUDIO_MODE_LONGTEXT, true )
         change_integer_list( i_tuner_audio_modes_list,
                              psz_tuner_audio_modes_list_text )
         change_safe()
@@ -572,8 +568,8 @@ int SetupAudio (vlc_object_t *obj, int fd,
         return -1;
     }
 
-    msg_Dbg (obj, "audio input %"PRIu32" (%s) is %s"
-             " (capabilities: 0x%08"PRIX32")", enumaudio.index, enumaudio.name,
+    msg_Dbg (obj, "audio input %s (%"PRIu32") is %s"
+             " (capabilities: 0x%08"PRIX32")", enumaudio.name, enumaudio.index,
              (enumaudio.capability & V4L2_AUDCAP_STEREO) ? "Stereo" : "Mono",
              enumaudio.capability);
     if (enumaudio.capability & V4L2_AUDCAP_AVL)
@@ -588,6 +584,113 @@ int SetupAudio (vlc_object_t *obj, int fd,
         return -1;
     }
     msg_Dbg (obj, "selected audio input %"PRIu32, idx);
+    return 0;
+}
+
+int SetupTuner (vlc_object_t *obj, int fd,
+                const struct v4l2_input *restrict input)
+{
+    switch (input->type)
+    {
+        case V4L2_INPUT_TYPE_TUNER:
+            msg_Dbg (obj, "tuning required: tuner %"PRIu32, input->tuner);
+            break;
+        case V4L2_INPUT_TYPE_CAMERA:
+            msg_Dbg (obj, "no tuning required (analog baseband input)");
+            return 0;
+        default:
+            msg_Err (obj, "unknown input tuning type %"PRIu32, input->type);
+            return 0; // hopefully we can stream regardless...
+    }
+
+    struct v4l2_tuner tuner = { .index = input->tuner };
+
+    if (v4l2_ioctl (fd, VIDIOC_G_TUNER, &tuner) < 0)
+    {
+        msg_Err (obj, "cannot get tuner %"PRIu32" properties: %m",
+                 input->tuner);
+        return -1;
+    }
+
+    /* NOTE: This is overkill. Only video devices currently work, so the
+     * type is always analog TV. */
+    const char *typename, *mult;
+    switch (tuner.type)
+    {
+        case V4L2_TUNER_RADIO:
+            typename = "Radio";
+            break;
+        case V4L2_TUNER_ANALOG_TV:
+            typename = "Analog TV";
+            break;
+        default:
+            typename = "unknown";
+    }
+    mult = (tuner.capability & V4L2_TUNER_CAP_LOW) ? "" : "k";
+
+    msg_Dbg (obj, "tuner %s (%"PRIu32") is %s", tuner.name, tuner.index,
+             typename);
+    msg_Dbg (obj, " ranges from %u.%u %sHz to %u.%c %sHz",
+             (tuner.rangelow * 125) >> 1, (tuner.rangelow & 1) * 5, mult,
+             (tuner.rangehigh * 125) >> 1, (tuner.rangehigh & 1) * 5,
+             mult);
+
+    /* TODO: only set video standard if the tuner requires it */
+
+    /* Configure the audio mode */
+    /* TODO: Ideally, L1 would be selected for stereo tuners, and L1_L2
+     * for mono tuners. When dual-mono is detected after tuning on a stereo
+     * tuner, we would fallback to L1_L2 too. Then we would flag dual-mono
+     * for the audio E/S. Unfortunately, we have no access to the audio E/S
+     * here (it belongs in the slave audio input...). */
+    tuner.audmode = var_InheritInteger (obj, CFG_PREFIX"tuner-audio-mode");
+    memset (tuner.reserved, 0, sizeof (tuner.reserved));
+
+    if (tuner.capability & V4L2_TUNER_CAP_LANG1)
+        msg_Dbg (obj, " supports primary audio language");
+    else if (tuner.audmode == V4L2_TUNER_MODE_LANG1)
+    {
+        msg_Warn (obj, " falling back to stereo mode");
+        tuner.audmode = V4L2_TUNER_MODE_STEREO;
+    }
+    if (tuner.capability & V4L2_TUNER_CAP_LANG2)
+        msg_Dbg (obj, " supports secondary audio language or program");
+    if (tuner.capability & V4L2_TUNER_CAP_STEREO)
+        msg_Dbg (obj, " supports stereo audio");
+    else if (tuner.audmode == V4L2_TUNER_MODE_STEREO)
+    {
+        msg_Warn (obj, " falling back to mono mode");
+        tuner.audmode = V4L2_TUNER_MODE_MONO;
+    }
+
+    if (v4l2_ioctl (fd, VIDIOC_S_TUNER, &tuner) < 0)
+    {
+        msg_Err (obj, "cannot set tuner %"PRIu32" audio mode: %m",
+                 input->tuner);
+        return -1;
+    }
+    msg_Dbg (obj, "tuner %"PRIu32" audio mode %u set", input->tuner,
+             tuner.audmode);
+
+    /* Tune to the requested frequency */
+    uint32_t freq = var_InheritInteger (obj, CFG_PREFIX"tuner-frequency");
+    if (freq != (uint32_t)-1)
+    {
+        struct v4l2_frequency frequency = {
+            .tuner = input->tuner,
+            .type = V4L2_TUNER_ANALOG_TV,
+            .frequency = freq * 125 / 2
+        };
+
+        if (v4l2_ioctl (fd, VIDIOC_S_FREQUENCY, &frequency) < 0)
+        {
+            msg_Err (obj, "cannot tuner tuner %u to frequency %u %sHz: %m",
+                     input->tuner, freq, mult);
+            return -1;
+        }
+    }
+    msg_Dbg (obj, "tuner %"PRIu32" tuned to frequency %"PRIu32" %sHz",
+             input->tuner, freq, mult);
     return 0;
 }
 
@@ -937,79 +1040,8 @@ int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
     else
         bottom_first = false;
 
-    /* Set audio input */
     SetupAudio (p_obj, i_fd, &input);
-
-    /* List tuner caps */
-    if( cap.capabilities & V4L2_CAP_TUNER )
-    {
-        struct v4l2_tuner tuner;
-        uint32_t idx = var_CreateGetInteger( p_obj, CFG_PREFIX"tuner" );
-        enum v4l2_tuner_type type = V4L2_TUNER_RADIO;
-
-        tuner.index = 0;
-        while( v4l2_ioctl( i_fd, VIDIOC_G_TUNER, &tuner ) >= 0 )
-        {
-            if( tuner.index == idx )
-                type = tuner.type;
-
-            const char *unit =
-                (tuner.capability & V4L2_TUNER_CAP_LOW) ? "Hz" : "kHz";
-            msg_Dbg( p_obj, "tuner %u (%s) has type: %s, "
-                     "frequency range: %.1f %s -> %.1f %s", tuner.index,
-                     tuner.name,
-                     tuner.type == V4L2_TUNER_RADIO ? "Radio" : "Analog TV",
-                     tuner.rangelow * 62.5, unit,
-                     tuner.rangehigh * 62.5, unit );
-
-            struct v4l2_frequency frequency = { .tuner = tuner.index };
-            if( v4l2_ioctl( i_fd, VIDIOC_G_FREQUENCY, &frequency ) < 0 )
-            {
-                msg_Err( p_obj, "cannot get tuner frequency: %m" );
-                return -1;
-            }
-            msg_Dbg( p_obj, "tuner %u (%s) frequency: %.1f %s", tuner.index,
-                     tuner.name, frequency.frequency * 62.5, unit );
-            tuner.index++;
-        }
-
-        /* Tune the tuner */
-        uint32_t freq = var_InheritInteger( p_obj,
-                                            CFG_PREFIX"tuner-frequency" );
-        if( freq != (uint32_t)-1 )
-        {
-            struct v4l2_frequency frequency = {
-                .tuner = idx,
-                .type = type,
-                .frequency = freq / 62.5,
-            };
-
-            if( v4l2_ioctl( i_fd, VIDIOC_S_FREQUENCY, &frequency ) < 0 )
-            {
-                msg_Err( p_obj, "cannot set tuner frequency: %m" );
-                return -1;
-            }
-            msg_Dbg( p_obj, "tuner frequency set" );
-        }
-
-        /* Set the tuner audio mode */
-        int32_t audmode = var_InheritInteger( p_obj,
-                                              CFG_PREFIX"tuner-audio-mode" );
-        if( audmode >= 0 )
-        {
-            struct v4l2_tuner tuner = {
-                .index = idx,
-                .audmode = audmode,
-            };
-
-            if( v4l2_ioctl( i_fd, VIDIOC_S_TUNER, &tuner ) < 0 )
-            {
-                msg_Err( p_obj, "cannot set tuner audio mode: %m" );
-                return -1;
-            }
-            msg_Dbg( p_obj, "tuner audio mode set" );
-        }
-    }
+    SetupTuner (p_obj, i_fd, &input);
 
     /* Probe for available chromas */
     struct v4l2_fmtdesc *codecs = NULL;

@@ -111,6 +111,7 @@ struct buffer_t
 /* video.c */
 void ParseMRL(vlc_object_t *, const char *);
 int SetupAudio (vlc_object_t *, int, const struct v4l2_input *);
+int SetupTuner (vlc_object_t *, int, const struct v4l2_input *);
 block_t* GrabVideo(vlc_object_t *, demux_sys_t *);
 int InitVideo(vlc_object_t *, int fd, demux_sys_t *, bool demux);
 
