@@ -555,6 +555,8 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
       buffering( false ), showBuffering(false), bufVal( -1 ), displayType( _displayType )
 {
     b_remainingTime = false;
+    if( _displayType != TimeLabel::Elapsed )
+        b_remainingTime = getSettings()->value( "MainWindow/ShowRemainingTime", false ).toBool();
     switch( _displayType ) {
         case TimeLabel::Elapsed:
             setText( " --:-- " );
@@ -680,6 +682,7 @@ void TimeLabel::setDisplayPosition( float pos )
 void TimeLabel::toggleTimeDisplay()
 {
     b_remainingTime = !b_remainingTime;
+    getSettings()->setValue( "MainWindow/ShowRemainingTime", b_remainingTime );
 }
 
 
