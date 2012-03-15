@@ -162,6 +162,7 @@ void SeekSlider::setPosition( float pos, int64_t time, int length )
     if( pos == -1.0 )
     {
         setEnabled( false );
+        mTimeTooltip->hide();
         isSliding = false;
     }
     else
