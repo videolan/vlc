@@ -28,10 +28,13 @@
 #endif
 
 #include "v4l2.h"
-#include <vlc_access.h>
 
 #include <errno.h>
+#include <fcntl.h>
 #include <poll.h>
+
+#include <vlc_access.h>
+#include <vlc_fs.h>
 
 static block_t *AccessRead( access_t * );
 static ssize_t AccessReadStream( access_t *, uint8_t *, size_t );
@@ -49,13 +52,36 @@ int AccessOpen( vlc_object_t *obj )
     access->p_sys = (access_sys_t *)sys;
 
     ParseMRL( obj, access->psz_location );
-    sys->i_fd = OpenVideo( obj, sys, false );
-    if( sys->i_fd == -1 )
+
+    char *path = var_InheritString (obj, CFG_PREFIX"dev");
+    if (unlikely(path == NULL))
+        goto error; /* probably OOM */
+    msg_Dbg (obj, "opening device '%s'", path);
+
+    int rawfd = vlc_open (path, O_RDWR);
+    if (rawfd == -1)
     {
-        free( sys );
-        return VLC_EGENERIC;
+        msg_Err (obj, "cannot open device '%s': %m", path);
+        free (path);
+        goto error;
+    }
+    free (path);
+
+    int fd = v4l2_fd_open (rawfd, 0);
+    if (fd == -1)
+    {
+        msg_Warn (obj, "cannot initialize user-space library: %m");
+        /* fallback to direct kernel mode anyway */
+        fd = rawfd;
     }
 
+    if (InitVideo (obj, fd, sys, false))
+    {
+        v4l2_close (fd);
+        goto error;
+    }
+
+    sys->i_fd = fd;
     if( sys->io == IO_METHOD_READ )
         access->pf_read = AccessReadStream;
     else
@@ -63,6 +89,9 @@ int AccessOpen( vlc_object_t *obj )
     access->pf_seek = NULL;
     access->pf_control = AccessControl;
     return VLC_SUCCESS;
+error:
+    free (sys);
+    return VLC_EGENERIC;
 }
 
 void AccessClose( vlc_object_t *obj )

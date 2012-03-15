@@ -39,13 +39,11 @@
 
 #include "v4l2.h"
 #include <vlc_plugin.h>
-#include <vlc_fs.h>
 #include <vlc_demux.h>
 
 #include <math.h>
 #include <assert.h>
 #include <errno.h>
-#include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <poll.h>
@@ -776,46 +774,8 @@ static bool IsPixelFormatSupported( struct v4l2_fmtdesc *codecs, size_t n,
 }
 
 
-static int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
-                      bool b_demux );
-
-/**
- * Opens and sets up a video device
- * \return file descriptor or -1 on error
- */
-int OpenVideo( vlc_object_t *obj, demux_sys_t *sys, bool b_demux )
-{
-    char *path = var_InheritString( obj, CFG_PREFIX"dev" );
-    if( unlikely(path == NULL) )
-        return -1; /* probably OOM */
-
-    msg_Dbg( obj, "opening device '%s'", path );
-
-    int fd = vlc_open( path, O_RDWR );
-    if( fd == -1 )
-    {
-        msg_Err( obj, "cannot open device '%s': %m", path );
-        free( path );
-        return -1;
-    }
-    free( path );
-
-    int libfd = v4l2_fd_open( fd, 0 );
-    if( libfd == -1 )
-        goto error;
-    libfd = fd;
-
-    if( InitVideo( obj, fd, sys, b_demux ) )
-        goto error;
-
-    return fd;
-error:
-    close( fd );
-    return -1;
-}
-
-static int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
-                      bool b_demux )
+int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
+               bool b_demux )
 {
     struct v4l2_cropcap cropcap;
     struct v4l2_crop crop;

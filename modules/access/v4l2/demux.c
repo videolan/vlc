@@ -28,11 +28,14 @@
 #endif
 
 #include "v4l2.h"
-#include <vlc_demux.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <poll.h>
+
+#include <vlc_demux.h>
+#include <vlc_fs.h>
 
 static int DemuxControl( demux_t *, int, va_list );
 static int Demux( demux_t * );
@@ -40,25 +43,52 @@ static int Demux( demux_t * );
 int DemuxOpen( vlc_object_t *obj )
 {
     demux_t *demux = (demux_t *)obj;
+
     demux_sys_t *sys = calloc( 1, sizeof( demux_sys_t ) );
     if( unlikely(sys == NULL) )
         return VLC_ENOMEM;
     demux->p_sys = sys;
 
     ParseMRL( obj, demux->psz_location );
-    sys->i_fd = OpenVideo( obj, sys, true );
-    if( sys->i_fd == -1 )
+
+    char *path = var_InheritString (obj, CFG_PREFIX"dev");
+    if (unlikely(path == NULL))
+        goto error; /* probably OOM */
+    msg_Dbg (obj, "opening device '%s'", path);
+
+    int rawfd = vlc_open (path, O_RDWR);
+    if (rawfd == -1)
     {
-        free( sys );
-        return VLC_EGENERIC;
+        msg_Err (obj, "cannot open device '%s': %m", path);
+        free (path);
+        goto error;
+    }
+    free (path);
+
+    int fd = v4l2_fd_open (rawfd, 0);
+    if (fd == -1)
+    {
+        msg_Warn (obj, "cannot initialize user-space library: %m");
+        /* fallback to direct kernel mode anyway */
+        fd = rawfd;
     }
 
+    if (InitVideo (obj, fd, sys, true))
+    {
+        v4l2_close (fd);
+        goto error;
+    }
+
+    sys->i_fd = fd;
     demux->pf_demux = Demux;
     demux->pf_control = DemuxControl;
     demux->info.i_update = 0;
     demux->info.i_title = 0;
     demux->info.i_seekpoint = 0;
     return VLC_SUCCESS;
+error:
+    free (sys);
+    return VLC_EGENERIC;
 }
 
 void DemuxClose( vlc_object_t *obj )
