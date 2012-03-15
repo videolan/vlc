@@ -567,7 +567,7 @@ static void *Run( void *data )
 
         mtime_t now = mdate();
 
-        /* A 1 hour timeout correspong to the RFC Implicit timeout.
+        /* A 1 hour timeout correspond to the RFC Implicit timeout.
          * This timeout is tuned in the following loop. */
         timeout = 1000 * 60 * 60;
 
@@ -578,7 +578,7 @@ static void *Run( void *data )
             sap_announce_t * p_announce = p_sd->p_sys->pp_announces[i];
             mtime_t i_last_period = now - p_announce->i_last;
 
-            /* Remove the annoucement, if the last announcement was 1 hour ago
+            /* Remove the announcement, if the last announcement was 1 hour ago
              * or if the last packet emitted was 3 times the average time
              * between two packets */
             if( ( p_announce->i_period_trust > 5 && i_last_period > 3 * p_announce->i_period ) ||
@@ -795,7 +795,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         {
             /* We don't support delete announcement as they can easily
              * Be used to highjack an announcement by a third party.
-             * Intead we cleverly implement Implicit Announcement removal.
+             * Instead we cleverly implement Implicit Announcement removal.
              *
              * if( b_need_delete )
              *    RemoveAnnounce( p_sd, p_sd->p_sys->pp_announces[i]);
