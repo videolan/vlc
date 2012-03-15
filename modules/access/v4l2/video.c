@@ -809,6 +809,12 @@ int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
             ( cap.capabilities & V4L2_CAP_STREAMING ? 'X':' ' ),
             ( cap.capabilities & V4L2_CAP_ASYNCIO ? 'X':' ' ) );
 
+    if (!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE))
+    {
+        msg_Err (p_obj, "not a video capture device");
+        return -1;
+    }
+
     if( cap.capabilities & V4L2_CAP_STREAMING )
         p_sys->io = IO_METHOD_MMAP;
     else if( cap.capabilities & V4L2_CAP_READWRITE )
@@ -822,30 +828,27 @@ int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
     /* Now, enumerate all the video inputs. This is useless at the moment
        since we have no way to present that info to the user except with
        debug messages */
-    if( cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
+    struct v4l2_input input;
+    unsigned index = var_InheritInteger( p_obj, CFG_PREFIX"input" );
+
+    input.index = 0;
+    while( v4l2_ioctl( i_fd, VIDIOC_ENUMINPUT, &input ) >= 0 )
     {
-        struct v4l2_input input;
-        unsigned index = var_InheritInteger( p_obj, CFG_PREFIX"input" );
-
-        input.index = 0;
-        while( v4l2_ioctl( i_fd, VIDIOC_ENUMINPUT, &input ) >= 0 )
-        {
-            msg_Dbg( p_obj, "video input %u (%s) has type: %s %c",
-                     input.index, input.name,
-                     input.type == V4L2_INPUT_TYPE_TUNER
+        msg_Dbg( p_obj, "video input %u (%s) has type: %s %c",
+                 input.index, input.name,
+                 input.type == V4L2_INPUT_TYPE_TUNER
                           ? "Tuner adapter" : "External analog input",
-                     input.index == index ? '*' : ' ' );
-            input.index++;
-        }
-
-        /* Select input */
-        if( v4l2_ioctl( i_fd, VIDIOC_S_INPUT, &index ) < 0 )
-        {
-            msg_Err( p_obj, "cannot set input %u: %m", index );
-            return -1;
-        }
-        msg_Dbg( p_obj, "input set to %u", index );
+                 input.index == index ? '*' : ' ' );
+        input.index++;
     }
+
+    /* Select input */
+    if( v4l2_ioctl( i_fd, VIDIOC_S_INPUT, &index ) < 0 )
+    {
+        msg_Err( p_obj, "cannot set input %u: %m", index );
+        return -1;
+    }
+    msg_Dbg( p_obj, "input set to %u", index );
 
     /* Select standard */
     bool bottom_first;
