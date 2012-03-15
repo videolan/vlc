@@ -52,7 +52,7 @@ struct filter_sys_t
                          * allocate buffer, then dont free it twice */
 };
 
-#define DESCRIPTION N_("This filter enhances stereo effect by \
+#define HELP_TEXT N_("This filter enhances stereo effect by \
             suppressing mono,i.e. signal common to both channels, \
             and by delaying the signal of left into right and vice versa \
             thereby widening stereo effect")
@@ -75,7 +75,8 @@ struct filter_sys_t
  *****************************************************************************/
 vlc_module_begin ()
     set_shortname( N_("stereo_widen") )
-    set_description( DESCRIPTION )
+    set_description( N_("Stereo Enhancer") )
+    set_help( HELP_TEXT )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
     set_capability( "audio filter", 0 )
