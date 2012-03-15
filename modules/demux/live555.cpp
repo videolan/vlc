@@ -32,6 +32,7 @@
  * Note: config.h may include inttypes.h, so make sure we define this option
  * early enough. */
 #define __STDC_CONSTANT_MACROS 1
+#define __STDC_LIMIT_MACROS 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -1350,7 +1351,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = (int64_t*)va_arg( args, int64_t * );
             if( p_sys->f_npt_length > 0 )
             {
-                *pi64 = (int64_t)(p_sys->f_npt_length * 1000000.0);
+                double d_length = p_sys->f_npt_length * 1000000.0;
+                /* Not sure if -0.5 is needed, but better be safe */
+                if( d_length - 0.5 > INT64_MAX )
+                    *pi64 = INT64_MAX;
+                else
+                    *pi64 = (int64_t)d_length;
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
