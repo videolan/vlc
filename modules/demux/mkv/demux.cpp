@@ -536,10 +536,12 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
                         else if( MKV_IS_ID( l, KaxPrevUID ) )
                         {
                             p_segment1->p_prev_segment_uid = new KaxPrevUID( *static_cast<KaxPrevUID*>(l) );
+                            p_segment1->b_ref_external_segments = true;
                         }
                         else if( MKV_IS_ID( l, KaxNextUID ) )
                         {
                             p_segment1->p_next_segment_uid = new KaxNextUID( *static_cast<KaxNextUID*>(l) );
+                            p_segment1->b_ref_external_segments = true;
                         }
                         else if( MKV_IS_ID( l, KaxSegmentFamily ) )
                         {

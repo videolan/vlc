@@ -102,8 +102,10 @@ virtual_chapter_c::~virtual_chapter_c()
 
 virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<matroska_segment_c*> *opened_segments)
 {
+    bool b_fake_ordered = false;
     matroska_segment_c *p_main_segment = (*opened_segments)[0];
     p_edition = p_edit;
+    b_ordered = false;
 
     int64_t usertime_offset = 0;
 
@@ -123,14 +125,13 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
     }
     else /* Not ordered or no edition at all */
     {
-        b_ordered = false;
         matroska_segment_c * p_cur = p_main_segment;
         virtual_chapter_c * p_vchap = NULL;
         int64_t tmp = 0;
 
         /* check for prev linked segments */
-        /* FIXME to avoid infinite recursion we limit to 5 prev sould be better as parameter */
-        for( int limit = 0; limit < 5 && p_cur->p_prev_segment_uid ; limit++ )
+        /* FIXME to avoid infinite recursion we limit to 10 prev should be better as parameter */
+        for( int limit = 0; limit < 10 && p_cur->p_prev_segment_uid ; limit++ )
         {
             matroska_segment_c * p_prev = NULL;
             if( ( p_prev = getSegmentbyUID( p_cur->p_prev_segment_uid, opened_segments ) ) )
@@ -138,6 +139,10 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
                 tmp = 0;
                 msg_Dbg( &p_main_segment->sys.demuxer, "Prev segment 0x%x found\n",
                          *(int32_t*)p_cur->p_prev_segment_uid->GetBuffer() );
+
+                /* Preload segment */
+                if ( !p_prev->b_preloaded )
+                    p_prev->Preload();
 
                 /* Create virtual_chapter from the first edition if any */
                 chapter_item_c * p_chap = ( p_prev->stored_editions.size() > 0 )? ((chapter_item_c *)p_prev->stored_editions[0]) : NULL;
@@ -148,6 +153,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
                     chapters.insert( chapters.begin(), p_vchap );
 
                 p_cur = p_prev;
+                b_fake_ordered = true;
             }
             else /* segment not found */
                 break;
@@ -162,7 +168,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
             chapters.push_back( p_vchap );
 
         /* Append next linked segments */
-        for( int limit = 0; limit < 5 && p_cur->p_next_segment_uid; limit++ )
+        for( int limit = 0; limit < 10 && p_cur->p_next_segment_uid; limit++ )
         {
             matroska_segment_c * p_next = NULL;
             if( ( p_next = getSegmentbyUID( p_cur->p_next_segment_uid, opened_segments ) ) )
@@ -170,6 +176,10 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
                 tmp = 0;
                 msg_Dbg( &p_main_segment->sys.demuxer, "Next segment 0x%x found\n",
                          *(int32_t*) p_cur->p_next_segment_uid->GetBuffer() );
+
+                /* Preload segment */
+                if ( !p_next->b_preloaded )
+                    p_next->Preload();
 
                 /* Create virtual_chapter from the first edition if any */
                 chapter_item_c * p_chap = ( p_next->stored_editions.size() > 0 )?( (chapter_item_c *)p_next->stored_editions[0] ) : NULL;
@@ -181,6 +191,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
 
 
                 p_cur = p_next;
+                b_fake_ordered = true;
             }
             else /* segment not found */
                 break;
@@ -188,6 +199,8 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
 
         /* Retime chapters */
         retimeChapters();
+        if(b_fake_ordered)
+            b_ordered = true;
     }
 
 #if MKV_DEBUG
@@ -227,10 +240,6 @@ void virtual_edition_c::retimeChapters()
         return;
 
     i_duration = 0;
-
-    /* Sort by start time */
-    if( chapters.size() > 1 )
-        std::sort( chapters.begin(), chapters.end(), virtual_chapter_c::CompareTimecode );
 
     /* On non ordered editions we have one top chapter == one segment */
     for( size_t i = 0; i < chapters.size(); i++ )
@@ -383,8 +392,8 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
                 {
                     // only physically seek if necessary
                     if ( p_current_chapter == NULL ||
-                        ( p_current_chapter->p_chapter->i_end_time != p_cur_chapter->p_chapter->i_start_time ) ||
-                        ( p_current_chapter && p_current_chapter->p_segment != p_cur_chapter->p_segment ) )
+                        ( p_current_chapter && p_current_chapter->p_segment != p_cur_chapter->p_segment ) ||
+                        ( p_current_chapter->p_chapter->i_end_time != p_cur_chapter->p_chapter->i_start_time ))
                     {
                         Seek( demux, p_cur_chapter->i_virtual_start_time, 0, p_cur_chapter, -1 );
                         return true;
@@ -439,8 +448,8 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_
 
     if ( p_chapter != NULL )
     {
-        p_sys->i_chapter_time =
-            i_time_offset = p_chapter->i_virtual_start_time - ( ( p_chapter->p_chapter )? p_chapter->p_chapter->i_start_time : 0 );
+        i_time_offset = p_chapter->i_virtual_start_time - ( ( p_chapter->p_chapter )? p_chapter->p_chapter->i_start_time : 0 );
+        p_sys->i_chapter_time = i_time_offset - p_chapter->p_segment->i_start_time;
         if ( p_chapter->p_chapter && p_chapter->i_seekpoint_num > 0 )
         {
             demuxer.info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;

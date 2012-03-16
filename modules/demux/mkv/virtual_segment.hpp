@@ -63,9 +63,7 @@ public:
 
     static bool CompareTimecode( const virtual_chapter_c * itemA, const virtual_chapter_c * itemB )
     {
-        return ( itemA->i_virtual_start_time < itemB->i_virtual_start_time ||
-                ( itemA->i_virtual_start_time == itemB->i_virtual_start_time &&
-                  itemA->i_virtual_stop_time < itemB->i_virtual_stop_time ) );
+        return ( itemA->i_virtual_start_time < itemB->i_virtual_start_time );
     }
 
     matroska_segment_c  *p_segment;
