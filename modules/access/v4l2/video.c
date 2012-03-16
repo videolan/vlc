@@ -537,8 +537,66 @@ void ParseMRL( vlc_object_t *obj, const char *mrl )
     }
 }
 
-int SetupAudio (vlc_object_t *obj, int fd,
-                const struct v4l2_input *restrict input)
+static v4l2_std_id var_InheritStandard (vlc_object_t *obj, const char *varname)
+{
+    char *name = var_InheritString (obj, varname);
+    if (name == NULL)
+        return V4L2_STD_UNKNOWN;
+
+    const size_t n = sizeof (standards_vlc) / sizeof (*standards_vlc);
+
+    static_assert (sizeof (standards_vlc) / sizeof (*standards_vlc)
+                         == sizeof (standards_v4l2) / sizeof (*standards_v4l2),
+                   "Inconsistent standards tables");
+    static_assert (sizeof (standards_vlc) / sizeof (*standards_vlc)
+                         == sizeof (standards_user) / sizeof (*standards_user),
+                   "Inconsistent standards tables");
+
+    for (size_t i = 0; i < n; i++)
+        if (strcasecmp (name, standards_vlc[i]) == 0)
+        {
+            free (name);
+            return standards_v4l2[i];
+        }
+
+    /* Backward compatibility with old versions using V4L2 magic numbers */
+    char *end;
+    v4l2_std_id std = strtoull (name, &end, 0);
+    if (*end != '\0')
+    {
+        msg_Err (obj, "unknown video standard \"%s\"", name);
+        std = V4L2_STD_UNKNOWN;
+    }
+    free (name);
+    return std;
+}
+
+static int SetupStandard (vlc_object_t *obj, int fd,
+                          const struct v4l2_input *restrict input)
+{
+    if (!(input->capabilities & V4L2_IN_CAP_STD))
+    {
+        msg_Dbg (obj, "no video standard selection");
+        return 0;
+    }
+
+    v4l2_std_id std = var_InheritStandard (obj, CFG_PREFIX"standard");
+    if (std == V4L2_STD_UNKNOWN)
+    {
+        msg_Warn (obj, "video standard not set");
+        return 0;
+    }
+    if (v4l2_ioctl (fd, VIDIOC_S_STD, &std) < 0)
+    {
+        msg_Err (obj, "cannot set video standard 0x%"PRIx64": %m", std);
+        return -1;
+    }
+    msg_Dbg (obj, "video standard set to 0x%"PRIx64":", std);
+    return 0;
+}
+
+static int SetupAudio (vlc_object_t *obj, int fd,
+                       const struct v4l2_input *restrict input)
 {
     if (input->audioset == 0)
     {
@@ -587,8 +645,8 @@ int SetupAudio (vlc_object_t *obj, int fd,
     return 0;
 }
 
-int SetupTuner (vlc_object_t *obj, int fd,
-                const struct v4l2_input *restrict input)
+static int SetupTuner (vlc_object_t *obj, int fd,
+                       const struct v4l2_input *restrict input)
 {
     switch (input->type)
     {
@@ -1003,39 +1061,7 @@ int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
     }
     msg_Dbg( p_obj, "input set to %u", index );
 
-    /* Select standard */
-    const char *stdname = var_InheritString( p_obj, CFG_PREFIX"standard" );
-    if( stdname != NULL )
-    {
-        v4l2_std_id std = strtoull( stdname, NULL, 0 );
-        if( std == 0 )
-        {
-            const size_t n = sizeof(standards_vlc) / sizeof(*standards_vlc);
-
-            static_assert(sizeof(standards_vlc) / sizeof(*standards_vlc)
-                         == sizeof (standards_v4l2) / sizeof (*standards_v4l2),
-                          "Inconsistent standards tables");
-            static_assert(sizeof(standards_vlc) / sizeof(*standards_vlc)
-                         == sizeof (standards_user) / sizeof (*standards_user),
-                          "Inconsistent standards tables");
-
-            for( size_t i = 0; i < n; i++ )
-                if( strcasecmp( stdname, standards_vlc[i] ) == 0 )
-                {
-                    std = standards_v4l2[i];
-                    break;
-                }
-        }
-
-        if( v4l2_ioctl( i_fd, VIDIOC_S_STD, &std ) < 0
-         || v4l2_ioctl( i_fd, VIDIOC_G_STD, &std ) < 0 )
-        {
-            msg_Err( p_obj, "cannot set standard 0x%"PRIx64": %m", std );
-            return -1;
-        }
-        msg_Dbg( p_obj, "standard set to 0x%"PRIx64":", std );
-    }
-
+    SetupStandard (p_obj, i_fd, &input);
     SetupAudio (p_obj, i_fd, &input);
     SetupTuner (p_obj, i_fd, &input);
 
