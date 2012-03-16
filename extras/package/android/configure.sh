@@ -9,19 +9,24 @@ ANDROID_API=android-9
 
 VLC_SOURCEDIR="`dirname $0`/../../.."
 
-CFLAGS="-g -O2 -mlong-calls -fstrict-aliasing -fprefetch-loop-arrays -ffast-math"
+CFLAGS="-g -O2 -mlong-calls -fstrict-aliasing -mfloat-abi=softfp -funsafe-math-optimizations"
 LDFLAGS="-Wl,-Bdynamic,-dynamic-linker=/system/bin/linker -Wl,--no-undefined"
 
 if [ -z "$NO_NEON" ]; then
     CXX_TARGET="armeabi-v7a"
-    CFLAGS="$CFLAGS -mfpu=neon -march=armv7-a -mtune=cortex-a8 -mfloat-abi=softfp -ftree-vectorize -mvectorize-with-neon-quad -funsafe-math-optimizations"
+    CFLAGS="$CFLAGS -mfpu=neon -mcpu=cortex-a8"
     LDFLAGS="$LDFLAGS -Wl,--fix-cortex-a8"
     EXTRA_PARAMS=" --enable-neon"
+else if [ -n "$TEGRA2" ]
+    CXX_TARGET="armeabi-v7a"
+    CFLAGS="$CFLAGS -mfpu=vfpv3-d16 -mcpu=cortex-a9"
+    EXTRA_PARAMS=" --disable-neon"
 else
     CXX_TARGET="armeabi"
-    CFLAGS="$CFLAGS -march=armv6j -mtune=arm1136j-s -msoft-float"
+    CFLAGS="$CFLAGS -mcpu=arm1136jf-s -mfpu=vfp"
     EXTRA_PARAMS=" --disable-neon"
 fi
+
 
 CPPFLAGS="-I${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/include -I${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/libs/${CXX_TARGET}/include"
 LDFLAGS="$LDFLAGS -L${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/libs/${CXX_TARGET}"
