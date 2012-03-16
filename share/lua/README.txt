@@ -1,21 +1,22 @@
-Instructions to code your own VLC Lua scripts.
+Instructions to code your own VLC Lua scripts and extensions
 $Id$
 
 1 - About Lua
 =============
 
-Lua documentation is available on http://www.lua.org . The reference manual
+Lua documentation is available on http://www.lua.org/ . The reference manual
 is very useful: http://www.lua.org/manual/5.1/ .
 VLC uses Lua 5.1
 All the Lua standard libraries are available.
+
 
 2 - Lua in VLC
 ==============
 
 Several types of VLC Lua scripts can currently be coded:
- * Playlist (see playlist/README.txt)
- * Art fetcher (see meta/README.txt)
- * Interface (see intf/README.txt)
+ * Playlist and websites parsers (see playlist/README.txt)
+ * Art fetchers (see meta/README.txt)
+ * Interfaces (see intf/README.txt)
  * Extensions (see extensions/README.txt)
  * Services Discovery (see sd/README.txt)
 
@@ -23,6 +24,7 @@ Lua scripts are tried in alphabetical order in the user's VLC config
 directory lua/{playlist,meta,intf}/ subdirectory on Windows and Mac OS X or
 in the user's local share directory (~/.local/share/vlc/lua/... on linux),
 then in the global VLC lua/{playlist,meta,intf}/ directory.
+
 
 3 - VLC specific Lua modules
 ============================
@@ -54,8 +56,8 @@ config.homedir(): Get the user's home directory.
 config.configdir(): Get the user's VLC config directory.
 config.cachedir(): Get the user's VLC cache directory.
 
-config.datadir_list( name ): FIXME: write description ... or ditch function
-  if it isn't useful anymore, we have datadir and userdatadir :)
+config.datadir_list( name ): Get the list of possible data directories in
+                             order of priority, appended by "name"
 
 Dialog
 ------
@@ -148,8 +150,12 @@ msg.warn( [str1, [str2, [...]]] ): Output warning messages (-v).
 msg.err( [str1, [str2, [...]]] ): Output error messages.
 msg.info( [str1, [str2, [...]]] ): Output info messages.
 
-Misc
-----
+Misc (Interfaces only)
+----------------------
+----------------------------------------------------------------
+/!\ NB: this namespace is ONLY usable for interfaces.
+---
+----------------------------------------------------------------
 misc.version(): Get the VLC version string.
 misc.copyright(): Get the VLC copyright statement.
 misc.license(): Get the VLC license.
