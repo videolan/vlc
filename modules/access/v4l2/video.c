@@ -752,6 +752,45 @@ static int SetupTuner (vlc_object_t *obj, int fd,
     return 0;
 }
 
+static int SetupInput (vlc_object_t *obj, int fd)
+{
+    struct v4l2_input input;
+
+    input.index = var_InheritInteger (obj, CFG_PREFIX"input");
+    if (v4l2_ioctl (fd, VIDIOC_ENUMINPUT, &input) < 0)
+    {
+        msg_Err (obj, "invalid video input %"PRIu32": %m", input.index);
+        return -1;
+    }
+
+    const char *typename = "unknown";
+    switch (input.type)
+    {
+        case V4L2_INPUT_TYPE_TUNER:
+            typename = "tuner";
+            break;
+        case V4L2_INPUT_TYPE_CAMERA:
+            typename = "camera";
+            break;
+    }
+
+    msg_Dbg (obj, "video input %s (%"PRIu32") is %s", input.name,
+             input.index, typename);
+
+    /* Select input */
+    if (v4l2_ioctl (fd, VIDIOC_S_INPUT, &input.index) < 0)
+    {
+        msg_Err (obj, "cannot select input %"PRIu32": %m", input.index);
+        return -1;
+    }
+    msg_Dbg (obj, "selected input %"PRIu32, input.index);
+
+    SetupStandard (obj, fd, &input);
+    SetupTuner (obj, fd, &input);
+    SetupAudio (obj, fd, &input);
+    return 0;
+}
+
 /*****************************************************************************
  * GrabVideo: Grab a video frame
  *****************************************************************************/
@@ -1036,34 +1075,8 @@ int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
         return -1;
     }
 
-    /* Now, enumerate all the video inputs. This is useless at the moment
-       since we have no way to present that info to the user except with
-       debug messages */
-    struct v4l2_input input;
-    unsigned index = var_InheritInteger( p_obj, CFG_PREFIX"input" );
-
-    input.index = 0;
-    while( v4l2_ioctl( i_fd, VIDIOC_ENUMINPUT, &input ) >= 0 )
-    {
-        msg_Dbg( p_obj, "video input %u (%s) has type: %s %c",
-                 input.index, input.name,
-                 input.type == V4L2_INPUT_TYPE_TUNER
-                          ? "Tuner adapter" : "External analog input",
-                 input.index == index ? '*' : ' ' );
-        input.index++;
-    }
-
-    /* Select input */
-    if( v4l2_ioctl( i_fd, VIDIOC_S_INPUT, &index ) < 0 )
-    {
-        msg_Err( p_obj, "cannot set input %u: %m", index );
+    if (SetupInput (p_obj, i_fd))
         return -1;
-    }
-    msg_Dbg( p_obj, "input set to %u", index );
-
-    SetupStandard (p_obj, i_fd, &input);
-    SetupAudio (p_obj, i_fd, &input);
-    SetupTuner (p_obj, i_fd, &input);
 
     /* Probe for available chromas */
     struct v4l2_fmtdesc *codecs = NULL;
