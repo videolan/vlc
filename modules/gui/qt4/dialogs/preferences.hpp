@@ -33,14 +33,13 @@ class AdvPrefsPanel;
 class SPrefsPanel;
 class QTreeWidgetItem;
 class QTreeWidget;
-class QHBoxLayout;
-class QVBoxLayout;
 class QGroupBox;
 class QRadioButton;
 class QWidget;
 class QCheckBox;
 class QLabel;
 class SearchLineEdit;
+class QStackedWidget;
 
 class PrefsDialog : public QVLCDialog
 {
@@ -54,15 +53,18 @@ public:
 #endif
 
 private:
-    QWidget *main_panel;
-    QHBoxLayout *main_panel_l;
+    enum { SIMPLE, ADVANCED };
+    QStackedWidget *stack;
+
+    QWidget *simple_main_panel, *advanced_main_panel;
+    QWidget *simple_split_widget, *advanced_split_widget;
 
     AdvPrefsPanel *advanced_panel;
     SPrefsPanel *current_simple_panel;
     SPrefsPanel *simple_panels[SPrefsMax];
 
-    QWidget *tree_panel;
-    QVBoxLayout *tree_panel_l;
+    QWidget *simple_tree_panel;
+    QWidget *advanced_tree_panel;
 
     SPrefsCatList *simple_tree;
     PrefsTree *advanced_tree;

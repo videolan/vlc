@@ -41,6 +41,7 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QDialogButtonBox>
+#include <QStackedWidget>
 
 PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
             : QVLCDialog( parent, _p_intf )
@@ -55,12 +56,17 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     setAttribute( Qt::WA_DeleteOnClose );
 
     /* Create Panels */
-    tree_panel = new QWidget;
-    tree_panel_l = new QVBoxLayout;
-    tree_panel->setLayout( tree_panel_l );
-    main_panel = new QWidget;
-    main_panel_l = new QHBoxLayout;
-    main_panel->setLayout( main_panel_l );
+    simple_tree_panel = new QWidget;
+    simple_tree_panel->setLayout( new QVBoxLayout );
+
+    advanced_tree_panel = new QWidget;
+    advanced_tree_panel->setLayout( new QVBoxLayout );
+
+    simple_main_panel = new QWidget;
+    simple_main_panel->setLayout( new QHBoxLayout );
+
+    advanced_main_panel = new QWidget;
+    advanced_main_panel->setLayout( new QHBoxLayout );
 
     /* Choice for types */
     types = new QGroupBox( qtr("Show settings") );
@@ -93,26 +99,36 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     buttonsBox->addButton( cancel, QDialogButtonBox::RejectRole );
     buttonsBox->addButton( reset, QDialogButtonBox::ResetRole );
 
+
+    simple_split_widget = new QWidget();
+    simple_split_widget->setLayout( new QHBoxLayout );
+
+    advanced_split_widget = new QWidget();
+    advanced_split_widget->setLayout( new QHBoxLayout );
+
+    stack = new QStackedWidget();
+    stack->insertWidget( SIMPLE, simple_split_widget );
+    stack->insertWidget( ADVANCED, advanced_split_widget );
+
+    simple_split_widget->layout()->addWidget( simple_tree_panel );
+    simple_split_widget->layout()->addWidget( simple_main_panel );
+    simple_split_widget->layout()->setMargin( 0 );
+
+    advanced_split_widget->layout()->addWidget( advanced_tree_panel );
+    advanced_split_widget->layout()->addWidget( advanced_main_panel );
+    advanced_split_widget->layout()->setMargin( 0 );
+
     /* Layout  */
-    main_layout->addWidget( tree_panel, 0, 0, 3, 1 );
+    main_layout->addWidget( stack, 0, 0, 3, 3 );
     main_layout->addWidget( types, 3, 0, 2, 1 );
-    main_layout->addWidget( main_panel, 0, 1, 4, 2 );
     main_layout->addWidget( buttonsBox, 4, 2, 1 ,1 );
-
-    main_layout->setColumnMinimumWidth( 0, 150 );
-    main_layout->setColumnMinimumWidth( 1, 10 );
-    main_layout->setColumnStretch( 0, 1 );
-    main_layout->setColumnStretch( 1, 0 );
-    main_layout->setColumnStretch( 2, 10 );
-
     main_layout->setRowStretch( 2, 4 );
-
     main_layout->setMargin( 9 );
     setLayout( main_layout );
 
     /* Margins */
-    tree_panel_l->setMargin( 1 );
-    main_panel_l->setContentsMargins( 6, 0, 0, 3 );
+    simple_tree_panel->layout()->setMargin( 1 );
+    simple_main_panel->layout()->setContentsMargins( 6, 0, 0, 3 );
 
     b_small = (p_intf->p_sys->i_screenHeight < 750);
     if( b_small ) msg_Dbg( p_intf, "Small Resolution");
@@ -137,49 +153,36 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
 
 void PrefsDialog::setAdvanced()
 {
-    /* We already have a simple TREE, and we just want to hide it */
-    if( simple_tree )
-        if( simple_tree->isVisible() ) simple_tree->hide();
-
     if ( !tree_filter )
     {
-        tree_filter = new SearchLineEdit( tree_panel );
+        tree_filter = new SearchLineEdit( simple_tree_panel );
         tree_filter->setMinimumHeight( 26 );
 
         CONNECT( tree_filter, textChanged( const QString &  ),
                 this, advancedTreeFilterChanged( const QString & ) );
 
-        tree_panel_l->addWidget( tree_filter );
+        advanced_tree_panel->layout()->addWidget( tree_filter );
     }
-
-    tree_filter->show();
 
     /* If don't have already and advanced TREE, then create it */
     if( !advanced_tree )
     {
         /* Creation */
-         advanced_tree = new PrefsTree( p_intf, tree_panel );
+         advanced_tree = new PrefsTree( p_intf, simple_tree_panel );
         /* and connections */
          CONNECT( advanced_tree,
                   currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ),
                   this, changeAdvPanel( QTreeWidgetItem * ) );
-        tree_panel_l->addWidget( advanced_tree );
+        advanced_tree_panel->layout()->addWidget( advanced_tree );
+        advanced_tree_panel->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Preferred );
     }
-
-    /* Show it */
-    advanced_tree->show();
-
-    /* Remove the simple current panel from the main panels*/
-    if( current_simple_panel )
-        if( current_simple_panel->isVisible() ) current_simple_panel->hide();
 
     /* If no advanced Panel exist, create one, attach it and show it*/
     if( !advanced_panel )
     {
-        advanced_panel = new AdvPrefsPanel( main_panel );
-        main_panel_l->addWidget( advanced_panel );
+        advanced_panel = new AdvPrefsPanel( simple_main_panel );
+        advanced_main_panel->layout()->addWidget( advanced_panel );
     }
-    advanced_panel->show();
 
     /* Select the first Item of the preferences. Maybe you want to select a specified
        category... */
@@ -187,44 +190,33 @@ void PrefsDialog::setAdvanced()
             advanced_tree->model()->index( 0, 0, QModelIndex() ) );
 
     all->setChecked( true );
+    stack->setCurrentIndex( ADVANCED );
 }
 
 void PrefsDialog::setSmall()
 {
-    /* If an advanced TREE exists, remove and hide it */
-    if( advanced_tree )
-        if( advanced_tree->isVisible() ) advanced_tree->hide();
-
-    if( tree_filter )
-        if( tree_filter->isVisible() ) tree_filter->hide();
-
     /* If no simple_tree, create one, connect it */
     if( !simple_tree )
     {
-         simple_tree = new SPrefsCatList( p_intf, tree_panel, b_small );
+         simple_tree = new SPrefsCatList( p_intf, simple_tree_panel, b_small );
          CONNECT( simple_tree,
                   currentItemChanged( int ),
                   this,  changeSimplePanel( int ) );
-        tree_panel_l->addWidget( simple_tree );
+        simple_tree_panel->layout()->addWidget( simple_tree );
+        simple_tree_panel->setMinimumSize( QSize( 150, 0 ) );
+        simple_tree_panel->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred );
     }
-
-    /*show it */
-    simple_tree->show();
-
-    /* If an Advanced PANEL exists, remove it */
-    if( advanced_panel )
-        if( advanced_panel->isVisible() ) advanced_panel->hide();
 
     if( !current_simple_panel )
     {
         current_simple_panel =
-            new SPrefsPanel( p_intf, main_panel, SPrefsDefaultCat, b_small );
+            new SPrefsPanel( p_intf, simple_main_panel, SPrefsDefaultCat, b_small );
         simple_panels[SPrefsDefaultCat] =  current_simple_panel;
-        main_panel_l->addWidget( current_simple_panel );
+        simple_main_panel->layout()->addWidget( current_simple_panel );
     }
 
-    current_simple_panel->show();
     small->setChecked( true );
+    stack->setCurrentIndex( SIMPLE );
 }
 
 /* Switching from on simple panel to another */
@@ -236,9 +228,9 @@ void PrefsDialog::changeSimplePanel( int number )
     current_simple_panel = simple_panels[number];
     if( !current_simple_panel )
     {
-        current_simple_panel  = new SPrefsPanel( p_intf, main_panel, number, b_small );
+        current_simple_panel  = new SPrefsPanel( p_intf, simple_main_panel, number, b_small );
         simple_panels[number] = current_simple_panel;
-        main_panel_l->addWidget( current_simple_panel );
+        simple_main_panel->layout()->addWidget( current_simple_panel );
     }
 
     current_simple_panel->show();
@@ -255,8 +247,8 @@ void PrefsDialog::changeAdvPanel( QTreeWidgetItem *item )
 
     if( !data->panel )
     {
-        data->panel = new AdvPrefsPanel( p_intf, main_panel , data );
-        main_panel_l->addWidget( data->panel );
+        data->panel = new AdvPrefsPanel( p_intf, simple_main_panel , data );
+        advanced_main_panel->layout()->addWidget( data->panel );
     }
 
     advanced_panel = data->panel;
