@@ -360,6 +360,9 @@ void vlc_CPU_dump (vlc_object_t *obj)
 #elif defined (__arm__)
     PRINT_CAPABILITY(CPU_CAPABILITY_NEON, "NEONv1");
 
+#else
+    (void) flags;
+
 #endif
 
 #if HAVE_FPU
