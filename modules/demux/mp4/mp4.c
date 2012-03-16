@@ -495,7 +495,6 @@ static int Open( vlc_object_t * p_this )
     p_sys->track = calloc( p_sys->i_tracks, sizeof( mp4_track_t ) );
     if( p_sys->track == NULL )
         goto error;
-    memset( p_sys->track, 0, p_sys->i_tracks * sizeof( mp4_track_t ) );
 
     /* Search the first chap reference (like quicktime) and
      * check that at least 1 stream is enabled */
