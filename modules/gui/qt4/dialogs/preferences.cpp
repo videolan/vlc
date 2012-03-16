@@ -62,9 +62,6 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     advanced_tree_panel = new QWidget;
     advanced_tree_panel->setLayout( new QVBoxLayout );
 
-    advanced_main_panel = new QWidget;
-    advanced_main_panel->setLayout( new QHBoxLayout );
-
     /* Choice for types */
     types = new QGroupBox( qtr("Show settings") );
     types->setAlignment( Qt::AlignHCenter );
@@ -83,7 +80,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     tree_filter = NULL;
     simple_tree = NULL;
     simple_panels_stack = new QStackedWidget;
-    advanced_panel = NULL;
+    advanced_panels_stack = new QStackedWidget;
 
     /* Buttons */
     QDialogButtonBox *buttonsBox = new QDialogButtonBox();
@@ -112,7 +109,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     simple_split_widget->layout()->setMargin( 0 );
 
     advanced_split_widget->layout()->addWidget( advanced_tree_panel );
-    advanced_split_widget->layout()->addWidget( advanced_main_panel );
+    advanced_split_widget->layout()->addWidget( advanced_panels_stack );
     advanced_split_widget->layout()->setMargin( 0 );
 
     /* Layout  */
@@ -175,10 +172,10 @@ void PrefsDialog::setAdvanced()
     }
 
     /* If no advanced Panel exist, create one, attach it and show it*/
-    if( !advanced_panel )
+    if( advanced_panels_stack->count() < 1 )
     {
-        advanced_panel = new AdvPrefsPanel( advanced_main_panel );
-        advanced_main_panel->layout()->addWidget( advanced_panel );
+        AdvPrefsPanel *insert = new AdvPrefsPanel( advanced_panels_stack );
+        advanced_panels_stack->insertWidget( 0, insert );
     }
 
     /* Select the first Item of the preferences. Maybe you want to select a specified
@@ -229,17 +226,13 @@ void PrefsDialog::changeAdvPanel( QTreeWidgetItem *item )
     if( item == NULL ) return;
     PrefsItemData *data = item->data( 0, Qt::UserRole ).value<PrefsItemData*>();
 
-    if( advanced_panel )
-        if( advanced_panel->isVisible() ) advanced_panel->hide();
-
     if( !data->panel )
     {
-        data->panel = new AdvPrefsPanel( p_intf, advanced_main_panel, data );
-        advanced_main_panel->layout()->addWidget( data->panel );
+        data->panel = new AdvPrefsPanel( p_intf, advanced_panels_stack, data );
+        advanced_panels_stack->insertWidget( advanced_panels_stack->count(),
+                                             data->panel );
     }
-
-    advanced_panel = data->panel;
-    advanced_panel->show();
+    advanced_panels_stack->setCurrentWidget( data->panel );
 }
 
 #if 0
