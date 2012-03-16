@@ -374,7 +374,6 @@ static inline int block_GetBytes( block_bytestream_t *p_bytestream,
         i_offset = 0;
     }
 
-    /* No buffer given, just skip the data */
     p_bytestream->p_block = p_block;
     p_bytestream->i_offset = i_offset + i_copy;
 
