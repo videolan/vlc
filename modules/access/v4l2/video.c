@@ -1004,7 +1004,6 @@ int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
     msg_Dbg( p_obj, "input set to %u", index );
 
     /* Select standard */
-    bool bottom_first;
     const char *stdname = var_InheritString( p_obj, CFG_PREFIX"standard" );
     if( stdname != NULL )
     {
@@ -1035,10 +1034,7 @@ int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
             return -1;
         }
         msg_Dbg( p_obj, "standard set to 0x%"PRIx64":", std );
-        bottom_first = std == V4L2_STD_NTSC;
     }
-    else
-        bottom_first = false;
 
     SetupAudio (p_obj, i_fd, &input);
     SetupTuner (p_obj, i_fd, &input);
@@ -1285,9 +1281,9 @@ int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
             break;
         case V4L2_FIELD_INTERLACED:
             msg_Dbg( p_obj, "Interlacing setting: interleaved (bottom top if M/NTSC, top bottom otherwise)" );
-            if( bottom_first )
+            /*if (NTSC)
                 p_sys->i_block_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
-            else
+            else*/
                 p_sys->i_block_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
             break;
         case V4L2_FIELD_SEQ_TB:
