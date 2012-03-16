@@ -62,9 +62,6 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     advanced_tree_panel = new QWidget;
     advanced_tree_panel->setLayout( new QVBoxLayout );
 
-    simple_main_panel = new QWidget;
-    simple_main_panel->setLayout( new QHBoxLayout );
-
     advanced_main_panel = new QWidget;
     advanced_main_panel->setLayout( new QHBoxLayout );
 
@@ -85,7 +82,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     advanced_tree = NULL;
     tree_filter = NULL;
     simple_tree = NULL;
-    current_simple_panel  = NULL;
+    simple_panels_stack = new QStackedWidget;
     advanced_panel = NULL;
 
     /* Buttons */
@@ -111,7 +108,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     stack->insertWidget( ADVANCED, advanced_split_widget );
 
     simple_split_widget->layout()->addWidget( simple_tree_panel );
-    simple_split_widget->layout()->addWidget( simple_main_panel );
+    simple_split_widget->layout()->addWidget( simple_panels_stack );
     simple_split_widget->layout()->setMargin( 0 );
 
     advanced_split_widget->layout()->addWidget( advanced_tree_panel );
@@ -128,7 +125,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
 
     /* Margins */
     simple_tree_panel->layout()->setMargin( 1 );
-    simple_main_panel->layout()->setContentsMargins( 6, 0, 0, 3 );
+    simple_panels_stack->layout()->setContentsMargins( 6, 0, 0, 3 );
 
     b_small = (p_intf->p_sys->i_screenHeight < 750);
     if( b_small ) msg_Dbg( p_intf, "Small Resolution");
@@ -180,7 +177,7 @@ void PrefsDialog::setAdvanced()
     /* If no advanced Panel exist, create one, attach it and show it*/
     if( !advanced_panel )
     {
-        advanced_panel = new AdvPrefsPanel( simple_main_panel );
+        advanced_panel = new AdvPrefsPanel( advanced_main_panel );
         advanced_main_panel->layout()->addWidget( advanced_panel );
     }
 
@@ -207,13 +204,8 @@ void PrefsDialog::setSmall()
         simple_tree_panel->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred );
     }
 
-    if( !current_simple_panel )
-    {
-        current_simple_panel =
-            new SPrefsPanel( p_intf, simple_main_panel, SPrefsDefaultCat, b_small );
-        simple_panels[SPrefsDefaultCat] =  current_simple_panel;
-        simple_main_panel->layout()->addWidget( current_simple_panel );
-    }
+    if( ! simple_panels[SPrefsDefaultCat] )
+        changeSimplePanel( SPrefsDefaultCat );
 
     small->setChecked( true );
     stack->setCurrentIndex( SIMPLE );
@@ -222,18 +214,13 @@ void PrefsDialog::setSmall()
 /* Switching from on simple panel to another */
 void PrefsDialog::changeSimplePanel( int number )
 {
-    if( current_simple_panel )
-        if( current_simple_panel->isVisible() ) current_simple_panel->hide();
-
-    current_simple_panel = simple_panels[number];
-    if( !current_simple_panel )
+    if( ! simple_panels[number] )
     {
-        current_simple_panel  = new SPrefsPanel( p_intf, simple_main_panel, number, b_small );
-        simple_panels[number] = current_simple_panel;
-        simple_main_panel->layout()->addWidget( current_simple_panel );
+        SPrefsPanel *insert = new SPrefsPanel( p_intf, simple_panels_stack, number, b_small ) ;
+        simple_panels_stack->insertWidget( number, insert );
+        simple_panels[number] = insert;
     }
-
-    current_simple_panel->show();
+    simple_panels_stack->setCurrentWidget( simple_panels[number] );
 }
 
 /* Changing from one Advanced Panel to another */
@@ -247,7 +234,7 @@ void PrefsDialog::changeAdvPanel( QTreeWidgetItem *item )
 
     if( !data->panel )
     {
-        data->panel = new AdvPrefsPanel( p_intf, simple_main_panel , data );
+        data->panel = new AdvPrefsPanel( p_intf, advanced_main_panel, data );
         advanced_main_panel->layout()->addWidget( data->panel );
     }
 
@@ -296,7 +283,8 @@ void PrefsDialog::save()
     {
         msg_Dbg( p_intf, "Saving the simple preferences" );
         for( int i = 0 ; i< SPrefsMax; i++ ){
-            if( simple_panels[i] )simple_panels[i]->apply();
+            if( simple_panels_stack->widget(i) )
+                qobject_cast<SPrefsPanel *>(simple_panels_stack->widget(i))->apply();
         }
     }
     else if( all->isChecked() && advanced_tree->isVisible() )

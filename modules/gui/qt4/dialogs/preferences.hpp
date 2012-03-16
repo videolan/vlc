@@ -56,11 +56,11 @@ private:
     enum { SIMPLE, ADVANCED };
     QStackedWidget *stack;
 
-    QWidget *simple_main_panel, *advanced_main_panel;
+    QWidget *advanced_main_panel;
     QWidget *simple_split_widget, *advanced_split_widget;
 
     AdvPrefsPanel *advanced_panel;
-    SPrefsPanel *current_simple_panel;
+    QStackedWidget *simple_panels_stack;
     SPrefsPanel *simple_panels[SPrefsMax];
 
     QWidget *simple_tree_panel;
