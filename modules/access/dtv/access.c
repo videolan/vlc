@@ -141,6 +141,8 @@ static const char *const hierarchy_user[] = { N_("Automatic"),
     N_("None"), "1", "2", "4",
 };
 
+#define PLP_ID_TEXT N_("DVB-T2 Physical Layer Pipe")
+
 #define SEGMENT_COUNT_A_TEXT N_("Layer A segments count")
 #define SEGMENT_COUNT_B_TEXT N_("Layer B segments count")
 #define SEGMENT_COUNT_C_TEXT N_("Layer C segments count")
@@ -289,6 +291,9 @@ vlc_module_begin ()
         change_safe ()
     add_integer ("dvb-hierarchy", -1, HIERARCHY_TEXT, HIERARCHY_TEXT, true)
         change_integer_list (hierarchy_vlc, hierarchy_user)
+        change_safe ()
+    add_integer ("dvb-plp-id", 0, PLP_ID_TEXT, PLP_ID_TEXT, false)
+        change_integer_range (0, 0xFFFFFFFF)
         change_safe ()
 
     set_section (N_("ISDB-T reception parameters"), NULL)
@@ -904,9 +909,10 @@ static int dvbt2_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
     uint32_t fec = var_InheritCodeRate (obj, "dvb-fec");
     uint32_t guard = var_InheritGuardInterval (obj);
     uint32_t bw = var_InheritInteger (obj, "dvb-bandwidth");
+    uint32_t plp = var_InheritInteger (obj, "dvd-plp-id");
     int tx = var_InheritInteger (obj, "dvb-transmission");
 
-    return dvb_set_dvbt2 (dev, freq, mod, fec, bw, tx, guard);
+    return dvb_set_dvbt2 (dev, freq, mod, fec, bw, tx, guard, plp);
 }
 
 static const delsys_t dvbt = { .setup = dvbt_setup };

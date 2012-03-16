@@ -85,7 +85,7 @@ int dvb_set_dvbt (dvb_device_t *, uint32_t freq, const char *mod,
                   int transmission, uint32_t guard, int hierarchy);
 int dvb_set_dvbt2 (dvb_device_t *, uint32_t freq, const char *mod,
                    uint32_t fec, uint32_t bandwidth,
-                   int transmission, uint32_t guard);
+                   int transmission, uint32_t guard, uint32_t plp);
 
 /* ATSC */
 int dvb_set_atsc (dvb_device_t *, uint32_t freq, const char *mod);
