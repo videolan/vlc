@@ -42,6 +42,7 @@
 #include <QMessageBox>
 #include <QDialogButtonBox>
 #include <QStackedWidget>
+#include <QSplitter>
 
 PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
             : QVLCDialog( parent, _p_intf )
@@ -97,7 +98,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     simple_split_widget = new QWidget();
     simple_split_widget->setLayout( new QHBoxLayout );
 
-    advanced_split_widget = new QWidget();
+    advanced_split_widget = new QSplitter();
     advanced_split_widget->setLayout( new QHBoxLayout );
 
     stack = new QStackedWidget();

@@ -40,6 +40,7 @@ class QCheckBox;
 class QLabel;
 class SearchLineEdit;
 class QStackedWidget;
+class QSplitter;
 
 class PrefsDialog : public QVLCDialog
 {
@@ -56,7 +57,8 @@ private:
     enum { SIMPLE, ADVANCED };
     QStackedWidget *stack;
 
-    QWidget *simple_split_widget, *advanced_split_widget;
+    QWidget *simple_split_widget;
+    QSplitter *advanced_split_widget;
 
     QStackedWidget *advanced_panels_stack;
     QStackedWidget *simple_panels_stack;
