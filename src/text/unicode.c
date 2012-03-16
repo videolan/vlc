@@ -280,7 +280,7 @@ size_t vlc_towc (const char *str, uint32_t *restrict pwc)
                 return -1;
             cp |= (c & 0x3f) << 6;
 
-            if (unlikely(cp >= 0xD800 && cp < 0xC000)) // UTF-16 surrogate
+            if (unlikely(cp >= 0xD800 && cp < 0xE000)) // UTF-16 surrogate
                 return -1;
             if (unlikely(cp < (1u << (5 * charlen - 4)))) // non-ASCII overlong
                 return -1;
