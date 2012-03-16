@@ -43,6 +43,7 @@ $Id$
  * alphamask: Alpha layer mask video filter
  * alsa: audio output module using the ALSA API
  * amem: audio memory output
+ * anaglyph: anaglyph 3d video filter
  * android_surface: video output for Android, based on Surface
  * antiflicker: anti-flicker video filter
  * aout_directx: audio output module using the DirectX API
@@ -73,7 +74,7 @@ $Id$
  * cdda: input module to read audio CDs
  * cdg: CD-G decoder
  * chain: Video filtering using a chain of video filter modules
- * chorus_flanger: variable delay audio filter
+ * chorus_flanger: Basic chorus/flanger/variable delay audio filter
  * chroma_omx: OMX Development Layer chroma conversions
  * chroma_yuv_neon: ARM NEON video chroma conversion
  * clone: Clone video filter
@@ -107,7 +108,6 @@ $Id$
  * dtstospdif: Audio converter that encapsulates DTS into S/PDIF
  * dtv: DVB support (superseds bda module for Windows)
  * dummy: dummy interface
- * dvb: input module for DVB-S/C/T streaming using v4l2 API
  * dvbsub: decoder module for subs in dvb streams
  * dvdnav: access module for DVDs with libdvdnav
  * dvdread: input module for accessing DVDs, uses libdvdread
@@ -236,6 +236,7 @@ $Id$
  * opencv_example: OpenCV example (face identification)
  * opencv_wrapper: OpenCV wrapper video filter
  * opensles_android: OpenSL ES audio output for Android
+ * os2drive: service discovery for OS/2 drives
  * osd_parser: OSD import module
  * osdmenu: video_filter for displaying and streaming a On Screen Display menu
  * oss: audio output module using the OSS /dev/dsp interface
@@ -389,6 +390,7 @@ $Id$
  * xosd: X On Screen Display interface
  * xscreensaver: Xscreensaver inhibition
  * yuv: yuv video output
+ * yuv_rgb_neon: yuv->RGB chroma converter for NEON devices
  * yuvp: YUVP to YUVA/RGBA chroma converter
  * yuy2_i420: yuy2 to 4:2:0 conversions functions
  * yuy2_i422: yuy2 to 4:2:2 conversions functions
