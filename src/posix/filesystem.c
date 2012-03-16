@@ -123,6 +123,7 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
 #else
     int fd = -1;
     errno = ENOSYS;
+    (void) mode;
 #endif
 
     LocaleFree (local_name);
