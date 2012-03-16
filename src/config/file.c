@@ -402,9 +402,7 @@ static int SaveConfigFile (vlc_object_t *p_this)
 
         while ((linelen = getline (&line, &bufsize, file)) != -1)
         {
-            char *p_index2;
-
-            if ((line[0] == '[') && (p_index2 = strchr(line,']')))
+            if ((line[0] == '[') && (strchr (line,']') != NULL))
             {
                 module_t *module;
 
