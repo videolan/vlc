@@ -332,11 +332,11 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
         {
             if( p_module->p_config[i].ppsz_list )
             {
-                int j;
                 p_module->p_config[i].ppsz_list =
                     xmalloc( (p_module->p_config[i].i_list+1) * sizeof(char *));
                 if( p_module->p_config[i].ppsz_list )
                 {
+                    int j;
                     for( j = 0; j < p_module->p_config[i].i_list; j++ )
                         LOAD_STRING( p_module->p_config[i].ppsz_list[j] );
                     p_module->p_config[i].ppsz_list[j] = NULL;
@@ -344,14 +344,14 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
             }
             if( p_module->p_config[i].ppsz_list_text )
             {
-                int j;
                 p_module->p_config[i].ppsz_list_text =
                     xmalloc( (p_module->p_config[i].i_list+1) * sizeof(char *));
                 if( p_module->p_config[i].ppsz_list_text )
                 {
-                  for( j = 0; j < p_module->p_config[i].i_list; j++ )
-                      LOAD_STRING( p_module->p_config[i].ppsz_list_text[j] );
-                  p_module->p_config[i].ppsz_list_text[j] = NULL;
+                    int j;
+                    for( j = 0; j < p_module->p_config[i].i_list; j++ )
+                        LOAD_STRING( p_module->p_config[i].ppsz_list_text[j] );
+                    p_module->p_config[i].ppsz_list_text[j] = NULL;
                 }
             }
             if( p_module->p_config[i].pi_list )
