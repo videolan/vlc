@@ -78,6 +78,7 @@
 #define ATOM_mehd VLC_FOURCC( 'm', 'e', 'h', 'd' )
 #define ATOM_mfhd VLC_FOURCC( 'm', 'f', 'h', 'd' )
 #define ATOM_traf VLC_FOURCC( 't', 'r', 'a', 'f' )
+#define ATOM_sidx VLC_FOURCC( 's', 'i', 'd', 'x' )
 #define ATOM_tfhd VLC_FOURCC( 't', 'f', 'h', 'd' )
 #define ATOM_trun VLC_FOURCC( 't', 'r', 'u', 'n' )
 #define ATOM_cprt VLC_FOURCC( 'c', 'p', 'r', 't' )
@@ -837,6 +838,32 @@ typedef struct MP4_Box_data_mfhd_s
 
 } MP4_Box_data_mfhd_t;
 
+typedef struct MP4_Box_sidx_item_s
+{
+    bool     b_reference_type;
+    uint32_t i_referenced_size;
+    uint32_t i_subsegment_duration;
+    bool     b_starts_with_SAP;
+    uint8_t  i_SAP_type;
+    uint32_t i_SAP_delta_time;
+
+} MP4_Box_sidx_item_t;
+
+typedef struct MP4_Box_data_sidx_s
+{
+    uint8_t  i_version;
+    uint32_t i_flags;
+
+    uint32_t i_reference_ID;
+    uint32_t i_timescale;
+    uint64_t i_earliest_presentation_time;
+    uint64_t i_first_offset;
+    uint16_t i_reference_count;
+
+    MP4_Box_sidx_item_t *p_items;
+
+} MP4_Box_data_sidx_t;
+
 #define MP4_TFHD_BASE_DATA_OFFSET     (1LL<<0)
 #define MP4_TFHD_SAMPLE_DESC_INDEX    (1LL<<1)
 #define MP4_TFHD_DFLT_SAMPLE_DURATION (1LL<<3)
@@ -1063,6 +1090,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_ftyp_t *p_ftyp;
     MP4_Box_data_mvhd_t *p_mvhd;
     MP4_Box_data_mfhd_t *p_mfhd;
+    MP4_Box_data_sidx_t *p_sidx;
     MP4_Box_data_tfhd_t *p_tfhd;
     MP4_Box_data_trun_t *p_trun;
     MP4_Box_data_tkhd_t *p_tkhd;
