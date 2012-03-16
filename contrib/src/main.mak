@@ -109,7 +109,7 @@ EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/include
 ifdef HAVE_NEON
     EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/libs/armeabi-v7a/include -mfloat-abi=softfp -mfpu=neon -mcpu=cortex-a8
 else
-    EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include
+    EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include -mfloat-abi=softfp -mcpu=arm1136jf-s -mfpu=vfp
 endif
 endif
 
