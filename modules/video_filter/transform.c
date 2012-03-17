@@ -100,7 +100,7 @@ static void R270(int *sx, int *sy, int w, int h, int dx, int dy)
 typedef void (*convert_t)(int *, int *, int, int, int, int);
 
 #define PLANAR(f) \
-static void Planar##f(plane_t *restrict dst, const plane_t *restrict src) \
+static void Plane8_##f(plane_t *restrict dst, const plane_t *restrict src) \
 { \
     for (int y = 0; y < dst->i_visible_lines; y++) { \
         for (int x = 0; x < dst->i_visible_pitch; x++) { \
@@ -123,22 +123,27 @@ typedef struct {
     bool      is_rotated;
     convert_t convert;
     convert_t iconvert;
-    void      (*planar)(plane_t *dst, const plane_t *src);
+    void      (*plane8)(plane_t *dst, const plane_t *src);
 } transform_description_t;
 
-static const transform_description_t descriptions[] = {
-    { "90",    true,  R90,   R270,  PlanarR90, },
-    { "180",   false, R180,  R180,  PlanarR180, },
-    { "270",   true,  R270,  R90,   PlanarR270, },
-    { "hflip", false, HFlip, HFlip, PlanarHFlip, },
-    { "vflip", false, VFlip, VFlip, PlanarVFlip, },
+#define DESC(str, rotated, f, invf) \
+    { str, rotated, f, invf, Plane8_##f, }
 
-    { "", false, NULL, NULL, NULL, }
+static const transform_description_t descriptions[] = {
+    DESC("90",    true,  R90,   R270),
+    DESC("180",   false, R180,  R180),
+    DESC("270",   true,  R270,  R90),
+    DESC("hflip", false, HFlip, HFlip),
+    DESC("vflip", false, VFlip, VFlip),
 };
 
+static const size_t n_transforms =
+    sizeof (descriptions) / sizeof (descriptions[0]);
+
 struct filter_sys_t {
-    const transform_description_t  *dsc;
     const vlc_chroma_description_t *chroma;
+    void (*plane)(plane_t *, const plane_t *);
+    convert_t convert;
 };
 
 static picture_t *Filter(filter_t *filter, picture_t *src)
@@ -152,12 +157,8 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
     }
 
     const vlc_chroma_description_t *chroma = sys->chroma;
-    if (chroma->plane_count < 3) {
-        /* TODO */
-    } else {
-        for (unsigned i = 0; i < chroma->plane_count; i++)
-            sys->dsc->planar(&dst->p[i], &src->p[i]);
-    }
+    for (unsigned i = 0; i < chroma->plane_count; i++)
+         sys->plane(&dst->p[i], &src->p[i]);
 
     picture_CopyProperties(dst, src);
     picture_Release(src);
@@ -169,12 +170,13 @@ static int Mouse(filter_t *filter, vlc_mouse_t *mouse,
 {
     VLC_UNUSED( mold );
 
-    const video_format_t          *fmt = &filter->fmt_out.video;
-    const transform_description_t *dsc = filter->p_sys->dsc;
+    const video_format_t *fmt = &filter->fmt_out.video;
+    const filter_sys_t   *sys = filter->p_sys;
 
     *mouse = *mnew;
-    dsc->convert(&mouse->i_x, &mouse->i_y,
-                 fmt->i_visible_width, fmt->i_visible_height, mouse->i_x, mouse->i_y);
+    sys->convert(&mouse->i_x, &mouse->i_y,
+                 fmt->i_visible_width, fmt->i_visible_height,
+                 mouse->i_x, mouse->i_y);
     return VLC_SUCCESS;
 }
 
@@ -215,24 +217,27 @@ static int Open(vlc_object_t *object)
     sys->chroma = chroma;
 
     char *type_name = var_InheritString(filter, CFG_PREFIX"type");
+    const transform_description_t *dsc = NULL;
 
-    sys->dsc = NULL;
-    for (int i = 0; !sys->dsc && *descriptions[i].name; i++) {
-        if (type_name && *type_name && !strcmp(descriptions[i].name, type_name))
-            sys->dsc = &descriptions[i];
-    }
-    if (!sys->dsc) {
-        sys->dsc = &descriptions[0];
-        msg_Warn(filter, "No valid transform mode provided, using '%s'", sys->dsc->name);
+    for (size_t i = 0; i < n_transforms; i++)
+        if (type_name && !strcmp(descriptions[i].name, type_name)) {
+            dsc = &descriptions[i];
+            break;
+        }
+    if (dsc == NULL) {
+        dsc = &descriptions[0];
+        msg_Warn(filter, "No valid transform mode provided, using '%s'",
+                 dsc->name);
     }
 
     free(type_name);
 
-    if (sys->dsc->is_rotated) {
+    sys->plane = dsc->plane8;
+    sys->convert = dsc->convert;
+    if (dsc->is_rotated) {
         if (!filter->b_allow_fmt_out_change) {
             msg_Err(filter, "Format change is not allowed");
-            free(sys);
-            return VLC_EGENERIC;
+            goto error;
         }
 
         dst->i_width          = src->i_height;
@@ -247,10 +252,9 @@ static int Open(vlc_object_t *object)
     dst->i_y_offset       = INT_MAX;
     for (int i = 0; i < 2; i++) {
         int tx, ty;
-        sys->dsc->iconvert(&tx, &ty,
-                           src->i_width, src->i_height,
-                           src->i_x_offset + i * (src->i_visible_width  - 1),
-                           src->i_y_offset + i * (src->i_visible_height - 1));
+        dsc->iconvert(&tx, &ty, src->i_width, src->i_height,
+                      src->i_x_offset + i * (src->i_visible_width  - 1),
+                      src->i_y_offset + i * (src->i_visible_height - 1));
         dst->i_x_offset = __MIN(dst->i_x_offset, (unsigned)(1 + tx));
         dst->i_y_offset = __MIN(dst->i_y_offset, (unsigned)(1 + ty));
     }
@@ -259,6 +263,9 @@ static int Open(vlc_object_t *object)
     filter->pf_video_filter = Filter;
     filter->pf_video_mouse  = Mouse;
     return VLC_SUCCESS;
+error:
+    free(sys);
+    return VLC_EGENERIC;
 }
 
 static void Close(vlc_object_t *object)
