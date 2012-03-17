@@ -100,19 +100,18 @@ static void R270(int *sx, int *sy, int w, int h, int dx, int dy)
 }
 typedef void (*convert_t)(int *, int *, int, int, int, int);
 
-static void Planar(plane_t *dst, const plane_t *src, convert_t f)
-{
-    for (int y = 0; y < dst->i_visible_lines; y++) {
-        for (int x = 0; x < dst->i_visible_pitch; x++) {
-            int sx, sy;
-            f(&sx, &sy, dst->i_visible_pitch, dst->i_visible_lines, x, y);
-            dst->p_pixels[y * dst->i_pitch + x] = src->p_pixels[sy * src->i_pitch + sx];
-        }
-    }
-}
-
 #define PLANAR(f) \
-    static void Planar##f(plane_t *dst, const plane_t *src) { Planar(dst, src, f); }
+static void Planar##f(plane_t *dst, const plane_t *src) \
+{ \
+    for (int y = 0; y < dst->i_visible_lines; y++) { \
+        for (int x = 0; x < dst->i_visible_pitch; x++) { \
+            int sx, sy; \
+            (f)(&sx, &sy, dst->i_visible_pitch, dst->i_visible_lines, x, y); \
+            dst->p_pixels[y * dst->i_pitch + x] = \
+                src->p_pixels[sy * src->i_pitch + sx]; \
+        } \
+    } \
+}
 
 PLANAR(HFlip)
 PLANAR(VFlip)
