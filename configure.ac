@@ -3893,6 +3893,23 @@ AS_IF([test "${enable_projectm}" != "no"],
   ])
 
 dnl
+dnl Vovoid VSXu visualization plugin
+dnl
+AC_ARG_ENABLE(vsxu,
+  [  --enable-vsxu           Vovoid VSXu visualization plugin (default auto)])
+AS_IF([test "${enable_vsxu}" != "no"],
+  [
+    PKG_CHECK_MODULES(VSXU, libvsxu,
+    [
+      VLC_ADD_PLUGIN([vsxu])
+      VLC_ADD_CXXFLAGS([vsxu],[$VSXU_CFLAGS])
+      VLC_ADD_LIBS([vsxu],[$VSXU_LIBS])
+    ],[
+      AC_MSG_WARN([${VSXU_PKG_ERRORS}.])
+    ])
+  ])
+
+dnl
 dnl  AtmoLight (homemade Philips Ambilight clone)
 dnl
 AC_ARG_ENABLE(atmo,

@@ -615,18 +615,28 @@ static int VisualizationCallback (vlc_object_t *obj, char const *var,
         ChangeFiltersString (obj, "audio-visual", "goom", false);
         ChangeFiltersString (obj, "audio-visual", "visual", false);
         ChangeFiltersString (obj, "audio-visual", "projectm", false);
+        ChangeFiltersString (obj, "audio-visual", "vsxu", false);
     }
     else if (!strcmp ("goom", mode))
     {
         ChangeFiltersString (obj, "audio-visual", "visual", false );
         ChangeFiltersString (obj, "audio-visual", "goom", true );
         ChangeFiltersString (obj, "audio-visual", "projectm", false );
+        ChangeFiltersString (obj, "audio-visual", "vsxu", false);
     }
     else if (!strcmp ("projectm", mode))
     {
         ChangeFiltersString (obj, "audio-visual", "visual", false);
         ChangeFiltersString (obj, "audio-visual", "goom", false);
         ChangeFiltersString (obj, "audio-visual", "projectm", true);
+        ChangeFiltersString (obj, "audio-visual", "vsxu", false);
+    }
+    else if (!strcmp ("vsxu", mode))
+    {
+        ChangeFiltersString (obj, "audio-visual", "visual", false);
+        ChangeFiltersString (obj, "audio-visual", "goom", false);
+        ChangeFiltersString (obj, "audio-visual", "projectm", false);
+        ChangeFiltersString (obj, "audio-visual", "vsxu", true);
     }
     else
     {

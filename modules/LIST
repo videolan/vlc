@@ -368,6 +368,7 @@ $Id$
  * vout_ios: iOS video output
  * vout_macosx: MacOS X OpenGL provider
  * vout_sdl: video output module using the SDL library
+ * vsxu: audio visualization using Vovoid VSXu
  * wall: image wall filter
  * wav: Wav demuxer
  * wave: Wave video effect

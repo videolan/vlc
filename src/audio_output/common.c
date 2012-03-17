@@ -110,6 +110,13 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
         text.psz_string = (char*)"projectM";
         var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
     }
+    /* Look for VSXu plugin */
+    if (module_exists ("vsxu"))
+    {
+        val.psz_string = (char *)"vsxu";
+        text.psz_string = (char*)"Vovoid VSXu";
+        var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    }
     str = var_GetNonEmptyString (aout, "effect-list");
     if (str != NULL)
     {
