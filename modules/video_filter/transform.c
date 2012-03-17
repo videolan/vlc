@@ -45,7 +45,6 @@ static void Close(vlc_object_t *);
 #define CFG_PREFIX "transform-"
 
 #define TYPE_TEXT N_("Transform type")
-#define TYPE_LONGTEXT N_("One of '90', '180', '270', 'hflip' and 'vflip'")
 static const char * const type_list[] = { "90", "180", "270", "hflip", "vflip" };
 static const char * const type_list_text[] = { N_("Rotate by 90 degrees"),
   N_("Rotate by 180 degrees"), N_("Rotate by 270 degrees"),
@@ -59,7 +58,7 @@ vlc_module_begin()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
 
-    add_string(CFG_PREFIX "type", "90", TYPE_TEXT, TYPE_LONGTEXT, false)
+    add_string(CFG_PREFIX "type", "90", TYPE_TEXT, TYPE_TEXT, false)
         change_string_list(type_list, type_list_text, 0)
 
     add_shortcut("transform")
