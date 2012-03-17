@@ -101,7 +101,7 @@ static void R270(int *sx, int *sy, int w, int h, int dx, int dy)
 typedef void (*convert_t)(int *, int *, int, int, int, int);
 
 #define PLANAR(f) \
-static void Planar##f(plane_t *dst, const plane_t *src) \
+static void Planar##f(plane_t *restrict dst, const plane_t *restrict src) \
 { \
     for (int y = 0; y < dst->i_visible_lines; y++) { \
         for (int x = 0; x < dst->i_visible_pitch; x++) { \
