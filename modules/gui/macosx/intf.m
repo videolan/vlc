@@ -614,7 +614,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* yeah, we are done */
     b_nativeFullscreenMode = NO;
 #ifdef MAC_OS_X_VERSION_10_7
-    b_nativeFullscreenMode = config_GetInt( p_intf, "macosx-nativefullscreenmode" );
+    if( OSX_LION )
+        b_nativeFullscreenMode = config_GetInt( p_intf, "macosx-nativefullscreenmode" );
 #endif
     nib_main_loaded = TRUE;
 }
@@ -697,7 +698,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     int returnedValue = 0;
 
     /* always exit fullscreen on quit, otherwise we get ugly artifacts on the next launch */
-    if (OSX_LION && b_nativeFullscreenMode)
+    if (b_nativeFullscreenMode)
     {
         [o_mainwindow toggleFullScreen: self];
         [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
@@ -1371,7 +1372,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     playlist_t * p_playlist = pl_Get( VLCIntf );
     BOOL b_fullscreen = var_GetBool( p_playlist, "fullscreen" );
 
-    if (OSX_LION && b_nativeFullscreenMode)
+    if (b_nativeFullscreenMode)
     {
         [o_mainwindow toggleFullScreen: self];
         if(b_fullscreen)

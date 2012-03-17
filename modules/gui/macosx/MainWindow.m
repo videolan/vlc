@@ -126,7 +126,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     /* setup the styled interface */
     b_nativeFullscreenMode = NO;
 #ifdef MAC_OS_X_VERSION_10_7
-    b_nativeFullscreenMode = config_GetInt( VLCIntf, "macosx-nativefullscreenmode" );
+    if( OSX_LION )
+        b_nativeFullscreenMode = config_GetInt( VLCIntf, "macosx-nativefullscreenmode" );
 #endif
     i_lastShownVolume = -1;
     t_hide_mouse_timer = nil;
@@ -187,7 +188,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_volume_down_btn setImage: [NSImage imageNamed:@"volume-low"]];
         [o_volume_track_view setImage: [NSImage imageNamed:@"volume-slider-track"]];
         [o_volume_up_btn setImage: [NSImage imageNamed:@"volume-high"]];
-        if (OSX_LION && b_nativeFullscreenMode)
+        if (b_nativeFullscreenMode)
         {
             [o_effects_btn setImage: [NSImage imageNamed:@"effects-one-button"]];
             [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-one-button-blue"]];
@@ -239,7 +240,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_volume_down_btn setImage: [NSImage imageNamed:@"volume-low_dark"]];
         [o_volume_track_view setImage: [NSImage imageNamed:@"volume-slider-track_dark"]];
         [o_volume_up_btn setImage: [NSImage imageNamed:@"volume-high_dark"]];
-        if (OSX_LION && b_nativeFullscreenMode)
+        if (b_nativeFullscreenMode)
         {
             [o_effects_btn setImage: [NSImage imageNamed:@"effects-one-button_dark"]];
             [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-one-button-blue_dark"]];
@@ -287,7 +288,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
     [o_dropzone_view setFrame: [o_playlist_table frame]];
     [o_left_split_view setFrame: [o_sidebar_view frame]];
-    if (OSX_LION && b_nativeFullscreenMode)
+    if (b_nativeFullscreenMode)
     {
         NSRect frame;
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
@@ -1375,7 +1376,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (id)setupVideoView
 {
     vout_thread_t *p_vout = getVout();
-    if (config_GetInt( VLCIntf, "embedded-video" ) || (OSX_LION && b_nativeFullscreenMode))
+    if (config_GetInt( VLCIntf, "embedded-video" ) || b_nativeFullscreenMode)
     {
         if ([o_video_view window] != self)
         {
@@ -1420,7 +1421,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     if (!b_videoPlayback)
         [o_detached_video_window orderOut: nil];
-    if( OSX_LION && b_nativeFullscreenMode )
+    if( b_nativeFullscreenMode )
     {
         if( [NSApp presentationOptions] & NSApplicationPresentationFullScreen )
             [o_bottombar_view setHidden: b_videoPlayback];
@@ -1436,14 +1437,14 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     if (!b_videoPlayback && b_fullscreen)
     {
-        if (!b_nativeFullscreenMode || !OSX_LION)
+        if (!b_nativeFullscreenMode)
             [[VLCCoreInteraction sharedInstance] toggleFullscreen];
     }
 }
 
 - (void)resizeWindow
 {
-    if ( b_fullscreen || (OSX_LION && [NSApp presentationOptions] & NSApplicationPresentationFullScreen && b_nativeFullscreenMode) )
+    if ( b_fullscreen || (b_nativeFullscreenMode && [NSApp presentationOptions] & NSApplicationPresentationFullScreen ))
         return;
 
     NSPoint topleftbase = NSMakePoint(0, [self frame].size.height);
