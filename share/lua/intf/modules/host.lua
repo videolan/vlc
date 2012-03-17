@@ -278,14 +278,14 @@ function host()
             local ret = vlc.net.poll( pollfds )
             if ret > 0 then
                 for _, client in pairs(clients) do
-                    if is_flag_set(pollfds[client:fd()], vlc.net.POLLERR)
+                    if is_flag_set(pollfds[client:fd()], vlc.net.POLLIN) then
+                        table.insert(rclients, client)
+                    elseif is_flag_set(pollfds[client:fd()], vlc.net.POLLERR)
                     or is_flag_set(pollfds[client:fd()], vlc.net.POLLHUP)
                     or is_flag_set(pollfds[client:fd()], vlc.net.POLLNVAL) then
                         client:del()
                     elseif is_flag_set(pollfds[client:fd()], vlc.net.POLLOUT) then
                         table.insert(wclients, client)
-                    elseif is_flag_set(pollfds[client:fd()], vlc.net.POLLIN) then
-                        table.insert(rclients, client)
                     end
                 end
                 if listeners.tcp then
