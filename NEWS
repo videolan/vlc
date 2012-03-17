@@ -13,6 +13,7 @@ Encoders:
 Audio Filters:
  * new remapping channel filter
  * new filter to enhance stereo effect by mono suppression and delay effect
+ * new VSXu visualization plugin
 
 Codecs:
  * Support for CDXL, Ut Video, VBLE, Dxtory codecs via libavcodec.

@@ -1157,6 +1157,7 @@ modules/visualization/visual/fft.c
 modules/visualization/visual/fft.h
 modules/visualization/visual/visual.c
 modules/visualization/visual/visual.h
+modules/visualization/vsxu.cpp
 share/lua/http/dialogs/batch_window.html
 share/lua/http/dialogs/browse_window.html
 share/lua/http/dialogs/create_stream.html
