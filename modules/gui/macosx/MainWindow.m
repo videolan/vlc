@@ -1636,10 +1636,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (b_fullscreen)
     {
         /* Make sure we are hidden */
-        if( b_nonembedded )
-            [o_detached_video_window orderOut: self];
-        else
-            [super orderOut: self];
+        [o_videoWindow orderOut: self];
 
         [self unlockFullscreenAnimation];
         return;
@@ -1709,11 +1706,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_fspanel setVoutWasUpdated: (int)[[o_fullscreen_window screen] displayID]];
     [o_fspanel setActive: nil];
 
-    if( !b_nonembedded && [self isVisible] )
-        [super orderOut: self];
-
-    if( b_nonembedded && [o_detached_video_window isVisible] )
-        [o_detached_video_window orderOut: self];
+    id o_videoWindow = b_nonembedded ? o_detached_video_window : self;
+    if( [o_videoWindow isVisible] )
+        [o_videoWindow orderOut: self];
 
     [o_fspanel setActive: nil];
 
@@ -1909,15 +1904,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         /* Fullscreen started */
         [self hasBecomeFullscreen];
     }
-}
-
-- (void)orderOut: (id)sender
-{
-    /* Make sure we leave fullscreen */
-    if (!(OSX_LION || !b_nativeFullscreenMode))
-        [self leaveFullscreenAndFadeOut: YES];
-
-    [super orderOut: sender];
 }
 
 - (void)makeKeyAndOrderFront: (id)sender
