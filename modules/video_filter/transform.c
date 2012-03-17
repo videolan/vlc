@@ -110,6 +110,42 @@ static void Plane8_##f(plane_t *restrict dst, const plane_t *restrict src) \
                 src->p_pixels[sy * src->i_pitch + sx]; \
         } \
     } \
+} \
+ \
+static void Plane16_##f(plane_t *restrict dst, const plane_t *restrict src) \
+{ \
+    const uint16_t *src_pixels = (const uint16_t *)src->p_pixels; \
+    uint16_t *restrict dst_pixels = (uint16_t *)dst->p_pixels; \
+    unsigned src_pitch = src->i_pitch / 2; \
+    unsigned dst_pitch = dst->i_pitch / 2; \
+    unsigned dst_visible_width = dst->i_visible_pitch / 2; \
+ \
+    for (int y = 0; y < dst->i_visible_lines; y++) { \
+        for (unsigned x = 0; x < dst_visible_width; x++) { \
+            int sx, sy; \
+            (f)(&sx, &sy, dst_visible_width, dst->i_visible_lines, x, y);\
+            dst_pixels[y * dst_pitch + x] = \
+                src_pixels[sy * src_pitch + sx]; \
+        } \
+    } \
+} \
+ \
+static void Plane32_##f(plane_t *restrict dst, const plane_t *restrict src) \
+{ \
+    const uint32_t *src_pixels = (const uint32_t *)src->p_pixels; \
+    uint32_t *restrict dst_pixels = (uint32_t *)dst->p_pixels; \
+    unsigned src_pitch = src->i_pitch / 4; \
+    unsigned dst_pitch = dst->i_pitch / 4; \
+    unsigned dst_visible_width = dst->i_visible_pitch / 4; \
+ \
+    for (int y = 0; y < dst->i_visible_lines; y++) { \
+        for (unsigned x = 0; x < dst_visible_width; x++) { \
+            int sx, sy; \
+            (f)(&sx, &sy, dst_visible_width, dst->i_visible_lines, x, y);\
+            dst_pixels[y * dst_pitch + x] = \
+                src_pixels[sy * src_pitch + sx]; \
+        } \
+    } \
 }
 
 PLANAR(HFlip)
@@ -123,11 +159,13 @@ typedef struct {
     bool      is_rotated;
     convert_t convert;
     convert_t iconvert;
-    void      (*plane8)(plane_t *dst, const plane_t *src);
+    void      (*plane8) (plane_t *dst, const plane_t *src);
+    void      (*plane16)(plane_t *dst, const plane_t *src);
+    void      (*plane32)(plane_t *dst, const plane_t *src);
 } transform_description_t;
 
 #define DESC(str, rotated, f, invf) \
-    { str, rotated, f, invf, Plane8_##f, }
+    { str, rotated, f, invf, Plane8_##f, Plane16_##f, Plane32_##f }
 
 static const transform_description_t descriptions[] = {
     DESC("90",    true,  R90,   R270),
@@ -185,9 +223,6 @@ static bool SupportedChroma(const vlc_chroma_description_t *chroma)
     if (chroma == NULL)
         return false;
 
-    if (chroma->pixel_size != 1)
-        return false;
-
     for (unsigned i = 0; i < chroma->plane_count; i++)
         if (chroma->p[i].w.num * chroma->p[i].h.den
          != chroma->p[i].h.num * chroma->p[i].w.den)
@@ -206,7 +241,7 @@ static int Open(vlc_object_t *object)
         vlc_fourcc_GetChromaDescription(src->i_chroma);
     if (!SupportedChroma(chroma)) {
         msg_Err(filter, "Unsupported chroma (%4.4s)", (char*)&src->i_chroma);
-        /* TODO support packed and rgb */
+        /* TODO support I422 ?! */
         return VLC_EGENERIC;
     }
 
@@ -232,7 +267,22 @@ static int Open(vlc_object_t *object)
 
     free(type_name);
 
-    sys->plane = dsc->plane8;
+    switch (chroma->pixel_size) {
+        case 1:
+            sys->plane = dsc->plane8;
+            break;
+        case 2:
+            sys->plane = dsc->plane16;
+            break;
+        case 4:
+            sys->plane = dsc->plane32;
+            break;
+        default:
+            msg_Err(filter, "Unsupported pixel size %u (chroma %4.4s)",
+                    chroma->pixel_size, (char *)&src->i_chroma);
+            goto error;
+    }
+
     sys->convert = dsc->convert;
     if (dsc->is_rotated) {
         if (!filter->b_allow_fmt_out_change) {
