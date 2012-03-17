@@ -433,7 +433,7 @@ error:
         o_value = [o_item_value copy];
         i_object_id = i_id;
         o_parent = o_parent_item;
-        p_item = [[[VLCMain sharedInstance] info] item];
+        p_item = [(VLCInfo *)[[VLCMain sharedInstance] info] item];
         o_children = nil;
     }
     return( self );
@@ -512,7 +512,7 @@ error:
 - (void)refresh
 {
     input_item_t * oldItem = p_item;
-    p_item = [[[VLCMain sharedInstance] info] item];
+    p_item = [(VLCInfo *)[[VLCMain sharedInstance] info] item];
     if( oldItem && oldItem != p_item ) vlc_gc_decref( oldItem );
 
     [o_children release];
