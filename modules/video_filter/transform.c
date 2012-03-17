@@ -218,19 +218,6 @@ static int Mouse(filter_t *filter, vlc_mouse_t *mouse,
     return VLC_SUCCESS;
 }
 
-static bool SupportedChroma(const vlc_chroma_description_t *chroma)
-{
-    if (chroma == NULL)
-        return false;
-
-    for (unsigned i = 0; i < chroma->plane_count; i++)
-        if (chroma->p[i].w.num * chroma->p[i].h.den
-         != chroma->p[i].h.num * chroma->p[i].w.den)
-            return false;
-
-    return true;
-}
-
 static int Open(vlc_object_t *object)
 {
     filter_t *filter = (filter_t *)object;
@@ -239,11 +226,8 @@ static int Open(vlc_object_t *object)
 
     const vlc_chroma_description_t *chroma =
         vlc_fourcc_GetChromaDescription(src->i_chroma);
-    if (!SupportedChroma(chroma)) {
-        msg_Err(filter, "Unsupported chroma (%4.4s)", (char*)&src->i_chroma);
-        /* TODO support I422 ?! */
+    if (chroma == NULL)
         return VLC_EGENERIC;
-    }
 
     filter_sys_t *sys = malloc(sizeof(*sys));
     if (!sys)
@@ -285,6 +269,15 @@ static int Open(vlc_object_t *object)
 
     sys->convert = dsc->convert;
     if (dsc->is_rotated) {
+        for (unsigned i = 0; i < chroma->plane_count; i++) {
+            if (chroma->p[i].w.num * chroma->p[i].h.den
+             != chroma->p[i].h.num * chroma->p[i].w.den) {
+                msg_Err(filter, "Format rotation not possible (chroma %4.4s)",
+                        (char *)&src->i_chroma); /* I422... */
+                goto error;
+            }
+        }
+
         if (!filter->b_allow_fmt_out_change) {
             msg_Err(filter, "Format change is not allowed");
             goto error;
@@ -296,6 +289,24 @@ static int Open(vlc_object_t *object)
         dst->i_visible_height = src->i_visible_width;
         dst->i_sar_num        = src->i_sar_den;
         dst->i_sar_den        = src->i_sar_num;
+    }
+
+    /* Deal with weird packed formats */
+    switch (src->i_chroma) {
+        case VLC_CODEC_YUYV:
+        case VLC_CODEC_UYVY:
+        case VLC_CODEC_YVYU:
+        case VLC_CODEC_VYUY:
+            if (dsc->is_rotated) {
+                msg_Err(filter, "Format rotation not possible (chroma %4.4s)",
+                        (char *)&src->i_chroma);
+                goto error;
+            }
+            sys->plane = dsc->plane32; /* 32-bits, not 16-bits! */
+            break;
+        case VLC_CODEC_NV12:
+        case VLC_CODEC_NV21:
+            goto error;
     }
 
     dst->i_x_offset       = INT_MAX;
