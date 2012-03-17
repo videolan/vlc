@@ -179,6 +179,22 @@ static int Mouse(filter_t *filter, vlc_mouse_t *mouse,
     return VLC_SUCCESS;
 }
 
+static bool SupportedChroma(const vlc_chroma_description_t *chroma)
+{
+    if (chroma == NULL)
+        return false;
+
+    if (chroma->pixel_size != 1)
+        return false;
+
+    for (unsigned i = 0; i < chroma->plane_count; i++)
+        if (chroma->p[i].w.num * chroma->p[i].h.den
+         != chroma->p[i].h.num * chroma->p[i].w.den)
+            return false;
+
+    return true;
+}
+
 static int Open(vlc_object_t *object)
 {
     filter_t *filter = (filter_t *)object;
@@ -187,7 +203,7 @@ static int Open(vlc_object_t *object)
 
     const vlc_chroma_description_t *chroma =
         vlc_fourcc_GetChromaDescription(src->i_chroma);
-    if (!chroma || chroma->plane_count < 3 || chroma->pixel_size != 1) {
+    if (!SupportedChroma(chroma)) {
         msg_Err(filter, "Unsupported chroma (%4.4s)", (char*)&src->i_chroma);
         /* TODO support packed and rgb */
         return VLC_EGENERIC;
