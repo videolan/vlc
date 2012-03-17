@@ -17,7 +17,7 @@ if [ -z "$NO_NEON" ]; then
     CFLAGS="$CFLAGS -mfpu=neon -mcpu=cortex-a8"
     LDFLAGS="$LDFLAGS -Wl,--fix-cortex-a8"
     EXTRA_PARAMS=" --enable-neon"
-else if [ -n "$TEGRA2" ]
+else if [ -n "$TEGRA2" ]; then
     CXX_TARGET="armeabi-v7a"
     CFLAGS="$CFLAGS -mfpu=vfpv3-d16 -mcpu=cortex-a9"
     EXTRA_PARAMS=" --disable-neon"
