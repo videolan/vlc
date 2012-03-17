@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc_es.h: Elementary stream formats descriptions
  *****************************************************************************
- * Copyright (C) 1999-2001 VLC authors and VideoLAN
+ * Copyright (C) 1999-2012 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -137,6 +137,42 @@ struct audio_format_t
 #define AOUT_CHAN_MAX               9
 
 /**
+ * Picture orientation.
+ */
+typedef enum video_orientation_t
+{
+    ORIENT_TOP_LEFT = 0, /**< Top line represents top, left column left. */
+    ORIENT_TOP_RIGHT, /**< Flipped horizontally */
+    ORIENT_BOTTOM_LEFT, /**< Flipped vertically */
+    ORIENT_BOTTOM_RIGHT, /**< Rotated 180 degrees */
+    ORIENT_LEFT_TOP, /**< Transposed */
+    ORIENT_LEFT_BOTTOM, /**< Rotated 90 degrees clockwise */
+    ORIENT_RIGHT_TOP, /**< Rotated 90 degrees anti-clockwise */
+    ORIENT_RIGHT_BOTTOM, /**< Anti-transposed */
+
+    ORIENT_NORMAL      = ORIENT_TOP_LEFT,
+    ORIENT_HFLIPPED    = ORIENT_TOP_RIGHT,
+    ORIENT_VFLIPPED    = ORIENT_BOTTOM_LEFT,
+    ORIENT_ROTATED_180 = ORIENT_BOTTOM_RIGHT,
+    ORIENT_ROTATED_270 = ORIENT_LEFT_BOTTOM,
+    ORIENT_ROTATED_90  = ORIENT_RIGHT_TOP,
+} video_orientation_t;
+/** Convert EXIF orientation to enum video_orientation_t */
+#define ORIENT_FROM_EXIF(exif) ((0x01324675U >> (4 * ((exif) - 1))) & 7)
+/** Convert enum video_orientation_t to EXIF */
+#define ORIENT_TO_EXIF(orient) ((0x12435867U >> (4 * (orient))) & 15)
+/** If the orientation is natural or mirrored */
+#define ORIENT_IS_MIRROR(orient) parity(orient)
+/** If the orientation swaps dimensions */
+#define ORIENT_IS_SWAP(orient) (((orient) & 4) != 0)
+/** Applies horizontal flip to an orientation */
+#define ORIENT_HFLIP(orient) ((orient) ^ 1)
+/** Applies vertical flip to an orientation */
+#define ORIENT_VFLIP(orient) ((orient) ^ 2)
+/** Applies horizontal flip to an orientation */
+#define ORIENT_ROTATE_180(orient) ((orient) ^ 3)
+
+/**
  * video format description
  */
 struct video_format_t
@@ -163,6 +199,7 @@ struct video_format_t
     int i_rgshift, i_lgshift;
     int i_rbshift, i_lbshift;
     video_palette_t *p_palette;              /**< video palette from demuxer */
+    video_orientation_t orientation;                /**< picture orientation */
 };
 
 /**
