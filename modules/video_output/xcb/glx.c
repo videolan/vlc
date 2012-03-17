@@ -381,7 +381,10 @@ static int Open (vlc_object_t *obj)
     if (HasExtension (glx_extensions, "GLX_EXT_swap_control")) {
         PFNGLXSWAPINTERVALEXTPROC SwapIntervalEXT = (PFNGLXSWAPINTERVALEXTPROC)GetProcAddress (NULL, "glXSwapIntervalEXT");
         if (!is_swap_interval_set && SwapIntervalEXT)
-            is_swap_interval_set = !SwapIntervalEXT (dpy, sys->glwin, 1);
+        {
+            SwapIntervalEXT (dpy, sys->glwin, 1);
+            is_swap_interval_set = true;
+        }
     }
 #endif
 
