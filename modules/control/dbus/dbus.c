@@ -97,10 +97,6 @@ static void Run     ( intf_thread_t * );
 static int TrackChange( intf_thread_t * );
 static int AllCallback( vlc_object_t*, const char*, vlc_value_t, vlc_value_t, void* );
 
-static void dispatch_status_cb( DBusConnection *p_conn,
-                                DBusDispatchStatus i_status,
-                                void *p_data);
-
 static dbus_bool_t add_timeout ( DBusTimeout *p_timeout, void *p_data );
 static dbus_bool_t add_watch   ( DBusWatch *p_watch, void *p_data );
 
@@ -233,10 +229,6 @@ static int Open( vlc_object_t *p_this )
     var_AddCallback( p_playlist, "loop", AllCallback, p_intf );
     var_AddCallback( p_playlist, "fullscreen", AllCallback, p_intf );
 
-    dbus_connection_set_dispatch_status_function( p_conn,
-                                                  dispatch_status_cb,
-                                                  p_intf, NULL );
-
     if( !dbus_connection_set_timeout_functions( p_conn,
                                                 add_timeout,
                                                 remove_timeout,
@@ -311,14 +303,6 @@ static void Close   ( vlc_object_t *p_this )
     vlc_array_destroy( p_sys->p_timeouts );
     vlc_array_destroy( p_sys->p_watches );
     free( p_sys );
-}
-
-static void dispatch_status_cb( DBusConnection *p_conn,
-                                DBusDispatchStatus i_status,
-                                void *p_data)
-{
-    (void) p_conn;
-
 }
 
 static dbus_bool_t add_timeout( DBusTimeout *p_timeout, void *p_data )
@@ -617,6 +601,8 @@ static void ProcessWatches( intf_thread_t *p_intf,
                             DBusWatch **p_watches, int i_watches,
                             struct pollfd *p_fds,  int i_fds )
 {
+    VLC_UNUSED(p_intf);
+
     /* Process watches */
     for( int i = 0; i < i_watches; i++ )
     {
