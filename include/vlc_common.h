@@ -616,6 +616,18 @@ static inline unsigned popcount (unsigned x)
 #endif
 }
 
+VLC_USED
+static inline unsigned parity (unsigned x)
+{
+#if VLC_GCC_VERSION(3,4)
+    return __builtin_parity (x);
+#else
+    for (unsigned i = 4 * sizeof (x); i > 0; i /= 2)
+        x ^= x >> i;
+    return x & 1;
+#endif
+}
+
 #ifdef __OS2__
 #   undef bswap16
 #   undef bswap32
