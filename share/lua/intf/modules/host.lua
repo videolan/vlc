@@ -125,24 +125,24 @@ function host()
         return vlc.win.console_read()
     end
 
-    local function del_client( client, nostdioerror )
-        --client:send("Cleaning up.\r\n")
-        if client.type == client_type.stdio then
-            if not nostdioerror then
-                client:send( "Cannot delete stdin/stdout client.\n" )
-            end
-        elseif clients[client] then
-            if client.type == client_type.net
-            or client.type == client_type.telnet then
-                if client.wfd ~= client.rfd then
-                    vlc.net.close( client.rfd )
-                end
-                vlc.net.close( client.wfd )
-            end
-            clients[client] = nil
-        else
+    local function del_client( client )
+        if not clients[client] then
             vlc.msg.err("couldn't find client to remove.")
+            return
         end
+
+        if client.type == client_type.stdio then
+            h:broadcast("Shutting down.\r\n")
+            vlc.msg.info("Requested shutdown.")
+            vlc.misc.quit()
+        elseif client.type == client_type.net
+        or client.type == client_type.telnet then
+            if client.wfd ~= client.rfd then
+                vlc.net.close( client.rfd )
+            end
+            vlc.net.close( client.wfd )
+        end
+        clients[client] = nil
     end
 
     local function switch_status( client, s )
@@ -318,7 +318,9 @@ function host()
 
     local function destructor( h )
         for _,client in pairs(clients) do
-            client:del(true)
+            if client.type ~= client_type.stdio then
+                client:del()
+            end
         end
     end
 
