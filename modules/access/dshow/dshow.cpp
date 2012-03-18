@@ -363,17 +363,23 @@ static void CreateDirectShowGraph( access_sys_t *p_sys )
     }
 }
 
-static void DeleteDirectShowGraph( access_sys_t *p_sys )
+static void DeleteDirectShowGraph( vlc_object_t *p_this, access_sys_t *p_sys )
 {
     DeleteCrossbarRoutes( p_sys );
 
     /* Remove filters from graph */
+    msg_Dbg( p_this, "DeleteDirectShowGraph: Removing filters" );
     for( int i = 0; i < p_sys->i_streams; i++ )
     {
+        /* RemoveFilter does an undocumented Release()
+         * but does not set item to NULL */
+        msg_Dbg( p_this, "DeleteDirectShowGraph: Removing capture filter" );
         p_sys->p_graph->RemoveFilter( p_sys->pp_streams[i]->p_capture_filter );
+        p_sys->pp_streams[i]->p_capture_filter = NULL;
+
+        msg_Dbg( p_this, "DeleteDirectShowGraph: Removing device filter" );
         p_sys->p_graph->RemoveFilter( p_sys->pp_streams[i]->p_device_filter );
-        p_sys->pp_streams[i]->p_capture_filter->Release();
-        p_sys->pp_streams[i]->p_device_filter->Release();
+        p_sys->pp_streams[i]->p_device_filter = NULL;
     }
 
     /* Release directshow objects */
@@ -837,7 +843,7 @@ static void CommonClose( vlc_object_t *p_this, access_sys_t *p_sys )
 {
     msg_Dbg( p_this, "releasing DirectShow");
 
-    DeleteDirectShowGraph( p_sys );
+    DeleteDirectShowGraph( p_this, p_sys );
 
     /* Uninitialize OLE/COM */
     CoUninitialize();
@@ -1197,12 +1203,16 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
 
  fail:
     /* Remove filters from graph */
+    msg_Dbg( p_this, "OpenDevice: Removing filters" ) ;
     p_sys->p_graph->RemoveFilter( p_device_filter );
     p_sys->p_graph->RemoveFilter( p_capture_filter );
 
     /* Release objects */
-    p_device_filter->Release();
-    p_capture_filter->Release();
+    /* RemoveFilter does an undocumented Release()
+     * but does not set item to NULL*/
+
+    p_device_filter = NULL;
+    p_capture_filter = NULL;
 
     return VLC_EGENERIC;
 }
