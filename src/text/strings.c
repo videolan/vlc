@@ -1223,6 +1223,9 @@ char *make_path (const char *url)
         if (!strncasecmp (path, "localhost/", 10))
             return memmove (path, path + 9, strlen (path + 9) + 1);
 #else
+        /* cannot start with a space */
+        if (*path == ' ')
+            goto out;
         for (char *p = strchr (path, '/'); p; p = strchr (p + 1, '/'))
             *p = '\\';
 
