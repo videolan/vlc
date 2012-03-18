@@ -114,11 +114,12 @@ function host()
         end
     end
 
-	local function write_console( client, data )
-		-- FIXME: this method shouldn't be needed. vlc.net.write should just work
-		io.write(data or client.buffer)
-		return string.len(data or client.buffer)
-	end
+    local function write_console( client, data )
+        -- FIXME: this method shouldn't be needed. vlc.net.write should
+        -- just work
+        io.write(data or client.buffer)
+        return string.len(data or client.buffer)
+    end
 
     local function read_console( client, len )
         -- Read stdin from a windows console (beware: select/poll doesn't work!)
@@ -164,18 +165,18 @@ function host()
         if t == client_type.net or t == client_type.telnet then
             w = send
             r = recv
-        else if t == client_type.stdio or t == client_type.fifo then
+        elseif t == client_type.stdio or t == client_type.fifo then
             if vlc.win and t == client_type.stdio then
                 vlc.win.console_init()
-				w = write_console
+                w = write_console
                 r = read_console
             else
-				w = write
+                w = write
                 r = read
             end
         else
             error("Unknown client type", t )
-        end end
+        end
 
         local client = { -- data
                          rfd = fd,
