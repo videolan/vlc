@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2000-2006 the VideoLAN team
  * Copyright (C) 2010 Laurent Aimar
- * $Id$
+ * Copyright (C) 2012 Rémi Denis-Courmont
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
@@ -45,10 +45,12 @@ static void Close(vlc_object_t *);
 #define CFG_PREFIX "transform-"
 
 #define TYPE_TEXT N_("Transform type")
-static const char * const type_list[] = { "90", "180", "270", "hflip", "vflip" };
+static const char * const type_list[] = { "90", "180", "270",
+    "hflip", "vflip", "transpose", "antitranspose" };
 static const char * const type_list_text[] = { N_("Rotate by 90 degrees"),
-  N_("Rotate by 180 degrees"), N_("Rotate by 270 degrees"),
-  N_("Flip horizontally"), N_("Flip vertically") };
+    N_("Rotate by 180 degrees"), N_("Rotate by 270 degrees"),
+    N_("Flip horizontally"), N_("Flip vertically"),
+    N_("Transpose"), N_("Anti-transpose") };
 
 vlc_module_begin()
     set_description(N_("Video transformation filter"))
@@ -79,6 +81,17 @@ static void VFlip(int *sx, int *sy, int w, int h, int dx, int dy)
     VLC_UNUSED( w );
     *sx = dx;
     *sy = h - 1 - dy;
+}
+static void Transpose(int *sx, int *sy, int w, int h, int dx, int dy)
+{
+    VLC_UNUSED( h ); VLC_UNUSED( w );
+    *sx = dy;
+    *sy = dx;
+}
+static void AntiTranspose(int *sx, int *sy, int w, int h, int dx, int dy)
+{
+    *sx = h - 1 - dy;
+    *sy = w - 1 - dx;
 }
 static void R90(int *sx, int *sy, int w, int h, int dx, int dy)
 {
@@ -150,12 +163,14 @@ static void Plane32_##f(plane_t *restrict dst, const plane_t *restrict src) \
 
 PLANAR(HFlip)
 PLANAR(VFlip)
+PLANAR(Transpose)
+PLANAR(AntiTranspose)
 PLANAR(R90)
 PLANAR(R180)
 PLANAR(R270)
 
 typedef struct {
-    char      name[8];
+    char      name[16];
     bool      is_rotated;
     convert_t convert;
     convert_t iconvert;
@@ -168,11 +183,13 @@ typedef struct {
     { str, rotated, f, invf, Plane8_##f, Plane16_##f, Plane32_##f }
 
 static const transform_description_t descriptions[] = {
-    DESC("90",    true,  R90,   R270),
-    DESC("180",   false, R180,  R180),
-    DESC("270",   true,  R270,  R90),
-    DESC("hflip", false, HFlip, HFlip),
-    DESC("vflip", false, VFlip, VFlip),
+    DESC("90",            true,  R90,           R270),
+    DESC("180",           false, R180,          R180),
+    DESC("270",           true,  R270,          R90),
+    DESC("hflip",         false, HFlip,         HFlip),
+    DESC("vflip",         false, VFlip,         VFlip),
+    DESC("transpose",     true,  Transpose,     Transpose),
+    DESC("antitranspose", true,  AntiTranspose, AntiTranspose),
 };
 
 static const size_t n_transforms =
