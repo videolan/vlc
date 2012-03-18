@@ -832,9 +832,10 @@ typedef struct
 
 typedef struct MP4_Box_data_mfhd_s
 {
-    uint32_t i_sequence_number;
+    uint8_t  i_version;
+    uint32_t i_flags;
 
-    uint8_t *p_vendor_extension;
+    uint32_t i_sequence_number;
 
 } MP4_Box_data_mfhd_t;
 
