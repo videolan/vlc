@@ -66,6 +66,10 @@ public:
 
     /* */
     int SubmitTuneRequest(void);
+    unsigned EnumSystems(void);
+    int SetInversion(int);
+    float GetSignalStrength(void);
+    float GetSignalNoiseRatio(void);
 
     int SetCQAM(long);
     int SetATSC(long);
@@ -87,8 +91,10 @@ private:
     STDMETHODIMP BufferCB( double d_time, BYTE* p_buffer, long l_buffer_len );
 
     vlc_object_t *p_access;
-    CLSID     guid_network_type;
-    long      l_tuner_used;        /* Index of the Tuning Device */
+    CLSID     guid_network_type;   /* network type in use */
+    long      l_tuner_used;        /* Index of the Tuning Device in use */
+    unsigned  systems;             /* bitmask of all tuners' network types */
+
     /* registration number for the RunningObjectTable */
     DWORD     d_graph_register;
 
@@ -96,25 +102,39 @@ private:
 
     IMediaControl*  p_media_control;
     IGraphBuilder*  p_filter_graph;
-    ITuningSpace*   p_tuning_space;
-    ITuneRequest*   p_tune_request;
+    ITuningSpaceContainer*      p_tuning_space_container;
+    ITuningSpace*               p_tuning_space;
+    ITuneRequest*               p_tune_request;
+
+    IDVBTuningSpace*            p_dvb_tuning_space;
+    IDVBSTuningSpace*           p_dvbs_tuning_space;
+#if 0
+    IDigitalCableTuningSpace*   p_cqam_tuning_space;
+    IATSCTuningSpace*           p_atsc_tuning_space;
+#endif
 
     ICreateDevEnum* p_system_dev_enum;
     IBaseFilter*    p_network_provider;
-    IScanningTuner* p_scanning_tuner;
     IBaseFilter*    p_tuner_device;
     IBaseFilter*    p_capture_device;
     IBaseFilter*    p_sample_grabber;
     IBaseFilter*    p_mpeg_demux;
     IBaseFilter*    p_transport_info;
+    IScanningTuner* p_scanning_tuner;
     ISampleGrabber* p_grabber;
 
-    HRESULT CreateTuneRequest( );
+    HRESULT SetUpTuner( REFCLSID guid_this_network_type );
+    HRESULT GetNextNetworkType( CLSID* guid_this_network_type );
     HRESULT Build( );
+    HRESULT Check( REFCLSID guid_this_network_type );
+    HRESULT GetFilterName( IBaseFilter* p_filter, char** psz_bstr_name );
+    HRESULT GetPinName( IPin* p_pin, char** psz_bstr_name );
+    unsigned GetSystem( REFCLSID clsid );
+    HRESULT ListFilters( REFCLSID this_clsid );
     HRESULT FindFilter( REFCLSID clsid, long* i_moniker_used,
-        IBaseFilter* p_upstream, IBaseFilter** p_p_downstream );
+        IBaseFilter* p_upstream, IBaseFilter** p_p_downstream);
     HRESULT Connect( IBaseFilter* p_filter_upstream,
-        IBaseFilter* p_filter_downstream );
+        IBaseFilter* p_filter_downstream);
     HRESULT Start( );
     HRESULT Destroy( );
     HRESULT Register( );

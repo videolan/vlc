@@ -48,6 +48,7 @@ class ISampleGrabber;
 class ISampleGrabberCB;
 class IScanningTuner;
 class ITuner;
+class ITunerCap;
 class ITuneRequest;
 class ITuningSpace;
 class ITuningSpaceContainer;
@@ -312,6 +313,19 @@ public:
     virtual HRESULT __stdcall Reset( void )=0;
     virtual HRESULT __stdcall Clone( IEnumTuningSpaces** p_p_enum )=0;
 };
+
+class ITunerCap : public IUnknown
+{
+public:
+    virtual HRESULT __stdcall get_AuxInputCount( ULONG* pulCompositeCount,
+        ULONG* pulSvideoCount )=0;
+    virtual HRESULT __stdcall get_SupportedNetworkTypes(
+        ULONG ulcNetworkTypesMax, ULONG* pulcNetworkTypes,
+        GUID* pguidNetworkTypes )=0;
+    virtual HRESULT __stdcall get_SupportedVideoFormats(
+        ULONG* pulAMTunerModeType, ULONG* pulAnalogVideoStandard )=0;
+};
+
 
 class ITuner : public IUnknown
 {
@@ -664,7 +678,7 @@ public:
     virtual HRESULT __stdcall CreateTopology( ULONG ulInputPinId,
        ULONG ulOutputPinId )=0;
     virtual HRESULT __stdcall GetControlNode( ULONG ulInputPinId,
-        ULONG ulOutputPinId, ULONG ulNodeType, IUnknown **ppControlNode )=0;
+       ULONG ulOutputPinId, ULONG ulNodeType, IUnknown **ppControlNode )=0;
 };
 
 typedef struct _MPEG_HEADER_BITS_MIDL
@@ -955,6 +969,8 @@ const IID IID_IDigitalCableLocator =
     {0x48F66A11,0x171A,0x419A,{0x95,0x25,0xBE,0xEE,0xCD,0x51,0x58,0x4C}};
 
 /* KSCATEGORY_BDA */
+const GUID KSCATEGORY_BDA_NETWORK_PROVIDER =
+    {0x71985F4B,0x1CA1,0x11d3,{0x9C,0xC8,0x00,0xC0,0x4F,0x79,0x71,0xE0}};
 const GUID KSCATEGORY_BDA_TRANSPORT_INFORMATION =
     {0xa2e3074f,0x6c3d,0x11d3,{0xb6,0x53,0x00,0xc0,0x4f,0x79,0x49,0x8e}};
 const GUID KSCATEGORY_BDA_RECEIVER_COMPONENT    =
@@ -1007,6 +1023,10 @@ extern const IID IID_IMpeg2Demultiplexer;
 extern const IID IID_ISampleGrabber;
 extern const IID IID_IScanningTuner;
 extern const IID IID_ITuner;
+/* Following symbol does not exist in library
+extern const IID IID_ITunerCap; */
+const IID IID_ITunerCap =
+    {0xE60DFA45,0x8D56,0x4e65,{0xA8,0xAB,0xD6,0xBE,0x94,0x12,0xC2,0x49}};
 extern const IID IID_ITuningSpace;
 extern const IID IID_ITuningSpaceContainer;
 /* Following symbol does not exist in library

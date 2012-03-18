@@ -3,13 +3,14 @@
  *****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
  * Copyright (C) 2011 Rémi Denis-Courmont
+ * Copyright (C) 2012 John Freed
  *
  * Author: Ken Self <kenself(at)optusnet(dot)com(dot)au>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *( at your option ) any later version.
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,7 +33,7 @@
 #include <vlc_block.h>
 #include "dtv/bdagraph.hpp"
 #include "dtv/dtv.h"
-
+#undef DEBUG_MONIKER_NAME
 
 static ModulationType dvb_parse_modulation (const char *mod)
 {
@@ -164,29 +165,25 @@ void dvb_remove_pid (dvb_device_t *, uint16_t)
 {
 }
 
-unsigned dvb_enum_systems (dvb_device_t *)
+unsigned dvb_enum_systems (dvb_device_t *d)
 {
-#warning TODO
-    return 0;
+    return d->module->EnumSystems( );
 }
 
-float dvb_get_signal_strength (dvb_device_t *)
+float dvb_get_signal_strength (dvb_device_t *d)
 {
-    return 0.;
+    return d->module->GetSignalStrength( );
 }
 
-float dvb_get_snr (dvb_device_t *)
+float dvb_get_snr (dvb_device_t *d)
 {
-    return 0.;
+    return d->module->GetSignalNoiseRatio( );
 }
 
 int dvb_set_inversion (dvb_device_t *d, int inversion)
 {
     d->inversion = inversion;
-    if (d->frequency == 0)
-        return 0; /* not DVB-S */
-    return d->module->SetDVBS(d->frequency, d->srate, d->fec, d->inversion,
-                              d->pol, d->lowf, d->highf, d->switchf);
+    return d->module->SetInversion( d->inversion );
 }
 
 int dvb_tune (dvb_device_t *d)
@@ -277,7 +274,6 @@ int dvb_set_cqam (dvb_device_t *d, uint32_t freq, const char * /*mod*/)
     return d->module->SetCQAM(freq / 1000);
 }
 
-
 /*****************************************************************************
 * BDAOutput
 *****************************************************************************/
@@ -358,12 +354,14 @@ BDAGraph::BDAGraph( vlc_object_t *p_this ):
     p_access( p_this ),
     guid_network_type(GUID_NULL),
     l_tuner_used(-1),
+    systems(0),
     d_graph_register( 0 ),
     output( p_this )
 {
-    p_tuning_space = NULL;
-    p_tune_request = NULL;
     p_media_control = NULL;
+
+    p_tuning_space = NULL;
+
     p_filter_graph = NULL;
     p_system_dev_enum = NULL;
     p_network_provider = p_tuner_device = p_capture_device = NULL;
@@ -382,35 +380,143 @@ BDAGraph::BDAGraph( vlc_object_t *p_this ):
 BDAGraph::~BDAGraph()
 {
     Destroy();
+
+    if( p_tuning_space )
+        p_tuning_space->Release();
+    p_tuning_space = NULL;
+
+    systems = 0;
     CoUninitialize();
 }
 
+/*****************************************************************************
+* GetSystem
+* helper function
+*****************************************************************************/
+unsigned BDAGraph::GetSystem( REFCLSID clsid )
+{
+    unsigned sys = 0;
+
+    if( clsid == CLSID_DVBTNetworkProvider )
+        sys = DVB_T;
+    if( clsid == CLSID_DVBCNetworkProvider )
+        sys = DVB_C;
+    if( clsid == CLSID_DVBSNetworkProvider )
+        sys = DVB_S;
+    if( clsid == CLSID_ATSCNetworkProvider )
+        sys = ATSC;
+    if( clsid == CLSID_DigitalCableNetworkType )
+        sys = CQAM;
+
+    return sys;
+}
+
+
+/*****************************************************************************
+ * Enumerate Systems
+ *****************************************************************************
+ * here is logic for special case where user uses an MRL that points
+ * to DTV but is not fully specific. This is usually dvb:// and can come
+ * either from a playlist, a channels.conf MythTV file, or from manual entry.
+ *
+ * Since this is done before the real tune request is submitted, we can
+ * use the global device enumerator, etc., so long as we do a Destroy() at
+ * the end
+ *****************************************************************************/
+unsigned BDAGraph::EnumSystems()
+{
+    HRESULT hr = S_OK;
+    GUID guid_network_provider = GUID_NULL;
+
+    msg_Dbg( p_access, "EnumSystems: Entering " );
+
+    do
+    {
+        hr = GetNextNetworkType( &guid_network_provider );
+        if( hr != S_OK ) break;
+        hr = Check( guid_network_provider );
+        if( FAILED( hr ) )
+            msg_Dbg( p_access, "EnumSystems: Check failed, trying next" );
+    }
+    while( true );
+
+    if( p_filter_graph )
+        Destroy();
+    msg_Dbg( p_access, "EnumSystems: Returning systems 0x%08x", systems );
+    return systems;
+}
+
+float BDAGraph::GetSignalNoiseRatio(void)
+{
+    /* not implemented until Windows 7
+     * IBDA_Encoder::GetState */
+    return 0.;
+}
+
+float BDAGraph::GetSignalStrength(void)
+{
+    HRESULT hr = S_OK;
+    long l_strength = 0;
+    msg_Dbg( p_access, "GetSignalStrength: entering" );
+    if( !p_scanning_tuner)
+        return 0.;
+    hr = p_scanning_tuner->get_SignalStrength( &l_strength );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "GetSignalStrength: "
+            "Cannot get value: hr=0x%8lx", hr );
+        return 0.;
+    }
+    msg_Dbg( p_access, "GetSignalStrength: got %ld", l_strength );
+    if( l_strength == -1 )
+        return -1.;
+    return l_strength / 100.;
+}
 
 int BDAGraph::SubmitTuneRequest(void)
 {
     HRESULT hr;
+    int i = 0;
 
-    /* Build and Run the Graph. If a Tuner device is in use the graph will
-     * fail to run. Repeated calls to build will check successive tuner
+    /* Build and Start the Graph. If a Tuner device is in use the graph will
+     * fail to start. Repeated calls to Build will check successive tuner
      * devices */
     do
     {
+        msg_Dbg( p_access, "SubmitTuneRequest: Building the Graph" );
+
         hr = Build();
         if( FAILED( hr ) )
         {
             msg_Warn( p_access, "SubmitTuneRequest: "
-                      "Cannot Build the Graph: hr=0x%8lx", hr );
+                "Cannot Build the Graph: hr=0x%8lx", hr );
             return VLC_EGENERIC;
         }
+        msg_Dbg( p_access, "SubmitTuneRequest: Starting the Graph" );
+
         hr = Start();
+        if( FAILED( hr ) )
+        {
+            msg_Dbg( p_access, "SubmitTuneRequest: "
+                "Cannot Start the Graph, retrying: hr=0x%8lx", hr );
+            ++i;
+        }
     }
-    while( hr != S_OK );
+    while( hr != S_OK && i < 10 ); /* give up after 10 tries */
+
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SubmitTuneRequest: "
+            "Failed to Start the Graph: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
 
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
-* Set clear QAM (US cable)
+* Set Clear QAM (DigitalCable)
+* Local ATSC Digital Antenna
 *****************************************************************************/
 int BDAGraph::SetCQAM(long l_frequency)
 {
@@ -418,11 +524,18 @@ int BDAGraph::SetCQAM(long l_frequency)
     class localComPtr
     {
         public:
-        IDigitalCableTuneRequest* p_cqam_tune_request;
-        IDigitalCableLocator* p_cqam_locator;
-        localComPtr(): p_cqam_tune_request(NULL), p_cqam_locator(NULL) {};
+        ITuneRequest*               p_tune_request;
+        IDigitalCableTuneRequest*   p_cqam_tune_request;
+        IDigitalCableLocator*       p_cqam_locator;
+        localComPtr():
+            p_tune_request(NULL),
+            p_cqam_tune_request(NULL),
+            p_cqam_locator(NULL)
+            {};
         ~localComPtr()
         {
+            if( p_tune_request )
+                p_tune_request->Release();
             if( p_cqam_tune_request )
                 p_cqam_tune_request->Release();
             if( p_cqam_locator )
@@ -434,28 +547,43 @@ int BDAGraph::SetCQAM(long l_frequency)
     l_physical_channel = var_GetInteger( p_access, "dvb-physical-channel" );
     l_minor_channel    = var_GetInteger( p_access, "dvb-minor-channel" );
 
-    guid_network_type = CLSID_DigitalCableNetworkType;
-    hr = CreateTuneRequest();
+    /* try to set p_scanning_tuner */
+    hr = Check( CLSID_DigitalCableNetworkType );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitCQAMTuneRequest: "\
-                 "Cannot create Tuning Space: hr=0x%8lx", hr );
+        msg_Warn( p_access, "SetCQAM: "\
+            "Cannot create Tuning Space: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
-    hr = p_tune_request->QueryInterface( IID_IDigitalCableTuneRequest,
-        (void**)&l.p_cqam_tune_request );
+    if( !p_scanning_tuner )
+    {
+        msg_Warn( p_access, "SetCQAM: Cannot get scanning tuner" );
+        return VLC_EGENERIC;
+    }
+
+    hr = p_scanning_tuner->get_TuneRequest( &l.p_tune_request );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitCQAMTuneRequest: "\
+        msg_Warn( p_access, "SetCQAM: "\
+            "Cannot get Tune Request: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
+    hr = l.p_tune_request->QueryInterface( IID_IDigitalCableTuneRequest,
+        reinterpret_cast<void**>( &l.p_cqam_tune_request ) );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SetCQAM: "\
                   "Cannot QI for IDigitalCableTuneRequest: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
+
     hr = ::CoCreateInstance( CLSID_DigitalCableLocator, 0, CLSCTX_INPROC,
-                             IID_IDigitalCableLocator, (void**)&l.p_cqam_locator );
+        IID_IDigitalCableLocator, reinterpret_cast<void**>( &l.p_cqam_locator ) );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitCQAMTuneRequest: "\
+        msg_Warn( p_access, "SetCQAM: "\
                   "Cannot create the CQAM locator: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
@@ -469,16 +597,31 @@ int BDAGraph::SetCQAM(long l_frequency)
         hr = l.p_cqam_tune_request->put_MinorChannel( l_minor_channel );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitCQAMTuneRequest: "\
+        msg_Warn( p_access, "SetCQAM: "\
                  "Cannot set tuning parameters: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
-    hr = p_tune_request->put_Locator( l.p_cqam_locator );
+    hr = l.p_cqam_tune_request->put_Locator( l.p_cqam_locator );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitCQAMTuneRequest: "\
+        msg_Warn( p_access, "SetCQAM: "\
                   "Cannot put the locator: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
+    hr = p_scanning_tuner->Validate( l.p_cqam_tune_request );
+    if( FAILED( hr ) )
+    {
+        msg_Dbg( p_access, "SetCQAM: "\
+            "Tune Request cannot be validated: hr=0x%8lx", hr );
+    }
+    /* increments ref count for scanning tuner */
+    hr = p_scanning_tuner->put_TuneRequest( l.p_cqam_tune_request );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SetCQAM: "\
+            "Cannot put the tune request: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
@@ -494,11 +637,18 @@ int BDAGraph::SetATSC(long l_frequency)
     class localComPtr
     {
         public:
-        IATSCChannelTuneRequest* p_atsc_tune_request;
-        IATSCLocator* p_atsc_locator;
-        localComPtr(): p_atsc_tune_request(NULL), p_atsc_locator(NULL) {};
+        ITuneRequest*               p_tune_request;
+        IATSCChannelTuneRequest*    p_atsc_tune_request;
+        IATSCLocator*               p_atsc_locator;
+        localComPtr():
+            p_tune_request(NULL),
+            p_atsc_tune_request(NULL),
+            p_atsc_locator(NULL)
+            {};
         ~localComPtr()
         {
+            if( p_tune_request )
+                p_tune_request->Release();
             if( p_atsc_tune_request )
                 p_atsc_tune_request->Release();
             if( p_atsc_locator )
@@ -507,32 +657,48 @@ int BDAGraph::SetATSC(long l_frequency)
     } l;
     long l_major_channel, l_minor_channel, l_physical_channel;
 
+    /* fixme: these parameters should have dtv prefix, not dvb */
     l_major_channel     = var_GetInteger( p_access, "dvb-major-channel" );
     l_minor_channel     = var_GetInteger( p_access, "dvb-minor-channel" );
     l_physical_channel  = var_GetInteger( p_access, "dvb-physical-channel" );
 
-    guid_network_type = CLSID_ATSCNetworkProvider;
-    hr = CreateTuneRequest();
+    /* try to set p_scanning_tuner */
+    hr = Check( CLSID_ATSCNetworkProvider );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitATSCTuneRequest: "\
+        msg_Warn( p_access, "SetATSC: "\
             "Cannot create Tuning Space: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
-    hr = p_tune_request->QueryInterface( IID_IATSCChannelTuneRequest,
-        (void**)&l.p_atsc_tune_request );
+    if( !p_scanning_tuner )
+    {
+        msg_Warn( p_access, "SetATSC: Cannot get scanning tuner" );
+        return VLC_EGENERIC;
+    }
+
+    hr = p_scanning_tuner->get_TuneRequest( &l.p_tune_request );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitATSCTuneRequest: "\
+        msg_Warn( p_access, "SetATSC: "\
+            "Cannot get Tune Request: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
+    hr = l.p_tune_request->QueryInterface( IID_IATSCChannelTuneRequest,
+        reinterpret_cast<void**>( &l.p_atsc_tune_request ) );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SetATSC: "\
             "Cannot QI for IATSCChannelTuneRequest: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
+
     hr = ::CoCreateInstance( CLSID_ATSCLocator, 0, CLSCTX_INPROC,
-                             IID_IATSCLocator, (void**)&l.p_atsc_locator );
+        IID_IATSCLocator, reinterpret_cast<void**>( &l.p_atsc_locator ) );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitATSCTuneRequest: "\
+        msg_Warn( p_access, "SetATSC: "\
             "Cannot create the ATSC locator: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
@@ -548,40 +714,69 @@ int BDAGraph::SetATSC(long l_frequency)
         hr = l.p_atsc_locator->put_PhysicalChannel( l_physical_channel );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitATSCTuneRequest: "\
+        msg_Warn( p_access, "SetATSC: "\
             "Cannot set tuning parameters: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
-    hr = p_tune_request->put_Locator( l.p_atsc_locator );
+    hr = l.p_atsc_tune_request->put_Locator( l.p_atsc_locator );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitATSCTuneRequest: "\
+        msg_Warn( p_access, "SetATSC: "\
             "Cannot put the locator: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
+
+    hr = p_scanning_tuner->Validate( l.p_atsc_tune_request );
+    if( FAILED( hr ) )
+    {
+        msg_Dbg( p_access, "SetATSC: "\
+            "Tune Request cannot be validated: hr=0x%8lx", hr );
+    }
+    /* increments ref count for scanning tuner */
+    hr = p_scanning_tuner->put_TuneRequest( l.p_atsc_tune_request );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SetATSC: "\
+            "Cannot put the tune request: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
 * Set DVB-T
+*
+* This provides the tune request that everything else is built upon.
+*
+* Stores the tune request to the scanning tuner, where it is pulled out by
+* dvb_tune a/k/a SubmitTuneRequest.
 ******************************************************************************/
 int BDAGraph::SetDVBT(long l_frequency, uint32_t fec_hp, uint32_t fec_lp,
     long l_bandwidth, int transmission, uint32_t guard, int hierarchy)
 {
     HRESULT hr = S_OK;
+
     class localComPtr
     {
         public:
-        IDVBTuneRequest* p_dvbt_tune_request;
-        IDVBTLocator* p_dvbt_locator;
-        IDVBTuningSpace2* p_dvb_tuning_space;
-        localComPtr(): p_dvbt_tune_request(NULL), p_dvbt_locator(NULL),
-           p_dvb_tuning_space(NULL) {};
+        ITuneRequest*       p_tune_request;
+        IDVBTuneRequest*    p_dvb_tune_request;
+        IDVBTLocator*       p_dvbt_locator;
+        IDVBTuningSpace2*   p_dvb_tuning_space;
+        localComPtr():
+            p_tune_request(NULL),
+            p_dvb_tune_request(NULL),
+            p_dvbt_locator(NULL),
+            p_dvb_tuning_space(NULL)
+            {};
         ~localComPtr()
         {
-            if( p_dvbt_tune_request )
-                p_dvbt_tune_request->Release();
+            if( p_tune_request )
+                p_tune_request->Release();
+            if( p_dvb_tune_request )
+                p_dvb_tune_request->Release();
             if( p_dvbt_locator )
                 p_dvbt_locator->Release();
             if( p_dvb_tuning_space )
@@ -589,53 +784,82 @@ int BDAGraph::SetDVBT(long l_frequency, uint32_t fec_hp, uint32_t fec_lp,
         }
     } l;
 
+    /* create local dvbt-specific tune request and locator
+     * then put it to existing scanning tuner */
     BinaryConvolutionCodeRate i_hp_fec = dvb_parse_fec(fec_hp);
     BinaryConvolutionCodeRate i_lp_fec = dvb_parse_fec(fec_lp);
     GuardInterval i_guard = dvb_parse_guard(guard);
     TransmissionMode i_transmission = dvb_parse_transmission(transmission);
     HierarchyAlpha i_hierarchy = dvb_parse_hierarchy(hierarchy);
 
-    guid_network_type = CLSID_DVBTNetworkProvider;
-    hr = CreateTuneRequest();
+    /* try to set p_scanning_tuner */
+    msg_Dbg( p_access, "SetDVBT: set up scanning tuner" );
+    hr = Check( CLSID_DVBTNetworkProvider );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBTTuneRequest: "\
-            "Cannot create Tune Request: hr=0x%8lx", hr );
+        msg_Warn( p_access, "SetDVBT: "\
+            "Cannot create Tuning Space: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
-    hr = p_tune_request->QueryInterface( IID_IDVBTuneRequest,
-        (void**)&l.p_dvbt_tune_request );
+    if( !p_scanning_tuner )
+    {
+        msg_Warn( p_access, "SetDVBT: Cannot get scanning tuner" );
+        return VLC_EGENERIC;
+    }
+
+    hr = p_scanning_tuner->get_TuneRequest( &l.p_tune_request );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBTTuneRequest: "\
+        msg_Warn( p_access, "SetDVBT: "\
+            "Cannot get Tune Request: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
+    msg_Dbg( p_access, "SetDVBT: Creating DVB tune request" );
+    hr = l.p_tune_request->QueryInterface( IID_IDVBTuneRequest,
+        reinterpret_cast<void**>( &l.p_dvb_tune_request ) );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SetDVBT: "\
             "Cannot QI for IDVBTuneRequest: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
-    l.p_dvbt_tune_request->put_ONID( -1 );
-    l.p_dvbt_tune_request->put_SID( -1 );
-    l.p_dvbt_tune_request->put_TSID( -1 );
 
-    hr = ::CoCreateInstance( CLSID_DVBTLocator, 0, CLSCTX_INPROC,
-        IID_IDVBTLocator, (void**)&l.p_dvbt_locator );
+    l.p_dvb_tune_request->put_ONID( -1 );
+    l.p_dvb_tune_request->put_SID( -1 );
+    l.p_dvb_tune_request->put_TSID( -1 );
+
+    msg_Dbg( p_access, "SetDVBT: get TS" );
+    hr = p_scanning_tuner->get_TuningSpace( &p_tuning_space );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBTTuneRequest: "\
-            "Cannot create the DVBT Locator: hr=0x%8lx", hr );
+        msg_Dbg( p_access, "SetDVBT: "\
+            "cannot get tuning space: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
+
+    msg_Dbg( p_access, "SetDVBT: QI to DVBT TS" );
     hr = p_tuning_space->QueryInterface( IID_IDVBTuningSpace2,
-        (void**)&l.p_dvb_tuning_space );
+        reinterpret_cast<void**>( &l.p_dvb_tuning_space ) );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBTTuneRequest: "\
+        msg_Warn( p_access, "SetDVBT: "\
             "Cannot QI for IDVBTuningSpace2: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
-    hr = S_OK;
-    hr = l.p_dvb_tuning_space->put_SystemType( DVB_Terrestrial );
+    msg_Dbg( p_access, "SetDVBT: Creating local locator" );
+    hr = ::CoCreateInstance( CLSID_DVBTLocator, 0, CLSCTX_INPROC,
+        IID_IDVBTLocator, reinterpret_cast<void**>( &l.p_dvbt_locator ) );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SetDVBT: "\
+            "Cannot create the DVBT Locator: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
 
+    hr = l.p_dvb_tuning_space->put_SystemType( DVB_Terrestrial );
     if( SUCCEEDED( hr ) && l_frequency > 0 )
         hr = l.p_dvbt_locator->put_CarrierFrequency( l_frequency );
     if( SUCCEEDED( hr ) && l_bandwidth > 0 )
@@ -650,21 +874,41 @@ int BDAGraph::SetDVBT(long l_frequency, uint32_t fec_hp, uint32_t fec_lp,
         hr = l.p_dvbt_locator->put_Mode( i_transmission );
     if( SUCCEEDED( hr ) && i_hierarchy != BDA_HALPHA_NOT_SET )
         hr = l.p_dvbt_locator->put_HAlpha( i_hierarchy );
+
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBTTuneRequest: "\
+        msg_Warn( p_access, "SetDVBT: "\
             "Cannot set tuning parameters on Locator: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
-    hr = p_tune_request->put_Locator( l.p_dvbt_locator );
+    msg_Dbg( p_access, "SetDVBT: putting DVBT locator into local tune request" );
+
+    hr = l.p_dvb_tune_request->put_Locator( l.p_dvbt_locator );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBTTuneRequest: "\
+        msg_Warn( p_access, "SetDVBT: "\
             "Cannot put the locator: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
+    msg_Dbg( p_access, "SetDVBT: putting local Tune Request to scanning tuner" );
+    hr = p_scanning_tuner->Validate( l.p_dvb_tune_request );
+    if( FAILED( hr ) )
+    {
+        msg_Dbg( p_access, "SetDVBT: "\
+            "Tune Request cannot be validated: hr=0x%8lx", hr );
+    }
+    /* increments ref count for scanning tuner */
+    hr = p_scanning_tuner->put_TuneRequest( l.p_dvb_tune_request );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SetDVBT: "\
+            "Cannot put the tune request: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
+    msg_Dbg( p_access, "SetDVBT: return success" );
     return VLC_SUCCESS;
 }
 
@@ -678,16 +922,23 @@ int BDAGraph::SetDVBC(long l_frequency, const char *mod, long l_symbolrate)
     class localComPtr
     {
         public:
-        IDVBTuneRequest* p_dvbc_tune_request;
-        IDVBCLocator* p_dvbc_locator;
-        IDVBTuningSpace2* p_dvb_tuning_space;
+        ITuneRequest*       p_tune_request;
+        IDVBTuneRequest*    p_dvb_tune_request;
+        IDVBCLocator*       p_dvbc_locator;
+        IDVBTuningSpace2*   p_dvb_tuning_space;
 
-        localComPtr(): p_dvbc_tune_request(NULL), p_dvbc_locator(NULL),
-                       p_dvb_tuning_space(NULL) {};
+        localComPtr():
+            p_tune_request(NULL),
+            p_dvb_tune_request(NULL),
+            p_dvbc_locator(NULL),
+            p_dvb_tuning_space(NULL)
+            {};
         ~localComPtr()
         {
-            if( p_dvbc_tune_request )
-                p_dvbc_tune_request->Release();
+            if( p_tune_request )
+                p_tune_request->Release();
+            if( p_dvb_tune_request )
+                p_dvb_tune_request->Release();
             if( p_dvbc_locator )
                 p_dvbc_locator->Release();
             if( p_dvb_tuning_space )
@@ -697,44 +948,78 @@ int BDAGraph::SetDVBC(long l_frequency, const char *mod, long l_symbolrate)
 
     ModulationType i_qam_mod = dvb_parse_modulation(mod);
 
-    guid_network_type = CLSID_DVBCNetworkProvider;
-    hr = CreateTuneRequest();
+    /* try to set p_scanning_tuner */
+    hr = Check( CLSID_DVBCNetworkProvider );
+    msg_Dbg( p_access, "SetDVBC: returned from Check" );
+
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBCTuneRequest: "\
-            "Cannot create Tune Request: hr=0x%8lx", hr );
+        msg_Warn( p_access, "SetDVBC: "\
+            "Cannot create Tuning Space: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
-    hr = p_tune_request->QueryInterface( IID_IDVBTuneRequest,
-        (void**)&l.p_dvbc_tune_request );
+    msg_Dbg( p_access, "SetDVBC: check on scanning tuner" );
+    if( !p_scanning_tuner )
+    {
+        msg_Warn( p_access, "SetDVBC: Cannot get scanning tuner" );
+        return VLC_EGENERIC;
+    }
+
+    msg_Dbg( p_access, "SetDVBC: get tune request" );
+    hr = p_scanning_tuner->get_TuneRequest( &l.p_tune_request );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBCTuneRequest: "\
+        msg_Warn( p_access, "SetDVBC: "\
+            "Cannot get Tune Request: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
+    msg_Dbg( p_access, "SetDVBC: QI for dvb tune request" );
+    hr = l.p_tune_request->QueryInterface( IID_IDVBTuneRequest,
+        reinterpret_cast<void**>( &l.p_dvb_tune_request ) );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SetDVBC: "\
             "Cannot QI for IDVBTuneRequest: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
-    l.p_dvbc_tune_request->put_ONID( -1 );
-    l.p_dvbc_tune_request->put_SID( -1 );
-    l.p_dvbc_tune_request->put_TSID( -1 );
 
+    l.p_dvb_tune_request->put_ONID( -1 );
+    l.p_dvb_tune_request->put_SID( -1 );
+    l.p_dvb_tune_request->put_TSID( -1 );
+
+    msg_Dbg( p_access, "SetDVBC: create dvbc locator" );
     hr = ::CoCreateInstance( CLSID_DVBCLocator, 0, CLSCTX_INPROC,
-        IID_IDVBCLocator, (void**)&l.p_dvbc_locator );
+        IID_IDVBCLocator, reinterpret_cast<void**>( &l.p_dvbc_locator ) );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBCTuneRequest: "\
+        msg_Warn( p_access, "SetDVBC: "\
             "Cannot create the DVB-C Locator: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
-    hr = p_tuning_space->QueryInterface( IID_IDVBTuningSpace2,
-        (void**)&l.p_dvb_tuning_space );
+
+
+    msg_Dbg( p_access, "SetDVBC: get TS" );
+    hr = p_scanning_tuner->get_TuningSpace( &p_tuning_space );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBCTuneRequest: "\
+        msg_Dbg( p_access, "SetDVBC: "\
+            "cannot get tuning space: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
+    msg_Dbg( p_access, "SetDVBC: QI for dvb tuning space" );
+    hr = p_tuning_space->QueryInterface( IID_IDVBTuningSpace2,
+        reinterpret_cast<void**>( &l.p_dvb_tuning_space ) );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SetDVBC: "\
             "Cannot QI for IDVBTuningSpace2: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
+    msg_Dbg( p_access, "SetDVBC: set up locator" );
     hr = S_OK;
     hr = l.p_dvb_tuning_space->put_SystemType( DVB_Cable );
 
@@ -747,16 +1032,105 @@ int BDAGraph::SetDVBC(long l_frequency, const char *mod, long l_symbolrate)
 
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBCTuneRequest: "\
+        msg_Warn( p_access, "SetDVBC: "\
             "Cannot set tuning parameters on Locator: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
-    hr = p_tune_request->put_Locator( l.p_dvbc_locator );
+    msg_Dbg( p_access, "SetDVBC: put locator to dvb tune request" );
+    hr = l.p_dvb_tune_request->put_Locator( l.p_dvbc_locator );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBCTuneRequest: "\
+        msg_Warn( p_access, "SetDVBC: "\
             "Cannot put the locator: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
+    msg_Dbg( p_access, "SetDVBC: validate dvb tune request" );
+    hr = p_scanning_tuner->Validate( l.p_dvb_tune_request );
+    if( FAILED( hr ) )
+    {
+        msg_Dbg( p_access, "SetDVBC: "\
+            "Tune Request cannot be validated: hr=0x%8lx", hr );
+    }
+
+    /* increments ref count for scanning tuner */
+    msg_Dbg( p_access, "SetDVBC: put dvb tune request to tuner" );
+    hr = p_scanning_tuner->put_TuneRequest( l.p_dvb_tune_request );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SetDVBC: "\
+            "Cannot put the tune request: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+    msg_Dbg( p_access, "SetDVBC: return success" );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+* Set Inversion
+******************************************************************************/
+int BDAGraph::SetInversion(int inversion)
+{
+    HRESULT hr = S_OK;
+    class localComPtr
+    {
+        public:
+        IDVBSTuningSpace*   p_dvbs_tuning_space;
+        localComPtr() :
+            p_dvbs_tuning_space(NULL)
+        {}
+        ~localComPtr()
+        {
+            if( p_dvbs_tuning_space )
+                p_dvbs_tuning_space->Release();
+        }
+    } l;
+
+    SpectralInversion i_inversion = dvb_parse_inversion( inversion );
+
+    if( !p_scanning_tuner )
+    {
+        msg_Warn( p_access, "SetInversion: "\
+            "No scanning tuner" );
+        return VLC_EGENERIC;
+    }
+
+    /* SetInversion is called for all DVB tuners, before the dvb_tune(),
+     * in access.c. Since DVBT and DVBC don't support spectral
+     * inversion, we need to return VLC_SUCCESS in those cases
+     * so that dvb_tune() will be called */
+    if( ( GetSystem( guid_network_type ) & ( DVB_S | DVB_S2 | ISDB_S ) ) == 0 )
+    {
+        msg_Dbg( p_access, "SetInversion: Not Satellite type" );
+        return VLC_SUCCESS;
+    }
+
+    msg_Dbg( p_access, "SetInversion: get TS" );
+    hr = p_scanning_tuner->get_TuningSpace( &p_tuning_space );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SetInversion: "\
+            "cannot get tuning space: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
+    hr = p_tuning_space->QueryInterface( IID_IDVBSTuningSpace,
+        reinterpret_cast<void**>( &l.p_dvbs_tuning_space ) );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SetInversion: "\
+            "Cannot QI for IDVBSTuningSpace: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
+    if( i_inversion != BDA_SPECTRAL_INVERSION_NOT_SET )
+        hr = l.p_dvbs_tuning_space->put_SpectralInversion( i_inversion );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SetInversion: "\
+            "Cannot put inversion: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
@@ -775,29 +1149,39 @@ int BDAGraph::SetDVBS(long l_frequency, long l_symbolrate, uint32_t fec,
     class localComPtr
     {
         public:
-        IDVBTuneRequest* p_dvbs_tune_request;
-        IDVBSLocator* p_dvbs_locator;
-        IDVBSTuningSpace* p_dvbs_tuning_space;
-        char* psz_polarisation;
-        char* psz_input_range;
-        BSTR bstr_input_range;
-        WCHAR* pwsz_input_range;
-        int i_range_len;
-        localComPtr() : p_dvbs_tune_request(NULL), p_dvbs_locator(NULL),
+        ITuneRequest*       p_tune_request;
+        IDVBTuneRequest*    p_dvb_tune_request;
+        IDVBSLocator*       p_dvbs_locator;
+        IDVBSTuningSpace*   p_dvbs_tuning_space;
+        char*               psz_polarisation;
+        char*               psz_input_range;
+        BSTR                bstr_input_range;
+        WCHAR*              pwsz_input_range;
+        int                 i_range_len;
+        localComPtr() :
+            p_tune_request(NULL),
+            p_dvb_tune_request(NULL),
+            p_dvbs_locator(NULL),
             p_dvbs_tuning_space(NULL),
-            psz_polarisation(NULL), psz_input_range(NULL),
-            bstr_input_range(NULL), pwsz_input_range(NULL), i_range_len(0)
+            psz_polarisation(NULL),
+            psz_input_range(NULL),
+            bstr_input_range(NULL),
+            pwsz_input_range(NULL),
+            i_range_len(0)
         {}
         ~localComPtr()
         {
-            if( p_dvbs_tuning_space )
-                p_dvbs_tuning_space->Release();
-            if( p_dvbs_tune_request )
-                p_dvbs_tune_request->Release();
+            if( p_tune_request )
+                p_tune_request->Release();
+            if( p_dvb_tune_request )
+                p_dvb_tune_request->Release();
             if( p_dvbs_locator )
                 p_dvbs_locator->Release();
+            if( p_dvbs_tuning_space )
+                p_dvbs_tuning_space->Release();
             SysFreeString( bstr_input_range );
-            delete pwsz_input_range;
+            if( pwsz_input_range )
+                delete[] pwsz_input_range;
             free( psz_input_range );
             free( psz_polarisation );
         }
@@ -815,12 +1199,12 @@ int BDAGraph::SetDVBS(long l_frequency, long l_symbolrate, uint32_t fec,
     l_longitude        = var_GetInteger( p_access, "dvb-longitude" );
     l_network_id       = var_GetInteger( p_access, "dvb-network-id" );
 
-    l.psz_input_range  = var_GetNonEmptyString( p_access, "dvb-range" );
     if( asprintf( &l.psz_polarisation, "%c", pol ) == -1 )
         abort();
 
     b_west = ( l_longitude < 0 );
 
+    l.psz_input_range  = var_GetNonEmptyString( p_access, "dvb-range" );
     l.i_range_len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,
         l.psz_input_range, -1, l.pwsz_input_range, 0 );
     if( l.i_range_len > 0 )
@@ -828,49 +1212,72 @@ int BDAGraph::SetDVBS(long l_frequency, long l_symbolrate, uint32_t fec,
         l.pwsz_input_range = new WCHAR[l.i_range_len];
         MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,
             l.psz_input_range, -1, l.pwsz_input_range, l.i_range_len );
-        l.bstr_input_range=SysAllocString( l.pwsz_input_range );
+        l.bstr_input_range = SysAllocString( l.pwsz_input_range );
     }
 
-    guid_network_type = CLSID_DVBSNetworkProvider;
-    hr = CreateTuneRequest();
+    /* try to set p_scanning_tuner */
+    hr = Check( CLSID_DVBSNetworkProvider );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBSTuneRequest: "\
-            "Cannot create Tune Request: hr=0x%8lx", hr );
+        msg_Warn( p_access, "SetDVBS: "\
+            "Cannot create Tuning Space: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
-    hr = p_tune_request->QueryInterface( IID_IDVBTuneRequest,
-        (void**)&l.p_dvbs_tune_request );
+    if( !p_scanning_tuner )
+    {
+        msg_Warn( p_access, "SetDVBS: Cannot get scanning tuner" );
+        return VLC_EGENERIC;
+    }
+
+    hr = p_scanning_tuner->get_TuneRequest( &l.p_tune_request );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBSTuneRequest: "\
+        msg_Warn( p_access, "SetDVBS: "\
+            "Cannot get Tune Request: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
+    hr = l.p_tune_request->QueryInterface( IID_IDVBTuneRequest,
+        reinterpret_cast<void**>( &l.p_dvb_tune_request ) );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SetDVBS: "\
             "Cannot QI for IDVBTuneRequest: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
-    l.p_dvbs_tune_request->put_ONID( -1 );
-    l.p_dvbs_tune_request->put_SID( -1 );
-    l.p_dvbs_tune_request->put_TSID( -1 );
+
+    l.p_dvb_tune_request->put_ONID( -1 );
+    l.p_dvb_tune_request->put_SID( -1 );
+    l.p_dvb_tune_request->put_TSID( -1 );
 
     hr = ::CoCreateInstance( CLSID_DVBSLocator, 0, CLSCTX_INPROC,
-        IID_IDVBSLocator, (void**)&l.p_dvbs_locator );
+        IID_IDVBSLocator, reinterpret_cast<void**>( &l.p_dvbs_locator ) );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBSTuneRequest: "\
+        msg_Warn( p_access, "SetDVBS: "\
             "Cannot create the DVBS Locator: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
-    hr = p_tuning_space->QueryInterface( IID_IDVBSTuningSpace,
-        (void**)&l.p_dvbs_tuning_space );
+    msg_Dbg( p_access, "SetDVBS: get TS" );
+    hr = p_scanning_tuner->get_TuningSpace( &p_tuning_space );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBSTuneRequest: "\
+        msg_Dbg( p_access, "SetDVBS: "\
+            "cannot get tuning space: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
+    hr = p_tuning_space->QueryInterface( IID_IDVBSTuningSpace,
+        reinterpret_cast<void**>( &l.p_dvbs_tuning_space ) );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SetDVBS: "\
             "Cannot QI for IDVBSTuningSpace: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
-    hr = S_OK;
     hr = l.p_dvbs_tuning_space->put_SystemType( DVB_Satellite );
     if( SUCCEEDED( hr ) && l_lnb_lof1 > 0 )
         hr = l.p_dvbs_tuning_space->put_LowOscillator( l_lnb_lof1 );
@@ -904,18 +1311,35 @@ int BDAGraph::SetDVBS(long l_frequency, long l_symbolrate, uint32_t fec,
         hr = l.p_dvbs_locator->put_WestPosition( b_west );
     if( SUCCEEDED( hr ) )
         hr = l.p_dvbs_locator->put_OrbitalPosition( labs( l_longitude ) );
+
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBSTuneRequest: "\
+        msg_Warn( p_access, "SetDVBS: "\
             "Cannot set tuning parameters on Locator: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
-    hr = p_tune_request->put_Locator( l.p_dvbs_locator );
+    hr = l.p_dvb_tune_request->put_Locator( l.p_dvbs_locator );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBSTuneRequest: "\
+        msg_Warn( p_access, "SetDVBS: "\
             "Cannot put the locator: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
+    hr = p_scanning_tuner->Validate( l.p_dvb_tune_request );
+    if( FAILED( hr ) )
+    {
+        msg_Dbg( p_access, "SetDVBS: "\
+            "Tune Request cannot be validated: hr=0x%8lx", hr );
+    }
+
+    /* increments ref count for scanning tuner */
+    hr = p_scanning_tuner->put_TuneRequest( l.p_dvb_tune_request );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SetDVBS: "\
+            "Cannot put the tune request: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
@@ -923,33 +1347,63 @@ int BDAGraph::SetDVBS(long l_frequency, long l_symbolrate, uint32_t fec,
 }
 
 /*****************************************************************************
-* Load the Tuning Space from System Tuning Spaces according to the
-* Network Type requested
+* SetUpTuner
+******************************************************************************
+* Sets up global p_scanning_tuner and sets guid_network_type according
+* to the Network Type requested.
+*
+* Logic: if tuner is set up and is the right network type, use it.
+* Otherwise, poll the tuner for the right tuning space. 
+*
+* Then set up a tune request and try to validate it. Finally, put
+* tune request and tuning space to tuner
+*
+* on success, sets globals: p_scanning_tuner and guid_network_type
+*
 ******************************************************************************/
-HRESULT BDAGraph::CreateTuneRequest()
+HRESULT BDAGraph::SetUpTuner( REFCLSID guid_this_network_type )
 {
     HRESULT hr = S_OK;
-    GUID guid_this_network_type;
-
     class localComPtr
     {
         public:
-        ITuningSpaceContainer*  p_tuning_space_container;
-        IEnumTuningSpaces*      p_tuning_space_enum;
-        ITuningSpace*           p_this_tuning_space;
-        IDVBTuningSpace2*       p_dvb_tuning_space;
-        BSTR                    bstr_name;
-        char * psz_network_name;
-        char * psz_create_name;
-        char * psz_bstr_name;
-        WCHAR * wpsz_create_name;
-        int i_name_len;
+        ITuningSpaceContainer*      p_tuning_space_container;
+        IEnumTuningSpaces*          p_tuning_space_enum;
+        ITuningSpace*               p_test_tuning_space;
+        ITuneRequest*               p_tune_request;
+        IDVBTuneRequest*            p_dvb_tune_request;
 
-        localComPtr(): p_tuning_space_container(NULL),
-            p_tuning_space_enum(NULL), p_this_tuning_space(NULL),
-            p_dvb_tuning_space(NULL), bstr_name(NULL),
-            psz_network_name(NULL), psz_create_name(NULL),
-            psz_bstr_name(NULL), wpsz_create_name(NULL), i_name_len(0)
+        IDigitalCableTuneRequest*   p_cqam_tune_request;
+        IATSCChannelTuneRequest*    p_atsc_tune_request;
+        ILocator*                   p_locator;
+        IDVBTLocator*               p_dvbt_locator;
+        IDVBCLocator*               p_dvbc_locator;
+        IDVBSLocator*               p_dvbs_locator;
+
+        BSTR                        bstr_name;
+
+        CLSID                       guid_test_network_type;
+        char*                       psz_network_name;
+        char*                       psz_bstr_name;
+        int                         i_name_len;
+
+        localComPtr():
+            p_tuning_space_container(NULL),
+            p_tuning_space_enum(NULL),
+            p_test_tuning_space(NULL),
+            p_tune_request(NULL),
+            p_dvb_tune_request(NULL),
+            p_cqam_tune_request(NULL),
+            p_atsc_tune_request(NULL),
+            p_locator(NULL),
+            p_dvbt_locator(NULL),
+            p_dvbc_locator(NULL),
+            p_dvbs_locator(NULL),
+            bstr_name(NULL),
+            guid_test_network_type(GUID_NULL),
+            psz_network_name(NULL),
+            psz_bstr_name(NULL),
+            i_name_len(0)
         {}
         ~localComPtr()
         {
@@ -957,27 +1411,44 @@ HRESULT BDAGraph::CreateTuneRequest()
                 p_tuning_space_enum->Release();
             if( p_tuning_space_container )
                 p_tuning_space_container->Release();
-            if( p_this_tuning_space )
-                p_this_tuning_space->Release();
-            if( p_dvb_tuning_space )
-                p_dvb_tuning_space->Release();
+            if( p_test_tuning_space )
+                p_test_tuning_space->Release();
+            if( p_tune_request )
+                p_tune_request->Release();
+            if( p_dvb_tune_request )
+                p_dvb_tune_request->Release();
+            if( p_cqam_tune_request )
+                p_cqam_tune_request->Release();
+            if( p_atsc_tune_request )
+                p_atsc_tune_request->Release();
+            if( p_locator )
+                p_locator->Release();
+            if( p_dvbt_locator )
+                p_dvbt_locator->Release();
+            if( p_dvbc_locator )
+                p_dvbc_locator->Release();
+            if( p_dvbs_locator )
+                p_dvbs_locator->Release();
             SysFreeString( bstr_name );
             delete[] psz_bstr_name;
-            delete[] wpsz_create_name;
             free( psz_network_name );
-            free( psz_create_name );
         }
     } l;
 
+    msg_Dbg( p_access, "SetUpTuner: entering" );
+
+
     /* We shall test for a specific Tuning space name supplied on the command
-     * line as dvb-networkname=xxx.
+     * line as dvb-network-name=xxx.
      * For some users with multiple cards and/or multiple networks this could
      * be useful. This allows us to reasonably safely apply updates to the
      * System Tuning Space in the registry without disrupting other streams. */
+
     l.psz_network_name = var_GetNonEmptyString( p_access, "dvb-network-name" );
+
     if( l.psz_network_name )
     {
-        msg_Dbg( p_access, "CreateTuneRequest: Find Tuning Space: %s",
+        msg_Dbg( p_access, "SetUpTuner: Find Tuning Space: %s",
             l.psz_network_name );
     }
     else
@@ -986,274 +1457,297 @@ HRESULT BDAGraph::CreateTuneRequest()
         *l.psz_network_name = '\0';
     }
 
-    /* A Tuning Space may already have been set up. If it is for the same
+    /* Tuner may already have been set up. If it is for the same
      * network type then all is well. Otherwise, reset the Tuning Space and get
      * a new one */
+    msg_Dbg( p_access, "SetUpTuner: Checking for tuning space" );
+    if( !p_scanning_tuner )
+    {
+        msg_Warn( p_access, "SetUpTuner: "\
+            "Cannot find scanning tuner" );
+        return E_FAIL;
+    }
+
     if( p_tuning_space )
     {
-        hr = p_tuning_space->get__NetworkType( &guid_this_network_type );
-        if( FAILED( hr ) ) guid_this_network_type = GUID_NULL;
-        if( guid_this_network_type == guid_network_type )
+        msg_Dbg( p_access, "SetUpTuner: get network type" );
+        hr = p_tuning_space->get__NetworkType( &l.guid_test_network_type );
+        if( FAILED( hr ) )
         {
+            msg_Warn( p_access, "Check: "\
+                "Cannot get network type: hr=0x%8lx", hr );
+            l.guid_test_network_type = GUID_NULL;
+        }
+
+        msg_Dbg( p_access, "SetUpTuner: see if it's the right one" );
+        if( l.guid_test_network_type == guid_this_network_type )
+        {
+            msg_Dbg( p_access, "SetUpTuner: it's the right one" );
+            SysFreeString( l.bstr_name );
+
             hr = p_tuning_space->get_UniqueName( &l.bstr_name );
             if( FAILED( hr ) )
             {
-                msg_Warn( p_access, "CreateTuneRequest: "\
+                /* should never fail on a good tuning space */
+                msg_Dbg( p_access, "SetUpTuner: "\
                     "Cannot get UniqueName for Tuning Space: hr=0x%8lx", hr );
-                return hr;
+                goto NoTuningSpace;
             }
+
+            /* Test for a specific Tuning space name supplied on the command
+             * line as dvb-network-name=xxx */
+            if( l.psz_bstr_name )
+                delete[] l.psz_bstr_name;
             l.i_name_len = WideCharToMultiByte( CP_ACP, 0, l.bstr_name, -1,
                 l.psz_bstr_name, 0, NULL, NULL );
             l.psz_bstr_name = new char[ l.i_name_len ];
             l.i_name_len = WideCharToMultiByte( CP_ACP, 0, l.bstr_name, -1,
                 l.psz_bstr_name, l.i_name_len, NULL, NULL );
 
-            /* Test for a specific Tuning space name supplied on the command
-             * line as dvb-networkname=xxx */
+            /* if no name was requested on command line, or if the name
+             * requested equals the name of this space, we are OK */
             if( *l.psz_network_name == '\0' ||
                 strcmp( l.psz_network_name, l.psz_bstr_name ) == 0 )
             {
-                msg_Dbg( p_access, "CreateTuneRequest: Using Tuning Space: %s",
-                    l.psz_network_name );
-                return S_OK;
+                msg_Dbg( p_access, "SetUpTuner: Using Tuning Space: %s",
+                    l.psz_bstr_name );
+                /* p_tuning_space and guid_network_type are already set */
+                /* you probably already have a tune request, also */
+                hr = p_scanning_tuner->get_TuneRequest( &l.p_tune_request );
+                if( SUCCEEDED( hr ) )
+                {
+                    return S_OK;
+                }
+                /* CreateTuneRequest adds l.p_tune_request to p_tuning_space
+                 * l.p_tune_request->RefCount = 1 */
+                hr = p_tuning_space->CreateTuneRequest( &l.p_tune_request );
+                if( SUCCEEDED( hr ) )
+                {
+                    return S_OK;
+                }
+                msg_Warn( p_access, "SetUpTuner: "\
+                    "Cannot Create Tune Request: hr=0x%8lx", hr );
+               /* fall through to NoTuningSpace */
             }
         }
+
         /* else different guid_network_type */
+    NoTuningSpace:
         if( p_tuning_space )
             p_tuning_space->Release();
-        if( p_tune_request )
-            p_tune_request->Release();
         p_tuning_space = NULL;
-        p_tune_request = NULL;
+        /* pro forma; should have returned S_OK if we created this */
+        if( l.p_tune_request )
+            l.p_tune_request->Release();
+        l.p_tune_request = NULL;
     }
 
-    /* Force use of the first available Tuner Device during Build */
-    l_tuner_used = -1;
 
-    /* Get the SystemTuningSpaces container to enumerate through all the
-     * defined tuning spaces.
-     * l.p_tuning_space_container->Refcount = 1  */
-    hr = ::CoCreateInstance( CLSID_SystemTuningSpaces, 0, CLSCTX_INPROC,
-        IID_ITuningSpaceContainer, (void**)&l.p_tuning_space_container );
+    /* p_tuning_space is null at this point; we have already
+       returned S_OK if it was good. So find a tuning
+       space on the scanning tuner. */
+
+    msg_Dbg( p_access, "SetUpTuner: release TuningSpaces Enumerator" );
+    if( l.p_tuning_space_enum )
+        l.p_tuning_space_enum->Release();
+    msg_Dbg( p_access, "SetUpTuner: nullify TuningSpaces Enumerator" );
+    l.p_tuning_space_enum = NULL;
+    msg_Dbg( p_access, "SetUpTuner: create TuningSpaces Enumerator" );
+
+    hr = p_scanning_tuner->EnumTuningSpaces( &l.p_tuning_space_enum );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "CreateTuneRequest: "\
-            "Cannot CoCreate SystemTuningSpaces: hr=0x%8lx", hr );
-        return hr;
-    }
-
-    /* Get the SystemTuningSpaces container to enumerate through all the
-     * defined tuning spaces.
-     * l.p_tuning_space_container->Refcount = 2
-     * l.p_tuning_space_enum->Refcount = 1  */
-    hr = l.p_tuning_space_container->get_EnumTuningSpaces(
-         &l.p_tuning_space_enum );
-    if( FAILED( hr ) )
-    {
-        msg_Warn( p_access, "CreateTuneRequest: "\
-            "Cannot create SystemTuningSpaces Enumerator: hr=0x%8lx", hr );
-        return hr;
+        msg_Warn( p_access, "SetUpTuner: "\
+            "Cannot create TuningSpaces Enumerator: hr=0x%8lx", hr );
+        goto TryToClone;
     }
 
     do
     {
-        /* l.p_this_tuning_space->RefCount = 1 after the first pass
-         * Release before overwriting with Next */
-        if( l.p_this_tuning_space )
-            l.p_this_tuning_space->Release();
-        l.p_this_tuning_space = NULL;
+        msg_Dbg( p_access, "SetUpTuner: top of loop" );
+        l.guid_test_network_type = GUID_NULL;
+        if( l.p_test_tuning_space )
+            l.p_test_tuning_space->Release();
+        l.p_test_tuning_space = NULL;
+        if( p_tuning_space )
+            p_tuning_space->Release();
+        p_tuning_space = NULL;
         SysFreeString( l.bstr_name );
-
-        hr = l.p_tuning_space_enum->Next( 1, &l.p_this_tuning_space, NULL );
+        msg_Dbg( p_access, "SetUpTuner: need good TS enum" );
+        if( !l.p_tuning_space_enum ) break;
+        msg_Dbg( p_access, "SetUpTuner: next tuning space" );
+        hr = l.p_tuning_space_enum->Next( 1, &l.p_test_tuning_space, NULL );
         if( hr != S_OK ) break;
-
-        hr = l.p_this_tuning_space->get__NetworkType( &guid_this_network_type );
-
-        /* GUID_NULL means a non-BDA network was found e.g analog
-         * Ignore failures and non-BDA networks and keep looking */
-        if( FAILED( hr ) ) guid_this_network_type == GUID_NULL;
-
-        if( guid_this_network_type == guid_network_type )
+        msg_Dbg( p_access, "SetUpTuner: get network type" );
+        hr = l.p_test_tuning_space->get__NetworkType( &l.guid_test_network_type );
+        if( FAILED( hr ) )
         {
-            /* QueryInterface to clone l.p_this_tuning_space
-             * l.p_this_tuning_space->RefCount = 2 */
-            hr = l.p_this_tuning_space->Clone( &p_tuning_space );
-            if( FAILED( hr ) )
-            {
-                msg_Warn( p_access, "CreateTuneRequest: "\
-                    "Cannot QI Tuning Space: hr=0x%8lx", hr );
-                return hr;
-            }
-            hr = p_tuning_space->get_UniqueName( &l.bstr_name );
-            if( FAILED( hr ) )
-            {
-                msg_Warn( p_access, "CreateTuneRequest: "\
-                    "Cannot get UniqueName for Tuning Space: hr=0x%8lx", hr );
-                return hr;
-            }
+            msg_Warn( p_access, "Check: "\
+                "Cannot get network type: hr=0x%8lx", hr );
+            l.guid_test_network_type = GUID_NULL;
+        }
+        if( l.guid_test_network_type == guid_this_network_type )
+        {
+            msg_Dbg( p_access, "SetUpTuner: Found matching space on tuner" );
 
-            /* Test for a specific Tuning space name supplied on the command
-             * line as dvb-networkname=xxx */
-            delete[] l.psz_bstr_name;
+            SysFreeString( l.bstr_name );
+            msg_Dbg( p_access, "SetUpTuner: get unique name" );
+
+            hr = l.p_test_tuning_space->get_UniqueName( &l.bstr_name );
+            if( FAILED( hr ) )
+            {
+                /* should never fail on a good tuning space */
+                msg_Dbg( p_access, "SetUpTuner: "\
+                    "Cannot get UniqueName for Tuning Space: hr=0x%8lx", hr );
+                continue;
+            }
+            msg_Dbg( p_access, "SetUpTuner: convert w to multi" );
+            if ( l.psz_bstr_name )
+                delete[] l.psz_bstr_name;
             l.i_name_len = WideCharToMultiByte( CP_ACP, 0, l.bstr_name, -1,
                 l.psz_bstr_name, 0, NULL, NULL );
             l.psz_bstr_name = new char[ l.i_name_len ];
             l.i_name_len = WideCharToMultiByte( CP_ACP, 0, l.bstr_name, -1,
                 l.psz_bstr_name, l.i_name_len, NULL, NULL );
-            if( *l.psz_network_name == '\0' ||
-                strcmp( l.psz_network_name, l.psz_bstr_name ) == 0 )
-            {
-                msg_Dbg( p_access, "CreateTuneRequest: Using Tuning Space: %s",
-                    l.psz_bstr_name );
-
-            /* CreateTuneRequest adds TuneRequest to p_tuning_space
-             * p_tune_request->RefCount = 1 */
-                hr = p_tuning_space->CreateTuneRequest( &p_tune_request );
-                if( FAILED( hr ) )
-                    msg_Warn( p_access, "CreateTuneRequest: "\
-                        "Cannot Create Tune Request: hr=0x%8lx", hr );
-                return hr;
-            }
-            if( p_tuning_space )
-                p_tuning_space->Release();
-            p_tuning_space = NULL;
+            msg_Dbg( p_access, "SetUpTuner: Using Tuning Space: %s",
+                l.psz_bstr_name );
+            break;
         }
+
     }
     while( true );
+    msg_Dbg( p_access, "SetUpTuner: checking what we got" );
 
-    /* No tuning space was found. If the create-name parameter was set then
-     * create a tuning space. By rights should use the same name used in
-     * network-name
-     * Also would be nice to copy a tuning space but we only come here if we do
-     * not find any. */
-    l.psz_create_name = var_GetNonEmptyString( p_access, "dvb-create-name" );
-    if( !l.psz_create_name || strlen( l.psz_create_name ) <= 0 )
+    if( l.guid_test_network_type == GUID_NULL)
     {
-        hr = E_FAIL;
-        msg_Warn( p_access, "CreateTuneRequest: "\
-            "Cannot find a suitable System Tuning Space: hr=0x%8lx", hr );
-        return hr;
-    }
-    if( strcmp( l.psz_create_name, l.psz_network_name ) )
-    {
-        hr = E_FAIL;
-        msg_Warn( p_access, "CreateTuneRequest: "\
-            "dvb-create-name %s must match dvb-network-name %s",
-            l.psz_create_name, l.psz_network_name );
-        return hr;
+        msg_Dbg( p_access, "SetUpTuner: got null, try to clone" );
+        goto TryToClone;
     }
 
-    /* Need to use DVBSTuningSpace for DVB-S and ATSCTuningSpace for ATSC */
-    VARIANT var_id;
-    CLSID cls_tuning_space;
-
-    if( IsEqualCLSID( guid_network_type, CLSID_ATSCNetworkProvider ) )
-        cls_tuning_space = CLSID_ATSCTuningSpace;
-    if( IsEqualCLSID( guid_network_type, CLSID_DVBTNetworkProvider ) )
-        cls_tuning_space = CLSID_DVBTuningSpace;
-    if( IsEqualCLSID( guid_network_type, CLSID_DVBCNetworkProvider ) )
-        cls_tuning_space = CLSID_DVBTuningSpace;
-    if( IsEqualCLSID( guid_network_type, CLSID_DVBSNetworkProvider ) )
-        cls_tuning_space = CLSID_DVBSTuningSpace;
-
-    l.i_name_len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,
-        l.psz_create_name, -1, l.wpsz_create_name, 0 );
-    if( l.i_name_len <= 0 )
+    msg_Dbg( p_access, "SetUpTuner: put TS" );
+    hr = p_scanning_tuner->put_TuningSpace( l.p_test_tuning_space );
+    if( FAILED( hr ) )
     {
-        hr = E_FAIL;
-        msg_Warn( p_access, "CreateTuneRequest: "\
-            "Cannot convert zero length dvb-create-name %s",
-            l.psz_create_name );
-        return hr;
-    }
-    l.wpsz_create_name = new WCHAR[l.i_name_len];
-    MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, l.psz_create_name, -1,
-            l.wpsz_create_name, l.i_name_len );
-    if( l.bstr_name )
-        SysFreeString( l.bstr_name );
-    l.bstr_name = SysAllocString( l.wpsz_create_name );
-
-    msg_Dbg( p_access, "CreateTuneRequest: Create Tuning Space: %s",
-        l.psz_create_name );
-
-    hr = ::CoCreateInstance( cls_tuning_space, 0, CLSCTX_INPROC,
-         IID_ITuningSpace, (void**)&p_tuning_space );
-
-    if( FAILED( hr ) )
-        msg_Warn( p_access, "CreateTuneRequest: "\
-            "Cannot CoCreate new TuningSpace: hr=0x%8lx", hr );
-    if( SUCCEEDED( hr ) )
-        hr = p_tuning_space->put__NetworkType( guid_network_type );
-    if( FAILED( hr ) )
-        msg_Warn( p_access, "CreateTuneRequest: "\
-            "Cannot Put Network Type: hr=0x%8lx", hr );
-    if( SUCCEEDED( hr ) )
-        hr = p_tuning_space->put_UniqueName( l.bstr_name );
-    if( FAILED( hr ) )
-        msg_Warn( p_access, "CreateTuneRequest: "\
-            "Cannot Put Unique Name: hr=0x%8lx", hr );
-    if( SUCCEEDED( hr ) )
-        hr = p_tuning_space->put_FriendlyName( l.bstr_name );
-    if( FAILED( hr ) )
-        msg_Warn( p_access, "CreateTuneRequest: "\
-            "Cannot Put Friendly Name: hr=0x%8lx", hr );
-    if( guid_network_type == CLSID_DVBTNetworkProvider ||
-        guid_network_type == CLSID_DVBCNetworkProvider ||
-        guid_network_type == CLSID_DVBSNetworkProvider )
-    {
-        hr = p_tuning_space->QueryInterface( IID_IDVBTuningSpace2,
-            (void**)&l.p_dvb_tuning_space );
-        if( FAILED( hr ) )
-        {
-            msg_Warn( p_access, "CreateTuneRequest: "\
-                "Cannot QI for IDVBTuningSpace2: hr=0x%8lx", hr );
-            return hr;
-        }
-        if( guid_network_type == CLSID_DVBTNetworkProvider )
-            hr = l.p_dvb_tuning_space->put_SystemType( DVB_Terrestrial );
-        if( guid_network_type == CLSID_DVBCNetworkProvider )
-            hr = l.p_dvb_tuning_space->put_SystemType( DVB_Cable );
-        if( guid_network_type == CLSID_DVBSNetworkProvider )
-            hr = l.p_dvb_tuning_space->put_SystemType( DVB_Satellite );
+        msg_Dbg( p_access, "SetUpTuner: "\
+            "cannot put tuning space: hr=0x%8lx", hr );
+        goto TryToClone;
     }
 
-    if( SUCCEEDED( hr ) )
-        hr = l.p_tuning_space_container->Add( p_tuning_space, &var_id );
-
+    msg_Dbg( p_access, "SetUpTuner: get default locator" );
+    hr = l.p_test_tuning_space->get_DefaultLocator( &l.p_locator );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "CreateTuneRequest: "\
-            "Cannot Create new TuningSpace: hr=0x%8lx", hr );
+        msg_Dbg( p_access, "SetUpTuner: "\
+            "cannot get default locator: hr=0x%8lx", hr );
+        goto TryToClone;
+    }
+
+    msg_Dbg( p_access, "SetUpTuner: create tune request" );
+    hr = l.p_test_tuning_space->CreateTuneRequest( &l.p_tune_request );
+    if( FAILED( hr ) )
+    {
+        msg_Dbg( p_access, "SetUpTuner: "\
+            "cannot create tune request: hr=0x%8lx", hr );
+        goto TryToClone;
+    }
+
+    msg_Dbg( p_access, "SetUpTuner: put locator" );
+    hr = l.p_tune_request->put_Locator( l.p_locator );
+    if( FAILED( hr ) )
+    {
+        msg_Dbg( p_access, "SetUpTuner: "\
+            "cannot put locator: hr=0x%8lx", hr );
+        goto TryToClone;
+    }
+
+    msg_Dbg( p_access, "SetUpTuner: try to validate tune request" );
+    hr = p_scanning_tuner->Validate( l.p_tune_request );
+    if( FAILED( hr ) )
+    {
+        msg_Dbg( p_access, "SetUpTuner: "\
+            "Tune Request cannot be validated: hr=0x%8lx", hr );
+    }
+
+    msg_Dbg( p_access, "SetUpTuner: Attach tune request to Scanning Tuner");
+    /* increments ref count for scanning tuner */
+    hr = p_scanning_tuner->put_TuneRequest( l.p_tune_request );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SetUpTuner: "\
+            "Cannot submit the tune request: hr=0x%8lx", hr );
         return hr;
     }
 
-    msg_Dbg( p_access, "CreateTuneRequest: Tuning Space: %s created",
-         l.psz_create_name );
+    msg_Dbg( p_access, "SetUpTuner: Tuning Space and Tune Request created" );
+    return S_OK;
 
-    hr = p_tuning_space->CreateTuneRequest( &p_tune_request );
-    if( FAILED( hr ) )
-        msg_Warn( p_access, "CreateTuneRequest: "\
-            "Cannot Create Tune Request: hr=0x%8lx", hr );
+    /* Get the SystemTuningSpaces container
+     * p_tuning_space_container->Refcount = 1  */
+TryToClone:
+    msg_Warn( p_access, "SetUpTuner: won't try to clone " );
+    return E_FAIL;
+}
 
+/*****************************************************************************
+* GetNextNetworkType
+* helper function; this is probably best done as an Enumeration of
+* network providers
+*****************************************************************************/
+HRESULT BDAGraph::GetNextNetworkType( CLSID* guid_this_network_type )
+{
+    HRESULT hr = S_OK;
+    if( *guid_this_network_type == GUID_NULL )
+    {
+        msg_Dbg( p_access, "GetNextNetworkType: DVB-C" );
+        *guid_this_network_type = CLSID_DVBCNetworkProvider;
+        return S_OK;
+    }
+    if( *guid_this_network_type == CLSID_DVBCNetworkProvider )
+    {
+        msg_Dbg( p_access, "GetNextNetworkType: DVB-T" );
+        *guid_this_network_type = CLSID_DVBTNetworkProvider;
+        return S_OK;
+    }
+    if( *guid_this_network_type == CLSID_DVBTNetworkProvider )
+    {
+        msg_Dbg( p_access, "GetNextNetworkType: DVB-S" );
+        *guid_this_network_type = CLSID_DVBSNetworkProvider;
+        return S_OK;
+    }
+    if( *guid_this_network_type == CLSID_DVBSNetworkProvider )
+    {
+        msg_Dbg( p_access, "GetNextNetworkType: ATSC" );
+        *guid_this_network_type = CLSID_ATSCNetworkProvider;
+        return S_OK;
+    }
+    msg_Dbg( p_access, "GetNextNetworkType: failed" );
+    *guid_this_network_type = GUID_NULL;
+    hr = E_FAIL;
     return hr;
 }
 
+
 /******************************************************************************
-* Build
-* Step 4: Build the Filter Graph
-* Build sets up devices, adds and connects filters
+* Check
+*******************************************************************************
+* Check if tuner supports this network type
+*
+* on success, sets globals:
+* systems, l_tuner_used, p_network_provider, p_scanning_tuner, p_tuner_device,
+* p_tuning_space, p_filter_graph
 ******************************************************************************/
-HRESULT BDAGraph::Build()
+HRESULT BDAGraph::Check( REFCLSID guid_this_network_type )
 {
     HRESULT hr = S_OK;
-    long l_capture_used, l_tif_used;
-    VARIANT l_tuning_space_id;
-    AM_MEDIA_TYPE grabber_media_type;
+
     class localComPtr
     {
         public:
         ITuningSpaceContainer*  p_tuning_space_container;
-        localComPtr(): p_tuning_space_container(NULL) {};
+
+        localComPtr():
+             p_tuning_space_container(NULL)
+        {};
         ~localComPtr()
         {
             if( p_tuning_space_container )
@@ -1261,141 +1755,202 @@ HRESULT BDAGraph::Build()
         }
     } l;
 
-    /* Get the SystemTuningSpaces container to save the Tuning space */
-    l_tuning_space_id.vt = VT_I4;
-    l_tuning_space_id.lVal = 0L;
-    hr = ::CoCreateInstance( CLSID_SystemTuningSpaces, 0, CLSCTX_INPROC,
-        IID_ITuningSpaceContainer, (void**)&l.p_tuning_space_container );
-    if( FAILED( hr ) )
-    {
-        msg_Warn( p_access, "Build: "\
-            "Cannot CoCreate SystemTuningSpaces: hr=0x%8lx", hr );
-        return hr;
-    }
-    hr = l.p_tuning_space_container->FindID( p_tuning_space,
-        &l_tuning_space_id.lVal );
-    if( FAILED( hr ) )
-    {
-        msg_Warn( p_access, "Build: "\
-            "Cannot Find Tuning Space ID: hr=0x%8lx", hr );
-        return hr;
-    }
-    msg_Dbg( p_access, "Build: Using Tuning Space ID %ld",
-        l_tuning_space_id.lVal );
-    hr = l.p_tuning_space_container->put_Item( l_tuning_space_id,
-        p_tuning_space );
-    if( FAILED( hr ) )
-    {
-        msg_Warn( p_access, "Build: "\
-            "Cannot save Tuning Space: hr=0x%8lx (ignored)", hr );
-    }
+    msg_Dbg( p_access, "Check: entering ");
+
+    /* Note that the systems global is persistent across Destroy().
+     * So we need to see if a tuner has been physically removed from
+     * the system since the last Check. Before we do anything,
+     * assume that this Check will fail and remove this network type
+     * from systems. It will be restored if the Check passes.
+     */
+
+    systems &= ~( GetSystem( guid_this_network_type ) );
+
 
     /* If we have already have a filter graph, rebuild it*/
-    Destroy();
-
+    msg_Dbg( p_access, "Check: Destroying filter graph" );
+    if( p_filter_graph )
+        Destroy();
+    p_filter_graph = NULL;
     hr = ::CoCreateInstance( CLSID_FilterGraph, NULL, CLSCTX_INPROC,
-        IID_IGraphBuilder, (void**)&p_filter_graph );
+        IID_IGraphBuilder, reinterpret_cast<void**>( &p_filter_graph ) );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "Build: "\
+        msg_Warn( p_access, "Check: "\
             "Cannot CoCreate IFilterGraph: hr=0x%8lx", hr );
         return hr;
     }
 
     /* First filter in the graph is the Network Provider and
-     * its Scanning Tuner which takes the Tune Request
-     * Try to build the Win 7 Universal Network Provider first*/
-    hr = ::CoCreateInstance( CLSID_NetworkProvider, NULL, CLSCTX_INPROC_SERVER,
-        IID_IBaseFilter, (void**)&p_network_provider);
+     * its Scanning Tuner which takes the Tune Request */
+    if( p_network_provider )
+        p_network_provider->Release();
+    p_network_provider = NULL;
+    hr = ::CoCreateInstance( guid_this_network_type, NULL, CLSCTX_INPROC_SERVER,
+        IID_IBaseFilter, reinterpret_cast<void**>( &p_network_provider ) );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "Build: "\
-            "Cannot CoCreate the Universal Network Provider, trying the old way...");
-        hr = ::CoCreateInstance( guid_network_type, NULL, CLSCTX_INPROC_SERVER,
-            IID_IBaseFilter, (void**)&p_network_provider);
-        if( FAILED( hr ) )
-        {
-            msg_Warn( p_access, "Build: "\
-                "Cannot CoCreate Network Provider: hr=0x%8lx", hr );
-            return hr;
-        }
+        msg_Warn( p_access, "Check: "\
+            "Cannot CoCreate Network Provider: hr=0x%8lx", hr );
+        return hr;
     }
+
+    msg_Dbg( p_access, "Check: adding Network Provider to graph");
     hr = p_filter_graph->AddFilter( p_network_provider, L"Network Provider" );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "Build: "\
+        msg_Warn( p_access, "Check: "\
             "Cannot load network provider: hr=0x%8lx", hr );
         return hr;
     }
 
     /* Add the Network Tuner to the Network Provider. On subsequent calls,
-     * l_tuner_used will cause a different tuner to be selected
+     * l_tuner_used will cause a different tuner to be selected.
+     *
      * To select a specific device first get the parameter that nominates the
      * device (dvb-adapter) and use the value to initialise l_tuner_used.
-     * When FindFilter returns check the contents of l_tuner_used.
-     * If it is not what was selected then the requested device was not
-     * available so return with an error. */
+     * Note that dvb-adapter is 1-based, while l_tuner_used is 0-based.
+     * When FindFilter returns, check the contents of l_tuner_used.
+     * If it is not what was selected, then the requested device was not
+     * available, so return with an error. */
 
     long l_adapter = -1;
     l_adapter = var_GetInteger( p_access, "dvb-adapter" );
     if( l_tuner_used < 0 && l_adapter >= 0 )
         l_tuner_used = l_adapter - 1;
 
+    /* If tuner is in cold state, we have to do a successful put_TuneRequest
+     * before it will Connect. */
+    msg_Dbg( p_access, "Check: Creating Scanning Tuner");
+    if( p_scanning_tuner )
+        p_scanning_tuner->Release();
+    p_scanning_tuner = NULL;
+    hr = p_network_provider->QueryInterface( IID_IScanningTuner,
+        reinterpret_cast<void**>( &p_scanning_tuner ) );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "Check: "\
+            "Cannot QI Network Provider for Scanning Tuner: hr=0x%8lx", hr );
+        return hr;
+    }
+
+    /* try to set up p_scanning_tuner */
+    msg_Dbg( p_access, "Check: Calling SetUpTuner" );
+    hr = SetUpTuner( guid_this_network_type );
+    if( FAILED( hr ) )
+    {
+        msg_Dbg( p_access, "Check: "\
+            "Cannot set up scanner in Check mode: hr=0x%8lx", hr );
+        return hr;
+    }
+
+    msg_Dbg( p_access, "Check: "\
+        "Calling FindFilter for KSCATEGORY_BDA_NETWORK_TUNER with "\
+        "p_network_provider; l_tuner_used=%ld", l_tuner_used );
     hr = FindFilter( KSCATEGORY_BDA_NETWORK_TUNER, &l_tuner_used,
         p_network_provider, &p_tuner_device );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "Build: "\
+        msg_Warn( p_access, "Check: "\
             "Cannot load tuner device and connect network provider: "\
             "hr=0x%8lx", hr );
         return hr;
     }
+
     if( l_adapter > 0 && l_tuner_used != l_adapter )
     {
-         msg_Warn( p_access, "Build: "\
+         msg_Warn( p_access, "Check: "\
              "Tuner device %ld is not available", l_adapter );
+         return E_FAIL;
+    }
+
+    msg_Dbg( p_access, "Check: Using adapter %ld", l_tuner_used );
+    /* success!
+     * already set l_tuner_used,
+     * p_tuning_space
+     */
+    msg_Dbg( p_access, "Check: check succeeded: hr=0x%8lx", hr );
+    systems |= GetSystem( guid_this_network_type );
+    msg_Dbg( p_access, "Check: returning from Check mode" );
+    return S_OK;
+}
+
+
+/******************************************************************************
+* Build
+*******************************************************************************
+* Build the Filter Graph
+*
+* connects filters and
+* creates the media control and registers the graph
+* on success, sets globals:
+* d_graph_register, p_media_control, p_grabber, p_sample_grabber,
+* p_mpeg_demux, p_transport_info
+******************************************************************************/
+HRESULT BDAGraph::Build()
+{
+    HRESULT hr = S_OK;
+    long            l_capture_used;
+    long            l_tif_used;
+    AM_MEDIA_TYPE   grabber_media_type;
+
+    class localComPtr
+    {
+        public:
+        ITuningSpaceContainer*  p_tuning_space_container;
+        localComPtr():
+            p_tuning_space_container(NULL)
+        {};
+        ~localComPtr()
+        {
+            if( p_tuning_space_container )
+                p_tuning_space_container->Release();
+        }
+    } l;
+
+    msg_Dbg( p_access, "Build: entering");
+
+    /* at this point, you've connected to a scanning tuner of the right
+     * network type.
+     */
+    if( !p_scanning_tuner || !p_tuner_device )
+    {
+        msg_Warn( p_access, "Build: "\
+            "Scanning Tuner does not exist" );
         return E_FAIL;
     }
-    msg_Dbg( p_access, "BDAGraph: Using adapter %ld", l_tuner_used );
 
-/* VLC 1.0 works reliably up this point then crashes
- * Obvious candidate is FindFilter */
+    hr = p_scanning_tuner->get_TuneRequest( &p_tune_request );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "Build: no tune request" );
+        return hr;
+    }
+    hr = p_scanning_tuner->get_TuningSpace( &p_tuning_space );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "Build: no tuning space" );
+        return hr;
+    }
+    hr = p_tuning_space->get__NetworkType( &guid_network_type );
+
+
     /* Always look for all capture devices to match the Network Tuner */
     l_capture_used = -1;
+    msg_Dbg( p_access, "Build: "\
+        "Calling FindFilter for KSCATEGORY_BDA_RECEIVER_COMPONENT with "\
+        "p_tuner_device; l_capture_used=%ld", l_capture_used );
     hr = FindFilter( KSCATEGORY_BDA_RECEIVER_COMPONENT, &l_capture_used,
         p_tuner_device, &p_capture_device );
     if( FAILED( hr ) )
     {
         /* Some BDA drivers do not provide a Capture Device Filter so force
          * the Sample Grabber to connect directly to the Tuner Device */
+        msg_Dbg( p_access, "Build: "\
+            "Cannot find Capture device. Connect to tuner "\
+            "and AddRef() : hr=0x%8lx", hr );
         p_capture_device = p_tuner_device;
-        p_tuner_device = NULL;
-        msg_Warn( p_access, "Build: "\
-            "Cannot find Capture device. Connecting to tuner: hr=0x%8lx", hr );
-    }
-
-    hr = p_network_provider->QueryInterface( IID_IScanningTuner,
-        (void**)&p_scanning_tuner );
-    if( FAILED( hr ) )
-    {
-        msg_Warn( p_access, "Build: "\
-            "Cannot QI Network Provider for Scanning Tuner: hr=0x%8lx", hr );
-        return hr;
-    }
-
-    hr = p_scanning_tuner->Validate( p_tune_request );
-    if( FAILED( hr ) )
-    {
-        msg_Warn( p_access, "Build: "\
-            "Tune Request is invalid: hr=0x%8lx", hr );
-        //return hr; it is not mandatory to validate. Validate fails, but the request is successfully accepted
-    }
-    hr = p_scanning_tuner->put_TuneRequest( p_tune_request );
-    if( FAILED( hr ) )
-    {
-        msg_Warn( p_access, "Build: "\
-            "Cannot submit the tune request: hr=0x%8lx", hr );
-        return hr;
+        p_capture_device->AddRef();
     }
 
     if( p_sample_grabber )
@@ -1403,13 +1958,14 @@ HRESULT BDAGraph::Build()
     p_sample_grabber = NULL;
     /* Insert the Sample Grabber to tap into the Transport Stream. */
     hr = ::CoCreateInstance( CLSID_SampleGrabber, NULL, CLSCTX_INPROC_SERVER,
-        IID_IBaseFilter, (void**)&p_sample_grabber );
+        IID_IBaseFilter, reinterpret_cast<void**>( &p_sample_grabber ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Build: "\
             "Cannot load Sample Grabber Filter: hr=0x%8lx", hr );
         return hr;
     }
+
     hr = p_filter_graph->AddFilter( p_sample_grabber, L"Sample Grabber" );
     if( FAILED( hr ) )
     {
@@ -1418,11 +1974,12 @@ HRESULT BDAGraph::Build()
         return hr;
     }
 
+    /* create the sample grabber */
     if( p_grabber )
         p_grabber->Release();
     p_grabber = NULL;
     hr = p_sample_grabber->QueryInterface( IID_ISampleGrabber,
-        (void**)&p_grabber );
+        reinterpret_cast<void**>( &p_grabber ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Build: "\
@@ -1445,7 +2002,11 @@ HRESULT BDAGraph::Build()
         {
             hr = Connect( p_capture_device, p_sample_grabber );
             if( SUCCEEDED( hr ) )
+            {
+                msg_Dbg( p_access, "Build: "\
+                    "Connected capture device to sample grabber" );
                 break;
+            }
             msg_Warn( p_access, "Build: "\
                 "Cannot connect Sample Grabber to Capture device: hr=0x%8lx (try %d/2)", hr, 1+i );
         }
@@ -1455,20 +2016,32 @@ HRESULT BDAGraph::Build()
                 "Cannot set media type on grabber filter: hr=0x%8lx (try %d/2", hr, 1+i );
         }
     }
-    if( hr )
+    msg_Dbg( p_access, "Build: This is where it used to return upon success" );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "Build: "\
+            "Cannot use capture device: hr=0x%8lx", hr );
         return hr;
+    }
 
     /* We need the MPEG2 Demultiplexer even though we are going to use the VLC
      * TS demuxer. The TIF filter connects to the MPEG2 demux and works with
      * the Network Provider filter to set up the stream */
+    //msg_Dbg( p_access, "Build: using MPEG2 demux" );
+    if( p_mpeg_demux )
+        p_mpeg_demux->Release();
+    p_mpeg_demux = NULL;
     hr = ::CoCreateInstance( CLSID_MPEG2Demultiplexer, NULL,
-        CLSCTX_INPROC_SERVER, IID_IBaseFilter, (void**)&p_mpeg_demux );
+        CLSCTX_INPROC_SERVER, IID_IBaseFilter,
+        reinterpret_cast<void**>( &p_mpeg_demux ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Build: "\
             "Cannot CoCreateInstance MPEG2 Demultiplexer: hr=0x%8lx", hr );
         return hr;
     }
+
+    //msg_Dbg( p_access, "Build: adding demux" );
     hr = p_filter_graph->AddFilter( p_mpeg_demux, L"Demux" );
     if( FAILED( hr ) )
     {
@@ -1476,6 +2049,7 @@ HRESULT BDAGraph::Build()
             "Cannot add demux filter to graph: hr=0x%8lx", hr );
         return hr;
     }
+
     hr = Connect( p_sample_grabber, p_mpeg_demux );
     if( FAILED( hr ) )
     {
@@ -1484,9 +2058,15 @@ HRESULT BDAGraph::Build()
         return hr;
     }
 
-    /* Always look for the Transform Information Filter from the start
+    //msg_Dbg( p_access, "Build: Connected sample grabber to demux" );
+    /* Always look for the Transport Information Filter from the start
      * of the collection*/
     l_tif_used = -1;
+    msg_Dbg( p_access, "Check: "\
+        "Calling FindFilter for KSCATEGORY_BDA_TRANSPORT_INFORMATION with "\
+        "p_mpeg_demux; l_tif_used=%ld", l_tif_used );
+
+
     hr = FindFilter( KSCATEGORY_BDA_TRANSPORT_INFORMATION, &l_tif_used,
         p_mpeg_demux, &p_transport_info );
     if( FAILED( hr ) )
@@ -1495,6 +2075,7 @@ HRESULT BDAGraph::Build()
             "Cannot load TIF onto demux: hr=0x%8lx", hr );
         return hr;
     }
+
     /* Configure the Sample Grabber to buffer the samples continuously */
     hr = p_grabber->SetBufferSamples( true );
     if( FAILED( hr ) )
@@ -1503,6 +2084,7 @@ HRESULT BDAGraph::Build()
             "Cannot set Sample Grabber to buffering: hr=0x%8lx", hr );
         return hr;
     }
+
     hr = p_grabber->SetOneShot( false );
     if( FAILED( hr ) )
     {
@@ -1510,6 +2092,11 @@ HRESULT BDAGraph::Build()
             "Cannot set Sample Grabber to multi shot: hr=0x%8lx", hr );
         return hr;
     }
+
+    /* Second parameter to SetCallback specifies the callback method; 0 uses
+     * the ISampleGrabberCB::SampleCB method, which receives an IMediaSample
+     * pointer. */
+    //msg_Dbg( p_access, "Build: Adding grabber callback" );
     hr = p_grabber->SetCallback( this, 0 );
     if( FAILED( hr ) )
     {
@@ -1518,10 +2105,12 @@ HRESULT BDAGraph::Build()
         return hr;
     }
 
-    hr = Register();
+    hr = Register(); /* creates d_graph_register */
     if( FAILED( hr ) )
     {
         d_graph_register = 0;
+        msg_Dbg( p_access, "Build: "\
+            "Cannot register graph: hr=0x%8lx", hr );
     }
 
     /* The Media Control is used to Run and Stop the Graph */
@@ -1529,7 +2118,7 @@ HRESULT BDAGraph::Build()
         p_media_control->Release();
     p_media_control = NULL;
     hr = p_filter_graph->QueryInterface( IID_IMediaControl,
-        (void**)&p_media_control );
+        reinterpret_cast<void**>( &p_media_control ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Build: "\
@@ -1537,8 +2126,184 @@ HRESULT BDAGraph::Build()
         return hr;
     }
 
-    return hr;
+    /* success! */
+    //msg_Dbg( p_access, "Build: succeeded: hr=0x%8lx", hr );
+    return S_OK;
+}
 
+/* debugging */
+HRESULT BDAGraph::ListFilters( REFCLSID this_clsid )
+{
+    HRESULT                 hr = S_OK;
+
+    class localComPtr
+    {
+        public:
+        ICreateDevEnum*    p_local_system_dev_enum;
+        IEnumMoniker*      p_moniker_enum;
+        IMoniker*          p_moniker;
+        IBaseFilter*       p_filter;
+        IBaseFilter*       p_this_filter;
+        IBindCtx*          p_bind_context;
+        IPropertyBag*      p_property_bag;
+
+        char*              psz_downstream;
+        char*              psz_bstr;
+        int                i_bstr_len;
+
+        localComPtr():
+            p_local_system_dev_enum(NULL),
+            p_moniker_enum(NULL),
+            p_moniker(NULL),
+            p_filter(NULL),
+            p_this_filter(NULL),
+            p_bind_context( NULL ),
+            p_property_bag(NULL),
+            psz_downstream( NULL ),
+            psz_bstr( NULL )
+        {}
+        ~localComPtr()
+        {
+            if( p_property_bag )
+                p_property_bag->Release();
+            if( p_bind_context )
+                p_bind_context->Release();
+            if( p_filter )
+                p_filter->Release();
+            if( p_this_filter )
+                p_this_filter->Release();
+            if( p_moniker )
+                p_moniker->Release();
+            if( p_moniker_enum )
+                p_moniker_enum->Release();
+            if( p_local_system_dev_enum )
+                p_local_system_dev_enum->Release();
+            if( psz_bstr )
+                delete[] psz_bstr;
+            if( psz_downstream )
+                delete[] psz_downstream;
+        }
+    } l;
+
+
+//    msg_Dbg( p_access, "ListFilters: Create local system_dev_enum");
+    if( l.p_local_system_dev_enum )
+        l.p_local_system_dev_enum->Release();
+    l.p_local_system_dev_enum = NULL;
+    hr = ::CoCreateInstance( CLSID_SystemDeviceEnum, 0, CLSCTX_INPROC,
+        IID_ICreateDevEnum, reinterpret_cast<void**>( &l.p_local_system_dev_enum ) );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "ListFilters: "\
+            "Cannot CoCreate SystemDeviceEnum: hr=0x%8lx", hr );
+        return hr;
+    }
+
+    //msg_Dbg( p_access, "ListFilters: Create p_moniker_enum");
+    if( l.p_moniker_enum )
+        l.p_moniker_enum->Release();
+    l.p_moniker_enum = NULL;
+    hr = l.p_local_system_dev_enum->CreateClassEnumerator( this_clsid,
+        &l.p_moniker_enum, 0 );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "ListFilters: "\
+            "Cannot CreateClassEnumerator: hr=0x%8lx", hr );
+        return hr;
+    }
+
+    //msg_Dbg( p_access, "ListFilters: Entering main loop" );
+    do
+    {
+        /* We are overwriting l.p_moniker so we should Release and nullify
+         * It is important that p_moniker and p_property_bag are fully released
+         * l.p_filter may not be dereferenced so we could force to NULL */
+        /* msg_Dbg( p_access, "ListFilters: top of main loop");*/
+        //msg_Dbg( p_access, "ListFilters: releasing property bag");
+        if( l.p_property_bag )
+            l.p_property_bag->Release();
+        l.p_property_bag = NULL;
+        //msg_Dbg( p_access, "ListFilters: releasing filter");
+        if( l.p_filter )
+            l.p_filter->Release();
+        l.p_filter = NULL;
+        //msg_Dbg( p_access, "ListFilters: releasing bind context");
+        if( l.p_bind_context )
+           l.p_bind_context->Release();
+        l.p_bind_context = NULL;
+        //msg_Dbg( p_access, "ListFilters: releasing moniker");
+        if( l.p_moniker )
+            l.p_moniker->Release();
+        l.p_moniker = NULL;
+        //msg_Dbg( p_access, "ListFilters: trying a moniker");
+
+        if( !l.p_moniker_enum ) break;
+        hr = l.p_moniker_enum->Next( 1, &l.p_moniker, 0 );
+        if( hr != S_OK ) break;
+
+        /* l.p_bind_context is Released at the top of the loop */
+        hr = CreateBindCtx( 0, &l.p_bind_context );
+        if( FAILED( hr ) )
+        {
+            msg_Dbg( p_access, "ListFilters: "\
+                "Cannot create bind_context, trying another: hr=0x%8lx", hr );
+            continue;
+        }
+
+        /* l.p_filter is Released at the top of the loop */
+        hr = l.p_moniker->BindToObject( l.p_bind_context, NULL, IID_IBaseFilter,
+            reinterpret_cast<void**>( &l.p_filter ) );
+        if( FAILED( hr ) )
+        {
+            msg_Dbg( p_access, "ListFilters: "\
+                "Cannot create p_filter, trying another: hr=0x%8lx", hr );
+            continue;
+        }
+
+#ifdef DEBUG_MONIKER_NAME
+        WCHAR*  pwsz_downstream = NULL;
+
+        hr = l.p_moniker->GetDisplayName(l.p_bind_context, NULL,
+            &pwsz_downstream );
+        if( FAILED( hr ) )
+        {
+            msg_Dbg( p_access, "ListFilters: "\
+                "Cannot get display name, trying another: hr=0x%8lx", hr );
+            continue;
+        }
+
+        if( l.psz_downstream )
+            delete[] l.psz_downstream;
+        l.i_bstr_len = WideCharToMultiByte( CP_ACP, 0, pwsz_downstream, -1,
+            l.psz_downstream, 0, NULL, NULL );
+        l.psz_downstream = new char[ l.i_bstr_len ];
+        l.i_bstr_len = WideCharToMultiByte( CP_ACP, 0, pwsz_downstream, -1,
+            l.psz_downstream, l.i_bstr_len, NULL, NULL );
+
+        LPMALLOC p_alloc;
+        ::CoGetMalloc( 1, &p_alloc );
+        p_alloc->Free( pwsz_downstream );
+        p_alloc->Release();
+        msg_Dbg( p_access, "ListFilters: "\
+            "Moniker name is  %s",  l.psz_downstream );
+#else
+        l.psz_downstream = strdup( "Downstream" );
+#endif
+        /* l.p_property_bag is released at the top of the loop */
+        hr = l.p_moniker->BindToStorage( NULL, NULL, IID_IPropertyBag,
+            reinterpret_cast<void**>( &l.p_property_bag ) );
+        if( FAILED( hr ) )
+        {
+            msg_Dbg( p_access, "ListFilters: "\
+                "Cannot Bind to Property Bag: hr=0x%8lx", hr );
+            continue;
+        }
+
+        //msg_Dbg( p_access, "ListFilters: displaying another" );
+    }
+    while( true );
+
+    return S_OK;
 }
 
 /******************************************************************************
@@ -1550,7 +2315,7 @@ HRESULT BDAGraph::Build()
 * This is used when the graph does not run because a tuner device is in use so
 * another one needs to be selected.
 ******************************************************************************/
-HRESULT BDAGraph::FindFilter( REFCLSID clsid, long* i_moniker_used,
+HRESULT BDAGraph::FindFilter( REFCLSID this_clsid, long* i_moniker_used,
     IBaseFilter* p_upstream, IBaseFilter** p_p_downstream )
 {
     HRESULT                 hr = S_OK;
@@ -1558,39 +2323,52 @@ HRESULT BDAGraph::FindFilter( REFCLSID clsid, long* i_moniker_used,
     class localComPtr
     {
         public:
-        IMoniker*      p_moniker;
         IEnumMoniker*  p_moniker_enum;
-        IBaseFilter*   p_filter;
+        IMoniker*      p_moniker;
+        IBindCtx*      p_bind_context;
         IPropertyBag*  p_property_bag;
+        char*          psz_upstream;
+        int            i_upstream_len;
+
+        char*          psz_downstream;
         VARIANT        var_bstr;
-        char *         psz_bstr;
         int            i_bstr_len;
         localComPtr():
-            p_moniker(NULL),
             p_moniker_enum(NULL),
-            p_filter(NULL),
+            p_moniker(NULL),
+            p_bind_context( NULL ),
             p_property_bag(NULL),
-            psz_bstr( NULL )
-            { ::VariantInit(&var_bstr); };
+            psz_upstream( NULL ),
+            psz_downstream( NULL )
+        {
+            ::VariantInit(&var_bstr);
+        }
         ~localComPtr()
         {
-            if( p_property_bag )
-                p_property_bag->Release();
-            if( p_filter )
-                p_filter->Release();
-            if( p_moniker )
-                p_moniker->Release();
             if( p_moniker_enum )
                 p_moniker_enum->Release();
+            if( p_moniker )
+                p_moniker->Release();
+            if( p_bind_context )
+                p_bind_context->Release();
+            if( p_property_bag )
+                p_property_bag->Release();
+            if( psz_upstream )
+                delete[] psz_upstream;
+            if( psz_downstream )
+                delete[] psz_downstream;
+
             ::VariantClear(&var_bstr);
-            delete[] psz_bstr;
         }
     } l;
 
+    /* create system_dev_enum the first time through, or preserve the
+     * existing one to loop through classes */
     if( !p_system_dev_enum )
     {
+        msg_Dbg( p_access, "FindFilter: Create p_system_dev_enum");
         hr = ::CoCreateInstance( CLSID_SystemDeviceEnum, 0, CLSCTX_INPROC,
-            IID_ICreateDevEnum, (void**)&p_system_dev_enum );
+            IID_ICreateDevEnum, reinterpret_cast<void**>( &p_system_dev_enum ) );
         if( FAILED( hr ) )
         {
             msg_Warn( p_access, "FindFilter: "\
@@ -1599,98 +2377,169 @@ HRESULT BDAGraph::FindFilter( REFCLSID clsid, long* i_moniker_used,
         }
     }
 
-    hr = p_system_dev_enum->CreateClassEnumerator( clsid,
+    msg_Dbg( p_access, "FindFilter: Create p_moniker_enum");
+    hr = p_system_dev_enum->CreateClassEnumerator( this_clsid,
         &l.p_moniker_enum, 0 );
-    if( hr != S_OK )
+    if( FAILED( hr ) )
     {
         msg_Warn( p_access, "FindFilter: "\
             "Cannot CreateClassEnumerator: hr=0x%8lx", hr );
-        return E_FAIL;
+        return hr;
     }
+
+    msg_Dbg( p_access, "FindFilter: get filter name");
+    hr = GetFilterName( p_upstream, &l.psz_upstream );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "FindFilter: "\
+            "Cannot GetFilterName: hr=0x%8lx", hr );
+        return hr;
+    }
+
+    msg_Dbg( p_access, "FindFilter: "\
+        "called with i_moniker_used=%ld, " \
+        "p_upstream = %s", *i_moniker_used, l.psz_upstream );
 
     do
     {
         /* We are overwriting l.p_moniker so we should Release and nullify
-         * It is important that p_moniker and p_property_bag are fully released
-         * l.p_filter may not be dereferenced so we could force to NULL */
+         * It is important that p_moniker and p_property_bag are fully released */
+        msg_Dbg( p_access, "FindFilter: top of main loop");
         if( l.p_property_bag )
             l.p_property_bag->Release();
         l.p_property_bag = NULL;
-        if( l.p_filter )
-            l.p_filter->Release();
-        l.p_filter = NULL;
+        msg_Dbg( p_access, "FindFilter: releasing bind context");
+        if( l.p_bind_context )
+           l.p_bind_context->Release();
+        l.p_bind_context = NULL;
+        msg_Dbg( p_access, "FindFilter: releasing moniker");
         if( l.p_moniker )
             l.p_moniker->Release();
-         l.p_moniker = NULL;
+        msg_Dbg( p_access, "FindFilter: null moniker");
+        l.p_moniker = NULL;
 
+        msg_Dbg( p_access, "FindFilter: quit if no enum");
+        if( !l.p_moniker_enum ) break;
+        msg_Dbg( p_access, "FindFilter: trying a moniker");
         hr = l.p_moniker_enum->Next( 1, &l.p_moniker, 0 );
         if( hr != S_OK ) break;
+
         i_moniker_index++;
 
         /* Skip over devices already found on previous calls */
+        msg_Dbg( p_access, "FindFilter: skip previously found devices");
+
         if( i_moniker_index <= *i_moniker_used ) continue;
         *i_moniker_used = i_moniker_index;
 
-        /* l.p_filter is Released at the top of the loop */
-        hr = l.p_moniker->BindToObject( NULL, NULL, IID_IBaseFilter,
-            (void**)&l.p_filter );
+        /* l.p_bind_context is Released at the top of the loop */
+        msg_Dbg( p_access, "FindFilter: create bind context");
+        hr = CreateBindCtx( 0, &l.p_bind_context );
         if( FAILED( hr ) )
         {
+            msg_Dbg( p_access, "FindFilter: "\
+                "Cannot create bind_context, trying another: hr=0x%8lx", hr );
             continue;
         }
-        /* l.p_property_bag is released at the top of the loop */
-        hr = l.p_moniker->BindToStorage( NULL, NULL, IID_IPropertyBag,
-            (void**)&l.p_property_bag );
+
+        msg_Dbg( p_access, "FindFilter: try to create downstream filter");
+        *p_p_downstream = NULL;
+        hr = l.p_moniker->BindToObject( l.p_bind_context, NULL, IID_IBaseFilter,
+            reinterpret_cast<void**>( p_p_downstream ) );
         if( FAILED( hr ) )
         {
-            msg_Warn( p_access, "FindFilter: "\
-                "Cannot Bind to Property Bag: hr=0x%8lx", hr );
-            return hr;
+            msg_Dbg( p_access, "FindFilter: "\
+                "Cannot bind to downstream, trying another: hr=0x%8lx", hr );
+            continue;
         }
+
+#ifdef DEBUG_MONIKER_NAME
+        msg_Dbg( p_access, "FindFilter: get downstream filter name");
+
+        WCHAR*  pwsz_downstream = NULL;
+
+        hr = l.p_moniker->GetDisplayName(l.p_bind_context, NULL,
+            &pwsz_downstream );
+        if( FAILED( hr ) )
+        {
+            msg_Dbg( p_access, "FindFilter: "\
+                "Cannot get display name, trying another: hr=0x%8lx", hr );
+            continue;
+        }
+
+        if( l.psz_downstream )
+            delete[] l.psz_downstream;
+        l.i_bstr_len = WideCharToMultiByte( CP_ACP, 0, pwsz_downstream, -1,
+            l.psz_downstream, 0, NULL, NULL );
+        l.psz_downstream = new char[ l.i_bstr_len ];
+        l.i_bstr_len = WideCharToMultiByte( CP_ACP, 0, pwsz_downstream, -1,
+            l.psz_downstream, l.i_bstr_len, NULL, NULL );
+
+        LPMALLOC p_alloc;
+        ::CoGetMalloc( 1, &p_alloc );
+        p_alloc->Free( pwsz_downstream );
+        p_alloc->Release();
+#else
+        l.psz_downstream = strdup( "Downstream" );
+#endif
+
+        /* l.p_property_bag is released at the top of the loop */
+        msg_Dbg( p_access, "FindFilter: "\
+            "Moniker name is  %s, binding to storage",  l.psz_downstream );
+        hr = l.p_moniker->BindToStorage( l.p_bind_context, NULL,
+            IID_IPropertyBag, reinterpret_cast<void**>( &l.p_property_bag ) );
+        if( FAILED( hr ) )
+        {
+            msg_Dbg( p_access, "FindFilter: "\
+                "Cannot Bind to Property Bag: hr=0x%8lx", hr );
+            continue;
+        }
+
+        msg_Dbg( p_access, "FindFilter: read friendly name");
         hr = l.p_property_bag->Read( L"FriendlyName", &l.var_bstr, NULL );
         if( FAILED( hr ) )
         {
-            msg_Warn( p_access, "FindFilter: "\
-                "Cannot read filter friendly name: hr=0x%8lx", hr );
-            return hr;
+           msg_Dbg( p_access, "FindFilter: "\
+               "Cannot read friendly name, next?: hr=0x%8lx", hr );
+           continue;
         }
 
-        hr = p_filter_graph->AddFilter( l.p_filter, l.var_bstr.bstrVal );
+        msg_Dbg( p_access, "FindFilter: add filter to graph" );
+        hr = p_filter_graph->AddFilter( *p_p_downstream, l.var_bstr.bstrVal );
         if( FAILED( hr ) )
         {
-            msg_Warn( p_access, "FindFilter: "\
-                "Cannot add filter: hr=0x%8lx", hr );
-            return hr;
+            msg_Dbg( p_access, "FindFilter: "\
+                "Cannot add filter, trying another: hr=0x%8lx", hr );
+            continue;
         }
-        hr = Connect( p_upstream, l.p_filter );
+
+        msg_Dbg( p_access, "FindFilter: "\
+            "Trying to Connect %s to %s", l.psz_upstream, l.psz_downstream );
+        hr = Connect( p_upstream, *p_p_downstream );
         if( SUCCEEDED( hr ) )
         {
-            /* p_p_downstream has not been touched yet so no release needed */
-            delete[] l.psz_bstr;
-            l.i_bstr_len = WideCharToMultiByte( CP_ACP, 0,
-                l.var_bstr.bstrVal, -1, l.psz_bstr, 0, NULL, NULL );
-            l.psz_bstr = new char[l.i_bstr_len];
-            l.i_bstr_len = WideCharToMultiByte( CP_ACP, 0,
-                l.var_bstr.bstrVal, -1, l.psz_bstr, l.i_bstr_len, NULL, NULL );
-            msg_Dbg( p_access, "FindFilter: Connected %s", l.psz_bstr );
-            l.p_filter->QueryInterface( IID_IBaseFilter,
-                (void**)p_p_downstream );
+            msg_Dbg( p_access, "FindFilter: Connected %s", l.psz_downstream );
             return S_OK;
         }
+
         /* Not the filter we want so unload and try the next one */
-        hr = p_filter_graph->RemoveFilter( l.p_filter );
+        /* Warning: RemoveFilter does an undocumented Release()
+         * on pointer but does not set it to NULL */
+        msg_Dbg( p_access, "FindFilter: Removing filter" );
+        hr = p_filter_graph->RemoveFilter( *p_p_downstream );
         if( FAILED( hr ) )
         {
             msg_Warn( p_access, "FindFilter: "\
                 "Failed unloading Filter: hr=0x%8lx", hr );
-            return hr;
+            continue;
         }
-
+        msg_Dbg( p_access, "FindFilter: trying another" );
     }
     while( true );
 
+    /* nothing found */
+    msg_Warn( p_access, "FindFilter: No filter connected" );
     hr = E_FAIL;
-    msg_Warn( p_access, "FindFilter: No filter connected: hr=0x%8lx", hr );
     return hr;
 }
 
@@ -1708,9 +2557,16 @@ HRESULT BDAGraph::Connect( IBaseFilter* p_upstream, IBaseFilter* p_downstream )
         IEnumPins* p_pin_upstream_enum;
         IEnumPins* p_pin_downstream_enum;
         IPin*      p_pin_temp;
-        localComPtr(): p_pin_upstream(NULL), p_pin_downstream(NULL),
+        char*      psz_upstream;
+        char*      psz_downstream;
+
+        localComPtr():
+            p_pin_upstream(NULL), p_pin_downstream(NULL),
             p_pin_upstream_enum(NULL), p_pin_downstream_enum(NULL),
-            p_pin_temp(NULL) { };
+            p_pin_temp(NULL),
+            psz_upstream( NULL ),
+            psz_downstream( NULL )
+            { };
         ~localComPtr()
         {
             if( p_pin_temp )
@@ -1723,11 +2579,16 @@ HRESULT BDAGraph::Connect( IBaseFilter* p_upstream, IBaseFilter* p_downstream )
                 p_pin_downstream_enum->Release();
             if( p_pin_upstream_enum )
                 p_pin_upstream_enum->Release();
+            if( psz_upstream )
+                delete[] psz_upstream;
+            if( psz_downstream )
+                delete[] psz_downstream;
         }
     } l;
 
     PIN_DIRECTION pin_dir;
 
+    //msg_Dbg( p_access, "Connect: entering" );
     hr = p_upstream->EnumPins( &l.p_pin_upstream_enum );
     if( FAILED( hr ) )
     {
@@ -1739,11 +2600,22 @@ HRESULT BDAGraph::Connect( IBaseFilter* p_upstream, IBaseFilter* p_downstream )
     do
     {
         /* Release l.p_pin_upstream before next iteration */
-        if( l.p_pin_upstream  )
+        if( l.p_pin_upstream )
             l.p_pin_upstream ->Release();
         l.p_pin_upstream = NULL;
+        if( !l.p_pin_upstream_enum ) break;
         hr = l.p_pin_upstream_enum->Next( 1, &l.p_pin_upstream, 0 );
         if( hr != S_OK ) break;
+
+        //msg_Dbg( p_access, "Connect: get pin name");
+        hr = GetPinName( l.p_pin_upstream, &l.psz_upstream );
+        if( FAILED( hr ) )
+        {
+            msg_Warn( p_access, "Connect: "\
+                "Cannot GetPinName: hr=0x%8lx", hr );
+            return hr;
+        }
+        //msg_Dbg( p_access, "Connect: p_pin_upstream = %s", l.psz_upstream );
 
         hr = l.p_pin_upstream->QueryDirection( &pin_dir );
         if( FAILED( hr ) )
@@ -1752,22 +2624,26 @@ HRESULT BDAGraph::Connect( IBaseFilter* p_upstream, IBaseFilter* p_downstream )
                 "Cannot get upstream filter pin direction: hr=0x%8lx", hr );
             return hr;
         }
+
         hr = l.p_pin_upstream->ConnectedTo( &l.p_pin_downstream );
         if( SUCCEEDED( hr ) )
         {
             l.p_pin_downstream->Release();
             l.p_pin_downstream = NULL;
         }
+
         if( FAILED( hr ) && hr != VFW_E_NOT_CONNECTED )
         {
             msg_Warn( p_access, "Connect: "\
                 "Cannot check upstream filter connection: hr=0x%8lx", hr );
             return hr;
         }
+
         if( ( pin_dir == PINDIR_OUTPUT ) && ( hr == VFW_E_NOT_CONNECTED ) )
         {
             /* The upstream pin is not yet connected so check each pin on the
              * downstream filter */
+            //msg_Dbg( p_access, "Connect: enumerating downstream pins" );
             hr = p_downstream->EnumPins( &l.p_pin_downstream_enum );
             if( FAILED( hr ) )
             {
@@ -1775,15 +2651,29 @@ HRESULT BDAGraph::Connect( IBaseFilter* p_upstream, IBaseFilter* p_downstream )
                     "downstream filter enumerator: hr=0x%8lx", hr );
                 return hr;
             }
+
             do
             {
                 /* Release l.p_pin_downstream before next iteration */
-                if( l.p_pin_downstream  )
+                if( l.p_pin_downstream )
                     l.p_pin_downstream ->Release();
                 l.p_pin_downstream = NULL;
-
+                if( !l.p_pin_downstream_enum ) break;
                 hr = l.p_pin_downstream_enum->Next( 1, &l.p_pin_downstream, 0 );
                 if( hr != S_OK ) break;
+
+                //msg_Dbg( p_access, "Connect: get pin name");
+                hr = GetPinName( l.p_pin_downstream, &l.psz_downstream );
+                if( FAILED( hr ) )
+                {
+                    msg_Warn( p_access, "Connect: "\
+                        "Cannot GetPinName: hr=0x%8lx", hr );
+                    return hr;
+                }
+/*
+                msg_Dbg( p_access, "Connect: Trying p_downstream = %s",
+                    l.psz_downstream );
+*/
 
                 hr = l.p_pin_downstream->QueryDirection( &pin_dir );
                 if( FAILED( hr ) )
@@ -1802,6 +2692,7 @@ HRESULT BDAGraph::Connect( IBaseFilter* p_upstream, IBaseFilter* p_downstream )
                     l.p_pin_temp->Release();
                     l.p_pin_temp = NULL;
                 }
+
                 if( hr != VFW_E_NOT_CONNECTED )
                 {
                     if( FAILED( hr ) )
@@ -1811,9 +2702,12 @@ HRESULT BDAGraph::Connect( IBaseFilter* p_upstream, IBaseFilter* p_downstream )
                         return hr;
                     }
                 }
+
                 if( ( pin_dir == PINDIR_INPUT ) &&
                     ( hr == VFW_E_NOT_CONNECTED ) )
                 {
+                    //msg_Dbg( p_access, "Connect: trying to connect pins" );
+
                     hr = p_filter_graph->ConnectDirect( l.p_pin_upstream,
                         l.p_pin_downstream, NULL );
                     if( SUCCEEDED( hr ) )
@@ -1844,6 +2738,7 @@ HRESULT BDAGraph::Connect( IBaseFilter* p_upstream, IBaseFilter* p_downstream )
     while( true );
     /* If we arrive here it means we did not find any pair of suitable pins
      * Outstanding refcounts are released in the destructor */
+    //msg_Dbg( p_access, "Connect: No pins connected" );
     return E_FAIL;
 }
 
@@ -1855,18 +2750,25 @@ HRESULT BDAGraph::Start()
     HRESULT hr = S_OK;
     OAFilterState i_state; /* State_Stopped, State_Paused, State_Running */
 
+    msg_Dbg( p_access, "Start: entering" );
+
     if( !p_media_control )
     {
-        msg_Dbg( p_access, "Start: Media Control has not been created" );
+        msg_Warn( p_access, "Start: Media Control has not been created" );
         return E_FAIL;
     }
-    hr = p_media_control->Run();
-    msg_Dbg( p_access, "Graph started hr=0x%lx", hr );
-    if( hr == S_OK )
-        return hr;
 
+    msg_Dbg( p_access, "Start: Run()" );
+    hr = p_media_control->Run();
+    if( SUCCEEDED( hr ) )
+    {
+        msg_Dbg( p_access, "Start: Graph started, hr=0x%lx", hr );
+        return S_OK;
+    }
+
+    msg_Dbg( p_access, "Start: would not start, will retry" );
     /* Query the state of the graph - timeout after 100 milliseconds */
-    while( (hr = p_media_control->GetState( 100, &i_state )) != S_OK )
+    while( (hr = p_media_control->GetState( 100, &i_state) ) != S_OK )
     {
         if( FAILED( hr ) )
         {
@@ -1875,8 +2777,13 @@ HRESULT BDAGraph::Start()
             return hr;
         }
     }
+
+    msg_Dbg( p_access, "Start: got state" );
     if( i_state == State_Running )
-        return hr;
+    {
+        msg_Dbg( p_access, "Graph started after a delay, hr=0x%lx", hr );
+        return S_OK;
+    }
 
     /* The Graph is not running so stop it and return an error */
     msg_Warn( p_access, "Start: Graph not started: %d", (int)i_state );
@@ -1887,6 +2794,7 @@ HRESULT BDAGraph::Start()
             "Start: Cannot stop Graph after Run failed: hr=0x%8lx", hr );
         return hr;
     }
+
     return E_FAIL;
 }
 
@@ -1907,6 +2815,10 @@ STDMETHODIMP BDAGraph::SampleCB( double /*date*/, IMediaSample *p_sample )
         msg_Warn( p_access, "BDA SampleCB: Sample Discontinuity.");
 
     const size_t i_sample_size = p_sample->GetActualDataLength();
+
+    /* The buffer memory is owned by the media sample object, and is automatically
+     * released when the media sample is destroyed. The caller should not free or
+     * reallocate the buffer. */
     BYTE *p_sample_data;
     p_sample->GetPointer( &p_sample_data );
 
@@ -1934,80 +2846,166 @@ STDMETHODIMP BDAGraph::BufferCB( double /*date*/, BYTE* /*buffer*/,
 ******************************************************************************/
 HRESULT BDAGraph::Destroy()
 {
+    HRESULT hr = S_OK;
+    ULONG mem_ref = 0;
+//    msg_Dbg( p_access, "Destroy: media control 1" );
     if( p_media_control )
         p_media_control->StopWhenReady(); /* Instead of Stop() */
 
+//    msg_Dbg( p_access, "Destroy: deregistering graph" );
     if( d_graph_register )
-    {
         Deregister();
-    }
 
+//    msg_Dbg( p_access, "Destroy: calling Empty" );
     output.Empty();
 
-    if( p_grabber )
-    {
-        p_grabber->Release();
-        p_grabber = NULL;
-    }
-
+//    msg_Dbg( p_access, "Destroy: TIF" );
     if( p_transport_info )
     {
-        p_filter_graph->RemoveFilter( p_transport_info );
-        p_transport_info->Release();
+        /* Warning: RemoveFilter does an undocumented Release()
+         * on pointer but does not set it to NULL */
+        hr = p_filter_graph->RemoveFilter( p_transport_info );
+        if( FAILED( hr ) )
+        {
+            msg_Dbg( p_access, "Destroy: "\
+                "Failed unloading TIF: hr=0x%8lx", hr );
+        }
         p_transport_info = NULL;
     }
+
+//    msg_Dbg( p_access, "Destroy: demux" );
     if( p_mpeg_demux )
     {
         p_filter_graph->RemoveFilter( p_mpeg_demux );
-        p_mpeg_demux->Release();
+        if( FAILED( hr ) )
+        {
+            msg_Dbg( p_access, "Destroy: "\
+                "Failed unloading demux: hr=0x%8lx", hr );
+        }
         p_mpeg_demux = NULL;
     }
+
+//    msg_Dbg( p_access, "Destroy: sample grabber" );
+    if( p_grabber )
+    {
+        mem_ref = p_grabber->Release();
+        if( mem_ref != 0 )
+        {
+            msg_Dbg( p_access, "Destroy: "\
+                "Sample grabber mem_ref (varies): mem_ref=%ld", mem_ref );
+        }
+        p_grabber = NULL;
+    }
+
+//    msg_Dbg( p_access, "Destroy: sample grabber filter" );
     if( p_sample_grabber )
     {
-        p_filter_graph->RemoveFilter( p_sample_grabber );
-        p_sample_grabber->Release();
+        hr = p_filter_graph->RemoveFilter( p_sample_grabber );
         p_sample_grabber = NULL;
+        if( FAILED( hr ) )
+        {
+            msg_Dbg( p_access, "Destroy: "\
+                "Failed unloading sampler: hr=0x%8lx", hr );
+        }
     }
+
+//    msg_Dbg( p_access, "Destroy: capture device" );
     if( p_capture_device )
     {
         p_filter_graph->RemoveFilter( p_capture_device );
-        p_capture_device->Release();
+        if( FAILED( hr ) )
+        {
+            msg_Dbg( p_access, "Destroy: "\
+                "Failed unloading capture device: hr=0x%8lx", hr );
+        }
         p_capture_device = NULL;
     }
+
+//    msg_Dbg( p_access, "Destroy: tuner device" );
     if( p_tuner_device )
     {
-        p_filter_graph->RemoveFilter( p_tuner_device );
-        p_tuner_device->Release();
+        //msg_Dbg( p_access, "Destroy: remove filter on tuner device" );
+        hr = p_filter_graph->RemoveFilter( p_tuner_device );
+        //msg_Dbg( p_access, "Destroy: force tuner device to NULL" );
         p_tuner_device = NULL;
-    }
-    if( p_scanning_tuner )
-    {
-        p_scanning_tuner->Release();
-        p_scanning_tuner = NULL;
-    }
-    if( p_network_provider )
-    {
-        p_filter_graph->RemoveFilter( p_network_provider );
-        p_network_provider->Release();
-        p_network_provider = NULL;
+        if( FAILED( hr ) )
+        {
+            msg_Dbg( p_access, "Destroy: "\
+                "Failed unloading tuner device: hr=0x%8lx", hr );
+        }
     }
 
-    if( p_media_control )
+//    msg_Dbg( p_access, "Destroy: scanning tuner" );
+    if( p_scanning_tuner )
     {
-        p_media_control->Release();
-        p_media_control = NULL;
+        mem_ref = p_scanning_tuner->Release();
+        if( mem_ref != 0 )
+        {
+            msg_Dbg( p_access, "Destroy: "\
+                "Scanning tuner mem_ref (normally 2 if warm, "\
+                "3 if active): mem_ref=%ld", mem_ref );
+        }
+        p_scanning_tuner = NULL;
     }
+
+//    msg_Dbg( p_access, "Destroy: net provider" );
+    if( p_network_provider )
+    {
+        hr = p_filter_graph->RemoveFilter( p_network_provider );
+        p_network_provider = NULL;
+        if( FAILED( hr ) )
+        {
+            msg_Dbg( p_access, "Destroy: "\
+                "Failed unloading net provider: hr=0x%8lx", hr );
+        }
+    }
+
+//    msg_Dbg( p_access, "Destroy: filter graph" );
     if( p_filter_graph )
     {
-        p_filter_graph->Release();
+        mem_ref = p_filter_graph->Release();
+        if( mem_ref != 0 )
+        {
+            msg_Dbg( p_access, "Destroy: "\
+                "Filter graph mem_ref (normally 1 if active): mem_ref=%ld",
+                mem_ref );
+        }
         p_filter_graph = NULL;
     }
+
+    /* first call to FindFilter creates p_system_dev_enum */
+
+//    msg_Dbg( p_access, "Destroy: system dev enum" );
     if( p_system_dev_enum )
     {
-        p_system_dev_enum->Release();
+        mem_ref = p_system_dev_enum->Release();
+        if( mem_ref != 0 )
+        {
+            msg_Dbg( p_access, "Destroy: "\
+                "System_dev_enum mem_ref: mem_ref=%ld", mem_ref );
+        }
         p_system_dev_enum = NULL;
     }
 
+//    msg_Dbg( p_access, "Destroy: media control 2" );
+    if( p_media_control )
+    {
+        msg_Dbg( p_access, "Destroy: release media control" );
+        mem_ref = p_media_control->Release();
+        if( mem_ref != 0 )
+        {
+            msg_Dbg( p_access, "Destroy: "\
+                "Media control mem_ref: mem_ref=%ld", mem_ref );
+        }
+        msg_Dbg( p_access, "Destroy: force media control to NULL" );
+        p_media_control = NULL;
+    }
+
+    d_graph_register = 0;
+    l_tuner_used = -1;
+    guid_network_type = GUID_NULL;
+
+//    msg_Dbg( p_access, "Destroy: returning" );
     return S_OK;
 }
 
@@ -2022,7 +3020,10 @@ HRESULT BDAGraph::Register()
         public:
         IMoniker*             p_moniker;
         IRunningObjectTable*  p_ro_table;
-        localComPtr(): p_moniker(NULL), p_ro_table(NULL) {};
+        localComPtr():
+            p_moniker(NULL),
+            p_ro_table(NULL)
+        {};
         ~localComPtr()
         {
             if( p_moniker )
@@ -2031,7 +3032,7 @@ HRESULT BDAGraph::Register()
                 p_ro_table->Release();
         }
     } l;
-    WCHAR     psz_w_graph_name[128];
+    WCHAR     pwsz_graph_name[128];
     HRESULT   hr;
 
     hr = ::GetRunningObjectTable( 0, &l.p_ro_table );
@@ -2041,11 +3042,11 @@ HRESULT BDAGraph::Register()
         return hr;
     }
 
-    size_t len = sizeof(psz_w_graph_name) / sizeof(psz_w_graph_name[0]);
-    _snwprintf( psz_w_graph_name, len - 1, L"VLC BDA Graph %08x Pid %08x",
+    size_t len = sizeof(pwsz_graph_name) / sizeof(pwsz_graph_name[0]);
+    _snwprintf( pwsz_graph_name, len - 1, L"VLC BDA Graph %08x Pid %08x",
         (DWORD_PTR) p_filter_graph, ::GetCurrentProcessId() );
-    psz_w_graph_name[len-1] = 0;
-    hr = CreateItemMoniker( L"!", psz_w_graph_name, &l.p_moniker );
+    pwsz_graph_name[len-1] = 0;
+    hr = CreateItemMoniker( L"!", pwsz_graph_name, &l.p_moniker );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Register: Cannot Create Moniker: hr=0x%8lx", hr );
@@ -2058,7 +3059,8 @@ HRESULT BDAGraph::Register()
         msg_Warn( p_access, "Register: Cannot Register Graph: hr=0x%8lx", hr );
         return hr;
     }
-//    msg_Dbg( p_access, "Register: registered Graph: %S", psz_w_graph_name );
+
+    msg_Dbg( p_access, "Register: registered Graph: %S", pwsz_graph_name );
     return hr;
 }
 
@@ -2067,8 +3069,51 @@ void BDAGraph::Deregister()
     HRESULT   hr;
     IRunningObjectTable* p_ro_table;
     hr = ::GetRunningObjectTable( 0, &p_ro_table );
+    /* docs say this does a Release() on d_graph_register stuff */
     if( SUCCEEDED( hr ) )
         p_ro_table->Revoke( d_graph_register );
     d_graph_register = 0;
     p_ro_table->Release();
+}
+
+HRESULT BDAGraph::GetFilterName( IBaseFilter* p_filter, char** psz_bstr_name )
+{
+    FILTER_INFO filter_info;
+    HRESULT     hr = S_OK;
+
+    hr = p_filter->QueryFilterInfo(&filter_info);
+    if( FAILED( hr ) )
+        return hr;
+    int i_name_len = WideCharToMultiByte( CP_ACP, 0, filter_info.achName,
+        -1, *psz_bstr_name, 0, NULL, NULL );
+    *psz_bstr_name = new char[ i_name_len ];
+    i_name_len = WideCharToMultiByte( CP_ACP, 0, filter_info.achName,
+        -1, *psz_bstr_name, i_name_len, NULL, NULL );
+
+    // The FILTER_INFO structure holds a pointer to the Filter Graph
+    // Manager, with a reference count that must be released.
+    if( filter_info.pGraph )
+        filter_info.pGraph->Release();
+    return S_OK;
+}
+
+HRESULT BDAGraph::GetPinName( IPin* p_pin, char** psz_bstr_name )
+{
+    PIN_INFO    pin_info;
+    HRESULT     hr = S_OK;
+
+    hr = p_pin->QueryPinInfo(&pin_info);
+    if( FAILED( hr ) )
+        return hr;
+    int i_name_len = WideCharToMultiByte( CP_ACP, 0, pin_info.achName,
+        -1, *psz_bstr_name, 0, NULL, NULL );
+    *psz_bstr_name = new char[ i_name_len ];
+    i_name_len = WideCharToMultiByte( CP_ACP, 0, pin_info.achName,
+        -1, *psz_bstr_name, i_name_len, NULL, NULL );
+
+    // The PIN_INFO structure holds a pointer to the Filter,
+    // with a referenppce count that must be released.
+    if( pin_info.pFilter )
+        pin_info.pFilter->Release();
+    return S_OK;
 }
