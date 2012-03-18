@@ -119,8 +119,7 @@ static void DestroySource (void *data)
 {
     struct device *d = data;
 
-    if (d->sd)
-        services_discovery_RemoveItem (d->sd, d->item);
+    services_discovery_RemoveItem (d->sd, d->item);
     vlc_gc_decref (d->item);
     free (d);
 }
@@ -164,18 +163,22 @@ static int AddSource (services_discovery_t *sd, const pa_source_info *info)
     }
     d->index = info->index;
     d->item = item;
-    d->sd = NULL;
 
     struct device **dp = tsearch (d, &sys->root, cmpsrc);
     if (dp == NULL) /* Out-of-memory */
     {
-        DestroySource (d);
+        free (d);
+        vlc_gc_decref (item);
         return -1;
     }
-    if (*dp != d) /* Replace existing source */
+    if (*dp != d) /* Update existing source */
     {
-        DestroySource (*dp);
-        *dp = d;
+        free (d);
+        d = *dp;
+        input_item_SetURI (d->item, item->psz_uri);
+        input_item_SetName (d->item, item->psz_name);
+        vlc_gc_decref (item);
+        return 0;
     }
 
     char *card;
