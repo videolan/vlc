@@ -129,16 +129,16 @@ static void Plane16_##f(plane_t *restrict dst, const plane_t *restrict src) \
 { \
     const uint16_t *src_pixels = (const uint16_t *)src->p_pixels; \
     uint16_t *restrict dst_pixels = (uint16_t *)dst->p_pixels; \
-    unsigned src_pitch = src->i_pitch / 2; \
-    unsigned dst_pitch = dst->i_pitch / 2; \
+    unsigned src_width = src->i_pitch / 2; \
+    unsigned dst_width = dst->i_pitch / 2; \
     unsigned dst_visible_width = dst->i_visible_pitch / 2; \
  \
     for (int y = 0; y < dst->i_visible_lines; y++) { \
         for (unsigned x = 0; x < dst_visible_width; x++) { \
             int sx, sy; \
-            (f)(&sx, &sy, dst_visible_width, dst->i_visible_lines, x, y);\
-            dst_pixels[y * dst_pitch + x] = \
-                src_pixels[sy * src_pitch + sx]; \
+            (f)(&sx, &sy, dst_visible_width, dst->i_visible_lines, x, y); \
+            dst_pixels[y * dst_width + x] = \
+                src_pixels[sy * src_width + sx]; \
         } \
     } \
 } \
@@ -147,16 +147,16 @@ static void Plane32_##f(plane_t *restrict dst, const plane_t *restrict src) \
 { \
     const uint32_t *src_pixels = (const uint32_t *)src->p_pixels; \
     uint32_t *restrict dst_pixels = (uint32_t *)dst->p_pixels; \
-    unsigned src_pitch = src->i_pitch / 4; \
-    unsigned dst_pitch = dst->i_pitch / 4; \
+    unsigned src_width = src->i_pitch / 4; \
+    unsigned dst_width = dst->i_pitch / 4; \
     unsigned dst_visible_width = dst->i_visible_pitch / 4; \
  \
     for (int y = 0; y < dst->i_visible_lines; y++) { \
         for (unsigned x = 0; x < dst_visible_width; x++) { \
             int sx, sy; \
-            (f)(&sx, &sy, dst_visible_width, dst->i_visible_lines, x, y);\
-            dst_pixels[y * dst_pitch + x] = \
-                src_pixels[sy * src_pitch + sx]; \
+            (f)(&sx, &sy, dst_visible_width, dst->i_visible_lines, x, y); \
+            dst_pixels[y * dst_width + x] = \
+                src_pixels[sy * src_width + sx]; \
         } \
     } \
 }
