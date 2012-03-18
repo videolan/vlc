@@ -159,6 +159,40 @@ static void Plane32_##f(plane_t *restrict dst, const plane_t *restrict src) \
                 src_pixels[sy * src_width + sx]; \
         } \
     } \
+} \
+ \
+static void YUYV_##f(plane_t *restrict dst, const plane_t *restrict src) \
+{ \
+    unsigned dst_visible_width = dst->i_visible_pitch / 2; \
+ \
+    for (int y = 0; y < dst->i_visible_lines; y += 2) { \
+        for (unsigned x = 0; x < dst_visible_width; x+= 2) { \
+            int sx0, sy0, sx1, sy1; \
+            (f)(&sx0, &sy0, dst_visible_width, dst->i_visible_lines, x, y); \
+            (f)(&sx1, &sy1, dst_visible_width, dst->i_visible_lines, \
+                x + 1, y + 1); \
+            dst->p_pixels[(y + 0) * dst->i_pitch + 2 * (x + 0)] = \
+                src->p_pixels[sy0 * src->i_pitch + 2 * sx0]; \
+            dst->p_pixels[(y + 0) * dst->i_pitch + 2 * (x + 1)] = \
+                src->p_pixels[sy1 * src->i_pitch + 2 * sx0]; \
+            dst->p_pixels[(y + 1) * dst->i_pitch + 2 * (x + 0)] = \
+                src->p_pixels[sy0 * src->i_pitch + 2 * sx1]; \
+            dst->p_pixels[(y + 1) * dst->i_pitch + 2 * (x + 1)] = \
+                src->p_pixels[sy1 * src->i_pitch + 2 * sx1]; \
+ \
+            int sx, sy, u, v; \
+            (f)(&sx, &sy, dst_visible_width / 2, dst->i_visible_lines / 2, \
+                x / 2, y / 2); \
+            u = (1 + src->p_pixels[2 * sy * src->i_pitch + 4 * sx + 1] + \
+                src->p_pixels[(2 * sy + 1) * src->i_pitch + 4 * sx + 1]) / 2; \
+            v = (1 + src->p_pixels[2 * sy * src->i_pitch + 4 * sx + 3] + \
+                src->p_pixels[(2 * sy + 1) * src->i_pitch + 4 * sx + 3]) / 2; \
+            dst->p_pixels[(y + 0) * dst->i_pitch + 2 * x + 1] = u; \
+            dst->p_pixels[(y + 0) * dst->i_pitch + 2 * x + 3] = v; \
+            dst->p_pixels[(y + 1) * dst->i_pitch + 2 * x + 1] = u; \
+            dst->p_pixels[(y + 1) * dst->i_pitch + 2 * x + 3] = v; \
+        } \
+    } \
 }
 
 PLANAR(HFlip)
@@ -177,10 +211,11 @@ typedef struct {
     void      (*plane8) (plane_t *dst, const plane_t *src);
     void      (*plane16)(plane_t *dst, const plane_t *src);
     void      (*plane32)(plane_t *dst, const plane_t *src);
+    void      (*yuyv)(plane_t *dst, const plane_t *src);
 } transform_description_t;
 
 #define DESC(str, rotated, f, invf) \
-    { str, rotated, f, invf, Plane8_##f, Plane16_##f, Plane32_##f }
+    { str, rotated, f, invf, Plane8_##f, Plane16_##f, Plane32_##f, YUYV_##f }
 
 static const transform_description_t descriptions[] = {
     DESC("90",            true,  R90,           R270),
@@ -311,8 +346,10 @@ static int Open(vlc_object_t *object)
     /* Deal with weird packed formats */
     switch (src->i_chroma) {
         case VLC_CODEC_YUYV:
-        case VLC_CODEC_UYVY:
         case VLC_CODEC_YVYU:
+            sys->plane = dsc->is_rotated ? dsc->yuyv : dsc->plane32;
+            break;
+        case VLC_CODEC_UYVY:
         case VLC_CODEC_VYUY:
             if (dsc->is_rotated) {
                 msg_Err(filter, "Format rotation not possible (chroma %4.4s)",
