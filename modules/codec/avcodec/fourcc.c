@@ -427,6 +427,10 @@ static const struct
     { VLC_CODEC_WMAL, CODEC_ID_WMALOSSLESS, AUDIO_ES },
 #endif
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 54, 10, 0 )
+    { VLC_CODEC_RALF, CODEC_ID_RALF, AUDIO_ES },
+#endif
+
 
     /* PCM */
     { VLC_CODEC_S8, CODEC_ID_PCM_S8, AUDIO_ES },
