@@ -1,4 +1,4 @@
-Changes between 2.0.0 and 2.1.0-git:
+Changes between 2.0.x and 2.1.0-git:
 --------------------------------
 
 3rd party libraries (contrib):
@@ -27,6 +27,91 @@ Interfaces:
 
 Removed modules:
  * portaudio audio output
+
+
+Changes between 2.0.0 and 2.0.1:
+--------------------------------
+
+Access:
+ * fix and improve the CDDB information retrieval
+ * fix the samba module compilation
+ * fix UDP / RTP multicast stream reception on Mac OS X when using the 10.7 SDK
+ * multiple fixes for HLS support, notably on Win32 and for encryption
+ * multiple fixes for Bluray discs playback
+ * fix for DVD decryption on some RPC-I drives
+
+Codecs:
+ * Support for MXPEG files
+ * limit auto-detected threads to 4 in avcodec module
+ * fix quicktime audio codecs in RTSP streams
+
+Demuxers:
+ * Fix multi-file splitted RAR archive support
+ * Fix a crash when seeking in mka
+ * Improve MKV multi-video tracks support
+
+Muxers:
+ * Fix ogm header creation
+
+Audio filters:
+ * limit spatializer filter distortions
+ * Use fastest SinC algorithm for samplerate module
+
+Audio output:
+ * Fix S/PDIF passthrough with ALSA.
+ * Remove flawed ALSA channels autodetection.
+   The available ALSA channels MUST be configured now (stereo by default).
+ * Fix delay when changing the volume on Mac OS X
+
+Video filters:
+ * Fix gradfun unloading on Windows platform
+
+Mac OS X interface:
+ * allow to hide the playlist to get a small controller window
+ * allow to hide the sidebar
+ * disable Lion fullscreen mode by default, since its behavior is misleading
+   - this fixes fullscreen video output on a secondary screen
+ * noticebly faster launch time
+ * correct a few visual glitches and accessibility support
+ * re-enable visual feedback on seek and volume changes
+ * improve track synchronization panel
+ * fix fontconfig cache dialog, closure of the interface and numerous crashes
+ * fix crop, aspect ratio handling, DVD (no menu) support and Open subtitle menu
+
+Qt interface:
+ * allow a native seek slider instead of the blue one
+ * fixes in the playlist, the addons dialog, the menus, the main toolbar
+   the open dialogs, preferences and customization dialogs
+ * fix for fontconfig cache dialog, when rebuilding ASS fonts
+
+Skins interface:
+ * fix for menus display
+ * Addition of $R to display current playback speed
+ * documentation update
+
+Web interface:
+ * fix mobiles display for remote control mode
+ * support for .drc and .3ga extensions
+
+Service discovery:
+ * fix SAP discovery, where an item was added multiple times
+ * fix SAP discovery on Mac OS X when using the 10.7 SDK
+ * Update Jamendo selections
+
+Miscellaneous:
+ * fix DBus crash
+ * fix build issues on BSD, Linux/PPC and Linux/Sparc
+ * fix a crash on VLM close
+
+Security:
+ * Update libpng to 1.5.9 (CVE-2011-3026)
+ * Update freetype to 2.4.9 (CVE-2012-1126 up to CVE-2012-1144)
+ * Fix MMS stack overflow (SA-1201)
+ * Fix RealRTSP heap overflow (SA-1202)
+
+Translations:
+ * Update of Czech, Spanish, Swedish, Turkish and Walloon translations
+
 
 Changes between 1.1.13 and 2.0.0:
 ---------------------------------
