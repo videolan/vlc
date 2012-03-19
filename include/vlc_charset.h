@@ -38,12 +38,6 @@ VLC_API int vlc_iconv_close( vlc_iconv_t );
 
 #include <stdarg.h>
 
-VLC_API void LocaleFree( const char * );
-VLC_API char * FromLocale( const char * ) VLC_USED;
-VLC_API char * FromLocaleDup( const char * ) VLC_USED;
-VLC_API char * ToLocale( const char * ) VLC_USED;
-VLC_API char * ToLocaleDup( const char * ) VLC_USED;
-
 VLC_API int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap );
 VLC_API int utf8_fprintf( FILE *, const char *, ... ) VLC_FORMAT( 2, 3 );
 VLC_API char * vlc_strcasestr(const char *, const char *) VLC_USED;
