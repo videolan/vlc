@@ -298,6 +298,8 @@
 #define VLC_CODEC_BD_LPCM   VLC_FOURCC('b','p','c','m')
 #define VLC_CODEC_SDDS      VLC_FOURCC('s','d','d','s')
 #define VLC_CODEC_MIDI      VLC_FOURCC('M','I','D','I')
+#define VLC_CODEC_RALF      VLC_FOURCC('R','A','L','F')
+
 #define VLC_CODEC_S8        VLC_FOURCC('s','8',' ',' ')
 #define VLC_CODEC_U8        VLC_FOURCC('u','8',' ',' ')
 #define VLC_CODEC_S16L      VLC_FOURCC('s','1','6','l')

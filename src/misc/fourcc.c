@@ -1189,6 +1189,9 @@ static const entry_t p_list_audio[] = {
     B(VLC_CODEC_MIDI, "MIDI Audio"),
         A("MIDI"),
 
+    B(VLC_CODEC_RALF, "RealAudio Lossless"),
+        A("LSD:"),
+
     /* PCM */
     B(VLC_CODEC_S8, "PCM S8"),
         A("s8  "),
