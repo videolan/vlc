@@ -28,7 +28,6 @@
 #include <vlc_common.h>
 
 #include "../libvlc.h"
-#include <vlc_charset.h>
 #include "config/configuration.h"
 
 #include <unistd.h>
@@ -87,7 +86,7 @@ static char *config_GetHomeDir (void)
     if (!home)
         return NULL;
 
-    return FromLocaleDup (home);
+    return strdup (home);
 }
 
 static char *config_GetAppDir (const char *xdg_name, const char *xdg_default)
@@ -98,16 +97,15 @@ static char *config_GetAppDir (const char *xdg_name, const char *xdg_default)
     /* XDG Base Directory Specification - Version 0.6 */
     snprintf (var, sizeof (var), "XDG_%s_HOME", xdg_name);
 
-    char *psz_home = FromLocale (getenv (var));
-    if( psz_home )
+    const char *home = getenv (var);
+    if (home != NULL)
     {
-        if( asprintf( &psz_dir, "%s/vlc", psz_home ) == -1 )
+        if (asprintf (&psz_dir, "%s/vlc", home) == -1)
             psz_dir = NULL;
-        LocaleFree (psz_home);
         return psz_dir;
     }
 
-    psz_home = config_GetHomeDir ();
+    char *psz_home = config_GetHomeDir ();
     if( psz_home == NULL
      || asprintf( &psz_dir, "%s/%s/vlc", psz_home, xdg_default ) == -1 )
         psz_dir = NULL;
@@ -215,9 +213,7 @@ static char *config_GetTypeDir (const char *xdg_name)
             path = strdup (home);
     }
 
-    char *ret = FromLocaleDup (path);
-    free (path);
-    return ret;
+    return path;
 }
 
 

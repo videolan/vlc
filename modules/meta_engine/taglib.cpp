@@ -31,7 +31,6 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>              /* demux_meta_t */
 #include <vlc_strings.h>            /* vlc_b64_decode_binary */
-#include <vlc_charset.h>            /* ToLocale, LocaleFree */
 #include <vlc_input.h>              /* for attachment_new */
 
 #ifdef WIN32
@@ -458,14 +457,7 @@ static int ReadMeta( vlc_object_t* p_this)
     f = FileRef( wpath );
     free( wpath );
 #else
-    const char* local_name = ToLocale( psz_path );
-    if( !local_name )
-    {
-        free( psz_path );
-        return VLC_EGENERIC;
-    }
-    f = FileRef( local_name );
-    LocaleFree( local_name );
+    f = FileRef( psz_path );
 #endif
     free( psz_path );
 
@@ -687,11 +679,7 @@ static int WriteMeta( vlc_object_t *p_this )
     f = FileRef( wpath );
     free( wpath );
 #else
-    const char* local_name = ToLocale( p_export->psz_file );
-    if( !local_name )
-        return VLC_EGENERIC;
-    f = FileRef( local_name );
-    LocaleFree( local_name );
+    f = FileRef( p_export->psz_file );
 #endif
 
     if( f.isNull() || !f.tag() || f.file()->readOnly() )

@@ -31,7 +31,6 @@
 #include <vlc_common.h>
 
 #include "../libvlc.h"
-#include <vlc_charset.h>
 #include <vlc_configuration.h>
 #include "config/configuration.h"
 
@@ -139,7 +138,7 @@ static char *config_GetHomeDir (void)
     if (home == NULL)
         home = "/tmp";
 
-    return FromLocaleDup (home);
+    return strdup (home);
 }
 
 static char *getAppDependentDir(vlc_userdir_t type)

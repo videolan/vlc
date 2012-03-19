@@ -42,7 +42,6 @@
 #include <sys/socket.h>
 
 #include <vlc_common.h>
-#include <vlc_charset.h>
 #include <vlc_fs.h>
 #include "libvlc.h" /* vlc_mkdir */
 
@@ -69,19 +68,9 @@ int vlc_open (const char *filename, int flags, ...)
     flags |= O_CLOEXEC;
 #endif
 
-    const char *local_name = ToLocale (filename);
-
-    if (local_name == NULL)
-    {
-        errno = ENOENT;
-        return -1;
-    }
-
-    int fd = open (local_name, flags, mode);
+    int fd = open (filename, flags, mode);
     if (fd != -1)
         fcntl (fd, F_SETFD, FD_CLOEXEC);
-
-    LocaleFree (local_name);
     return fd;
 }
 
@@ -109,15 +98,8 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
     flags |= O_CLOEXEC;
 #endif
 
-    const char *local_name = ToLocale (filename);
-    if (local_name == NULL)
-    {
-        errno = ENOENT;
-        return -1;
-    }
-
 #ifdef HAVE_OPENAT
-    int fd = openat (dir, local_name, flags, mode);
+    int fd = openat (dir, filename, flags, mode);
     if (fd != -1)
         fcntl (fd, F_SETFD, FD_CLOEXEC);
 #else
@@ -125,8 +107,6 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
     errno = ENOSYS;
     (void) mode;
 #endif
-
-    LocaleFree (local_name);
     return fd;
 }
 
@@ -141,16 +121,7 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
  */
 int vlc_mkdir (const char *dirname, mode_t mode)
 {
-    char *locname = ToLocale (dirname);
-    if (unlikely(locname == NULL))
-    {
-        errno = ENOENT;
-        return -1;
-    }
-
-    int res = mkdir (locname, mode);
-    LocaleFree (locname);
-    return res;
+    return mkdir (dirname, mode);
 }
 
 /**
@@ -221,28 +192,9 @@ char *vlc_readdir( DIR *dir )
     if (val != 0)
         errno = val;
     else if (ent != NULL)
-#ifndef __APPLE__
-        path = FromLocaleDup (ent->d_name);
-#else
-        path = FromCharset ("UTF-8-MAC", ent->d_name, strlen (ent->d_name));
-#endif
+        path = strdup (ent->d_name);
     free (buf);
     return path;
-}
-
-static int vlc_statEx (const char *filename, struct stat *buf, bool deref)
-{
-    const char *local_name = ToLocale (filename);
-    if (unlikely(local_name == NULL))
-    {
-        errno = ENOENT;
-        return -1;
-    }
-
-    int res = deref ? stat (local_name, buf)
-                    : lstat (local_name, buf);
-    LocaleFree (local_name);
-    return res;
 }
 
 /**
@@ -253,7 +205,7 @@ static int vlc_statEx (const char *filename, struct stat *buf, bool deref)
  */
 int vlc_stat (const char *filename, struct stat *buf)
 {
-    return vlc_statEx (filename, buf, true);
+    return stat (filename, buf);
 }
 
 /**
@@ -264,7 +216,7 @@ int vlc_stat (const char *filename, struct stat *buf)
  */
 int vlc_lstat (const char *filename, struct stat *buf)
 {
-    return vlc_statEx (filename, buf, false);
+    return lstat (filename, buf);
 }
 
 /**
@@ -276,16 +228,7 @@ int vlc_lstat (const char *filename, struct stat *buf)
  */
 int vlc_unlink (const char *filename)
 {
-    const char *local_name = ToLocale (filename);
-    if (unlikely(local_name == NULL))
-    {
-        errno = ENOENT;
-        return -1;
-    }
-
-    int ret = unlink (local_name);
-    LocaleFree (local_name);
-    return ret;
+    return unlink (filename);
 }
 
 /**
@@ -298,23 +241,7 @@ int vlc_unlink (const char *filename)
  */
 int vlc_rename (const char *oldpath, const char *newpath)
 {
-    const char *lo = ToLocale (oldpath);
-    if (lo == NULL)
-        goto error;
-
-    const char *ln = ToLocale (newpath);
-    if (ln == NULL)
-    {
-        LocaleFree (lo);
-error:
-        errno = ENOENT;
-        return -1;
-    }
-
-    int ret = rename (lo, ln);
-    LocaleFree (lo);
-    LocaleFree (ln);
-    return ret;
+    return rename (oldpath, newpath);
 }
 
 /**
@@ -333,7 +260,7 @@ char *vlc_getcwd (void)
         /* Make sure $PWD is correct */
         if (stat (pwd, &s1) == 0 && stat (".", &s2) == 0
          && s1.st_dev == s2.st_dev && s1.st_ino == s2.st_ino)
-            return ToLocaleDup (pwd);
+            return strdup (pwd);
     }
 
     /* Otherwise iterate getcwd() until the buffer is big enough */
@@ -347,15 +274,7 @@ char *vlc_getcwd (void)
             break;
 
         if (getcwd (buf, size) != NULL)
-#ifdef ASSUME_UTF8
             return buf;
-#else
-        {
-            char *ret = ToLocaleDup (buf);
-            free (buf);
-            return ret; /* success */
-        }
-#endif
         free (buf);
 
         if (errno != ERANGE)

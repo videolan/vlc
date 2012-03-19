@@ -35,8 +35,6 @@
 
 #include <libgnomevfs/gnome-vfs.h>
 
-
-#include <vlc_charset.h>
 #include <vlc_url.h>
 
 /*****************************************************************************
@@ -87,7 +85,6 @@ static int Open( vlc_object_t *p_this )
     access_t       *p_access = (access_t*)p_this;
     access_sys_t   *p_sys = NULL;
     char           *psz_name = NULL;
-    char           *psz = NULL;
     char           *psz_uri = NULL;
     char           *psz_unescaped = NULL;
     char           *psz_expand_tilde = NULL;
@@ -121,9 +118,7 @@ static int Open( vlc_object_t *p_this )
     {
         psz_name = strdup( p_access->psz_location );
     }
-    psz = ToLocale( psz_name );
-    psz_expand_tilde = gnome_vfs_expand_initial_tilde( psz );
-    LocaleFree( psz );
+    psz_expand_tilde = gnome_vfs_expand_initial_tilde( psz_name );
 
     psz_unescaped = gnome_vfs_make_uri_from_shell_arg( psz_expand_tilde );
 

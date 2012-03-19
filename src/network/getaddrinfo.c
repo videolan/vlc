@@ -27,7 +27,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_charset.h>
 
 #include <stddef.h> /* size_t */
 #include <string.h> /* strlen(), memcpy(), memset(), strchr() */
@@ -157,7 +156,6 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     }
 
     int ret;
-    node = ToLocale (node);
 #ifdef WIN32
     /*
      * Winsock tries to resolve numerical IPv4 addresses as AAAA
@@ -186,6 +184,5 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
 #if defined(AI_IDN) || defined(WIN32)
 out:
 #endif
-    LocaleFree (node);
     return ret;
 }
