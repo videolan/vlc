@@ -57,13 +57,13 @@ VLC_API void * ToCharset( const char *charset, const char *in, size_t *outsize )
 
 #else
 VLC_USED
-static inline const char *FromLocale (const char *locale)
+static inline char *FromLocale (const char *locale)
 {
     return locale ? FromCharset ("", locale, strlen (locale)) : NULL;
 }
 
 VLC_USED
-static inline const char *ToLocale (const char *utf8)
+static inline char *ToLocale (const char *utf8)
 {
     size_t outsize;
     return utf8 ? (char *)ToCharset ("", utf8, &outsize) : (char *)NULL;
