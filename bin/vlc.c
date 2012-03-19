@@ -50,9 +50,6 @@
 #endif
 
 
-/* Explicit HACK */
-extern void LocaleFree (const char *);
-extern char *FromLocale (const char *);
 extern void vlc_enable_override (void);
 
 static bool signal_ignored (int signum)
@@ -173,28 +170,14 @@ int main( int i_argc, const char *ppsz_argv[] )
     /* Block all these signals */
     pthread_sigmask (SIG_SETMASK, &set, NULL);
 
-    /* Note that FromLocale() can be used before libvlc is initialized */
     const char *argv[i_argc + 3];
     int argc = 0;
 
     argv[argc++] = "--no-ignore-config";
     argv[argc++] = "--media-library";
 #ifdef TOP_SRCDIR
-    argv[argc++] = FromLocale ("--data-path="TOP_SRCDIR"/share");
+    argv[argc++] = "--data-path="TOP_SRCDIR"/share";
 #endif
-
-    int i = 1;
-#ifdef __APPLE__
-    /* When VLC.app is run by double clicking in Mac OS X, the 2nd arg
-     * is the PSN - process serial number (a unique PID-ish thingie)
-     * still ok for real Darwin & when run from command line
-     * for example -psn_0_9306113 */
-    if(i_argc >= 2 && !strncmp( ppsz_argv[1] , "-psn" , 4 ))
-        i = 2;
-#endif
-    for (; i < i_argc; i++)
-        if ((argv[argc++] = FromLocale (ppsz_argv[i])) == NULL)
-            return 1; // BOOM!
     argv[argc] = NULL;
 
     vlc_enable_override ();
@@ -249,8 +232,6 @@ int main( int i_argc, const char *ppsz_argv[] )
 out:
     if (vlc != NULL)
         libvlc_release (vlc);
-    for (int i = 2; i < argc; i++)
-        LocaleFree (argv[i]);
 
     return 0;
 }
