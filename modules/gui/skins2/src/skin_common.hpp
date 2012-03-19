@@ -70,7 +70,7 @@ typedef void* vlc_wnd_type;
 /// Wrapper around FromLocale, to avoid the need to call LocaleFree()
 static inline string sFromLocale( const string &rLocale )
 {
-    char *s = FromLocale( rLocale.c_str() );
+    const char *s = FromLocale( rLocale.c_str() );
     string res = s;
     LocaleFree( s );
     return res;
@@ -90,7 +90,7 @@ static inline string sFromWide( const wstring &rWide )
 /// Wrapper around ToLocale, to avoid the need to call LocaleFree()
 static inline string sToLocale( const string &rUTF8 )
 {
-    char *s = ToLocale( rUTF8.c_str() );
+    const char *s = ToLocale( rUTF8.c_str() );
     string res = s;
     LocaleFree( s );
     return res;
