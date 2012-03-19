@@ -66,7 +66,7 @@ VLC_USED
 static inline const char *ToLocale (const char *utf8)
 {
     size_t outsize;
-    return utf8 ? ToCharset ("", utf8, &outsize) : NULL;
+    return utf8 ? (char *)ToCharset ("", utf8, &outsize) : (char *)NULL;
 }
 # define LocaleFree(s) free((char *)(s))
 # define FromLocaleDup FromLocale
