@@ -27,7 +27,6 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_dialog.h>
-#include <vlc_charset.h>
 
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
@@ -117,11 +116,8 @@ static int Open (vlc_object_t *p_this)
     char *font_path = var_InheritString (p_this, "soundfont");
     if (font_path != NULL)
     {
-        const char *lpath = ToLocale (font_path);
-
         msg_Dbg (p_this, "loading sound fonts file %s", font_path);
         p_sys->soundfont = fluid_synth_sfload (p_sys->synth, font_path, 1);
-        LocaleFree (lpath);
         if (p_sys->soundfont == -1)
             msg_Err (p_this, "cannot load sound fonts file %s", font_path);
         free (font_path);
