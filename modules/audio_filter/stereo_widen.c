@@ -52,30 +52,30 @@ struct filter_sys_t
                          * allocate buffer, then dont free it twice */
 };
 
-#define HELP_TEXT N_("This filter enhances stereo effect by \
-            suppressing mono,i.e. signal common to both channels, \
-            and by delaying the signal of left into right and vice versa \
-            thereby widening stereo effect")
+#define HELP_TEXT N_("This filter enhances the stereo effect by "\
+            "suppressing mono (signal common to both channels) "\
+            "and by delaying the signal of left into right and vice versa, "\
+            "thereby widening the stereo effect.")
 #define DELAY_TEXT N_("Delay time")
-#define DELAY_LONGTEXT N_("Time in ms of the delay of left signal into right \
-            and vice versa.")
-#define FEEDBACK_TEXT N_("Feedback Gain")
-#define FEEDBACK_LONGTEXT N_("Amount of gain in delayed left signal into \
-            right and vice versa. Gives a delay effect of left signal in \
-            right output and vice versa which gives widening effect")
+#define DELAY_LONGTEXT N_("Time in ms of the delay of left signal into right "\
+            "and vice versa.")
+#define FEEDBACK_TEXT N_("Feedback gain")
+#define FEEDBACK_LONGTEXT N_("Amount of gain in delayed left signal into "\
+            "right and vice versa. Gives a delay effect of left signal in "\
+            "right output and vice versa which gives widening effect.")
 #define CROSSFEED_TEXT N_("Crossfeed")
-#define CROSSFEED_LONGTEXT N_("Cross feed of left into right with inverted \
-            phase. This helps in suppression of mono. If its value is 1 it \
-            cancels all the signal common to both channels")
-#define DRYMIX_TEXT N_("Dry Mix")
-#define DRYMIX_LONGTEXT N_("Level of input signal of original channel")
+#define CROSSFEED_LONGTEXT N_("Cross feed of left into right with inverted "\
+            "phase. This helps in suppressing the mono. If the value is 1 it "\
+            "will cancel all the signal common to both channels.")
+#define DRYMIX_TEXT N_("Dry mix")
+#define DRYMIX_LONGTEXT N_("Level of input signal of original channel.")
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
-    set_shortname( N_("stereo_widen") )
-    set_description( N_("Stereo Enhancer") )
+    set_shortname( N_("Stereo Enhancer") )
+    set_description( N_("Simple stereo widening effect") )
     set_help( HELP_TEXT )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
