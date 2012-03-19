@@ -56,7 +56,7 @@ vlc_module_begin ()
         set_description( N_("M3U8 playlist export") )
         add_shortcut( "export-m3u8" )
         set_capability( "playlist export" , 0 )
-        set_callbacks( Export_M3U , NULL )
+        set_callbacks( Export_M3U8, NULL )
 
     add_submodule ()
         set_description( N_("XSPF playlist export") )
