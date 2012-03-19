@@ -162,15 +162,17 @@ int vlc_mkdir (const char *dirname, mode_t mode)
  */
 DIR *vlc_opendir (const char *dirname)
 {
-    const char *local_name = ToLocale (dirname);
-    if (unlikely(local_name == NULL))
-    {
-        errno = ENOENT;
+#ifdef O_DIRECTORY
+    int fd = vlc_open (dirname, O_RDONLY | O_DIRECTORY);
+#else /* If O_DIRECTORY is missing. fdopendir() will deal with ENOTDIR. */
+    int fd = vlc_open (dirname, O_RDONLY);
+#endif
+    if (fd == -1)
         return NULL;
-    }
 
-    DIR *dir = opendir (local_name);
-    LocaleFree (local_name);
+    DIR *dir = fdopendir (fd);
+    if (dir == NULL)
+        close (fd);
     return dir;
 }
 
