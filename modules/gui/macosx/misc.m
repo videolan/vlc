@@ -31,6 +31,7 @@
 #import "misc.h"
 #import "playlist.h"
 #import "controls.h"
+#import "CoreInteraction.h"
 #import <vlc_url.h>
 
 /*****************************************************************************
@@ -367,6 +368,11 @@ static NSMutableArray *blackoutWindows = NULL;
 - (BOOL)isFullscreen
 {
     return b_isFullscreen;
+}
+
+- (IBAction)fullscreen:(id)sender
+{
+    [[VLCCoreInteraction sharedInstance] toggleFullscreen];
 }
 
 @end
