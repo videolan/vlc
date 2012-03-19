@@ -316,7 +316,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
             uint32_t p_priv[ 64 ];
             struct md5_s md5;
 
-            if( i_len < 64 )
+            if( i_len < 64 || p_drms->p_name == NULL )
             {
                 i_ret = -2;
                 break;
