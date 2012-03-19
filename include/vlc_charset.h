@@ -51,7 +51,33 @@ VLC_API char * vlc_strcasestr(const char *, const char *) VLC_USED;
 VLC_API char * EnsureUTF8( char * );
 VLC_API const char * IsUTF8( const char * ) VLC_USED;
 
-#ifdef WIN32
+VLC_API char * FromCharset( const char *charset, const void *data, size_t data_size ) VLC_USED;
+VLC_API void * ToCharset( const char *charset, const char *in, size_t *outsize ) VLC_USED;
+
+#ifndef WIN32
+# define FromLocale(l) (l)
+# define ToLocale(u)   (u)
+# define LocaleFree(s) ((void)(s))
+# define FromLocaleDup strdup
+# define ToLocaleDup   strdup
+
+#else
+VLC_USED
+static inline const char *FromLocale (const char *locale)
+{
+    return locale ? FromCharset ("", locale, strlen (locale)) : NULL;
+}
+
+VLC_USED
+static inline const char *ToLocale (const char *utf8)
+{
+    size_t outsize;
+    return utf8 ? ToCharset ("", utf8, &outsize) : NULL;
+}
+# define LocaleFree(s) free((char *)(s))
+# define FromLocaleDup FromLocale
+# define ToLocaleDup   ToLocale
+
 VLC_USED
 static inline char *FromWide (const wchar_t *wide)
 {
@@ -115,9 +141,6 @@ static inline char *FromLatin1 (const char *latin)
     utf8 = (char *)realloc (str, utf8 - str);
     return utf8 ? utf8 : str;
 }
-
-VLC_API char * FromCharset( const char *charset, const void *data, size_t data_size ) VLC_USED;
-VLC_API void * ToCharset( const char *charset, const char *in, size_t *outsize ) VLC_USED;
 
 VLC_API double us_strtod( const char *, char ** ) VLC_USED;
 VLC_API float us_strtof( const char *, char ** ) VLC_USED;

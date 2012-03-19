@@ -763,20 +763,6 @@ fi
 AM_CONDITIONAL(HAVE_MINIZIP, [ test "${have_minizip}" = "yes" ])
 
 
-dnl Manual switch for UTF-8
-AC_ARG_ENABLE(non-utf8,
-  [AS_HELP_STRING([--enable-non-utf8],
-    [support legacy non-UTF-8 systems (default disabled)])],, [
-  AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce" -o "${SYS}" = "os2"], [
-    enable_non_utf8="no"
-  ])
-])
-AS_IF([test "${enable_non_utf8}" != "no"], [
-  AC_DEFINE([ASSUME_UTF8], [1],
-            [Define to 1 if the operating system uses UTF-8 internally])
-])
-
-
 dnl Check for dbus
 AC_ARG_ENABLE(dbus,
   [AS_HELP_STRING([--enable-dbus],

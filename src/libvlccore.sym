@@ -144,8 +144,6 @@ filter_chain_VideoFlush
 filter_ConfigureBlend
 filter_DeleteBlend
 filter_NewBlend
-FromLocale
-FromLocaleDup
 FromCharset
 GetLang_1
 GetLang_2B
@@ -240,7 +238,6 @@ libvlc_InternalInit
 libvlc_InternalWait
 libvlc_Quit
 libvlc_SetExitHandler
-LocaleFree
 make_URI
 make_path
 mdate
@@ -437,8 +434,6 @@ subpicture_region_New
 vlc_tls_ClientCreate
 vlc_tls_ClientDelete
 ToCharset
-ToLocale
-ToLocaleDup
 update_Check
 update_Delete
 update_Download
