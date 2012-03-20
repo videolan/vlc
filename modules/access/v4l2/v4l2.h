@@ -110,8 +110,9 @@ struct buffer_t
 
 /* video.c */
 void ParseMRL(vlc_object_t *, const char *);
+int SetupInput (vlc_object_t *, int fd);
+int InitMmap (vlc_object_t *, demux_sys_t *, int);
 block_t* GrabVideo(vlc_object_t *, demux_sys_t *);
-int InitVideo(vlc_object_t *, int fd, demux_sys_t *, bool demux);
 
 /* demux.c */
 int DemuxOpen(vlc_object_t *);

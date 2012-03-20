@@ -27,7 +27,9 @@
 # include "config.h"
 #endif
 
+#include <math.h>
 #include <errno.h>
+#include <assert.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -41,6 +43,7 @@
 
 static int DemuxControl( demux_t *, int, va_list );
 static int Demux( demux_t * );
+static int InitVideo (demux_t *, int);
 
 int DemuxOpen( vlc_object_t *obj )
 {
@@ -75,7 +78,7 @@ int DemuxOpen( vlc_object_t *obj )
         fd = rawfd;
     }
 
-    if (InitVideo (obj, fd, sys, true))
+    if (InitVideo (demux, fd))
     {
         v4l2_close (fd);
         goto error;
@@ -91,6 +94,455 @@ int DemuxOpen( vlc_object_t *obj )
 error:
     free (sys);
     return VLC_EGENERIC;
+}
+
+/**
+ * \return true if the specified V4L2 pixel format is
+ * in the array of supported formats returned by the driver
+ */
+static bool IsPixelFormatSupported( struct v4l2_fmtdesc *codecs, size_t n,
+                                    unsigned int i_pixelformat )
+{
+    for( size_t i = 0; i < n; i++ )
+        if( codecs[i].pixelformat == i_pixelformat )
+            return true;
+    return false;
+}
+
+static const struct
+{
+    unsigned int i_v4l2;
+    vlc_fourcc_t i_fourcc;
+    int i_rmask;
+    int i_gmask;
+    int i_bmask;
+} v4l2chroma_to_fourcc[] =
+{
+    /* Raw data types */
+    { V4L2_PIX_FMT_GREY,    VLC_CODEC_GREY, 0, 0, 0 },
+    { V4L2_PIX_FMT_HI240,   VLC_FOURCC('I','2','4','0'), 0, 0, 0 },
+    { V4L2_PIX_FMT_RGB555,  VLC_CODEC_RGB15, 0x001f,0x03e0,0x7c00 },
+    { V4L2_PIX_FMT_RGB565,  VLC_CODEC_RGB16, 0x001f,0x07e0,0xf800 },
+    /* Won't work since we don't know how to handle such gmask values
+     * correctly
+    { V4L2_PIX_FMT_RGB555X, VLC_CODEC_RGB15, 0x007c,0xe003,0x1f00 },
+    { V4L2_PIX_FMT_RGB565X, VLC_CODEC_RGB16, 0x00f8,0xe007,0x1f00 },
+    */
+    { V4L2_PIX_FMT_BGR24,   VLC_CODEC_RGB24, 0xff0000,0xff00,0xff },
+    { V4L2_PIX_FMT_RGB24,   VLC_CODEC_RGB24, 0xff,0xff00,0xff0000 },
+    { V4L2_PIX_FMT_BGR32,   VLC_CODEC_RGB32, 0xff0000,0xff00,0xff },
+    { V4L2_PIX_FMT_RGB32,   VLC_CODEC_RGB32, 0xff,0xff00,0xff0000 },
+    { V4L2_PIX_FMT_YUYV,    VLC_CODEC_YUYV, 0, 0, 0 },
+    { V4L2_PIX_FMT_UYVY,    VLC_CODEC_UYVY, 0, 0, 0 },
+    { V4L2_PIX_FMT_Y41P,    VLC_FOURCC('I','4','1','N'), 0, 0, 0 },
+    { V4L2_PIX_FMT_YUV422P, VLC_CODEC_I422, 0, 0, 0 },
+    { V4L2_PIX_FMT_YVU420,  VLC_CODEC_YV12, 0, 0, 0 },
+    { V4L2_PIX_FMT_YUV411P, VLC_CODEC_I411, 0, 0, 0 },
+    { V4L2_PIX_FMT_YUV410,  VLC_CODEC_I410, 0, 0, 0 },
+
+    /* Raw data types, not in V4L2 spec but still in videodev2.h and supported
+     * by VLC */
+    { V4L2_PIX_FMT_YUV420,  VLC_CODEC_I420, 0, 0, 0 },
+    /* FIXME { V4L2_PIX_FMT_RGB444,  VLC_CODEC_RGB32 }, */
+
+    /* Compressed data types */
+    { V4L2_PIX_FMT_MJPEG,   VLC_CODEC_MJPG, 0, 0, 0 },
+    { V4L2_PIX_FMT_JPEG,    VLC_CODEC_JPEG, 0, 0, 0 },
+#if 0
+    { V4L2_PIX_FMT_DV,      VLC_FOURCC('?','?','?','?') },
+    { V4L2_PIX_FMT_MPEG,    VLC_FOURCC('?','?','?','?') },
+#endif
+    { 0, 0, 0, 0, 0 }
+};
+
+/**
+ * List of V4L2 chromas were confident enough to use as fallbacks if the
+ * user hasn't provided a --v4l2-chroma value.
+ *
+ * Try YUV chromas first, then RGB little endian and MJPEG as last resort.
+ */
+static const uint32_t p_chroma_fallbacks[] =
+{ V4L2_PIX_FMT_YUV420, V4L2_PIX_FMT_YVU420, V4L2_PIX_FMT_YUV422P,
+  V4L2_PIX_FMT_YUYV, V4L2_PIX_FMT_UYVY, V4L2_PIX_FMT_BGR24,
+  V4L2_PIX_FMT_BGR32, V4L2_PIX_FMT_MJPEG, V4L2_PIX_FMT_JPEG };
+
+static int InitVideo (demux_t *demux, int fd)
+{
+    demux_sys_t *sys = demux->p_sys;
+    unsigned int i_min;
+    enum v4l2_buf_type buf_type;
+
+    /* Get device capabilites */
+    struct v4l2_capability cap;
+    if (v4l2_ioctl (fd, VIDIOC_QUERYCAP, &cap) < 0)
+    {
+        msg_Err (demux, "cannot get device capabilities: %m");
+        return -1;
+    }
+
+    msg_Dbg (demux, "device %s using driver %s (version %u.%u.%u) on %s",
+            cap.card, cap.driver, (cap.version >> 16) & 0xFF,
+            (cap.version >> 8) & 0xFF, cap.version & 0xFF, cap.bus_info);
+    msg_Dbg (demux, "the device has the capabilities: 0x%08X",
+             cap.capabilities );
+    msg_Dbg (demux, " (%c) Video Capture, (%c) Audio, (%c) Tuner, (%c) Radio",
+             (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE ? 'X' : ' '),
+             (cap.capabilities & V4L2_CAP_AUDIO ? 'X' : ' '),
+             (cap.capabilities & V4L2_CAP_TUNER ? 'X' : ' '),
+             (cap.capabilities & V4L2_CAP_RADIO ? 'X' : ' '));
+    msg_Dbg (demux, " (%c) Read/Write, (%c) Streaming, (%c) Asynchronous",
+             (cap.capabilities & V4L2_CAP_READWRITE ? 'X' : ' '),
+             (cap.capabilities & V4L2_CAP_STREAMING ? 'X' : ' '),
+             (cap.capabilities & V4L2_CAP_ASYNCIO ? 'X' : ' '));
+
+    if (!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE))
+    {
+        msg_Err (demux, "not a video capture device");
+        return -1;
+    }
+
+    if (cap.capabilities & V4L2_CAP_STREAMING)
+        sys->io = IO_METHOD_MMAP;
+    else if (cap.capabilities & V4L2_CAP_READWRITE)
+        sys->io = IO_METHOD_READ;
+    else
+    {
+        msg_Err (demux, "no supported I/O method");
+        return -1;
+    }
+
+    if (SetupInput (VLC_OBJECT(demux), fd))
+        return -1;
+
+    /* Probe for available chromas */
+    struct v4l2_fmtdesc *codecs = NULL;
+    uint_fast32_t ncodec = 0;
+    if (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE)
+    {
+        struct v4l2_fmtdesc codec = {
+            .index = 0,
+            .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
+        };
+
+        while (v4l2_ioctl (fd, VIDIOC_ENUM_FMT, &codec) >= 0)
+            codec.index = ++ncodec;
+
+        codecs = malloc (ncodec * sizeof (*codecs));
+        if (unlikely(codecs == NULL))
+            ncodec = 0;
+
+        for (uint_fast32_t i = 0; i < ncodec; i++)
+        {
+            codecs[i].index = i;
+            codecs[i].type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+            if (v4l2_ioctl (fd, VIDIOC_ENUM_FMT, &codecs[i]) < 0)
+            {
+                msg_Err (demux, "cannot get codec description: %m");
+                goto error;
+            }
+
+            /* only print if vlc supports the format */
+            char fourcc_v4l2[5];
+            memset (fourcc_v4l2, 0, sizeof (fourcc_v4l2));
+            vlc_fourcc_to_char (codecs[i].pixelformat, fourcc_v4l2);
+
+            bool b_codec_supported = false;
+            for (unsigned j = 0; v4l2chroma_to_fourcc[j].i_v4l2 != 0; j++)
+            {
+                if (v4l2chroma_to_fourcc[j].i_v4l2 == codecs[i].pixelformat)
+                {
+                    char fourcc[5];
+                    memset (fourcc, 0, sizeof (fourcc));
+                    vlc_fourcc_to_char (v4l2chroma_to_fourcc[j].i_fourcc,
+                                        fourcc);
+                    msg_Dbg (demux, "device supports chroma %4.4s [%s, %s]",
+                             fourcc, codecs[i].description, fourcc_v4l2);
+                    b_codec_supported = true;
+                }
+            }
+            if (!b_codec_supported)
+                msg_Dbg (demux, "device codec %4.4s (%s) not supported",
+                         fourcc_v4l2, codecs[i].description);
+        }
+    }
+
+    /* TODO: Move the resolution stuff up here */
+    sys->controls = ControlsInit (VLC_OBJECT(demux), fd);
+
+    /* Try and find default resolution if not specified */
+    struct v4l2_format fmt = { .type = V4L2_BUF_TYPE_VIDEO_CAPTURE };
+    int width = var_InheritInteger (demux, CFG_PREFIX"width");
+    int height = var_InheritInteger (demux, CFG_PREFIX"height");
+
+    if (width <= 0 || height <= 0)
+    {
+        /* Use current width and height settings */
+        if (v4l2_ioctl (fd, VIDIOC_G_FMT, &fmt) < 0)
+        {
+            msg_Err (demux, "cannot get default width and height: %m" );
+            goto error;
+        }
+
+        msg_Dbg (demux, "found default width and height of %ux%u",
+                 fmt.fmt.pix.width, fmt.fmt.pix.height);
+
+        if (width < 0 || height < 0)
+            msg_Dbg (demux, "will try to find optimal width and height" );
+    }
+    else
+    {
+        /* Use user specified width and height */
+        msg_Dbg (demux, "trying specified size %dx%d", width, height);
+        fmt.fmt.pix.width = width;
+        fmt.fmt.pix.height = height;
+    }
+
+    /* Test and set Chroma */
+    fmt.fmt.pix.field = V4L2_FIELD_NONE;
+    fmt.fmt.pix.pixelformat = 0;
+
+    float fps;
+
+    char *reqchroma = var_InheritString (demux, CFG_PREFIX"chroma");
+    if (reqchroma != NULL)
+    {
+        /* User specified chroma */
+        const vlc_fourcc_t i_requested_fourcc =
+            vlc_fourcc_GetCodecFromString( VIDEO_ES, reqchroma );
+
+        for (int i = 0; v4l2chroma_to_fourcc[i].i_v4l2 != 0; i++)
+            if (v4l2chroma_to_fourcc[i].i_fourcc == i_requested_fourcc)
+            {
+                fmt.fmt.pix.pixelformat = v4l2chroma_to_fourcc[i].i_v4l2;
+                break;
+            }
+
+        /* Try and set user chroma */
+        bool b_error = !IsPixelFormatSupported (codecs, ncodec,
+                                                fmt.fmt.pix.pixelformat);
+        if (!b_error && fmt.fmt.pix.pixelformat)
+        {
+            if (v4l2_ioctl (fd, VIDIOC_S_FMT, &fmt) < 0)
+            {
+                fmt.fmt.pix.field = V4L2_FIELD_ANY;
+                if (v4l2_ioctl (fd, VIDIOC_S_FMT, &fmt) < 0)
+                {
+                    fmt.fmt.pix.field = V4L2_FIELD_NONE;
+                    b_error = true;
+                }
+            }
+        }
+        if (b_error)
+        {
+            msg_Warn (demux, "requested chroma %s not supported. "
+                      " Trying default.", reqchroma);
+            fmt.fmt.pix.pixelformat = 0;
+        }
+        free (reqchroma);
+    }
+
+    /* If no user specified chroma, find best */
+    /* This also decides if MPEG encoder card or not */
+    if (!fmt.fmt.pix.pixelformat)
+    {
+        unsigned int i;
+        for (i = 0; i < ARRAY_SIZE(p_chroma_fallbacks); i++)
+        {
+            fmt.fmt.pix.pixelformat = p_chroma_fallbacks[i];
+            if (IsPixelFormatSupported (codecs, ncodec,
+                                        fmt.fmt.pix.pixelformat))
+            {
+                if (v4l2_ioctl (fd, VIDIOC_S_FMT, &fmt) >= 0)
+                    break;
+                fmt.fmt.pix.field = V4L2_FIELD_ANY;
+                if (v4l2_ioctl (fd, VIDIOC_S_FMT, &fmt) >= 0)
+                    break;
+                fmt.fmt.pix.field = V4L2_FIELD_NONE;
+            }
+        }
+        if (i == ARRAY_SIZE(p_chroma_fallbacks))
+        {
+            msg_Warn (demux, "Could not select any of the default chromas; attempting to open as MPEG encoder card (access)");
+            goto error;
+        }
+    }
+    free (codecs);
+
+    if (width < 0 || height < 0)
+    {
+        fps = var_InheritFloat (demux, CFG_PREFIX"fps");
+        if (fps <= 0.)
+        {
+            fps = GetAbsoluteMaxFrameRate (VLC_OBJECT(demux), fd,
+                                           fmt.fmt.pix.pixelformat);
+            msg_Dbg (demux, "Found maximum framerate of %f", fps);
+        }
+        uint32_t i_width, i_height;
+        GetMaxDimensions (VLC_OBJECT(demux), fd, fmt.fmt.pix.pixelformat, fps,
+                          &i_width, &i_height);
+        if (i_width || i_height)
+        {
+            msg_Dbg (demux, "Found optimal dimensions for framerate %f "
+                            "of %ux%u", fps, i_width, i_height);
+            fmt.fmt.pix.width = i_width;
+            fmt.fmt.pix.height = i_height;
+            if (v4l2_ioctl (fd, VIDIOC_S_FMT, &fmt) < 0)
+            {
+                msg_Err (demux, "Cannot set size to optimal dimensions %ux%u",
+                         i_width, i_height);
+                return -1;
+            }
+        }
+        else
+        {
+            msg_Warn (demux, "Could not find optimal width and height, "
+                      "falling back to driver default.");
+        }
+    }
+
+    width = fmt.fmt.pix.width;
+    height = fmt.fmt.pix.height;
+
+    if (v4l2_ioctl (fd, VIDIOC_G_FMT, &fmt) < 0) {;}
+
+    /* Print extra info */
+    msg_Dbg (demux, "%d bytes maximum for complete image",
+             fmt.fmt.pix.sizeimage);
+    /* Check interlacing */
+    switch (fmt.fmt.pix.field)
+    {
+        case V4L2_FIELD_NONE:
+            msg_Dbg (demux, "Interlacing setting: progressive");
+            break;
+        case V4L2_FIELD_TOP:
+            msg_Dbg (demux, "Interlacing setting: top field only");
+            break;
+        case V4L2_FIELD_BOTTOM:
+            msg_Dbg (demux, "Interlacing setting: bottom field only");
+            break;
+        case V4L2_FIELD_INTERLACED:
+            msg_Dbg (demux, "Interlacing setting: interleaved");
+            /*if (NTSC)
+                sys->i_block_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+            else*/
+                sys->i_block_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
+            break;
+        case V4L2_FIELD_SEQ_TB:
+            msg_Dbg (demux, "Interlacing setting: sequential top bottom (TODO)");
+            break;
+        case V4L2_FIELD_SEQ_BT:
+            msg_Dbg (demux, "Interlacing setting: sequential bottom top (TODO)");
+            break;
+        case V4L2_FIELD_ALTERNATE:
+            msg_Dbg (demux, "Interlacing setting: alternate fields (TODO)");
+            height *= 2;
+            break;
+        case V4L2_FIELD_INTERLACED_TB:
+            msg_Dbg (demux, "Interlacing setting: interleaved top bottom");
+            sys->i_block_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
+            break;
+        case V4L2_FIELD_INTERLACED_BT:
+            msg_Dbg (demux, "Interlacing setting: interleaved bottom top");
+            sys->i_block_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+            break;
+        default:
+            msg_Warn (demux, "Interlacing setting: unknown type (%d)",
+                      fmt.fmt.pix.field);
+            break;
+    }
+
+    /* Look up final fourcc */
+    es_format_t es_fmt;
+    sys->i_fourcc = 0;
+    for (int i = 0; v4l2chroma_to_fourcc[i].i_fourcc != 0; i++)
+        if (v4l2chroma_to_fourcc[i].i_v4l2 == fmt.fmt.pix.pixelformat)
+        {
+            sys->i_fourcc = v4l2chroma_to_fourcc[i].i_fourcc;
+            es_format_Init (&es_fmt, VIDEO_ES, sys->i_fourcc);
+            es_fmt.video.i_rmask = v4l2chroma_to_fourcc[i].i_rmask;
+            es_fmt.video.i_gmask = v4l2chroma_to_fourcc[i].i_gmask;
+            es_fmt.video.i_bmask = v4l2chroma_to_fourcc[i].i_bmask;
+            break;
+        }
+
+    /* Buggy driver paranoia */
+    i_min = fmt.fmt.pix.width * 2;
+    if (fmt.fmt.pix.bytesperline < i_min)
+        fmt.fmt.pix.bytesperline = i_min;
+    i_min = fmt.fmt.pix.bytesperline * fmt.fmt.pix.height;
+    if (fmt.fmt.pix.sizeimage < i_min)
+        fmt.fmt.pix.sizeimage = i_min;
+
+    /* Init I/O method */
+    switch (sys->io)
+    {
+    case IO_METHOD_READ:
+        sys->blocksize = fmt.fmt.pix.sizeimage;
+        break;
+
+    case IO_METHOD_MMAP:
+        if (InitMmap (VLC_OBJECT(demux), sys, fd))
+            return -1;
+        for (unsigned int i = 0; i < sys->i_nbuffers; i++)
+        {
+            struct v4l2_buffer buf = {
+                .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
+                .memory = V4L2_MEMORY_MMAP,
+                .index = i,
+            };
+
+            if (v4l2_ioctl (fd, VIDIOC_QBUF, &buf) < 0)
+            {
+                msg_Err (demux, "cannot queue buffer: %m");
+                return -1;
+            }
+        }
+
+        buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        if (v4l2_ioctl (fd, VIDIOC_STREAMON, &buf_type) < 0)
+        {
+            msg_Err (demux, "cannot start streaming: %m");
+            return -1;
+        }
+        break;
+
+    default:
+        assert (0);
+    }
+
+    int ar = 4 * VOUT_ASPECT_FACTOR / 3;
+    char *str = var_InheritString (demux, CFG_PREFIX"aspect-ratio");
+    if (likely(str != NULL))
+    {
+        const char *delim = strchr (str, ':');
+        if (delim != NULL)
+            ar = atoi (str) * VOUT_ASPECT_FACTOR / atoi (delim + 1);
+        free (str);
+    }
+
+    /* Add */
+    es_fmt.video.i_width  = width;
+    es_fmt.video.i_height = height;
+
+    /* Get aspect-ratio */
+    es_fmt.video.i_sar_num = ar * es_fmt.video.i_height;
+    es_fmt.video.i_sar_den = VOUT_ASPECT_FACTOR * es_fmt.video.i_width;
+
+    /* Framerate */
+    es_fmt.video.i_frame_rate = lround (fps * 1000000.);
+    es_fmt.video.i_frame_rate_base = 1000000;
+
+    msg_Dbg (demux, "added new video es %4.4s %dx%d", (char *)&es_fmt.i_codec,
+             es_fmt.video.i_width, es_fmt.video.i_height);
+    msg_Dbg (demux, " frame rate: %f", fps);
+
+    sys->p_es = es_out_Add (demux->out, &es_fmt);
+    return 0;
+
+error:
+    free (codecs);
+    return -1;
 }
 
 void DemuxClose( vlc_object_t *obj )
