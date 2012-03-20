@@ -206,12 +206,6 @@ void intf_DestroyAll( libvlc_int_t * );
 
 #define libvlc_stats( o ) (libvlc_priv((VLC_OBJECT(o))->p_libvlc)->b_stats)
 
-/**
- * LibVLC "main module" configuration settings array.
- */
-extern module_config_t libvlc_config[];
-extern const size_t libvlc_config_count;
-
 /*
  * Variables stuff
  */
