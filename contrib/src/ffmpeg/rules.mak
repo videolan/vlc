@@ -41,7 +41,10 @@ endif
 #endif
 
 ifdef HAVE_CROSS_COMPILE
-FFMPEGCONF += --enable-cross-compile --cross-prefix=$(HOST)-
+FFMPEGCONF += --enable-cross-compile
+ifndef HAVE_IOS
+FFMPEGCONF += --cross-prefix=$(HOST)-
+endif
 endif
 
 # ARM stuff
@@ -65,6 +68,9 @@ endif
 ifeq ($(ARCH),x86_64)
 FFMPEGCONF += --cpu=core2
 endif
+endif
+ifdef HAVE_IOS
+FFMPEGCONF += --as="$(TOPSRC)/../extras/tools/gas/gas-preprocessor.pl $(CC)" --enable-pic
 endif
 
 # Linux
