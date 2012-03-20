@@ -197,6 +197,21 @@ CLEAN_FILE += .openssl
 CLEAN_PKG += openssl
 DISTCLEAN_PKG += openssl-$(OPENSSL_VERSION).tar.gz
 
+# gas-preprocessor
+yuvi-gas-preprocessor-$(GAS_VERSION).tar.gz:
+	$(call download,$(GAS_URL))
+
+gas: yuvi-gas-preprocessor-$(GAS_VERSION).tar.gz
+	$(UNPACK)
+	$(MOVE)
+
+.gas: gas
+	touch $@
+
+CLEAN_FILE += .gas
+CLEAN_PKG += gas
+DISTCLEAN_PKG += yuvi-gas-preprocessor-$(GAS_VERSION).tar.gz
+
 #
 #
 #
