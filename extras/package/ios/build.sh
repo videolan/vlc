@@ -165,7 +165,25 @@ else
   export ASCPP="xcrun as"
 fi
 
-../bootstrap --host=${TARGET} --build="i686-apple-darwin10" --disable-disc --disable-sout  > ${out}
+../bootstrap --host=${TARGET} --build="i686-apple-darwin10" --disable-disc --disable-sout \
+    --enable-small \
+    --disable-sdl \
+    --disable-SDL_image \
+    --disable-fontconfig \
+    --disable-ass \
+    --disable-freetype2 \
+    --disable-fribidi \
+    --disable-zvbi \
+    --disable-kate \
+    --disable-caca \
+    --disable-gettext \
+    --disable-mpcdec \
+    --disable-upnp \
+    --disable-gme \
+    --disable-tremor \
+    --disable-vorbis \
+    --disable-sidplay2 \
+    --disable-samplerate > ${out}
 make
 spopd
 
