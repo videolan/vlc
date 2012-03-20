@@ -294,7 +294,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #ifdef WIN32
             audioControl( DirectX );
             optionWidgets.append( DirectXControl );
-            CONFIG_GENERIC_NO_UI( "directx-audio-device-name", StringList,
+            CONFIG_GENERIC_NO_UI( "directx-audio-device", StringList,
                     DirectXLabel, DirectXDevice );
 #elif defined( __OS2__ )
             audioControl( kai );
