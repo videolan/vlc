@@ -87,7 +87,7 @@ bool X11Factory::init()
     m_resourcePath.push_back( (string)datadir + "/skins2" );
     free( datadir );
     m_resourcePath.push_back( (string)"share/skins2" );
-    datadir = config_GetDataDir( getIntf() );
+    datadir = config_GetDataDir();
     m_resourcePath.push_back( (string)datadir + "/skins2" );
     free( datadir );
 

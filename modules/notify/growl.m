@@ -117,7 +117,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->app_name = CFSTR( "VLC media player" );
     p_sys->notification_type = CFSTR( "New input playing" );
     
-    char *data_path = config_GetDataDir ( p_this );
+    char *data_path = config_GetDataDir ();
     char buf[strlen (data_path) + sizeof ("/vlc512x512.png")];
     snprintf (buf, sizeof (buf), "%s/vlc512x512.png", data_path);
     msg_Dbg( p_this, "looking for icon at %s", buf );

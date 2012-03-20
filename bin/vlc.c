@@ -100,6 +100,7 @@ int main( int i_argc, const char *ppsz_argv[] )
 
 #ifdef TOP_BUILDDIR
     setenv ("VLC_PLUGIN_PATH", TOP_BUILDDIR"/modules", 1);
+    setenv ("VLC_DATA_PATH", TOP_SRCDIR"/share", 1);
 #endif
 
     /* Clear the X.Org startup notification ID. Otherwise the UI might try to
@@ -167,14 +168,11 @@ int main( int i_argc, const char *ppsz_argv[] )
     /* Block all these signals */
     pthread_sigmask (SIG_SETMASK, &set, NULL);
 
-    const char *argv[i_argc + 3];
+    const char *argv[i_argc + 2];
     int argc = 0;
 
     argv[argc++] = "--no-ignore-config";
     argv[argc++] = "--media-library";
-#ifdef TOP_SRCDIR
-    argv[argc++] = "--data-path="TOP_SRCDIR"/share";
-#endif
     ppsz_argv++; i_argc--; /* skip executable path */
 #ifdef __APPLE__
     /* When VLC.app is run by double clicking in Mac OS X, the 2nd arg

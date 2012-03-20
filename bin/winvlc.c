@@ -123,6 +123,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #ifndef UNDER_CE
 #ifdef TOP_BUILDDIR
     putenv("VLC_PLUGIN_PATH=Z:"TOP_BUILDDIR"/modules");
+    putenv("VLC_DATA_PATH=Z:"TOP_SRCDIR"/share");
 #endif
 
     HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);

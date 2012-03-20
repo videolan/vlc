@@ -30,15 +30,16 @@
 
 #include "configuration.h"
 
-#undef config_GetDataDir
 /**
  * Determines the shared architecture-independent data directory
  *
  * @return a string or NULL. Use free() to release.
  */
-char *config_GetDataDir( vlc_object_t *p_obj )
+char *config_GetDataDir(void)
 {
-    char *psz_path = var_InheritString( p_obj, "data-path" );
-    return psz_path ? psz_path : config_GetDataDirDefault();
+    const char *path = getenv ("VLC_DATA_PATH");
+    if (path)
+        return strdup (path);
+    return config_GetDataDirDefault();
 }
 

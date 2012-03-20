@@ -226,7 +226,7 @@ int vlclua_dir_list( vlc_object_t *p_this, const char *luadirname,
     }
 #endif
 
-    char *psz_datapath = config_GetDataDir( p_this );
+    char *psz_datapath = config_GetDataDir();
     if( likely(psz_datapath != NULL) )
     {
         if( likely(asprintf( &ppsz_dir_list[i], "%s"DIR_SEP"lua"DIR_SEP"%s",

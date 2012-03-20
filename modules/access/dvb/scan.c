@@ -248,7 +248,7 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
         DIR *p_dir;
 
         char *psz_dir = NULL;
-        char *data_dir = config_GetDataDir( p_scan->p_obj );
+        char *data_dir = config_GetDataDir();
 
         if( asprintf( &psz_dir, "%s" DIR_SEP "dvb" DIR_SEP "dvb-s", data_dir ) == -1 )
             psz_dir = NULL;

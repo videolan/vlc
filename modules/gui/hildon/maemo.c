@@ -173,7 +173,7 @@ static void *Thread( void *obj )
 
     // A little theming
     char *psz_rc_file = NULL;
-    char *psz_data = config_GetDataDir( p_intf );
+    char *psz_data = config_GetDataDir();
     if( asprintf( &psz_rc_file, "%s/maemo/vlc_intf.rc", psz_data ) != -1 )
     {
         gtk_rc_parse( psz_rc_file );

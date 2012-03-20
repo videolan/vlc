@@ -369,7 +369,7 @@ static void *Thread( void *p_data )
 #ifdef WIN32
     if ( psz_preset_path == NULL )
     {
-        char *psz_data_path = config_GetDataDir( p_filter );
+        char *psz_data_path = config_GetDataDir();
         asprintf( &psz_preset_path, "%s" DIR_SEP "visualization", psz_data_path );
         free( psz_data_path );
     }
