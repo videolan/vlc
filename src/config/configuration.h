@@ -41,8 +41,6 @@ bool config_PrintHelp (vlc_object_t *);
 int config_SortConfig (void);
 void config_UnsortConfig (void);
 
-char *config_GetDataDirDefault( void );
-
 #define CONFIG_CLASS(x) ((x) & ~0x1F)
 
 static inline bool IsConfigStringType(unsigned type)

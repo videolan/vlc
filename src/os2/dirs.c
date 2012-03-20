@@ -51,14 +51,16 @@ char *config_GetLibDir (void)
  *
  * @return a nul-terminated string or NULL. Use free() to release it.
  */
-char *config_GetDataDirDefault (void)
+char *config_GetDataDir (void)
 {
-    char *datadir = config_GetLibDir();
+    const char *path = getenv ("VLC_DATA_PATH");
+    if (path)
+        return strdup (path);
 
+    char *datadir = config_GetLibDir();
     if (datadir)
         /* replace last lib\vlc with share */
         strcpy ( datadir + strlen (datadir) - 7, "share");
-
     return datadir;
 }
 

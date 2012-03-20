@@ -41,9 +41,10 @@
  *
  * @return a nul-terminated string or NULL. Use free() to release it.
  */
-char *config_GetDataDirDefault (void)
+char *config_GetDataDir (void)
 {
-    return strdup (PKGDATADIR);
+    const char *path = getenv ("VLC_DATA_PATH");
+    return strdup ((path != NULL) ? path : PKGDATADIR);
 }
 
 /**

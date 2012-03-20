@@ -28,7 +28,6 @@
 #ifdef ENABLE_NLS
 # include <libintl.h>
 # if defined (__APPLE__) || defined (WIN32) || defined(__OS2__)
-#  include "config/configuration.h"
 #  include <vlc_charset.h>
 # endif
 #endif
@@ -46,7 +45,7 @@ int vlc_bindtextdomain (const char *domain)
         return -1;
     }
 # else
-    char *datadir = config_GetDataDirDefault();
+    char *datadir = config_GetDataDir();
     if (unlikely(datadir == NULL))
         return -1;
 

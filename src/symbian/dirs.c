@@ -40,7 +40,7 @@
  *
  * @return a null-terminated string or NULL. Use free() to release it.
  */
-char *config_GetDataDirDefault (void)
+char *config_GetDataDir (void)
 {
     return GetConstPrivatePath();
 }

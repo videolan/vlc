@@ -75,7 +75,7 @@ error:
     return (path != NULL) ? path : strdup (PKGLIBDIR);
 }
 
-char *config_GetDataDirDefault (void)
+char *config_GetDataDir (void)
 {
     char *libdir = config_GetLibDir ();
     if (libdir == NULL)

@@ -63,9 +63,10 @@ error:
     abort ();
 }
 
-char *config_GetDataDirDefault( void )
+char *config_GetDataDir (void)
 {
-    return config_GetLibDir ();
+    const char *path = getenv ("VLC_DATA_PATH");
+    return (path != NULL) ? strdup (path) : config_GetLibDir ();
 }
 
 const char *config_GetConfDir (void)

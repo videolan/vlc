@@ -119,8 +119,12 @@ char *config_GetLibDir (void)
     abort ();
 }
 
-char *config_GetDataDirDefault (void)
+char *config_GetDataDir (void)
 {
+    const char *path = getenv ("VLC_DATA_PATH");
+    if (path)
+        return strdup (path);
+
     char *vlcpath = config_GetLibDir ();
     char *datadir;
 
