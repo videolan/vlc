@@ -868,54 +868,6 @@ block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
         }
 
         break;
-
-    case IO_METHOD_USERPTR:
-        memset( &buf, 0, sizeof(buf) );
-        buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        buf.memory = V4L2_MEMORY_USERPTR;
-
-        /* Wait for next frame */
-        if (v4l2_ioctl( p_sys->i_fd, VIDIOC_DQBUF, &buf ) < 0 )
-        {
-            switch( errno )
-            {
-            case EAGAIN:
-                return NULL;
-            case EIO:
-                /* Could ignore EIO, see spec. */
-                /* fall through */
-            default:
-                msg_Err( p_demux, "Failed to wait (VIDIOC_DQBUF)" );
-                return NULL;
-            }
-        }
-
-        /* Find frame? */
-        unsigned int i;
-        for( i = 0; i < p_sys->i_nbuffers; i++ )
-        {
-            if( buf.m.userptr == (unsigned long)p_sys->p_buffers[i].start &&
-                buf.length == p_sys->p_buffers[i].length ) break;
-        }
-
-        if( i >= p_sys->i_nbuffers )
-        {
-            msg_Err( p_demux, "Failed capturing new frame as i>=nbuffers" );
-            return NULL;
-        }
-
-        p_block = ProcessVideoFrame( p_demux, (uint8_t*)buf.m.userptr, buf.bytesused );
-        if( !p_block )
-            return NULL;
-
-        /* Unlock */
-        if( v4l2_ioctl( p_sys->i_fd, VIDIOC_QBUF, &buf ) < 0 )
-        {
-            msg_Err( p_demux, "Failed to unlock (VIDIOC_QBUF)" );
-            block_Release( p_block );
-            return NULL;
-        }
-        break;
     default:
         assert(0);
     }
@@ -997,43 +949,6 @@ static int InitMmap( vlc_object_t *p_demux, demux_sys_t *p_sys, int i_fd )
             msg_Err( p_demux, "mmap failed: %m" );
             return -1;
         }
-    }
-
-    return 0;
-}
-
-/*****************************************************************************
- * Helper function to initalise video IO using the userbuf method
- *****************************************************************************/
-static int InitUserP( vlc_object_t *p_demux, demux_sys_t *p_sys, int i_fd, unsigned int i_buffer_size )
-{
-    struct v4l2_requestbuffers req;
-    unsigned int i_page_size;
-
-    i_page_size = sysconf(_SC_PAGESIZE);
-    i_buffer_size = ( i_buffer_size + i_page_size - 1 ) & ~( i_page_size - 1);
-
-    memset( &req, 0, sizeof(req) );
-    req.count = 4;
-    req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    req.memory = V4L2_MEMORY_USERPTR;
-
-    if( v4l2_ioctl( i_fd, VIDIOC_REQBUFS, &req ) < 0 )
-    {
-        msg_Err( p_demux, "device does not support user pointer i/o" );
-        return -1;
-    }
-
-    p_sys->p_buffers = calloc( 4, sizeof( *p_sys->p_buffers ) );
-    if( !p_sys->p_buffers )
-        return -1;
-
-    for( p_sys->i_nbuffers = 0; p_sys->i_nbuffers < 4; ++p_sys->i_nbuffers )
-    {
-        p_sys->p_buffers[p_sys->i_nbuffers].length = i_buffer_size;
-        if( posix_memalign( &p_sys->p_buffers[p_sys->i_nbuffers].start,
-                /* boundary */ i_page_size, i_buffer_size ) )
-            return -1;
     }
 
     return 0;
@@ -1406,35 +1321,8 @@ int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
             goto error;
         }
         break;
-
-    case IO_METHOD_USERPTR:
-        if( InitUserP( p_obj, p_sys, i_fd, fmt.fmt.pix.sizeimage ) )
-            goto error;
-        for( unsigned int i = 0; i < p_sys->i_nbuffers; ++i )
-        {
-            struct v4l2_buffer buf;
-
-            memset( &buf, 0, sizeof(buf) );
-            buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-            buf.memory = V4L2_MEMORY_USERPTR;
-            buf.index = i;
-            buf.m.userptr = (unsigned long)p_sys->p_buffers[i].start;
-            buf.length = p_sys->p_buffers[i].length;
-
-            if( v4l2_ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 )
-            {
-                msg_Err( p_obj, "VIDIOC_QBUF failed" );
-                goto error;
-            }
-        }
-
-        buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        if( v4l2_ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 )
-        {
-            msg_Err( p_obj, "VIDIOC_STREAMON failed" );
-            goto error;
-        }
-        break;
+    default:
+        assert(0);
     }
 
     free( codecs );
