@@ -34,6 +34,7 @@
 #include <vlc_input.h>              /* for attachment_new */
 
 #ifdef WIN32
+# include <vlc_charset.h>
 # include <io.h>
 #else
 # include <unistd.h>
