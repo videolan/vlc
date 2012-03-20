@@ -35,6 +35,7 @@
 #include <assert.h>
 #include <limits.h>
 
+#if !defined (__linux__)
 /**
  * Determines the shared data directory
  *
@@ -42,10 +43,9 @@
  */
 char *config_GetDataDirDefault (void)
 {
-    return strdup (DATA_PATH);
+    return strdup (PKGDATADIR);
 }
 
-#if !defined (__linux__)
 /**
  * Determines the architecture-dependent data directory
  *

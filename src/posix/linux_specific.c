@@ -26,7 +26,8 @@
 #include <string.h>
 
 #include <vlc_common.h>
-#include "../libvlc.h"
+#include "libvlc.h"
+#include "config/configuration.h"
 
 char *config_GetLibDir (void)
 {
@@ -72,4 +73,30 @@ char *config_GetLibDir (void)
     fclose (maps);
 error:
     return (path != NULL) ? path : strdup (PKGLIBDIR);
+}
+
+char *config_GetDataDirDefault (void)
+{
+    char *libdir = config_GetLibDir ();
+    if (libdir == NULL)
+        return NULL; /* OOM */
+
+    char *datadir = NULL;
+
+    /* There are no clean ways to do this, are there?
+     * Due to multilibs, we cannot simply append ../share/. */
+    char *p = strstr (libdir, "/lib/");
+    if (p != NULL)
+    {
+        char *p2;
+        /* Deal with nested "lib" directories. Grmbl. */
+        while ((p2 = strstr (p + 4, "/lib/")) != NULL)
+            p = p2;
+        *p = '\0';
+
+        if (unlikely(asprintf (&datadir, "%s/share/"PACKAGE, libdir) == -1))
+            datadir = NULL;
+    }
+    free (libdir);
+    return (datadir != NULL) ? datadir : strdup (PKGDATADIR);
 }
