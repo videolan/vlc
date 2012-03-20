@@ -30,6 +30,7 @@
 #include <vlc_keys.h>
 #include <vlc_charset.h>
 #include <vlc_modules.h>
+#include <vlc_plugin.h>
 
 #include "vlc_getopt.h"
 

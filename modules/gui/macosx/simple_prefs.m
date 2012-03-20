@@ -32,6 +32,7 @@
 #import <vlc_aout_intf.h>
 #import <vlc_dialog.h>
 #import <vlc_modules.h>
+#import <vlc_plugin.h>
 #import <vlc_config_cat.h>
 #import "misc.h"
 #import "intf.h"

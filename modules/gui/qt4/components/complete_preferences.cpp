@@ -42,6 +42,7 @@
 #include <vlc_config_cat.h>
 #include <vlc_intf_strings.h>
 #include <vlc_modules.h>
+#include <vlc_plugin.h>
 #include <assert.h>
 
 #define ITEM_HEIGHT 25

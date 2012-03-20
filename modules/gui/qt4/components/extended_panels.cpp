@@ -49,6 +49,7 @@
 #include <vlc_vout.h>
 #include <vlc_osd.h>
 #include <vlc_modules.h>
+#include <vlc_plugin.h>
 
 #include <vlc_charset.h> /* us_strtod */
 

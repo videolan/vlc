@@ -59,6 +59,7 @@
 #import "prefs_widgets.h"
 #import <vlc_keys.h>
 #import <vlc_modules.h>
+#import <vlc_plugin.h>
 
 /* /!\ Warning: Unreadable code :/ */
 

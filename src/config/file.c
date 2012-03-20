@@ -45,6 +45,7 @@
 #include <vlc_fs.h>
 #include <vlc_keys.h>
 #include <vlc_modules.h>
+#include <vlc_plugin.h>
 
 #include "configuration.h"
 #include "modules/modules.h"

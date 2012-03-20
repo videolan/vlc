@@ -22,16 +22,18 @@
 # include "config.h"
 #endif
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 #include <vlc_common.h>
 #include <vlc_charset.h>
 #include <vlc_modules.h>
+#include <vlc_plugin.h>
 #include "modules/modules.h"
 #include "config/configuration.h"
 #include "libvlc.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #if defined( WIN32 ) && !defined( UNDER_CE )
 static void ShowConsole (void);
 static void PauseConsole (void);

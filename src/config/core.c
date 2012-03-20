@@ -28,6 +28,7 @@
 #include <vlc_common.h>
 #include <vlc_keys.h>
 #include <vlc_modules.h>
+#include <vlc_plugin.h>
 
 #include "vlc_configuration.h"
 

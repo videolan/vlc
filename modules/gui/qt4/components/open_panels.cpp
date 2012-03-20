@@ -37,6 +37,7 @@
 #include "util/qt_dirs.hpp"
 #include <vlc_intf_strings.h>
 #include <vlc_modules.h>
+#include <vlc_plugin.h>
 #ifdef WIN32
   #include <vlc_charset.h> /* FromWide for Win32 */
 #endif

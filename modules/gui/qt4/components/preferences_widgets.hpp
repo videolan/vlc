@@ -124,7 +124,7 @@ public:
     VIntConfigControl( vlc_object_t *a, module_config_t *b ) :
                 ConfigControl(a,b) {};
     virtual int getValue() const = 0;
-    virtual int getType() const { return CONFIG_ITEM_INTEGER; }
+    virtual int getType() const;
     virtual void doApply();
 };
 
@@ -203,7 +203,7 @@ public:
     virtual int getValue() const;
     virtual void show() { checkbox->show(); }
     virtual void hide() { checkbox->hide(); }
-    virtual int getType() const { return CONFIG_ITEM_BOOL; }
+    virtual int getType() const;
 private:
     QAbstractButton *checkbox;
     void finish();
@@ -241,7 +241,7 @@ public:
     VFloatConfigControl( vlc_object_t *a, module_config_t *b ) :
                 ConfigControl(a,b) {};
     virtual float getValue() const = 0;
-    virtual int getType() const { return CONFIG_ITEM_FLOAT; }
+    virtual int getType() const;
     virtual void doApply();
 };
 
@@ -289,7 +289,7 @@ public:
     VStringConfigControl( vlc_object_t *a, module_config_t *b ) :
                 ConfigControl(a,b) {};
     virtual QString getValue() const = 0;
-    virtual int getType() const { return CONFIG_ITEM_STRING; }
+    virtual int getType() const;
     virtual void doApply();
 };
 
@@ -454,7 +454,7 @@ class KeySelectorControl : public ConfigControl
 public:
     KeySelectorControl( vlc_object_t *, module_config_t *, QWidget *,
                         QGridLayout*, int );
-    virtual int getType() const { return CONFIG_ITEM_KEY; }
+    virtual int getType() const;
     virtual void hide() { table->hide(); if( label ) label->hide(); }
     virtual void show() { table->show(); if( label ) label->show(); }
     virtual void doApply();

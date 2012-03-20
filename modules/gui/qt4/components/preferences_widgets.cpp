@@ -39,6 +39,7 @@
 #include <vlc_keys.h>
 #include <vlc_intf_strings.h>
 #include <vlc_modules.h>
+#include <vlc_plugin.h>
 
 #include <QString>
 #include <QVariant>
@@ -242,6 +243,8 @@ StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
     label = _label;
     finish( );
 }
+
+int VStringConfigControl::getType() const { return CONFIG_ITEM_STRING; }
 
 void StringConfigControl::finish()
 {
@@ -917,6 +920,8 @@ int IntegerConfigControl::getValue() const
     return spin->value();
 }
 
+int VIntConfigControl::getType() const { return CONFIG_ITEM_INTEGER; }
+
 /********* Integer range **********/
 IntegerRangeConfigControl::IntegerRangeConfigControl( vlc_object_t *_p_this,
                                             module_config_t *_p_item,
@@ -1122,6 +1127,8 @@ BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
     finish();
 }
 
+int BoolConfigControl::getType() const { return CONFIG_ITEM_BOOL; }
+
 void BoolConfigControl::finish()
 {
     checkbox->setChecked( p_item->value.i );
@@ -1242,6 +1249,8 @@ FloatConfigControl::FloatConfigControl( vlc_object_t *_p_this,
     }
 }
 
+int VFloatConfigControl::getType() const { return CONFIG_ITEM_FLOAT; }
+
 FloatConfigControl::FloatConfigControl( vlc_object_t *_p_this,
                                         module_config_t *_p_item,
                                         QLabel *_label,
@@ -1345,6 +1354,8 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
     CONNECT( actionSearch, textChanged( const QString& ),
              this, filter( const QString& ) );
 }
+
+int KeySelectorControl::getType() const { return CONFIG_ITEM_KEY; }
 
 void KeySelectorControl::finish()
 {
@@ -1617,4 +1628,3 @@ void KeyInputDialog::wheelEvent( QWheelEvent *e )
     checkForConflicts( i_vlck );
     keyValue = i_vlck;
 }
-
