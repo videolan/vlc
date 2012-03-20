@@ -154,6 +154,13 @@ AR=xcrun ar
 LD=xcrun ld
 STRIP=xcrun strip
 RANLIB=xcrun ranlib
+ifeq ($(ARCH), arm)
+EXTRA_CFLAGS += -arch armv7 -mno-thumb
+EXTRA_LDFLAGS += -arch armv7
+else
+EXTRA_CFLAGS += -m32
+EXTRA_LDFLAGS += -m32
+endif
 EXTRA_CFLAGS += -isysroot $(SDKROOT)  -miphoneos-version-min=5.0
 EXTRA_LDFLAGS += -Wl,-syslibroot,$(SDKROOT) -isysroot $(SDKROOT) -miphoneos-version-min=5.0
 endif
