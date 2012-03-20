@@ -1,0 +1,12 @@
+diff -ru libdvbpsi/Makefile.in libdvbpsi/Makefile.in
+--- libdvbpsi/Makefile.in	2011-11-03 16:55:02.000000000 +0100
++++ dvb.fix/Makefile.in	2012-03-20 17:19:49.000000000 +0100
+@@ -245,7 +245,7 @@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-SUBDIRS = src examples misc
++SUBDIRS = src misc
+ DIST_SUBDIRS = $(SUBDIRS) doc wince
+ EXTRA_DIST = libdvbpsi.spec libdvbpsi.spec.in libdvbpsi.pc.in bootstrap
+ pkgconfigdir = $(libdir)/pkgconfig
