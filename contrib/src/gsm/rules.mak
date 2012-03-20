@@ -12,7 +12,7 @@ gsm: gsm-$(GSM_VERSION).tar.gz .sum-gsm
 	mv gsm-1.0-* gsm-$(GSM_VERSION)
 	$(APPLY) $(SRC)/gsm/gsm-cross.patch
 	$(MOVE)
-ifdef HAVE_MACOSX
+ifdef HAVE_DARWIN_OS
 	(cd $@; sed -e 's%-O2%-O2\ $(EXTRA_CFLAGS)\ $(EXTRA_LDFLAGS)%' -e 's%# LDFLAGS >=%LDFLAGS >-= $(EXTRA_LDFLAGS)%' -e 's%gcc%$(CC)%' -i.orig  Makefile)
 endif
 	(cd $@; sed -i -e 's%-O2%-O2 -fPIC%' Makefile)
