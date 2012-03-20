@@ -33,16 +33,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include <locale.h>
 #include <signal.h>
 #ifdef HAVE_PTHREAD_H
 # include <pthread.h>
 #endif
 #include <unistd.h>
-
-#ifdef __APPLE__
-#include <string.h>
-#endif
 
 #ifdef __OS2__
 # define pthread_t      int
@@ -178,6 +175,17 @@ int main( int i_argc, const char *ppsz_argv[] )
 #ifdef TOP_SRCDIR
     argv[argc++] = "--data-path="TOP_SRCDIR"/share";
 #endif
+    ppsz_argv++; i_argc--; /* skip executable path */
+#ifdef __APPLE__
+    /* When VLC.app is run by double clicking in Mac OS X, the 2nd arg
+     * is the PSN - process serial number (a unique PID-ish thingie)
+     * still ok for real Darwin & when run from command line
+     * for example -psn_0_9306113 */
+    if (i_argc >= 1 && !strncmp (*ppsz_argv, "-psn" , 4))
+        ppsz_argv++, i_argc--;
+#endif
+    memcpy (argv + argc, ppsz_argv, i_argc * sizeof (*argv));
+    argc += i_argc;
     argv[argc] = NULL;
 
     vlc_enable_override ();
