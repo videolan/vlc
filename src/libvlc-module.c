@@ -1168,10 +1168,6 @@ static const char *const ppsz_prefres[] = {
     "Additional path for VLC to look for its modules. You can add " \
     "several paths by concatenating them using \" PATH_SEP \" as separator")
 
-#define DATA_PATH_TEXT N_("Data search path")
-#define DATA_PATH_LONGTEXT N_( \
-    "Override the default data/share search path.")
-
 #define VLM_CONF_TEXT N_("VLM configuration file")
 #define VLM_CONF_LONGTEXT N_( \
     "Read a VLM configuration file as soon as VLM is started." )
@@ -2105,9 +2101,8 @@ vlc_module_begin ()
     set_section( N_("Plugins" ), NULL )
     add_bool( "plugins-cache", true, PLUGINS_CACHE_TEXT,
               PLUGINS_CACHE_LONGTEXT, true )
-    add_obsolete_string( "plugin-path" )
-    add_directory( "data-path", NULL, DATA_PATH_TEXT,
-                   DATA_PATH_LONGTEXT, true )
+    add_obsolete_string( "plugin-path" ) /* since 2.0.0 */
+    add_obsolete_string( "data-path" ) /* since 2.1.0 */
 
     set_section( N_("Performance options"), NULL )
 
