@@ -752,6 +752,32 @@ static int SetupTuner (vlc_object_t *obj, int fd,
     return 0;
 }
 
+static int ResetCrop (vlc_object_t *obj, int fd)
+{
+    struct v4l2_cropcap cropcap = { .type = V4L2_BUF_TYPE_VIDEO_CAPTURE };
+
+    /* In theory, this ioctl() must work for all video capture devices.
+     * In practice, it does not. */
+    if (v4l2_ioctl (fd, VIDIOC_CROPCAP, &cropcap) < 0)
+    {
+        msg_Warn (obj, "cannot get cropping properties: %m");
+        return -1;
+    }
+
+    /* Reset to the default cropping rectangle */
+    struct v4l2_crop crop = {
+        .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
+        .c = cropcap.defrect,
+    };
+
+    if (v4l2_ioctl (fd, VIDIOC_S_CROP, &crop) < 0)
+    {
+        msg_Warn (obj, "cannot reset cropping limits: %m");
+        return -1;
+    }
+    return 0;
+}
+
 static int SetupInput (vlc_object_t *obj, int fd)
 {
     struct v4l2_input input;
@@ -786,6 +812,7 @@ static int SetupInput (vlc_object_t *obj, int fd)
     msg_Dbg (obj, "selected input %"PRIu32, input.index);
 
     SetupStandard (obj, fd, &input);
+    ResetCrop (obj, fd); /* crop depends on standard */
     SetupTuner (obj, fd, &input);
     SetupAudio (obj, fd, &input);
     return 0;
@@ -1029,8 +1056,6 @@ static bool IsPixelFormatSupported( struct v4l2_fmtdesc *codecs, size_t n,
 int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
                bool b_demux )
 {
-    struct v4l2_cropcap cropcap;
-    struct v4l2_crop crop;
     struct v4l2_format fmt;
     unsigned int i_min;
     enum v4l2_buf_type buf_type;
@@ -1136,30 +1161,6 @@ int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
     /* TODO: Move the resolution stuff up here */
     /* if MPEG encoder card, no need to do anything else after this */
     p_sys->controls = ControlsInit( p_obj, i_fd );
-
-    /* Reset Cropping */
-    memset( &cropcap, 0, sizeof(cropcap) );
-    cropcap.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    if( v4l2_ioctl( i_fd, VIDIOC_CROPCAP, &cropcap ) >= 0 )
-    {
-        crop.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        crop.c = cropcap.defrect; /* reset to default */
-        if( crop.c.width > 0 && crop.c.height > 0 ) /* Fix for fm tuners */
-        {
-            if( v4l2_ioctl( i_fd, VIDIOC_S_CROP, &crop ) < 0 )
-            {
-                switch( errno )
-                {
-                    case EINVAL:
-                        /* Cropping not supported. */
-                        break;
-                    default:
-                        /* Errors ignored. */
-                        break;
-                }
-            }
-        }
-    }
 
     /* Try and find default resolution if not specified */
     int width = var_InheritInteger( p_obj, CFG_PREFIX"width" );
