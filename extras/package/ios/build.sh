@@ -2,8 +2,8 @@
 set -e
 
 PLATFORM=OS
-SDK=iphoneos3.2
 VERBOSE=no
+SDK_VERSION=5.0
 
 usage()
 {
@@ -45,7 +45,7 @@ do
              ;;
          s)
              PLATFORM=Simulator
-             SDK=iphonesimulator3.2
+             SDK=5.0
              ;;
          k)
              SDK=$OPTARG
@@ -74,15 +74,10 @@ if [ "$PLATFORM" = "Simulator" ]; then
     TARGET="i686-apple-darwin10"
     ARCH="i386"
 else
-    TARGET="arm-apple-darwin10"
+    TARGET="arm-apple-darwin11"
     ARCH="armv7"
     OPTIM="-mno-thumb"
 fi
-
-# Test if SDK exists
-xcodebuild -find gcc -sdk ${SDK} > ${out}
-
-SDK_VERSION=`echo ${SDK} | sed -e 's/iphoneos//' -e 's/iphonesimulator//'`
 
 info "Using ${ARCH} with SDK version ${SDK_VERSION}"
 
@@ -92,8 +87,17 @@ spushd `dirname ${THIS_SCRIPT_PATH}`/../../..
 VLCROOT=`pwd` # Let's make sure VLCROOT is an absolute path
 spopd
 
-DEVROOT="/Developer/Platforms/iPhone${PLATFORM}.platform/Developer"
-IOS_SDK_ROOT="${DEVROOT}/SDKs/iPhone${PLATFORM}${SDK_VERSION}.sdk"
+if test -z "$SDKROOT"
+then
+    SDKROOT=`xcode-select -print-path`/Platforms/iPhone${PLATFORM}.platform/Developer/SDKs/iPhone${PLATFORM}${SDK_VERSION}.sdk
+    echo "SDKROOT not specified, assuming $SDKROOT"
+fi
+
+if [ ! -d "${SDKROOT}" ]
+then
+    echo "*** ${SDKROOT} does not exist, please install required SDK, or set SDKROOT manually. ***"
+    exit 1
+fi
 
 BUILDDIR="${VLCROOT}/build-ios-${PLATFORM}"
 
@@ -101,81 +105,109 @@ PREFIX="${VLCROOT}/install-ios-${PLATFORM}"
 
 IOS_GAS_PREPROCESSOR="${VLCROOT}/extras/package/ios/resources/gas-preprocessor.pl"
 
-export AR="${DEVROOT}/usr/bin/ar"
-export RANLIB="${DEVROOT}/usr/bin/ranlib"
-export CFLAGS="-isysroot ${IOS_SDK_ROOT} -arch ${ARCH} -miphoneos-version-min=3.2 ${OPTIM}"
-export OBJCFLAGS="${CFLAGS}"
-if [ "$PLATFORM" = "Simulator" ]; then
-    # Use the new ABI on simulator, else we can't build
-    export OBJCFLAGS="-fobjc-abi-version=2 -fobjc-legacy-dispatch ${OBJCFLAGS}"
-fi
-export CPPFLAGS="${CFLAGS}"
-export CXXFLAGS="${CFLAGS}"
-export CPP="${DEVROOT}/usr/bin/cpp-4.2"
-export CXXCPP="${DEVROOT}/usr/bin/cpp-4.2"
-
-export CC="${DEVROOT}/usr/bin/gcc-4.2"
-export OBJC="${DEVROOT}/usr/bin/gcc-4.2"
-export CXX="${DEVROOT}/usr/bin/g++-4.2"
-export LD="${DEVROOT}/usr/bin/ld"
-export STRIP="${DEVROOT}/usr/bin/strip"
-
-if [ "$PLATFORM" = "OS" ]; then
-  export LDFLAGS="-L${IOS_SDK_ROOT}/usr/lib -arch ${ARCH}"
-else
-  export LDFLAGS="-syslibroot=${IOS_SDK_ROOT}/ -arch ${ARCH}"
-fi
-
-export PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:${VLCROOT}/extras/contrib/build/bin:${VLCROOT}/extras/package/ios/resources"
-
-spushd ${VLCROOT}/extras/contrib
+export PATH="${VLCROOT}/extras/tools/build/bin:${VLCROOT}/contrib/${TARGET}/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin"
 
 # contains gas-processor.pl
 export PATH=$PATH:${VLCROOT}/extras/package/ios/resources
 
+info "Building tools"
+spushd "${VLCROOT}/extras/tools"
+./bootstrap
+make
+spopd
+
+info "Building contrib for iOS in '${VLCROOT}/contrib/iPhone${PLATFORM}'"
+
 # The contrib will read the following
-export IOS_SDK_ROOT
+export AR="xcrun ar"
 
-info "Building contrib for iOS in '${VLCROOT}/contrib-builddir-ios-${TARGET}'"
+export RANLIB="xcrun ranlib"
+export CC="xcrun clang"
+export OBJC="xcrun clang"
+export CXX="xcrun clang++"
+export LD="xcrun ld"
+export STRIP="xcrun strip"
 
-./bootstrap -t ${TARGET} -d ios \
-   -b "${VLCROOT}/contrib-builddir-ios-${TARGET}" \
-   -i "${VLCROOT}/contrib-ios-${TARGET}" > ${out}
-spushd "${VLCROOT}/contrib-builddir-ios-${TARGET}"
-make src > ${out}
-spopd
 
-info "Building contrib for current host"
-./bootstrap > ${out}
-make > ${out}
+export SDKROOT
+export CPPFLAGS="${CFLAGS}"
+export CXXFLAGS="${CFLAGS}"
+export CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -miphoneos-version-min=5.0 ${OPTIM}"
+export OBJCFLAGS="${CFLAGS}"
 
-spopd
+export CPP="xcrun cc -E"
+export CXXCPP="xcrun c++ -E"
+
+if [ "$PLATFORM" = "Simulator" ]; then
+    # Use the new ABI on simulator, else we can't build
+    export OBJCFLAGS="-fobjc-abi-version=2 -fobjc-legacy-dispatch ${OBJCFLAGS}"
+fi
+
+if [ "$PLATFORM" = "OS" ]; then
+  export LDFLAGS="-L${SDKROOT}/usr/lib -arch ${ARCH}  -isysroot ${SDKROOT}  -miphoneos-version-min=5.0 "
+else
+  export LDFLAGS="-syslibroot=${SDKROOT}/ -arch ${ARCH} "
+fi
+
+info "LD FLAGS SELECTED = '${LDFLAGS}'"
+
+spushd ${VLCROOT}/contrib
+
+echo ${VLCROOT}
+mkdir -p "${VLCROOT}/contrib/iPhone${PLATFORM}"
+cd "${VLCROOT}/contrib/iPhone${PLATFORM}"
 
 if [ "$PLATFORM" = "OS" ]; then
   export AS="${IOS_GAS_PREPROCESSOR} ${CC}"
   export ASCPP="${IOS_GAS_PREPROCESSOR} ${CC}"
 else
-  export AS="${DEVROOT}/usr/bin/as"
-  export ASCPP="${DEVROOT}/usr/bin/as"
+  export AS="xcrun as"
+  export ASCPP="xcrun as"
+fi
+
+../bootstrap --host=${TARGET} --build="i686-apple-darwin10" --disable-disc --disable-sout  > ${out}
+make
+spopd
+
+
+if [ "$PLATFORM" = "OS" ]; then
+  export AS="${IOS_GAS_PREPROCESSOR} ${CC}"
+  export ASCPP="${IOS_GAS_PREPROCESSOR} ${CC}"
+else
+  export AS="xcrun as"
+  export ASCPP="xcrun as"
 fi
 
 
 info "Bootstraping vlc"
-
+pwd
+info "VLCROOT = ${VLCROOT}"
 if ! [ -e ${VLCROOT}/configure ]; then
-    ${VLCROOT}/bootstrap > ${out}
+    ${VLCROOT}/bootstrap  > ${out}
 fi
+
+info "Bootstraping vlc finished"
 
 if [ ".$PLATFORM" != ".Simulator" ]; then
     # FIXME - Do we still need this?
-    export AVCODEC_CFLAGS="-I${PREFIX}/include"
+    export AVCODEC_CFLAGS="-I${PREFIX}/include "
     export AVCODEC_LIBS="-L${PREFIX}/lib -lavcodec -lavutil -lz"
     export AVFORMAT_CFLAGS="-I${PREFIX}/include"
     export AVFORMAT_LIBS="-L${PREFIX}/lib -lavcodec -lz -lavutil -lavformat"
 fi
 
+export DVBPSI_CFLAGS="-I${VLCROOT}/contrib-ios-${TARGET}/include "
+export DVBPSI_LIBS="-L${VLCROOT}/contrib-ios-${TARGET}/lib "
+
+export SWSCALE_CFLAGS="-I${VLCROOT}/contrib-ios-${TARGET}/include "
+export SWSCALE_LIBS="-L${VLCROOT}/contrib-ios-${TARGET}/lib "
+
+
+
 mkdir -p ${BUILDDIR}
 spushd ${BUILDDIR}
+
+info ">> --prefix=${PREFIX} --host=${TARGET}"
 
 # Run configure only upon changes.
 if [ "${VLCROOT}/configure" -nt config.log -o \
@@ -190,34 +222,48 @@ ${VLCROOT}/configure \
     --disable-macosx-defaults \
     --disable-macosx-vout \
     --disable-macosx-dialog-provider \
-    --disable-macosx-qtcapture \
+    --disable-macosx-qtkit \
     --disable-macosx-eyetv \
     --disable-macosx-vlc-app \
-    --with-macosx-sdk=${IOS_SDK_ROOT} \
+    --with-macosx-sdk=${SDKROOT} \
     --enable-audioqueue \
     --enable-ios-vout \
+    --disable-shared \
+    --disable-macosx-quartztext \
     --enable-avcodec \
-    --enable-avformat \
+    --disable-avio \
+    --disable-dummy \
+    --disable-mkv \
+    --enable-ffmpeg \
+    --enable-dvbpsi \
     --enable-swscale \
-    --enable-faad \
+    --disable-projectm \
+    --disable-sout \
+    --disable-faad \
     --disable-mad \
     --disable-a52 \
     --disable-fribidi \
+    --disable-jpeg \
     --disable-macosx-audio \
+    --disable-qtcapture \
+    --disable-qtsound \
     --disable-qt4 --disable-skins2 \
     --disable-libgcrypt \
     --disable-remoteosd \
     --disable-vcd \
     --disable-postproc \
     --disable-vlc \
+    --disable-audio_filter \
+    --disable-spatializer \
     --disable-vlm \
     --disable-httpd \
     --disable-nls \
     --disable-glx \
-    --disable-visual \
+    --enable-visual \
     --disable-lua \
     --disable-sse \
     --disable-neon \
+    --disable-notify \
     --disable-mmx > ${out} # MMX and SSE support requires llvm which is broken on Simulator
 fi
 
