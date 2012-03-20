@@ -188,7 +188,8 @@ test -z "$ENABLE_SMALL" || add_make_enabled "ENABLE_SMALL"
 #
 # Checks
 #
-case "${HOST}" in
+OS="${HOST#*-}" # strip architecture
+case "${OS}" in
 	arm-apple-darwin*)
 		check_ios_sdk
 		add_make_enabled "HAVE_IOS" "HAVE_DARWIN_OS" "HAVE_BSD"
@@ -204,7 +205,7 @@ case "${HOST}" in
 	*bsd*)
 		add_make_enabled "HAVE_BSD"
 		;;
-	*linux-androideabi)
+	linux-androideabi)
 		check_android_sdk
 		add_make_enabled "HAVE_LINUX" "HAVE_ANDROID"
 		add_make "PATH = ${ANDROID_NDK}/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86/bin/:${PATH}"
