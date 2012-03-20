@@ -147,6 +147,17 @@ endif
 
 endif
 
+ifdef HAVE_IOS
+CC=xcrun clang
+CXX=xcrun clang++
+AR=xcrun ar
+LD=xcrun ld
+STRIP=xcrun strip
+RANLIB=xcrun ranlib
+EXTRA_CFLAGS += -isysroot $(SDKROOT)  -miphoneos-version-min=5.0
+EXTRA_LDFLAGS += -Wl,-syslibroot,$(SDKROOT) -isysroot $(SDKROOT) -miphoneos-version-min=5.0
+endif
+
 ifdef HAVE_WIN32
 ifneq ($(shell $(CC) $(CFLAGS) -E -dM -include _mingw.h - < /dev/null | grep -E __MINGW64_VERSION_MAJOR),)
 HAVE_MINGW_W64 := 1
@@ -380,7 +391,7 @@ ifdef HAVE_WIN32
 	echo "set(CMAKE_SYSTEM_NAME Windows)" >> $@
 	echo "set(CMAKE_RC_COMPILER $(HOST)-windres)" >> $@
 endif
-ifdef HAVE_MACOSX
+ifdef HAVE_DARWIN_OS
 	echo "set(CMAKE_SYSTEM_NAME Darwin)" >> $@
 	echo "set(CMAKE_C_FLAGS $(CFLAGS))" >> $@
 	echo "set(CMAKE_CXX_FLAGS $(CFLAGS))" >> $@

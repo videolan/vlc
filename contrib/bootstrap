@@ -155,6 +155,24 @@ check_macosx_sdk()
    add_make "OSX_VERSION ?= ${OSX_VERSION}"
 }
 
+check_ios_sdk()
+{
+	if test -z "$SDKROOT"
+	then
+		SDKROOT=`xcode-select -print-path`/Platforms/iPhone${PLATFORM}.platform/Developer/SDKs/iPhone${PLATFORM}${SDK_VERSION}.sdk
+		echo "SDKROOT not specified, assuming $SDKROOT"
+	else
+		SDKROOT="$SDKROOT"
+	fi
+
+	if [ ! -d "${SDKROOT}" ]
+	then
+		echo "*** ${SDKROOT} does not exist, please install required SDK, or set SDKROOT manually. ***"
+		exit 1
+	fi
+	add_make "SDKROOT=${SDKROOT}"
+}
+
 check_android_sdk()
 {
 	[ -z "${ANDROID_NDK}" ] && echo "You must set ANDROID_NDK environment variable" && exit 1
@@ -172,6 +190,7 @@ test -z "$ENABLE_SMALL" || add_make_enabled "ENABLE_SMALL"
 #
 case "${HOST}" in
 	arm-apple-darwin*)
+		check_ios_sdk
 		add_make_enabled "HAVE_IOS" "HAVE_DARWIN_OS" "HAVE_BSD"
 		;;
 	*86*-apple-darwin*)
