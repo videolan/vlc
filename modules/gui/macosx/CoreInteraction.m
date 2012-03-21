@@ -470,8 +470,6 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     vout_thread_t *p_vout = getVout();
     if (p_vout)
     {
-        vout_OSDSlider( p_vout, SPU_DEFAULT_CHANNEL,
-                       [self volume]*100/AOUT_VOLUME_MAX, OSD_VERT_SLIDER );
         vout_OSDMessage( p_vout, SPU_DEFAULT_CHANNEL, _( "Volume %d%%" ),
                        [self volume]*100/AOUT_VOLUME_DEFAULT );
         vlc_object_release( p_vout );
