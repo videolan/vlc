@@ -328,10 +328,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             return VLC_SUCCESS;
         }
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
-        {
-            [[sys->glView window] performSelectorOnMainThread:@selector(performZoom:) withObject: nil waitUntilDone:NO];
-            return VLC_SUCCESS;
-        }
         case VOUT_DISPLAY_CHANGE_ZOOM:
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
@@ -676,8 +672,17 @@ static void OpenglSwap(vlc_gl_t *gl)
 
     NSRect bounds = [self bounds];
 
-    CGFloat height = bounds.size.height;
-    CGFloat width = bounds.size.width;
+    CGFloat height, width;
+    if( !vd || ( vd && vd->cfg->is_display_filled ))
+    {
+        height = bounds.size.height;
+        width = bounds.size.width;
+    }
+    else
+    {
+        height = vd->source.i_visible_height;
+        width = vd->source.i_visible_width;
+    }
 
     GLint x = width, y = height;
 
@@ -703,7 +708,7 @@ static void OpenglSwap(vlc_gl_t *gl)
     }
 
     if ([self lockgl]) {
-        glViewport((width - x) / 2, (height - y) / 2, x, y);
+        glViewport((bounds.size.width - x) / 2, (bounds.size.height - y) / 2, x, y);
 
         @synchronized(self) {
             // This may be cleared before -drawRect is being called,
