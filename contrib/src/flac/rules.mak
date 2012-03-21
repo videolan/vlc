@@ -17,7 +17,7 @@ flac: flac-$(FLAC_VERSION).tar.gz .sum-flac
 	$(UNPACK)
 	$(APPLY) $(SRC)/flac/flac-win32.patch
 	$(APPLY) $(SRC)/flac/libFLAC-pc.patch
-ifdef HAVE_MACOSX
+ifdef HAVE_DARWIN_OS
 	cd $(UNPACK_DIR) && sed -e 's,-dynamiclib,-dynamiclib -arch $(ARCH),' -i.orig configure
 endif
 	$(UPDATE_AUTOCONFIG)
@@ -30,7 +30,7 @@ FLACCONF := $(HOSTCONF) \
 	--disable-cpplibs \
 	--disable-oggtest
 # TODO? --enable-sse
-ifdef HAVE_MACOSX
+ifdef HAVE_DARWIN_OS
 ifneq ($(findstring $(ARCH),i386 x86_64),)
 FLACCONF += --disable-asm-optimizations
 endif
