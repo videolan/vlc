@@ -183,7 +183,8 @@ fi
     --disable-tremor \
     --disable-vorbis \
     --disable-sidplay2 \
-    --disable-samplerate > ${out}
+    --disable-samplerate \
+    --disable-goom > ${out}
 make
 spopd
 
