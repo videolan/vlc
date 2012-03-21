@@ -43,7 +43,7 @@
 # define PFNGLDELETEPROGRAMSARBPROC           typeof(glDeleteProgramsARB)*
 # define PFNGLPROGRAMLOCALPARAMETER4FVARBPROC typeof(glProgramLocalParameter4fvARB)*
 # define PFNGLACTIVETEXTUREARBPROC            typeof(glActiveTextureARB)*
-# define PFNGLMULTITEXCOORD2FARBPROC          typeof(glMultiTexCoord2fARB)*
+# define PFNGLCLIENTACTIVETEXTUREARBPROC      typeof(glClientActiveTextureARB)*
 #endif
 
 /* RV16 */
@@ -118,7 +118,7 @@ struct vout_display_opengl_t {
     /* multitexture */
     bool use_multitexture;
     PFNGLACTIVETEXTUREARBPROC   ActiveTextureARB;
-    PFNGLMULTITEXCOORD2FARBPROC MultiTexCoord2fARB;
+    PFNGLCLIENTACTIVETEXTUREARBPROC ClientActiveTextureARB;
 };
 
 static inline int GetAlignedSize(unsigned size)
@@ -188,13 +188,13 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     if (HasExtension(extensions, "GL_ARB_multitexture")) {
 #if !defined(MACOS_OPENGL)
         vgl->ActiveTextureARB   = (PFNGLACTIVETEXTUREARBPROC)vlc_gl_GetProcAddress(vgl->gl, "glActiveTextureARB");
-        vgl->MultiTexCoord2fARB = (PFNGLMULTITEXCOORD2FARBPROC)vlc_gl_GetProcAddress(vgl->gl, "glMultiTexCoord2fARB");
+        vgl->ClientActiveTextureARB = (PFNGLCLIENTACTIVETEXTUREARBPROC)vlc_gl_GetProcAddress(vgl->gl, "glClientActiveTextureARB");
 #else
         vgl->ActiveTextureARB = glActiveTextureARB;
-        vgl->MultiTexCoord2fARB = glMultiTexCoord2fARB;
+        vgl->ClientActiveTextureARB = glClientActiveTextureARB;
 #endif
         supports_multitexture = vgl->ActiveTextureARB &&
-                                vgl->MultiTexCoord2fARB;
+                                vgl->ClientActiveTextureARB;
         if (supports_multitexture)
             glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &max_texture_units);
     }
@@ -669,35 +669,45 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     glTexCoordPointer(2, GL_FLOAT, 0, textureCoord);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
 #else
-    for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-        if (vgl->use_multitexture)
-            vgl->ActiveTextureARB(GL_TEXTURE0_ARB + j);
+
+    const GLfloat vertexCoord[] = {
+        -1.0, 1.0,
+        -1.0, -1.0,
+        1.0, 1.0,
+        1.0, -1.0,
+    };
+
+    for( unsigned j = 0; j < vgl->chroma->plane_count; j++)
+    {
+        const GLfloat texCoord[] = {
+            left[j], top[j],
+            left[j], bottom[j],
+            right[j], top[j],
+            right[j], bottom[j],
+        };
+        vgl->ActiveTextureARB( GL_TEXTURE0_ARB+j);
+        vgl->ClientActiveTextureARB( GL_TEXTURE0_ARB+j);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glBindTexture(vgl->tex_target, vgl->texture[0][j]);
+        glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
     }
-    glBegin(GL_POLYGON);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
+    glDrawArrays( GL_TRIANGLE_STRIP, 0, 4);
+    glDisableClientState(GL_VERTEX_ARRAY);
 
-    glTexCoord2f(left[0],  top[0]);
-    for (unsigned j = 1; j < vgl->chroma->plane_count; j++)
-        vgl->MultiTexCoord2fARB(GL_TEXTURE0_ARB + j, left[j], top[j]);
-    glVertex2f(-1.0,  1.0);
+    for( int j = vgl->chroma->plane_count; j >= 0;j--)
+    {
+        vgl->ActiveTextureARB( GL_TEXTURE0_ARB+j);
+        vgl->ClientActiveTextureARB( GL_TEXTURE0_ARB+j);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    }
 
-    glTexCoord2f(right[0], top[0]);
-    for (unsigned j = 1; j < vgl->chroma->plane_count; j++)
-        vgl->MultiTexCoord2fARB(GL_TEXTURE0_ARB + j, right[j], top[j]);
-    glVertex2f( 1.0,  1.0);
 
-    glTexCoord2f(right[0], bottom[0]);
-    for (unsigned j = 1; j < vgl->chroma->plane_count; j++)
-        vgl->MultiTexCoord2fARB(GL_TEXTURE0_ARB + j, right[j], bottom[j]);
-    glVertex2f( 1.0, -1.0);
-
-    glTexCoord2f(left[0],  bottom[0]);
-    for (unsigned j = 1; j < vgl->chroma->plane_count; j++)
-        vgl->MultiTexCoord2fARB(GL_TEXTURE0_ARB + j, left[j], bottom[j]);
-    glVertex2f(-1.0, -1.0);
-
-    glEnd();
 #endif
 
     if (vgl->program)
@@ -711,29 +721,31 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    const GLfloat textureCoord[] = {
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 0.0,
+        1.0, 1.0,
+    };
     for (int i = 0; i < vgl->region_count; i++) {
         gl_region_t *glr = &vgl->region[i];
+        const GLfloat vertexCoord[] = {
+            glr->left, glr->top,
+            glr->left, glr->bottom,
+            glr->right, glr->top,
+            glr->right,glr->bottom,
+        };
+        glColor4f(1.0f, 1.0f, 1.0f, glr->alpha);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
         glBindTexture(GL_TEXTURE_2D, glr->texture);
-
-        glBegin(GL_POLYGON);
-
-        glColor4f(1.0, 1.0, 1.0, glr->alpha);
-
-        glTexCoord2f(0.0, 0.0);
-        glVertex2f(glr->left, glr->top);
-
-        glTexCoord2f(1.0, 0.0);
-        glVertex2f(glr->right, glr->top);
-
-        glTexCoord2f(1.0, 1.0);
-        glVertex2f(glr->right, glr->bottom);
-
-        glTexCoord2f(0.0, 1.0);
-        glVertex2f(glr->left, glr->bottom);
-
-        glEnd();
+        glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
+        glTexCoordPointer(2, GL_FLOAT, 0, textureCoord);
+        glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
+    glDisableClientState(GL_VERTEX_ARRAY);
     glDisable(GL_BLEND);
     glDisable(GL_TEXTURE_2D);
 #endif
