@@ -15,7 +15,10 @@ POSTPROCCONF += --enable-small --optflags=-O2
 endif
 
 ifdef HAVE_CROSS_COMPILE
-POSTPROCCONF += --enable-cross-compile --cross-prefix=$(HOST)-
+POSTPROCCONF += --enable-cross-compile
+ifndef HAVE_IOS
+POSTPROCCONF += --cross-prefix=$(HOST)-
+endif
 endif
 
 # ARM stuff
@@ -28,8 +31,11 @@ endif
 endif
 
 # Darwin
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 POSTPROCCONF += --arch=$(ARCH) --target-os=darwin
+endif
+ifdef HAVE_IOS
+POSTPROCCONF += --cpu=cortex-a8 --as="$(AS)" --target-os=darwin
 endif
 ifeq ($(ARCH),x86_64)
 POSTPROCCONF += --cpu=core2
