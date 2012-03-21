@@ -18,12 +18,18 @@ Audio Filters:
 Codecs:
  * Support for CDXL, Ut Video, VBLE, Dxtory codecs via libavcodec.
 
+Access:
+ * Screen: Added support for OS X Lion
+
 Video Filters:
  * new anaglyph video filter which transforms side by side 3D video streams in
    anaglyph glasses (aka red/blue) compatible images.
 
 Interfaces:
  * fixed lua command line interface console mode under Windows.
+
+Mac OS X Interface:
+ * added a GUI for the QTSound access module to process audio captured locally
 
 Removed modules:
  * portaudio audio output
