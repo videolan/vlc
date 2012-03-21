@@ -206,6 +206,7 @@ gas: yuvi-gas-preprocessor-$(GAS_VERSION).tar.gz
 	$(MOVE)
 
 .gas: gas
+	cp gas/gas-preprocessor.pl build/bin/
 	touch $@
 
 CLEAN_FILE += .gas
