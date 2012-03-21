@@ -14,6 +14,9 @@ endif
 ifdef HAVE_MACOSX
 LUA_TARGET := macosx
 endif
+ifdef HAVE_IOS
+LUA_TARGET := ios
+endif
 ifdef HAVE_WIN32
 LUA_TARGET := mingw
 endif
@@ -34,11 +37,14 @@ lua: lua-$(LUA_VERSION).tar.gz .sum-lua
 	$(APPLY) $(SRC)/lua/lua-noreadline.patch
 	$(APPLY) $(SRC)/lua/luac-32bits.patch
 	$(APPLY) $(SRC)/lua/no-localeconv.patch
-ifdef HAVE_MACOSX
+ifdef HAVE_DARWIN_OS
 	(cd $(UNPACK_DIR) && \
 	sed -e 's%gcc%$(CC)%' \
 		-e 's%LDFLAGS=%LDFLAGS=$(EXTRA_CFLAGS) $(EXTRA_LDFLAGS)%' \
 		-i.orig src/Makefile)
+endif
+ifdef HAVE_IOS
+	$(APPLY) $(SRC)/lua/lua-ios-support.patch
 endif
 ifdef HAVE_WIN32
 	cd $(UNPACK_DIR) && sed -i.orig -e 's/lua luac/lua.exe/' Makefile
