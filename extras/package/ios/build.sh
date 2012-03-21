@@ -113,7 +113,7 @@ export PATH=$PATH:${VLCROOT}/extras/package/ios/resources
 info "Building tools"
 spushd "${VLCROOT}/extras/tools"
 ./bootstrap
-make
+make && make .gas
 spopd
 
 info "Building contrib for iOS in '${VLCROOT}/contrib/iPhone${PLATFORM}'"
