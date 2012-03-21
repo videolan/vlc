@@ -21,7 +21,7 @@ endif
 ifdef HAVE_WINCE
 LIVE_TARGET := mingw
 endif
-ifdef HAVE_MACOSX
+ifdef HAVE_DARWIN_OS
 LIVE_TARGET := macosx
 else
 ifdef HAVE_BSD
