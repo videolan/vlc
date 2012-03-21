@@ -47,7 +47,7 @@ endif
 
 ifdef HAVE_LINUX
 VPX_OS := linux
-else ifdef HAVE_MACOSX
+else ifdef HAVE_DARWIN_OS
 ifeq ($(ARCH),arm)
 VPX_OS := darwin
 else
