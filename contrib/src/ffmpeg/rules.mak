@@ -70,7 +70,10 @@ FFMPEGCONF += --cpu=core2
 endif
 endif
 ifdef HAVE_IOS
-FFMPEGCONF += --as="$(TOPSRC)/../extras/tools/gas/gas-preprocessor.pl $(CC)" --enable-pic
+FFMPEGCONF += --as="$(AS)" --enable-pic
+ifeq ($(ARCH), arm)
+FFMPEGCONF += --cpu=cortex-a8
+endif
 endif
 
 # Linux

@@ -150,6 +150,11 @@ endif
 ifdef HAVE_IOS
 CC=xcrun clang
 CXX=xcrun clang++
+ifeq ($(ARCH), arm)
+AS=perl $(abspath ../../extras/tools/build/bin/gas-preprocessor.pl) $(CC)
+else
+AS=xcrun as
+endif
 AR=xcrun ar
 LD=xcrun ld
 STRIP=xcrun strip
