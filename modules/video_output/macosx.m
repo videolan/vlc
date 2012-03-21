@@ -561,8 +561,6 @@ static void OpenglSwap(vlc_gl_t *gl)
     if (![[self window] isFullscreen])
     {
         NSRect frame = [value rectValue];
-        if (frame.origin.x <= 0.0 && frame.origin.y <= 0.0)
-            [[self window] center];
         [[self window] setFrame:frame display:YES animate: YES];
     }
 }
