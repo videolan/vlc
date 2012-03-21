@@ -434,6 +434,8 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                     new_frame.size.height = screenFrame.size.height;
                     new_frame.origin.y = screenFrame.origin.y;
                 }
+                if( new_frame.origin.y < screenFrame.origin.y )
+                    new_frame.origin.y = screenFrame.origin.y;
 
                 [sys->glView performSelectorOnMainThread:@selector(setWindowFrameWithValue:) withObject:[NSValue valueWithRect:new_frame] waitUntilDone:NO];
             }
