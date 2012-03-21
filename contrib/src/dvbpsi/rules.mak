@@ -16,9 +16,7 @@ $(TARBALLS)/libdvbpsi-$(DVBPSI_VERSION).tar.bz2:
 libdvbpsi: libdvbpsi-$(DVBPSI_VERSION).tar.bz2 .sum-dvbpsi
 	$(UNPACK)
 	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub .auto
-ifdef HAVE_IOS
 	$(APPLY) $(SRC)/dvbpsi/dvbpsi-noexamples.patch
-endif
 	$(MOVE)
 
 .dvbpsi: libdvbpsi
