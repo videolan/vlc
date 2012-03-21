@@ -15,14 +15,11 @@ VLC_PLATFORM[sdk=iphoneos*]=OS
 VLC_INSTALL_DIR=$(VLC_SRC_DIR)/install-ios-$(VLC_PLATFORM)
 
 //OTHER_CFLAGS= -ObjC -all_load
-
 #include "vlc-plugins.xcconfig"
 
-VLC_CONTRIB_DIR=$VLC_SRC_DIR/contrib-ios-$(VLC_ARCH)-apple-darwin10
-AVCODEC=${VLC_CONTRIB_DIR}/lib/libavcore.a $(VLC_CONTRIB_DIR)/lib/libavutil.a ${VLC_CONTRIB_DIR}/lib/libavcodec.a $(VLC_CONTRIB_DIR)/lib/libavformat.a $(VLC_CONTRIB_DIR)/lib/libswscale.a
-LIVE555=$(VLC_CONTRIB_DIR)/lib/libBasicUsageEnvironment.a $(VLC_CONTRIB_DIR)/lib/libUsageEnvironment.a $(VLC_CONTRIB_DIR)/lib/libliveMedia.a $(VLC_CONTRIB_DIR)/lib/libgroupsock.a
+VLC_CONTRIB_DIR=$VLC_SRC_DIR/contrib/$(VLC_ARCH)-apple-darwin11
 DVBPSI=$(VLC_CONTRIB_DIR)/lib/libdvbpsi.a
-LUA=//$(VLC_CONTRIB_DIR)/lib/liblua.a
-FAAD=$(VLC_CONTRIB_DIR)/lib/libfaad.a
+AVCODEC=$(VLC_CONTRIB_DIR)/lib/libavutil.a ${VLC_CONTRIB_DIR}/lib/libavcodec.a $(VLC_CONTRIB_DIR)/lib/libavformat.a $(VLC_CONTRIB_DIR)/lib/libswscale.a
+LIVE555=$(VLC_CONTRIB_DIR)/lib/libliveMedia.a
 
-OTHER_LIBTOOLFLAGS=$(AVCODEC) $(LIVE555) $(DVBPSI) $(LUA) $(FAAD) $(VLC_INSTALL_DIR)/lib/libvlc.a $(VLC_INSTALL_DIR)/lib/libvlccore.a $(VLC_PLUGINS_LDFLAGS)
+OTHER_LIBTOOLFLAGS=$(AVCODEC) $(DVBPSI) $(LIVE555) $(VLC_INSTALL_DIR)/lib/vlc/libcompat.a  $(VLC_INSTALL_DIR)/lib/libvlc.a $(VLC_INSTALL_DIR)/lib/libvlccore.a $(VLC_PLUGINS_LDFLAGS)
