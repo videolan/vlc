@@ -1,0 +1,12 @@
+diff -ru libogg/src/Makefile.am libogg/src/Makefile.am
+--- libogg/src/Makefile.am	2011-08-04 19:07:42.000000000 +0200
++++ libogg-f/src/Makefile.am	2012-03-21 13:05:23.000000000 +0100
+@@ -9,7 +9,7 @@
+ 
+ # build and run the self tests on 'make check'
+ 
+-noinst_PROGRAMS = test_bitwise test_framing
++noinst_PROGRAMS =
+ 
+ test_bitwise_SOURCES = bitwise.c
+ test_bitwise_CFLAGS = -D_V_SELFTEST

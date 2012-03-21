@@ -22,11 +22,12 @@ libogg: libogg-$(OGG_VERSION).tar.xz .sum-ogg
 ifdef HAVE_WINCE
 	$(APPLY) $(SRC)/ogg/libogg-wince.patch
 endif
+	$(APPLY) $(SRC)/ogg/libogg-disable-check.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 .ogg: libogg
-	#$(RECONF)
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
