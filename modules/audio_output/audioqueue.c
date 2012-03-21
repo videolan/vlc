@@ -36,6 +36,7 @@
 #include <AudioToolBox/AudioToolBox.h>
 
 #define NUMBER_OF_BUFFERS 3
+#define FRAME_SIZE 2048
 
 /*****************************************************************************
  * aout_sys_t: AudioQueue audio output method descriptor
@@ -133,6 +134,22 @@ static int Open ( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
+  * aout_FifoPop : get the next buffer out of the FIFO
+  *****************************************************************************/
+static aout_buffer_t *aout_FifoPop2( aout_fifo_t * p_fifo )
+ {
+     aout_buffer_t *p_buffer = p_fifo->p_first;
+     if( p_buffer != NULL )
+     {
+         p_fifo->p_first = p_buffer->p_next;
+         if( p_fifo->p_first == NULL )
+             p_fifo->pp_last = &p_fifo->p_first;
+     }
+     return p_buffer;
+ }
+
+
+/*****************************************************************************
  * Close: close the audio device
  *****************************************************************************/
 static void Close ( vlc_object_t *p_this )
@@ -153,9 +170,15 @@ void AudioQueueCallback(void * inUserData, AudioQueueRef inAQ, AudioQueueBufferR
     aout_buffer_t *   p_buffer = NULL;
 
     if (p_aout) {
-        vlc_mutex_lock( &p_aout->lock );
-        p_buffer = aout_FifoPop( &p_aout->fifo );
-        vlc_mutex_unlock( &p_aout->lock );
+        struct aout_sys_t * p_sys = p_aout->sys;
+        aout_packet_t * packet = &p_sys->packet;
+
+        if (packet)
+        {
+            vlc_mutex_lock( &packet->lock );
+            p_buffer = aout_FifoPop2( &packet->fifo );
+            vlc_mutex_unlock( &packet->lock );
+        }
     }
 
     if ( p_buffer != NULL ) {
