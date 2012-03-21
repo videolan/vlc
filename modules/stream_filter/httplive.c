@@ -484,7 +484,8 @@ static char *parse_Attributes(const char *line, const char *attr)
     begin = p;
     do
     {
-        if (strncasecmp(begin, attr, strlen(attr)) == 0)
+        if (strncasecmp(begin, attr, strlen(attr)) == 0
+          && begin[strlen(attr)] == '=')
         {
             /* <attr>=<value>[,]* */
             p = strchr(begin, ',');
