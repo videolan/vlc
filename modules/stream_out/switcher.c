@@ -286,7 +286,9 @@ static int Open( vlc_object_t *p_this )
     p_stream->pf_send   = Send;
     p_stream->p_sys     = p_sys;
 
+#if LIBAVCODEC_VERSION_MAJOR < 54
     avcodec_init();
+#endif
     avcodec_register_all();
 
     return VLC_SUCCESS;
@@ -349,7 +351,11 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             return NULL;
         }
 
+#if LIBAVCODEC_VERSION_MAJOR < 54
         id->ff_enc_c = avcodec_alloc_context();
+#else
+        id->ff_enc_c = avcodec_alloc_context3( id->ff_enc );
+#endif
 
         /* Set CPU capabilities */
         unsigned i_cpu = vlc_CPU();
@@ -382,7 +388,11 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->ff_enc_c->bit_rate    = p_fmt->i_bitrate;
 
         vlc_avcodec_lock();
+#if LIBAVCODEC_VERSION_MAJOR >= 54
+        if( avcodec_open2( id->ff_enc_c, id->ff_enc, NULL /* options */ ) )
+#else
         if( avcodec_open( id->ff_enc_c, id->ff_enc ) )
+#endif
         {
             vlc_avcodec_unlock();
             msg_Err( p_stream, "cannot open encoder" );
@@ -742,7 +752,11 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
             return 0;
         }
 
+#if LIBAVCODEC_VERSION_MAJOR < 54
         id->ff_enc_c = avcodec_alloc_context();
+#else
+        id->ff_enc_c = avcodec_alloc_context3( id->ff_enc );
+#endif
 
         /* Set CPU capabilities */
         unsigned i_cpu = vlc_CPU();
@@ -797,7 +811,11 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
         id->ff_enc_c->pix_fmt = PIX_FMT_YUV420P;
 
         vlc_avcodec_lock();
+#if LIBAVCODEC_VERSION_MAJOR >= 54
+        if( avcodec_open2( id->ff_enc_c, id->ff_enc, NULL /* options */ ) )
+#else
         if( avcodec_open( id->ff_enc_c, id->ff_enc ) )
+#endif
         {
             vlc_avcodec_unlock();
             msg_Err( p_stream, "cannot open encoder" );
@@ -838,7 +856,7 @@ static block_t *VideoGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     if ( id->i_nb_pred >= p_sys->i_gop )
     {
-        id->p_frame->pict_type = FF_I_TYPE;
+        id->p_frame->pict_type = AV_PICTURE_TYPE_I;
 #if 0
         id->p_frame->me_threshold = 0;
         id->p_frame->mb_threshold = 0;
@@ -847,7 +865,7 @@ static block_t *VideoGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
     }
     else
     {
-        id->p_frame->pict_type = FF_P_TYPE;
+        id->p_frame->pict_type = AV_PICTURE_TYPE_P;
 #if 0
         if ( id->p_frame->mb_type != NULL )
         {
@@ -867,7 +885,7 @@ static block_t *VideoGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
 
 #if 0
     if ( id->p_frame->mb_type == NULL
-          && id->ff_enc_c->coded_frame->pict_type != FF_I_TYPE )
+          && id->ff_enc_c->coded_frame->pict_type != AV_PICTURE_TYPE_I )
     {
         int mb_width = (id->ff_enc_c->width + 15) / 16;
         int mb_height = (id->ff_enc_c->height + 15) / 16;
@@ -920,13 +938,13 @@ static block_t *VideoGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     switch ( id->ff_enc_c->coded_frame->pict_type )
     {
-    case FF_I_TYPE:
+    case AV_PICTURE_TYPE_I:
         p_out->i_flags |= BLOCK_FLAG_TYPE_I;
         break;
-    case FF_P_TYPE:
+    case AV_PICTURE_TYPE_P:
         p_out->i_flags |= BLOCK_FLAG_TYPE_P;
         break;
-    case FF_B_TYPE:
+    case AV_PICTURE_TYPE_B:
         p_out->i_flags |= BLOCK_FLAG_TYPE_B;
         break;
     default:
