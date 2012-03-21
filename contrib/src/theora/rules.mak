@@ -37,6 +37,9 @@ endif
 ifdef HAVE_MACOSX64
 THEORACONF += --disable-asm
 endif
+ifdef HAVE_IOS
+THEORACONF += --disable-asm
+endif
 ifdef HAVE_WIN64
 THEORACONF += --disable-asm
 endif
