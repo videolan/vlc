@@ -103,7 +103,7 @@ BUILDDIR="${VLCROOT}/build-ios-${PLATFORM}"
 
 PREFIX="${VLCROOT}/install-ios-${PLATFORM}"
 
-IOS_GAS_PREPROCESSOR="${VLCROOT}/extras/package/ios/resources/gas-preprocessor.pl"
+IOS_GAS_PREPROCESSOR="${VLCROOT}/extras/tools/gas/gas-preprocessor.pl"
 
 export PATH="${VLCROOT}/extras/tools/build/bin:${VLCROOT}/contrib/${TARGET}/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin"
 
