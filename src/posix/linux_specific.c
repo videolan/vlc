@@ -77,6 +77,10 @@ error:
 
 char *config_GetDataDir (void)
 {
+    const char *path = getenv ("VLC_DATA_PATH");
+    if (path != NULL)
+        return strdup (path);
+
     char *libdir = config_GetLibDir ();
     if (libdir == NULL)
         return NULL; /* OOM */
