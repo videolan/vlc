@@ -51,12 +51,6 @@
 #   include <avcodec.h>
 #endif
 
-#ifdef HAVE_POSTPROC_POSTPROCESS_H
-#   include <postproc/postprocess.h>
-#else
-#   include <libpostproc/postprocess.h>
-#endif
-
 #include "../codec/avcodec/avcodec.h"
 
 #define SOUT_CFG_PREFIX "sout-switcher-"
