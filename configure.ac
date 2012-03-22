@@ -504,7 +504,8 @@ AC_LINK_IFELSE([
             c = NULL;
     ])],[AC_DEFINE([HAVE_ASPRINTF],[1],[Define to 1 if you have asprintf function])],[AC_LIBOBJ([asprintf])])
 AC_LINK_IFELSE([
-    AC_LANG_PROGRAM([#include <stdio.h>], [
+    AC_LANG_PROGRAM([#include <stdio.h>
+                     #include <stdarg.h>], [
         char *c;
         va_list ap;
         if (vasprintf(&c, "%s %d", ap) == -1)
