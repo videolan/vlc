@@ -57,22 +57,6 @@ VLC_API void * ToCharset( const char *charset, const char *in, size_t *outsize )
 
 #else
 VLC_USED
-static inline char *FromLocale (const char *locale)
-{
-    return locale ? FromCharset ("", locale, strlen (locale)) : NULL;
-}
-
-VLC_USED
-static inline char *ToLocale (const char *utf8)
-{
-    size_t outsize;
-    return utf8 ? (char *)ToCharset ("", utf8, &outsize) : (char *)NULL;
-}
-# define LocaleFree(s) free((char *)(s))
-# define FromLocaleDup FromLocale
-# define ToLocaleDup   ToLocale
-
-VLC_USED
 static inline char *FromWide (const wchar_t *wide)
 {
     size_t len = WideCharToMultiByte (CP_UTF8, 0, wide, -1, NULL, 0, NULL, NULL);
@@ -135,13 +119,30 @@ static inline char *FromCodePage (unsigned cp, const char *mb)
     return utf8;
 }
 
+VLC_USED VLC_MALLOC
+static inline char *FromANSI (const char *ansi)
+{
+    return FromCodePage (GetACP (), ansi);
+}
+
+VLC_USED VLC_MALLOC
+static inline char *ToANSI (const char *utf8)
+{
+    return ToCodePage (GetACP (), utf8);
+}
+
 # ifdef UNICODE
 #  define FromT FromWide
 #  define ToT   ToWide
 # else
-#  define FromT FromLocaleDup
-#  define ToT   ToLocaleDup
+#  define FromT FromANSI
+#  define ToT   ToANSI
 # endif
+# define FromLocale    FromANSI
+# define ToLocale      ToAnsi
+# define LocaleFree(s) free((char *)(s))
+# define FromLocaleDup FromANSI
+# define ToLocaleDup   ToANSI
 #endif
 
 /**
