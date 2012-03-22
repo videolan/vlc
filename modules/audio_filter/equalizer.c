@@ -1,7 +1,7 @@
 /*****************************************************************************
  * equalizer.c:
  *****************************************************************************
- * Copyright (C) 2004-2009 the VideoLAN team
+ * Copyright (C) 2004-2012 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -39,11 +39,11 @@
 #include <vlc_filter.h>
 
 #include "equalizer_presets.h"
+
 /* TODO:
- *  - add tables for other rates ( 22500, 11250, ...)
  *  - optimize a bit (you can hardly do slower ;)
  *  - add tables for more bands (15 and 32 would be cool), maybe with auto coeffs
- *  computation (not too hard once the Q is found).
+ *    computation (not too hard once the Q is found).
  *  - support for external preset
  *  - callback to handle preset changes on the fly
  *  - ...
@@ -63,6 +63,11 @@ static void Close( vlc_object_t * );
          "Don't use presets, but manually specified bands. You need to " \
          "provide 10 values between -20dB and 20dB, separated by spaces, " \
          "e.g. \"0 2 4 2 0 -2 -4 -2 0 2\"." )
+
+#define VLC_BANDS_TEXT N_( "Use VLC frequency bands" )
+#define VLC_BANDS_LONGTEXT N_( \
+         "Use the VLC frequency bands. Otherwise, use the ISO Standard " \
+         "frequency bands." )
 
 #define TWOPASS_TEXT N_( "Two pass" )
 #define TWOPASS_LONGTEXT N_( "Filter the audio twice. This provides a more "  \
@@ -85,6 +90,8 @@ vlc_module_begin ()
                 BANDS_LONGTEXT, true )
     add_bool( "equalizer-2pass", false, TWOPASS_TEXT,
               TWOPASS_LONGTEXT, true )
+    add_bool( "equalizer-vlcfreqs", true, VLC_BANDS_TEXT,
+              VLC_BANDS_LONGTEXT, true )
     add_float( "equalizer-preamp", 12.0, PREAMP_TEXT,
                PREAMP_LONGTEXT, true )
     set_callbacks( Open, Close )
@@ -225,39 +232,67 @@ typedef struct
 
 } eqz_config_t;
 
-/* Value from equ-xmms */
-static const eqz_config_t eqz_config_44100_10b =
+/* The frequency tables */
+static const float f_vlc_frequency_table_10b[EQZ_BANDS_MAX] =
 {
-    10,
-    {
-        {    60, 0.003013, 0.993973, 1.993901 },
-        {   170, 0.008490, 0.983019, 1.982437 },
-        {   310, 0.015374, 0.969252, 1.967331 },
-        {   600, 0.029328, 0.941343, 1.934254 },
-        {  1000, 0.047918, 0.904163, 1.884869 },
-        {  3000, 0.130408, 0.739184, 1.582718 },
-        {  6000, 0.226555, 0.546889, 1.015267 },
-        { 12000, 0.344937, 0.310127, -0.181410 },
-        { 14000, 0.366438, 0.267123, -0.521151 },
-        { 16000, 0.379009, 0.241981, -0.808451 },
-    }
+    60, 170, 310, 600, 1000, 3000, 6000, 12000, 14000, 16000,
 };
-static const eqz_config_t eqz_config_48000_10b =
+
+static const float f_iso_frequency_table_10b[EQZ_BANDS_MAX] =
 {
-    10,
-    {
-        {    60, 0.002769, 0.994462, 1.994400 },
-        {   170, 0.007806, 0.984388, 1.983897 },
-        {   310, 0.014143, 0.971714, 1.970091 },
-        {   600, 0.027011, 0.945978, 1.939979 },
-        {  1000, 0.044203, 0.911595, 1.895241 },
-        {  3000, 0.121223, 0.757553, 1.623767 },
-        {  6000, 0.212888, 0.574224, 1.113145 },
-        { 12000, 0.331347, 0.337307, 0.000000 },
-        { 14000, 0.355263, 0.289473, -0.333740 },
-        { 16000, 0.371900, 0.256201, -0.628100 }
-    }
+    31.25, 62.5, 125, 250, 500, 1000, 2000, 4000, 8000, 16000,
 };
+
+/* Equalizer coefficient calculation function based on equ-xmms */
+static void EqzCoeffs( int i_rate, float f_octave_percent,
+                       bool b_use_vlc_freqs,
+                       eqz_config_t *p_eqz_config )
+{
+    const float *f_freq_table_10b = b_use_vlc_freqs
+                                  ? f_vlc_frequency_table_10b
+                                  : f_iso_frequency_table_10b;
+    float f_rate = (float) i_rate;
+    float f_nyquist_freq = 0.5 * f_rate;
+    float f_octave_factor = pow( 2.0, 0.5 * f_octave_percent );
+    float f_octave_factor_1 = 0.5 * ( f_octave_factor + 1.0 );
+    float f_octave_factor_2 = 0.5 * ( f_octave_factor - 1.0 );
+
+    p_eqz_config->i_band = EQZ_BANDS_MAX;
+
+    for( int i = 0; i < EQZ_BANDS_MAX; i++ )
+    {
+        float f_freq = f_freq_table_10b[i];
+
+        p_eqz_config->band[i].f_frequency = f_freq;
+
+        if( f_freq <= f_nyquist_freq )
+        {
+            float f_theta_1 = ( 2.0 * M_PI * f_freq ) / f_rate;
+            float f_theta_2 = f_theta_1 / f_octave_factor;
+            float f_sin     = sin( f_theta_2 ) * 0.5;
+            float f_sin_prd = sin( f_theta_2 * f_octave_factor_1 )
+                            * sin( f_theta_2 * f_octave_factor_2 );
+            /* The equation from equ-xmms simplifies to something similar to
+             * this when you restrict the domain to all valid frequencies at or
+             * below the Nyquist frequency (the interval 0 <= f_theta_1 <= Pi).
+             * (This result for the root is twice that returned by equ-xmms,
+             * but the more efficient calculations for alpha, beta, and gamma
+             * below compensate for this.) */
+            float f_root    = ( f_sin - f_sin_prd ) / ( f_sin + f_sin_prd );
+
+            p_eqz_config->band[i].f_alpha = ( 1.0 - f_root ) * 0.5;
+            p_eqz_config->band[i].f_beta  = f_root;
+            p_eqz_config->band[i].f_gamma = ( 1.0 + f_root ) * cos( f_theta_1 );
+        }
+        else
+        {
+            /* Any frequency beyond the Nyquist frequency is no good... */
+            p_eqz_config->band[i].f_alpha =
+            p_eqz_config->band[i].f_beta  =
+            p_eqz_config->band[i].f_gamma = 0.0;
+        }
+    }
+}
 
 static inline float EqzConvertdB( float db )
 {
@@ -279,30 +314,17 @@ static inline float EqzConvertdB( float db )
 static int EqzInit( filter_t *p_filter, int i_rate )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    const eqz_config_t *p_cfg;
+    eqz_config_t cfg;
     int i, ch;
     vlc_value_t val1, val2, val3;
     vlc_object_t *p_aout = p_filter->p_parent;
     int i_ret = VLC_ENOMEM;
 
-    /* Select the config */
-    if( i_rate == 48000 )
-    {
-        p_cfg = &eqz_config_48000_10b;
-    }
-    else if( i_rate == 44100 )
-    {
-        p_cfg = &eqz_config_44100_10b;
-    }
-    else
-    {
-        /* TODO compute the coeffs on the fly */
-        msg_Err( p_filter, "rate not supported" );
-        return VLC_EGENERIC;
-    }
+    bool b_vlcFreqs = var_InheritBool( p_aout, "equalizer-vlcfreqs" );
+    EqzCoeffs( i_rate, 1.0, b_vlcFreqs, &cfg );
 
     /* Create the static filter config */
-    p_sys->i_band = p_cfg->i_band;
+    p_sys->i_band = cfg.i_band;
     p_sys->f_alpha = malloc( p_sys->i_band * sizeof(float) );
     p_sys->f_beta  = malloc( p_sys->i_band * sizeof(float) );
     p_sys->f_gamma = malloc( p_sys->i_band * sizeof(float) );
@@ -311,9 +333,9 @@ static int EqzInit( filter_t *p_filter, int i_rate )
 
     for( i = 0; i < p_sys->i_band; i++ )
     {
-        p_sys->f_alpha[i] = p_cfg->band[i].f_alpha;
-        p_sys->f_beta[i]  = p_cfg->band[i].f_beta;
-        p_sys->f_gamma[i] = p_cfg->band[i].f_gamma;
+        p_sys->f_alpha[i] = cfg.band[i].f_alpha;
+        p_sys->f_beta[i]  = cfg.band[i].f_beta;
+        p_sys->f_gamma[i] = cfg.band[i].f_gamma;
     }
 
     /* Filter dyn config */
@@ -396,7 +418,7 @@ static int EqzInit( filter_t *p_filter, int i_rate )
     for( i = 0; i < p_sys->i_band; i++ )
     {
         msg_Dbg( p_filter, "   %d Hz -> factor:%f alpha:%f beta:%f gamma:%f",
-                 (int)p_cfg->band[i].f_frequency, p_sys->f_amp[i],
+                 (int)cfg.band[i].f_frequency, p_sys->f_amp[i],
                  p_sys->f_alpha[i], p_sys->f_beta[i], p_sys->f_gamma[i]);
     }
     return VLC_SUCCESS;
