@@ -22,6 +22,16 @@ where path attributes are provided in output, these should be ignored in favour 
 path support is scheduled to be removed entirely from 1.3
 ---
 
+<root> (/)
+===========
+
+
+> Get album art for current input:
+  /art  (NB: not /requests/art)
+
+> Get album art for any playlist input (available from API version 3):
+  /art?item=123  (NB: not /requests/art)
+
 
 status.xml or status.json
 ===========

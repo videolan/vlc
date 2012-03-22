@@ -437,7 +437,7 @@ local aout = vlc.object.aout()
     local s ={}
 
     --update api version when new data/commands added
-    s.apiversion=2
+    s.apiversion=3
     s.version=vlc.misc.version()
     s.volume=vlc.volume.get()
 
