@@ -287,6 +287,7 @@ static int Open(vlc_object_t *obj)
 
     const pa_stream_flags_t flags = PA_STREAM_INTERPOLATE_TIMING
                                   | PA_STREAM_AUTO_TIMING_UPDATE
+                                  | PA_STREAM_ADJUST_LATENCY
                                   | PA_STREAM_FIX_FORMAT
                                   | PA_STREAM_FIX_RATE
                                   /*| PA_STREAM_FIX_CHANNELS*/;
