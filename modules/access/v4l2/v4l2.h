@@ -94,7 +94,6 @@ struct demux_sys_t
     unsigned int i_nbuffers;
 #define blocksize i_nbuffers /* HACK HACK */
 
-    int i_fourcc;
     uint32_t i_block_flags;
 
     es_out_id_t *p_es;
