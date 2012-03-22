@@ -57,7 +57,9 @@ int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
     return vfprintf (stream, fmt, ap);
 #else
     char *str;
-    int res;
+    int res = vasprintf (&str, fmt, ap);
+    if (unlikely(res == -1))
+        return -1;
 
 # ifndef UNDER_CE
     /* Writing to the console is a lot of fun on Microsoft Windows.
@@ -67,44 +69,33 @@ int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
     int fd = _fileno (stream);
     if (likely(fd != -1) && _isatty (fd))
     {
-        res = vasprintf (&str, fmt, ap);
-        if (unlikely(res == -1))
-            return -1;
-
-        size_t wlen = 2 * (res + 1);
-        wchar_t *wide = malloc (wlen);
+        wchar_t *wide = ToWide (str);
         if (likely(wide != NULL))
         {
-            wlen = MultiByteToWideChar (CP_UTF8, 0, str, res + 1, wide, wlen);
-            if (wlen > 0)
-            {
-                HANDLE h = (HANDLE)(intptr_t)_get_osfhandle (fd);
-                DWORD out;
+            HANDLE h = (HANDLE)((uintptr_t)_get_osfhandle (fd));
+            DWORD out;
 
-                WriteConsoleW (h, wide, wlen - 1, &out, NULL);
-            }
-            else
-                res = -1;
+            /* XXX: It is not clear whether WriteConsole() wants the number of
+             * Unicode characters or the size of the wchar_t array. */
+            WriteConsoleW (h, wide, wcslen (wide), &out, NULL);
             free (wide);
         }
         else
             res = -1;
-        free (str);
-        return res;
     }
+    else
 # endif
-
-    res = vasprintf (&str, fmt, ap);
-    if (unlikely(res == -1))
-        return -1;
-
-    char *ansi = ToLocaleDup (str);
+    {
+        char *ansi = ToANSI (str);
+        if (ansi != NULL)
+        {
+            fputs (ansi, stream);
+            free (ansi);
+        }
+        else
+            res = -1;
+    }
     free (str);
-
-    if (ansi == NULL)
-        return -1;
-    fputs (ansi, stream);
-    free (ansi);
     return res;
 #endif
 }
