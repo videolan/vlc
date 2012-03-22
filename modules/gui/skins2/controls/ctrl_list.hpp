@@ -61,6 +61,9 @@ public:
     /// Return true if the control can gain the focus
     virtual bool isFocusable() const { return true; }
 
+    /// Return true if the control can be scrollable
+    virtual bool isScrollable() const { return true; }
+
     /// Get the type of control (custom RTTI)
     virtual string getType() const { return "list"; }
 

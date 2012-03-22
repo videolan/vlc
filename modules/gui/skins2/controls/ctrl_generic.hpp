@@ -81,6 +81,9 @@ public:
     /// Return true if the control can gain the focus
     virtual bool isFocusable() const { return false; }
 
+    /// Return true if the control can be scrollable
+    virtual bool isScrollable() const { return false; }
+
     /// Return true if the control is visible
     virtual bool isVisible() const;
 

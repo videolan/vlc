@@ -55,6 +55,9 @@ public:
     /// Handle an event
     virtual void handleEvent( EvtGeneric &rEvent );
 
+    /// Return true if the control can be scrollable
+    virtual bool isScrollable() const { return true; }
+
     /// Check whether coordinates are inside the control
     virtual bool mouseOver( int x, int y ) const;
 
@@ -131,6 +134,9 @@ public:
                   int nbVert, int padHoriz, int padVert, VarBool *pVisible,
                   const UString &rHelp );
     virtual ~CtrlSliderBg();
+
+    /// Return true if the control can be scrollable
+    virtual bool isScrollable() const { return true; }
 
     /// Tell whether the mouse is over the control
     virtual bool mouseOver( int x, int y ) const;

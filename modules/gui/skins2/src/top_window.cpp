@@ -247,17 +247,14 @@ void TopWindow::processEvent( EvtScroll &rEvtScroll )
                                                   rEvtScroll.getYPos());
     setLastHit( pNewHitControl );
 
-    // Send a mouse event to the hit control, or to the control
-    // that captured the mouse, if any
-    CtrlGeneric *pActiveControl = pNewHitControl;
+    // send a mouse event to the right control when scrollable
+    // if none, send it directly to the vlc core
+    CtrlGeneric *pHitControl = m_pCapturingControl ?
+                               m_pCapturingControl : pNewHitControl;
 
-    if( m_pCapturingControl )
+    if( pHitControl && pHitControl->isScrollable() )
     {
-        pActiveControl = m_pCapturingControl;
-    }
-    if( pActiveControl )
-    {
-        pActiveControl->handleEvent( rEvtScroll );
+        pHitControl->handleEvent( rEvtScroll );
     }
     else
     {
