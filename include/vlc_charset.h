@@ -100,6 +100,41 @@ static inline wchar_t *ToWide (const char *utf8)
     return out;
 }
 
+VLC_USED VLC_MALLOC
+static inline char *ToCodePage (unsigned cp, const char *utf8)
+{
+    wchar_t *wide = ToWide (utf8);
+    if (wide == NULL)
+        return NULL;
+
+    size_t len = WideCharToMultiByte (cp, 0, wide, -1, NULL, 0, NULL, NULL);
+    if (len == 0)
+        return NULL;
+
+    char *out = (char *)malloc (len);
+    if (likely(out != NULL))
+        WideCharToMultiByte (cp, 0, wide, -1, out, len, NULL, NULL);
+    free (wide);
+    return out;
+}
+
+VLC_USED VLC_MALLOC
+static inline char *FromCodePage (unsigned cp, const char *mb)
+{
+    int len = MultiByteToWideChar (cp, 0, mb, -1, NULL, 0);
+    if (len == 0)
+        return NULL;
+
+    wchar_t *wide = (wchar_t *)malloc (len * sizeof (wchar_t));
+    if (unlikely(wide == NULL))
+        return NULL;
+    MultiByteToWideChar (cp, 0, mb, -1, wide, len);
+
+    char *utf8 = FromWide (wide);
+    free (wide);
+    return utf8;
+}
+
 # ifdef UNICODE
 #  define FromT FromWide
 #  define ToT   ToWide
