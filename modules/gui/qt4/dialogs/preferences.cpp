@@ -198,7 +198,6 @@ void PrefsDialog::setSmall()
                   currentItemChanged( int ),
                   this,  changeSimplePanel( int ) );
         simple_tree_panel->layout()->addWidget( simple_tree );
-        simple_tree_panel->setMinimumSize( QSize( 150, 0 ) );
         simple_tree_panel->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred );
     }
 
