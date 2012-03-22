@@ -278,7 +278,6 @@
 				COPY_PHASE_STRIP = NO;
 				DSTROOT = /tmp/MobileVLCKit.dst;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MobileVLCKit_Prefix.pch;
@@ -295,7 +294,6 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = armv7;
 				DSTROOT = /tmp/MobileVLCKit.dst;
-				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MobileVLCKit_Prefix.pch;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../../include";
