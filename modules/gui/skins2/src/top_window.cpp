@@ -159,27 +159,23 @@ void TopWindow::processEvent( EvtMouse &rEvtMouse )
         // Raise the window
         m_rWindowManager.raise( *this );
 
-        if( pNewHitControl && pNewHitControl->isFocusable() )
+        if( m_pFocusControl != pNewHitControl )
         {
-            // If a new control gains the focus, the previous one loses it
-            if( m_pFocusControl && m_pFocusControl != pNewHitControl )
+            if( m_pFocusControl )
             {
+                // The previous control loses the focus
                 EvtFocus evt( getIntf(), false );
                 m_pFocusControl->handleEvent( evt );
+                m_pFocusControl = NULL;
             }
-            if( pNewHitControl != m_pFocusControl )
+
+            if( pNewHitControl && pNewHitControl->isFocusable() )
             {
+                // The hit control gains the focus
                 m_pFocusControl = pNewHitControl;
                 EvtFocus evt( getIntf(), true );
                 pNewHitControl->handleEvent( evt );
             }
-        }
-        else if( m_pFocusControl )
-        {
-            // The previous control loses the focus
-            EvtFocus evt( getIntf(), false );
-            m_pFocusControl->handleEvent( evt );
-            m_pFocusControl = NULL;
         }
     }
 
