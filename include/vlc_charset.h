@@ -139,7 +139,7 @@ static inline char *ToANSI (const char *utf8)
 #  define ToT   ToANSI
 # endif
 # define FromLocale    FromANSI
-# define ToLocale      ToAnsi
+# define ToLocale      ToANSI
 # define LocaleFree(s) free((char *)(s))
 # define FromLocaleDup FromANSI
 # define ToLocaleDup   ToANSI
