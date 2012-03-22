@@ -880,7 +880,6 @@ static void* WaveOutThread( void *data )
     int i, i_queued_frames;
     bool b_sleek;
     mtime_t next_date;
-    uint32_t i_buffer_length = 64;
     int canc = vlc_savecancel ();
 
     /* We don't want any resampling when using S/PDIF */
@@ -952,7 +951,6 @@ static void* WaveOutThread( void *data )
                 {
                     mtime_t buffer_length = p_buffer->i_length;
                     next_date = next_date + buffer_length;
-                    i_buffer_length = buffer_length/1000;
                 }
 
                 /* Do the channel reordering */
