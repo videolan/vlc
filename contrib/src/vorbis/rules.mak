@@ -1,6 +1,6 @@
 # libvorbis
 
-VORBIS_VERSION := 1.3.2
+VORBIS_VERSION := 1.3.3
 VORBIS_URL := http://downloads.xiph.org/releases/vorbis/libvorbis-$(VORBIS_VERSION).tar.xz
 #VORBIS_URL := $(CONTRIB_VIDEOLAN)/libvorbis-$(VORBIS_VERSION).tar.gz
 
