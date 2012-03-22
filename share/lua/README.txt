@@ -299,6 +299,7 @@ playlist.get( [what, [tree]] ): Get the playlist.
   playlist will be returned in a tree layout. If set to false, the playlist
   will be returned using the flat layout.
   Each playlist item returned will have the following members:
+      .item: The input item.
       .id: The item's id.
       .flags: a table with the following members if the corresponding flag is
               set:
