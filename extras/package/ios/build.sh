@@ -130,9 +130,9 @@ export STRIP="xcrun strip"
 
 
 export SDKROOT
+export CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -mcpu=cortex-a8 -miphoneos-version-min=5.0 ${OPTIM}"
 export CPPFLAGS="${CFLAGS}"
 export CXXFLAGS="${CFLAGS}"
-export CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -miphoneos-version-min=5.0 ${OPTIM}"
 export OBJCFLAGS="${CFLAGS}"
 
 export CPP="xcrun cc -E"
@@ -168,7 +168,6 @@ fi
 ../bootstrap --host=${TARGET} --build="i686-apple-darwin10" --disable-disc --disable-sout \
     --enable-small \
     --disable-sdl \
-    --disable-SDL_image \
     --disable-fontconfig \
     --disable-ass \
     --disable-freetype2 \
@@ -184,7 +183,13 @@ fi
     --disable-vorbis \
     --disable-sidplay2 \
     --disable-samplerate \
-    --disable-goom > ${out}
+    --disable-goom \
+    --disable-gcrypt \
+    --disable-gnutls \
+    --disable-orc \
+    --disable-schroedinger \
+    --disable-libmpeg2 \
+    --disable-mad > ${out}
 make
 spopd
 
@@ -243,7 +248,6 @@ ${VLCROOT}/configure \
     --disable-macosx-qtkit \
     --disable-macosx-eyetv \
     --disable-macosx-vlc-app \
-    --with-macosx-sdk=${SDKROOT} \
     --enable-audioqueue \
     --enable-ios-vout \
     --disable-shared \
@@ -263,7 +267,6 @@ ${VLCROOT}/configure \
     --disable-qt4 --disable-skins2 \
     --disable-libgcrypt \
     --disable-vcd \
-    --disable-postproc \
     --disable-vlc \
     --disable-vlm \
     --disable-httpd \
@@ -274,6 +277,36 @@ ${VLCROOT}/configure \
     --disable-sse \
     --disable-neon \
     --disable-notify \
+    --enable-live555 \
+    --enable-realrtsp \
+    --enable-dvbpsi \
+    --enable-swscale \
+    --disable-projectm \
+    --disable-libass \
+    --disable-sqlite \
+    --disable-libxml2 \
+    --disable-goom \
+    --disable-dvdread \
+    --disable-dvdnav \
+    --disable-bluray \
+    --disable-linsys \
+    --disable-libva \
+    --disable-gme \
+    --disable-tremor \
+    --disable-vorbis \
+    --disable-fluidsynth \
+    --disable-jack \
+    --disable-pulse \
+    --disable-sout \
+    --disable-faad \
+    --disable-lua \
+    --disable-mad \
+    --enable-a52 \
+    --disable-mtp \
+    --disable-ogg \
+    --disable-speex \
+    --disable-theora \
+    --disable-flac \
     --disable-mmx > ${out} # MMX and SSE support requires llvm which is broken on Simulator
 fi
 
