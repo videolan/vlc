@@ -100,7 +100,6 @@ error:
 int InitVideo (access_t *access, int fd)
 {
     demux_sys_t *sys = (demux_sys_t *)access->p_sys;
-    unsigned int i_min;
     enum v4l2_buf_type buf_type;
 
     /* Get device capabilites */
