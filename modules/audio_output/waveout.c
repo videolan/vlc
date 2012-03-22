@@ -30,11 +30,15 @@
 # include "config.h"
 #endif
 
+#include <stdio.h>
+#include <wchar.h>
+
+#define UNICODE
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_aout_intf.h>
-#include <vlc_charset.h>                        /* FromLocaleDup, LocaleFree */
+#include <vlc_charset.h> /* FromWide() */
 #include <vlc_atomic.h>
 
 #include "windows_audio_common.h"
@@ -71,7 +75,7 @@ static int ReloadWaveoutDevices( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
 static uint32_t findDeviceID(char *);
 
-static const char psz_device_name_fmt[] = "%s ($%x,$%x)";
+static const wchar_t device_name_fmt[] = L"%ls ($%x,$%x)";
 
 static const char *const ppsz_adev[] = { "wavemapper", };
 static const char *const ppsz_adev_text[] = { N_("Microsoft Soundmapper") };
@@ -192,7 +196,7 @@ static int Open( vlc_object_t *p_this )
     {
       /* log debug some infos about driver, to know who to blame
          if it doesn't work */
-        msg_Dbg( p_aout, "Drivername: %s", waveoutcaps.szPname);
+        msg_Dbg( p_aout, "Drivername: %ls", waveoutcaps.szPname);
         msg_Dbg( p_aout, "Driver Version: %d.%d",
                           (waveoutcaps.vDriverVersion>>8)&255,
                           waveoutcaps.vDriverVersion & 255);
@@ -1052,24 +1056,22 @@ static int ReloadWaveoutDevices( vlc_object_t *p_this, char const *psz_name,
     p_item->ppsz_list_text = xrealloc( p_item->ppsz_list_text,
                           (wave_devices+2) * sizeof(char *) );
 
-    WAVEOUTCAPS caps;
-    char sz_dev_name[MAXPNAMELEN+32];
     int j=1;
     for(int i=0; i<wave_devices; i++)
     {
-        if(waveOutGetDevCaps(i, &caps, sizeof(WAVEOUTCAPS))
-           == MMSYSERR_NOERROR)
-        {
-          sprintf( sz_dev_name, psz_device_name_fmt, caps.szPname,
-                                               caps.wMid,
-                                               caps.wPid
-                                              );
-          p_item->ppsz_list[j] = FromLocaleDup( sz_dev_name );
-          p_item->ppsz_list_text[j] = FromLocaleDup( sz_dev_name );
-          p_item->i_list++;
-          j++;
-        }
+        WAVEOUTCAPS caps;
+        wchar_t dev_name[MAXPNAMELEN+32];
 
+        if(waveOutGetDevCaps(i, &caps, sizeof(WAVEOUTCAPS))
+                                                           != MMSYSERR_NOERROR)
+            continue;
+
+        swprintf(dev_name, MAXPNAMELEN + 32, device_name_fmt,
+                 caps.szPname, caps.wMid, caps.wPid);
+        p_item->ppsz_list[j] = FromWide( dev_name );
+        p_item->ppsz_list_text[j] = FromWide( dev_name );
+        p_item->i_list++;
+        j++;
     }
     p_item->ppsz_list[j] = NULL;
     p_item->ppsz_list_text[j] = NULL;
@@ -1092,27 +1094,25 @@ static uint32_t findDeviceID(char *psz_device_name)
        return WAVE_MAPPER;
 
     uint32_t wave_devices = waveOutGetNumDevs();
-    WAVEOUTCAPS caps;
-    char sz_dev_name[MAXPNAMELEN+32];
 
     for( uint32_t i = 0; i < wave_devices; i++ )
     {
-        if( waveOutGetDevCaps( i, &caps, sizeof(WAVEOUTCAPS) )
-           == MMSYSERR_NOERROR)
-        {
-            sprintf( sz_dev_name, psz_device_name_fmt, caps.szPname,
-                                               caps.wMid,
-                                               caps.wPid
-                                              );
-            char *psz_temp = FromLocaleDup(sz_dev_name);
+        WAVEOUTCAPS caps;
+        wchar_t dev_name[MAXPNAMELEN+32];
 
-            if( !stricmp(psz_temp, psz_device_name) )
-            {
-                LocaleFree( psz_temp );
-                return i;
-            }
-            LocaleFree( psz_temp );
+        if( waveOutGetDevCaps( i, &caps, sizeof(WAVEOUTCAPS) )
+                                                          != MMSYSERR_NOERROR )
+            continue;
+
+        swprintf( dev_name, MAXPNAMELEN + 32, device_name_fmt,
+                  caps.szPname, caps.wMid, caps.wPid );
+        char *u8 = FromWide(dev_name);
+        if( !stricmp(u8, psz_device_name) )
+        {
+            free( u8 );
+            return i;
         }
+        free( u8 );
     }
 
     return WAVE_MAPPER;
