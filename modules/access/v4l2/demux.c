@@ -191,7 +191,6 @@ static const uint32_t p_chroma_fallbacks[] =
 static int InitVideo (demux_t *demux, int fd)
 {
     demux_sys_t *sys = demux->p_sys;
-    unsigned int i_min;
     enum v4l2_buf_type buf_type;
 
     /* Get device capabilites */
@@ -399,14 +398,6 @@ static int InitVideo (demux_t *demux, int fd)
     es_fmt.video.i_rmask = selected->red;
     es_fmt.video.i_gmask = selected->green;
     es_fmt.video.i_bmask = selected->blue;
-
-    /* Buggy driver paranoia */
-    i_min = fmt.fmt.pix.width * 2;
-    if (fmt.fmt.pix.bytesperline < i_min)
-        fmt.fmt.pix.bytesperline = i_min;
-    i_min = fmt.fmt.pix.bytesperline * fmt.fmt.pix.height;
-    if (fmt.fmt.pix.sizeimage < i_min)
-        fmt.fmt.pix.sizeimage = i_min;
 
     /* Init I/O method */
     switch (sys->io)
