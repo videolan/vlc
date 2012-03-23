@@ -672,6 +672,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisableClientState(GL_VERTEX_ARRAY);
+    glDisable(vgl->tex_target);
 #else
 
     const GLfloat vertexCoord[] = {
@@ -708,14 +709,12 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     }
 
 
-#endif
 
     if (vgl->program)
         glDisable(GL_FRAGMENT_PROGRAM_ARB);
     else
         glDisable(vgl->tex_target);
 
-#if !USE_OPENGL_ES
     if (vgl->use_multitexture)
         vgl->ActiveTextureARB(GL_TEXTURE0_ARB + 0);
     glEnable(GL_TEXTURE_2D);
