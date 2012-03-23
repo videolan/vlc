@@ -614,6 +614,15 @@ static int Direct3DOpen(vout_display_t *vd, video_format_t *fmt)
     }
 #endif
 
+    /* */
+    D3DADAPTER_IDENTIFIER9 d3dai;
+    if (FAILED(IDirect3D9_GetAdapterIdentifier(d3dobj,AdapterToUse,0, &d3dai))) {
+        msg_Warn(vd, "IDirect3D9_GetAdapterIdentifier failed");
+    } else {
+        msg_Dbg(vd, "Direct3d Device: %s %lu %lu %lu", d3dai.Description,
+                d3dai.VendorId, d3dai.DeviceId, d3dai.Revision );
+    }
+
     HRESULT hr = IDirect3D9_CreateDevice(d3dobj, AdapterToUse,
                                          DeviceType, sys->hvideownd,
                                          D3DCREATE_SOFTWARE_VERTEXPROCESSING|
