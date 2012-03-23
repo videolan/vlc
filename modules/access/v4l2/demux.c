@@ -106,42 +106,102 @@ typedef struct
     uint32_t blue;
 } vlc_v4l2_fmt_t;
 
+/* NOTE: Currently vlc_v4l2_fmt_rank() assumes format are sorted in order of
+ * decreasing preference. */
 static const vlc_v4l2_fmt_t v4l2_fmts[] =
 {
-    /* Raw data types */
-    { V4L2_PIX_FMT_GREY,    VLC_CODEC_GREY, 0, 0, 0 },
-    { V4L2_PIX_FMT_HI240,   VLC_FOURCC('I','2','4','0'), 0, 0, 0 },
-    { V4L2_PIX_FMT_RGB555,  VLC_CODEC_RGB15, 0x001f,0x03e0,0x7c00 },
-    { V4L2_PIX_FMT_RGB565,  VLC_CODEC_RGB16, 0x001f,0x07e0,0xf800 },
-    /* Won't work since we don't know how to handle such gmask values
-     * correctly
-    { V4L2_PIX_FMT_RGB555X, VLC_CODEC_RGB15, 0x007c,0xe003,0x1f00 },
-    { V4L2_PIX_FMT_RGB565X, VLC_CODEC_RGB16, 0x00f8,0xe007,0x1f00 },
-    */
-    { V4L2_PIX_FMT_BGR24,   VLC_CODEC_RGB24, 0xff0000,0xff00,0xff },
-    { V4L2_PIX_FMT_RGB24,   VLC_CODEC_RGB24, 0xff,0xff00,0xff0000 },
-    { V4L2_PIX_FMT_BGR32,   VLC_CODEC_RGB32, 0xff0000,0xff00,0xff },
-    { V4L2_PIX_FMT_RGB32,   VLC_CODEC_RGB32, 0xff,0xff00,0xff0000 },
-    { V4L2_PIX_FMT_YUYV,    VLC_CODEC_YUYV, 0, 0, 0 },
-    { V4L2_PIX_FMT_UYVY,    VLC_CODEC_UYVY, 0, 0, 0 },
-    { V4L2_PIX_FMT_Y41P,    VLC_FOURCC('I','4','1','N'), 0, 0, 0 },
-    { V4L2_PIX_FMT_YUV422P, VLC_CODEC_I422, 0, 0, 0 },
-    { V4L2_PIX_FMT_YVU420,  VLC_CODEC_YV12, 0, 0, 0 },
-    { V4L2_PIX_FMT_YUV411P, VLC_CODEC_I411, 0, 0, 0 },
-    { V4L2_PIX_FMT_YUV410,  VLC_CODEC_I410, 0, 0, 0 },
+    /* Planar YUV 4:2:0 */
+    { V4L2_PIX_FMT_YUV420,   VLC_CODEC_I420, 0, 0, 0 },
+    { V4L2_PIX_FMT_YVU420,   VLC_CODEC_YV12, 0, 0, 0 },
+    { V4L2_PIX_FMT_YUV422P,  VLC_CODEC_I422, 0, 0, 0 },
+    /* Packed YUV 4:2:2 */
+    { V4L2_PIX_FMT_YUYV,     VLC_CODEC_YUYV, 0, 0, 0 },
+    { V4L2_PIX_FMT_UYVY,     VLC_CODEC_UYVY, 0, 0, 0 },
+    { V4L2_PIX_FMT_YVYU,     VLC_CODEC_YVYU, 0, 0, 0 },
+    { V4L2_PIX_FMT_VYUY,     VLC_CODEC_VYUY, 0, 0, 0 },
 
-    /* Raw data types, not in V4L2 spec but still in videodev2.h and supported
-     * by VLC */
-    { V4L2_PIX_FMT_YUV420,  VLC_CODEC_I420, 0, 0, 0 },
-    /* FIXME { V4L2_PIX_FMT_RGB444,  VLC_CODEC_RGB32 }, */
+    { V4L2_PIX_FMT_YUV411P,  VLC_CODEC_I411, 0, 0, 0 },
+
+    { V4L2_PIX_FMT_YUV410,   VLC_CODEC_I410, 0, 0, 0 },
+//  { V4L2_PIX_FMT_YVU410     },
+
+//  { V4L2_PIX_FMT_NV24,      },
+//  { V4L2_PIX_FMT_NV42,      },
+//  { V4L2_PIX_FMT_NV16,     VLC_CODEC_NV16, 0, 0, 0 },
+//  { V4L2_PIX_FMT_NV61,     VLC_CODEC_NV61, 0, 0, 0 },
+    { V4L2_PIX_FMT_NV12,     VLC_CODEC_NV12, 0, 0, 0 },
+    { V4L2_PIX_FMT_NV21,     VLC_CODEC_NV21, 0, 0, 0 },
+
+    /* V4L2-documented but VLC-unsupported misc. YUV formats */
+//  { V4L2_PIX_FMT_Y41P       },
+//  { V4L2_PIX_FMT_NV12MT,    },
+//  { V4L2_PIX_FMT_M420,      },
+
+    /* Packed RGB */
+#ifdef WORDS_BIGENDIAN
+    { V4L2_PIX_FMT_RGB32,    VLC_CODEC_RGB32,   0xFF00, 0xFF0000, 0xFF000000 },
+    { V4L2_PIX_FMT_BGR32,    VLC_CODEC_RGB32, 0xFF000000, 0xFF0000,   0xFF00 },
+    { V4L2_PIX_FMT_RGB24,    VLC_CODEC_RGB24,   0xFF0000, 0x00FF00, 0x0000FF },
+    { V4L2_PIX_FMT_BGR24,    VLC_CODEC_RGB24,   0x0000FF, 0x00FF00, 0xFF0000 },
+//  { V4L2_PIX_FMT_BGR666,    },
+//  { V4L2_PIX_FMT_RGB565,    },
+    { V4L2_PIX_FMT_RGB565X,  VLC_CODEC_RGB16,     0x001F,   0x07E0,   0xF800 },
+//  { V4L2_PIX_FMT_RGB555,    },
+    { V4L2_PIX_FMT_RGB555X,  VLC_CODEC_RGB15,     0x001F,   0x03E0,   0x7C00 },
+//  { V4L2_PIX_FMT_RGB444,   VLC_CODEC_RGB12,     0x000F,   0xF000,   0x0F00 },
+#else
+    { V4L2_PIX_FMT_RGB32,    VLC_CODEC_RGB32,   0x0000FF, 0x00FF00, 0xFF0000 },
+    { V4L2_PIX_FMT_BGR32,    VLC_CODEC_RGB32,   0xFF0000, 0x00FF00, 0x0000FF },
+    { V4L2_PIX_FMT_RGB24,    VLC_CODEC_RGB24,   0x0000FF, 0x00FF00, 0xFF0000 },
+    { V4L2_PIX_FMT_BGR24,    VLC_CODEC_RGB24,   0xFF0000, 0x00FF00, 0x0000FF },
+//  { V4L2_PIX_FMT_BGR666,    },
+    { V4L2_PIX_FMT_RGB565,   VLC_CODEC_RGB16,     0x001F,   0x07E0,   0xF800 },
+//  { V4L2_PIX_FMT_RGB565X,   },
+    { V4L2_PIX_FMT_RGB555,   VLC_CODEC_RGB15,     0x001F,   0x03E0,   0x7C00 },
+//  { V4L2_PIX_FMT_RGB555X,   },
+//  { V4L2_PIX_FMT_RGB444,   VLC_CODEC_RGB12,     0x0F00,   0x00F0,   0x000F },
+#endif
+//  { V4L2_PIX_FMT_RGB332,   VLC_CODEC_RGB8,        0xC0,     0x38,     0x07 },
+
+    /* Bayer (sub-sampled RGB). Not supported. */
+//  { V4L2_PIX_FMT_SBGGR16,  }
+//  { V4L2_PIX_FMT_SRGGB12,  }
+//  { V4L2_PIX_FMT_SGRBG12,  }
+//  { V4L2_PIX_FMT_SGBRG12,  }
+//  { V4L2_PIX_FMT_SBGGR12,  }
+//  { V4L2_PIX_FMT_SRGGB10,  }
+//  { V4L2_PIX_FMT_SGRBG10,  }
+//  { V4L2_PIX_FMT_SGBRG10,  }
+//  { V4L2_PIX_FMT_SBGGR10,  }
+//  { V4L2_PIX_FMT_SBGGR8,   }
+//  { V4L2_PIX_FMT_SGBRG8,   }
+//  { V4L2_PIX_FMT_SGRBG8,   }
+//  { V4L2_PIX_FMT_SRGGB8,   }
 
     /* Compressed data types */
+    { V4L2_PIX_FMT_JPEG,   VLC_CODEC_MJPG, 0, 0, 0 },
+    { V4L2_PIX_FMT_H264,   VLC_CODEC_H264, 0, 0, 0 },
+    /* FIXME: fill p_extra for avc1... */
+//  { V4L2_PIX_FMT_H264_NO_SC, VLC_FOURCC('a','v','c','1'), 0, 0, 0 }
+    { V4L2_PIX_FMT_MPEG4,  VLC_CODEC_MP4V, 0, 0, 0 },
+    { V4L2_PIX_FMT_XVID,   VLC_CODEC_MP4V, 0, 0, 0 },
+    { V4L2_PIX_FMT_H263,   VLC_CODEC_H263, 0, 0, 0 },
+    { V4L2_PIX_FMT_MPEG2,  VLC_CODEC_MPGV, 0, 0, 0 },
+    { V4L2_PIX_FMT_MPEG1,  VLC_CODEC_MPGV, 0, 0, 0 },
+    { V4L2_PIX_FMT_VC1_ANNEX_G, VLC_CODEC_VC1, 0, 0, 0 },
+    { V4L2_PIX_FMT_VC1_ANNEX_L, VLC_CODEC_VC1, 0, 0, 0 },
+    //V4L2_PIX_FMT_MPEG -> use access
+
+    /* Reserved formats */
     { V4L2_PIX_FMT_MJPEG,   VLC_CODEC_MJPG, 0, 0, 0 },
-    { V4L2_PIX_FMT_JPEG,    VLC_CODEC_JPEG, 0, 0, 0 },
-#if 0
-    { V4L2_PIX_FMT_DV,      VLC_FOURCC('?','?','?','?') },
-    { V4L2_PIX_FMT_MPEG,    VLC_FOURCC('?','?','?','?') },
-#endif
+    //V4L2_PIX_FMT_DV -> use access
+
+    /* Grey scale */
+//  { V4L2_PIX_FMT_Y16,       },
+//  { V4L2_PIX_FMT_Y12,       },
+//  { V4L2_PIX_FMT_Y10,       },
+//  { V4L2_PIX_FMT_Y10BPACK,  },
+    { V4L2_PIX_FMT_GREY,     VLC_CODEC_GREY, 0, 0, 0 },
 };
 
 static const vlc_v4l2_fmt_t *vlc_from_v4l2_fourcc (uint32_t fourcc)
