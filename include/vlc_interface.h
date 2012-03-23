@@ -166,8 +166,8 @@ typedef enum vlc_dialog {
 #define INTF_ABOUT_MSG LICENSE_MSG
 
 #define EXTENSIONS_AUDIO_CSV "3ga", "669", "a52", "aac", "ac3", "ape", "awb", "dts", "flac", "it", \
-                         "m4a", "m4p", "mka", "mlp", "mod", "mp1", "mp2", "mp3",\
-                         "oga", "ogg", "oma", "qcp", "rmi", "s3m", "spx", "thd", "tta", \
+                         "m4a", "m4p", "mka", "mlp", "mod", "mp1", "mp2", "mp3", "mpc", "mpga", \
+                         "oga", "ogg", "oma", "qcp", "ra", "rmi", "s3m", "spx", "thd", "tta", \
                          "wav", "wma", "wv", "xm"
 
 #define EXTENSIONS_VIDEO_CSV "asf", "avi", "divx", "drc", "dv", "f4v", "flv", "gxf", "iso", \
@@ -175,7 +175,7 @@ typedef enum vlc_dialog {
                              "mp2", "mp4", "mpeg", "mpeg1", \
                              "mpeg2", "mpeg4", "mpg", "mts", "mtv", "mxf", "mxg", "nuv", \
                              "ogg", "ogm", "ogv", "ogx", "ps", \
-                             "rec", "rm", "rmvb", "ts", "vob", "wmv"
+                             "rec", "rm", "rmvb", "ts", "vob", "wm", "wmv"
 
 #define EXTENSIONS_AUDIO \
     "*.3ga;" \
@@ -207,10 +207,12 @@ typedef enum vlc_dialog {
     "*.mp2;" \
     "*.mp3;" \
     "*.mpc;" \
+    "*.mpga;" \
     "*.oga;" \
     "*.ogg;" \
     "*.oma;" \
     "*.qcp;" \
+    "*.ra;" \
     "*.rmi;" \
     "*.s3m;" \
     "*.spx;" \
@@ -229,9 +231,9 @@ typedef enum vlc_dialog {
                          "*.m2t;*.m2ts;*.m4v;*.mkv;*.mov;*.mp2;*.mp2v;*.mp4;*.mp4v;*.mpa;*.mpe;*.mpeg;*.mpeg1;" \
                          "*.mpeg2;*.mpeg4;*.mpg;*.mpv2;*.mts;*.mtv;*.mxf;*.mxg;*.nsv;*.nuv;" \
                          "*.ogg;*.ogm;*.ogv;*.ogx;*.ps;" \
-                         "*.rec;*.rm;*.rmvb;*.tod;*.ts;*.tts;*.vob;*.vro;*.webm;*.wmv"
+                         "*.rec;*.rm;*.rmvb;*.tod;*.ts;*.tts;*.vob;*.vro;*.webm;*.wm;*.wmv"
 
-#define EXTENSIONS_PLAYLIST "*.asx;*.b4s;*.cue;*.ifo;*.m3u;*.m3u8;*.pls;*.ram;*.rar;*.sdp;*.vlc;*.xspf;*.zip;*.conf"
+#define EXTENSIONS_PLAYLIST "*.asx;*.b4s;*.cue;*.ifo;*.m3u;*.m3u8;*.pls;*.ram;*.rar;*.sdp;*.vlc;*.xspf;*.wvx;*.zip;*.conf"
 
 #define EXTENSIONS_MEDIA EXTENSIONS_VIDEO ";" EXTENSIONS_AUDIO ";" \
                           EXTENSIONS_PLAYLIST
