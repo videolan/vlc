@@ -42,8 +42,8 @@
 # define PFNGLPROGRAMSTRINGARBPROC            typeof(glProgramStringARB)*
 # define PFNGLDELETEPROGRAMSARBPROC           typeof(glDeleteProgramsARB)*
 # define PFNGLPROGRAMLOCALPARAMETER4FVARBPROC typeof(glProgramLocalParameter4fvARB)*
-# define PFNGLACTIVETEXTUREARBPROC            typeof(glActiveTextureARB)*
-# define PFNGLCLIENTACTIVETEXTUREARBPROC      typeof(glClientActiveTextureARB)*
+# define PFNGLACTIVETEXTUREPROC               typeof(glActiveTexture)*
+# define PFNGLCLIENTACTIVETEXTUREPROC         typeof(glClientActiveTexture)*
 #endif
 
 /* RV16 */
@@ -117,8 +117,8 @@ struct vout_display_opengl_t {
 
     /* multitexture */
     bool use_multitexture;
-    PFNGLACTIVETEXTUREARBPROC   ActiveTextureARB;
-    PFNGLCLIENTACTIVETEXTUREARBPROC ClientActiveTextureARB;
+    PFNGLACTIVETEXTUREPROC   ActiveTexture;
+    PFNGLCLIENTACTIVETEXTUREPROC ClientActiveTexture;
 };
 
 static inline int GetAlignedSize(unsigned size)
@@ -187,14 +187,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GLint max_texture_units = 0;
     if (HasExtension(extensions, "GL_ARB_multitexture")) {
 #if !defined(MACOS_OPENGL)
-        vgl->ActiveTextureARB   = (PFNGLACTIVETEXTUREARBPROC)vlc_gl_GetProcAddress(vgl->gl, "glActiveTextureARB");
-        vgl->ClientActiveTextureARB = (PFNGLCLIENTACTIVETEXTUREARBPROC)vlc_gl_GetProcAddress(vgl->gl, "glClientActiveTextureARB");
+        vgl->ActiveTexture   = (PFNGLACTIVETEXTUREPROC)vlc_gl_GetProcAddress(vgl->gl, "glActiveTexture");
+        vgl->ClientActiveTexture = (PFNGLCLIENTACTIVETEXTUREPROC)vlc_gl_GetProcAddress(vgl->gl, "glClientActiveTexture");
 #else
-        vgl->ActiveTextureARB = glActiveTextureARB;
-        vgl->ClientActiveTextureARB = glClientActiveTextureARB;
+        vgl->ActiveTexture = glActiveTexture;
+        vgl->ClientActiveTexture = glClientActiveTexture;
 #endif
-        supports_multitexture = vgl->ActiveTextureARB &&
-                                vgl->ClientActiveTextureARB;
+        supports_multitexture = vgl->ActiveTexture &&
+                                vgl->ClientActiveTexture;
         if (supports_multitexture)
             glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &max_texture_units);
     }
@@ -458,7 +458,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
         glGenTextures(vgl->chroma->plane_count, vgl->texture[i]);
         for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
             if (vgl->use_multitexture)
-                vgl->ActiveTextureARB(GL_TEXTURE0_ARB + j);
+                vgl->ActiveTexture(GL_TEXTURE0 + j);
             glBindTexture(vgl->tex_target, vgl->texture[i][j]);
 
 #if !USE_OPENGL_ES
@@ -514,7 +514,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     /* Update the texture */
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
         if (vgl->use_multitexture)
-            vgl->ActiveTextureARB(GL_TEXTURE0_ARB + j);
+            vgl->ActiveTexture(GL_TEXTURE0 + j);
         glBindTexture(vgl->tex_target, vgl->texture[0][j]);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, picture->p[j].i_pitch / picture->p[j].i_pixel_pitch);
         glTexSubImage2D(vgl->tex_target, 0,
@@ -540,7 +540,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
         vgl->region       = calloc(count, sizeof(*vgl->region));
 
         if (vgl->use_multitexture)
-            vgl->ActiveTextureARB(GL_TEXTURE0_ARB + 0);
+            vgl->ActiveTexture(GL_TEXTURE0 + 0);
         int i = 0;
         for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next, i++) {
             gl_region_t *glr = &vgl->region[i];
@@ -690,8 +690,8 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
             right[j], top[j],
             right[j], bottom[j],
         };
-        vgl->ActiveTextureARB( GL_TEXTURE0_ARB+j);
-        vgl->ClientActiveTextureARB( GL_TEXTURE0_ARB+j);
+        vgl->ActiveTexture( GL_TEXTURE0+j);
+        vgl->ClientActiveTexture( GL_TEXTURE0+j);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glBindTexture(vgl->tex_target, vgl->texture[0][j]);
         glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
@@ -703,8 +703,8 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
     for( int j = vgl->chroma->plane_count; j >= 0;j--)
     {
-        vgl->ActiveTextureARB( GL_TEXTURE0_ARB+j);
-        vgl->ClientActiveTextureARB( GL_TEXTURE0_ARB+j);
+        vgl->ActiveTexture( GL_TEXTURE0+j);
+        vgl->ClientActiveTexture( GL_TEXTURE0+j);
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
 
@@ -716,7 +716,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         glDisable(vgl->tex_target);
 
     if (vgl->use_multitexture)
-        vgl->ActiveTextureARB(GL_TEXTURE0_ARB + 0);
+        vgl->ActiveTexture(GL_TEXTURE0 + 0);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
