@@ -371,7 +371,7 @@ static subpicture_t *FilterSub( filter_t *p_filter, mtime_t date )
     if( p_list->i_repeat != -1 && p_list->i_counter == 0 )
     {
         p_list->i_repeat--;
-        if( p_list->i_repeat == 0 )
+        if( p_list->i_repeat < 0 )
             goto exit;
     }
     if( !p_pic || !p_logo->i_alpha ||
