@@ -81,11 +81,7 @@ static VLCLibrary * sharedLibrary = nil;
             paramNum++;
         }
         unsigned argc = sizeof(lib_vlc_params)/sizeof(lib_vlc_params[0]);
-#if TARGET_OS_IPHONE
-        instance = libvlc_new_with_builtins(argc, lib_vlc_params, vlc_builtins_modules);
-#else
         instance = libvlc_new(argc, lib_vlc_params);
-#endif
         NSAssert(instance, @"libvlc failed to initialize");
     }
     return self;
