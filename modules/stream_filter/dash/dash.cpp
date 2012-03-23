@@ -165,10 +165,20 @@ static int  Read            (stream_t *p_stream, void *p_buffer, unsigned int i_
     stream_sys_t        *p_sys          = (stream_sys_t *) p_stream->p_sys;
     dash::DASHManager   *p_dashManager  = p_sys->p_dashManager;
     int                 i_ret           = 0;
+    int                 i_read          = 0;
 
-    i_ret = p_dashManager->read(p_buffer, i_len );
+    while( i_len > 0 )
+    {
+        i_read = p_dashManager->read( p_buffer, i_len );
+        if( i_read < 0 )
+            break;
+        p_buffer += i_read;
+        i_ret += i_read;
+        i_len -= i_read;
+    }
+    p_buffer -= i_ret;
 
-    if (i_ret < 0)
+    if (i_read < 0)
     {
         switch (errno)
         {
