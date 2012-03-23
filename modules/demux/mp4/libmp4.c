@@ -139,6 +139,11 @@ static inline void GetUUID( UUID_t *p_uuid, const uint8_t *p_buff )
     memcpy( p_uuid, p_buff, 16 );
 }
 
+static inline int CmpUUID( const UUID_t *u1, const UUID_t *u2 )
+{
+    return memcmp( u1, u2, 16 );
+}
+
 static void CreateUUID( UUID_t *p_uuid, uint32_t i_fourcc )
 {
     /* made by 0xXXXXXXXX-0011-0010-8000-00aa00389b71
@@ -147,6 +152,14 @@ static void CreateUUID( UUID_t *p_uuid, uint32_t i_fourcc )
     (void)p_uuid;
     (void)i_fourcc;
 }
+
+const UUID_t TfrfBoxUUID = { .b =
+                { 0xd4, 0x80, 0x7e, 0xf2, 0xca, 0x39, 0x46, 0x95,
+                  0x8e, 0x54, 0x26, 0xcb, 0x9e, 0x46, 0xa7, 0x9f } };
+
+const UUID_t TfxdBoxUUID = { .b =
+                { 0x6d, 0x1d, 0x9b, 0x05, 0x42, 0xd5, 0x44, 0xe6,
+                  0x80, 0xe2, 0x14, 0x1b, 0xaf, 0xf7, 0x57, 0xb2 } };
 
 /* convert 16.16 fixed point to floating point */
 static double conv_fx( int32_t fx ) {
@@ -499,6 +512,109 @@ static int MP4_ReadBox_mfhd(  stream_t *p_stream, MP4_Box_t *p_box )
                   p_box->data.p_mfhd->i_sequence_number );
 #endif
     MP4_READBOX_EXIT( 1 );
+}
+
+static int MP4_ReadBox_tfxd(  stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_tfxd_t );
+
+    MP4_Box_data_tfxd_t *p_tfxd_data = p_box->data.p_tfxd;
+    MP4_GETVERSIONFLAGS( p_tfxd_data );
+
+    if( p_tfxd_data->i_version == 0 )
+    {
+        MP4_GET4BYTES( p_tfxd_data->i_fragment_abs_time );
+        MP4_GET4BYTES( p_tfxd_data->i_fragment_duration );
+    }
+    else
+    {
+        MP4_GET8BYTES( p_tfxd_data->i_fragment_abs_time );
+        MP4_GET8BYTES( p_tfxd_data->i_fragment_duration );
+    }
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream, "read box: \"tfxd\" version %d, flags 0x%x, "\
+            "fragment duration %"PRIu64", fragment abs time %"PRIu64,
+                p_tfxd_data->i_version,
+                p_tfxd_data->i_flags,
+                p_tfxd_data->i_fragment_duration,
+                p_tfxd_data->i_fragment_abs_time
+           );
+#endif
+
+    MP4_READBOX_EXIT( 1 );
+}
+
+static int MP4_ReadBox_tfrf(  stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_tfxd_t );
+
+    MP4_Box_data_tfrf_t *p_tfrf_data = p_box->data.p_tfrf;
+    MP4_GETVERSIONFLAGS( p_tfrf_data );
+
+    MP4_GET1BYTE( p_tfrf_data->i_fragment_count );
+
+    p_tfrf_data->p_tfrf_data_fields = calloc( p_tfrf_data->i_fragment_count,
+                                              sizeof( TfrfBoxDataFields_t ) );
+    if( !p_tfrf_data->p_tfrf_data_fields )
+        MP4_READBOX_EXIT( 0 );
+
+    for( uint8_t i = 0; i < p_tfrf_data->i_fragment_count; i++ )
+    {
+        TfrfBoxDataFields_t *TfrfBoxDataField = &p_tfrf_data->p_tfrf_data_fields[i];
+        if( p_tfrf_data->i_version == 0 )
+        {
+            MP4_GET4BYTES( TfrfBoxDataField->i_fragment_abs_time );
+            MP4_GET4BYTES( TfrfBoxDataField->i_fragment_duration );
+        }
+        else
+        {
+            MP4_GET8BYTES( TfrfBoxDataField->i_fragment_abs_time );
+            MP4_GET8BYTES( TfrfBoxDataField->i_fragment_duration );
+        }
+    }
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream, "read box: \"tfrf\" version %d, flags 0x%x, "\
+            "fragment count %"PRIu8, p_tfrf_data->i_version,
+                p_tfrf_data->i_flags, p_tfrf_data->i_fragment_count );
+
+    for( uint8_t i = 0; i < p_tfrf_data->i_fragment_count; i++ )
+    {
+        TfrfBoxDataFields_t *TfrfBoxDataField = &p_tfrf_data->p_tfrf_data_fields[i];
+        msg_Dbg( p_stream, "\"tfrf\" fragment duration %"PRIu64", "\
+                                    "fragment abs time %"PRIu64,
+                    TfrfBoxDataField->i_fragment_duration,
+                    TfrfBoxDataField->i_fragment_abs_time );
+    }
+
+#endif
+
+    MP4_READBOX_EXIT( 1 );
+}
+
+static void MP4_FreeBox_tfrf( MP4_Box_t *p_box )
+{
+    FREENULL( p_box->data.p_tfrf->p_tfrf_data_fields );
+}
+
+static int MP4_ReadBox_uuid( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    if( !CmpUUID( &p_box->i_uuid, &TfrfBoxUUID ) )
+        return MP4_ReadBox_tfrf( p_stream, p_box );
+    if( !CmpUUID( &p_box->i_uuid, &TfxdBoxUUID ) )
+        return MP4_ReadBox_tfxd( p_stream, p_box );
+
+    msg_Warn( p_stream, "Unknown uuid type box" );
+    return 1;
+}
+
+static void MP4_FreeBox_uuid( MP4_Box_t *p_box )
+{
+    if( !CmpUUID( &p_box->i_uuid, &TfrfBoxUUID ) )
+        return MP4_FreeBox_tfrf( p_box );
+    if( !CmpUUID( &p_box->i_uuid, &TfxdBoxUUID ) )
+        return MP4_FreeBox_Common( p_box );
 }
 
 static int MP4_ReadBox_sidx(  stream_t *p_stream, MP4_Box_t *p_box )
@@ -3303,6 +3419,7 @@ static const struct
     { ATOM_sdtp,    MP4_ReadBox_sdtp,         MP4_FreeBox_sdtp },
     { ATOM_tfra,    MP4_ReadBox_tfra,         MP4_FreeBox_tfra },
     { ATOM_mfro,    MP4_ReadBox_mfro,         MP4_FreeBox_Common },
+    { ATOM_uuid,    MP4_ReadBox_uuid,         MP4_FreeBox_uuid },
 
     /* Last entry */
     { 0,              MP4_ReadBox_default,      NULL }

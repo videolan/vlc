@@ -260,6 +260,33 @@ typedef struct UUID_s
 
 /* specific structure for all boxes */
 
+typedef struct MP4_Box_data_tfxd_s
+{
+    uint8_t  i_version;
+    uint32_t i_flags;
+
+    uint64_t i_fragment_duration;
+    uint64_t i_fragment_abs_time;
+
+} MP4_Box_data_tfxd_t;
+
+typedef struct TfrfBoxDataFields_s
+{
+    uint64_t i_fragment_duration;
+    uint64_t i_fragment_abs_time;
+
+} TfrfBoxDataFields_t;
+
+typedef struct MP4_Box_data_tfrf_s
+{
+    uint8_t  i_version;
+    uint8_t  i_fragment_count;
+    uint32_t i_flags;
+
+    TfrfBoxDataFields_t *p_tfrf_data_fields;
+
+} MP4_Box_data_tfrf_t;
+
 typedef struct MP4_Box_data_ftyp_s
 {
     uint32_t i_major_brand;
@@ -1157,6 +1184,9 @@ typedef union MP4_Box_data_s
     MP4_Box_data_chpl_t *p_chpl;
     MP4_Box_data_tref_generic_t *p_tref_generic;
     MP4_Box_data_name_t *p_name;
+
+    MP4_Box_data_tfrf_t *p_tfrf;
+    MP4_Box_data_tfxd_t *p_tfxd;
 
     void                *p_data; /* for unknow type */
 } MP4_Box_data_t;
