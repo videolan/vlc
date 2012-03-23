@@ -655,7 +655,12 @@ describe:
             if( i_code == 0 )
                 msg_Dbg( p_demux, "connection timeout" );
             else
+            {
                 msg_Dbg( p_demux, "connection error %d", i_code );
+                if( i_code == 403 )
+                    dialog_Fatal( p_demux, _("RTSP connection failed"),
+                                    _("You are not allowed to access this server.") );
+            }
             if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
             p_sys->rtsp = NULL;
         }
