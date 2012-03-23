@@ -69,7 +69,7 @@ static void module_StoreBank (module_t *module)
     modules.head = module;
 }
 
-#if defined(__ELF__) || defined(__APPLE__)
+#if defined(__ELF__) || (defined(__APPLE__) && !HAVE_DYNAMIC_PLUGINS)
 # ifdef __GNUC__
 __attribute__((weak))
 # else
