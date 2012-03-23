@@ -256,6 +256,13 @@ static int InitVideo (demux_t *demux, int fd)
         if (dsc == NULL)
             continue; /* ignore VLC-unsupported codec */
 
+        if (dsc->vlc == reqfourcc)
+        {
+            msg_Dbg (demux, "  matches the requested format");
+            selected = dsc;
+            break; /* always select the requested format if found */
+        }
+
         if (codec.flags & V4L2_FMT_FLAG_EMULATED)
         {
             if (native)
@@ -263,13 +270,6 @@ static int InitVideo (demux_t *demux, int fd)
         }
         else
             native = true;
-
-        if (dsc->v4l2 == reqfourcc)
-        {
-            msg_Dbg (demux, "  matches the requested format");
-            selected = dsc;
-            break; /* always select the requested format if found */
-        }
 
         if (vlc_v4l2_fmt_rank (dsc) > vlc_v4l2_fmt_rank (selected))
             continue; /* ignore if rank is worse */
