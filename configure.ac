@@ -142,6 +142,10 @@ case "${host_os}" in
       x86_64*)
         ARCH_flag="-arch x86_64"
       ;;
+      arm*)
+        ARCH_flag="-arch armv7"
+        ac_cv_c_bigendian="no"
+      ;;
     esac
 
     SYS=darwin
