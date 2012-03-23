@@ -81,7 +81,7 @@ struct stream_sys_t
         bool                                isLive;
 };
 
-static int  Read            (stream_t *p_stream, void *p_buffer, unsigned int i_len);
+static int  Read            (stream_t *p_stream, void *p_ptr, unsigned int i_len);
 static int  Peek            (stream_t *p_stream, const uint8_t **pp_peek, unsigned int i_peek);
 static int  Control         (stream_t *p_stream, int i_query, va_list args);
 
@@ -160,10 +160,11 @@ static void Close(vlc_object_t *p_obj)
 /*****************************************************************************
  * Callbacks:
  *****************************************************************************/
-static int  Read            (stream_t *p_stream, void *p_buffer, unsigned int i_len)
+static int  Read            (stream_t *p_stream, void *p_ptr, unsigned int i_len)
 {
     stream_sys_t        *p_sys          = (stream_sys_t *) p_stream->p_sys;
     dash::DASHManager   *p_dashManager  = p_sys->p_dashManager;
+    uint8_t             *p_buffer       = (uint8_t*)p_ptr;
     int                 i_ret           = 0;
     int                 i_read          = 0;
 
