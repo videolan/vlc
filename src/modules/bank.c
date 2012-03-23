@@ -69,7 +69,7 @@ static void module_StoreBank (module_t *module)
     modules.head = module;
 }
 
-#ifdef __ELF__
+#if defined(__ELF__) || defined(__APPLE__)
 # ifdef __GNUC__
 __attribute__((weak))
 # else
