@@ -1419,7 +1419,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         if( p_current_input )
         {
             var_AddCallback( p_current_input, "intf-event", InputEvent, [VLCMain sharedInstance] );
-
+            [self playbackStatusUpdated];
             [o_mainmenu setRateControlsEnabled: YES];
             if ( [self activeVideoPlayback] && [[o_mainwindow videoView] isHidden] )
                 [o_mainwindow performSelectorOnMainThread:@selector(togglePlaylist:) withObject: nil waitUntilDone:NO];
