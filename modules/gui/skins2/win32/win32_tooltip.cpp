@@ -34,14 +34,13 @@ Win32Tooltip::Win32Tooltip( intf_thread_t *pIntf, HINSTANCE hInst,
 {
     // Create the window
     m_hWnd = CreateWindowEx( WS_EX_TOOLWINDOW,
-        "SkinWindowClass", "default name", WS_POPUP, CW_USEDEFAULT,
-        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hParentWindow, 0,
-        hInst, NULL );
+        "SkinWindowClass", "tooltip", WS_POPUP | WS_DISABLED,
+        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+        hParentWindow, 0, hInst, NULL );
 
     if( !m_hWnd )
     {
         msg_Err( getIntf(), "createWindow failed" );
-        return;
     }
 }
 
@@ -60,9 +59,11 @@ void Win32Tooltip::show( int left, int top, OSGraphics &rText )
     int width = rText.getWidth();
     int height = rText.getHeight();
 
-    // Set the window on top, resize it and show it
-    SetWindowPos( m_hWnd, HWND_TOPMOST, left, top, width, height, 0 );
-    ShowWindow( m_hWnd, SW_SHOW );
+    // Set the window on top, resize it, and show it
+    // SWP_NOACTIVATE is needed to make sure the underlying window
+    // keeps the keyboard focus ( keys + mouse_wheel )
+    SetWindowPos( m_hWnd, HWND_TOPMOST, left, top, width, height,
+                  SWP_NOACTIVATE | SWP_SHOWWINDOW );
 
     HDC wndDC = GetDC( m_hWnd );
     BitBlt( wndDC, 0, 0, width, height, srcDC, 0, 0, SRCCOPY );
