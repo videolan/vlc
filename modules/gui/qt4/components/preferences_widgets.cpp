@@ -220,6 +220,7 @@ StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
 
     if( !l )
     {
+        widget = new QWidget( _parent );
         QHBoxLayout *layout = new QHBoxLayout();
         layout->addWidget( label, 0 ); layout->insertSpacing( 1, 10 );
         layout->addWidget( text, LAST_COLUMN );
@@ -281,6 +282,7 @@ FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
 
     if( !l )
     {
+        widget = new QWidget( _parent );
         QHBoxLayout *layout = new QHBoxLayout();
         layout->addWidget( label, 0 );
         layout->insertSpacing( 1, 10 );
@@ -376,6 +378,7 @@ FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
     font->setCurrentFont( QFont( qfu( p_item->value.psz) ) );
     if( !_p_layout )
     {
+        widget = new QWidget( _parent );
         QHBoxLayout *layout = new QHBoxLayout();
         layout->addWidget( label, 0 );
         layout->addWidget( font, 1 );
@@ -424,6 +427,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
     finish( p_module_config );
     if( !l )
     {
+        widget = new QWidget( _parent );
         l = new QGridLayout();
         l->addWidget( label, 0, 0 ); l->addWidget( combo, 0, LAST_COLUMN );
         widget->setLayout( l );
@@ -598,6 +602,7 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
     finish( bycat );
     if( !l )
     {
+        widget = new QWidget( _parent );
         QHBoxLayout *layout = new QHBoxLayout();
         layout->addWidget( label ); layout->addWidget( combo, LAST_COLUMN );
         widget->setLayout( layout );
@@ -706,6 +711,7 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
 
     if( !l )
     {
+        widget = new QWidget( _parent );
         QVBoxLayout *layout = new QVBoxLayout();
         layout->addWidget( groupBox, line, 0 );
         widget->setLayout( layout );
@@ -878,6 +884,7 @@ IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
 
     if( !l )
     {
+        widget = new QWidget( _parent );
         QHBoxLayout *layout = new QHBoxLayout();
         layout->addWidget( label, 0 ); layout->addWidget( spin, LAST_COLUMN );
         widget->setLayout( layout );
@@ -989,6 +996,7 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
     finish( p_module_config );
     if( !l )
     {
+        widget = new QWidget( _parent );
         QHBoxLayout *layout = new QHBoxLayout();
         layout->addWidget( label ); layout->addWidget( combo, LAST_COLUMN );
         widget->setLayout( layout );
@@ -1106,6 +1114,7 @@ BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
 
     if( !l )
     {
+        widget = new QWidget( _parent );
         QHBoxLayout *layout = new QHBoxLayout();
         layout->addWidget( checkbox, 0 );
         widget->setLayout( layout );
@@ -1154,6 +1163,7 @@ ColorConfigControl::ColorConfigControl( vlc_object_t *_p_this,
 
     if( !l )
     {
+        widget = new QWidget( _parent );
         QHBoxLayout *layout = new QHBoxLayout();
         layout->addWidget( label, 0 ); layout->addWidget( color_but, LAST_COLUMN );
         widget->setLayout( layout );
@@ -1238,6 +1248,7 @@ FloatConfigControl::FloatConfigControl( vlc_object_t *_p_this,
 
     if( !l )
     {
+        widget = new QWidget( _parent );
         QHBoxLayout *layout = new QHBoxLayout();
         layout->addWidget( label, 0 ); layout->addWidget( spin, LAST_COLUMN );
         widget->setLayout( layout );

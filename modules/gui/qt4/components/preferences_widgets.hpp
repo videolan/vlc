@@ -82,7 +82,7 @@ public:
     ConfigControl( vlc_object_t *_p_this, module_config_t *_p_conf,
                    QWidget *p ) : p_this( _p_this ), p_item( _p_conf )
     {
-        widget = new QWidget( p );
+        widget = NULL;
     }
     ConfigControl( vlc_object_t *_p_this, module_config_t *_p_conf ) :
                             p_this (_p_this ), p_item( _p_conf )
@@ -91,10 +91,10 @@ public:
     }
     virtual int getType() const = 0;
     const char * getName() const { return  p_item->psz_name; }
-    QWidget *getWidget() const { assert( widget ); return widget; }
+    QWidget *getWidget() const { return widget; }
     bool isAdvanced() const { return p_item->b_advanced; }
-    virtual void hide() { getWidget()->hide(); };
-    virtual void show() { getWidget()->show(); };
+    virtual void hide() { if ( widget ) widget->hide(); };
+    virtual void show() { if ( widget ) widget->show(); };
 
     static ConfigControl * createControl( vlc_object_t*,
                                           module_config_t*,QWidget*,
