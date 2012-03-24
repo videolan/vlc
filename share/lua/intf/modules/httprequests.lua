@@ -58,10 +58,6 @@ function strsplit(text, delimiter)
     return list
 end
 
-function round(what, precision)
-if what then return math.floor(what*math.pow(10,precision)+0.5) / math.pow(10,precision) else return "" end
-end
-
 --main function to process commands sent with the request
 
 processcommands = function ()
