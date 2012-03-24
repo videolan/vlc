@@ -132,15 +132,15 @@ static void cleanOverlapped( EPGEventByTimeQMap *epgItemByTime, EPGItem *epgItem
     }
 }
 
-bool EPGView::addEPGEvent( vlc_epg_event_t *data, QString channelName, bool b_current )
+bool EPGView::addEPGEvent( vlc_epg_event_t *eventdata, QString channelName, bool b_current )
 {
     /* Init our nested map if required */
     EPGEventByTimeQMap *epgItemByTime;
     EPGItem *epgItem;
     bool b_refresh_channels = false;
 
-    QDateTime eventStart = QDateTime::fromTime_t( data->i_start );
-    if ( eventStart.addSecs( data->i_duration ) < m_baseTime )
+    QDateTime eventStart = QDateTime::fromTime_t( eventdata->i_start );
+    if ( eventStart.addSecs( eventdata->i_duration ) < m_baseTime )
         return false; /* EPG feed sent expired item */
     if ( eventStart < m_startTime )
     {
@@ -164,13 +164,13 @@ bool EPGView::addEPGEvent( vlc_epg_event_t *data, QString channelName, bool b_cu
         /* Update our existing programs */
         epgItem = epgItemByTime->value( eventStart );
         epgItem->setCurrent( b_current );
-        if ( epgItem->setData( data ) ) /* updates our entry */
+        if ( epgItem->setData( eventdata ) ) /* updates our entry */
             cleanOverlapped( epgItemByTime, epgItem, scene() );
         mutex.unlock();
         return false;
     } else {
         /* Insert a new program entry */
-        epgItem = new EPGItem( data, this );
+        epgItem = new EPGItem( eventdata, this );
         cleanOverlapped( epgItemByTime, epgItem, scene() );
         /* Effectively insert our new program */
         epgItem->setCurrent( b_current );
@@ -187,10 +187,10 @@ bool EPGView::addEPGEvent( vlc_epg_event_t *data, QString channelName, bool b_cu
     return true;
 }
 
-void EPGView::removeEPGEvent( vlc_epg_event_t *data, QString channelName )
+void EPGView::removeEPGEvent( vlc_epg_event_t *eventdata, QString channelName )
 {
     EPGEventByTimeQMap *epgItemByTime;
-    QDateTime eventStart = QDateTime::fromTime_t( data->i_start );
+    QDateTime eventStart = QDateTime::fromTime_t( eventdata->i_start );
     EPGItem *epgItem;
     bool b_update_channels = false;
 
