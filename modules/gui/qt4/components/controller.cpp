@@ -150,7 +150,7 @@ void AbstractController::parseAndCreate( const QString& config,
     }
 }
 
-void AbstractController::createAndAddWidget( QBoxLayout *controlLayout,
+void AbstractController::createAndAddWidget( QBoxLayout *controlLayout_,
                                              int i_index,
                                              buttonType_e i_type,
                                              int i_option )
@@ -160,18 +160,18 @@ void AbstractController::createAndAddWidget( QBoxLayout *controlLayout,
     /* Close the current buttonGroup if we have a special widget or a spacer */
     if( buttonGroupLayout && i_type > BUTTON_MAX )
     {
-        controlLayout->addLayout( buttonGroupLayout );
+        controlLayout_->addLayout( buttonGroupLayout );
         buttonGroupLayout = NULL;
     }
 
     /* Special case for SPACERS, who aren't QWidgets */
     if( i_type == WIDGET_SPACER )
     {
-        controlLayout->addSpacing( 12 );
+        controlLayout_->addSpacing( 12 );
     }
     else if(  i_type == WIDGET_SPACER_EXTEND )
     {
-        controlLayout->addStretch( 12 );
+        controlLayout_->addStretch( 12 );
     }
     else
     {
@@ -191,7 +191,7 @@ void AbstractController::createAndAddWidget( QBoxLayout *controlLayout,
         }
         else /* Special widgets */
         {
-            controlLayout->addWidget( widg );
+            controlLayout_->addWidget( widg );
         }
     }
 }
