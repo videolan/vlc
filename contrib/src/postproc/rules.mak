@@ -31,11 +31,14 @@ endif
 endif
 
 # Darwin
-ifdef HAVE_MACOSX
+ifdef HAVE_DARWIN_OS
 POSTPROCCONF += --arch=$(ARCH) --target-os=darwin
 endif
 ifdef HAVE_IOS
-POSTPROCCONF += --cpu=cortex-a8 --as="$(AS)" --target-os=darwin
+POSTPROCCONF += --as="$(AS)"
+ifeq ($(ARCH),arm)
+POSTPROCCONF += --cpu=cortex-a8
+endif
 endif
 ifeq ($(ARCH),x86_64)
 POSTPROCCONF += --cpu=core2

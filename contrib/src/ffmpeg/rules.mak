@@ -60,8 +60,6 @@ endif
 ifdef HAVE_DARWIN_OS
 FFMPEGCONF += --arch=$(ARCH) --target-os=darwin
 FFMPEG_CFLAGS += -DHAVE_LRINTF
-endif
-ifdef HAVE_MACOSX
 ifneq ($(findstring $(ARCH),i386 x86_64),)
 FFMPEGCONF += --enable-memalign-hack
 endif
@@ -70,7 +68,7 @@ FFMPEGCONF += --cpu=core2
 endif
 endif
 ifdef HAVE_IOS
-FFMPEGCONF += --as="$(AS)" --enable-pic
+FFMPEGCONF += --enable-pic --as="$(AS)" --disable-decoder=snow
 ifeq ($(ARCH), arm)
 FFMPEGCONF += --cpu=cortex-a8
 endif
