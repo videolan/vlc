@@ -315,7 +315,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_CHANGE_FULLSCREEN:
         {
             NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-            [[sys->glView window] performSelectorOnMainThread:@selector(fullscreen:) withObject: nil waitUntilDone:NO];
+            [[sys->glView window] performSelectorOnMainThread:@selector(updateFullscreen) withObject: nil waitUntilDone:NO];
             [o_pool release];
             return VLC_SUCCESS;
         }
