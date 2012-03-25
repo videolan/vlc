@@ -4,6 +4,7 @@ set -e
 PLATFORM=OS
 VERBOSE=no
 SDK_VERSION=5.0
+SDK_MIN=5.0
 
 usage()
 {
@@ -45,7 +46,7 @@ do
              ;;
          s)
              PLATFORM=Simulator
-             SDK=5.0
+             SDK=${SDK_MIN}
              ;;
          k)
              SDK=$OPTARG
@@ -71,7 +72,7 @@ fi
 info "Building libvlc for the iOS"
 
 if [ "$PLATFORM" = "Simulator" ]; then
-    TARGET="i686-apple-darwin10"
+    TARGET="i686-apple-darwin11"
     ARCH="i386"
 else
     TARGET="arm-apple-darwin11"
@@ -130,7 +131,11 @@ export STRIP="xcrun strip"
 
 
 export SDKROOT
-export CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -mcpu=cortex-a8 -miphoneos-version-min=5.0 ${OPTIM}"
+if [ "$PLATFORM" = "OS" ]; then
+export CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -mcpu=cortex-a8 -miphoneos-version-min=${SDK_MIN} ${OPTIM}"
+else
+export CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -miphoneos-version-min=${SDK_MIN} ${OPTIM}"
+fi
 export CPPFLAGS="${CFLAGS}"
 export CXXFLAGS="${CFLAGS}"
 export OBJCFLAGS="${CFLAGS}"
@@ -138,13 +143,15 @@ export OBJCFLAGS="${CFLAGS}"
 export CPP="xcrun cc -E"
 export CXXCPP="xcrun c++ -E"
 
+export BUILDFORIOS="yes"
+
 if [ "$PLATFORM" = "Simulator" ]; then
     # Use the new ABI on simulator, else we can't build
     export OBJCFLAGS="-fobjc-abi-version=2 -fobjc-legacy-dispatch ${OBJCFLAGS}"
 fi
 
 if [ "$PLATFORM" = "OS" ]; then
-  export LDFLAGS="-L${SDKROOT}/usr/lib -arch ${ARCH}  -isysroot ${SDKROOT}  -miphoneos-version-min=5.0 "
+  export LDFLAGS="-L${SDKROOT}/usr/lib -arch ${ARCH}  -isysroot ${SDKROOT}  -miphoneos-version-min=${SDK_MIN} "
 else
   export LDFLAGS="-syslibroot=${SDKROOT}/ -arch ${ARCH} "
 fi
@@ -192,7 +199,6 @@ fi
     --disable-mad > ${out}
 make
 spopd
-
 
 if [ "$PLATFORM" = "OS" ]; then
   export AS="${IOS_GAS_PREPROCESSOR} ${CC}"
@@ -301,7 +307,6 @@ ${VLCROOT}/configure \
     --disable-faad \
     --disable-lua \
     --disable-mad \
-    --enable-a52 \
     --disable-mtp \
     --disable-ogg \
     --disable-speex \
