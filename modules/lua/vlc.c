@@ -125,9 +125,6 @@ vlc_module_begin ()
         set_description( N_("Lua Telnet") )
         add_shortcut( "luatelnet", "telnet" )
 
-        /* add_shortcut( "luahotkeys" ) */
-        /* add_shortcut( "hotkeys" ) */
-
     add_submodule ()
         set_shortname( N_( "Lua Meta Fetcher" ) )
         set_description( N_("Fetch meta data using lua scripts") )
