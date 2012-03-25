@@ -315,9 +315,15 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_CHANGE_FULLSCREEN:
         {
             NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-            [[sys->glView window] performSelectorOnMainThread:@selector(updateFullscreen) withObject: nil waitUntilDone:NO];
+            id window = [sys->glView window];
+            if ([window respondsToSelector:@selector(updateFullscreen)])
+            {
+                [[sys->glView window] performSelectorOnMainThread:@selector(updateFullscreen) withObject: nil waitUntilDone:NO];
+                [o_pool release];
+                return VLC_SUCCESS;
+            }
             [o_pool release];
-            return VLC_SUCCESS;
+            return VLC_EGENERIC;
         }
         case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
         {
@@ -560,11 +566,16 @@ static void OpenglSwap(vlc_gl_t *gl)
  */
 - (void)setWindowFrameWithValue:(NSValue *)value
 {
-    if (![[self window] isFullscreen])
+    id window = [self window];
+    NSRect frame = [value rectValue];
+
+    if ([window respondsToSelector:@selector(isFullscreen)])
     {
-        NSRect frame = [value rectValue];
-        [[self window] setFrame:frame display:YES animate: YES];
+        if (!(BOOL)[[self window] isFullscreen])
+            [[self window] setFrame:frame display:YES animate:YES];
     }
+    else
+        [[self window] setFrame:frame display:YES animate:YES];
 }
 
 /**
