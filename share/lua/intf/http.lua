@@ -332,6 +332,3 @@ end
 h = vlc.httpd()
 local root_acl = load_dir( http_dir )
 local a = h:handler("/art",nil,nil,root_acl,callback_art,nil)
-
-while not vlc.misc.lock_and_wait() do end -- everything happens in callbacks
-
