@@ -59,10 +59,12 @@ static VLCLibrary * sharedLibrary = nil;
             [defaultParams addObject:@"--play-and-pause"];                          // We want every movie to pause instead of stopping at eof
             [defaultParams addObject:@"--no-color"];                                // Don't use color in output (Xcode doesn't show it)
             [defaultParams addObject:@"--no-video-title-show"];                     // Don't show the title on overlay when starting to play
-            [defaultParams addObject:@"--verbose=-1"];                               // Let's not wreck the logs
+            [defaultParams addObject:@"--verbose=4"];                               // Let's not wreck the logs
 #if TARGET_OS_IPHONE
-//            [defaultParams addObject:@"--ffmpeg-fast"];                             // Let's disable this as it is error-prone
+            [defaultParams addObject:@"--ffmpeg-fast"];
             [defaultParams addObject:@"--ffmpeg-skiploopfilter=all"];
+            [defaultParams addObject:@"--vout=vout_ios"];
+            [defaultParams addObject:@"--aout=audioqueue"];
 #else
             [defaultParams addObject:@"--no-sout-keep"];
             [defaultParams addObject:@"--vout=macosx"];                             // Select Mac OS X video output
