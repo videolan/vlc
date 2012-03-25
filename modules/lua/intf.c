@@ -362,12 +362,8 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
 
     p_sys->L = L;
 
-    vlc_mutex_init( &p_sys->lock );
-    p_sys->exiting = false;
-
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
-        vlc_mutex_destroy( &p_sys->lock );
         lua_close( p_sys->L );
         goto error;
     }
@@ -387,13 +383,7 @@ void Close_LuaIntf( vlc_object_t *p_this )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     vlc_cancel( p_sys->thread );
-
-    vlc_mutex_lock( &p_sys->lock );
-    p_sys->exiting = true;
-    vlc_mutex_unlock( &p_sys->lock );
     vlc_join( p_sys->thread, NULL );
-    vlc_mutex_destroy( &p_sys->lock );
-
     lua_close( p_sys->L );
 
     free( p_sys->psz_filename );

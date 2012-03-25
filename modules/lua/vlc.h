@@ -164,8 +164,6 @@ struct intf_sys_t
     lua_State *L;
 
     vlc_thread_t thread;
-    vlc_mutex_t lock;
-    bool exiting;
 };
 
 #endif /* VLC_LUA_H */

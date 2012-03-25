@@ -147,8 +147,8 @@ static int vlclua_mwait( lua_State *L )
 
 static int vlclua_intf_should_die( lua_State *L )
 {
-    intf_sys_t *p_sys = vlclua_get_intf( L );
-    lua_pushboolean( L, p_sys->exiting );
+    vlc_object_t *p_this = vlclua_get_this( L );
+    lua_pushboolean( L, !vlc_object_alive( p_this ) );
     return 1;
 }
 
