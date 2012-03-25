@@ -132,22 +132,6 @@ static int vlclua_quit( lua_State *L )
     return 0;
 }
 
-/*****************************************************************************
- *
- *****************************************************************************/
-static int vlclua_lock_and_wait( lua_State *L )
-{
-    intf_sys_t *p_sys = vlclua_get_intf( L );
-
-    vlc_mutex_lock( &p_sys->lock );
-    mutex_cleanup_push( &p_sys->lock );
-    while( !p_sys->exiting )
-        vlc_cond_wait( &p_sys->wait, &p_sys->lock );
-    vlc_cleanup_run();
-    lua_pushboolean( L, 1 );
-    return 1;
-}
-
 static int vlclua_mdate( lua_State *L )
 {
     lua_pushnumber( L, mdate() );
@@ -189,8 +173,6 @@ static const luaL_Reg vlclua_misc_reg[] = {
 
     { "mdate", vlclua_mdate },
     { "mwait", vlclua_mwait },
-
-    { "lock_and_wait", vlclua_lock_and_wait },
 
     { "should_die", vlclua_intf_should_die },
     { "quit", vlclua_quit },

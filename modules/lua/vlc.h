@@ -165,7 +165,6 @@ struct intf_sys_t
 
     vlc_thread_t thread;
     vlc_mutex_t lock;
-    vlc_cond_t wait;
     bool exiting;
 };
 

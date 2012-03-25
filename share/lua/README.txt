@@ -165,8 +165,6 @@ misc.action_id( name ): get the id of the given action.
 misc.mdate(): Get the current date (in microseconds).
 misc.mwait(): Wait for the given date (in microseconds).
 
-misc.lock_and_wait(): Lock our object thread and wait for a wake up signal.
-
 misc.should_die(): Returns true if the interface should quit.
 misc.quit(): Quit VLC.
 

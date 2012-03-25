@@ -363,12 +363,10 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
     p_sys->L = L;
 
     vlc_mutex_init( &p_sys->lock );
-    vlc_cond_init( &p_sys->wait );
     p_sys->exiting = false;
 
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
-        vlc_cond_destroy( &p_sys->wait );
         vlc_mutex_destroy( &p_sys->lock );
         lua_close( p_sys->L );
         goto error;
@@ -392,10 +390,8 @@ void Close_LuaIntf( vlc_object_t *p_this )
 
     vlc_mutex_lock( &p_sys->lock );
     p_sys->exiting = true;
-    vlc_cond_signal( &p_sys->wait );
     vlc_mutex_unlock( &p_sys->lock );
     vlc_join( p_sys->thread, NULL );
-    vlc_cond_destroy( &p_sys->wait );
     vlc_mutex_destroy( &p_sys->lock );
 
     lua_close( p_sys->L );
