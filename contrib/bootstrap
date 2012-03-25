@@ -190,17 +190,15 @@ test -z "$ENABLE_SMALL" || add_make_enabled "ENABLE_SMALL"
 #
 OS="${HOST#*-}" # strip architecture
 case "${OS}" in
-	arm-apple-darwin*)
-		check_ios_sdk
-		add_make_enabled "HAVE_IOS" "HAVE_DARWIN_OS" "HAVE_BSD"
-		;;
-	*86*-apple-darwin*)
-		check_macosx_sdk
-		add_make_enabled "HAVE_MACOSX" "HAVE_DARWIN_OS" "HAVE_BSD"
-		;;
-	powerpc-apple-darwin*)
-		check_macosx_sdk
-		add_make_enabled "HAVE_MACOSX" "HAVE_DARWIN_OS" "HAVE_BSD"
+	apple-darwin*)
+		if test -z "$BUILDFORIOS"
+		then
+			check_macosx_sdk
+			add_make_enabled "HAVE_MACOSX" "HAVE_DARWIN_OS" "HAVE_BSD"
+		else
+			check_ios_sdk
+			add_make_enabled "HAVE_IOS" "HAVE_DARWIN_OS" "HAVE_BSD"
+		fi
 		;;
 	*bsd*)
 		add_make_enabled "HAVE_BSD"
