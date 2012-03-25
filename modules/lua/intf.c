@@ -423,5 +423,13 @@ int Open_LuaCLI( vlc_object_t *p_this )
 
 int Open_LuaTelnet( vlc_object_t *p_this )
 {
+    char *pw = var_CreateGetNonEmptyString( p_this, "telnet-password" );
+    if( pw == NULL )
+    {
+        msg_Err( p_this, "password not configured" );
+        msg_Info( p_this, "Please specify the password in the preferences." );
+        return VLC_EGENERIC;
+    }
+    free( pw );
     return Start_LuaIntf( p_this, "telnet" );
 }
