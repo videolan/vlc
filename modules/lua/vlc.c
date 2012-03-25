@@ -66,7 +66,6 @@
 #define TELNETPWD_TEXT N_( "Password" )
 #define TELNETPWD_LONGTEXT N_( "A single password restricts access " \
     "to this interface." )
-#define TELNETPWD_DEFAULT "admin"
 #define RCHOST_TEXT N_("TCP command input")
 #define RCHOST_LONGTEXT N_("Accept commands over a socket rather than stdin. " \
             "You can set the address and port the interface will bind to." )
@@ -118,7 +117,7 @@ vlc_module_begin ()
                         TELNETHOST_LONGTEXT, true )
             add_integer( "telnet-port", TELNETPORT_DEFAULT, TELNETPORT_TEXT,
                          TELNETPORT_LONGTEXT, true )
-            add_password( "telnet-password", TELNETPWD_DEFAULT, TELNETPWD_TEXT,
+            add_password( "telnet-password", NULL, TELNETPWD_TEXT,
 
                           TELNETPWD_LONGTEXT, true )
         set_capability( "interface", 0 )
