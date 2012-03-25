@@ -1352,7 +1352,6 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
                                  &i_karaoke_bg_color ))
     {
         psz_fontname = strdup( psz_fontname );
-        i_font_size = i_font_size;
     }
     i_font_alpha = (i_font_color >> 24) & 0xff;
     i_font_color &= 0x00ffffff;
