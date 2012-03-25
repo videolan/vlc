@@ -556,7 +556,9 @@ inline void MainInterface::showTab( QWidget *widget )
         /* Embedded playlist -> Non-embedded playlist */
         if( bgWidget == stackCentralOldWidget && widget == videoWidget )
         {
-            playlistWidget->artContainer->removeWidget( videoWidget );
+            /* In rare case when video is started before the interface */
+            if( playlistWidget != NULL )
+                playlistWidget->artContainer->removeWidget( videoWidget );
             videoWidget->show(); videoWidget->raise();
             stackCentralW->addWidget( videoWidget );
             stackCentralW->setCurrentWidget( videoWidget );
