@@ -237,7 +237,7 @@ char *vlc_strcasestr (const char *haystack, const char *needle)
         s = vlc_towc (haystack, &(uint32_t) { 0 });
         haystack += s;
     }
-    while (s != 0);
+    while (s > 0);
 
     return NULL;
 }
