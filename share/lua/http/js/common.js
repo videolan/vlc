@@ -15,7 +15,7 @@ var audio_types = [
 ];
 var playlist_types = [
         "asx", "b4s", "cue", "ifo", "m3u", "m3u8", "pls", "ram", "rar",
-        "sdp", "vlc", "xspf", "zip", "conf",
+        "sdp", "vlc", "xspf", "zip", "conf"
 ];
 
 var stream_server = window.location.hostname;
@@ -75,7 +75,18 @@ function isMobile() {
 }
 
 function createElementLi(name, type, dir, ext) {
-    var icon = type == "dir" && name == '..' ? 'Back-48.png' : (type == 'dir' ? "Folder-48.png" : ($.inArray(ext, video_types) != -1 ? "Video-48.png" : ($.inArray(ext, audio_types) != -1 ? "Audio-48.png" : ($.inArray(ext, playlist_types) != -1 ? "Other-48.png")));
+    var icon = "Other-48.png";
+    if( type == "dir" && name == '..' )
+        icon = "Back-48.png";
+    else if( type == 'dir' )
+        icon = "Folder-48.png";
+    else if( $.inArray(ext, video_types) != -1 )
+        icon = "Video-48.png";
+    else if( $.inArray(ext, audio_types) != -1 )
+        icon = "Audio-48.png";
+    else if( $.inArray(ext, playlist_types) != -1 )
+        // TODO: Playlist-48.png
+        icon = "Other-48.png";
     var open = type == "dir" ? "opendir='" + dir + "'" : (type == "file" ? "openfile='" + dir + "'" : "opendev='" + dir + "'");
     var str = "<li class='system_icon ui-widget-content' " + open + " ><img src='images/" + icon + "' width='48px' height='48px' title='" + name + "' alt='" + name + "' style='border: none;background:none;'/><div style='font-size:10px;border:none;background:none;'>" + name + "</div></li>";
     return str;
