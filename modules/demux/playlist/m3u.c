@@ -55,6 +55,11 @@ static char *GuessEncoding (const char *str)
     return IsUTF8 (str) ? strdup (str) : FromLatin1 (str);
 }
 
+static char *CheckUnicode (const char *str)
+{
+    return IsUTF8 (str) ? strdup (str): NULL;
+}
+
 /*****************************************************************************
  * Import_M3U: main import function
  *****************************************************************************/
@@ -68,7 +73,7 @@ int Import_M3U( vlc_object_t *p_this )
     if( POKE( p_peek, "RTSPtext", 8 ) /* QuickTime */
      || demux_IsPathExtension( p_demux, ".m3u8" )
      || demux_IsForced( p_demux, "m3u8" ) )
-        pf_dup = strdup; /* UTF-8 */
+        pf_dup = CheckUnicode; /* UTF-8 */
     else
     if( POKE( p_peek, "#EXTM3U", 7 )
      || demux_IsPathExtension( p_demux, ".m3u" )
