@@ -24,6 +24,7 @@
 
 module("httprequests",package.seeall)
 
+local common = require ("common")
 local dkjson = require ("dkjson")
 
 
@@ -197,6 +198,8 @@ end
 function xmlString(s)
   if (type(s)=="string") then
       return vlc.strings.convert_xml_special_chars(s)
+  elseif (type(s)=="number") then
+      return common.us_tostring(s)
   else
       return tostring(s)
   end

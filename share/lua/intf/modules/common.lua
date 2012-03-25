@@ -68,6 +68,13 @@ function us_tonumber(str)
     return s * (tonumber(i) + tonumber(d)/(10^string.len(d)))
 end
 
+-- tostring() for decimals number, using a dot as decimal separator
+-- regardless of the system locale 
+function us_tostring(n)
+    s = tostring(n):gsub(",", ".", 1)
+    return s
+end
+
 -- strip leading and trailing spaces
 function strip(str)
     return string.gsub(str, "^%s*(.-)%s*$", "%1")
