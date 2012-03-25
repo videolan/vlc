@@ -170,10 +170,6 @@ misc.lock_and_wait(): Lock our object thread and wait for a wake up signal.
 misc.should_die(): Returns true if the interface should quit.
 misc.quit(): Quit VLC.
 
-misc.timer(callback): Create a timer which call the callback function
-  :schedule(relative, value, interval): schedule the timer
-  :getoverrun(): number of time the timer got overrun (normally 0)
-
 Net
 ---
 net.url_parse( url, [option delimiter] ): Parse URL. Returns a table with

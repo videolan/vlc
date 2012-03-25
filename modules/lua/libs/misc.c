@@ -178,107 +178,6 @@ static int vlclua_action_id( lua_State *L )
 }
 
 /*****************************************************************************
- * Timer functions
- *****************************************************************************/
-static int vlclua_timer_schedule( lua_State *L );
-static int vlclua_timer_getoverrun( lua_State *L);
-
-static const luaL_Reg vlclua_timer_reg[] = {
-    { "schedule",   vlclua_timer_schedule   },
-    { "getoverrun", vlclua_timer_getoverrun },
-    { NULL,         NULL                    }
-};
-
-typedef struct
-{
-    lua_State *L;
-    vlc_timer_t timer;
-    char *psz_callback;
-} vlclua_timer_t;
-
-static int vlclua_timer_schedule( lua_State *L )
-{
-    vlclua_timer_t **pp_timer = (vlclua_timer_t**)luaL_checkudata( L, 1, "timer" );
-    if( !pp_timer || !*pp_timer )
-        luaL_error( L, "Can't get pointer to timer" );
-
-    bool b_relative = luaL_checkboolean( L, 2 );
-    mtime_t i_value = luaL_checkinteger( L, 3 );
-    mtime_t i_interval = luaL_checkinteger( L, 4 );
-
-    vlc_timer_schedule( (*pp_timer)->timer, b_relative, i_value, i_interval );
-    return 0;
-}
-
-static int vlclua_timer_getoverrun( lua_State *L )
-{
-    vlclua_timer_t **pp_timer = (vlclua_timer_t**)luaL_checkudata(L, 1, "timer" );
-    if( !pp_timer || !*pp_timer )
-        luaL_error( L, "Can't get pointer to timer" );
-
-    lua_pushinteger( L, vlc_timer_getoverrun( (*pp_timer)->timer ) );
-    return 1;
-}
-
-static void vlclua_timer_callback( void *data )
-{
-    vlclua_timer_t *p_timer = (vlclua_timer_t*)data;
-    lua_State *L = p_timer->L;
-
-    lua_getglobal( L, p_timer->psz_callback );
-    if( lua_pcall( L, 0, 0, 0 ) )
-    {
-        const char *psz_err = lua_tostring( L, -1 );
-        msg_Err( vlclua_get_this( L ), "Error while running the timer callback: '%s'", psz_err );
-        lua_settop( L, 0 );
-    }
-}
-
-static int vlclua_timer_delete( lua_State *L )
-{
-    vlclua_timer_t **pp_timer = (vlclua_timer_t**)luaL_checkudata( L, 1, "timer" );
-    if( !pp_timer || !*pp_timer )
-        luaL_error( L, "Can't get pointer to timer" );
-
-    vlc_timer_destroy( (*pp_timer)->timer );
-    free( (*pp_timer)->psz_callback );
-    free( (*pp_timer) );
-    return 0;
-}
-
-static int vlclua_timer_create( lua_State *L )
-{
-    if( !lua_isstring( L, 1 ) )
-        return luaL_error( L, "timer(function_name)" );
-
-    vlclua_timer_t *p_timer = malloc( sizeof( vlclua_timer_t ) );
-    if( vlc_timer_create( &p_timer->timer, vlclua_timer_callback, p_timer ) )
-    {
-        free( p_timer );
-        return luaL_error( L, "Cannot initialize the timer" );
-    }
-
-    p_timer->L = L;
-    p_timer->psz_callback = strdup( luaL_checkstring( L, 1 ) );
-
-    vlclua_timer_t **pp_timer = lua_newuserdata( L, sizeof( vlclua_timer_t* ) );
-    *pp_timer = p_timer;
-
-    /* Create the object */
-    if( luaL_newmetatable( L, "timer" ) )
-    {
-        lua_newtable( L );
-        luaL_register( L, NULL, vlclua_timer_reg );
-        lua_setfield( L, -2, "__index" );
-        lua_pushcfunction( L, vlclua_timer_delete );
-        lua_setfield( L, -2, "__gc" );
-    }
-    lua_setmetatable( L, -2 );
-
-    return 1;
-}
-
-/*****************************************************************************
  *
  *****************************************************************************/
 static const luaL_Reg vlclua_misc_reg[] = {
@@ -295,8 +194,6 @@ static const luaL_Reg vlclua_misc_reg[] = {
 
     { "should_die", vlclua_intf_should_die },
     { "quit", vlclua_quit },
-
-    { "timer", vlclua_timer_create },
 
     { NULL, NULL }
 };

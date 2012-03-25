@@ -7,23 +7,11 @@ function assert_url(result, protocol, username, password, host, port, path)
     assert(result.path     == path)
 end
 
-local timer_count = 0
-function timer_callback()
-  timer_count = timer_count + 1
-end
-
 vlc.msg.info('---- Testing misc functions ----')
 vlc.msg.info('version: ' .. vlc.misc.version())
 vlc.msg.info('copyright: ' .. vlc.misc.copyright())
 vlc.msg.info('license: ' .. vlc.misc.license())
 vlc.msg.info('mdate: ' .. vlc.misc.mdate())
-
-vlc.msg.info(' * Testing the timer')
-local timer = vlc.misc.timer('timer_callback')
-timer:schedule(true, 100, 0)
-vlc.misc.mwait(vlc.misc.mdate()+1000000)
-assert(timer_count == 1)
-vlc.msg.info('   [done]')
 
 vlc.msg.info('---- Testing config functions ----')
 vlc.msg.info('datadir: ' .. vlc.config.datadir())
