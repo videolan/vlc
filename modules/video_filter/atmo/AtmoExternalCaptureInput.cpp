@@ -137,7 +137,7 @@ void CAtmoExternalCaptureInput::DeliverNewSourceDataPaket(VLC_BITMAPINFOHEADER *
 
 DWORD CAtmoExternalCaptureInput::Execute(void)
 {
-    while ((this->m_bTerminated == ATMO_FALSE)) {
+    while (this->m_bTerminated == ATMO_FALSE) {
           vlc_mutex_lock( &m_WakeupLock );
           vlc_cond_timedwait(&m_WakeupCond, &m_WakeupLock, mdate() + 75000 );
 
