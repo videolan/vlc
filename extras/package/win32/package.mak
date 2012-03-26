@@ -68,10 +68,8 @@ if BUILD_OSDMENU
 endif
 
 if !HAVE_WINCE
-if !HAVE_WIN64
 	cp "$(top_builddir)/npapi-vlc/activex/axvlc.dll.manifest" "$(win32_destdir)/"
 	cp "$(top_builddir)/npapi-vlc/installed/lib/axvlc.dll" "$(win32_destdir)/"
-endif
 	cp "$(top_builddir)/npapi-vlc/npapi/npvlc.dll.manifest" "$(win32_destdir)/"
 	cp "$(top_builddir)/npapi-vlc/installed/lib/npvlc.dll" "$(win32_destdir)/"
 endif
@@ -90,10 +88,8 @@ if !HAVE_WINCE
 	$(DLLTOOL) -D libvlc.dll -l "$(win32_destdir)/sdk/lib/libvlc.lib" -d "$(top_builddir)/lib/.libs/libvlc.dll.def" "$(prefix)/bin/libvlc.dll"
 	$(DLLTOOL) -D libvlccore.dll -l "$(win32_destdir)/sdk/lib/libvlccore.lib" -d "$(top_builddir)/src/.libs/libvlccore.dll.def" "$(prefix)/bin/libvlccore.dll"
 
-if !HAVE_WIN64
 	mkdir -p "$(win32_destdir)/sdk/activex/"
 	cd $(top_builddir)/npapi-vlc && cp activex/README.TXT share/test.html $(win32_destdir)/sdk/activex/
-endif
 endif
 
 # Convert to DOS line endings

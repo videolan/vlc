@@ -17,18 +17,11 @@ stamp-npapi-autogen: stamp-npapi-fetch
 	$(SHELL) ./autogen.sh
 	touch $@
 
-if HAVE_WIN64
-CONF_ACTIVEX = --disable-activex
-else
-CONF_ACTIVEX =
-endif
-
 stamp-npapi-configure: stamp-npapi-autogen stamp-gecko-fetch
 	cd npapi-vlc && \
 	$(SHELL) ./configure \
 		--prefix=/ \
 		--host=$(host_alias) --build=$(build_alias) \
-		$(CONF_ACTIVEX) \
 		CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS)" \
 		CC="$(CC)" CFLAGS="$(CFLAGS)" \
 		CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" \
