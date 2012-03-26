@@ -2,9 +2,6 @@ SOURCES_mp4 = \
 	mp4.c \
 	libmp4.c \
 	libmp4.h \
-	drms.c \
-	drms.h \
-	drmstables.h \
 	id3genres.h \
 	$(NULL)
 

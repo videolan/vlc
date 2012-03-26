@@ -32,7 +32,6 @@
 #endif
 
 #include "libmp4.h"
-#include "drms.h"
 #include <math.h>
 
 /*****************************************************************************
@@ -1671,13 +1670,8 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
 
     if( p_box->i_type == ATOM_drms )
     {
-        char *home = config_GetUserDir( VLC_HOME_DIR );
-        if( home != NULL )
-        {
-            p_box->data.p_sample_soun->p_drms = drms_alloc( home );
-            if( p_box->data.p_sample_soun->p_drms == NULL )
-                msg_Err( p_stream, "drms_alloc() failed" );
-        }
+        msg_Warn( p_stream, "DRM protected streams are not supported." );
+        MP4_READBOX_EXIT( 0 );
     }
 
     if( p_box->i_type == ATOM_samr || p_box->i_type == ATOM_sawb )
@@ -1704,14 +1698,6 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
 static void MP4_FreeBox_sample_soun( MP4_Box_t *p_box )
 {
     FREENULL( p_box->data.p_sample_soun->p_qt_description );
-
-    if( p_box->i_type == ATOM_drms )
-    {
-        if( p_box->data.p_sample_soun->p_drms )
-        {
-            drms_free( p_box->data.p_sample_soun->p_drms );
-        }
-    }
 }
 
 
@@ -1770,13 +1756,8 @@ int MP4_ReadBox_sample_vide( stream_t *p_stream, MP4_Box_t *p_box )
 
     if( p_box->i_type == ATOM_drmi )
     {
-        char *home = config_GetUserDir( VLC_HOME_DIR );
-        if( home != NULL )
-        {
-            p_box->data.p_sample_vide->p_drms = drms_alloc( home );
-            if( p_box->data.p_sample_vide->p_drms == NULL )
-                msg_Err( p_stream, "drms_alloc() failed" );
-        }
+        msg_Warn( p_stream, "DRM protected streams are not supported." );
+        MP4_READBOX_EXIT( 0 );
     }
 
     MP4_ReadBoxContainerRaw( p_stream, p_box );
@@ -1795,14 +1776,6 @@ int MP4_ReadBox_sample_vide( stream_t *p_stream, MP4_Box_t *p_box )
 void MP4_FreeBox_sample_vide( MP4_Box_t *p_box )
 {
     FREENULL( p_box->data.p_sample_vide->p_qt_image_description );
-
-    if( p_box->i_type == ATOM_drmi )
-    {
-        if( p_box->data.p_sample_vide->p_drms )
-        {
-            drms_free( p_box->data.p_sample_vide->p_drms );
-        }
-    }
 }
 
 static int MP4_ReadBox_sample_mp4s( stream_t *p_stream, MP4_Box_t *p_box )
@@ -2593,56 +2566,11 @@ static int MP4_ReadBox_skcr( stream_t *p_stream, MP4_Box_t *p_box )
 
 static int MP4_ReadBox_drms( stream_t *p_stream, MP4_Box_t *p_box )
 {
-    MP4_Box_t *p_drms_box = p_box;
-    void *p_drms = NULL;
-
-    MP4_READBOX_ENTER( uint8_t );
-
-    do
-    {
-        p_drms_box = p_drms_box->p_father;
-    } while( p_drms_box && p_drms_box->i_type != ATOM_drms
-                        && p_drms_box->i_type != ATOM_drmi );
-
-    if( p_drms_box && p_drms_box->i_type == ATOM_drms )
-        p_drms = p_drms_box->data.p_sample_soun->p_drms;
-    else if( p_drms_box && p_drms_box->i_type == ATOM_drmi )
-        p_drms = p_drms_box->data.p_sample_vide->p_drms;
-
-    if( p_drms_box && p_drms )
-    {
-        int i_ret = drms_init( p_drms, p_box->i_type, p_peek, i_read );
-        if( i_ret )
-        {
-            const char *psz_error;
-
-            switch( i_ret )
-            {
-                case -1: psz_error = "unimplemented"; break;
-                case -2: psz_error = "invalid argument"; break;
-                case -3: psz_error = "could not get system key"; break;
-                case -4: psz_error = "could not get SCI data"; break;
-                case -5: psz_error = "no user key found in SCI data"; break;
-                case -6: psz_error = "invalid user key"; break;
-                default: psz_error = "unknown error"; break;
-            }
-            if MP4_BOX_TYPE_ASCII()
-                msg_Err( p_stream, "drms_init(%4.4s) failed (%s)",
-                        (char *)&p_box->i_type, psz_error );
-            else
-                msg_Err( p_stream, "drms_init(c%3.3s) failed (%s)",
-                        (char *)&p_box->i_type+1, psz_error );
-
-            drms_free( p_drms );
-
-            if( p_drms_box->i_type == ATOM_drms )
-                p_drms_box->data.p_sample_soun->p_drms = NULL;
-            else if( p_drms_box->i_type == ATOM_drmi )
-                p_drms_box->data.p_sample_vide->p_drms = NULL;
-        }
-    }
-
-    MP4_READBOX_EXIT( 1 );
+    /* ATOMs 'user', 'key', 'iviv', and 'priv' will be skipped,
+     * so unless data decrypt itself by magic, there will be no playback,
+     * but we never know... */
+    msg_Warn( p_stream, "DRM protected streams are not supported." );
+    return 1;
 }
 
 static int MP4_ReadBox_name( stream_t *p_stream, MP4_Box_t *p_box )

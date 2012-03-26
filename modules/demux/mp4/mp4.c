@@ -37,7 +37,6 @@
 #include <vlc_input.h>
 
 #include "libmp4.h"
-#include "drms.h"
 #include "id3genres.h"                             /* for ATOM_gnre */
 
 /*****************************************************************************
@@ -135,8 +134,6 @@ typedef struct
     MP4_Box_t *p_stsd;  /* will contain all data to initialize decoder */
     MP4_Box_t *p_sample;/* point on actual sdsd */
 
-    bool b_drms;
-    void      *p_drms;
     MP4_Box_t *p_skcr;
 
 } mp4_track_t;
@@ -684,27 +681,6 @@ static int Demux( demux_t *p_demux )
                     break;
                 }
 
-                if( tk->b_drms && tk->p_drms )
-                {
-                    if( tk->p_skcr )
-                    {
-                        uint32_t p_key[4];
-                        drms_get_p_key( tk->p_drms, p_key );
-
-                        for( size_t i_pos = tk->p_skcr->data.p_skcr->i_init; i_pos < p_block->i_buffer; )
-                        {
-                            int n = __MIN( tk->p_skcr->data.p_skcr->i_encr, p_block->i_buffer - i_pos );
-                            drms_decrypt( tk->p_drms, (uint32_t*)&p_block->p_buffer[i_pos], n, p_key );
-                            i_pos += n;
-                            i_pos += __MIN( tk->p_skcr->data.p_skcr->i_decr, p_block->i_buffer - i_pos );
-                        }
-                    }
-                    else
-                    {
-                        drms_decrypt( tk->p_drms, (uint32_t*)p_block->p_buffer,
-                                      p_block->i_buffer, NULL );
-                    }
-                }
                 else if( tk->fmt.i_cat == SPU_ES )
                 {
                     if( tk->fmt.i_codec == VLC_FOURCC( 's', 'u', 'b', 't' ) &&
@@ -745,8 +721,7 @@ static int Demux( demux_t *p_demux )
                 else
                     p_block->i_pts = VLC_TS_INVALID;
 
-                if( !tk->b_drms || ( tk->b_drms && tk->p_drms ) )
-                    es_out_Send( p_demux->out, tk->p_es, p_block );
+                es_out_Send( p_demux->out, tk->p_es, p_block );
             }
 
             /* Next sample */
@@ -2273,8 +2248,6 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     MP4_Box_t *p_vmhd;
     MP4_Box_t *p_smhd;
 
-    MP4_Box_t *p_drms;
-
     unsigned int i;
     char language[4];
 
@@ -2395,22 +2368,6 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     {
         return;
     }
-
-    p_drms = MP4_BoxGet( p_track->p_stsd, "drms" );
-    p_track->b_drms = p_drms != NULL;
-    p_track->p_drms = p_track->b_drms ?
-        p_drms->data.p_sample_soun->p_drms : NULL;
-
-    if ( !p_drms )
-    {
-        p_drms = MP4_BoxGet( p_track->p_stsd, "drmi" );
-        p_track->b_drms = p_drms != NULL;
-        p_track->p_drms = p_track->b_drms ?
-            p_drms->data.p_sample_vide->p_drms : NULL;
-    }
-
-    if( p_drms )
-        p_track->p_skcr = MP4_BoxGet( p_drms, "sinf/skcr" );
 
     /* Set language */
     if( *language && strcmp( language, "```" ) && strcmp( language, "und" ) )

@@ -487,8 +487,6 @@ typedef struct MP4_Box_data_sample_soun_s
     int     i_qt_description;
     uint8_t *p_qt_description;
 
-    void    *p_drms;
-
 } MP4_Box_data_sample_soun_t;
 
 typedef struct MP4_Box_data_sample_vide_s
@@ -520,8 +518,6 @@ typedef struct MP4_Box_data_sample_vide_s
     /* XXX hack ImageDescription */
     int     i_qt_image_description;
     uint8_t *p_qt_image_description;
-
-    void    *p_drms;
 
 } MP4_Box_data_sample_vide_t;
 
