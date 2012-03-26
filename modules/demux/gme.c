@@ -262,7 +262,7 @@ static int Control (demux_t *demux, int query, va_list args)
                 break;
 
             int seek = (sys->titlev[sys->track_id]->i_length / 1000) * pos;
-            if (seek > INT_MAX || gme_seek (sys->emu, seek))
+            if (gme_seek (sys->emu, seek))
                 break;
             return VLC_SUCCESS;
         }
@@ -302,7 +302,7 @@ static int Control (demux_t *demux, int query, va_list args)
 
             unsigned n = sys->titlec;
             *titlev = malloc (sizeof (**titlev) * n);
-            if (unlikely(titlev == NULL))
+            if (unlikely(*titlev == NULL))
                 n = 0;
             *titlec = n;
             for (unsigned i = 0; i < n; i++)
