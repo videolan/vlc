@@ -465,9 +465,6 @@ modules/demux/mkv/util.hpp
 modules/demux/mkv/virtual_segment.cpp
 modules/demux/mkv/virtual_segment.hpp
 modules/demux/mod.c
-modules/demux/mp4/drms.c
-modules/demux/mp4/drms.h
-modules/demux/mp4/drmstables.h
 modules/demux/mp4/id3genres.h
 modules/demux/mp4/libmp4.c
 modules/demux/mp4/libmp4.h
