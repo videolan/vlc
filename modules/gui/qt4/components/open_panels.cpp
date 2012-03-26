@@ -741,8 +741,8 @@ void CaptureOpenPanel::initialize()
             1, 0, 3, 1 );
 
     /* dshow CONNECTs */
-    CuMRL( vdevDshowW->combo, currentIndexChanged ( int ) );
-    CuMRL( adevDshowW->combo, currentIndexChanged ( int ) );
+    CuMRL( vdevDshowW, changed() );
+    CuMRL( adevDshowW, changed() );
     CuMRL( dshowVSizeLine, textChanged( const QString& ) );
     configList << "dshow-vdev" << "dshow-adev" << "dshow-size";
     }

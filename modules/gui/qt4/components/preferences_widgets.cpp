@@ -457,6 +457,12 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
     }
 }
 
+void StringListConfigControl::comboIndexChanged( int i_index )
+{
+    Q_UNUSED( i_index );
+    emit changed();
+}
+
 void StringListConfigControl::actionRequested( int i_action )
 {
     /* Supplementary check for boundaries */
@@ -493,6 +499,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
 void StringListConfigControl::finish(module_config_t *p_module_config )
 {
     combo->setEditable( false );
+    CONNECT( combo, currentIndexChanged ( int ), this, comboIndexChanged( int ) );
 
     if(!p_module_config) return;
 

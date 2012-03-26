@@ -101,9 +101,10 @@ protected:
     vlc_object_t *p_this;
     module_config_t *p_item;
     QWidget *widget;
+signals:
+    void changed();
 #if 0
 /* You shouldn't use that now..*/
-signals:
     void Updated();
 #endif
 };
@@ -471,7 +472,7 @@ private:
     QLabel *label;
 private slots:
     void actionRequested( int );
-
+    void comboIndexChanged( int );
 };
 
 void setfillVLCConfigCombo(const char *configname, intf_thread_t *p_intf,
