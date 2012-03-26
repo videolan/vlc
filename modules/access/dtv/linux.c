@@ -621,7 +621,7 @@ static int dvb_vset_props (dvb_device_t *d, size_t n, va_list ap)
     struct dtv_property buf[n], *prop = buf;
     struct dtv_properties props = { .num = n, .props = buf };
 
-    memset (prop, 0, sizeof (prop));
+    memset (buf, 0, sizeof (buf));
 
     while (n > 0)
     {
