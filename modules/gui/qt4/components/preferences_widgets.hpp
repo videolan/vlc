@@ -83,8 +83,8 @@ public:
     const char * getName() const { return  p_item->psz_name; }
     QWidget *getWidget() const { return widget; }
     bool isAdvanced() const { return p_item->b_advanced; }
-    virtual void hide() { if ( widget ) widget->hide(); };
-    virtual void show() { if ( widget ) widget->show(); };
+    void hide() { changeVisibility( false ); }
+    void show() { changeVisibility( true ); }
 
     static ConfigControl * createControl( vlc_object_t*,
                                           module_config_t*,QWidget*,
@@ -93,14 +93,11 @@ public:
 protected:
     ConfigControl( vlc_object_t *_p_this, module_config_t *_p_conf,
                    QWidget *p ) : p_this( _p_this ), p_item( _p_conf )
-    {
-        widget = NULL;
-    }
+    { widget = NULL; }
     ConfigControl( vlc_object_t *_p_this, module_config_t *_p_conf ) :
                             p_this (_p_this ), p_item( _p_conf )
-    {
-        widget = NULL;
-    }
+    { widget = NULL; }
+    virtual void changeVisibility( bool b ) { if ( widget ) widget->setVisible( b ); }
     vlc_object_t *p_this;
     module_config_t *p_item;
     QWidget *widget;
@@ -139,11 +136,14 @@ public:
     IntegerConfigControl( vlc_object_t *, module_config_t *,
                           QLabel*, QSlider* );
     virtual int getValue() const;
-    virtual void show() { spin->show(); if( label ) label->show(); }
-    virtual void hide() { spin->hide(); if( label ) label->hide(); }
-
 protected:
     QSpinBox *spin;
+    virtual void changeVisibility( bool b )
+    {
+        spin->setVisible( b );
+        if ( label ) label->setVisible( b );
+        ConfigControl::changeVisibility( b );
+    }
 private:
     QLabel *label;
     void finish();
@@ -168,6 +168,12 @@ public:
     virtual int getValue() const;
 protected:
     QSlider *slider;
+    virtual void changeVisibility( bool b )
+    {
+        slider->setVisible( b );
+        if ( label ) label->setVisible( b );
+        ConfigControl::changeVisibility( b );
+    }
 private:
     QLabel *label;
     void finish();
@@ -182,8 +188,13 @@ public:
     IntegerListConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                               QComboBox*, bool );
     virtual int getValue() const;
-    virtual void hide() { combo->hide(); if( label ) label->hide(); }
-    virtual void show() { combo->show(); if( label ) label->show(); }
+protected:
+    virtual void changeVisibility( bool b )
+    {
+        combo->setVisible( b );
+        if ( label ) label->setVisible( b );
+        ConfigControl::changeVisibility( b );
+    }
 private:
     void finish(module_config_t * );
     QLabel *label;
@@ -201,9 +212,13 @@ public:
     BoolConfigControl( vlc_object_t *, module_config_t *,
                        QLabel *, QAbstractButton* );
     virtual int getValue() const;
-    virtual void show() { checkbox->show(); }
-    virtual void hide() { checkbox->hide(); }
     virtual int getType() const;
+protected:
+    virtual void changeVisibility( bool b )
+    {
+        checkbox->setVisible( b );
+        ConfigControl::changeVisibility( b );
+    }
 private:
     QAbstractButton *checkbox;
     void finish();
@@ -219,6 +234,13 @@ public:
                         QLabel *, QAbstractButton* );
     virtual ~ColorConfigControl() { delete color_px; }
     virtual int getValue() const;
+protected:
+    virtual void changeVisibility( bool b )
+    {
+        color_but->setVisible( b );
+        if ( label ) label->setVisible( b );
+        ConfigControl::changeVisibility( b );
+    }
 private:
     QLabel *label;
     QAbstractButton *color_but;
@@ -255,10 +277,14 @@ public:
     FloatConfigControl( vlc_object_t *, module_config_t *,
                         QLabel*, QDoubleSpinBox* );
     virtual float getValue() const;
-    virtual void show() { spin->show(); if( label ) label->show(); }
-    virtual void hide() { spin->hide(); if( label ) label->hide(); }
 
 protected:
+    virtual void changeVisibility( bool b )
+    {
+        spin->setVisible( b );
+        if ( label ) label->setVisible( b );
+        ConfigControl::changeVisibility( b );
+    }
     QDoubleSpinBox *spin;
 
 private:
@@ -304,8 +330,13 @@ public:
     StringConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                          QLineEdit*,  bool pwd );
     virtual QString getValue() const { return text->text(); };
-    virtual void show() { text->show(); if( label ) label->show(); }
-    virtual void hide() { text->hide(); if( label ) label->hide(); }
+protected:
+    virtual void changeVisibility( bool b )
+    {
+        text->setVisible( b );
+        if ( label ) label->setVisible( b );
+        ConfigControl::changeVisibility( b );
+    }
 private:
     void finish();
     QLineEdit *text;
@@ -321,11 +352,16 @@ public:
     FileConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                        QLineEdit *, QPushButton * );
     virtual QString getValue() const { return text->text(); };
-    virtual void show() { text->show(); if( label ) label->show(); browse->show(); }
-    virtual void hide() { text->hide(); if( label ) label->hide(); browse->hide(); }
 public slots:
     virtual void updateField();
 protected:
+    virtual void changeVisibility( bool b )
+    {
+        text->setVisible( b );
+        browse->setVisible( b );
+        if ( label ) label->setVisible( b );
+        ConfigControl::changeVisibility( b );
+    }
     void finish();
     QLineEdit *text;
     QLabel *label;
@@ -354,6 +390,12 @@ public:
                        QFontComboBox *);
     virtual QString getValue() const { return font->currentFont().family(); }
 protected:
+    virtual void changeVisibility( bool b )
+    {
+        font->setVisible( b );
+        if ( label ) label->setVisible( b );
+        ConfigControl::changeVisibility( b );
+    }
     QLabel *label;
     QFontComboBox *font;
 };
@@ -366,8 +408,12 @@ public:
     ModuleConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                          QComboBox*, bool );
     virtual QString getValue() const;
-    virtual void hide() { combo->hide(); if( label ) label->hide(); }
-    virtual void show() { combo->show(); if( label ) label->show(); }
+    virtual void changeVisibility( bool b )
+    {
+        combo->setVisible( b );
+        if ( label ) label->setVisible( b );
+        ConfigControl::changeVisibility( b );
+    }
 private:
     void finish( bool );
     QLabel *label;
@@ -390,10 +436,10 @@ public:
 //                         QComboBox*, bool );
     virtual ~ModuleListConfigControl();
     virtual QString getValue() const;
-    virtual void hide();
-    virtual void show();
 public slots:
     void onUpdate();
+protected:
+    virtual void changeVisibility( bool );
 private:
     void finish( bool );
     void checkbox_lists(module_t*);
@@ -412,8 +458,13 @@ public:
     StringListConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                              QComboBox*, bool );
     virtual QString getValue() const;
-    virtual void hide() { combo->hide(); if( label ) label->hide(); }
-    virtual void show() { combo->show(); if( label ) label->show(); }
+protected:
+    virtual void changeVisibility( bool b )
+    {
+        combo->setVisible( b );
+        if ( label ) label->setVisible( b );
+        ConfigControl::changeVisibility( b );
+    }
     QComboBox *combo;
 private:
     void finish(module_config_t * );
@@ -457,11 +508,15 @@ public:
     KeySelectorControl( vlc_object_t *, module_config_t *, QWidget *,
                         QGridLayout*, int );
     virtual int getType() const;
-    virtual void hide() { table->hide(); if( label ) label->hide(); }
-    virtual void show() { table->show(); if( label ) label->show(); }
     virtual void doApply();
 protected:
     virtual bool eventFilter( QObject *, QEvent * );
+    virtual void changeVisibility( bool b )
+    {
+        table->setVisible( b );
+        if ( label ) label->setVisible( b );
+        ConfigControl::changeVisibility( b );
+    }
 private:
     void finish();
     QLabel *label;

@@ -822,20 +822,13 @@ QString ModuleListConfigControl::getValue() const
     return text->text();
 }
 
-void ModuleListConfigControl::hide()
+void ModuleListConfigControl::changeVisibility( bool b )
 {
     foreach ( checkBoxListItem *it, modules )
-        it->checkBox->hide();
-    groupBox->hide();
+        it->checkBox->setVisible( b );
+    groupBox->setVisible( b );
+    ConfigControl::changeVisibility( b );
 }
-
-void ModuleListConfigControl::show()
-{
-    foreach ( checkBoxListItem *it, modules )
-        it->checkBox->show();
-    groupBox->show();
-}
-
 
 void ModuleListConfigControl::onUpdate()
 {
