@@ -124,6 +124,8 @@ int main (void)
                "http://www.example.com/%7Ejohn/");
     test_path ("/", "file:///");
     test_path ("/home/john/", "file:///home/john/");
+    test_path ("/home/john//too///many//slashes",
+               "file:///home/john//too///many//slashes");
     test_path ("/home/john/music.ogg", "file:///home/john/music.ogg");
     test_path ("\\\\server/pub/music.ogg", "smb://server/pub/music.ogg");
     test_path ("\\\\server\\pub\\music.ogg", "smb://server/pub/music.ogg");
