@@ -145,6 +145,7 @@ case "${host_os}" in
       arm*)
         ARCH_flag="-arch armv7"
         ac_cv_c_bigendian="no"
+        ac_cv_c_attribute_packed="no"
       ;;
     esac
 
