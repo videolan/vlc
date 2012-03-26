@@ -93,7 +93,7 @@ public:
 protected:
     ConfigControl( vlc_object_t *_p_this, module_config_t *_p_conf,
                    QWidget *p ) : p_this( _p_this ), p_item( _p_conf )
-    { widget = NULL; }
+    { Q_UNUSED( p ); widget = NULL; }
     ConfigControl( vlc_object_t *_p_this, module_config_t *_p_conf ) :
                             p_this (_p_this ), p_item( _p_conf )
     { widget = NULL; }
