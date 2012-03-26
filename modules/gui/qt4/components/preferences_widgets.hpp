@@ -79,16 +79,6 @@ class ConfigControl : public QObject
 {
     Q_OBJECT
 public:
-    ConfigControl( vlc_object_t *_p_this, module_config_t *_p_conf,
-                   QWidget *p ) : p_this( _p_this ), p_item( _p_conf )
-    {
-        widget = NULL;
-    }
-    ConfigControl( vlc_object_t *_p_this, module_config_t *_p_conf ) :
-                            p_this (_p_this ), p_item( _p_conf )
-    {
-        widget = NULL;
-    }
     virtual int getType() const = 0;
     const char * getName() const { return  p_item->psz_name; }
     QWidget *getWidget() const { return widget; }
@@ -101,6 +91,16 @@ public:
                                           QGridLayout *, int line = 0 );
     virtual void doApply() = 0;
 protected:
+    ConfigControl( vlc_object_t *_p_this, module_config_t *_p_conf,
+                   QWidget *p ) : p_this( _p_this ), p_item( _p_conf )
+    {
+        widget = NULL;
+    }
+    ConfigControl( vlc_object_t *_p_this, module_config_t *_p_conf ) :
+                            p_this (_p_this ), p_item( _p_conf )
+    {
+        widget = NULL;
+    }
     vlc_object_t *p_this;
     module_config_t *p_item;
     QString _name;
@@ -119,13 +119,14 @@ class VIntConfigControl : public ConfigControl
 {
 Q_OBJECT
 public:
+    virtual int getValue() const = 0;
+    virtual int getType() const;
+    virtual void doApply();
+protected:
     VIntConfigControl( vlc_object_t *a, module_config_t *b, QWidget *c ) :
             ConfigControl(a,b,c) {};
     VIntConfigControl( vlc_object_t *a, module_config_t *b ) :
                 ConfigControl(a,b) {};
-    virtual int getValue() const = 0;
-    virtual int getType() const;
-    virtual void doApply();
 };
 
 class IntegerConfigControl : public VIntConfigControl
@@ -236,13 +237,14 @@ class VFloatConfigControl : public ConfigControl
 {
     Q_OBJECT
 public:
+    virtual float getValue() const = 0;
+    virtual int getType() const;
+    virtual void doApply();
+protected:
     VFloatConfigControl( vlc_object_t *a, module_config_t *b, QWidget *c ) :
                 ConfigControl(a,b,c) {};
     VFloatConfigControl( vlc_object_t *a, module_config_t *b ) :
                 ConfigControl(a,b) {};
-    virtual float getValue() const = 0;
-    virtual int getType() const;
-    virtual void doApply();
 };
 
 class FloatConfigControl : public VFloatConfigControl
@@ -284,13 +286,14 @@ class VStringConfigControl : public ConfigControl
 {
     Q_OBJECT
 public:
+    virtual QString getValue() const = 0;
+    virtual int getType() const;
+    virtual void doApply();
+protected:
     VStringConfigControl( vlc_object_t *a, module_config_t *b, QWidget *c ) :
                 ConfigControl(a,b,c) {};
     VStringConfigControl( vlc_object_t *a, module_config_t *b ) :
                 ConfigControl(a,b) {};
-    virtual QString getValue() const = 0;
-    virtual int getType() const;
-    virtual void doApply();
 };
 
 class StringConfigControl : public VStringConfigControl
