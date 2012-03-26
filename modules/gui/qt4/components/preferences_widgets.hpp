@@ -103,7 +103,6 @@ protected:
     }
     vlc_object_t *p_this;
     module_config_t *p_item;
-    QString _name;
     QWidget *widget;
 #if 0
 /* You shouldn't use that now..*/
