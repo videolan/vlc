@@ -46,15 +46,15 @@ namespace dash
                 BlockBuffer           (stream_t *stream);
                 virtual ~BlockBuffer  ();
 
-                void    put         (block_t *block);
-                int     get         (void *p_data, unsigned int len);
-                int     peek        (const uint8_t **pp_peek, unsigned int i_peek);
+                void    put           (block_t *block);
+                int     get           (void *p_data, unsigned int len);
+                int     peek          (const uint8_t **pp_peek, unsigned int i_peek);
                 int     seekBackwards (unsigned len);
-                void    setEOF      (bool value);
-                bool    getEOF      ();
-                mtime_t size        ();
-                void    attach      (IBufferObserver *observer);
-                void    notify      ();
+                void    setEOF        (bool value);
+                bool    getEOF        ();
+                mtime_t size          ();
+                void    attach        (IBufferObserver *observer);
+                void    notify        ();
 
             private:
                 mtime_t             capacityMicroSec;
