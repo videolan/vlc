@@ -117,6 +117,7 @@ vlc_module_begin ()
                         TELNETHOST_LONGTEXT, true )
             add_integer( "telnet-port", TELNETPORT_DEFAULT, TELNETPORT_TEXT,
                          TELNETPORT_LONGTEXT, true )
+                change_integer_range( 1, 65535 )
             add_password( "telnet-password", NULL, TELNETPWD_TEXT,
 
                           TELNETPWD_LONGTEXT, true )
