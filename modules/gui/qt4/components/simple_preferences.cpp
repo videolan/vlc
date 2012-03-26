@@ -680,8 +680,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             int line = 0;
 
             panel_label->setText( qtr( "Configure Hotkeys" ) );
-            control = new KeySelectorControl( VLC_OBJECT(p_intf), p_config ,
-                                                this, gLayout, line );
+            control = new KeySelectorControl( VLC_OBJECT(p_intf), p_config, this );
+            control->insertIntoExistingGrid( gLayout, line );
             controls.append( control );
 
             line++;
@@ -694,14 +694,16 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             p_config = config_FindConfig( VLC_OBJECT(p_intf), "hotkeys-mousewheel-mode" );
             control = new IntegerListConfigControl( VLC_OBJECT(p_intf),
-                    p_config, this, false, gLayout, line );
+                    p_config, this, false );
+            control->insertIntoExistingGrid( gLayout, line );
             controls.append( control );
 
 #ifdef WIN32
             line++;
 
             p_config = config_FindConfig( VLC_OBJECT(p_intf), "qt-disable-volume-keys" );
-            control = new BoolConfigControl( VLC_OBJECT(p_intf), p_config, this, gLayout, line );
+            control = new BoolConfigControl( VLC_OBJECT(p_intf), p_config, this );
+            control->insertIntoExistingGrid( gLayout, line );
             controls.append( control );
 #endif
 

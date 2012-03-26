@@ -82,81 +82,83 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
     switch( p_item->i_type )
     {
     case CONFIG_ITEM_MODULE:
-        p_control = new ModuleConfigControl( p_this, p_item, parent, false,
-                                             l, line );
+        p_control = new ModuleConfigControl( p_this, p_item, parent, false );
         break;
     case CONFIG_ITEM_MODULE_CAT:
-        p_control = new ModuleConfigControl( p_this, p_item, parent, true,
-                                             l, line );
+        p_control = new ModuleConfigControl( p_this, p_item, parent, true );
         break;
     case CONFIG_ITEM_MODULE_LIST:
-        p_control = new ModuleListConfigControl( p_this, p_item, parent, false,
-                                             l, line );
+        p_control = new ModuleListConfigControl( p_this, p_item, parent, false );
         break;
     case CONFIG_ITEM_MODULE_LIST_CAT:
-        p_control = new ModuleListConfigControl( p_this, p_item, parent, true,
-                                             l, line );
+        p_control = new ModuleListConfigControl( p_this, p_item, parent, true );
         break;
     case CONFIG_ITEM_STRING:
         if( !p_item->i_list )
-            p_control = new StringConfigControl( p_this, p_item, parent,
-                                                 l, line, false );
+            p_control = new StringConfigControl( p_this, p_item, parent, false );
         else
-            p_control = new StringListConfigControl( p_this, p_item,
-                                            parent, l, line );
+            p_control = new StringListConfigControl( p_this, p_item, parent );
         break;
     case CONFIG_ITEM_PASSWORD:
         if( !p_item->i_list )
-            p_control = new StringConfigControl( p_this, p_item, parent,
-                                                 l, line, true );
+            p_control = new StringConfigControl( p_this, p_item, parent, true );
         else
-            p_control = new StringListConfigControl( p_this, p_item,
-                                            parent, l, line );
+            p_control = new StringListConfigControl( p_this, p_item, parent );
         break;
     case CONFIG_ITEM_RGB:
-        p_control = new ColorConfigControl( p_this, p_item, parent, l, line );
+        p_control = new ColorConfigControl( p_this, p_item, parent );
         break;
     case CONFIG_ITEM_INTEGER:
         if( p_item->i_list )
-            p_control = new IntegerListConfigControl( p_this, p_item,
-                                            parent, false, l, line );
+            p_control = new IntegerListConfigControl( p_this, p_item, parent, false );
         else if( p_item->min.i || p_item->max.i )
-            p_control = new IntegerRangeConfigControl( p_this, p_item, parent,
-                                                       l, line );
+            p_control = new IntegerRangeConfigControl( p_this, p_item, parent );
         else
-            p_control = new IntegerConfigControl( p_this, p_item, parent,
-                                                  l, line );
+            p_control = new IntegerConfigControl( p_this, p_item, parent );
         break;
     case CONFIG_ITEM_LOADFILE:
     case CONFIG_ITEM_SAVEFILE:
-        p_control = new FileConfigControl( p_this, p_item, parent, l, line);
+        p_control = new FileConfigControl( p_this, p_item, parent );
         break;
     case CONFIG_ITEM_DIRECTORY:
-        p_control = new DirectoryConfigControl( p_this, p_item, parent, l,
-                                                line );
+        p_control = new DirectoryConfigControl( p_this, p_item, parent );
         break;
     case CONFIG_ITEM_FONT:
-        p_control = new FontConfigControl( p_this, p_item, parent, l,
-                                           line);
+        p_control = new FontConfigControl( p_this, p_item, parent );
         break;
     case CONFIG_ITEM_KEY:
-        p_control = new KeySelectorControl( p_this, p_item, parent, l, line );
+        p_control = new KeySelectorControl( p_this, p_item, parent );
         break;
     case CONFIG_ITEM_BOOL:
-        p_control = new BoolConfigControl( p_this, p_item, parent, l, line );
+        p_control = new BoolConfigControl( p_this, p_item, parent );
         break;
     case CONFIG_ITEM_FLOAT:
         if( p_item->min.f || p_item->max.f )
-            p_control = new FloatRangeConfigControl( p_this, p_item, parent,
-                                                     l, line );
+            p_control = new FloatRangeConfigControl( p_this, p_item, parent );
         else
-            p_control = new FloatConfigControl( p_this, p_item, parent,
-                                                  l, line );
+            p_control = new FloatConfigControl( p_this, p_item, parent );
         break;
     default:
         break;
     }
+    if ( p_control ) p_control->insertIntoExistingGrid( l, line );
     return p_control;
+}
+
+/* Inserts controls into layouts
+   This is sub-optimal in the OO way, as controls's code still
+   depends on Layout classes. We should use layout inserters [friend]
+   classes, but it's unlikely we had to deal with a different layout.*/
+void ConfigControl::insertInto( QBoxLayout *layout )
+{
+    QGridLayout *sublayout = new QGridLayout();
+    fillGrid( sublayout, 0 );
+    layout->addLayout( sublayout );
+}
+
+void ConfigControl::insertIntoExistingGrid( QGridLayout *l, int line )
+{
+    fillGrid( l, line );
 }
 
 /*******************************************************
@@ -209,29 +211,21 @@ VStringConfigControl::doApply()
 /*********** String **************/
 StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
                                           module_config_t *_p_item,
-                                          QWidget *_parent, QGridLayout *l,
-                                          int line, bool pwd ) :
-                           VStringConfigControl( _p_this, _p_item, _parent )
+                                          QWidget *_parent,
+                                          bool pwd ) :
+                           VStringConfigControl( _p_this, _p_item )
 {
-    label = new QLabel( qtr(p_item->psz_text) );
-    text = new QLineEdit( qfu(p_item->value.psz) );
+    label = new QLabel( qtr(p_item->psz_text), _parent );
+    text = new QLineEdit( qfu(p_item->value.psz), _parent );
     if( pwd ) text->setEchoMode( QLineEdit::Password );
     finish();
+}
 
-    if( !l )
-    {
-        widget = new QWidget( _parent );
-        QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget( label, 0 ); layout->insertSpacing( 1, 10 );
-        layout->addWidget( text, LAST_COLUMN );
-        widget->setLayout( layout );
-    }
-    else
-    {
-        l->addWidget( label, line, 0 );
-        l->setColumnMinimumWidth( 1, 10 );
-        l->addWidget( text, line, LAST_COLUMN );
-    }
+void StringConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( label, line, 0 );
+    l->setColumnMinimumWidth( 1, 10 );
+    l->addWidget( text, line, LAST_COLUMN, Qt::AlignRight );
 }
 
 StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
@@ -263,40 +257,28 @@ void StringConfigControl::finish()
 
 /*********** File **************/
 FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
-                                          module_config_t *_p_item,
-                                          QWidget *_parent, QGridLayout *l,
-                                          int line ) :
-                           VStringConfigControl( _p_this, _p_item, _parent )
+                                      module_config_t *_p_item, QWidget *p ) :
+                           VStringConfigControl( _p_this, _p_item )
 {
-    label = new QLabel( qtr(p_item->psz_text) );
-    text = new QLineEdit( qfu(p_item->value.psz) );
-    browse = new QPushButton( qtr( "Browse..." ) );
-    QHBoxLayout *textAndButton = new QHBoxLayout();
-    textAndButton->setMargin( 0 );
-    textAndButton->addWidget( text, 2 );
-    textAndButton->addWidget( browse, 0 );
+    label = new QLabel( qtr(p_item->psz_text), p );
+    text = new QLineEdit( qfu(p_item->value.psz), p );
+    browse = new QPushButton( qtr( "Browse..." ), p );
 
     BUTTONACT( browse, updateField() );
 
     finish();
-
-    if( !l )
-    {
-        widget = new QWidget( _parent );
-        QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget( label, 0 );
-        layout->insertSpacing( 1, 10 );
-        layout->addLayout( textAndButton, LAST_COLUMN );
-        widget->setLayout( layout );
-    }
-    else
-    {
-        l->addWidget( label, line, 0 );
-        l->setColumnMinimumWidth( 1, 10 );
-        l->addLayout( textAndButton, line, LAST_COLUMN );
-    }
 }
 
+void FileConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( label, line, 0 );
+    l->setColumnMinimumWidth( 1, 10 );
+    QHBoxLayout *textAndButton = new QHBoxLayout();
+    textAndButton->setMargin( 0 );
+    textAndButton->addWidget( text, 2 );
+    textAndButton->addWidget( browse, 0 );
+    l->addLayout( textAndButton, line, LAST_COLUMN, 0 );
+}
 
 FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
                                    module_config_t *_p_item,
@@ -344,9 +326,8 @@ void FileConfigControl::finish()
 
 /********* String / Directory **********/
 DirectoryConfigControl::DirectoryConfigControl( vlc_object_t *_p_this,
-                        module_config_t *_p_item, QWidget *_p_widget,
-                        QGridLayout *_p_layout, int _int ) :
-     FileConfigControl( _p_this, _p_item, _p_widget, _p_layout, _int )
+                        module_config_t *_p_item, QWidget *p ) :
+     FileConfigControl( _p_this, _p_item, p )
 {}
 
 DirectoryConfigControl::DirectoryConfigControl( vlc_object_t *_p_this,
@@ -369,31 +350,23 @@ void DirectoryConfigControl::updateField()
 
 /********* String / Font **********/
 FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
-                        module_config_t *_p_item, QWidget *_parent,
-                        QGridLayout *_p_layout, int line) :
-     VStringConfigControl( _p_this, _p_item, _parent )
+                        module_config_t *_p_item, QWidget *p ) :
+     VStringConfigControl( _p_this, _p_item )
 {
-    label = new QLabel( qtr(p_item->psz_text) );
-    font = new QFontComboBox( _parent );
+    label = new QLabel( qtr(p_item->psz_text), p );
+    font = new QFontComboBox( p );
     font->setCurrentFont( QFont( qfu( p_item->value.psz) ) );
-    if( !_p_layout )
-    {
-        widget = new QWidget( _parent );
-        QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget( label, 0 );
-        layout->addWidget( font, 1 );
-        widget->setLayout( layout );
-    }
-    else
-    {
-        _p_layout->addWidget( label, line, 0 );
-        _p_layout->addWidget( font, line, 1, 1, -1 );
-    }
 
     if( p_item->psz_longtext )
     {
         label->setToolTip( formatTooltip( qtr(p_item->psz_longtext) ) );
     }
+}
+
+void FontConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( label, line, 0 );
+    l->addWidget( font, line, 1, 1, -1 );
 }
 
 FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
@@ -413,30 +386,17 @@ FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
 
 /********* String / choice list **********/
 StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
-               module_config_t *_p_item, QWidget *_parent,
-               QGridLayout *l, int line) :
-               VStringConfigControl( _p_this, _p_item, _parent )
+               module_config_t *_p_item, QWidget *p ) :
+               VStringConfigControl( _p_this, _p_item )
 {
-    label = new QLabel( qtr(p_item->psz_text) );
-    combo = new QComboBox();
+    label = new QLabel( qtr(p_item->psz_text), p );
+    combo = new QComboBox( p );
     combo->setMinimumWidth( MINWIDTH_BOX );
     combo->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
 
     module_config_t *p_module_config = config_FindConfig( p_this, p_item->psz_name );
 
     finish( p_module_config );
-    if( !l )
-    {
-        widget = new QWidget( _parent );
-        l = new QGridLayout();
-        l->addWidget( label, 0, 0 ); l->addWidget( combo, 0, LAST_COLUMN );
-        widget->setLayout( l );
-    }
-    else
-    {
-        l->addWidget( label, line, 0 );
-        l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
-    }
 
     if( p_item->i_action )
     {
@@ -446,15 +406,24 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
         for( int i = 0; i < p_item->i_action; i++ )
         {
             QPushButton *button =
-                new QPushButton( qtr( p_item->ppsz_action_text[i] ));
+                new QPushButton( qtr( p_item->ppsz_action_text[i] ), p );
+            buttons << button;
             CONNECT( button, clicked(), signalMapper, map() );
             signalMapper->setMapping( button, i );
-            l->addWidget( button, line, LAST_COLUMN - p_item->i_action + i,
-                    Qt::AlignRight );
         }
         CONNECT( signalMapper, mapped( int ),
                 this, actionRequested( int ) );
     }
+}
+
+void StringListConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( label, line, 0 );
+    l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
+    int i = 0;
+    foreach( QPushButton *button, buttons )
+        l->addWidget( button, line, LAST_COLUMN - p_item->i_action + i++,
+                      Qt::AlignRight );
 }
 
 void StringListConfigControl::comboIndexChanged( int i_index )
@@ -484,6 +453,7 @@ void StringListConfigControl::actionRequested( int i_action )
         p_module_config->b_dirty = false;
     }
 }
+
 StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
                 module_config_t *_p_item, QLabel *_label, QComboBox *_combo,
                 bool ) : VStringConfigControl( _p_this, _p_item )
@@ -599,26 +569,19 @@ void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
 
 /********* Module **********/
 ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
-               module_config_t *_p_item, QWidget *_parent, bool bycat,
-               QGridLayout *l, int line) :
-               VStringConfigControl( _p_this, _p_item, _parent )
+               module_config_t *_p_item, QWidget *p, bool bycat ) :
+               VStringConfigControl( _p_this, _p_item )
 {
-    label = new QLabel( qtr(p_item->psz_text) );
-    combo = new QComboBox();
+    label = new QLabel( qtr(p_item->psz_text), p );
+    combo = new QComboBox( p );
     combo->setMinimumWidth( MINWIDTH_BOX );
     finish( bycat );
-    if( !l )
-    {
-        widget = new QWidget( _parent );
-        QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget( label ); layout->addWidget( combo, LAST_COLUMN );
-        widget->setLayout( layout );
-    }
-    else
-    {
-        l->addWidget( label, line, 0 );
-        l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
-    }
+}
+
+void ModuleConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( label, line, 0 );
+    l->addWidget( combo, line, LAST_COLUMN, 0 );
 }
 
 ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
@@ -692,17 +655,16 @@ QString ModuleConfigControl::getValue() const
 
 /********* Module list **********/
 ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
-        module_config_t *_p_item, QWidget *_parent, bool bycat,
-        QGridLayout *l, int line) :
-    VStringConfigControl( _p_this, _p_item, _parent )
+        module_config_t *_p_item, QWidget *p, bool bycat ) :
+    VStringConfigControl( _p_this, _p_item )
 {
     groupBox = NULL;
 
     /* Special Hack */
     if( !p_item->psz_text ) return;
 
-    groupBox = new QGroupBox ( qtr(p_item->psz_text), _parent );
-    text = new QLineEdit;
+    groupBox = new QGroupBox ( qtr(p_item->psz_text), p );
+    text = new QLineEdit( p );
     QGridLayout *layoutGroupBox = new QGridLayout( groupBox );
 
     finish( bycat );
@@ -716,20 +678,13 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
 
     layoutGroupBox->addWidget( text, boxline, 0, 1, 2 );
 
-    if( !l )
-    {
-        widget = new QWidget( _parent );
-        QVBoxLayout *layout = new QVBoxLayout();
-        layout->addWidget( groupBox, line, 0 );
-        widget->setLayout( layout );
-    }
-    else
-    {
-        l->addWidget( groupBox, line, 0, 1, -1 );
-    }
-
     if( p_item->psz_longtext )
         text->setToolTip( formatTooltip( qtr( p_item->psz_longtext) ) );
+}
+
+void ModuleListConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( groupBox, line, 0, 1, -1 );
 }
 
 ModuleListConfigControl::~ModuleListConfigControl()
@@ -834,7 +789,6 @@ void ModuleListConfigControl::changeVisibility( bool b )
     foreach ( checkBoxListItem *it, modules )
         it->checkBox->setVisible( b );
     groupBox->setVisible( b );
-    ConfigControl::changeVisibility( b );
 }
 
 void ModuleListConfigControl::onUpdate()
@@ -871,30 +825,16 @@ VIntConfigControl::doApply()
 
 /*********** Integer **************/
 IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
-                                            module_config_t *_p_item,
-                                            QWidget *_parent, QGridLayout *l,
-                                            int line ) :
-                           VIntConfigControl( _p_this, _p_item, _parent )
+                                            module_config_t *_p_item, QWidget *p ) :
+                           VIntConfigControl( _p_this, _p_item )
 {
-    label = new QLabel( qtr(p_item->psz_text) );
-    spin = new QSpinBox; spin->setMinimumWidth( MINWIDTH_BOX );
+    label = new QLabel( qtr(p_item->psz_text), p );
+    spin = new QSpinBox( p ); spin->setMinimumWidth( MINWIDTH_BOX );
     spin->setAlignment( Qt::AlignRight );
     spin->setMaximumWidth( MINWIDTH_BOX );
     finish();
-
-    if( !l )
-    {
-        widget = new QWidget( _parent );
-        QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget( label, 0 ); layout->addWidget( spin, LAST_COLUMN );
-        widget->setLayout( layout );
-    }
-    else
-    {
-        l->addWidget( label, line, 0 );
-        l->addWidget( spin, line, LAST_COLUMN, Qt::AlignRight );
-    }
 }
+
 IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
                                             module_config_t *_p_item,
                                             QLabel *_label, QSpinBox *_spin ) :
@@ -903,6 +843,12 @@ IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
     spin = _spin;
     label = _label;
     finish();
+}
+
+void IntegerConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( label, line, 0 );
+    l->addWidget( spin, line, LAST_COLUMN, Qt::AlignRight );
 }
 
 void IntegerConfigControl::finish()
@@ -931,10 +877,8 @@ int VIntConfigControl::getType() const { return CONFIG_ITEM_INTEGER; }
 
 /********* Integer range **********/
 IntegerRangeConfigControl::IntegerRangeConfigControl( vlc_object_t *_p_this,
-                                            module_config_t *_p_item,
-                                            QWidget *_parent, QGridLayout *l,
-                                            int line ) :
-            IntegerConfigControl( _p_this, _p_item, _parent, l, line )
+                                            module_config_t *_p_item, QWidget *p ) :
+            IntegerConfigControl( _p_this, _p_item, p )
 {
     finish();
 }
@@ -983,29 +927,16 @@ int IntegerRangeSliderConfigControl::getValue() const
 
 /********* Integer / choice list **********/
 IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
-               module_config_t *_p_item, QWidget *_parent, bool,
-               QGridLayout *l, int line) :
-               VIntConfigControl( _p_this, _p_item, _parent )
+               module_config_t *_p_item, QWidget *p, bool ) :
+               VIntConfigControl( _p_this, _p_item )
 {
-    label = new QLabel( qtr(p_item->psz_text) );
-    combo = new QComboBox();
+    label = new QLabel( qtr(p_item->psz_text), p );
+    combo = new QComboBox( p );
     combo->setMinimumWidth( MINWIDTH_BOX );
 
     module_config_t *p_module_config = config_FindConfig( p_this, p_item->psz_name );
 
     finish( p_module_config );
-    if( !l )
-    {
-        widget = new QWidget( _parent );
-        QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget( label ); layout->addWidget( combo, LAST_COLUMN );
-        widget->setLayout( layout );
-    }
-    else
-    {
-        l->addWidget( label, line, 0 );
-        l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
-    }
 
     if( p_item->i_action )
     {
@@ -1015,17 +946,27 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
         for( int i = 0; i < p_item->i_action; i++ )
         {
             QPushButton *button =
-                new QPushButton( qfu( p_item->ppsz_action_text[i] ));
+                    new QPushButton( qfu( p_item->ppsz_action_text[i] ), p );
+            buttons << button;
             CONNECT( button, clicked(), signalMapper, map() );
             signalMapper->setMapping( button, i );
-            l->addWidget( button, line, LAST_COLUMN - p_item->i_action + i,
-                    Qt::AlignRight );
         }
         CONNECT( signalMapper, mapped( int ),
                 this, actionRequested( int ) );
     }
 
 }
+
+void IntegerListConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( label, line, 0 );
+    l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
+    int i = 0;
+    foreach( QPushButton *button, buttons )
+        l->addWidget( button, line, LAST_COLUMN - p_item->i_action + i++,
+                      Qt::AlignRight );
+}
+
 IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
                 module_config_t *_p_item, QLabel *_label, QComboBox *_combo,
                 bool ) : VIntConfigControl( _p_this, _p_item )
@@ -1104,25 +1045,16 @@ int IntegerListConfigControl::getValue() const
 
 /*********** Boolean **************/
 BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
-                                      module_config_t *_p_item,
-                                      QWidget *_parent, QGridLayout *l,
-                                      int line ) :
-                    VIntConfigControl( _p_this, _p_item, _parent )
+                                      module_config_t *_p_item, QWidget *p ) :
+                    VIntConfigControl( _p_this, _p_item )
 {
-    checkbox = new QCheckBox( qtr(p_item->psz_text) );
+    checkbox = new QCheckBox( qtr(p_item->psz_text), p );
     finish();
+}
 
-    if( !l )
-    {
-        widget = new QWidget( _parent );
-        QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget( checkbox, 0 );
-        widget->setLayout( layout );
-    }
-    else
-    {
-        l->addWidget( checkbox, line, 0 );
-    }
+void BoolConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( checkbox, line, 0, 1, -1, 0 );
 }
 
 BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
@@ -1152,27 +1084,18 @@ int BoolConfigControl::getValue() const
 
 /************* Color *************/
 ColorConfigControl::ColorConfigControl( vlc_object_t *_p_this,
-                                            module_config_t *_p_item,
-                                            QWidget *_parent, QGridLayout *l,
-                                            int line ) :
-                           VIntConfigControl( _p_this, _p_item, _parent )
+                                        module_config_t *_p_item, QWidget *p ) :
+                           VIntConfigControl( _p_this, _p_item )
 {
-    label = new QLabel;
-    color_but = new QToolButton;
+    label = new QLabel( p );
+    color_but = new QToolButton( p );
     finish();
+}
 
-    if( !l )
-    {
-        widget = new QWidget( _parent );
-        QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget( label, 0 ); layout->addWidget( color_but, LAST_COLUMN );
-        widget->setLayout( layout );
-    }
-    else
-    {
-        l->addWidget( label, line, 0 );
-        l->addWidget( color_but, line, LAST_COLUMN, Qt::AlignRight );
-    }
+void ColorConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( label, line, 0 );
+    l->addWidget( color_but, line, LAST_COLUMN, Qt::AlignRight );
 }
 
 ColorConfigControl::ColorConfigControl( vlc_object_t *_p_this,
@@ -1234,30 +1157,21 @@ VFloatConfigControl::doApply()
 
 /*********** Float **************/
 FloatConfigControl::FloatConfigControl( vlc_object_t *_p_this,
-                                        module_config_t *_p_item,
-                                        QWidget *_parent, QGridLayout *l,
-                                        int line ) :
-                    VFloatConfigControl( _p_this, _p_item, _parent )
+                                        module_config_t *_p_item, QWidget *p ) :
+                    VFloatConfigControl( _p_this, _p_item )
 {
-    label = new QLabel( qtr(p_item->psz_text) );
-    spin = new QDoubleSpinBox;
+    label = new QLabel( qtr(p_item->psz_text), p );
+    spin = new QDoubleSpinBox( p );
     spin->setMinimumWidth( MINWIDTH_BOX );
     spin->setMaximumWidth( MINWIDTH_BOX );
     spin->setAlignment( Qt::AlignRight );
     finish();
+}
 
-    if( !l )
-    {
-        widget = new QWidget( _parent );
-        QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget( label, 0 ); layout->addWidget( spin, LAST_COLUMN );
-        widget->setLayout( layout );
-    }
-    else
-    {
-        l->addWidget( label, line, 0 );
-        l->addWidget( spin, line, LAST_COLUMN, Qt::AlignRight );
-    }
+void FloatConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( label, line, 0 );
+    l->addWidget( spin, line, LAST_COLUMN, Qt::AlignRight );
 }
 
 int VFloatConfigControl::getType() const { return CONFIG_ITEM_FLOAT; }
@@ -1297,10 +1211,8 @@ float FloatConfigControl::getValue() const
 
 /*********** Float with range **************/
 FloatRangeConfigControl::FloatRangeConfigControl( vlc_object_t *_p_this,
-                                        module_config_t *_p_item,
-                                        QWidget *_parent, QGridLayout *l,
-                                        int line ) :
-                FloatConfigControl( _p_this, _p_item, _parent, l, line )
+                                        module_config_t *_p_item, QWidget *p ) :
+                FloatConfigControl( _p_this, _p_item, p )
 {
     finish();
 }
@@ -1325,23 +1237,18 @@ void FloatRangeConfigControl::finish()
  * Key selector widget
  **********************************************************************/
 KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
-                                      module_config_t *_p_item,
-                                      QWidget *_parent, QGridLayout *l,
-                                      int line ) :
-                                ConfigControl( _p_this, _p_item, _parent )
+                                      module_config_t *_p_item, QWidget *p ) :
+                                ConfigControl( _p_this, _p_item )
 
 {
-    QWidget *keyContainer = new QWidget;
-    QGridLayout *gLayout = new QGridLayout( keyContainer );
-
     label = new QLabel(
         qtr( "Select or double click an action to change the associated "
-             "hotkey. Use delete key to remove hotkeys") );
+             "hotkey. Use delete key to remove hotkeys"), p );
 
-    QLabel *searchLabel = new QLabel( qtr( "Search" ) );
-    SearchLineEdit *actionSearch = new SearchLineEdit( keyContainer );
+    searchLabel = new QLabel( qtr( "Search" ), p );
+    actionSearch = new SearchLineEdit();
 
-    table = new QTreeWidget;
+    table = new QTreeWidget( p );
     table->setColumnCount(3);
     table->headerItem()->setText( 0, qtr( "Action" ) );
     table->headerItem()->setText( 1, qtr( "Hotkey" ) );
@@ -1355,15 +1262,18 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
 
     finish();
 
+    CONNECT( actionSearch, textChanged( const QString& ),
+             this, filter( const QString& ) );
+}
+
+void KeySelectorControl::fillGrid( QGridLayout *l, int line )
+{
+    QGridLayout *gLayout = new QGridLayout();
     gLayout->addWidget( label, 0, 0, 1, 4 );
     gLayout->addWidget( searchLabel, 1, 0, 1, 2 );
     gLayout->addWidget( actionSearch, 1, 2, 1, 2 );
     gLayout->addWidget( table, 2, 0, 1, 4 );
-
-    l->addWidget( keyContainer, line, 0, 1, -1 );
-
-    CONNECT( actionSearch, textChanged( const QString& ),
-             this, filter( const QString& ) );
+    l->addLayout( gLayout, line, 0, 1, -1 );
 }
 
 int KeySelectorControl::getType() const { return CONFIG_ITEM_KEY; }
@@ -1474,7 +1384,7 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
     bool b_global = ( column == 2 );
 
     /* Launch a small dialog to ask for a new key */
-    KeyInputDialog *d = new KeyInputDialog( table, keyItem->text( 0 ), widget, b_global );
+    KeyInputDialog *d = new KeyInputDialog( table, keyItem->text( 0 ), table, b_global );
     d->exec();
 
     if( d->result() == QDialog::Accepted )

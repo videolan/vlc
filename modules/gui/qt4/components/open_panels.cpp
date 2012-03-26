@@ -723,12 +723,14 @@ void CaptureOpenPanel::initialize()
     module_config_t *p_config =
         config_FindConfig( VLC_OBJECT(p_intf), "dshow-vdev" );
     vdevDshowW = new StringListConfigControl(
-        VLC_OBJECT(p_intf), p_config, this, dshowDevLayout, line );
+        VLC_OBJECT(p_intf), p_config, this );
+    vdevDshowW->insertIntoExistingGrid( dshowDevLayout, line );
     line++;
 
     p_config = config_FindConfig( VLC_OBJECT(p_intf), "dshow-adev" );
     adevDshowW = new StringListConfigControl(
-        VLC_OBJECT(p_intf), p_config, this, dshowDevLayout, line );
+        VLC_OBJECT(p_intf), p_config, this );
+    adevDshowW->insertIntoExistingGrid( dshowDevLayout, line );
     line++;
 
     /* dshow Properties */
