@@ -399,12 +399,6 @@ var.create( object, name, value ): Create and set the object's variable "name"
   to "value". Created vars can be of type float, string, bool or void.
   For a void variable the value has to be 'nil'.
 
-var.add_callback( object, name, function, data ): Add a callback to the
-  object's "name" variable. Callback functions take 4 arguments: the
-  variable name, the old value, the new value and data.
-var.del_callback( object, name, function, data ): Delete a callback to
-  the object's "name" variable. "function" and "data" must be the same as
-  when add_callback() was called.
 var.trigger_callback( object, name ): Trigger the callbacks associated with the
   object's "name" variable.
 
