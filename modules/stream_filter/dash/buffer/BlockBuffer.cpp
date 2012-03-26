@@ -85,6 +85,22 @@ int     BlockBuffer::peek                 (const uint8_t **pp_peek, unsigned int
     vlc_mutex_unlock(&this->monitorMutex);
     return ret;
 }
+
+int     BlockBuffer::seekBackwards       (unsigned len)
+{
+    vlc_mutex_lock(&this->monitorMutex);
+    if( this->buffer.i_offset > len )
+    {
+        this->buffer.i_offset -= len;
+        this->sizeBytes += len;
+        vlc_mutex_unlock(&this->monitorMutex);
+        return VLC_SUCCESS;
+    }
+
+    vlc_mutex_unlock(&this->monitorMutex);
+    return VLC_EGENERIC;
+}
+
 int     BlockBuffer::get                  (void *p_data, unsigned int len)
 {
     vlc_mutex_lock(&this->monitorMutex);

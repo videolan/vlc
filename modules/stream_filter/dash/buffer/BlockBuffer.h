@@ -49,6 +49,7 @@ namespace dash
                 void    put         (block_t *block);
                 int     get         (void *p_data, unsigned int len);
                 int     peek        (const uint8_t **pp_peek, unsigned int i_peek);
+                int     seekBackwards (unsigned len);
                 void    setEOF      (bool value);
                 bool    getEOF      ();
                 mtime_t size        ();

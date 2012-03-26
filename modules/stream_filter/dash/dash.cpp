@@ -77,7 +77,7 @@ struct stream_sys_t
         dash::DASHManager                   *p_dashManager;
         dash::http::HTTPConnectionManager   *p_conManager;
         dash::mpd::MPD                      *p_mpd;
-        int                                 position;
+        uint64_t                            position;
         bool                                isLive;
 };
 
@@ -160,6 +160,46 @@ static void Close(vlc_object_t *p_obj)
 /*****************************************************************************
  * Callbacks:
  *****************************************************************************/
+static int  Seek            ( stream_t *p_stream, uint64_t pos )
+{
+    stream_sys_t        *p_sys          = (stream_sys_t *) p_stream->p_sys;
+    dash::DASHManager   *p_dashManager  = p_sys->p_dashManager;
+    int                 i_ret           = 0;
+    unsigned            i_len           = 0;
+    long                i_read          = 0;
+
+    if( pos < p_sys->position )
+    {
+        if( p_sys->position - pos > UINT_MAX )
+        {
+            msg_Err( p_stream, "Cannot seek backward that far!" );
+            return VLC_EGENERIC;
+        }
+        i_len = p_sys->position - pos;
+        i_ret = p_dashManager->seekBackwards( i_len );
+        if( i_ret == VLC_EGENERIC )
+        {
+            msg_Err( p_stream, "Cannot seek backward outside the current block :-/" );
+            return VLC_EGENERIC;
+        }
+        else
+            return VLC_SUCCESS;
+    }
+
+    /* Seek forward */
+    if( pos - p_sys->position > UINT_MAX )
+    {
+        msg_Err( p_stream, "Cannot seek forward that far!" );
+        return VLC_EGENERIC;
+    }
+    i_len = pos - p_sys->position;
+    i_read = Read( p_stream, (void *)NULL, i_len );
+    if( (unsigned)i_read == i_len )
+        return VLC_SUCCESS;
+    else
+        return VLC_EGENERIC;
+}
+
 static int  Read            (stream_t *p_stream, void *p_ptr, unsigned int i_len)
 {
     stream_sys_t        *p_sys          = (stream_sys_t *) p_stream->p_sys;
@@ -221,7 +261,16 @@ static int  Control         (stream_t *p_stream, int i_query, va_list args)
             *(va_arg (args, uint64_t *)) = p_sys->position;
             break;
         case STREAM_SET_POSITION:
-            return VLC_EGENERIC;
+        {
+            uint64_t pos = (uint64_t)va_arg(args, uint64_t);
+            if(Seek(p_stream, pos) == VLC_SUCCESS)
+            {
+                p_sys->position = pos;
+                break;
+            }
+            else
+                return VLC_EGENERIC;
+        }
         case STREAM_GET_SIZE:
         {
             uint64_t*   res = (va_arg (args, uint64_t *));

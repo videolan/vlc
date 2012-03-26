@@ -47,6 +47,7 @@ namespace dash
             bool    start   ();
             int     read    ( void *p_buffer, size_t len );
             int     peek    ( const uint8_t **pp_peek, size_t i_peek );
+            int     seekBackwards ( unsigned len );
 
             const mpd::IMPDManager*         getMpdManager   () const;
             const logic::IAdaptationLogic*  getAdaptionLogic() const;

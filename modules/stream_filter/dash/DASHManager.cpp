@@ -74,6 +74,11 @@ int     DASHManager::read( void *p_buffer, size_t len )
     return this->buffer->get(p_buffer, len);
 }
 
+int     DASHManager::seekBackwards( unsigned i_len )
+{
+    return this->buffer->seekBackwards( i_len );
+}
+
 int     DASHManager::peek( const uint8_t **pp_peek, size_t i_peek )
 {
     return this->buffer->peek(pp_peek, i_peek);
