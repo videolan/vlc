@@ -79,6 +79,7 @@ vlc_module_begin ()
             N_( "Address of the CDDB server to use." ), true )
     add_integer( "cddb-port", 80, N_( "CDDB port" ),
             N_( "CDDB Server port to use." ), true )
+        change_integer_range( 1, 65535 )
 #endif
 
     add_shortcut( "cdda", "cddasimple" )
