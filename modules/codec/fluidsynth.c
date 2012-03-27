@@ -74,7 +74,7 @@ vlc_module_begin ()
     add_loadfile ("soundfont", "",
                   SOUNDFONT_TEXT, SOUNDFONT_LONGTEXT, false)
     add_bool ("synth-chorus", true, CHORUS_TEXT, CHORUS_TEXT, false)
-    add_float ("synth-gain", 0.8, GAIN_TEXT, GAIN_LONGTEXT, false)
+    add_float ("synth-gain", .5, GAIN_TEXT, GAIN_LONGTEXT, false)
         change_float_range (0., 10.)
     add_integer ("synth-polyphony", 256,
                  POLYPHONY_TEXT, POLYPHONY_LONGTEXT, false)
