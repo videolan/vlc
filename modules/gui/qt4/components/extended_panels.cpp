@@ -1365,23 +1365,7 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
     for( int i = 0 ; i < NUM_SP_CTRL ; i++ )
     {
         spatCtrl[i] = new QSlider( Qt::Vertical );
-        if( i < 2 )
-        {
-            spatCtrl[i]->setMaximum( 100 );
-            spatCtrl[i]->setValue( 20 );
-        }
-        else if( i < 4 )
-        {
-            spatCtrl[i]->setMaximum( 100 );
-            spatCtrl[i]->setValue( 20 );
-            spatCtrl[i]->setMinimum( -100 );
-        }
-        else
-        {
-            spatCtrl[i]->setMaximum( 40 );
-            spatCtrl[i]->setValue( 10 );
-        }
-
+        spatCtrl[i]->setValue( (int)var_InheritFloat( p_intf, spat_controls[i].psz_name ) * 10. );
         oldControlVars[i] = spatCtrl[i]->value();
 
         CONNECT( spatCtrl[i], valueChanged( int ), this, setInitValues() );
@@ -1395,7 +1379,9 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
         layout->addWidget( spatCtrl[i],     1, i, Qt::AlignHCenter );
         layout->addWidget( ctrl_readout[i], 2, i, Qt::AlignHCenter );
         layout->addWidget( ctrl_texts[i],   3, i, Qt::AlignHCenter );
+        spatCtrl[i]->setRange( 0, 10 );
     }
+    spatCtrl[0]->setRange( 0, 11 );
 
     BUTTONACT( enableCheck, enable() );
 
