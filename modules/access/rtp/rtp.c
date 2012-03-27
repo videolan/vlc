@@ -33,6 +33,7 @@
 #include <vlc_network.h>
 #include <vlc_plugin.h>
 #include <vlc_dialog.h>
+#include <vlc_aout.h> /* aout_FormatPrepare() */
 
 #include "rtp.h"
 #ifdef HAVE_SRTP
@@ -416,6 +417,8 @@ static int Control (demux_t *demux, int i_query, va_list args)
 
 void *codec_init (demux_t *demux, es_format_t *fmt)
 {
+    if (fmt->i_cat == AUDIO_ES)
+        aout_FormatPrepare (&fmt->audio);
     return es_out_Add (demux->out, fmt);
 }
 
