@@ -672,7 +672,7 @@ static int InitDirectSound( audio_output_t *p_aout )
                        "DirectSoundEnumerateW" );
     if( OurDirectSoundEnumerate )
     {
-        p_aout->sys->psz_device = var_InheritString(p_aout, "directx-audio-device-name");
+        p_aout->sys->psz_device = var_InheritString(p_aout, "directx-audio-device");
         /* Attempt enumeration */
         if( FAILED( OurDirectSoundEnumerate( CallBackDirectSoundEnum,
                                              p_aout ) ) )
