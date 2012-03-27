@@ -1018,6 +1018,9 @@ static const entry_t p_list_audio[] = {
         A("DTS "),
         A("dtsb"),
         A("dtsc"),
+        E("dtse", "DTS Express"),
+        E("dtsh", "DTS-HD High Resolution Audio"),
+        E("dtsl", "DTS-HD Lossless"),
         A("ms\x20\x01"),
 
     /* AAC audio */
