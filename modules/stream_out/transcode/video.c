@@ -62,23 +62,6 @@ static void video_unlink_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
 
 static picture_t *video_new_buffer_decoder( decoder_t *p_dec )
 {
-    sout_stream_sys_t *p_ssys = p_dec->p_owner->p_sys;
-    if( p_ssys->i_threads >= 1 )
-    {
-        int i_first_pic = p_ssys->i_first_pic;
-
-        if( p_ssys->i_first_pic != p_ssys->i_last_pic )
-        {
-            /* Encoder still has stuff to encode, wait to clear-up the list */
-            while( p_ssys->i_first_pic == i_first_pic )
-            {
-#warning THERE IS DEFINITELY A BUG! LOCKING IS INSUFFICIENT!
-                msleep( 10000 );
-                barrier ();
-            }
-        }
-    }
-
     p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
     return picture_NewFromFormat( &p_dec->fmt_out.video );
 }
@@ -120,7 +103,8 @@ static void* EncoderThread( void *obj )
         block_t *p_block;
 
         vlc_mutex_lock( &p_sys->lock_out );
-        while( !p_sys->b_abort && p_sys->i_last_pic == p_sys->i_first_pic )
+        while( !p_sys->b_abort &&
+               (p_pic = picture_fifo_Pop( p_sys->pp_pics )) == NULL )
             vlc_cond_wait( &p_sys->cond, &p_sys->lock_out );
 
         if( p_sys->b_abort )
@@ -128,9 +112,6 @@ static void* EncoderThread( void *obj )
             vlc_mutex_unlock( &p_sys->lock_out );
             break;
         }
-
-        p_pic = p_sys->pp_pics[p_sys->i_first_pic++];
-        p_sys->i_first_pic %= PICTURE_RING_SIZE;
         vlc_mutex_unlock( &p_sys->lock_out );
 
         p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
@@ -142,12 +123,6 @@ static void* EncoderThread( void *obj )
         picture_Release( p_pic );
     }
 
-    while( p_sys->i_last_pic != p_sys->i_first_pic )
-    {
-        p_pic = p_sys->pp_pics[p_sys->i_first_pic++];
-        p_sys->i_first_pic %= PICTURE_RING_SIZE;
-        picture_Release( p_pic );
-    }
     block_ChainRelease( p_sys->p_buffers );
 
     vlc_restorecancel (canc);
@@ -249,16 +224,22 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         p_sys->id_video = id;
         vlc_mutex_init( &p_sys->lock_out );
         vlc_cond_init( &p_sys->cond );
-        memset( p_sys->pp_pics, 0, sizeof(p_sys->pp_pics) );
-        p_sys->i_first_pic = 0;
-        p_sys->i_last_pic = 0;
+        p_sys->pp_pics = picture_fifo_New();
+        if( p_sys->pp_pics == NULL )
+        {
+            msg_Err( p_stream, "cannot create picture fifo" );
+            module_unneed( id->p_decoder, id->p_decoder->p_module );
+            id->p_decoder->p_module = NULL;
+            free( id->p_decoder->p_owner );
+            return VLC_ENOMEM;
+        }
         p_sys->p_buffers = NULL;
-        p_sys->b_abort = 0;
+        p_sys->b_abort = false;
         if( vlc_clone( &p_sys->thread, EncoderThread, p_sys, i_priority ) )
         {
             msg_Err( p_stream, "cannot spawn encoder thread" );
             module_unneed( id->p_decoder, id->p_decoder->p_module );
-            id->p_decoder->p_module = 0;
+            id->p_decoder->p_module = NULL;
             free( id->p_decoder->p_owner );
             return VLC_EGENERIC;
         }
@@ -550,6 +531,9 @@ void transcode_video_close( sout_stream_t *p_stream,
         vlc_join( p_stream->p_sys->thread, NULL );
         vlc_mutex_destroy( &p_stream->p_sys->lock_out );
         vlc_cond_destroy( &p_stream->p_sys->cond );
+
+        picture_fifo_Delete( p_stream->p_sys->pp_pics );
+        p_stream->p_sys->pp_pics = NULL;
     }
 
     /* Close decoder */
@@ -768,14 +752,12 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
         else
         {
             vlc_mutex_lock( &p_sys->lock_out );
-            p_sys->pp_pics[p_sys->i_last_pic++] = p_pic;
-            p_sys->i_last_pic %= PICTURE_RING_SIZE;
+            picture_fifo_Push( p_sys->pp_pics, p_pic );
             *out = p_sys->p_buffers;
             p_sys->p_buffers = NULL;
             if( p_pic2 != NULL )
             {
-                p_sys->pp_pics[p_sys->i_last_pic++] = p_pic2;
-                p_sys->i_last_pic %= PICTURE_RING_SIZE;
+                picture_fifo_Push( p_sys->pp_pics, p_pic2 );
             }
             vlc_cond_signal( &p_sys->cond );
             vlc_mutex_unlock( &p_sys->lock_out );

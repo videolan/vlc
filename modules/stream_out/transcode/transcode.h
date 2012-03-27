@@ -9,9 +9,7 @@
 #include <vlc_es.h>
 #include <vlc_codec.h>
 
-
-#define PICTURE_RING_SIZE 64
-#define SUBPICTURE_RING_SIZE 20
+#include <vlc_picture_fifo.h>
 
 #define MASTER_SYNC_MAX_DRIFT 100000
 
@@ -22,8 +20,7 @@ struct sout_stream_sys_t
     vlc_mutex_t     lock_out;
     vlc_cond_t      cond;
     bool            b_abort;
-    picture_t *     pp_pics[PICTURE_RING_SIZE];
-    int             i_first_pic, i_last_pic;
+    picture_fifo_t *pp_pics;
     vlc_thread_t    thread;
 
     /* Audio */
