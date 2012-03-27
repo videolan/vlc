@@ -151,7 +151,7 @@ static int vlclua_datadir_list( lua_State *L )
     char **ppsz_dir_list = NULL;
     int i = 1;
 
-    if( vlclua_dir_list( vlclua_get_this( L ), psz_dirname, &ppsz_dir_list )
+    if( vlclua_dir_list( psz_dirname, &ppsz_dir_list )
         != VLC_SUCCESS )
         return 0;
     lua_newtable( L );

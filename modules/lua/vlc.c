@@ -194,8 +194,7 @@ static int file_compare( const char **a, const char **b )
     return strcmp( *a, *b );
 }
 
-int vlclua_dir_list( vlc_object_t *p_this, const char *luadirname,
-                     char ***pppsz_dir_list )
+int vlclua_dir_list( const char *luadirname, char ***pppsz_dir_list )
 {
 #define MAX_DIR_LIST_SIZE 5
     *pppsz_dir_list = malloc(MAX_DIR_LIST_SIZE*sizeof(char *));
@@ -265,7 +264,7 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
     char **ppsz_dir_list = NULL;
     int i_ret;
 
-    if( (i_ret = vlclua_dir_list( p_this, luadirname, &ppsz_dir_list )) != VLC_SUCCESS)
+    if( (i_ret = vlclua_dir_list( luadirname, &ppsz_dir_list )) != VLC_SUCCESS)
         return i_ret;
 
     i_ret = VLC_EGENERIC;
@@ -316,7 +315,7 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
 char *vlclua_find_file( vlc_object_t *p_this, const char *psz_luadirname, const char *psz_name )
 {
     char **ppsz_dir_list = NULL;
-    vlclua_dir_list( p_this, psz_luadirname, &ppsz_dir_list );
+    vlclua_dir_list( psz_luadirname, &ppsz_dir_list );
 
     for( char **ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
     {
@@ -602,7 +601,7 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
     char **ppsz_dir_list = NULL;
     char **ppsz_dir;
     lua_State *L = NULL;
-    vlclua_dir_list( obj, "sd", &ppsz_dir_list );
+    vlclua_dir_list( "sd", &ppsz_dir_list );
     for( ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
     {
         int i_files;
@@ -774,7 +773,7 @@ int vlclua_add_modules_path( vlc_object_t *obj, lua_State *L, const char *psz_fi
     count += vlclua_add_modules_path_inner( L, psz_path );
 
     char **ppsz_dir_list = NULL;
-    vlclua_dir_list( obj, psz_char+1/* gruik? */, &ppsz_dir_list );
+    vlclua_dir_list( psz_char+1/* gruik? */, &ppsz_dir_list );
     char **ppsz_dir = ppsz_dir_list;
 
     for( ; *ppsz_dir && strcmp( *ppsz_dir, psz_path ); ppsz_dir++ );
