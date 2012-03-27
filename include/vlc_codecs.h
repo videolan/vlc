@@ -208,8 +208,10 @@ ATTR_PACKED
 } VIDEOINFO;
 #endif
 
-#if defined(__SUNPRO_C) || (defined(__APPLE__) && !HAVE_ATTRIBUTE_PACKED)
+#if defined(__SUNPRO_C)
 #   pragma pack()
+#elif defined(__APPLE__) && !HAVE_ATTRIBUTE_PACKED
+#   pragma pack(pop)
 #endif
 
 /* WAVE format wFormatTag IDs */
