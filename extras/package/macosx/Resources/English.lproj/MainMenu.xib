@@ -21,16 +21,16 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="29"/>
-      <integer value="4948"/>
-      <integer value="4850"/>
-      <integer value="915"/>
-      <integer value="4756"/>
-      <integer value="4596"/>
       <integer value="2770"/>
+      <integer value="29"/>
+      <integer value="4596"/>
+      <integer value="4739"/>
+      <integer value="4850"/>
+      <integer value="4756"/>
       <integer value="2730"/>
       <integer value="1617"/>
-      <integer value="4739"/>
+      <integer value="4948"/>
+      <integer value="915"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -2335,8 +2335,8 @@
                 <object class="NSMenuItem" id="355945594">
                   <reference key="NSMenu" ref="1016637396"/>
                   <string key="NSTitle">Playback Window</string>
-                  <string key="NSKeyEquiv">C</string>
-                  <int key="NSKeyEquivModMask">1048576</int>
+                  <string key="NSKeyEquiv">c</string>
+                  <int key="NSKeyEquivModMask">1572864</int>
                   <int key="NSMnemonicLoc">2147483647</int>
                   <reference key="NSOnImage" ref="447396056"/>
                   <reference key="NSMixedImage" ref="100133332"/>
@@ -2344,8 +2344,8 @@
                 <object class="NSMenuItem" id="302191520">
                   <reference key="NSMenu" ref="1016637396"/>
                   <string key="NSTitle">Playlist</string>
-                  <string key="NSKeyEquiv">P</string>
-                  <int key="NSKeyEquivModMask">1048576</int>
+                  <string key="NSKeyEquiv">p</string>
+                  <int key="NSKeyEquivModMask">1572864</int>
                   <int key="NSMnemonicLoc">2147483647</int>
                   <reference key="NSOnImage" ref="447396056"/>
                   <reference key="NSMixedImage" ref="100133332"/>
@@ -12145,7 +12145,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{709, 453}, {243, 283}}</string>
+          <string>{{653, 166}, {243, 283}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
