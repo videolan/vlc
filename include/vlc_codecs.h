@@ -50,6 +50,9 @@ typedef GUID guid_t;
 #elif defined(__SUNPRO_C)
 #   pragma pack(1)
 #   define ATTR_PACKED
+#elif defined(__APPLE__)
+#   pragma pack(push, 1)
+#   define ATTR_PACKED
 #else
 #   error FIXME
 #endif
@@ -205,7 +208,7 @@ ATTR_PACKED
 } VIDEOINFO;
 #endif
 
-#if defined(__SUNPRO_C)
+#if defined(__SUNPRO_C) || (defined(__APPLE__) && !HAVE_ATTRIBUTE_PACKED)
 #   pragma pack()
 #endif
 
