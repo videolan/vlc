@@ -844,8 +844,12 @@ static VLCOpen *_o_sharedMainInstance = nil;
                 returnValue = kVLCMediaBDMVFolder;
             else
             {
+                // NSFileManager is not thread-safe, don't use defaultManager outside of the main thread
+                NSFileManager * fm = [[NSFileManager alloc] init];
                 NSArray * topLevelItems;
-                topLevelItems = [[NSFileManager defaultManager] subpathsOfDirectoryAtPath: mountPath error: NULL];
+                topLevelItems = [fm subpathsOfDirectoryAtPath: mountPath error: NULL];
+                [fm release];
+
                 NSUInteger itemCount = [topLevelItems count];
                 for (int i = 0; i < itemCount; i++) {
                     if([[topLevelItems objectAtIndex:i] rangeOfString:@"SVCD"].location != NSNotFound) {
