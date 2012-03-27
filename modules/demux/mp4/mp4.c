@@ -1852,6 +1852,9 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             case( 0x20 ): /* MPEG4 VIDEO */
                 p_track->fmt.i_codec = VLC_FOURCC( 'm','p','4','v' );
                 break;
+            case( 0x21 ): /* H.264 */
+                p_track->fmt.i_codec = VLC_CODEC_H264;
+                break;
             case( 0x40):
                 p_track->fmt.i_codec = VLC_FOURCC( 'm','p','4','a' );
                 if( p_decconfig->i_decoder_specific_info_len >= 2 &&
@@ -1891,11 +1894,20 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             case( 0x6d ): /* png */
                 p_track->fmt.i_codec = VLC_FOURCC( 'p','n','g',' ' );
                 break;
-            case( 0x6e ): /* jpeg200 */
+            case( 0x6e ): /* jpeg2000 */
                 p_track->fmt.i_codec = VLC_FOURCC( 'M','J','2','C' );
                 break;
             case( 0xa3 ): /* vc1 */
                 p_track->fmt.i_codec = VLC_FOURCC( 'W','V','C','1' );
+                break;
+            case( 0xa4 ):
+                p_track->fmt.i_codec = VLC_CODEC_DIRAC;
+                break;
+            case( 0xa5 ):
+                p_track->fmt.i_codec = VLC_CODEC_A52;
+                break;
+            case( 0xa6 ):
+                p_track->fmt.i_codec = VLC_CODEC_EAC3;
                 break;
             case( 0xa9 ): /* dts */
             case( 0xaa ): /* DTS-HD HRA */
