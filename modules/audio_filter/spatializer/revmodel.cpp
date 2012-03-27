@@ -12,9 +12,11 @@
 // This code is public domain
 
 #include "revmodel.hpp"
+#include "tuning.h"
 #include <stdlib.h>
 
-revmodel::revmodel()
+revmodel::revmodel() : wet(initialwet), width(1.), mode(0.), roomsize(initialroom),
+                       damp(initialdamp), dry(initialdry)
 {
     // Tie the components to their buffers
     combL[0].setbuffer(bufcombL1,combtuningL1);
