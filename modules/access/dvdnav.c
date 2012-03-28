@@ -1467,7 +1467,8 @@ static int ProbeDVD( const char *psz_name )
         goto bailout;
     ext++;
     if( strcasecmp( ext, "iso" ) && strcasecmp( ext, "img" ) &&
-        strcasecmp( ext, "mdf" ) && strcasecmp( ext, "dvd" ) )
+        strcasecmp( ext, "mdf" ) && strcasecmp( ext, "dvd" ) &&
+        strcasecmp( ext, "bin" ) && strcasecmp( ext, "nrg" ) )
         goto bailout;
 
     /* Try to find the anchor (2 bytes at LBA 256) */
