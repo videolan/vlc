@@ -1,15 +1,15 @@
 # GSM
-GSM_VERSION := 1.0.12
-GSM_URL := $(CONTRIB_VIDEOLAN)/gsm-$(GSM_VERSION).tar.gz
+GSM_VERSION := 1.0.13
+GSM_URL := $(CONTRIB_VIDEOLAN)/libgsm_$(GSM_VERSION).tar.gz
 
-$(TARBALLS)/gsm-$(GSM_VERSION).tar.gz:
+$(TARBALLS)/libgsm_$(GSM_VERSION).tar.gz:
 	$(call download,$(GSM_URL))
 
-.sum-gsm: gsm-$(GSM_VERSION).tar.gz
+.sum-gsm: libgsm_$(GSM_VERSION).tar.gz
 
-gsm: gsm-$(GSM_VERSION).tar.gz .sum-gsm
+gsm: libgsm_$(GSM_VERSION).tar.gz .sum-gsm
 	$(UNPACK)
-	mv gsm-1.0-* gsm-$(GSM_VERSION)
+	mv gsm-1.0-* libgsm_$(GSM_VERSION)
 	$(APPLY) $(SRC)/gsm/gsm-cross.patch
 	$(MOVE)
 ifdef HAVE_DARWIN_OS
