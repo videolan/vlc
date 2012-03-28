@@ -48,6 +48,10 @@ struct audio_mixer
     void (*mix)(audio_mixer_t *, block_t *, float); /**< Amplifier */
 };
 
+VLC_API audio_mixer_t *aout_MixerNew(vlc_object_t *, vlc_fourcc_t) VLC_USED;
+VLC_API void aout_MixerDelete(audio_mixer_t *);
+VLC_API void aout_MixerRun(audio_mixer_t *, block_t *, float);
+
 #ifdef __cplusplus
 }
 #endif

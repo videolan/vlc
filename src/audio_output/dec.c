@@ -32,6 +32,7 @@
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
+#include <vlc_aout_mixer.h>
 #include <vlc_input.h>
 #include <vlc_atomic.h>
 
