@@ -2,6 +2,7 @@ SOURCES_equalizer = equalizer.c equalizer_presets.h
 SOURCES_compressor = compressor.c
 SOURCES_karaoke = karaoke.c
 SOURCES_normvol = normvol.c
+SOURCES_gain = gain.c
 SOURCES_audiobargraph_a = audiobargraph_a.c
 SOURCES_param_eq = param_eq.c
 SOURCES_scaletempo = scaletempo.c
@@ -22,6 +23,7 @@ libvlc_LTLIBRARIES += \
 	libequalizer_plugin.la \
 	libkaraoke_plugin.la \
 	libnormvol_plugin.la \
+	libgain_plugin.la \
 	libparam_eq_plugin.la \
 	libscaletempo_plugin.la \
 	libspatializer_plugin.la \
