@@ -1,22 +1,21 @@
 # jpeg
 
-OPENJPEG_VERSION := 1_4_sources_r697
-OPENJPEG_URL := http://openjpeg.googlecode.com/files/openjpeg_v$(OPENJPEG_VERSION).tgz
+OPENJPEG_VERSION := 1.5.0
+OPENJPEG_URL := http://openjpeg.googlecode.com/files/openjpeg-$(OPENJPEG_VERSION).tar.gz
 
-$(TARBALLS)/openjpeg_v$(OPENJPEG_VERSION).tgz:
+$(TARBALLS)/openjpeg-$(OPENJPEG_VERSION).tar.gz:
 	$(call download,$(OPENJPEG_URL))
 
-.sum-openjpeg: openjpeg_v$(OPENJPEG_VERSION).tgz
+.sum-openjpeg: openjpeg-$(OPENJPEG_VERSION).tar.gz
 
-openjpeg: openjpeg_v$(OPENJPEG_VERSION).tgz .sum-openjpeg
+openjpeg: openjpeg-$(OPENJPEG_VERSION).tar.gz .sum-openjpeg
 	$(UNPACK)
-	$(APPLY) $(SRC)/openjpeg/pkg-config.patch
 	$(APPLY) $(SRC)/openjpeg/freebsd.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 .openjpeg: openjpeg
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure --enable-png=no --enable-tiff=no $(HOSTCONF)
-	cd $< && $(MAKE) -j1 install
+	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -DOPJ_STATIC" ./configure --enable-png=no --enable-tiff=no $(HOSTCONF)
+	cd $< && $(MAKE) -C libopenjpeg -j1 install
 	touch $@
