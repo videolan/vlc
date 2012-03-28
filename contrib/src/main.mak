@@ -102,15 +102,16 @@ endif
 ifdef HAVE_ANDROID
 CC :=  $(HOST)-gcc --sysroot=$(ANDROID_NDK)/platforms/android-9/arch-arm
 CXX := $(HOST)-g++ --sysroot=$(ANDROID_NDK)/platforms/android-9/arch-arm
-
-# Kludge for C++ prebuilt compiler
-EXTRA_CFLAGS += -D__STDC_VERSION__=199901L
-EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/include
 ifdef HAVE_NEON
-    EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/libs/armeabi-v7a/include -mfloat-abi=softfp -mfpu=neon -mcpu=cortex-a8
+    ANDROID_ABI = armeabi-v7a
+    ANDROID_CPU_FLAGS = -mfpu=neon -mcpu=cortex-a8
 else
-    EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include -mfloat-abi=softfp -mcpu=arm1136jf-s -mfpu=vfp
+    ANDROID_ABI = armeabi
+    ANDROID_CPU_FLAGS = -mcpu=arm1136jf-s -mfpu=vfp
 endif
+EXTRA_CFLAGS += -D__STDC_VERSION__=199901L -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/include
+EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/libs/$(ANDROID_ABI)/include
+EXTRA_CFLAGS += -mfloat-abi=softfp $(ANDROID_CPU_FLAGS)
 endif
 
 ifdef HAVE_MACOSX
