@@ -1255,8 +1255,8 @@ static void Direct3DImportSubpicture(vout_display_t *vd,
                                                 NULL);
             if (FAILED(hr)) {
                 d3dr->texture = NULL;
-                msg_Err(vd, "Failed to create %dx%d texture for OSD",
-                        d3dr->width, d3dr->height);
+                msg_Err(vd, "Failed to create %dx%d texture for OSD (hr=0x%0lX)",
+                        d3dr->width, d3dr->height, hr);
                 continue;
             }
             msg_Dbg(vd, "Created %dx%d texture for OSD",
