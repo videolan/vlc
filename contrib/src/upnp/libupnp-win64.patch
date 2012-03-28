@@ -1,25 +1,3 @@
---- libupnp/upnp/inc/upnp.h	2011-03-15 22:59:38.000000000 +0100
-+++ libupnp.new/upnp/inc/upnp.h	2011-09-23 01:39:55.000000000 +0200
-@@ -57,6 +57,19 @@
- 	/* Other systems ??? */
- #endif
-
-+#   if defined( __MINGW32__ )
-+#       if !defined( _OFF_T_ )
-+            typedef long long _off_t;
-+            typedef _off_t off_t;
-+#           define _OFF_T_
-+#       else
-+#           ifdef off_t
-+#               undef off_t
-+#           endif
-+#           define off_t long long
-+#       endif
-+#   endif
-+
- #define LINE_SIZE  180
- #define NAME_SIZE  256
- #define MNFT_NAME_SIZE  64
 --- libupnp/threadutil/inc/ThreadPool.h	2011-01-20 07:46:57.000000000 +0100
 +++ libupnp.new/threadutil/inc/ThreadPool.h	2011-09-23 01:36:12.000000000 +0200
 @@ -45,6 +45,7 @@
@@ -38,3 +16,26 @@
  #else /* WIN32 */
  	#include <sys/param.h>
  	#include <sys/time.h> /* for gettimeofday() */
+--- libupnp-1.6.16/upnp/inc/upnp.h.orig	2012-03-22 00:15:38.000000000 +0100
++++ libupnp-1.6.16/upnp/inc/upnp.h	2012-03-28 18:58:55.043642000 +0200
+@@ -61,6 +61,20 @@
+ 	/* Other systems ??? */
+ #endif
+ 
++#   if defined( __MINGW32__ )
++#       if !defined( _OFF_T_ )
++            typedef long long _off_t;
++            typedef _off_t off_t;
++#           define _OFF_T_
++#       else
++#           ifdef off_t
++#               undef off_t
++#           endif
++#           define off_t long long
++#       endif
++#   endif
++
++
+ #define LINE_SIZE  (size_t)180
+ #define NAME_SIZE  (size_t)256
+ #define MNFT_NAME_SIZE  64
