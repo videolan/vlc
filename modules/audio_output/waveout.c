@@ -1066,7 +1066,7 @@ static int ReloadWaveoutDevices( vlc_object_t *p_this, char const *psz_name,
                                                            != MMSYSERR_NOERROR)
             continue;
 
-        swprintf(dev_name, MAXPNAMELEN + 32, device_name_fmt,
+        _snwprintf(dev_name, MAXPNAMELEN + 32, device_name_fmt,
                  caps.szPname, caps.wMid, caps.wPid);
         p_item->ppsz_list[j] = FromWide( dev_name );
         p_item->ppsz_list_text[j] = FromWide( dev_name );
@@ -1104,7 +1104,7 @@ static uint32_t findDeviceID(char *psz_device_name)
                                                           != MMSYSERR_NOERROR )
             continue;
 
-        swprintf( dev_name, MAXPNAMELEN + 32, device_name_fmt,
+        _snwprintf( dev_name, MAXPNAMELEN + 32, device_name_fmt,
                   caps.szPname, caps.wMid, caps.wPid );
         char *u8 = FromWide(dev_name);
         if( !stricmp(u8, psz_device_name) )
