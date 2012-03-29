@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dvb.c : DVB channel list import (szap/tzap/czap compatible channel lists)
+ * dvb.c: LinuxTV channels list
  *****************************************************************************
  * Copyright (C) 2005-20009 the VideoLAN team
  * $Id$
@@ -21,12 +21,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <limits.h>
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_demux.h>
@@ -34,281 +38,306 @@
 
 #include "playlist.h"
 
-#ifndef LONG_MAX
-#   define LONG_MAX 2147483647L
-#   define LONG_MIN (-LONG_MAX-1)
-#endif
+static int Demux(demux_t *);
+static input_item_t *ParseLine(char *line);
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int Demux( demux_t *p_demux);
-
-static int ParseLine( char *, char **, char ***, int *);
-
-/*****************************************************************************
- * Import_DVB: main import function
- *****************************************************************************/
-int Import_DVB( vlc_object_t *p_this )
+/** Detect dvb-utils zap channels.conf format */
+int Import_DVB(vlc_object_t *obj)
 {
-    demux_t *p_demux = (demux_t *)p_this;
-    const uint8_t *p_peek;
-    int     i_peek;
-    bool b_valid = false;
+    demux_t *demux = (demux_t *)obj;
 
-    if( !demux_IsPathExtension( p_demux, ".conf" ) && !p_demux->b_force )
+    if (!demux_IsPathExtension(demux, ".conf" ) && !demux->b_force )
         return VLC_EGENERIC;
 
     /* Check if this really is a channels file */
-    if( (i_peek = stream_Peek( p_demux->s, &p_peek, 1024 )) > 0 )
-    {
-        char psz_line[1024+1];
-        int i;
+    const uint8_t *peek;
+    int len = stream_Peek(demux->s, &peek, 1023);
+    if (len <= 0)
+        return VLC_EGENERIC;
 
-        for( i = 0; i < i_peek; i++ )
-        {
-            if( p_peek[i] == '\n' ) break;
-            psz_line[i] = p_peek[i];
-        }
-        psz_line[i] = 0;
+    const uint8_t *eol = memchr(peek, '\n', len);
+    if (eol == NULL)
+        return VLC_EGENERIC;
+    len = eol - peek;
 
-        if( ParseLine( psz_line, 0, 0, 0 ) ) b_valid = true;
-    }
+    char line[len + 1];
+    memcpy(line, peek, len);
+    line[len] = '\0';
 
-    if( !b_valid ) return VLC_EGENERIC;
+    input_item_t *item = ParseLine(line);
+    if (item == NULL)
+        return VLC_EGENERIC;
+    vlc_gc_decref(item);
 
-    msg_Dbg( p_demux, "found valid DVB conf playlist file");
-    p_demux->pf_control = Control;
-    p_demux->pf_demux = Demux;
+    msg_Dbg(demux, "found valid channels.conf file");
+    demux->pf_control = Control;
+    demux->pf_demux = Demux;
 
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * Demux: The important stuff
- *****************************************************************************/
-static int Demux( demux_t *p_demux )
+/** Parses the whole channels.conf file */
+static int Demux(demux_t *demux)
 {
-    char       *psz_line;
-    input_item_t *p_input;
-    input_item_t *p_current_input = GetCurrentItem(p_demux);
+    input_item_t *input = GetCurrentItem(demux);
+    input_item_node_t *subitems = input_item_node_Create(input);
+    char *line;
 
-    input_item_node_t *p_subitems = input_item_node_Create( p_current_input );
-
-    while( (psz_line = stream_ReadLine( p_demux->s )) )
+    while ((line = stream_ReadLine(demux->s)) != NULL)
     {
-        char **ppsz_options = NULL;
-        int  i_options = 0;
-        char *psz_name = NULL;
-
-        if( !ParseLine( psz_line, &psz_name, &ppsz_options, &i_options ) )
-        {
-            free( psz_line );
+        input_item_t *item = ParseLine(line);
+        if (item == NULL)
             continue;
-        }
 
-        EnsureUTF8( psz_name );
-        for( int i = 0; i< i_options; i++ )
-            EnsureUTF8( ppsz_options[i] );
-
-        p_input = input_item_NewExt( "dvb://", psz_name,
-                                     i_options, (const char**)ppsz_options, VLC_INPUT_OPTION_TRUSTED, -1 );
-        input_item_node_AppendItem( p_subitems, p_input );
-        vlc_gc_decref( p_input );
-
-        while( i_options-- )
-            free( ppsz_options[i_options] );
-        free( ppsz_options );
-
-        free( psz_line );
+        input_item_node_AppendItem(subitems, item);
+        vlc_gc_decref(item);
     }
 
-    input_item_node_PostAndDelete( p_subitems );
+    input_item_node_PostAndDelete(subitems);
+    vlc_gc_decref(input);
 
-    vlc_gc_decref(p_current_input);
     return 0; /* Needed for correct operation of go back */
 }
 
-static const struct
+static int cmp(const void *k, const void *e)
 {
-    const char *psz_name;
-    const char *psz_option;
+    return strcmp(k, e);
+}
 
-} dvb_options[] =
+static const char *ParseFEC(const char *str)
 {
-    { "INVERSION_OFF", "dvb-inversion=0" },
-    { "INVERSION_ON", "dvb-inversion=1" },
-    { "INVERSION_AUTO", "dvb-inversion=-1" },
+     static const struct fec
+     {
+         char dvb[5];
+         char vlc[5];
+     } tab[] = {
+         { "1_2", "1/2" }, { "2_3", "2/3" }, { "3_4", "3/4" },
+         { "4_5", "4/5" }, { "5_6", "5/6" }, { "6_7", "6/7" },
+         { "7_8", "7/8" }, { "8_9", "8/9" }, { "9_10", "9/10" },
+         { "AUTO", "" },   { "NONE", "0" }
+     };
 
-    { "BANDWIDTH_AUTO", "dvb-bandwidth=0" },
-    { "BANDWIDTH_6_MHZ", "dvb-bandwidth=6" },
-    { "BANDWIDTH_7_MHZ", "dvb-bandwidth=7" },
-    { "BANDWIDTH_8_MHZ", "dvb-bandwidth=8" },
+     if (strncmp(str, "FEC_", 4))
+         return NULL;
+     str += 4;
 
-    { "FEC_NONE", "dvb-fec=0" },
-    { "FEC_1_2", "dvb-fec=1/2" },
-    { "FEC_2_3", "dvb-fec=2/3" },
-    { "FEC_3_4", "dvb-fec=3/4" },
-    { "FEC_4_5", "dvb-fec=4/5" },
-    { "FEC_5_6", "dvb-fec=5/6" },
-    { "FEC_6_7", "dvb-fec=6/7" },
-    { "FEC_7_8", "dvb-fec=7/8" },
-    { "FEC_8_9", "dvb-fec=8/9" },
-    { "FEC_AUTO", "dvb-fec=" },
+     const struct fec *f = bsearch(str, tab, sizeof (tab) / sizeof(tab[0]),
+                                   sizeof (tab[0]), cmp);
+     return (f != NULL) ? f->vlc : NULL;
+}
 
-    { "GUARD_INTERVAL_AUTO", "dvb-guard=" },
-    { "GUARD_INTERVAL_1_4", "dvb-guard=1/4" },
-    { "GUARD_INTERVAL_1_8", "dvb-guard=1/8" },
-    { "GUARD_INTERVAL_1_16", "dvb-guard=1/16" },
-    { "GUARD_INTERVAL_1_32", "dvb-guard=1/32" },
-
-    { "HIERARCHY_NONE", "dvb-hierarchy=-1" },
-    { "HIERARCHY_1", "dvb-hierarchy=1" },
-    { "HIERARCHY_2", "dvb-hierarchy=2" },
-    { "HIERARCHY_4", "dvb-hierarchy=4" },
-
-    { "QPSK", "dvb-modulation=QPSK" },
-    { "QAM_AUTO", "dvb-modulation=QAM" },
-    { "QAM_16", "dvb-modulation=16QAM" },
-    { "QAM_32", "dvb-modulation=32QAM" },
-    { "QAM_64", "dvb-modulation=64QAM" },
-    { "QAM_128", "dvb-modulation=128QAM" },
-    { "QAM_256", "dvb-modulation=256QAM" },
-    { "8VSB", "dvb-modulation=8VSB"  },
-    { "16VSB", "dvb-modulation=16VSB"  },
-
-    { "TRANSMISSION_MODE_AUTO", "dvb-transmission=-1" },
-    { "TRANSMISSION_MODE_2K", "dvb-transmission=2" },
-    { "TRANSMISSION_MODE_8K", "dvb-transmission=8" },
-    { 0, 0 }
-
-};
-
-static int ParseLine( char *psz_line, char **ppsz_name,
-                      char ***pppsz_options, int *pi_options )
+static const char *ParseModulation(const char *str)
 {
-    char *psz_name = NULL, *psz_parse = psz_line;
-    int i_count = 0, i_program = 0, i_frequency = 0, i_symbolrate = 0;
-    bool b_valid = false;
+     static const struct mod
+     {
+         char dvb[9];
+         char vlc[7];
+     } tab[] = {
+         { "APSK_16", "16APSK" }, { "APSK_32", "32APSK" },
+         { "DQPSK", "DQPSK" }, { "PSK_8", "8PSK" }, { "QPSK", "QPSK" },
+         { "QAM_128", "128QAM" }, { "QAM_16", "16QAM" },
+         { "QAM_256", "256QAM" }, { "QAM_32", "32QAM" },
+         { "QAM_64", "64QAM" }, { "QAM_AUTO", "QAM" },
+         { "VSB_16", "16VSB" }, { "VSB_8", "8VSB" }
+     };
 
-    if( pppsz_options ) *pppsz_options = NULL;
-    if( pi_options ) *pi_options = 0;
-    if( ppsz_name ) *ppsz_name = NULL;
+     const struct mod *m = bsearch(str, tab, sizeof (tab) / sizeof(tab[0]),
+                                   sizeof (tab[0]), cmp);
+     return (m != NULL) ? m->vlc : NULL;
+}
 
-    /* Skip leading tabs and spaces */
-    while( *psz_parse == ' ' || *psz_parse == '\t' ||
-           *psz_parse == '\n' || *psz_parse == '\r' ) psz_parse++;
+static const char *ParseGuard(const char *str)
+{
+     static const struct guard
+     {
+         char dvb[7];
+         char vlc[7];
+     } tab[] = {
+         { "19_128", "19/128" }, { "19_256", "19/256" }, { "1_128", "1/128" },
+         { "1_16", "1/16" }, { "1_32", "1/32" }, { "1_4", "1/4" },
+         { "1_8", "1/8" }, { "AUTO", "" },
+     };
 
-    /* Ignore comments */
-    if( *psz_parse == '#' ) return false;
+     if (strncmp(str, "GUARD_INTERVAL_", 15))
+         return NULL;
+     str += 15;
 
-    while( psz_parse )
-    {
-        const char *psz_option = NULL;
-        char *psz_option_end = strchr( psz_parse, ':' );
-        if( psz_option_end ) { *psz_option_end = 0; psz_option_end++; }
+     const struct guard *g = bsearch(str, tab, sizeof (tab) / sizeof(tab[0]),
+                                     sizeof (tab[0]), cmp);
+     return (g != NULL) ? g->vlc : NULL;
+}
 
-        if( i_count == 0 )
-        {
-            /* Channel name */
-            psz_name = psz_parse;
-        }
-        else if( i_count == 1 )
-        {
-            /* Frequency */
-            char *psz_end;
-            long i_value;
+/* http://www.linuxtv.org/vdrwiki/index.php/Syntax_of_channels.conf or not...
+ * Read the dvb-apps source code for reference. */
+static input_item_t *ParseLine(char *line)
+{
+    char *str, *end;
 
-            i_value = strtol( psz_parse, &psz_end, 10 );
-            if( psz_end == psz_parse ||
-                i_value == LONG_MAX || i_value == LONG_MIN ) break;
+    line += strspn(line, " \t\r"); /* skip leading white spaces */
+    if (*line == '#')
+        return NULL; /* skip comments */
 
-            i_frequency = i_value;
+    /* Extract channel cute name */
+    char *name = strsep(&line, ":");
+    assert(name != NULL);
+    EnsureUTF8(name);
+
+    /* Extract central frequency */
+    str = strsep(&line, ":");
+    if (str == NULL)
+        return NULL;
+    unsigned long freq = strtoul(str, &end, 10);
+    if (*end)
+        return NULL;
+
+    /* Extract tuning parameters */
+    str = strsep(&line, ":");
+    if (str == NULL)
+        return NULL;
+
+    char *mrl;
+
+    if (!strcmp(str, "h") || !strcmp(str, "v"))
+    {   /* DVB-S */
+        char polarization = toupper(*str);
+
+        /* TODO: sat no. */
+        str = strsep(&line, ":");
+        if (str == NULL)
+            return NULL;
+
+        /* baud rate */
+        str = strsep(&line, ":");
+        if (str == NULL)
+            return NULL;
+
+        unsigned long rate = strtoul(str, &end, 10);
+        if (*end || rate > (ULONG_MAX / 1000u))
+            return NULL;
+        rate *= 1000;
+
+        if (asprintf(&mrl,
+                     "dvb-s://frequency=%"PRIu64":polarization=%c:srate=%lu",
+                     freq * UINT64_C(1000000), polarization, rate) == -1)
+            mrl = NULL;
+    }
+    else
+    if (!strncmp(str, "INVERSION_", 10))
+    {   /* DVB-C or DVB-T */
+        int inversion;
+
+        str += 10;
+        if (strcmp(str, "AUTO"))
+            inversion = -1;
+        else if (strcmp(str, "OFF"))
+            inversion = 0;
+        else if (strcmp(str, "ON"))
+            inversion = 1;
+        else
+            return NULL;
+
+        str = strsep(&line, ":");
+        if (str == NULL)
+            return NULL;
+
+        if (strncmp(str, "BANDWIDTH_", 10))
+        {   /* DVB-C */
+            unsigned long rate = strtoul(str, &end, 10);
+            if (*end)
+                return NULL;
+
+            str = strsep(&line, ":");
+            const char *fec = ParseFEC(str);
+            str = strsep(&line, ":");
+            const char *mod = ParseModulation(str);
+            if (fec == NULL || mod == NULL)
+                return NULL;
+
+            if (asprintf(&mrl, "dvb-c://frequency=%lu:inversion:%d:srate=%lu:"
+                         "fec=%s:modulation=%s", freq, inversion, rate, fec,
+                         mod) == -1)
+                mrl = NULL;
         }
         else
-        {
-            int i;
+        {   /* DVB-T */
+            unsigned bandwidth = atoi(str + 10);
 
-            /* Check option name with our list */
-            for( i = 0; dvb_options[i].psz_name; i++ )
-            {
-                if( !strcmp( psz_parse, dvb_options[i].psz_name ) )
-                {
-                    psz_option = dvb_options[i].psz_option;
+            str = strsep(&line, ":");
+            const char *hp = ParseFEC(str);
+            str = strsep(&line, ":");
+            const char *lp = ParseFEC(str);
+            str = strsep(&line, ":");
+            const char *mod = ParseModulation(str);
+            if (hp == NULL || lp == NULL || mod == NULL)
+                return NULL;
 
-                    /* If we recognize one of the strings, then we are sure
-                     * the data is really valid (ie. a channels file). */
-                    b_valid = true;
-                    break;
-                }
-            }
+            str = strsep(&line, ":");
+            if (str == NULL || strncmp(str, "TRANSMISSION_MODE_", 18))
+                return NULL;
+            int xmit = atoi(str);
+            if (xmit == 0)
+                xmit = -1; /* AUTO */
 
-            if( !psz_option )
-            {
-                /* Option not recognized, test if it is a number */
-                char *psz_end;
-                long i_value;
+            str = strsep(&line, ":");
+            const char *guard = ParseGuard(str);
+            if (guard == NULL)
+                return NULL;
 
-                i_value = strtol( psz_parse, &psz_end, 10 );
-                if( psz_end != psz_parse &&
-                    i_value != LONG_MAX && i_value != LONG_MIN &&
-                    !i_symbolrate )
-                {
-                    i_symbolrate = i_value;
-                }
-                else if( psz_end != psz_parse &&
-                    i_value != LONG_MAX && i_value != LONG_MIN )
-                {
-                    i_program = i_value;
-                }
-            }
+            str = strsep(&line, ":");
+            if (str == NULL || strncmp(str, "HIERARCHY_", 10))
+                return NULL;
+            str += 10;
+            int hierarchy = atoi(str);
+            if (!strcmp(str, "AUTO"))
+                hierarchy = -1;
+
+            if (asprintf(&mrl, "dvb-t://frequency=%lu:inversion=%d:"
+                         "bandwidth=%u:code-rate-hp=%s:code-rate-lp=%s:"
+                         "modulation=%s:transmission=%d:guard=%s:"
+                         "hierarchy=%d", freq, inversion, bandwidth, hp, lp,
+                         mod, xmit, guard, hierarchy) == -1)
+                mrl = NULL;
         }
+    }
+    else
+    {   /* ATSC */
+        const char *mod = ParseModulation(str);
+        if (mod == NULL)
+            return NULL;
 
-        if( psz_option && pppsz_options && pi_options )
-        {
-            char *psz_dup = strdup( psz_option );
-            if (psz_dup != NULL)
-                INSERT_ELEM( *pppsz_options, (*pi_options), (*pi_options),
-                             psz_dup );
-        }
-
-        psz_parse = psz_option_end;
-        i_count++;
+        if (asprintf(&mrl, "atsc://frequency=%lu:modulation=%s", freq,
+                     mod) == -1)
+            mrl = NULL;
     }
 
-    if( !b_valid && pppsz_options && pi_options )
+    if (unlikely(mrl == NULL))
+        return NULL;
+
+    /* Video PID (TODO? set video track) */
+    strsep(&line, ":");
+    /* Audio PID (TODO? set audio track) */
+    strsep(&line, ":");
+    /* Extract SID */
+    str = strsep(&line, ":");
+    if (str == NULL)
     {
-        /* This isn't a valid channels file, cleanup everything */
-        while( (*pi_options)-- ) free( (*pppsz_options)[*pi_options] );
-        free( *pppsz_options );
-        *pppsz_options = NULL; *pi_options = 0;
+        free(mrl);
+        return NULL;
     }
-
-    if( i_program && pppsz_options && pi_options )
+    unsigned long sid = strtoul(str, &end, 10);
+    if (*end || sid > 65535)
     {
-        char *psz_option;
-
-        if( asprintf( &psz_option, "program=%i", i_program ) != -1 )
-            INSERT_ELEM( *pppsz_options, (*pi_options), (*pi_options),
-                         psz_option );
+        free(mrl);
+        return NULL;
     }
-    if( i_frequency && pppsz_options && pi_options )
-    {
-        char *psz_option;
 
-        if( asprintf( &psz_option, "dvb-frequency=%i", i_frequency ) != -1 )
-            INSERT_ELEM( *pppsz_options, (*pi_options), (*pi_options),
-                         psz_option );
-    }
-    if( i_symbolrate && pppsz_options && pi_options )
-    {
-        char *psz_option;
+    char sid_opt[sizeof("program=65535")];
+    snprintf(sid_opt, sizeof(sid_opt), "program=%lu", sid);
 
-        if( asprintf( &psz_option, "dvb-srate=%i", i_symbolrate ) != -1 )
-            INSERT_ELEM( *pppsz_options, (*pi_options), (*pi_options),
-                         psz_option );
-    }
-    if( ppsz_name && psz_name ) *ppsz_name = strdup( psz_name );
+    const char *opts[] = { sid_opt };
 
-    return b_valid;
+    input_item_t *item = input_item_NewWithType(mrl, name, 1, opts, 0, -1,
+                                                ITEM_TYPE_CARD);
+    free(mrl);
+    return item;
 }
