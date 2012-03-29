@@ -51,20 +51,16 @@ static bool IsWhitespace( const char *psz_string );
  *****************************************************************************/
 int Import_B4S( vlc_object_t *p_this )
 {
-    DEMUX_BY_EXTENSION_OR_FORCED_MSG( ".b4s", "b4s-open",
-                                      "using B4S playlist reader" );
+    demux_t *demux = (demux_t *)p_this;
+
+    if( !demux_IsPathExtension( demux, ".b4s" )
+     && !demux_IsForced( demux, "b4s-open" ) )
+        return VLC_EGENERIC;
+
+    demux->pf_demux = Demux;
+    demux->pf_control = Control;
+
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Deactivate: frees unused data
- *****************************************************************************/
-void Close_B4S( vlc_object_t *p_this )
-{
-    demux_t *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    free( p_sys );
 }
 
 static int Demux( demux_t *p_demux )

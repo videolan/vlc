@@ -93,14 +93,6 @@ int Import_IFO( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * Deactivate: frees unused data
- *****************************************************************************/
-void Close_IFO( vlc_object_t *p_this )
-{
-    VLC_UNUSED(p_this);
-}
-
 static int Demux( demux_t *p_demux )
 {
     char *psz_url, *psz_dir;

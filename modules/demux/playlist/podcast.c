@@ -58,14 +58,6 @@ int Import_podcast( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * Deactivate: frees unused data
- *****************************************************************************/
-void Close_podcast( vlc_object_t *p_this )
-{
-    (void)p_this;
-}
-
 /* "specs" : http://phobos.apple.com/static/iTunesRSS.html */
 static int Demux( demux_t *p_demux )
 {

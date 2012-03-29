@@ -42,19 +42,15 @@ int Import_PLS ( vlc_object_t * );
 void Close_PLS ( vlc_object_t * );
 
 int Import_B4S ( vlc_object_t * );
-void Close_B4S ( vlc_object_t * );
 
 int Import_DVB ( vlc_object_t * );
-void Close_DVB ( vlc_object_t * );
 
 int Import_podcast ( vlc_object_t * );
-void Close_podcast ( vlc_object_t * );
 
 int Import_xspf ( vlc_object_t * );
 void Close_xspf ( vlc_object_t * );
 
 int Import_Shoutcast ( vlc_object_t * );
-void Close_Shoutcast ( vlc_object_t * );
 
 int Import_ASX ( vlc_object_t * );
 void Close_ASX ( vlc_object_t * );
@@ -63,7 +59,6 @@ int Import_SGIMB ( vlc_object_t * );
 void Close_SGIMB ( vlc_object_t * );
 
 int Import_QTL ( vlc_object_t * );
-void Close_QTL ( vlc_object_t * );
 
 int Import_GVP ( vlc_object_t * );
 void Close_GVP ( vlc_object_t * );
