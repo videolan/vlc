@@ -15,6 +15,7 @@ Codecs:
  * Support for TechSmith Screen Codec 2, Microsoft Expression Encoder Screen,
    Microsoft Application Screen Decoder 1 (MSS1)
  * Support for Indeo Audio Coder, RealAudio Lossless
+ * Add Hardware Acceleration support on OS X for H.264 based upon VDADecoder
 
 Encoders:
  * high10, high422 and high444 encoding support in h264

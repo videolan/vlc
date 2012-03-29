@@ -52,6 +52,9 @@
 #   ifdef HAVE_AVCODEC_DXVA2
 #       include <libavcodec/dxva2.h>
 #   endif
+#   ifdef HAVE_AVCODEC_VDA
+#       include <libavcodec/vda.h>
+#   endif
 #elif defined(HAVE_FFMPEG_AVCODEC_H)
 #   include <ffmpeg/avcodec.h>
 #else
@@ -60,7 +63,7 @@
 
 #include "avcodec.h"
 #include "va.h"
-#if defined(HAVE_AVCODEC_VAAPI) || defined(HAVE_AVCODEC_DXVA2)
+#if defined(HAVE_AVCODEC_VAAPI) || defined(HAVE_AVCODEC_DXVA2) || defined(HAVE_AVCODEC_VDA)
 #   define HAVE_AVCODEC_VA
 #endif
 
@@ -1167,6 +1170,9 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
 #ifdef HAVE_AVCODEC_DXVA2
             [PIX_FMT_DXVA2_VLD] = "PIX_FMT_DXVA2_VLD",
 #endif
+#ifdef HAVE_AVCODEC_VDA
+            [PIX_FMT_VDA_VLD] = "PIX_FMT_VDA_VLD",
+#endif
             [PIX_FMT_YUYV422] = "PIX_FMT_YUYV422",
             [PIX_FMT_YUV420P] = "PIX_FMT_YUV420P",
         };
@@ -1196,6 +1202,16 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
             p_sys->p_va = vlc_va_NewDxva2( VLC_OBJECT(p_dec), p_sys->i_codec_id );
             if( !p_sys->p_va )
                 msg_Warn( p_dec, "Failed to open DXVA2" );
+        }
+#endif
+
+#ifdef HAVE_AVCODEC_VDA
+        if( pi_fmt[i] == PIX_FMT_VDA_VLD )
+        {
+            msg_Dbg( p_dec, "Trying VDA" );
+            p_sys->p_va = vlc_va_NewVDA( VLC_OBJECT(p_dec), p_sys->i_codec_id, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
+            if( !p_sys->p_va )
+                msg_Warn( p_dec, "Failed to open VDA" );
         }
 #endif
 

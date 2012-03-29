@@ -70,6 +70,12 @@ static const int  nloopf_list[] = { 0, 1, 2, 3, 4 };
 static const char *const nloopf_list_text[] =
   { N_("None"), N_("Non-ref"), N_("Bidir"), N_("Non-key"), N_("All") };
 
+#if defined(HAVE_AVCODEC_VDA)
+static const int  nvda_pix_fmt_list[] = { 0, 1 };
+static const char *const nvda_pix_fmt_list_text[] =
+  { N_("420YpCbCr8Planar"), N_("422YpCbCr8") };
+#endif
+
 #ifdef ENABLE_SOUT
 static const char *const enc_hq_list[] = { "rd", "bits", "simple" };
 static const char *const enc_hq_list_text[] = {
@@ -140,9 +146,15 @@ vlc_module_begin ()
                  true )
     add_obsolete_string( "ffmpeg-codec" ) /* removed since 2.1.0 */
     add_string( "avcodec-codec", NULL, CODEC_TEXT, CODEC_LONGTEXT, true )
-#if defined(HAVE_AVCODEC_VAAPI) || defined(HAVE_AVCODEC_DXVA2)
+#if defined(HAVE_AVCODEC_VAAPI) || defined(HAVE_AVCODEC_DXVA2) || defined(HAVE_AVCODEC_VDA)
     add_obsolete_bool( "ffmpeg-hw" ) /* removed since 2.1.0 */
     add_bool( "avcodec-hw", false, HW_TEXT, HW_LONGTEXT, false )
+#if defined(HAVE_AVCODEC_VDA)
+    add_integer ( "avcodec-vda-pix-fmt", 0, VDA_PIX_FMT_TEXT,
+                  VDA_PIX_FMT_LONGTEXT, false)
+        change_safe ()
+        change_integer_list( nvda_pix_fmt_list, nvda_pix_fmt_list_text )
+#endif
 #endif
 #if defined(FF_THREAD_FRAME)
     add_obsolete_integer( "ffmpeg-threads" ) /* removed since 2.1.0 */

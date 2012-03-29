@@ -138,6 +138,9 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 #define HW_TEXT N_("Hardware decoding")
 #define HW_LONGTEXT N_("This allows hardware decoding when available.")
 
+#define VDA_PIX_FMT_TEXT N_("VDA output pixel format")
+#define VDA_PIX_FMT_LONGTEXT N_("The pixel format for output image buffers.")
+
 #define THREADS_TEXT N_( "Threads" )
 #define THREADS_LONGTEXT N_( "Number of threads used for decoding, 0 meaning auto" )
 
@@ -273,10 +276,11 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 #   define HAVE_AVCODEC_MT
 #endif
 
-/* Uncomment it to enable compilation with vaapi/dxva2 (you also must change the build
+/* Uncomment it to enable compilation with vaapi/dxva2/vda (you also must change the build
  * system) */
 //#define HAVE_AVCODEC_VAAPI 1
 //#define HAVE_AVCODEC_DXVA2 1
+//#define HAVE_AVCODEC_VDA 1
 
 /* Ugly ifdefinitions to provide backwards compatibility with older ffmpeg/libav
  * versions */

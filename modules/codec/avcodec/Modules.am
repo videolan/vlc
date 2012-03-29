@@ -11,6 +11,7 @@ libavcodec_plugin_la_SOURCES = \
 	chroma.c \
 	vaapi.c \
 	dxva2.c \
+	vda.c \
 	copy.c \
 	copy.h \
 	va.h \

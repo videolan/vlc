@@ -2366,6 +2366,38 @@ AS_IF([test "${enable_dxva2}" != "no"], [
   fi
 ])
 
+dnl
+dnl vda needs avcodec
+dnl
+AC_ARG_ENABLE(vda,
+  [  --enable-vda          VDA  support (default auto)])
+
+AS_IF([test "${enable_vda}" != "no"], [
+  if test "${SYS}" = "darwin"; then
+  AS_IF([test "x${have_avcodec}" = "xyes"], [
+    AC_CHECK_HEADERS(VideoDecodeAcceleration/VDADecoder.h,
+      [
+        AC_CHECK_HEADERS(libavcodec/vda.h, [
+           VLC_ADD_LIBS([avcodec],[-Wl,-framework,CoreFoundation,-framework,VideoDecodeAcceleration,-framework,QuartzCore])
+           VLC_ADD_LDFLAGS([vda],[-Wl,-framework,CoreFoundation,-framework,VideoDecodeAcceleration,-framework,QuartzCore])
+           AC_DEFINE(HAVE_AVCODEC_VDA, 1, [Define if avcodec has to be built with VDA support.])
+        ],[
+	AS_IF([test "${enable_vda}" == "yes"],
+	      [AC_MSG_ERROR([vda is present but libavcodec/vda.h is missing])],
+              [AC_MSG_WARN([vda is present but libavcodec/vda.h is missing ])])
+        ])
+  ],[
+	AS_IF([test "${enable_vda}" == "yes"],
+              [AC_MSG_ERROR([Could not find required VideoDecodeAcceleration/VDADecoder.h])],
+              [AC_MSG_WARN([VideoDecodeAcceleration/VDADecoder.h not found])])
+      ])
+  ],[
+    AS_IF([test "x${enable_vda}" != "x"], [
+      AC_MSG_ERROR([--enable-vda and --disable-avcodec options are mutually exclusive.])
+    ])
+ ])
+  fi
+])
 
 dnl
 dnl stream_out switcher needs libavcodec
