@@ -61,7 +61,7 @@ Representation*         BasicCMManager::getBestRepresentation   (Period *period)
 {
     std::vector<Group *> groups = period->getGroups();
 
-    int             bitrate  = 0;
+    uint64_t        bitrate  = 0;
     Representation  *best    = NULL;
 
     for(size_t i = 0; i < groups.size(); i++)
@@ -69,8 +69,7 @@ Representation*         BasicCMManager::getBestRepresentation   (Period *period)
         std::vector<Representation *> reps = groups.at(i)->getRepresentations();
         for(size_t j = 0; j < reps.size(); j++)
         {
-            int currentBitrate = reps.at(j)->getBandwidth();
-            assert( currentBitrate != -1 );
+            uint64_t currentBitrate = reps.at(j)->getBandwidth();
 
             if( currentBitrate > bitrate)
             {
@@ -104,7 +103,6 @@ Representation*         BasicCMManager::getRepresentation(Period *period, uint64
         for( size_t j = 0; j < reps.size(); j++ )
         {
             uint64_t currentBitrate = reps.at(j)->getBandwidth();
-            assert( currentBitrate != -1 );
 
             if ( best == NULL ||
                  ( currentBitrate > best->getBandwidth() &&
