@@ -202,6 +202,8 @@ int OpenEncoder( vlc_object_t *p_this )
     float f_val;
     char *psz_val;
 
+    config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
+
     if( p_enc->fmt_out.i_codec == VLC_CODEC_MP3 )
     {
         i_cat = AUDIO_ES;
@@ -333,8 +335,6 @@ int OpenEncoder( vlc_object_t *p_this )
         p_context->dsp_mask |= AV_CPU_FLAG_SSE;
         p_context->dsp_mask |= AV_CPU_FLAG_SSE2;
     }
-
-    config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 
     p_sys->i_key_int = var_GetInteger( p_enc, ENC_CFG_PREFIX "keyint" );
     p_sys->i_b_frames = var_GetInteger( p_enc, ENC_CFG_PREFIX "bframes" );
