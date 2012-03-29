@@ -419,7 +419,6 @@ int net_Subscribe (vlc_object_t *obj, int fd,
         return 0;
 
 #else
-    VLC_UNUSED( grplen );
     switch (grp->sa_family)
     {
 # ifdef IPV6_JOIN_GROUP
