@@ -16,7 +16,6 @@ SOURCES_stream_out_record = record.c
 SOURCES_stream_out_smem = smem.c
 SOURCES_stream_out_setid = setid.c
 SOURCES_stream_out_langfromtelx = langfromtelx.c
-SOURCES_stream_out_select = select.c
 
 libvlc_LTLIBRARIES += \
 	libstream_out_dummy_plugin.la \
@@ -34,7 +33,6 @@ libvlc_LTLIBRARIES += \
 	libstream_out_smem_plugin.la \
 	libstream_out_setid_plugin.la \
 	libstream_out_langfromtelx_plugin.la \
-	libstream_out_select_plugin.la \
 	$(NULL)
 
 # RTP plugin
