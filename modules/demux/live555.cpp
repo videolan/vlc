@@ -1357,8 +1357,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->f_npt_length > 0 )
             {
                 double d_length = p_sys->f_npt_length * 1000000.0;
-                /* Not sure if -0.5 is needed, but better be safe */
-                if( d_length - 0.5 > INT64_MAX )
+                if( d_length >= INT64_MAX )
                     *pi64 = INT64_MAX;
                 else
                     *pi64 = (int64_t)d_length;
