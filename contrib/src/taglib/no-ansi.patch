@@ -1,0 +1,14 @@
+diff -ru taglib.orig/CMakeLists.txt taglib/CMakeLists.txt
+--- taglib.orig/CMakeLists.txt	2012-03-29 16:07:01.933538361 -0400
++++ taglib/CMakeLists.txt	2012-03-29 16:07:09.545538361 -0400
+@@ -24,8 +24,8 @@
+ 
+ if (CMAKE_COMPILER_IS_GNUCXX)
+    if (CMAKE_SYSTEM_NAME MATCHES Linux)
+-     set ( CMAKE_C_FLAGS     "${CMAKE_C_FLAGS} -Wno-long-long -ansi -Wundef -Wcast-align -Werror-implicit-function-declaration -Wchar-subscripts -Wall -W -Wpointer-arith -Wwrite-strings -Wformat-security -Wmissing-format-attribute -fno-common")
+-     set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor -Wno-long-long -ansi -Wundef -Wcast-align -Wchar-subscripts -Wall -W -Wpointer-arith -Wwrite-strings -Wformat-security -fno-check-new -fno-common")
++     set ( CMAKE_C_FLAGS     "${CMAKE_C_FLAGS} -Wno-long-long -Wundef -Wcast-align -Werror-implicit-function-declaration -Wchar-subscripts -Wall -W -Wpointer-arith -Wwrite-strings -Wformat-security -Wmissing-format-attribute -fno-common")
++     set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor -Wno-long-long -Wundef -Wcast-align -Wchar-subscripts -Wall -W -Wpointer-arith -Wwrite-strings -Wformat-security -fno-check-new -fno-common")
+    endif (CMAKE_SYSTEM_NAME MATCHES Linux)
+ endif (CMAKE_COMPILER_IS_GNUCXX)
+ if(MSVC)

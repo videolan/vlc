@@ -12,6 +12,7 @@ $(TARBALLS)/libebml-$(EBML_VERSION).tar.bz2:
 libebml: libebml-$(EBML_VERSION).tar.bz2 .sum-ebml
 	$(UNPACK)
 	$(APPLY) $(SRC)/ebml/ebml-pic.patch
+	$(APPLY) $(SRC)/ebml/no-ansi.patch
 	$(MOVE)
 
 .ebml: libebml

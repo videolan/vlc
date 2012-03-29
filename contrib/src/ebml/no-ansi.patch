@@ -1,0 +1,12 @@
+diff -ur libebml.orig/make/linux/Makefile libebml/make/linux/Makefile
+--- libebml.orig/make/linux/Makefile	2012-03-29 16:03:42.965538360 -0400
++++ libebml/make/linux/Makefile	2012-03-29 16:04:03.673538362 -0400
+@@ -61,7 +61,7 @@
+ objects:=$(patsubst %$(EXTENSION),%.o,$(sources))
+ objects_so:=$(objects)
+ 
+-WARNINGFLAGS=-Wall -Wno-unknown-pragmas -ansi -fno-gnu-keywords -Wshadow
++WARNINGFLAGS=-Wall -Wno-unknown-pragmas -fno-gnu-keywords -Wshadow
+ COMPILEFLAGS=$(WARNINGFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(DEBUGFLAGS) $(INCLUDE)
+ DEPENDFLAGS  = $(CXXFLAGS) $(INCLUDE)
+ 

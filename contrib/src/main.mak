@@ -114,7 +114,7 @@ else
     ANDROID_CPU_FLAGS = -mcpu=arm1136jf-s -mfpu=vfp
 endif
 endif
-EXTRA_CFLAGS += -D__STDC_VERSION__=199901L -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/include
+EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/include
 EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/libs/$(ANDROID_ABI)/include
 EXTRA_CFLAGS += -mfloat-abi=softfp $(ANDROID_CPU_FLAGS)
 endif
