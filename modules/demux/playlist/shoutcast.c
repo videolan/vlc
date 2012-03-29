@@ -45,7 +45,6 @@
  * Local prototypes
  *****************************************************************************/
 static int Demux( demux_t *p_demux);
-static int Control( demux_t *p_demux, int i_query, va_list args );
 
 static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
                        input_item_node_t *p_input_node );
@@ -350,10 +349,4 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
     }
     /* FIXME: leaks on missing ENDELEMENT? */
     return 0;
-}
-
-static int Control( demux_t *p_demux, int i_query, va_list args )
-{
-    VLC_UNUSED(p_demux); VLC_UNUSED(i_query); VLC_UNUSED(args);
-    return VLC_EGENERIC;
 }

@@ -63,7 +63,6 @@ struct demux_sys_t
  * Local prototypes
  *****************************************************************************/
 static int Demux( demux_t *p_demux);
-static int Control( demux_t *p_demux, int i_query, va_list args );
 static void ParseClipInfo( const char * psz_clipinfo, char **ppsz_artist, char **ppsz_title,
                            char **ppsz_album, char **ppsz_genre, char **ppsz_year,
                            char **ppsz_cdnum, char **ppsz_comments );
@@ -384,17 +383,6 @@ static int Demux( demux_t *p_demux )
     vlc_gc_decref(p_current_input);
     var_Destroy( p_demux, "m3u-extvlcopt" );
     return 0; /* Needed for correct operation of go back */
-}
-
-/**
- * @param p_demux: This object
- * @param i_query:
- * @param args: List of arguments
- */
-static int Control( demux_t *p_demux, int i_query, va_list args )
-{
-    VLC_UNUSED(p_demux); VLC_UNUSED(i_query); VLC_UNUSED(args);
-    return VLC_EGENERIC;
 }
 
 /**

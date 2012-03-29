@@ -146,6 +146,12 @@ vlc_module_begin ()
         set_callbacks( Import_ZPL, Close_ZPL )
 vlc_module_end ()
 
+int Control(demux_t *demux, int query, va_list args)
+{
+    (void) demux; (void) query; (void) args;
+    return VLC_EGENERIC;
+}
+
 input_item_t * GetCurrentItem(demux_t *p_demux)
 {
     input_thread_t *p_input_thread = demux_GetParentInput( p_demux );

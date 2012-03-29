@@ -43,7 +43,6 @@ struct demux_sys_t
     int i_ntracks;
 };
 
-static int Control( demux_t *, int, va_list );
 static int Demux( demux_t * );
 
 /**
@@ -113,13 +112,6 @@ end:
 
     /* Needed for correct operation of go back */
     return 0;
-}
-
-/** \brief dummy function for demux callback interface */
-static int Control( demux_t *p_demux, int i_query, va_list args )
-{
-    VLC_UNUSED(p_demux); VLC_UNUSED(i_query); VLC_UNUSED(args);
-    return VLC_EGENERIC;
 }
 
 /**

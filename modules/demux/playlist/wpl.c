@@ -42,7 +42,6 @@ struct demux_sys_t
  * Local prototypes
  *****************************************************************************/
 static int Demux( demux_t *p_demux);
-static int Control( demux_t *p_demux, int i_query, va_list args );
 
 /*****************************************************************************
  * Import_WPL: main import function
@@ -116,10 +115,4 @@ static int Demux( demux_t *p_demux )
     vlc_gc_decref(p_current_input);
     var_Destroy( p_demux, "wpl-extvlcopt" );
     return 0; /* Needed for correct operation of go back */
-}
-
-static int Control( demux_t *p_demux, int i_query, va_list args )
-{
-    VLC_UNUSED(p_demux); VLC_UNUSED(i_query); VLC_UNUSED(args);
-    return VLC_EGENERIC;
 }

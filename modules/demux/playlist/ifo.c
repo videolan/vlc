@@ -39,7 +39,6 @@
  *****************************************************************************/
 static int Demux( demux_t *p_demux);
 static int DemuxDVD_VR( demux_t *p_demux);
-static int Control( demux_t *p_demux, int i_query, va_list args );
 
 /*****************************************************************************
  * Import_IFO: main import function
@@ -137,11 +136,4 @@ static int DemuxDVD_VR( demux_t *p_demux )
     free( psz_url );
 
     return 0; /* Needed for correct operation of go back */
-}
-
-
-static int Control( demux_t *p_demux, int i_query, va_list args )
-{
-    VLC_UNUSED(p_demux); VLC_UNUSED(i_query); VLC_UNUSED(args);
-    return VLC_EGENERIC;
 }

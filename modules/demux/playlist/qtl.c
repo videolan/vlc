@@ -73,7 +73,6 @@ const char* ppsz_loop[] = { "true", "false", "palindrome" };
  * Local prototypes
  *****************************************************************************/
 static int Demux( demux_t *p_demux);
-static int Control( demux_t *p_demux, int i_query, va_list args );
 
 /*****************************************************************************
  * Import_QTL: main import function
@@ -265,10 +264,4 @@ error:
     free( psz_src );
     free( psz_mimetype );
     return i_ret;
-}
-
-static int Control( demux_t *p_demux, int i_query, va_list args )
-{
-    VLC_UNUSED(p_demux); VLC_UNUSED(i_query); VLC_UNUSED(args);
-    return VLC_EGENERIC;
 }

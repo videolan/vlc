@@ -77,7 +77,6 @@ struct demux_sys_t
     char * psz_base;
 };
 
-static int Control(demux_t *, int, va_list);
 static int Demux(demux_t *);
 
 /**
@@ -157,13 +156,6 @@ end:
     if (p_xml_reader)
         xml_ReaderDelete(p_xml_reader);
     return i_ret; /* Needed for correct operation of go back */
-}
-
-/** \brief dummy function for demux callback interface */
-static int Control(demux_t *p_demux, int i_query, va_list args)
-{
-    VLC_UNUSED(p_demux); VLC_UNUSED(i_query); VLC_UNUSED(args);
-    return VLC_EGENERIC;
 }
 
 static const xml_elem_hnd_t *get_handler(const xml_elem_hnd_t *tab, size_t n, const char *name)

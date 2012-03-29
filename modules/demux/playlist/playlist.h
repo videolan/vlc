@@ -24,6 +24,7 @@
 #include <vlc_input.h>
 #include <vlc_playlist.h>
 
+int Control(demux_t *, int, va_list);
 char *ProcessMRL( const char *, const char * );
 char *FindPrefix( demux_t * );
 

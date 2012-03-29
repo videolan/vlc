@@ -38,7 +38,6 @@
  * Local prototypes
  *****************************************************************************/
 static int Demux( demux_t *p_demux);
-static int Control( demux_t *p_demux, int i_query, va_list args );
 static mtime_t strTimeToMTime( const char *psz );
 
 /*****************************************************************************
@@ -322,12 +321,6 @@ error:
 
     vlc_gc_decref(p_current_input);
     return -1;
-}
-
-static int Control( demux_t *p_demux, int i_query, va_list args )
-{
-    VLC_UNUSED(p_demux); VLC_UNUSED(i_query); VLC_UNUSED(args);
-    return VLC_EGENERIC;
 }
 
 static mtime_t strTimeToMTime( const char *psz )
