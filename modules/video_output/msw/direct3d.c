@@ -510,7 +510,9 @@ static int Direct3DCreate(vout_display_t *vd)
     }
 
     /* TODO: need to test device capabilities and select the right render function */
-    if (!(sys->d3dcaps.DevCaps2 & D3DDEVCAPS2_CAN_STRETCHRECT_FROM_TEXTURES)) {
+    if (!(sys->d3dcaps.DevCaps2 & D3DDEVCAPS2_CAN_STRETCHRECT_FROM_TEXTURES) ||
+        !(sys->d3dcaps.TextureFilterCaps & (D3DPTFILTERCAPS_MAGFLINEAR)) ||
+        !(sys->d3dcaps.TextureFilterCaps & (D3DPTFILTERCAPS_MINFLINEAR))) {
         msg_Err(vd, "Device does not support stretching from textures.");
         return VLC_EGENERIC;
     }
