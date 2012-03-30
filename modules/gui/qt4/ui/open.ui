@@ -33,186 +33,6 @@
    <item row="0" column="0" colspan="3">
     <widget class="QTabWidget" name="Tab"/>
    </item>
-   <item row="1" column="0" colspan="3">
-    <widget class="QCheckBox" name="advancedCheckBox">
-     <property name="toolTip">
-      <string>Show extended options</string>
-     </property>
-     <property name="text">
-      <string>Show &amp;more options</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="3">
-    <widget class="QGroupBox" name="advancedFrame">
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QLabel" name="cacheLabel">
-        <property name="text">
-         <string>Caching</string>
-        </property>
-        <property name="buddy">
-         <cstring>cacheSpinBox</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QSpinBox" name="cacheSpinBox">
-        <property name="toolTip">
-         <string>Change the caching for the media</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight</set>
-        </property>
-        <property name="suffix">
-         <string> ms</string>
-        </property>
-        <property name="maximum">
-         <number>65535</number>
-        </property>
-        <property name="singleStep">
-         <number>100</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <spacer>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>16</width>
-          <height>24</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="4">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Start Time</string>
-        </property>
-        <property name="buddy">
-         <cstring>startTimeTimeEdit</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2" colspan="6">
-       <widget class="Line" name="line"/>
-      </item>
-      <item row="2" column="0" colspan="8">
-       <widget class="QCheckBox" name="slaveCheckbox">
-        <property name="text">
-         <string>Play another media synchronously (extra audio file, ...)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="slaveLabel">
-        <property name="text">
-         <string>Extra media</string>
-        </property>
-        <property name="buddy">
-         <cstring>slaveText</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2" colspan="4">
-       <widget class="QLineEdit" name="slaveText"/>
-      </item>
-      <item row="3" column="6" colspan="2">
-       <widget class="QPushButton" name="slaveBrowseButton">
-        <property name="toolTip">
-         <string>Select the file</string>
-        </property>
-        <property name="text">
-         <string>Browse...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="2" colspan="6">
-       <widget class="Line" name="line"/>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="advancedLabel">
-        <property name="text">
-         <string>MRL</string>
-        </property>
-        <property name="buddy">
-         <cstring>advancedLineInput</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="2" colspan="6">
-       <widget class="QLineEdit" name="mrlLine">
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="2" colspan="6">
-       <widget class="QLineEdit" name="advancedLineInput">
-        <property name="toolTip">
-         <string>Complete MRL for VLC internal</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Edit Options</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="5" colspan="3">
-       <widget class="QTimeEdit" name="startTimeTimeEdit">
-        <property name="toolTip">
-         <string>Change the start time for the media</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight</set>
-        </property>
-        <property name="currentSection">
-         <enum>QDateTimeEdit::SecondSection</enum>
-        </property>
-        <property name="displayFormat">
-         <string>HH'H':mm'm':ss's'.zzz</string>
-        </property>
-        <property name="timeSpec">
-         <enum>Qt::LocalTime</enum>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <spacer>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="3" column="2">
-    <widget class="QDialogButtonBox" name="buttonsBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::NoButton</set>
-     </property>
-    </widget>
-   </item>
    <item row="3" column="1">
     <widget class="QToolButton" name="playButton">
      <property name="sizePolicy">
@@ -235,6 +55,215 @@
      </property>
     </widget>
    </item>
+   <item row="3" column="0">
+    <spacer>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="0" colspan="3">
+    <widget class="QCheckBox" name="advancedCheckBox">
+     <property name="toolTip">
+      <string>Show extended options</string>
+     </property>
+     <property name="text">
+      <string>Show &amp;more options</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="3">
+    <widget class="QGroupBox" name="advancedFrame">
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0" colspan="3">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="cacheLabel">
+          <property name="text">
+           <string>Caching</string>
+          </property>
+          <property name="buddy">
+           <cstring>cacheSpinBox</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Preferred</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>30</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="cacheSpinBox">
+          <property name="toolTip">
+           <string>Change the caching for the media</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight</set>
+          </property>
+          <property name="suffix">
+           <string> ms</string>
+          </property>
+          <property name="maximum">
+           <number>65535</number>
+          </property>
+          <property name="singleStep">
+           <number>100</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Expanding</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="advancedLabel">
+        <property name="text">
+         <string>MRL</string>
+        </property>
+        <property name="buddy">
+         <cstring>mrlLine</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Start Time</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="buddy">
+         <cstring>startTimeTimeEdit</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Edit Options</string>
+        </property>
+        <property name="buddy">
+         <cstring>advancedLineInput</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="slaveLabel">
+        <property name="text">
+         <string>Extra media</string>
+        </property>
+        <property name="buddy">
+         <cstring>slaveText</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1" colspan="5">
+       <widget class="QLineEdit" name="mrlLine">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1" colspan="5">
+       <widget class="QLineEdit" name="advancedLineInput">
+        <property name="toolTip">
+         <string>Complete MRL for VLC internal</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1" colspan="4">
+       <widget class="QLineEdit" name="slaveText"/>
+      </item>
+      <item row="5" column="5">
+       <widget class="QPushButton" name="slaveBrowseButton">
+        <property name="toolTip">
+         <string>Select the file</string>
+        </property>
+        <property name="text">
+         <string>Browse...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1" colspan="5">
+       <widget class="Line" name="line"/>
+      </item>
+      <item row="3" column="1" colspan="5">
+       <widget class="Line" name="line"/>
+      </item>
+      <item row="0" column="4" colspan="2">
+       <widget class="QTimeEdit" name="startTimeTimeEdit">
+        <property name="toolTip">
+         <string>Change the start time for the media</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="currentSection">
+         <enum>QDateTimeEdit::HourSection</enum>
+        </property>
+        <property name="displayFormat">
+         <string>HH'H':mm'm':ss's'.zzz</string>
+        </property>
+        <property name="timeSpec">
+         <enum>Qt::LocalTime</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="6">
+       <widget class="QCheckBox" name="slaveCheckbox">
+        <property name="text">
+         <string>Play another media synchronously (extra audio file, ...)</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QDialogButtonBox" name="buttonsBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::NoButton</set>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <tabstops>
@@ -245,6 +274,8 @@
   <tabstop>slaveCheckbox</tabstop>
   <tabstop>slaveText</tabstop>
   <tabstop>slaveBrowseButton</tabstop>
+  <tabstop>mrlLine</tabstop>
+  <tabstop>advancedLineInput</tabstop>
   <tabstop>playButton</tabstop>
   <tabstop>buttonsBox</tabstop>
  </tabstops>
@@ -257,12 +288,12 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>384</y>
+     <x>74</x>
+     <y>240</y>
     </hint>
     <hint type="destinationlabel">
-     <x>63</x>
-     <y>410</y>
+     <x>83</x>
+     <y>271</y>
     </hint>
    </hints>
   </connection>
@@ -273,12 +304,12 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>127</x>
-     <y>387</y>
+     <x>147</x>
+     <y>240</y>
     </hint>
     <hint type="destinationlabel">
-     <x>136</x>
-     <y>406</y>
+     <x>243</x>
+     <y>270</y>
     </hint>
    </hints>
   </connection>
@@ -289,12 +320,12 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>219</x>
-     <y>102</y>
+     <x>239</x>
+     <y>240</y>
     </hint>
     <hint type="destinationlabel">
-     <x>386</x>
-     <y>131</y>
+     <x>535</x>
+     <y>271</y>
     </hint>
    </hints>
   </connection>
