@@ -1717,6 +1717,10 @@ static int hls_Download(stream_t *s, segment_t *segment)
     uint64_t size;
     do
     {
+        /* NOTE: Beware the size reported for a segment by the HLS server may not
+         * be correct, when downloading the segment data. Therefore check the size
+         * and enlarge the segment data block if necessary.
+         */
         size = stream_Size(p_ts);
         if (size > segment->size)
         {
