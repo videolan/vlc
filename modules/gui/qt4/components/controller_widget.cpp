@@ -289,11 +289,16 @@ void AspectRatioComboBox::updateRatios()
                  QString( val_list.p_list->p_values[i].psz_string ) );
     setEnabled( true );
     var_FreeList( &val_list, &text_list );
+    vlc_object_release( p_vout );
 }
 
 void AspectRatioComboBox::updateAspectRatio( int x )
 {
     vout_thread_t* p_vout = THEMIM->getVout();
     if( p_vout && x >= 0 )
+    {
         var_SetString( p_vout, "aspect-ratio", qtu( itemData(x).toString() ) );
+        vlc_object_release( p_vout );
+    }
 }
+
