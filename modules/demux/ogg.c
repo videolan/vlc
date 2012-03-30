@@ -239,7 +239,7 @@ static int Demux( demux_t * p_demux )
             return 0;
 
         msg_Dbg( p_demux, "beginning of a group of logical streams" );
-        es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 );
     }
 
     /*
@@ -284,9 +284,9 @@ static int Demux( demux_t * p_demux )
                 ogg_stream_reset_serialno( &p_stream->os, ogg_page_serialno( &p_sys->current_page ) );
 
                 p_stream->b_reinit = true;
-                p_stream->i_pcr = -1;
-                p_stream->i_interpolated_pcr = -1;
-                es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+                p_stream->i_pcr = VLC_TS_0;
+                p_stream->i_interpolated_pcr = VLC_TS_0;
+                es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0);
             }
 
             if( ogg_stream_pagein( &p_stream->os, &p_sys->current_page ) != 0 )
@@ -699,7 +699,6 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             if( p_stream->i_previous_pcr == 0 &&
                 p_stream->i_pcr  > 3 * DEFAULT_PTS_DELAY )
             {
-                es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
                 /* Call the pace control */
                 es_out_Control( p_demux->out, ES_OUT_SET_PCR,
@@ -727,7 +726,6 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             if( p_stream->i_previous_pcr == 0 &&
                 p_stream->i_pcr  > 3 * DEFAULT_PTS_DELAY )
             {
-                es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
                 /* Call the pace control */
                 es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_stream->i_pcr );
