@@ -281,8 +281,8 @@ void PLSelector::setSource( QTreeWidgetItem *item )
                 return ;
 
             services_discovery_descriptor_t *p_test = new services_discovery_descriptor_t;
-            playlist_ServicesDiscoveryControl( THEPL, qtu( qs ), SD_CMD_DESCRIPTOR, p_test );
-            if( p_test->i_capabilities & SD_CAP_SEARCH )
+            int i_ret = playlist_ServicesDiscoveryControl( THEPL, qtu( qs ), SD_CMD_DESCRIPTOR, p_test );
+            if( i_ret == VLC_SUCCESS && p_test->i_capabilities & SD_CAP_SEARCH )
                 item->setData( 0, CAP_SEARCH_ROLE, true );
         }
     }
