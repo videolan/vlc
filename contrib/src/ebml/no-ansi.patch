@@ -1,6 +1,6 @@
-diff -ur libebml.orig/make/linux/Makefile libebml/make/linux/Makefile
---- libebml.orig/make/linux/Makefile	2012-03-29 16:03:42.965538360 -0400
-+++ libebml/make/linux/Makefile	2012-03-29 16:04:03.673538362 -0400
+diff -ru libebml-1.2.2/make/linux/Makefile libebml-fix/make/linux/Makefile
+--- libebml-1.2.2/make/linux/Makefile	2012-03-31 14:53:46.000000000 +0200
++++ libebml-fix/make/linux/Makefile	2012-03-31 14:54:28.000000000 +0200
 @@ -61,7 +61,7 @@
  objects:=$(patsubst %$(EXTENSION),%.o,$(sources))
  objects_so:=$(objects)
