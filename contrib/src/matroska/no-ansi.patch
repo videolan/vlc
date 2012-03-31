@@ -1,6 +1,6 @@
-diff -ru libmatroska.orig/make/linux/Makefile libmatroska/make/linux/Makefile
---- libmatroska.orig/make/linux/Makefile	2012-03-29 16:04:40.525538362 -0400
-+++ libmatroska/make/linux/Makefile	2012-03-29 16:04:58.105538361 -0400
+diff -ru libmatroska-1.3.0/make/linux/Makefile libmatroska-fix/make/linux/Makefile
+--- libmatroska-1.3.0/make/linux/Makefile	2012-03-31 15:04:21.000000000 +0200
++++ libmatroska-fix/make/linux/Makefile	2012-03-31 15:05:04.000000000 +0200
 @@ -67,7 +67,7 @@
  
  objects_so:=$(objects)
