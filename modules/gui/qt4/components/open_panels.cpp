@@ -497,10 +497,11 @@ void DiscOpenPanel::updateMRL()
     QString discPath;
     QStringList fileList;
 
-    if( ui.deviceCombo->itemData( ui.deviceCombo->currentIndex() ) != QVariant::Invalid )
-        discPath = ui.deviceCombo->itemData( ui.deviceCombo->currentIndex() ).toString();
-    else
-        discPath = ui.deviceCombo->currentText();
+    discPath = ui.deviceCombo->currentText();
+
+    int tmp = ui.deviceCombo->findText( discPath );
+    if( tmp != -1 &&  ui.deviceCombo->itemData( tmp ) != QVariant::Invalid )
+        discPath = ui.deviceCombo->itemData( tmp ).toString();
 
     /* MRL scheme */
     const char *scheme;
@@ -573,7 +574,6 @@ void DiscOpenPanel::browseDevice()
     {
         ui.deviceCombo->addItem( toNativeSepNoSlash( dir ) );
         ui.deviceCombo->setCurrentIndex( ui.deviceCombo->findText( toNativeSepNoSlash( dir ) ) );
-        updateMRL();
     }
 
     updateMRL();
