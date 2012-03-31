@@ -372,6 +372,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
 void DiscOpenPanel::onFocus()
 {
+    ui.deviceCombo->clear();
 #ifdef WIN32 /* Disc drives probing for Windows */
     wchar_t szDrives[512];
     szDrives[0] = '\0';
@@ -387,11 +388,13 @@ void DiscOpenPanel::onFocus()
                 GetVolumeInformationW( drive, psz_name, 511, NULL, NULL, NULL, NULL, 0 );
 
                 QString displayName = FromWide( drive );
-                if( !*psz_name ) {
-                    displayName = displayName + " - "  + FromWide( psz_name );
+                char *psz_title = FromWide( psz_name );
+                if( !EMPTY_STR(psz_title)) {
+                    displayName = displayName + " - "  + psz_title;
                 }
 
                 ui.deviceCombo->addItem( displayName, FromWide( drive ) );
+                free( psz_title );
             }
 
             /* go to next drive */
