@@ -37,6 +37,9 @@
 /* FIXME it is needed for VOUT_ALIGN_* only */
 #include <vlc_vout.h>
 
+#define ROW_MAX (15)
+#define COL_MAX (15)
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -69,7 +72,9 @@ vlc_module_begin()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_integer( CFG_PREFIX "cols", 3, COLS_TEXT, COLS_LONGTEXT, false )
+    change_integer_range( 1, COL_MAX )
     add_integer( CFG_PREFIX "rows", 3, ROWS_TEXT, ROWS_LONGTEXT, false )
+    change_integer_range( 1, ROW_MAX )
     add_string( CFG_PREFIX "active", NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT,
                  true )
     add_string( CFG_PREFIX "element-aspect", "16:9", ASPECT_TEXT, ASPECT_LONGTEXT, false )
@@ -97,8 +102,6 @@ typedef struct
     int  i_top;
 } wall_output_t;
 
-#define ROW_MAX (15)
-#define COL_MAX (15)
 struct video_splitter_sys_t
 {
     int           i_col;
