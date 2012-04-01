@@ -382,6 +382,8 @@ int OpenEncoder( vlc_object_t *p_this )
     p_sys->b_trellis = var_GetBool( p_enc, ENC_CFG_PREFIX "trellis" );
 
     p_context->strict_std_compliance = var_GetInteger( p_enc, ENC_CFG_PREFIX "strict" );
+    if( i_codec_id == CODEC_ID_AAC )
+        p_context->strict_std_compliance = -2;
 
     p_sys->f_lumi_masking = var_GetFloat( p_enc, ENC_CFG_PREFIX "lumi-masking" );
     p_sys->f_dark_masking = var_GetFloat( p_enc, ENC_CFG_PREFIX "dark-masking" );
