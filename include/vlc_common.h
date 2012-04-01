@@ -325,7 +325,6 @@ typedef struct filter_sys_t filter_sys_t;
 
 /* Network */
 typedef struct virtual_socket_t v_socket_t;
-typedef struct vlc_acl_t vlc_acl_t;
 typedef struct vlc_url_t vlc_url_t;
 
 /* Misc */

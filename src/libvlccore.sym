@@ -1,10 +1,4 @@
 access_GetParentInput
-ACL_AddNet
-ACL_Check
-ACL_Create
-ACL_Destroy
-ACL_Duplicate
-ACL_LoadFile
 AddMD5
 aout_BitsPerSample
 aout_ChannelExtract

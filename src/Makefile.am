@@ -24,7 +24,6 @@ pluginsincludedir = $(pkgincludedir)/plugins
 
 pluginsinclude_HEADERS = \
 	../include/vlc_access.h \
-	../include/vlc_acl.h \
 	../include/vlc_aout.h \
 	../include/vlc_aout_intf.h \
 	../include/vlc_aout_mixer.h \
@@ -396,7 +395,6 @@ SOURCES_libvlc_common = \
 	audio_output/intf.c \
 	osd/osd.c \
 	osd/osd_text.c \
-	network/acl.c \
 	network/getaddrinfo.c \
 	network/io.c \
 	network/tcp.c \

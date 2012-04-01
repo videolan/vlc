@@ -1,6 +1,5 @@
 # main sources
 include/vlc_access.h
-include/vlc_acl.h
 include/vlc_aout.h
 include/vlc_arrays.h
 include/vlc_bits.h
@@ -132,7 +131,6 @@ src/modules/cache.c
 src/modules/entry.c
 src/modules/modules.c
 src/modules/modules.h
-src/network/acl.c
 src/network/getaddrinfo.c
 src/network/httpd.c
 src/network/io.c
