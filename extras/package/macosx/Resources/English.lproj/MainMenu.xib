@@ -21,16 +21,16 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="2770"/>
-      <integer value="29"/>
+      <integer value="1617"/>
+      <integer value="915"/>
+      <integer value="4756"/>
       <integer value="4596"/>
       <integer value="4739"/>
-      <integer value="4850"/>
-      <integer value="4756"/>
+      <integer value="2770"/>
       <integer value="2730"/>
-      <integer value="1617"/>
+      <integer value="29"/>
+      <integer value="4850"/>
       <integer value="4948"/>
-      <integer value="915"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -984,14 +984,14 @@
                 <object class="NSTextField" id="533732100">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">289</int>
-                  <string key="NSFrame">{{403, 11}, {53, 13}}</string>
+                  <string key="NSFrame">{{402, 11}, {55, 13}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <bool key="NSEnabled">YES</bool>
                   <object class="NSTextFieldCell" key="NSCell" id="896153998">
                     <int key="NSCellFlags">-2079195584</int>
                     <int key="NSCellFlags2">138413056</int>
-                    <string key="NSContents">00:00</string>
+                    <string key="NSContents">-1:41:19</string>
                     <reference key="NSSupport" ref="188716167"/>
                     <reference key="NSControlView" ref="533732100"/>
                     <reference key="NSBackgroundColor" ref="166084101"/>
@@ -4578,14 +4578,14 @@ LCAuLi4</string>
       <object class="NSWindowTemplate" id="429979276">
         <int key="NSWindowStyleMask">15</int>
         <int key="NSWindowBacking">2</int>
-        <string key="NSWindowRect">{{131, 97}, {362, 239}}</string>
+        <string key="NSWindowRect">{{131, 97}, {363, 239}}</string>
         <int key="NSWTFlags">1954022400</int>
         <string key="NSWindowTitle">Detached Video</string>
         <string key="NSWindowClass">VLCDetachedVideoWindow</string>
         <nil key="NSViewClass"/>
         <nil key="NSUserInterfaceItemIdentifier"/>
         <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
-        <string key="NSWindowContentMinSize">{362, 203}</string>
+        <string key="NSWindowContentMinSize">{363, 203}</string>
         <object class="NSView" key="NSWindowView" id="598483044">
           <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
@@ -4611,7 +4611,7 @@ LCAuLi4</string>
                       <string>NeXT TIFF v4.0 pasteboard type</string>
                     </object>
                   </object>
-                  <string key="NSFrame">{{348, 0}, {14, 14}}</string>
+                  <string key="NSFrame">{{349, 0}, {14, 14}}</string>
                   <reference key="NSSuperview" ref="984096082"/>
                   <string key="NSReuseIdentifierKey">_NS:2165</string>
                   <bool key="NSEnabled">YES</bool>
@@ -4630,7 +4630,7 @@ LCAuLi4</string>
                 <object class="NSButton" id="750485577">
                   <reference key="NSNextResponder" ref="984096082"/>
                   <int key="NSvFlags">289</int>
-                  <string key="NSFrame">{{326, 6}, {29, 23}}</string>
+                  <string key="NSFrame">{{327, 6}, {29, 23}}</string>
                   <reference key="NSSuperview" ref="984096082"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <bool key="NSEnabled">YES</bool>
@@ -4656,7 +4656,7 @@ LCAuLi4</string>
                   <reference key="NSNextResponder" ref="984096082"/>
                   <int key="NSvFlags">-2147482334</int>
                   <object class="NSPSMatrix" key="NSDrawMatrix"/>
-                  <string key="NSFrame">{{92, 12}, {185, 12}}</string>
+                  <string key="NSFrame">{{92, 12}, {186, 12}}</string>
                   <reference key="NSSuperview" ref="984096082"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <int key="NSpiFlags">16650</int>
@@ -4673,7 +4673,7 @@ LCAuLi4</string>
                 <object class="NSSlider" id="672269443">
                   <reference key="NSNextResponder" ref="984096082"/>
                   <int key="NSvFlags">290</int>
-                  <string key="NSFrame">{{93, 10}, {182, 15}}</string>
+                  <string key="NSFrame">{{93, 10}, {183, 15}}</string>
                   <reference key="NSSuperview" ref="984096082"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <bool key="NSViewCanDrawConcurrently">YES</bool>
@@ -4699,7 +4699,7 @@ LCAuLi4</string>
                 <object class="NSTextField" id="156940539">
                   <reference key="NSNextResponder" ref="984096082"/>
                   <int key="NSvFlags">289</int>
-                  <string key="NSFrame">{{278, 11}, {53, 13}}</string>
+                  <string key="NSFrame">{{276, 11}, {55, 13}}</string>
                   <reference key="NSSuperview" ref="984096082"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <bool key="NSEnabled">YES</bool>
@@ -4720,7 +4720,7 @@ LCAuLi4</string>
                 <object class="NSCustomView" id="640104047">
                   <reference key="NSNextResponder" ref="984096082"/>
                   <int key="NSvFlags">290</int>
-                  <string key="NSFrame">{{92, 10}, {185, 14}}</string>
+                  <string key="NSFrame">{{92, 10}, {186, 14}}</string>
                   <reference key="NSSuperview" ref="984096082"/>
                   <string key="NSReuseIdentifierKey">_NS:1109</string>
                   <string key="NSClassName">VLCThreePartImageView</string>
@@ -4797,18 +4797,18 @@ LCAuLi4</string>
                   </object>
                 </object>
               </object>
-              <string key="NSFrameSize">{362, 36}</string>
+              <string key="NSFrameSize">{363, 36}</string>
               <reference key="NSSuperview" ref="598483044"/>
               <string key="NSReuseIdentifierKey">_NS:1109</string>
               <string key="NSClassName">VLCThreePartDropView</string>
             </object>
           </object>
-          <string key="NSFrameSize">{362, 239}</string>
+          <string key="NSFrameSize">{363, 239}</string>
           <reference key="NSSuperview"/>
           <string key="NSReuseIdentifierKey">_NS:122</string>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
-        <string key="NSMinSize">{362, 225}</string>
+        <string key="NSMinSize">{363, 225}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <string key="NSFrameAutosaveName">detachedvideowindow</string>
         <bool key="NSWindowIsRestorable">NO</bool>
@@ -12704,12 +12704,12 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>{{596, 363}, {64, 6}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{396, 139}, {362, 239}}</string>
+          <string>{{396, 139}, {363, 239}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{396, 139}, {362, 239}}</string>
+          <string>{{396, 139}, {363, 239}}</string>
           <boolean value="NO"/>
           <boolean value="YES"/>
-          <string>{362, 203}</string>
+          <string>{363, 203}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
