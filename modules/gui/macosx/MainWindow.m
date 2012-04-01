@@ -1563,6 +1563,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     screen_rect = [screen frame];
 
     [o_fullscreen_btn setState: YES];
+    [o_detached_fullscreen_btn setState: YES];
 
     [self recreateHideMouseTimer];
 
@@ -1736,6 +1737,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     b_fullscreen = NO;
     [o_fullscreen_btn setState: NO];
+    [o_detached_fullscreen_btn setState: NO];
 
     /* We always try to do so */
     [NSScreen unblackoutScreens];
