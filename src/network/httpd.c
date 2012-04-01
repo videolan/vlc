@@ -1198,25 +1198,21 @@ void httpd_HostDelete( httpd_host_t *host )
 /* register a new url */
 static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, const char *psz_url,
                                          const char *psz_user, const char *psz_password,
-                                         const vlc_acl_t *p_acl, bool b_check )
+                                         const vlc_acl_t *p_acl )
 {
     httpd_url_t *url;
-    int         i;
 
     assert( psz_url != NULL );
 
     vlc_mutex_lock( &host->lock );
-    if( b_check )
+    for( int i = 0; i < host->i_url; i++ )
     {
-        for( i = 0; i < host->i_url; i++ )
+        if( !strcmp( psz_url, host->url[i]->psz_url ) )
         {
-            if( !strcmp( psz_url, host->url[i]->psz_url ) )
-            {
-                msg_Warn( host,
-                          "cannot add '%s' (url already defined)", psz_url );
-                vlc_mutex_unlock( &host->lock );
-                return NULL;
-            }
+            msg_Warn( host,
+                      "cannot add '%s' (url already defined)", psz_url );
+            vlc_mutex_unlock( &host->lock );
+            return NULL;
         }
     }
 
@@ -1228,7 +1224,7 @@ static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, const char *psz_url
     url->psz_user = strdup( psz_user ? psz_user : "" );
     url->psz_password = strdup( psz_password ? psz_password : "" );
     url->p_acl = ACL_Duplicate( host, p_acl );
-    for( i = 0; i < HTTPD_MSG_MAX; i++ )
+    for( int i = 0; i < HTTPD_MSG_MAX; i++ )
     {
         url->catch[i].cb = NULL;
         url->catch[i].p_sys = NULL;
@@ -1246,7 +1242,7 @@ httpd_url_t *httpd_UrlNewUnique( httpd_host_t *host, const char *psz_url,
                                  const vlc_acl_t *p_acl )
 {
     return httpd_UrlNewPrivate( host, psz_url, psz_user,
-                                psz_password, p_acl, true );
+                                psz_password, p_acl );
 }
 
 /* register callback on a url */
