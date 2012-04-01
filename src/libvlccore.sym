@@ -176,7 +176,6 @@ httpd_StreamNew
 httpd_StreamSend
 httpd_UrlCatch
 httpd_UrlDelete
-httpd_UrlNew
 httpd_UrlNewUnique
 image_Ext2Fourcc
 image_HandlerCreate

@@ -101,7 +101,6 @@ VLC_API httpd_host_t *vlc_rtsp_HostNew( vlc_object_t * ) VLC_USED;
 VLC_API void httpd_HostDelete( httpd_host_t * );
 
 /* register a new url */
-VLC_API httpd_url_t * httpd_UrlNew( httpd_host_t *, const char *psz_url, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl ) VLC_USED;
 VLC_API httpd_url_t * httpd_UrlNewUnique( httpd_host_t *, const char *psz_url, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl ) VLC_USED;
 /* register callback on a url */
 VLC_API int httpd_UrlCatch( httpd_url_t *, int i_msg, httpd_callback_t, httpd_callback_sys_t * );

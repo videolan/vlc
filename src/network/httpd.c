@@ -1241,14 +1241,6 @@ static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, const char *psz_url
     return url;
 }
 
-httpd_url_t *httpd_UrlNew( httpd_host_t *host, const char *psz_url,
-                           const char *psz_user, const char *psz_password,
-                           const vlc_acl_t *p_acl )
-{
-    return httpd_UrlNewPrivate( host, psz_url, psz_user,
-                                psz_password, p_acl, false );
-}
-
 httpd_url_t *httpd_UrlNewUnique( httpd_host_t *host, const char *psz_url,
                                  const char *psz_user, const char *psz_password,
                                  const vlc_acl_t *p_acl )
