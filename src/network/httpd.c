@@ -34,7 +34,6 @@
 
 #include <vlc_network.h>
 #include <vlc_tls.h>
-#include <vlc_acl.h>
 #include <vlc_strings.h>
 #include <vlc_rand.h>
 #include <vlc_charset.h>
@@ -68,9 +67,6 @@
 #endif
 
 static void httpd_ClientClean( httpd_client_t *cl );
-static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *, const char *,
-                                         const char *, const char *,
-                                         const vlc_acl_t * );
 
 /* each host run in his own thread */
 struct httpd_host_t
@@ -113,7 +109,6 @@ struct httpd_url_t
     char      *psz_url;
     char      *psz_user;
     char      *psz_password;
-    vlc_acl_t *p_acl;
 
     struct
     {
@@ -445,13 +440,12 @@ httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl,
 httpd_file_t *httpd_FileNew( httpd_host_t *host,
                              const char *psz_url, const char *psz_mime,
                              const char *psz_user, const char *psz_password,
-                             const vlc_acl_t *p_acl, httpd_file_callback_t pf_fill,
+                             httpd_file_callback_t pf_fill,
                              httpd_file_sys_t *p_sys )
 {
     httpd_file_t *file = xmalloc( sizeof( httpd_file_t ) );
 
-    file->url = httpd_UrlNewPrivate( host, psz_url, psz_user, psz_password,
-                                     p_acl );
+    file->url = httpd_UrlNew( host, psz_url, psz_user, psz_password );
     if( file->url == NULL )
     {
         free( file );
@@ -592,14 +586,12 @@ httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl,
 httpd_handler_t *httpd_HandlerNew( httpd_host_t *host, const char *psz_url,
                                    const char *psz_user,
                                    const char *psz_password,
-                                   const vlc_acl_t *p_acl,
                                    httpd_handler_callback_t pf_fill,
                                    httpd_handler_sys_t *p_sys )
 {
     httpd_handler_t *handler = xmalloc( sizeof( httpd_handler_t ) );
 
-    handler->url = httpd_UrlNewPrivate( host, psz_url, psz_user, psz_password,
-                                        p_acl );
+    handler->url = httpd_UrlNew( host, psz_url, psz_user, psz_password );
     if( handler->url == NULL )
     {
         free( handler );
@@ -852,8 +844,7 @@ httpd_stream_t *httpd_StreamNew( httpd_host_t *host,
 {
     httpd_stream_t *stream = xmalloc( sizeof( httpd_stream_t ) );
 
-    stream->url = httpd_UrlNewPrivate( host, psz_url, psz_user, psz_password,
-                                       NULL );
+    stream->url = httpd_UrlNew( host, psz_url, psz_user, psz_password );
     if( stream->url == NULL )
     {
         free( stream );
@@ -1199,9 +1190,8 @@ void httpd_HostDelete( httpd_host_t *host )
 }
 
 /* register a new url */
-static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, const char *psz_url,
-                                         const char *psz_user, const char *psz_password,
-                                         const vlc_acl_t *p_acl )
+httpd_url_t *httpd_UrlNew( httpd_host_t *host, const char *psz_url,
+                           const char *psz_user, const char *psz_password )
 {
     httpd_url_t *url;
 
@@ -1226,7 +1216,6 @@ static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, const char *psz_url
     url->psz_url = strdup( psz_url );
     url->psz_user = strdup( psz_user ? psz_user : "" );
     url->psz_password = strdup( psz_password ? psz_password : "" );
-    url->p_acl = ACL_Duplicate( host, p_acl );
     for( int i = 0; i < HTTPD_MSG_MAX; i++ )
     {
         url->catch[i].cb = NULL;
@@ -1238,12 +1227,6 @@ static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, const char *psz_url
     vlc_mutex_unlock( &host->lock );
 
     return url;
-}
-
-httpd_url_t *httpd_UrlNew( httpd_host_t *host, const char *psz_url,
-                           const char *psz_user, const char *psz_password )
-{
-    return httpd_UrlNewPrivate( host, psz_url, psz_user, psz_password, NULL );
 }
 
 /* register callback on a url */
@@ -1271,7 +1254,6 @@ void httpd_UrlDelete( httpd_url_t *url )
     free( url->psz_url );
     free( url->psz_user );
     free( url->psz_password );
-    ACL_Destroy( url->p_acl );
 
     for( i = 0; i < host->i_client; i++ )
     {
@@ -2162,7 +2144,6 @@ static void* httpd_HostThread( void *data )
                 else
                 {
                     bool b_auth_failed = false;
-                    bool b_hosts_failed = false;
 
                     /* Search the url and trigger callbacks */
                     for(int i = 0; i < host->i_url; i++ )
@@ -2173,18 +2154,6 @@ static void* httpd_HostThread( void *data )
                         {
                             if( url->catch[i_msg].cb )
                             {
-                                if( answer && ( url->p_acl != NULL ) )
-                                {
-                                    char ip[NI_MAXNUMERICHOST];
-
-                                    if( ( httpd_ClientIP( cl, ip, NULL ) == NULL )
-                                     || ACL_Check( url->p_acl, ip ) )
-                                    {
-                                        b_hosts_failed = true;
-                                        break;
-                                    }
-                                }
-
                                 if( answer && ( *url->psz_user || *url->psz_password ) )
                                 {
                                     /* create the headers */
@@ -2252,11 +2221,7 @@ static void* httpd_HostThread( void *data )
                         answer->i_type   = HTTPD_MSG_ANSWER;
                         answer->i_version= 0;
 
-                        if( b_hosts_failed )
-                        {
-                            answer->i_status = 403;
-                        }
-                        else if( b_auth_failed )
+                        if( b_auth_failed )
                         {
                             answer->i_status = 401;
                         }

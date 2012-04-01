@@ -1364,7 +1364,7 @@ static int HttpSetup( sout_stream_t *p_stream, const vlc_url_t *url)
         p_sys->p_httpd_file = httpd_FileNew( p_sys->p_httpd_host,
                                              url->psz_path ? url->psz_path : "/",
                                              "application/sdp",
-                                             NULL, NULL, NULL,
+                                             NULL, NULL,
                                              HttpCallback, (void*)p_sys );
     }
     if( p_sys->p_httpd_file == NULL )

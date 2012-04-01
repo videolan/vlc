@@ -163,7 +163,7 @@ static int vlclua_httpd_handler_new( lua_State * L )
      * the callback's stack. */
     lua_xmove( L, p_sys->L, 2 );
     httpd_handler_t *p_handler = httpd_HandlerNew(
-                            *pp_host, psz_url, psz_user, psz_password, NULL,
+                            *pp_host, psz_url, psz_user, psz_password,
                             vlclua_httpd_handler_callback, p_sys );
     if( !p_handler )
     {
@@ -251,7 +251,7 @@ static int vlclua_httpd_file_new( lua_State *L )
     p_sys->ref = luaL_ref( L, LUA_REGISTRYINDEX ); /* pops the object too */
     lua_xmove( L, p_sys->L, 2 );
     httpd_file_t *p_file = httpd_FileNew( *pp_host, psz_url, psz_mime,
-                                          psz_user, psz_password, NULL,
+                                          psz_user, psz_password,
                                           vlclua_httpd_file_callback, p_sys );
     if( !p_file )
     {

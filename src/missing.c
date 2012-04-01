@@ -59,12 +59,11 @@ httpd_file_sys_t *httpd_FileDelete (httpd_file_t *file)
 httpd_file_t *httpd_FileNew (httpd_host_t *host,
                              const char *url, const char *content_type,
                              const char *login, const char *password,
-                             const vlc_acl_t *acl,
                              httpd_file_callback_t cb, httpd_file_sys_t *data)
 {
     (void) host;
     (void) url; (void) content_type;
-    (void) login; (void) password; (void) acl;
+    (void) login; (void) password;
     (void) cb; (void) data;
     assert (0);
 }
@@ -77,12 +76,11 @@ httpd_handler_sys_t *httpd_HandlerDelete (httpd_handler_t *handler)
 
 httpd_handler_t *httpd_HandlerNew (httpd_host_t *host, const char *url,
                                    const char *login, const char *password,
-                                   const vlc_acl_t *acl,
                                    httpd_handler_callback_t cb,
                                    httpd_handler_sys_t *data)
 {
     (void) host; (void) url;
-    (void) login; (void) password; (void) acl;
+    (void) login; (void) password;
     (void) cb; (void) data;
     assert (0);
 }
