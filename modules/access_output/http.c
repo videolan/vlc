@@ -212,7 +212,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->p_httpd_stream =
         httpd_StreamNew( p_sys->p_httpd_host, path, psz_mime,
-                         psz_user, psz_pwd, NULL );
+                         psz_user, psz_pwd );
     free( psz_user );
     free( psz_pwd );
     free( psz_mime );

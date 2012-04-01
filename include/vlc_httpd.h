@@ -124,7 +124,7 @@ VLC_API httpd_redirect_t * httpd_RedirectNew( httpd_host_t *, const char *psz_ur
 VLC_API void httpd_RedirectDelete( httpd_redirect_t * );
 
 
-VLC_API httpd_stream_t * httpd_StreamNew( httpd_host_t *, const char *psz_url, const char *psz_mime, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl ) VLC_USED;
+VLC_API httpd_stream_t * httpd_StreamNew( httpd_host_t *, const char *psz_url, const char *psz_mime, const char *psz_user, const char *psz_password ) VLC_USED;
 VLC_API void httpd_StreamDelete( httpd_stream_t * );
 VLC_API int httpd_StreamHeader( httpd_stream_t *, uint8_t *p_data, int i_data );
 VLC_API int httpd_StreamSend( httpd_stream_t *, uint8_t *p_data, int i_data );
