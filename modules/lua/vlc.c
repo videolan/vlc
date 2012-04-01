@@ -50,6 +50,9 @@
 
 #define CONFIG_TEXT N_("Lua interface configuration")
 #define CONFIG_LONGTEXT N_("Lua interface configuration string. Format is: '[\"<interface module name>\"] = { <option> = <value>, ...}, ...'.")
+#define PASS_TEXT N_( "Password" )
+#define PASS_LONGTEXT N_( "A single password restricts access " \
+    "to this interface." )
 #define SRC_TEXT N_( "Source directory" )
 #define SRC_LONGTEXT N_( "Source directory" )
 #define INDEX_TEXT N_( "Directory index" )
@@ -91,6 +94,7 @@ vlc_module_begin ()
 
     add_submodule ()
         set_section( N_("Lua HTTP"), 0 )
+            add_password ( "http-password", NULL, PASS_TEXT, PASS_LONGTEXT, false )
             add_string ( "http-src",  NULL, SRC_TEXT,  SRC_LONGTEXT,  true )
             add_bool   ( "http-index", false, INDEX_TEXT, INDEX_LONGTEXT, true )
         set_capability( "interface", 0 )

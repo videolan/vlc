@@ -134,7 +134,7 @@ function dirlisting(url,listing,acl_)
 </body>
 </html>]]
     end
-    return h:file(url,"text/html",nil,nil,acl_,callback,nil)
+    return h:file(url,"text/html",nil,password,acl_,callback,nil)
 end
 
 -- FIXME: Experimental art support. Needs some cleaning up.
@@ -207,7 +207,7 @@ function file(h,path,url,acl_,mime)
         end
         return table.concat(page)
     end
-    return h:file(url or path,mime,nil,nil,acl_,callback,nil)
+    return h:file(url or path,mime,nil,password,acl_,callback,nil)
 end
 
 function rawfile(h,path,url,acl_)
@@ -228,7 +228,7 @@ function rawfile(h,path,url,acl_)
         end
         return page
     end
-    return h:file(url or path,nil,nil,nil,acl_,callback,nil)
+    return h:file(url or path,nil,nil,password,acl_,callback,nil)
 end
 
 function parse_url_request(request)
@@ -329,6 +329,7 @@ if config.host then
     vlc.msg.info("Pass --http-host=IP "..(port and "and --http-port="..port.." " or "").."on the command line instead.")
 end
 
+password = vlc.var.inherit(nil,"http-password")
 h = vlc.httpd()
 local root_acl = load_dir( http_dir )
-local a = h:handler("/art",nil,nil,root_acl,callback_art,nil)
+local a = h:handler("/art",nil,password,root_acl,callback_art,nil)
