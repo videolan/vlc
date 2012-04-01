@@ -174,7 +174,9 @@ public:
     virtual ~DiscOpenPanel();
     virtual void clear() ;
     virtual void accept() ;
+#ifdef WIN32
     void onFocus();
+#endif
 private:
     Ui::OpenDisk ui;
     char *psz_dvddiscpath, *psz_vcddiscpath, *psz_cddadiscpath;
