@@ -341,24 +341,12 @@ static int config_PrepareDir (vlc_object_t *obj)
     return ret;
 }
 
-/*****************************************************************************
- * config_SaveConfigFile: Save a module's config options.
- *****************************************************************************
- * It's no use to save the config options that kept their default values, so
- * we'll try to be a bit clever here.
- *
- * When we save we mustn't delete the config options of the modules that
- * haven't been loaded. So we cannot just create a new config file with the
- * config structures we've got in memory.
- * I don't really know how to deal with this nicely, so I will use a completly
- * dumb method ;-)
- * I will load the config file in memory, but skipping all the sections of the
- * modules we want to save. Then I will create a brand new file, dump the file
- * loaded in memory and then append the sections of the modules we want to
- * save.
- * Really stupid no ?
- *****************************************************************************/
-static int SaveConfigFile (vlc_object_t *p_this)
+#undef config_SaveConfigFile
+/**
+ * Saves the in-memory configuration into a file.
+ * @return 0 on success, -1 on error.
+ */
+int config_SaveConfigFile (vlc_object_t *p_this)
 {
     char *permanent = NULL, *temporary = NULL;
 
@@ -456,7 +444,7 @@ static int SaveConfigFile (vlc_object_t *p_this)
     /* Configuration lock must be taken before vlcrc serializer below. */
     vlc_rwlock_rdlock (&config_lock);
 
-    /* The temporary configuration file is per-PID. Therefore SaveConfigFile()
+    /* The temporary configuration file is per-PID. Therefore this function
      * should be serialized against itself within a given process. */
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
     vlc_mutex_lock (&lock);
@@ -643,15 +631,9 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
 
     if (save)
         /* Note: this will get the read lock recursively. Ok. */
-        ret = SaveConfigFile (p_this);
+        ret = config_SaveConfigFile (p_this);
     vlc_rwlock_unlock (&config_lock);
 
     module_list_free (list);
     return ret;
-}
-
-#undef config_SaveConfigFile
-int config_SaveConfigFile( vlc_object_t *p_this )
-{
-    return SaveConfigFile (p_this);
 }
