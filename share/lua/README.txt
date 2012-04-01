@@ -106,8 +106,8 @@ HTTPd
 http( host, port, [cert, key, ca, crl]): create a new HTTP (SSL) daemon.
 
 local h = vlc.httpd( "localhost", 8080 )
-h:handler( url, user, password, acl, callback, data ) -- add a handler for given url. If user and password are non nil, they will be used to authenticate connecting clients. If acl is non nil, it will be used to restrict access. callback will be called to handle connections. The callback function takes 7 arguments: data, url, request, type, in, addr, host. It returns the reply as a string.
-h:file( url, mime, user, password, acl, callback, data ) -- add a file for given url with given mime type. If user and password are non nil, they will be used to authenticate connecting clients. If acl is non nil, it will be used to restrict access. callback will be called to handle connections. The callback function takes 2 arguments: data and request. It returns the reply as a string.
+h:handler( url, user, password, callback, data ) -- add a handler for given url. If user and password are non nil, they will be used to authenticate connecting clients. callback will be called to handle connections. The callback function takes 7 arguments: data, url, request, type, in, addr, host. It returns the reply as a string.
+h:file( url, mime, user, password, callback, data ) -- add a file for given url with given mime type. If user and password are non nil, they will be used to authenticate connecting clients. callback will be called to handle connections. The callback function takes 2 arguments: data and request. It returns the reply as a string.
 h:redirect( url_dst, url_src ): Redirect all connections from url_src to url_dst.
 
 Input

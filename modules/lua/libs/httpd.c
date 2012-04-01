@@ -149,11 +149,10 @@ static int vlclua_httpd_handler_new( lua_State * L )
     const char *psz_url = luaL_checkstring( L, 2 );
     const char *psz_user = luaL_nilorcheckstring( L, 3 );
     const char *psz_password = luaL_nilorcheckstring( L, 4 );
-    const vlc_acl_t **pp_acl = lua_isnil( L, 5 ) ? NULL : luaL_checkudata( L, 5, "acl" );
-    /* Stack item 6 is the callback function */
-    luaL_argcheck( L, lua_isfunction( L, 6 ), 6, "Should be a function" );
-    /* Stack item 7 is the callback data */
-    lua_settop( L, 7 );
+    /* Stack item 5 is the callback function */
+    luaL_argcheck( L, lua_isfunction( L, 5 ), 5, "Should be a function" );
+    /* Stack item 6 is the callback data */
+    lua_settop( L, 6 );
     httpd_handler_sys_t *p_sys = (httpd_handler_sys_t*)
                                  malloc( sizeof( httpd_handler_sys_t ) );
     if( !p_sys )
@@ -164,8 +163,7 @@ static int vlclua_httpd_handler_new( lua_State * L )
      * the callback's stack. */
     lua_xmove( L, p_sys->L, 2 );
     httpd_handler_t *p_handler = httpd_HandlerNew(
-                            *pp_host, psz_url, psz_user, psz_password,
-                            pp_acl?*pp_acl:NULL,
+                            *pp_host, psz_url, psz_user, psz_password, NULL,
                             vlclua_httpd_handler_callback, p_sys );
     if( !p_handler )
     {
@@ -242,9 +240,8 @@ static int vlclua_httpd_file_new( lua_State *L )
     const char *psz_mime = luaL_nilorcheckstring( L, 3 );
     const char *psz_user = luaL_nilorcheckstring( L, 4 );
     const char *psz_password = luaL_nilorcheckstring( L, 5 );
-    const vlc_acl_t **pp_acl = lua_isnil( L, 6 ) ? NULL : luaL_checkudata( L, 6, "acl" );
     /* Stack item 7 is the callback function */
-    luaL_argcheck( L, lua_isfunction( L, 7 ), 7, "Should be a function" );
+    luaL_argcheck( L, lua_isfunction( L, 6 ), 6, "Should be a function" );
     /* Stack item 8 is the callback data */
     httpd_file_sys_t *p_sys = (httpd_file_sys_t *)
                               malloc( sizeof( httpd_file_sys_t ) );
@@ -254,8 +251,7 @@ static int vlclua_httpd_file_new( lua_State *L )
     p_sys->ref = luaL_ref( L, LUA_REGISTRYINDEX ); /* pops the object too */
     lua_xmove( L, p_sys->L, 2 );
     httpd_file_t *p_file = httpd_FileNew( *pp_host, psz_url, psz_mime,
-                                          psz_user, psz_password,
-                                          pp_acl?*pp_acl:NULL,
+                                          psz_user, psz_password, NULL,
                                           vlclua_httpd_file_callback, p_sys );
     if( !p_file )
     {
