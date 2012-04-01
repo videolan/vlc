@@ -26,7 +26,9 @@ Video Filters:
    anaglyph glasses (aka red/blue) compatible images.
 
 Interfaces:
- * fixed lua command line interface console mode under Windows.
+ * configurable password for the HTTP server.
+ * .hosts removed from the HTTP server.
+ * fixed Lua command line interface console mode under Windows.
 
 Mac OS X Interface:
  * added a GUI for the QTSound access module to process audio captured locally
