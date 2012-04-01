@@ -472,14 +472,11 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             }
             CONFIG_BOOL( "ffmpeg-hw", hwAccelBox );
 #ifdef WIN32
-            CONFIG_BOOL( "prefer-system-codecs", systemCodecBox );
             HINSTANCE hdxva2_dll = LoadLibrary(TEXT("DXVA2.DLL") );
             if( !hdxva2_dll )
                 ui.hwAccelBox->setEnabled( false );
             else
                 FreeLibrary( hdxva2_dll );
-#else
-            ui.systemCodecBox->hide();
 #endif
             optionWidgets.append( ui.DVDDeviceComboBox );
             optionWidgets.append( ui.cachingCombo );
