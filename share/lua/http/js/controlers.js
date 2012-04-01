@@ -166,7 +166,7 @@ function browse(dir) {
             var tgt = browse_target.indexOf('__') == -1 ? browse_target : browse_target.substr(0, browse_target.indexOf('__'));
             $('#browse_elements').empty();
             $('element', data).each(function () {
-                var ext = $(this).attr('name').substr($(this).attr('name').lastIndexOf('.') + 1);
+                var ext = $(this).attr('name').substr($(this).attr('name').lastIndexOf('.') + 1).toLowerCase();
                 if ($(this).attr('type') == 'dir' || $.inArray(ext, video_types) != -1 || $.inArray(ext, audio_types) != -1) {
                     $('#browse_elements').append(createElementLi($(this).attr('name'), $(this).attr('type'), $(this).attr('uri'), ext));
                 }
