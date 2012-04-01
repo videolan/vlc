@@ -283,7 +283,6 @@ DIST_http_lua = \
 	lua/http/dialogs/batch_window.html \
 	lua/http/dialogs/error_window.html \
 	lua/http/dialogs/browse_window.html \
-	lua/http/dialogs/.hosts \
 	lua/http/dialogs/stream_window.html \
 	lua/http/dialogs/offset_window.html \
 	lua/http/dialogs/stream_config_window.html \
@@ -346,7 +345,6 @@ DIST_http_lua = \
 	lua/http/mobile_browse.html \
 	lua/http/favicon.ico \
 	lua/http/mobile_view.html \
-	lua/http/.hosts \
 	lua/http/requests/playlist.xml \
 	lua/http/requests/playlist.json \
 	lua/http/requests/README.txt \
