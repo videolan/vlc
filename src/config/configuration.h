@@ -51,6 +51,7 @@ void config_UnsortConfig (void);
     ((type) == CONFIG_ITEM_FLOAT)
 
 extern vlc_rwlock_t config_lock;
+extern bool config_dirty;
 
 bool config_IsSafe (const char *);
 

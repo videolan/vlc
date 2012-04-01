@@ -540,7 +540,6 @@ int config_SaveConfigFile (vlc_object_t *p_this)
                               !modified, p_item->psz_name, "%s",
                               psz_value ? psz_value : "");
             }
-            p_item->b_dirty = false;
         }
     }
     vlc_rwlock_unlock (&config_lock);
@@ -606,34 +605,18 @@ error:
 
 int config_AutoSaveConfigFile( vlc_object_t *p_this )
 {
-    int ret = VLC_SUCCESS;
-    bool save = false;
+    int ret = 0;
 
     assert( p_this );
 
-    /* Check if there's anything to save */
-    module_t **list = module_list_get (NULL);
     vlc_rwlock_rdlock (&config_lock);
-    for (size_t i_index = 0; list[i_index] && !save; i_index++)
+    if (config_dirty)
     {
-        module_t *p_parser = list[i_index];
-        module_config_t *p_item, *p_end;
-
-        if( !p_parser->i_config_items ) continue;
-
-        for( p_item = p_parser->p_config, p_end = p_item + p_parser->confsize;
-             p_item < p_end && !save;
-             p_item++ )
-        {
-            save = p_item->b_dirty;
-        }
-    }
-
-    if (save)
         /* Note: this will get the read lock recursively. Ok. */
         ret = config_SaveConfigFile (p_this);
+        config_dirty = (ret != 0);
+    }
     vlc_rwlock_unlock (&config_lock);
 
-    module_list_free (list);
     return ret;
 }

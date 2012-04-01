@@ -326,8 +326,6 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
             memcpy (&p_module->p_config[i].value, &p_module->p_config[i].orig,
                     sizeof (p_module->p_config[i].value));
 
-        p_module->p_config[i].b_dirty = false;
-
         if( p_module->p_config[i].i_list )
         {
             if( p_module->p_config[i].ppsz_list )

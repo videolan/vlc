@@ -71,7 +71,6 @@ struct module_config_t
     char         i_short;                     /* Optional short option name */
 
     /* Misc */
-    unsigned    b_dirty:1;        /* Dirty flag to indicate a config change */
     unsigned    b_advanced:1;        /* Flag to indicate an advanced option */
     unsigned    b_internal:1; /* Flag to indicate option is not to be shown */
     unsigned    b_unsaveable:1;               /* Config should not be saved */

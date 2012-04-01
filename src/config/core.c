@@ -38,6 +38,7 @@
 #include "modules/modules.h"
 
 vlc_rwlock_t config_lock = VLC_STATIC_RWLOCK;
+bool config_dirty = false;
 
 static inline char *strdupnull (const char *src)
 {
@@ -242,7 +243,7 @@ void config_PutPsz( vlc_object_t *p_this,
     vlc_rwlock_wrlock (&config_lock);
     oldstr = (char *)p_config->value.psz;
     p_config->value.psz = str;
-    p_config->b_dirty = true;
+    config_dirty = true;
     vlc_rwlock_unlock (&config_lock);
 
     free (oldstr);
@@ -283,7 +284,7 @@ void config_PutInt( vlc_object_t *p_this, const char *psz_name,
 
     vlc_rwlock_wrlock (&config_lock);
     p_config->value.i = i_value;
-    p_config->b_dirty = true;
+    config_dirty = true;
     vlc_rwlock_unlock (&config_lock);
 }
 
@@ -324,7 +325,7 @@ void config_PutFloat( vlc_object_t *p_this,
 
     vlc_rwlock_wrlock (&config_lock);
     p_config->value.f = f_value;
-    p_config->b_dirty = true;
+    config_dirty = true;
     vlc_rwlock_unlock (&config_lock);
 }
 
