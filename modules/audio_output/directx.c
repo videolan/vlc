@@ -1162,9 +1162,6 @@ static int ReloadDirectXDevices( vlc_object_t *p_this, char const *psz_name,
     p_item->i_list = 0;
     OurDirectSoundEnumerate(CallBackConfigEnum, p_item);
 
-    /* Signal change to the interface */
-    p_item->b_dirty = true;
-
 error:
     FreeLibrary(hdsound_dll);
 

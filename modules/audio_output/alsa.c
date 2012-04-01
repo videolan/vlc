@@ -759,9 +759,6 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
 
     GetDevices (p_this, p_item, "default");
 
-    /* Signal change to the interface */
-    p_item->b_dirty = true;
-
     return VLC_SUCCESS;
 }
 
