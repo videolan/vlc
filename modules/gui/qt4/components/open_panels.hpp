@@ -140,8 +140,8 @@ public:
     NetOpenPanel( QWidget *, intf_thread_t * );
     virtual ~NetOpenPanel();
     virtual void clear() ;
-    void onFocus();
-    void onAccept();
+    virtual void onFocus();
+    virtual void onAccept();
 private:
     Ui::OpenNetwork ui;
     bool b_recentList;
@@ -175,7 +175,7 @@ public:
     virtual void clear() ;
     virtual void accept() ;
 #ifdef WIN32
-    void onFocus();
+    virtual void onFocus();
 #endif
 private:
     Ui::OpenDisk ui;
