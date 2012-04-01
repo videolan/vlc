@@ -320,6 +320,7 @@ FunctionEnd
   !insertmacro ${_action} ".dv"
   !insertmacro ${_action} ".f4v"
   !insertmacro ${_action} ".flv"
+  !insertmacro ${_action} ".gvi"
   !insertmacro ${_action} ".gxf"
   !insertmacro ${_action} ".m1v"
   !insertmacro ${_action} ".m2t"
