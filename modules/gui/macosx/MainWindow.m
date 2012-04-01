@@ -131,6 +131,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 #endif
     i_lastShownVolume = -1;
     t_hide_mouse_timer = nil;
+    [self useOptimizedDrawing: YES];
 
     [o_play_btn setToolTip: _NS("Play/Pause")];
     [o_detached_play_btn setToolTip: [o_play_btn toolTip]];
