@@ -528,33 +528,34 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
     else
         [o_spat_enable_ckb setState: NSOffState];
 
-    [o_spat_band1_sld setFloatValue: config_GetFloat( p_intf, "spatializer-roomsize" )];
-    [o_spat_band1_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [o_spat_band1_sld floatValue]]];
-    [o_spat_band2_sld setFloatValue: config_GetFloat( p_intf, "spatializer-width" )];
-    [o_spat_band2_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [o_spat_band2_sld floatValue]]];
-    [o_spat_band3_sld setFloatValue: config_GetFloat( p_intf, "spatializer-wet" )];
-    [o_spat_band3_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [o_spat_band3_sld floatValue]]];
-    [o_spat_band4_sld setFloatValue: config_GetFloat( p_intf, "spatializer-dry" )];
-    [o_spat_band4_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [o_spat_band4_sld floatValue]]];
-    [o_spat_band5_sld setFloatValue: config_GetFloat( p_intf, "spatializer-damp" )];
-    [o_spat_band5_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [o_spat_band5_sld floatValue]]];
+#define setSlider( bandsld, bandfld, var ) \
+    [bandsld setFloatValue: config_GetFloat( p_intf, var ) * 10.]; \
+    [bandfld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [bandsld floatValue]]]
+
+    setSlider( o_spat_band1_sld, o_spat_band1_fld, "spatializer-roomsize" );
+    setSlider( o_spat_band2_sld, o_spat_band2_fld, "spatializer-width" );
+    setSlider( o_spat_band3_sld, o_spat_band3_fld, "spatializer-wet" );
+    setSlider( o_spat_band4_sld, o_spat_band4_fld, "spatializer-dry" );
+    setSlider( o_spat_band5_sld, o_spat_band5_fld, "spatializer-damp" );
+
+#undef setSlider
 }
 
 - (IBAction)resetSpatializerValues:(id)sender
 {
-    config_PutFloat( p_intf, "spatializer-roomsize", 1.050000 );
-    config_PutFloat( p_intf, "spatializer-width", 10.000000 );
-    config_PutFloat( p_intf, "spatializer-wet", 3.000000 );
-    config_PutFloat( p_intf, "spatializer-dry", 2.000000 );
-    config_PutFloat( p_intf, "spatializer-damp", 1.000000 );
+    config_PutFloat( p_intf, "spatializer-roomsize", .85 );
+    config_PutFloat( p_intf, "spatializer-width", 1. );
+    config_PutFloat( p_intf, "spatializer-wet", .4 );
+    config_PutFloat( p_intf, "spatializer-dry", .5 );
+    config_PutFloat( p_intf, "spatializer-damp", .5 );
 
     audio_output_t * p_aout = getAout();
     if (p_aout) {
-        var_SetFloat( p_aout, "spatializer-roomsize", 1.050000 );
-        var_SetFloat( p_aout, "spatializer-width", 10.000000 );
-        var_SetFloat( p_aout, "spatializer-wet", 3.000000 );
-        var_SetFloat( p_aout, "spatializer-dry", 2.000000 );
-        var_SetFloat( p_aout, "spatializer-damp", 1.000000 );
+        var_SetFloat( p_aout, "spatializer-roomsize", .85 );
+        var_SetFloat( p_aout, "spatializer-width", 1. );
+        var_SetFloat( p_aout, "spatializer-wet", .4 );
+        var_SetFloat( p_aout, "spatializer-dry", .5 );
+        var_SetFloat( p_aout, "spatializer-damp", .5 );
         vlc_object_release( p_aout );
     }
     [self resetSpatializer];
@@ -581,10 +582,10 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
         value = "spatializer-damp";
 
     if( p_aout ) {
-        var_SetFloat( p_aout, value, [sender floatValue] );
+        var_SetFloat( p_aout, value, [sender floatValue] / 10. );
         vlc_object_release( p_aout );
     }
-    config_PutFloat( p_intf, value, [sender floatValue] );
+    config_PutFloat( p_intf, value, [sender floatValue] / 10. );
 
     if( sender == o_spat_band1_sld )
         [o_spat_band1_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
