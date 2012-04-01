@@ -1400,9 +1400,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_detached_video_window setLevel:NSNormalWindowLevel];
         [o_detached_video_window useOptimizedDrawing: YES];
         [o_detached_video_window center];
-        [o_detached_video_window makeKeyAndOrderFront:self];
         b_nonembedded = YES;
     }
+    [[o_video_view window] makeKeyAndOrderFront: self];
 
     if (p_vout)
     {
