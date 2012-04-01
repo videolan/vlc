@@ -822,7 +822,6 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
         if( p_ext )
         {
             /* Load more libraries */
-            luaopen_acl( L );
             luaopen_config( L );
             luaopen_dialog( L, p_ext );
             luaopen_input( L );

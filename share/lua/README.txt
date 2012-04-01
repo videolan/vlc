@@ -36,16 +36,6 @@ vlc.msg.info( "This is an info message and will be displayed in the console" )
 Note: availability of the different VLC specific Lua modules depends on
 the type of VLC Lua script your are in.
 
-Access lists
-------------
-local a = vlc.acl(true) -> new ACL with default set to allow
-a:check("10.0.0.1") -> 0 == allow, 1 == deny, -1 == error
-a("10.0.0.1") -> same as a:check("10.0.0.1")
-a:duplicate() -> duplicate ACL object
-a:add_host("10.0.0.1",true) -> allow 10.0.0.1
-a:add_net("10.0.0.0",24,true) -> allow 10.0.0.0/24 (not sure)
-a:load_file("/path/to/acl") -> load ACL from file
-
 Configuration
 -------------
 config.get( name ): Get the VLC configuration option "name"'s value.

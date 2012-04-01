@@ -892,7 +892,6 @@ modules/gui/skins2/x11/x11_window.cpp
 modules/gui/skins2/x11/x11_window.hpp
 modules/lua/demux.c
 modules/lua/intf.c
-modules/lua/libs/acl.c
 modules/lua/libs/configuration.c
 modules/lua/libs.h
 modules/lua/libs/httpd.c

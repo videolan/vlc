@@ -9,7 +9,6 @@ SOURCES_lua = \
 	vlc.c \
 	vlc.h \
 	libs.h \
-	libs/acl.c \
 	libs/configuration.c \
 	libs/equalizer.c \
 	libs/gettext.c \

@@ -246,7 +246,6 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
     luaL_register( L, "vlc", p_reg );
 
     /* register submodules */
-    luaopen_acl( L );
     luaopen_config( L );
     luaopen_volume( L );
     luaopen_httpd( L );
