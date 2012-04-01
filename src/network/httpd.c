@@ -68,6 +68,9 @@
 #endif
 
 static void httpd_ClientClean( httpd_client_t *cl );
+static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *, const char *,
+                                         const char *, const char *,
+                                         const vlc_acl_t * );
 
 /* each host run in his own thread */
 struct httpd_host_t
@@ -447,9 +450,9 @@ httpd_file_t *httpd_FileNew( httpd_host_t *host,
 {
     httpd_file_t *file = xmalloc( sizeof( httpd_file_t ) );
 
-    if( ( file->url = httpd_UrlNewUnique( host, psz_url, psz_user,
-                                          psz_password, p_acl )
-        ) == NULL )
+    file->url = httpd_UrlNewPrivate( host, psz_url, psz_user, psz_password,
+                                     p_acl );
+    if( file->url == NULL )
     {
         free( file );
         return NULL;
@@ -595,9 +598,9 @@ httpd_handler_t *httpd_HandlerNew( httpd_host_t *host, const char *psz_url,
 {
     httpd_handler_t *handler = xmalloc( sizeof( httpd_handler_t ) );
 
-    if( ( handler->url = httpd_UrlNewUnique( host, psz_url, psz_user,
-                                             psz_password, p_acl )
-        ) == NULL )
+    handler->url = httpd_UrlNewPrivate( host, psz_url, psz_user, psz_password,
+                                        p_acl );
+    if( handler->url == NULL )
     {
         free( handler );
         return NULL;
@@ -666,7 +669,8 @@ httpd_redirect_t *httpd_RedirectNew( httpd_host_t *host, const char *psz_url_dst
 {
     httpd_redirect_t *rdir = xmalloc( sizeof( httpd_redirect_t ) );
 
-    if( !( rdir->url = httpd_UrlNewUnique( host, psz_url_src, NULL, NULL, NULL ) ) )
+    rdir->url = httpd_UrlNew( host, psz_url_src, NULL, NULL );
+    if( rdir->url == NULL )
     {
         free( rdir );
         return NULL;
@@ -849,9 +853,9 @@ httpd_stream_t *httpd_StreamNew( httpd_host_t *host,
 {
     httpd_stream_t *stream = xmalloc( sizeof( httpd_stream_t ) );
 
-    if( ( stream->url = httpd_UrlNewUnique( host, psz_url, psz_user,
-                                            psz_password, p_acl )
-        ) == NULL )
+    stream->url = httpd_UrlNewPrivate( host, psz_url, psz_user, psz_password,
+                                       p_acl );
+    if( stream->url == NULL )
     {
         free( stream );
         return NULL;
@@ -1237,12 +1241,10 @@ static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, const char *psz_url
     return url;
 }
 
-httpd_url_t *httpd_UrlNewUnique( httpd_host_t *host, const char *psz_url,
-                                 const char *psz_user, const char *psz_password,
-                                 const vlc_acl_t *p_acl )
+httpd_url_t *httpd_UrlNew( httpd_host_t *host, const char *psz_url,
+                           const char *psz_user, const char *psz_password )
 {
-    return httpd_UrlNewPrivate( host, psz_url, psz_user,
-                                psz_password, p_acl );
+    return httpd_UrlNewPrivate( host, psz_url, psz_user, psz_password, NULL );
 }
 
 /* register callback on a url */

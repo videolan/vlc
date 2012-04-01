@@ -183,11 +183,10 @@ void httpd_UrlDelete (httpd_url_t *url)
     assert (0);
 }
 
-httpd_url_t *httpd_UrlNewUnique (httpd_host_t *host, const char *url,
-                                 const char *login, const char *password,
-                                 const vlc_acl_t *acl)
+httpd_url_t *httpd_UrlNew (httpd_host_t *host, const char *url,
+                           const char *login, const char *password)
 {
-    (void) host; (void) url; (void) login; (void) password; (void) acl;
+    (void) host; (void) url; (void) login; (void) password;
     assert (0);
 }
 #endif /* !ENABLE_HTTPD */

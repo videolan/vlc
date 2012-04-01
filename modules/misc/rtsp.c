@@ -372,8 +372,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
                   p_sys->psz_path, psz_name ) <0 )
         return NULL;
     p_media->p_rtsp_url =
-        httpd_UrlNewUnique( p_sys->p_rtsp_host, p_media->psz_rtsp_path, NULL,
-                            NULL, NULL );
+        httpd_UrlNew( p_sys->p_rtsp_host, p_media->psz_rtsp_path, NULL, NULL );
 
     if( !p_media->p_rtsp_url )
     {
@@ -678,8 +677,7 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
     }
 
     p_es->p_rtsp_url =
-        httpd_UrlNewUnique( p_vod->p_sys->p_rtsp_host, psz_urlc, NULL, NULL,
-                            NULL );
+        httpd_UrlNew( p_vod->p_sys->p_rtsp_host, psz_urlc, NULL, NULL );
 
     if( !p_es->p_rtsp_url )
     {
