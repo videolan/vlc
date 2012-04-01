@@ -903,11 +903,13 @@ static VLCMainMenu *_o_sharedInstance = nil;
             return;
     }
 
-    /* Make sure we want to display the variable */
-    if( i_type & VLC_VAR_HASCHOICE )
+    /* Make sure we want to display the variable
+     * special case for spu-es, which we want to display in any case */
+    if( i_type & VLC_VAR_HASCHOICE && strcmp( psz_variable, "spu-es" ) )
     {
         var_Change( p_object, psz_variable, VLC_VAR_CHOICESCOUNT, &val, NULL );
-        if( val.i_int == 0 ) return;
+        if( val.i_int == 0 )
+            return;
         if( (i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE && val.i_int == 1 )
             return;
     }
@@ -926,6 +928,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         free( text.psz_string );
         return;
     }
+
     if( var_Get( p_object, psz_variable, &val ) < 0 )
     {
         return;
@@ -980,6 +983,28 @@ static VLCMainMenu *_o_sharedInstance = nil;
         [o_menu removeAllItems];
     }
 
+    /* Aspect Ratio */
+    if( [[o_parent title] isEqualToString: _NS("Aspect-ratio")] == YES )
+    {
+        NSMenuItem *o_lmi_tmp2;
+        o_lmi_tmp2 = [o_menu addItemWithTitle: _NS("Lock Aspect Ratio") action: @selector(lockVideosAspectRatio:) keyEquivalent: @""];
+        [o_lmi_tmp2 setTarget: self];
+        [o_lmi_tmp2 setEnabled: YES];
+        [o_lmi_tmp2 setState: [[VLCCoreInteraction sharedInstance] aspectRatioIsLocked]];
+        [o_parent setEnabled: YES];
+        [o_menu addItem: [NSMenuItem separatorItem]];
+    }
+
+    /* special case for the subtitles item */
+    if( [[o_parent title] isEqualToString: _NS("Subtitles Track")] == YES )
+    {
+        NSMenuItem * o_lmi_tmp;
+        o_lmi_tmp = [o_menu addItemWithTitle: _NS("Open File...") action: @selector(addSubtitleFile:) keyEquivalent: @""];
+        [o_lmi_tmp setTarget: [[VLCMain sharedInstance] controls]];
+        [o_lmi_tmp setEnabled: YES];
+        [o_parent setEnabled: YES];
+    }
+
     /* Check the type of the object variable */
     i_type = var_Type( p_object, psz_variable );
 
@@ -1022,28 +1047,9 @@ static VLCMainMenu *_o_sharedInstance = nil;
     /* make (un)sensitive */
     [o_parent setEnabled: ( val_list.p_list->i_count > 1 )];
 
-    /* Aspect Ratio */
-    if( [[o_parent title] isEqualToString: _NS("Aspect-ratio")] == YES )
-    {
-        NSMenuItem *o_lmi_tmp2;
-        o_lmi_tmp2 = [o_menu addItemWithTitle: _NS("Lock Aspect Ratio") action: @selector(lockVideosAspectRatio:) keyEquivalent: @""];
-        [o_lmi_tmp2 setTarget: self];
-        [o_lmi_tmp2 setEnabled: YES];
-        [o_lmi_tmp2 setState: [[VLCCoreInteraction sharedInstance] aspectRatioIsLocked]];
-        [o_parent setEnabled: YES];
-        [o_menu addItem: [NSMenuItem separatorItem]];
-    }
-
-    /* special case for the subtitles items */
+    /* another special case for the subtitles item */
     if( [[o_parent title] isEqualToString: _NS("Subtitles Track")] == YES )
-    {
-        NSMenuItem * o_lmi_tmp;
-        o_lmi_tmp = [o_menu addItemWithTitle: _NS("Open File...") action: @selector(addSubtitleFile:) keyEquivalent: @""];
-        [o_lmi_tmp setTarget: [[VLCMain sharedInstance] controls]];
-        [o_lmi_tmp setEnabled: YES];
-        [o_parent setEnabled: YES];
         [o_menu addItem: [NSMenuItem separatorItem]];
-    }
 
     for( i = 0; i < val_list.p_list->i_count; i++ )
     {
