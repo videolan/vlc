@@ -209,7 +209,13 @@ static int Open (vlc_object_t * p_this)
 
         for (;;)
         {
-            stream_Read (stream, head, 8);
+            if (stream_Read (stream, head, 8) < 8)
+            {
+                /* FIXME: don't give up if we have at least one valid track */
+                msg_Err (p_this, "incomplete SMF chunk, file is corrupted");
+                goto error;
+            }
+
             if (memcmp (head, "MTrk", 4) == 0)
                 break;
 
