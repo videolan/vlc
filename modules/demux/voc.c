@@ -357,6 +357,12 @@ static int ReadBlockHeader( demux_t *p_demux )
                     return VLC_EGENERIC;
             }
 
+            if( new_fmt.audio.i_channels == 0 )
+            {
+                msg_Err( p_demux, "0 channels detected" );
+                return VLC_EGENERIC;
+            }
+
             new_fmt.audio.i_bytes_per_frame = new_fmt.audio.i_channels
                 * (new_fmt.audio.i_bitspersample / 8);
             new_fmt.audio.i_frame_length = 1;
