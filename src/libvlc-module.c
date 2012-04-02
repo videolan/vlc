@@ -1779,9 +1779,9 @@ vlc_module_begin ()
     add_integer( "sub-autodetect-fuzzy", 3,
                  SUB_FUZZY_TEXT, SUB_FUZZY_LONGTEXT, true )
 #if defined( WIN32 ) || defined( __OS2__ )
-#   define SUB_PATH ".\\subtitles"
+#   define SUB_PATH ".\\subtitles, .\\subs"
 #else
-#   define SUB_PATH "./Subtitles, ./subtitles"
+#   define SUB_PATH "./Subtitles, ./subtitles, ./Subs, ./subs"
 #endif
     add_string( "sub-autodetect-path", SUB_PATH,
                  SUB_PATH_TEXT, SUB_PATH_LONGTEXT, true )
