@@ -261,6 +261,13 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    if( p_sys->fmt.audio.i_rate == 0 )
+    {
+        msg_Err( p_demux, "invalid samplerate: 0" );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
     /* add the es */
     p_sys->es = es_out_Add( p_demux->out, &p_sys->fmt );
 
