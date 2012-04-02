@@ -166,12 +166,7 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     /* we work-around a Cocoa limitation here, since you cannot delay an execution
      * on the main thread within a single call */
     b_progress_cancelled = NO;
-    if (VLCIntf)
-        [self performSelector:@selector(showProgressDialog:) withObject: o_value afterDelay:3.00];
-}
 
--(void)showProgressDialog: (NSValue *)o_value
-{
     dialog_progress_bar_t *p_dialog = [o_value pointerValue];
 
     if (!p_dialog || b_progress_cancelled)
@@ -195,6 +190,18 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
         [o_prog_description_txt setStringValue: [NSString stringWithUTF8String: p_dialog->message]];
     else
         [o_prog_description_txt setStringValue: @""];
+
+    if (VLCIntf)
+        [self performSelector:@selector(showProgressDialog:) withObject: o_value afterDelay:3.00];
+}
+
+-(void)showProgressDialog: (NSValue *)o_value
+{
+    dialog_progress_bar_t *p_dialog = [o_value pointerValue];
+
+    if (!p_dialog || b_progress_cancelled)
+        return;
+
     [o_prog_bar setDoubleValue: 0];
     [o_prog_bar setIndeterminate: YES];
     [o_prog_bar startAnimation: self];
