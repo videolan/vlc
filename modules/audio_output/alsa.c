@@ -580,22 +580,30 @@ static void Play (audio_output_t *aout, block_t *block)
         if (state != SND_PCM_STATE_RUNNING)
         {
             delay = block->i_pts - (mdate () + delay);
-            if (delay > 0 && aout->format.i_format != VLC_CODEC_SPDIFL)
+            if (delay > 0)
             {
-                frames = (delay * aout->format.i_rate) / CLOCK_FREQ;
-                msg_Dbg (aout, "prepending %ld zeroes", frames);
-
-                void *pad = calloc (frames, aout->format.i_bytes_per_frame);
-                if (likely(pad != NULL))
+                if (aout->format.i_format != VLC_CODEC_SPDIFL)
                 {
-                    snd_pcm_writei (pcm, pad, frames);
-                    free (pad);
-                    delay = 0;
+                    frames = (delay * aout->format.i_rate) / CLOCK_FREQ;
+                    msg_Dbg (aout, "prepending %ld zeroes", frames);
+
+                    void *z = calloc (frames, aout->format.i_bytes_per_frame);
+                    if (likely(z != NULL))
+                    {
+                        snd_pcm_writei (pcm, z, frames);
+                        free (z);
+                        delay = 0;
+                    }
+                }
+                /* Lame fallback if zero padding does not work */
+                if (delay > 0)
+                {
+                    msg_Dbg (aout, "deferring start (%"PRId64" us)", delay);
+                    msleep (delay);
                 }
             }
-            /* Lame fallback if zero padding does not work */
-            if (delay > 0)
-                mwait (block->i_pts - delay);
+            else
+                msg_Dbg (aout, "starting late (%"PRId64" us)", delay);
         }
         else
             aout_TimeReport (aout, block->i_pts - delay);
