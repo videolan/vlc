@@ -1494,12 +1494,7 @@ static int hls_DownloadSegmentData(stream_t *s, hls_stream_t *hls, segment_t *se
     msg_Info(s, "downloaded segment %d from stream %d",
                 segment->sequence, *cur_stream);
 
-    /* check for division by zero */
-    double ms = (double)duration / 1000.0; /* ms */
-    if (ms <= 0.0)
-        return VLC_SUCCESS;
-
-    uint64_t bw = ((double)(segment->size * 8) / ms) * 1000; /* bits / s */
+    uint64_t bw = segment->size * 8 * 1000000 / __MAX(1, duration); /* bits / s */
     p_sys->bandwidth = bw;
     if (p_sys->b_meta && (hls->bandwidth != bw))
     {
