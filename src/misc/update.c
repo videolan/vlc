@@ -75,17 +75,20 @@
  */
 
 #if defined( UNDER_CE )
-#   define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-ce"
+# define UPDATE_OS_SUFFIX "-ce"
+#elif defined( WIN64 )
+# define UPDATE_OS_SUFFIX "-win-x64"
 #elif defined( WIN32 )
-#  ifndef NDEBUG
-#    define UPDATE_VLC_STATUS_URL "http://update-test.videolan.org/vlc/status-win-x86"
-#  else
-#    define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-win-x86"
-#  endif
+# define UPDATE_OS_SUFFIX "-win-x86"
 #else
-#   define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status"
+# define UPDATE_OS_SUFFIX ""
 #endif
 
+#ifndef NDEBUG
+# define UPDATE_VLC_STATUS_URL "http://update-test.videolan.org/vlc/status-win-x86"
+#else
+# define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status" UPDATE_OS_SUFFIX
+#endif
 
 /*****************************************************************************
  * Update_t functions
