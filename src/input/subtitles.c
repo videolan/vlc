@@ -278,7 +278,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
         free( psz_fname );
         return NULL;
     }
-    *(f_fname++) = 0; /* skip dir separator */
+    *(++f_fname) = 0; /* keep dir separator in f_dir */
 
     i_fname_len = strlen( f_fname );
 
