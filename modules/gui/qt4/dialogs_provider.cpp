@@ -506,7 +506,7 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
     if( dir.isEmpty() )
         return;
 
-    p_intf->p_sys->filepath = qtu( dir );
+    p_intf->p_sys->filepath = dir;
 
     const char *scheme = "directory";
     if( dir.endsWith( "/VIDEO_TS", Qt::CaseInsensitive ) )
