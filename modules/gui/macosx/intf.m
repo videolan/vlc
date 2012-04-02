@@ -618,6 +618,13 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( OSX_LION )
         b_nativeFullscreenMode = config_GetInt( p_intf, "macosx-nativefullscreenmode" );
 #endif
+
+    /* recover stored audio device, if set
+     * in case it was unplugged in the meantime, auhal will fall back on the default */
+    int i_value = config_GetInt( p_intf, "macosx-audio-device" );
+    if (i_value > 0)
+        var_SetInteger( pl_Get( VLCIntf ), "audio-device", i_value );
+
     nib_main_loaded = TRUE;
 }
 

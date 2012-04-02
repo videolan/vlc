@@ -1129,6 +1129,10 @@ static VLCMainMenu *_o_sharedInstance = nil;
     if( !strcmp( [menuContent name], "fullscreen" ) || !strcmp( [menuContent name], "video-on-top" ) )
         var_Set( pl_Get( VLCIntf ), [menuContent name] , [menuContent value] );
 
+    /* save our audio device across multiple sessions */
+    if( !strcmp( [menuContent name], "audio-device" ) )
+        config_PutInt( VLCIntf, "macosx-audio-device", [menuContent value].i_int );
+
     p_object = [menuContent vlcObject];
 
     if( p_object != NULL )
