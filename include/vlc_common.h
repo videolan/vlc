@@ -334,23 +334,6 @@ typedef struct iso639_lang_t iso639_lang_t;
 typedef struct block_t      block_t;
 typedef struct block_fifo_t block_fifo_t;
 
-/* httpd */
-typedef struct httpd_t          httpd_t;
-typedef struct httpd_host_t     httpd_host_t;
-typedef struct httpd_url_t      httpd_url_t;
-typedef struct httpd_client_t   httpd_client_t;
-typedef struct httpd_callback_sys_t httpd_callback_sys_t;
-typedef struct httpd_message_t  httpd_message_t;
-typedef int    (*httpd_callback_t)( httpd_callback_sys_t *, httpd_client_t *, httpd_message_t *answer, const httpd_message_t *query );
-typedef struct httpd_file_t     httpd_file_t;
-typedef struct httpd_file_sys_t httpd_file_sys_t;
-typedef int (*httpd_file_callback_t)( httpd_file_sys_t *, httpd_file_t *, uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
-typedef struct httpd_handler_t  httpd_handler_t;
-typedef struct httpd_handler_sys_t httpd_handler_sys_t;
-typedef int (*httpd_handler_callback_t)( httpd_handler_sys_t *, httpd_handler_t *, char *psz_url, uint8_t *psz_request, int i_type, uint8_t *p_in, int i_in, char *psz_remote_addr, char *psz_remote_host, uint8_t **pp_data, int *pi_data );
-typedef struct httpd_redirect_t httpd_redirect_t;
-typedef struct httpd_stream_t httpd_stream_t;
-
 /* Hashing */
 typedef struct md5_s md5_t;
 

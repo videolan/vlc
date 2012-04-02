@@ -1013,7 +1013,7 @@ httpd_host_t *vlc_rtsp_HostNew( vlc_object_t *p_this )
     return httpd_HostCreate( p_this, "rtsp-host", "rtsp-port", NULL );
 }
 
-static struct httpd_t
+static struct httpd
 {
     vlc_mutex_t  mutex;
 
