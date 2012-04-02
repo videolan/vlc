@@ -569,7 +569,7 @@ void DiscOpenPanel::updateMRL()
 void DiscOpenPanel::browseDevice()
 {
     QString dir = QFileDialog::getExistingDirectory( this,
-            qtr( I_DEVICE_TOOLTIP ) );
+            qtr( I_DEVICE_TOOLTIP ), p_intf->p_sys->filepath );
     if( !dir.isEmpty() )
     {
         ui.deviceCombo->addItem( toNativeSepNoSlash( dir ) );
