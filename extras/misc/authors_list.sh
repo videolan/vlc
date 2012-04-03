@@ -13,11 +13,12 @@ echo "Checking all git logs"
 git shortlog -sn > temp_update_AUTHORS/all_git.txt
 
 echo "Checking "po only" git logs"
-git shortlog -sn po/ > temp_update_AUTHORS/po_git.txt
+git shortlog -sn po extras/package/win32/languages/ share/vlc.desktop.in > temp_update_AUTHORS/po_git.txt
+# Now, not only po/ is checked. This way, translators are identified better and we save some lines in coders (some translators-only are removed)
 
 echo "reading AUTHORS"
-sed -n '/Programming/,$  s/[^-].*/&/p' < AUTHORS | sed '1 d'  > temp_update_AUTHORS/programmers_part.txt
-# The bottom part of AUTHORS, could be done with one sed, but I don't care...
+sed -n '/Programming/,/^$/  s/[^-].*/&/p' < AUTHORS | sed '1 d'  > temp_update_AUTHORS/programmers_part.txt
+# The part of AUTHORS between Programming and the first empty line, without the ---- line
 
 
 echo "Removing commit counts from git log"
