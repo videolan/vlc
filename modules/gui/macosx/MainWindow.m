@@ -1404,6 +1404,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         b_nonembedded = YES;
     }
     [[o_video_view window] makeKeyAndOrderFront: self];
+    [[o_video_view window] setAlphaValue: config_GetFloat( VLCIntf, "macosx-opaqueness" )];
 
     if (p_vout)
     {
@@ -1421,7 +1422,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
     BOOL b_videoPlayback = [[VLCMain sharedInstance] activeVideoPlayback];
 
     if (!b_videoPlayback)
+    {
         [o_detached_video_window orderOut: nil];
+
+        // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
+        [self setAlphaValue:1.0];
+    }
+    
     if( b_nativeFullscreenMode )
     {
         if( [NSApp presentationOptions] & NSApplicationPresentationFullScreen )
@@ -1880,6 +1887,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_fullscreen_window release];
     o_fullscreen_window = nil;
     [[o_video_view window] setLevel:i_originalLevel];
+    [[o_video_view window] setAlphaValue: config_GetFloat( VLCIntf, "macosx-opaqueness" )];
 
     // if we quit fullscreen because there is no video anymore, make sure non-embedded window is not visible
     if( ![[VLCMain sharedInstance] activeVideoPlayback] && b_nonembedded )
