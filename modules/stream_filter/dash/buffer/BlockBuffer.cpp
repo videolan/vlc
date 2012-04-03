@@ -50,8 +50,6 @@ BlockBuffer::BlockBuffer    (stream_t *stream) :
 }
 BlockBuffer::~BlockBuffer   ()
 {
-    std::cout << "Delete buffer" << std::endl;
-
     block_Release(this->peekBlock);
 
     block_BytestreamRelease(&this->buffer);
