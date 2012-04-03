@@ -70,7 +70,7 @@ namespace dash
 
                 std::vector<IBufferObserver *> bufferObservers;
 
-                void reduceBufferMilliSec(size_t bytes);
+                void updateBufferSize(size_t bytes);
         };
     }
 }

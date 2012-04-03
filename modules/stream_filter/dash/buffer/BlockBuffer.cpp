@@ -117,14 +117,14 @@ int     BlockBuffer::get                  (void *p_data, unsigned int len)
 
     int ret = len > this->sizeBytes ? this->sizeBytes : len;
 
-    this->reduceBufferMilliSec(ret);
-
     if(p_data == NULL)
         block_SkipBytes(&this->buffer, ret);
     else
         block_GetBytes(&this->buffer, (uint8_t *)p_data, ret);
 
     block_BytestreamFlush(&this->buffer);
+    this->updateBufferSize(ret);
+
     this->notify();
 
     vlc_cond_signal(&this->empty);
@@ -178,47 +178,19 @@ void    BlockBuffer::notify               ()
     for(size_t i = 0; i < this->bufferObservers.size(); i++)
         this->bufferObservers.at(i)->bufferLevelChanged(this->sizeMicroSec, ((float)this->sizeMicroSec / this->capacityMicroSec) * 100);
 }
-void    BlockBuffer::reduceBufferMilliSec (size_t bytes)
+void    BlockBuffer::updateBufferSize     (size_t bytes)
 {
-    size_t  pos      = 0;
-    float   microsec = 0;
-
     block_t *block = this->buffer.p_block;
 
-    if(bytes < (block->i_buffer - this->buffer.i_offset))
-    {
-        pos = bytes;
-        microsec = ((float)block->i_length / block->i_buffer) * bytes;
-    }
-    else
-    {
-        pos = block->i_buffer - this->buffer.i_offset;
-        microsec = ((float)block->i_length / block->i_buffer) * (block->i_buffer - this->buffer.i_offset);
-    }
+    this->sizeMicroSec = 0;
 
-    while(pos < bytes)
+    while(block)
     {
+        this->sizeMicroSec += block->i_length;
         block = block->p_next;
-        if((bytes - pos) < (block->i_buffer - this->buffer.i_offset))
-        {
-            pos = bytes;
-            microsec += ((float)block->i_length / block->i_buffer) * (bytes - pos);
-        }
-        else
-        {
-            pos += block->i_buffer;
-            microsec += block->i_length;
-        }
     }
 
-    this->sizeMicroSec  -= microsec;
-    this->sizeBytes     -= bytes;
-
-    if(this->sizeMicroSec < 0)
-        this->sizeMicroSec = 0;
-
-    if(this->sizeBytes == 0)
-        this->sizeMicroSec = 0;
+    this->sizeBytes -= bytes;
 }
 mtime_t BlockBuffer::size                 ()
 {
