@@ -96,11 +96,11 @@ int                                 HTTPConnectionManager::read                 
 
     return ret;
 }
-void                HTTPConnectionManager::attach                   (IDownloadRateObserver *observer)
+void                                HTTPConnectionManager::attach                   (IDownloadRateObserver *observer)
 {
     this->rateObservers.push_back(observer);
 }
-void                HTTPConnectionManager::notify                   ()
+void                                HTTPConnectionManager::notify                   ()
 {
     if ( this->bpsAvg == 0 )
         return ;
