@@ -43,20 +43,6 @@ DASHManager::DASHManager    ( MPD *mpd,
              mpd            ( mpd ),
              stream         (stream)
 {
-    this->mpdManager        = mpd::MPDManagerFactory::create( mpd );
-    if ( this->mpdManager == NULL )
-        return ;
-    this->adaptationLogic   = AdaptationLogicFactory::create( this->logicType, this->mpdManager, this->stream);
-    if ( this->adaptationLogic == NULL )
-        return ;
-
-    this->conManager = new dash::http::HTTPConnectionManager(this->adaptationLogic, this->stream);
-
-    this->buffer     = new BlockBuffer(this->stream);
-    this->downloader = new DASHDownloader(this->conManager, this->buffer);
-
-    this->conManager->attach(this->adaptationLogic);
-    this->buffer->attach(this->adaptationLogic);
 }
 DASHManager::~DASHManager   ()
 {
@@ -69,6 +55,23 @@ DASHManager::~DASHManager   ()
 
 bool    DASHManager::start()
 {
+    this->mpdManager = mpd::MPDManagerFactory::create( mpd );
+
+    if ( this->mpdManager == NULL )
+        return false;
+
+    this->adaptationLogic = AdaptationLogicFactory::create( this->logicType, this->mpdManager, this->stream);
+
+    if ( this->adaptationLogic == NULL )
+        return false;
+
+    this->conManager = new dash::http::HTTPConnectionManager(this->adaptationLogic, this->stream);
+    this->buffer     = new BlockBuffer(this->stream);
+    this->downloader = new DASHDownloader(this->conManager, this->buffer);
+
+    this->conManager->attach(this->adaptationLogic);
+    this->buffer->attach(this->adaptationLogic);
+
     return this->downloader->start();
 }
 int     DASHManager::read( void *p_buffer, size_t len )
