@@ -95,7 +95,6 @@ Representation*         BasicCMManager::getRepresentation(Period *period, uint64
     std::vector<Group *>    groups = period->getGroups();
 
     Representation  *best = NULL;
-    std::cout << "Sarching for best representation with bitrate: " << bitrate << std::endl;
 
     for(size_t i = 0; i < groups.size(); i++)
     {
@@ -108,7 +107,6 @@ Representation*         BasicCMManager::getRepresentation(Period *period, uint64
                  ( currentBitrate > best->getBandwidth() &&
                    currentBitrate < bitrate ) )
             {
-                std::cout << "Found a better Representation (#" << j << ") in group #" << i << std::endl;
                 best = reps.at( j );
             }
         }

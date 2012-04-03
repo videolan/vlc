@@ -95,7 +95,6 @@ Representation*             IsoffMainManager::getRepresentation     (Period *per
     std::vector<AdaptationSet *> adaptationSets = period->getAdaptationSets();
 
     Representation  *best = NULL;
-    std::cout << "Searching for best representation with bitrate: " << bitrate << std::endl;
 
     for(size_t i = 0; i < adaptationSets.size(); i++)
     {
@@ -110,7 +109,6 @@ Representation*             IsoffMainManager::getRepresentation     (Period *per
             }
         }
     }
-    std::cout << "Found Representation bandwidth=" << best->getBandwidth() << std::endl;
     return best;
 }
 Period*                     IsoffMainManager::getNextPeriod         (Period *period)
@@ -135,9 +133,6 @@ Representation*             IsoffMainManager::getRepresentation     (Period *per
         return NULL;
 
     std::vector<AdaptationSet *> adaptationSets = period->getAdaptationSets();
-
-    std::cout << "Searching for best representation with bitrate: " << bitrate << " and resolution: " << width << "x" << height << std::endl;
-
     std::vector<Representation *> resMatchReps;
 
     int lowerWidth  = 0;
@@ -172,7 +167,6 @@ Representation*             IsoffMainManager::getRepresentation     (Period *per
             best = resMatchReps.at(j);
         }
     }
-    std::cout << "Found a better Representation bandwidth=" << best->getBandwidth()
-              << " and resolution: " << best->getWidth() << "x" << best->getHeight() << std::endl;
+
     return best;
 }
