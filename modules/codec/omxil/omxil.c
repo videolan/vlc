@@ -413,6 +413,15 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
         CHECK_ERROR(omx_error, "SetAudioParameters failed (%x : %s)",
                     omx_error, ErrorToString(omx_error));
     }
+    if (!strcmp(p_dec->p_sys->psz_component, "OMX.TI.DUCATI1.VIDEO.DECODER") &&
+                def->eDir == OMX_DirOutput)
+    {
+        /* When setting the output buffer size above, the decoder actually
+         * sets the buffer size to a lower value than what was chosen. If
+         * we try to allocate buffers of this size, it fails. Thus, forcibly
+         * use a larger buffer size. */
+        def->nBufferSize *= 2;
+    }
 
  error:
     return omx_error;
