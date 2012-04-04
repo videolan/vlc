@@ -453,6 +453,8 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
             p_fmt->video.i_visible_width = crop_rect.nWidth;
             p_fmt->video.i_height = crop_rect.nHeight;
             p_fmt->video.i_visible_height = crop_rect.nHeight;
+            if (def->format.video.eColorFormat == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar)
+                def->format.video.nSliceHeight -= crop_rect.nTop/2;
         }
         else
         {
