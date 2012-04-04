@@ -168,6 +168,18 @@ static int get_param_size(OMX_INDEXTYPE param_index)
     }
 }
 
+static int get_config_size(OMX_INDEXTYPE param_index)
+{
+    switch (param_index) {
+    case OMX_IndexConfigCommonOutputCrop:
+        return sizeof(OMX_CONFIG_RECTTYPE);
+    default:
+        /* Dynamically queried config indices could have any size, but
+         * are currently only used with OMX_BOOL. */
+        return sizeof(OMX_BOOL);
+    }
+}
+
 static OMX_ERRORTYPE iomx_send_command(OMX_HANDLETYPE component, OMX_COMMANDTYPE command, OMX_U32 param1, OMX_PTR)
 {
     OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
@@ -268,8 +280,13 @@ static OMX_ERRORTYPE iomx_get_extension_index(OMX_HANDLETYPE component, OMX_STRI
 static OMX_ERRORTYPE iomx_set_config(OMX_HANDLETYPE component, OMX_INDEXTYPE index, OMX_PTR param)
 {
     OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
-    /* TODO: Need a way to map index to param size */
-    return get_error(ctx->iomx->setConfig(node->node, index, param, sizeof(OMX_BOOL)));
+    return get_error(ctx->iomx->setConfig(node->node, index, param, get_config_size(index)));
+}
+
+static OMX_ERRORTYPE iomx_get_config(OMX_HANDLETYPE component, OMX_INDEXTYPE index, OMX_PTR param)
+{
+    OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
+    return get_error(ctx->iomx->getConfig(node->node, index, param, get_config_size(index)));
 }
 
 extern "C" {
@@ -302,6 +319,7 @@ OMX_ERRORTYPE PREFIX(OMX_GetHandle)(OMX_HANDLETYPE *handle_ptr, OMX_STRING compo
     component->ComponentRoleEnum = iomx_component_role_enum;
     component->GetExtensionIndex = iomx_get_extension_index;
     component->SetConfig = iomx_set_config;
+    component->GetConfig = iomx_get_config;
 
     *handle_ptr = component;
     node->handle = component;
