@@ -69,6 +69,7 @@ typedef struct OmxPort
     OmxFormatParam format_param;
 
     OMX_BOOL b_reconfigure;
+    OMX_BOOL b_update_def;
     OMX_BOOL b_direct;
     OMX_BOOL b_flushed;
 

@@ -1213,6 +1213,12 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         OMX_FIFO_PEEK(&p_sys->out.fifo, p_header);
         if(!p_header) break; /* No frame available */
 
+        if(p_sys->out.b_update_def)
+        {
+            omx_error = GetPortDefinition(p_dec, &p_sys->out, p_sys->out.p_fmt);
+            p_sys->out.b_update_def = 0;
+        }
+
         if(p_header->nFilledLen)
         {
             p_pic = p_header->pAppPrivate;
@@ -1320,9 +1326,16 @@ reconfig:
     for(i = 0; i < p_sys->ports; i++)
     {
         OmxPort *p_port = &p_sys->p_ports[i];
-        if(!p_port->b_reconfigure) continue;
-        p_port->b_reconfigure = 0;
-        omx_error = PortReconfigure(p_dec, p_port);
+        if(p_port->b_reconfigure)
+        {
+            omx_error = PortReconfigure(p_dec, p_port);
+            p_port->b_reconfigure = 0;
+        }
+        if(p_port->b_update_def)
+        {
+            omx_error = GetPortDefinition(p_dec, p_port, p_port->p_fmt);
+            p_port->b_update_def = 0;
+        }
     }
 
     return p_pic;
@@ -1638,6 +1651,12 @@ static OMX_ERRORTYPE OmxEventHandler( OMX_HANDLETYPE omx_handle,
             memset(&p_sys->sentinel_buffer, 0, sizeof(p_sys->sentinel_buffer));
             p_sys->sentinel_buffer.nFlags = OMX_BUFFERFLAG_EOS;
             OMX_FIFO_PUT(&p_sys->in.fifo, &p_sys->sentinel_buffer);
+        }
+        else if( data_2 == OMX_IndexConfigCommonOutputCrop )
+        {
+            for(i = 0; i < p_sys->ports; i++)
+                if(p_sys->p_ports[i].definition.nPortIndex == data_1)
+                    p_sys->p_ports[i].b_update_def = true;
         }
         else
         {
