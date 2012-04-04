@@ -1630,12 +1630,19 @@ static OMX_ERRORTYPE OmxEventHandler( OMX_HANDLETYPE omx_handle,
     case OMX_EventPortSettingsChanged:
         msg_Dbg( p_dec, "OmxEventHandler (%s, %u, %u)", EventToString(event),
                  (unsigned int)data_1, (unsigned int)data_2 );
-        for(i = 0; i < p_sys->ports; i++)
-            if(p_sys->p_ports[i].definition.eDir == OMX_DirOutput)
-                p_sys->p_ports[i].b_reconfigure = true;
-        memset(&p_sys->sentinel_buffer, 0, sizeof(p_sys->sentinel_buffer));
-        p_sys->sentinel_buffer.nFlags = OMX_BUFFERFLAG_EOS;
-        OMX_FIFO_PUT(&p_sys->in.fifo, &p_sys->sentinel_buffer);
+        if( data_2 == 0 || data_2 == OMX_IndexParamPortDefinition )
+        {
+            for(i = 0; i < p_sys->ports; i++)
+                if(p_sys->p_ports[i].definition.eDir == OMX_DirOutput)
+                    p_sys->p_ports[i].b_reconfigure = true;
+            memset(&p_sys->sentinel_buffer, 0, sizeof(p_sys->sentinel_buffer));
+            p_sys->sentinel_buffer.nFlags = OMX_BUFFERFLAG_EOS;
+            OMX_FIFO_PUT(&p_sys->in.fifo, &p_sys->sentinel_buffer);
+        }
+        else
+        {
+            msg_Dbg( p_dec, "Unhandled setting change %x", (unsigned int)data_2 );
+        }
         break;
 
     default:
