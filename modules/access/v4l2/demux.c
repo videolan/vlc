@@ -544,7 +544,6 @@ void DemuxClose( vlc_object_t *obj )
             break;
 
         case IO_METHOD_MMAP:
-        case IO_METHOD_USERPTR:
         {
             /* NOTE: Some buggy drivers hang if buffers are not unmapped before
              * streamoff */
@@ -552,8 +551,7 @@ void DemuxClose( vlc_object_t *obj )
             {
                 struct v4l2_buffer buf = {
                     .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
-                    .memory = ( sys->io == IO_METHOD_USERPTR ) ?
-                    V4L2_MEMORY_USERPTR : V4L2_MEMORY_MMAP,
+                    .memory = V4L2_MEMORY_MMAP,
                 };
                 v4l2_ioctl( fd, VIDIOC_DQBUF, &buf );
             }
@@ -575,11 +573,6 @@ void DemuxClose( vlc_object_t *obj )
             for( unsigned i = 0; i < sys->i_nbuffers; ++i )
                 v4l2_munmap( sys->p_buffers[i].start,
                              sys->p_buffers[i].length );
-            break;
-
-        case IO_METHOD_USERPTR:
-            for( unsigned i = 0; i < sys->i_nbuffers; ++i )
-               free( sys->p_buffers[i].start );
             break;
         }
         free( sys->p_buffers );

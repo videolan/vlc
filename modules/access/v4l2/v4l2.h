@@ -71,7 +71,6 @@ extern int (*v4l2_munmap) (void *, size_t);
 typedef enum {
     IO_METHOD_READ=1,
     IO_METHOD_MMAP,
-    IO_METHOD_USERPTR,
 } io_method;
 
 typedef struct vlc_v4l2_ctrl vlc_v4l2_ctrl_t;
