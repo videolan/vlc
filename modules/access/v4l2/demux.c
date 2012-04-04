@@ -264,27 +264,31 @@ static int InitVideo (demux_t *demux, int fd)
     msg_Dbg (demux, "device %s using driver %s (version %u.%u.%u) on %s",
             cap.card, cap.driver, (cap.version >> 16) & 0xFF,
             (cap.version >> 8) & 0xFF, cap.version & 0xFF, cap.bus_info);
-    msg_Dbg (demux, "the device has the capabilities: 0x%08X",
-             cap.capabilities );
-    msg_Dbg (demux, " (%c) Video Capture, (%c) Audio, (%c) Tuner, (%c) Radio",
-             (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE ? 'X' : ' '),
-             (cap.capabilities & V4L2_CAP_AUDIO ? 'X' : ' '),
-             (cap.capabilities & V4L2_CAP_TUNER ? 'X' : ' '),
-             (cap.capabilities & V4L2_CAP_RADIO ? 'X' : ' '));
-    msg_Dbg (demux, " (%c) Read/Write, (%c) Streaming, (%c) Asynchronous",
-             (cap.capabilities & V4L2_CAP_READWRITE ? 'X' : ' '),
-             (cap.capabilities & V4L2_CAP_STREAMING ? 'X' : ' '),
-             (cap.capabilities & V4L2_CAP_ASYNCIO ? 'X' : ' '));
 
-    if (!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE))
+    uint32_t caps;
+#ifdef V4L2_CAP_DEVICE_CAPS
+    if (cap.capabilities & V4L2_CAP_DEVICE_CAPS)
+    {
+        msg_Dbg (demux, " with capabilities 0x%08"PRIX32" "
+                 "(overall 0x%08"PRIX32")", cap.device_caps, cap.capabilities);
+        caps = cap.device_caps;
+    }
+    else
+#endif
+    {
+        msg_Dbg (demux, " with unknown capabilities  "
+                 "(overall 0x%08"PRIX32")", cap.capabilities);
+        caps = cap.capabilities;
+    }
+    if (!(caps & V4L2_CAP_VIDEO_CAPTURE))
     {
         msg_Err (demux, "not a video capture device");
         return -1;
     }
 
-    if (cap.capabilities & V4L2_CAP_STREAMING)
+    if (caps & V4L2_CAP_STREAMING)
         sys->io = IO_METHOD_MMAP;
-    else if (cap.capabilities & V4L2_CAP_READWRITE)
+    else if (caps & V4L2_CAP_READWRITE)
         sys->io = IO_METHOD_READ;
     else
     {
