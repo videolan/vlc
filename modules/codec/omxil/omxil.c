@@ -910,6 +910,7 @@ loaded:
     p_sys->out.p_fmt = &p_dec->fmt_out;
     p_sys->ports = 2;
     p_sys->p_ports = &p_sys->in;
+    p_sys->b_use_pts = 0;
 
     msg_Dbg(p_dec, "fmt in:%4.4s, out: %4.4s", (char *)&p_dec->fmt_in.i_codec,
             (char *)&p_dec->fmt_out.i_codec);
@@ -1051,6 +1052,8 @@ loaded:
     if(p_sys->b_error) goto error;
 
     p_dec->b_need_packetized = true;
+    if (!strcmp(p_sys->psz_component, "OMX.TI.DUCATI1.VIDEO.DECODER"))
+        p_sys->b_use_pts = 1;
     return VLC_SUCCESS;
 
  error:
@@ -1270,7 +1273,10 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         p_header->nFilledLen = p_block->i_buffer;
         p_header->nOffset = 0;
         p_header->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
-        p_header->nTimeStamp = p_block->i_dts;
+        if (p_sys->b_use_pts)
+            p_header->nTimeStamp = p_block->i_pts;
+        else
+            p_header->nTimeStamp = p_block->i_dts;
 
         /* In direct mode we pass the input pointer as is.
          * Otherwise we memcopy the data */
