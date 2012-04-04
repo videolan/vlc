@@ -237,17 +237,6 @@ static vlc_fourcc_t var_InheritFourCC (vlc_object_t *obj, const char *varname)
 }
 #define var_InheritFourCC(o, v) var_InheritFourCC(VLC_OBJECT(o), v)
 
-/**
- * List of V4L2 chromas were confident enough to use as fallbacks if the
- * user hasn't provided a --v4l2-chroma value.
- *
- * Try YUV chromas first, then RGB little endian and MJPEG as last resort.
- */
-static const uint32_t p_chroma_fallbacks[] =
-{ V4L2_PIX_FMT_YUV420, V4L2_PIX_FMT_YVU420, V4L2_PIX_FMT_YUV422P,
-  V4L2_PIX_FMT_YUYV, V4L2_PIX_FMT_UYVY, V4L2_PIX_FMT_BGR24,
-  V4L2_PIX_FMT_BGR32, V4L2_PIX_FMT_MJPEG, V4L2_PIX_FMT_JPEG };
-
 static int InitVideo (demux_t *demux, int fd)
 {
     demux_sys_t *sys = demux->p_sys;
