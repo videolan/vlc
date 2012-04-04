@@ -828,6 +828,7 @@ void PrintOmx(decoder_t *p_dec, OMX_HANDLETYPE omx_handle, OMX_U32 i_port)
             OmxFormatParam format_param;
             vlc_fourcc_t i_fourcc;
             const char *psz_name;
+            OMX_CONFIG_RECTTYPE crop_rect;
 
             if(i_port != OMX_ALL && i_port != param.nStartPortNumber + j)
                 continue;
@@ -864,14 +865,26 @@ void PrintOmx(decoder_t *p_dec, OMX_HANDLETYPE omx_handle, OMX_U32 i_port)
                     GetVlcChromaFormat( definition.format.video.eColorFormat,
                                         &i_fourcc, &psz_name );
 
-                msg_Dbg( p_dec, "  -> video %s %ix%i@%.2f (%i,%i) (%i,%i)", psz_name,
+                OMX_INIT_STRUCTURE(crop_rect);
+                crop_rect.nPortIndex = definition.nPortIndex;
+                omx_error = OMX_GetConfig(omx_handle, OMX_IndexConfigCommonOutputCrop, &crop_rect);
+                if (omx_error != OMX_ErrorNone)
+                {
+                    crop_rect.nLeft = crop_rect.nTop = 0;
+                    crop_rect.nWidth  = definition.format.video.nFrameWidth;
+                    crop_rect.nHeight = definition.format.video.nFrameHeight;
+                }
+
+                msg_Dbg( p_dec, "  -> video %s %ix%i@%.2f (%i,%i) (%i,%i) (%i,%i,%i,%i)", psz_name,
                          (int)definition.format.video.nFrameWidth,
                          (int)definition.format.video.nFrameHeight,
                          (float)definition.format.video.xFramerate/(float)(1<<16),
                          (int)definition.format.video.eCompressionFormat,
                          (int)definition.format.video.eColorFormat,
                          (int)definition.format.video.nStride,
-                         (int)definition.format.video.nSliceHeight);
+                         (int)definition.format.video.nSliceHeight,
+                         (int)crop_rect.nLeft, (int)crop_rect.nTop,
+                         (int)crop_rect.nWidth, (int)crop_rect.nHeight);
                 break;
 
             case OMX_PortDomainAudio:
