@@ -427,6 +427,7 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
     decoder_sys_t *p_sys = p_dec->p_sys;
     OMX_PARAM_PORTDEFINITIONTYPE *def = &p_port->definition;
     OMX_ERRORTYPE omx_error;
+    OMX_CONFIG_RECTTYPE crop_rect;
 
     omx_error = OMX_GetParameter(p_port->omx_handle,
                                  OMX_IndexParamPortDefinition, def);
@@ -442,6 +443,22 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
         p_fmt->video.i_visible_height = def->format.video.nFrameHeight;
         p_fmt->video.i_frame_rate = p_dec->fmt_in.video.i_frame_rate;
         p_fmt->video.i_frame_rate_base = p_dec->fmt_in.video.i_frame_rate_base;
+
+        OMX_INIT_STRUCTURE(crop_rect);
+        crop_rect.nPortIndex = def->nPortIndex;
+        omx_error = OMX_GetConfig(p_port->omx_handle, OMX_IndexConfigCommonOutputCrop, &crop_rect);
+        if (omx_error == OMX_ErrorNone)
+        {
+            p_fmt->video.i_width = crop_rect.nWidth;
+            p_fmt->video.i_visible_width = crop_rect.nWidth;
+            p_fmt->video.i_height = crop_rect.nHeight;
+            p_fmt->video.i_visible_height = crop_rect.nHeight;
+        }
+        else
+        {
+            /* Don't pass the error back to the caller, this isn't mandatory */
+            omx_error = OMX_ErrorNone;
+        }
 
         /* Hack: Nexus One (stock firmware with binary OMX driver blob)
          * claims to output 420Planar even though it in in practice is
