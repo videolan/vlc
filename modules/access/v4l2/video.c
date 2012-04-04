@@ -763,57 +763,47 @@ int SetupInput (vlc_object_t *obj, int fd)
 /*****************************************************************************
  * GrabVideo: Grab a video frame
  *****************************************************************************/
-block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
+block_t* GrabVideo (vlc_object_t *demux, demux_sys_t *sys)
 {
-    block_t *p_block;
-    struct v4l2_buffer buf;
+    struct v4l2_buffer buf = {
+        .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
+        .memory = V4L2_MEMORY_MMAP,
+    };
 
-    /* Grab Video Frame */
-    switch( p_sys->io )
+    /* Wait for next frame */
+    if (v4l2_ioctl (sys->i_fd, VIDIOC_DQBUF, &buf) < 0)
     {
-    case IO_METHOD_MMAP:
-        memset( &buf, 0, sizeof(buf) );
-        buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        buf.memory = V4L2_MEMORY_MMAP;
-
-        /* Wait for next frame */
-        if (v4l2_ioctl( p_sys->i_fd, VIDIOC_DQBUF, &buf ) < 0 )
+        switch (errno)
         {
-            switch( errno )
-            {
             case EAGAIN:
                 return NULL;
             case EIO:
                 /* Could ignore EIO, see spec. */
                 /* fall through */
             default:
-                msg_Err( p_demux, "Failed to wait (VIDIOC_DQBUF)" );
+                msg_Err (demux, "dequeue error: %m");
                 return NULL;
-               }
         }
-
-        if( buf.index >= p_sys->i_nbuffers ) {
-            msg_Err( p_demux, "Failed capturing new frame as i>=nbuffers" );
-            return NULL;
-        }
-
-        p_block = ProcessVideoFrame( p_demux, p_sys->p_buffers[buf.index].start, buf.bytesused );
-        if( !p_block )
-            return NULL;
-
-        /* Unlock */
-        if( v4l2_ioctl( p_sys->i_fd, VIDIOC_QBUF, &buf ) < 0 )
-        {
-            msg_Err( p_demux, "Failed to unlock (VIDIOC_QBUF)" );
-            block_Release( p_block );
-            return NULL;
-        }
-
-        break;
-    default:
-        assert(0);
     }
-    return p_block;
+
+    if (buf.index >= sys->i_nbuffers) {
+        msg_Err (demux, "Failed capturing new frame as i>=nbuffers");
+        return NULL;
+    }
+
+    block_t *block = ProcessVideoFrame(demux, sys->p_buffers[buf.index].start,
+                                       buf.bytesused);
+    if (block == NULL)
+        return NULL;
+
+    /* Unlock */
+    if (v4l2_ioctl (sys->i_fd, VIDIOC_QBUF, &buf) < 0)
+    {
+        msg_Err (demux, "queue error: %m");
+        block_Release (block);
+        return NULL;
+    }
+    return block;
 }
 
 /*****************************************************************************
