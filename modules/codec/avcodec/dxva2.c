@@ -646,6 +646,7 @@ static char *DxDescribe(vlc_va_dxva2_t *va)
     } vendors [] = {
         { 0x1002, "ATI" },
         { 0x10DE, "NVIDIA" },
+        { 0x1106, "VIA" },
         { 0x8086, "Intel" },
         { 0x5333, "S3 Graphics" },
         { 0, "" }
