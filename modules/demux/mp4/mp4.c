@@ -1988,11 +1988,14 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                             p_track->fmt.i_extra);
                 }
                 break;
-            case VLC_FOURCC( 's', 'a', 'm', 'r' ):
+
+            case VLC_CODEC_AMR_NB:
                 p_track->fmt.audio.i_rate = 8000;
+            case VLC_CODEC_AMR_WB:
+                p_track->fmt.audio.i_rate = 16000;
             case VLC_FOURCC( 'Q', 'D', 'M', 'C' ):
-            case VLC_FOURCC( 'Q', 'D', 'M', '2' ):
-            case VLC_FOURCC( 'a', 'l', 'a', 'c' ):
+            case VLC_CODEC_QDM2:
+            case VLC_CODEC_ALAC:
                 p_track->fmt.i_extra =
                     p_sample->data.p_sample_soun->i_qt_description;
                 if( p_track->fmt.i_extra > 0 )
@@ -2026,9 +2029,9 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 break;
             }
 
-            case VLC_FOURCC('m','s',0x00,0x02):
-            case VLC_FOURCC('m','s',0x00,0x11):
-            case VLC_FOURCC('Q','c','l','p'):
+            case VLC_CODEC_ADPCM_MS:
+            case VLC_CODEC_ADPCM_IMA_WAV:
+            case VLC_CODEC_QCELP:
                 p_track->fmt.audio.i_blockalign = p_sample->data.p_sample_soun->i_bytes_per_frame;
                 break;
 
