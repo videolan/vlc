@@ -426,6 +426,22 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_TIME:
             return VLC_EGENERIC;
 
+        case DEMUX_GET_ATTACHMENTS:
+        {
+            input_attachment_t ***ppp_attach =
+                (input_attachment_t***)va_arg( args, input_attachment_t*** );
+            int *pi_int = (int*)va_arg( args, int * );
+
+            if( p_sys->i_attachments <= 0 )
+                return VLC_EGENERIC;
+
+            *pi_int = p_sys->i_attachments;
+            *ppp_attach = xmalloc( sizeof(input_attachment_t**) * p_sys->i_attachments );
+            for( int i = 0; i < p_sys->i_attachments; i++ )
+                (*ppp_attach)[i] = vlc_input_attachment_Duplicate( p_sys->attachments[i] );
+            return VLC_SUCCESS;
+        }
+
         case DEMUX_SET_POSITION:
             /* forbid seeking if we haven't initialized all logical bitstreams yet;
                if we allowed, some headers would not get backed up and decoder init
