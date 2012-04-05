@@ -1914,6 +1914,9 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             case( 0xab ): /* DTS-HD Master Audio */
                 p_track->fmt.i_codec = VLC_CODEC_DTS;
                 break;
+            case( 0xDD ):
+                p_track->fmt.i_codec = VLC_CODEC_VORBIS;
+                break;
 
             /* Private ID */
             case( 0xe0 ): /* NeroDigital: dvd subs */
