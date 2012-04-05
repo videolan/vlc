@@ -572,7 +572,6 @@ static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, int i_data,
     /* TODO sort it by size and remove wrong seek entry (time not increasing) */
 }
 
-#define RM(x) do { i_data -= (x); p_data += (x); } while(0)
 static void ParseComment( demux_t *p_demux, const uint8_t *p_data, int i_data )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -600,43 +599,13 @@ static void ParsePicture( demux_t *p_demux, const uint8_t *p_data, int i_data )
     };
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_type;
-    int i_len;
-    char *psz_mime = NULL;
-    char *psz_description = NULL;
-    input_attachment_t *p_attachment;
-    char psz_name[128];
 
-    if( i_data < 4 + 3*4 )
+    i_data -= 4; p_data += 4;
+
+    input_attachment_t *p_attachment = ParseFlacPicture( p_data, i_data, p_sys->i_attachments, &i_type );
+    if( p_attachment == NULL )
         return;
-#define RM(x) do { i_data -= (x); p_data += (x); } while(0)
-    RM(4);
 
-    i_type = GetDWBE( p_data ); RM(4);
-    i_len = GetDWBE( p_data ); RM(4);
-    if( i_len < 0 || i_data < i_len + 4 )
-        goto error;
-    psz_mime = strndup( (const char*)p_data, i_len ); RM(i_len);
-    i_len = GetDWBE( p_data ); RM(4);
-    if( i_len < 0 || i_data < i_len + 4*4 + 4)
-        goto error;
-    psz_description = strndup( (const char*)p_data, i_len ); RM(i_len);
-    EnsureUTF8( psz_description );
-    RM(4*4);
-    i_len = GetDWBE( p_data ); RM(4);
-    if( i_len < 0 || i_len > i_data )
-        goto error;
-
-    msg_Dbg( p_demux, "Picture type=%d mime=%s description='%s' file length=%d",
-             i_type, psz_mime, psz_description, i_len );
-
-    snprintf( psz_name, sizeof(psz_name), "picture%d", p_sys->i_attachments );
-    if( !strcasecmp( psz_mime, "image/jpeg" ) )
-        strcat( psz_name, ".jpg" );
-    else if( !strcasecmp( psz_mime, "image/png" ) )
-        strcat( psz_name, ".png" );
-
-    p_attachment = vlc_input_attachment_New( psz_name, psz_mime, psz_description,
-                                             p_data, i_data );
     TAB_APPEND( p_sys->i_attachments, p_sys->attachments, p_attachment );
 
     if( i_type >= 0 && (unsigned int)i_type < sizeof(pi_cover_score)/sizeof(pi_cover_score[0]) &&
@@ -645,9 +614,5 @@ static void ParsePicture( demux_t *p_demux, const uint8_t *p_data, int i_data )
         p_sys->i_cover_idx = p_sys->i_attachments-1;
         p_sys->i_cover_score = pi_cover_score[i_type];
     }
-error:
-    free( psz_mime );
-    free( psz_description );
 }
-#undef RM
 
