@@ -103,6 +103,11 @@ struct buffer_t
 /* video.c */
 void ParseMRL(vlc_object_t *, const char *);
 int SetupInput (vlc_object_t *, int fd);
+int SetupFormat (vlc_object_t *, int, uint32_t,
+                 struct v4l2_format *, struct v4l2_streamparm *);
+#define SetupFormat(o,fd,fcc,fmt,p) \
+        SetupFormat(VLC_OBJECT(o),fd,fcc,fmt,p)
+
 int InitMmap (vlc_object_t *, demux_sys_t *, int);
 block_t* GrabVideo(vlc_object_t *, demux_sys_t *);
 

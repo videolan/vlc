@@ -338,66 +338,20 @@ static int InitVideo (demux_t *demux, int fd)
     msg_Dbg (demux, "selected format %4.4s (%4.4s)",
              (const char *)&selected->v4l2, (const char *)&selected->vlc);
 
-    struct v4l2_format fmt = { .type = V4L2_BUF_TYPE_VIDEO_CAPTURE };
-    if (v4l2_ioctl (fd, VIDIOC_G_FMT, &fmt) < 0)
-    {
-        msg_Err (demux, "cannot get device default format: %m");
+    /* Find best resolution and frame rate available */
+    struct v4l2_format fmt;
+    struct v4l2_streamparm parm;
+    if (SetupFormat (demux, fd, selected->v4l2, &fmt, &parm))
         return -1;
-    }
 
-    fmt.fmt.pix.pixelformat = selected->v4l2;
-
+#if 0
     uint32_t width = var_InheritInteger (demux, CFG_PREFIX"width");
     if (width != (uint32_t)-1)
         fmt.fmt.pix.width = width; /* override width */
     uint32_t height = var_InheritInteger (demux, CFG_PREFIX"height");
     if (height != (uint32_t)-1)
         fmt.fmt.pix.height = height; /* override height */
-
-    if (v4l2_ioctl (fd, VIDIOC_S_FMT, &fmt) < 0)
-    {
-        msg_Err (demux, "cannot set format: %m");
-        return -1;
-    }
-
-    /* Try and find default resolution if not specified */
-    float fps = 0.;
-    if (width == (uint32_t)-1 || height == (uint32_t)-1)
-    {
-        fps = var_InheritFloat (demux, CFG_PREFIX"fps");
-        if (fps <= 0.)
-        {
-            fps = GetAbsoluteMaxFrameRate (VLC_OBJECT(demux), fd,
-                                           fmt.fmt.pix.pixelformat);
-            msg_Dbg (demux, "Found maximum framerate of %f", fps);
-        }
-        uint32_t i_width, i_height;
-        GetMaxDimensions (VLC_OBJECT(demux), fd, fmt.fmt.pix.pixelformat, fps,
-                          &i_width, &i_height);
-        if (i_width || i_height)
-        {
-            msg_Dbg (demux, "Found optimal dimensions for framerate %f "
-                            "of %ux%u", fps, i_width, i_height);
-            fmt.fmt.pix.width = i_width;
-            fmt.fmt.pix.height = i_height;
-            if (v4l2_ioctl (fd, VIDIOC_S_FMT, &fmt) < 0)
-            {
-                msg_Err (demux, "Cannot set size to optimal dimensions %ux%u",
-                         i_width, i_height);
-                return -1;
-            }
-        }
-        else
-        {
-            msg_Warn (demux, "Could not find optimal width and height, "
-                      "falling back to driver default.");
-        }
-    }
-
-    width = fmt.fmt.pix.width;
-    height = fmt.fmt.pix.height;
-
-    if (v4l2_ioctl (fd, VIDIOC_G_FMT, &fmt) < 0) {;}
+#endif
 
     /* Print extra info */
     msg_Dbg (demux, "%d bytes maximum for complete image",
@@ -429,7 +383,7 @@ static int InitVideo (demux_t *demux, int fd)
             break;
         case V4L2_FIELD_ALTERNATE:
             msg_Dbg (demux, "Interlacing setting: alternate fields (TODO)");
-            height *= 2;
+            fmt.fmt.pix.height *= 2;
             break;
         case V4L2_FIELD_INTERLACED_TB:
             msg_Dbg (demux, "Interlacing setting: interleaved top bottom");
@@ -445,12 +399,35 @@ static int InitVideo (demux_t *demux, int fd)
             break;
     }
 
-    /* Look up final fourcc */
+    /* Declare our unique elementary (video) stream */
     es_format_t es_fmt;
+
     es_format_Init (&es_fmt, VIDEO_ES, selected->vlc);
     es_fmt.video.i_rmask = selected->red;
     es_fmt.video.i_gmask = selected->green;
     es_fmt.video.i_bmask = selected->blue;
+    es_fmt.video.i_width = fmt.fmt.pix.width;
+    es_fmt.video.i_height = fmt.fmt.pix.height;
+    es_fmt.video.i_frame_rate = parm.parm.capture.timeperframe.denominator;
+    es_fmt.video.i_frame_rate_base = parm.parm.capture.timeperframe.numerator;
+
+    int ar = 4 * VOUT_ASPECT_FACTOR / 3;
+    char *str = var_InheritString (demux, CFG_PREFIX"aspect-ratio");
+    if (likely(str != NULL))
+    {
+        const char *delim = strchr (str, ':');
+        if (delim != NULL)
+            ar = atoi (str) * VOUT_ASPECT_FACTOR / atoi (delim + 1);
+        free (str);
+    }
+    es_fmt.video.i_sar_num = ar * es_fmt.video.i_height;
+    es_fmt.video.i_sar_den = VOUT_ASPECT_FACTOR * es_fmt.video.i_width;
+
+    msg_Dbg (demux, "added new video es %4.4s %dx%d", (char *)&es_fmt.i_codec,
+             es_fmt.video.i_width, es_fmt.video.i_height);
+    msg_Dbg (demux, " frame rate: %u/%u", es_fmt.video.i_frame_rate,
+             es_fmt.video.i_frame_rate_base);
+    sys->p_es = es_out_Add (demux->out, &es_fmt);
 
     /* Init I/O method */
     switch (sys->io)
@@ -489,33 +466,6 @@ static int InitVideo (demux_t *demux, int fd)
         assert (0);
     }
 
-    int ar = 4 * VOUT_ASPECT_FACTOR / 3;
-    char *str = var_InheritString (demux, CFG_PREFIX"aspect-ratio");
-    if (likely(str != NULL))
-    {
-        const char *delim = strchr (str, ':');
-        if (delim != NULL)
-            ar = atoi (str) * VOUT_ASPECT_FACTOR / atoi (delim + 1);
-        free (str);
-    }
-
-    /* Add */
-    es_fmt.video.i_width  = width;
-    es_fmt.video.i_height = height;
-
-    /* Get aspect-ratio */
-    es_fmt.video.i_sar_num = ar * es_fmt.video.i_height;
-    es_fmt.video.i_sar_den = VOUT_ASPECT_FACTOR * es_fmt.video.i_width;
-
-    /* Framerate */
-    es_fmt.video.i_frame_rate = lround (fps * 1000000.);
-    es_fmt.video.i_frame_rate_base = 1000000;
-
-    msg_Dbg (demux, "added new video es %4.4s %dx%d", (char *)&es_fmt.i_codec,
-             es_fmt.video.i_width, es_fmt.video.i_height);
-    msg_Dbg (demux, " frame rate: %f", fps);
-
-    sys->p_es = es_out_Add (demux->out, &es_fmt);
     return 0;
 }
 
@@ -659,175 +609,4 @@ static int Demux( demux_t *demux )
     es_out_Control( demux->out, ES_OUT_SET_PCR, block->i_pts );
     es_out_Send( demux->out, sys->p_es, block );
     return 1;
-}
-
-static float GetMaxFPS( vlc_object_t *obj, int fd, uint32_t pixel_format,
-                        uint32_t width, uint32_t height )
-{
-#ifdef VIDIOC_ENUM_FRAMEINTERVALS
-    /* This is new in Linux 2.6.19 */
-    struct v4l2_frmivalenum fie = {
-        .pixel_format = pixel_format,
-        .width = width,
-        .height = height,
-    };
-
-    if( v4l2_ioctl( fd, VIDIOC_ENUM_FRAMEINTERVALS, &fie ) < 0 )
-        return -1.;
-
-    switch( fie.type )
-    {
-        case V4L2_FRMIVAL_TYPE_DISCRETE:
-        {
-            float max = -1.;
-            do
-            {
-                float fps = (float)fie.discrete.denominator
-                          / (float)fie.discrete.numerator;
-                if( fps > max )
-                    max = fps;
-                msg_Dbg( obj, "  discrete frame interval %"PRIu32"/%"PRIu32
-                         " supported",
-                         fie.discrete.numerator, fie.discrete.denominator );
-                fie.index++;
-            } while( v4l2_ioctl( fd, VIDIOC_ENUM_FRAMEINTERVALS, &fie ) >= 0 );
-            return max;
-        }
-
-        case V4L2_FRMIVAL_TYPE_STEPWISE:
-        case V4L2_FRMIVAL_TYPE_CONTINUOUS:
-            msg_Dbg( obj, "  frame intervals from %"PRIu32"/%"PRIu32
-                    "to %"PRIu32"/%"PRIu32" supported",
-                    fie.stepwise.min.numerator, fie.stepwise.min.denominator,
-                    fie.stepwise.max.numerator, fie.stepwise.max.denominator );
-            if( fie.type == V4L2_FRMIVAL_TYPE_STEPWISE )
-                msg_Dbg( obj, "  with %"PRIu32"/%"PRIu32" step",
-                         fie.stepwise.step.numerator,
-                         fie.stepwise.step.denominator );
-            return __MAX( (float)fie.stepwise.max.denominator
-                        / (float)fie.stepwise.max.numerator,
-                          (float)fie.stepwise.min.denominator
-                        / (float)fie.stepwise.min.numerator );
-    }
-#endif
-    return -1.;
-}
-
-float GetAbsoluteMaxFrameRate( vlc_object_t *obj, int fd,
-                               uint32_t pixel_format )
-{
-#ifdef VIDIOC_ENUM_FRAMESIZES
-    /* This is new in Linux 2.6.19 */
-    struct v4l2_frmsizeenum fse = {
-        .pixel_format = pixel_format
-    };
-
-    if( v4l2_ioctl( fd, VIDIOC_ENUM_FRAMESIZES, &fse ) < 0 )
-        return -1.;
-
-    float max = -1.;
-    switch( fse.type )
-    {
-      case V4L2_FRMSIZE_TYPE_DISCRETE:
-        do
-        {
-            float fps = GetMaxFPS( obj, fd, pixel_format,
-                                   fse.discrete.width, fse.discrete.height );
-            if( fps > max )
-                max = fps;
-            fse.index++;
-        } while( v4l2_ioctl( fd, VIDIOC_ENUM_FRAMESIZES, &fse ) >= 0 );
-        break;
-
-      case V4L2_FRMSIZE_TYPE_STEPWISE:
-      case V4L2_FRMSIZE_TYPE_CONTINUOUS:
-        msg_Dbg( obj, " sizes from %"PRIu32"x%"PRIu32" "
-                 "to %"PRIu32"x%"PRIu32" supported",
-                 fse.stepwise.min_width, fse.stepwise.min_height,
-                 fse.stepwise.max_width, fse.stepwise.max_height );
-        if( fse.type == V4L2_FRMSIZE_TYPE_STEPWISE )
-            msg_Dbg( obj, "  with %"PRIu32"x%"PRIu32" steps",
-                     fse.stepwise.step_width, fse.stepwise.step_height );
-
-        for( uint32_t width =  fse.stepwise.min_width;
-                      width <= fse.stepwise.max_width;
-                      width += fse.stepwise.step_width )
-            for( uint32_t height =  fse.stepwise.min_height;
-                          height <= fse.stepwise.max_width;
-                          height += fse.stepwise.step_height )
-            {
-                float fps = GetMaxFPS( obj, fd, pixel_format, width, height );
-                if( fps > max )
-                    max = fps;
-            }
-        break;
-    }
-    return max;
-#else
-    return -1.;
-#endif
-}
-
-void GetMaxDimensions( vlc_object_t *obj, int fd, uint32_t pixel_format,
-                       float fps_min, uint32_t *pwidth, uint32_t *pheight )
-{
-    *pwidth = 0;
-    *pheight = 0;
-
-#ifdef VIDIOC_ENUM_FRAMESIZES
-    /* This is new in Linux 2.6.19 */
-    struct v4l2_frmsizeenum fse = {
-        .pixel_format = pixel_format
-    };
-
-    if( v4l2_ioctl( fd, VIDIOC_ENUM_FRAMESIZES, &fse ) < 0 )
-        return;
-
-    switch( fse.type )
-    {
-      case V4L2_FRMSIZE_TYPE_DISCRETE:
-        do
-        {
-            msg_Dbg( obj, " discrete size %"PRIu32"x%"PRIu32" supported",
-                     fse.discrete.width, fse.discrete.height );
-
-            float fps = GetMaxFPS( obj, fd, pixel_format,
-                                   fse.discrete.width, fse.discrete.height );
-            if( fps >= fps_min && fse.discrete.width > *pwidth )
-            {
-                *pwidth = fse.discrete.width;
-                *pheight = fse.discrete.height;
-            }
-            fse.index++;
-        }
-        while( v4l2_ioctl( fd, VIDIOC_ENUM_FRAMESIZES, &fse ) >= 0 );
-        break;
-
-      case V4L2_FRMSIZE_TYPE_STEPWISE:
-      case V4L2_FRMSIZE_TYPE_CONTINUOUS:
-        msg_Dbg( obj, " sizes from %"PRIu32"x%"PRIu32" "
-                 "to %"PRIu32"x%"PRIu32" supported",
-                 fse.stepwise.min_width, fse.stepwise.min_height,
-                 fse.stepwise.max_width, fse.stepwise.max_height );
-        if( fse.type == V4L2_FRMSIZE_TYPE_STEPWISE )
-            msg_Dbg( obj, "  with %"PRIu32"x%"PRIu32" steps",
-                     fse.stepwise.step_width, fse.stepwise.step_height );
-
-        for( uint32_t width =  fse.stepwise.min_width;
-                      width <= fse.stepwise.max_width;
-                      width += fse.stepwise.step_width )
-            for( uint32_t height = fse.stepwise.min_height;
-                          height <= fse.stepwise.max_width;
-                          height += fse.stepwise.step_height )
-            {
-                float fps = GetMaxFPS( obj, fd, pixel_format, width, height );
-                if( fps >= fps_min && width > *pwidth )
-                {
-                    *pwidth = width;
-                    *pheight = height;
-                }
-            }
-        break;
-    }
-#endif
 }

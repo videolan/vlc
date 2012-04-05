@@ -760,6 +760,206 @@ int SetupInput (vlc_object_t *obj, int fd)
     return 0;
 }
 
+/** Compares two V4L2 fractions. */
+static int64_t fcmp (struct v4l2_fract a, struct v4l2_fract b)
+{
+    return (uint64_t)a.numerator * b.denominator
+         - (uint64_t)b.numerator * a.denominator;
+}
+
+/**
+ * Finds the highest frame rate possible of a certain V4L2 format.
+ * @param fmt V4L2 capture format [IN]
+ * @param it V4L2 frame interval [OUT]
+ * @return 0 on success, -1 on failure.
+ */
+static int FindMaxRate (vlc_object_t *obj, int fd,
+                        const struct v4l2_format *restrict fmt,
+                        struct v4l2_fract *restrict it)
+{
+    struct v4l2_frmivalenum fie = {
+        .pixel_format = fmt->fmt.pix.pixelformat,
+        .width = fmt->fmt.pix.width,
+        .height = fmt->fmt.pix.height,
+    };
+    /* Mind that maximum rate means minimum interval */
+    struct v4l2_fract min = { 1, 0 }; /* infinity */
+
+    if (v4l2_ioctl (fd, VIDIOC_ENUM_FRAMEINTERVALS, &fie) < 0)
+    {
+        msg_Dbg (obj, "  unknown frame internals: %m");
+        return -1;
+    }
+
+    switch (fie.type)
+    {
+        case V4L2_FRMIVAL_TYPE_DISCRETE:
+            do
+            {
+                if (fcmp (fie.discrete, min) < 0)
+                    min = fie.discrete;
+                msg_Dbg (obj, "  discrete frame interval: %"PRIu32"/%"PRIu32,
+                         fie.discrete.numerator, fie.discrete.denominator);
+                fie.index++;
+            }
+            while (v4l2_ioctl (fd, VIDIOC_ENUM_FRAMEINTERVALS, &fie) >= 0);
+
+            msg_Dbg (obj, "  best discrete frame interval: %"PRIu32"/%"PRIu32,
+                     min.numerator, min.denominator);
+            break;
+
+        case V4L2_FRMIVAL_TYPE_STEPWISE:
+        case V4L2_FRMIVAL_TYPE_CONTINUOUS:
+            msg_Dbg (obj, "  frame intervals from %"PRIu32"/%"PRIu32
+                     "to %"PRIu32"/%"PRIu32" supported",
+                     fie.stepwise.min.numerator, fie.stepwise.min.denominator,
+                     fie.stepwise.max.numerator, fie.stepwise.max.denominator);
+            if (fie.type == V4L2_FRMIVAL_TYPE_STEPWISE)
+                msg_Dbg (obj, "  with %"PRIu32"/%"PRIu32" step",
+                         fie.stepwise.step.numerator,
+                         fie.stepwise.step.denominator);
+            min = fie.stepwise.min;
+            break;
+    }
+
+    *it = min;
+    return 0;
+}
+
+#undef SetupFormat
+/**
+ * Finds the best possible frame rate and resolution.
+ * @param fourcc pixel format
+ * @param fmt V4L2 capture format [OUT]
+ * @param parm V4L2 capture streaming parameters [OUT]
+ * @return 0 on success, -1 on failure.
+ */
+int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
+                 struct v4l2_format *restrict fmt,
+                 struct v4l2_streamparm *restrict parm)
+{
+    memset (fmt, 0, sizeof (*fmt));
+    fmt->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    memset (parm, 0, sizeof (*parm));
+    parm->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+    if (v4l2_ioctl (fd, VIDIOC_G_FMT, fmt) < 0)
+    {
+        msg_Err (obj, "cannot get default format: %m");
+        return -1;
+    }
+    fmt->fmt.pix.pixelformat = fourcc;
+    if (v4l2_ioctl (fd, VIDIOC_G_PARM, parm) < 0)
+    {
+        msg_Err (obj, "cannot get streaming parameters: %m");
+        return -1;
+    }
+
+    struct v4l2_frmsizeenum fse = {
+        .pixel_format = fourcc,
+    };
+    struct v4l2_fract best_it = { 1, 0 }; /* infinity */
+    uint64_t best_area = 0;
+
+    if (v4l2_ioctl (fd, VIDIOC_ENUM_FRAMESIZES, &fse) < 0)
+    {
+        /* Fallback to current format, try to maximize frame rate */
+        msg_Dbg (obj, " unknown frame sizes: %m");
+        msg_Dbg (obj, " default frame size: %"PRIu32"x%"PRIu32,
+                 fmt->fmt.pix.width, fmt->fmt.pix.height);
+        if (!(parm->parm.capture.capability & V4L2_CAP_TIMEPERFRAME)
+         || FindMaxRate (obj, fd, fmt, &best_it))
+        {
+            best_it = parm->parm.capture.timeperframe;
+            msg_Dbg (obj, "  constant frame interval: %"PRIu32"/%"PRIu32,
+                     best_it.numerator, best_it.denominator);
+        }
+    }
+    else
+    switch (fse.type)
+    {
+        case V4L2_FRMSIZE_TYPE_DISCRETE:
+            do
+            {
+                struct v4l2_fract cur_it;
+
+                msg_Dbg (obj, " frame size %"PRIu32"x%"PRIu32,
+                         fse.discrete.width, fse.discrete.height);
+                if (FindMaxRate (obj, fd, fmt, &cur_it))
+                    /* If frame rate is not known, find largest resolution */
+                    cur_it.denominator = 0;
+
+                int64_t c = fcmp (cur_it, best_it);
+                uint64_t area = fse.discrete.width * fse.discrete.height;
+                if (c < 0 || (c == 0 && area > best_area))
+                {
+                    best_it = cur_it;
+                    best_area = area;
+                    fmt->fmt.pix.width = fse.discrete.width;
+                    fmt->fmt.pix.height = fse.discrete.height;
+                }
+
+                fse.index++;
+            }
+            while (v4l2_ioctl (fd, VIDIOC_ENUM_FRAMESIZES, &fse) >= 0);
+
+            msg_Dbg (obj, " best discrete frame size: %"PRIu32"x%"PRIu32,
+                     fmt->fmt.pix.width, fmt->fmt.pix.height);
+            break;
+
+        case V4L2_FRMSIZE_TYPE_STEPWISE:
+        case V4L2_FRMSIZE_TYPE_CONTINUOUS:
+            msg_Dbg (obj, " frame sizes from %"PRIu32"x%"PRIu32" to "
+                     "%"PRIu32"x%"PRIu32" supported",
+                     fse.stepwise.min_width, fse.stepwise.min_height,
+                     fse.stepwise.max_width, fse.stepwise.max_height);
+            if (fse.type == V4L2_FRMSIZE_TYPE_STEPWISE)
+                msg_Dbg (obj, "  with %"PRIu32"x%"PRIu32" steps",
+                         fse.stepwise.step_width, fse.stepwise.step_height);
+
+            /* FIXME: slow and dumb */
+            for (uint32_t width =  fse.stepwise.min_width;
+                          width <= fse.stepwise.max_width;
+                          width += fse.stepwise.step_width)
+                for (uint32_t height =  fse.stepwise.min_height;
+                              height <= fse.stepwise.max_width;
+                              height += fse.stepwise.step_height)
+                {
+                    struct v4l2_fract cur_it;
+
+                    if (FindMaxRate (obj, fd, fmt, &cur_it))
+                        continue;
+
+                    int64_t c = fcmp (cur_it, best_it);
+                    uint64_t area = width * height;
+
+                    if (c < 0 || (c == 0 && area > best_area))
+                    {
+                        best_it = cur_it;
+                        best_area = area;
+                        fmt->fmt.pix.width = width;
+                        fmt->fmt.pix.height = height;
+                    }
+                }
+
+            msg_Dbg (obj, " best frame size: %"PRIu32"x%"PRIu32,
+                     fmt->fmt.pix.width, fmt->fmt.pix.height);
+            break;
+    }
+
+    if (v4l2_ioctl (fd, VIDIOC_S_FMT, fmt) < 0)
+    {
+        msg_Err (obj, "cannot set format: %m");
+        return -1;
+    }
+
+    parm->parm.capture.timeperframe = best_it;
+    if (v4l2_ioctl (fd, VIDIOC_S_PARM, parm) < 0)
+        msg_Warn (obj, "cannot set streaming parameters: %m");
+    return 0;
+}
+
+
 /*****************************************************************************
  * GrabVideo: Grab a video frame
  *****************************************************************************/
