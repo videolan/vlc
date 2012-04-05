@@ -66,6 +66,7 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
     bool hasDescription = false;
     bool hasGenre = false;
     bool hasDate = false;
+    bool hasPublisher = false;
 
     for( ; i_comment > 0; i_comment-- )
     {
@@ -104,6 +105,7 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
         else IF_EXTRACT("TRACKNUMBER=", TrackNumber )
         else IF_EXTRACT("ARTIST=", Artist )
         else IF_EXTRACT("COPYRIGHT=", Copyright )
+        else IF_EXTRACT("ORGANIZATION=", Publisher )
         else IF_EXTRACT("DESCRIPTION=", Description )
         else IF_EXTRACT("GENRE=", Genre )
         else IF_EXTRACT("DATE=", Date )
