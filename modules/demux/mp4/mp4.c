@@ -683,7 +683,7 @@ static int Demux( demux_t *p_demux )
 
                 else if( tk->fmt.i_cat == SPU_ES )
                 {
-                    if( tk->fmt.i_codec == VLC_FOURCC( 's', 'u', 'b', 't' ) &&
+                    if( tk->fmt.i_codec == VLC_CODEC_SUBT &&
                         p_block->i_buffer >= 2 )
                     {
                         size_t i_size = GetWBE( p_block->p_buffer );
@@ -1125,7 +1125,7 @@ static void LoadChapter( demux_t  *p_demux )
             {
                 mp4_track_t *tk = &p_sys->track[j];
                 if( tk->b_ok && tk->i_track_ID == p_chap->i_track_ID[i] &&
-                    tk->fmt.i_cat == SPU_ES && tk->fmt.i_codec == VLC_FOURCC( 's', 'u', 'b', 't' ) )
+                    tk->fmt.i_cat == SPU_ES && tk->fmt.i_codec == VLC_CODEC_SUBT )
                     break;
             }
             if( j < p_sys->i_tracks )
@@ -1676,14 +1676,14 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         case( VLC_FOURCC( '.', 'm', 'p', '3' ) ):
         case( VLC_FOURCC( 'm', 's', 0x00, 0x55 ) ):
         {
-            p_track->fmt.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'a' );
+            p_track->fmt.i_codec = VLC_CODEC_MPGA;
             break;
         }
         case( VLC_FOURCC( 'a', 'c', '-', '3' ) ):
         {
             MP4_Box_t *p_dac3_box = MP4_BoxGet(  p_sample, "dac3", 0 );
 
-            p_track->fmt.i_codec = VLC_FOURCC( 'a', '5', '2', ' ' );
+            p_track->fmt.i_codec = VLC_CODEC_A52;
             if( p_dac3_box )
             {
                 static const int pi_bitrate[] = {
@@ -1704,7 +1704,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         }
         case( VLC_FOURCC( 'e', 'c', '-', '3' ) ):
         {
-            p_track->fmt.i_codec = VLC_FOURCC( 'e', 'a', 'c', '3' );
+            p_track->fmt.i_codec = VLC_CODEC_EAC3;
             break;
         }
 
@@ -1738,12 +1738,12 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         }
 
         case( VLC_FOURCC( 's', '2', '6', '3' ) ):
-            p_track->fmt.i_codec = VLC_FOURCC( 'h', '2', '6', '3' );
+            p_track->fmt.i_codec = VLC_CODEC_H263;
             break;
 
         case( VLC_FOURCC( 't', 'e', 'x', 't' ) ):
         case( VLC_FOURCC( 't', 'x', '3', 'g' ) ):
-            p_track->fmt.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
+            p_track->fmt.i_codec = VLC_CODEC_SUBT;
             /* FIXME: Not true, could be UTF-16 with a Byte Order Mark (0xfeff) */
             /* FIXME UTF-8 doesn't work here ? */
             if( p_track->b_mac_encoding )
@@ -1753,7 +1753,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             break;
 
         case VLC_FOURCC('y','v','1','2'):
-            p_track->fmt.i_codec = VLC_FOURCC('Y','V','1','2');
+            p_track->fmt.i_codec = VLC_CODEC_YV12;
             break;
         case VLC_FOURCC('y','u','v','2'):
             p_track->fmt.i_codec = VLC_FOURCC('Y','U','Y','2');
@@ -1850,13 +1850,13 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         switch( p_decconfig->i_objectTypeIndication )
         {
             case( 0x20 ): /* MPEG4 VIDEO */
-                p_track->fmt.i_codec = VLC_FOURCC( 'm','p','4','v' );
+                p_track->fmt.i_codec = VLC_CODEC_MP4V;
                 break;
             case( 0x21 ): /* H.264 */
                 p_track->fmt.i_codec = VLC_CODEC_H264;
                 break;
             case( 0x40):
-                p_track->fmt.i_codec = VLC_FOURCC( 'm','p','4','a' );
+                p_track->fmt.i_codec = VLC_CODEC_MP4A;
                 if( p_decconfig->i_decoder_specific_info_len >= 2 &&
                      p_decconfig->p_decoder_specific_info[0]       == 0xF8 &&
                     (p_decconfig->p_decoder_specific_info[1]&0xE0) == 0x80 )
@@ -1870,23 +1870,23 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             case( 0x63):
             case( 0x64):
             case( 0x65): /* MPEG2 video */
-                p_track->fmt.i_codec = VLC_FOURCC( 'm','p','g','v' );
+                p_track->fmt.i_codec = VLC_CODEC_MPGV;
                 break;
             /* Theses are MPEG2-AAC */
             case( 0x66): /* main profile */
             case( 0x67): /* Low complexity profile */
             case( 0x68): /* Scaleable Sampling rate profile */
-                p_track->fmt.i_codec = VLC_FOURCC( 'm','p','4','a' );
+                p_track->fmt.i_codec = VLC_CODEC_MP4A;
                 break;
-            /* true MPEG 2 audio */
+            /* True MPEG 2 audio */
             case( 0x69):
-                p_track->fmt.i_codec = VLC_FOURCC( 'm','p','g','a' );
+                p_track->fmt.i_codec = VLC_CODEC_MPGA;
                 break;
             case( 0x6a): /* MPEG1 video */
                 p_track->fmt.i_codec = VLC_FOURCC( 'm','p','g','v' );
                 break;
             case( 0x6b): /* MPEG1 audio */
-                p_track->fmt.i_codec = VLC_FOURCC( 'm','p','g','a' );
+                p_track->fmt.i_codec = VLC_CODEC_MPGA;
                 break;
             case( 0x6c ): /* jpeg */
                 p_track->fmt.i_codec = VLC_FOURCC( 'j','p','e','g' );
