@@ -577,11 +577,6 @@ static void ParseVorbisComments( decoder_t *p_dec )
             if( *psz_value == '\0' )
                 break;
 
-            if( !p_dec->p_description )
-                p_dec->p_description = vlc_meta_New();
-            if( p_dec->p_description )
-                vlc_meta_AddExtra( p_dec->p_description, psz_name, psz_value );
-
             if( !strcasecmp( psz_name, "REPLAYGAIN_TRACK_GAIN" ) ||
                      !strcasecmp( psz_name, "RG_RADIO" ) )
             {
@@ -613,6 +608,16 @@ static void ParseVorbisComments( decoder_t *p_dec )
                 r->pb_peak[AUDIO_REPLAY_GAIN_ALBUM] = true;
                 r->pf_peak[AUDIO_REPLAY_GAIN_ALBUM] = atof( psz_value );
             }
+            else if( !strcasecmp( psz_name, "METADATA_BLOCK_PICTURE" ) )
+            { /* Do nothing, for now */ }
+            else
+            {
+                if( !p_dec->p_description )
+                    p_dec->p_description = vlc_meta_New();
+                if( p_dec->p_description )
+                    vlc_meta_AddExtra( p_dec->p_description, psz_name, psz_value );
+            }
+
         }
         free( psz_comment );
         i++;
