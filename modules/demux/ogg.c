@@ -1525,7 +1525,8 @@ static void Ogg_ExtractXiphMeta( demux_t *p_demux, const void *p_headers, unsign
 
     /* TODO how to handle multiple comments properly ? */
     if( i_count >= 2 && pi_size[1] > i_skip )
-        vorbis_ParseComment( &p_ogg->p_meta, (uint8_t*)pp_data[1] + i_skip, pi_size[1] - i_skip );
+        vorbis_ParseComment( &p_ogg->p_meta, (uint8_t*)pp_data[1] + i_skip, pi_size[1] - i_skip,
+                             &p_ogg->i_attachments, &p_ogg->attachments );
 
     for( unsigned i = 0; i < i_count; i++ )
         free( pp_data[i] );

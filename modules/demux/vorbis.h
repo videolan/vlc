@@ -70,7 +70,8 @@ error:
     return p_attachment;
 }
 
-static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_data, int i_data )
+static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_data, int i_data,
+        int *i_attachments, input_attachment_t ***attachments)
 {
     int n;
     int i_comment;
@@ -158,6 +159,9 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
         else IF_EXTRACT("DATE=", Date )
         else if( !strncasecmp( psz, "METADATA_BLOCK_PICTURE=", strlen("METADATA_BLOCK_PICTURE=")))
         {
+            if( attachments == NULL )
+                continue;
+
             int i;
             uint8_t *p_picture;
             size_t i_size = vlc_b64_decode_binary( &p_picture, &psz[strlen("METADATA_BLOCK_PICTURE=")]);
@@ -168,6 +172,7 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
                 snprintf( psz_url, sizeof(psz_url), "attachment://%s", p_attachment->psz_name );
                 vlc_meta_Set( p_meta, vlc_meta_ArtworkURL, psz_url );
                 i_attach++;
+                TAB_APPEND( *i_attachments, *attachments, p_attachment );
             }
         }
         else if( strchr( psz, '=' ) )
