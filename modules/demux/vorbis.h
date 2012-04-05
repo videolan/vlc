@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include <vlc_charset.h>
+#include <vlc_strings.h>
 
 static input_attachment_t* ParseFlacPicture( const uint8_t *p_data, int i_data, int i_attachments, int *i_type )
 {
@@ -73,6 +74,7 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
 {
     int n;
     int i_comment;
+    int i_attach = 0;
     if( i_data < 8 )
         return;
 
@@ -154,6 +156,20 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
         else IF_EXTRACT("DESCRIPTION=", Description )
         else IF_EXTRACT("GENRE=", Genre )
         else IF_EXTRACT("DATE=", Date )
+        else if( !strncasecmp( psz, "METADATA_BLOCK_PICTURE=", strlen("METADATA_BLOCK_PICTURE=")))
+        {
+            int i;
+            uint8_t *p_picture;
+            size_t i_size = vlc_b64_decode_binary( &p_picture, &psz[strlen("METADATA_BLOCK_PICTURE=")]);
+            input_attachment_t *p_attachment = ParseFlacPicture( p_picture, i_size, i_attach, &i );
+            if( p_attachment )
+            {
+                char psz_url[128];
+                snprintf( psz_url, sizeof(psz_url), "attachment://%s", p_attachment->psz_name );
+                vlc_meta_Set( p_meta, vlc_meta_ArtworkURL, psz_url );
+                i_attach++;
+            }
+        }
         else if( strchr( psz, '=' ) )
         {
             /* generic (PERFORMER/LICENSE/ORGANIZATION/LOCATION/CONTACT/ISRC,
