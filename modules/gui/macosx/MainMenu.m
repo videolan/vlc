@@ -988,7 +988,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     {
         NSMenuItem *o_lmi_tmp2;
         o_lmi_tmp2 = [o_menu addItemWithTitle: _NS("Lock Aspect Ratio") action: @selector(lockVideosAspectRatio:) keyEquivalent: @""];
-        [o_lmi_tmp2 setTarget: self];
+        [o_lmi_tmp2 setTarget: [[VLCMain sharedInstance] controls]];
         [o_lmi_tmp2 setEnabled: YES];
         [o_lmi_tmp2 setState: [[VLCCoreInteraction sharedInstance] aspectRatioIsLocked]];
         [o_parent setEnabled: YES];

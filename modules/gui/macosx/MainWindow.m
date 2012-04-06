@@ -131,6 +131,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 #endif
     i_lastShownVolume = -1;
     t_hide_mouse_timer = nil;
+    [o_detached_video_window setDelegate: self];
     [self useOptimizedDrawing: YES];
 
     [o_play_btn setToolTip: _NS("Play/Pause")];
@@ -1045,6 +1046,27 @@ static VLCMainWindow *_o_sharedInstance = nil;
         }
     }
 }
+
+- (NSSize)windowWillResize:(NSWindow *)window toSize:(NSSize)proposedFrameSize
+{
+    id videoWindow = [o_video_view window];
+    if (![[VLCMain sharedInstance] activeVideoPlayback] || nativeVideoSize.width == 0. || nativeVideoSize.height == 0. || window != videoWindow)
+        return proposedFrameSize;
+
+    if( [[VLCCoreInteraction sharedInstance] aspectRatioIsLocked] )
+    {
+        NSRect videoWindowFrame = [videoWindow frame];
+        NSRect viewRect = [o_video_view convertRect:[o_video_view bounds] toView: nil];
+        NSRect contentRect = [videoWindow contentRectForFrameRect:videoWindowFrame];
+        float marginy = viewRect.origin.y + videoWindowFrame.size.height - contentRect.size.height;
+        float marginx = contentRect.size.width - viewRect.size.width;
+
+        proposedFrameSize.height = (proposedFrameSize.width - marginx) * nativeVideoSize.height / nativeVideoSize.width + marginy;
+    }
+
+    return proposedFrameSize;
+}
+
 
 #pragma mark -
 #pragma mark Update interface and respond to foreign events

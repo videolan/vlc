@@ -207,7 +207,7 @@
 
 - (IBAction)lockVideosAspectRatio:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setAspectRatioLocked: [sender state]];
+    [[VLCCoreInteraction sharedInstance] setAspectRatioLocked: ![sender state]];
     [sender setState: [[VLCCoreInteraction sharedInstance] aspectRatioIsLocked]];
 }
 
