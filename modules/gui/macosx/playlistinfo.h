@@ -98,6 +98,8 @@
     VLCInfoTreeItem * rootItem;
 
     input_item_t * p_item;
+
+    BOOL b_awakeFromNib;
 }
 
 - (void)initPanel;

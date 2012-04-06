@@ -121,6 +121,8 @@ static VLCInfo *_o_sharedInstance = nil;
     [o_info_window setInitialFirstResponder: o_uri_txt];
     [o_info_window setDelegate: self];
 
+    b_awakeFromNib = YES;
+
     /* We may be awoken from nib way after initialisation
      * Update ourselves */
     [self updatePanelWithItem:p_item];
@@ -278,6 +280,9 @@ static VLCInfo *_o_sharedInstance = nil;
 
 - (void)updateStatistics
 {
+    if (!b_awakeFromNib)
+        return;
+
     if ([o_info_window isVisible])
     {
         if( !p_item || !p_item->p_stats )
