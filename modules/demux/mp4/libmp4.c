@@ -1381,8 +1381,8 @@ static int MP4_ReadBox_dvc1( stream_t *p_stream, MP4_Box_t *p_box )
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream,
-             "read box: \"dvc1\" profile=0x%x level=0x%x",
-             p_dvc1->i_profile_level & 0xf0 >> 4, p_dvc1->i_profile_level & 0xe > 1 );
+             "read box: \"dvc1\" profile=%i level=%i",
+             p_dvc1->i_profile_level & 0xf0 >> 4, p_dvc1->i_profile_level & 0x0e >> 1 );
 #endif
 
     MP4_READBOX_EXIT( 1 );
