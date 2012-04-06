@@ -348,7 +348,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
     case INPUT_SLIDER: {
         SeekSlider *slider = new SeekSlider( Qt::Horizontal, NULL, !b_shiny );
         SeekPoints *chapters = new SeekPoints( this, p_intf );
-        CONNECT( THEMIM->getIM(), titleChanged( bool ), chapters, update() );
+        CONNECT( THEMIM->getIM(), chapterChanged( bool ), chapters, update() );
         slider->setChapters( chapters );
 
         /* Update the position when the IM has changed */
@@ -545,9 +545,9 @@ QFrame *AbstractController::discFrame()
 
     /* Change the navigation button display when the IM
        navigation changes */
-    CONNECT( THEMIM->getIM(), titleChanged( bool ),
-            discFrame, setVisible( bool ) );
     CONNECT( THEMIM->getIM(), chapterChanged( bool ),
+            discFrame, setVisible( bool ) );
+    CONNECT( THEMIM->getIM(), titleChanged( bool ),
             menuButton, setVisible( bool ) );
     /* Changes the IM navigation when triggered on the nav buttons */
     CONNECT( prevSectionButton, clicked(), THEMIM->getIM(),
