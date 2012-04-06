@@ -297,7 +297,8 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_osd_osd_ckb setTitle: _NS("Enable OSD")];
     [o_osd_opacity_txt setStringValue: _NS("Opacity")];
     [o_osd_forcebold_ckb setTitle: _NS("Force Bold")];
-    [o_osd_moreoptions_txt setStringValue: _NS("More options on background, shadow and outline are available in the advanced preferences.")];
+    [o_osd_outline_color_txt setStringValue: _NS("Outline Color")];
+    [o_osd_outline_thickness_txt setStringValue: _NS("Outline Thickness")];
 
     /* video */
     [o_video_black_ckb setTitle: _NS("Black screens in Fullscreen mode")];
@@ -667,6 +668,8 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     [o_osd_opacity_sld setToolTip: _NS(config_GetLabel( p_intf, "freetype-opacity"))];
     [o_osd_opacity_fld setToolTip: [o_osd_opacity_sld toolTip]];
     [self setupButton: o_osd_forcebold_ckb forBoolValue: "freetype-bold"];
+    [self setupButton: o_osd_outline_color_pop forIntList: "freetype-outline-color"];
+    [self setupButton: o_osd_outline_thickness_pop forIntList: "freetype-outline-thickness"];
 
     /********************
      * hotkeys settings *
@@ -985,6 +988,8 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         SaveIntList( o_osd_font_size_pop, "freetype-rel-fontsize" );
         config_PutInt( p_intf, "freetype-opacity", [o_osd_opacity_sld intValue] );
         config_PutInt( p_intf, "freetype-bold", [o_osd_forcebold_ckb state] );
+        SaveIntList( o_osd_outline_color_pop, "freetype-outline-color" );
+        SaveIntList( o_osd_outline_thickness_pop, "freetype-outline-thickness" );
         b_osdSettingChanged = NO;
     }
 
