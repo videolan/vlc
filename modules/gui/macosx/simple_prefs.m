@@ -37,6 +37,7 @@
 #import "misc.h"
 #import "intf.h"
 #import "AppleRemote.h"
+#import "CoreInteraction.h"
 
 #import <Sparkle/Sparkle.h>                        //for o_intf_last_update_lbl
 
@@ -1054,6 +1055,9 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
     if( sender == o_intf_nativefullscreen_ckb && [o_intf_nativefullscreen_ckb state] == NSOnState )
         [o_intf_embedded_ckb setState: NSOnState];
+
+    if( sender == o_intf_embedded_ckb )
+        [[VLCCoreInteraction sharedInstance] stop];
 
     b_intfSettingChanged = YES;
 }
