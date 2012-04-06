@@ -405,9 +405,27 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             }
             else
             {
+                const vout_display_cfg_t *cfg;
+                const video_format_t *source;
+                bool is_forced = false;
+
+                source = &vd->source;
                 cfg = (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
-                i_width = cfg->display.width;
-                i_height = cfg->display.height;
+                is_forced = (bool)va_arg (ap, int);
+
+                if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE
+                    && is_forced
+                    && (cfg->display.width  != vd->cfg->display.width
+                        ||cfg->display.height != vd->cfg->display.height)
+                    && vout_window_SetSize (sys->embed,
+                                            cfg->display.width,
+                                            cfg->display.height))
+                    return VLC_EGENERIC;
+
+                vout_display_place_t place;
+                vout_display_PlacePicture (&place, source, cfg, false);
+                i_width = place.width;
+                i_height = place.height;
             }
 
             /* Calculate the window's new size, if it is larger than our minimal size */
