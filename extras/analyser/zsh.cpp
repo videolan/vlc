@@ -33,6 +33,7 @@
 #include <vlc/vlc.h>
 #include <vlc_common.h>
 #include <vlc_modules.h>
+#include <vlc_plugin.h>
 #include "../src/modules/modules.h" /* evil hack */
 
 typedef std::pair<std::string, std::string> mpair;
