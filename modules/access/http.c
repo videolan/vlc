@@ -110,6 +110,7 @@ vlc_module_begin ()
                 false )
     add_password( "http-proxy-pwd", NULL,
                   PROXY_PASS_TEXT, PROXY_PASS_LONGTEXT, false )
+    add_obsolete_bool( "http-use-IE-proxy" )
     add_string( "http-referrer", NULL, REFERER_TEXT, REFERER_LONGTEXT, false )
         change_safe()
     add_string( "http-user-agent", NULL, UA_TEXT, UA_LONGTEXT, false )
@@ -401,7 +402,7 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
             msg_Err(p_access, "Allocating memory for libproxy failed");
         }
     }
-#elif defined( WIN32 )
+#elif (0) // defined( WIN32 ) The parsing is not complete enough
     else
     {
         /* Try to get the proxy server address from Windows internet settings using registry. */
