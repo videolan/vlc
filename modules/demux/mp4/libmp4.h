@@ -130,6 +130,7 @@
 #define ATOM_alac VLC_FOURCC( 'a', 'l', 'a', 'c' )
 #define ATOM_dac3 VLC_FOURCC( 'd', 'a', 'c', '3' )
 #define ATOM_dec3 VLC_FOURCC( 'd', 'e', 'c', '3' )
+#define ATOM_dvc1 VLC_FOURCC( 'd', 'v', 'c', '1' )
 #define ATOM_enda VLC_FOURCC( 'e', 'n', 'd', 'a' )
 #define ATOM_gnre VLC_FOURCC( 'g', 'n', 'r', 'e' )
 #define ATOM_trkn VLC_FOURCC( 't', 'r', 'k', 'n' )
@@ -1009,6 +1010,15 @@ typedef struct
 
 typedef struct
 {
+    uint8_t i_profile_level;
+
+    int i_vc1;
+    uint8_t *p_vc1;
+
+} MP4_Box_data_dvc1_t;
+
+typedef struct
+{
     uint16_t i_little_endian;
 
 } MP4_Box_data_enda_t;
@@ -1139,6 +1149,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_esds_t *p_esds;
     MP4_Box_data_avcC_t *p_avcC;
     MP4_Box_data_dac3_t *p_dac3;
+    MP4_Box_data_dvc1_t *p_dvc1;
     MP4_Box_data_enda_t *p_enda;
     MP4_Box_data_gnre_t *p_gnre;
     MP4_Box_data_trkn_t *p_trkn;

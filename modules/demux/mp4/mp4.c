@@ -1898,7 +1898,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 p_track->fmt.i_codec = VLC_FOURCC( 'M','J','2','C' );
                 break;
             case( 0xa3 ): /* vc1 */
-                p_track->fmt.i_codec = VLC_FOURCC( 'W','V','C','1' );
+                p_track->fmt.i_codec = VLC_CODEC_VC1;
                 break;
             case( 0xa4 ):
                 p_track->fmt.i_codec = VLC_CODEC_DIRAC;
@@ -2011,6 +2011,26 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                     p_track->fmt.audio.i_rate = GetDWBE((uint8_t*)p_track->fmt.p_extra + 52);
                 }
                 break;
+
+            case VLC_FOURCC( 'v', 'c', '-', '1' ):
+            {
+                MP4_Box_t *p_dvc1 = MP4_BoxGet( p_sample, "dvc1" );
+                if( p_dvc1 )
+                {
+                    p_track->fmt.i_extra = p_dvc1->data.p_dvc1->i_vc1;
+                    if( p_track->fmt.i_extra > 0 )
+                    {
+                        p_track->fmt.p_extra = malloc( p_dvc1->data.p_dvc1->i_vc1 );
+                        memcpy( p_track->fmt.p_extra, p_dvc1->data.p_dvc1->p_vc1,
+                                p_track->fmt.i_extra );
+                    }
+                }
+                else
+                {
+                    msg_Err( p_demux, "missing dvc1" );
+                }
+                break;
+            }
 
             /* avc1: send avcC (h264 without annexe B, ie without start code)*/
             case VLC_FOURCC( 'a', 'v', 'c', '1' ):
