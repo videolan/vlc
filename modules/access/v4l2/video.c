@@ -516,11 +516,15 @@ static v4l2_std_id var_InheritStandard (vlc_object_t *obj, const char *varname)
 static int SetupStandard (vlc_object_t *obj, int fd,
                           const struct v4l2_input *restrict input)
 {
+#ifdef V4L2_IN_CAP_STD
     if (!(input->capabilities & V4L2_IN_CAP_STD))
     {
         msg_Dbg (obj, "no video standard selection");
         return 0;
     }
+#else
+    msg_Dbg (obj, "video standard selection unknown");
+#endif
 
     v4l2_std_id std = var_InheritStandard (obj, CFG_PREFIX"standard");
     if (std == V4L2_STD_UNKNOWN)
