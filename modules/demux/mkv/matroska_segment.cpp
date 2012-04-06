@@ -371,7 +371,6 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
  *****************************************************************************/
 void matroska_segment_c::InformationCreate( )
 {
-#if 0
     sys.meta = vlc_meta_New();
 
     if( psz_title )
@@ -382,6 +381,7 @@ void matroska_segment_c::InformationCreate( )
     {
         vlc_meta_SetDate( sys.meta, psz_date_utc );
     }
+#if 0
 
     if( psz_segment_filename )
     {
