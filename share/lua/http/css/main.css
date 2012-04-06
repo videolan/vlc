@@ -78,29 +78,46 @@ body{
 	text-align: left;
 	width: 380px;
 }
-#buttonzone {
+
+.buttonszone{
 	position:absolute;
-	top: 200px;
 	width: 20px;
 	margin-left:-20px;
 	vertical-align:top;
 	padding:0px;
-}
-#buttonzone li{
-	float:left;
+	font-size:0px;
+	line-height:0px;
 }
 
-#buttonszone{
-	position: absolute;
+#buttonszone1 {
+	top: 200px;
+}
+
+#buttonszone2 {
 	top: 20px;
-	width: 20px;
-	vertical-align: top;
-	margin-left:-20px;
-	padding: 0;
 }
-#buttonszone li{
-	float: left;
+
+.buttonszone li{
+	float:left;
+	clear:left;
+	font-size:0px;
 }
+
+.buttonszone li span{
+	float:left
+}
+
+.buttonszone_active {
+	width: 120px;
+	margin-left:-122px;
+	font-size:10px;
+	line-height:16px;
+}
+
+.buttonszone_active li {
+	width:120px;
+}
+
 
 #volumesliderzone{
 	position: absolute;

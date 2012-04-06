@@ -94,4 +94,13 @@ $(function () {
         codeimg.dialog({width: 350, height: 350, title: 'QR-Code'});
         return false;
     });
+
+    $('.buttonszone').each(function(i){
+        $(this).mouseover(function(){
+            $(this).addClass('buttonszone_active');
+        }).mouseleave(function () {
+        $(this).removeClass('buttonszone_active');
+        });
+    });
+
 })
