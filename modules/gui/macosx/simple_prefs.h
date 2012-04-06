@@ -158,6 +158,11 @@ IBOutlet id o_intf_mediakeys_ckb;
     IBOutlet id o_video_snap_prefix_fld;
     IBOutlet id o_video_snap_prefix_txt;
     IBOutlet id o_video_snap_seqnum_ckb;
+    IBOutlet id o_video_deinterlace_txt;
+    IBOutlet id o_video_deinterlace_pop;
+    IBOutlet id o_video_deinterlace_mode_txt;
+    IBOutlet id o_video_deinterlace_mode_pop;
+    IBOutlet id o_video_video_box;
     IBOutlet id o_video_view;
 
     BOOL b_audioSettingChanged;

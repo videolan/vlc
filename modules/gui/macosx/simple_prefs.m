@@ -315,6 +315,9 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_video_snap_format_txt setStringValue: _NS("Format")];
     [o_video_snap_prefix_txt setStringValue: _NS("Prefix")];
     [o_video_snap_seqnum_ckb setTitle: _NS("Sequential numbering")];
+    [o_video_deinterlace_txt setStringValue: _NS("Deinterlace")];
+    [o_video_deinterlace_mode_txt setStringValue: _NS("Deinterlace mode")];
+    [o_video_video_box setTitle: _NS("Video")];
 
     /* generic stuff */
     [o_sprefs_showAll_btn setTitle: _NS("Show All")];
@@ -600,6 +603,8 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     [self setupField: o_video_snap_prefix_fld forOption:"snapshot-prefix"];
     [self setupButton: o_video_snap_seqnum_ckb forBoolValue: "snapshot-sequential"];
     [self setupButton: o_video_snap_format_pop forStringList: "snapshot-format"];
+    [self setupButton: o_video_deinterlace_pop forIntList: "deinterlace"];
+    [self setupButton: o_video_deinterlace_mode_pop forStringList: "deinterlace-mode"];
 
     /***************************
      * input & codecs settings *
@@ -932,6 +937,8 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         config_PutPsz( p_intf, "snapshot-prefix", [[o_video_snap_prefix_fld stringValue] UTF8String] );
         config_PutInt( p_intf, "snapshot-sequential", [o_video_snap_seqnum_ckb state] );
         SaveStringList( o_video_snap_format_pop, "snapshot-format" );
+        SaveIntList( o_video_deinterlace_pop, "deinterlace" );
+        SaveStringList( o_video_deinterlace_mode_pop, "deinterlace-mode" );
         b_videoSettingChanged = NO;
     }
 
