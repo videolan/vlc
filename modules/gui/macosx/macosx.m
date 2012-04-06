@@ -102,6 +102,8 @@ void WindowClose  ( vout_window_t * );
 #define PAUSE_MINIMIZED_LONGTEXT N_( \
 "With this option enabled, the playback will be automatically paused when minimizing the window." )
 
+#define LOCK_ASPECT_RATIO_TEXT N_("Lock Aspect Ratio")
+
 vlc_module_begin ()
     set_description( N_("Mac OS X interface") )
     set_capability( "interface", 200 )
@@ -122,6 +124,7 @@ vlc_module_begin ()
     add_obsolete_bool( "macosx-eq-keep" ) /* since 2.0.0 */
     add_bool( "macosx-video-autoresize", true, KEEPSIZE_TEXT, KEEPSIZE_LONGTEXT, false )
     add_bool( "macosx-pause-minimized", false, PAUSE_MINIMIZED_TEXT, PAUSE_MINIMIZED_LONGTEXT, false )
+    add_bool( "macosx-lock-aspect-ratio", true, LOCK_ASPECT_RATIO_TEXT, LOCK_ASPECT_RATIO_TEXT, true )
 
     add_submodule ()
         set_description( "Mac OS X Video Output Provider" )

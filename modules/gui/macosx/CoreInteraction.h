@@ -27,7 +27,6 @@
 
 @interface VLCCoreInteraction : NSObject {
     int i_currentPlaybackRate;
-    BOOL b_lockAspectRatio;
 }
 + (VLCCoreInteraction *)sharedInstance;
 

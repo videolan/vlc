@@ -53,7 +53,6 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     else
     {
         _o_sharedInstance = [super init];
-        b_lockAspectRatio = YES;
     }
 
     return _o_sharedInstance;
@@ -555,12 +554,12 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
 - (void)setAspectRatioLocked:(BOOL)b_value
 {
-    b_lockAspectRatio = b_value;
+    config_PutInt( VLCIntf, "macosx-lock-aspect-ratio", b_value );
 }
 
 - (BOOL)aspectRatioIsLocked
 {
-    return b_lockAspectRatio;
+    return config_GetInt( VLCIntf, "macosx-lock-aspect-ratio" );
 }
 
 - (void)toggleFullscreen
