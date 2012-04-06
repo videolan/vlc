@@ -2061,6 +2061,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 break;
 
             default:
+                msg_Dbg( p_demux, "Unrecognized FourCC %4.4s", (char *)&p_sample->i_type );
                 break;
         }
     }
