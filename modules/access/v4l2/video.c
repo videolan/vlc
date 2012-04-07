@@ -852,12 +852,15 @@ int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
         msg_Err (obj, "cannot get default format: %m");
         return -1;
     }
-    fmt->fmt.pix.pixelformat = fourcc;
     if (v4l2_ioctl (fd, VIDIOC_G_PARM, parm) < 0)
     {
         msg_Err (obj, "cannot get streaming parameters: %m");
         return -1;
     }
+
+    fmt->fmt.pix.pixelformat = fourcc;
+    parm->parm.capture.capturemode = 0; /* normal video mode */
+    parm->parm.capture.extendedmode = 0;
 
     struct v4l2_frmsizeenum fse = {
         .pixel_format = fourcc,
