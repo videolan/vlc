@@ -326,7 +326,6 @@ $Id$
  * stream_out_raop: Remote Audio Output Protocol (AirTunes) stream out
  * stream_out_record: record stream output module
  * stream_out_rtp: rtp stream output module
- * stream_out_select: Replace an existing ES with another ES in the same track
  * stream_out_setid: Set the ID/Lang of an ES when streaming
  * stream_out_smem: stream output module to a memory buffer
  * stream_out_standard: standard stream output module
@@ -379,7 +378,8 @@ $Id$
  * wingapi: Win CE video output
  * wingdi: WIN 32 / WIN CE GDI video output
  * wma_fixed: wma decoder using integer decoder from Rockbox
- * x264: H264 video decoder using X264
+ * x26410b: H264 10 bit video encoder using X264
+ * x264: H264 video encoder using X264
  * xa: XA demuxer
  * xcb_apps: List the application windows using XCB
  * xcb_glx: a opengl provider using XCB OpenGL
