@@ -18,17 +18,19 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if defined(HAVE_LINUX_VIDEODEV2_H)
-#   include <linux/videodev2.h>
-#elif defined(HAVE_SYS_VIDEOIO_H)
-#   include <sys/videoio.h>
+#if defined (HAVE_LINUX_VIDEODEV2_H)
+# include <linux/videodev2.h>
+#elif defined (HAVE_SYS_VIDEOIO_H)
+# include <sys/videoio.h>
 #else
-#   error "No Video4Linux2 headers found."
+# error "No Video4Linux2 headers found."
+#endif
+#ifndef V4L2_CAP_DEVICE_CAPS
+# warning Please update Video4Linux2 headers!
 #endif
 
 /* Hacks to compile with old headers */
 #ifndef V4L2_CTRL_FLAG_VOLATILE /* 3.2 */
-# warning Please update Video4Linux2 headers!
 # define V4L2_CTRL_FLAG_VOLATILE 0x0080
 # define V4L2_CID_POWER_LINE_FREQUENCY_AUTO 3
 # define V4L2_STD_G (V4L2_STD_PAL_G|V4L2_STD_SECAM_G)
