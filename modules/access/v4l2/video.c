@@ -926,6 +926,12 @@ int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
                 msg_Dbg (obj, "  with %"PRIu32"x%"PRIu32" steps",
                          fse.stepwise.step_width, fse.stepwise.step_height);
 
+            if (!(parm->parm.capture.capability & V4L2_CAP_TIMEPERFRAME))
+            {   /* Frame rate is constant, lets maximize resolution */
+                fmt->fmt.pix.width = fse.stepwise.max_width;
+                fmt->fmt.pix.height = fse.stepwise.max_height;
+            }
+            else
             /* FIXME: slow and dumb */
             for (uint32_t width =  fse.stepwise.min_width;
                           width <= fse.stepwise.max_width;
