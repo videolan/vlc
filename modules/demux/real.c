@@ -1567,7 +1567,10 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
         {
             fmt.p_extra = malloc( i_extra_codec );
             if( !fmt.p_extra || i_extra_codec > i_data )
+            {
+                free( fmt.p_extra );
                 return VLC_ENOMEM;
+            }
 
             fmt.i_extra = i_extra_codec;
             memcpy( fmt.p_extra, p_data, fmt.i_extra );
@@ -1606,7 +1609,10 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
         {
             fmt.p_extra = malloc( i_extra_codec );
             if( !fmt.p_extra || i_extra_codec > i_data )
+            {
+                free( fmt.p_extra );
                 return VLC_ENOMEM;
+            }
 
             fmt.i_extra = i_extra_codec;
             memcpy( fmt.p_extra, p_data, fmt.i_extra );
