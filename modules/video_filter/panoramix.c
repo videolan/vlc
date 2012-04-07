@@ -51,6 +51,9 @@
 #   endif
 #endif
 
+#define ROW_MAX (15)
+#define COL_MAX (15)
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -83,7 +86,9 @@ vlc_module_begin()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_integer( CFG_PREFIX "cols", -1, COLS_TEXT, COLS_LONGTEXT, true )
+    change_integer_range( -1, COL_MAX )
     add_integer( CFG_PREFIX "rows", -1, ROWS_TEXT, ROWS_LONGTEXT, true )
+    change_integer_range( -1, ROW_MAX )
 
 #ifdef OVERLAP
 #define LENGTH_TEXT N_("length of the overlapping area (in %)")
@@ -190,9 +195,6 @@ static const char *const ppsz_filter_options[] = {
     "bz-whitelevel-green", "bz-whitelevel-blue", "active",
     NULL
 };
-
-#define ROW_MAX (15)
-#define COL_MAX (15)
 
 #define ACCURACY 1000
 
