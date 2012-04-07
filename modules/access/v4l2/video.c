@@ -523,9 +523,9 @@ static int SetupStandard (vlc_object_t *obj, int fd,
         return 0;
     }
 #else
+    (void) input;
     msg_Dbg (obj, "video standard selection unknown");
 #endif
-
     v4l2_std_id std = var_InheritStandard (obj, CFG_PREFIX"standard");
     if (std == V4L2_STD_UNKNOWN)
     {
