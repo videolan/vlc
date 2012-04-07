@@ -153,7 +153,9 @@ static int ControlSetCallback (vlc_object_t *obj, const char *var,
     {
         case V4L2_CTRL_TYPE_INTEGER:
         case V4L2_CTRL_TYPE_MENU:
+#if HAVE_DECL_V4L2_CTRL_TYPE_BITMASK
         case V4L2_CTRL_TYPE_BITMASK:
+#endif
             ret = ControlSet (ctrl, cur.i_int);
             break;
         case V4L2_CTRL_TYPE_BOOLEAN:
@@ -279,7 +281,7 @@ next:
                     case V4L2_CTRL_TYPE_STRING:
                         ControlSetStr (c, value);
                         break;
-
+#if HAVE_DECL_V4L2_CTRL_TYPE_BITMASK
                     case V4L2_CTRL_TYPE_BITMASK:
                     {
                         unsigned long val = strtoul (value, &end, 0);
@@ -292,7 +294,7 @@ next:
                         ControlSet (c, val);
                         break;
                     }
-
+#endif
                     default:
                         msg_Err (obj, "setting \"%s\" not supported", name);
                         goto next;
@@ -598,6 +600,7 @@ static vlc_v4l2_ctrl_t *ControlAddString (vlc_object_t *obj, int fd,
     return c;
 }
 
+#if HAVE_DECL_V4L2_CTRL_TYPE_BITMASK
 static vlc_v4l2_ctrl_t *ControlAddBitMask (vlc_object_t *obj, int fd,
                                            const struct v4l2_queryctrl *query)
 {
@@ -633,6 +636,7 @@ static vlc_v4l2_ctrl_t *ControlAddBitMask (vlc_object_t *obj, int fd,
     var_Change (obj, c->name, VLC_VAR_SETDEFAULT, &val, NULL);
     return c;
 }
+#endif
 
 static vlc_v4l2_ctrl_t *ControlAddUnknown (vlc_object_t *obj, int fd,
                                            const struct v4l2_queryctrl *query)
@@ -665,7 +669,9 @@ vlc_v4l2_ctrl_t *ControlsInit (vlc_object_t *obj, int fd)
         [V4L2_CTRL_TYPE_INTEGER64] = ControlAddInteger64,
         [V4L2_CTRL_TYPE_CTRL_CLASS] = ControlAddClass,
         [V4L2_CTRL_TYPE_STRING] = ControlAddString,
+#if HAVE_DECL_V4L2_CTRL_TYPE_BITMASK
         [V4L2_CTRL_TYPE_BITMASK] = ControlAddBitMask,
+#endif
     };
 
     vlc_v4l2_ctrl_t *list = NULL;

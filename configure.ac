@@ -1830,6 +1830,14 @@ AS_IF([test "$enable_v4l2" != "no"], [
   AC_CHECK_HEADERS([linux/videodev2.h sys/videoio.h], [
     have_v4l2="yes"
   ])
+  AC_CHECK_DECLS([V4L2_CTRL_TYPE_BITMASK],,, [
+#ifdef HAVE_LINUX_VIDEODEV2_H
+# include <linux/videodev2.h>
+#endif
+#ifdef HAVE_SYS_VIDEOIO_H
+# include <sys/videoio.h>
+#endif
+  ])
 ])
 AS_IF([test "$have_v4l2" = "yes"], [
   AS_IF([test "${enable_pvr}" = "yes"], [
