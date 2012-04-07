@@ -739,11 +739,12 @@ static const char *const ppsz_clock_descriptions[] =
     "resolution is closest to (but not higher than) this setting, " \
     "in number of lines. Use this option if you don't have enough CPU " \
     "power or network bandwith to play higher resolutions.")
-static const int pi_prefres[] = { -1, 1080, 720, 576, 320 };
+static const int pi_prefres[] = { -1, 1080, 720, 576, 360, 240 };
 static const char *const ppsz_prefres[] = {
     N_("Best available"), N_("Full HD (1080p)"), N_("HD (720p)"),
     N_("Standard Definition (576 or 480 lines)"),
-    N_("Low definition (320 lines)")
+    N_("Low Definition (360 lines)"),
+    N_("Very Low Definition (240 lines)"),
 };
 
 #define INPUT_REPEAT_TEXT N_("Input repetitions")
