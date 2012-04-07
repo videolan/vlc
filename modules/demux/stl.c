@@ -68,7 +68,7 @@ struct demux_sys_t {
     int64_t     next_date;
 };
 
-static int ParseInteger(uint8_t *data, int size)
+static int ParseInteger(uint8_t *data, size_t size)
 {
     char tmp[16];
     assert(size < sizeof(tmp));
