@@ -239,6 +239,20 @@ static vlc_fourcc_t var_InheritFourCC (vlc_object_t *obj, const char *varname)
 }
 #define var_InheritFourCC(o, v) var_InheritFourCC(VLC_OBJECT(o), v)
 
+static void GetAR (int fd, unsigned *restrict num, unsigned *restrict den)
+{
+    struct v4l2_cropcap cropcap = { .type = V4L2_BUF_TYPE_VIDEO_CAPTURE };
+
+    /* TODO: get CROPCAP only once (see ResetCrop()). */
+    if (v4l2_ioctl (fd, VIDIOC_CROPCAP, &cropcap) < 0)
+    {
+        *num = *den = 1;
+        return;
+    }
+    *num = cropcap.pixelaspect.numerator;
+    *den = cropcap.pixelaspect.denominator;
+}
+
 static int InitVideo (demux_t *demux, int fd)
 {
     demux_sys_t *sys = demux->p_sys;
@@ -412,23 +426,14 @@ static int InitVideo (demux_t *demux, int fd)
     es_fmt.video.i_height = fmt.fmt.pix.height;
     es_fmt.video.i_frame_rate = parm.parm.capture.timeperframe.denominator;
     es_fmt.video.i_frame_rate_base = parm.parm.capture.timeperframe.numerator;
+    GetAR (fd, &es_fmt.video.i_sar_num, &es_fmt.video.i_sar_den);
 
-    int ar = 4 * VOUT_ASPECT_FACTOR / 3;
-    char *str = var_InheritString (demux, CFG_PREFIX"aspect-ratio");
-    if (likely(str != NULL))
-    {
-        const char *delim = strchr (str, ':');
-        if (delim != NULL)
-            ar = atoi (str) * VOUT_ASPECT_FACTOR / atoi (delim + 1);
-        free (str);
-    }
-    es_fmt.video.i_sar_num = ar * es_fmt.video.i_height;
-    es_fmt.video.i_sar_den = VOUT_ASPECT_FACTOR * es_fmt.video.i_width;
-
-    msg_Dbg (demux, "added new video es %4.4s %dx%d", (char *)&es_fmt.i_codec,
+    msg_Dbg (demux, "added new video ES %4.4s %ux%u", (char *)&es_fmt.i_codec,
              es_fmt.video.i_width, es_fmt.video.i_height);
     msg_Dbg (demux, " frame rate: %u/%u", es_fmt.video.i_frame_rate,
              es_fmt.video.i_frame_rate_base);
+    msg_Dbg (demux, " aspect ratio: %u/%u", es_fmt.video.i_sar_num,
+             es_fmt.video.i_sar_den);
     sys->p_es = es_out_Add (demux->out, &es_fmt);
 
     /* Init I/O method */
