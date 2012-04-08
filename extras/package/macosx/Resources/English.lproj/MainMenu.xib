@@ -21,16 +21,16 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="1617"/>
+      <integer value="4850"/>
+      <integer value="29"/>
       <integer value="4596"/>
       <integer value="4722"/>
-      <integer value="2770"/>
+      <integer value="21"/>
+      <integer value="1617"/>
       <integer value="2730"/>
-      <integer value="29"/>
-      <integer value="915"/>
-      <integer value="4850"/>
       <integer value="4948"/>
-      <integer value="4756"/>
+      <integer value="2770"/>
+      <integer value="915"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -11224,7 +11224,6 @@ LCAuLi4</string>
           <string>1996.ImportedFromIB2</string>
           <string>1997.IBPluginDependency</string>
           <string>1997.ImportedFromIB2</string>
-          <string>2.CustomClassName</string>
           <string>2.IBPluginDependency</string>
           <string>2.ImportedFromIB2</string>
           <string>202.IBPluginDependency</string>
@@ -12072,7 +12071,6 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>VLCControllerView</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -13171,11 +13169,6 @@ LCAuLi4</string>
             <string key="majorKey">IBProjectSource</string>
             <string key="minorKey">../../../modules/gui/macosx/bookmarks.h</string>
           </object>
-        </object>
-        <object class="IBPartialClassDescription">
-          <string key="className">VLCControllerView</string>
-          <string key="superclassName">NSView</string>
-          <reference key="sourceIdentifier" ref="516086310"/>
         </object>
         <object class="IBPartialClassDescription">
           <string key="className">VLCControls</string>
@@ -15815,11 +15808,6 @@ LCAuLi4</string>
         <object class="IBPartialClassDescription">
           <string key="className">VLBrushedMetalImageView</string>
           <string key="superclassName">NSImageView</string>
-          <reference key="sourceIdentifier" ref="386911354"/>
-        </object>
-        <object class="IBPartialClassDescription">
-          <string key="className">VLCControllerView</string>
-          <string key="superclassName">NSView</string>
           <reference key="sourceIdentifier" ref="386911354"/>
         </object>
         <object class="IBPartialClassDescription">
