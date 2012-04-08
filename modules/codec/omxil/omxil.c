@@ -1230,12 +1230,13 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                 /* We're not in direct rendering mode.
                  * Get a new picture and copy the content */
                 p_pic = decoder_NewPicture( p_dec );
-                if( !p_pic ) break; /* No picture available */
 
-                CopyOmxPicture(p_dec, p_pic, p_header, p_sys->out.definition.format.video.nSliceHeight);
+                if (p_pic)
+                    CopyOmxPicture(p_dec, p_pic, p_header, p_sys->out.definition.format.video.nSliceHeight);
             }
 
-            p_pic->date = p_header->nTimeStamp;
+            if (p_pic)
+                p_pic->date = p_header->nTimeStamp;
             p_header->nFilledLen = 0;
             p_header->pAppPrivate = 0;
         }
