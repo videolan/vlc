@@ -31,7 +31,8 @@ matroska_segment_c * getSegmentbyUID( KaxSegmentUID * p_uid, std::vector<matrosk
 {
     for( size_t i = 0; i < (*segments).size(); i++ )
     {
-        if( *p_uid == *((*segments)[i]->p_segment_uid) )
+        if( (*segments)[i]->p_segment_uid &&
+            *p_uid == *((*segments)[i]->p_segment_uid) )
             return (*segments)[i];
     }
     return NULL;

@@ -554,7 +554,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
                     break;
                 }
             }
-            if ( b_keep_segment )
+            if ( b_keep_segment || !p_segment1->p_segment_uid )
             {
                 b_keep_stream = true;
                 p_stream1->segments.push_back( p_segment1 );
@@ -746,7 +746,7 @@ matroska_segment_c *demux_sys_t::FindSegment( const EbmlBinary & uid ) const
 {
     for (size_t i=0; i<opened_segments.size(); i++)
     {
-        if ( *opened_segments[i]->p_segment_uid == uid )
+        if ( opened_segments[i]->p_segment_uid && *opened_segments[i]->p_segment_uid == uid )
             return opened_segments[i];
     }
     return NULL;
