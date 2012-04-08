@@ -313,16 +313,33 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     {
         case VOUT_DISPLAY_CHANGE_FULLSCREEN:
         {
-            NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-            id window = [sys->glView window];
-            if ([window respondsToSelector:@selector(updateFullscreen)])
-            {
-                [[sys->glView window] performSelectorOnMainThread:@selector(updateFullscreen) withObject: nil waitUntilDone:NO];
-                [o_pool release];
-                return VLC_SUCCESS;
-            }
-            [o_pool release];
-            return VLC_EGENERIC;
+            const vout_display_cfg_t *cfg = va_arg (ap, const vout_display_cfg_t *);
+            if (vout_window_SetFullScreen (sys->embed, cfg->is_fullscreen))
+                return VLC_EGENERIC;
+
+            NSRect frame;
+
+            /* when entering fullscreen, set the OSD / display size to the visible screen size.
+             * this way, the text rendering will be as sharp as possible.
+             * when returning from fullscreen, pick the dimensions from cfg, which can be different
+             * from the native video size because of crop and zoom */
+            if (cfg->is_fullscreen)
+                frame = [[[sys->glView window] screen] visibleFrame];
+            else
+                frame = NSMakeRect( 0., 0., cfg->display.width, cfg->display.height );
+
+            vout_display_SendEventDisplaySize( vd, frame.size.width, frame.size.height, cfg->is_fullscreen );
+
+            const video_format_t * source;
+            source = &vd->source;
+            vout_display_cfg_t place_cfg = *cfg;
+            place_cfg.display.width  = frame.size.width;
+            place_cfg.display.height = frame.size.height;
+
+            vout_display_place_t place;
+            vout_display_PlacePicture(&place, source, &place_cfg, false);
+
+            return VLC_SUCCESS;
         }
         case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
         {
@@ -405,6 +422,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             }
             else
             {
+                // VOUT_DISPLAY_CHANGE_ZOOM, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE
                 const vout_display_cfg_t *cfg;
                 const video_format_t *source;
                 bool is_forced = false;
