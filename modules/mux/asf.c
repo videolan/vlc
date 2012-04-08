@@ -517,7 +517,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 tk->psz_name = "MSMPEG-4 V2 Video";
                 tk->i_fourcc = VLC_FOURCC( 'M', 'P', '4', '2' );
             }
-            else if( p_input->p_fmt->i_codec == VLC_CODEC_DIV2 )
+            else if( p_input->p_fmt->i_codec == VLC_CODEC_DIV1 )
             {
                 tk->psz_name = "MSMPEG-4 V1 Video";
                 tk->i_fourcc = VLC_FOURCC( 'M', 'P', 'G', '4' );
