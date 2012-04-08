@@ -1573,7 +1573,7 @@
             if ([self currentPlaylistRoot] == p_playlist->p_local_category || [self currentPlaylistRoot] == p_playlist->p_ml_category) 
                 p_new_parent = [self currentPlaylistRoot];
             else
-                p_new_parent = p_playlist->p_local_category;
+                return NO;
         }
         else
             p_new_parent = [item pointerValue];
@@ -1649,6 +1649,9 @@
 
     else if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] )
     {
+        if ([self currentPlaylistRoot] != p_playlist->p_local_category && [self currentPlaylistRoot] != p_playlist->p_ml_category) 
+            return NO;
+
         playlist_item_t *p_node = [item pointerValue];
 
         NSArray *o_values = [[o_pasteboard propertyListForType: NSFilenamesPboardType]
