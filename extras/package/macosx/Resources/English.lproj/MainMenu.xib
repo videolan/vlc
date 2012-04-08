@@ -22,15 +22,15 @@
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <integer value="4850"/>
-      <integer value="29"/>
-      <integer value="4596"/>
-      <integer value="4722"/>
-      <integer value="21"/>
-      <integer value="1617"/>
-      <integer value="2730"/>
-      <integer value="4948"/>
       <integer value="2770"/>
+      <integer value="4596"/>
+      <integer value="1617"/>
+      <integer value="29"/>
+      <integer value="4722"/>
+      <integer value="4948"/>
       <integer value="915"/>
+      <integer value="2730"/>
+      <integer value="21"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -89,7 +89,7 @@
                             <bool key="EncodedWithXMLCoder">YES</bool>
                             <object class="NSOutlineView" id="1064884668">
                               <reference key="NSNextResponder" ref="18556274"/>
-                              <int key="NSvFlags">4354</int>
+                              <int key="NSvFlags">258</int>
                               <string key="NSFrameSize">{199, 272}</string>
                               <reference key="NSSuperview" ref="18556274"/>
                               <int key="NSViewLayerContentsRedrawPolicy">2</int>

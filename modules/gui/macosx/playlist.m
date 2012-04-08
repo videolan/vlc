@@ -1443,6 +1443,11 @@
 
     return o_playing_item;
 }
+
+- (NSArray *)draggedItems
+{
+    return [[o_nodes_array arrayByAddingObjectsFromArray: o_items_array] retain];
+}
 @end
 
 @implementation VLCPlaylist (NSOutlineViewDataSource)
@@ -1471,15 +1476,6 @@
     {
         id o_item = [items objectAtIndex: i];
 
-        /* Refuse to move items that are not in the General Node
-           (Service Discovery) */
-        if( (![self isItem: [o_item pointerValue] inNode: p_playlist->p_local_category checkItemExistence: NO] &&
-            var_CreateGetBool( p_playlist, "media-library" ) && ![self isItem: [o_item pointerValue] inNode: p_playlist->p_ml_category checkItemExistence: NO]) ||
-            [o_item pointerValue] == p_playlist->p_local_category ||
-            [o_item pointerValue] == p_playlist->p_ml_category )
-        {
-            return NO;
-        }
         /* Fill the items and nodes to move in 2 different arrays */
         if( ((playlist_item_t *)[o_item pointerValue])->i_children > 0 )
             [o_nodes_array addObject: o_item];
@@ -1563,8 +1559,7 @@
     {
         int i_row, i_removed_from_node = 0;
         playlist_item_t *p_new_parent, *p_item = NULL;
-        NSArray *o_all_items = [o_nodes_array arrayByAddingObjectsFromArray:
-                                                                o_items_array];
+        NSArray *o_all_items = [o_nodes_array arrayByAddingObjectsFromArray: o_items_array];
         /* If the item is to be dropped as root item of the outline, make it a
            child of the respective general node, if is either the pl or the ml
            Else, choose the proposed parent as parent. */

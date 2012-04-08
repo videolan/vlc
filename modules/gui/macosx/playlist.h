@@ -148,6 +148,7 @@
 - (IBAction)recursiveExpandNode:(id)sender;
 
 - (id)playingItem;
+- (NSArray *)draggedItems;
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
 - (void)appendNodeArray:(NSArray*)o_array inNode:(playlist_item_t *)p_node atPos:(int)i_position enqueue:(BOOL)b_enqueue;

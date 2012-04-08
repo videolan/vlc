@@ -446,6 +446,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     for (NSUInteger x = 0; x < i_sidebaritem_count; x++)
         [o_sidebar_view expandItem: [o_sidebaritems objectAtIndex: x] expandChildren: YES];
     [o_sidebar_view selectRowIndexes:[NSIndexSet indexSetWithIndex:1] byExtendingSelection:NO];
+    [o_sidebar_view setDropItem:playlistItem dropChildIndex:NSOutlineViewDropOnItemIndex];
+    [o_sidebar_view registerForDraggedTypes:[NSArray arrayWithObjects: NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
 
     if( b_dark_interface )
     {
@@ -2239,6 +2241,72 @@ static VLCMainWindow *_o_sharedInstance = nil;
     PL_UNLOCK;
 }
 
+- (NSDragOperation)sourceList:(PXSourceList *)aSourceList validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
+{
+    if ([[item identifier] isEqualToString:@"playlist"] || [[item identifier] isEqualToString:@"medialibrary"] )
+    {
+        NSPasteboard *o_pasteboard = [info draggingPasteboard];
+        if ([[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"] || [[o_pasteboard types] containsObject: NSFilenamesPboardType])
+            return NSDragOperationGeneric;
+    }
+    return NSDragOperationNone;
+}
+
+- (BOOL)sourceList:(PXSourceList *)aSourceList acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(NSInteger)index
+{
+    NSPasteboard *o_pasteboard = [info draggingPasteboard];
+
+    playlist_t * p_playlist = pl_Get( VLCIntf );
+    playlist_item_t *p_node;
+
+    if ([[item identifier] isEqualToString:@"playlist"])
+        p_node = p_playlist->p_local_category;
+    else
+        p_node = p_playlist->p_ml_category;
+
+    if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] )
+    {
+        NSArray *o_values = [[o_pasteboard propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)];
+        NSUInteger count = [o_values count];
+        NSMutableArray *o_array = [NSMutableArray arrayWithCapacity:count];
+
+        for( NSUInteger i = 0; i < count; i++)
+        {
+            NSDictionary *o_dic;
+            char *psz_uri = make_URI([[o_values objectAtIndex:i] UTF8String], NULL);
+            if( !psz_uri )
+                continue;
+
+            o_dic = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
+
+            free( psz_uri );
+
+            [o_array addObject: o_dic];
+        }
+
+        [[[VLCMain sharedInstance] playlist] appendNodeArray:o_array inNode: p_node atPos:-1 enqueue:YES];
+        return YES;
+    }
+    else if( [[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"] )
+    {
+        NSArray * array = [[[VLCMain sharedInstance] playlist] draggedItems];
+
+        NSUInteger count = [array count];
+        playlist_item_t * p_item = NULL;
+
+        PL_LOCK;
+        for( NSUInteger i = 0; i < count; i++ )
+        {
+            p_item = [[array objectAtIndex:i] pointerValue];
+            if( !p_item ) continue;
+            playlist_NodeAddCopy( p_playlist, p_item, p_node, PLAYLIST_END );
+        }
+        PL_UNLOCK;
+
+        return YES;
+    }
+    return NO;
+}
 @end
 
 @implementation VLCDetachedVideoWindow
