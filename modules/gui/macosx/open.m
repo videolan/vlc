@@ -59,15 +59,6 @@ NSArray *qtkaudioDevices;
 [o_capture_long_lbl displayIfNeeded]; \
 [self showCaptureView: o_capture_label_view]
 
-#define kVLCMediaAudioCD "AudioCD"
-#define kVLCMediaDVD "DVD"
-#define kVLCMediaVCD "VCD"
-#define kVLCMediaSVCD "SVCD"
-#define kVLCMediaBD "Bluray"
-#define kVLCMediaVideoTSFolder "VIDEO_TS"
-#define kVLCMediaBDMVFolder "BDMV"
-#define kVLCMediaUnknown "Unknown"
-
 struct display_info_t
 {
     CGRect rect;

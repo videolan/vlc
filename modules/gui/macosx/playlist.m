@@ -48,6 +48,7 @@
 #import "playlist.h"
 #import "controls.h"
 #import "misc.h"
+#import "open.h"
 
 #include <vlc_keys.h>
 #import <vlc_services_discovery.h>
@@ -1028,61 +1029,63 @@
     playlist_t * p_playlist = pl_Get( p_intf );
 
     input_item_t *p_input;
-    BOOL b_rem = FALSE, b_dir = FALSE;
-    NSString *o_uri, *o_name;
+    BOOL b_rem = FALSE, b_dir = FALSE, b_writable = FALSE;
+    NSString *o_uri, *o_name, *o_path;
+    NSURL * o_nsurl;
     NSArray *o_options;
     NSURL *o_true_file;
 
     /* Get the item */
     o_uri = (NSString *)[o_one_item objectForKey: @"ITEM_URL"];
+    o_nsurl = [NSURL URLWithString: o_uri];
+    o_path = [o_nsurl path];
     o_name = (NSString *)[o_one_item objectForKey: @"ITEM_NAME"];
     o_options = (NSArray *)[o_one_item objectForKey: @"ITEM_OPTIONS"];
 
-    /* Find the name for a disc entry (i know, can you believe the trouble?) */
-    if( ( !o_name || [o_name isEqualToString:@""] ) && [o_uri rangeOfString: @"/dev/"].location != NSNotFound )
+    if( [[NSFileManager defaultManager] fileExistsAtPath:o_path isDirectory:&b_dir] && b_dir &&
+        [[NSWorkspace sharedWorkspace] getFileSystemInfoForPath:o_path isRemovable: &b_rem
+                                                     isWritable:&b_writable isUnmountable:NULL description:NULL type:NULL] && b_rem && !b_writable && [o_nsurl isFileURL] )
     {
-        int i_count;
-        struct statfs *mounts = NULL;
 
-        i_count = getmntinfo (&mounts, MNT_NOWAIT);
-        /* getmntinfo returns a pointer to static data. Do not free. */
-        for( int i_index = 0 ; i_index < i_count; i_index++ )
+        id o_vlc_open = [[VLCMain sharedInstance] open];
+
+        char *diskType = [o_vlc_open getVolumeTypeFromMountPath: o_path];
+        msg_Dbg( p_intf, "detected optical media of type '%s' in the file input", diskType );
+
+        if (diskType == kVLCMediaDVD)
         {
-            NSMutableString *o_temp, *o_temp2;
-            o_temp = [NSMutableString stringWithString: o_uri];
-            o_temp2 = [NSMutableString stringWithUTF8String: mounts[i_index].f_mntfromname];
-            [o_temp replaceOccurrencesOfString: @"/dev/rdisk" withString: @"/dev/disk" options:NSLiteralSearch range:NSMakeRange(0, [o_temp length]) ];
-            [o_temp2 replaceOccurrencesOfString: @"s0" withString: @"" options:NSLiteralSearch range:NSMakeRange(0, [o_temp2 length]) ];
-            [o_temp2 replaceOccurrencesOfString: @"s1" withString: @"" options:NSLiteralSearch range:NSMakeRange(0, [o_temp2 length]) ];
-
-            if( strstr( [o_temp fileSystemRepresentation], [o_temp2 fileSystemRepresentation] ) != NULL )
-            {
-                o_name = [[NSFileManager defaultManager] displayNameAtPath: [NSString stringWithUTF8String:mounts[i_index].f_mntonname]];
-            }
+            o_uri = [NSString stringWithFormat: @"dvdnav://%@", [o_vlc_open getBSDNodeFromMountPath: o_path]];
         }
+        else if (diskType == kVLCMediaVideoTSFolder)
+        {
+            o_uri = [NSString stringWithFormat: @"dvdnav://%@", o_path];
+        }
+        else if (diskType == kVLCMediaAudioCD)
+        {
+            o_uri = [NSString stringWithFormat: @"cdda://%@", [o_vlc_open getBSDNodeFromMountPath: o_path]];
+        }
+        else if (diskType == kVLCMediaVCD)
+        {
+            o_uri = [NSString stringWithFormat: @"vcd://%@#0:0", [o_vlc_open getBSDNodeFromMountPath: o_path]];
+        }
+        else if (diskType == kVLCMediaSVCD)
+        {
+            o_uri = [NSString stringWithFormat: @"vcd://%@@0:0", [o_vlc_open getBSDNodeFromMountPath: o_path]];
+        }
+        else if (diskType == kVLCMediaBD || diskType == kVLCMediaBDMVFolder)
+        {
+            o_uri = [NSString stringWithFormat: @"bluray://%@", o_path];
+        }
+        else
+        {
+            msg_Warn( VLCIntf, "unknown disk type, treating %s as regular input", [o_path UTF8String] );
+        }
+
+        p_input = input_item_New( [o_uri UTF8String], [[[NSFileManager defaultManager] displayNameAtPath: o_path] UTF8String] );
     }
+    else
+        p_input = input_item_New( [o_uri fileSystemRepresentation], o_name ? [o_name UTF8String] : NULL );
 
-    if( [[NSFileManager defaultManager] fileExistsAtPath:o_uri isDirectory:&b_dir] && b_dir &&
-        [[NSWorkspace sharedWorkspace] getFileSystemInfoForPath: o_uri isRemovable: &b_rem
-                isWritable:NULL isUnmountable:NULL description:NULL type:NULL] && b_rem   )
-    {
-        /* All of this is to make sure CD's play when you D&D them on VLC */
-        /* Converts mountpoint to a /dev file */
-        struct statfs *buf;
-        char *psz_dev;
-        NSMutableString *o_temp;
-
-        buf = (struct statfs *) malloc (sizeof(struct statfs));
-        statfs( [o_uri fileSystemRepresentation], buf );
-        psz_dev = strdup(buf->f_mntfromname);
-        o_temp = [NSMutableString stringWithUTF8String: psz_dev ];
-        [o_temp replaceOccurrencesOfString: @"/dev/disk" withString: @"/dev/rdisk" options:NSLiteralSearch range:NSMakeRange(0, [o_temp length]) ];
-        [o_temp replaceOccurrencesOfString: @"s0" withString: @"" options:NSLiteralSearch range:NSMakeRange(0, [o_temp length]) ];
-        [o_temp replaceOccurrencesOfString: @"s1" withString: @"" options:NSLiteralSearch range:NSMakeRange(0, [o_temp length]) ];
-        o_uri = o_temp;
-    }
-
-    p_input = input_item_New( [o_uri fileSystemRepresentation], o_name ? [o_name UTF8String] : NULL );
     if( !p_input )
         return NULL;
 
@@ -1097,11 +1100,9 @@
     }
 
     /* Recent documents menu */
-    o_true_file = [NSURL URLWithString: o_uri];
-    if( o_true_file != nil && (BOOL)config_GetInt( p_playlist, "macosx-recentitems" ) == YES )
+    if( o_nsurl != nil && (BOOL)config_GetInt( p_playlist, "macosx-recentitems" ) == YES )
     {
-        [[NSDocumentController sharedDocumentController]
-            noteNewRecentDocumentURL: o_true_file];
+        [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: o_nsurl];
     }
     return p_input;
 }
