@@ -633,6 +633,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
     plrect = [[o_playlist_table animator] frame];
     plrect.size.height = i_lastSplitViewHeight - 19.0; // actual pl top bar height, which differs from its frame
     [[o_playlist_table animator] setFrame: plrect];
+
+    NSRect rightSplitRect;
+    rightSplitRect = [o_right_split_view frame];
+    plrect = [[o_dropzone_box animator] frame];
+    plrect.origin.x = (rightSplitRect.size.width - plrect.size.width) / 2;
+    plrect.origin.y = (rightSplitRect.size.height - plrect.size.height) / 2;
+    [[o_dropzone_box animator] setFrame: plrect];
 }
 
 - (IBAction)togglePlaylist:(id)sender
@@ -1109,6 +1116,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)showSplitView
 {
+    [self updateWindow];
     if (b_dark_interface)
         [self setContentMinSize:NSMakeSize( 604., 288. + [o_titlebar_view frame].size.height )];
     else
@@ -1122,7 +1130,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self setFrame: winrect display: YES animate: YES];
 
     [self performSelector:@selector(resizePlaylistAfterCollapse) withObject: nil afterDelay:0.75];
-    [self performSelector:@selector(updateWindow) withObject: nil afterDelay:0.3];
 
     b_splitview_removed = NO;
 }

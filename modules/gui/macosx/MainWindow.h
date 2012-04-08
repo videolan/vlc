@@ -66,6 +66,7 @@
     IBOutlet id o_dropzone_view;
     IBOutlet id o_dropzone_btn;
     IBOutlet id o_dropzone_lbl;
+    IBOutlet id o_dropzone_box;
 
     IBOutlet VLCFSPanel *o_fspanel;
     IBOutlet id o_titlebar_view;
