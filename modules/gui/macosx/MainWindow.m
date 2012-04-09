@@ -442,7 +442,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_sidebaritems addObject: internetItem];
 
     [o_sidebar_view reloadData];
-    [o_sidebar_view expandItem: libraryItem expandChildren: YES];
     [o_sidebar_view selectRowIndexes:[NSIndexSet indexSetWithIndex:1] byExtendingSelection:NO];
     [o_sidebar_view setDropItem:playlistItem dropChildIndex:NSOutlineViewDropOnItemIndex];
     [o_sidebar_view registerForDraggedTypes:[NSArray arrayWithObjects: NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
@@ -451,6 +450,19 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [(PXSourceList *)o_sidebar_view setDataSource:self];
     [o_sidebar_view setDelegate:self];
     [o_sidebar_view setAutosaveExpandedItems:YES];
+
+    [o_sidebar_view expandItem: libraryItem expandChildren: YES];
+
+    /* make sure we display the desired default appearance when VLC launches for the first time */
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    if (![defaults objectForKey:@"VLCFirstRun"])
+    {
+        [defaults setObject:[NSDate date] forKey:@"VLCFirstRun"];
+
+        NSUInteger i_sidebaritem_count = [o_sidebaritems count];
+        for (NSUInteger x = 0; x < i_sidebaritem_count; x++)
+            [o_sidebar_view expandItem: [o_sidebaritems objectAtIndex: x] expandChildren: YES];
+    }
 
     if( b_dark_interface )
     {
