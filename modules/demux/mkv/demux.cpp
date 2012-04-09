@@ -463,7 +463,6 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
     bool b_keep_stream = false, b_keep_segment = false;
 
     // verify the EBML Header
-    vlc_stream_io_callback & io_stream = (vlc_stream_io_callback &) p_estream->I_O();
     p_l0 = p_estream->FindNextID(EBML_INFO(EbmlHead), UINT64_MAX);
     if (p_l0 == NULL)
     {
