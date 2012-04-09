@@ -21,7 +21,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="5"/>
+      <integer value="2"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -82,7 +82,7 @@
                       <object class="NSTextFieldCell" key="NSCell" id="827348791">
                         <int key="NSCellFlags">68288064</int>
                         <int key="NSCellFlags2">272761856</int>
-                        <string key="NSContents">Advance of audio over video:</string>
+                        <string key="NSContents">Audio track synchronization:</string>
                         <object class="NSFont" key="NSSupport" id="26">
                           <string key="NSName">LucidaGrande</string>
                           <double key="NSSize">11</double>
@@ -172,8 +172,8 @@
                             <bool key="NS.raise.underflow">YES</bool>
                             <bool key="NS.raise.dividebyzero">YES</bool>
                           </object>
-                          <string key="NS.decimal">,</string>
-                          <string key="NS.thousand">.</string>
+                          <string key="NS.decimal">.</string>
+                          <string key="NS.thousand">,</string>
                           <bool key="NS.hasthousands">YES</bool>
                           <bool key="NS.localized">YES</bool>
                           <bool key="NS.allowsfloats">YES</bool>
@@ -326,7 +326,7 @@
                       <object class="NSTextFieldCell" key="NSCell" id="53850351">
                         <int key="NSCellFlags">68288064</int>
                         <int key="NSCellFlags2">272761856</int>
-                        <string key="NSContents">Advance of subtitles over video:</string>
+                        <string key="NSContents">Subtitle track syncronization:</string>
                         <reference key="NSSupport" ref="26"/>
                         <reference key="NSControlView" ref="662764430"/>
                         <reference key="NSBackgroundColor" ref="592262308"/>
@@ -486,7 +486,7 @@
                       <object class="NSTextFieldCell" key="NSCell" id="432856306">
                         <int key="NSCellFlags">68288064</int>
                         <int key="NSCellFlags2">272761856</int>
-                        <string key="NSContents">Speed of the subtitles:</string>
+                        <string key="NSContents">Subtitles speed:</string>
                         <reference key="NSSupport" ref="26"/>
                         <reference key="NSControlView" ref="1031205444"/>
                         <reference key="NSBackgroundColor" ref="592262308"/>
@@ -1518,9 +1518,9 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{409, 177}, {408, 193}}</string>
+          <string>{{436, 259}, {408, 193}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{409, 177}, {408, 193}}</string>
+          <string>{{436, 259}, {408, 193}}</string>
           <boolean value="NO"/>
           <string>{196, 240}</string>
           <string>{{357, 418}, {480, 270}}</string>

@@ -52,14 +52,14 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
     [o_window setTitle:_NS("Track Synchronization")];
     [o_reset_btn setTitle:_NS("Reset")];
     [o_av_lbl setStringValue:_NS("Audio/Video")];
-    [o_av_advance_lbl setStringValue: _NS("Advance of audio over video:")];
+    [o_av_advance_lbl setStringValue: _NS("Audio track synchronization:")];
     [[o_av_value_fld formatter] setFormat:[NSString stringWithFormat:@"#,##0.000 %@", _NS("s")]];
     [o_av_value_fld setToolTip: _NS("A positive value means that the audio is ahead of the video")];
     [o_sv_lbl setStringValue: _NS("Subtitles/Video")];
-    [o_sv_advance_lbl setStringValue: _NS("Advance of subtitles over video:")];
+    [o_sv_advance_lbl setStringValue: _NS("Subtitle track syncronization:")];
     [[o_sv_advance_value_fld formatter] setFormat:[NSString stringWithFormat:@"#,##0.000 %@", _NS("s")]];
     [o_sv_advance_value_fld setToolTip: _NS("A positive value means that the subtitles are ahead of the video" )];
-    [o_sv_speed_lbl setStringValue: _NS("Speed of the subtitles:")];
+    [o_sv_speed_lbl setStringValue: _NS("Subtitles speed:")];
     [[o_sv_speed_value_fld formatter] setFormat:[NSString stringWithFormat:@"#,##0.000 %@", _NS("fps")]];
 
     if (OSX_LION)
