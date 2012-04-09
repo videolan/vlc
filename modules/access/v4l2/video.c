@@ -302,8 +302,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     set_section( N_( "Video input" ), NULL )
-    add_string( CFG_PREFIX "dev", "/dev/video0", DEVICE_TEXT, DEVICE_LONGTEXT,
-                 false )
+    add_loadfile( CFG_PREFIX "dev", "/dev/video0",
+                  DEVICE_TEXT, DEVICE_LONGTEXT, false )
         change_safe()
     add_string( CFG_PREFIX "standard", "",
                 STANDARD_TEXT, STANDARD_LONGTEXT, false )
