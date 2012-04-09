@@ -979,7 +979,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                 {
                     /* Very unlikely yet possible: bug #5659*/
                     size_t maxlen = p_tk->i_extra_data - sizeof( VLC_BITMAPINFOHEADER );
-                    p_tk->fmt.i_extra = ( p_tk->fmt.i_extra < maxlen )?
+                    p_tk->fmt.i_extra = ( (unsigned)p_tk->fmt.i_extra < maxlen )?
                         p_tk->fmt.i_extra : maxlen;
 
                     p_tk->fmt.p_extra = xmalloc( p_tk->fmt.i_extra );
