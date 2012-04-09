@@ -231,9 +231,9 @@ static int Open( vlc_object_t *p_this )
     DemuxTitles( p_demux, &p_sys->i_angle );
     if( DvdReadSetArea( p_demux, 0, 0, p_sys->i_angle ) != VLC_SUCCESS )
     {
-        Close( p_this );
         msg_Err( p_demux, "DvdReadSetArea(0,0,%i) failed (can't decrypt DVD?)",
                  p_sys->i_angle );
+        Close( p_this );
         return VLC_EGENERIC;
     }
 
