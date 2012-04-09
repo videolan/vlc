@@ -24,8 +24,15 @@
 
 #import "CompatibilityFixes.h"
 #import "intf.h"
+#import "VideoEffects.h"
 #import <vlc_common.h>
 #import "TrackSynchronization.h"
+
+#define SUBSDELAY_CFG_MODE                     "subsdelay-mode"
+#define SUBSDELAY_CFG_FACTOR                   "subsdelay-factor"
+#define SUBSDELAY_MODE_ABSOLUTE                0
+#define SUBSDELAY_MODE_RELATIVE_SOURCE_DELAY   1
+#define SUBSDELAY_MODE_RELATIVE_SOURCE_CONTENT 2
 
 @implementation VLCTrackSynchronization
 static VLCTrackSynchronization *_o_sharedInstance = nil;
@@ -61,6 +68,30 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
     [o_sv_advance_value_fld setToolTip: _NS("A positive value means that the subtitles are ahead of the video" )];
     [o_sv_speed_lbl setStringValue: _NS("Subtitles speed:")];
     [[o_sv_speed_value_fld formatter] setFormat:[NSString stringWithFormat:@"#,##0.000 %@", _NS("fps")]];
+    [o_sv_dur_lbl setStringValue: _NS("Subtitles duration factor:")];
+
+    int i_mode = var_InheritInteger( p_intf, SUBSDELAY_CFG_MODE );
+    NSString * o_toolTip, * o_suffix;
+
+    switch (i_mode)
+    {
+        default:
+        case SUBSDELAY_MODE_ABSOLUTE:
+            o_toolTip = _NS("Extend subtitles duration by this value.\nSet 0 to disable.");
+            o_suffix = @" s";
+            break;
+        case SUBSDELAY_MODE_RELATIVE_SOURCE_DELAY:
+            o_toolTip = _NS("Multiply subtitles duration by this value.\nSet 0 to disable.");
+            o_suffix = @"";
+            break;
+        case SUBSDELAY_MODE_RELATIVE_SOURCE_CONTENT:
+            o_toolTip = _NS("Recalculate subtitles duration according\nto their content and this value.\nSet 0 to disable.");
+            o_suffix = @"";
+            break;
+    }
+
+    [[o_sv_dur_value_fld formatter] setFormat:[NSString stringWithFormat:@"#,##0.000%@", o_suffix]];
+    [o_sv_dur_value_fld setToolTip: o_toolTip];
 
     if (OSX_LION)
         [o_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
@@ -81,9 +112,11 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
     [o_av_value_fld setFloatValue:0.0];
     [o_sv_advance_value_fld setFloatValue:0.0];
     [o_sv_speed_value_fld setFloatValue:1.0];
+    [o_sv_dur_value_fld setFloatValue:0.0];
     [o_av_stp setFloatValue:0.0];
     [o_sv_advance_stp setFloatValue:0.0];
     [o_sv_speed_stp setFloatValue:1.0];
+    [o_sv_dur_stp setFloatValue:0.0];
 
     input_thread_t * p_input = pl_CurrentInput( p_intf );
 
@@ -92,6 +125,7 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
         var_SetTime( p_input, "audio-delay", 0.0 );
         var_SetTime( p_input, "spu-delay", 0.0 );
         var_SetFloat( p_input, "sub-fps", 1.0 );
+        [self svDurationValueChanged:nil];
         vlc_object_release( p_input );
     }
 }
@@ -114,12 +148,6 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
 
 - (IBAction)avValueChanged:(id)sender
 {
-    if( sender == o_av_minus_btn )
-        [o_av_value_fld setDoubleValue: [o_av_value_fld doubleValue] - 0.5];
-
-    if( sender == o_av_plus_btn )
-        [o_av_value_fld setDoubleValue: [o_av_value_fld doubleValue] + 0.5];
-
     if( sender == o_av_stp )
         [o_av_value_fld setDoubleValue: [o_av_stp doubleValue]];
     else
@@ -137,12 +165,6 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
 
 - (IBAction)svAdvanceValueChanged:(id)sender
 {
-    if( sender == o_sv_advance_minus_btn )
-        [o_sv_advance_value_fld setDoubleValue: [o_sv_advance_value_fld doubleValue] - 0.5];
-
-    if( sender == o_sv_advance_plus_btn )
-        [o_sv_advance_value_fld setDoubleValue: [o_sv_advance_value_fld doubleValue] + 0.5];
-
     if( sender == o_sv_advance_stp )
         [o_sv_advance_value_fld setDoubleValue: [o_sv_advance_stp doubleValue]];
     else
@@ -160,12 +182,6 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
 
 - (IBAction)svSpeedValueChanged:(id)sender
 {
-    if( sender == o_sv_speed_minus_btn )
-        [o_sv_speed_value_fld setFloatValue: [o_sv_speed_value_fld floatValue] - 0.5];
-
-    if( sender == o_sv_speed_plus_btn )
-        [o_sv_speed_value_fld setFloatValue: [o_sv_speed_value_fld floatValue] + 0.5];
-
     if( sender == o_sv_speed_stp )
         [o_sv_speed_value_fld setFloatValue: [o_sv_speed_stp floatValue]];
     else
@@ -176,6 +192,33 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
     if( p_input )
     {
         var_SetFloat( p_input, "sub-fps", [o_sv_speed_value_fld floatValue] );
+
+        vlc_object_release( p_input );
+    }
+}
+
+- (IBAction)svDurationValueChanged:(id)sender
+{
+    if( sender == o_sv_dur_stp )
+        [o_sv_dur_value_fld setFloatValue: [o_sv_dur_stp floatValue]];
+    else
+        [o_sv_dur_stp setFloatValue: [o_sv_dur_value_fld floatValue]];
+
+    input_thread_t * p_input = pl_CurrentInput( p_intf );
+
+    if( p_input )
+    {
+        float f_factor = [o_sv_dur_value_fld floatValue];
+        config_PutFloat( p_intf, SUBSDELAY_CFG_FACTOR, f_factor );
+
+        /* Try to find an instance of subsdelay, and set its factor */
+        vlc_object_t *p_obj = ( vlc_object_t * ) vlc_object_find_name( p_intf->p_libvlc, "subsdelay" );
+        if( p_obj )
+        {
+            var_SetFloat( p_obj, SUBSDELAY_CFG_FACTOR, f_factor );
+            vlc_object_release( p_obj );
+        }
+        [[VLCVideoEffects sharedInstance] setVideoFilter: "subsdelay" on: f_factor > 0];
 
         vlc_object_release( p_input );
     }

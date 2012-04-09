@@ -34,23 +34,20 @@
     /* Audio / Video */
     IBOutlet id o_av_lbl;
     IBOutlet id o_av_advance_lbl;
-    IBOutlet id o_av_minus_btn;
-    IBOutlet id o_av_plus_btn;
     IBOutlet id o_av_value_fld;
     IBOutlet id o_av_stp;
 
     /* Subtitles / Video */
     IBOutlet id o_sv_lbl;
     IBOutlet id o_sv_advance_lbl;
-    IBOutlet id o_sv_advance_minus_btn;
-    IBOutlet id o_sv_advance_plus_btn;
     IBOutlet id o_sv_advance_value_fld;
     IBOutlet id o_sv_advance_stp;
     IBOutlet id o_sv_speed_lbl;
-    IBOutlet id o_sv_speed_minus_btn;
-    IBOutlet id o_sv_speed_plus_btn;
     IBOutlet id o_sv_speed_value_fld;
     IBOutlet id o_sv_speed_stp;
+    IBOutlet id o_sv_dur_lbl;
+    IBOutlet id o_sv_dur_value_fld;
+    IBOutlet id o_sv_dur_stp;
 }
 
 /* generic */
@@ -65,4 +62,5 @@
 /* Subtitles / Video */
 - (IBAction)svAdvanceValueChanged:(id)sender;
 - (IBAction)svSpeedValueChanged:(id)sender;
+- (IBAction)svDurationValueChanged:(id)sender;
 @end
