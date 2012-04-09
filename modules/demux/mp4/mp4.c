@@ -1528,82 +1528,6 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
 
     p_pasp = MP4_BoxGet( p_sample, "pasp" );
 
-    if( p_track->fmt.i_cat == AUDIO_ES && ( p_track->i_sample_size == 1 || p_track->i_sample_size == 2 ) )
-    {
-        MP4_Box_data_sample_soun_t *p_soun;
-
-        p_soun = p_sample->data.p_sample_soun;
-
-        if( p_soun->i_qt_version == 0 )
-        {
-            switch( p_sample->i_type )
-            {
-                case VLC_FOURCC( 'i', 'm', 'a', '4' ):
-                    p_soun->i_qt_version = 1;
-                    p_soun->i_sample_per_packet = 64;
-                    p_soun->i_bytes_per_packet  = 34;
-                    p_soun->i_bytes_per_frame   = 34 * p_soun->i_channelcount;
-                    p_soun->i_bytes_per_sample  = 2;
-                    break;
-                case VLC_FOURCC( 'M', 'A', 'C', '3' ):
-                    p_soun->i_qt_version = 1;
-                    p_soun->i_sample_per_packet = 6;
-                    p_soun->i_bytes_per_packet  = 2;
-                    p_soun->i_bytes_per_frame   = 2 * p_soun->i_channelcount;
-                    p_soun->i_bytes_per_sample  = 2;
-                    break;
-                case VLC_FOURCC( 'M', 'A', 'C', '6' ):
-                    p_soun->i_qt_version = 1;
-                    p_soun->i_sample_per_packet = 12;
-                    p_soun->i_bytes_per_packet  = 2;
-                    p_soun->i_bytes_per_frame   = 2 * p_soun->i_channelcount;
-                    p_soun->i_bytes_per_sample  = 2;
-                    break;
-                case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
-                case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
-                    p_soun->i_samplesize = 8;
-                    p_track->i_sample_size = p_soun->i_channelcount;
-                    break;
-                case VLC_FOURCC( 'N', 'O', 'N', 'E' ):
-                case VLC_FOURCC( 'r', 'a', 'w', ' ' ):
-                case VLC_FOURCC( 't', 'w', 'o', 's' ):
-                case VLC_FOURCC( 's', 'o', 'w', 't' ):
-                    /* What would be the fun if you could trust the .mov */
-                    p_track->i_sample_size = ((p_soun->i_samplesize+7)/8) * p_soun->i_channelcount;
-                    break;
-                default:
-                    break;
-            }
-
-        }
-        else if( p_soun->i_qt_version == 1 && p_soun->i_sample_per_packet <= 0 )
-        {
-            p_soun->i_qt_version = 0;
-        }
-    }
-    else if( p_track->fmt.i_cat == AUDIO_ES && p_sample->data.p_sample_soun->i_qt_version == 1 )
-    {
-        MP4_Box_data_sample_soun_t *p_soun = p_sample->data.p_sample_soun;
-
-        switch( p_sample->i_type )
-        {
-            case( VLC_FOURCC( '.', 'm', 'p', '3' ) ):
-            case( VLC_FOURCC( 'm', 's', 0x00, 0x55 ) ):
-            {
-                if( p_track->i_sample_size > 1 )
-                    p_soun->i_qt_version = 0;
-                break;
-            }
-            case( VLC_FOURCC( 'a', 'c', '-', '3' ) ):
-            case( VLC_FOURCC( 'e', 'c', '-', '3' ) ):
-            case( VLC_FOURCC( 'm', 's', 0x20, 0x00 ) ):
-                p_soun->i_qt_version = 0;
-                break;
-            default:
-                break;
-        }
-    }
-
     /* */
     switch( p_track->fmt.i_cat )
     {
@@ -1657,8 +1581,84 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         p_track->fmt.audio.i_bitspersample =
             p_sample->data.p_sample_soun->i_samplesize;
 
+        if( ( p_track->i_sample_size == 1 || p_track->i_sample_size == 2 ) )
+        {
+            MP4_Box_data_sample_soun_t *p_soun;
+            p_soun = p_sample->data.p_sample_soun;
+
+            if( p_soun->i_qt_version == 0 )
+            {
+                switch( p_sample->i_type )
+                {
+                    case VLC_FOURCC( 'i', 'm', 'a', '4' ):
+                        p_soun->i_qt_version = 1;
+                        p_soun->i_sample_per_packet = 64;
+                        p_soun->i_bytes_per_packet  = 34;
+                        p_soun->i_bytes_per_frame   = 34 * p_soun->i_channelcount;
+                        p_soun->i_bytes_per_sample  = 2;
+                        break;
+                    case VLC_FOURCC( 'M', 'A', 'C', '3' ):
+                        p_soun->i_qt_version = 1;
+                        p_soun->i_sample_per_packet = 6;
+                        p_soun->i_bytes_per_packet  = 2;
+                        p_soun->i_bytes_per_frame   = 2 * p_soun->i_channelcount;
+                        p_soun->i_bytes_per_sample  = 2;
+                        break;
+                    case VLC_FOURCC( 'M', 'A', 'C', '6' ):
+                        p_soun->i_qt_version = 1;
+                        p_soun->i_sample_per_packet = 12;
+                        p_soun->i_bytes_per_packet  = 2;
+                        p_soun->i_bytes_per_frame   = 2 * p_soun->i_channelcount;
+                        p_soun->i_bytes_per_sample  = 2;
+                        break;
+                    case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
+                    case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
+                        p_soun->i_samplesize = 8;
+                        p_track->i_sample_size = p_soun->i_channelcount;
+                        break;
+                    case VLC_FOURCC( 'N', 'O', 'N', 'E' ):
+                    case VLC_FOURCC( 'r', 'a', 'w', ' ' ):
+                    case VLC_FOURCC( 't', 'w', 'o', 's' ):
+                    case VLC_FOURCC( 's', 'o', 'w', 't' ):
+                        /* What would be the fun if you could trust the .mov */
+                        p_track->i_sample_size = ((p_soun->i_samplesize+7)/8) * p_soun->i_channelcount;
+                        break;
+                    default:
+                        break;
+                }
+
+            }
+            else if( p_soun->i_qt_version == 1 && p_soun->i_sample_per_packet <= 0 )
+            {
+                p_soun->i_qt_version = 0;
+            }
+        }
+        else if( p_sample->data.p_sample_soun->i_qt_version == 1 )
+        {
+            MP4_Box_data_sample_soun_t *p_soun = p_sample->data.p_sample_soun;
+
+            switch( p_sample->i_type )
+            {
+                case( VLC_FOURCC( '.', 'm', 'p', '3' ) ):
+                case( VLC_FOURCC( 'm', 's', 0x00, 0x55 ) ):
+                    {
+                        if( p_track->i_sample_size > 1 )
+                            p_soun->i_qt_version = 0;
+                        break;
+                    }
+                case( VLC_FOURCC( 'a', 'c', '-', '3' ) ):
+                case( VLC_FOURCC( 'e', 'c', '-', '3' ) ):
+                case( VLC_FOURCC( 'm', 's', 0x20, 0x00 ) ):
+                    p_soun->i_qt_version = 0;
+                    break;
+                default:
+                    break;
+            }
+        }
+
         if( p_track->i_sample_size != 0 &&
-            p_sample->data.p_sample_soun->i_qt_version == 1 && p_sample->data.p_sample_soun->i_sample_per_packet <= 0 )
+                p_sample->data.p_sample_soun->i_qt_version == 1 &&
+                p_sample->data.p_sample_soun->i_sample_per_packet <= 0 )
         {
             msg_Err( p_demux, "Invalid sample per packet value for qt_version 1" );
             return VLC_EGENERIC;
