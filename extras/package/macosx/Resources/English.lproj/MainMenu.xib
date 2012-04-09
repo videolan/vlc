@@ -21,16 +21,16 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="4850"/>
       <integer value="2770"/>
-      <integer value="4596"/>
-      <integer value="1617"/>
-      <integer value="29"/>
+      <integer value="2730"/>
+      <integer value="915"/>
       <integer value="4722"/>
       <integer value="4948"/>
-      <integer value="915"/>
-      <integer value="2730"/>
-      <integer value="21"/>
+      <integer value="4596"/>
+      <integer value="4713"/>
+      <integer value="29"/>
+      <integer value="4850"/>
+      <integer value="1617"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -7404,22 +7404,6 @@ LCAuLi4</string>
             <reference key="destination" ref="355945594"/>
           </object>
           <int key="connectionID">4704</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">dataSource</string>
-            <reference key="source" ref="1064884668"/>
-            <reference key="destination" ref="498338108"/>
-          </object>
-          <int key="connectionID">4719</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">delegate</string>
-            <reference key="source" ref="1064884668"/>
-            <reference key="destination" ref="498338108"/>
-          </object>
-          <int key="connectionID">4720</int>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">

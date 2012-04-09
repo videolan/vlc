@@ -442,12 +442,15 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_sidebaritems addObject: internetItem];
 
     [o_sidebar_view reloadData];
-    NSUInteger i_sidebaritem_count = [o_sidebaritems count];
-    for (NSUInteger x = 0; x < i_sidebaritem_count; x++)
-        [o_sidebar_view expandItem: [o_sidebaritems objectAtIndex: x] expandChildren: YES];
+    [o_sidebar_view expandItem: libraryItem expandChildren: YES];
     [o_sidebar_view selectRowIndexes:[NSIndexSet indexSetWithIndex:1] byExtendingSelection:NO];
     [o_sidebar_view setDropItem:playlistItem dropChildIndex:NSOutlineViewDropOnItemIndex];
     [o_sidebar_view registerForDraggedTypes:[NSArray arrayWithObjects: NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
+
+    [o_sidebar_view setAutosaveName:@"mainwindow-sidebar"];
+    [(PXSourceList *)o_sidebar_view setDataSource:self];
+    [o_sidebar_view setDelegate:self];
+    [o_sidebar_view setAutosaveExpandedItems:YES];
 
     if( b_dark_interface )
     {
@@ -2306,6 +2309,31 @@ static VLCMainWindow *_o_sharedInstance = nil;
         return YES;
     }
     return NO;
+}
+
+- (id)sourceList:(PXSourceList *)aSourceList persistentObjectForItem:(id)item
+{
+    return [item identifier];
+}
+
+- (id)sourceList:(PXSourceList *)aSourceList itemForPersistentObject:(id)object
+{
+    /* the following code assumes for sakes of simplicity that only the top level
+     * items are allowed to have children */
+
+    NSArray * array = [NSArray arrayWithArray: o_sidebaritems]; // read-only arrays are noticebly faster
+    NSUInteger count = [array count];
+    if (count < 1)
+        return nil;
+
+    for (NSUInteger x = 0; x < count; x++)
+    {
+        id item = [array objectAtIndex: x]; // save one objc selector call
+        if ([[item identifier] isEqualToString:object])
+            return item;
+    }
+
+    return nil;
 }
 @end
 

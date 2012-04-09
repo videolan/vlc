@@ -27,6 +27,7 @@
 #import <Cocoa/Cocoa.h>
 #import "CompatibilityFixes.h"
 #import "PXSourceList.h"
+#import "PXSourceListDataSource.h"
 #import <vlc_input.h>
 #import "misc.h"
 #import "fspanel.h"
