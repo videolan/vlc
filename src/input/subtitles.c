@@ -326,16 +326,14 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             char tmp_fname_noext[strlen( psz_name ) + 1];
             char tmp_fname_trim[strlen( psz_name ) + 1];
             char tmp_fname_ext[strlen( psz_name ) + 1];
-            char *tmp;
-
-            int i_prio;
+            const char *tmp;
+            int i_prio = SUB_PRIORITY_NONE;
 
             /* retrieve various parts of the filename */
             strcpy_strip_ext( tmp_fname_noext, psz_name );
             strcpy_get_ext( tmp_fname_ext, psz_name );
             strcpy_trim( tmp_fname_trim, tmp_fname_noext );
 
-            i_prio = SUB_PRIORITY_NONE;
             if( !strcmp( tmp_fname_trim, f_fname_trim ) )
             {
                 /* matches the movie name exactly */
