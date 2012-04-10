@@ -736,6 +736,8 @@ static int MP4_ReadBox_tkhd(  stream_t *p_stream, MP4_Box_t *p_box )
     if (rotation < 0)
         rotation += 360.;
 
+    p_box->data.p_tkhd->f_rotation = rotation;
+
 #ifdef MP4_VERBOSE
     MP4_ConvertDate2Str( s_creation_time, p_box->data.p_mvhd->i_creation_time );
     MP4_ConvertDate2Str( s_modification_time, p_box->data.p_mvhd->i_modification_time );

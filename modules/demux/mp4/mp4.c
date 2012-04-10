@@ -105,6 +105,7 @@ typedef struct
     /* display size only ! */
     int i_width;
     int i_height;
+    float f_rotation;
 
     /* more internal data */
     uint64_t        i_timescale;    /* time scale for this track only */
@@ -1568,6 +1569,20 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                               p_track, i_sample_description_index, i_chunk );
         p_demux->p_sys->f_fps = (float)p_track->fmt.video.i_frame_rate /
                                 (float)p_track->fmt.video.i_frame_rate_base;
+
+        /* Rotation */
+        switch( (int)p_track->f_rotation ) {
+            case 90:
+                p_track->fmt.video.orientation = ORIENT_ROTATED_90;
+                break;
+            case 180:
+                p_track->fmt.video.orientation = ORIENT_ROTATED_180;
+                break;
+            case 270:
+                p_track->fmt.video.orientation = ORIENT_ROTATED_270;
+                break;
+        }
+
         break;
 
     case AUDIO_ES:
@@ -2325,6 +2340,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     p_track->i_track_ID = p_tkhd->data.p_tkhd->i_track_ID;
     p_track->i_width = p_tkhd->data.p_tkhd->i_width / 65536;
     p_track->i_height = p_tkhd->data.p_tkhd->i_height / 65536;
+    p_track->f_rotation = p_tkhd->data.p_tkhd->f_rotation;
 
     if( p_tref )
     {
