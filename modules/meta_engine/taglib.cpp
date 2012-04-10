@@ -67,6 +67,7 @@
 #include <mpegfile.h>
 #include <oggfile.h>
 #include <oggflacfile.h>
+#include "../demux/vorbis.h"
 
 #if TAGLIB_VERSION >= VERSION_INT(1,6,0)
 # define TAGLIB_HAVE_AIFF_WAV_H
@@ -365,35 +366,51 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
     StringList mime_list = tag->fieldListMap()[ "COVERARTMIME" ];
     StringList art_list = tag->fieldListMap()[ "COVERART" ];
 
-    // We get only the first covert art
-    if( mime_list.size() > 1 || art_list.size() > 1 )
-        msg_Warn( p_demux_meta, "Found %i embedded arts, so using only the first one",
-                  art_list.size() );
-    else if( mime_list.size() == 0 || art_list.size() == 0 )
-        return;
-
     input_attachment_t *p_attachment;
 
-    const char* psz_name = "cover";
-    const char* psz_mime = mime_list[0].toCString(true);
-    const char* psz_description = "cover";
+    if( mime_list.size() != 0 && art_list.size() != 0 )
+    {
+        // We get only the first covert art
+        if( mime_list.size() > 1 || art_list.size() > 1 )
+            msg_Warn( p_demux_meta, "Found %i embedded arts, so using only the first one",
+                    art_list.size() );
 
-    uint8_t *p_data;
-    int i_data = vlc_b64_decode_binary( &p_data, art_list[0].toCString(true) );
+        const char* psz_name = "cover";
+        const char* psz_mime = mime_list[0].toCString(true);
+        const char* psz_description = "cover";
 
-    msg_Dbg( p_demux_meta, "Found embedded art: %s (%s) is %i bytes",
-             psz_name, psz_mime, i_data );
+        uint8_t *p_data;
+        int i_data = vlc_b64_decode_binary( &p_data, art_list[0].toCString(true) );
+
+        msg_Dbg( p_demux_meta, "Found embedded art: %s (%s) is %i bytes",
+                psz_name, psz_mime, i_data );
+
+        p_attachment = vlc_input_attachment_New( psz_name, psz_mime,
+                psz_description, p_data, i_data );
+        free( p_data );
+    }
+    else
+    {
+        art_list = tag->fieldListMap()[ "METADATA_BLOCK_PICTURE" ];
+        if( art_list.size() == 0 )
+            return;
+
+        uint8_t *p_data;
+        int type;
+        int i_data = vlc_b64_decode_binary( &p_data, art_list[0].toCString(true) );
+        p_attachment = ParseFlacPicture( p_data, i_data, 0, &type );
+    }
 
     TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
-              p_attachment = vlc_input_attachment_New( psz_name, psz_mime,
-              psz_description, p_data, i_data );
-    free( p_data );
-
     TAB_APPEND_CAST( (input_attachment_t**),
                      p_demux_meta->i_attachments, p_demux_meta->attachments,
                      p_attachment );
 
-    vlc_meta_SetArtURL( p_meta, "attachment://cover" );
+    char *psz_url;
+    if( asprintf( &psz_url, "attachment://%s", p_attachment->psz_name ) != -1 ) {
+        vlc_meta_SetArtURL( p_meta, psz_url );
+        free( psz_url );
+    }
 }
 
 
