@@ -546,6 +546,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
     [[VLCMain sharedInstance] playbackModeUpdated];
 
+    [o_split_view setAutosaveName:@"10thanniversary-splitview"];
     if (b_splitviewShouldBeHidden)
     {
         i_lastSplitViewHeight = [o_split_view frame].size.height;
@@ -1090,7 +1091,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     return proposedFrameSize;
 }
-
 
 #pragma mark -
 #pragma mark Update interface and respond to foreign events
@@ -2070,9 +2070,14 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (CGFloat)splitView:(NSSplitView *)splitView constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)dividerIndex
 {
     if (dividerIndex == 0)
-        return ([self frame].size.width - 400.0);
+        return 300.;
     else
         return proposedMax;
+}
+
+- (BOOL)splitView:(NSSplitView *)splitView canCollapseSubview:(NSView *)subview
+{
+    return ([subview isEqual:o_left_split_view]);
 }
 
 #pragma mark -

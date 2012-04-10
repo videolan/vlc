@@ -686,23 +686,6 @@ void _drawFrameInRect(NSRect frameRect)
 {
     return 1.0;
 }
-
-- (void)adjustSubviews
-{
-    NSArray *o_subviews = [self subviews];
-    NSRect viewDimensions = [self frame];
-    NSRect leftViewDimensions = [[o_subviews objectAtIndex:0] frame];
-    NSRect rightViewDimensions = [[o_subviews objectAtIndex:1] frame];
-    CGFloat f_dividerThickness = [self dividerThickness];
-
-    leftViewDimensions.size.height = viewDimensions.size.height;
-    [[o_subviews objectAtIndex:0] setFrame: leftViewDimensions];
-
-    rightViewDimensions.origin.x = leftViewDimensions.size.width + f_dividerThickness;
-    rightViewDimensions.size.width = viewDimensions.size.width - leftViewDimensions.size.width - f_dividerThickness;
-    rightViewDimensions.size.height = viewDimensions.size.height;
-    [[o_subviews objectAtIndex:1] setFrame: rightViewDimensions];
-}
 @end
 
 /*****************************************************************************

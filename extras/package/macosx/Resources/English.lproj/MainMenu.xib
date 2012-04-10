@@ -21,16 +21,16 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="4850"/>
-      <integer value="29"/>
-      <integer value="4948"/>
-      <integer value="915"/>
-      <integer value="2770"/>
-      <integer value="2730"/>
       <integer value="4722"/>
       <integer value="4596"/>
+      <integer value="2"/>
+      <integer value="29"/>
+      <integer value="2730"/>
+      <integer value="915"/>
+      <integer value="4948"/>
       <integer value="1617"/>
-      <integer value="4713"/>
+      <integer value="4850"/>
+      <integer value="2770"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -604,7 +604,6 @@
               <int key="NSViewLayerContentsRedrawPolicy">2</int>
               <bool key="NSIsVertical">YES</bool>
               <int key="NSDividerStyle">2</int>
-              <string key="NSAutosaveName">10thanniversary-splitview</string>
             </object>
             <object class="NSCustomView" id="515305233">
               <reference key="NSNextResponder" ref="429932428"/>
@@ -12064,9 +12063,9 @@ LCAuLi4</string>
           <string>{{430, 565}, {137, 103}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{364, 446}, {604, 310}}</string>
+          <string>{{363, 446}, {604, 310}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{364, 446}, {604, 310}}</string>
+          <string>{{363, 446}, {604, 310}}</string>
           <boolean value="YES"/>
           <boolean value="NO"/>
           <boolean value="NO"/>
