@@ -758,7 +758,6 @@ int SetupInput (vlc_object_t *obj, int fd)
     msg_Dbg (obj, "selected input %"PRIu32, input.index);
 
     SetupStandard (obj, fd, &input);
-    ResetCrop (obj, fd); /* crop depends on standard */
     SetupTuner (obj, fd, &input);
     SetupAudio (obj, fd, &input);
     return 0;
@@ -970,6 +969,7 @@ int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
     }
     if (v4l2_ioctl (fd, VIDIOC_S_PARM, parm) < 0)
         msg_Warn (obj, "cannot set streaming parameters: %m");
+    ResetCrop (obj, fd); /* crop depends on frame size */
 
     return 0;
 }
