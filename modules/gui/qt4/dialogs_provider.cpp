@@ -97,6 +97,7 @@ DialogsProvider::~DialogsProvider()
     UpdateDialog::killInstance();
 #endif
     PluginDialog::killInstance();
+    EpgDialog::killInstance();
 
     delete menusMapper;
     delete menusUpdateMapper;
