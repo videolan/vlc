@@ -85,10 +85,6 @@ int AccessOpen( vlc_object_t *obj )
     }
 
     sys->i_fd = fd;
-    if( sys->io == IO_METHOD_READ )
-        access->pf_read = AccessReadStream;
-    else
-        access->pf_block = AccessRead;
     access->pf_seek = NULL;
     access->pf_control = AccessControl;
     return VLC_SUCCESS;
@@ -131,16 +127,6 @@ int InitVideo (access_t *access, int fd)
         return -1;
     }
 
-    if (cap.capabilities & V4L2_CAP_STREAMING)
-        sys->io = IO_METHOD_MMAP;
-    else if (cap.capabilities & V4L2_CAP_READWRITE)
-        sys->io = IO_METHOD_READ;
-    else
-    {
-        msg_Err (access, "no supported I/O method");
-        return -1;
-    }
-
     if (SetupInput (VLC_OBJECT(access), fd))
         return -1;
 
@@ -180,13 +166,8 @@ int InitVideo (access_t *access, int fd)
     }
 
     /* Init I/O method */
-    switch (sys->io)
+    if (cap.capabilities & V4L2_CAP_STREAMING)
     {
-    case IO_METHOD_READ:
-        sys->blocksize = fmt.fmt.pix.sizeimage;
-        break;
-
-    case IO_METHOD_MMAP:
         if (InitMmap (VLC_OBJECT(access), sys, fd))
             return -1;
         for (unsigned int i = 0; i < sys->i_nbuffers; i++)
@@ -210,9 +191,18 @@ int InitVideo (access_t *access, int fd)
             msg_Err (access, "cannot start streaming: %m" );
             return -1;
         }
-        break;
-    default:
-        assert (0);
+
+        access->pf_block = AccessRead;
+    }
+    else if (cap.capabilities & V4L2_CAP_READWRITE)
+    {
+        sys->blocksize = fmt.fmt.pix.sizeimage;
+        access->pf_read = AccessReadStream;
+    }
+    else
+    {
+        msg_Err (access, "no supported I/O method");
+        return -1;
     }
     return 0;
 }
