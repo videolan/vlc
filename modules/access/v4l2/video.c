@@ -72,11 +72,10 @@
 #define AUDIO_INPUT_LONGTEXT N_( \
     "Audio input of the card to use (see debug)." )
 #define WIDTH_TEXT N_( "Width" )
-#define WIDTH_LONGTEXT N_( \
-    "Force width (-1 for autodetect, 0 for driver default)." )
 #define HEIGHT_TEXT N_( "Height" )
-#define HEIGHT_LONGTEXT N_( \
-    "Force height (-1 for autodetect, 0 for driver default)." )
+#define SIZE_LONGTEXT N_( \
+    "The specified pixel resolution is forced " \
+    "(if both width and height are strictly positive)." )
 #define FPS_TEXT N_( "Framerate" )
 #define FPS_LONGTEXT N_( "Framerate to capture, if applicable " \
     "(0 for autodetect)." )
@@ -285,16 +284,6 @@ static const char *const psz_tuner_audio_modes_list_text[] = {
 
 #define V4L2_DEFAULT "/dev/video0"
 
-#ifdef HAVE_MAEMO
-# define DEFAULT_WIDTH	640
-# define DEFAULT_HEIGHT	492
-#endif
-
-#ifndef DEFAULT_WIDTH
-# define DEFAULT_WIDTH	(-1)
-# define DEFAULT_HEIGHT	(-1)
-#endif
-
 vlc_module_begin ()
     set_shortname( N_("Video4Linux2") )
     set_description( N_("Video4Linux2 input") )
@@ -321,11 +310,11 @@ vlc_module_begin ()
         change_integer_range( -1, 0xFFFFFFFE )
         change_safe()
     add_obsolete_integer( CFG_PREFIX "io" ) /* since 2.0.0 */
-    add_integer( CFG_PREFIX "width", DEFAULT_WIDTH, WIDTH_TEXT,
-                WIDTH_LONGTEXT, true )
+    add_integer( CFG_PREFIX "width", 0, WIDTH_TEXT, SIZE_LONGTEXT, false )
+        change_integer_range( 0, VOUT_MAX_WIDTH )
         change_safe()
-    add_integer( CFG_PREFIX "height", DEFAULT_HEIGHT, HEIGHT_TEXT,
-                HEIGHT_LONGTEXT, true )
+    add_integer( CFG_PREFIX "height", 0, HEIGHT_TEXT, SIZE_LONGTEXT, false )
+        change_integer_range( 0, VOUT_MAX_WIDTH )
         change_safe()
     add_string( CFG_PREFIX "aspect-ratio", "4:3", ASPECT_TEXT,
               ASPECT_LONGTEXT, true )
@@ -877,11 +866,22 @@ int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
     struct v4l2_fract best_it = infinity;
     uint64_t best_area = 0;
 
+    uint32_t width = var_InheritInteger (obj, CFG_PREFIX"width");
+    uint32_t height = var_InheritInteger (obj, CFG_PREFIX"height");
+    if (width > 0 && height > 0)
+    {
+        fmt->fmt.pix.width = width;
+        fmt->fmt.pix.height = height;
+        msg_Dbg (obj, " requested frame size: %"PRIu32"x%"PRIu32,
+                 width, height);
+        FindMaxRate (obj, fd, fmt, parm, &best_it);
+    }
+    else
     if (v4l2_ioctl (fd, VIDIOC_ENUM_FRAMESIZES, &fse) < 0)
     {
         /* Fallback to current format, try to maximize frame rate */
         msg_Dbg (obj, " unknown frame sizes: %m");
-        msg_Dbg (obj, " default frame size: %"PRIu32"x%"PRIu32,
+        msg_Dbg (obj, " current frame size: %"PRIu32"x%"PRIu32,
                  fmt->fmt.pix.width, fmt->fmt.pix.height);
         FindMaxRate (obj, fd, fmt, parm, &best_it);
     }
