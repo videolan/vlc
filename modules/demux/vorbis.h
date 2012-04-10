@@ -172,7 +172,8 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
                 snprintf( psz_url, sizeof(psz_url), "attachment://%s", p_attachment->psz_name );
                 vlc_meta_Set( p_meta, vlc_meta_ArtworkURL, psz_url );
                 i_attach++;
-                TAB_APPEND( *i_attachments, *attachments, p_attachment );
+                TAB_APPEND_CAST( (input_attachment_t**),
+                    *i_attachments, *attachments, p_attachment );
             }
         }
         else if( strchr( psz, '=' ) )
