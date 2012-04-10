@@ -81,6 +81,7 @@ typedef struct vlc_v4l2_ctrl vlc_v4l2_ctrl_t;
 struct demux_sys_t
 {
     int  i_fd;
+    vlc_thread_t thread;
 
     /* Video */
     io_method io;

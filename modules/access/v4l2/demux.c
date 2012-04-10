@@ -41,8 +41,9 @@
 
 #include "v4l2.h"
 
+static void *StreamThread (void *);
+static void *ReadThread (void *);
 static int DemuxControl( demux_t *, int, va_list );
-static int Demux( demux_t * );
 static int InitVideo (demux_t *, int);
 
 int DemuxOpen( vlc_object_t *obj )
@@ -86,7 +87,7 @@ int DemuxOpen( vlc_object_t *obj )
 
     sys->i_fd = fd;
     sys->controls = ControlsInit (VLC_OBJECT(demux), fd);
-    demux->pf_demux = Demux;
+    demux->pf_demux = NULL;
     demux->pf_control = DemuxControl;
     demux->info.i_update = 0;
     demux->info.i_title = 0;
@@ -256,7 +257,6 @@ static void GetAR (int fd, unsigned *restrict num, unsigned *restrict den)
 static int InitVideo (demux_t *demux, int fd)
 {
     demux_sys_t *sys = demux->p_sys;
-    enum v4l2_buf_type buf_type;
 
     /* Get device capabilites */
     struct v4l2_capability cap;
@@ -288,16 +288,6 @@ static int InitVideo (demux_t *demux, int fd)
     if (!(caps & V4L2_CAP_VIDEO_CAPTURE))
     {
         msg_Err (demux, "not a video capture device");
-        return -1;
-    }
-
-    if (caps & V4L2_CAP_STREAMING)
-        sys->io = IO_METHOD_MMAP;
-    else if (caps & V4L2_CAP_READWRITE)
-        sys->io = IO_METHOD_READ;
-    else
-    {
-        msg_Err (demux, "no supported I/O method");
         return -1;
     }
 
@@ -437,13 +427,9 @@ static int InitVideo (demux_t *demux, int fd)
     sys->p_es = es_out_Add (demux->out, &es_fmt);
 
     /* Init I/O method */
-    switch (sys->io)
+    void *(*entry) (void *);
+    if (caps & V4L2_CAP_STREAMING)
     {
-    case IO_METHOD_READ:
-        sys->blocksize = fmt.fmt.pix.sizeimage;
-        break;
-
-    case IO_METHOD_MMAP:
         if (InitMmap (VLC_OBJECT(demux), sys, fd))
             return -1;
         for (unsigned int i = 0; i < sys->i_nbuffers; i++)
@@ -461,18 +447,30 @@ static int InitVideo (demux_t *demux, int fd)
             }
         }
 
-        buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        enum v4l2_buf_type buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         if (v4l2_ioctl (fd, VIDIOC_STREAMON, &buf_type) < 0)
         {
             msg_Err (demux, "cannot start streaming: %m");
             return -1;
         }
-        break;
 
-    default:
-        assert (0);
+        sys->io = IO_METHOD_MMAP;
+        entry = StreamThread;
+    }
+    else if (caps & V4L2_CAP_READWRITE)
+    {
+        sys->blocksize = fmt.fmt.pix.sizeimage;
+        sys->io = IO_METHOD_READ;
+        entry = ReadThread;
+    }
+    else
+    {
+        msg_Err (demux, "no supported I/O method");
+        return -1;
     }
 
+    if (vlc_clone (&sys->thread, entry, demux, VLC_THREAD_PRIORITY_INPUT))
+        return -1;
     return 0;
 }
 
@@ -481,6 +479,9 @@ void DemuxClose( vlc_object_t *obj )
     demux_t *demux = (demux_t *)obj;
     demux_sys_t *sys = demux->p_sys;
     int fd = sys->i_fd;
+
+    vlc_cancel (sys->thread);
+    vlc_join (sys->thread, NULL);
 
     /* Stop video capture */
     switch( sys->io )
@@ -529,6 +530,86 @@ void DemuxClose( vlc_object_t *obj )
     free( sys );
 }
 
+static void *StreamThread (void *data)
+{
+    demux_t *demux = data;
+    demux_sys_t *sys = demux->p_sys;
+    int fd = sys->i_fd;
+    struct pollfd ufd[1];
+
+    ufd[0].fd = fd;
+    ufd[0].events = POLLIN | POLLPRI;
+
+    for (;;)
+    {
+        /* Wait for data */
+        if (poll (ufd, 1, -1) == -1)
+        {
+           if (errno != EINTR)
+               msg_Err (demux, "poll error: %m");
+           continue;
+        }
+
+        int canc = vlc_savecancel ();
+        block_t *block = GrabVideo (VLC_OBJECT(demux), sys);
+        if (block != NULL)
+        {
+            block->i_pts = block->i_dts = mdate ();
+            block->i_flags |= sys->i_block_flags;
+            es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts);
+            es_out_Send (demux->out, sys->p_es, block);
+        }
+        vlc_restorecancel (canc);
+    }
+
+    assert (0);
+}
+
+static void *ReadThread (void *data)
+{
+    demux_t *demux = data;
+    demux_sys_t *sys = demux->p_sys;
+    int fd = sys->i_fd;
+    struct pollfd ufd[1];
+
+    ufd[0].fd = fd;
+    ufd[0].events = POLLIN | POLLPRI;
+
+    for (;;)
+    {
+        /* Wait for data */
+        if (poll (ufd, 1, -1) == -1)
+        {
+           if (errno != EINTR)
+               msg_Err (demux, "poll error: %m");
+           continue;
+        }
+
+        block_t *block = block_Alloc (sys->blocksize);
+        if (unlikely(block == NULL))
+        {
+            msg_Err (demux, "read error: %m");
+            v4l2_read (fd, NULL, 0); /* discard frame */
+            continue;
+        }
+        block->i_pts = block->i_dts = mdate ();
+        block->i_flags |= sys->i_block_flags;
+
+        int canc = vlc_savecancel ();
+        ssize_t val = v4l2_read (fd, block->p_buffer, block->i_buffer);
+        if (val != -1)
+        {
+            block->i_buffer = val;
+            es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts);
+            es_out_Send (demux->out, sys->p_es, block);
+        }
+        else
+            block_Release (block);
+        vlc_restorecancel (canc);
+    }
+    assert (0);
+}
+
 static int DemuxControl( demux_t *demux, int query, va_list args )
 {
     switch( query )
@@ -555,65 +636,4 @@ static int DemuxControl( demux_t *demux, int query, va_list args )
     }
 
     return VLC_EGENERIC;
-}
-
-/** Gets a frame in read/write mode */
-static block_t *BlockRead( vlc_object_t *obj, int fd, size_t size )
-{
-    block_t *block = block_Alloc( size );
-    if( unlikely(block == NULL) )
-        return NULL;
-
-    ssize_t val = v4l2_read( fd, block->p_buffer, size );
-    if( val == -1 )
-    {
-        block_Release( block );
-        switch( errno )
-        {
-            case EAGAIN:
-                return NULL;
-            case EIO: /* could be ignored per specification */
-                /* fall through */
-            default:
-                msg_Err( obj, "cannot read frame: %m" );
-                return NULL;
-        }
-    }
-    block->i_buffer = val;
-    return block;
-}
-
-static int Demux( demux_t *demux )
-{
-    demux_sys_t *sys = demux->p_sys;
-    struct pollfd ufd;
-
-    ufd.fd = sys->i_fd;
-    ufd.events = POLLIN|POLLPRI;
-    /* Wait for data */
-    /* FIXME: remove timeout */
-    while( poll( &ufd, 1, 500 ) == -1 )
-        if( errno != EINTR )
-        {
-            msg_Err( demux, "poll error: %m" );
-            return -1;
-        }
-
-    if( ufd.revents == 0 )
-        return 1;
-
-    block_t *block;
-
-    if( sys->io == IO_METHOD_READ )
-        block = BlockRead( VLC_OBJECT(demux), ufd.fd, sys->blocksize );
-    else
-        block = GrabVideo( VLC_OBJECT(demux), sys );
-    if( block == NULL )
-        return 1;
-
-    block->i_pts = block->i_dts = mdate();
-    block->i_flags |= sys->i_block_flags;
-    es_out_Control( demux->out, ES_OUT_SET_PCR, block->i_pts );
-    es_out_Send( demux->out, sys->p_es, block );
-    return 1;
 }
