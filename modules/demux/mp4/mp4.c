@@ -2312,7 +2312,6 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     MP4_Box_t *p_vmhd;
     MP4_Box_t *p_smhd;
 
-    unsigned int i;
     char language[4];
 
     /* hint track unsupported */
@@ -2338,6 +2337,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
         p_track->fmt.i_priority = -1;
 
     p_track->i_track_ID = p_tkhd->data.p_tkhd->i_track_ID;
+
     p_track->i_width = p_tkhd->data.p_tkhd->i_width / 65536;
     p_track->i_height = p_tkhd->data.p_tkhd->i_height / 65536;
     p_track->f_rotation = p_tkhd->data.p_tkhd->f_rotation;
@@ -2368,7 +2368,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     }
     else
     {
-        for( i = 0; i < 3; i++ )
+        for( unsigned i = 0; i < 3; i++ )
             language[i] = p_mdhd->data.p_mdhd->i_language[i];
         language[3] = '\0';
     }
