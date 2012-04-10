@@ -271,14 +271,15 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
         return NULL;
     }
 
-    char *f_fname = strrchr( f_dir, DIR_SEP_CHAR );
+    const char *f_fname = strrchr( psz_fname, DIR_SEP_CHAR );
     if( !f_fname )
     {
         free( f_dir );
         free( psz_fname );
         return NULL;
     }
-    *(++f_fname) = 0; /* keep dir separator in f_dir */
+    f_fname++; /* Skip the '/' */
+    f_dir[f_fname - psz_fname] = 0; /* keep dir separator in f_dir */
 
     i_fname_len = strlen( f_fname );
 
