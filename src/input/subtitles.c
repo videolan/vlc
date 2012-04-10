@@ -336,13 +336,12 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             strcpy_trim( tmp_fname_trim, tmp_fname_noext );
 
             i_prio = SUB_PRIORITY_NONE;
-            if( i_prio == SUB_PRIORITY_NONE && !strcmp( tmp_fname_trim, f_fname_trim ) )
+            if( !strcmp( tmp_fname_trim, f_fname_trim ) )
             {
                 /* matches the movie name exactly */
                 i_prio = SUB_PRIORITY_MATCH_ALL;
             }
-            if( i_prio == SUB_PRIORITY_NONE &&
-                ( tmp = strstr( tmp_fname_trim, f_fname_trim ) ) )
+            else if( (tmp = strstr( tmp_fname_trim, f_fname_trim )) )
             {
                 /* contains the movie name */
                 tmp += strlen( f_fname_trim );
@@ -358,7 +357,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                     i_prio = SUB_PRIORITY_MATCH_LEFT;
                 }
             }
-            if( i_prio == SUB_PRIORITY_NONE &&
+            else if( i_prio == SUB_PRIORITY_NONE &&
                 j == 0 )
             {
                 /* doesn't contain the movie name, prefer files in f_dir over subdirs */
