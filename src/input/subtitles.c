@@ -247,7 +247,9 @@ static char **paths_to_list( const char *psz_dir, char *psz_path )
 char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                          const char *psz_name_org )
 {
-    int i_fuzzy;
+    int i_fuzzy = var_GetInteger( p_this, "sub-autodetect-fuzzy" );
+    if ( i_fuzzy == 0 )
+        return NULL;
     int j, i_result2, i_sub_count, i_fname_len;
     char *f_fname_noext = NULL, *f_fname_trim = NULL;
 
@@ -296,8 +298,6 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
 
     strcpy_strip_ext( f_fname_noext, f_fname );
     strcpy_trim( f_fname_trim, f_fname_noext );
-
-    i_fuzzy = var_GetInteger( p_this, "sub-autodetect-fuzzy" );
 
     result = calloc( MAX_SUBTITLE_FILES+1, sizeof(vlc_subfn_t) ); /* We check it later (simplify code) */
     subdirs = paths_to_list( f_dir, psz_path );
