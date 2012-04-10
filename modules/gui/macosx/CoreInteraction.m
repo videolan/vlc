@@ -24,6 +24,7 @@
 #import "CoreInteraction.h"
 #import "intf.h"
 #import "open.h"
+#import "playlist.h"
 #import <vlc_playlist.h>
 #import <vlc_input.h>
 #import <vlc_keys.h>
@@ -31,6 +32,7 @@
 #import <vlc_aout_intf.h>
 #import <vlc/vlc.h>
 #import <vlc_strings.h>
+#import <vlc_url.h>
 
 @implementation VLCCoreInteraction
 static VLCCoreInteraction *_o_sharedInstance = nil;
@@ -547,6 +549,60 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
         return;
 
     aout_VolumeSet( pl_Get( p_intf ), i_value );
+}
+
+#pragma mark -
+#pragma mark drag and drop support for VLCVoutView, VLBrushedMetalImageView and VLCThreePartDropView
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+{
+    NSPasteboard *o_paste = [sender draggingPasteboard];
+    NSArray *o_types = [NSArray arrayWithObject: NSFilenamesPboardType];
+    NSString *o_desired_type = [o_paste availableTypeFromArray:o_types];
+    NSData *o_carried_data = [o_paste dataForType:o_desired_type];
+    BOOL b_autoplay = config_GetInt( VLCIntf, "macosx-autoplay" );
+
+    if( o_carried_data )
+    {
+        if ([o_desired_type isEqualToString:NSFilenamesPboardType])
+        {
+            NSArray *o_array = [NSArray array];
+            NSArray *o_values = [[o_paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+            NSUInteger count = [o_values count];
+
+            input_thread_t * p_input = pl_CurrentInput( VLCIntf );
+            BOOL b_returned = NO;
+
+            if (count == 1 && p_input)
+            {
+                b_returned = input_AddSubtitle( p_input, make_URI([[o_values objectAtIndex:0] UTF8String], NULL), true );
+                vlc_object_release( p_input );
+                if(!b_returned)
+                    return YES;
+            }
+            else if( p_input )
+                vlc_object_release( p_input );
+
+            for( NSUInteger i = 0; i < count; i++)
+            {
+                NSDictionary *o_dic;
+                char *psz_uri = make_URI([[o_values objectAtIndex:i] UTF8String], NULL);
+                if( !psz_uri )
+                    continue;
+
+                o_dic = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
+                free( psz_uri );
+
+                o_array = [o_array arrayByAddingObject: o_dic];
+            }
+            if( b_autoplay )
+                [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue:NO];
+            else
+                [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue:YES];
+
+            return YES;
+        }
+    }
+    return NO;
 }
 
 #pragma mark -

@@ -74,6 +74,50 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
  * VLCVoutView implementation
  *****************************************************************************/
 @implementation VLCVoutView
+
+#pragma mark -
+#pragma mark drag & drop support
+
+- (void)dealloc
+{
+    [self unregisterDraggedTypes];
+    [super dealloc];
+}
+
+- (void)awakeFromNib
+{
+    [self registerForDraggedTypes:[NSArray arrayWithObject: NSFilenamesPboardType]];
+}
+
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
+{
+    if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) == NSDragOperationGeneric)
+        return NSDragOperationGeneric;
+    return NSDragOperationNone;
+}
+
+- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
+{
+    return YES;
+}
+
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+{
+    BOOL b_returned;
+    b_returned = [[VLCCoreInteraction sharedInstance] performDragOperation: sender];
+
+    [self setNeedsDisplay:YES];
+    return b_returned;
+}
+
+- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
+{
+    [self setNeedsDisplay:YES];
+}
+
+#pragma mark -
+#pragma mark vout actions
+
 - (void)closeVout
 {
     vout_thread_t * p_vout = getVout();

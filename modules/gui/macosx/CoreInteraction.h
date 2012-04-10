@@ -70,6 +70,8 @@
 - (int)volume;
 - (void)setVolume:(int)i_value;
 
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
+
 - (void)setAspectRatioLocked:(BOOL)b_value;
 - (BOOL)aspectRatioIsLocked;
 - (void)toggleFullscreen;
