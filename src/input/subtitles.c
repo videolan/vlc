@@ -357,8 +357,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                     i_prio = SUB_PRIORITY_MATCH_LEFT;
                 }
             }
-            else if( i_prio == SUB_PRIORITY_NONE &&
-                j == -1 )
+            else if( j == -1 )
             {
                 /* doesn't contain the movie name, prefer files in f_dir over subdirs */
                 i_prio = SUB_PRIORITY_MATCH_NONE;
