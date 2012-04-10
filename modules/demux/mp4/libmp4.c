@@ -720,19 +720,19 @@ static int MP4_ReadBox_tkhd(  stream_t *p_stream, MP4_Box_t *p_box )
     double rotation;    //angle in degrees to be rotated clockwise
     double scale[2];    // scale factor; sx = scale[0] , sy = scale[1]
     double translate[2];// amount to translate; tx = translate[0] , ty = translate[1]
-    
+
     int *matrix = p_box->data.p_tkhd->i_matrix;
-    
+
     translate[0] = conv_fx(matrix[6]);
     translate[1] = conv_fx(matrix[7]);
-    
+
     scale[0] = sqrt(conv_fx(matrix[0]) * conv_fx(matrix[0]) +
                     conv_fx(matrix[3]) * conv_fx(matrix[3]));
     scale[1] = sqrt(conv_fx(matrix[1]) * conv_fx(matrix[1]) +
                     conv_fx(matrix[4]) * conv_fx(matrix[4]));
-    
+
     rotation = atan2(conv_fx(matrix[1]) / scale[1], conv_fx(matrix[0]) / scale[0]) * 180 / M_PI;
-    
+
     if (rotation < 0)
         rotation += 360.;
 
