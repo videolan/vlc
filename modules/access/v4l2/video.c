@@ -438,8 +438,6 @@ vlc_module_end ()
  * Access: local prototypes
  *****************************************************************************/
 
-static block_t* ProcessVideoFrame( vlc_object_t *p_demux, uint8_t *p_frame, size_t );
-
 /**
  * Parses a V4L2 MRL into VLC object variables.
  */
@@ -1008,10 +1006,11 @@ block_t* GrabVideo (vlc_object_t *demux, demux_sys_t *sys)
         return NULL;
     }
 
-    block_t *block = ProcessVideoFrame(demux, sys->p_buffers[buf.index].start,
-                                       buf.bytesused);
-    if (block == NULL)
+    /* Copy frame */
+    block_t *block = block_Alloc (buf.bytesused);
+    if (unlikely(block == NULL))
         return NULL;
+    memcpy (block->p_buffer, sys->p_buffers[buf.index].start, buf.bytesused);
 
     /* Unlock */
     if (v4l2_ioctl (sys->i_fd, VIDIOC_QBUF, &buf) < 0)
@@ -1021,29 +1020,6 @@ block_t* GrabVideo (vlc_object_t *demux, demux_sys_t *sys)
         return NULL;
     }
     return block;
-}
-
-/*****************************************************************************
- * ProcessVideoFrame: Helper function to take a buffer and copy it into
- * a new block
- *****************************************************************************/
-static block_t* ProcessVideoFrame( vlc_object_t *p_demux, uint8_t *p_frame, size_t i_size )
-{
-    block_t *p_block;
-
-    if( !p_frame ) return NULL;
-
-    /* New block */
-    if( !( p_block = block_New( p_demux, i_size ) ) )
-    {
-        msg_Warn( p_demux, "Cannot get new block" );
-        return NULL;
-    }
-
-    /* Copy frame */
-    memcpy( p_block->p_buffer, p_frame, i_size );
-
-    return p_block;
 }
 
 /*****************************************************************************
