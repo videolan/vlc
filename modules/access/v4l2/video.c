@@ -765,13 +765,12 @@ static const struct v4l2_fract infinity = { 1, 0 };
 /**
  * Finds the highest frame rate possible of a certain V4L2 format.
  * @param fmt V4L2 capture format [IN]
- * @param parm V4L2 capture streaming parameters [IN]
  * @param it V4L2 frame interval [OUT]
+ * @return 0 on success, -1 on error.
  */
-static void FindMaxRate (vlc_object_t *obj, int fd,
-                         const struct v4l2_format *restrict fmt,
-                         const struct v4l2_streamparm *restrict parm,
-                         struct v4l2_fract *restrict it)
+static int FindMaxRate (vlc_object_t *obj, int fd,
+                        const struct v4l2_format *restrict fmt,
+                        struct v4l2_fract *restrict it)
 {
     struct v4l2_frmivalenum fie = {
         .pixel_format = fmt->fmt.pix.pixelformat,
@@ -780,19 +779,26 @@ static void FindMaxRate (vlc_object_t *obj, int fd,
     };
     /* Mind that maximum rate means minimum interval */
 
-    if (!(parm->parm.capture.capability & V4L2_CAP_TIMEPERFRAME))
-    {
-        *it = parm->parm.capture.timeperframe;
-        msg_Dbg (obj, "  constant frame interval: %"PRIu32"/%"PRIu32,
-                 it->numerator, it->denominator);
-    }
-    else
     if (v4l2_ioctl (fd, VIDIOC_ENUM_FRAMEINTERVALS, &fie) < 0)
     {
-        msg_Warn (obj, "  unknown frame intervals: %m");
-        *it = parm->parm.capture.timeperframe;
-        msg_Dbg (obj, "  default frame interval: %"PRIu32"/%"PRIu32,
-                 it->numerator, it->denominator);
+        msg_Dbg (obj, "  unknown frame intervals: %m");
+        /* Frame intervals cannot be enumerated. Set the format and then
+         * get the streaming parameters to figure out the default frame
+         * interval. This is not necessarily the maximum though. */
+        struct v4l2_format dummy_fmt = *fmt;
+        struct v4l2_streamparm parm = { .type = V4L2_BUF_TYPE_VIDEO_CAPTURE };
+
+        if (v4l2_ioctl (fd, VIDIOC_S_FMT, &dummy_fmt) < 0
+         || v4l2_ioctl (fd, VIDIOC_G_PARM, &parm) < 0)
+        {
+            *it = infinity;
+            return -1;
+        }
+
+        *it = parm.parm.capture.timeperframe;
+        msg_Dbg (obj, "  %s frame interval: %"PRIu32"/%"PRIu32,
+                 (parm.parm.capture.capability & V4L2_CAP_TIMEPERFRAME)
+                 ? "default" : "constant", it->numerator, it->denominator);
     }
     else
     switch (fie.type)
@@ -803,14 +809,12 @@ static void FindMaxRate (vlc_object_t *obj, int fd,
             {
                 if (fcmp (&fie.discrete, it) < 0)
                     *it = fie.discrete;
-                msg_Dbg (obj, "  discrete frame interval: %"PRIu32"/%"PRIu32,
-                         fie.discrete.numerator, fie.discrete.denominator);
                 fie.index++;
             }
             while (v4l2_ioctl (fd, VIDIOC_ENUM_FRAMEINTERVALS, &fie) >= 0);
 
-            msg_Dbg (obj, "  best discrete frame interval: %"PRIu32"/%"PRIu32,
-                     it->numerator, it->denominator);
+            msg_Dbg (obj, "  %s frame interval: %"PRIu32"/%"PRIu32,
+                     "discrete", it->numerator, it->denominator);
             break;
 
         case V4L2_FRMIVAL_TYPE_STEPWISE:
@@ -826,6 +830,7 @@ static void FindMaxRate (vlc_object_t *obj, int fd,
             *it = fie.stepwise.min;
             break;
     }
+    return 0;
 }
 
 #undef SetupFormat
@@ -850,15 +855,7 @@ int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
         msg_Err (obj, "cannot get default format: %m");
         return -1;
     }
-    if (v4l2_ioctl (fd, VIDIOC_G_PARM, parm) < 0)
-    {
-        msg_Err (obj, "cannot get streaming parameters: %m");
-        return -1;
-    }
-
     fmt->fmt.pix.pixelformat = fourcc;
-    parm->parm.capture.capturemode = 0; /* normal video mode */
-    parm->parm.capture.extendedmode = 0;
 
     struct v4l2_frmsizeenum fse = {
         .pixel_format = fourcc,
@@ -874,7 +871,7 @@ int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
         fmt->fmt.pix.height = height;
         msg_Dbg (obj, " requested frame size: %"PRIu32"x%"PRIu32,
                  width, height);
-        FindMaxRate (obj, fd, fmt, parm, &best_it);
+        FindMaxRate (obj, fd, fmt, &best_it);
     }
     else
     if (v4l2_ioctl (fd, VIDIOC_ENUM_FRAMESIZES, &fse) < 0)
@@ -883,7 +880,7 @@ int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
         msg_Dbg (obj, " unknown frame sizes: %m");
         msg_Dbg (obj, " current frame size: %"PRIu32"x%"PRIu32,
                  fmt->fmt.pix.width, fmt->fmt.pix.height);
-        FindMaxRate (obj, fd, fmt, parm, &best_it);
+        FindMaxRate (obj, fd, fmt, &best_it);
     }
     else
     switch (fse.type)
@@ -895,7 +892,7 @@ int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
 
                 msg_Dbg (obj, " frame size %"PRIu32"x%"PRIu32,
                          fse.discrete.width, fse.discrete.height);
-                FindMaxRate (obj, fd, fmt, parm, &cur_it);
+                FindMaxRate (obj, fd, fmt, &cur_it);
 
                 int64_t c = fcmp (&cur_it, &best_it);
                 uint64_t area = fse.discrete.width * fse.discrete.height;
@@ -925,12 +922,6 @@ int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
                 msg_Dbg (obj, "  with %"PRIu32"x%"PRIu32" steps",
                          fse.stepwise.step_width, fse.stepwise.step_height);
 
-            if (!(parm->parm.capture.capability & V4L2_CAP_TIMEPERFRAME))
-            {   /* Frame rate is constant, lets maximize resolution */
-                fmt->fmt.pix.width = fse.stepwise.max_width;
-                fmt->fmt.pix.height = fse.stepwise.max_height;
-            }
-            else
             /* FIXME: slow and dumb */
             for (uint32_t width =  fse.stepwise.min_width;
                           width <= fse.stepwise.max_width;
@@ -941,7 +932,7 @@ int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
                 {
                     struct v4l2_fract cur_it;
 
-                    FindMaxRate (obj, fd, fmt, parm, &cur_it);
+                    FindMaxRate (obj, fd, fmt, &cur_it);
 
                     int64_t c = fcmp (&cur_it, &best_it);
                     uint64_t area = width * height;
@@ -960,15 +951,26 @@ int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
             break;
     }
 
-    parm->parm.capture.timeperframe = best_it;
-
+    /* Set the final format */
     if (v4l2_ioctl (fd, VIDIOC_S_FMT, fmt) < 0)
     {
         msg_Err (obj, "cannot set format: %m");
         return -1;
     }
+
+    /* Now that the final format is set, fetch and override parameters */
+    if (v4l2_ioctl (fd, VIDIOC_G_PARM, parm) < 0)
+    {
+        msg_Err (obj, "cannot get streaming parameters: %m");
+        return -1;
+    }
+    parm->parm.capture.capturemode = 0; /* normal video mode */
+    parm->parm.capture.extendedmode = 0;
+    if (best_it.denominator != 0)
+        parm->parm.capture.timeperframe = best_it;
     if (v4l2_ioctl (fd, VIDIOC_S_PARM, parm) < 0)
         msg_Warn (obj, "cannot set streaming parameters: %m");
+
     ResetCrop (obj, fd); /* crop depends on frame size */
 
     return 0;
