@@ -39,14 +39,13 @@ namespace dash
     struct thread_sys_t
     {
         dash::http::HTTPConnectionManager   *conManager;
-        logic::IAdaptationLogic             *adaptationLogic;
         buffer::BlockBuffer                 *buffer;
     };
 
     class DASHDownloader
     {
         public:
-            DASHDownloader          (http::HTTPConnectionManager *conManager, logic::IAdaptationLogic *adaptationLogic, buffer::BlockBuffer *buffer);
+            DASHDownloader          (http::HTTPConnectionManager *conManager, buffer::BlockBuffer *buffer);
             virtual ~DASHDownloader ();
 
             bool            start       ();

@@ -74,9 +74,8 @@ vlc_module_end ()
  *****************************************************************************/
 struct stream_sys_t
 {
-        dash::DASHManager                   *p_dashManager;
-        dash::http::HTTPConnectionManager   *p_conManager;
-        dash::mpd::MPD                      *p_mpd;
+        dash::DASHManager   *p_dashManager;
+        dash::mpd::MPD      *p_mpd;
         uint64_t                            position;
         bool                                isLive;
 };
@@ -114,24 +113,20 @@ static int Open(vlc_object_t *p_obj)
         return VLC_ENOMEM;
 
     p_sys->p_mpd = mpd;
-    dash::http::HTTPConnectionManager *p_conManager =
-                              new dash::http::HTTPConnectionManager( p_stream );
-    dash::DASHManager*p_dashManager =
-            new dash::DASHManager( p_conManager, p_sys->p_mpd,
-                                   dash::logic::IAdaptationLogic::RateBased, p_stream);
+    dash::DASHManager*p_dashManager = new dash::DASHManager(p_sys->p_mpd,
+                                          dash::logic::IAdaptationLogic::RateBased,
+                                          p_stream);
 
     if ( p_dashManager->getMpdManager()           == NULL   ||
          p_dashManager->getMpdManager()->getMPD() == NULL   ||
          p_dashManager->getAdaptionLogic()        == NULL   ||
          p_dashManager->start()                   == false)
     {
-        delete p_conManager;
         delete p_dashManager;
         free( p_sys );
         return VLC_EGENERIC;
     }
     p_sys->p_dashManager    = p_dashManager;
-    p_sys->p_conManager     = p_conManager;
     p_sys->position         = 0;
     p_sys->isLive           = p_dashManager->getMpdManager()->getMPD()->isLive();
     p_stream->p_sys         = p_sys;
@@ -151,9 +146,7 @@ static void Close(vlc_object_t *p_obj)
     stream_t                            *p_stream       = (stream_t*) p_obj;
     stream_sys_t                        *p_sys          = (stream_sys_t *) p_stream->p_sys;
     dash::DASHManager                   *p_dashManager  = p_sys->p_dashManager;
-    dash::http::HTTPConnectionManager   *p_conManager   = p_sys->p_conManager;
 
-    delete(p_conManager);
     delete(p_dashManager);
     free(p_sys);
 }

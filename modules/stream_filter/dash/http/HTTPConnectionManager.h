@@ -29,14 +29,13 @@
 
 #include <string>
 #include <vector>
+#include <deque>
 #include <iostream>
 #include <ctime>
-#include <map>
 #include <limits.h>
 
-#include "http/HTTPConnection.h"
-#include "http/Chunk.h"
-#include "adaptationlogic/IDownloadRateObserver.h"
+#include "http/PersistentConnection.h"
+#include "adaptationlogic/IAdaptationLogic.h"
 
 namespace dash
 {
@@ -45,31 +44,36 @@ namespace dash
         class HTTPConnectionManager
         {
             public:
-                HTTPConnectionManager           (stream_t *stream);
+                HTTPConnectionManager           (logic::IAdaptationLogic *adaptationLogic, stream_t *stream);
                 virtual ~HTTPConnectionManager  ();
 
-                void                closeAllConnections ();
-                bool                closeConnection     (IHTTPConnection *con);
-                int                 read                (Chunk *chunk, void *p_buffer, size_t len);
-                int                 peek                (Chunk *chunk, const uint8_t **pp_peek, size_t i_peek);
-                void                attach              (dash::logic::IDownloadRateObserver *observer);
-                void                notify              ();
+                void    closeAllConnections ();
+                bool    addChunk            (Chunk *chunk);
+                int     read                (block_t *block);
+                void    attach              (dash::logic::IDownloadRateObserver *observer);
+                void    notify              ();
 
             private:
-                std::map<Chunk *, HTTPConnection *>                 chunkMap;
-                std::map<std::string, HTTPConnection *>             urlMap;
                 std::vector<dash::logic::IDownloadRateObserver *>   rateObservers;
-                uint64_t                                            bpsAvg;
-                uint64_t                                            bpsLastChunk;
-                long                                                bytesReadSession;
-                double                                              timeSecSession;
-                long                                                bytesReadChunk;
-                double                                              timeSecChunk;
+                std::deque<Chunk *>                                 downloadQueue;
+                std::vector<PersistentConnection *>                 connectionPool;
+                logic::IAdaptationLogic                             *adaptationLogic;
                 stream_t                                            *stream;
                 int                                                 chunkCount;
+                int64_t                                             bpsAvg;
+                int64_t                                             bpsLastChunk;
+                int64_t                                             bpsCurrentChunk;
+                int64_t                                             bytesReadSession;
+                int64_t                                             bytesReadChunk;
+                double                                              timeSession;
+                double                                              timeChunk;
 
-                bool                closeConnection( Chunk *chunk );
-                IHTTPConnection*    initConnection( Chunk *chunk );
+                static const size_t     PIPELINE;
+                static const size_t     PIPELINELENGTH;
+                static const uint64_t   CHUNKDEFAULTBITRATE;
+
+                std::vector<PersistentConnection *>     getConnectionsForHost   (const std::string &hostname);
+                void                                    updateStatistics        (int bytes, double time);
 
         };
     }

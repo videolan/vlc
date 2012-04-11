@@ -40,7 +40,7 @@ namespace dash
     class DASHManager
     {
         public:
-            DASHManager( http::HTTPConnectionManager *conManager, mpd::MPD *mpd,
+            DASHManager( mpd::MPD *mpd,
                          logic::IAdaptationLogic::LogicType type, stream_t *stream);
             virtual ~DASHManager    ();
 

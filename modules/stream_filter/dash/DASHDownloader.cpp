@@ -32,11 +32,11 @@ using namespace dash::http;
 using namespace dash::logic;
 using namespace dash::buffer;
 
-DASHDownloader::DASHDownloader  (HTTPConnectionManager *conManager, IAdaptationLogic *adaptationLogic, BlockBuffer *buffer)
+
+DASHDownloader::DASHDownloader  (HTTPConnectionManager *conManager, BlockBuffer *buffer)
 {
     this->t_sys                     = (thread_sys_t *) malloc(sizeof(thread_sys_t));
     this->t_sys->conManager         = conManager;
-    this->t_sys->adaptationLogic    = adaptationLogic;
     this->t_sys->buffer             = buffer;
 }
 DASHDownloader::~DASHDownloader ()
@@ -57,42 +57,24 @@ void*       DASHDownloader::download    (void *thread_sys)
 {
     thread_sys_t            *t_sys              = (thread_sys_t *) thread_sys;
     HTTPConnectionManager   *conManager         = t_sys->conManager;
-    IAdaptationLogic        *adaptationLogic    = t_sys->adaptationLogic;
     BlockBuffer             *buffer             = t_sys->buffer;
-    Chunk                   *currentChunk       = NULL;
     block_t                 *block              = block_Alloc(BLOCKSIZE);
+    int                     ret                 = 0;
 
     do
     {
-        if(currentChunk == NULL)
+        ret = conManager->read(block);
+        if(ret > 0)
         {
-            currentChunk  = adaptationLogic->getNextChunk();
-            if(currentChunk == NULL)
-            {
-                buffer->setEOF(true);
-            }
+            block_t *bufBlock = block_Alloc(ret);
+            memcpy(bufBlock->p_buffer, block->p_buffer, ret);
+
+            bufBlock->i_length = block->i_length;
+            buffer->put(bufBlock);
         }
-        else
-        {
-            int ret = conManager->read(currentChunk, block->p_buffer, block->i_buffer);
-            if(ret <= 0)
-            {
-                currentChunk = NULL;
-            }
-            else
-            {
-                block_t *bufBlock = block_Alloc(ret);
-                memcpy(bufBlock->p_buffer, block->p_buffer, ret);
+    }while(ret && !buffer->getEOF());
 
-                if(currentChunk->getBitrate() <= 0)
-                    currentChunk->setBitrate(CHUNKDEFAULTBITRATE);
-
-                bufBlock->i_length = (mtime_t)((ret * 8) / ((float)currentChunk->getBitrate() / 1000000));
-                buffer->put(bufBlock);
-            }
-        }
-    }while(!buffer->getEOF());
-
+    buffer->setEOF(true);
     block_Release(block);
 
     return NULL;

@@ -34,9 +34,8 @@ using namespace dash::logic;
 using namespace dash::mpd;
 using namespace dash::buffer;
 
-DASHManager::DASHManager    ( HTTPConnectionManager *conManager, MPD *mpd,
+DASHManager::DASHManager    ( MPD *mpd,
                               IAdaptationLogic::LogicType type, stream_t *stream) :
-             conManager     ( conManager ),
              currentChunk   ( NULL ),
              adaptationLogic( NULL ),
              logicType      ( type ),
@@ -51,8 +50,10 @@ DASHManager::DASHManager    ( HTTPConnectionManager *conManager, MPD *mpd,
     if ( this->adaptationLogic == NULL )
         return ;
 
+    this->conManager = new dash::http::HTTPConnectionManager(this->adaptationLogic, this->stream);
+
     this->buffer     = new BlockBuffer(this->stream);
-    this->downloader = new DASHDownloader(this->conManager, this->adaptationLogic, this->buffer);
+    this->downloader = new DASHDownloader(this->conManager, this->buffer);
 
     this->conManager->attach(this->adaptationLogic);
     this->buffer->attach(this->adaptationLogic);
@@ -61,6 +62,7 @@ DASHManager::~DASHManager   ()
 {
     delete this->downloader;
     delete this->buffer;
+    delete this->conManager;
     delete this->adaptationLogic;
     delete this->mpdManager;
 }
