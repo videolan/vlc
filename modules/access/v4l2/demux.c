@@ -41,6 +41,32 @@
 
 #include "v4l2.h"
 
+/* TODO: remove this, use callbacks */
+typedef enum {
+    IO_METHOD_READ=1,
+    IO_METHOD_MMAP,
+} io_method;
+
+struct demux_sys_t
+{
+    int fd;
+    vlc_thread_t thread;
+
+    /* Video */
+    io_method io;
+
+    struct buffer_t *bufv;
+    union
+    {
+        uint32_t bufc;
+        uint32_t blocksize;
+    };
+    uint32_t block_flags;
+
+    es_out_id_t *es;
+    vlc_v4l2_ctrl_t *controls;
+};
+
 static void *StreamThread (void *);
 static void *ReadThread (void *);
 static int DemuxControl( demux_t *, int, va_list );
@@ -85,7 +111,7 @@ int DemuxOpen( vlc_object_t *obj )
         goto error;
     }
 
-    sys->i_fd = fd;
+    sys->fd = fd;
     sys->controls = ControlsInit (VLC_OBJECT(demux), fd);
     demux->pf_demux = NULL;
     demux->pf_control = DemuxControl;
@@ -377,9 +403,9 @@ static int InitVideo (demux_t *demux, int fd)
         case V4L2_FIELD_INTERLACED:
             msg_Dbg (demux, "Interlacing setting: interleaved");
             /*if (NTSC)
-                sys->i_block_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+                sys->block_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
             else*/
-                sys->i_block_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
+                sys->block_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
             break;
         case V4L2_FIELD_SEQ_TB:
             msg_Dbg (demux, "Interlacing setting: sequential top bottom (TODO)");
@@ -393,11 +419,11 @@ static int InitVideo (demux_t *demux, int fd)
             break;
         case V4L2_FIELD_INTERLACED_TB:
             msg_Dbg (demux, "Interlacing setting: interleaved top bottom");
-            sys->i_block_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
+            sys->block_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
             break;
         case V4L2_FIELD_INTERLACED_BT:
             msg_Dbg (demux, "Interlacing setting: interleaved bottom top");
-            sys->i_block_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+            sys->block_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
             break;
         default:
             msg_Warn (demux, "Interlacing setting: unknown type (%d)",
@@ -424,7 +450,7 @@ static int InitVideo (demux_t *demux, int fd)
              es_fmt.video.i_frame_rate_base);
     msg_Dbg (demux, " aspect ratio: %u/%u", es_fmt.video.i_sar_num,
              es_fmt.video.i_sar_den);
-    sys->p_es = es_out_Add (demux->out, &es_fmt);
+    sys->es = es_out_Add (demux->out, &es_fmt);
 
     /* Init I/O method */
     void *(*entry) (void *);
@@ -479,7 +505,7 @@ void DemuxClose( vlc_object_t *obj )
 {
     demux_t *demux = (demux_t *)obj;
     demux_sys_t *sys = demux->p_sys;
-    int fd = sys->i_fd;
+    int fd = sys->fd;
 
     vlc_cancel (sys->thread);
     vlc_join (sys->thread, NULL);
@@ -505,7 +531,7 @@ void DemuxClose( vlc_object_t *obj )
                 v4l2_munmap (sys->bufv[i].start, sys->bufv[i].length);
             }
             enum v4l2_buf_type buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-            v4l2_ioctl( sys->i_fd, VIDIOC_STREAMOFF, &buf_type );
+            v4l2_ioctl (fd, VIDIOC_STREAMOFF, &buf_type);
             free (sys->bufv);
             break;
         }
@@ -520,7 +546,7 @@ static void *StreamThread (void *data)
 {
     demux_t *demux = data;
     demux_sys_t *sys = demux->p_sys;
-    int fd = sys->i_fd;
+    int fd = sys->fd;
     struct pollfd ufd[1];
 
     ufd[0].fd = fd;
@@ -541,9 +567,9 @@ static void *StreamThread (void *data)
         if (block != NULL)
         {
             block->i_pts = block->i_dts = mdate ();
-            block->i_flags |= sys->i_block_flags;
+            block->i_flags |= sys->block_flags;
             es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts);
-            es_out_Send (demux->out, sys->p_es, block);
+            es_out_Send (demux->out, sys->es, block);
         }
         vlc_restorecancel (canc);
     }
@@ -555,7 +581,7 @@ static void *ReadThread (void *data)
 {
     demux_t *demux = data;
     demux_sys_t *sys = demux->p_sys;
-    int fd = sys->i_fd;
+    int fd = sys->fd;
     struct pollfd ufd[1];
 
     ufd[0].fd = fd;
@@ -579,7 +605,7 @@ static void *ReadThread (void *data)
             continue;
         }
         block->i_pts = block->i_dts = mdate ();
-        block->i_flags |= sys->i_block_flags;
+        block->i_flags |= sys->block_flags;
 
         int canc = vlc_savecancel ();
         ssize_t val = v4l2_read (fd, block->p_buffer, block->i_buffer);
@@ -587,7 +613,7 @@ static void *ReadThread (void *data)
         {
             block->i_buffer = val;
             es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts);
-            es_out_Send (demux->out, sys->p_es, block);
+            es_out_Send (demux->out, sys->es, block);
         }
         else
             block_Release (block);

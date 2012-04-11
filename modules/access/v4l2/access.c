@@ -38,6 +38,19 @@
 
 #include "v4l2.h"
 
+struct access_sys_t
+{
+    int fd;
+    uint32_t block_flags;
+    union
+    {
+        uint32_t bufc;
+        uint32_t blocksize;
+    };
+    struct buffer_t *bufv;
+    vlc_v4l2_ctrl_t *controls;
+};
+
 static block_t *AccessRead( access_t * );
 static ssize_t AccessReadStream( access_t *, uint8_t *, size_t );
 static int AccessControl( access_t *, int, va_list );
@@ -49,10 +62,10 @@ int AccessOpen( vlc_object_t *obj )
 
     access_InitFields( access );
 
-    demux_sys_t *sys = calloc( 1, sizeof( demux_sys_t ));
+    access_sys_t *sys = calloc (1, sizeof (*sys));
     if( unlikely(sys == NULL) )
         return VLC_ENOMEM;
-    access->p_sys = (access_sys_t *)sys;
+    access->p_sys = sys;
 
     ParseMRL( obj, access->psz_location );
 
@@ -84,7 +97,7 @@ int AccessOpen( vlc_object_t *obj )
         goto error;
     }
 
-    sys->i_fd = fd;
+    sys->fd = fd;
     access->pf_seek = NULL;
     access->pf_control = AccessControl;
     return VLC_SUCCESS;
@@ -95,7 +108,7 @@ error:
 
 int InitVideo (access_t *access, int fd)
 {
-    demux_sys_t *sys = (demux_sys_t *)access->p_sys;
+    access_sys_t *sys = access->p_sys;
 
     /* Get device capabilites */
     struct v4l2_capability cap;
@@ -148,17 +161,17 @@ int InitVideo (access_t *access, int fd)
         case V4L2_FIELD_INTERLACED:
             msg_Dbg (access, "Interlacing setting: interleaved");
             /*if (NTSC)
-                sys->i_block_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+                sys->block_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
             else*/
-                sys->i_block_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
+                sys->block_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
             break;
         case V4L2_FIELD_INTERLACED_TB:
             msg_Dbg (access, "Interlacing setting: interleaved top bottom" );
-            sys->i_block_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
+            sys->block_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
             break;
         case V4L2_FIELD_INTERLACED_BT:
             msg_Dbg (access, "Interlacing setting: interleaved bottom top" );
-            sys->i_block_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+            sys->block_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
             break;
         default:
             break;
@@ -210,19 +223,19 @@ int InitVideo (access_t *access, int fd)
 void AccessClose( vlc_object_t *obj )
 {
     access_t *access = (access_t *)obj;
-    demux_sys_t *sys = (demux_sys_t *)access->p_sys;
+    access_sys_t *sys = access->p_sys;
 
     ControlsDeinit( obj, sys->controls );
-    v4l2_close( sys->i_fd );
+    v4l2_close (sys->fd);
     free( sys );
 }
 
 static block_t *AccessRead( access_t *access )
 {
-    demux_sys_t *sys = (demux_sys_t *)access->p_sys;
+    access_sys_t *sys = access->p_sys;
 
     struct pollfd fd;
-    fd.fd = sys->i_fd;
+    fd.fd = sys->fd;
     fd.events = POLLIN|POLLPRI;
     fd.revents = 0;
 
@@ -231,22 +244,22 @@ static block_t *AccessRead( access_t *access )
     if( poll( &fd, 1, 500 ) <= 0 )
         return NULL;
 
-    block_t *block = GrabVideo (VLC_OBJECT(access), sys->i_fd, sys->bufv);
+    block_t *block = GrabVideo (VLC_OBJECT(access), sys->fd, sys->bufv);
     if( block != NULL )
     {
         block->i_pts = block->i_dts = mdate();
-        block->i_flags |= sys->i_block_flags;
+        block->i_flags |= sys->block_flags;
     }
     return block;
 }
 
 static ssize_t AccessReadStream( access_t *access, uint8_t *buf, size_t len )
 {
-    demux_sys_t *sys = (demux_sys_t *)access->p_sys;
+    access_sys_t *sys = access->p_sys;
     struct pollfd ufd;
     int i_ret;
 
-    ufd.fd = sys->i_fd;
+    ufd.fd = sys->fd;
     ufd.events = POLLIN;
 
     if( access->info.b_eof )
@@ -269,7 +282,7 @@ static ssize_t AccessReadStream( access_t *access, uint8_t *buf, size_t len )
         return -1;
     }
 
-    i_ret = v4l2_read( sys->i_fd, buf, len );
+    i_ret = v4l2_read (sys->fd, buf, len);
     if( i_ret == 0 )
         access->info.b_eof = true;
     else if( i_ret > 0 )

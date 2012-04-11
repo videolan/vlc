@@ -69,33 +69,7 @@ extern int (*v4l2_munmap) (void *, size_t);
 
 #define CFG_PREFIX "v4l2-"
 
-/* TODO: remove this, use callbacks */
-typedef enum {
-    IO_METHOD_READ=1,
-    IO_METHOD_MMAP,
-} io_method;
-
 typedef struct vlc_v4l2_ctrl vlc_v4l2_ctrl_t;
-
-/* TODO: move this to access.c and demux.c (separately) */
-struct demux_sys_t
-{
-    int  i_fd;
-    vlc_thread_t thread;
-
-    /* Video */
-    io_method io;
-
-    struct buffer_t *bufv;
-    uint32_t bufc;
-#define blocksize bufc /* HACK HACK */
-
-    uint32_t i_block_flags;
-
-    es_out_id_t *p_es;
-
-    vlc_v4l2_ctrl_t *controls;
-};
 
 struct buffer_t
 {
