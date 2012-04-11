@@ -1052,6 +1052,10 @@ void PLModel::popupAddToPlaylist()
 
     foreach( QModelIndex currentIndex, current_selection )
     {
+        /* Don't add item multiple times when there are more columns in the model */
+        if( currentIndex.column() )
+            continue;
+
         playlist_item_t *p_item = playlist_ItemGetById( THEPL, itemId( currentIndex ) );
         if( !p_item ) continue;
 
