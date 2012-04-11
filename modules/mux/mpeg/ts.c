@@ -464,11 +464,10 @@ static csa_t *csaSetup( vlc_object_t *p_this )
     vlc_mutex_init( &p_sys->csa_lock );
     p_sys->b_crypt_audio = var_GetBool( p_mux, SOUT_CFG_PREFIX "crypt-audio" );
     p_sys->b_crypt_video = var_GetBool( p_mux, SOUT_CFG_PREFIX "crypt-video" );
-    p_sys->csa = csa;
 
     char *csa2ck = var_CreateGetNonEmptyStringCommand( p_mux, SOUT_CFG_PREFIX "csa2-ck");
-    if (!csa2ck || csa_SetCW( p_this, p_sys->csa, csa2ck, false ) )
-        csa_SetCW( p_this, p_sys->csa, csack, false );
+    if (!csa2ck || csa_SetCW( p_this, csa, csa2ck, false ) )
+        csa_SetCW( p_this, csa, csack, false );
     free(csa2ck);
 
     var_Create( p_mux, SOUT_CFG_PREFIX "csa-use", VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
