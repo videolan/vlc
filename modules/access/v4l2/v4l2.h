@@ -77,8 +77,11 @@ struct buffer_t
     size_t  length;
 };
 
-/* video.c */
+/* v4l2.c */
 void ParseMRL(vlc_object_t *, const char *);
+v4l2_std_id var_InheritStandard (vlc_object_t *, const char *);
+
+/* video.c */
 int SetupInput (vlc_object_t *, int fd);
 int SetupFormat (vlc_object_t *, int, uint32_t,
                  struct v4l2_format *, struct v4l2_streamparm *);

@@ -158,6 +158,7 @@ libaccess_shm_plugin_la_DEPENDENCIES =
 libvlc_LTLIBRARIES += $(LTLIBaccess_shm)
 
 libv4l2_plugin_la_SOURCES = \
+	v4l2/v4l2.c \
 	v4l2/video.c \
 	v4l2/demux.c \
 	v4l2/access.c \
