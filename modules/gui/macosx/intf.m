@@ -773,8 +773,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_embedded_list release];
     [o_coredialogs release];
     [o_eyetv release];
-    [o_mainwindow release];
-    o_mainwindow = NULL;
 
     /* unsubscribe from libvlc's debug messages */
     vlc_Unsubscribe( p_intf->p_sys->p_sub );
@@ -793,6 +791,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mainmenu release];
 
     libvlc_Quit( p_intf->p_libvlc );
+
+    [o_mainwindow release];
+    o_mainwindow = NULL;
 
     [self setIntf:nil];
 }
