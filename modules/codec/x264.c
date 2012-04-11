@@ -404,11 +404,8 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
     "Currently default can cause sync-issues on unmuxable output, like rtsp-output without ts-mux" )
 
 #define HRD_TEXT N_("HRD-timing information")
-#define HRD_LONGTEXT N_("HRD-timing information")
-
-#define TUNE_TEXT N_("Tune the settings for a particular type of source or situation. " \
-     "Overridden by user settings." )
-#define PRESET_TEXT N_("Use preset as default settings. Overridden by user settings." )
+#define TUNE_TEXT N_("Default tune setting used" )
+#define PRESET_TEXT N_("Default preset setting used" )
 
 static const char *const enc_me_list[] =
   { "dia", "hex", "umh", "esa", "tesa" };
@@ -533,7 +530,7 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "slice-max-mbs", 0, SLICE_MAX_MBS, SLICE_MAX_MBS_LONGTEXT, true )
 
 #if X264_BUILD >= 89
-    add_string( SOUT_CFG_PREFIX "hrd", "none", HRD_TEXT, HRD_LONGTEXT, true )
+    add_string( SOUT_CFG_PREFIX "hrd", "none", HRD_TEXT, HRD_TEXT, true )
         change_string_list( x264_nal_hrd_names, x264_nal_hrd_names, 0 );
 #endif
 
