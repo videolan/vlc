@@ -367,15 +367,6 @@ static int InitVideo (demux_t *demux, int fd)
     if (SetupFormat (demux, fd, selected->v4l2, &fmt, &parm))
         return -1;
 
-#if 0
-    uint32_t width = var_InheritInteger (demux, CFG_PREFIX"width");
-    if (width != (uint32_t)-1)
-        fmt.fmt.pix.width = width; /* override width */
-    uint32_t height = var_InheritInteger (demux, CFG_PREFIX"height");
-    if (height != (uint32_t)-1)
-        fmt.fmt.pix.height = height; /* override height */
-#endif
-
     /* Print extra info */
     msg_Dbg (demux, "%d bytes maximum for complete image",
              fmt.fmt.pix.sizeimage);
