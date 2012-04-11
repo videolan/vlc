@@ -824,7 +824,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         if( keyCode == NX_KEYTYPE_PLAY && keyState == 0 )
             var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
 
-        if( keyCode == NX_KEYTYPE_FAST && !b_mediakeyJustJumped )
+        if( (keyCode == NX_KEYTYPE_FAST || keyCode == NX_KEYTYPE_NEXT) && !b_mediakeyJustJumped )
         {
             if( keyState == 0 && keyRepeat == 0 )
                 var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_NEXT );
@@ -838,7 +838,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             }
         }
 
-        if( keyCode == NX_KEYTYPE_REWIND && !b_mediakeyJustJumped )
+        if( (keyCode == NX_KEYTYPE_REWIND || keyCode == NX_KEYTYPE_PREVIOUS) && !b_mediakeyJustJumped )
         {
             if( keyState == 0 && keyRepeat == 0 )
                 var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_PREV );
