@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vorbis.c: vorbis decoder/encoder/packetizer module using of libvorbis.
  *****************************************************************************
- * Copyright (C) 2001-2003 the VideoLAN team
+ * Copyright (C) 2001-2012 the VideoLAN team
  * Copyright (C) 2007 Société des arts technologiques
  * Copyright (C) 2007 Savoir-faire Linux
  *
@@ -233,12 +233,11 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
 
     if( p_dec->fmt_in.i_codec != VLC_CODEC_VORBIS )
-    {
         return VLC_EGENERIC;
-    }
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys = malloc( sizeof(*p_sys) ) ) == NULL )
+    p_dec->p_sys = p_sys = malloc( sizeof(*p_sys) );
+    if( unlikely( !p_sys ) )
         return VLC_ENOMEM;
 
     /* Misc init */
@@ -474,10 +473,8 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
 static void Interleave( INTERLEAVE_TYPE *p_out, const INTERLEAVE_TYPE **pp_in,
                         int i_nb_channels, int i_samples, int *pi_chan_table)
 {
-    int i, j;
-
-    for ( j = 0; j < i_samples; j++ )
-        for ( i = 0; i < i_nb_channels; i++ )
+    for( int j = 0; j < i_samples; j++ )
+        for( int i = 0; i < i_nb_channels; i++ )
             p_out[j * i_nb_channels + pi_chan_table[i]] = pp_in[i][j]
 #ifdef MODULE_NAME_IS_tremor
                 * (FIXED32_ONE >> 24)
@@ -743,7 +740,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->p_sys = p_sys;
 
     p_enc->pf_encode_audio = Encode;
-    p_enc->fmt_in.i_codec = VLC_CODEC_FL32;
+    p_enc->fmt_in.i_codec  = VLC_CODEC_FL32;
     p_enc->fmt_out.i_codec = VLC_CODEC_VORBIS;
 
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
@@ -850,8 +847,6 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     ogg_packet oggpacket;
     block_t *p_block, *p_chain = NULL;
     float **buffer;
-    unsigned int i;
-    unsigned int j;
 
     mtime_t i_pts = p_aout_buf->i_pts -
                 (mtime_t)1000000 * (mtime_t)p_sys->i_samples_delay /
@@ -862,9 +857,9 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     buffer = vorbis_analysis_buffer( &p_sys->vd, p_aout_buf->i_nb_samples );
 
     /* convert samples to float and uninterleave */
-    for( i = 0; i < p_sys->i_channels; i++ )
+    for( unsigned int i = 0; i < p_sys->i_channels; i++ )
     {
-        for( j = 0 ; j < p_aout_buf->i_nb_samples ; j++ )
+        for( unsigned int j = 0 ; j < p_aout_buf->i_nb_samples ; j++ )
         {
             buffer[i][j]= ((float *)p_aout_buf->p_buffer)
                                     [j * p_sys->i_channels + p_sys->pi_chan_table[i]];
