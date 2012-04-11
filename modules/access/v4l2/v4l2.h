@@ -87,7 +87,10 @@ int SetupFormat (vlc_object_t *, int, uint32_t,
                  struct v4l2_format *, struct v4l2_streamparm *);
 #define SetupFormat(o,fd,fcc,fmt,p) \
         SetupFormat(VLC_OBJECT(o),fd,fcc,fmt,p)
-struct buffer_t *InitMmap (vlc_object_t *, int, uint32_t *);
+
+struct buffer_t *StartMmap (vlc_object_t *, int, uint32_t *);
+void StopMmap (int, struct buffer_t *, uint32_t);
+
 block_t* GrabVideo (vlc_object_t *, int, const struct buffer_t *);
 
 /* demux.c */

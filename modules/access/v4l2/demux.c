@@ -438,30 +438,10 @@ static int InitVideo (demux_t *demux, int fd)
     void *(*entry) (void *);
     if (caps & V4L2_CAP_STREAMING)
     {
-        sys->bufv = InitMmap (VLC_OBJECT(demux), fd, &sys->bufc);
+        sys->bufc = 4;
+        sys->bufv = StartMmap (VLC_OBJECT(demux), fd, &sys->bufc);
         if (sys->bufv == NULL)
             return -1;
-        for (uint32_t i = 0; i < sys->bufc; i++)
-        {
-            struct v4l2_buffer buf = {
-                .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
-                .memory = V4L2_MEMORY_MMAP,
-                .index = i,
-            };
-
-            if (v4l2_ioctl (fd, VIDIOC_QBUF, &buf) < 0)
-            {
-                msg_Err (demux, "cannot queue buffer: %m");
-                return -1;
-            }
-        }
-
-        enum v4l2_buf_type buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        if (v4l2_ioctl (fd, VIDIOC_STREAMON, &buf_type) < 0)
-        {
-            msg_Err (demux, "cannot start streaming: %m");
-            return -1;
-        }
         entry = StreamThread;
     }
     else if (caps & V4L2_CAP_READWRITE)
@@ -485,32 +465,13 @@ void DemuxClose( vlc_object_t *obj )
 {
     demux_t *demux = (demux_t *)obj;
     demux_sys_t *sys = demux->p_sys;
-    int fd = sys->fd;
 
     vlc_cancel (sys->thread);
     vlc_join (sys->thread, NULL);
-
-    /* Stop video capture */
     if (sys->bufv != NULL)
-    {
-        for (uint32_t i = 0; i < sys->bufc; i++)
-        {
-            struct v4l2_buffer buf = {
-                .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
-                .memory = V4L2_MEMORY_MMAP,
-            };
-
-            v4l2_ioctl (fd, VIDIOC_DQBUF, &buf);
-            v4l2_munmap (sys->bufv[i].start, sys->bufv[i].length);
-        }
-
-        enum v4l2_buf_type buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        v4l2_ioctl (fd, VIDIOC_STREAMOFF, &buf_type);
-        free (sys->bufv);
-    }
-
+        StopMmap (sys->fd, sys->bufv, sys->bufc);
     ControlsDeinit( obj, sys->controls );
-    v4l2_close( fd );
+    v4l2_close (sys->fd);
     free( sys );
 }
 

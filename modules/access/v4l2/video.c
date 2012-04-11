@@ -556,13 +556,15 @@ block_t *GrabVideo (vlc_object_t *demux, int fd,
     return block;
 }
 
-/*****************************************************************************
- * Helper function to initalise video IO using the mmap method
- *****************************************************************************/
-struct buffer_t *InitMmap (vlc_object_t *obj, int fd, uint32_t *restrict n)
+/**
+ * Allocates memory-mapped buffers, queues them and start streaming.
+ * @param n requested buffers count [IN], allocated buffers count [OUT]
+ * @return array of allocated buffers (use free()), or NULL on error.
+ */
+struct buffer_t *StartMmap (vlc_object_t *obj, int fd, uint32_t *restrict n)
 {
     struct v4l2_requestbuffers req = {
-        .count = 4,
+        .count = *n,
         .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
         .memory = V4L2_MEMORY_MMAP,
     };
@@ -597,6 +599,11 @@ struct buffer_t *InitMmap (vlc_object_t *obj, int fd, uint32_t *restrict n)
             msg_Err (obj, "cannot query buffer %"PRIu32": %m", bufc);
             goto error;
         }
+        if (v4l2_ioctl (fd, VIDIOC_QBUF, &buf) < 0)
+        {
+            msg_Err (obj, "cannot queue buffer %"PRIu32": %m", bufc);
+            goto error;
+        }
 
         bufv[bufc].start = v4l2_mmap (NULL, buf.length, PROT_READ | PROT_WRITE,
                                       MAP_SHARED, fd, buf.m.offset);
@@ -608,14 +615,26 @@ struct buffer_t *InitMmap (vlc_object_t *obj, int fd, uint32_t *restrict n)
         bufv[bufc].length = buf.length;
     }
 
+    enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    if (v4l2_ioctl (fd, VIDIOC_STREAMON, &type) < 0)
+    {
+        msg_Err (obj, "cannot start streaming: %m");
+        goto error;
+    }
     *n = bufc;
     return bufv;
 error:
-    while (bufc > 0)
-    {
-        bufc--;
-        v4l2_munmap (bufv[bufc].start, bufv[bufc].length);
-    }
-    free (bufv);
+    StopMmap (fd, bufv, bufc);
     return NULL;
+}
+
+void StopMmap (int fd, struct buffer_t *bufv, uint32_t bufc)
+{
+    enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+    /* STREAMOFF implicitly dequeues all buffers */
+    v4l2_ioctl (fd, VIDIOC_STREAMOFF, &type);
+    for (uint32_t i = bufc; i < bufc; i++)
+        v4l2_munmap (bufv[i].start, bufv[i].length);
+    free (bufv);
 }

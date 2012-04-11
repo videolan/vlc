@@ -180,36 +180,16 @@ int InitVideo (access_t *access, int fd)
     /* Init I/O method */
     if (cap.capabilities & V4L2_CAP_STREAMING)
     {
-        sys->bufv = InitMmap (VLC_OBJECT(access), fd, &sys->bufc);
+        sys->bufc = 4;
+        sys->bufv = StartMmap (VLC_OBJECT(access), fd, &sys->bufc);
         if (sys->bufv == NULL)
             return -1;
-        for (uint32_t i = 0; i < sys->bufc; i++)
-        {
-            struct v4l2_buffer buf = {
-                .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
-                .memory = V4L2_MEMORY_MMAP,
-                .index = i,
-            };
-
-            if (v4l2_ioctl (fd, VIDIOC_QBUF, &buf) < 0)
-            {
-                msg_Err (access, "cannot queue buffer: %m");
-                return -1;
-            }
-        }
-
-        enum v4l2_buf_type buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        if (v4l2_ioctl (fd, VIDIOC_STREAMON, &buf_type) < 0)
-        {
-            msg_Err (access, "cannot start streaming: %m" );
-            return -1;
-        }
-
         access->pf_block = AccessRead;
     }
     else if (cap.capabilities & V4L2_CAP_READWRITE)
     {
         sys->blocksize = fmt.fmt.pix.sizeimage;
+        sys->bufv = NULL;
         access->pf_read = AccessReadStream;
     }
     else
@@ -225,6 +205,8 @@ void AccessClose( vlc_object_t *obj )
     access_t *access = (access_t *)obj;
     access_sys_t *sys = access->p_sys;
 
+    if (sys->bufv != NULL)
+        StopMmap (sys->fd, sys->bufv, sys->bufc);
     ControlsDeinit( obj, sys->controls );
     v4l2_close (sys->fd);
     free( sys );
