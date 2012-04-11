@@ -111,7 +111,7 @@ int SetupFormat (vlc_object_t *, int, uint32_t,
 #define SetupFormat(o,fd,fcc,fmt,p) \
         SetupFormat(VLC_OBJECT(o),fd,fcc,fmt,p)
 struct buffer_t *InitMmap (vlc_object_t *, int, uint32_t *);
-block_t* GrabVideo(vlc_object_t *, demux_sys_t *);
+block_t* GrabVideo (vlc_object_t *, int, const struct buffer_t *);
 
 /* demux.c */
 int DemuxOpen(vlc_object_t *);

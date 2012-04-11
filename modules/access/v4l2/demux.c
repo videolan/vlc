@@ -537,7 +537,7 @@ static void *StreamThread (void *data)
         }
 
         int canc = vlc_savecancel ();
-        block_t *block = GrabVideo (VLC_OBJECT(demux), sys);
+        block_t *block = GrabVideo (VLC_OBJECT(demux), fd, sys->bufv);
         if (block != NULL)
         {
             block->i_pts = block->i_dts = mdate ();

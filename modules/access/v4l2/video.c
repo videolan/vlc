@@ -978,7 +978,8 @@ int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
 /*****************************************************************************
  * GrabVideo: Grab a video frame
  *****************************************************************************/
-block_t* GrabVideo (vlc_object_t *demux, demux_sys_t *sys)
+block_t *GrabVideo (vlc_object_t *demux, int fd,
+                    const struct buffer_t *restrict bufv)
 {
     struct v4l2_buffer buf = {
         .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
@@ -986,7 +987,7 @@ block_t* GrabVideo (vlc_object_t *demux, demux_sys_t *sys)
     };
 
     /* Wait for next frame */
-    if (v4l2_ioctl (sys->i_fd, VIDIOC_DQBUF, &buf) < 0)
+    if (v4l2_ioctl (fd, VIDIOC_DQBUF, &buf) < 0)
     {
         switch (errno)
         {
@@ -1001,19 +1002,14 @@ block_t* GrabVideo (vlc_object_t *demux, demux_sys_t *sys)
         }
     }
 
-    if (buf.index >= sys->bufc) {
-        msg_Err (demux, "Failed capturing new frame as i>=nbuffers");
-        return NULL;
-    }
-
     /* Copy frame */
     block_t *block = block_Alloc (buf.bytesused);
     if (unlikely(block == NULL))
         return NULL;
-    memcpy (block->p_buffer, sys->bufv[buf.index].start, buf.bytesused);
+    memcpy (block->p_buffer, bufv[buf.index].start, buf.bytesused);
 
     /* Unlock */
-    if (v4l2_ioctl (sys->i_fd, VIDIOC_QBUF, &buf) < 0)
+    if (v4l2_ioctl (fd, VIDIOC_QBUF, &buf) < 0)
     {
         msg_Err (demux, "queue error: %m");
         block_Release (block);

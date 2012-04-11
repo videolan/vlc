@@ -231,7 +231,7 @@ static block_t *AccessRead( access_t *access )
     if( poll( &fd, 1, 500 ) <= 0 )
         return NULL;
 
-    block_t *block = GrabVideo( VLC_OBJECT(access), sys );
+    block_t *block = GrabVideo (VLC_OBJECT(access), sys->i_fd, sys->bufv);
     if( block != NULL )
     {
         block->i_pts = block->i_dts = mdate();
