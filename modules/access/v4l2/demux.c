@@ -95,6 +95,7 @@ int DemuxOpen( vlc_object_t *obj )
         /* fallback to direct kernel mode anyway */
         fd = rawfd;
     }
+    sys->fd = fd;
 
     if (InitVideo (demux, fd))
     {
@@ -102,7 +103,6 @@ int DemuxOpen( vlc_object_t *obj )
         goto error;
     }
 
-    sys->fd = fd;
     sys->controls = ControlsInit (VLC_OBJECT(demux), fd);
     demux->pf_demux = NULL;
     demux->pf_control = DemuxControl;

@@ -90,6 +90,7 @@ int AccessOpen( vlc_object_t *obj )
         /* fallback to direct kernel mode anyway */
         fd = rawfd;
     }
+    sys->fd = fd;
 
     if (InitVideo (access, fd))
     {
@@ -97,7 +98,6 @@ int AccessOpen( vlc_object_t *obj )
         goto error;
     }
 
-    sys->fd = fd;
     access->pf_seek = NULL;
     access->pf_control = AccessControl;
     return VLC_SUCCESS;
