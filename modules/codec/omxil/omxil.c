@@ -418,8 +418,14 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
                                        p_fmt->i_bitrate,
                                        p_fmt->audio.i_bitspersample,
                                        p_fmt->audio.i_blockalign);
-        CHECK_ERROR(omx_error, "SetAudioParameters failed (%x : %s)",
-                    omx_error, ErrorToString(omx_error));
+        if (def->eDir == OMX_DirInput) {
+            CHECK_ERROR(omx_error, "SetAudioParameters failed (%x : %s)",
+                        omx_error, ErrorToString(omx_error));
+        } else {
+            msg_Warn(p_dec, "SetAudioParameters failed (%x : %s) on output port",
+                     omx_error, ErrorToString(omx_error));
+            omx_error = OMX_ErrorNone;
+        }
     }
     if (!strcmp(p_dec->p_sys->psz_component, "OMX.TI.DUCATI1.VIDEO.DECODER") &&
                 def->eDir == OMX_DirOutput)
