@@ -430,9 +430,10 @@ static int InitVideo (demux_t *demux, int fd)
     void *(*entry) (void *);
     if (caps & V4L2_CAP_STREAMING)
     {
-        if (InitMmap (VLC_OBJECT(demux), sys, fd))
+        sys->bufv = InitMmap (VLC_OBJECT(demux), fd, &sys->bufc);
+        if (sys->bufv == NULL)
             return -1;
-        for (unsigned int i = 0; i < sys->i_nbuffers; i++)
+        for (uint32_t i = 0; i < sys->bufc; i++)
         {
             struct v4l2_buffer buf = {
                 .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
@@ -494,35 +495,20 @@ void DemuxClose( vlc_object_t *obj )
         {
             /* NOTE: Some buggy drivers hang if buffers are not unmapped before
              * streamoff */
-            for( unsigned i = 0; i < sys->i_nbuffers; i++ )
+            for (uint32_t i = 0; i < sys->bufc; i++)
             {
                 struct v4l2_buffer buf = {
                     .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
                     .memory = V4L2_MEMORY_MMAP,
                 };
-                v4l2_ioctl( fd, VIDIOC_DQBUF, &buf );
+                v4l2_ioctl (fd, VIDIOC_DQBUF, &buf);
+                v4l2_munmap (sys->bufv[i].start, sys->bufv[i].length);
             }
             enum v4l2_buf_type buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
             v4l2_ioctl( sys->i_fd, VIDIOC_STREAMOFF, &buf_type );
+            free (sys->bufv);
             break;
         }
-    }
-
-    /* Free Video Buffers */
-    if( sys->p_buffers ) {
-        switch( sys->io )
-        {
-        case IO_METHOD_READ:
-            free( sys->p_buffers[0].start );
-            break;
-
-        case IO_METHOD_MMAP:
-            for( unsigned i = 0; i < sys->i_nbuffers; ++i )
-                v4l2_munmap( sys->p_buffers[i].start,
-                             sys->p_buffers[i].length );
-            break;
-        }
-        free( sys->p_buffers );
     }
 
     ControlsDeinit( obj, sys->controls );

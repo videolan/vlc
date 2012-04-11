@@ -1001,7 +1001,7 @@ block_t* GrabVideo (vlc_object_t *demux, demux_sys_t *sys)
         }
     }
 
-    if (buf.index >= sys->i_nbuffers) {
+    if (buf.index >= sys->bufc) {
         msg_Err (demux, "Failed capturing new frame as i>=nbuffers");
         return NULL;
     }
@@ -1010,7 +1010,7 @@ block_t* GrabVideo (vlc_object_t *demux, demux_sys_t *sys)
     block_t *block = block_Alloc (buf.bytesused);
     if (unlikely(block == NULL))
         return NULL;
-    memcpy (block->p_buffer, sys->p_buffers[buf.index].start, buf.bytesused);
+    memcpy (block->p_buffer, sys->bufv[buf.index].start, buf.bytesused);
 
     /* Unlock */
     if (v4l2_ioctl (sys->i_fd, VIDIOC_QBUF, &buf) < 0)
@@ -1025,56 +1025,63 @@ block_t* GrabVideo (vlc_object_t *demux, demux_sys_t *sys)
 /*****************************************************************************
  * Helper function to initalise video IO using the mmap method
  *****************************************************************************/
-int InitMmap( vlc_object_t *p_demux, demux_sys_t *p_sys, int i_fd )
+struct buffer_t *InitMmap (vlc_object_t *obj, int fd, uint32_t *restrict n)
 {
-    struct v4l2_requestbuffers req;
+    struct v4l2_requestbuffers req = {
+        .count = 4,
+        .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
+        .memory = V4L2_MEMORY_MMAP,
+    };
 
-    memset( &req, 0, sizeof(req) );
-    req.count = 4;
-    req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    req.memory = V4L2_MEMORY_MMAP;
-
-    if( v4l2_ioctl( i_fd, VIDIOC_REQBUFS, &req ) < 0 )
+    if (v4l2_ioctl (fd, VIDIOC_REQBUFS, &req) < 0)
     {
-        msg_Err( p_demux, "device does not support mmap I/O" );
-        return -1;
+        msg_Err (obj, "cannot allocate buffers: %m" );
+        return NULL;
     }
 
-    if( req.count < 2 )
+    if (req.count < 2)
     {
-        msg_Err( p_demux, "insufficient buffers" );
-        return -1;
+        msg_Err (obj, "cannot allocate enough buffers");
+        return NULL;
     }
 
-    p_sys->p_buffers = calloc( req.count, sizeof( *p_sys->p_buffers ) );
-    if( unlikely(!p_sys->p_buffers) )
-        return -1;
+    struct buffer_t *bufv = malloc (req.count * sizeof (*bufv));
+    if (unlikely(bufv == NULL))
+        return NULL;
 
-    for( p_sys->i_nbuffers = 0; p_sys->i_nbuffers < req.count; ++p_sys->i_nbuffers )
+    uint32_t bufc;
+    for (bufc = 0; bufc < req.count; bufc++)
     {
-        struct v4l2_buffer buf;
+        struct v4l2_buffer buf = {
+            .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
+            .memory = V4L2_MEMORY_MMAP,
+            .index = bufc,
+        };
 
-        memset( &buf, 0, sizeof(buf) );
-        buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        buf.memory = V4L2_MEMORY_MMAP;
-        buf.index = p_sys->i_nbuffers;
-
-        if( v4l2_ioctl( i_fd, VIDIOC_QUERYBUF, &buf ) < 0 )
+        if (v4l2_ioctl (fd, VIDIOC_QUERYBUF, &buf) < 0)
         {
-            msg_Err( p_demux, "VIDIOC_QUERYBUF: %m" );
-            return -1;
+            msg_Err (obj, "cannot query buffer %"PRIu32": %m", bufc);
+            goto error;
         }
 
-        p_sys->p_buffers[p_sys->i_nbuffers].length = buf.length;
-        p_sys->p_buffers[p_sys->i_nbuffers].start =
-            v4l2_mmap( NULL, buf.length, PROT_READ | PROT_WRITE, MAP_SHARED, i_fd, buf.m.offset );
-
-        if( p_sys->p_buffers[p_sys->i_nbuffers].start == MAP_FAILED )
+        bufv[bufc].start = v4l2_mmap (NULL, buf.length, PROT_READ | PROT_WRITE,
+                                      MAP_SHARED, fd, buf.m.offset);
+        if (bufv[bufc].start == MAP_FAILED)
         {
-            msg_Err( p_demux, "mmap failed: %m" );
-            return -1;
+            msg_Err (obj, "cannot map buffer %"PRIu32": %m", bufc);
+            goto error;
         }
+        bufv[bufc].length = buf.length;
     }
 
-    return 0;
+    *n = bufc;
+    return bufv;
+error:
+    while (bufc > 0)
+    {
+        bufc--;
+        v4l2_munmap (bufv[bufc].start, bufv[bufc].length);
+    }
+    free (bufv);
+    return NULL;
 }

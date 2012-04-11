@@ -86,9 +86,9 @@ struct demux_sys_t
     /* Video */
     io_method io;
 
-    struct buffer_t *p_buffers;
-    unsigned int i_nbuffers;
-#define blocksize i_nbuffers /* HACK HACK */
+    struct buffer_t *bufv;
+    uint32_t bufc;
+#define blocksize bufc /* HACK HACK */
 
     uint32_t i_block_flags;
 
@@ -110,8 +110,7 @@ int SetupFormat (vlc_object_t *, int, uint32_t,
                  struct v4l2_format *, struct v4l2_streamparm *);
 #define SetupFormat(o,fd,fcc,fmt,p) \
         SetupFormat(VLC_OBJECT(o),fd,fcc,fmt,p)
-
-int InitMmap (vlc_object_t *, demux_sys_t *, int);
+struct buffer_t *InitMmap (vlc_object_t *, int, uint32_t *);
 block_t* GrabVideo(vlc_object_t *, demux_sys_t *);
 
 /* demux.c */

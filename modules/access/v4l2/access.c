@@ -96,7 +96,6 @@ error:
 int InitVideo (access_t *access, int fd)
 {
     demux_sys_t *sys = (demux_sys_t *)access->p_sys;
-    enum v4l2_buf_type buf_type;
 
     /* Get device capabilites */
     struct v4l2_capability cap;
@@ -168,9 +167,10 @@ int InitVideo (access_t *access, int fd)
     /* Init I/O method */
     if (cap.capabilities & V4L2_CAP_STREAMING)
     {
-        if (InitMmap (VLC_OBJECT(access), sys, fd))
+        sys->bufv = InitMmap (VLC_OBJECT(access), fd, &sys->bufc);
+        if (sys->bufv == NULL)
             return -1;
-        for (unsigned int i = 0; i < sys->i_nbuffers; i++)
+        for (uint32_t i = 0; i < sys->bufc; i++)
         {
             struct v4l2_buffer buf = {
                 .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
@@ -185,7 +185,7 @@ int InitVideo (access_t *access, int fd)
             }
         }
 
-        buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        enum v4l2_buf_type buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         if (v4l2_ioctl (fd, VIDIOC_STREAMON, &buf_type) < 0)
         {
             msg_Err (access, "cannot start streaming: %m" );
