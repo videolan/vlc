@@ -42,18 +42,20 @@
 #include <ogg/ogg.h>
 
 #ifdef MODULE_NAME_IS_tremor
-#include <tremor/ivorbiscodec.h>
-#define INTERLEAVE_TYPE int32_t
+# include <tremor/ivorbiscodec.h>
+# define INTERLEAVE_TYPE int32_t
 
 #else
-#include <vorbis/vorbisenc.h>
-#define INTERLEAVE_TYPE float
-#define HAVE_VORBIS_ENCODER
+# include <vorbis/codec.h>
+# define INTERLEAVE_TYPE float
 
-# ifndef OV_ECTL_RATEMANAGE_AVG
+# ifdef ENABLE_SOUT
+#  define HAVE_VORBIS_ENCODER
+#  include <vorbis/vorbisenc.h>
+#  ifndef OV_ECTL_RATEMANAGE_AVG
 #   define OV_ECTL_RATEMANAGE_AVG 0x0
+#  endif
 # endif
-
 #endif
 
 /*****************************************************************************
