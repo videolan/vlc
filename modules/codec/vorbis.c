@@ -712,7 +712,7 @@ struct encoder_sys_t
 
     int i_last_block_size;
     int i_samples_delay;
-    int i_channels;
+    unsigned int i_channels;
 
     /*
     ** Channel reordering
@@ -850,7 +850,7 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     ogg_packet oggpacket;
     block_t *p_block, *p_chain = NULL;
     float **buffer;
-    int i;
+    unsigned int i;
     unsigned int j;
 
     mtime_t i_pts = p_aout_buf->i_pts -
