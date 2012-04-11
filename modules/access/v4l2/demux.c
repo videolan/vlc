@@ -41,19 +41,10 @@
 
 #include "v4l2.h"
 
-/* TODO: remove this, use callbacks */
-typedef enum {
-    IO_METHOD_READ=1,
-    IO_METHOD_MMAP,
-} io_method;
-
 struct demux_sys_t
 {
     int fd;
     vlc_thread_t thread;
-
-    /* Video */
-    io_method io;
 
     struct buffer_t *bufv;
     union
@@ -480,14 +471,12 @@ static int InitVideo (demux_t *demux, int fd)
             msg_Err (demux, "cannot start streaming: %m");
             return -1;
         }
-
-        sys->io = IO_METHOD_MMAP;
         entry = StreamThread;
     }
     else if (caps & V4L2_CAP_READWRITE)
     {
+        sys->bufv = NULL;
         sys->blocksize = fmt.fmt.pix.sizeimage;
-        sys->io = IO_METHOD_READ;
         entry = ReadThread;
     }
     else
@@ -511,30 +500,22 @@ void DemuxClose( vlc_object_t *obj )
     vlc_join (sys->thread, NULL);
 
     /* Stop video capture */
-    switch( sys->io )
+    if (sys->bufv != NULL)
     {
-        case IO_METHOD_READ:
-            /* Nothing to do */
-            break;
-
-        case IO_METHOD_MMAP:
+        for (uint32_t i = 0; i < sys->bufc; i++)
         {
-            /* NOTE: Some buggy drivers hang if buffers are not unmapped before
-             * streamoff */
-            for (uint32_t i = 0; i < sys->bufc; i++)
-            {
-                struct v4l2_buffer buf = {
-                    .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
-                    .memory = V4L2_MEMORY_MMAP,
-                };
-                v4l2_ioctl (fd, VIDIOC_DQBUF, &buf);
-                v4l2_munmap (sys->bufv[i].start, sys->bufv[i].length);
-            }
-            enum v4l2_buf_type buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-            v4l2_ioctl (fd, VIDIOC_STREAMOFF, &buf_type);
-            free (sys->bufv);
-            break;
+            struct v4l2_buffer buf = {
+                .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
+                .memory = V4L2_MEMORY_MMAP,
+            };
+
+            v4l2_ioctl (fd, VIDIOC_DQBUF, &buf);
+            v4l2_munmap (sys->bufv[i].start, sys->bufv[i].length);
         }
+
+        enum v4l2_buf_type buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        v4l2_ioctl (fd, VIDIOC_STREAMOFF, &buf_type);
+        free (sys->bufv);
     }
 
     ControlsDeinit( obj, sys->controls );
