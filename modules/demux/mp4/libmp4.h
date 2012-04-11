@@ -1342,6 +1342,21 @@ static const UUID_t TfxdBoxUUID = {
                   0x80, 0xe2, 0x14, 0x1b, 0xaf, 0xf7, 0x57, 0xb2 } };
 
 
+/*****************************************************************************
+ * MP4_BoxGetInitFrag : Parse the initialization segment.
+ *****************************************************************************
+ *  The first box is a virtual box "root", and is the father of the boxes
+ *  'ftyp' and 'moov'.
+ *****************************************************************************/
+MP4_Box_t *MP4_BoxGetInitFrag( stream_t * );
+
+/*****************************************************************************
+ * MP4_BoxGetNextChunk : Parse the entire moof box.
+ *****************************************************************************
+ *  The first box is a virtual box "root" and is the father of the boxes
+ *  'moof' and, possibly, 'sidx'.
+ *****************************************************************************/
+MP4_Box_t *MP4_BoxGetNextChunk( stream_t * );
 
 /*****************************************************************************
  * MP4_BoxGetRoot : Parse the entire file, and create all boxes in memory

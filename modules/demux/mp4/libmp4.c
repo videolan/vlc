@@ -3366,6 +3366,115 @@ void MP4_BoxFree( stream_t *s, MP4_Box_t *p_box )
     free( p_box );
 }
 
+MP4_Box_t *MP4_BoxGetInitFrag( stream_t *s )
+{
+    /* p_chunk is a virtual root container for the ftyp and moov boxes */
+    MP4_Box_t *p_chunk;
+    MP4_Box_t *p_ftyp;
+    MP4_Box_t *p_moov;
+
+    p_chunk = calloc( 1, sizeof( MP4_Box_t ) );
+    if( unlikely( p_chunk == NULL ) )
+        return NULL;
+
+    p_chunk->i_type = ATOM_root;
+    p_chunk->i_shortsize = 1;
+
+    p_ftyp = MP4_ReadBox( s, p_chunk );
+    if( !p_ftyp )
+    {
+        msg_Warn( s, "no ftyp box found!");
+        goto error;
+    }
+
+    /* there may be some boxes between ftyp and moov,
+     * we skip them, but put a reasonable limit */
+#define MAX_SKIP 8
+    for( int i = 0 ; i < MAX_SKIP; i++ )
+    {
+        p_moov = MP4_ReadBox( s, p_chunk );
+        if( !p_moov )
+            goto error;
+        if( p_moov->i_type != ATOM_moov )
+        {
+            if( i == MAX_SKIP - 1 )
+                return NULL;
+            stream_Read( s, NULL, p_moov->i_size );
+            MP4_BoxFree( s, p_moov );
+        }
+        else
+            break;
+    }
+
+    p_chunk->p_first = p_ftyp;
+    p_ftyp->p_next = p_moov;
+    p_chunk->p_last = p_moov;
+
+    return p_chunk;
+
+error:
+        free( p_chunk );
+        return NULL;
+}
+
+MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
+{
+    /* p_chunk is a virtual root container for the moof and mdat boxes */
+    MP4_Box_t *p_chunk;
+    MP4_Box_t *p_moof = NULL;
+    MP4_Box_t *p_sidx = NULL;
+
+    p_chunk = calloc( 1, sizeof( MP4_Box_t ) );
+    if( unlikely( p_chunk == NULL ) )
+        return NULL;
+
+    p_chunk->i_type = ATOM_root;
+    p_chunk->i_shortsize = 1;
+
+    /* there may be some boxes before moof,
+     * we skip them (but sidx) for now, but put a reasonable limit */
+    for( int i = 0 ; i < MAX_SKIP; i++ )
+    {
+        p_moof = MP4_ReadBox( s, p_chunk );
+        if( !p_moof )
+            goto error;
+        if( p_moof->i_type != ATOM_moof )
+        {
+            if( i == MAX_SKIP - 1 )
+            {
+                MP4_BoxFree( s, p_moof );
+                goto error;
+            }
+            if( p_moof->i_type != ATOM_sidx )
+            {
+                MP4_BoxFree( s, p_moof );
+                stream_Read( s, NULL, p_moof->i_size );
+            }
+            else
+                p_sidx = p_moof;
+        }
+        else
+            break;
+    }
+
+    p_chunk->p_first = p_moof;
+    p_chunk->p_last = p_moof;
+
+    if( p_sidx )
+    {
+        p_chunk->p_first = p_sidx;
+        p_sidx->p_next = p_moof;
+    }
+
+    return p_chunk;
+
+error:
+    free( p_chunk );
+    return NULL;
+}
+
+#undef MAX_SKIP
+
 /*****************************************************************************
  * MP4_BoxGetRoot : Parse the entire file, and create all boxes in memory
  *****************************************************************************
