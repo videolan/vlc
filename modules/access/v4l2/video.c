@@ -159,7 +159,7 @@ static int SetupTuner (vlc_object_t *obj, int fd,
 
     msg_Dbg (obj, "tuner %s (%"PRIu32") is %s", tuner.name, tuner.index,
              typename);
-    msg_Dbg (obj, " ranges from %u.%u %sHz to %u.%c %sHz",
+    msg_Dbg (obj, " ranges from %u.%u %sHz to %u.%u %sHz",
              (tuner.rangelow * 125) >> 1, (tuner.rangelow & 1) * 5, mult,
              (tuner.rangehigh * 125) >> 1, (tuner.rangehigh & 1) * 5,
              mult);
@@ -217,9 +217,11 @@ static int SetupTuner (vlc_object_t *obj, int fd,
                      input->tuner, freq, mult);
             return -1;
         }
+        msg_Dbg (obj, "tuner %"PRIu32" tuned to frequency %"PRIu32" %sHz",
+                 input->tuner, freq, mult);
     }
-    msg_Dbg (obj, "tuner %"PRIu32" tuned to frequency %"PRIu32" %sHz",
-             input->tuner, freq, mult);
+    else
+        msg_Dbg (obj, "tuner not tuned");
     return 0;
 }
 
