@@ -457,7 +457,11 @@ static int InitVideo (demux_t *demux, int fd)
     }
 
     if (vlc_clone (&sys->thread, entry, demux, VLC_THREAD_PRIORITY_INPUT))
+    {
+        if (sys->bufv != NULL)
+            StopMmap (sys->fd, sys->bufv, sys->bufc);
         return -1;
+    }
     return 0;
 }
 
