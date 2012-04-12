@@ -239,7 +239,7 @@ static int Open( decoder_t *p_dec, bool b_packetizer )
     /* Allocate the memory needed to store the decoder's structure */
     p_dec->p_sys = p_sys = malloc( sizeof(decoder_sys_t) );
 
-    if( !p_sys )
+    if( unlikely( !p_sys ) )
         return VLC_EGENERIC;
 
     /* Misc init */
