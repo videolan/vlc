@@ -290,7 +290,6 @@ static block_t *Parse( decoder_t *p_dec, int *pi_frame_length, int *pi_bits,
     uint32_t h;
     unsigned int i_size;
     int i_channels;
-    int i_id;
     int i_bits;
 
     if( !pp_block || !*pp_block ) return NULL;
@@ -331,7 +330,6 @@ static block_t *Parse( decoder_t *p_dec, int *pi_frame_length, int *pi_bits,
     h = GetDWBE( p_block->p_buffer );
     i_size = (h >> 16) & 0xffff;
     i_channels = 2 + 2*( (h >> 14) & 0x03 );
-    i_id = (h >> 6) & 0xff;
     i_bits = 16 + 4*( (h >> 4)&0x03 );
 
     if( AES3_HEADER_LEN + i_size != p_block->i_buffer || i_bits > 24 )
