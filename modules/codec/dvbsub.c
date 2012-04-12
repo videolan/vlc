@@ -1475,7 +1475,7 @@ static subpicture_t *render( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     subpicture_t *p_spu;
     subpicture_region_t **pp_spu_region;
-    int i, j, i_timeout = 0;
+    int i, j;
     int i_base_x;
     int i_base_y;
 
@@ -1535,8 +1535,6 @@ static subpicture_t *render( decoder_t *p_dec )
         video_format_t fmt;
         video_palette_t palette;
         int i_pitch;
-
-        i_timeout = p_sys->p_page->i_timeout;
 
         p_regiondef = &p_sys->p_page->p_region_defs[i];
 
