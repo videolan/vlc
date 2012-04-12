@@ -163,6 +163,16 @@ static int get_param_size(OMX_INDEXTYPE param_index)
         return sizeof(OMX_AUDIO_PARAM_WMATYPE);
     case OMX_IndexParamAudioRa:
         return sizeof(OMX_AUDIO_PARAM_RATYPE);
+    case OMX_IndexParamVideoPortFormat:
+        return sizeof(OMX_VIDEO_PARAM_PORTFORMATTYPE);
+    case OMX_IndexParamVideoBitrate:
+        return sizeof(OMX_VIDEO_PARAM_BITRATETYPE);
+    case OMX_IndexParamVideoH263:
+        return sizeof(OMX_VIDEO_PARAM_H263TYPE);
+    case OMX_IndexParamVideoMpeg4:
+        return sizeof(OMX_VIDEO_PARAM_MPEG4TYPE);
+    case OMX_IndexParamVideoAvc:
+        return sizeof(OMX_VIDEO_PARAM_AVCTYPE);
     default:
         return 0;
     }
