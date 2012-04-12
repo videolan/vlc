@@ -1094,6 +1094,8 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
 
                 wf_tag_to_fourcc( GetWLE( &p_wf->wFormatTag ), &p_tk->fmt.i_codec, NULL );
 
+                if( p_tk->fmt.i_codec == VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
+                    msg_Err( &sys.demuxer, "Unrecognized wf tag: 0x%x", GetWLE( &p_wf->wFormatTag ) );
                 p_tk->fmt.audio.i_channels   = GetWLE( &p_wf->nChannels );
                 p_tk->fmt.audio.i_rate = GetDWLE( &p_wf->nSamplesPerSec );
                 p_tk->fmt.i_bitrate    = GetDWLE( &p_wf->nAvgBytesPerSec ) * 8;
