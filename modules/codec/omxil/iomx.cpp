@@ -393,5 +393,26 @@ OMX_ERRORTYPE PREFIX(OMX_GetRolesOfComponent)(OMX_STRING component_name, OMX_U32
     }
     return OMX_ErrorInvalidComponentName;
 }
+
+OMX_ERRORTYPE PREFIX(OMX_GetComponentsOfRole)(OMX_STRING role, OMX_U32 *num_comps, OMX_U8 **comp_names)
+{
+    OMX_U32 i = 0;
+    for( List<IOMX::ComponentInfo>::iterator it = ctx->components.begin(); it != ctx->components.end(); it++ ) {
+        for( List<String8>::iterator it2 = it->mRoles.begin(); it2 != it->mRoles.end(); it2++ ) {
+            if (!strcmp(it2->string(), role)) {
+                if (comp_names) {
+                    if (*num_comps < i)
+                        return OMX_ErrorInsufficientResources;
+                    strncpy((char*)comp_names[i], it->mName.string(), OMX_MAX_STRINGNAME_SIZE);
+                    comp_names[i][OMX_MAX_STRINGNAME_SIZE - 1] = '\0';
+                }
+                i++;
+                break;
+            }
+        }
+    }
+    *num_comps = i;
+    return OMX_ErrorNone;
+}
 }
 
