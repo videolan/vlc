@@ -1090,6 +1090,9 @@ static const entry_t p_list_audio[] = {
     B(VLC_CODEC_ADPCM_IMA_AMV, "IMA AMV ADPCM Audio"),
         A("imav"),
 
+    B(VLC_CODEC_ADPCM_YAMAHA, "Yamaha ADPCM Audio" ),
+        A("ms\x00\x20"),
+
     /* AMR */
     B(VLC_CODEC_AMR_NB, "AMR narrow band"),
         A("samr"),
