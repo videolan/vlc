@@ -326,6 +326,8 @@ static int AccessSeek( access_t *p_access, uint64_t seek_len )
     unsigned i_seek = 0;
     int i_read = 1;
     char *p_buffer = ( char* ) calloc( 1, ZIP_BUFFER_LEN );
+    if( unlikely( !p_buffer ) )
+        return VLC_EGENERIC;
     while( ( i_seek < seek_len ) && ( i_read > 0 ) )
     {
         i_read = ( seek_len - i_seek < ZIP_BUFFER_LEN )
