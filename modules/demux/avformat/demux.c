@@ -749,7 +749,7 @@ static block_t *BuildSsaFrame( const AVPacket *p_pkt, unsigned i_order )
     if( asprintf( &p, "%u,%d,%.*s", i_order, i_layer, p_pkt->size - i_position, p_pkt->data + i_position ) < 0 )
         return NULL;
 
-    block_t *p_frame = block_heap_Alloc( p, p, strlen(p) + 1 );
+    block_t *p_frame = block_heap_Alloc( p, strlen(p) + 1 );
     if( p_frame )
         p_frame->i_length = CLOCK_FREQ * ((h1-h0) * 3600 +
                                           (m1-m0) * 60 +

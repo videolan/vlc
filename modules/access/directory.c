@@ -297,7 +297,7 @@ block_t *DirBlock (access_t *p_access)
             if (unlikely(len == -1))
                 goto fatal;
 
-            block_t *block = block_heap_Alloc (footer, footer, len);
+            block_t *block = block_heap_Alloc (footer, len);
             if (unlikely(block == NULL))
                 free (footer);
             p_access->info.b_eof = true;
@@ -453,7 +453,7 @@ notdir:
         p_sys->xspf_ext = NULL;
     free (old_xspf_ext);
 
-    block_t *block = block_heap_Alloc (entry, entry, len);
+    block_t *block = block_heap_Alloc (entry, len);
     if (unlikely(block == NULL))
     {
         free (entry);

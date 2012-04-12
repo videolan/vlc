@@ -42,16 +42,6 @@
  * @section Block handling functions.
  */
 
-/**
- * Internal state for heap block.
-  */
-struct block_sys_t
-{
-    block_t     self;
-    size_t      i_allocated_buffer;
-    uint8_t     p_allocated_buffer[];
-};
-
 #ifndef NDEBUG
 static void BlockNoRelease( block_t *b )
 {
@@ -66,6 +56,8 @@ void block_Init( block_t *restrict b, void *buf, size_t size )
     b->p_next = NULL;
     b->p_buffer = buf;
     b->i_buffer = size;
+    b->p_start = buf;
+    b->i_size = size;
     b->i_flags = 0;
     b->i_nb_samples = 0;
     b->i_pts =
@@ -98,51 +90,26 @@ static void BlockMetaCopy( block_t *restrict out, const block_t *in )
 /* Maximum size of reserved footer before we release with realloc() */
 #define BLOCK_WASTE_SIZE   2048
 
-block_t *block_Alloc( size_t i_size )
+block_t *block_Alloc (size_t size)
 {
-    /* We do only one malloc
-     * TODO: bench if doing 2 malloc but keeping a pool of buffer is better
-     * 2 * BLOCK_PADDING -> pre + post padding
-     */
-    block_sys_t *p_sys;
-    uint8_t *buf;
-#define ALIGN(x) (((x) + BLOCK_ALIGN - 1) & ~(BLOCK_ALIGN - 1))
-#if 0 /*def HAVE_POSIX_MEMALIGN */
-    /* posix_memalign(,16,) is much slower than malloc() on glibc.
-     * -- Courmisch, September 2009, glibc 2.5 & 2.9 */
-    const size_t i_alloc = ALIGN(sizeof(*p_sys)) + (2 * BLOCK_PADDING)
-                         + ALIGN(i_size);
-    if( unlikely(i_alloc <= i_size) )
-        return NULL;
-    void *ptr;
-
-    if( posix_memalign( &ptr, BLOCK_ALIGN, i_alloc ) )
+    /* 2 * BLOCK_PADDING: pre + post padding */
+    const size_t alloc = sizeof (block_t) + BLOCK_ALIGN + (2 * BLOCK_PADDING)
+                       + size;
+    if (unlikely(alloc <= size))
         return NULL;
 
-    p_sys = ptr;
-    buf = p_sys->p_allocated_buffer + (-sizeof(*p_sys) & (BLOCK_ALIGN - 1));
-
-#else
-    const size_t i_alloc = sizeof(*p_sys) + BLOCK_ALIGN + (2 * BLOCK_PADDING)
-                         + ALIGN(i_size);
-    if( unlikely(i_alloc <= i_size) )
+    block_t *b = malloc (alloc);
+    if (unlikely(b == NULL))
         return NULL;
 
-    p_sys = malloc( i_alloc );
-    if( p_sys == NULL )
-        return NULL;
-
-    buf = (void *)ALIGN((uintptr_t)p_sys->p_allocated_buffer);
-
-#endif
-    buf += BLOCK_PADDING;
-
-    block_Init( &p_sys->self, buf, i_size );
-    p_sys->self.pf_release    = BlockRelease;
-    /* Fill opaque data */
-    p_sys->i_allocated_buffer = i_alloc - sizeof(*p_sys);
-
-    return &p_sys->self;
+    block_Init (b, b + 1, alloc);
+    static_assert ((BLOCK_PADDING % BLOCK_ALIGN) == 0,
+                   "BLOCK_PADDING must be a multiple of BLOCK_ALIGN");
+    b->p_buffer += BLOCK_PADDING + BLOCK_ALIGN - 1;
+    b->p_buffer = (void *)(((uintptr_t)b->p_buffer) & ~(BLOCK_ALIGN - 1));
+    b->i_buffer = size;
+    b->pf_release = BlockRelease;
+    return b;
 }
 
 block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
@@ -156,37 +123,20 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
         return NULL;
     }
 
-    if( p_block->pf_release != BlockRelease )
-    {
-        /* Special case when pf_release if overloaded
-         * TODO if used one day, then implement it in a smarter way */
-        block_t *p_dup = block_Duplicate( p_block );
-        block_Release( p_block );
-        if( !p_dup )
-            return NULL;
-
-        p_block = p_dup;
-    }
-
-    block_sys_t *p_sys = (block_sys_t *)p_block;
-    uint8_t *p_start = p_sys->p_allocated_buffer;
-    uint8_t *p_end = p_sys->p_allocated_buffer + p_sys->i_allocated_buffer;
-
-    assert( p_block->p_buffer + p_block->i_buffer <= p_end );
-    assert( p_block->p_buffer >= p_start );
+    assert( p_block->p_start <= p_block->p_buffer );
+    assert( p_block->p_start + p_block->i_size
+                                    >= p_block->p_buffer + p_block->i_buffer );
 
     /* Corner case: the current payload is discarded completely */
     if( i_prebody <= 0 && p_block->i_buffer <= (size_t)-i_prebody )
          p_block->i_buffer = 0; /* discard current payload */
     if( p_block->i_buffer == 0 )
     {
-        size_t available = p_end - p_start;
-
-        if( requested <= available )
+        if( requested <= p_block->i_size )
         {   /* Enough room: recycle buffer */
-            size_t extra = available - requested;
+            size_t extra = p_block->i_size - requested;
 
-            p_block->p_buffer = p_start + (extra / 2);
+            p_block->p_buffer = p_block->p_start + (extra / 2);
             p_block->i_buffer = requested;
             return p_block;
         }
@@ -213,6 +163,9 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
     /* Trim payload end */
     if( p_block->i_buffer > i_body )
         p_block->i_buffer = i_body;
+
+    uint8_t *p_start = p_block->p_start;
+    uint8_t *p_end = p_start + p_block->i_size;
 
     /* Second, reallocate the buffer if we lack space. This is done now to
      * minimize the payload size for memory copy. */
@@ -270,17 +223,9 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
 }
 
 
-typedef struct
+static void block_heap_Release (block_t *block)
 {
-    block_t  self;
-    void    *mem;
-} block_heap_t;
-
-static void block_heap_Release (block_t *self)
-{
-    block_heap_t *block = (block_heap_t *)self;
-
-    free (block->mem);
+    free (block->p_start);
     free (block);
 }
 
@@ -292,42 +237,31 @@ static void block_heap_Release (block_t *self)
  * When block_Release() is called, VLC will free() the specified pointer.
  *
  * @param ptr base address of the heap allocation (will be free()'d)
- * @param addr base address of the useful buffer data
- * @param length bytes length of the useful buffer data
+ * @param length bytes length of the heap allocation
  * @return NULL in case of error (ptr free()'d in that case), or a valid
  * block_t pointer.
  */
-block_t *block_heap_Alloc (void *ptr, void *addr, size_t length)
+block_t *block_heap_Alloc (void *addr, size_t length)
 {
-    block_heap_t *block = malloc (sizeof (*block));
+    block_t *block = malloc (sizeof (*block));
     if (block == NULL)
     {
         free (addr);
         return NULL;
     }
 
-    block_Init (&block->self, (uint8_t *)addr, length);
-    block->self.pf_release = block_heap_Release;
-    block->mem = ptr;
-    return &block->self;
+    block_Init (block, addr, length);
+    block->pf_release = block_heap_Release;
+    return block;
 }
 
 #ifdef HAVE_MMAP
 # include <sys/mman.h>
 
-typedef struct block_mmap_t
-{
-    block_t     self;
-    void       *base_addr;
-    size_t      length;
-} block_mmap_t;
-
 static void block_mmap_Release (block_t *block)
 {
-    block_mmap_t *p_sys = (block_mmap_t *)block;
-
-    munmap (p_sys->base_addr, p_sys->length);
-    free (p_sys);
+    munmap (block->p_start, block->i_size);
+    free (block);
 }
 
 /**
@@ -345,18 +279,16 @@ block_t *block_mmap_Alloc (void *addr, size_t length)
     if (addr == MAP_FAILED)
         return NULL;
 
-    block_mmap_t *block = malloc (sizeof (*block));
+    block_t *block = malloc (sizeof (*block));
     if (block == NULL)
     {
         munmap (addr, length);
         return NULL;
     }
 
-    block_Init (&block->self, (uint8_t *)addr, length);
-    block->self.pf_release = block_mmap_Release;
-    block->base_addr = addr;
-    block->length = length;
-    return &block->self;
+    block_Init (block, addr, length);
+    block->pf_release = block_mmap_Release;
+    return block;
 }
 #else
 block_t *block_mmap_Alloc (void *addr, size_t length)

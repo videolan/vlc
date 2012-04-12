@@ -411,10 +411,12 @@ discard:
     if (img == NULL)
         return;
 
-    block_t *block = block_heap_Alloc (img, xcb_get_image_data (img),
-                                       xcb_get_image_data_length (img));
+    size_t datalen = xcb_get_image_data_length (img);
+    block_t *block = block_heap_Alloc (img, sizeof (*img) + datalen);
     if (block == NULL)
         return;
+    block->p_buffer = xcb_get_image_data (img);
+    block->i_buffer = datalen;
 
     /* Send block - zero copy */
     if (sys->es != NULL)

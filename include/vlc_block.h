@@ -103,10 +103,12 @@ typedef void (*block_free_t) (block_t *);
 
 struct block_t
 {
-    block_t     *p_next;
+    block_t    *p_next;
 
-    uint8_t     *p_buffer;
-    size_t      i_buffer;
+    uint8_t    *p_buffer; /**< Payload start */
+    size_t      i_buffer; /**< Payload length */
+    uint8_t    *p_start; /**< Buffer start */
+    size_t      i_size; /**< Buffer total size */
 
     uint32_t    i_flags;
     unsigned    i_nb_samples; /* Used for audio */
@@ -163,7 +165,7 @@ static inline void block_Release( block_t *p_block )
     p_block->pf_release( p_block );
 }
 
-VLC_API block_t * block_heap_Alloc(void *, void *, size_t) VLC_USED;
+VLC_API block_t * block_heap_Alloc(void *, size_t) VLC_USED;
 VLC_API block_t * block_mmap_Alloc(void *addr, size_t length) VLC_USED;
 VLC_API block_t * block_File(int fd) VLC_USED;
 
