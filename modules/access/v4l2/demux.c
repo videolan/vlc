@@ -67,8 +67,8 @@ int DemuxOpen( vlc_object_t *obj )
 {
     demux_t *demux = (demux_t *)obj;
 
-    demux_sys_t *sys = calloc( 1, sizeof( demux_sys_t ) );
-    if( unlikely(sys == NULL) )
+    demux_sys_t *sys = malloc (sizeof (*sys));
+    if (unlikely(sys == NULL))
         return VLC_ENOMEM;
     demux->p_sys = sys;
 
@@ -371,6 +371,7 @@ static int InitVideo (demux_t *demux, int fd)
     msg_Dbg (demux, "%d bytes maximum for complete image",
              fmt.fmt.pix.sizeimage);
     /* Check interlacing */
+    sys->block_flags = 0;
     switch (fmt.fmt.pix.field)
     {
         case V4L2_FIELD_NONE:
