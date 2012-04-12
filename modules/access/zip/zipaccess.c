@@ -60,7 +60,7 @@ static char *unescapeXml( const char *psz_text );
 static char *unescapeXml( const char *psz_text )
 {
     char *psz_ret = malloc( strlen( psz_text ) + 1 );
-    if( !psz_ret ) return NULL;
+    if( unlikely( !psz_ret ) ) return NULL;
 
     char *psz_tmp = psz_ret;
     for( char *psz_iter = (char*) psz_text; *psz_iter; ++psz_iter, ++psz_tmp )
@@ -113,7 +113,7 @@ int AccessOpen( vlc_object_t *p_this )
 
     p_access->p_sys = p_sys = (access_sys_t*)
             calloc( 1, sizeof( access_sys_t ) );
-    if( !p_sys )
+    if( unlikely( !p_sys ) )
         return VLC_ENOMEM;
 
     /* Split the MRL */
@@ -128,17 +128,17 @@ int AccessOpen( vlc_object_t *p_this )
         msg_Dbg( p_access, "not an encoded URL  Trying file '%s'",
                  psz_path );
         psz_pathToZip = strdup( psz_path );
-        if( !psz_pathToZip )
+        if( unlikely( !psz_pathToZip ) )
         {
             i_ret = VLC_ENOMEM;
             goto exit;
         }
     }
     p_sys->psz_fileInzip = unescapeXml( psz_sep + ZIP_SEP_LEN );
-    if( !p_sys->psz_fileInzip )
+    if( unlikely( !p_sys->psz_fileInzip ) )
     {
         p_sys->psz_fileInzip = strdup( psz_sep + ZIP_SEP_LEN );
-        if( !p_sys->psz_fileInzip )
+        if( unlikely( !p_sys->psz_fileInzip ) )
         {
             i_ret = VLC_ENOMEM;
             goto exit;
@@ -148,7 +148,7 @@ int AccessOpen( vlc_object_t *p_this )
     /* Define IO functions */
     zlib_filefunc_def *p_func = (zlib_filefunc_def*)
                                     calloc( 1, sizeof( zlib_filefunc_def ) );
-    if( !p_func )
+    if( unlikely( !p_func ) )
     {
         i_ret = VLC_ENOMEM;
         goto exit;
@@ -390,7 +390,7 @@ static void* ZCALLBACK ZipIO_Open( void* opaque, const char* file, int mode )
     access_t *p_access = (access_t*) opaque;
 
     char *fileUri = malloc( strlen(file) + 8 );
-    if( !fileUri )
+    if( unlikely( !fileUri ) )
         return NULL;
     if( !strstr( file, "://" ) )
     {
