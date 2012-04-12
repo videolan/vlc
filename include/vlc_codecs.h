@@ -225,6 +225,7 @@ ATTR_PACKED
 #define WAVE_FORMAT_DTS_MS              0x0008 /* Microsoft Corporation */
 #define WAVE_FORMAT_WMAS                0x000a /* WMA 9 Speech */
 #define WAVE_FORMAT_IMA_ADPCM           0x0011 /* Intel Corporation */
+#define WAVE_FORMAT_YAMAHA_ADPCM        0x0020 /* Yamaha */
 #define WAVE_FORMAT_TRUESPEECH          0x0022 /* TrueSpeech */
 #define WAVE_FORMAT_GSM610              0x0031 /* Microsoft Corporation */
 #define WAVE_FORMAT_MSNAUDIO            0x0032 /* Microsoft Corporation */
@@ -336,6 +337,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_ALAW,       VLC_CODEC_ALAW,                   "A-Law" },
     { WAVE_FORMAT_MULAW,      VLC_CODEC_MULAW,                  "Mu-Law" },
     { WAVE_FORMAT_IMA_ADPCM,  VLC_CODEC_ADPCM_IMA_WAV,          "Ima-ADPCM" },
+    { WAVE_FORMAT_YAMAHA_ADPCM, VLC_CODEC_ADPCM_YAMAHA,         "Yamaha ADPCM" },
     { WAVE_FORMAT_TRUESPEECH, VLC_FOURCC(0x22, 0x0, 0x0, 0x0 ), "Truespeech" },
     { WAVE_FORMAT_GSM610,     VLC_CODEC_GSM_MS,                 "Microsoft WAV GSM" },
     { WAVE_FORMAT_G726,       VLC_CODEC_ADPCM_G726,             "G.726 ADPCM" },
