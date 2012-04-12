@@ -124,7 +124,7 @@ private:
     void ParseTracks( KaxTracks *tracks );
     void ParseChapterAtom( int i_level, KaxChapterAtom *ca, chapter_item_c & chapters );
     void ParseTrackEntry( KaxTrackEntry *m );
-    void ParseCluster( );
+    void ParseCluster( bool b_update_start_time = true );
     void ParseSimpleTags( KaxTagSimple *tag );
     void IndexAppendCluster( KaxCluster *cluster );
 };

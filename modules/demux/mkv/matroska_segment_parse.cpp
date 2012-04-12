@@ -1094,7 +1094,7 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
     }
 }
 
-void matroska_segment_c::ParseCluster( )
+void matroska_segment_c::ParseCluster( bool b_update_start_time )
 {
     EbmlElement *el;
     EbmlMaster  *m;
@@ -1117,6 +1117,7 @@ void matroska_segment_c::ParseCluster( )
         }
     }
 
-    i_start_time = cluster->GlobalTimecode() / 1000;
+    if( b_update_start_time )
+        i_start_time = cluster->GlobalTimecode() / 1000;
 }
 

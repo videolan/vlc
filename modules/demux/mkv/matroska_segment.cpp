@@ -691,6 +691,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     spoint *p_first = NULL;
     spoint *p_last = NULL;
     int i_cat;
+    bool b_has_key = false;
 
     if( i_global_position >= 0 )
     {
@@ -717,7 +718,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
                     ( i_index > 0 &&
                       p_indexes[i_index - 1].i_position < (int64_t)cluster->GetElementPosition() ) )
                 {
-                    ParseCluster();
+                    ParseCluster(false);
                     IndexAppendCluster( cluster );
                 }
                 if( es.I_O().getFilePointer() >= (unsigned) i_global_position )
@@ -744,9 +745,9 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     }
 #endif
 
+    int i_idx = 0;
     if ( i_index > 0 )
     {
-        int i_idx = 0;
 
         for( ; i_idx < i_index; i_idx++ )
             if( p_indexes[i_idx].i_time + i_time_offset > i_date )
@@ -773,9 +774,9 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
 
     /* now parse until key frame */
-    const int es[3] = { VIDEO_ES, AUDIO_ES, SPU_ES };
-    i_cat = es[0];
-    for( int i = 0; i < 2; i_cat = es[++i] )
+    const int es_types[3] = { VIDEO_ES, AUDIO_ES, SPU_ES };
+    i_cat = es_types[0];
+    for( int i = 0; i < 2; i_cat = es_types[++i] )
     {
         for( i_track = 0; i_track < tracks.size(); i_track++ )
         {
@@ -811,49 +812,63 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     if( unlikely( !p_first ) )
         return; 
 
-    while( i_pts < i_date )
+    for(;;)
     {
-        bool b_key_picture;
-        bool b_discardable_picture;
-        if( BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration ) )
+        while( i_pts < i_date )
         {
-            msg_Warn( &sys.demuxer, "cannot get block EOF?" );
-
-            return;
-        }
-
-        /* check if block's track is in our list */
-        for( i_track = 0; i_track < tracks.size(); i_track++ )
-        {
-            if( (simpleblock && tracks[i_track]->i_number == simpleblock->TrackNum()) ||
-                (block && tracks[i_track]->i_number == block->TrackNum()) )
-                break;
-        }
-
-        if( simpleblock )
-            i_pts = sys.i_chapter_time + simpleblock->GlobalTimecode() / (mtime_t) 1000;
-        else
-            i_pts = sys.i_chapter_time + block->GlobalTimecode() / (mtime_t) 1000;
-        if( i_track < tracks.size() )
-        {
-            if( tracks[i_track]->fmt.i_cat == i_cat && b_key_picture )
+            bool b_key_picture;
+            bool b_discardable_picture;
+            if( BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration ) )
             {
-                /* get the seekpoint */
-                spoint * sp;
-                for( sp =  p_first; sp; sp = sp->p_next )
-                    if( sp->i_track == i_track )
-                        break;
-
-                sp->i_date = i_pts;
-                if( simpleblock )
-                    sp->i_seek_pos = simpleblock->GetElementPosition();
-                else
-                    sp->i_seek_pos = i_block_pos;
-                sp->i_cluster_pos = i_cluster_pos;
+                msg_Warn( &sys.demuxer, "cannot get block EOF?" );
+                return;
             }
-        }
 
-        delete block;
+            /* check if block's track is in our list */
+            for( i_track = 0; i_track < tracks.size(); i_track++ )
+            {
+                if( (simpleblock && tracks[i_track]->i_number == simpleblock->TrackNum()) ||
+                    (block && tracks[i_track]->i_number == block->TrackNum()) )
+                    break;
+            }
+
+            if( simpleblock )
+                i_pts = sys.i_chapter_time + simpleblock->GlobalTimecode() / (mtime_t) 1000;
+            else
+                i_pts = sys.i_chapter_time + block->GlobalTimecode() / (mtime_t) 1000;
+            if( i_track < tracks.size() )
+            {
+                if( tracks[i_track]->fmt.i_cat == i_cat && b_key_picture )
+                {
+                    /* get the seekpoint */
+                    spoint * sp;
+                    for( sp =  p_first; sp; sp = sp->p_next )
+                        if( sp->i_track == i_track )
+                            break;
+
+                    sp->i_date = i_pts;
+                    if( simpleblock )
+                        sp->i_seek_pos = simpleblock->GetElementPosition();
+                    else
+                        sp->i_seek_pos = i_block_pos;
+                    sp->i_cluster_pos = i_cluster_pos;
+                    b_has_key = true;
+                }
+            }
+
+            delete block;
+        }
+        if( b_has_key || !i_idx )
+            break;
+
+        /* No key picture was found in the cluster seek to previous seekpoint */
+        i_date = i_time_offset + p_indexes[i_idx].i_time;
+        i_idx--;
+        i_pts = 0;
+        es.I_O().setFilePointer( p_indexes[i_idx].i_position );
+        delete ep;
+        ep = new EbmlParser( &es, segment, &sys.demuxer );
+        cluster = NULL;
     }
 
     /* rewind to the last I img */
@@ -865,7 +880,6 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     sys.i_pcr = sys.i_pts = p_min->i_date;
     es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, VLC_TS_0 + sys.i_pcr );
     cluster = (KaxCluster *) ep->UnGet( p_min->i_seek_pos, p_min->i_cluster_pos );
-
 
     /* hack use BlockGet to get the cluster then goto the wanted block */
     if ( !cluster )
