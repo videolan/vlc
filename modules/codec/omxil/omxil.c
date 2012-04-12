@@ -614,8 +614,10 @@ static OMX_ERRORTYPE DeinitialiseComponent(decoder_t *p_dec,
             for(j = 0; j < p_port->i_buffers; j++)
             {
                 OMX_FIFO_GET(&p_port->fifo, p_buffer);
-                if (p_buffer == &p_sys->sentinel_buffer)
+                if (p_buffer == &p_sys->sentinel_buffer) {
+                    j--;
                     continue;
+                }
                 omx_error = OMX_FreeBuffer( omx_handle,
                                             p_port->i_port_index, p_buffer );
 
@@ -1090,8 +1092,10 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
     for(i = 0; i < p_port->i_buffers; i++)
     {
         OMX_FIFO_GET(&p_port->fifo, p_buffer);
-        if (p_buffer == &p_sys->sentinel_buffer)
+        if (p_buffer == &p_sys->sentinel_buffer) {
+            i--;
             continue;
+        }
         omx_error = OMX_FreeBuffer( p_sys->omx_handle,
                                     p_port->i_port_index, p_buffer );
 
