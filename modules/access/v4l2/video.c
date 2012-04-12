@@ -587,8 +587,8 @@ struct buffer_t *StartMmap (vlc_object_t *obj, int fd, uint32_t *restrict n)
     if (unlikely(bufv == NULL))
         return NULL;
 
-    uint32_t bufc;
-    for (bufc = 0; bufc < req.count; bufc++)
+    uint32_t bufc = 0;
+    while (bufc < req.count)
     {
         struct v4l2_buffer buf = {
             .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
@@ -601,11 +601,6 @@ struct buffer_t *StartMmap (vlc_object_t *obj, int fd, uint32_t *restrict n)
             msg_Err (obj, "cannot query buffer %"PRIu32": %m", bufc);
             goto error;
         }
-        if (v4l2_ioctl (fd, VIDIOC_QBUF, &buf) < 0)
-        {
-            msg_Err (obj, "cannot queue buffer %"PRIu32": %m", bufc);
-            goto error;
-        }
 
         bufv[bufc].start = v4l2_mmap (NULL, buf.length, PROT_READ | PROT_WRITE,
                                       MAP_SHARED, fd, buf.m.offset);
@@ -615,6 +610,14 @@ struct buffer_t *StartMmap (vlc_object_t *obj, int fd, uint32_t *restrict n)
             goto error;
         }
         bufv[bufc].length = buf.length;
+        bufc++;
+
+        /* Some drivers refuse to queue buffers before they are mapped. Bug? */
+        if (v4l2_ioctl (fd, VIDIOC_QBUF, &buf) < 0)
+        {
+            msg_Err (obj, "cannot queue buffer %"PRIu32": %m", bufc);
+            goto error;
+        }
     }
 
     enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
