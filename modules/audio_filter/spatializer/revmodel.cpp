@@ -15,8 +15,8 @@
 #include "tuning.h"
 #include <stdlib.h>
 
-revmodel::revmodel() : wet(initialwet), width(1.), mode(0.), roomsize(initialroom),
-                       damp(initialdamp), dry(initialdry)
+revmodel::revmodel() : roomsize(initialroom), damp(initialdamp),
+                       wet(initialwet), dry(initialdry), width(1.), mode(0.)
 {
     // Tie the components to their buffers
     combL[0].setbuffer(bufcombL1,combtuningL1);
