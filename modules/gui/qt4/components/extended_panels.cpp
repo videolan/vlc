@@ -893,10 +893,16 @@ void ExtV4l2::ValueChange( int value )
  * Equalizer
  **********************************************************************/
 
-static const QString band_frequencies[] =
+static const QString vlc_band_frequencies[] =
 {
     "  60 Hz  ", " 170 Hz ", " 310 Hz ", " 600 Hz ", "  1 kHz ",
     "  3 kHz  ", "  6 kHz ", " 12 kHz ", " 14 kHz ", " 16 kHz "
+};
+
+static const QString iso_band_frequencies[] =
+{
+    " 31.25 Hz ", " 62.5 Hz ", " 125 Hz ", " 250 Hz ", " 500 Hz ",
+    "    1 kHz ", "   2 kHz ", "  4 kHz ", "  8 kHz ", " 16 kHz "
 };
 
 Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
@@ -912,6 +918,8 @@ Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
     presetsComboBox = ui.presetsCombo;
     CONNECT( presetsComboBox, activated( int ), this, setCorePreset( int ) );
 
+    b_vlcBands = var_InheritBool( p_intf, "equalizer-vlcfreqs" );
+
     /* Add the sliders for the Bands */
     QGridLayout *grid = new QGridLayout( ui.frame );
     grid->setMargin( 0 );
@@ -923,7 +931,8 @@ Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
         bands[i]->setMinimumWidth(34);
         CONNECT( bands[i], valueChanged( int ), this, setCoreBands() );
 
-        band_texts[i] = new QLabel( band_frequencies[i] + "\n00.0dB" );
+        band_texts[i] = new QLabel( b_vlcBands ? vlc_band_frequencies[i]
+                                               : iso_band_frequencies[i] + "\n00.0dB" );
         band_texts[i]->setFont( smallFont );
 
         grid->addWidget( bands[i], 0, i );
@@ -1002,7 +1011,23 @@ void Equalizer::updateUIFromCore()
     free( psz_pres );
 }
 
-/* Functin called when enableButton is toggled */
+void Equalizer::changeFreqLabels( bool b_useVlcBands )
+{
+    b_vlcBands = b_useVlcBands;
+
+    const QString *band_frequencies = b_vlcBands
+                                    ? vlc_band_frequencies
+                                    : iso_band_frequencies;
+
+    for( int i = 0; i < BANDS; i++ )
+    {
+        const float f_val = (float)( bands[i]->value() ) / 10 - 20;
+        QString val = QString("%1").arg( f_val, 5, 'f', 1 );
+        band_texts[i]->setText( band_frequencies[i] + "\n" + val + "dB" );
+    }
+}
+
+/* Function called when enableButton is toggled */
 void Equalizer::enable()
 {
     bool en = ui.enableCheck->isChecked();
@@ -1065,6 +1090,10 @@ void Equalizer::setCoreBands()
 {
     /**\todo smoothing */
 
+    const QString *band_frequencies = b_vlcBands
+                                    ? vlc_band_frequencies
+                                    : iso_band_frequencies;
+
     QString values;
     for( int i = 0; i < BANDS; i++ )
     {
@@ -1110,6 +1139,10 @@ void Equalizer::setCorePreset( int i_preset )
 
     char *psz_values = createValuesFromPreset( i_preset );
     if( !psz_values ) return ;
+
+    const QString *band_frequencies = b_vlcBands
+                                    ? vlc_band_frequencies
+                                    : iso_band_frequencies;
 
     char *p = psz_values;
     for( int i = 0; i < BANDS && *p; i++ )

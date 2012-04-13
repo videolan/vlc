@@ -93,10 +93,12 @@ public:
 
     char * createValuesFromPreset( int i_preset );
     void updateUIFromCore();
+    void changeFreqLabels( bool );
 private:
     Ui::EqualizerWidget ui;
     QSlider *bands[BANDS];
     QLabel *band_texts[BANDS];
+    bool b_vlcBands;
 
     void delCallbacks( vlc_object_t * );
     void addCallbacks( vlc_object_t * );
