@@ -244,6 +244,9 @@ ATTR_PACKED
 #define WAVE_FORMAT_WMAP                0x0162 /* WMA 9 Professional */
 #define WAVE_FORMAT_WMAL                0x0163 /* WMA 9 Lossless */
 
+#define WAVE_FORMAT_ATRAC3              0x0270 /* Atrac3, != from MSDN doc */
+#define WAVE_FORMAT_SONY_ATRAC3         0x0272 /* Atrac3, != from MSDN doc */
+
 #define WAVE_FORMAT_AAC_2               0x1601 /* Other AAC */
 #define WAVE_FORMAT_AAC_LATM            0x1602 /* AAC/LATM */
 
@@ -352,6 +355,8 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_WMAP,       VLC_CODEC_WMAP,                   "Window Media Audio 9 Professional" },
     { WAVE_FORMAT_WMAL,       VLC_CODEC_WMAL,                   "Window Media Audio 9 Lossless" },
     { WAVE_FORMAT_WMAS,       VLC_CODEC_WMAS,                   "Window Media Audio 9 Speech" },
+    { WAVE_FORMAT_ATRAC3,     VLC_CODEC_ATRAC3,                 "Sony Atrac3" },
+    { WAVE_FORMAT_SONY_ATRAC3,VLC_CODEC_ATRAC3,                 "Sony Atrac3" },
     { WAVE_FORMAT_DK3,        VLC_FOURCC( 'm', 's', 0x00,0x61), "Duck DK3" },
     { WAVE_FORMAT_DK4,        VLC_FOURCC( 'm', 's', 0x00,0x62), "Duck DK4" },
     { WAVE_FORMAT_DTS,        VLC_CODEC_DTS,                    "DTS Coherent Acoustics" },
