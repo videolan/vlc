@@ -19,6 +19,7 @@ $(TARBALLS)/libshout-$(SHOUT_VERSION).tar.gz:
 libshout: libshout-$(SHOUT_VERSION).tar.gz .sum-shout
 	$(UNPACK)
 	$(APPLY) $(SRC)/shout/libshout-win32.patch
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 DEPS_shout = ogg $(DEPS_ogg) theora $(DEPS_theora) speex $(DEPS_speex)

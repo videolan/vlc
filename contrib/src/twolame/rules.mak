@@ -23,6 +23,7 @@ twolame: twolame-$(TWOLAME_VERSION).tar.gz twolame-winutil.h .sum-twolame
 ifdef HAVE_WIN32
 	cp -f $(filter %winutil.h,$^) $@-$(TWOLAME_VERSION)/win32/winutil.h
 endif
+	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && cp config.guess config.sub build-scripts
 	$(MOVE)
 
 .twolame: twolame

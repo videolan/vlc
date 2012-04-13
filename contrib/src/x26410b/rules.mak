@@ -42,6 +42,7 @@ x26410b: x26410b-$(X264_VERSION).tar.gz .sum-x26410b
 	rm -Rf x26410b-git
 	mkdir -p x26410b-git
 	$(ZCAT) "$<" | (cd x26410b-git && tar xv --strip-components=1)
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 .x26410b: x26410b

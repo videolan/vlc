@@ -11,6 +11,7 @@ $(TARBALLS)/lame-$(LAME_VERSION).tar.gz:
 lame: lame-$(LAME_VERSION).tar.gz .sum-lame
 	$(UNPACK)
 	$(APPLY) $(SRC)/lame/lame-forceinline.patch
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 .lame: lame
