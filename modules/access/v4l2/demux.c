@@ -58,7 +58,8 @@ struct demux_sys_t
     vlc_v4l2_ctrl_t *controls;
 };
 
-static void *StreamThread (void *);
+static void *UserPtrThread (void *);
+static void *MmapThread (void *);
 static void *ReadThread (void *);
 static int DemuxControl( demux_t *, int, va_list );
 static int InitVideo (demux_t *, int);
@@ -439,21 +440,40 @@ static int InitVideo (demux_t *demux, int fd)
     void *(*entry) (void *);
     if (caps & V4L2_CAP_STREAMING)
     {
-        sys->bufc = 4;
-        sys->bufv = StartMmap (VLC_OBJECT(demux), fd, &sys->bufc);
-        if (sys->bufv == NULL)
-            return -1;
-        entry = StreamThread;
+        if (StartUserPtr (VLC_OBJECT(demux), fd) == 0)
+        {
+            /* In principles, mmap() will pad the length to a multiple of the
+             * page size, so there is no need to care. Nevertheless with the
+             * page size, block->i_size can be set optimally. */
+            const long pagemask = sysconf (_SC_PAGE_SIZE) - 1;
+
+            sys->blocksize = (fmt.fmt.pix.sizeimage + pagemask) & ~pagemask;
+            sys->bufv = NULL;
+            entry = UserPtrThread;
+            msg_Dbg (demux, "streaming with %"PRIu32"-bytes user buffers",
+                     sys->blocksize);
+        }
+        else /* fall back to memory map */
+        {
+            sys->bufc = 4;
+            sys->bufv = StartMmap (VLC_OBJECT(demux), fd, &sys->bufc);
+            if (sys->bufv == NULL)
+                return -1;
+            entry = MmapThread;
+            msg_Dbg (demux, "streaming with %"PRIu32" memory-mapped buffers",
+                     sys->bufc);
+        }
     }
     else if (caps & V4L2_CAP_READWRITE)
     {
-        sys->bufv = NULL;
         sys->blocksize = fmt.fmt.pix.sizeimage;
+        sys->bufv = NULL;
         entry = ReadThread;
+        msg_Dbg (demux, "reading %zu bytes at a time", sys->blocksize);
     }
     else
     {
-        msg_Err (demux, "no supported I/O method");
+        msg_Err (demux, "no supported capture method");
         return -1;
     }
 
@@ -480,7 +500,91 @@ void DemuxClose( vlc_object_t *obj )
     free( sys );
 }
 
-static void *StreamThread (void *data)
+/** Allocates and queue a user buffer using mmap(). */
+static block_t *UserPtrQueue (vlc_object_t *obj, int fd, size_t length)
+{
+    void *ptr = mmap (NULL, length, PROT_READ | PROT_WRITE,
+                      MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    if (ptr == MAP_FAILED)
+    {
+        msg_Err (obj, "cannot allocate %zu-bytes buffer: %m", length);
+        return NULL;
+    }
+
+    block_t *block = block_mmap_Alloc (ptr, length);
+    if (unlikely(block == NULL))
+    {
+        munmap (ptr, length);
+        return NULL;
+    }
+
+    struct v4l2_buffer buf = {
+        .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
+        .memory = V4L2_MEMORY_USERPTR,
+        .m = {
+            .userptr = (uintptr_t)ptr,
+        },
+        .length = length,
+    };
+
+    if (v4l2_ioctl (fd, VIDIOC_QBUF, &buf) < 0)
+    {
+        msg_Err (obj, "cannot queue buffer: %m");
+        block_Release (block);
+        return NULL;
+    }
+    return block;
+}
+
+static void *UserPtrThread (void *data)
+{
+    demux_t *demux = data;
+    demux_sys_t *sys = demux->p_sys;
+    int fd = sys->fd;
+    struct pollfd ufd[1];
+
+    ufd[0].fd = fd;
+    ufd[0].events = POLLIN;
+
+    int canc = vlc_savecancel ();
+    for (;;)
+    {
+        struct v4l2_buffer buf = {
+            .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
+            .memory = V4L2_MEMORY_USERPTR,
+        };
+        block_t *block = UserPtrQueue (VLC_OBJECT(demux), fd, sys->blocksize);
+        if (block == NULL)
+            break;
+
+        /* Wait for data */
+        vlc_restorecancel (canc);
+        block_cleanup_push (block);
+        while (poll (ufd, 1, -1) == -1)
+           if (errno != EINTR)
+               msg_Err (demux, "poll error: %m");
+        vlc_cleanup_pop ();
+        canc = vlc_savecancel ();
+
+        if (v4l2_ioctl (fd, VIDIOC_DQBUF, &buf) < 0)
+        {
+            msg_Err (demux, "cannot dequeue buffer: %m");
+            block_Release (block);
+            continue;
+        }
+
+        assert (block->p_buffer == (void *)buf.m.userptr);
+        block->i_buffer = buf.length;
+        block->i_pts = block->i_dts = mdate ();
+        block->i_flags |= sys->block_flags;
+        es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts);
+        es_out_Send (demux->out, sys->es, block);
+    }
+    vlc_restorecancel (canc); /* <- hmm, this is purely cosmetic */
+    return NULL;
+}
+
+static void *MmapThread (void *data)
 {
     demux_t *demux = data;
     demux_sys_t *sys = demux->p_sys;

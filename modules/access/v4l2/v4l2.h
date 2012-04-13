@@ -88,6 +88,7 @@ int SetupFormat (vlc_object_t *, int, uint32_t,
 #define SetupFormat(o,fd,fcc,fmt,p) \
         SetupFormat(VLC_OBJECT(o),fd,fcc,fmt,p)
 
+int StartUserPtr (vlc_object_t *, int);
 struct buffer_t *StartMmap (vlc_object_t *, int, uint32_t *);
 void StopMmap (int, struct buffer_t *, uint32_t);
 

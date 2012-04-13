@@ -559,6 +559,30 @@ block_t *GrabVideo (vlc_object_t *demux, int fd,
 }
 
 /**
+ * Allocates user pointer buffers, and start streaming.
+ */
+int StartUserPtr (vlc_object_t *obj, int fd)
+{
+    struct v4l2_requestbuffers reqbuf = {
+        .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
+        .memory = V4L2_MEMORY_USERPTR,
+        .count = 2,
+    };
+
+    if (v4l2_ioctl (fd, VIDIOC_REQBUFS, &reqbuf) < 0)
+    {
+        msg_Dbg (obj, "cannot reserve user buffers: %m");
+        return -1;
+    }
+    if (v4l2_ioctl (fd, VIDIOC_STREAMON, &reqbuf.type) < 0)
+    {
+        msg_Err (obj, "cannot start streaming: %m");
+        return -1;
+    }
+    return 0;
+}
+
+/**
  * Allocates memory-mapped buffers, queues them and start streaming.
  * @param n requested buffers count [IN], allocated buffers count [OUT]
  * @return array of allocated buffers (use free()), or NULL on error.
