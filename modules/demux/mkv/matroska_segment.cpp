@@ -1262,17 +1262,24 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                 p_fmt->audio.i_rate = 8000;
                 p_fmt->audio.i_blockalign = 0x14;
             }
-            else
+            else if( p_tk->i_extra_data > 28 )
             {
-                if( !strcmp( p_tk->psz_codec, "A_REAL/COOK" ) )
-                    p_tk->fmt.i_codec = VLC_CODEC_COOK;
-                else if( !strcmp( p_tk->psz_codec, "A_REAL/ATRC" ) )
-                    p_tk->fmt.i_codec = VLC_CODEC_ATRAC3;
-                else if( !strcmp( p_tk->psz_codec, "A_REAL/28_8" ) )
-                    p_tk->fmt.i_codec = VLC_CODEC_RA_288;
-                /* FIXME RALF and SIPR */
+                uint8_t *p = p_tk->p_extra_data;
+                if( memcmp( p, ".ra", 3 ) ) {
+                    msg_Err( &sys.demuxer, "Invalid Real ExtraData 0x%4.4s", (char *)p );
+                    p_tk->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+                }
+                else {
+                    if( !strcmp( p_tk->psz_codec, "A_REAL/COOK" ) )
+                        p_tk->fmt.i_codec = VLC_CODEC_COOK;
+                    else if( !strcmp( p_tk->psz_codec, "A_REAL/ATRC" ) )
+                        p_tk->fmt.i_codec = VLC_CODEC_ATRAC3;
+                    else if( !strcmp( p_tk->psz_codec, "A_REAL/28_8" ) )
+                        p_tk->fmt.i_codec = VLC_CODEC_RA_288;
+                    /* FIXME RALF and SIPR */
 
-                fill_extra_data( p_tk, p_tk->fmt.i_codec == VLC_CODEC_RA_288 ? 0 : 78);
+                    fill_extra_data( p_tk, p_tk->fmt.i_codec == VLC_CODEC_RA_288 ? 0 : 78);
+                }
             }
         }
         else if( !strcmp( p_tk->psz_codec, "S_KATE" ) )
