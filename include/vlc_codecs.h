@@ -278,6 +278,7 @@ ATTR_PACKED
 #define WAVE_FORMAT_VORB_3PLUS          0x6771
 
 #define WAVE_FORMAT_SPEEX               0xa109 /* Speex audio */
+#define WAVE_FORMAT_FLAC                0xf1ac /* Xiph Flac */
 
 #if !defined(WAVE_FORMAT_EXTENSIBLE)
   #define WAVE_FORMAT_EXTENSIBLE          0xFFFE /* Microsoft */
@@ -374,6 +375,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_VORB_3,     VLC_FOURCC( 'v', 'o', 'r', '3' ), "Vorbis 3 Audio" },
     { WAVE_FORMAT_VORB_3PLUS, VLC_FOURCC( 'v', 'o', '3', '+' ), "Vorbis 3+ Audio" },
     { WAVE_FORMAT_SPEEX,      VLC_CODEC_SPEEX,                  "Speex Audio" },
+    { WAVE_FORMAT_FLAC,       VLC_CODEC_FLAC,                   "FLAC Audio" },
     { WAVE_FORMAT_UNKNOWN,    VLC_FOURCC( 'u', 'n', 'd', 'f' ), "Unknown" }
 };
 
