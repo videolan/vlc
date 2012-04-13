@@ -52,6 +52,8 @@
 
 //#define OMXIL_EXTRA_DEBUG
 
+#define SENTINEL_FLAG 0x10000
+
 /*****************************************************************************
  * List of OpenMAX IL core we will try in order
  *****************************************************************************/
@@ -614,7 +616,8 @@ static OMX_ERRORTYPE DeinitialiseComponent(decoder_t *p_dec,
             for(j = 0; j < p_port->i_buffers; j++)
             {
                 OMX_FIFO_GET(&p_port->fifo, p_buffer);
-                if (p_buffer == &p_sys->sentinel_buffer) {
+                if (p_buffer->nFlags & SENTINEL_FLAG) {
+                    free(p_buffer);
                     j--;
                     continue;
                 }
@@ -625,6 +628,17 @@ static OMX_ERRORTYPE DeinitialiseComponent(decoder_t *p_dec,
             }
             CHECK_ERROR(omx_error, "OMX_FreeBuffer failed (%x, %i, %i)",
                         omx_error, (int)p_port->i_port_index, j );
+            while (1) {
+                OMX_FIFO_PEEK(&p_port->fifo, p_buffer);
+                if (!p_buffer) break;
+
+                OMX_FIFO_GET(&p_port->fifo, p_buffer);
+                if (p_buffer->nFlags & SENTINEL_FLAG) {
+                    free(p_buffer);
+                    continue;
+                }
+                msg_Warn( p_dec, "Stray buffer left in fifo, %p", p_buffer );
+            }
         }
 
         omx_error = WaitForSpecificOmxEvent(p_dec, OMX_EventCmdComplete, 0, 0, 0);
@@ -1092,7 +1106,8 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
     for(i = 0; i < p_port->i_buffers; i++)
     {
         OMX_FIFO_GET(&p_port->fifo, p_buffer);
-        if (p_buffer == &p_sys->sentinel_buffer) {
+        if (p_buffer->nFlags & SENTINEL_FLAG) {
+            free(p_buffer);
             i--;
             continue;
         }
@@ -1270,8 +1285,10 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     /* Send the input buffer to the component */
     OMX_FIFO_GET(&p_sys->in.fifo, p_header);
 
-    if (p_header && p_header->nFlags & OMX_BUFFERFLAG_EOS)
+    if (p_header && p_header->nFlags & SENTINEL_FLAG) {
+        free(p_header);
         goto reconfig;
+    }
 
     if(p_header)
     {
@@ -1438,8 +1455,10 @@ aout_buffer_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     /* Send the input buffer to the component */
     OMX_FIFO_GET(&p_sys->in.fifo, p_header);
 
-    if (p_header && p_header->nFlags & OMX_BUFFERFLAG_EOS)
+    if (p_header && p_header->nFlags & SENTINEL_FLAG) {
+        free(p_header);
         goto reconfig;
+    }
 
     if(p_header)
     {
@@ -1656,12 +1675,15 @@ static OMX_ERRORTYPE OmxEventHandler( OMX_HANDLETYPE omx_handle,
                  (unsigned int)data_1, (unsigned int)data_2 );
         if( data_2 == 0 || data_2 == OMX_IndexParamPortDefinition )
         {
+            OMX_BUFFERHEADERTYPE *sentinel;
             for(i = 0; i < p_sys->ports; i++)
                 if(p_sys->p_ports[i].definition.eDir == OMX_DirOutput)
                     p_sys->p_ports[i].b_reconfigure = true;
-            memset(&p_sys->sentinel_buffer, 0, sizeof(p_sys->sentinel_buffer));
-            p_sys->sentinel_buffer.nFlags = OMX_BUFFERFLAG_EOS;
-            OMX_FIFO_PUT(&p_sys->in.fifo, &p_sys->sentinel_buffer);
+            sentinel = calloc(1, sizeof(*sentinel));
+            if (sentinel) {
+                sentinel->nFlags = SENTINEL_FLAG;
+                OMX_FIFO_PUT(&p_sys->in.fifo, sentinel);
+            }
         }
         else if( data_2 == OMX_IndexConfigCommonOutputCrop )
         {

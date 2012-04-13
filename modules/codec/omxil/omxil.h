@@ -105,5 +105,4 @@ struct decoder_sys_t
     int i_nal_size_length; /* Length of the NAL size field for H264 */
     int b_use_pts;
 
-    OMX_BUFFERHEADERTYPE sentinel_buffer;
 };
