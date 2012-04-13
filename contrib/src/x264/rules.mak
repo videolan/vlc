@@ -26,6 +26,9 @@ X264CONF += --enable-pic
 else
 X264CONF += --enable-win32thread
 endif
+ifdef HAVE_CROSS_COMPILE
+X264CONF += --cross-prefix="$(HOST)-"
+endif
 
 $(TARBALLS)/x26410b-git.tar.xz:
 	$(call download_git,$(X264_GITURL))
