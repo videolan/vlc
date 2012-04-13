@@ -1371,7 +1371,7 @@ static int MP4_ReadBox_dvc1( stream_t *p_stream, MP4_Box_t *p_box )
     p_dvc1 = p_box->data.p_dvc1;
 
     MP4_GET1BYTE( p_dvc1->i_profile_level ); /* profile is on 4bits, level 3bits */
-    if( p_dvc1->i_profile_level & 0xf0 >> 4 != 0x06 )
+    if( (p_dvc1->i_profile_level & 0xf0) >> 4 != 0x06 )
     {
         msg_Warn( p_stream, "unsupported VC-1 profile, please report" );
         MP4_READBOX_EXIT( 0 );
