@@ -1261,8 +1261,8 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                 p_tk->fmt.i_codec = VLC_CODEC_ATRAC3;
             else if( !strcmp( p_tk->psz_codec, "A_REAL/28_8" ) )
                 p_tk->fmt.i_codec = VLC_CODEC_RA_288;
-            /* FIXME 14_4, RALF and SIPR */
-            fill_extra_data( p_tk, p_tk->fmt.i_codec == VLC_CODEC_RA_288 ? 0 : 0 /*78 - FIXME need to implement reading support for cook */ );
+            /* FIXME RALF and SIPR */
+            fill_extra_data( p_tk, p_tk->fmt.i_codec == VLC_CODEC_RA_288 ? 0 : 78);
         }
         else if( !strcmp( p_tk->psz_codec, "A_REAL/14_4" ) )
         {
