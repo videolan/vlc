@@ -218,7 +218,7 @@ static block_t *AccessRead( access_t *access )
 
     struct pollfd fd;
     fd.fd = sys->fd;
-    fd.events = POLLIN|POLLPRI;
+    fd.events = POLLIN;
     fd.revents = 0;
 
     /* Wait for data */

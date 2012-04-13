@@ -488,7 +488,7 @@ static void *StreamThread (void *data)
     struct pollfd ufd[1];
 
     ufd[0].fd = fd;
-    ufd[0].events = POLLIN | POLLPRI;
+    ufd[0].events = POLLIN;
 
     for (;;)
     {
@@ -523,7 +523,7 @@ static void *ReadThread (void *data)
     struct pollfd ufd[1];
 
     ufd[0].fd = fd;
-    ufd[0].events = POLLIN | POLLPRI;
+    ufd[0].events = POLLIN;
 
     for (;;)
     {
