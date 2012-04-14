@@ -111,7 +111,7 @@ FFMPEG_CFLAGS += --std=gnu99
 # Build
 
 PKGS += ffmpeg
-ifeq ($(call need_pkg,"libavcodec libavformat libswscale"),)
+ifeq ($(call need_pkg,"libavcodec >= 52.25.0 libavformat >= 52.30.0 libswscale"),)
 PKGS_FOUND += ffmpeg
 endif
 
