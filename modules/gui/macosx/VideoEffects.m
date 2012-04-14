@@ -409,6 +409,9 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         else if( (NSInteger)strstr( psz_string, psz_name ) == NO )
             psz_string = (char *)[[NSString stringWithFormat: @"%s:%s", psz_string, psz_name] UTF8String];
     } else {
+        if( !psz_string )
+            return;
+
         psz_parser = strstr( psz_string, psz_name );
         if( psz_parser )
         {
