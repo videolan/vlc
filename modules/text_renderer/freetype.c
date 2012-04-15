@@ -189,6 +189,7 @@ vlc_module_begin ()
 
     add_integer( "freetype-fontsize", 0, FONTSIZE_TEXT,
                  FONTSIZE_LONGTEXT, true )
+        change_integer_range( 0, 4096)
         change_safe()
 
     add_integer( "freetype-rel-fontsize", 16, FONTSIZER_TEXT,

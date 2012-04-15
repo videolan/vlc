@@ -169,6 +169,7 @@ vlc_module_begin ()
         change_integer_list( pi_color_values, ppsz_color_descriptions )
     add_integer( CFG_PREFIX "size", -1, SIZE_TEXT, SIZE_LONGTEXT,
                  false )
+        change_integer_range( -1, 4096)
 
     set_section( N_("Misc"), NULL )
     add_integer( CFG_PREFIX "timeout", 0, TIMEOUT_TEXT, TIMEOUT_LONGTEXT,
