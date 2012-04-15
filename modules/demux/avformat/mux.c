@@ -94,10 +94,10 @@ int OpenMux( vlc_object_t *p_this )
 
     vlc_init_avformat();
 
-    config_ChainParse( p_mux, "ffmpeg-", ppsz_mux_options, p_mux->p_cfg );
+    config_ChainParse( p_mux, "sout-avformat-", ppsz_mux_options, p_mux->p_cfg );
 
     /* Find the requested muxer */
-    psz_mux = var_GetNonEmptyString( p_mux, "ffmpeg-mux" );
+    psz_mux = var_GetNonEmptyString( p_mux, "sout-avformat-mux" );
     if( psz_mux )
     {
 #if( LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT( 52, 45, 0 ) )

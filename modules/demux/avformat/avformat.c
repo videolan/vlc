@@ -41,7 +41,8 @@ vlc_module_begin ()
     set_shortname( N_("Avformat") )
     set_capability( "demux", 2 )
     set_callbacks( OpenDemux, CloseDemux )
-    add_string( "ffmpeg-format", NULL, FORMAT_TEXT, FORMAT_LONGTEXT, true )
+    add_string( "avformat-format", NULL, FORMAT_TEXT, FORMAT_LONGTEXT, true )
+    add_obsolete_string("ffmpeg-format") /* removed since 2.1.0 */
 
 #ifdef ENABLE_SOUT
     /* mux submodule */
@@ -49,8 +50,8 @@ vlc_module_begin ()
     add_shortcut( "ffmpeg", "avformat" )
     set_description( N_("Avformat muxer" ) )
     set_capability( "sout mux", 2 )
-    add_string( "ffmpeg-mux", NULL, MUX_TEXT,
-                MUX_LONGTEXT, true )
+    add_string( "sout-avformat-mux", NULL, MUX_TEXT, MUX_LONGTEXT, true )
+    add_obsolete_string("ffmpeg-mux") /* removed since 2.1.0 */
     set_callbacks( OpenMux, CloseMux )
 #endif
 #ifndef MERGE_FFMPEG

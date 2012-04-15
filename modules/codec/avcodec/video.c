@@ -234,36 +234,36 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     /*  ***** Get configuration of ffmpeg plugin ***** */
     p_sys->p_context->workaround_bugs =
-        var_InheritInteger( p_dec, "ffmpeg-workaround-bugs" );
+        var_InheritInteger( p_dec, "avcodec-workaround-bugs" );
 #if LIBAVCODEC_VERSION_MAJOR < 54
     p_sys->p_context->error_recognition =
 #else
     p_sys->p_context->err_recognition =
 #endif
-        var_InheritInteger( p_dec, "ffmpeg-error-resilience" );
+        var_InheritInteger( p_dec, "avcodec-error-resilience" );
 
     if( var_CreateGetBool( p_dec, "grayscale" ) )
         p_sys->p_context->flags |= CODEC_FLAG_GRAY;
 
-    i_val = var_CreateGetInteger( p_dec, "ffmpeg-vismv" );
+    i_val = var_CreateGetInteger( p_dec, "avcodec-vismv" );
     if( i_val ) p_sys->p_context->debug_mv = i_val;
 
-    i_val = var_CreateGetInteger( p_dec, "ffmpeg-lowres" );
+    i_val = var_CreateGetInteger( p_dec, "avcodec-lowres" );
     if( i_val > 0 && i_val <= 2 ) p_sys->p_context->lowres = i_val;
 
-    i_val = var_CreateGetInteger( p_dec, "ffmpeg-skiploopfilter" );
+    i_val = var_CreateGetInteger( p_dec, "avcodec-skiploopfilter" );
     if( i_val >= 4 ) p_sys->p_context->skip_loop_filter = AVDISCARD_ALL;
     else if( i_val == 3 ) p_sys->p_context->skip_loop_filter = AVDISCARD_NONKEY;
     else if( i_val == 2 ) p_sys->p_context->skip_loop_filter = AVDISCARD_BIDIR;
     else if( i_val == 1 ) p_sys->p_context->skip_loop_filter = AVDISCARD_NONREF;
 
-    if( var_CreateGetBool( p_dec, "ffmpeg-fast" ) )
+    if( var_CreateGetBool( p_dec, "avcodec-fast" ) )
         p_sys->p_context->flags2 |= CODEC_FLAG2_FAST;
 
     /* ***** ffmpeg frame skipping ***** */
-    p_sys->b_hurry_up = var_CreateGetBool( p_dec, "ffmpeg-hurry-up" );
+    p_sys->b_hurry_up = var_CreateGetBool( p_dec, "avcodec-hurry-up" );
 
-    switch( var_CreateGetInteger( p_dec, "ffmpeg-skip-frame" ) )
+    switch( var_CreateGetInteger( p_dec, "avcodec-skip-frame" ) )
     {
         case -1:
             p_sys->p_context->skip_frame = AVDISCARD_NONE;
@@ -286,7 +286,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     }
     p_sys->i_skip_frame = p_sys->p_context->skip_frame;
 
-    switch( var_CreateGetInteger( p_dec, "ffmpeg-skip-idct" ) )
+    switch( var_CreateGetInteger( p_dec, "avcodec-skip-idct" ) )
     {
         case -1:
             p_sys->p_context->skip_idct = AVDISCARD_NONE;
@@ -312,7 +312,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     /* ***** ffmpeg direct rendering ***** */
     p_sys->b_direct_rendering = false;
     p_sys->i_direct_rendering_used = -1;
-    if( var_CreateGetBool( p_dec, "ffmpeg-dr" ) &&
+    if( var_CreateGetBool( p_dec, "avcodec-dr" ) &&
        (p_sys->p_codec->capabilities & CODEC_CAP_DR1) &&
         /* No idea why ... but this fixes flickering on some TSCC streams */
         p_sys->i_codec_id != CODEC_ID_TSCC && p_sys->i_codec_id != CODEC_ID_CSCD &&
@@ -349,7 +349,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_context->opaque = p_dec;
 
 #ifdef HAVE_AVCODEC_MT
-    int i_thread_count = var_InheritInteger( p_dec, "ffmpeg-threads" );
+    int i_thread_count = var_InheritInteger( p_dec, "avcodec-threads" );
     if( i_thread_count <= 0 )
     {
         i_thread_count = vlc_GetCPUCount();
@@ -365,7 +365,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 #endif
 
 #ifdef HAVE_AVCODEC_VA
-    const bool b_use_hw = var_CreateGetBool( p_dec, "ffmpeg-hw" );
+    const bool b_use_hw = var_CreateGetBool( p_dec, "avcodec-hw" );
     if( b_use_hw &&
         (i_codec_id == CODEC_ID_MPEG1VIDEO || i_codec_id == CODEC_ID_MPEG2VIDEO ||
          i_codec_id == CODEC_ID_MPEG4 ||

@@ -140,7 +140,7 @@ int OpenDemux( vlc_object_t *p_this )
 
     vlc_init_avformat();
 
-    char *psz_format = var_InheritString( p_this, "ffmpeg-format" );
+    char *psz_format = var_InheritString( p_this, "avformat-format" );
     if( psz_format )
     {
         if( fmt = av_find_input_format(psz_format) )

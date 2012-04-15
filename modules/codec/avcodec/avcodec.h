@@ -144,7 +144,7 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 /*
  * Encoder options
  */
-#define ENC_CFG_PREFIX "sout-ffmpeg-"
+#define ENC_CFG_PREFIX "sout-avcodec-"
 
 #define ENC_KEYINT_TEXT N_( "Ratio of key frames" )
 #define ENC_KEYINT_LONGTEXT N_( "Number of frames " \
