@@ -413,7 +413,8 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                This has the positive side effect that we avoid erratic sizing as we animate every resize. */
             if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
             {
-                glViewport (place.x, place.y, place.width, place.height);
+                // x / y are top left corner, but we need the lower left one
+                glViewport (place.x, cfg_tmp.display.height - (place.y + place.height), place.width, place.height);
             }
 
             // this should not be needed, but currently it improves crop somehow, when we are in fullscreen
@@ -655,7 +656,8 @@ static void OpenglSwap(vlc_gl_t *gl)
     }
 
     if ([self lockgl]) {
-        glViewport (place.x, place.y, place.width, place.height);
+        // x / y are top left corner, but we need the lower left one
+        glViewport (place.x, bounds.size.height - (place.y + place.height), place.width, place.height);
 
         @synchronized(self) {
             // This may be cleared before -drawRect is being called,
