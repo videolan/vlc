@@ -97,6 +97,36 @@
     }
 }
 
+- (BOOL)validateMenuItem:(NSMenuItem *)item
+{
+    if (([self numberOfSelectedRows] >= 1 && [item action] == @selector(delete:)) || [item action] == @selector(selectAll:))
+        return YES;
+
+    return NO;
+}
+
+- (BOOL) acceptsFirstResponder
+{
+    return YES;
+}
+
+- (BOOL) becomeFirstResponder
+{
+    [self setNeedsDisplay:YES];
+    return YES;
+}
+
+- (BOOL) resignFirstResponder
+{
+    [self setNeedsDisplay:YES];
+    return YES;
+}
+
+- (IBAction)delete:(id)sender
+{
+    [[[VLCMain sharedInstance] playlist] deleteItem: sender];
+}
+
 @end
 
 /*****************************************************************************
