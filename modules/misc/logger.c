@@ -368,7 +368,7 @@ static void AndroidPrint( void *opaque, int type, const msg_item_t *item,
         return;
 
     int canc = vlc_savecancel();
-    __android_log_vprint(prioritytype[type], "vlc", fmt, ap);
+    __android_log_vprint(prioritytype[type], "VLC", fmt, ap);
     vlc_restorecancel( canc );
 }
 #endif
