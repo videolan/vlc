@@ -33,6 +33,7 @@
 #include <vlc_avcodec.h>
 
 #include "avio.h"
+#include "../codec/avcodec/avcommon.h"
 
 #if LIBAVFORMAT_VERSION_MAJOR < 54
 # define AVIOContext URLContext
@@ -137,9 +138,7 @@ int OpenAvio(vlc_object_t *object)
     }
 
     /* */
-    vlc_avcodec_lock();
-    av_register_all();
-    vlc_avcodec_unlock();
+    vlc_init_avformat();
 
     int ret;
 #if LIBAVFORMAT_VERSION_MAJOR < 54
@@ -204,9 +203,7 @@ int OutOpenAvio(vlc_object_t *object)
     sys->context = NULL;
 
     /* */
-    vlc_avcodec_lock();
-    av_register_all();
-    vlc_avcodec_unlock();
+    vlc_init_avformat();
 
     if (!access->psz_path)
         goto error;

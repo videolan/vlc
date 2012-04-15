@@ -97,14 +97,13 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
 #else
     ret = avcodec_open2(context, codec, NULL /* options */);
 #endif
+    vlc_avcodec_unlock();
     if (ret < 0) {
-        vlc_avcodec_unlock();
         msg_Err(dec, "cannot open codec (%s)", namecodec);
         free(context->extradata);
         free(sys);
         return VLC_EGENERIC;
     }
-    vlc_avcodec_unlock();
 
     /* */
     msg_Dbg(dec, "ffmpeg codec (%s) started", namecodec);

@@ -52,6 +52,7 @@
 #endif
 
 #include "../codec/avcodec/avcodec.h"
+#include "../codec/avcodec/avcommon.h"
 
 #define SOUT_CFG_PREFIX "sout-switcher-"
 #define MAX_PICTURES 10
@@ -286,10 +287,7 @@ static int Open( vlc_object_t *p_this )
     p_stream->pf_send   = Send;
     p_stream->p_sys     = p_sys;
 
-#if LIBAVCODEC_VERSION_MAJOR < 54
-    avcodec_init();
-#endif
-    avcodec_register_all();
+    vlc_init_avcodec();
 
     return VLC_SUCCESS;
 }
@@ -811,17 +809,18 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
         id->ff_enc_c->pix_fmt = PIX_FMT_YUV420P;
 
         vlc_avcodec_lock();
+        int ret;
 #if LIBAVCODEC_VERSION_MAJOR >= 54
-        if( avcodec_open2( id->ff_enc_c, id->ff_enc, NULL /* options */ ) )
+        ret = avcodec_open2( id->ff_enc_c, id->ff_enc, NULL /* options */ );
 #else
-        if( avcodec_open( id->ff_enc_c, id->ff_enc ) )
+        ret = avcodec_open( id->ff_enc_c, id->ff_enc );
 #endif
+        vlc_avcodec_unlock();
+        if (ret)
         {
-            vlc_avcodec_unlock();
             msg_Err( p_stream, "cannot open encoder" );
             return 0;
         }
-        vlc_avcodec_unlock();
 
         id->p_buffer_out = malloc( id->ff_enc_c->width * id->ff_enc_c->height * 3 );
         id->p_frame = avcodec_alloc_frame();

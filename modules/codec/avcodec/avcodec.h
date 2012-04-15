@@ -45,8 +45,6 @@ void CloseAudioEncoder( vlc_object_t * );
 int  OpenDeinterlace( vlc_object_t * );
 void CloseDeinterlace( vlc_object_t * );
 
-void InitLibavcodec( vlc_object_t *p_object );
-
 /* Video Decoder */
 int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
                   AVCodec *p_codec, int i_codec_id, const char *psz_namecodec );

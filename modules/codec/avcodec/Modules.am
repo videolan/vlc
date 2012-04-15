@@ -1,6 +1,7 @@
 libavcodec_plugin_la_SOURCES = \
 	avcodec.c \
 	avcodec.h \
+	avcommon.h \
 	video.c \
 	subtitle.c \
 	audio.c \

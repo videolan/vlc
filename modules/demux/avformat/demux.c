@@ -42,6 +42,7 @@
 
 #include "../../codec/avcodec/avcodec.h"
 #include "../../codec/avcodec/chroma.h"
+#include "../../codec/avcodec/avcommon.h"
 #include "avformat.h"
 #include "../xiph.h"
 #include "../vobsub.h"
@@ -137,9 +138,7 @@ int OpenDemux( vlc_object_t *p_this )
     }
     stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_can_seek );
 
-    vlc_avcodec_lock();
-    av_register_all(); /* Can be called several times */
-    vlc_avcodec_unlock();
+    vlc_init_avformat();
 
     char *psz_format = var_InheritString( p_this, "ffmpeg-format" );
     if( psz_format )
@@ -257,12 +256,12 @@ int OpenDemux( vlc_object_t *p_this )
 #else
     error = av_find_stream_info( p_sys->ic );
 #endif
+    vlc_avcodec_unlock();
     if( error < 0 )
     {
         errno = AVUNERROR(error);
         msg_Warn( p_demux, "Could not find stream info: %m" );
     }
-    vlc_avcodec_unlock();
 
     for( i = 0; i < p_sys->ic->nb_streams; i++ )
     {

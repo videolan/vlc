@@ -37,6 +37,7 @@
 
 #include "avformat.h"
 #include "../../codec/avcodec/avcodec.h"
+#include "../../codec/avcodec/avcommon.h"
 
 /* Support for deprecated APIs */
 #if LIBAVFORMAT_VERSION_INT < ((52<<16)+(105<<8)+0)
@@ -91,8 +92,7 @@ int OpenMux( vlc_object_t *p_this )
     sout_mux_sys_t *p_sys;
     char *psz_mux;
 
-    /* Should we call it only once ? */
-    av_register_all();
+    vlc_init_avformat();
 
     config_ChainParse( p_mux, "ffmpeg-", ppsz_mux_options, p_mux->p_cfg );
 

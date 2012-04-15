@@ -45,6 +45,7 @@
 
 #include "avcodec.h"
 #include "chroma.h"
+#include "avcommon.h"
 
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 52, 25, 0 )
 #   error You must update libavcodec to a version >= 52.25.0
@@ -236,7 +237,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Initialization must be done before avcodec_find_decoder() */
-    InitLibavcodec(p_this);
+    vlc_init_avcodec();
 
     /* *** ask ffmpeg for a decoder *** */
     char *psz_decoder = var_CreateGetString( p_this, "ffmpeg-codec" );
@@ -383,32 +384,6 @@ static void CloseDecoder( vlc_object_t *p_this )
     }
 
     free( p_sys );
-}
-
-void InitLibavcodec( vlc_object_t *p_object )
-{
-    static bool b_ffmpeginit = false;
-
-    vlc_avcodec_lock();
-
-    /* *** init ffmpeg library (libavcodec) *** */
-    if( !b_ffmpeginit )
-    {
-#if LIBAVCODEC_VERSION_MAJOR < 54
-        avcodec_init();
-#endif
-        avcodec_register_all();
-        b_ffmpeginit = true;
-
-        msg_Dbg( p_object, "libavcodec initialized (interface 0x%x)",
-                 LIBAVCODEC_VERSION_INT );
-    }
-    else
-    {
-        msg_Dbg( p_object, "libavcodec already initialized" );
-    }
-
-    vlc_avcodec_unlock();
 }
 
 /*****************************************************************************

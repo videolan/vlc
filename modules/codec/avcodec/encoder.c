@@ -49,6 +49,7 @@
 #endif
 
 #include "avcodec.h"
+#include "avcommon.h"
 
 #define HURRY_UP_GUARD1 (450000)
 #define HURRY_UP_GUARD2 (300000)
@@ -202,6 +203,9 @@ int OpenEncoder( vlc_object_t *p_this )
     float f_val;
     char *psz_val;
 
+    /* Initialization must be done before avcodec_find_encoder() */
+    vlc_init_avcodec();
+
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 
     if( p_enc->fmt_out.i_codec == VLC_CODEC_MP3 )
@@ -250,9 +254,6 @@ int OpenEncoder( vlc_object_t *p_this )
         /* We don't support subtitle encoding */
         return VLC_EGENERIC;
     }
-
-    /* Initialization must be done before avcodec_find_encoder() */
-    InitLibavcodec( p_this );
 
     char *psz_encoder = var_GetString( p_this, ENC_CFG_PREFIX "codec" );
     if( psz_encoder && *psz_encoder )
