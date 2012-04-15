@@ -337,18 +337,12 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 return VLC_EGENERIC;
 
             NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-            NSPoint topleftbase;
-            NSPoint topleftscreen;
-            NSRect new_frame;
 
             id o_window = [sys->glView window];
             if (!o_window)
                 return VLC_SUCCESS; // this is okay, since the event will occur again when we have a window
-            NSRect windowFrame = [o_window frame];
-            NSRect glViewFrame = [sys->glView frame];
-            NSRect screenFrame = [[o_window screen] visibleFrame];
-            NSSize windowMinSize = [o_window minSize];
 
+            NSSize windowMinSize = [o_window minSize];
             int i_width = 0;
             int i_height = 0;
 
@@ -357,10 +351,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             bool is_forced = false;
 
             vout_display_place_t place;
-
-            topleftbase.x = 0;
-            topleftbase.y = windowFrame.size.height;
-            topleftscreen = [o_window convertBaseToScreen: topleftbase];
 
             if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP)
             {
@@ -390,8 +380,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 cfg_tmp.display.height = windowMinSize.height;
 
             vout_display_PlacePicture (&place, source, &cfg_tmp, false);
-            i_width = place.width;
-            i_height = place.height;
 
             if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP || query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT)
             {
@@ -425,44 +413,13 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                This has the positive side effect that we avoid erratic sizing as we animate every resize. */
             if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
             {
-                glViewport (place.x, place.y, i_width, i_height);
+                glViewport (place.x, place.y, place.width, place.height);
             }
 
             // this should not be needed, but currently it improves crop somehow, when we are in fullscreen
             if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP)
                 [sys->glView performSelectorOnMainThread:@selector(reshapeView:) withObject:nil waitUntilDone:NO];
 
-            /* Calculate the window's new size, if it is larger than our minimal size */
-            if (i_width < windowMinSize.width)
-                i_width = windowMinSize.width;
-            if (i_height < windowMinSize.height)
-                i_height = windowMinSize.height;
-
-            if (config_GetInt (vd, "macosx-video-autoresize") && query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE && is_forced && 
-                (i_height != glViewFrame.size.height || i_width != glViewFrame.size.width))
-            {
-                new_frame.size.width = windowFrame.size.width - glViewFrame.size.width + i_width;
-                new_frame.size.height = windowFrame.size.height - glViewFrame.size.height + i_height;
-
-                new_frame.origin.x = topleftscreen.x;
-                new_frame.origin.y = topleftscreen.y - new_frame.size.height;
-
-                /* make sure the window doesn't exceed the screen size the window is on */
-                if( new_frame.size.width > screenFrame.size.width )
-                {
-                    new_frame.size.width = screenFrame.size.width;
-                    new_frame.origin.x = screenFrame.origin.x;
-                }
-                if( new_frame.size.height > screenFrame.size.height )
-                {
-                    new_frame.size.height = screenFrame.size.height;
-                    new_frame.origin.y = screenFrame.origin.y;
-                }
-                if( new_frame.origin.y < screenFrame.origin.y )
-                    new_frame.origin.y = screenFrame.origin.y;
-
-                [sys->glView performSelectorOnMainThread:@selector(setWindowFrameWithValue:) withObject:[NSValue valueWithRect:new_frame] waitUntilDone:NO];
-            }
             [o_pool release];
             return VLC_SUCCESS;
         }
@@ -578,23 +535,6 @@ static void OpenglSwap(vlc_gl_t *gl)
 - (void)setFrameWithValue:(NSValue *)value
 {
     [self setFrame:[value rectValue]];
-}
-
-/**
- * Gets called by Control() to make sure that we're performing on the main thread
- */
-- (void)setWindowFrameWithValue:(NSValue *)value
-{
-    id window = [self window];
-    NSRect frame = [value rectValue];
-
-    if ([window respondsToSelector:@selector(isFullscreen)])
-    {
-        if (!(BOOL)[[self window] isFullscreen])
-            [[self window] setFrame:frame display:YES animate:YES];
-    }
-    else
-        [[self window] setFrame:frame display:YES animate:YES];
 }
 
 /**

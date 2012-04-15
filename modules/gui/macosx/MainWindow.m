@@ -1498,33 +1498,53 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)resizeWindow
 {
-    if ( b_fullscreen || (b_nativeFullscreenMode && [NSApp presentationOptions] & NSApplicationPresentationFullScreen ))
+    if( b_fullscreen || ( b_nativeFullscreenMode && [NSApp presentationOptions] & NSApplicationPresentationFullScreen ) )
         return;
 
-    NSPoint topleftbase = NSMakePoint(0, [self frame].size.height);
-    NSPoint topleftscreen = [self convertBaseToScreen: topleftbase];
+    id o_videoWindow = b_nonembedded ? o_detached_video_window : self;
+    NSSize windowMinSize = [o_videoWindow minSize];
+    NSRect screenFrame = [[o_videoWindow screen] visibleFrame];
+
+    NSPoint topleftbase = NSMakePoint( 0, [o_videoWindow frame].size.height );
+    NSPoint topleftscreen = [o_videoWindow convertBaseToScreen: topleftbase];
+
+    unsigned int i_width = nativeVideoSize.width;
+    unsigned int i_height = nativeVideoSize.height;
+    if (i_width < windowMinSize.width)
+        i_width = windowMinSize.width;
+    if (i_height < windowMinSize.height)
+        i_height = windowMinSize.height;
 
     /* Calculate the window's new size */
-    float w = [self frame].size.width  - [o_video_view frame].size.width
-        + nativeVideoSize.width;
-    float h = [self frame].size.height - [o_video_view frame].size.height
-        + nativeVideoSize.height;
+    NSRect new_frame;
+    new_frame.size.width = [o_videoWindow frame].size.width - [o_video_view frame].size.width + i_width;
+    new_frame.size.height = [o_videoWindow frame].size.height - [o_video_view frame].size.height + i_height;
+    new_frame.origin.x = topleftscreen.x;
+    new_frame.origin.y = topleftscreen.y - new_frame.size.height;
 
-    if (b_dark_interface)
-        h += [o_titlebar_view frame].size.height;
+    /* make sure the window doesn't exceed the screen size the window is on */
+    if( new_frame.size.width > screenFrame.size.width )
+    {
+        new_frame.size.width = screenFrame.size.width;
+        new_frame.origin.x = screenFrame.origin.x;
+    }
+    if( new_frame.size.height > screenFrame.size.height )
+    {
+        new_frame.size.height = screenFrame.size.height;
+        new_frame.origin.y = screenFrame.origin.y;
+    }
+    if( new_frame.origin.y < screenFrame.origin.y )
+        new_frame.origin.y = screenFrame.origin.y;
 
-    NSRect new_frame = NSMakeRect(topleftscreen.x, topleftscreen.y - h, w, h);
-
-    [[self animator] setFrame:new_frame display:YES];
+    [[o_videoWindow animator] setFrame:new_frame display:YES];
 }
 
 - (void)setNativeVideoSize:(NSSize)size
 {
-    if (size.width != nativeVideoSize.width || size.height != nativeVideoSize.height )
-    {
-        nativeVideoSize = size;
-        [self resizeWindow];
-    }
+    nativeVideoSize = size;
+
+    if( config_GetInt( VLCIntf, "macosx-video-autoresize" ) && !b_fullscreen )
+        [self performSelectorOnMainThread:@selector(resizeWindow) withObject:nil waitUntilDone:NO];
 }
 
 //  Called automatically if window's acceptsMouseMovedEvents property is true
@@ -1789,7 +1809,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [self lockFullscreenAnimation];
 
-    b_fullscreen = NO;
     [o_fullscreen_btn setState: NO];
     [o_detached_fullscreen_btn setState: NO];
 
@@ -1911,6 +1930,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)hasEndedFullscreen
 {
+    b_fullscreen = NO;
+
     /* This function is private and should be only triggered at the end of the fullscreen change animation */
     /* Make sure we don't see the o_video_view disappearing of the screen during this operation */
     NSDisableScreenUpdates();
