@@ -67,7 +67,7 @@ static inline void vlc_init_avcodec(void)
 static inline AVDictionary *vlc_av_get_options(const char *psz_opts)
 {
     AVDictionary *options = NULL;
-    config_chain_t *cfg;
+    config_chain_t *cfg = NULL;
     config_ChainParseOptions(&cfg, psz_opts);
     while (cfg) {
         config_chain_t *next = cfg->p_next;

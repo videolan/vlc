@@ -250,13 +250,31 @@ int OpenDemux( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    vlc_avcodec_lock(); /* avformat calls avcodec behind our back!!! */
 #if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(26<<8)+0)
-    error = avformat_find_stream_info( p_sys->ic, NULL /* options */ );
-#else
-    error = av_find_stream_info( p_sys->ic );
-#endif
+    char *psz_opts = var_InheritString( p_demux, "avformat-options" );
+    AVDictionary *options[p_sys->ic->nb_streams];
+    if (psz_opts && *psz_opts) {
+        options[0] = vlc_av_get_options(psz_opts);
+        for (unsigned i = 1; i < p_sys->ic->nb_streams; i++) {
+            options[i] = NULL;
+            av_dict_copy(&options[i], options[0], 0);
+        }
+    }
+    free(psz_opts);
+    vlc_avcodec_lock(); /* avformat calls avcodec behind our back!!! */
+    error = avformat_find_stream_info( p_sys->ic, options );
     vlc_avcodec_unlock();
+    AVDictionaryEntry *t = NULL;
+    while ((t = av_dict_get(options, "", t, AV_DICT_IGNORE_SUFFIX))) {
+        msg_Err( p_demux, "Unknown option \"%s\"", t->key );
+    }
+    av_dict_free(&options);
+#else
+    vlc_avcodec_lock(); /* avformat calls avcodec behind our back!!! */
+    error = av_find_stream_info( p_sys->ic );
+    vlc_avcodec_unlock();
+#endif
+
     if( error < 0 )
     {
         errno = AVUNERROR(error);

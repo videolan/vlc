@@ -47,7 +47,7 @@
 //#define AVFORMAT_DEBUG 1
 
 static const char *const ppsz_mux_options[] = {
-    "mux", NULL
+    "mux", "options", NULL
 };
 
 /*****************************************************************************
@@ -381,7 +381,17 @@ static int Mux( sout_mux_t *p_mux )
         msg_Dbg( p_mux, "writing header" );
 
 #if (LIBAVFORMAT_VERSION_INT >= ((53<<16)+(2<<8)+0))
-        error = avformat_write_header( p_sys->oc, NULL /* options */ );
+        char *psz_opts = var_GetNonEmptyString( p_mux, "sout-avformat-options" );
+        AVDictionary *options = NULL;
+        if (psz_opts && *psz_opts)
+            options = vlc_av_get_options(psz_opts);
+        free(psz_opts);
+        error = avformat_write_header( p_sys->oc, options ? &options : NULL);
+        AVDictionaryEntry *t = NULL;
+        while ((t = av_dict_get(options, "", t, AV_DICT_IGNORE_SUFFIX))) {
+            msg_Err( p_mux, "Unknown option \"%s\"", t->key );
+        }
+        av_dict_free(&options);
 #else
         error = av_write_header( p_sys->oc );
 #endif
