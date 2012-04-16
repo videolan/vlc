@@ -267,7 +267,7 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
     bool b_color       = var_InheritBool( p_this, "color" );
     bool b_has_advanced = false;
     bool b_found       = false;
-    int  i_only_advanced = 0; /* Number of modules ignored because they
+    unsigned i_only_advanced = 0; /* Number of modules ignored because they
                                * only have advanced options */
     bool b_strict = psz_search && *psz_search == '=';
     if( b_strict ) psz_search++;
@@ -688,15 +688,15 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
     if( i_only_advanced > 0 )
     {
         if( b_color )
-        {
             utf8_fprintf( stdout, "\n" WHITE "%s" GRAY " ", _( "Note:" ) );
-            utf8_fprintf( stdout, _( "%d module(s) were not displayed because they only have advanced options.\n" ), i_only_advanced );
-        }
         else
-        {
             utf8_fprintf( stdout, "\n%s ", _( "Note:" ) );
-            utf8_fprintf( stdout, _( "%d module(s) were not displayed because they only have advanced options.\n" ), i_only_advanced );
-        }
+
+        utf8_fprintf( stdout, vlc_ngettext("%u module was not displayed "
+                                     "because it only has advanced options.\n",
+                                           "%u modules were not displayed "
+                                  "because they only have advanced options.\n",
+                      i_only_advanced ), i_only_advanced );
     }
     else if( !b_found )
     {
