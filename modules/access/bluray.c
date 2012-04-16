@@ -996,7 +996,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         case DEMUX_GET_LENGTH:
         {
             int64_t *pi_length = (int64_t*)va_arg(args, int64_t *);
-            *pi_length = p_demux->info.i_title < p_sys->i_title ? CUR_LENGTH : 0;
+            *pi_length = p_demux->info.i_title < (int)p_sys->i_title ? CUR_LENGTH : 0;
             return VLC_SUCCESS;
         }
         case DEMUX_SET_TIME:
@@ -1015,7 +1015,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         case DEMUX_GET_POSITION:
         {
             double *pf_position = (double*)va_arg( args, double * );
-            *pf_position = p_demux->info.i_title < p_sys->i_title ?
+            *pf_position = p_demux->info.i_title < (int)p_sys->i_title ?
                         (double)FROM_TICKS(bd_tell_time(p_sys->bluray))/CUR_LENGTH : 0.0;
             return VLC_SUCCESS;
         }
