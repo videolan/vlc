@@ -1,9 +1,9 @@
-SOURCES_aout_directx = directx.c windows_audio_common.h
+SOURCES_aout_directx = directx.c windows_audio_common.h packet.c
 SOURCES_aout_file = file.c
-SOURCES_waveout = waveout.c windows_audio_common.h
-SOURCES_auhal = auhal.c
-SOURCES_jack = jack.c
-SOURCES_audioqueue = audioqueue.c
+SOURCES_waveout = waveout.c windows_audio_common.h packet.c
+SOURCES_auhal = auhal.c packet.c
+SOURCES_jack = jack.c packet.c
+SOURCES_audioqueue = audioqueue.c packet.c
 SOURCES_opensles_android = opensles_android.c
 
 libadummy_plugin_la_SOURCES = adummy.c
@@ -21,7 +21,7 @@ libvlc_LTLIBRARIES += \
 	libamem_plugin.la \
 	libaout_file_plugin.la
 
-liboss_plugin_la_SOURCES = oss.c
+liboss_plugin_la_SOURCES = oss.c packet.c
 liboss_plugin_la_CFLAGS = $(AM_CFLAGS)
 liboss_plugin_la_LIBADD = $(AM_LIBADD) $(OSS_LIBS)
 liboss_plugin_la_DEPENDENCIES =
@@ -45,7 +45,7 @@ if HAVE_PULSE
 libvlc_LTLIBRARIES += libpulse_plugin.la
 endif
 
-libkai_plugin_la_SOURCES = kai.c
+libkai_plugin_la_SOURCES = kai.c packet.c
 libkai_plugin_la_CFLAGS = $(AM_CFLAGS)
 libkai_plugin_la_LIBADD = $(AM_LIBADD) $(KAI_LIBS)
 libkai_plugin_la_DEPENDENCIES =

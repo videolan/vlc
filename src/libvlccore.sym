@@ -14,12 +14,6 @@ aout_FormatPrintChannels
 aout_MixerDelete
 aout_MixerNew
 aout_MixerRun
-aout_PacketInit
-aout_PacketDestroy
-aout_PacketPlay
-aout_PacketPause
-aout_PacketFlush
-aout_PacketNext
 aout_VolumeGet
 aout_VolumeSet
 aout_VolumeUp
