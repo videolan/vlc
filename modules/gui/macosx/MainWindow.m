@@ -2027,7 +2027,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 }
 
 #pragma mark -
-#pragma mark Lion's native fullscreen handling
+#pragma mark Lion native fullscreen handling
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
     [o_video_view setFrame: [[self contentView] frame]];
