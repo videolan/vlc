@@ -48,6 +48,36 @@ static void BlockNoRelease( block_t *b )
     fprintf( stderr, "block %p has no release callback! This is a bug!\n", b );
     abort();
 }
+
+static void block_Check (block_t *block)
+{
+    while (block != NULL)
+    {
+        unsigned char *start = block->p_start;
+        unsigned char *end = block->p_start + block->i_size;
+        unsigned char *bufstart = block->p_buffer;
+        unsigned char *bufend = block->p_buffer + block->i_buffer;
+
+        assert (block->pf_release != BlockNoRelease);
+        assert (start <= end);
+        assert (bufstart <= bufend);
+        assert (bufstart >= start);
+        assert (bufend <= end);
+
+        block = block->p_next;
+    }
+}
+
+static void block_Invalidate (block_t *block)
+{
+    block->p_next = NULL;
+    block_Check (block);
+    block->pf_release = BlockNoRelease;
+    barrier (); /* prevent compiler from optimizing this assignment out */
+}
+#else
+# define block_Check(b) ((void)(b))
+# define block_Invalidate(b) ((void)(b))
 #endif
 
 void block_Init( block_t *restrict b, void *buf, size_t size )
@@ -68,9 +98,10 @@ void block_Init( block_t *restrict b, void *buf, size_t size )
 #endif
 }
 
-static void BlockRelease( block_t *p_block )
+static void BlockRelease (block_t *block)
 {
-    free( p_block );
+    block_Invalidate (block);
+    free (block);
 }
 
 static void BlockMetaCopy( block_t *restrict out, const block_t *in )
@@ -115,6 +146,8 @@ block_t *block_Alloc (size_t size)
 block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
 {
     size_t requested = i_prebody + i_body;
+
+    block_Check( p_block );
 
     /* Corner case: empty block requested */
     if( i_prebody <= 0 && i_body <= (size_t)(-i_prebody) )
@@ -225,6 +258,7 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
 
 static void block_heap_Release (block_t *block)
 {
+    block_Invalidate (block);
     free (block->p_start);
     free (block);
 }
@@ -260,6 +294,7 @@ block_t *block_heap_Alloc (void *addr, size_t length)
 
 static void block_mmap_Release (block_t *block)
 {
+    block_Invalidate (block);
     munmap (block->p_start, block->i_size);
     free (block);
 }
