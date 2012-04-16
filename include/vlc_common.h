@@ -918,7 +918,8 @@ VLC_API void * vlc_memcpy( void *, const void *, size_t );
 /*****************************************************************************
  * I18n stuff
  *****************************************************************************/
-VLC_API char * vlc_gettext( const char *msgid ) VLC_FORMAT_ARG(1);
+VLC_API char *vlc_gettext( const char *msgid ) VLC_FORMAT_ARG(1);
+VLC_API char *vlc_ngettext( const char *s, const char *p, unsigned long n ) VLC_FORMAT_ARG(1) VLC_FORMAT_ARG(2);
 
 #define vlc_pgettext( ctx, id ) \
         vlc_pgettext_aux( ctx "\004" id, id )

@@ -97,10 +97,17 @@ int vlc_bindtextdomain (const char *domain)
 char *vlc_gettext (const char *msgid)
 {
 #ifdef ENABLE_NLS
-    if (unlikely(!*msgid))
-        return (char *)"";
-    return dgettext (PACKAGE_NAME, msgid);
-#else
-    return (char *)msgid;
+    if (likely(*msgid))
+        return dgettext (PACKAGE_NAME, msgid);
 #endif
+    return (char *)msgid;
+}
+
+char *vlc_ngettext (const char *msgid, const char *plural, unsigned long n)
+{
+#ifdef ENABLE_NLS
+    if (likely(*msgid))
+        return dngettext (PACKAGE_NAME, msgid, plural, n);
+#endif
+    return (char *)((n == 1) ? msgid : plural);
 }

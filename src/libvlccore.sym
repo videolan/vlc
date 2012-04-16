@@ -537,6 +537,7 @@ vlc_GetActionId
 vlc_getaddrinfo
 vlc_getnameinfo
 vlc_gettext
+vlc_ngettext
 vlc_hold
 vlc_iconv
 vlc_iconv_close
