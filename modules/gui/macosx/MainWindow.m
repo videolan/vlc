@@ -1085,6 +1085,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         NSRect contentRect = [videoWindow contentRectForFrameRect:videoWindowFrame];
         float marginy = viewRect.origin.y + videoWindowFrame.size.height - contentRect.size.height;
         float marginx = contentRect.size.width - viewRect.size.width;
+        if( b_dark_interface )
+            marginy += [o_titlebar_view frame].size.height;
 
         proposedFrameSize.height = (proposedFrameSize.width - marginx) * nativeVideoSize.height / nativeVideoSize.width + marginy;
     }
