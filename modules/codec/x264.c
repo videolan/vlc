@@ -407,6 +407,9 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 #define TUNE_TEXT N_("Default tune setting used" )
 #define PRESET_TEXT N_("Default preset setting used" )
 
+#define X264_OPTIONS_TEXT N_("x264 advanced options.")
+#define X264_OPTIONS_LONGTEXT N_("x264 advanced options, in the form {opt=val,op2=val2} .")
+
 static const char *const enc_me_list[] =
   { "dia", "hex", "umh", "esa", "tesa" };
 static const char *const enc_me_list_text[] =
@@ -721,6 +724,9 @@ vlc_module_begin ()
     add_string( SOUT_CFG_PREFIX "tune", NULL , TUNE_TEXT, TUNE_TEXT, false )
         change_string_list( x264_tune_names, x264_tune_names, 0 );
 
+    add_string( SOUT_CFG_PREFIX "options", NULL, X264_OPTIONS_TEXT,
+                X264_OPTIONS_LONGTEXT, true )
+
 vlc_module_end ()
 
 /*****************************************************************************
@@ -740,7 +746,8 @@ static const char *const ppsz_sout_options[] = {
     "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "weightp",
     "aq-mode", "aq-strength", "psy-rd", "psy", "profile", "lookahead", "slices",
     "slice-max-size", "slice-max-mbs", "intra-refresh", "mbtree", "hrd",
-    "tune","preset", "opengop", "bluray-compat", "frame-packing", NULL
+    "tune","preset", "opengop", "bluray-compat", "frame-packing", "options",
+    NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -1323,6 +1330,28 @@ static int  Open ( vlc_object_t *p_this )
 
     /* We don't want repeated headers, we repeat p_extra ourself if needed */
     p_sys->param.b_repeat_headers = 0;
+
+    char *psz_opts = var_InheritString( p_enc, SOUT_CFG_PREFIX "options" );
+    if (psz_opts && *psz_opts) {
+        config_chain_t *cfg = NULL;
+        config_ChainParseOptions(&cfg, psz_opts);
+        while (cfg) {
+            config_chain_t *next = cfg->p_next;
+            char *name  = cfg->psz_name;
+            char *value = cfg->psz_value;
+            int ret = x264_param_parse(&p_sys->param, name, value);
+            if (ret == X264_PARAM_BAD_NAME) {
+                msg_Err(p_enc, "Unknown option \"%s\"", name);
+            } else if (ret == X264_PARAM_BAD_VALUE) {
+                msg_Err(p_enc, "Bad value \"%s\" for option \"%s\"", value, name);
+            }
+            free(name);
+            free(value);
+            free(cfg);
+            cfg = next;
+        }
+    }
+    free(psz_opts);
 
     /* Open the encoder */
     p_sys->h = x264_encoder_open( &p_sys->param );
