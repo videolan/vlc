@@ -90,7 +90,7 @@ static const char* psz_introspection_xml =
 "    <method name=\"Pause\" />\n"
 "    <method name=\"PlayPause\" />\n"
 "    <method name=\"Seek\">\n"
-"      <arg type=\"x\" direction=\"out\" />\n"
+"      <arg type=\"x\" direction=\"in\" />\n"
 "    </method>"
 "    <method name=\"OpenUri\">\n"
 "      <arg type=\"s\" direction=\"in\" />\n"
