@@ -299,9 +299,9 @@ static int Control (demux_t *demux, int query, va_list args)
 /**
  * Processing callback
  */
-static void Demux (void *data)
+static void Demux (void *opaque)
 {
-    demux_t *demux = data;
+    demux_t *demux = opaque;
     demux_sys_t *sys = demux->p_sys;
     xcb_connection_t *conn = sys->conn;
 
@@ -411,11 +411,12 @@ discard:
     if (img == NULL)
         return;
 
+    uint8_t *data = xcb_get_image_data (img);
     size_t datalen = xcb_get_image_data_length (img);
-    block_t *block = block_heap_Alloc (img, sizeof (*img) + datalen);
+    block_t *block = block_heap_Alloc (img, data + datalen - (uint8_t *)img);
     if (block == NULL)
         return;
-    block->p_buffer = xcb_get_image_data (img);
+    block->p_buffer = data;
     block->i_buffer = datalen;
 
     /* Send block - zero copy */
