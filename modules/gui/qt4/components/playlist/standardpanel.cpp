@@ -203,8 +203,19 @@ void StandardPLPanel::browseInto( const QModelIndex &index )
 {
     if( currentView == iconView || currentView == listView || currentView == picFlowView )
     {
-        currentRootIndexId = model->itemId( index );
+
         currentView->setRootIndex( index );
+
+        /* When going toward root in LocationBar, scroll to the item
+           that was previously as root */
+        QModelIndex newIndex = model->index(currentRootIndexId,0);
+        while( newIndex.isValid() && (newIndex.parent() != index) )
+            newIndex = newIndex.parent();
+        if( newIndex.isValid() )
+            currentView->scrollTo( newIndex );
+
+        /* Store new rootindexid*/
+        currentRootIndexId = model->itemId( index );
     }
 
     emit viewChanged( index );
