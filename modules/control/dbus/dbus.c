@@ -2,8 +2,8 @@
  * dbus.c : D-Bus control interface
  *****************************************************************************
  * Copyright © 2006-2008 Rafaël Carré
- * Copyright © 2007-2010 Mirsal Ennaime
- * Copyright © 2009-2010 The VideoLAN team
+ * Copyright © 2007-2012 Mirsal Ennaime
+ * Copyright © 2009-2012 The VideoLAN team
  * $Id$
  *
  * Authors:    Rafaël Carré <funman at videolanorg>
@@ -185,10 +185,17 @@ static int Open( vlc_object_t *p_this )
     dbus_connection_set_exit_on_disconnect( p_conn, FALSE );
 
     /* register a well-known name on the bus */
-    char unique_service[sizeof (DBUS_MPRIS_BUS_NAME) + 10];
+    size_t i_length = sizeof( DBUS_MPRIS_BUS_NAME ) +
+        sizeof( DBUS_INSTANCE_ID_PREFIX ) + 10;
+
+    char unique_service[i_length];
+
     snprintf( unique_service, sizeof (unique_service),
-              DBUS_MPRIS_BUS_NAME"-%"PRIu32, (uint32_t)getpid() );
+            DBUS_MPRIS_BUS_NAME"."DBUS_INSTANCE_ID_PREFIX"%"PRIu32,
+            (uint32_t)getpid() );
+
     dbus_bus_request_name( p_conn, unique_service, 0, &error );
+
     if( dbus_error_is_set( &error ) )
     {
         msg_Err( p_this, "Error requesting service name %s: %s",

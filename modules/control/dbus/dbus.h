@@ -2,8 +2,8 @@
  * dbus.h : D-Bus control interface
  *****************************************************************************
  * Copyright © 2006-2008 Rafaël Carré
- * Copyright © 2007-2010 Mirsal Ennaime
- * Copyright © 2009-2010 The VideoLAN team
+ * Copyright © 2007-2012 Mirsal Ennaime
+ * Copyright © 2009-2012 The VideoLAN team
  * $Id$
  *
  * Authors:    Rafaël Carré <funman at videolanorg>
@@ -28,6 +28,7 @@
 #define _VLC_DBUS_H
 
 #define DBUS_MPRIS_BUS_NAME "org.mpris.MediaPlayer2.vlc"
+#define DBUS_INSTANCE_ID_PREFIX "instance"
 
 static DBusHandlerResult
 MPRISEntryPoint ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this );
