@@ -1330,8 +1330,8 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     else if (!strcmp( psz_cmd, "goto" ) )
     {
         PL_LOCK;
-        int i_pos = atoi( newval.psz_string );
-        int i_size = p_playlist->items.i_size;
+        unsigned i_pos = atoi( newval.psz_string );
+        unsigned i_size = p_playlist->items.i_size;
 
         if( i_pos <= 0 )
             msg_rc( "%s", _("Error: `goto' needs an argument greater than zero.") );
@@ -1345,7 +1345,9 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
                     p_parent, p_item );
         }
         else
-            msg_rc( _("Playlist has only %d elements"), i_size );
+            msg_rc( vlc_ngettext("Playlist has only %u element",
+                                 "Playlsit has only %u elements", i_size),
+                     i_size );
         PL_UNLOCK;
     }
     else if( !strcmp( psz_cmd, "stop" ) )
