@@ -504,7 +504,7 @@ void DemuxClose( vlc_object_t *obj )
 static block_t *UserPtrQueue (vlc_object_t *obj, int fd, size_t length)
 {
     void *ptr = mmap (NULL, length, PROT_READ | PROT_WRITE,
-                      MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+                      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (ptr == MAP_FAILED)
     {
         msg_Err (obj, "cannot allocate %zu-bytes buffer: %m", length);
