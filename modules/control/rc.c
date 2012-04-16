@@ -1346,7 +1346,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         }
         else
             msg_rc( vlc_ngettext("Playlist has only %u element",
-                                 "Playlsit has only %u elements", i_size),
+                                 "Playlist has only %u elements", i_size),
                      i_size );
         PL_UNLOCK;
     }
