@@ -513,7 +513,8 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
     {
         EvtDragDrop& evt = static_cast<EvtDragDrop&>(rEvent);
         Playtree& rPlaytree = static_cast<Playtree&>(m_rTree);
-        rPlaytree.insertItems( *m_itOver, evt.getFiles(), false );
+        VarTree& item = ( m_itOver != m_rTree.end() ) ? *m_itOver : m_rTree;
+        rPlaytree.insertItems( item, evt.getFiles(), false );
         m_itOver = m_rTree.end();
         needRefresh = true;
     }

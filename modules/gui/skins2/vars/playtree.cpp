@@ -283,15 +283,29 @@ void Playtree::insertItems( VarTree& elem, const list<string>& files, bool start
 
     playlist_Lock( m_pPlaylist );
 
+    if( p_elem == this )
+    {
+        for( Iterator it = m_children.begin(); it != m_children.end(); ++it )
+        {
+            if( it->getId() == m_pPlaylist->p_local_category->i_id )
+            {
+                p_elem = &*it;
+                break;
+            }
+        }
+    }
+
     if( p_elem->getId() == m_pPlaylist->p_local_category->i_id )
     {
         p_node = m_pPlaylist->p_local_category;
         i_pos = 0;
+        p_elem->setExpanded( true );
     }
     else if( p_elem->getId() == m_pPlaylist->p_ml_category->i_id )
     {
         p_node = m_pPlaylist->p_ml_category;
         i_pos = 0;
+        p_elem->setExpanded( true );
     }
     else if( p_elem->size() && p_elem->isExpanded() )
     {
