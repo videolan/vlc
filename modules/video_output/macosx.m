@@ -379,6 +379,13 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             if (cfg_tmp.display.height < windowMinSize.height)
                 cfg_tmp.display.height = windowMinSize.height;
 
+            NSRect bounds = [sys->glView bounds];
+            if (!config_GetInt(vd, "macosx-video-autoresize"))
+            {
+                cfg_tmp.display.width = bounds.size.width;
+                cfg_tmp.display.height = bounds.size.height;
+            }
+
             vout_display_PlacePicture (&place, source, &cfg_tmp, false);
 
             if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP || query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT)
