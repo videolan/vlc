@@ -292,6 +292,11 @@ static const muxer_properties_t p_muxers[] = {
                                 VLC_CODEC_DTS,
                                 VLC_CODEC_SPU ),
 
+    M( "avi", "avi", 100,       VLC_CODEC_A52, VLC_CODEC_MPGA,
+                                VLC_CODEC_WMA1, VLC_CODEC_WMA2, VLC_CODEC_WMAP, VLC_CODEC_WMAL,
+                                VLC_CODEC_U8, VLC_CODEC_S16L, VLC_CODEC_S24L,
+                                VLC_CODEC_MP4V ),
+
     M( "ts", "ts", 8000,        VLC_CODEC_MPGV,
                                 VLC_CODEC_H264,
                                 VLC_CODEC_MPGA, VLC_CODEC_DVD_LPCM, VLC_CODEC_A52,
