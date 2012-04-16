@@ -1876,7 +1876,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
     if( version == 1 )
     {
-        NSMutableString * o_workString = [[NSMutableString alloc] initWithFormat:@"%s", config_GetPsz( VLCIntf, "extraintf" )];
+        NSMutableString * o_workString;
         NSRange returnedRange;
         NSRange fullRange;
         BOOL b_needsRestart = NO;
