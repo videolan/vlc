@@ -409,7 +409,7 @@ dnl
 dnl Gettext stuff
 dnl
 AM_GNU_GETTEXT_VERSION([0.18.1])
-AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT([external], [need-ngettext])
 
 dnl
 dnl Iconv stuff
