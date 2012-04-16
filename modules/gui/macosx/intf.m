@@ -779,6 +779,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [o_msg_arr removeAllObjects];
     [o_msg_arr release];
+    o_msg_arr = NULL;
 
     [o_msg_lock release];
 
@@ -2001,36 +2002,39 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
 - (void)processReceivedlibvlcMessage:(const msg_item_t *) item ofType: (int)i_type withStr: (char *)str
 {
-    NSColor *o_white = [NSColor whiteColor];
-    NSColor *o_red = [NSColor redColor];
-    NSColor *o_yellow = [NSColor yellowColor];
-    NSColor *o_gray = [NSColor grayColor];
-    NSString * firstString, * secondString;
-
-    NSColor * pp_color[4] = { o_white, o_red, o_yellow, o_gray };
-    static const char * ppsz_type[4] = { ": ", " error: ", " warning: ", " debug: " };
-
-    NSDictionary *o_attr;
-    NSMutableAttributedString *o_msg_color;
-
-    [o_msg_lock lock];
-
-    if( [o_msg_arr count] + 2 > 600 )
+    if (o_msg_arr)
     {
-        [o_msg_arr removeObjectAtIndex: 0];
-        [o_msg_arr removeObjectAtIndex: 1];
+        NSColor *o_white = [NSColor whiteColor];
+        NSColor *o_red = [NSColor redColor];
+        NSColor *o_yellow = [NSColor yellowColor];
+        NSColor *o_gray = [NSColor grayColor];
+        NSString * firstString, * secondString;
+
+        NSColor * pp_color[4] = { o_white, o_red, o_yellow, o_gray };
+        static const char * ppsz_type[4] = { ": ", " error: ", " warning: ", " debug: " };
+
+        NSDictionary *o_attr;
+        NSMutableAttributedString *o_msg_color;
+
+        [o_msg_lock lock];
+
+        if( [o_msg_arr count] + 2 > 600 )
+        {
+            [o_msg_arr removeObjectAtIndex: 0];
+            [o_msg_arr removeObjectAtIndex: 1];
+        }
+        firstString = [NSString stringWithFormat:@"%s%s", item->psz_module, ppsz_type[i_type]];
+        secondString = [NSString stringWithFormat:@"%@%s\n", firstString, str];
+
+        o_attr = [NSDictionary dictionaryWithObject: pp_color[i_type]  forKey: NSForegroundColorAttributeName];
+        o_msg_color = [[NSMutableAttributedString alloc] initWithString: secondString attributes: o_attr];
+        o_attr = [NSDictionary dictionaryWithObject: pp_color[3] forKey: NSForegroundColorAttributeName];
+        [o_msg_color setAttributes: o_attr range: NSMakeRange( 0, [firstString length] )];
+        [o_msg_arr addObject: [o_msg_color autorelease]];
+
+        b_msg_arr_changed = YES;
+        [o_msg_lock unlock];
     }
-    firstString = [NSString stringWithFormat:@"%s%s", item->psz_module, ppsz_type[i_type]];
-    secondString = [NSString stringWithFormat:@"%@%s\n", firstString, str];
-
-    o_attr = [NSDictionary dictionaryWithObject: pp_color[i_type]  forKey: NSForegroundColorAttributeName];
-    o_msg_color = [[NSMutableAttributedString alloc] initWithString: secondString attributes: o_attr];
-    o_attr = [NSDictionary dictionaryWithObject: pp_color[3] forKey: NSForegroundColorAttributeName];
-    [o_msg_color setAttributes: o_attr range: NSMakeRange( 0, [firstString length] )];
-    [o_msg_arr addObject: [o_msg_color autorelease]];
-
-    b_msg_arr_changed = YES;
-    [o_msg_lock unlock];
 }
 
 - (IBAction)saveDebugLog:(id)sender
