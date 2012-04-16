@@ -420,6 +420,9 @@ DBUS_METHOD( CanSeek )
 
     MarshalCanSeek( p_this, &v );
 
+    if( !dbus_message_iter_close_container( &args, &v ) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
     REPLY_SEND;
 }
 
