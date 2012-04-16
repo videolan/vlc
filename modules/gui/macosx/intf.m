@@ -1869,42 +1869,83 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 - (void)_removeOldPreferences
 {
     static NSString * kVLCPreferencesVersion = @"VLCPreferencesVersion";
-    static const int kCurrentPreferencesVersion = 1;
+    static const int kCurrentPreferencesVersion = 2;
     int version = [[NSUserDefaults standardUserDefaults] integerForKey:kVLCPreferencesVersion];
     if( version >= kCurrentPreferencesVersion ) return;
 
-    NSArray *libraries = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
-        NSUserDomainMask, YES);
-    if( !libraries || [libraries count] == 0) return;
-    NSString * preferences = [[libraries objectAtIndex:0] stringByAppendingPathComponent:@"Preferences"];
-
-    /* File not found, don't attempt anything */
-    if(![[NSFileManager defaultManager] fileExistsAtPath:[preferences stringByAppendingPathComponent:@"org.videolan.vlc"]] &&
-       ![[NSFileManager defaultManager] fileExistsAtPath:[preferences stringByAppendingPathComponent:@"org.videolan.vlc.plist"]] )
+    if( version == 1 )
     {
-        [[NSUserDefaults standardUserDefaults] setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
-        return;
-    }
+        NSMutableString * o_workString = [[NSMutableString alloc] initWithFormat:@"%s", config_GetPsz( VLCIntf, "extraintf" )];
+        NSRange returnedRange;
+        NSRange fullRange;
+        BOOL b_needsRestart = NO;
 
-    int res = NSRunInformationalAlertPanel(_NS("Remove old preferences?"),
-                _NS("We just found an older version of VLC's preferences files."),
-                _NS("Move To Trash and Relaunch VLC"), _NS("Ignore"), nil, nil);
-    if( res != NSOKButton )
+        #define fixpref( pref ) \
+        o_workString = [[NSMutableString alloc] initWithFormat:@"%s", config_GetPsz( VLCIntf, pref )]; \
+        if ([o_workString length] > 0) \
+        { \
+            returnedRange = [o_workString rangeOfString:@"macosx" options: NSCaseInsensitiveSearch]; \
+            if (returnedRange.location != NSNotFound) \
+            { \
+                fullRange = NSMakeRange( 0, [o_workString length] ); \
+                [o_workString replaceOccurrencesOfString:@":macosx" withString:@"" options: NSCaseInsensitiveSearch range: fullRange]; \
+                fullRange = NSMakeRange( 0, [o_workString length] ); \
+                [o_workString replaceOccurrencesOfString:@"macosx:" withString:@"" options: NSCaseInsensitiveSearch range: fullRange]; \
+                fullRange = NSMakeRange( 0, [o_workString length] ); \
+                [o_workString replaceOccurrencesOfString:@"macosx" withString:@"" options: NSCaseInsensitiveSearch range: fullRange]; \
+                config_PutPsz( VLCIntf, pref, [o_workString UTF8String] ); \
+                b_needsRestart = YES; \
+            } \
+        } \
+        [o_workString release]
+
+        fixpref( "control" );
+        fixpref( "extraintf" );
+        #undef fixpref
+
+        [[NSUserDefaults standardUserDefaults] setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+
+        if (!b_needsRestart)
+            return;
+        else
+            config_SaveConfigFile( VLCIntf ); // we need to do manually, since we won't quit libvlc cleanly
+    }
+    else
     {
+        NSArray *libraries = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
+            NSUserDomainMask, YES);
+        if( !libraries || [libraries count] == 0) return;
+        NSString * preferences = [[libraries objectAtIndex:0] stringByAppendingPathComponent:@"Preferences"];
+
+        /* File not found, don't attempt anything */
+        if(![[NSFileManager defaultManager] fileExistsAtPath:[preferences stringByAppendingPathComponent:@"org.videolan.vlc"]] &&
+           ![[NSFileManager defaultManager] fileExistsAtPath:[preferences stringByAppendingPathComponent:@"org.videolan.vlc.plist"]] )
+        {
+            [[NSUserDefaults standardUserDefaults] setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
+            return;
+        }
+
+        int res = NSRunInformationalAlertPanel(_NS("Remove old preferences?"),
+                    _NS("We just found an older version of VLC's preferences files."),
+                    _NS("Move To Trash and Relaunch VLC"), _NS("Ignore"), nil, nil);
+        if( res != NSOKButton )
+        {
+            [[NSUserDefaults standardUserDefaults] setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
+            return;
+        }
+
+        NSArray * ourPreferences = [NSArray arrayWithObjects:@"org.videolan.vlc.plist", @"VLC", nil];
+
+        /* Move the file to trash so that user can find them later */
+        [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:preferences destination:nil files:ourPreferences tag:0];
+
+        /* really reset the defaults from now on */
+        [NSUserDefaults resetStandardUserDefaults];
+
         [[NSUserDefaults standardUserDefaults] setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
-        return;
+        [[NSUserDefaults standardUserDefaults] synchronize];
     }
-
-    NSArray * ourPreferences = [NSArray arrayWithObjects:@"org.videolan.vlc.plist", @"VLC", nil];
-
-    /* Move the file to trash so that user can find them later */
-    [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:preferences destination:nil files:ourPreferences tag:0];
-
-    /* really reset the defaults from now on */
-    [NSUserDefaults resetStandardUserDefaults];
-
-    [[NSUserDefaults standardUserDefaults] setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
-    [[NSUserDefaults standardUserDefaults] synchronize];
 
     /* Relaunch now */
     const char * path = [[[NSBundle mainBundle] executablePath] UTF8String];
