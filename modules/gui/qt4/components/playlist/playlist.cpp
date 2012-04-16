@@ -136,7 +136,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
         viewSelectionMapper->setMapping( viewActions[i], i );
         CONNECT( viewActions[i], triggered(), viewSelectionMapper, map() );
     }
-    viewActions[0]->setChecked( true );
+    viewActions[mainView->currentViewIndex()]->setChecked( true );
 
     QMenu *viewMenu = new QMenu( viewButton );
     viewMenu->addActions( actionGroup->actions() );
@@ -249,8 +249,6 @@ void PlaylistWidget::changeView( const QModelIndex& index )
 {
     searchEdit->clear();
     locationBar->setIndex( index );
-    int i = mainView->currentViewIndex();
-    viewActions[i]->setChecked(true);
 }
 
 void PlaylistWidget::clearPlaylist()
