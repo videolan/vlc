@@ -61,6 +61,7 @@ struct vlc_thread
     void          *data;
 };
 
+static LARGE_INTEGER freq;
 static vlc_mutex_t super_mutex;
 static vlc_cond_t  super_variable;
 extern vlc_rwlock_t config_lock, msg_lock;
@@ -75,6 +76,8 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
     switch (fdwReason)
     {
         case DLL_PROCESS_ATTACH:
+            if (!QueryPerformanceFrequency (&freq))
+                return FALSE;
             vlc_mutex_init (&super_mutex);
             vlc_cond_init (&super_variable);
             vlc_threadvar_create (&thread_key, NULL);
@@ -771,10 +774,9 @@ void vlc_control_cancel (int cmd, ...)
 mtime_t mdate (void)
 {
     /* We don't need the real date, just the value of a high precision timer */
-    LARGE_INTEGER counter, freq;
-    if (!QueryPerformanceCounter (&counter)
-     || !QueryPerformanceFrequency (&freq))
-        abort();
+    LARGE_INTEGER counter;
+    if (!QueryPerformanceCounter (&counter))
+        abort ();
 
     /* Convert to from (1/freq) to microsecond resolution */
     /* We need to split the division to avoid 63-bits overflow */
