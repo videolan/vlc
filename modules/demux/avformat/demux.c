@@ -265,10 +265,12 @@ int OpenDemux( vlc_object_t *p_this )
     error = avformat_find_stream_info( p_sys->ic, options );
     vlc_avcodec_unlock();
     AVDictionaryEntry *t = NULL;
-    while ((t = av_dict_get(options, "", t, AV_DICT_IGNORE_SUFFIX))) {
+    while ((t = av_dict_get(options[0], "", t, AV_DICT_IGNORE_SUFFIX))) {
         msg_Err( p_demux, "Unknown option \"%s\"", t->key );
     }
-    av_dict_free(&options);
+    for (unsigned i = 0; i < p_sys->ic->nb_streams; i++) {
+        av_dict_free(&options[i]);
+    }
 #else
     vlc_avcodec_lock(); /* avformat calls avcodec behind our back!!! */
     error = av_find_stream_info( p_sys->ic );
