@@ -50,17 +50,17 @@ DialogHandler::DialogHandler (intf_thread_t *p_intf, QObject *_parent)
     connect (this, SIGNAL(error(const QString &, const QString &)),
              SLOT(displayError(const QString &, const QString &)));
 
-    connect (&critical, SIGNAL(pointerChanged(vlc_object_t *, void *)),
-             SLOT(displayCritical(vlc_object_t *, void *)),
+    connect (&critical, SIGNAL(pointerChanged(void *)),
+             SLOT(displayCritical(void *)),
              Qt::BlockingQueuedConnection);
-    connect (&login, SIGNAL(pointerChanged(vlc_object_t *, void *)),
-             SLOT(requestLogin(vlc_object_t *, void *)),
+    connect (&login, SIGNAL(pointerChanged(void *)),
+             SLOT(requestLogin(void *)),
              Qt::BlockingQueuedConnection);
-    connect (&question, SIGNAL(pointerChanged(vlc_object_t *, void *)),
-             SLOT(requestAnswer(vlc_object_t *, void *)),
+    connect (&question, SIGNAL(pointerChanged(void *)),
+             SLOT(requestAnswer(void *)),
              Qt::BlockingQueuedConnection);
-    connect (&progressBar, SIGNAL(pointerChanged(vlc_object_t *, void *)),
-             SLOT(startProgressBar(vlc_object_t *, void *)),
+    connect (&progressBar, SIGNAL(pointerChanged(void *)),
+             SLOT(startProgressBar(void *)),
              Qt::BlockingQueuedConnection);
     connect (this,
              SIGNAL(progressBarDestroyed(QWidget *)),
@@ -93,7 +93,7 @@ void DialogHandler::displayError (const QString& title, const QString& message)
     ErrorsDialog::getInstance (intf)->addError(title, message);
 }
 
-void DialogHandler::displayCritical (vlc_object_t *, void *value)
+void DialogHandler::displayCritical (void *value)
 {
     const dialog_fatal_t *dialog = (const dialog_fatal_t *)value;
 
@@ -101,7 +101,7 @@ void DialogHandler::displayCritical (vlc_object_t *, void *value)
                            QMessageBox::Ok);
 }
 
-void DialogHandler::requestLogin (vlc_object_t *, void *value)
+void DialogHandler::requestLogin (void *value)
 {
     dialog_login_t *data = (dialog_login_t *)value;
     QDialog *dialog = new QDialog;
@@ -153,7 +153,7 @@ void DialogHandler::requestLogin (vlc_object_t *, void *value)
     delete dialog;
 }
 
-void DialogHandler::requestAnswer (vlc_object_t *, void *value)
+void DialogHandler::requestAnswer (void *value)
 {
     dialog_question_t *data = (dialog_question_t *)value;
 
@@ -245,7 +245,7 @@ void QVLCProgressDialog::saveCancel (void)
     cancelled = true;
 }
 
-void DialogHandler::startProgressBar (vlc_object_t *, void *value)
+void DialogHandler::startProgressBar (void *value)
 {
     dialog_progress_bar_t *data = (dialog_progress_bar_t *)value;
     QWidget *dlg = new QVLCProgressDialog (this, data);

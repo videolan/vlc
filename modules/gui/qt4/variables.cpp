@@ -52,7 +52,7 @@ int QVLCVariable::callback (vlc_object_t *object, const char *,
 
     QVLCVariable *self = static_cast<QVLCVariable *>(data);
 
-    self->trigger (self->object, old, cur);
+    self->trigger (old, cur);
     return VLC_SUCCESS;
 }
 
@@ -62,10 +62,9 @@ QVLCPointer::QVLCPointer (vlc_object_t *obj, const char *varname, bool inherit)
 {
 }
 
-void QVLCPointer::trigger (vlc_object_t *obj, vlc_value_t old, vlc_value_t cur)
+void QVLCPointer::trigger (vlc_value_t, vlc_value_t cur)
 {
-    emit pointerChanged (obj, old.p_address, cur.p_address);
-    emit pointerChanged (obj, cur.p_address);
+    emit pointerChanged (cur.p_address);
 }
 
 
@@ -74,8 +73,38 @@ QVLCInteger::QVLCInteger (vlc_object_t *obj, const char *varname, bool inherit)
 {
 }
 
-void QVLCInteger::trigger (vlc_object_t *obj, vlc_value_t old, vlc_value_t cur)
+void QVLCInteger::trigger (vlc_value_t, vlc_value_t cur)
 {
-    emit integerChanged (obj, old.i_int, cur.i_int);
-    emit integerChanged (obj, cur.i_int);
+    emit integerChanged (cur.i_int);
+}
+
+QVLCBool::QVLCBool (vlc_object_t *obj, const char *varname, bool inherit)
+    : QVLCVariable (obj, varname, VLC_VAR_BOOL, inherit)
+{
+}
+
+void QVLCBool::trigger (vlc_value_t, vlc_value_t cur)
+{
+    emit boolChanged (cur.b_bool);
+}
+
+QVLCFloat::QVLCFloat (vlc_object_t *obj, const char *varname, bool inherit)
+    : QVLCVariable (obj, varname, VLC_VAR_FLOAT, inherit)
+{
+}
+
+void QVLCFloat::trigger (vlc_value_t, vlc_value_t cur)
+{
+    emit floatChanged (cur.f_float);
+}
+
+QVLCString::QVLCString (vlc_object_t *obj, const char *varname, bool inherit)
+    : QVLCVariable (obj, varname, VLC_VAR_STRING, inherit)
+{
+}
+
+void QVLCString::trigger (vlc_value_t, vlc_value_t cur)
+{
+    QString str = qfu(cur.psz_string);
+    emit stringChanged (str);
 }

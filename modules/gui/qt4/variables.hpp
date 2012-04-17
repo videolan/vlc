@@ -36,39 +36,75 @@ private:
                          vlc_value_t, vlc_value_t, void *);
     vlc_object_t *object;
     QString name;
-    virtual void trigger (vlc_object_t *, vlc_value_t, vlc_value_t) = 0;
+    virtual void trigger (vlc_value_t, vlc_value_t) = 0;
 
 public:
     QVLCVariable (vlc_object_t *, const char *, int, bool);
-    virtual ~QVLCVariable (void);
+    ~QVLCVariable (void);
 };
 
 class QVLCPointer : public QVLCVariable
 {
     Q_OBJECT
 private:
-    virtual void trigger (vlc_object_t *, vlc_value_t, vlc_value_t);
+    virtual void trigger (vlc_value_t, vlc_value_t);
 
 public:
     QVLCPointer (vlc_object_t *, const char *, bool inherit = false);
 
 signals:
-    void pointerChanged (vlc_object_t *, void *, void *);
-    void pointerChanged (vlc_object_t *, void *);
+    void pointerChanged (void *);
 };
 
 class QVLCInteger : public QVLCVariable
 {
     Q_OBJECT
 private:
-    virtual void trigger (vlc_object_t *, vlc_value_t, vlc_value_t);
+    virtual void trigger (vlc_value_t, vlc_value_t);
 
 public:
     QVLCInteger (vlc_object_t *, const char *, bool inherit = false);
 
 signals:
-    void integerChanged (vlc_object_t *, int, int);
-    void integerChanged (vlc_object_t *, int);
+    void integerChanged (int64_t);
 };
 
+class QVLCBool : public QVLCVariable
+{
+    Q_OBJECT
+private:
+    virtual void trigger (vlc_value_t, vlc_value_t);
+
+public:
+    QVLCBool (vlc_object_t *, const char *, bool inherit = false);
+
+signals:
+    void boolChanged (bool);
+};
+
+class QVLCFloat : public QVLCVariable
+{
+    Q_OBJECT
+private:
+    virtual void trigger (vlc_value_t, vlc_value_t);
+
+public:
+    QVLCFloat (vlc_object_t *, const char *, bool inherit = false);
+
+signals:
+    void floatChanged (float);
+};
+
+class QVLCString : public QVLCVariable
+{
+    Q_OBJECT
+private:
+    virtual void trigger (vlc_value_t, vlc_value_t);
+
+public:
+    QVLCString (vlc_object_t *, const char *, bool inherit = false);
+
+signals:
+    void stringChanged (QString);
+};
 #endif

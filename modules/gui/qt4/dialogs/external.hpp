@@ -56,10 +56,10 @@ signals:
 
 private slots:
     void displayError (const QString&, const QString&);
-    void displayCritical (vlc_object_t *, void *);
-    void requestLogin (vlc_object_t *, void *);
-    void requestAnswer (vlc_object_t *, void *);
-    void startProgressBar (vlc_object_t *, void *);
+    void displayCritical (void *);
+    void requestLogin (void *);
+    void requestAnswer (void *);
+    void startProgressBar (void *);
     void stopProgressBar (QWidget *);
 };
 
