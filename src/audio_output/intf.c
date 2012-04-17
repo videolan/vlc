@@ -87,6 +87,8 @@ static int commitVolume (vlc_object_t *obj, audio_output_t *aout,
     /* update caller (input manager) volume */
     var_SetInteger (obj, "volume", volume);
     var_SetBool (obj, "mute", mute);
+    if (var_InheritBool (obj, "volume-save"))
+        config_PutInt (obj, "volume", volume);
 
     if (aout != NULL)
     {

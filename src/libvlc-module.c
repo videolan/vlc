@@ -277,6 +277,11 @@ static const char *const ppsz_snap_formats[] =
     "in a range from 0 to 1024." )
 #define AOUT_VOLUME_STEP 32
 
+#define VOLUME_SAVE_TEXT N_( "Remember the audio volume" )
+#define VOLUME_SAVE_LONGTEXT N_( \
+    "The volume can be recorded and automatically restored next time " \
+    "VLC is used." )
+
 #define AOUT_RATE_TEXT N_("Audio output frequency (Hz)")
 #define AOUT_RATE_LONGTEXT N_( \
     "You can force the audio output frequency here. Common values are " \
@@ -1591,6 +1596,7 @@ vlc_module_begin ()
     add_integer_with_range( "volume-step", AOUT_VOLUME_STEP, 0,
                             AOUT_VOLUME_MAX, VOLUME_STEP_TEXT,
                             VOLUME_STEP_LONGTEXT, true )
+    add_bool( "volume-save", true, VOLUME_SAVE_TEXT, VOLUME_SAVE_TEXT, true )
     add_obsolete_integer( "aout-rate" ) /* since 2.0.0 */
 #if HAVE_FPU && !defined( __APPLE__ )
     add_bool( "hq-resampling", 1, AOUT_RESAMP_TEXT,
