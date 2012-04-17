@@ -807,20 +807,23 @@ static int LOASParse( decoder_t *p_dec, uint8_t *p_buffer, int i_buffer )
             p_sys->i_rate = st->cfg.i_samplerate;
             p_sys->i_frame_length = st->cfg.i_frame_length;
 
-            /* FIXME And if it changes ? */
-            if( !p_dec->fmt_out.i_extra && st->i_extra > 0 )
+            if ( p_sys->i_channels > 0 && p_sys->i_rate > 0 &&
+                 p_sys->i_frame_length > 0 )
             {
-                p_dec->fmt_out.i_extra = st->i_extra;
-                p_dec->fmt_out.p_extra = malloc( st->i_extra );
-                if( !p_dec->fmt_out.p_extra )
+                /* FIXME And if it changes ? */
+                if( !p_dec->fmt_out.i_extra && st->i_extra > 0 )
                 {
-                    p_dec->fmt_out.i_extra = 0;
-                    return 0;
+                    p_dec->fmt_out.i_extra = st->i_extra;
+                    p_dec->fmt_out.p_extra = malloc( st->i_extra );
+                    if( !p_dec->fmt_out.p_extra )
+                    {
+                        p_dec->fmt_out.i_extra = 0;
+                        return 0;
+                    }
+                    memcpy( p_dec->fmt_out.p_extra, st->extra, st->i_extra );
                 }
-                memcpy( p_dec->fmt_out.p_extra, st->extra, st->i_extra );
+                p_sys->b_latm_cfg = true;
             }
-
-            p_sys->b_latm_cfg = true;
         }
     }
     /* Wait for the configuration */
