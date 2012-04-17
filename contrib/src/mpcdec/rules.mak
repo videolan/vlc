@@ -27,6 +27,7 @@ $(TARBALLS)/musepack_src_r$(MUSE_REV).tar.gz:
 musepack: musepack_src_r$(MUSE_REV).tar.gz .sum-mpcdec
 	$(UNPACK)
 	$(APPLY) $(SRC)/mpcdec/musepack-no-cflags-clobber.patch
+	$(APPLY) $(SRC)/mpcdec/musepack-no-binaries.patch
 	sed -i.orig \
 		-e 's,^add_subdirectory(mpcgain),,g' \
 		-e 's,^add_subdirectory(mpcchap),,g' \
