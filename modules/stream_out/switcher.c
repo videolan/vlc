@@ -131,11 +131,13 @@ vlc_module_begin ()
                  QSCALE_TEXT, QSCALE_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "mute-audio", true,
               AUDIO_TEXT, AUDIO_LONGTEXT, true )
+    add_string( SOUT_CFG_PREFIX "options", NULL,
+                AV_OPTIONS_TEXT, AV_OPTIONS_LONGTEXT, true )
 vlc_module_end ()
 
 static const char *const ppsz_sout_options[] = {
     "files", "sizes", "aspect-ratio", "port", "command", "gop", "qscale",
-    "mute-audio", NULL
+    "mute-audio", "options", NULL
 };
 
 struct sout_stream_sys_t
@@ -153,6 +155,10 @@ struct sout_stream_sys_t
     /* Command */
     int             i_fd;
     int             i_cmd, i_old_cmd;
+
+#if LIBAVCODEC_VERSION_MAJOR >= 54
+    AVDictionary    *options;
+#endif
 };
 
 struct sout_stream_id_t
@@ -182,6 +188,8 @@ static int Open( vlc_object_t *p_this )
     vlc_value_t       val;
     char              *psz_files, *psz_sizes;
     int               i_height = 0, i_width = 0;
+
+    vlc_init_avcodec();
 
     p_sys = calloc( 1, sizeof(sout_stream_sys_t) );
     if( !p_sys )
@@ -287,7 +295,15 @@ static int Open( vlc_object_t *p_this )
     p_stream->pf_send   = Send;
     p_stream->p_sys     = p_sys;
 
-    vlc_init_avcodec();
+#if LIBAVCODEC_VERSION_MAJOR >= 54
+    char *psz_opts = var_InheritString( p_stream, SOUT_CFG_PREFIX "options" );
+    if (psz_opts && *psz_opts) {
+        p_sys->options = vlc_av_get_options(psz_opts);
+    } else {
+        p_sys->options = NULL;
+    }
+    free(psz_opts);
+#endif
 
     return VLC_SUCCESS;
 }
@@ -299,6 +315,10 @@ static void Close( vlc_object_t * p_this )
 {
     sout_stream_t       *p_stream = (sout_stream_t *)p_this;
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
+
+#if LIBAVCODEC_VERSION_MAJOR >= 54
+    av_dict_free( &p_sys->options );
+#endif
 
     free( p_sys );
 }
@@ -385,20 +405,32 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->ff_enc_c->channels    = p_fmt->audio.i_channels;
         id->ff_enc_c->bit_rate    = p_fmt->i_bitrate;
 
-        vlc_avcodec_lock();
+        int ret;
 #if LIBAVCODEC_VERSION_MAJOR >= 54
-        if( avcodec_open2( id->ff_enc_c, id->ff_enc, NULL /* options */ ) )
+        AVDictionary *options = NULL;
+        if (p_sys->options)
+            av_dict_copy(&options, p_sys->options, 0);
+        vlc_avcodec_lock();
+        ret = avcodec_open2( id->ff_enc_c, id->ff_enc, options ? &options : NULL );
+        vlc_avcodec_unlock();
+        AVDictionaryEntry *t = NULL;
+        while ((t = av_dict_get(options, "", t, AV_DICT_IGNORE_SUFFIX))) {
+            msg_Err( p_stream, "Unknown option \"%s\"", t->key );
+        }
+        av_dict_free(&options);
 #else
-        if( avcodec_open( id->ff_enc_c, id->ff_enc ) )
+        vlc_avcodec_lock();
+        ret = avcodec_open( id->ff_enc_c, id->ff_enc );
+        vlc_avcodec_unlock();
 #endif
+
+        if (ret)
         {
-            vlc_avcodec_unlock();
             msg_Err( p_stream, "cannot open encoder" );
             av_free( id->ff_enc_c );
             free( id );
             return NULL;
         }
-        vlc_avcodec_unlock();
 
         id->p_buffer_out = malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE * 2 );
         id->p_samples = calloc( id->ff_enc_c->frame_size * p_fmt->audio.i_channels,
@@ -811,11 +843,21 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
         vlc_avcodec_lock();
         int ret;
 #if LIBAVCODEC_VERSION_MAJOR >= 54
-        ret = avcodec_open2( id->ff_enc_c, id->ff_enc, NULL /* options */ );
+        AVDictionary *options = NULL;
+        if (p_sys->options)
+            av_dict_copy(&options, p_sys->options, 0);
+        ret = avcodec_open2( id->ff_enc_c, id->ff_enc, options ? &options : NULL );
 #else
         ret = avcodec_open( id->ff_enc_c, id->ff_enc );
 #endif
         vlc_avcodec_unlock();
+#if LIBAVCODEC_VERSION_MAJOR >= 54
+        AVDictionaryEntry *t = NULL;
+        while ((t = av_dict_get(options, "", t, AV_DICT_IGNORE_SUFFIX))) {
+            msg_Err( p_stream, "Unknown option \"%s\"", t->key );
+        }
+        av_dict_free(&options);
+#endif
         if (ret)
         {
             msg_Err( p_stream, "cannot open encoder" );
