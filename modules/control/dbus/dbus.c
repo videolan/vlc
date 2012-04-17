@@ -184,7 +184,9 @@ static int Open( vlc_object_t *p_this )
 
     dbus_connection_set_exit_on_disconnect( p_conn, FALSE );
 
-    /* register a well-known name on the bus */
+    /* register an instance-specific well known name of the form
+     * org.mpris.MediaPlayer2.vlc.instanceXXXX where XXXX is the
+     * current process's pid */
     size_t i_length = sizeof( DBUS_MPRIS_BUS_NAME ) +
         sizeof( DBUS_INSTANCE_ID_PREFIX ) + 10;
 
@@ -206,6 +208,8 @@ static int Open( vlc_object_t *p_this )
     }
     msg_Dbg( p_intf, "listening on dbus as: %s", unique_service );
 
+    /* Try to register org.mpris.MediaPlayer2.vlc as well in case we are
+     * the only VLC instance currently connected to the bus */
     dbus_bus_request_name( p_conn, DBUS_MPRIS_BUS_NAME, 0, NULL );
 
     /* Register the entry point object path */
