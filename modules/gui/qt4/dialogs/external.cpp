@@ -50,18 +50,16 @@ DialogHandler::DialogHandler (intf_thread_t *p_intf, QObject *_parent)
     connect (this, SIGNAL(error(const QString &, const QString &)),
              SLOT(displayError(const QString &, const QString &)));
 
-    connect (&critical, SIGNAL(pointerChanged(void *)),
-             SLOT(displayCritical(void *)),
-             Qt::BlockingQueuedConnection);
-    connect (&login, SIGNAL(pointerChanged(void *)),
-             SLOT(requestLogin(void *)),
-             Qt::BlockingQueuedConnection);
-    connect (&question, SIGNAL(pointerChanged(void *)),
-             SLOT(requestAnswer(void *)),
-             Qt::BlockingQueuedConnection);
-    connect (&progressBar, SIGNAL(pointerChanged(void *)),
-             SLOT(startProgressBar(void *)),
-             Qt::BlockingQueuedConnection);
+    critical.addCallback(this, SLOT(displayCritical(void *)),
+                         Qt::BlockingQueuedConnection);
+    login.addCallback(this, SLOT(requestLogin(void *)),
+                      Qt::BlockingQueuedConnection);
+    question.addCallback(this, SLOT(requestAnswer(void *)),
+                         Qt::BlockingQueuedConnection);
+    question.addCallback(this, SLOT(requestAnswer(void *)),
+                         Qt::BlockingQueuedConnection);
+    progressBar.addCallback(this, SLOT(startProgressBar(void *)),
+                            Qt::BlockingQueuedConnection);
     connect (this,
              SIGNAL(progressBarDestroyed(QWidget *)),
              SLOT(stopProgressBar(QWidget *)));
