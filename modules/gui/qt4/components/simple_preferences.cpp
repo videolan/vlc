@@ -470,7 +470,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 ui.live555TransportHTTPRadio->hide();
                 ui.live555TransportLabel->hide();
             }
-            CONFIG_BOOL( "ffmpeg-hw", hwAccelBox );
+            CONFIG_BOOL( "avcodec-hw", hwAccelBox );
 #ifdef WIN32
             HINSTANCE hdxva2_dll = LoadLibrary(TEXT("DXVA2.DLL") );
             if( !hdxva2_dll )
@@ -480,7 +480,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #endif
             optionWidgets.append( ui.DVDDeviceComboBox );
             optionWidgets.append( ui.cachingCombo );
-            CONFIG_GENERIC( "ffmpeg-skiploopfilter", IntegerList, ui.filterLabel, loopFilterBox );
+            CONFIG_GENERIC( "avcodec-skiploopfilter", IntegerList, ui.filterLabel, loopFilterBox );
             CONFIG_GENERIC( "sout-x264-tune", StringList, ui.x264Label, tuneBox );
             CONFIG_GENERIC( "sout-x264-preset", StringList, ui.x264Label, presetBox );
             CONFIG_GENERIC( "sout-x264-profile", StringList, ui.x264profileLabel, profileBox );
