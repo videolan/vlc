@@ -977,11 +977,6 @@ MainInputManager::~MainInputManager()
     var_DelCallback( THEPL, "item-current", PLItemChanged, this );
     var_DelCallback( THEPL, "playlist-item-append", PLItemAppended, this );
     var_DelCallback( THEPL, "playlist-item-deleted", PLItemRemoved, this );
-
-    /* Save some interface state in configuration, at module quit */
-    config_PutInt( p_intf, "random", var_GetBool( THEPL, "random" ) );
-    config_PutInt( p_intf, "loop", var_GetBool( THEPL, "loop" ) );
-    config_PutInt( p_intf, "repeat", var_GetBool( THEPL, "repeat" ) );
 }
 
 vout_thread_t* MainInputManager::getVout()
@@ -1125,7 +1120,7 @@ void MainInputManager::pause()
 
 void MainInputManager::toggleRandom()
 {
-    var_ToggleBool( THEPL, "random" );
+    config_PutInt( p_intf, "random", var_ToggleBool( THEPL, "random" ) );
 }
 
 void MainInputManager::notifyRandom(bool value)
@@ -1144,15 +1139,29 @@ void MainInputManager::notifyRepeatLoop(bool)
 void MainInputManager::loopRepeatLoopStatus()
 {
     /* Toggle Normal -> Loop -> Repeat -> Normal ... */
-    if( var_GetBool( THEPL, "repeat" ) )
-        var_SetBool( THEPL, "repeat", false );
-    else if( var_GetBool( THEPL, "loop" ) )
+    bool loop = var_GetBool( THEPL, "loop" );
+    bool repeat = var_GetBool( THEPL, "repeat" );
+
+    if( repeat )
     {
-        var_SetBool( THEPL, "loop", false );
-        var_SetBool( THEPL, "repeat", true );
+        loop = false;
+        repeat = false;
+    }
+    else if( loop )
+    {
+        loop = false;
+        repeat = true;
     }
     else
-        var_SetBool( THEPL, "loop", true );
+    {
+        loop = true;
+        //repeat = false;
+    }
+
+    var_SetBool( THEPL, "loop", loop );
+    var_SetBool( THEPL, "repeat", repeat );
+    config_PutInt( p_intf, "loop", loop );
+    config_PutInt( p_intf, "repeat", repeat );
 }
 
 void MainInputManager::activatePlayQuit( bool b_exit )
