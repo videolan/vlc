@@ -982,9 +982,6 @@ MainInputManager::~MainInputManager()
     config_PutInt( p_intf, "random", var_GetBool( THEPL, "random" ) );
     config_PutInt( p_intf, "loop", var_GetBool( THEPL, "loop" ) );
     config_PutInt( p_intf, "repeat", var_GetBool( THEPL, "repeat" ) );
-
-    if( var_InheritBool( p_intf, "qt-autosave-volume" ) )
-        config_PutInt( p_intf, "volume", aout_VolumeGet( THEPL ) );
 }
 
 vout_thread_t* MainInputManager::getVout()

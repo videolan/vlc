@@ -333,7 +333,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONNECT( ui.defaultVolume, valueChanged( int ),
                      this, updateAudioVolume( int ) );
 
-            CONFIG_BOOL( "qt-autosave-volume", keepVolumeRadio );
+            CONFIG_BOOL( "volume-save", keepVolumeRadio );
             ui.defaultVolume_zone->setEnabled( ui.resetVolumeRadio->isChecked() );
             CONNECT( ui.resetVolumeRadio, toggled( bool ),
                      ui.defaultVolume_zone, setEnabled( bool ) );
