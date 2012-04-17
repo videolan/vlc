@@ -282,11 +282,6 @@ static const char *const ppsz_snap_formats[] =
     "The volume can be recorded and automatically restored next time " \
     "VLC is used." )
 
-#define AOUT_RATE_TEXT N_("Audio output frequency (Hz)")
-#define AOUT_RATE_LONGTEXT N_( \
-    "You can force the audio output frequency here. Common values are " \
-    "0 (undefined), 48000, 44100, 32000, 22050, 16000, 11025, 8000.")
-
 #if !defined( __APPLE__ )
 #define AOUT_RESAMP_TEXT N_("High quality audio resampling")
 #define AOUT_RESAMP_LONGTEXT N_( \
