@@ -33,6 +33,7 @@
 
 #include "qt4.hpp"
 #include "util/singleton.hpp"
+#include "variables.hpp"
 
 #include <QObject>
 #include <QEvent>
@@ -273,8 +274,8 @@ private:
     InputManager            *im;
     input_thread_t          *p_input;
     intf_thread_t           *p_intf;
+    QVLCBool random, repeat, loop;
 
-    void notifyRepeatLoop();
 public slots:
     void togglePlayPause();
     void play();
@@ -287,7 +288,9 @@ public slots:
     void activatePlayQuit( bool );
 
     void loopRepeatLoopStatus();
-
+private slots:
+    void notifyRandom( bool );
+    void notifyRepeatLoop( bool );
 signals:
     void inputChanged( input_thread_t * );
     void volumeChanged();

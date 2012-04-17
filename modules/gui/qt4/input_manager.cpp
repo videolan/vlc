@@ -56,11 +56,6 @@ static int VolumeChanged( vlc_object_t *, const char *,
 static int SoundMuteChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
 
-static int RandomChanged( vlc_object_t *, const char *,
-                        vlc_value_t, vlc_value_t, void * );
-static int LoopOrRepeatChanged( vlc_object_t *, const char *,
-                        vlc_value_t, vlc_value_t, void * );
-
 static int InputEvent( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void * );
 static int VbiEvent( vlc_object_t *, const char *,
@@ -929,7 +924,9 @@ void InputManager::AtoBLoop( float, int64_t i_time, int )
  **********************************************************************/
 
 MainInputManager::MainInputManager( intf_thread_t *_p_intf )
-                 : QObject(NULL), p_intf( _p_intf )
+    : QObject(NULL), p_intf( _p_intf ),
+      random( VLC_OBJECT(THEPL), "random" ),
+      repeat( VLC_OBJECT(THEPL), "repeat" ), loop( VLC_OBJECT(THEPL), "loop" )
 {
     p_input = NULL;
     im = new InputManager( this, p_intf );
@@ -940,9 +937,9 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     var_AddCallback( THEPL, "leaf-to-parent", LeafToParent, this );
     var_AddCallback( THEPL, "playlist-item-append", PLItemAppended, this );
     var_AddCallback( THEPL, "playlist-item-deleted", PLItemRemoved, this );
-    var_AddCallback( THEPL, "random", RandomChanged, this );
-    var_AddCallback( THEPL, "repeat", LoopOrRepeatChanged, this );
-    var_AddCallback( THEPL, "loop", LoopOrRepeatChanged, this );
+    random.addCallback( this, SLOT(notifyRandom(bool)) );
+    repeat.addCallback( this, SLOT(notifyRepeatLoop(bool)) );
+    loop.addCallback( this, SLOT(notifyRepeatLoop(bool)) );
 
     var_AddCallback( THEPL, "volume", VolumeChanged, this );
     var_AddCallback( THEPL, "mute", SoundMuteChanged, this );
@@ -980,9 +977,6 @@ MainInputManager::~MainInputManager()
     var_DelCallback( THEPL, "item-current", PLItemChanged, this );
     var_DelCallback( THEPL, "playlist-item-append", PLItemAppended, this );
     var_DelCallback( THEPL, "playlist-item-deleted", PLItemRemoved, this );
-    var_DelCallback( THEPL, "random", RandomChanged, this );
-    var_DelCallback( THEPL, "repeat", LoopOrRepeatChanged, this );
-    var_DelCallback( THEPL, "loop", LoopOrRepeatChanged, this );
 
     /* Save some interface state in configuration, at module quit */
     config_PutInt( p_intf, "random", var_GetBool( THEPL, "random" ) );
@@ -1029,12 +1023,6 @@ void MainInputManager::customEvent( QEvent *event )
     case PLEmpty_Type:
         plEv = static_cast<PLEvent*>( event );
         emit playlistNotEmpty( plEv->i_item >= 0 );
-        return;
-    case RandomChanged_Type:
-        emit randomChanged( var_GetBool( THEPL, "random" ) );
-        return;
-    case LoopOrRepeatChanged_Type:
-        notifyRepeatLoop();
         return;
     case LeafToParent_Type:
         plEv = static_cast<PLEvent*>( event );
@@ -1143,7 +1131,12 @@ void MainInputManager::toggleRandom()
     var_ToggleBool( THEPL, "random" );
 }
 
-void MainInputManager::notifyRepeatLoop()
+void MainInputManager::notifyRandom(bool value)
+{
+    emit randomChanged(value);
+}
+
+void MainInputManager::notifyRepeatLoop(bool)
 {
     int i_value = var_GetBool( THEPL, "loop" ) * REPEAT_ALL
               + var_GetBool( THEPL, "repeat" ) * REPEAT_ONE;
@@ -1263,29 +1256,5 @@ static int PLItemRemoved
         event = new PLEvent( PLEmpty_Type, -1, 0 );
         QApplication::postEvent( mim, event );
     }
-    return VLC_SUCCESS;
-}
-
-static int RandomChanged
-( vlc_object_t * obj, const char *var, vlc_value_t old, vlc_value_t cur, void *data )
-{
-    VLC_UNUSED( obj ); VLC_UNUSED( var ); VLC_UNUSED( old ); VLC_UNUSED( cur );
-
-    MainInputManager *mim = static_cast<MainInputManager*>(data);
-
-    IMEvent *event = new IMEvent( RandomChanged_Type );
-    QApplication::postEvent( mim, event );
-    return VLC_SUCCESS;
-}
-
-static int LoopOrRepeatChanged
-( vlc_object_t * obj, const char *var, vlc_value_t old, vlc_value_t cur, void *data )
-{
-    VLC_UNUSED( obj ); VLC_UNUSED( var ); VLC_UNUSED( old ); VLC_UNUSED( cur );
-
-    MainInputManager *mim = static_cast<MainInputManager*>(data);
-
-    IMEvent *event = new IMEvent( LoopOrRepeatChanged_Type );
-    QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
 }
