@@ -105,7 +105,7 @@ typedef struct meta_export_t
 VLC_API int input_item_WriteMeta(vlc_object_t *, input_item_t *);
 
 /* Setters for meta.
- * Warning: Make sure to use the input_item meta setters (defined in vlc_input.h)
+ * Warning: Make sure to use the input_item meta setters (defined in vlc_input_item.h)
  * instead of those one. */
 #define vlc_meta_SetTitle( meta, b )       vlc_meta_Set( meta, vlc_meta_Title, b )
 #define vlc_meta_SetArtist( meta, b )      vlc_meta_Set( meta, vlc_meta_Artist, b )
