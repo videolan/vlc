@@ -61,7 +61,9 @@ struct vlc_thread
     void          *data;
 };
 
+#if (_WIN32_WINNT < 0x0601)
 static LARGE_INTEGER freq;
+#endif
 static vlc_mutex_t super_mutex;
 static vlc_cond_t  super_variable;
 extern vlc_rwlock_t config_lock, msg_lock;
@@ -76,8 +78,10 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
     switch (fdwReason)
     {
         case DLL_PROCESS_ATTACH:
+#if (_WIN32_WINNT < 0x0601)
             if (!QueryPerformanceFrequency (&freq))
                 return FALSE;
+#endif
             vlc_mutex_init (&super_mutex);
             vlc_cond_init (&super_variable);
             vlc_threadvar_create (&thread_key, NULL);
@@ -773,6 +777,14 @@ void vlc_control_cancel (int cmd, ...)
 /*** Clock ***/
 mtime_t mdate (void)
 {
+#if (_WIN32_WINNT >= 0x0601)
+    ULONGLONG ts;
+
+    if (unlikely(!QueryUnbiasedInterruptTime (&ts)))
+        abort ();
+
+    return ts / 10; /* hundreds of nanoseconds */
+#else
     /* We don't need the real date, just the value of a high precision timer */
     LARGE_INTEGER counter;
     if (!QueryPerformanceCounter (&counter))
@@ -783,6 +795,7 @@ mtime_t mdate (void)
     lldiv_t d = lldiv (counter.QuadPart, freq.QuadPart);
 
     return (d.quot * 1000000) + ((d.rem * 1000000) / freq.QuadPart);
+#endif
 }
 
 #undef mwait
