@@ -2541,24 +2541,19 @@ dnl
 dnl  faad decoder plugin
 dnl
 AC_ARG_ENABLE(faad,
-[  --enable-faad           faad codec (default disabled)])
-if test "${enable_faad}" = "yes"
-then
-  AC_ARG_WITH(faad-tree,
-  [  --with-faad-tree=PATH   faad tree for static linking])
-  if test -n "${with_faad_tree}"
-  then
+[  --enable-faad           faad codec (default auto)])
+if test "${enable_faad}" != "no"; then
+  AC_ARG_WITH(faad-tree,  [  --with-faad-tree=PATH   faad tree for static linking])
+  if test -n "${with_faad_tree}"; then
     AC_MSG_CHECKING(for libfaad.a in ${with_faad_tree})
     real_faad_tree="`cd ${with_faad_tree} 2>/dev/null && pwd`"
-    if test -z "${real_faad_tree}"
-    then
+    if test -z "${real_faad_tree}"; then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot cd to ${with_faad_tree}])
     fi
-    if test -f "${real_faad_tree}/libfaad/.libs/libfaad.a"
-    then
-      dnl  Use a custom faad
+    if test -f "${real_faad_tree}/libfaad/.libs/libfaad.a"; then
+      dnl  Use the custom faad
       AC_MSG_RESULT(${real_faad_tree}/libfaad/.libs/libfaad.a)
       VLC_ADD_PLUGIN([faad])
       VLC_ADD_LIBS([faad],[${real_faad_tree}/libfaad/.libs/libfaad.a])
@@ -2572,15 +2567,19 @@ then
     VLC_SAVE_FLAGS
     CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_faad}"
     LDFLAGS="${LDFLAGS} ${LIBS_faad}"
-    AC_CHECK_HEADERS(faad.h, ,
-      [ AC_MSG_ERROR([Cannot find development headers for libfaad...]) ])
-    AC_CHECK_LIB(faad, faacDecOpen, [
-      VLC_ADD_PLUGIN([faad])
-      VLC_ADD_LIBS([faad],[-lfaad]) ],
-      AC_CHECK_LIB(faad, NeAACDecOpen, [
-        VLC_ADD_PLUGIN([faad])
-        VLC_ADD_LIBS([faad],[-lfaad]) ],
-        [ AC_MSG_ERROR([Cannot find libfaad library...]) ]))
+    AC_CHECK_HEADERS(faad.h,
+      [ AC_CHECK_LIB(faad, faacDecOpen, [
+          VLC_ADD_PLUGIN([faad])
+          VLC_ADD_LIBS([faad],[-lfaad]) ], [
+            AC_CHECK_LIB(faad, NeAACDecOpen, [
+              VLC_ADD_PLUGIN([faad])
+              VLC_ADD_LIBS([faad],[-lfaad]) ], [
+                AS_IF([test "${enable_faad}" = "yes"],
+                [ AC_MSG_ERROR([Cannot find libfaad library...]) ],
+                [ AC_MSG_WARN([Cannot find libfaad library...]) ]) ]) ])
+      ] , [ AS_IF([test "${enable_faad}" = "yes"],
+        [ AC_MSG_ERROR([Cannot find development headers for libfaad...]) ],
+        [ AC_MSG_WARN([Cannot find development headers for libfaad...]) ]) ])
     VLC_RESTORE_FLAGS
   fi
 fi
