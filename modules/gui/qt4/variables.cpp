@@ -67,6 +67,11 @@ void QVLCPointer::trigger (vlc_value_t, vlc_value_t cur)
     emit pointerChanged (cur.p_address);
 }
 
+bool QVLCPointer::addCallback (QObject *tgt, const char *method,
+                               Qt::ConnectionType type)
+{
+    return tgt->connect (this, SIGNAL(pointerChanged(void *)), method, type);
+}
 
 QVLCInteger::QVLCInteger (vlc_object_t *obj, const char *varname, bool inherit)
     : QVLCVariable (obj, varname, VLC_VAR_INTEGER, inherit)
@@ -76,6 +81,12 @@ QVLCInteger::QVLCInteger (vlc_object_t *obj, const char *varname, bool inherit)
 void QVLCInteger::trigger (vlc_value_t, vlc_value_t cur)
 {
     emit integerChanged (cur.i_int);
+}
+
+bool QVLCInteger::addCallback (QObject *tgt, const char *method,
+                               Qt::ConnectionType type)
+{
+    return tgt->connect (this, SIGNAL(integerChanged(int64_t)), method, type);
 }
 
 QVLCBool::QVLCBool (vlc_object_t *obj, const char *varname, bool inherit)
@@ -88,6 +99,12 @@ void QVLCBool::trigger (vlc_value_t, vlc_value_t cur)
     emit boolChanged (cur.b_bool);
 }
 
+bool QVLCBool::addCallback (QObject *tgt, const char *method,
+                            Qt::ConnectionType type)
+{
+    return tgt->connect (this, SIGNAL(boolChanged(bool)), method, type);
+}
+
 QVLCFloat::QVLCFloat (vlc_object_t *obj, const char *varname, bool inherit)
     : QVLCVariable (obj, varname, VLC_VAR_FLOAT, inherit)
 {
@@ -96,6 +113,12 @@ QVLCFloat::QVLCFloat (vlc_object_t *obj, const char *varname, bool inherit)
 void QVLCFloat::trigger (vlc_value_t, vlc_value_t cur)
 {
     emit floatChanged (cur.f_float);
+}
+
+bool QVLCFloat::addCallback (QObject *tgt, const char *method,
+                            Qt::ConnectionType type)
+{
+    return tgt->connect (this, SIGNAL(floatChanged(float)), method, type);
 }
 
 QVLCString::QVLCString (vlc_object_t *obj, const char *varname, bool inherit)
@@ -107,4 +130,10 @@ void QVLCString::trigger (vlc_value_t, vlc_value_t cur)
 {
     QString str = qfu(cur.psz_string);
     emit stringChanged (str);
+}
+
+bool QVLCString::addCallback (QObject *tgt, const char *method,
+                              Qt::ConnectionType type)
+{
+    return tgt->connect (this, SIGNAL(stringChanged(QString)), method, type);
 }

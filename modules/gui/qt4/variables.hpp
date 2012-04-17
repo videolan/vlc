@@ -51,6 +51,8 @@ private:
 
 public:
     QVLCPointer (vlc_object_t *, const char *, bool inherit = false);
+    bool addCallback (QObject *, const char *,
+                      Qt::ConnectionType type = Qt::AutoConnection);
 
 signals:
     void pointerChanged (void *);
@@ -64,6 +66,8 @@ private:
 
 public:
     QVLCInteger (vlc_object_t *, const char *, bool inherit = false);
+    bool addCallback (QObject *, const char *,
+                      Qt::ConnectionType type = Qt::AutoConnection);
 
 signals:
     void integerChanged (int64_t);
@@ -77,6 +81,8 @@ private:
 
 public:
     QVLCBool (vlc_object_t *, const char *, bool inherit = false);
+    bool addCallback (QObject *, const char *,
+                      Qt::ConnectionType type = Qt::AutoConnection);
 
 signals:
     void boolChanged (bool);
@@ -90,6 +96,8 @@ private:
 
 public:
     QVLCFloat (vlc_object_t *, const char *, bool inherit = false);
+    bool addCallback (QObject *, const char *,
+                      Qt::ConnectionType type = Qt::AutoConnection);
 
 signals:
     void floatChanged (float);
@@ -103,6 +111,8 @@ private:
 
 public:
     QVLCString (vlc_object_t *, const char *, bool inherit = false);
+    bool addCallback (QObject *, const char *,
+                      Qt::ConnectionType type = Qt::AutoConnection);
 
 signals:
     void stringChanged (QString);
