@@ -131,8 +131,10 @@ vlc_module_begin ()
                  QSCALE_TEXT, QSCALE_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "mute-audio", true,
               AUDIO_TEXT, AUDIO_LONGTEXT, true )
+#if LIBAVCODEC_VERSION_MAJOR >= 54
     add_string( SOUT_CFG_PREFIX "options", NULL,
                 AV_OPTIONS_TEXT, AV_OPTIONS_LONGTEXT, true )
+#endif
 vlc_module_end ()
 
 static const char *const ppsz_sout_options[] = {
