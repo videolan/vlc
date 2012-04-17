@@ -307,7 +307,7 @@ UNPACK = $(RM) -R $@ \
 	$(foreach f,$(filter %.zip,$^), && unzip $(f))
 UNPACK_DIR = $(basename $(basename $(notdir $<)))
 APPLY = (cd $(UNPACK_DIR) && patch -p1) <
-pkg_static = (cd $(UNPACK_DIR) && ../../src/pkg-static.sh $(1))
+pkg_static = (cd $(UNPACK_DIR) && ../../../contrib/src/pkg-static.sh $(1))
 MOVE = mv $(UNPACK_DIR) $@ && touch $@
 
 AUTOMAKE_DATA_DIRS=$(abspath $(dir $(shell which automake))/../share/automake*)
