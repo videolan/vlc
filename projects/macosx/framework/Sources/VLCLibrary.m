@@ -61,8 +61,8 @@ static VLCLibrary * sharedLibrary = nil;
             [defaultParams addObject:@"--no-video-title-show"];                     // Don't show the title on overlay when starting to play
             [defaultParams addObject:@"--verbose=4"];                               // Let's not wreck the logs
 #if TARGET_OS_IPHONE
-            [defaultParams addObject:@"--ffmpeg-fast"];
-            [defaultParams addObject:@"--ffmpeg-skiploopfilter=all"];
+            [defaultParams addObject:@"--avcodec-fast"];
+            [defaultParams addObject:@"--avcodec-skiploopfilter=all"];
             [defaultParams addObject:@"--vout=vout_ios"];
             [defaultParams addObject:@"--aout=audioqueue"];
 #else

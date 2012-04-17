@@ -227,9 +227,9 @@ static const char *getMuxFromAlias( const char *psz_alias )
         { "ps",  "ps" },
         { "mpeg1","mpeg1" },
         { "wav", "wav" },
-        { "flv", "ffmpeg{mux=flv}" },
-        { "mkv", "ffmpeg{mux=matroska}"},
-        { "webm", "ffmpeg{mux=webm}"},
+        { "flv", "avformat{mux=flv}" },
+        { "mkv", "avformat{mux=matroska}"},
+        { "webm", "avformat{mux=webm}"},
     };
 
     if( !psz_alias )
@@ -303,9 +303,9 @@ static void checkAccessMux( sout_stream_t *p_stream, char *psz_access,
         msg_Err( p_stream, "mov and mp4 mux are only valid with file output" );
     else if( !strncmp( psz_access, "udp", 3 ) )
     {
-        if( !strncmp( psz_mux, "ffmpeg", 6 ) )
+        if( !strncmp( psz_mux, "ffmpeg", 6 ) || !strncmp( psz_mux, "avformat", 8 ) )
         {   /* why would you use ffmpeg's ts muxer ? YOU DON'T LOVE VLC ??? */
-            char *psz_ffmpeg_mux = var_CreateGetString( p_stream, "ffmpeg-mux" );
+            char *psz_ffmpeg_mux = var_CreateGetString( p_stream, "sout-avformat-mux" );
             if( !psz_ffmpeg_mux || strncmp( psz_ffmpeg_mux, "mpegts", 6 ) )
                 msg_Err( p_stream, "UDP output is only valid with TS mux" );
             free( psz_ffmpeg_mux );

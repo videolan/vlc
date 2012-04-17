@@ -255,9 +255,9 @@ void dropframe_cb( GtkMenuItem *menuitem, gpointer user_data )
     intf_thread_t *p_intf = (intf_thread_t *)user_data;
 
     if( gtk_check_menu_item_get_active( GTK_CHECK_MENU_ITEM( menuitem ) ) )
-        config_PutInt( p_intf, "ffmpeg-skip-frame", 1 );
+        config_PutInt( p_intf, "avcodec-skip-frame", 1 );
     else
-        config_PutInt( p_intf, "ffmpeg-skip-frame", 0 );
+        config_PutInt( p_intf, "avcodec-skip-frame", 0 );
 }
 
 static int keyModifiersToVLC( GdkEventKey *event )

@@ -618,7 +618,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     [self setupButton: o_input_avi_pop forIntList: "avi-index"];
 
     [self setupButton: o_input_rtsp_ckb forBoolValue: "rtsp-tcp"];
-    [self setupButton: o_input_skipLoop_pop forIntList: "ffmpeg-skiploopfilter"];
+    [self setupButton: o_input_skipLoop_pop forIntList: "avcodec-skiploopfilter"];
 
     [self setupButton: o_input_mkv_preload_dir_ckb forBoolValue: "mkv-preload-local-dir"];
 
@@ -955,7 +955,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         SaveIntList( o_input_avi_pop, "avi-index" );
 
         config_PutInt( p_intf, "rtsp-tcp", [o_input_rtsp_ckb state] );
-        SaveIntList( o_input_skipLoop_pop, "ffmpeg-skiploopfilter" );
+        SaveIntList( o_input_skipLoop_pop, "avcodec-skiploopfilter" );
 
         config_PutInt( p_intf, "mkv-preload-local-dir", [o_input_mkv_preload_dir_ckb state] );
 

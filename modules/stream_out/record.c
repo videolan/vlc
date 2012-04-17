@@ -276,7 +276,7 @@ static const muxer_properties_t p_muxers[] = {
     M( "wav", "wav", 1,         VLC_CODEC_U8,   VLC_CODEC_S16L,
                                 VLC_CODEC_S24L, VLC_CODEC_S32L, VLC_CODEC_FL32 ),
 
-    //M( "ffmpeg{mux=flac}", "flac", 1, VLC_CODEC_FLAC ), BROKEN
+    //M( "avformat{mux=flac}", "flac", 1, VLC_CODEC_FLAC ), BROKEN
 
     M( "ogg", "ogg", INT_MAX,   VLC_CODEC_VORBIS, VLC_CODEC_SPEEX,  VLC_CODEC_FLAC,
                                 VLC_CODEC_SUBT,   VLC_CODEC_THEORA, VLC_CODEC_DIRAC  ),
@@ -427,11 +427,11 @@ static void OutputStart( sout_stream_t *p_stream )
 #if 0
             // XXX ffmpeg sefault really easily if you try an unsupported codec
             // mov and avi at least segfault
-            { "ffmpeg{mux=avi}", "avi" },
-            { "ffmpeg{mux=mov}", "mov" },
-            { "ffmpeg{mux=mp4}", "mp4" },
-            { "ffmpeg{mux=nsv}", "nsv" },
-            { "ffmpeg{mux=flv}", "flv" },
+            { "avformat{mux=avi}", "avi" },
+            { "avformat{mux=mov}", "mov" },
+            { "avformat{mux=mp4}", "mp4" },
+            { "avformat{mux=nsv}", "nsv" },
+            { "avformat{mux=flv}", "flv" },
 #endif
             { NULL, NULL }
         };

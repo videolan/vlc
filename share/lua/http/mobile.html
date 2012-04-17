@@ -57,7 +57,7 @@
 				$('#buttonSout').click(function(){
 					var file			=	  decodeURIComponent($('#buttonPlay').attr('mrl'));
 					if(file){
-						var defaultStream	=	'new Current broadcast enabled input "'+file+'" output #transcode{vcodec=FLV1,vb=4096,fps=25,scale=1,acodec=mp3,ab=512,samplerate=44100,channels=2}:std{access='+$('#stream_protocol').val()+',mux=ffmpeg{{mux=flv}},dst=0.0.0.0:'+$('#stream_port').val()+'/'+$('#stream_file').val()+'}';
+						var defaultStream	=	'new Current broadcast enabled input "'+file+'" output #transcode{vcodec=FLV1,vb=4096,fps=25,scale=1,acodec=mp3,ab=512,samplerate=44100,channels=2}:std{access='+$('#stream_protocol').val()+',mux=avformat{{mux=flv}},dst=0.0.0.0:'+$('#stream_port').val()+'/'+$('#stream_file').val()+'}';
 						sendVLMCmd('del Current;'+defaultStream+';control Current play','window.location="mobile_view.html"');
 					}
 					return false;
