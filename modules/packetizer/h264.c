@@ -820,7 +820,7 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
     p_dec->fmt_out.i_level = bs_read( &s, 8 );
     /* sps id */
     i_sps_id = bs_read_ue( &s );
-    if( i_sps_id >= SPS_MAX )
+    if( i_sps_id >= SPS_MAX || i_sps_id < 0 )
     {
         msg_Warn( p_dec, "invalid SPS (sps_id=%d)", i_sps_id );
         free( pb_dec );
