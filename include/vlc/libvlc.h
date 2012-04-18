@@ -307,9 +307,83 @@ LIBVLC_API const char * libvlc_event_type_name( libvlc_event_type_t event_type )
 
 /** \defgroup libvlc_log LibVLC logging
  * libvlc_log_* functions provide access to the LibVLC messages log.
- * This is used for debugging or by advanced users.
+ * This is used for logging and debugging.
  * @{
  */
+
+/**
+ * Logging messages level.
+ * \note Future LibVLC versions may define new levels.
+ */
+enum libvlc_log_level
+{
+    LIBVLC_DEBUG=0 /**< Debug message */,
+    LIBVLC_NOTICE=2 /**< Important informational message */,
+    LIBVLC_WARNING=3 /**< Warning (potential error) message */,
+    LIBVLC_ERROR=4 /**< Error message */,
+};
+
+/**
+ * Callback prototype for LibVLC log message handler.
+ * \param data data pointer as given to libvlc_log_subscribe()
+ * \param level message level (@ref enum libvlc_log_level)
+ * \param fmt printf() format string (as defined by ISO C11)
+ * \param args variable argument list for the format
+ * \note Log message handlers <b>must</b> be thread-safe.
+ */
+typedef void (*libvlc_log_cb)(void *data, int level, const char *fmt,
+                              va_list args);
+
+/**
+ * Data structure for a LibVLC logging callbacks.
+ * \note This structure contains exactly 4 pointers and will never change.
+ * Nevertheless, it should not be accessed directly outside of LibVLC.
+ * (In fact, doing so would fail the thread memory model.)
+ */
+typedef struct libvlc_log_subscriber
+{
+    struct libvlc_log_subscriber *prev, *next;
+    libvlc_log_cb func;
+    void *opaque;
+} libvlc_log_subscriber_t;
+
+/**
+ * Registers a logging callback to LibVLC.
+ * This function is thread-safe.
+ *
+ * \param sub uninitialized subscriber structure
+ * \param cb callback function pointer
+ * \param data opaque data pointer for the callback function
+ *
+ * \note Some log messages (especially debug) are emitted by LibVLC while
+ * initializing, before any LibVLC instance even exists.
+ * Thus this function does not require a LibVLC instance parameter.
+ *
+ * \warning As a consequence of not depending on a LibVLC instance,
+ * all logging callbacks are shared by all LibVLC instances within the
+ * process / address space. This also enables log messages to be emitted
+ * by LibVLC components that are not specific to any given LibVLC instance.
+ *
+ * \warning Do not call this function from within a logging callback.
+ * It would trigger a dead lock.
+ */
+LIBVLC_API void libvlc_log_subscribe( libvlc_log_subscriber_t *sub,
+                                      libvlc_log_cb cb, void *data );
+
+/**
+ * Deregisters a logging callback from LibVLC.
+ * This function is thread-safe.
+ *
+ * \note After (and only after) libvlc_log_unsubscribe() has returned,
+ * LibVLC warrants that there are no more pending calls of the subscription
+ * callback function.
+ *
+ * \warning Do not call this function from within a logging callback.
+ * It would trigger a dead lock.
+ *
+ * \param sub initialized subscriber structure
+ */
+LIBVLC_API void libvlc_log_unsubscribe( libvlc_log_subscriber_t *sub );
 
 /**
  * Always returns minus one.
