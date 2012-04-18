@@ -257,12 +257,9 @@ ssize_t
 net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
           void *restrict p_buf, size_t i_buflen, bool waitall)
 {
-#ifndef POLLRDHUP /* This is nice but non-portable */
-# define POLLRDHUP 0
-#endif
     size_t i_total = 0;
     struct pollfd ufd[2] = {
-        { .fd = fd,                           .events = POLLIN|POLLRDHUP },
+        { .fd = fd,                           .events = POLLIN },
         { .fd = vlc_object_waitpipe (p_this), .events = POLLIN },
     };
 
@@ -271,8 +268,6 @@ net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
 
     while (i_buflen > 0)
     {
-        ufd[0].revents = ufd[1].revents = 0;
-
         if (poll (ufd, sizeof (ufd) / sizeof (ufd[0]), -1) < 0)
         {
             if (errno != EINTR)
@@ -285,7 +280,7 @@ net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
             /* Errors (-1) and EOF (0) will be returned on next call,
              * otherwise we'd "hide" the error from the caller, which is a
              * bad idea™. */
-            if (ufd[0].revents & (POLLERR|POLLNVAL|POLLRDHUP))
+            if (ufd[0].revents & (POLLERR|POLLNVAL))
                 break;
             if (ufd[1].revents)
                 break;
