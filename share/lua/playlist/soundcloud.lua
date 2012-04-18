@@ -23,19 +23,19 @@
 -- Probe function.
 function probe()
     return vlc.access == "http"
-        and string.match( vlc.path, "soundcloud\.com/.+/.+" )
+        and string.match( vlc.path, "soundcloud%.com/.+/.+" )
 end
 
 -- Parse function.
 function parse()
-    if string.match ( vlc.path, "soundcloud\.com" ) then
+    if string.match ( vlc.path, "soundcloud%.com" ) then
         while true do
             line = vlc.readline()
             if not line then break end
-            if string.match( line, "window\.SC\.bufferTracks\.push" ) then
+            if string.match( line, "window%.SC%.bufferTracks%.push" ) then
                 -- all the data is nicely stored on this one line
                 _,_,uid,token,name = string.find (line,
-                        "window\.SC\.bufferTracks\.push.*" ..
+                        "window%.SC%.bufferTracks%.push.*" ..
                         "\"uid\":\"([^\"]*)\".*" ..
                         "\"token\":\"([^\"]*)\".*" ..
                         "\"title\":\"([^\"]*)\"")
