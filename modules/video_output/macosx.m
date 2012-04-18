@@ -376,8 +376,8 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             vout_display_cfg_t cfg_tmp = *cfg;
             if (cfg_tmp.display.width < windowMinSize.width)
                 cfg_tmp.display.width = windowMinSize.width;
-            if (cfg_tmp.display.height < windowMinSize.height)
-                cfg_tmp.display.height = windowMinSize.height;
+            if (cfg_tmp.display.height < 70)
+                cfg_tmp.display.height = 70;
 
             NSRect bounds = [sys->glView bounds];
             if (!config_GetInt(vd, "macosx-video-autoresize"))

@@ -42,6 +42,8 @@
 #import <vlc_aout_intf.h>
 
 @implementation VLCMainWindow
+static const float f_min_video_height = 70.0;
+
 static VLCMainWindow *_o_sharedInstance = nil;
 
 + (VLCMainWindow *)sharedInstance
@@ -272,16 +274,27 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_volume_up_btn setEnabled: b_mute];
 
     /* interface builder action */
-    if ([self frame].size.height < 100)
+    float f_threshold_height = f_min_video_height + [o_bottombar_view frame].size.height;
+    if( b_dark_interface )
+        f_threshold_height += [o_titlebar_view frame].size.height;
+    if( [[self contentView] frame].size.height < f_threshold_height )
         b_splitviewShouldBeHidden = YES;
+
     [self setDelegate: self];
     [self setExcludedFromWindowsMenu: YES];
     [self setAcceptsMouseMovedEvents: YES];
     // Set that here as IB seems to be buggy
     if (b_dark_interface)
-        [self setContentMinSize:NSMakeSize(604., (288. + [o_titlebar_view frame].size.height))];
+    {
+        [self setContentMinSize:NSMakeSize(604., 288. + [o_titlebar_view frame].size.height)];
+        [o_detached_video_window setContentMinSize: NSMakeSize( 363., f_min_video_height + [o_detached_bottombar_view frame].size.height + [o_detached_titlebar_view frame].size.height )];
+    }
     else
+    {
         [self setContentMinSize:NSMakeSize(604., 288.)];
+        [o_detached_video_window setContentMinSize: NSMakeSize( 363., f_min_video_height + [o_detached_bottombar_view frame].size.height )];
+    }
+
     [self setTitle: _NS("VLC media player")];
     [o_time_fld setAlignment: NSCenterTextAlignment];
     [o_time_fld setNeedsDisplay:YES];
@@ -549,8 +562,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_split_view setAutosaveName:@"10thanniversary-splitview"];
     if (b_splitviewShouldBeHidden)
     {
-        i_lastSplitViewHeight = [o_split_view frame].size.height;
         [self hideSplitView];
+        i_lastSplitViewHeight = 300;
     }
 }
 
@@ -660,6 +673,42 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[o_dropzone_box animator] setFrame: plrect];
 }
 
+- (void)makeSplitViewVisible
+{
+    if( b_dark_interface )
+        [self setContentMinSize: NSMakeSize( 604., 288. + [o_titlebar_view frame].size.height )];
+    else
+        [self setContentMinSize: NSMakeSize( 604., 288. )];
+
+    NSRect old_frame = [self frame];
+    float newHeight = [self minSize].height;
+    if( old_frame.size.height < newHeight )
+    {
+        NSRect new_frame = old_frame;
+        new_frame.origin.y = old_frame.origin.y + old_frame.size.height - newHeight;
+        new_frame.size.height = newHeight;
+
+        [[self animator] setFrame: new_frame display: YES animate: YES];
+    }
+
+    [o_video_view setHidden: YES];
+    [o_split_view setHidden: NO];
+    [self makeFirstResponder: nil];
+
+}
+
+- (void)makeSplitViewHidden
+{
+    if( b_dark_interface )
+        [self setContentMinSize: NSMakeSize( 604., f_min_video_height + [o_titlebar_view frame].size.height )];
+    else
+        [self setContentMinSize: NSMakeSize( 604., f_min_video_height )];
+
+    [o_split_view setHidden: YES];
+    [o_video_view setHidden: NO];
+    [self makeFirstResponder: o_video_view];
+}
+
 - (IBAction)togglePlaylist:(id)sender
 {
     if (![self isVisible] && sender != nil)
@@ -703,17 +752,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         if (!b_nonembedded)
         {
-            if (([o_video_view isHidden] && b_activeVideo) || b_restored ) {
-                [o_split_view setHidden: YES];
-                [o_video_view setHidden: NO];
-                [self makeFirstResponder: o_video_view];
-            }
+            if (([o_video_view isHidden] && b_activeVideo) || b_restored )
+                [self makeSplitViewHidden];
             else
-            {
-                [o_video_view setHidden: YES];
-                [o_split_view setHidden: NO];
-                [self makeFirstResponder: nil];
-            }
+                [self makeSplitViewVisible];
         }
         else
         {
@@ -1128,8 +1170,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self setContentMinSize: NSMakeSize( 604., [o_bottombar_view frame].size.height )];
         [self setContentMaxSize: NSMakeSize( FLT_MAX, [o_bottombar_view frame].size.height )];
     }
-    if (i_lastSplitViewHeight < 100)
-        i_lastSplitViewHeight = 300; // random reasonable size
+
     b_splitview_removed = YES;
 }
 
@@ -1476,7 +1517,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
         [self setAlphaValue:1.0];
     }
-    
+
     if( b_nativeFullscreenMode )
     {
         if( [NSApp presentationOptions] & NSApplicationPresentationFullScreen )
@@ -1514,8 +1555,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     unsigned int i_height = nativeVideoSize.height;
     if (i_width < windowMinSize.width)
         i_width = windowMinSize.width;
-    if (i_height < windowMinSize.height)
-        i_height = windowMinSize.height;
+    if (i_height < f_min_video_height)
+        i_height = f_min_video_height;
 
     /* Calculate the window's new size */
     NSRect new_frame;
