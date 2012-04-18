@@ -235,10 +235,9 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
     va_end (ap);
 
 #ifdef WIN32
-    va_list dol;
-    va_copy (dol, args);
-    Win32DebugOutputMsg (&priv->i_verbose, type, &msg, format, dol);
-    va_end (dol);
+    va_copy (ap, args);
+    Win32DebugOutputMsg (&priv->i_verbose, type, &msg, format, ap);
+    va_end (ap);
 #endif
 
     vlc_rwlock_rdlock (&msg_lock);
