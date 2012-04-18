@@ -227,9 +227,9 @@ static void * EventDispatcherMainLoop(void * user_data)
 
     if( [NSThread isMainThread] )
     {
-        NSData *message = [NSData dataWithBytes:&message length:sizeof(message_t)];
-        [self addMessageToHandleOnMainThread:message];
-        [self callDelegateOfObjectAndSendNotificationWithArgs:[message retain] /* released in the call */];
+        NSData *nsd_message = [NSData dataWithBytes:&message length:sizeof(message_t)];
+        [self addMessageToHandleOnMainThread:nsd_message];
+        [self callDelegateOfObjectAndSendNotificationWithArgs:[nsd_message retain] /* released in the call */];
     }
     else
     {
