@@ -113,6 +113,25 @@ void libvlc_log_unsubscribe( libvlc_log_subscriber_t *sub )
     vlc_rwlock_unlock (&log_lock);
 }
 
+/*** Helpers for logging to files ***/
+static void libvlc_log_file (void *data, int level, const char *fmt,
+                             va_list ap)
+{
+    FILE *stream = data;
+
+    flockfile (stream);
+    vfprintf (stream, fmt, ap);
+    fputc ('\n', stream);
+    funlockfile (stream);
+    (void) level;
+}
+
+void libvlc_log_subscribe_file (libvlc_log_subscriber_t *sub, FILE *stream)
+{
+    libvlc_log_subscribe (sub, libvlc_log_file, stream);
+}
+
+/*** Stubs for the old interface ***/
 unsigned libvlc_get_log_verbosity( const libvlc_instance_t *p_instance )
 {
     (void) p_instance;

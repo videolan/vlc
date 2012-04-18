@@ -56,11 +56,13 @@
 # define LIBVLC_DEPRECATED
 #endif
 
+#include <stdio.h>
+#include <stdarg.h>
+
 # ifdef __cplusplus
 extern "C" {
 # endif
 
-#include <stdarg.h>
 #include <vlc/libvlc_structures.h>
 
 /** \defgroup libvlc_core LibVLC core
@@ -369,6 +371,15 @@ typedef struct libvlc_log_subscriber
  */
 LIBVLC_API void libvlc_log_subscribe( libvlc_log_subscriber_t *sub,
                                       libvlc_log_cb cb, void *data );
+
+
+/**
+ * Registers a logging callback to a file.
+ * @param stream FILE pointer opened for writing
+ *         (the FILE pointer must remain valid until libvlc_log_unsubscribe())
+ */
+LIBVLC_API void libvlc_log_subscribe_file( libvlc_log_subscriber_t *sub,
+                                           FILE *stream );
 
 /**
  * Deregisters a logging callback from LibVLC.
