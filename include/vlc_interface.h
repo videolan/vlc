@@ -96,19 +96,34 @@ struct intf_dialog_args_t
     struct interaction_dialog_t *p_dialog;
 };
 
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
 VLC_API int intf_Create( vlc_object_t *, const char * );
 #define intf_Create(a,b) intf_Create(VLC_OBJECT(a),b)
 
 VLC_API void libvlc_Quit( libvlc_int_t * );
 
+/**
+ * \defgroup vlc_subscription Log messages subscription
+ * These functions deal with log messages.
+ * @{
+ */
+
+/**
+ * Used by interface plugins which subscribe to the message bank.
+ */
+typedef struct msg_subscription_t msg_subscription_t;
+
+/**
+ * Message logging callback signature.
+ * Accepts one private data pointer, the message, and an overrun counter.
+ */
+typedef void (*msg_callback_t) (void *, int, const msg_item_t *,
+                                const char *, va_list);
+
+VLC_API msg_subscription_t *vlc_Subscribe(msg_callback_t, void *) VLC_USED;
+VLC_API void vlc_Unsubscribe(msg_subscription_t *);
+
 /*@}*/
 
-/*****************************************************************************
- * Macros
- *****************************************************************************/
 #if defined( WIN32 ) && !defined( UNDER_CE )
 #    define CONSOLE_INTRO_MSG \
          if( !getenv( "PWD" ) ) /* detect Cygwin shell or Wine */ \

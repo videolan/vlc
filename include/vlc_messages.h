@@ -62,14 +62,6 @@ typedef struct
     const char *psz_header; /**< Additional header (used by VLM media) */
 } msg_item_t;
 
-/**
- * Used by interface plugins which subscribe to the message bank.
- */
-typedef struct msg_subscription_t msg_subscription_t;
-
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
 VLC_API void vlc_Log(vlc_object_t *, int,
                      const char *, const char *, ...) VLC_FORMAT( 4, 5 );
 VLC_API void vlc_vaLog(vlc_object_t *, int,
@@ -84,16 +76,6 @@ VLC_API void vlc_vaLog(vlc_object_t *, int,
     vlc_Log( VLC_OBJECT(p_this), VLC_MSG_WARN, MODULE_STRING, __VA_ARGS__ )
 #define msg_Dbg( p_this, ... ) \
     vlc_Log( VLC_OBJECT(p_this), VLC_MSG_DBG,  MODULE_STRING, __VA_ARGS__ )
-
-/**
- * Message logging callback signature.
- * Accepts one private data pointer, the message, and an overrun counter.
- */
-typedef void (*msg_callback_t) (void *, int, const msg_item_t *,
-                                const char *, va_list);
-
-VLC_API msg_subscription_t *vlc_Subscribe(msg_callback_t, void *) VLC_USED;
-VLC_API void vlc_Unsubscribe(msg_subscription_t *);
 
 /**
  * @}

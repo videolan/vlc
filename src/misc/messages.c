@@ -32,8 +32,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-
 #include <stdarg.h>                                       /* va_list for BSD */
 #ifdef __APPLE__
 # include <xlocale.h>
@@ -41,13 +39,13 @@
 # include <locale.h>
 #endif
 #include <errno.h>                                                  /* errno */
+#include <assert.h>
 
+#include <vlc_common.h>
+#include <vlc_interface.h>
 #ifdef WIN32
 #   include <vlc_network.h>          /* 'net_strerror' and 'WSAGetLastError' */
 #endif
-
-#include <assert.h>
-
 #include <vlc_charset.h>
 #include "../libvlc.h"
 
