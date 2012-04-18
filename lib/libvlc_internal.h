@@ -80,8 +80,8 @@ struct libvlc_instance_t
  ***************************************************************************/
 
 /* Thread context */
-void libvlc_init_threads (void);
-void libvlc_deinit_threads (void);
+void libvlc_threads_init (void);
+void libvlc_threads_deinit (void);
 
 /* Events */
 libvlc_event_manager_t * libvlc_event_manager_new(

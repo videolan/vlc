@@ -40,11 +40,11 @@ static const char nomemstr[] = "Insufficient memory";
 
 libvlc_instance_t * libvlc_new( int argc, const char *const *argv )
 {
+    libvlc_threads_init ();
+
     libvlc_instance_t *p_new = malloc (sizeof (*p_new));
     if (unlikely(p_new == NULL))
         return NULL;
-
-    libvlc_init_threads ();
 
     const char *my_argv[argc + 2];
     my_argv[0] = "libvlc"; /* dummy arg0, skipped by getopt() et al */
@@ -74,8 +74,8 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv )
     return p_new;
 
 error:
-    libvlc_deinit_threads ();
     free (p_new);
+    libvlc_threads_deinit ();
     return NULL;
 }
 
@@ -107,7 +107,7 @@ void libvlc_release( libvlc_instance_t *p_instance )
         libvlc_InternalCleanup( p_instance->p_libvlc_int );
         libvlc_InternalDestroy( p_instance->p_libvlc_int );
         free( p_instance );
-        libvlc_deinit_threads ();
+        libvlc_threads_deinit ();
     }
 }
 
