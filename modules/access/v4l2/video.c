@@ -663,7 +663,7 @@ void StopMmap (int fd, struct buffer_t *bufv, uint32_t bufc)
 
     /* STREAMOFF implicitly dequeues all buffers */
     v4l2_ioctl (fd, VIDIOC_STREAMOFF, &type);
-    for (uint32_t i = bufc; i < bufc; i++)
+    for (uint32_t i = 0; i < bufc; i++)
         v4l2_munmap (bufv[i].start, bufv[i].length);
     free (bufv);
 }
