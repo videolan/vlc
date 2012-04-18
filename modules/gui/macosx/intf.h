@@ -75,7 +75,7 @@ struct intf_sys_t
     bool b_vout_update;
 
     /* The messages window */
-    msg_subscription_t * p_sub;
+    msg_subscription_t sub;
 };
 
 /*****************************************************************************

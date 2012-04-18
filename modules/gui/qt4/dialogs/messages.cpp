@@ -121,13 +121,13 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     readSettings( "Messages", QSize( 600, 450 ) );
 
     /* Hook up to LibVLC messaging */
-    sub = vlc_Subscribe( MsgCallback, this );
+    vlc_Subscribe( &sub, MsgCallback, this );
 }
 
 MessagesDialog::~MessagesDialog()
 {
     writeSettings( "Messages" );
-    vlc_Unsubscribe( sub );
+    vlc_Unsubscribe( &sub );
 };
 
 void MessagesDialog::changeVerbosity( int i_verbosity )

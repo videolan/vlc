@@ -55,13 +55,6 @@
 vlc_rwlock_t msg_lock = VLC_STATIC_RWLOCK;
 msg_subscription_t *msg_head;
 
-struct msg_subscription_t
-{
-    msg_subscription_t *prev, *next;
-    msg_callback_t  func;
-    void           *opaque;
-};
-
 /**
  * Subscribe to the message queue.
  * Whenever a message is emitted, a callback will be called.
@@ -69,14 +62,9 @@ struct msg_subscription_t
  *
  * @param cb callback function
  * @param opaque data for the callback function
- * @return a subscription pointer, or NULL in case of failure
  */
-msg_subscription_t *vlc_Subscribe (msg_callback_t cb, void *opaque)
+void vlc_Subscribe (msg_subscription_t *sub, msg_callback_t cb, void *opaque)
 {
-    msg_subscription_t *sub = malloc (sizeof (*sub));
-    if (sub == NULL)
-        return NULL;
-
     sub->prev = NULL;
     sub->func = cb;
     sub->opaque = opaque;
@@ -85,8 +73,6 @@ msg_subscription_t *vlc_Subscribe (msg_callback_t cb, void *opaque)
     sub->next = msg_head;
     msg_head = sub;
     vlc_rwlock_unlock (&msg_lock);
-
-    return sub;
 }
 
 /**
@@ -106,7 +92,6 @@ void vlc_Unsubscribe (msg_subscription_t *sub)
         msg_head = sub->next;
     }
     vlc_rwlock_unlock (&msg_lock);
-    free (sub);
 }
 
 /**

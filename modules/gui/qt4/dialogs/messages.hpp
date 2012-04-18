@@ -48,7 +48,7 @@ private:
     virtual ~MessagesDialog();
 
     Ui::messagesPanelWidget ui;
-    msg_subscription_t *sub;
+    msg_subscription_t sub;
     static void sinkMessage( void *, msg_item_t *, unsigned );
     void customEvent( QEvent * );
     void sinkMessage( const MsgEvent * );

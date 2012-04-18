@@ -108,18 +108,23 @@ VLC_API void libvlc_Quit( libvlc_int_t * );
  */
 
 /**
- * Used by interface plugins which subscribe to the message bank.
- */
-typedef struct msg_subscription_t msg_subscription_t;
-
-/**
  * Message logging callback signature.
  * Accepts one private data pointer, the message, and an overrun counter.
  */
 typedef void (*msg_callback_t) (void *, int, const msg_item_t *,
                                 const char *, va_list);
 
-VLC_API msg_subscription_t *vlc_Subscribe(msg_callback_t, void *) VLC_USED;
+/**
+ * Used by interface plugins which subscribe to the message bank.
+ */
+typedef struct msg_subscription
+{
+    struct msg_subscription *prev, *next;
+    msg_callback_t func;
+    void *opaque;
+} msg_subscription_t;
+
+VLC_API void vlc_Subscribe(msg_subscription_t *, msg_callback_t, void *);
 VLC_API void vlc_Unsubscribe(msg_subscription_t *);
 
 /*@}*/

@@ -190,7 +190,7 @@ struct intf_sys_t
     int             box_start;        // first line of box displayed
     int             box_idx;          // selected line
 
-    msg_subscription_t  *sub;         // message bank subscription
+    msg_subscription_t sub;         // message bank subscription
     struct
     {
         int              type;
@@ -1789,7 +1789,7 @@ static int Open(vlc_object_t *p_this)
     vlc_mutex_init(&sys->pl_lock);
 
     sys->verbosity = var_InheritInteger(intf, "verbose");
-    sys->sub = vlc_Subscribe(MsgCallback, sys);
+    vlc_Subscribe(&sys->sub, MsgCallback, sys);
 
     sys->box_type = BOX_PLAYLIST;
     sys->plidx_follow = true;
@@ -1842,7 +1842,7 @@ static void Close(vlc_object_t *p_this)
 
     endwin();   /* Close the ncurses interface */
 
-    vlc_Unsubscribe(sys->sub);
+    vlc_Unsubscribe(&sys->sub);
     vlc_mutex_destroy(&sys->msg_lock);
     vlc_mutex_destroy(&sys->pl_lock);
     for(unsigned i = 0; i < sizeof sys->msgs / sizeof *sys->msgs; i++) {
