@@ -435,7 +435,7 @@ static void HtmlPrint( void *opaque, int type, const msg_item_t *item,
     fprintf( stream, "%s%s: <span style=\"color: #%06x\">",
              item->psz_module, ppsz_type[type], color[type] );
     /* FIXME: encode special ASCII characters */
-    fprintf( stream, fmt, ap );
+    vfprintf( stream, fmt, ap );
     fputs( "</span>\n", stream );
     funlockfile( stream );
     vlc_restorecancel( canc );
