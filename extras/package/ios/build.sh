@@ -203,6 +203,7 @@ spopd
 if [ "$PLATFORM" = "OS" ]; then
   export AS="${IOS_GAS_PREPROCESSOR} ${CC}"
   export ASCPP="${IOS_GAS_PREPROCESSOR} ${CC}"
+  export CCAS="${IOS_GAS_PREPROCESSOR} ${CC}"
 else
   export AS="xcrun as"
   export ASCPP="xcrun as"
