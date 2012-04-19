@@ -941,7 +941,7 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
     p_ck->p_data      = p_sys->buffer + 12;
     p_ck->i_data      = p_ck->i_size2 - 8;
 
-    if( p_ck->i_type == 0x4524 )   // Transfer complete
+    if( p_ck->i_type == 0x4524 )   // $E (End-of-Stream Notification) Packet
     {
         if( p_ck->i_sequence == 0 )
         {
@@ -954,7 +954,7 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
             return VLC_EGENERIC;
         }
     }
-    else if( p_ck->i_type == 0x4324 )
+    else if( p_ck->i_type == 0x4324 ) // $C (Stream Change Notification) Packet
     {
         /* 0x4324 is CHUNK_TYPE_RESET: a new stream will follow with a sequence of 0 */
         msg_Warn( p_access, "next stream following (reset) seq=%d", p_ck->i_sequence  );
@@ -962,7 +962,12 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
     }
     else if( (p_ck->i_type != 0x4824) && (p_ck->i_type != 0x4424) )
     {
-        msg_Err( p_access, "invalid chunk FATAL (0x%x)", p_ck->i_type );
+        /* Unsupported so far:
+         * $M (Metadata) Packet               0x4D24
+         * $P (Packet-Pair) Packet            0x5024
+         * $T (Test Data Notification) Packet 0x5424
+         */
+        msg_Err( p_access, "unrecognized chunk FATAL (0x%x)", p_ck->i_type );
         return VLC_EGENERIC;
     }
 
