@@ -130,7 +130,7 @@ loop_col:
 	vsub.s16	chro_g, Gc, chro_g
 	vadd.s16	chro_b, Bc, chro_b
 
-	PLD	[U]
+	pld	[U]
 
 	/* Y Top Row */
 	vld2.u8	{y1,y2}, [Y1,:128]!
@@ -153,7 +153,7 @@ loop_col:
 	vqrshrun.s16	green2, green, #6
 	vqrshrun.s16	blue2, blue, #6
 
-	PLD	[Y1]
+	pld	[Y1]
 
 	vmov.u8	alpha2, #255
 	vzip.u8	red1, red2
@@ -184,7 +184,7 @@ loop_col:
 	vqrshrun.s16	green2, green, #6
 	vqrshrun.s16	blue2, blue, #6
 
-	PLD	[Y2]
+	pld	[Y2]
 
 	vmov.u8	alpha2, #255
 	vzip.u8	red1, red2
