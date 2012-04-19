@@ -508,7 +508,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     for (NSUInteger i = 0; i < count; i++)
     {
         s_rect = [[o_screens objectAtIndex: i] frame];
-        [o_submenu addItemWithTitle: [NSString stringWithFormat: @"%@ %i (%ix%i)", _NS("Screen"), i+1,
+        [o_submenu addItemWithTitle: [NSString stringWithFormat: @"%@ %li (%ix%i)", _NS("Screen"), i+1,
                                       (int)s_rect.size.width, (int)s_rect.size.height] action:@selector(toggleFullscreenDevice:) keyEquivalent:@""];
         o_mitem = [o_submenu itemAtIndex:i+1];
         [o_mitem setTag: (int)[[o_screens objectAtIndex: i] displayID]];

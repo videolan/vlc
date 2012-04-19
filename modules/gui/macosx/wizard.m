@@ -1122,17 +1122,17 @@ static VLCWizard *_o_sharedInstance = nil;
             if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
                 NSBeginInformationalAlertSheet(_NS("No folder selected"),
                     _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil,
-                    [NSString stringWithFormat: @"%@\n\n%@", _NS("A directory "
+                    @"%@\n\n%@", _NS("A directory "
                     "where to save the files has to be selected."),
                     _NS("Enter either a valid path or use the \"Choose...\" "
-                    "button to select a location.")]);
+                    "button to select a location."));
             else
                 NSBeginInformationalAlertSheet(_NS("No file selected"),
                     _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil,
-                    [NSString stringWithFormat: @"%@\n\n%@", _NS("A file "
+                    @"%@\n\n%@", _NS("A file "
                     "where to save the stream has to be selected."),
                     _NS("Enter either a valid path or use the \"Choose\" "
-                    "button to select a location.")]);
+                    "button to select a location."));
         } else {
             /* create a string containing the requested suffix for later usage */
             NSString * theEncapFormat = [[o_encapFormats objectAtIndex:
@@ -1423,7 +1423,7 @@ static VLCWizard *_o_sharedInstance = nil;
         /* do only show the destination of the first item and add a counter, if needed */
         if( [[o_userSelections objectForKey: @"trnscdFilePath"] count] > 1 )
             [o_t8_fld_saveFileTo setStringValue:
-                [NSString stringWithFormat: @"%@ (+%i)",
+                [NSString stringWithFormat: @"%@ (+%li)",
                 [[o_userSelections objectForKey: @"trnscdFilePath"] objectAtIndex:0],
                 ([[o_userSelections objectForKey: @"trnscdFilePath"] count] - 1)]];
         else

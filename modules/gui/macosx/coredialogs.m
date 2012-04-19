@@ -97,7 +97,7 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     dialog_fatal_t *p_dialog = [o_value pointerValue];
     NSAlert *o_alert;
 
-    o_alert = [NSAlert alertWithMessageText: [NSString stringWithUTF8String: p_dialog->title] defaultButton: _NS("OK") alternateButton: nil otherButton: nil informativeTextWithFormat: [NSString stringWithUTF8String: p_dialog->message]];
+    o_alert = [NSAlert alertWithMessageText: [NSString stringWithUTF8String: p_dialog->title] defaultButton: _NS("OK") alternateButton: nil otherButton: nil informativeTextWithFormat: @"%s", p_dialog->message];
     [o_alert setAlertStyle: NSCriticalAlertStyle];
     [o_alert runModal];
 }
@@ -116,7 +116,7 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     if( p_dialog->cancel != NULL )
         o_cancel = [NSString stringWithUTF8String: p_dialog->cancel];
 
-    o_alert = [NSAlert alertWithMessageText: [NSString stringWithUTF8String: p_dialog->title] defaultButton: o_yes alternateButton:o_no otherButton: o_cancel informativeTextWithFormat: [NSString stringWithUTF8String: p_dialog->message]];
+    o_alert = [NSAlert alertWithMessageText: [NSString stringWithUTF8String: p_dialog->title] defaultButton: o_yes alternateButton:o_no otherButton: o_cancel informativeTextWithFormat: @"%s", p_dialog->message];
     [o_alert setAlertStyle: NSInformationalAlertStyle];
     i_returnValue = [o_alert runModal];
 

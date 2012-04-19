@@ -983,7 +983,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         if( p_item->psz_text )
             o_labelString = _NS((char *)p_item->psz_text);
         else
-            o_labelString = [NSString stringWithString:@""];
+            o_labelString = @"";
         ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString, o_textfieldTooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
@@ -992,7 +992,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         if( p_item->value.psz )
             o_textfieldString = _NS((char *)p_item->value.psz);
         else
-            o_textfieldString = [NSString stringWithString: @""];
+            o_textfieldString = @"";
         if( p_item->i_type == CONFIG_ITEM_PASSWORD )
         {
             ADD_SECURETEXTFIELD( o_textfield, mainFrame, [o_label frame].size.width + 2,
@@ -1045,7 +1045,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     if( psz_value )
         o_textfieldString = _NS(psz_value);
     else
-        o_textfieldString = [NSString stringWithString: @""];
+        o_textfieldString = @"";
     free( psz_value );
     [super resetValues];
 }
@@ -1073,7 +1073,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         if( p_item->psz_text )
             o_labelString = _NS((char *)p_item->psz_text);
         else
-            o_labelString = [NSString stringWithString:@""];
+            o_labelString = @"";
         ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString, o_textfieldTooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
@@ -1188,7 +1188,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         if( p_item->psz_text )
             o_labelString = _NS((char *)p_item->psz_text);
         else
-            o_labelString = [NSString stringWithString:@""];
+            o_labelString = @"";
         ADD_LABEL( o_label, mainFrame, 0, 3, o_labelString, o_itemTooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
@@ -1203,7 +1203,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         if( p_item->value.psz )
             o_textfieldString = [NSString stringWithFormat: @"%s", (char *)p_item->value.psz];
         else
-            o_textfieldString = [NSString stringWithString: @""];
+            o_textfieldString = @"";
         ADD_TEXTFIELD( o_textfield, mainFrame, 12, 2, mainFrame.size.width -
                         8 - [o_button frame].size.width,
                         o_itemTooltip, o_textfieldString )
@@ -1271,7 +1271,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     if( psz_value )
         o_textfieldString = [NSString stringWithFormat: @"%s", psz_value];
     else
-        o_textfieldString = [NSString stringWithString: @""];
+        o_textfieldString = @"";
 
     free(psz_value);
     [super resetValues];
@@ -1299,7 +1299,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         if( p_item->psz_text )
             o_labelString = _NS((char *)p_item->psz_text);
         else
-            o_labelString = [NSString stringWithString:@""];
+            o_labelString = @"";
 
         ADD_LABEL( o_label, mainFrame, 0, -1, o_labelString, o_popupTooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
@@ -1469,7 +1469,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         if( p_item->psz_text )
             o_labelString = _NS((char *)p_item->psz_text);
         else
-            o_labelString = [NSString stringWithString:@""];
+            o_labelString = @"";
         ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString, o_tooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
@@ -1564,7 +1564,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         if( p_item->psz_text )
             o_labelString = _NS((char *)p_item->psz_text);
         else
-            o_labelString = [NSString stringWithString:@""];
+            o_labelString = @"";
         ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString, o_textfieldTooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
@@ -1664,7 +1664,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         if( p_item->psz_text )
             o_labelString = _NS((char *)p_item->psz_text);
         else
-            o_labelString = [NSString stringWithString:@""];
+            o_labelString = @"";
         ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString, o_tooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
@@ -1780,7 +1780,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         if( p_item->psz_text )
             o_labelString = _NS((char *)p_item->psz_text);
         else
-            o_labelString = [NSString stringWithString:@""];
+            o_labelString = @"";
         ADD_LABEL( o_label, mainFrame, 0, -2, o_labelString, o_tooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
@@ -1873,7 +1873,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         if( p_item->psz_text )
             o_labelString = _NS((char *)p_item->psz_text);
         else
-            o_labelString = [NSString stringWithString:@""];
+            o_labelString = @"";
         ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString, o_tooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
@@ -1993,7 +1993,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         if( p_item->psz_text )
             o_labelString = _NS((char *)p_item->psz_text);
         else
-            o_labelString = [NSString stringWithString:@""];
+            o_labelString = @"";
         ADD_LABEL( o_label, mainFrame, [o_checkbox frame].size.width, 0, o_labelString, o_tooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
@@ -2040,7 +2040,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         if( p_item->psz_text )
             o_labelString = _NS((char *)p_item->psz_text);
         else
-            o_labelString = [NSString stringWithString:@""];
+            o_labelString = @"";
         ADD_LABEL( o_label, mainFrame, 0, -1, o_labelString, o_tooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
@@ -2177,7 +2177,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         if( p_item->psz_text )
             o_labelString = _NS((char *)p_item->psz_text);
         else
-            o_labelString = [NSString stringWithString:@""];
+            o_labelString = @"";
         ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString, o_tooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
@@ -2186,7 +2186,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         if( p_item->value.psz )
             o_textfieldString = _NS((char *)p_item->value.psz);
         else
-            o_textfieldString = [NSString stringWithString: @""];
+            o_textfieldString = @"";
         ADD_TEXTFIELD( o_textfield, mainFrame, [o_label frame].size.width + 2,
                       mainFrame.size.height - 22, mainFrame.size.width -
                       [o_label frame].size.width - 2, o_tooltip, o_textfieldString )

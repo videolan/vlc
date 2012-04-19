@@ -372,8 +372,7 @@
         {
             NSMutableArray * o_sout_options;
             o_sout_options = [NSArray arrayWithObjects:
-                                    [NSString stringWithString:
-                                    @":demux=dump"],
+                                    @":demux=dump",
                                     [NSString stringWithFormat:
                                     @":demuxdump-file=%@",
                                     [o_file_field stringValue]],

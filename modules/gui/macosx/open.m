@@ -434,7 +434,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
                     @"subsdec-encoding=%@",
                     [o_file_sub_encoding_pop titleOfSelectedItem]]];
             [o_options addObject: [NSString stringWithFormat:
-                    @"subsdec-align=%i",
+                    @"subsdec-align=%li",
                     [o_file_sub_align_pop indexOfSelectedItem]]];
 
             p_item = config_FindConfig( VLC_OBJECT(p_intf),
@@ -1086,9 +1086,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
             int i_port = [o_net_udp_port intValue];
 
             if( [[o_net_udp_protocol_mat selectedCell] tag] == 0 )
-                o_mrl_string = [NSString stringWithString: @"udp://"];
+                o_mrl_string = @"udp://";
             else
-                o_mrl_string = [NSString stringWithString: @"rtp://"];
+                o_mrl_string = @"rtp://";
 
             if( i_port != config_GetInt( p_intf, "server-port" ) )
             {
@@ -1144,9 +1144,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
             int i_port = [o_net_udp_port intValue];
 
             if( [[o_net_udp_protocol_mat selectedCell] tag] == 0 )
-                o_mrl_string = [NSString stringWithString: @"udp://"];
+                o_mrl_string = @"udp://";
             else
-                o_mrl_string = [NSString stringWithString: @"rtp://"];
+                o_mrl_string = @"rtp://";
 
             if( i_port != config_GetInt( p_intf, "server-port" ) )
             {
