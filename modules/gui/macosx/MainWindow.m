@@ -720,6 +720,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
     BOOL b_activeVideo = [[VLCMain sharedInstance] activeVideoPlayback];
     BOOL b_restored = NO;
 
+    // TODO: implement toggle playlist in this situation (triggerd via menu item).
+    // but for now we block this case, to avoid displaying only the half
+    if( b_nativeFullscreenMode && b_fullscreen && b_activeVideo && sender != nil )
+        return;
+
     if (b_dropzone_active && !b_activeVideo && ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0)
     {
         b_dropzone_active = NO;
@@ -727,7 +732,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         return;
     }
 
-    if ( !b_splitview_removed && ( (([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0 && b_activeVideo)
+    if ( !(b_nativeFullscreenMode && b_fullscreen) && !b_splitview_removed && ( (([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0 && b_activeVideo)
                                   || (b_nonembedded && sender != nil)
                                   || (!b_activeVideo && sender != nil)
                                   || b_minimized_view ) )
