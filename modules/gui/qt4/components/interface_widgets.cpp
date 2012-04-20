@@ -352,7 +352,7 @@ SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, QWidget *parent )
     setFrameStyle( QFrame::StyledPanel | QFrame::Raised );
     setLineWidth( 1 );
 
-    setRate( var_InheritFloat( p_intf, "rate" ) );
+    setRate( var_InheritFloat( THEPL, "rate" ) );
 }
 
 SpeedLabel::~SpeedLabel()
