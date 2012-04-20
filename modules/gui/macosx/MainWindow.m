@@ -1120,6 +1120,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (![[VLCMain sharedInstance] activeVideoPlayback] || nativeVideoSize.width == 0. || nativeVideoSize.height == 0. || window != videoWindow)
         return proposedFrameSize;
 
+    // needed when entering lion fullscreen mode
+    if( b_fullscreen )
+        return proposedFrameSize;
+    
     if( [[VLCCoreInteraction sharedInstance] aspectRatioIsLocked] )
     {
         NSRect videoWindowFrame = [videoWindow frame];
