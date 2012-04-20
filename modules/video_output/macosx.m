@@ -343,8 +343,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 return VLC_SUCCESS; // this is okay, since the event will occur again when we have a window
 
             NSSize windowMinSize = [o_window minSize];
-            int i_width = 0;
-            int i_height = 0;
 
             const vout_display_cfg_t *cfg;
             const video_format_t *source;
@@ -379,9 +377,9 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             if (cfg_tmp.display.height < 70)
                 cfg_tmp.display.height = 70;
 
-            NSRect bounds = [sys->glView bounds];
             if (!config_GetInt(vd, "macosx-video-autoresize"))
             {
+                NSRect bounds = [sys->glView bounds];
                 cfg_tmp.display.width = bounds.size.width;
                 cfg_tmp.display.height = bounds.size.height;
             }
