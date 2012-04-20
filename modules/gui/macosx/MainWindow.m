@@ -2119,6 +2119,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     if ([[VLCMain sharedInstance] activeVideoPlayback])
         [o_bottombar_view setHidden: YES];
+    
+    [self setMovableByWindowBackground: NO];
 }
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
@@ -2159,6 +2161,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     if ([[VLCMain sharedInstance] activeVideoPlayback])
         [o_bottombar_view setHidden: NO];
+    
+    [self setMovableByWindowBackground: YES];
 }
 
 #pragma mark -
