@@ -296,7 +296,7 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *sub
 {
     vout_display_sys_t *sys = vd->sys;
     [sys->glView setVoutFlushing:YES];
-    vout_display_opengl_Display(sys->vgl, &vd->fmt );
+    vout_display_opengl_Display(sys->vgl, &vd->source );
     [sys->glView setVoutFlushing:NO];
     picture_Release (pic);
     sys->has_first_frame = true;
@@ -388,34 +388,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
             vout_display_PlacePicture (&place, source, &cfg_tmp, false);
 
-            if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP || query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT)
-            {
-                vd->fmt.i_width  = vd->source.i_width  * place.width  / vd->source.i_visible_width;
-                vd->fmt.i_height = vd->source.i_height * place.height / vd->source.i_visible_height;
-                vd->fmt.i_visible_width  = vd->source.i_visible_width;
-                vd->fmt.i_visible_height = vd->source.i_visible_height;
-                vd->fmt.i_x_offset = vd->source.i_x_offset * place.width  / vd->source.i_visible_width;
-                vd->fmt.i_y_offset = vd->source.i_y_offset * place.height / vd->source.i_visible_height;
-
-                if (vd->fmt.i_x_offset > 0)
-                {
-                    if (vd->source.i_width / vd->fmt.i_x_offset <= 4)
-                    {
-                        /* hack and special case for the "Default" state
-                         * The 'Default' state tries to set the dimensions with a huge x offset and a weird
-                         * width / height ratio, which definitely isn't the default for the played media. 
-                         * That's why, we enforce the media's actual dimensions here.
-                         * The quotient of 4 is a stochastic value, which isn't reached by any other crop state. */
-                        vd->fmt.i_width  = vd->source.i_width;
-                        vd->fmt.i_height = vd->source.i_height;
-                        vd->fmt.i_visible_width  = vd->source.i_width;
-                        vd->fmt.i_visible_height = vd->source.i_height;
-                        vd->fmt.i_x_offset = 0;
-                        vd->fmt.i_y_offset = 0;
-                    }
-                }
-            }
-
             /* For resize, we call glViewport in reshape and not here.
                This has the positive side effect that we avoid erratic sizing as we animate every resize. */
             if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
@@ -423,10 +395,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 // x / y are top left corner, but we need the lower left one
                 glViewport (place.x, cfg_tmp.display.height - (place.y + place.height), place.width, place.height);
             }
-
-            // this should not be needed, but currently it improves crop somehow, when we are in fullscreen
-            if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP)
-                [sys->glView performSelectorOnMainThread:@selector(reshapeView:) withObject:nil waitUntilDone:NO];
 
             [o_pool release];
             return VLC_SUCCESS;
