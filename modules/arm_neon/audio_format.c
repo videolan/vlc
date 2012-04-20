@@ -135,8 +135,10 @@ static block_t *Do_F32_S32 (filter_t *filter, block_t *inbuf)
 }
 #endif
 
-void s32_s16_neon_unaligned (int16_t *out, const int32_t *in, unsigned nb);
-void s32_s16_neon (int16_t *out, const int32_t *in, unsigned nb);
+extern void s32_s16_neon_unaligned (int16_t *out, const int32_t *in,
+                                    unsigned nb) asm("s32_s16_neon_unaligned");
+extern void s32_s16_neon (int16_t *out, const int32_t *in,
+                          unsigned nb) asm("s32_s16_neon");
 
 /**
  * Signed 32-bits fixed point to signed 16-bits integer
