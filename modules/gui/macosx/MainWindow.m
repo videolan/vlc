@@ -2095,8 +2095,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     
     [o_video_view setFrame: [[self contentView] frame]];
     b_fullscreen = YES;
-    [o_fspanel setVoutWasUpdated: (int)[[self screen] displayID]];
-    [o_fspanel setActive: nil];
 
     [self recreateHideMouseTimer];
     i_originalLevel = [self level];
@@ -2121,6 +2119,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_bottombar_view setHidden: YES];
     
     [self setMovableByWindowBackground: NO];
+}
+
+- (void)windowDidEnterFullScreen:(NSNotification *)notification
+{
+    [o_fspanel setVoutWasUpdated: (int)[[self screen] displayID]];
+    [o_fspanel setActive: nil];
 }
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
