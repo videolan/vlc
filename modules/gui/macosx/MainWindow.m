@@ -1514,8 +1514,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     BOOL b_videoPlayback = [[VLCMain sharedInstance] activeVideoPlayback];
 
-    if (!b_videoPlayback)
+    if( b_videoPlayback )
     {
+        // look for 'start at fullscreen'
+        [[VLCMain sharedInstance] fullscreenChanged];
+
+        [self makeFirstResponder: o_video_view];
+    }
+    else
+    {
+        [self makeFirstResponder: nil];
         [o_detached_video_window orderOut: nil];
 
         // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
@@ -1531,10 +1539,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         if (!b_videoPlayback)
             [o_fspanel setNonActive: nil];
     }
-    if (b_videoPlayback)
-        [self makeFirstResponder: o_video_view];
-    else
-        [self makeFirstResponder: nil];
 
     if (!b_videoPlayback && b_fullscreen)
     {
@@ -2075,6 +2079,15 @@ static VLCMainWindow *_o_sharedInstance = nil;
 #pragma mark Lion native fullscreen handling
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
+    var_SetBool( pl_Get( VLCIntf ), "fullscreen", true );
+    
+    vout_thread_t *p_vout = getVout();
+    if( p_vout )
+    {
+        var_SetBool( p_vout, "fullscreen", true );
+        vlc_object_release( p_vout );
+    }
+    
     [o_video_view setFrame: [[self contentView] frame]];
     b_fullscreen = YES;
     [o_fspanel setVoutWasUpdated: (int)[[self screen] displayID]];
@@ -2105,6 +2118,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
 {
+
+    var_SetBool( pl_Get( VLCIntf ), "fullscreen", false );
+    
+    vout_thread_t *p_vout = getVout();
+    if( p_vout )
+    {
+        var_SetBool( p_vout, "fullscreen", false );
+        vlc_object_release( p_vout );
+    }
+
     [o_video_view setFrame: [o_split_view frame]];
     [NSCursor setHiddenUntilMouseMoves: NO];
     [o_fspanel setNonActive: nil];

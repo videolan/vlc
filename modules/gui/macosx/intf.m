@@ -169,7 +169,8 @@ static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
     else if( i_query == VOUT_WINDOW_SET_FULLSCREEN )
     {
         NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-        [[VLCMain sharedInstance] fullscreenChanged];
+        // we already have our playlist "fullscreen" callback, do not repeat the same call here
+        //[[VLCMain sharedInstance] performSelectorOnMainThread:@selector(fullscreenChanged) withObject: nil waitUntilDone: NO];
         [o_pool release];
     }
     else
@@ -1385,7 +1386,11 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
     if (b_nativeFullscreenMode)
     {
-        [o_mainwindow toggleFullScreen: self];
+        // this is called twice in certain situations, so only toogle if we really need to
+        if( (  b_fullscreen && !([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen) ) || 
+            ( !b_fullscreen &&  ([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen) ) )
+            [o_mainwindow toggleFullScreen: self];
+
         if(b_fullscreen)
             [NSApp setPresentationOptions:(NSApplicationPresentationFullScreen | NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
         else
