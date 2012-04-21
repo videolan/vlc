@@ -334,12 +334,11 @@ FindFormat (vlc_object_t *obj, xcb_connection_t *conn, video_format_t *fmt,
             if (!var_GetBool (obj->p_libvlc, "xvideo-res-error"))
             {
                 dialog_FatalWait (obj, _("Video acceleration not available"),
-                    _("Your video output acceleration driver does not support "
-                      "the required resolution of %ux%u pixels. The supported "
-                      "resolution is %"PRIu32"x%"PRIu32".\n"
-                      "Video output acceleration will be disabled. However, "
-                      "rendering videos with overly large resolution "
-                      "may cause severe performance degration."),
+                    _("The XVideo rendering acceleration driver does not "
+                      "support the required resolution of %ux%u pixels but "
+                      "%"PRIu32"x%"PRIu32" pixels instead.\n"
+                      "Acceleration will thus be disabled. Performance may "
+                      "be degraded severely if the resolution is large."),
                                   width, height, i->width, i->height);
                 var_SetBool (obj->p_libvlc, "xvideo-res-error", true);
             }
