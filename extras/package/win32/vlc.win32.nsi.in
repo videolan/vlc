@@ -780,6 +780,13 @@ SectionEnd
 ;;; Start function
 Function .onInit
 
+@HAVE_WIN64_TRUE@ !include "x64.nsh"
+@HAVE_WIN64_TRUE@ ${If} ${RunningX64}
+@HAVE_WIN64_TRUE@ ${Else}
+@HAVE_WIN64_TRUE@    MessageBox MB_OK|MB_ICONSTOP "This version of VLC only runs on 64bits operating systems.$\nYour operating system is 32bits.$\n$\nPlease get the 32 BITS version."
+@HAVE_WIN64_TRUE@    Quit
+@HAVE_WIN64_TRUE@ ${Endif}
+
 @HAVE_WIN64_TRUE@ SetRegView 64
 ReadRegStr $INSTDIR HKLM "${PRODUCT_DIR_REGKEY}" ""
 StrCmp $INSTDIR "" 0 +1
