@@ -660,12 +660,12 @@ static void ConfigureChannelOrder(int *pi_chan_table, int i_channels, uint32_t i
 
     if( b_decode )
         aout_CheckChannelReorder( pi_channels_in, NULL,
-                                  i_channel_mask & AOUT_CHAN_PHYSMASK,
+                                  i_channel_mask,
                                   i_channels,
                                   pi_chan_table );
     else
         aout_CheckChannelReorder( NULL, pi_channels_in,
-                                  i_channel_mask & AOUT_CHAN_PHYSMASK,
+                                  i_channel_mask,
                                   i_channels,
                                   pi_chan_table );
 }

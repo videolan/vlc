@@ -300,7 +300,7 @@ void aout_FormatPrepare( audio_sample_format_t * p_format )
  *****************************************************************************/
 const char * aout_FormatPrintChannels( const audio_sample_format_t * p_format )
 {
-    switch ( p_format->i_physical_channels & AOUT_CHAN_PHYSMASK )
+    switch ( p_format->i_physical_channels )
     {
     case AOUT_CHAN_LEFT:
     case AOUT_CHAN_RIGHT:

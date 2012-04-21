@@ -123,8 +123,7 @@ static int Open( vlc_object_t *p_this, filter_sys_t *p_sys,
 
     /* We'll do our own downmixing, thanks. */
     p_sys->i_nb_channels = aout_FormatNbChannels( output );
-    switch ( (output->i_physical_channels & AOUT_CHAN_PHYSMASK)
-              & ~AOUT_CHAN_LFE )
+    switch ( output->i_physical_channels & ~AOUT_CHAN_LFE )
     {
     case AOUT_CHAN_CENTER:
         if ( (output->i_original_channels & AOUT_CHAN_CENTER)
@@ -214,7 +213,7 @@ static int Open( vlc_object_t *p_this, filter_sys_t *p_sys,
     }
 
     aout_CheckChannelReorder( pi_channels_in, NULL,
-                              output->i_physical_channels & AOUT_CHAN_PHYSMASK,
+                              output->i_physical_channels,
                               p_sys->i_nb_channels,
                               p_sys->pi_chan_table );
 

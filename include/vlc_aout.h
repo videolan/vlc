@@ -209,7 +209,7 @@ VLC_API void aout_ChannelExtract( void *p_dst, int i_dst_channels, const void *p
 /* */
 static inline unsigned aout_FormatNbChannels(const audio_sample_format_t *fmt)
 {
-    return popcount(fmt->i_physical_channels & AOUT_CHAN_PHYSMASK);
+    return popcount(fmt->i_physical_channels);
 }
 
 VLC_API unsigned int aout_BitsPerSample( vlc_fourcc_t i_format ) VLC_USED;
