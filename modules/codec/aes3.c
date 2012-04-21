@@ -352,7 +352,7 @@ static block_t *Parse( decoder_t *p_dec, int *pi_frame_length, int *pi_bits,
 
     p_dec->fmt_out.audio.i_channels = i_channels;
     p_dec->fmt_out.audio.i_original_channels = pi_original_channels[i_channels/2-1];
-    p_dec->fmt_out.audio.i_physical_channels = pi_original_channels[i_channels/2-1] & AOUT_CHAN_PHYSMASK;
+    p_dec->fmt_out.audio.i_physical_channels = pi_original_channels[i_channels/2-1];
 
     *pi_frame_length = (p_block->i_buffer - AES3_HEADER_LEN) / ( (4+i_bits) * i_channels / 8 );
     *pi_bits = i_bits;

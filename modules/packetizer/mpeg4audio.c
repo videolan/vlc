@@ -1211,8 +1211,7 @@ static void SetupOutput( decoder_t *p_dec, block_t *p_block )
 
 #if 0
     p_dec->fmt_out.audio.i_original_channels = p_sys->i_channels_conf;
-    p_dec->fmt_out.audio.i_physical_channels =
-        p_sys->i_channels_conf & AOUT_CHAN_PHYSMASK;
+    p_dec->fmt_out.audio.i_physical_channels = p_sys->i_channels_conf;
 #endif
 
     p_block->i_pts = p_block->i_dts = date_Get( &p_sys->end_date );

@@ -301,7 +301,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             p_dec->fmt_out.audio.i_rate     = p_sys->mlp.i_rate;
             p_dec->fmt_out.audio.i_channels = p_sys->mlp.i_channels;
             p_dec->fmt_out.audio.i_original_channels = p_sys->mlp.i_channels_conf;
-            p_dec->fmt_out.audio.i_physical_channels = p_sys->mlp.i_channels_conf & AOUT_CHAN_PHYSMASK;
+            p_dec->fmt_out.audio.i_physical_channels = p_sys->mlp.i_channels_conf;
 
             p_out_buffer->i_pts = p_out_buffer->i_dts = date_Get( &p_sys->end_date );
 
