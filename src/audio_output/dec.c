@@ -51,17 +51,6 @@ int aout_DecNew( audio_output_t *p_aout,
                  const aout_request_vout_t *p_request_vout )
 {
     /* Sanitize audio format */
-    if( p_format->i_channels > AOUT_CHAN_MAX )
-    {
-        msg_Err( p_aout, "too many audio channels (%u)",
-                 p_format->i_channels );
-        return -1;
-    }
-    if( p_format->i_channels <= 0 )
-    {
-        msg_Err( p_aout, "no audio channels" );
-        return -1;
-    }
     if( p_format->i_channels != aout_FormatNbChannels( p_format ) )
     {
         msg_Err( p_aout, "incompatible audio channels count with layout mask" );
