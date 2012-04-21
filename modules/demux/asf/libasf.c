@@ -1244,6 +1244,7 @@ static const struct
       ASF_ReadObject_codec_list, ASF_FreeObject_codec_list },
     { &asf_object_marker_guid, ASF_OBJECT_MARKER, NULL, NULL },
     { &asf_object_padding, ASF_OBJECT_PADDING, NULL, NULL },
+    { &asf_object_compatibility_guid, ASF_OBJECT_OTHER, NULL, NULL },
     { &asf_object_content_description_guid, ASF_OBJECT_CONTENT_DESCRIPTION,
       ASF_ReadObject_content_description, ASF_FreeObject_content_description },
     { &asf_object_language_list, ASF_OBJECT_OTHER,
