@@ -71,7 +71,7 @@ struct audio_format_t
 
     /* Describes the channels configuration of the samples (ie. number of
      * channels which are available in the buffer, and positions). */
-    uint32_t     i_physical_channels;
+    uint16_t     i_physical_channels;
 
     /* Describes from which original channels, before downmixing, the
      * buffer is derived. */
