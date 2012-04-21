@@ -774,7 +774,7 @@ static int Start( access_t *p_access, uint64_t i_pos )
 
     for( i = 1; i < 128; i++ )
     {
-        if( p_sys->asfh.stream[i].i_cat == ASF_STREAM_UNKNOWN )
+        if( p_sys->asfh.stream[i].i_cat == ASF_CODEC_TYPE_UNKNOWN )
             continue;
         i_streams++;
         if( p_sys->asfh.stream[i].i_selected )
@@ -816,7 +816,7 @@ static int Start( access_t *p_access, uint64_t i_pos )
 
     for( i = 1; i < 128; i++ )
     {
-        if( p_sys->asfh.stream[i].i_cat != ASF_STREAM_UNKNOWN )
+        if( p_sys->asfh.stream[i].i_cat != ASF_CODEC_TYPE_UNKNOWN )
         {
             int i_select = 2;
             if( p_sys->asfh.stream[i].i_selected )

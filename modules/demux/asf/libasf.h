@@ -190,7 +190,7 @@ typedef struct
 
 #define ASF_CODEC_TYPE_VIDEO    0x0001
 #define ASF_CODEC_TYPE_AUDIO    0x0002
-#define ASF_CODEC_TYPE_UNKNOW   0xffff
+#define ASF_CODEC_TYPE_UNKNOWN  0xffff
 
 typedef struct
 {

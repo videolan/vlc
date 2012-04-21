@@ -33,13 +33,13 @@
 
 #include "../../demux/asf/libasf_guid.h"
 
-#define ASF_STREAM_VIDEO    0x0001
-#define ASF_STREAM_AUDIO    0x0002
-#define ASF_STREAM_UNKNOWN  0xffff
+#define ASF_CODEC_TYPE_VIDEO   0x0001
+#define ASF_CODEC_TYPE_AUDIO   0x0002
+#define ASF_CODEC_TYPE_UNKNOWN 0xffff
 
 typedef struct
 {
-    int i_cat;      /* ASF_STREAM_VIDEO, ASF_STREAM_AUDIO */
+    int i_cat;      /* ASF_CODEC_TYPE_VIDEO, ASF_CODEC_TYPE_AUDIO, */
     int i_bitrate;  /* -1 if unknown */
     int i_selected;
 } asf_stream_t;

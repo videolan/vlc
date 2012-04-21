@@ -803,7 +803,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     for( i = 1; i < 128; i++ )
     {
 
-        if( p_sys->asfh.stream[i].i_cat != ASF_STREAM_UNKNOWN )
+        if( p_sys->asfh.stream[i].i_cat != ASF_CODEC_TYPE_UNKNOWN )
         {
             i_streams++;
             if( i_first != -1 )
@@ -821,7 +821,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
                 msg_Info( p_access,
                           "selecting stream[0x%x] %s (%d Kib/s)",
                           i,
-                          ( p_sys->asfh.stream[i].i_cat == ASF_STREAM_AUDIO  ) ?
+                          ( p_sys->asfh.stream[i].i_cat == ASF_CODEC_TYPE_AUDIO  ) ?
                                                   "audio" : "video" ,
                           p_sys->asfh.stream[i].i_bitrate / 1024);
             }
@@ -831,7 +831,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
                 msg_Info( p_access,
                           "ignoring stream[0x%x] %s (%d Kib/s)",
                           i,
-                          ( p_sys->asfh.stream[i].i_cat == ASF_STREAM_AUDIO  ) ?
+                          ( p_sys->asfh.stream[i].i_cat == ASF_CODEC_TYPE_AUDIO  ) ?
                                     "audio" : "video" ,
                           p_sys->asfh.stream[i].i_bitrate / 1024);
 

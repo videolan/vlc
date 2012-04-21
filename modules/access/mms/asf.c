@@ -52,7 +52,7 @@ void  asf_HeaderParse ( asf_header_t *hdr,
     hdr->i_min_data_packet_size = 0;
     for( unsigned i = 0; i < 128; i++ )
     {
-        hdr->stream[i].i_cat = ASF_STREAM_UNKNOWN;
+        hdr->stream[i].i_cat = ASF_CODEC_TYPE_UNKNOWN;
         hdr->stream[i].i_selected = 0;
         hdr->stream[i].i_bitrate = -1;
     }
@@ -140,15 +140,15 @@ void  asf_HeaderParse ( asf_header_t *hdr,
 
             if( guidcmp( &stream_type, &asf_object_stream_type_video ) )
             {
-                hdr->stream[i_stream_id].i_cat = ASF_STREAM_VIDEO;
+                hdr->stream[i_stream_id].i_cat = ASF_CODEC_TYPE_VIDEO;
             }
             else if( guidcmp( &stream_type, &asf_object_stream_type_audio ) )
             {
-                hdr->stream[i_stream_id].i_cat = ASF_STREAM_AUDIO;
+                hdr->stream[i_stream_id].i_cat = ASF_CODEC_TYPE_AUDIO;
             }
             else
             {
-                hdr->stream[i_stream_id].i_cat = ASF_STREAM_UNKNOWN;
+                hdr->stream[i_stream_id].i_cat = ASF_CODEC_TYPE_UNKNOWN;
             }
         }
         else if ( guidcmp( &guid, &asf_object_stream_bitrate_properties ) )
@@ -198,7 +198,7 @@ void  asf_StreamSelect  ( asf_header_t *hdr,
         /* select all valid stream */
         for( i = 1; i < 128; i++ )
         {
-            if( hdr->stream[i].i_cat != ASF_STREAM_UNKNOWN )
+            if( hdr->stream[i].i_cat != ASF_CODEC_TYPE_UNKNOWN )
             {
                 hdr->stream[i].i_selected = 1;
             }
@@ -229,11 +229,11 @@ void  asf_StreamSelect  ( asf_header_t *hdr,
      */
     for( i = 1; i < 128; i++ )
     {
-        if( hdr->stream[i].i_cat == ASF_STREAM_UNKNOWN )
+        if( hdr->stream[i].i_cat == ASF_CODEC_TYPE_UNKNOWN )
         {
             continue;
         }
-        else if( hdr->stream[i].i_cat == ASF_STREAM_AUDIO && b_audio &&
+        else if( hdr->stream[i].i_cat == ASF_CODEC_TYPE_AUDIO && b_audio &&
                  ( i_audio <= 0 ||
                     ( ( ( hdr->stream[i].i_bitrate > hdr->stream[i_audio].i_bitrate &&
                           ( i_bitrate_total + hdr->stream[i].i_bitrate - hdr->stream[i_audio].i_bitrate
@@ -259,7 +259,7 @@ void  asf_StreamSelect  ( asf_header_t *hdr,
             }
             i_audio = i;
         }
-        else if( hdr->stream[i].i_cat == ASF_STREAM_VIDEO && b_video &&
+        else if( hdr->stream[i].i_cat == ASF_CODEC_TYPE_VIDEO && b_video &&
                  ( i_video <= 0 ||
                     (
                         ( ( hdr->stream[i].i_bitrate > hdr->stream[i_video].i_bitrate &&
