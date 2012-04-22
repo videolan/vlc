@@ -320,4 +320,5 @@ end
 
 password = vlc.var.inherit(nil,"http-password")
 h = vlc.httpd()
+load_dir( http_dir )
 local a = h:handler("/art",nil,password,callback_art,nil)
