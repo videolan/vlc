@@ -66,6 +66,7 @@ enum {
     RAR_BLOCK_MARKER = 0x72,
     RAR_BLOCK_ARCHIVE = 0x73,
     RAR_BLOCK_FILE = 0x74,
+    RAR_BLOCK_SUBBLOCK = 0x7a,
     RAR_BLOCK_END = 0x7b,
 };
 enum {
@@ -90,7 +91,9 @@ static int PeekBlock(stream_t *s, rar_block_t *hdr)
     hdr->flags = GetWLE(&peek[3]);
     hdr->size  = GetWLE(&peek[5]);
     hdr->add_size = 0;
-    if (hdr->flags & 0x8000) {
+    if ((hdr->flags & 0x8000) ||
+        hdr->type == RAR_BLOCK_FILE ||
+        hdr->type == RAR_BLOCK_SUBBLOCK) {
         if (peek_size < 11)
             return VLC_EGENERIC;
         hdr->add_size = GetDWLE(&peek[7]);
