@@ -626,6 +626,21 @@ static VLCMain *_o_sharedMainInstance = nil;
     if (i_value > 0)
         var_SetInteger( pl_Get( VLCIntf ), "audio-device", i_value );
 
+    if (config_GetInt( VLCIntf, "macosx-icon-change"))
+    {
+        /* After day 354 of the year, the usual VLC cone is replaced by another cone
+         * wearing a Father Xmas hat.
+         * Note: this icon doesn't represent an endorsement of The Coca-Cola Company.
+         */
+        NSCalendar *gregorian =
+        [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+        NSUInteger dayOfYear = [gregorian ordinalityOfUnit:NSDayCalendarUnit inUnit:NSYearCalendarUnit forDate:[NSDate date]];
+        [gregorian release];
+
+        if (dayOfYear >= 354)
+            [[VLCApplication sharedApplication] setApplicationIconImage: [NSImage imageNamed:@"vlc-xmas"]];
+    }
+
     nib_main_loaded = TRUE;
 }
 

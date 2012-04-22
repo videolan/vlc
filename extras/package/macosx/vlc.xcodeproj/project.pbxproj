@@ -248,6 +248,7 @@
 		CC58012C1423A85300166912 /* fs_volume_slider_bar@x1.5.png in Resources */ = {isa = PBXBuildFile; fileRef = CC5801111423A85300166912 /* fs_volume_slider_bar@x1.5.png */; };
 		CC58012D1423A85300166912 /* fs_volume_slider_knob_highlight@x1.5.png in Resources */ = {isa = PBXBuildFile; fileRef = CC5801121423A85300166912 /* fs_volume_slider_knob_highlight@x1.5.png */; };
 		CC58012E1423A85300166912 /* fs_volume_slider_knob@x1.5.png in Resources */ = {isa = PBXBuildFile; fileRef = CC5801131423A85300166912 /* fs_volume_slider_knob@x1.5.png */; };
+		CC68B0331544C1AE00FD9C7F /* vlc-xmas.png in Resources */ = {isa = PBXBuildFile; fileRef = CC68B0321544C1AE00FD9C7F /* vlc-xmas.png */; };
 		CC78DA4413DE056700E9603C /* topbar_background.png in Resources */ = {isa = PBXBuildFile; fileRef = CC78DA4313DE056700E9603C /* topbar_background.png */; };
 		CC8062641021F8790021EB9A /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = CC8062631021F8790021EB9A /* dsa_pub.pem */; };
 		CC84FB2D130083BB00816D38 /* BGHUDAppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */; };
@@ -575,6 +576,7 @@
 		CC5801111423A85300166912 /* fs_volume_slider_bar@x1.5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "fs_volume_slider_bar@x1.5.png"; path = "Resources/fspanel/fs_volume_slider_bar@x1.5.png"; sourceTree = "<group>"; };
 		CC5801121423A85300166912 /* fs_volume_slider_knob_highlight@x1.5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "fs_volume_slider_knob_highlight@x1.5.png"; path = "Resources/fspanel/fs_volume_slider_knob_highlight@x1.5.png"; sourceTree = "<group>"; };
 		CC5801131423A85300166912 /* fs_volume_slider_knob@x1.5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "fs_volume_slider_knob@x1.5.png"; path = "Resources/fspanel/fs_volume_slider_knob@x1.5.png"; sourceTree = "<group>"; };
+		CC68B0321544C1AE00FD9C7F /* vlc-xmas.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "vlc-xmas.png"; path = "Resources/icons/vlc-xmas.png"; sourceTree = "<group>"; };
 		CC6C01A90DDF3E9200C7D754 /* intf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = intf.h; path = ../../../modules/gui/minimal_macosx/intf.h; sourceTree = SOURCE_ROOT; };
 		CC6C01AA0DDF3E9200C7D754 /* intf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = intf.m; path = ../../../modules/gui/minimal_macosx/intf.m; sourceTree = SOURCE_ROOT; };
 		CC6C01AB0DDF3E9200C7D754 /* macosx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = macosx.c; path = ../../../modules/gui/minimal_macosx/macosx.c; sourceTree = SOURCE_ROOT; };
@@ -827,6 +829,7 @@
 				CC0433A313B28B9C00D7D52E /* vlc.icns */,
 				CC0433A413B28B9C00D7D52E /* vob.icns */,
 				CC0433A513B28B9C00D7D52E /* wav.icns */,
+				CC68B0321544C1AE00FD9C7F /* vlc-xmas.png */,
 				CC0433A613B28B9C00D7D52E /* wma.icns */,
 				CC0433A713B28B9C00D7D52E /* wmv.icns */,
 			);
@@ -1539,6 +1542,7 @@
 				CC0F725315063C820086B6A0 /* fullscreen-one-button.png in Resources */,
 				CC0F725715063C980086B6A0 /* fullscreen-one-button_dark.png in Resources */,
 				CC0F725815063C980086B6A0 /* fullscreen-one-button-pressed_dark.png in Resources */,
+				CC68B0331544C1AE00FD9C7F /* vlc-xmas.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
