@@ -4015,7 +4015,7 @@ AC_ARG_ENABLE(growl,
 AS_IF([test "${enable_growl}" != "no"], [
     AC_CHECK_HEADERS(${CONTRIB_DIR}/Growl.framework/Versions/A/Headers/GrowlDefines.h, [
       VLC_ADD_PLUGIN([growl])
-      VLC_ADD_LIBS([growl], [-F${CONTRIB_DIR} -Wl,-framework,Growl,-framework,CoreFoundation])
+      VLC_ADD_LIBS([growl], [-F${CONTRIB_DIR} -Wl,-framework,Growl,-framework,Foundation])
       VLC_ADD_OBJCFLAGS([growl], [-F${CONTRIB_DIR}])
       VLC_ADD_OBJCFLAGS([growl], [-fobjc-exceptions] )
     ])
