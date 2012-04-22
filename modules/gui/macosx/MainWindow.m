@@ -2084,6 +2084,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 #pragma mark Lion native fullscreen handling
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
+    // workaround, see #6668
+    [NSApp setPresentationOptions:(NSApplicationPresentationFullScreen | NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
+
     var_SetBool( pl_Get( VLCIntf ), "fullscreen", true );
     
     vout_thread_t *p_vout = getVout();
