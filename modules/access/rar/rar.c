@@ -175,7 +175,7 @@ static int SkipFile(stream_t *s, int *count, rar_file_t ***file,
     uint16_t name_size = GetWLE(&peek[7+19]);
     uint32_t file_size_high = 0;
     if (hdr->flags & RAR_BLOCK_FILE_HAS_HIGH)
-        file_size_high = GetDWLE(&peek[7+25]);
+        file_size_high = GetDWLE(&peek[7+29]);
     const uint64_t file_size = ((uint64_t)file_size_high << 32) | file_size_low;
 
     char *name = calloc(1, name_size + 1);
