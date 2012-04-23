@@ -929,14 +929,13 @@ Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
         bands[i] = new QSlider( Qt::Vertical );
         bands[i]->setMaximum( 400 );
         bands[i]->setValue( 200 );
-        bands[i]->setMinimumWidth(40);
+        bands[i]->setMinimumWidth(36);
         CONNECT( bands[i], valueChanged( int ), this, setCoreBands() );
 
+        QString val = QString("%1").arg( 0.0, 5, 'f', 1 );
         band_texts[i] = new QLabel( (b_vlcBands ? vlc_band_frequencies[i]
-                                               : iso_band_frequencies[i]) + "\n0.0dB" );
+                                               : iso_band_frequencies[i]) + "\n" + val + "dB" );
         band_texts[i]->setFont( smallFont );
-        band_texts[i]->setAlignment( Qt::AlignRight );
-        bands[i]->setMinimumWidth(40);
 
         grid->addWidget( bands[i], 0, i );
         grid->addWidget( band_texts[i], 1, i );
