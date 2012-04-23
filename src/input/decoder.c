@@ -1138,21 +1138,18 @@ static void DecoderWaitDate( decoder_t *p_dec,
     if( *pb_reject || i_deadline < 0 )
         return;
 
-    for( ;; )
+    vlc_mutex_lock( &p_owner->lock );
+    do
     {
-        vlc_mutex_lock( &p_owner->lock );
         if( p_owner->b_flushing || p_owner->b_exit )
         {
             *pb_reject = true;
-            vlc_mutex_unlock( &p_owner->lock );
             break;
         }
-        int i_ret = vlc_cond_timedwait( &p_owner->wait_request, &p_owner->lock,
-                                        i_deadline );
-        vlc_mutex_unlock( &p_owner->lock );
-        if( i_ret )
-            break;
     }
+    while( vlc_cond_timedwait( &p_owner->wait_request, &p_owner->lock,
+                               i_deadline ) == 0 );
+    vlc_mutex_unlock( &p_owner->lock );
 }
 
 static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
