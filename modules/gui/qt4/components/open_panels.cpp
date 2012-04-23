@@ -452,6 +452,7 @@ void DiscOpenPanel::updateButtons()
         {
             setDrive( psz_dvddiscpath );
             m_discType = BRD;
+            ui.dvdsimple->setChecked( !var_InheritBool( p_intf, "bluray-menu" ) );
         }
         ui.titleLabel->setText( qtr("Title") );
         ui.chapterLabel->hide();
