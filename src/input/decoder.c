@@ -1135,10 +1135,11 @@ static void DecoderWaitDate( decoder_t *p_dec,
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
+    vlc_assert_locked( &p_owner->lock );
+
     if( *pb_reject || i_deadline < 0 )
         return;
 
-    vlc_mutex_lock( &p_owner->lock );
     do
     {
         if( p_owner->b_flushing || p_owner->b_exit )
@@ -1149,7 +1150,6 @@ static void DecoderWaitDate( decoder_t *p_dec,
     }
     while( vlc_cond_timedwait( &p_owner->wait_request, &p_owner->lock,
                                i_deadline ) == 0 );
-    vlc_mutex_unlock( &p_owner->lock );
 }
 
 static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
@@ -1215,8 +1215,6 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
         DecoderFixTs( p_dec, &p_audio->i_pts, NULL, &p_audio->i_length,
                       &i_rate, AOUT_MAX_ADVANCE_TIME );
 
-        vlc_mutex_unlock( &p_owner->lock );
-
         if( !p_aout ||
             p_audio->i_pts <= VLC_TS_INVALID ||
             i_rate < INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE ||
@@ -1228,6 +1226,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
 
         if( !b_reject )
         {
+            assert( !p_owner->b_paused );
             if( !aout_DecPlay( p_aout, p_audio, i_rate ) )
                 *pi_played_sum += 1;
             *pi_lost_sum += aout_DecGetResetLost( p_aout );
@@ -1244,9 +1243,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
         }
 
         if( !b_has_more )
-            return;
-
-        vlc_mutex_lock( &p_owner->lock );
+            break;
         if( !p_owner->buffer.p_audio )
             break;
     }
@@ -1593,13 +1590,12 @@ static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic )
         DecoderFixTs( p_dec, &p_subpic->i_start, &p_subpic->i_stop, NULL,
                       NULL, INT64_MAX );
 
-        vlc_mutex_unlock( &p_owner->lock );
-
         if( p_subpic->i_start <= VLC_TS_INVALID )
             b_reject = true;
 
         DecoderWaitDate( p_dec, &b_reject,
                          p_subpic->i_start - SPU_MAX_PREPARE_TIME );
+        vlc_mutex_unlock( &p_owner->lock );
 
         if( !b_reject )
             vout_PutSubpicture( p_vout, p_subpic );
