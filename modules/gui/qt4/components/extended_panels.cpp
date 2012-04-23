@@ -1,11 +1,12 @@
 /*****************************************************************************
  * extended_panels.cpp : Extended controls panels
  ****************************************************************************
- * Copyright (C) 2006-2008 the VideoLAN team
+ * Copyright (C) 2006-2012 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Antoine Cellerier <dionoea .t videolan d@t org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -928,12 +929,14 @@ Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
         bands[i] = new QSlider( Qt::Vertical );
         bands[i]->setMaximum( 400 );
         bands[i]->setValue( 200 );
-        bands[i]->setMinimumWidth(34);
+        bands[i]->setMinimumWidth(40);
         CONNECT( bands[i], valueChanged( int ), this, setCoreBands() );
 
-        band_texts[i] = new QLabel( b_vlcBands ? vlc_band_frequencies[i]
-                                               : iso_band_frequencies[i] + "\n00.0dB" );
+        band_texts[i] = new QLabel( (b_vlcBands ? vlc_band_frequencies[i]
+                                               : iso_band_frequencies[i]) + "\n0.0dB" );
         band_texts[i]->setFont( smallFont );
+        band_texts[i]->setAlignment( Qt::AlignRight );
+        bands[i]->setMinimumWidth(40);
 
         grid->addWidget( bands[i], 0, i );
         grid->addWidget( band_texts[i], 1, i );
