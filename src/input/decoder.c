@@ -1188,12 +1188,13 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
 
     for( ;; )
     {
-        bool b_has_more = false;
-        bool b_reject;
-        DecoderWaitUnblock( p_dec, &b_reject );
+        bool b_has_more = false, b_paused, b_reject;
 
+        DecoderWaitUnblock( p_dec, &b_reject );
         if( p_owner->b_buffering )
             break;
+
+        b_paused = p_owner->b_paused;
 
         /* */
         if( p_owner->buffer.p_audio )
@@ -1214,14 +1215,18 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
         DecoderFixTs( p_dec, &p_audio->i_pts, NULL, &p_audio->i_length,
                       &i_rate, AOUT_MAX_ADVANCE_TIME );
 
-        if( !p_aout ||
-            p_audio->i_pts <= VLC_TS_INVALID ||
-            i_rate < INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE ||
-            i_rate > INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE )
+        if( p_audio->i_pts <= VLC_TS_INVALID
+         || i_rate < INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE
+         || i_rate > INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE )
             b_reject = true;
 
         DecoderWaitDate( p_dec, &b_reject,
                          p_audio->i_pts - AOUT_MAX_PREPARE_TIME );
+
+        if( unlikely(p_owner->b_paused != b_paused) )
+            continue; /* race with input thread? retry... */
+        if( p_aout == NULL )
+            b_reject = true;
 
         if( !b_reject )
         {
