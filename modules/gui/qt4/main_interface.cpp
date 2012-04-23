@@ -210,7 +210,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
             CONNECT( this, askVideoToResize( unsigned int, unsigned int ),
                      this, setVideoSize( unsigned int, unsigned int ) );
             CONNECT( videoWidget, sizeChanged( int, int ),
-                     this, resizeStack( int,  int ) );
+                     this, videoSizeChanged( int,  int ) );
         }
         CONNECT( this, askVideoSetFullScreen( bool ),
                  this, setVideoFullScreen( bool ) );
@@ -681,6 +681,12 @@ void MainInterface::setVideoSize( unsigned int w, unsigned int h )
 {
     if( !isFullScreen() && !isMaximized() )
         videoWidget->SetSizing( w, h );
+}
+
+void MainInterface::videoSizeChanged( int w, int h )
+{
+    if( !playlistWidget || playlistWidget->artContainer->currentWidget() != videoWidget )
+        resizeStack( w, h );
 }
 
 void MainInterface::setVideoFullScreen( bool fs )

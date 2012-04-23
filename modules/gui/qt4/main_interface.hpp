@@ -238,6 +238,7 @@ private slots:
     }
 
     void setVideoSize( unsigned int, unsigned int );
+    void videoSizeChanged( int, int );
     void setVideoFullScreen( bool );
     void setVideoOnTop( bool );
     void setBoss();
