@@ -519,6 +519,8 @@ static void Play(audio_output_t *aout, block_t *block)
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
 
+    assert (sys->paused == VLC_TS_INVALID);
+
     const void *ptr = data_convert(&block);
     if (unlikely(ptr == NULL))
         return;
