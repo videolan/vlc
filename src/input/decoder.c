@@ -1193,10 +1193,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
         DecoderWaitUnblock( p_dec, &b_reject );
 
         if( p_owner->b_buffering )
-        {
-            vlc_mutex_unlock( &p_owner->lock );
-            return;
-        }
+            break;
 
         /* */
         if( p_owner->buffer.p_audio )
@@ -1247,15 +1244,13 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
         }
 
         if( !b_has_more )
-            break;
+            return;
 
         vlc_mutex_lock( &p_owner->lock );
         if( !p_owner->buffer.p_audio )
-        {
-            vlc_mutex_unlock( &p_owner->lock );
             break;
-        }
     }
+    vlc_mutex_unlock( &p_owner->lock );
 }
 
 static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
