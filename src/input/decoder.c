@@ -1017,8 +1017,10 @@ static void DecoderWaitUnblock( decoder_t *p_dec, bool *pb_reject )
 
     vlc_assert_locked( &p_owner->lock );
 
-    while( !p_owner->b_flushing )
+    for( ;; )
     {
+        if( p_owner->b_flushing )
+            break;
         if( p_owner->b_paused )
         {
             if( p_owner->b_buffering && !p_owner->buffer.b_full )
