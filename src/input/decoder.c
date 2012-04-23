@@ -1209,7 +1209,6 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
         }
 
         /* */
-        const bool b_dated = p_audio->i_pts > VLC_TS_INVALID;
         int i_rate = INPUT_RATE_DEFAULT;
 
         DecoderFixTs( p_dec, &p_audio->i_pts, NULL, &p_audio->i_length,
@@ -1233,11 +1232,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
         }
         else
         {
-            if( b_dated )
-                msg_Warn( p_dec, "received buffer in the future" );
-            else
-                msg_Warn( p_dec, "non-dated audio buffer received" );
-
+            msg_Dbg( p_dec, "discarded audio buffer" );
             *pi_lost_sum += 1;
             aout_BufferFree( p_audio );
         }
