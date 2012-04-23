@@ -1541,7 +1541,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [o_bottombar_view setHidden: b_videoPlayback];
         else
             [o_bottombar_view setHidden: NO];
-        if (!b_videoPlayback)
+        if( b_videoPlayback )
+            [o_fspanel setActive: nil];
+        else
             [o_fspanel setNonActive: nil];
     }
 
