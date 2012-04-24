@@ -132,7 +132,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
     /* Misc init */
     p_dec->p_sys->b_packetizer = false;
-    p_sys->b_invert = 0;
+    p_sys->b_invert = false;
 
     if( (int)p_dec->fmt_in.video.i_height < 0 )
     {
