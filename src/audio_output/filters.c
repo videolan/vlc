@@ -44,25 +44,33 @@
  * FindFilter: find an audio filter for a specific transformation
  *****************************************************************************/
 static filter_t * FindFilter( vlc_object_t *obj,
-                              const audio_sample_format_t * p_input_format,
-                              const audio_sample_format_t * p_output_format )
+                              const audio_sample_format_t *infmt,
+                              const audio_sample_format_t *outfmt )
 {
     static const char typename[] = "audio filter";
+    const char *type = "audio filter", *name = NULL;
     filter_t * p_filter;
 
     p_filter = vlc_custom_create( obj, sizeof(*p_filter), typename );
 
     if ( p_filter == NULL ) return NULL;
 
-    memcpy( &p_filter->fmt_in.audio, p_input_format,
-            sizeof(audio_sample_format_t) );
-    p_filter->fmt_in.i_codec = p_input_format->i_format;
-    memcpy( &p_filter->fmt_out.audio, p_output_format,
-            sizeof(audio_sample_format_t) );
-    p_filter->fmt_out.i_codec = p_output_format->i_format;
+    p_filter->fmt_in.audio = *infmt;
+    p_filter->fmt_in.i_codec = infmt->i_format;
+    p_filter->fmt_out.audio = *outfmt;
+    p_filter->fmt_out.i_codec = outfmt->i_format;
     p_filter->p_owner = NULL;
 
-    p_filter->p_module = module_need( p_filter, "audio filter", NULL, false );
+    if( infmt->i_format == outfmt->i_format
+     && infmt->i_physical_channels == outfmt->i_physical_channels
+     && infmt->i_original_channels == outfmt->i_original_channels )
+    {
+        assert( infmt->i_rate != outfmt->i_rate );
+        type = "audio resampler";
+        name = "$audio-resampler";
+    }
+
+    p_filter->p_module = module_need( p_filter, type, name, false );
     if ( p_filter->p_module == NULL )
     {
         vlc_object_release( p_filter );

@@ -295,6 +295,10 @@ static const char *const ppsz_snap_formats[] =
     "This delays the audio output. The delay must be given in milliseconds. " \
     "This can be handy if you notice a lag between the video and the audio.")
 
+#define AUDIO_RESAMPLER_TEXT N_("Audio resampler")
+#define AUDIO_RESAMPLER_LONGTEXT N_( \
+    "This selects which plugin to use for audio resampling." )
+
 #define MULTICHA_TEXT N_("Audio output channels mode")
 #define MULTICHA_LONGTEXT N_( \
     "This sets the audio output channels mode that will " \
@@ -1604,6 +1608,9 @@ vlc_module_begin ()
     add_integer( "audio-desync", 0, DESYNC_TEXT,
                  DESYNC_LONGTEXT, true )
         change_safe ()
+
+    add_module( "audio-resampler", "audio resampler", NULL,
+                AUDIO_RESAMPLER_TEXT, AUDIO_RESAMPLER_LONGTEXT, true )
 
     /* FIXME TODO create a subcat replay gain ? */
     add_string( "audio-replay-gain-mode", ppsz_replay_gain_mode[0], AUDIO_REPLAY_GAIN_MODE_TEXT,
