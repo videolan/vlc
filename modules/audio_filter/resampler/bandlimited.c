@@ -89,6 +89,10 @@ vlc_module_begin ()
     set_description( N_("Audio filter for band-limited interpolation resampling") )
     set_capability( "audio filter", 20 )
     set_callbacks( OpenFilter, CloseFilter )
+
+    add_submodule()
+    set_capability( "audio resampler", 20 )
+    set_callbacks( OpenFilter, CloseFilter )
 vlc_module_end ()
 
 /*****************************************************************************

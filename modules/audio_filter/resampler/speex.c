@@ -46,6 +46,10 @@ vlc_module_begin ()
         change_integer_range (0, 10)
     set_capability ("audio filter", 60)
     set_callbacks (Open, Close)
+
+    add_submodule ()
+    set_capability ("audio resampler", 60)
+    set_callbacks (Open, Close)
 vlc_module_end ()
 
 static block_t *Resample (filter_t *, block_t *);
