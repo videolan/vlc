@@ -128,6 +128,8 @@ int OpenMux( vlc_object_t *p_this )
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
     p_mux->p_sys = p_sys = malloc( sizeof( sout_mux_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     p_sys->oc = avformat_alloc_context();
     p_sys->oc->oformat = file_oformat;
