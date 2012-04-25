@@ -253,10 +253,11 @@ int OpenDemux( vlc_object_t *p_this )
 #if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(26<<8)+0)
     char *psz_opts = var_InheritString( p_demux, "avformat-options" );
     AVDictionary *options[p_sys->ic->nb_streams];
+    for (unsigned i = 0; i < p_sys->ic->nb_streams; i++)
+        options[i] = NULL;
     if (psz_opts && *psz_opts) {
         options[0] = vlc_av_get_options(psz_opts);
         for (unsigned i = 1; i < p_sys->ic->nb_streams; i++) {
-            options[i] = NULL;
             av_dict_copy(&options[i], options[0], 0);
         }
     }
