@@ -969,7 +969,7 @@ static const char *const ppsz_prefres[] = {
 
 #define HTTP_CRL_TEXT N_("HTTP/TLS Certificate Revocation List")
 #define CRL_LONGTEXT N_( \
-   "This file countains an optional CRL to prevent remove clients " \
+   "This file contains an optional CRL to prevent remove clients " \
    "from using revoked certificates in TLS sessions.")
 
 #define SOCKS_SERVER_TEXT N_("SOCKS server")

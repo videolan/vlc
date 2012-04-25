@@ -3095,7 +3095,7 @@ msgstr "HTTP/TLS証明書の廃止リストファイルを指定します。"
 
 #: src/libvlc-module.c:960
 msgid ""
-"This file countains an optional CRL to prevent remove clients from using "
+"This file contains an optional CRL to prevent remove clients from using "
 "revoked certificates in TLS sessions."
 msgstr ""
 "このファイルはTLSセッションで使われている廃止された証明書からクライアントを削"

@@ -3121,7 +3121,7 @@ msgstr "Файл зі списком відкликаних сертифікат
 
 #: src/libvlc-module.c:960
 msgid ""
-"This file countains an optional CRL to prevent remove clients from using "
+"This file contains an optional CRL to prevent remove clients from using "
 "revoked certificates in TLS sessions."
 msgstr ""
 

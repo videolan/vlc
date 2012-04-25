@@ -3143,7 +3143,7 @@ msgstr "Liste de révocations de certificats HTTP/TLS"
 
 #: src/libvlc-module.c:960
 msgid ""
-"This file countains an optional CRL to prevent remove clients from using "
+"This file contains an optional CRL to prevent remove clients from using "
 "revoked certificates in TLS sessions."
 msgstr ""
 "Ce fichier contient un CRL optionnel pour éviter que de clients  supprimés "
