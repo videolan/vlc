@@ -285,6 +285,7 @@ void matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag )
             goto done;
         }
     }
+    msg_Dbg( &sys.demuxer, "|   |   + %s: %s", k, v);
     vlc_meta_AddExtra( sys.meta, k, v );
 done:
     free( k );
