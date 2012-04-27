@@ -1440,12 +1440,12 @@ static void ASF_ObjectDumpDebug( vlc_object_t *p_obj,
         return;
 
     memset( str, ' ', sizeof( str ) );
-    for( i = 1; i < i_level; i++ )
+    for( i = 0; i < i_level; i++ )
     {
-        str[i * 5] = '|';
+        str[i * 4] = '|';
     }
-    snprintf( &str[5*i_level], sizeof(str) - 5*i_level,
-             "+ '%s' GUID "GUID_FMT" size:%"PRIu64"pos:%"PRIu64,
+    snprintf( &str[4*i_level], sizeof(str) - 5*i_level,
+             "+ '%s' GUID "GUID_FMT" size:%"PRIu64" pos:%"PRIu64,
              psz_name,
              GUID_PRINT( p_node->i_object_id ),
              p_node->i_object_size, p_node->i_object_pos );
