@@ -371,7 +371,8 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
  *****************************************************************************/
 void matroska_segment_c::InformationCreate( )
 {
-    sys.meta = vlc_meta_New();
+    if( !sys.meta )
+        sys.meta = vlc_meta_New();
 
     if( psz_title )
     {
