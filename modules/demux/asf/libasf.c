@@ -1445,10 +1445,18 @@ static void ASF_ObjectDumpDebug( vlc_object_t *p_obj,
         str[i * 4] = '|';
     }
     snprintf( &str[4*i_level], sizeof(str) - 5*i_level,
-             "+ '%s' GUID "GUID_FMT" size:%"PRIu64" pos:%"PRIu64,
-             psz_name,
-             GUID_PRINT( p_node->i_object_id ),
-             p_node->i_object_size, p_node->i_object_pos );
+             "+ '%s'"
+#ifdef ASF_DEBUG
+             "GUID "GUID_FMT" size:%"PRIu64" pos:%"PRIu64
+#endif
+             , psz_name
+
+#ifdef ASF_DEBUG
+             , GUID_PRINT( p_node->i_object_id ),
+             p_node->i_object_size, p_node->i_object_pos
+#endif
+             );
+
 
     msg_Dbg( p_obj, "%s", str );
 
