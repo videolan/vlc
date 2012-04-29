@@ -1,5 +1,5 @@
---- qt-everywhere-opensource-src-4.7.4/src/plugins/imageformats/imageformats.pro.orig	2011-11-10 18:56:04.617315921 -0500
-+++ qt-everywhere-opensource-src-4.7.4/src/plugins/imageformats/imageformats.pro	2011-11-10 18:56:39.269487754 -0500
+--- src/plugins/imageformats/imageformats.pro.orig	2011-11-10 18:56:04.617315921 -0500
++++ src/plugins/imageformats/imageformats.pro	2011-11-10 18:56:39.269487754 -0500
 @@ -1,8 +1,8 @@
  TEMPLATE = subdirs
  

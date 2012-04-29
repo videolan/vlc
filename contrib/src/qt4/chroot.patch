@@ -1,7 +1,7 @@
 Fix build when using a 32-bit chroot with a x86_64 kernel
 Native tools would be built with -m64
---- qt-everywhere-opensource-src-4.7.4/configure.orig	2011-11-11 14:48:12.944666802 -0500
-+++ qt-everywhere-opensource-src-4.7.4/configure	2011-11-11 14:48:55.108875882 -0500
+--- configure.orig	2011-11-11 14:48:12.944666802 -0500
++++ configure	2011-11-11 14:48:55.108875882 -0500
 @@ -168,7 +168,7 @@
  #-------------------------------------------------------------------------------
  
