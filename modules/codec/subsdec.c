@@ -666,6 +666,11 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                                 psz_subtitle++;
                                 i_len = strcspn( psz_subtitle, "\"" );
                             }
+                            else if( *psz_subtitle == '\'' )
+                            {
+                                psz_subtitle++;
+                                i_len = strcspn( psz_subtitle, "'" );
+                            }
                             else
                             {
                                 i_len = strcspn( psz_subtitle, " \t>" );
@@ -675,7 +680,7 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                             HtmlPut( &psz_html, "\"" );
 
                             psz_subtitle += i_len;
-                            if( *psz_subtitle == '\"' )
+                            if( *psz_subtitle == '\"' || *psz_subtitle == '\'' )
                                 psz_subtitle++;
                             break;
                         }
