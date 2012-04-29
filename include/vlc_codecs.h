@@ -255,6 +255,9 @@ ATTR_PACKED
 #define WAVE_FORMAT_FFMPEG_AAC          0x706D
 #define WAVE_FORMAT_DIVIO_AAC           0x4143 /* Divio's AAC */
 
+#define WAVE_FORMAT_GSM_AMR_FIXED       0x7A21 /* Fixed bitrate, no SID */
+#define WAVE_FORMAT_GSM_AMR             0x7A22 /* Variable bitrate, including SID */
+
 /* Need to check these */
 #define WAVE_FORMAT_DK3                 0x0061
 #define WAVE_FORMAT_DK4                 0x0062
@@ -376,6 +379,8 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_VORB_3PLUS, VLC_FOURCC( 'v', 'o', '3', '+' ), "Vorbis 3+ Audio" },
     { WAVE_FORMAT_SPEEX,      VLC_CODEC_SPEEX,                  "Speex Audio" },
     { WAVE_FORMAT_FLAC,       VLC_CODEC_FLAC,                   "FLAC Audio" },
+    { WAVE_FORMAT_GSM_AMR_FIXED, VLC_CODEC_AMR_NB,              "GSM-AMR Audio CBR, no SID" },
+    { WAVE_FORMAT_GSM_AMR,    VLC_CODEC_AMR_NB,                 "GSM-AMR Audio VBR, SID" },
     { WAVE_FORMAT_UNKNOWN,    VLC_FOURCC( 'u', 'n', 'd', 'f' ), "Unknown" }
 };
 
