@@ -836,8 +836,8 @@ static int DemuxInit( demux_t *p_demux )
             i_format = GetWLE( &p_data[0] );
             wf_tag_to_fourcc( i_format, &fmt.i_codec, NULL );
             fmt.audio.i_channels        = GetWLE(  &p_data[2] );
-            fmt.audio.i_rate      = GetDWLE( &p_data[4] );
-            fmt.i_bitrate         = GetDWLE( &p_data[8] ) * 8;
+            fmt.audio.i_rate            = GetDWLE( &p_data[4] );
+            fmt.i_bitrate               = GetDWLE( &p_data[8] ) * 8;
             fmt.audio.i_blockalign      = GetWLE(  &p_data[12] );
             fmt.audio.i_bitspersample   = GetWLE(  &p_data[14] );
 
@@ -951,8 +951,8 @@ static int DemuxInit( demux_t *p_demux )
                 else
                     wf_tag_to_fourcc( i_format, &fmt.i_codec, NULL );
                 fmt.audio.i_channels        = GetWLE(  &p_data[2] );
-                fmt.audio.i_rate      = GetDWLE( &p_data[4] );
-                fmt.i_bitrate         = GetDWLE( &p_data[8] ) * 8;
+                fmt.audio.i_rate            = GetDWLE( &p_data[4] );
+                fmt.i_bitrate               = GetDWLE( &p_data[8] ) * 8;
                 fmt.audio.i_blockalign      = GetWLE(  &p_data[12] );
                 fmt.audio.i_bitspersample   = GetWLE(  &p_data[14] );
                 fmt.b_packetized = true;
@@ -1122,7 +1122,6 @@ error:
 static void DemuxEnd( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int         i;
 
     if( p_sys->p_root )
     {
@@ -1135,7 +1134,7 @@ static void DemuxEnd( demux_t *p_demux )
         p_sys->meta = NULL;
     }
 
-    for( i = 0; i < 128; i++ )
+    for( int i = 0; i < 128; i++ )
     {
         asf_track_t *tk = p_sys->track[i];
 
