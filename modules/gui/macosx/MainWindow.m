@@ -1222,7 +1222,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         var_Get( p_input, "time", &time );
 
         mtime_t dur = input_item_GetDuration( input_GetItem( p_input ) );
-        if( [o_time_fld timeRemaining] && dur != -1 )
+        if( [o_time_fld timeRemaining] && dur > 0 )
         {
             o_time = [NSString stringWithFormat: @"-%s", secstotimestr( psz_time, ((dur - time.i_time) / 1000000))];
         }
