@@ -695,12 +695,17 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                             if( psz_subtitle[i_len] == '\"' )
                                 i_len++;
                         }
+                        /* Not a tag, something else we do not understand */
+                        if( i_len == 0 )
+                            *psz_subtitle++;
+
                         psz_subtitle += i_len;
                     }
                     while (*psz_subtitle == ' ')
                         *psz_html++ = *psz_subtitle++;
                 }
-                *psz_html++ = *psz_subtitle++;
+                *psz_html++ = '>';
+                *psz_subtitle++;
             }
             else if( !strncmp( psz_subtitle, "</", 2 ))
             {
