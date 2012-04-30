@@ -1541,9 +1541,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [o_bottombar_view setHidden: b_videoPlayback];
         else
             [o_bottombar_view setHidden: NO];
-        if( b_videoPlayback )
+        if( b_videoPlayback && b_fullscreen )
             [o_fspanel setActive: nil];
-        else
+        if( !b_videoPlayback )
             [o_fspanel setNonActive: nil];
     }
 
@@ -1847,8 +1847,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     id o_videoWindow = b_nonembedded ? o_detached_video_window : self;
     if( [o_videoWindow isVisible] )
         [o_videoWindow orderOut: self];
-
-    [o_fspanel setActive: nil];
 
     b_fullscreen = YES;
     [self unlockFullscreenAnimation];
