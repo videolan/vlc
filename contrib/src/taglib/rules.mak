@@ -1,7 +1,7 @@
 # TagLib
 
-TAGLIB_VERSION := 1.7
-TAGLIB_URL := http://developer.kde.org/~wheeler/files/src/taglib-$(TAGLIB_VERSION).tar.gz
+TAGLIB_VERSION := 1.7.2
+TAGLIB_URL := https://github.com/downloads/taglib/taglib/taglib-$(TAGLIB_VERSION).tar.gz
 
 PKGS += taglib
 
