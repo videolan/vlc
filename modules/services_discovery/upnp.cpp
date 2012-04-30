@@ -89,7 +89,13 @@ const char* xml_getChildElementAttributeValue( IXML_Element* p_parent,
                                         const char* psz_tag_name_,
                                         const char* psz_attribute_ );
 
+const char* xml_getChildElementValue( IXML_Document* p_doc,
+                                      const char*    psz_tag_name );
+
 IXML_Document* parseBrowseResult( IXML_Document* p_doc );
+
+int parseBrowseNumberValue( IXML_Document* p_doc,
+                            const char*    psz_tag_name );
 
 /*
  * Initializes UPNP instance.
@@ -214,16 +220,16 @@ const char* xml_getChildElementAttributeValue( IXML_Element* p_parent,
 }
 
 /*
- * Extracts the result document from a SOAP response
+ * Returns the value of a child element, or NULL on error
  */
-IXML_Document* parseBrowseResult( IXML_Document* p_doc )
+const char* xml_getChildElementValue( IXML_Document*  p_doc,
+                                      const char*     psz_tag_name_ )
 {
-    ixmlRelaxParser( 1 );
-
     if ( !p_doc ) return 0;
+    if ( !psz_tag_name_ ) return 0;
 
     IXML_NodeList* p_result_list = ixmlDocument_getElementsByTagName( p_doc,
-                                                                   "Result" );
+                                                                   psz_tag_name_ );
 
     if ( !p_result_list ) return 0;
 
@@ -236,13 +242,47 @@ IXML_Document* parseBrowseResult( IXML_Document* p_doc )
     IXML_Node* p_text_node = ixmlNode_getFirstChild( p_result_node );
     if ( !p_text_node ) return 0;
 
-    const char* psz_result_string = ixmlNode_getNodeValue( p_text_node );
+    return ixmlNode_getNodeValue( p_text_node );
+}
+
+/*
+ * Extracts the result document from a SOAP response
+ */
+IXML_Document* parseBrowseResult( IXML_Document* p_doc )
+{
+    ixmlRelaxParser( 1 );
+
+    const char* psz_result_string = xml_getChildElementValue( p_doc, "Result" );
+    if( !psz_result_string ) return 0;
 
     IXML_Document* p_browse_doc = ixmlParseBuffer( psz_result_string );
 
     return p_browse_doc;
 }
 
+/*
+ * Get the number value from a SOAP response
+ */
+int parseBrowseNumberValue( IXML_Document* p_doc,
+                            const char* psz_tag_name_ )
+{
+    ixmlRelaxParser( 1 );
+
+    const char* psz_number_string = xml_getChildElementValue( p_doc,
+                                                              psz_tag_name_ );
+    if( !psz_number_string ) return 0;
+
+    char *psz_end;
+    long l = strtol( psz_number_string, &psz_end, 10 );
+    if( *psz_end || l < 0 || l > INT_MAX )
+    {
+        return 0;
+    }
+    else
+    {
+        return (int)l;
+    }
+}
 
 /*
  * Handles all UPnP events
@@ -709,7 +749,7 @@ void MediaServer::fetchContents()
 
     Container* root = new Container( 0, "0", getFriendlyName() );
 
-    _fetchContents( root );
+    _fetchContents( root, 0 );
 
     _p_contents = root;
     _p_contents->setInputItem( _p_input_item );
@@ -720,7 +760,7 @@ void MediaServer::fetchContents()
 /*
  * Fetches and parses the UPNP response
  */
-bool MediaServer::_fetchContents( Container* p_parent )
+bool MediaServer::_fetchContents( Container* p_parent, int i_starting_index )
 {
     if (!p_parent)
     {
@@ -728,9 +768,21 @@ bool MediaServer::_fetchContents( Container* p_parent )
         return false;
     }
 
+    char* psz_starting_index;
+    if( asprintf( &psz_starting_index, "%d", i_starting_index ) < 0 )
+    {
+        msg_Err( _p_sd, "asprintf error:%d", i_starting_index );
+        return false;
+    }
+
     IXML_Document* p_response = _browseAction( p_parent->getObjectID(),
                                       "BrowseDirectChildren",
-                                      "*", "0", "0", "" );
+                                      "*", /* Filter */
+                                      psz_starting_index, /* StartingIndex */
+                                      "0", /* RequestedCount */
+                                      "" /* SortCriteria */
+                                      );
+    free( psz_starting_index );
     if ( !p_response )
     {
         msg_Err( _p_sd, "No response from browse() action" );
@@ -738,6 +790,12 @@ bool MediaServer::_fetchContents( Container* p_parent )
     }
 
     IXML_Document* p_result = parseBrowseResult( p_response );
+    int i_number_returned = parseBrowseNumberValue( p_response, "NumberReturned" );
+    int i_total_matches = parseBrowseNumberValue( p_response , "TotalMatches" );
+#ifndef NDEBUG
+    msg_Dbg( _p_sd, "i_starting_index[%d]i_number_returned[%d]_total_matches[%d]\n",
+             i_starting_index, i_number_returned, i_total_matches );
+#endif
     ixmlDocument_free( p_response );
 
     if ( !p_result )
@@ -777,7 +835,7 @@ bool MediaServer::_fetchContents( Container* p_parent )
 
             Container* container = new Container( p_parent, objectID, title );
             p_parent->addContainer( container );
-            _fetchContents( container );
+            _fetchContents( container, 0 );
         }
         ixmlNodeList_free( containerNodeList );
     }
@@ -833,6 +891,15 @@ bool MediaServer::_fetchContents( Container* p_parent )
     }
 
     ixmlDocument_free( p_result );
+
+    if( i_starting_index + i_number_returned < i_total_matches )
+    {
+        if( !_fetchContents( p_parent, i_starting_index + i_number_returned ) )
+        {
+            return false;
+        }
+    }
+
     return true;
 }
 

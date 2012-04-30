@@ -69,7 +69,7 @@ public:
 
 private:
 
-    bool _fetchContents( Container* p_parent );
+    bool _fetchContents( Container* p_parent, int i_starting_index );
     void _buildPlaylist( Container* p_container, input_item_node_t *p_item_node );
 
     IXML_Document* _browseAction( const char*, const char*,
