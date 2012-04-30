@@ -640,7 +640,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             if( p_stream->p_headers )
             {
                 memcpy( (unsigned char *)p_stream->p_headers + p_stream->i_headers - p_oggpacket->bytes,
-                        p_oggpacket->packet, p_stream->i_headers );
+                        p_oggpacket->packet, p_oggpacket->bytes );
             }
             else
             {
