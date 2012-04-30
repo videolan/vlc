@@ -579,7 +579,6 @@ struct encoder_sys_t
     int i_headers;
 
     int i_samples_delay;
-    int i_channels;
 
     FLAC__int32 *p_buffer;
     unsigned int i_buffer;
