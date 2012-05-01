@@ -121,6 +121,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    ixmlRelaxParser( 1 );
+
     p_sys->p_server_list = new MediaServerList( p_sd );
     vlc_mutex_init( &p_sys->callback_lock );
 
@@ -249,8 +251,6 @@ const char* xml_getChildElementValue( IXML_Document*  p_doc,
  */
 IXML_Document* parseBrowseResult( IXML_Document* p_doc )
 {
-    ixmlRelaxParser( 1 );
-
     const char* psz_result_string = xml_getChildElementValue( p_doc, "Result" );
     if( !psz_result_string ) return 0;
 
@@ -265,8 +265,6 @@ IXML_Document* parseBrowseResult( IXML_Document* p_doc )
 int xml_getNumber( IXML_Document* p_doc,
                    const char* psz_tag_name )
 {
-    ixmlRelaxParser( 1 );
-
     const char* psz = xml_getChildElementValue( p_doc, psz_tag_name );
     if( !psz ) return 0;
 
