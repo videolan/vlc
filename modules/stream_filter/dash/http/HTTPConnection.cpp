@@ -119,7 +119,7 @@ bool            HTTPConnection::parseHeader     ()
 
     while(line.compare("\r\n"))
     {
-        if(!line.compare(0, 14, "Content-Length"))
+        if(!strncasecmp(line.c_str(), "Content-Length", 14))
             this->contentLength = atoi(line.substr(15,line.size()).c_str());
 
         line = this->readLine();
