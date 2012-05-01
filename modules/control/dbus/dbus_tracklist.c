@@ -36,15 +36,56 @@
 #include "dbus_tracklist.h"
 #include "dbus_common.h"
 
+/**
+ * Retrieves the position of an input item in the playlist, given its id
+ *
+ * This function must be called with the playlist locked
+ *
+ * @param playlist_t*   p_playlist The playlist
+ * @param input_item_t* i_input_id An input item ID
+ *
+ * @return int The position of the input item or a VLC error constant
+ */
+static int getInputPosition( playlist_t* p_playlist, int i_input_id )
+{
+    input_item_t* p_input = NULL;
+
+    assert( p_playlist );
+    assert( i_input_id >= 0 );
+
+    playlist_AssertLocked( p_playlist );
+
+    for( int i = 0; i < playlist_CurrentSize( p_playlist ); i++ )
+    {
+        p_input = p_playlist->current.p_elems[i]->p_input;
+
+        if( !p_input )
+            return VLC_EGENERIC;
+
+        if( p_input->i_id == i_input_id )
+            return i;
+    }
+
+    return VLC_ENOITEM;
+}
+
 DBUS_METHOD( AddTrack )
-{ /* add the string to the playlist, and play it if the boolean is true */
+{
     REPLY_INIT;
 
     DBusError error;
     dbus_error_init( &error );
 
     char *psz_mrl, *psz_aftertrack;
+    playlist_t *p_playlist = PL;
     dbus_bool_t b_play;
+
+    int i_input_id = -1;
+    int i_mode = PLAYLIST_APPEND;
+    int i_pos  = PLAYLIST_END;
+
+    size_t i_append_len  = sizeof( DBUS_MPRIS_APPEND );
+    size_t i_notrack_len = sizeof( DBUS_MPRIS_NOTRACK );
 
     dbus_message_get_args( p_from, &error,
             DBUS_TYPE_STRING, &psz_mrl,
@@ -56,14 +97,43 @@ DBUS_METHOD( AddTrack )
     {
         msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s",
                 error.message );
+
         dbus_error_free( &error );
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-#warning psz_aftertrack is not used
-    playlist_Add( PL, psz_mrl, NULL, PLAYLIST_APPEND |
-            ( ( b_play == TRUE ) ? PLAYLIST_GO : 0 ) ,
-            PLAYLIST_END, true, false );
+    if( !strncmp( DBUS_MPRIS_APPEND, psz_aftertrack, i_append_len ) )
+    {
+        i_mode = PLAYLIST_APPEND;
+        i_pos  = PLAYLIST_END;
+    }
+    else if( !strncmp( DBUS_MPRIS_NOTRACK, psz_aftertrack, i_notrack_len ) )
+    {
+        i_mode = PLAYLIST_INSERT;
+        i_pos  = 0;
+    }
+    else if( 1 == sscanf( psz_aftertrack, MPRIS_TRACKID_FORMAT, &i_input_id ) )
+    {
+        PL_LOCK;
+        int i_res = getInputPosition( p_playlist, i_input_id );
+        PL_UNLOCK;
+
+        if( i_res < 0 )
+            goto invalidTrackID;
+
+        i_mode = PLAYLIST_INSERT;
+        i_pos  = i_res + 1;
+    }
+    else
+    {
+invalidTrackID:
+        msg_Warn( (vlc_object_t *) p_this,
+                "AfterTrack: Invalid track ID \"%s\", appending instead",
+                psz_aftertrack );
+    }
+
+    i_mode |= ( TRUE == b_play ) ? PLAYLIST_GO : 0;
+    playlist_Add( PL, psz_mrl, NULL, i_mode, i_pos, true, false );
 
     REPLY_SEND;
 }

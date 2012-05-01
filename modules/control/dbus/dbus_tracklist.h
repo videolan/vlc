@@ -34,6 +34,9 @@
 #define DBUS_MPRIS_TRACKLIST_INTERFACE    "org.mpris.MediaPlayer2.TrackList"
 #define DBUS_MPRIS_TRACKLIST_PATH         "/org/mpris/MediaPlayer2/TrackList"
 
+#define DBUS_MPRIS_NOTRACK   "/org/mpris/MediaPlayer2/TrackList/NoTrack"
+#define DBUS_MPRIS_APPEND    "/org/mpris/MediaPlayer2/TrackList/Append"
+
 /* Handle incoming dbus messages */
 DBusHandlerResult handle_tracklist ( DBusConnection *p_conn,
                                      DBusMessage *p_from,
