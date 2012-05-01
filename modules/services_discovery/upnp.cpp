@@ -85,17 +85,17 @@ static int Callback( Upnp_EventType event_type, void* p_event, void* p_user_data
 const char* xml_getChildElementValue( IXML_Element* p_parent,
                                       const char*   psz_tag_name );
 
-const char* xml_getChildElementAttributeValue( IXML_Element* p_parent,
-                                        const char* psz_tag_name_,
-                                        const char* psz_attribute_ );
-
 const char* xml_getChildElementValue( IXML_Document* p_doc,
                                       const char*    psz_tag_name );
 
-IXML_Document* parseBrowseResult( IXML_Document* p_doc );
+const char* xml_getChildElementAttributeValue( IXML_Element* p_parent,
+                                        const char* psz_tag_name,
+                                        const char* psz_attribute );
 
-int parseBrowseNumberValue( IXML_Document* p_doc,
-                            const char*    psz_tag_name );
+int xml_getNumber( IXML_Document* p_doc,
+                   const char*    psz_tag_name );
+
+IXML_Document* parseBrowseResult( IXML_Document* p_doc );
 
 /*
  * Initializes UPNP instance.
@@ -180,17 +180,18 @@ static void Close( vlc_object_t *p_this )
  * Returns the value of a child element, or NULL on error
  */
 const char* xml_getChildElementValue( IXML_Element* p_parent,
-                                      const char*   psz_tag_name_ )
+                                      const char*   psz_tag_name )
 {
-    if ( !p_parent ) return NULL;
-    if ( !psz_tag_name_ ) return NULL;
+    if( !p_parent )     return NULL;
+    if( !psz_tag_name ) return NULL;
 
-    IXML_NodeList* p_node_list = ixmlElement_getElementsByTagName( p_parent, psz_tag_name_ );
+    IXML_NodeList* p_node_list;
+    p_node_list = ixmlElement_getElementsByTagName( p_parent, psz_tag_name );
     if ( !p_node_list ) return NULL;
 
     IXML_Node* p_element = ixmlNodeList_item( p_node_list, 0 );
     ixmlNodeList_free( p_node_list );
-    if ( !p_element ) return NULL;
+    if ( !p_element )   return NULL;
 
     IXML_Node* p_text_node = ixmlNode_getFirstChild( p_element );
     if ( !p_text_node ) return NULL;
@@ -202,45 +203,43 @@ const char* xml_getChildElementValue( IXML_Element* p_parent,
  * Returns the value of a child element's attribute, or NULL on error
  */
 const char* xml_getChildElementAttributeValue( IXML_Element* p_parent,
-                                        const char* psz_tag_name_,
-                                        const char* psz_attribute_ )
+                                        const char* psz_tag_name,
+                                        const char* psz_attribute )
 {
-    if ( !p_parent ) return NULL;
-    if ( !psz_tag_name_ ) return NULL;
-    if ( !psz_attribute_ ) return NULL;
+    if ( !p_parent )      return NULL;
+    if ( !psz_tag_name )  return NULL;
+    if ( !psz_attribute ) return NULL;
 
-    IXML_NodeList* p_node_list = ixmlElement_getElementsByTagName( p_parent, psz_tag_name_ );
-    if ( !p_node_list ) return NULL;
+    IXML_NodeList* p_node_list;
+    p_node_list = ixmlElement_getElementsByTagName( p_parent, psz_tag_name );
+    if ( !p_node_list )   return NULL;
 
     IXML_Node* p_element = ixmlNodeList_item( p_node_list, 0 );
     ixmlNodeList_free( p_node_list );
-    if ( !p_element ) return NULL;
+    if ( !p_element )     return NULL;
 
-    return ixmlElement_getAttribute( (IXML_Element*) p_element, psz_attribute_ );
+    return ixmlElement_getAttribute( (IXML_Element*) p_element, psz_attribute );
 }
 
 /*
  * Returns the value of a child element, or NULL on error
  */
 const char* xml_getChildElementValue( IXML_Document*  p_doc,
-                                      const char*     psz_tag_name_ )
+                                      const char*     psz_tag_name )
 {
-    if ( !p_doc ) return 0;
-    if ( !psz_tag_name_ ) return 0;
+    if ( !p_doc )        return NULL;
+    if ( !psz_tag_name ) return NULL;
 
-    IXML_NodeList* p_result_list = ixmlDocument_getElementsByTagName( p_doc,
-                                                                   psz_tag_name_ );
+    IXML_NodeList* p_node_list;
+    p_node_list = ixmlDocument_getElementsByTagName( p_doc, psz_tag_name );
+    if ( !p_node_list )  return NULL;
 
-    if ( !p_result_list ) return 0;
+    IXML_Node* p_element = ixmlNodeList_item( p_node_list, 0 );
+    ixmlNodeList_free( p_node_list );
+    if ( !p_element )    return NULL;
 
-    IXML_Node* p_result_node = ixmlNodeList_item( p_result_list, 0 );
-
-    ixmlNodeList_free( p_result_list );
-
-    if ( !p_result_node ) return 0;
-
-    IXML_Node* p_text_node = ixmlNode_getFirstChild( p_result_node );
-    if ( !p_text_node ) return 0;
+    IXML_Node* p_text_node = ixmlNode_getFirstChild( p_element );
+    if ( !p_text_node )  return NULL;
 
     return ixmlNode_getNodeValue( p_text_node );
 }
@@ -263,25 +262,21 @@ IXML_Document* parseBrowseResult( IXML_Document* p_doc )
 /*
  * Get the number value from a SOAP response
  */
-int parseBrowseNumberValue( IXML_Document* p_doc,
-                            const char* psz_tag_name_ )
+int xml_getNumber( IXML_Document* p_doc,
+                   const char* psz_tag_name )
 {
     ixmlRelaxParser( 1 );
 
-    const char* psz_number_string = xml_getChildElementValue( p_doc,
-                                                              psz_tag_name_ );
-    if( !psz_number_string ) return 0;
+    const char* psz = xml_getChildElementValue( p_doc, psz_tag_name );
+    if( !psz ) return 0;
 
     char *psz_end;
-    long l = strtol( psz_number_string, &psz_end, 10 );
+    long l = strtol( psz, &psz_end, 10 );
+
     if( *psz_end || l < 0 || l > INT_MAX )
-    {
         return 0;
-    }
-    else
-    {
-        return (int)l;
-    }
+
+    return (int)l;
 }
 
 /*
@@ -760,7 +755,7 @@ void MediaServer::fetchContents()
 /*
  * Fetches and parses the UPNP response
  */
-bool MediaServer::_fetchContents( Container* p_parent, int i_starting_index )
+bool MediaServer::_fetchContents( Container* p_parent, int i_offset )
 {
     if (!p_parent)
     {
@@ -769,9 +764,9 @@ bool MediaServer::_fetchContents( Container* p_parent, int i_starting_index )
     }
 
     char* psz_starting_index;
-    if( asprintf( &psz_starting_index, "%d", i_starting_index ) < 0 )
+    if( asprintf( &psz_starting_index, "%d", i_offset ) < 0 )
     {
-        msg_Err( _p_sd, "asprintf error:%d", i_starting_index );
+        msg_Err( _p_sd, "asprintf error:%d", i_offset );
         return false;
     }
 
@@ -790,12 +785,14 @@ bool MediaServer::_fetchContents( Container* p_parent, int i_starting_index )
     }
 
     IXML_Document* p_result = parseBrowseResult( p_response );
-    int i_number_returned = parseBrowseNumberValue( p_response, "NumberReturned" );
-    int i_total_matches = parseBrowseNumberValue( p_response , "TotalMatches" );
+    int i_number_returned = xml_getNumber( p_response, "NumberReturned" );
+    int i_total_matches   = xml_getNumber( p_response , "TotalMatches" );
+
 #ifndef NDEBUG
-    msg_Dbg( _p_sd, "i_starting_index[%d]i_number_returned[%d]_total_matches[%d]\n",
-             i_starting_index, i_number_returned, i_total_matches );
+    msg_Dbg( _p_sd, "i_offset[%d]i_number_returned[%d]_total_matches[%d]\n",
+             i_offset, i_number_returned, i_total_matches );
 #endif
+
     ixmlDocument_free( p_response );
 
     if ( !p_result )
@@ -803,12 +800,9 @@ bool MediaServer::_fetchContents( Container* p_parent, int i_starting_index )
         msg_Err( _p_sd, "browse() response parsing failed" );
         return false;
     }
+
 #ifndef NDEBUG
-    else
-    {
-        msg_Dbg( _p_sd, "Got DIDL document: %s",
-                ixmlPrintDocument( p_result ) );
-    }
+    msg_Dbg( _p_sd, "Got DIDL document: %s", ixmlPrintDocument( p_result ) );
 #endif
 
     IXML_NodeList* containerNodeList =
@@ -892,13 +886,8 @@ bool MediaServer::_fetchContents( Container* p_parent, int i_starting_index )
 
     ixmlDocument_free( p_result );
 
-    if( i_starting_index + i_number_returned < i_total_matches )
-    {
-        if( !_fetchContents( p_parent, i_starting_index + i_number_returned ) )
-        {
-            return false;
-        }
-    }
+    if( i_offset + i_number_returned < i_total_matches )
+        return _fetchContents( p_parent, i_offset + i_number_returned );
 
     return true;
 }
