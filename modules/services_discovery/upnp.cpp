@@ -435,7 +435,8 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
                     strlen( MEDIA_SERVER_DEVICE_TYPE ) - 1 ) != 0 )
                 continue;
 
-            const char* psz_udn = xml_getChildElementValue( p_device_element, "UDN" );
+            const char* psz_udn = xml_getChildElementValue( p_device_element,
+                                                            "UDN" );
             if ( !psz_udn )
             {
                 msg_Warn( p_sd, "No UDN!" );
@@ -459,7 +460,8 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
                 continue;
             }
 
-            MediaServer* p_server = new MediaServer( psz_udn, psz_friendly_name, p_sd );
+            MediaServer* p_server = new MediaServer( psz_udn,
+                    psz_friendly_name, p_sd );
 
             if ( !p_sd->p_sys->p_server_list->addServer( p_server ) )
             {
@@ -478,7 +480,7 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
                       j < ixmlNodeList_length( p_service_list ); j++ )
                 {
                     IXML_Element* p_service_element =
-                        ( IXML_Element* ) ixmlNodeList_item( p_service_list, j );
+                       ( IXML_Element* ) ixmlNodeList_item( p_service_list, j );
 
                     const char* psz_service_type =
                         xml_getChildElementValue( p_service_element,
