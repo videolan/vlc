@@ -184,8 +184,8 @@ static void Close( vlc_object_t *p_this )
 const char* xml_getChildElementValue( IXML_Element* p_parent,
                                       const char*   psz_tag_name )
 {
-    if( !p_parent )     return NULL;
-    if( !psz_tag_name ) return NULL;
+    assert( p_parent );
+    assert( psz_tag_name );
 
     IXML_NodeList* p_node_list;
     p_node_list = ixmlElement_getElementsByTagName( p_parent, psz_tag_name );
@@ -208,9 +208,9 @@ const char* xml_getChildElementAttributeValue( IXML_Element* p_parent,
                                         const char* psz_tag_name,
                                         const char* psz_attribute )
 {
-    if ( !p_parent )      return NULL;
-    if ( !psz_tag_name )  return NULL;
-    if ( !psz_attribute ) return NULL;
+    assert( p_parent );
+    assert( psz_tag_name );
+    assert( psz_attribute );
 
     IXML_NodeList* p_node_list;
     p_node_list = ixmlElement_getElementsByTagName( p_parent, psz_tag_name );
@@ -229,8 +229,8 @@ const char* xml_getChildElementAttributeValue( IXML_Element* p_parent,
 const char* xml_getChildElementValue( IXML_Document*  p_doc,
                                       const char*     psz_tag_name )
 {
-    if ( !p_doc )        return NULL;
-    if ( !psz_tag_name ) return NULL;
+    assert( p_doc );
+    assert( psz_tag_name );
 
     IXML_NodeList* p_node_list;
     p_node_list = ixmlDocument_getElementsByTagName( p_doc, psz_tag_name );
@@ -251,8 +251,12 @@ const char* xml_getChildElementValue( IXML_Document*  p_doc,
  */
 IXML_Document* parseBrowseResult( IXML_Document* p_doc )
 {
+    assert( p_doc );
+
     const char* psz_result_string = xml_getChildElementValue( p_doc, "Result" );
-    if( !psz_result_string ) return 0;
+
+    if( !psz_result_string )
+        return NULL;
 
     IXML_Document* p_browse_doc = ixmlParseBuffer( psz_result_string );
 
@@ -265,8 +269,13 @@ IXML_Document* parseBrowseResult( IXML_Document* p_doc )
 int xml_getNumber( IXML_Document* p_doc,
                    const char* psz_tag_name )
 {
+    assert( p_doc );
+    assert( psz_tag_name );
+
     const char* psz = xml_getChildElementValue( p_doc, psz_tag_name );
-    if( !psz ) return 0;
+
+    if( !psz )
+        return 0;
 
     char *psz_end;
     long l = strtol( psz, &psz_end, 10 );
@@ -410,8 +419,12 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
             IXML_Element* p_device_element =
                    ( IXML_Element* ) ixmlNodeList_item( p_device_list, i );
 
-            const char* psz_device_type = xml_getChildElementValue( p_device_element,
-                                                               "deviceType" );
+            if( !p_device_element )
+                continue;
+
+            const char* psz_device_type =
+                xml_getChildElementValue( p_device_element, "deviceType" );
+
             if ( !psz_device_type )
             {
                 msg_Warn( p_sd, "No deviceType found!" );
