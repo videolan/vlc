@@ -15,10 +15,10 @@ $(TARBALLS)/zlib-$(ZLIB_VERSION).tar.gz:
 zlib: zlib-$(ZLIB_VERSION).tar.gz .sum-zlib
 	$(UNPACK)
 	$(APPLY) $(SRC)/zlib/zlib-wince.patch
+	$(APPLY) $(SRC)/zlib/zlib-osx.patch
 	$(MOVE)
 
 .zlib: zlib
-	#$(RECONF)
 	cd $< && $(HOSTVARS) ./configure --prefix=$(PREFIX) --static
 	cd $< && $(MAKE) install
 	touch $@

@@ -1,0 +1,12 @@
+diff -ru zlib.orig/configure zlib/configure
+--- zlib.orig/configure	2012-04-30 23:41:03.155668067 -0400
++++ zlib/configure	2012-04-30 23:41:13.787667975 -0400
+@@ -206,7 +206,7 @@
+              SHAREDLIBV=libz.$VER$shared_ext
+              SHAREDLIBM=libz.$VER1$shared_ext
+              LDSHARED=${LDSHARED-"$cc -dynamiclib -install_name $libdir/$SHAREDLIBM -compatibility_version $VER1 -current_version $VER3"}
+-             AR="libtool"
++             AR="/usr/bin/libtool"
+              ARFLAGS="-o" ;;
+   *)             LDSHARED=${LDSHARED-"$cc -shared"} ;;
+   esac
