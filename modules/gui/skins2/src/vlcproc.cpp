@@ -190,6 +190,8 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
 
     // initialize variables refering to liblvc and playlist objects
     init_variables();
+
+    interaction_Register( pIntf );
 }
 
 
