@@ -81,7 +81,7 @@ DIST_rsrc = \
 	vlc_wince_rc.rc
 
 DIST_icons = \
-	vlc48x48.ico. \
+	vlc48x48.ico \
 	vlc512x512.png
 
 DIST_skins2 = \
