@@ -87,17 +87,22 @@ vlc_module_begin ()
 
     add_float_with_range( "contrast", 1.0, 0.0, 2.0,
                           CONT_TEXT, CONT_LONGTEXT, false )
+        change_safe()
     add_float_with_range( "brightness", 1.0, 0.0, 2.0,
                            LUM_TEXT, LUM_LONGTEXT, false )
+        change_safe()
     add_integer_with_range( "hue", 0, 0, 360,
                             HUE_TEXT, HUE_LONGTEXT, false )
+        change_safe()
     add_float_with_range( "saturation", 1.0, 0.0, 3.0,
                           SAT_TEXT, SAT_LONGTEXT, false )
+        change_safe()
     add_float_with_range( "gamma", 1.0, 0.01, 10.0,
                           GAMMA_TEXT, GAMMA_LONGTEXT, false )
-
+        change_safe()
     add_bool( "brightness-threshold", false,
               THRES_TEXT, THRES_LONGTEXT, false )
+        change_safe()
 
     add_shortcut( "adjust" )
     set_callbacks( Create, Destroy )
