@@ -86,17 +86,6 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     return self;
 }
 
-- (id)initWithArray:(NSArray *)array
-{
-    self = [self init];
-    if (!self)
-        return nil;
-
-    for (VLCMedia *media in array)
-        [self addMedia:media];
-    return self;
-}
-
 - (void)dealloc
 {
     libvlc_event_manager_t *em = libvlc_media_list_event_manager(p_mlist);

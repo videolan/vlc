@@ -58,12 +58,6 @@ extern NSString * VLCMediaListItemDeleted;
     NSMutableArray * cachedMedia;                   //< Private copy of media objects.
 }
 
-/**
- * Init a MediaList with the media contained in array.
- * \array an array of VLCMedia.
- */
-- (id)initWithArray:(NSArray *)array;
-
 /* Operations */
 /**
  * TODO: Documentation - [VLCMediaList lock]
