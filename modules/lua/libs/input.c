@@ -175,6 +175,56 @@ static int vlclua_input_metas_internal( lua_State *L, input_item_t *p_item )
     return 1;
 }
 
+static int vlclua_input_item_es_state( lua_State *L )
+{
+    /* HACK to add ES state */
+    input_thread_t *p_input = vlclua_get_input_internal( L );
+    lua_newtable( L );
+    if( p_input )
+    {
+#define ES_STATUS_UNKNOWN  "Unknown"
+#define ES_STATUS_DISABLED "Disabled"
+#define ES_STATUS_ENABLED  "Enabled"
+#define ES_STATUS_ERROR    "Error"
+
+#define PUSH_ES_STATE( n, m ) \
+        lua_pushstring( L, n ); \
+        lua_setfield( L, -2, m )
+
+        const char* ppsz_es_cat[] = { "unknown-es", "video-es", "audio-es", "spu-es", "nav-es" };
+        const int cat[] = { UNKNOWN_ES, VIDEO_ES, AUDIO_ES, SPU_ES, NAV_ES };
+
+        for( unsigned int i = 0; i < ARRAY_SIZE(cat); i++ )
+        {
+             input_es_state_e es_state = input_GetEsState( p_input, cat[i] );
+             switch( es_state )
+             {
+                case INPUT_ES_STATE_DISABLED:
+                     PUSH_ES_STATE( ES_STATUS_DISABLED, ppsz_es_cat[i] );
+                     break;
+                case INPUT_ES_STATE_ENABLED:
+                     PUSH_ES_STATE( ES_STATUS_ENABLED, ppsz_es_cat[i] );
+                     break;
+                case INPUT_ES_STATE_ERROR:
+                     PUSH_ES_STATE( ES_STATUS_ERROR, ppsz_es_cat[i] );
+                     break;
+                default:
+                     PUSH_ES_STATE( ES_STATUS_UNKNOWN, ppsz_es_cat[i] );
+                     break;
+            }
+        }
+
+#undef PUSH_ES_STATE
+#undef ES_STATUS_UNKNOWN
+#undef ES_STATUS_DISABLED
+#undef ES_STATUS_ENABLED
+#undef ES_STATUS_ERROR
+
+        vlc_object_release( p_input );
+    }
+    return 1;
+}
+
 static int vlclua_input_item_stats( lua_State *L )
 {
     input_item_t *p_item = vlclua_input_item_get_internal( L );
@@ -406,6 +456,7 @@ static const luaL_Reg vlclua_input_item_reg[] = {
     { "duration", vlclua_input_item_duration },
     { "stats", vlclua_input_item_stats },
     { "info", vlclua_input_item_info },
+    { "es_state", vlclua_input_item_es_state },
     { NULL, NULL }
 };
 
