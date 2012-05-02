@@ -45,6 +45,7 @@ EXTRA_DIST += \
 	$(skins2_default_vlt_FILES) \
 	$(DIST_rsrc) \
 	$(DIST_skins2) \
+	$(DIST_icons) \
 	$(DIST_http_lua) \
 	$(DIST_lua) \
 	osdmenu/default.cfg.in \
@@ -78,6 +79,10 @@ DIST_rsrc = \
 	newres.h \
 	resource.h \
 	vlc_wince_rc.rc
+
+DIST_icons = \
+	vlc48x48.ico. \
+	vlc512x512.png
 
 DIST_skins2 = \
 	skins2/fonts/FreeSans.ttf \
