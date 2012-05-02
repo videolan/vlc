@@ -411,9 +411,6 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         p_dec->fmt_out.audio.i_rate = frame.samplerate;
         p_dec->fmt_out.audio.i_channels = frame.channels;
-        p_dec->fmt_out.audio.i_physical_channels
-            = p_dec->fmt_out.audio.i_original_channels
-            = pi_channels_guessed[frame.channels];
 
         /* Adjust stream info when dealing with SBR/PS */
         bool b_sbr = (frame.sbr == 1) || (frame.sbr == 2);
