@@ -436,7 +436,8 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         /* Convert frame.channel_position to our own channel values */
         p_dec->fmt_out.audio.i_physical_channels = 0;
-        for( i = 0; i < frame.channels; i++ )
+        const uint32_t nbChannels = frame.channels;
+        for( i = 0; i < nbChannels; i++ )
         {
             /* Find the channel code */
             for( j = 0; j < MAX_CHANNEL_POSITIONS; j++ )
