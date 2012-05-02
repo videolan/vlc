@@ -226,13 +226,6 @@ static void HandleMediaParsedChanged(const libvlc_event_t * event, void * self)
     return self;
 }
 
-- (void)setValue:(NSString *)value forMeta:(NSString *)meta
-{
-    libvlc_meta_t metaName = [VLCMedia stringToMetaType:meta];
-    NSAssert(metaName >= 0, @"Invalid meta");
-    libvlc_media_set_meta(p_md, metaName, [value UTF8String]);
-}
-
 - (void)dealloc
 {
     libvlc_event_manager_t * p_em = libvlc_media_event_manager(p_md);

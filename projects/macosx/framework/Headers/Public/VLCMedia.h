@@ -235,12 +235,6 @@ typedef enum VLCMediaState
 @property (readonly) VLCMediaState state;
 
 /**
- * Sets a value of the metaDictionary
- */
-- (void)setValue:(id)value forMeta:(NSString *)VLCMetaInformation;
-
-
-/**
  * Tracks information NSDictionary Possible Keys
  */
 
