@@ -62,6 +62,7 @@ vlc_module_begin()
 
     add_string(CFG_PREFIX "type", "90", TYPE_TEXT, TYPE_TEXT, false)
         change_string_list(type_list, type_list_text, 0)
+        change_safe()
 
     add_shortcut("transform")
     set_callbacks(Open, Close)
