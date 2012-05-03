@@ -346,6 +346,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/sidebar-icons/sidebar-podcast.png \
 	extras/package/macosx/Resources/vlc.scriptSuite \
 	extras/package/macosx/Resources/vlc.scriptTerminology \
+	extras/package/macosx/build-package.sh \
 	extras/package/macosx/fullscreen_panel.svg \
 	extras/package/macosx/ub.sh \
 	extras/package/macosx/vlc.xcodeproj/project.pbxproj \

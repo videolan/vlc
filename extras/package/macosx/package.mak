@@ -18,7 +18,7 @@ VLC-dev.app: VLC-tmp
 VLC.app: VLC-tmp
 	rm -Rf $@
 	cp -R VLC-tmp $@
-	PRODUCT="$@" ACTION="release-makefile" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/projects/macosx/framework/Pre-Compile.sh
+	PRODUCT="$@" ACTION="release-makefile" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/extras/package/macosx/build-package.sh
 	find $@ -type d -exec chmod ugo+rx '{}' \;
 	find $@ -type f -exec chmod ugo+r '{}' \;
 	rm -Rf $@/Contents/Frameworks/BGHUDAppKit.framework/Resources/
