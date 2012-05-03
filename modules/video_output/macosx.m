@@ -13,6 +13,7 @@
  *          Damien Fouilleul <damienf at videolan dot org>
  *          Pierre d'Herbemont <pdherbemont at videolan dot org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
+ *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,31 +55,31 @@
 /**
  * Forward declarations
  */
-static int Open(vlc_object_t *);
-static void Close(vlc_object_t *);
+static int Open (vlc_object_t *);
+static void Close (vlc_object_t *);
 
-static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count);
-static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
-static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
+static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count);
+static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
+static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
 static int Control (vout_display_t *vd, int query, va_list ap);
 
-static int OpenglLock(vlc_gl_t *gl);
-static void OpenglUnlock(vlc_gl_t *gl);
-static void OpenglSwap(vlc_gl_t *gl);
+static int OpenglLock (vlc_gl_t *gl);
+static void OpenglUnlock (vlc_gl_t *gl);
+static void OpenglSwap (vlc_gl_t *gl);
 
 /**
  * Module declaration
  */
 vlc_module_begin ()
     /* Will be loaded even without interface module. see voutgl.m */
-    set_shortname("Mac OS X")
-    set_description( N_("Mac OS X OpenGL video output (requires drawable-nsobject)"))
-    set_category(CAT_VIDEO)
-    set_subcategory(SUBCAT_VIDEO_VOUT )
-    set_capability("vout display", 300)
-    set_callbacks(Open, Close)
+    set_shortname ("Mac OS X")
+    set_description (N_("Mac OS X OpenGL video output (requires drawable-nsobject)"))
+    set_category (CAT_VIDEO)
+    set_subcategory (SUBCAT_VIDEO_VOUT )
+    set_capability ("vout display", 300)
+    set_callbacks (Open, Close)
 
-    add_shortcut("macosx", "vout_macosx")
+    add_shortcut ("macosx", "vout_macosx")
 vlc_module_end ()
 
 /**
@@ -114,22 +115,22 @@ struct vout_display_sys_t
     bool has_first_frame;
 };
 
-static int Open(vlc_object_t *this)
+static int Open (vlc_object_t *this)
 {
     vout_display_t *vd = (vout_display_t *)this;
-    vout_display_sys_t *sys = calloc(1, sizeof(*sys));
+    vout_display_sys_t *sys = calloc (1, sizeof(*sys));
     NSAutoreleasePool *nsPool = nil;
 
     if (!sys)
         return VLC_ENOMEM;
 
-    if( !CGDisplayUsesOpenGLAcceleration( kCGDirectMainDisplay ) )
+    if (!CGDisplayUsesOpenGLAcceleration (kCGDirectMainDisplay))
     {
-        msg_Err( this, "no OpenGL hardware acceleration found. this can lead to slow output and unexpected results" );
-        dialog_Fatal( this, _("OpenGL acceleration is not supported on your Mac"), _("Your Mac lacks Quartz Extreme acceleration, which is required for video output. It will still work, but much slower and with possibly unexpected results.") );
+        msg_Err (this, "no OpenGL hardware acceleration found. this can lead to slow output and unexpected results");
+        dialog_Fatal (this, _("OpenGL acceleration is not supported on your Mac"), _("Your Mac lacks Quartz Extreme acceleration, which is required for video output. It will still work, but much slower and with possibly unexpected results."));
     }
     else
-        msg_Dbg( this, "Quartz Extreme acceleration is active" );
+        msg_Dbg (this, "Quartz Extreme acceleration is active");
 
     vd->sys = sys;
     sys->pool = NULL;
@@ -137,10 +138,10 @@ static int Open(vlc_object_t *this)
     sys->embed = NULL;
 
     /* Get the drawable object */
-    id container = var_CreateGetAddress(vd, "drawable-nsobject");
+    id container = var_CreateGetAddress (vd, "drawable-nsobject");
     if (container)
     {
-        vout_display_DeleteWindow(vd, NULL);
+        vout_display_DeleteWindow (vd, NULL);
     }
     else
     {
@@ -207,7 +208,7 @@ static int Open(vlc_object_t *this)
     const vlc_fourcc_t *subpicture_chromas;
     video_format_t fmt = vd->fmt;
 
-    sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas, &sys->gl);
+    sys->vgl = vout_display_opengl_New (&vd->fmt, &subpicture_chromas, &sys->gl);
     if (!sys->vgl)
     {
         sys->gl.sys = NULL;
@@ -239,7 +240,7 @@ error:
     return VLC_EGENERIC;
 }
 
-void Close(vlc_object_t *this)
+void Close (vlc_object_t *this)
 {
     vout_display_t *vd = (vout_display_t *)this;
     vout_display_sys_t *sys = vd->sys;
@@ -249,7 +250,7 @@ void Close(vlc_object_t *this)
 
     [sys->glView setVoutDisplay:nil];
 
-    var_Destroy(vd, "drawable-nsobject");
+    var_Destroy (vd, "drawable-nsobject");
     if ([(id)sys->container respondsToSelector:@selector(removeVoutSubview:)])
     {
         /* This will retain sys->glView */
@@ -262,10 +263,10 @@ void Close(vlc_object_t *this)
     [sys->glView release];
 
     if (sys->gl.sys != NULL)
-        vout_display_opengl_Delete(sys->vgl);
+        vout_display_opengl_Delete (sys->vgl);
 
     if (sys->embed)
-        vout_display_DeleteWindow(vd, sys->embed);
+        vout_display_DeleteWindow (vd, sys->embed);
     free (sys);
 }
 
@@ -273,7 +274,7 @@ void Close(vlc_object_t *this)
  * vout display callbacks
  *****************************************************************************/
 
-static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
+static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
 {
     vout_display_sys_t *sys = vd->sys;
 
@@ -283,19 +284,19 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
     return sys->pool;
 }
 
-static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
+static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
 
     vout_display_sys_t *sys = vd->sys;
 
-    vout_display_opengl_Prepare( sys->vgl, pic, subpicture );
+    vout_display_opengl_Prepare (sys->vgl, pic, subpicture);
 }
 
-static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
+static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
     [sys->glView setVoutFlushing:YES];
-    vout_display_opengl_Display(sys->vgl, &vd->source );
+    vout_display_opengl_Display (sys->vgl, &vd->source);
     [sys->glView setVoutFlushing:NO];
     picture_Release (pic);
     sys->has_first_frame = true;
@@ -421,11 +422,11 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 /*****************************************************************************
  * vout opengl callbacks
  *****************************************************************************/
-static int OpenglLock(vlc_gl_t *gl)
+static int OpenglLock (vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
     NSOpenGLContext *context = [sys->glView openGLContext];
-    CGLError err = CGLLockContext([context CGLContextObj]);
+    CGLError err = CGLLockContext ([context CGLContextObj]);
     if (kCGLNoError == err)
     {
         [context makeCurrentContext];
@@ -434,13 +435,13 @@ static int OpenglLock(vlc_gl_t *gl)
     return 1;
 }
 
-static void OpenglUnlock(vlc_gl_t *gl)
+static void OpenglUnlock (vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
-    CGLUnlockContext([[sys->glView openGLContext] CGLContextObj]);
+    CGLUnlockContext ([[sys->glView openGLContext] CGLContextObj]);
 }
 
-static void OpenglSwap(vlc_gl_t *gl)
+static void OpenglSwap (vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
     [[sys->glView openGLContext] flushBuffer];
@@ -496,7 +497,7 @@ static void OpenglSwap(vlc_gl_t *gl)
      http://developer.apple.com/documentation/GraphicsImaging/
      Conceptual/OpenGL/chap5/chapter_5_section_44.html */
     GLint params[] = { 1 };
-    CGLSetParameter([[self openGLContext] CGLContextObj], kCGLCPSwapInterval, params);
+    CGLSetParameter ([[self openGLContext] CGLContextObj], kCGLCPSwapInterval, params);
 
     [self setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
     return self;
@@ -560,7 +561,7 @@ static void OpenglSwap(vlc_gl_t *gl)
 {
     VLCAssertMainThread();
     NSOpenGLContext *context = [self openGLContext];
-    CGLError err = CGLLockContext([context CGLContextObj]);
+    CGLError err = CGLLockContext ([context CGLContextObj]);
     if (err == kCGLNoError)
         [context makeCurrentContext];
     return err == kCGLNoError;
@@ -572,7 +573,7 @@ static void OpenglSwap(vlc_gl_t *gl)
 - (void)unlockgl
 {
     VLCAssertMainThread();
-    CGLUnlockContext([[self openGLContext] CGLContextObj]);
+    CGLUnlockContext ([[self openGLContext] CGLContextObj]);
 }
 
 /**
@@ -595,10 +596,10 @@ static void OpenglSwap(vlc_gl_t *gl)
 
     if (hasFirstFrame) {
         // This will lock gl.
-        vout_display_opengl_Display( vd->sys->vgl, &vd->source );
+        vout_display_opengl_Display (vd->sys->vgl, &vd->source);
     }
     else
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear (GL_COLOR_BUFFER_BIT);
 }
 
 /**
@@ -698,7 +699,7 @@ static void OpenglSwap(vlc_gl_t *gl)
 
 - (void)setWindowLevel:(NSNumber*)state
 {
-    if( [state unsignedIntValue] & VOUT_WINDOW_STATE_ABOVE )
+    if ([state unsignedIntValue] & VOUT_WINDOW_STATE_ABOVE)
         [[self window] setLevel: NSStatusWindowLevel];
     else
         [[self window] setLevel: NSNormalWindowLevel];
