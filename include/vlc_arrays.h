@@ -507,7 +507,7 @@ vlc_dictionary_all_keys( const vlc_dictionary_t * p_dict )
     int i, count = vlc_dictionary_keys_count( p_dict );
 
     ppsz_ret = (char**)malloc(sizeof(char *) * (count + 1));
-    if( !ppsz_ret )
+    if( unlikely(!ppsz_ret) )
         return NULL;
 
     count = 0;
