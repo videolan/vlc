@@ -36,6 +36,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <OpenGL/OpenGL.h>
+#import <dlfcn.h>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -62,6 +63,8 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count);
 static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
 static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
 static int Control (vout_display_t *vd, int query, va_list ap);
+
+static void *OurGetProcAddress(vlc_gl_t *, const char *);
 
 static int OpenglLock (vlc_gl_t *gl);
 static void OpenglUnlock (vlc_gl_t *gl);
@@ -114,6 +117,14 @@ struct vout_display_sys_t
     picture_t *current;
     bool has_first_frame;
 };
+
+
+static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
+{
+    VLC_UNUSED(gl);
+
+    return dlsym(RTLD_DEFAULT, name);
+}
 
 static int Open (vlc_object_t *this)
 {
@@ -203,7 +214,7 @@ static int Open (vlc_object_t *this)
     sys->gl.lock = OpenglLock;
     sys->gl.unlock = OpenglUnlock;
     sys->gl.swap = OpenglSwap;
-    sys->gl.getProcAddress = NULL;
+    sys->gl.getProcAddress = OurGetProcAddress;
     sys->gl.sys = sys;
     const vlc_fourcc_t *subpicture_chromas;
     video_format_t fmt = vd->fmt;
