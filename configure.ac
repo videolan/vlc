@@ -3985,7 +3985,7 @@ AS_IF([test "${have_libgcrypt}" != "yes"], [
   enable_gnutls="no"
 ])
 AS_IF([test "${enable_gnutls}" != "no"], [
-  PKG_CHECK_MODULES(GNUTLS, [gnutls >= 2.0.0], [
+  PKG_CHECK_MODULES(GNUTLS, [gnutls >= 2.8.0], [
     VLC_ADD_PLUGIN([gnutls])
   ], [
     AS_IF([test -n "${enable_gnutls}"], [
