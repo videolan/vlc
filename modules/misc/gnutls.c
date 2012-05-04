@@ -738,7 +738,7 @@ error:
 static int gnutls_ServerAddCA (vlc_tls_creds_t *server, const char *ca_path)
 {
     vlc_tls_creds_sys_t *sys = server->sys;
-    char *local_path = ToLocale (ca_path);
+    const char *local_path = ToLocale (ca_path);
 
     int val = gnutls_certificate_set_x509_trust_file (sys->x509_cred,
                                                       local_path,
@@ -769,7 +769,7 @@ static int gnutls_ServerAddCA (vlc_tls_creds_t *server, const char *ca_path)
 static int gnutls_ServerAddCRL (vlc_tls_creds_t *server, const char *crl_path)
 {
     vlc_tls_creds_sys_t *sys = server->sys;
-    char *local_path = ToLocale (crl_path);
+    const char *local_path = ToLocale (crl_path);
 
     int val = gnutls_certificate_set_x509_crl_file (sys->x509_cred,
                                                     local_path,
