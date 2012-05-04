@@ -27,7 +27,6 @@
 #endif
 
 #include <errno.h>
-#include <time.h>
 #include <sys/types.h>
 #include <errno.h>
 
@@ -346,21 +345,6 @@ static int gnutls_HandshakeAndValidate (vlc_tls_t *session)
      && !gnutls_x509_crt_check_hostname (cert, sys->hostname))
     {
         msg_Err (session, "Certificate does not match \"%s\"", sys->hostname);
-        goto error;
-    }
-
-    time_t now;
-    time (&now);
-
-    if (gnutls_x509_crt_get_expiration_time (cert) < now)
-    {
-        msg_Err (session, "Certificate expired");
-        goto error;
-    }
-
-    if (gnutls_x509_crt_get_activation_time (cert) > now)
-    {
-        msg_Err( session, "Certificate not yet valid" );
         goto error;
     }
 
