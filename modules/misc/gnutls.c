@@ -275,6 +275,10 @@ static const error_msg_t cert_errors[] =
         "Certificate's signer is not a CA" },
     { GNUTLS_CERT_INSECURE_ALGORITHM,
         "Insecure certificate signature algorithm" },
+    { GNUTLS_CERT_NOT_ACTIVATED,
+        "Certificate is not yet activated" },
+    { GNUTLS_CERT_EXPIRED,
+        "Certificate has expired" },
     { 0, NULL }
 };
 
