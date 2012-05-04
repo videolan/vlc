@@ -19,9 +19,6 @@ EXTRA_DIST = \
 	extras/package/win32/peflags.pl \
 	extras/package/win32/change-contribs-directory.sh \
 	extras/package/win32/configure.sh \
-	extras/package/rpm/vlc.suse.spec \
-	extras/package/rpm/vlc.fedora.spec \
-	extras/package/rpm/vlc.altlinux.spec \
 	extras/package/symbian/configure.sh \
 	extras/package/npapi.am \
 	extras/package/win32/vlc.win32.nsi.in \
