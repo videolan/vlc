@@ -28,7 +28,8 @@
 #import <UIKit/UIKit.h>
 #import <OpenGLES/ES1/gl.h>
 #import <OpenGLES/ES1/glext.h>
-#include <QuartzCore/QuartzCore.h>
+#import <QuartzCore/QuartzCore.h>
+#import <dlfcn.h>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -53,6 +54,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count);
 static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
 static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
 static int Control (vout_display_t *vd, int query, va_list ap);
+
+static void *OurGetProcAddress(vlc_gl_t *, const char *);
 
 static int OpenglClean(vlc_gl_t *gl);
 static void OpenglSwap(vlc_gl_t *gl);
@@ -101,6 +104,13 @@ struct vout_display_sys_t
     bool has_first_frame;
 };
 
+static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
+{
+    VLC_UNUSED(gl);
+
+    return dlsym(RTLD_MAIN_ONLY, name);
+}
+
 // Called from vout thread
 static int Open(vlc_object_t *this)
 {
@@ -148,7 +158,7 @@ static int Open(vlc_object_t *this)
     sys->gl.lock = OpenglClean; // We don't do locking, but sometimes we need to cleanup the framebuffer
     sys->gl.unlock = NULL;
     sys->gl.swap = OpenglSwap;
-	sys->gl.getProcAddress = NULL;
+	sys->gl.getProcAddress = OurGetProcAddress;
     sys->gl.sys = sys;
 
 	sys->vgl = vout_display_opengl_New(&vd->fmt, NULL, &sys->gl);
