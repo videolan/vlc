@@ -278,6 +278,7 @@ static const event_name_t event_list[] = {
     DEF(MediaPlayerTitleChanged)
     DEF(MediaPlayerSnapshotTaken)
     DEF(MediaPlayerLengthChanged)
+    DEF(MediaPlayerVout)
 
     DEF(MediaListItemAdded)
     DEF(MediaListWillAddItem)
@@ -303,6 +304,10 @@ static const event_name_t event_list[] = {
     DEF(VlmMediaInstanceStopped)
     DEF(VlmMediaInstanceStatusInit)
     DEF(VlmMediaInstanceStatusOpening)
+    DEF(VlmMediaInstanceStatusPlaying)
+    DEF(VlmMediaInstanceStatusPause)
+    DEF(VlmMediaInstanceStatusEnd)
+    DEF(VlmMediaInstanceStatusError)
 };
 #undef DEF
 
