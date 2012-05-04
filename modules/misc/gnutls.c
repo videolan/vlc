@@ -304,7 +304,7 @@ static int gnutls_HandshakeAndValidate (vlc_tls_t *session)
 
     if (status)
     {
-        msg_Err (session, "TLS session: access denied");
+        msg_Err (session, "TLS session: access denied (status 0x%X)", status);
         for (const error_msg_t *e = cert_errors; e->flag; e++)
         {
             if (status & e->flag)
