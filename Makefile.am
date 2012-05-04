@@ -19,9 +19,11 @@ EXTRA_DIST = \
 	extras/package/win32/peflags.pl \
 	extras/package/win32/change-contribs-directory.sh \
 	extras/package/win32/configure.sh \
-	extras/package/macosx/README.MacOSX.rtf \
+	extras/package/rpm/vlc.suse.spec \
 	extras/package/rpm/vlc.fedora.spec \
 	extras/package/rpm/vlc.altlinux.spec \
+	extras/package/symbian/configure.sh \
+	extras/package/npapi.am \
 	extras/package/win32/vlc.win32.nsi.in \
 	extras/package/win32/spad.nsi.in \
 	extras/package/win32/UAC.nsh \
@@ -38,7 +40,9 @@ EXTRA_DIST = \
 	extras/package/win32/languages/estonian.nsh \
 	extras/package/win32/languages/finnish.nsh \
 	extras/package/win32/languages/french.nsh \
+	extras/package/win32/languages/galician.nsh \
 	extras/package/win32/languages/german.nsh \
+	extras/package/win32/languages/hebrew.nsh \
 	extras/package/win32/languages/hungarian.nsh \
 	extras/package/win32/languages/italian.nsh \
 	extras/package/win32/languages/japanese.nsh \
@@ -46,12 +50,14 @@ EXTRA_DIST = \
 	extras/package/win32/languages/occitan.nsh \
 	extras/package/win32/languages/polish.nsh \
 	extras/package/win32/languages/punjabi.nsh \
+	extras/package/win32/languages/russian.nsh
 	extras/package/win32/languages/romanian.nsh \
 	extras/package/win32/languages/schinese.nsh \
 	extras/package/win32/languages/slovak.nsh \
 	extras/package/win32/languages/slovenian.nsh \
 	extras/package/win32/languages/sorani.nsh \
-	extras/package/win32/languages/spanish.nsh
+	extras/package/win32/languages/spanish.nsh \
+	extras/package/win32/languages/swedish.nsh
 
 dist_noinst_SCRIPTS = bootstrap
 nodist_noinst_SCRIPTS = compile
@@ -90,10 +96,11 @@ ChangeLog: Makefile.am
 	$(LN_S) -f doc/ChangeLog-2009 "$@"
 
 ###############################################################################
-# MacOS X project
+# Mac OS X project
 ###############################################################################
 
 EXTRA_DIST += \
+	extras/package/macosx/README.MacOSX.rtf \
 	extras/package/macosx/Resources/about_bg.png \
 	extras/package/macosx/Resources/dsa_pub.pem \
 	extras/package/macosx/Resources/English.lproj/About.xib \
@@ -101,6 +108,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/Bookmarks.xib \
 	extras/package/macosx/Resources/English.lproj/CoreDialogs.xib \
 	extras/package/macosx/Resources/English.lproj/ErrorPanel.xib \
+	extras/package/macosx/Resources/English.lproj/InfoPlist.strings.in \
 	extras/package/macosx/Resources/English.lproj/MainMenu.xib \
 	extras/package/macosx/Resources/English.lproj/MediaInfo.xib \
 	extras/package/macosx/Resources/English.lproj/Open.xib \
@@ -349,6 +357,9 @@ EXTRA_DIST += \
 	extras/package/macosx/build-package.sh \
 	extras/package/macosx/fullscreen_panel.svg \
 	extras/package/macosx/ub.sh \
+	extras/package/macosx/build.sh \
+	extras/package/macosx/configure.sh \
+	extras/package/macosx/dmg_setup.scpt \
 	extras/package/macosx/vlc.xcodeproj/project.pbxproj \
 	extras/package/macosx/Delete_Preferences.app/Contents/Info.plist \
 	extras/package/macosx/Delete_Preferences.app/Contents/PkgInfo \
@@ -369,6 +380,19 @@ EXTRA_DIST += \
 	extras/package/macosx/README.MacOSX.rtf \
 	extras/package/macosx/Info.plist.in
 
+###############################################################################
+# iOS project
+##############################################################################
+EXTRA_DIST += \
+	extras/package/ios/build.sh
+
+###############################################################################
+# tools (needed for contrib)
+##############################################################################
+EXTRA_DIST += \
+	extras/tools/bootstrap \
+	extras/tools/packages.mak \
+	extras/tools/tools.mak
 
 ###############################################################################
 # Various utilities ( editor syntax files, D-Bus controller ... )
