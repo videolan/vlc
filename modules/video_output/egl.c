@@ -109,12 +109,33 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
 {
     vlc_gl_t *gl = (vlc_gl_t *)obj;
 
-#ifdef __unix__
+    /* <EGL/eglplatform.h> defines the list and order of platforms */
+#if defined(_WIN32) || defined(__VC32__) \
+ && !defined(__CYGWIN__) && !defined(__SCITECH_SNAP__)
+# define vlc_eglGetWindow(w) ((w)->handle.hwnd)
+
+#elif defined(__WINSCW__) || defined(__SYMBIAN32__)  /* Symbian */
+# error Symbian EGL not supported.
+
+#elif defined(WL_EGL_PLATFORM)
+# error Wayland EGL not supported.
+
+#elif defined(__GBM__)
+# error Glamor EGL not supported.
+
+#elif defined(ANDROID)
+# error Android EGL not supported
+
+#elif defined(__unix__) /* X11 */
+# define vlc_eglGetWindow(w) ((w)->handle.xid)
     /* EGL can only use the default X11 display */
     if (gl->surface->display.x11 != NULL)
         return VLC_EGENERIC;
     if (!vlc_xlib_init (obj))
         return VLC_EGENERIC;
+
+#else
+# error EGL platform not recognized.
 #endif
 
     /* Initialize EGL display */
@@ -163,12 +184,7 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
         goto error;
 
     /* Create a drawing surface */
-#if defined (WIN32)
-    EGLNativeWindowType win = gl->surface->handle.hwnd;
-#elif defined (__unix__)
-    EGLNativeWindowType win = gl->surface->handle.xid;
-#endif
-
+    EGLNativeWindowType win = vlc_eglGetWindow(gl->surface);
     EGLSurface surface = eglCreateWindowSurface (dpy, cfgv[0], win, NULL);
     if (surface == EGL_NO_SURFACE)
     {
