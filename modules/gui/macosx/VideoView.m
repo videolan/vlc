@@ -313,7 +313,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 - (void)mouseMoved:(NSEvent *)o_event
 {
     vout_thread_t * p_vout = getVout();
-    if (p_vout)
+    if( p_vout )
     {
         NSPoint ml;
         NSRect s_rect;
@@ -325,7 +325,21 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
         if( b_inside )
         {
-            vout_display_SendEventMouseMoved( [[[self subviews] objectAtIndex:0] voutDisplay], ((int)ml.x), ((int)s_rect.size.height - ((int)ml.y)) );
+            vout_display_t *vd = [[[self subviews] objectAtIndex:0] voutDisplay];
+
+            vout_display_place_t place;
+            vout_display_PlacePicture( &place, &vd->source, vd->cfg, false );
+
+            if( place.width > 0 && place.height > 0 )
+            {
+                const int x = vd->source.i_x_offset +
+                    (int64_t)(ml.x - place.x) * vd->source.i_visible_width / place.width;
+                const int y = vd->source.i_y_offset +
+                    (int64_t)((int)s_rect.size.height - (int)ml.y - place.y) * vd->source.i_visible_height / place.height;
+
+                vout_display_SendEventMouseMoved( vd, x, y );
+            }
+
             [[VLCMain sharedInstance] showFullscreenController];
         }
         vlc_object_release( p_vout );
