@@ -698,11 +698,6 @@ static void OpenglSwap (vlc_gl_t *gl)
     [super renewGState];
 }
 
-- (BOOL)mouseDownCanMoveWindow
-{
-    return YES;
-}
-
 - (BOOL)isOpaque
 {
     return YES;
@@ -715,4 +710,98 @@ static void OpenglSwap (vlc_gl_t *gl)
     else
         [[self window] setLevel: NSNormalWindowLevel];
 }
+
+#pragma mark -
+#pragma mark Mouse handling
+
+- (void)mouseDown:(NSEvent *)o_event
+{
+    if ([o_event type] == NSLeftMouseDown && !([o_event modifierFlags] &  NSControlKeyMask))
+    {
+        if ([o_event clickCount] <= 1)
+            vout_display_SendEventMousePressed (vd, MOUSE_BUTTON_LEFT);
+    }
+
+    [super mouseDown:o_event];
+}
+
+- (void)otherMouseDown:(NSEvent *)o_event
+{
+    vout_display_SendEventMousePressed (vd, MOUSE_BUTTON_CENTER);
+
+    [super otherMouseDown: o_event];
+}
+
+- (void)mouseUp:(NSEvent *)o_event
+{
+    if ([o_event type] == NSLeftMouseUp)
+        vout_display_SendEventMouseReleased (vd, MOUSE_BUTTON_LEFT);
+
+    [super mouseUp: o_event];
+}
+
+- (void)otherMouseUp:(NSEvent *)o_event
+{
+    vout_display_SendEventMouseReleased (vd, MOUSE_BUTTON_CENTER);
+
+    [super otherMouseUp: o_event];
+}
+
+- (void)mouseMoved:(NSEvent *)o_event
+{
+    NSPoint ml;
+    NSRect s_rect;
+    BOOL b_inside;
+
+    s_rect = [self bounds];
+    ml = [self convertPoint: [o_event locationInWindow] fromView: nil];
+    b_inside = [self mouse: ml inRect: s_rect];
+
+    if (b_inside)
+    {
+        vout_display_place_t place;
+        vout_display_PlacePicture (&place, &vd->source, vd->cfg, false);
+
+        if (place.width > 0 && place.height > 0)
+        {
+            const int x = vd->source.i_x_offset +
+            (int64_t)(ml.x - place.x) * vd->source.i_visible_width / place.width;
+            const int y = vd->source.i_y_offset +
+            (int64_t)((int)s_rect.size.height - (int)ml.y - place.y) * vd->source.i_visible_height / place.height;
+
+            vout_display_SendEventMouseMoved (vd, x, y);
+        }
+    }
+
+    [super mouseMoved: o_event];
+}
+
+- (void)mouseDragged:(NSEvent *)o_event
+{
+    [self mouseMoved: o_event];
+    [super mouseDragged: o_event];
+}
+
+- (void)otherMouseDragged:(NSEvent *)o_event
+{
+    [self mouseMoved: o_event];
+    [super otherMouseDragged: o_event];
+}
+
+- (void)rightMouseDragged:(NSEvent *)o_event
+{
+    [self mouseMoved: o_event];
+    [super rightMouseDragged: o_event];
+}
+
+- (BOOL)acceptsFirstResponder
+{
+    return YES;
+}
+
+- (BOOL)mouseDownCanMoveWindow
+{
+    return YES;
+}
+
 @end

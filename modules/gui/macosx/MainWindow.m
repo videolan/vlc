@@ -706,7 +706,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [o_split_view setHidden: YES];
     [o_video_view setHidden: NO];
-    [self makeFirstResponder: o_video_view];
+    
+    if( [[o_video_view subviews] count] > 0 )
+        [self makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
 }
 
 - (IBAction)togglePlaylist:(id)sender
@@ -767,8 +769,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [o_split_view setHidden: NO];
             [o_playlist_table setHidden: NO];
             [o_video_view setHidden: !b_activeVideo];
-            if (b_activeVideo)
-                [o_detached_video_window makeFirstResponder: o_video_view];
+            if( b_activeVideo && [[o_video_view subviews] count] > 0 )
+                [o_detached_video_window makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
         }
     }
 }
@@ -1523,8 +1525,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     {
         // look for 'start at fullscreen'
         [[VLCMain sharedInstance] fullscreenChanged];
-
-        [self makeFirstResponder: o_video_view];
     }
     else
     {
@@ -1835,7 +1835,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)hasBecomeFullscreen
 {
-    [o_fullscreen_window makeFirstResponder: o_video_view];
+    [o_fullscreen_window makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
 
     [o_fullscreen_window makeKeyWindow];
     [o_fullscreen_window setAcceptsMouseMovedEvents: TRUE];
@@ -1996,7 +1996,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[o_temp_view superview] replaceSubview:o_temp_view with:o_video_view];
     [o_video_view release];
     [o_video_view setFrame:[o_temp_view frame]];
-    [[o_video_view window] makeFirstResponder: o_video_view];
+    [[o_video_view window] makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
     if( [[o_video_view window] isVisible] )
     {
         if( !b_nonembedded )
