@@ -3609,11 +3609,9 @@ static void get_token( char **ppsz_path, char **ppsz_token, int *pi_number )
     {
         i_len = 1;
     }
-    *ppsz_token = xmalloc( i_len + 1 );
-
-    memcpy( *ppsz_token, *ppsz_path, i_len );
-
-    (*ppsz_token)[i_len] = '\0';
+    *ppsz_token = strndup( *ppsz_path, i_len );
+    if( unlikely(!*ppsz_token) )
+        abort();
 
     *ppsz_path += i_len;
 
