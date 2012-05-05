@@ -133,7 +133,7 @@ block_t *block_Alloc (size_t size)
     if (unlikely(b == NULL))
         return NULL;
 
-    block_Init (b, b + 1, alloc);
+    block_Init (b, b + 1, alloc - sizeof (*b));
     static_assert ((BLOCK_PADDING % BLOCK_ALIGN) == 0,
                    "BLOCK_PADDING must be a multiple of BLOCK_ALIGN");
     b->p_buffer += BLOCK_PADDING + BLOCK_ALIGN - 1;
