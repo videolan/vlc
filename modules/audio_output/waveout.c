@@ -291,20 +291,14 @@ static int Open( vlc_object_t *p_this )
             p_aout->format.i_bytes_per_frame;
 
         aout_PacketInit( p_aout, &p_aout->sys->packet, FRAME_SIZE );
-        aout_VolumeSoftInit( p_aout );
 
         /* Check for hardware volume support */
         if( waveOutGetDevCaps( (UINT_PTR)p_aout->sys->h_waveout,
-                               &wocaps, sizeof(wocaps) ) == MMSYSERR_NOERROR &&
-            wocaps.dwSupport & WAVECAPS_VOLUME )
-        {
-            DWORD i_dummy;
-            if( waveOutGetVolume( p_aout->sys->h_waveout, &i_dummy )
-                == MMSYSERR_NOERROR )
-            {
-                p_aout->pf_volume_set = VolumeSet;
-            }
-        }
+                               &wocaps, sizeof(wocaps) ) == MMSYSERR_NOERROR
+         && (wocaps.dwSupport & WAVECAPS_VOLUME) )
+            aout_VolumeHardInit( p_aout, VolumeSet );
+        else
+            aout_VolumeSoftInit( p_aout );
     }
 
 
