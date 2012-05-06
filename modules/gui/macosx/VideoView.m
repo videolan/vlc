@@ -189,26 +189,20 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)mouseDown:(NSEvent *)o_event
 {
-    vout_thread_t * p_vout = getVout();
-    if( p_vout )
+    if( ( [o_event type] == NSLeftMouseDown ) &&
+       ( ! ( [o_event modifierFlags] &  NSControlKeyMask ) ) )
     {
-        if( ( [o_event type] == NSLeftMouseDown ) &&
-          ( ! ( [o_event modifierFlags] &  NSControlKeyMask ) ) )
+        if( [o_event clickCount] > 1 )
         {
-            if( [o_event clickCount] > 1 )
-            {
-                /* multiple clicking */
-                [[VLCCoreInteraction sharedInstance] toggleFullscreen];
-            }
+            /* multiple clicking */
+            [[VLCCoreInteraction sharedInstance] toggleFullscreen];
         }
-        else if( ( [o_event type] == NSRightMouseDown ) ||
-               ( ( [o_event type] == NSLeftMouseDown ) &&
-                 ( [o_event modifierFlags] &  NSControlKeyMask ) ) )
-        {
-            msg_Dbg( p_vout, "received NSRightMouseDown (generic method) or Ctrl clic" );
-            [NSMenu popUpContextMenu: [[VLCMainMenu sharedInstance] voutMenu] withEvent: o_event forView: self];
-        }
-        vlc_object_release( p_vout );
+    }
+    else if( ( [o_event type] == NSRightMouseDown ) ||
+            ( ( [o_event type] == NSLeftMouseDown ) &&
+             ( [o_event modifierFlags] &  NSControlKeyMask ) ) )
+    {
+        [NSMenu popUpContextMenu: [[VLCMainMenu sharedInstance] voutMenu] withEvent: o_event forView: self];
     }
 
     [super mouseDown: o_event];
@@ -217,12 +211,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 - (void)rightMouseDown:(NSEvent *)o_event
 {
     if( [o_event type] == NSRightMouseDown )
-    {
-        vout_thread_t * p_vout = getVout();
-        if (p_vout)
-            [NSMenu popUpContextMenu: [[VLCMainMenu sharedInstance] voutMenu] withEvent: o_event forView: self];
-        vlc_object_release( p_vout );
-    }
+        [NSMenu popUpContextMenu: [[VLCMainMenu sharedInstance] voutMenu] withEvent: o_event forView: self];
 
     [super mouseDown: o_event];
 }
@@ -230,14 +219,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 - (void)rightMouseUp:(NSEvent *)o_event
 {
     if( [o_event type] == NSRightMouseUp )
-    {
-        vout_thread_t * p_vout = getVout();
-        if (p_vout)
-        {
-            [NSMenu popUpContextMenu: [[VLCMainMenu sharedInstance] voutMenu] withEvent: o_event forView: self];
-            vlc_object_release( p_vout );
-        }
-    }
+        [NSMenu popUpContextMenu: [[VLCMainMenu sharedInstance] voutMenu] withEvent: o_event forView: self];
 
     [super mouseUp: o_event];
 }
