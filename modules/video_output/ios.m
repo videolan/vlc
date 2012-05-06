@@ -108,7 +108,7 @@ static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
 {
     VLC_UNUSED(gl);
 
-    return dlsym(RTLD_MAIN_ONLY, name);
+    return dlsym(RTLD_DEFAULT, name);
 }
 
 // Called from vout thread
