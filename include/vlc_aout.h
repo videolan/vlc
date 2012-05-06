@@ -221,7 +221,7 @@ VLC_API const char * aout_FormatPrintChannels( const audio_sample_format_t * ) V
 
 VLC_API void aout_VolumeNoneInit( audio_output_t * );
 VLC_API void aout_VolumeSoftInit( audio_output_t * );
-VLC_API void aout_VolumeHardInit( audio_output_t *, aout_volume_cb );
+VLC_API void aout_VolumeHardInit( audio_output_t *, aout_volume_cb, bool );
 VLC_API void aout_VolumeHardSet( audio_output_t *, float, bool );
 
 VLC_API void aout_TimeReport(audio_output_t *, mtime_t);

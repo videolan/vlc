@@ -334,13 +334,22 @@ void aout_VolumeSoftInit (audio_output_t *aout)
  * Configures a custom volume setter. This is used by audio outputs that can
  * control the hardware volume directly and/or emulate it internally.
  * @param setter volume setter callback
+ * @param restore apply volume from VLC configuration immediately
  */
-void aout_VolumeHardInit (audio_output_t *aout, aout_volume_cb setter)
+void aout_VolumeHardInit (audio_output_t *aout, aout_volume_cb setter,
+                          bool restore)
 {
     aout_assert_locked (aout);
     aout->pf_volume_set = setter;
     var_Create (aout, "volume", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT);
     var_Create (aout, "mute", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
+
+    if (restore)
+    {
+        float vol = var_InheritInteger (aout, "volume")
+                  / (float)AOUT_VOLUME_DEFAULT;
+        setter (aout, vol, var_InheritBool (aout, "mute"));
+    }
 }
 
 /**

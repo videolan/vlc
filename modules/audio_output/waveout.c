@@ -296,7 +296,7 @@ static int Open( vlc_object_t *p_this )
         if( waveOutGetDevCaps( (UINT_PTR)p_aout->sys->h_waveout,
                                &wocaps, sizeof(wocaps) ) == MMSYSERR_NOERROR
          && (wocaps.dwSupport & WAVECAPS_VOLUME) )
-            aout_VolumeHardInit( p_aout, VolumeSet );
+            aout_VolumeHardInit( p_aout, VolumeSet, false /* ?? */ );
         else
             aout_VolumeSoftInit( p_aout );
     }
