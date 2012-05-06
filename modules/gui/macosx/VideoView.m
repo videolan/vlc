@@ -61,16 +61,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 }
 
 /*****************************************************************************
- * VLCOpenGLVideoView interface excerpt
- * full implementation in modules/video_output/macosx.m:95
- *****************************************************************************/
-@interface VLCOpenGLVideoView : NSOpenGLView
-{
-}
-- (vout_display_t *)voutDisplay;
-@end
-
-/*****************************************************************************
  * VLCVoutView implementation
  *****************************************************************************/
 @implementation VLCVoutView
