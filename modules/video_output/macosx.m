@@ -394,15 +394,18 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 cfg_tmp.display.width = bounds.size.width;
                 cfg_tmp.display.height = bounds.size.height;
             }
-
-            vout_display_PlacePicture (&sys->place, source, &cfg_tmp, false);
+            vout_display_place_t place;
+            vout_display_PlacePicture (&place, source, &cfg_tmp, false);
+            @synchronized (sys->glView) {
+                sys->place = place;
+            }
 
             /* For resize, we call glViewport in reshape and not here.
                This has the positive side effect that we avoid erratic sizing as we animate every resize. */
             if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
             {
                 // x / y are top left corner, but we need the lower left one
-                glViewport (sys->place.x, cfg_tmp.display.height - (sys->place.y + sys->place.height), sys->place.width, sys->place.height);
+                glViewport (place.x, cfg_tmp.display.height - (place.y + place.height), place.width, place.height);
             }
 
             [o_pool release];
@@ -621,23 +624,23 @@ static void OpenglSwap (vlc_gl_t *gl)
     VLCAssertMainThread();
 
     NSRect bounds = [self bounds];
-
+    vout_display_place_t place;
+    
     @synchronized(self) {
         if (vd) {
             vout_display_cfg_t cfg_tmp = *(vd->cfg);
             cfg_tmp.display.width  = bounds.size.width;
             cfg_tmp.display.height = bounds.size.height;
 
-            vout_display_PlacePicture (&vd->sys->place, &vd->source, &cfg_tmp, false);
+            vout_display_PlacePicture (&place, &vd->source, &cfg_tmp, false);
+            vd->sys->place = place;
             vout_display_SendEventDisplaySize (vd, bounds.size.width, bounds.size.height, vd->cfg->is_fullscreen);
         }
     }
 
     if ([self lockgl]) {
-        if (vd) { 
-            // x / y are top left corner, but we need the lower left one
-            glViewport (vd->sys->place.x, bounds.size.height - (vd->sys->place.y + vd->sys->place.height), vd->sys->place.width, vd->sys->place.height);
-        }
+        // x / y are top left corner, but we need the lower left one
+        glViewport (place.x, bounds.size.height - (place.y + place.height), place.width, place.height);
 
         @synchronized(self) {
             // This may be cleared before -drawRect is being called,
@@ -757,17 +760,25 @@ static void OpenglSwap (vlc_gl_t *gl)
     s_rect = [self bounds];
     ml = [self convertPoint: [o_event locationInWindow] fromView: nil];
     b_inside = [self mouse: ml inRect: s_rect];
-
+    
     if (b_inside)
     {
-        if (vd && vd->sys->place.width > 0 && vd->sys->place.height > 0)
+        @synchronized (self)
         {
-            const int x = vd->source.i_x_offset +
-            (int64_t)(ml.x - vd->sys->place.x) * vd->source.i_visible_width / vd->sys->place.width;
-            const int y = vd->source.i_y_offset +
-            (int64_t)((int)s_rect.size.height - (int)ml.y - vd->sys->place.y) * vd->source.i_visible_height / vd->sys->place.height;
+            if (vd)
+            {
+                vout_display_place_t place = vd->sys->place;
 
-            vout_display_SendEventMouseMoved (vd, x, y);
+                if (place.width > 0 && place.height > 0)
+                {
+                    const int x = vd->source.i_x_offset +
+                    (int64_t)(ml.x - place.x) * vd->source.i_visible_width / place.width;
+                    const int y = vd->source.i_y_offset +
+                    (int64_t)((int)s_rect.size.height - (int)ml.y - place.y) * vd->source.i_visible_height / place.height;
+
+                    vout_display_SendEventMouseMoved (vd, x, y);
+                }
+            }
         }
     }
 
