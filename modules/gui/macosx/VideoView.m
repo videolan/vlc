@@ -216,7 +216,10 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)mouseMoved:(NSEvent *)o_event
 {
-    [[VLCMain sharedInstance] showFullscreenController];
+    NSPoint ml = [self convertPoint: [o_event locationInWindow] fromView: nil];
+    if( [self mouse: ml inRect: [self bounds]] )
+        [[VLCMain sharedInstance] showFullscreenController];
+
     [super mouseMoved: o_event];
 }
 
