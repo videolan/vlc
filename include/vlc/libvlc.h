@@ -167,15 +167,20 @@ int libvlc_add_intf( libvlc_instance_t *p_instance, const char *name );
 
 /**
  * Registers a callback for the LibVLC exit event. This is mostly useful if
- * you have started at least one interface with libvlc_add_intf().
+ * the VLC playlist and/or at least one interface are started with
+ * libvlc_playlist_play() or libvlc_add_intf() respectively.
  * Typically, this function will wake up your application main loop (from
  * another thread).
  *
+ * \note This function should be called before the playlist or interface are
+ * started. Otherwise, there is a small race condition: the exit event could
+ * be raised before the handler is registered.
+ *
  * \param p_instance LibVLC instance
- * \param cb callback to invoke when LibVLC wants to exit
+ * \param cb callback to invoke when LibVLC wants to exit,
+ *           or NULL to disable the exit handler (as by default)
  * \param opaque data pointer for the callback
  * \warning This function and libvlc_wait() cannot be used at the same time.
- * Use either or none of them but not both.
  */
 LIBVLC_API
 void libvlc_set_exit_handler( libvlc_instance_t *p_instance,
@@ -186,8 +191,10 @@ void libvlc_set_exit_handler( libvlc_instance_t *p_instance,
  * You should start at least one interface first, using libvlc_add_intf().
  *
  * \param p_instance the instance
+ * \warning This function wastes one thread doing basically nothing.
+ * libvlc_set_exit_handler() should be used instead.
  */
-LIBVLC_API
+LIBVLC_DEPRECATED LIBVLC_API
 void libvlc_wait( libvlc_instance_t *p_instance );
 
 /**
