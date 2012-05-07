@@ -136,10 +136,20 @@ void libvlc_set_exit_handler( libvlc_instance_t *p_i, void (*cb) (void *),
     libvlc_SetExitHandler( p_libvlc, cb, data );
 }
 
+static void libvlc_wait_wakeup( void *data )
+{
+    vlc_sem_post( data );
+}
+
 void libvlc_wait( libvlc_instance_t *p_i )
 {
-    libvlc_int_t *p_libvlc = p_i->p_libvlc_int;
-    libvlc_InternalWait( p_libvlc );
+    vlc_sem_t sem;
+
+    vlc_sem_init( &sem, 0 );
+    libvlc_set_exit_handler( p_i, libvlc_wait_wakeup, &sem );
+    vlc_sem_wait( &sem );
+    libvlc_set_exit_handler( p_i, NULL, NULL );
+    vlc_sem_destroy( &sem );
 }
 
 void libvlc_set_user_agent (libvlc_instance_t *p_i,

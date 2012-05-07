@@ -225,7 +225,6 @@ libvlc_InternalCleanup
 libvlc_InternalCreate
 libvlc_InternalDestroy
 libvlc_InternalInit
-libvlc_InternalWait
 libvlc_Quit
 libvlc_SetExitHandler
 make_URI
