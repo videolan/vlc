@@ -76,7 +76,6 @@ typedef struct vlc_exit
     vlc_mutex_t lock;
     void (*handler) (void *);
     void *opaque;
-    bool killed;
 } vlc_exit_t;
 
 void vlc_ExitInit( vlc_exit_t * );

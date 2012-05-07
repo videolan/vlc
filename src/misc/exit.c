@@ -32,7 +32,6 @@ void vlc_ExitInit( vlc_exit_t *exit )
     vlc_mutex_init( &exit->lock );
     exit->handler = NULL;
     exit->opaque = NULL;
-    exit->killed = false;
 }
 
 void vlc_ExitDestroy( vlc_exit_t *exit )
@@ -50,8 +49,6 @@ void libvlc_SetExitHandler( libvlc_int_t *p_libvlc, void (*handler) (void *),
     vlc_exit_t *exit = &libvlc_priv( p_libvlc )->exit;
 
     vlc_mutex_lock( &exit->lock );
-    if( exit->killed && handler != NULL ) /* already exited (race condition) */
-        handler( opaque );
     exit->handler = handler;
     exit->opaque = opaque;
     vlc_mutex_unlock( &exit->lock );
@@ -65,13 +62,11 @@ void libvlc_Quit( libvlc_int_t *p_libvlc )
 {
     vlc_exit_t *exit = &libvlc_priv( p_libvlc )->exit;
 
+    msg_Dbg( p_libvlc, "exiting" );
     vlc_mutex_lock( &exit->lock );
-    if( !exit->killed )
-    {
-        msg_Dbg( p_libvlc, "exiting" );
-        exit->killed = true;
-        if( exit->handler != NULL )
-            exit->handler( exit->opaque );
-    }
+    if( exit->handler != NULL )
+        exit->handler( exit->opaque );
+    else
+        msg_Dbg( p_libvlc, "no exit handler" );
     vlc_mutex_unlock( &exit->lock );
 }
