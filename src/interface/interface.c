@@ -134,19 +134,9 @@ int intf_Create( vlc_object_t *p_this, const char *chain )
      * (it needs access to the main thread) */
     if( p_intf->b_should_run_on_first_thread )
     {
-        if( vlc_clone( &p_intf->thread,
-                       MonitorLibVLCDeath, p_intf, VLC_THREAD_PRIORITY_LOW ) )
-        {
-            msg_Err( p_intf, "cannot spawn libvlc death monitoring thread" );
-            goto error;
-        }
+        libvlc_SetExitHandler( p_libvlc, vlc_object_kill, p_intf );
         assert( p_intf->pf_run );
         p_intf->pf_run( p_intf );
-
-        /* It is monitoring libvlc, not the p_intf */
-        vlc_object_kill( p_intf->p_libvlc );
-
-        vlc_join( p_intf->thread, NULL );
     }
     else
 #endif
@@ -229,27 +219,6 @@ static void* RunInterface( void *p_this )
     p_intf->pf_run( p_intf );
     return NULL;
 }
-
-#if defined( __APPLE__ )
-#include "../lib/libvlc_internal.h" /* libvlc_InternalWait */
-/**
- * MonitorLibVLCDeath: Used when b_should_run_on_first_thread is set.
- *
- * @param p_this: the interface object
- */
-static void * MonitorLibVLCDeath( vlc_object_t * p_this )
-{
-    intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    libvlc_int_t * p_libvlc = p_intf->p_libvlc;
-    int canc = vlc_savecancel ();
-
-    libvlc_InternalWait( p_libvlc );
-
-    vlc_object_kill( p_intf ); /* Kill the stupid first thread interface */
-    vlc_restorecancel (canc);
-    return NULL;
-}
-#endif
 
 static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
