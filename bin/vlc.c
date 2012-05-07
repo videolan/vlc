@@ -166,6 +166,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     sigaddset (&set, SIGCHLD);
 
     /* Block all these signals */
+    pthread_t self = pthread_self ();
     pthread_sigmask (SIG_SETMASK, &set, NULL);
 
     const char *argv[i_argc + 2];
@@ -193,6 +194,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     if (vlc == NULL)
         goto out;
 
+    libvlc_set_exit_handler (vlc, vlc_kill, &self);
     libvlc_set_user_agent (vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
 
 #if !defined (HAVE_MAEMO) && !defined __APPLE__ && !defined (__OS2__)
@@ -206,10 +208,6 @@ int main( int i_argc, const char *ppsz_argv[] )
         goto out;
 
     libvlc_playlist_play (vlc, -1, 0, NULL);
-
-    /* Wait for a termination signal */
-    pthread_t self = pthread_self ();
-    libvlc_set_exit_handler (vlc, vlc_kill, &self);
 
     /* Qt4 insists on catching SIGCHLD via signal handler. To work around that,
      * unblock it after all our child threads are created. */
