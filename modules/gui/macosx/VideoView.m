@@ -35,13 +35,10 @@
 #import "VideoView.h"
 #import "CoreInteraction.h"
 #import "MainMenu.h"
-#import "MainWindow.h"
 
 #import <vlc_common.h>
-#import <vlc_vout_window.h>
-#import <vlc_vout_display.h>
 #import <vlc_keys.h>
-#import <vlc_mouse.h>
+
 /*****************************************************************************
  * DeviceCallback: Callback triggered when the video-device variable is changed
  *****************************************************************************/
