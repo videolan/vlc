@@ -375,6 +375,7 @@ typedef struct libvlc_log_subscriber
  *
  * \warning Do not call this function from within a logging callback.
  * It would trigger a dead lock.
+ * \version LibVLC 2.1.0 or later
  */
 LIBVLC_API void libvlc_log_subscribe( libvlc_log_subscriber_t *sub,
                                       libvlc_log_cb cb, void *data );
@@ -382,8 +383,9 @@ LIBVLC_API void libvlc_log_subscribe( libvlc_log_subscriber_t *sub,
 
 /**
  * Registers a logging callback to a file.
- * @param stream FILE pointer opened for writing
+ * \param stream FILE pointer opened for writing
  *         (the FILE pointer must remain valid until libvlc_log_unsubscribe())
+ * \version LibVLC 2.1.0 or later
  */
 LIBVLC_API void libvlc_log_subscribe_file( libvlc_log_subscriber_t *sub,
                                            FILE *stream );
@@ -400,6 +402,7 @@ LIBVLC_API void libvlc_log_subscribe_file( libvlc_log_subscriber_t *sub,
  * It would trigger a dead lock.
  *
  * \param sub initialized subscriber structure
+ * \version LibVLC 2.1.0 or later
  */
 LIBVLC_API void libvlc_log_unsubscribe( libvlc_log_subscriber_t *sub );
 
