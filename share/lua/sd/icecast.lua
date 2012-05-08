@@ -38,7 +38,9 @@ function main()
                           title=station_name,
                           genre=station.children_map["genre"][1].children[1],
                           nowplaying=station.children_map["current_song"][1].children[1],
-                          meta={["Icecast"]={["Bitrate"]=station.children_map["bitrate"][1].children[1];
-                                             ["Server type"]=station.children_map["server_type"][1].children[1]}}} )
+                          meta={
+				  ["Icecast Bitrate"]=station.children_map["bitrate"][1].children[1];
+				  ["Icecast Server Type"]=station.children_map["server_type"][1].children[1];
+			  }} )
     end
 end
