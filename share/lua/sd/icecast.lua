@@ -33,6 +33,11 @@ function main()
 	if station_name == "Unspecified name" or station_name == ""
 	then
 		station_name = station.children_map["listen_url"][1].children[1]
+		if string.find( station_name, "radionomy.com" )
+		then
+			station_name = string.match( station_name, "([^/]+)$")
+			station_name = string.gsub( station_name, "-", "\ " )
+		end
 	end
         vlc.sd.add_item( {path=station.children_map["listen_url"][1].children[1],
                           title=station_name,
