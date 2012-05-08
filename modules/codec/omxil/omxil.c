@@ -460,6 +460,10 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
         omx_error = OMX_GetConfig(p_port->omx_handle, OMX_IndexConfigCommonOutputCrop, &crop_rect);
         if (omx_error == OMX_ErrorNone)
         {
+            if (!def->format.video.nSliceHeight)
+                def->format.video.nSliceHeight = def->format.video.nFrameHeight;
+            if (!def->format.video.nStride)
+                def->format.video.nStride = def->format.video.nFrameWidth;
             p_fmt->video.i_width = crop_rect.nWidth;
             p_fmt->video.i_visible_width = crop_rect.nWidth;
             p_fmt->video.i_height = crop_rect.nHeight;
