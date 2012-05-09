@@ -43,10 +43,11 @@
  *****************************************************************************/
 struct intf_sys_t
 {
-    xosd *      p_osd;          /* libxosd handle */
-    bool        b_need_update;  /* Update display ? */
-    vlc_mutex_t lock;           /* lock for the condition variable */
-    vlc_cond_t  cond;           /* condition variable to know when to update */
+    xosd *       p_osd; /**< libxosd handle */
+    bool         b_need_update; /**< Update display ? */
+    vlc_mutex_t  lock; /**< state lock */
+    vlc_cond_t   cond; /**< update condition variable */
+    vlc_thread_t thread; /**< interface thread handle */
 };
 
 #define MAX_LINE_LENGTH 256
@@ -56,8 +57,7 @@ struct intf_sys_t
  *****************************************************************************/
 static int  Open        ( vlc_object_t * );
 static void Close       ( vlc_object_t * );
-
-static void Run         ( intf_thread_t * );
+static void *Run        ( void * );
 
 static int PlaylistNext ( vlc_object_t *p_this, const char *psz_variable,
                           vlc_value_t oval, vlc_value_t nval, void *param );
@@ -162,14 +162,24 @@ static int Open( vlc_object_t *p_this )
     // Initialize mutex and condition variable before adding the callbacks
     vlc_mutex_init( &p_sys->lock );
     vlc_cond_init( &p_sys->cond );
+    p_sys->b_need_update = true;
+    if( vlc_clone( &p_sys->thread, VLC_THREAD_PRIORITY_LOW, Run, p_intf ) )
+        goto error;
+
     // Add the callbacks
     playlist_t *p_playlist = pl_Get( p_intf );
     var_AddCallback( p_playlist, "item-current", PlaylistNext, p_this );
     var_AddCallback( p_playlist, "item-change", PlaylistNext, p_this );
 
-    p_sys->b_need_update = true;
-    p_intf->pf_run = Run;
+    p_intf->pf_run = NULL;
     return VLC_SUCCESS;
+
+error:
+    xosd_destroy( p_sys->p_osd );
+    vlc_cond_destroy( &p_sys->cond );
+    vlc_mutex_destroy( &p_sys->lock );
+    free( p_sys );
+    return VLC_ENOMEM;
 }
 
 /*****************************************************************************
@@ -178,18 +188,23 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-
+    intf_sys_t *p_sys = p_intf->p_sys;
     playlist_t *p_playlist = pl_Get( p_intf );
+
+    vlc_cancel( p_sys->thread );
+
     var_DelCallback( p_playlist, "item-current", PlaylistNext, p_this );
     var_DelCallback( p_playlist, "item-change", PlaylistNext, p_this );
 
+    vlc_join( p_sys->thread, NULL );
+    vlc_cond_destroy( &p_sys->cond );
+    vlc_mutex_destroy( &p_sys->lock );
+
     /* Uninitialize library */
-    xosd_destroy( p_intf->p_sys->p_osd );
+    xosd_destroy( p_sys->p_osd );
 
     /* Destroy structure */
-    vlc_cond_destroy( &p_intf->p_sys->cond );
-    vlc_mutex_destroy( &p_intf->p_sys->lock );
-    free( p_intf->p_sys );
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -197,14 +212,15 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************
  * This part of the interface runs in a separate thread
  *****************************************************************************/
-static void Run( intf_thread_t *p_intf )
+static void *Run( void *data )
 {
+    intf_thread_t *p_intf = data;
     playlist_t *p_playlist;
     playlist_item_t *p_item = NULL;
     char *psz_display = NULL;
     int cancel = vlc_savecancel();
 
-    while( true )
+    for( ;; )
     {
         // Wait for a signal
         vlc_restorecancel( cancel );
