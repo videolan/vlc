@@ -572,22 +572,22 @@ static void* update_DownloadReal( void *obj )
 
     /* Create a buffer and fill it with the downloaded file */
     p_buffer = (void *)malloc( 1 << 10 );
-    if( !p_buffer )
-    {
-        msg_Err( p_udt, "Can't malloc (1 << 10) bytes! download cancelled." );
+    if( unlikely(p_buffer == NULL) )
         goto end;
-    }
 
     msg_Dbg( p_udt, "Downloading Stream '%s'", p_update->release.psz_url );
 
     psz_size = size_str( l_size );
     if( asprintf( &psz_status, _("%s\nDownloading... %s/%s %.1f%% done"),
-        p_update->release.psz_url, "0.0", psz_size, 0.0 ) != -1 )
-    {
-        p_progress = dialog_ProgressCreate( p_udt, _( "Downloading ..."),
-                                            psz_status, _("Cancel") );
-        free( psz_status );
-    }
+        p_update->release.psz_url, "0.0", psz_size, 0.0 ) == -1 )
+        goto end;
+
+    p_progress = dialog_ProgressCreate( p_udt, _( "Downloading ..."),
+                                        psz_status, _("Cancel") );
+
+    free( psz_status );
+    if( p_progress == NULL )
+        goto end;
 
     while( vlc_object_alive( p_udt ) &&
            ( i_read = stream_Read( p_stream, p_buffer, 1 << 10 ) ) &&
