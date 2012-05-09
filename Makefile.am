@@ -477,6 +477,8 @@ endif
 vlc$(EXEEXT):
 	$(AM_V_GEN)$(LN_S) -f bin/vlc-static$(EXEEXT) vlc$(EXEEXT)
 
+TESTS = test/run_vlc.sh
+
 ###############################################################################
 # Installing plugins cache
 ###############################################################################
