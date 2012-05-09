@@ -1340,8 +1340,8 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                 ptr[p_sys->i_nal_size_length - 1] = 1;
                 if( nal_len > INT_MAX || nal_len > (unsigned int) i_len )
                     break;
-                ptr   += nal_len + 4;
-                i_len -= nal_len + 4;
+                ptr   += nal_len + p_sys->i_nal_size_length;
+                i_len -= nal_len + p_sys->i_nal_size_length;
             }
         }
 #ifdef OMXIL_EXTRA_DEBUG
