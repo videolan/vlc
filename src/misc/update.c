@@ -494,7 +494,7 @@ void update_Download( update_t *p_update, const char *psz_destdir )
     // If the object already exist, destroy it
     if( p_update->p_download )
     {
-        vlc_atomic_set( &p_udt->p_download->aborted, 1 );
+        vlc_atomic_set( &p_update->p_download->aborted, 1 );
         vlc_join( p_update->p_download->thread, NULL );
         vlc_object_release( p_update->p_download );
     }
