@@ -169,6 +169,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     VariablesInit( p_playlist );
     vlc_mutex_init( &p->lock );
     vlc_cond_init( &p->signal );
+    p->killed = false;
 
     /* Initialise data structures */
     pl_priv(p_playlist)->i_last_playlist_id = 0;
