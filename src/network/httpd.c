@@ -1145,10 +1145,7 @@ void httpd_HostDelete( httpd_host_t *host )
     vlc_mutex_lock( &host->lock );
     host->i_ref--;
     if( host->i_ref == 0 )
-    {
-        vlc_cond_signal( &host->wait );
         delete = true;
-    }
     vlc_mutex_unlock( &host->lock );
     if( !delete )
     {
@@ -1159,7 +1156,7 @@ void httpd_HostDelete( httpd_host_t *host )
     }
     TAB_REMOVE( httpd.i_host, httpd.host, host );
 
-    vlc_object_kill( host );
+    vlc_cancel( host->thread );
     vlc_join( host->thread, NULL );
 
     msg_Dbg( host, "HTTP host removed" );
@@ -2001,11 +1998,12 @@ static void httpd_ClientTlsHsOut( httpd_client_t *cl )
 static void* httpd_HostThread( void *data )
 {
     httpd_host_t *host = data;
-    int evfd = vlc_object_waitpipe( VLC_OBJECT( host ) );
+    int canc = vlc_savecancel();
 
-    for( ;; )
+    vlc_mutex_lock( &host->lock );
+    while( host->i_ref > 0 )
     {
-        struct pollfd ufd[host->nfd + host->i_client + 1];
+        struct pollfd ufd[host->nfd + host->i_client];
         unsigned nfd;
         for( nfd = 0; nfd < host->nfd; nfd++ )
         {
@@ -2015,9 +2013,14 @@ static void* httpd_HostThread( void *data )
         }
 
         /* add all socket that should be read/write and close dead connection */
-        vlc_mutex_lock( &host->lock );
-        while( host->i_url <= 0 && host->i_ref > 0 )
+        while( host->i_url <= 0 )
+        {
+            mutex_cleanup_push( &host->lock );
+            vlc_restorecancel( canc );
             vlc_cond_wait( &host->wait, &host->lock );
+            canc = vlc_savecancel();
+            vlc_cleanup_pop();
+        }
 
         mtime_t now = mdate();
         bool b_low_delay = false;
@@ -2329,14 +2332,14 @@ static void* httpd_HostThread( void *data )
                 b_low_delay = true;
         }
         vlc_mutex_unlock( &host->lock );
-
-        ufd[nfd].fd = evfd;
-        ufd[nfd].events = POLLIN;
-        ufd[nfd].revents = 0;
-        nfd++;
+        vlc_restorecancel( canc );
 
         /* we will wait 20ms (not too big) if HTTPD_CLIENT_WAITING */
-        switch( poll( ufd, nfd, b_low_delay ? 20 : -1) )
+        int ret = poll( ufd, nfd, b_low_delay ? 20 : -1 );
+
+        canc = vlc_savecancel();
+        vlc_mutex_lock( &host->lock );
+        switch( ret )
         {
             case -1:
                 if (errno != EINTR)
@@ -2349,13 +2352,10 @@ static void* httpd_HostThread( void *data )
                 continue;
         }
 
-        if( ufd[nfd - 1].revents )
-            break;
-
         /* Handle client sockets */
-        vlc_mutex_lock( &host->lock );
         now = mdate();
         nfd = host->nfd;
+
         for( int i_client = 0; i_client < host->i_client; i_client++ )
         {
             httpd_client_t *cl = host->client[i_client];
@@ -2388,7 +2388,6 @@ static void* httpd_HostThread( void *data )
                 httpd_ClientTlsHsOut( cl );
             }
         }
-        vlc_mutex_unlock( &host->lock );
 
         /* Handle server sockets (accept new connections) */
         for( nfd = 0; nfd < host->nfd; nfd++ )
@@ -2437,14 +2436,11 @@ static void* httpd_HostThread( void *data )
                 p_tls = NULL;
 
             cl = httpd_ClientNew( fd, p_tls, now );
-            vlc_mutex_lock( &host->lock );
             TAB_APPEND( host->i_client, host->client, cl );
-            vlc_mutex_unlock( &host->lock );
             if( i_state != -1 )
                 cl->i_state = i_state; // override state for TLS
         }
-
     }
-
+    vlc_mutex_unlock( &host->lock );
     return NULL;
 }
