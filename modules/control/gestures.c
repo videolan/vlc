@@ -35,10 +35,7 @@
 #include <vlc_vout.h>
 #include <vlc_aout_intf.h>
 #include <vlc_playlist.h>
-
-#ifdef HAVE_UNISTD_H
-#    include <unistd.h>
-#endif
+#include <assert.h>
 
 /*****************************************************************************
  * intf_sys_t: description and status of interface
@@ -46,6 +43,7 @@
 struct intf_sys_t
 {
     vlc_mutex_t         lock;
+    input_thread_t     *p_input;
     vout_thread_t      *p_vout;
     bool                b_button_pressed;
     int                 i_last_x, i_last_y;
@@ -104,11 +102,14 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 vlc_module_end ()
 
+static int PlaylistEvent( vlc_object_t *, char const *,
+                          vlc_value_t, vlc_value_t, void * );
+static int InputEvent( vlc_object_t *, char const *,
+                       vlc_value_t, vlc_value_t, void * );
 static int MovedEvent( vlc_object_t *, char const *,
                        vlc_value_t, vlc_value_t, void * );
 static int ButtonEvent( vlc_object_t *, char const *,
                         vlc_value_t, vlc_value_t, void * );
-static void RunIntf        ( intf_thread_t *p_intf );
 
 /*****************************************************************************
  * OpenIntf: initialize interface
@@ -119,13 +120,12 @@ static int Open ( vlc_object_t *p_this )
 
     /* Allocate instance and initialize some members */
     intf_sys_t *p_sys = p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
-    if( p_intf->p_sys == NULL )
+    if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 
     // Configure the module
-    p_intf->pf_run = RunIntf;
-
     vlc_mutex_init( &p_sys->lock );
+    p_sys->p_input = NULL;
     p_sys->p_vout = NULL;
     p_sys->b_button_pressed = false;
     p_sys->i_threshold = var_InheritInteger( p_intf, "gestures-threshold" );
@@ -142,6 +142,8 @@ static int Open ( vlc_object_t *p_this )
 
     p_sys->i_pattern = 0;
     p_sys->i_num_gestures = 0;
+
+    var_AddCallback( pl_Get(p_intf), "input-current", PlaylistEvent, p_intf );
 
     return VLC_SUCCESS;
 }
@@ -162,11 +164,18 @@ static void Close ( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys = p_intf->p_sys;
 
-    // Destroy the callbacks
+    /* Destroy the callbacks (the order matters!) */
+    var_DelCallback( pl_Get(p_intf), "input-current", PlaylistEvent, p_intf );
+
+    if( p_sys->p_input )
+    {
+        var_DelCallback( p_sys->p_input, "intf-event", InputEvent, p_intf );
+        vlc_object_release( p_sys->p_input );
+    }
+
     if( p_sys->p_vout )
     {
-        var_DelCallback( p_sys->p_vout, "mouse-moved",
-                         MovedEvent, p_intf );
+        var_DelCallback( p_sys->p_vout, "mouse-moved", MovedEvent, p_intf );
         var_DelCallback( p_sys->p_vout, "mouse-button-down",
                          ButtonEvent, p_intf );
         vlc_object_release( p_sys->p_vout );
@@ -175,60 +184,6 @@ static void Close ( vlc_object_t *p_this )
     /* Destroy structure */
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
-}
-
-
-/*****************************************************************************
- * RunIntf: main loop
- *****************************************************************************/
-static void RunIntf( intf_thread_t *p_intf )
-{
-    intf_sys_t *p_sys = p_intf->p_sys;
-    int canc = vlc_savecancel();
-    input_thread_t *p_input;
-
-    /* Main loop */
-    while( vlc_object_alive( p_intf ) )
-    {
-        vlc_mutex_lock( &p_sys->lock );
-
-        /*
-         * video output
-         */
-        if( p_sys->p_vout && !vlc_object_alive( p_sys->p_vout ) )
-        {
-            var_DelCallback( p_sys->p_vout, "mouse-moved",
-                             MovedEvent, p_intf );
-            var_DelCallback( p_sys->p_vout, "mouse-button-down",
-                             ButtonEvent, p_intf );
-            vlc_object_release( p_sys->p_vout );
-            p_sys->p_vout = NULL;
-        }
-
-        if( p_sys->p_vout == NULL )
-        {
-            p_input = playlist_CurrentInput( pl_Get( p_intf ) );
-            if( p_input )
-            {
-                p_sys->p_vout = input_GetVout( p_input );
-                vlc_object_release( p_input );
-            }
-            if( p_sys->p_vout )
-            {
-                var_AddCallback( p_sys->p_vout, "mouse-moved",
-                                 MovedEvent, p_intf );
-                var_AddCallback( p_sys->p_vout, "mouse-button-down",
-                                 ButtonEvent, p_intf );
-            }
-        }
-
-        vlc_mutex_unlock( &p_sys->lock );
-
-        /* Wait a bit */
-        msleep( INTF_IDLE_SLEEP );
-    }
-
-    vlc_restorecancel( canc );
 }
 
 static void ProcessGesture( intf_thread_t *p_intf )
@@ -482,7 +437,7 @@ static int ButtonEvent( vlc_object_t *p_this, char const *psz_var,
     intf_thread_t *p_intf = p_data;
     intf_sys_t *p_sys = p_intf->p_sys;
 
-    (void) p_this; (void) psz_var; (void) oldval;
+    (void) psz_var; (void) oldval;
 
     vlc_mutex_lock( &p_sys->lock );
     if( val.i_int & p_sys->i_button_mask )
@@ -490,7 +445,7 @@ static int ButtonEvent( vlc_object_t *p_this, char const *psz_var,
         if( !p_sys->b_button_pressed )
         {
             p_sys->b_button_pressed = true;
-            var_GetCoords( p_sys->p_vout, "mouse-moved",
+            var_GetCoords( p_this, "mouse-moved",
                            &p_sys->i_last_x, &p_sys->i_last_y );
         }
     }
@@ -504,5 +459,61 @@ static int ButtonEvent( vlc_object_t *p_this, char const *psz_var,
     }
     vlc_mutex_unlock( &p_sys->lock );
 
+    return VLC_SUCCESS;
+}
+
+static int InputEvent( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t val, void *p_data )
+{
+    input_thread_t *p_input = (input_thread_t *)p_this;
+    intf_thread_t *p_intf = p_data;
+    intf_sys_t *p_sys = p_intf->p_sys;
+
+    (void) psz_var; (void) oldval;
+
+    switch( val.i_int )
+    {
+      case INPUT_EVENT_DEAD:
+        vlc_object_release( p_input );
+        p_sys->p_input = NULL; /* FIXME: locking!! */
+        break;
+
+      case INPUT_EVENT_VOUT:
+        /* intf-event is serialized against itself and is the sole user of
+         * p_sys->p_vout. So there is no need to acquire the lock currently. */
+        if( p_sys->p_vout != NULL )
+        {   /* /!\ Beware of lock inversion with var_DelCallback() /!\ */
+            var_DelCallback( p_sys->p_vout, "mouse-moved", MovedEvent,
+                             p_intf );
+            var_DelCallback( p_sys->p_vout, "mouse-clicked", ButtonEvent,
+                             p_intf );
+            vlc_object_release( p_sys->p_vout );
+        }
+
+        p_sys->p_vout = input_GetVout( p_input );
+        if( p_sys->p_vout != NULL )
+        {
+            var_AddCallback( p_sys->p_vout, "mouse-moved", MovedEvent,
+                             p_intf );
+            var_AddCallback( p_sys->p_vout, "mouse-clicked", ButtonEvent,
+                             p_intf );
+        }
+        break;
+    }
+    return VLC_SUCCESS;
+}
+
+static int PlaylistEvent( vlc_object_t *p_this, char const *psz_var,
+                          vlc_value_t oldval, vlc_value_t val, void *p_data )
+{
+    intf_thread_t *p_intf = p_data;
+    intf_sys_t *p_sys = p_intf->p_sys;
+    input_thread_t *p_input = val.p_address;
+
+    (void) p_this; (void) psz_var; (void) oldval;
+
+    var_AddCallback( p_input, "intf-event", InputEvent, p_intf );
+    assert( p_sys->p_input == NULL );
+    p_sys->p_input = vlc_object_hold( p_input );
     return VLC_SUCCESS;
 }
