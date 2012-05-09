@@ -47,6 +47,10 @@
 #include <vlc_interface.h>
 #include "libvlc.h"
 
+#ifdef __APPLE__
+#include "../lib/libvlc_internal.h"
+#endif
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
