@@ -40,7 +40,6 @@
 
 #include <vlc_input.h>
 #import <vlc_interface.h>
-#include "../../../lib/libvlc_internal.h"
 
 #import <intf.h>
 
@@ -64,8 +63,8 @@ int OpenIntf ( vlc_object_t *p_this )
 
     memset( p_intf->p_sys, 0, sizeof( *p_intf->p_sys ) );
 
-    libvlc_SetExitHandler( p_intf->p_libvlc, vlc_object_kill, p_intf );
-    Run( p_intf );
+    p_intf->pf_run = Run;
+    p_intf->b_should_run_on_first_thread = true;
 
     return VLC_SUCCESS;
 }

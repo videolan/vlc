@@ -43,7 +43,6 @@
 #include <vlc_aout_intf.h>
 #include <vlc_vout_window.h>
 #include <unistd.h> /* execl() */
-#include "../../../lib/libvlc_internal.h"
 
 #import "CompatibilityFixes.h"
 #import "intf.h"
@@ -108,11 +107,10 @@ int OpenIntf ( vlc_object_t *p_this )
 
     /* subscribe to LibVLCCore's messages */
     vlc_Subscribe( &p_intf->p_sys->sub, MsgCallback, NULL );
+    p_intf->pf_run = Run;
+    p_intf->b_should_run_on_first_thread = true;
 
     [o_pool release];
-
-    libvlc_SetExitHandler( p_intf->p_libvlc, vlc_object_kill, p_intf );
-    Run( p_intf );
     return VLC_SUCCESS;
 }
 
