@@ -106,6 +106,11 @@ int intf_Create( vlc_object_t *p_this, const char *chain )
 
     var_AddCallback( p_intf, "intf-add", AddIntfCallback, NULL );
 
+    /* Attach interface to LibVLC */
+#if defined( __APPLE__ )
+    p_intf->b_should_run_on_first_thread = false;
+#endif
+
     /* Choose the best module */
     p_intf->p_cfg = NULL;
     char *psz_parser = *chain == '$'
@@ -124,6 +129,17 @@ int intf_Create( vlc_object_t *p_this, const char *chain )
         goto error;
     }
 
+#if defined( __APPLE__ )
+    /* Hack to get Mac OS X Cocoa runtime running
+     * (it needs access to the main thread) */
+    if( p_intf->b_should_run_on_first_thread )
+    {
+        libvlc_SetExitHandler( p_libvlc, vlc_object_kill, p_intf );
+        assert( p_intf->pf_run );
+        p_intf->pf_run( p_intf );
+    }
+    else
+#endif
     /* Run the interface in a separate thread */
     if( p_intf->pf_run
      && vlc_clone( &p_intf->thread,
@@ -176,6 +192,9 @@ void intf_DestroyAll( libvlc_int_t *p_libvlc )
         if( p_intf->pf_run )
         {
             vlc_cancel( p_intf->thread );
+#ifdef __APPLE__
+            if (!p_intf->b_should_run_on_first_thread)
+#endif
             vlc_join( p_intf->thread, NULL );
         }
         module_unneed( p_intf, p_intf->p_module );
