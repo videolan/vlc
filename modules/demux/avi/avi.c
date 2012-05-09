@@ -244,7 +244,7 @@ static int Open( vlc_object_t * p_this )
     demux_t  *p_demux = (demux_t *)p_this;
     demux_sys_t     *p_sys;
 
-    bool       b_index = false;
+    bool       b_index = false, b_aborted = false;
     int              i_do_index;
 
     avi_chunk_list_t    *p_riff;
@@ -689,8 +689,7 @@ aviindex:
                         msg_Dbg( p_demux, "Fixing AVI index" );
                         goto aviindex;
                     case 3:
-                        /* Kill input */
-                        vlc_object_kill( p_demux->p_parent );
+                        b_aborted = true;
                         goto error;
                 }
             }
@@ -766,7 +765,7 @@ error:
 
     AVI_ChunkFreeRoot( p_demux->s, &p_sys->ck_root );
     free( p_sys );
-    return vlc_object_alive( p_demux ) ? VLC_EGENERIC : VLC_ETIMEOUT;
+    return b_aborted ? VLC_ETIMEOUT : VLC_EGENERIC;
 }
 
 /*****************************************************************************
