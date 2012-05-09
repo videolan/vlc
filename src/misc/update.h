@@ -38,6 +38,7 @@
  */
 
 #include <vlc_update.h>
+#include <vlc_atomic.h>
 
 enum    /* Public key algorithms */
 {
@@ -152,6 +153,7 @@ typedef struct
     VLC_COMMON_MEMBERS
 
     vlc_thread_t thread;
+    vlc_atomic_t aborted;
     update_t *p_update;
     char *psz_destdir;
 } update_download_thread_t;
