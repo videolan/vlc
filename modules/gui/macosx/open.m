@@ -829,9 +829,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
             returnValue = kVLCMediaBD;
         else
         {
-            if ([mountPath rangeOfString:@"VIDEO_TS"].location != NSNotFound)
+            if ([mountPath rangeOfString:@"VIDEO_TS" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound)
                 returnValue = kVLCMediaVideoTSFolder;
-            else if ([mountPath rangeOfString:@"BDMV"].location != NSNotFound)
+            else if ([mountPath rangeOfString:@"BDMV" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound)
                 returnValue = kVLCMediaBDMVFolder;
             else
             {
@@ -853,7 +853,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
                     }
                 }
                 if(!returnValue)
-                    returnValue = kVLCMediaUnknown;
+                    returnValue = kVLCMediaVideoTSFolder;
             }
         }
 
@@ -972,13 +972,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
         NSString *o_path = [[[o_open_panel URLs] objectAtIndex: 0] path];
         if ([o_path length] > 0 )
         {
-            if ([o_path rangeOfString:@"VIDEO_TS"].location != NSNotFound || [o_path rangeOfString:@"BDMV"].location != NSNotFound)
-            {
-                [o_specialMediaFolders addObject: o_path];
-                [self scanOpticalMedia: nil];
-            }
-            else
-                msg_Dbg( VLCIntf, "chosen directory is no suitable special media folder" );
+            [o_specialMediaFolders addObject: o_path];
+            [self scanOpticalMedia: nil];
         }
     }
 }
