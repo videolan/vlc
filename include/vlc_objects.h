@@ -73,10 +73,6 @@ VLC_API char *vlc_object_get_name( const vlc_object_t * ) VLC_USED;
     vlc_list_children( VLC_OBJECT(a) )
 
 /* Objects and threading */
-VLC_API void vlc_object_kill( vlc_object_t * ) VLC_DEPRECATED;
-#define vlc_object_kill(a) \
-    vlc_object_kill( VLC_OBJECT(a) )
-
 VLC_USED VLC_DEPRECATED
 static inline bool vlc_object_alive (const vlc_object_t *obj)
 {
