@@ -646,14 +646,18 @@ libvlc_media_list_player_get_state(libvlc_media_list_player_t * p_mlp)
 int libvlc_media_list_player_play_item_at_index(libvlc_media_list_player_t * p_mlp, int i_index)
 {
     lock(p_mlp);
-    set_current_playing_item(p_mlp, libvlc_media_list_path_with_root_index(i_index));
+    libvlc_media_list_path_t path = libvlc_media_list_path_with_root_index(i_index);
+    set_current_playing_item(p_mlp, path);
     libvlc_media_player_play(p_mlp->p_mi);
     unlock(p_mlp);
 
     /* Send the next item event */
     libvlc_event_t event;
     event.type = libvlc_MediaListPlayerNextItemSet;
+    libvlc_media_t * p_md = libvlc_media_list_item_at_path(p_mlp->p_mlist, path);
+    event.u.media_list_player_next_item_set.item = p_md;
     libvlc_event_send(p_mlp->p_event_manager, &event);
+    libvlc_media_release(p_md);
     return 0;
 }
 
