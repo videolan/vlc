@@ -51,9 +51,6 @@
  * Local prototypes
  *****************************************************************************/
 static void* RunInterface( void * );
-#if defined( __APPLE__)
-static void * MonitorLibVLCDeath( vlc_object_t *p_this );
-#endif
 static int AddIntfCallback( vlc_object_t *, char const *,
                             vlc_value_t , vlc_value_t , void * );
 
