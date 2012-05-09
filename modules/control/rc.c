@@ -455,6 +455,16 @@ static void Run( intf_thread_t *p_intf )
 
     p_buffer[0] = 0;
 
+#ifdef WIN32
+    /* Get the file descriptor of the console input */
+    p_intf->p_sys->hConsoleIn = GetStdHandle(STD_INPUT_HANDLE);
+    if( p_intf->p_sys->hConsoleIn == INVALID_HANDLE_VALUE )
+    {
+        msg_Err( p_intf, "couldn't find user input handle" );
+        return;
+    }
+#endif
+
     /* Register commands that will be cleaned up upon object destruction */
     p_intf->p_sys->p_playlist = p_playlist;
     RegisterCallbacks( p_intf );
@@ -462,16 +472,6 @@ static void Run( intf_thread_t *p_intf )
     /* status callbacks */
     /* Listen to audio volume updates */
     var_AddCallback( p_playlist, "volume", VolumeChanged, p_intf );
-
-#ifdef WIN32
-    /* Get the file descriptor of the console input */
-    p_intf->p_sys->hConsoleIn = GetStdHandle(STD_INPUT_HANDLE);
-    if( p_intf->p_sys->hConsoleIn == INVALID_HANDLE_VALUE )
-    {
-        msg_Err( p_intf, "couldn't find user input handle" );
-        vlc_object_kill( p_intf );
-    }
-#endif
 
     while( vlc_object_alive( p_intf ) )
     {
