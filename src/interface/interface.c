@@ -134,8 +134,8 @@ int intf_Create( vlc_object_t *p_this, const char *chain )
         libvlc_SetExitHandler( p_libvlc, vlc_object_kill, p_intf );
         assert( p_intf->pf_run );
         p_intf->pf_run( p_intf );
+        p_intf->pf_run = NULL;
     }
-    else
 #endif
     /* Run the interface in a separate thread */
     if( p_intf->pf_run
@@ -189,9 +189,6 @@ void intf_DestroyAll( libvlc_int_t *p_libvlc )
         if( p_intf->pf_run )
         {
             vlc_cancel( p_intf->thread );
-#ifdef __APPLE__
-            if (!p_intf->b_should_run_on_first_thread)
-#endif
             vlc_join( p_intf->thread, NULL );
         }
         module_unneed( p_intf, p_intf->p_module );
