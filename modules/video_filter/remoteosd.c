@@ -370,10 +370,6 @@ static void stop_osdvnc ( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    /* It will unlock socket reading */
-    vlc_object_kill( p_filter );
-
-    /* */
     msg_Dbg( p_filter, "joining worker_thread" );
     vlc_cancel( p_sys->worker_thread );
     vlc_join( p_sys->worker_thread, NULL );
