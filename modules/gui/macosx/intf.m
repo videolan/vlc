@@ -65,6 +65,8 @@
 #import <AddressBook/AddressBook.h>         /* for crashlog send mechanism */
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */
 
+#include "../../../lib/libvlc_internal.h"
+
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -97,6 +99,7 @@ int OpenIntf ( vlc_object_t *p_this )
 {
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     [VLCApplication sharedApplication];
+
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
 
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
@@ -107,8 +110,9 @@ int OpenIntf ( vlc_object_t *p_this )
 
     /* subscribe to LibVLCCore's messages */
     vlc_Subscribe( &p_intf->p_sys->sub, MsgCallback, NULL );
-    p_intf->pf_run = Run;
-    p_intf->b_should_run_on_first_thread = true;
+
+    libvlc_SetExitHandler( p_intf->p_libvlc, vlc_object_kill, p_intf );
+    Run( p_intf );
 
     [o_pool release];
     return VLC_SUCCESS;
@@ -205,6 +209,8 @@ static void Run( intf_thread_t *p_intf )
     [[VLCMain sharedInstance] applicationWillTerminate:nil];
     [o_appLock release];
     [o_pool release];
+
+    raise(SIGTERM);
 }
 
 #pragma mark -
