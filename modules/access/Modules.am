@@ -44,7 +44,6 @@ libaccess_smb_plugin_la_DEPENDENCIES =
 libvlc_LTLIBRARIES += $(LTLIBaccess_smb)
 
 SOURCES_access_directory = directory.c
-SOURCES_access_dv = dv.c
 SOURCES_access_udp = udp.c
 SOURCES_access_tcp = tcp.c
 SOURCES_access_http = http.c
@@ -54,6 +53,7 @@ SOURCES_access_eyetv = eyetv.m
 SOURCES_dvdnav = dvdnav.c
 SOURCES_dvdread = dvdread.c
 SOURCES_dc1394 = dc1394.c
+SOURCES_dv1394 = dv.c
 SOURCES_pvr = pvr.c
 SOURCES_linsys_sdi = linsys/linsys_sdi.c linsys/linsys_sdi.h
 SOURCES_linsys_hdsdi = \

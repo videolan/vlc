@@ -62,7 +62,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     set_capability( "access", 0 )
-    add_shortcut( "dv", "dv1394", "raw1394" )
+    add_shortcut( "dv", "raw1394" )
     set_callbacks( Open, Close )
 vlc_module_end ()
 

@@ -9,7 +9,6 @@ $Id$
  * access_avio: Access and Stream output module using libavformat network
  * access_bd: Blu-Ray Disc access
  * access_directory: Access module to read files in a directory
- * access_dv: Raw1394 Digital Video (Firewire/IEEE1394/I-Link) access module
  * access_eyetv: Access module to connect to our plugin running within EyeTV
  * access_ftp: FTP Network access module
  * access_gnomevfs: GnomeVFS access
@@ -108,6 +107,7 @@ $Id$
  * dtstospdif: Audio converter that encapsulates DTS into S/PDIF
  * dtv: DVB support (superseds bda module for Windows)
  * dummy: dummy interface
+ * dv1394: Digital Video (Firewire/IEEE1394/I-Link) access module
  * dvbsub: decoder module for subs in dvb streams
  * dvdnav: access module for DVDs with libdvdnav
  * dvdread: input module for accessing DVDs, uses libdvdread

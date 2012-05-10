@@ -1719,7 +1719,7 @@ dnl - dv module: digital video module check for libraw1394
 dnl - linsys modules: access module check for libzvbi
 dnl
 PKG_ENABLE_MODULES_VLC([DC1394], [], [libraw1394 >= 2.0.1 libdc1394-2 >= 2.1.0], [dc1394 access module], [auto])
-PKG_ENABLE_MODULES_VLC([DV], [access_dv], [libraw1394 >= 2.0.1 libavc1394 >= 0.5.3], [DV input module], [auto])
+PKG_ENABLE_MODULES_VLC([DV1394], [], [libraw1394 >= 2.0.1 libavc1394 >= 0.5.3], [DV FireWire input module], [auto])
 
 AC_ARG_ENABLE(linsys,
   [AS_HELP_STRING([--enable-linsys],
