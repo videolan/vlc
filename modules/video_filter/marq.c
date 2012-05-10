@@ -36,6 +36,7 @@
 
 #include <vlc_filter.h>
 #include <vlc_block.h>
+#include <vlc_fs.h>
 
 #include <vlc_strings.h>
 
@@ -349,7 +350,7 @@ out:
 
 static char *ReadFile( filter_t *obj, const char *path )
 {
-    FILE *stream = fopen( path, "rt" );
+    FILE *stream = vlc_fopen( path, "rt" );
     if( stream == NULL )
     {
         msg_Err( obj, "cannot open %s: %m", path );
