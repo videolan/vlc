@@ -51,6 +51,7 @@ static const char *const ppsz_encodings[] = {
     "GB18030",
     "ISO-8859-15",
     "Windows-1252",
+    "IBM850",
     "ISO-8859-2",
     "Windows-1250",
     "ISO-8859-3",
@@ -103,6 +104,7 @@ static const char *const ppsz_encoding_names[] = {
     /* 1 */
     N_("Western European (Latin-9)"), /* mostly superset of Latin-1 */
     N_("Western European (Windows-1252)"),
+    N_("Western European (IBM 00850)"),
     /* 2 */
     N_("Eastern European (Latin-2)"),
     N_("Eastern European (Windows-1250)"),
