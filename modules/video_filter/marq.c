@@ -46,7 +46,7 @@ static int  CreateFilter ( vlc_object_t * );
 static void DestroyFilter( vlc_object_t * );
 static subpicture_t *Filter( filter_t *, mtime_t );
 
-
+static char *ReadFile( filter_t *, const char * );
 static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
                             vlc_value_t oldval, vlc_value_t newval,
                             void *p_data );
@@ -74,6 +74,7 @@ struct filter_sys_t
     int i_timeout;
 
     char *format; /**< marquee text format */
+    char *filepath; /**< marquee file path */
     char *message; /**< marquee plain text */
 
     text_style_t *p_style; /* font control */
@@ -99,6 +100,8 @@ struct filter_sys_t
     "$N = name, $O = audio language, $P = position (in %), $R = rate, " \
     "$S = audio sample rate (in kHz), " \
     "$T = time, $U = publisher, $V = volume, $_ = new line) ")
+#define FILE_TEXT N_("Text file")
+#define FILE_LONGTEXT N_("File to read the marquee text from.")
 #define POSX_TEXT N_("X offset")
 #define POSX_LONGTEXT N_("X offset, from the left screen edge." )
 #define POSY_TEXT N_("Y offset")
@@ -152,6 +155,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
     add_string( CFG_PREFIX "marquee", "VLC", MSG_TEXT, MSG_LONGTEXT,
                 false )
+    add_loadfile( CFG_PREFIX "file", NULL, FILE_TEXT, FILE_LONGTEXT, true )
 
     set_section( N_("Position"), NULL )
     add_integer( CFG_PREFIX "x", 0, POSX_TEXT, POSX_LONGTEXT, true )
@@ -217,6 +221,7 @@ static int CreateFilter( vlc_object_t *p_this )
     var_AddCallback( p_filter, "marq-refresh", MarqueeCallback, p_sys );
     CREATE_VAR( i_pos, Integer, "marq-position" );
     CREATE_VAR( format, String, "marq-marquee" );
+    p_sys->filepath = var_InheritString( p_filter, "marq-file" );
     p_sys->message = NULL;
     p_sys->p_style->i_font_alpha = var_CreateGetIntegerCommand( p_filter,
                                                             "marq-opacity" );
@@ -255,6 +260,7 @@ static void DestroyFilter( vlc_object_t *p_this )
     vlc_mutex_destroy( &p_sys->lock );
     text_style_Delete( p_sys->p_style );
     free( p_sys->format );
+    free( p_sys->filepath );
     free( p_sys->message );
     free( p_sys );
 }
@@ -273,6 +279,16 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     vlc_mutex_lock( &p_sys->lock );
     if( p_sys->last_time + p_sys->i_refresh > date )
         goto out;
+
+    if( p_sys->filepath != NULL )
+    {
+        char *fmt = ReadFile( p_filter, p_sys->filepath );
+        if( fmt != NULL )
+        {
+            free( p_sys->format );
+            p_sys->format = fmt;
+        }
+    }
 
     char *msg = str_format( p_filter, p_sys->format ? p_sys->format : "" );
     if( unlikely( msg == NULL ) )
@@ -329,6 +345,31 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 out:
     vlc_mutex_unlock( &p_sys->lock );
     return p_spu;
+}
+
+static char *ReadFile( filter_t *obj, const char *path )
+{
+    FILE *stream = fopen( path, "rt" );
+    if( stream == NULL )
+    {
+        msg_Err( obj, "cannot open %s: %m", path );
+        return NULL;
+    }
+
+    char *line = NULL;
+
+    ssize_t len = getline( &line, &(size_t){ 0 }, stream );
+    if( len == -1 )
+    {
+        msg_Err( obj, "cannot read %s: %m", path );
+        clearerr( stream );
+        line = NULL;
+    }
+    fclose( stream );
+
+    if( len >= 1 && line[len - 1] == '\n' )
+        line[--len]  = '\0';
+    return line;
 }
 
 /**********************************************************************
