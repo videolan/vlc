@@ -2253,6 +2253,18 @@ static void UpdateGenericFromDemux( input_thread_t *p_input )
         }
         p_demux->info.i_update &= ~INPUT_UPDATE_META;
     }
+    if( p_demux->info.i_update & INPUT_UPDATE_SIGNAL )
+    {
+        double quality;
+        double strength;
+
+        if( demux_Control( p_demux, DEMUX_GET_SIGNAL, &quality, &strength ) )
+            quality = strength = -1.;
+
+        input_SendEventSignal( p_input, quality, strength );
+
+        p_demux->info.i_update &= ~INPUT_UPDATE_SIGNAL;
+    }
 
     p_demux->info.i_update &= ~INPUT_UPDATE_SIZE;
 }
