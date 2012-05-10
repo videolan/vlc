@@ -47,7 +47,7 @@ static int  CreateFilter ( vlc_object_t * );
 static void DestroyFilter( vlc_object_t * );
 static subpicture_t *Filter( filter_t *, mtime_t );
 
-static char *ReadFile( filter_t *, const char * );
+static char *MarqueeReadFile( filter_t *, const char * );
 static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
                             vlc_value_t oldval, vlc_value_t newval,
                             void *p_data );
@@ -283,7 +283,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     if( p_sys->filepath != NULL )
     {
-        char *fmt = ReadFile( p_filter, p_sys->filepath );
+        char *fmt = MarqueeReadFile( p_filter, p_sys->filepath );
         if( fmt != NULL )
         {
             free( p_sys->format );
@@ -348,7 +348,7 @@ out:
     return p_spu;
 }
 
-static char *ReadFile( filter_t *obj, const char *path )
+static char *MarqueeReadFile( filter_t *obj, const char *path )
 {
     FILE *stream = vlc_fopen( path, "rt" );
     if( stream == NULL )
