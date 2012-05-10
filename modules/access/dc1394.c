@@ -34,20 +34,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_input.h>
 #include <vlc_demux.h>
-#include <vlc_fs.h>
-#include <vlc_picture.h>
-
-#include <fcntl.h>
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#elif defined( WIN32 ) && !defined( UNDER_CE )
-#   include <io.h>
-#endif
-
-#include <sys/ioctl.h>
-#include <sys/soundcard.h>
 
 #include <dc1394/dc1394.h>
 
@@ -59,8 +46,6 @@
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
-static int OpenAudioDev( demux_t *p_demux );
-static inline void CloseAudioDev( demux_t *p_demux );
 
 vlc_module_begin()
     set_shortname( N_("DC1394") )
@@ -93,14 +78,6 @@ struct demux_sys_t
     unsigned int        focus;
     es_out_id_t         *p_es_video;
     dc1394video_frame_t *frame;
-
-    /* audio stuff */
-    int                 i_sample_rate;
-    int                 channels;
-    int                 i_audio_max_frame_size;
-    int                 fd_audio;
-    char                *audio_device;
-    es_out_id_t         *p_es_audio;
 };
 
 /*****************************************************************************
@@ -109,7 +86,6 @@ struct demux_sys_t
 static int Demux( demux_t *p_demux );
 static int Control( demux_t *, int, va_list );
 static block_t *GrabVideo( demux_t *p_demux );
-static block_t *GrabAudio( demux_t *p_demux );
 static int process_options( demux_t *p_demux);
 
 /*****************************************************************************
@@ -214,7 +190,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->frame_rate      = DC1394_FRAMERATE_15;
     p_sys->brightness      = 200;
     p_sys->focus           = 0;
-    p_sys->fd_audio        = -1;
     p_sys->p_dccontext     = NULL;
     p_sys->camera          = NULL;
     p_sys->selected_camera = -1;
@@ -382,28 +357,6 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->p_es_video = es_out_Add( p_demux->out, &fmt );
 
-    if( p_sys->audio_device )
-    {
-        if( OpenAudioDev( p_demux ) == VLC_SUCCESS )
-        {
-            es_format_t fmt;
-            es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_S16L ); /* FIXME: hmm, ?? */
-
-            fmt.audio.i_channels = p_sys->channels ? p_sys->channels : 1;
-            fmt.audio.i_rate = p_sys->i_sample_rate;
-            fmt.audio.i_bitspersample = 16;
-            fmt.audio.i_blockalign = fmt.audio.i_channels *
-                                     fmt.audio.i_bitspersample / 8;
-            fmt.i_bitrate = fmt.audio.i_channels * fmt.audio.i_rate *
-                            fmt.audio.i_bitspersample;
-
-            msg_Dbg( p_demux, "New audio es %d channels %dHz",
-            fmt.audio.i_channels, fmt.audio.i_rate );
-
-            p_sys->p_es_audio = es_out_Add( p_demux->out, &fmt );
-        }
-    }
-
     /* have the camera start sending us data */
     if( dc1394_video_set_transmission( p_sys->camera,
                        DC1394_ON ) != DC1394_SUCCESS )
@@ -416,70 +369,6 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_demux, "Set iso transmission" );
     // TODO: reread camera
     return VLC_SUCCESS;
-}
-
-static int OpenAudioDev( demux_t *p_demux )
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-    char *psz_device = p_sys->audio_device;
-    int i_format = AFMT_S16_LE;
-    int result;
-
-    p_sys->fd_audio = vlc_open( psz_device, O_RDONLY | O_NONBLOCK );
-    if( p_sys->fd_audio  < 0 )
-    {
-        msg_Err( p_demux, "Cannot open audio device (%s)", psz_device );
-        return VLC_EGENERIC;
-    }
-
-    if( !p_sys->i_sample_rate )
-        p_sys->i_sample_rate = 44100;
-
-    result = ioctl( p_sys->fd_audio, SNDCTL_DSP_SETFMT, &i_format );
-    if( (result  < 0) || (i_format != AFMT_S16_LE) )
-    {
-        msg_Err( p_demux, "Cannot set audio format (16b little endian) "
-                          "(%d)", i_format );
-        goto error;
-    }
-
-    result = ioctl( p_sys->fd_audio, SNDCTL_DSP_CHANNELS, &p_sys->channels );
-    if( result < 0 )
-    {
-        msg_Err( p_demux, "Cannot set audio channels count (%d)",
-                 p_sys->channels );
-        goto error;
-    }
-
-    result = ioctl( p_sys->fd_audio, SNDCTL_DSP_SPEED, &p_sys->i_sample_rate );
-    if( result < 0 )
-    {
-        msg_Err( p_demux, "Cannot set audio sample rate (%d)",
-         p_sys->i_sample_rate );
-        goto error;
-    }
-
-    msg_Dbg( p_demux, "Opened adev=`%s' %s %dHz",
-             psz_device,
-             (p_sys->channels > 1) ? "stereo" : "mono",
-             p_sys->i_sample_rate );
-
-    p_sys->i_audio_max_frame_size = 32 * 1024;
-
-    return VLC_SUCCESS;
-
-error:
-    CloseAudioDev( p_demux );
-    p_sys->fd_audio = -1;
-    return VLC_EGENERIC;
-}
-
-static inline void CloseAudioDev( demux_t *p_demux )
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    if( p_sys->fd_audio >= 0 )
-        close( p_sys->fd_audio );
 }
 
 /*****************************************************************************
@@ -498,13 +387,10 @@ static void Close( vlc_object_t *p_this )
     /* Close camera */
     dc1394_capture_stop( p_sys->camera );
 
-    CloseAudioDev( p_demux );
-
     dc1394_camera_free(p_sys->camera);
     dc1394_free(p_sys->p_dccontext);
 
     free( p_sys->video_device );
-    free( p_sys->audio_device );
     free( p_sys );
 }
 
@@ -581,71 +467,21 @@ static block_t *GrabVideo( demux_t *p_demux )
     return p_block;
 }
 
-static block_t *GrabAudio( demux_t *p_demux )
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-    struct audio_buf_info buf_info;
-    block_t *p_block = NULL;
-    int i_read = 0;
-    int i_correct = 0;
-    int result = 0;
-
-    p_block = block_New( p_demux, p_sys->i_audio_max_frame_size );
-    if( !p_block )
-    {
-        msg_Warn( p_demux, "Cannot get buffer" );
-        return NULL;
-    }
-
-    i_read = read( p_sys->fd_audio, p_block->p_buffer,
-                   p_sys->i_audio_max_frame_size );
-
-    if( i_read <= 0 )
-    {
-        block_Release( p_block );
-        return NULL;
-    }
-
-    p_block->i_buffer = i_read;
-
-    /* Correct the date because of kernel buffering */
-    i_correct = i_read;
-    result = ioctl( p_sys->fd_audio, SNDCTL_DSP_GETISPACE, &buf_info );
-    if( result == 0 )
-        i_correct += buf_info.bytes;
-
-    p_block->i_pts = p_block->i_dts =
-                        mdate() - INT64_C(1000000) * (mtime_t)i_correct /
-                        2 / p_sys->channels / p_sys->i_sample_rate;
-    return p_block;
-}
-
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    block_t *p_blocka = NULL;
     block_t *p_blockv = NULL;
-
-    /* Try grabbing audio frames first */
-    if( p_sys->fd_audio >= 0 )
-        p_blocka = GrabAudio( p_demux );
 
     /* Try grabbing video frame */
     p_blockv = GrabVideo( p_demux );
 
-    if( !p_blocka && !p_blockv )
+    if( !p_blockv )
     {
         /* Sleep so we do not consume all the cpu, 10ms seems
          * like a good value (100fps)
          */
         msleep( 10000 );
         return 1;
-    }
-
-    if( p_blocka )
-    {
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_blocka->i_pts );
-        es_out_Send( p_demux->out, p_sys->p_es_audio, p_blocka );
     }
 
     if( p_blockv )
@@ -879,22 +715,6 @@ static int process_options( demux_t *p_demux )
             token += strlen("vdev=");
             p_sys->video_device = strdup(token);
             msg_Dbg( p_demux, "Using video device '%s'.", token );
-        }
-        else if( strncmp( token, "adev=", strlen( "adev=" ) ) == 0 )
-        {
-            token += strlen("adev=");
-            p_sys->audio_device = strdup(token);
-            msg_Dbg( p_demux, "Using audio device '%s'.", token );
-        }
-        else if( strncmp( token, "samplerate=", strlen( "samplerate=" ) ) == 0 )
-        {
-            token += strlen("samplerate=");
-            sscanf( token, "%d", &p_sys->i_sample_rate );
-        }
-        else if( strncmp( token, "channels=", strlen("channels=" ) ) == 0 )
-        {
-            token += strlen("channels=");
-            sscanf( token, "%d", &p_sys->channels );
         }
         else if( strncmp( token, "focus=", strlen("focus=" ) ) == 0)
         {
