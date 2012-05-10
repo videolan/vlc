@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dc1394.c: firewire input module
+ * dc1394.c: IIDC (DCAM) FireWire input module
  *****************************************************************************
  * Copyright (C) 2006-2009 VideoLAN
  *
@@ -49,7 +49,6 @@
 #include <sys/ioctl.h>
 #include <sys/soundcard.h>
 
-#include <libraw1394/raw1394.h>
 #include <dc1394/dc1394.h>
 
 #define MAX_IEEE1394_HOSTS 32
@@ -64,7 +63,8 @@ static int OpenAudioDev( demux_t *p_demux );
 static inline void CloseAudioDev( demux_t *p_demux );
 
 vlc_module_begin()
-    set_description( N_("dc1394 input") )
+    set_shortname( N_("DC1394") )
+    set_description( N_("IIDC Digital Camera (FireWire) input") )
     set_capability( "access_demux", 10 )
     add_shortcut( "dc1394" )
     set_callbacks( Open, Close )

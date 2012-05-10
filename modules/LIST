@@ -85,7 +85,7 @@ $Id$
  * crystalhd: crystalhd decoder
  * cvdsub: CVD subtitles decoder
  * dbus: D-Bus control interface
- * dc1394: firewire input module
+ * dc1394: IIDC (DCAM) FireWire input module
  * ddummy: dummy decoder
  * decklink: input module to read from a Blackmagic SDI card
  * decomp: Decompression module
