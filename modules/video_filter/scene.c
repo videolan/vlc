@@ -1,7 +1,7 @@
 /*****************************************************************************
  * scene.c : scene video filter (based on modules/video_output/image.c)
  *****************************************************************************
- * Copyright (C) 2004-2008 the VideoLAN team
+ * Copyright (C) 2004-2012 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman@videolan.org>
@@ -40,6 +40,8 @@
 #include <vlc_strings.h>
 #include <vlc_fs.h>
 
+#include <vlc_picture_fifo.h>
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -50,6 +52,7 @@ static picture_t *Filter( filter_t *, picture_t * );
 
 static void SnapshotRatio( filter_t *p_filter, picture_t *p_pic );
 static void SavePicture( filter_t *, picture_t * );
+static void *WriteThread( void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -123,8 +126,12 @@ static const char *const ppsz_vfilter_options[] = {
 };
 
 typedef struct scene_t {
-    picture_t       *p_pic;
-    video_format_t  format;
+    picture_fifo_t  *fifo;
+
+    vlc_mutex_t     lock;
+    vlc_cond_t      wait;
+    bool            empty;
+    bool            stop;
 } scene_t;
 
 /*****************************************************************************
@@ -132,6 +139,8 @@ typedef struct scene_t {
  *****************************************************************************/
 struct filter_sys_t
 {
+    vlc_thread_t thread;
+
     image_handler_t *p_image;
     scene_t scene;
 
@@ -161,6 +170,13 @@ static int Create( vlc_object_t *p_this )
     if( p_filter->p_sys == NULL )
         return VLC_ENOMEM;
 
+    p_sys->scene.fifo = picture_fifo_New();
+    if( !p_sys->scene.fifo)
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
+
     p_sys->p_image = image_HandlerCreate( p_this );
     if( !p_sys->p_image )
     {
@@ -189,8 +205,28 @@ static int Create( vlc_object_t *p_this )
     if( p_sys->psz_path == NULL )
         p_sys->psz_path = config_GetUserDir( VLC_PICTURES_DIR );
 
+    p_sys->scene.stop = false;
+    p_sys->scene.empty = true;
+
+    vlc_mutex_init( &p_sys->scene.lock );
+    vlc_cond_init( &p_sys->scene.wait );
+
     p_filter->pf_video_filter = Filter;
 
+    if( vlc_clone( &p_sys->thread, WriteThread, (void *)p_filter,
+                   VLC_THREAD_PRIORITY_OUTPUT ) )
+    {
+        image_HandlerDelete( p_sys->p_image );
+
+        if( p_sys->scene.fifo )
+            picture_fifo_Delete( p_sys->scene.fifo );
+
+        free( p_sys->psz_format );
+        free( p_sys->psz_prefix );
+        free( p_sys->psz_path );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
     return VLC_SUCCESS;
 }
 
@@ -202,10 +238,21 @@ static void Destroy( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = (filter_sys_t *) p_filter->p_sys;
 
+    vlc_mutex_lock( &p_sys->scene.lock );
+    p_sys->scene.stop = true;
+    vlc_cond_signal( &p_sys->scene.wait );
+    vlc_mutex_unlock( &p_sys->scene.lock );
+
+    vlc_join( p_sys->thread, NULL );
+
+    vlc_cond_destroy( &p_sys->scene.wait );
+    vlc_mutex_destroy( &p_sys->scene.lock );
+
     image_HandlerDelete( p_sys->p_image );
 
-    if( p_sys->scene.p_pic )
-        picture_Release( p_sys->scene.p_pic );
+    if( p_sys->scene.fifo )
+        picture_fifo_Delete( p_sys->scene.fifo );
+
     free( p_sys->psz_format );
     free( p_sys->psz_prefix );
     free( p_sys->psz_path );
@@ -235,29 +282,56 @@ static void SnapshotRatio( filter_t *p_filter, picture_t *p_pic )
     }
     p_sys->i_frames++;
 
-    if( p_sys->scene.p_pic )
-        picture_Release( p_sys->scene.p_pic );
+    picture_t *p_newpic = picture_NewFromFormat( &p_pic->format );
+    if( p_newpic )
+    {
+        picture_Copy( p_newpic, p_pic );
+        picture_fifo_Push( p_sys->scene.fifo, p_newpic );
 
-    if( (p_sys->i_width <= 0) && (p_sys->i_height > 0) )
-    {
-        p_sys->i_width = (p_pic->format.i_width * p_sys->i_height) / p_pic->format.i_height;
+        vlc_mutex_lock( &p_sys->scene.lock );
+        if( p_sys->scene.empty )
+        {
+            p_sys->scene.empty = false;
+            vlc_cond_signal( &p_sys->scene.wait );
+        }
+        vlc_mutex_unlock( &p_sys->scene.lock );
     }
-    else if( (p_sys->i_height <= 0) && (p_sys->i_width > 0) )
+}
+
+static void *WriteThread( void *data )
+{
+    filter_t *p_filter = (filter_t *)data;
+    filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
+    picture_t *p_pic = NULL;
+
+    for(;;)
     {
-        p_sys->i_height = (p_pic->format.i_height * p_sys->i_width) / p_pic->format.i_width;
-    }
-    else if( (p_sys->i_width <= 0) && (p_sys->i_height <= 0) )
-    {
-        p_sys->i_width = p_pic->format.i_width;
-        p_sys->i_height = p_pic->format.i_height;
+        p_pic = picture_fifo_Pop( p_sys->scene.fifo );
+        if( !p_pic )
+        {
+            vlc_mutex_lock( &p_sys->scene.lock );
+            p_sys->scene.empty = true;
+            while( p_sys->scene.empty && !p_sys->scene.stop )
+                vlc_cond_wait( &p_sys->scene.wait, &p_sys->scene.lock );
+            if( p_sys->scene.stop )
+            {
+                vlc_mutex_unlock( &p_sys->scene.lock );
+                break;
+            }
+            vlc_mutex_unlock( &p_sys->scene.lock );
+            continue;
+        }
+
+        SavePicture( p_filter, p_pic );
+
+        picture_Release( p_pic );
+        p_pic = NULL;
     }
 
-    p_sys->scene.p_pic = picture_NewFromFormat( &p_pic->format );
-    if( p_sys->scene.p_pic )
-    {
-        picture_Copy( p_sys->scene.p_pic, p_pic );
-        SavePicture( p_filter, p_sys->scene.p_pic );
-    }
+    if( p_pic )
+        picture_Release( p_pic );
+
+    return NULL;
 }
 
 /*****************************************************************************
@@ -273,6 +347,21 @@ static void SavePicture( filter_t *p_filter, picture_t *p_pic )
 
     memset( &fmt_in, 0, sizeof(video_format_t) );
     memset( &fmt_out, 0, sizeof(video_format_t) );
+
+    /* Aspect */
+    if( (p_sys->i_width <= 0) && (p_sys->i_height > 0) )
+    {
+        p_sys->i_width = (p_pic->format.i_width * p_sys->i_height) / p_pic->format.i_height;
+    }
+    else if( (p_sys->i_height <= 0) && (p_sys->i_width > 0) )
+    {
+        p_sys->i_height = (p_pic->format.i_height * p_sys->i_width) / p_pic->format.i_width;
+    }
+    else if( (p_sys->i_width <= 0) && (p_sys->i_height <= 0) )
+    {
+        p_sys->i_width = p_pic->format.i_width;
+        p_sys->i_height = p_pic->format.i_height;
+    }
 
     /* Save snapshot psz_format to a memory zone */
     fmt_in = p_pic->format;
