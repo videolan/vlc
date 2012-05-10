@@ -36,18 +36,14 @@
 PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf )
                 : QVLCMW( _p_intf )
 {
-    QWidget *main = new QWidget( this );
-    setCentralWidget( main );
     setWindowTitle( qtr( "Playlist" ) );
     setWindowRole( "vlc-playlist" );
     setWindowOpacity( var_InheritFloat( p_intf, "qt-opacity" ) );
 
-    QHBoxLayout *l = new QHBoxLayout( centralWidget() );
-
     getSettings()->beginGroup("playlistdialog");
 
     playlistWidget = new PlaylistWidget( p_intf, this );
-    l->addWidget( playlistWidget );
+    setCentralWidget( playlistWidget );
 
     readSettings( getSettings(), QSize( 600,700 ) );
 
