@@ -80,7 +80,6 @@ struct demux_sys_t
     uint64_t            selected_uid;
     uint32_t            dma_buffers;
     dc1394featureset_t  features;
-    quadlet_t           supported_framerates;
     bool                reset_bus;
 
     /* video info */
