@@ -1836,7 +1836,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_fullscreen_window makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
 
     [o_fullscreen_window makeKeyWindow];
-    [o_fullscreen_window setAcceptsMouseMovedEvents: TRUE];
+    [o_fullscreen_window setAcceptsMouseMovedEvents: YES];
 
     /* tell the fspanel to move itself to front next time it's triggered */
     [o_fspanel setVoutWasUpdated: (int)[[o_fullscreen_window screen] displayID]];
@@ -2494,6 +2494,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
+    [self setAcceptsMouseMovedEvents: YES];
+
     if (b_dark_interface)
     {
         [self setBackgroundColor: [NSColor clearColor]];
