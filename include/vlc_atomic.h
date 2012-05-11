@@ -189,14 +189,25 @@ bool vlc_atomic_compare_exchange(volatile void *object, void *expected,
 # define VLC_ATOMIC_INIT(val) { (val) }
 
 /* All functions return the atom value _after_ the operation. */
+static inline uintptr_t vlc_atomic_get(const vlc_atomic_t *atom)
+{
+    return atomic_load(&atom->u);
+}
 
-VLC_API uintptr_t vlc_atomic_get(const vlc_atomic_t *);
-VLC_API uintptr_t vlc_atomic_set(vlc_atomic_t *, uintptr_t);
-VLC_API uintptr_t vlc_atomic_add(vlc_atomic_t *, uintptr_t);
+static inline uintptr_t vlc_atomic_set(vlc_atomic_t *atom, uintptr_t v)
+{
+    atomic_store(&atom->u, v);
+    return v;
+}
+
+static inline uintptr_t vlc_atomic_add(vlc_atomic_t *atom, uintptr_t v)
+{
+    return atomic_fetch_add(&atom->u, v) + v;
+}
 
 static inline uintptr_t vlc_atomic_sub (vlc_atomic_t *atom, uintptr_t v)
 {
-    return vlc_atomic_add (atom, -v);
+    return atomic_fetch_sub (&atom->u, v) - v;
 }
 
 static inline uintptr_t vlc_atomic_inc (vlc_atomic_t *atom)
@@ -209,8 +220,16 @@ static inline uintptr_t vlc_atomic_dec (vlc_atomic_t *atom)
     return vlc_atomic_sub (atom, 1);
 }
 
-VLC_API uintptr_t vlc_atomic_swap(vlc_atomic_t *, uintptr_t);
-VLC_API uintptr_t vlc_atomic_compare_swap(vlc_atomic_t *, uintptr_t, uintptr_t);
+static inline uintptr_t vlc_atomic_swap(vlc_atomic_t *atom, uintptr_t v)
+{
+    return atomic_exchange(&atom->u, v);
+}
+
+static inline uintptr_t vlc_atomic_compare_swap(vlc_atomic_t *atom,
+                                                uintptr_t u, uintptr_t v)
+{
+    return atomic_compare_exchange_strong(&atom->u, &u, v);
+}
 
 /** Helper to retrieve a single precision from an atom. */
 static inline float vlc_atomic_getf(const vlc_atomic_t *atom)

@@ -239,7 +239,6 @@ endif
 
 SOURCES_libvlc_darwin = \
 	posix/darwin_dirs.c \
-	misc/atomic.c \
 	posix/filesystem.c \
 	posix/plugin.c \
 	posix/thread.c \
@@ -249,7 +248,6 @@ SOURCES_libvlc_darwin = \
 
 SOURCES_libvlc_linux = \
 	posix/dirs.c \
-	misc/atomic.c \
 	posix/filesystem.c \
 	posix/plugin.c \
 	posix/thread.c \
@@ -261,7 +259,6 @@ SOURCES_libvlc_linux = \
 
 SOURCES_libvlc_win32 = \
 	win32/dirs.c \
-	win32/atomic.c \
 	win32/filesystem.c \
 	win32/plugin.c \
 	win32/thread.c \
@@ -273,7 +270,6 @@ SOURCES_libvlc_win32 = \
 SOURCES_libvlc_symbian = \
 	symbian/path.cpp \
 	symbian/dirs.c \
-	misc/atomic.c \
 	win32/plugin.c \
 	posix/rand.c \
 	$(NULL)
@@ -281,7 +277,6 @@ SOURCES_libvlc_symbian = \
 SOURCES_libvlc_os2 = \
 	os2/getaddrinfo.c \
 	os2/dirs.c \
-	misc/atomic.c \
 	os2/filesystem.c \
 	os2/plugin.c \
 	os2/thread.c \
@@ -291,7 +286,6 @@ SOURCES_libvlc_os2 = \
 
 SOURCES_libvlc_other = \
 	posix/dirs.c \
-	misc/atomic.c \
 	posix/filesystem.c \
 	posix/thread.c \
 	posix/plugin.c \

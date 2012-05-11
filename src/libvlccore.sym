@@ -489,11 +489,6 @@ vlc_clone
 VLC_CompileBy
 VLC_CompileHost
 VLC_Compiler
-vlc_atomic_get
-vlc_atomic_set
-vlc_atomic_add
-vlc_atomic_swap
-vlc_atomic_compare_swap
 vlc_cond_broadcast
 vlc_cond_destroy
 vlc_cond_init
