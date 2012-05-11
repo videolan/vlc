@@ -75,4 +75,6 @@
 - (void)setAspectRatioLocked:(BOOL)b_value;
 - (BOOL)aspectRatioIsLocked;
 - (void)toggleFullscreen;
+
+- (BOOL)fixPreferences;
 @end

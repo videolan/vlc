@@ -1011,6 +1011,8 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         b_hotkeyChanged = NO;
     }
 
+    [[VLCCoreInteraction sharedInstance] fixPreferences];
+
     /* okay, let's save our changes to vlcrc */
     config_SaveConfigFile( p_intf );
 

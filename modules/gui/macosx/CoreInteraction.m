@@ -638,4 +638,41 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     }
 }
 
+#pragma mark -
+#pragma mark uncommon stuff
+
+- (BOOL)fixPreferences
+{
+    NSMutableString * o_workString;
+    NSRange returnedRange;
+    NSRange fullRange;
+    BOOL b_needsRestart = NO;
+
+    #define fixpref( pref ) \
+    o_workString = [[NSMutableString alloc] initWithFormat:@"%s", config_GetPsz( VLCIntf, pref )]; \
+    if ([o_workString length] > 0) \
+    { \
+        returnedRange = [o_workString rangeOfString:@"macosx" options: NSCaseInsensitiveSearch]; \
+        if (returnedRange.location != NSNotFound) \
+        { \
+            if ([o_workString isEqualToString:@"macosx"]) \
+                [o_workString setString:@""]; \
+            fullRange = NSMakeRange( 0, [o_workString length] ); \
+            [o_workString replaceOccurrencesOfString:@":macosx" withString:@"" options: NSCaseInsensitiveSearch range: fullRange]; \
+            fullRange = NSMakeRange( 0, [o_workString length] ); \
+            [o_workString replaceOccurrencesOfString:@"macosx:" withString:@"" options: NSCaseInsensitiveSearch range: fullRange]; \
+            \
+            config_PutPsz( VLCIntf, pref, [o_workString UTF8String] ); \
+            b_needsRestart = YES; \
+        } \
+    } \
+    [o_workString release]
+
+    fixpref( "control" );
+    fixpref( "extraintf" );
+    #undef fixpref
+
+    return b_needsRestart;
+}
+
 @end

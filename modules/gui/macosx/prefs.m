@@ -57,6 +57,7 @@
 #import "prefs.h"
 #import "simple_prefs.h"
 #import "prefs_widgets.h"
+#import "CoreInteraction.h"
 #import <vlc_keys.h>
 #import <vlc_modules.h>
 #import <vlc_plugin.h>
@@ -213,6 +214,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 {
     /* TODO: call savePrefs on Root item */
     [_rootTreeItem applyChanges];
+    [[VLCCoreInteraction sharedInstance] fixPreferences];
     config_SaveConfigFile( p_intf );
     [o_prefs_window orderOut:self];
 }

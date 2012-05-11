@@ -1899,38 +1899,10 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
     if( version == 1 )
     {
-        NSMutableString * o_workString;
-        NSRange returnedRange;
-        NSRange fullRange;
-        BOOL b_needsRestart = NO;
-
-        #define fixpref( pref ) \
-        o_workString = [[NSMutableString alloc] initWithFormat:@"%s", config_GetPsz( VLCIntf, pref )]; \
-        if ([o_workString length] > 0) \
-        { \
-            returnedRange = [o_workString rangeOfString:@"macosx" options: NSCaseInsensitiveSearch]; \
-            if (returnedRange.location != NSNotFound) \
-            { \
-                fullRange = NSMakeRange( 0, [o_workString length] ); \
-                [o_workString replaceOccurrencesOfString:@":macosx" withString:@"" options: NSCaseInsensitiveSearch range: fullRange]; \
-                fullRange = NSMakeRange( 0, [o_workString length] ); \
-                [o_workString replaceOccurrencesOfString:@"macosx:" withString:@"" options: NSCaseInsensitiveSearch range: fullRange]; \
-                fullRange = NSMakeRange( 0, [o_workString length] ); \
-                [o_workString replaceOccurrencesOfString:@"macosx" withString:@"" options: NSCaseInsensitiveSearch range: fullRange]; \
-                config_PutPsz( VLCIntf, pref, [o_workString UTF8String] ); \
-                b_needsRestart = YES; \
-            } \
-        } \
-        [o_workString release]
-
-        fixpref( "control" );
-        fixpref( "extraintf" );
-        #undef fixpref
-
         [[NSUserDefaults standardUserDefaults] setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
         [[NSUserDefaults standardUserDefaults] synchronize];
 
-        if (!b_needsRestart)
+        if (![[VLCCoreInteraction sharedInstance] fixPreferences])
             return;
         else
             config_SaveConfigFile( VLCIntf ); // we need to do manually, since we won't quit libvlc cleanly
@@ -1959,7 +1931,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
             return;
         }
 
-        NSArray * ourPreferences = [NSArray arrayWithObjects:@"org.videolan.vlc.plist", @"VLC", nil];
+        NSArray * ourPreferences = [NSArray arrayWithObjects:@"org.videolan.vlc.plist", @"VLC", @"org.videolan.vlc", nil];
 
         /* Move the file to trash so that user can find them later */
         [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:preferences destination:nil files:ourPreferences tag:0];
