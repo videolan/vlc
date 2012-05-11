@@ -155,7 +155,7 @@ Representation*             IsoffMainManager::getRepresentation     (Period *per
     }
 
     if(resMatchReps.size() == 0)
-        return this->getRepresentation(period, bitrate, lowerWidth, lowerHeight);
+        return this->getRepresentation(period, bitrate);
 
     Representation  *best = NULL;
     for( size_t j = 0; j < resMatchReps.size(); j++ )
