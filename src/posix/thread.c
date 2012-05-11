@@ -994,7 +994,7 @@ struct vlc_timer
     void       (*func) (void *);
     void        *data;
     mtime_t      value, interval;
-    vlc_atomic_t overruns;
+    atomic_uint  overruns;
 };
 
 VLC_NORETURN
@@ -1037,7 +1037,8 @@ static void *vlc_timer_thread (void *data)
         {
             misses--;
             timer->value += misses * timer->interval;
-            vlc_atomic_add (&timer->overruns, misses);
+            atomic_fetch_add_explicit (&timer->overruns, misses,
+                                       memory_order_relaxed);
         }
     }
 
@@ -1069,7 +1070,7 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
     timer->data = data;
     timer->value = 0;
     timer->interval = 0;
-    vlc_atomic_set(&timer->overruns, 0);
+    atomic_init(&timer->overruns, 0);
 
     if (vlc_clone (&timer->thread, vlc_timer_thread, timer,
                    VLC_THREAD_PRIORITY_INPUT))
@@ -1141,7 +1142,8 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
  */
 unsigned vlc_timer_getoverrun (vlc_timer_t timer)
 {
-    return vlc_atomic_swap (&timer->overruns, 0);
+    return atomic_exchange_explicit (&timer->overruns, 0,
+                                     memory_order_relaxed);
 }
 
 
