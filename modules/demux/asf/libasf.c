@@ -1187,6 +1187,65 @@ static void ASF_FreeObject_extended_content_description( asf_object_t *p_obj)
     FREENULL( p_ec->ppsz_value );
 }
 
+static int ASF_ReadObject_marker(stream_t *s, asf_object_t *p_obj)
+{
+    asf_object_marker_t *p_mk = (asf_object_marker_t *)p_obj;
+    const uint8_t *p_peek, *p_data;
+    int i_peek;
+
+    if( ( i_peek = stream_Peek( s, &p_peek, p_mk->i_object_size ) ) < 24 )
+       return VLC_EGENERIC;
+
+    p_data = &p_peek[24];
+
+    ASF_GetGUID( &p_mk->i_reserved1, p_data );
+    ASF_SKIP( 16 );
+    p_mk->i_count = ASF_READ4();
+    p_mk->i_reserved2 = ASF_READ2();
+    p_mk->name = ASF_READS( ASF_READ2() );
+
+    if( p_mk->i_count > 0 )
+    {
+        p_mk->marker = calloc( p_mk->i_count,
+                              sizeof( asf_marker_t ) );
+        if( !p_mk->marker )
+            return VLC_ENOMEM;
+
+        for( unsigned i = 0; i < p_mk->i_count; i++ )
+        {
+            asf_marker_t *p_marker = &p_mk->marker[i];
+
+            if( !ASF_HAVE(8+8+2+4+4+4) )
+                break;
+
+            p_marker->i_offset = ASF_READ8();
+            p_marker->i_presentation_time = ASF_READ8();
+            p_marker->i_entry_length = ASF_READ2();
+            p_marker->i_send_time = ASF_READ4();
+            p_marker->i_flags = ASF_READ4();
+            p_marker->i_marker_description_length = ASF_READ4();
+            p_marker->p_marker_description = ASF_READS( p_marker->i_marker_description_length * 2 );
+        }
+    }
+
+#ifdef ASF_DEBUG
+    msg_Dbg( s, "Read \"marker object\": %i chapters: %s", p_mk->i_count, p_mk->name );
+
+    for( unsigned i = 0; i < p_mk->i_count; i++ )
+        msg_Dbg( s, "New chapter named: %s", p_mk->marker[i].p_marker_description );
+#endif
+    return VLC_SUCCESS;
+}
+static void ASF_FreeObject_marker( asf_object_t *p_obj)
+{
+    asf_object_marker_t *p_mk = (asf_object_marker_t *)p_obj;
+
+    for( unsigned i = 0; i < p_mk->i_count; i++ )
+    {
+        FREENULL( p_mk->marker[i].p_marker_description  );
+    }
+    FREENULL( p_mk->name );
+}
 
 #if 0
 static int ASF_ReadObject_XXX(stream_t *s, asf_object_t *p_obj)
@@ -1242,7 +1301,8 @@ static const struct
       ASF_ReadObject_metadata, ASF_FreeObject_metadata},
     { &asf_object_codec_list_guid, ASF_OBJECT_CODEC_LIST,
       ASF_ReadObject_codec_list, ASF_FreeObject_codec_list },
-    { &asf_object_marker_guid, ASF_OBJECT_MARKER, NULL, NULL },
+    { &asf_object_marker_guid, ASF_OBJECT_MARKER, 
+      ASF_ReadObject_marker, ASF_FreeObject_marker },
     { &asf_object_padding, ASF_OBJECT_PADDING, NULL, NULL },
     { &asf_object_compatibility_guid, ASF_OBJECT_OTHER, NULL, NULL },
     { &asf_object_content_description_guid, ASF_OBJECT_CONTENT_DESCRIPTION,

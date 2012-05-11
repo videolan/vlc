@@ -181,13 +181,6 @@ typedef struct
 
 } asf_object_content_description_t;
 
-typedef struct
-{
-    uint16_t i_length;
-    uint16_t *i_char;
-
-} string16_t;
-
 #define ASF_CODEC_TYPE_VIDEO    0x0001
 #define ASF_CODEC_TYPE_AUDIO    0x0002
 #define ASF_CODEC_TYPE_UNKNOWN  0xffff
@@ -219,7 +212,7 @@ typedef struct
     uint32_t     i_send_time;
     uint32_t     i_flags;
     uint32_t     i_marker_description_length;
-    uint8_t      *i_marker_description;
+    uint8_t      *p_marker_description;
 
 } asf_marker_t;
 
@@ -229,7 +222,7 @@ typedef struct
     guid_t      i_reserved1;
     uint32_t    i_count;
     uint16_t    i_reserved2;
-    string16_t name;
+    char *name;
     asf_marker_t *marker;
 
 } asf_object_marker_t;
