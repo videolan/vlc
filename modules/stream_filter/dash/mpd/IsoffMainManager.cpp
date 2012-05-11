@@ -135,9 +135,6 @@ Representation*             IsoffMainManager::getRepresentation     (Period *per
     std::vector<AdaptationSet *> adaptationSets = period->getAdaptationSets();
     std::vector<Representation *> resMatchReps;
 
-    int lowerWidth  = 0;
-    int lowerHeight = 0;
-
     for(size_t i = 0; i < adaptationSets.size(); i++)
     {
         std::vector<Representation *> reps = adaptationSets.at(i)->getRepresentations();
@@ -145,12 +142,6 @@ Representation*             IsoffMainManager::getRepresentation     (Period *per
         {
             if(reps.at(j)->getWidth() == width && reps.at(j)->getHeight() == height)
                 resMatchReps.push_back(reps.at(j));
-
-            if(reps.at(j)->getHeight() < height)
-            {
-                lowerWidth  = reps.at(j)->getWidth();
-                lowerHeight = reps.at(j)->getHeight();
-            }
         }
     }
 
