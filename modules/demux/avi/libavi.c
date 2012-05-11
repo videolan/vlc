@@ -576,7 +576,39 @@ static void AVI_ChunkFree_indx( avi_chunk_t *p_chk )
     FREENULL( p_indx->idx.super );
 }
 
+static int AVI_ChunkRead_vprp( stream_t *s, avi_chunk_t *p_chk )
+{
+    avi_chunk_vprp_t *p_vprp = (avi_chunk_vprp_t*)p_chk;
 
+    AVI_READCHUNK_ENTER;
+
+    AVI_READ4BYTES( p_vprp->i_video_format_token );
+    AVI_READ4BYTES( p_vprp->i_video_standard );
+    AVI_READ4BYTES( p_vprp->i_vertical_refresh );
+    AVI_READ4BYTES( p_vprp->i_h_total_in_t );
+    AVI_READ4BYTES( p_vprp->i_v_total_in_lines );
+    AVI_READ4BYTES( p_vprp->i_frame_aspect_ratio );
+    AVI_READ4BYTES( p_vprp->i_frame_width_in_pixels );
+    AVI_READ4BYTES( p_vprp->i_frame_height_in_pixels );
+    AVI_READ4BYTES( p_vprp->i_nb_fields_per_frame );
+    for( unsigned i = 0; i < __MIN( p_vprp->i_nb_fields_per_frame, 2 ); i++ )
+    {
+        AVI_READ4BYTES( p_vprp->field_info[i].i_compressed_bm_height );
+        AVI_READ4BYTES( p_vprp->field_info[i].i_compressed_bm_width );
+        AVI_READ4BYTES( p_vprp->field_info[i].i_valid_bm_height );
+        AVI_READ4BYTES( p_vprp->field_info[i].i_valid_bm_width );
+        AVI_READ4BYTES( p_vprp->field_info[i].i_valid_bm_x_offset );
+        AVI_READ4BYTES( p_vprp->field_info[i].i_valid_bm_y_offset );
+        AVI_READ4BYTES( p_vprp->field_info[i].i_video_x_offset_in_t );
+        AVI_READ4BYTES( p_vprp->field_info[i].i_video_y_valid_start_line );
+    }
+
+#ifdef AVI_DEBUG
+    msg_Dbg( (vlc_object_t*)s, "vprp: format:%d standard:%d",
+             p_vprp->i_video_format_token, p_vprp->i_video_standard );
+#endif
+    AVI_READCHUNK_EXIT( VLC_SUCCESS );
+}
 
 static const struct
 {
@@ -674,6 +706,7 @@ static const struct
     { AVIFOURCC_strd, AVI_ChunkRead_strd, AVI_ChunkFree_strd },
     { AVIFOURCC_idx1, AVI_ChunkRead_idx1, AVI_ChunkFree_idx1 },
     { AVIFOURCC_indx, AVI_ChunkRead_indx, AVI_ChunkFree_indx },
+    { AVIFOURCC_vprp, AVI_ChunkRead_vprp, AVI_ChunkFree_nothing },
     { AVIFOURCC_JUNK, AVI_ChunkRead_nothing, AVI_ChunkFree_nothing },
 
     { AVIFOURCC_IARL, AVI_ChunkRead_strz, AVI_ChunkFree_strz },

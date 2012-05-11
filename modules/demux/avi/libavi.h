@@ -145,6 +145,32 @@ typedef struct avi_chunk_strd_s
     uint8_t  *p_data;
 } avi_chunk_strd_t;
 
+typedef struct avi_chunk_vprp_s
+{
+    AVI_CHUNK_COMMON
+    uint32_t i_video_format_token;
+    uint32_t i_video_standard;
+    uint32_t i_vertical_refresh;
+    uint32_t i_h_total_in_t;
+    uint32_t i_v_total_in_lines;
+    uint32_t i_frame_aspect_ratio;
+    uint32_t i_frame_width_in_pixels;
+    uint32_t i_frame_height_in_pixels;
+    uint32_t i_nb_fields_per_frame;
+    struct
+    {
+        uint32_t i_compressed_bm_height;
+        uint32_t i_compressed_bm_width;
+        uint32_t i_valid_bm_height;
+        uint32_t i_valid_bm_width;
+        uint32_t i_valid_bm_x_offset;
+        uint32_t i_valid_bm_y_offset;
+        uint32_t i_video_x_offset_in_t;
+        uint32_t i_video_y_valid_start_line;
+    } field_info[2];
+
+} avi_chunk_vprp_t;
+
 
 #define AVI_INDEX_OF_INDEXES    0x00
 #define AVI_INDEX_OF_CHUNKS     0x01
@@ -206,6 +232,7 @@ typedef union avi_chunk_u
     avi_chunk_strh_t    strh;
     avi_chunk_strf_t    strf;
     avi_chunk_strd_t    strd;
+    avi_chunk_vprp_t    vprp;
     avi_chunk_indx_t    indx;
     avi_chunk_STRING_t  strz;
 } avi_chunk_t;
@@ -258,6 +285,7 @@ void    AVI_ChunkFreeRoot( stream_t *, avi_chunk_t  *p_chk );
 #define AVIFOURCC_strd         VLC_FOURCC('s','t','r','d')
 #define AVIFOURCC_strn         VLC_FOURCC('s','t','r','n')
 #define AVIFOURCC_indx         VLC_FOURCC('i','n','d','x')
+#define AVIFOURCC_vprp         VLC_FOURCC('v','p','r','p')
 
 #define AVIFOURCC_rec          VLC_FOURCC('r','e','c',' ')
 #define AVIFOURCC_auds         VLC_FOURCC('a','u','d','s')

@@ -464,6 +464,7 @@ static int Open( vlc_object_t * p_this )
                 break;
 
             case( AVIFOURCC_vids ):
+            {
                 tk->i_cat   = VIDEO_ES;
                 tk->i_codec = AVI_FourccGetCodec( VIDEO_ES,
                                                   p_vids->p_bih->biCompression );
@@ -530,6 +531,16 @@ static int Open( vlc_object_t * p_this )
                 fmt.video.i_bits_per_pixel = p_vids->p_bih->biBitCount;
                 fmt.video.i_frame_rate = tk->i_rate;
                 fmt.video.i_frame_rate_base = tk->i_scale;
+                avi_chunk_vprp_t *p_vprp = AVI_ChunkFind( p_strl, AVIFOURCC_vprp, 0 );
+                if( p_vprp )
+                {
+                    uint32_t i_frame_aspect_ratio = p_vprp->i_frame_aspect_ratio;
+                    if( p_vprp->i_video_format_token >= 1 &&
+                        p_vprp->i_video_format_token <= 4 )
+                        i_frame_aspect_ratio = 0x00040003;
+                    fmt.video.i_sar_num = ((i_frame_aspect_ratio >> 16) & 0xffff) * fmt.video.i_height;
+                    fmt.video.i_sar_den = ((i_frame_aspect_ratio >>  0) & 0xffff) * fmt.video.i_width;
+                }
                 fmt.i_extra =
                     __MAX( p_vids->p_bih->biSize - sizeof( VLC_BITMAPINFOHEADER ),
                            p_vids->i_chunk_size - sizeof(VLC_BITMAPINFOHEADER) );
@@ -576,6 +587,7 @@ static int Open( vlc_object_t * p_this )
                     }
                 }
                 break;
+            }
 
             case( AVIFOURCC_txts):
                 msg_Dbg( p_demux, "stream[%d] subtitle attachment", i );
