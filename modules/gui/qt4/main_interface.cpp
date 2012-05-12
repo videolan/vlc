@@ -529,7 +529,11 @@ inline void MainInterface::restoreStackOldWidget()
 inline void MainInterface::showTab( QWidget *widget )
 {
 #ifdef DEBUG_INTF
-    msg_Warn( p_intf, "Old stackCentralOldWidget %i", stackCentralW->indexOf( stackCentralOldWidget ) );
+    if ( stackCentralOldWidget )
+        msg_Dbg( p_intf, "Old stackCentralOldWidget %s at index %i",
+                 stackCentralOldWidget->metaObject()->className(),
+                 stackCentralW->indexOf( stackCentralOldWidget ) );
+    msg_Dbg( p_intf, "ShowTab request for %s", widget->metaObject()->className() );
 #endif
 
     stackCentralOldWidget = stackCentralW->currentWidget();
@@ -570,8 +574,12 @@ inline void MainInterface::showTab( QWidget *widget )
         resizeStack( stackWidgetsSizes[widget].width(), stackWidgetsSizes[widget].height() );
 
 #ifdef DEBUG_INTF
-    msg_Warn( p_intf, "State change %i",  stackCentralW->currentIndex() );
-    msg_Warn( p_intf, "New stackCentralOldWidget %i", stackCentralW->indexOf( stackCentralOldWidget ) );
+    msg_Dbg( p_intf, "Stack state changed to %s, index %i",
+              stackCentralW->currentWidget()->metaObject()->className(),
+              stackCentralW->currentIndex() );
+    msg_Dbg( p_intf, "New stackCentralOldWidget %s at index %i",
+              stackCentralOldWidget->metaObject()->className(),
+              stackCentralW->indexOf( stackCentralOldWidget ) );
 #endif
 
     /* This part is done later, to account for the new pl size */
