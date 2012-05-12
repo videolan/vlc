@@ -285,7 +285,7 @@ static void DecodeRIDU( uint8_t *p_ret, int *pi_ret, uint8_t *src, int i_src )
     while( src < end && dst < dst_end )
     {
         if( src < end - 3 && src[0] == 0x00 && src[1] == 0x00 &&
-            src[2] == 0x03 )
+            src[2] == 0x03 && dst < dst_end - 1 )
         {
             *dst++ = 0x00;
             *dst++ = 0x00;
