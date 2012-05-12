@@ -742,7 +742,7 @@ static const char *const ppsz_clock_descriptions[] =
     "When several video formats are available, select one whose " \
     "resolution is closest to (but not higher than) this setting, " \
     "in number of lines. Use this option if you don't have enough CPU " \
-    "power or network bandwith to play higher resolutions.")
+    "power or network bandwidth to play higher resolutions.")
 static const int pi_prefres[] = { -1, 1080, 720, 576, 360, 240 };
 static const char *const ppsz_prefres[] = {
     N_("Best available"), N_("Full HD (1080p)"), N_("HD (720p)"),
