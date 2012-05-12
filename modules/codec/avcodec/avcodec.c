@@ -463,6 +463,11 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
         p_sys->p_context->block_align = p_dec->fmt_in.audio.i_blockalign;
         p_sys->p_context->bit_rate = p_dec->fmt_in.i_bitrate;
         p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.audio.i_bitspersample;
+        if( p_sys->i_codec_id == CODEC_ID_ADPCM_G726 &&
+            p_sys->p_context->bit_rate > 0 &&
+            p_sys->p_context->sample_rate >  0)
+            p_sys->p_context->bits_per_coded_sample = p_sys->p_context->bit_rate /
+                                                      p_sys->p_context->sample_rate;
     }
     int ret;
     vlc_avcodec_lock();
