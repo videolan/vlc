@@ -169,6 +169,8 @@ int FileOpen( vlc_object_t *p_this )
     {
         const char *path = p_access->psz_filepath;
 
+        if (unlikely(path == NULL))
+            return VLC_EGENERIC;
         msg_Dbg (p_access, "opening file `%s'", path);
         fd = vlc_open (path, O_RDONLY | O_NONBLOCK);
         if (fd == -1)
