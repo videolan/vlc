@@ -372,6 +372,21 @@ static int Open (vlc_object_t *obj)
     snd_pcm_hw_params_any (pcm, hw);
     Dump (aout, "initial hardware setup:\n", snd_pcm_hw_params_dump, hw);
 
+    val = snd_pcm_hw_params_set_rate_resample(pcm, hw, 0);
+    if (val)
+    {
+        msg_Err (aout, "cannot disable resampling: %s", snd_strerror (val));
+        goto error;
+    }
+
+    val = snd_pcm_hw_params_set_access (pcm, hw,
+                                        SND_PCM_ACCESS_RW_INTERLEAVED);
+    if (val)
+    {
+        msg_Err (aout, "cannot set access mode: %s", snd_strerror (val));
+        goto error;
+    }
+
     /* Set sample format */
     if (snd_pcm_hw_params_test_format (pcm, hw, pcm_format) == 0)
         ;
@@ -406,14 +421,6 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
 
-    val = snd_pcm_hw_params_set_access (pcm, hw,
-                                        SND_PCM_ACCESS_RW_INTERLEAVED);
-    if (val)
-    {
-        msg_Err (aout, "cannot set access mode: %s", snd_strerror (val));
-        goto error;
-    }
-
     /* Set channels count */
     /* By default, ALSA plug will pad missing channels with zeroes, which is
      * usually fine. However, it will also discard extraneous channels, which
@@ -439,30 +446,30 @@ static int Open (vlc_object_t *obj)
         msg_Dbg (aout, "resampling from %d Hz to %d Hz",
                  aout->format.i_rate, rate);
 
-    /* Set number of periods (at least two) */
-    param = 2;
-    val = snd_pcm_hw_params_set_periods_min (pcm, hw, &param, NULL);
-    if (val)
-    {
-        msg_Err (aout, "cannot set minimum of %u periods: %s", param,
-                 snd_strerror (val));
-        goto error;
-    }
-
     /* Set buffer size */
     param = AOUT_MAX_ADVANCE_TIME;
     val = snd_pcm_hw_params_set_buffer_time_near (pcm, hw, &param, NULL);
     if (val)
     {
-        msg_Err (aout, "cannot set buffer duration near %u us: %s",
-                 param, snd_strerror (val));
+        msg_Err (aout, "cannot set buffer duration: %s", snd_strerror (val));
         goto error;
     }
-
-    val = snd_pcm_hw_params_set_periods_first (pcm, hw, &param, NULL);
+#if 1
+    val = snd_pcm_hw_params_get_buffer_time (hw, &param, NULL);
     if (val)
     {
-        msg_Err (aout, "cannot select periods: %s", snd_strerror (val));
+        msg_Warn (aout, "cannot get buffer time: %s", snd_strerror(val));
+        param = AOUT_MIN_PREPARE_TIME;
+    }
+    else
+        param /= 2;
+#else /* work-around for PulseAudio: */
+    param = AOUT_MIN_PREPARE_TIME;
+#endif
+    val = snd_pcm_hw_params_set_period_time_near (pcm, hw, &param, NULL);
+    if (val)
+    {
+        msg_Err (aout, "cannot set period: %s", snd_strerror (val));
         goto error;
     }
 
