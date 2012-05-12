@@ -339,6 +339,11 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
 /* FIXME: could be replaced by using Unix sockets */
 #ifdef HAVE_DBUS
+
+#define MPRIS_BUS_NAME "org.mpris.MediaPlayer2.vlc"
+#define MPRIS_OBJECT_PATH "/org/mpris/MediaPlayer2"
+#define MPRIS_TRACKLIST_INTERFACE "org.mpris.MediaPlayer2.TrackList"
+
     dbus_threads_init_default();
 
     if( var_InheritBool( p_libvlc, "one-instance" )
@@ -364,22 +369,16 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             /* check if VLC is available on the bus
              * if not: D-Bus control is not enabled on the other
              * instance and we can't pass MRLs to it */
-            DBusMessage *p_test_msg   = NULL;
-            DBusMessage *p_test_reply = NULL;
-
-            p_test_msg =  dbus_message_new_method_call(
-                    "org.mpris.MediaPlayer2.vlc", "/org/mpris/MediaPlayer2",
-                    "org.freedesktop.DBus.Introspectable", "Introspect" );
-
-            /* block until a reply arrives */
-            p_test_reply = dbus_connection_send_with_reply_and_block(
-                    p_conn, p_test_msg, -1, &dbus_error );
-            dbus_message_unref( p_test_msg );
-            if( p_test_reply == NULL )
+            if( !dbus_bus_name_has_owner( p_conn, MPRIS_BUS_NAME, &dbus_error ) )
             {
-                dbus_error_free( &dbus_error );
-                msg_Dbg( p_libvlc, "No Media Player is running. "
-                        "Continuing normally." );
+                if( dbus_error_is_set( &dbus_error ) )
+                {
+                    msg_Err( p_libvlc, "D-Bus error: %s", dbus_error.message );
+                    dbus_error_free( &dbus_error );
+                }
+                else
+                    msg_Dbg( p_libvlc, "No Media Player is running. "
+                            "Continuing normally." );
             }
             else
             {
@@ -389,7 +388,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                 DBusPendingCall* p_dbus_pending = NULL;
                 dbus_bool_t b_play;
 
-                dbus_message_unref( p_test_reply );
                 msg_Warn( p_libvlc, "Another Media Player is running. Exiting");
 
                 for( i_input = vlc_optind; i_input < i_argc;i_input++ )
@@ -412,8 +410,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                              psz_mrl );
 
                     p_dbus_msg = dbus_message_new_method_call(
-                        "org.mpris.MediaPlayer2.vlc", "/org/mpris/MediaPlayer2",
-                        "org.mpris.MediaPlayer2.TrackList", "AddTrack" );
+                        MPRIS_BUS_NAME, MPRIS_OBJECT_PATH,
+                        MPRIS_TRACKLIST_INTERFACE, "AddTrack" );
 
                     if ( NULL == p_dbus_msg )
                     {
@@ -487,6 +485,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         /* we unreference the connection when we've finished with it */
         if( p_conn ) dbus_connection_unref( p_conn );
     }
+#undef MPRIS_BUS_NAME
+#undef MPRIS_OBJECT_PATH
+#undef MPRIS_TRACKLIST_INTERFACE
+
 #endif
 
     /*
