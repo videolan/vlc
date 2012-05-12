@@ -340,6 +340,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 /* FIXME: could be replaced by using Unix sockets */
 #ifdef HAVE_DBUS
 
+#define MPRIS_APPEND "/org/mpris/MediaPlayer2/TrackList/Append"
 #define MPRIS_BUS_NAME "org.mpris.MediaPlayer2.vlc"
 #define MPRIS_OBJECT_PATH "/org/mpris/MediaPlayer2"
 #define MPRIS_TRACKLIST_INTERFACE "org.mpris.MediaPlayer2.TrackList"
@@ -402,7 +403,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
                     /* We need to resolve relative paths in this instance */
                     char *psz_mrl = make_URI( ppsz_argv[i_input], NULL );
-                    const char *psz_after_track = "/";
+                    const char *psz_after_track = MPRIS_APPEND;
 
                     if( psz_mrl == NULL )
                         continue;
@@ -485,11 +486,13 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         /* we unreference the connection when we've finished with it */
         if( p_conn ) dbus_connection_unref( p_conn );
     }
+
+#undef MPRIS_APPEND
 #undef MPRIS_BUS_NAME
 #undef MPRIS_OBJECT_PATH
 #undef MPRIS_TRACKLIST_INTERFACE
 
-#endif
+#endif // HAVE_DBUS
 
     /*
      * Message queue options
