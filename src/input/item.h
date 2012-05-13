@@ -29,4 +29,11 @@
 void input_item_SetErrorWhenReading( input_item_t *p_i, bool b_error );
 void input_item_UpdateTracksInfo( input_item_t *item, const es_format_t *fmt );
 
+typedef struct input_item_owner
+{
+    input_item_t item;
+} input_item_owner_t;
+
+# define item_owner(item) ((struct input_item_owner *)(item))
+
 #endif

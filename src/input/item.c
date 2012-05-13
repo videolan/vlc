@@ -39,45 +39,6 @@
 
 static int GuessType( const input_item_t *p_item );
 
-static inline void input_item_Clean( input_item_t *p_i )
-{
-    int i;
-
-    vlc_event_manager_fini( &p_i->event_manager );
-
-    free( p_i->psz_name );
-    free( p_i->psz_uri );
-    if( p_i->p_stats )
-    {
-        vlc_mutex_destroy( &p_i->p_stats->lock );
-        free( p_i->p_stats );
-    }
-
-    if( p_i->p_meta )
-        vlc_meta_Delete( p_i->p_meta );
-
-    for( i = 0; i < p_i->i_options; i++ )
-        free( p_i->ppsz_options[i] );
-    TAB_CLEAN( p_i->i_options, p_i->ppsz_options );
-    free( p_i->optflagv);
-
-    for( i = 0; i < p_i->i_es; i++ )
-    {
-        es_format_Clean( p_i->es[i] );
-        free( p_i->es[i] );
-    }
-    TAB_CLEAN( p_i->i_es, p_i->es );
-
-    for( i = 0; i < p_i->i_epg; i++ )
-        vlc_epg_Delete( p_i->pp_epg[i] );
-    TAB_CLEAN( p_i->i_epg, p_i->pp_epg );
-
-    for( i = 0; i < p_i->i_categories; i++ )
-        info_category_Delete( p_i->pp_categories[i] );
-    TAB_CLEAN( p_i->i_categories, p_i->pp_categories );
-
-    vlc_mutex_destroy( &p_i->lock );
-}
 void input_item_SetErrorWhenReading( input_item_t *p_i, bool b_error )
 {
     bool b_changed;
@@ -449,9 +410,43 @@ bool input_item_IsArtFetched( input_item_t *p_item )
 static void input_item_Destroy ( gc_object_t *p_gc )
 {
     input_item_t *p_item = vlc_priv( p_gc, input_item_t );
+    input_item_owner_t *owner = item_owner(p_item);
 
-    input_item_Clean( p_item );
-    free( p_item );
+    vlc_event_manager_fini( &p_item->event_manager );
+
+    free( p_item->psz_name );
+    free( p_item->psz_uri );
+    if( p_item->p_stats != NULL )
+    {
+        vlc_mutex_destroy( &p_item->p_stats->lock );
+        free( p_item->p_stats );
+    }
+
+    if( p_item->p_meta != NULL )
+        vlc_meta_Delete( p_item->p_meta );
+
+    for( int i = 0; i < p_item->i_options; i++ )
+        free( p_item->ppsz_options[i] );
+    TAB_CLEAN( p_item->i_options, p_item->ppsz_options );
+    free( p_item->optflagv );
+
+    for( int i = 0; i < p_item->i_es; i++ )
+    {
+        es_format_Clean( p_item->es[i] );
+        free( p_item->es[i] );
+    }
+    TAB_CLEAN( p_item->i_es, p_item->es );
+
+    for( int i = 0; i < p_item->i_epg; i++ )
+        vlc_epg_Delete( p_item->pp_epg[i] );
+    TAB_CLEAN( p_item->i_epg, p_item->pp_epg );
+
+    for( int i = 0; i < p_item->i_categories; i++ )
+        info_category_Delete( p_item->pp_categories[i] );
+    TAB_CLEAN( p_item->i_categories, p_item->pp_categories );
+
+    vlc_mutex_destroy( &p_item->lock );
+    free( owner );
 }
 
 int input_item_AddOption( input_item_t *p_input, const char *psz_option,
@@ -811,9 +806,11 @@ input_item_NewWithType( const char *psz_uri, const char *psz_name,
 {
     static vlc_atomic_t last_input_id = VLC_ATOMIC_INIT(0);
 
-    input_item_t* p_input = calloc( 1, sizeof( *p_input ) );
-    if( !p_input )
+    input_item_owner_t *owner = calloc( 1, sizeof( *owner ) );
+    if( unlikely(owner == NULL) )
         return NULL;
+
+    input_item_t *p_input = &owner->item;
     vlc_event_manager_t * p_em = &p_input->event_manager;
 
     p_input->i_id = vlc_atomic_inc(&last_input_id);
