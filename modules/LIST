@@ -389,7 +389,6 @@ $Id$
  * xcb_xv: a XVideo video output using XCB
  * xdg_screensaver: xdg-utils screensaver inhibition
  * xml: LibXML xml parser
- * xosd: X On Screen Display interface
  * xscreensaver: Xscreensaver inhibition
  * yuv: yuv video output
  * yuv_rgb_neon: yuv->RGB chroma converter for NEON devices

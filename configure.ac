@@ -3805,26 +3805,6 @@ if test "${enable_ncurses}" != "no"; then
 fi
 
 dnl
-dnl  XOSD plugin
-dnl
-AC_ARG_ENABLE(xosd,
-  [  --enable-xosd           xosd interface support (default disabled)])
-if test "${enable_xosd}" = "yes"
-then
-  AC_CHECK_HEADERS(xosd.h,
-    AC_CHECK_LIB(xosd, xosd_set_horizontal_offset, [
-      AS_IF([test "${no_x}" != "yes"], [
-          VLC_ADD_PLUGIN([xosd])
-          VLC_ADD_LIBS([xosd],[-lxosd ${X_LIBS} ${X_PRE_LIBS} -lX11])
-          VLC_ADD_CFLAGS([xosd],[${X_CFLAGS}])
-        ],[
-          AC_MSG_ERROR([Xlib is required with xosd.])
-        ])
-    ])
-  )
-fi
-
-dnl
 dnl Framebuffer (overlay) plugin
 dnl
 AC_ARG_ENABLE(fbosd,

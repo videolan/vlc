@@ -6,7 +6,6 @@ LIBTOOL=@LIBTOOL@ --tag=CC
 SOURCES_msn = msn.c
 SOURCES_growl = growl.m
 SOURCES_notify = notify.c
-SOURCES_xosd = xosd.c
 SOURCES_telepathy = telepathy.c
 
 if HAVE_WIN32

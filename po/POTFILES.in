@@ -964,7 +964,6 @@ modules/notify/growl.m
 modules/notify/msn.c
 modules/notify/notify.c
 modules/notify/telepathy.c
-modules/notify/xosd.c
 modules/packetizer/copy.c
 modules/packetizer/dirac.c
 modules/packetizer/flac.c

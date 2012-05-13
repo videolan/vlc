@@ -35,6 +35,7 @@ Mac OS X Interface:
 
 Removed modules:
  * portaudio audio output
+ * X11 On Screen Display notifications (xosd)
 
 
 Changes between 2.0.0 and 2.0.1:
