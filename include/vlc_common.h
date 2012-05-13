@@ -497,26 +497,6 @@ typedef union
 # define VLC_OBJECT( x ) ((vlc_object_t *)(x))
 #endif
 
-typedef struct gc_object_t
-{
-    vlc_atomic_t    refs;
-    void          (*pf_destructor) (struct gc_object_t *);
-} gc_object_t;
-
-/**
- * These members are common to all objects that wish to be garbage-collected.
- */
-#define VLC_GC_MEMBERS gc_object_t vlc_gc_data;
-
-VLC_API void * vlc_gc_init(gc_object_t *, void (*)(gc_object_t *));
-VLC_API void * vlc_hold(gc_object_t *);
-VLC_API void vlc_release(gc_object_t *);
-
-#define vlc_gc_init( a,b ) vlc_gc_init( &(a)->vlc_gc_data, (b) )
-#define vlc_gc_incref( a ) vlc_hold( &(a)->vlc_gc_data )
-#define vlc_gc_decref( a ) vlc_release( &(a)->vlc_gc_data )
-#define vlc_priv( gc, t ) ((t *)(((char *)(gc)) - offsetof(t, vlc_gc_data)))
-
 /*****************************************************************************
  * Macros and inline functions
  *****************************************************************************/

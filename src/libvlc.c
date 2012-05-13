@@ -70,7 +70,6 @@
 #include <vlc_fs.h>
 #include <vlc_cpu.h>
 #include <vlc_url.h>
-#include <vlc_atomic.h>
 #include <vlc_modules.h>
 
 #include "libvlc.h"
@@ -92,56 +91,6 @@
 #if !defined(WIN32) && !defined(__OS2__)
 static bool b_daemon = false;
 #endif
-
-#undef vlc_gc_init
-#undef vlc_hold
-#undef vlc_release
-
-/**
- * Atomically set the reference count to 1.
- * @param p_gc reference counted object
- * @param pf_destruct destruction calback
- * @return p_gc.
- */
-void *vlc_gc_init (gc_object_t *p_gc, void (*pf_destruct) (gc_object_t *))
-{
-    /* There is no point in using the GC if there is no destructor... */
-    assert (pf_destruct);
-    p_gc->pf_destructor = pf_destruct;
-
-    vlc_atomic_set (&p_gc->refs, 1);
-    return p_gc;
-}
-
-/**
- * Atomically increment the reference count.
- * @param p_gc reference counted object
- * @return p_gc.
- */
-void *vlc_hold (gc_object_t * p_gc)
-{
-    uintptr_t refs;
-
-    assert( p_gc );
-    refs = vlc_atomic_inc (&p_gc->refs);
-    assert (refs != 1); /* there had to be a reference already */
-    return p_gc;
-}
-
-/**
- * Atomically decrement the reference count and, if it reaches zero, destroy.
- * @param p_gc reference counted object.
- */
-void vlc_release (gc_object_t *p_gc)
-{
-    uintptr_t refs;
-
-    assert( p_gc );
-    refs = vlc_atomic_dec (&p_gc->refs);
-    assert (refs != (uintptr_t)(-1)); /* reference underflow?! */
-    if (refs == 0)
-        p_gc->pf_destructor (p_gc);
-}
 
 /*****************************************************************************
  * Local prototypes
