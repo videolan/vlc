@@ -3805,18 +3805,6 @@ if test "${enable_ncurses}" != "no"; then
 fi
 
 dnl
-dnl Framebuffer (overlay) plugin
-dnl
-AC_ARG_ENABLE(fbosd,
-  [  --enable-fbosd          fbosd interface support (default disabled)])
-if test "${enable_fbosd}" = "yes"
-then
-  AC_CHECK_HEADERS(linux/fb.h, [
-    VLC_ADD_PLUGIN([fbosd])
- ])
-fi
-
-dnl
 dnl  Lirc plugin
 dnl
 AC_ARG_ENABLE(lirc,

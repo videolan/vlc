@@ -511,7 +511,6 @@ modules/demux/vobsub.c
 modules/demux/voc.c
 modules/demux/wav.c
 modules/demux/xa.c
-modules/gui/fbosd.c
 modules/gui/hildon/maemo.c
 modules/gui/macosx/about.h
 modules/gui/macosx/about.m
