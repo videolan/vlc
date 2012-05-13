@@ -203,6 +203,14 @@ bool vlc_atomic_compare_exchange(volatile void *object, void *expected,
 
 # endif
 
+/**
+ * Memory storage space for an atom. Never access it directly.
+ */
+typedef union
+{
+    atomic_uintptr_t u;
+} vlc_atomic_t;
+
 /** Static initializer for \ref vlc_atomic_t */
 # define VLC_ATOMIC_INIT(val) { (val) }
 

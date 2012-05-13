@@ -32,6 +32,7 @@
  */
 
 #include <vlc_es.h>
+#include <vlc_atomic.h>
 
 /** Description of a planar graphic field */
 typedef struct plane_t

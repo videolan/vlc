@@ -25,7 +25,6 @@
 #endif
 
 #include "dialogs/messages.hpp"
-#include <vlc_atomic.h>
 
 #include <QTextEdit>
 #include <QTextCursor>

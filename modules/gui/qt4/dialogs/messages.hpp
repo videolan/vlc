@@ -28,6 +28,7 @@
 #include "util/singleton.hpp"
 #include "ui/messages_panel.h"
 #include <stdarg.h>
+#include <vlc_atomic.h>
 
 class QTabWidget;
 class QPushButton;
