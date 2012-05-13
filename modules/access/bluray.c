@@ -36,6 +36,7 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>                      /* demux_t */
 #include <vlc_input.h>                      /* Seekpoints, chapters */
+#include <vlc_atomic.h>
 #include <vlc_dialog.h>                     /* BD+/AACS warnings */
 #include <vlc_vout.h>                       /* vout_PutSubpicture / subpicture_t */
 
@@ -82,8 +83,7 @@ typedef enum OverlayStatus {
 
 typedef struct bluray_overlay_t
 {
-    VLC_GC_MEMBERS
-
+    atomic_flag         released_once;
     vlc_mutex_t         lock;
     subpicture_t        *p_pic;
     OverlayStatus       status;
@@ -563,9 +563,11 @@ static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
     vlc_mutex_unlock(&p_overlay->lock);
 }
 
+static void blurayCleanOverlayStruct(bluray_overlay_t *);
+
 static void subpictureUpdaterDestroy(subpicture_t *p_subpic)
 {
-    vlc_gc_decref(p_subpic->updater.p_sys->p_overlay);
+    blurayCleanOverlayStruct(p_subpic->updater.p_sys->p_overlay);
 }
 
 /*****************************************************************************
@@ -594,10 +596,10 @@ static int onMouseEvent(vlc_object_t *p_vout, const char *psz_var, vlc_value_t o
 /*****************************************************************************
  * libbluray overlay handling:
  *****************************************************************************/
-static void blurayCleanOverayStruct(gc_object_t *p_gc)
+static void blurayCleanOverlayStruct(bluray_overlay_t *p_overlay)
 {
-    bluray_overlay_t *p_overlay = vlc_priv(p_gc, bluray_overlay_t);
-
+    if (!atomic_flag_test_and_set(&p_overlay->released_once))
+        return;
     /*
      * This will be called when destroying the picture.
      * Don't delete it again from here!
@@ -617,7 +619,7 @@ static void blurayCloseAllOverlays(demux_t *p_demux)
             if (p_sys->p_overlays[i] != NULL) {
                 vout_FlushSubpictureChannel(p_sys->p_vout,
                                             p_sys->p_overlays[i]->p_pic->i_channel);
-                vlc_gc_decref(p_sys->p_overlays[i]);
+                blurayCleanOverlayStruct(p_sys->p_overlays[i]);
                 p_sys->p_overlays[i] = NULL;
             }
         }
@@ -677,9 +679,8 @@ static void blurayInitOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
         p_sys->p_overlays[ov->plane] = NULL;
         return;
     }
-    vlc_gc_init(p_sys->p_overlays[ov->plane], blurayCleanOverayStruct);
-    /* Incrementing refcounter: vout + demux */
-    vlc_gc_incref(p_sys->p_overlays[ov->plane]);
+    /* two references: vout + demux */
+    p_sys->p_overlays[ov->plane]->released_once = ATOMIC_FLAG_INIT;
 
     p_upd_sys->p_overlay = p_sys->p_overlays[ov->plane];
     subpicture_updater_t updater = {
