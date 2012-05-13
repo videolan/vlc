@@ -3,6 +3,13 @@ SOURCES_auhal = auhal.c packet.c
 SOURCES_audioqueue = audioqueue.c packet.c
 SOURCES_opensles_android = opensles_android.c
 
+libandroid_audiotrack_plugin_la_SOURCES = android_audiotrack.c
+libandroid_audiotrack_plugin_la_CFLAGS = $(AM_CFLAGS)
+libandroid_audiotrack_plugin_la_LIBADD = $(AM_LIBADD) -ldl
+if HAVE_ANDROID
+libvlc_LTLIBRARIES += libandroid_audiotrack_plugin.la
+endif
+
 libadummy_plugin_la_SOURCES = adummy.c
 libadummy_plugin_la_CFLAGS = $(AM_CFLAGS)
 libadummy_plugin_la_LIBADD = $(AM_LIBADD)
