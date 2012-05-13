@@ -189,6 +189,7 @@ public slots:
     void toggleFSC();
 
     void setStatusBarVisibility(bool b_visible);
+    void setPlaylistVisibility(bool b_visible);
 
     void popupMenu( const QPoint& );
 #ifdef WIN32

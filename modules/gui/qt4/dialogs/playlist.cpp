@@ -40,21 +40,43 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf )
     setWindowRole( "vlc-playlist" );
     setWindowOpacity( var_InheritFloat( p_intf, "qt-opacity" ) );
 
-    getSettings()->beginGroup("playlistdialog");
-
     playlistWidget = new PlaylistWidget( p_intf, this );
     setCentralWidget( playlistWidget );
 
-    readSettings( getSettings(), QSize( 600,700 ) );
+    readSettings( "playlistdialog", QSize( 600,700 ) );
+}
 
-    getSettings()->endGroup();
+PlaylistWidget *PlaylistDialog::exportPlaylistWidget()
+{
+    Q_ASSERT( playlistWidget );
+    PlaylistWidget *widget = playlistWidget;
+    layout()->removeWidget( playlistWidget );
+    playlistWidget = NULL;
+    return widget;
+}
+
+void PlaylistDialog::importPlaylistWidget( PlaylistWidget *widget )
+{
+    Q_ASSERT( !playlistWidget );
+    playlistWidget = widget;
+    setCentralWidget( playlistWidget );
+    playlistWidget->show();
+}
+
+bool PlaylistDialog::hasPlaylistWidget()
+{
+    return ( !! playlistWidget );
+}
+
+void PlaylistDialog::hideEvent( QHideEvent * event )
+{
+    QWidget::hideEvent( event );
+    emit visibilityChanged( false );
 }
 
 PlaylistDialog::~PlaylistDialog()
 {
-    getSettings()->beginGroup("playlistdialog");
-    writeSettings( getSettings() );
-    getSettings()->endGroup();
+    writeSettings( "playlistdialog" );
 }
 
 void PlaylistDialog::dropEvent( QDropEvent *event )

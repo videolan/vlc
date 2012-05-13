@@ -41,6 +41,7 @@
 #include "components/controller.hpp"            // controllers
 #include "components/playlist/playlist.hpp"     // plWidget
 #include "dialogs/firstrun.hpp"                 // First Run
+#include "dialogs/playlist.hpp"                 // PlaylistDialog
 
 #include "menus.hpp"                            // Menu creation
 #include "recents.hpp"                          // RecentItems when DnD
@@ -284,9 +285,9 @@ MainInterface::~MainInterface()
 
     settings->beginGroup("MainWindow");
     settings->setValue( "pl-dock-status", b_plDocked );
+
     /* Save playlist state */
-    if( playlistWidget )
-        settings->setValue( "playlist-visible", playlistVisible );
+    settings->setValue( "playlist-visible", playlistVisible );
 
     settings->setValue( "adv-controls",
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
@@ -299,12 +300,6 @@ MainInterface::~MainInterface()
 
     /* Save this size */
     QVLCTools::saveWidgetPosition(settings, this);
-
-    /* Save undocked playlist size */
-    if( playlistWidget && !isPlDocked() )
-        QVLCTools::saveWidgetPosition( p_intf, "Playlist", playlistWidget );
-
-    delete playlistWidget;
 
     delete statusBar();
 
@@ -528,6 +523,7 @@ inline void MainInterface::restoreStackOldWidget()
 
 inline void MainInterface::showTab( QWidget *widget )
 {
+    if ( !widget ) widget = bgWidget; /* trying to restore a null oldwidget */
 #ifdef DEBUG_INTF
     if ( stackCentralOldWidget )
         msg_Dbg( p_intf, "Old stackCentralOldWidget %s at index %i",
@@ -804,36 +800,26 @@ int MainInterface::controlVideo( int i_query, va_list args )
  **/
 void MainInterface::createPlaylist()
 {
-    playlistWidget = new PlaylistWidget( p_intf, this );
+    PlaylistDialog *dialog = PlaylistDialog::getInstance( p_intf );
 
     if( b_plDocked )
     {
+        playlistWidget = dialog->exportPlaylistWidget();
         stackCentralW->addWidget( playlistWidget );
         stackWidgetsSizes[playlistWidget] = settings->value( "playlistSize", QSize( 600, 300 ) ).toSize();
     }
-    else
-    {
-#ifdef WIN32
-        playlistWidget->setParent( NULL );
-#endif
-        playlistWidget->setWindowFlags( Qt::Window );
-
-        /* This will restore the geometry but will not work for position,
-           because of parenting */
-        QVLCTools::restoreWidgetPosition( p_intf, "Playlist",
-                playlistWidget, QSize( 600, 300 ) );
-    }
+    CONNECT( dialog, visibilityChanged(bool), this, setPlaylistVisibility(bool) );
 }
 
 void MainInterface::togglePlaylist()
 {
-    if( !playlistWidget )
-    {
-        createPlaylist();
-    }
+    if( !playlistWidget ) createPlaylist();
 
+    PlaylistDialog *dialog = PlaylistDialog::getInstance( p_intf );
     if( b_plDocked )
     {
+        if ( dialog->hasPlaylistWidget() )
+            playlistWidget = dialog->exportPlaylistWidget();
         /* Playlist is not visible, show it */
         if( stackCentralW->currentWidget() != playlistWidget )
         {
@@ -849,12 +835,13 @@ void MainInterface::togglePlaylist()
     }
     else
     {
-#ifdef WIN32
-        playlistWidget->setParent( NULL );
-#endif
-        playlistWidget->setWindowFlags( Qt::Window );
         playlistVisible = !playlistVisible;
-        playlistWidget->setVisible( playlistVisible );
+        if ( ! dialog->hasPlaylistWidget() )
+            dialog->importPlaylistWidget( playlistWidget );
+        if ( playlistVisible )
+            dialog->show();
+        else
+            dialog->hide();
     }
     debug();
 }
@@ -862,35 +849,30 @@ void MainInterface::togglePlaylist()
 void MainInterface::dockPlaylist( bool p_docked )
 {
     if( b_plDocked == p_docked ) return;
-    b_plDocked = p_docked;
+    /* some extra check */
+    if ( b_plDocked && !playlistWidget ) createPlaylist();
 
-    if( !playlistWidget ) return; /* Playlist wasn't created yet */
+    b_plDocked = p_docked;
+    PlaylistDialog *dialog = PlaylistDialog::getInstance( p_intf );
+
     if( !p_docked ) /* Previously docked */
     {
-        /* If playlist is invisible don't show it */
-        if( stackCentralW->currentWidget() != playlistWidget ) return;
+        playlistVisible = playlistWidget->isVisible();
         stackCentralW->removeWidget( playlistWidget );
-#ifdef WIN32
-        playlistWidget->setParent( NULL );
-#endif
-        playlistWidget->setWindowFlags( Qt::Window );
-        QVLCTools::restoreWidgetPosition( p_intf, "Playlist",
-                playlistWidget, QSize( 600, 300 ) );
-        playlistWidget->show();
+        dialog->importPlaylistWidget( playlistWidget );
+        if ( playlistVisible ) dialog->show();
         restoreStackOldWidget();
     }
     else /* Previously undocked */
     {
-        QVLCTools::saveWidgetPosition( p_intf, "Playlist", playlistWidget );
-        playlistWidget->setWindowFlags( Qt::Widget ); // Probably a Qt bug here
-        // It would be logical that QStackWidget::addWidget reset the flags...
+        playlistVisible = dialog->isVisible();
+        dialog->hide();
+        playlistWidget = dialog->exportPlaylistWidget();
         stackCentralW->addWidget( playlistWidget );
 
         /* If playlist is invisible don't show it */
-        if( !playlistWidget->isVisible() ) return;
-        showTab( playlistWidget );
+        if( playlistVisible ) showTab( playlistWidget );
     }
-    playlistVisible = true;
 }
 
 /*
@@ -952,6 +934,13 @@ void MainInterface::setStatusBarVisibility( bool b_visible )
     statusBar()->setVisible( b_visible );
     b_statusbarVisible = b_visible;
     if( controls ) controls->setGripVisible( !b_statusbarVisible );
+}
+
+
+void MainInterface::setPlaylistVisibility( bool b_visible )
+{
+    if ( !isPlDocked() )
+        playlistVisible = b_visible;
 }
 
 #if 0

@@ -52,7 +52,6 @@ class PlaylistWidget : public QWidget
 {
     Q_OBJECT
 public:
-    PlaylistWidget( intf_thread_t *_p_i, QWidget * );
     virtual ~PlaylistWidget();
 
     void forceHide();
@@ -72,12 +71,15 @@ private:
     intf_thread_t *p_intf;
 
 protected:
+    PlaylistWidget( intf_thread_t *_p_i, QWidget * );
     virtual void dropEvent( QDropEvent *);
     virtual void dragEnterEvent( QDragEnterEvent * );
     virtual void closeEvent( QCloseEvent * );
 private slots:
     void changeView( const QModelIndex& index );
     void clearPlaylist();
+
+    friend class PlaylistDialog;
 };
 
 #ifdef Q_WS_MAC

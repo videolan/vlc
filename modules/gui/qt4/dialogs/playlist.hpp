@@ -34,14 +34,22 @@ class QSignalMapper;
 class PLSelector;
 class PLPanel;
 class QSettings;
+class QHideEvent;
 
 class PlaylistDialog : public QVLCMW, public Singleton<PlaylistDialog>
 {
     Q_OBJECT
-private:
-    PlaylistWidget *playlistWidget;
+
+public:
+    PlaylistWidget *exportPlaylistWidget( );
+    void importPlaylistWidget( PlaylistWidget * );
+    bool hasPlaylistWidget();
+
+protected:
+    virtual void hideEvent( QHideEvent * );
 
 private:
+    PlaylistWidget *playlistWidget;
     PlaylistDialog( intf_thread_t * );
     virtual ~PlaylistDialog();
 
@@ -51,6 +59,9 @@ private:
     void dragLeaveEvent( QDragLeaveEvent * );
 
     friend class    Singleton<PlaylistDialog>;
+
+signals:
+    void visibilityChanged( bool );
 };
 
 
