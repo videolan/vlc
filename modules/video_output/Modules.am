@@ -135,6 +135,9 @@ libvlc_LTLIBRARIES += $(LTLIBegl)
 libcaca_plugin_la_SOURCES = caca.c
 libcaca_plugin_la_CFLAGS = $(AM_CFLAGS) $(CACA_CFLAGS)
 libcaca_plugin_la_LIBADD = $(AM_LIBADD) $(CACA_LIBS)
+if !HAVE_WIN32
+libcaca_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIBS) -lX11
+endif
 libcaca_plugin_la_DEPENDENCIES =
 EXTRA_LTLIBRARIES += libcaca_plugin.la
 libvlc_LTLIBRARIES += $(LTLIBcaca)
