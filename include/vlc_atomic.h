@@ -55,26 +55,44 @@
  * unsigned equivalents, i.e. 4-bytes and 8-bytes types, although GCC also
  * supports 1 and 2-bytes types. Some non-x86 architectures do not support
  * 8-byte atomic types (or not efficiently). So lets stick to (u)intptr_t. */
-typedef  intptr_t          atomic_flag;
-typedef  intptr_t          atomic_bool;
-typedef  intptr_t          atomic_char;
-typedef  intptr_t          atomic_schar;
-typedef uintptr_t          atomic_uchar;
-typedef  intptr_t          atomic_short;
-typedef uintptr_t          atomic_ushort;
-typedef  intptr_t          atomic_int;
-typedef uintptr_t          atomic_uint;
-//typedef   signed long atomic_long;
-//typedef unsigned long atomic_ulong;
-//typedef   signed long long atomic_llong;
-//typedef unsigned long long atomic_ullong;
-/* ... */
-typedef  intptr_t          atomic_intptr_t;
-typedef uintptr_t          atomic_uintptr_t;
-typedef uintptr_t          atomic_size_t;
-typedef  intptr_t          atomic_ptrdiff_t;
-//typedef  intmax_t          atomic_intmax_t;
-//typedef uintmax_t          atomic_uintmax_t;
+typedef  intptr_t atomic_flag;
+typedef  intptr_t atomic_bool;
+typedef  intptr_t atomic_char;
+typedef  intptr_t atomic_schar;
+typedef uintptr_t atomic_uchar;
+typedef  intptr_t atomic_short;
+typedef uintptr_t atomic_ushort;
+typedef  intptr_t atomic_int;
+typedef uintptr_t atomic_uint;
+typedef  intptr_t atomic_long;
+typedef uintptr_t atomic_ulong;
+//atomic_llong
+//atomic_ullong
+typedef uintptr_t atomic_char16_t;
+typedef uintptr_t atomic_char32_t;
+typedef uintptr_t atomic_wchar_t;
+typedef  intptr_t atomic_int_least8_t;
+typedef uintptr_t atomic_uint_least8_t;
+typedef  intptr_t atomic_int_least16_t;
+typedef uintptr_t atomic_uint_least16_t;
+typedef  intptr_t atomic_int_least32_t;
+typedef uintptr_t atomic_uint_least32_t;
+//atomic_int_least64_t
+//atomic_uint_least64_t
+typedef  intptr_t atomic_int_fast8_t;
+typedef uintptr_t atomic_uint_fast8_t;
+typedef  intptr_t atomic_int_fast16_t;
+typedef uintptr_t atomic_uint_fast16_t;
+typedef  intptr_t atomic_int_fast32_t;
+typedef uintptr_t atomic_uint_fast32_t;
+//atomic_int_fast64_t
+//atomic_uint_fast64_t
+typedef  intptr_t atomic_intptr_t;
+typedef uintptr_t atomic_uintptr_t;
+typedef uintptr_t atomic_size_t;
+typedef  intptr_t atomic_ptrdiff_t;
+//atomic_intmax_t
+//atomic_uintmax_t
 
 #  define atomic_store(object,desired) \
     do { \
