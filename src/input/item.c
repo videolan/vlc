@@ -804,7 +804,7 @@ input_item_NewWithType( const char *psz_uri, const char *psz_name,
                         int i_options, const char *const *ppsz_options,
                         unsigned flags, mtime_t duration, int type )
 {
-    static vlc_atomic_t last_input_id = VLC_ATOMIC_INIT(0);
+    static atomic_int last_input_id = ATOMIC_VAR_INIT(0);
 
     input_item_owner_t *owner = calloc( 1, sizeof( *owner ) );
     if( unlikely(owner == NULL) )
@@ -813,7 +813,7 @@ input_item_NewWithType( const char *psz_uri, const char *psz_name,
     input_item_t *p_input = &owner->item;
     vlc_event_manager_t * p_em = &p_input->event_manager;
 
-    p_input->i_id = vlc_atomic_inc(&last_input_id);
+    p_input->i_id = atomic_fetch_add(&last_input_id, 1);
     vlc_gc_init( p_input, input_item_Destroy );
     vlc_mutex_init( &p_input->lock );
 
