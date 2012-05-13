@@ -31,6 +31,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_atomic.h>
 #include <vlc_vout.h>
 #include <vlc_spu.h>
 #include <vlc_aout.h>
@@ -44,7 +45,7 @@
 
 struct input_resource_t
 {
-    VLC_GC_MEMBERS
+    atomic_uint    refs;
 
     vlc_object_t   *p_parent;
 
@@ -420,9 +421,24 @@ static void TerminateAout( input_resource_t *p_resource )
         aout_Destroy( p_aout );
 }
 
-static void Destructor( gc_object_t *p_gc )
+/* */
+input_resource_t *input_resource_New( vlc_object_t *p_parent )
 {
-    input_resource_t *p_resource = vlc_priv( p_gc, input_resource_t );
+    input_resource_t *p_resource = calloc( 1, sizeof(*p_resource) );
+    if( !p_resource )
+        return NULL;
+
+    atomic_init( &p_resource->refs, 1 );
+    p_resource->p_parent = p_parent;
+    vlc_mutex_init( &p_resource->lock );
+    vlc_mutex_init( &p_resource->lock_hold );
+    return p_resource;
+}
+
+void input_resource_Release( input_resource_t *p_resource )
+{
+    if( atomic_fetch_sub( &p_resource->refs, 1 ) != 1 )
+        return;
 
     DestroySout( p_resource );
     DestroyVout( p_resource );
@@ -433,28 +449,9 @@ static void Destructor( gc_object_t *p_gc )
     free( p_resource );
 }
 
-/* */
-input_resource_t *input_resource_New( vlc_object_t *p_parent )
-{
-    input_resource_t *p_resource = calloc( 1, sizeof(*p_resource) );
-    if( !p_resource )
-        return NULL;
-
-    vlc_gc_init( p_resource, Destructor );
-    p_resource->p_parent = p_parent;
-    vlc_mutex_init( &p_resource->lock );
-    vlc_mutex_init( &p_resource->lock_hold );
-    return p_resource;
-}
-
-void input_resource_Release( input_resource_t *p_resource )
-{
-    vlc_gc_decref( p_resource );
-}
-
 input_resource_t *input_resource_Hold( input_resource_t *p_resource )
 {
-    vlc_gc_incref( p_resource );
+    atomic_fetch_add( &p_resource->refs, 1 );
     return p_resource;
 }
 
