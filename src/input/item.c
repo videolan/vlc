@@ -29,10 +29,8 @@
 
 #include <vlc_common.h>
 #include <vlc_url.h>
-#include "vlc_playlist.h"
-#include "vlc_interface.h"
+#include <vlc_interface.h>
 #include <vlc_charset.h>
-#include <vlc_atomic.h>
 
 #include "item.h"
 #include "info.h"
@@ -407,10 +405,20 @@ bool input_item_IsArtFetched( input_item_t *p_item )
     return b_fetched;
 }
 
-static void input_item_Destroy ( gc_object_t *p_gc )
+input_item_t *input_item_Hold( input_item_t *p_item )
 {
-    input_item_t *p_item = vlc_priv( p_gc, input_item_t );
     input_item_owner_t *owner = item_owner(p_item);
+
+    atomic_fetch_add( &owner->refs, 1 );
+    return p_item;
+}
+
+void input_item_Release( input_item_t *p_item )
+{
+    input_item_owner_t *owner = item_owner(p_item);
+
+    if( atomic_fetch_sub(&owner->refs, 1) != 1 )
+        return;
 
     vlc_event_manager_fini( &p_item->event_manager );
 
@@ -810,11 +818,12 @@ input_item_NewWithType( const char *psz_uri, const char *psz_name,
     if( unlikely(owner == NULL) )
         return NULL;
 
+    atomic_init( &owner->refs, 1 );
+
     input_item_t *p_input = &owner->item;
     vlc_event_manager_t * p_em = &p_input->event_manager;
 
     p_input->i_id = atomic_fetch_add(&last_input_id, 1);
-    vlc_gc_init( p_input, input_item_Destroy );
     vlc_mutex_init( &p_input->lock );
 
     p_input->psz_name = NULL;

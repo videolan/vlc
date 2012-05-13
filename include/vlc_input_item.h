@@ -54,7 +54,6 @@ struct info_category_t
 
 struct input_item_t
 {
-    VLC_GC_MEMBERS
     int        i_id;                 /**< Identifier of the item */
 
     char       *psz_name;            /**< text describing this item */
@@ -267,6 +266,15 @@ VLC_API input_item_t * input_item_NewExt( const char *psz_uri, const char *psz_n
  */
 VLC_API input_item_t * input_item_Copy(input_item_t * ) VLC_USED;
 
+/** Holds an input item, i.e. creates a new reference. */
+VLC_API input_item_t *input_item_Hold(input_item_t *);
+
+/** Releases an input item, i.e. decrements its reference counter. */
+VLC_API void input_item_Release(input_item_t *);
+
+/* Historical hack... */
+#define vlc_gc_incref(i) input_item_Hold(i)
+#define vlc_gc_decref(i) input_item_Release(i)
 
 /******************
  * Input stats
