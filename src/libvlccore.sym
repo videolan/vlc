@@ -522,13 +522,11 @@ vlc_fourcc_IsYUV
 vlc_fourcc_GetRGBFallback
 vlc_fourcc_GetYUVFallback
 vlc_fourcc_AreUVPlanesSwapped
-vlc_gc_init
 vlc_GetActionId
 vlc_getaddrinfo
 vlc_getnameinfo
 vlc_gettext
 vlc_ngettext
-vlc_hold
 vlc_iconv
 vlc_iconv_close
 vlc_iconv_open
@@ -564,7 +562,6 @@ vlc_rand_bytes
 vlc_drand48
 vlc_lrand48
 vlc_mrand48
-vlc_release
 vlc_restorecancel
 vlc_rwlock_destroy
 vlc_rwlock_init
