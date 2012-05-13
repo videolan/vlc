@@ -5,7 +5,6 @@ SUBDIRS = msw
 LIBTOOL=@LIBTOOL@ --tag=CC
 
 SOURCES_aa = aa.c
-SOURCES_caca = caca.c
 SOURCES_fb = fb.c
 SOURCES_vout_sdl = sdl.c
 SOURCES_directfb = directfb.c
@@ -131,6 +130,14 @@ endif
 libegl_plugin_la_DEPENDENCIES =
 EXTRA_LTLIBRARIES += libegl_plugin.la
 libvlc_LTLIBRARIES += $(LTLIBegl)
+
+### Coloured ASCII art ###
+libcaca_plugin_la_SOURCES = caca.c
+libcaca_plugin_la_CFLAGS = $(AM_CFLAGS) $(CACA_CFLAGS)
+libcaca_plugin_la_LIBADD = $(AM_LIBADD) $(CACA_LIBS)
+libcaca_plugin_la_DEPENDENCIES =
+EXTRA_LTLIBRARIES += libcaca_plugin.la
+libvlc_LTLIBRARIES += $(LTLIBcaca)
 
 ### Common ###
 libvdummy_plugin_la_SOURCES = vdummy.c
