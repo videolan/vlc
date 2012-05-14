@@ -466,7 +466,7 @@ void InputManager::UpdateName()
     free( formated );
 
     /* If we have Nothing */
-    if( name.isEmpty() )
+    if( name.simplified().isEmpty() )
     {
         char *uri = input_item_GetURI( input_GetItem( p_input ) );
         char *file = uri ? strrchr( uri, '/' ) : NULL;
