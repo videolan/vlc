@@ -133,7 +133,7 @@
     theScreensFrame = [screen frame];
     theWindowsFrame = [self frame];
 
-    if( theScreensFrame.size.width >= 1920 ) //  17" MBP, 24"/27" iMacs, external displays
+    if( theScreensFrame.size.width >= 2560 ) //  27" iMacs, external displays
         b_usingBigScreen = YES;
 
     if( (b_usingBigScreen && theWindowsFrame.size.width < 820) || (!b_usingBigScreen && theWindowsFrame.size.width > 550) )
