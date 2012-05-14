@@ -74,27 +74,24 @@ int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
         {
             HANDLE h = (HANDLE)((uintptr_t)_get_osfhandle (fd));
             DWORD out;
-
             /* XXX: It is not clear whether WriteConsole() wants the number of
              * Unicode characters or the size of the wchar_t array. */
-            WriteConsoleW (h, wide, wcslen (wide), &out, NULL);
+            BOOL ok = WriteConsoleW (h, wide, wcslen (wide), &out, NULL);
             free (wide);
+            if (ok)
+                goto out;
         }
-        else
-            res = -1;
+    }
+# endif
+    char *ansi = ToANSI (str);
+    if (ansi != NULL)
+    {
+        fputs (ansi, stream);
+        free (ansi);
     }
     else
-# endif
-    {
-        char *ansi = ToANSI (str);
-        if (ansi != NULL)
-        {
-            fputs (ansi, stream);
-            free (ansi);
-        }
-        else
-            res = -1;
-    }
+        res = -1;
+out:
     free (str);
     return res;
 #endif
