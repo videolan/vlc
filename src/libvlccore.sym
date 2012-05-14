@@ -454,6 +454,7 @@ vlc_rename
 vlc_getcwd
 vlc_dup
 vlc_pipe
+vlc_socket
 vlc_accept
 utf8_vfprintf
 var_AddCallback
