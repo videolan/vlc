@@ -1720,8 +1720,10 @@ static void cookie_append( vlc_array_t * cookies, char * cookie )
 
         assert( current_cookie_name );
 
-        bool is_domain_matching = ( cookie_domain && current_cookie_domain &&
-                                         !strcmp( cookie_domain, current_cookie_domain ) );
+        bool is_domain_matching = (
+                      ( !cookie_domain && !current_cookie_domain ) ||
+                      ( cookie_domain && current_cookie_domain &&
+                        !strcmp( cookie_domain, current_cookie_domain ) ) );
 
         if( is_domain_matching && !strcmp( cookie_name, current_cookie_name )  )
         {
