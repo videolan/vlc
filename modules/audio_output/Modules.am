@@ -45,6 +45,12 @@ if HAVE_PULSE
 libvlc_LTLIBRARIES += libpulse_plugin.la
 endif
 
+libwasapi_plugin_la_SOURCES = wasapi.c
+libwasapi_plugin_la_CFLAGS = $(AM_CFLAGS)
+libwasapi_plugin_la_LIBADD = $(AM_LIBADD) -lole32 -lksuser
+libwasapi_plugin_la_DEPENDENCIES =
+EXTRA_LTLIBRARIES += libwasapi_plugin.la
+
 libkai_plugin_la_SOURCES = kai.c packet.c
 libkai_plugin_la_CFLAGS = $(AM_CFLAGS)
 libkai_plugin_la_LIBADD = $(AM_LIBADD) $(KAI_LIBS)
