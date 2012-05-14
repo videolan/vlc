@@ -224,8 +224,8 @@ static int vlclua_sd_add_item( lua_State *L )
             int i_options = 0;
             const char *psz_path = lua_tostring( L, -1 );
 
-            vlclua_read_options( p_sd, L, &i_options, &ppsz_options );
             lua_pop( L, 1 );
+            vlclua_read_options( p_sd, L, &i_options, &ppsz_options );
             lua_getfield( L, -1, "title" );
             const char *psz_title = luaL_checkstring( L, -1 ) ? luaL_checkstring( L, -1 ) : psz_path;
             input_item_t *p_input = input_item_NewExt( psz_path, psz_title,
