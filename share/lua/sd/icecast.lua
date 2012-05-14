@@ -36,7 +36,7 @@ function main()
 		if string.find( station_name, "radionomy.com" )
 		then
 			station_name = string.match( station_name, "([^/]+)$")
-			station_name = string.gsub( station_name, "-", "\ " )
+			station_name = string.gsub( station_name, "-", " " )
 		end
 	end
         vlc.sd.add_item( {path=station.children_map["listen_url"][1].children[1],
@@ -44,8 +44,8 @@ function main()
                           genre=station.children_map["genre"][1].children[1],
                           nowplaying=station.children_map["current_song"][1].children[1],
                           meta={
-				  ["Icecast Bitrate"]=station.children_map["bitrate"][1].children[1];
-				  ["Icecast Server Type"]=station.children_map["server_type"][1].children[1];
+				  ["Icecast Bitrate"]=station.children_map["bitrate"][1].children[1],
+				  ["Icecast Server Type"]=station.children_map["server_type"][1].children[1]
 			  }} )
     end
 end
