@@ -50,6 +50,7 @@ struct aout_sys_t
 {
     IAudioClient *client;
     IAudioRenderClient *render;
+    IAudioClock *clock;
     UINT32 frames; /**< Total buffer size (frames) */
     HANDLE done; /**< Semaphore for MTA thread */
 };
@@ -60,8 +61,17 @@ static void Play(audio_output_t *aout, block_t *block)
     HRESULT hr;
 
     CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    if (likely(sys->clock != NULL))
+    {
+        UINT64 pos, qpcpos;
 
-    while (block->i_nb_samples > 0)
+        IAudioClock_GetPosition(sys->clock, &pos, &qpcpos);
+        qpcpos = (qpcpos + 5) / 10; /* 100ns -> 1µs */
+        /* NOTE: this assumes mdate() uses QPC() (which it currently does). */
+        aout_TimeReport(aout, qpcpos);
+    }
+
+    for (;;)
     {
         UINT32 frames;
         hr = IAudioClient_GetCurrentPadding(sys->client, &frames);
@@ -93,14 +103,17 @@ static void Play(audio_output_t *aout, block_t *block)
             msg_Err(aout, "cannot release buffer (error 0x%lx)", hr);
             break;
         }
+        IAudioClient_Start(sys->client);
 
         block->p_buffer += copy;
         block->i_buffer -= copy;
         block->i_nb_samples -= frames;
+        if (block->i_nb_samples == 0)
+            break; /* done */
 
-        /* FIXME: implement synchro */
-        IAudioClient_Start(sys->client);
-        Sleep(AOUT_MIN_PREPARE_TIME / 1000);
+        /* Out of buffer space, sleep */
+        msleep(AOUT_MIN_PREPARE_TIME
+             + block->i_nb_samples * CLOCK_FREQ / aout->format.i_rate);
     }
 
     CoUninitialize();
@@ -112,13 +125,14 @@ static void Pause(audio_output_t *aout, bool paused, mtime_t date)
     aout_sys_t *sys = aout->sys;
     HRESULT hr;
 
-    if (!paused)
-        return;
-
     CoInitializeEx(NULL, COINIT_MULTITHREADED);
-    hr = IAudioClient_Stop(sys->client);
+    if (paused)
+        hr = IAudioClient_Stop(sys->client);
+    else
+        hr = IAudioClient_Start(sys->client);
     if (FAILED(hr))
-        msg_Warn(aout, "cannot stop stream (error 0x%lx)", hr);
+        msg_Warn(aout, "cannot %s stream (error 0x%lx)",
+                 paused ? "stop" : "start", hr);
     CoUninitialize();
     (void) date;
 }
@@ -243,6 +257,7 @@ static int Open(vlc_object_t *obj)
         return VLC_ENOMEM;
     sys->client = NULL;
     sys->render = NULL;
+    sys->clock = NULL;
     sys->done = NULL;
 
     hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
@@ -343,6 +358,11 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
 
+    hr = IAudioClient_GetService(sys->client, &IID_IAudioClock,
+                                 (void **)&sys->clock);
+    if (FAILED(hr))
+        msg_Warn(aout, "cannot get audio clock (error 0x%lx)", hr);
+
     sys->done = CreateSemaphore(NULL, 0, 1, NULL);
     if (unlikely(sys->done == NULL))
         goto error;
@@ -361,6 +381,8 @@ static int Open(vlc_object_t *obj)
 error:
     if (sys->done != NULL)
         CloseHandle(sys->done);
+    if (sys->clock != NULL)
+        IAudioClock_Release(sys->clock);
     if (sys->render != NULL)
         IAudioRenderClient_Release(sys->render);
     if (sys->client != NULL)
@@ -376,6 +398,8 @@ static void Close (vlc_object_t *obj)
     aout_sys_t *sys = aout->sys;
 
     CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    IAudioClient_Stop(sys->client); /* should not be needed */
+    IAudioClock_Release(sys->clock);
     IAudioRenderClient_Release(sys->render);
     IAudioClient_Release(sys->client);
     CoUninitialize();
