@@ -123,8 +123,9 @@ static void Flush(audio_output_t *aout, bool wait)
     HRESULT hr;
 
     if (wait)
-        return;
+        return; /* Not drain implemented */
 
+    IAudioClient_Stop(sys->client);
     hr = IAudioClient_Reset(sys->client);
     if (FAILED(hr))
         msg_Warn(aout, "cannot reset stream (error 0x%lx)", hr);
