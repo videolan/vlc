@@ -864,25 +864,14 @@ static VLCMainWindow *_o_sharedInstance = nil;
     p_input = pl_CurrentInput( VLCIntf );
     if( p_input != NULL )
     {
-        vlc_value_t time;
         vlc_value_t pos;
         NSString * o_time;
-        char psz_time[MSTRTIME_MAX_SIZE];
 
         pos.f_float = f_updated / 10000.;
         var_Set( p_input, "position", pos );
         [o_time_sld setFloatValue: f_updated];
 
-        var_Get( p_input, "time", &time );
-
-        mtime_t dur = input_item_GetDuration( input_GetItem( p_input ) );
-        if( [o_time_fld timeRemaining] && dur != -1 )
-        {
-            o_time = [NSString stringWithFormat: @"-%s", secstotimestr( psz_time, ((dur - time.i_time) / 1000000) )];
-        }
-        else
-            o_time = [NSString stringWithUTF8String: secstotimestr( psz_time, (time.i_time / 1000000) )];
-
+        o_time = [self getCurrentTimeAsString: p_input];
         [o_time_fld setStringValue: o_time];
         [o_fspanel setStreamPos: f_updated andTime: o_time];
         vlc_object_release( p_input );
@@ -1205,32 +1194,44 @@ static VLCMainWindow *_o_sharedInstance = nil;
     b_splitview_removed = NO;
 }
 
+- (NSString *)getCurrentTimeAsString:(input_thread_t *)p_input
+{
+    assert( p_input != nil );
+
+    vlc_value_t time;
+    char psz_time[MSTRTIME_MAX_SIZE];
+
+    var_Get( p_input, "time", &time );
+
+    mtime_t dur = input_item_GetDuration( input_GetItem( p_input ) );
+    if( [o_time_fld timeRemaining] && dur > 0 )
+    {
+        mtime_t remaining = 0;
+        if( dur > time.i_time )
+            remaining = dur - time.i_time;
+        return [NSString stringWithFormat: @"-%s", secstotimestr( psz_time, ( remaining / 1000000 ) )];
+    }
+    else
+        return [NSString stringWithUTF8String: secstotimestr( psz_time, ( time.i_time / 1000000 ) )];
+}
+
 - (void)updateTimeSlider
 {
     input_thread_t * p_input;
     p_input = pl_CurrentInput( VLCIntf );
     if( p_input )
     {
-        vlc_value_t time;
         NSString * o_time;
         vlc_value_t pos;
-        char psz_time[MSTRTIME_MAX_SIZE];
         float f_updated;
 
         var_Get( p_input, "position", &pos );
         f_updated = 10000. * pos.f_float;
         [o_time_sld setFloatValue: f_updated];
 
-        var_Get( p_input, "time", &time );
+        o_time = [self getCurrentTimeAsString: p_input];
 
         mtime_t dur = input_item_GetDuration( input_GetItem( p_input ) );
-        if( [o_time_fld timeRemaining] && dur > 0 )
-        {
-            o_time = [NSString stringWithFormat: @"-%s", secstotimestr( psz_time, ((dur - time.i_time) / 1000000))];
-        }
-        else
-            o_time = [NSString stringWithUTF8String: secstotimestr( psz_time, (time.i_time / 1000000) )];
-
         if (dur == -1) {
             [o_time_sld setEnabled: NO];
             [o_time_sld setHidden: YES];
