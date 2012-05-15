@@ -613,7 +613,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONNECT( ui.updatesBox, toggled( bool ),
                      ui.updatesDays, setEnabled( bool ) );
 #else
-            ui.updateNotifierZone->hide();
+            ui.updatesBox->hide();
+            ui.updatesDays->hide();
 #endif
             /* ONE INSTANCE options */
 #if defined( WIN32 ) || defined( HAVE_DBUS ) || defined(__APPLE__)

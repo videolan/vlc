@@ -71,88 +71,21 @@
       <string>Privacy / Network Interaction</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
-      <item row="0" column="0">
-       <widget class="QLabel" name="artFetchLabel">
-        <property name="minimumSize">
+      <item row="2" column="1">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Preferred</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
          <size>
-          <width>220</width>
-          <height>0</height>
+          <width>40</width>
+          <height>20</height>
          </size>
         </property>
-        <property name="text">
-         <string>Album art download policy:</string>
-        </property>
-        <property name="buddy">
-         <cstring>artFetcher</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3" colspan="2">
-       <widget class="QComboBox" name="artFetcher"/>
-      </item>
-      <item row="3" column="0">
-       <widget class="QCheckBox" name="saveRecentlyPlayed">
-        <property name="minimumSize">
-         <size>
-          <width>220</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Save recently played items</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2">
-       <widget class="QLabel" name="filterLabel">
-        <property name="text">
-         <string>Filter:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>5</number>
-        </property>
-        <property name="buddy">
-         <cstring>recentlyPlayedFilters</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="3" colspan="2">
-       <widget class="QLineEdit" name="recentlyPlayedFilters">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="toolTip">
-         <string>Separate words by | (without space)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="5">
-       <widget class="QWidget" name="updateNotifierZone" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <property name="margin">
-          <number>0</number>
-         </property>
-        </layout>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="updatesBox">
-        <property name="minimumSize">
-         <size>
-          <width>220</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Activate updates notifier</string>
-        </property>
-       </widget>
+       </spacer>
       </item>
       <item row="1" column="3">
        <widget class="QSpinBox" name="updatesDays">
@@ -173,21 +106,79 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="0" column="3" colspan="2">
+       <widget class="QComboBox" name="artFetcher"/>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLabel" name="filterLabel">
+        <property name="text">
+         <string>Filter:</string>
         </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Preferred</enum>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
-        <property name="sizeHint" stdset="0">
+        <property name="margin">
+         <number>5</number>
+        </property>
+        <property name="buddy">
+         <cstring>recentlyPlayedFilters</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3" colspan="2">
+       <widget class="QLineEdit" name="recentlyPlayedFilters">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Separate words by | (without space)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="saveRecentlyPlayed">
+        <property name="minimumSize">
          <size>
-          <width>40</width>
-          <height>20</height>
+          <width>220</width>
+          <height>0</height>
          </size>
         </property>
-       </spacer>
+        <property name="text">
+         <string>Save recently played items</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="artFetchLabel">
+        <property name="minimumSize">
+         <size>
+          <width>220</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Album art download policy:</string>
+        </property>
+        <property name="buddy">
+         <cstring>artFetcher</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="updatesBox">
+        <property name="minimumSize">
+         <size>
+          <width>220</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Activate updates notifier</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
