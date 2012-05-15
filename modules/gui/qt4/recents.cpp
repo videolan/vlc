@@ -90,7 +90,10 @@ void RecentsMRL::addRecent( const QString &mrl )
     /* Add to the Windows 7 default list in taskbar */
     char* path = make_path( qtu( mrl ) );
     if( path )
+    {
         SHAddToRecentDocs( SHARD_PATHW, path );
+        free( path );
+    }
 #endif
 
     int i_index = stack->indexOf( mrl );
