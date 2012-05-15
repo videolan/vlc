@@ -369,6 +369,7 @@ $Id$
  * vout_sdl: video output module using the SDL library
  * vsxu: audio visualization using Vovoid VSXu
  * wall: image wall filter
+ * wasapi: Windows Audio Session API audio output
  * wav: Wav demuxer
  * wave: Wave video effect
  * waveout: simple audio output module for Windows

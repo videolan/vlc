@@ -5,6 +5,7 @@ Changes between 2.0.x and 2.1.0-git:
  * /extras/contrib has been replaced by a better system in /contrib
 
 Audio output:
+ * Windows Audio Session API audio output support
  * OpenBSD sndio audio output support
 
 Encoders:
