@@ -478,6 +478,7 @@ vlc$(EXEEXT):
 	$(AM_V_GEN)$(LN_S) -f bin/vlc-static$(EXEEXT) vlc$(EXEEXT)
 
 TESTS = test/run_vlc.sh
+dist_noinst_SCRIPTS += test/run_vlc.sh
 
 ###############################################################################
 # Installing plugins cache
