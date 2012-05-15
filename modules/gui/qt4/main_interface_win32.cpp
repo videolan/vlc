@@ -71,7 +71,6 @@
 
 void MainInterface::createTaskBarButtons()
 {
-    taskbar_wmsg = WM_NULL;
     /*Here is the code for the taskbar thumb buttons
     FIXME:We need pretty buttons in 16x16 px that are handled correctly by masks in Qt
     FIXME:the play button's picture doesn't changed to pause when clicked
