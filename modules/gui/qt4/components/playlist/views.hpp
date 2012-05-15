@@ -104,6 +104,7 @@ public:
     virtual QRect visualRect(const QModelIndex&) const;
     virtual void scrollTo(const QModelIndex&, QAbstractItemView::ScrollHint);
     virtual QModelIndex indexAt(const QPoint&) const;
+    virtual void setModel(QAbstractItemModel *model);
 
 protected:
     virtual int horizontalOffset() const;

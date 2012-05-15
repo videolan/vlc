@@ -378,9 +378,15 @@ PicFlowView::PicFlowView( PLModel *p_model, QWidget *parent ) : QAbstractItemVie
     QHBoxLayout *layout = new QHBoxLayout( this );
     layout->setMargin( 0 );
     picFlow = new PictureFlow( this, p_model );
-    picFlow->setSlideSize(QSize(128,128));
     layout->addWidget( picFlow );
+    picFlow->setSlideSize(QSize( 4*LISTVIEW_ART_SIZE, 3*LISTVIEW_ART_SIZE) );
     setSelectionMode( QAbstractItemView::SingleSelection );
+}
+
+void PicFlowView::setModel( QAbstractItemModel *model )
+{
+    QAbstractItemView::setModel( model );
+    picFlow->setModel( model );
 }
 
 int PicFlowView::horizontalOffset() const
