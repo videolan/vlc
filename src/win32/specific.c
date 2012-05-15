@@ -39,43 +39,32 @@
 
 #include <winsock.h>
 
-/*****************************************************************************
- * system_Init: initialize winsock and misc other things.
- *****************************************************************************/
-void system_Init( void )
-{
-    WSADATA Data;
 
+static int system_InitWSA(int hi, int lo)
+{
+    WSADATA data;
+
+    if (WSAStartup(MAKEWORD(hi, lo), &data) == 0)
+    {
+        if (LOBYTE(data.wVersion) == 2 && HIBYTE(data.wVersion) == 2)
+            return 0;
+        /* Winsock DLL is not usable */
+        WSACleanup( );
+    }
+    return -1;
+}
+
+/**
+ * Initializes MME timer, Winsock.
+ */
+void system_Init(void)
+{
 #if !defined( UNDER_CE )
     timeBeginPeriod(5);
 #endif
 
-    /* WinSock Library Init. */
-    if( !WSAStartup( MAKEWORD( 2, 2 ), &Data ) )
-    {
-        /* Aah, pretty useless check, we should always have Winsock 2.2
-         * since it appeared in Win98. */
-        if( LOBYTE( Data.wVersion ) != 2 || HIBYTE( Data.wVersion ) != 2 )
-            /* We could not find a suitable WinSock DLL. */
-            WSACleanup( );
-        else
-            /* Everything went ok. */
-            return;
-    }
-
-    /* Let's try with WinSock 1.1 */
-    if( !WSAStartup( MAKEWORD( 1, 1 ), &Data ) )
-    {
-        /* Confirm that the WinSock DLL supports 1.1.*/
-        if( LOBYTE( Data.wVersion ) != 1 || HIBYTE( Data.wVersion ) != 1 )
-            /* We could not find a suitable WinSock DLL. */
-            WSACleanup( );
-        else
-            /* Everything went ok. */
-            return;
-    }
-
-    fprintf( stderr, "error: can't initialize WinSocks\n" );
+    if (system_InitWSA(2, 2) && system_InitWSA(1, 1))
+        fputs("Error: cannot initialize Winsocks\n", stderr);
 }
 
 /*****************************************************************************
@@ -327,10 +316,10 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
     return DefWindowProc( hwnd, uMsg, wParam, lParam );
 }
 
-/*****************************************************************************
- * system_End: terminate winsock.
- *****************************************************************************/
-void system_End( void )
+/**
+ * Cleans up after system_Init() and system_Configure().
+ */
+void system_End(void)
 {
     HWND ipcwindow;
 
@@ -349,5 +338,6 @@ void system_End( void )
     timeEndPeriod(5);
 #endif
 
+    /* XXX: In theory, we should not call this if WSAStartup() failed. */
     WSACleanup();
 }
