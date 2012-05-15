@@ -249,6 +249,7 @@ void PlaylistWidget::changeView( const QModelIndex& index )
 {
     searchEdit->clear();
     locationBar->setIndex( index );
+    viewActions[mainView->currentViewIndex()]->setChecked( true );
 }
 
 void PlaylistWidget::clearPlaylist()
