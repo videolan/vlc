@@ -3497,6 +3497,25 @@ AS_IF([test "$enable_sndio" != "no"], [
 AM_CONDITIONAL([HAVE_SNDIO], [test "${have_sndio}" = "yes"])
 
 dnl
+dnl  Windows Audio Session plugin
+dnl
+AC_ARG_ENABLE([wasapi],
+  [AS_HELP_STRING([--enable-wasapi],
+    [use the Windows Audio Session API (default auto)])
+])
+have_wasapi="no"
+AS_IF([test "$enable_wasapi" != "no"], [
+  AC_CHECK_HEADER([audioclient.h], [
+    have_wasapi="yes"
+  ], [
+    AS_IF([test "x${enable_wasapi}" != "x"], [
+      AC_MSG_ERROR([Windows Audio Session API not found.])
+    ])
+  ])
+])
+AM_CONDITIONAL([HAVE_WASAPI], [test "${have_wasapi}" = "yes"])
+
+dnl
 dnl  win32 waveOut plugin
 dnl
 AC_ARG_ENABLE(waveout,
