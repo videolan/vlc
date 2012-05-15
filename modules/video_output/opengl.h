@@ -34,6 +34,13 @@
 # define USE_OPENGL_ES 0
 #endif
 
+#ifdef __APPLE__
+# include "TargetConditionals.h"
+# if defined(TARGET_OS_IPHONE) || defined(TARGET_IPHONE_SIMULATOR)
+#  define USE_OPENGL_ES 1
+# endif
+#endif
+
 #if !defined (__APPLE__)
 # if USE_OPENGL_ES == 2
 #  include <GLES2/gl2.h>
@@ -42,14 +49,16 @@
 # else
 #  ifdef WIN32
 #   include <GL/glew.h>
+#  else
+#   include <GL/glx.h>
 #  endif
 #  include <GL/gl.h>
 # endif
 #else
-# if USE_OPENGL_ES == 2
-#  include <OpenGLES/ES2/gl.h>
-# elif USE_OPENGL_ES == 1
+# if USE_OPENGL_ES
 #  include <OpenGLES/ES1/gl.h>
+#  include <OpenGLES/ES2/gl.h>
+#  include <OpenGLES/ES2/glext.h>
 # else
 #  define MACOS_OPENGL
 #  include <OpenGL/gl.h>
