@@ -88,7 +88,9 @@ void RecentsMRL::addRecent( const QString &mrl )
 
 #ifdef WIN32
     /* Add to the Windows 7 default list in taskbar */
-    SHAddToRecentDocs( SHARD_PATHW, qtu( mrl ) );
+    char* path = make_path( qtu( mrl ) );
+    if( path )
+        SHAddToRecentDocs( SHARD_PATHW, path );
 #endif
 
     int i_index = stack->indexOf( mrl );
