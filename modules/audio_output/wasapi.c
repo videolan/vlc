@@ -46,6 +46,24 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 vlc_module_end()
 
+static int TryEnter(void)
+{
+    HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    return -!!FAILED(hr);
+}
+
+static void Enter(void)
+{
+    HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    if (unlikely(FAILED(hr)))
+        abort();
+}
+
+static void Leave(void)
+{
+    CoUninitialize();
+}
+
 struct aout_sys_t
 {
     IAudioClient *client;
@@ -65,7 +83,7 @@ static void Play(audio_output_t *aout, block_t *block)
     aout_sys_t *sys = aout->sys;
     HRESULT hr;
 
-    CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    Enter();
     if (likely(sys->clock != NULL))
     {
         UINT64 pos, qpcpos;
@@ -121,7 +139,7 @@ static void Play(audio_output_t *aout, block_t *block)
              + block->i_nb_samples * CLOCK_FREQ / aout->format.i_rate);
     }
 
-    CoUninitialize();
+    Leave();
     block_Release(block);
 }
 
@@ -130,7 +148,7 @@ static void Pause(audio_output_t *aout, bool paused, mtime_t date)
     aout_sys_t *sys = aout->sys;
     HRESULT hr;
 
-    CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    Enter();
     if (paused)
         hr = IAudioClient_Stop(sys->client);
     else
@@ -138,7 +156,7 @@ static void Pause(audio_output_t *aout, bool paused, mtime_t date)
     if (FAILED(hr))
         msg_Warn(aout, "cannot %s stream (error 0x%lx)",
                  paused ? "stop" : "start", hr);
-    CoUninitialize();
+    Leave();
     (void) date;
 }
 
@@ -150,12 +168,12 @@ static void Flush(audio_output_t *aout, bool wait)
     if (wait)
         return; /* Not drain implemented */
 
-    CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    Enter();
     IAudioClient_Stop(sys->client);
     hr = IAudioClient_Reset(sys->client);
     if (FAILED(hr))
         msg_Warn(aout, "cannot reset stream (error 0x%lx)", hr);
-    CoUninitialize();
+    Leave();
 }
 
 static int SimpleVolumeSet(audio_output_t *aout, float vol, bool mute)
@@ -166,8 +184,8 @@ static int SimpleVolumeSet(audio_output_t *aout, float vol, bool mute)
     if (vol > 1.)
         vol = 1.;
 
+    Enter();
     /* NOTE: better change volume while muted (if mute is toggled) */
-    CoInitializeEx(NULL, COINIT_MULTITHREADED);
     if (mute)
     {
         hr = ISimpleAudioVolume_SetMute(sys->volume.simple, true, NULL);
@@ -185,7 +203,7 @@ static int SimpleVolumeSet(audio_output_t *aout, float vol, bool mute)
         if (FAILED(hr))
             msg_Warn(aout, "cannot unmute session (error 0x%lx)", hr);
     }
-    CoUninitialize();
+    Leave();
     return 0;
 }
 
@@ -268,9 +286,7 @@ static void MTAThread(void *data)
     aout_sys_t *sys = aout->sys;
     HRESULT hr;
 
-    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-    if (unlikely(FAILED(hr)))
-        abort();
+    Enter();
 
     hr = IAudioClient_GetService(sys->client, &IID_IAudioRenderClient,
                                  (void **)&sys->render);
@@ -299,7 +315,7 @@ static void MTAThread(void *data)
         IAudioClock_Release(sys->clock);
     IAudioRenderClient_Release(sys->render);
 fail:
-    CoUninitialize();
+    Leave();
     ReleaseSemaphore(sys->ready, 1, NULL);
 }
 
@@ -323,8 +339,7 @@ static int Open(vlc_object_t *obj)
     sys->done = NULL;
     aout->sys = sys;
 
-    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-    if (FAILED(hr))
+    if (TryEnter())
     {
         free(sys);
         return VLC_EGENERIC;
@@ -430,7 +445,7 @@ static int Open(vlc_object_t *obj)
     aout->pf_flush = Flush;
     /*if (AOUT_FMT_LINEAR(&format) && !exclusive)*/
         aout_VolumeHardInit(aout, SimpleVolumeSet, false);
-    CoUninitialize();
+    Leave();
     return VLC_SUCCESS;
 error:
     if (sys->done != NULL)
@@ -439,7 +454,7 @@ error:
         CloseHandle(sys->done);
     if (sys->client != NULL)
         IAudioClient_Release(sys->client);
-    CoUninitialize();
+    Leave();
     free(sys);
     return VLC_EGENERIC;
 }
@@ -449,12 +464,12 @@ static void Close (vlc_object_t *obj)
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
 
-    CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    Enter();
     ReleaseSemaphore(sys->done, 1, NULL); /* tell MTA thread to finish */
     WaitForSingleObject(sys->ready, INFINITE); /* wait for that ^ */
     IAudioClient_Stop(sys->client); /* should not be needed */
     IAudioClient_Release(sys->client);
-    CoUninitialize();
+    Leave();
 
     CloseHandle(sys->done);
     CloseHandle(sys->ready);
