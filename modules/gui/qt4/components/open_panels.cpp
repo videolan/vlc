@@ -1279,7 +1279,7 @@ void CaptureOpenPanel::advancedDialog()
         if( name.isEmpty() || configList.contains( name ) )
             continue;
 
-        msg_Err( p_intf, "%s", p_item->psz_name);
+        msg_Dbg( p_intf, "item %s", p_item->psz_name);
         ConfigControl *config = ConfigControl::createControl(
                         VLC_OBJECT( p_intf ), p_item, advFrame, gLayout, n );
         if( config )
