@@ -51,6 +51,10 @@ struct aout_sys_t
     IAudioClient *client;
     IAudioRenderClient *render;
     IAudioClock *clock;
+    union
+    {
+        ISimpleAudioVolume *simple;
+    } volume;
     UINT32 frames; /**< Total buffer size (frames) */
     HANDLE ready; /**< Semaphore from MTA thread */
     HANDLE done; /**< Semaphore to MTA thread */
@@ -154,12 +158,36 @@ static void Flush(audio_output_t *aout, bool wait)
     CoUninitialize();
 }
 
-/*static int VolumeSet(audio_output_t *aout, float vol, bool mute)
+static int SimpleVolumeSet(audio_output_t *aout, float vol, bool mute)
 {
     aout_sys_t *sys = aout->sys;
+    HRESULT hr;
 
+    if (vol > 1.)
+        vol = 1.;
+
+    /* NOTE: better change volume while muted (if mute is toggled) */
+    CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    if (mute)
+    {
+        hr = ISimpleAudioVolume_SetMute(sys->volume.simple, true, NULL);
+        if (FAILED(hr))
+            msg_Warn(aout, "cannot mute session (error 0x%lx)", hr);
+    }
+
+    hr = ISimpleAudioVolume_SetMasterVolume(sys->volume.simple, vol, NULL);
+    if (FAILED(hr))
+        msg_Warn(aout, "cannot set session volume (error 0x%lx)", hr);
+
+    if (mute)
+    {
+        hr = ISimpleAudioVolume_SetMute(sys->volume.simple, false, NULL);
+        if (FAILED(hr))
+            msg_Warn(aout, "cannot unmute session (error 0x%lx)", hr);
+    }
+    CoUninitialize();
     return 0;
-}*/
+}
 
 static void vlc_ToWave(WAVEFORMATEXTENSIBLE *restrict wf,
                        audio_sample_format_t *restrict audio)
@@ -256,6 +284,12 @@ static void MTAThread(void *data)
                                  (void **)&sys->clock);
     if (FAILED(hr))
         msg_Warn(aout, "cannot get audio clock (error 0x%lx)", hr);
+
+    /*if (AOUT_FMT_LINEAR(&format) && !exclusive)*/
+    {
+        hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume,
+                                     (void **)&sys->volume.simple);
+    }
 
     /* do nothing until the audio session terminates */
     ReleaseSemaphore(sys->ready, 1, NULL);
@@ -394,7 +428,8 @@ static int Open(vlc_object_t *obj)
     aout->pf_play = Play;
     aout->pf_pause = Pause;
     aout->pf_flush = Flush;
-    aout_VolumeNoneInit (aout);
+    /*if (AOUT_FMT_LINEAR(&format) && !exclusive)*/
+        aout_VolumeHardInit(aout, SimpleVolumeSet, false);
     CoUninitialize();
     return VLC_SUCCESS;
 error:
