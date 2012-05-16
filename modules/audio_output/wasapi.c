@@ -166,22 +166,21 @@ static void vlc_ToWave(WAVEFORMATEXTENSIBLE *restrict wf,
 {
     switch (audio->i_format)
     {
-#if 0
-        case VLC_CODEC_FL32:
         case VLC_CODEC_FL64:
+            audio->i_format = VLC_CODEC_FL32;
+        case VLC_CODEC_FL32:
             wf->SubFormat = KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
             break;
 
         case VLC_CODEC_S8:
+        case VLC_CODEC_U8:
+            audio->i_format = VLC_CODEC_S16N;
         case VLC_CODEC_S16N:
-        case VLC_CODEC_S24N:
-        case VLC_CODEC_S32N:
             wf->SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
             break;
-#endif
+
         default:
             audio->i_format = VLC_CODEC_FL32;
-            audio->i_rate = 48000;
             wf->SubFormat = KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
             break;
      }
@@ -297,7 +296,7 @@ static int Open(vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
-    /* Select audio device */
+    /* Get audio device according to policy */
     IMMDeviceEnumerator *devs;
     hr = CoCreateInstance(&CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL,
                           &IID_IMMDeviceEnumerator, (void **)&devs);
@@ -307,7 +306,6 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
 
-    /* TODO: support selecting a device from config? */
     IMMDevice *dev;
     hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(devs, eRender,
                                                      eConsole, &dev);
