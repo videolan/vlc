@@ -52,7 +52,8 @@ struct aout_sys_t
     IAudioRenderClient *render;
     IAudioClock *clock;
     UINT32 frames; /**< Total buffer size (frames) */
-    HANDLE done; /**< Semaphore for MTA thread */
+    HANDLE ready; /**< Semaphore from MTA thread */
+    HANDLE done; /**< Semaphore to MTA thread */
 };
 
 static void Play(audio_output_t *aout, block_t *block)
@@ -233,18 +234,40 @@ static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
     return 0;
 }
 
-/* Dummy thread to keep COM MTA alive */
+/* Dummy thread to create and release COM interfaces when needed. */
 static void MTAThread(void *data)
 {
-    HANDLE done = data;
+    audio_output_t *aout = data;
+    aout_sys_t *sys = aout->sys;
     HRESULT hr;
 
     hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
     if (unlikely(FAILED(hr)))
         abort();
-    WaitForSingleObject(done, INFINITE);
+
+    hr = IAudioClient_GetService(sys->client, &IID_IAudioRenderClient,
+                                 (void **)&sys->render);
+    if (FAILED(hr))
+    {
+        msg_Err(aout, "cannot get audio render service (error 0x%lx)", hr);
+        goto fail;
+    }
+
+    hr = IAudioClient_GetService(sys->client, &IID_IAudioClock,
+                                 (void **)&sys->clock);
+    if (FAILED(hr))
+        msg_Warn(aout, "cannot get audio clock (error 0x%lx)", hr);
+
+    /* do nothing until the audio session terminates */
+    ReleaseSemaphore(sys->ready, 1, NULL);
+    WaitForSingleObject(sys->done, INFINITE);
+
+    if (sys->clock != NULL)
+        IAudioClock_Release(sys->clock);
+    IAudioRenderClient_Release(sys->render);
+fail:
     CoUninitialize();
-    CloseHandle(done);
+    ReleaseSemaphore(sys->ready, 1, NULL);
 }
 
 static int Open(vlc_object_t *obj)
@@ -263,7 +286,9 @@ static int Open(vlc_object_t *obj)
     sys->client = NULL;
     sys->render = NULL;
     sys->clock = NULL;
+    sys->ready = NULL;
     sys->done = NULL;
+    aout->sys = sys;
 
     hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
     if (FAILED(hr))
@@ -355,28 +380,19 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
 
-    hr = IAudioClient_GetService(sys->client, &IID_IAudioRenderClient,
-                                 (void **)&sys->render);
-    if (FAILED(hr))
-    {
-        msg_Err(aout, "cannot get audio render service (error 0x%lx)", hr);
-        goto error;
-    }
-
-    hr = IAudioClient_GetService(sys->client, &IID_IAudioClock,
-                                 (void **)&sys->clock);
-    if (FAILED(hr))
-        msg_Warn(aout, "cannot get audio clock (error 0x%lx)", hr);
-
+    sys->ready = CreateSemaphore(NULL, 0, 1, NULL);
     sys->done = CreateSemaphore(NULL, 0, 1, NULL);
-    if (unlikely(sys->done == NULL))
+    if (unlikely(sys->ready == NULL || sys->done == NULL))
         goto error;
     /* Note: thread handle released by CRT, ignore it. */
-    if (_beginthread(MTAThread, 0, sys->done) == (uintptr_t)-1)
+    if (_beginthread(MTAThread, 0, aout) == (uintptr_t)-1)
+        goto error;
+
+    WaitForSingleObject(sys->ready, INFINITE);
+    if (sys->render == NULL)
         goto error;
 
     aout->format = format;
-    aout->sys = sys;
     aout->pf_play = Play;
     aout->pf_pause = Pause;
     aout->pf_flush = Flush;
@@ -386,10 +402,8 @@ static int Open(vlc_object_t *obj)
 error:
     if (sys->done != NULL)
         CloseHandle(sys->done);
-    if (sys->clock != NULL)
-        IAudioClock_Release(sys->clock);
-    if (sys->render != NULL)
-        IAudioRenderClient_Release(sys->render);
+    if (sys->ready != NULL)
+        CloseHandle(sys->done);
     if (sys->client != NULL)
         IAudioClient_Release(sys->client);
     CoUninitialize();
@@ -403,12 +417,13 @@ static void Close (vlc_object_t *obj)
     aout_sys_t *sys = aout->sys;
 
     CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    ReleaseSemaphore(sys->done, 1, NULL); /* tell MTA thread to finish */
+    WaitForSingleObject(sys->ready, INFINITE); /* wait for that ^ */
     IAudioClient_Stop(sys->client); /* should not be needed */
-    IAudioClock_Release(sys->clock);
-    IAudioRenderClient_Release(sys->render);
     IAudioClient_Release(sys->client);
     CoUninitialize();
 
-    ReleaseSemaphore(sys->done, 1, NULL); /* MTA thread will exit */
+    CloseHandle(sys->done);
+    CloseHandle(sys->ready);
     free(sys);
 }
