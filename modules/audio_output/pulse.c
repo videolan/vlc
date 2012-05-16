@@ -254,7 +254,6 @@ static void stream_resync(audio_output_t *aout, pa_stream *s)
     aout_sys_t *sys = aout->sys;
     mtime_t delta;
 
-    assert (pa_stream_is_corked(s) > 0);
     assert (sys->pts != VLC_TS_INVALID);
 
     delta = vlc_pa_get_latency(aout, sys->context, s);
