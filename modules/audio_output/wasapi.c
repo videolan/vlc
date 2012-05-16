@@ -252,6 +252,11 @@ static int Open(vlc_object_t *obj)
     audio_output_t *aout = (audio_output_t *)obj;
     HRESULT hr;
 
+    if (AOUT_FMT_SPDIF(&aout->format) && !aout->b_force
+     && var_InheritBool(aout, "spdif"))
+        /* Fallback to other plugin until pass-through is implemented */
+        return VLC_EGENERIC;
+
     aout_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
