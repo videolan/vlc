@@ -651,6 +651,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     if( !p_intf ) return;
 
+    [self updateCurrentlyUsedHotkeys];
+
     [o_mainwindow updateWindow];
     [o_mainwindow updateTimeSlider];
     [o_mainwindow updateVolumeSlider];
@@ -1295,8 +1297,8 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     unsigned int i_pressed_modifiers = 0;
     const struct hotkey *p_hotkeys;
     int i;
-    NSMutableString *tempString = [[[NSMutableString alloc] init] autorelease];
-    NSMutableString *tempStringPlus = [[[NSMutableString alloc] init] autorelease];
+    NSMutableString *tempString = [[NSMutableString alloc] init];
+    NSMutableString *tempStringPlus = [[NSMutableString alloc] init];
 
     val.i_int = 0;
     p_hotkeys = p_intf->p_libvlc->p_hotkeys;
@@ -1333,6 +1335,8 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     if( key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask )
     {
         [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+        [tempString release];
+        [tempStringPlus release];
         return YES;
     }
 
@@ -1348,12 +1352,16 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         case NSLeftArrowFunctionKey:
         case NSEnterCharacter:
         case NSCarriageReturnCharacter:
+            [tempString release];
+            [tempStringPlus release];
             return NO;
     }
 
     if( key == 0x0020 ) // space key
     {
         [[VLCCoreInteraction sharedInstance] play];
+        [tempString release];
+        [tempStringPlus release];
         return YES;
     }
 
@@ -1362,9 +1370,13 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     if( [o_usedHotkeys indexOfObject: tempString] != NSNotFound || [o_usedHotkeys indexOfObject: tempStringPlus] != NSNotFound )
     {
         var_SetInteger( p_intf->p_libvlc, "key-pressed", val.i_int );
+        [tempString release];
+        [tempStringPlus release];
         return YES;
     }
 
+    [tempString release];
+    [tempStringPlus release];
     return NO;
 }
 
@@ -1392,7 +1404,8 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         }
     }
     module_config_free (p_config);
-    o_usedHotkeys = [[NSArray alloc] initWithArray: o_usedHotkeys copyItems: YES];
+    o_usedHotkeys = [[NSArray alloc] initWithArray: o_tempArray copyItems: YES];
+    [o_tempArray release];
 }
 
 #pragma mark -
