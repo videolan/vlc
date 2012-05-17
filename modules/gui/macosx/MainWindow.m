@@ -727,7 +727,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if( b_nativeFullscreenMode && b_fullscreen && b_activeVideo && sender != nil )
         return;
 
-    if (b_dropzone_active && !b_activeVideo && ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0)
+    if (b_dropzone_active && ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0)
     {
         b_dropzone_active = NO;
         [self hideDropZone];
@@ -1148,6 +1148,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)hideDropZone
 {
+    b_dropzone_active = NO;
     [o_dropzone_view removeFromSuperview];
     [[o_playlist_table animator] setHidden: NO];
 }
