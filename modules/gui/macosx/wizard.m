@@ -953,7 +953,7 @@ static VLCWizard *_o_sharedInstance = nil;
             [[o_t5_matrix_encap cellAtRow:9 column:0] setEnabled:YES];
             [o_t5_matrix_encap selectCellAtRow:9 column:0];
         }
-        else if ( i_streamingMethod == 0] )
+        else if ( i_streamingMethod == 0 )
         {
             /* if HTTP is the streaming protocol, disable all unsupported
              * encap-formats, but don't touch the other ones selected above */
