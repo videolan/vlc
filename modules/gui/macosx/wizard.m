@@ -4,7 +4,7 @@
  * Copyright (C) 2005-2012 VLC authors and VideoLAN
  * $Id$
  *
- * Authors: Felix KÃ¼hne <fkuehne at videolan dot org>,
+ * Authors: Felix Paul Kühne <fkuehne at videolan dot org>,
  *          Brendon Justin <brendonjustin at gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify

@@ -1,10 +1,10 @@
 /*****************************************************************************
  * bookmarks.m: MacOS X Bookmarks window
  *****************************************************************************
- * Copyright (C) 2005 - 2007 VLC authors and VideoLAN
+ * Copyright (C) 2005 - 2012 VLC authors and VideoLAN
  * $Id$
  *
- * Authors: Felix Kühne <fkuehne at videolan dot org>
+ * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
