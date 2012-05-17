@@ -306,6 +306,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_video_display_box setTitle: _NS("Display")];
     [o_video_enable_ckb setTitle: _NS("Enable Video")];
     [o_video_fullscreen_ckb setTitle: _NS("Fullscreen")];
+    [o_video_videodeco_ckb setTitle: _NS("Window decorations")];
     [o_video_onTop_ckb setTitle: _NS("Always on top")];
     [o_video_output_txt setStringValue: _NS("Output module")];
     [o_video_skipFrames_ckb setTitle: _NS("Skip frames")];
@@ -579,6 +580,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     [self setupButton: o_video_onTop_ckb forBoolValue: "video-on-top"];
     [self setupButton: o_video_skipFrames_ckb forBoolValue: "skip-frames"];
     [self setupButton: o_video_black_ckb forBoolValue: "macosx-black"];
+    [self setupButton: o_video_videodeco_ckb forBoolValue: "video-deco"];
 
     [self setupButton: o_video_output_pop forModuleList: "vout"];
 
@@ -927,6 +929,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     {
         config_PutInt( p_intf, "video", [o_video_enable_ckb state] );
         config_PutInt( p_intf, "fullscreen", [o_video_fullscreen_ckb state] );
+        config_PutInt( p_intf, "video-deco", [o_video_videodeco_ckb state] );
         config_PutInt( p_intf, "video-on-top", [o_video_onTop_ckb state] );
         config_PutInt( p_intf, "skip-frames", [o_video_skipFrames_ckb state] );
         config_PutInt( p_intf, "macosx-black", [o_video_black_ckb state] );

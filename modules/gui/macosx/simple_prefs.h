@@ -1,7 +1,7 @@
 /*****************************************************************************
 * simple_prefs.h: Simple Preferences for Mac OS X
 *****************************************************************************
-* Copyright (C) 2008-2011 VLC authors and VideoLAN
+* Copyright (C) 2008-2012 VLC authors and VideoLAN
 * $Id$
 *
 * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
@@ -145,6 +145,7 @@ IBOutlet id o_intf_mediakeys_ckb;
     IBOutlet id o_video_display_box;
     IBOutlet id o_video_enable_ckb;
     IBOutlet id o_video_fullscreen_ckb;
+    IBOutlet id o_video_videodeco_ckb;
     IBOutlet id o_video_onTop_ckb;
     IBOutlet id o_video_output_pop;
     IBOutlet id o_video_output_txt;
