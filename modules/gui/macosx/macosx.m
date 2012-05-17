@@ -102,10 +102,13 @@ void WindowClose  ( vout_window_t * );
 #define PAUSE_MINIMIZED_LONGTEXT N_( \
 "With this option enabled, the playback will be automatically paused when minimizing the window." )
 
-#define ICONCHANGE_TEXT N_( "Allow automatic icon changes")
-#define ICONCHANGE_LONGTEXT N_( "This option allows the interface to change its icon on various occasions.")
+#define ICONCHANGE_TEXT N_( "Allow automatic icon changes" )
+#define ICONCHANGE_LONGTEXT N_( "This option allows the interface to change its icon on various occasions." )
 
-#define LOCK_ASPECT_RATIO_TEXT N_("Lock Aspect Ratio")
+#define LOCK_ASPECT_RATIO_TEXT N_( "Lock Aspect Ratio" )
+
+#define JUMPBUTTONS_TEXT N_( "Shows playlist item control buttons" )
+#define JUMPBUTTONS_LONGTEXT N_("Shows the previous and next buttons in the main window" )
 
 vlc_module_begin ()
     set_description( N_("Mac OS X interface") )
@@ -129,6 +132,7 @@ vlc_module_begin ()
     add_bool( "macosx-pause-minimized", false, PAUSE_MINIMIZED_TEXT, PAUSE_MINIMIZED_LONGTEXT, false )
     add_bool( "macosx-lock-aspect-ratio", true, LOCK_ASPECT_RATIO_TEXT, LOCK_ASPECT_RATIO_TEXT, true )
     add_bool( "macosx-icon-change", true, ICONCHANGE_TEXT, ICONCHANGE_LONGTEXT, true )
+    add_bool( "macosx-show-playback-buttons", false, JUMPBUTTONS_TEXT, JUMPBUTTONS_LONGTEXT, false )
 
     add_submodule ()
         set_description( "Mac OS X Video Output Provider" )

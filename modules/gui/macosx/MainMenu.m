@@ -1,7 +1,7 @@
 /*****************************************************************************
  * MainMenu.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011 Felix Paul Kühne
+ * Copyright (C) 2011-2012 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -281,6 +281,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_quitAfterPB setTitle: _NS("Quit after Playback")];
     [o_mi_fwd setTitle: _NS("Step Forward")];
     [o_mi_bwd setTitle: _NS("Step Backward")];
+    [o_mi_toggleJumpButtons setTitle: _NS("Show Previous & Next Buttons")];
+    [o_mi_toggleJumpButtons setState: config_GetInt( VLCIntf, "macosx-show-playback-buttons")];
 
     [o_mi_program setTitle: _NS("Program")];
     [o_mu_program setTitle: _NS("Program")];
@@ -609,8 +611,16 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_rate_sld setIntValue: i];
 }
 
+- (IBAction)toggleJumpButtons:(id)sender
+{
+    BOOL b_value = !config_GetInt( VLCIntf, "macosx-show-playback-buttons" );
+    config_PutInt( VLCIntf, "macosx-show-playback-buttons", b_value );
+    [[[VLCMain sharedInstance] mainWindow] toggleJumpButtons];
+    [o_mi_toggleJumpButtons setState: b_value];
+}
+
 #pragma mark -
-#pragma video menu
+#pragma mark video menu
 - (IBAction)toggleFullscreen:(id)sender
 {
     [[VLCCoreInteraction sharedInstance] toggleFullscreen];

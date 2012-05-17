@@ -189,7 +189,9 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/icons/wav.icns \
 	extras/package/macosx/Resources/icons/wma.icns \
 	extras/package/macosx/Resources/icons/wmv.icns \
+	extras/package/macosx/Resources/mainwindow/back-pressed-single.png \
 	extras/package/macosx/Resources/mainwindow/back-pressed.png \
+	extras/package/macosx/Resources/mainwindow/back-single.png \
 	extras/package/macosx/Resources/mainwindow/back.png \
 	extras/package/macosx/Resources/mainwindow/bottom-background.png \
 	extras/package/macosx/Resources/mainwindow/bottombar-mini.png \
@@ -200,7 +202,9 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/effects-double-buttons.png \
 	extras/package/macosx/Resources/mainwindow/effects-one-button-blue.png \
 	extras/package/macosx/Resources/mainwindow/effects-one-button.png \
+	extras/package/macosx/Resources/mainwindow/forward-pressed-single.png \
 	extras/package/macosx/Resources/mainwindow/forward-pressed.png \
+	extras/package/macosx/Resources/mainwindow/forward-single.png \
 	extras/package/macosx/Resources/mainwindow/forward.png \
 	extras/package/macosx/Resources/mainwindow/fullscreen-double-buttons-pressed.png \
 	extras/package/macosx/Resources/mainwindow/fullscreen-double-buttons.png \

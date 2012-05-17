@@ -277,6 +277,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_volume_sld setEnabled: b_mute];
     [o_volume_up_btn setEnabled: b_mute];
 
+    b_show_jump_buttons = config_GetInt( VLCIntf, "macosx-show-playback-buttons" );
+    if (b_show_jump_buttons)
+        [self addJumpButtons];
+
     /* interface builder action */
     float f_threshold_height = f_min_video_height + [o_bottombar_view frame].size.height;
     if( b_dark_interface )
@@ -586,6 +590,130 @@ static VLCMainWindow *_o_sharedInstance = nil;
 }
 
 #pragma mark -
+#pragma mark interface customization
+- (void)toggleJumpButtons
+{
+    b_show_jump_buttons = config_GetInt( VLCIntf, "macosx-show-playback-buttons" );
+
+    if (b_show_jump_buttons)
+        [self addJumpButtons];
+    else
+        [self removeJumpButtons];
+}
+
+- (void)addJumpButtons
+{
+    NSRect preliminaryFrame = [o_bwd_btn frame];
+    BOOL b_enabled = [o_bwd_btn isEnabled];
+    preliminaryFrame.size.width = 26.;
+    o_prev_btn = [[NSButton alloc] initWithFrame:preliminaryFrame];
+    [o_prev_btn setButtonType: NSMomentaryChangeButton];
+    [o_prev_btn setImage: [NSImage imageNamed:@"back-single"]];
+    [o_prev_btn setAlternateImage: [NSImage imageNamed:@"back-pressed-single"]];
+    [o_prev_btn setBezelStyle:NSRegularSquareBezelStyle];
+    [o_prev_btn setBordered:NO];
+    [o_prev_btn setTarget:self];
+    [o_prev_btn setAction:@selector(prev:)];
+    [o_prev_btn setToolTip: _NS("Previous")];
+    [o_prev_btn setEnabled: b_enabled];
+
+    o_next_btn = [[NSButton alloc] initWithFrame:preliminaryFrame];
+    [o_next_btn setButtonType: NSMomentaryChangeButton];
+    [o_next_btn setImage: [NSImage imageNamed:@"forward-single"]];
+    [o_next_btn setAlternateImage: [NSImage imageNamed:@"forward-pressed-single"]];
+    [o_next_btn setBezelStyle:NSRegularSquareBezelStyle];
+    [o_next_btn setBordered:NO];
+    [o_next_btn setTarget:self];
+    [o_next_btn setAction:@selector(next:)];
+    [o_next_btn setToolTip: _NS("Next")];
+    [o_next_btn setEnabled: b_enabled];
+
+    NSRect frame;
+    float f_space = 32.;
+    #define moveItem( item ) \
+    frame = [item frame]; \
+    frame.origin.x = frame.origin.x + f_space; \
+    [item setFrame: frame]
+
+    moveItem( o_bwd_btn );
+    moveItem( o_play_btn );
+    moveItem( o_fwd_btn );
+    f_space = 62.;
+    moveItem( o_stop_btn );
+    moveItem( o_playlist_btn );
+    moveItem( o_repeat_btn );
+    moveItem( o_shuffle_btn );
+    #undef moveItem
+
+    #define resizeItem( item ) \
+    frame = [item frame]; \
+    frame.size.width = frame.size.width - f_space; \
+    frame.origin.x = frame.origin.x + f_space; \
+    [item setFrame: frame]
+
+    resizeItem( o_time_sld );
+    resizeItem( o_progress_bar );
+    resizeItem( o_time_sld_background );
+    resizeItem( o_time_sld_fancygradient_view );
+    #undef resizeItem
+
+    preliminaryFrame.origin.x = [o_fwd_btn frame].origin.x + [o_fwd_btn frame].size.width + 4.;
+    [o_next_btn setFrame: preliminaryFrame];
+    [[self contentView] addSubview: o_prev_btn];
+    [[self contentView] addSubview: o_next_btn];
+
+    [o_fwd_btn setAction:@selector(forward:)];
+    [o_bwd_btn setAction:@selector(backward:)];
+}
+
+- (void)removeJumpButtons
+{
+    if (!o_prev_btn || !o_next_btn )
+        return;
+
+    [[o_prev_btn animator] setHidden: YES];
+    [[o_next_btn animator] setHidden: YES];
+    [o_prev_btn removeFromSuperviewWithoutNeedingDisplay];
+    [o_next_btn removeFromSuperviewWithoutNeedingDisplay];
+    [o_prev_btn release];
+    [o_next_btn release];
+
+    NSRect frame;
+    float f_space = 32.;
+    #define moveItem( item ) \
+    frame = [item frame]; \
+    frame.origin.x = frame.origin.x - f_space; \
+    [item setFrame: frame]
+
+    moveItem( o_bwd_btn );
+    moveItem( o_play_btn );
+    moveItem( o_fwd_btn );
+    f_space = 62.;
+    moveItem( o_stop_btn );
+    moveItem( o_playlist_btn );
+    moveItem( o_repeat_btn );
+    moveItem( o_shuffle_btn );
+    #undef moveItem
+
+    #define resizeItem( item ) \
+    frame = [item frame]; \
+    frame.size.width = frame.size.width + f_space; \
+    frame.origin.x = frame.origin.x - f_space; \
+    [item setFrame: frame]
+
+    resizeItem( o_time_sld );
+    resizeItem( o_progress_bar );
+    resizeItem( o_time_sld_background );
+    resizeItem( o_time_sld_fancygradient_view );
+    #undef resizeItem
+
+    [o_bottombar_view setNeedsDisplay:YES];
+
+    [o_fwd_btn setAction:@selector(fwd:)];
+    [o_bwd_btn setAction:@selector(bwd:)];
+}
+
+#pragma mark -
 #pragma mark Button Actions
 
 - (IBAction)play:(id)sender
@@ -607,6 +735,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
     // the user stopped skipping, so let's allow him to change the item
     if (([NSDate timeIntervalSinceReferenceDate] - last_bwd_event) >= 0.35)
         just_triggered_previous = NO;
+}
+
+- (IBAction)prev:(id)sender
+{
+    [[VLCCoreInteraction sharedInstance] previous];
 }
 
 - (IBAction)bwd:(id)sender
@@ -632,6 +765,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 }
 
+- (IBAction)backward:(id)sender
+{
+    [[VLCCoreInteraction sharedInstance] backwardShort];
+}
+
 - (void)resetNextButton
 {
     if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) >= 0.35) {
@@ -646,6 +784,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
     // the user stopped skipping, so let's allow him to change the item
     if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) >= 0.35)
         just_triggered_next = NO;
+}
+
+- (IBAction)next:(id)sender
+{
+    [[VLCCoreInteraction sharedInstance] next];
+}
+
+- (IBAction)forward:(id)sender
+{
+    [[VLCCoreInteraction sharedInstance] forwardShort];
 }
 
 - (IBAction)fwd:(id)sender
@@ -1402,6 +1550,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_stop_btn setEnabled: b_input];
     [o_fwd_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
     [o_bwd_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
+    if (b_show_jump_buttons)
+    {
+        [o_prev_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
+        [o_next_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
+    }
     if (b_video_deco)
     {
         [o_detached_fwd_btn setEnabled: (b_seekable || b_plmul || b_chapters)];

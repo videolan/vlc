@@ -94,6 +94,7 @@
     BOOL b_splitview_removed;
     BOOL b_minimized_view;
     BOOL b_video_deco;
+    BOOL b_show_jump_buttons;
     int i_lastSplitViewHeight;
     int i_lastShownVolume;
     input_state_e cachedInputState;
@@ -117,6 +118,9 @@
     NSTimeInterval last_bwd_event;
     BOOL just_triggered_next;
     BOOL just_triggered_previous;
+    NSButton * o_prev_btn;
+    NSButton * o_next_btn;
+
     NSMutableArray *o_sidebaritems;
 
     BOOL              b_nonembedded;
@@ -171,6 +175,7 @@
 - (void)setRepeatAll;
 - (void)setRepeatOff;
 - (void)setShuffle;
+- (void)toggleJumpButtons;
 
 - (void)drawFancyGradientEffectForTimeSlider;
 

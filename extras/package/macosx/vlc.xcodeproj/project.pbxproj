@@ -270,6 +270,10 @@
 		CCD83E4D13FEA143004F1652 /* VideoEffects.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E4013FEA143004F1652 /* VideoEffects.xib */; };
 		CCD83E4E13FEA143004F1652 /* Wizard.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E4213FEA143004F1652 /* Wizard.xib */; };
 		CCDB535D13E97D3500A1782F /* dropzone-background.png in Resources */ = {isa = PBXBuildFile; fileRef = CCDB535C13E97D3500A1782F /* dropzone-background.png */; };
+		CCE4057A15655B1900FA5CCA /* forward-pressed-single.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE4057815655B1900FA5CCA /* forward-pressed-single.png */; };
+		CCE4057B15655B1900FA5CCA /* forward-single.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE4057915655B1900FA5CCA /* forward-single.png */; };
+		CCE4057F15655B2100FA5CCA /* back-pressed-single.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE4057D15655B2100FA5CCA /* back-pressed-single.png */; };
+		CCE4058215655B3300FA5CCA /* back-single.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE4058115655B3300FA5CCA /* back-single.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -637,6 +641,10 @@
 		CCD83E4313FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/Wizard.xib; sourceTree = "<group>"; };
 		CCDB535C13E97D3500A1782F /* dropzone-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "dropzone-background.png"; path = "Resources/mainwindow/dropzone-background.png"; sourceTree = "<group>"; };
 		CCDBA3B313D32E200006127B /* macosx.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = macosx.m; path = ../../../modules/video_output/macosx.m; sourceTree = "<group>"; };
+		CCE4057815655B1900FA5CCA /* forward-pressed-single.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "forward-pressed-single.png"; path = "Resources/mainwindow/forward-pressed-single.png"; sourceTree = "<group>"; };
+		CCE4057915655B1900FA5CCA /* forward-single.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "forward-single.png"; path = "Resources/mainwindow/forward-single.png"; sourceTree = "<group>"; };
+		CCE4057D15655B2100FA5CCA /* back-pressed-single.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "back-pressed-single.png"; path = "Resources/mainwindow/back-pressed-single.png"; sourceTree = "<group>"; };
+		CCE4058115655B3300FA5CCA /* back-single.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "back-single.png"; path = "Resources/mainwindow/back-single.png"; sourceTree = "<group>"; };
 		CCF0777913659A8000AF19FD /* SPInvocationGrabbing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPInvocationGrabbing.h; path = ../../../modules/gui/macosx/SPInvocationGrabbing.h; sourceTree = "<group>"; };
 		CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SPInvocationGrabbing.m; path = ../../../modules/gui/macosx/SPInvocationGrabbing.m; sourceTree = "<group>"; };
 		CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPMediaKeyTap.h; path = ../../../modules/gui/macosx/SPMediaKeyTap.h; sourceTree = "<group>"; };
@@ -925,6 +933,8 @@
 			children = (
 				CC04332B13B28B8200D7D52E /* back-pressed.png */,
 				CC04332C13B28B8200D7D52E /* back.png */,
+				CCE4057D15655B2100FA5CCA /* back-pressed-single.png */,
+				CCE4058115655B3300FA5CCA /* back-single.png */,
 				CC9B43AE13B29C79000205AE /* bottom-background.png */,
 				CC5800F41423A80400166912 /* bottombar-mini.png */,
 				CC04332E13B28B8200D7D52E /* effects-double-buttons-blue.png */,
@@ -934,6 +944,8 @@
 				CC04333213B28B8200D7D52E /* effects-one-button.png */,
 				CC04333513B28B8200D7D52E /* forward-pressed.png */,
 				CC04333613B28B8200D7D52E /* forward.png */,
+				CCE4057815655B1900FA5CCA /* forward-pressed-single.png */,
+				CCE4057915655B1900FA5CCA /* forward-single.png */,
 				CC04333713B28B8200D7D52E /* fullscreen-double-buttons-pressed.png */,
 				CC04333813B28B8200D7D52E /* fullscreen-double-buttons.png */,
 				CC0F725015063C820086B6A0 /* fullscreen-one-button-pressed.png */,
@@ -1543,6 +1555,10 @@
 				CC0F725715063C980086B6A0 /* fullscreen-one-button_dark.png in Resources */,
 				CC0F725815063C980086B6A0 /* fullscreen-one-button-pressed_dark.png in Resources */,
 				CC68B0331544C1AE00FD9C7F /* vlc-xmas.png in Resources */,
+				CCE4057A15655B1900FA5CCA /* forward-pressed-single.png in Resources */,
+				CCE4057B15655B1900FA5CCA /* forward-single.png in Resources */,
+				CCE4057F15655B2100FA5CCA /* back-pressed-single.png in Resources */,
+				CCE4058215655B3300FA5CCA /* back-single.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * MainMenu.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011 Felix Paul Kühne
+ * Copyright (C) 2011-2012 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -102,6 +102,7 @@
     IBOutlet NSMenu * o_mu_title;
     IBOutlet NSMenuItem * o_mi_chapter;
     IBOutlet NSMenu * o_mu_chapter;
+    IBOutlet NSMenuItem * o_mi_toggleJumpButtons;
 
     IBOutlet NSMenu * o_mu_audio;
     IBOutlet NSMenuItem * o_mi_vol_up;
@@ -212,6 +213,7 @@
 - (void)updateRecordState:(BOOL)b_value;
 - (IBAction)setPlaybackRate:(id)sender;
 - (void)updatePlaybackRate;
+- (IBAction)toggleJumpButtons:(id)sender;
 
 - (IBAction)toggleFullscreen:(id)sender;
 - (IBAction)resizeVideoWindow:(id)sender;
