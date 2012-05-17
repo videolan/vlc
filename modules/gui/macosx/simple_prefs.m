@@ -1,7 +1,7 @@
 /*****************************************************************************
 * simple_prefs.m: Simple Preferences for Mac OS X
 *****************************************************************************
-* Copyright (C) 2008-2011 VLC authors and VideoLAN
+* Copyright (C) 2008-2012 VLC authors and VideoLAN
 * $Id$
 *
 * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
@@ -801,6 +801,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 {
     module_config_t *p_item;
     module_t *p_parser, **p_list;
+    NSString * objectTitle = [[object selectedItem] title];
 
     p_item = config_FindConfig( VLC_OBJECT(p_intf), name );
 
@@ -811,7 +812,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
         if( p_item->i_type == CONFIG_ITEM_MODULE && module_provides( p_parser, p_item->psz_type ) )
         {
-            if( [[[object selectedItem] title] isEqualToString: _NS( module_GetLongName( p_parser ) )] )
+            if( [objectTitle isEqualToString: _NS( module_GetLongName( p_parser ) )] )
             {
                 config_PutPsz( p_intf, name, strdup( module_get_object( p_parser )));
                 break;
@@ -819,7 +820,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         }
     }
     module_list_free( p_list );
-    if( [[[object selectedItem] title] isEqualToString: _NS( "Default" )] )
+    if( [objectTitle isEqualToString: _NS( "Default" )] )
         config_PutPsz( p_intf, name, "" );
 }
 
@@ -1337,13 +1338,15 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
-    if( [[aTableColumn identifier] isEqualToString: @"action"] )
+    NSString * identifier = [aTableColumn identifier];
+
+    if( [identifier isEqualToString: @"action"] )
         return [o_hotkeyDescriptions objectAtIndex: rowIndex];
-    else if( [[aTableColumn identifier] isEqualToString: @"shortcut"] )
+    else if( [identifier isEqualToString: @"shortcut"] )
         return [self OSXStringKeyToString:[o_hotkeySettings objectAtIndex: rowIndex]];
     else
     {
-        msg_Err( p_intf, "unknown TableColumn identifier (%s)!", [[aTableColumn identifier] UTF8String] );
+        msg_Err( p_intf, "unknown TableColumn identifier (%s)!", [identifier UTF8String] );
         return NULL;
     }
 }
@@ -1415,15 +1418,16 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     NSString *keyString = [o_theEvent characters];
 
     unichar key = [keyString characterAtIndex:0];
+    NSUInteger i_modifiers = [o_theEvent modifierFlags];
 
     /* modifiers */
-    if( [o_theEvent modifierFlags] & NSControlKeyMask )
+    if( i_modifiers & NSControlKeyMask )
         [tempString appendString:@"Ctrl-"];
-    if( [o_theEvent modifierFlags] & NSAlternateKeyMask  )
+    if( i_modifiers & NSAlternateKeyMask  )
         [tempString appendString:@"Alt-"];
-    if( [o_theEvent modifierFlags] & NSShiftKeyMask )
+    if( i_modifiers & NSShiftKeyMask )
         [tempString appendString:@"Shift-"];
-    if( [o_theEvent modifierFlags] & NSCommandKeyMask )
+    if( i_modifiers & NSCommandKeyMask )
         [tempString appendString:@"Command-"];
 
     /* non character keys */
