@@ -10,7 +10,8 @@ info()
 }
 
 ARCH="x86_64"
-SDK="10.6"
+OSX_VERSION="10.6"
+SDKROOT=`xcode-select -print-path`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$OSX_VERSION.sdk
 
 usage()
 {
@@ -22,7 +23,7 @@ Build vlc in the current directory
 OPTIONS:
    -h            Show some help
    -q            Be quiet
-   -k <sdk>      Use the specified sdk (default: $SDK)
+   -k <sdk>      Use the specified sdk (default: $SDKROOT)
    -a <arch>     Use the specified arch (default: $ARCH)
 EOF
 
@@ -53,7 +54,7 @@ do
              ARCH=$OPTARG
          ;;
          k)
-             SDK=$OPTARG
+             SDKROOT=$OPTARG
          ;;
      esac
 done
@@ -83,10 +84,11 @@ builddir=`pwd`
 
 info "Building in \"$builddir\""
 
-export CC=/Developer/usr/bin/clang
-export CXX="/Developer/usr/bin/clang++"
-export OBJC=/Developer/usr/bin/clang
-export OSX_VERSION=$SDK
+export CC="xcrun clang"
+export CXX="xcrun clang++"
+export OBJC="xcrun clang"
+export OSX_VERSION
+export SDKROOT
 export PATH="${vlcroot}/extras/tools/build/bin:$PATH"
 
 TRIPLET=$ARCH-apple-darwin10
@@ -139,7 +141,7 @@ if [ "${vlcroot}/configure" -nt Makefile ]; then
       --build=$TRIPLET \
       --host=$TRIPLET \
       --with-macosx-version-min=$OSX_VERSION \
-      --with-macosx-sdk=/Developer/SDKs/MacOSX$OSX_VERSION.sdk > $out
+      --with-macosx-sdk=$SDKROOT > $out
 fi
 
 

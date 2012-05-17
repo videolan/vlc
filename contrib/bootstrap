@@ -143,15 +143,19 @@ add_make_enabled()
 
 check_macosx_sdk()
 {
-   [ -z "${OSX_VERSION}" ] && echo "OSX_VERSION not specified, assuming 10.5" && OSX_VERSION=10.5
-   SDK="/Developer/SDKs/MacOSX${OSX_VERSION}.sdk"
-   if [ ! -d "${SDK}" ]
+   [ -z "${OSX_VERSION}" ] && echo "OSX_VERSION not specified, assuming 10.6" && OSX_VERSION=10.6
+   if test -z "$SDKROOT"
    then
-	   echo "
-*** ${SDK} does not exist, please install required SDK, or use export OSX_VERSION=10.6 ***
-"
-	   exit 1
+      SDKROOT=`xcode-select -print-path`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$OSX_VERSION.sdk
+      echo "SDKROOT not specified, assuming $SDKROOT"
    fi
+
+   if [ ! -d "${SDKROOT}" ]
+   then
+      echo "*** ${SDKROOT} does not exist, please install required SDK, or set SDKROOT manually. ***"
+      exit 1
+   fi
+
    add_make "OSX_VERSION ?= ${OSX_VERSION}"
 }
 
