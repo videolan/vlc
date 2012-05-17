@@ -125,7 +125,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)awakeFromNib
 {
     BOOL b_splitviewShouldBeHidden = NO;
+
     /* setup the styled interface */
+    b_video_deco = config_GetInt( VLCIntf, "video-deco" );
+    if (b_video_deco)
+        b_nonembedded = YES;
     b_nativeFullscreenMode = NO;
 #ifdef MAC_OS_X_VERSION_10_7
     if( OSX_LION )
@@ -284,15 +288,25 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self setExcludedFromWindowsMenu: YES];
     [self setAcceptsMouseMovedEvents: YES];
     // Set that here as IB seems to be buggy
-    if (b_dark_interface)
+    if (b_dark_interface && b_video_deco)
     {
         [self setContentMinSize:NSMakeSize(604., 288. + [o_titlebar_view frame].size.height)];
         [o_detached_video_window setContentMinSize: NSMakeSize( 363., f_min_video_height + [o_detached_bottombar_view frame].size.height + [o_detached_titlebar_view frame].size.height )];
     }
-    else
+    else if( b_video_deco )
     {
         [self setContentMinSize:NSMakeSize(604., 288.)];
         [o_detached_video_window setContentMinSize: NSMakeSize( 363., f_min_video_height + [o_detached_bottombar_view frame].size.height )];
+    }
+    else
+    {
+        if (b_dark_interface)
+            [self setContentMinSize:NSMakeSize(604., 288. + [o_titlebar_view frame].size.height)];
+        else
+            [self setContentMinSize:NSMakeSize(604., 288.)];
+
+        [o_detached_bottombar_view setHidden:YES];
+        [o_detached_video_window setContentMinSize: NSMakeSize( 363., f_min_video_height )];
     }
 
     [self setTitle: _NS("VLC media player")];
@@ -338,7 +352,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     else
     {
         [o_titlebar_view setFullscreenButtonHidden: YES];
-        [o_detached_titlebar_view setFullscreenButtonHidden: YES];
+        if (b_video_deco)
+            [o_detached_titlebar_view setFullscreenButtonHidden: YES];
     }
 
     if (OSX_LION)
@@ -508,8 +523,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         /* detached video window */
         winrect = [o_detached_video_window frame];
-        [o_detached_titlebar_view setFrame: NSMakeRect( 0, winrect.size.height - f_titleBarHeight, winrect.size.width, f_titleBarHeight )];
-        [[o_detached_video_window contentView] addSubview: o_detached_titlebar_view positioned: NSWindowAbove relativeTo: nil];
+        if (b_video_deco)
+        {
+            [o_detached_titlebar_view setFrame: NSMakeRect( 0, winrect.size.height - f_titleBarHeight, winrect.size.width, f_titleBarHeight )];
+            [[o_detached_video_window contentView] addSubview: o_detached_titlebar_view positioned: NSWindowAbove relativeTo: nil];
+        }
 
         o_color_backdrop = [[VLCColorView alloc] initWithFrame: [o_split_view frame]];
         [[self contentView] addSubview: o_color_backdrop positioned: NSWindowBelow relativeTo: o_split_view];
@@ -927,7 +945,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (b_dark_interface)
     {
         [o_titlebar_view setWindowTitle: title];
-        [o_detached_titlebar_view setWindowTitle: title];
+        if (b_video_deco)
+            [o_detached_titlebar_view setWindowTitle: title];
     }
     if (b_nonembedded && [[VLCMain sharedInstance] activeVideoPlayback])
         [o_detached_video_window setTitle: title];
@@ -938,7 +957,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     NSWindow *o_key_window = [NSApp keyWindow];
 
-    if (b_dark_interface)
+    if (b_dark_interface || !b_video_deco)
     {
         [o_key_window orderOut: sender];
         if ( [[VLCMain sharedInstance] activeVideoPlayback] && ( !b_nonembedded || o_key_window != self ))
@@ -1255,13 +1274,17 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_time_sld setEnabled: NO];
         [o_time_sld setHidden: YES];
         [o_time_sld_fancygradient_view setHidden: YES];
-        [o_detached_time_sld_fancygradient_view setHidden: YES];
+        if (b_video_deco)
+            [o_detached_time_sld_fancygradient_view setHidden: YES];
     }
 
-    [o_detached_time_sld setFloatValue: [o_time_sld floatValue]];
-    [o_detached_time_sld setEnabled: [o_time_sld isEnabled]];
-    [o_detached_time_fld setStringValue: [o_time_fld stringValue]];
-    [o_detached_time_sld setHidden: [o_time_sld isHidden]];
+    if (b_video_deco)
+    {
+        [o_detached_time_sld setFloatValue: [o_time_sld floatValue]];
+        [o_detached_time_sld setEnabled: [o_time_sld isEnabled]];
+        [o_detached_time_fld setStringValue: [o_time_fld stringValue]];
+        [o_detached_time_sld setHidden: [o_time_sld isHidden]];
+    }
 }
 
 - (void)updateVolumeSlider
@@ -1379,8 +1402,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_stop_btn setEnabled: b_input];
     [o_fwd_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
     [o_bwd_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
-    [o_detached_fwd_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
-    [o_detached_bwd_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
+    if (b_video_deco)
+    {
+        [o_detached_fwd_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
+        [o_detached_bwd_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
+    }
     [[VLCMainMenu sharedInstance] setRateControlsEnabled: b_control];
 
     [o_time_sld setEnabled: b_seekable];
@@ -1401,9 +1427,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_play_btn setImage: o_pause_img];
     [o_play_btn setAlternateImage: o_pause_pressed_img];
     [o_play_btn setToolTip: _NS("Pause")];
-    [o_detached_play_btn setImage: o_pause_img];
-    [o_detached_play_btn setAlternateImage: o_pause_pressed_img];
-    [o_detached_play_btn setToolTip: _NS("Pause")];
+    if (b_video_deco)
+    {
+        [o_detached_play_btn setImage: o_pause_img];
+        [o_detached_play_btn setAlternateImage: o_pause_pressed_img];
+        [o_detached_play_btn setToolTip: _NS("Pause")];
+    }
     [o_fspanel setPause];
 }
 
@@ -1412,9 +1441,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_play_btn setImage: o_play_img];
     [o_play_btn setAlternateImage: o_play_pressed_img];
     [o_play_btn setToolTip: _NS("Play")];
-    [o_detached_play_btn setImage: o_play_img];
-    [o_detached_play_btn setAlternateImage: o_play_pressed_img];
-    [o_detached_play_btn setToolTip: _NS("Play")];
+    if (b_video_deco)
+    {
+        [o_detached_play_btn setImage: o_play_img];
+        [o_detached_play_btn setAlternateImage: o_play_pressed_img];
+        [o_detached_play_btn setToolTip: _NS("Play")];
+    }
     [o_fspanel setPlay];
 }
 
@@ -1435,7 +1467,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [o_time_sld_fancygradient_view setFrame: NSMakeRect( oldFrame.origin.x, oldFrame.origin.y, f_value, oldFrame.size.height )];
         }
 
-        if (b_nonembedded)
+        if (b_nonembedded && b_video_deco)
         {
             f_value = [o_detached_time_sld knobPosition];
             oldFrame = [o_detached_time_sld_fancygradient_view frame];
@@ -1456,12 +1488,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
             frame.size.width = 0;
             [o_time_sld_fancygradient_view setFrame: frame];
 
-            frame = [o_detached_time_sld_fancygradient_view frame];
-            frame.size.width = 0;
-            [o_detached_time_sld_fancygradient_view setFrame: frame];
+            if (b_video_deco)
+            {
+                frame = [o_detached_time_sld_fancygradient_view frame];
+                frame.size.width = 0;
+                [o_detached_time_sld_fancygradient_view setFrame: frame];
+            }
         }
         [o_time_sld_fancygradient_view setHidden: YES];
-        [o_detached_time_sld_fancygradient_view setHidden: YES];
+        if (b_video_deco)
+            [o_detached_time_sld_fancygradient_view setHidden: YES];
     }
     [o_pool release];
 }
@@ -1476,7 +1512,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (id)setupVideoView
 {
     vout_thread_t *p_vout = getVout();
-    if (config_GetInt( VLCIntf, "embedded-video" ) || b_nativeFullscreenMode)
+    if ((config_GetInt( VLCIntf, "embedded-video" ) || b_nativeFullscreenMode) && b_video_deco)
     {
         if ([o_video_view window] != self)
         {
@@ -1494,7 +1530,15 @@ static VLCMainWindow *_o_sharedInstance = nil;
         NSRect frame = [o_detached_video_window frame];
         NSRect videoFrame = [o_video_view frame];
         frame.size.width = videoFrame.size.width;
-        frame.size.height = videoFrame.size.height + [o_detached_bottombar_view frame].size.height + [o_titlebar_view frame].size.height;
+        if (b_video_deco)
+            frame.size.height = videoFrame.size.height + [o_detached_bottombar_view frame].size.height + [o_titlebar_view frame].size.height;
+        else
+        {
+            frame.size.height = videoFrame.size.height;
+            videoFrame.origin.y = .0;
+            videoFrame.origin.x = .0;
+            [o_video_view setFrame: videoFrame];
+        }
         [o_detached_video_window setFrame: frame display: NO];
         [[o_detached_video_window contentView] addSubview: o_video_view positioned:NSWindowAbove relativeTo:nil];
         [o_detached_video_window setLevel:NSNormalWindowLevel];
@@ -1694,7 +1738,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     screen_rect = [screen frame];
 
     [o_fullscreen_btn setState: YES];
-    [o_detached_fullscreen_btn setState: YES];
+    if (b_video_deco)
+        [o_detached_fullscreen_btn setState: YES];
 
     [self recreateHideMouseTimer];
 
@@ -1866,7 +1911,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self lockFullscreenAnimation];
 
     [o_fullscreen_btn setState: NO];
-    [o_detached_fullscreen_btn setState: NO];
+    if (b_video_deco)
+        [o_detached_fullscreen_btn setState: NO];
 
     /* We always try to do so */
     [NSScreen unblackoutScreens];
@@ -2469,7 +2515,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     b_dark_interface = config_GetInt( VLCIntf, "macosx-interfacestyle" );
 
-    if (b_dark_interface)
+    if (b_dark_interface || !b_video_deco)
     {
 #ifdef MAC_OS_X_VERSION_10_7
         if (OSX_LION)
@@ -2481,8 +2527,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
 #endif
     }
 
-    self = [super initWithContentRect:contentRect styleMask:styleMask
+    b_video_deco = config_GetInt( VLCIntf, "video-deco" );
+    if (b_video_deco)
+        self = [super initWithContentRect:contentRect styleMask:styleMask
                               backing:backingType defer:flag];
+    else
+        self = [super initWithContentRect:contentRect styleMask:styleMask
+                                  backing:backingType defer:flag];
 
     /* we want to be moveable regardless of our style */
     [self setMovableByWindowBackground: YES];
@@ -2525,7 +2576,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)performClose:(id)sender
 {
-    if (b_dark_interface)
+    if (b_dark_interface || !b_video_deco)
         [[VLCMainWindow sharedInstance] performClose: sender];
     else
         [super performClose: sender];
@@ -2533,7 +2584,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)performMiniaturize:(id)sender
 {
-    if (b_dark_interface)
+    if (b_dark_interface || !b_video_deco)
         [self miniaturize: sender];
     else
         [super performMiniaturize: sender];
@@ -2541,7 +2592,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)performZoom:(id)sender
 {
-    if (b_dark_interface)
+    if (b_dark_interface || !b_video_deco)
         [self customZoom: sender];
     else
         [super performZoom: sender];
@@ -2549,7 +2600,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)zoom:(id)sender
 {
-    if (b_dark_interface)
+    if (b_dark_interface || !b_video_deco)
         [self customZoom: sender];
     else
         [super zoom: sender];

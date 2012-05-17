@@ -93,6 +93,7 @@
     BOOL b_dropzone_active;
     BOOL b_splitview_removed;
     BOOL b_minimized_view;
+    BOOL b_video_deco;
     int i_lastSplitViewHeight;
     int i_lastShownVolume;
     input_state_e cachedInputState;
@@ -204,6 +205,7 @@
 @interface VLCDetachedVideoWindow : NSWindow
 {
     BOOL b_dark_interface;
+    BOOL b_video_deco;
     NSRect previousSavedFrame;
 }
 
