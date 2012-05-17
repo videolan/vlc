@@ -912,20 +912,32 @@ static int InputIntfEventCallback( intf_thread_t   *p_intf,
         case INPUT_EVENT_POSITION:
             /* Detect seeks
              * XXX: This is way more convoluted than it should be... */
+            i_pos = var_GetTime( p_input, "time" );
+
             if( !p_intf->p_sys->i_last_input_pos_event ||
                 !( var_GetInteger( p_input, "state" ) == PLAYING_S ) )
+            {
+                p_intf->p_sys->i_last_input_pos_event = i_now;
+                p_intf->p_sys->i_last_input_pos = i_pos;
                 break;
-            i_pos = var_GetTime( p_input, "time" );
+            }
+
             f_current_rate = var_GetFloat( p_input, "rate" );
             i_interval = ( i_now - p_intf->p_sys->i_last_input_pos_event );
-            i_projected_pos = p_intf->p_sys->i_last_input_pos + ( i_interval * f_current_rate );
+
+            i_projected_pos = p_intf->p_sys->i_last_input_pos +
+                ( i_interval * f_current_rate );
+
             p_intf->p_sys->i_last_input_pos_event = i_now;
             p_intf->p_sys->i_last_input_pos = i_pos;
+
             if( ABS( i_pos - i_projected_pos ) < SEEK_THRESHOLD )
                 break;
+
             p_info->signal = SIGNAL_SEEK;
             p_info->i_item = input_GetItem( p_input )->i_id;
             break;
+
         default:
             return VLC_EGENERIC;
     }
