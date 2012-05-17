@@ -21,16 +21,16 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="4756"/>
-      <integer value="915"/>
       <integer value="2770"/>
-      <integer value="235"/>
       <integer value="2730"/>
       <integer value="4850"/>
-      <integer value="1617"/>
-      <integer value="4596"/>
       <integer value="4722"/>
       <integer value="4948"/>
+      <integer value="4756"/>
+      <integer value="915"/>
+      <integer value="1617"/>
+      <integer value="4596"/>
+      <integer value="235"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1824,6 +1824,14 @@
                 <object class="NSMenuItem" id="835383299">
                   <reference key="NSMenu" ref="1017583928"/>
                   <string key="NSTitle">Show Previous &amp; Next Buttons</string>
+                  <string key="NSKeyEquiv"/>
+                  <int key="NSMnemonicLoc">2147483647</int>
+                  <reference key="NSOnImage" ref="447396056"/>
+                  <reference key="NSMixedImage" ref="100133332"/>
+                </object>
+                <object class="NSMenuItem" id="833088677">
+                  <reference key="NSMenu" ref="1017583928"/>
+                  <string key="NSTitle">Show Shuffle &amp; Repeat Buttons</string>
                   <string key="NSKeyEquiv"/>
                   <int key="NSMnemonicLoc">2147483647</int>
                   <reference key="NSOnImage" ref="447396056"/>
@@ -8005,6 +8013,22 @@ LCAuLi4</string>
           </object>
           <int key="connectionID">5090</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_togglePlaymodeButtons</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="833088677"/>
+          </object>
+          <int key="connectionID">5093</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">togglePlaymodeButtons:</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="833088677"/>
+          </object>
+          <int key="connectionID">5094</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -8479,6 +8503,7 @@ LCAuLi4</string>
               <reference ref="261314859"/>
               <reference ref="57503205"/>
               <reference ref="835383299"/>
+              <reference ref="833088677"/>
             </object>
             <reference key="parent" ref="565445175"/>
           </object>
@@ -11070,6 +11095,11 @@ LCAuLi4</string>
             <reference key="object" ref="835383299"/>
             <reference key="parent" ref="1017583928"/>
           </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5091</int>
+            <reference key="object" ref="833088677"/>
+            <reference key="parent" ref="1017583928"/>
+          </object>
         </object>
       </object>
       <object class="NSMutableDictionary" key="flattenedProperties">
@@ -11882,6 +11912,7 @@ LCAuLi4</string>
           <string>5084.IBPluginDependency</string>
           <string>5087.IBPluginDependency</string>
           <string>5088.IBPluginDependency</string>
+          <string>5091.IBPluginDependency</string>
           <string>56.IBPluginDependency</string>
           <string>56.ImportedFromIB2</string>
           <string>57.IBEditorWindowLastContentRect</string>
@@ -12161,7 +12192,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{663, 482}, {298, 393}}</string>
+          <string>{{663, 462}, {302, 413}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12843,6 +12874,7 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>{{329, 186}, {267, 263}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12899,7 +12931,7 @@ LCAuLi4</string>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">5090</int>
+      <int key="maxID">5094</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -15706,6 +15738,7 @@ LCAuLi4</string>
               <string>toggleFullscreen:</string>
               <string>toggleFullscreenDevice:</string>
               <string>toggleJumpButtons:</string>
+              <string>togglePlaymodeButtons:</string>
               <string>toggleRecord:</string>
               <string>toggleVar:</string>
               <string>viewAbout:</string>
@@ -15715,6 +15748,7 @@ LCAuLi4</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -15775,6 +15809,7 @@ LCAuLi4</string>
               <string>toggleFullscreen:</string>
               <string>toggleFullscreenDevice:</string>
               <string>toggleJumpButtons:</string>
+              <string>togglePlaymodeButtons:</string>
               <string>toggleRecord:</string>
               <string>toggleVar:</string>
               <string>viewAbout:</string>
@@ -15878,6 +15913,10 @@ LCAuLi4</string>
               </object>
               <object class="IBActionInfo">
                 <string key="name">toggleJumpButtons:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">togglePlaymodeButtons:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
@@ -16008,6 +16047,7 @@ LCAuLi4</string>
               <string>o_mi_teletext_yellow</string>
               <string>o_mi_title</string>
               <string>o_mi_toggleJumpButtons</string>
+              <string>o_mi_togglePlaymodeButtons</string>
               <string>o_mi_trackSynchronization</string>
               <string>o_mi_videoeffects</string>
               <string>o_mi_videotrack</string>
@@ -16133,6 +16173,7 @@ LCAuLi4</string>
               <string>id</string>
               <string>id</string>
               <string>NSView</string>
+              <string>NSMenuItem</string>
               <string>NSMenuItem</string>
               <string>NSMenuItem</string>
               <string>NSMenuItem</string>
@@ -16299,6 +16340,7 @@ LCAuLi4</string>
               <string>o_mi_teletext_yellow</string>
               <string>o_mi_title</string>
               <string>o_mi_toggleJumpButtons</string>
+              <string>o_mi_togglePlaymodeButtons</string>
               <string>o_mi_trackSynchronization</string>
               <string>o_mi_videoeffects</string>
               <string>o_mi_videotrack</string>
@@ -16735,6 +16777,10 @@ LCAuLi4</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_mi_toggleJumpButtons</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_togglePlaymodeButtons</string>
                 <string key="candidateClassName">NSMenuItem</string>
               </object>
               <object class="IBToOneOutletInfo">

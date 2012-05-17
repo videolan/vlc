@@ -103,6 +103,7 @@
     IBOutlet NSMenuItem * o_mi_chapter;
     IBOutlet NSMenu * o_mu_chapter;
     IBOutlet NSMenuItem * o_mi_toggleJumpButtons;
+    IBOutlet NSMenuItem * o_mi_togglePlaymodeButtons;
 
     IBOutlet NSMenu * o_mu_audio;
     IBOutlet NSMenuItem * o_mi_vol_up;
@@ -214,6 +215,7 @@
 - (IBAction)setPlaybackRate:(id)sender;
 - (void)updatePlaybackRate;
 - (IBAction)toggleJumpButtons:(id)sender;
+- (IBAction)togglePlaymodeButtons:(id)sender;
 
 - (IBAction)toggleFullscreen:(id)sender;
 - (IBAction)resizeVideoWindow:(id)sender;

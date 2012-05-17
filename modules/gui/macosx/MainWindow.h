@@ -95,6 +95,7 @@
     BOOL b_minimized_view;
     BOOL b_video_deco;
     BOOL b_show_jump_buttons;
+    BOOL b_show_playmode_buttons;
     int i_lastSplitViewHeight;
     int i_lastShownVolume;
     input_state_e cachedInputState;
@@ -176,6 +177,7 @@
 - (void)setRepeatOff;
 - (void)setShuffle;
 - (void)toggleJumpButtons;
+- (void)togglePlaymodeButtons;
 
 - (void)drawFancyGradientEffectForTimeSlider;
 

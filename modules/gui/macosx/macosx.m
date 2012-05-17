@@ -108,7 +108,10 @@ void WindowClose  ( vout_window_t * );
 #define LOCK_ASPECT_RATIO_TEXT N_( "Lock Aspect Ratio" )
 
 #define JUMPBUTTONS_TEXT N_( "Shows playlist item control buttons" )
-#define JUMPBUTTONS_LONGTEXT N_("Shows the previous and next buttons in the main window" )
+#define JUMPBUTTONS_LONGTEXT N_( "Shows the previous and next buttons in the main window" )
+
+#define PLAYMODEBUTTONS_TEXT N_( "Show play mode control buttons" )
+#define PLAYMODEBUTTONS_LONGTEXT N_( "Shows the shuffle and repeat buttons in the main window" )
 
 vlc_module_begin ()
     set_description( N_("Mac OS X interface") )
@@ -133,6 +136,7 @@ vlc_module_begin ()
     add_bool( "macosx-lock-aspect-ratio", true, LOCK_ASPECT_RATIO_TEXT, LOCK_ASPECT_RATIO_TEXT, true )
     add_bool( "macosx-icon-change", true, ICONCHANGE_TEXT, ICONCHANGE_LONGTEXT, true )
     add_bool( "macosx-show-playback-buttons", false, JUMPBUTTONS_TEXT, JUMPBUTTONS_LONGTEXT, false )
+    add_bool( "macosx-show-playmode-buttons", true, PLAYMODEBUTTONS_TEXT, PLAYMODEBUTTONS_LONGTEXT, false )
 
     add_submodule ()
         set_description( "Mac OS X Video Output Provider" )

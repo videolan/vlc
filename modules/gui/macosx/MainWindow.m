@@ -631,7 +631,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     #define moveItem( item ) \
     frame = [item frame]; \
     frame.origin.x = frame.origin.x + f_space; \
-    [item setFrame: frame]
+    [[item animator] setFrame: frame]
 
     moveItem( o_bwd_btn );
     moveItem( o_play_btn );
@@ -647,7 +647,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     frame = [item frame]; \
     frame.size.width = frame.size.width - f_space; \
     frame.origin.x = frame.origin.x + f_space; \
-    [item setFrame: frame]
+    [[item animator] setFrame: frame]
 
     resizeItem( o_time_sld );
     resizeItem( o_progress_bar );
@@ -655,10 +655,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
     resizeItem( o_time_sld_fancygradient_view );
     #undef resizeItem
 
-    preliminaryFrame.origin.x = [o_fwd_btn frame].origin.x + [o_fwd_btn frame].size.width + 4.;
+    preliminaryFrame.origin.x = [o_next_btn frame].origin.x + 80. + [o_fwd_btn frame].size.width;
     [o_next_btn setFrame: preliminaryFrame];
-    [[self contentView] addSubview: o_prev_btn];
-    [[self contentView] addSubview: o_next_btn];
+
+    // wait until the animation is done
+    [[self contentView] performSelector:@selector(addSubview:) withObject:o_prev_btn afterDelay:.2];
+    [[self contentView] performSelector:@selector(addSubview:) withObject:o_next_btn afterDelay:.2];
 
     [o_fwd_btn setAction:@selector(forward:)];
     [o_bwd_btn setAction:@selector(backward:)];
@@ -681,7 +683,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     #define moveItem( item ) \
     frame = [item frame]; \
     frame.origin.x = frame.origin.x - f_space; \
-    [item setFrame: frame]
+    [[item animator] setFrame: frame]
 
     moveItem( o_bwd_btn );
     moveItem( o_play_btn );
@@ -697,7 +699,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     frame = [item frame]; \
     frame.size.width = frame.size.width + f_space; \
     frame.origin.x = frame.origin.x - f_space; \
-    [item setFrame: frame]
+    [[item animator] setFrame: frame]
 
     resizeItem( o_time_sld );
     resizeItem( o_progress_bar );
@@ -709,6 +711,61 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [o_fwd_btn setAction:@selector(fwd:)];
     [o_bwd_btn setAction:@selector(bwd:)];
+}
+
+- (void)togglePlaymodeButtons
+{
+    b_show_playmode_buttons = config_GetInt( VLCIntf, "macosx-show-playmode-buttons" );
+
+    if (b_show_playmode_buttons)
+        [self addPlaymodeButtons];
+    else
+        [self removePlaymodeButtons];
+}
+
+- (void)addPlaymodeButtons
+{
+    NSRect frame;
+    float f_space = [o_repeat_btn frame].size.width + [o_shuffle_btn frame].size.width - 6.;
+
+    // FIXME: switch o_playlist_btn artwork
+
+    #define resizeItem( item ) \
+    frame = [item frame]; \
+    frame.size.width = frame.size.width - f_space; \
+    frame.origin.x = frame.origin.x + f_space; \
+    [[item animator] setFrame: frame]
+
+    resizeItem( o_time_sld );
+    resizeItem( o_progress_bar );
+    resizeItem( o_time_sld_background );
+    resizeItem( o_time_sld_fancygradient_view );
+    #undef resizeItem
+
+    [[o_repeat_btn animator] setHidden: NO];
+    [[o_shuffle_btn animator] setHidden: NO];
+}
+
+- (void)removePlaymodeButtons
+{
+    NSRect frame;
+    float f_space = [o_repeat_btn frame].size.width + [o_shuffle_btn frame].size.width - 6.;
+    [o_repeat_btn setHidden: YES];
+    [o_shuffle_btn setHidden: YES];
+
+    // FIXME: switch o_playlist_btn artwork
+
+    #define resizeItem( item ) \
+    frame = [item frame]; \
+    frame.size.width = frame.size.width + f_space; \
+    frame.origin.x = frame.origin.x - f_space; \
+    [[item animator] setFrame: frame]
+
+    resizeItem( o_time_sld );
+    resizeItem( o_progress_bar );
+    resizeItem( o_time_sld_background );
+    resizeItem( o_time_sld_fancygradient_view );
+    #undef resizeItem
 }
 
 #pragma mark -

@@ -283,6 +283,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_bwd setTitle: _NS("Step Backward")];
     [o_mi_toggleJumpButtons setTitle: _NS("Show Previous & Next Buttons")];
     [o_mi_toggleJumpButtons setState: config_GetInt( VLCIntf, "macosx-show-playback-buttons")];
+    [o_mi_togglePlaymodeButtons setTitle: _NS("Show Shuffle & Repeat Buttons")];
+    [o_mi_togglePlaymodeButtons setState: config_GetInt( VLCIntf, "macosx-show-playmode-buttons")];
 
     [o_mi_program setTitle: _NS("Program")];
     [o_mu_program setTitle: _NS("Program")];
@@ -617,6 +619,14 @@ static VLCMainMenu *_o_sharedInstance = nil;
     config_PutInt( VLCIntf, "macosx-show-playback-buttons", b_value );
     [[[VLCMain sharedInstance] mainWindow] toggleJumpButtons];
     [o_mi_toggleJumpButtons setState: b_value];
+}
+
+- (IBAction)togglePlaymodeButtons:(id)sender
+{
+    BOOL b_value = !config_GetInt( VLCIntf, "macosx-show-playmode-buttons" );
+    config_PutInt( VLCIntf, "macosx-show-playmode-buttons", b_value );
+    [[[VLCMain sharedInstance] mainWindow] togglePlaymodeButtons];
+    [o_mi_togglePlaymodeButtons setState: b_value];
 }
 
 #pragma mark -
