@@ -38,7 +38,7 @@ open_tag = "<?vlc"
 close_tag = "?>"
 
 -- TODO: use internal VLC mime lookup function for mimes not included here
-local mimes = {
+mimes = {
     txt = "text/plain",
     json = "text/plain",
     html = "text/html",
@@ -277,7 +277,7 @@ do
     end
     package.path = oldpath
 end
-local files = {}
+files = {}
 local function load_dir(dir,root)
     local root = root or "/"
     local has_index = false
@@ -321,4 +321,4 @@ end
 password = vlc.var.inherit(nil,"http-password")
 h = vlc.httpd()
 load_dir( http_dir )
-local a = h:handler("/art",nil,password,callback_art,nil)
+a = h:handler("/art",nil,password,callback_art,nil)
