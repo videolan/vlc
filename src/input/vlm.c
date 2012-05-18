@@ -421,7 +421,7 @@ static void* Manage( void* p_object )
     int canc = vlc_savecancel ();
     i_lastcheck = vlm_Date();
 
-    while( !vlm->b_die )
+    while( vlc_object_alive( vlm ) )
     {
         char **ppsz_scheduled_commands = NULL;
         int    i_scheduled_commands = 0;
