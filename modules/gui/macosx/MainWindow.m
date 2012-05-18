@@ -1529,9 +1529,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         NSURL * o_url = [NSURL URLWithString: [NSString stringWithUTF8String: uri]];
         if ([o_url isFileURL])
+        {
             [self setRepresentedURL: o_url];
-        else
+            [o_detached_video_window setRepresentedURL: o_url];
+        } else {
             [self setRepresentedURL: nil];
+            [o_detached_video_window setRepresentedURL: nil];
+        }
         free( uri );
 
         if ([aString isEqualToString:@""])
