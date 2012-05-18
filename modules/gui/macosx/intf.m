@@ -845,15 +845,15 @@ static VLCMain *_o_sharedMainInstance = nil;
         int keyRepeat = (keyFlags & 0x1);
 
         if( keyCode == NX_KEYTYPE_PLAY && keyState == 0 )
-            var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
+            [[VLCCoreInteraction sharedInstance] play];
 
         if( (keyCode == NX_KEYTYPE_FAST || keyCode == NX_KEYTYPE_NEXT) && !b_mediakeyJustJumped )
         {
             if( keyState == 0 && keyRepeat == 0 )
-                var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_NEXT );
+                [[VLCCoreInteraction sharedInstance] next];
             else if( keyRepeat == 1 )
             {
-                var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_JUMP_FORWARD_SHORT );
+                [[VLCCoreInteraction sharedInstance] forwardShort];
                 b_mediakeyJustJumped = YES;
                 [self performSelector:@selector(resetMediaKeyJump)
                            withObject: NULL
@@ -864,10 +864,10 @@ static VLCMain *_o_sharedMainInstance = nil;
         if( (keyCode == NX_KEYTYPE_REWIND || keyCode == NX_KEYTYPE_PREVIOUS) && !b_mediakeyJustJumped )
         {
             if( keyState == 0 && keyRepeat == 0 )
-                var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_PREV );
+                [[VLCCoreInteraction sharedInstance] previous];
             else if( keyRepeat == 1 )
             {
-                var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_JUMP_BACKWARD_SHORT );
+                [[VLCCoreInteraction sharedInstance] backwardShort];
                 b_mediakeyJustJumped = YES;
                 [self performSelector:@selector(resetMediaKeyJump)
                            withObject: NULL
