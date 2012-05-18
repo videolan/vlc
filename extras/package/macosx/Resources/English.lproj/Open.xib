@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">11D50</string>
+    <string key="IBDocument.SystemVersion">11E53</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1138.32</string>
-    <string key="IBDocument.HIToolboxVersion">568.00</string>
+    <string key="IBDocument.AppKitVersion">1138.47</string>
+    <string key="IBDocument.HIToolboxVersion">569.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
       <string key="NS.object.0">851</string>
@@ -13,6 +13,7 @@
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <integer value="2787"/>
+      <integer value="637"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -50,7 +51,7 @@
         <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <string key="NSWindowContentMinSize">{213, 107}</string>
         <object class="NSView" key="NSWindowView" id="971209704">
-          <nil key="NSNextResponder"/>
+          <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -141,7 +142,6 @@
               <int key="NSvFlags">264</int>
               <string key="NSFrame">{{13, 96}, {548, 278}}</string>
               <reference key="NSSuperview" ref="971209704"/>
-              <bool key="NSViewIsLayerTreeHost">YES</bool>
               <int key="NSViewLayerContentsRedrawPolicy">2</int>
               <object class="NSMutableArray" key="NSTabViewItems">
                 <bool key="EncodedWithXMLCoder">YES</bool>
@@ -492,7 +492,7 @@
                 <object class="NSTabViewItem" id="472694042">
                   <string key="NSIdentifier">optical</string>
                   <object class="NSView" key="NSView" id="906662545">
-                    <nil key="NSNextResponder"/>
+                    <reference key="NSNextResponder" ref="1068542774"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -571,6 +571,8 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {528, 232}}</string>
+                    <reference key="NSSuperview" ref="1068542774"/>
+                    <bool key="NSViewIsLayerTreeHost">YES</bool>
                     <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   </object>
                   <string key="NSLabel">Disc</string>
@@ -647,6 +649,7 @@
                           <string key="NSContents">To Open a usual network stream (HTTP, RTSP, MMS, FTP, etc.), just enter the URL in the field above. If you want to open a RTP or UDP stream, press the button below.</string>
                           <reference key="NSSupport" ref="26"/>
                           <reference key="NSControlView" ref="289307388"/>
+                          <bool key="NSDrawsBackground">YES</bool>
                           <reference key="NSBackgroundColor" ref="227735768"/>
                           <object class="NSColor" key="NSTextColor">
                             <int key="NSColorSpace">3</int>
@@ -693,7 +696,7 @@
                 </object>
                 <object class="NSTabViewItem" id="161127032">
                   <object class="NSView" key="NSView" id="149945758">
-                    <reference key="NSNextResponder" ref="1068542774"/>
+                    <nil key="NSNextResponder"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -772,7 +775,6 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {528, 232}}</string>
-                    <reference key="NSSuperview" ref="1068542774"/>
                     <reference key="NSNextKeyView" ref="517042156"/>
                     <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   </object>
@@ -781,14 +783,14 @@
                   <reference key="NSTabView" ref="1068542774"/>
                 </object>
               </object>
-              <reference key="NSSelectedTabViewItem" ref="161127032"/>
+              <reference key="NSSelectedTabViewItem" ref="472694042"/>
               <reference key="NSFont" ref="725567486"/>
               <int key="NSTvFlags">0</int>
               <bool key="NSAllowTruncatedLabels">YES</bool>
               <bool key="NSDrawsBackground">YES</bool>
               <object class="NSMutableArray" key="NSSubviews">
                 <bool key="EncodedWithXMLCoder">YES</bool>
-                <reference ref="149945758"/>
+                <reference ref="906662545"/>
               </object>
             </object>
             <object class="NSButton" id="995273671">
@@ -869,6 +871,7 @@
             </object>
           </object>
           <string key="NSFrameSize">{574, 380}</string>
+          <reference key="NSSuperview"/>
           <reference key="NSNextKeyView" ref="1068542774"/>
           <int key="NSViewLayerContentsRedrawPolicy">2</int>
         </object>
@@ -11734,6 +11737,7 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
           <string>3466.IBPluginDependency</string>
           <string>3467.IBPluginDependency</string>
           <string>408.IBPluginDependency</string>
+          <string>636.IBEditorWindowLastContentRect</string>
           <string>636.IBPluginDependency</string>
           <string>636.IBWindowTemplateEditedContentRect</string>
           <string>636.windowTemplate.hasMinSize</string>
@@ -12206,8 +12210,9 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>{{340, 1005}, {574, 380}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{329, 376}, {574, 380}}</string>
+          <string>{{340, 1005}, {574, 380}}</string>
           <boolean value="YES"/>
           <string>{213, 107}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
