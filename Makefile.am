@@ -103,6 +103,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/About.xib \
 	extras/package/macosx/Resources/English.lproj/AudioEffects.xib \
 	extras/package/macosx/Resources/English.lproj/Bookmarks.xib \
+	extras/package/macosx/Resources/English.lproj/ConvertAndSave.xib \
 	extras/package/macosx/Resources/English.lproj/CoreDialogs.xib \
 	extras/package/macosx/Resources/English.lproj/ErrorPanel.xib \
 	extras/package/macosx/Resources/English.lproj/InfoPlist.strings.in \

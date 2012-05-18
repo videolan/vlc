@@ -74,5 +74,7 @@ SOURCES_macosx = \
 	VideoView.m \
 	MainWindowTitle.h \
 	MainWindowTitle.m \
+	ConvertAndSave.h \
+	ConvertAndSave.m \
 	$(NULL)
 

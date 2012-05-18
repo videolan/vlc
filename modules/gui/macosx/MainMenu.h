@@ -34,12 +34,14 @@
     BOOL b_nib_audioeffects_loaded;
     BOOL b_nib_tracksynchro_loaded;
     BOOL b_nib_bookmarks_loaded;
+    BOOL b_nib_convertandsave_loaded;
 
     id o_about;                 /* VLAboutBox     */
     id o_videoeffects;          /* VLCVideoEffects */
     id o_audioeffects;          /* VLCAudioEffects */
     id o_trackSynchronization;  /* VLCTrackSynchronization */
     id o_bookmarks;             /* VLCBookmarks */
+    id o_convertandsave;        /* VLCConvertAndSave */
 
     id o_extMgr;                /* Extensions Manager */
 
@@ -66,6 +68,7 @@
     IBOutlet NSMenuItem * o_mi_open_capture;
     IBOutlet NSMenuItem * o_mi_open_recent;
     IBOutlet NSMenuItem * o_mi_open_wizard;
+    IBOutlet NSMenuItem * o_mi_convertandsave;
 
     IBOutlet NSMenu * o_mu_edit;
     IBOutlet NSMenuItem * o_mi_cut;
@@ -224,6 +227,7 @@
 - (IBAction)toggleFullscreenDevice:(id)sender;
 
 - (IBAction)showWizard:(id)sender;
+- (IBAction)showConvertAndSave:(id)sender;
 - (IBAction)showVideoEffects:(id)sender;
 - (IBAction)showAudioEffects:(id)sender;
 - (IBAction)showTrackSynchronization:(id)sender;

@@ -41,6 +41,7 @@
 #import "CoreInteraction.h"
 #import "MainWindow.h"
 #import "ExtensionsManager.h"
+#import "ConvertAndSave.h"
 
 @implementation VLCMainMenu
 static VLCMainMenu *_o_sharedInstance = nil;
@@ -83,6 +84,9 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
     if (b_nib_tracksynchro_loaded)
         [o_trackSynchronization release];
+
+    if (b_nib_convertandsave_loaded)
+        [o_convertandsave release];
 
     [o_extMgr release];
 
@@ -254,6 +258,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_open_capture setTitle: _NS("Open Capture Device...")];
     [o_mi_open_recent setTitle: _NS("Open Recent")];
     [o_mi_open_wizard setTitle: _NS("Streaming/Exporting Wizard...")];
+    [o_mi_convertandsave setTitle: _NS("Convert / Save...")];
 
     [o_mu_edit setTitle: _NS("Edit")];
     [o_mi_cut setTitle: _NS("Cut")];
@@ -733,6 +738,17 @@ static VLCMainMenu *_o_sharedInstance = nil;
 {
     [[[VLCMain sharedInstance] wizard] resetWizard];
     [[[VLCMain sharedInstance] wizard] showWizard];
+}
+
+- (IBAction)showConvertAndSave:(id)sender
+{
+    if( o_convertandsave == nil )
+        o_convertandsave = [[VLCConvertAndSave alloc] init];
+
+    if( !b_nib_convertandsave_loaded )
+        b_nib_convertandsave_loaded = [NSBundle loadNibNamed:@"ConvertAndSave" owner: NSApp];
+
+    [o_convertandsave toggleWindow];
 }
 
 - (IBAction)showVideoEffects:(id)sender

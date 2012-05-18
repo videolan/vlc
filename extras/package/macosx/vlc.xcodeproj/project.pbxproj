@@ -156,6 +156,7 @@
 		CC0586BD14ACF7C000659A99 /* sidebar-pictures.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0586B714ACF7C000659A99 /* sidebar-pictures.png */; };
 		CC0586BE14ACF7C000659A99 /* sidebar-playlist.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0586B814ACF7C000659A99 /* sidebar-playlist.png */; };
 		CC0586BF14ACF7C000659A99 /* sidebar-podcast.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0586B914ACF7C000659A99 /* sidebar-podcast.png */; };
+		CC0663391566CD5A003A411C /* ConvertAndSave.xib in Resources */ = {isa = PBXBuildFile; fileRef = CC0663371566CD5A003A411C /* ConvertAndSave.xib */; };
 		CC0F725215063C820086B6A0 /* fullscreen-one-button-pressed.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0F725015063C820086B6A0 /* fullscreen-one-button-pressed.png */; };
 		CC0F725315063C820086B6A0 /* fullscreen-one-button.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0F725115063C820086B6A0 /* fullscreen-one-button.png */; };
 		CC0F725715063C980086B6A0 /* fullscreen-one-button_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0F725515063C980086B6A0 /* fullscreen-one-button_dark.png */; };
@@ -480,6 +481,9 @@
 		CC0586B714ACF7C000659A99 /* sidebar-pictures.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sidebar-pictures.png"; path = "Resources/sidebar-icons/sidebar-pictures.png"; sourceTree = "<group>"; };
 		CC0586B814ACF7C000659A99 /* sidebar-playlist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sidebar-playlist.png"; path = "Resources/sidebar-icons/sidebar-playlist.png"; sourceTree = "<group>"; };
 		CC0586B914ACF7C000659A99 /* sidebar-podcast.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sidebar-podcast.png"; path = "Resources/sidebar-icons/sidebar-podcast.png"; sourceTree = "<group>"; };
+		CC0663341566C34C003A411C /* ConvertAndSave.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ConvertAndSave.h; path = ../../../modules/gui/macosx/ConvertAndSave.h; sourceTree = "<group>"; };
+		CC0663351566C34C003A411C /* ConvertAndSave.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ConvertAndSave.m; path = ../../../modules/gui/macosx/ConvertAndSave.m; sourceTree = "<group>"; };
+		CC0663381566CD5A003A411C /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/ConvertAndSave.xib; sourceTree = "<group>"; };
 		CC0CD0DF13DE0EAE00B0D90D /* PXSourceList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PXSourceList.h; path = ../../../modules/gui/macosx/PXSourceList.h; sourceTree = "<group>"; };
 		CC0CD0E013DE0EAE00B0D90D /* PXSourceList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PXSourceList.m; path = ../../../modules/gui/macosx/PXSourceList.m; sourceTree = "<group>"; };
 		CC0CD0E113DE0EAE00B0D90D /* PXSourceListDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PXSourceListDataSource.h; path = ../../../modules/gui/macosx/PXSourceListDataSource.h; sourceTree = "<group>"; };
@@ -777,6 +781,8 @@
 				CC707EC4137464CD0003010A /* TrackSynchronization.m */,
 				CCCE366D13817E4500694F2A /* VideoEffects.h */,
 				CCCE366E13817E4500694F2A /* VideoEffects.m */,
+				CC0663341566C34C003A411C /* ConvertAndSave.h */,
+				CC0663351566C34C003A411C /* ConvertAndSave.m */,
 				CC017A0E14A4C8B600C09A4F /* custom UI code */,
 				CC0CD0E513DE0FC600B0D90D /* Imported Code */,
 			);
@@ -1245,6 +1251,7 @@
 				CCD83E4013FEA143004F1652 /* VideoEffects.xib */,
 				CCD83E4213FEA143004F1652 /* Wizard.xib */,
 				CCD83E2B13FE9B90004F1652 /* MainMenu.xib */,
+				CC0663371566CD5A003A411C /* ConvertAndSave.xib */,
 			);
 			name = xibs;
 			sourceTree = "<group>";
@@ -1559,12 +1566,21 @@
 				CCE4057B15655B1900FA5CCA /* forward-single.png in Resources */,
 				CCE4057F15655B2100FA5CCA /* back-pressed-single.png in Resources */,
 				CCE4058215655B3300FA5CCA /* back-single.png in Resources */,
+				CC0663391566CD5A003A411C /* ConvertAndSave.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		CC0663371566CD5A003A411C /* ConvertAndSave.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CC0663381566CD5A003A411C /* English */,
+			);
+			name = ConvertAndSave.xib;
+			sourceTree = "<group>";
+		};
 		CCD83E2B13FE9B90004F1652 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
