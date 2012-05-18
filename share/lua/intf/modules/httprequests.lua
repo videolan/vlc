@@ -31,7 +31,13 @@ local dkjson = require ("dkjson")
 
 --Round the number to the specified precision
 function round(what, precision)
-  if what then return math.floor(what*math.pow(10,precision)+0.5) / math.pow(10,precision) else return "" end
+  if type(what) == "string" then
+    what = common.us_tonumber(what)
+  end
+  if type(what) == "number" then
+    return math.floor(what*math.pow(10,precision)+0.5) / math.pow(10,precision)
+  end
+  return nil
 end
 
 --split text where it matches the delimiter
