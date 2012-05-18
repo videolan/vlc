@@ -233,6 +233,8 @@ void vlm_Delete( vlm_t *p_vlm )
     TAB_CLEAN( p_vlm->i_schedule, p_vlm->schedule );
     vlc_mutex_unlock( &p_vlm->lock );
 
+    vlc_object_kill( p_vlm );
+
     if( p_vlm->p_vod )
     {
         module_unneed( p_vlm->p_vod, p_vlm->p_vod->p_module );
