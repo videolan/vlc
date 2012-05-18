@@ -1317,7 +1317,8 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
                     continue;
                 }
                 /* We must free the content, because if the key was not downloaded, content can't be decrypted */
-                if (segment->data)
+                if ((p->psz_key_path || p->b_key_loaded) &&
+                    segment->data)
                 {
                     block_Release(segment->data);
                     segment->data = NULL;
