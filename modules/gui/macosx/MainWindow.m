@@ -301,14 +301,14 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_detached_video_window setContentMinSize: NSMakeSize( 363., f_min_video_height + [o_detached_bottombar_view frame].size.height )];
     }
     else
-    {
+    {   // !b_video_deco:
         if (b_dark_interface)
             [self setContentMinSize:NSMakeSize(604., 288. + [o_titlebar_view frame].size.height)];
         else
             [self setContentMinSize:NSMakeSize(604., 288.)];
 
         [o_detached_bottombar_view setHidden:YES];
-        [o_detached_video_window setContentMinSize: NSMakeSize( 363., f_min_video_height )];
+        [o_detached_video_window setContentMinSize: NSMakeSize( f_min_video_height, f_min_video_height )];
     }
 
     [self setTitle: _NS("VLC media player")];
@@ -1349,7 +1349,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         NSRect contentRect = [videoWindow contentRectForFrameRect:videoWindowFrame];
         float marginy = viewRect.origin.y + videoWindowFrame.size.height - contentRect.size.height;
         float marginx = contentRect.size.width - viewRect.size.width;
-        if( b_dark_interface )
+        if( b_dark_interface && b_video_deco )
             marginy += [o_titlebar_view frame].size.height;
 
         proposedFrameSize.height = (proposedFrameSize.width - marginx) * nativeVideoSize.height / nativeVideoSize.width + marginy;

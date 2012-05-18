@@ -22,15 +22,15 @@
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <integer value="2770"/>
+      <integer value="235"/>
       <integer value="2730"/>
-      <integer value="4850"/>
-      <integer value="4722"/>
-      <integer value="4948"/>
       <integer value="4756"/>
+      <integer value="4722"/>
+      <integer value="4850"/>
+      <integer value="4948"/>
       <integer value="915"/>
       <integer value="1617"/>
       <integer value="4596"/>
-      <integer value="235"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -4609,7 +4609,6 @@ LCAuLi4</string>
         <nil key="NSViewClass"/>
         <nil key="NSUserInterfaceItemIdentifier"/>
         <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
-        <string key="NSWindowContentMinSize">{363, 203}</string>
         <object class="NSView" key="NSWindowView" id="598483044">
           <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
@@ -4832,7 +4831,6 @@ LCAuLi4</string>
           <string key="NSReuseIdentifierKey">_NS:122</string>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
-        <string key="NSMinSize">{363, 225}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <string key="NSFrameAutosaveName">detachedvideowindow</string>
         <bool key="NSWindowIsRestorable">NO</bool>
@@ -12192,7 +12190,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{663, 462}, {302, 413}}</string>
+          <string>{{956, 323}, {302, 413}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12361,7 +12359,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{519, 875}, {468, 20}}</string>
+          <string>{{812, 736}, {468, 20}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12772,7 +12770,7 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>{{396, 139}, {363, 239}}</string>
           <boolean value="NO"/>
-          <boolean value="YES"/>
+          <boolean value="NO"/>
           <string>{363, 203}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
