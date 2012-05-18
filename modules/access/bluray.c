@@ -234,9 +234,35 @@ static int blurayOpen( vlc_object_t *object )
             goto error;
         }
         if (!disc_info->aacs_handled) {
+#ifdef BD_AACS_CORRUPTED_DISC
+            if (disc_info->aacs_error_code) {
+                switch (disc_info->aacs_error_code) {
+                    case BD_AACS_CORRUPTED_DISC:
+                        error_msg = _("BluRay Disc is corrupted.");
+                        break;
+                    case BD_AACS_NO_CONFIG:
+                        error_msg = _("Missing AACS configuration file!");
+                        break;
+                    case BD_AACS_NO_PK:
+                        error_msg = _("No valid processing key found in AACS config file.");
+                        break;
+                    case BD_AACS_NO_CERT:
+                        error_msg = _("No valid host certificate found in AACS config file.");
+                        break;
+                    case BD_AACS_CERT_REVOKED:
+                        error_msg = _("AACS Host certificate revoked.");
+                        break;
+                    case BD_AACS_MMC_FAILED:
+                        error_msg = _("AACS MMC failed.");
+                        break;
+                }
+                goto error;
+            }
+#else
             error_msg = _("Your system AACS decoding library does not work. "
                       "Missing keys?");
             goto error;
+#endif /* BD_AACS_CORRUPTED_DISC */
         }
     }
 
