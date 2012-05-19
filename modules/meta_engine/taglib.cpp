@@ -32,6 +32,11 @@
 #include <vlc_demux.h>              /* demux_meta_t */
 #include <vlc_strings.h>            /* vlc_b64_decode_binary */
 #include <vlc_input.h>              /* for attachment_new */
+#include <vlc_url.h>                /* make_path */
+#include <vlc_mime.h>               /* mime type */
+#include <vlc_fs.h>
+
+#include <sys/stat.h>
 
 #ifdef WIN32
 # include <vlc_charset.h>
@@ -701,6 +706,76 @@ static void WriteMetaToId3v2( ID3v2::Tag* tag, input_item_t* p_item )
     WRITE( Publisher, "TPUB" );
 
 #undef WRITE
+
+    /* Write album art */
+    char *psz_url = input_item_GetArtworkURL( p_item );
+    if( psz_url == NULL )
+        return;
+
+    char *psz_path = make_path( psz_url );
+    free( psz_url );
+    if( psz_path == NULL )
+        return;
+
+    const char *psz_mime = vlc_mime_Ext2Mime( psz_path );
+
+    FILE *p_file = vlc_fopen( psz_path, "rb" );
+    if( p_file == NULL )
+    {
+        free( psz_path );
+        return;
+    }
+
+    struct stat st;
+    if( vlc_stat( psz_path, &st ) == -1 )
+    {
+        free( psz_path );
+        fclose( p_file );
+        return;
+    }
+    off_t file_size = st.st_size;
+
+    free( psz_path );
+
+    /* Limit picture size to 10MiB */
+    if( file_size > 10485760 )
+    {
+      fclose( p_file );
+      return;
+    }
+
+    char *p_buffer = new (std::nothrow) char[file_size];
+    if( p_buffer == NULL )
+    {
+        fclose( p_file );
+        return;
+    }
+
+    if( fread( p_buffer, 1, file_size, p_file ) != (unsigned)file_size )
+    {
+        fclose( p_file );
+        delete[] p_buffer;
+        return;
+    }
+    fclose( p_file );
+
+    ByteVector data( p_buffer, file_size );
+    delete[] p_buffer;
+
+    ID3v2::FrameList frames = tag->frameList( "APIC" );
+    ID3v2::AttachedPictureFrame *frame = NULL;
+    if( frames.isEmpty() )
+    {
+        frame = new TagLib::ID3v2::AttachedPictureFrame;
+        tag->addFrame( frame );
+    }
+    else
+    {
+        frame = static_cast<ID3v2::AttachedPictureFrame *>( frames.back() );
+    }
+
+    frame->setPicture( data );
+    frame->setMimeType( psz_mime );
 }
 
 
