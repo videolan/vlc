@@ -441,7 +441,8 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
         if( p_sys->i_codec_id == CODEC_ID_VC1 ||
             p_sys->i_codec_id == CODEC_ID_VORBIS ||
             p_sys->i_codec_id == CODEC_ID_THEORA ||
-            p_sys->i_codec_id == CODEC_ID_AAC )
+            ( p_sys->i_codec_id == CODEC_ID_AAC &&
+              !p_dec->fmt_in.b_packetized ) )
         {
             msg_Warn( p_dec, "waiting for extra data for codec %s",
                       p_sys->psz_namecodec );
