@@ -133,7 +133,7 @@ Band 9: 16 kHz
 *****************************************************************************/
 static int vlclua_equalizer_get( lua_State *L )
 {
-    int bands = 9;
+    const unsigned bands = 10;
     input_thread_t *p_input = vlclua_get_input_internal( L );
     if( !p_input )
         return 0;
@@ -142,7 +142,6 @@ static int vlclua_equalizer_get( lua_State *L )
     if( !p_aout )
         return 0;
 
-    float level = 0 ;
     char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
     if( !psz_af || strstr ( psz_af, "equalizer" ) == NULL )
     {
@@ -159,24 +158,31 @@ static int vlclua_equalizer_get( lua_State *L )
         vlc_object_release( p_aout );
         return 0;
     }
+
+    bool error = false;
     locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
     locale_t oldloc = uselocale (loc);
-    int i = 0;
-    char *str;
     lua_newtable( L );
-    while( bands >= 0 )
+    for( unsigned i = 0; i < bands; i++ )
     {
-        level = strtof( psz_bands, &psz_bands);
-        bands--;
+        float level = strtof( psz_bands, &psz_bands );
+        char *str;
         if( asprintf( &str , "%f" , level ) == -1 )
-            return 0;
+        {
+            error = true;
+            break;
+        }
         lua_pushstring( L, str );
         free(str);
-        if( asprintf( &str , "band id=\"%d\"", i++ ) == -1 )
-            return 0;
+        if( asprintf( &str , "band id=\"%u\"", i ) == -1 )
+        {
+            error = true;
+            break;
+        }
         lua_setfield( L , -2 , str );
         free( str );
     }
+
     free( psz_bands_origin );
     if( loc != (locale_t)0 )
     {
@@ -184,7 +190,7 @@ static int vlclua_equalizer_get( lua_State *L )
         freelocale (loc);
     }
     vlc_object_release( p_aout );
-    return 1;
+    return error ? 0 : 1;
 }
 
 
