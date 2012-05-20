@@ -33,6 +33,11 @@ Interfaces:
 
 Mac OS X Interface:
  * added a GUI for the QTSound access module to process audio captured locally
+ * added an option to let the Apple Remote control the system volume instead of
+   VLC's internal volume level
+ * added an option to show next / previous buttons
+ * added an option to hide the shuffle and repeat buttons
+ * re-added an option to hide the window decoration during video playback
 
 Removed modules:
  * portaudio audio output
