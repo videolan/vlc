@@ -289,6 +289,7 @@ $Id$
  * shm: Shared memory framebuffer access module
  * sid: Sidplay demuxer
  * simple_channel_mixer: channel mixer
+ * simple_channel_mixer_neon: channel mixer using NEON assembly
  * skins2: Skinnable interface, new generation
  * smf: Standard MIDI file demuxer
  * smooth: Microsoft Smooth Streaming input

@@ -8,6 +8,13 @@ libaudio_format_neon_plugin_la_SOURCES = \
 libaudio_format_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
 libaudio_format_neon_plugin_la_LIBADD = $(AM_LIBADD)
 
+libsimple_channel_mixer_neon_plugin_la_SOURCES = \
+	simple_channel_mixer.S \
+	simple_channel_mixer.c
+libsimple_channel_mixer_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
+libsimple_channel_mixer_neon_plugin_la_LIBADD = $(AM_LIBADD)
+libsimple_channel_mixer_neon_plugin_la_DEPENDENCIES =
+
 libchroma_yuv_neon_plugin_la_SOURCES = \
 	i420_yuyv.S \
 	i422_yuyv.S \
@@ -30,6 +37,7 @@ libyuv_rgb_neon_plugin_la_LIBADD = $(AM_LIBADD)
 
 libvlc_LTLIBRARIES += \
 	libaudio_format_neon_plugin.la \
+	libsimple_channel_mixer_neon_plugin.la \
 	libchroma_yuv_neon_plugin.la \
 	libvolume_neon_plugin.la \
 	libyuv_rgb_neon_plugin.la \
