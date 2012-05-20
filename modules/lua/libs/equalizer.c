@@ -265,9 +265,11 @@ static int vlclua_equalizer_setpreset( lua_State *L )
         char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
         if( !psz_af || strstr ( psz_af, "equalizer" ) == NULL )
         {
+            free( psz_af );
             vlc_object_release( p_aout );
             return 0;
         }
+        free( psz_af );
         char *newstr;
         if( asprintf( &newstr , "%6.1f" , eqz_preset_10b[presetid].f_amp[0] ) == -1 )
             return 0;
