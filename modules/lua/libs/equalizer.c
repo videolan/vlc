@@ -240,6 +240,7 @@ static int vlclua_equalizer_set( lua_State *L )
         bands[i_pos+i] = newstr[i];
     var_SetString( p_aout, "equalizer-bands", bands );
 
+    free( bands );
     vlc_object_release( p_aout );
     return 1;
 }
