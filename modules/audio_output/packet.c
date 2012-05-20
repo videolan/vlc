@@ -21,6 +21,7 @@
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
+#include <limits.h>
 #include <assert.h>
 #include <vlc_common.h>
 #include <vlc_aout.h>
@@ -141,7 +142,7 @@ void aout_PacketInit (audio_output_t *aout, aout_packet_t *p, unsigned samples)
     aout_FifoInit (&p->partial, aout->format.i_rate);
     aout_FifoInit (&p->fifo, aout->format.i_rate);
     p->pause_date = VLC_TS_INVALID;
-    p->time_report = VLC_TS_INVALID;
+    p->time_report = INT64_MIN;
     p->samples = samples;
     p->starving = true;
 }
@@ -168,10 +169,10 @@ void aout_PacketPlay (audio_output_t *aout, block_t *block)
         aout_FifoPush (&p->fifo, block);
 
     time_report = p->time_report;
-    p->time_report = VLC_TS_INVALID;
+    p->time_report = INT64_MIN;
     vlc_mutex_unlock (&p->lock);
 
-    if (time_report != VLC_TS_INVALID)
+    if (time_report != INT64_MIN)
         aout_TimeReport (aout, mdate () - time_report);
 }
 
