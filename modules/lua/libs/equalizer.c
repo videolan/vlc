@@ -206,7 +206,6 @@ static int vlclua_equalizer_set( lua_State *L )
     if( !p_input )
         return 0;
 
-    int i_pos = 0 , j = 0;
     audio_output_t *p_aout = input_GetAout( p_input );
     vlc_object_release( p_input );
     if( !p_aout )
@@ -223,26 +222,36 @@ static int vlclua_equalizer_set( lua_State *L )
 
     float level = luaL_checknumber( L, 2 );
     char *bands = var_GetString( p_aout, "equalizer-bands" );
-    char newstr[7];
-    while( j != bandid )
-    {
-        i_pos++;
-        if( bands[i_pos] == '.' )
-        {
-            i_pos++;
-            j++;
-        }
-    }
-    if( bandid != 0 )
-        i_pos++;
-    snprintf( newstr, sizeof ( newstr ) , "%6.1f", level);
-    for( int i = 0 ; i < 6 ; i++ )
-        bands[i_pos+i] = newstr[i];
-    var_SetString( p_aout, "equalizer-bands", bands );
 
+    locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
+    locale_t oldloc = uselocale (loc);
+    char *b = bands;
+    while( bandid > 0 )
+    {
+        float dummy = strtof( b, &b );
+        (void)dummy;
+        bandid--;
+    }
+    if( *b != '\0' )
+        *b++ = '\0';
+    float dummy = strtof( b, &b );
+    (void)dummy;
+
+    char *newstr;
+    if( asprintf( &newstr, "%s %.1f%s", bands, level, b ) != -1 )
+    {
+        var_SetString( p_aout, "equalizer-bands", newstr );
+        free( newstr );
+    }
+
+    if( loc != (locale_t)0 )
+    {
+        uselocale (oldloc);
+        freelocale (loc);
+    }
     free( bands );
     vlc_object_release( p_aout );
-    return 1;
+    return 0;
 }
 
 /*****************************************************************************
