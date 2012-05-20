@@ -270,19 +270,8 @@ static int vlclua_equalizer_setpreset( lua_State *L )
             return 0;
         }
         free( psz_af );
-        char *newstr;
-        if( asprintf( &newstr , "%6.1f" , eqz_preset_10b[presetid].f_amp[0] ) == -1 )
-            return 0;
-        for ( int i = 1 ; i < 10 ; i++ )
-        {
-            if( asprintf( &newstr, "%s%6.1f",newstr ,eqz_preset_10b[presetid].f_amp[i]) == -1 )
-                return 0;
-        }
-        var_SetString( p_aout, "equalizer-bands",newstr );
-        var_SetFloat( p_aout, "equalizer-preamp", eqz_preset_10b[presetid].f_preamp );
         var_SetString( p_aout , "equalizer-preset" , preset_list[presetid] );
         vlc_object_release( p_aout );
-        free( newstr );
         return 1;
     }
     return 0;
