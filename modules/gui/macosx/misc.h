@@ -1,7 +1,7 @@
 /*****************************************************************************
  * misc.h: code not specific to vlc
  *****************************************************************************
- * Copyright (C) 2003-2011 VLC authors and VideoLAN
+ * Copyright (C) 2003-2012 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -24,6 +24,22 @@
 
 #import <Cocoa/Cocoa.h>
 #import "CompatibilityFixes.h"
+
+/*****************************************************************************
+ * NSSound (VLCAdditions)
+ *
+ * added code to change the system volume, needed for the apple remote code
+ * this is simplified code, which won't let you set the exact volume
+ * (that's what the audio output is for after all), but just the system volume
+ * in steps of 1/16 (matching the default AR or volume key implementation).
+ *****************************************************************************/
+
+@interface NSSound (VLCAdditions)
++ (float)systemVolumeForChannel:(int)channel;
++ (bool)setSystemVolume:(float)volume forChannel:(int)channel;
++ (void)increaseSystemVolume;
++ (void)decreaseSystemVolume;
+@end
 
 /*****************************************************************************
  * NSAnimation (VLCAddition)

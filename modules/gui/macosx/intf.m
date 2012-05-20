@@ -1003,10 +1003,16 @@ static VLCMain *_o_sharedMainInstance = nil;
             }
             break;
         case kRemoteButtonVolume_Plus:
-            [[VLCCoreInteraction sharedInstance] volumeUp];
+            if (config_GetInt( VLCIntf, "macosx-appleremote-sysvol"))
+                [NSSound increaseSystemVolume];
+            else
+                [[VLCCoreInteraction sharedInstance] volumeUp];
             break;
         case kRemoteButtonVolume_Minus:
-            [[VLCCoreInteraction sharedInstance] volumeDown];
+            if (config_GetInt( VLCIntf, "macosx-appleremote-sysvol"))
+                [NSSound decreaseSystemVolume];
+            else
+                [[VLCCoreInteraction sharedInstance] volumeDown];
             break;
         case kRemoteButtonRight:
             [[VLCCoreInteraction sharedInstance] next];
