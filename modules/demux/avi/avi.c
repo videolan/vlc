@@ -2548,6 +2548,7 @@ static void AVI_MetaLoad( demux_t *p_demux,
         { AVIFOURCC_ICOP, vlc_meta_Copyright },
         { AVIFOURCC_IGNR, vlc_meta_Genre },
         { AVIFOURCC_INAM, vlc_meta_Title },
+        { AVIFOURCC_ICRD, vlc_meta_Date },
         { 0, -1 }
     };
     for( int i = 0; p_dsc[i].i_id != 0; i++ )
