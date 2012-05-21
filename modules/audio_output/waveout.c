@@ -31,6 +31,7 @@
 #endif
 
 #include <stdio.h>
+#include <math.h>
 #include <wchar.h>
 
 #define UNICODE
@@ -995,22 +996,21 @@ static void* WaveOutThread( void *data )
 
 static int VolumeSet( audio_output_t * p_aout, float volume, bool mute )
 {
+#ifndef UNDER_CE
+    const HWAVEOUT hwo = p_aout->sys->h_waveout;
+#else
+    const HWAVEOUT hwo = 0;
+#endif
+    const float full = 0xffff.fp0;
+
     if( mute )
         volume = 0.;
+    volume *= full;
+    if( volume >= full )
+        volume = full;
 
-    unsigned long i_waveout_vol = volume
-        * (0xFFFF * AOUT_VOLUME_DEFAULT / AOUT_VOLUME_MAX);
-
-    if( i_waveout_vol <= 0xFFFF )
-        i_waveout_vol |= i_waveout_vol << 16;
-    else
-        i_waveout_vol = 0xFFFFFFFF;
-
-#ifdef UNDER_CE
-    waveOutSetVolume( 0, i_waveout_vol );
-#else
-    waveOutSetVolume( p_aout->sys->h_waveout, i_waveout_vol );
-#endif
+    uint16_t vol = lroundf(volume);
+    waveOutSetVolume( hwo, vol | (vol << 16) );
     return 0;
 }
 
