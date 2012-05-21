@@ -1,6 +1,10 @@
 Changes between 2.0.x and 2.1.0-git:
 --------------------------------
 
+Important changes for packagers:
+ * The --with-tuning and --without-tuning options are removed. To tune
+   compilation for a specific processor type, set CFLAGS manually.
+
 3rd party libraries (contrib):
  * /extras/contrib has been replaced by a better system in /contrib
 

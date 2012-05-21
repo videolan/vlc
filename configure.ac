@@ -1482,44 +1482,6 @@ dnl - Others: test should fail
 AM_CONDITIONAL([HAVE_ALTIVEC], [test "$have_altivec" = "yes"])
 
 dnl
-dnl  Special arch tuning
-dnl
-AC_ARG_WITH(tuning,
-  [AS_HELP_STRING([--with-tuning=ARCH],
-    [tune compilation for an architecture (default varies)])])
-if test -n "${with_tuning}"; then
-    if test "${with_tuning}" != "no"; then
-        CFLAGS_TUNING="-mtune=${with_tuning}"
-    fi
-else
-    if test "${SYS}" = "darwin" -a "${host_cpu}" = "i686"; then
-        CFLAGS_TUNING="-march=prescott -mtune=generic"
-    elif test "${SYS}" = "darwin" -a "${host_cpu}" = "x86_64"; then
-        CFLAGS_TUNING="-march=core2 -mtune=core2"
-    elif test "${host_cpu}" = "i686" -o "${host_cpu}" = "i586" -o "${host_cpu}" = "i486" -o "${host_cpu}" = "i386"; then
-        CFLAGS_TUNING="-mtune=pentium2"
-    elif test "${host_cpu}" = "x86_64"; then
-        CFLAGS_TUNING="-mtune=athlon64"
-    elif test "${host_cpu}" = "powerpc"; then
-        CFLAGS_TUNING="-mtune=G4";
-    fi
-fi
-
-dnl NOTE: this can't be cached cleanly
-AS_IF([test -n "${CFLAGS_TUNING}"], [
-  VLC_SAVE_FLAGS
-  CFLAGS="${CFLAGS} ${CFLAGS_TUNING}"
-  AC_MSG_CHECKING([whether $CC accepts ${CFLAGS_TUNING}])
-  AC_COMPILE_IFELSE([AC_LANG_SOURCE([])], [
-    AC_MSG_RESULT([yes])
-  ], [
-    VLC_RESTORE_FLAGS
-    AC_MSG_RESULT([no])
-    AS_IF([test "${with_tuning}"], [AC_MSG_ERROR([requested tuning not supported])])
-  ])
-])
-
-dnl
 dnl  Memory usage
 dnl
 AC_ARG_ENABLE(optimize-memory,
