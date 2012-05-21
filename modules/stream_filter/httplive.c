@@ -210,7 +210,7 @@ static bool isHTTPLiveStreaming(stream_t *s)
         for (size_t i = 0; i < ARRAY_SIZE(ext); i++)
         {
             size_t len = strlen(ext[i]);
-            if (size < len)
+            if (size < 0 || (size_t)size < len)
                 continue;
             if (!memcmp(peek, ext[i], len))
                 return true;
