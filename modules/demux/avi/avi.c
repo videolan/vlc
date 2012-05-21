@@ -2568,6 +2568,27 @@ static void AVI_MetaLoad( demux_t *p_demux,
             vlc_meta_Set( p_meta, p_dsc[i].i_type, psz_value );
         free( psz_value );
     }
+
+    static const vlc_fourcc_t p_extra[] = {
+        AVIFOURCC_IARL, AVIFOURCC_ICMS, AVIFOURCC_ICRP, AVIFOURCC_IDIM, AVIFOURCC_IDPI,
+        AVIFOURCC_IENG, AVIFOURCC_IKEY, AVIFOURCC_ILGT, AVIFOURCC_IMED, AVIFOURCC_IPLT,
+        AVIFOURCC_IPRD, AVIFOURCC_ISBJ, AVIFOURCC_ISFT, AVIFOURCC_ISHP, AVIFOURCC_ISRC,
+        AVIFOURCC_ISRF, AVIFOURCC_ITCH, AVIFOURCC_ISMP, AVIFOURCC_IDIT, 0
+    };
+
+    for( int i = 0; p_extra[i] != 0; i++ )
+    {
+        avi_chunk_STRING_t *p_strz = AVI_ChunkFind( p_info, p_extra[i], 0 );
+        if( !p_strz )
+            continue;
+        char *psz_value = FromACP( p_strz->p_str );
+        if( !psz_value )
+            continue;
+
+        if( *psz_value )
+            vlc_meta_AddExtra( p_meta, p_strz->p_type, psz_value );
+        free( psz_value );
+    }
 }
 
 /*****************************************************************************
