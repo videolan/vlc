@@ -1973,6 +1973,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_fullscreen_window setFullscreen: YES];
         [o_fullscreen_window setBackgroundColor: [NSColor blackColor]];
         [o_fullscreen_window setCanBecomeKeyWindow: YES];
+        [o_fullscreen_window setCanBecomeMainWindow: YES];
 
         if (![o_videoWindow isVisible] || [o_videoWindow alphaValue] == 0.0)
         {
