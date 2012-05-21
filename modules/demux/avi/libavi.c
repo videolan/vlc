@@ -710,7 +710,6 @@ static const struct
     { AVIFOURCC_JUNK, AVI_ChunkRead_nothing, AVI_ChunkFree_nothing },
 
     { AVIFOURCC_IARL, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
-    { AVIFOURCC_IARL, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
     { AVIFOURCC_IART, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
     { AVIFOURCC_ICMS, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
     { AVIFOURCC_ICMT, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
@@ -735,6 +734,10 @@ static const struct
     { AVIFOURCC_ITCH, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
     { AVIFOURCC_ISMP, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
     { AVIFOURCC_IDIT, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
+    { AVIFOURCC_ILNG, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
+    { AVIFOURCC_IRTD, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
+    { AVIFOURCC_IWEB, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
+    { AVIFOURCC_IPRT, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
     { AVIFOURCC_strn, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
     { 0,           NULL,               NULL }
 };
