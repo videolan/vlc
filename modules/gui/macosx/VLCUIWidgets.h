@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import "CompatibilityFixes.h"
 #import <vlc_extensions.h>
 
 @class VLCDialogGridView;
@@ -61,7 +62,7 @@
 @end
 
 
-@interface VLCDialogList : NSTableView {
+@interface VLCDialogList : NSTableView <NSTableViewDataSource> {
     extension_widget_t *widget;
     NSMutableArray *contentArray;
 }
