@@ -56,14 +56,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if( _o_sharedInstance)
+    if( _o_sharedInstance )
     {
         [self dealloc];
         return _o_sharedInstance;
     }
     else
     {
-        o_fspanel = [[VLCFSPanel alloc] init];
         _o_sharedInstance = [super init];
     }
 
@@ -89,6 +88,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     self = [super initWithContentRect:contentRect styleMask:styleMask
                               backing:backingType defer:flag];
+    _o_sharedInstance = self;
 
     [[VLCMain sharedInstance] updateTogglePlaylistState];
 
