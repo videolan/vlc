@@ -472,7 +472,7 @@ static int InitVideo (demux_t *demux, int fd)
         sys->blocksize = fmt.fmt.pix.sizeimage;
         sys->bufv = NULL;
         entry = ReadThread;
-        msg_Dbg (demux, "reading %zu bytes at a time", sys->blocksize);
+        msg_Dbg (demux, "reading %"PRIu32" bytes at a time", sys->blocksize);
     }
     else
     {
