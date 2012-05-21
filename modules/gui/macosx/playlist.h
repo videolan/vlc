@@ -99,14 +99,6 @@
     IBOutlet id o_mi_sort_author;
     IBOutlet id o_mi_recursive_expand;
 
-    /* "services discovery" menu in the playlist menu */
-    IBOutlet id o_mi_services;
-    IBOutlet id o_mu_services;
-
-    /* "services discovery" menu in the main menu */
-    IBOutlet id o_mm_mi_services;
-    IBOutlet id o_mm_mu_services;
-
     IBOutlet id o_save_accessory_view;
     IBOutlet id o_save_accessory_popup;
     IBOutlet id o_save_accessory_text;
@@ -135,7 +127,6 @@
 
 - (BOOL)isSelectionEmpty;
 
-- (IBAction)servicesChange:(id)sender;
 - (IBAction)playItem:(id)sender;
 - (IBAction)revealItemInFinder:(id)sender;
 - (IBAction)preparseItem:(id)sender;

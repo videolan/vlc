@@ -27,8 +27,6 @@
 /* TODO
  * add 'icons' for different types of nodes? (http://www.cocoadev.com/index.pl?IconAndTextInTableCell)
  * reimplement enable/disable item
- * create a new 'tool' button (see the gear button in the Finder window) for 'actions'
-   (adding service discovery, other views, new node/playlist, save node/playlist) stuff like that
  */
 
 
@@ -51,7 +49,6 @@
 #import "open.h"
 
 #include <vlc_keys.h>
-#import <vlc_services_discovery.h>
 #import <vlc_osd.h>
 #import <vlc_interface.h>
 
@@ -464,45 +461,6 @@
     o_descendingSortingImage = [[NSOutlineView class] _defaultTableHeaderReverseSortImage];
 
     o_tc_sortColumn = nil;
-#if 0
-    char ** ppsz_name;
-    char ** ppsz_services = vlc_sd_GetNames( VLCIntf, &ppsz_name, NULL );
-    if( !ppsz_services )
-        return;
-
-    for( i = 0; ppsz_services[i]; i++ )
-    {
-        bool  b_enabled;
-        NSMenuItem  *o_lmi;
-
-        char * name = ppsz_name[i] ? ppsz_name[i] : ppsz_services[i];
-        /* Check whether to enable these menuitems */
-        b_enabled = playlist_IsServicesDiscoveryLoaded( p_playlist, ppsz_services[i] );
-
-        /* Create the menu entries used in the playlist menu */
-        o_lmi = [[o_mi_services submenu] addItemWithTitle:
-                 [NSString stringWithUTF8String: name]
-                                         action: @selector(servicesChange:)
-                                         keyEquivalent: @""];
-        [o_lmi setTarget: self];
-        [o_lmi setRepresentedObject: [NSString stringWithUTF8String: ppsz_services[i]]];
-        if( b_enabled ) [o_lmi setState: NSOnState];
-
-        /* Create the menu entries for the main menu */
-        o_lmi = [[o_mm_mi_services submenu] addItemWithTitle:
-                 [NSString stringWithUTF8String: name]
-                                         action: @selector(servicesChange:)
-                                         keyEquivalent: @""];
-        [o_lmi setTarget: self];
-        [o_lmi setRepresentedObject: [NSString stringWithUTF8String: ppsz_services[i]]];
-        if( b_enabled ) [o_lmi setState: NSOnState];
-
-        free( ppsz_services[i] );
-        free( ppsz_name[i] );
-    }
-    free( ppsz_services );
-    free( ppsz_name );
-#endif
 }
 
 - (void)searchfieldChanged:(NSNotification *)o_notification
@@ -527,8 +485,6 @@
     [[o_mm_mi_revealInFinder menu] setAutoenablesItems: NO];
     [o_mi_sort_name setTitle: _NS("Sort Node by Name")];
     [o_mi_sort_author setTitle: _NS("Sort Node by Author")];
-    [o_mi_services setTitle: _NS("Services discovery")];
-    [o_mm_mi_services setTitle: _NS("Services discovery")];
 
     [o_search_field setToolTip: _NS("Search in Playlist")];
     [o_search_field_other setToolTip: _NS("Search in Playlist")];
@@ -931,23 +887,6 @@
             playlist_AskForArtEnqueue( p_playlist, p_item->p_input );
     }
     [self playlistUpdated];
-}
-
-- (IBAction)servicesChange:(id)sender
-{
-    NSMenuItem *o_mi = (NSMenuItem *)sender;
-    NSString *o_string = [o_mi representedObject];
-    playlist_t * p_playlist = pl_Get( VLCIntf );
-    if( !playlist_IsServicesDiscoveryLoaded( p_playlist, [o_string UTF8String] ) )
-        playlist_ServicesDiscoveryAdd( p_playlist, [o_string UTF8String] );
-    else
-        playlist_ServicesDiscoveryRemove( p_playlist, [o_string UTF8String] );
-
-    [o_mi setState: playlist_IsServicesDiscoveryLoaded( p_playlist,
-                                          [o_string UTF8String] ) ? YES : NO];
-
-    [self playlistUpdated];
-    return;
 }
 
 - (IBAction)selectAll:(id)sender
