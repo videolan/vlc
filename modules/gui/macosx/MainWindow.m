@@ -2255,13 +2255,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_video_view setFrame:[o_temp_view frame]];
     if( [[o_video_view subviews] count] > 0 )
         [[o_video_view window] makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
-    if( [[o_video_view window] isVisible] )
-    {
-        if( !b_nonembedded )
+    if( !b_nonembedded )
             [super makeKeyAndOrderFront:self]; /* our version contains a workaround */
-        else
-            [[o_video_view window] makeKeyAndOrderFront: self];
-    }
+    else
+        [[o_video_view window] makeKeyAndOrderFront: self];
     [o_fullscreen_window orderOut: self];
     NSEnableScreenUpdates();
 
