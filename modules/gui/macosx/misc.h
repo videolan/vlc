@@ -84,6 +84,8 @@
 
 - (void)setCanBecomeKeyWindow: (BOOL)canBecomeKey;
 
+- (void)setCanBecomeMainWindow: (BOOL)canBecomeMain;
+
 /* animate mode is only supported in >=10.4 */
 - (void)orderFront: (id)sender animate: (BOOL)animate;
 
