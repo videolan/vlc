@@ -326,7 +326,7 @@ static ULONG APIENTRY KaiCallback( PVOID p_cb_data,
 
             next_date += p_aout_buffer->i_length;
 
-            aout_BufferFree( p_aout_buffer );
+            block_Release( p_aout_buffer );
         }
         else
         {

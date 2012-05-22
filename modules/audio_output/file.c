@@ -322,5 +322,5 @@ static void Play( audio_output_t * p_aout, block_t *p_buffer )
         p_aout->sys->waveh.DataLength += p_buffer->i_buffer;
     }
 
-    aout_BufferFree( p_buffer );
+    block_Release( p_buffer );
 }

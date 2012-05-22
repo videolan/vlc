@@ -271,7 +271,7 @@ block_t *aout_DecNewBuffer (audio_output_t *aout, size_t samples)
 void aout_DecDeleteBuffer (audio_output_t *aout, block_t *block)
 {
     (void) aout;
-    aout_BufferFree (block);
+    block_Release (block);
 }
 
 /*****************************************************************************
@@ -296,7 +296,7 @@ int aout_DecPlay (audio_output_t *p_aout, block_t *p_buffer, int i_input_rate)
     if (unlikely(input == NULL)) /* can happen due to restart */
     {
         aout_unlock( p_aout );
-        aout_BufferFree( p_buffer );
+        block_Release( p_buffer );
         return -1;
     }
 

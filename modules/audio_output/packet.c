@@ -72,7 +72,7 @@ static void aout_FifoReset( aout_fifo_t * p_fifo )
     while ( p_buffer != NULL )
     {
         aout_buffer_t * p_next = p_buffer->p_next;
-        aout_BufferFree( p_buffer );
+        block_Release( p_buffer );
         p_buffer = p_next;
     }
     p_fifo->p_first = NULL;
@@ -121,7 +121,7 @@ static void aout_FifoDestroy( aout_fifo_t * p_fifo )
     while ( p_buffer != NULL )
     {
         aout_buffer_t * p_next = p_buffer->p_next;
-        aout_BufferFree( p_buffer );
+        block_Release( p_buffer );
         p_buffer = p_next;
     }
 
@@ -294,7 +294,7 @@ static block_t *aout_OutputSlice (audio_output_t *p_aout)
             needed -= avail;
             p_out += avail;
             /* Next buffer */
-            aout_BufferFree( aout_FifoPop( p_fifo ) );
+            block_Release( aout_FifoPop( p_fifo ) );
         }
     }
     else

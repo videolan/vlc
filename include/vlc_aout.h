@@ -125,8 +125,6 @@ typedef int32_t vlc_fixed_t;
  * Main audio output structures
  *****************************************************************************/
 
-#define aout_BufferFree( buffer ) block_Release( buffer )
-
 /* Size of a frame for S/PDIF output. */
 #define AOUT_SPDIF_SIZE 6144
 

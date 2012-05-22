@@ -849,7 +849,7 @@ static int WaveOutClearDoneBuffers(aout_sys_t *p_sys)
                                     sizeof(WAVEHDR) );
 
             if( p_waveheader[i].dwUser != 1 )
-                aout_BufferFree( p_buffer );
+                block_Release( p_buffer );
 
             p_waveheader[i].dwUser = 0;
         }

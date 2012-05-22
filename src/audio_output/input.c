@@ -549,7 +549,7 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
 
 static void inputDrop( aout_input_t *p_input, aout_buffer_t *p_buffer )
 {
-    aout_BufferFree( p_buffer );
+    block_Release( p_buffer );
 
     p_input->i_buffer_lost++;
 }

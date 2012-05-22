@@ -1163,7 +1163,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
     {
         msg_Warn( p_dec, "non-dated audio buffer received" );
         *pi_lost_sum += 1;
-        aout_BufferFree( p_audio );
+        block_Release( p_audio );
         return;
     }
 
@@ -1239,7 +1239,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
         {
             msg_Dbg( p_dec, "discarded audio buffer" );
             *pi_lost_sum += 1;
-            aout_BufferFree( p_audio );
+            block_Release( p_audio );
         }
 
         if( !b_has_more )
@@ -1713,7 +1713,7 @@ static void DecoderFlushBuffering( decoder_t *p_dec )
         p_owner->buffer.p_audio = p_audio->p_next;
         p_owner->buffer.i_count--;
 
-        aout_BufferFree( p_audio );
+        block_Release( p_audio );
 
         if( !p_owner->buffer.p_audio )
             p_owner->buffer.pp_audio_next = &p_owner->buffer.p_audio;

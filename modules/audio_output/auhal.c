@@ -1321,7 +1321,7 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
                 vlc_memcpy( p_sys->p_remainder_buffer,
                             &p_buffer->p_buffer[i_second_mData_bytes],
                             p_sys->i_total_bytes );
-                aout_BufferFree( p_buffer );
+                block_Release( p_buffer );
                 break;
             }
             else
@@ -1330,7 +1330,7 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
                 current_date += (mtime_t) ( (mtime_t) 1000000 / p_aout->format.i_rate ) *
                                 ( i_second_mData_bytes / 4 / aout_FormatNbChannels( &p_aout->format )  ); // 4 is fl32 specific
             }
-            aout_BufferFree( p_buffer );
+            block_Release( p_buffer );
         }
         else
         {
@@ -1382,7 +1382,7 @@ static OSStatus RenderCallbackSPDIF( AudioDeviceID inDevice,
 
         /* move data into output data buffer */
         vlc_memcpy( BUFFER.mData, p_buffer->p_buffer, p_buffer->i_buffer );
-        aout_BufferFree( p_buffer );
+        block_Release( p_buffer );
     }
     else
     {

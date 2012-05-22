@@ -558,7 +558,7 @@ static void OSSThreadCleanup( void *data )
 {
     oss_thread_ctx_t *p_ctx = data;
     if( p_ctx->p_buffer )
-        aout_BufferFree( p_ctx->p_buffer );
+        block_Release( p_ctx->p_buffer );
     else
         free( p_ctx->p_bytes );
 }

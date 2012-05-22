@@ -300,9 +300,7 @@ int Process( jack_nframes_t i_frames, void *p_arg )
     }
 
     if( p_buffer )
-    {
-        aout_BufferFree( p_buffer );
-    }
+        block_Release( p_buffer );
     return 0;
 }
 

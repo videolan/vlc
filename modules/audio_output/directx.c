@@ -984,7 +984,7 @@ static int FillBuffer( audio_output_t *p_aout, int i_frame,
     if( dsresult != DS_OK )
     {
         msg_Warn( p_aout, "cannot lock buffer" );
-        if( p_buffer ) aout_BufferFree( p_buffer );
+        if( p_buffer ) block_Release( p_buffer );
         return VLC_EGENERIC;
     }
 
@@ -1003,7 +1003,7 @@ static int FillBuffer( audio_output_t *p_aout, int i_frame,
         }
 
         vlc_memcpy( p_write_position, p_buffer->p_buffer, l_bytes1 );
-        aout_BufferFree( p_buffer );
+        block_Release( p_buffer );
     }
 
     /* Now the data has been copied, unlock the buffer */
