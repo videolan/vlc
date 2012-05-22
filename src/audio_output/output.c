@@ -211,7 +211,7 @@ void aout_OutputDelete (audio_output_t *aout)
     aout->pf_play = aout_DecDeleteBuffer; /* gruik */
     aout->pf_pause = NULL;
     aout->pf_flush = NULL;
-    aout_VolumeNoneInit (aout);
+    aout->pf_volume_set = NULL;
     owner->module = NULL;
     aout_FiltersDestroyPipeline (owner->filters, owner->nb_filters);
 }
@@ -265,28 +265,6 @@ void aout_OutputFlush( audio_output_t *aout, bool wait )
 
 
 /*** Volume handling ***/
-
-/**
- * Dummy volume setter. This is the default volume setter.
- */
-static int aout_VolumeNoneSet (audio_output_t *aout, float volume, bool mute)
-{
-    (void)aout; (void)volume; (void)mute;
-    return -1;
-}
-
-/**
- * Configures the dummy volume setter.
- * @note Audio output plugins for which volume is irrelevant
- * should call this function during activation.
- */
-void aout_VolumeNoneInit (audio_output_t *aout)
-{
-    /* aout_New() -safely- calls this function without the lock, before any
-     * other thread knows of this audio output instance.
-    aout_assert_locked (aout); */
-    aout->pf_volume_set = aout_VolumeNoneSet;
-}
 
 /**
  * Volume setter for software volume.

@@ -233,7 +233,7 @@ static int OpenAudio( vlc_object_t *p_this )
 
         aout_PacketInit( p_aout, &p_aout->sys->packet, A52_FRAME_NB );
         p_aout->sys->volume = -1;
-        aout_VolumeNoneInit( p_aout );
+        p_aout->pf_volume_set = NULL;
     }
     else
     {

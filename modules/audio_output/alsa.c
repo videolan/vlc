@@ -526,7 +526,7 @@ static int Open (vlc_object_t *obj)
     {
         aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         aout->format.i_frame_length = A52_FRAME_NB;
-        aout_VolumeNoneInit (aout);
+        aout->pf_volume_set = NULL;
     }
     else
     {

@@ -97,7 +97,7 @@ static int commitVolume (vlc_object_t *obj, audio_output_t *aout,
 
         /* apply volume to the pipeline */
         aout_lock (aout);
-        if (owner->module != NULL)
+        if (aout->pf_volume_set != NULL)
             ret = aout->pf_volume_set (aout, vol, mute);
         aout_unlock (aout);
 

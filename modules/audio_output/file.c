@@ -194,7 +194,7 @@ static int Open( vlc_object_t * p_this )
         p_aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         p_aout->format.i_frame_length = A52_FRAME_NB;
     }
-    aout_VolumeNoneInit( p_aout );
+    p_aout->pf_volume_set = NULL;
 
     /* Channels number */
     i_channels = var_CreateGetInteger( p_this, "audiofile-channels" );
