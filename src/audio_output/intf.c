@@ -92,7 +92,6 @@ static int commitVolume (vlc_object_t *obj, audio_output_t *aout,
 
     if (aout != NULL)
     {
-        aout_owner_t *owner = aout_owner (aout);
         float vol = volume / (float)AOUT_VOLUME_DEFAULT;
 
         /* apply volume to the pipeline */
