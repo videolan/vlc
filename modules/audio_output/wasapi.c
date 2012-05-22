@@ -166,7 +166,7 @@ static void Flush(audio_output_t *aout, bool wait)
     HRESULT hr;
 
     if (wait)
-        return; /* Not drain implemented */
+        return; /* Drain not implemented */
 
     Enter();
     IAudioClient_Stop(sys->client);
