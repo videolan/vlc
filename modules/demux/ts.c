@@ -3544,7 +3544,7 @@ static char *GetAudioTypeDesc(demux_t *p_demux, int type)
     if (type < 0 || type > 3)
         msg_Dbg( p_demux, "unknown audio type: %d", type);
     else if (type > 0)
-        return strdup(audio_type[type - 1]);
+        return strdup(audio_type[type]);
 
     return NULL;
 }
