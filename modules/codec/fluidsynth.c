@@ -95,7 +95,7 @@ struct decoder_sys_t
 };
 
 
-static aout_buffer_t *DecodeBlock (decoder_t *p_dec, block_t **pp_block);
+static block_t *DecodeBlock (decoder_t *p_dec, block_t **pp_block);
 
 
 static int Open (vlc_object_t *p_this)
@@ -195,11 +195,11 @@ static void Close (vlc_object_t *p_this)
 }
 
 
-static aout_buffer_t *DecodeBlock (decoder_t *p_dec, block_t **pp_block)
+static block_t *DecodeBlock (decoder_t *p_dec, block_t **pp_block)
 {
     block_t *p_block;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    aout_buffer_t *p_out = NULL;
+    block_t *p_out = NULL;
 
     if (pp_block == NULL)
         return NULL;

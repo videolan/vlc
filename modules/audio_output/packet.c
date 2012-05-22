@@ -41,7 +41,7 @@ static void aout_FifoInit( aout_fifo_t *p_fifo, uint32_t i_rate )
 /**
  * Pushes a packet into the FIFO.
  */
-static void aout_FifoPush( aout_fifo_t * p_fifo, aout_buffer_t * p_buffer )
+static void aout_FifoPush( aout_fifo_t * p_fifo, block_t * p_buffer )
 {
     *p_fifo->pp_last = p_buffer;
     p_fifo->pp_last = &p_buffer->p_next;
@@ -65,13 +65,13 @@ static void aout_FifoPush( aout_fifo_t * p_fifo, aout_buffer_t * p_buffer )
  */
 static void aout_FifoReset( aout_fifo_t * p_fifo )
 {
-    aout_buffer_t * p_buffer;
+    block_t * p_buffer;
 
     date_Set( &p_fifo->end_date, VLC_TS_INVALID );
     p_buffer = p_fifo->p_first;
     while ( p_buffer != NULL )
     {
-        aout_buffer_t * p_next = p_buffer->p_next;
+        block_t * p_next = p_buffer->p_next;
         block_Release( p_buffer );
         p_buffer = p_next;
     }
@@ -98,9 +98,9 @@ static void aout_FifoMoveDates( aout_fifo_t *fifo, mtime_t difference )
 /**
  * Gets the next buffer out of the FIFO
  */
-static aout_buffer_t *aout_FifoPop( aout_fifo_t * p_fifo )
+static block_t *aout_FifoPop( aout_fifo_t * p_fifo )
 {
-    aout_buffer_t *p_buffer = p_fifo->p_first;
+    block_t *p_buffer = p_fifo->p_first;
     if( p_buffer != NULL )
     {
         p_fifo->p_first = p_buffer->p_next;
@@ -115,12 +115,12 @@ static aout_buffer_t *aout_FifoPop( aout_fifo_t * p_fifo )
  */
 static void aout_FifoDestroy( aout_fifo_t * p_fifo )
 {
-    aout_buffer_t * p_buffer;
+    block_t * p_buffer;
 
     p_buffer = p_fifo->p_first;
     while ( p_buffer != NULL )
     {
-        aout_buffer_t * p_next = p_buffer->p_next;
+        block_t * p_next = p_buffer->p_next;
         block_Release( p_buffer );
         p_buffer = p_next;
     }
@@ -229,7 +229,7 @@ static block_t *aout_OutputSlice (audio_output_t *p_aout)
     mtime_t start_date = date_Get( &exact_start_date );
 
     /* Check if there is enough data to slice a new buffer. */
-    aout_buffer_t *p_buffer = p_fifo->p_first;
+    block_t *p_buffer = p_fifo->p_first;
     if( p_buffer == NULL )
         return NULL;
 
@@ -266,7 +266,7 @@ static block_t *aout_OutputSlice (audio_output_t *p_aout)
 
         for( uint8_t *p_out = p_buffer->p_buffer; needed > 0; )
         {
-            aout_buffer_t *p_inbuf = p_fifo->p_first;
+            block_t *p_inbuf = p_fifo->p_first;
             if( unlikely(p_inbuf == NULL) )
             {
                 msg_Err( p_aout, "packetization error" );

@@ -118,11 +118,11 @@ static void Close( vlc_object_t *p_this )
  ****************************************************************************
  * Beware, this function must be fed with complete frames (PES packet).
  *****************************************************************************/
-static aout_buffer_t *Decode( decoder_t *p_dec, block_t **pp_block )
+static block_t *Decode( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t       *p_block;
-    aout_buffer_t *p_aout_buffer;
+    block_t       *p_aout_buffer;
     int            i_frame_length, i_bits;
 
     p_block = Parse( p_dec, &i_frame_length, &i_bits, pp_block, false );

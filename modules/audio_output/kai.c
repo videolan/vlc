@@ -284,7 +284,7 @@ static ULONG APIENTRY KaiCallback( PVOID p_cb_data,
                                    ULONG i_buf_size )
 {
     audio_output_t *p_aout = (audio_output_t *)p_cb_data;
-    aout_buffer_t  *p_aout_buffer;
+    block_t  *p_aout_buffer;
     mtime_t current_date, next_date;
     ULONG i_len;
 

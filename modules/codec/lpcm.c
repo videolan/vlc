@@ -49,7 +49,7 @@ static void CloseCommon   ( vlc_object_t * );
 #ifdef ENABLE_SOUT
 static int  OpenEncoder   ( vlc_object_t * );
 static void CloseEncoder  ( vlc_object_t * );
-static block_t *EncodeFrames( encoder_t *, aout_buffer_t * );
+static block_t *EncodeFrames( encoder_t *, block_t * );
 #endif
 
 vlc_module_begin ()
@@ -169,7 +169,7 @@ static int VobHeader( unsigned *pi_rate,
                       unsigned *pi_channels, unsigned *pi_original_channels,
                       unsigned *pi_bits,
                       const uint8_t *p_header );
-static void VobExtract( aout_buffer_t *, block_t *, unsigned i_bits );
+static void VobExtract( block_t *, block_t *, unsigned i_bits );
 /* */
 static int AobHeader( unsigned *pi_rate,
                       unsigned *pi_channels, unsigned *pi_layout,
@@ -177,7 +177,7 @@ static int AobHeader( unsigned *pi_rate,
                       unsigned *pi_padding,
                       aob_group_t g[2],
                       const uint8_t *p_header );
-static void AobExtract( aout_buffer_t *, block_t *, unsigned i_bits, aob_group_t p_group[2] );
+static void AobExtract( block_t *, block_t *, unsigned i_bits, aob_group_t p_group[2] );
 /* */
 static int BdHeader( unsigned *pi_rate,
                      unsigned *pi_channels,
@@ -185,7 +185,7 @@ static int BdHeader( unsigned *pi_rate,
                      unsigned *pi_original_channels,
                      unsigned *pi_bits,
                      const uint8_t *p_header );
-static void BdExtract( aout_buffer_t *, block_t *, unsigned, unsigned, unsigned, unsigned );
+static void BdExtract( block_t *, block_t *, unsigned, unsigned, unsigned, unsigned );
 
 
 /*****************************************************************************
@@ -387,7 +387,7 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         }
 
         /* */
-        aout_buffer_t *p_aout_buffer;
+        block_t *p_aout_buffer;
         p_aout_buffer = decoder_NewAudioBuffer( p_dec, i_frame_length );
         if( !p_aout_buffer )
             return NULL;
@@ -505,7 +505,7 @@ static void CloseEncoder ( vlc_object_t *p_this )
 /*****************************************************************************
  * EncodeFrames: encode zero or more LCPM audio packets
  *****************************************************************************/
-static block_t *EncodeFrames( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
+static block_t *EncodeFrames( encoder_t *p_enc, block_t *p_aout_buf )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
     block_t *p_first_block = NULL, *p_last_block = NULL;
@@ -911,7 +911,7 @@ static int BdHeader( unsigned *pi_rate,
     return 0;
 }
 
-static void VobExtract( aout_buffer_t *p_aout_buffer, block_t *p_block,
+static void VobExtract( block_t *p_aout_buffer, block_t *p_block,
                         unsigned i_bits )
 {
     uint8_t *p_out = p_aout_buffer->p_buffer;
@@ -975,7 +975,7 @@ static void VobExtract( aout_buffer_t *p_aout_buffer, block_t *p_block,
         memcpy( p_out, p_block->p_buffer, p_block->i_buffer );
     }
 }
-static void AobExtract( aout_buffer_t *p_aout_buffer,
+static void AobExtract( block_t *p_aout_buffer,
                         block_t *p_block, unsigned i_bits, aob_group_t p_group[2] )
 {
     const unsigned i_channels = p_group[0].i_channels +
@@ -1033,7 +1033,7 @@ static void AobExtract( aout_buffer_t *p_aout_buffer,
 
     }
 }
-static void BdExtract( aout_buffer_t *p_aout_buffer, block_t *p_block,
+static void BdExtract( block_t *p_aout_buffer, block_t *p_block,
                        unsigned i_frame_length,
                        unsigned i_channels, unsigned i_channels_padding,
                        unsigned i_bits )

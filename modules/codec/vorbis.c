@@ -151,7 +151,7 @@ static block_t *DecodeBlock  ( decoder_t *, block_t ** );
 static int  ProcessHeaders( decoder_t * );
 static void *ProcessPacket ( decoder_t *, ogg_packet *, block_t ** );
 
-static aout_buffer_t *DecodePacket  ( decoder_t *, ogg_packet * );
+static block_t *DecodePacket( decoder_t *, ogg_packet * );
 static block_t *SendPacket( decoder_t *, ogg_packet *, block_t * );
 
 static void ParseVorbisComments( decoder_t * );
@@ -161,7 +161,7 @@ static void ConfigureChannelOrder(int *, int, uint32_t, bool );
 #ifdef HAVE_VORBIS_ENCODER
 static int OpenEncoder   ( vlc_object_t * );
 static void CloseEncoder ( vlc_object_t * );
-static block_t *Encode   ( encoder_t *, aout_buffer_t * );
+static block_t *Encode   ( encoder_t *, block_t * );
 #endif
 
 /*****************************************************************************
@@ -460,7 +460,7 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     }
     else
     {
-        aout_buffer_t *p_aout_buffer = DecodePacket( p_dec, p_oggpacket );
+        block_t *p_aout_buffer = DecodePacket( p_dec, p_oggpacket );
         if( p_block )
             block_Release( p_block );
         return p_aout_buffer;
@@ -485,7 +485,7 @@ static void Interleave( INTERLEAVE_TYPE *p_out, const INTERLEAVE_TYPE **pp_in,
 /*****************************************************************************
  * DecodePacket: decodes a Vorbis packet.
  *****************************************************************************/
-static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
+static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int           i_samples;
@@ -504,7 +504,7 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
     if( ( i_samples = vorbis_synthesis_pcmout( &p_sys->vd, &pp_pcm ) ) > 0 )
     {
 
-        aout_buffer_t *p_aout_buffer;
+        block_t *p_aout_buffer;
 
         p_aout_buffer =
             decoder_NewAudioBuffer( p_dec, i_samples );
@@ -841,7 +841,7 @@ static int OpenEncoder( vlc_object_t *p_this )
  ****************************************************************************
  * This function spits out ogg packets.
  ****************************************************************************/
-static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
+static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
     ogg_packet oggpacket;

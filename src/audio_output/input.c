@@ -44,7 +44,7 @@
 
 #include "aout_internal.h"
 
-static void inputDrop( aout_input_t *, aout_buffer_t * );
+static void inputDrop( aout_input_t *, block_t * );
 static void inputResamplingStop( aout_input_t *p_input );
 
 static int VisualizationCallback( vlc_object_t *, char const *,
@@ -547,7 +547,7 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
  * static functions
  *****************************************************************************/
 
-static void inputDrop( aout_input_t *p_input, aout_buffer_t *p_buffer )
+static void inputDrop( aout_input_t *p_input, block_t *p_buffer )
 {
     block_Release( p_buffer );
 

@@ -49,11 +49,9 @@ static void CloseFilter   ( vlc_object_t * );
 
 static block_t *Convert( filter_t *p_filter, block_t *p_block );
 
-static unsigned int stereo_to_mono( filter_t *, aout_buffer_t *,
-                                    aout_buffer_t * );
-static unsigned int mono( filter_t *, aout_buffer_t *, aout_buffer_t * );
-static void stereo2mono_downmix( filter_t *, aout_buffer_t *,
-                                 aout_buffer_t * );
+static unsigned int stereo_to_mono( filter_t *, block_t *, block_t * );
+static unsigned int mono( filter_t *, block_t *, block_t * );
+static void stereo2mono_downmix( filter_t *, block_t *, block_t * );
 
 /*****************************************************************************
  * Local structures
@@ -504,7 +502,7 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
  * Written by Boris Dorès <babal@via.ecp.fr>
  */
 static void stereo2mono_downmix( filter_t * p_filter,
-                            aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+                                 block_t * p_in_buf, block_t * p_out_buf )
 {
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
 
@@ -607,7 +605,7 @@ static void stereo2mono_downmix( filter_t * p_filter,
 
 /* Simple stereo to mono mixing. */
 static unsigned int mono( filter_t *p_filter,
-                          aout_buffer_t *p_output, aout_buffer_t *p_input )
+                          block_t *p_output, block_t *p_input )
 {
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
     int16_t *p_in, *p_out;
@@ -627,7 +625,7 @@ static unsigned int mono( filter_t *p_filter,
 
 /* Simple stereo to mono mixing. */
 static unsigned int stereo_to_mono( filter_t *p_filter,
-                                    aout_buffer_t *p_output, aout_buffer_t *p_input )
+                                    block_t *p_output, block_t *p_input )
 {
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
     int16_t *p_in, *p_out;

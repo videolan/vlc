@@ -78,7 +78,7 @@ vlc_module_end ()
 static int           OpenAudio( decoder_t * );
 static int           OpenVideo( decoder_t * );
 
-static aout_buffer_t *DecodeAudio( decoder_t *, block_t ** );
+static block_t       *DecodeAudio( decoder_t *, block_t ** );
 #ifndef WIN32
 static picture_t     *DecodeVideo( decoder_t *, block_t ** );
 #endif
@@ -523,7 +523,7 @@ exit_error:
 /*****************************************************************************
  * DecodeAudio:
  *****************************************************************************/
-static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
+static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -638,7 +638,7 @@ static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
 
     if( p_sys->i_out < p_sys->i_out_frames )
     {
-        aout_buffer_t *p_out;
+        block_t *p_out;
         int  i_frames = __MIN( p_sys->i_out_frames - p_sys->i_out, 1000 );
 
         p_out = decoder_NewAudioBuffer( p_dec, i_frames );

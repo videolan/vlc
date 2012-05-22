@@ -231,9 +231,9 @@ VLC_API vout_thread_t * aout_filter_RequestVout( filter_t *, vout_thread_t *p_vo
 /** Audio output buffer FIFO */
 struct aout_fifo_t
 {
-    aout_buffer_t *         p_first;
-    aout_buffer_t **        pp_last;
-    date_t                  end_date;
+    block_t  *p_first;
+    block_t **pp_last;
+    date_t    end_date;
 };
 
 /* Legacy packet-oriented audio output helpers */

@@ -185,17 +185,17 @@ static const int pi_channels_maps[6] =
  ****************************************************************************/
 
 static block_t *DecodeBlock  ( decoder_t *, block_t ** );
-static aout_buffer_t *DecodeRtpSpeexPacket( decoder_t *, block_t **);
+static block_t *DecodeRtpSpeexPacket( decoder_t *, block_t **);
 static int  ProcessHeaders( decoder_t * );
 static int  ProcessInitialHeader ( decoder_t *, ogg_packet * );
 static void *ProcessPacket( decoder_t *, ogg_packet *, block_t ** );
 
-static aout_buffer_t *DecodePacket( decoder_t *, ogg_packet * );
+static block_t *DecodePacket( decoder_t *, ogg_packet * );
 static block_t *SendPacket( decoder_t *, block_t * );
 
 static void ParseSpeexComments( decoder_t *, ogg_packet * );
 
-static block_t *Encode   ( encoder_t *, aout_buffer_t * );
+static block_t *Encode   ( encoder_t *, block_t * );
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -555,7 +555,7 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     }
     else
     {
-        aout_buffer_t *p_aout_buffer = DecodePacket( p_dec, p_oggpacket );
+        block_t *p_aout_buffer = DecodePacket( p_dec, p_oggpacket );
 
         if( p_block )
             block_Release( p_block );
@@ -563,11 +563,11 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     }
 }
 
-static aout_buffer_t *DecodeRtpSpeexPacket( decoder_t *p_dec, block_t **pp_block )
+static block_t *DecodeRtpSpeexPacket( decoder_t *p_dec, block_t **pp_block )
 {
     block_t *p_speex_bit_block = *pp_block;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    aout_buffer_t *p_aout_buffer;
+    block_t *p_aout_buffer;
     int i_decode_ret;
     unsigned int i_speex_frame_size;
 
@@ -685,7 +685,7 @@ static aout_buffer_t *DecodeRtpSpeexPacket( decoder_t *p_dec, block_t **pp_block
 /*****************************************************************************
  * DecodePacket: decodes a Speex packet.
  *****************************************************************************/
-static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
+static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -700,7 +700,7 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
     /* Decode one frame at a time */
     if( p_sys->i_frame_in_packet < p_sys->p_header->frames_per_packet )
     {
-        aout_buffer_t *p_aout_buffer;
+        block_t *p_aout_buffer;
         if( p_sys->p_header->frame_size == 0 )
             return NULL;
 
@@ -978,7 +978,7 @@ static int OpenEncoder( vlc_object_t *p_this )
  ****************************************************************************
  * This function spits out ogg packets.
  ****************************************************************************/
-static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
+static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
     block_t *p_block, *p_chain = NULL;

@@ -56,8 +56,8 @@ struct decoder_sys_t
      * Input/Output properties
      */
     block_t *p_block;
-    aout_buffer_t *p_aout_buffer;
-    date_t        end_date;
+    block_t *p_aout_buffer;
+    date_t   end_date;
 
     /*
      * FLAC properties
@@ -96,7 +96,7 @@ static void CloseDecoder  ( vlc_object_t * );
 static int OpenEncoder   ( vlc_object_t * );
 static void CloseEncoder ( vlc_object_t * );
 
-static aout_buffer_t *DecodeBlock( decoder_t *, block_t ** );
+static block_t *DecodeBlock( decoder_t *, block_t ** );
 
 /*****************************************************************************
  * Module descriptor
@@ -523,7 +523,7 @@ static void decoder_state_error( decoder_t *p_dec,
 /****************************************************************************
  * DecodeBlock: the whole thing
  ****************************************************************************/
-static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -599,7 +599,7 @@ struct encoder_sys_t
 
 #define STREAMINFO_SIZE 38
 
-static block_t *Encode( encoder_t *, aout_buffer_t * );
+static block_t *Encode( encoder_t *, block_t * );
 
 /*****************************************************************************
  * EncoderWriteCallback: called by libflac to output encoded samples
@@ -743,7 +743,7 @@ static int OpenEncoder( vlc_object_t *p_this )
  ****************************************************************************
  * This function spits out ogg packets.
  ****************************************************************************/
-static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
+static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
     block_t *p_chain;

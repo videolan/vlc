@@ -102,9 +102,9 @@ static inline int SyncCode( const uint8_t * );
 static int  SyncInfo( const uint8_t *, bool *, unsigned int *, unsigned int *,
                       unsigned int *, unsigned int *, unsigned int * );
 
-static uint8_t       *GetOutBuffer ( decoder_t *, block_t ** );
-static aout_buffer_t *GetAoutBuffer( decoder_t * );
-static block_t       *GetSoutBuffer( decoder_t * );
+static uint8_t *GetOutBuffer ( decoder_t *, block_t ** );
+static block_t *GetAoutBuffer( decoder_t * );
+static block_t *GetSoutBuffer( decoder_t * );
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder
@@ -388,7 +388,7 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
     }
     else
     {
-        aout_buffer_t *p_aout_buffer = GetAoutBuffer( p_dec );
+        block_t *p_aout_buffer = GetAoutBuffer( p_dec );
         p_buf = p_aout_buffer ? p_aout_buffer->p_buffer : NULL;
         *pp_out_buffer = p_aout_buffer;
     }
@@ -399,10 +399,10 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
 /*****************************************************************************
  * GetAoutBuffer:
  *****************************************************************************/
-static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
+static block_t *GetAoutBuffer( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    aout_buffer_t *p_buf;
+    block_t *p_buf;
 
     /* Hack for DTS S/PDIF filter which needs to send 3 frames at a time
      * (plus a few header bytes) */

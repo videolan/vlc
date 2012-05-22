@@ -140,7 +140,7 @@ int aout_FiltersCreatePipeline( vlc_object_t *, filter_t **, int *,
 #define aout_FiltersCreatePipeline(o, pv, pc, inf, outf) \
         aout_FiltersCreatePipeline(VLC_OBJECT(o), pv, pc, inf, outf)
 void aout_FiltersDestroyPipeline( filter_t *const *, unsigned );
-void aout_FiltersPlay( filter_t *const *, unsigned, aout_buffer_t ** );
+void aout_FiltersPlay( filter_t *const *, unsigned, block_t ** );
 
 /* From mixer.c : */
 #define aout_MixerNew(o, f) aout_MixerNew(VLC_OBJECT(o), f)
@@ -163,7 +163,7 @@ static inline void aout_ReplayGainInit(audio_replay_gain_t *restrict d,
 /* From output.c : */
 int aout_OutputNew( audio_output_t * p_aout,
                     const audio_sample_format_t * p_format );
-void aout_OutputPlay( audio_output_t * p_aout, aout_buffer_t * p_buffer );
+void aout_OutputPlay( audio_output_t * p_aout, block_t * p_buffer );
 void aout_OutputPause( audio_output_t * p_aout, bool, mtime_t );
 void aout_OutputFlush( audio_output_t * p_aout, bool );
 void aout_OutputDelete( audio_output_t * p_aout );

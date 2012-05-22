@@ -263,7 +263,7 @@ int Process( jack_nframes_t i_frames, void *p_arg )
     mtime_t play_date = mdate() + (mtime_t) ( dtime );
 
     /* Get the next audio data buffer */
-    aout_buffer_t *p_buffer = aout_PacketNext( p_aout, play_date );
+    block_t *p_buffer = aout_PacketNext( p_aout, play_date );
 
     if( p_buffer != NULL )
     {

@@ -41,7 +41,7 @@
 static int  OpenDecoder( vlc_object_t * );
 static void CloseDecoder( vlc_object_t * );
 
-static aout_buffer_t *DecodeBlock( decoder_t *, block_t ** );
+static block_t *DecodeBlock( decoder_t *, block_t ** );
 
 vlc_module_begin ()
     set_description( N_("ADPCM audio decoder") )
@@ -264,7 +264,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 /*****************************************************************************
  * DecodeBlock:
  *****************************************************************************/
-static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys  = p_dec->p_sys;
     block_t *p_block;
@@ -290,7 +290,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( p_block->i_buffer >= p_sys->i_block )
     {
-        aout_buffer_t *p_out;
+        block_t *p_out;
 
         p_out = decoder_NewAudioBuffer( p_dec, p_sys->i_samplesperblock );
         if( p_out == NULL )

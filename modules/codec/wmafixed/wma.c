@@ -71,7 +71,7 @@ static unsigned int pi_channels_maps[7] =
 static int  OpenDecoder   ( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 
-static aout_buffer_t *DecodeFrame  ( decoder_t *, block_t ** );
+static block_t *DecodeFrame( decoder_t *, block_t ** );
 
 /*****************************************************************************
  * Module descriptor
@@ -89,11 +89,11 @@ vlc_module_end();
  * SplitBuffer: Needed because aout really doesn't like big audio chunk and
  * wma produces easily > 30000 samples...
  *****************************************************************************/
-static aout_buffer_t *SplitBuffer( decoder_t *p_dec )
+static block_t *SplitBuffer( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     unsigned int i_samples = __MIN( p_sys->i_samples, 2048 );
-    aout_buffer_t *p_buffer;
+    block_t *p_buffer;
 
     if( i_samples == 0 ) return NULL;
 
@@ -191,11 +191,11 @@ static int OpenDecoder( vlc_object_t *p_this )
 /*****************************************************************************
  * DecodeFrame: decodes a wma frame.
  *****************************************************************************/
-static aout_buffer_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
+static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t       *p_block;
-    aout_buffer_t *p_aout_buffer = NULL;
+    block_t       *p_aout_buffer = NULL;
 
     if( !pp_block || !*pp_block ) return NULL;
 

@@ -92,7 +92,7 @@ static int  OpenGeneric( vlc_object_t *, bool b_encode );
 static void CloseGeneric( vlc_object_t * );
 
 static picture_t *DecodeVideo( decoder_t *, block_t ** );
-static aout_buffer_t *DecodeAudio ( decoder_t *, block_t ** );
+static block_t *DecodeAudio ( decoder_t *, block_t ** );
 static block_t *EncodeVideo( encoder_t *, picture_t * );
 
 static OMX_ERRORTYPE OmxEventHandler( OMX_HANDLETYPE, OMX_PTR, OMX_EVENTTYPE,
@@ -1376,10 +1376,10 @@ reconfig:
 /*****************************************************************************
  * DecodeAudio: Called to decode one frame
  *****************************************************************************/
-aout_buffer_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
+block_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    aout_buffer_t *p_buffer = 0;
+    block_t *p_buffer = NULL;
     OMX_BUFFERHEADERTYPE *p_header;
     OMX_ERRORTYPE omx_error;
     block_t *p_block;

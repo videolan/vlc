@@ -550,7 +550,7 @@ static mtime_t BufferDuration( audio_output_t * p_aout )
 
 typedef struct
 {
-    aout_buffer_t *p_buffer;
+    block_t *p_buffer;
     void          *p_bytes;
 } oss_thread_ctx_t;
 
@@ -574,7 +574,7 @@ static void* OSSThread( void *obj )
 
     for( ;; )
     {
-        aout_buffer_t * p_buffer = NULL;
+        block_t * p_buffer = NULL;
 
         int canc = vlc_savecancel ();
         if ( p_aout->format.i_format != VLC_CODEC_SPDIFL )

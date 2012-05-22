@@ -1304,7 +1304,7 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
     while( i_mData_bytes < ioData->mBuffers[0].mDataByteSize )
     {
         /* We don't have enough data yet */
-        aout_buffer_t * p_buffer;
+        block_t * p_buffer;
         p_buffer = aout_PacketNext( p_aout, current_date );
 
         if( p_buffer != NULL )
@@ -1353,7 +1353,7 @@ static OSStatus RenderCallbackSPDIF( AudioDeviceID inDevice,
                                     const AudioTimeStamp * inOutputTime,
                                     void * threadGlobals )
 {
-    aout_buffer_t * p_buffer;
+    block_t * p_buffer;
     mtime_t         current_date;
 
     audio_output_t * p_aout = (audio_output_t *)threadGlobals;

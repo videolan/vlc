@@ -136,9 +136,9 @@ static int Open ( vlc_object_t *p_this )
 /*****************************************************************************
   * aout_FifoPop : get the next buffer out of the FIFO
   *****************************************************************************/
-static aout_buffer_t *aout_FifoPop2( aout_fifo_t * p_fifo )
+static block_t *aout_FifoPop2( aout_fifo_t * p_fifo )
  {
-     aout_buffer_t *p_buffer = p_fifo->p_first;
+     block_t *p_buffer = p_fifo->p_first;
      if( p_buffer != NULL )
      {
          p_fifo->p_first = p_buffer->p_next;
@@ -167,7 +167,7 @@ static void Close ( vlc_object_t *p_this )
 
 void AudioQueueCallback(void * inUserData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
     audio_output_t * p_aout = (audio_output_t *)inUserData;
-    aout_buffer_t *   p_buffer = NULL;
+    block_t *   p_buffer = NULL;
 
     if (p_aout) {
         struct aout_sys_t * p_sys = p_aout->sys;

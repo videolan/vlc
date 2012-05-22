@@ -44,7 +44,7 @@
  ****************************************************************************/
 static int OpenEncoder   ( vlc_object_t * );
 static void CloseEncoder ( vlc_object_t * );
-static block_t *Encode   ( encoder_t *, aout_buffer_t * );
+static block_t *Encode   ( encoder_t *, block_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -258,7 +258,7 @@ static void Bufferize( encoder_t *p_enc, int16_t *p_in, int i_nb_samples )
                              * sizeof(int16_t) );
 }
 
-static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
+static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
     int16_t *p_buffer = (int16_t *)p_aout_buf->p_buffer;

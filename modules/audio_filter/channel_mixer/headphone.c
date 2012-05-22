@@ -330,7 +330,7 @@ static int Init( vlc_object_t *p_this, struct filter_sys_t * p_data
  * DoWork: convert a buffer
  *****************************************************************************/
 static void DoWork( filter_t * p_filter,
-                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+                    block_t * p_in_buf, block_t * p_out_buf )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     int i_input_nb = aout_FormatNbChannels( &p_filter->fmt_in.audio );

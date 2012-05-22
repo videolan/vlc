@@ -57,7 +57,7 @@ struct encoder_sys_t
 static int  OpenEncoder   ( vlc_object_t * );
 static void CloseEncoder  ( vlc_object_t * );
 
-static block_t *EncodeFrame  ( encoder_t *, aout_buffer_t * );
+static block_t *EncodeFrame  ( encoder_t *, block_t * );
 
 vlc_module_begin();
     set_category( CAT_INPUT );
@@ -137,7 +137,7 @@ enomem:
 }
 
 /* We split/pack PCM blocks to a fixed size: pcm_chunk_size bytes */
-static block_t *GetPCM( encoder_t *p_enc, aout_buffer_t *p_block )
+static block_t *GetPCM( encoder_t *p_enc, block_t *p_block )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
     block_t *p_pcm_block;
@@ -200,7 +200,7 @@ buffered:
     return block_FifoCount( p_sys->p_fifo ) > 0 ? block_FifoGet( p_sys->p_fifo ) : NULL;
 }
 
-static block_t *EncodeFrame( encoder_t *p_enc, aout_buffer_t *p_block )
+static block_t *EncodeFrame( encoder_t *p_enc, block_t *p_block )
 {
     block_t *p_pcm_block;
     block_t *p_chain = NULL;

@@ -51,7 +51,7 @@ vlc_module_end ()
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static aout_buffer_t *DecodeBlock( decoder_t *, block_t ** );
+static block_t *DecodeBlock( decoder_t *, block_t ** );
 static void DoReordering( uint32_t *, uint32_t *, int, int, uint32_t * );
 
 #define MAX_CHANNEL_POSITIONS 9
@@ -199,7 +199,7 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * DecodeBlock:
  *****************************************************************************/
-static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_block;
@@ -314,7 +314,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         void *samples;
         faacDecFrameInfo frame;
-        aout_buffer_t *p_out;
+        block_t *p_out;
         int i, j;
 
         samples = faacDecDecode( p_sys->hfaad, &frame,

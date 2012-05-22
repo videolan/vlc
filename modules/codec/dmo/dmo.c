@@ -274,7 +274,7 @@ found:
     /* Set callbacks */
     p_dec->pf_decode_video = (picture_t *(*)(decoder_t *, block_t **))
         DecodeBlock;
-    p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))
+    p_dec->pf_decode_audio = (block_t *(*)(decoder_t *, block_t **))
         DecodeBlock;
 
     vlc_mutex_init( &p_sys->lock );
@@ -979,7 +979,7 @@ static void *DecBlock( decoder_t *p_dec, block_t **pp_block )
     }
     else
     {
-        aout_buffer_t *p_aout_buffer;
+        block_t *p_aout_buffer;
         int i_samples = block_out.i_buffer /
             ( p_dec->fmt_out.audio.i_bitspersample *
               p_dec->fmt_out.audio.i_channels / 8 );
@@ -1094,7 +1094,7 @@ static int EncoderOpen( vlc_object_t *p_this )
     /* Set callbacks */
     p_enc->pf_encode_video = (block_t *(*)(encoder_t *, picture_t *))
         EncodeBlock;
-    p_enc->pf_encode_audio = (block_t *(*)(encoder_t *, aout_buffer_t *))
+    p_enc->pf_encode_audio = (block_t *(*)(encoder_t *, block_t *))
         EncodeBlock;
 
     return VLC_SUCCESS;
@@ -1543,7 +1543,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
     }
     else
     {
-        aout_buffer_t *p_aout_buffer = (aout_buffer_t *)p_data;
+        block_t *p_aout_buffer = (block_t *)p_data;
         p_block_in = block_New( p_enc, p_aout_buffer->i_buffer );
         memcpy( p_block_in->p_buffer, p_aout_buffer->p_buffer,
                 p_block_in->i_buffer );

@@ -63,7 +63,7 @@ static int OpenWaveOut   ( audio_output_t *, uint32_t,
 static int OpenWaveOutPCM( audio_output_t *, uint32_t,
                            vlc_fourcc_t*, int, int, int, bool );
 static int PlayWaveOut   ( audio_output_t *, HWAVEOUT, WAVEHDR *,
-                           aout_buffer_t *, bool );
+                           block_t *, bool );
 
 static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR );
 static void* WaveOutThread( void * );
@@ -738,8 +738,7 @@ static int OpenWaveOutPCM( audio_output_t *p_aout, uint32_t i_device_id,
  * PlayWaveOut: play a buffer through the WaveOut device
  *****************************************************************************/
 static int PlayWaveOut( audio_output_t *p_aout, HWAVEOUT h_waveout,
-                        WAVEHDR *p_waveheader, aout_buffer_t *p_buffer,
-                        bool b_spdif)
+                        WAVEHDR *p_waveheader, block_t *p_buffer, bool b_spdif)
 {
     MMRESULT result;
 
@@ -842,8 +841,8 @@ static int WaveOutClearDoneBuffers(aout_sys_t *p_sys)
         if( (p_waveheader[i].dwFlags & WHDR_DONE) &&
             p_waveheader[i].dwUser )
         {
-            aout_buffer_t *p_buffer =
-                    (aout_buffer_t *)(p_waveheader[i].dwUser);
+            block_t *p_buffer =
+                    (block_t *)(p_waveheader[i].dwUser);
             /* Unprepare and free the buffers which has just been played */
             waveOutUnprepareHeader( p_sys->h_waveout, &p_waveheader[i],
                                     sizeof(WAVEHDR) );
@@ -874,7 +873,7 @@ static void* WaveOutThread( void *data )
 {
     audio_output_t *p_aout = data;
     aout_sys_t *p_sys = p_aout->sys;
-    aout_buffer_t *p_buffer = NULL;
+    block_t *p_buffer = NULL;
     WAVEHDR *p_waveheader = p_sys->waveheader;
     int i, i_queued_frames;
     bool b_sleek;

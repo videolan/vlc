@@ -39,7 +39,7 @@
  * Local prototypes
  *****************************************************************************/
 static int Create( vlc_object_t * );
-static void DoWork( audio_mixer_t *, aout_buffer_t *, float );
+static void DoWork( audio_mixer_t *, block_t *, float );
 
 /*****************************************************************************
  * Module descriptor
@@ -69,7 +69,7 @@ static int Create( vlc_object_t *p_this )
 /**
  * Mixes a new output buffer
  */
-static void DoWork( audio_mixer_t * p_mixer, aout_buffer_t *p_buffer,
+static void DoWork( audio_mixer_t * p_mixer, block_t *p_buffer,
                     float f_multiplier )
 {
     if( f_multiplier == 1.0 )

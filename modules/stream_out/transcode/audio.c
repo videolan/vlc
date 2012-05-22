@@ -45,7 +45,7 @@ static const int pi_channels_maps[6] =
      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
 };
 
-static aout_buffer_t *audio_new_buffer( decoder_t *p_dec, int i_samples )
+static block_t *audio_new_buffer( decoder_t *p_dec, int i_samples )
 {
     block_t *p_block;
     int i_size;

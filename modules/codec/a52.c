@@ -91,9 +91,9 @@ struct decoder_sys_t
  ****************************************************************************/
 static block_t *DecodeBlock  ( decoder_t *, block_t ** );
 
-static uint8_t       *GetOutBuffer ( decoder_t *, block_t ** );
-static aout_buffer_t *GetAoutBuffer( decoder_t * );
-static block_t       *GetSoutBuffer( decoder_t * );
+static uint8_t *GetOutBuffer ( decoder_t *, block_t ** );
+static block_t *GetAoutBuffer( decoder_t * );
+static block_t *GetSoutBuffer( decoder_t * );
 
 /*****************************************************************************
  * OpenCommon: probe the decoder/packetizer and return score
@@ -367,7 +367,7 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
     }
     else
     {
-        aout_buffer_t *p_aout_buffer = GetAoutBuffer( p_dec );
+        block_t *p_aout_buffer = GetAoutBuffer( p_dec );
         p_buf = p_aout_buffer ? p_aout_buffer->p_buffer : NULL;
         *pp_out_buffer = p_aout_buffer;
     }
@@ -378,11 +378,11 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
 /*****************************************************************************
  * GetAoutBuffer:
  *****************************************************************************/
-static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
+static block_t *GetAoutBuffer( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    aout_buffer_t *p_buf = decoder_NewAudioBuffer( p_dec, p_sys->frame.i_samples );
+    block_t *p_buf = decoder_NewAudioBuffer( p_dec, p_sys->frame.i_samples );
     if( p_buf )
     {
         p_buf->i_pts = date_Get( &p_sys->end_date );

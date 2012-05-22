@@ -66,7 +66,7 @@ int  OpenEncoder ( vlc_object_t * );
 void CloseEncoder( vlc_object_t * );
 
 static block_t *EncodeVideo( encoder_t *, picture_t * );
-static block_t *EncodeAudio( encoder_t *, aout_buffer_t * );
+static block_t *EncodeAudio( encoder_t *, block_t * );
 
 struct thread_context_t;
 
@@ -1065,7 +1065,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 /****************************************************************************
  * EncodeAudio: the whole thing
  ****************************************************************************/
-static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
+static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
 

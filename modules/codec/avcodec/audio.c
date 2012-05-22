@@ -225,11 +225,11 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
  * SplitBuffer: Needed because aout really doesn't like big audio chunk and
  * wma produces easily > 30000 samples...
  *****************************************************************************/
-static aout_buffer_t *SplitBuffer( decoder_t *p_dec )
+static block_t *SplitBuffer( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_samples = __MIN( p_sys->i_samples, 4096 );
-    aout_buffer_t *p_buffer;
+    block_t *p_buffer;
 
     if( i_samples == 0 ) return NULL;
 
@@ -256,11 +256,11 @@ static aout_buffer_t *SplitBuffer( decoder_t *p_dec )
 /*****************************************************************************
  * DecodeAudio: Called to decode one frame
  *****************************************************************************/
-aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
+block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_used, i_output;
-    aout_buffer_t *p_buffer;
+    block_t *p_buffer;
     block_t *p_block;
     AVPacket pkt;
 

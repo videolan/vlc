@@ -59,7 +59,7 @@ static block_t *Filter( filter_t *, block_t * );
  * DoWork: convert a buffer
  *****************************************************************************/
 static void DoWork( filter_t * p_filter,
-                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+                    block_t * p_in_buf, block_t * p_out_buf )
 {
     const unsigned i_input_physical = p_filter->fmt_in.audio.i_physical_channels;
 

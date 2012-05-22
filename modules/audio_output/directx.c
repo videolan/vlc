@@ -105,7 +105,7 @@ static int  CreateDSBuffer    ( audio_output_t *, int, int, int, int, int, bool 
 static int  CreateDSBufferPCM ( audio_output_t *, vlc_fourcc_t*, int, int, int, bool );
 static void DestroyDSBuffer   ( audio_output_t * );
 static void* DirectSoundThread( void * );
-static int  FillBuffer        ( audio_output_t *, int, aout_buffer_t * );
+static int  FillBuffer        ( audio_output_t *, int, block_t * );
 
 static int ReloadDirectXDevices( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
@@ -949,8 +949,7 @@ static void DestroyDSBuffer( audio_output_t *p_aout )
  *****************************************************************************
  * Returns VLC_SUCCESS on success.
  *****************************************************************************/
-static int FillBuffer( audio_output_t *p_aout, int i_frame,
-                       aout_buffer_t *p_buffer )
+static int FillBuffer( audio_output_t *p_aout, int i_frame, block_t *p_buffer )
 {
     aout_sys_t *p_sys = p_aout->sys;
     notification_thread_t *p_notif = &p_sys->notif;
@@ -1099,7 +1098,7 @@ static void* DirectSoundThread( void *data )
 
         for( i = 0; i < l_free_slots; i++ )
         {
-            aout_buffer_t *p_buffer = aout_PacketNext( p_aout,
+            block_t *p_buffer = aout_PacketNext( p_aout,
                 mtime + INT64_C(1000000) * (i * i_frame_siz + l_queued) /
                 p_aout->format.i_rate );
 

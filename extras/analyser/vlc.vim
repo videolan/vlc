@@ -53,7 +53,7 @@ function VlcSyntax()
   syn keyword cType es_format_t video_palette_t
   " Aout
   syn keyword cType audio_output_t aout_sys_t
-  syn keyword cType aout_fifo_t aout_input_t aout_buffer_t audio_sample_format_t
+  syn keyword cType aout_fifo_t aout_input_t audio_sample_format_t
   syn keyword cType aout_mixer_sys_t aout_filter_sys_t audio_volume_t
   syn keyword cType aout_mixer_t aout_output_t audio_date_t 
   syn keyword cType aout_filter_t

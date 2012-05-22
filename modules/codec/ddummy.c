@@ -95,7 +95,7 @@ static int OpenDecoderCommon( vlc_object_t *p_this, bool b_force_dump )
     /* Set callbacks */
     p_dec->pf_decode_video = (picture_t *(*)(decoder_t *, block_t **))
         DecodeBlock;
-    p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))
+    p_dec->pf_decode_audio = (block_t *(*)(decoder_t *, block_t **))
         DecodeBlock;
     p_dec->pf_decode_sub = (subpicture_t *(*)(decoder_t *, block_t **))
         DecodeBlock;

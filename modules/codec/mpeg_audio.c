@@ -75,9 +75,9 @@ struct decoder_sys_t
 
 /* This isn't the place to put mad-specific stuff. However, it makes the
  * mad plug-in's life much easier if we put 8 extra bytes at the end of the
- * buffer, because that way it doesn't have to copy the aout_buffer_t to a
- * bigger buffer. This has no implication on other plug-ins, and we only
- * lose 8 bytes per frame. --Meuuh */
+ * buffer, because that way it doesn't have to copy the block_t to a bigger
+ * buffer. This has no implication on other plug-ins, and we only lose 8 bytes
+ * per frame. --Meuuh */
 #define MAD_BUFFER_GUARD 8
 #define MPGA_HEADER_SIZE 4
 
@@ -89,9 +89,9 @@ static int  OpenPacketizer( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 static block_t *DecodeBlock  ( decoder_t *, block_t ** );
 
-static uint8_t       *GetOutBuffer ( decoder_t *, block_t ** );
-static aout_buffer_t *GetAoutBuffer( decoder_t * );
-static block_t       *GetSoutBuffer( decoder_t * );
+static uint8_t *GetOutBuffer ( decoder_t *, block_t ** );
+static block_t *GetAoutBuffer( decoder_t * );
+static block_t *GetSoutBuffer( decoder_t * );
 
 static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
                      unsigned int * pi_channels_conf,
@@ -516,7 +516,7 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
     }
     else
     {
-        aout_buffer_t *p_aout_buffer = GetAoutBuffer( p_dec );
+        block_t *p_aout_buffer = GetAoutBuffer( p_dec );
         p_buf = p_aout_buffer ? p_aout_buffer->p_buffer : NULL;
         *pp_out_buffer = p_aout_buffer;
     }
@@ -527,10 +527,10 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
 /*****************************************************************************
  * GetAoutBuffer:
  *****************************************************************************/
-static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
+static block_t *GetAoutBuffer( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    aout_buffer_t *p_buf;
+    block_t *p_buf;
 
     p_buf = decoder_NewAudioBuffer( p_dec, p_sys->i_frame_length );
     if( p_buf == NULL ) return NULL;

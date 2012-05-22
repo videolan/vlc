@@ -71,7 +71,7 @@ struct decoder_t
 
     /* */
     picture_t *         ( * pf_decode_video )( decoder_t *, block_t ** );
-    aout_buffer_t *     ( * pf_decode_audio )( decoder_t *, block_t ** );
+    block_t *           ( * pf_decode_audio )( decoder_t *, block_t ** );
     subpicture_t *      ( * pf_decode_sub)   ( decoder_t *, block_t ** );
     block_t *           ( * pf_packetize )   ( decoder_t *, block_t ** );
 
@@ -110,7 +110,7 @@ struct decoder_t
 
     /* Audio output callbacks
      * XXX use decoder_NewAudioBuffer/decoder_DeleteAudioBuffer */
-    aout_buffer_t  *(*pf_aout_buffer_new)( decoder_t *, int );
+    block_t        *(*pf_aout_buffer_new)( decoder_t *, int );
 
     /* SPU output callbacks
      * XXX use decoder_NewSubpicture and decoder_DeleteSubpicture */
@@ -162,7 +162,7 @@ struct encoder_t
     es_format_t         fmt_out;
 
     block_t *           ( * pf_encode_video )( encoder_t *, picture_t * );
-    block_t *           ( * pf_encode_audio )( encoder_t *, aout_buffer_t * );
+    block_t *           ( * pf_encode_audio )( encoder_t *, block_t * );
     block_t *           ( * pf_encode_sub )( encoder_t *, subpicture_t * );
 
     /* Common encoder options */
@@ -209,7 +209,7 @@ VLC_API void decoder_UnlinkPicture( decoder_t *, picture_t * );
  * output buffer. You have to release it using decoder_DeleteAudioBuffer
  * or by returning it to the caller as a pf_decode_audio return value.
  */
-VLC_API aout_buffer_t * decoder_NewAudioBuffer( decoder_t *, int i_size ) VLC_USED;
+VLC_API block_t * decoder_NewAudioBuffer( decoder_t *, int i_size ) VLC_USED;
 
 /**
  * This function will return a new subpicture usable by a decoder as an output
