@@ -421,16 +421,18 @@ AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
     AC_MSG_CHECKING(for broken mingw-runtime)
     AC_PREPROC_IFELSE([AC_LANG_SOURCE([
 #include <_mingw.h>
-#if (__MINGW32_MAJOR_VERSION == 3) && (__MINGW32_MINOR_VERSION < 15)
-#ifndef __MINGW64_VERSION_MAJOR
+#if defined(__MINGW64_VERSION_MAJOR)
+# if __MINGW64_VERSION_MAJOR < 3
+#  error Attempting to use mingw-runtime with broken vsnprintf and direct2d support
+# endif
+#elif __MINGW32_MAJOR_VERSION == 3 && __MINGW32_MINOR_VERSION < 15
 # error Attempting to use mingw-runtime with broken vsnprintf support
-#endif
 #endif
     ])], [
         AC_MSG_RESULT([ok])
     ], [
         AC_MSG_RESULT([present])
-        AC_MSG_ERROR([LibVLC requires mingw-runtime version 3.15 or higher!])
+        AC_MSG_ERROR([LibVLC requires mingw-runtime version 3.15 or higher, or mingw-w64 version 3.0 or higher!])
     ])
     dnl force use of mingw provided c99 *printf over msvcrt
     CPPFLAGS="${CPPFLAGS} -D__USE_MINGW_ANSI_STDIO=1"
