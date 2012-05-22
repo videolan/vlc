@@ -75,12 +75,7 @@
 #ifdef __MINGW32__
 # include <_mingw.h>
 
-# if defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR < 3
-#  undef  IDirect3DDeviceManager9_Release
-#  define IDirect3DDeviceManager9_Release(This) (This)->lpVtbl->Release(This)
-# endif
-
-# if !defined(__MINGW64_VERSION_MAJOR) || __MINGW64_VERSION_MAJOR < 3
+# if !defined(__MINGW64_VERSION_MAJOR)
 #  undef MS_GUID
 #  define MS_GUID DEFINE_GUID /* dxva2api.h fails to declare those, redefine as static */
 #  define DXVA2_E_NEW_VIDEO_DEVICE MAKE_HRESULT(1, 4, 4097)

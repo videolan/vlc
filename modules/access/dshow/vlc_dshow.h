@@ -39,13 +39,7 @@
 #include <ksmedia.h>
 #include <ddraw.h>
 
-#ifdef __MINGW64_VERSION_MAJOR
-
-#if __MINGW64_VERSION_MAJOR < 3
-DEFINE_GUID(MEDIASUBTYPE_I420,0x30323449,0x0000,0x0010,0x80,0x00,0x00,0xaa,0x00,0x38,0x9b,0x71);
-#endif
-
-#else /* !__MINGW64_VERSION_MAJOR */
+#ifndef __MINGW64_VERSION_MAJOR
 
 #include <dshow.h>
 
