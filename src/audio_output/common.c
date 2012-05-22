@@ -75,6 +75,8 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
     vlc_value_t val, text;
     char *str;
 
+    var_Create (aout, "volume", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    var_Create (aout, "mute", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     var_Create (aout, "intf-change", VLC_VAR_VOID);
 
     /* Visualizations */

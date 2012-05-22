@@ -286,8 +286,6 @@ void aout_VolumeNoneInit (audio_output_t *aout)
      * other thread knows of this audio output instance.
     aout_assert_locked (aout); */
     aout->pf_volume_set = aout_VolumeNoneSet;
-    var_Destroy (aout, "volume");
-    var_Destroy (aout, "mute");
 }
 
 /**
@@ -322,8 +320,8 @@ static int aout_VolumeSoftSet (audio_output_t *aout, float volume, bool mute)
  */
 void aout_VolumeSoftInit (audio_output_t *aout)
 {
-    audio_volume_t volume = var_InheritInteger (aout, "volume");
-    bool mute = var_InheritBool (aout, "mute");
+    audio_volume_t volume = var_GetInteger (aout, "volume");
+    bool mute = var_GetBool (aout, "mute");
 
     aout_assert_locked (aout);
     aout->pf_volume_set = aout_VolumeSoftSet;
@@ -341,14 +339,12 @@ void aout_VolumeHardInit (audio_output_t *aout, aout_volume_cb setter,
 {
     aout_assert_locked (aout);
     aout->pf_volume_set = setter;
-    var_Create (aout, "volume", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT);
-    var_Create (aout, "mute", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
 
     if (restore)
     {
-        float vol = var_InheritInteger (aout, "volume")
+        float vol = var_GetInteger (aout, "volume")
                   / (float)AOUT_VOLUME_DEFAULT;
-        setter (aout, vol, var_InheritBool (aout, "mute"));
+        setter (aout, vol, var_GetBool (aout, "mute"));
     }
 }
 
