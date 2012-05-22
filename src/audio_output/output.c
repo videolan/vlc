@@ -213,6 +213,7 @@ void aout_OutputDelete (audio_output_t *aout)
     aout->pf_flush = NULL;
     aout->pf_volume_set = NULL;
     owner->module = NULL;
+    owner->volume.multiplier = 1.0;
     aout_FiltersDestroyPipeline (owner->filters, owner->nb_filters);
 }
 
