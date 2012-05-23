@@ -330,7 +330,7 @@ int RarParse(stream_t *s, int *count, rar_file_t ***file)
         }
 
         /* */
-        int has_next = 1;
+        int has_next = -1;
         for (;;) {
             rar_block_t bk;
             int ret;
@@ -353,8 +353,8 @@ int RarParse(stream_t *s, int *count, rar_file_t ***file)
             if (ret)
                 break;
         }
-        if (has_next < 0)
-            has_next = *count > 0 && !(*file)[*count -1]->is_complete;
+        if (has_next < 0 && *count > 0 && !(*file)[*count -1]->is_complete)
+            has_next = 1;
         if (vol != s)
             stream_Delete(vol);
 
@@ -391,7 +391,12 @@ int RarParse(stream_t *s, int *count, rar_file_t ***file)
 
         if (!volume_mrl)
             return VLC_SUCCESS;
+
+        const int s_flags = s->i_flags;
+        if (has_next < 0)
+            s->i_flags |= OBJECT_FLAGS_NOINTERACT;
         vol = stream_UrlNew(s, volume_mrl);
+        s->i_flags = s_flags;
 
         if (!vol) {
             free(volume_mrl);
