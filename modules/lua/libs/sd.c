@@ -220,19 +220,23 @@ static int vlclua_sd_add_item( lua_State *L )
         lua_getfield( L, -1, "path" );
         if( lua_isstring( L, -1 ) )
         {
-            char **ppsz_options = NULL;
-            int i_options = 0;
             const char *psz_path = lua_tostring( L, -1 );
 
-            lua_pop( L, 1 );
-            vlclua_read_options( p_sd, L, &i_options, &ppsz_options );
-            lua_getfield( L, -1, "title" );
+            lua_getfield( L, -2, "title" );
             const char *psz_title = luaL_checkstring( L, -1 ) ? luaL_checkstring( L, -1 ) : psz_path;
+
+            /* The table must be at the top of the stack when calling
+             * vlclua_read_options() */
+            char **ppsz_options = NULL;
+            int i_options = 0;
+            lua_pushvalue( L, -3 );
+            vlclua_read_options( p_sd, L, &i_options, &ppsz_options );
+
             input_item_t *p_input = input_item_NewExt( psz_path, psz_title,
                                                        i_options,
                                                        (const char **)ppsz_options,
                                                        VLC_INPUT_OPTION_TRUSTED, -1 );
-            lua_pop( L, 1 );
+            lua_pop( L, 3 );
 
             if( p_input )
             {
@@ -310,16 +314,21 @@ static int vlclua_node_add_subitem( lua_State *L )
             lua_getfield( L, -1, "path" );
             if( lua_isstring( L, -1 ) )
             {
+                const char *psz_path = lua_tostring( L, -1 );
+
+                /* The table must be at the top of the stack when calling
+                 * vlclua_read_options() */
                 char **ppsz_options = NULL;
                 int i_options = 0;
-                const char *psz_path = lua_tostring( L, -1 );
+                lua_pushvalue( L, -2 );
                 vlclua_read_options( p_sd, L, &i_options, &ppsz_options );
+
                 input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
                 input_item_t *p_input = input_item_NewExt( psz_path,
                                                            psz_path, i_options,
                                                            (const char **)ppsz_options,
                                                            VLC_INPUT_OPTION_TRUSTED, -1 );
-                lua_pop( L, 1 );
+                lua_pop( L, 2 );
 
                 if( p_input )
                 {
