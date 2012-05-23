@@ -440,7 +440,7 @@ static es_out_id_t *esOutAdd( es_out_t *p_out, const es_format_t *p_fmt )
             if ( likely(p_pair != NULL) ) {
                 p_pair->i_id = p_fmt->i_id;
                 p_pair->p_es = p_es;
-                msg_Err( p_out->p_sys->p_demux, "Adding ES %d", p_fmt->i_id );
+                msg_Info( p_out->p_sys->p_demux, "Adding ES %d", p_fmt->i_id );
                 vlc_array_append(&p_sys->es, p_pair);
             }
         }
