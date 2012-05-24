@@ -24,14 +24,21 @@ $(function () {
         value: 50,
         min: 0,
         max: 100,
+        start: function (event, ui) {
+            $("#volumeSlider").data( 'clicked', true );
+        },
         stop: function (event, ui) {
             $("#currentVolume").empty().append(ui.value * 2 + "%");
             sendCommand({
                 'command': 'volume',
                 'val': Math.round(ui.value * 5.12)
             })
+            $("#volumeSlider").data( 'clicked', false );
         }
     });
+    /* To ensure that updateStatus() doesn't interfere while use is
+     * sliding on the control. */
+    $("#volumeSlider").data( 'clicked', false );
     $('#buttonStop').click(function () {
         switch (current_que) {
         case 'main':

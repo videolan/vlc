@@ -21,9 +21,12 @@ function updateStatus() {
                     value: toFloat($('position', data).text()) * 100
                 });
                 $('#currentVolume').append(Math.round($('volume', data).text() / 2.56) + '%');
-                $('#volumeSlider').slider({
-                    value: ($('volume', data).text() / 5.12)
-                });
+                /* Don't interfere with the user's action */
+                if (!$('#volumeSlider').data('clicked')) {
+                    $('#volumeSlider').slider({
+                        value: ($('volume', data).text() / 5.12)
+                    });
+                }
                 $('#rateSlider').slider({
                     value: ($('rate', data).text())
                 });
