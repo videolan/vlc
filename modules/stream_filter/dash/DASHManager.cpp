@@ -36,12 +36,15 @@ using namespace dash::buffer;
 
 DASHManager::DASHManager    ( MPD *mpd,
                               IAdaptationLogic::LogicType type, stream_t *stream) :
+             conManager     ( NULL ),
              currentChunk   ( NULL ),
              adaptationLogic( NULL ),
              logicType      ( type ),
              mpdManager     ( NULL ),
              mpd            ( mpd ),
-             stream         (stream)
+             stream         ( stream ),
+             downloader     ( NULL ),
+             buffer         ( NULL )
 {
 }
 DASHManager::~DASHManager   ()
