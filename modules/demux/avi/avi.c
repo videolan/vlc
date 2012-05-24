@@ -335,13 +335,13 @@ static int Open( vlc_object_t * p_this )
 
     if( !p_hdrl || !p_movi )
     {
-        msg_Err( p_demux, "avi module discarded (invalid file)" );
+        msg_Err( p_demux, "invalid file: cannot find hdrl or movi chunks" );
         goto error;
     }
 
     if( !( p_avih = AVI_ChunkFind( p_hdrl, AVIFOURCC_avih, 0 ) ) )
     {
-        msg_Err( p_demux, "cannot find avih chunk" );
+        msg_Err( p_demux, "invalid file: cannot find avih chunk" );
         goto error;
     }
     i_track = AVI_ChunkCount( p_hdrl, AVIFOURCC_strl );

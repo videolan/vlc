@@ -418,7 +418,8 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
 #endif
             break;
         default:
-            msg_Warn( (vlc_object_t*)s, "unknown stream type" );
+            msg_Warn( (vlc_object_t*)s, "unknown stream type: %4.4s",
+                    (char*)&p_strh->strh.i_type );
             p_chk->strf.common.i_cat = UNKNOWN_ES;
             break;
     }
@@ -817,7 +818,8 @@ int  _AVI_ChunkRead( stream_t *s, avi_chunk_t *p_chk, avi_chunk_t *p_father )
         p_chk->common.i_chunk_fourcc = AVIFOURCC_indx;
         return AVI_ChunkRead_indx( s, p_chk );
     }
-    msg_Warn( (vlc_object_t*)s, "unknown chunk (not loaded)" );
+    msg_Warn( (vlc_object_t*)s, "unknown chunk: %4.4s (not loaded)",
+            (char*)&p_chk->common.i_chunk_fourcc );
     return AVI_NextChunk( s, p_chk );
 }
 
@@ -853,7 +855,8 @@ void _AVI_ChunkFree( stream_t *s,
     }
     else
     {
-        msg_Warn( (vlc_object_t*)s, "unknown chunk (not unloaded)" );
+        msg_Warn( (vlc_object_t*)s, "unknown chunk: %4.4s (not unloaded)",
+                (char*)&p_chk->common.i_chunk_fourcc );
     }
     p_chk->common.p_first = NULL;
     p_chk->common.p_last  = NULL;
