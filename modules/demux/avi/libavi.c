@@ -113,7 +113,7 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
     const uint8_t *p_peek;
     bool b_seekable;
 
-    if( p_container->common.i_chunk_size > 0 && p_container->common.i_chunk_size < 8 )
+    if( p_container->common.i_chunk_size > 0 && p_container->common.i_chunk_size < 4 )
     {
         /* empty box */
         msg_Warn( (vlc_object_t*)s, "empty list chunk" );
