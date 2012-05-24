@@ -57,6 +57,9 @@
 #elif defined( HAVE_MAEMO )
 # define DEFAULT_FONT_FILE "/usr/share/fonts/nokia/nosnb.ttf"
 # define DEFAULT_FAMILY "Nokia Sans Bold"
+#elif defined( __ANDROID__ )
+# define DEFAULT_FONT_FILE "/system/fonts/DroidSans-Bold.ttf"
+# define DEFAULT_FAMILY "Droid Sans Bold"
 #else
 # define DEFAULT_FONT_FILE "/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf"
 # define DEFAULT_FAMILY "Serif Bold"
