@@ -17,9 +17,11 @@ function updateStatus() {
                 $('#mediaTitle').append($('[name="filename"]', data).text());
                 $('#totalTime').append(format_time($('length', data).text()));
                 $('#currentTime').append(format_time($('time', data).text()));
-                $('#seekSlider').slider({
-                    value: toFloat($('position', data).text()) * 100
-                });
+                if (!$('#seekSlider').data('clicked')) {
+                    $('#seekSlider').slider({
+                        value: toFloat($('position', data).text()) * 100
+                    });
+                }
                 $('#currentVolume').append(Math.round($('volume', data).text() / 2.56) + '%');
                 /* Don't interfere with the user's action */
                 if (!$('#volumeSlider').data('clicked')) {

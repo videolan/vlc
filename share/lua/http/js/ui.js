@@ -4,6 +4,9 @@ $(function () {
         value: 0,
         min: 0,
         max: 100,
+        start: function (event, ui) {
+            $("#seekSlider").data( 'clicked', true );
+        },
         stop: function (event, ui) {
             $("#currentTime").empty().append(format_time(Math.round((ui.value / 100) * $('#seekSlider').attr('totalLength'))));
             switch (current_que) {
@@ -17,6 +20,7 @@ $(function () {
                 sendVLMCmd('control Current seek ' + ui.value);
                 break;
             }
+            $("#seekSlider").data( 'clicked', false );
         }
     });
     $("#volumeSlider").slider({
@@ -36,8 +40,9 @@ $(function () {
             $("#volumeSlider").data( 'clicked', false );
         }
     });
-    /* To ensure that updateStatus() doesn't interfere while use is
-     * sliding on the control. */
+    /* To ensure that updateStatus() doesn't interfere while the user
+     * slides the controls. */
+    $("#seekSlider").data( 'clicked', false );
     $("#volumeSlider").data( 'clicked', false );
     $('#buttonStop').click(function () {
         switch (current_que) {
