@@ -23,6 +23,11 @@ ifdef HAVE_WINCE
 	$(APPLY) $(SRC)/iconv/libiconv-wince.patch
 	$(APPLY) $(SRC)/iconv/libiconv-wince-hack.patch
 endif
+ifdef HAVE_ANDROID
+	$(APPLY) $(SRC)/iconv/libiconv-android.patch
+endif
+	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub build-aux
+	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub libcharset/build-aux
 	$(MOVE)
 
 .iconv: iconv
