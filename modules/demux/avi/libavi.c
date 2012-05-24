@@ -867,23 +867,22 @@ void _AVI_ChunkFree( stream_t *s,
 static void AVI_ChunkDumpDebug_level( vlc_object_t *p_obj,
                                       avi_chunk_t  *p_chk, unsigned i_level )
 {
-    unsigned i;
     avi_chunk_t *p_child;
 
     char str[512];
-    if( i_level >= (sizeof(str) - 1)/5 )
+    if( i_level >= (sizeof(str) - 1)/4 )
         return;
 
     memset( str, ' ', sizeof( str ) );
-    for( i = 1; i < i_level; i++ )
+    for( unsigned i = 1; i < i_level; i++ )
     {
-        str[i * 5] = '|';
+        str[i * 4] = '|';
     }
     if( p_chk->common.i_chunk_fourcc == AVIFOURCC_RIFF ||
         p_chk->common.i_chunk_fourcc == AVIFOURCC_ON2  ||
         p_chk->common.i_chunk_fourcc == AVIFOURCC_LIST )
     {
-        snprintf( &str[i_level * 5], sizeof(str) - 5*i_level,
+        snprintf( &str[i_level * 4], sizeof(str) - 4*i_level,
                  "%c %4.4s-%4.4s size:%"PRIu64" pos:%"PRIu64,
                  i_level ? '+' : '*',
                  (char*)&p_chk->common.i_chunk_fourcc,
@@ -893,7 +892,7 @@ static void AVI_ChunkDumpDebug_level( vlc_object_t *p_obj,
     }
     else
     {
-        snprintf( &str[i_level * 5], sizeof(str) - 5*i_level,
+        snprintf( &str[i_level * 4], sizeof(str) - 4*i_level,
                  "+ %4.4s size:%"PRIu64" pos:%"PRIu64,
                  (char*)&p_chk->common.i_chunk_fourcc,
                  p_chk->common.i_chunk_size,
