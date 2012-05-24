@@ -613,6 +613,21 @@ static int AVI_ChunkRead_vprp( stream_t *s, avi_chunk_t *p_chk )
     AVI_READCHUNK_EXIT( VLC_SUCCESS );
 }
 
+static int AVI_ChunkRead_dmlh( stream_t *s, avi_chunk_t *p_chk )
+{
+    avi_chunk_dmlh_t *p_dmlh = (avi_chunk_dmlh_t*)p_chk;
+
+    AVI_READCHUNK_ENTER;
+
+    AVI_READ4BYTES( p_dmlh->dwTotalFrames );
+
+#ifdef AVI_DEBUG
+    msg_Dbg( (vlc_object_t*)s, "dmlh: dwTotalFrames %d",
+             p_dmlh->dwTotalFrames );
+#endif
+    AVI_READCHUNK_EXIT( VLC_SUCCESS );
+}
+
 static const struct
 {
     vlc_fourcc_t i_fourcc;
@@ -724,6 +739,7 @@ static const struct
     { AVIFOURCC_indx, AVI_ChunkRead_indx, AVI_ChunkFree_indx },
     { AVIFOURCC_vprp, AVI_ChunkRead_vprp, AVI_ChunkFree_nothing },
     { AVIFOURCC_JUNK, AVI_ChunkRead_nothing, AVI_ChunkFree_nothing },
+    { AVIFOURCC_dmlh, AVI_ChunkRead_dmlh, AVI_ChunkFree_nothing },
 
     { AVIFOURCC_IARL, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
     { AVIFOURCC_IART, AVI_ChunkRead_strz, AVI_ChunkFree_strz },

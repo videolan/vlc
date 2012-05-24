@@ -171,6 +171,12 @@ typedef struct avi_chunk_vprp_s
 
 } avi_chunk_vprp_t;
 
+typedef struct avi_chunk_dmlh_s
+{
+    AVI_CHUNK_COMMON
+    uint32_t dwTotalFrames;
+} avi_chunk_dmlh_t;
+
 
 #define AVI_INDEX_OF_INDEXES    0x00
 #define AVI_INDEX_OF_CHUNKS     0x01
@@ -281,6 +287,7 @@ void    AVI_ChunkFreeRoot( stream_t *, avi_chunk_t  *p_chk );
 #define AVIFOURCC_strn         VLC_FOURCC('s','t','r','n')
 #define AVIFOURCC_indx         VLC_FOURCC('i','n','d','x')
 #define AVIFOURCC_vprp         VLC_FOURCC('v','p','r','p')
+#define AVIFOURCC_dmlh         VLC_FOURCC('d','m','l','h')
 
 #define AVIFOURCC_rec          VLC_FOURCC('r','e','c',' ')
 #define AVIFOURCC_auds         VLC_FOURCC('a','u','d','s')
