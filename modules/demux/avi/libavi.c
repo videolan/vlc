@@ -67,8 +67,7 @@ static int AVI_ChunkReadCommon( stream_t *s, avi_chunk_t *p_chk )
 
 #ifdef AVI_DEBUG
     msg_Dbg( (vlc_object_t*)s,
-             "found Chunk fourcc:%8.8x (%4.4s) size:%"PRId64" pos:%"PRId64,
-             p_chk->common.i_chunk_fourcc,
+             "found chunk, fourcc: %4.4s size:%"PRId64" pos:%"PRId64,
              (char*)&p_chk->common.i_chunk_fourcc,
              p_chk->common.i_chunk_size,
              p_chk->common.i_chunk_pos );
@@ -790,6 +789,7 @@ int  AVI_ChunkRead( stream_t *s, avi_chunk_t *p_chk, avi_chunk_t *p_father )
 
     if( !p_chk )
     {
+        msg_Warn( (vlc_object_t*)s, "cannot read null chunk" );
         return VLC_EGENERIC;
     }
 
@@ -798,6 +798,7 @@ int  AVI_ChunkRead( stream_t *s, avi_chunk_t *p_chk, avi_chunk_t *p_father )
         msg_Warn( (vlc_object_t*)s, "cannot read one chunk" );
         return VLC_EGENERIC;
     }
+
     if( p_chk->common.i_chunk_fourcc == VLC_FOURCC( 0, 0, 0, 0 ) )
     {
         msg_Warn( (vlc_object_t*)s, "found null fourcc chunk (corrupted file?)" );
@@ -818,6 +819,7 @@ int  AVI_ChunkRead( stream_t *s, avi_chunk_t *p_chk, avi_chunk_t *p_father )
         p_chk->common.i_chunk_fourcc = AVIFOURCC_indx;
         return AVI_ChunkRead_indx( s, p_chk );
     }
+
     msg_Warn( (vlc_object_t*)s, "unknown chunk: %4.4s (not loaded)",
             (char*)&p_chk->common.i_chunk_fourcc );
     return AVI_NextChunk( s, p_chk );
