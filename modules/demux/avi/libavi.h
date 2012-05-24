@@ -240,10 +240,10 @@ typedef union avi_chunk_u
 /****************************************************************************
  * Stream(input) access functions
  ****************************************************************************/
-int     _AVI_ChunkRead( stream_t *,
+int     AVI_ChunkRead( stream_t *,
                         avi_chunk_t *p_chk,
                         avi_chunk_t *p_father );
-void    _AVI_ChunkFree( stream_t *, avi_chunk_t * );
+void    AVI_ChunkFree( stream_t *, avi_chunk_t * );
 
 int     _AVI_ChunkCount( avi_chunk_t *, vlc_fourcc_t );
 void   *_AVI_ChunkFind ( avi_chunk_t *, vlc_fourcc_t, int );
@@ -251,17 +251,12 @@ void   *_AVI_ChunkFind ( avi_chunk_t *, vlc_fourcc_t, int );
 int     AVI_ChunkReadRoot( stream_t *, avi_chunk_t *p_root );
 void    AVI_ChunkFreeRoot( stream_t *, avi_chunk_t  *p_chk );
 
-#define AVI_ChunkRead( s, p_chk, p_father ) \
-    _AVI_ChunkRead( s, p_chk, (avi_chunk_t*)p_father )
 #define AVI_ChunkCount( p_chk, i_fourcc ) \
-    _AVI_ChunkCount( (avi_chunk_t*)p_chk, i_fourcc )
+    _AVI_ChunkCount( AVI_CHUNK(p_chk), i_fourcc )
 #define AVI_ChunkFind( p_chk, i_fourcc, i_number ) \
-    _AVI_ChunkFind( (avi_chunk_t*)p_chk, i_fourcc, i_number )
-#define AVI_ChunkFree( a, b ) \
-    _AVI_ChunkFree( (a), (avi_chunk_t*)(b) )
+    _AVI_ChunkFind( AVI_CHUNK(p_chk), i_fourcc, i_number )
 
-
-    /* *** avi stuff *** */
+/* *** avi stuff *** */
 
 #define AVIFOURCC_RIFF         VLC_FOURCC('R','I','F','F')
 #define AVIFOURCC_ON2          VLC_FOURCC('O','N','2',' ')

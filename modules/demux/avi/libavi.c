@@ -784,7 +784,7 @@ static int AVI_ChunkFunctionFind( vlc_fourcc_t i_fourcc )
     }
 }
 
-int  _AVI_ChunkRead( stream_t *s, avi_chunk_t *p_chk, avi_chunk_t *p_father )
+int  AVI_ChunkRead( stream_t *s, avi_chunk_t *p_chk, avi_chunk_t *p_father )
 {
     int i_index;
 
@@ -823,7 +823,7 @@ int  _AVI_ChunkRead( stream_t *s, avi_chunk_t *p_chk, avi_chunk_t *p_father )
     return AVI_NextChunk( s, p_chk );
 }
 
-void _AVI_ChunkFree( stream_t *s,
+void AVI_ChunkFree( stream_t *s,
                      avi_chunk_t *p_chk )
 {
     int i_index;
