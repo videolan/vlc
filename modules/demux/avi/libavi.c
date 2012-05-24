@@ -416,6 +416,9 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
                      p_chk->strf.vids.p_bih->biBitCount );
 #endif
             break;
+        case( AVIFOURCC_txts ):
+            p_chk->strf.common.i_cat = SPU_ES;
+            break;
         default:
             msg_Warn( (vlc_object_t*)s, "unknown stream type: %4.4s",
                     (char*)&p_strh->strh.i_type );

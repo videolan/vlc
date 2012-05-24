@@ -2718,9 +2718,9 @@ exit:
         block_Release( p_block );
 
     if( p_attachment )
-        msg_Dbg( p_demux, "Loaded an embed subtitle" );
+        msg_Dbg( p_demux, "Loaded an embedded subtitle" );
     else
-        msg_Warn( p_demux, "Failed to load an embed subtitle" );
+        msg_Warn( p_demux, "Failed to load an embedded subtitle" );
 
     if( p_indx == &ck.indx )
         AVI_ChunkFree( p_demux->s, &ck );
