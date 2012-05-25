@@ -45,8 +45,8 @@
  * Merge (line blending) routines
  *****************************************************************************/
 
-void MergeGeneric( void *_p_dest, const void *_p_s1,
-                   const void *_p_s2, size_t i_bytes )
+void Merge8BitGeneric( void *_p_dest, const void *_p_s1,
+                       const void *_p_s2, size_t i_bytes )
 {
     uint8_t* p_dest = (uint8_t*)_p_dest;
     const uint8_t *p_s1 = (const uint8_t *)_p_s1;
@@ -71,6 +71,31 @@ void MergeGeneric( void *_p_dest, const void *_p_s1,
     {
         *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
     }
+}
+
+void Merge16BitGeneric( void *_p_dest, const void *_p_s1,
+                        const void *_p_s2, size_t i_bytes )
+{
+    uint16_t* p_dest = (uint16_t*)_p_dest;
+    const uint16_t *p_s1 = (const uint16_t *)_p_s1;
+    const uint16_t *p_s2 = (const uint16_t *)_p_s2;
+    uint16_t* p_end = p_dest + (i_bytes/2) - 4;
+
+    while( p_dest < p_end )
+    {
+        *p_dest++ = ( (uint32_t)(*p_s1++) + (uint32_t)(*p_s2++) ) >> 1;
+        *p_dest++ = ( (uint32_t)(*p_s1++) + (uint32_t)(*p_s2++) ) >> 1;
+        *p_dest++ = ( (uint32_t)(*p_s1++) + (uint32_t)(*p_s2++) ) >> 1;
+        *p_dest++ = ( (uint32_t)(*p_s1++) + (uint32_t)(*p_s2++) ) >> 1;
+    }
+
+    p_end += 4;
+
+    while( p_dest < p_end )
+    {
+        *p_dest++ = ( (uint32_t)(*p_s1++) + (uint32_t)(*p_s2++) ) >> 1;
+    }
+
 }
 
 #if defined(CAN_COMPILE_MMXEXT)
@@ -246,7 +271,7 @@ void MergeNEON (void *restrict out, const void *in1,
 
     if (mis)
     {
-        MergeGeneric (outp, in1p, in2p, mis);
+        Merge8BitGeneric (outp, in1p, in2p, mis);
         outp += mis;
         in1p += mis;
         in2p += mis;
@@ -291,7 +316,7 @@ void MergeNEON (void *restrict out, const void *in1,
                   "q8", "q9", "q10", "q11", "memory");
     n &= 15;
     if (n)
-        MergeGeneric (outp, in1p, in2p, n);
+        Merge8BitGeneric (outp, in1p, in2p, n);
 }
 #endif
 

@@ -41,18 +41,7 @@
 
    Note that you'll need to include vlc_filter.h and deinterlace.h
    to use these.
-*/
-#define Merge p_filter->p_sys->pf_merge
-#define EndMerge if(p_filter->p_sys->pf_end_merge) p_filter->p_sys->pf_end_merge
 
-/*****************************************************************************
- * Merge routines
- *****************************************************************************/
-
-/**
- * Generic routine to blend pixels from two picture lines.
- * No inline assembler acceleration.
- *
  * Note that the Open() call of the deinterlace filter automatically selects
  * the most appropriate merge routine based on the CPU capabilities.
  * You can call the most appropriate version automatically, from a function
@@ -65,11 +54,25 @@
  * Macro syntax:
  *   Merge( _p_dest, _p_s1, _p_s2, i_bytes );
  *
- * See also the EndMerge() macro, which must be called after the merge is
- * finished, if the Merge() macro was used to perform the merge.
- *
- * i_bytes > 0; no other restrictions. This holds for all versions of the
+  * i_bytes > 0; no other restrictions. This holds for all versions of the
  * merge routine.
+ *
+ */
+#define Merge p_filter->p_sys->pf_merge
+
+/*
+ * EndMerge() macro, which must be called after the merge is
+ * finished, if the Merge() macro was used to perform the merge.
+ */
+#define EndMerge if(p_filter->p_sys->pf_end_merge) p_filter->p_sys->pf_end_merge
+
+/*****************************************************************************
+ * Merge routines
+ *****************************************************************************/
+
+/**
+ * Generic routine to blend 8 bit pixels from two picture lines.
+ * No inline assembler acceleration.
  *
  * @param _p_dest Target line. Blend result = (A + B)/2.
  * @param _p_s1 Source line A.
@@ -77,8 +80,21 @@
  * @param i_bytes Number of bytes to merge.
  * @see Open()
  */
-void MergeGeneric( void *_p_dest, const void *_p_s1, const void *_p_s2,
-                   size_t i_bytes );
+void Merge8BitGeneric( void *_p_dest, const void *_p_s1, const void *_p_s2,
+                       size_t i_bytes );
+
+/**
+ * Generic routine to blend 16 bit pixels from two picture lines.
+ * No inline assembler acceleration.
+ *
+ * @param _p_dest Target line. Blend result = (A + B)/2.
+ * @param _p_s1 Source line A.
+ * @param _p_s2 Source line B.
+ * @param i_bytes Number of *bytes* to merge.
+ * @see Open()
+ */
+void Merge16BitGeneric( void *_p_dest, const void *_p_s1, const void *_p_s2,
+                        size_t i_bytes );
 
 #if defined(CAN_COMPILE_C_ALTIVEC)
 /**
