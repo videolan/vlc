@@ -35,6 +35,7 @@
 #import "VideoView.h"
 #import "CoreInteraction.h"
 #import "MainMenu.h"
+#import "MainWindow.h"
 
 #import <vlc_common.h>
 #import <vlc_keys.h>
@@ -172,6 +173,11 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     }
     else
         [super keyDown: o_event];
+}
+
+- (BOOL)performKeyEquivalent:(NSEvent *)o_event
+{
+    return [[VLCMainWindow sharedInstance] performKeyEquivalent: o_event];
 }
 
 - (void)mouseDown:(NSEvent *)o_event

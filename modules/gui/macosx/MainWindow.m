@@ -102,14 +102,39 @@ static VLCMainWindow *_o_sharedInstance = nil;
     return self;
 }
 
+- (BOOL)isEvent:(NSEvent *)o_event forKey:(const char *)keyString
+{
+    char *key;
+    NSString *o_key;
+
+    key = config_GetPsz( VLCIntf, keyString );
+    o_key = [NSString stringWithFormat:@"%s", key];
+    FREENULL( key );
+
+    unsigned int i_keyModifiers = [[VLCMain sharedInstance] VLCModifiersToCocoa:o_key];
+
+    return [[[o_event charactersIgnoringModifiers] lowercaseString] isEqualToString: [[VLCMain sharedInstance] VLCKeyToString: o_key]] && 
+            (i_keyModifiers & NSShiftKeyMask)     == ([o_event modifierFlags] & NSShiftKeyMask) && 
+            (i_keyModifiers & NSControlKeyMask)   == ([o_event modifierFlags] & NSControlKeyMask) && 
+            (i_keyModifiers & NSAlternateKeyMask) == ([o_event modifierFlags] & NSAlternateKeyMask) && 
+            (i_keyModifiers & NSCommandKeyMask)   == ([o_event modifierFlags] & NSCommandKeyMask);
+}
+
 - (BOOL)performKeyEquivalent:(NSEvent *)o_event
 {
-    /* We indeed want to prioritize Cocoa key equivalent against libvlc,
-     so we perform the menu equivalent now. */
-    if([[NSApp mainMenu] performKeyEquivalent:o_event])
-        return TRUE;
+    // these are key events which should be handled by vlc core, but are attached to a main menu item
+    if( ![self isEvent: o_event forKey: "key-vol-up"] &&
+        ![self isEvent: o_event forKey: "key-vol-down"] &&
+        ![self isEvent: o_event forKey: "key-vol-mute"] )
+    {
+        /* We indeed want to prioritize some Cocoa key equivalent against libvlc,
+         so we perform the menu equivalent now. */
+        if([[NSApp mainMenu] performKeyEquivalent:o_event])
+            return TRUE;
+    }
 
-    return [[VLCMain sharedInstance] hasDefinedShortcutKey:o_event] || [(VLCControls *)[[VLCMain sharedInstance] controls] keyEvent:o_event];
+    return [[VLCMain sharedInstance] hasDefinedShortcutKey:o_event] ||
+           [(VLCControls *)[[VLCMain sharedInstance] controls] keyEvent:o_event];
 }
 
 - (void)dealloc
