@@ -220,7 +220,7 @@ void MergeNEON (void *restrict out, const void *in1,
     uint8_t *outp = out;
     const uint8_t *in1p = in1;
     const uint8_t *in2p = in2;
-    size_t mis = ((uintptr_t)outp) & 15;
+    size_t mis = __MIN((16 - ((uintptr_t)outp & 15)) & 15, n);
 
     if (mis)
     {
