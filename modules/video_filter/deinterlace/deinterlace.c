@@ -254,6 +254,7 @@ void GetOutputFormat( filter_t *p_filter,
         case DEINTERLACE_PHOSPHOR:
         case DEINTERLACE_IVTC:
         case DEINTERLACE_DISCARD:
+        case DEINTERLACE_BOB:
             p_dst->i_chroma = p_src->i_chroma;
             break;
         default:
@@ -460,11 +461,11 @@ picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
             break;
 
         case DEINTERLACE_BOB:
-            RenderBob( p_filter, p_dst[0], p_pic, !b_top_field_first );
+            RenderBob( p_dst[0], p_pic, !b_top_field_first );
             if( p_dst[1] )
-                RenderBob( p_filter, p_dst[1], p_pic, b_top_field_first );
+                RenderBob( p_dst[1], p_pic, b_top_field_first );
             if( p_dst[2] )
-                RenderBob( p_filter, p_dst[2], p_pic, !b_top_field_first );
+                RenderBob( p_dst[2], p_pic, !b_top_field_first );
             break;;
 
         case DEINTERLACE_LINEAR:

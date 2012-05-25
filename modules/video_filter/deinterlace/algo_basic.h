@@ -59,15 +59,13 @@ void RenderDiscard( picture_t *p_outpic, picture_t *p_pic, int i_field );
  *
  * For a 1x (non-doubling) near-equivalent, see RenderDiscard().
  *
- * @param p_filter The filter instance. Must be non-NULL.
  * @param p_outpic Output frame. Must be allocated by caller.
  * @param p_pic Input frame. Must exist.
  * @param i_field Render which field? 0 = top field, 1 = bottom field.
  * @see RenderLinear()
  * @see Deinterlace()
  */
-void RenderBob( filter_t *p_filter,
-                picture_t *p_outpic, picture_t *p_pic, int i_field );
+void RenderBob( picture_t *p_outpic, picture_t *p_pic, int i_field );
 
 /**
  * RenderLinear: Bob with linear interpolation.
