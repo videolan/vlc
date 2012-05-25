@@ -636,9 +636,9 @@ int Open( vlc_object_t *p_this )
     else
 #endif
 #if defined(CAN_COMPILE_SSE)
-    if( chroma->pixel_size == 1 && (vlc_CPU() & CPU_CAPABILITY_SSE2) )
+    if( (vlc_CPU() & CPU_CAPABILITY_SSE2) )
     {
-        p_sys->pf_merge = MergeSSE2;
+        p_sys->pf_merge = chroma->pixel_size == 1 ? Merge8BitSSE2 : Merge16BitSSE2;
         p_sys->pf_end_merge = EndMMX;
     }
     else
