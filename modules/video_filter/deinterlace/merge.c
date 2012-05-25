@@ -48,65 +48,34 @@
 void Merge8BitGeneric( void *_p_dest, const void *_p_s1,
                        const void *_p_s2, size_t i_bytes )
 {
-    uint8_t* p_dest = (uint8_t*)_p_dest;
-    const uint8_t *p_s1 = (const uint8_t *)_p_s1;
-    const uint8_t *p_s2 = (const uint8_t *)_p_s2;
-    uint8_t* p_end = p_dest + i_bytes - 8;
+    uint8_t *p_dest = _p_dest;
+    const uint8_t *p_s1 = _p_s1;
+    const uint8_t *p_s2 = _p_s2;
 
-    while( p_dest < p_end )
-    {
-        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
-        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
-        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
-        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
-        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
-        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
-        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
-        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
-    }
-
-    p_end += 8;
-
-    while( p_dest < p_end )
-    {
-        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
-    }
+    for( ; i_bytes > 0; i_bytes-- )
+        *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
 }
 
 void Merge16BitGeneric( void *_p_dest, const void *_p_s1,
                         const void *_p_s2, size_t i_bytes )
 {
-    uint16_t* p_dest = (uint16_t*)_p_dest;
-    const uint16_t *p_s1 = (const uint16_t *)_p_s1;
-    const uint16_t *p_s2 = (const uint16_t *)_p_s2;
-    uint16_t* p_end = p_dest + (i_bytes/2) - 4;
+    uint16_t *p_dest = _p_dest;
+    const uint16_t *p_s1 = _p_s1;
+    const uint16_t *p_s2 = _p_s2;
 
-    while( p_dest < p_end )
-    {
-        *p_dest++ = ( (uint32_t)(*p_s1++) + (uint32_t)(*p_s2++) ) >> 1;
-        *p_dest++ = ( (uint32_t)(*p_s1++) + (uint32_t)(*p_s2++) ) >> 1;
-        *p_dest++ = ( (uint32_t)(*p_s1++) + (uint32_t)(*p_s2++) ) >> 1;
-        *p_dest++ = ( (uint32_t)(*p_s1++) + (uint32_t)(*p_s2++) ) >> 1;
-    }
-
-    p_end += 4;
-
-    while( p_dest < p_end )
-    {
-        *p_dest++ = ( (uint32_t)(*p_s1++) + (uint32_t)(*p_s2++) ) >> 1;
-    }
-
+    for( size_t i_words = i_bytes / 2; i_words > 0; i_words-- )
+        *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
 }
 
 #if defined(CAN_COMPILE_MMXEXT)
 void MergeMMXEXT( void *_p_dest, const void *_p_s1, const void *_p_s2,
                   size_t i_bytes )
 {
-    uint8_t* p_dest = (uint8_t*)_p_dest;
-    const uint8_t *p_s1 = (const uint8_t *)_p_s1;
-    const uint8_t *p_s2 = (const uint8_t *)_p_s2;
-    uint8_t* p_end = p_dest + i_bytes - 8;
-    while( p_dest < p_end )
+    uint8_t *p_dest = _p_dest;
+    const uint8_t *p_s1 = _p_s1;
+    const uint8_t *p_s2 = _p_s2;
+
+    for( ; i_bytes >= 8; i_bytes -= 8 )
     {
         __asm__  __volatile__( "movq %2,%%mm1;"
                                "pavgb %1, %%mm1;"
@@ -118,12 +87,8 @@ void MergeMMXEXT( void *_p_dest, const void *_p_s1, const void *_p_s2,
         p_s2 += 8;
     }
 
-    p_end += 8;
-
-    while( p_dest < p_end )
-    {
-        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
-    }
+    for( ; i_bytes > 0; i_bytes-- )
+        *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
 }
 #endif
 
@@ -131,11 +96,11 @@ void MergeMMXEXT( void *_p_dest, const void *_p_s1, const void *_p_s2,
 void Merge3DNow( void *_p_dest, const void *_p_s1, const void *_p_s2,
                  size_t i_bytes )
 {
-    uint8_t* p_dest = (uint8_t*)_p_dest;
-    const uint8_t *p_s1 = (const uint8_t *)_p_s1;
-    const uint8_t *p_s2 = (const uint8_t *)_p_s2;
-    uint8_t* p_end = p_dest + i_bytes - 8;
-    while( p_dest < p_end )
+    uint8_t *p_dest = _p_dest;
+    const uint8_t *p_s1 = _p_s1;
+    const uint8_t *p_s2 = _p_s2;
+
+    for( ; i_bytes >= 8; i_bytes -= 8 )
     {
         __asm__  __volatile__( "movq %2,%%mm1;"
                                "pavgusb %1, %%mm1;"
@@ -147,12 +112,8 @@ void Merge3DNow( void *_p_dest, const void *_p_s1, const void *_p_s2,
         p_s2 += 8;
     }
 
-    p_end += 8;
-
-    while( p_dest < p_end )
-    {
-        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
-    }
+    for( ; i_bytes > 0; i_bytes-- )
+        *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
 }
 #endif
 
@@ -160,16 +121,14 @@ void Merge3DNow( void *_p_dest, const void *_p_s1, const void *_p_s2,
 void MergeSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
                 size_t i_bytes )
 {
-    uint8_t* p_dest = (uint8_t*)_p_dest;
-    const uint8_t *p_s1 = (const uint8_t *)_p_s1;
-    const uint8_t *p_s2 = (const uint8_t *)_p_s2;
-    uint8_t* p_end;
-    while( (uintptr_t)p_s1 % 16 )
-    {
-        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
-    }
-    p_end = p_dest + i_bytes - 16;
-    while( p_dest < p_end )
+    uint8_t *p_dest = _p_dest;
+    const uint8_t *p_s1 = _p_s1;
+    const uint8_t *p_s2 = _p_s2;
+
+    for( ; i_bytes > 0 && ((uintptr_t)p_s1 & 15); i_bytes-- )
+        *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
+
+    for( ; i_bytes >= 16; i_bytes -= 16 )
     {
         __asm__  __volatile__( "movdqu %2,%%xmm1;"
                                "pavgb %1, %%xmm1;"
@@ -181,12 +140,8 @@ void MergeSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
         p_s2 += 16;
     }
 
-    p_end += 16;
-
-    while( p_dest < p_end )
-    {
-        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
-    }
+    for( ; i_bytes > 0; i_bytes-- )
+        *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
 }
 #endif
 
@@ -194,9 +149,9 @@ void MergeSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
 void MergeAltivec( void *_p_dest, const void *_p_s1,
                    const void *_p_s2, size_t i_bytes )
 {
-    uint8_t *p_dest = (uint8_t *)_p_dest;
-    uint8_t *p_s1   = (uint8_t *)_p_s1;
-    uint8_t *p_s2   = (uint8_t *)_p_s2;
+    uint8_t *p_dest = _p_dest;
+    const uint8_t *p_s1 = _p_s1;
+    const uint8_t *p_s2 = _p_s2;
     uint8_t *p_end  = p_dest + i_bytes - 15;
 
     /* Use C until the first 16-bytes aligned destination pixel */
@@ -254,9 +209,7 @@ void MergeAltivec( void *_p_dest, const void *_p_s1,
     p_end += 15;
 
     while( p_dest < p_end )
-    {
-        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
-    }
+        *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
 }
 #endif
 
