@@ -130,11 +130,9 @@ struct filter_sys_t
  *
  * @param p_filter The filter instance.
  * @param psz_method Desired method. See mode_list for available choices.
- * @param i_chroma Input chroma. Set this to p_filter->fmt_in.video.i_chroma.
  * @see mode_list
  */
-void SetFilterMethod( filter_t *p_filter, const char *psz_method,
-                      vlc_fourcc_t i_chroma );
+void SetFilterMethod( filter_t *p_filter, const char *psz_method );
 
 /**
  * Get the output video format of the chosen deinterlace method

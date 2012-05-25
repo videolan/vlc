@@ -135,8 +135,7 @@ static const char *const ppsz_filter_options[] = {
  * SetFilterMethod: setup the deinterlace method to use.
  *****************************************************************************/
 
-void SetFilterMethod( filter_t *p_filter, const char *psz_method,
-                      vlc_fourcc_t i_chroma )
+void SetFilterMethod( filter_t *p_filter, const char *psz_method )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -202,12 +201,9 @@ void SetFilterMethod( filter_t *p_filter, const char *psz_method,
     }
     else if( !strcmp( psz_method, "discard" ) )
     {
-        const bool b_i422 = i_chroma == VLC_CODEC_I422 ||
-                            i_chroma == VLC_CODEC_J422;
-
         p_sys->i_mode = DEINTERLACE_DISCARD;
         p_sys->b_double_rate = false;
-        p_sys->b_half_height = !b_i422;
+        p_sys->b_half_height = true;
         p_sys->b_use_frame_history = false;
     }
     else
@@ -257,6 +253,7 @@ void GetOutputFormat( filter_t *p_filter,
         case DEINTERLACE_YADIF2X:
         case DEINTERLACE_PHOSPHOR:
         case DEINTERLACE_IVTC:
+        case DEINTERLACE_DISCARD:
             p_dst->i_chroma = p_src->i_chroma;
             break;
         default:
@@ -459,7 +456,7 @@ picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
     switch( p_sys->i_mode )
     {
         case DEINTERLACE_DISCARD:
-            RenderDiscard( p_filter, p_dst[0], p_pic, 0 );
+            RenderDiscard( p_dst[0], p_pic, 0 );
             break;
 
         case DEINTERLACE_BOB:
@@ -700,7 +697,7 @@ int Open( vlc_object_t *p_this )
                        p_filter->p_cfg );
 
     char *psz_mode = var_GetNonEmptyString( p_filter, FILTER_CFG_PREFIX "mode" );
-    SetFilterMethod( p_filter, psz_mode, p_filter->fmt_in.video.i_chroma );
+    SetFilterMethod( p_filter, psz_mode );
     free( psz_mode );
 
     if( p_sys->i_mode == DEINTERLACE_PHOSPHOR )
