@@ -241,35 +241,18 @@ void GetOutputFormat( filter_t *p_filter,
         p_dst->i_sar_den *= 2;
     }
 
-    if( p_src->i_chroma == VLC_CODEC_I422 ||
-        p_src->i_chroma == VLC_CODEC_J422 )
-    {
-        switch( p_sys->i_mode )
-        {
-        case DEINTERLACE_MEAN:
-        case DEINTERLACE_LINEAR:
-        case DEINTERLACE_X:
-        case DEINTERLACE_YADIF:
-        case DEINTERLACE_YADIF2X:
-        case DEINTERLACE_PHOSPHOR:
-        case DEINTERLACE_IVTC:
-        case DEINTERLACE_DISCARD:
-        case DEINTERLACE_BOB:
-        case DEINTERLACE_BLEND:
-            p_dst->i_chroma = p_src->i_chroma;
-            break;
-        default:
-            p_dst->i_chroma = p_src->i_chroma == VLC_CODEC_I422 ? VLC_CODEC_I420 :
-                                                                  VLC_CODEC_J420;
-            break;
-        }
-    }
-    else if( p_sys->i_mode == DEINTERLACE_PHOSPHOR  &&
-             p_sys->phosphor.i_chroma_for_420 == PC_UPCONVERT )
+    if( p_sys->i_mode == DEINTERLACE_PHOSPHOR  &&
+        p_src->i_chroma != VLC_CODEC_I422 && p_src->i_chroma != VLC_CODEC_J422 &&
+        p_sys->phosphor.i_chroma_for_420 == PC_UPCONVERT )
     {
         p_dst->i_chroma = p_src->i_chroma == VLC_CODEC_J420 ? VLC_CODEC_J422 :
                                                               VLC_CODEC_I422;
     }
+    else
+    {
+        p_dst->i_chroma = p_src->i_chroma;
+    }
+
 }
 
 /*****************************************************************************
