@@ -255,6 +255,7 @@ void GetOutputFormat( filter_t *p_filter,
         case DEINTERLACE_IVTC:
         case DEINTERLACE_DISCARD:
         case DEINTERLACE_BOB:
+        case DEINTERLACE_BLEND:
             p_dst->i_chroma = p_src->i_chroma;
             break;
         default:

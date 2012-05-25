@@ -228,56 +228,18 @@ void RenderBlend( filter_t *p_filter,
         p_out_end = p_out + p_outpic->p[i_plane].i_pitch
                              * p_outpic->p[i_plane].i_visible_lines;
 
-        switch( p_filter->fmt_in.video.i_chroma )
+        /* First line: simple copy */
+        vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
+        p_out += p_outpic->p[i_plane].i_pitch;
+
+        /* Remaining lines: mean value */
+        for( ; p_out < p_out_end ; )
         {
-            case VLC_CODEC_I420:
-            case VLC_CODEC_J420:
-            case VLC_CODEC_YV12:
-                /* First line: simple copy */
-                vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
-                p_out += p_outpic->p[i_plane].i_pitch;
+            Merge( p_out, p_in, p_in + p_pic->p[i_plane].i_pitch,
+                   p_pic->p[i_plane].i_pitch );
 
-                /* Remaining lines: mean value */
-                for( ; p_out < p_out_end ; )
-                {
-                    Merge( p_out, p_in, p_in + p_pic->p[i_plane].i_pitch,
-                           p_pic->p[i_plane].i_pitch );
-
-                    p_out += p_outpic->p[i_plane].i_pitch;
-                    p_in  += p_pic->p[i_plane].i_pitch;
-                }
-                break;
-
-            case VLC_CODEC_I422:
-            case VLC_CODEC_J422:
-                /* First line: simple copy */
-                vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
-                p_out += p_outpic->p[i_plane].i_pitch;
-
-                /* Remaining lines: mean value */
-                if( i_plane == Y_PLANE )
-                {
-                    for( ; p_out < p_out_end ; )
-                    {
-                        Merge( p_out, p_in, p_in + p_pic->p[i_plane].i_pitch,
-                               p_pic->p[i_plane].i_pitch );
-
-                        p_out += p_outpic->p[i_plane].i_pitch;
-                        p_in  += p_pic->p[i_plane].i_pitch;
-                    }
-                }
-                else
-                {
-                    for( ; p_out < p_out_end ; )
-                    {
-                        Merge( p_out, p_in, p_in + p_pic->p[i_plane].i_pitch,
-                               p_pic->p[i_plane].i_pitch );
-
-                        p_out += p_outpic->p[i_plane].i_pitch;
-                        p_in  += 2*p_pic->p[i_plane].i_pitch;
-                    }
-                }
-                break;
+            p_out += p_outpic->p[i_plane].i_pitch;
+            p_in  += p_pic->p[i_plane].i_pitch;
         }
     }
     EndMerge();
