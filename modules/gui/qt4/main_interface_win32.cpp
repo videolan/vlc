@@ -26,6 +26,7 @@
 
 #include "input_manager.hpp"
 #include "actions_manager.hpp"
+#include "dialogs_provider.hpp"
 
 #include <QBitmap>
 #include <vlc_windows_interfaces.h>
