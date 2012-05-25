@@ -470,17 +470,6 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     }
 }
 
-- (void)displayVolume
-{
-    vout_thread_t *p_vout = getVout();
-    if( p_vout )
-    {
-        vout_OSDMessage( p_vout, SPU_DEFAULT_CHANNEL, _( "Volume %d%%" ),
-                       [self volume]*100/AOUT_VOLUME_DEFAULT );
-        vlc_object_release( p_vout );
-    }
-}
-
 - (void)volumeUp
 {
     intf_thread_t *p_intf = VLCIntf;
@@ -488,7 +477,6 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
         return;
 
     aout_VolumeUp( pl_Get( p_intf ), 1, NULL );
-    [self displayVolume];
 }
 
 - (void)volumeDown
@@ -498,7 +486,6 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
         return;
 
     aout_VolumeDown( pl_Get( p_intf ), 1, NULL );
-    [self displayVolume];
 }
 
 - (void)mute
@@ -508,19 +495,6 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
         return;
 
     aout_ToggleMute( pl_Get( p_intf ), NULL );
-
-    vout_thread_t *p_vout = getVout();
-    if( p_vout )
-    {
-        if( [self isMuted] )
-        {
-            vout_OSDIcon( p_vout, SPU_DEFAULT_CHANNEL, OSD_MUTE_ICON );
-        }
-        else
-            [self displayVolume];
-
-        vlc_object_release( p_vout );
-    }
 }
 
 - (BOOL)isMuted
