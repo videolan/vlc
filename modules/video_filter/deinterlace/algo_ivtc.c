@@ -1438,9 +1438,9 @@ static bool IVTCOutputOrDropFrame( filter_t *p_filter, picture_t *p_dst )
     else if( op == IVTC_OP_COPY_C )
         picture_Copy( p_dst, p_curr );
     else if( op == IVTC_OP_COMPOSE_TNBC )
-        ComposeFrame( p_filter, p_dst, p_next, p_curr, CC_ALTLINE );
+        ComposeFrame( p_filter, p_dst, p_next, p_curr, CC_ALTLINE, false );
     else if( op == IVTC_OP_COMPOSE_TCBN )
-        ComposeFrame( p_filter, p_dst, p_curr, p_next, CC_ALTLINE );
+        ComposeFrame( p_filter, p_dst, p_curr, p_next, CC_ALTLINE, false );
 
     /* Slide history of outgoing interlace scores. This must be done last,
        and only if the frame was not dropped, so we do it here.

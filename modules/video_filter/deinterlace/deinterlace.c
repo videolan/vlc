@@ -242,7 +242,8 @@ void GetOutputFormat( filter_t *p_filter,
     }
 
     if( p_sys->i_mode == DEINTERLACE_PHOSPHOR  &&
-        p_src->i_chroma != VLC_CODEC_I422 && p_src->i_chroma != VLC_CODEC_J422 &&
+        2 * p_sys->chroma->p[1].h.num == p_sys->chroma->p[1].h.den &&
+        2 * p_sys->chroma->p[2].h.num == p_sys->chroma->p[2].h.den &&
         p_sys->phosphor.i_chroma_for_420 == PC_UPCONVERT )
     {
         p_dst->i_chroma = p_src->i_chroma == VLC_CODEC_J420 ? VLC_CODEC_J422 :
@@ -253,19 +254,6 @@ void GetOutputFormat( filter_t *p_filter,
         p_dst->i_chroma = p_src->i_chroma;
     }
 
-}
-
-/*****************************************************************************
- * IsChromaSupported: return whether the specified chroma is implemented.
- *****************************************************************************/
-
-bool IsChromaSupported( vlc_fourcc_t i_chroma )
-{
-    return i_chroma == VLC_CODEC_I420 ||
-           i_chroma == VLC_CODEC_J420 ||
-           i_chroma == VLC_CODEC_YV12 ||
-           i_chroma == VLC_CODEC_I422 ||
-           i_chroma == VLC_CODEC_J422;
 }
 
 /*****************************************************************************
@@ -607,14 +595,21 @@ int Open( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys;
 
-    if( !IsChromaSupported( p_filter->fmt_in.video.i_chroma ) )
+    const vlc_fourcc_t fourcc = p_filter->fmt_in.video.i_chroma;
+    const vlc_chroma_description_t *chroma = vlc_fourcc_GetChromaDescription( fourcc );
+    if( !vlc_fourcc_IsYUV( fourcc ) ||
+        !chroma || chroma->plane_count != 3 || chroma->pixel_size != 1 )
+    {
+        msg_Err( p_filter, "Unsupported chroma (%4.4s)", (char*)&fourcc );
         return VLC_EGENERIC;
+    }
 
     /* */
     p_sys = p_filter->p_sys = malloc( sizeof( *p_sys ) );
     if( !p_sys )
         return VLC_ENOMEM;
 
+    p_sys->chroma = chroma;
     p_sys->i_mode = DEINTERLACE_BLEND;
     p_sys->b_double_rate = false;
     p_sys->b_half_height = true;

@@ -68,8 +68,9 @@
  * @see RenderPhosphor()
  * @see ComposeFrame()
  */
-static void DarkenField( picture_t *p_dst, const int i_field,
-                                           const int i_strength )
+static void DarkenField( picture_t *p_dst,
+                         const int i_field, const int i_strength,
+                         bool process_chroma )
 {
     assert( p_dst != NULL );
     assert( i_field == 0 || i_field == 1 );
@@ -147,8 +148,7 @@ static void DarkenField( picture_t *p_dst, const int i_field,
        The chroma processing is a bit more complicated than luma,
        and needs MMX for vectorization.
     */
-    if( p_dst->format.i_chroma == VLC_CODEC_I422  ||
-        p_dst->format.i_chroma == VLC_CODEC_J422 )
+    if( process_chroma )
     {
         for( i_plane = 0 ; i_plane < p_dst->i_planes ; i_plane++ )
         {
@@ -213,7 +213,7 @@ static void DarkenField( picture_t *p_dst, const int i_field,
                     (*po) = 128 + ( ((*po) - 128) / (1 << i_strength) );
             } /* for p_out... */
         } /* for i_plane... */
-    } /* if b_i422 */
+    } /* if process_chroma */
 
 #ifdef CAN_COMPILE_MMXEXT
     if( u_cpu & CPU_CAPABILITY_MMXEXT )
@@ -265,9 +265,13 @@ int RenderPhosphor( filter_t *p_filter,
             p_in_top = p_old;
     }
 
-    compose_chroma_t cc = CC_ALTLINE; /* initialize to prevent compiler warning */
-    switch( p_sys->phosphor.i_chroma_for_420 )
+    compose_chroma_t cc = CC_ALTLINE;
+    if( 2 * p_sys->chroma->p[1].h.num == p_sys->chroma->p[1].h.den &&
+        2 * p_sys->chroma->p[2].h.num == p_sys->chroma->p[2].h.den )
     {
+        /* Only 420 like chroma */
+        switch( p_sys->phosphor.i_chroma_for_420 )
+        {
         case PC_BLEND:
             cc = CC_MERGE;
             break;
@@ -287,9 +291,9 @@ int RenderPhosphor( filter_t *p_filter,
             /* The above are the only possibilities, if there are no bugs. */
             assert(0);
             break;
+        }
     }
-
-    ComposeFrame( p_filter, p_dst, p_in_top, p_in_bottom, cc );
+    ComposeFrame( p_filter, p_dst, p_in_top, p_in_bottom, cc, p_filter->fmt_in.video.i_chroma == VLC_CODEC_YV12 );
 
     /* Simulate phosphor light output decay for the old field.
 
@@ -301,7 +305,9 @@ int RenderPhosphor( filter_t *p_filter,
        In most use cases the dimmer is used.
     */
     if( p_sys->phosphor.i_dimmer_strength > 0 )
-        DarkenField( p_dst, !i_field, p_sys->phosphor.i_dimmer_strength );
+        DarkenField( p_dst, !i_field, p_sys->phosphor.i_dimmer_strength,
+                     p_sys->chroma->p[1].h.num == p_sys->chroma->p[1].h.den &&
+                     p_sys->chroma->p[2].h.num == p_sys->chroma->p[2].h.den );
 
     return VLC_SUCCESS;
 }

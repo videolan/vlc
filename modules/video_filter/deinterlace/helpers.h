@@ -89,13 +89,15 @@ typedef enum { CC_ALTLINE, CC_UPCONVERT, CC_SOURCE_TOP, CC_SOURCE_BOTTOM,
  * @param p_inpic_top Picture to extract the top field from.
  * @param p_inpic_bottom Picture to extract the bottom field from.
  * @param i_output_chroma Chroma operation mode for 4:2:0 (see function doc)
+ * @param swapped_uv_conversion Swap UV while up converting (for YV12)
  * @see compose_chroma_t
  * @see RenderPhosphor()
  * @see RenderIVTC()
  */
-void ComposeFrame( filter_t *p_filter, picture_t *p_outpic,
+void ComposeFrame( filter_t *p_filter,
+                   picture_t *p_outpic,
                    picture_t *p_inpic_top, picture_t *p_inpic_bottom,
-                   compose_chroma_t i_output_chroma );
+                   compose_chroma_t i_output_chroma, bool swapped_uv_conversion );
 
 /**
  * Helper function: Estimates the number of 8x8 blocks which have motion

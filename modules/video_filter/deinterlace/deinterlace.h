@@ -89,6 +89,8 @@ typedef struct {
  */
 struct filter_sys_t
 {
+    const vlc_chroma_description_t *chroma;
+
     int  i_mode;              /**< Deinterlace mode */
 
     /* Algorithm behaviour flags */
@@ -149,20 +151,6 @@ void SetFilterMethod( filter_t *p_filter, const char *psz_method );
 void GetOutputFormat( filter_t *p_filter,
                       video_format_t *p_dst,
                       const video_format_t *p_src );
-
-/**
- * Returns whether the specified chroma is implemented in the deinterlace
- * filter.
- *
- * Currently, supported chromas are I420, J420 (4:2:0 full scale),
- * YV12 (like I420, but YVU), I422 and J422.
- *
- * Note for deinterlace hackers: adding support for a new chroma typically
- * requires changes to all low-level functions across all the algorithms.
- *
- * @see vlc_fourcc_t
- */
-bool IsChromaSupported( vlc_fourcc_t i_chroma );
 
 /*****************************************************************************
  * video filter2 functions

@@ -246,11 +246,11 @@ static inline int TestForMotionInBlock( uint8_t *p_pix_p, uint8_t *p_pix_c,
  *****************************************************************************/
 
 /* See header for function doc. */
-void ComposeFrame( filter_t *p_filter, picture_t *p_outpic,
+void ComposeFrame( filter_t *p_filter,
+                   picture_t *p_outpic,
                    picture_t *p_inpic_top, picture_t *p_inpic_bottom,
-                   compose_chroma_t i_output_chroma )
+                   compose_chroma_t i_output_chroma, bool swapped_uv_conversion )
 {
-    assert( p_filter != NULL );
     assert( p_outpic != NULL );
     assert( p_inpic_top != NULL );
     assert( p_inpic_bottom != NULL );
@@ -262,21 +262,14 @@ void ComposeFrame( filter_t *p_filter, picture_t *p_outpic,
             i_output_chroma == CC_SOURCE_BOTTOM ||
             i_output_chroma == CC_MERGE );
 
-    const int i_chroma = p_filter->fmt_in.video.i_chroma;
-    const bool b_i422 = i_chroma == VLC_CODEC_I422 ||
-                        i_chroma == VLC_CODEC_J422;
-    const bool b_upconvert_chroma = ( !b_i422  &&
-                                      i_output_chroma == CC_UPCONVERT );
+    const bool b_upconvert_chroma = i_output_chroma == CC_UPCONVERT;
 
     for( int i_plane = 0 ; i_plane < p_inpic_top->i_planes ; i_plane++ )
     {
         bool b_is_chroma_plane = ( i_plane == U_PLANE || i_plane == V_PLANE );
 
-        /* YV12 is YVU, but I422 is YUV. For such input, swap chroma planes
-           in output when converting to 4:2:2. */
         int i_out_plane;
-        if( b_is_chroma_plane  &&  b_upconvert_chroma  &&
-            i_chroma == VLC_CODEC_YV12 )
+        if( b_is_chroma_plane  &&  b_upconvert_chroma  && swapped_uv_conversion )
         {
             if( i_plane == U_PLANE )
                 i_out_plane = V_PLANE;
@@ -289,7 +282,7 @@ void ComposeFrame( filter_t *p_filter, picture_t *p_outpic,
         }
 
         /* Copy luma or chroma, alternating between input fields. */
-        if( !b_is_chroma_plane  ||  b_i422  ||  i_output_chroma == CC_ALTLINE )
+        if( !b_is_chroma_plane  ||  i_output_chroma == CC_ALTLINE )
         {
             /* Do an alternating line copy. This is always done for luma,
                and for 4:2:2 chroma. It can be requested for 4:2:0 chroma
