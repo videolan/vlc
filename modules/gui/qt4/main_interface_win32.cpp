@@ -48,6 +48,8 @@
 #define APPCOMMAND_MICROPHONE_VOLUME_MUTE 24
 #define APPCOMMAND_MICROPHONE_VOLUME_DOWN 25
 #define APPCOMMAND_MICROPHONE_VOLUME_UP   26
+#define APPCOMMAND_HELP                   27
+#define APPCOMMAND_OPEN                   30
 #define APPCOMMAND_DICTATE_OR_COMMAND_CONTROL_TOGGLE    43
 #define APPCOMMAND_MIC_ON_OFF_TOGGLE      44
 #define APPCOMMAND_MEDIA_PLAY             46
@@ -224,6 +226,18 @@ bool MainInterface::winEvent ( MSG * msg, long * result )
                     break;
                 case APPCOMMAND_VOLUME_MUTE:
                     THEAM->toggleMuteAudio();
+                    break;
+                case APPCOMMAND_MEDIA_FAST_FORWARD:
+                    THEMIM->getIM()->faster();
+                    break;
+                case APPCOMMAND_MEDIA_REWIND:
+                    THEMIM->getIM()->slower();
+                    break;
+                case APPCOMMAND_HELP:
+                    THEDP->mediaInfoDialog();
+                    break;
+                case APPCOMMAND_OPEN:
+                    THEDP->simpleOpenDialog();
                     break;
                 default:
                      msg_Dbg( p_intf, "unknown APPCOMMAND = %d", cmd);
