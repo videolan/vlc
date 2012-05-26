@@ -28,6 +28,8 @@
 #   include "config.h"
 #endif
 
+#include <vlc_common.h>
+
 #include <stdlib.h>
 #include <stdint.h>
 
