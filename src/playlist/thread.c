@@ -144,7 +144,7 @@ static void UpdateActivity( playlist_t *p_playlist, int i_delta )
  * \param p_cur the current playlist item
  * \return nothing
  */
-static void ResyncCurrentIndex( playlist_t *p_playlist, playlist_item_t *p_cur )
+void ResyncCurrentIndex( playlist_t *p_playlist, playlist_item_t *p_cur )
 {
     PL_ASSERT_LOCKED;
 
@@ -163,7 +163,14 @@ static void ResyncCurrentIndex( playlist_t *p_playlist, playlist_item_t *p_cur )
     PL_DEBUG( "%s is at %i", PLI_NAME( p_cur ), p_playlist->i_current_index );
 }
 
-static void ResetCurrentlyPlaying( playlist_t *p_playlist,
+/**
+ * Reset the currently playing playlist.
+ *
+ * \param p_playlist the playlist structure
+ * \param p_cur the current playlist item
+ * \return nothing
+ */
+void ResetCurrentlyPlaying( playlist_t *p_playlist,
                                    playlist_item_t *p_cur )
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
@@ -540,6 +547,7 @@ static void LoopRequest( playlist_t *p_playlist )
     if( p_item )
     {
         msg_Dbg( p_playlist, "starting playback of the new playlist item" );
+        ResyncCurrentIndex( p_playlist, p_item );
         PlayItem( p_playlist, p_item );
         return;
     }
