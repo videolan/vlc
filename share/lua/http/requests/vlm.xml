@@ -52,7 +52,8 @@ local function print_table(name,t)
 end
 local function print_media(m)
   local name = m.name
-  local type_, enabled, loop, output
+  local type_, enabled, output
+  local loop = ""
   local inputs = {}
   local options = {}
   local instances = {}
