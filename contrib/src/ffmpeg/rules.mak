@@ -11,7 +11,6 @@ FFMPEGCONF = \
 	--enable-libgsm \
 	--enable-libopenjpeg \
 	--disable-debug \
-	--enable-gpl \
 	--disable-avdevice \
 	--disable-devices \
 	--disable-avfilter \
