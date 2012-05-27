@@ -4128,7 +4128,7 @@ AC_SUBST(VERSION_MINOR)
 AC_SUBST(VERSION_REVISION)
 AC_SUBST(VERSION_EXTRA)
 AC_SUBST(COPYRIGHT_YEARS)
-AC_DEFINE_UNQUOTED(VLC_COMPILE_BY, "`whoami`", [user who ran configure])
+AC_DEFINE_UNQUOTED(VLC_COMPILE_BY, "`whoami|sed -e's/\\\/\\\\\\\/g'`", [user who ran configure])
 AC_DEFINE_UNQUOTED(VLC_COMPILE_HOST, "`hostname -f 2>/dev/null || hostname`", [host which ran configure])
 AC_DEFINE_UNQUOTED(VLC_COMPILER, "`$CC -v 2>&1 | tail -n 1`", [compiler])
 dnl
