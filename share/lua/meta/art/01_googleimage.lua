@@ -24,14 +24,20 @@ function fetch_art()
     if vlc.item == nil then return nil end
 
     local meta = vlc.item:metas()
-    if meta["artist"] and meta["album"] then
-        title = meta["artist"].." "..meta["album"]
+
+-- IceCast Entries
+    if meta["Listing Source"] == "dir.xiph.org"
+    then
+        title = meta["title"] .. " radio logo"
+-- Album entries
+    elseif meta["artist"] and meta["album"] then
+        title = meta["artist"].." "..meta["album"].." cover"
     elseif meta["artist"] and meta["title"] then
-        title = meta["artist"].." "..meta["title"]
+        title = meta["artist"].." "..meta["title"].." cover"
     else
         return nil
     end
-    fd = vlc.stream( "http://images.google.com/images?q="..vlc.strings.encode_uri_component( title.." cover" ) )
+    fd = vlc.stream( "http://images.google.com/images?q="..vlc.strings.encode_uri_component( title ) )
     if not fd then return nil end
 
     page = fd:read( 65653 )
