@@ -63,7 +63,8 @@ typedef struct
  *****************************************************************************/
 struct filter_sys_t
 {
-    vout_thread_t   *p_vout;
+    vout_thread_t*  p_vout;
+    bool            b_close;
 
     int             i_width;
     int             i_height;

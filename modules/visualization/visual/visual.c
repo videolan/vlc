@@ -198,6 +198,7 @@ static int Open( vlc_object_t *p_this )
     if( (p_sys->i_height % 2 ) != 0 ) p_sys->i_height--;
     if( (p_sys->i_width % 2 )  != 0 ) p_sys->i_width--;
 
+    p_sys->b_close = false;
     p_sys->i_effect = 0;
     p_sys->effect   = NULL;
 
@@ -323,13 +324,13 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     picture_t *p_outpic;
 
     /* First, get a new picture */
-    while( ( p_outpic = vout_GetPicture( p_sys->p_vout ) ) == NULL)
-    {   /* XXX: This looks like a bad idea. Don't run to me for sympathy if it
-         * dead locks... */
-        if( !vlc_object_alive (p_sys->p_vout) )
+    do
+    {
+        if( p_sys->b_close )
             return NULL;
         msleep( VOUT_OUTMEM_SLEEP );
     }
+    while( ( p_outpic = vout_GetPicture( p_sys->p_vout ) ) == NULL);
 
     /* Blank the picture */
     for( int i = 0 ; i < p_outpic->i_planes ; i++ )
@@ -363,6 +364,8 @@ static void Close( vlc_object_t *p_this )
 {
     filter_t * p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
+
+    p_sys->b_close = true;
 
     if( p_filter->p_sys->p_vout )
     {
