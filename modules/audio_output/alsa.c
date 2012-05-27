@@ -149,18 +149,14 @@ static void DumpDeviceStatus (vlc_object_t *obj, snd_pcm_t *pcm)
  */
 static void Probe (vlc_object_t *obj, const char *dev)
 {
-    /* Due to design bug in audio output core, this hack is required: */
-    if (var_Type (obj, "audio-device") == 0)
-    {
-        /* The variable does not exist - first call. */
-        vlc_value_t text;
+    vlc_value_t text;
 
-        var_Create (obj, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
-        text.psz_string = _("Audio Device");
-        var_Change (obj, "audio-device", VLC_VAR_SETTEXT, &text, NULL);
+    var_Create (obj, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
+    text.psz_string = _("Audio Device");
+    var_Change (obj, "audio-device", VLC_VAR_SETTEXT, &text, NULL);
 
-        GetDevices (obj, NULL, dev);
-    }
+    GetDevices (obj, NULL, dev);
+
     var_AddCallback (obj, "audio-device", aout_ChannelsRestart, NULL);
     var_TriggerCallback (obj, "intf-change");
 }
@@ -178,12 +174,7 @@ static int Open (vlc_object_t *obj)
     audio_output_t *aout = (audio_output_t *)obj;
 
     /* Get device name */
-    char *device;
-
-    if (var_Type (aout, "audio-device"))
-        device = var_GetString (aout, "audio-device");
-    else
-        device = var_InheritString (aout, "alsa-audio-device");
+    char *device = var_InheritString (aout, "alsa-audio-device");
     if (unlikely(device == NULL))
         return VLC_ENOMEM;
 
@@ -694,7 +685,18 @@ static void Close (vlc_object_t *obj)
     aout_sys_t *sys = aout->sys;
     snd_pcm_t *pcm = aout->sys->pcm;
 
+    /* FIXME: ugly hack so selected ALSA device survives restart */
+    char *device = var_InheritString (obj, "audio-device");
+    if (device != NULL)
+    {
+        if (!var_Type (obj, "alsa-audio-device"))
+            var_Create (obj, "alsa-audio-device", VLC_VAR_STRING);
+        var_SetString (obj, "alsa-audio-device", device);
+        free (device);
+    }
+
     var_DelCallback (obj, "audio-device", aout_ChannelsRestart, NULL);
+    var_Destroy (obj, "audio-device");
     snd_pcm_drop (pcm);
     snd_pcm_close (pcm);
     free (sys);
