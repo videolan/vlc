@@ -29,23 +29,24 @@ function main()
     local tree = simplexml.parse_url("http://dir.xiph.org/yp.xml")
     for _, station in ipairs( tree.children ) do
         simplexml.add_name_maps( station )
-	local station_name = station.children_map["server_name"][1].children[1]
-	if station_name == "Unspecified name" or station_name == ""
-	then
-		station_name = station.children_map["listen_url"][1].children[1]
-		if string.find( station_name, "radionomy.com" )
-		then
-			station_name = string.match( station_name, "([^/]+)$")
-			station_name = string.gsub( station_name, "-", " " )
-		end
-	end
+        local station_name = station.children_map["server_name"][1].children[1]
+        if station_name == "Unspecified name" or station_name == ""
+        then
+                station_name = station.children_map["listen_url"][1].children[1]
+                if string.find( station_name, "radionomy.com" )
+                then
+                        station_name = string.match( station_name, "([^/]+)$")
+                        station_name = string.gsub( station_name, "-", " " )
+                end
+        end
         vlc.sd.add_item( {path=station.children_map["listen_url"][1].children[1],
                           title=station_name,
                           genre=station.children_map["genre"][1].children[1],
                           nowplaying=station.children_map["current_song"][1].children[1],
                           meta={
-				  ["Icecast Bitrate"]=station.children_map["bitrate"][1].children[1],
-				  ["Icecast Server Type"]=station.children_map["server_type"][1].children[1]
-			  }} )
+                                  ["Listing Source"]="dir.xiph.org",
+                                  ["Icecast Bitrate"]=station.children_map["bitrate"][1].children[1],
+                                  ["Icecast Server Type"]=station.children_map["server_type"][1].children[1]
+                          }} )
     end
 end
