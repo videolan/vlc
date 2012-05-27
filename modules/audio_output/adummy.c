@@ -73,9 +73,6 @@ static int Open( vlc_object_t * p_this )
     else
         p_aout->format.i_format = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_S16N;
 
-    /* Create the variable for the audio-device */
-    var_Create( p_aout, "audio-device", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-
     return VLC_SUCCESS;
 }
 
