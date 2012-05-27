@@ -1404,11 +1404,6 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
 static void* ThreadSend( void *data )
 {
 #ifdef WIN32
-# define ECONNREFUSED WSAECONNREFUSED
-# define ENOPROTOOPT  WSAENOPROTOOPT
-# define EHOSTUNREACH WSAEHOSTUNREACH
-# define ENETUNREACH  WSAENETUNREACH
-# define ENETDOWN     WSAENETDOWN
 # define ENOBUFS      WSAENOBUFS
 # define EAGAIN       WSAEWOULDBLOCK
 # define EWOULDBLOCK  WSAEWOULDBLOCK

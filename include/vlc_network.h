@@ -39,7 +39,6 @@
 #   endif
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
-#   define ENETUNREACH WSAENETUNREACH
 #   define net_errno (WSAGetLastError())
 extern const char *net_strerror( int val );
 
