@@ -743,10 +743,14 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
 - (IBAction)buttonAction:(id)sender
 {
     if( sender == o_sprefs_cancel_btn )
+    {
+        [[NSFontPanel sharedFontPanel] close];
         [o_sprefs_win orderOut: sender];
+    }
     else if( sender == o_sprefs_save_btn )
     {
         [self saveChangedSettings];
+        [[NSFontPanel sharedFontPanel] close];
         [o_sprefs_win orderOut: sender];
     }
     else if( sender == o_sprefs_reset_btn )
