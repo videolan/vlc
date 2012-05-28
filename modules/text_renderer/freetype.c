@@ -333,11 +333,9 @@ struct filter_sys_t
     int            i_default_font_size;
     int            i_display_height;
     char*          psz_fontfamily;
-#ifdef HAVE_STYLES
     xml_reader_t  *p_xml;
 #ifdef WIN32
     char*          psz_win_fonts_path;
-#endif
 #endif
 
     input_attachment_t **pp_font_attachments;
@@ -1614,7 +1612,6 @@ static int ProcessNodes( filter_t *p_filter,
                                                        STYLE_UNDERLINE |
                                                        STYLE_STRIKEOUT);
     }
-#ifdef HAVE_STYLES
     else
     {
         rv = PushFont( &p_fonts,
@@ -1624,7 +1621,6 @@ static int ProcessNodes( filter_t *p_filter,
                           ((p_sys->i_font_opacity & 0xff) << 24),
                        0x00ffffff );
     }
-#endif
     if( p_sys->b_font_bold )
         i_style_flags |= STYLE_BOLD;
 
@@ -2438,7 +2434,6 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     uint32_t *pi_k_durations   = NULL;
 
-#ifdef HAVE_STYLES
     if( b_html )
     {
         stream_t *p_sub = stream_MemoryNew( VLC_OBJECT(p_filter),
@@ -2496,7 +2491,6 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
         stream_Delete( p_sub );
     }
     else
-#endif
     {
         text_style_t *p_style;
         if( p_region_in->p_style )
@@ -2598,16 +2592,12 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     return RenderCommon( p_filter, p_region_out, p_region_in, false, p_chroma_list );
 }
 
-#ifdef HAVE_STYLES
-
 static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                        subpicture_region_t *p_region_in,
                        const vlc_fourcc_t *p_chroma_list )
 {
     return RenderCommon( p_filter, p_region_out, p_region_in, true, p_chroma_list );
 }
-
-#endif
 
 /*****************************************************************************
  * Create: allocates osd-text video thread output method
@@ -2628,9 +2618,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->psz_fontfamily   = NULL;
-#ifdef HAVE_STYLES
     p_sys->p_xml            = NULL;
-#endif
     p_sys->p_face           = 0;
     p_sys->p_library        = 0;
     p_sys->i_font_size      = 0;
@@ -2769,11 +2757,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_font_attachments = 0;
 
     p_filter->pf_render_text = RenderText;
-#ifdef HAVE_STYLES
     p_filter->pf_render_html = RenderHtml;
-#else
-    p_filter->pf_render_html = NULL;
-#endif
 
     LoadFontsFromAttachments( p_filter );
 
@@ -2812,9 +2796,7 @@ static void Destroy( vlc_object_t *p_this )
         free( p_sys->pp_font_attachments );
     }
 
-#ifdef HAVE_STYLES
     if( p_sys->p_xml ) xml_ReaderDelete( p_sys->p_xml );
-#endif
     free( p_sys->psz_fontfamily );
 
     /* FcFini asserts calling the subfunction FcCacheFini()
