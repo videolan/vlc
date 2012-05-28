@@ -39,6 +39,9 @@
     IBOutlet id o_specificTime_sec_lbl;
     IBOutlet id o_specificTime_stepper;
     IBOutlet id o_specificTime_mi;
+
+    NSInteger i_lastScrollWheelDirection;
+    NSTimeInterval t_lastScrollEvent;
 }
 - (IBAction)play:(id)sender;
 - (IBAction)stop:(id)sender;

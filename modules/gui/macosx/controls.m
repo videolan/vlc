@@ -54,6 +54,8 @@
     [o_specificTime_ok_btn setTitle: _NS("OK")];
     [o_specificTime_sec_lbl setStringValue: _NS("sec.")];
     [o_specificTime_goTo_lbl setStringValue: _NS("Jump to time")];
+
+    i_lastScrollWheelDirection = 0;
 }
 
 
@@ -254,6 +256,13 @@
     vlc_object_release( p_input );
 }
 
+- (void)resetScrollWheelDirection
+{
+    /* release the scroll direction 0.8 secs after the last event */
+    if (([NSDate timeIntervalSinceReferenceDate] - t_lastScrollEvent) >= 0.80)
+        i_lastScrollWheelDirection = 0;
+}
+
 - (void)scrollWheel:(NSEvent *)theEvent
 {
     intf_thread_t * p_intf = VLCIntf;
@@ -271,7 +280,8 @@
 
     CGFloat f_yabsvalue = f_deltaY > 0.0f ? f_deltaY : -f_deltaY;
     CGFloat f_xabsvalue = f_deltaX > 0.0f ? f_deltaX : -f_deltaX;
-    int i_yvlckey, i_xvlckey;
+
+    int i_yvlckey, i_xvlckey = 0;
 
     if (b_invertedEventFromDevice)
     {
@@ -298,15 +308,37 @@
             i_xvlckey = KEY_MOUSEWHEELLEFT;
     }
 
-    /* Send multiple key event, depending on the intensity of the event */
-    for (NSUInteger i = 0; i < (int)(f_yabsvalue/4.+1.) && f_yabsvalue > 0.05 ; i++)
-        var_SetInteger( p_intf->p_libvlc, "key-pressed", i_yvlckey );
-
-    /* Prioritize Y event (sound volume) over X event */
-    if (f_yabsvalue < 0.05)
+    /* in the following, we're forwarding either a x or a y event */
+    /* Multiple key events are send depending on the intensity of the event */
+    /* the opposite direction is being blocked for 0.8 secs */
+    if (f_yabsvalue > 0.05)
     {
+        if (i_lastScrollWheelDirection < 0) // last was a X
+            return;
+
+        i_lastScrollWheelDirection = 1; // Y
+        for (NSUInteger i = 0; i < (int)(f_yabsvalue/4.+1.) && f_yabsvalue > 0.05 ; i++)
+            var_SetInteger( p_intf->p_libvlc, "key-pressed", i_yvlckey );
+
+        t_lastScrollEvent = [NSDate timeIntervalSinceReferenceDate];
+        [self performSelector:@selector(resetScrollWheelDirection)
+                   withObject: NULL
+                   afterDelay:1.00];
+        return;
+    }
+    if (f_xabsvalue > 0.05)
+    {
+        if (i_lastScrollWheelDirection > 0) // last was a Y
+            return;
+
+        i_lastScrollWheelDirection = -1; // X
         for (NSUInteger i = 0; i < (int)(f_xabsvalue/6.+1.) && f_xabsvalue > 0.05; i++)
-         var_SetInteger( p_intf->p_libvlc, "key-pressed", i_xvlckey );
+            var_SetInteger( p_intf->p_libvlc, "key-pressed", i_xvlckey );
+
+        t_lastScrollEvent = [NSDate timeIntervalSinceReferenceDate];
+        [self performSelector:@selector(resetScrollWheelDirection)
+                   withObject: NULL
+                   afterDelay:1.00];
     }
 }
 
