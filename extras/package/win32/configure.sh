@@ -37,4 +37,4 @@ then
     OPTIONS="${OPTIONS} --disable-taglib --disable-mkv"
 fi
 
-sh "$(dirname $0)"/../../../configure ${OPTIONS} $*
+sh "$(dirname $0)"/../../../configure ${OPTIONS} $* CFLAGS="-march=pentium"
