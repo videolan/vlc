@@ -157,7 +157,7 @@ static const char *const ppsz_language_text[] =
 #endif
 
 static const char *const ppsz_snap_formats[] =
-{ "png", "jpg" };
+{ "png", "jpg", "tiff" };
 
 /*****************************************************************************
  * Configuration options for the main program. Each module will also separatly
