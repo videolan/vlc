@@ -1,13 +1,14 @@
 /*****************************************************************************
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
- * Copyright (C) 2002 - 2011 the VideoLAN team
+ * Copyright (C) 2002 - 2012 the VideoLAN team
  * $Id$
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
  *          Gildas Bazin <gbazin@videolan.org>
  *          Bernie Purcell <bitmap@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
+ *          Felix Paul Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -75,6 +76,13 @@
 #define FT_CEIL(X)      (((X + 63) & -64) >> 6)
 #ifndef FT_MulFix
  #define FT_MulFix(v, s) (((v)*(s))>>16)
+#endif
+
+/* apple stuff */
+#ifdef __APPLE__
+#include <Carbon/Carbon.h>
+#undef HAVE_FONTCONFIG
+#define HAVE_STYLES
 #endif
 
 /* RTL */
@@ -698,6 +706,76 @@ fail:
     }
 }
 #endif /* HAVE_WIN32 */
+
+#ifdef __APPLE__
+static char* MacLegacy_Select( filter_t *p_filter, const char* psz_fontname,
+                          bool b_bold, bool b_italic, int i_size, int *i_idx )
+{
+    VLC_UNUSED( b_bold );
+    VLC_UNUSED( b_italic );
+    VLC_UNUSED( i_size );
+    FSRef ref;
+    unsigned char path[1024];
+    char * psz_path;
+
+    CFStringRef  cf_fontName;
+    ATSFontRef   ats_font_id;
+
+    *i_idx = 0;
+
+    msg_Dbg( p_filter, "looking for %s", psz_fontname );
+    cf_fontName = CFStringCreateWithCString( NULL, psz_fontname, kCFStringEncodingMacRoman );
+    ats_font_id = ATSFontFindFromName( cf_fontName, kATSOptionFlagsIncludeDisabledMask );
+    CFRelease( cf_fontName );
+
+    if ( ats_font_id == 0 || ats_font_id == 0xFFFFFFFFUL )
+    {
+        msg_Dbg( p_filter, "ATS couldn't find %s by name, checking family", psz_fontname );
+        ats_font_id = ATSFontFamilyFindFromName( cf_fontName, kATSOptionFlagsIncludeDisabledMask );
+
+        if ( ats_font_id == 0 || ats_font_id == 0xFFFFFFFFUL )
+        {
+            msg_Err( p_filter, "ATS couldn't find either %s nor its family", psz_fontname );
+            return NULL;
+        }
+    }
+
+    if ( noErr != ATSFontGetFileReference( ats_font_id, &ref ) )
+    {
+        msg_Err( p_filter, "ATS couldn't get file ref for %s", psz_fontname );
+        return NULL;
+    }
+
+    /* i_idx calculation by searching preceding fontIDs */
+    /* with same FSRef                                       */
+    {
+        ATSFontRef  id2 = ats_font_id - 1;
+        FSRef       ref2;
+
+        while ( id2 > 0 )
+        {
+            if ( noErr != ATSFontGetFileReference( id2, &ref2 ) )
+                break;
+            if ( noErr != FSCompareFSRefs( &ref, &ref2 ) )
+                break;
+
+            id2 --;
+        }
+        *i_idx = ats_font_id - ( id2 + 1 );
+    }
+
+    if ( noErr != FSRefMakePath( &ref, path, sizeof(path) ) )
+    {
+        msg_Err( p_filter, "failure when getting path from FSRef" );
+        return NULL;
+    }
+    msg_Dbg( p_filter, "found %s", path );
+
+    psz_path = strdup( (char *)path );
+
+    return psz_path;
+}
+#endif
 
 #endif /* HAVE_STYLES */
 
@@ -1728,7 +1806,7 @@ static FT_Face LoadFace( filter_t *p_filter,
     if( !p_face )
     {
         int  i_idx = 0;
-        char *psz_fontfile;
+        char *psz_fontfile = NULL;
 #ifdef HAVE_FONTCONFIG
         psz_fontfile = FontConfig_Select( NULL,
                                           p_style->psz_fontname,
@@ -1736,6 +1814,8 @@ static FT_Face LoadFace( filter_t *p_filter,
                                           (p_style->i_style_flags & STYLE_ITALIC) != 0,
                                           -1,
                                           &i_idx );
+#elif defined( __APPLE__ )
+        psz_fontfile = MacLegacy_Select( p_filter, p_style->psz_fontname, false, false, -1, &i_idx );
 #elif defined( WIN32 )
         psz_fontfile = Win32_Select( p_filter,
                                     p_style->psz_fontname,
@@ -2626,6 +2706,8 @@ static int Create( vlc_object_t *p_this )
     /* */
     psz_fontfile = FontConfig_Select( NULL, psz_fontfamily, false, false,
                                       p_sys->i_default_font_size, &fontindex );
+#elif defined(__APPLE__)
+    psz_fontfile = MacLegacy_Select( p_filter, psz_fontfamily, false, false, 0, &fontindex );
 #elif defined(WIN32)
     psz_fontfile = Win32_Select( p_filter, psz_fontfamily, false, false,
                                  p_sys->i_default_font_size, &fontindex );
