@@ -85,7 +85,7 @@
 
         case NSEnterCharacter:
         case NSCarriageReturnCharacter:
-            [(VLCPlaylist *)[[VLCMain sharedInstance] playlist] playItem:self];
+            [(VLCPlaylist *)[[VLCMain sharedInstance] playlist] playItem:nil];
             break;
 
         default:
@@ -788,6 +788,10 @@
     playlist_item_t *p_item;
     playlist_item_t *p_node = NULL;
 
+    // ignore clicks on column header when handling double action
+    if( sender != nil && [o_outline_view clickedRow] == -1 )
+        return;
+
     p_item = [[o_outline_view itemAtRow:[o_outline_view selectedRow]] pointerValue];
 
     PL_LOCK;
@@ -1315,7 +1319,7 @@
 
     /* Check whether the selected table column header corresponds to a
        sortable table column*/
-    if( !( o_tc == o_tc_name || o_tc == o_tc_author ) )
+    if( !( o_tc == o_tc_name || o_tc == o_tc_author || o_tc == o_tc_duration ) )
     {
         return;
     }
@@ -1336,6 +1340,10 @@
     else if( o_tc == o_tc_author )
     {
         i_mode = SORT_ARTIST;
+    }
+    else if( o_tc == o_tc_duration )
+    {
+        i_mode = SORT_DURATION;
     }
 
     if( b_isSortDescending )
