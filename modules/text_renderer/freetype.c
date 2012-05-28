@@ -724,7 +724,7 @@ static char* MacLegacy_Select( filter_t *p_filter, const char* psz_fontname,
     *i_idx = 0;
 
     msg_Dbg( p_filter, "looking for %s", psz_fontname );
-    cf_fontName = CFStringCreateWithCString( NULL, psz_fontname, kCFStringEncodingMacRoman );
+    cf_fontName = CFStringCreateWithCString( NULL, psz_fontname, kCFStringEncodingUTF8 );
     ats_font_id = ATSFontFindFromName( cf_fontName, kATSOptionFlagsIncludeDisabledMask );
     CFRelease( cf_fontName );
 
