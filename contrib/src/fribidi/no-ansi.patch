@@ -1,0 +1,12 @@
+diff -ur fribidi.orig/configure.ac fribidi/configure.ac
+--- fribidi.orig/configure.ac	2012-05-29 16:13:47.340167837 -0400
++++ fribidi/configure.ac	2012-05-29 16:14:23.180167432 -0400
+@@ -110,7 +110,7 @@
+ # Checks for compiler characteristics.
+ changequote(,)dnl
+ if test "x$GCC" = "xyes"; then
+-  CFLAGS="$CFLAGS -Wall -ansi "
++  CFLAGS="$CFLAGS -Wall"
+ fi
+ changequote([,])dnl
+ 
