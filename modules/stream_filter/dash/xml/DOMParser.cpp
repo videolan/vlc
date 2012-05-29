@@ -159,7 +159,9 @@ Profile DOMParser::getProfile               ()
 
     const std::string profile = this->root->getAttributeValue("profiles");
 
-    if(profile.find("urn:mpeg:mpegB:profile:dash:isoff-basic-on-demand:cm") != std::string::npos)
+    if(profile.find("urn:mpeg:mpegB:profile:dash:isoff-basic-on-demand:cm") != std::string::npos ||
+            profile.find("urn:mpeg:dash:profile:isoff-ondemand:2011") != std::string::npos ||
+            profile.find("urn:mpeg:dash:profile:isoff-on-demand:2011") != std::string::npos)
         return dash::mpd::BasicCM;
 
     if(profile.find("urn:mpeg:dash:profile:isoff-main:2011") != std::string::npos)
