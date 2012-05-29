@@ -134,6 +134,18 @@
  *****************************************************************************/
 @implementation VLCPlaylistCommon
 
++ (void)initialize{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSMutableArray * o_columnArray = [[NSMutableArray alloc] init];
+    [o_columnArray addObject: [NSArray arrayWithObjects: TITLE_COLUMN, [NSNumber numberWithFloat: 190.], nil]];
+    [o_columnArray addObject: [NSArray arrayWithObjects: ARTIST_COLUMN, [NSNumber numberWithFloat: 95.], nil]];
+    [o_columnArray addObject: [NSArray arrayWithObjects: DURATION_COLUMN, [NSNumber numberWithFloat: 95.], nil]];
+    NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:[NSArray arrayWithArray:o_columnArray] forKey:@"PlaylistColumnSelection"];
+
+    [defaults registerDefaults:appDefaults];
+    [o_columnArray release];
+}
+
 - (id)init
 {
     playlist_t * p_playlist = pl_Get( VLCIntf );
@@ -165,13 +177,29 @@
     [[o_tc_author_other headerCell] setStringValue:_NS("Author")];
     [[o_tc_duration_other headerCell] setStringValue:_NS("Duration")];
 
-    [self setColumn: TITLE_COLUMN state: NSOnState];
-    [self setColumn: ARTIST_COLUMN state: NSOnState];
-    [self setColumn: DURATION_COLUMN state: NSOnState];
+    NSArray * o_columnArray = [[NSUserDefaults standardUserDefaults] arrayForKey:@"PlaylistColumnSelection"];
+    NSUInteger count = [o_columnArray count];
+
     id o_menu = [[VLCMain sharedInstance] mainMenu];
-    [o_menu setPlaylistColumnTableState: NSOnState forColumn: TITLE_COLUMN];
-    [o_menu setPlaylistColumnTableState: NSOnState forColumn: ARTIST_COLUMN];
-    [o_menu setPlaylistColumnTableState: NSOnState forColumn: DURATION_COLUMN];
+    NSString * o_column;
+    for (NSUInteger i = 0; i < count; i++)
+    {
+        o_column = [[o_columnArray objectAtIndex:i] objectAtIndex:0];
+        if ([o_column isEqualToString:@"status"])
+            continue;
+
+        [self setColumn: o_column state: NSOnState];
+        [o_menu setPlaylistColumnTableState: NSOnState forColumn: o_column];
+        [[o_outline_view tableColumnWithIdentifier: o_column] setWidth: [[[o_columnArray objectAtIndex:i] objectAtIndex:1] floatValue]];
+    }
+
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
+}
+
+- (void)applicationWillTerminate:(NSNotification *)notification
+{
+    /* let's make sure we save the correct widths and positions, since this likely changed since the last time the user played with the column selection */
+    [self saveTableColumns];
 }
 
 - (void)setPlaylistRoot: (playlist_item_t *)root_item
@@ -214,7 +242,10 @@
             [[o_work_tc headerCell] setStringValue: @"#"];
         }
         else if ([o_column isEqualToString: TITLE_COLUMN])
+        {
             [[o_work_tc headerCell] setStringValue: _NS("Name")];
+            [o_work_tc setResizingMask: NSTableColumnAutoresizingMask | NSTableColumnUserResizingMask];
+        }
         else if ([o_column isEqualToString: ARTIST_COLUMN])
             [[o_work_tc headerCell] setStringValue: _NS("Author")];
         else if ([o_column isEqualToString: DURATION_COLUMN])
@@ -237,6 +268,23 @@
     }
     else
         [o_outline_view removeTableColumn: [o_outline_view tableColumnWithIdentifier: o_column]];
+
+    [self saveTableColumns];
+}
+
+- (void)saveTableColumns
+{
+    NSMutableArray * o_arrayToSave = [[NSMutableArray alloc] init];
+    NSArray * o_columns = [o_outline_view tableColumns];
+    NSUInteger count = [o_columns count];
+    NSTableColumn * o_currentColumn;
+    for (NSUInteger i = 0; i < count; i++)
+    {
+        o_currentColumn = [o_columns objectAtIndex: i];
+        [o_arrayToSave addObject: [NSArray arrayWithObjects: [o_currentColumn identifier], [NSNumber numberWithFloat: [o_currentColumn width]], nil]];
+    }
+    [[NSUserDefaults standardUserDefaults] setObject: o_arrayToSave forKey:@"PlaylistColumnSelection"];
+    [o_arrayToSave release];
 }
 
 @end
