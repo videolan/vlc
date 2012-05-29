@@ -1069,6 +1069,7 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
         assert(hls);
 
         /* */
+        bool media_sequence_loaded = false;
         int segment_duration = -1;
         do
         {
@@ -1083,7 +1084,15 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
             else if (strncmp(line, "#EXT-X-TARGETDURATION", 21) == 0)
                 err = parse_TargetDuration(s, hls, line);
             else if (strncmp(line, "#EXT-X-MEDIA-SEQUENCE", 21) == 0)
-                err = parse_MediaSequence(s, hls, line);
+            {
+                /* A Playlist file MUST NOT contain more than one EXT-X-MEDIA-SEQUENCE tag. */
+                /* We only care about first one */
+                if (!media_sequence_loaded)
+                {
+                    err = parse_MediaSequence(s, hls, line);
+                    media_sequence_loaded = true;
+                }
+            }
             else if (strncmp(line, "#EXT-X-KEY", 10) == 0)
                 err = parse_Key(s, hls, line);
             else if (strncmp(line, "#EXT-X-PROGRAM-DATE-TIME", 24) == 0)
