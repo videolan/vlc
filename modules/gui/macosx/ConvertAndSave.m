@@ -22,8 +22,13 @@
  *****************************************************************************/
 
 #import "ConvertAndSave.h"
+#import <vlc_common.h>
+#import <vlc_url.h>
 
 @implementation VLCConvertAndSave
+
+@synthesize MRL;
+
 static VLCConvertAndSave *_o_sharedInstance = nil;
 
 + (VLCConvertAndSave *)sharedInstance
@@ -70,6 +75,64 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (IBAction)chooseDestination:(id)sender
 {
+}
+
+- (void)updateDropView
+{
+
+}
+
+@end
+
+
+@implementation VLCDropEnabledBox
+
+- (void)awakeFromNib
+{
+    [self registerForDraggedTypes:[NSArray arrayWithObject: NSFilenamesPboardType]];
+}
+
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
+{
+    if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) == NSDragOperationGeneric)
+        return NSDragOperationGeneric;
+
+    return NSDragOperationNone;
+}
+
+- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
+{
+    return YES;
+}
+
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+{
+    NSPasteboard *o_paste = [sender draggingPasteboard];
+    NSArray *o_types = [NSArray arrayWithObject: NSFilenamesPboardType];
+    NSString *o_desired_type = [o_paste availableTypeFromArray:o_types];
+    NSData *o_carried_data = [o_paste dataForType:o_desired_type];
+
+    if( o_carried_data )
+    {
+        if( [o_desired_type isEqualToString:NSFilenamesPboardType] )
+        {
+            NSArray *o_values = [[o_paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+
+            if ([o_values count] > 0)
+            {
+                id VLCCAS = [VLCConvertAndSave sharedInstance];
+                [VLCCAS setMRL: [NSString stringWithUTF8String:make_URI([[o_values objectAtIndex:0] UTF8String], NULL)]];
+                [VLCCAS updateDropView];
+                return YES;
+            }
+        }
+    }
+    return NO;
+}
+
+- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
+{
+    [self setNeedsDisplay:YES];
 }
 
 @end

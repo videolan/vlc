@@ -46,7 +46,11 @@
     IBOutlet id o_dropin_view;
     IBOutlet id o_dropin_icon_view;
     IBOutlet id o_dropin_media_lbl;
+
+    NSString * MRL;
 }
+@property (readwrite, nonatomic, retain) NSString * MRL;
+
 + (VLCConvertAndSave *)sharedInstance;
 
 - (IBAction)toggleWindow;
@@ -56,5 +60,11 @@
 - (IBAction)profileSelection:(id)sender;
 - (IBAction)customizeProfile:(id)sender;
 - (IBAction)chooseDestination:(id)sender;
+
+- (void)updateDropView;
+
+@end
+
+@interface VLCDropEnabledBox : NSBox
 
 @end
