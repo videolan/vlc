@@ -105,7 +105,6 @@ static block_t *dv_extract_audio( block_t *p_frame_block )
     int i_audio_quant, i_samples, i_size, i_half_ch;
     const uint16_t (*audio_shuffle)[9];
     int i, j, d, of;
-    uint16_t lc;
 
     if( p_frame_block->i_buffer < 4 )
         return NULL;
@@ -173,17 +172,24 @@ static block_t *dv_extract_audio( block_t *p_frame_block )
                 else
                 {
                     /* 12bit quantization */
-                    lc = ((uint16_t)p_frame[d] << 4) |
-                         ((uint16_t)p_frame[d+2] >> 4);
-                    lc = (lc == 0x800 ? 0 : dv_audio_12to16(lc));
+                    uint16_t lc = (p_frame[d+0] << 4) | (p_frame[d+2] >> 4);
+                    uint16_t rc = (p_frame[d+1] << 4) | (p_frame[d+2] & 0x0f);
 
-                    of = audio_shuffle[i][j] + (d - 8) / 3 *
-                         (i_dsf ? 108 : 90);
-                    if( of*2 >= i_size ) continue;
+                    lc = lc == 0x800 ? 0 : dv_audio_12to16(lc);
+                    rc = rc == 0x800 ? 0 : dv_audio_12to16(rc);
 
-                    /* big endian */
-                    p_block->p_buffer[of*2] = lc & 0xff;
+                    of = audio_shuffle[i][j] + (d - 8) / 3 * (i_dsf ? 108 : 90);
+                    if( of*2 >= i_size )
+                        continue;
+                    p_block->p_buffer[of*2+0] = lc & 0xff;
                     p_block->p_buffer[of*2+1] = lc >> 8;
+
+                    of = audio_shuffle[i + i_half_ch][j] + (d - 8) / 3 * (i_dsf ? 108 : 90);
+                    if( of*2 >= i_size )
+                        continue;
+                    p_block->p_buffer[of*2+0] = rc & 0xff;
+                    p_block->p_buffer[of*2+1] = rc >> 8;
+
                     ++d;
                 }
             }
