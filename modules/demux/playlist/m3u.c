@@ -70,6 +70,7 @@ int Import_M3U( vlc_object_t *p_this )
     char *(*pf_dup) (const char *);
 
     if( POKE( p_peek, "RTSPtext", 8 ) /* QuickTime */
+     || POKE( p_peek, "\xef\xbb\xbf" "#EXTM3U", 10) /* BOM at start */
      || demux_IsPathExtension( p_demux, ".m3u8" )
      || demux_IsForced( p_demux, "m3u8" ) )
         pf_dup = CheckUnicode; /* UTF-8 */
