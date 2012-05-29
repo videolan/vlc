@@ -45,7 +45,6 @@ namespace dash
                 virtual ~MPD();
 
                 Profile                         getProfile() const;
-                void                            setProfile( const std::string &strProfile );
                 void                            setProfile( Profile profile );
                 bool                            isLive() const;
                 void                            setLive( bool live );

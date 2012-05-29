@@ -157,7 +157,9 @@ Profile DOMParser::getProfile               ()
     if(this->root == NULL)
         return dash::mpd::UnknownProfile;
 
-    const std::string profile = this->root->getAttributeValue("profiles");
+    std::string profile = this->root->getAttributeValue("profiles");
+    if ( profile.length() == 0 )
+        profile = this->root->getAttributeValue("profile"); //The standard spells it the both ways...
 
     if(profile.find("urn:mpeg:mpegB:profile:dash:isoff-basic-on-demand:cm") != std::string::npos ||
             profile.find("urn:mpeg:dash:profile:isoff-ondemand:2011") != std::string::npos ||

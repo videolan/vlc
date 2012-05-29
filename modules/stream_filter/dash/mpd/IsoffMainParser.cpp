@@ -62,10 +62,6 @@ void    IsoffMainParser::setMPDAttributes   ()
 
     std::map<std::string, std::string>::const_iterator it;
 
-    it = attr.find("profiles");
-    if(it != attr.end())
-        this->mpd->setProfile(it->second);
-
     it = attr.find("mediaPresentationDuration");
     if(it != attr.end())
         this->mpd->setDuration(str_duration(it->second.c_str()));

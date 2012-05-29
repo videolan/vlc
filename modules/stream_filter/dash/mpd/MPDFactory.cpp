@@ -49,7 +49,7 @@ MPD* MPDFactory::createBasicCMMPD    (dash::xml::Node *root, stream_t *p_stream)
 
     if(mpdParser.parse() == false || mpdParser.getMPD() == NULL)
         return NULL;
-
+    mpdParser.getMPD()->setProfile( dash::mpd::BasicCM );
     return mpdParser.getMPD();
 }
 MPD* MPDFactory::createIsoffMainMPD  (dash::xml::Node *root, stream_t *p_stream)
@@ -58,6 +58,6 @@ MPD* MPDFactory::createIsoffMainMPD  (dash::xml::Node *root, stream_t *p_stream)
 
     if(mpdParser.parse() == false || mpdParser.getMPD() == NULL)
         return NULL;
-
+    mpdParser.getMPD()->setProfile( dash::mpd::IsoffMain );
     return mpdParser.getMPD();
 }

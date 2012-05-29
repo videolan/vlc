@@ -75,12 +75,6 @@ bool    BasicCMParser::setMPD()
     this->mpd = new MPD;
 
     std::map<std::string, std::string>::const_iterator  it;
-    it = attr.find( "profile" );
-    if ( it == attr.end() )
-        it = attr.find( "profiles" ); //The standard spells it the two ways...
-    if ( it != attr.end() )
-        this->mpd->setProfile( it->second );
-
     it = attr.find("mediaPresentationDuration");
     /*
         Standard specifies a default of "On-Demand",
