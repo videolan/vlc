@@ -81,6 +81,7 @@
 /* apple stuff */
 #ifdef __APPLE__
 #include <Carbon/Carbon.h>
+#include <sys/param.h>                         /* for MAXPATHLEN */
 #undef HAVE_FONTCONFIG
 #define HAVE_STYLES
 #endif
@@ -713,7 +714,7 @@ static char* MacLegacy_Select( filter_t *p_filter, const char* psz_fontname,
     VLC_UNUSED( b_italic );
     VLC_UNUSED( i_size );
     FSRef ref;
-    unsigned char path[1024];
+    unsigned char path[MAXPATHLEN];
     char * psz_path;
 
     CFStringRef  cf_fontName;
