@@ -107,6 +107,16 @@
     IBOutlet NSMenu * o_mu_chapter;
     IBOutlet NSMenuItem * o_mi_toggleJumpButtons;
     IBOutlet NSMenuItem * o_mi_togglePlaymodeButtons;
+    IBOutlet NSMenu * o_mu_playlistTableColumns;
+    IBOutlet NSMenuItem * o_mi_ptc_tracknum;
+    IBOutlet NSMenuItem * o_mi_ptc_title;
+    IBOutlet NSMenuItem * o_mi_ptc_artist;
+    IBOutlet NSMenuItem * o_mi_ptc_duration;
+    IBOutlet NSMenuItem * o_mi_ptc_genre;
+    IBOutlet NSMenuItem * o_mi_ptc_album;
+    IBOutlet NSMenuItem * o_mi_ptc_description;
+    IBOutlet NSMenuItem * o_mi_ptc_date;
+    IBOutlet NSMenuItem * o_mi_ptc_language;
 
     IBOutlet NSMenu * o_mu_audio;
     IBOutlet NSMenuItem * o_mi_vol_up;
@@ -219,6 +229,8 @@
 - (void)updatePlaybackRate;
 - (IBAction)toggleJumpButtons:(id)sender;
 - (IBAction)togglePlaymodeButtons:(id)sender;
+- (IBAction)togglePlaylistColumnTable:(id)sender;
+- (void)setPlaylistColumnTableState:(NSInteger)i_state forColumn:(NSString *)o_column;
 
 - (IBAction)toggleFullscreen:(id)sender;
 - (IBAction)resizeVideoWindow:(id)sender;

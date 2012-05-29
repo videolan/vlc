@@ -25,6 +25,17 @@
 
 #import "PXSourceList.h"
 
+/* playlist column definitions */
+#define TRACKNUM_COLUMN @"tracknumber"
+#define TITLE_COLUMN @"name"
+#define ARTIST_COLUMN @"artist"
+#define DURATION_COLUMN @"duration"
+#define GENRE_COLUMN @"genre"
+#define ALBUM_COLUMN @"album"
+#define DESCRIPTION_COLUMN @"description"
+#define DATE_COLUMN @"date"
+#define LANGUAGE_COLUMN @"language"
+
 /*****************************************************************************
  * VLCPlaylistView interface
  *****************************************************************************/
@@ -39,9 +50,6 @@
  *****************************************************************************/
 @interface VLCPlaylistCommon : NSObject <NSOutlineViewDataSource, NSOutlineViewDelegate>
 {
-    IBOutlet id o_tc_name;
-    IBOutlet id o_tc_author;
-    IBOutlet id o_tc_duration;
     IBOutlet VLCPlaylistView* o_outline_view;
 
     IBOutlet id o_tc_name_other;
@@ -55,10 +63,10 @@
 
 - (void)setPlaylistRoot: (playlist_item_t *)root_item;
 - (playlist_item_t *)currentPlaylistRoot;
-- (void)initStrings;
 - (playlist_item_t *)selectedPlaylistItem;
 - (NSOutlineView *)outlineView;
-- (void)swapPlaylists:(id)newList;
+
+- (void)setColumn: (NSString *)o_column state: (NSInteger)i_state;
 @end
 
 /*****************************************************************************
@@ -143,5 +151,4 @@
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
 - (void)appendNodeArray:(NSArray*)o_array inNode:(playlist_item_t *)p_node atPos:(int)i_position enqueue:(BOOL)b_enqueue;
-
 @end

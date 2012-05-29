@@ -47,13 +47,13 @@
 #import "controls.h"
 #import "misc.h"
 #import "open.h"
+#import "MainMenu.h"
 
 #include <vlc_keys.h>
 #import <vlc_osd.h>
 #import <vlc_interface.h>
 
 #include <vlc_url.h>
-
 
 /*****************************************************************************
  * VLCPlaylistView implementation
@@ -161,18 +161,17 @@
     [o_outline_view_other setDataSource: self];
     [o_outline_view_other setAllowsEmptySelection: NO];
 
-    [self initStrings];
-}
-
-- (void)initStrings
-{
-    [[o_tc_name headerCell] setStringValue:_NS("Name")];
-    [[o_tc_author headerCell] setStringValue:_NS("Author")];
-    [[o_tc_duration headerCell] setStringValue:_NS("Duration")];
-
     [[o_tc_name_other headerCell] setStringValue:_NS("Name")];
     [[o_tc_author_other headerCell] setStringValue:_NS("Author")];
     [[o_tc_duration_other headerCell] setStringValue:_NS("Duration")];
+
+    [self setColumn: TITLE_COLUMN state: NSOnState];
+    [self setColumn: ARTIST_COLUMN state: NSOnState];
+    [self setColumn: DURATION_COLUMN state: NSOnState];
+    id o_menu = [[VLCMain sharedInstance] mainMenu];
+    [o_menu setPlaylistColumnTableState: NSOnState forColumn: TITLE_COLUMN];
+    [o_menu setPlaylistColumnTableState: NSOnState forColumn: ARTIST_COLUMN];
+    [o_menu setPlaylistColumnTableState: NSOnState forColumn: DURATION_COLUMN];
 }
 
 - (void)setPlaylistRoot: (playlist_item_t *)root_item
@@ -187,25 +186,6 @@
     return p_current_root_item;
 }
 
-- (void)swapPlaylists:(id)newList
-{
-    if(newList != o_outline_view)
-    {
-        id o_outline_view_temp = o_outline_view;
-        id o_tc_author_temp = o_tc_author;
-        id o_tc_duration_temp = o_tc_duration;
-        id o_tc_name_temp = o_tc_name;
-        o_outline_view = o_outline_view_other;
-        o_tc_author = o_tc_author_other;
-        o_tc_duration = o_tc_duration_other;
-        o_tc_name = o_tc_name_other;
-        o_outline_view_other = o_outline_view_temp;
-        o_tc_author_other = o_tc_author_temp;
-        o_tc_duration_other = o_tc_duration_temp;
-        o_tc_name_other = o_tc_name_temp;
-    }
-}
-
 - (NSOutlineView *)outlineView
 {
     return o_outline_view;
@@ -215,6 +195,48 @@
 {
     return [[o_outline_view itemAtRow: [o_outline_view selectedRow]]
                                                                 pointerValue];
+}
+
+- (void)setColumn: (NSString *)o_column state: (NSInteger)i_state
+{
+    NSTableColumn * o_work_tc;
+
+    if (i_state == NSOnState)
+    {
+        o_work_tc = [[NSTableColumn alloc] initWithIdentifier: o_column];
+        [o_work_tc setEditable: NO];
+        [[o_work_tc dataCell] setFont: [NSFont controlContentFontOfSize:11.]];
+
+        /* we cannot use a makro here, because gettext isn't clever enough for that */
+        if ([o_column isEqualToString: TRACKNUM_COLUMN])
+        {
+            [o_work_tc setMaxWidth: 20.];
+            [[o_work_tc headerCell] setStringValue: @"#"];
+        }
+        else if ([o_column isEqualToString: TITLE_COLUMN])
+            [[o_work_tc headerCell] setStringValue: _NS("Name")];
+        else if ([o_column isEqualToString: ARTIST_COLUMN])
+            [[o_work_tc headerCell] setStringValue: _NS("Author")];
+        else if ([o_column isEqualToString: DURATION_COLUMN])
+            [[o_work_tc headerCell] setStringValue: _NS("Duration")];
+        else if ([o_column isEqualToString: GENRE_COLUMN])
+            [[o_work_tc headerCell] setStringValue: _NS("Genre")];
+        else if ([o_column isEqualToString: ALBUM_COLUMN])
+            [[o_work_tc headerCell] setStringValue: _NS("Album")];
+        else if ([o_column isEqualToString: DESCRIPTION_COLUMN])
+            [[o_work_tc headerCell] setStringValue: _NS("Description")];
+        else if ([o_column isEqualToString: DATE_COLUMN])
+            [[o_work_tc headerCell] setStringValue: _NS("Date")];
+        else if ([o_column isEqualToString: LANGUAGE_COLUMN])
+            [[o_work_tc headerCell] setStringValue: _NS("Language")];
+
+        [o_outline_view addTableColumn: o_work_tc];
+        [o_work_tc release];
+        [o_outline_view reloadData];
+        [o_outline_view setNeedsDisplay: YES];
+    }
+    else
+        [o_outline_view removeTableColumn: [o_outline_view tableColumnWithIdentifier: o_column]];
 }
 
 @end
@@ -306,6 +328,7 @@
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)o_tc byItem:(id)item
 {
     id o_value = nil;
+    char * psz_value;
     playlist_item_t *p_item;
 
     /* For error handling */
@@ -337,8 +360,17 @@
     }
 
     attempted_reload = NO;
+    NSString * o_identifier = [o_tc identifier];
 
-    if( [[o_tc identifier] isEqualToString:@"name"] )
+    if( [o_identifier isEqualToString:TRACKNUM_COLUMN] )
+    {
+        psz_value = input_item_GetTrackNumber( p_item->p_input ); \
+        if (psz_value) { \
+            o_value = [NSString stringWithUTF8String: psz_value]; \
+            free( psz_value ); \
+        }
+    }
+    else if( [o_identifier isEqualToString:TITLE_COLUMN] )
     {
         /* sanity check to prevent the NSString class from crashing */
         char *psz_title =  input_item_GetTitleFbName( p_item->p_input );
@@ -348,14 +380,15 @@
             free( psz_title );
         }
     }
-    else if( [[o_tc identifier] isEqualToString:@"artist"] )
+    else if( [o_identifier isEqualToString:ARTIST_COLUMN] )
     {
-        char *psz_artist = input_item_GetArtist( p_item->p_input );
-        if( psz_artist )
-            o_value = [NSString stringWithUTF8String: psz_artist];
-        free( psz_artist );
+        psz_value = input_item_GetArtist( p_item->p_input ); \
+        if (psz_value) { \
+            o_value = [NSString stringWithUTF8String: psz_value]; \
+            free( psz_value ); \
+        }
     }
-    else if( [[o_tc identifier] isEqualToString:@"duration"] )
+    else if( [o_identifier isEqualToString:@"duration"] )
     {
         char psz_duration[MSTRTIME_MAX_SIZE];
         mtime_t dur = input_item_GetDuration( p_item->p_input );
@@ -367,7 +400,47 @@
         else
             o_value = @"--:--";
     }
-    else if( [[o_tc identifier] isEqualToString:@"status"] )
+    else if( [o_identifier isEqualToString:GENRE_COLUMN] )
+    {
+        psz_value = input_item_GetGenre( p_item->p_input ); \
+        if (psz_value) { \
+            o_value = [NSString stringWithUTF8String: psz_value]; \
+            free( psz_value ); \
+        }
+    }
+    else if( [o_identifier isEqualToString:ALBUM_COLUMN] )
+    {
+        psz_value = input_item_GetAlbum( p_item->p_input ); \
+        if (psz_value) { \
+            o_value = [NSString stringWithUTF8String: psz_value]; \
+            free( psz_value ); \
+        }
+    }
+    else if( [o_identifier isEqualToString:DESCRIPTION_COLUMN] )
+    {
+        psz_value = input_item_GetDescription( p_item->p_input ); \
+        if (psz_value) { \
+            o_value = [NSString stringWithUTF8String: psz_value]; \
+            free( psz_value ); \
+        }
+    }
+    else if( [o_identifier isEqualToString:DATE_COLUMN] )
+    {
+        psz_value = input_item_GetDate( p_item->p_input ); \
+        if (psz_value) { \
+            o_value = [NSString stringWithUTF8String: psz_value]; \
+            free( psz_value ); \
+        }
+    }
+    else if( [o_identifier isEqualToString:LANGUAGE_COLUMN] )
+    {
+        psz_value = input_item_GetLanguage( p_item->p_input ); \
+        if (psz_value) { \
+            o_value = [NSString stringWithUTF8String: psz_value]; \
+            free( psz_value ); \
+        }
+    }
+    else if( [o_identifier isEqualToString:@"status"] )
     {
         if( input_item_HasErrorWhenReading( p_item->p_input ) )
         {
@@ -375,6 +448,7 @@
             [o_value setSize: NSMakeSize(16,16)];
         }
     }
+
     return o_value;
 }
 
@@ -470,8 +544,6 @@
 
 - (void)initStrings
 {
-    [super initStrings];
-
     [o_mi_save_playlist setTitle: _NS("Save Playlist...")];
     [o_mi_play setTitle: _NS("Play")];
     [o_mi_delete setTitle: _NS("Delete")];
@@ -493,18 +565,6 @@
     [[o_save_accessory_popup itemAtIndex:0] setTitle: _NS("Extended M3U")];
     [[o_save_accessory_popup itemAtIndex:1] setTitle: _NS("XML Shareable Playlist Format (XSPF)")];
     [[o_save_accessory_popup itemAtIndex:2] setTitle: _NS("HTML Playlist")];
-}
-
-- (void)swapPlaylists:(id)newList
-{
-    if(newList != o_outline_view)
-    {
-        id o_search_field_temp = o_search_field;
-        o_search_field = o_search_field_other;
-        o_search_field_other = o_search_field_temp;
-        [super swapPlaylists:newList];
-        [self playlistUpdated];
-    }
 }
 
 - (void)playlistUpdated
@@ -1314,46 +1374,31 @@
 {
     int i_mode, i_type = 0;
     intf_thread_t *p_intf = VLCIntf;
+    NSString * o_identifier = [o_tc identifier];
 
     playlist_t *p_playlist = pl_Get( p_intf );
 
     /* Check whether the selected table column header corresponds to a
        sortable table column*/
-    if( !( o_tc == o_tc_name || o_tc == o_tc_author || o_tc == o_tc_duration ) )
-    {
+    if( !( [o_identifier isEqualToString:TITLE_COLUMN] || [o_identifier isEqualToString:ARTIST_COLUMN] || [o_identifier isEqualToString:DURATION_COLUMN] ) )
         return;
-    }
 
     if( o_tc_sortColumn == o_tc )
-    {
         b_isSortDescending = !b_isSortDescending;
-    }
     else
-    {
         b_isSortDescending = false;
-    }
 
-    if( o_tc == o_tc_name )
-    {
+    if( [o_identifier isEqualToString:TITLE_COLUMN] )
         i_mode = SORT_TITLE;
-    }
-    else if( o_tc == o_tc_author )
-    {
+    else if( [o_identifier isEqualToString:ARTIST_COLUMN] )
         i_mode = SORT_ARTIST;
-    }
-    else if( o_tc == o_tc_duration )
-    {
+    else if( [o_identifier isEqualToString:DURATION_COLUMN] )
         i_mode = SORT_DURATION;
-    }
 
     if( b_isSortDescending )
-    {
         i_type = ORDER_REVERSE;
-    }
     else
-    {
         i_type = ORDER_NORMAL;
-    }
 
     PL_LOCK;
     playlist_RecursiveNodeSort( p_playlist, [self currentPlaylistRoot], i_mode, i_type );
@@ -1365,15 +1410,9 @@
     [o_outline_view setHighlightedTableColumn:o_tc];
 
     if( b_isSortDescending )
-    {
-        [o_outline_view setIndicatorImage:o_descendingSortingImage
-                                                        inTableColumn:o_tc];
-    }
+        [o_outline_view setIndicatorImage:o_descendingSortingImage inTableColumn:o_tc];
     else
-    {
-        [o_outline_view setIndicatorImage:o_ascendingSortingImage
-                                                        inTableColumn:o_tc];
-    }
+        [o_outline_view setIndicatorImage:o_ascendingSortingImage inTableColumn:o_tc];
 }
 
 
@@ -1670,6 +1709,5 @@
     }
     return NO;
 }
+
 @end
-
-

@@ -36,6 +36,7 @@
 #import "simple_prefs.h"
 #import "coredialogs.h"
 #import "controls.h"
+#import "playlist.h"
 #import "playlistinfo.h"
 #import "VideoView.h"
 #import "CoreInteraction.h"
@@ -290,6 +291,16 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_toggleJumpButtons setState: config_GetInt( VLCIntf, "macosx-show-playback-buttons")];
     [o_mi_togglePlaymodeButtons setTitle: _NS("Show Shuffle & Repeat Buttons")];
     [o_mi_togglePlaymodeButtons setState: config_GetInt( VLCIntf, "macosx-show-playmode-buttons")];
+    [o_mu_playlistTableColumns setTitle: _NS("Playlist Table Columns")];
+    [o_mi_ptc_tracknum setTitle: _NS("Track Number")];
+    [o_mi_ptc_title setTitle: _NS("Title")];
+    [o_mi_ptc_artist setTitle: _NS("Artist")];
+    [o_mi_ptc_duration setTitle: _NS("Duration")];
+    [o_mi_ptc_genre setTitle: _NS("Genre")];
+    [o_mi_ptc_album setTitle: _NS("Album")];
+    [o_mi_ptc_description setTitle: _NS("Description")];
+    [o_mi_ptc_date setTitle: _NS("Date")];
+    [o_mi_ptc_language setTitle: _NS("Language")];
 
     [o_mi_program setTitle: _NS("Program")];
     [o_mu_program setTitle: _NS("Program")];
@@ -632,6 +643,56 @@ static VLCMainMenu *_o_sharedInstance = nil;
     config_PutInt( VLCIntf, "macosx-show-playmode-buttons", b_value );
     [[[VLCMain sharedInstance] mainWindow] togglePlaymodeButtons];
     [o_mi_togglePlaymodeButtons setState: b_value];
+}
+
+- (IBAction)togglePlaylistColumnTable:(id)sender
+{
+    [sender setState: ![sender state]];
+
+    NSString * o_column;
+
+    if (sender == o_mi_ptc_tracknum)
+        o_column = TRACKNUM_COLUMN;
+    else if (sender == o_mi_ptc_title)
+        o_column = TITLE_COLUMN;
+    else if (sender == o_mi_ptc_artist)
+        o_column = ARTIST_COLUMN;
+    else if (sender == o_mi_ptc_duration)
+        o_column = DURATION_COLUMN;
+    else if (sender == o_mi_ptc_genre)
+        o_column = GENRE_COLUMN;
+    else if (sender == o_mi_ptc_album)
+        o_column = ALBUM_COLUMN;
+    else if (sender == o_mi_ptc_description)
+        o_column = DESCRIPTION_COLUMN;
+    else if (sender == o_mi_ptc_date)
+        o_column = DATE_COLUMN;
+    else if (sender == o_mi_ptc_language)
+        o_column = LANGUAGE_COLUMN;
+
+    [[[VLCMain sharedInstance] playlist] setColumn: o_column state: [sender state]];
+}
+
+- (void)setPlaylistColumnTableState:(NSInteger)i_state forColumn:(NSString *)o_column
+{
+    if ([o_column isEqualToString: TRACKNUM_COLUMN])
+        [o_mi_ptc_tracknum setState: i_state];
+    else if ([o_column isEqualToString: TITLE_COLUMN])
+        [o_mi_ptc_title setState: i_state];
+    else if ([o_column isEqualToString: ARTIST_COLUMN])
+        [o_mi_ptc_artist setState: i_state];
+    else if ([o_column isEqualToString: DURATION_COLUMN])
+        [o_mi_ptc_duration setState: i_state];
+    else if ([o_column isEqualToString: GENRE_COLUMN])
+        [o_mi_ptc_genre setState: i_state];
+    else if ([o_column isEqualToString: ALBUM_COLUMN])
+        [o_mi_ptc_album setState: i_state];
+    else if ([o_column isEqualToString: DESCRIPTION_COLUMN])
+        [o_mi_ptc_description setState: i_state];
+    else if ([o_column isEqualToString: DATE_COLUMN])
+        [o_mi_ptc_date setState: i_state];
+    else if ([o_column isEqualToString: LANGUAGE_COLUMN])
+        [o_mi_ptc_language setState: i_state];
 }
 
 #pragma mark -
