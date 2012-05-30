@@ -561,7 +561,7 @@ bool    BasicCMParser::parseCommonAttributesElements( Node *node, CommonAttribut
     {
         if ( parent && parent->getMimeType().empty() == false )
             common->setMimeType( parent->getMimeType() );
-        else
+        else if ( node->getName().find( "Representation" ) != std::string::npos )
         {
             std::cerr << "Missing mandatory attribute: @mimeType" << std::endl;
             return false;
