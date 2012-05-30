@@ -210,8 +210,13 @@ static int Create( vlc_object_t *p_this )
     ass_set_font_scale( p_renderer, 1.0 );
     ass_set_line_spacing( p_renderer, 0.0 );
 
+#if defined( __ANDROID__ )
+    const char *psz_font = "/system/fonts/DroidSans-Bold.ttf";
+    const char *psz_family = "Droid Sans Bold";
+#else
     const char *psz_font = NULL; /* We don't ship a default font with VLC */
     const char *psz_family = "Arial"; /* Use Arial if we can't find anything more suitable */
+#endif
 
 #ifdef HAVE_FONTCONFIG
 #if defined(WIN32)
