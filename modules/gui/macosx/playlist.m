@@ -1417,8 +1417,7 @@
     return( o_ctx_menu );
 }
 
-- (void)outlineView: (NSOutlineView *)o_tv
-                  didClickTableColumn:(NSTableColumn *)o_tc
+- (void)outlineView: (NSOutlineView *)o_tv didClickTableColumn:(NSTableColumn *)o_tc
 {
     int i_mode, i_type = 0;
     intf_thread_t *p_intf = VLCIntf;
@@ -1426,22 +1425,27 @@
 
     playlist_t *p_playlist = pl_Get( p_intf );
 
-    /* Check whether the selected table column header corresponds to a
-       sortable table column*/
-    if( !( [o_identifier isEqualToString:TITLE_COLUMN] || [o_identifier isEqualToString:ARTIST_COLUMN] || [o_identifier isEqualToString:DURATION_COLUMN] ) )
+    if( [o_identifier isEqualToString:TRACKNUM_COLUMN] )
+        i_mode = SORT_TRACK_NUMBER;
+    else if( [o_identifier isEqualToString:TITLE_COLUMN] )
+        i_mode = SORT_TITLE;
+    else if( [o_identifier isEqualToString:ARTIST_COLUMN] )
+        i_mode = SORT_ARTIST;
+    else if( [o_identifier isEqualToString:GENRE_COLUMN] )
+        i_mode = SORT_GENRE;
+    else if( [o_identifier isEqualToString:DURATION_COLUMN] )
+        i_mode = SORT_DURATION;
+    else if( [o_identifier isEqualToString:ALBUM_COLUMN] )
+        i_mode = SORT_ALBUM;
+    else if( [o_identifier isEqualToString:DESCRIPTION_COLUMN] )
+        i_mode = SORT_DESCRIPTION;
+    else
         return;
 
     if( o_tc_sortColumn == o_tc )
         b_isSortDescending = !b_isSortDescending;
     else
         b_isSortDescending = false;
-
-    if( [o_identifier isEqualToString:TITLE_COLUMN] )
-        i_mode = SORT_TITLE;
-    else if( [o_identifier isEqualToString:ARTIST_COLUMN] )
-        i_mode = SORT_ARTIST;
-    else if( [o_identifier isEqualToString:DURATION_COLUMN] )
-        i_mode = SORT_DURATION;
 
     if( b_isSortDescending )
         i_type = ORDER_REVERSE;
