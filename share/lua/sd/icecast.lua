@@ -43,6 +43,8 @@ function main()
                           title=station_name,
                           genre=station.children_map["genre"][1].children[1],
                           nowplaying=station.children_map["current_song"][1].children[1],
+                          uiddata=station.children_map["listen_url"][1].children[1]
+                                  .. station.children_map["listen_url"][1].children[1],
                           meta={
                                   ["Listing Source"]="dir.xiph.org",
                                   ["Icecast Bitrate"]=station.children_map["bitrate"][1].children[1],

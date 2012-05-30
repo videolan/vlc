@@ -177,7 +177,10 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
     free( psz_artist );
     free( psz_album );
 
-    playlist_FindArtInCache( p_item );
+    if ( playlist_FindArtInCacheUsingItemUID( p_item ) != VLC_SUCCESS )
+        playlist_FindArtInCache( p_item );
+    else
+        msg_Dbg( p_fetcher->p_playlist, "successfully retrieved arturl by uid" );
 
     char *psz_arturl = input_item_GetArtURL( p_item );
     if( psz_arturl )

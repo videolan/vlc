@@ -35,6 +35,7 @@ typedef struct
 } playlist_album_t;
 
 int playlist_FindArtInCache( input_item_t * );
+int playlist_FindArtInCacheUsingItemUID( input_item_t * );
 
 int playlist_SaveArt( playlist_t *, input_item_t *, const uint8_t *p_buffer, int i_buffer, const char *psz_type );
 

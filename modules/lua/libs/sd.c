@@ -37,6 +37,7 @@
 #include <vlc_services_discovery.h>
 #include <vlc_playlist.h>
 #include <vlc_charset.h>
+#include <vlc_md5.h>
 
 #include "../vlc.h"
 #include "../libs.h"
@@ -256,6 +257,27 @@ static int vlclua_sd_add_item( lua_State *L )
                 else
                     services_discovery_AddItem( p_sd, p_input, NULL );
                 lua_pop( L, 1 );
+
+                /* string to build the input item uid */
+                lua_getfield( L, -1, "uiddata" );
+                if( lua_isstring( L, -1 ) )
+                {
+                    char *s = strdup( luaL_checkstring( L, -1 ) );
+                    if ( s )
+                    {
+                        struct md5_s md5;
+                        InitMD5( &md5 );
+                        AddMD5( &md5, s, strlen( s ) );
+                        EndMD5( &md5 );
+                        free( s );
+                        s = psz_md5_hash( &md5 );
+                        if ( s )
+                            input_item_AddInfo( p_input, "uid", "md5", "%s", s );
+                        free( s );
+                    }
+                }
+                lua_pop( L, 1 );
+
                 input_item_t **udata = (input_item_t **)
                                        lua_newuserdata( L, sizeof( input_item_t * ) );
                 *udata = p_input;
