@@ -567,7 +567,8 @@ bool    BasicCMParser::parseCommonAttributesElements( Node *node, CommonAttribut
             return false;
         }
     }
-    common->setMimeType( it->second );
+    else
+        common->setMimeType( it->second );
     //Everything else is optionnal.
     it = attr.find( "width" );
     if ( it != attr.end() )
