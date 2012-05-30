@@ -167,19 +167,22 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     /* Don't update each time an item has been preparsed */
     if( b_is_item_current )
     { /* stores the current input item id */
-        p_intf->p_sys->i_id = p_item->i_id;
-        p_intf->p_sys->i_item_changes = 0;
+        if( p_intf->p_sys->i_id != p_item->i_id )
+        {
+            p_intf->p_sys->i_id = p_item->i_id;
+            p_intf->p_sys->i_item_changes = 0;
+        }
         return VLC_SUCCESS;
     }
     /* ignore items which weren't pre-parsed yet */
     else if( !input_item_IsPreparsed(p_item) )
         return VLC_SUCCESS;
     else
-    {
-        if( p_item->i_id != p_intf->p_sys->i_id ) { /* "item-change" */
-            p_intf->p_sys->i_item_changes = 0;
+    {   /* "item-change" */
+        
+        if( p_item->i_id != p_intf->p_sys->i_id )
             return VLC_SUCCESS;
-        }
+
         /* Some variable bitrate inputs call "item-change" callbacks each time
          * their length is updated, that is several times per second.
          * We'll limit the number of changes to 1 per input. */
@@ -187,18 +190,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
             return VLC_SUCCESS;
 
         p_intf->p_sys->i_item_changes++;
-    }
-
-
-    input_thread_t *p_input = playlist_CurrentInput( (playlist_t*)p_this );
-
-    if( !p_input ) return VLC_SUCCESS;
-
-    if( p_input->b_dead || !input_GetItem(p_input)->psz_name )
-    {
-        /* Not playing anything ... */
-        vlc_object_release( p_input );
-        return VLC_SUCCESS;
     }
 
     /* Playing something ... */
@@ -209,7 +200,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     if( EMPTY_STR( psz_title ) )
     {
         free( psz_title );
-        vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
 
@@ -232,7 +222,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         free( psz_title );
         free( psz_artist );
         free( psz_album );
-        vlc_object_release( p_input );
         return VLC_ENOMEM;
     }
 
@@ -252,7 +241,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     free( psz_arturl );
     free( psz_tmp );
 
-    vlc_object_release( p_input );
     return VLC_SUCCESS;
 }
 
