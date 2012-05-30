@@ -66,8 +66,7 @@ BasicCMParser::~BasicCMParser   ()
 
 bool    BasicCMParser::parse                ()
 {
-    this->setMPD();
-    return true;
+    return this->setMPD();
 }
 bool    BasicCMParser::setMPD()
 {
