@@ -1160,7 +1160,6 @@ static int Demux_Seekable( demux_t *p_demux )
             p_frame->i_pts = VLC_TS_INVALID;
         }
 
-        //p_pes->i_rate = p_demux->stream.control.i_rate;
         if( tk->i_dv_audio_rate )
             AVI_DvHandleAudio( p_demux, tk, p_frame );
         es_out_Send( p_demux->out, tk->p_es, p_frame );
@@ -1277,7 +1276,6 @@ static int Demux_UnSeekable( demux_t *p_demux )
                     p_frame->i_pts = VLC_TS_INVALID;
                 }
 
-                //p_pes->i_rate = p_demux->stream.control.i_rate;
                 if( p_stream->i_dv_audio_rate )
                     AVI_DvHandleAudio( p_demux, p_stream, p_frame );
                 es_out_Send( p_demux->out, p_stream->p_es, p_frame );
