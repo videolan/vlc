@@ -633,9 +633,9 @@ static int MpgaCheckSync( const uint8_t *p_peek )
     uint32_t h = GetDWBE( p_peek );
 
     if( ((( h >> 21 )&0x07FF) != 0x07FF )   /* header sync */
+        || (((h >> 19)&0x03) == 1 )         /* valid version ID ? */
         || (((h >> 17)&0x03) == 0 )         /* valid layer ?*/
-        || (((h >> 12)&0x0F) == 0x0F )
-        || (((h >> 12)&0x0F) == 0x00 )      /* valid bitrate ? */
+        || (((h >> 12)&0x0F) == 0x0F )      /* valid bitrate ?*/
         || (((h >> 10) & 0x03) == 0x03 )    /* valide sampling freq ? */
         || ((h & 0x03) == 0x02 ))           /* valid emphasis ? */
     {
