@@ -41,6 +41,8 @@ Mac OS X Interface:
    VLC's internal volume level
  * added an option to show next / previous buttons
  * added an option to hide the shuffle and repeat buttons
+ * added optional playlist columns for track number, genre, album, description,
+   date and language.
 
 Removed modules:
  * portaudio audio output
