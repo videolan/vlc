@@ -71,13 +71,13 @@ vlc_module_end()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void HFlip(int *sx, int *sy, int w, int h, int dx, int dy)
+static void VFlip(int *sx, int *sy, int w, int h, int dx, int dy)
 {
     VLC_UNUSED( h );
     *sx = w - 1 - dx;
     *sy = dy;
 }
-static void VFlip(int *sx, int *sy, int w, int h, int dx, int dy)
+static void HFlip(int *sx, int *sy, int w, int h, int dx, int dy)
 {
     VLC_UNUSED( w );
     *sx = dx;
