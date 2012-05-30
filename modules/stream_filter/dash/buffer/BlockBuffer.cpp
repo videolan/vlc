@@ -162,10 +162,9 @@ void    BlockBuffer::setEOF               (bool value)
 }
 bool    BlockBuffer::getEOF               ()
 {
-    vlc_mutex_lock(&this->monitorMutex);
-    bool ret = this->isEOF;
-    vlc_mutex_unlock(&this->monitorMutex);
-    return ret;
+    vlc_mutex_locker    lock(&this->monitorMutex);
+
+    return this->isEOF;
 }
 void    BlockBuffer::attach               (IBufferObserver *observer)
 {
