@@ -954,6 +954,8 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
 
         /* M3U8 Meta Index file */
         do {
+            bool failed_to_download_stream_m3u8 = false;
+
             /* Next line */
             line = ReadLine(p_begin, &p_read, p_end - p_begin);
             if (line == NULL)
@@ -976,15 +978,29 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
                     }
                     else
                     {
+                        bool new_stream_added = false;
                         hls_stream_t *hls = NULL;
                         err = parse_StreamInformation(s, &streams, &hls, line, uri);
+                        if (err == VLC_SUCCESS)
+                            new_stream_added = true;
+
                         free(uri);
 
                         /* Download playlist file from server */
                         uint8_t *buf = NULL;
                         ssize_t len = read_M3U8_from_url(s, hls->url, &buf);
                         if (len < 0)
-                            err = VLC_EGENERIC;
+                        {
+                            msg_Warn(s, "failed to read %s, continue for other streams", hls->url);
+                            failed_to_download_stream_m3u8 = true;
+
+                            /* remove stream just added */
+                            if (new_stream_added)
+                                vlc_array_remove(streams, vlc_array_count(streams) - 1);
+
+                            /* ignore download error, so we have chance to try other streams */
+                            err = VLC_SUCCESS;
+                        }
                         else
                         {
                             /* Parse HLS m3u8 content. */
@@ -1011,6 +1027,13 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
 
         } while (err == VLC_SUCCESS);
 
+        size_t stream_count = vlc_array_count(streams);
+        msg_Dbg(s, "%d streams loaded in Meta playlist", (int)stream_count);
+        if (stream_count == 0)
+        {
+            msg_Err(s, "No playable streams found in Meta playlist");
+            err = VLC_EGENERIC;
+        }
     }
     else
     {
