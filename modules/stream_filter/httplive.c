@@ -2354,16 +2354,12 @@ static int segment_Seek(stream_t *s, const uint64_t pos)
     uint64_t size = hls->size;
     int count = vlc_array_count(hls->segments);
 
-    /* restore current segment to start position */
-    segment_t *segment = segment_GetSegment(hls, p_sys->playback.segment);
-    if (segment == NULL)
+    segment_t *currentSegment = segment_GetSegment(hls, p_sys->playback.segment);
+    if (currentSegment == NULL)
     {
         vlc_mutex_unlock(&hls->lock);
         return VLC_EGENERIC;
     }
-    vlc_mutex_lock(&segment->lock);
-    segment_RestorePos(segment);
-    vlc_mutex_unlock(&segment->lock);
 
     for (int n = 0; n < count; n++)
     {
@@ -2402,7 +2398,13 @@ static int segment_Seek(stream_t *s, const uint64_t pos)
     /* */
     if (b_found)
     {
-        /* restore segment to start position */
+
+        /* restore current segment to start position */
+        vlc_mutex_lock(&currentSegment->lock);
+        segment_RestorePos(currentSegment);
+        vlc_mutex_unlock(&currentSegment->lock);
+
+        /* restore seeked segment to start position */
         segment_t *segment = segment_GetSegment(hls, p_sys->playback.segment);
         if (segment == NULL)
         {
