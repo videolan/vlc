@@ -1652,8 +1652,13 @@ static int Prefetch(stream_t *s, int *current)
     if (hls == NULL)
         return VLC_EGENERIC;
 
-    /* Download first 2 segments of this HLS stream */
-    for (int i = 0; i < 2; i++)
+    if (vlc_array_count(hls->segments) == 0)
+        return VLC_EGENERIC;
+    else if (vlc_array_count(hls->segments) == 1 && p_sys->b_live)
+        msg_Warn(s, "Only 1 segment available to prefetch in live stream; may stall");
+
+    /* Download first 2 segments of this HLS stream if they exist */
+    for (int i = 0; i < __MIN(vlc_array_count(hls->segments), 2); i++)
     {
         segment_t *segment = segment_GetSegment(hls, p_sys->download.segment);
         if (segment == NULL )
