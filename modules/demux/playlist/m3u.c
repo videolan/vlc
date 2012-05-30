@@ -48,6 +48,7 @@ struct demux_sys_t
 static int Demux( demux_t *p_demux);
 static void parseEXTINF( char *psz_string, char **ppsz_artist, char **ppsz_name, int *pi_duration );
 static bool ContainsURL( demux_t *p_demux );
+static bool CheckContentType( stream_t * p_stream, const char * psz_ctype );
 
 static char *GuessEncoding (const char *str)
 {
@@ -72,14 +73,16 @@ int Import_M3U( vlc_object_t *p_this )
     if( POKE( p_peek, "RTSPtext", 8 ) /* QuickTime */
      || POKE( p_peek, "\xef\xbb\xbf" "#EXTM3U", 10) /* BOM at start */
      || demux_IsPathExtension( p_demux, ".m3u8" )
-     || demux_IsForced( p_demux, "m3u8" ) )
+     || demux_IsForced( p_demux, "m3u8" )
+     || CheckContentType( p_demux->s, "application/vnd.apple.mpegurl" ) )
         pf_dup = CheckUnicode; /* UTF-8 */
     else
     if( POKE( p_peek, "#EXTM3U", 7 )
      || demux_IsPathExtension( p_demux, ".m3u" )
      || demux_IsPathExtension( p_demux, ".vlc" )
      || demux_IsForced( p_demux, "m3u" )
-     || ContainsURL( p_demux ) )
+     || ContainsURL( p_demux )
+     || CheckContentType( p_demux->s, "audio/x-mpegurl") )
         pf_dup = GuessEncoding;
     else
         return VLC_EGENERIC;
@@ -123,6 +126,17 @@ static bool ContainsURL( demux_t *p_demux )
             p_peek++;
     }
     return false;
+}
+
+static bool CheckContentType( stream_t * p_stream, const char * psz_ctype )
+{
+    char *psz_check = stream_ContentType( p_stream );
+    if( !psz_check ) return false;
+
+    int i_res = strncasecmp( psz_check, psz_ctype, strlen( psz_check ) );
+    free( psz_check );
+
+    return ( i_res == 0 ) ? true : false;
 }
 
 /*****************************************************************************
