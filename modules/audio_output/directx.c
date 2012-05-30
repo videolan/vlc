@@ -580,25 +580,24 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer )
 static int VolumeSet( audio_output_t *p_aout, float vol, bool mute )
 {
     aout_sys_t *sys = p_aout->sys;
-    LONG volume;
-    float f = vol;
 
-    if( mute )
-        f = 0.;
-    /* Convert UI volume percentage to linear factor (cube) */
-    f = f * f * f;
-
-    /* "DirectSound does not support amplification." -- MSDN */
-    if( f > 1. )
-        f = 1.;
+    /* Convert UI volume to linear factor (cube) */
+    vol = vol * vol * vol;
 
     /* millibels from linear amplification */
-    if( f <= powf(10., DSBVOLUME_MIN / -2000.) )
-        volume = DSBVOLUME_MIN;
-    else
-        volume = lroundf(-2000. * log10f(f));
+    LONG mb = lroundf(2000.f * log10f(vol));
 
-    InterlockedExchange(&sys->volume, volume);
+    /* Clamp to allowed DirectSound range */
+    static_assert( DSBVOLUME_MIN < DSBVOLUME_MAX, "DSBVOLUME_* confused" );
+    if( mb >= DSBVOLUME_MAX )
+        mb = DSBVOLUME_MAX;
+    if( mb <= DSBVOLUME_MIN )
+        mb = DSBVOLUME_MIN;
+
+    InterlockedExchange(&sys->volume, mute ? DSBVOLUME_MIN : mb);
+
+    /* Convert back to UI volume */
+    vol = cbrtf(powf(10.f, ((float)mb) / -2000.f));
     aout_VolumeHardSet( p_aout, vol, mute );
     return 0;
 }
