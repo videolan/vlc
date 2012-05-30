@@ -27,7 +27,6 @@
 #include <vector>
 #include <string>
 
-#include "mpd/Group.h"
 #include "mpd/AdaptationSet.h"
 
 namespace dash
@@ -40,13 +39,10 @@ namespace dash
                 Period();
                 virtual ~Period ();
 
-                const std::vector<Group *>&         getGroups           () const;
-                void                                addGroup            (Group *group);
                 const std::vector<AdaptationSet *>& getAdaptationSets   () const;
                 void                                addAdaptationSet    (AdaptationSet *AdaptationSet);
 
             private:
-                std::vector<Group *>            groups;
                 std::vector<AdaptationSet *>    adaptationSets;
         };
     }

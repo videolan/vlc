@@ -37,7 +37,7 @@ namespace dash
 {
     namespace mpd
     {
-        class Group;
+        class AdaptationSet;
 
         class Representation : public CommonAttributesElements
         {
@@ -69,8 +69,8 @@ namespace dash
 
                 void                setSegmentInfo( SegmentInfo *info );
                 void                setTrickMode( TrickModeType *trickModeType );
-                const Group*        getParentGroup() const;
-                void                setParentGroup( const Group *group );
+                const AdaptationSet*        getParentGroup() const;
+                void                setParentGroup( const AdaptationSet *group );
 
                 SegmentList*        getSegmentList          () const;
                 void                setSegmentList          (SegmentList *list);
@@ -88,7 +88,7 @@ namespace dash
                 std::list<const Representation*>    dependencies;
                 SegmentInfo                         *segmentInfo;
                 TrickModeType                       *trickModeType;
-                const Group                         *parentGroup;
+                const AdaptationSet                         *parentGroup;
                 SegmentBase                         *segmentBase;
                 SegmentList                         *segmentList;
                 int                                 width;

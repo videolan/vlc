@@ -1,9 +1,9 @@
 /*
  * AdaptationSet.cpp
  *****************************************************************************
- * Copyright (C) 2010 - 2012 Klagenfurt University
+ * Copyright (C) 2010 - 2011 Klagenfurt University
  *
- * Created on: Jan 27, 2012
+ * Created on: Aug 10, 2010
  * Authors: Christopher Mueller <christopher.mueller@itec.uni-klu.ac.at>
  *          Christian Timmerer  <christian.timmerer@itec.uni-klu.ac.at>
  *
@@ -28,20 +28,76 @@
 
 #include "AdaptationSet.h"
 
+#include <vlc_common.h>
+#include <vlc_arrays.h>
+
+#include "SegmentInfoDefault.h"
+
 using namespace dash::mpd;
 
-AdaptationSet::AdaptationSet        () :
-               isBitstreamSwitching (false)
+AdaptationSet::AdaptationSet() :
+    subsegmentAlignmentFlag( false ),
+    segmentInfoDefault( NULL ),
+    isBitstreamSwitching( false )
 {
 }
+
 AdaptationSet::~AdaptationSet   ()
 {
+    delete this->segmentInfoDefault;
+    vlc_delete_all( this->representations );
+}
+
+bool                AdaptationSet::getSubsegmentAlignmentFlag() const
+{
+    return this->subsegmentAlignmentFlag;
+}
+
+void AdaptationSet::setSubsegmentAlignmentFlag(bool alignment)
+{
+    this->subsegmentAlignmentFlag = alignment;
+}
+
+std::vector<Representation*>    AdaptationSet::getRepresentations       ()
+{
+    return this->representations;
+}
+
+const Representation *AdaptationSet::getRepresentationById(const std::string &id) const
+{
+    std::vector<Representation*>::const_iterator    it = this->representations.begin();
+    std::vector<Representation*>::const_iterator    end = this->representations.end();
+
+    while ( it != end )
+    {
+        if ( (*it)->getId() == id )
+            return *it;
+        ++it;
+    }
+    return NULL;
+}
+
+const SegmentInfoDefault *AdaptationSet::getSegmentInfoDefault() const
+{
+    return this->segmentInfoDefault;
+}
+
+void AdaptationSet::setSegmentInfoDefault(const SegmentInfoDefault *seg)
+{
+    if ( seg != NULL )
+        this->segmentInfoDefault = seg;
+}
+
+void                            AdaptationSet::addRepresentation        (Representation *rep)
+{
+    this->representations.push_back(rep);
 }
 
 void AdaptationSet::setBitstreamSwitching  (bool value)
 {
     this->isBitstreamSwitching = value;
 }
+
 bool AdaptationSet::getBitstreamSwitching  () const
 {
     return this->isBitstreamSwitching;

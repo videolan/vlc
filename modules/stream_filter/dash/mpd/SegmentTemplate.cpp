@@ -27,7 +27,7 @@
 #include "SegmentTemplate.h"
 #include "SegmentTimeline.h"
 #include "Representation.h"
-#include "Group.h"
+#include "AdaptationSet.h"
 #include "SegmentInfoDefault.h"
 
 #include <cassert>

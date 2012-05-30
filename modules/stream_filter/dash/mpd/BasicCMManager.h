@@ -31,7 +31,6 @@
 
 #include "mpd/MPD.h"
 #include "mpd/Period.h"
-#include "mpd/Group.h"
 #include "mpd/Representation.h"
 #include "mpd/SegmentInfo.h"
 #include "mpd/Segment.h"

@@ -32,8 +32,6 @@ SOURCES_stream_filter_dash = \
     mpd/CommonAttributesElements.h \
     mpd/ContentDescription.cpp \
     mpd/ContentDescription.h \
-    mpd/Group.cpp \
-    mpd/Group.h \
     mpd/IMPDManager.h \
     mpd/IMPDParser.h \
     mpd/IsoffMainParser.cpp \

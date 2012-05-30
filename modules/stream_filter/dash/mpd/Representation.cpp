@@ -87,12 +87,12 @@ void                Representation::setTrickMode        (TrickModeType *trickMod
     this->trickModeType = trickModeType;
 }
 
-const Group *Representation::getParentGroup() const
+const AdaptationSet *Representation::getParentGroup() const
 {
     return this->parentGroup;
 }
 
-void Representation::setParentGroup(const Group *group)
+void Representation::setParentGroup(const AdaptationSet *group)
 {
     if ( group != NULL )
         this->parentGroup = group;

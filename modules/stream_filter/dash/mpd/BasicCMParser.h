@@ -30,7 +30,7 @@
 #include "mpd/IMPDParser.h"
 #include "mpd/MPD.h"
 #include "mpd/Period.h"
-#include "mpd/Group.h"
+#include "mpd/AdaptationSet.h"
 #include "mpd/Representation.h"
 #include "mpd/BaseUrl.h"
 #include "mpd/SegmentInfo.h"
@@ -52,17 +52,17 @@ namespace dash
                 MPD*    getMPD ();
 
             private:
-                void    handleDependencyId( Representation* rep, const Group* group, const std::string& dependencyId );
+                void    handleDependencyId( Representation* rep, const AdaptationSet* adaptationSet, const std::string& dependencyId );
 
             private:
                 bool    setMPD              ();
                 void    setPeriods          (dash::xml::Node *root);
                 void    parseSegmentTimeline( xml::Node* node, SegmentInfoCommon *segmentInfo );
                 void    parseSegmentInfoCommon( xml::Node* node, SegmentInfoCommon *segmentInfo );
-                void    parseSegmentInfoDefault( xml::Node* node, Group* group );
-                void    setGroups           (dash::xml::Node *root, Period *period);
+                void    parseSegmentInfoDefault( xml::Node* node, AdaptationSet* group );
+                void    setAdaptationSet           (dash::xml::Node *root, Period *period);
                 void    parseTrickMode( dash::xml::Node *node, Representation *repr );
-                void    setRepresentations  (dash::xml::Node *root, Group *group);
+                void    setRepresentations  (dash::xml::Node *root, AdaptationSet *group);
                 bool    setSegmentInfo      (dash::xml::Node *root, Representation *rep);
                 void    setInitSegment      (dash::xml::Node *root, SegmentInfoCommon *info);
                 bool    setSegments         (dash::xml::Node *root, SegmentInfo *info );

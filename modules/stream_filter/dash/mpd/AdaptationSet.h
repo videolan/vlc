@@ -1,9 +1,9 @@
 /*
  * AdaptationSet.h
  *****************************************************************************
- * Copyright (C) 2010 - 2012 Klagenfurt University
+ * Copyright (C) 2010 - 2011 Klagenfurt University
  *
- * Created on: Jan 27, 2012
+ * Created on: Aug 10, 2010
  * Authors: Christopher Mueller <christopher.mueller@itec.uni-klu.ac.at>
  *          Christian Timmerer  <christian.timmerer@itec.uni-klu.ac.at>
  *
@@ -25,23 +25,40 @@
 #ifndef ADAPTATIONSET_H_
 #define ADAPTATIONSET_H_
 
-#include "mpd/Group.h"
+#include <vector>
+#include <string>
+#include <map>
+
+#include "mpd/Representation.h"
+#include "mpd/CommonAttributesElements.h"
 
 namespace dash
 {
     namespace mpd
     {
-        class AdaptationSet : public Group
+        class SegmentInfoDefault;
+
+        class AdaptationSet : public CommonAttributesElements
         {
             public:
-                AdaptationSet           ();
-                virtual ~AdaptationSet  ();
+                AdaptationSet();
+                virtual ~AdaptationSet();
 
-                void setBitstreamSwitching  (bool value);
-                bool getBitstreamSwitching  () const;
+                bool                            getSubsegmentAlignmentFlag() const;
+                void                            setSubsegmentAlignmentFlag( bool alignment );
+                std::vector<Representation *>   getRepresentations      ();
+                const Representation*           getRepresentationById   ( const std::string &id ) const;
+                const SegmentInfoDefault*       getSegmentInfoDefault() const;
+                void                            setSegmentInfoDefault( const SegmentInfoDefault* seg );
+                void                            setBitstreamSwitching(bool value);
+                bool                            getBitstreamSwitching() const;
+                void                            addRepresentation( Representation *rep );
 
             private:
-                bool isBitstreamSwitching;
+                bool                            subsegmentAlignmentFlag;
+                std::vector<Representation *>   representations;
+                const SegmentInfoDefault*       segmentInfoDefault;
+                bool                            isBitstreamSwitching;
         };
     }
 }

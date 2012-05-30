@@ -59,14 +59,14 @@ const std::vector<Period*>&    BasicCMManager::getPeriods              () const
 
 Representation*         BasicCMManager::getBestRepresentation   (Period *period)
 {
-    std::vector<Group *> groups = period->getGroups();
+    std::vector<AdaptationSet *> adaptSet = period->getAdaptationSets();
 
     uint64_t        bitrate  = 0;
     Representation  *best    = NULL;
 
-    for(size_t i = 0; i < groups.size(); i++)
+    for(size_t i = 0; i < adaptSet.size(); i++)
     {
-        std::vector<Representation *> reps = groups.at(i)->getRepresentations();
+        std::vector<Representation *> reps = adaptSet.at(i)->getRepresentations();
         for(size_t j = 0; j < reps.size(); j++)
         {
             uint64_t currentBitrate = reps.at(j)->getBandwidth();
@@ -92,13 +92,13 @@ Period*                 BasicCMManager::getFirstPeriod          ()
 
 Representation*         BasicCMManager::getRepresentation(Period *period, uint64_t bitrate ) const
 {
-    std::vector<Group *>    groups = period->getGroups();
+    std::vector<AdaptationSet *>    adaptSet = period->getAdaptationSets();
 
     Representation  *best = NULL;
 
-    for(size_t i = 0; i < groups.size(); i++)
+    for(size_t i = 0; i < adaptSet.size(); i++)
     {
-        std::vector<Representation *> reps = groups.at(i)->getRepresentations();
+        std::vector<Representation *> reps = adaptSet.at(i)->getRepresentations();
         for( size_t j = 0; j < reps.size(); j++ )
         {
             uint64_t currentBitrate = reps.at(j)->getBandwidth();

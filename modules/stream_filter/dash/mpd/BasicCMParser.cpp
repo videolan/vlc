@@ -154,7 +154,7 @@ void    BasicCMParser::setPeriods           (Node *root)
     for(size_t i = 0; i < periods.size(); i++)
     {
         Period *period = new Period();
-        this->setGroups(periods.at(i), period);
+        this->setAdaptationSet(periods.at(i), period);
         this->mpd->addPeriod(period);
     }
 }
@@ -230,7 +230,7 @@ void BasicCMParser::parseSegmentInfoCommon(Node *node, SegmentInfoCommon *segmen
     this->parseSegmentTimeline( node, segmentInfo );
 }
 
-void BasicCMParser::parseSegmentInfoDefault(Node *node, Group *group)
+void BasicCMParser::parseSegmentInfoDefault(Node *node, AdaptationSet *group)
 {
     Node*   segmentInfoDefaultNode = DOMHelper::getFirstChildElementByName( node, "SegmentInfoDefault" );
 
@@ -243,25 +243,27 @@ void BasicCMParser::parseSegmentInfoDefault(Node *node, Group *group)
     }
 }
 
-void    BasicCMParser::setGroups            (Node *root, Period *period)
+void    BasicCMParser::setAdaptationSet            (Node *root, Period *period)
 {
-    std::vector<Node *> groups = DOMHelper::getElementByTagName(root, "Group", false);
+    std::vector<Node *> adaptSets = DOMHelper::getElementByTagName(root, "AdaptationSet", false);
+    if ( adaptSets.size() == 0 ) //In some old file, AdaptationSet may still be called Group
+        adaptSets = DOMHelper::getElementByTagName(root, "Group", false);
 
-    for(size_t i = 0; i < groups.size(); i++)
+    for(size_t i = 0; i < adaptSets.size(); i++)
     {
-        const std::map<std::string, std::string>    attr = groups.at(i)->getAttributes();
-        Group *group = new Group;
-        if ( this->parseCommonAttributesElements( groups.at( i ), group, NULL ) == false )
+        const std::map<std::string, std::string>    attr = adaptSets.at(i)->getAttributes();
+        AdaptationSet *adaptSet = new AdaptationSet;
+        if ( this->parseCommonAttributesElements( adaptSets.at( i ), adaptSet, NULL ) == false )
         {
-            delete group;
+            delete adaptSet;
             continue ;
         }
         std::map<std::string, std::string>::const_iterator  it = attr.find( "subsegmentAlignmentFlag" );
         if ( it != attr.end() && it->second == "true" )
-            group->setSubsegmentAlignmentFlag( true ); //Otherwise it is false by default.
-        this->parseSegmentInfoDefault( groups.at( i ), group );
-        this->setRepresentations(groups.at(i), group);
-        period->addGroup(group);
+            adaptSet->setSubsegmentAlignmentFlag( true ); //Otherwise it is false by default.
+        this->parseSegmentInfoDefault( adaptSets.at( i ), adaptSet );
+        this->setRepresentations(adaptSets.at(i), adaptSet);
+        period->addAdaptationSet(adaptSet);
     }
 }
 
@@ -284,7 +286,7 @@ void BasicCMParser::parseTrickMode(Node *node, Representation *repr)
     repr->setTrickMode( trickMode );
 }
 
-void    BasicCMParser::setRepresentations   (Node *root, Group *group)
+void    BasicCMParser::setRepresentations   (Node *root, AdaptationSet *group)
 {
     std::vector<Node *> representations = DOMHelper::getElementByTagName(root, "Representation", false);
 
@@ -334,7 +336,7 @@ void    BasicCMParser::setRepresentations   (Node *root, Group *group)
     }
 }
 
-void    BasicCMParser::handleDependencyId( Representation *rep, const Group *group, const std::string &dependencyId )
+void    BasicCMParser::handleDependencyId(Representation *rep, const AdaptationSet *adaptationSet, const std::string &dependencyId )
 {
     if ( dependencyId.empty() == true )
         return ;
@@ -343,7 +345,7 @@ void    BasicCMParser::handleDependencyId( Representation *rep, const Group *gro
     {
         std::string     id;
         s >> id;
-        const Representation    *dep = group->getRepresentationById( id );
+        const Representation    *dep = adaptationSet->getRepresentationById( id );
         if ( dep )
             rep->addDependency( dep );
     }
