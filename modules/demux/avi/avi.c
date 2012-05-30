@@ -43,6 +43,7 @@
 #include <vlc_memory.h>
 
 #include "libavi.h"
+#include "../rawdv.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -148,6 +149,9 @@ typedef struct
 
     es_out_id_t     *p_es;
 
+    int             i_dv_audio_rate;
+    es_out_id_t     *p_es_dv_audio;
+
     /* Avi Index */
     avi_index_t     idx;
 
@@ -158,8 +162,6 @@ typedef struct
     unsigned int    i_blockno;
     unsigned int    i_blocksize;
 
-    /* For muxed streams */
-    stream_t        *p_out_muxed;
 } avi_track_t;
 
 struct demux_sys_t
@@ -168,7 +170,6 @@ struct demux_sys_t
     mtime_t i_length;
 
     bool  b_seekable;
-    bool  b_muxed;
     avi_chunk_t ck_root;
 
     bool  b_odml;
@@ -216,6 +217,8 @@ static void AVI_IndexLoad    ( demux_t * );
 static void AVI_IndexCreate  ( demux_t * );
 
 static void AVI_ExtractSubtitle( demux_t *, unsigned int i_stream, avi_chunk_list_t *, avi_chunk_STRING_t * );
+
+static void AVI_DvHandleAudio( demux_t *, avi_track_t *, block_t * );
 
 static mtime_t  AVI_MovieGetLength( demux_t * );
 
@@ -279,7 +282,6 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_length = 0;
     p_sys->i_movi_lastchunk_pos = 0;
     p_sys->b_odml   = false;
-    p_sys->b_muxed  = false;
     p_sys->i_track  = 0;
     p_sys->track    = NULL;
     p_sys->meta     = NULL;
@@ -597,21 +599,16 @@ static int Open( vlc_object_t * p_this )
 
             case( AVIFOURCC_iavs):
             case( AVIFOURCC_ivas):
-                p_sys->b_muxed = true;
                 msg_Dbg( p_demux, "stream[%d] iavs with handler %4.4s", i, (char *)&p_strh->i_handler );
-                if( p_strh->i_handler == FOURCC_dvsd ||
-                    p_strh->i_handler == FOURCC_dvhd ||
-                    p_strh->i_handler == FOURCC_dvsl ||
-                    p_strh->i_handler == FOURCC_dv25 ||
-                    p_strh->i_handler == FOURCC_dv50 )
-                {
-                    tk->p_out_muxed = stream_DemuxNew( p_demux, (char *)"rawdv", p_demux->out );
-                    if( !tk->p_out_muxed )
-                        msg_Err( p_demux, "could not load the DV parser" );
-                    else break;
-                }
-                free( tk );
-                continue;
+                tk->i_cat   = VIDEO_ES;
+                tk->i_codec = AVI_FourccGetCodec( VIDEO_ES, p_strh->i_handler );
+                tk->i_samplesize = 0;
+                tk->i_dv_audio_rate = tk->i_codec == VLC_CODEC_DV ? -1 : 0;
+
+                es_format_Init( &fmt, VIDEO_ES, p_strh->i_handler );
+                fmt.video.i_width  = p_avih->i_width;
+                fmt.video.i_height = p_avih->i_height;
+                break;
 
             case( AVIFOURCC_mids):
                 msg_Dbg( p_demux, "stream[%d] midi is UNSUPPORTED", i );
@@ -623,13 +620,9 @@ static int Open( vlc_object_t * p_this )
         }
         if( p_strn )
             fmt.psz_description = FromACP( p_strn->p_str );
-        if( tk->p_out_muxed == NULL )
-            tk->p_es = es_out_Add( p_demux->out, &fmt );
+        tk->p_es = es_out_Add( p_demux->out, &fmt );
         TAB_APPEND( p_sys->i_track, p_sys->track, tk );
-        if(!p_sys->b_muxed )
-        {
-            es_format_Clean( &fmt );
-        }
+        es_format_Clean( &fmt );
     }
 
     if( p_sys->i_track <= 0 )
@@ -793,8 +786,6 @@ static void Close ( vlc_object_t * p_this )
     {
         if( p_sys->track[i] )
         {
-            if( p_sys->track[i]->p_out_muxed )
-                stream_Delete( p_sys->track[i]->p_out_muxed );
             avi_index_Clean( &p_sys->track[i]->idx );
             free( p_sys->track[i] );
         }
@@ -843,14 +834,13 @@ static int Demux_Seekable( demux_t *p_demux )
         avi_track_t *tk = p_sys->track[i_track];
         bool  b;
 
-        if( p_sys->b_muxed && tk->p_out_muxed )
-        {
-            i_track_count++;
-            tk->b_activated = true;
-            continue;
-        }
-
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
+        if( tk->p_es_dv_audio )
+        {
+            bool b_extra;
+            es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es_dv_audio, &b_extra );
+            b |= b_extra;
+        }
         if( b && !tk->b_activated )
         {
             if( p_sys->b_seekable)
@@ -1171,10 +1161,9 @@ static int Demux_Seekable( demux_t *p_demux )
         }
 
         //p_pes->i_rate = p_demux->stream.control.i_rate;
-        if( tk->p_out_muxed )
-            stream_DemuxSend( tk->p_out_muxed, p_frame );
-        else
-            es_out_Send( p_demux->out, tk->p_es, p_frame );
+        if( tk->i_dv_audio_rate )
+            AVI_DvHandleAudio( p_demux, tk, p_frame );
+        es_out_Send( p_demux->out, tk->p_es, p_frame );
     }
 }
 
@@ -1191,12 +1180,6 @@ static int Demux_UnSeekable( demux_t *p_demux )
     unsigned int i_stream;
     unsigned int i_packet;
 
-    if( p_sys->b_muxed )
-    {
-        msg_Err( p_demux, "Can not yet process muxed avi substreams without seeking" );
-        return VLC_EGENERIC;
-    }
-
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time + 1 );
 
     /* *** find master stream for data packet skipping algo *** */
@@ -1207,6 +1190,12 @@ static int Demux_UnSeekable( demux_t *p_demux )
         bool  b;
 
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
+        if( tk->p_es_dv_audio )
+        {
+            bool b_extra;
+            es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es_dv_audio, &b_extra );
+            b |= b_extra;
+        }
 
         if( b && tk->i_cat == VIDEO_ES )
         {
@@ -1289,6 +1278,8 @@ static int Demux_UnSeekable( demux_t *p_demux )
                 }
 
                 //p_pes->i_rate = p_demux->stream.control.i_rate;
+                if( p_stream->i_dv_audio_rate )
+                    AVI_DvHandleAudio( p_demux, p_stream, p_frame );
                 es_out_Send( p_demux->out, p_stream->p_es, p_frame );
             }
             else
@@ -2592,6 +2583,34 @@ static void AVI_MetaLoad( demux_t *p_demux,
             vlc_meta_AddExtra( p_meta, p_strz->p_type, psz_value );
         free( psz_value );
     }
+}
+
+static void AVI_DvHandleAudio( demux_t *p_demux, avi_track_t *tk, block_t *p_frame )
+{
+    size_t i_offset = 80*6+80*16*3 + 3;
+    if( p_frame->i_buffer < i_offset + 5 )
+        return;
+
+    if( p_frame->p_buffer[i_offset] != 0x50 )
+        return;
+
+    es_format_t fmt;
+    dv_get_audio_format( &fmt, &p_frame->p_buffer[i_offset + 1] );
+
+    if( tk->p_es_dv_audio && tk->i_dv_audio_rate != fmt.audio.i_rate )
+    {
+        es_out_Del( p_demux->out, tk->p_es_dv_audio );
+        tk->p_es_dv_audio = es_out_Add( p_demux->out, &fmt );
+    }
+    else if( !tk->p_es_dv_audio )
+    {
+        tk->p_es_dv_audio = es_out_Add( p_demux->out, &fmt );
+    }
+    tk->i_dv_audio_rate = fmt.audio.i_rate;
+
+    block_t *p_frame_audio = dv_extract_audio( p_frame );
+    if( p_frame_audio )
+        es_out_Send( p_demux->out, tk->p_es_dv_audio, p_frame_audio );
 }
 
 /*****************************************************************************

@@ -416,6 +416,10 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
                      p_chk->strf.vids.p_bih->biBitCount );
 #endif
             break;
+        case AVIFOURCC_iavs:
+        case AVIFOURCC_ivas:
+            p_chk->strf.common.i_cat = UNKNOWN_ES;
+            break;
         case( AVIFOURCC_txts ):
             p_chk->strf.common.i_cat = SPU_ES;
             break;
