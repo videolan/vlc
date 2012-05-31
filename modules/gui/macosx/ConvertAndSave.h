@@ -32,6 +32,7 @@
     IBOutlet id o_drop_lbl;
     IBOutlet id o_drop_image_view;
     IBOutlet id o_drop_btn;
+    IBOutlet id o_drop_box;
 
     IBOutlet id o_profile_lbl;
     IBOutlet id o_profile_pop;
@@ -47,7 +48,7 @@
     IBOutlet id o_dropin_icon_view;
     IBOutlet id o_dropin_media_lbl;
 
-    NSString * MRL;
+    NSString * _MRL;
 }
 @property (readwrite, nonatomic, retain) NSString * MRL;
 
@@ -66,5 +67,13 @@
 @end
 
 @interface VLCDropEnabledBox : NSBox
+
+@end
+
+@interface VLCDropEnabledImageView : NSImageView
+
+@end
+
+@interface VLCDropEnabledButton : NSButton
 
 @end
