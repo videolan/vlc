@@ -20,10 +20,8 @@ aout_VolumeUp
 aout_ToggleMute
 aout_IsMuted
 aout_SetMute
-aout_TimeReport
 aout_VolumeSoftInit
 aout_VolumeHardInit
-aout_VolumeHardSet
 block_Alloc
 block_FifoCount
 block_FifoEmpty

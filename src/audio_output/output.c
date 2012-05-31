@@ -21,9 +21,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -39,6 +36,73 @@
 #include "libvlc.h"
 #include "aout_internal.h"
 
+/**
+ * Notifies the audio input of the drift from the requested audio
+ * playback timestamp (@ref block_t.i_pts) to the anticipated playback time
+ * as reported by the audio output hardware.
+ * Depending on the drift amplitude, the input core may ignore the drift
+ * trigger upsampling or downsampling, or even discard samples.
+ * Future VLC versions may instead adjust the input decoding speed.
+ *
+ * The audio output plugin is responsible for estimating the ideal current
+ * playback time defined as follows:
+ *  ideal time = buffer timestamp - (output latency + pending buffer duration)
+ *
+ * Practically, this is the PTS (block_t.i_pts) of the current buffer minus
+ * the latency reported by the output programming interface.
+ * Computing the estimated drift directly would probably be more intuitive.
+ * However the use of an absolute time value does not introduce extra
+ * measurement errors due to the CPU scheduling jitter and clock resolution.
+ * Furthermore, the ideal while it is an abstract value, is easy for most
+ * audio output plugins to compute.
+ * The following definition is equivalent but depends on the clock time:
+ *  ideal time = real time + drift
+
+ * @note If aout_LatencyReport() is never called, the core will assume that
+ * there is no drift.
+ *
+ * @param ideal estimated ideal time as defined above.
+ */
+static void aout_OutputTimeReport (audio_output_t *aout, mtime_t ideal)
+{
+    mtime_t delta = mdate() - ideal /* = -drift */;
+
+    aout_assert_locked (aout);
+    if (delta < -AOUT_MAX_PTS_ADVANCE || +AOUT_MAX_PTS_DELAY < delta)
+    {
+        aout_owner_t *owner = aout_owner (aout);
+
+        msg_Warn (aout, "not synchronized (%"PRId64" us), resampling",
+                  delta);
+        if (date_Get (&owner->sync.date) != VLC_TS_INVALID)
+            date_Move (&owner->sync.date, delta);
+    }
+}
+
+/**
+ * Supply or update the current custom ("hardware") volume.
+ * @note This only makes sense after calling aout_VolumeHardInit().
+ * @param volume current custom volume
+ *
+ * @warning The caller (i.e. the audio output plug-in) is responsible for
+ * interlocking and synchronizing call to this function and to the
+ * audio_output_t.pf_volume_set callback. This ensures that VLC gets correct
+ * volume information (possibly with a latency).
+ */
+static void aout_OutputVolumeReport (audio_output_t *aout, float volume)
+{
+    audio_volume_t vol = lroundf (volume * (float)AOUT_VOLUME_DEFAULT);
+
+    /* We cannot acquire the volume lock as this gets called from the audio
+     * output plug-in (it would cause a lock inversion). */
+    var_SetInteger (aout, "volume", vol);
+}
+
+static void aout_OutputMuteReport (audio_output_t *aout, bool mute)
+{
+    var_SetBool (aout, "mute", mute);
+}
+
 /*****************************************************************************
  * aout_OutputNew : allocate a new output and rework the filter pipeline
  *****************************************************************************
@@ -51,8 +115,11 @@ int aout_OutputNew( audio_output_t *p_aout,
 
     aout_assert_locked( p_aout );
     p_aout->format = *p_format;
-
     aout_FormatPrepare( &p_aout->format );
+
+    p_aout->event.time_report = aout_OutputTimeReport;
+    p_aout->event.volume_report = aout_OutputVolumeReport;
+    p_aout->event.mute_report = aout_OutputMuteReport;
 
     /* Find the best output plug-in. */
     owner->module = module_need (p_aout, "audio output", "$aout", false);
@@ -324,26 +391,4 @@ void aout_VolumeHardInit (audio_output_t *aout, aout_volume_cb setter,
                   / (float)AOUT_VOLUME_DEFAULT;
         setter (aout, vol, var_GetBool (aout, "mute"));
     }
-}
-
-/**
- * Supply or update the current custom ("hardware") volume.
- * @note This only makes sense after calling aout_VolumeHardInit().
- * @param setter volume setter callback
- * @param volume current custom volume
- * @param mute current mute flag
- *
- * @warning The caller (i.e. the audio output plug-in) is responsible for
- * interlocking and synchronizing call to this function and to the
- * audio_output_t.pf_volume_set callback. This ensures that VLC gets correct
- * volume information (possibly with a latency).
- */
-void aout_VolumeHardSet (audio_output_t *aout, float volume, bool mute)
-{
-    audio_volume_t vol = lroundf (volume * (float)AOUT_VOLUME_DEFAULT);
-
-    /* We cannot acquire the volume lock as this gets called from the audio
-     * output plug-in (it would cause a lock inversion). */
-    var_SetInteger (aout, "volume", vol);
-    var_SetBool (aout, "mute", mute);
 }

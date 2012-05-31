@@ -151,6 +151,12 @@ struct audio_output
     void (* pf_flush)( audio_output_t *, bool ); /**< Flush/drain callback
         (optional, may be NULL) */
     aout_volume_cb          pf_volume_set; /**< Volume setter (or NULL) */
+
+    struct {
+        void (*time_report)(audio_output_t *, mtime_t);
+        void (*volume_report)(audio_output_t *, float);
+        void (*mute_report)(audio_output_t *, bool);
+    } event;
 };
 
 /**
@@ -219,9 +225,17 @@ VLC_API const char * aout_FormatPrintChannels( const audio_sample_format_t * ) V
 
 VLC_API void aout_VolumeSoftInit( audio_output_t * );
 VLC_API void aout_VolumeHardInit( audio_output_t *, aout_volume_cb, bool );
-VLC_API void aout_VolumeHardSet( audio_output_t *, float, bool );
 
-VLC_API void aout_TimeReport(audio_output_t *, mtime_t);
+static inline void aout_VolumeHardSet(audio_output_t *aout, float v, bool m)
+{
+    aout->event.volume_report(aout, v);
+    aout->event.mute_report(aout, m);
+}
+
+static inline void aout_TimeReport(audio_output_t *aout, mtime_t date)
+{
+    aout->event.time_report(aout, date);
+}
 
 VLC_API int aout_ChannelsRestart( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * );
 
