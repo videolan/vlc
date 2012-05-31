@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #import "ConvertAndSave.h"
+#import "intf.h"
 #import <vlc_common.h>
 #import <vlc_url.h>
 
@@ -49,7 +50,16 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
-    // i18n, bla
+    [_window setTitle: _NS("Convert & Save")];
+    [_cancel_btn setTitle: _NS("Cancel")];
+    [_ok_btn setTitle: _NS("Save")];
+    [_drop_lbl setStringValue: _NS("Drop Media here")];
+    [_drop_btn setTitle: _NS("Open Media...")];
+    [_profile_lbl setStringValue: _NS("Choose Profile")];
+    [_profile_btn setTitle: _NS("Customize")];
+    [_destination_lbl setStringValue: _NS("Choose Destination")];
+    [_destination_filename_stub_lbl setStringValue: _NS("Choose an output location")];
+    [_destination_filename_lbl setHidden: YES];
 }
 
 - (void)toggleWindow
@@ -110,7 +120,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
     if( carried_data ) {
         if( [desired_type isEqualToString:NSFilenamesPboardType] ) {
-            NSArray *values = [[o_paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+            NSArray *values = [[paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 
             if ([values count] > 0) {
                 [self setMRL: [NSString stringWithUTF8String:make_URI([[values objectAtIndex:0] UTF8String], NULL)]];
