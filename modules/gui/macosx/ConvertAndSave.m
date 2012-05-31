@@ -28,7 +28,7 @@
 
 @implementation VLCConvertAndSave
 
-@synthesize MRL=_MRL;
+@synthesize MRL=_MRL, outputDestination=_outputDestination;
 
 static VLCConvertAndSave *_o_sharedInstance = nil;
 
@@ -85,6 +85,24 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (IBAction)chooseDestination:(id)sender
 {
+    NSSavePanel * saveFilePanel = [[NSSavePanel alloc] init];
+    [saveFilePanel setCanSelectHiddenExtension: YES];
+    [saveFilePanel setCanCreateDirectories: YES];
+    [saveFilePanel beginSheetForDirectory:nil file:nil modalForWindow: _window modalDelegate:self didEndSelector:@selector(savePanelDidEnd:returnCode:contextInfo:) contextInfo:nil];
+}
+
+- (void)savePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+    if (returnCode == NSOKButton) {
+        _outputDestination = [[sheet URL] path];
+        [_destination_filename_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:_outputDestination]];
+        [[_destination_filename_stub_lbl animator] setHidden: YES];
+        [[_destination_filename_lbl animator] setHidden: NO];
+    } else {
+        _outputDestination = @"";
+        [[_destination_filename_lbl animator] setHidden: YES];
+        [[_destination_filename_stub_lbl animator] setHidden: NO];
+    }
 }
 
 - (void)updateDropView

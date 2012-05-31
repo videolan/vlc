@@ -49,8 +49,10 @@
     IBOutlet id _dropin_media_lbl;
 
     NSString * _MRL;
+    NSString * _outputDestination;
 }
 @property (readwrite, nonatomic, retain) NSString * MRL;
+@property (readwrite, nonatomic, retain) NSString * outputDestination;
 
 + (VLCConvertAndSave *)sharedInstance;
 
