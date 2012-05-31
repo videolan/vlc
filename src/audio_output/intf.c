@@ -105,8 +105,6 @@ static int commitVolume (vlc_object_t *obj, audio_output_t *aout,
         var_SetBool (aout, "mute", mute);
         aout_unlock_volume (aout);
 
-        if (ret == 0)
-            var_TriggerCallback (aout, "intf-change");
         vlc_object_release (aout);
     }
     return ret;

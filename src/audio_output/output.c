@@ -153,7 +153,6 @@ int aout_OutputNew( audio_output_t *p_aout,
         var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
                          NULL );
     }
-    var_TriggerCallback( p_aout, "intf-change" );
 
     aout_FormatPrepare( &p_aout->format );
     aout_FormatPrint( p_aout, "output", &p_aout->format );
@@ -347,5 +346,4 @@ void aout_VolumeHardSet (audio_output_t *aout, float volume, bool mute)
      * output plug-in (it would cause a lock inversion). */
     var_SetInteger (aout, "volume", vol);
     var_SetBool (aout, "mute", mute);
-    var_TriggerCallback (aout, "intf-change");
 }

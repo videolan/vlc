@@ -158,7 +158,6 @@ static void Probe (vlc_object_t *obj, const char *dev)
     GetDevices (obj, NULL, dev);
 
     var_AddCallback (obj, "audio-device", aout_ChannelsRestart, NULL);
-    var_TriggerCallback (obj, "intf-change");
 }
 
 

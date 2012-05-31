@@ -233,8 +233,6 @@ static int Open ( vlc_object_t *p_this )
         var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
     }
 
-    var_TriggerCallback( p_aout, "intf-change" );
-
     /* Prevent SIG_FPE */
     _control87(MCW_EM, MCW_EM);
 

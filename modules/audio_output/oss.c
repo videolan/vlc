@@ -344,8 +344,6 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    var_TriggerCallback( p_aout, "intf-change" );
-
     /* Reset the DSP device */
     if( ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
     {
