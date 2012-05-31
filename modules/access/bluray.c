@@ -715,6 +715,7 @@ static void blurayInitOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
         .pf_destroy  = subpictureUpdaterDestroy,
         .p_sys       = p_upd_sys,
     };
+    vlc_mutex_init(&p_sys->p_overlays[ov->plane]->lock);
     p_sys->p_overlays[ov->plane]->p_pic = subpicture_New(&updater);
     p_sys->p_overlays[ov->plane]->p_pic->i_original_picture_width = ov->w;
     p_sys->p_overlays[ov->plane]->p_pic->i_original_picture_height = ov->h;
