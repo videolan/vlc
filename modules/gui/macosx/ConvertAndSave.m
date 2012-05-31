@@ -54,7 +54,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (void)toggleWindow
 {
-    [o_window makeKeyAndOrderFront: nil];
+    [_window makeKeyAndOrderFront: nil];
 }
 
 - (IBAction)windowButtonAction:(id)sender
@@ -79,47 +79,41 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (void)updateDropView
 {
-    if ([_MRL length] > 0)
-    {
+    if ([_MRL length] > 0) {
         NSString * path = [[NSURL URLWithString:_MRL] path];
-        [o_dropin_media_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath: path]];
+        [_dropin_media_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath: path]];
         NSImage * image = [[NSWorkspace sharedWorkspace] iconForFile: path];
         [image setSize:NSMakeSize(64,64)];
-        [o_dropin_icon_view setImage: image];
+        [_dropin_icon_view setImage: image];
 
-        if (![o_dropin_view superview]) {
-            NSRect boxFrame = [o_drop_box frame];
-            NSRect subViewFrame = [o_dropin_view frame];
+        if (![_dropin_view superview]) {
+            NSRect boxFrame = [_drop_box frame];
+            NSRect subViewFrame = [_dropin_view frame];
             subViewFrame.origin.x = (boxFrame.size.width - subViewFrame.size.width) / 2;
             subViewFrame.origin.y = (boxFrame.size.height - subViewFrame.size.height) / 2;
-            [o_dropin_view setFrame: subViewFrame];
-            [[o_drop_image_view animator] setHidden: YES];
-            [o_drop_box performSelector:@selector(addSubview:) withObject:o_dropin_view afterDelay:0.4];
+            [_dropin_view setFrame: subViewFrame];
+            [[_drop_image_view animator] setHidden: YES];
+            [_drop_box performSelector:@selector(addSubview:) withObject:_dropin_view afterDelay:0.4];
         }
-    }
-    else
-    {
-        [o_dropin_view removeFromSuperview];
-        [[o_drop_image_view animator] setHidden: NO];
+    } else {
+        [_dropin_view removeFromSuperview];
+        [[_drop_image_view animator] setHidden: NO];
     }
 }
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 {
-    NSPasteboard *o_paste = [sender draggingPasteboard];
-    NSArray *o_types = [NSArray arrayWithObject: NSFilenamesPboardType];
-    NSString *o_desired_type = [o_paste availableTypeFromArray:o_types];
-    NSData *o_carried_data = [o_paste dataForType:o_desired_type];
+    NSPasteboard *paste = [sender draggingPasteboard];
+    NSArray *types = [NSArray arrayWithObject: NSFilenamesPboardType];
+    NSString *desired_type = [paste availableTypeFromArray: types];
+    NSData *carried_data = [paste dataForType: desired_type];
 
-    if( o_carried_data )
-    {
-        if( [o_desired_type isEqualToString:NSFilenamesPboardType] )
-        {
-            NSArray *o_values = [[o_paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+    if( carried_data ) {
+        if( [desired_type isEqualToString:NSFilenamesPboardType] ) {
+            NSArray *values = [[o_paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 
-            if ([o_values count] > 0)
-            {
-                [self setMRL: [NSString stringWithUTF8String:make_URI([[o_values objectAtIndex:0] UTF8String], NULL)]];
+            if ([values count] > 0) {
+                [self setMRL: [NSString stringWithUTF8String:make_URI([[values objectAtIndex:0] UTF8String], NULL)]];
                 [self updateDropView];
                 return YES;
             }

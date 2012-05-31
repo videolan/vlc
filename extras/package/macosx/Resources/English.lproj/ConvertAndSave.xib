@@ -12,7 +12,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="3"/>
+      <integer value="2"/>
       <integer value="25"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
@@ -464,7 +464,7 @@
                     <object class="NSTextField" id="316407005">
                       <reference key="NSNextResponder" ref="446951149"/>
                       <int key="NSvFlags">268</int>
-                      <string key="NSFrame">{{105, 26}, {335, 17}}</string>
+                      <string key="NSFrame">{{105, 27}, {335, 17}}</string>
                       <reference key="NSSuperview" ref="446951149"/>
                       <int key="NSViewLayerContentsRedrawPolicy">2</int>
                       <bool key="NSEnabled">YES</bool>
@@ -632,142 +632,6 @@
       <object class="NSMutableArray" key="connectionRecords">
         <bool key="EncodedWithXMLCoder">YES</bool>
         <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_cancel_btn</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="477712445"/>
-          </object>
-          <int key="connectionID">80</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_destination_btn</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="550909268"/>
-          </object>
-          <int key="connectionID">81</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_destination_filename_lbl</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="316407005"/>
-          </object>
-          <int key="connectionID">82</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_destination_filename_stub_lbl</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="672608831"/>
-          </object>
-          <int key="connectionID">83</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_destination_icon_view</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="185323398"/>
-          </object>
-          <int key="connectionID">84</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_destination_lbl</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="57051022"/>
-          </object>
-          <int key="connectionID">85</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_drop_btn</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="775178384"/>
-          </object>
-          <int key="connectionID">86</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_drop_image_view</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="57114548"/>
-          </object>
-          <int key="connectionID">87</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_drop_lbl</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="807070215"/>
-          </object>
-          <int key="connectionID">88</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_dropin_icon_view</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="580302459"/>
-          </object>
-          <int key="connectionID">89</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_dropin_media_lbl</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="375510155"/>
-          </object>
-          <int key="connectionID">90</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_dropin_view</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="494472580"/>
-          </object>
-          <int key="connectionID">91</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_ok_btn</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="210468830"/>
-          </object>
-          <int key="connectionID">92</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_profile_btn</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="614860136"/>
-          </object>
-          <int key="connectionID">93</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_profile_pop</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="803077624"/>
-          </object>
-          <int key="connectionID">94</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_profile_lbl</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="368464562"/>
-          </object>
-          <int key="connectionID">95</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_window</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="1005"/>
-          </object>
-          <int key="connectionID">96</int>
-        </object>
-        <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">chooseDestination:</string>
             <reference key="source" ref="203744709"/>
@@ -817,11 +681,147 @@
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
-            <string key="label">o_drop_box</string>
+            <string key="label">_cancel_btn</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="477712445"/>
+          </object>
+          <int key="connectionID">104</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_destination_btn</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="550909268"/>
+          </object>
+          <int key="connectionID">105</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_destination_filename_lbl</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="316407005"/>
+          </object>
+          <int key="connectionID">106</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_destination_filename_stub_lbl</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="672608831"/>
+          </object>
+          <int key="connectionID">107</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_destination_icon_view</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="185323398"/>
+          </object>
+          <int key="connectionID">108</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_destination_lbl</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="57051022"/>
+          </object>
+          <int key="connectionID">109</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_drop_box</string>
             <reference key="source" ref="203744709"/>
             <reference key="destination" ref="90126139"/>
           </object>
-          <int key="connectionID">103</int>
+          <int key="connectionID">110</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_drop_btn</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="775178384"/>
+          </object>
+          <int key="connectionID">111</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_drop_image_view</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="57114548"/>
+          </object>
+          <int key="connectionID">112</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_drop_lbl</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="807070215"/>
+          </object>
+          <int key="connectionID">113</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_dropin_icon_view</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="580302459"/>
+          </object>
+          <int key="connectionID">114</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_dropin_media_lbl</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="375510155"/>
+          </object>
+          <int key="connectionID">115</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_dropin_view</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="494472580"/>
+          </object>
+          <int key="connectionID">116</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_ok_btn</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="210468830"/>
+          </object>
+          <int key="connectionID">117</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_profile_btn</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="614860136"/>
+          </object>
+          <int key="connectionID">118</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_profile_lbl</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="368464562"/>
+          </object>
+          <int key="connectionID">119</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_profile_pop</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="803077624"/>
+          </object>
+          <int key="connectionID">120</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_window</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="1005"/>
+          </object>
+          <int key="connectionID">121</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -1339,7 +1339,7 @@
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">P4AAAL+AAABCvAAAwkQAAA</bytes>
+            <bytes key="NSTransformStruct">P4AAAL+AAABC0gAAwigAAA</bytes>
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1380,7 +1380,7 @@
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">103</int>
+      <int key="maxID">121</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
@@ -1445,24 +1445,24 @@
             <bool key="EncodedWithXMLCoder">YES</bool>
             <object class="NSArray" key="dict.sortedKeys">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>o_cancel_btn</string>
-              <string>o_destination_btn</string>
-              <string>o_destination_filename_lbl</string>
-              <string>o_destination_filename_stub_lbl</string>
-              <string>o_destination_icon_view</string>
-              <string>o_destination_lbl</string>
-              <string>o_drop_box</string>
-              <string>o_drop_btn</string>
-              <string>o_drop_image_view</string>
-              <string>o_drop_lbl</string>
-              <string>o_dropin_icon_view</string>
-              <string>o_dropin_media_lbl</string>
-              <string>o_dropin_view</string>
-              <string>o_ok_btn</string>
-              <string>o_profile_btn</string>
-              <string>o_profile_lbl</string>
-              <string>o_profile_pop</string>
-              <string>o_window</string>
+              <string>_cancel_btn</string>
+              <string>_destination_btn</string>
+              <string>_destination_filename_lbl</string>
+              <string>_destination_filename_stub_lbl</string>
+              <string>_destination_icon_view</string>
+              <string>_destination_lbl</string>
+              <string>_drop_box</string>
+              <string>_drop_btn</string>
+              <string>_drop_image_view</string>
+              <string>_drop_lbl</string>
+              <string>_dropin_icon_view</string>
+              <string>_dropin_media_lbl</string>
+              <string>_dropin_view</string>
+              <string>_ok_btn</string>
+              <string>_profile_btn</string>
+              <string>_profile_lbl</string>
+              <string>_profile_pop</string>
+              <string>_window</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1490,102 +1490,102 @@
             <bool key="EncodedWithXMLCoder">YES</bool>
             <object class="NSArray" key="dict.sortedKeys">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>o_cancel_btn</string>
-              <string>o_destination_btn</string>
-              <string>o_destination_filename_lbl</string>
-              <string>o_destination_filename_stub_lbl</string>
-              <string>o_destination_icon_view</string>
-              <string>o_destination_lbl</string>
-              <string>o_drop_box</string>
-              <string>o_drop_btn</string>
-              <string>o_drop_image_view</string>
-              <string>o_drop_lbl</string>
-              <string>o_dropin_icon_view</string>
-              <string>o_dropin_media_lbl</string>
-              <string>o_dropin_view</string>
-              <string>o_ok_btn</string>
-              <string>o_profile_btn</string>
-              <string>o_profile_lbl</string>
-              <string>o_profile_pop</string>
-              <string>o_window</string>
+              <string>_cancel_btn</string>
+              <string>_destination_btn</string>
+              <string>_destination_filename_lbl</string>
+              <string>_destination_filename_stub_lbl</string>
+              <string>_destination_icon_view</string>
+              <string>_destination_lbl</string>
+              <string>_drop_box</string>
+              <string>_drop_btn</string>
+              <string>_drop_image_view</string>
+              <string>_drop_lbl</string>
+              <string>_dropin_icon_view</string>
+              <string>_dropin_media_lbl</string>
+              <string>_dropin_view</string>
+              <string>_ok_btn</string>
+              <string>_profile_btn</string>
+              <string>_profile_lbl</string>
+              <string>_profile_pop</string>
+              <string>_window</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_cancel_btn</string>
+                <string key="name">_cancel_btn</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_destination_btn</string>
+                <string key="name">_destination_btn</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_destination_filename_lbl</string>
+                <string key="name">_destination_filename_lbl</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_destination_filename_stub_lbl</string>
+                <string key="name">_destination_filename_stub_lbl</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_destination_icon_view</string>
+                <string key="name">_destination_icon_view</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_destination_lbl</string>
+                <string key="name">_destination_lbl</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_drop_box</string>
+                <string key="name">_drop_box</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_drop_btn</string>
+                <string key="name">_drop_btn</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_drop_image_view</string>
+                <string key="name">_drop_image_view</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_drop_lbl</string>
+                <string key="name">_drop_lbl</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_dropin_icon_view</string>
+                <string key="name">_dropin_icon_view</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_dropin_media_lbl</string>
+                <string key="name">_dropin_media_lbl</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_dropin_view</string>
+                <string key="name">_dropin_view</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_ok_btn</string>
+                <string key="name">_ok_btn</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_profile_btn</string>
+                <string key="name">_profile_btn</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_profile_lbl</string>
+                <string key="name">_profile_lbl</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_profile_pop</string>
+                <string key="name">_profile_pop</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_window</string>
+                <string key="name">_window</string>
                 <string key="candidateClassName">id</string>
               </object>
             </object>
           </object>
-          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="748209823">
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="851626212">
             <string key="majorKey">IBDocumentRelativeSource</string>
             <string key="minorKey">../../../../../modules/gui/macosx/ConvertAndSave.h</string>
           </object>
@@ -1593,17 +1593,17 @@
         <object class="IBPartialClassDescription">
           <string key="className">VLCDropEnabledBox</string>
           <string key="superclassName">NSBox</string>
-          <reference key="sourceIdentifier" ref="748209823"/>
+          <reference key="sourceIdentifier" ref="851626212"/>
         </object>
         <object class="IBPartialClassDescription">
           <string key="className">VLCDropEnabledButton</string>
           <string key="superclassName">NSButton</string>
-          <reference key="sourceIdentifier" ref="748209823"/>
+          <reference key="sourceIdentifier" ref="851626212"/>
         </object>
         <object class="IBPartialClassDescription">
           <string key="className">VLCDropEnabledImageView</string>
           <string key="superclassName">NSImageView</string>
-          <reference key="sourceIdentifier" ref="748209823"/>
+          <reference key="sourceIdentifier" ref="851626212"/>
         </object>
       </object>
     </object>

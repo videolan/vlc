@@ -25,28 +25,28 @@
 
 @interface VLCConvertAndSave : NSObject
 {
-    IBOutlet id o_window;
-    IBOutlet id o_cancel_btn;
-    IBOutlet id o_ok_btn;
+    IBOutlet id _window;
+    IBOutlet id _cancel_btn;
+    IBOutlet id _ok_btn;
 
-    IBOutlet id o_drop_lbl;
-    IBOutlet id o_drop_image_view;
-    IBOutlet id o_drop_btn;
-    IBOutlet id o_drop_box;
+    IBOutlet id _drop_lbl;
+    IBOutlet id _drop_image_view;
+    IBOutlet id _drop_btn;
+    IBOutlet id _drop_box;
 
-    IBOutlet id o_profile_lbl;
-    IBOutlet id o_profile_pop;
-    IBOutlet id o_profile_btn;
+    IBOutlet id _profile_lbl;
+    IBOutlet id _profile_pop;
+    IBOutlet id _profile_btn;
 
-    IBOutlet id o_destination_lbl;
-    IBOutlet id o_destination_btn;
-    IBOutlet id o_destination_icon_view;
-    IBOutlet id o_destination_filename_lbl;
-    IBOutlet id o_destination_filename_stub_lbl;
+    IBOutlet id _destination_lbl;
+    IBOutlet id _destination_btn;
+    IBOutlet id _destination_icon_view;
+    IBOutlet id _destination_filename_lbl;
+    IBOutlet id _destination_filename_stub_lbl;
 
-    IBOutlet id o_dropin_view;
-    IBOutlet id o_dropin_icon_view;
-    IBOutlet id o_dropin_media_lbl;
+    IBOutlet id _dropin_view;
+    IBOutlet id _dropin_icon_view;
+    IBOutlet id _dropin_media_lbl;
 
     NSString * _MRL;
 }
