@@ -193,33 +193,61 @@ static bool CheckMimeHeader( demux_t *p_demux, int *p_header_size )
     if( strncmp( (char *)p_sys->p_peek, "--", 2 ) != 0
         && strncmp( (char *)p_sys->p_peek, "\r\n--", 4 ) != 0 )
     {
-        *p_header_size = 0;
-        return false;
-    }
-    i_pos = *p_sys->p_peek == '-' ? 2 : 4;
-    psz_line = GetLine( p_demux, &i_pos );
-    if( NULL == psz_line )
-    {
-        msg_Err( p_demux, "no EOL" );
-        *p_header_size = -3;
-        return false;
-    }
-
-    /* Read the separator and remember it if not yet stored */
-    if( p_sys->psz_separator == NULL )
-    {
-        p_sys->psz_separator = psz_line;
-        msg_Dbg( p_demux, "Multipart MIME detected, using separator: %s",
-                 p_sys->psz_separator );
+        /* Some broken stream may lack the first boundary */
+        if ( p_sys->psz_separator == NULL )
+        {
+            msg_Warn( p_demux, "Misformed stream. Trying to work around");
+            char *content_type = stream_ContentType( p_demux->s );
+            if ( content_type == NULL )
+                return false;
+            const char* boundary = strstr( content_type, "boundary=--" );
+            if ( boundary != NULL )
+            {
+                p_sys->psz_separator = strdup( boundary + strlen( "boundary=--" ) );
+                msg_Dbg( p_demux, "Video boundary extracted from Content-Type: %s", p_sys->psz_separator );
+                free( content_type );
+                /* Skip to HTTP header parsing as there's no boundary to extract
+                 * from the stream */
+            }
+            else
+            {
+                free( content_type );
+                return false;
+            }
+        }
+        else
+        {
+            *p_header_size = 0;
+            return false;
+        }
     }
     else
     {
-        if( strcmp( psz_line, p_sys->psz_separator ) )
+        i_pos = *p_sys->p_peek == '-' ? 2 : 4;
+        psz_line = GetLine( p_demux, &i_pos );
+        if( NULL == psz_line )
         {
-            msg_Warn( p_demux, "separator %s does not match %s", psz_line,
-                      p_sys->psz_separator );
+            msg_Err( p_demux, "no EOL" );
+            *p_header_size = -3;
+            return false;
         }
-        free( psz_line );
+
+        /* Read the separator and remember it if not yet stored */
+        if( p_sys->psz_separator == NULL )
+        {
+            p_sys->psz_separator = psz_line;
+            msg_Dbg( p_demux, "Multipart MIME detected, using separator: %s",
+                     p_sys->psz_separator );
+        }
+        else
+        {
+            if( strcmp( psz_line, p_sys->psz_separator ) )
+            {
+                msg_Warn( p_demux, "separator %s does not match %s", psz_line,
+                          p_sys->psz_separator );
+            }
+            free( psz_line );
+        }
     }
 
     psz_line = GetLine( p_demux, &i_pos );
