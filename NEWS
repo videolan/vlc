@@ -8,32 +8,44 @@ Important changes for packagers:
 3rd party libraries (contrib):
  * /extras/contrib has been replaced by a better system in /contrib
 
-Audio output:
- * Windows Audio Session API audio output support
- * OpenBSD sndio audio output support
+Codecs:
+ * Support for CDXL, Ut Video, VBLE, Dxtory codecs via libavcodec.
+ * Numerous improvements in OpenMAX IL codec
 
 Encoders:
  * high10,high422 and high444 encoding support in h264
+
+Access:
+ * Screen: Added support for OS X Lion
+ * Major improvements in DASH support
+ * Improvements in Blu-Ray module, notably for multiple video tracks support
+
+Demuxers:
+ * MP4: partial support for fragmented MP4
+ * Vorbis: better support for metadata and cover art
+ * AVI: better support for tags and extended metadata
+ * Support for FLAC, Atrac and some ADPCM in AVI
+
+Audio output:
+ * Windows Audio Session API audio output support
+ * OpenBSD sndio audio output support
 
 Audio Filters:
  * new remapping channel filter
  * new filter to enhance stereo effect by mono suppression and delay effect
  * new VSXu visualization plugin
 
-Codecs:
- * Support for CDXL, Ut Video, VBLE, Dxtory codecs via libavcodec.
-
-Access:
- * Screen: Added support for OS X Lion
-
 Video Filters:
  * new anaglyph video filter which transforms side by side 3D video streams in
    anaglyph glasses (aka red/blue) compatible images.
+ * Support in deinterlacing filter for most 4:2:0, 4:2:2, 4:4:4 YUV formats
+   and for bits depth higher than 8bits (like 10bits)
 
 Interfaces:
  * configurable password for the HTTP server.
  * .hosts removed from the HTTP server.
  * fixed Lua command line interface console mode under Windows.
+ * Better support for MCE remotes on Windows
 
 Mac OS X Interface:
  * added a GUI for the QTSound access module to process audio captured locally
