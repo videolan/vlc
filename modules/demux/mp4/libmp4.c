@@ -650,7 +650,7 @@ static int MP4_ReadBox_trun(  stream_t *p_stream, MP4_Box_t *p_box )
     }
 
 #ifdef MP4_VERBOSE
-    msg_Dbg( p_stream, "read box: \"trun\" version %d flags 0x%x sample count %d",
+    msg_Dbg( p_stream, "read box: \"trun\" version %u flags 0x%x sample count %u",
                   p_box->data.p_trun->i_version,
                   p_box->data.p_trun->i_flags,
                   p_box->data.p_trun->i_sample_count );
@@ -658,7 +658,8 @@ static int MP4_ReadBox_trun(  stream_t *p_stream, MP4_Box_t *p_box )
     for( unsigned int i = 0; i<p_box->data.p_trun->i_sample_count; i++ )
     {
         MP4_descriptor_trun_sample_t *p_sample = &p_box->data.p_trun->p_samples[i];
-        msg_Dbg( p_stream, "read box: \"trun\" sample %4.4d flags 0x%x duration %d size %d composition time offset %d",
+        msg_Dbg( p_stream, "read box: \"trun\" sample %4.4u flags 0x%x "\
+            "duration %"PRIu32" size %"PRIu32" composition time offset %"PRIu32,
                         i, p_sample->i_flags, p_sample->i_duration,
                         p_sample->i_size, p_sample->i_composition_time_offset );
     }

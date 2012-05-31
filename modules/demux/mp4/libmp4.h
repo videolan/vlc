@@ -935,7 +935,7 @@ typedef struct MP4_Box_data_trun_s
     uint32_t i_sample_count;
 
     /* optional fields */
-    uint32_t i_data_offset;
+    int32_t i_data_offset;
     uint32_t i_first_sample_flags;
 
     MP4_descriptor_trun_sample_t *p_samples;
