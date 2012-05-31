@@ -402,12 +402,12 @@ vlc_module_begin ()
     add_obsolete_bool( CFG_PREFIX "stereo" )
     add_obsolete_integer( CFG_PREFIX "samplerate" )
 
-    add_shortcut( "v4l2" )
+    add_shortcut( "v4l", "v4l2" )
     set_capability( "access_demux", 0 )
     set_callbacks( DemuxOpen, DemuxClose )
 
     add_submodule ()
-    add_shortcut( "v4l2", "v4l2c" )
+    add_shortcut( "v4l", "v4l2", "v4l2c" )
     set_description( N_("Video4Linux2 Compressed A/V") )
     set_capability( "access", 0 )
     /* use these when open as access_demux fails; VLC will use another demux */
