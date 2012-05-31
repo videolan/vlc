@@ -1227,7 +1227,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 - (void)changeFont:(id)sender
 {
     NSFont * font = [sender convertFont:[[NSFontManager sharedFontManager] selectedFont]];
-    [o_osd_font_fld setStringValue:[font familyName]];
+    [o_osd_font_fld setStringValue:[font fontName]];
     [self osdSettingChanged:self];
 }
 
