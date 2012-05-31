@@ -734,9 +734,15 @@ static char* MacLegacy_Select( filter_t *p_filter, const char* psz_fontname,
 
         if ( ats_font_id == 0 || ats_font_id == 0xFFFFFFFFUL )
         {
-            msg_Err( p_filter, "ATS couldn't find either %s nor its family", psz_fontname );
-            CFRelease( cf_fontName );
-            return NULL;
+            msg_Dbg( p_filter, "ATS couldn't find either %s nor its family, checking PS name", psz_fontname );
+            ats_font_id = ATSFontFindFromPostScriptName( cf_fontName, kATSOptionFlagsDefault );
+
+            if ( ats_font_id == 0 || ats_font_id == 0xFFFFFFFFUL )
+            {
+                msg_Err( p_filter, "ATS couldn't find %s (no font name, family or PS name)", psz_fontname );
+                CFRelease( cf_fontName );
+                return NULL;
+            }
         }
     }
     CFRelease( cf_fontName );
