@@ -726,9 +726,8 @@ static char* MacLegacy_Select( filter_t *p_filter, const char* psz_fontname,
     cf_fontName = CFStringCreateWithCString( kCFAllocatorDefault, psz_fontname, kCFStringEncodingUTF8 );
 
     ats_font_id = ATSFontFindFromName( cf_fontName, kATSOptionFlagsIncludeDisabledMask );
-    CFRelease( cf_fontName );
 
-    if ( ats_font_id == 0xFFFFFFFFUL )
+    if ( ats_font_id == 0 || ats_font_id == 0xFFFFFFFFUL )
     {
         msg_Dbg( p_filter, "ATS couldn't find %s by name, checking family", psz_fontname );
         ats_font_id = ATSFontFamilyFindFromName( cf_fontName, kATSOptionFlagsDefault );
@@ -736,14 +735,11 @@ static char* MacLegacy_Select( filter_t *p_filter, const char* psz_fontname,
         if ( ats_font_id == 0 || ats_font_id == 0xFFFFFFFFUL )
         {
             msg_Err( p_filter, "ATS couldn't find either %s nor its family", psz_fontname );
+            CFRelease( cf_fontName );
             return NULL;
         }
     }
-    else if( ats_font_id == 0 )
-    {
-        msg_Err( p_filter, "ATS couldn't find %s by name, won't check family", psz_fontname );
-        return NULL;
-    }
+    CFRelease( cf_fontName );
 
     if ( noErr != ATSFontGetFileReference( ats_font_id, &ref ) )
     {
