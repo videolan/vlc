@@ -98,11 +98,26 @@ static void dv_get_audio_format( es_format_t *p_fmt, const uint8_t *p_aaux_src )
     }
 }
 
+static inline int dv_get_audio_sample_count( const uint8_t *p_buffer, int i_dsf )
+{
+    int i_samples = p_buffer[0] & 0x3f; /* samples in this frame - min samples */
+    switch( (p_buffer[3] >> 3) & 0x07 )
+    {
+    case 0:
+        return i_samples + (i_dsf ? 1896 : 1580);
+    case 1:
+        return i_samples + (i_dsf ? 1742 : 1452);
+    case 2:
+    default:
+        return i_samples + (i_dsf ? 1264 : 1053);
+    }
+}
+
 static block_t *dv_extract_audio( block_t *p_frame_block )
 {
     block_t *p_block;
     uint8_t *p_frame, *p_buf;
-    int i_audio_quant, i_samples, i_size, i_half_ch;
+    int i_audio_quant, i_samples, i_half_ch;
     const uint16_t (*audio_shuffle)[9];
     int i, j, d, of;
 
@@ -121,23 +136,9 @@ static block_t *dv_extract_audio( block_t *p_frame_block )
     if( i_audio_quant > 1 )
         return NULL;
 
-    i_samples = p_buf[1] & 0x3f; /* samples in this frame - min samples */
-    switch( (p_buf[4] >> 3) & 0x07 )
-    {
-    case 0:
-        i_size = i_dsf ? 1896 : 1580;
-        break;
-    case 1:
-        i_size = i_dsf ? 1742 : 1452;
-        break;
-    case 2:
-    default:
-        i_size = i_dsf ? 1264 : 1053;
-        break;
-    }
-    i_size = (i_size + i_samples) * 4; /* 2ch, 2bytes */
+    i_samples = dv_get_audio_sample_count( &p_buf[1], i_dsf );
 
-    p_block = block_New( p_demux, i_size );
+    p_block = block_New( p_demux, 4 * i_samples );
 
     /* for each DIF segment */
     p_frame = p_frame_block->p_buffer;
@@ -159,7 +160,7 @@ static block_t *dv_extract_audio( block_t *p_frame_block )
                     of = audio_shuffle[i][j] + (d - 8) / 2 *
                            (i_dsf ? 108 : 90);
 
-                    if( of * 2 >= i_size ) continue;
+                    if( of * 2 >= 4 * i_samples ) continue;
 
                     /* big endian */
                     p_block->p_buffer[of*2] = p_frame[d+1];
@@ -179,13 +180,13 @@ static block_t *dv_extract_audio( block_t *p_frame_block )
                     rc = rc == 0x800 ? 0 : dv_audio_12to16(rc);
 
                     of = audio_shuffle[i][j] + (d - 8) / 3 * (i_dsf ? 108 : 90);
-                    if( of*2 >= i_size )
+                    if( of*2 >= 4 * i_samples )
                         continue;
                     p_block->p_buffer[of*2+0] = lc & 0xff;
                     p_block->p_buffer[of*2+1] = lc >> 8;
 
                     of = audio_shuffle[i + i_half_ch][j] + (d - 8) / 3 * (i_dsf ? 108 : 90);
-                    if( of*2 >= i_size )
+                    if( of*2 >= 4 * i_samples )
                         continue;
                     p_block->p_buffer[of*2+0] = rc & 0xff;
                     p_block->p_buffer[of*2+1] = rc >> 8;
