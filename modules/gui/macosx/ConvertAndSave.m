@@ -108,6 +108,13 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_customize_subs_ckb setTitle: _NS("Subtitles")];
     [_customize_subs_overlay_ckb setTitle: _NS("Overlay subtitles on the video")];
 
+    /* there is no way to hide single cells, so replace the existing ones with empty cells.. */
+    id blankCell = [[[NSCell alloc] init] autorelease];
+    [blankCell setEnabled:NO];
+    [_customize_encap_matrix putCell:blankCell atRow:3 column:1];
+    [_customize_encap_matrix putCell:blankCell atRow:3 column:2];
+    [_customize_encap_matrix putCell:blankCell atRow:3 column:3];
+
     _profileNames = [[NSArray alloc] initWithObjects:
                      @"Video - H.264 + MP3 (MP4)",
                      @"Video - VP80 + Vorbis (Webm)",
