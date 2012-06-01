@@ -51,6 +51,7 @@
     IBOutlet id _customize_panel;
     IBOutlet id _customize_ok_btn;
     IBOutlet id _customize_cancel_btn;
+    IBOutlet id _customize_tabview;
     IBOutlet id _customize_encap_matrix;
     IBOutlet id _customize_vid_ckb;
     IBOutlet id _customize_vid_keep_ckb;

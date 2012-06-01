@@ -82,6 +82,31 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_destination_lbl setStringValue: _NS("Choose Destination")];
     [_destination_filename_stub_lbl setStringValue: _NS("Choose an output location")];
     [_destination_filename_lbl setHidden: YES];
+    [_customize_ok_btn setTitle: _NS("Apply")];
+    [_customize_cancel_btn setTitle: _NS("Cancel")];
+    [[_customize_tabview tabViewItemAtIndex:0] setLabel: _NS("Encapsulation")];
+    [[_customize_tabview tabViewItemAtIndex:1] setLabel: _NS("Video codec")];
+    [[_customize_tabview tabViewItemAtIndex:2] setLabel: _NS("Audio codec")];
+    [[_customize_tabview tabViewItemAtIndex:3] setLabel: _NS("Subtitles")];
+    [_customize_tabview selectTabViewItemAtIndex: 0];
+    [_customize_vid_ckb setTitle: _NS("Video")];
+    [_customize_vid_keep_ckb setTitle: _NS("Keep original video track")];
+    [_customize_vid_codec_lbl setStringValue: _NS("Codec")];
+    [_customize_vid_bitrate_lbl setStringValue: _NS("Bitrate")];
+    [_customize_vid_framerate_lbl setStringValue: _NS("Frame Rate")];
+    [_customize_vid_res_box setTitle: _NS("Resolution")];
+    [_customize_vid_res_lbl setStringValue: _NS("You just need to fill one of the three following parameters, VLC will autodetect the other using the original aspect ratio")];
+    [_customize_vid_width_lbl setStringValue: _NS("Width")];
+    [_customize_vid_height_lbl setStringValue: _NS("Height")];
+    [_customize_vid_scale_lbl setStringValue: _NS("Scale")];
+    [_customize_aud_ckb setTitle: _NS("Audio")];
+    [_customize_aud_keep_ckb setTitle: _NS("Keep original audio track")];
+    [_customize_aud_codec_lbl setStringValue: _NS("Codec")];
+    [_customize_aud_bitrate_lbl setStringValue: _NS("Bitrate")];
+    [_customize_aud_channels_lbl setStringValue: _NS("Channels")];
+    [_customize_aud_samplerate_lbl setStringValue: _NS("Sample Rate")];
+    [_customize_subs_ckb setTitle: _NS("Subtitles")];
+    [_customize_subs_overlay_ckb setTitle: _NS("Overlay subtitles on the video")];
 
     _profileNames = [[NSArray alloc] initWithObjects:
                      @"Video - H.264 + MP3 (MP4)",
