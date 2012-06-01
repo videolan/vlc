@@ -85,9 +85,15 @@
 
     NSString * _MRL;
     NSString * _outputDestination;
+    NSArray * _profileNames;
+    NSArray * _profileValueList;
+    NSMutableArray * _currentProfile;
 }
 @property (readwrite, nonatomic, retain) NSString * MRL;
 @property (readwrite, nonatomic, retain) NSString * outputDestination;
+@property (readwrite, retain) NSArray * profileNames;
+@property (readwrite, retain) NSArray * profileValueList;
+@property (readwrite, retain) NSMutableArray * currentProfile;
 
 + (VLCConvertAndSave *)sharedInstance;
 

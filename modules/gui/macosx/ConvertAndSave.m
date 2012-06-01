@@ -26,12 +26,6 @@
 #import <vlc_common.h>
 #import <vlc_url.h>
 
-@interface VLCConvertAndSave ()
-@property (readwrite, retain) NSArray * profileNames;
-@property (readwrite, retain) NSArray * profileValueList;
-@property (readwrite, retain) NSMutableArray * currentProfile;
-@end
-
 @implementation VLCConvertAndSave
 
 @synthesize MRL=_MRL, outputDestination=_outputDestination, profileNames=_profileNames, profileValueList=_profileValueList, currentProfile=_currentProfile;
