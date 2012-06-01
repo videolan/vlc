@@ -153,6 +153,14 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (IBAction)customizeProfile:(id)sender
 {
+    [NSApp beginSheet:_customize_panel modalForWindow:_window modalDelegate:self didEndSelector:NULL contextInfo:nil];
+}
+
+- (IBAction)closeCustomizationSheet:(id)sender
+{
+    // sender == _customize_ok_btn ?
+    [_customize_panel orderOut:sender];
+    [NSApp endSheet: _customize_panel];
 }
 
 - (IBAction)chooseDestination:(id)sender
@@ -160,7 +168,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     NSSavePanel * saveFilePanel = [[NSSavePanel alloc] init];
     [saveFilePanel setCanSelectHiddenExtension: YES];
     [saveFilePanel setCanCreateDirectories: YES];
-    [saveFilePanel beginSheetForDirectory:nil file:nil modalForWindow: _window modalDelegate:self didEndSelector:@selector(savePanelDidEnd:returnCode:contextInfo:) contextInfo:nil];
+    [saveFilePanel beginSheetForDirectory:nil file:nil modalForWindow:_window modalDelegate:self didEndSelector:@selector(savePanelDidEnd:returnCode:contextInfo:) contextInfo:nil];
 }
 
 - (void)savePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo

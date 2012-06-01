@@ -48,6 +48,40 @@
     IBOutlet id _dropin_icon_view;
     IBOutlet id _dropin_media_lbl;
 
+    IBOutlet id _customize_panel;
+    IBOutlet id _customize_ok_btn;
+    IBOutlet id _customize_cancel_btn;
+    IBOutlet id _customize_encap_matrix;
+    IBOutlet id _customize_vid_ckb;
+    IBOutlet id _customize_vid_keep_ckb;
+    IBOutlet id _customize_vid_codec_lbl;
+    IBOutlet id _customize_vid_codec_pop;
+    IBOutlet id _customize_vid_bitrate_lbl;
+    IBOutlet id _customize_vid_bitrate_fld;
+    IBOutlet id _customize_vid_framerate_lbl;
+    IBOutlet id _customize_vid_framerate_fld;
+    IBOutlet id _customize_vid_res_box;
+    IBOutlet id _customize_vid_res_lbl;
+    IBOutlet id _customize_vid_width_lbl;
+    IBOutlet id _customize_vid_width_fld;
+    IBOutlet id _customize_vid_height_lbl;
+    IBOutlet id _customize_vid_height_fld;
+    IBOutlet id _customize_vid_scale_lbl;
+    IBOutlet id _customize_vid_scale_fld;
+    IBOutlet id _customize_aud_ckb;
+    IBOutlet id _customize_aud_keep_ckb;
+    IBOutlet id _customize_aud_codec_lbl;
+    IBOutlet id _customize_aud_codec_pop;
+    IBOutlet id _customize_aud_bitrate_lbl;
+    IBOutlet id _customize_aud_bitrate_fld;
+    IBOutlet id _customize_aud_channels_lbl;
+    IBOutlet id _customize_aud_channels_fld;
+    IBOutlet id _customize_aud_samplerate_lbl;
+    IBOutlet id _customize_aud_samplerate_pop;
+    IBOutlet id _customize_subs_ckb;
+    IBOutlet id _customize_subs_pop;
+    IBOutlet id _customize_subs_overlay_ckb;
+
     NSString * _MRL;
     NSString * _outputDestination;
 }
@@ -62,6 +96,7 @@
 - (IBAction)openMedia:(id)sender;
 - (IBAction)profileSelection:(id)sender;
 - (IBAction)customizeProfile:(id)sender;
+- (IBAction)closeCustomizationSheet:(id)sender;
 - (IBAction)chooseDestination:(id)sender;
 
 - (void)updateDropView;
