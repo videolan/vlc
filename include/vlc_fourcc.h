@@ -330,6 +330,8 @@
 #define VLC_CODEC_FI32      VLC_FOURCC('f','i','3','2')
 #define VLC_CODEC_TWINVQ    VLC_FOURCC('T','W','I','N')
 #define VLC_CODEC_BMVAUDIO  VLC_FOURCC('B','M','V','A')
+#define VLC_CODEC_ULEAD_DV_AUDIO_NTSC VLC_FOURCC('m','s',0x02,0x15)
+#define VLC_CODEC_ULEAD_DV_AUDIO_PAL  VLC_FOURCC('m','s',0x02,0x16)
 
 /* Subtitle */
 #define VLC_CODEC_SPU       VLC_FOURCC('s','p','u',' ')

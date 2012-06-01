@@ -1285,6 +1285,11 @@ static const entry_t p_list_audio[] = {
     B(VLC_CODEC_BMVAUDIO, "Discworld II BMV audio"),
         A("BMVA"),
 
+    B(VLC_CODEC_ULEAD_DV_AUDIO_NTSC, "Ulead DV audio NTSC"),
+        A("ms\x02\x15"),
+    B(VLC_CODEC_ULEAD_DV_AUDIO_PAL, "Ulead DV audio PAL"),
+        A("ms\x02\x16"),
+
     B(0, "")
 };
 static const entry_t p_list_spu[] = {
