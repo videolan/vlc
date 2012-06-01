@@ -173,7 +173,7 @@ static char* GetLine( demux_t *p_demux, int *p_pos )
 static bool CheckMimeHeader( demux_t *p_demux, int *p_header_size )
 {
     bool  b_jpeg = false;
-    int         i_pos;
+    int         i_pos = 0;
     char        *psz_line;
     char        *p_ch;
     demux_sys_t *p_sys = p_demux->p_sys;
