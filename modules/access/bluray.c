@@ -198,12 +198,13 @@ static int blurayOpen( vlc_object_t *object )
              * sure we look up the real device */
             char* bd_device = realpath(bd_path, NULL);
             while ((m = getmntent_r (mtab, &mbuf, buf, sizeof(buf))) != NULL) {
-                if (!strcmp (m->mnt_fsname, bd_device)) {
+                if (!strcmp (m->mnt_fsname, (bd_device == NULL ? bd_path : bd_device))) {
                     strncpy (bd_path, m->mnt_dir, sizeof(bd_path));
                     bd_path[sizeof(bd_path) - 1] = '\0';
                     break;
                 }
             }
+            free(bd_device);
             endmntent (mtab);
         }
     }
