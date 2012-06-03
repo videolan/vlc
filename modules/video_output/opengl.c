@@ -263,6 +263,18 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
             list++;
         }
     }
+#if (defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)) && defined (__APPLE__)
+    /* This is a work-around for dated PowerPC-based Macs, which run OpenGL 1.3 only and don't
+     * support the GL_ARB_fragment_program extension.
+     * Affected devices are all Macs built between 2002 and 2005 with an ATI Radeon 7500,
+     * an ATI Radeon 9200 or a NVIDIA GeForceFX 5200 Ultra. */
+    else
+    {
+        vgl->tex_format   = GL_YCBCR_422_APPLE;
+        vgl->tex_type     = GL_UNSIGNED_SHORT_8_8_APPLE;
+        vgl->fmt.i_chroma = VLC_CODEC_YUYV;
+    }
+#endif
 
     vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
     vgl->use_multitexture = vgl->chroma->plane_count > 1;
