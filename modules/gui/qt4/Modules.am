@@ -12,7 +12,7 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 MOSTLYCLEANFILES = $(UIH)
-SUFFIXES = .ui .h .hpp .moc.cpp .mm
+SUFFIXES = .ui .h .hpp .moc.cpp
 
 nodist_SOURCES_qt4 = \
 		main_interface.moc.cpp \
@@ -246,9 +246,6 @@ endif
 	$(AM_V_at)sed -e 's/Q_(\"_(\\\"\(.*\)\\\")"/Q_("\1"/' $@.tmp >$@
 	$(AM_V_at)rm -f $@.tmp
 
-.mm.lo: 
-	$(top_builddir)/libtool --verbose --mode=compile $(CXX) $(objcxxflags) -DQ_WS_MAC -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) $(CXXFLAGS_qt4) -c $< -o $@ 
-
 SOURCES_qt4 = 	qt4.cpp \
 		menus.cpp \
 		main_interface.cpp \
@@ -318,10 +315,6 @@ SOURCES_qt4 = 	qt4.cpp \
 		util/buttons/DeckButtonsLayout.cpp \
 		util/buttons/RoundButton.cpp \
 		styles/seekstyle.cpp
-
-if HAVE_DARWIN
-SOURCES_qt4 +=  util/searchlineedit_mac.mm
-endif
 
 if HAVE_WIN32
 SOURCES_qt4 += main_interface_win32.cpp
