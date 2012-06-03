@@ -194,8 +194,11 @@ static int blurayOpen( vlc_object_t *object )
             struct mntent* m;
             struct mntent mbuf;
             char buf [8192];
+            /* bd_path may be a symlink (e.g. /dev/dvd -> /dev/sr0), so make
+             * sure we look up the real device */
+            char* bd_device = realpath(bd_path, NULL);
             while ((m = getmntent_r (mtab, &mbuf, buf, sizeof(buf))) != NULL) {
-                if (!strcmp (m->mnt_fsname, bd_path)) {
+                if (!strcmp (m->mnt_fsname, bd_device)) {
                     strncpy (bd_path, m->mnt_dir, sizeof(bd_path));
                     bd_path[sizeof(bd_path) - 1] = '\0';
                     break;
