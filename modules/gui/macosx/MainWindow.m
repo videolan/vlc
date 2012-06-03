@@ -1004,7 +1004,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         if (!b_nonembedded)
         {
-            if (([o_video_view isHidden] && b_activeVideo) || b_restored )
+            if (([o_video_view isHidden] && b_activeVideo) || b_restored || (b_activeVideo && sender == nil) )
                 [self makeSplitViewHidden];
             else
                 [self makeSplitViewVisible];
