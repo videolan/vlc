@@ -310,7 +310,7 @@ APPLY = (cd $(UNPACK_DIR) && patch -p1) <
 pkg_static = (cd $(UNPACK_DIR) && ../../../contrib/src/pkg-static.sh $(1))
 MOVE = mv $(UNPACK_DIR) $@ && touch $@
 
-AUTOMAKE_DATA_DIRS=$(abspath $(dir $(shell which automake))/../share/automake*)
+AUTOMAKE_DATA_DIRS=$(foreach n,$(foreach n,$(subst :, ,$(shell echo $$PATH)),$(abspath $(n)/../share)),$(wildcard $(n)/automake*))
 UPDATE_AUTOCONFIG = for dir in $(AUTOMAKE_DATA_DIRS); do \
 		if test -f "$${dir}/config.sub" -a -f "$${dir}/config.guess"; then \
 			cp "$${dir}/config.sub" "$${dir}/config.guess" $(UNPACK_DIR); \
