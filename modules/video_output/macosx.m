@@ -199,7 +199,7 @@ static int Open (vlc_object_t *this)
     {
         NSView *parentView = container;
         [parentView performSelectorOnMainThread:@selector(addSubview:) withObject:sys->glView waitUntilDone:NO];
-        [sys->glView performSelectorOnMainThread:@selector(setFrameWithValue:) withObject:[NSValue valueWithRect:[parentView bounds]] waitUntilDone:NO];
+        [sys->glView performSelectorOnMainThread:@selector(setFrameToBoundsOfView:) withObject:[NSValue valueWithPointer:parentView] waitUntilDone:NO];
     }
     else
     {
@@ -519,9 +519,10 @@ static void OpenglSwap (vlc_gl_t *gl)
 /**
  * Gets called by the Open() method.
  */
-- (void)setFrameWithValue:(NSValue *)value
+- (void)setFrameToBoundsOfView:(NSValue *)value
 {
-    [self setFrame:[value rectValue]];
+    NSView *parentView = [value pointerValue];
+    [self setFrame:[parentView bounds]];
 }
 
 /**
