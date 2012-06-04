@@ -234,7 +234,7 @@ public:
 protected:
     virtual void mouseDoubleClickEvent( QMouseEvent *event )
     {
-        if( qobject_cast<MetaPanel *>(this->window()) == NULL )
+        if( ! p_item && qobject_cast<MetaPanel *>(this->window()) == NULL )
         {
             THEDP->mediaInfoDialog();
         }
