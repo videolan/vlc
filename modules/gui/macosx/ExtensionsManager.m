@@ -92,7 +92,7 @@ static ExtensionsManager* instance = nil;
     {
         bool b_Active = extension_IsActivated( p_extensions_manager, p_ext );
 
-        NSString *titleString = [NSString stringWithCString:p_ext->psz_title 
+        NSString *titleString = [NSString stringWithCString:p_ext->psz_title
                                                    encoding:NSUTF8StringEncoding];
 
         if( b_Active && extension_HasMenu( p_extensions_manager, p_ext ) )
@@ -147,8 +147,8 @@ static ExtensionsManager* instance = nil;
 
             [submenu addItem:[NSMenuItem separatorItem]];
 
-            NSMenuItem *deactivateItem = [submenu addItemWithTitle:@"Deactivate" 
-                                                            action:@selector(triggerMenu:) 
+            NSMenuItem *deactivateItem = [submenu addItemWithTitle:@"Deactivate"
+                                                            action:@selector(triggerMenu:)
                                                      keyEquivalent:@""];
             [deactivateItem setTarget:self];
             deactivateItem.tag = MENU_MAP(0, i_ext);

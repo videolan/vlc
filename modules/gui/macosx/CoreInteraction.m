@@ -68,7 +68,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
-    [[NSNotificationCenter defaultCenter] addObserver: self 
+    [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(applicationWillFinishLaunching:)
                                                  name: NSApplicationWillFinishLaunchingNotification
                                                object: nil];
@@ -313,7 +313,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
     if( [o_name isEqualToString:@""] )
     {
-        if( [o_url isFileURL] ) 
+        if( [o_url isFileURL] )
             o_name = [[NSFileManager defaultManager] displayNameAtPath: [o_url path]];
         else
             o_name = [o_url absoluteString];

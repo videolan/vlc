@@ -183,7 +183,7 @@
         {
             var_SetBool( p_vout, "fullscreen", true );
             vlc_object_release( p_vout );
-        }    
+        }
     }
     else
         msg_Err( VLCIntf, "unknown button action sender" );

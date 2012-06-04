@@ -418,7 +418,7 @@
             NSArray * o_urlItems = [[o_stream_address stringValue] componentsSeparatedByString: @"/"];
             NSMutableString * o_finalStreamAddress;
             o_finalStreamAddress = [[NSMutableString alloc] init];
- 
+
             if ([o_urlItems count] == 1)
             {
                 [o_finalStreamAddress appendFormat: @"\"%@:%@\"", [o_stream_address stringValue],[o_stream_port stringValue]];
@@ -433,7 +433,7 @@
                 }
                 [o_finalStreamAddress appendString: @"\""];
             }
- 
+
             [o_mrl_string appendFormat:
                         @"std{access=%@,mux=%@,dst=%@%@}",
                         o_mode, o_mux_string, o_finalStreamAddress, o_announce];

@@ -58,7 +58,7 @@ static VLAboutBox *_o_sharedInstance = nil;
     } else {
         _o_sharedInstance = [super init];
     }
- 
+
     return _o_sharedInstance;
 }
 
@@ -118,7 +118,7 @@ static VLAboutBox *_o_sharedInstance = nil;
         NSString *authors = [tmpArray componentsJoinedByString:@"\n\n"];
 
         /* setup the authors and thanks field */
-        [o_credits_textview setString: [NSString stringWithFormat: @"%@\n\n\n\n\n\n%@\n\n%@\n\n", 
+        [o_credits_textview setString: [NSString stringWithFormat: @"%@\n\n\n\n\n\n%@\n\n%@\n\n",
                                         [_NS(INTF_ABOUT_MSG) stringByReplacingOccurrencesOfString:@"\n" withString:@" "],
                                         authors,
                                         [[NSString stringWithUTF8String: psz_thanks] stringByReplacingOccurrencesOfString:@"\n" withString:@" " options:0 range:NSRangeFromString(@"680 2")]]];
@@ -177,7 +177,7 @@ static VLAboutBox *_o_sharedInstance = nil;
         if( f_current >= f_end )
         {
             /* f_end may be wrong on first run, so don't trust it too much */
-            if( f_end == [o_credits_textview bounds].size.height - [o_credits_scrollview bounds].size.height ) 
+            if( f_end == [o_credits_textview bounds].size.height - [o_credits_scrollview bounds].size.height )
             {
                 b_restart = YES;
                 [o_credits_textview scrollPoint:NSMakePoint( 0, 0 )];
@@ -227,7 +227,7 @@ static VLAboutBox *_o_sharedInstance = nil;
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
     /* delegate to update button states (we're the frameLoadDelegate for our help's webview)« */
-    [o_help_fwd_btn setEnabled: [o_help_web_view canGoForward]]; 
+    [o_help_fwd_btn setEnabled: [o_help_web_view canGoForward]];
     [o_help_bwd_btn setEnabled: [o_help_web_view canGoBack]];
 }
 

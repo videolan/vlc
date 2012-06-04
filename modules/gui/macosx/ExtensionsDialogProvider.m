@@ -465,7 +465,7 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
     if (!shouldDestroy)
     {
         NSRect content = NSMakeRect(0, 0, 1, 1);
-        dialogWindow = [[VLCDialogWindow alloc] initWithContentRect:content 
+        dialogWindow = [[VLCDialogWindow alloc] initWithContentRect:content
                                                           styleMask:NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask
                                                             backing:NSBackingStoreBuffered
                                                               defer:NO];
@@ -551,7 +551,7 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
         if( strcmp( [[dialogWindow title] UTF8String],
                     p_dialog->psz_title ) != 0 )
         {
-            NSString *titleString = [NSString stringWithCString:p_dialog->psz_title 
+            NSString *titleString = [NSString stringWithCString:p_dialog->psz_title
                                                        encoding:NSUTF8StringEncoding];
 
             [dialogWindow setTitle:titleString];

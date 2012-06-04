@@ -79,7 +79,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
 - (void)initStrings
 {
     /* localise the items */
- 
+
     /* main window */
     [o_bookmarks_window setTitle: _NS("Bookmarks")];
     [o_btn_add setTitle: _NS("Add")];
@@ -93,7 +93,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
         setStringValue: _NS("Position")];
     [[[o_tbl_dataTable tableColumnWithIdentifier:@"time_offset"] headerCell]
         setStringValue: _NS("Time")];
- 
+
     /* edit window */
     [o_edit_btn_ok setTitle: _NS("OK")];
     [o_edit_btn_cancel setTitle: _NS("Cancel")];
@@ -115,7 +115,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
     input_thread_t * p_input = pl_CurrentInput( VLCIntf );
 
     if( !p_input ) return;
- 
+
     seekpoint_t bookmark;
 
     if( !input_Control( p_input, INPUT_GET_BOOKMARK, &bookmark ) )
@@ -123,9 +123,9 @@ static VLCBookmarks *_o_sharedInstance = nil;
         bookmark.psz_name = _("Untitled");
         input_Control( p_input, INPUT_ADD_BOOKMARK, &bookmark );
     }
- 
+
     vlc_object_release( p_input );
- 
+
     [o_tbl_dataTable reloadData];
 }
 
@@ -133,14 +133,14 @@ static VLCBookmarks *_o_sharedInstance = nil;
 {
     /* clear table */
     input_thread_t * p_input = pl_CurrentInput( VLCIntf );
- 
+
     if( !p_input )
         return;
 
     input_Control( p_input, INPUT_CLEAR_BOOKMARKS );
 
     vlc_object_release( p_input );
- 
+
     [o_tbl_dataTable reloadData];
 }
 
@@ -154,7 +154,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
     int i_bookmarks;
     int row;
     row = [o_tbl_dataTable selectedRow];
- 
+
     if( !p_input && row < 0 )
         return;
 
@@ -171,7 +171,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
             (pp_bookmarks[row]->i_time_offset / 1000000)] stringValue]];
     [o_edit_fld_bytes setStringValue: [[NSNumber numberWithInt:
             pp_bookmarks[row]->i_byte_offset] stringValue]];
- 
+
     /* Just keep the pointer value to check if it
      * changes. Note, we don't need to keep a reference to the object.
      * so release it now. */
@@ -204,7 +204,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
      seekpoint_t **pp_bookmarks;
     int i_bookmarks, i;
     input_thread_t * p_input = pl_CurrentInput( VLCIntf );
- 
+
     if( !p_input )
     {
         NSBeginCriticalAlertSheet(_NS("No input"), _NS("OK"),
@@ -223,7 +223,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
         vlc_object_release( p_input );
         return;
     }
- 
+
     if( input_Control( p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks,
         &i_bookmarks ) != VLC_SUCCESS )
     {
@@ -232,24 +232,24 @@ static VLCBookmarks *_o_sharedInstance = nil;
     }
 
     i = [o_tbl_dataTable selectedRow];
- 
+
     free( pp_bookmarks[i]->psz_name );
 
     pp_bookmarks[i]->psz_name = strdup([[o_edit_fld_name stringValue] UTF8String]);
     pp_bookmarks[i]->i_byte_offset = [[o_edit_fld_bytes stringValue] intValue];
     pp_bookmarks[i]->i_time_offset = ([[o_edit_fld_time stringValue] intValue]  * 1000000);
- 
+
     if( input_Control( p_input, INPUT_CHANGE_BOOKMARK, pp_bookmarks[i], i )
         != VLC_SUCCESS )
     {
         msg_Warn( VLCIntf, "Unable to change the bookmark");
         goto clear;
     }
- 
+
     [o_tbl_dataTable reloadData];
     vlc_object_release( p_input );
- 
- 
+
+
     [NSApp endSheet: o_edit_window];
     [o_edit_window close];
 
@@ -278,7 +278,7 @@ clear:
             _NS("The stream must be playing or paused for bookmarks to work."));
         return;
     }
- 
+
     seekpoint_t **pp_bookmarks;
     int i_bookmarks ;
     int i_first = -1;
@@ -300,9 +300,9 @@ clear:
             }
         }
     }
- 
+
     msg_Dbg( VLCIntf, "got the bookmark-indexes");
- 
+
     if( input_Control( p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks,
         &i_bookmarks ) != VLC_SUCCESS )
     {
@@ -332,7 +332,7 @@ clear:
 - (IBAction)goToBookmark:(id)sender
 {
     input_thread_t * p_input = pl_CurrentInput( VLCIntf );
- 
+
     if( !p_input ) return;
 
     input_Control( p_input, INPUT_SET_BOOKMARK, [o_tbl_dataTable selectedRow] );
@@ -344,7 +344,7 @@ clear:
 {
     /* remove selected item */
     input_thread_t * p_input = pl_CurrentInput( VLCIntf );
- 
+
     if( !p_input ) return;
 
     int i_focused = [o_tbl_dataTable selectedRow];
@@ -353,7 +353,7 @@ clear:
         input_Control( p_input, INPUT_DEL_BOOKMARK, i_focused );
 
     vlc_object_release( p_input );
- 
+
     [o_tbl_dataTable reloadData];
 }
 
@@ -376,7 +376,7 @@ clear:
     input_thread_t * p_input = pl_CurrentInput( VLCIntf );
     seekpoint_t **pp_bookmarks;
     int i_bookmarks;
- 
+
     if( !p_input ) return 0;
     else if( input_Control( p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks,
                        &i_bookmarks ) != VLC_SUCCESS )

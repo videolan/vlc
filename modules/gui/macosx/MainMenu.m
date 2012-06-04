@@ -96,7 +96,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
-    [[NSNotificationCenter defaultCenter] addObserver: self 
+    [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(applicationWillFinishLaunching:)
                                                  name: NSApplicationWillFinishLaunchingNotification
                                                object: nil];

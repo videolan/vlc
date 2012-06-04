@@ -94,7 +94,7 @@
     {
         return nil;
     }
- 
+
     if ( [o_command isEqualToString:@"play"] )
     {
         [[VLCCoreInteraction sharedInstance] play];

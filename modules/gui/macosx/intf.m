@@ -1370,9 +1370,9 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         unsigned int i_keyModifiers = [self VLCModifiersToCocoa: str];
 
         if( [[[o_event charactersIgnoringModifiers] lowercaseString] isEqualToString: [self VLCKeyToString: str]] &&
-           (i_keyModifiers & NSShiftKeyMask)     == (i_pressed_modifiers & NSShiftKeyMask) && 
-           (i_keyModifiers & NSControlKeyMask)   == (i_pressed_modifiers & NSControlKeyMask) && 
-           (i_keyModifiers & NSAlternateKeyMask) == (i_pressed_modifiers & NSAlternateKeyMask) && 
+           (i_keyModifiers & NSShiftKeyMask)     == (i_pressed_modifiers & NSShiftKeyMask) &&
+           (i_keyModifiers & NSControlKeyMask)   == (i_pressed_modifiers & NSControlKeyMask) &&
+           (i_keyModifiers & NSAlternateKeyMask) == (i_pressed_modifiers & NSAlternateKeyMask) &&
            (i_keyModifiers & NSCommandKeyMask)   == (i_pressed_modifiers & NSCommandKeyMask) )
         {
             b_found_key = YES;
@@ -1415,7 +1415,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         }
     }
     module_config_free (p_config);
-    
+
     if( o_usedHotkeys )
         [o_usedHotkeys release];
     o_usedHotkeys = [[NSArray alloc] initWithArray: o_tempArray copyItems: YES];
@@ -1432,7 +1432,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     if (b_nativeFullscreenMode)
     {
         // this is called twice in certain situations, so only toogle if we really need to
-        if( (  b_fullscreen && !([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen) ) || 
+        if( (  b_fullscreen && !([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen) ) ||
             ( !b_fullscreen &&  ([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen) ) )
             [o_mainwindow toggleFullScreen: self];
 
@@ -2004,7 +2004,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 {
     if (aTableView == o_msgs_table)
         return [o_msg_arr count];
-    return 0; 
+    return 0;
 }
 
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex

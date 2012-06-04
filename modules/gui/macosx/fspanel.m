@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -42,9 +42,9 @@
  *****************************************************************************/
 @implementation VLCFSPanel
 /* We override this initializer so we can set the NSBorderlessWindowMask styleMask, and set a few other important settings */
-- (id)initWithContentRect:(NSRect)contentRect 
-                styleMask:(NSUInteger)aStyle 
-                  backing:(NSBackingStoreType)bufferingType 
+- (id)initWithContentRect:(NSRect)contentRect
+                styleMask:(NSUInteger)aStyle
+                  backing:(NSBackingStoreType)bufferingType
                     defer:(BOOL)flag
 {
     id win = [super initWithContentRect:contentRect styleMask:NSTexturedBackgroundWindowMask backing:bufferingType defer:flag];
@@ -239,10 +239,10 @@
         {
             b_fadeQueued=NO;
             [self setFadeTimer:
-                [NSTimer scheduledTimerWithTimeInterval:0.1 
-                                                 target:self 
-                                               selector:@selector(focus:) 
-                                               userInfo:NULL 
+                [NSTimer scheduledTimerWithTimeInterval:0.1
+                                                 target:self
+                                               selector:@selector(focus:)
+                                               userInfo:NULL
                                                 repeats:YES]];
         }
     }
@@ -322,9 +322,9 @@
         }
         /* released in -autoHide and -dealloc */
         hideAgainTimer = [[NSTimer scheduledTimerWithTimeInterval: 0.5
-                                                          target: self 
+                                                          target: self
                                                         selector: @selector(keepVisible:)
-                                                        userInfo: nil 
+                                                        userInfo: nil
                                                          repeats: YES] retain];
         b_alreadyCounting = YES;
     }

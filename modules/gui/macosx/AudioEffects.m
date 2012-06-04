@@ -425,7 +425,7 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
     if( psz_afilters ) {
         [o_comp_enable_ckb setState: (NSInteger)strstr( psz_afilters, "compressor" ) ];
         free( psz_afilters );
-    } 
+    }
     else
         [o_comp_enable_ckb setState: NSOffState];
 
@@ -524,7 +524,7 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
     if( psz_afilters ) {
         [o_spat_enable_ckb setState: (NSInteger)strstr( psz_afilters, "spatializer" ) ];
         free( psz_afilters );
-    } 
+    }
     else
         [o_spat_enable_ckb setState: NSOffState];
 

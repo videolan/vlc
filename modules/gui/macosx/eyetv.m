@@ -37,7 +37,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
 }
 
-- (id)init 
+- (id)init
 {
     if (_o_sharedInstance) {
         [self dealloc];
@@ -89,7 +89,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
                  "end tell"];
     NSDictionary *errorDict;
     NSAppleEventDescriptor *descriptor = [script executeAndReturnError:&errorDict];
-    if( nil == descriptor ) 
+    if( nil == descriptor )
     {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
         NSLog( @"opening EyeTV failed with error status '%@'", errorString );
@@ -104,7 +104,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
             @"tell application \"EyeTV\" to get current channel"];
     NSDictionary *errorDict;
     NSAppleEventDescriptor *descriptor = [script executeAndReturnError:&errorDict];
-    if( nil == descriptor ) 
+    if( nil == descriptor )
     {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
         NSLog( @"EyeTV channel inventory failed with error status '%@'", errorString );
@@ -144,7 +144,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     }
 
     descriptor = [script executeAndReturnError:&errorDict];
-    if( nil == descriptor ) 
+    if( nil == descriptor )
     {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
         NSLog( @"EyeTV channel change failed with error status '%@'", errorString );
@@ -197,7 +197,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     }
     NSDictionary *errorDict;
     NSAppleEventDescriptor *descriptor = [script executeAndReturnError:&errorDict];
-    if( nil == descriptor ) 
+    if( nil == descriptor )
     {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
         NSLog( @"EyeTV source change failed with error status '%@'", errorString );
@@ -212,7 +212,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
             @"tell application \"EyeTV\" to get name of every channel"];
     NSDictionary *errorDict;
     NSAppleEventDescriptor *descriptor = [script executeAndReturnError:&errorDict];
-    if( nil == descriptor ) 
+    if( nil == descriptor )
     {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
         NSLog( @"EyeTV channel inventory failed with error status '%@'", errorString );
@@ -220,7 +220,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     else
     {
         int count = [descriptor numberOfItems];
-        int x=0; 
+        int x=0;
         NSMutableArray *channelArray = [NSMutableArray arrayWithCapacity:count];
         while( x++ < count ) {
             [channelArray addObject:[[descriptor descriptorAtIndex:x] stringValue]];

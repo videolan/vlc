@@ -992,7 +992,7 @@
     [o_selected_indexes getIndexes:indexes maxCount:i_count inIndexRange:nil];
     for (int i = 0; i < i_count; i++)
     {
-        p_item = [[o_outline_view itemAtRow: indexes[i]] pointerValue];   
+        p_item = [[o_outline_view itemAtRow: indexes[i]] pointerValue];
         [o_outline_view deselectRow: indexes[i]];
 
         if( p_item && p_item->i_children == -1 )
@@ -1633,7 +1633,7 @@
            Else, choose the proposed parent as parent. */
         if( item == nil )
         {
-            if ([self currentPlaylistRoot] == p_playlist->p_local_category || [self currentPlaylistRoot] == p_playlist->p_ml_category) 
+            if ([self currentPlaylistRoot] == p_playlist->p_local_category || [self currentPlaylistRoot] == p_playlist->p_ml_category)
                 p_new_parent = [self currentPlaylistRoot];
             else
                 return NO;
@@ -1712,7 +1712,7 @@
 
     else if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] )
     {
-        if ([self currentPlaylistRoot] != p_playlist->p_local_category && [self currentPlaylistRoot] != p_playlist->p_ml_category) 
+        if ([self currentPlaylistRoot] != p_playlist->p_local_category && [self currentPlaylistRoot] != p_playlist->p_ml_category)
             return NO;
 
         playlist_item_t *p_node = [item pointerValue];

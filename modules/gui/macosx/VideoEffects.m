@@ -868,7 +868,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (IBAction)enableExtract:(id)sender
 {
-    BOOL b_state = [o_extract_ckb state]; 
+    BOOL b_state = [o_extract_ckb state];
     [self setVideoFilter: "extract" on: b_state];
     [o_extract_fld setEnabled: b_state];
     [o_extract_lbl setEnabled: b_state];
@@ -876,7 +876,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (IBAction)extractModifierChanged:(id)sender
 {
-    [self setVideoFilterProperty: "extract-component" forFilter: "extract" integer: [o_extract_fld intValue]];  
+    [self setVideoFilterProperty: "extract-component" forFilter: "extract" integer: [o_extract_fld intValue]];
 }
 
 - (IBAction)enableInvert:(id)sender

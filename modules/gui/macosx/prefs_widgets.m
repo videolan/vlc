@@ -859,7 +859,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
                         withView: o_parent_view];
         }
         break;
-    /* don't display keys in the advanced settings, since the current controls 
+    /* don't display keys in the advanced settings, since the current controls
     are broken by design. The user is required to change hotkeys in the sprefs
     and can only change really advanced stuff here..
     case CONFIG_ITEM_KEY:
@@ -1558,7 +1558,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         int i_index;
         i_view_type = CONFIG_ITEM_STRING_LIST;
 
-        o_textfieldTooltip = [[VLCMain sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];    
+        o_textfieldTooltip = [[VLCMain sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
         if( p_item->psz_text )
@@ -1867,7 +1867,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     {
         i_view_type = CONFIG_ITEM_RANGED_INTEGER;
 
-        o_tooltip = [[VLCMain sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];    
+        o_tooltip = [[VLCMain sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
         if( p_item->psz_text )
@@ -2288,7 +2288,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 
 -(void)resetValues
 {
-#warning Reset prefs of the module selector is broken atm. 
+#warning Reset prefs of the module selector is broken atm.
     msg_Err( VLCIntf, "don't forget about modulelistconfig" );
     [super resetValues];
 }
