@@ -628,17 +628,24 @@ void InputManager::UpdateCaching()
     }
 }
 
-void InputManager::requestArtUpdate()
+void InputManager::requestArtUpdate( input_item_t *p_item )
 {
-    if( hasInput() )
-    {
-        playlist_AskForArtEnqueue( pl_Get(p_intf), input_GetItem( p_input ) );
+    bool b_current_item = false;
+    if ( !p_item && hasInput() )
+    {   /* default to current item */
+        p_item = input_GetItem( p_input );
+        b_current_item = true;
     }
-    else
+
+    if ( p_item )
     {
+        playlist_AskForArtEnqueue( pl_Get(p_intf), p_item );
         /* No input will signal the cover art to update,
-         * let's do it ourself */
-        UpdateArt();
+             * let's do it ourself */
+        if ( b_current_item )
+            UpdateArt();
+        else
+            emit artChanged( p_item );
     }
 }
 
@@ -689,6 +696,7 @@ inline void InputManager::UpdateStats()
 inline void InputManager::UpdateMeta( input_item_t *p_item_ )
 {
     emit metaChanged( p_item_ );
+    emit artChanged( p_item_ );
 }
 
 inline void InputManager::UpdateMeta()

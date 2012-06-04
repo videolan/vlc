@@ -263,6 +263,7 @@ void MetaPanel::update( input_item_t *p_item )
     }
 
     art_cover->showArtUpdate( file );
+    art_cover->setItem( p_item );
 }
 
 /**

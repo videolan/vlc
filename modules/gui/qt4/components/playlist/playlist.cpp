@@ -78,6 +78,8 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
 
     CONNECT( THEMIM->getIM(), artChanged( QString ),
              art, showArtUpdate( const QString& ) );
+    CONNECT( THEMIM->getIM(), artChanged( input_item_t * ),
+             art, showArtUpdate( input_item_t * ) );
 
     leftSplitter->addWidget( artContainer );
 

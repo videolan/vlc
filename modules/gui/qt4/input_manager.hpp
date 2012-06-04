@@ -140,7 +140,7 @@ public:
     bool hasAudio();
     bool hasVideo() { return hasInput() && b_video; }
     bool hasVisualisation();
-    void requestArtUpdate();
+    void requestArtUpdate( input_item_t *p_item );
 
     QString getName() { return oldName; }
     static const QString decodeArtURL( input_item_t *p_item );
@@ -223,7 +223,8 @@ signals:
     void infoChanged( input_item_t* );
     void currentMetaChanged( input_item_t* );
     void metaChanged( input_item_t *);
-    void artChanged( QString );
+    void artChanged( QString ); /* current item art ( same as item == NULL ) */
+    void artChanged( input_item_t * );
     /// Play/pause status
     void playingStatusChanged( int );
     void recordingStateChanged( bool );

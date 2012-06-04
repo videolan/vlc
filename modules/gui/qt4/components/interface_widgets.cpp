@@ -503,10 +503,12 @@ void SpeedControlWidget::resetRate()
 }
 
 CoverArtLabel::CoverArtLabel( QWidget *parent, intf_thread_t *_p_i )
-              : QLabel( parent ), p_intf( _p_i )
+    : QLabel( parent ), p_intf( _p_i ), p_item( NULL )
 {
     setContextMenuPolicy( Qt::ActionsContextMenu );
     CONNECT( this, updateRequested(), this, askForUpdate() );
+    CONNECT( THEMIM->getIM(), artChanged( input_item_t * ),
+             this, showArtUpdate( input_item_t * ) );
 
     setMinimumHeight( 128 );
     setMinimumWidth( 128 );
@@ -527,6 +529,14 @@ CoverArtLabel::~CoverArtLabel()
     QList< QAction* > artActions = actions();
     foreach( QAction *act, artActions )
         removeAction( act );
+    if ( p_item ) vlc_gc_decref( p_item );
+}
+
+void CoverArtLabel::setItem( input_item_t *_p_item )
+{
+    if ( p_item ) vlc_gc_decref( p_item );
+    p_item = _p_item;
+    if ( p_item ) vlc_gc_incref( p_item );
 }
 
 void CoverArtLabel::showArtUpdate( const QString& url )
@@ -545,9 +555,20 @@ void CoverArtLabel::showArtUpdate( const QString& url )
     setPixmap( pix );
 }
 
+void CoverArtLabel::showArtUpdate( input_item_t *_p_item )
+{
+    /* not for me */
+    if ( _p_item != p_item )
+        return;
+
+    QString url;
+    if ( _p_item ) url = THEMIM->getIM()->decodeArtURL( _p_item );
+    showArtUpdate( url );
+}
+
 void CoverArtLabel::askForUpdate()
 {
-    THEMIM->getIM()->requestArtUpdate();
+    THEMIM->getIM()->requestArtUpdate( p_item );
 }
 
 TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )

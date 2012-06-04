@@ -228,6 +228,7 @@ class CoverArtLabel : public QLabel
     Q_OBJECT
 public:
     CoverArtLabel( QWidget *parent, intf_thread_t * );
+    void setItem( input_item_t * );
     virtual ~CoverArtLabel();
 
 protected:
@@ -241,6 +242,7 @@ protected:
     }
 private:
     intf_thread_t *p_intf;
+    input_item_t *p_item;
 
 public slots:
     void requestUpdate() { emit updateRequested(); }
@@ -249,6 +251,7 @@ public slots:
         requestUpdate();
     }
     void showArtUpdate( const QString& );
+    void showArtUpdate( input_item_t * );
 
 private slots:
     void askForUpdate();
