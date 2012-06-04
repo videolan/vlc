@@ -47,6 +47,7 @@ function main()
                                   .. station.children_map["listen_url"][1].children[1],
                           meta={
                                   ["Listing Source"]="dir.xiph.org",
+                                  ["Listing Type"]="radio",
                                   ["Icecast Bitrate"]=station.children_map["bitrate"][1].children[1],
                                   ["Icecast Server Type"]=station.children_map["server_type"][1].children[1]
                           }} )

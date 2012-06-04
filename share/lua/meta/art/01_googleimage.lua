@@ -25,10 +25,14 @@ function fetch_art()
 
     local meta = vlc.item:metas()
 
--- IceCast Entries
-    if meta["Listing Source"] == "dir.xiph.org"
+-- Radio Entries
+    if meta["Listing Type"] == "radio"
     then
         title = meta["title"] .. " radio logo"
+-- TV Entries
+    elseif meta["Listing Type"] == "tv"
+    then
+        title = meta["title"] .. " tv logo"
 -- Album entries
     elseif meta["artist"] and meta["album"] then
         title = meta["artist"].." "..meta["album"].." cover"

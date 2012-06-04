@@ -23,6 +23,11 @@
 function fetch_art()
     if vlc.item == nil then return nil end
     local meta = vlc.item:metas()
+
+    if meta["Listing Type"] == "radio"
+    or meta["Listing Type"] == "tv"
+    then return nil end
+
     if meta["artist"] and meta["album"] then
         title = meta["artist"].."/"..meta["album"]
     else

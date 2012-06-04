@@ -52,6 +52,10 @@ end
 function fetch_art()
     local meta = vlc.item:metas()
 
+    if meta["Listing Type"] == "radio"
+    or meta["Listing Type"] == "tv"
+    then return nil end
+
     if meta["artist"] and meta["album"] then
         query = "artist:\"" .. meta["artist"] .. "\" AND release:\"" .. meta["album"] .. "\""
         relquery = "http://mb.videolan.org/ws/2/release/?query=" .. vlc.strings.encode_uri_component( query )
