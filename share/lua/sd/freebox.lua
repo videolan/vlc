@@ -91,6 +91,7 @@ function main()
                               artist = artist,
                               title = name,
                               arturl = arturl,
+                              uiddata = line,
                               meta = {["Listing Type"]="tv"},
                               options = options })
             duration = nil
