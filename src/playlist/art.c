@@ -232,7 +232,12 @@ static char * GetFileByItemUID( char *psz_dir, const char *psz_type )
 int playlist_FindArtInCacheUsingItemUID( input_item_t *p_item )
 {
     char *uid = input_item_GetInfo( p_item, "uid", "md5" );
-    if ( !uid ) return VLC_EGENERIC;
+    if ( ! *uid )
+    {
+        free( uid );
+        return VLC_EGENERIC;
+    }
+
     /* we have an input item uid set */
     bool b_done = false;
     char *psz_byuiddir = GetDirByItemUIDs( uid );
@@ -305,7 +310,11 @@ int playlist_SaveArt( playlist_t *p_playlist, input_item_t *p_item,
 
     /* save uid info */
     char *uid = input_item_GetInfo( p_item, "uid", "md5" );
-    if ( !uid ) goto end;
+    if ( ! *uid )
+    {
+        free( uid );
+        goto end;
+    }
 
     char *psz_byuiddir = GetDirByItemUIDs( uid );
     char *psz_byuidfile = GetFileByItemUID( psz_byuiddir, "arturl" );
