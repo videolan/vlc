@@ -93,8 +93,6 @@ void WindowClose  ( vout_window_t * );
 #define NATIVE_FULLSCREEN_MODE_ON_LION_TEXT N_("Use the native fullscreen mode on OS X Lion")
 #define NATIVE_FULLSCREEN_MODE_ON_LION_LONGTEXT N_("By default, VLC uses the fullscreen mode known from previous Mac OS X releases. It can also use the native fullscreen mode on Mac OS X 10.7 and later.")
 
-#define SAVEVOL_TEXT N_( "Automatically save the volume on exit" )
-
 #define KEEPSIZE_TEXT N_( "Resize interface to the native video size" )
 #define KEEPSIZE_LONGTEXT N_( "You have two choices:\n" \
 " - The interface will resize to the native video size\n" \
@@ -131,7 +129,6 @@ vlc_module_begin ()
     add_bool( "macosx-mediakeys", true, USE_MEDIAKEYS_TEXT, USE_MEDIAKEYS_LONGTEXT, false )
     add_bool( "macosx-interfacestyle", false, INTERFACE_STYLE_TEXT, INTERFACE_STYLE_LONGTEXT, false )
     add_bool( "macosx-nativefullscreenmode", false, NATIVE_FULLSCREEN_MODE_ON_LION_TEXT, NATIVE_FULLSCREEN_MODE_ON_LION_LONGTEXT, false )
-    add_bool( "macosx-autosave-volume", true, SAVEVOL_TEXT, SAVEVOL_TEXT, true )
     add_obsolete_bool( "macosx-stretch" ) /* since 2.0.0 */
     add_obsolete_bool( "macosx-background" ) /* since 2.0.0 */
     add_obsolete_bool( "macosx-eq-keep" ) /* since 2.0.0 */

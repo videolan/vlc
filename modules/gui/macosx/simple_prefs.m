@@ -520,7 +520,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
      ******************/
     [self setupButton: o_audio_enable_ckb forBoolValue: "audio"];
 
-    if ( config_GetInt( p_intf, "macosx-autosave-volume" ))
+    if ( config_GetInt( p_intf, "volume-save" ))
     {
         [o_audio_autosavevol_yes_bcell setState: NSOnState];
         [o_audio_autosavevol_no_bcell setState: NSOffState];
@@ -900,7 +900,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         config_PutInt( p_intf, "audio", [o_audio_enable_ckb state] );
         if( [o_audio_vol_fld isEnabled] )
             config_PutInt( p_intf, "volume", [o_audio_vol_fld intValue] * AOUT_VOLUME_MAX / 200 );
-        config_PutInt( p_intf, "macosx-autosave-volume", [o_audio_autosavevol_yes_bcell state] );
+        config_PutInt( p_intf, "volume-save", [o_audio_autosavevol_yes_bcell state] );
         config_PutInt( p_intf, "spdif", [o_audio_spdif_ckb state] );
 
         SaveIntList( o_audio_dolby_pop, "force-dolby-surround" );

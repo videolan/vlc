@@ -97,7 +97,6 @@
     BOOL b_show_jump_buttons;
     BOOL b_show_playmode_buttons;
     int i_lastSplitViewHeight;
-    int i_lastShownVolume;
     input_state_e cachedInputState;
 
     NSImage * o_pause_img;

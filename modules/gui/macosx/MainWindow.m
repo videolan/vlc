@@ -158,7 +158,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if( OSX_LION && b_video_deco )
         b_nativeFullscreenMode = config_GetInt( VLCIntf, "macosx-nativefullscreenmode" );
 #endif
-    i_lastShownVolume = -1;
     t_hide_mouse_timer = nil;
     [o_detached_video_window setDelegate: self];
     [self useOptimizedDrawing: YES];
@@ -1329,9 +1328,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
-    if( config_GetInt( VLCIntf, "macosx-autosave-volume" ))
-        config_PutInt( VLCIntf->p_libvlc, "volume", i_lastShownVolume );
-
     [self saveFrameUsingName: [self frameAutosaveName]];
 }
 
@@ -1524,7 +1520,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     if( !b_muted )
     {
-        i_lastShownVolume = i_volume;
         [o_volume_sld setIntValue: i_volume];
         [o_fspanel setVolumeLevel: i_volume];
     }
