@@ -132,6 +132,7 @@ vlc_module_begin ()
     add_obsolete_bool( "macosx-stretch" ) /* since 2.0.0 */
     add_obsolete_bool( "macosx-background" ) /* since 2.0.0 */
     add_obsolete_bool( "macosx-eq-keep" ) /* since 2.0.0 */
+    add_obsolete_bool( "macosx-autosave-volume" ) /* since 2.1.0 */
     add_bool( "macosx-video-autoresize", true, KEEPSIZE_TEXT, KEEPSIZE_LONGTEXT, false )
     add_bool( "macosx-pause-minimized", false, PAUSE_MINIMIZED_TEXT, PAUSE_MINIMIZED_LONGTEXT, false )
     add_bool( "macosx-lock-aspect-ratio", true, LOCK_ASPECT_RATIO_TEXT, LOCK_ASPECT_RATIO_TEXT, true )
