@@ -669,7 +669,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     [self setupField: o_osd_font_fld forOption: "freetype-font"];
     [self setupButton: o_osd_font_color_pop forIntList: "freetype-color"];
     [self setupButton: o_osd_font_size_pop forIntList: "freetype-rel-fontsize"];
-    i = config_GetInt( p_intf, "freetype-opacity" );
+    i = config_GetInt( p_intf, "freetype-opacity" ) * 100.0 / 255.0 + 0.5;
     [o_osd_opacity_fld setIntValue: i];
     [o_osd_opacity_sld setIntValue: i];
     [o_osd_opacity_sld setToolTip: _NS(config_GetLabel( p_intf, "freetype-opacity"))];
@@ -1001,7 +1001,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         config_PutPsz( p_intf, "freetype-font", [[o_osd_font_fld stringValue] UTF8String] );
         SaveIntList( o_osd_font_color_pop, "freetype-color" );
         SaveIntList( o_osd_font_size_pop, "freetype-rel-fontsize" );
-        config_PutInt( p_intf, "freetype-opacity", [o_osd_opacity_sld intValue] );
+        config_PutInt( p_intf, "freetype-opacity", [o_osd_opacity_fld intValue] * 255.0 / 100.0 + 0.5 );
         config_PutInt( p_intf, "freetype-bold", [o_osd_forcebold_ckb state] );
         SaveIntList( o_osd_outline_color_pop, "freetype-outline-color" );
         SaveIntList( o_osd_outline_thickness_pop, "freetype-outline-thickness" );
