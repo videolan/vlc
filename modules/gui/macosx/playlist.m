@@ -928,23 +928,34 @@
 
 - (IBAction)revealItemInFinder:(id)sender
 {
-    playlist_item_t * p_item = [[o_outline_view itemAtRow:[o_outline_view selectedRow]] pointerValue];
-    NSMutableString * o_mrl = nil;
+    NSIndexSet * selectedRows = [o_outline_view selectedRowIndexes];
+    NSUInteger count = [selectedRows count];
+    NSUInteger indexes[count];
+    [selectedRows getIndexes:indexes maxCount:count inIndexRange:nil];
 
-    if(! p_item || !p_item->p_input )
-        return;
+    NSMutableString * o_mrl;
+    playlist_item_t *p_item;
+    for (NSUInteger i = 0; i < count; i++) {
+        p_item = [[o_outline_view itemAtRow:indexes[i]] pointerValue];
 
-    char *psz_uri = decode_URI( input_item_GetURI( p_item->p_input ) );
-    if( psz_uri )
-        o_mrl = [NSMutableString stringWithUTF8String: psz_uri];
+        if(! p_item || !p_item->p_input )
+            continue;
 
-    /* perform some checks whether it is a file and if it is local at all... */
-    NSRange prefix_range = [o_mrl rangeOfString: @"file:"];
-    if( prefix_range.location != NSNotFound )
-        [o_mrl deleteCharactersInRange: prefix_range];
+        o_mrl = [[NSMutableString alloc] initWithFormat: @"%s", decode_URI( input_item_GetURI( p_item->p_input ))];
 
-    if( [o_mrl characterAtIndex:0] == '/' )
-        [[NSWorkspace sharedWorkspace] selectFile: o_mrl inFileViewerRootedAtPath: o_mrl];
+        /* perform some checks whether it is a file and if it is local at all... */
+        if ([o_mrl length] > 0)
+        {
+            NSRange prefix_range = [o_mrl rangeOfString: @"file:"];
+            if( prefix_range.location != NSNotFound )
+                [o_mrl deleteCharactersInRange: prefix_range];
+
+            if( [o_mrl characterAtIndex:0] == '/' )
+                [[NSWorkspace sharedWorkspace] selectFile: o_mrl inFileViewerRootedAtPath: o_mrl];
+        }
+
+        [o_mrl release];
+    }
 }
 
 /* When called retrieves the selected outlineview row and plays that node or item */
