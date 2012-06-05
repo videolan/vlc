@@ -972,6 +972,11 @@ loaded:
         /* The same sw codecs, renamed in ICS (perhaps also in honeycomb) */
         if (!strncmp(p_sys->ppsz_components[i], "OMX.google.", 11))
             continue;
+        /* This one has been seen on HTC One V - it behaves like it works,
+         * but FillBufferDone returns buffers filled with 0 bytes. The One V
+         * has got a working OMX.qcom.video.decoder.avc instead though. */
+        if (!strncmp(p_sys->ppsz_components[i], "OMX.ARICENT.", 12))
+            continue;
 #endif
         omx_error = InitialiseComponent(p_dec, p_sys->ppsz_components[i],
                                         &p_sys->omx_handle);
