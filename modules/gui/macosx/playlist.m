@@ -1375,18 +1375,28 @@
 
 - (IBAction)recursiveExpandNode:(id)sender
 {
-    id o_item = [o_outline_view itemAtRow: [o_outline_view selectedRow]];
-    playlist_item_t *p_item = (playlist_item_t *)[o_item pointerValue];
+    NSIndexSet * selectedRows = [o_outline_view selectedRowIndexes];
+    NSUInteger count = [selectedRows count];
+    NSUInteger indexes[count];
+    [selectedRows getIndexes:indexes maxCount:count inIndexRange:nil];
 
-    if( ![[o_outline_view dataSource] outlineView: o_outline_view isItemExpandable: o_item] )
-    {
-        o_item = [o_outline_dict objectForKey: [NSString stringWithFormat: @"%p", p_item->p_parent]];
+    id o_item;
+    playlist_item_t *p_item;
+    for (NSUInteger i = 0; i < count; i++) {
+        o_item = [o_outline_view itemAtRow: indexes[i]];
+        p_item = (playlist_item_t *)[o_item pointerValue];
+
+        if( ![[o_outline_view dataSource] outlineView: o_outline_view isItemExpandable: o_item] )
+            o_item = [o_outline_dict objectForKey: [NSString stringWithFormat: @"%p", p_item->p_parent]];
+
+        /* We need to collapse the node first, since OSX refuses to recursively
+         expand an already expanded node, even if children nodes are collapsed. */
+        [o_outline_view collapseItem: o_item collapseChildren: YES];
+        [o_outline_view expandItem: o_item expandChildren: YES];
+
+        selectedRows = [o_outline_view selectedRowIndexes];
+        [selectedRows getIndexes:indexes maxCount:count inIndexRange:nil];
     }
-
-    /* We need to collapse the node first, since OSX refuses to recursively
-       expand an already expanded node, even if children nodes are collapsed. */
-    [o_outline_view collapseItem: o_item collapseChildren: YES];
-    [o_outline_view expandItem: o_item expandChildren: YES];
 }
 
 - (NSMenu *)menuForEvent:(NSEvent *)o_event
