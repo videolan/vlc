@@ -1004,7 +1004,6 @@
     for (int i = 0; i < i_count; i++)
     {
         p_item = [[o_outline_view itemAtRow: indexes[i]] pointerValue];
-        [o_outline_view deselectRow: indexes[i]];
 
         if( p_item && p_item->i_children == -1 )
             playlist_AskForArtEnqueue( p_playlist, p_item->p_input );
