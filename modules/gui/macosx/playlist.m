@@ -897,7 +897,7 @@
     playlist_item_t *p_node = NULL;
 
     // ignore clicks on column header when handling double action
-    if( sender != nil && [o_outline_view clickedRow] == -1 )
+    if( sender != nil && [o_outline_view clickedRow] == -1 && sender != o_mi_play)
         return;
 
     p_item = [[o_outline_view itemAtRow:[o_outline_view selectedRow]] pointerValue];
