@@ -1378,8 +1378,7 @@
     id o_item = [o_outline_view itemAtRow: [o_outline_view selectedRow]];
     playlist_item_t *p_item = (playlist_item_t *)[o_item pointerValue];
 
-    if( ![[o_outline_view dataSource] outlineView: o_outline_view
-                                                    isItemExpandable: o_item] )
+    if( ![[o_outline_view dataSource] outlineView: o_outline_view isItemExpandable: o_item] )
     {
         o_item = [o_outline_dict objectForKey: [NSString stringWithFormat: @"%p", p_item->p_parent]];
     }
@@ -1396,10 +1395,9 @@
     bool b_rows;
     bool b_item_sel;
 
-    pt = [o_outline_view convertPoint: [o_event locationInWindow]
-                                                 fromView: nil];
+    pt = [o_outline_view convertPoint: [o_event locationInWindow] fromView: nil];
     int row = [o_outline_view rowAtPoint:pt];
-    if( row != -1 )
+    if( row != -1 && [o_outline_view selectedRow] == -1)
         [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 
     b_item_sel = ( row != -1 && [o_outline_view selectedRow] != -1 );
