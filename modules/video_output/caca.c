@@ -88,10 +88,13 @@ static int Open(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
 
-#ifndef X_DISPLAY_MISSING
+#if !defined(__APPLE__)
+# ifndef X_DISPLAY_MISSING
     if (!vlc_xlib_init(object))
         return VLC_EGENERIC;
+# endif
 #endif
+
 #if defined(WIN32) && !defined(UNDER_CE)
     CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
     SMALL_RECT rect;
