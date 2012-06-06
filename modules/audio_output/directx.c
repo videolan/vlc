@@ -824,7 +824,8 @@ static int CreateDSBuffer( audio_output_t *p_aout, int i_format,
     memset(&dsbdesc, 0, sizeof(DSBUFFERDESC));
     dsbdesc.dwSize = sizeof(DSBUFFERDESC);
     dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2/* Better position accuracy */
-                    | DSBCAPS_GLOBALFOCUS;      /* Allows background playing */
+                    | DSBCAPS_GLOBALFOCUS       /* Allows background playing */
+                    | DSBCAPS_CTRLVOLUME;       /* Allows volume control */
 
     /* Only use the new WAVE_FORMAT_EXTENSIBLE format for multichannel audio */
     if( i_nb_channels <= 2 )
