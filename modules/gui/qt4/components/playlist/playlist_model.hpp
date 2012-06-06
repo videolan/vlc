@@ -41,6 +41,8 @@
 #include <QAbstractItemModel>
 #include <QVariant>
 #include <QModelIndex>
+#include <QTimer>
+#include <QMutex>
 
 class PLItem;
 class PLSelector;
@@ -130,6 +132,15 @@ private:
 
     static QIcon icons[ITEM_TYPE_NUMBER];
 
+    /* single row linear inserts agregation */
+    void bufferedRowInsert( PLItem *item, PLItem *parent, int pos );
+    PLItem *insertBufferRoot;
+    int insertbuffer_firstrow;
+    int insertbuffer_lastrow;
+    QTimer insertBufferCommitTimer;
+    QList<PLItem *> insertBuffer;
+    QMutex insertBufferMutex;
+
     /* Custom model private methods */
     /* Lookups */
     QStringList selectedURIs();
@@ -192,6 +203,7 @@ private slots:
     void processInputItemUpdate( input_thread_t* p_input );
     void processItemRemoval( int i_id );
     void processItemAppend( int item, int parent );
+    void commitBufferedRowInserts();
     void activateItem( playlist_item_t *p_item );
     void increaseZoom();
     void decreaseZoom();
