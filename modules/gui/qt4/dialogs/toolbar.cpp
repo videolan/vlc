@@ -524,6 +524,7 @@ DroppingController::DroppingController( intf_thread_t *_p_intf,
     controlLayout->setMargin( 0 );
     setFrameShape( QFrame::StyledPanel );
     setFrameShadow( QFrame::Raised );
+    setMinimumHeight( 20 );
 
     parseAndCreate( line, controlLayout );
 }
