@@ -350,6 +350,13 @@ void PlListView::keyPressEvent( QKeyEvent *event )
         QListView::keyPressEvent( event );
 }
 
+void PlTreeView::setModel( QAbstractItemModel * model )
+{
+    QTreeView::setModel( model );
+    CONNECT( this, expanded( const QModelIndex & ),
+             model, ensureArtRequested( const QModelIndex & ) );
+}
+
 void PlTreeView::startDrag ( Qt::DropActions supportedActions )
 {
     plViewStartDrag( this, supportedActions );

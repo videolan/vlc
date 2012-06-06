@@ -121,6 +121,7 @@ signals:
 public slots:
     virtual void activateItem( const QModelIndex &index );
     void clearPlaylist();
+    void ensureArtRequested( const QModelIndex &index );
 private:
     /* General */
     PLItem *rootItem;

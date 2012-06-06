@@ -93,6 +93,7 @@ protected:
     virtual void startDrag ( Qt::DropActions supportedActions );
     virtual void dragMoveEvent ( QDragMoveEvent * event );
     virtual void keyPressEvent( QKeyEvent *event );
+    virtual void setModel( QAbstractItemModel * );
 };
 
 class PicFlowView : public QAbstractItemView

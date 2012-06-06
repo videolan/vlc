@@ -639,6 +639,14 @@ void InputManager::requestArtUpdate( input_item_t *p_item )
 
     if ( p_item )
     {
+        /* check if it has already been enqueued */
+        if ( p_item->p_meta )
+        {
+            int status = vlc_meta_GetStatus( p_item->p_meta );
+            if ( status & ( ITEM_ART_NOTFOUND|ITEM_ART_FETCHED|
+                            ITEM_ARTURL_FETCHED|ITEM_PREPARSED ) )
+                return;
+        }
         playlist_AskForArtEnqueue( pl_Get(p_intf), p_item );
         /* No input will signal the cover art to update,
              * let's do it ourself */

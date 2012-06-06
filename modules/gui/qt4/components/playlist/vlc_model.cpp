@@ -38,13 +38,18 @@ QString VLCModel::getMeta( const QModelIndex & index, int meta )
         data().toString();
 }
 
+QString VLCModel::getArtUrl( const QModelIndex & index )
+{
+    return index.model()->index( index.row(),
+                    columnFromMeta( COLUMN_COVER ),
+                    index.parent() )
+           .data().toString();
+}
+
 QPixmap VLCModel::getArtPixmap( const QModelIndex & index, const QSize & size )
 {
-    QString artUrl;
-    artUrl = index.model()->index( index.row(),
-                                  columnFromMeta( COLUMN_COVER ),
-                                  index.parent() )
-                                  .data().toString();
+    QString artUrl = VLCModel::getArtUrl( index ) ;
+
     QPixmap artPix;
 
     QString key = artUrl + QString("%1%2").arg(size.width()).arg(size.height());

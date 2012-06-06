@@ -216,6 +216,7 @@ void StandardPLPanel::browseInto( const QModelIndex &index )
 
         /* Store new rootindexid*/
         currentRootIndexId = model->itemId( index );
+        model->ensureArtRequested( index );
     }
 
     emit viewChanged( index );

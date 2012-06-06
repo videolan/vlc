@@ -688,7 +688,6 @@ void PLModel::rebuild( playlist_item_t *p_root )
 
     /* And signal the view */
     reset();
-
     if( p_root ) emit rootIndexChanged();
 }
 
@@ -908,6 +907,21 @@ void PLModel::clearPlaylist()
         l.append( indexrecord );
     }
     doDelete(l);
+}
+
+void PLModel::ensureArtRequested( const QModelIndex &index )
+{
+    if ( index.isValid() && hasChildren( index ) )
+    {
+        int nbnodes = rowCount( index );
+        QModelIndex child;
+        for( int row = 0 ; row < nbnodes ; row++ )
+        {
+            child = index.child( row, 0 );
+            if ( child.isValid() && getArtUrl( child ).isEmpty() )
+                THEMIM->getIM()->requestArtUpdate( getItem( child )->inputItem() );
+        }
+    }
 }
 
 /*********** Popup *********/
