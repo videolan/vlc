@@ -19588,7 +19588,7 @@ msgstr "Copyright ©"
 msgid " by the VideoLAN Team.\n"
 msgstr ""
 " par l'équipe VideoLAN.\n"
-"Traductions © 2008-2011 Éric Lassauge - Une pensée pour Mehdi (†).\n"
+"Traductions © 2008-2012 Éric Lassauge.\n"
 
 #: modules/gui/qt4/dialogs/help.cpp:157
 msgid "&Recheck version"
