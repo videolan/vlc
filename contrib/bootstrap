@@ -152,6 +152,13 @@ check_macosx_sdk()
 
    if [ ! -d "${SDKROOT}" ]
    then
+      SDKROOT_NOT_FOUND=`xcode-select -print-path`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$OSX_VERSION.sdk
+      SDKROOT=`xcode-select -print-path`/SDKs/MacOSX$OSX_VERSION.sdk
+      echo "SDKROOT not found at $SDKROOT_NOT_FOUND, trying $SDKROOT"
+   fi
+
+   if [ ! -d "${SDKROOT}" ]
+   then
       echo "*** ${SDKROOT} does not exist, please install required SDK, or set SDKROOT manually. ***"
       exit 1
    fi
