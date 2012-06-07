@@ -34,7 +34,6 @@ args="--enable-faad $args"
 args="--enable-flac $args"
 args="--enable-theora $args"
 args="--enable-shout $args"
-args="--enable-caca $args"
 args="--enable-twolame $args"
 args="--enable-realrtsp $args"
 args="--enable-libass $args"
@@ -46,6 +45,7 @@ args="--enable-macosx-vout $args"
 
 # disabled stuff
 args="--disable-growl $args"
+args="--disable-caca $args"
 args="--disable-ncurses $args"
 args="--disable-httpd $args"
 args="--disable-vlm $args"
@@ -56,6 +56,7 @@ args="--disable-xcb $args"
 args="--disable-sdl $args"
 args="--disable-sdl-image $args"
 args="--disable-visual $args"
+args="--disable-samplerate $args"
 
 if test "x$SDKROOT" != "x"
 then
