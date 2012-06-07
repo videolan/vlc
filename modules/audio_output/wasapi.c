@@ -27,11 +27,13 @@
 
 #include <assert.h>
 #include <audioclient.h>
+#include <audiopolicy.h>
 #include <mmdeviceapi.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
+#include <vlc_charset.h>
 
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
@@ -73,6 +75,7 @@ struct aout_sys_t
     {
         ISimpleAudioVolume *simple;
     } volume;
+    IAudioSessionControl *control;
     UINT32 frames; /**< Total buffer size (frames) */
     HANDLE ready; /**< Semaphore from MTA thread */
     HANDLE done; /**< Semaphore to MTA thread */
@@ -279,6 +282,18 @@ static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
     return 0;
 }
 
+static wchar_t *var_InheritWide(vlc_object_t *obj, const char *name)
+{
+    char *v8 = var_InheritString(obj, name);
+    if (v8 == NULL)
+        return NULL;
+
+    wchar_t *v16 = ToWide(v8);
+    free(v8);
+    return v16;
+}
+#define var_InheritWide(o,n) var_InheritWide(VLC_OBJECT(o),n)
+
 /* Dummy thread to create and release COM interfaces when needed. */
 static void MTAThread(void *data)
 {
@@ -307,10 +322,23 @@ static void MTAThread(void *data)
                                      (void **)&sys->volume.simple);
     }
 
+    hr = IAudioClient_GetService(sys->client, &IID_IAudioSessionControl,
+                                 (void **)&sys->control);
+    if (FAILED(hr))
+        msg_Warn(aout, "cannot get audio session control (error 0x%lx)", hr);
+    else
+    {
+        wchar_t *ua = var_InheritWide(aout, "user-agent");
+        IAudioSessionControl_SetDisplayName(sys->control, ua, NULL);
+        free(ua);
+    }
+
     /* do nothing until the audio session terminates */
     ReleaseSemaphore(sys->ready, 1, NULL);
     WaitForSingleObject(sys->done, INFINITE);
 
+    if (sys->control != NULL)
+        IAudioSessionControl_Release(sys->control);
     /*if (AOUT_FMT_LINEAR(&format) && !exclusive)*/
     {
         if (sys->volume.simple != NULL)
