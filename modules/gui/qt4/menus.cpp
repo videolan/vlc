@@ -882,8 +882,10 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
     action->setIcon( QIcon( ":/toolbar/skip_back") );
 #endif
     action->setData( ACTION_STATIC );
-    addDPStaticEntry( menu, qtr( I_MENU_GOTOTIME ),"",
-                      SLOT( gotoTimeDialog() ), "Ctrl+T" );
+
+    action = menu->addAction( qtr( I_MENU_GOTOTIME ), THEDP, SLOT( gotoTimeDialog() ), qtr( "Ctrl+T" ) );
+    action->setData( ACTION_ALWAYS_ENABLED );
+
     menu->addSeparator();
 }
 
