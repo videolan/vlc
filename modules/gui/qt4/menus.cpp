@@ -90,7 +90,7 @@ QAction *addDPStaticEntry( QMenu *menu,
                        const char *icon,
                        const char *member,
                        const char *shortcut = NULL,
-                       QAction::MenuRole = QAction::NoRole
+                       QAction::MenuRole role = QAction::NoRole
                        )
 {
     QAction *action = NULL;
@@ -111,6 +111,9 @@ QAction *addDPStaticEntry( QMenu *menu,
         else
             action = menu->addAction( text, THEDP, member );
     }
+#ifdef __APPLE__
+    action->setMenuRole( role )
+#endif
     action->setData( VLCMenuBar::ACTION_STATIC );
     return action;
 }
