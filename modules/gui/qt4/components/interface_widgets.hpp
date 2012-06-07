@@ -245,19 +245,9 @@ private:
     input_item_t *p_item;
 
 public slots:
-    void requestUpdate() { emit updateRequested(); }
-    void update( )
-    {
-        requestUpdate();
-    }
     void showArtUpdate( const QString& );
     void showArtUpdate( input_item_t * );
-
-private slots:
     void askForUpdate();
-
-signals:
-    void updateRequested();
 };
 
 #endif

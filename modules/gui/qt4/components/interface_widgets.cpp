@@ -506,7 +506,6 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, intf_thread_t *_p_i )
     : QLabel( parent ), p_intf( _p_i ), p_item( NULL )
 {
     setContextMenuPolicy( Qt::ActionsContextMenu );
-    CONNECT( this, updateRequested(), this, askForUpdate() );
     CONNECT( THEMIM->getIM(), artChanged( input_item_t * ),
              this, showArtUpdate( input_item_t * ) );
 
