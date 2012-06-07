@@ -311,6 +311,11 @@ static void MTAThread(void *data)
     ReleaseSemaphore(sys->ready, 1, NULL);
     WaitForSingleObject(sys->done, INFINITE);
 
+    /*if (AOUT_FMT_LINEAR(&format) && !exclusive)*/
+    {
+        if (sys->volume.simple != NULL)
+            ISimpleAudioVolume_Release(sys->volume.simple);
+    }
     if (sys->clock != NULL)
         IAudioClock_Release(sys->clock);
     IAudioRenderClient_Release(sys->render);
