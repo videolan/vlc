@@ -567,7 +567,7 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0430;
 			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "VLCKit" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -922,6 +922,7 @@
 		6337547C10ED090B0072A0D9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				PRODUCT_NAME = VLC;
 				SDKROOT = macosx;
 			};
@@ -930,6 +931,7 @@
 		6337547D10ED090B0072A0D9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				PRODUCT_NAME = VLC;
 				SDKROOT = macosx;
 			};
@@ -941,6 +943,7 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				PRODUCT_NAME = "vlc-contrib";
 				SDKROOT = macosx;
 			};
@@ -951,6 +954,7 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				PRODUCT_NAME = "vlc-contrib";
 				SDKROOT = macosx;
 				ZERO_LINK = NO;
@@ -960,13 +964,13 @@
 		63FFDBD00D2AE2AE0092FC96 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CC = "/Developer/usr/bin/llvm-gcc-4.2";
+				CC = "xcrun clang";
 				COPY_PHASE_STRIP = NO;
-				CXX = "/Developer/usr/bin/llvm-g++-4.2";
+				CXX = "xcrun clang++";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				OBJC = "/Developer/usr/bin/llvm-gcc-4.2";
+				OBJC = "xcrun clang";
 				PRODUCT_NAME = "vlc-bootstrap";
 				SDKROOT = macosx;
 			};
@@ -975,12 +979,12 @@
 		63FFDBD10D2AE2AE0092FC96 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CC = "/Developer/usr/bin/llvm-gcc-4.2";
+				CC = "xcrun clang";
 				COPY_PHASE_STRIP = YES;
-				CXX = "/Developer/usr/bin/llvm-g++-4.2";
+				CXX = "xcrun clang++";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				OBJC = "/Developer/usr/bin/llvm-gcc-4.2";
+				OBJC = "xcrun clang";
 				PRODUCT_NAME = "vlc-bootstrap";
 				SDKROOT = macosx;
 				ZERO_LINK = NO;
@@ -1063,6 +1067,7 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				PRODUCT_NAME = "Make VLC and VLCKit";
 				SDKROOT = macosx;
 			};
@@ -1073,6 +1078,7 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				PRODUCT_NAME = "Make VLC and VLCKit";
 				SDKROOT = macosx;
 				ZERO_LINK = NO;
