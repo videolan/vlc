@@ -142,6 +142,10 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
 
     createItems();
 
+    /* Expand at least to show level 2 */
+    for ( int i = 0; i < topLevelItemCount(); i++ )
+        expandItem( topLevelItem( i ) );
+
     /***
      * We need to react to both clicks and activation (enter-key) here.
      * We use curItem to avoid rebuilding twice.
