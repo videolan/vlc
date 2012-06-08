@@ -34,16 +34,8 @@
 Volume::Volume( intf_thread_t *pIntf ): VarPercent( pIntf )
 {
     m_step = (float)config_GetInt( pIntf, "volume-step" ) / AOUT_VOLUME_MAX;
-    if( var_InheritBool( pIntf, "qt-volume-complete" ) )
-    {
-        m_max = AOUT_VOLUME_MAX * 100 / AOUT_VOLUME_DEFAULT;
-        m_volumeMax = AOUT_VOLUME_MAX;
-    }
-    else
-    {
-        m_max = 200;
-        m_volumeMax = AOUT_VOLUME_DEFAULT * 2;
-    }
+    m_max = 200;
+    m_volumeMax = AOUT_VOLUME_DEFAULT * 2;
 
     // Initial value
     audio_volume_t val = aout_VolumeGet( getIntf()->p_sys->p_playlist );
@@ -74,7 +66,7 @@ void Volume::set( int val, bool updateVLC )
 string Volume::getAsStringPercent() const
 {
     int value = (int)(m_max * VarPercent::get());
-    // 0 <= value <= 400, so we need 4 chars
+    // 0 <= value <= 200, so we need 4 chars
     char str[4];
     snprintf( str, 4, "%d", value );
     return string(str);
