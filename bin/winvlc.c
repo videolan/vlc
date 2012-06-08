@@ -142,7 +142,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
             mySetProcessDEPPolicy(PROCESS_DEP_ENABLE);
 
         /* Do NOT load any library from cwd. */
-        mySetDllDirectoryA = (BOOL WINAPI (*)(const char*)) GetProcAddress(h_Kernel32, "SetDllDirectoryA");
+        mySetDllDirectoryA = (BOOL WINAPI (*)(const char*))
+                            GetProcAddress(h_Kernel32, "SetDllDirectoryA");
         if(mySetDllDirectoryA)
             mySetDllDirectoryA("");
 
@@ -234,31 +235,38 @@ static void check_crashdump(void)
 
     if(answer == IDYES)
     {
-        HINTERNET Hint = InternetOpen(L"VLC Crash Reporter", INTERNET_OPEN_TYPE_PRECONFIG, NULL,NULL,0);
+        HINTERNET Hint = InternetOpen(L"VLC Crash Reporter",
+                INTERNET_OPEN_TYPE_PRECONFIG, NULL,NULL,0);
         if(Hint)
         {
-            HINTERNET ftp = InternetConnect(Hint, L"crash.videolan.org", INTERNET_DEFAULT_FTP_PORT,
-                                            NULL, NULL, INTERNET_SERVICE_FTP, INTERNET_FLAG_PASSIVE, 0);
+            HINTERNET ftp = InternetConnect(Hint, L"crash.videolan.org",
+                        INTERNET_DEFAULT_FTP_PORT, NULL, NULL
+                        INTERNET_SERVICE_FTP, INTERNET_FLAG_PASSIVE, 0);
             if(ftp)
             {
                 SYSTEMTIME now;
                 GetSystemTime(&now);
                 wchar_t remote_file[MAX_PATH];
-                swprintf( remote_file, L"/crashes-win32/%04d%02d%02d%02d%02d%02d",
-                          now.wYear, now.wMonth, now.wDay, now.wHour, now.wMinute, now.wSecond );
+                swprintf(remote_file,
+                        L"/crashes-win32/%04d%02d%02d%02d%02d%02d",
+                        now.wYear, now.wMonth, now.wDay, now.wHour,
+                        now.wMinute, now.wSecond );
 
-                if( FtpPutFile( ftp, crashdump_path, remote_file, FTP_TRANSFER_TYPE_BINARY, 0) )
-                    MessageBox( NULL, L"Report sent correctly. Thanks a lot for the help.",
-                                L"Report sent", MB_OK);
+                if( FtpPutFile( ftp, crashdump_path, remote_file,
+                            FTP_TRANSFER_TYPE_BINARY, 0) )
+                    MessageBox( NULL, L"Report sent correctly. Thanks a lot \
+                            for the help.", L"Report sent", MB_OK);
                 else
-                    MessageBox( NULL, L"There was an error while transferring to the FTP server. "\
+                    MessageBox( NULL, L"There was an error while \
+                            transferring to the FTP server. "\
                                 "Thanks a lot for the help anyway.",
                                 L"Report sending failed", MB_OK);
                 InternetCloseHandle(ftp);
             }
             else
             {
-                MessageBox( NULL, L"There was an error while connecting to the FTP server. "\
+                MessageBox( NULL, L"There was an error while connecting to \
+                        the FTP server. "\
                                 "Thanks a lot for the help anyway.",
                                 L"Report sending failed", MB_OK);
                 fprintf(stderr,"Can't connect to FTP server 0x%08lu\n",
@@ -268,7 +276,8 @@ static void check_crashdump(void)
         }
         else
         {
-              MessageBox( NULL, L"There was an error while connecting to Internet. "\
+              MessageBox( NULL, L"There was an error while connecting to the \
+                      Internet. "\
                                 "Thanks a lot for the help anyway.",
                                 L"Report sending failed", MB_OK);
         }
@@ -284,7 +293,8 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
 {
     if(IsDebuggerPresent())
     {
-        //If a debugger is present, pass the exception to the debugger with EXCEPTION_CONTINUE_SEARCH
+        //If a debugger is present, pass the exception to the debugger
+        //with EXCEPTION_CONTINUE_SEARCH
         return EXCEPTION_CONTINUE_SEARCH;
     }
     else
@@ -304,17 +314,17 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
         osvi.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
         GetVersionEx( &osvi );
 
-        fwprintf( fd, L"[version]\nOS=%d.%d.%d.%d.%s\nVLC=" VERSION_MESSAGE, osvi.dwMajorVersion,
-                                                               osvi.dwMinorVersion,
-                                                               osvi.dwBuildNumber,
-                                                               osvi.dwPlatformId,
-                                                               osvi.szCSDVersion);
+        fwprintf( fd, L"[version]\nOS=%d.%d.%d.%d.%s\nVLC=" VERSION_MESSAGE,
+                osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber,
+                osvi.dwPlatformId, osvi.szCSDVersion);
 
-        const CONTEXT *const pContext = (const CONTEXT *)lpExceptionInfo->ContextRecord;
-        const EXCEPTION_RECORD *const pException = (const EXCEPTION_RECORD *)lpExceptionInfo->ExceptionRecord;
-        /*No nested exceptions for now*/
-        fwprintf( fd, L"\n\n[exceptions]\n%08x at %px",pException->ExceptionCode,
-                                                pException->ExceptionAddress );
+        const CONTEXT *const pContext = (const CONTEXT *)
+            lpExceptionInfo->ContextRecord;
+        const EXCEPTION_RECORD *const pException = (const EXCEPTION_RECORD *)
+            lpExceptionInfo->ExceptionRecord;
+        /* No nested exceptions for now */
+        fwprintf( fd, L"\n\n[exceptions]\n%08x at %px", 
+                pException->ExceptionCode, pException->ExceptionAddress );
 
         for( unsigned int i = 0; i < pException->NumberParameters; i++ )
             fwprintf( fd, L" | %p", pException->ExceptionInformation[i] );
