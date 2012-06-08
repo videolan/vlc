@@ -28,8 +28,6 @@
 #include <QCheckBox>
 #include <QLabel>
 #include <QDialogButtonBox>
-#include <QPushButton>
-#include <QSettings>
 
 FirstRun::FirstRun( QWidget *_p, intf_thread_t *_p_intf  )
          : QWidget( _p ), p_intf( _p_intf )

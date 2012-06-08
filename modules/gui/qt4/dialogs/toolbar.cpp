@@ -39,7 +39,6 @@
 #include "input_manager.hpp"
 #include <vlc_vout.h>                       /* vout_thread_t for aspect ratio combobox */
 
-#include <QScrollArea>
 #include <QGroupBox>
 #include <QLabel>
 #include <QComboBox>

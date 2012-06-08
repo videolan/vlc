@@ -30,7 +30,6 @@
 #include "util/qt_dirs.hpp"
 
 #include <QTabWidget>
-#include <QGridLayout>
 #include <QRegExp>
 #include <QMenu>
 
