@@ -37,7 +37,10 @@
        <item row="1" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Verbosity:</string>
+          <string>&amp;Verbosity:</string>
+         </property>
+         <property name="buddy">
+          <cstring>verbosityBox</cstring>
          </property>
         </widget>
        </item>
@@ -67,7 +70,10 @@
        <item row="1" column="2">
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Filter:</string>
+          <string>&amp;Filter:</string>
+         </property>
+         <property name="buddy">
+          <cstring>filterEdit</cstring>
          </property>
         </widget>
        </item>
