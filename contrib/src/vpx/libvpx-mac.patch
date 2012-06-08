@@ -1,0 +1,16 @@
+libvpx's configure script hard-codes the SDK location of previous Xcode release in the /Developer folder. However, starting with Xcode 4.3, the SDKs moved to /Applications/Xcode.app/blabla
+VLC's contrib system is clever enough to detect this, but libvpx fails miserably. However, they are providing a work-around for iOS and Android, which is expanded by this patch.
+
+diff -ru libvpx/build/make/configure.sh libvpx/build/make/configure.sh
+--- libvpx/build/make/configure.sh	2012-06-08 10:26:47.000000000 +0200
++++ libvpx-fixed/build/make/configure.sh	2012-06-08 10:26:07.000000000 +0200
+@@ -628,6 +628,9 @@
+     if [ -d "/Developer/SDKs/MacOSX10.7.sdk" ]; then
+         osx_sdk_dir="/Developer/SDKs/MacOSX10.7.sdk"
+     fi
++    if [ -d "${sdk_path}" ]; then
++        osx_sdk_dir=${sdk_path}
++    fi
+ 
+     case ${toolchain} in
+         *-darwin8-*)
