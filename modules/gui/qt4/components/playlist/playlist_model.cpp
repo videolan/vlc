@@ -1027,12 +1027,12 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
                         qtr(I_POP_STREAM), this, SLOT( popupStream() ) );
         menu.addAction( qtr(I_POP_SAVE), this, SLOT( popupSave() ) );
         menu.addAction( QIcon( ":/menu/info" ), qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
+        menu.addSeparator();
         if( p_input->psz_uri && !strncasecmp( p_input->psz_uri, "file://", 7 ) )
         {
             menu.addAction( QIcon( ":/type/folder-grey" ),
                             qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
         }
-        menu.addSeparator();
     }
     vlc_gc_decref( p_input );
 
@@ -1040,8 +1040,8 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
     if( canEdit() )
     {
         QIcon addIcon( ":/buttons/playlist/playlist_add" );
-        menu.addSeparator();
         if( tree ) menu.addAction( addIcon, qtr(I_POP_NEWFOLDER), this, SLOT( popupAddNode() ) );
+        menu.addSeparator();
         if( rootItem->id() == THEPL->p_playing->i_id )
         {
             menu.addAction( addIcon, qtr(I_PL_ADDF), THEDP, SLOT( simplePLAppendDialog()) );
@@ -1057,21 +1057,27 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
         }
     }
 
-    /* Item removal */
     if( i_popup_item > -1 )
     {
         if( rootItem->id() != THEPL->p_playing->i_id )
             menu.addAction( qtr( "Add to playlist"), this, SLOT( popupAddToPlaylist() ) );
-        menu.addAction( QIcon( ":/buttons/playlist/playlist_remove" ),
-                        qtr(I_POP_DEL), this, SLOT( popupDel() ) );
     }
 
     menu.addSeparator();
+
+    /* Item removal */
+    if( i_popup_item > -1 )
+    {
+        menu.addAction( QIcon( ":/buttons/playlist/playlist_remove" ),
+                        qtr(I_POP_DEL), this, SLOT( popupDel() ) );
+    }
 
     if( canEdit() ) {
         menu.addAction( QIcon( ":/toolbar/clear" ), qtr("Clear playlist"),
                         this, SLOT( clearPlaylist() ) );
     }
+
+    menu.addSeparator();
 
     /* Playlist sorting */
     if( !sortingMenu )
