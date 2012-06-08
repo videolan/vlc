@@ -113,6 +113,8 @@ QAction *addDPStaticEntry( QMenu *menu,
     }
 #ifdef __APPLE__
     action->setMenuRole( role )
+#else
+    Q_UNUSED( role );
 #endif
     action->setData( VLCMenuBar::ACTION_STATIC );
     return action;
