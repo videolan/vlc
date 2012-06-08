@@ -441,6 +441,9 @@ static const struct
     { VLC_CODEC_RALF, CODEC_ID_RALF, AUDIO_ES },
 #endif
 
+#if LIBAVCODEC_VERSION_CHECK( 54, 14, 0, 26, 100 )
+    { VLC_CODEC_INDEO_AUDIO, CODEC_ID_IAC, AUDIO_ES },
+#endif
 
     /* PCM */
     { VLC_CODEC_S8, CODEC_ID_PCM_S8, AUDIO_ES },
