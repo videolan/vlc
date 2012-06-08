@@ -87,7 +87,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
 
     int i_verbosity = var_InheritInteger( p_intf, "verbose" );
     changeVerbosity( i_verbosity );
-    ui.verbosityBox->setValue( i_verbosity );
+    ui.verbosityBox->setValue( qMin( i_verbosity, 2 ) );
 
     char *objs = var_InheritString( p_intf, "verbose-objects" );
     if( objs != NULL )
