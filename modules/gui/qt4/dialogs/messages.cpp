@@ -114,7 +114,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     CONNECT( ui.mainTab, currentChanged( int ), this, tabChanged( int ) );
 
     /* General action */
-    readSettings( "Messages", QSize( 600, 450 ) );
+    restoreWidgetPosition( "Messages", QSize( 600, 450 ) );
 
     /* Hook up to LibVLC messaging */
     vlc_Subscribe( &sub, MsgCallback, this );
@@ -122,7 +122,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
 
 MessagesDialog::~MessagesDialog()
 {
-    writeSettings( "Messages" );
+    saveWidgetPosition( "Messages" );
     vlc_Unsubscribe( &sub );
 };
 

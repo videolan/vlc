@@ -94,13 +94,13 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf ):QVLCFrame( _p_intf )
 #endif
     CONNECT( buttonsBox, rejected(), this, close() );
 
-    readSettings( "Bookmarks", QSize( 435, 280 ) );
+    restoreWidgetPosition( "Bookmarks", QSize( 435, 280 ) );
     updateGeometry();
 }
 
 BookmarksDialog::~BookmarksDialog()
 {
-    writeSettings( "Bookmarks" );
+    saveWidgetPosition( "Bookmarks" );
 }
 
 void BookmarksDialog::update()

@@ -75,12 +75,12 @@ PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     box->addButton( okButton, QDialogButtonBox::RejectRole );
     layout->addWidget( box );
     BUTTONACT( okButton, close() );
-    readSettings( "PluginsDialog", QSize( 435, 280 ) );
+    restoreWidgetPosition( "PluginsDialog", QSize( 435, 280 ) );
 }
 
 PluginDialog::~PluginDialog()
 {
-    writeSettings( "PluginsDialog" );
+    saveWidgetPosition( "PluginsDialog" );
 }
 
 /* Plugins tab */
@@ -125,7 +125,7 @@ PluginTab::PluginTab( intf_thread_t *p_intf_ )
             this, search( const QString& ) );
 
     setMinimumSize( 500, 300 );
-    readSettings( "Plugins", QSize( 540, 400 ) );
+    restoreWidgetPosition( "Plugins", QSize( 540, 400 ) );
 }
 
 inline void PluginTab::FillTree()
@@ -164,7 +164,7 @@ void PluginTab::search( const QString& qs )
 
 PluginTab::~PluginTab()
 {
-    writeSettings( "Plugins" );
+    saveWidgetPosition( "Plugins" );
     getSettings()->setValue( "Plugins/Header-State",
                              treePlugins->header()->saveState() );
 }

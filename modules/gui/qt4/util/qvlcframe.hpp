@@ -113,14 +113,14 @@ public:
 protected:
     intf_thread_t *p_intf;
 
-    void readSettings( const QString& name,
+    void restoreWidgetPosition( const QString& name,
                        QSize defSize = QSize( 1, 1 ),
                        QPoint defPos = QPoint( 0, 0 ) )
     {
         QVLCTools::restoreWidgetPosition(p_intf, name, this, defSize, defPos);
     }
 
-    void writeSettings( const QString& name )
+    void saveWidgetPosition( const QString& name )
     {
         QVLCTools::saveWidgetPosition( p_intf, name, this);
     }

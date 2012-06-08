@@ -125,12 +125,12 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
     if( p_item )
         updateAllTabs( p_item );
 
-    readSettings( "Mediainfo", QSize( 600 , 480 ) );
+    restoreWidgetPosition( "Mediainfo", QSize( 600 , 480 ) );
 }
 
 MediaInfoDialog::~MediaInfoDialog()
 {
-    writeSettings( "Mediainfo" );
+    saveWidgetPosition( "Mediainfo" );
 }
 
 void MediaInfoDialog::showTab( int i_tab = 0 )

@@ -70,12 +70,12 @@ HelpDialog::HelpDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     layout->addWidget( closeButtonBox );
 
     CONNECT( closeButtonBox, rejected(), this, close() );
-    readSettings( "Help", QSize( 500, 450 ) );
+    restoreWidgetPosition( "Help", QSize( 500, 450 ) );
 }
 
 HelpDialog::~HelpDialog()
 {
-    writeSettings( "Help" );
+    saveWidgetPosition( "Help" );
 }
 
 AboutDialog::AboutDialog( intf_thread_t *_p_intf)

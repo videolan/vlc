@@ -96,12 +96,12 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     CONNECT( timer, timeout(), this, updateInfos() );
 
     updateInfos();
-    readSettings( "EPGDialog", QSize( 650, 450 ) );
+    restoreWidgetPosition( "EPGDialog", QSize( 650, 450 ) );
 }
 
 EpgDialog::~EpgDialog()
 {
-    writeSettings( "EPGDialog" );
+    saveWidgetPosition( "EPGDialog" );
 }
 
 void EpgDialog::displayEvent( EPGItem *epgItem )
