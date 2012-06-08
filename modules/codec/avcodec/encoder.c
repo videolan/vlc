@@ -220,6 +220,12 @@ int OpenEncoder( vlc_object_t *p_this )
         i_codec_id = CODEC_ID_MP2;
         psz_namecodec = "MPEG I/II Layer 2";
     }
+    else if( p_enc->fmt_out.i_codec == VLC_CODEC_MP1V )
+    {
+        i_cat = VIDEO_ES;
+        i_codec_id = CODEC_ID_MPEG1VIDEO;
+        psz_namecodec = "MPEG-1 video";
+    }
     else if( !GetFfmpegCodec( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
                              &psz_namecodec ) )
     {
@@ -466,8 +472,7 @@ int OpenEncoder( vlc_object_t *p_this )
         p_context->b_frame_strategy = 0;
         if( !p_context->max_b_frames  &&
             (  p_enc->fmt_out.i_codec == VLC_CODEC_MPGV ||
-               p_enc->fmt_out.i_codec == VLC_CODEC_MP2V ||
-               p_enc->fmt_out.i_codec == VLC_CODEC_MP1V ) )
+               p_enc->fmt_out.i_codec == VLC_CODEC_MP2V ) )
             p_context->flags |= CODEC_FLAG_LOW_DELAY;
 
         if( p_enc->fmt_out.i_codec == VLC_CODEC_MP2V )
