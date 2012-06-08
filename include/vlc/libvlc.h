@@ -326,10 +326,10 @@ LIBVLC_API const char * libvlc_event_type_name( libvlc_event_type_t event_type )
  */
 enum libvlc_log_level
 {
-    LIBVLC_DEBUG=0 /**< Debug message */,
-    LIBVLC_NOTICE=2 /**< Important informational message */,
-    LIBVLC_WARNING=3 /**< Warning (potential error) message */,
-    LIBVLC_ERROR=4 /**< Error message */,
+    LIBVLC_DEBUG=0,   /**< Debug message */
+    LIBVLC_NOTICE=2,  /**< Important informational message */
+    LIBVLC_WARNING=3, /**< Warning (potential error) message */
+    LIBVLC_ERROR=4    /**< Error message */
 };
 
 /**
