@@ -26,8 +26,9 @@
 
 #include "dialogs/messages.hpp"
 
-#include <QTextEdit>
+#include <QPlainTextEdit>
 #include <QTextCursor>
+#include <QTextBlock>
 #include <QFileDialog>
 #include <QTextStream>
 #include <QMessageBox>
@@ -37,6 +38,8 @@
 #include <QMutex>
 #include <QLineEdit>
 #include <QScrollBar>
+#include <QMutex>
+#include <QMutexLocker>
 
 #include <assert.h>
 
@@ -89,16 +92,9 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     changeVerbosity( i_verbosity );
     ui.verbosityBox->setValue( qMin( i_verbosity, 2 ) );
 
-    char *objs = var_InheritString( p_intf, "verbose-objects" );
-    if( objs != NULL )
-    {
-        ui.vbobjectsEdit->setText( qfu(objs) );
-        free( objs );
-    }
-    updateConfig();
-    ui.vbobjectsEdit->setToolTip( "verbose-objects usage: \n"
-                            "--verbose-objects=+printthatobject,-dontprintthatone\n"
-                            "(keyword 'all' to applies to all objects)");
+    getSettings()->beginGroup( "Messages" );
+    ui.filterEdit->setText( getSettings()->value( "messages-filter" ).toString() );
+    getSettings()->endGroup();
 
     updateButton = new QPushButton( QIcon(":/update"), "" );
     updateButton->setToolTip( qtr("Update the tree") );
@@ -109,7 +105,8 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     BUTTONACT( ui.clearButton, clear() );
     BUTTONACT( updateButton, updateTree() );
     BUTTONACT( ui.saveLogButton, save() );
-    CONNECT( ui.vbobjectsEdit, editingFinished(), this, updateConfig());
+    CONNECT( ui.filterEdit, editingFinished(), this, updateConfig() );
+    CONNECT( ui.filterEdit, textChanged(QString), this, filterMessages() );
     CONNECT( ui.bottomButtonsBox, rejected(), this, hide() );
     CONNECT( ui.verbosityBox, valueChanged( int ),
              this, changeVerbosity( int ) );
@@ -136,43 +133,47 @@ void MessagesDialog::changeVerbosity( int i_verbosity )
 
 void MessagesDialog::updateConfig()
 {
-    const QString& objects = ui.vbobjectsEdit->text();
-    /* FIXME: config item should be part of Qt4 module */
-    config_PutPsz(p_intf, "verbose-objects", qtu(objects));
+    getSettings()->beginGroup( "Messages" );
+    getSettings()->setValue( "messages-filter", ui.filterEdit->text() );
+    getSettings()->endGroup();
+}
 
-    QStringList filterOut, filterIn;
-    /* If a filter is set, disable by default */
-    /* If no filters are set, enable */
-    filterDefault = objects.isEmpty();
-    foreach( const QString& elem, objects.split(QChar(',')) )
+void MessagesDialog::filterMessages()
+{
+    QMutexLocker locker( &messageLocker );
+    QPlainTextEdit *messages = ui.messages;
+    QTextBlock block = messages->document()->firstBlock();
+
+    while( block.isValid() )
     {
-        QString object = elem;
-        bool add = true;
-
-        if( elem.startsWith(QChar('-')) )
-        {
-            add = false;
-            object.remove( 0, 1 );
-        }
-        else if( elem.startsWith(QChar('+')) )
-            object.remove( 0, 1 );
-
-        if( object.compare(qfu("all"), Qt::CaseInsensitive) == 0 )
-            filterDefault = add;
-        else
-            (add ? &filterIn : &filterOut)->append( object );
+        block.setVisible( matchFilter( block.text().toLower() ) );
+        block = block.next();
     }
-    filter = filterDefault ? filterOut : filterIn;
-    filter.removeDuplicates();
+
+    /* Consider the whole QTextDocument as dirty now */
+    messages->document()->markContentsDirty( 0, messages->document()->characterCount() );
+
+    /* FIXME This solves a bug (Qt?) with the viewport not resizing the
+       vertical scroll bar when one or more QTextBlock are hidden */
+    QSize vsize = messages->viewport()->size();
+    messages->viewport()->resize( vsize + QSize( 1, 1 ) );
+    messages->viewport()->resize( vsize );
+}
+
+bool MessagesDialog::matchFilter( const QString& text )
+{
+    const QString& filter = ui.filterEdit->text();
+
+    if( filter.isEmpty() || text.contains( filter.toLower() ) )
+        return true;
+    return false;
 }
 
 void MessagesDialog::sinkMessage( const MsgEvent *msg )
 {
-    if( (filter.contains(msg->module) || filter.contains(msg->object_type))
-                                                            == filterDefault )
-        return;
+    QMutexLocker locker( &messageLocker );
 
-    QTextEdit *messages = ui.messages;
+    QPlainTextEdit *messages = ui.messages;
     /* Only scroll if the viewport is at the end.
        Don't bug user by auto-changing/losing viewport on insert(). */
     bool b_autoscroll = ( messages->verticalScrollBar()->value()
@@ -188,36 +189,41 @@ void MessagesDialog::sinkMessage( const MsgEvent *msg )
          messages->textCursor().anchor() != messages->textCursor().position() )
          messages->moveCursor( QTextCursor::End );
 
-    messages->setFontItalic( true );
-    messages->setTextColor( "darkBlue" );
-    messages->insertPlainText( msg->module );
+    /* Start a new logic block so we can hide it on-demand */
+    messages->textCursor().insertBlock();
 
-    switch (msg->priority)
+    QString buf = QString( "<i><font color='darkblue'>%1</font>" ).arg( msg->module );
+
+    switch ( msg->priority )
     {
         case VLC_MSG_INFO:
-            messages->setTextColor( "blue" );
-            messages->insertPlainText( " info: " );
+            buf += "<font color='blue'> info: </font>";
             break;
         case VLC_MSG_ERR:
-            messages->setTextColor( "red" );
-            messages->insertPlainText( " error: " );
+            buf += "<font color='red'> error: </font>";
             break;
         case VLC_MSG_WARN:
-            messages->setTextColor( "green" );
-            messages->insertPlainText( " warning: " );
+            buf += "<font color='green'> warning: </font>";
             break;
         case VLC_MSG_DBG:
         default:
-            messages->setTextColor( "grey" );
-            messages->insertPlainText( " debug: " );
+            buf += "<font color='grey'> debug: </font>";
             break;
     }
 
-    /* Add message Regular black Font */
-    messages->setFontItalic( false );
-    messages->setTextColor( "black" );
-    messages->insertPlainText( msg->text );
-    messages->insertPlainText( "\n" );
+    /* Insert the prefix */
+    messages->textCursor().insertHtml( buf /* + "</i>" */ );
+
+    /* Insert the message */
+    messages->textCursor().insertHtml( msg->text );
+
+    /* Pass the new message thru the filter */
+    QTextBlock b = messages->document()->lastBlock();
+    b.setVisible( matchFilter( b.text() ) );
+
+    /* Tell the QTextDocument to recompute the size of the given area */
+    messages->document()->markContentsDirty( b.position(), b.length() );
+
     if ( b_autoscroll ) messages->ensureCursorVisible();
 }
 
@@ -253,8 +259,15 @@ bool MessagesDialog::save()
         }
 
         QTextStream out( &file );
-        out << ui.messages->toPlainText() << "\n";
 
+        QTextBlock block = ui.messages->document()->firstBlock();
+        while( block.isValid() )
+        {
+            if( block.isVisible() )
+                out << block.text() << "\n";
+
+            block = block.next();
+        }
         return true;
     }
     return false;

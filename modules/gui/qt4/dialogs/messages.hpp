@@ -29,6 +29,7 @@
 #include "ui/messages_panel.h"
 #include <stdarg.h>
 #include <vlc_atomic.h>
+#include <QMutex>
 
 class QTabWidget;
 class QPushButton;
@@ -53,13 +54,11 @@ private:
     static void sinkMessage( void *, msg_item_t *, unsigned );
     void customEvent( QEvent * );
     void sinkMessage( const MsgEvent * );
+    bool matchFilter( const QString& );
 
     vlc_atomic_t verbosity;
     static void MsgCallback( void *, int, const msg_item_t *, const char *,
                              va_list );
-
-    QStringList filter;
-    bool filterDefault;
 
 private slots:
     bool save();
@@ -68,12 +67,14 @@ private slots:
     void clear();
     void updateTree();
     void tabChanged( int );
+    void filterMessages();
 
 private:
     void buildTree( QTreeWidgetItem *, vlc_object_t * );
 
     friend class    Singleton<MessagesDialog>;
     QPushButton *updateButton;
+    QMutex messageLocker;
 };
 
 #endif
