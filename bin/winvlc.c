@@ -240,7 +240,7 @@ static void check_crashdump(void)
         if(Hint)
         {
             HINTERNET ftp = InternetConnect(Hint, L"crash.videolan.org",
-                        INTERNET_DEFAULT_FTP_PORT, NULL, NULL
+                        INTERNET_DEFAULT_FTP_PORT, NULL, NULL,
                         INTERNET_SERVICE_FTP, INTERNET_FLAG_PASSIVE, 0);
             if(ftp)
             {
