@@ -130,6 +130,24 @@ static inline int GetAlignedSize(unsigned size)
 
 static bool IsLuminance16Supported(int target)
 {
+#if defined(MACOS_OPENGL)
+    /* OpenGL 1.x on OS X does _not_ support 16bit shaders, but pretends to.
+     * That's why we enforce return false here, even though the actual code below
+     * would return true.
+     * This fixes playback of 10bit content on the Intel GMA 950 chipset, which is
+     * the only "GPU" supported by 10.6 and 10.7 with just an OpenGL 1.4 driver.
+     *
+     * Presumely, this also improves playback on the GMA 3100, GeForce FX 5200,
+     * GeForce4 Ti, GeForce3, GeForce2 MX/4 MX and the Radeon 8500 when
+     * running OS X 10.5. */
+    const GLubyte * p_glversion;
+    float f_glversion;
+    p_glversion = glGetString (GL_VERSION);
+    sscanf((char *)p_glversion, "%f", &f_glversion);
+    if (f_glversion < 2)
+        return false;
+#endif
+
     GLuint texture;
 
     glGenTextures(1, &texture);
