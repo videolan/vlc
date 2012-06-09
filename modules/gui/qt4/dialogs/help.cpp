@@ -178,7 +178,7 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     setMinimumSize( 300, 300 );
     setMaximumSize( 400, 300 );
 
-    readSettings( "Update", QSize( 300, 250 ) );
+    restoreWidgetPosition( "Update", QSize( 300, 250 ) );
 
     /* Check for updates */
     UpdateOrDownload();
@@ -187,7 +187,7 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 UpdateDialog::~UpdateDialog()
 {
     update_Delete( p_update );
-    writeSettings( "Update" );
+    saveWidgetPosition( "Update" );
 }
 
 /* Check for updates */
