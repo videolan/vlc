@@ -19,7 +19,7 @@ libvpx: libvpx-$(VPX_VERSION).tar.bz2 .sum-vpx
 	$(APPLY) $(SRC)/vpx/libvpx-no-cross.patch
 	$(APPLY) $(SRC)/vpx/libvpx-no-abi.patch
 ifdef HAVE_MACOSX
-	$(APPLY) $(SRC)/vpx/libvpx-xcode43.patch
+	$(APPLY) $(SRC)/vpx/libvpx-mac.patch
 endif
 	$(PATCH_BASH_LOCATION)
 	$(MOVE)
