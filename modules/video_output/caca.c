@@ -88,7 +88,7 @@ static int Open(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
 
-#if !defined(__APPLE__)
+#if !defined(__APPLE__) && !defined(WIN32)
 # ifndef X_DISPLAY_MISSING
     if (!vlc_xlib_init(object))
         return VLC_EGENERIC;
