@@ -79,7 +79,7 @@ static int RenderYUVA(filter_t *p_filter, subpicture_region_t *p_region,
                        CFMutableAttributedStringRef p_attrString);
 
 static void setFontAttibutes(char *psz_fontname, int i_font_size, uint32_t i_font_color,
-                              bool b_bold, bool b_italic, bool b_underline,
+                              bool b_bold, bool b_italic, bool b_underline, bool b_halfwidth,
                               CFRange p_range, CFMutableAttributedStringRef p_attrString);
 
 /*****************************************************************************
@@ -312,9 +312,9 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
     char         *psz_string;
     int           i_font_size;
     uint32_t      i_font_color;
-    bool          b_bold, b_uline, b_italic;
+    bool          b_bold, b_uline, b_italic, b_halfwidth;
     vlc_value_t val;
-    b_bold = b_uline = b_italic = FALSE;
+    b_bold = b_uline = b_italic = b_halfwidth = FALSE;
     VLC_UNUSED(p_chroma_list);
 
     p_sys->i_font_size = GetFontSize(p_filter);
@@ -337,6 +337,8 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
                 b_italic = TRUE;
             if (p_region_in->p_style->i_style_flags & STYLE_UNDERLINE)
                 b_uline = TRUE;
+            if (p_region_in->p_style->i_style_flags & STYLE_HALFWIDTH)
+                b_halfwidth = TRUE;
         }
     } else {
         i_font_color = p_sys->i_font_color;
@@ -366,7 +368,7 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
         CFRelease(p_cfString);
         len = CFAttributedStringGetLength(p_attrString);
 
-        setFontAttibutes(p_sys->psz_font_name, i_font_size, i_font_color, b_bold, b_italic, b_uline,
+        setFontAttibutes(p_sys->psz_font_name, i_font_size, i_font_color, b_bold, b_italic, b_uline, b_halfwidth,
                                              CFRangeMake(0, len), p_attrString);
 
         RenderYUVA(p_filter, p_region_out, p_attrString);
@@ -523,11 +525,15 @@ static int HandleFontAttributes(xml_reader_t *p_xml_reader,
 }
 
 static void setFontAttibutes(char *psz_fontname, int i_font_size, uint32_t i_font_color,
-        bool b_bold, bool b_italic, bool b_underline,
+        bool b_bold, bool b_italic, bool b_underline, bool b_halfwidth,
         CFRange p_range, CFMutableAttributedStringRef p_attrString)
 {
     CFStringRef p_cfString;
     CTFontRef   p_font;
+
+    int i_font_width = b_halfwidth ? i_font_size / 2 : i_font_size;
+    CGAffineTransform trans = CGAffineTransformMakeScale((float)i_font_width
+                                                         / i_font_size, 1.0);
 
     // fallback on default
     if (!psz_fontname)
@@ -538,7 +544,7 @@ static void setFontAttibutes(char *psz_fontname, int i_font_size, uint32_t i_fon
                                             kCFStringEncodingUTF8);
     p_font     = CTFontCreateWithName(p_cfString,
                                        (float)i_font_size,
-                                       NULL);
+                                       &trans);
     CFRelease(p_cfString);
     CFAttributedStringSetAttribute(p_attrString,
                                     p_range,
@@ -622,7 +628,7 @@ static void GetAttrStrFromFontStack(font_stack_t **p_fonts,
         setFontAttibutes(psz_fontname,
                          i_font_size,
                          i_font_color,
-                         b_bold, b_italic, b_uline,
+                         b_bold, b_italic, b_uline, FALSE,
                          p_range,
                          p_attrString);
     }
@@ -861,7 +867,7 @@ static CGContextRef CreateOffScreenContext(int i_width, int i_height,
     return p_context;
 }
 
-static offscreen_bitmap_t *Compose(int i_text_align,
+static offscreen_bitmap_t *Compose( subpicture_region_t *p_region,
                                     CFMutableAttributedStringRef p_attrString,
                                     unsigned i_width,
                                     unsigned i_height,
@@ -879,9 +885,9 @@ static offscreen_bitmap_t *Compose(int i_text_align,
 
         CGContextSetTextMatrix(p_context, CGAffineTransformIdentity);
 
-        if (i_text_align == SUBPICTURE_ALIGN_RIGHT)
+        if (p_region->i_align & SUBPICTURE_ALIGN_RIGHT)
             horiz_flush = 1.0;
-        else if (i_text_align != SUBPICTURE_ALIGN_LEFT)
+        else if ((p_region->i_align & SUBPICTURE_ALIGN_LEFT) == 0)
             horiz_flush = 0.5;
         else
             horiz_flush = 0.0;
@@ -925,6 +931,8 @@ static offscreen_bitmap_t *Compose(int i_text_align,
 
                     double penOffset = CTLineGetPenOffsetForFlush(line, horiz_flush, (i_width  - HORIZONTAL_MARGIN*2));
                     penPosition.x = HORIZONTAL_MARGIN + penOffset;
+                    if (horiz_flush == 0.0)
+                        penPosition.x = p_region->i_x;
                     penPosition.y -= ascent;
                     CGContextSetTextPosition(p_context, penPosition.x, penPosition.y);
                     CTLineDraw(line, p_context);
@@ -969,14 +977,13 @@ static int RenderYUVA(filter_t *p_filter, subpicture_region_t *p_region,
 
     unsigned i_width = p_filter->fmt_out.video.i_visible_width;
     unsigned i_height = p_filter->fmt_out.video.i_visible_height;
-    unsigned i_text_align = p_region->i_align & 0x3;
 
     if (!p_attrString) {
         msg_Err(p_filter, "Invalid argument to RenderYUVA");
         return VLC_EGENERIC;
     }
 
-    p_offScreen = Compose(i_text_align, p_attrString,
+    p_offScreen = Compose( p_region, p_attrString,
                            i_width, i_height, &i_textblock_height);
 
     if (!p_offScreen) {

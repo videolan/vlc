@@ -1331,9 +1331,16 @@ static int ProcessLines( filter_t *p_filter,
                 p_face = LoadFace( p_filter, p_current_style );
             }
             FT_Face p_current_face = p_face ? p_face : p_sys->p_face;
-            if( !p_previous_style || p_previous_style->i_font_size != p_current_style->i_font_size )
+            if( !p_previous_style || p_previous_style->i_font_size != p_current_style->i_font_size ||
+                ((p_previous_style->i_style_flags ^ p_current_style->i_style_flags) & STYLE_HALFWIDTH) )
+
             {
-                if( FT_Set_Pixel_Sizes( p_current_face, 0, p_current_style->i_font_size ) )
+                int i_font_width = ( p_current_style->i_style_flags & STYLE_HALFWIDTH )
+                                    ? p_current_style->i_font_size / 2
+                                    : p_current_style->i_font_size;
+                if( FT_Set_Pixel_Sizes( p_current_face,
+                                        i_font_width,
+                                        p_current_style->i_font_size ) )
                     msg_Err( p_filter, "Failed to set font size to %d", p_current_style->i_font_size );
                 if( p_sys->p_stroker )
                 {
@@ -1370,10 +1377,15 @@ static int ProcessLines( filter_t *p_filter,
                     .x = pen.x + kerning.x,
                     .y = pen.y + kerning.y,
                 };
+
+                int i_font_width = ( p_current_style->i_style_flags & STYLE_HALFWIDTH )
+                                    ? p_current_style->i_font_size / 2
+                                    : p_current_style->i_font_size;
                 FT_Vector pen_shadow_new = {
-                    .x = pen_new.x + p_sys->f_shadow_vector_x * (p_current_style->i_font_size << 6),
+                    .x = pen_new.x + p_sys->f_shadow_vector_x * (i_font_width << 6),
                     .y = pen_new.y + p_sys->f_shadow_vector_y * (p_current_style->i_font_size << 6),
                 };
+
                 FT_Glyph glyph;
                 FT_BBox  glyph_bbox;
                 FT_Glyph outline;
@@ -1693,7 +1705,8 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
                                    p_region_in->p_style->i_style_flags & (STYLE_BOLD |
                                                                           STYLE_ITALIC |
                                                                           STYLE_UNDERLINE |
-                                                                          STYLE_STRIKEOUT) );
+                                                                          STYLE_STRIKEOUT |
+                                                                          STYLE_HALFWIDTH) );
         else
         {
             uint32_t i_font_color = var_InheritInteger( p_filter, "freetype-color" );
