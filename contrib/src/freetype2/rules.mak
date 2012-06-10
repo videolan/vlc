@@ -1,7 +1,7 @@
 # freetype2
 
 FREETYPE2_VERSION := 2.4.9
-FREETYPE2_URL := $(SF)/freetype/freetype-$(FREETYPE2_VERSION).tar.gz
+FREETYPE2_URL := $(SF)/freetype/freetype2/$(FREETYPE2_VERSION)/freetype-$(FREETYPE2_VERSION).tar.gz
 
 PKGS += freetype2
 ifeq ($(call need_pkg,"freetype2"),)
