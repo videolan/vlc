@@ -64,8 +64,7 @@ private slots:
     bool save();
     void updateConfig();
     void changeVerbosity( int );
-    void clear();
-    void updateTree();
+    void updateOrClear();
     void tabChanged( int );
     void filterMessages();
 

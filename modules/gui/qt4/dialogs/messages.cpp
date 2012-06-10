@@ -80,7 +80,6 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     ui.setupUi( this );
     ui.bottomButtonsBox->addButton( new QPushButton( qtr("&Close"), this ),
                                          QDialogButtonBox::RejectRole );
-    updateTree();
 
     /* Modules tree */
     ui.modulesTree->setHeaderHidden( true );
@@ -97,13 +96,12 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     getSettings()->endGroup();
 
     updateButton = new QPushButton( QIcon(":/update"), "" );
-    updateButton->setToolTip( qtr("Update the tree") );
-    ui.mainTab->setCornerWidget( updateButton );
-    updateButton->setVisible( false );
     updateButton->setFlat( true );
+    ui.mainTab->setCornerWidget( updateButton );
 
-    BUTTONACT( ui.clearButton, clear() );
-    BUTTONACT( updateButton, updateTree() );
+    tabChanged(0);
+
+    BUTTONACT( updateButton, updateOrClear() );
     BUTTONACT( ui.saveLogButton, save() );
     CONNECT( ui.filterEdit, editingFinished(), this, updateConfig() );
     CONNECT( ui.filterEdit, textChanged(QString), this, filterMessages() );
@@ -118,6 +116,8 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
 
     /* Hook up to LibVLC messaging */
     vlc_Subscribe( &sub, MsgCallback, this );
+
+    buildTree( NULL, VLC_OBJECT( p_intf->p_libvlc ) );
 }
 
 MessagesDialog::~MessagesDialog()
@@ -235,11 +235,6 @@ void MessagesDialog::customEvent( QEvent *event )
     sinkMessage( msge );
 }
 
-void MessagesDialog::clear()
-{
-    ui.messages->clear();
-}
-
 bool MessagesDialog::save()
 {
     QString saveLogFileName = QFileDialog::getSaveFileName(
@@ -300,15 +295,22 @@ void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
     vlc_list_release( l );
 }
 
-void MessagesDialog::updateTree()
+void MessagesDialog::updateOrClear()
 {
-    ui.modulesTree->clear();
-    buildTree( NULL, VLC_OBJECT( p_intf->p_libvlc ) );
+    if( ui.mainTab->currentIndex() == 1)
+    {
+        ui.modulesTree->clear();
+        buildTree( NULL, VLC_OBJECT( p_intf->p_libvlc ) );
+    }
+    else
+        ui.messages->clear();
 }
 
 void MessagesDialog::tabChanged( int i )
 {
-    updateButton->setVisible( i == 1 );
+    updateButton->setIcon( i == 1 ? QIcon(":/update") : QIcon(":/toolbar/clear") );
+    updateButton->setToolTip( i == 1 ? qtr("Update the tree")
+                                     : qtr("Clear the messages") );
 }
 
 void MessagesDialog::MsgCallback( void *self, int type, const msg_item_t *item,
