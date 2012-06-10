@@ -102,6 +102,7 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent, bool sma
     layout->setMargin( 0 );
     layout->setSpacing( 1 );
 
+    setMinimumWidth( 140 );
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     setLayout( layout );
 
