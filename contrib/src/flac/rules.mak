@@ -1,7 +1,7 @@
 # FLAC
 
 FLAC_VERSION := 1.2.1
-FLAC_URL := $(SF)/flac/flac-$(FLAC_VERSION).tar.gz
+FLAC_URL := $(SF)/flac/flac-src/flac-$(FLAC_VERSION)-src/flac-$(FLAC_VERSION).tar.gz
 
 PKGS += flac
 ifeq ($(call need_pkg,"flac"),)
