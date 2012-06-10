@@ -177,7 +177,9 @@ libegl_plugin_la_SOURCES = egl.c
 libegl_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS)
 libegl_plugin_la_LIBADD = $(AM_LIBADD) $(EGL_LIBS)
 if !HAVE_WIN32
+if !HAVE_DARWIN
 libegl_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIBS) -lX11
+endif
 else
 libegl_plugin_la_DEPENDENCIES = libegl_plugin.rc.o
 endif
