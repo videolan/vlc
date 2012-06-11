@@ -119,7 +119,7 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
 
     for( ; i_comment > 0; i_comment-- )
     {
-        char *psz;
+        char *psz_comment;
         if( i_data < 4 )
             break;
         n = GetDWLE(p_data); RM(4);
@@ -128,25 +128,25 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
         if( n <= 0 )
             continue;
 
-        psz = strndup( (const char*)p_data, n );
+        psz_comment = strndup( (const char*)p_data, n );
         RM(n);
 
-        EnsureUTF8( psz );
+        EnsureUTF8( psz_comment );
 
 #define IF_EXTRACT(txt,var) \
-    if( !strncasecmp(psz, txt, strlen(txt)) ) \
+    if( !strncasecmp(psz_comment, txt, strlen(txt)) ) \
     { \
         const char *oldval = vlc_meta_Get( p_meta, vlc_meta_ ## var ); \
         if( oldval && has##var) \
         { \
             char * newval; \
-            if( asprintf( &newval, "%s,%s", oldval, &psz[strlen(txt)] ) == -1 ) \
+            if( asprintf( &newval, "%s,%s", oldval, &psz_comment[strlen(txt)] ) == -1 ) \
                 newval = NULL; \
             vlc_meta_Set( p_meta, vlc_meta_ ## var, newval ); \
             free( newval ); \
         } \
         else \
-            vlc_meta_Set( p_meta, vlc_meta_ ## var, &psz[strlen(txt)] ); \
+            vlc_meta_Set( p_meta, vlc_meta_ ## var, &psz_comment[strlen(txt)] ); \
         has##var = true; \
     }
         IF_EXTRACT("TITLE=", Title )
@@ -164,14 +164,14 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
         }
         else IF_EXTRACT("GENRE=", Genre )
         else IF_EXTRACT("DATE=", Date )
-        else if( !strncasecmp( psz, "METADATA_BLOCK_PICTURE=", strlen("METADATA_BLOCK_PICTURE=")))
+        else if( !strncasecmp( psz_comment, "METADATA_BLOCK_PICTURE=", strlen("METADATA_BLOCK_PICTURE=")))
         {
             if( attachments == NULL )
                 continue;
 
             int i;
             uint8_t *p_picture;
-            size_t i_size = vlc_b64_decode_binary( &p_picture, &psz[strlen("METADATA_BLOCK_PICTURE=")]);
+            size_t i_size = vlc_b64_decode_binary( &p_picture, &psz_comment[strlen("METADATA_BLOCK_PICTURE=")]);
             input_attachment_t *p_attachment = ParseFlacPicture( p_picture, i_size, i_attach, &i );
             if( p_attachment )
             {
@@ -183,16 +183,16 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
                     *i_attachments, *attachments, p_attachment );
             }
         }
-        else if( strchr( psz, '=' ) )
+        else if( strchr( psz_comment, '=' ) )
         {
             /* generic (PERFORMER/LICENSE/ORGANIZATION/LOCATION/CONTACT/ISRC,
              * undocumented tags and replay gain ) */
-            char *p = strchr( psz, '=' );
+            char *p = strchr( psz_comment, '=' );
             *p++ = '\0';
-            vlc_meta_AddExtra( p_meta, psz, p );
+            vlc_meta_AddExtra( p_meta, psz_comment, p );
         }
 #undef IF_EXTRACT
-        free( psz );
+        free( psz_comment );
     }
 #undef RM
 }
