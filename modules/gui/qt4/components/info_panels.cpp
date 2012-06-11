@@ -231,6 +231,7 @@ void MetaPanel::update( input_item_t *p_item )
 
     UPDATE_META( Date, date_text );
     UPDATE_META( TrackNum, seqnum_text );
+    UPDATE_META( TrackTotal, seqtot_text );
 //    UPDATE_META( Setting, setting_text );
 //    UPDATE_META_INT( Rating, rating_text );
 
@@ -280,6 +281,7 @@ void MetaPanel::saveMeta()
     input_item_SetAlbum(  p_input, qtu( collection_text->text() ) );
     input_item_SetGenre(  p_input, qtu( genre_text->text() ) );
     input_item_SetTrackNum(  p_input, qtu( seqnum_text->text() ) );
+    input_item_SetTrackTotal(  p_input, qtu( seqtot_text->text() ) );
     input_item_SetDate(  p_input, qtu( date_text->text() ) );
 
     input_item_SetCopyright( p_input, qtu( copyright_text->text() ) );
@@ -322,6 +324,7 @@ void MetaPanel::clear()
     copyright_text->clear();
     collection_text->clear();
     seqnum_text->clear();
+    seqtot_text->clear();
     description_text->clear();
     date_text->clear();
     language_text->clear();
