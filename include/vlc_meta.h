@@ -48,10 +48,11 @@ typedef enum vlc_meta_type_t
     vlc_meta_Publisher,
     vlc_meta_EncodedBy,
     vlc_meta_ArtworkURL,
-    vlc_meta_TrackID
+    vlc_meta_TrackID,
+    vlc_meta_TrackTotal
 } vlc_meta_type_t;
 
-#define VLC_META_TYPE_COUNT 17
+#define VLC_META_TYPE_COUNT 18
 
 #define ITEM_PREPARSED       1
 #define ITEM_ARTURL_FETCHED  2
