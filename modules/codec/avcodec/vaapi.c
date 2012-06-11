@@ -60,6 +60,8 @@ typedef struct
 {
     vlc_va_t     va;
 
+    vlc_object_t *log;
+
     /* */
     Display      *p_display_x11;
     VADisplay     p_display;
@@ -129,7 +131,6 @@ static int Open( vlc_va_vaapi_t *p_va, int i_codec_id )
     }
 
     /* */
-    memset( p_va, 0, sizeof(*p_va) );
     p_va->i_config_id  = VA_INVALID_ID;
     p_va->i_context_id = VA_INVALID_ID;
     p_va->image.image_id = VA_INVALID_ID;
@@ -137,19 +138,28 @@ static int Open( vlc_va_vaapi_t *p_va, int i_codec_id )
     /* Create a VA display */
     p_va->p_display_x11 = XOpenDisplay(NULL);
     if( !p_va->p_display_x11 )
+    {
+        msg_Err( p_va->log, "Could not connect to X server" );
         goto error;
+    }
 
     p_va->p_display = vaGetDisplay( p_va->p_display_x11 );
     if( !p_va->p_display )
+    {
+        msg_Err( p_va->log, "Could not get a VAAPI device" );
         goto error;
+    }
 
     if( vaInitialize( p_va->p_display, &p_va->i_version_major, &p_va->i_version_minor ) )
+    {
+        msg_Err( p_va->log, "Failed to initialize the VAAPI device" );
         goto error;
+    }
 
     /* Check if the selected profile is supported */
     i_profiles_nb = vaMaxNumProfiles( p_va->p_display );
     p_profiles_list = calloc( i_profiles_nb, sizeof( VAProfile ) );
-    if ( !p_profiles_list )
+    if( !p_profiles_list )
         goto error;
 
     VAStatus i_status = vaQueryConfigProfiles( p_va->p_display, p_profiles_list, &i_profiles_nb );
@@ -166,7 +176,10 @@ static int Open( vlc_va_vaapi_t *p_va, int i_codec_id )
     }
     free( p_profiles_list );
     if ( !b_supported_profile )
+    {
+        msg_Dbg( p_va->log, "Codec and profile not supported by the hardware" );
         goto error;
+    }
 
     /* Create a VA configuration */
     VAConfigAttrib attrib;
@@ -505,6 +518,8 @@ vlc_va_t *vlc_va_NewVaapi( vlc_object_t *obj, int i_codec_id )
     vlc_va_vaapi_t *p_va = calloc( 1, sizeof(*p_va) );
     if( !p_va )
         return NULL;
+
+    p_va->log = obj;
 
     if( Open( p_va, i_codec_id ) )
     {
