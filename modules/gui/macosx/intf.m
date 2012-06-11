@@ -929,10 +929,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
     free( psz_uri );
 
-    NSMutableArray *o_result = [NSMutableArray arrayWithCapacity: [o_names count]];
-    for( int i = 0; i < [o_names count]; i++ )
+    NSArray *o_sorted_names = [o_names sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)];
+    NSMutableArray *o_result = [NSMutableArray arrayWithCapacity: [o_sorted_names count]];
+    for( int i = 0; i < [o_sorted_names count]; i++ )
     {
-        psz_uri = make_URI([[o_names objectAtIndex: i] UTF8String], "file" );
+        psz_uri = make_URI([[o_sorted_names objectAtIndex: i] UTF8String], "file" );
         if( !psz_uri )
             return NO;
 
