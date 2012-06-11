@@ -904,39 +904,47 @@ static VLCMain *_o_sharedMainInstance = nil;
 }
 
 #pragma mark -
-#pragma mark File opening
+#pragma mark File opening over dock icon
 
-- (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename
+- (BOOL)application:(NSApplication *)o_app openFiles:(NSArray *)o_names
 {
     BOOL b_autoplay = config_GetInt( VLCIntf, "macosx-autoplay" );
-    char *psz_uri = make_URI([o_filename UTF8String], "file" );
-    if( !psz_uri )
-        return( FALSE );
+    char *psz_uri = make_URI([[o_names objectAtIndex:0] UTF8String], "file" );
 
-    input_thread_t * p_input = pl_CurrentInput( VLCIntf );
-    BOOL b_returned = NO;
-
-    if (p_input)
+    // try to add file as subtitle
+    if( [o_names count] == 1 && psz_uri )
     {
-        b_returned = input_AddSubtitle( p_input, psz_uri, true );
-        vlc_object_release( p_input );
-        if(!b_returned)
+        input_thread_t * p_input = pl_CurrentInput( VLCIntf );
+        if( p_input )
         {
-            free( psz_uri );
-            return YES;
+            BOOL b_returned = NO;
+            b_returned = input_AddSubtitle( p_input, psz_uri, true );
+            vlc_object_release( p_input );
+            if( !b_returned )
+            {
+                free( psz_uri );
+                return YES;
+            }
         }
     }
-    else if( p_input )
-        vlc_object_release( p_input );
-
-    NSDictionary *o_dic = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
-
     free( psz_uri );
 
+    NSMutableArray *o_result = [NSMutableArray arrayWithCapacity: [o_names count]];
+    for( int i = 0; i < [o_names count]; i++ )
+    {
+        psz_uri = make_URI([[o_names objectAtIndex: i] UTF8String], "file" );
+        if( !psz_uri )
+            return NO;
+
+        NSDictionary *o_dic = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
+        free( psz_uri );
+        [o_result insertObject: o_dic atIndex: i];
+    }
+
     if( b_autoplay )
-        [o_playlist appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue: NO];
+        [o_playlist appendArray: o_result atPos: -1 enqueue: NO];
     else
-        [o_playlist appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue: YES];
+        [o_playlist appendArray: o_result atPos: -1 enqueue: YES];
 
     return( TRUE );
 }

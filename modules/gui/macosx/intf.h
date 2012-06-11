@@ -196,7 +196,7 @@ struct intf_sys_t
 - (void)showFullscreenController;
 - (void)updateDelays;
 - (void)initStrings;
-- (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename;
+- (BOOL)application:(NSApplication *)o_app openFiles:(NSString *)o_filename;
 
 - (IBAction)crashReporterAction:(id)sender;
 - (IBAction)openCrashLog:(id)sender;
