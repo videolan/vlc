@@ -48,6 +48,7 @@
 #include <QDesktopServices>
 #include <QInputDialog>
 #include <QSignalMapper>
+#include <QTimer>
 
 #define I_NEW_DIR \
     I_DIR_OR_FOLDER( N_("Create Directory"), N_( "Create Folder" ) )
@@ -100,6 +101,7 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
              this, processItemAppend( int, int ) );
     CONNECT( THEMIM, playlistItemRemoved( int ),
              this, processItemRemoval( int ) );
+    CONNECT( &insertBufferCommitTimer, timeout(), this, commitBufferedRowInserts() );
 }
 
 PLModel::~PLModel()
@@ -628,6 +630,85 @@ void PLModel::processItemRemoval( int i_id )
     removeItem( i_id );
 }
 
+void PLModel::commitBufferedRowInserts()
+{
+    PLItem *toemit = NULL;
+    insertBufferCommitTimer.stop();
+    insertBufferMutex.lock();
+    if ( !insertBuffer.isEmpty() )
+    {
+        beginInsertRows( index( insertBufferRoot, 0 ), insertbuffer_firstrow, insertbuffer_lastrow );
+        foreach (PLItem *item, insertBuffer)
+        {
+            insertBufferRoot->insertChild( item, insertbuffer_firstrow++ );
+            if( item->inputItem() == THEMIM->currentInputItem() )
+                toemit = item;
+        }
+        endInsertRows();
+        insertBuffer.clear();
+    }
+    insertBufferMutex.unlock();
+    if ( toemit )
+        emit currentIndexChanged( index( toemit, 0 ) );
+}
+
+/*
+    Tries to agregate linear inserts of single row. Sends
+    more efficient updates notifications to views and then
+    avoids the flickering effect.
+*/
+void PLModel::bufferedRowInsert( PLItem *item, PLItem *parent, int pos )
+{
+    insertBufferMutex.lock();
+    if ( ! insertBuffer.isEmpty() )
+    {
+        /* Check if we're doing linear insert */
+        if ( parent != insertBufferRoot || pos != insertbuffer_lastrow + 1 )
+        {
+            insertBufferMutex.unlock();
+            commitBufferedRowInserts();
+            bufferedRowInsert( item, parent, pos );
+            return;
+        }
+    }
+
+    if ( insertBuffer.isEmpty() )
+    {
+        insertBuffer << item;
+        insertBufferRoot = parent;
+        insertbuffer_firstrow = pos;
+        insertbuffer_lastrow = pos;
+    } else {
+        insertBuffer << item;
+        insertbuffer_lastrow++;
+    }
+    insertBufferMutex.unlock();
+
+    /* Schedule commit */
+    if ( ! insertBufferCommitTimer.isActive() )
+    {
+        insertBufferCommitTimer.setSingleShot( true );
+        insertBufferCommitTimer.start( 100 );
+    }
+}
+
+bool PLModel::isBufferedForInsert( PLItem *parent, int i_item )
+{
+    bool b_return = false;
+    insertBufferMutex.lock();
+    if ( parent == insertBufferRoot )
+    {
+        foreach (PLItem *item, insertBuffer)
+            if ( item->i_id == i_item )
+            {
+                b_return = true;
+                break;
+            }
+    }
+    insertBufferMutex.unlock();
+    return b_return;
+}
+
 void PLModel::processItemAppend( int i_item, int i_parent )
 {
     playlist_item_t *p_item = NULL;
@@ -636,9 +717,15 @@ void PLModel::processItemAppend( int i_item, int i_parent )
 
     /* Find the Parent */
     PLItem *nodeParentItem = findById( rootItem, i_parent );
+    if( !nodeParentItem )
+    { /* retry as it might have been in buffer */
+        commitBufferedRowInserts();
+        nodeParentItem = findById( rootItem, i_parent );
+    }
     if( !nodeParentItem ) return;
 
     /* Search for an already matching children */
+    if ( isBufferedForInsert( nodeParentItem, i_item ) ) return;
     foreach( const PLItem *existing, nodeParentItem->children )
         if( existing->i_id == i_item ) return;
 
@@ -657,12 +744,7 @@ void PLModel::processItemAppend( int i_item, int i_parent )
     PL_UNLOCK;
 
     /* We insert the newItem (children) inside the parent */
-    beginInsertRows( index( nodeParentItem, 0 ), pos, pos );
-    nodeParentItem->insertChild( newItem, pos );
-    endInsertRows();
-
-    if( newItem->inputItem() == THEMIM->currentInputItem() )
-        emit currentIndexChanged( index( newItem, 0 ) );
+    bufferedRowInsert( newItem, nodeParentItem, pos );
 
     if( latestSearch.isEmpty() ) return;
     search( latestSearch, index( rootItem, 0), false /*FIXME*/ );
@@ -670,6 +752,7 @@ void PLModel::processItemAppend( int i_item, int i_parent )
 
 void PLModel::rebuild( playlist_item_t *p_root )
 {
+    commitBufferedRowInserts();
     /* Invalidate cache */
     i_cached_id = i_cached_input_id = -1;
 
@@ -693,6 +776,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
 
 void PLModel::takeItem( PLItem *item )
 {
+    commitBufferedRowInserts();
     assert( item );
     PLItem *parent = item->parent();
     assert( parent );
@@ -705,6 +789,7 @@ void PLModel::takeItem( PLItem *item )
 
 void PLModel::insertChildren( PLItem *node, QList<PLItem*>& items, int i_pos )
 {
+    commitBufferedRowInserts();
     assert( node );
     int count = items.count();
     if( !count ) return;
@@ -720,6 +805,7 @@ void PLModel::insertChildren( PLItem *node, QList<PLItem*>& items, int i_pos )
 void PLModel::removeItem( PLItem *item )
 {
     if( !item ) return;
+    commitBufferedRowInserts();
 
     i_cached_id = -1;
     i_cached_input_id = -1;
@@ -822,6 +908,9 @@ void PLModel::sort( const int i_root_id, const int column, Qt::SortOrder order )
 
     PLItem *item = findById( rootItem, i_root_id );
     if( !item ) return;
+
+    commitBufferedRowInserts();
+
     QModelIndex qIndex = index( item, 0 );
     int count = item->childCount();
     if( count )
@@ -867,6 +956,8 @@ void PLModel::sort( const int i_root_id, const int column, Qt::SortOrder order )
 void PLModel::search( const QString& search_text, const QModelIndex & idx, bool b_recursive )
 {
     latestSearch = search_text;
+
+    commitBufferedRowInserts();
 
     /** \todo Fire the search with a small delay ? */
     PL_LOCK;
