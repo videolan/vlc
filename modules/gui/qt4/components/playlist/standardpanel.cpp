@@ -46,6 +46,7 @@
 #include <QStackedLayout>
 #include <QSignalMapper>
 #include <QSettings>
+#include <QStylePainter>
 
 #include <assert.h>
 
@@ -235,7 +236,7 @@ void StandardPLPanel::wheelEvent( QWheelEvent *e )
     e->accept();
 }
 
-bool StandardPLPanel::eventFilter ( QObject *, QEvent * event )
+bool StandardPLPanel::eventFilter ( QObject *obj, QEvent * event )
 {
     if (event->type() == QEvent::KeyPress)
     {
@@ -245,6 +246,32 @@ bool StandardPLPanel::eventFilter ( QObject *, QEvent * event )
         {
             deleteSelection();
             return true;
+        }
+    }
+    else if ( event->type() == QEvent::Paint )
+    {/* Warn! Don't filter events from anything else than views ! */
+        if ( model->rowCount() == 0 && p_selector->getCurrentItemCategory() == PL_ITEM_TYPE )
+        {
+            QWidget *viewport = qobject_cast<QWidget *>( obj );
+            QStylePainter painter( viewport );
+            QPixmap dropzone(":/dropzone");
+            QRect rect = viewport->geometry();
+            QSize size = rect.size() / 2 - dropzone.size() / 2;
+            rect.adjust( 0, size.height(), 0 , 0 );
+            painter.drawItemPixmap( rect, Qt::AlignHCenter, dropzone );
+            /* now select the zone just below the drop zone and let Qt center
+               the text by itself */
+            rect.adjust( 0, dropzone.size().height() + 10, 0, 0 );
+            rect.setRight( viewport->geometry().width() );
+            rect.setLeft( 0 );
+            painter.drawItemText( rect,
+                                  Qt::AlignHCenter,
+                                  palette(),
+                                  true,
+                                  qtr("Playlist is currently Empty\n"
+                                      "Drop a file here or select a "
+                                      "media source from the left"),
+                                  QPalette::Text );
         }
     }
     return false;
@@ -266,6 +293,7 @@ void StandardPLPanel::createIconView()
     CONNECT( iconView, activated( const QModelIndex & ),
              this, activate( const QModelIndex & ) );
     iconView->installEventFilter( this );
+    iconView->viewport()->installEventFilter( this );
     viewStack->addWidget( iconView );
 }
 
@@ -278,6 +306,7 @@ void StandardPLPanel::createListView()
     CONNECT( listView, activated( const QModelIndex & ),
              this, activate( const QModelIndex & ) );
     listView->installEventFilter( this );
+    listView->viewport()->installEventFilter( this );
     viewStack->addWidget( listView );
 }
 
@@ -326,6 +355,7 @@ void StandardPLPanel::createTreeView()
     CONNECT( treeView, customContextMenuRequested( const QPoint & ),
              this, popupPlView( const QPoint & ) );
     treeView->installEventFilter( this );
+    treeView->viewport()->installEventFilter( this );
 
     /* SignalMapper for columns */
     selectColumnsSigMapper = new QSignalMapper( this );
