@@ -27,7 +27,7 @@ LANG=C
 export LANG
 
 if test "$1" = "-h" -o "$1" = "--help" -o $# -gt 2; then
-  echo "Usage: $0 [new_prefix] [old prefix]
+  echo "Usage: $0 [old prefix] [new prefix]
 
 Without arguments, this script assumes old prefix = @@CONTRIB_PREFIX@@,
 and new prefix = current directory.
