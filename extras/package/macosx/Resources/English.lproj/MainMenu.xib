@@ -21,16 +21,16 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="4948"/>
-      <integer value="2730"/>
       <integer value="2770"/>
-      <integer value="4850"/>
-      <integer value="21"/>
+      <integer value="4948"/>
+      <integer value="4372"/>
       <integer value="915"/>
-      <integer value="1617"/>
-      <integer value="4596"/>
-      <integer value="5100"/>
       <integer value="4722"/>
+      <integer value="4596"/>
+      <integer value="2730"/>
+      <integer value="4850"/>
+      <integer value="5100"/>
+      <integer value="1617"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -445,10 +445,9 @@
                               <reference key="NSBackgroundColor" ref="885475112"/>
                               <reference key="NSGridColor" ref="756174976"/>
                               <double key="NSRowHeight">15</double>
-                              <int key="NSTvFlags">-71303168</int>
+                              <int key="NSTvFlags">-88080384</int>
                               <reference key="NSDelegate"/>
                               <reference key="NSDataSource"/>
-                              <string key="NSAutosaveName">10thaniversary-mainPlaylistView</string>
                               <int key="NSGridStyleMask">1</int>
                               <int key="NSColumnAutoresizingStyle">4</int>
                               <int key="NSDraggingSourceMaskForLocal">15</int>
