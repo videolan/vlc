@@ -109,6 +109,7 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
     bool hasTitle = false;
     bool hasAlbum = false;
     bool hasTrackNumber = false;
+    bool hasTrackTotal = false;
     bool hasArtist = false;
     bool hasCopyright = false;
     bool hasDescription = false;
@@ -151,6 +152,8 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
         IF_EXTRACT("TITLE=", Title )
         else IF_EXTRACT("ALBUM=", Album )
         else IF_EXTRACT("TRACKNUMBER=", TrackNumber )
+        else IF_EXTRACT("TRACKTOTAL=", TrackTotal )
+        else IF_EXTRACT("TOTALTRACKS=", TrackTotal )
         else IF_EXTRACT("ARTIST=", Artist )
         else IF_EXTRACT("COPYRIGHT=", Copyright )
         else IF_EXTRACT("ORGANIZATION=", Publisher )
