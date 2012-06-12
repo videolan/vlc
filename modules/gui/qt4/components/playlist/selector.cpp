@@ -211,6 +211,13 @@ void PLSelector::createItems()
     QTreeWidgetItem *lan = addItem( CATEGORY_TYPE, N_("Local Network") )->treeItem();
     QTreeWidgetItem *internet = addItem( CATEGORY_TYPE, N_("Internet") )->treeItem();
 
+#define NOT_SELECTABLE(w) w->setFlags( w->flags() ^ Qt::ItemIsSelectable );
+    NOT_SELECTABLE( mycomp );
+    NOT_SELECTABLE( devices );
+    NOT_SELECTABLE( lan );
+    NOT_SELECTABLE( internet );
+#undef NOT_SELECTABLE
+
     /* SD subnodes */
     char **ppsz_longnames;
     int *p_categories;
