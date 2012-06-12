@@ -108,6 +108,18 @@ vlc_module_end ()
 
 using namespace TagLib;
 
+static void ExtractTrackNumberValues( vlc_meta_t* p_meta, const char *psz_value )
+{
+    unsigned int i_trknum, i_trktot;
+    if( sscanf( psz_value, "%u/%u", &i_trknum, &i_trktot ) == 2 )
+    {
+        char psz_trck[11];
+        snprintf( psz_trck, sizeof( psz_trck ), "%u", i_trknum );
+        vlc_meta_SetTrackNum( p_meta, psz_trck );
+        snprintf( psz_trck, sizeof( psz_trck ), "%u", i_trktot );
+        vlc_meta_Set( p_meta, vlc_meta_TrackTotal, psz_trck );
+    }
+}
 
 /**
  * Read meta information from APE tags
@@ -243,6 +255,13 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_meta_t* p_demux_meta, vlc_
     SET( "TPUB", Publisher );
 
 #undef SET
+
+    /* */
+    list = tag->frameListMap()["TRCK"];
+    if( !list.isEmpty() )
+    {
+        ExtractTrackNumberValues( p_meta, (*list.begin())->toString().toCString( true ) );
+    }
 
     /* Preferred type of image
      * The 21 types are defined in id3v2 standard:
