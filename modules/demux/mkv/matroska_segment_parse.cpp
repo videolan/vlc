@@ -601,6 +601,10 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
         {
             EbmlMaster *tka = static_cast<EbmlMaster*>(l);
 
+            /* Initialize default values */
+            tk->fmt.audio.i_channels = 1;
+            tk->fmt.audio.i_rate = 8000;
+
             msg_Dbg( &sys.demuxer, "|   |   |   + Track Audio" );
 
             for( unsigned int j = 0; j < tka->ListSize(); j++ )
