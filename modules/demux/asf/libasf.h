@@ -212,7 +212,7 @@ typedef struct
     uint32_t     i_send_time;
     uint32_t     i_flags;
     uint32_t     i_marker_description_length;
-    uint8_t      *p_marker_description;
+    char         *p_marker_description;
 
 } asf_marker_t;
 
