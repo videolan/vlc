@@ -222,7 +222,7 @@ typedef struct
     guid_t      i_reserved1;
     uint32_t    i_count;
     uint16_t    i_reserved2;
-    char *name;
+    char        *name;
     asf_marker_t *marker;
 
 } asf_object_marker_t;

@@ -93,8 +93,7 @@ static char *AsfObjectHelperReadString( const uint8_t *p_peek, int i_peek, uint8
         psz_string = calloc( i_size/2 + 1, sizeof( char ) );
         if( psz_string )
         {
-            int i;
-            for( i = 0; i < i_size/2; i++ )
+            for( int i = 0; i < i_size/2; i++ )
                 psz_string[i] = GetWLE( &p_data[2*i] );
             psz_string[i_size/2] = '\0';
         }
@@ -336,9 +335,8 @@ static int ASF_ReadObject_file_properties( stream_t *s, asf_object_t *p_obj )
 static void ASF_FreeObject_metadata( asf_object_t *p_obj )
 {
     asf_object_metadata_t *p_meta = &p_obj->metadata;
-    unsigned int i;
 
-    for( i = 0; i < p_meta->i_record_entries_count; i++ )
+    for( unsigned int i = 0; i < p_meta->i_record_entries_count; i++ )
     {
         free( p_meta->record[i].psz_name );
         free( p_meta->record[i].p_data );
@@ -353,9 +351,6 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
     int i_peek;
     unsigned int i;
     const uint8_t *p_peek, *p_data;
-#ifdef ASF_DEBUG
-    unsigned int j;
-#endif
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_meta->i_object_size ) ) <
         __MAX( (int64_t)p_meta->i_object_size, 26 ) )
@@ -436,7 +431,7 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
     msg_Dbg( s,
             "read \"metadata object\" %d entries",
             p_meta->i_record_entries_count );
-    for( j = 0; j < p_meta->i_record_entries_count; j++ )
+    for( unsigned int j = 0; j < p_meta->i_record_entries_count; j++ )
     {
         asf_metadata_record_t *p_rec = &p_meta->record[j];
 
@@ -687,9 +682,8 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
 static void ASF_FreeObject_codec_list( asf_object_t *p_obj )
 {
     asf_object_codec_list_t *p_cl = &p_obj->codec_list;
-    unsigned int i_codec;
 
-    for( i_codec = 0; i_codec < p_cl->i_codec_entries_count; i_codec++ )
+    for( unsigned int i_codec = 0; i_codec < p_cl->i_codec_entries_count; i_codec++ )
     {
         asf_codec_entry_t *p_codec = &p_cl->codec[i_codec];
 
@@ -959,9 +953,8 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
 static void ASF_FreeObject_extended_stream_properties( asf_object_t *p_obj)
 {
     asf_object_extended_stream_properties_t *p_esp = &p_obj->ext_stream;
-    int i;
 
-    for( i = 0; i < p_esp->i_stream_name_count; i++ )
+    for( int i = 0; i < p_esp->i_stream_name_count; i++ )
         FREENULL( p_esp->ppsz_stream_name[i] );
     FREENULL( p_esp->pi_stream_name_language );
     FREENULL( p_esp->ppsz_stream_name );
@@ -1110,19 +1103,19 @@ static int ASF_ReadObject_extended_content_description( stream_t *s,
 
         if( i_type == 0 )
         {
+            /* Unicode string */
             p_ec->ppsz_value[i] = ASF_READS( i_size );
         }
         else if( i_type == 1 )
         {
             /* Byte array */
             static const char hex[16] = "0123456789ABCDEF";
-            int j;
 
             p_ec->ppsz_value[i] = malloc( 2*i_size + 1 );
             if( p_ec->ppsz_value[i] )
             {
                 char *psz_value = p_ec->ppsz_value[i];
-                for( j = 0; j < i_size; j++ )
+                for( int j = 0; j < i_size; j++ )
                 {
                     const uint8_t v = ASF_READ1();
                     psz_value[2*j+0] = hex[v>>4];
@@ -1176,9 +1169,8 @@ static void ASF_FreeObject_extended_content_description( asf_object_t *p_obj)
 {
     asf_object_extended_content_description_t *p_ec =
                                         &p_obj->extended_content_description;
-    int i;
 
-    for( i = 0; i < p_ec->i_count; i++ )
+    for( int i = 0; i < p_ec->i_count; i++ )
     {
         FREENULL( p_ec->ppsz_name[i] );
         FREENULL( p_ec->ppsz_value[i] );
@@ -1605,7 +1597,6 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
             if( p_hdr_ext )
             {
                 int i_ext_stream;
-                int i;
 
                 p_root->p_metadata =
                     ASF_FindObject( p_hdr_ext,
@@ -1613,7 +1604,7 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
                 /* Special case for broken designed file format :( */
                 i_ext_stream = ASF_CountObject( p_hdr_ext,
                                     &asf_object_extended_stream_properties_guid );
-                for( i = 0; i < i_ext_stream; i++ )
+                for( int i = 0; i < i_ext_stream; i++ )
                 {
                     asf_object_t *p_esp =
                         ASF_FindObject( p_hdr_ext,
