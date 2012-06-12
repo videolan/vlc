@@ -240,6 +240,7 @@ static const struct {
                      {vlc_meta_Publisher,   "PUBLISHER"},
                      {vlc_meta_URL,         "URL"},
                      {vlc_meta_TrackNumber, "PART_NUMBER"},
+                     {vlc_meta_TrackTotal,  "TOTAL_PARTS"},
                      {vlc_meta_Date,        "DATE_RELEASE"},
                      {vlc_meta_Title,       NULL},
 };
