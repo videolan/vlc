@@ -221,6 +221,11 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_meta_t* p_demux_meta, vlc_
                 dynamic_cast<ID3v2::UserTextIdentificationFrame*>(*iter);
         if( !p_txxx )
             continue;
+        if( !strcmp( p_txxx->description().toCString( true ), "TRACKTOTAL" ) )
+        {
+            vlc_meta_Set( p_meta, vlc_meta_TrackTotal, p_txxx->fieldList().back().toCString( true ) );
+            continue;
+        }
         vlc_meta_AddExtra( p_meta, p_txxx->description().toCString( true ),
                            p_txxx->fieldList().back().toCString( true ) );
     }
