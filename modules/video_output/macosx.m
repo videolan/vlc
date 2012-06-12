@@ -60,7 +60,7 @@
 @interface NSView (IntroducedInLion)
 - (NSRect)convertRectToBacking:(NSRect)aRect;
 - (void)setWantsBestResolutionOpenGLSurface:(BOOL)aBool;
-@endif
+@end
 
 #endif
 
