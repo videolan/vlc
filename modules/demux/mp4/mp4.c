@@ -843,6 +843,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     snprintf( psz_trck, sizeof( psz_trck ), "%i",
                               p_0xa9xxx->data.p_trkn->i_track_number );
                     vlc_meta_SetTrackNum( p_meta, psz_trck );
+                    snprintf( psz_trck, sizeof( psz_trck ), "%i",
+                              p_0xa9xxx->data.p_trkn->i_track_total );
+                    vlc_meta_Set( p_meta, vlc_meta_TrackTotal, psz_trck );
                     break;
                 }
                 case ATOM_0xa9cmt: /* Commment */

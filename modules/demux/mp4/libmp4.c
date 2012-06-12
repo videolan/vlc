@@ -1461,13 +1461,14 @@ static int MP4_ReadBox_trkn( stream_t *p_stream, MP4_Box_t *p_box )
     uint32_t i_reserved;
     MP4_GET4BYTES( i_version );
     MP4_GET4BYTES( i_reserved );
-    MP4_GET4BYTES( p_trkn->i_track_number );
+    MP4_GET2BYTES( i_reserved );
+    MP4_GET2BYTES( p_trkn->i_track_number );
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "read box: \"trkn\" number=%i", p_trkn->i_track_number );
 #endif
     if( i_data_len > 15 )
     {
-       MP4_GET4BYTES( p_trkn->i_track_total );
+       MP4_GET2BYTES( p_trkn->i_track_total );
 #ifdef MP4_VERBOSE
        msg_Dbg( p_stream, "read box: \"trkn\" total=%i", p_trkn->i_track_total );
 #endif
