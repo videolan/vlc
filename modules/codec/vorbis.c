@@ -577,7 +577,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
                 break;
 
             if( !strcasecmp( psz_name, "REPLAYGAIN_TRACK_GAIN" ) ||
-                     !strcasecmp( psz_name, "RG_RADIO" ) )
+                !strcasecmp( psz_name, "RG_RADIO" ) )
             {
                 audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
 
