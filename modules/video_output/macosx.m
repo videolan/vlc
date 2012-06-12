@@ -389,7 +389,12 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
             if (!config_GetInt(vd, "macosx-video-autoresize"))
             {
-                NSRect bounds = [sys->glView bounds];
+                NSRect bounds;
+                /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
+                if ([sys->glView respondsToSelector:@selector(convertRectToBacking:)])
+                    bounds = [sys->glView convertRectToBacking:[sys->glView bounds]];
+                else
+                    bounds = [sys->glView bounds];
                 cfg_tmp.display.width = bounds.size.width;
                 cfg_tmp.display.height = bounds.size.height;
             }
@@ -506,6 +511,10 @@ static void OpenglSwap (vlc_gl_t *gl)
     if (!self)
         return nil;
 
+    /* enable HiDPI support on OS X 10.7 and later */
+    if ([self respondsToSelector:@selector(setWantsBestResolutionOpenGLSurface:)])
+        [self setWantsBestResolutionOpenGLSurface:YES];
+
     /* Swap buffers only during the vertical retrace of the monitor.
      http://developer.apple.com/documentation/GraphicsImaging/
      Conceptual/OpenGL/chap5/chapter_5_section_44.html */
@@ -522,7 +531,13 @@ static void OpenglSwap (vlc_gl_t *gl)
 - (void)setFrameToBoundsOfView:(NSValue *)value
 {
     NSView *parentView = [value pointerValue];
-    [self setFrame:[parentView bounds]];
+    NSRect frame;
+    /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
+    if ([parentView respondsToSelector:@selector(convertRectToBacking:)])
+        frame = [parentView convertRectToBacking:[parentView bounds]];
+    else
+        frame = [parentView bounds];
+    [self setFrame:frame];
 }
 
 /**
@@ -618,7 +633,12 @@ static void OpenglSwap (vlc_gl_t *gl)
 {
     VLCAssertMainThread();
 
-    NSRect bounds = [self bounds];
+    NSRect bounds;
+    /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
+    if ([self respondsToSelector:@selector(convertRectToBacking:)])
+        bounds = [self convertRectToBacking:[self bounds]];
+    else
+        bounds = [self bounds];
     vout_display_place_t place;
     
     @synchronized(self) {
@@ -752,7 +772,11 @@ static void OpenglSwap (vlc_gl_t *gl)
     NSRect s_rect;
     BOOL b_inside;
 
-    s_rect = [self bounds];
+    /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
+    if ([self respondsToSelector:@selector(convertRectToBacking:)])
+        s_rect = [self convertRectToBacking:[self bounds]];
+    else
+        s_rect = [self bounds];
     ml = [self convertPoint: [o_event locationInWindow] fromView: nil];
     b_inside = [self mouse: ml inRect: s_rect];
     
