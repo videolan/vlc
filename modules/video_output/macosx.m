@@ -53,6 +53,17 @@
 - (BOOL)isFullscreen;
 @end
 
+/* compilation support for 10.5 and 10.6 */
+#define OSX_LION NSAppKitVersionNumber >= 1115.2
+#ifndef MAC_OS_X_VERSION_10_7
+
+@interface NSView (IntroducedInLion)
+- (NSRect)convertRectToBacking:(NSRect)aRect;
+- (void)setWantsBestResolutionOpenGLSurface:(BOOL)aBool;
+@endif
+
+#endif
+
 /**
  * Forward declarations
  */
@@ -391,7 +402,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             {
                 NSRect bounds;
                 /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
-                if ([sys->glView respondsToSelector:@selector(convertRectToBacking:)])
+                if (OSX_LION)
                     bounds = [sys->glView convertRectToBacking:[sys->glView bounds]];
                 else
                     bounds = [sys->glView bounds];
@@ -512,7 +523,7 @@ static void OpenglSwap (vlc_gl_t *gl)
         return nil;
 
     /* enable HiDPI support on OS X 10.7 and later */
-    if ([self respondsToSelector:@selector(setWantsBestResolutionOpenGLSurface:)])
+    if (OSX_LION)
         [self setWantsBestResolutionOpenGLSurface:YES];
 
     /* Swap buffers only during the vertical retrace of the monitor.
@@ -533,7 +544,7 @@ static void OpenglSwap (vlc_gl_t *gl)
     NSView *parentView = [value pointerValue];
     NSRect frame;
     /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
-    if ([parentView respondsToSelector:@selector(convertRectToBacking:)])
+    if (OSX_LION)
         frame = [parentView convertRectToBacking:[parentView bounds]];
     else
         frame = [parentView bounds];
@@ -635,7 +646,7 @@ static void OpenglSwap (vlc_gl_t *gl)
 
     NSRect bounds;
     /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
-    if ([self respondsToSelector:@selector(convertRectToBacking:)])
+    if (OSX_LION)
         bounds = [self convertRectToBacking:[self bounds]];
     else
         bounds = [self bounds];
@@ -773,7 +784,7 @@ static void OpenglSwap (vlc_gl_t *gl)
     BOOL b_inside;
 
     /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
-    if ([self respondsToSelector:@selector(convertRectToBacking:)])
+    if (OSX_LION)
         s_rect = [self convertRectToBacking:[self bounds]];
     else
         s_rect = [self bounds];
