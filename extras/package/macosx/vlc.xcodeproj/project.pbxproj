@@ -211,7 +211,6 @@
 		CC402EB90E00ABBB006A4BA4 /* vlc.scriptSuite in Resources */ = {isa = PBXBuildFile; fileRef = 8EBF3FA303F13FFB0059A3A7 /* vlc.scriptSuite */; };
 		CC402EBA0E00ABBB006A4BA4 /* vlc.scriptTerminology in Resources */ = {isa = PBXBuildFile; fileRef = 8EBF3FA503F140960059A3A7 /* vlc.scriptTerminology */; };
 		CC402EBB0E00ABBB006A4BA4 /* README.MacOSX.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */; };
-		CC402EF30E00ABBB006A4BA4 /* about_bg.png in Resources */ = {isa = PBXBuildFile; fileRef = DCDA5E6408F94518009D93A8 /* about_bg.png */; };
 		CC402F3C0E00ABBB006A4BA4 /* noart.png in Resources */ = {isa = PBXBuildFile; fileRef = CC1C41D00D9BAD7F002728FA /* noart.png */; };
 		CC402F410E00ABBB006A4BA4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 		CC402F420E00ABBB006A4BA4 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */; };
@@ -423,9 +422,9 @@
 		CC04334113B28B8200D7D52E /* pause.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = pause.png; path = Resources/mainwindow/pause.png; sourceTree = "<group>"; };
 		CC04334213B28B8200D7D52E /* play-pressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "play-pressed.png"; path = "Resources/mainwindow/play-pressed.png"; sourceTree = "<group>"; };
 		CC04334313B28B8200D7D52E /* play.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = play.png; path = Resources/mainwindow/play.png; sourceTree = "<group>"; };
-		CC04334413B28B8200D7D52E /* playlist-btn-blue.png */ = {isa = PBXFileReference; name = "playlist-btn-blue.png"; path = "Resources/mainwindow/playlist-btn-blue.png"; sourceTree = "<group>"; };
-		CC04334513B28B8200D7D52E /* playlist-btn-pressed.png */ = {isa = PBXFileReference; name = "playlist-btn-pressed.png"; path = "Resources/mainwindow/playlist-btn-pressed.png"; sourceTree = "<group>"; };
-		CC04334613B28B8200D7D52E /* playlist-btn.png */ = {isa = PBXFileReference; name = "playlist-btn.png"; path = "Resources/mainwindow/playlist-btn.png"; sourceTree = "<group>"; };
+		CC04334413B28B8200D7D52E /* playlist-btn-blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "playlist-btn-blue.png"; path = "Resources/mainwindow/playlist-btn-blue.png"; sourceTree = "<group>"; };
+		CC04334513B28B8200D7D52E /* playlist-btn-pressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "playlist-btn-pressed.png"; path = "Resources/mainwindow/playlist-btn-pressed.png"; sourceTree = "<group>"; };
+		CC04334613B28B8200D7D52E /* playlist-btn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "playlist-btn.png"; path = "Resources/mainwindow/playlist-btn.png"; sourceTree = "<group>"; };
 		CC04334713B28B8200D7D52E /* progression-fill-left.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "progression-fill-left.png"; path = "Resources/mainwindow/progression-fill-left.png"; sourceTree = "<group>"; };
 		CC04334813B28B8200D7D52E /* progression-fill-middle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "progression-fill-middle.png"; path = "Resources/mainwindow/progression-fill-middle.png"; sourceTree = "<group>"; };
 		CC04334913B28B8200D7D52E /* progression-fill-right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "progression-fill-right.png"; path = "Resources/mainwindow/progression-fill-right.png"; sourceTree = "<group>"; };
@@ -656,7 +655,6 @@
 		DC1A176914E2778A001477C6 /* qtsound.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = qtsound.m; path = ../../../modules/access/qtsound.m; sourceTree = "<group>"; };
 		DC769AB7085DF0DB001A838D /* wizard.m */ = {isa = PBXFileReference; fileEncoding = 5; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; name = wizard.m; path = ../../../modules/gui/macosx/wizard.m; sourceTree = SOURCE_ROOT; tabWidth = 4; usesTabs = 0; };
 		DC769AB8085DF0DB001A838D /* wizard.h */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.h; name = wizard.h; path = ../../../modules/gui/macosx/wizard.h; sourceTree = SOURCE_ROOT; };
-		DCDA5E6408F94518009D93A8 /* about_bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = about_bg.png; path = Resources/about_bg.png; sourceTree = "<group>"; };
 		DCE7BD0608A5724D007B10AE /* bookmarks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = bookmarks.m; path = ../../../modules/gui/macosx/bookmarks.m; sourceTree = SOURCE_ROOT; };
 		DCE7BD0708A5724D007B10AE /* bookmarks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bookmarks.h; path = ../../../modules/gui/macosx/bookmarks.h; sourceTree = SOURCE_ROOT; };
 		F69B0CA702E24F6401A80112 /* English */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = text.plist.strings; name = English; path = Resources/English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -710,7 +708,6 @@
 				CC5800F81423A82100166912 /* fspanel (@1.5x) */,
 				CCCB86BF0ACFDE4A00CF1E10 /* fspanel */,
 				DCF358BC077F1236007DB450 /* xibs */,
-				DCDA5E6408F94518009D93A8 /* about_bg.png */,
 				8E445F86047289E50059A3A7 /* fileicons */,
 				CC0430EE13B2461A00D7D52E /* 10th anniversary ui */,
 				F69B0CA602E24F6401A80112 /* InfoPlist.strings */,
@@ -1314,7 +1311,6 @@
 				CC402EB90E00ABBB006A4BA4 /* vlc.scriptSuite in Resources */,
 				CC402EBA0E00ABBB006A4BA4 /* vlc.scriptTerminology in Resources */,
 				CC402EBB0E00ABBB006A4BA4 /* README.MacOSX.rtf in Resources */,
-				CC402EF30E00ABBB006A4BA4 /* about_bg.png in Resources */,
 				CC402F3C0E00ABBB006A4BA4 /* noart.png in Resources */,
 				CC04323B13B246DF00D7D52E /* back_dark.png in Resources */,
 				CC04323C13B246DF00D7D52E /* back-pressed_dark.png in Resources */,

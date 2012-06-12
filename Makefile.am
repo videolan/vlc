@@ -98,7 +98,6 @@ ChangeLog: Makefile.am
 
 EXTRA_DIST += \
 	extras/package/macosx/README.MacOSX.rtf \
-	extras/package/macosx/Resources/about_bg.png \
 	extras/package/macosx/Resources/dsa_pub.pem \
 	extras/package/macosx/Resources/English.lproj/About.xib \
 	extras/package/macosx/Resources/English.lproj/AudioEffects.xib \

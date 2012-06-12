@@ -38,6 +38,7 @@
     IBOutlet id o_credits_scrollview;
     IBOutlet id o_gpl_btn;
     IBOutlet id o_name_field;
+    id o_color_backdrop;
 
     NSTimer *o_scroll_timer;
     float f_current;
@@ -63,5 +64,9 @@
 - (void)showHelp;
 - (IBAction)showGPL:(id)sender;
 - (IBAction)helpGoHome:(id)sender;
+
+@end
+
+@interface VLAboutColoredBackdrop : NSView
 
 @end
