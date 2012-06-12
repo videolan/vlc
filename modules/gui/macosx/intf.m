@@ -935,11 +935,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         psz_uri = make_URI([[o_sorted_names objectAtIndex: i] UTF8String], "file" );
         if( !psz_uri )
-            return NO;
+            continue;
 
         NSDictionary *o_dic = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
         free( psz_uri );
-        [o_result insertObject: o_dic atIndex: i];
+        [o_result addObject: o_dic];
     }
 
     if( b_autoplay )
