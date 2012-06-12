@@ -542,13 +542,7 @@ static void OpenglSwap (vlc_gl_t *gl)
 - (void)setFrameToBoundsOfView:(NSValue *)value
 {
     NSView *parentView = [value pointerValue];
-    NSRect frame;
-    /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
-    if (OSX_LION)
-        frame = [parentView convertRectToBacking:[parentView bounds]];
-    else
-        frame = [parentView bounds];
-    [self setFrame:frame];
+    [self setFrame:[parentView bounds]];
 }
 
 /**
