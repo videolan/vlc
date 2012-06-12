@@ -21,16 +21,16 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="2770"/>
-      <integer value="4948"/>
-      <integer value="4372"/>
       <integer value="915"/>
+      <integer value="2770"/>
       <integer value="4722"/>
-      <integer value="4596"/>
-      <integer value="2730"/>
       <integer value="4850"/>
       <integer value="5100"/>
       <integer value="1617"/>
+      <integer value="4596"/>
+      <integer value="4948"/>
+      <integer value="2730"/>
+      <integer value="4756"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -741,11 +741,11 @@
                     <int key="NSButtonFlags2">2</int>
                     <object class="NSCustomResource" key="NSNormalImage">
                       <string key="NSClassName">NSImage</string>
-                      <string key="NSResourceName">playlist</string>
+                      <string key="NSResourceName">playlist-btn</string>
                     </object>
                     <object class="NSCustomResource" key="NSAlternateImage">
                       <string key="NSClassName">NSImage</string>
-                      <string key="NSResourceName">playlist-pressed</string>
+                      <string key="NSResourceName">playlist-btn-pressed</string>
                     </object>
                     <string key="NSAlternateContents"/>
                     <string key="NSKeyEquivalent"/>
@@ -12150,7 +12150,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{329, 622}, {140, 123}}</string>
+          <string>{{329, 553}, {140, 123}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12201,9 +12201,9 @@ LCAuLi4</string>
           <string>{{619, 772}, {137, 103}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{363, 446}, {604, 310}}</string>
+          <string>{{363, 366}, {604, 310}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{363, 446}, {604, 310}}</string>
+          <string>{{363, 366}, {604, 310}}</string>
           <boolean value="YES"/>
           <boolean value="NO"/>
           <boolean value="NO"/>
@@ -12244,7 +12244,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{473, 299}, {302, 433}}</string>
+          <string>{{956, 223}, {302, 433}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12360,9 +12360,9 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{340, 658}, {549, 87}}</string>
+          <string>{{340, 589}, {549, 87}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{340, 658}, {549, 87}}</string>
+          <string>{{340, 589}, {549, 87}}</string>
           <boolean value="YES"/>
           <boolean value="NO"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12413,7 +12413,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{329, 732}, {468, 20}}</string>
+          <string>{{812, 656}, {468, 20}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12712,7 +12712,7 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{566, 458}, {402, 252}}</string>
+          <string>{{566, 424}, {402, 252}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform"/>
           <string>VLBrushedMetalImageView</string>
@@ -12750,7 +12750,7 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{363, 734}, {400, 22}}</string>
+          <string>{{880, 654}, {400, 22}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform"/>
           <string>VLCCustomWindowCloseButton</string>
@@ -12917,7 +12917,7 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{775, 139}, {149, 183}}</string>
+          <string>{{1258, 63}, {149, 183}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -19169,8 +19169,8 @@ LCAuLi4</string>
         <string>fullscreen-double-buttons-pressed</string>
         <string>play</string>
         <string>play-pressed</string>
-        <string>playlist</string>
-        <string>playlist-pressed</string>
+        <string>playlist-btn</string>
+        <string>playlist-btn-pressed</string>
         <string>repeat</string>
         <string>repeat-pressed</string>
         <string>shuffle</string>
@@ -19211,8 +19211,8 @@ LCAuLi4</string>
         <string>{29, 23}</string>
         <string>{29, 30}</string>
         <string>{29, 30}</string>
-        <string>{512, 512}</string>
-        <string>{28, 23}</string>
+        <string>{128, 128}</string>
+        <string>{128, 128}</string>
         <string>{28, 23}</string>
         <string>{28, 23}</string>
         <string>{29, 23}</string>
