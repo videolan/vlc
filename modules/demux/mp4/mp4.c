@@ -689,7 +689,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date )
     demux_sys_t *p_sys = p_demux->p_sys;
     unsigned int i_track;
 
-    /* First update update global time */
+    /* First update global time */
     p_sys->i_time = i_date * p_sys->i_timescale / 1000000;
     p_sys->i_pcr  = i_date;
 
