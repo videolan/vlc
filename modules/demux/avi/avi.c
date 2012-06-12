@@ -2542,6 +2542,7 @@ static void AVI_MetaLoad( demux_t *p_demux,
         { AVIFOURCC_IRTD, vlc_meta_Rating },
         { AVIFOURCC_IWEB, vlc_meta_URL },
         { AVIFOURCC_IPRT, vlc_meta_TrackNumber },
+        { AVIFOURCC_IFRM, vlc_meta_TrackTotal },
         { 0, -1 }
     };
     for( int i = 0; p_dsc[i].i_id != 0; i++ )
@@ -2565,7 +2566,7 @@ static void AVI_MetaLoad( demux_t *p_demux,
         AVIFOURCC_ISRF, AVIFOURCC_ITCH, AVIFOURCC_ISMP, AVIFOURCC_IDIT, AVIFOURCC_ISGN,
         AVIFOURCC_IWRI, AVIFOURCC_IPRO, AVIFOURCC_ICNM, AVIFOURCC_IPDS, AVIFOURCC_IEDT,
         AVIFOURCC_ICDS, AVIFOURCC_IMUS, AVIFOURCC_ISTD, AVIFOURCC_IDST, AVIFOURCC_ICNT,
-        AVIFOURCC_ISTR, AVIFOURCC_IFRM, 0,
+        AVIFOURCC_ISTR, 0,
     };
 
     for( int i = 0; p_extra[i] != 0; i++ )
