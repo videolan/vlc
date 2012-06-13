@@ -139,6 +139,13 @@ static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t*, vlc_meta_t* p_meta )
     SET( "PUBLISHER", Publisher );
 
 #undef SET
+
+    /* */
+    item = tag->itemListMap()["TRACK"];
+    if( !item.isEmpty() )
+    {
+        ExtractTrackNumberValues( p_meta, item.toString().toCString( true ) );
+    }
 }
 
 
