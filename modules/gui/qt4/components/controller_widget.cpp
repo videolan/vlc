@@ -298,7 +298,8 @@ void AspectRatioComboBox::updateAspectRatio( int x )
     if( p_vout && x >= 0 )
     {
         var_SetString( p_vout, "aspect-ratio", qtu( itemData(x).toString() ) );
-        vlc_object_release( p_vout );
     }
+    if( p_vout )
+        vlc_object_release( p_vout );
 }
 
