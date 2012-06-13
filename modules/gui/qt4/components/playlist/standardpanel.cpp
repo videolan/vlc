@@ -510,7 +510,6 @@ void StandardPLPanel::browseInto( int i_id )
     if( i_id != lastActivatedId ) return;
 
     QModelIndex index = model->index( i_id, 0 );
-    playlist_Unlock( THEPL );
 
     if( currentView == treeView )
         treeView->setExpanded( index, true );
