@@ -861,6 +861,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     SET( vlc_meta_SetEncodedBy );
                     break;
 
+                case ATOM_0xa9pub:
+                    SET( vlc_meta_SetPublisher );
+                    break;
+
                 default:
                     break;
                 }
@@ -883,10 +887,24 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     { ATOM_0xa9wrn, N_("Warning") },
                     { ATOM_0xa9swr, N_("Software") },
                     { ATOM_0xa9lyr, N_("Lyrics") },
-                    { ATOM_0xa9mak, N_("Make") },
+                    { ATOM_0xa9mak, N_("Record Company") },
                     { ATOM_0xa9mod, N_("Model") },
                     { ATOM_0xa9PRD, N_("Product") },
                     { ATOM_0xa9grp, N_("Grouping") },
+                    { ATOM_0xa9gen, N_("Genre") },
+                    { ATOM_0xa9st3, N_("Sub-Title") },
+                    { ATOM_0xa9arg, N_("Arranger") },
+                    { ATOM_0xa9ard, N_("Art Director") },
+                    { ATOM_0xa9cak, N_("Copyright Acknowledgement") },
+                    { ATOM_0xa9con, N_("Conductor") },
+                    { ATOM_0xa9des, N_("Song Description") },
+                    { ATOM_0xa9lnt, N_("Liner Notes") },
+                    { ATOM_0xa9phg, N_("Phonogram Rights") },
+                    { ATOM_0xa9pub, N_("Publisher") },
+                    { ATOM_0xa9sne, N_("Sound Engineer") },
+                    { ATOM_0xa9sol, N_("Soloist") },
+                    { ATOM_0xa9thx, N_("Thanks") },
+                    { ATOM_0xa9xpd, N_("Executive Producer") },
                     { 0, "" },
                 };
                 for( unsigned i = 0; xa9typetoextrameta[i].xa9_type; i++ )
