@@ -389,6 +389,33 @@ QVariant PLModel::data( const QModelIndex &index, const int role ) const
             f.setBold( true );
         return QVariant( f );
     }
+    else if( role == Qt::ToolTipRole )
+    {
+        QString artUrl = getArtUrl( index );
+        if ( artUrl.isEmpty() ) artUrl = ":/noart";
+        QString duration = qtr( "unknown" );
+        QString name;
+        PL_LOCK;
+        input_item_t *p_item = item->inputItem();
+        if ( !p_item )
+        {
+            PL_UNLOCK;
+            return QVariant();
+        }
+        if ( p_item->i_duration > 0 )
+        {
+            char *psz = psz_column_meta( item->inputItem(), COLUMN_DURATION );
+            duration = qfu( psz );
+            free( psz );
+        }
+        name = QString( p_item->psz_name );
+        PL_UNLOCK;
+        return QVariant( QString("<img width=\"128\" height=\"128\" align=\"left\" src=\"%1\"/><div><b>%2</b><br/>%3</div>")
+                         .arg( artUrl )
+                         .arg( name )
+                         .arg( qtr("Duration") + ": " + duration )
+                        );
+    }
     else if( role == Qt::BackgroundRole && isCurrent( index ) )
     {
         return QVariant( QBrush( Qt::gray ) );

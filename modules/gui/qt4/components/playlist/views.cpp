@@ -313,6 +313,19 @@ void PlIconView::dragMoveEvent ( QDragMoveEvent * event )
     QAbstractItemView::dragMoveEvent( event );
 }
 
+bool PlIconView::viewportEvent ( QEvent * event )
+{
+    if ( event->type() == QEvent::ToolTip )
+    {
+        event->ignore();
+        return true;
+    }
+    else
+    {
+        return QAbstractItemView::viewportEvent( event );
+    }
+}
+
 PlListView::PlListView( PLModel *, QWidget *parent ) : QListView( parent )
 {
     setViewMode( QListView::ListMode );
@@ -348,6 +361,19 @@ void PlListView::keyPressEvent( QKeyEvent *event )
     //Otherwise, just do as usual.
     else
         QListView::keyPressEvent( event );
+}
+
+bool PlListView::viewportEvent ( QEvent * event )
+{
+    if ( event->type() == QEvent::ToolTip )
+    {
+        event->ignore();
+        return true;
+    }
+    else
+    {
+        return QAbstractItemView::viewportEvent( event );
+    }
 }
 
 void PlTreeView::setModel( QAbstractItemModel * model )
@@ -477,3 +503,15 @@ void PicFlowView::playItem( int i_item )
     emit activated( model()->index(i_item, 0) );
 }
 
+bool PicFlowView::viewportEvent ( QEvent * event )
+{
+    if ( event->type() == QEvent::ToolTip )
+    {
+        event->ignore();
+        return true;
+    }
+    else
+    {
+        return QAbstractItemView::viewportEvent( event );
+    }
+}

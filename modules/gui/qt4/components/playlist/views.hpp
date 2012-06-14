@@ -71,6 +71,7 @@ public:
 protected:
     virtual void startDrag ( Qt::DropActions supportedActions );
     virtual void dragMoveEvent ( QDragMoveEvent * event );
+    virtual bool viewportEvent ( QEvent * );
 };
 
 class PlListView : public QListView
@@ -83,6 +84,7 @@ protected:
     virtual void startDrag ( Qt::DropActions supportedActions );
     virtual void dragMoveEvent ( QDragMoveEvent * event );
     virtual void keyPressEvent( QKeyEvent *event );
+    virtual bool viewportEvent ( QEvent * );
 };
 
 class PlTreeView : public QTreeView
@@ -114,6 +116,7 @@ protected:
     virtual bool isIndexHidden(const QModelIndex&) const;
     virtual QRegion visualRegionForSelection(const QItemSelection&) const;
     virtual void setSelection(const QRect&, QFlags<QItemSelectionModel::SelectionFlag>);
+    virtual bool viewportEvent ( QEvent * );
 
 private:
     PictureFlow *picFlow;
