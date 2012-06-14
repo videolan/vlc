@@ -1,7 +1,7 @@
 /*****************************************************************************
  * fspanel.h: MacOS X full screen panel
  *****************************************************************************
- * Copyright (C) 2006-2011 VLC authors and VideoLAN
+ * Copyright (C) 2006-2012 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jérôme Decoodt <djc at videolan dot org>

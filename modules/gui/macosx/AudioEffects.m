@@ -1,7 +1,7 @@
 /*****************************************************************************
  * AudioEffects.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2004-2011 VLC authors and VideoLAN
+ * Copyright (C) 2004-2012 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
