@@ -251,7 +251,11 @@ LIBVLC_API libvlc_media_t *libvlc_media_new_as_node(
  * read the media. This allows to use VLC's advanced
  * reading/streaming options on a per-media basis.
  *
- * The options are detailed in vlc --long-help, for instance "--sout-all"
+ * The options are detailed in vlc --long-help, for instance
+ * "--sout-all". Note that all options are not usable on medias:
+ * specifically, due to architectural issues, video-related options
+ * such as text renderer options cannot be set on a single media. They
+ * must be set on the whole libvlc instance instead.
  *
  * \param p_md the media descriptor
  * \param ppsz_options the options (as a string)
@@ -267,7 +271,11 @@ LIBVLC_API void libvlc_media_add_option(
  * read the media. This allows to use VLC's advanced
  * reading/streaming options on a per-media basis.
  *
- * The options are detailed in vlc --long-help, for instance "--sout-all"
+ * The options are detailed in vlc --long-help, for instance
+ * "--sout-all". Note that all options are not usable on medias:
+ * specifically, due to architectural issues, video-related options
+ * such as text renderer options cannot be set on a single media. They
+ * must be set on the whole libvlc instance instead.
  *
  * \param p_md the media descriptor
  * \param ppsz_options the options (as a string)
