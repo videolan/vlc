@@ -722,6 +722,9 @@ static char* MacLegacy_Select( filter_t *p_filter, const char* psz_fontname,
 
     *i_idx = 0;
 
+    if( psz_fontname == NULL )
+        return NULL;
+
     msg_Dbg( p_filter, "looking for %s", psz_fontname );
     cf_fontName = CFStringCreateWithCString( kCFAllocatorDefault, psz_fontname, kCFStringEncodingUTF8 );
 
