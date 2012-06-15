@@ -408,7 +408,7 @@ QVariant PLModel::data( const QModelIndex &index, const int role ) const
             duration = qfu( psz );
             free( psz );
         }
-        name = QString( p_item->psz_name );
+        name = qfu( p_item->psz_name );
         PL_UNLOCK;
         return QVariant( QString("<img width=\"128\" height=\"128\" align=\"left\" src=\"%1\"/><div><b>%2</b><br/>%3</div>")
                          .arg( artUrl )
