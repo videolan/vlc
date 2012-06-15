@@ -2811,6 +2811,10 @@ static void Destroy( vlc_object_t *p_this )
     if( p_sys->p_xml ) xml_ReaderDelete( p_sys->p_xml );
     free( p_sys->psz_fontfamily );
 
+#ifdef WIN32
+    free( p_sys->psz_win_fonts_path );
+#endif
+
     /* FcFini asserts calling the subfunction FcCacheFini()
      * even if no other library functions have been made since FcInit(),
      * so don't call it. */
