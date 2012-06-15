@@ -165,12 +165,8 @@ vlc_module_end ()
                  b2Ptr = (const float *) tempAudioBufferList->mBuffers[1].mData;
                  i < numberOfSamples; i++)
             {
-                *uPtr = *b1Ptr;
-                uPtr ++;
-                b1Ptr ++;
-                *uPtr = *b2Ptr;
-                uPtr ++;
-                b2Ptr ++;
+                *uPtr++ = *b1Ptr++;
+                *uPtr++ = *b2Ptr++;
             }
 
             if (currentAudioBuffer == nil)
@@ -450,15 +446,6 @@ static int Open( vlc_object_t *p_this )
      */
     audiofmt.audio.i_original_channels = AOUT_CHAN_RIGHT | AOUT_CHAN_LEFT;
     /*
-     * i_bytes_per_frame Optional - for A/52, SPDIF and DTS types:
-     * Bytes used by one compressed frame, depends on bitrate.
-     */
-    audiofmt.audio.i_bytes_per_frame = 4;
-    /*
-     * Number of sampleframes contained in one compressed frame.
-     */
-    audiofmt.audio.i_frame_length = 1;
-    /*
      * Please note that it may be completely arbitrary - buffers are not
      * obliged to contain a integral number of so-called "frames". It's
      * just here for the division:
@@ -466,9 +453,9 @@ static int Open( vlc_object_t *p_this )
      */
     audiofmt.audio.i_bitspersample = 32;
     audiofmt.audio.i_channels = 2;
-    audiofmt.audio.i_blockalign = audiofmt.audio.i_channels * audiofmt.audio.i_bitspersample / 16;
+    audiofmt.audio.i_blockalign = audiofmt.audio.i_channels * (audiofmt.audio.i_bitspersample / 8);
     audiofmt.i_bitrate = audiofmt.audio.i_channels * audiofmt.audio.i_rate * audiofmt.audio.i_bitspersample;
-    p_sys->i_audio_max_buffer_size = 4096;
+    p_sys->i_audio_max_buffer_size = audiofmt.i_bitrate;
 
     p_sys->session = [[QTCaptureSession alloc] init];
 
@@ -554,10 +541,10 @@ static int Demux( demux_t *p_demux )
     {
         if ( [p_sys->audiooutput checkCurrentAudioBuffer] )
         {
-            p_blocka->i_pts = [p_sys->audiooutput getCurrentPts];
-            p_blocka->p_buffer = [p_sys->audiooutput getCurrentAudioBufferData];
+            p_blocka->i_buffer = p_blocka->i_size = [p_sys->audiooutput getCurrentTotalDataSize];
+            p_blocka->p_buffer = p_blocka->p_start = [p_sys->audiooutput getCurrentAudioBufferData];
             p_blocka->i_nb_samples = [p_sys->audiooutput getNumberOfSamples];
-            p_blocka->i_buffer = [p_sys->audiooutput getCurrentTotalDataSize];
+            p_blocka->i_pts = [p_sys->audiooutput getCurrentPts];
         }
     }
 
@@ -577,13 +564,6 @@ static int Demux( demux_t *p_demux )
 
     @synchronized (p_sys->audiooutput)
     {
-        /*
-         * Free Memory
-         *
-         * Wait before freeing memory, so we don't get no crackling sound
-         * crackling sound artefacts start at 100 ms and below
-         */
-        msleep( 200 );
         [p_sys->audiooutput freeAudioMem];
     }
 
