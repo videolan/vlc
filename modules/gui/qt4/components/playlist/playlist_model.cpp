@@ -391,7 +391,11 @@ QVariant PLModel::data( const QModelIndex &index, const int role ) const
     }
     else if( role == Qt::ToolTipRole )
     {
-        QString artUrl = getArtUrl( index );
+        int i_art_policy = var_GetInteger( p_playlist, "album-art" );
+        QString artUrl;
+        /* FIXME: Skip, as we don't want the pixmap and do not know the cached art file */
+        if ( i_art_policy == ALBUM_ART_ALL )
+            artUrl = getArtUrl( index );
         if ( artUrl.isEmpty() ) artUrl = ":/noart";
         QString duration = qtr( "unknown" );
         QString name;
@@ -1031,6 +1035,8 @@ void PLModel::ensureArtRequested( const QModelIndex &index )
 {
     if ( index.isValid() && hasChildren( index ) )
     {
+        int i_art_policy = var_GetInteger( p_playlist, "album-art" );
+        if ( i_art_policy != ALBUM_ART_ALL ) return;
         int nbnodes = rowCount( index );
         QModelIndex child;
         for( int row = 0 ; row < nbnodes ; row++ )

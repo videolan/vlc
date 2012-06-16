@@ -643,8 +643,7 @@ void InputManager::requestArtUpdate( input_item_t *p_item )
         if ( p_item->p_meta )
         {
             int status = vlc_meta_GetStatus( p_item->p_meta );
-            if ( status & ( ITEM_ART_NOTFOUND|ITEM_ART_FETCHED|
-                            ITEM_ARTURL_FETCHED|ITEM_PREPARSED ) )
+            if ( status & ( ITEM_ART_NOTFOUND|ITEM_ART_FETCHED ) )
                 return;
         }
         playlist_AskForArtEnqueue( pl_Get(p_intf), p_item );
