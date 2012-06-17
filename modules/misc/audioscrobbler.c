@@ -691,7 +691,7 @@ static void Run(intf_thread_t *p_intf)
     bool                    b_handshaked = false;
 
     /* data about audioscrobbler session */
-    mtime_t                 next_exchange;      /**< when can we send data  */
+    mtime_t                 next_exchange = -1; /**< when can we send data  */
     unsigned int            i_interval;         /**< waiting interval (secs)*/
 
     intf_sys_t *p_sys = p_intf->p_sys;
