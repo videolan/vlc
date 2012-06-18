@@ -97,7 +97,9 @@ ChangeLog: Makefile.am
 ###############################################################################
 
 EXTRA_DIST += \
+	extras/package/macosx/codesign.sh \
 	extras/package/macosx/README.MacOSX.rtf \
+	extras/package/macosx/VLC.entitlements \
 	extras/package/macosx/Resources/dsa_pub.pem \
 	extras/package/macosx/Resources/English.lproj/About.xib \
 	extras/package/macosx/Resources/English.lproj/AudioEffects.xib \
