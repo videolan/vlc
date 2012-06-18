@@ -53,13 +53,6 @@
 #endif
 #include <dirent.h>
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
-#   ifdef lseek
-#      undef lseek
-#   endif
-#   define lseek _lseeki64
-#endif
-
 #include <vlc_common.h>
 #include "fs.h"
 #include <vlc_input.h>
