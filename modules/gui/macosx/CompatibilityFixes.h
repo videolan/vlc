@@ -35,6 +35,7 @@
 #ifndef MAC_OS_X_VERSION_10_6
 
 @protocol NSAnimationDelegate <NSObject> @end
+@protocol NSApplicationDelegate <NSObject> @end
 @protocol NSWindowDelegate <NSObject> @end
 @protocol NSComboBoxDataSource <NSObject> @end
 @protocol NSTextFieldDelegate <NSObject> @end

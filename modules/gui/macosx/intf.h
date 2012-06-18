@@ -86,7 +86,7 @@ struct intf_sys_t
 @class VLCEmbeddedWindow;
 @class VLCControls;
 @class VLCPlaylist;
-@interface VLCMain : NSObject <NSWindowDelegate>
+@interface VLCMain : NSObject <NSWindowDelegate, NSApplicationDelegate>
 {
     intf_thread_t *p_intf;      /* The main intf object */
     input_thread_t *p_current_input;
@@ -196,7 +196,6 @@ struct intf_sys_t
 - (void)showFullscreenController;
 - (void)updateDelays;
 - (void)initStrings;
-- (BOOL)application:(NSApplication *)o_app openFiles:(NSString *)o_filename;
 
 - (IBAction)crashReporterAction:(id)sender;
 - (IBAction)openCrashLog:(id)sender;

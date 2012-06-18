@@ -906,7 +906,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 #pragma mark -
 #pragma mark File opening over dock icon
 
-- (BOOL)application:(NSApplication *)o_app openFiles:(NSArray *)o_names
+- (void)application:(NSApplication *)o_app openFiles:(NSArray *)o_names
 {
     BOOL b_autoplay = config_GetInt( VLCIntf, "macosx-autoplay" );
     char *psz_uri = make_URI([[o_names objectAtIndex:0] UTF8String], "file" );
@@ -923,7 +923,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             if( !b_returned )
             {
                 free( psz_uri );
-                return YES;
+                return;
             }
         }
     }
@@ -947,7 +947,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     else
         [o_playlist appendArray: o_result atPos: -1 enqueue: YES];
 
-    return( TRUE );
+    return;
 }
 
 /* When user click in the Dock icon our double click in the finder */
