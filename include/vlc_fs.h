@@ -76,6 +76,10 @@ static inline void vlc_rewinddir( DIR *dir )
 # endif
 #endif
 
+#ifdef __ANDROID__
+# define lseek lseek64
+#endif
+
 struct stat;
 
 VLC_API int vlc_stat( const char *filename, struct stat *buf );
