@@ -38,10 +38,10 @@ ifdef HAVE_WINCE
 endif
 	cd live && sed -e 's%cc%$(CC)%' -e 's%c++%$(CXX)%' -e 's%LIBRARY_LINK =.*ar%LIBRARY_LINK = $(AR)%' -i.orig config.$(LIVE_TARGET)
 	cd live && sed -i.orig -e s/"libtool -s -o"/"ar cr"/g config.macosx*
-	cd live && sed \
-		-e 's%-DBSD=1%-DBSD=1\ $(EXTRA_CFLAGS)\ $(EXTRA_LDFLAGS)%' \
-		-e 's%$(CXX)%$(CXX)\ $(EXTRA_LDFLAGS)%' \
-		-i.orig config.macosx
+	cd live && sed -i.orig config.macosx \
+		-e 's%$(CXX)%$(CXX)\ $(EXTRA_LDFLAGS)%'
+	cd live && sed -i.orig config.* \
+		-e 's%^COMPILE_OPTS.*$$%\0 '"$(EXTRA_CFLAGS)%"
 	cd live && sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig config.linux
 ifdef HAVE_ANDROID
 	cd live && sed -e 's%-DPIC%-DPIC -DNO_SSTREAM=1 -DLOCALE_NOT_USED -I$(ANDROID_NDK)/platforms/android-9/arch-arm/usr/include%' -i.orig config.linux
