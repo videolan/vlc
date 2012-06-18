@@ -29,6 +29,6 @@
 	<key>com.apple.security.temporary-exception.files.home-relative-path.read-only</key>
 	<string>/</string>
 	<key>com.apple.security.temporary-exception.files.absolute-path.read-only</key>
-	<string>/dev/</string>
+	<string>/tmp/</string>
 </dict>
 </plist>
