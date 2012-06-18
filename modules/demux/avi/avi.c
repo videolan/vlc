@@ -543,15 +543,6 @@ static int Open( vlc_object_t * p_this )
                     fmt.video.i_sar_num = ((i_frame_aspect_ratio >> 16) & 0xffff) * fmt.video.i_height;
                     fmt.video.i_sar_den = ((i_frame_aspect_ratio >>  0) & 0xffff) * fmt.video.i_width;
                 }
-                fmt.i_extra =
-                    __MAX( p_vids->p_bih->biSize - sizeof( VLC_BITMAPINFOHEADER ),
-                           p_vids->i_chunk_size - sizeof(VLC_BITMAPINFOHEADER) );
-                if( fmt.i_extra > 0 )
-                {
-                    fmt.p_extra = malloc( fmt.i_extra );
-                    if( !fmt.p_extra ) goto error;
-                    memcpy( fmt.p_extra, &p_vids->p_bih[1], fmt.i_extra );
-                }
 
                 msg_Dbg( p_demux, "stream[%d] video(%4.4s) %"PRIu32"x%"PRIu32" %dbpp %ffps",
                          i, (char*)&p_vids->p_bih->biCompression,
@@ -572,10 +563,15 @@ static int Open( vlc_object_t * p_this )
                  *  to be true for all palettized codecs we support) */
                 if( fmt.video.i_bits_per_pixel > 0 && fmt.video.i_bits_per_pixel <= 8 )
                 {
-                    /* The palette is not always included in biSize */
+                    /* The palette should not be included in biSize, but come
+                     * directly after BITMAPINFORHEADER in the BITMAPINFO structure */
                     fmt.i_extra = p_vids->i_chunk_size - sizeof(VLC_BITMAPINFOHEADER);
-                    if( fmt.i_extra > 0 && fmt.p_extra )
+                    if( fmt.i_extra > 0 )
                     {
+                        fmt.p_extra = malloc( fmt.i_extra );
+                        if( !fmt.p_extra ) goto error;
+                        memcpy( fmt.p_extra, &p_vids->p_bih[1], fmt.i_extra );
+
                         const uint8_t *p_pal = fmt.p_extra;
 
                         fmt.video.p_palette = calloc( 1, sizeof(video_palette_t) );
