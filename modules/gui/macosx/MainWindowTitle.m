@@ -240,6 +240,19 @@
     else
         [o_fullscreen_btn setImage: [NSImage imageNamed:@"window-fullscreen"]];
 }
+
+- (void)mouseUp:(NSEvent *)event
+{
+    if ([event clickCount] == 2) {
+        //Get settings from "System Preferences" >  "Appearance" > "Double-click on windows title bar to minimize"
+        NSString *const MDAppleMiniaturizeOnDoubleClickKey = @"AppleMiniaturizeOnDoubleClick";
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        [userDefaults addSuiteNamed:NSGlobalDomain];
+
+        if ([[userDefaults objectForKey:MDAppleMiniaturizeOnDoubleClickKey] boolValue])
+            [[self window] miniaturize:self];
+    }
+}
 @end
 
 /*****************************************************************************
