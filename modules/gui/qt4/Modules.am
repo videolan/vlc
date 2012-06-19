@@ -133,6 +133,7 @@ DEPS_res = \
 	pixmaps/playlist/repeat_one.png \
 	pixmaps/playlist/shuffle_off.png \
 	pixmaps/playlist/shuffle_on.png \
+	pixmaps/playlist/dropzone.png \
 	pixmaps/prefs/advprefs_audio.png \
 	pixmaps/prefs/advprefs_codec.png \
 	pixmaps/prefs/advprefs_extended.png \
