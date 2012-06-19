@@ -133,7 +133,14 @@ static bool CheckContentType( stream_t * p_stream, const char * psz_ctype )
     char *psz_check = stream_ContentType( p_stream );
     if( !psz_check ) return false;
 
-    int i_res = strncasecmp( psz_check, psz_ctype, strlen( psz_check ) );
+    int i_len = strlen( psz_check );
+    if ( i_len == 0 )
+    {
+        free( psz_check );
+        return false;
+    }
+
+    int i_res = strncasecmp( psz_check, psz_ctype, i_len );
     free( psz_check );
 
     return ( i_res == 0 ) ? true : false;
