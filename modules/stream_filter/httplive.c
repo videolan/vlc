@@ -2154,11 +2154,11 @@ static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
             else
                 segment_RestorePos(segment);
 
-            p_sys->playback.segment++;
             vlc_mutex_unlock(&segment->lock);
 
             /* signal download thread */
             vlc_mutex_lock(&p_sys->download.lock_wait);
+            p_sys->playback.segment++;
             vlc_cond_signal(&p_sys->download.wait);
             vlc_mutex_unlock(&p_sys->download.lock_wait);
             continue;
