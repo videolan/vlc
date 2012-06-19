@@ -1996,6 +1996,9 @@ static void Close(vlc_object_t *p_this)
 
     /* */
     vlc_mutex_lock(&p_sys->download.lock_wait);
+    /* negate the condition variable's predicate */
+    p_sys->download.segment = p_sys->playback.segment = 0;
+    p_sys->download.seek = 0; /* better safe than sorry */
     vlc_cond_signal(&p_sys->download.wait);
     vlc_mutex_unlock(&p_sys->download.lock_wait);
 
