@@ -156,7 +156,7 @@ case "${host_os}" in
     OBJCFLAGS="${OBJCFLAGS} -D_INTL_REDIRECT_MACROS -std=gnu99 ${ARCH_flag}"
     LDFLAGS="${LDFLAGS} -Wl,-headerpad_max_install_names ${ARCH_flag}"
     VLC_ADD_LIBS([mkv mp4 motion], [-Wl,-framework,IOKit,-framework,CoreFoundation])
-    VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup])
+    VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup,-framework,Appkit])
     VLC_ADD_LIBS([avcodec avformat access_avio swscale postproc i420_rgb_mmx x264 x26410b],[-Wl,-read_only_relocs,suppress])
     VLC_ADD_CFLAGS([motion],[-fconstant-cfstrings])
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation])
