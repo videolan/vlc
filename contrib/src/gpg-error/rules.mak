@@ -12,9 +12,11 @@ libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.bz2 .sum-gpg-error
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/gpg-error/windres-make.patch
 endif
+	$(APPLY) $(SRC)/gpg-error/cppflags.patch
 	$(MOVE)
 
 .gpg-error: libgpg-error
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-nls --disable-shared --disable-languages
 	cd $< && $(MAKE) install
 	touch $@
