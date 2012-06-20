@@ -56,8 +56,6 @@ DialogHandler::DialogHandler (intf_thread_t *p_intf, QObject *_parent)
                       Qt::BlockingQueuedConnection);
     question.addCallback(this, SLOT(requestAnswer(void *)),
                          Qt::BlockingQueuedConnection);
-    question.addCallback(this, SLOT(requestAnswer(void *)),
-                         Qt::BlockingQueuedConnection);
     progressBar.addCallback(this, SLOT(startProgressBar(void *)),
                             Qt::BlockingQueuedConnection);
     connect (this,
