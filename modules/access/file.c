@@ -182,6 +182,11 @@ int FileOpen( vlc_object_t *p_this )
         msg_Err (p_access, "failed to read (%m)");
         goto error;
     }
+
+    if (!S_ISFIFO (st.st_mode) && !S_ISSOCK (st.st_mode))
+        /* Clear non-blocking mode when not useful or not specified */
+        fcntl (fd, F_SETFL, fcntl (fd, F_GETFL) & ~O_NONBLOCK);
+
     /* Directories can be opened and read from, but only readdir() knows
      * how to parse the data. The directory plugin will do it. */
     if (S_ISDIR (st.st_mode))
