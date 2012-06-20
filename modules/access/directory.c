@@ -36,6 +36,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <errno.h>
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #   include <fcntl.h>
@@ -324,22 +325,18 @@ block_t *DirBlock (access_t *p_access)
     {
         DIR *handle;
 #ifdef HAVE_OPENAT
-        int fd = vlc_openat (dirfd (current->handle), entry, O_RDONLY);
+        int fd = vlc_openat (dirfd (current->handle), entry,
+                             O_RDONLY | O_DIRECTORY);
         if (fd == -1)
+        {
+            if (errno == ENOTDIR)
+                goto notdir;
             goto skip; /* File cannot be opened... forget it */
+        }
 
         struct stat st;
-        if (fstat (fd, &st))
-        {
-            close (fd);
-            goto skip; /* cannot stat?! */
-        }
-        if (!S_ISDIR (st.st_mode))
-        {
-            close (fd);
-            goto notdir;
-        }
-        if (p_sys->mode == MODE_NONE
+        if (fstat (fd, &st)
+         || p_sys->mode == MODE_NONE
          || has_inode_loop (current, st.st_dev, st.st_ino)
          || (handle = fdopendir (fd)) == NULL)
         {
