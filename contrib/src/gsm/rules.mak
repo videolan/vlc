@@ -11,14 +11,11 @@ gsm: libgsm_$(GSM_VERSION).tar.gz .sum-gsm
 	$(UNPACK)
 	mv gsm-1.0-* libgsm_$(GSM_VERSION)
 	$(APPLY) $(SRC)/gsm/gsm-cross.patch
+	sed -e 's/^CFLAGS.*=/CFLAGS+=/' -i.orig libgsm_$(GSM_VERSION)/Makefile
 	$(MOVE)
-ifdef HAVE_DARWIN_OS
-	(cd $@; sed -e 's%-O2%-O2\ $(EXTRA_CFLAGS)\ $(EXTRA_LDFLAGS)%' -e 's%# LDFLAGS >=%LDFLAGS >-= $(EXTRA_LDFLAGS)%' -e 's%gcc%$(CC)%' -i.orig  Makefile)
-endif
-	(cd $@; sed -i -e 's%-O2%-O2 -fPIC%' Makefile)
 
 .gsm: gsm
-	cd $< && $(HOSTVARS) $(MAKE)
+	cd $< && $(HOSTVARS_PIC) $(MAKE)
 	mkdir -p "$(PREFIX)/include/gsm" "$(PREFIX)/lib"
 	cp $</inc/gsm.h "$(PREFIX)/include/gsm/"
 	cp $</lib/libgsm.a "$(PREFIX)/lib/"
