@@ -511,11 +511,9 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, intf_thread_t *_p_i )
 
     setMinimumHeight( 128 );
     setMinimumWidth( 128 );
-    setMaximumHeight( 128 );
     setScaledContents( false );
     setAlignment( Qt::AlignCenter );
 
-    QList< QAction* > artActions = actions();
     QAction *action = new QAction( qtr( "Download cover art" ), this );
     CONNECT( action, triggered(), this, askForUpdate() );
     addAction( action );

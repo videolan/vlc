@@ -69,7 +69,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     /* Create a Container for the Art Label
        in order to have a beautiful resizing for the selector above it */
     artContainer = new QStackedWidget;
-    artContainer->setMaximumHeight( 128 );
+    artContainer->setMaximumHeight( 256 );
 
     /* Art label */
     CoverArtLabel *art = new CoverArtLabel( artContainer, p_intf );
