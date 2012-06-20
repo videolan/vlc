@@ -112,7 +112,7 @@ QAction *addDPStaticEntry( QMenu *menu,
             action = menu->addAction( text, THEDP, member );
     }
 #ifdef __APPLE__
-    action->setMenuRole( role )
+    action->setMenuRole( role );
 #else
     Q_UNUSED( role );
 #endif
