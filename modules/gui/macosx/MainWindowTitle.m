@@ -26,6 +26,7 @@
 #import "MainWindowTitle.h"
 #import "CoreInteraction.h"
 #import "CompatibilityFixes.h"
+#import <SystemConfiguration/SystemConfiguration.h> // for the revealInFinder clone
 
 /*****************************************************************************
  * VLCMainWindowTitleView
@@ -451,5 +452,125 @@
     return ([theAttributeName isEqualToString: NSAccessibilitySubroleAttribute] ? NSAccessibilityFullScreenButtonAttribute : nil);
 }
 #endif
+
+@end
+
+
+@implementation VLCWindowTitleTextField
+
+- (void)dealloc
+{
+    if (contextMenu)
+        [contextMenu release];
+
+    [super dealloc];
+}
+
+- (void)showRightClickMenuWithEvent:(NSEvent *)o_event
+{
+    if (contextMenu)
+        [contextMenu release];
+
+    NSURL * representedURL = [[self window] representedURL];
+    if (! representedURL)
+        return;
+
+    NSArray * pathComponents;
+
+    if (OSX_SNOW_LEOPARD || OSX_LION)
+        pathComponents = [representedURL pathComponents];
+    else
+        pathComponents = [[representedURL path] pathComponents];
+
+    if (!pathComponents)
+        return;
+
+    contextMenu = [[NSMenu alloc] initWithTitle: [[NSFileManager defaultManager] displayNameAtPath: [representedURL path]]];
+
+    NSUInteger count = [pathComponents count];
+    NSImage * icon;
+    NSMenuItem * currentItem;
+    NSMutableString * currentPath;
+    NSSize iconSize = NSMakeSize( 16., 16. );
+    for (NSUInteger i = count - 1; i > 0; i--) {
+        currentPath = [NSMutableString stringWithCapacity:1024];
+        for (NSUInteger y = 0; y < i; y++)
+            [currentPath appendFormat: @"/%@", [pathComponents objectAtIndex:y + 1]];
+
+        [contextMenu addItemWithTitle: [[NSFileManager defaultManager] displayNameAtPath: currentPath] action:@selector(revealInFinder:) keyEquivalent:@""];
+        currentItem = [contextMenu itemAtIndex:[contextMenu numberOfItems] - 1];
+        [currentItem setTarget: self];
+
+        icon = [[NSWorkspace sharedWorkspace] iconForFile:currentPath];
+        [icon setSize: iconSize];
+        [currentItem setImage: icon];
+    }
+
+    if ([[pathComponents objectAtIndex: 1] isEqualToString:@"Users"]) {
+        /* we're on the boot drive, so add it is since it isn't part of the components */
+        [contextMenu addItemWithTitle: [[NSFileManager defaultManager] displayNameAtPath:@"/"] action:@selector(revealInFinder:) keyEquivalent:@""];
+        currentItem = [contextMenu itemAtIndex: [contextMenu numberOfItems] - 1];
+        icon = [[NSWorkspace sharedWorkspace] iconForFile:@"/"];
+        [icon setSize: iconSize];
+        [currentItem setImage: icon];
+        [currentItem setTarget: self];
+    }
+
+    /* add the computer item */
+    [contextMenu addItemWithTitle: [(NSString*)SCDynamicStoreCopyComputerName(NULL, NULL) autorelease] action:@selector(revealInFinder:) keyEquivalent:@""];
+    currentItem = [contextMenu itemAtIndex: [contextMenu numberOfItems] - 1];
+    icon = [NSImage imageNamed: NSImageNameComputer];
+    [icon setSize: iconSize];
+    [currentItem setImage: icon];
+    [currentItem setTarget: self];
+
+    [NSMenu popUpContextMenu: contextMenu withEvent: o_event forView: [self superview]];
+}
+
+- (IBAction)revealInFinder:(id)sender
+{
+    NSUInteger count = [contextMenu numberOfItems];
+    NSUInteger selectedItem = [contextMenu indexOfItem: sender];
+
+    if (selectedItem == count - 1)  // the fake computer item
+    {
+        [[NSWorkspace sharedWorkspace] selectFile: @"/" inFileViewerRootedAtPath: @""];
+        return;
+    }
+
+    NSURL * representedURL = [[self window] representedURL];
+    if (! representedURL)
+        return;
+
+    if (selectedItem == 0) // the actual file, let's save time
+    {
+        [[NSWorkspace sharedWorkspace] selectFile: [representedURL path] inFileViewerRootedAtPath: [representedURL path]];
+        return;
+    }
+
+    NSArray * pathComponents;
+    if (OSX_SNOW_LEOPARD || OSX_LION)
+        pathComponents = [representedURL pathComponents];
+    else
+        pathComponents = [[representedURL path] pathComponents];
+    if (!pathComponents)
+        return;
+
+    NSMutableString * currentPath;
+    currentPath = [NSMutableString stringWithCapacity:1024];
+    selectedItem = count - selectedItem;
+    for (NSUInteger y = 1; y < selectedItem; y++)
+        [currentPath appendFormat: @"/%@", [pathComponents objectAtIndex:y]];
+
+    [[NSWorkspace sharedWorkspace] selectFile: currentPath inFileViewerRootedAtPath: currentPath];
+}
+
+- (void)rightMouseDown:(NSEvent *)o_event
+{
+    if( [o_event type] == NSRightMouseDown )
+        [self showRightClickMenuWithEvent:o_event];
+
+    [super mouseDown: o_event];
+}
 
 @end

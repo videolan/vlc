@@ -103,3 +103,10 @@
 {
 }
 @end
+
+@interface VLCWindowTitleTextField : NSTextField
+{
+    NSMenu * contextMenu;
+}
+
+@end
