@@ -301,6 +301,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_ptc_description setTitle: _NS("Description")];
     [o_mi_ptc_date setTitle: _NS("Date")];
     [o_mi_ptc_language setTitle: _NS("Language")];
+    [o_mi_ptc_uri setTitle: _NS("URI")];
 
     [o_mi_program setTitle: _NS("Program")];
     [o_mu_program setTitle: _NS("Program")];
@@ -669,6 +670,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
         o_column = DATE_COLUMN;
     else if (sender == o_mi_ptc_language)
         o_column = LANGUAGE_COLUMN;
+    else if (sender == o_mi_ptc_uri)
+        o_column = URI_COLUMN;
 
     [[[VLCMain sharedInstance] playlist] setColumn: o_column state: [sender state]];
 }
@@ -693,6 +696,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
         [o_mi_ptc_date setState: i_state];
     else if ([o_column isEqualToString: LANGUAGE_COLUMN])
         [o_mi_ptc_language setState: i_state];
+    else if ([o_column isEqualToString: URI_COLUMN])
+        [o_mi_ptc_uri setState: i_state];
 }
 
 #pragma mark -

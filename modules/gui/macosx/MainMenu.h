@@ -117,6 +117,7 @@
     IBOutlet NSMenuItem * o_mi_ptc_description;
     IBOutlet NSMenuItem * o_mi_ptc_date;
     IBOutlet NSMenuItem * o_mi_ptc_language;
+    IBOutlet NSMenuItem * o_mi_ptc_uri;
 
     IBOutlet NSMenu * o_mu_audio;
     IBOutlet NSMenuItem * o_mi_vol_up;

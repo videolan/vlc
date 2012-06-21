@@ -35,6 +35,7 @@
 #define DESCRIPTION_COLUMN @"description"
 #define DATE_COLUMN @"date"
 #define LANGUAGE_COLUMN @"language"
+#define URI_COLUMN @"uri"
 
 /*****************************************************************************
  * VLCPlaylistView interface

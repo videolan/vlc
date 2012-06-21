@@ -390,6 +390,14 @@
             free( psz_value ); \
         }
     }
+    else if( [o_identifier isEqualToString:URI_COLUMN] )
+    {
+        psz_value = decode_URI(input_item_GetURI( p_item->p_input )); \
+        if (psz_value) { \
+            o_value = [NSString stringWithUTF8String: psz_value]; \
+            free( psz_value ); \
+        }
+    }
     else if( [o_identifier isEqualToString:@"status"] )
     {
         if( input_item_HasErrorWhenReading( p_item->p_input ) )
@@ -1394,6 +1402,8 @@
         i_mode = SORT_ALBUM;
     else if( [o_identifier isEqualToString:DESCRIPTION_COLUMN] )
         i_mode = SORT_DESCRIPTION;
+    else if( [o_identifier isEqualToString:URI_COLUMN] )
+        i_mode = SORT_URI;
     else
         return;
 
@@ -1507,6 +1517,8 @@
             [[o_work_tc headerCell] setStringValue: _NS("Date")];
         else if ([o_column isEqualToString: LANGUAGE_COLUMN])
             [[o_work_tc headerCell] setStringValue: _NS("Language")];
+        else if ([o_column isEqualToString: URI_COLUMN])
+            [[o_work_tc headerCell] setStringValue: _NS("URI")];
 
         [o_outline_view addTableColumn: o_work_tc];
         [o_work_tc release];
