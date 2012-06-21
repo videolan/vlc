@@ -428,7 +428,7 @@ static void gnutls_x509_AddFD (vlc_object_t *obj,
     block_t *block = block_File (fd);
     if (block != NULL)
     {
-        gnutls_datum data = {
+        gnutls_datum_t data = {
             .data = block->p_buffer,
             .size = block->i_buffer,
         };
@@ -451,7 +451,7 @@ static void gnutls_x509_AddFD (vlc_object_t *obj,
 }
 
 static void gnutls_x509_AddPath (vlc_object_t *obj,
-                                 gnutls_certificate_credentials cred,
+                                 gnutls_certificate_credentials_t cred,
                                  const char *path, bool priv)
 {
     msg_Dbg (obj, "loading x509 credentials in %s...", path);
