@@ -3,7 +3,7 @@ set -e
 
 PLATFORM=OS
 VERBOSE=no
-SDK_VERSION=5.0
+SDK_VERSION=5.1
 SDK_MIN=5.0
 
 usage()
