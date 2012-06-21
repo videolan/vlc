@@ -506,8 +506,13 @@
         [currentItem setImage: icon];
     }
 
-    if ([[pathComponents objectAtIndex: 1] isEqualToString:@"Users"]) {
-        /* we're on the boot drive, so add it is since it isn't part of the components */
+    if ([[pathComponents objectAtIndex: 1] isEqualToString:@"Volumes"]) {
+        /* we don't want to show the Volumes item, since the Cocoa does it neither */
+        currentItem = [contextMenu itemWithTitle:[[NSFileManager defaultManager] displayNameAtPath: @"/Volumes"]];
+        if (currentItem)
+            [contextMenu removeItem: currentItem];
+    } else {
+        /* we're on the boot drive, so add it since it isn't part of the components */
         [contextMenu addItemWithTitle: [[NSFileManager defaultManager] displayNameAtPath:@"/"] action:@selector(revealInFinder:) keyEquivalent:@""];
         currentItem = [contextMenu itemAtIndex: [contextMenu numberOfItems] - 1];
         icon = [[NSWorkspace sharedWorkspace] iconForFile:@"/"];
@@ -559,6 +564,11 @@
     NSMutableString * currentPath;
     currentPath = [NSMutableString stringWithCapacity:1024];
     selectedItem = count - selectedItem;
+
+    /* fix for non-startup volumes */
+    if ([[pathComponents objectAtIndex:1] isEqualToString:@"Volumes"])
+        selectedItem += 1;
+
     for (NSUInteger y = 1; y < selectedItem; y++)
         [currentPath appendFormat: @"/%@", [pathComponents objectAtIndex:y]];
 
