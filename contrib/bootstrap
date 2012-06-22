@@ -188,8 +188,9 @@ check_android_sdk()
 {
 	[ -z "${ANDROID_NDK}" ] && echo "You must set ANDROID_NDK environment variable" && exit 1
 	add_make "ANDROID_NDK := ${ANDROID_NDK}"
+	[ -z "${ANDROID_ABI}" ] && echo "You must set ANDROID_ABI environment variable" && exit 1
+	add_make "ANDROID_ABI := ${ANDROID_ABI}"
 	test -z "${NO_NEON}" && add_make_enabled "HAVE_NEON"
-	test -n "${TEGRA2}" && add_make_enabled "HAVE_TEGRA2"
 }
 
 test -z "$PREFIX" || add_make "PREFIX := $PREFIX"

@@ -102,21 +102,8 @@ endif
 ifdef HAVE_ANDROID
 CC :=  $(HOST)-gcc --sysroot=$(ANDROID_NDK)/platforms/android-9/arch-arm
 CXX := $(HOST)-g++ --sysroot=$(ANDROID_NDK)/platforms/android-9/arch-arm
-ifdef HAVE_NEON
-    ANDROID_ABI = armeabi-v7a
-    ANDROID_CPU_FLAGS = -mfpu=neon -mcpu=cortex-a8
-else
-ifdef HAVE_TEGRA2
-    ANDROID_ABI = armeabi-v7a
-    ANDROID_CPU_FLAGS = -mfpu=vfpv3-d16 -mcpu=cortex-a9
-else
-    ANDROID_ABI = armeabi
-    ANDROID_CPU_FLAGS = -mcpu=arm1136jf-s -mfpu=vfp
-endif
-endif
 EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/include
 EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/libs/$(ANDROID_ABI)/include
-EXTRA_CFLAGS += -mfloat-abi=softfp $(ANDROID_CPU_FLAGS)
 endif
 
 ifdef HAVE_MACOSX
