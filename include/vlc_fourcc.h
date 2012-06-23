@@ -452,6 +452,8 @@
 #define VLC_CODEC_OGT       VLC_FOURCC('o','g','t',' ')
 #define VLC_CODEC_CVD       VLC_FOURCC('c','v','d',' ')
 #define VLC_CODEC_TX3G      VLC_FOURCC('t','x','3','g')
+#define VLC_CODEC_ARIB_A    VLC_FOURCC('a','r','b','a')
+#define VLC_CODEC_ARIB_C    VLC_FOURCC('a','r','b','c')
 /* Blu-ray Presentation Graphics */
 #define VLC_CODEC_BD_PG     VLC_FOURCC('b','d','p','g')
 /* EBU STL (TECH. 3264-E) */

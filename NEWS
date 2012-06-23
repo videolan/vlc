@@ -10,6 +10,7 @@ Access:
 Decoder:
  * OMX GPU-zerocopy support for decoding and display on Android using OpenMax IL
  * Support 4:4:4 chroma sampling with VDPAU hw acceleration
+ * Support for ARIB B24 subtitles
 
 Demuxers:
  * Support HD-DVD .evo (H.264, VC-1, MPEG-2, PCM, AC-3, E-AC3, MLP, DTS)

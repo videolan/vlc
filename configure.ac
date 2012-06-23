@@ -3033,6 +3033,24 @@ AS_IF( [test "${enable_libass}" != "no"], [
   ])
 
 dnl
+dnl ARIB subtitles rendering module
+dnl
+AC_ARG_ENABLE(aribsub,
+  [  --enable-aribsub        ARIB Subtitles support (default enabled)])
+AS_IF( [test "${enable_aribsub}" != "no" ],[
+  PKG_CHECK_MODULES(ARIBB24, [aribb24 >= 1.0.1], [
+      have_aribb24="yes"
+      VLC_ADD_PLUGIN([aribsub])
+      VLC_ADD_LIBS([aribsub],[-laribb24])
+      AC_DEFINE(HAVE_ARIBB24, 1, [Define if libaribb24 is available.])
+    ],[
+      AC_MSG_WARN(Library [aribb24] needed for [aribsub] was not found)
+      have_aribb24="no"
+  ])
+  AM_CONDITIONAL([HAVE_ARIBB24], [test "${have_aribb24}" = "yes"])
+])
+
+dnl
 dnl  kate decoder plugin
 dnl
 PKG_ENABLE_MODULES_VLC([KATE], [], [kate >= 0.3.0], [kate codec], [auto])

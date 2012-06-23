@@ -152,6 +152,11 @@ codec_LTLIBRARIES += libcvdsub_plugin.la
 libdvbsub_plugin_la_SOURCES = codec/dvbsub.c
 codec_LTLIBRARIES += libdvbsub_plugin.la
 
+libaribsub_plugin_la_SOURCES = codec/arib/aribsub.c codec/arib/substext.h
+libaribsub_plugin_la_CFLAGS = $(ARIBB24_CFLAGS)
+libaribsub_plugin_la_LIBADD = $(ARIBB24_LIBS)
+codec_LTLIBRARIES += libaribsub_plugin.la
+
 libscte27_plugin_la_SOURCES = codec/scte27.c
 codec_LTLIBRARIES += libscte27_plugin.la
 
