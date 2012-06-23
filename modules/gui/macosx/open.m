@@ -980,9 +980,18 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (IBAction)dvdreadOptionChanged:(id)sender
 {
+    NSString *o_device_path = [o_opticalDevices objectAtIndex: [o_disc_selector_pop indexOfSelectedItem]];
+    char *diskType = [self getVolumeTypeFromMountPath:o_device_path];
+
+    NSString *pathToOpen;
+    if (diskType == kVLCMediaVideoTSFolder)
+        pathToOpen = o_device_path;
+    else
+        pathToOpen = [self getBSDNodeFromMountPath: o_device_path];
+
     if (sender == o_disc_dvdwomenus_enablemenus_btn) {
         b_nodvdmenus = NO;
-        [self setMRL: [NSString stringWithFormat: @"dvdnav://%@", [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: [o_disc_selector_pop indexOfSelectedItem]]]]];
+        [self setMRL: [NSString stringWithFormat: @"dvdnav://%@", pathToOpen]];
         [self showOpticalMediaView: o_disc_dvd_view withIcon: [o_currentOpticalMediaIconView image]];
         return;
     }
@@ -1000,7 +1009,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     if (sender == o_disc_dvdwomenus_chapter_stp)
         [o_disc_dvdwomenus_chapter setIntValue: [o_disc_dvdwomenus_chapter_stp intValue]];
 
-    [self setMRL: [NSString stringWithFormat: @"dvdread://%@#%i:%i-", [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: [o_disc_selector_pop indexOfSelectedItem]]], [o_disc_dvdwomenus_title intValue], [o_disc_dvdwomenus_chapter intValue]]];
+    [self setMRL: [NSString stringWithFormat: @"dvdread://%@#%i:%i-", pathToOpen, [o_disc_dvdwomenus_title intValue], [o_disc_dvdwomenus_chapter intValue]]];
 }
 
 - (IBAction)vcdOptionChanged:(id)sender
