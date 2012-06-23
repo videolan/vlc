@@ -1,10 +1,11 @@
 /*****************************************************************************
  * opensles_android.c : audio output for android native code
  *****************************************************************************
- * Copyright © 2011 VideoLAN
+ * Copyright © 2011-2012 VideoLAN
  *
  * Authors: Dominique Martinet <asmadeus@codewreck.org>
  *          Hugo Beauzée-Luyssen <beauze.h@gmail.com>
+ *          Rafaël Carré <funman@videolanorg>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,6 +53,7 @@
     (*a)->CreateAudioPlayer(a, b, c, d, e, f, g)
 #define Enqueue(a, b, c) (*a)->Enqueue(a, b, c)
 #define Clear(a) (*a)->Clear(a)
+#define GetState(a, b) (*a)->GetState(a, b)
 
 /*****************************************************************************
  * aout_sys_t: audio output method descriptor
@@ -71,6 +73,7 @@ struct aout_sys_t
     vlc_mutex_t                     lock;
     block_t                        *p_chain;
     block_t                       **pp_last;
+    mtime_t                         length;
 
     void                           *p_so_handle;
 };
@@ -112,6 +115,29 @@ static void Clean( aout_sys_t *p_sys )
     free( p_sys );
 }
 
+static void Flush(audio_output_t *p_aout, bool wait)
+{
+    (void)wait; /* FIXME */
+    aout_sys_t *p_sys = p_aout->sys;
+
+    vlc_mutex_lock( &p_sys->lock );
+    SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_STOPPED );
+    Clear( p_sys->playerBufferQueue );
+    SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_PLAYING );
+    block_ChainRelease( p_sys->p_chain );
+    p_sys->p_chain = NULL;
+    p_sys->pp_last = &p_sys->p_chain;
+    vlc_mutex_unlock( &p_sys->lock );
+}
+
+static void Pause(audio_output_t *p_aout, bool pause, mtime_t date)
+{
+    (void)date;
+    aout_sys_t *p_sys = p_aout->sys;
+    SetPlayState( p_sys->playerPlay,
+        pause ? SL_PLAYSTATE_PAUSED : SL_PLAYSTATE_PLAYING );
+}
+
 /*****************************************************************************
  * Play: play a sound
  *****************************************************************************/
@@ -119,9 +145,23 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer )
 {
     aout_sys_t *p_sys = p_aout->sys;
     int tries = 5;
-    block_t **pp_last, *p_block;;
+    block_t **pp_last, *p_block;
+
+    SLAndroidSimpleBufferQueueState st;
+    SLresult res = GetState(p_sys->playerBufferQueue, &st);
+    if (unlikely(res != SL_RESULT_SUCCESS)) {
+        msg_Err(p_aout, "Could not query buffer queue state (%lu)", res);
+        st.count = 0;
+    }
+
+    if (!p_buffer->i_length) {
+        p_buffer->i_length = (mtime_t)(p_buffer->i_buffer / 2 / p_aout->format.i_channels) * CLOCK_FREQ / p_aout->format.i_rate;
+    }
 
     vlc_mutex_lock( &p_sys->lock );
+
+    mtime_t delay = p_sys->length;
+    p_sys->length += p_buffer->i_length;
 
     /* If something bad happens, we must remove this buffer from the FIFO */
     pp_last = p_sys->pp_last;
@@ -129,6 +169,10 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer )
 
     block_ChainLastAppend( &p_sys->pp_last, p_buffer );
     vlc_mutex_unlock( &p_sys->lock );
+
+    if (delay && st.count) {
+        aout_TimeReport(p_aout, p_buffer->i_pts - delay);
+    }
 
     for (;;)
     {
@@ -143,6 +187,7 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer )
             if (tries--)
             {
                 // Wait a bit to retry.
+                // FIXME: buffer in aout_sys_t and retry at next Play() call
                 msleep(CLOCK_FREQ);
                 continue;
             }
@@ -152,6 +197,7 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer )
             vlc_mutex_lock( &p_sys->lock );
             p_sys->pp_last = pp_last;
             *pp_last = p_block;
+            p_sys->length -= p_buffer->i_length;
             vlc_mutex_unlock( &p_sys->lock );
             block_Release( p_buffer );
         case SL_RESULT_SUCCESS:
@@ -162,8 +208,10 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer )
 
 static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext )
 {
+    (void)caller;
     block_t *p_block;
-    aout_sys_t *p_sys = pContext;
+    audio_output_t *p_aout = pContext;
+    aout_sys_t *p_sys = p_aout->sys;
 
     assert (caller == p_sys->playerBufferQueue);
 
@@ -177,6 +225,8 @@ static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext
      * appended block */
     if (!p_sys->p_chain)
         p_sys->pp_last = &p_sys->p_chain;
+
+    p_sys->length -= p_block->i_length;
 
     vlc_mutex_unlock( &p_sys->lock );
 
@@ -305,7 +355,7 @@ static int Open( vlc_object_t *p_this )
     CHECK_OPENSL_ERROR( "Failed to get buff queue interface" );
 
     result = RegisterCallback( p_sys->playerBufferQueue, PlayedCallback,
-                                   (void*)p_sys);
+                                   (void*)p_aout);
     CHECK_OPENSL_ERROR( "Failed to register buff queue callback." );
 
 
@@ -321,8 +371,8 @@ static int Open( vlc_object_t *p_this )
     p_aout->format.i_format              = VLC_CODEC_S16L;
     p_aout->format.i_physical_channels   = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     p_aout->pf_play                      = Play;
-    p_aout->pf_pause                     = NULL;
-    p_aout->pf_flush                     = NULL;
+    p_aout->pf_pause                     = Pause;
+    p_aout->pf_flush                     = Flush;
 
     aout_FormatPrepare( &p_aout->format );
 
