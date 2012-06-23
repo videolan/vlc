@@ -85,6 +85,7 @@ private:
     float f_buffering;
     SeekPoints* chapters;
     bool b_classic;
+    bool b_seekable;
     int mHandleLength;
 
     /* Colors & gradients */
@@ -102,6 +103,7 @@ private:
 
 public slots:
     void setPosition( float, int64_t, int );
+    void setSeekable( bool b ) { b_seekable = b ; }
     void updateBuffering( float );
     void hideHandle();
 

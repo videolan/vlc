@@ -218,6 +218,7 @@ signals:
     /// Used to signal whether we should show navigation buttons
     void titleChanged( bool );
     void chapterChanged( bool );
+    void inputCanSeek( bool );
     /// Statistics are updated
     void statisticsUpdated( input_item_t* );
     void infoChanged( input_item_t* );

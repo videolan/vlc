@@ -426,6 +426,11 @@ void InputManager::UpdateNavigation()
     }
     else
         emit chapterChanged( false );
+
+    if( hasInput() )
+        emit inputCanSeek( var_GetBool( p_input, "can-seek" ) );
+    else
+        emit inputCanSeek( false );
 }
 
 void InputManager::UpdateStatus()
