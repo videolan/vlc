@@ -837,21 +837,41 @@ static VLCOpen *_o_sharedMainInstance = nil;
             {
                 // NSFileManager is not thread-safe, don't use defaultManager outside of the main thread
                 NSFileManager * fm = [[NSFileManager alloc] init];
-                NSArray * topLevelItems;
-                topLevelItems = [fm subpathsOfDirectoryAtPath: mountPath error: NULL];
-                [fm release];
 
-                NSUInteger itemCount = [topLevelItems count];
-                for (int i = 0; i < itemCount; i++) {
-                    if([[topLevelItems objectAtIndex:i] rangeOfString:@"SVCD"].location != NSNotFound) {
-                        returnValue = kVLCMediaSVCD;
-                        break;
-                    }
-                    if([[topLevelItems objectAtIndex:i] rangeOfString:@"VCD"].location != NSNotFound) {
-                        returnValue = kVLCMediaVCD;
-                        break;
+                NSArray *dirContents = [fm contentsOfDirectoryAtPath:mountPath error:nil];
+                for (int i = 0; i < [dirContents count]; i++)
+                {
+                    NSString *currentFile = [dirContents objectAtIndex:i];
+                    NSString *fullPath = [mountPath stringByAppendingPathComponent:currentFile];
+
+                    BOOL isDir;
+                    if ([fm fileExistsAtPath:fullPath isDirectory:&isDir] && isDir)
+                    {                        
+                        if ([currentFile caseInsensitiveCompare:@"SVCD"] == NSOrderedSame)
+                        {
+                            returnValue = kVLCMediaSVCD;
+                            break;
+                        }
+                        if ([currentFile caseInsensitiveCompare:@"VCD"] == NSOrderedSame)
+                        {
+                            returnValue = kVLCMediaVCD;
+                            break;
+                        }
+                        if ([currentFile caseInsensitiveCompare:@"BDMV"] == NSOrderedSame)
+                        {
+                            returnValue = kVLCMediaBDMVFolder;
+                            break;
+                        }
+                        if ([currentFile caseInsensitiveCompare:@"VIDEO_TS"] == NSOrderedSame)
+                        {
+                            returnValue = kVLCMediaVideoTSFolder;
+                            break;
+                        }
                     }
                 }
+
+                [fm release];
+
                 if(!returnValue)
                     returnValue = kVLCMediaVideoTSFolder;
             }
