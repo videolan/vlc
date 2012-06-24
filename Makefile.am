@@ -116,58 +116,85 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/VideoEffects.xib \
 	extras/package/macosx/Resources/English.lproj/Wizard.xib \
 	extras/package/macosx/Resources/fspanel/fs_background.png \
-	extras/package/macosx/Resources/fspanel/fs_exit_fullscreen.png \
-	extras/package/macosx/Resources/fspanel/fs_exit_fullscreen_highlight.png \
-	extras/package/macosx/Resources/fspanel/fs_forward.png \
-	extras/package/macosx/Resources/fspanel/fs_forward_highlight.png \
-	extras/package/macosx/Resources/fspanel/fs_pause.png \
-	extras/package/macosx/Resources/fspanel/fs_pause_highlight.png \
-	extras/package/macosx/Resources/fspanel/fs_play.png \
-	extras/package/macosx/Resources/fspanel/fs_play_highlight.png \
-	extras/package/macosx/Resources/fspanel/fs_rewind.png \
-	extras/package/macosx/Resources/fspanel/fs_rewind_highlight.png \
-	extras/package/macosx/Resources/fspanel/fs_skip_next.png \
-	extras/package/macosx/Resources/fspanel/fs_skip_next_highlight.png \
-	extras/package/macosx/Resources/fspanel/fs_skip_previous.png \
-	extras/package/macosx/Resources/fspanel/fs_skip_previous_highlight.png \
-	extras/package/macosx/Resources/fspanel/fs_stop.png \
-	extras/package/macosx/Resources/fspanel/fs_stop_highlight.png \
-	extras/package/macosx/Resources/fspanel/fs_time_slider.png \
-	extras/package/macosx/Resources/fspanel/fs_time_slider_knob.png \
-	extras/package/macosx/Resources/fspanel/fs_time_slider_knob_highlight.png \
-	extras/package/macosx/Resources/fspanel/fs_volume_max.png \
-	extras/package/macosx/Resources/fspanel/fs_volume_max_highlight.png \
-	extras/package/macosx/Resources/fspanel/fs_volume_mute.png \
-	extras/package/macosx/Resources/fspanel/fs_volume_mute_highlight.png \
-	extras/package/macosx/Resources/fspanel/fs_volume_slider_bar.png \
-	extras/package/macosx/Resources/fspanel/fs_volume_slider_knob.png \
-	extras/package/macosx/Resources/fspanel/fs_volume_slider_knob_highlight.png \
+	extras/package/macosx/Resources/fspanel/fs_background@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_background@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_exit_fullscreen.png \
+	extras/package/macosx/Resources/fspanel/fs_exit_fullscreen@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_exit_fullscreen@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_exit_fullscreen_highlight.png \
+	extras/package/macosx/Resources/fspanel/fs_exit_fullscreen_highlight@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_exit_fullscreen_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_forward.png \
+	extras/package/macosx/Resources/fspanel/fs_forward@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_forward@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_forward_highlight.png \
+	extras/package/macosx/Resources/fspanel/fs_forward_highlight@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_forward_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_pause.png \
+	extras/package/macosx/Resources/fspanel/fs_pause@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_pause@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_pause_highlight.png \
+	extras/package/macosx/Resources/fspanel/fs_pause_highlight@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_pause_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_play.png \
+	extras/package/macosx/Resources/fspanel/fs_play@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_play@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_play_highlight.png \
+	extras/package/macosx/Resources/fspanel/fs_play_highlight@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_play_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_rewind.png \
+	extras/package/macosx/Resources/fspanel/fs_rewind@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_rewind@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_rewind_highlight.png \
+	extras/package/macosx/Resources/fspanel/fs_rewind_highlight@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_rewind_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_skip_next.png \
+	extras/package/macosx/Resources/fspanel/fs_skip_next@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_skip_next@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_skip_next_highlight.png \
+	extras/package/macosx/Resources/fspanel/fs_skip_next_highlight@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_skip_next_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_skip_previous.png \
+	extras/package/macosx/Resources/fspanel/fs_skip_previous@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_skip_previous@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_skip_previous_highlight.png \
+	extras/package/macosx/Resources/fspanel/fs_skip_previous_highlight@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_skip_previous_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_stop.png \
+	extras/package/macosx/Resources/fspanel/fs_stop@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_stop@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_stop_highlight.png \
+	extras/package/macosx/Resources/fspanel/fs_stop_highlight@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_stop_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_time_slider.png \
+	extras/package/macosx/Resources/fspanel/fs_time_slider@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_time_slider@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_time_slider_knob.png \
+	extras/package/macosx/Resources/fspanel/fs_time_slider_knob@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_time_slider_knob@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_time_slider_knob_highlight.png \
+	extras/package/macosx/Resources/fspanel/fs_time_slider_knob_highlight@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_time_slider_knob_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_max.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_max@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_volume_max@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_max_highlight.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_max_highlight@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_volume_max_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_mute.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_mute@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_volume_mute@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_mute_highlight.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_mute_highlight@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_volume_mute_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_slider_bar.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_slider_bar@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_volume_slider_bar@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_slider_knob.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_slider_knob@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_volume_slider_knob@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_slider_knob_highlight.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_slider_knob_highlight@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_volume_slider_knob_highlight@x1.5.png \
 	extras/package/macosx/Resources/icons/aiff.icns \
 	extras/package/macosx/Resources/icons/audio.icns \
@@ -349,18 +376,18 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/prefs/spref_cone_Subtitles_64.png \
 	extras/package/macosx/Resources/prefs/spref_cone_Video_64.png \
 	extras/package/macosx/Resources/README \
-	extras/package/macosx/Resources/sidebar-icons//sidebar-local.png \
-	extras/package/macosx/Resources/sidebar-icons//sidebar-local@2x.png \
-	extras/package/macosx/Resources/sidebar-icons//sidebar-movie.png \
-	extras/package/macosx/Resources/sidebar-icons//sidebar-movie@2x.png \
-	extras/package/macosx/Resources/sidebar-icons//sidebar-music.png \
-	extras/package/macosx/Resources/sidebar-icons//sidebar-music@2x.png \
-	extras/package/macosx/Resources/sidebar-icons//sidebar-pictures.png \
-	extras/package/macosx/Resources/sidebar-icons//sidebar-pictures@2x.png \
-	extras/package/macosx/Resources/sidebar-icons//sidebar-playlist.png \
-	extras/package/macosx/Resources/sidebar-icons//sidebar-playlist@2x.png \
-	extras/package/macosx/Resources/sidebar-icons//sidebar-podcast.png \
-	extras/package/macosx/Resources/sidebar-icons//sidebar-podcast@2x.png \
+	extras/package/macosx/Resources/sidebar-icons/sidebar-local.png \
+	extras/package/macosx/Resources/sidebar-icons/sidebar-local@2x.png \
+	extras/package/macosx/Resources/sidebar-icons/sidebar-movie.png \
+	extras/package/macosx/Resources/sidebar-icons/sidebar-movie@2x.png \
+	extras/package/macosx/Resources/sidebar-icons/sidebar-music.png \
+	extras/package/macosx/Resources/sidebar-icons/sidebar-music@2x.png \
+	extras/package/macosx/Resources/sidebar-icons/sidebar-pictures.png \
+	extras/package/macosx/Resources/sidebar-icons/sidebar-pictures@2x.png \
+	extras/package/macosx/Resources/sidebar-icons/sidebar-playlist.png \
+	extras/package/macosx/Resources/sidebar-icons/sidebar-playlist@2x.png \
+	extras/package/macosx/Resources/sidebar-icons/sidebar-podcast.png \
+	extras/package/macosx/Resources/sidebar-icons/sidebar-podcast@2x.png \
 	extras/package/macosx/Resources/vlc.scriptSuite \
 	extras/package/macosx/Resources/vlc.scriptTerminology \
 	extras/package/macosx/build-package.sh \
