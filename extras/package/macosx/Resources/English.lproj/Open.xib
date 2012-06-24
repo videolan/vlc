@@ -13,6 +13,7 @@
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <integer value="2787"/>
+      <integer value="2837"/>
       <integer value="637"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
@@ -4607,7 +4608,7 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
         <bool key="NSWindowIsRestorable">YES</bool>
       </object>
       <object class="NSCustomView" id="146872184">
-        <nil key="NSNextResponder"/>
+        <reference key="NSNextResponder"/>
         <int key="NSvFlags">256</int>
         <object class="NSMutableArray" key="NSSubviews">
           <bool key="EncodedWithXMLCoder">YES</bool>
@@ -4628,7 +4629,7 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
                     <reference key="NSSuperview" ref="907806527"/>
                     <bool key="NSEnabled">YES</bool>
                     <object class="NSTextFieldCell" key="NSCell" id="461334910">
-                      <int key="NSCellFlags">-1804468671</int>
+                      <int key="NSCellFlags">-2072904127</int>
                       <int key="NSCellFlags2">4326400</int>
                       <string key="NSContents"/>
                       <reference key="NSSupport" ref="26"/>
@@ -4667,6 +4668,7 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
           </object>
         </object>
         <string key="NSFrameSize">{553, 52}</string>
+        <reference key="NSSuperview"/>
         <reference key="NSNextKeyView" ref="615662556"/>
         <string key="NSClassName">NSView</string>
         <string key="NSExtension">NSResponder</string>
@@ -11472,6 +11474,7 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
           <string>2835.CustomClassName</string>
           <string>2835.IBPluginDependency</string>
           <string>2836.IBPluginDependency</string>
+          <string>2837.IBEditorWindowLastContentRect</string>
           <string>2837.IBPluginDependency</string>
           <string>2838.IBPluginDependency</string>
           <string>2840.IBPluginDependency</string>
@@ -11892,7 +11895,7 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{887, 1167}, {528, 222}}</string>
+          <string>{{752, 534}, {528, 222}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -11941,6 +11944,7 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
           <string>VLCOpenTextField</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>{{329, 693}, {553, 52}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12210,9 +12214,9 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{340, 1005}, {574, 380}}</string>
+          <string>{{706, 376}, {574, 380}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{340, 1005}, {574, 380}}</string>
+          <string>{{706, 376}, {574, 380}}</string>
           <boolean value="YES"/>
           <string>{213, 107}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
