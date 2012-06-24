@@ -220,25 +220,39 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/icons/wmv.icns \
 	extras/package/macosx/Resources/mainwindow/back-pressed-single.png \
 	extras/package/macosx/Resources/mainwindow/back-pressed.png \
+	extras/package/macosx/Resources/mainwindow/back-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/back-single.png \
 	extras/package/macosx/Resources/mainwindow/back.png \
+	extras/package/macosx/Resources/mainwindow/back@2x.png \
 	extras/package/macosx/Resources/mainwindow/bottom-background.png \
+	extras/package/macosx/Resources/mainwindow/bottom-background@2x.png \
 	extras/package/macosx/Resources/mainwindow/bottombar-mini.png \
 	extras/package/macosx/Resources/mainwindow/dropzone-background.png \
 	extras/package/macosx/Resources/mainwindow/dropzone.png \
 	extras/package/macosx/Resources/mainwindow/effects-double-buttons-blue.png \
+	extras/package/macosx/Resources/mainwindow/effects-double-buttons-blue@2x.png \
 	extras/package/macosx/Resources/mainwindow/effects-double-buttons-pressed.png \
+	extras/package/macosx/Resources/mainwindow/effects-double-buttons-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/effects-double-buttons.png \
+	extras/package/macosx/Resources/mainwindow/effects-double-buttons@2x.png \
 	extras/package/macosx/Resources/mainwindow/effects-one-button-blue.png \
+	extras/package/macosx/Resources/mainwindow/effects-one-button-blue@2x.png \
 	extras/package/macosx/Resources/mainwindow/effects-one-button.png \
+	extras/package/macosx/Resources/mainwindow/effects-one-button@2x.png \
 	extras/package/macosx/Resources/mainwindow/forward-pressed-single.png \
 	extras/package/macosx/Resources/mainwindow/forward-pressed.png \
+	extras/package/macosx/Resources/mainwindow/forward-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/forward-single.png \
 	extras/package/macosx/Resources/mainwindow/forward.png \
+	extras/package/macosx/Resources/mainwindow/forward@2x.png \
 	extras/package/macosx/Resources/mainwindow/fullscreen-double-buttons-pressed.png \
+	extras/package/macosx/Resources/mainwindow/fullscreen-double-buttons-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/fullscreen-double-buttons.png \
+	extras/package/macosx/Resources/mainwindow/fullscreen-double-buttons@2x.png \
 	extras/package/macosx/Resources/mainwindow/fullscreen-one-button-pressed.png \
+	extras/package/macosx/Resources/mainwindow/fullscreen-one-button-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/fullscreen-one-button.png \
+	extras/package/macosx/Resources/mainwindow/fullscreen-one-button@2x.png \
 	extras/package/macosx/Resources/mainwindow/mini-progressbar-fill-left.png \
 	extras/package/macosx/Resources/mainwindow/mini-progressbar-fill-middle.png \
 	extras/package/macosx/Resources/mainwindow/mini-progressbar-fill-right.png \
@@ -247,36 +261,66 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/mini-progressbar-wrapper-middle.png \
 	extras/package/macosx/Resources/mainwindow/mini-progressbar-wrapper-right.png \
 	extras/package/macosx/Resources/mainwindow/pause-pressed.png \
+	extras/package/macosx/Resources/mainwindow/pause-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/pause.png \
+	extras/package/macosx/Resources/mainwindow/pause@2x.png \
 	extras/package/macosx/Resources/mainwindow/play-pressed.png \
+	extras/package/macosx/Resources/mainwindow/play-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/play.png \
+	extras/package/macosx/Resources/mainwindow/play@2x.png \
+	extras/package/macosx/Resources/mainwindow/playlist-blue@2x.png \
 	extras/package/macosx/Resources/mainwindow/playlist-btn-blue.png \
 	extras/package/macosx/Resources/mainwindow/playlist-btn-pressed.png \
 	extras/package/macosx/Resources/mainwindow/playlist-btn.png \
+	extras/package/macosx/Resources/mainwindow/playlist-btn@2x.png \
+	extras/package/macosx/Resources/mainwindow/playlist-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/progression-fill-left.png \
+	extras/package/macosx/Resources/mainwindow/progression-fill-left@2x.png \
 	extras/package/macosx/Resources/mainwindow/progression-fill-middle.png \
+	extras/package/macosx/Resources/mainwindow/progression-fill-middle@2x.png \
 	extras/package/macosx/Resources/mainwindow/progression-fill-right.png \
+	extras/package/macosx/Resources/mainwindow/progression-fill-right@2x.png \
 	extras/package/macosx/Resources/mainwindow/progression-knob.png \
+	extras/package/macosx/Resources/mainwindow/progression-knob@2x.png \
 	extras/package/macosx/Resources/mainwindow/progression-track-wrapper-left.png \
+	extras/package/macosx/Resources/mainwindow/progression-track-wrapper-left@2x.png \
 	extras/package/macosx/Resources/mainwindow/progression-track-wrapper-middle.png \
+	extras/package/macosx/Resources/mainwindow/progression-track-wrapper-middle@2x.png \
 	extras/package/macosx/Resources/mainwindow/progression-track-wrapper-right.png \
+	extras/package/macosx/Resources/mainwindow/progression-track-wrapper-right@2x.png \
 	extras/package/macosx/Resources/mainwindow/repeat-all-pressed.png \
+	extras/package/macosx/Resources/mainwindow/repeat-all-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/repeat-all.png \
+	extras/package/macosx/Resources/mainwindow/repeat-all@2x.png \
 	extras/package/macosx/Resources/mainwindow/repeat-one-pressed.png \
+	extras/package/macosx/Resources/mainwindow/repeat-one-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/repeat-one.png \
+	extras/package/macosx/Resources/mainwindow/repeat-one@2x.png \
 	extras/package/macosx/Resources/mainwindow/repeat-pressed.png \
+	extras/package/macosx/Resources/mainwindow/repeat-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/repeat.png \
+	extras/package/macosx/Resources/mainwindow/repeat@2x.png \
 	extras/package/macosx/Resources/mainwindow/shuffle-blue-pressed.png \
+	extras/package/macosx/Resources/mainwindow/shuffle-blue-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/shuffle-blue.png \
+	extras/package/macosx/Resources/mainwindow/shuffle-blue@2x.png \
 	extras/package/macosx/Resources/mainwindow/shuffle-pressed.png \
+	extras/package/macosx/Resources/mainwindow/shuffle-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/shuffle.png \
+	extras/package/macosx/Resources/mainwindow/shuffle@2x.png \
 	extras/package/macosx/Resources/mainwindow/stop-pressed.png \
+	extras/package/macosx/Resources/mainwindow/stop-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/stop.png \
+	extras/package/macosx/Resources/mainwindow/stop@2x.png \
 	extras/package/macosx/Resources/mainwindow/topbar_background.png \
 	extras/package/macosx/Resources/mainwindow/volume-high.png \
+	extras/package/macosx/Resources/mainwindow/volume-high@2x.png \
 	extras/package/macosx/Resources/mainwindow/volume-low.png \
+	extras/package/macosx/Resources/mainwindow/volume-low@2x.png \
 	extras/package/macosx/Resources/mainwindow/volume-slider-knob.png \
+	extras/package/macosx/Resources/mainwindow/volume-slider-knob@2x.png \
 	extras/package/macosx/Resources/mainwindow/volume-slider-track.png \
+	extras/package/macosx/Resources/mainwindow/volume-slider-track@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/back-pressed_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/back_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottom-background_dark.png \
