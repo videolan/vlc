@@ -349,12 +349,18 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/prefs/spref_cone_Subtitles_64.png \
 	extras/package/macosx/Resources/prefs/spref_cone_Video_64.png \
 	extras/package/macosx/Resources/README \
-	extras/package/macosx/Resources/sidebar-icons/sidebar-local.png \
-	extras/package/macosx/Resources/sidebar-icons/sidebar-movie.png \
-	extras/package/macosx/Resources/sidebar-icons/sidebar-music.png \
-	extras/package/macosx/Resources/sidebar-icons/sidebar-pictures.png \
-	extras/package/macosx/Resources/sidebar-icons/sidebar-playlist.png \
-	extras/package/macosx/Resources/sidebar-icons/sidebar-podcast.png \
+	extras/package/macosx/Resources/sidebar-icons//sidebar-local.png \
+	extras/package/macosx/Resources/sidebar-icons//sidebar-local@2x.png \
+	extras/package/macosx/Resources/sidebar-icons//sidebar-movie.png \
+	extras/package/macosx/Resources/sidebar-icons//sidebar-movie@2x.png \
+	extras/package/macosx/Resources/sidebar-icons//sidebar-music.png \
+	extras/package/macosx/Resources/sidebar-icons//sidebar-music@2x.png \
+	extras/package/macosx/Resources/sidebar-icons//sidebar-pictures.png \
+	extras/package/macosx/Resources/sidebar-icons//sidebar-pictures@2x.png \
+	extras/package/macosx/Resources/sidebar-icons//sidebar-playlist.png \
+	extras/package/macosx/Resources/sidebar-icons//sidebar-playlist@2x.png \
+	extras/package/macosx/Resources/sidebar-icons//sidebar-podcast.png \
+	extras/package/macosx/Resources/sidebar-icons//sidebar-podcast@2x.png \
 	extras/package/macosx/Resources/vlc.scriptSuite \
 	extras/package/macosx/Resources/vlc.scriptTerminology \
 	extras/package/macosx/build-package.sh \
