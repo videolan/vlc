@@ -586,26 +586,27 @@
     [[VLCCoreInteraction sharedInstance] setVolume: [sender intValue]];
 }
 
-#define addImage(image, _x, _y, mode, _width)                                               \
-    image_rect.size = [image size];                                                         \
+#define addImage(image, _x, _y, mode)                                                       \
+    image_size = [image size];                                                              \
+    image_rect.size = image_size;                                                           \
     image_rect.origin.x = 0;                                                                \
     image_rect.origin.y = 0;                                                                \
     frame.origin.x = _x;                                                                    \
     frame.origin.y = _y;                                                                    \
-    frame.size = [image size];                                                              \
-    if( _width ) frame.size.width = _width;                                                 \
+    frame.size = image_size;                                                                \
     [image drawInRect:frame fromRect:image_rect operation:mode fraction:1];
 
 - (void)drawRect:(NSRect)rect
 {
     NSRect frame = [self frame];
     NSRect image_rect;
+    NSSize image_size;
     NSImage *img;
-    addImage( o_background_img, 0, 0, NSCompositeCopy, 0 );
-    addImage( o_vol_sld_img, 26, 23, NSCompositeSourceOver, 0 );
-    addImage( o_vol_mute_img, 16, 18, NSCompositeSourceOver, 0 );
-    addImage( o_vol_max_img, 124, 18, NSCompositeSourceOver, 0 );
-    addImage( o_time_sld_img, 15, 53, NSCompositeSourceOver, 0);
+    addImage( o_background_img, 0, 0, NSCompositeCopy );
+    addImage( o_vol_sld_img, 26, 23, NSCompositeSourceOver );
+    addImage( o_vol_mute_img, 16, 18, NSCompositeSourceOver );
+    addImage( o_vol_max_img, 124, 18, NSCompositeSourceOver );
+    addImage( o_time_sld_img, 15, 53, NSCompositeSourceOver );
 }
 
 @end
