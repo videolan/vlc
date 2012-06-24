@@ -194,10 +194,8 @@ static const codec_dll decoders_table[] =
     /* WMV1 */
     { VLC_CODEC_WMV1,   "wmvdmod.dll", &guid_wmv },
     /* Screen codecs */
-    { VLC_FOURCC('M','S','S','2'), "wmsdmod.dll", &guid_wms },
-    { VLC_FOURCC('m','s','s','2'), "wmsdmod.dll", &guid_wms },
-    { VLC_FOURCC('M','S','S','1'), "wmsdmod.dll", &guid_wms },
-    { VLC_FOURCC('m','s','s','1'), "wmsdmod.dll", &guid_wms },
+    { VLC_CODEC_MSS2,   "wmsdmod.dll", &guid_wms },
+    { VLC_CODEC_MSS1,   "wmsdmod.dll", &guid_wms },
     /* Windows Media Video Adv */
     { VLC_CODEC_WMVA,   "wmvadvd.dll", &guid_wmva },
 
