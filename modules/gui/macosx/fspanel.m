@@ -472,11 +472,22 @@
     s_rc.size.width = 65;
     addTextfield( VLCTimeField, o_streamPosition_txt, NSRightTextAlignment, systemFontOfSize, whiteColor );
 
+    o_background_img = [[NSImage imageNamed:@"fs_background"] retain];
+    o_vol_sld_img = [[NSImage imageNamed:@"fs_volume_slider_bar"] retain];
+    o_vol_mute_img = [[NSImage imageNamed:@"fs_volume_mute"] retain];
+    o_vol_max_img = [[NSImage imageNamed:@"fs_volume_max"] retain];
+    o_time_sld_img = [[NSImage imageNamed:@"fs_time_slider"] retain];
+
     return view;
 }
 
 - (void)dealloc
 {
+    [o_background_img release];
+    [o_vol_sld_img release];
+    [o_vol_mute_img release];
+    [o_vol_max_img release];
+    [o_time_sld_img release];
     [o_fs_timeSlider release];
     [o_fs_volumeSlider release];
     [o_prev release];
@@ -576,26 +587,25 @@
 }
 
 #define addImage(image, _x, _y, mode, _width)                                               \
-    img = [NSImage imageNamed:image];                                              \
-    image_rect.size = [img size];                                                           \
+    image_rect.size = [image size];                                                         \
     image_rect.origin.x = 0;                                                                \
     image_rect.origin.y = 0;                                                                \
     frame.origin.x = _x;                                                                    \
     frame.origin.y = _y;                                                                    \
-    frame.size = [img size];                                                                \
+    frame.size = [image size];                                                              \
     if( _width ) frame.size.width = _width;                                                 \
-    [img drawInRect:frame fromRect:image_rect operation:mode fraction:1];
+    [image drawInRect:frame fromRect:image_rect operation:mode fraction:1];
 
 - (void)drawRect:(NSRect)rect
 {
     NSRect frame = [self frame];
     NSRect image_rect;
     NSImage *img;
-    addImage( @"fs_background", 0, 0, NSCompositeCopy, 0 );
-    addImage( @"fs_volume_slider_bar", 26, 23, NSCompositeSourceOver, 0 );
-    addImage( @"fs_volume_mute", 16, 18, NSCompositeSourceOver, 0 );
-    addImage( @"fs_volume_max", 124, 18, NSCompositeSourceOver, 0 );
-    addImage( @"fs_time_slider", 15, 53, NSCompositeSourceOver, 0);
+    addImage( o_background_img, 0, 0, NSCompositeCopy, 0 );
+    addImage( o_vol_sld_img, 26, 23, NSCompositeSourceOver, 0 );
+    addImage( o_vol_mute_img, 16, 18, NSCompositeSourceOver, 0 );
+    addImage( o_vol_max_img, 124, 18, NSCompositeSourceOver, 0 );
+    addImage( o_time_sld_img, 15, 53, NSCompositeSourceOver, 0);
 }
 
 @end
