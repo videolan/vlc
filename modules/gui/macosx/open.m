@@ -941,6 +941,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
         else
             [o_disc_selector_pop setHidden: NO];
 
+        // select newly added media folder
+        if (o_notification && [[o_notification name] isEqualToString:@"VLCNewMediaFolderNotification"])
+            [o_disc_selector_pop selectItemAtIndex: [[o_disc_selector_pop itemArray] count] - 1];
+
         [self showSelectedOpticalDisc];
     }
     else
@@ -973,7 +977,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         if ([o_path length] > 0 )
         {
             [o_specialMediaFolders addObject: o_path];
-            [self scanOpticalMedia: nil];
+            [self scanOpticalMedia: [NSNotification notificationWithName:@"VLCNewMediaFolderNotification" object:nil]];
         }
     }
 }
