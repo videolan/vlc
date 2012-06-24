@@ -126,6 +126,8 @@
 #define VLC_CODEC_UTVIDEO   VLC_FOURCC('U','L','R','A')
 #define VLC_CODEC_VBLE      VLC_FOURCC('V','B','L','E')
 #define VLC_CODEC_DXTORY    VLC_FOURCC('x','t','o','r')
+#define VLC_CODEC_MSS1      VLC_FOURCC('M','S','S','1')
+#define VLC_CODEC_MSS2      VLC_FOURCC('M','S','S','2')
 
 /* Planar YUV 4:1:0 Y:V:U */
 #define VLC_CODEC_YV9       VLC_FOURCC('Y','V','U','9')

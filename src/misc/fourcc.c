@@ -923,6 +923,14 @@ static const entry_t p_list_video[] = {
     B(VLC_CODEC_DXTORY, "Dxtory capture format"),
         A("xtor"),
 
+    B(VLC_CODEC_MSS1, "Windows Media Video 7 Screen"),
+        A("MSS1"),
+        A("mss1"),
+
+    B(VLC_CODEC_MSS2, "Windows Media Video 9 Screen"),
+        A("MSS2"),
+        A("mss2"),
+
     B(0, "")
 };
 static const entry_t p_list_audio[] = {
