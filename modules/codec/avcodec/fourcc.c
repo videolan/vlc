@@ -234,6 +234,11 @@ static const struct
     { VLC_CODEC_DXTORY, CODEC_ID_DXTORY, VIDEO_ES },
 #endif
 
+#if LIBAVCODEC_VERSION_CHECK( 54, 16, 0, 27, 100 )
+    { VLC_CODEC_MSS1, CODEC_ID_MSS1, VIDEO_ES },
+#endif
+
+
     /* Videogames Codecs */
 
     { VLC_CODEC_INTERPLAY, CODEC_ID_INTERPLAY_VIDEO, VIDEO_ES },
