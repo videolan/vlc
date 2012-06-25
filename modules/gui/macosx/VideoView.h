@@ -30,5 +30,6 @@
  *****************************************************************************/
 @interface VLCVoutView : NSView
 {
+    CGFloat f_cumulated_magnification;
 }
 @end

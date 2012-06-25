@@ -40,6 +40,12 @@
 #import <vlc_common.h>
 #import <vlc_keys.h>
 
+#import <AppKit/NSEvent.h>
+
+@interface NSEvent (Undocumented)
++ (CGFloat)standardMagnificationThreshold;
+@end
+
 /*****************************************************************************
  * DeviceCallback: Callback triggered when the video-device variable is changed
  *****************************************************************************/
@@ -75,6 +81,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 - (void)awakeFromNib
 {
     [self registerForDraggedTypes:[NSArray arrayWithObject: NSFilenamesPboardType]];
+
+    f_cumulated_magnification = 0.0;
 }
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
@@ -250,6 +258,24 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 -(void)didAddSubview:(NSView *)subview
 {
     [[self window] makeFirstResponder: subview];
+}
+
+- (void)magnifyWithEvent:(NSEvent *)event
+{
+    f_cumulated_magnification += [event magnification];
+    CGFloat f_threshold = [NSEvent standardMagnificationThreshold];
+    BOOL b_fullscreen = [[VLCMainWindow sharedInstance] isFullscreen];
+
+    if( ( f_cumulated_magnification > f_threshold && !b_fullscreen ) || ( f_cumulated_magnification < -f_threshold && b_fullscreen ) )
+    {
+        f_cumulated_magnification = 0.0;
+        [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+    }
+}
+
+- (void)beginGestureWithEvent:(NSEvent *)event
+{
+    f_cumulated_magnification = 0.0;
 }
 
 @end
