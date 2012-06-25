@@ -272,6 +272,7 @@ static OMX_ERRORTYPE ImplementationSpecificWorkarounds(decoder_t *p_dec,
             def->format.video.xFramerate >>= 16;
         }
     }
+#if 0 /* FIXME: doesn't apply for HP Touchpad */
     else if (!strncmp(p_sys->psz_component, "OMX.qcom.video.decoder.",
                       strlen("OMX.qcom.video.decoder")))
     {
@@ -282,6 +283,7 @@ static OMX_ERRORTYPE ImplementationSpecificWorkarounds(decoder_t *p_dec,
             p_port->i_frame_size = def->nBufferSize;
         }
     }
+#endif
 
     return OMX_ErrorNone;
 }

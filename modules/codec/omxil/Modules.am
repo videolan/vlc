@@ -1,6 +1,7 @@
 SOURCES_omxil = omxil.c utils.c omxil.h omxil_utils.h \
 	OMX_Component.h OMX_Core.h OMX_Image.h OMX_IVCommon.h OMX_Types.h \
-        OMX_Audio.h OMX_Index.h OMX_Other.h OMX_Video.h ../h264_nal.h
+	OMX_Audio.h OMX_Index.h OMX_Other.h OMX_Video.h ../h264_nal.h \
+	qcom.h qcom.c
 
 CPPFLAGS_iomx = -DUSE_IOMX
 SOURCES_iomx = $(SOURCES_omxil)
