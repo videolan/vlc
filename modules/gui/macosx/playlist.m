@@ -430,10 +430,11 @@
 @end
 
 /*****************************************************************************
- * extension to NSOutlineView's interface to fix compilation warnings
- * and let us access these 2 functions properly
- * this uses a private Apple-API, but works fine on all current OSX releases
- * keep checking for compatiblity with future releases though
+ * An extension to NSOutlineView's interface to fix compilation warnings
+ * and let us access these 2 functions properly.
+ * This uses a private API, but works fine on all current OSX releases.
+ * Radar ID 11739459 request a public API for this. However, it is probably
+ * easier and faster to recreate similar looking bitmaps ourselves.
  *****************************************************************************/
 
 @interface NSOutlineView (UndocumentedSortImages)
@@ -498,9 +499,9 @@
       @"VLCPlaylistItemPboardType", nil]];
     [o_outline_view_other setIntercellSpacing: NSMakeSize (0.0, 1.0)];
 
-    /* This uses private Apple API which works fine until 10.5.
-     * We need to keep checking in the future!
-     * These methods are being added artificially to NSOutlineView's interface above */
+    /* This uses a private API, but works fine on all current OSX releases.
+     * Radar ID 11739459 request a public API for this. However, it is probably
+     * easier and faster to recreate similar looking bitmaps ourselves. */
     o_ascendingSortingImage = [[NSOutlineView class] _defaultTableHeaderSortImage];
     o_descendingSortingImage = [[NSOutlineView class] _defaultTableHeaderReverseSortImage];
 
