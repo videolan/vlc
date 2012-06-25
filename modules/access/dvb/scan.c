@@ -308,7 +308,7 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
             int res;
             do
             {
-                if ( ( res = fscanf( f, "%c %d %c %d %s\n",
+                if ( ( res = fscanf( f, "%c %d %c %d %2s\n",
                             &type,
                             &p_transponders[*pi_count].i_frequency,
                             &p_transponders[*pi_count].c_polarization,
