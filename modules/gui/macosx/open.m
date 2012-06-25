@@ -70,6 +70,9 @@ struct display_info_t
  *****************************************************************************/
 @implementation VLCOpen
 
+#pragma mark -
+#pragma mark Init
+
 static VLCOpen *_o_sharedMainInstance = nil;
 
 + (VLCOpen *)sharedInstance
@@ -532,6 +535,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
     }
 }
 
+#pragma mark -
+#pragma mark Main Actions
+
 - (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)o_tvi
 {
     NSString *o_label = [o_tvi label];
@@ -587,36 +593,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [[o_panel contentView] addSubview: o_mrl_view];
 }
 
-- (IBAction)inputSlaveAction:(id)sender
-{
-    if( sender == o_file_slave_ckbox )
-        [o_file_slave_select_btn setEnabled: [o_file_slave_ckbox state]];
-    else
-    {
-        NSOpenPanel *o_open_panel;
-        o_open_panel = [NSOpenPanel openPanel];
-        [o_open_panel setCanChooseFiles: YES];
-        [o_open_panel setCanChooseDirectories: NO];
-        if( [o_open_panel runModal] == NSOKButton )
-        {
-            if( o_file_slave_path )
-                [o_file_slave_path release];
-            o_file_slave_path = [[[o_open_panel URLs] objectAtIndex: 0] path];
-            [o_file_slave_path retain];
-        }
-    }
-    if( o_file_slave_path && [o_file_slave_ckbox state] == NSOnState)
-    {
-        [o_file_slave_filename_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:o_file_slave_path]];
-        [o_file_slave_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile: o_file_slave_path]];
-    }
-    else
-    {
-        [o_file_slave_filename_lbl setStringValue: @""];
-        [o_file_slave_icon_well setImage: NULL];
-    }
-}
-
 - (void)openFileGeneric
 {
     [self openFilePathChanged: nil];
@@ -642,6 +618,51 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [self openCaptureModeChanged: nil];
     [self openTarget: 3];
 }
+
+- (void)openFile
+{
+    NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
+    b_autoplay = config_GetInt( VLCIntf, "macosx-autoplay" );
+
+    [o_open_panel setAllowsMultipleSelection: YES];
+    [o_open_panel setCanChooseDirectories: YES];
+    [o_open_panel setTitle: _NS("Open File")];
+    [o_open_panel setPrompt: _NS("Open")];
+
+    if( [o_open_panel runModal] == NSOKButton )
+    {
+        NSArray * o_urls = [o_open_panel URLs];
+        NSUInteger count = [o_urls count];
+        NSMutableArray *o_values = [NSMutableArray arrayWithCapacity:count];
+        NSMutableArray *o_array = [NSMutableArray arrayWithCapacity:count];
+        for( NSUInteger i = 0; i < count; i++ )
+        {
+            [o_values addObject: [[o_urls objectAtIndex: i] path]];
+        }
+        [o_values sortUsingSelector:@selector(caseInsensitiveCompare:)];
+
+        for( NSUInteger i = 0; i < count; i++ )
+        {
+            NSDictionary *o_dic;
+            char *psz_uri = make_URI([[o_values objectAtIndex:i] UTF8String], "file");
+            if( !psz_uri )
+                continue;
+
+            o_dic = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
+
+            free( psz_uri );
+
+            [o_array addObject: o_dic];
+        }
+        if( b_autoplay )
+            [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue:NO];
+        else
+            [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue:YES];
+    }
+}
+
+#pragma mark -
+#pragma mark File Panel
 
 - (void)openFilePathChanged:(NSNotification *)o_notification
 {
@@ -717,6 +738,39 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     [self openFilePathChanged: nil];
 }
+
+- (IBAction)inputSlaveAction:(id)sender
+{
+    if( sender == o_file_slave_ckbox )
+        [o_file_slave_select_btn setEnabled: [o_file_slave_ckbox state]];
+    else
+    {
+        NSOpenPanel *o_open_panel;
+        o_open_panel = [NSOpenPanel openPanel];
+        [o_open_panel setCanChooseFiles: YES];
+        [o_open_panel setCanChooseDirectories: NO];
+        if( [o_open_panel runModal] == NSOKButton )
+        {
+            if( o_file_slave_path )
+                [o_file_slave_path release];
+            o_file_slave_path = [[[o_open_panel URLs] objectAtIndex: 0] path];
+            [o_file_slave_path retain];
+        }
+    }
+    if( o_file_slave_path && [o_file_slave_ckbox state] == NSOnState)
+    {
+        [o_file_slave_filename_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:o_file_slave_path]];
+        [o_file_slave_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile: o_file_slave_path]];
+    }
+    else
+    {
+        [o_file_slave_filename_lbl setStringValue: @""];
+        [o_file_slave_icon_well setImage: NULL];
+    }
+}
+
+#pragma mark -
+#pragma mark Optical Media Panel
 
 - (void)showOpticalMediaView: theView withIcon:(NSImage *)icon
 {
@@ -1050,6 +1104,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [self setMRL: [NSString stringWithFormat: @"vcd://%@@%i:%i", [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: [o_disc_selector_pop indexOfSelectedItem]]], [o_disc_vcd_title intValue], [o_disc_vcd_chapter intValue]]];
 }
 
+#pragma mark -
+#pragma mark Network Panel
+
 - (void)textFieldWasClicked:(NSNotification *)o_notification
 {
     if( [o_notification object] == o_net_udp_port )
@@ -1205,47 +1262,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
     }
 }
 
-- (void)openFile
-{
-    NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
-    b_autoplay = config_GetInt( VLCIntf, "macosx-autoplay" );
-
-    [o_open_panel setAllowsMultipleSelection: YES];
-    [o_open_panel setCanChooseDirectories: YES];
-    [o_open_panel setTitle: _NS("Open File")];
-    [o_open_panel setPrompt: _NS("Open")];
-
-    if( [o_open_panel runModal] == NSOKButton )
-    {
-        NSArray * o_urls = [o_open_panel URLs];
-        NSUInteger count = [o_urls count];
-        NSMutableArray *o_values = [NSMutableArray arrayWithCapacity:count];
-        NSMutableArray *o_array = [NSMutableArray arrayWithCapacity:count];
-        for( NSUInteger i = 0; i < count; i++ )
-        {
-            [o_values addObject: [[o_urls objectAtIndex: i] path]];
-        }
-        [o_values sortUsingSelector:@selector(caseInsensitiveCompare:)];
-
-        for( NSUInteger i = 0; i < count; i++ )
-        {
-            NSDictionary *o_dic;
-            char *psz_uri = make_URI([[o_values objectAtIndex:i] UTF8String], "file");
-            if( !psz_uri )
-                continue;
-
-            o_dic = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
-
-            free( psz_uri );
-
-            [o_array addObject: o_dic];
-        }
-        if( b_autoplay )
-            [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue:NO];
-        else
-            [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue:YES];
-    }
-}
+#pragma mark -
+#pragma mark Capture Panel
 
 - (void)showCaptureView: theView
 {
@@ -1474,6 +1492,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_eyetv_chn_status_txt setHidden: YES];
 }
 
+#pragma mark -
+#pragma mark Subtitle Settings
+
 - (IBAction)subsChanged:(id)sender
 {
     if ([o_file_sub_ckbox state] == NSOnState)
@@ -1554,6 +1575,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     [o_file_sub_fps setFloatValue: [o_file_sub_fps_stp floatValue]];
 }
+
+#pragma mark -
+#pragma mark Miscellaneous
 
 - (IBAction)panelCancel:(id)sender
 {
