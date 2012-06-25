@@ -40,12 +40,6 @@
 #import <vlc_common.h>
 #import <vlc_keys.h>
 
-#import <AppKit/NSEvent.h>
-
-@interface NSEvent (Undocumented)
-+ (CGFloat)standardMagnificationThreshold;
-@end
-
 /*****************************************************************************
  * DeviceCallback: Callback triggered when the video-device variable is changed
  *****************************************************************************/
@@ -263,7 +257,10 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 - (void)magnifyWithEvent:(NSEvent *)event
 {
     f_cumulated_magnification += [event magnification];
-    CGFloat f_threshold = [NSEvent standardMagnificationThreshold];
+
+    // This is the result of [NSEvent standardMagnificationThreshold].
+    // Unfortunately, this is a private API, currently.
+    CGFloat f_threshold = 0.3;
     BOOL b_fullscreen = [[VLCMainWindow sharedInstance] isFullscreen];
 
     if( ( f_cumulated_magnification > f_threshold && !b_fullscreen ) || ( f_cumulated_magnification < -f_threshold && b_fullscreen ) )
