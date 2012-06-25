@@ -802,7 +802,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
     while( fgets( line, 1024, cuefile ) && i_tracks < INT_MAX-1 )
     {
         /* look for a TRACK line */
-        char psz_dummy[9];
+        char psz_dummy[10];
         if( !sscanf( line, "%9s", psz_dummy ) || strcmp(psz_dummy, "TRACK") )
             continue;
 
