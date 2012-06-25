@@ -298,108 +298,42 @@ QString VLCKeyToString( unsigned val )
     return r;
 }
 
+PixmapAnimator::PixmapAnimator( QWidget *parent, QList<QString> frames )
+    : QAbstractAnimation( parent ), current_frame( 0 )
+{
+    foreach( QString name, frames )
+        pixmaps.append( new QPixmap( name ) );
+    currentPixmap = pixmaps.at( 0 );
+    setFps( frames.count() ); /* default to 1 sec loop */
+    setLoopCount( -1 );
+}
+
+void PixmapAnimator::updateCurrentTime( int msecs )
+{
+    int i = msecs / interval;
+    if ( i >= pixmaps.count() ) i = pixmaps.count() - 1; /* roundings */
+    if ( i != current_frame )
+    {
+        current_frame = i;
+        currentPixmap = pixmaps.at( current_frame );
+        emit pixmapReady( *currentPixmap );
+    }
+}
 
 /* Animated Icon implementation */
-
-AnimatedIcon::AnimatedIcon( QWidget *parent )
-    : QLabel( parent ), mTimer( this ), mIdleFrame( NULL )
+SpinningIcon::SpinningIcon( QWidget *parent ) : QLabel( parent )
 {
-    mCurrentFrame = mRemainingLoops = 0;
-    connect( &mTimer, SIGNAL( timeout() ), this, SLOT( onTimerTick() ) );
-}
-
-AnimatedIcon::~AnimatedIcon()
-{
-    // We don't need to destroy the timer, he's our child
-    delete mIdleFrame;
-    foreach( QPixmap *frame, mFrames )
-        delete frame;
-}
-
-void AnimatedIcon::addFrame( const QPixmap &pxm, int index )
-{
-    if( index == 0 )
-    {
-        // Replace idle frame
-        delete mIdleFrame;
-        mIdleFrame = new QPixmap( pxm );
-        setPixmap( *mIdleFrame );
-        return;
-    }
-    QPixmap *copy = new QPixmap( pxm );
-    mFrames.insert( ( index < 0 || index > mFrames.count() ) ? mFrames.count() :
-                    index, copy );
-    if( !pixmap() )
-        setPixmap( *copy );
-}
-
-void AnimatedIcon::play( int loops, int interval )
-{
-    if( interval < 20 )
-    {
-        interval = 20;
-    }
-
-    if( !mIdleFrame && (mFrames.isEmpty() || loops != 0 ) )
-    {
-        return;
-    }
-
-    if( loops == 0 )
-    {
-        // Stop playback
-        mCurrentFrame = mRemainingLoops = 0;
-        mTimer.stop();
-        setPixmap( mIdleFrame != NULL ? *mIdleFrame : *mFrames.last() );
-        return;
-    }
-
-    if( loops <= -1 )
-        loops = -1;
-
-    mCurrentFrame = 1;
-    mRemainingLoops = loops;
-    mTimer.start( interval );
-    setPixmap( *mFrames.first() );
-}
-
-// private slot
-void AnimatedIcon::onTimerTick()
-{
-    //assert( !mFrames.isEmpty() );
-    if( ++mCurrentFrame > mFrames.count() )
-    {
-        if( mRemainingLoops != -1 )
-        {
-            if( --mRemainingLoops == 0 )
-            {
-                mTimer.stop();
-                setPixmap( mIdleFrame ? *mIdleFrame : *mFrames.last() );
-                return;
-            }
-        }
-        mCurrentFrame = 1;
-    }
-    //assert( mCurrentFrame >= 1 && mCurrentFrame <= mFrames.count() );
-    setPixmap( *mFrames.at( mCurrentFrame - 1 ) );
-}
-
-
-/* SpinningIcon implementation */
-
-SpinningIcon::SpinningIcon( QWidget *parent, bool noIdleFrame )
-    : AnimatedIcon( parent )
-{
-    if( noIdleFrame )
-        addFrame( QPixmap(), 0 );
-    else
-        addFrame( QPixmap( ":/util/wait0" ), 0 );
-    addFrame( QPixmap( ":/util/wait1" ) );
-    addFrame( QPixmap( ":/util/wait2" ) );
-    addFrame( QPixmap( ":/util/wait3" ) );
-    addFrame( QPixmap( ":/util/wait4" ) );
+    QList<QString> frames;
+    frames << ":/util/wait1";
+    frames << ":/util/wait2";
+    frames << ":/util/wait3";
+    frames << ":/util/wait4";
+    animator = new PixmapAnimator( this, frames );
+    CONNECT( animator, pixmapReady( const QPixmap & ), this, setPixmap( const QPixmap & ) );
+    CONNECT( animator, pixmapReady( const QPixmap & ), this, repaint() );
     setScaledContents( true );
     setFixedSize( 16, 16 );
+    animator->setCurrentTime( 0 );
 }
 
 QToolButtonExt::QToolButtonExt(QWidget *parent, int ms )
