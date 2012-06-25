@@ -94,6 +94,19 @@ bool X11Factory::init()
     // Determine the monitor geometry
     getDefaultGeometry( &m_screenWidth, &m_screenHeight );
 
+    // list all available monitors
+    int num_screen;
+    XineramaScreenInfo* info = XineramaQueryScreens( pDisplay, &num_screen );
+    if( info )
+    {
+        msg_Dbg( getIntf(), "number of monitors detected : %i", num_screen );
+        for( int i = 0; i < num_screen; i++ )
+            msg_Dbg( getIntf(), "  monitor #%i : %ix%i at +%i+%i",
+                                i, info[i].width, info[i].height,
+                                info[i].x_org, info[i].y_org );
+        XFree( info );
+    }
+
     return true;
 }
 
