@@ -183,9 +183,11 @@ int FileOpen( vlc_object_t *p_this )
         goto error;
     }
 
+#ifdef S_ISSOCK
     if (!S_ISFIFO (st.st_mode) && !S_ISSOCK (st.st_mode))
         /* Clear non-blocking mode when not useful or not specified */
         fcntl (fd, F_SETFL, fcntl (fd, F_GETFL) & ~O_NONBLOCK);
+#endif
 
     /* Directories can be opened and read from, but only readdir() knows
      * how to parse the data. The directory plugin will do it. */
