@@ -2458,9 +2458,24 @@ static VLCMainWindow *_o_sharedInstance = nil;
         return proposedMax;
 }
 
+- (CGFloat)splitView:(NSSplitView *)splitView constrainMinCoordinate:(CGFloat)proposedMin ofSubviewAt:(NSInteger)dividerIndex
+{
+    if (dividerIndex == 0)
+        return 100.;
+    else
+        return proposedMin;
+}
+
 - (BOOL)splitView:(NSSplitView *)splitView canCollapseSubview:(NSView *)subview
 {
     return ([subview isEqual:o_left_split_view]);
+}
+
+- (BOOL)splitView:(NSSplitView *)splitView shouldAdjustSizeOfSubview:(NSView *)subview
+{
+    if ([subview isEqual:o_left_split_view])
+        return NO;
+    return YES;
 }
 
 #pragma mark -
