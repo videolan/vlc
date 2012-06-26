@@ -980,6 +980,9 @@ loaded:
          * has got a working OMX.qcom.video.decoder.avc instead though. */
         if (!strncmp(p_sys->ppsz_components[i], "OMX.ARICENT.", 12))
             continue;
+        /* Some nVidia codec with DRM */
+        if (!strncmp(p_sys->ppsz_components[i], "OMX.Nvidia.h264.decode.secure", 29))
+            continue;
 #endif
         omx_error = InitialiseComponent(p_dec, p_sys->ppsz_components[i],
                                         &p_sys->omx_handle);
