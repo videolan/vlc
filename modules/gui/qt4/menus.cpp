@@ -769,7 +769,8 @@ QMenu *VLCMenuBar::HelpMenu( QWidget *parent )
  *****************************************************************************/
 #define POPUP_BOILERPLATE \
     static QMenu* menu = NULL;  \
-    delete menu; menu = NULL; \
+    if ( menu ) menu->deleteLater(); \ /* Ensure it is deleted after processing events */
+    menu = NULL; \                     /* or we might crash on an incoming mouseup event */
     if( !show ) \
         return; \
     QVector<vlc_object_t *> objects; \
