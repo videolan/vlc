@@ -397,7 +397,7 @@ NSString * const PXSLDeleteKeyPressedOnRowsNotification = @"PXSourceListDeleteKe
                     }
 
                     //Use 10.6 NSImage drawing if we can
-                    if([icon respondsToSelector:@selector(drawInRect:fromRect:operation:fraction:respectFlipped:hints:)]) {
+                    if(NSAppKitVersionNumber >= 1115.2) { // Lion
                         [icon drawInRect:iconRect
                                 fromRect:NSZeroRect
                                operation:NSCompositeSourceOver
