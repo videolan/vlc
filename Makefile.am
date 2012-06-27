@@ -202,6 +202,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/bottombar-mini.png \
 	extras/package/macosx/Resources/mainwindow/dropzone-background.png \
 	extras/package/macosx/Resources/mainwindow/dropzone.png \
+	extras/package/macosx/Resources/mainwindow/dropzone@2x.png \
 	extras/package/macosx/Resources/mainwindow/effects-double-buttons-blue.png \
 	extras/package/macosx/Resources/mainwindow/effects-double-buttons-blue@2x.png \
 	extras/package/macosx/Resources/mainwindow/effects-double-buttons-pressed.png \
@@ -295,67 +296,128 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/volume-slider-track.png \
 	extras/package/macosx/Resources/mainwindow/volume-slider-track@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/back-pressed_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/back-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/back_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/back_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottom-background_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/bottom-background_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottombar-mini.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottomdark-left.png \
+	extras/package/macosx/Resources/mainwindow_dark/bottomdark-left@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottomdark-right.png \
+	extras/package/macosx/Resources/mainwindow_dark/bottomdark-right@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-double-buttons-blue_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/effects-double-buttons-blue_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-double-buttons-pressed_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/effects-double-buttons-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-double-buttons_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/effects-double-buttons_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-one-button-blue_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/effects-one-button-blue_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-one-button_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/effects-one-button_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/forward-pressed_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/forward-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/forward_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/forward_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/fullscreen-double-buttons-pressed_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/fullscreen-double-buttons-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/fullscreen-double-buttons_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/fullscreen-double-buttons_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/fullscreen-one-button-pressed_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/fullscreen-one-button-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/fullscreen-one-button_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/fullscreen-one-button_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/pause-pressed_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/pause-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/pause_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/pause_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/play-pressed_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/play-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/play_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/play_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/playlist-blue-pressed_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/playlist-blue-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/playlist-blue_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/playlist-blue_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/playlist-pressed_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/playlist-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/playlist_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/playlist_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/progressbar-fill-left_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/progressbar-fill-left_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/progressbar-fill-middle_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/progressbar-fill-middle_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/progressbar-fill-right_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/progressbar-fill-right_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/progression-knob_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/progression-knob_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/progression-track-wrapper-left_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/progression-track-wrapper-left_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/progression-track-wrapper-middle_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/progression-track-wrapper-middle_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/progression-track-wrapper-right_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/progression-track-wrapper-right_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/repeat-all-blue-pressed_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/repeat-all-blue-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/repeat-all-blue_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/repeat-all-blue_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/repeat-one-blue-pressed_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/repeat-one-blue-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/repeat-one-blue_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/repeat-one-blue_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/repeat-pressed_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/repeat-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/repeat_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/repeat_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/shuffle-blue-pressed_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/shuffle-blue-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/shuffle-blue_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/shuffle-blue_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/shuffle-pressed_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/shuffle-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/shuffle_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/shuffle_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/stop-pressed_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/stop-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/stop_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/stop_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-close-graphite.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-close-graphite@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-close-on-graphite.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-close-on-graphite@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-close-on.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-close-on@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-close-over-graphite.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-close-over-graphite@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-close-over.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-close-over@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-close.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-close@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize-graphite.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize-graphite@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize-on-graphite.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize-on-graphite@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize-on.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize-on@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize-over-graphite.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize-over-graphite@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize-over.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize-over@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-minimize@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-zoom-graphite.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-zoom-graphite@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-zoom-on-graphite.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-zoom-on-graphite@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-zoom-on.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-zoom-on@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-zoom-over-graphite.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-zoom-over-graphite@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-zoom-over.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-zoom-over@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-zoom.png \
+	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-zoom@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-close-graphite.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-close-on-graphite.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-close-on.png \
@@ -375,12 +437,19 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-zoom-over.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-zoom.png \
 	extras/package/macosx/Resources/mainwindow_dark/topbar-dark-center-fill.png \
+	extras/package/macosx/Resources/mainwindow_dark/topbar-dark-center-fill@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/topbar-dark-left.png \
+	extras/package/macosx/Resources/mainwindow_dark/topbar-dark-left@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/topbar-dark-right.png \
+	extras/package/macosx/Resources/mainwindow_dark/topbar-dark-right@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/volume-high_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/volume-high_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/volume-low_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/volume-low_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/volume-slider-knob_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/volume-slider-knob_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/volume-slider-track_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/volume-slider-track_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/window-fullscreen-on.png \
 	extras/package/macosx/Resources/mainwindow_dark/window-fullscreen-over.png \
 	extras/package/macosx/Resources/mainwindow_dark/window-fullscreen.png \
