@@ -1487,34 +1487,22 @@ char *stream_ReadLine( stream_t *s )
         i_pos = stream_Tell( s );
         if( i_pos == 0 && i_data >= 3 )
         {
-            int i_bom_size = 0;
             const char *psz_encoding = NULL;
 
             if( !memcmp( p_data, "\xEF\xBB\xBF", 3 ) )
             {
                 psz_encoding = "UTF-8";
-                i_bom_size = 3;
             }
             else if( !memcmp( p_data, "\xFF\xFE", 2 ) )
             {
                 psz_encoding = "UTF-16LE";
                 s->p_text->b_little_endian = true;
                 s->p_text->i_char_width = 2;
-                i_bom_size = 2;
             }
             else if( !memcmp( p_data, "\xFE\xFF", 2 ) )
             {
                 psz_encoding = "UTF-16BE";
                 s->p_text->i_char_width = 2;
-                i_bom_size = 2;
-            }
-
-            /* Seek past the BOM */
-            if( i_bom_size )
-            {
-                stream_Seek( s, i_bom_size );
-                p_data += i_bom_size;
-                i_data -= i_bom_size;
             }
 
             /* Open the converter if we need it */
