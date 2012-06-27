@@ -157,6 +157,18 @@ static void Close( vlc_object_t *p_this )
     skin_load.intf = NULL;
     vlc_mutex_unlock( &skin_load.mutex);
 
+    AsyncQueue *pQueue = p_intf->p_sys->p_queue;
+    if( pQueue )
+    {
+        CmdGeneric *pCmd = new CmdExitLoop( p_intf );
+        if( pCmd )
+            pQueue->push( CmdGenericPtr( pCmd ) );
+    }
+    else
+    {
+        msg_Err( p_intf, "thread found already stopped (weird!)" );
+    }
+
     vlc_join( p_intf->p_sys->thread, NULL );
 
     vlc_mutex_destroy( &p_intf->p_sys->init_lock );
@@ -350,8 +362,7 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
     if( pIntf == NULL )
         return VLC_EGENERIC;
 
-    if( !vlc_object_alive( pIntf ) ||
-        !var_InheritBool( pIntf, "skinned-video") ||
+    if( !var_InheritBool( pIntf, "skinned-video") ||
         cfg->is_standalone )
     {
         vlc_object_release( pIntf );

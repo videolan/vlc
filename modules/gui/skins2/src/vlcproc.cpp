@@ -83,13 +83,8 @@ void VlcProc::destroy( intf_thread_t *pIntf )
 
 VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     m_varEqBands( pIntf ), m_pVout( NULL ), m_pAout( NULL ),
-    m_bEqualizer_started( false ), m_cmdManage( this )
+    m_bEqualizer_started( false )
 {
-    // Create a timer to poll the status of the vlc
-    OSFactory *pOsFactory = OSFactory::instance( pIntf );
-    m_pTimer = pOsFactory->createOSTimer( m_cmdManage );
-    m_pTimer->start( 100, false );
-
     // Create and register VLC variables
     VarManager *pVarManager = VarManager::instance( getIntf() );
 
@@ -195,9 +190,6 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
 
 VlcProc::~VlcProc()
 {
-    m_pTimer->stop();
-    delete( m_pTimer );
-
     if( m_pAout )
     {
         vlc_object_release( m_pAout );
@@ -233,28 +225,6 @@ VlcProc::~VlcProc()
                      onItemChange, this );
     var_DelCallback( getIntf(), "interaction", onInteraction, this );
 }
-
-void VlcProc::manage()
-{
-    // Did the user request to quit vlc ?
-    if( !vlc_object_alive( getIntf() ) )
-    {
-        // Get the instance of OSFactory
-        OSFactory *pOsFactory = OSFactory::instance( getIntf() );
-
-        // Exit the main OS loop
-        pOsFactory->getOSLoop()->exit();
-
-        return;
-    }
-}
-
-void VlcProc::CmdManage::execute()
-{
-    // Just forward to VlcProc
-    m_pParent->manage();
-}
-
 
 int VlcProc::onInputNew( vlc_object_t *pObj, const char *pVariable,
                          vlc_value_t oldval, vlc_value_t newval, void *pParam )

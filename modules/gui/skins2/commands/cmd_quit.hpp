@@ -31,4 +31,7 @@
 /// "Quit" command
 DEFINE_COMMAND( Quit, "quit" )
 
+/// "ExitLoop" command
+DEFINE_COMMAND( ExitLoop, "exitloop" )
+
 #endif

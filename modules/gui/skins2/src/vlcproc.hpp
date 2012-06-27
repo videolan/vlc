@@ -37,7 +37,6 @@
 #include "../utils/position.hpp"
 #include "../utils/var_text.hpp"
 #include "../utils/var_string.hpp"
-#include "../commands/cmd_generic.hpp"
 #include "../controls/ctrl_video.hpp"
 
 class OSTimer;
@@ -122,8 +121,6 @@ protected:
     virtual ~VlcProc();
 
 private:
-    /// Timer to call manage() regularly (via doManage())
-    OSTimer *m_pTimer;
     /// Playtree variable
     VariablePtr m_cPlaytree;
     VariablePtr m_cVarRandom;
@@ -168,23 +165,11 @@ private:
     audio_output_t *m_pAout;
     bool m_bEqualizer_started;
 
-    /**
-     * Poll VLC internals to update the status (volume, current time in
-     * the stream, current filename, play/pause/stop status, ...)
-     * This function should be called regurlarly, since there is no
-     * callback mechanism (yet?) to automatically update a variable when
-     * the internal status changes
-     */
-    void manage();
-
     // reset variables when input is over
     void reset_input();
 
     // init variables (libvlc and playlist levels)
     void init_variables();
-
-    /// Define the command that calls manage()
-    DEFINE_CALLBACK( VlcProc, Manage );
 
     /// Callback for intf-show variable
     static int onIntfShow( vlc_object_t *pObj, const char *pVariable,
@@ -233,6 +218,5 @@ private:
                                    vlc_value_t oldVal, vlc_value_t newVal,
                                    void *pParam );
 };
-
 
 #endif

@@ -49,3 +49,13 @@ void CmdQuit::execute()
     // Kill libvlc
     libvlc_Quit( getIntf()->p_libvlc );
 }
+
+
+void CmdExitLoop::execute()
+{
+    // Get the instance of OSFactory
+    OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+
+    // Exit the main OS loop
+    pOsFactory->getOSLoop()->exit();
+}
