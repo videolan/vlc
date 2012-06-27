@@ -295,6 +295,17 @@ static int Open ( vlc_object_t *p_this )
     }
     free( psz_type );
 
+    /* Detect Unicode while skipping the UTF-8 Byte Order Mark */
+    bool unicode = false;
+    const uint8_t *p_data;
+    if( stream_Peek( p_demux->s, &p_data, 3 ) >= 3
+     && !memcmp( p_data, "\xEF\xBB\xBF", 3 ) )
+    {
+        unicode = true;
+        stream_Seek( p_demux->s, 3 ); /* skip BOM */
+        msg_Dbg( p_demux, "detected Unicode Byte Order Mark" );
+    }
+
     /* Probe if unknown type */
     if( p_sys->i_type == SUB_TYPE_UNKNOWN )
     {
@@ -442,15 +453,14 @@ static int Open ( vlc_object_t *p_this )
 
         /* It will nearly always work even for non seekable stream thanks the
          * caching system, and if it fails we lose just a few sub */
-        if( stream_Seek( p_demux->s, 0 ) )
-        {
+        if( stream_Seek( p_demux->s, unicode ? 3 : 0 ) )
             msg_Warn( p_demux, "failed to rewind" );
-        }
     }
 
     /* Quit on unknown subtitles */
     if( p_sys->i_type == SUB_TYPE_UNKNOWN )
     {
+        stream_Seek( p_demux->s, 0 );
         msg_Warn( p_demux, "failed to recognize subtitle type" );
         free( p_sys );
         return VLC_EGENERIC;
@@ -518,9 +528,9 @@ static int Open ( vlc_object_t *p_this )
         es_format_Init( &fmt, SPU_ES, VLC_CODEC_SSA );
     }
     else
-    {
         es_format_Init( &fmt, SPU_ES, VLC_CODEC_SUBT );
-    }
+    if( unicode )
+        fmt.subs.psz_encoding = strdup( "UTF-8" );
     char *psz_description = var_InheritString( p_demux, "sub-description" );
     if( psz_description && *psz_description )
         fmt.psz_description = psz_description;
