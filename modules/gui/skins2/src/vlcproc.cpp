@@ -190,8 +190,6 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
 
     // initialize variables refering to liblvc and playlist objects
     init_variables();
-
-    interaction_Register( pIntf );
 }
 
 
@@ -210,8 +208,6 @@ VlcProc::~VlcProc()
         vlc_object_release( m_pVout );
         m_pVout = NULL;
     }
-
-    interaction_Unregister( getIntf() );
 
     var_DelCallback( getIntf()->p_sys->p_playlist, "volume",
                      onGenericCallback, this );
