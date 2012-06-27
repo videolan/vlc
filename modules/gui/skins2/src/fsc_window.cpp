@@ -28,7 +28,7 @@
 
 /**
  * Fading out is computed in the following way:
- *    - a timer is fired with a given period (FSC_DELAY)
+ *    - a timer is fired with a given period (m_delay)
  *    - a total of FSC_COUNT transitions are processed before
  *      hiding the controller
  *    - transparency is changed in the following way :
@@ -56,6 +56,11 @@ FscWindow::FscWindow( intf_thread_t *pIntf, int left, int top,
 
     // opacity overridden by user
     m_opacity = 255 * var_InheritFloat( getIntf(), "qt-fs-opacity" );
+
+    // fullscreen-controller timeout overridden by user
+    m_delay = var_InheritInteger( getIntf(), "mouse-hide-timeout" ) / FSC_COUNT;
+    if( m_delay <= 0 )
+        m_delay = FSC_DELAY;
 
     // register Fsc
     VoutManager::instance( getIntf())->registerFSC( this );
@@ -85,7 +90,7 @@ void FscWindow::onMouseMoved( )
             m_pTimer->stop();
             m_count = FSC_COUNT;
             setOpacity( m_opacity );
-            m_pTimer->start( FSC_DELAY, false );
+            m_pTimer->start( m_delay, false );
         }
     }
 }
@@ -130,7 +135,7 @@ void FscWindow::processEvent( EvtLeave &rEvtLeave )
 
     m_count = FSC_COUNT;
     setOpacity( m_opacity );
-    m_pTimer->start( FSC_DELAY, false );
+    m_pTimer->start( m_delay, false );
 
     TopWindow::processEvent( rEvtLeave  );
 }
@@ -156,7 +161,7 @@ void FscWindow::innerShow()
 
     m_count = FSC_COUNT;
     setOpacity( m_opacity );
-    m_pTimer->start( FSC_DELAY, false );
+    m_pTimer->start( m_delay, false );
 }
 
 

@@ -67,6 +67,8 @@ private:
     int m_count;
     /// opacity set by user
     int m_opacity;
+    /// delay set by user
+    int m_delay;
 
     /// Callback for the timer
     DEFINE_CALLBACK( FscWindow, FscHide )
