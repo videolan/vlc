@@ -62,6 +62,9 @@ FscWindow::FscWindow( intf_thread_t *pIntf, int left, int top,
     if( m_delay <= 0 )
         m_delay = FSC_DELAY;
 
+    /// activation overridden by user
+    m_enabled = var_InheritBool( getIntf(), "qt-fs-controller" );
+
     // register Fsc
     VoutManager::instance( getIntf())->registerFSC( this );
 }
@@ -157,6 +160,9 @@ void FscWindow::onUpdate( Subject<VarBool> &rVariable, void *arg  )
 
 void FscWindow::innerShow()
 {
+    if( !m_enabled )
+        return;
+
     TopWindow::innerShow();
 
     m_count = FSC_COUNT;
