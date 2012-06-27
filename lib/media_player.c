@@ -1295,7 +1295,7 @@ void libvlc_media_player_navigate( libvlc_media_player_t* p_mi,
 {
     input_thread_t *p_input_thread;
 
-    if ( navigate > libvlc_navigate_to_action_size)
+    if ( navigate >= libvlc_navigate_to_action_size)
       return;
 
     p_input_thread = libvlc_get_input_thread ( p_mi );
