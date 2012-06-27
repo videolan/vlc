@@ -1485,46 +1485,28 @@ char *stream_ReadLine( stream_t *s )
 
         /* BOM detection */
         i_pos = stream_Tell( s );
-        if( i_pos == 0 && i_data >= 3 )
+        if( i_pos == 0 && i_data >= 2 )
         {
             const char *psz_encoding = NULL;
 
-            if( !memcmp( p_data, "\xEF\xBB\xBF", 3 ) )
-            {
-                psz_encoding = "UTF-8";
-            }
-            else if( !memcmp( p_data, "\xFF\xFE", 2 ) )
+            if( !memcmp( p_data, "\xFF\xFE", 2 ) )
             {
                 psz_encoding = "UTF-16LE";
                 s->p_text->b_little_endian = true;
-                s->p_text->i_char_width = 2;
             }
             else if( !memcmp( p_data, "\xFE\xFF", 2 ) )
             {
                 psz_encoding = "UTF-16BE";
-                s->p_text->i_char_width = 2;
             }
 
             /* Open the converter if we need it */
             if( psz_encoding != NULL )
             {
-                msg_Dbg( s, "%s BOM detected", psz_encoding );
-                if( s->p_text->i_char_width > 1 )
-                {
-                    s->p_text->conv = vlc_iconv_open( "UTF-8", psz_encoding );
-                    if( s->p_text->conv == (vlc_iconv_t)-1 )
-                    {
-                        msg_Err( s, "iconv_open failed" );
-                    }
-                }
-
-                /* FIXME that's UGLY */
-                input_thread_t *p_input = s->p_input;
-                if( p_input != NULL)
-                {
-                    var_Create( p_input, "subsdec-encoding", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-                    var_SetString( p_input, "subsdec-encoding", "UTF-8" );
-                }
+                msg_Dbg( s, "UTF-16 BOM detected" );
+                s->p_text->i_char_width = 2;
+                s->p_text->conv = vlc_iconv_open( "UTF-8", psz_encoding );
+                if( s->p_text->conv == (vlc_iconv_t)-1 )
+                    msg_Err( s, "iconv_open failed" );
             }
         }
 
