@@ -242,12 +242,12 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/play-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/play.png \
 	extras/package/macosx/Resources/mainwindow/play@2x.png \
-	extras/package/macosx/Resources/mainwindow/playlist-blue@2x.png \
 	extras/package/macosx/Resources/mainwindow/playlist-btn-blue.png \
+	extras/package/macosx/Resources/mainwindow/playlist-btn-blue@2x.png \
 	extras/package/macosx/Resources/mainwindow/playlist-btn-pressed.png \
+	extras/package/macosx/Resources/mainwindow/playlist-btn-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/playlist-btn.png \
 	extras/package/macosx/Resources/mainwindow/playlist-btn@2x.png \
-	extras/package/macosx/Resources/mainwindow/playlist-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/progression-fill-left.png \
 	extras/package/macosx/Resources/mainwindow/progression-fill-left@2x.png \
 	extras/package/macosx/Resources/mainwindow/progression-fill-middle.png \
