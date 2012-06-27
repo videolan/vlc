@@ -160,10 +160,7 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
         else IF_EXTRACT("COPYRIGHT=", Copyright )
         else IF_EXTRACT("ORGANIZATION=", Publisher )
         else IF_EXTRACT("DESCRIPTION=", Description )
-        else if( !hasDescription )
-        {
-            IF_EXTRACT("COMMENTS=", Description )
-        }
+        else IF_EXTRACT("COMMENTS=", Description )
         else IF_EXTRACT("GENRE=", Genre )
         else IF_EXTRACT("DATE=", Date )
         else if( !strncasecmp( psz_comment, "METADATA_BLOCK_PICTURE=", strlen("METADATA_BLOCK_PICTURE=")))
