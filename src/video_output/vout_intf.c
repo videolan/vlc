@@ -84,7 +84,7 @@ static const struct
     { 0.5, N_("1:2 Half") },
     { 1, N_("1:1 Original") },
     { 2, N_("2:1 Double") },
-    { 0, NULL } };
+};
 
 static const struct
 {
@@ -102,7 +102,7 @@ static const struct
     { "4:3", "4:3" },
     { "5:4", "5:4" },
     { "1:1", "1:1" },
-    { NULL, NULL } };
+};
 
 static const struct
 {
@@ -118,7 +118,7 @@ static const struct
     { "235:100", "2.35:1" },
     { "239:100", "2.39:1" },
     { "5:4", "5:4" },
-    { NULL, NULL } };
+};
 
 static void AddCustomRatios( vout_thread_t *p_vout, const char *psz_var,
                              char *psz_list )
@@ -147,7 +147,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
 {
     vlc_value_t val, text, old_val;
     char *psz_buf;
-    int i;
 
     /* Create a few object variables we'll need later on */
     var_Create( p_vout, "snapshot-path", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -184,7 +183,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
     var_Get( p_vout, "zoom", &old_val );
 
-    for( i = 0; p_zoom_values[i].f_value; i++ )
+    for( size_t i = 0; i < ARRAY_SIZE(p_zoom_values); i++ )
     {
         if( old_val.f_float == p_zoom_values[i].f_value )
             var_Change( p_vout, "zoom", VLC_VAR_DELCHOICE, &old_val, NULL );
@@ -218,7 +217,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     val.psz_string = (char*)"";
     var_Change( p_vout, "crop", VLC_VAR_DELCHOICE, &val, 0 );
 
-    for( i = 0; p_crop_values[i].psz_value; i++ )
+    for( size_t i = 0; i < ARRAY_SIZE(p_crop_values); i++ )
     {
         val.psz_string = (char*)p_crop_values[i].psz_value;
         text.psz_string = _( p_crop_values[i].psz_label );
@@ -252,7 +251,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     val.psz_string = (char*)"";
     var_Change( p_vout, "aspect-ratio", VLC_VAR_DELCHOICE, &val, 0 );
 
-    for( i = 0; p_aspect_ratio_values[i].psz_value; i++ )
+    for( size_t i = 0; i < ARRAY_SIZE(p_aspect_ratio_values); i++ )
     {
         val.psz_string = (char*)p_aspect_ratio_values[i].psz_value;
         text.psz_string = _( p_aspect_ratio_values[i].psz_label );
