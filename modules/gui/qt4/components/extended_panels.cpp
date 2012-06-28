@@ -362,10 +362,10 @@ static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_
             }
 
             /* Remove trailing : : */
-            if( strlen( psz_string ) > 0 &&
-                *( psz_string + strlen( psz_string ) -1 ) == ':' )
+            size_t i_len = strlen( psz_string );
+            if( i_len > 0 && *( psz_string + i_len - 1 ) == ':' )
             {
-                *( psz_string + strlen( psz_string ) -1 ) = '\0';
+                *( psz_string + i_len - 1 ) = '\0';
             }
         }
         else
