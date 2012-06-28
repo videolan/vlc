@@ -530,7 +530,7 @@ static int string_to_IV(char *string_hexa, uint8_t iv[AES_BLOCK_SIZE])
             return VLC_EGENERIC;
     }
 
-    for (int i = 8; i ; --i) {
+    for (int i = 7; i >= 0 ; --i) {
         iv[  i] = iv_hi & 0xff;
         iv[8+i] = iv_lo & 0xff;
         iv_hi >>= 8;
