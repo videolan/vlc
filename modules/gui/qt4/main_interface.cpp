@@ -75,6 +75,9 @@ static int IntfRaiseMainCB( vlc_object_t *p_this, const char *psz_variable,
                            vlc_value_t old_val, vlc_value_t new_val,
                            void *param );
 
+const QEvent::Type MainInterface::ToolbarsNeedRebuild =
+        (QEvent::Type)QEvent::registerEventType();
+
 MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
     /* Variables initialisation */
@@ -217,7 +220,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
                  this, setVideoFullScreen( bool ) );
     }
 
-    CONNECT( THEDP, toolBarConfUpdated(), this, recreateToolbars() );
+    CONNECT( THEDP, toolBarConfUpdated(), this, toolBarConfUpdated() );
+    installEventFilter( this );
 
     CONNECT( this, askToQuit(), THEDP, quit() );
 
@@ -1335,6 +1339,22 @@ void MainInterface::closeEvent( QCloseEvent *e )
     emit askToQuit(); /* ask THEDP to quit, so we have a unique method */
     /* Accept session quit. Otherwise we break the desktop mamager. */
     e->accept();
+}
+
+bool MainInterface::eventFilter( QObject *obj, QEvent *event )
+{
+    if ( event->type() == MainInterface::ToolbarsNeedRebuild ) {
+        event->accept();
+        recreateToolbars();
+        return true;
+    } else {
+        return QObject::eventFilter( obj, event );
+    }
+}
+
+void MainInterface::toolBarConfUpdated()
+{
+    QApplication::postEvent( this, new QEvent( MainInterface::ToolbarsNeedRebuild ) );
 }
 
 void MainInterface::setInterfaceFullScreen( bool fs )

@@ -61,7 +61,6 @@ enum {
     CONTROLS_ADVANCED = 0x4,
 };
 
-
 class MainInterface : public QVLCMW
 {
     Q_OBJECT
@@ -72,6 +71,8 @@ public:
     /* tors */
     MainInterface( intf_thread_t *);
     virtual ~MainInterface();
+
+    static const QEvent::Type ToolbarsNeedRebuild;
 
     /* Video requests from core */
     WId  getVideo( int *pi_x, int *pi_y,
@@ -101,6 +102,7 @@ protected:
     virtual void closeEvent( QCloseEvent *);
     virtual void keyPressEvent( QKeyEvent *);
     virtual void wheelEvent( QWheelEvent * );
+    virtual bool eventFilter(QObject *, QEvent *);
 
 private:
     /* Main Widgets Creation */
@@ -205,6 +207,7 @@ public slots:
     void emitRaise();
 
     void reloadPrefs();
+    void toolBarConfUpdated();
 
 private slots:
     void debug();
