@@ -99,16 +99,6 @@ libvlc_LTLIBRARIES += \
         $(NULL)
 endif
 
-libaccess_rtmp_plugin_la_SOURCES = \
-        rtmp/access.c \
-        rtmp/rtmp_amf_flv.c \
-        rtmp/rtmp_amf_flv.h \
-        $(NULL)
-libaccess_rtmp_plugin_la_CFLAGS = $(AM_CFLAGS) \
-	-fno-strict-aliasing
-libaccess_rtmp_plugin_la_LIBADD = $(AM_LIBADD)
-libaccess_rtmp_plugin_la_DEPENDENCIES =
-
 libvlc_LTLIBRARIES += \
 	libfilesystem_plugin.la \
 	libidummy_plugin.la \

@@ -242,9 +242,6 @@ modules/access/rar/access.c
 modules/access/rar/rar.c
 modules/access/rar/rar.h
 modules/access/rar/stream.c
-modules/access/rtmp/access.c
-modules/access/rtmp/rtmp_amf_flv.c
-modules/access/rtmp/rtmp_amf_flv.h
 modules/access/rtp/input.c
 modules/access/rtp/rtp.c
 modules/access/rtp/rtp.h
