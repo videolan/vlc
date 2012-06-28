@@ -78,7 +78,7 @@ static int SubMarginCallback( vlc_object_t *, char const *,
 static const struct
 {
     double f_value;
-    const char *psz_label;
+    char psz_label[13];
 } p_zoom_values[] = {
     { 0.25, N_("1:4 Quarter") },
     { 0.5, N_("1:2 Half") },
@@ -88,8 +88,8 @@ static const struct
 
 static const struct
 {
-    const char *psz_value;
-    const char *psz_label;
+    char psz_value[8];
+    char psz_label[8];
 } p_crop_values[] = {
     { "", N_("Default") },
     { "16:10", "16:10" },
@@ -106,8 +106,8 @@ static const struct
 
 static const struct
 {
-    const char *psz_value;
-    const char *psz_label;
+    char psz_value[8];
+    char psz_label[8];
 } p_aspect_ratio_values[] = {
     { "", N_("Default") },
     { "1:1", "1:1" },
