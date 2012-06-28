@@ -504,7 +504,7 @@ LIBVLC_API void *libvlc_media_get_user_data( libvlc_media_t *p_md );
  *
  * \param p_md media descriptor object
  * \param tracks address to store an allocated array of Elementary Streams
- * descriptions (must be freed by the caller)
+ *        descriptions (must be freed by the caller) [OUT]
  *
  * \return the number of Elementary Streams
  */
