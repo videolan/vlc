@@ -208,7 +208,6 @@ endif
 
 
 EXTRA_LTLIBRARIES += \
-	libaccess_rtmp_plugin.la \
 	libaccess_shm_plugin.la \
 	libaccess_smb_plugin.la \
 	$(NULL)
