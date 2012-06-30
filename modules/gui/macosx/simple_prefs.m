@@ -1212,12 +1212,11 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 - (IBAction)showFontPicker:(id)sender
 {
     char * font = config_GetPsz( p_intf, "freetype-font" );
-    NSString * fontFamilyName = font ? [NSString stringWithUTF8String: font] : nil;
+    NSString * fontName = font ? [NSString stringWithUTF8String: font] : nil;
     free(font);
-    if( fontFamilyName )
+    if( fontName )
     {
-        NSFontDescriptor * fd = [NSFontDescriptor fontDescriptorWithFontAttributes:nil];
-        NSFont * font = [NSFont fontWithDescriptor:[fd fontDescriptorWithFamily:fontFamilyName] textTransform:nil];
+        NSFont * font = [NSFont fontWithName:fontName size:0.0];
         [[NSFontManager sharedFontManager] setSelectedFont:font isMultiple:NO];
     }
     [[NSFontManager sharedFontManager] setTarget: self];
