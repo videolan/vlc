@@ -70,6 +70,8 @@
 #   define PFNGLUSEPROGRAMPROC               typeof(glUseProgram)*
 #   define PFNGLDELETEPROGRAMPROC            typeof(glDeleteProgram)*
 #   define PFNGLATTACHSHADERPROC             typeof(glAttachShader)*
+#   define PFNGLACTIVETEXTUREPROC            typeof(glActiveTexture)*
+#   define PFNGLCLIENTACTIVETEXTUREPROC      typeof(glClientActiveTexture)*
 #endif
 
 #if USE_OPENGL_ES
