@@ -152,6 +152,8 @@ void SearchLineEdit::setMessageVisible( bool on )
 
 void SearchLineEdit::updateText( const QString& text )
 {
+    /* if reset() won't be focused out */
+    if ( !text.isEmpty() ) setMessageVisible( false );
     clearButton->setVisible( !text.isEmpty() );
 }
 
