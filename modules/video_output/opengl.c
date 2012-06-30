@@ -773,48 +773,8 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     return VLC_SUCCESS;
 }
 
-int vout_display_opengl_Display(vout_display_opengl_t *vgl,
-                                const video_format_t *source)
+static void draw_without_shaders( vout_display_opengl_t *vgl, float *left, float *top, float *right, float *bottom )
 {
-    if (vlc_gl_Lock(vgl->gl))
-        return VLC_EGENERIC;
-
-    /* glTexCoord works differently with GL_TEXTURE_2D and
-       GL_TEXTURE_RECTANGLE_EXT */
-    float left[PICTURE_PLANE_MAX];
-    float top[PICTURE_PLANE_MAX];
-    float right[PICTURE_PLANE_MAX];
-    float bottom[PICTURE_PLANE_MAX];
-    for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-        float scale_w, scale_h;
-        if (vgl->tex_target == GL_TEXTURE_2D) {
-            scale_w = (float)vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den / vgl->tex_width[j];
-            scale_h = (float)vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den / vgl->tex_height[j];
-
-        } else {
-            scale_w = 1.0;
-            scale_h = 1.0;
-        }
-        left[j]   = (source->i_x_offset +                       0 ) * scale_w;
-        top[j]    = (source->i_y_offset +                       0 ) * scale_h;
-        right[j]  = (source->i_x_offset + source->i_visible_width ) * scale_w;
-        bottom[j] = (source->i_y_offset + source->i_visible_height) * scale_h;
-    }
-
-
-    /* Why drawing here and not in Render()? Because this way, the
-       OpenGL providers can call vout_display_opengl_Display to force redraw.i
-       Currently, the OS X provider uses it to get a smooth window resizing */
-
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    vgl->UseProgram(vgl->program[0]);
-    vgl->Uniform4fv( vgl->GetUniformLocation( vgl->program[0], "coefficient" ), 4, vgl->local_value);
-    vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[0], "Texture0" ), 0);
-    vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[0], "Texture1" ), 1);
-    vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[0], "Texture2" ), 2);
-
-#if USE_OPENGL_ES
     static const GLfloat vertexCoord[] = {
         -1.0f, -1.0f,
          1.0f, -1.0f,
@@ -831,6 +791,10 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    vgl->ActiveTexture( GL_TEXTURE0);
+    vgl->ClientActiveTexture( GL_TEXTURE0);
+    glEnable(vgl->tex_target);
+    glBindTexture(vgl->tex_target, vgl->texture[0][0]);
     glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
     glTexCoordPointer(2, GL_FLOAT, 0, textureCoord);
 
@@ -839,7 +803,15 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisable(vgl->tex_target);
-#else
+}
+
+static void draw_with_shaders( vout_display_opengl_t *vgl, float *left, float *top, float *right, float *bottom )
+{
+    vgl->UseProgram(vgl->program[0]);
+    vgl->Uniform4fv( vgl->GetUniformLocation( vgl->program[0], "coefficient" ), 4, vgl->local_value);
+    vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[0], "Texture0" ), 0);
+    vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[0], "Texture1" ), 1);
+    vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[0], "Texture2" ), 2);
 
     const GLfloat vertexCoord[] = {
         -1.0, 1.0,
@@ -877,7 +849,55 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
 
+    vgl->ActiveTexture(GL_TEXTURE0 + 0);
+    vgl->ClientActiveTexture(GL_TEXTURE0 + 0);
+}
 
+int vout_display_opengl_Display(vout_display_opengl_t *vgl,
+                                const video_format_t *source)
+{
+    if (vlc_gl_Lock(vgl->gl))
+        return VLC_EGENERIC;
+
+    /* glTexCoord works differently with GL_TEXTURE_2D and
+       GL_TEXTURE_RECTANGLE_EXT */
+    float left[PICTURE_PLANE_MAX];
+    float top[PICTURE_PLANE_MAX];
+    float right[PICTURE_PLANE_MAX];
+    float bottom[PICTURE_PLANE_MAX];
+    for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
+        float scale_w, scale_h;
+        if (vgl->tex_target == GL_TEXTURE_2D) {
+            scale_w = (float)vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den / vgl->tex_width[j];
+            scale_h = (float)vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den / vgl->tex_height[j];
+
+        } else {
+            scale_w = 1.0;
+            scale_h = 1.0;
+        }
+        left[j]   = (source->i_x_offset +                       0 ) * scale_w;
+        top[j]    = (source->i_y_offset +                       0 ) * scale_h;
+        right[j]  = (source->i_x_offset + source->i_visible_width ) * scale_w;
+        bottom[j] = (source->i_y_offset + source->i_visible_height) * scale_h;
+    }
+
+
+    /* Why drawing here and not in Render()? Because this way, the
+       OpenGL providers can call vout_display_opengl_Display to force redraw.i
+       Currently, the OS X provider uses it to get a smooth window resizing */
+
+    glClear(GL_COLOR_BUFFER_BIT);
+
+
+    if( vgl->program[0] )
+    {
+        draw_with_shaders( vgl, left, top ,right, bottom );
+        // Change the program for overlays
+        vgl->UseProgram(vgl->program[1]);
+        vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[1], "Texture0" ), 0);
+    } else {
+        draw_without_shaders( vgl, left, top, right, bottom );
+    }
 
     vgl->ActiveTexture(GL_TEXTURE0 + 0);
     vgl->ClientActiveTexture(GL_TEXTURE0 + 0);
@@ -885,17 +905,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnableClientState(GL_VERTEX_ARRAY);
-    const GLfloat textureCoord[] = {
-        0.0, 0.0,
-        0.0, 1.0,
-        1.0, 0.0,
-        1.0, 1.0,
-    };
 
-    vgl->UseProgram(vgl->program[1]);
-    vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[1], "Texture0" ), 0);
-    vgl->ActiveTexture(GL_TEXTURE0 + 0);
-    vgl->ClientActiveTexture(GL_TEXTURE0 + 0);
     for (int i = 0; i < vgl->region_count; i++) {
         gl_region_t *glr = &vgl->region[i];
         const GLfloat vertexCoord[] = {
@@ -904,7 +914,24 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
             glr->right, glr->top,
             glr->right,glr->bottom,
         };
-        vgl->Uniform4f( vgl->GetUniformLocation( vgl->program[1], "fillColor"), 1.0f, 1.0f, 1.0f, glr->alpha);
+        static const GLfloat textureCoord[] = {
+            0.0, 0.0,
+            0.0, 1.0,
+            1.0, 0.0,
+            1.0, 1.0,
+        };
+
+        if( vgl->program[0] )
+        {
+            vgl->Uniform4f( vgl->GetUniformLocation( vgl->program[1], "fillColor"), 1.0f, 1.0f, 1.0f, glr->alpha);
+        }
+        else
+        {
+            glColor4f( 1.0f, 1.0f, 1.0f, glr->alpha );
+            glEnable(GL_TEXTURE_COORD_ARRAY);
+            glEnable(GL_VERTEX_ARRAY);
+        }
+
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
         glBindTexture(GL_TEXTURE_2D, glr->texture);
@@ -916,7 +943,6 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisable(GL_BLEND);
     glDisable(GL_TEXTURE_2D);
-#endif
 
     vlc_gl_Swap(vgl->gl);
 
