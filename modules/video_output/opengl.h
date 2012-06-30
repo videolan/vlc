@@ -55,13 +55,13 @@
 #  include <GL/gl.h>
 # endif
 #else
-# if USE_OPENGL_ES
+# if !USE_OPENGL_ES
+#  define MACOS_OPENGL
+#  include <OpenGL/gl.h>
+# else
 #  include <OpenGLES/ES1/gl.h>
 #  include <OpenGLES/ES2/gl.h>
 #  include <OpenGLES/ES2/glext.h>
-# else
-#  define MACOS_OPENGL
-#  include <OpenGL/gl.h>
 # endif
 #endif
 
