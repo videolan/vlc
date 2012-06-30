@@ -896,7 +896,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 logical_stream_t *p_stream;
 
                 p_stream = malloc( sizeof(logical_stream_t) );
-                if( !p_stream )
+                if( unlikely( !p_stream ) )
                     return VLC_ENOMEM;
 
                 TAB_APPEND( p_ogg->i_streams, p_ogg->pp_stream, p_stream );
