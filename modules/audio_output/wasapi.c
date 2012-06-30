@@ -200,7 +200,7 @@ static int SimpleVolumeSet(audio_output_t *aout, float vol, bool mute)
     if (FAILED(hr))
         msg_Warn(aout, "cannot set session volume (error 0x%lx)", hr);
 
-    if (mute)
+    if (!mute)
     {
         hr = ISimpleAudioVolume_SetMute(sys->volume.simple, false, NULL);
         if (FAILED(hr))
