@@ -72,6 +72,9 @@
 #   define PFNGLATTACHSHADERPROC             typeof(glAttachShader)*
 #   define PFNGLACTIVETEXTUREPROC            typeof(glActiveTexture)*
 #   define PFNGLCLIENTACTIVETEXTUREPROC      typeof(glClientActiveTexture)*
+#if USE_OPENGL_ES
+#   define GL_UNPACK_ROW_LENGTH 0
+#endif
 #endif
 
 #if USE_OPENGL_ES
