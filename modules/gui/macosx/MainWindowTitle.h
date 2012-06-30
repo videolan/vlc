@@ -56,6 +56,10 @@
 - (void)setWindowButtonOver:(BOOL)b_value;
 - (void)setWindowFullscreenButtonOver:(BOOL)b_value;
 
+- (NSButton*)closeButton;
+- (NSButton*)minimizeButton;
+- (NSButton*)zoomButton;
+
 @end
 
 @interface VLCWindowButtonCell : NSButtonCell

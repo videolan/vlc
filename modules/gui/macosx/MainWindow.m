@@ -2750,6 +2750,59 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     return nil;
 }
+
+#pragma mark -
+#pragma mark Accessibility stuff
+
+- (NSArray *)accessibilityAttributeNames
+{
+    if( !b_dark_interface )
+        return [super accessibilityAttributeNames];
+
+    static NSMutableArray *attributes = nil;
+    if ( attributes == nil ) {
+        attributes = [[super accessibilityAttributeNames] mutableCopy];
+        NSArray *appendAttributes = [NSArray arrayWithObjects: NSAccessibilitySubroleAttribute,
+                                     NSAccessibilityCloseButtonAttribute,
+                                     NSAccessibilityMinimizeButtonAttribute,
+                                     NSAccessibilityZoomButtonAttribute,
+                                     nil];
+
+        for( NSString *attribute in appendAttributes )
+        {
+            if( ![attributes containsObject:attribute] )
+                [attributes addObject:attribute];
+        }
+    }
+    return attributes;
+}
+
+- (id)accessibilityAttributeValue: (NSString*)o_attribute_name
+{
+    if( b_dark_interface )
+    {
+        VLCMainWindowTitleView *o_tbv = o_titlebar_view;
+
+        if( [o_attribute_name isEqualTo: NSAccessibilitySubroleAttribute] )
+            return NSAccessibilityStandardWindowSubrole;
+
+        if( [o_attribute_name isEqualTo: NSAccessibilityCloseButtonAttribute] )
+            return [[o_tbv closeButton] cell];
+
+        if( [o_attribute_name isEqualTo: NSAccessibilityMinimizeButtonAttribute] )
+            return [[o_tbv minimizeButton] cell];
+        
+        if( [o_attribute_name isEqualTo: NSAccessibilityZoomButtonAttribute] )
+            return [[o_tbv zoomButton] cell];
+    }
+
+    return [super accessibilityAttributeValue: o_attribute_name];
+}
+
+- (id)detachedTitlebarView
+{
+    return o_detached_titlebar_view;
+}
 @end
 
 @implementation VLCDetachedVideoWindow
@@ -2958,6 +3011,51 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     [self setFrame: maxRect display: YES animate: YES];
+}
+
+- (NSArray *)accessibilityAttributeNames
+{
+    if( !b_dark_interface )
+        return [super accessibilityAttributeNames];
+    
+    static NSMutableArray *attributes = nil;
+    if ( attributes == nil ) {
+        attributes = [[super accessibilityAttributeNames] mutableCopy];
+        NSArray *appendAttributes = [NSArray arrayWithObjects: NSAccessibilitySubroleAttribute,
+                                     NSAccessibilityCloseButtonAttribute,
+                                     NSAccessibilityMinimizeButtonAttribute,
+                                     NSAccessibilityZoomButtonAttribute,
+                                     nil];
+        
+        for( NSString *attribute in appendAttributes )
+        {
+            if( ![attributes containsObject:attribute] )
+                [attributes addObject:attribute];
+        }
+    }
+    return attributes;
+}
+
+- (id)accessibilityAttributeValue: (NSString*)o_attribute_name
+{
+    if( b_dark_interface )
+    {
+        VLCMainWindowTitleView *o_tbv = [[VLCMainWindow sharedInstance] detachedTitlebarView];
+        
+        if( [o_attribute_name isEqualTo: NSAccessibilitySubroleAttribute] )
+            return NSAccessibilityStandardWindowSubrole;
+        
+        if( [o_attribute_name isEqualTo: NSAccessibilityCloseButtonAttribute] )
+            return [[o_tbv closeButton] cell];
+        
+        if( [o_attribute_name isEqualTo: NSAccessibilityMinimizeButtonAttribute] )
+            return [[o_tbv minimizeButton] cell];
+        
+        if( [o_attribute_name isEqualTo: NSAccessibilityZoomButtonAttribute] )
+            return [[o_tbv zoomButton] cell];
+    }
+    
+    return [super accessibilityAttributeValue: o_attribute_name];
 }
 
 @end

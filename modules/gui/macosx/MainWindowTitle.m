@@ -257,6 +257,22 @@
 
     [super mouseDown: event];
 }
+
+- (NSButton*)closeButton
+{
+    return o_red_btn;
+}
+
+- (NSButton*)minimizeButton
+{
+    return o_yellow_btn;
+}
+
+- (NSButton*)zoomButton
+{
+    return o_green_btn;
+}
+
 @end
 
 /*****************************************************************************
