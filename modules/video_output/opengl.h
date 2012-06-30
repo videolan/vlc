@@ -29,16 +29,22 @@
 #include <vlc_picture_pool.h>
 #include <vlc_opengl.h>
 
+#ifdef __APPLE__
+# include "TargetConditionals.h"
+# if defined(TARGET_OS_MAC)
+#  define MACOS_OPENGL
+#  include <OpenGL/gl.h>
+# else
+#  define USE_OPENGL_ES 1
+#  include <OpenGLES/ES1/gl.h>
+#  include <OpenGLES/ES2/gl.h>
+#  include <OpenGLES/ES2/glext.h>
+# endif
+#endif
+
 // Define USE_OPENGL_ES to the GL ES Version you want to select
 #ifndef USE_OPENGL_ES
 # define USE_OPENGL_ES 0
-#endif
-
-#ifdef __APPLE__
-# include "TargetConditionals.h"
-# if defined(TARGET_OS_IPHONE) || defined(TARGET_IPHONE_SIMULATOR)
-#  define USE_OPENGL_ES 1
-# endif
 #endif
 
 #if !defined (__APPLE__)
@@ -53,15 +59,6 @@
 #   include <GL/glx.h>
 #  endif
 #  include <GL/gl.h>
-# endif
-#else
-# if !USE_OPENGL_ES
-#  define MACOS_OPENGL
-#  include <OpenGL/gl.h>
-# else
-#  include <OpenGLES/ES1/gl.h>
-#  include <OpenGLES/ES2/gl.h>
-#  include <OpenGLES/ES2/glext.h>
 # endif
 #endif
 
