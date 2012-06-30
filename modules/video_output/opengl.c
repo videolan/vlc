@@ -241,7 +241,9 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
 
-    bool supports_fp = true;
+    const char *ogl_version = glGetString(GL_VERSION);
+    float f_ogl_version = atof(ogl_version);
+    bool supports_shaders = f_ogl_version >= 2.0f;
     GLint max_texture_units = 0;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
 
@@ -281,7 +283,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     /* Use YUV if possible and needed */
     bool need_fs_yuv = false;
     float yuv_range_correction = 1.0;
-    if ( max_texture_units >= 3 &&
+    if ( max_texture_units >= 3 && supports_shaders &&
         vlc_fourcc_IsYUV(fmt->i_chroma) && !vlc_fourcc_IsYUV(vgl->fmt.i_chroma)) {
         const vlc_fourcc_t *list = vlc_fourcc_GetYUVFallback(fmt->i_chroma);
         while (*list) {
@@ -360,7 +362,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     if( !vgl->CreateShader || !vgl->ShaderSource || !vgl->CreateProgram )
     {
-        fprintf(stderr, "Looks like you don't have all the opengl we need, only %s, giving up\n", glGetString(GL_VERSION));
+        fprintf(stderr, "Looks like you don't have all the opengl we need. Driver is %s, giving up\n", glGetString(GL_VERSION));
         free( vgl );
         return NULL;
     }
@@ -379,7 +381,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->program[1] = 0;
     vgl->local_count = 0;
     vgl->shader[0] = vgl->shader[1] = vgl->shader[2] = -1;
-    if (supports_fp) {
+    if (supports_shaders) {
         char *code = NULL;
 
             /* [R/G/B][Y U V O] from TV range to full range
@@ -515,7 +517,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
                     if( link_status == GL_FALSE )
                     {
-                        msg_Err( vgl->gl, "Unable to use program %d", i );
+                        fprintf( stderr, "Unable to use program %d", i );
                         free( vgl );
                         return NULL;
                     }
