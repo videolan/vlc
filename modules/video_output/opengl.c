@@ -1,7 +1,7 @@
 /*****************************************************************************
  * opengl.c: OpenGL and OpenGL ES output common code
  *****************************************************************************
- * Copyright (C) 2004-2011 VLC authors and VideoLAN
+ * Copyright (C) 2004-2012 VLC authors and VideoLAN
  * Copyright (C) 2009, 2011 Laurent Aimar
  *
  * Authors: Cyril Deguet <asmax@videolan.org>
@@ -9,6 +9,7 @@
  *          Eric Petit <titer@m0k.org>
  *          Cedric Cocquebert <cedric.cocquebert@supelec.fr>
  *          Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
+ *          Ilkka Ollakka <ileoo@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
