@@ -33,11 +33,12 @@ OPTIONS:
    -h            Show this help
    -i            Identity to use
    -t            Entitlements file to use
+   -g            Enable additional magic
 EOF
 
 }
 
-while getopts "hi:t:" OPTION
+while getopts "hi:t:g" OPTION
 do
      case $OPTION in
          h)
@@ -50,6 +51,9 @@ do
          t)
              OPTIONS="--entitlements $OPTARG"
          ;;
+         g)
+             GK="yes"
+         ;;
      esac
 done
 shift $(($OPTIND - 1))
@@ -59,18 +63,32 @@ if [ "x$1" != "x" ]; then
     exit 1
 fi
 
-info "Signing the executable"
+if test -z "$GK"
+then
+    info "Signing the executable"
+    codesign --force --sign "$IDENTITY" $OPTIONS VLC.app/Contents/MacOS/VLC
 
-codesign -s "$IDENTITY" $OPTIONS VLC.app/Contents/MacOS/VLC
+    info "Signing the modules"
+    find VLC.app/Contents/MacOS/plugins/* -type f -exec codesign --force -s "$IDENTITY" $OPTIONS '{}' \;
 
-info "Signing the modules"
-find VLC.app/Contents/MacOS/plugins/* -type f -exec codesign -s "$IDENTITY" $OPTIONS '{}' \;
+    info "Signing the libraries"
+    find VLC.app/Contents/MacOS/lib/* -type f -exec codesign --force -s "$IDENTITY" $OPTIONS '{}' \;
 
-info "Signing the libraries"
-find VLC.app/Contents/MacOS/lib/* -type f -exec codesign -s "$IDENTITY" $OPTIONS '{}' \;
+    info "Signing the lua stuff"
+    find VLC.app/Contents/MacOS/share/lua/* -name *luac -type f -exec codesign --force -s "$IDENTITY" $OPTIONS '{}' \;
+else
+    info "Signing the executable"
+    codesign --force --sign "$IDENTITY" $OPTIONS --requirements "=designated => anchor apple generic  and identifier \"org.videolan.vlc\" and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or ( certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists  and certificate leaf[subject.OU] = \"75GAHG3SZQ\" ))" VLC.app/Contents/MacOS/VLC
 
-info "Signing the lua stuff"
-find VLC.app/Contents/MacOS/share/lua/* -type f -exec codesign -s "$IDENTITY" $OPTIONS '{}' \;
+    info "Signing the modules"
+    find VLC.app/Contents/MacOS/plugins/* -type f -exec codesign --force -s "$IDENTITY" $OPTIONS --requirements "=designated => anchor apple generic  and identifier \"org.videolan.vlc\" and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or ( certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists  and certificate leaf[subject.OU] = \"75GAHG3SZQ\" ))" '{}' \;
+
+    info "Signing the libraries"
+    find VLC.app/Contents/MacOS/lib/* -type f -exec codesign --force -s "$IDENTITY" $OPTIONS --requirements "=designated => anchor apple generic  and identifier \"org.videolan.vlc\" and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or ( certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists  and certificate leaf[subject.OU] = \"75GAHG3SZQ\" ))" '{}' \;
+
+    info "Signing the lua stuff"
+    find VLC.app/Contents/MacOS/share/lua/* -name *luac -type f -exec codesign --force -s "$IDENTITY" $OPTIONS --requirements "=designated => anchor apple generic  and identifier \"org.videolan.vlc\" and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or ( certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists  and certificate leaf[subject.OU] = \"75GAHG3SZQ\" ))" '{}' \;
+fi
 
 info "all items signed, validating..."
 
@@ -84,6 +102,6 @@ info "Validating libraries"
 find VLC.app/Contents/MacOS/lib/* -type f -exec codesign --verify '{}' \;
 
 info "Validating lua stuff"
-find VLC.app/Contents/MacOS/share/lua/* -type f -exec codesign --verify '{}' \;
+find VLC.app/Contents/MacOS/share/lua/* -name *luac -type f -exec codesign --verify '{}' \;
 
 info "Validation complete"
