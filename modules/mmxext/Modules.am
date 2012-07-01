@@ -3,6 +3,8 @@ libmemcpymmxext_plugin_la_CFLAGS = $(AM_CFLAGS)
 libmemcpymmxext_plugin_la_LIBADD = $(AM_LIBADD)
 libmemcpymmxext_plugin_la_DEPENDENCIES =
 
+if HAVE_WIN32
 libvlc_LTLIBRARIES += \
 	libmemcpymmxext_plugin.la \
 	$(NULL)
+endif
