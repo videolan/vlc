@@ -794,8 +794,12 @@ static void draw_without_shaders( vout_display_opengl_t *vgl, float *left, float
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glEnable(GL_VERTEX_ARRAY);
+    glEnable(GL_TEXTURE_COORD_ARRAY);
+
     vgl->ActiveTexture( GL_TEXTURE0);
     vgl->ClientActiveTexture( GL_TEXTURE0);
+
     glEnable(vgl->tex_target);
     glBindTexture(vgl->tex_target, vgl->texture[0][0]);
     glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
@@ -803,9 +807,11 @@ static void draw_without_shaders( vout_display_opengl_t *vgl, float *left, float
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
+    glDisable(vgl->tex_target);
+    glDisable(GL_TEXTURE_COORD_ARRAY);
+    glDisable(GL_VERTEX_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisableClientState(GL_VERTEX_ARRAY);
-    glDisable(vgl->tex_target);
 }
 
 static void draw_with_shaders( vout_display_opengl_t *vgl, float *left, float *top, float *right, float *bottom )
