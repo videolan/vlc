@@ -30,8 +30,8 @@
 #include <vlc_opengl.h>
 
 #ifdef __APPLE__
-# include "TargetConditionals.h"
-# if !defined(TARGET_OS_IPHONE)
+# include <TargetConditionals.h>
+# if !TARGET_OS_IPHONE
 #  define MACOS_OPENGL
 #  include <OpenGL/gl.h>
 # else
