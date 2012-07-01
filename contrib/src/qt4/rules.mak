@@ -1,7 +1,7 @@
 # qt4
 
-QT4_VERSION = 4.8.1
-QT4_URL := http://download.qt.nokia.com/qt/source/qt-everywhere-opensource-src-$(QT4_VERSION).tar.gz
+QT4_VERSION = 4.8.2
+QT4_URL := http://releases.qt-project.org/qt4/source/qt-everywhere-opensource-src-$(QT4_VERSION).tar.gz
 
 ifdef HAVE_MACOSX
 #PKGS += qt4
