@@ -323,7 +323,7 @@ int libvlc_audio_get_mute( libvlc_media_player_t *mp )
 
 void libvlc_audio_set_mute( libvlc_media_player_t *mp, int mute )
 {
-    aout_SetMute( VLC_OBJECT(mp), NULL, !!mute );
+    aout_MuteSet( VLC_OBJECT(mp), mute != 0 );
 }
 
 /*****************************************************************************

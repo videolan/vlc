@@ -204,7 +204,7 @@ void SoundWidget::setMuted( bool mute )
 {
     b_is_muted = mute;
     playlist_t *p_playlist = pl_Get( p_intf );
-    aout_SetMute( VLC_OBJECT(p_playlist), NULL, mute );
+    aout_MuteSet( VLC_OBJECT(p_playlist), mute );
 }
 
 bool SoundWidget::eventFilter( QObject *obj, QEvent *e )
