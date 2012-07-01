@@ -245,9 +245,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
 
-    const char *ogl_version = glGetString(GL_VERSION);
-    float f_ogl_version = atof(ogl_version);
-    bool supports_shaders = f_ogl_version >= 2.0f;
+    const unsigned char *ogl_version = glGetString(GL_VERSION);
+    bool supports_shaders = strverscmp((const char *)ogl_version, "2.0") >= 0;
     GLint max_texture_units = 0;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
 
