@@ -153,9 +153,9 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
         else IF_EXTRACT("ALBUM=", Album )
         else IF_EXTRACT("TRACKNUMBER=", TrackNumber )
         else if( !hasTrackTotal )
-            IF_EXTRACT("TRACKTOTAL=", TrackTotal )
+        { IF_EXTRACT("TRACKTOTAL=", TrackTotal ) }
         else if( !hasTrackTotal )
-            IF_EXTRACT("TOTALTRACKS=", TrackTotal )
+        { IF_EXTRACT("TOTALTRACKS=", TrackTotal ) }
         else IF_EXTRACT("ARTIST=", Artist )
         else IF_EXTRACT("COPYRIGHT=", Copyright )
         else IF_EXTRACT("ORGANIZATION=", Publisher )
