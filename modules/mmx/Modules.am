@@ -27,8 +27,11 @@ libi422_yuy2_mmx_plugin_la_LIBADD = $(AM_LIBADD)
 libi422_yuy2_mmx_plugin_la_DEPENDENCIES =
 
 libvlc_LTLIBRARIES += \
-	libmemcpymmx_plugin.la \
 	libi420_rgb_mmx_plugin.la \
 	libi420_yuy2_mmx_plugin.la \
 	libi422_yuy2_mmx_plugin.la \
 	$(NULL)
+
+if HAVE_WIN32
+libvlc_LTLIBRARIES += libmemcpymmx_plugin.la
+endif
