@@ -53,11 +53,6 @@
 # elif USE_OPENGL_ES == 1
 #  include <GLES/gl.h>
 # else
-#  ifdef WIN32
-#   include <GL/glew.h>
-#  else
-#   include <GL/glx.h>
-#  endif
 #  include <GL/gl.h>
 # endif
 #endif
