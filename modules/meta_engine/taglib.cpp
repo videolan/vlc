@@ -127,13 +127,47 @@ static void ExtractTrackNumberValues( vlc_meta_t* p_meta, const char *psz_value 
  * @param p_demux_meta: the demuxer meta
  * @param p_meta: the meta
  */
-static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t*, vlc_meta_t* p_meta )
+static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta_t* p_meta )
 {
     APE::Item item;
+
+    item = tag->itemListMap()["COVER ART (FRONT)"];
+    if( !item.isEmpty() )
+    {
+        input_attachment_t *p_attachment;
+
+        const ByteVector picture = item.value();
+        const char *p_data = picture.data();
+        unsigned i_data = picture.size();
+
+        size_t desc_len = strnlen(p_data, i_data);
+        if (desc_len < i_data) {
+            const char *psz_name = p_data;
+            p_data += desc_len + 1; /* '\0' */
+            i_data -= desc_len + 1;
+            msg_Dbg( p_demux_meta, "Found embedded art: %s (%s) is %u bytes",
+                     psz_name, "image/jpeg", i_data );
+
+            p_attachment = vlc_input_attachment_New( "cover", "image/jpeg",
+                                    psz_name, p_data, i_data );
+            if( p_attachment )
+                TAB_APPEND_CAST( (input_attachment_t**),
+                                 p_demux_meta->i_attachments, p_demux_meta->attachments,
+                                 p_attachment );
+
+            vlc_meta_SetArtURL( p_meta, "attachment://cover" );
+        }
+    }
+
 #define SET( keyName, metaName ) \
     item = tag->itemListMap()[keyName]; \
     if( !item.isEmpty() ) vlc_meta_Set##metaName( p_meta, item.toString().toCString( true ) ); \
 
+    SET( "ALBUM", Album );
+    SET( "ARTIST", Artist );
+    SET( "COMMENT", Description );
+    SET( "GENRE", Genre );
+    SET( "TITLE", Title );
     SET( "COPYRIGHT", Copyright );
     SET( "LANGUAGE", Language );
     SET( "PUBLISHER", Publisher );
