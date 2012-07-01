@@ -180,23 +180,18 @@ int aout_VolumeUp (vlc_object_t *obj, int value, audio_volume_t *volp)
     return ret;
 }
 
-#undef aout_ToggleMute
+#undef aout_MuteToggle
 /**
  * Toggles the mute state.
  */
-int aout_ToggleMute (vlc_object_t *obj, audio_volume_t *volp)
+int aout_MuteToggle (vlc_object_t *obj)
 {
     audio_output_t *aout;
-    int ret;
-    float vol;
     bool mute;
 
     prepareVolume (obj, &aout, &vol, &mute);
     mute = !mute;
-    ret = commitVolume (obj, aout, vol, mute);
-    if (volp != NULL)
-        *volp = lroundf (vol * AOUT_VOLUME_DEFAULT);
-    return ret;
+    return commitVolume (obj, aout, vol, mute);
 }
 
 /**

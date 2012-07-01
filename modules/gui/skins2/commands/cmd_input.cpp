@@ -102,7 +102,7 @@ void CmdFaster::execute()
 
 void CmdMute::execute()
 {
-    aout_ToggleMute( getIntf()->p_sys->p_playlist, NULL );
+    aout_MuteToggle( getIntf()->p_sys->p_playlist );
 }
 
 

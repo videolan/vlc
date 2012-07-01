@@ -17,7 +17,7 @@ aout_MixerRun
 aout_VolumeGet
 aout_VolumeSet
 aout_VolumeUp
-aout_ToggleMute
+aout_MuteToggle
 aout_IsMuted
 aout_SetMute
 aout_VolumeSoftInit

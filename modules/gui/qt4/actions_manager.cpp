@@ -179,7 +179,7 @@ void ActionsManager::frame()
 
 void ActionsManager::toggleMuteAudio()
 {
-     aout_ToggleMute( THEPL, NULL );
+     aout_MuteToggle( THEPL );
 }
 
 void ActionsManager::AudioUp()

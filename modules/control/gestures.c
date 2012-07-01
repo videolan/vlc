@@ -274,7 +274,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
         case GESTURE(UP,DOWN,NONE,NONE):
         case GESTURE(DOWN,UP,NONE,NONE):
             msg_Dbg( p_intf, "Mute sound" );
-            aout_ToggleMute( p_playlist, NULL );
+            aout_MuteToggle( p_playlist );
             break;
 
         case GESTURE(UP,RIGHT,NONE,NONE):

@@ -1499,7 +1499,7 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
         /* Set. */
         audio_volume_t i_volume = atoi( newval.psz_string );
         if( i_volume == 0 )
-            aout_ToggleMute( p_playlist, NULL );
+            aout_MuteToggle( p_playlist );
         if( !aout_VolumeSet( p_playlist, i_volume ) )
             i_error = VLC_SUCCESS;
         osd_Volume( p_this );

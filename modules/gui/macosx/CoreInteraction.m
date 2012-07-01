@@ -494,7 +494,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     if( !p_intf )
         return;
 
-    aout_ToggleMute( pl_Get( p_intf ), NULL );
+    aout_MuteToggle( pl_Get( p_intf ) );
 }
 
 - (BOOL)isMuted

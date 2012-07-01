@@ -201,21 +201,20 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         }
 
         case ACTIONID_VOL_MUTE:
-        {
-            audio_volume_t i_newvol = -1;
-            aout_ToggleMute( p_playlist, &i_newvol );
-            if( p_vout )
+            if( aout_MuteToggle( p_playlist ) == 0 && p_vout != NULL )
             {
-                if( i_newvol == 0 )
+                if( aout_IsMuted( VLC_OBJECT(p_playlist) ) )
                 {
                     ClearChannels( p_intf, p_vout );
                     DisplayIcon( p_vout, OSD_MUTE_ICON );
                 }
                 else
-                    DisplayVolume( p_intf, p_vout, i_newvol );
+                {
+                    audio_volume_t i_vol = aout_VolumeGet( p_playlist );
+                    DisplayVolume( p_intf, p_vout, i_vol );
+                }
             }
             break;
-        }
 
         /* Interface showing */
         case ACTIONID_INTF_TOGGLE_FSC:
