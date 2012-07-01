@@ -1,0 +1,15 @@
+diff --git a/taglib/mpeg/id3v2/id3v2tag.cpp b/taglib/mpeg/id3v2/id3v2tag.cpp
+index c6fe7b7..ebb1969 100644
+--- a/taglib/mpeg/id3v2/id3v2tag.cpp
++++ b/taglib/mpeg/id3v2/id3v2tag.cpp
+@@ -652,7 +652,9 @@ void ID3v2::Tag::parse(const ByteVector &origData)
+       return;
+     }
+ 
+-    Frame *frame = d->factory->createFrame(data.mid(frameDataPosition),
++    Frame *frame = NULL;
++    if (d->factory)
++        frame = d->factory->createFrame(data.mid(frameDataPosition),
+                                            &d->header);
+ 
+     if(!frame)

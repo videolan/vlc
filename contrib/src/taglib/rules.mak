@@ -14,6 +14,7 @@ taglib: taglib-$(TAGLIB_VERSION).tar.gz .sum-taglib
 	$(UNPACK)
 	$(APPLY) $(SRC)/taglib/taglib-static.patch
 	$(APPLY) $(SRC)/taglib/no-ansi.patch
+	$(APPLY) $(SRC)/taglib/7036.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/taglib/taglib-win32.patch
 endif
