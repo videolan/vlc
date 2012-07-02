@@ -983,7 +983,7 @@ static void FilterPlanar( uint8_t *p_out, int i_out_pitch,
     /* Top black border */
     for( int b = 0; b < p_cfg->black.i_top; b++ )
     {
-        vlc_memset( p_out, i_pixel_black, i_out_width );
+        memset( p_out, i_pixel_black, i_out_width );
         p_out += i_out_pitch;
     }
 
@@ -1036,7 +1036,7 @@ static void FilterPlanar( uint8_t *p_out, int i_out_pitch,
     /* Bottom black border */
     for( int b = 0; b < p_cfg->black.i_bottom; b++ )
     {
-        vlc_memset( p_out, i_pixel_black, i_out_width );
+        memset( p_out, i_pixel_black, i_out_width );
         p_out += i_out_pitch;
     }
 }

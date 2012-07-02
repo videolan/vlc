@@ -328,7 +328,7 @@ static ULONG APIENTRY KaiCallback( PVOID p_cb_data,
         }
         else
         {
-            vlc_memset( ( uint8_t * ) p_buffer + i_len, 0, i_buf_size - i_len );
+            memset( ( uint8_t * ) p_buffer + i_len, 0, i_buf_size - i_len );
 
             i_len = i_buf_size;
         }

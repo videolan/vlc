@@ -286,10 +286,10 @@ static void PlanarI420Sepia( picture_t *p_pic, picture_t *p_outpic,
                     &p_pic->p[Y_PLANE].p_pixels[i_dy_line2_start + x + 8],
                     i_intensity_spread );
                 /* Copy precomputed values to destination memory location */
-                vlc_memset(
+                memset(
                     &p_outpic->p[U_PLANE].p_pixels[i_du_line_start + (x / 2)],
                     filling_const_8u, 8 );
-                vlc_memset(
+                memset(
                     &p_outpic->p[V_PLANE].p_pixels[i_dv_line_start + (x / 2)],
                     filling_const_8v, 8 );
             }

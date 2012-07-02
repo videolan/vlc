@@ -164,10 +164,10 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     v = p_filter->p_sys->v;
     for( y = 0; y<p_outpic->p[U_PLANE].i_lines; y++)
     {
-        vlc_memset(
+        memset(
                 p_outpic->p[U_PLANE].p_pixels+y*p_outpic->p[U_PLANE].i_pitch,
                 u, p_outpic->p[U_PLANE].i_pitch );
-        vlc_memset(
+        memset(
                 p_outpic->p[V_PLANE].p_pixels+y*p_outpic->p[V_PLANE].i_pitch,
                 v, p_outpic->p[V_PLANE].i_pitch );
         if( v == 0 && u != 0 )

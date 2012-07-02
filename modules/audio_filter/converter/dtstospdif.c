@@ -205,7 +205,7 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
 
         if( i_fz > i_length + 8 )
         {
-            vlc_memset( p_out + 8 + i_length_padded, 0,
+            memset( p_out + 8 + i_length_padded, 0,
                         i_fz - i_length_padded - 8 );
         }
     }

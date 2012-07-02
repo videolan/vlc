@@ -1334,7 +1334,7 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
         }
         else
         {
-             vlc_memset( (uint8_t *)ioData->mBuffers[0].mData +i_mData_bytes,
+             memset( (uint8_t *)ioData->mBuffers[0].mData +i_mData_bytes,
                          0,ioData->mBuffers[0].mDataByteSize - i_mData_bytes );
              i_mData_bytes += ioData->mBuffers[0].mDataByteSize - i_mData_bytes;
         }
@@ -1386,7 +1386,7 @@ static OSStatus RenderCallbackSPDIF( AudioDeviceID inDevice,
     }
     else
     {
-        vlc_memset( BUFFER.mData, 0, BUFFER.mDataByteSize );
+        memset( BUFFER.mData, 0, BUFFER.mDataByteSize );
     }
 #undef BUFFER
 

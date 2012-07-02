@@ -270,7 +270,7 @@ static block_t *aout_OutputSlice (audio_output_t *p_aout)
             if( unlikely(p_inbuf == NULL) )
             {
                 msg_Err( p_aout, "packetization error" );
-                vlc_memset( p_out, 0, needed );
+                memset( p_out, 0, needed );
                 break;
             }
 

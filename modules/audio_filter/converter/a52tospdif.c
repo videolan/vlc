@@ -106,7 +106,7 @@ static block_t *DoWork( filter_t * p_filter, block_t *p_in_buf )
         SetWLE( p_out + 6, i_frame_size << 4 );
         swab( p_in, &p_out[8], i_frame_size * 2 );
     }
-    vlc_memset( p_out + 8 + i_frame_size * 2, 0,
+    memset( p_out + 8 + i_frame_size * 2, 0,
                 AOUT_SPDIF_SIZE - i_frame_size * 2 - 8 );
 
     p_out_buf->i_dts = p_in_buf->i_dts;

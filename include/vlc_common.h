@@ -881,9 +881,8 @@ static inline void *vlc_memalign(size_t align, size_t size)
 
 VLC_API void vlc_tdestroy( void *, void (*)(void *) );
 
-/* Fast large memory copy and memory set */
+/* Fast large memory copy */
 VLC_API void * vlc_memcpy( void *, const void *, size_t );
-#define vlc_memset memset
 
 /*****************************************************************************
  * I18n stuff

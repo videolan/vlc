@@ -975,8 +975,8 @@ static int DecodeFrame( demux_t *p_demux )
         {
             /* For PAL, erase first half of line 23, last half of line 623,
              * and line 624 ; no need to erase chrominance */
-            vlc_memset( p_sys->p_y, 0, p_sys->i_width / 2 );
-            vlc_memset( p_sys->p_y + p_sys->i_width * 574 + p_sys->i_width / 2,
+            memset( p_sys->p_y, 0, p_sys->i_width / 2 );
+            memset( p_sys->p_y + p_sys->i_width * 574 + p_sys->i_width / 2,
                         0, p_sys->i_width * 3 / 2 );
         }
     }

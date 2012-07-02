@@ -317,7 +317,7 @@ static void DrawRectangle( uint8_t *pb_dst, int i_pitch, int i_width, int i_heig
         return;
 
     /* top line */
-    vlc_memset( &pb_dst[y * i_pitch + x], 0xff, i_w );
+    memset( &pb_dst[y * i_pitch + x], 0xff, i_w );
 
     /* left and right */
     for( dy = 1; dy < i_h-1; dy++ )
@@ -327,7 +327,7 @@ static void DrawRectangle( uint8_t *pb_dst, int i_pitch, int i_width, int i_heig
     }
 
     /* bottom line */
-    vlc_memset( &pb_dst[(y+i_h-1) * i_pitch + x], 0xff, i_w );
+    memset( &pb_dst[(y+i_h-1) * i_pitch + x], 0xff, i_w );
 }
 
 static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse, const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )

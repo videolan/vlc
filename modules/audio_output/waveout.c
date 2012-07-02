@@ -765,7 +765,7 @@ static int PlayWaveOut( audio_output_t *p_aout, HWAVEOUT h_waveout,
            p_aout->sys->i_repeat_counter--;
            if(!p_aout->sys->i_repeat_counter)
            {
-               vlc_memset( p_aout->sys->p_silence_buffer,
+               memset( p_aout->sys->p_silence_buffer,
                            0x00, p_aout->sys->i_buffer_size );
            }
         }
