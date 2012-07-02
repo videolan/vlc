@@ -347,6 +347,7 @@ static int aout_SoftVolumeSet (audio_output_t *aout, float volume)
      * formula, be sure to update the aout_VolumeHardInit()-based plugins also.
      */
     owner->volume.amp = volume * volume * volume;
+    aout_VolumeReport (aout, volume);
     return 0;
 }
 
@@ -356,6 +357,7 @@ static int aout_SoftMuteSet (audio_output_t *aout, bool mute)
 
     aout_assert_locked (aout);
     owner->volume.mute = mute;
+    aout_MuteReport (aout, mute);
     return 0;
 }
 
