@@ -949,7 +949,7 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
             for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines;
                  i_line++ )
             {
-                vlc_memcpy( p_dst, p_src, i_size );
+                memcpy( p_dst, p_src, i_size );
                 p_src += i_src_stride;
                 p_dst += i_dst_stride;
             }

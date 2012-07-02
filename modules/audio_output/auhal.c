@@ -1291,7 +1291,7 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
     if( p_sys->i_total_bytes > 0 )
     {
         i_mData_bytes = __MIN( p_sys->i_total_bytes - p_sys->i_read_bytes, ioData->mBuffers[0].mDataByteSize );
-        vlc_memcpy( ioData->mBuffers[0].mData,
+        memcpy( ioData->mBuffers[0].mData,
                     &p_sys->p_remainder_buffer[p_sys->i_read_bytes],
                     i_mData_bytes );
         p_sys->i_read_bytes += i_mData_bytes;
@@ -1312,14 +1312,14 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
         {
             uint32_t i_second_mData_bytes = __MIN( p_buffer->i_buffer, ioData->mBuffers[0].mDataByteSize - i_mData_bytes );
 
-            vlc_memcpy( (uint8_t *)ioData->mBuffers[0].mData + i_mData_bytes,
+            memcpy( (uint8_t *)ioData->mBuffers[0].mData + i_mData_bytes,
                         p_buffer->p_buffer, i_second_mData_bytes );
             i_mData_bytes += i_second_mData_bytes;
 
             if( i_mData_bytes >= ioData->mBuffers[0].mDataByteSize )
             {
                 p_sys->i_total_bytes = p_buffer->i_buffer - i_second_mData_bytes;
-                vlc_memcpy( p_sys->p_remainder_buffer,
+                memcpy( p_sys->p_remainder_buffer,
                             &p_buffer->p_buffer[i_second_mData_bytes],
                             p_sys->i_total_bytes );
                 block_Release( p_buffer );
@@ -1382,7 +1382,7 @@ static OSStatus RenderCallbackSPDIF( AudioDeviceID inDevice,
             msg_Warn( p_aout, "bytesize: %d nb_bytes: %d", (int)BUFFER.mDataByteSize, (int)p_buffer->i_buffer );
 
         /* move data into output data buffer */
-        vlc_memcpy( BUFFER.mData, p_buffer->p_buffer, p_buffer->i_buffer );
+        memcpy( BUFFER.mData, p_buffer->p_buffer, p_buffer->i_buffer );
         block_Release( p_buffer );
     }
     else

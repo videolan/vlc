@@ -312,7 +312,7 @@ void plane_CopyPixels( plane_t *p_dst, const plane_t *p_src )
         p_src->i_pitch < 2*p_src->i_visible_pitch )
     {
         /* There are margins, but with the same width : perfect ! */
-        vlc_memcpy( p_dst->p_pixels, p_src->p_pixels,
+        memcpy( p_dst->p_pixels, p_src->p_pixels,
                     p_src->i_pitch * i_height );
     }
     else
@@ -327,7 +327,7 @@ void plane_CopyPixels( plane_t *p_dst, const plane_t *p_src )
 
         for( i_line = i_height; i_line--; )
         {
-            vlc_memcpy( p_out, p_in, i_width );
+            memcpy( p_out, p_in, i_width );
             p_in += p_src->i_pitch;
             p_out += p_dst->i_pitch;
         }

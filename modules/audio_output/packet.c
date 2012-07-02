@@ -278,7 +278,7 @@ static block_t *aout_OutputSlice (audio_output_t *p_aout)
             size_t avail = p_inbuf->i_nb_samples * framesize;
             if( avail > needed )
             {
-                vlc_memcpy( p_out, p_in, needed );
+                memcpy( p_out, p_in, needed );
                 p_fifo->p_first->p_buffer += needed;
                 p_fifo->p_first->i_buffer -= needed;
                 needed /= framesize;
@@ -290,7 +290,7 @@ static block_t *aout_OutputSlice (audio_output_t *p_aout)
                 break;
             }
 
-            vlc_memcpy( p_out, p_in, avail );
+            memcpy( p_out, p_in, avail );
             needed -= avail;
             p_out += avail;
             /* Next buffer */

@@ -1018,7 +1018,7 @@ static void CopyPicture( picture_t *p_pic, uint8_t *p_in )
 
         for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines; i_line++ )
         {
-            vlc_memcpy( p_dst, p_src, i_width );
+            memcpy( p_dst, p_src, i_width );
             p_src += i_width;
             p_dst += i_dst_stride;
         }
@@ -1531,7 +1531,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
             for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines;
                  i_line++ )
             {
-                vlc_memcpy( p_dst, p_src, i_width );
+                memcpy( p_dst, p_src, i_width );
                 p_dst += i_width;
                 p_src += i_src_stride;
             }

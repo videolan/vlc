@@ -134,10 +134,10 @@ static void I422_I420( filter_t *p_filter, picture_t *p_source,
 
     for ( ; i_y--; )
     {
-        vlc_memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
-        vlc_memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
-        vlc_memcpy(p_du, p_u, i_width/2); p_du -= i_dpuv; p_u -= 2*i_spuv;
-        vlc_memcpy(p_dv, p_v, i_width/2); p_dv -= i_dpuv; p_v -= 2*i_spuv;
+        memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
+        memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
+        memcpy(p_du, p_u, i_width/2); p_du -= i_dpuv; p_u -= 2*i_spuv;
+        memcpy(p_dv, p_v, i_width/2); p_dv -= i_dpuv; p_v -= 2*i_spuv;
     }
 }
 
@@ -163,10 +163,10 @@ static void I422_YV12( filter_t *p_filter, picture_t *p_source,
 
     for ( ; i_y--; )
     {
-        vlc_memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
-        vlc_memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
-        vlc_memcpy(p_du, p_u, i_width/2); p_du -= i_dpuv; p_u -= 2*i_spuv;
-        vlc_memcpy(p_dv, p_v, i_width/2); p_dv -= i_dpuv; p_v -= 2*i_spuv;
+        memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
+        memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
+        memcpy(p_du, p_u, i_width/2); p_du -= i_dpuv; p_u -= 2*i_spuv;
+        memcpy(p_dv, p_v, i_width/2); p_dv -= i_dpuv; p_v -= 2*i_spuv;
     }
 }
 

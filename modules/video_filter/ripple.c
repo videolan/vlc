@@ -160,7 +160,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         for( i_line = 0 ; i_line < i_first_line ; i_line++ )
         {
-            vlc_memcpy( p_out, p_in, p_pic->p[i_index].i_visible_pitch );
+            memcpy( p_out, p_in, p_pic->p[i_index].i_visible_pitch );
             p_in += p_pic->p[i_index].i_pitch;
             p_out += p_outpic->p[i_index].i_pitch;
         }
@@ -181,7 +181,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             {
                 if( i_offset < 0 )
                 {
-                    vlc_memcpy( p_out, p_in - i_offset,
+                    memcpy( p_out, p_in - i_offset,
                                 p_pic->p[i_index].i_visible_pitch + i_offset );
                     p_in -= p_pic->p[i_index].i_pitch;
                     p_out += p_outpic->p[i_index].i_pitch;
@@ -189,7 +189,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                 }
                 else
                 {
-                    vlc_memcpy( p_out + i_offset, p_in,
+                    memcpy( p_out + i_offset, p_in,
                                 p_pic->p[i_index].i_visible_pitch - i_offset );
                     memset( p_out, black_pixel, i_offset );
                     p_in -= p_pic->p[i_index].i_pitch;
@@ -198,7 +198,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             }
             else
             {
-                vlc_memcpy( p_out, p_in, p_pic->p[i_index].i_visible_pitch );
+                memcpy( p_out, p_in, p_pic->p[i_index].i_visible_pitch );
                 p_in -= p_pic->p[i_index].i_pitch;
                 p_out += p_outpic->p[i_index].i_pitch;
             }

@@ -369,11 +369,11 @@ static int SendVideo( sout_stream_t *p_stream, sout_stream_id_t *id,
     if( id->format->video.i_bits_per_pixel > 0 )
     {
         for ( int line = 0; line < i_line; line++, p_pixels += i_line_size )
-            vlc_memcpy( p_pixels, p_buffer->p_buffer + i_line_size * line , i_line_size );
+            memcpy( p_pixels, p_buffer->p_buffer + i_line_size * line , i_line_size );
     }
     else
     {
-        vlc_memcpy( p_pixels, p_buffer->p_buffer, i_size );
+        memcpy( p_pixels, p_buffer->p_buffer, i_size );
     }
     /* Calling the postrender callback to tell the user his buffer is ready */
     p_sys->pf_video_postrender_callback( id->p_data, p_pixels,
@@ -410,7 +410,7 @@ static int SendAudio( sout_stream_t *p_stream, sout_stream_id_t *id,
     }
 
     /* Copying data into user buffer */
-    vlc_memcpy( p_pcm_buffer, p_buffer->p_buffer, i_size );
+    memcpy( p_pcm_buffer, p_buffer->p_buffer, i_size );
     /* Calling the postrender callback to tell the user his buffer is ready */
     p_sys->pf_audio_postrender_callback( id->p_data, p_pcm_buffer,
                                          id->format->audio.i_channels, id->format->audio.i_rate, i_samples,

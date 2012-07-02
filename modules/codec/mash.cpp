@@ -209,11 +209,11 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         p_sys->p_decoder->sync();
         p_sys->i_counter = 0;
         p_frame = p_sys->p_decoder->frame();
-        vlc_memcpy( p_dec, p_pic->p[0].p_pixels, p_frame, i_width*i_height );
+        memcpy( p_dec, p_pic->p[0].p_pixels, p_frame, i_width*i_height );
         p_frame += i_width * i_height;
-        vlc_memcpy( p_dec, p_pic->p[1].p_pixels, p_frame, i_width*i_height/4 );
+        memcpy( p_dec, p_pic->p[1].p_pixels, p_frame, i_width*i_height/4 );
         p_frame += i_width * i_height/4;
-        vlc_memcpy( p_dec, p_pic->p[2].p_pixels, p_frame, i_width*i_height/4 );
+        memcpy( p_dec, p_pic->p[2].p_pixels, p_frame, i_width*i_height/4 );
         p_pic->date = p_sys->i_pts;
     }
     block_Release( p_block);

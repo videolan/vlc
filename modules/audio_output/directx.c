@@ -1033,7 +1033,7 @@ static int FillBuffer( audio_output_t *p_aout, int i_frame, block_t *p_buffer )
                                  p_sys->i_bits_per_sample );
         }
 
-        vlc_memcpy( p_write_position, p_buffer->p_buffer, l_bytes1 );
+        memcpy( p_write_position, p_buffer->p_buffer, l_bytes1 );
         block_Release( p_buffer );
     }
 

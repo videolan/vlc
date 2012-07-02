@@ -283,7 +283,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             p_out += i_xpadd * i_pixel_pitch;
 
             /* Copy the image and crop on the right */
-            vlc_memcpy( p_out, p_in, i_width * i_pixel_pitch );
+            memcpy( p_out, p_in, i_width * i_pixel_pitch );
             p_out += i_width * i_pixel_pitch;
             p_in += i_width * i_pixel_pitch;
 

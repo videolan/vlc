@@ -132,7 +132,7 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
 
     /* Backup frame */
     /* TODO: keeping the blocks in a list would save one memcpy */
-    vlc_memcpy( p_filter->p_sys->p_buf + p_in_buf->i_buffer *
+    memcpy( p_filter->p_sys->p_buf + p_in_buf->i_buffer *
                   p_filter->p_sys->i_frames,
                 p_in_buf->p_buffer, p_in_buf->i_buffer );
 
@@ -171,13 +171,13 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
         /* Copy the S/PDIF headers. */
         if( p_filter->fmt_out.audio.i_format == VLC_CODEC_SPDIFB )
         {
-            vlc_memcpy( p_out, p_sync_be, 6 );
+            memcpy( p_out, p_sync_be, 6 );
             p_out[5] = i_ac5_spdif_type;
             SetWBE( p_out + 6, i_length << 3 );
         }
         else
         {
-            vlc_memcpy( p_out, p_sync_le, 6 );
+            memcpy( p_out, p_sync_le, 6 );
             p_out[4] = i_ac5_spdif_type;
             SetWLE( p_out + 6, i_length << 3 );
         }
@@ -200,7 +200,7 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
         }
         else
         {
-            vlc_memcpy( p_out + 8, p_in, i_length );
+            memcpy( p_out + 8, p_in, i_length );
         }
 
         if( i_fz > i_length + 8 )

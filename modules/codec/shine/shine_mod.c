@@ -154,14 +154,14 @@ static block_t *GetPCM( encoder_t *p_enc, block_t *p_block )
 
         if( p_sys->i_buffer )
         {
-            vlc_memcpy( p_pcm_block->p_buffer, p_sys->p_buffer, p_sys->i_buffer );
+            memcpy( p_pcm_block->p_buffer, p_sys->p_buffer, p_sys->i_buffer );
 
             i_buffer = p_sys->i_buffer;
             p_sys->i_buffer = 0;
             free( p_sys->p_buffer );
         }
 
-        vlc_memcpy( p_pcm_block->p_buffer + i_buffer,
+        memcpy( p_pcm_block->p_buffer + i_buffer,
                     p_block->p_buffer, pcm_chunk_size - i_buffer );
         p_block->p_buffer += pcm_chunk_size - i_buffer;
 
@@ -188,7 +188,7 @@ static block_t *GetPCM( encoder_t *p_enc, block_t *p_block )
             return NULL;
         }
         p_sys->p_buffer = p_tmp;
-        vlc_memcpy( p_sys->p_buffer + p_sys->i_buffer,
+        memcpy( p_sys->p_buffer + p_sys->i_buffer,
                     p_block->p_buffer, p_block->i_buffer );
 
         p_sys->i_buffer += p_block->i_buffer;
@@ -228,7 +228,7 @@ static block_t *EncodeFrame( encoder_t *p_enc, block_t *p_block )
         if( !p_mp3_block )
             break;
 
-        vlc_memcpy( p_mp3_block->p_buffer, chunk->enc_data, chunk->enc_size );
+        memcpy( p_mp3_block->p_buffer, chunk->enc_data, chunk->enc_size );
 
         /* date management */
         p_mp3_block->i_length = SAMP_PER_FRAME1 * 1000000 /

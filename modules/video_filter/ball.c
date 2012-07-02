@@ -595,11 +595,11 @@ static void FilterBall( filter_t *p_filter, picture_t *p_inpic,
 
     if( !p_smooth || !p_grad_x || !p_grad_y ) return;
 
-    vlc_memcpy( p_outpic->p[0].p_pixels, p_inpic->p[0].p_pixels,
+    memcpy( p_outpic->p[0].p_pixels, p_inpic->p[0].p_pixels,
                 p_outpic->p[0].i_lines * p_outpic->p[0].i_pitch );
-    vlc_memcpy( p_outpic->p[1].p_pixels, p_inpic->p[1].p_pixels,
+    memcpy( p_outpic->p[1].p_pixels, p_inpic->p[1].p_pixels,
                 p_outpic->p[1].i_lines * p_outpic->p[1].i_pitch );
-    vlc_memcpy( p_outpic->p[2].p_pixels, p_inpic->p[2].p_pixels,
+    memcpy( p_outpic->p[2].p_pixels, p_inpic->p[2].p_pixels,
                 p_outpic->p[2].i_lines * p_outpic->p[2].i_pitch );
 
     GaussianConvolution( p_converted, p_smooth );

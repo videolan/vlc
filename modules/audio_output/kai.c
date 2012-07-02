@@ -316,7 +316,7 @@ static ULONG APIENTRY KaiCallback( PVOID p_cb_data,
 
         if ( p_aout_buffer != NULL )
         {
-            vlc_memcpy( ( uint8_t * ) p_buffer + i_len,
+            memcpy( ( uint8_t * ) p_buffer + i_len,
                         p_aout_buffer->p_buffer,
                         p_aout_buffer->i_buffer );
 

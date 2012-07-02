@@ -834,7 +834,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
 
         for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines; i_line++ )
         {
-            vlc_memcpy( p_dst, p_src, i_width );
+            memcpy( p_dst, p_src, i_width );
             p_dst += i_width;
             p_src += i_src_stride;
         }

@@ -181,7 +181,7 @@ static void stream_read_cb(pa_stream *s, size_t length, void *userdata)
 
     block_t *block = block_Alloc(length);
     if (likely(block != NULL)) {
-        vlc_memcpy(block->p_buffer, ptr, length);
+        memcpy(block->p_buffer, ptr, length);
         block->i_nb_samples = samples;
         block->i_dts = block->i_pts = pts;
         if (sys->discontinuity) {

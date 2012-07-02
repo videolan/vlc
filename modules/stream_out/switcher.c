@@ -942,7 +942,7 @@ static block_t *VideoGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
             = id->ff_enc_c->coded_frame->motion_subsample_log2;
         id->p_frame->mb_type = malloc( ((mb_width + 1) * (mb_height + 1) + 1)
                                     * sizeof(uint32_t) );
-        vlc_memcpy( id->p_frame->mb_type, id->ff_enc_c->coded_frame->mb_type,
+        memcpy( id->p_frame->mb_type, id->ff_enc_c->coded_frame->mb_type,
                     (mb_width + 1) * mb_height * sizeof(id->p_frame->mb_type[0]));
 
         for ( i = 0; i < 2; i++ )
@@ -957,7 +957,7 @@ static block_t *VideoGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
             {
                 id->p_frame->motion_val[i] = malloc( 2 * stride * height
                                                 * sizeof(int16_t) );
-                vlc_memcpy( id->p_frame->motion_val[i],
+                memcpy( id->p_frame->motion_val[i],
                             id->ff_enc_c->coded_frame->motion_val[i],
                             2 * stride * height * sizeof(int16_t) );
             }
@@ -965,7 +965,7 @@ static block_t *VideoGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
             {
                 id->p_frame->ref_index[i] = malloc( b8_stride * 2 * mb_height
                                                * sizeof(int8_t) );
-                vlc_memcpy( id->p_frame->ref_index[i],
+                memcpy( id->p_frame->ref_index[i],
                             id->ff_enc_c->coded_frame->ref_index[i],
                             b8_stride * 2 * mb_height * sizeof(int8_t));
             }
@@ -974,7 +974,7 @@ static block_t *VideoGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
 #endif
 
     p_out = block_New( p_stream, i_out );
-    vlc_memcpy( p_out->p_buffer, id->p_buffer_out, i_out );
+    memcpy( p_out->p_buffer, id->p_buffer_out, i_out );
     p_out->i_length = p_buffer->i_length;
     p_out->i_pts = p_buffer->i_dts;
     p_out->i_dts = p_buffer->i_dts;
@@ -1017,7 +1017,7 @@ static block_t *AudioGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
         return NULL;
 
     p_out = block_New( p_stream, i_out );
-    vlc_memcpy( p_out->p_buffer, id->p_buffer_out, i_out );
+    memcpy( p_out->p_buffer, id->p_buffer_out, i_out );
     p_out->i_length = p_buffer->i_length;
     p_out->i_pts = p_buffer->i_dts;
     p_out->i_dts = p_buffer->i_dts;

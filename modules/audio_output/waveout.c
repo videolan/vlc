@@ -763,7 +763,7 @@ static int PlayWaveOut( audio_output_t *p_aout, HWAVEOUT h_waveout,
         */
         if(b_spdif)
         {
-           vlc_memcpy( p_aout->sys->p_silence_buffer,
+           memcpy( p_aout->sys->p_silence_buffer,
                        p_buffer->p_buffer,
                        p_aout->sys->i_buffer_size );
            p_aout->sys->i_repeat_counter = 2;

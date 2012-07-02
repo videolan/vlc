@@ -589,7 +589,7 @@ static void theora_CopyPicture( picture_t *p_pic,
              i_line < __MIN(p_pic->p[i_plane].i_lines, ycbcr[i_plane].height);
              i_line++ )
         {
-            vlc_memcpy( p_dst, p_src, ycbcr[i_plane].width );
+            memcpy( p_dst, p_src, ycbcr[i_plane].width );
             p_src += i_src_stride;
             p_dst += i_dst_stride;
         }

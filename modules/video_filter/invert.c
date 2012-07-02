@@ -107,7 +107,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     {
         /* We don't want to invert the alpha plane */
         i_planes = p_pic->i_planes - 1;
-        vlc_memcpy(
+        memcpy(
             p_outpic->p[A_PLANE].p_pixels, p_pic->p[A_PLANE].p_pixels,
             p_pic->p[A_PLANE].i_pitch *  p_pic->p[A_PLANE].i_lines );
     }

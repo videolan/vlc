@@ -133,7 +133,7 @@ int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src,
             {
                 if( (y % 2) == i_field  ||  yadif_parity == 2 )
                 {
-                    vlc_memcpy( &dstp->p_pixels[y * dstp->i_pitch],
+                    memcpy( &dstp->p_pixels[y * dstp->i_pitch],
                                 &curp->p_pixels[y * curp->i_pitch], dstp->i_visible_pitch );
                 }
                 else
@@ -156,11 +156,11 @@ int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src,
 
                 /* We duplicate the first and last lines */
                 if( y == 1 )
-                    vlc_memcpy(&dstp->p_pixels[(y-1) * dstp->i_pitch],
+                    memcpy(&dstp->p_pixels[(y-1) * dstp->i_pitch],
                                &dstp->p_pixels[ y    * dstp->i_pitch],
                                dstp->i_pitch);
                 else if( y == dstp->i_visible_lines - 2 )
-                    vlc_memcpy(&dstp->p_pixels[(y+1) * dstp->i_pitch],
+                    memcpy(&dstp->p_pixels[(y+1) * dstp->i_pitch],
                                &dstp->p_pixels[ y    * dstp->i_pitch],
                                dstp->i_pitch);
             }

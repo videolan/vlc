@@ -140,7 +140,7 @@ static void DoWork( filter_t * p_filter,
         else
         {
             assert( p_pcm->channels == 1 );
-            vlc_memcpy( p_samples, p_left, i_samples * sizeof(mad_fixed_t) );
+            memcpy( p_samples, p_left, i_samples * sizeof(mad_fixed_t) );
         }
     }
     else

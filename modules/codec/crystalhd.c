@@ -599,7 +599,7 @@ static void crystal_CopyPicture ( picture_t *p_pic, BC_DTS_PROC_OUT* p_out )
     p_dst_end     = p_dst  + (i_dst_stride * p_out->PicInfo.height);
 
     for( ; p_dst < p_dst_end; p_dst += i_dst_stride, p_src += (p_out->PicInfo.width * 2))
-        vlc_memcpy( p_dst, p_src, p_out->PicInfo.width * 2); // Copy in bytes
+        memcpy( p_dst, p_src, p_out->PicInfo.width * 2); // Copy in bytes
 }
 #endif
 

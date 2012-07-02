@@ -526,7 +526,7 @@ static int exec_DataSharedMem( filter_t *p_filter,
                  i_line < (size_t)p_ovl->data.p_pic->p[i_plane].i_visible_lines;
                  ++i_line )
             {
-                vlc_memcpy( p_out, p_in,
+                memcpy( p_out, p_in,
                             p_ovl->data.p_pic->p[i_plane].i_visible_pitch );
                 p_out += p_ovl->data.p_pic->p[i_plane].i_pitch;
                 p_in += p_ovl->data.p_pic->p[i_plane].i_visible_pitch;

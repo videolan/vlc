@@ -948,7 +948,7 @@ static int DecodeAudio( demux_t *p_demux, sdi_audio_t *p_audio )
 
     if ( p_audio->i_left_samples == p_audio->i_nb_samples &&
          p_audio->i_right_samples == p_audio->i_nb_samples )
-        vlc_memcpy( p_output, p_audio->p_buffer,
+        memcpy( p_output, p_audio->p_buffer,
                     p_audio->i_nb_samples * sizeof(int16_t) * 2 );
     else
     {
@@ -1054,7 +1054,7 @@ static const uint8_t *GetLine( demux_t *p_demux, const uint8_t **pp_parser,
     if ( p_sys->i_line_buffer )
     {
         unsigned int i_remaining = i_total_size - p_sys->i_line_buffer;
-        vlc_memcpy( p_sys->p_line_buffer + p_sys->i_line_buffer,
+        memcpy( p_sys->p_line_buffer + p_sys->i_line_buffer,
                                    *pp_parser, i_remaining );
         *pp_parser += i_remaining;
         p_sys->i_line_buffer = 0;
@@ -1064,7 +1064,7 @@ static const uint8_t *GetLine( demux_t *p_demux, const uint8_t **pp_parser,
 
     if ( p_end - *pp_parser < (int)i_total_size )
     {
-        vlc_memcpy( p_sys->p_line_buffer, *pp_parser,
+        memcpy( p_sys->p_line_buffer, *pp_parser,
                                    p_end - *pp_parser );
         p_sys->i_line_buffer = p_end - *pp_parser;
         return NULL;

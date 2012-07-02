@@ -415,7 +415,7 @@ int  EStoPES ( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
             p_pes->i_length = 0;
             if( i_pes_payload > 0 )
             {
-                vlc_memcpy( p_pes->p_buffer + i_pes_header, p_data,
+                memcpy( p_pes->p_buffer + i_pes_header, p_data,
                             i_pes_payload );
             }
             i_pes_count++;

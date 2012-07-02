@@ -1004,7 +1004,7 @@ static void FilterPlanar( uint8_t *p_out, int i_out_pitch,
 
         /* Unmodified video */
         const int i_unmodified_width = i_copy_pitch - p_cfg->attenuate.i_left - p_cfg->attenuate.i_right;
-        vlc_memcpy( p_dst, p_src, i_unmodified_width );
+        memcpy( p_dst, p_src, i_unmodified_width );
         p_dst += i_unmodified_width;
         p_src += i_unmodified_width;
 

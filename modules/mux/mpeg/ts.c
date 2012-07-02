@@ -1538,7 +1538,7 @@ static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo )
     else if( i_size > STD_PES_PAYLOAD )
     {
         block_t *p_new = block_New( p_mux, STD_PES_PAYLOAD );
-        vlc_memcpy( p_new->p_buffer, p_data->p_buffer, STD_PES_PAYLOAD );
+        memcpy( p_new->p_buffer, p_data->p_buffer, STD_PES_PAYLOAD );
         p_new->i_pts = p_data->i_pts;
         p_new->i_dts = p_data->i_dts;
         p_new->i_length = p_data->i_length * STD_PES_PAYLOAD
@@ -1567,7 +1567,7 @@ static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo )
         }
         i_copy = __MIN( STD_PES_PAYLOAD - i_size, p_next->i_buffer );
 
-        vlc_memcpy( &p_data->p_buffer[i_size], p_next->p_buffer, i_copy );
+        memcpy( &p_data->p_buffer[i_size], p_next->p_buffer, i_copy );
         p_next->i_pts += p_next->i_length * i_copy / p_next->i_buffer;
         p_next->i_dts += p_next->i_length * i_copy / p_next->i_buffer;
         p_next->i_length -= p_next->i_length * i_copy / p_next->i_buffer;

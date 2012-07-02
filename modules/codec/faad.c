@@ -249,7 +249,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( p_block->i_buffer > 0 )
     {
-        vlc_memcpy( &p_sys->p_buffer[p_sys->i_buffer],
+        memcpy( &p_sys->p_buffer[p_sys->i_buffer],
                      p_block->p_buffer, p_block->i_buffer );
         p_sys->i_buffer += p_block->i_buffer;
         p_block->i_buffer = 0;

@@ -182,7 +182,7 @@ void AudioQueueCallback(void * inUserData, AudioQueueRef inAQ, AudioQueueBufferR
     }
 
     if ( p_buffer != NULL ) {
-        vlc_memcpy( inBuffer->mAudioData, p_buffer->p_buffer, p_buffer->i_buffer );
+        memcpy( inBuffer->mAudioData, p_buffer->p_buffer, p_buffer->i_buffer );
         inBuffer->mAudioDataByteSize = p_buffer->i_buffer;
         block_Release( p_buffer );
     } else {

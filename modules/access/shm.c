@@ -367,7 +367,7 @@ static void Demux (void *data)
     if (block == NULL)
         return;
 
-    vlc_memcpy (block->p_buffer, sys->addr, sys->length);
+    memcpy (block->p_buffer, sys->addr, sys->length);
 
     /* Send block */
     vlc_mutex_lock (&sys->lock);

@@ -283,7 +283,7 @@ void I420_A8B8G8R8     ( filter_t *, picture_t *, picture_t * );
         while( (i_scale_count -= p_filter->fmt_in.video.i_height) > 0 )       \
         {                                                                     \
             /* Height increment: copy previous picture line */                \
-            vlc_memcpy( p_pic, p_pic_start, p_filter->fmt_out.video.i_width * BPP ); \
+            memcpy( p_pic, p_pic_start, p_filter->fmt_out.video.i_width * BPP ); \
             p_pic = (void*)((uint8_t*)p_pic + p_dest->p->i_pitch );           \
         }                                                                     \
         i_scale_count += p_filter->fmt_out.video.i_height;                    \

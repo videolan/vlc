@@ -283,7 +283,7 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
                                p_sys->p_out_buffer, MAX_CODED_FRAME_SIZE );
         p_sys->i_nb_samples = 0;
         p_block = block_New( p_enc, i_used );
-        vlc_memcpy( p_block->p_buffer, p_sys->p_out_buffer, i_used );
+        memcpy( p_block->p_buffer, p_sys->p_out_buffer, i_used );
         p_block->i_length = (mtime_t)1000000 *
                 (mtime_t)MPEG_FRAME_SIZE / (mtime_t)p_enc->fmt_out.audio.i_rate;
         p_block->i_dts = p_block->i_pts = p_sys->i_pts;
