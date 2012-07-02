@@ -195,10 +195,12 @@ int aout_MuteToggle (vlc_object_t *obj)
     return commitVolume (obj, aout, vol, mute);
 }
 
+#undef aout_MuteGet
 /**
  * Gets the output mute status.
+ * \return 0 if not muted, 1 if muted, -1 if undefined.
  */
-bool aout_IsMuted (vlc_object_t *obj)
+int aout_MuteGet (vlc_object_t *obj)
 {
     audio_output_t *aout;
     bool mute;

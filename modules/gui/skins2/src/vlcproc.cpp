@@ -695,7 +695,7 @@ void VlcProc::on_volume_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 
     audio_volume_t volume = aout_VolumeGet( pPlaylist );
     SET_VOLUME( m_cVarVolume, volume, false );
-    bool b_is_muted = aout_IsMuted( VLC_OBJECT(pPlaylist) );
+    bool b_is_muted = aout_MuteGet( pPlaylist ) > 0;
     SET_BOOL( m_cVarMute, b_is_muted );
 }
 
@@ -800,7 +800,7 @@ void VlcProc::init_variables()
 
     audio_volume_t volume = aout_VolumeGet( pPlaylist );
     SET_VOLUME( m_cVarVolume, volume, false );
-    bool b_is_muted = aout_IsMuted( VLC_OBJECT(pPlaylist) );
+    bool b_is_muted = aout_MuteGet( pPlaylist ) > 0;
     SET_BOOL( m_cVarMute, b_is_muted );
 
     update_equalizer();

@@ -203,7 +203,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         case ACTIONID_VOL_MUTE:
             if( aout_MuteToggle( p_playlist ) == 0 && p_vout != NULL )
             {
-                if( aout_IsMuted( VLC_OBJECT(p_playlist) ) )
+                if( aout_MuteGet( p_playlist ) > 0 )
                 {
                     ClearChannels( p_intf, p_vout );
                     DisplayIcon( p_vout, OSD_MUTE_ICON );

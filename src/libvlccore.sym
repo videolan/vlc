@@ -19,7 +19,7 @@ aout_VolumeSet
 aout_VolumeUp
 aout_MuteToggle
 aout_MuteSet
-aout_IsMuted
+aout_MuteGet
 aout_VolumeSoftInit
 aout_VolumeHardInit
 block_Alloc

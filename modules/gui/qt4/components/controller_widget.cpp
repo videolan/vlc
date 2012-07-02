@@ -185,7 +185,7 @@ void SoundWidget::valueChangedFilter( int i_val )
 void SoundWidget::updateMuteStatus()
 {
     playlist_t *p_playlist = pl_Get( p_intf );
-    b_is_muted = aout_IsMuted( VLC_OBJECT(p_playlist) );
+    b_is_muted = aout_MuteGet( p_playlist ) > 0;
 
     SoundSlider *soundSlider = qobject_cast<SoundSlider *>(volumeSlider);
     if( soundSlider )

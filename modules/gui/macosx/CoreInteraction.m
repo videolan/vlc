@@ -504,7 +504,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
         return NO;
 
     BOOL b_is_muted = NO;
-    b_is_muted = aout_IsMuted( VLC_OBJECT(pl_Get( p_intf )) );
+    b_is_muted = aout_MuteGet( pl_Get( p_intf ) ) > 0;
 
     return b_is_muted;
 }

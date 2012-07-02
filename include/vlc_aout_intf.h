@@ -40,7 +40,8 @@ VLC_API int aout_MuteToggle( vlc_object_t * );
 #define aout_MuteToggle(a) aout_MuteToggle(VLC_OBJECT(a))
 VLC_API int aout_MuteSet( vlc_object_t *, bool );
 #define aout_MuteSet(a, b) aout_MuteSet(VLC_OBJECT(a), b)
-VLC_API bool aout_IsMuted( vlc_object_t * );
+VLC_API int aout_MuteGet( vlc_object_t * );
+#define aout_MuteGet(a) aout_MuteGet(VLC_OBJECT(a))
 
 VLC_API void aout_EnableFilter( vlc_object_t *, const char *, bool );
 #define aout_EnableFilter( o, n, b ) \
