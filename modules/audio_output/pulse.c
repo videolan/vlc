@@ -481,7 +481,8 @@ static void sink_input_info_cb(pa_context *ctx, const pa_sink_input_info *i,
 
     pa_volume_t volume = pa_cvolume_max(&i->volume);
     volume = pa_sw_volume_divide(volume, sys->base_volume);
-    aout_VolumeHardSet(aout, (float)volume / PA_VOLUME_NORM, i->mute);
+    aout_VolumeReport(aout, (float)volume / PA_VOLUME_NORM);
+    aout_MuteReport(aout, i->mute);
 }
 
 
@@ -601,7 +602,7 @@ static void Flush(audio_output_t *aout, bool wait)
     pa_threaded_mainloop_unlock(sys->mainloop);
 }
 
-static int VolumeSet(audio_output_t *aout, float vol, bool mute)
+static int VolumeSet(audio_output_t *aout, float vol)
 {
     aout_sys_t *sys = aout->sys;
     pa_operation *op;
@@ -626,6 +627,18 @@ static int VolumeSet(audio_output_t *aout, float vol, bool mute)
     op = pa_context_set_sink_input_volume(sys->context, idx, &cvolume, NULL, NULL);
     if (likely(op != NULL))
         pa_operation_unref(op);
+    pa_threaded_mainloop_unlock(sys->mainloop);
+
+    return 0;
+}
+
+static int MuteSet(audio_output_t *aout, bool mute)
+{
+    aout_sys_t *sys = aout->sys;
+    pa_operation *op;
+    uint32_t idx = pa_stream_get_index(sys->stream);
+
+    pa_threaded_mainloop_lock(sys->mainloop);
     op = pa_context_set_sink_input_mute(sys->context, idx, mute, NULL, NULL);
     if (likely(op != NULL))
         pa_operation_unref(op);
@@ -946,7 +959,8 @@ static int Open(vlc_object_t *obj)
     aout->pf_play = Play;
     aout->pf_pause = Pause;
     aout->pf_flush = Flush;
-    aout_VolumeHardInit (aout, VolumeSet, false);
+    aout->volume_set = VolumeSet;
+    aout->mute_set = MuteSet;
     return VLC_SUCCESS;
 
 fail:

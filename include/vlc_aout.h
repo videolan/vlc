@@ -134,8 +134,6 @@ typedef int32_t vlc_fixed_t;
 /* FIXME to remove once aout.h is cleaned a bit more */
 #include <vlc_block.h>
 
-typedef int (*aout_volume_cb) (audio_output_t *, float, bool);
-
 /** Audio output object */
 struct audio_output
 {
@@ -150,7 +148,8 @@ struct audio_output
         callback (optional, may be NULL) */
     void (* pf_flush)( audio_output_t *, bool ); /**< Flush/drain callback
         (optional, may be NULL) */
-    aout_volume_cb          pf_volume_set; /**< Volume setter (or NULL) */
+    int (*volume_set)(audio_output_t *, float); /**< Volume setter (or NULL) */
+    int (*mute_set)(audio_output_t *, bool); /**< Mute setter (or NULL) */
 
     struct {
         void (*time_report)(audio_output_t *, mtime_t);
@@ -224,12 +223,15 @@ VLC_API void aout_FormatPrint(vlc_object_t *, const char *,
 VLC_API const char * aout_FormatPrintChannels( const audio_sample_format_t * ) VLC_USED;
 
 VLC_API void aout_VolumeSoftInit( audio_output_t * );
-VLC_API void aout_VolumeHardInit( audio_output_t *, aout_volume_cb, bool );
 
-static inline void aout_VolumeHardSet(audio_output_t *aout, float v, bool m)
+static inline void aout_VolumeReport(audio_output_t *aout, float volume)
 {
-    aout->event.volume_report(aout, v);
-    aout->event.mute_report(aout, m);
+    aout->event.volume_report(aout, volume);
+}
+
+static inline void aout_MuteReport(audio_output_t *aout, bool mute)
+{
+    aout->event.mute_report(aout, mute);
 }
 
 static inline void aout_TimeReport(audio_output_t *aout, mtime_t date)

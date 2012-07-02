@@ -277,7 +277,8 @@ void aout_OutputDelete (audio_output_t *aout)
     aout->pf_play = aout_DecDeleteBuffer; /* gruik */
     aout->pf_pause = NULL;
     aout->pf_flush = NULL;
-    aout->pf_volume_set = NULL;
+    aout->volume_set = NULL;
+    aout->mute_set = NULL;
     owner->module = NULL;
     owner->volume.amp = 1.f;
     owner->volume.mute = false;
@@ -334,15 +335,11 @@ void aout_OutputFlush( audio_output_t *aout, bool wait )
 
 /*** Volume handling ***/
 
-/**
- * Volume setter for software volume.
- */
-static int aout_VolumeSoftSet (audio_output_t *aout, float volume, bool mute)
+static int aout_SoftVolumeSet (audio_output_t *aout, float volume)
 {
     aout_owner_t *owner = aout_owner (aout);
 
     aout_assert_locked (aout);
-
     /* Cubic mapping from software volume to amplification factor.
      * This provides a good tradeoff between low and high volume ranges.
      *
@@ -350,6 +347,14 @@ static int aout_VolumeSoftSet (audio_output_t *aout, float volume, bool mute)
      * formula, be sure to update the aout_VolumeHardInit()-based plugins also.
      */
     owner->volume.amp = volume * volume * volume;
+    return 0;
+}
+
+static int aout_SoftMuteSet (audio_output_t *aout, bool mute)
+{
+    aout_owner_t *owner = aout_owner (aout);
+
+    aout_assert_locked (aout);
     owner->volume.mute = mute;
     return 0;
 }
@@ -366,26 +371,8 @@ void aout_VolumeSoftInit (audio_output_t *aout)
     bool mute = var_GetBool (aout, "mute");
 
     aout_assert_locked (aout);
-    aout->pf_volume_set = aout_VolumeSoftSet;
-    aout_VolumeSoftSet (aout, volume / (float)AOUT_VOLUME_DEFAULT, mute);
-}
-
-/**
- * Configures a custom volume setter. This is used by audio outputs that can
- * control the hardware volume directly and/or emulate it internally.
- * @param setter volume setter callback
- * @param restore apply volume from VLC configuration immediately
- */
-void aout_VolumeHardInit (audio_output_t *aout, aout_volume_cb setter,
-                          bool restore)
-{
-    aout_assert_locked (aout);
-    aout->pf_volume_set = setter;
-
-    if (restore)
-    {
-        float vol = var_GetInteger (aout, "volume")
-                  / (float)AOUT_VOLUME_DEFAULT;
-        setter (aout, vol, var_GetBool (aout, "mute"));
-    }
+    aout->volume_set = aout_SoftVolumeSet;
+    aout->mute_set = aout_SoftMuteSet;
+    aout_SoftVolumeSet (aout, volume / (float)AOUT_VOLUME_DEFAULT);
+    aout_SoftMuteSet (aout, mute);
 }

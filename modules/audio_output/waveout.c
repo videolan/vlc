@@ -68,7 +68,8 @@ static int PlayWaveOut   ( audio_output_t *, HWAVEOUT, WAVEHDR *,
 static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR );
 static void* WaveOutThread( void * );
 
-static int VolumeSet( audio_output_t *, float, bool );
+static int VolumeSet( audio_output_t *, float );
+static int MuteSet( audio_output_t *, bool );
 
 static int WaveOutClearDoneBuffers(aout_sys_t *p_sys);
 
@@ -140,6 +141,9 @@ struct aout_sys_t
 
     uint8_t *p_silence_buffer;              /* buffer we use to play silence */
 
+    float volume;
+    bool mute;
+
     bool b_chan_reorder;              /* do we need channel reordering */
     int pi_chan_table[AOUT_CHAN_MAX];
 };
@@ -168,7 +172,6 @@ static int Open( vlc_object_t *p_this )
      initialize/update Device selection List
     */
     ReloadWaveoutDevices( p_this, "waveout-audio-device", val, val, NULL);
-
 
     /*
       check for configured audio device!
@@ -246,7 +249,8 @@ static int Open( vlc_object_t *p_this )
             p_aout->format.i_bytes_per_frame;
 
         aout_PacketInit( p_aout, &p_aout->sys->packet, A52_FRAME_NB );
-        p_aout->pf_volume_set = NULL;
+        p_aout->volume_set = NULL;
+        p_aout->mute_set = NULL;
     }
     else
     {
@@ -293,15 +297,21 @@ static int Open( vlc_object_t *p_this )
 
         aout_PacketInit( p_aout, &p_aout->sys->packet, FRAME_SIZE );
 
+#ifndef UNDER_CE
         /* Check for hardware volume support */
         if( waveOutGetDevCaps( (UINT_PTR)p_aout->sys->h_waveout,
                                &wocaps, sizeof(wocaps) ) == MMSYSERR_NOERROR
          && (wocaps.dwSupport & WAVECAPS_VOLUME) )
-            aout_VolumeHardInit( p_aout, VolumeSet, false /* ?? */ );
+        {
+            p_aout->volume_set = VolumeSet;
+            p_aout->mute_set = MuteSet;
+            p_aout->sys->volume = 0xffff.fp0;
+            p_aout->sys->mute = false;
+        }
         else
+#endif
             aout_VolumeSoftInit( p_aout );
     }
-
 
     waveOutReset( p_aout->sys->h_waveout );
 
@@ -992,26 +1002,37 @@ static void* WaveOutThread( void *data )
     return NULL;
 }
 
-static int VolumeSet( audio_output_t * p_aout, float volume, bool mute )
-{
 #ifndef UNDER_CE
-    const HWAVEOUT hwo = p_aout->sys->h_waveout;
-#else
-    const HWAVEOUT hwo = 0;
-#endif
+static int VolumeSet( audio_output_t *aout, float volume )
+{
+    aout_sys_t *sys = aout->sys;
+    const HWAVEOUT hwo = sys->h_waveout;
     const float full = 0xffff.fp0;
 
-    if( mute )
-        volume = 0.;
     volume *= full;
     if( volume >= full )
-        volume = full;
+        return -1;
+
+    sys->volume = volume;
+    if( sys->mute )
+        return 0;
 
     uint16_t vol = lroundf(volume);
     waveOutSetVolume( hwo, vol | (vol << 16) );
     return 0;
 }
 
+static int MuteSet( audio_output_t * p_aout, bool mute )
+{
+    aout_sys_t *sys = p_aout->sys;
+    const HWAVEOUT hwo = sys->h_waveout;
+    uint16_t vol = mute ? 0 : lroundf(sys->volume);
+
+    sys->mute = mute;
+    waveOutSetVolume( hwo, vol | (vol << 16) );
+    return 0;
+}
+#endif
 
 /*
   reload the configuration drop down list, of the Audio Devices

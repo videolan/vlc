@@ -67,7 +67,8 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
     owner->volume.mixer = NULL;
 
     aout->pf_play = aout_DecDeleteBuffer;
-    aout->pf_volume_set = NULL;
+    aout->volume_set = NULL;
+    aout->mute_set = NULL;
     vlc_object_set_destructor (aout, aout_Destructor);
 
     /*

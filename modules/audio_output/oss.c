@@ -368,7 +368,8 @@ static int Open( vlc_object_t *p_this )
         p_aout->format.i_frame_length = A52_FRAME_NB;
 
         aout_PacketInit( p_aout, &p_sys->packet, A52_FRAME_NB );
-        p_aout->pf_volume_set = NULL;
+        p_aout->volume_set = NULL;
+        p_aout->mute_set = NULL;
     }
     else
     {

@@ -21,7 +21,6 @@ aout_MuteToggle
 aout_MuteSet
 aout_MuteGet
 aout_VolumeSoftInit
-aout_VolumeHardInit
 block_Alloc
 block_FifoCount
 block_FifoEmpty

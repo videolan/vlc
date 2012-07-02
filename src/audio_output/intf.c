@@ -90,8 +90,12 @@ static int commitVolume (vlc_object_t *obj, audio_output_t *aout,
     {
         /* apply volume to the pipeline */
         aout_lock (aout);
-        if (aout->pf_volume_set != NULL)
-            ret = aout->pf_volume_set (aout, vol, mute);
+        if (aout->mute_set != NULL)
+            ret = aout->mute_set (aout, mute);
+        else
+            ret = -1;
+        if (ret == 0 && aout->volume_set != NULL)
+            ret = aout->volume_set (aout, vol);
         aout_unlock (aout);
 
         if (ret == 0)

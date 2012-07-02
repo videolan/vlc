@@ -75,7 +75,12 @@ struct aout_sys_t
     LPDIRECTSOUNDBUFFER p_dsbuffer;   /* the sound buffer we use (direct sound
                                        * takes care of mixing all the
                                        * secondary buffers into the primary) */
-    LONG                volume;
+    struct
+    {
+        LONG             volume;
+        LONG             mb;
+        bool             mute;
+    } volume;
 
     notification_thread_t notif;                  /* DirectSoundThread id */
 
@@ -96,7 +101,8 @@ struct aout_sys_t
 static int  OpenAudio  ( vlc_object_t * );
 static void CloseAudio ( vlc_object_t * );
 static void Play       ( audio_output_t *, block_t * );
-static int  VolumeSet  ( audio_output_t *, float, bool );
+static int  VolumeSet  ( audio_output_t *, float );
+static int  MuteSet    ( audio_output_t *, bool );
 
 /* local functions */
 static void Probe             ( audio_output_t * );
@@ -232,8 +238,6 @@ static int OpenAudio( vlc_object_t *p_this )
         }
 
         aout_PacketInit( p_aout, &p_aout->sys->packet, A52_FRAME_NB );
-        p_aout->sys->volume = -1;
-        p_aout->pf_volume_set = NULL;
     }
     else
     {
@@ -287,8 +291,9 @@ static int OpenAudio( vlc_object_t *p_this )
         /* Calculate the frame size in bytes */
         aout_FormatPrepare( &p_aout->format );
         aout_PacketInit( p_aout, &p_aout->sys->packet, FRAME_SIZE );
-        aout_VolumeHardInit( p_aout, VolumeSet, true );
     }
+
+    p_aout->sys->volume.volume = -1;
 
     /* Now we need to setup our DirectSound play notification structure */
     vlc_atomic_set(&p_aout->sys->notif.abort, 0);
@@ -313,6 +318,19 @@ static int OpenAudio( vlc_object_t *p_this )
     p_aout->pf_pause = aout_PacketPause;
     p_aout->pf_flush = aout_PacketFlush;
 
+    /* Volume */
+    if( val.i_int == AOUT_VAR_SPDIF )
+    {
+        p_aout->volume_set = NULL;
+        p_aout->mute_set = NULL;
+    }
+    else
+    {
+        p_aout->sys->volume.mb = 0;
+        p_aout->sys->volume.mute = false;
+        p_aout->volume_set = VolumeSet;
+        p_aout->mute_set = MuteSet;
+    }
     return VLC_SUCCESS;
 
  error:
@@ -573,12 +591,10 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer )
     p_aout->pf_play = aout_PacketPlay;
 }
 
-/*****************************************************************************
- * VolumeSet: change audio device volume
- *****************************************************************************/
-static int VolumeSet( audio_output_t *p_aout, float vol, bool mute )
+static int VolumeSet( audio_output_t *p_aout, float vol )
 {
     aout_sys_t *sys = p_aout->sys;
+    int ret = 0;
 
     /* Convert UI volume to linear factor (cube) */
     vol = vol * vol * vol;
@@ -589,15 +605,32 @@ static int VolumeSet( audio_output_t *p_aout, float vol, bool mute )
     /* Clamp to allowed DirectSound range */
     static_assert( DSBVOLUME_MIN < DSBVOLUME_MAX, "DSBVOLUME_* confused" );
     if( mb >= DSBVOLUME_MAX )
+    {
         mb = DSBVOLUME_MAX;
+        ret = -1;
+    }
     if( mb <= DSBVOLUME_MIN )
         mb = DSBVOLUME_MIN;
 
-    InterlockedExchange(&sys->volume, mute ? DSBVOLUME_MIN : mb);
+    sys->volume.mb = mb;
+    if (!sys->volume.mute)
+        InterlockedExchange(&sys->volume.volume, mb);
 
     /* Convert back to UI volume */
     vol = cbrtf(powf(10.f, ((float)mb) / -2000.f));
-    aout_VolumeHardSet( p_aout, vol, mute );
+    aout_VolumeReport( p_aout, vol );
+    return ret;
+}
+
+static int MuteSet( audio_output_t *p_aout, bool mute )
+{
+    aout_sys_t *sys = p_aout->sys;
+
+    sys->volume.mute = mute;
+    InterlockedExchange(&sys->volume.volume,
+                        mute ? DSBVOLUME_MIN : sys->volume.mb);
+
+    aout_MuteReport( p_aout, mute );
     return 0;
 }
 
@@ -1064,7 +1097,7 @@ static void* DirectSoundThread( void *data )
         int i;
 
         /* Update volume if required */
-        LONG volume = InterlockedExchange( &p_aout->sys->volume, -1 );
+        LONG volume = InterlockedExchange( &p_aout->sys->volume.volume, -1 );
         if( unlikely(volume != -1) )
             IDirectSoundBuffer_SetVolume( p_aout->sys->p_dsbuffer, volume );
 
