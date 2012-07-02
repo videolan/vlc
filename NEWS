@@ -66,6 +66,128 @@ Removed modules:
  * RTMP access: use libavformat avio instead
 
 
+Changes between 2.0.1 and 2.0.2:
+--------------------------------
+
+Video Output:
+ * XP machine will now use DirectX mode by default, like in previous versions.
+   There were too many errors with broken drivers.
+ * More accurate colourspaces conversions for YUV->RGB in OpenGL
+ * Add menu support for libvlc / VLCKit applications on Mac OS X
+ * Various fixes on Mac OS X, notably for crop, zoom, osd and menu support
+ * Misc fixes in OpenGL module, on all platforms
+ * Fix video output on PowerPC-based Macs equipped with an ATI Radeon 7500,
+   an ATI Radeon 9200 or a NVIDIA GeForceFX 5200 Ultra.
+ * Fix video output of 10bit encoded contents on Intel-based Macs equipped
+   with an Intel GMA 950 chipset running OS X 10.6 or later.
+ * Add support for the HiDPI mode used on recent Apple products with so-called
+   Retina Displays.
+
+Access:
+ * Rework Digital TV module for Windows. DVB-T and DVB-C should work again
+ * Fixes for RAR compressed files
+ * Fix DirectShow crashes on exit
+ * Improve PulseAudio input latency
+ * Fixes for HTTP access through a proxy
+ * v4l2 webcam outputting H264 can now be used directly (use --v4l2-chroma=h264)
+ * Fix subtitles auto-detection in subfolders and detection behaviour
+ * IE http proxy is not used anymore by VLC on Win32
+ * Accept more extensions for DVD images
+ * Fix crash in VC1 packetizer
+ * Improvements in Blu-Ray playback
+ * Improvements and fixes in HLS support
+
+Codec:
+ * Fix crashes in AAC decoder on channels changes, notably in ISDB streams
+ * Fix compilation with multiple FFmpeg and libav versions
+ * Fix G726 support
+ * Fix MP3 free format support
+
+Demuxers:
+ * Fixes for MKV segments, seeking and MKV title display
+ * Fix for some mp4, voc, midi and au crashes
+ * Fix for Real .ram, .f4v, .avi and .ra files support
+ * Fix for DVB channels file support
+ * Fixes for alac, vorbis, DTS, VC-1 and Dirac in mp4
+
+Encoders:
+ * Fix for MPEG Audio encoding, use layer2 when using fourcc "mp2 " and "mp2a"
+ * Fix for JPEG generation, when doing snapshots
+
+Audio filters and output:
+ * Limitation of spatializer volume output
+ * Fix DirectSound device selection
+ * Correct PulseAudio volume control
+ * Do not apply volume in file output
+ * Fix sampling rate in JACK output
+ * Fixes in ALSA output for latency and for broken drivers
+
+Mac OS X:
+ * Enable drag and drop of playlist items between the temporary playlist and
+   the persistant media library
+ * Enable import of playlist items taken from the service discovery modules
+   to the media library or the temporary playlist
+ * Media key support for keyboards by other manufacturers than Apple
+   This fix was facilitated through a hardware donation by ZF Friedrichshafen AG
+   manufacturing keyboards under the brand "Cherry".
+ * Add support for the Apple Remote to set the Mac to sleep using a longer
+   press on the Play/Pause button
+ * Remove libfontconfig's font cache by an Apple Type Services lookup.
+   This removes the "Updating Cache" dialog, before finding all fonts.
+ * Re-add an option to hide the window decoration during video playback
+ * Improve compatibility with other 3rd party apps using SPMediaKeyTap
+ * Many Fullscreen fixes
+ * Keep Aspect Ratio when resizing is back
+ * Add controls to manipulate the Subtitles Duration to the Track
+   Synchronization panel
+ * Hidden items in the sidebar are being retained for the next launch now
+ * Fix crash when trying to open an Audio CD by drag & drop
+ * Improve reliability when opening DVDs or BDs by drag & drop
+ * Fix crashes on exit
+ * Fix crash when mounting a device with multiple logical volumes while
+   VLC is running
+ * Chosen audio output device is retained throughout multiple sessions
+ * Since running the Mac OS X interface as an Extra Interface or Control
+   Interface can lead to undefined results, eventual settings will be
+   automatically reset on the first launch.
+   - This fixes issues with unresponsive playback controls and crashes on quit.
+ * Update Growl plugin for use with Growl 1.3
+ * Miscellaneous minor interface improvements
+
+Lua Scripts:
+ * Fixes for stdin/stdout and for different locale issues
+ * Fixes for icecast SD
+
+Qt:
+ * Fix preferences for audio devices on Windows
+ * Fix playlist search and selector behaviour
+ * Fix multiple issues in the Open Disc dialog
+ * Miscellaneous fixes in preferences, buttons, EPG, playlist and customize dialog
+ * Fix tags and file names display
+ * Fix various crashes, display issues and usability issues
+
+Skins2:
+ * Fix mousewheel on Windows
+ * Fix for key events and focus loss
+
+Web interface:
+ * Fix display of some buttons
+ * Fix listing of files in the Open interface
+ * Fixes for widgets behaviour and vlm dialog
+
+Security:
+ * Fix Ogg Heap buffer overflow
+ * Update taglib (CVE-2012-2396)
+ * Update libavcodec and other codecs libraries
+
+Translation:
+ * Traditional Chinese, Simplified Chinese, Walloon, Slovak, Polish, Khmer,
+   Japanese, Italian, French, Czech, Belarusian, Breton, Greek, Spanish,
+   Estonian, Irish, Galician, Hungarian, Japanese, Dutch, Telugu, Ukranian,
+   Thai translations update
+ * New Scottish Gaelic translation
+
+
 Changes between 2.0.0 and 2.0.1:
 --------------------------------
 
