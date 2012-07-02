@@ -64,6 +64,7 @@ Removed modules:
  * X11 On Screen Display notifications (xosd)
  * Linux Framebuffer On Screen Display interface (fbosd)
  * RTMP access: use libavformat avio instead
+ * RTMP access_output: use libavformat avio instead
 
 
 Changes between 2.0.1 and 2.0.2:

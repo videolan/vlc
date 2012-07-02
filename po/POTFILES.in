@@ -232,7 +232,6 @@ modules/access_output/dummy.c
 modules/access_output/file.c
 modules/access_output/http.c
 modules/access_output/livehttp.c
-modules/access_output/rtmp.c
 modules/access_output/shout.c
 modules/access_output/udp.c
 modules/access/pulse.c
