@@ -25,9 +25,7 @@ EXTRA_SUBDIRS = \
 	mux \
 	stream_out \
 	mmx \
-	mmxext \
 	sse2 \
-	3dnow \
 	altivec \
 	arm_neon \
 	lua \
@@ -41,14 +39,8 @@ endif
 if HAVE_MMX
 SUBDIRS += mmx
 endif
-if HAVE_MMXEXT
-SUBDIRS += mmxext
-endif
 if HAVE_SSE2
 SUBDIRS += sse2
-endif
-if HAVE_3DNOW
-SUBDIRS += 3dnow
 endif
 if HAVE_ALTIVEC
 SUBDIRS += altivec

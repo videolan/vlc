@@ -184,7 +184,6 @@ lib/video.c
 lib/vlm.c
 
 # modules
-modules/3dnow/memcpy.c
 modules/access/alsa.c
 modules/access/attachment.c
 modules/access/avio.h
@@ -281,7 +280,6 @@ modules/access/vcdx/vcdplayer.c
 modules/access/vcdx/vcdplayer.h
 modules/access/vdr.c
 modules/access/zip/zipstream.c
-modules/altivec/memcpy.c
 modules/arm_neon/audio_format.c
 modules/arm_neon/chroma_yuv.c
 modules/audio_filter/audiobargraph_a.c
@@ -922,7 +920,6 @@ modules/misc/inhibit/mce.c
 modules/misc/inhibit/xdg.c
 modules/misc/inhibit/xscreensaver.c
 modules/misc/logger.c
-modules/misc/memcpy.c
 modules/misc/osd/osd_menu.c
 modules/misc/osd/osd_menu.h
 modules/misc/osd/parser.c
@@ -940,8 +937,6 @@ modules/misc/stats/encoder.c
 modules/misc/stats/stats.c
 modules/misc/stats/stats.h
 modules/misc/xml/libxml.c
-modules/mmxext/memcpy.c
-modules/mmx/memcpy.c
 modules/mux/asf.c
 modules/mux/avi.c
 modules/mux/dummy.c

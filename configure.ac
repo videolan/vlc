@@ -4233,8 +4233,6 @@ AC_CONFIG_FILES([
   modules/visualization/Makefile
   modules/visualization/visual/Makefile
   modules/mmx/Makefile
-  modules/mmxext/Makefile
-  modules/3dnow/Makefile
   modules/sse2/Makefile
   modules/altivec/Makefile
   modules/arm_neon/Makefile

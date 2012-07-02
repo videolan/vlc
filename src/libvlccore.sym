@@ -508,7 +508,6 @@ vlc_event_manager_fini
 vlc_event_manager_init
 vlc_event_manager_register_event_type
 vlc_event_send
-vlc_fastmem_register
 vlc_fourcc_GetCodec
 vlc_fourcc_GetCodecAudio
 vlc_fourcc_GetCodecFromString
@@ -529,7 +528,6 @@ vlc_iconv_open
 vlc_join
 vlc_list_children
 vlc_list_release
-vlc_memcpy
 vlc_meta_AddExtra
 vlc_meta_CopyExtraNames
 vlc_meta_Delete

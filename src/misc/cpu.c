@@ -372,20 +372,3 @@ void vlc_CPU_dump (vlc_object_t *obj)
     if (p > buf)
         msg_Dbg (obj, "CPU has capabilities %s", buf);
 }
-
-
-static vlc_memcpy_t pf_vlc_memcpy = memcpy;
-
-void vlc_fastmem_register (vlc_memcpy_t cpy)
-{
-    assert (cpy != NULL);
-    pf_vlc_memcpy = cpy;
-}
-
-/**
- * vlc_memcpy: fast CPU-dependent memcpy
- */
-void *vlc_memcpy (void *tgt, const void *src, size_t n)
-{
-    return pf_vlc_memcpy (tgt, src, n);
-}
