@@ -1461,6 +1461,10 @@ LIBVLC_API void libvlc_audio_output_set_device_type( libvlc_media_player_t *p_mi
  * Toggle mute status.
  *
  * \param p_mi media player
+ * \warning Toggling mute atomically is not always possible: On some platforms,
+ * other processes can mute the VLC audio playback stream asynchronously. Thus,
+ * there is a small race condition where toggling will not work.
+ * See also the limitations of libvlc_audio_set_mute().
  */
 LIBVLC_API void libvlc_audio_toggle_mute( libvlc_media_player_t *p_mi );
 
@@ -1468,9 +1472,7 @@ LIBVLC_API void libvlc_audio_toggle_mute( libvlc_media_player_t *p_mi );
  * Get current mute status.
  *
  * \param p_mi media player
- * \return the mute status (boolean)
- *
- * \libvlc_return_bool
+ * \return the mute status (boolean) if defined, -1 if undefined/unapplicable
  */
 LIBVLC_API int libvlc_audio_get_mute( libvlc_media_player_t *p_mi );
 
@@ -1479,6 +1481,12 @@ LIBVLC_API int libvlc_audio_get_mute( libvlc_media_player_t *p_mi );
  *
  * \param p_mi media player
  * \param status If status is true then mute, otherwise unmute
+ * \warning This function does not always work. If there are no active audio
+ * playback stream, the mute status might not be available. If digital
+ * pass-through (S/PDIF, HDMI...) is in use, muting may be unapplicable. Also
+ * some audio output plugins do not support muting at all.
+ * \note To force silent playback, disable all audio tracks. This is more
+ * efficient and reliable than mute.
  */
 LIBVLC_API void libvlc_audio_set_mute( libvlc_media_player_t *p_mi, int status );
 

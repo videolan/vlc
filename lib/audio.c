@@ -308,9 +308,6 @@ void libvlc_audio_output_set_device_type( libvlc_media_player_t *mp,
     vlc_object_release( p_aout );
 }
 
-/*****************************************************************************
- * libvlc_audio_get_mute : Get the volume state, true if muted
- *****************************************************************************/
 void libvlc_audio_toggle_mute( libvlc_media_player_t *mp )
 {
     aout_MuteToggle( mp );
