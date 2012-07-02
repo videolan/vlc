@@ -1098,7 +1098,6 @@ AC_ARG_ENABLE(mmx,
   esac
 ])
 have_mmx="no"
-have_mmxext="no"
 AS_IF([test "${enable_mmx}" != "no"], [
   ARCH="${ARCH} mmx"
   VLC_SAVE_FLAGS
@@ -1145,26 +1144,9 @@ asm volatile("packuswb %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
     have_mmx="yes"
   ])
 
-  AC_CACHE_CHECK([if $CC groks MMX EXT inline assembly],
-                 [ac_cv_mmxext_inline], [
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
-void *p;
-asm volatile("maskmovq %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
-]])
-    ], [
-      ac_cv_mmxext_inline=yes
-    ], [
-      ac_cv_mmxext_inline=no
-    ])
-  ])
   VLC_RESTORE_FLAGS
-  AS_IF([test "${ac_cv_mmxext_inline}" != "no"], [
-    AC_DEFINE(CAN_COMPILE_MMXEXT, 1, [Define to 1 if MMX EXT inline assembly is available.])
-    have_mmxext="yes"
-  ])
 ])
 AM_CONDITIONAL([HAVE_MMX], [test "${have_mmx}" = "yes"])
-AM_CONDITIONAL([HAVE_MMXEXT], [test "${have_mmxext}" = "yes"])
 
 dnl  Check for fully workin SSE2 intrinsics
 dnl  We need support for -mmmx, we need <emmintrin.h>, and we also need a
@@ -1327,29 +1309,6 @@ asm volatile("insertq %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
     AC_DEFINE(CAN_COMPILE_SSE4A, 1, [Define to 1 if SSE4A inline assembly is available.]) ])
 ])
 AM_CONDITIONAL([HAVE_SSE2], [test "$have_sse2" = "yes"])
-
-VLC_SAVE_FLAGS
-CFLAGS="${CFLAGS} -mmmx"
-have_3dnow="no"
-AC_CACHE_CHECK([if $CC groks 3D Now! inline assembly], [ac_cv_3dnow_inline], [
-  AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
-void *p;
-asm volatile("pfadd %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
-]])
-  ], [
-    ac_cv_3dnow_inline=yes
-  ], [
-    ac_cv_3dnow_inline=no
-  ])
-])
-VLC_RESTORE_FLAGS
-AS_IF([test "${ac_cv_3dnow_inline}" != "no"], [
-  AC_DEFINE(CAN_COMPILE_3DNOW, 1,
-            [Define to 1 if 3D Now! inline assembly is available.])
-  have_3dnow="yes"
-])
-AM_CONDITIONAL([HAVE_3DNOW], [test "$have_3dnow" = "yes"])
-
 
 AC_ARG_ENABLE(neon,
   [AS_HELP_STRING([--disable-neon],
