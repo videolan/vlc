@@ -76,8 +76,6 @@ vlc_module_end ()
  * Local prototypes
  ****************************************************************************/
 
-void *( *swscale_fast_memcpy )( void *, const void *, size_t );
-
 /**
  * Internal swscale filter structure.
  */
@@ -155,9 +153,6 @@ static int OpenScaler( vlc_object_t *p_this )
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_filter->p_sys = p_sys = malloc(sizeof(filter_sys_t)) ) == NULL )
         return VLC_ENOMEM;
-
-    /* FIXME pointer assignment may not be atomic */
-    swscale_fast_memcpy = vlc_memcpy;
 
     /* Set CPU capabilities */
     p_sys->i_cpu_mask = GetSwsCpuMask();
