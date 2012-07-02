@@ -91,7 +91,8 @@ typedef struct
     struct
     {
         vlc_mutex_t lock;
-        float multiplier; /**< Software volume amplification multiplier */
+        float amp; /**< Software volume amplification */
+        bool mute; /**< Software mute */
         struct audio_mixer *mixer; /**< Software volume plugin */
     } volume;
 

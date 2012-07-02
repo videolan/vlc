@@ -310,7 +310,9 @@ int aout_DecPlay (audio_output_t *p_aout, block_t *p_buffer, int i_input_rate)
         /* Mixer */
         if (owner->volume.mixer != NULL)
         {
-            float amp = owner->volume.multiplier
+            float amp = 0.f;
+            if (!owner->volume.mute)
+                amp = owner->volume.amp
                       * vlc_atomic_getf (&owner->gain.multiplier);
             aout_MixerRun (owner->volume.mixer, p_buffer, amp);
         }

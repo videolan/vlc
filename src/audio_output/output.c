@@ -279,7 +279,8 @@ void aout_OutputDelete (audio_output_t *aout)
     aout->pf_flush = NULL;
     aout->pf_volume_set = NULL;
     owner->module = NULL;
-    owner->volume.multiplier = 1.0;
+    owner->volume.amp = 1.f;
+    owner->volume.mute = false;
     aout_FiltersDestroyPipeline (owner->filters, owner->nb_filters);
 }
 
@@ -348,12 +349,8 @@ static int aout_VolumeSoftSet (audio_output_t *aout, float volume, bool mute)
      * This code is only used for the VLC software mixer. If you change this
      * formula, be sure to update the aout_VolumeHardInit()-based plugins also.
      */
-    if (!mute)
-        volume = volume * volume * volume;
-    else
-        volume = 0.;
-
-    owner->volume.multiplier = volume;
+    owner->volume.amp = volume * volume * volume;
+    owner->volume.mute = mute;
     return 0;
 }
 
