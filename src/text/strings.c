@@ -37,6 +37,7 @@
 /* Needed by str_format_time */
 #include <time.h>
 #include <limits.h>
+#include <math.h>
 
 /* Needed by str_format_meta */
 #include <vlc_input.h>
@@ -889,12 +890,18 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                     }
                     break;
                 case 'V':
+                {
+                    float vol = aout_VolumeGet( p_object );
+                    if( vol >= 0. )
                     {
-                        audio_volume_t volume = aout_VolumeGet( p_object );
-                        snprintf( buf, 10, "%d", volume );
+                        snprintf( buf, 10, "%ld",
+                                  lroundf(vol * AOUT_VOLUME_DEFAULT ) );
                         INSERT_STRING_NO_FREE( buf );
-                        break;
                     }
+                    else
+                         INSERT_STRING_NO_FREE( "---" );
+                    break;
+                }
                 case '_':
                     *(dst+d) = '\n';
                     d++;

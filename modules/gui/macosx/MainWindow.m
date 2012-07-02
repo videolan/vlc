@@ -34,6 +34,7 @@
 #import "controls.h" // TODO: remove me
 #import "playlist.h"
 #import "SideBarItem.h"
+#import <math.h>
 #import <vlc_playlist.h>
 #import <vlc_aout_intf.h>
 #import <vlc_url.h>
@@ -1515,10 +1516,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)updateVolumeSlider
 {
-    audio_volume_t i_volume;
     playlist_t * p_playlist = pl_Get( VLCIntf );
-
-    i_volume = aout_VolumeGet( p_playlist );
+    int i_volume = lroundf(aout_VolumeGet( p_playlist ) * AOUT_VOLUME_DEFAULT);
     BOOL b_muted = [[VLCCoreInteraction sharedInstance] isMuted];
 
     if( !b_muted )

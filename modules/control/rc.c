@@ -36,6 +36,7 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <signal.h>
 #include <assert.h>
+#include <math.h>
 
 #include <vlc_interface.h>
 #include <vlc_aout_intf.h>
@@ -1497,8 +1498,9 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
     if ( *newval.psz_string )
     {
         /* Set. */
-        audio_volume_t i_volume = atoi( newval.psz_string );
-        if( !aout_VolumeSet( p_playlist, i_volume ) )
+        int i_volume = atoi( newval.psz_string );
+        if( !aout_VolumeSet( p_playlist,
+                             i_volume / (float)AOUT_VOLUME_DEFAULT ) )
             i_error = VLC_SUCCESS;
         aout_MuteSet( p_playlist, i_volume == 0 );
         osd_Volume( p_this );
@@ -1507,8 +1509,8 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
     else
     {
         /* Get. */
-        audio_volume_t i_volume = aout_VolumeGet( p_playlist );
-        msg_rc( STATUS_CHANGE "( audio volume: %d )", i_volume );
+        msg_rc( STATUS_CHANGE "( audio volume: %ld )",
+               lroundf( aout_VolumeGet( p_playlist ) * AOUT_VOLUME_DEFAULT ) );
         i_error = VLC_SUCCESS;
     }
 
@@ -1520,7 +1522,7 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
 {
     VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
-    audio_volume_t i_volume;
+    float volume;
     input_thread_t *p_input =
         playlist_CurrentInput( p_intf->p_sys->p_playlist );
     int i_nb_steps = atoi(newval.psz_string);
@@ -1539,11 +1541,13 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !strcmp(psz_cmd, "voldown") )
         i_nb_steps *= -1;
-    if( aout_VolumeUp( p_intf->p_sys->p_playlist, i_nb_steps, &i_volume ) < 0 )
+    if( aout_VolumeUp( p_intf->p_sys->p_playlist, i_nb_steps, &volume ) < 0 )
         i_error = VLC_EGENERIC;
     osd_Volume( p_this );
 
-    if ( !i_error ) msg_rc( STATUS_CHANGE "( audio volume: %d )", i_volume );
+    if ( !i_error )
+        msg_rc( STATUS_CHANGE "( audio volume: %ld )",
+                lroundf( volume * AOUT_VOLUME_DEFAULT ) );
     return i_error;
 }
 

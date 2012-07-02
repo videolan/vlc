@@ -167,11 +167,11 @@ DBUS_METHOD( Seek )
 static void
 MarshalVolume( intf_thread_t *p_intf, DBusMessageIter *container )
 {
-    audio_volume_t i_vol = aout_VolumeGet( p_intf->p_sys->p_playlist );
+    float f_vol = aout_VolumeGet( p_intf->p_sys->p_playlist );
+    if( f_vol < 0.f )
+        f_vol = 1.f; /* ? */
 
-    /* A volume of 1.0 represents a sensible maximum, ie: 0dB */
-    double d_vol = (double) i_vol / AOUT_VOLUME_DEFAULT;
-
+    double d_vol = f_vol;
     dbus_message_iter_append_basic( container, DBUS_TYPE_DOUBLE, &d_vol );
 }
 
@@ -204,9 +204,7 @@ DBUS_METHOD( VolumeSet )
     d_dbus_vol *= AOUT_VOLUME_DEFAULT;
     if( d_dbus_vol < 0. )
         d_dbus_vol = 0.;
-    if( d_dbus_vol > AOUT_VOLUME_MAX )
-        d_dbus_vol = AOUT_VOLUME_MAX;
-    aout_VolumeSet( PL, lround(d_dbus_vol) );
+    aout_VolumeSet( PL, d_dbus_vol );
 
     REPLY_SEND;
 }

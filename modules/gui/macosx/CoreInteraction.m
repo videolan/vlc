@@ -25,6 +25,7 @@
 #import "intf.h"
 #import "open.h"
 #import "playlist.h"
+#import <math.h>
 #import <vlc_playlist.h>
 #import <vlc_input.h>
 #import <vlc_keys.h>
@@ -515,9 +516,9 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     if( !p_intf )
         return 0;
 
-    audio_volume_t i_volume = aout_VolumeGet( pl_Get( p_intf ) );
+    float volume = aout_VolumeGet( pl_Get( p_intf ) );
 
-    return (int)i_volume;
+    return lroundf(volume * AOUT_VOLUME_DEFAULT);
 }
 
 - (void)setVolume: (int)i_value
@@ -526,7 +527,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     if( !p_intf )
         return;
 
-    aout_VolumeSet( pl_Get( p_intf ), i_value );
+    aout_VolumeSet( pl_Get( p_intf ), i_value / (float)AOUT_VOLUME_DEFAULT );
 }
 
 #pragma mark -

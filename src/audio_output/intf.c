@@ -127,15 +127,17 @@ static void cancelVolume (vlc_object_t *obj, audio_output_t *aout)
 #undef aout_VolumeGet
 /**
  * Gets the volume of the output device (independent of mute).
+ * \return Current audio volume (0 = silent, 1 = nominal),
+ * or a strictly negative value if undefined.
  */
-audio_volume_t aout_VolumeGet (vlc_object_t *obj)
+float aout_VolumeGet (vlc_object_t *obj)
 {
     audio_output_t *aout;
     float vol;
 
     prepareVolume (obj, &aout, &vol, NULL);
     cancelVolume (obj, aout);
-    return lroundf (vol * AOUT_VOLUME_DEFAULT);
+    return vol;
 }
 
 #undef aout_VolumeSet
@@ -143,10 +145,9 @@ audio_volume_t aout_VolumeGet (vlc_object_t *obj)
  * Sets the volume of the output device.
  * The mute status is not changed.
  */
-int aout_VolumeSet (vlc_object_t *obj, audio_volume_t volume)
+int aout_VolumeSet (vlc_object_t *obj, float vol)
 {
     audio_output_t *aout;
-    float vol = volume / (float)AOUT_VOLUME_DEFAULT;
     bool mute;
 
     prepareVolume (obj, &aout, NULL, &mute);
@@ -159,7 +160,7 @@ int aout_VolumeSet (vlc_object_t *obj, audio_volume_t volume)
  * \param value how much to increase (> 0) or decrease (< 0) the volume
  * \param volp if non-NULL, will contain contain the resulting volume
  */
-int aout_VolumeUp (vlc_object_t *obj, int value, audio_volume_t *volp)
+int aout_VolumeUp (vlc_object_t *obj, int value, float *volp)
 {
     audio_output_t *aout;
     int ret;
@@ -176,7 +177,7 @@ int aout_VolumeUp (vlc_object_t *obj, int value, audio_volume_t *volp)
         vol = AOUT_VOLUME_MAX / AOUT_VOLUME_DEFAULT;
     ret = commitVolume (obj, aout, vol, mute);
     if (volp != NULL)
-        *volp = lroundf (vol * AOUT_VOLUME_DEFAULT);
+        *volp = vol;
     return ret;
 }
 

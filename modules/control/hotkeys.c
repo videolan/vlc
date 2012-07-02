@@ -70,7 +70,7 @@ static int  SpecialKeyEvent( vlc_object_t *, char const *,
 static void PlayBookmark( intf_thread_t *, int );
 static void SetBookmark ( intf_thread_t *, int );
 static void DisplayPosition( intf_thread_t *, vout_thread_t *, input_thread_t * );
-static void DisplayVolume  ( intf_thread_t *, vout_thread_t *, audio_volume_t );
+static void DisplayVolume( intf_thread_t *, vout_thread_t *, float );
 static void DisplayRate ( vout_thread_t *, float );
 static float AdjustRateFine( input_thread_t *, const int );
 static void ClearChannels  ( intf_thread_t *, vout_thread_t * );
@@ -186,33 +186,31 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         /* Volume and audio actions */
         case ACTIONID_VOL_UP:
         {
-            audio_volume_t i_newvol;
-            aout_VolumeUp( p_playlist, 1, &i_newvol );
-            DisplayVolume( p_intf, p_vout, i_newvol );
+            float vol;
+            if( aout_VolumeUp( p_playlist, 1, &vol ) == 0 )
+                DisplayVolume( p_intf, p_vout, vol );
             break;
         }
 
         case ACTIONID_VOL_DOWN:
         {
-            audio_volume_t i_newvol;
-            aout_VolumeDown( p_playlist, 1, &i_newvol );
-            DisplayVolume( p_intf, p_vout, i_newvol );
+            float vol;
+            if( aout_VolumeDown( p_playlist, 1, &vol ) == 0 )
+                DisplayVolume( p_intf, p_vout, vol );
             break;
         }
 
         case ACTIONID_VOL_MUTE:
-            if( aout_MuteToggle( p_playlist ) == 0 && p_vout != NULL )
+            if( aout_MuteToggle( p_playlist ) == 0 )
             {
-                if( aout_MuteGet( p_playlist ) > 0 )
+                float vol = aout_VolumeGet( p_playlist );
+                if( aout_MuteGet( p_playlist ) > 0 || vol == 0.f )
                 {
                     ClearChannels( p_intf, p_vout );
                     DisplayIcon( p_vout, OSD_MUTE_ICON );
                 }
                 else
-                {
-                    audio_volume_t i_vol = aout_VolumeGet( p_playlist );
-                    DisplayVolume( p_intf, p_vout, i_vol );
-                }
+                    DisplayVolume( p_intf, p_vout, vol );
             }
             break;
 
@@ -1013,21 +1011,17 @@ static void DisplayPosition( intf_thread_t *p_intf, vout_thread_t *p_vout,
 }
 
 static void DisplayVolume( intf_thread_t *p_intf, vout_thread_t *p_vout,
-                           audio_volume_t i_vol )
+                           float vol )
 {
     if( p_vout == NULL )
-    {
         return;
-    }
     ClearChannels( p_intf, p_vout );
 
     if( var_GetBool( p_vout, "fullscreen" ) )
-    {
-        vout_OSDSlider( p_vout, VOLUME_WIDGET_CHAN,
-            i_vol*100/AOUT_VOLUME_MAX, OSD_VERT_SLIDER );
-    }
-    DisplayMessage( p_vout, VOLUME_TEXT_CHAN, _( "Volume %d%%" ),
-                    i_vol*100/AOUT_VOLUME_DEFAULT );
+        vout_OSDSlider( p_vout, VOLUME_WIDGET_CHAN, lround(vol * 100.),
+                        OSD_VERT_SLIDER );
+    DisplayMessage( p_vout, VOLUME_TEXT_CHAN, _( "Volume %ld%%" ),
+                    lround(vol * 100.) );
 }
 
 static void DisplayRate( vout_thread_t *p_vout, float f_rate )

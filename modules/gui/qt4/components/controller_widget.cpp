@@ -31,6 +31,7 @@
 #include "input_manager.hpp"         /* Get notification of Volume Change */
 #include "util/input_slider.hpp"     /* SoundSlider */
 
+#include <math.h>
 #include <vlc_aout_intf.h>           /* Volume functions */
 
 #include <QLabel>
@@ -151,8 +152,7 @@ void SoundWidget::userUpdateVolume( int i_sliderVolume )
     /* Only if volume is set by user action on slider */
     setMuted( false );
     playlist_t *p_playlist = pl_Get( p_intf );
-    int i_res = i_sliderVolume * (AOUT_VOLUME_DEFAULT * 2) / VOLUME_MAX;
-    aout_VolumeSet( p_playlist, i_res );
+    aout_VolumeSet( p_playlist, i_sliderVolume / 100.f );
     refreshLabels();
 }
 
@@ -160,11 +160,8 @@ void SoundWidget::userUpdateVolume( int i_sliderVolume )
 void SoundWidget::libUpdateVolume()
 {
     /* Audio part */
-    audio_volume_t i_volume;
     playlist_t *p_playlist = pl_Get( p_intf );
-
-    i_volume = aout_VolumeGet( p_playlist );
-    i_volume = (i_volume * VOLUME_MAX ) / (AOUT_VOLUME_DEFAULT * 2);
+    long i_volume = lroundf(aout_VolumeGet( p_playlist ) * 100.f);
 
     if ( i_volume - volumeSlider->value() != 0 )
     {

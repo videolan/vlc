@@ -33,6 +33,7 @@
 # include "config.h"
 #endif
 
+#include <math.h>
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_meta.h>
@@ -48,34 +49,38 @@
 static int vlclua_volume_set( lua_State *L )
 {
     playlist_t *p_this = vlclua_get_playlist_internal( L );
-    int i_volume = VLC_CLIP( luaL_checkint( L, 1 ), 0, AOUT_VOLUME_MAX );
-    int i_ret = aout_VolumeSet( p_this, i_volume );
+    int i_volume = luaL_checkint( L, 1 );
+    if( i_volume < 0 )
+        i_volume = 0;
+    int i_ret = aout_VolumeSet( p_this, i_volume/(float)AOUT_VOLUME_DEFAULT );
     return vlclua_push_ret( L, i_ret );
 }
 
 static int vlclua_volume_get( lua_State *L )
 {
     playlist_t *p_this = vlclua_get_playlist_internal( L );
-    audio_volume_t i_volume = aout_VolumeGet( p_this );
+    long i_volume = lroundf(aout_VolumeGet( p_this ) * AOUT_VOLUME_DEFAULT);
     lua_pushnumber( L, i_volume );
     return 1;
 }
 
 static int vlclua_volume_up( lua_State *L )
 {
-    audio_volume_t i_volume;
     playlist_t *p_this = vlclua_get_playlist_internal( L );
-    aout_VolumeUp( p_this, luaL_optint( L, 1, 1 ), &i_volume );
-    lua_pushnumber( L, i_volume );
+    float volume;
+
+    aout_VolumeUp( p_this, luaL_optint( L, 1, 1 ), &volume );
+    lua_pushnumber( L, lroundf(volume * AOUT_VOLUME_DEFAULT) );
     return 1;
 }
 
 static int vlclua_volume_down( lua_State *L )
 {
-    audio_volume_t i_volume;
     playlist_t *p_this = vlclua_get_playlist_internal( L );
-    aout_VolumeDown( p_this, luaL_optint( L, 1, 1 ), &i_volume );
-    lua_pushnumber( L, i_volume );
+    float volume;
+
+    aout_VolumeDown( p_this, luaL_optint( L, 1, 1 ), &volume );
+    lua_pushnumber( L, lroundf(volume * AOUT_VOLUME_DEFAULT) );
     return 1;
 }
 

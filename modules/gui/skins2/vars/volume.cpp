@@ -38,7 +38,7 @@ Volume::Volume( intf_thread_t *pIntf ): VarPercent( pIntf )
     m_volumeMax = AOUT_VOLUME_DEFAULT * 2;
 
     // Initial value
-    audio_volume_t val = aout_VolumeGet( getIntf()->p_sys->p_playlist );
+    float val = aout_VolumeGet( getIntf()->p_sys->p_playlist ) * 100.f;
     set( val, false );
 }
 

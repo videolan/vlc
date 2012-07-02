@@ -91,7 +91,7 @@ static void aout_OutputTimeReport (audio_output_t *aout, mtime_t ideal)
  */
 static void aout_OutputVolumeReport (audio_output_t *aout, float volume)
 {
-    audio_volume_t vol = lroundf (volume * (float)AOUT_VOLUME_DEFAULT);
+    long vol = lroundf (volume * (float)AOUT_VOLUME_DEFAULT);
 
     /* We cannot acquire the volume lock as this gets called from the audio
      * output plug-in (it would cause a lock inversion). */
@@ -365,7 +365,7 @@ static int aout_VolumeSoftSet (audio_output_t *aout, float volume, bool mute)
  */
 void aout_VolumeSoftInit (audio_output_t *aout)
 {
-    audio_volume_t volume = var_GetInteger (aout, "volume");
+    long volume = var_GetInteger (aout, "volume");
     bool mute = var_GetBool (aout, "mute");
 
     aout_assert_locked (aout);

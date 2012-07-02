@@ -27,6 +27,7 @@
 #endif
 
 #include <assert.h>
+#include <math.h>
 
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_media.h>
@@ -323,29 +324,21 @@ void libvlc_audio_set_mute( libvlc_media_player_t *mp, int mute )
     aout_MuteSet( VLC_OBJECT(mp), mute != 0 );
 }
 
-/*****************************************************************************
- * libvlc_audio_get_volume : Get the current volume
- *****************************************************************************/
 int libvlc_audio_get_volume( libvlc_media_player_t *mp )
 {
-    unsigned volume = aout_VolumeGet( mp );
-
-    return (volume * 100 + AOUT_VOLUME_DEFAULT / 2) / AOUT_VOLUME_DEFAULT;
+    float vol = aout_VolumeGet( mp );
+    return ( vol >= 0.f ) ? lroundf( vol * 100.f ) : -1;
 }
 
-
-/*****************************************************************************
- * libvlc_audio_set_volume : Set the current volume
- *****************************************************************************/
 int libvlc_audio_set_volume( libvlc_media_player_t *mp, int volume )
 {
-    volume = (volume * AOUT_VOLUME_DEFAULT + 50) / 100;
-    if (volume < 0 || volume > AOUT_VOLUME_MAX)
+    float vol = volume / 100.f;
+    if (vol < 0.f)
     {
         libvlc_printerr( "Volume out of range" );
         return -1;
     }
-    aout_VolumeSet (mp, volume);
+    aout_VolumeSet (mp, vol);
     return 0;
 }
 
