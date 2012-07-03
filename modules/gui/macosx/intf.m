@@ -1337,7 +1337,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         val.i_int |= KEY_MODIFIER_COMMAND;
     }
 
-    key = [[o_event charactersIgnoringModifiers] characterAtIndex: 0];
+    key = [[[o_event charactersIgnoringModifiers] lowercaseString] characterAtIndex: 0];
 
     /* handle Lion's default key combo for fullscreen-toggle in addition to our own hotkeys */
     if( key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask )
