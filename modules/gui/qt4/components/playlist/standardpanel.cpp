@@ -268,9 +268,9 @@ bool StandardPLPanel::eventFilter ( QObject *obj, QEvent * event )
                                   Qt::AlignHCenter,
                                   palette(),
                                   true,
-                                  qtr("Playlist is currently Empty\n"
+                                  qtr("Playlist is currently empty.\n"
                                       "Drop a file here or select a "
-                                      "media source from the left"),
+                                      "media source from the left."),
                                   QPalette::Text );
         }
     }
