@@ -325,7 +325,7 @@ static const char *const ppsz_force_dolby_descriptions[] = {
     "This adds audio post processing filters, to modify " \
     "the sound rendering." )
 
-#define AUDIO_VISUAL_TEXT N_("Audio visualizations ")
+#define AUDIO_VISUAL_TEXT N_("Audio visualizations")
 #define AUDIO_VISUAL_LONGTEXT N_( \
     "This adds visualization modules (spectrum analyzer, etc.).")
 
