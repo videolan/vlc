@@ -151,9 +151,6 @@
  #include <sys/syslimits.h>
 #endif
 
-/* Audio volume */
-typedef uint16_t            audio_volume_t;
-
 /**
  * High precision date or time interval
  *
