@@ -107,7 +107,7 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 
 #define SKIP_IDCT_TEXT N_("Skip idct (default=0)")
 #define SKIP_IDCT_LONGTEXT N_( \
-    "Force skipping of idct to speed up decoding for frame types" \
+    "Force skipping of idct to speed up decoding for frame types " \
     "(-1=None, 0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)." )
 
 #define DEBUG_TEXT N_( "Debug mask" )

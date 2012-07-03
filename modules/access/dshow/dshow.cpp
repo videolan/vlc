@@ -156,7 +156,7 @@ static const char *const ppsz_standards_list_text[] =
     "(eg. I420 (default), RV24, etc.)")
 #define FPS_TEXT N_("Video input frame rate")
 #define FPS_LONGTEXT N_( \
-    "Force the DirectShow video input to use a specific frame rate" \
+    "Force the DirectShow video input to use a specific frame rate " \
     "(eg. 0 means default, 25, 29.97, 50, 59.94, etc.)")
 #define CONFIG_TEXT N_("Device properties")
 #define CONFIG_LONGTEXT N_( \
