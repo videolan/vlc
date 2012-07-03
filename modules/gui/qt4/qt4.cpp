@@ -1,5 +1,5 @@
 /*****************************************************************************
- * qt4.cpp : QT4 interface
+ * qt4.cpp : Qt interface
  ****************************************************************************
  * Copyright © 2006-2009 the VideoLAN team
  * $Id$
@@ -311,7 +311,7 @@ vlc_module_end ()
 
 /*****************************************/
 
-/* Ugly, but the Qt4 interface assumes single instance anyway */
+/* Ugly, but the Qt interface assumes single instance anyway */
 static vlc_sem_t ready;
 static QMutex lock;
 static bool busy = false;
@@ -360,7 +360,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     QMutexLocker locker (&lock);
     if (busy)
     {
-        msg_Err (p_this, "cannot start Qt4 multiple times");
+        msg_Err (p_this, "cannot start Qt multiple times");
         return VLC_EGENERIC;
     }
 
@@ -401,7 +401,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     return VLC_SUCCESS;
 }
 
-/* Open qt4 interface */
+/* Open Qt interface */
 static int OpenIntf( vlc_object_t *p_this )
 {
     return Open( p_this, false );
@@ -607,7 +607,7 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
         (intf_thread_t *)var_InheritAddress( p_wnd, "qt4-iface" );
     if( !p_intf )
     {   /* If another interface is used, this plugin cannot work */
-        msg_Dbg( p_wnd, "Qt4 interface not found" );
+        msg_Dbg( p_wnd, "Qt interface not found" );
         return VLC_EGENERIC;
     }
 

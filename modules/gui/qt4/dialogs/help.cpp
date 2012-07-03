@@ -114,7 +114,7 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf)
             + qfu( VLC_CompileBy() )+ " on " + qfu( VLC_CompileHost() ) +
             + " ("__DATE__" "__TIME__").\n"
             + qtr( "Compiler: " ) + qfu( VLC_Compiler() ) + ".\n"
-            + qtr( "You are using the Qt4 Interface.\n\n" )
+            + qtr( "You are using the Qt Interface.\n\n" )
             + qtr( "Copyright (C) " ) + COPYRIGHT_YEARS
             + qtr( " by the VideoLAN Team.\n" )
             + "http://www.videolan.org" );

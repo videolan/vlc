@@ -1065,7 +1065,7 @@ static int FullscreenControllerWidgetFullscreenChanged( vlc_object_t *vlc_object
 
     vout_thread_t *p_vout = (vout_thread_t *) vlc_object;
 
-    msg_Dbg( p_vout, "Qt4: Fullscreen state changed" );
+    msg_Dbg( p_vout, "Qt: Fullscreen state changed" );
     FullscreenControllerWidget *p_fs = (FullscreenControllerWidget *)data;
 
     p_fs->fullscreenChanged( p_vout, new_val.b_bool, var_GetInteger( p_vout, "mouse-hide-timeout" ) );
