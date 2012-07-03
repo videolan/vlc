@@ -319,8 +319,10 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     char         *psz_string;
+    char         *psz_fontname;
     int           i_font_size;
     int           i_spacing = 0;
+    int           i_font_alpha;
     uint32_t      i_font_color;
     bool          b_bold, b_uline, b_italic, b_halfwidth;
     vlc_value_t val;
@@ -338,6 +340,8 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
         return VLC_EGENERIC;
 
     if (p_region_in->p_style) {
+        psz_fontname = p_region_in->p_style->psz_fontname ?
+            p_region_in->p_style->psz_fontname : p_sys->psz_font_name;
         i_font_color = VLC_CLIP(p_region_in->p_style->i_font_color, 0, 0xFFFFFF);
         i_font_size  = VLC_CLIP(p_region_in->p_style->i_font_size, 0, 255);
         if (p_region_in->p_style->i_style_flags) {
@@ -352,6 +356,7 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
         }
         i_spacing = VLC_CLIP(p_region_in->p_style->i_spacing, 0, 255);
     } else {
+        psz_fontname = p_sys->psz_font_name;
         i_font_color = p_sys->i_font_color;
         i_font_size  = p_sys->i_font_size;
     }
@@ -379,7 +384,7 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
         CFRelease(p_cfString);
         len = CFAttributedStringGetLength(p_attrString);
 
-        setFontAttibutes(p_sys->psz_font_name, i_font_size, i_font_color, b_bold, b_italic, b_uline, b_halfwidth,
+        setFontAttibutes(psz_fontname, i_font_size, i_font_color, b_bold, b_italic, b_uline, b_halfwidth,
                                              i_spacing,
                                              CFRangeMake(0, len), p_attrString);
 
