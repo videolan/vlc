@@ -122,6 +122,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (BOOL)performKeyEquivalent:(NSEvent *)o_event
 {
+    BOOL b_force = NO;
     // these are key events which should be handled by vlc core, but are attached to a main menu item
     if( ![self isEvent: o_event forKey: "key-vol-up"] &&
         ![self isEvent: o_event forKey: "key-vol-down"] &&
@@ -132,8 +133,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
         if([[NSApp mainMenu] performKeyEquivalent:o_event])
             return TRUE;
     }
+    else
+        b_force = YES;
 
-    return [[VLCMain sharedInstance] hasDefinedShortcutKey:o_event] ||
+    return [[VLCMain sharedInstance] hasDefinedShortcutKey:o_event force:b_force] ||
            [(VLCControls *)[[VLCMain sharedInstance] controls] keyEvent:o_event];
 }
 

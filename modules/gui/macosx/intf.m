@@ -1315,7 +1315,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
  * shortcut key.  If it is, pass it off to VLC for handling and return YES,
  * otherwise ignore it and return NO (where it will get handled by Cocoa).
  *****************************************************************************/
-- (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event
+- (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event force:(BOOL)b_force
 {
     unichar key = 0;
     vlc_value_t val;
@@ -1346,7 +1346,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         return YES;
     }
 
-    if( val.i_int == 0 ) // ignore only when no modifier is pressed
+    if( !b_force )
     {
         switch( key )
         {
