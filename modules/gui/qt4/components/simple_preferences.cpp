@@ -549,12 +549,12 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                     ui.skins->setChecked( true );
             } else {
                 /* defaults to qt */
-                ui.qt4->setChecked( true );
+                ui.qt->setChecked( true );
             }
             free( psz_intf );
 
             optionWidgets.append( ui.skins );
-            optionWidgets.append( ui.qt4 );
+            optionWidgets.append( ui.qt );
 #if !defined( WIN32)
             ui.stylesCombo->addItem( qtr("System's default") );
             ui.stylesCombo->addItems( QStyleFactory::keys() );
@@ -572,7 +572,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             optionWidgets.append( NULL );
 #endif
             radioGroup = new QButtonGroup(this);
-            radioGroup->addButton( ui.qt4, 0 );
+            radioGroup->addButton( ui.qt, 0 );
             radioGroup->addButton( ui.skins, 1 );
             CONNECT( radioGroup, buttonClicked( int ),
                      ui.styleStackedWidget, setCurrentIndex( int ) );

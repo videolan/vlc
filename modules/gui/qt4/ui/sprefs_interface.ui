@@ -348,7 +348,7 @@
        </spacer>
       </item>
       <item row="0" column="2">
-       <widget class="QRadioButton" name="qt4">
+       <widget class="QRadioButton" name="qt">
         <property name="toolTip">
          <string>This is VLC's default interface, with a native look and feel.</string>
         </property>
@@ -674,7 +674,7 @@
  </customwidgets>
  <tabstops>
   <tabstop>language</tabstop>
-  <tabstop>qt4</tabstop>
+  <tabstop>qt</tabstop>
   <tabstop>skins</tabstop>
   <tabstop>fsController</tabstop>
   <tabstop>minimalviewBox</tabstop>
