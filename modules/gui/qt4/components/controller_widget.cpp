@@ -110,15 +110,16 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
 
     /* Set the volume from the config */
     libUpdateVolume();
-    /* Force the update at build time in order to have a muted icon if needed */
-    updateMuteStatus();
+    /* Sync mute status */
+    if( aout_MuteGet( THEPL ) > 0 )
+        updateMuteStatus( true );
 
     /* Volume control connection */
     volumeSlider->setTracking( true );
     CONNECT( volumeSlider, valueChanged( int ), this, valueChangedFilter( int ) );
     CONNECT( this, valueReallyChanged( int ), this, userUpdateVolume( int ) );
     CONNECT( THEMIM, volumeChanged( void ), this, libUpdateVolume( void ) );
-    CONNECT( THEMIM, soundMuteChanged( void ), this, updateMuteStatus( void ) );
+    CONNECT( THEMIM, soundMuteChanged( bool ), this, updateMuteStatus( bool ) );
 }
 
 SoundWidget::~SoundWidget()
@@ -179,14 +180,13 @@ void SoundWidget::valueChangedFilter( int i_val )
 }
 
 /* libvlc mute/unmute event slot */
-void SoundWidget::updateMuteStatus()
+void SoundWidget::updateMuteStatus( bool mute )
 {
-    playlist_t *p_playlist = pl_Get( p_intf );
-    b_is_muted = aout_MuteGet( p_playlist ) > 0;
+    b_is_muted = mute;
 
     SoundSlider *soundSlider = qobject_cast<SoundSlider *>(volumeSlider);
     if( soundSlider )
-        soundSlider->setMuted( b_is_muted );
+        soundSlider->setMuted( mute );
     refreshLabels();
 }
 

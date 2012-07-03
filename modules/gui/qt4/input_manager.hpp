@@ -46,7 +46,6 @@ enum {
     ItemTitleChanged_Type,
     ItemRateChanged_Type,
     VolumeChanged_Type,
-    SoundMuteChanged_Type,
     ItemEsChanged_Type,
     ItemTeletextChanged_Type,
     InterfaceVoutUpdate_Type,
@@ -277,6 +276,7 @@ private:
     input_thread_t          *p_input;
     intf_thread_t           *p_intf;
     QVLCBool random, repeat, loop;
+    QVLCBool mute;
 
 public slots:
     void togglePlayPause();
@@ -293,10 +293,11 @@ public slots:
 private slots:
     void notifyRandom( bool );
     void notifyRepeatLoop( bool );
+    void notifyMute( bool );
 signals:
     void inputChanged( input_thread_t * );
     void volumeChanged();
-    void soundMuteChanged();
+    void soundMuteChanged(bool);
     void playlistItemAppended( int itemId, int parentId );
     void playlistItemRemoved( int itemId );
     void playlistNotEmpty( bool );

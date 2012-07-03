@@ -118,7 +118,7 @@ private:
 protected slots:
     void userUpdateVolume( int );
     void libUpdateVolume( void );
-    void updateMuteStatus( void );
+    void updateMuteStatus( bool );
     void refreshLabels( void );
     void showVolumeMenu( QPoint pos );
     void valueChangedFilter( int );
