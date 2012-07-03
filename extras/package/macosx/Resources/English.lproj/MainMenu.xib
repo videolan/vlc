@@ -21,15 +21,15 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
+      <integer value="2770"/>
+      <integer value="2730"/>
+      <integer value="4948"/>
+      <integer value="29"/>
       <integer value="1617"/>
+      <integer value="4722"/>
       <integer value="4850"/>
       <integer value="4756"/>
-      <integer value="4722"/>
       <integer value="915"/>
-      <integer value="4948"/>
-      <integer value="2730"/>
-      <integer value="2770"/>
-      <integer value="29"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -4509,7 +4509,7 @@ LCAuLi4</string>
           <object class="NSButton" id="880009621">
             <reference key="NSNextResponder" ref="661733562"/>
             <int key="NSvFlags">268</int>
-            <string key="NSFrame">{{48, 1}, {14, 16}}</string>
+            <string key="NSFrame">{{48, 3}, {14, 16}}</string>
             <reference key="NSSuperview" ref="661733562"/>
             <string key="NSReuseIdentifierKey">_NS:610</string>
             <bool key="NSEnabled">YES</bool>
@@ -4531,7 +4531,7 @@ LCAuLi4</string>
           <object class="NSButton" id="297736534">
             <reference key="NSNextResponder" ref="661733562"/>
             <int key="NSvFlags">268</int>
-            <string key="NSFrame">{{28, 1}, {14, 16}}</string>
+            <string key="NSFrame">{{28, 3}, {14, 16}}</string>
             <reference key="NSSuperview" ref="661733562"/>
             <string key="NSReuseIdentifierKey">_NS:610</string>
             <bool key="NSEnabled">YES</bool>
@@ -4553,7 +4553,7 @@ LCAuLi4</string>
           <object class="NSButton" id="425279991">
             <reference key="NSNextResponder" ref="661733562"/>
             <int key="NSvFlags">268</int>
-            <string key="NSFrame">{{8, 1}, {14, 16}}</string>
+            <string key="NSFrame">{{8, 3}, {14, 16}}</string>
             <reference key="NSSuperview" ref="661733562"/>
             <string key="NSReuseIdentifierKey">_NS:610</string>
             <bool key="NSEnabled">YES</bool>
