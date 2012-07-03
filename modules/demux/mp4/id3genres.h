@@ -96,7 +96,7 @@ static const char *ppsz_genres[] = {
     N_("Native American"),
     N_("Cabaret"),
     N_("New Wave"),
-    N_("Psychadelic"),
+    N_("Psychedelic"),
     N_("Rave"),
     N_("Showtunes"),
     N_("Trailer"),
