@@ -38,14 +38,12 @@
 #include <QObject>
 #include <QEvent>
 
-
 enum {
     PositionUpdate_Type = QEvent::User + IMEventType + 1,
     ItemChanged_Type,
     ItemStateChanged_Type,
     ItemTitleChanged_Type,
     ItemRateChanged_Type,
-    VolumeChanged_Type,
     ItemEsChanged_Type,
     ItemTeletextChanged_Type,
     InterfaceVoutUpdate_Type,
@@ -276,6 +274,7 @@ private:
     input_thread_t          *p_input;
     intf_thread_t           *p_intf;
     QVLCBool random, repeat, loop;
+    QVLCInteger volume;
     QVLCBool mute;
 
 public slots:
@@ -293,11 +292,12 @@ public slots:
 private slots:
     void notifyRandom( bool );
     void notifyRepeatLoop( bool );
+    void notifyVolume( int );
     void notifyMute( bool );
 signals:
     void inputChanged( input_thread_t * );
-    void volumeChanged();
-    void soundMuteChanged(bool);
+    void volumeChanged( float );
+    void soundMuteChanged( bool );
     void playlistItemAppended( int itemId, int parentId );
     void playlistItemRemoved( int itemId );
     void playlistNotEmpty( bool );

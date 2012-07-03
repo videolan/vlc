@@ -51,8 +51,6 @@ static int PLItemAppended( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
 static int PLItemRemoved( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
-static int VolumeChanged( vlc_object_t *, const char *,
-                        vlc_value_t, vlc_value_t, void * );
 
 static int InputEvent( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void * );
@@ -945,7 +943,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     : QObject(NULL), p_intf( _p_intf ),
       random( VLC_OBJECT(THEPL), "random" ),
       repeat( VLC_OBJECT(THEPL), "repeat" ), loop( VLC_OBJECT(THEPL), "loop" ),
-      mute( VLC_OBJECT(THEPL), "mute" )
+      volume( VLC_OBJECT(THEPL), "volume" ), mute( VLC_OBJECT(THEPL), "mute" )
 {
     p_input = NULL;
     im = new InputManager( this, p_intf );
@@ -960,7 +958,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     repeat.addCallback( this, SLOT(notifyRepeatLoop(bool)) );
     loop.addCallback( this, SLOT(notifyRepeatLoop(bool)) );
 
-    var_AddCallback( THEPL, "volume", VolumeChanged, this );
+    volume.addCallback( this, SLOT(notifyVolume(int)) );
     mute.addCallback( this, SLOT(notifyMute(bool)) );
 
     /* Warn our embedded IM about input changes */
@@ -985,8 +983,6 @@ MainInputManager::~MainInputManager()
        var_DelCallback( p_input, "state", PLItemChanged, this );
        vlc_object_release( p_input );
     }
-
-    var_DelCallback( THEPL, "volume", VolumeChanged, this );
 
     var_DelCallback( THEPL, "activity", PLItemChanged, this );
     var_DelCallback( THEPL, "item-change", ItemChanged, im );
@@ -1016,9 +1012,6 @@ void MainInputManager::customEvent( QEvent *event )
     // msg_Dbg( p_intf, "New MainIM Event of type: %i", type );
     switch( type )
     {
-    case VolumeChanged_Type:
-        emit volumeChanged();
-        return;
     case PLItemAppended_Type:
         plEv = static_cast<PLEvent*>( event );
         emit playlistItemAppended( plEv->i_item, plEv->i_parent );
@@ -1224,16 +1217,9 @@ static int LeafToParent( vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
-static int VolumeChanged( vlc_object_t *p_this, const char *psz_var,
-                        vlc_value_t oldval, vlc_value_t newval, void *param )
+void MainInputManager::notifyVolume( int volume )
 {
-    VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval ); VLC_UNUSED( newval );
-
-    MainInputManager *mim = (MainInputManager*)param;
-
-    IMEvent *event = new IMEvent( VolumeChanged_Type );
-    QApplication::postEvent( mim, event );
-    return VLC_SUCCESS;
+    emit volumeChanged( volume / (float)AOUT_VOLUME_DEFAULT );
 }
 
 void MainInputManager::notifyMute( bool mute )

@@ -109,7 +109,8 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
         layout->addWidget( volumeSlider, 0, Qt::AlignBottom  );
 
     /* Set the volume from the config */
-    libUpdateVolume();
+    float volume = aout_VolumeGet( THEPL );
+    libUpdateVolume( (volume >= 0.f) ? volume : 1.f );
     /* Sync mute status */
     if( aout_MuteGet( THEPL ) > 0 )
         updateMuteStatus( true );
@@ -118,7 +119,7 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     volumeSlider->setTracking( true );
     CONNECT( volumeSlider, valueChanged( int ), this, valueChangedFilter( int ) );
     CONNECT( this, valueReallyChanged( int ), this, userUpdateVolume( int ) );
-    CONNECT( THEMIM, volumeChanged( void ), this, libUpdateVolume( void ) );
+    CONNECT( THEMIM, volumeChanged( float ), this, libUpdateVolume( float ) );
     CONNECT( THEMIM, soundMuteChanged( bool ), this, updateMuteStatus( bool ) );
 }
 
@@ -152,19 +153,15 @@ void SoundWidget::userUpdateVolume( int i_sliderVolume )
 {
     /* Only if volume is set by user action on slider */
     setMuted( false );
-    playlist_t *p_playlist = pl_Get( p_intf );
-    aout_VolumeSet( p_playlist, i_sliderVolume / 100.f );
+    aout_VolumeSet( THEPL, i_sliderVolume / 100.f );
     refreshLabels();
 }
 
 /* libvlc changed value event slot */
-void SoundWidget::libUpdateVolume()
+void SoundWidget::libUpdateVolume( float volume )
 {
-    /* Audio part */
-    playlist_t *p_playlist = pl_Get( p_intf );
-    long i_volume = lroundf(aout_VolumeGet( p_playlist ) * 100.f);
-
-    if ( i_volume - volumeSlider->value() != 0 )
+    long i_volume = lroundf(volume * 100.f);
+    if( i_volume != volumeSlider->value()  )
     {
         b_ignore_valuechanged = true;
         volumeSlider->setValue( i_volume );
