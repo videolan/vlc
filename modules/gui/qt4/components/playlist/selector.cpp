@@ -424,7 +424,7 @@ void PLSelector::dragMoveEvent ( QDragMoveEvent * event )
 
 void PLSelector::plItemAdded( int item, int parent )
 {
-    if( parent != podcastsParentId ) return;
+    if( parent != podcastsParentId || podcastsParent == NULL ) return;
 
     playlist_Lock( THEPL );
 
@@ -473,6 +473,9 @@ void PLSelector::plItemRemoved( int id )
 
 void PLSelector::inputItemUpdate( input_item_t *arg )
 {
+    if( podcastsParent == NULL )
+        return;
+
     int c = podcastsParent->childCount();
     for( int i = 0; i < c; i++ )
     {
