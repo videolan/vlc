@@ -263,7 +263,7 @@ ${VLCROOT}/configure \
     --disable-a52 \
     --disable-fribidi \
     --disable-macosx-audio \
-    --disable-qt4 --disable-skins2 \
+    --disable-qt --disable-skins2 \
     --disable-libgcrypt \
     --disable-vcd \
     --disable-vlc \
