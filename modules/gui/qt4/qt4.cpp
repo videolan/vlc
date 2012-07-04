@@ -295,15 +295,20 @@ vlc_module_begin ()
 
         set_callbacks( OpenDialogs, Close )
 
-#if defined(Q_WS_X11) || defined(Q_WS_WIN) || defined(Q_WS_MAC)  || defined(Q_WS_PM)
+#if defined (Q_WS_X11) || (defined (Q_WS_QPA) && defined (__unix__))
     add_submodule ()
-#if defined(Q_WS_X11)
         set_capability( "vout window xid", 0 )
-#elif defined(Q_WS_WIN) || defined(Q_WS_PM)
-        set_capability( "vout window hwnd", 0 )
-#elif defined(Q_WS_MAC)
-        set_capability( "vout window nsobject", 0 )
+        set_callbacks( WindowOpen, WindowClose )
 #endif
+#if defined (Q_WS_WIN) || (defined (Q_WS_QPA) && defined (WIN32)) \
+ || defined (Q_WS_PM)  || (defined (Q_WS_QPA) && defined (__OS2__))
+    add_submodule ()
+        set_capability( "vout window hwnd", 0 )
+        set_callbacks( WindowOpen, WindowClose )
+#endif
+#if defined (Q_WS_MAC) || (defined (Q_WS_QPA) && defined (__APPLE__))
+    add_submodule ()
+        set_capability( "vout window nsobject", 0 )
         set_callbacks( WindowOpen, WindowClose )
 #endif
 
@@ -507,6 +512,22 @@ static void *Thread( void *obj )
     /* Explain how to show a dialog :D */
     p_intf->pf_show_dialog = ShowDialog;
 
+    /* Check window type from the Qt platform back-end */
+    p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_INVALID;
+#if defined (Q_WS_QPA)
+    QString platform = app.platformName();
+    if( platform == qfu("xcb") )
+        p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
+    else
+        msg_Err( p_intf, "unknown Qt platform: %s", qtu(platform) );
+#elif defined (Q_WS_X11)
+    p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
+#elif defined (Q_WS_WIN) || defined (Q_WS_PM)
+    p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
+#elif defined (Q_WS_MAC)
+    p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
+#endif
+
     /* Tell the main LibVLC thread we are ready */
     vlc_sem_post (&ready);
 
@@ -595,13 +616,8 @@ static int WindowControl( vout_window_t *, int i_query, va_list );
 
 static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 {
-    /* */
     if( cfg->is_standalone )
         return VLC_EGENERIC;
-#if defined (Q_WS_X11)
-    if( var_InheritBool( p_wnd, "video-wallpaper" ) )
-        return VLC_EGENERIC;
-#endif
 
     intf_thread_t *p_intf =
         (intf_thread_t *)var_InheritAddress( p_wnd, "qt4-iface" );
@@ -610,13 +626,22 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
         msg_Dbg( p_wnd, "Qt interface not found" );
         return VLC_EGENERIC;
     }
+    if( p_intf->p_sys->voutWindowType != cfg->type )
+        return VLC_EGENERIC;
+    switch( cfg->type )
+    {
+        case VOUT_WINDOW_TYPE_XID:
+            if( var_InheritBool( p_wnd, "video-wallpaper" ) )
+                return VLC_EGENERIC;
+            break;
+    }
 
     QMutexLocker locker (&lock);
     if (unlikely(!active))
         return VLC_EGENERIC;
 
     MainInterface *p_mi = p_intf->p_sys->p_mi;
-    msg_Dbg( p_wnd, "requesting video..." );
+    msg_Dbg( p_wnd, "requesting video window..." );
 
     int i_x = cfg->x;
     int i_y = cfg->y;
@@ -626,16 +651,21 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
     WId wid = p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
     if( !wid )
         return VLC_EGENERIC;
-#if defined (Q_WS_X11)
-    p_wnd->handle.xid = wid;
-    p_wnd->display.x11 = NULL;
-#elif defined (Q_WS_WIN) || defined (Q_WS_PM)
-    p_wnd->handle.hwnd = (void *)wid;
-#elif defined (Q_WS_MAC)
-    p_wnd->handle.nsobject = (void *)wid;
-#else
-# error FIXME
-#endif
+
+    switch( cfg->type )
+    {
+        case VOUT_WINDOW_TYPE_XID:
+            p_wnd->handle.xid = wid;
+            p_wnd->display.x11 = NULL;
+            break;
+        case VOUT_WINDOW_TYPE_HWND:
+            p_wnd->handle.hwnd = (void *)wid;
+            break;
+        case VOUT_WINDOW_TYPE_NSOBJECT:
+            p_wnd->handle.nsobject = (void *)wid;
+            break;
+    }
+
     p_wnd->control = WindowControl;
     p_wnd->sys = (vout_window_sys_t*)p_mi;
     return VLC_SUCCESS;
