@@ -705,10 +705,6 @@ static int Open(vlc_object_t *obj)
         case VLC_CODEC_F32L:
             ss.format = PA_SAMPLE_FLOAT32LE;
             break;
-        case VLC_CODEC_FI32:
-            format = VLC_CODEC_FL32;
-            ss.format = PA_SAMPLE_FLOAT32NE;
-            break;
         case VLC_CODEC_S32B:
             ss.format = PA_SAMPLE_S32BE;
             break;

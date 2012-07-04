@@ -195,10 +195,6 @@ static int Open (vlc_object_t *obj)
         case VLC_CODEC_F32L:
             pcm_format = SND_PCM_FORMAT_FLOAT_LE;
             break;
-        case VLC_CODEC_FI32:
-            fourcc = VLC_CODEC_FL32;
-            pcm_format = SND_PCM_FORMAT_FLOAT;
-            break;
         case VLC_CODEC_S32B:
             pcm_format = SND_PCM_FORMAT_S32_BE;
             break;

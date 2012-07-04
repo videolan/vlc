@@ -88,7 +88,7 @@ static void    Play        ( audio_output_t *, block_t * );
                         "header to the file.")
 
 static const char *const format_list[] = { "u8", "s8", "u16", "s16", "u16_le",
-                                     "s16_le", "u16_be", "s16_be", "fixed32",
+                                     "s16_le", "u16_be", "s16_be",
                                      "float32", "spdif" };
 static const int format_int[] = { VLC_CODEC_U8,
                                   VLC_CODEC_S8,
@@ -97,7 +97,6 @@ static const int format_int[] = { VLC_CODEC_U8,
                                   VLC_CODEC_S16L,
                                   VLC_CODEC_U16B,
                                   VLC_CODEC_S16B,
-                                  VLC_CODEC_FI32,
                                   VLC_CODEC_FL32,
                                   VLC_CODEC_SPDIFL };
 
