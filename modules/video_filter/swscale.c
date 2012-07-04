@@ -37,6 +37,10 @@
 
 #include <libswscale/swscale.h>
 
+#ifdef __APPLE__
+# include <TargetConditionals.h>
+#endif
+
 #include "../codec/avcodec/chroma.h" // Chroma Avutil <-> VLC conversion
 
 /* Gruikkkkkkkkkk!!!!! */
@@ -303,7 +307,7 @@ static int GetParameters( ScalerConfiguration *p_cfg,
     FixParameters( &i_fmti, &b_has_ai, &b_swap_uvi, p_fmti->i_chroma );
     FixParameters( &i_fmto, &b_has_ao, &b_swap_uvo, p_fmto->i_chroma );
 
-#ifndef __ANDROID__
+#if !defined (__ANDROID__) || !TARGET_OS_IPHONE
     /* FIXME TODO removed when ffmpeg is fixed
      * Without SWS_ACCURATE_RND the quality is really bad for some conversions */
     switch( i_fmto )
