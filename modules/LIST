@@ -120,7 +120,6 @@ $Id$
  * faad: AAC decoder using libfaad2
  * fb: video output module for the Linux framebuffer
  * filesystem: Filesystem access module
- * fixed32_mixer: Fixed-point audio mixer
  * flac: Flac decoder using libflac
  * flacsys: FLAC demuxer
  * float32_mixer: Precise float32 audio mixer
@@ -163,6 +162,7 @@ $Id$
  * idummy: dummy input
  * image: Image file video output
  * inhibit: preventing the computer from suspending
+ * integer_mixer: Integer audio mixer
  * invert: inverse video filter
  * iomx: IPC/OpenMaxIL for Android
  * jack: jack server audio output

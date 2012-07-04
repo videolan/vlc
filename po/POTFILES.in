@@ -319,8 +319,8 @@ modules/audio_filter/spatializer/revmodel.cpp
 modules/audio_filter/spatializer/revmodel.hpp
 modules/audio_filter/spatializer/spatializer.cpp
 modules/audio_filter/spatializer/tuning.h
-modules/audio_mixer/fixed32.c
 modules/audio_mixer/float32.c
+modules/audio_mixer/integer.c
 modules/audio_output/adummy.c
 modules/audio_output/alsa.c
 modules/audio_output/amem.c

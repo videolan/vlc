@@ -1,5 +1,5 @@
 /*****************************************************************************
- * fixed32.c : fixed-point software volume
+ * integer.c: integer software volume
  *****************************************************************************
  * Copyright (C) 2011 Rémi Denis-Courmont
  *
@@ -32,12 +32,11 @@ static int Activate (vlc_object_t *);
 vlc_module_begin ()
     set_category (CAT_AUDIO)
     set_subcategory (SUBCAT_AUDIO_MISC)
-    set_description (N_("Fixed-point audio mixer"))
+    set_description (N_("Integer audio mixer"))
     set_capability ("audio mixer", 9)
     set_callbacks (Activate, NULL)
 vlc_module_end ()
 
-static void FilterFI32 (audio_mixer_t *, block_t *, float);
 static void FilterS16N (audio_mixer_t *, block_t *, float);
 
 static int Activate (vlc_object_t *obj)
@@ -46,9 +45,6 @@ static int Activate (vlc_object_t *obj)
 
     switch (mixer->format)
     {
-        case VLC_CODEC_FI32:
-            mixer->mix = FilterFI32;
-            break;
         case VLC_CODEC_S16N:
             mixer->mix = FilterS16N;
             break;
@@ -56,24 +52,6 @@ static int Activate (vlc_object_t *obj)
             return -1;
     }
     return 0;
-}
-
-static void FilterFI32 (audio_mixer_t *mixer, block_t *block, float volume)
-{
-    const int64_t mult = volume * 0x1.p32;
-
-    if (mult == 0x1.p32)
-        return;
-
-    int32_t *p = (int32_t *)block->p_buffer;
-
-    for (size_t n = block->i_buffer / sizeof (*p); n > 0; n--)
-    {
-        *p = (*p * mult) >> INT64_C(32);
-        p++;
-    }
-
-    (void) mixer;
 }
 
 static void FilterS16N (audio_mixer_t *mixer, block_t *block, float volume)
