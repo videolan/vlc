@@ -534,23 +534,23 @@ static const entry_t p_list_video[] = {
         A("CLJR"),
 
     /* Real Video */
-    B(VLC_CODEC_RV10, "Real Video 1.0"),
+    B(VLC_CODEC_RV10, "RealVideo 1.0"),
         A("RV10"),
         A("rv10"),
 
-    B(VLC_CODEC_RV13, "Real Video 1.3"),
+    B(VLC_CODEC_RV13, "RealVideo 1.3"),
         A("RV13"),
         A("rv13"),
 
-    B(VLC_CODEC_RV20, "Real Video 2.0"),
+    B(VLC_CODEC_RV20, "RealVideo G2 (2.0)"),
         A("RV20"),
         A("rv20"),
 
-    B(VLC_CODEC_RV30, "Real Video 3.0"),
+    B(VLC_CODEC_RV30, "RealVideo 8 (3.0)"),
         A("RV30"),
         A("rv30"),
 
-    B(VLC_CODEC_RV40, "Real Video 4.0"),
+    B(VLC_CODEC_RV40, "RealVideo 9/10 (4.0)"),
         A("RV40"),
         A("rv40"),
 
