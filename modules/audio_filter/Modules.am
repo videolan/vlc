@@ -46,7 +46,6 @@ libvlc_LTLIBRARIES += \
 	libtrivial_channel_mixer_plugin.la
 
 # Converters
-SOURCES_converter_fixed = converter/fixed.c
 SOURCES_a52tospdif = converter/a52tospdif.c
 SOURCES_a52tofloat32 = converter/a52tofloat32.c
 SOURCES_dtstospdif = converter/dtstospdif.c
@@ -57,7 +56,6 @@ SOURCES_audio_format = converter/format.c
 libvlc_LTLIBRARIES += \
 	liba52tospdif_plugin.la \
 	libaudio_format_plugin.la \
-	libconverter_fixed_plugin.la \
 	libdtstospdif_plugin.la
 
 # Resamplers

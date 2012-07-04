@@ -1381,7 +1381,6 @@ static int EncoderOpen( vlc_object_t *p_this )
              p_enc->fmt_out.i_codec == VLC_CODEC_U32B ||
              p_enc->fmt_out.i_codec == VLC_CODEC_S32L ||
              p_enc->fmt_out.i_codec == VLC_CODEC_S32B ||
-             p_enc->fmt_out.i_codec == VLC_CODEC_FI32 ||
              p_enc->fmt_out.i_codec == VLC_CODEC_FL32 )
     {
         p_enc->fmt_out.audio.i_bitspersample = 32;
