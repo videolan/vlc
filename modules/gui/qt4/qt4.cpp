@@ -623,25 +623,19 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
     unsigned i_width = cfg->width;
     unsigned i_height = cfg->height;
 
+    WId wid = p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
+    if( !wid )
+        return VLC_EGENERIC;
 #if defined (Q_WS_X11)
-    p_wnd->handle.xid = p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
-    if( !p_wnd->handle.xid )
-        return VLC_EGENERIC;
+    p_wnd->handle.xid = wid;
     p_wnd->display.x11 = NULL;
-
-#elif defined (Q_WS_WIN) || defined(Q_WS_PM)
-    p_wnd->handle.hwnd = (void *)p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
-    if( !p_wnd->handle.hwnd )
-        return VLC_EGENERIC;
-
+#elif defined (Q_WS_WIN) || defined (Q_WS_PM)
+    p_wnd->handle.hwnd = (void *)wid;
 #elif defined (Q_WS_MAC)
-    p_wnd->handle.nsobject = (void *)p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
-    if( !p_wnd->handle.nsobject )
-        return VLC_EGENERIC;
+    p_wnd->handle.nsobject = (void *)wid;
 #else
 # error FIXME
 #endif
-
     p_wnd->control = WindowControl;
     p_wnd->sys = (vout_window_sys_t*)p_mi;
     return VLC_SUCCESS;
