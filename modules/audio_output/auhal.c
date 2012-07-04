@@ -120,7 +120,8 @@ static OSStatus StreamListener          ( AudioObjectID, UInt32, const AudioObje
 static int      AudioDeviceCallback     ( vlc_object_t *, const char *,
                                           vlc_value_t, vlc_value_t, void * );
 
-static int      VolumeSet               ( audio_output_t *, float, bool );
+static int      VolumeSet               ( audio_output_t *, float );
+static int      MuteSet                 ( audio_output_t *, bool );
 
 
 /*****************************************************************************
@@ -560,7 +561,8 @@ static int OpenAnalog( audio_output_t *p_aout )
     /* Do the last VLC aout setups */
     aout_FormatPrepare( &p_aout->format );
     aout_PacketInit( p_aout, &p_sys->packet, FRAMESIZE );
-    aout_VolumeHardInit( p_aout, VolumeSet, true );
+    p_aout->volume_set = VolumeSet;
+    p_aout->mute_set = MuteSet;
 
     /* set the IOproc callback */
     input.inputProc = (AURenderCallback) RenderCallbackAnalog;
@@ -1456,15 +1458,14 @@ static int AudioDeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 /*****************************************************************************
  * VolumeSet: Implements pf_volume_set(). Update the CoreAudio AU volume immediately.
  *****************************************************************************/
-static int VolumeSet( audio_output_t * p_aout, float volume, bool mute )
+static int VolumeSet( audio_output_t * p_aout, float volume )
 {
     struct   aout_sys_t *p_sys = p_aout->sys;
     OSStatus ostatus;
+    
+    aout_VolumeReport( p_aout, volume );
 
-    if( mute )
-        volume = 0.0;
-    else
-        volume = volume * volume * volume; // cubic mapping from output.c
+    volume = volume * volume * volume; // cubic mapping from output.c
 
     /* Set volume for output unit */
     ostatus = AudioUnitSetParameter( p_sys->au_unit,
@@ -1475,4 +1476,11 @@ static int VolumeSet( audio_output_t * p_aout, float volume, bool mute )
                                      0 );
 
     return ostatus;
+}
+
+static int MuteSet( audio_output_t * p_aout, bool mute )
+{
+    aout_MuteReport( p_aout, mute );
+
+    return 0;
 }
