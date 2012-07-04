@@ -178,8 +178,7 @@ static int Open( vlc_object_t *p_this )
     char *psz_effects, *psz_parser;
     video_format_t fmt;
 
-    if( ( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 &&
-          p_filter->fmt_in.audio.i_format != VLC_CODEC_FI32 ) )
+    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 )
     {
         return VLC_EGENERIC;
     }
