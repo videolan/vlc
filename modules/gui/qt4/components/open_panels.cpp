@@ -50,6 +50,7 @@
 #include <QDirModel>
 #include <QScrollArea>
 #include <QUrl>
+#include <QMimeData>
 #include <QDropEvent>
 
 #define I_DEVICE_TOOLTIP \

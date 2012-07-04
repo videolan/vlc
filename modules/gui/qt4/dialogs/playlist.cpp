@@ -31,6 +31,7 @@
 #include "util/qt_dirs.hpp"
 
 #include <QUrl>
+#include <QMimeData>
 #include <QHBoxLayout>
 
 PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf )

@@ -52,6 +52,7 @@
 #include <QUrl>
 #include <QSize>
 #include <QDate>
+#include <QMimeData>
 
 #include <QMenu>
 #include <QMenuBar>

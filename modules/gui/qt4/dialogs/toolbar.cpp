@@ -45,10 +45,11 @@
 #include <QListWidget>
 #include <QSpinBox>
 #include <QRubberBand>
-
+#include <QDrag>
 #include <QDragEnterEvent>
 #include <QDialogButtonBox>
 #include <QInputDialog>
+#include <QMimeData>
 
 #include <assert.h>
 
