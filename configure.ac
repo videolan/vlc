@@ -3557,64 +3557,71 @@ AS_IF([test "${enable_hildon}" = "yes"], [
 AM_CONDITIONAL(BUILD_HILDON, [test "${enable_hildon}" = "yes"])
 
 dnl
-dnl QT 4
+dnl QT
 dnl
-AC_ARG_ENABLE(qt4,
-  [  --enable-qt4            Qt 4 support (default enabled) ],, [
-  AS_IF([test "${SYS}" = "darwin"], [enable_qt4=no])
+AC_ARG_ENABLE(qt, [
+  AS_HELP_STRING([--disable-qt], [Qt UI support (default enabled)])],, [
+  AS_IF([test "${SYS}" = "darwin"], [
+    enable_qt="no"
+  ])
 ])
-AS_IF([test "${enable_qt4}" != "no"], [
-  PKG_CHECK_MODULES(QT4, [QtCore QtGui >= 4.6.0], [
-    VLC_ADD_PLUGIN([qt4])
-    VLC_ADD_LIBS([qt4],[${QT4_LIBS}])
-    VLC_ADD_CXXFLAGS([qt4],[${QT4_CFLAGS}])
-    ALIASES="${ALIASES} qvlc"
+AS_IF([test "${enable_qt}" != "no"], [
+  PKG_CHECK_MODULES([QT], [QtCore >= 5 QtWidgets QtGui],, [
+    PKG_CHECK_MODULES([QT], [QtCore QtGui >= 4.6.0],, [
+      AS_IF([test -n "${enable_qt}"],[
+        AC_MSG_ERROR([${QT_PKG_ERRORS}.])
+      ],[
+        AC_MSG_WARN([${QT_PKG_ERRORS}.])
+      ])
+      enable_qt="no"
+    ])
+  ])
+])
+AS_IF([test "${enable_qt}" != "no"], [
+  VLC_ADD_PLUGIN([qt4])
+  VLC_ADD_LIBS([qt4],[${QT_LIBS}])
+  VLC_ADD_CXXFLAGS([qt4],[${QT_CFLAGS}])
+  ALIASES="${ALIASES} qvlc"
 
-    AC_LANG_PUSH([C++])
-    VLC_SAVE_FLAGS
+  AC_LANG_PUSH([C++])
+  VLC_SAVE_FLAGS
 
-    AC_MSG_CHECKING([whether Qt uses X11])
-    CPPFLAGS="${CPPFLAGS} ${QT4_CFLAGS}"
-    AC_PREPROC_IFELSE([AC_LANG_SOURCE([
+  AC_MSG_CHECKING([whether Qt uses Xlib])
+  CPPFLAGS="${CPPFLAGS} ${QT_CFLAGS}"
+  AC_PREPROC_IFELSE([AC_LANG_SOURCE([
 #include <QWidget>
 #if !defined (Q_WS_X11)
 # error Fail
 #endif
-    ])], [
-      AC_MSG_RESULT([yes])
-      VLC_ADD_LIBS([qt4],[${X_LIBS} ${X_PRE_LIBS} -lX11])
-      VLC_ADD_CXXFLAGS([qt4],[${X_CFLAGS}])
-    ], [
-      AC_MSG_RESULT([no])
-    ])
-
-    VLC_RESTORE_FLAGS
-    AC_LANG_POP([C++])
-
-    AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
-        VLC_ADD_LIBS([qt4],[-lole32])
-    ])
-    AS_IF([test "${SYS}" = "darwin" ],[
-         VLC_ADD_LIBS([qt4], [-Wl,-framework,Cocoa])
-    ])
-    AC_PATH_PROGS(MOC, [moc-qt4 moc], moc,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)
-    AC_PATH_PROG(RCC, rcc, rcc,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)
-    AC_PATH_PROGS(UIC, [uic-qt4 uic], uic,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)
+  ])], [
+    AC_MSG_RESULT([yes])
+    VLC_ADD_LIBS([qt4],[${X_LIBS} ${X_PRE_LIBS} -lX11])
+    VLC_ADD_CXXFLAGS([qt4],[${X_CFLAGS}])
   ], [
-    AS_IF([test -n "${enable_qt4}"],[
-      AC_MSG_ERROR([${QT4_PKG_ERRORS}.])
-    ],[
-      AC_MSG_WARN([${QT4_PKG_ERRORS}.])
-    ])
-    enable_qt4="no"
+    AC_MSG_RESULT([no])
   ])
+
+  VLC_RESTORE_FLAGS
+  AC_LANG_POP([C++])
+
+  AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
+      VLC_ADD_LIBS([qt4],[-lole32])
+  ])
+  AS_IF([test "${SYS}" = "darwin" ],[
+       VLC_ADD_LIBS([qt4], [-Wl,-framework,Cocoa])
+  ])
+
+  QT_PATH="$(eval $PKG_CONFIG --variable=exec_prefix QtCore)"
+  AC_PATH_PROGS(MOC, [moc-qt4 moc], moc, [${QT_PATH}/bin])
+  AC_PATH_PROG(RCC, rcc, rcc, [${QT_PATH}/bin])
+  AC_PATH_PROGS(UIC, [uic-qt4 uic], uic, [${QT_PATH}/bin])
 ])
-AM_CONDITIONAL(ENABLE_QT4, [test "x$enable_qt4" != "xno"])
+AM_CONDITIONAL(ENABLE_QT4, [test "$enable_qt" != "no"])
 
 dnl
 dnl Simple test for skins2 dependency
 dnl
-AS_IF([test "x$enable_qt4" = "xno"], [
+AS_IF([test "$enable_qt" = "no"], [
   AS_IF([test "${enable_skins2}" = "yes"], [
     AC_MSG_ERROR([The skins2 module depends on the Qt4 interface. Without it you will not be able to open any dialog box from the interface, which makes the skins2 interface rather useless. Install the Qt4 development package or alternatively you can also configure with: --disable-qt4 --disable-skins2.])
   ], [
