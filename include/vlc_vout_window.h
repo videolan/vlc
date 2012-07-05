@@ -41,6 +41,7 @@ typedef struct vout_window_sys_t vout_window_sys_t;
  * Window handle type
  */
 enum {
+    VOUT_WINDOW_TYPE_INVALID=0,
     VOUT_WINDOW_TYPE_XID,
     VOUT_WINDOW_TYPE_HWND,
     VOUT_WINDOW_TYPE_NSOBJECT,
@@ -66,7 +67,7 @@ typedef struct {
     bool is_standalone;
 
     /* Window handle type */
-    int type;
+    unsigned type;
 
     /* Window position hint */
     int x;
