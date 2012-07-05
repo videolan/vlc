@@ -120,12 +120,14 @@ WId VideoWidget::request( int *pi_x, int *pi_y,
     plt.setColor( QPalette::Window, Qt::black );
     stable->setPalette( plt );
     stable->setAutoFillBackground(true);
+    /* Force the widget to be native so that it gets a winId() */
+    stable->setAttribute( Qt::WA_NativeWindow, true );
     /* Indicates that the widget wants to draw directly onto the screen.
        Widgets with this attribute set do not participate in composition
        management */
     /* This is currently disabled on X11 as it does not seem to improve
      * performance, but causes the video widget to be transparent... */
-#ifndef Q_WS_X11
+#if !defined (Q_WS_X11) && !defined (Q_WS_QPA)
     stable->setAttribute( Qt::WA_PaintOnScreen, true );
 #endif
 
