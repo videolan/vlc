@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ios.m: iOS X OpenGLES provider
  *****************************************************************************
- * Copyright (C) 2001-2009 the VideoLAN team
+ * Copyright (C) 2001-2012 VLC Authors and VideoLAN
  * $Id$
  *
  * Authors: Romain Goyet <romain.goyet at likid dot org>
@@ -39,8 +39,6 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_opengl.h>
-
-#define USE_OPENGL_ES 1
 
 #include "opengl.h"
 
@@ -181,8 +179,11 @@ static int Open(vlc_object_t *this)
     vd->control = Control;
 
     /* */
+    CGRect bounds = sys->glView.layer.bounds;
+    CGFloat scaleFactor = sys->glView.contentScaleFactor;
+    /* we need to multiply the bounds dimensions by the scaleFactor to be save for Retina Displays */
     vout_display_SendEventFullscreen (vd, false);
-    vout_display_SendEventDisplaySize (vd, vd->source.i_visible_width, vd->source.i_visible_height, false);
+    vout_display_SendEventDisplaySize (vd, bounds.size.width * scaleFactor, bounds.size.height * scaleFactor, false);
 
     return VLC_SUCCESS;
 
@@ -257,7 +258,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         {
-            return VLC_EGENERIC;
+            return VLC_SUCCESS;
         }
         case VOUT_DISPLAY_HIDE_MOUSE:
             return VLC_SUCCESS;
@@ -377,6 +378,11 @@ static void OpenglSwap(vlc_gl_t *gl)
     }
 }
 
+/* we don't get the correct scale factor if we don't overwrite this method */
+- (void) drawRect: (CGRect) rect
+{
+}
+
 @end
 
 @implementation VLCOpenGLESVideoView (Private)
@@ -428,6 +434,15 @@ static void OpenglSwap(vlc_gl_t *gl)
         {
             x = width;
             y = (width * videoHeight * sarDen) / (videoWidth * sarNum);
+        }
+
+        @synchronized (self)
+        {
+            vout_display_cfg_t cfg_tmp = *(_vd->cfg);
+            cfg_tmp.display.width  = width;
+            cfg_tmp.display.height = height;
+
+            vout_display_SendEventDisplaySize (_vd, width, height, false);
         }
     }
 
