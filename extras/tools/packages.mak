@@ -29,5 +29,5 @@ XZ_URL=http://tukaani.org/xz/xz-$(XZ_VERSION).tar.bz2
 OPENSSL_VERSION=1.0.0e
 OPENSSL_URL=http://www.openssl.org/source/openssl-$(OPENSSL_VERSION).tar.gz
 
-GAS_URL=https://github.com/yuvi/gas-preprocessor/tarball/master
-GAS_VERSION=867337f
+GAS_URL=https://github.com/mansr/gas-preprocessor/tarball/master
+GAS_VERSION=4ef872b
