@@ -78,21 +78,8 @@ RequestExecutionLevel user
   ; Instfiles page
     !insertmacro MUI_PAGE_INSTFILES
   ; Finish page
-
-    Function ExecAppFile
-      Exec '$INSTDIR\vlc.exe'
-    FunctionEnd
-
-    Function AppRunAs
-      !insertmacro UAC.CallFunctionAsUser ExecAppFile
-    FunctionEnd
-
-    !define MUI_FINISHPAGE_RUN
-    !define MUI_FINISHPAGE_RUN_FUNCTION AppRunAs
     !define MUI_FINISHPAGE_LINK $Link_VisitWebsite
     !define MUI_FINISHPAGE_LINK_LOCATION "http://www.videolan.org/vlc/"
-    !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\README.txt"
-    !define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
     !define MUI_FINISHPAGE_NOREBOOTSUPPORT
     !insertmacro MUI_PAGE_FINISH
 
