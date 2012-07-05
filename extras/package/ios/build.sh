@@ -165,9 +165,15 @@ mkdir -p "${VLCROOT}/contrib/iPhone${PLATFORM}"
 cd "${VLCROOT}/contrib/iPhone${PLATFORM}"
 
 if [ "$PLATFORM" = "OS" ]; then
-  export AS="${IOS_GAS_PREPROCESSOR} ${CC}"
-  export ASCPP="${IOS_GAS_PREPROCESSOR} ${CC}"
-  export CCAS="${IOS_GAS_PREPROCESSOR} ${CC}"
+    if [ "$SDK_VERSION" = "6.0" ]; then
+      export AS="${IOS_GAS_PREPROCESSOR} clang"
+      export ASCPP="${IOS_GAS_PREPROCESSOR} clang"
+      export CCAS="${IOS_GAS_PREPROCESSOR} clang"
+    else
+      export AS="${IOS_GAS_PREPROCESSOR} xcrun clang"
+      export ASCPP="${IOS_GAS_PREPROCESSOR} xcrun clang"
+      export CCAS="${IOS_GAS_PREPROCESSOR} xcrun clang"
+    fi
 else
   export AS="xcrun as"
   export ASCPP="xcrun as"
@@ -274,7 +280,7 @@ ${VLCROOT}/configure \
     --enable-visual \
     --disable-lua \
     --disable-sse \
-    --disable-neon \
+    --enable-neon \
     --disable-notify \
     --enable-live555 \
     --enable-realrtsp \
