@@ -655,7 +655,7 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
     switch( cfg->type )
     {
         case VOUT_WINDOW_TYPE_XID:
-            p_wnd->handle.xid = wid;
+            p_wnd->handle.xid = (uintptr_t)wid;
             p_wnd->display.x11 = NULL;
             break;
         case VOUT_WINDOW_TYPE_HWND:
