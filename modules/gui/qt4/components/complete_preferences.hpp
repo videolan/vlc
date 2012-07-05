@@ -47,6 +47,7 @@ class QVBoxLayout;
 
 class PrefsItemData : public QObject
 {
+    Q_OBJECT
 public:
     PrefsItemData()
     { panel = NULL; i_object_id = 0; i_subcat_id = -1; psz_name = NULL; };
