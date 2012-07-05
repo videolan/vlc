@@ -779,35 +779,38 @@ static void draw_without_shaders( vout_display_opengl_t *vgl, float *left, float
         right[0], top[0]
     };
 
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glEnable(GL_VERTEX_ARRAY);
-    glEnable(GL_TEXTURE_COORD_ARRAY);
+    for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
+       vgl->ActiveTexture( GL_TEXTURE0 + j );
+       vgl->ClientActiveTexture( GL_TEXTURE0 + j );
 
-    vgl->ActiveTexture( GL_TEXTURE0);
-    vgl->ClientActiveTexture( GL_TEXTURE0);
+       glEnableClientState(GL_VERTEX_ARRAY);
+       glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-    glEnable(vgl->tex_target);
-    glBindTexture(vgl->tex_target, vgl->texture[0][0]);
+       glEnable(vgl->tex_target);
+
+       glBindTexture(vgl->tex_target, vgl->texture[0][j]);
+       glTexCoordPointer(2, GL_FLOAT, 0, textureCoord);
+    }
+    vgl->ActiveTexture( GL_TEXTURE0 );
+    vgl->ClientActiveTexture( GL_TEXTURE0 );
+
     glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
-    glTexCoordPointer(2, GL_FLOAT, 0, textureCoord);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-    glDisable(vgl->tex_target);
-    glDisable(GL_TEXTURE_COORD_ARRAY);
-    glDisable(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glDisableClientState(GL_VERTEX_ARRAY);
+    for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
+       vgl->ActiveTexture( GL_TEXTURE0 + j );
+       vgl->ClientActiveTexture( GL_TEXTURE0 + j );
+       glDisable(vgl->tex_target);
+       glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+       glDisableClientState(GL_VERTEX_ARRAY);
+    }
+    vgl->ActiveTexture( GL_TEXTURE0 );
+    vgl->ClientActiveTexture( GL_TEXTURE0 );
 }
 
 static void draw_with_shaders( vout_display_opengl_t *vgl, float *left, float *top, float *right, float *bottom )
 {
-    vgl->UseProgram(vgl->program[0]);
-    vgl->Uniform4fv( vgl->GetUniformLocation( vgl->program[0], "coefficient" ), 4, vgl->local_value);
-    vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[0], "Texture0" ), 0);
-    vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[0], "Texture1" ), 1);
-    vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[0], "Texture2" ), 2);
 
     const GLfloat vertexCoord[] = {
         -1.0, 1.0,
@@ -887,6 +890,11 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
     if( vgl->program[0] )
     {
+        vgl->UseProgram(vgl->program[0]);
+        vgl->Uniform4fv( vgl->GetUniformLocation( vgl->program[0], "coefficient" ), 4, vgl->local_value);
+        vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[0], "Texture0" ), 0);
+        vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[0], "Texture1" ), 1);
+        vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[0], "Texture2" ), 2);
         draw_with_shaders( vgl, left, top ,right, bottom );
         // Change the program for overlays
         vgl->UseProgram(vgl->program[1]);
