@@ -1870,6 +1870,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if( new_frame.origin.y < screenFrame.origin.y )
         new_frame.origin.y = screenFrame.origin.y;
 
+    CGFloat right_screen_point = screenFrame.origin.x + screenFrame.size.width;
+    CGFloat right_window_point = new_frame.origin.x + new_frame.size.width;
+    if( right_window_point > right_screen_point )
+        new_frame.origin.x -= ( right_window_point - right_screen_point );
+
     [[o_videoWindow animator] setFrame:new_frame display:YES];
 }
 
