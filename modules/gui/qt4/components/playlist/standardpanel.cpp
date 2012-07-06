@@ -116,7 +116,7 @@ void StandardPLPanel::popupPlView( const QPoint &point )
     QModelIndex index = currentView->indexAt( point );
     QPoint globalPoint = currentView->viewport()->mapToGlobal( point );
     QItemSelectionModel *selection = currentView->selectionModel();
-    QModelIndexList list = selection->selectedIndexes();
+    QModelIndexList list = selection->selectedRows();
 
     if( !model->popup( index, globalPoint, list ) )
         VLCMenuBar::PopupMenu( p_intf, true );

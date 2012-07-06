@@ -293,6 +293,7 @@ PlIconView::PlIconView( PLModel *, QWidget *parent ) : QListView( parent )
     setWrapping( true );
     setUniformItemSizes( true );
     setSelectionMode( QAbstractItemView::ExtendedSelection );
+    setSelectionBehavior( QAbstractItemView::SelectRows );
     setDragEnabled(true);
     setAttribute( Qt::WA_MacShowFocusRect, false );
     /* dropping in QListView::IconMode does not seem to work */
@@ -331,6 +332,7 @@ PlListView::PlListView( PLModel *, QWidget *parent ) : QListView( parent )
     setViewMode( QListView::ListMode );
     setUniformItemSizes( true );
     setSelectionMode( QAbstractItemView::ExtendedSelection );
+    setSelectionBehavior( QAbstractItemView::SelectRows );
     setAlternatingRowColors( true );
     setDragEnabled(true);
     setAcceptDrops( true );
