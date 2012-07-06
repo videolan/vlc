@@ -1950,13 +1950,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     NSScreen *screen;
     NSRect screen_rect;
     NSRect rect;
-    vout_thread_t *p_vout = getVout();
     BOOL blackout_other_displays = config_GetInt( VLCIntf, "macosx-black" );
     id o_videoWindow = b_nonembedded ? o_detached_video_window : self;
 
-    if( p_vout )
-        screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)config_GetInt( VLCIntf, "macosx-vdev" )];
-
+    screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)config_GetInt( VLCIntf, "macosx-vdev" )];
     [self lockFullscreenAnimation];
 
     if (!screen)
@@ -1969,9 +1966,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         msg_Dbg( VLCIntf, "Using deepest screen" );
         screen = [NSScreen deepestScreen];
     }
-
-    if( p_vout )
-        vlc_object_release( p_vout );
 
     screen_rect = [screen frame];
 
