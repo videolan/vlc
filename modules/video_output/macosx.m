@@ -390,25 +390,18 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 && vout_window_SetSize (sys->embed, cfg->display.width, cfg->display.height))
                 return VLC_EGENERIC;
  
-            /* for the case that the core wants to resize below minimum window size we correct the size here
-             to ensure a centered picture */
+            /* we always use our current frame here, because we have some size constraints 
+               in the ui vout provider */
             vout_display_cfg_t cfg_tmp = *cfg;
-            if (cfg_tmp.display.width < windowMinSize.width)
-                cfg_tmp.display.width = windowMinSize.width;
-            if (cfg_tmp.display.height < 70)
-                cfg_tmp.display.height = 70;
+            NSRect bounds;
+            /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
+            if (OSX_LION)
+                bounds = [sys->glView convertRectToBacking:[sys->glView bounds]];
+            else
+                bounds = [sys->glView bounds];
+            cfg_tmp.display.width = bounds.size.width;
+            cfg_tmp.display.height = bounds.size.height;
 
-            if (!config_GetInt(vd, "macosx-video-autoresize"))
-            {
-                NSRect bounds;
-                /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
-                if (OSX_LION)
-                    bounds = [sys->glView convertRectToBacking:[sys->glView bounds]];
-                else
-                    bounds = [sys->glView bounds];
-                cfg_tmp.display.width = bounds.size.width;
-                cfg_tmp.display.height = bounds.size.height;
-            }
             vout_display_place_t place;
             vout_display_PlacePicture (&place, source, &cfg_tmp, false);
             @synchronized (sys->glView) {
