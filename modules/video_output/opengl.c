@@ -35,12 +35,7 @@
 #include <vlc_opengl.h>
 
 #include "opengl.h"
-// Define USE_OPENGL_ES to the GL ES Version you want to select
 
-/* RV16 */
-#ifndef GL_UNSIGNED_SHORT_5_6_5
-# define GL_UNSIGNED_SHORT_5_6_5 0x8363
-#endif
 #ifndef GL_CLAMP_TO_EDGE
 # define GL_CLAMP_TO_EDGE 0x812F
 #endif
@@ -252,22 +247,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     /* Initialize with default chroma */
     vgl->fmt = *fmt;
-#if USE_OPENGL_ES
-    vgl->fmt.i_chroma = VLC_CODEC_RGB16;
-#   if defined(WORDS_BIGENDIAN)
-    vgl->fmt.i_rmask  = 0x001f;
-    vgl->fmt.i_gmask  = 0x07e0;
-    vgl->fmt.i_bmask  = 0xf800;
-#   else
-    vgl->fmt.i_rmask  = 0xf800;
-    vgl->fmt.i_gmask  = 0x07e0;
-    vgl->fmt.i_bmask  = 0x001f;
-#   endif
-    vgl->tex_target   = GL_TEXTURE_2D;
-    vgl->tex_format   = GL_RGB;
-    vgl->tex_internal = GL_RGB;
-    vgl->tex_type     = GL_UNSIGNED_SHORT_5_6_5;
-#else
     vgl->fmt.i_chroma = VLC_CODEC_RGB32;
 #   if defined(WORDS_BIGENDIAN)
     vgl->fmt.i_rmask  = 0xff000000;
@@ -282,7 +261,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->tex_format   = GL_RGBA;
     vgl->tex_internal = GL_RGBA;
     vgl->tex_type     = GL_UNSIGNED_BYTE;
-#endif
     /* Use YUV if possible and needed */
     bool need_fs_yuv = false;
     float yuv_range_correction = 1.0;
