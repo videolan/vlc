@@ -184,7 +184,7 @@ Security:
 Translation:
  * Traditional Chinese, Simplified Chinese, Walloon, Slovak, Polish, Khmer,
    Japanese, Italian, French, Czech, Belarusian, Breton, Greek, Spanish,
-   Estonian, Irish, Galician, Hungarian, Japanese, Dutch, Telugu, Ukranian,
+   Estonian, Irish, Galician, Hungarian, Japanese, Dutch, Telugu, Ukrainian,
    Thai translations update
  * New Scottish Gaelic translation
 
@@ -850,7 +850,7 @@ Win32:
  * Fix folders opening from the interface
 
 Translations:
- * Update translations for Lithuanian, Bengali, Slovak, French, Dutch, Ukranian
+ * Update translations for Lithuanian, Bengali, Slovak, French, Dutch, Ukrainian
    Polish, Simplified Chinese, German and Galician
 
 
@@ -1565,7 +1565,7 @@ Bunch of small bugfixes.
 Changes between 0.9.5 and 0.9.6:
 --------------------------------
 New Localizations:
- * Ukranian
+ * Ukrainian
 
 Security updates:
  * Fixed overflow in CUE support from VCD access (SA-0810, CVE-2008-5032)
