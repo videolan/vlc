@@ -240,7 +240,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
     }
 
-#ifndef USE_OPENGL_ES
+#if !USE_OPENGL_ES
     const unsigned char *ogl_version = glGetString(GL_VERSION);
     bool supports_shaders = strverscmp((const char *)ogl_version, "2.0") >= 0;
 #else
