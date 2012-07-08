@@ -174,6 +174,9 @@ struct vout_display_opengl_t {
     PFNGLACTIVETEXTUREPROC  ActiveTexture;
     PFNGLCLIENTACTIVETEXTUREPROC  ClientActiveTexture;
     bool use_multitexture;
+
+    /* Non-power-of-2 texture size support */
+    bool supports_npot;
 };
 
 static inline int GetAlignedSize(unsigned size)
@@ -240,6 +243,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
     }
 
+    const char *extensions = (const char *)glGetString(GL_EXTENSIONS);
 #if !USE_OPENGL_ES
     const unsigned char *ogl_version = glGetString(GL_VERSION);
     bool supports_shaders = strverscmp((const char *)ogl_version, "2.0") >= 0;
@@ -349,6 +353,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
     vgl->use_multitexture = vgl->chroma->plane_count > 1;
+    vgl->supports_npot = HasExtension( extensions, "GL_ARB_texture_non_power_of_two" ) ||
+                         HasExtension( extensions, "GL_APPLE_texture_2D_limited_npot" );
 
     if( !vgl->CreateShader || !vgl->ShaderSource || !vgl->CreateProgram )
     {
@@ -362,8 +368,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
         int w = vgl->fmt.i_width  * vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den;
         int h = vgl->fmt.i_height * vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den;
-        vgl->tex_width[j]  = w;
-        vgl->tex_height[j] = h;
+        if( vgl->supports_npot )
+        {
+            vgl->tex_width[j]  = w;
+            vgl->tex_height[j] = h;
+        } else {
+            vgl->tex_width[j]  = GetAlignedSize(w);
+            vgl->tex_height[j] = GetAlignedSize(h);
+        }
     }
 
     /* Build fragment program if needed */
@@ -705,6 +717,11 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
             glr->type   = GL_UNSIGNED_BYTE;
             glr->width  = r->fmt.i_visible_width;
             glr->height = r->fmt.i_visible_height;
+            if(!vgl->supports_npot )
+            {
+                glr->width  = GetAlignedSize( glr->width );
+                glr->height = GetAlignedSize( glr->height );
+            }
             glr->alpha  = (float)subpicture->i_alpha * r->i_alpha / 255 / 255;
             glr->left   =  2.0 * (r->i_x                          ) / subpicture->i_original_picture_width  - 1.0;
             glr->top    = -2.0 * (r->i_y                          ) / subpicture->i_original_picture_height + 1.0;
