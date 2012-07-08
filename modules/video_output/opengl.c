@@ -70,6 +70,7 @@
 #   define PFNGLCLIENTACTIVETEXTUREPROC      typeof(glClientActiveTexture)*
 #if USE_OPENGL_ES
 #   define GL_UNPACK_ROW_LENGTH 0
+#   import <CoreFoundation/CoreFoundation.h>
 #endif
 #endif
 
@@ -239,9 +240,17 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
     }
 
-
+#ifndef USE_OPENGL_ES
     const unsigned char *ogl_version = glGetString(GL_VERSION);
     bool supports_shaders = strverscmp((const char *)ogl_version, "2.0") >= 0;
+#else
+    bool supports_shaders = false;
+#ifdef __APPLE__
+    if( kCFCoreFoundationVersionNumber >= 786. )
+         supports_shaders = true;
+#endif
+#endif
+
     GLint max_texture_units = 0;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
 
@@ -498,7 +507,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
                     if( link_status == GL_FALSE )
                     {
-                        fprintf( stderr, "Unable to use program %d", i );
+                        fprintf( stderr, "Unable to use program %d\n", i );
                         free( vgl );
                         return NULL;
                     }
