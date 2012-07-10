@@ -1586,7 +1586,14 @@ AS_IF([test "${enable_live555}" != "no" -a -n "${CXX}"], [
   AC_LANG_PUSH(C++)
   VLC_SAVE_FLAGS
   AS_IF([test -z "${CONTRIB_DIR}"], [
-    CPPFLAGS_live555="-I/usr/include/liveMedia -I/usr/include/groupsock -I/usr/include/BasicUsageEnvironment -I/usr/include/UsageEnvironment"
+    AS_IF([test ${SYS} != "os2"], [
+      LIVE555_PREFIX=${LIVE555_PREFIX-"/usr"}
+      CPPFLAGS_live555="-I${LIVE555_PREFIX}/include/liveMedia -I${LIVE555_PREFIX}/include/groupsock -I${LIVE555_PREFIX}/include/BasicUsageEnvironment -I${LIVE555_PREFIX}/include/UsageEnvironment"
+    ], [
+      LIVE555_PREFIX=${LIVE555_PREFIX-"/usr/lib/live"}
+      CPPFLAGS_live555="-I${LIVE555_PREFIX}/liveMedia/include -I${LIVE555_PREFIX}/groupsock/include -I${LIVE555_PREFIX}/BasicUsageEnvironment/include -I${LIVE555_PREFIX}/UsageEnvironment/include"
+      LDFLAGS_live555="-L${LIVE555_PREFIX}/liveMedia -L${LIVE555_PREFIX}/groupsock -L${LIVE555_PREFIX}/BasicUsageEnvironment -L${LIVE555_PREFIX}/UsageEnvironment"
+    ])
   ], [
     CPPFLAGS_live555="-I${CONTRIB_DIR}/include/liveMedia -I${CONTRIB_DIR}/include/groupsock -I${CONTRIB_DIR}/include/BasicUsageEnvironment -I${CONTRIB_DIR}/include/UsageEnvironment"
   ])
@@ -1594,6 +1601,7 @@ AS_IF([test "${enable_live555}" != "no" -a -n "${CXX}"], [
     CPPFLAGS_live555="${CPPFLAGS_live555} -DSOLARIS"
   ])
   CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_live555}"
+  LDFLAGS="${LDFLAGS} ${LDFLAGS_live555}"
 
   AC_CACHE_CHECK([for live555 version 1324598400 or later], [ac_cv_live555], [
     AC_PREPROC_IFELSE([AC_LANG_PROGRAM([
@@ -1628,6 +1636,7 @@ You can get an updated one from http://www.live555.com/liveMedia .])
     dnl We need to check for pic because live555 don't provide shared libs
     dnl and we want to build a plugins so we need -fPIC on some arch.
     VLC_ADD_CXXFLAGS([live555], [${CPPFLAGS_live555}])
+    VLC_ADD_LDFLAGS([live555], [${LDFLAGS_live555}])
     AC_CHECK_LIB(liveMedia_pic, main, [
       VLC_ADD_PLUGIN([live555])
       VLC_ADD_LIBS([live555], [-lliveMedia_pic ${other_libs_pic}])
