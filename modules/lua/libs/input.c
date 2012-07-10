@@ -321,8 +321,8 @@ static int vlclua_input_item_set_meta( lua_State *L )
 #define META_TYPE( n, s ) { s, vlc_meta_ ## n },
     static const struct
     {
-        const char *psz_name;
-        vlc_meta_type_t type;
+        const char psz_name[15];
+        unsigned char type;
     } pp_meta_types[] = {
         META_TYPE( Title, "title" )
         META_TYPE( Artist, "artist" )
