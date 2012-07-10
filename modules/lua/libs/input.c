@@ -344,6 +344,9 @@ static int vlclua_input_item_set_meta( lua_State *L )
     };
 #undef META_TYPE
 
+    static_assert( sizeof(pp_meta_types)
+                      == VLC_META_TYPE_COUNT * sizeof(pp_meta_types[0]),
+                   "Inconsistent meta data types" );
     vlc_meta_type_t type = vlc_meta_Title;
     for( unsigned i = 0; i < VLC_META_TYPE_COUNT; i++ )
     {
