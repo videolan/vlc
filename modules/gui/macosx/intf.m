@@ -170,8 +170,8 @@ static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
     else if( i_query == VOUT_WINDOW_SET_FULLSCREEN )
     {
         NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-        // we already have our playlist "fullscreen" callback, do not repeat the same call here
-        //[[VLCMain sharedInstance] performSelectorOnMainThread:@selector(fullscreenChanged) withObject: nil waitUntilDone: NO];
+        int i_full = va_arg( args, int );
+        [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(checkFullscreenChange:) withObject:[NSNumber numberWithInt: i_full] waitUntilDone:NO];
         [o_pool release];
     }
     else
@@ -1471,6 +1471,15 @@ unsigned int CocoaKeyToVLC( unichar i_key )
             // leaving fullscreen is always allowed
             [o_mainwindow performSelectorOnMainThread:@selector(leaveFullscreen) withObject:nil waitUntilDone:NO];
         }
+    }
+}
+
+- (void)checkFullscreenChange:(NSNumber *)o_full
+{
+    BOOL b_full = [o_full boolValue];    
+    if( p_intf && !var_GetBool( pl_Get( p_intf ), "fullscreen" ) != !b_full )
+    {
+        var_SetBool( pl_Get(p_intf), "fullscreen", b_full );        
     }
 }
 

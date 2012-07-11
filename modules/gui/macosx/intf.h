@@ -180,6 +180,7 @@ struct intf_sys_t
 - (unsigned int)VLCModifiersToCocoa:(NSString *)theString;
 - (void)updateCurrentlyUsedHotkeys;
 - (void)fullscreenChanged;
+- (void)checkFullscreenChange:(NSNumber *)o_full;
 - (void)PlaylistItemChanged;
 - (void)playbackStatusUpdated;
 - (void)sendDistributedNotificationWithUpdatedPlaybackStatus;
