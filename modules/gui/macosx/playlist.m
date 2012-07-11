@@ -1656,7 +1656,7 @@
     /* Drag & Drop inside the playlist */
     if( [[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"] )
     {
-        int i_row, i_removed_from_node = 0;
+        int i_row = 0;
         playlist_item_t *p_new_parent, *p_item = NULL;
         NSArray *o_all_items = [o_nodes_array arrayByAddingObjectsFromArray: o_items_array];
         /* If the item is to be dropped as root item of the outline, make it a
@@ -1680,52 +1680,32 @@
         }
 
         NSUInteger count = [o_all_items count];
+        if( count == 0 )
+            return NO;
+
+        playlist_item_t **pp_items = (playlist_item_t **)calloc( count, sizeof( playlist_item_t* ) );
+        if ( !pp_items )
+            return NO;
+
+        PL_LOCK;
+        NSUInteger j = 0;
         for( NSUInteger i = 0; i < count; i++ )
         {
-            playlist_item_t *p_old_parent = NULL;
-            int i_old_index = 0;
-
             p_item = [[o_all_items objectAtIndex:i] pointerValue];
-            p_old_parent = p_item->p_parent;
-            if( !p_old_parent )
-            continue;
-            /* We may need the old index later */
-            if( p_new_parent == p_old_parent )
-            {
-                for( NSInteger j = 0; j < p_old_parent->i_children; j++ )
-                {
-                    if( p_old_parent->pp_children[j] == p_item )
-                    {
-                        i_old_index = j;
-                        break;
-                    }
-                }
-            }
-
-            PL_LOCK;
-            // Actually detach the item from the old position
-            if( playlist_NodeRemoveItem( p_playlist, p_item, p_old_parent ) ==
-                VLC_SUCCESS )
-            {
-                int i_new_index;
-                /* Calculate the new index */
-                if( index == -1 )
-                i_new_index = -1;
-                /* If we move the item in the same node, we need to take into
-                   account that one item will be deleted */
-                else
-                {
-                    if ((p_new_parent == p_old_parent && i_old_index < index + (int)i) )
-                    {
-                        i_removed_from_node++;
-                    }
-                    i_new_index = index + i - i_removed_from_node;
-                }
-                // Reattach the item to the new position
-                playlist_NodeInsert( p_playlist, p_item, p_new_parent, i_new_index );
-            }
-            PL_UNLOCK;
+            if( p_item )
+                pp_items[j++] = p_item;
         }
+
+        if( j == 0 || playlist_TreeMoveMany( p_playlist, j, pp_items, p_new_parent, index ) != VLC_SUCCESS )
+        {
+            PL_UNLOCK;
+            free( pp_items );
+            return NO;
+        }
+
+        PL_UNLOCK;
+        free( pp_items );
+
         [self playlistUpdated];
         i_row = [o_outline_view rowForItem:[o_outline_dict objectForKey:[NSString stringWithFormat: @"%p", [[o_all_items objectAtIndex: 0] pointerValue]]]];
 
