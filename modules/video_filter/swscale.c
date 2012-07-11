@@ -307,7 +307,7 @@ static int GetParameters( ScalerConfiguration *p_cfg,
     FixParameters( &i_fmti, &b_has_ai, &b_swap_uvi, p_fmti->i_chroma );
     FixParameters( &i_fmto, &b_has_ao, &b_swap_uvo, p_fmto->i_chroma );
 
-#if !defined (__ANDROID__) || !TARGET_OS_IPHONE
+#if !defined (__ANDROID__) && !TARGET_OS_IPHONE
     /* FIXME TODO removed when ffmpeg is fixed
      * Without SWS_ACCURATE_RND the quality is really bad for some conversions */
     switch( i_fmto )
