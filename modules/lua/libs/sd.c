@@ -91,6 +91,7 @@ vlclua_item_meta(publisher, Publisher)
 vlclua_item_meta(encodedby, EncodedBy)
 vlclua_item_meta(arturl, ArtworkURL)
 vlclua_item_meta(trackid, TrackID)
+vlclua_item_meta(tracktotal, TrackTotal)
 
 static const luaL_Reg vlclua_item_reg[] = {
     vlclua_item_luareg(title)
@@ -110,6 +111,7 @@ static const luaL_Reg vlclua_item_reg[] = {
     vlclua_item_luareg(encodedby)
     vlclua_item_luareg(arturl)
     vlclua_item_luareg(trackid)
+    vlclua_item_luareg(tracktotal)
     { NULL, NULL }
 };
 
