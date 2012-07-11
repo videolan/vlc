@@ -266,8 +266,8 @@ Miscellaneous:
 Security:
  * Update libpng to 1.5.9 (CVE-2011-3026)
  * Update freetype to 2.4.9 (CVE-2012-1126 up to CVE-2012-1144)
- * Fix MMS stack overflow (SA-1201)
- * Fix RealRTSP heap overflow (SA-1202)
+ * Fix MMS stack overflow (SA-1201 - CVE-2012-1775)
+ * Fix RealRTSP heap overflow (SA-1202 - CVE-2012-1776)
 
 Translations:
  * Update of Czech, Spanish, Swedish, Turkish and Walloon translations
