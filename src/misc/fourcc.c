@@ -917,7 +917,7 @@ static const entry_t p_list_video[] = {
         A("ULY0"),
         A("ULY2"),
 
-    B(VLC_CODEC_VBLE, "VBLE Lossless Codec"),
+    B(VLC_CODEC_VBLE, "VBLE Lossless"),
         A("VBLE"),
 
     B(VLC_CODEC_DXTORY, "Dxtory capture format"),
@@ -932,6 +932,9 @@ static const entry_t p_list_video[] = {
         A("mss2"),
 
     B(VLC_CODEC_MSA1, "Microsoft Application Screen Decoder 1"),
+        A("MSA1"),
+
+    B(VLC_CODEC_TSC2, "TechSmith Screen Codec 2"),
         A("MSA1"),
 
     B(0, "")

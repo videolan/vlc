@@ -129,6 +129,7 @@
 #define VLC_CODEC_MSS1      VLC_FOURCC('M','S','S','1')
 #define VLC_CODEC_MSS2      VLC_FOURCC('M','S','S','2')
 #define VLC_CODEC_MSA1      VLC_FOURCC('M','S','A','1')
+#define VLC_CODEC_TSC2      VLC_FOURCC('T','S','C','2')
 
 /* Planar YUV 4:1:0 Y:V:U */
 #define VLC_CODEC_YV9       VLC_FOURCC('Y','V','U','9')
