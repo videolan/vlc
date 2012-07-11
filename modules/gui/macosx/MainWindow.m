@@ -1924,11 +1924,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_fspanel fadeIn];
 }
 
-- (void)updateFullscreen
-{
-    [[VLCMain sharedInstance] fullscreenChanged];
-}
-
 - (BOOL)isFullscreen
 {
     return b_fullscreen;
@@ -2856,11 +2851,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (IBAction)fullscreen:(id)sender
 {
     [[VLCCoreInteraction sharedInstance] toggleFullscreen];
-}
-
-- (void)updateFullscreen
-{
-    [[VLCMain sharedInstance] fullscreenChanged];
 }
 
 - (BOOL)isFullscreen
