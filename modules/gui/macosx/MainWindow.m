@@ -2398,6 +2398,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)windowDidEnterFullScreen:(NSNotification *)notification
 {
+    // Indeed, we somehow can have an "inactive" fullscreen (but a visible window!).
+    // But this creates some problems when leaving fs over remote intfs, so activate app here.
+    [NSApp activateIgnoringOtherApps:YES];
+
     [o_fspanel setVoutWasUpdated: (int)[[self screen] displayID]];
     [o_fspanel setActive: nil];
 }
