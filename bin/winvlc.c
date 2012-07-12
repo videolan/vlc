@@ -121,6 +121,13 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     int argc;
 
 #ifndef UNDER_CE
+    /* VLC does not change the thread locale, so gettext/libintil will use the
+     * user default locale as reference. */
+    /* gettext versions 0.18-0.18.1 will use the Windows Vista locale name
+     * if the GETTEXT_MUI environment variable is set. If not set or if running
+     * on Windows 2000/XP/2003 an hard-coded language ID list is used. This
+     * putenv() call may become redundant with later versions of gettext. */
+    putenv("GETTEXT_MUI=1");
 #ifdef TOP_BUILDDIR
     putenv("VLC_PLUGIN_PATH=Z:"TOP_BUILDDIR"/modules");
     putenv("VLC_DATA_PATH=Z:"TOP_SRCDIR"/share");
