@@ -8023,7 +8023,7 @@ msgstr "La session a échoué"
 
 #: modules/access/rtsp/access.c:229
 msgid "The requested RTSP session could not be established."
-msgstr "La sesion TRSP demandée n'a pu être établie."
+msgstr "La session RTSP demandée n'a pu être établie."
 
 #: modules/access/screen/screen.c:43
 #: modules/gui/qt4/components/open_panels.cpp:1034
