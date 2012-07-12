@@ -49,9 +49,6 @@
 
 #include "config/vlc_getopt.h"
 
-#ifdef HAVE_LOCALE_H
-#   include <locale.h>
-#endif
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h> /* isatty() */
 #endif
@@ -95,10 +92,6 @@ static bool b_daemon = false;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-#if defined( ENABLE_NLS ) && (defined (__APPLE__) || defined (WIN32)) && \
-    ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
-static void SetLanguage   ( char const * );
-#endif
 static void GetFilenames  ( libvlc_int_t *, unsigned, const char *const [] );
 
 /**
@@ -223,13 +216,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      */
 #if defined( ENABLE_NLS ) \
      && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
-# if defined (WIN32) || defined (__APPLE__)
-    /* Check if the user specified a custom language */
-    char *lang = var_InheritString (p_libvlc, "language");
-    if (lang != NULL && strcmp (lang, "auto"))
-        SetLanguage (lang);
-    free (lang);
-# endif
     vlc_bindtextdomain (PACKAGE_NAME);
 #endif
     /*xgettext: Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
@@ -804,28 +790,6 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
                  psz_module ? psz_module : "default" );
     return ret;
 }
-
-#if defined( ENABLE_NLS ) && (defined (__APPLE__) || defined (WIN32)) && \
-    ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
-/*****************************************************************************
- * SetLanguage: set the interface language.
- *****************************************************************************
- * We set the LC_MESSAGES locale category for interface messages and buttons,
- * as well as the LC_CTYPE category for string sorting and possible wide
- * character support.
- *****************************************************************************/
-static void SetLanguage ( const char *psz_lang )
-{
-#ifdef __APPLE__
-    /* I need that under Darwin, please check it doesn't disturb
-     * other platforms. --Meuuh */
-    setenv( "LANG", psz_lang, 1 );
-
-#endif
-
-    setlocale( LC_ALL, psz_lang );
-}
-#endif
 
 /*****************************************************************************
  * GetFilenames: parse command line options which are not flags
