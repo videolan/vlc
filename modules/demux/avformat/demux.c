@@ -591,8 +591,13 @@ static int Demux( demux_t *p_demux )
     int64_t     i_start_time;
 
     /* Read a frame */
-    if( av_read_frame( p_sys->ic, &pkt ) )
+    int i_av_ret = av_read_frame( p_sys->ic, &pkt );
+    if( i_av_ret )
     {
+        /* Avoid EOF if av_read_frame returns AVERROR(EAGAIN) */
+        if( i_av_ret == AVERROR(EAGAIN) )
+            return 1;
+
         return 0;
     }
     if( pkt.stream_index < 0 || pkt.stream_index >= p_sys->i_tk )
