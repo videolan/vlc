@@ -1328,7 +1328,7 @@ msgstr ""
 #. xgettext: Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
 #: src/libvlc.c:291
 msgid "C"
-msgstr ""
+msgstr "lg"
 
 #: src/libvlc.c:861
 msgid ""
