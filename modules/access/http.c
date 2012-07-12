@@ -1257,14 +1257,12 @@ static int Request( access_t *p_access, uint64_t i_tell )
         net_Printf( p_access, p_sys->fd, pvs, "Host: %s\r\n",
                     p_sys->url.psz_host );
     /* User Agent */
-    net_Printf( p_access, p_sys->fd, pvs,
-                "User-Agent: %s\r\n",
+    net_Printf( p_access, p_sys->fd, pvs, "User-Agent: %s\r\n",
                 p_sys->psz_user_agent );
     /* Referrer */
     if (p_sys->psz_referrer)
     {
-        net_Printf( p_access, p_sys->fd, pvs,
-                    "Referer: %s\r\n",
+        net_Printf( p_access, p_sys->fd, pvs, "Referer: %s\r\n",
                     p_sys->psz_referrer);
     }
     /* Offset */
