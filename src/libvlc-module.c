@@ -44,134 +44,6 @@
 #include "vlc_keys.h"
 #include "vlc_meta.h"
 
-#if defined (WIN32) || defined (__APPLE__)
-static const char *const ppsz_language[] =
-{
-    "auto",
-    "en",
-    "ar",
-    "bn",
-    "pt_BR",
-    "en_GB",
-    "el",
-    "bg",
-    "ca",
-    "zh_TW",
-    "cs",
-    "da",
-    "nl",
-    "fi",
-    "et",
-    "eu",
-    "fr",
-    "ga",
-    "gd",
-    "gl",
-    "ka",
-    "de",
-    "he",
-    "hr",
-    "hu",
-    "hy",
-    "is",
-    "id",
-    "it",
-    "ja",
-    "ko",
-    "lt",
-    "mn",
-    "ms",
-    "nb",
-    "nn",
-    "kk",
-    "km",
-    "ne",
-    "oc",
-    "fa",
-    "pl",
-    "pt_PT",
-    "pa",
-    "ro",
-    "ru",
-    "zh_CN",
-    "si",
-    "sr",
-    "sk",
-    "sl",
-    "ckb",
-    "es",
-    "sv",
-    "te",
-    "tr",
-    "uk",
-    "vi",
-    "wa",
-};
-
-static const char *const ppsz_language_text[] =
-{
-    N_("Auto"),
-    "American English",
-    "ﻉﺮﺒﻳ",
-    "বাংলা",
-    "Português Brasileiro",
-    "British English",
-    "Νέα Ελληνικά",
-    "български език",
-    "Català",
-    "正體中文",
-    "Čeština",
-    "Dansk",
-    "Nederlands",
-    "Suomi",
-    "eesti keel",
-    "Euskara",
-    "Français",
-    "Gaeilge",
-    "Gàidhlig",
-    "Galego",
-    "ქართული",
-    "Deutsch",
-    "עברית",
-    "hrvatski",
-    "Magyar",
-    "հայերեն",
-    "íslenska",
-    "Bahasa Indonesia",
-    "Italiano",
-    "日本語",
-    "한국어",
-    "lietuvių",
-    "Монгол хэл",
-    "Melayu",
-    "Bokmål",
-    "Nynorsk",
-    "Қазақ тілі",
-    "ភាសាខ្មែរ",
-    "नेपाली",
-    "Occitan",
-    "ﻑﺍﺮﺳی",
-    "Polski",
-    "Português",
-    "ਪੰਜਾਬੀ",
-    "Română",
-    "Русский",
-    "简体中文",
-    "සිංහල",
-    "српски",
-    "Slovensky",
-    "slovenščina",
-    "کوردیی سۆرانی",
-    "Español",
-    "Svenska",
-    "తెలుగు",
-    "Türkçe",
-    "украї́нська мо́ва",
-    "tiếng Việt",
-    "Walon",
-};
-#endif
-
 static const char *const ppsz_snap_formats[] =
 { "png", "jpg", "tiff" };
 
@@ -231,11 +103,6 @@ static const char *const ppsz_snap_formats[] =
 #define OPEN_TEXT N_("Default stream")
 #define OPEN_LONGTEXT N_( \
     "This stream will always be opened at VLC startup." )
-
-#define LANGUAGE_TEXT N_("Language")
-#define LANGUAGE_LONGTEXT N_( "You can manually select a language for the " \
-    "interface. The system language is auto-detected if \"auto\" is " \
-    "specified here." )
 
 #define COLOR_TEXT N_("Color messages")
 #define COLOR_LONGTEXT N_( \
@@ -2229,9 +2096,7 @@ vlc_module_begin ()
 #endif
 
 #if defined (WIN32) || defined (__APPLE__)
-    add_string( "language", "auto", LANGUAGE_TEXT, LANGUAGE_LONGTEXT,
-                false )
-        change_string_list( ppsz_language, ppsz_language_text, 0 )
+    add_obsolete_string( "language" ) /* since 2.1.0 */
 #endif
 
     add_bool( "color", true, COLOR_TEXT, COLOR_LONGTEXT, true )
