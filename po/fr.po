@@ -2750,7 +2750,7 @@ msgstr "Vitesse de lecture"
 
 #: src/libvlc-module.c:771
 msgid "This defines the playback speed (nominal speed is 1.0)."
-msgstr "Ceci définit la vitesse de lexture (la vitesse nominale est 1.0)."
+msgstr "Ceci définit la vitesse de lecture (la vitesse nominale est 1.0)."
 
 #: src/libvlc-module.c:773
 msgid "Input list"
