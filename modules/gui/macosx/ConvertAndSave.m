@@ -26,11 +26,31 @@
 #import <vlc_common.h>
 #import <vlc_url.h>
 
+/* mini doc:
+ * the used NSMatrix includes a bunch of cells referenced most easily by tags. There you go: */
+#define MPEGTS 0
+#define WEBM 1
+#define OGG 2
+#define MP4 3
+#define MPEGPS 4
+#define MJPEG 5
+#define WAV 6
+#define FLV 7
+#define MPEG1 8
+#define MKV 9
+#define RAW 10
+#define AVI 11
+#define ASF 12
+/* 13-15 are present, but not set */
+
 @implementation VLCConvertAndSave
 
 @synthesize MRL=_MRL, outputDestination=_outputDestination, profileNames=_profileNames, profileValueList=_profileValueList, currentProfile=_currentProfile;
 
 static VLCConvertAndSave *_o_sharedInstance = nil;
+
+#pragma mark -
+#pragma mark Initialization
 
 + (VLCConvertAndSave *)sharedInstance
 {
@@ -54,12 +74,14 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         [_MRL release];
     if (_outputDestination)
         [_outputDestination release];
-    if (_profileNames)
-        [_profileNames release];
-    if (_profileValueList)
-        [_profileValueList release];
     if (_currentProfile)
         [_currentProfile release];
+
+    [_profileNames release];
+    [_profileValueList release];
+    [_videoCodecs release];
+    [_audioCodecs release];
+    [_subsCodecs release];
 
     [super dealloc];
 }
@@ -124,7 +146,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
                      @"Audio - MP3 (MP4)",
                      @"Audio - FLAC",
                      @"Audio - CD",
-                     _NS("Custom"),
+//                     _NS("Custom"),
                      nil];
 
     /* We are using the same format as the Qt4 intf here:
@@ -151,12 +173,56 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
     [_profile_pop removeAllItems];
     [_profile_pop addItemsWithTitles: _profileNames];
+
+    _videoCodecs = [[NSArray alloc] initWithObjects:
+                    [NSArray arrayWithObjects:@"MPEG-1", @"MPEG-2", @"MPEG-4", @"DIVX 1", @"DIVX 2", @"DIVX 3", @"H.263", @"H.264", @"VP8", @"WMV1", @"WMV2", @"M-JPEG", @"Theora", @"Dirac", nil],
+                    [NSArray arrayWithObjects:@"mpgv", @"mp2v", @"mp4v", @"DIV1", @"DIV2", @"DIV3", @"H263", @"h264", @"VP80", @"WMV1", @"WMV2", @"MJPG", @"theo", @"drac", nil],
+                    nil];
+    _audioCodecs = [[NSArray alloc] initWithObjects:
+                    [NSArray arrayWithObjects:@"MPEG Audio", @"MP3", @"MPEG 4 Audio (AAC)", @"A52/AC-3", @"Vorbis", @"Flac", @"Speex", @"WAV", @"WMA2", nil],
+                    [NSArray arrayWithObjects:@"mpga", @"mp3", @"mp4a", @"a52", @"vorb", @"flac", @"spx", @"s16l", @"wma2", nil],
+                    nil];
+    _subsCodecs = [[NSArray alloc] initWithObjects:
+                   [NSArray arrayWithObjects:@"DVB subtitle", @"T.140", nil],
+                   [NSArray arrayWithObjects:@"dvbs", @"t140", nil],
+                   nil];
+
+    [_customize_vid_codec_pop removeAllItems];
+    [_customize_vid_scale_pop removeAllItems];
+    [_customize_aud_codec_pop removeAllItems];
+    [_customize_aud_samplerate_pop removeAllItems];
+    [_customize_subs_pop removeAllItems];
+
+    [_customize_vid_codec_pop addItemsWithTitles:[_videoCodecs objectAtIndex:0]];
+    [_customize_aud_codec_pop addItemsWithTitles:[_audioCodecs objectAtIndex:0]];
+    [_customize_subs_pop addItemsWithTitles:[_subsCodecs objectAtIndex:0]];
+
+    [_customize_aud_samplerate_pop addItemWithTitle:@"8000"];
+    [_customize_aud_samplerate_pop addItemWithTitle:@"11025"];
+    [_customize_aud_samplerate_pop addItemWithTitle:@"22050"];
+    [_customize_aud_samplerate_pop addItemWithTitle:@"44100"];
+    [_customize_aud_samplerate_pop addItemWithTitle:@"48000"];
+
+    [_customize_vid_scale_pop addItemWithTitle:@"1"];
+    [_customize_vid_scale_pop addItemWithTitle:@"0.25"];
+    [_customize_vid_scale_pop addItemWithTitle:@"0.5"];
+    [_customize_vid_scale_pop addItemWithTitle:@"0.75"];
+    [_customize_vid_scale_pop addItemWithTitle:@"1.25"];
+    [_customize_vid_scale_pop addItemWithTitle:@"1.5"];
+    [_customize_vid_scale_pop addItemWithTitle:@"1.75"];
+    [_customize_vid_scale_pop addItemWithTitle:@"2"];
 }
+
+# pragma mark -
+# pragma mark Code to Communicate with other objects
 
 - (void)toggleWindow
 {
     [_window makeKeyAndOrderFront: nil];
 }
+
+# pragma mark -
+# pragma mark User Interaction
 
 - (IBAction)windowButtonAction:(id)sender
 {
@@ -179,6 +245,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (IBAction)customizeProfile:(id)sender
 {
+    [self resetCustomizationSheetBasedOnProfile:[_profile_pop indexOfSelectedItem]];
     [NSApp beginSheet:_customize_panel modalForWindow:_window modalDelegate:self didEndSelector:NULL contextInfo:nil];
 }
 
@@ -211,6 +278,29 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     }
 }
 
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+{
+    NSPasteboard *paste = [sender draggingPasteboard];
+    NSArray *types = [NSArray arrayWithObject: NSFilenamesPboardType];
+    NSString *desired_type = [paste availableTypeFromArray: types];
+    NSData *carried_data = [paste dataForType: desired_type];
+
+    if( carried_data ) {
+        if( [desired_type isEqualToString:NSFilenamesPboardType] ) {
+            NSArray *values = [[paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+
+            if ([values count] > 0) {
+                [self setMRL: [NSString stringWithUTF8String:make_URI([[values objectAtIndex:0] UTF8String], NULL)]];
+                [self updateDropView];
+                return YES;
+            }
+        }
+    }
+    return NO;
+}
+
+# pragma mark -
+# pragma mark Private Functionality
 - (void)updateDropView
 {
     if ([_MRL length] > 0) {
@@ -235,25 +325,114 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     }
 }
 
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+- (void)resetCustomizationSheetBasedOnProfile:(NSInteger)profileNumber
 {
-    NSPasteboard *paste = [sender draggingPasteboard];
-    NSArray *types = [NSArray arrayWithObject: NSFilenamesPboardType];
-    NSString *desired_type = [paste availableTypeFromArray: types];
-    NSData *carried_data = [paste dataForType: desired_type];
+    /* Container(string), transcode video(bool), transcode audio(bool),
+    * use subtitles(bool), video codec(string), video bitrate(integer),
+    * scale(float), fps(float), width(integer, height(integer),
+                                      * audio codec(string), audio bitrate(integer), channels(integer),
+                                      * samplerate(integer), subtitle codec(string), subtitle overlay(bool) */
 
-    if( carried_data ) {
-        if( [desired_type isEqualToString:NSFilenamesPboardType] ) {
-            NSArray *values = [[paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+    NSArray * components = [[_profileValueList objectAtIndex:profileNumber] componentsSeparatedByString:@";"];
+    if ([components count] != 16) {
+        msg_Err(VLCIntf, "CAS: the requested profile %li is invalid", profileNumber);
+        return;
+    }
 
-            if ([values count] > 0) {
-                [self setMRL: [NSString stringWithUTF8String:make_URI([[values objectAtIndex:0] UTF8String], NULL)]];
-                [self updateDropView];
-                return YES;
+    [self selectCellByEncapsulationFormat:[components objectAtIndex:0]];
+    [_customize_vid_ckb setState:[[components objectAtIndex:1] intValue]];
+    [_customize_aud_ckb setState:[[components objectAtIndex:2] intValue]];
+    [_customize_subs_ckb setState:[[components objectAtIndex:3] intValue]];
+    [_customize_vid_bitrate_fld setStringValue:[components objectAtIndex:5]];
+    [_customize_vid_scale_pop selectItemWithTitle:[components objectAtIndex:6]];
+    [_customize_vid_framerate_fld setStringValue:[components objectAtIndex:7]];
+    [_customize_vid_width_fld setStringValue:[components objectAtIndex:8]];
+    [_customize_vid_height_fld setStringValue:[components objectAtIndex:9]];
+    [_customize_aud_bitrate_fld setStringValue:[components objectAtIndex:11]];
+    [_customize_aud_channels_fld setStringValue:[components objectAtIndex:12]];
+    [_customize_aud_samplerate_pop selectItemWithTitle:[components objectAtIndex:13]];
+    [_customize_subs_overlay_ckb setState:[[components objectAtIndex:15] intValue]];
+
+    /* since there is no proper lookup mechanism in arrays, we need to implement a string specific one ourselves */
+    NSArray * tempArray = [_videoCodecs objectAtIndex:1];
+    NSUInteger count = [tempArray count];
+    NSString * searchString = [components objectAtIndex:4];
+    if ([searchString isEqualToString:@"none"] || [searchString isEqualToString:@"0"]) {
+        [_customize_vid_codec_pop selectItemAtIndex:-1];
+    } else {
+        for (NSUInteger x = 0; x < count; x++) {
+            if ([[tempArray objectAtIndex:x] isEqualToString: searchString]) {
+                [_customize_vid_codec_pop selectItemAtIndex:x];
+                break;
             }
         }
     }
-    return NO;
+
+    tempArray = [_audioCodecs objectAtIndex:1];
+    count = [tempArray count];
+    searchString = [components objectAtIndex:10];
+    if ([searchString isEqualToString:@"none"] || [searchString isEqualToString:@"0"]) {
+        [_customize_aud_codec_pop selectItemAtIndex:-1];
+    } else {
+        for (NSUInteger x = 0; x < count; x++) {
+            if ([[tempArray objectAtIndex:x] isEqualToString: searchString]) {
+                [_customize_aud_codec_pop selectItemAtIndex:x];
+                break;
+            }
+        }
+    }
+
+    tempArray = [_subsCodecs objectAtIndex:1];
+    count = [tempArray count];
+    searchString = [components objectAtIndex:14];
+    if ([searchString isEqualToString:@"none"] || [searchString isEqualToString:@"0"]) {
+        [_customize_subs_pop selectItemAtIndex:-1];
+    } else {
+        for (NSUInteger x = 0; x < count; x++) {
+            if ([[tempArray objectAtIndex:x] isEqualToString: searchString]) {
+                [_customize_subs_pop selectItemAtIndex:x];
+                break;
+            }
+        }
+    }
+}
+
+- (void)selectCellByEncapsulationFormat:(NSString *)format
+{
+    if ([format isEqualToString:@"ts"])
+        [_customize_encap_matrix selectCellWithTag:MPEGTS];
+    else if([format isEqualToString:@"webm"])
+        [_customize_encap_matrix selectCellWithTag:WEBM];
+    else if([format isEqualToString:@"ogg"])
+        [_customize_encap_matrix selectCellWithTag:OGG];
+    else if([format isEqualToString:@"ogm"])
+        [_customize_encap_matrix selectCellWithTag:OGG];
+    else if([format isEqualToString:@"mp4"])
+        [_customize_encap_matrix selectCellWithTag:MP4];
+    else if([format isEqualToString:@"mov"])
+        [_customize_encap_matrix selectCellWithTag:MP4];
+    else if([format isEqualToString:@"ps"])
+        [_customize_encap_matrix selectCellWithTag:MPEGPS];
+    else if([format isEqualToString:@"mjpeg"])
+        [_customize_encap_matrix selectCellWithTag:MJPEG];
+    else if([format isEqualToString:@"wav"])
+        [_customize_encap_matrix selectCellWithTag:WAV];
+    else if([format isEqualToString:@"flv"])
+        [_customize_encap_matrix selectCellWithTag:FLV];
+    else if([format isEqualToString:@"mpg"])
+        [_customize_encap_matrix selectCellWithTag:MPEG1];
+    else if([format isEqualToString:@"mkv"])
+        [_customize_encap_matrix selectCellWithTag:MKV];
+    else if([format isEqualToString:@"raw"])
+        [_customize_encap_matrix selectCellWithTag:RAW];
+    else if([format isEqualToString:@"avi"])
+        [_customize_encap_matrix selectCellWithTag:AVI];
+    else if([format isEqualToString:@"asf"])
+        [_customize_encap_matrix selectCellWithTag:ASF];
+    else if([format isEqualToString:@"wmv"])
+        [_customize_encap_matrix selectCellWithTag:ASF];
+    else
+        msg_Err(VLCIntf, "CAS: unknown encap format requested for customization");
 }
 
 @end

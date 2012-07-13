@@ -68,7 +68,7 @@
     IBOutlet id _customize_vid_height_lbl;
     IBOutlet id _customize_vid_height_fld;
     IBOutlet id _customize_vid_scale_lbl;
-    IBOutlet id _customize_vid_scale_fld;
+    IBOutlet id _customize_vid_scale_pop;
     IBOutlet id _customize_aud_ckb;
     IBOutlet id _customize_aud_keep_ckb;
     IBOutlet id _customize_aud_codec_lbl;
@@ -87,6 +87,9 @@
     NSString * _outputDestination;
     NSArray * _profileNames;
     NSArray * _profileValueList;
+    NSArray * _videoCodecs;
+    NSArray * _audioCodecs;
+    NSArray * _subsCodecs;
     NSMutableArray * _currentProfile;
 }
 @property (readwrite, nonatomic, retain) NSString * MRL;
