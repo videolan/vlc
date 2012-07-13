@@ -17,7 +17,6 @@ $(TARBALLS)/libtheora-$(THEORA_VERSION).tar.xz:
 libtheora: libtheora-$(THEORA_VERSION).tar.xz .sum-theora
 	$(UNPACK)
 	$(APPLY) $(SRC)/theora/libtheora-includes.patch
-	echo 'ACLOCAL_AMFLAGS = -I m4' >> $(UNPACK_DIR)/Makefile.am
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
@@ -47,9 +46,6 @@ endif
 DEPS_theora = ogg $(DEPS_ogg)
 
 .theora: libtheora
-ifdef HAVE_WIN32
-	$(RECONF)
-endif
 	cd $< && $(HOSTVARS) ./configure $(THEORACONF)
 	cd $< && $(MAKE) install
 	touch $@
