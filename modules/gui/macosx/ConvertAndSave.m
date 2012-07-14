@@ -118,10 +118,6 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (void)dealloc
 {
-    if (_MRL)
-        [_MRL release];
-    if (_outputDestination)
-        [_outputDestination release];
     if (_currentProfile)
         [_currentProfile release];
 
@@ -224,6 +220,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_customize_vid_scale_pop addItemWithTitle:@"1.5"];
     [_customize_vid_scale_pop addItemWithTitle:@"1.75"];
     [_customize_vid_scale_pop addItemWithTitle:@"2"];
+
+    [_ok_btn setEnabled: NO];
 }
 
 # pragma mark -
@@ -289,6 +287,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         [[_destination_filename_lbl animator] setHidden: YES];
         [[_destination_filename_stub_lbl animator] setHidden: NO];
     }
+    [self updateOKButton];
 }
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
@@ -304,6 +303,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
             if ([values count] > 0) {
                 [self setMRL: [NSString stringWithUTF8String:make_URI([[values objectAtIndex:0] UTF8String], NULL)]];
+                [self updateOKButton];
                 [self updateDropView];
                 return YES;
             }
@@ -320,7 +320,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         NSString * path = [[NSURL URLWithString:_MRL] path];
         [_dropin_media_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath: path]];
         NSImage * image = [[NSWorkspace sharedWorkspace] iconForFile: path];
-        [image setSize:NSMakeSize(64,64)];
+        [image setSize:NSMakeSize(128,128)];
         [_dropin_icon_view setImage: image];
 
         if (![_dropin_view superview]) {
@@ -336,6 +336,14 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         [_dropin_view removeFromSuperview];
         [[_drop_image_view animator] setHidden: NO];
     }
+}
+
+- (void)updateOKButton
+{
+    if ([_outputDestination length] > 0 && [_MRL length] > 0)
+        [_ok_btn setEnabled: YES];
+    else
+        [_ok_btn setEnabled: NO];
 }
 
 - (void)resetCustomizationSheetBasedOnProfile:(NSString *)profileString
@@ -450,6 +458,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 @end
 
+# pragma mark -
+# pragma mark Drag and drop handling
 
 @implementation VLCDropEnabledBox
 
