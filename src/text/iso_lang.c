@@ -42,7 +42,7 @@
 #include "iso-639_def.h"
 
 static const iso639_lang_t unknown_language =
-    { "Unknown", "Unknown", "??", "???", "???" };
+    { "Unknown", "??", "???", "???" };
 
 const iso639_lang_t * GetLang_1( const char * psz_code )
 {

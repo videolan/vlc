@@ -30,7 +30,6 @@
 struct iso639_lang_t
 {
     const char *psz_eng_name;    /* Description in English */
-    const char *psz_native_name; /* Description in native language */
     const char psz_iso639_1[3];  /* ISO-639-1 (2 characters) code */
     const char psz_iso639_2T[4]; /* ISO-639-2/T (3 characters) English code */
     const char psz_iso639_2B[4]; /* ISO-639-2/B (3 characters) native code */
