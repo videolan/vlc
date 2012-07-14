@@ -2739,11 +2739,8 @@ static char *LanguageGetCode( const char *psz_lang )
             !strcasecmp( pl->psz_iso639_1, psz_lang ) ||
             !strcasecmp( pl->psz_iso639_2T, psz_lang ) ||
             !strcasecmp( pl->psz_iso639_2B, psz_lang ) )
-            break;
+            return strdup( pl->psz_iso639_1 );
     }
-
-    if( pl->psz_eng_name != NULL )
-        return strdup( pl->psz_iso639_1 );
 
     return strdup("??");
 }
