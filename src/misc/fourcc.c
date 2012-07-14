@@ -184,6 +184,8 @@ static const entry_t p_list_video[] = {
         E("FFDS", "FFDShow MPEG-4"),
         E("VIDM", "vidm 4.01 codec"),
         E("DP02", "DynaPel MPEG-4 codec"),
+        E("PLV1", "Pelco DVR MPEG-4"),
+        E("QMP4", "QNAP Systems MPEG-4"),
         /* 3ivx delta 3.5 Unsupported
          * putting it here gives extreme distorted images */
         //E("3IV1", "3ivx delta 3.5 MPEG-4 Video"),
