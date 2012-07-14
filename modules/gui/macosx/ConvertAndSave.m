@@ -135,8 +135,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_window setTitle: _NS("Convert & Save")];
     [_cancel_btn setTitle: _NS("Cancel")];
     [_ok_btn setTitle: _NS("Save")];
-    [_drop_lbl setStringValue: _NS("Drop Media here")];
-    [_drop_btn setTitle: _NS("Open Media...")];
+    [_drop_lbl setStringValue: _NS("Drop media here")];
+    [_drop_btn setTitle: _NS("Open media...")];
     [_profile_lbl setStringValue: _NS("Choose Profile")];
     [_profile_btn setTitle: _NS("Customize")];
     [_destination_lbl setStringValue: _NS("Choose Destination")];
@@ -181,7 +181,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     _profileNames = [[defaults arrayForKey:@"CASProfileNames"] retain];
 
     [_profile_pop removeAllItems];
-    [_profile_pop addItemsWithTitles: _profileNames];
+    [_profile_pop addItemsWithTitles:_profileNames];
+    [_profile_pop addItemWithTitle:_NS("Custom")];
 
     _videoCodecs = [[NSArray alloc] initWithObjects:
                     [NSArray arrayWithObjects:@"MPEG-1", @"MPEG-2", @"MPEG-4", @"DIVX 1", @"DIVX 2", @"DIVX 3", @"H.263", @"H.264", @"VP8", @"WMV1", @"WMV2", @"M-JPEG", @"Theora", @"Dirac", nil],
@@ -241,11 +242,30 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (IBAction)openMedia:(id)sender
 {
+    /* preliminary implementation until the open panel is cleaned up */
+    NSOpenPanel * openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setResolvesAliases:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel beginSheetForDirectory:nil file:nil types:nil modalForWindow: _window modalDelegate:self didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:) contextInfo:nil];
+}
+
+- (void)openPanelDidEnd:(NSOpenPanel *)panel returnCode:(int)returnCode  contextInfo:(void  *)contextInfo
+{
+    if (returnCode == NSOKButton)
+    {
+        [self setMRL: [NSString stringWithUTF8String:make_URI([[[panel URL] path] UTF8String], NULL)]];
+        [self updateOKButton];
+        [self updateDropView];
+    }
 }
 
 - (IBAction)customizeProfile:(id)sender
 {
-    [self resetCustomizationSheetBasedOnProfile:[_profileValueList objectAtIndex:[_profile_pop indexOfSelectedItem]]];
+    NSUInteger index = [_profile_pop indexOfSelectedItem];
+    if (index < ([_profileValueList count] - 1))
+        [self resetCustomizationSheetBasedOnProfile:[_profileValueList objectAtIndex:index]];
+
     [NSApp beginSheet:_customize_panel modalForWindow:_window modalDelegate:self didEndSelector:NULL contextInfo:nil];
 }
 
@@ -258,7 +278,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (IBAction)chooseDestination:(id)sender
 {
-    NSSavePanel * saveFilePanel = [[NSSavePanel alloc] init];
+    NSSavePanel * saveFilePanel = [NSSavePanel savePanel];
     [saveFilePanel setCanSelectHiddenExtension: YES];
     [saveFilePanel setCanCreateDirectories: YES];
     [saveFilePanel beginSheetForDirectory:nil file:nil modalForWindow:_window modalDelegate:self didEndSelector:@selector(savePanelDidEnd:returnCode:contextInfo:) contextInfo:nil];
@@ -319,7 +339,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
             subViewFrame.origin.y = (boxFrame.size.height - subViewFrame.size.height) / 2;
             [_dropin_view setFrame: subViewFrame];
             [[_drop_image_view animator] setHidden: YES];
-            [_drop_box performSelector:@selector(addSubview:) withObject:_dropin_view afterDelay:0.4];
+            [_drop_box performSelector:@selector(addSubview:) withObject:_dropin_view afterDelay:0.6];
         }
     } else {
         [_dropin_view removeFromSuperview];
