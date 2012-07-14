@@ -245,7 +245,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (IBAction)customizeProfile:(id)sender
 {
-    [self resetCustomizationSheetBasedOnProfile:[_profile_pop indexOfSelectedItem]];
+    [self resetCustomizationSheetBasedOnProfile:[_profileValueList objectAtIndex:[_profile_pop indexOfSelectedItem]]];
     [NSApp beginSheet:_customize_panel modalForWindow:_window modalDelegate:self didEndSelector:NULL contextInfo:nil];
 }
 
@@ -325,17 +325,17 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     }
 }
 
-- (void)resetCustomizationSheetBasedOnProfile:(NSInteger)profileNumber
+- (void)resetCustomizationSheetBasedOnProfile:(NSString *)profileString
 {
     /* Container(string), transcode video(bool), transcode audio(bool),
     * use subtitles(bool), video codec(string), video bitrate(integer),
     * scale(float), fps(float), width(integer, height(integer),
-                                      * audio codec(string), audio bitrate(integer), channels(integer),
-                                      * samplerate(integer), subtitle codec(string), subtitle overlay(bool) */
+    * audio codec(string), audio bitrate(integer), channels(integer),
+    * samplerate(integer), subtitle codec(string), subtitle overlay(bool) */
 
-    NSArray * components = [[_profileValueList objectAtIndex:profileNumber] componentsSeparatedByString:@";"];
+    NSArray * components = [profileString componentsSeparatedByString:@";"];
     if ([components count] != 16) {
-        msg_Err(VLCIntf, "CAS: the requested profile %li is invalid", profileNumber);
+        msg_Err(VLCIntf, "CAS: the requested profile '%s' is invalid", [profileString UTF8String]);
         return;
     }
 
