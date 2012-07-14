@@ -2720,11 +2720,7 @@ static char *LanguageGetName( const char *psz_code )
     }
     else
     {
-        if( *pl->psz_native_name )
-        {
-            return strdup( pl->psz_native_name );
-        }
-        return strdup( pl->psz_eng_name );
+        return strdup( vlc_gettext(pl->psz_eng_name) );
     }
 }
 
