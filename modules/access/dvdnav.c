@@ -935,7 +935,6 @@ static char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var )
         if( *psz_lang == '\0' )
             continue;
         if( !strcasecmp( pl->psz_eng_name, psz_lang ) ||
-            !strcasecmp( pl->psz_native_name, psz_lang ) ||
             !strcasecmp( pl->psz_iso639_1, psz_lang ) ||
             !strcasecmp( pl->psz_iso639_2T, psz_lang ) ||
             !strcasecmp( pl->psz_iso639_2B, psz_lang ) )
