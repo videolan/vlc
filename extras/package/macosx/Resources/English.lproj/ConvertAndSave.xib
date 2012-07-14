@@ -12,8 +12,8 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
+      <integer value="2"/>
       <integer value="132"/>
-      <integer value="10"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -2097,14 +2097,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
-            <string key="label">profileSelection:</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="803077624"/>
-          </object>
-          <int key="connectionID">100</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
             <string key="label">windowButtonAction:</string>
             <reference key="source" ref="203744709"/>
             <reference key="destination" ref="210468830"/>
@@ -4000,9 +3992,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{617, 266}, {663, 490}}</string>
+          <string>{{305, 266}, {663, 490}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{617, 266}, {663, 490}}</string>
+          <string>{{305, 266}, {663, 490}}</string>
           <boolean value="NO"/>
           <string>{196, 240}</string>
           <string>{{357, 418}, {480, 270}}</string>
@@ -4023,9 +4015,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABDUQAAwmgAAA</bytes>
           </object>
-          <string>{{292, 96}, {558, 370}}</string>
+          <string>{{329, 96}, {558, 370}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{292, 96}, {558, 370}}</string>
+          <string>{{329, 96}, {558, 370}}</string>
           <boolean value="NO"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4356,12 +4348,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
               <string>closeCustomizationSheet:</string>
               <string>customizeProfile:</string>
               <string>openMedia:</string>
-              <string>profileSelection:</string>
               <string>windowButtonAction:</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -4377,7 +4367,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
               <string>closeCustomizationSheet:</string>
               <string>customizeProfile:</string>
               <string>openMedia:</string>
-              <string>profileSelection:</string>
               <string>windowButtonAction:</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
@@ -4396,10 +4385,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
               </object>
               <object class="IBActionInfo">
                 <string key="name">openMedia:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">profileSelection:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">

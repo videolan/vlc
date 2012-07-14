@@ -243,17 +243,6 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 {
 }
 
-- (IBAction)profileSelection:(id)sender
-{
-    NSInteger index = [sender indexOfSelectedItem];
-    if (index != ([sender numberOfItems] - 1))
-    {
-        if (_currentProfile)
-            [_currentProfile release];
-        _currentProfile = [[NSMutableArray alloc] initWithArray: [[_profileValueList objectAtIndex:index] componentsSeparatedByString:@";"]];
-    }
-}
-
 - (IBAction)customizeProfile:(id)sender
 {
     [self resetCustomizationSheetBasedOnProfile:[_profileValueList objectAtIndex:[_profile_pop indexOfSelectedItem]]];
@@ -416,6 +405,10 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
             }
         }
     }
+
+    if (_currentProfile)
+        [_currentProfile release];
+    _currentProfile = [[NSMutableArray alloc] initWithArray: [profileString componentsSeparatedByString:@";"]];
 }
 
 - (void)selectCellByEncapsulationFormat:(NSString *)format

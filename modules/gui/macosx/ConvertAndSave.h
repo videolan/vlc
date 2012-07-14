@@ -104,7 +104,6 @@
 
 - (IBAction)windowButtonAction:(id)sender;
 - (IBAction)openMedia:(id)sender;
-- (IBAction)profileSelection:(id)sender;
 - (IBAction)customizeProfile:(id)sender;
 - (IBAction)closeCustomizationSheet:(id)sender;
 - (IBAction)chooseDestination:(id)sender;
