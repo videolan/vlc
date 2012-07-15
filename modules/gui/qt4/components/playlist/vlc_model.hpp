@@ -37,7 +37,7 @@
 #include <QPixmapCache>
 #include <QSize>
 #include <QAbstractItemModel>
-
+class QAction;
 
 class VLCModel : public QAbstractItemModel
 {
@@ -59,6 +59,24 @@ public:
     static QString getMeta( const QModelIndex & index, int meta );
     static QPixmap getArtPixmap( const QModelIndex & index, const QSize & size );
     static QString getArtUrl( const QModelIndex & index );
+
+    struct actionsContainerType
+    {
+        enum
+        {
+            ACTION_PLAY = 1,
+            ACTION_INFO,
+            ACTION_STREAM,
+            ACTION_SAVE,
+            ACTION_EXPLORE,
+            ACTION_ADDTOPLAYLIST,
+            ACTION_ADDNODE,
+            ACTION_REMOVE,
+            ACTION_SORT
+        } action;
+        QModelIndexList indexes; /* for passing selection or caller index(es) */
+        int column; /* for sorting */
+    };
 
     static int columnToMeta( int _column )
     {
@@ -88,11 +106,13 @@ public:
 
 public slots:
     virtual void activateItem( const QModelIndex &index ) = 0;
+    virtual void actionSlot( QAction *action ) = 0;
 
 protected:
     intf_thread_t *p_intf;
 
 };
 
+Q_DECLARE_METATYPE(VLCModel::actionsContainerType)
 
 #endif

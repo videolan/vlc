@@ -71,8 +71,6 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     p_playlist        = _p_playlist;
     i_cached_id       = -1;
     i_cached_input_id = -1;
-    popupLauncherIndex = QModelIndex();
-    sortingMenu       = NULL;
 
     rootItem          = NULL; /* PLItem rootItem, will be set in rebuild( ) */
     latestSearch      = QString();
@@ -108,7 +106,6 @@ PLModel::~PLModel()
 {
     getSettings()->setValue( "Playlist/zoom", i_zoom );
     delete rootItem;
-    delete sortingMenu;
 }
 
 Qt::DropActions PLModel::supportedDropActions() const
@@ -605,12 +602,12 @@ int PLModel::rowCount( const QModelIndex &parent ) const
     return parentItem->childCount();
 }
 
-QStringList PLModel::selectedURIs()
+QStringList PLModel::selectedURIs( QModelIndexList *current_selection )
 {
     QStringList lst;
-    for( int i = 0; i < current_selection.count(); i++ )
+    for( int i = 0; i < current_selection->count(); i++ )
     {
-        const PLItem *item = getItem( current_selection[i] );
+        const PLItem *item = getItem( current_selection->at(i) );
         if( item )
         {
             PL_LOCK;
@@ -978,10 +975,10 @@ void PLModel::recurseDelete( QList<PLItem*> children, QModelIndexList *fullList 
 /******* Volume III: Sorting and searching ********/
 void PLModel::sort( const int column, Qt::SortOrder order )
 {
-    sort( index( rootItem->id(), 0 ) , column, order );
+    sort( QModelIndex(), index( rootItem->id(), 0 ) , column, order );
 }
 
-void PLModel::sort( QModelIndex rootIndex, const int column, Qt::SortOrder order )
+void PLModel::sort( QModelIndex caller, QModelIndex rootIndex, const int column, Qt::SortOrder order )
 {
     msg_Dbg( p_intf, "Sorting by column %i, order %i", column, order );
 
@@ -1028,12 +1025,8 @@ void PLModel::sort( QModelIndex rootIndex, const int column, Qt::SortOrder order
     }
     PL_UNLOCK;
     /* if we have popup item, try to make sure that you keep that item visible */
-    if( popupLauncherIndex.isValid() )
-    {
-        emit currentIndexChanged( popupLauncherIndex );
-        /* reset i_popup_item as we don't show it as selected anymore anyway */
-        popupLauncherIndex = QModelIndex();
-    }
+    if( caller.isValid() ) emit currentIndexChanged( caller );
+
     else if( currentIndex().isValid() ) emit currentIndexChanged( currentIndex() );
 }
 
@@ -1101,28 +1094,165 @@ void PLModel::ensureArtRequested( const QModelIndex &index )
     }
 }
 
-/*********** Popup *********/
-bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list )
+void PLModel::actionSlot( QAction *action )
 {
-    popupLauncherIndex = index.isValid() ? index : QModelIndex();
+    char *uri = NULL, *path = NULL;
+    QString name;
+    QStringList mrls;
+    QModelIndex index;
+    bool ok;
+    playlist_item_t *p_item;
+
+    actionsContainerType a = action->data().value<actionsContainerType>();
+    switch ( a.action )
+    {
+
+    case actionsContainerType::ACTION_PLAY:
+        PL_LOCK;
+        {
+            if ( a.indexes.first().isValid() )
+            {
+                playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
+                                             itemId( a.indexes.first() ) );
+                activateItem( p_item );
+            }
+        }
+        PL_UNLOCK;
+        break;
+
+    case actionsContainerType::ACTION_ADDTOPLAYLIST:
+        PL_LOCK;
+        foreach( QModelIndex currentIndex, a.indexes )
+        {
+            playlist_item_t *p_item = playlist_ItemGetById( THEPL, itemId( currentIndex ) );
+            if( !p_item ) continue;
+
+            playlist_NodeAddCopy( THEPL, p_item,
+                                  THEPL->p_playing,
+                                  PLAYLIST_END );
+        }
+        PL_UNLOCK;
+        break;
+
+    case actionsContainerType::ACTION_INFO:
+        PL_LOCK;
+        if( a.indexes.first().isValid() )
+        {
+            input_item_t* p_input = getItem( a.indexes.first() )->inputItem();
+            vlc_gc_incref( p_input );
+            PL_UNLOCK;
+            MediaInfoDialog *mid = new MediaInfoDialog( p_intf, p_input );
+            vlc_gc_decref( p_input );
+            mid->setParent( PlaylistDialog::getInstance( p_intf ),
+                            Qt::Dialog );
+            mid->show();
+        } else
+            PL_UNLOCK;
+        break;
+
+    case actionsContainerType::ACTION_STREAM:
+        mrls = selectedURIs( & a.indexes );
+        if( !mrls.isEmpty() )
+            THEDP->streamingDialog( NULL, mrls[0], false );
+        break;
+
+    case actionsContainerType::ACTION_EXPLORE:
+        PL_LOCK;
+        if( a.indexes.first().isValid() )
+        {
+            input_item_t *p_input = getItem( a.indexes.first() )->inputItem();
+            uri = input_item_GetURI( p_input );
+        }
+        PL_UNLOCK;
+
+        if( uri != NULL )
+        {
+            path = make_path( uri );
+            free( uri );
+        }
+        if( path == NULL )
+            return;
+
+        QDesktopServices::openUrl(
+                    QUrl::fromLocalFile( QFileInfo( qfu( path ) ).absolutePath() ) );
+
+        free( path );
+        break;
+
+    case actionsContainerType::ACTION_SAVE:
+        mrls = selectedURIs( & a.indexes );
+        if( !mrls.isEmpty() )
+            THEDP->streamingDialog( NULL, mrls[0] );
+        break;
+
+    case actionsContainerType::ACTION_ADDNODE:
+        name = QInputDialog::getText( PlaylistDialog::getInstance( p_intf ),
+            qtr( I_NEW_DIR ), qtr( I_NEW_DIR_NAME ),
+            QLineEdit::Normal, QString(), &ok);
+        if( !ok || name.isEmpty() || !a.indexes.first().isValid() ) return;
+
+        PL_LOCK;
+        index = a.indexes.first().parent();
+        if ( !index.isValid() ) index = rootIndex();
+        p_item = playlist_ItemGetById( p_playlist, itemId( index ) );
+        if( p_item )
+            playlist_NodeCreate( p_playlist, qtu( name ), p_item, PLAYLIST_END, 0, NULL );
+        PL_UNLOCK;
+        break;
+
+    case actionsContainerType::ACTION_REMOVE:
+        doDelete( a.indexes );
+        break;
+
+    case actionsContainerType::ACTION_SORT:
+        index = a.indexes.first().parent();
+        if( !index.isValid() ) index = rootIndex();
+        sort( a.indexes.first(), index,
+              a.column > 0 ? a.column - 1 : -a.column - 1,
+              a.column > 0 ? Qt::AscendingOrder : Qt::DescendingOrder );
+        break;
+
+    }
+}
+
+/*********** Popup *********/
+bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &selectionlist )
+{
+    QModelIndexList callerAsList;
+    callerAsList << ( index.isValid() ? index : QModelIndex() );
+
+#define ADD_MENU_ENTRY( icon, title, act, data ) \
+    action = menu.addAction( icon, title ); \
+    container.action = act; \
+    container.indexes = data; \
+    action->setData( QVariant::fromValue( container ) )
 
     /* */
     QMenu menu;
+    QAction *action;
+    PLModel::actionsContainerType container;
 
     /* Play/Stream/Info static actions */
     if( index.isValid() )
     {
-        menu.addAction( QIcon( ":/menu/play" ), qtr(I_POP_PLAY), this, SLOT( popupPlay() ) );
-        menu.addAction( QIcon( ":/menu/stream" ),
-                        qtr(I_POP_STREAM), this, SLOT( popupStream() ) );
-        menu.addAction( qtr(I_POP_SAVE), this, SLOT( popupSave() ) );
-        menu.addAction( QIcon( ":/menu/info" ), qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
+        ADD_MENU_ENTRY( QIcon( ":/menu/play" ), qtr(I_POP_PLAY),
+                        container.ACTION_PLAY, callerAsList );
+
+        ADD_MENU_ENTRY( QIcon( ":/menu/stream" ), qtr(I_POP_STREAM),
+                        container.ACTION_STREAM, selectionlist );
+
+        ADD_MENU_ENTRY( QIcon(), qtr(I_POP_SAVE),
+                        container.ACTION_SAVE, selectionlist );
+
+        ADD_MENU_ENTRY( QIcon( ":/menu/info" ), qtr(I_POP_INFO),
+                        container.ACTION_INFO, callerAsList );
+
         menu.addSeparator();
 
         if( getURI( index ).startsWith( "file://" ) )
         {
-            menu.addAction( QIcon( ":/type/folder-grey" ),
-                            qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
+            ADD_MENU_ENTRY( QIcon( ":/type/folder-grey" ), qtr(I_POP_EXPLORE),
+                            container.ACTION_EXPLORE, callerAsList );
         }
     }
 
@@ -1130,7 +1260,13 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
     if( canEdit() )
     {
         QIcon addIcon( ":/buttons/playlist/playlist_add" );
-        if( isTree() ) menu.addAction( addIcon, qtr(I_POP_NEWFOLDER), this, SLOT( popupAddNode() ) );
+
+        if( isTree() )
+        {
+            ADD_MENU_ENTRY( addIcon, qtr(I_POP_NEWFOLDER),
+                            container.ACTION_ADDNODE, callerAsList );
+        }
+
         menu.addSeparator();
         if( isCurrentItem( rootIndex(), PLModel::IN_PLAYLIST ) )
         {
@@ -1149,7 +1285,10 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
     if( index.isValid() )
     {
         if( !isCurrentItem( rootIndex(), PLModel::IN_PLAYLIST ) )
-            menu.addAction( qtr( "Add to playlist"), this, SLOT( popupAddToPlaylist() ) );
+        {
+            ADD_MENU_ENTRY( QIcon(), qtr("Add to playlist"),
+                            container.ACTION_ADDTOPLAYLIST, selectionlist );
+        }
     }
 
     menu.addSeparator();
@@ -1157,8 +1296,8 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
     /* Item removal */
     if( index.isValid() )
     {
-        menu.addAction( QIcon( ":/buttons/playlist/playlist_remove" ),
-                        qtr(I_POP_DEL), this, SLOT( popupDel() ) );
+        ADD_MENU_ENTRY( QIcon( ":/buttons/playlist/playlist_remove" ), qtr(I_POP_DEL),
+                        container.ACTION_REMOVE, selectionlist );
     }
 
     if( canEdit() ) {
@@ -1169,23 +1308,21 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
     menu.addSeparator();
 
     /* Playlist sorting */
-    if( !sortingMenu )
+    QMenu *sortingMenu = new QMenu( qtr( "Sort by" ) );
+    /* Choose what columns to show in sorting menu, not sure if this should be configurable*/
+    QList<int> sortingColumns;
+    sortingColumns << COLUMN_TITLE << COLUMN_ARTIST << COLUMN_ALBUM << COLUMN_TRACK_NUMBER << COLUMN_URI;
+    container.action = container.ACTION_SORT;
+    container.indexes = callerAsList;
+    foreach( int Column, sortingColumns )
     {
-        sortingMenu = new QMenu( qtr( "Sort by" ) );
-        sortingMapper = new QSignalMapper( this );
-        /* Choose what columns to show in sorting menu, not sure if this should be configurable*/
-        QList<int> sortingColumns;
-        sortingColumns << COLUMN_TITLE << COLUMN_ARTIST << COLUMN_ALBUM << COLUMN_TRACK_NUMBER << COLUMN_URI;
-        foreach( int Column, sortingColumns )
-        {
-            QAction *asc  = sortingMenu->addAction( qfu( psz_column_title( Column ) ) + " " + qtr("Ascending") );
-            QAction *desc = sortingMenu->addAction( qfu( psz_column_title( Column ) ) + " " + qtr("Descending") );
-            sortingMapper->setMapping( asc, columnFromMeta(Column) + 1 );
-            sortingMapper->setMapping( desc, -1 * (columnFromMeta(Column)+1) );
-            CONNECT( asc, triggered(), sortingMapper, map() );
-            CONNECT( desc, triggered(), sortingMapper, map() );
-        }
-        CONNECT( sortingMapper, mapped( int ), this, popupSort( int ) );
+        action = sortingMenu->addAction( qfu( psz_column_title( Column ) ) + " " + qtr("Ascending") );
+        container.column = columnFromMeta(Column) + 1;
+        action->setData( QVariant::fromValue( container ) );
+
+        action = sortingMenu->addAction( qfu( psz_column_title( Column ) ) + " " + qtr("Descending") );
+        container.column = -1 * (columnFromMeta(Column)+1);
+        action->setData( QVariant::fromValue( container ) );
     }
     menu.addMenu( sortingMenu );
 
@@ -1195,8 +1332,7 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
     zoomMenu->addAction( qtr( "Decrease" ), this, SLOT( decreaseZoom() ) );
     menu.addMenu( zoomMenu );
 
-    /* Store the current selected item for popup*() methods */
-    current_selection = list;
+    CONNECT( &menu, triggered( QAction * ), this, actionSlot( QAction * ) );
 
     /* Display and forward the result */
     if( !menu.isEmpty() )
@@ -1204,125 +1340,8 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
         menu.exec( point ); return true;
     }
     else return false;
-}
 
-void PLModel::popupDel()
-{
-    doDelete( current_selection );
-}
-
-void PLModel::popupPlay()
-{
-    PL_LOCK;
-    {
-        if ( popupLauncherIndex.isValid() )
-        {
-            playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
-                                         itemId( popupLauncherIndex ) );
-            activateItem( p_item );
-        }
-    }
-    PL_UNLOCK;
-}
-
-void PLModel::popupAddToPlaylist()
-{
-    playlist_Lock( THEPL );
-
-    foreach( QModelIndex currentIndex, current_selection )
-    {
-        playlist_item_t *p_item = playlist_ItemGetById( THEPL, itemId( currentIndex ) );
-        if( !p_item ) continue;
-
-        playlist_NodeAddCopy( THEPL, p_item,
-                              THEPL->p_playing,
-                              PLAYLIST_END );
-    }
-    playlist_Unlock( THEPL );
-}
-
-void PLModel::popupInfo()
-{
-    PL_LOCK;
-    if( popupLauncherIndex.isValid() )
-    {
-        input_item_t* p_input = getItem( popupLauncherIndex )->inputItem();
-        vlc_gc_incref( p_input );
-        PL_UNLOCK;
-        MediaInfoDialog *mid = new MediaInfoDialog( p_intf, p_input );
-        vlc_gc_decref( p_input );
-        mid->setParent( PlaylistDialog::getInstance( p_intf ),
-                        Qt::Dialog );
-        mid->show();
-    } else
-        PL_UNLOCK;
-}
-
-void PLModel::popupStream()
-{
-    QStringList mrls = selectedURIs();
-    if( !mrls.isEmpty() )
-        THEDP->streamingDialog( NULL, mrls[0], false );
-}
-
-void PLModel::popupSave()
-{
-    QStringList mrls = selectedURIs();
-    if( !mrls.isEmpty() )
-        THEDP->streamingDialog( NULL, mrls[0] );
-}
-
-void PLModel::popupExplore()
-{
-    char *uri = NULL, *path = NULL;
-
-    PL_LOCK;
-    if( popupLauncherIndex.isValid() )
-    {
-        input_item_t *p_input = getItem( popupLauncherIndex )->inputItem();
-        uri = input_item_GetURI( p_input );
-    }
-    PL_UNLOCK;
-
-    if( uri != NULL )
-    {
-        path = make_path( uri );
-        free( uri );
-    }
-    if( path == NULL )
-        return;
-
-    QFileInfo info( qfu( path ) );
-    free( path );
-
-    QDesktopServices::openUrl( QUrl::fromLocalFile( info.absolutePath() ) );
-}
-
-void PLModel::popupAddNode()
-{
-    bool ok;
-    QString name = QInputDialog::getText( PlaylistDialog::getInstance( p_intf ),
-        qtr( I_NEW_DIR ), qtr( I_NEW_DIR_NAME ),
-        QLineEdit::Normal, QString(), &ok);
-    if( !ok || name.isEmpty() || !popupLauncherIndex.isValid() ) return;
-
-    PL_LOCK;
-    QModelIndex index = popupLauncherIndex.parent();
-    if ( !index.isValid() ) index = rootIndex();
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
-                                                    itemId( index ) );
-    if( p_item )
-        playlist_NodeCreate( p_playlist, qtu( name ), p_item, PLAYLIST_END, 0, NULL );
-    PL_UNLOCK;
-}
-
-void PLModel::popupSort( int column )
-{
-    QModelIndex index = popupLauncherIndex.parent();
-    if( !index.isValid() ) index = rootIndex();
-    sort( index,
-          column > 0 ? column - 1 : -column - 1,
-          column > 0 ? Qt::AscendingOrder : Qt::DescendingOrder );
+#undef ADD_MENU_ENTRY
 }
 
 /* */

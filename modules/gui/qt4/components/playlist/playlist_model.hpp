@@ -47,7 +47,6 @@
 class PLItem;
 class PLSelector;
 class PlMimeData;
-class QSignalMapper;
 
 class PLModel : public VLCModel
 {
@@ -128,6 +127,8 @@ public slots:
     virtual void activateItem( const QModelIndex &index );
     void clearPlaylist();
     void ensureArtRequested( const QModelIndex &index );
+    virtual void actionSlot( QAction *action );
+
 private:
     /* General */
     PLItem *rootItem;
@@ -154,7 +155,7 @@ private:
             return static_cast<PLItem*>( index.internalPointer() );
         else return rootItem;
     }
-    QStringList selectedURIs();
+    QStringList selectedURIs( QModelIndexList * );
     QModelIndex index( PLItem *, const int c ) const;
     bool isCurrent( const QModelIndex &index ) const;
     bool isParent( const QModelIndex &index, const QModelIndex &current) const;
@@ -175,13 +176,7 @@ private:
     void dropMove( const PlMimeData * data, PLItem *target, int new_pos );
 
     /* */
-    void sort( QModelIndex rootIndex, const int column, Qt::SortOrder order );
-
-    /* Popup */
-    QModelIndex popupLauncherIndex;
-    QModelIndexList current_selection;
-    QMenu *sortingMenu;
-    QSignalMapper *sortingMapper;
+    void sort( QModelIndex caller, QModelIndex rootIndex, const int column, Qt::SortOrder order );
 
     /* Lookups */
     PLItem *findById( PLItem *, int ) const;
@@ -200,15 +195,6 @@ private:
     QString latestSearch;
 
 private slots:
-    void popupPlay();
-    void popupDel();
-    void popupInfo();
-    void popupStream();
-    void popupSave();
-    void popupExplore();
-    void popupAddNode();
-    void popupAddToPlaylist();
-    void popupSort( int column );
     void processInputItemUpdate( input_item_t *);
     void processInputItemUpdate( input_thread_t* p_input );
     void processItemRemoval( int i_id );
