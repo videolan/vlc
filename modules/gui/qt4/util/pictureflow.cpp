@@ -502,9 +502,7 @@ QRect PictureFlowSoftwareRenderer::renderSlide(const SlideInfo &slide, int col1,
         index = ((PLModel*)state->model)->index( slide.slideIndex, 0, state->model->currentIndex().parent() );
         if( !index.isValid() )
             return QRect();
-
-        PLItem *item = static_cast<PLItem*>( index.internalPointer() );
-        artURL = InputManager::decodeArtURL( item->inputItem() );
+        artURL = plm->data( index, COLUMN_COVER ).toString();
     }
 #ifdef MEDIA_LIBRARY
     else if( mlm != 0 )

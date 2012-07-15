@@ -280,17 +280,7 @@ void LocationBar::setIndex( const QModelIndex &index )
 
     while( true )
     {
-        PLItem *item = model->getItem( i );
-        QString text;
-
-        char *fb_name = input_item_GetTitle( item->inputItem() );
-        if( EMPTY_STR( fb_name ) )
-        {
-            free( fb_name );
-            fb_name = input_item_GetName( item->inputItem() );
-        }
-        text = qfu(fb_name);
-        free(fb_name);
+        QString text = model->getTitle( i );
 
         QAbstractButton *btn = new LocationButton( text, first, !first, this );
         btn->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
@@ -300,7 +290,7 @@ void LocationBar::setIndex( const QModelIndex &index )
         actions.append( action );
         CONNECT( btn, clicked(), action, trigger() );
 
-        mapper->setMapping( action, item->id() );
+        mapper->setMapping( action, model->itemId( i ) );
         CONNECT( action, triggered(), mapper, map() );
 
         first = false;

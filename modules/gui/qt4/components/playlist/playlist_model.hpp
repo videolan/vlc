@@ -98,8 +98,19 @@ public:
 
     /* Lookups */
     QModelIndex index( const int i_id, const int c );
+    QModelIndex rootIndex() const;
+    bool isTree() const;
+    bool canEdit() const;
     virtual QModelIndex currentIndex() const;
     int itemId( const QModelIndex &index ) const;
+    QString getURI( const QModelIndex &index ) const;
+    QString getTitle( const QModelIndex &index ) const;
+    enum playLocation
+    {
+        IN_PLAYLIST,
+        IN_MEDIALIBRARY
+    };
+    bool isCurrentItem( const QModelIndex &index, playLocation where ) const;
 
     /* */
     void search( const QString& search_text, const QModelIndex & root, bool b_recursive );
@@ -108,13 +119,6 @@ public:
     /* Popup Actions */
     virtual bool popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list );
     virtual void doDelete( QModelIndexList selected );
-
-    PLItem *getItem( const QModelIndex & index ) const
-    {
-        if( index.isValid() )
-            return static_cast<PLItem*>( index.internalPointer() );
-        else return rootItem;
-    }
 
 signals:
     void currentIndexChanged( const QModelIndex& );
@@ -144,6 +148,12 @@ private:
 
     /* Custom model private methods */
     /* Lookups */
+    PLItem *getItem( const QModelIndex & index ) const
+    {
+        if( index.isValid() )
+            return static_cast<PLItem*>( index.internalPointer() );
+        else return rootItem;
+    }
     QStringList selectedURIs();
     QModelIndex index( PLItem *, const int c ) const;
     bool isCurrent( const QModelIndex &index ) const;
@@ -165,10 +175,10 @@ private:
     void dropMove( const PlMimeData * data, PLItem *target, int new_pos );
 
     /* */
-    void sort( const int i_root_id, const int column, Qt::SortOrder order );
+    void sort( QModelIndex rootIndex, const int column, Qt::SortOrder order );
 
     /* Popup */
-    int i_popup_item, i_popup_parent;
+    QModelIndex popupLauncherIndex;
     QModelIndexList current_selection;
     QMenu *sortingMenu;
     QSignalMapper *sortingMapper;
@@ -177,7 +187,6 @@ private:
     PLItem *findById( PLItem *, int ) const;
     PLItem *findByInput( PLItem *, int ) const;
     PLItem *findInner(PLItem *, int , bool ) const;
-    bool canEdit() const;
 
     PLItem *p_cached_item;
     PLItem *p_cached_item_bi;

@@ -34,8 +34,11 @@ class PLItem
 {
     friend class PLModel;
 public:
-    PLItem( playlist_item_t *, PLItem *parent );
     ~PLItem();
+    bool hasSameParent( PLItem *other ) { return parent() == other->parent(); }
+    bool operator< ( PLItem& );
+protected:
+    PLItem( playlist_item_t *, PLItem *parent );
 
     int row() const;
 
@@ -51,9 +54,7 @@ public:
     PLItem *parent() { return parentItem; }
     input_item_t *inputItem() const { return p_input; }
     int id() { return i_id; }
-    bool operator< ( PLItem& );
 
-protected:
     QList<PLItem*> children;
     PLItem *parentItem;
     int i_id;
