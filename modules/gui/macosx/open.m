@@ -832,13 +832,13 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     GetVolParmsInfoBuffer volumeParms;
     err = FSGetVolumeParms( actualVolume, &volumeParms, sizeof(volumeParms) );
-    if ( noErr != err ) {
-        msg_Err( p_intf, "error retrieving volume params, bailing out" );
-        return @"";
+    if ( noErr == err )
+    {
+        NSString *bsdName = [NSString stringWithUTF8String:(char *)volumeParms.vMDeviceID];
+        return [NSString stringWithFormat:@"/dev/r%@", bsdName];
     }
 
-    NSString *bsdName = [NSString stringWithUTF8String:(char *)volumeParms.vMDeviceID];
-    return [NSString stringWithFormat:@"/dev/r%@", bsdName];
+    return @"";
 }
 
 - (char *)getVolumeTypeFromMountPath:(NSString *)mountPath
@@ -900,7 +900,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
                     BOOL isDir;
                     if ([fm fileExistsAtPath:fullPath isDirectory:&isDir] && isDir)
-                    {                        
+                    {
                         if ([currentFile caseInsensitiveCompare:@"SVCD"] == NSOrderedSame)
                         {
                             returnValue = kVLCMediaSVCD;
