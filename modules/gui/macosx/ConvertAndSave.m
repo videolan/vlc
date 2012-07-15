@@ -315,7 +315,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
     if (sender == _customize_ok_btn && [_currentProfile count] == 16) {
         NSInteger i;
-        [_currentProfile replaceObjectAtIndex:0 withObject:[self currentEncapsulationFormat]];
+        [_currentProfile replaceObjectAtIndex:0 withObject:[self currentEncapsulationFormatAsFileExtension:NO]];
         [_currentProfile replaceObjectAtIndex:1 withObject:[NSString stringWithFormat:@"%li", [_customize_vid_ckb state]]];
         [_currentProfile replaceObjectAtIndex:2 withObject:[NSString stringWithFormat:@"%li", [_customize_aud_ckb state]]];
         [_currentProfile replaceObjectAtIndex:3 withObject:[NSString stringWithFormat:@"%li", [_customize_subs_ckb state]]];
@@ -351,6 +351,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     NSSavePanel * saveFilePanel = [NSSavePanel savePanel];
     [saveFilePanel setCanSelectHiddenExtension: YES];
     [saveFilePanel setCanCreateDirectories: YES];
+    if ([[_customize_encap_matrix selectedCell] tag] != RAW) // there is no clever guess for this
+        [saveFilePanel setAllowedFileTypes:[NSArray arrayWithObject:[self currentEncapsulationFormatAsFileExtension:YES]]];
     [saveFilePanel beginSheetForDirectory:nil file:nil modalForWindow:_window modalDelegate:self didEndSelector:@selector(savePanelDidEnd:returnCode:contextInfo:) contextInfo:nil];
 }
 
@@ -566,7 +568,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         msg_Err(VLCIntf, "CAS: unknown encap format requested for customization");
 }
 
-- (NSString *)currentEncapsulationFormat
+- (NSString *)currentEncapsulationFormatAsFileExtension:(BOOL)b_extension
 {
     NSUInteger cellTag = [[_customize_encap_matrix selectedCell] tag];
     NSString * returnValue;
@@ -581,11 +583,21 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
             returnValue = @"ogg";
             break;
         case MP4:
-            returnValue = @"mp4";
+        {
+            if (b_extension)
+                returnValue = @"m4v";
+            else
+                returnValue = @"mp4";
             break;
+        }
         case MPEGPS:
-            returnValue = @"ps";
+        {
+            if (b_extension)
+                returnValue = @"mpg";
+            else
+                returnValue = @"ps";
             break;
+        }
         case MJPEG:
             returnValue = @"mjpeg";
             break;
@@ -596,8 +608,13 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
             returnValue = @"flv";
             break;
         case MPEG1:
-            returnValue = @"mpeg1";
+        {
+            if (b_extension)
+                returnValue = @"mpg";
+            else
+                returnValue = @"mpeg1";
             break;
+        }
         case MKV:
             returnValue = @"mkv";
             break;
