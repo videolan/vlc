@@ -113,6 +113,9 @@
 @end
 
 @interface VLCDropEnabledBox : NSBox
+{
+    BOOL b_activeDragAndDrop;
+}
 
 @end
 

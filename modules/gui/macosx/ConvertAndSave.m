@@ -602,10 +602,40 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
+    b_activeDragAndDrop = YES;
+    [self setNeedsDisplay:YES];
+
     if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) == NSDragOperationGeneric)
         return NSDragOperationGeneric;
 
     return NSDragOperationNone;
+}
+
+- (void)draggingEnded:(id < NSDraggingInfo >)sender
+{
+    b_activeDragAndDrop = NO;
+    [self setNeedsDisplay:YES];
+}
+
+- (void)draggingExited:(id < NSDraggingInfo >)sender
+{
+    b_activeDragAndDrop = NO;
+    [self setNeedsDisplay:YES];
+}
+
+- (void)drawRect:(NSRect)dirtyRect
+{
+    if (b_activeDragAndDrop) {
+        [[NSColor colorWithCalibratedRed:(.154/.255) green:(.154/.255) blue:(.154/.255) alpha:1.] setFill];
+        NSRect frameRect = [[self contentView] bounds];
+        frameRect.origin.x += 10;
+        frameRect.origin.y += 10;
+        frameRect.size.width -= 17;
+        frameRect.size.height -= 17;
+        NSFrameRectWithWidthUsingOperation(frameRect, 4., NSCompositeHighlight);
+    }
+
+    [super drawRect:dirtyRect];
 }
 
 - (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
