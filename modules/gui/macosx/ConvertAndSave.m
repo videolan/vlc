@@ -669,10 +669,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
-    if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) == NSDragOperationGeneric)
-        return NSDragOperationGeneric;
-
-    return NSDragOperationNone;
+    return [[[self superview] superview] draggingEntered:sender];
 }
 
 - (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
@@ -701,10 +698,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
-    if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) == NSDragOperationGeneric)
-        return NSDragOperationGeneric;
-
-    return NSDragOperationNone;
+    return [[[self superview] superview] draggingEntered:sender];
 }
 
 - (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
