@@ -271,9 +271,47 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (IBAction)closeCustomizationSheet:(id)sender
 {
-    // sender == _customize_ok_btn ?
     [_customize_panel orderOut:sender];
     [NSApp endSheet: _customize_panel];
+
+    /* update current profile based upon the sheet's values */
+    /* Container(string), transcode video(bool), transcode audio(bool),
+     * use subtitles(bool), video codec(string), video bitrate(integer),
+     * scale(float), fps(float), width(integer, height(integer),
+     * audio codec(string), audio bitrate(integer), channels(integer),
+     * samplerate(integer), subtitle codec(string), subtitle overlay(bool) */
+
+    if (sender == _customize_ok_btn && [_currentProfile count] == 16) {
+        NSInteger i;
+        [_currentProfile replaceObjectAtIndex:0 withObject:[self currentEncapsulationFormat]];
+        [_currentProfile replaceObjectAtIndex:1 withObject:[NSString stringWithFormat:@"%li", [_customize_vid_ckb state]]];
+        [_currentProfile replaceObjectAtIndex:2 withObject:[NSString stringWithFormat:@"%li", [_customize_aud_ckb state]]];
+        [_currentProfile replaceObjectAtIndex:3 withObject:[NSString stringWithFormat:@"%li", [_customize_subs_ckb state]]];
+        i = [_customize_vid_codec_pop indexOfSelectedItem];
+        if (i >= 0)
+            [_currentProfile replaceObjectAtIndex:4 withObject:[_videoCodecs objectAtIndex:i]];
+        else
+            [_currentProfile replaceObjectAtIndex:4 withObject:@"none"];
+        [_currentProfile replaceObjectAtIndex:5 withObject:[_customize_vid_bitrate_fld stringValue]];
+        [_currentProfile replaceObjectAtIndex:6 withObject:[[_customize_vid_scale_pop selectedItem] title]];
+        [_currentProfile replaceObjectAtIndex:7 withObject:[_customize_vid_framerate_fld stringValue]];
+        [_currentProfile replaceObjectAtIndex:8 withObject:[_customize_vid_width_fld stringValue]];
+        [_currentProfile replaceObjectAtIndex:9 withObject:[_customize_vid_height_fld stringValue]];
+        i = [_customize_aud_codec_pop indexOfSelectedItem];
+        if (i >= 0)
+            [_currentProfile replaceObjectAtIndex:10 withObject:[_audioCodecs objectAtIndex:i]];
+        else
+            [_currentProfile replaceObjectAtIndex:10 withObject:@"none"];
+        [_currentProfile replaceObjectAtIndex:11 withObject:[_customize_aud_bitrate_fld stringValue]];
+        [_currentProfile replaceObjectAtIndex:12 withObject:[_customize_aud_channels_fld stringValue]];
+        [_currentProfile replaceObjectAtIndex:13 withObject:[[_customize_aud_samplerate_pop selectedItem] title]];
+        i = [_customize_subs_pop indexOfSelectedItem];
+        if (i >= 0)
+            [_currentProfile replaceObjectAtIndex:14 withObject:[_subsCodecs objectAtIndex:i]];
+        else
+            [_currentProfile replaceObjectAtIndex:14 withObject:@"none"];
+        [_currentProfile replaceObjectAtIndex:15 withObject:[NSString stringWithFormat:@"%li", [_customize_subs_overlay_ckb state]]];
+    }
 }
 
 - (IBAction)chooseDestination:(id)sender
@@ -467,6 +505,59 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         [_customize_encap_matrix selectCellWithTag:ASF];
     else
         msg_Err(VLCIntf, "CAS: unknown encap format requested for customization");
+}
+
+- (NSString *)currentEncapsulationFormat
+{
+    NSUInteger cellTag = [[_customize_encap_matrix selectedCell] tag];
+    NSString * returnValue;
+    switch (cellTag) {
+        case MPEGTS:
+            returnValue = @"ts";
+            break;
+        case WEBM:
+            returnValue = @"webm";
+            break;
+        case OGG:
+            returnValue = @"ogg";
+            break;
+        case MP4:
+            returnValue = @"mp4";
+            break;
+        case MPEGPS:
+            returnValue = @"ps";
+            break;
+        case MJPEG:
+            returnValue = @"mjpeg";
+            break;
+        case WAV:
+            returnValue = @"wav";
+            break;
+        case FLV:
+            returnValue = @"flv";
+            break;
+        case MPEG1:
+            returnValue = @"mpg";
+            break;
+        case MKV:
+            returnValue = @"mkv";
+            break;
+        case RAW:
+            returnValue = @"raw";
+            break;
+        case AVI:
+            returnValue = @"avi";
+            break;
+        case ASF:
+            returnValue = @"asf";
+            break;
+
+        default:
+            returnValue = @"none";
+            break;
+    }
+
+    return returnValue;
 }
 
 @end
