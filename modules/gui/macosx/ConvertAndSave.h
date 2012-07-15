@@ -102,8 +102,9 @@
 
 - (IBAction)toggleWindow;
 
-- (IBAction)windowButtonAction:(id)sender;
+- (IBAction)saveFile:(id)sender;
 - (IBAction)openMedia:(id)sender;
+- (IBAction)switchProfile:(id)sender;
 - (IBAction)customizeProfile:(id)sender;
 - (IBAction)closeCustomizationSheet:(id)sender;
 - (IBAction)chooseDestination:(id)sender;

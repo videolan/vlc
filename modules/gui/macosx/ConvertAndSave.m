@@ -224,6 +224,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_customize_vid_scale_pop addItemWithTitle:@"2"];
 
     [_ok_btn setEnabled: NO];
+
+    [self resetCustomizationSheetBasedOnProfile:[_profileValueList objectAtIndex:0]];
 }
 
 # pragma mark -
@@ -237,8 +239,34 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 # pragma mark -
 # pragma mark User Interaction
 
-- (IBAction)windowButtonAction:(id)sender
+- (IBAction)saveFile:(id)sender
 {
+    playlist_t * p_playlist = pl_Get(VLCIntf);
+
+    input_item_t *p_input = input_item_New([_MRL UTF8String], [[_dropin_media_lbl stringValue] UTF8String]);
+    if (!p_input)
+        return;
+
+    input_item_AddOption(p_input, [[self composedOptions] UTF8String], VLC_INPUT_OPTION_TRUSTED);
+
+    int returnValue;
+    returnValue = playlist_AddInput( p_playlist, p_input, PLAYLIST_STOP, PLAYLIST_END, true, pl_Unlocked );
+
+    if (returnValue == VLC_SUCCESS) {
+        /* let's "play" */
+        PL_LOCK;
+        playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input );
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, NULL,
+                         p_item );
+        PL_UNLOCK;
+    }
+    else
+        msg_Err( VLCIntf, "CAS: playlist add input failed :(");
+
+    /* we're done with this input */
+    vlc_gc_decref( p_input );
+
+    [_window performClose:sender];
 }
 
 - (IBAction)openMedia:(id)sender
@@ -261,12 +289,15 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     }
 }
 
-- (IBAction)customizeProfile:(id)sender
+- (IBAction)switchProfile:(id)sender
 {
     NSUInteger index = [_profile_pop indexOfSelectedItem];
     if (index < ([_profileValueList count] - 1))
         [self resetCustomizationSheetBasedOnProfile:[_profileValueList objectAtIndex:index]];
+}
 
+- (IBAction)customizeProfile:(id)sender
+{
     [NSApp beginSheet:_customize_panel modalForWindow:_window modalDelegate:self didEndSelector:NULL contextInfo:nil];
 }
 
@@ -326,12 +357,12 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 - (void)savePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
     if (returnCode == NSOKButton) {
-        _outputDestination = [[sheet URL] path];
+        [self setOutputDestination:[[sheet URL] path]];
         [_destination_filename_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:_outputDestination]];
         [[_destination_filename_stub_lbl animator] setHidden: YES];
         [[_destination_filename_lbl animator] setHidden: NO];
     } else {
-        _outputDestination = @"";
+        [self setOutputDestination:@""];
         [[_destination_filename_lbl animator] setHidden: YES];
         [[_destination_filename_stub_lbl animator] setHidden: NO];
     }
@@ -513,13 +544,13 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         [_customize_encap_matrix selectCellWithTag:MP4];
     else if([format isEqualToString:@"ps"])
         [_customize_encap_matrix selectCellWithTag:MPEGPS];
-    else if([format isEqualToString:@"mjpeg"])
+    else if([format isEqualToString:@"mpjpeg"])
         [_customize_encap_matrix selectCellWithTag:MJPEG];
     else if([format isEqualToString:@"wav"])
         [_customize_encap_matrix selectCellWithTag:WAV];
     else if([format isEqualToString:@"flv"])
         [_customize_encap_matrix selectCellWithTag:FLV];
-    else if([format isEqualToString:@"mpg"])
+    else if([format isEqualToString:@"mpeg1"])
         [_customize_encap_matrix selectCellWithTag:MPEG1];
     else if([format isEqualToString:@"mkv"])
         [_customize_encap_matrix selectCellWithTag:MKV];
@@ -565,7 +596,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
             returnValue = @"flv";
             break;
         case MPEG1:
-            returnValue = @"mpg";
+            returnValue = @"mpeg1";
             break;
         case MKV:
             returnValue = @"mkv";
@@ -586,6 +617,58 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     }
 
     return returnValue;
+}
+
+- (NSString *)composedOptions
+{
+    NSMutableString *composedOptions = [[NSMutableString alloc] initWithString:@":sout=#transcode{"];
+    if ([[_currentProfile objectAtIndex:1] intValue]) {
+        // video is enabled
+        [composedOptions appendFormat:@"vcodec=%@", [_currentProfile objectAtIndex:4]];
+        if (![[_currentProfile objectAtIndex:4] isEqualToString:@"none"]) {
+            if ([[_currentProfile objectAtIndex:5] intValue] > 0) // bitrate
+                [composedOptions appendFormat:@",vb=%@", [_currentProfile objectAtIndex:5]];
+            if ([[_currentProfile objectAtIndex:6] floatValue] > 0.) // scale
+                [composedOptions appendFormat:@",scale=%@", [_currentProfile objectAtIndex:6]];
+            if ([[_currentProfile objectAtIndex:7] floatValue] > 0.) // fps
+                [composedOptions appendFormat:@",fps=%@", [_currentProfile objectAtIndex:7]];
+            if ([[_currentProfile objectAtIndex:8] intValue] > 0) // width
+                [composedOptions appendFormat:@",width=%@", [_currentProfile objectAtIndex:8]];
+            if ([[_currentProfile objectAtIndex:9] intValue] > 0) // height
+                [composedOptions appendFormat:@",height=%@", [_currentProfile objectAtIndex:9]];
+        }
+    }
+    if ([[_currentProfile objectAtIndex:2] intValue]) {
+        // audio is enabled
+
+        // add another comma in case video is enabled
+        if ([[_currentProfile objectAtIndex:1] intValue])
+            [composedOptions appendString:@","];
+
+        [composedOptions appendFormat:@"acodec=%@", [_currentProfile objectAtIndex:10]];
+        if (![[_currentProfile objectAtIndex:10] isEqualToString:@"none"]) {
+            [composedOptions appendFormat:@",ab=%@", [_currentProfile objectAtIndex:11]]; // bitrate
+            [composedOptions appendFormat:@",channels=%@", [_currentProfile objectAtIndex:12]]; // channel number
+            [composedOptions appendFormat:@",samplerate=%@", [_currentProfile objectAtIndex:13]]; // sample rate
+        }
+    }
+    if ([_currentProfile objectAtIndex:3]) {
+        // subtitles enabled
+        [composedOptions appendFormat:@",scodec=%@", [_currentProfile objectAtIndex:14]];
+        if ([[_currentProfile objectAtIndex:15] intValue])
+            [composedOptions appendFormat:@",soverlay"];
+    }
+
+    // add muxer
+    [composedOptions appendFormat:@"}:standard{mux=%@", [_currentProfile objectAtIndex:0]];
+
+    // add output destination (file only at this point)
+    [composedOptions appendFormat:@",dst=%@,access=file}", _outputDestination];
+
+    NSString * returnString = [NSString stringWithString:composedOptions];
+    [composedOptions release];
+
+    return returnString;
 }
 
 @end
