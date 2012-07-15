@@ -23,6 +23,7 @@
 
 #import "ConvertAndSave.h"
 #import "intf.h"
+#import "playlist.h"
 #import <vlc_common.h>
 #import <vlc_url.h>
 
@@ -340,7 +341,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 {
     NSPasteboard *paste = [sender draggingPasteboard];
-    NSArray *types = [NSArray arrayWithObject: NSFilenamesPboardType];
+    NSArray *types = [NSArray arrayWithObjects: NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil];
     NSString *desired_type = [paste availableTypeFromArray: types];
     NSData *carried_data = [paste dataForType: desired_type];
 
@@ -353,6 +354,33 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
                 [self updateOKButton];
                 [self updateDropView];
                 return YES;
+            }
+        } else if( [desired_type isEqualToString:@"VLCPlaylistItemPboardType"] ) {
+            NSArray * array = [[[VLCMain sharedInstance] playlist] draggedItems];
+            NSUInteger count = [array count];
+            if (count > 0) {
+                playlist_t * p_playlist = pl_Get( VLCIntf );
+                playlist_item_t * p_item = NULL;
+
+                PL_LOCK;
+                /* let's look for the first proper input item */
+                for (NSUInteger x = 0; x < count; x++) {
+                    p_item = [[array objectAtIndex:x] pointerValue];
+                    if (p_item) {
+                        if (p_item->p_input) {
+                            if (p_item->p_input->psz_uri != nil) {
+                                [self setMRL: [NSString stringWithFormat:@"%s", p_item->p_input->psz_uri]];
+                                [self updateDropView];
+                                [self updateOKButton];
+
+                                PL_UNLOCK;
+
+                                return YES;
+                            }
+                        }
+                    }
+                }
+                PL_UNLOCK;
             }
         }
     }
@@ -569,7 +597,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
-    [self registerForDraggedTypes:[NSArray arrayWithObject: NSFilenamesPboardType]];
+    [self registerForDraggedTypes:[NSArray arrayWithObjects: NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
 }
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
@@ -601,7 +629,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
-    [self registerForDraggedTypes:[NSArray arrayWithObject: NSFilenamesPboardType]];
+    [self registerForDraggedTypes:[NSArray arrayWithObjects: NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
 }
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
@@ -633,7 +661,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
-    [self registerForDraggedTypes:[NSArray arrayWithObject: NSFilenamesPboardType]];
+    [self registerForDraggedTypes:[NSArray arrayWithObjects: NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
 }
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
