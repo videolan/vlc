@@ -79,6 +79,11 @@ extern OSErr UpdateSystemActivity(UInt8 activity);
 @interface NSURL (IntroducedInSnowLeopard)
 - (NSArray *)pathComponents;
 @end
+
+@interface NSCursor (IntroducedInSnowLeopard)
++ (NSCursor *)dragCopyCursor;
+@end
+
 #endif
 
 #pragma mark -

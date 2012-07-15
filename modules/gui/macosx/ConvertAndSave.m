@@ -605,6 +605,9 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     b_activeDragAndDrop = YES;
     [self setNeedsDisplay:YES];
 
+    if (OSX_SNOW_LEOPARD || OSX_LION)
+        [[NSCursor dragCopyCursor] set];
+
     if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) == NSDragOperationGeneric)
         return NSDragOperationGeneric;
 
@@ -613,12 +616,14 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (void)draggingEnded:(id < NSDraggingInfo >)sender
 {
+    [[NSCursor arrowCursor] set];
     b_activeDragAndDrop = NO;
     [self setNeedsDisplay:YES];
 }
 
 - (void)draggingExited:(id < NSDraggingInfo >)sender
 {
+    [[NSCursor arrowCursor] set];
     b_activeDragAndDrop = NO;
     [self setNeedsDisplay:YES];
 }
