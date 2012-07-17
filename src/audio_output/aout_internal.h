@@ -48,6 +48,8 @@ struct filter_owner_sys_t
     aout_input_t    *p_input;
 };
 
+typedef struct aout_volume aout_volume_t;
+
 /** an input stream for the audio output */
 struct aout_input_t
 {
@@ -82,24 +84,12 @@ typedef struct
     vlc_mutex_t lock;
     module_t *module; /**< Output plugin (or NULL if inactive) */
     aout_input_t *input;
+    aout_volume_t *volume;
 
     struct
     {
         date_t date;
     } sync;
-
-    struct
-    {
-        float amp; /**< Software volume amplification */
-        bool mute; /**< Software mute */
-        struct audio_mixer *mixer; /**< Software volume plugin */
-    } volume;
-
-    struct
-    {
-        vlc_atomic_t multiplier;
-        audio_replay_gain_t data;
-    } gain;
 
     audio_sample_format_t mixer_format;
     audio_sample_format_t input_format;
@@ -107,6 +97,12 @@ typedef struct
     /* Filters between mixer and output */
     filter_t *filters[AOUT_MAX_FILTERS];
     int       nb_filters;
+
+    struct
+    {
+        float volume;
+        bool mute;
+    } soft; /* temporary - TODO: move to output plugins */
 
     vlc_atomic_t restart;
 } aout_owner_t;
@@ -143,21 +139,12 @@ void aout_FiltersDestroyPipeline( filter_t *const *, unsigned );
 void aout_FiltersPlay( filter_t *const *, unsigned, block_t ** );
 
 /* From mixer.c : */
-#define aout_MixerNew(o, f) aout_MixerNew(VLC_OBJECT(o), f)
-
-float aout_ReplayGainSelect(vlc_object_t *, const char *,
-                            const audio_replay_gain_t *);
-#define aout_ReplayGainSelect(o, s, g) \
-        aout_ReplayGainSelect(VLC_OBJECT(o), s, g)
-
-static inline void aout_ReplayGainInit(audio_replay_gain_t *restrict d,
-                                       const audio_replay_gain_t *restrict s)
-{
-    if (s != NULL)
-        *d = *s;
-    else
-        memset (d, 0, sizeof (*d));
-}
+aout_volume_t *aout_volume_New(vlc_object_t *, const audio_replay_gain_t *);
+#define aout_volume_New(o, g) aout_volume_New(VLC_OBJECT(o), g)
+int aout_volume_SetFormat(aout_volume_t *, vlc_fourcc_t);
+void aout_volume_SetVolume(aout_volume_t *, float);
+int aout_volume_Amplify(aout_volume_t *, block_t *);
+void aout_volume_Delete(aout_volume_t *);
 
 
 /* From output.c : */

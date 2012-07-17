@@ -30,8 +30,9 @@
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
-#include <vlc_aout_mixer.h>
+#include <vlc_aout_volume.h>
 #include <vlc_filter.h>
+#include <vlc_modules.h>
 #include <vlc_plugin.h>
 
 
@@ -45,10 +46,10 @@ static block_t  *Process    ( filter_t *, block_t * );
 
 struct filter_sys_t
 {
+    audio_volume_t volume;
     float f_gain;
-    audio_mixer_t* p_mixer;
+    module_t *module;
 };
-
 
 /*****************************************************************************
  * Module descriptor
@@ -86,15 +87,17 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys = p_filter->p_sys = malloc( sizeof( *p_sys ) );
-    if( !p_sys )
+    p_sys = vlc_object_create( p_this, sizeof( *p_sys ) );
+    if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    p_sys->p_mixer = aout_MixerNew( p_this, p_filter->fmt_in.audio.i_format );
-    if( !p_sys->p_mixer )
+    p_filter->p_sys = p_sys;
+    p_sys->volume.format = p_filter->fmt_in.audio.i_format;
+    p_sys->module = module_need( &p_sys->volume, "audio volume", NULL, false );
+    if( p_sys->module == NULL )
     {
         msg_Warn( p_filter, "unsupported format" );
-        free( p_sys );
+        vlc_object_release( &p_sys->volume );
         return VLC_EGENERIC;
     }
 
@@ -114,8 +117,7 @@ static block_t *Process( filter_t *p_filter, block_t *p_block )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    aout_MixerRun( p_sys->p_mixer, p_block, p_sys->f_gain );
-
+    p_sys->volume.amplify( &p_sys->volume, p_block, p_sys->f_gain );
     return p_block;
 }
 
@@ -129,6 +131,6 @@ static void Close( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    aout_MixerDelete( p_sys->p_mixer );
-    free( p_sys );
+    module_unneed( &p_sys->volume, p_sys->module );
+    vlc_object_release( &p_sys->volume );
 }

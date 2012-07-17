@@ -11,9 +11,6 @@ aout_filter_RequestVout
 aout_FormatPrepare
 aout_FormatPrint
 aout_FormatPrintChannels
-aout_MixerDelete
-aout_MixerNew
-aout_MixerRun
 aout_VolumeGet
 aout_VolumeSet
 aout_VolumeUp

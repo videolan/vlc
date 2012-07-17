@@ -26,7 +26,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_access.h \
 	../include/vlc_aout.h \
 	../include/vlc_aout_intf.h \
-	../include/vlc_aout_mixer.h \
+	../include/vlc_aout_volume.h \
 	../include/vlc_arrays.h \
 	../include/vlc_art_finder.h \
 	../include/vlc_atomic.h \
@@ -384,8 +384,8 @@ SOURCES_libvlc_common = \
 	audio_output/dec.c \
 	audio_output/filters.c \
 	audio_output/input.c \
-	audio_output/mixer.c \
 	audio_output/output.c \
+	audio_output/volume.c \
 	audio_output/intf.c \
 	osd/osd.c \
 	osd/osd_text.c \

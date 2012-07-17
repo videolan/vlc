@@ -1,5 +1,5 @@
 /*****************************************************************************
- * float32.c : precise float32 audio mixer implementation
+ * float32.c : precise float32 audio volume implementation
  *****************************************************************************
  * Copyright (C) 2002 the VideoLAN team
  * $Id$
@@ -33,13 +33,13 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
-#include <vlc_aout_mixer.h>
+#include <vlc_aout_volume.h>
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int Create( vlc_object_t * );
-static void DoWork( audio_mixer_t *, block_t *, float );
+static void DoWork( audio_volume_t *, block_t *, float );
 
 /*****************************************************************************
  * Module descriptor
@@ -47,8 +47,8 @@ static void DoWork( audio_mixer_t *, block_t *, float );
 vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_MISC )
-    set_description( N_("Float32 audio mixer") )
-    set_capability( "audio mixer", 10 )
+    set_description( N_("Single precision audio volume") )
+    set_capability( "audio volume", 10 )
     set_callbacks( Create, NULL )
 vlc_module_end ()
 
@@ -57,19 +57,19 @@ vlc_module_end ()
  */
 static int Create( vlc_object_t *p_this )
 {
-    audio_mixer_t *p_mixer = (audio_mixer_t *)p_this;
+    audio_volume_t *p_volume = (audio_volume_t *)p_this;
 
-    if (p_mixer->format != VLC_CODEC_FL32)
+    if (p_volume->format != VLC_CODEC_FL32)
         return -1;
 
-    p_mixer->mix = DoWork;
+    p_volume->amplify = DoWork;
     return 0;
 }
 
 /**
  * Mixes a new output buffer
  */
-static void DoWork( audio_mixer_t * p_mixer, block_t *p_buffer,
+static void DoWork( audio_volume_t *p_volume, block_t *p_buffer,
                     float f_multiplier )
 {
     if( f_multiplier == 1.0 )
@@ -79,5 +79,5 @@ static void DoWork( audio_mixer_t * p_mixer, block_t *p_buffer,
     for( size_t i = p_buffer->i_buffer / sizeof(float); i > 0; i-- )
         *(p++) *= f_multiplier;
 
-    (void) p_mixer;
+    (void) p_volume;
 }

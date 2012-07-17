@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_aout_mixer.h : audio output mixer interface
+ * vlc_aout_volume.h: audio volume module
  *****************************************************************************
  * Copyright (C) 2002-2009 VLC authors and VideoLAN
  * $Id$
@@ -34,23 +34,18 @@
 extern "C" {
 #endif
 
-typedef struct audio_mixer audio_mixer_t;
+typedef struct audio_volume audio_volume_t;
 
-/** 
- * audio output mixer
+/**
+ * Audio volume
  */
-struct audio_mixer
+struct audio_volume
 {
     VLC_COMMON_MEMBERS
 
-    module_t *module; /**< Module handle */
     vlc_fourcc_t format; /**< Audio samples format */
-    void (*mix)(audio_mixer_t *, block_t *, float); /**< Amplifier */
+    void (*amplify)(audio_volume_t *, block_t *, float); /**< Amplifier */
 };
-
-VLC_API audio_mixer_t *aout_MixerNew(vlc_object_t *, vlc_fourcc_t) VLC_USED;
-VLC_API void aout_MixerDelete(audio_mixer_t *);
-VLC_API void aout_MixerRun(audio_mixer_t *, block_t *, float);
 
 #ifdef __cplusplus
 }

@@ -25,28 +25,28 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
-#include <vlc_aout_mixer.h>
+#include <vlc_aout_volume.h>
 
 static int Activate (vlc_object_t *);
 
 vlc_module_begin ()
     set_category (CAT_AUDIO)
     set_subcategory (SUBCAT_AUDIO_MISC)
-    set_description (N_("Integer audio mixer"))
-    set_capability ("audio mixer", 9)
+    set_description (N_("Integer audio volume"))
+    set_capability ("audio volume", 9)
     set_callbacks (Activate, NULL)
 vlc_module_end ()
 
-static void FilterS16N (audio_mixer_t *, block_t *, float);
+static void FilterS16N (audio_volume_t *, block_t *, float);
 
 static int Activate (vlc_object_t *obj)
 {
-    audio_mixer_t *mixer = (audio_mixer_t *)obj;
+    audio_volume_t *vol = (audio_volume_t *)obj;
 
-    switch (mixer->format)
+    switch (vol->format)
     {
         case VLC_CODEC_S16N:
-            mixer->mix = FilterS16N;
+            vol->amplify = FilterS16N;
             break;
         default:
             return -1;
@@ -54,7 +54,7 @@ static int Activate (vlc_object_t *obj)
     return 0;
 }
 
-static void FilterS16N (audio_mixer_t *mixer, block_t *block, float volume)
+static void FilterS16N (audio_volume_t *vol, block_t *block, float volume)
 {
     int32_t mult = volume * 0x1.p16;
 
@@ -83,5 +83,5 @@ static void FilterS16N (audio_mixer_t *mixer, block_t *block, float volume)
         }
     }
 
-    (void) mixer;
+    (void) vol;
 }

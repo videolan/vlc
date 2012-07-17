@@ -275,8 +275,6 @@ void aout_OutputDelete (audio_output_t *aout)
     aout->volume_set = NULL;
     aout->mute_set = NULL;
     owner->module = NULL;
-    owner->volume.amp = 1.f;
-    owner->volume.mute = false;
     aout_FiltersDestroyPipeline (owner->filters, owner->nb_filters);
 }
 
@@ -339,10 +337,12 @@ static int aout_SoftVolumeSet (audio_output_t *aout, float volume)
      * This provides a good tradeoff between low and high volume ranges.
      *
      * This code is only used for the VLC software mixer. If you change this
-     * formula, be sure to update the aout_VolumeHardInit()-based plugins also.
+     * formula, be sure to update the volume-capable plugins also.
      */
-    owner->volume.amp = volume * volume * volume;
     aout_VolumeReport (aout, volume);
+    volume = volume * volume * volume;
+    owner->soft.volume = volume;
+    aout_volume_SetVolume(owner->volume, owner->soft.mute ? 0.f : volume);
     return 0;
 }
 
@@ -351,8 +351,9 @@ static int aout_SoftMuteSet (audio_output_t *aout, bool mute)
     aout_owner_t *owner = aout_owner (aout);
 
     aout_assert_locked (aout);
-    owner->volume.mute = mute;
     aout_MuteReport (aout, mute);
+    owner->soft.mute = mute;
+    aout_volume_SetVolume(owner->volume, mute ? 0.f : owner->soft.volume);
     return 0;
 }
 
@@ -364,12 +365,15 @@ static int aout_SoftMuteSet (audio_output_t *aout, bool mute)
  */
 void aout_VolumeSoftInit (audio_output_t *aout)
 {
+    aout_owner_t *owner = aout_owner (aout);
     long volume = var_GetInteger (aout, "volume");
     bool mute = var_GetBool (aout, "mute");
 
     aout_assert_locked (aout);
+    /* volume depends on mute and vice versa... bootstrapping mute is easier */
+    owner->soft.mute = mute;
     aout->volume_set = aout_SoftVolumeSet;
     aout->mute_set = aout_SoftMuteSet;
     aout_SoftVolumeSet (aout, volume / (float)AOUT_VOLUME_DEFAULT);
-    aout_SoftMuteSet (aout, mute);
+    aout_MuteReport (aout, mute);
 }

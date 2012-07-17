@@ -61,9 +61,6 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
     vlc_mutex_init (&owner->lock);
     owner->module = NULL;
     owner->input = NULL;
-    owner->volume.amp = 1.f;
-    owner->volume.mute = false;
-    owner->volume.mixer = NULL;
 
     aout->pf_play = aout_DecDeleteBuffer;
     aout->volume_set = NULL;
