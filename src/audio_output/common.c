@@ -61,7 +61,6 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
     vlc_mutex_init (&owner->lock);
     owner->module = NULL;
     owner->input = NULL;
-    vlc_mutex_init (&owner->volume.lock);
     owner->volume.amp = 1.f;
     owner->volume.mute = false;
     owner->volume.mixer = NULL;
@@ -196,45 +195,8 @@ static void aout_Destructor (vlc_object_t *obj)
     audio_output_t *aout = (audio_output_t *)obj;
     aout_owner_t *owner = aout_owner (aout);
 
-    vlc_mutex_destroy (&owner->volume.lock);
     vlc_mutex_destroy (&owner->lock);
 }
-
-#ifdef AOUT_DEBUG
-/* Lock debugging */
-static __thread unsigned aout_locks = 0;
-
-void aout_lock_check (unsigned i)
-{
-    unsigned allowed;
-    switch (i)
-    {
-        case VOLUME_LOCK:
-            allowed = 0;
-            break;
-        case OUTPUT_LOCK:
-            allowed = VOLUME_LOCK;
-            break;
-        default:
-            abort ();
-    }
-
-    if (aout_locks & ~allowed)
-    {
-        fprintf (stderr, "Illegal audio lock transition (%x -> %x)\n",
-                 aout_locks, aout_locks|i);
-        vlc_backtrace ();
-        abort ();
-    }
-    aout_locks |= i;
-}
-
-void aout_unlock_check (unsigned i)
-{
-    assert (aout_locks & i);
-    aout_locks &= ~i;
-}
-#endif
 
 /*
  * Formats management (internal and external)

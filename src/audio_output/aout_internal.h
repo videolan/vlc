@@ -90,7 +90,6 @@ typedef struct
 
     struct
     {
-        vlc_mutex_t lock;
         float amp; /**< Software volume amplification */
         bool mute; /**< Software mute */
         struct audio_mixer *mixer; /**< Software volume plugin */
@@ -200,49 +199,14 @@ void aout_RequestRestart(audio_output_t *);
 void aout_Shutdown (audio_output_t *);
 
 /* Audio output locking */
-
-#if !defined (NDEBUG) \
- && defined __linux__ && (defined (__i386__) || defined (__x86_64__))
-# define AOUT_DEBUG 1
-#endif
-
-#ifdef AOUT_DEBUG
-enum
-{
-    OUTPUT_LOCK=1,
-    VOLUME_LOCK=2,
-};
-
-void aout_lock_check (unsigned);
-void aout_unlock_check (unsigned);
-
-#else
-# define aout_lock_check( i )   (void)0
-# define aout_unlock_check( i ) (void)0
-#endif
-
 static inline void aout_lock( audio_output_t *p_aout )
 {
-    aout_lock_check( OUTPUT_LOCK );
     vlc_mutex_lock( &aout_owner(p_aout)->lock );
 }
 
 static inline void aout_unlock( audio_output_t *p_aout )
 {
-    aout_unlock_check( OUTPUT_LOCK );
     vlc_mutex_unlock( &aout_owner(p_aout)->lock );
-}
-
-static inline void aout_lock_volume( audio_output_t *p_aout )
-{
-    aout_lock_check( VOLUME_LOCK );
-    vlc_mutex_lock( &aout_owner(p_aout)->volume.lock );
-}
-
-static inline void aout_unlock_volume( audio_output_t *p_aout )
-{
-    aout_unlock_check( VOLUME_LOCK );
-    vlc_mutex_unlock( &aout_owner(p_aout)->volume.lock );
 }
 
 #define aout_assert_locked( aout ) \
