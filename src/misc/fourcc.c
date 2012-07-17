@@ -155,6 +155,7 @@ static const entry_t p_list_video[] = {
         A("SN40"),
         A("EPHV"),
         A("DM4V"),
+        A("SM4V"),
         /* XVID flavours */
         E("xvid", "Xvid MPEG-4 Video"),
         E("XVID", "Xvid MPEG-4 Video"),
