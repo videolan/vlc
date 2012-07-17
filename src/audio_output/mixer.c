@@ -1,5 +1,5 @@
 /*****************************************************************************
- * mixer.c : audio output mixing operations
+ * mixer.c : audio output volume operations
  *****************************************************************************
  * Copyright (C) 2002-2004 VLC authors and VideoLAN
  * $Id$
@@ -38,13 +38,29 @@
 #include <vlc_aout_mixer.h>
 #include "aout_internal.h"
 
+/* Note: Once upon a time, the audio output volume module was also responsible
+ * for mixing multiple audio inputs together. Hence it was called mixer.
+ * Nowadays, there is only ever a single input per module instance, so this has
+ * become a misnomer. */
+
+typedef struct aout_volume
+{
+    audio_mixer_t volume;
+} aout_volume_t;
+
+static inline aout_volume_t *vol_priv(audio_mixer_t *volume)
+{
+    return (aout_volume_t *)volume;
+}
+
 #undef aout_MixerNew
 /**
  * Creates a software amplifier.
  */
 audio_mixer_t *aout_MixerNew(vlc_object_t *obj, vlc_fourcc_t format)
 {
-    audio_mixer_t *mixer = vlc_custom_create(obj, sizeof (*mixer), "mixer");
+    audio_mixer_t *mixer = vlc_custom_create(obj, sizeof (aout_volume_t),
+                                             "volume");
     if (unlikely(mixer == NULL))
         return NULL;
 
