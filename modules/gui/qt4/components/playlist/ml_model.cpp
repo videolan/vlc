@@ -593,59 +593,6 @@ bool MLModel::isCurrentItem( const QModelIndex &index, playLocation where ) cons
     return false;
 }
 
-bool MLModel::popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &selectionlist )
-{
-    QModelIndexList callerAsList;
-    callerAsList << ( index.isValid() ? index : QModelIndex() );
-
-#define ADD_MENU_ENTRY( icon, title, act, data ) \
-    action = menu.addAction( icon, title ); \
-    container.action = act; \
-    container.indexes = data; \
-    action->setData( QVariant::fromValue( container ) )
-
-    /* */
-    QMenu menu;
-    QAction *action;
-    VLCModel::actionsContainerType container;
-
-    if( index.isValid() )
-    {
-        ADD_MENU_ENTRY( QIcon( ":/menu/play" ), qtr(I_POP_PLAY),
-                        container.ACTION_PLAY, callerAsList );
-
-        ADD_MENU_ENTRY( QIcon( ":/menu/stream" ), qtr(I_POP_STREAM),
-                        container.ACTION_STREAM, selectionlist );
-
-        ADD_MENU_ENTRY( QIcon(), qtr(I_POP_SAVE),
-                        container.ACTION_SAVE, selectionlist );
-
-        ADD_MENU_ENTRY( QIcon( ":/menu/info" ), qtr(I_POP_INFO),
-                        container.ACTION_INFO, callerAsList );
-
-        menu.addSeparator();
-    }
-
-
-    QIcon addIcon( ":/buttons/playlist/playlist_add" );
-    menu.addSeparator();
-    //menu.addAction( addIcon, qtr(I_PL_ADDF), THEDP, SLOT( simpleMLAppendDialog()) );
-    //menu.addAction( addIcon, qtr(I_PL_ADDDIR), THEDP, SLOT( MLAppendDir() ) );
-    //menu.addAction( addIcon, qtr(I_OP_ADVOP), THEDP, SLOT( MLAppendDialog() ) );
-
-    if( index.isValid() )
-    {
-        ADD_MENU_ENTRY( QIcon( ":/buttons/playlist/playlist_remove" ), qtr(I_POP_DEL),
-                        container.ACTION_REMOVE, selectionlist );
-        menu.addSeparator();
-    }
-    if( !menu.isEmpty() )
-    {
-        menu.exec( point ); return true;
-    }
-    else return false;
-}
-
 QStringList MLModel::selectedURIs( QModelIndexList *current_selection )
 {
     QStringList list;

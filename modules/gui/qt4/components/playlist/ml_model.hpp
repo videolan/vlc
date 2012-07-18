@@ -93,7 +93,6 @@ public:
     void remove( QModelIndex idx );
 
     void clear();
-    virtual bool popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list );
     void play( const QModelIndex &idx );
     QStringList selectedURIs( QModelIndexList * );
     virtual QString getURI( const QModelIndex &index ) const;
