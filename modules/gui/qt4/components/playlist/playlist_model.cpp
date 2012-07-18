@@ -593,31 +593,6 @@ int PLModel::rowCount( const QModelIndex &parent ) const
     return parentItem->childCount();
 }
 
-QStringList PLModel::selectedURIs( QModelIndexList *current_selection )
-{
-    QStringList lst;
-    for( int i = 0; i < current_selection->count(); i++ )
-    {
-        const PLItem *item = getItem( current_selection->at(i) );
-        if( item )
-        {
-            PL_LOCK;
-            playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
-            if( p_item )
-            {
-                char *psz = input_item_GetURI( p_item->p_input );
-                if( psz )
-                {
-                    lst.append( qfu(psz) );
-                    free( psz );
-                }
-            }
-            PL_UNLOCK;
-        }
-    }
-    return lst;
-}
-
 /************************* Lookups *****************************/
 PLItem *PLModel::findById( PLItem *root, int i_id ) const
 {

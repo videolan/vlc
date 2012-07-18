@@ -566,18 +566,6 @@ bool MLModel::isCurrentItem( const QModelIndex &index, playLocation where ) cons
     return false;
 }
 
-QStringList MLModel::selectedURIs( QModelIndexList *current_selection )
-{
-    QStringList list;
-    for( int i = 0; i < current_selection->count(); i++ )
-    {
-        QModelIndex idx = current_selection->value(i);
-        MLItem *item = static_cast< MLItem* >( idx.internalPointer() );
-        list.append( QString( item->getUri().toString() ) );
-    }
-    return list;
-}
-
 QModelIndex MLModel::getIndexByMLID( int id ) const
 {
     for( int i = 0; i < rowCount( ); i++ )

@@ -150,7 +150,6 @@ private:
             return static_cast<PLItem*>( index.internalPointer() );
         else return rootItem;
     }
-    QStringList selectedURIs( QModelIndexList * );
     QModelIndex index( PLItem *, const int c ) const;
     bool isCurrent( const QModelIndex &index ) const;
     bool isParent( const QModelIndex &index, const QModelIndex &current) const;

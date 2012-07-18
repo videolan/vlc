@@ -95,7 +95,6 @@ public:
 
     void clear();
     void play( const QModelIndex &idx );
-    QStringList selectedURIs( QModelIndexList * );
     virtual QString getURI( const QModelIndex &index ) const;
     virtual QModelIndex rootIndex() const;
     virtual bool isTree() const;
