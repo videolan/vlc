@@ -35,11 +35,12 @@
 #include "components/playlist/selector.hpp"       /* PLSelector */
 #include "menus.hpp"                              /* Popup */
 #include "input_manager.hpp"                      /* THEMIM */
+#include "dialogs_provider.hpp"                   /* THEDP */
 
 #include <vlc_services_discovery.h>               /* SD_CMD_SEARCH */
+#include <vlc_intf_strings.h>                     /* POP_ */
 
 #include <QHeaderView>
-#include <QModelIndexList>
 #include <QMenu>
 #include <QKeyEvent>
 #include <QWheelEvent>
@@ -118,8 +119,138 @@ void StandardPLPanel::popupPlView( const QPoint &point )
     QItemSelectionModel *selection = currentView->selectionModel();
     QModelIndexList list = selection->selectedRows();
 
-    if( !model->popup( index, globalPoint, list ) )
+    if( !popup( index, globalPoint, list ) )
         VLCMenuBar::PopupMenu( p_intf, true );
+}
+
+/*********** Popup *********/
+bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &selectionlist )
+{
+    VLCModel *model = qobject_cast<VLCModel*>(currentView->model());
+    QModelIndexList callerAsList;
+    callerAsList << ( index.isValid() ? index : QModelIndex() );
+
+#define ADD_MENU_ENTRY( icon, title, act, data ) \
+    action = menu.addAction( icon, title ); \
+    container.action = act; \
+    container.indexes = data; \
+    action->setData( QVariant::fromValue( container ) )
+
+    /* */
+    QMenu menu;
+    QAction *action;
+    PLModel::actionsContainerType container;
+
+    /* Play/Stream/Info static actions */
+    if( index.isValid() )
+    {
+        ADD_MENU_ENTRY( QIcon( ":/menu/play" ), qtr(I_POP_PLAY),
+                        container.ACTION_PLAY, callerAsList );
+
+        ADD_MENU_ENTRY( QIcon( ":/menu/stream" ), qtr(I_POP_STREAM),
+                        container.ACTION_STREAM, selectionlist );
+
+        ADD_MENU_ENTRY( QIcon(), qtr(I_POP_SAVE),
+                        container.ACTION_SAVE, selectionlist );
+
+        ADD_MENU_ENTRY( QIcon( ":/menu/info" ), qtr(I_POP_INFO),
+                        container.ACTION_INFO, callerAsList );
+
+        menu.addSeparator();
+
+        if( model->getURI( index ).startsWith( "file://" ) )
+        {
+            ADD_MENU_ENTRY( QIcon( ":/type/folder-grey" ), qtr(I_POP_EXPLORE),
+                            container.ACTION_EXPLORE, callerAsList );
+        }
+    }
+
+    /* In PL or ML, allow to add a file/folder */
+    if( model->canEdit() )
+    {
+        QIcon addIcon( ":/buttons/playlist/playlist_add" );
+
+        if( model->isTree() )
+        {
+            ADD_MENU_ENTRY( addIcon, qtr(I_POP_NEWFOLDER),
+                            container.ACTION_ADDNODE, callerAsList );
+        }
+
+        menu.addSeparator();
+        if( model->isCurrentItem( model->rootIndex(), PLModel::IN_PLAYLIST ) )
+        {
+            menu.addAction( addIcon, qtr(I_PL_ADDF), THEDP, SLOT( simplePLAppendDialog()) );
+            menu.addAction( addIcon, qtr(I_PL_ADDDIR), THEDP, SLOT( PLAppendDir()) );
+            menu.addAction( addIcon, qtr(I_OP_ADVOP), THEDP, SLOT( PLAppendDialog()) );
+        }
+        else if( model->isCurrentItem( model->rootIndex(), PLModel::IN_MEDIALIBRARY ) )
+        {
+            menu.addAction( addIcon, qtr(I_PL_ADDF), THEDP, SLOT( simpleMLAppendDialog()) );
+            menu.addAction( addIcon, qtr(I_PL_ADDDIR), THEDP, SLOT( MLAppendDir() ) );
+            menu.addAction( addIcon, qtr(I_OP_ADVOP), THEDP, SLOT( MLAppendDialog() ) );
+        }
+    }
+
+    if( index.isValid() )
+    {
+        if( !model->isCurrentItem( model->rootIndex(), PLModel::IN_PLAYLIST ) )
+        {
+            ADD_MENU_ENTRY( QIcon(), qtr("Add to playlist"),
+                            container.ACTION_ADDTOPLAYLIST, selectionlist );
+        }
+    }
+
+    menu.addSeparator();
+
+    /* Item removal */
+    if( index.isValid() )
+    {
+        ADD_MENU_ENTRY( QIcon( ":/buttons/playlist/playlist_remove" ), qtr(I_POP_DEL),
+                        container.ACTION_REMOVE, selectionlist );
+    }
+
+    if( model->canEdit() ) {
+        menu.addAction( QIcon( ":/toolbar/clear" ), qtr("Clear playlist"),
+                        model, SLOT( clearPlaylist() ) );
+    }
+
+    menu.addSeparator();
+
+    /* Playlist sorting */
+    QMenu *sortingMenu = new QMenu( qtr( "Sort by" ) );
+    /* Choose what columns to show in sorting menu, not sure if this should be configurable*/
+    QList<int> sortingColumns;
+    sortingColumns << COLUMN_TITLE << COLUMN_ARTIST << COLUMN_ALBUM << COLUMN_TRACK_NUMBER << COLUMN_URI;
+    container.action = container.ACTION_SORT;
+    container.indexes = callerAsList;
+    foreach( int Column, sortingColumns )
+    {
+        action = sortingMenu->addAction( qfu( psz_column_title( Column ) ) + " " + qtr("Ascending") );
+        container.column = model->columnFromMeta(Column) + 1;
+        action->setData( QVariant::fromValue( container ) );
+
+        action = sortingMenu->addAction( qfu( psz_column_title( Column ) ) + " " + qtr("Descending") );
+        container.column = -1 * (model->columnFromMeta(Column)+1);
+        action->setData( QVariant::fromValue( container ) );
+    }
+    menu.addMenu( sortingMenu );
+
+    /* Zoom */
+    QMenu *zoomMenu = new QMenu( qtr( "Display size" ) );
+    zoomMenu->addAction( qtr( "Increase" ), model, SLOT( increaseZoom() ) );
+    zoomMenu->addAction( qtr( "Decrease" ), model, SLOT( decreaseZoom() ) );
+    menu.addMenu( zoomMenu );
+
+    CONNECT( &menu, triggered( QAction * ), model, actionSlot( QAction * ) );
+
+    /* Display and forward the result */
+    if( !menu.isEmpty() )
+    {
+        menu.exec( point ); return true;
+    }
+    else return false;
+
+#undef ADD_MENU_ENTRY
 }
 
 void StandardPLPanel::popupSelectColumn( QPoint )

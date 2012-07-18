@@ -52,13 +52,21 @@ public:
     VLCModel( intf_thread_t *_p_intf, QObject *parent = 0 );
     virtual int itemId( const QModelIndex & ) const = 0;
     virtual QModelIndex currentIndex() const = 0;
-    virtual bool popup( const QModelIndex & index,
-            const QPoint &point, const QModelIndexList &list ) = 0;
     virtual void doDelete( QModelIndexList ) = 0;
     virtual ~VLCModel();
     static QString getMeta( const QModelIndex & index, int meta );
     static QPixmap getArtPixmap( const QModelIndex & index, const QSize & size );
     static QString getArtUrl( const QModelIndex & index );
+    virtual QString getURI( const QModelIndex &index ) const = 0;
+    virtual QModelIndex rootIndex() const = 0;
+    virtual bool isTree() const = 0;
+    virtual bool canEdit() const = 0;
+    enum playLocation
+    {
+        IN_PLAYLIST,
+        IN_MEDIALIBRARY
+    };
+    virtual bool isCurrentItem( const QModelIndex &index, playLocation where ) const = 0;
 
     struct actionsContainerType
     {

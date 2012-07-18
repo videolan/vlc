@@ -97,26 +97,19 @@ public:
 
     /* Lookups */
     QModelIndex index( const int i_id, const int c );
-    QModelIndex rootIndex() const;
-    bool isTree() const;
-    bool canEdit() const;
+    virtual QModelIndex rootIndex() const;
+    virtual bool isTree() const;
+    virtual bool canEdit() const;
     virtual QModelIndex currentIndex() const;
     int itemId( const QModelIndex &index ) const;
-    QString getURI( const QModelIndex &index ) const;
+    virtual QString getURI( const QModelIndex &index ) const;
     QString getTitle( const QModelIndex &index ) const;
-    enum playLocation
-    {
-        IN_PLAYLIST,
-        IN_MEDIALIBRARY
-    };
-    bool isCurrentItem( const QModelIndex &index, playLocation where ) const;
+    virtual bool isCurrentItem( const QModelIndex &index, playLocation where ) const;
 
     /* */
     void search( const QString& search_text, const QModelIndex & root, bool b_recursive );
     void rebuild( playlist_item_t * p = NULL );
 
-    /* Popup Actions */
-    virtual bool popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list );
     virtual void doDelete( QModelIndexList selected );
 
 signals:

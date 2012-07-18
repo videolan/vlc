@@ -32,6 +32,7 @@
 #include "components/playlist/playlist.hpp"
 
 #include <QWidget>
+#include <QModelIndexList>
 
 #include <vlc_playlist.h> /* playlist_item_t */
 
@@ -74,6 +75,7 @@ protected:
     PLModel *model;
     MLModel *mlmodel;
     virtual void wheelEvent( QWheelEvent *e );
+    bool popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &selectionlist );
 
 private:
     intf_thread_t *p_intf;
