@@ -504,6 +504,37 @@ void MLModel::play( const QModelIndex &idx )
     AddItemToPlaylist( item->id(), true, p_ml, true );
 }
 
+QString MLModel::getURI( const QModelIndex &index ) const
+{
+    return QString();
+}
+
+QModelIndex MLModel::rootIndex() const
+{
+    // FIXME
+    return QModelIndex();
+}
+
+bool MLModel::isTree() const
+{
+    // FIXME ?
+    return false;
+}
+
+bool MLModel::canEdit() const
+{
+    /* can always insert */
+    return true;
+}
+
+bool MLModel::isCurrentItem( const QModelIndex &index, playLocation where ) const
+{
+    Q_UNUSED( index );
+    if ( where == IN_MEDIALIBRARY )
+        return true;
+    return false;
+}
+
 bool MLModel::popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list )
 {
     current_selection = list;
@@ -586,6 +617,18 @@ void MLModel::popupSave()
         THEDP->streamingDialog( NULL, mrls[0] );
 }
 
+QModelIndex MLModel::getIndexByMLID( int id ) const
+{
+    for( int i = 0; i < rowCount( ); i++ )
+    {
+        QModelIndex idx = index( i, 0 );
+        MLItem *item = static_cast< MLItem* >( idx.internalPointer() );
+        if( item->id() == id )
+            return idx;
+    }
+    return QModelIndex();
+}
+
 static int mediaAdded( vlc_object_t *p_this, char const *psz_var,
                                   vlc_value_t oldval, vlc_value_t newval,
                                   void *data )
@@ -614,17 +657,7 @@ static int mediaDeleted( vlc_object_t *p_this, char const *psz_var,
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
 
     MLModel* p_model = ( MLModel* )data;
-    QModelIndex remove_idx = QModelIndex();
-    for( int i = 0; i < p_model->rowCount( ); i++ )
-    {
-        QModelIndex idx = p_model->index( i, 0 );
-        MLItem *item = static_cast< MLItem* >( idx.internalPointer() );
-        if( item->id() == newval.i_int )
-        {
-            remove_idx = idx;
-            break;
-        }
-    }
+    QModelIndex remove_idx = p_model->getIndexByMLID( newval.i_int );
     if( remove_idx.isValid() )
         p_model->remove( remove_idx );
     return VLC_SUCCESS;

@@ -151,6 +151,11 @@ MLItem* MLItem::parent() const
     return parentItem;
 }
 
+input_item_t* MLItem::inputItem()
+{
+    return ml_CreateInputItem( p_ml,  id() );
+}
+
 /**
  * @brief Get a QVariant representing the data on a column
  * @param column

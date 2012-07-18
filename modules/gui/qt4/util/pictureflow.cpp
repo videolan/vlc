@@ -510,9 +510,7 @@ QRect PictureFlowSoftwareRenderer::renderSlide(const SlideInfo &slide, int col1,
         index = ((MLModel*)state->model)->index( slide.slideIndex, 0, QModelIndex() );
         if( !index.isValid() )
             return QRect();
-
-        MLItem *item = static_cast<MLItem*>( index.internalPointer() );
-        artURL = qfu( item->getMedia()->psz_cover );
+        artURL = mlm->data( index, COLUMN_COVER ).toString();
     }
 #endif
     QString key = QString("%1%2%3%4").arg(VLCModel::getMeta( index, COLUMN_TITLE )).arg( VLCModel::getMeta( index, COLUMN_ARTIST ) ).arg(index.data( VLCModel::IsCurrentRole ).toBool() ).arg( artURL );

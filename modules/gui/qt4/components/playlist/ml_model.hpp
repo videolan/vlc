@@ -54,12 +54,7 @@ public:
     // Basic QAbstractItemModel implementation
     MLModel( intf_thread_t *_p_intf, QObject *parent = NULL );
     virtual ~MLModel();
-    inline MLItem *getItem( QModelIndex index ) const
-    {
-        if( index.isValid() )
-            return static_cast<MLItem*>( index.internalPointer() );
-        else return NULL;
-    }
+
     virtual int itemId( const QModelIndex & ) const;
 
     QVariant data( const QModelIndex &idx, const int role = Qt::DisplayRole ) const;
@@ -95,13 +90,18 @@ public:
                            bool bSignal = true );
 
     virtual void doDelete( QModelIndexList list );
-    void remove( MLItem *item );
     void remove( QModelIndex idx );
 
     void clear();
     virtual bool popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list );
     void play( const QModelIndex &idx );
     QStringList selectedURIs();
+    virtual QString getURI( const QModelIndex &index ) const;
+    virtual QModelIndex rootIndex() const;
+    virtual bool isTree() const;
+    virtual bool canEdit() const;
+    virtual bool isCurrentItem( const QModelIndex &index, playLocation where ) const;
+    QModelIndex getIndexByMLID( int id ) const;
 
 public slots:
     void activateItem( const QModelIndex &index );
@@ -112,6 +112,15 @@ protected slots:
     void popupInfo();
     void popupStream();
     void popupSave();
+
+protected:
+    void remove( MLItem *item );
+    inline MLItem *getItem( QModelIndex index ) const
+    {
+        if( index.isValid() )
+            return static_cast<MLItem*>( index.internalPointer() );
+        else return NULL;
+    }
 
 private:
     QList< MLItem* > items;

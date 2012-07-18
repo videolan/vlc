@@ -45,11 +45,13 @@ class MLModel;
 
 class MLItem
 {
+    friend class MLModel;
 public:
     MLItem( const MLModel *p_model, intf_thread_t *_p_intf,
             ml_media_t *p_media, MLItem *p_parent );
     virtual ~MLItem();
 
+protected:
     void addChild( MLItem *child, int row = -1 );
     void delChild( int row );
     void clearChildren();
@@ -58,6 +60,7 @@ public:
     int childCount() const;
 
     MLItem* parent() const;
+    input_item_t *inputItem();
 
     QVariant data( int column ) const;
     bool setData( ml_select_e meta, const QVariant &data );
