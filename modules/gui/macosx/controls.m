@@ -163,7 +163,7 @@
         if( p_vout != NULL )
         {
             var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_POSITION );
-            vlc_object_release( (vlc_object_t *)p_vout );
+            vlc_object_release( p_vout );
         }
         vlc_object_release( p_input );
     }
@@ -359,14 +359,10 @@
                 /* Escape */
                 if( key == (unichar) 0x1b )
                 {
-                    vout_thread_t *p_vout = getVout();
-                    if (p_vout)
+                    if (var_GetBool( p_vout, "fullscreen" ))
                     {
-                        if (var_GetBool( p_vout, "fullscreen" ))
-                        {
-                            [[VLCCoreInteraction sharedInstance] toggleFullscreen];
-                            eventHandled = YES;
-                        }
+                        [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+                        eventHandled = YES;
                     }
                 }
                 else if( key == ' ' )
@@ -374,7 +370,7 @@
                     [self play:self];
                     eventHandled = YES;
                 }
-                vlc_object_release( (vlc_object_t *)p_vout );
+                vlc_object_release( p_vout );
             }
             vlc_object_release( p_input );
         }

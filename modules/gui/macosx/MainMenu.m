@@ -462,15 +462,13 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
             [self setupVarMenuItem: o_mi_visual target: (vlc_object_t *)p_aout
                                      var: "visual" selector: @selector(toggleVar:)];
-            vlc_object_release( (vlc_object_t *)p_aout );
+            vlc_object_release( p_aout );
         }
 
         vout_thread_t * p_vout = input_GetVout( p_input );
 
         if( p_vout != NULL )
         {
-            vlc_object_t * p_dec_obj;
-
             [self setupVarMenuItem: o_mi_aspect_ratio target: (vlc_object_t *)p_vout
                                      var: "aspect-ratio" selector: @selector(toggleVar:)];
 
@@ -488,7 +486,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
              (vlc_object_t *)p_vout var:"postprocess" selector:
              @selector(toggleVar:)];
 #endif
-            vlc_object_release( (vlc_object_t *)p_vout );
+            vlc_object_release( p_vout );
 
             [self refreshVoutDeviceMenu:nil];
             [self setSubmenusEnabled: YES];
@@ -1335,13 +1333,11 @@ static VLCMainMenu *_o_sharedInstance = nil;
             if( p_vout != NULL )
             {
                 if( [o_title isEqualToString: _NS("Float on Top")] )
-                {
                     [o_mi setState: var_GetBool( p_vout, "video-on-top" )];
-                }
 
                 bEnabled = TRUE;
 
-                vlc_object_release( (vlc_object_t *)p_vout );
+                vlc_object_release( p_vout );
             }
         }
         if( [o_title isEqualToString: _NS("Fullscreen")] )
@@ -1403,7 +1399,8 @@ bool b_telx = p_input && var_GetInteger( p_input, "teletext-es" ) >= 0;
 
 - (void)dealloc
 {
-    vlc_object_release( _vlc_object );
+    if( _vlc_object )
+        vlc_object_release( _vlc_object );
     if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING )
         free( value.psz_string );
     free( psz_name );

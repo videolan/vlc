@@ -73,6 +73,9 @@ static VLCBookmarks *_o_sharedInstance = nil;
 
 - (void)dealloc
 {
+    if (p_old_input)
+        vlc_object_release( p_old_input );
+
     [super dealloc];
 }
 
@@ -155,8 +158,14 @@ static VLCBookmarks *_o_sharedInstance = nil;
     int row;
     row = [o_tbl_dataTable selectedRow];
 
-    if( !p_input && row < 0 )
+    if( !p_input )
         return;
+
+    if( row < 0 )
+    {
+        vlc_object_release( p_input );
+        return;
+    }
 
     if( input_Control( p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks,
         &i_bookmarks ) != VLC_SUCCESS )
