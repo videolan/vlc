@@ -145,7 +145,6 @@ int aout_volume_Amplify(aout_volume_t *vol, block_t *block)
 static float aout_ReplayGainSelect(vlc_object_t *obj, const char *str,
                                    const audio_replay_gain_t *replay_gain)
 {
-    float gain = 0.;
     unsigned mode = AUDIO_REPLAY_GAIN_MAX;
 
     if (likely(str != NULL))
@@ -165,21 +164,32 @@ static float aout_ReplayGainSelect(vlc_object_t *obj, const char *str,
     }
 
     /* */
+    float multiplier;
+
     if (mode == AUDIO_REPLAY_GAIN_MAX)
-        return 1.;
-
-    if (replay_gain->pb_gain[mode])
-        gain = replay_gain->pf_gain[mode]
-             + var_InheritFloat (obj, "audio-replay-gain-preamp");
+    {
+        multiplier = 1.f;
+    }
     else
-        gain = var_InheritFloat (obj, "audio-replay-gain-default");
+    {
+        float gain;
 
-    float multiplier = pow (10., gain / 20.);
+        if (replay_gain->pb_gain[mode])
+            gain = replay_gain->pf_gain[mode]
+                 + var_InheritFloat (obj, "audio-replay-gain-preamp");
+        else
+            gain = var_InheritFloat (obj, "audio-replay-gain-default");
+
+        multiplier = pow (10., gain / 20.);
+    }
 
     if (replay_gain->pb_peak[mode]
      && var_InheritBool (obj, "audio-replay-gain-peak-protection")
      && replay_gain->pf_peak[mode] * multiplier > 1.0)
         multiplier = 1.0f / replay_gain->pf_peak[mode];
+
+    /* Command line / configuration gain */
+    multiplier *= var_InheritFloat (obj, "gain");
 
     return multiplier;
 }

@@ -149,6 +149,10 @@ static const char *const ppsz_snap_formats[] =
 #define MONO_LONGTEXT N_("This will force a mono audio output.")
 #endif
 
+#define GAIN_TEXT N_("Audio gain")
+#define GAIN_LONGTEXT N_( \
+    "Thus linear gain will be applied to outputted audio.")
+
 #define VOLUME_TEXT N_("Default audio volume")
 #define VOLUME_LONGTEXT N_( \
     "You can set the default audio output volume here.")
@@ -1470,6 +1474,8 @@ vlc_module_begin ()
 
     add_bool( "audio", 1, AUDIO_TEXT, AUDIO_LONGTEXT, false )
         change_safe ()
+    add_float( "gain", 1., GAIN_TEXT, GAIN_LONGTEXT, true )
+        change_float_range( 0., 8. )
     add_integer_with_range( "volume", AOUT_VOLUME_DEFAULT, 0,
                             AOUT_VOLUME_MAX, VOLUME_TEXT,
                             VOLUME_LONGTEXT, false )
