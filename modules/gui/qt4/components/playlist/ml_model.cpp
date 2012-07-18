@@ -36,7 +36,6 @@
 #include <QMimeData>
 #include "ml_item.hpp"
 #include "ml_model.hpp"
-#include "dialogs/mediainfo.hpp"
 #include "dialogs/playlist.hpp"
 #include "components/playlist/sorting.h"
 #include "dialogs_provider.hpp"
@@ -257,6 +256,11 @@ void MLModel::remove( QModelIndex idx )
 int MLModel::itemId( const QModelIndex &index ) const
 {
     return getItem( index )->id();
+}
+
+input_item_t * MLModel::getInputItem( const QModelIndex &index ) const
+{
+    return getItem( index )->inputItem();
 }
 
 QVariant MLModel::data( const QModelIndex &index, const int role ) const
@@ -511,11 +515,9 @@ QString MLModel::getURI( const QModelIndex &index ) const
 
 void MLModel::actionSlot( QAction *action )
 {
-    char *uri = NULL, *path = NULL;
     QString name;
     QStringList mrls;
     QModelIndex index;
-    bool ok;
     playlist_item_t *p_item;
 
     actionsContainerType a = action->data().value<actionsContainerType>();
@@ -527,35 +529,6 @@ void MLModel::actionSlot( QAction *action )
         break;
 
     case actionsContainerType::ACTION_ADDTOPLAYLIST:
-        break;
-
-    case actionsContainerType::ACTION_INFO:
-        if( a.indexes.first().isValid() )
-        {
-            input_item_t* p_input = getItem( a.indexes.first() )->inputItem();
-            MediaInfoDialog *mid = new MediaInfoDialog( p_intf, p_input );
-            mid->setParent( PlaylistDialog::getInstance( p_intf ),
-                            Qt::Dialog );
-            mid->show();
-        }
-        break;
-
-    case actionsContainerType::ACTION_STREAM:
-        mrls = selectedURIs( & a.indexes );
-        if( !mrls.isEmpty() )
-            THEDP->streamingDialog( NULL, mrls[0], false );
-        break;
-
-    case actionsContainerType::ACTION_EXPLORE:
-        break;
-
-    case actionsContainerType::ACTION_SAVE:
-        mrls = selectedURIs( & a.indexes );
-        if( !mrls.isEmpty() )
-            THEDP->streamingDialog( NULL, mrls[0] );
-        break;
-
-    case actionsContainerType::ACTION_ADDNODE:
         break;
 
     case actionsContainerType::ACTION_REMOVE:

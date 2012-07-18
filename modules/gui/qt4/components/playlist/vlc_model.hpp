@@ -51,6 +51,7 @@ public:
 
     VLCModel( intf_thread_t *_p_intf, QObject *parent = 0 );
     virtual int itemId( const QModelIndex & ) const = 0;
+    virtual input_item_t *getInputItem( const QModelIndex & ) const = 0;
     virtual QModelIndex currentIndex() const = 0;
     virtual void doDelete( QModelIndexList ) = 0;
     virtual ~VLCModel();
@@ -73,12 +74,7 @@ public:
         enum
         {
             ACTION_PLAY = 1,
-            ACTION_INFO,
-            ACTION_STREAM,
-            ACTION_SAVE,
-            ACTION_EXPLORE,
             ACTION_ADDTOPLAYLIST,
-            ACTION_ADDNODE,
             ACTION_REMOVE,
             ACTION_SORT
         } action;
@@ -111,6 +107,8 @@ public:
 
         return column;
     }
+
+    virtual void createNode( QModelIndex, QString ) {};
 
 public slots:
     virtual void activateItem( const QModelIndex &index ) = 0;

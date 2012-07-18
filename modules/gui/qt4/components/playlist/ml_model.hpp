@@ -56,6 +56,7 @@ public:
     virtual ~MLModel();
 
     virtual int itemId( const QModelIndex & ) const;
+    virtual input_item_t *getInputItem( const QModelIndex &index ) const;
 
     QVariant data( const QModelIndex &idx, const int role = Qt::DisplayRole ) const;
     bool setData( const QModelIndex &idx, const QVariant &value,

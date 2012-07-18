@@ -103,6 +103,9 @@ private:
     void changeModel ( bool b_ml );
     bool eventFilter ( QObject * watched, QEvent * event );
 
+    /* for popup */
+    QModelIndex popupIndex;  /* FIXME: don't store here, pass as Action param */
+
 public slots:
     void setRootItem( playlist_item_t *, bool );
     void browseInto( const QModelIndex& );
@@ -122,6 +125,11 @@ private slots:
 
     void popupPlView( const QPoint & );
     void popupSelectColumn( QPoint );
+    void popupPromptAndCreateNode();
+    void popupInfoDialog();
+    void popupExplore();
+    void popupStream();
+    void popupSave();
     void toggleColumnShown( int );
 
     void showView( int );

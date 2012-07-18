@@ -31,8 +31,6 @@
 #include "components/playlist/playlist_model.hpp"
 #include "dialogs_provider.hpp"                         /* THEDP */
 #include "input_manager.hpp"                            /* THEMIM */
-#include "dialogs/mediainfo.hpp"                        /* MediaInfo Dialog */
-#include "dialogs/playlist.hpp"                         /* Playlist Dialog */
 
 #include <vlc_intf_strings.h>                           /* I_DIR */
 
@@ -42,19 +40,7 @@
 #include <assert.h>
 #include <QIcon>
 #include <QFont>
-#include <QMenu>
-#include <QUrl>
-#include <QFileInfo>
-#include <QDesktopServices>
-#include <QInputDialog>
-#include <QSignalMapper>
 #include <QTimer>
-
-#define I_NEW_DIR \
-    I_DIR_OR_FOLDER( N_("Create Directory"), N_( "Create Folder" ) )
-#define I_NEW_DIR_NAME \
-    I_DIR_OR_FOLDER( N_( "Enter name for new directory:" ), \
-                     N_( "Enter name for new folder:" ) )
 
 QIcon PLModel::icons[ITEM_TYPE_NUMBER];
 
@@ -468,6 +454,11 @@ bool PLModel::isCurrent( const QModelIndex &index ) const
 int PLModel::itemId( const QModelIndex &index ) const
 {
     return getItem( index )->id();
+}
+
+input_item_t * PLModel::getInputItem( const QModelIndex &index ) const
+{
+    return getItem( index )->inputItem();
 }
 
 QString PLModel::getURI( const QModelIndex &index ) const
@@ -1094,14 +1085,25 @@ void PLModel::ensureArtRequested( const QModelIndex &index )
     }
 }
 
+
+void PLModel::createNode( QModelIndex index, QString name )
+{
+    if( name.isEmpty() || !index.isValid() ) return;
+
+    PL_LOCK;
+    index = index.parent();
+    if ( !index.isValid() ) index = rootIndex();
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, itemId( index ) );
+    if( p_item )
+        playlist_NodeCreate( p_playlist, qtu( name ), p_item, PLAYLIST_END, 0, NULL );
+    PL_UNLOCK;
+}
+
 void PLModel::actionSlot( QAction *action )
 {
-    char *uri = NULL, *path = NULL;
     QString name;
     QStringList mrls;
     QModelIndex index;
-    bool ok;
-    playlist_item_t *p_item;
 
     actionsContainerType a = action->data().value<actionsContainerType>();
     switch ( a.action )
@@ -1131,72 +1133,6 @@ void PLModel::actionSlot( QAction *action )
                                   THEPL->p_playing,
                                   PLAYLIST_END );
         }
-        PL_UNLOCK;
-        break;
-
-    case actionsContainerType::ACTION_INFO:
-        PL_LOCK;
-        if( a.indexes.first().isValid() )
-        {
-            input_item_t* p_input = getItem( a.indexes.first() )->inputItem();
-            vlc_gc_incref( p_input );
-            PL_UNLOCK;
-            MediaInfoDialog *mid = new MediaInfoDialog( p_intf, p_input );
-            vlc_gc_decref( p_input );
-            mid->setParent( PlaylistDialog::getInstance( p_intf ),
-                            Qt::Dialog );
-            mid->show();
-        } else
-            PL_UNLOCK;
-        break;
-
-    case actionsContainerType::ACTION_STREAM:
-        mrls = selectedURIs( & a.indexes );
-        if( !mrls.isEmpty() )
-            THEDP->streamingDialog( NULL, mrls[0], false );
-        break;
-
-    case actionsContainerType::ACTION_EXPLORE:
-        PL_LOCK;
-        if( a.indexes.first().isValid() )
-        {
-            input_item_t *p_input = getItem( a.indexes.first() )->inputItem();
-            uri = input_item_GetURI( p_input );
-        }
-        PL_UNLOCK;
-
-        if( uri != NULL )
-        {
-            path = make_path( uri );
-            free( uri );
-        }
-        if( path == NULL )
-            return;
-
-        QDesktopServices::openUrl(
-                    QUrl::fromLocalFile( QFileInfo( qfu( path ) ).absolutePath() ) );
-
-        free( path );
-        break;
-
-    case actionsContainerType::ACTION_SAVE:
-        mrls = selectedURIs( & a.indexes );
-        if( !mrls.isEmpty() )
-            THEDP->streamingDialog( NULL, mrls[0] );
-        break;
-
-    case actionsContainerType::ACTION_ADDNODE:
-        name = QInputDialog::getText( PlaylistDialog::getInstance( p_intf ),
-            qtr( I_NEW_DIR ), qtr( I_NEW_DIR_NAME ),
-            QLineEdit::Normal, QString(), &ok);
-        if( !ok || name.isEmpty() || !a.indexes.first().isValid() ) return;
-
-        PL_LOCK;
-        index = a.indexes.first().parent();
-        if ( !index.isValid() ) index = rootIndex();
-        p_item = playlist_ItemGetById( p_playlist, itemId( index ) );
-        if( p_item )
-            playlist_NodeCreate( p_playlist, qtu( name ), p_item, PLAYLIST_END, 0, NULL );
         PL_UNLOCK;
         break;
 

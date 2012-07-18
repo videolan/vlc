@@ -102,6 +102,7 @@ public:
     virtual bool canEdit() const;
     virtual QModelIndex currentIndex() const;
     int itemId( const QModelIndex &index ) const;
+    virtual input_item_t *getInputItem( const QModelIndex & ) const;
     virtual QString getURI( const QModelIndex &index ) const;
     QString getTitle( const QModelIndex &index ) const;
     virtual bool isCurrentItem( const QModelIndex &index, playLocation where ) const;
@@ -111,6 +112,7 @@ public:
     void rebuild( playlist_item_t * p = NULL );
 
     virtual void doDelete( QModelIndexList selected );
+    virtual void createNode( QModelIndex index, QString name );
 
 signals:
     void currentIndexChanged( const QModelIndex& );

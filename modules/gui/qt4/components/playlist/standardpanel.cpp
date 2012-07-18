@@ -36,9 +36,17 @@
 #include "menus.hpp"                              /* Popup */
 #include "input_manager.hpp"                      /* THEMIM */
 #include "dialogs_provider.hpp"                   /* THEDP */
+#include "dialogs/playlist.hpp"                   /* Playlist Dialog */
+#include "dialogs/mediainfo.hpp"                  /* MediaInfoDialog */
 
 #include <vlc_services_discovery.h>               /* SD_CMD_SEARCH */
 #include <vlc_intf_strings.h>                     /* POP_ */
+
+#define I_NEW_DIR \
+    I_DIR_OR_FOLDER( N_("Create Directory"), N_( "Create Folder" ) )
+#define I_NEW_DIR_NAME \
+    I_DIR_OR_FOLDER( N_( "Enter name for new directory:" ), \
+                     N_( "Enter name for new folder:" ) )
 
 #include <QHeaderView>
 #include <QMenu>
@@ -48,6 +56,9 @@
 #include <QSignalMapper>
 #include <QSettings>
 #include <QStylePainter>
+#include <QInputDialog>
+#include <QDesktopServices>
+#include <QUrl>
 
 #include <assert.h>
 
@@ -129,6 +140,7 @@ bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, con
     VLCModel *model = qobject_cast<VLCModel*>(currentView->model());
     QModelIndexList callerAsList;
     callerAsList << ( index.isValid() ? index : QModelIndex() );
+    popupIndex = index; /* suitable for modal only */
 
 #define ADD_MENU_ENTRY( icon, title, act, data ) \
     action = menu.addAction( icon, title ); \
@@ -147,22 +159,20 @@ bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, con
         ADD_MENU_ENTRY( QIcon( ":/menu/play" ), qtr(I_POP_PLAY),
                         container.ACTION_PLAY, callerAsList );
 
-        ADD_MENU_ENTRY( QIcon( ":/menu/stream" ), qtr(I_POP_STREAM),
-                        container.ACTION_STREAM, selectionlist );
+        menu.addAction( QIcon( ":/menu/stream" ), qtr(I_POP_STREAM),
+                        this, SLOT( popupStream() ) );
 
-        ADD_MENU_ENTRY( QIcon(), qtr(I_POP_SAVE),
-                        container.ACTION_SAVE, selectionlist );
+        menu.addAction( QIcon(), qtr(I_POP_SAVE),
+                        this, SLOT( popupSave() ) );
 
-        ADD_MENU_ENTRY( QIcon( ":/menu/info" ), qtr(I_POP_INFO),
-                        container.ACTION_INFO, callerAsList );
+        menu.addAction( QIcon( ":/menu/info" ), qtr(I_POP_INFO),
+                        this, SLOT( popupInfoDialog() ) );
 
         menu.addSeparator();
 
         if( model->getURI( index ).startsWith( "file://" ) )
-        {
-            ADD_MENU_ENTRY( QIcon( ":/type/folder-grey" ), qtr(I_POP_EXPLORE),
-                            container.ACTION_EXPLORE, callerAsList );
-        }
+            menu.addAction( QIcon( ":/type/folder-grey" ), qtr(I_POP_EXPLORE),
+                            this, SLOT( popupExplore() ) );
     }
 
     /* In PL or ML, allow to add a file/folder */
@@ -171,10 +181,8 @@ bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, con
         QIcon addIcon( ":/buttons/playlist/playlist_add" );
 
         if( model->isTree() )
-        {
-            ADD_MENU_ENTRY( addIcon, qtr(I_POP_NEWFOLDER),
-                            container.ACTION_ADDNODE, callerAsList );
-        }
+            menu.addAction( addIcon, qtr(I_POP_NEWFOLDER),
+                            this, SLOT( popupPromptAndCreateNode() ) );
 
         menu.addSeparator();
         if( model->isCurrentItem( model->rootIndex(), PLModel::IN_PLAYLIST ) )
@@ -269,6 +277,63 @@ void StandardPLPanel::popupSelectColumn( QPoint )
         CONNECT( option, triggered(), selectColumnsSigMapper, map() );
     }
     menu.exec( QCursor::pos() );
+}
+
+void StandardPLPanel::popupPromptAndCreateNode()
+{
+    bool ok;
+    QString name = QInputDialog::getText( PlaylistDialog::getInstance( p_intf ),
+        qtr( I_NEW_DIR ), qtr( I_NEW_DIR_NAME ),
+        QLineEdit::Normal, QString(), &ok);
+    if ( !ok ) return;
+    qobject_cast<VLCModel *>(currentView->model())->createNode( popupIndex, name );
+}
+
+void StandardPLPanel::popupInfoDialog()
+{
+    if( popupIndex.isValid() )
+    {
+        VLCModel *model = qobject_cast<VLCModel *>(currentView->model());
+        input_item_t* p_input = model->getInputItem( popupIndex );
+        MediaInfoDialog *mid = new MediaInfoDialog( p_intf, p_input );
+        mid->setParent( PlaylistDialog::getInstance( p_intf ),
+                        Qt::Dialog );
+        mid->show();
+    }
+}
+
+void StandardPLPanel::popupExplore()
+{
+    VLCModel *model = qobject_cast<VLCModel *>(currentView->model());
+    QString uri = model->getURI( popupIndex );
+    char *path = NULL;
+
+    if( ! uri.isEmpty() )
+        path = make_path( uri.toStdString().c_str() );
+
+    if( path == NULL )
+        return;
+
+    QDesktopServices::openUrl(
+                QUrl::fromLocalFile( QFileInfo( qfu( path ) ).absolutePath() ) );
+
+    free( path );
+}
+
+void StandardPLPanel::popupStream()
+{
+    VLCModel *model = qobject_cast<VLCModel *>(currentView->model());
+    QString uri = model->getURI( popupIndex );
+    if ( ! uri.isEmpty() )
+        THEDP->streamingDialog( NULL, uri, false );
+}
+
+void StandardPLPanel::popupSave()
+{
+    VLCModel *model = qobject_cast<VLCModel *>(currentView->model());
+    QString uri = model->getURI( popupIndex );
+    if ( ! uri.isEmpty() )
+        THEDP->streamingDialog( NULL, uri );
 }
 
 void StandardPLPanel::toggleColumnShown( int i )
