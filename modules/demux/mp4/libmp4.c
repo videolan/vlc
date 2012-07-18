@@ -3440,6 +3440,39 @@ void MP4_BoxFree( stream_t *s, MP4_Box_t *p_box )
     free( p_box );
 }
 
+/* SmooBox is a very simple MP4 box, VLC specific, used only for the stream_filter to
+ * send information to the demux. SmooBox is actually a simplified moov box (we wanted
+ * to avoid the hassle of building a moov box at the stream_filter level) */
+MP4_Box_t *MP4_BoxGetSmooBox( stream_t *s )
+{
+    /* p_chunk is a virtual root container for the smoo box */
+    MP4_Box_t *p_chunk;
+    MP4_Box_t *p_smoo;
+
+    p_chunk = calloc( 1, sizeof( MP4_Box_t ) );
+    if( unlikely( p_chunk == NULL ) )
+        return NULL;
+
+    p_chunk->i_type = ATOM_root;
+    p_chunk->i_shortsize = 1;
+
+    p_smoo = MP4_ReadBox( s, p_chunk );
+    if( !p_smoo || p_smoo->i_type != ATOM_uuid || CmpUUID( &p_smoo->i_uuid, &SmooBoxUUID ) )
+    {
+        msg_Warn( s, "no smoo box found!");
+        goto error;
+    }
+
+    p_chunk->p_first = p_smoo;
+    p_chunk->p_last = p_smoo;
+
+    return p_chunk;
+
+error:
+    free( p_chunk );
+    return NULL;
+}
+
 MP4_Box_t *MP4_BoxGetInitFrag( stream_t *s )
 {
     /* p_chunk is a virtual root container for the ftyp and moov boxes */
@@ -3497,6 +3530,24 @@ MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
     MP4_Box_t *p_chunk;
     MP4_Box_t *p_moof = NULL;
     MP4_Box_t *p_sidx = NULL;
+    MP4_Box_t *p_tmp_box = NULL;
+
+    p_tmp_box = calloc( 1, sizeof( MP4_Box_t ) );
+    if( unlikely( p_tmp_box == NULL ) )
+        return NULL;
+
+    /* We might get a ftyp box or a SmooBox */
+    MP4_ReadBoxCommon( s, p_tmp_box );
+
+    if( (p_tmp_box->i_type == ATOM_uuid && !CmpUUID( &p_tmp_box->i_uuid, &SmooBoxUUID )) )
+    {
+        return MP4_BoxGetSmooBox( s );
+    }
+    else if( p_tmp_box->i_type == ATOM_ftyp )
+    {
+        return MP4_BoxGetInitFrag( s );
+    }
+    free( p_tmp_box );
 
     p_chunk = calloc( 1, sizeof( MP4_Box_t ) );
     if( unlikely( p_chunk == NULL ) )

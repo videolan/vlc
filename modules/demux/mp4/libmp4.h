@@ -1476,6 +1476,7 @@ static const UUID_t StraBoxUUID = {
                 { 0xb0, 0x3e, 0xf7, 0x70, 0x33, 0xbd, 0x4b, 0xac,
                   0x96, 0xc7, 0xbf, 0x25, 0xf9, 0x7e, 0x24, 0x47 } };
 
+MP4_Box_t *MP4_BoxGetSmooBox( stream_t * );
 /*****************************************************************************
  * MP4_BoxGetInitFrag : Parse the initialization segment.
  *****************************************************************************
