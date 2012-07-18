@@ -181,9 +181,6 @@ private:
     int i_cached_id;
     int i_cached_input_id;
 
-    /* Zoom factor for font-size */
-    int i_zoom;
-
     /* */
     QString latestSearch;
 
@@ -194,8 +191,6 @@ private slots:
     void processItemAppend( int item, int parent );
     void commitBufferedRowInserts();
     void activateItem( playlist_item_t *p_item );
-    void increaseZoom();
-    void decreaseZoom();
 };
 
 class PlMimeData : public QMimeData

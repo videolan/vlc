@@ -1215,19 +1215,6 @@ void PLModel::actionSlot( QAction *action )
     }
 }
 
-/* */
-void PLModel::increaseZoom()
-{
-    i_zoom++;
-    emit layoutChanged();
-}
-
-void PLModel::decreaseZoom()
-{
-    i_zoom--;
-    emit layoutChanged();
-}
-
 /******************* Drag and Drop helper class ******************/
 PlMimeData::~PlMimeData()
 {
