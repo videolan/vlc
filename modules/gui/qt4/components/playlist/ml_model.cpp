@@ -509,6 +509,64 @@ QString MLModel::getURI( const QModelIndex &index ) const
     return QString();
 }
 
+void MLModel::actionSlot( QAction *action )
+{
+    char *uri = NULL, *path = NULL;
+    QString name;
+    QStringList mrls;
+    QModelIndex index;
+    bool ok;
+    playlist_item_t *p_item;
+
+    actionsContainerType a = action->data().value<actionsContainerType>();
+    switch ( a.action )
+    {
+
+    case actionsContainerType::ACTION_PLAY:
+        play( a.indexes.first() );
+        break;
+
+    case actionsContainerType::ACTION_ADDTOPLAYLIST:
+        break;
+
+    case actionsContainerType::ACTION_INFO:
+        if( a.indexes.first().isValid() )
+        {
+            input_item_t* p_input = getItem( a.indexes.first() )->inputItem();
+            MediaInfoDialog *mid = new MediaInfoDialog( p_intf, p_input );
+            mid->setParent( PlaylistDialog::getInstance( p_intf ),
+                            Qt::Dialog );
+            mid->show();
+        }
+        break;
+
+    case actionsContainerType::ACTION_STREAM:
+        mrls = selectedURIs( & a.indexes );
+        if( !mrls.isEmpty() )
+            THEDP->streamingDialog( NULL, mrls[0], false );
+        break;
+
+    case actionsContainerType::ACTION_EXPLORE:
+        break;
+
+    case actionsContainerType::ACTION_SAVE:
+        mrls = selectedURIs( & a.indexes );
+        if( !mrls.isEmpty() )
+            THEDP->streamingDialog( NULL, mrls[0] );
+        break;
+
+    case actionsContainerType::ACTION_ADDNODE:
+        break;
+
+    case actionsContainerType::ACTION_REMOVE:
+        doDelete( a.indexes );
+        break;
+
+    case actionsContainerType::ACTION_SORT:
+        break;
+    }
+}
+
 QModelIndex MLModel::rootIndex() const
 {
     // FIXME
@@ -535,18 +593,36 @@ bool MLModel::isCurrentItem( const QModelIndex &index, playLocation where ) cons
     return false;
 }
 
-bool MLModel::popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list )
+bool MLModel::popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &selectionlist )
 {
-    current_selection = list;
-    current_index = index;
+    QModelIndexList callerAsList;
+    callerAsList << ( index.isValid() ? index : QModelIndex() );
+
+#define ADD_MENU_ENTRY( icon, title, act, data ) \
+    action = menu.addAction( icon, title ); \
+    container.action = act; \
+    container.indexes = data; \
+    action->setData( QVariant::fromValue( container ) )
+
+    /* */
     QMenu menu;
+    QAction *action;
+    VLCModel::actionsContainerType container;
+
     if( index.isValid() )
     {
-        menu.addAction( QIcon( ":/menu/play" ), qtr(I_POP_PLAY), this, SLOT( popupPlay() ) );
-        menu.addAction( QIcon( ":/menu/stream" ),
-                        qtr(I_POP_STREAM), this, SLOT( popupStream() ) );
-        menu.addAction( qtr(I_POP_SAVE), this, SLOT( popupSave() ) );
-        menu.addAction( QIcon( ":/menu/info" ), qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
+        ADD_MENU_ENTRY( QIcon( ":/menu/play" ), qtr(I_POP_PLAY),
+                        container.ACTION_PLAY, callerAsList );
+
+        ADD_MENU_ENTRY( QIcon( ":/menu/stream" ), qtr(I_POP_STREAM),
+                        container.ACTION_STREAM, selectionlist );
+
+        ADD_MENU_ENTRY( QIcon(), qtr(I_POP_SAVE),
+                        container.ACTION_SAVE, selectionlist );
+
+        ADD_MENU_ENTRY( QIcon( ":/menu/info" ), qtr(I_POP_INFO),
+                        container.ACTION_INFO, callerAsList );
+
         menu.addSeparator();
     }
 
@@ -559,8 +635,8 @@ bool MLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
 
     if( index.isValid() )
     {
-        menu.addAction( QIcon( ":/buttons/playlist/playlist_remove" ),
-                        qtr(I_POP_DEL), this, SLOT( popupDel() ) );
+        ADD_MENU_ENTRY( QIcon( ":/buttons/playlist/playlist_remove" ), qtr(I_POP_DEL),
+                        container.ACTION_REMOVE, selectionlist );
         menu.addSeparator();
     }
     if( !menu.isEmpty() )
@@ -570,51 +646,16 @@ bool MLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
     else return false;
 }
 
-void MLModel::popupPlay()
-{
-    play( current_index );
-}
-
-void MLModel::popupDel()
-{
-    doDelete( current_selection );
-}
-
-void MLModel::popupInfo()
-{
-    MLItem *item = static_cast< MLItem* >( current_index.internalPointer() );
-    input_item_t* p_input = ml_CreateInputItem( p_ml,  item->id() );
-    MediaInfoDialog *mid = new MediaInfoDialog( p_intf, p_input );
-    mid->setParent( PlaylistDialog::getInstance( p_intf ),
-                    Qt::Dialog );
-    mid->show();
-}
-
-QStringList MLModel::selectedURIs()
+QStringList MLModel::selectedURIs( QModelIndexList *current_selection )
 {
     QStringList list;
-    for( int i = 0; i < current_selection.count(); i++ )
+    for( int i = 0; i < current_selection->count(); i++ )
     {
-        QModelIndex idx = current_selection.value(i);
+        QModelIndex idx = current_selection->value(i);
         MLItem *item = static_cast< MLItem* >( idx.internalPointer() );
         list.append( QString( item->getUri().toString() ) );
     }
     return list;
-}
-
-void MLModel::popupStream()
-{
-    QStringList mrls = selectedURIs();
-    if( !mrls.isEmpty() )
-        THEDP->streamingDialog( NULL, mrls[0], false );
-
-}
-
-void MLModel::popupSave()
-{
-    QStringList mrls = selectedURIs();
-    if( !mrls.isEmpty() )
-        THEDP->streamingDialog( NULL, mrls[0] );
 }
 
 QModelIndex MLModel::getIndexByMLID( int id ) const

@@ -95,7 +95,7 @@ public:
     void clear();
     virtual bool popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list );
     void play( const QModelIndex &idx );
-    QStringList selectedURIs();
+    QStringList selectedURIs( QModelIndexList * );
     virtual QString getURI( const QModelIndex &index ) const;
     virtual QModelIndex rootIndex() const;
     virtual bool isTree() const;
@@ -105,13 +105,7 @@ public:
 
 public slots:
     void activateItem( const QModelIndex &index );
-
-protected slots:
-    void popupDel();
-    void popupPlay();
-    void popupInfo();
-    void popupStream();
-    void popupSave();
+    virtual void actionSlot( QAction *action );
 
 protected:
     void remove( MLItem *item );
@@ -126,8 +120,6 @@ private:
     QList< MLItem* > items;
     media_library_t* p_ml;
 
-    QModelIndex current_index;
-    QModelIndexList current_selection;
 };
 
 #endif
