@@ -475,12 +475,66 @@ static void MP4_FreeBox_tfrf( MP4_Box_t *p_box )
     FREENULL( p_box->data.p_tfrf->p_tfrf_data_fields );
 }
 
+static int MP4_ReadBox_stra( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_stra_t );
+    MP4_Box_data_stra_t *p_stra = p_box->data.p_stra;
+
+    uint8_t i_reserved;
+    MP4_GET1BYTE( p_stra->i_es_cat );
+    MP4_GET1BYTE( i_reserved );
+    MP4_GET2BYTES( p_stra->i_track_ID );
+
+    MP4_GET4BYTES( p_stra->i_timescale );
+    MP4_GET8BYTES( p_stra->i_duration );
+
+    MP4_GET4BYTES( p_stra->FourCC );
+    MP4_GET4BYTES( p_stra->Bitrate );
+    MP4_GET4BYTES( p_stra->MaxWidth );
+    MP4_GET4BYTES( p_stra->MaxHeight );
+    MP4_GET4BYTES( p_stra->SamplingRate );
+    MP4_GET4BYTES( p_stra->Channels );
+    MP4_GET4BYTES( p_stra->BitsPerSample );
+    MP4_GET4BYTES( p_stra->PacketSize );
+    MP4_GET4BYTES( p_stra->AudioTag );
+    MP4_GET2BYTES( p_stra->nBlockAlign );
+
+    MP4_GET1BYTE( i_reserved );
+    MP4_GET1BYTE( i_reserved );
+    MP4_GET1BYTE( i_reserved );
+    uint8_t codec_data_length;
+    MP4_GET1BYTE( codec_data_length );
+    p_stra->CodecPrivateData = malloc( codec_data_length + 1);
+    if( unlikely( p_stra->CodecPrivateData == NULL ) )
+        goto error;
+    MP4_GETSTRINGZ( p_stra->CodecPrivateData );
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream, "es_cat is %"PRIu8", birate is %"PRIu32", "\
+            "CodecPrivateData is %s", p_stra->i_es_cat,
+            p_stra->Bitrate, p_stra->CodecPrivateData );
+#endif
+
+    MP4_READBOX_EXIT( 1 );
+error:
+    MP4_READBOX_EXIT( 0 );
+}
+
+static void MP4_FreeBox_stra( MP4_Box_t *p_box )
+{
+    FREENULL( p_box->data.p_stra->CodecPrivateData );
+}
+
 static int MP4_ReadBox_uuid( stream_t *p_stream, MP4_Box_t *p_box )
 {
     if( !CmpUUID( &p_box->i_uuid, &TfrfBoxUUID ) )
         return MP4_ReadBox_tfrf( p_stream, p_box );
     if( !CmpUUID( &p_box->i_uuid, &TfxdBoxUUID ) )
         return MP4_ReadBox_tfxd( p_stream, p_box );
+    if( !CmpUUID( &p_box->i_uuid, &SmooBoxUUID ) )
+        return MP4_ReadBoxContainer( p_stream, p_box );
+    if( !CmpUUID( &p_box->i_uuid, &StraBoxUUID ) )
+        return MP4_ReadBox_stra( p_stream, p_box );
 
     msg_Warn( p_stream, "Unknown uuid type box" );
     return 1;
@@ -492,6 +546,10 @@ static void MP4_FreeBox_uuid( MP4_Box_t *p_box )
         return MP4_FreeBox_tfrf( p_box );
     if( !CmpUUID( &p_box->i_uuid, &TfxdBoxUUID ) )
         return MP4_FreeBox_Common( p_box );
+    if( !CmpUUID( &p_box->i_uuid, &SmooBoxUUID ) )
+        return MP4_FreeBox_Common( p_box );
+    if( !CmpUUID( &p_box->i_uuid, &StraBoxUUID ) )
+        return MP4_FreeBox_stra( p_box );
 }
 
 static int MP4_ReadBox_sidx(  stream_t *p_stream, MP4_Box_t *p_box )
