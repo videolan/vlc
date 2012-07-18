@@ -1140,12 +1140,14 @@ typedef struct
     uint32_t MaxWidth;
     uint32_t MaxHeight;
     uint32_t SamplingRate;
+    uint32_t AvgBytesPerSec;
     uint32_t Channels;
     uint32_t BitsPerSample;
     uint32_t PacketSize;
     uint32_t AudioTag;
     uint16_t nBlockAlign;
-    char     *CodecPrivateData;
+    uint8_t  cpd_len;
+    uint8_t  *CodecPrivateData;
 } MP4_Box_data_stra_t;
 
 /*
@@ -1346,7 +1348,8 @@ typedef struct
     MP4_Box_t *p_sample;/* point on actual sdsd */
 
     bool b_drms;
-    bool b_end_of_chunk;
+    bool b_has_non_empty_cchunk;
+    bool b_codec_need_restart;
     void      *p_drms;
     MP4_Box_t *p_skcr;
 
@@ -1477,13 +1480,6 @@ static const UUID_t StraBoxUUID = {
                   0x96, 0xc7, 0xbf, 0x25, 0xf9, 0x7e, 0x24, 0x47 } };
 
 MP4_Box_t *MP4_BoxGetSmooBox( stream_t * );
-/*****************************************************************************
- * MP4_BoxGetInitFrag : Parse the initialization segment.
- *****************************************************************************
- *  The first box is a virtual box "root", and is the father of the boxes
- *  'ftyp' and 'moov'.
- *****************************************************************************/
-MP4_Box_t *MP4_BoxGetInitFrag( stream_t * );
 
 /*****************************************************************************
  * MP4_BoxGetNextChunk : Parse the entire moof box.

@@ -159,15 +159,20 @@ static int MP4_NextBox( stream_t *p_stream, MP4_Box_t *p_box )
 
     if( p_box->p_father )
     {
-        const off_t i_box_end = p_box->i_size + p_box->i_pos;
-        const off_t i_father_end = p_box->p_father->i_size + p_box->p_father->i_pos;
-
-        /* check if it's within p-father */
-        if( i_box_end >= i_father_end )
+        /* if father's size == 0, it means unknown or infinite size,
+         * and we skip the followong check */
+        if( p_box->p_father->i_size > 0 )
         {
-            if( i_box_end > i_father_end )
-                msg_Dbg( p_stream, "out of bound child" );
-            return 0; /* out of bound */
+            const off_t i_box_end = p_box->i_size + p_box->i_pos;
+            const off_t i_father_end = p_box->p_father->i_size + p_box->p_father->i_pos;
+
+            /* check if it's within p-father */
+            if( i_box_end >= i_father_end )
+            {
+                if( i_box_end > i_father_end )
+                    msg_Dbg( p_stream, "out of bound child" );
+                return 0; /* out of bound */
+            }
         }
     }
     if( stream_Seek( p_stream, p_box->i_size + p_box->i_pos ) )
@@ -184,12 +189,17 @@ static int MP4_NextBox( stream_t *p_stream, MP4_Box_t *p_box )
  *       after called one of theses functions, file position is unknown
  *       you need to call MP4_GotoBox to go where you want
  *****************************************************************************/
-static int MP4_ReadBoxContainerRaw( stream_t *p_stream, MP4_Box_t *p_container )
+static int MP4_ReadBoxContainerChildren( stream_t *p_stream,
+                                    MP4_Box_t *p_container, uint32_t i_last_child )
 {
     MP4_Box_t *p_box;
 
-    if( stream_Tell( p_stream ) + 8 >
+    /* Size of root container is set to 0 when unknown, for exemple
+     * with a DASH stream. In that case, we skip the following check */
+    if( p_container->i_size
+            && ( stream_Tell( p_stream ) + 8 >
         (off_t)(p_container->i_pos + p_container->i_size) )
+      )
     {
         /* there is no box to load */
         return 0;
@@ -204,14 +214,23 @@ static int MP4_ReadBoxContainerRaw( stream_t *p_stream, MP4_Box_t *p_container )
         else p_container->p_last->p_next = p_box;
         p_container->p_last = p_box;
 
+        if( p_box->i_type == i_last_child )
+            break;
+
     } while( MP4_NextBox( p_stream, p_box ) == 1 );
 
     return 1;
 }
 
+static int MP4_ReadBoxContainerRaw( stream_t *p_stream, MP4_Box_t *p_container )
+{
+    return MP4_ReadBoxContainerChildren( p_stream, p_container, 0 );
+}
+
 static int MP4_ReadBoxContainer( stream_t *p_stream, MP4_Box_t *p_container )
 {
-    if( p_container->i_size <= (size_t)mp4_box_headersize(p_container ) + 8 )
+    if( p_container->i_size &&
+        ( p_container->i_size <= (size_t)mp4_box_headersize(p_container ) + 8 ) )
     {
         /* container is empty, 8 stand for the first header in this box */
         return 1;
@@ -497,22 +516,23 @@ static int MP4_ReadBox_stra( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET4BYTES( p_stra->BitsPerSample );
     MP4_GET4BYTES( p_stra->PacketSize );
     MP4_GET4BYTES( p_stra->AudioTag );
+    MP4_GET4BYTES( p_stra->AvgBytesPerSec );
     MP4_GET2BYTES( p_stra->nBlockAlign );
 
     MP4_GET1BYTE( i_reserved );
     MP4_GET1BYTE( i_reserved );
     MP4_GET1BYTE( i_reserved );
-    uint8_t codec_data_length;
-    MP4_GET1BYTE( codec_data_length );
-    p_stra->CodecPrivateData = malloc( codec_data_length + 1);
+    MP4_GET1BYTE( p_stra->cpd_len );
+    if( p_stra->cpd_len > i_read )
+        goto error;
+    p_stra->CodecPrivateData = malloc( p_stra->cpd_len );
     if( unlikely( p_stra->CodecPrivateData == NULL ) )
         goto error;
-    MP4_GETSTRINGZ( p_stra->CodecPrivateData );
+    memcpy( p_stra->CodecPrivateData, p_peek, p_stra->cpd_len );
 
 #ifdef MP4_VERBOSE
-    msg_Dbg( p_stream, "es_cat is %"PRIu8", birate is %"PRIu32", "\
-            "CodecPrivateData is %s", p_stra->i_es_cat,
-            p_stra->Bitrate, p_stra->CodecPrivateData );
+    msg_Dbg( p_stream, "es_cat is %"PRIu8", birate is %"PRIu32,
+              p_stra->i_es_cat, p_stra->Bitrate );
 #endif
 
     MP4_READBOX_EXIT( 1 );
@@ -3474,57 +3494,7 @@ error:
     return NULL;
 }
 
-MP4_Box_t *MP4_BoxGetInitFrag( stream_t *s )
-{
-    /* p_chunk is a virtual root container for the ftyp and moov boxes */
-    MP4_Box_t *p_chunk;
-    MP4_Box_t *p_ftyp;
-    MP4_Box_t *p_moov;
-
-    p_chunk = calloc( 1, sizeof( MP4_Box_t ) );
-    if( unlikely( p_chunk == NULL ) )
-        return NULL;
-
-    p_chunk->i_type = ATOM_root;
-    p_chunk->i_shortsize = 1;
-
-    p_ftyp = MP4_ReadBox( s, p_chunk );
-    if( !p_ftyp )
-    {
-        msg_Warn( s, "no ftyp box found!");
-        goto error;
-    }
-
-    /* there may be some boxes between ftyp and moov,
-     * we skip them, but put a reasonable limit */
 #define MAX_SKIP 8
-    for( int i = 0 ; i < MAX_SKIP; i++ )
-    {
-        p_moov = MP4_ReadBox( s, p_chunk );
-        if( !p_moov )
-            goto error;
-        if( p_moov->i_type != ATOM_moov )
-        {
-            if( i == MAX_SKIP - 1 )
-                return NULL;
-            stream_Read( s, NULL, p_moov->i_size );
-            MP4_BoxFree( s, p_moov );
-        }
-        else
-            break;
-    }
-
-    p_chunk->p_first = p_ftyp;
-    p_ftyp->p_next = p_moov;
-    p_chunk->p_last = p_moov;
-
-    return p_chunk;
-
-error:
-        free( p_chunk );
-        return NULL;
-}
-
 MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
 {
     /* p_chunk is a virtual root container for the moof and mdat boxes */
@@ -3546,7 +3516,7 @@ MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
     }
     else if( p_tmp_box->i_type == ATOM_ftyp )
     {
-        return MP4_BoxGetInitFrag( s );
+        return MP4_BoxGetRoot( s );
     }
     free( p_tmp_box );
 
@@ -3620,7 +3590,8 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *s )
     p_root->i_pos = 0;
     p_root->i_type = ATOM_root;
     p_root->i_shortsize = 1;
-    p_root->i_size = stream_Size( s );
+    /* could be a DASH stream for exemple, 0 means unknown or infinite size */
+    p_root->i_size = 0;
     CreateUUID( &p_root->i_uuid, p_root->i_type );
 
     p_root->data.p_data = NULL;
@@ -3631,37 +3602,52 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *s )
 
     p_stream = s;
 
+    /* First get the moov */
+    i_result = MP4_ReadBoxContainerChildren( p_stream, p_root, ATOM_moov );
+
+    if( !i_result )
+        goto error;
+    /* If there is a mvex box, it means fragmented MP4, and we're done */
+    else if( MP4_BoxCount( p_root, "moov/mvex" ) > 0 )
+        return p_root;
+
+    p_root->i_size = stream_Size( s );
+    /* Get the rest of the file */
     i_result = MP4_ReadBoxContainerRaw( p_stream, p_root );
 
-    if( i_result )
+    if( !i_result )
+        goto error;
+
+    MP4_Box_t *p_moov;
+    MP4_Box_t *p_cmov;
+
+    /* check if there is a cmov, if so replace
+      compressed moov by  uncompressed one */
+    if( ( ( p_moov = MP4_BoxGet( p_root, "moov" ) ) &&
+          ( p_cmov = MP4_BoxGet( p_root, "moov/cmov" ) ) ) ||
+        ( ( p_moov = MP4_BoxGet( p_root, "foov" ) ) &&
+          ( p_cmov = MP4_BoxGet( p_root, "foov/cmov" ) ) ) )
     {
-        MP4_Box_t *p_moov;
-        MP4_Box_t *p_cmov;
+        /* rename the compressed moov as a box to skip */
+        p_moov->i_type = ATOM_skip;
 
-        /* check if there is a cmov, if so replace
-          compressed moov by  uncompressed one */
-        if( ( ( p_moov = MP4_BoxGet( p_root, "moov" ) ) &&
-              ( p_cmov = MP4_BoxGet( p_root, "moov/cmov" ) ) ) ||
-            ( ( p_moov = MP4_BoxGet( p_root, "foov" ) ) &&
-              ( p_cmov = MP4_BoxGet( p_root, "foov/cmov" ) ) ) )
-        {
-            /* rename the compressed moov as a box to skip */
-            p_moov->i_type = ATOM_skip;
+        /* get uncompressed p_moov */
+        p_moov = p_cmov->data.p_cmov->p_moov;
+        p_cmov->data.p_cmov->p_moov = NULL;
 
-            /* get uncompressed p_moov */
-            p_moov = p_cmov->data.p_cmov->p_moov;
-            p_cmov->data.p_cmov->p_moov = NULL;
+        /* make p_root father of this new moov */
+        p_moov->p_father = p_root;
 
-            /* make p_root father of this new moov */
-            p_moov->p_father = p_root;
-
-            /* insert this new moov box as first child of p_root */
-            p_moov->p_next = p_root->p_first;
-            p_root->p_first = p_moov;
-        }
+        /* insert this new moov box as first child of p_root */
+        p_moov->p_next = p_root->p_first;
+        p_root->p_first = p_moov;
     }
 
     return p_root;
+
+error:
+    free( p_root );
+    return NULL;
 }
 
 
