@@ -174,6 +174,13 @@ struct matroska_stream_c
 /*****************************************************************************
  * definitions of structures and functions used by this plugins
  *****************************************************************************/
+class PrivateTrackData
+{
+public:
+    virtual ~PrivateTrackData() {}
+    virtual int32_t Init() { return 0; }
+};
+
 struct mkv_track_t
 {
 //    ~mkv_track_t();
@@ -201,6 +208,9 @@ struct mkv_track_t
 
     /* audio */
     unsigned int i_original_rate;
+
+    /* Private track paramters */
+    PrivateTrackData *p_sys;
 
     bool            b_inited;
     /* data to be send first */

@@ -468,20 +468,6 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, virtual_ch
     p_vsegment->Seek( *p_demux, i_date, i_time_offset, p_chapter, i_global_position );
 }
 
-/* Utility function for BlockDecode */
-static block_t *MemToBlock( uint8_t *p_mem, size_t i_mem, size_t offset)
-{
-    if( unlikely( i_mem > SIZE_MAX - offset ) )
-        return NULL;
-
-    block_t *p_block = block_New( p_demux, i_mem + offset );
-    if( likely(p_block != NULL) )
-    {
-        memcpy( p_block->p_buffer + offset, p_mem, i_mem );
-    }
-    return p_block;
-}
-
 /* Needed by matroska_segment::Seek() and Seek */
 void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock,
                          mtime_t i_pts, mtime_t i_duration, bool f_mandatory )
@@ -591,6 +577,17 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             memcpy( p_block->p_buffer, tk->p_compression_data->GetBuffer(), tk->p_compression_data->GetSize() );
         }
 
+        if( tk->fmt.i_codec == VLC_CODEC_COOK ||
+            tk->fmt.i_codec == VLC_CODEC_ATRAC3 )
+        {
+            handle_real_audio(p_demux, tk, p_block, i_pts);
+            block_Release(p_block);
+            i_pts = ( tk->i_default_duration )?
+                i_pts + ( mtime_t )( tk->i_default_duration / 1000 ):
+                VLC_TS_INVALID;
+            continue;
+        }
+
         if ( tk->fmt.i_cat == NAV_ES )
         {
             // TODO handle the start/stop times of this packet
@@ -624,7 +621,8 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                     p_block->i_dts = min( i_pts, tk->i_last_dts + ( mtime_t )( tk->i_default_duration / 1000 ) );
             }
         }
-        tk->i_last_dts = p_block->i_dts;
+        if( tk->fmt.i_cat == VIDEO_ES || tk->fmt.i_cat == AUDIO_ES )
+            tk->i_last_dts = p_block->i_dts;
 
 #if 0
 msg_Dbg( p_demux, "block i_dts: %"PRId64" / i_pts: %"PRId64, p_block->i_dts, p_block->i_pts);
@@ -719,11 +717,16 @@ static int Demux( demux_t *p_demux)
         else
             p_sys->i_pts = p_sys->i_chapter_time + ( block->GlobalTimecode() / (mtime_t) 1000 );
 
-        /* The blocks are in coding order so we can safely consider that only references are in chronological order */
-        if( p_sys->i_pts > p_sys->i_pcr + 300000 )
+        mtime_t i_pcr = VLC_TS_INVALID;
+        for( size_t i = 0; i < p_segment->tracks.size(); i++)
+            if( p_segment->tracks[i]->i_last_dts > VLC_TS_INVALID &&
+                ( p_segment->tracks[i]->i_last_dts < i_pcr || i_pcr == VLC_TS_INVALID ))
+                i_pcr = p_segment->tracks[i]->i_last_dts;
+
+        if( i_pcr > p_sys->i_pcr + 300000 )
         {
             es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
-            p_sys->i_pcr = p_sys->i_pts;
+            p_sys->i_pcr = i_pcr;
         }
 
         if( p_sys->i_pts >= p_sys->i_start_pts  )

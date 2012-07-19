@@ -21,9 +21,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
 #include "util.hpp"
+#include "demux.hpp"
 
+#include <stdint.h>
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -78,4 +79,108 @@ block_t *block_zlib_decompress( vlc_object_t *p_this, block_t *p_in_block ) {
 }
 #endif
 
+/* Utility function for BlockDecode */
+block_t *MemToBlock( uint8_t *p_mem, size_t i_mem, size_t offset)
+{
+    if( unlikely( i_mem > SIZE_MAX - offset ) )
+        return NULL;
 
+    block_t *p_block = block_New( p_demux, i_mem + offset );
+    if( likely(p_block != NULL) )
+    {
+        memcpy( p_block->p_buffer + offset, p_mem, i_mem );
+    }
+    return p_block;
+}
+
+
+void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, mtime_t i_pts)
+{
+    uint8_t * p_frame = p_blk->p_buffer;
+    Cook_PrivateTrackData * p_sys = (Cook_PrivateTrackData *) p_tk->p_sys;
+    size_t size = p_blk->i_buffer;
+
+    if( p_tk->i_last_dts == VLC_TS_INVALID )
+    {
+        for( size_t i = 0; i < p_sys->i_subpackets; i++)
+            if( p_sys->p_subpackets[i] )
+            {
+                block_Release(p_sys->p_subpackets[i]);
+                p_sys->p_subpackets[i] = NULL;
+            }
+        p_sys->i_subpacket = 0;
+    }
+
+    if( p_tk->fmt.i_codec == VLC_CODEC_COOK ||
+        p_tk->fmt.i_codec == VLC_CODEC_ATRAC3 )
+    {
+        const uint32_t i_num = p_sys->i_frame_size / p_sys->i_subpacket_size;
+        const int y = p_sys->i_subpacket / ( p_sys->i_frame_size / p_sys->i_subpacket_size );
+
+        for( int i = 0; i < i_num; i++ )
+        {
+            int i_index = p_sys->i_sub_packet_h * i +
+                          ((p_sys->i_sub_packet_h + 1) / 2) * (y&1) + (y>>1);
+            if( i_index >= p_sys->i_subpackets )
+                return;
+
+            block_t *p_block = block_New( p_demux, p_sys->i_subpacket_size );
+            if( !p_block )
+                return;
+
+            if( size < p_sys->i_subpacket_size )
+                return;
+
+            memcpy( p_block->p_buffer, p_frame, p_sys->i_subpacket_size );
+            p_block->i_dts = VLC_TS_INVALID;
+            p_block->i_pts = VLC_TS_INVALID;
+            if( !p_sys->i_subpacket )
+            {
+                p_tk->i_last_dts = 
+                p_block->i_pts = i_pts + VLC_TS_0;
+            }
+
+            p_frame += p_sys->i_subpacket_size;
+            size -=  p_sys->i_subpacket_size;
+
+            p_sys->i_subpacket++;
+            p_sys->p_subpackets[i_index] = p_block;
+        }
+    }
+    else
+    {
+        /*TODO*/
+    }
+    if( p_sys->i_subpacket == p_sys->i_subpackets )
+    {
+        for( size_t i = 0; i < p_sys->i_subpackets; i++)
+        {
+            es_out_Send( p_demux->out, p_tk->p_es,  p_sys->p_subpackets[i]);
+            p_sys->p_subpackets[i] = NULL;
+        }
+        p_sys->i_subpacket = 0;
+    }
+}
+
+int32_t Cook_PrivateTrackData::Init()
+{
+    i_subpackets = (size_t) i_sub_packet_h * (size_t) i_frame_size / (size_t) i_subpacket_size;
+    p_subpackets = (block_t**) calloc(i_subpackets, sizeof(block_t*));
+
+    if( unlikely( !p_subpackets ) )
+    {
+        i_subpackets = 0;
+        return 1;
+    }
+
+    return 0;
+}
+
+Cook_PrivateTrackData::~Cook_PrivateTrackData()
+{
+    for( size_t i = 0; i < i_subpackets; i++ )
+        if( p_subpackets[i] )
+            block_Release( p_subpackets[i] );
+
+    free( p_subpackets );    
+}

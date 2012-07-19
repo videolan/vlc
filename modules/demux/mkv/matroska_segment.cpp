@@ -23,11 +23,9 @@
  *****************************************************************************/
 
 #include "matroska_segment.hpp"
-
 #include "chapters.hpp"
-
 #include "demux.hpp"
-
+#include "util.hpp"
 #include "Ebml_parser.hpp"
 
 extern "C" {
@@ -87,6 +85,7 @@ matroska_segment_c::~matroska_segment_c()
     {
         delete tracks[i_track]->p_compression_data;
         es_format_Clean( &tracks[i_track]->fmt );
+        delete tracks[i_track]->p_sys;
         free( tracks[i_track]->p_extra_data );
         free( tracks[i_track]->psz_codec );
         delete tracks[i_track];
@@ -696,6 +695,9 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     int i_cat;
     bool b_has_key = false;
 
+    for( size_t i = 0; i < tracks.size(); i++)
+        tracks[i]->i_last_dts = VLC_TS_INVALID;
+
     if( i_global_position >= 0 )
     {
         /* Special case for seeking in files with no cues */
@@ -1286,14 +1288,45 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                     msg_Err( &sys.demuxer, "Invalid Real ExtraData 0x%4.4s", (char *)p );
                     p_tk->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
                 }
-                else {
+                else
+                {
+                    real_audio_private * priv = (real_audio_private*) p_tk->p_extra_data;
                     if( !strcmp( p_tk->psz_codec, "A_REAL/COOK" ) )
+                    {
                         p_tk->fmt.i_codec = VLC_CODEC_COOK;
+                        p_tk->fmt.audio.i_blockalign = hton16(priv->sub_packet_size);
+                    }
                     else if( !strcmp( p_tk->psz_codec, "A_REAL/ATRC" ) )
                         p_tk->fmt.i_codec = VLC_CODEC_ATRAC3;
                     else if( !strcmp( p_tk->psz_codec, "A_REAL/28_8" ) )
                         p_tk->fmt.i_codec = VLC_CODEC_RA_288;
                     /* FIXME RALF and SIPR */
+                    uint16_t version = (uint16_t) hton16(priv->version);
+                    p_tk->p_sys =
+                        new Cook_PrivateTrackData( hton16(priv->sub_packet_h),
+                                                   hton16(priv->frame_size),
+                                                   hton16(priv->sub_packet_size));
+                    if( unlikely( !p_tk->p_sys ) )
+                        continue;
+
+                    if( unlikely( p_tk->p_sys->Init() ) )
+                        continue;
+
+                    if( version == 4 )
+                    {
+                        real_audio_private_v4 * v4 = (real_audio_private_v4*) priv;
+                        p_tk->fmt.audio.i_channels = hton16(v4->channels);
+                        p_tk->fmt.audio.i_bitspersample = hton16(v4->sample_size);
+                        p_tk->fmt.audio.i_rate = hton16(v4->sample_rate);
+                    }
+                    else if( version == 5 )
+                    {
+                        real_audio_private_v5 * v5 = (real_audio_private_v5*) priv;
+                        p_tk->fmt.audio.i_channels = hton16(v5->channels);
+                        p_tk->fmt.audio.i_bitspersample = hton16(v5->sample_size);
+                        p_tk->fmt.audio.i_rate = hton16(v5->sample_rate);
+                    }
+                    msg_Dbg(&sys.demuxer, "%d channels %d bits %d Hz",p_tk->fmt.audio.i_channels, p_tk->fmt.audio.i_bitspersample, p_tk->fmt.audio.i_rate);
 
                     fill_extra_data( p_tk, p_tk->fmt.i_codec == VLC_CODEC_RA_288 ? 0 : 78);
                 }
