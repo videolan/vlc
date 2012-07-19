@@ -338,6 +338,7 @@ static QRgb blendColor(QRgb c1, QRgb c2, int blend)
 static QImage* prepareSurface(const QImage* slideImage, int w, int h, QRgb bgcolor,
                               PictureFlow::ReflectionEffect reflectionEffect, QModelIndex index)
 {
+    Q_UNUSED(bgcolor);
     Qt::TransformationMode mode = Qt::SmoothTransformation;
     QImage img = slideImage->scaled(w, h, Qt::KeepAspectRatio, mode);
 
@@ -1115,12 +1116,16 @@ void PictureFlowPrivate::triggerRender()
 
 void PictureFlowPrivate::insertSlide(int index, const QImage& image)
 {
+    Q_UNUSED(index);
+    Q_UNUSED(image);
 //    state->slideImages.insert(index, new QImage(image));
 //    triggerRender();
 }
 
 void PictureFlowPrivate::replaceSlide(int index, const QImage& image)
 {
+    Q_UNUSED(index);
+    Q_UNUSED(image);
 //    Q_ASSERT((index >= 0) && (index < state->slideImages.count()));
 
 //    QImage* i = image.isNull() ? 0 : new QImage(image);
@@ -1131,6 +1136,7 @@ void PictureFlowPrivate::replaceSlide(int index, const QImage& image)
 
 void PictureFlowPrivate::removeSlide(int index)
 {
+    Q_UNUSED(index);
 //    delete state->slideImages[index];
 //    state->slideImages.remove(index);
 //    triggerRender();
