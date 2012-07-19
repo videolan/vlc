@@ -109,6 +109,27 @@ static int MuteSet (audio_output_t *aout, bool mute)
     return sys->set_volume (sys->opaque, sys->volume, mute) ? -1 : 0;
 }
 
+static int SoftVolumeSet (audio_output_t *aout, float vol)
+{
+    aout_sys_t *sys = aout->sys;
+
+    vol = vol * vol * vol;
+    if (!sys->mute && aout_GainRequest (aout, vol))
+        return -1;
+    sys->volume = vol;
+    return 0;
+}
+
+static int SoftMuteSet (audio_output_t *aout, bool mute)
+{
+    aout_sys_t *sys = aout->sys;
+
+    if (aout_GainRequest (aout, mute ? 0.f : sys->volume))
+        return -1;
+    sys->mute = mute;
+    return 0;
+}
+
 typedef int (*vlc_audio_format_cb) (void **, char *, unsigned *, unsigned *);
 
 static int Open (vlc_object_t *obj)
@@ -221,7 +242,10 @@ static int Open (vlc_object_t *obj)
         aout->mute_set = MuteSet;
     }
     else
-        aout_VolumeSoftInit (aout);
+    {
+        aout->volume_set = SoftVolumeSet;
+        aout->mute_set = SoftMuteSet;
+    }
     return VLC_SUCCESS;
 
 error:
