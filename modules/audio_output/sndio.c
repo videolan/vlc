@@ -139,7 +139,9 @@ static int Open (vlc_object_t *obj)
     aout->pf_play = Play;
     aout->pf_pause = Pause;
     aout->pf_flush  = NULL; /* sndio sucks! */
-    aout_VolumeSoftInit (aout); /* TODO: sio_onvol() */
+    /* TODO: sio_setvol()/sio_onvol() */
+    aout->volume_set = NULL;
+    aout->mute_set = NULL;
 
     sio_start (sio);
     return VLC_SUCCESS;
