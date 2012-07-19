@@ -30,9 +30,11 @@
 
 #include <limits.h>
 #include <assert.h>
+#include <math.h>
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
+#include <vlc_aout_intf.h>
 #include <vlc_modules.h>
 #include "aout_internal.h"
 #include "libvlc.h"
@@ -43,6 +45,25 @@
 
 /* Local functions */
 static void aout_Destructor( vlc_object_t * p_this );
+
+static int var_Copy (vlc_object_t *src, const char *name, vlc_value_t prev,
+                     vlc_value_t value, void *data)
+{
+    vlc_object_t *dst = data;
+
+    (void) src; (void) prev;
+    return var_Set (dst, name, value);
+}
+
+static int var_CopyVolume (vlc_object_t *src, const char *name,
+                           vlc_value_t prev, vlc_value_t value, void *data)
+{
+    vlc_object_t *dst = data;
+    long volume = lroundf (value.f_float * (float)AOUT_VOLUME_DEFAULT);
+
+    (void) src; (void) prev;
+    return var_SetInteger (dst, name, volume);
+}
 
 #undef aout_New
 /*****************************************************************************
@@ -74,7 +95,9 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
     char *str;
 
     var_Create (aout, "volume", VLC_VAR_FLOAT);
+    var_AddCallback (aout, "volume", var_CopyVolume, p_parent);
     var_Create (aout, "mute", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+    var_AddCallback (aout, "mute", var_Copy, p_parent);
 
     /* Visualizations */
     var_Create (aout, "visual", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
@@ -181,6 +204,9 @@ void aout_Destroy (audio_output_t *aout)
 
     if (owner->module != NULL)
         aout_Shutdown (aout);
+
+    var_DelCallback (aout, "mute", var_Copy, aout->p_parent);
+    var_DelCallback (aout, "volume", var_CopyVolume, aout->p_parent);
     vlc_object_release (aout);
 }
 
