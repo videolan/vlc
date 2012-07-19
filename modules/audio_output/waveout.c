@@ -82,33 +82,6 @@ static const wchar_t device_name_fmt[] = L"%ls ($%x,$%x)";
 static const char *const ppsz_adev[] = { "wavemapper", };
 static const char *const ppsz_adev_text[] = { N_("Microsoft Soundmapper") };
 
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-#define DEVICE_TEXT N_("Select Audio Device")
-#define DEVICE_LONG N_("Select special Audio device, or let windows "\
-                       "decide (default), change needs VLC restart "\
-                       "to apply.")
-#define DEFAULT_AUDIO_DEVICE N_("Default Audio Device")
-
-vlc_module_begin ()
-    set_shortname( "WaveOut" )
-    set_description( N_("Win32 waveOut extension output") )
-    set_capability( "audio output", 50 )
-    set_category( CAT_AUDIO )
-    set_subcategory( SUBCAT_AUDIO_AOUT )
-
-    add_string( "waveout-audio-device", "wavemapper",
-                 DEVICE_TEXT, DEVICE_LONG, false )
-       change_string_list( ppsz_adev, ppsz_adev_text, ReloadWaveoutDevices )
-       change_action_add( ReloadWaveoutDevices, N_("Refresh list") )
-
-    add_bool( "waveout-float32", true, FLOAT_TEXT, FLOAT_LONGTEXT, true )
-
-    set_callbacks( Open, Close )
-vlc_module_end ()
-
 /*****************************************************************************
  * aout_sys_t: waveOut audio output method descriptor
  *****************************************************************************
@@ -141,12 +114,47 @@ struct aout_sys_t
 
     uint8_t *p_silence_buffer;              /* buffer we use to play silence */
 
-    float volume;
-    bool mute;
+    union {
+        float volume;
+        float soft_gain;
+    };
+    union {
+        bool mute;
+        bool soft_mute;
+    };
 
     bool b_chan_reorder;              /* do we need channel reordering */
     int pi_chan_table[AOUT_CHAN_MAX];
 };
+
+#include "volume.h"
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+#define DEVICE_TEXT N_("Select Audio Device")
+#define DEVICE_LONG N_("Select special Audio device, or let windows "\
+                       "decide (default), change needs VLC restart "\
+                       "to apply.")
+#define DEFAULT_AUDIO_DEVICE N_("Default Audio Device")
+
+vlc_module_begin ()
+    set_shortname( "WaveOut" )
+    set_description( N_("Win32 waveOut extension output") )
+    set_capability( "audio output", 50 )
+    set_category( CAT_AUDIO )
+    set_subcategory( SUBCAT_AUDIO_AOUT )
+
+    add_string( "waveout-audio-device", "wavemapper",
+                 DEVICE_TEXT, DEVICE_LONG, false )
+       change_string_list( ppsz_adev, ppsz_adev_text, ReloadWaveoutDevices )
+       change_action_add( ReloadWaveoutDevices, N_("Refresh list") )
+    add_sw_gain( )
+
+    add_bool( "waveout-float32", true, FLOAT_TEXT, FLOAT_LONGTEXT, true )
+
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Open: open the audio device
@@ -310,7 +318,7 @@ static int Open( vlc_object_t *p_this )
         }
         else
 #endif
-            aout_VolumeSoftInit( p_aout );
+            aout_SoftVolumeInit( p_aout );
     }
 
     waveOutReset( p_aout->sys->h_waveout );
