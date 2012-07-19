@@ -44,7 +44,11 @@ struct aout_sys_t
 {
     snd_pcm_t *pcm;
     void (*reorder) (void *, size_t, unsigned);
+    float soft_gain;
+    bool soft_mute;
 };
+
+#include "volume.h"
 
 #define A52_FRAME_NB 1536
 
@@ -88,6 +92,7 @@ vlc_module_begin ()
     add_integer ("alsa-audio-channels", AOUT_CHANS_FRONT,
                  AUDIO_CHAN_TEXT, AUDIO_CHAN_LONGTEXT, false)
         change_integer_list (channels, channels_text)
+    add_sw_gain ()
     set_capability( "audio output", 150 )
     set_callbacks( Open, Close )
 vlc_module_end ()
@@ -528,7 +533,7 @@ static int Open (vlc_object_t *obj)
                 sys->reorder = NULL;
         }
 
-        aout_VolumeSoftInit (aout);
+        aout_SoftVolumeInit (aout);
     }
 
     aout->pf_play = Play;

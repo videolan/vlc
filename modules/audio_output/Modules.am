@@ -28,9 +28,9 @@ if HAVE_OSS
 libvlc_LTLIBRARIES += liboss_plugin.la
 endif
 
-libalsa_plugin_la_SOURCES = alsa.c
+libalsa_plugin_la_SOURCES = alsa.c volume.h
 libalsa_plugin_la_CFLAGS = $(AM_CFLAGS) $(ALSA_CFLAGS)
-libalsa_plugin_la_LIBADD = $(AM_LIBADD) $(ALSA_LIBS)
+libalsa_plugin_la_LIBADD = $(AM_LIBADD) $(ALSA_LIBS) $(LIBM)
 libalsa_plugin_la_DEPENDENCIES =
 if HAVE_ALSA
 libvlc_LTLIBRARIES += libalsa_plugin.la
