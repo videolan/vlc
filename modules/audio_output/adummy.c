@@ -61,7 +61,8 @@ static int Open( vlc_object_t * p_this )
     p_aout->pf_play = Play;
     p_aout->pf_pause = NULL;
     p_aout->pf_flush = NULL;
-    aout_VolumeSoftInit( p_aout );
+    p_aout->volume_set = NULL;
+    p_aout->mute_set = NULL;
 
     if( AOUT_FMT_SPDIF( &p_aout->format )
      && var_InheritBool( p_this, "spdif" ) )
