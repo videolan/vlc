@@ -22,6 +22,7 @@
 # include "config.h"
 #endif
 
+#include <math.h>
 #include <assert.h>
 
 #include <vlc_common.h>
@@ -42,12 +43,17 @@ vlc_module_begin ()
     set_callbacks (Open, Close )
 vlc_module_end ()
 
-static void Play  (audio_output_t *, block_t *);
+static void Play (audio_output_t *, block_t *);
 static void Pause (audio_output_t *, bool, mtime_t);
+static int VolumeSet (audio_output_t *, float);
+static int MuteSet (audio_output_t *, bool);
+static void VolumeChanged (void *, unsigned);
 
 struct aout_sys_t
 {
     struct sio_hdl *hdl;
+    unsigned volume;
+    bool mute;
 };
 
 /** Initializes an sndio playback stream */
@@ -149,7 +155,16 @@ static int Open (vlc_object_t *obj)
     aout->pf_play = Play;
     aout->pf_pause = Pause;
     aout->pf_flush  = NULL; /* sndio sucks! */
-    /* TODO: sio_setvol()/sio_onvol() */
+    if (sio_onvol(sys->hdl, VolumeChanged, aout))
+    {
+        aout->volume_set = VolumeSet;
+        aout->mute_set = MuteSet;
+    }
+    else
+    {
+        aout->volume_set = NULL;
+        aout->mute_set = NULL;
+    }
 
     sio_start (sys->hdl);
     return VLC_SUCCESS;
@@ -201,4 +216,37 @@ static void Pause (audio_output_t *aout, bool pause, mtime_t date)
     else
         sio_start (sys->hdl);
     (void) date;
+}
+
+static void VolumeChanged (void *arg, unsigned volume)
+{
+    audio_output_t *aout = arg;
+    float fvol = (float)volume / (float)SIO_MAXVOL;
+
+    aout_VolumeReport (aout, fvol);
+    aout_MuteReport (aout, volume == 0);
+    if (volume) /* remember last non-zero volume to unmute later */
+        aout->sys->volume = volume;
+}
+
+static int VolumeSet (audio_output_t *aout, float fvol)
+{
+    aout_sys_t *sys = aout->sys;
+    unsigned volume = lroundf (fvol * SIO_MAXVOL);
+
+    if (!sys->mute && !sio_setvol (sys->hdl, volume))
+        return -1;
+    sys->volume = volume;
+    return 0;
+}
+
+static int MuteSet (audio_output_t *aout, bool mute)
+{
+    aout_sys_t *sys = aout->sys;
+
+    if (!sio_setvol (sys->hdl, mute ? 0 : sys->volume))
+        return -1;
+
+    sys->mute = mute;
+    return 0;
 }
