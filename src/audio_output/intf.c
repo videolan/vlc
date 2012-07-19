@@ -72,9 +72,9 @@ float aout_VolumeGet (vlc_object_t *obj)
     if (aout == NULL)
         return -1.f;
 
-    long l = var_InheritInteger (aout, "volume");
+    float volume = var_GetFloat (aout, "volume");
     vlc_object_release (aout);
-    return l / (float)AOUT_VOLUME_DEFAULT;
+    return volume;
 }
 
 #undef aout_VolumeSet

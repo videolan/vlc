@@ -91,11 +91,7 @@ static void aout_OutputTimeReport (audio_output_t *aout, mtime_t ideal)
  */
 static void aout_OutputVolumeReport (audio_output_t *aout, float volume)
 {
-    long vol = lroundf (volume * (float)AOUT_VOLUME_DEFAULT);
-
-    /* We cannot acquire the volume lock as this gets called from the audio
-     * output plug-in (it would cause a lock inversion). */
-    var_SetInteger (aout, "volume", vol);
+    var_SetFloat (aout, "volume", volume);
 }
 
 static void aout_OutputMuteReport (audio_output_t *aout, bool mute)
