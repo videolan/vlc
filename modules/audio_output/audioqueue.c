@@ -48,6 +48,8 @@ struct aout_sys_t
 {
     aout_packet_t packet;
     AudioQueueRef audioQueue;
+    float soft_gain;
+    bool soft_mute;
 };
 
 /*****************************************************************************
@@ -57,6 +59,8 @@ static int  Open               ( vlc_object_t * );
 static void Close              ( vlc_object_t * );
 static void Play               ( audio_output_t *, block_t * );
 static void AudioQueueCallback (void *, AudioQueueRef, AudioQueueBufferRef);
+
+#include "volume.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -117,7 +121,7 @@ static int Open ( vlc_object_t *p_this )
     }
 
     /* Volume is entirely done in software. */
-    aout_VolumeSoftInit( p_aout );
+    aout_SoftVolumeInit( p_aout );
 
     p_aout->format.i_format = VLC_CODEC_S16L;
     p_aout->format.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
