@@ -348,7 +348,6 @@ static int config_PrepareDir (vlc_object_t *obj)
  */
 int config_SaveConfigFile (vlc_object_t *p_this)
 {
-    char *permanent = NULL, *temporary = NULL;
 
     if( config_PrepareDir( p_this ) )
     {
@@ -356,89 +355,30 @@ int config_SaveConfigFile (vlc_object_t *p_this)
         return -1;
     }
 
-    /* List all available modules */
-    module_t **list = module_list_get (NULL);
-
-    char *bigbuf = NULL;
-    size_t bigsize = 0;
-    FILE *file = config_OpenConfigFile (p_this);
-    if (file != NULL)
+    /*
+     * Save module config in file
+     */
+    char *temporary;
+    char *permanent = config_GetConfigFile (p_this);
+    if (permanent == NULL)
+        return -1;
+    if (asprintf (&temporary, "%s.%u", permanent, getpid ()) == -1)
+    {
+        free (permanent);
+        return -1;
+    }
+    else
     {
         struct stat st;
 
         /* Some users make vlcrc read-only to prevent changes.
          * The atomic replacement scheme breaks this "feature",
          * so we check for read-only by hand. */
-        if (fstat (fileno (file), &st)
-         || !(st.st_mode & S_IWUSR))
+        if (stat (permanent, &st) == 0 && !(st.st_mode & S_IWUSR))
         {
             msg_Err (p_this, "configuration file is read-only");
             goto error;
         }
-
-        bigsize = (st.st_size < LONG_MAX) ? st.st_size : 0;
-        bigbuf = malloc (bigsize + 1);
-        if (bigbuf == NULL)
-            goto error;
-
-        /* backup file into memory, we only need to backup the sections we
-         * won't save later on */
-        char *p_index = bigbuf;
-        char *line = NULL;
-        size_t bufsize;
-        ssize_t linelen;
-        bool backup = false;
-
-        while ((linelen = getline (&line, &bufsize, file)) != -1)
-        {
-            if ((line[0] == '[') && (strchr (line,']') != NULL))
-            {
-                module_t *module;
-
-                /* we found a new section, check if we need to do a backup */
-                backup = true;
-                for (int i = 0; (module = list[i]) != NULL; i++)
-                {
-                    const char *objname = module_get_object (module);
-
-                    if (!strncmp (line + 1, objname, strlen (objname)))
-                    {
-                        backup = false; /* no, we will rewrite it! */
-                        break;
-                    }
-                }
-            }
-
-            /* save line if requested and line is valid (doesn't begin with a
-             * space, tab, or eol) */
-            if (backup && !memchr ("\n\t ", line[0], 3))
-            {
-                memcpy (p_index, line, linelen);
-                p_index += linelen;
-            }
-        }
-        fclose (file);
-        file = NULL;
-        free (line);
-        *p_index = '\0';
-        bigsize = p_index - bigbuf;
-    }
-
-    /*
-     * Save module config in file
-     */
-    permanent = config_GetConfigFile (p_this);
-    if (!permanent)
-    {
-        module_list_free (list);
-        goto error;
-    }
-
-    if (asprintf (&temporary, "%s.%u", permanent, getpid ()) == -1)
-    {
-        temporary = NULL;
-        module_list_free (list);
-        goto error;
     }
 
     /* Configuration lock must be taken before vlcrc serializer below. */
@@ -454,17 +394,15 @@ int config_SaveConfigFile (vlc_object_t *p_this)
     {
         vlc_rwlock_unlock (&config_lock);
         vlc_mutex_unlock (&lock);
-        module_list_free (list);
         goto error;
     }
-    file = fdopen (fd, "wt");
+    FILE *file = fdopen (fd, "wt");
     if (file == NULL)
     {
         msg_Err (p_this, "cannot create configuration file: %m");
         vlc_rwlock_unlock (&config_lock);
         close (fd);
         vlc_mutex_unlock (&lock);
-        module_list_free (list);
         goto error;
     }
 
@@ -487,6 +425,7 @@ int config_SaveConfigFile (vlc_object_t *p_this)
     vlc_rwlock_rdlock (&config_lock);*/
 
     /* Look for the selected module, if NULL then save everything */
+    module_t **list = module_list_get (NULL);
     module_t *p_parser;
     for (int i = 0; (p_parser = list[i]) != NULL; i++)
     {
@@ -552,12 +491,6 @@ int config_SaveConfigFile (vlc_object_t *p_this)
     }
 
     /*
-     * Restore old settings from the config in file
-     */
-    if (bigsize)
-        fwrite (bigbuf, 1, bigsize, file);
-
-    /*
      * Flush to disk and replace atomically
      */
     fflush (file); /* Flush from run-time */
@@ -566,7 +499,7 @@ int config_SaveConfigFile (vlc_object_t *p_this)
         vlc_unlink (temporary);
         vlc_mutex_unlock (&lock);
         msg_Err (p_this, "cannot write configuration file");
-        clearerr (file);
+        fclose (file);
         goto error;
     }
 #if defined(__APPLE__) || defined(__ANDROID__)
@@ -591,15 +524,11 @@ int config_SaveConfigFile (vlc_object_t *p_this)
 
     free (temporary);
     free (permanent);
-    free (bigbuf);
     return 0;
 
 error:
-    if( file )
-        fclose( file );
     free (temporary);
     free (permanent);
-    free (bigbuf);
     return -1;
 }
 
