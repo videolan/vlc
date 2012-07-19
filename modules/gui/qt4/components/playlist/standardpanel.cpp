@@ -309,7 +309,7 @@ void StandardPLPanel::popupExplore()
     char *path = NULL;
 
     if( ! uri.isEmpty() )
-        path = make_path( uri.toStdString().c_str() );
+        path = make_path( uri.toAscii().constData() );
 
     if( path == NULL )
         return;
