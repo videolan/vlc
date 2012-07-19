@@ -45,17 +45,27 @@ vlc_module_end ()
 static void Play  (audio_output_t *, block_t *);
 static void Pause (audio_output_t *, bool, mtime_t);
 
+struct aout_sys_t
+{
+    struct sio_hdl *hdl;
+};
+
 /** Initializes an sndio playback stream */
 static int Open (vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = malloc (sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return VLC_EGENERIC;
 
-    struct sio_hdl *sio = sio_open (NULL, SIO_PLAY, 0 /* blocking */);
-    if (sio == NULL)
+    sys->hdl = sio_open (NULL, SIO_PLAY, 0 /* blocking */);
+    if (sys->hdl == NULL)
     {
         msg_Err (obj, "cannot create audio playback stream");
+        free (sys);
         return VLC_EGENERIC;
     }
+    aout->sys = sys;
 
     struct sio_par par;
     sio_initpar (&par);
@@ -67,7 +77,7 @@ static int Open (vlc_object_t *obj)
     par.rate = aout->format.i_rate;
     par.xrun = SIO_SYNC;
 
-    if (!sio_setpar (sio, &par) || !sio_getpar (sio, &par))
+    if (!sio_setpar (sys->hdl, &par) || !sio_getpar (sys->hdl, &par))
     {
         msg_Err (obj, "cannot negotiate audio playback parameters");
         goto error;
@@ -135,36 +145,35 @@ static int Open (vlc_object_t *obj)
     aout_FormatPrepare (&f);
 
     aout->format = f;
-    aout->sys = (void *)sio;
+    aout->sys = sys;
     aout->pf_play = Play;
     aout->pf_pause = Pause;
     aout->pf_flush  = NULL; /* sndio sucks! */
     /* TODO: sio_setvol()/sio_onvol() */
-    aout->volume_set = NULL;
-    aout->mute_set = NULL;
 
-    sio_start (sio);
+    sio_start (sys->hdl);
     return VLC_SUCCESS;
 
 error:
-    sio_close (sio);
+    Close (obj);
     return VLC_EGENERIC;
 }
 
 static void Close (vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
-    struct sio_hdl *sio = (void *)aout->sys;
+    aout_sys_t *sys = aout->sys;
 
-    sio_close (sio);
+    sio_close (sys->hdl);
+    free (sys);
 }
 
 static void Play (audio_output_t *aout, block_t *block)
 {
-    struct sio_hdl *sio = (void *)aout->sys;
+    aout_sys_t *sys = aout->sys;
     struct sio_par par;
 
-    if (sio_getpar (sio, &par) == 0)
+    if (sio_getpar (sys->hdl, &par) == 0)
     {
         mtime_t delay = par.bufsz * CLOCK_FREQ / aout->format.i_rate;
 
@@ -172,9 +181,9 @@ static void Play (audio_output_t *aout, block_t *block)
         aout_TimeReport (aout, block->i_pts - delay);
     }
 
-    while (block->i_buffer > 0 && !sio_eof (sio))
+    while (block->i_buffer > 0 && !sio_eof (sys->hdl))
     {
-        size_t bytes = sio_write (sio, block->p_buffer, block->i_buffer);
+        size_t bytes = sio_write (sys->hdl, block->p_buffer, block->i_buffer);
 
         block->p_buffer += bytes;
         block->i_buffer -= bytes;
@@ -185,11 +194,11 @@ static void Play (audio_output_t *aout, block_t *block)
 
 static void Pause (audio_output_t *aout, bool pause, mtime_t date)
 {
-    struct sio_hdl *sio = (void *)aout->sys;
+    aout_sys_t *sys = aout->sys;
 
     if (pause)
-        sio_stop (sio);
+        sio_stop (sys->hdl);
     else
-        sio_start (sio);
+        sio_start (sys->hdl);
     (void) date;
 }
