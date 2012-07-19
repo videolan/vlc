@@ -67,6 +67,33 @@ Removed modules:
  * RTMP access_output: use libavformat avio instead
 
 
+Changes between 2.0.2 and 2.0.3:
+--------------------------------
+
+Access:
+ * Fix some HTTP request that broke some radio channels
+
+Demuxers:
+ * Fix support for some flv files (notably joined)
+ * Fix a crash when opening ape files with ID3v1 tags
+
+Mac OS X:
+ * Add GateKeeper support
+ * Fix handling for some hotkeys
+ * Fix fullscreen toggle over extra interfaces
+ * Minor bugfixes and improvements
+
+Qt:
+ * Fix Windows 8 interface style
+
+Translations:
+ * Updates for Breton, Czech, Dutch, Gaelic, German, Hebrew, Hindi, Icelandic,
+   Japanese, Khmer, Korean, Polish, Russian, Simplified Chinese, Slovenian,
+   Thai, Turkish and Walloon
+ * New translations to Uzbek and Marathi
+ * Fix activation of Gaelic and Thai translations
+
+
 Changes between 2.0.1 and 2.0.2:
 --------------------------------
 
