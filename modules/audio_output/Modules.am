@@ -1,4 +1,3 @@
-SOURCES_aout_directx = directx.c windows_audio_common.h packet.c
 SOURCES_aout_file = file.c
 SOURCES_waveout = waveout.c windows_audio_common.h packet.c
 SOURCES_auhal = auhal.c packet.c
@@ -45,12 +44,12 @@ if HAVE_PULSE
 libvlc_LTLIBRARIES += libpulse_plugin.la
 endif
 
-libwasapi_plugin_la_SOURCES = wasapi.c
-libwasapi_plugin_la_CFLAGS = $(AM_CFLAGS)
-libwasapi_plugin_la_LIBADD = $(AM_LIBADD) -lole32 -lksuser
-libwasapi_plugin_la_DEPENDENCIES =
-if HAVE_WASAPI
-libvlc_LTLIBRARIES += libwasapi_plugin.la
+libaout_directx_plugin_la_SOURCES = directx.c windows_audio_common.h packet.c
+libaout_directx_plugin_la_CFLAGS = $(AM_CFLAGS)
+libaout_directx_plugin_la_LIBADD = $(AM_LIBADD)
+libaout_directx_plugin_la_DEPENDENCIES =
+if HAVE_DIRECTX
+libvlc_LTLIBRARIES += libaout_directx_plugin.la
 endif
 
 libkai_plugin_la_SOURCES = kai.c packet.c

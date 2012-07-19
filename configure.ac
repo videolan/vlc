@@ -3143,33 +3143,40 @@ then
 fi
 
 AC_ARG_ENABLE(directx,
-  [  --enable-directx        Win32 DirectX support (default enabled on Win32)])
-if test "${enable_directx}" != "no"; then
-  if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"; then
-      dnl DDraw
-      AC_CHECK_HEADERS(ddraw.h,
-      [ VLC_ADD_PLUGIN([directx aout_directx])
-        VLC_ADD_LIBS([directx],[-luser32 -lgdi32])
-      ],[AC_MSG_ERROR([Cannot find DirectX headers!])]
-      )
+  [AS_HELP_STRING([--enable-directx],
+    [Microsoft DirectX support (default enabled on Windows)])],, [
+  AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
+    enable_directx="yes"
+  ], [
+    enable_directx="no"
+  ])
+])
+have_directx="no"
+AS_IF([test "${enable_directx}" != "no"], [
+  dnl DirectDraw
+  AC_CHECK_HEADERS(ddraw.h, [
+    have_directx="yes"
+  ], [
+    AC_MSG_ERROR([Cannot find DirectX headers!])
+  ])
 
-      dnl OpenGL
-      AC_CHECK_HEADERS(GL/wglew.h,
-      [ VLC_ADD_PLUGIN([glwin32])
-        VLC_ADD_LIBS([glwin32],[-lopengl32 -lgdi32])
-      ],[],[
-        #include <windows.h>
-        #include <GL/gl.h>
-      ])
+  dnl OpenGL
+  AC_CHECK_HEADERS(GL/wglew.h, [
+    VLC_ADD_PLUGIN([glwin32])
+    VLC_ADD_LIBS([glwin32],[-lopengl32 -lgdi32])
+   ],, [
+     #include <windows.h>
+     #include <GL/gl.h>
+   ])
 
-      dnl Direct3D
-      AC_CHECK_HEADERS(d3d9.h,
-      [ VLC_ADD_PLUGIN([direct3d])
-        VLC_ADD_LIBS([direct3d],[-lgdi32])
-      ])
-      VLC_ADD_LIBS([direct3d directx glwin32],[-lole32 -luuid])
-  fi
-fi
+   dnl Direct3D
+   AC_CHECK_HEADERS(d3d9.h, [
+     VLC_ADD_PLUGIN([direct3d])
+     VLC_ADD_LIBS([direct3d],[-lgdi32])
+   ])
+   VLC_ADD_LIBS([direct3d glwin32],[-lole32 -luuid])
+])
+AM_CONDITIONAL([HAVE_DIRECTX], [test "$have_directx" = "yes"])
 
 dnl
 dnl  Windows Direct2D plugin

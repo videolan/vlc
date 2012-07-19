@@ -6,13 +6,19 @@ SOURCES_direct2d = \
         common.c \
         $(NULL)
 
-SOURCES_directx = \
+libdirectx_plugin_la_SOURCES = \
 	directx.c \
 	common.h \
 	events.h \
 	events.c \
 	common.c \
 	$(NULL)
+libdirectx_plugin_la_CFLAGS = $(AM_CFLAGS)
+libdirectx_plugin_la_LIBADD = $(AM_LIBADD) -luser32 -lgdi32 -lole32 -luuid
+libdirectx_plugin_la_DEPENDENCIES =
+if HAVE_DIRECTX
+libvlc_LTLIBRARIES += libdirectx_plugin.la
+endif
 
 SOURCES_direct3d = \
 	direct3d.c \
