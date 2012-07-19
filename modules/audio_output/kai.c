@@ -47,6 +47,8 @@ struct aout_sys_t
 {
     aout_packet_t   packet;
     HKAI            hkai;
+    float           soft_gain;
+    bool            soft_mute;
 };
 
 /*****************************************************************************
@@ -57,6 +59,8 @@ static void Close ( vlc_object_t * );
 static void Play  ( audio_output_t *_p_aout, block_t *block );
 
 static ULONG APIENTRY KaiCallback ( PVOID, PVOID, ULONG );
+
+#include "volume.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -87,6 +91,7 @@ vlc_module_begin ()
                 KAI_AUDIO_DEVICE_TEXT, KAI_AUDIO_DEVICE_LONGTEXT, false )
         change_string_list( ppsz_kai_audio_device, ppsz_kai_audio_device_text,
                             0 )
+    add_sw_gain( )
     add_bool( "kai-audio-exclusive-mode", false,
               KAI_AUDIO_EXCLUSIVE_MODE_TEXT, KAI_AUDIO_EXCLUSIVE_MODE_LONGTEXT,
               true )
@@ -205,7 +210,7 @@ static int Open ( vlc_object_t *p_this )
 
     aout_PacketInit( p_aout, &p_sys->packet,
                      ks_obtained.ulBufferSize / i_bytes_per_frame );
-    aout_VolumeSoftInit( p_aout );
+    aout_SoftVolumeInit( p_aout );
 
     if ( var_Type( p_aout, "audio-device" ) == 0 )
     {
