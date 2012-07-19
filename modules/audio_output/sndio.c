@@ -115,16 +115,16 @@ static int Open (vlc_object_t *obj)
             chans = AOUT_CHAN_CENTER;
             break;
         case 2:
-            chans = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+            chans = AOUT_CHANS_STEREO;
             break;
         case 4:
-            chans = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-                  | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+            chans = AOUT_CHANS_4_0;
             break;
         case 6:
-            chans = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-                  | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
-                  | AOUT_CHAN_CENTER | AOUT_CHAN_LFE;
+            chans = AOUT_CHANS_5_1;
+            break;
+        case 8:
+            chans = AOUT_CHANS_7_1;
             break;
         default:
             msg_Err (aout, "unknown %u channels map", par.pchan);
