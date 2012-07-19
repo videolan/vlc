@@ -44,12 +44,12 @@ if HAVE_PULSE
 libvlc_LTLIBRARIES += libpulse_plugin.la
 endif
 
-libaout_directx_plugin_la_SOURCES = directx.c windows_audio_common.h packet.c
-libaout_directx_plugin_la_CFLAGS = $(AM_CFLAGS)
-libaout_directx_plugin_la_LIBADD = $(AM_LIBADD)
-libaout_directx_plugin_la_DEPENDENCIES =
+libdirectsound_plugin_la_SOURCES = directx.c windows_audio_common.h packet.c
+libdirectsound_plugin_la_CFLAGS = $(AM_CFLAGS)
+libdirectsound_plugin_la_LIBADD = $(AM_LIBADD)
+libdirectsound_plugin_la_DEPENDENCIES =
 if HAVE_DIRECTX
-libvlc_LTLIBRARIES += libaout_directx_plugin.la
+libvlc_LTLIBRARIES += libdirectsound_plugin.la
 endif
 
 libkai_plugin_la_SOURCES = kai.c packet.c

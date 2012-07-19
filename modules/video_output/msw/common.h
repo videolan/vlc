@@ -110,7 +110,7 @@ struct vout_display_sys_t
 
     picture_pool_t *pool;
 
-#ifdef MODULE_NAME_IS_directx
+#ifdef MODULE_NAME_IS_directdraw
     /* Multi-monitor support */
     HMONITOR             hmonitor;          /* handle of the current monitor */
     GUID                 *display_driver;

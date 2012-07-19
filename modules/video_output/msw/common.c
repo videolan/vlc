@@ -39,7 +39,7 @@
 #include <windowsx.h>
 #include <shellapi.h>
 
-#ifdef MODULE_NAME_IS_directx
+#ifdef MODULE_NAME_IS_directdraw
 #include <ddraw.h>
 #endif
 #ifdef MODULE_NAME_IS_direct3d
@@ -99,7 +99,7 @@ int CommonInit(vout_display_t *vd)
 #ifdef MODULE_NAME_IS_direct3d
     cfg.use_desktop = sys->use_desktop;
 #endif
-#ifdef MODULE_NAME_IS_directx
+#ifdef MODULE_NAME_IS_directdraw
     cfg.use_overlay = sys->use_overlay;
 #endif
     cfg.win.type   = VOUT_WINDOW_TYPE_HWND;
@@ -396,7 +396,7 @@ void UpdateRects(vout_display_t *vd,
     rect_dest.top = point.y + place.y;
     rect_dest.bottom = rect_dest.top + place.height;
 
-#ifdef MODULE_NAME_IS_directx
+#ifdef MODULE_NAME_IS_directdraw
     /* Apply overlay hardware constraints */
     if (sys->use_overlay)
         AlignRect(&rect_dest, sys->i_align_dest_boundary, sys->i_align_dest_size);
@@ -404,7 +404,7 @@ void UpdateRects(vout_display_t *vd,
 
 #endif
 
-#if defined(MODULE_NAME_IS_directx)
+#if defined(MODULE_NAME_IS_directdraw)
     /* UpdateOverlay directdraw function doesn't automatically clip to the
      * display size so we need to do it otherwise it will fail */
 
@@ -458,7 +458,7 @@ void UpdateRects(vout_display_t *vd,
       (rect_dest.bottom - rect_dest_clipped.bottom) *
       source->i_visible_height / (rect_dest.bottom - rect_dest.top);
 
-#ifdef MODULE_NAME_IS_directx
+#ifdef MODULE_NAME_IS_directdraw
     /* Apply overlay hardware constraints */
     if (sys->use_overlay)
         AlignRect(&rect_src_clipped, sys->i_align_src_boundary, sys->i_align_src_size);
@@ -477,7 +477,7 @@ void UpdateRects(vout_display_t *vd,
                 rect_src_clipped.right, rect_src_clipped.bottom);
 #endif
 
-#ifdef MODULE_NAME_IS_directx
+#ifdef MODULE_NAME_IS_directdraw
     /* The destination coordinates need to be relative to the current
      * directdraw primary surface (display) */
     rect_dest_clipped.left -= sys->rect_display.left;

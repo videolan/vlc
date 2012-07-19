@@ -43,7 +43,6 @@ $Id$
  * anaglyph: anaglyph 3d video filter
  * android_surface: video output for Android, based on Surface
  * antiflicker: anti-flicker video filter
- * aout_directx: audio output module using the DirectX API
  * aout_file: Audio output to write to a file
  * araw: Pseudo audio decoder for raw PCM
  * asf: ASF demuxer
@@ -93,8 +92,9 @@ $Id$
  * dirac: BBC Dirac codec
  * direct2d: video output module using the Direct2D API
  * direct3d: video output module using the Direct3D API
+ * directdraw: video output module using the DirectDraw API
  * directfb: Direct Framebuffer video output
- * directx: video output module using the DirectX API
+ * directsound: audio output module using the DirectSound API
  * dmo: a DirectMediaObject decoder that uses DirectMedia to decode video (WMV3)
  * dolby_surround_decoder: simple decoder for dolby surround encoded streams
  * drawable: legacy LibVLC video window provider
