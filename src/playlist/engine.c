@@ -437,7 +437,7 @@ static void VariablesInit( playlist_t *p_playlist )
 
     /* Audio output parameters */
     var_Create( p_playlist, "mute", VLC_VAR_BOOL );
-    var_Create( p_playlist, "volume", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    var_Create( p_playlist, "volume", VLC_VAR_INTEGER );
     /* FIXME: horrible hack for audio output interface code */
     var_Create( p_playlist, "find-input-callback", VLC_VAR_ADDRESS );
     var_SetAddress( p_playlist, "find-input-callback", playlist_FindInput );

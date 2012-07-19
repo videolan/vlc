@@ -153,10 +153,6 @@ static const char *const ppsz_snap_formats[] =
 #define GAIN_LONGTEXT N_( \
     "This linear gain will be applied to outputted audio.")
 
-#define VOLUME_TEXT N_("Default audio volume")
-#define VOLUME_LONGTEXT N_( \
-    "You can set the default audio output volume here.")
-
 #define VOLUME_STEP_TEXT N_("Audio output volume step")
 #define VOLUME_STEP_LONGTEXT N_( \
     "The step size of the volume is adjustable using this option.")
@@ -1476,9 +1472,7 @@ vlc_module_begin ()
         change_safe ()
     add_float( "gain", 1., GAIN_TEXT, GAIN_LONGTEXT, true )
         change_float_range( 0., 8. )
-    add_integer_with_range( "volume", AOUT_VOLUME_DEFAULT, 0,
-                            AOUT_VOLUME_MAX, VOLUME_TEXT,
-                            VOLUME_LONGTEXT, false )
+    add_obsolete_integer( "volume" ) /* since 2.1.0 */
     add_integer_with_range( "volume-step", AOUT_VOLUME_STEP, 0,
                             AOUT_VOLUME_MAX, VOLUME_STEP_TEXT,
                             VOLUME_STEP_LONGTEXT, true )
