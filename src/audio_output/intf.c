@@ -100,8 +100,6 @@ int aout_VolumeSet (vlc_object_t *obj, float vol)
     if (ret == 0)
     {   /* update caller (input manager) volume */
         var_SetInteger (obj, "volume", volume);
-        if (var_InheritBool (obj, "volume-save"))
-            config_PutInt (obj, "volume", volume);
     }
     return ret;
 }

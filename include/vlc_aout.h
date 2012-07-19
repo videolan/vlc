@@ -223,8 +223,6 @@ VLC_API void aout_FormatPrint(vlc_object_t *, const char *,
 #define aout_FormatPrint(o, t, f) aout_FormatPrint(VLC_OBJECT(o), t, f)
 VLC_API const char * aout_FormatPrintChannels( const audio_sample_format_t * ) VLC_USED;
 
-VLC_API void aout_VolumeSoftInit( audio_output_t * );
-
 static inline void aout_TimeReport(audio_output_t *aout, mtime_t date)
 {
     aout->event.time_report(aout, date);

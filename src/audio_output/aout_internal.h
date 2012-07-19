@@ -98,12 +98,6 @@ typedef struct
     filter_t *filters[AOUT_MAX_FILTERS];
     int       nb_filters;
 
-    struct
-    {
-        float volume;
-        bool mute;
-    } soft; /* temporary - TODO: move to output plugins */
-
     vlc_atomic_t restart;
 } aout_owner_t;
 
