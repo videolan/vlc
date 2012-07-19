@@ -86,7 +86,8 @@ void QVLCInteger::trigger (vlc_value_t, vlc_value_t cur)
 bool QVLCInteger::addCallback (QObject *tgt, const char *method,
                                Qt::ConnectionType type)
 {
-    return tgt->connect (this, SIGNAL(integerChanged(int64_t)), method, type);
+    return tgt->connect (this, SIGNAL(integerChanged(qlonglong)), method,
+                         type);
 }
 
 QVLCBool::QVLCBool (vlc_object_t *obj, const char *varname, bool inherit)

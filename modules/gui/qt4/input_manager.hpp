@@ -292,7 +292,7 @@ public slots:
 private slots:
     void notifyRandom( bool );
     void notifyRepeatLoop( bool );
-    void notifyVolume( int64_t );
+    void notifyVolume( qlonglong );
     void notifyMute( bool );
 signals:
     void inputChanged( input_thread_t * );

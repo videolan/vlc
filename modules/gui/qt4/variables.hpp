@@ -70,7 +70,7 @@ public:
                       Qt::ConnectionType type = Qt::AutoConnection);
 
 signals:
-    void integerChanged (int64_t);
+    void integerChanged (qlonglong);
 };
 
 class QVLCBool : public QVLCVariable
