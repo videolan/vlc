@@ -151,7 +151,7 @@ static const char *const ppsz_snap_formats[] =
 
 #define GAIN_TEXT N_("Audio gain")
 #define GAIN_LONGTEXT N_( \
-    "Thus linear gain will be applied to outputted audio.")
+    "This linear gain will be applied to outputted audio.")
 
 #define VOLUME_TEXT N_("Default audio volume")
 #define VOLUME_LONGTEXT N_( \
