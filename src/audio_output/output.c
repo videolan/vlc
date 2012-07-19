@@ -103,6 +103,16 @@ static void aout_OutputMuteReport (audio_output_t *aout, bool mute)
     var_SetBool (aout, "mute", mute);
 }
 
+static int aout_OutputGainRequest (audio_output_t *aout, float gain)
+{
+    aout_owner_t *owner = aout_owner (aout);
+
+    aout_assert_locked (aout);
+    aout_volume_SetVolume (owner->volume, gain);
+    /* XXX: ideally, return -1 if format cannot be amplified */
+    return 0;
+}
+
 /*****************************************************************************
  * aout_OutputNew : allocate a new output and rework the filter pipeline
  *****************************************************************************
@@ -120,6 +130,7 @@ int aout_OutputNew( audio_output_t *p_aout,
     p_aout->event.time_report = aout_OutputTimeReport;
     p_aout->event.volume_report = aout_OutputVolumeReport;
     p_aout->event.mute_report = aout_OutputMuteReport;
+    p_aout->event.gain_request = aout_OutputGainRequest;
 
     /* Find the best output plug-in. */
     owner->module = module_need (p_aout, "audio output", "$aout", false);

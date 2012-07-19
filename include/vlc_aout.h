@@ -155,6 +155,7 @@ struct audio_output
         void (*time_report)(audio_output_t *, mtime_t);
         void (*volume_report)(audio_output_t *, float);
         void (*mute_report)(audio_output_t *, bool);
+        int (*gain_request)(audio_output_t *, float);
     } event;
 };
 
@@ -224,6 +225,11 @@ VLC_API const char * aout_FormatPrintChannels( const audio_sample_format_t * ) V
 
 VLC_API void aout_VolumeSoftInit( audio_output_t * );
 
+static inline void aout_TimeReport(audio_output_t *aout, mtime_t date)
+{
+    aout->event.time_report(aout, date);
+}
+
 static inline void aout_VolumeReport(audio_output_t *aout, float volume)
 {
     aout->event.volume_report(aout, volume);
@@ -234,9 +240,9 @@ static inline void aout_MuteReport(audio_output_t *aout, bool mute)
     aout->event.mute_report(aout, mute);
 }
 
-static inline void aout_TimeReport(audio_output_t *aout, mtime_t date)
+static inline int aout_GainRequest(audio_output_t *aout, float gain)
 {
-    aout->event.time_report(aout, date);
+    return aout->event.gain_request(aout, gain);
 }
 
 VLC_API int aout_ChannelsRestart( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * );
