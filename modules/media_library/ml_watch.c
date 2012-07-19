@@ -93,6 +93,11 @@ int watch_Init( media_library_t *p_ml )
     vlc_cond_init( &p_wt->cond );
     vlc_mutex_init( &p_wt->lock );
 
+    /* Initialise item append queue */
+    vlc_mutex_init( &p_wt->item_append_queue_lock );
+    p_wt->item_append_queue = NULL;
+    p_wt->item_append_queue_count = 0;
+
     if( vlc_clone( &p_wt->thread, watch_Thread, p_wt, VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Dbg( p_ml, "unable to launch the auto-updating thread" );
@@ -110,11 +115,6 @@ int watch_Init( media_library_t *p_ml )
     var_AddCallback( p_pl, "item-current", watch_PlaylistItemCurrent, p_ml );
     var_AddCallback( p_pl, "playlist-item-append", watch_PlaylistItemAppend, p_ml );
     var_AddCallback( p_pl, "playlist-item-deleted", watch_PlaylistItemDeleted, p_ml );
-
-    /* Initialise item append queue */
-    vlc_mutex_init( &p_wt->item_append_queue_lock );
-    p_wt->item_append_queue = NULL;
-    p_wt->item_append_queue_count = 0;
 
     return VLC_SUCCESS;
 }
