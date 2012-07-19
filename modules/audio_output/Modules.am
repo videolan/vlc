@@ -20,9 +20,9 @@ libvlc_LTLIBRARIES += \
 	libamem_plugin.la \
 	libaout_file_plugin.la
 
-liboss_plugin_la_SOURCES = oss.c packet.c
+liboss_plugin_la_SOURCES = oss.c packet.c volume.h
 liboss_plugin_la_CFLAGS = $(AM_CFLAGS)
-liboss_plugin_la_LIBADD = $(AM_LIBADD) $(OSS_LIBS)
+liboss_plugin_la_LIBADD = $(AM_LIBADD) $(OSS_LIBS) $(LIBM)
 liboss_plugin_la_DEPENDENCIES =
 if HAVE_OSS
 libvlc_LTLIBRARIES += liboss_plugin.la

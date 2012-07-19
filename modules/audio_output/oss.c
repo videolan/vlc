@@ -75,6 +75,8 @@ struct aout_sys_t
     int i_fragstotal;
     mtime_t max_buffer_duration;
     vlc_thread_t thread;
+    float soft_gain;
+    bool soft_mute;
 };
 
 /* This must be a power of 2. */
@@ -91,6 +93,8 @@ static void* OSSThread   ( void * );
 
 static mtime_t BufferDuration( audio_output_t * p_aout );
 
+#include "volume.h"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -102,6 +106,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_loadfile( "oss-audio-device", "/dev/dsp",
                   N_("OSS DSP device"), NULL, false )
+    add_sw_gain ()
 
     set_capability( "audio output", 100 )
     add_shortcut( "oss" )
@@ -471,7 +476,7 @@ static int Open( vlc_object_t *p_this )
 
         aout_PacketInit( p_aout, &p_sys->packet,
                          audio_buf.fragsize/p_aout->format.i_bytes_per_frame );
-        aout_VolumeSoftInit( p_aout );
+        aout_SoftVolumeInit( p_aout );
     }
 
     /* Create OSS thread and wait for its readiness. */
