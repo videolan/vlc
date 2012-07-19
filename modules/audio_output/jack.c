@@ -56,6 +56,8 @@ struct aout_sys_t
     jack_sample_t **p_jack_buffers;
     unsigned int    i_channels;
     jack_nframes_t latency;
+    float soft_gain;
+    bool soft_mute;
 };
 
 /*****************************************************************************
@@ -65,6 +67,8 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 static int  Process      ( jack_nframes_t i_frames, void *p_arg );
 static int  GraphChange  ( void *p_arg );
+
+#include "volume.h"
 
 #define AUTO_CONNECT_OPTION "jack-auto-connect"
 #define AUTO_CONNECT_TEXT N_("Automatically connect to writable clients")
@@ -91,6 +95,7 @@ vlc_module_begin ()
               AUTO_CONNECT_LONGTEXT, false )
     add_string( CONNECT_REGEX_OPTION, "system", CONNECT_REGEX_TEXT,
                 CONNECT_REGEX_LONGTEXT, false )
+    add_sw_gain( )
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -143,7 +148,7 @@ static int Open( vlc_object_t *p_this )
     p_aout->pf_flush = aout_PacketFlush;
     aout_PacketInit( p_aout, &p_sys->packet,
                      jack_get_buffer_size( p_sys->p_jack_client ) );
-    aout_VolumeSoftInit( p_aout );
+    aout_SoftVolumeInit( p_aout );
 
     p_sys->i_channels = aout_FormatNbChannels( &p_aout->format );
 

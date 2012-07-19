@@ -1,7 +1,6 @@
 SOURCES_aout_file = file.c
 SOURCES_waveout = waveout.c windows_audio_common.h packet.c
 SOURCES_auhal = auhal.c packet.c
-SOURCES_jack = jack.c packet.c
 SOURCES_audioqueue = audioqueue.c packet.c
 SOURCES_opensles_android = opensles_android.c
 
@@ -43,6 +42,13 @@ libpulse_plugin_la_DEPENDENCIES =
 if HAVE_PULSE
 libvlc_LTLIBRARIES += libpulse_plugin.la
 endif
+
+libjack_plugin_la_SOURCES = oss.c packet.c volume.h
+libjack_plugin_la_CFLAGS = $(AM_CFLAGS) $(JACK_CFLAGS)
+libjack_plugin_la_LIBADD = $(AM_LIBADD) $(JACK_LIBS) $(LIBM)
+libjack_plugin_la_DEPENDENCIES =
+EXTRA_LTLIBRARIES += libjack_plugin.la
+libvlc_LTLIBRARIES += $(LTLIBjack)
 
 libdirectsound_plugin_la_SOURCES = directx.c windows_audio_common.h packet.c
 libdirectsound_plugin_la_CFLAGS = $(AM_CFLAGS)
