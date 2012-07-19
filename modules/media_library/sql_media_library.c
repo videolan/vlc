@@ -1309,7 +1309,7 @@ void CopyMediaToInputItem( input_item_t *p_item, ml_media_t *p_media )
     ml_LockMedia( p_media );
     if( p_media->psz_title && *p_media->psz_title )
         input_item_SetTitle( p_item, p_media->psz_title );
-    if( p_media->psz_uri && *p_media->psz_uri )
+    if( p_media->psz_uri && *p_media->psz_uri && !strncmp( p_media->psz_uri, "http", 4 ) )
         input_item_SetURL( p_item, p_media->psz_uri );
     if( p_media->psz_album && *p_media->psz_album )
         input_item_SetAlbum( p_item, p_media->psz_album );
