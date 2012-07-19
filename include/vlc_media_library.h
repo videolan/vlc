@@ -558,8 +558,8 @@ static inline void ml_FreePeople( ml_person_t *p_person )
     if( p_person == NULL )
         return;
     ml_FreePeople( p_person->p_next );
-    FREENULL( p_person->psz_name );
-    FREENULL( p_person->psz_role );
+    free( p_person->psz_name );
+    free( p_person->psz_role );
     free( p_person );
 }
 
