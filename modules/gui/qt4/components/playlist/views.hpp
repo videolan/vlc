@@ -32,12 +32,19 @@
 
 class QPainter;
 class PLModel;
+class QFont;
 
 class AbstractPlViewItemDelegate : public QStyledItemDelegate
 {
+    Q_OBJECT
+
 public:
     AbstractPlViewItemDelegate( QWidget * parent = 0 ) : QStyledItemDelegate(parent) {}
     void paintBackground( QPainter *, const QStyleOptionViewItem &, const QModelIndex & ) const;
+    void setZoom( int z ) { i_zoom = z; };
+
+protected:
+    int i_zoom;
 };
 
 class PlIconViewItemDelegate : public AbstractPlViewItemDelegate

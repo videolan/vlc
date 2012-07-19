@@ -76,15 +76,3 @@ QPixmap VLCModel::getArtPixmap( const QModelIndex & index, const QSize & size )
 
     return artPix;
 }
-
-void VLCModel::increaseZoom()
-{
-    i_zoom++;
-    emit layoutChanged();
-}
-
-void VLCModel::decreaseZoom()
-{
-    i_zoom--;
-    emit layoutChanged();
-}

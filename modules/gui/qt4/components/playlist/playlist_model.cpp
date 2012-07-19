@@ -29,7 +29,6 @@
 
 #include "qt4.hpp"
 #include "components/playlist/playlist_model.hpp"
-#include "dialogs_provider.hpp"                         /* THEDP */
 #include "input_manager.hpp"                            /* THEMIM */
 
 #include <vlc_intf_strings.h>                           /* I_DIR */
@@ -41,6 +40,7 @@
 #include <QIcon>
 #include <QFont>
 #include <QTimer>
+#include <QAction>
 
 QIcon PLModel::icons[ITEM_TYPE_NUMBER];
 
@@ -74,8 +74,6 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     ADD_ICON( NODE, ":/type/node" );
 #undef ADD_ICON
 
-    i_zoom = getSettings()->value( "Playlist/zoom", 0 ).toInt();
-
     rebuild( p_root );
     DCONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
               this, processInputItemUpdate( input_item_t *) );
@@ -90,7 +88,6 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
 
 PLModel::~PLModel()
 {
-    getSettings()->setValue( "Playlist/zoom", i_zoom );
     delete rootItem;
 }
 
@@ -367,7 +364,6 @@ QVariant PLModel::data( const QModelIndex &index, const int role ) const
     else if( role == Qt::FontRole )
     {
         QFont f;
-        f.setPointSize( __MAX( f.pointSize() + i_zoom, 4 ) );
         if( isCurrent( index ) )
             f.setBold( true );
         return QVariant( f );

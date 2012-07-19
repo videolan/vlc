@@ -59,6 +59,7 @@
 #include <QInputDialog>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QFont>
 
 #include <assert.h>
 
@@ -88,6 +89,8 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     /* Saved Settings */
     int i_savedViewMode = getSettings()->value( "Playlist/view-mode", TREE_VIEW ).toInt();
+    i_zoom = getSettings()->value( "Playlist/zoom", 0 ).toInt();
+
     showView( i_savedViewMode );
 
     DCONNECT( THEMIM, leafBecameParent( int ),
@@ -106,6 +109,7 @@ StandardPLPanel::~StandardPLPanel()
     if( treeView )
         getSettings()->setValue( "headerStateV2", treeView->header()->saveState() );
     getSettings()->setValue( "view-mode", currentViewIndex() );
+    getSettings()->setValue( "zoom", i_zoom );
     getSettings()->endGroup();
 }
 
@@ -245,8 +249,8 @@ bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, con
 
     /* Zoom */
     QMenu *zoomMenu = new QMenu( qtr( "Display size" ) );
-    zoomMenu->addAction( qtr( "Increase" ), model, SLOT( increaseZoom() ) );
-    zoomMenu->addAction( qtr( "Decrease" ), model, SLOT( decreaseZoom() ) );
+    zoomMenu->addAction( qtr( "Increase" ), this, SLOT( increaseZoom() ) );
+    zoomMenu->addAction( qtr( "Decrease" ), this, SLOT( decreaseZoom() ) );
     menu.addMenu( zoomMenu );
 
     CONNECT( &menu, triggered( QAction * ), model, actionSlot( QAction * ) );
@@ -561,6 +565,20 @@ void StandardPLPanel::createTreeView()
     viewStack->addWidget( treeView );
 }
 
+void StandardPLPanel::updateZoom( int i )
+{
+    if ( i < 4 - QApplication::font().pointSize() ) return;
+    i_zoom = i;
+#define A_ZOOM( view ) \
+    if ( view ) \
+    qobject_cast<AbstractPlViewItemDelegate*>( view->itemDelegate() )->setZoom( i_zoom )
+    /* Can't iterate as picflow & tree aren't using custom delegate */
+    A_ZOOM( iconView );
+    A_ZOOM( listView );
+#undef A_ZOOM
+    currentView->reset();
+}
+
 void StandardPLPanel::changeModel( bool b_ml )
 {
 #ifdef MEDIA_LIBRARY
@@ -646,6 +664,7 @@ void StandardPLPanel::showView( int i_view )
         }
     }
 
+    updateZoom( i_zoom );
     viewStack->setCurrentWidget( currentView );
     browseInto();
     gotoPlayingItem();

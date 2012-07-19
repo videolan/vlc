@@ -113,13 +113,9 @@ public:
 public slots:
     virtual void activateItem( const QModelIndex &index ) = 0;
     virtual void actionSlot( QAction *action ) = 0;
-    void increaseZoom();
-    void decreaseZoom();
 
 protected:
     intf_thread_t *p_intf;
-    /* Zoom factor for font-size */
-    int i_zoom; /* FIXME: Probably should belong to View/Delegate */
 };
 
 Q_DECLARE_METATYPE(VLCModel::actionsContainerType)

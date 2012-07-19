@@ -86,6 +86,7 @@ private:
     PlIconView        *iconView;
     PlListView        *listView;
     PicFlowView       *picFlowView;
+    int i_zoom;
 
     QAbstractItemView *currentView;
 
@@ -100,6 +101,7 @@ private:
     void createIconView();
     void createListView();
     void createCoverView();
+    void updateZoom( int i_zoom );
     void changeModel ( bool b_ml );
     bool eventFilter ( QObject * watched, QEvent * event );
 
@@ -130,6 +132,8 @@ private slots:
     void popupExplore();
     void popupStream();
     void popupSave();
+    void increaseZoom() { updateZoom( i_zoom + 1 ); };
+    void decreaseZoom() { updateZoom( i_zoom - 1 ); };
     void toggleColumnShown( int );
 
     void showView( int );
