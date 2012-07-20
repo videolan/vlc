@@ -154,13 +154,6 @@ static float aout_ReplayGainSelect(vlc_object_t *obj, const char *str,
         else
         if (!strcmp (str, "album"))
             mode = AUDIO_REPLAY_GAIN_ALBUM;
-
-        /* If the selectrf mode is not available, prefer the other one */
-        if (mode != AUDIO_REPLAY_GAIN_MAX && !replay_gain->pb_gain[mode])
-        {
-            if (replay_gain->pb_gain[!mode])
-                mode = !mode;
-        }
     }
 
     /* */
@@ -173,6 +166,10 @@ static float aout_ReplayGainSelect(vlc_object_t *obj, const char *str,
     else
     {
         float gain;
+
+        /* If the selectrf mode is not available, prefer the other one */
+        if (!replay_gain->pb_gain[mode] && replay_gain->pb_gain[!mode])
+            mode = !mode;
 
         if (replay_gain->pb_gain[mode])
             gain = replay_gain->pf_gain[mode]
