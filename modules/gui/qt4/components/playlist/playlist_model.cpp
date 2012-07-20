@@ -575,11 +575,6 @@ QModelIndex PLModel::parent( const QModelIndex &index ) const
     return createIndex(parentItem->row(), 0, parentItem);
 }
 
-int PLModel::columnCount( const QModelIndex &) const
-{
-    return columnFromMeta( COLUMN_END );
-}
-
 int PLModel::rowCount( const QModelIndex &parent ) const
 {
     const PLItem *parentItem = parent.isValid() ? getItem( parent ) : rootItem;

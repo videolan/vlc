@@ -50,6 +50,9 @@ public:
     };
 
     VLCModel( intf_thread_t *_p_intf, QObject *parent = 0 );
+    /*** QAbstractItemModel subclassing ***/
+    virtual int columnCount( const QModelIndex &parent = QModelIndex() ) const;
+
     virtual int itemId( const QModelIndex & ) const = 0;
     virtual input_item_t *getInputItem( const QModelIndex & ) const = 0;
     virtual QModelIndex currentIndex() const = 0;

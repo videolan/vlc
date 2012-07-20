@@ -76,3 +76,9 @@ QPixmap VLCModel::getArtPixmap( const QModelIndex & index, const QSize & size )
 
     return artPix;
 }
+
+int VLCModel::columnCount( const QModelIndex & ) const
+{
+    return columnFromMeta( COLUMN_END );
+}
+

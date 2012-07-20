@@ -67,7 +67,6 @@ public:
                        const QModelIndex & parent = QModelIndex() ) const;
     virtual QModelIndex currentIndex() const;
     int rowCount( const QModelIndex & parent = QModelIndex() ) const;
-    int columnCount( const QModelIndex & parent = QModelIndex() ) const;
 
     QModelIndex parent( const QModelIndex& ) const;
     QVariant headerData( int, Qt::Orientation, int ) const;

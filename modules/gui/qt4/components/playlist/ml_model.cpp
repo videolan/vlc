@@ -214,11 +214,6 @@ QMimeData* MLModel::mimeData( const QModelIndexList &indexes ) const
     return data;
 }
 
-int MLModel::columnCount( const QModelIndex & ) const
-{
-    return columnFromMeta( COLUMN_END );
-}
-
 int MLModel::rowCount( const QModelIndex & parent ) const
 {
     if( !parent.isValid() )

@@ -78,7 +78,6 @@ public:
     virtual QVariant headerData( int section, Qt::Orientation orientation,
                          int role = Qt::DisplayRole ) const;
     virtual int rowCount( const QModelIndex &parent = QModelIndex() ) const;
-    virtual int columnCount( const QModelIndex &parent = QModelIndex() ) const;
     virtual Qt::ItemFlags flags( const QModelIndex &index ) const;
     virtual QModelIndex index( const int r, const int c, const QModelIndex &parent ) const;
     virtual QModelIndex parent( const QModelIndex &index ) const;
