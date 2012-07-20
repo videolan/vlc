@@ -157,7 +157,7 @@ private:
     void updateTreeItem( PLItem * );
     void removeItem ( PLItem * );
     void removeItem( int );
-    void recurseDelete( QList<PLItem*> children, QModelIndexList *fullList );
+    void recurseDelete( QList<AbstractPLItem*> children, QModelIndexList *fullList );
     void takeItem( PLItem * ); //will not delete item
     void insertChildren( PLItem *node, QList<PLItem*>& items, int i_pos );
     /* ...of which  the following will not update the views */

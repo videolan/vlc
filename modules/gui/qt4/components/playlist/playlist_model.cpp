@@ -147,11 +147,11 @@ QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
 
     qSort(list.begin(), list.end(), modelIndexLessThen);
 
-    PLItem *item = NULL;
+    AbstractPLItem *item = NULL;
     foreach( const QModelIndex &index, list ) {
         if( item )
         {
-            PLItem *testee = getItem( index );
+            AbstractPLItem *testee = getItem( index );
             while( testee->parent() )
             {
                 if( testee->parent() == item ||
@@ -164,7 +164,7 @@ QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
         else
             item = getItem( index );
 
-        plMimeData->appendItem( item->inputItem() );
+        plMimeData->appendItem( static_cast<PLItem*>(item)->inputItem() );
     }
 
     return plMimeData;
@@ -247,7 +247,7 @@ void PLModel::dropMove( const PlMimeData * plMimeData, PLItem *target, int row )
         /* Better not try to move a node into itself.
            Abort the whole operation in that case,
            because it is ambiguous. */
-        PLItem *climber = target;
+        AbstractPLItem *climber = target;
         while( climber )
         {
             if( climber == item )
@@ -324,7 +324,7 @@ void PLModel::activateItem( playlist_item_t *p_item )
 QVariant PLModel::data( const QModelIndex &index, const int role ) const
 {
     if( !index.isValid() ) return QVariant();
-    const PLItem *item = getItem( index );
+    PLItem *item = getItem( index );
     if( role == Qt::DisplayRole )
     {
         int metadata = columnToMeta( index.column() );
@@ -512,7 +512,7 @@ QModelIndex PLModel::index( const int row, const int column, const QModelIndex &
 {
     PLItem *parentItem = parent.isValid() ? getItem( parent ) : rootItem;
 
-    PLItem *childItem = parentItem->child( row );
+    PLItem *childItem = static_cast<PLItem*>(parentItem->child( row ));
     if( childItem )
         return createIndex( row, column, childItem );
     else
@@ -539,9 +539,9 @@ bool PLModel::isTree() const
 QModelIndex PLModel::index( PLItem *item, int column ) const
 {
     if( !item ) return QModelIndex();
-    const PLItem *parent = item->parent();
+    AbstractPLItem *parent = item->parent();
     if( parent )
-        return createIndex( parent->children.lastIndexOf( item ),
+        return createIndex( parent->lastIndexOf( item ),
                             column, item );
     return QModelIndex();
 }
@@ -565,7 +565,7 @@ QModelIndex PLModel::parent( const QModelIndex &index ) const
         return QModelIndex();
     }
 
-    PLItem *parentItem = childItem->parent();
+    PLItem *parentItem = static_cast<PLItem*>(childItem->parent());
     if( !parentItem || parentItem == rootItem ) return QModelIndex();
     if( !parentItem->parent() )
     {
@@ -577,7 +577,7 @@ QModelIndex PLModel::parent( const QModelIndex &index ) const
 
 int PLModel::rowCount( const QModelIndex &parent ) const
 {
-    const PLItem *parentItem = parent.isValid() ? getItem( parent ) : rootItem;
+    PLItem *parentItem = parent.isValid() ? getItem( parent ) : rootItem;
     return parentItem->childCount();
 }
 
@@ -603,18 +603,19 @@ PLItem * PLModel::findInner( PLItem *root, int i_id, bool b_input ) const
     else if( b_input && root->inputItem()->i_id == i_id )
         return root;
 
-    QList<PLItem *>::iterator it = root->children.begin();
+    QList<AbstractPLItem *>::iterator it = root->children.begin();
     while ( it != root->children.end() )
     {
-        if( !b_input && (*it)->id() == i_id )
-            return (*it);
+        PLItem *item = static_cast<PLItem *>(*it);
+        if( !b_input && item->id() == i_id )
+            return item;
 
-        else if( b_input && (*it)->inputItem()->i_id == i_id )
-            return (*it);
+        else if( b_input && item->inputItem()->i_id == i_id )
+            return item;
 
-        if( (*it)->childCount() )
+        if( item->childCount() )
         {
-            PLItem *childFound = findInner( (*it), i_id, b_input );
+            PLItem *childFound = findInner( item, i_id, b_input );
             if( childFound )
                 return childFound;
         }
@@ -759,8 +760,8 @@ void PLModel::processItemAppend( int i_item, int i_parent )
 
     /* Search for an already matching children */
     if ( isBufferedForInsert( nodeParentItem, i_item ) ) return;
-    foreach( const PLItem *existing, nodeParentItem->children )
-        if( existing->i_id == i_item ) return;
+    foreach( const AbstractPLItem *existing, nodeParentItem->children )
+        if( existing->id() == i_item ) return;
 
     /* Find the child */
     PL_LOCK;
@@ -789,7 +790,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
     /* Invalidate cache */
     i_cached_id = i_cached_input_id = -1;
 
-    if( rootItem ) rootItem->removeChildren();
+    if( rootItem ) rootItem->clearChildren();
 
     PL_LOCK;
     if( p_root ) // Can be NULL
@@ -811,9 +812,9 @@ void PLModel::takeItem( PLItem *item )
 {
     commitBufferedRowInserts();
     assert( item );
-    PLItem *parent = item->parent();
+    PLItem *parent = static_cast<PLItem*>(item->parent());
     assert( parent );
-    int i_index = parent->children.indexOf( item );
+    int i_index = parent->indexOf( item );
 
     beginRemoveRows( index( parent, 0 ), i_index, i_index );
     parent->takeChildAt( i_index );
@@ -844,8 +845,8 @@ void PLModel::removeItem( PLItem *item )
     i_cached_input_id = -1;
 
     if( item->parent() ) {
-        int i = item->parent()->children.indexOf( item );
-        beginRemoveRows( index( item->parent(), 0), i, i );
+        int i = item->parent()->indexOf( item );
+        beginRemoveRows( index( static_cast<PLItem*>(item->parent()), 0), i, i );
         item->parent()->children.removeAt(i);
         delete item;
         endRemoveRows();
@@ -915,11 +916,11 @@ void PLModel::doDelete( QModelIndexList selected )
     }
 }
 
-void PLModel::recurseDelete( QList<PLItem*> children, QModelIndexList *fullList )
+void PLModel::recurseDelete( QList<AbstractPLItem*> children, QModelIndexList *fullList )
 {
     for( int i = children.count() - 1; i >= 0 ; i-- )
     {
-        PLItem *item = children[i];
+        PLItem *item = static_cast<PLItem *>(children[i]);
         if( item->childCount() )
             recurseDelete( item->children, fullList );
         fullList->removeAll( index( item, 0 ) );
@@ -952,7 +953,7 @@ void PLModel::sort( QModelIndex caller, QModelIndex rootIndex, const int column,
     if( count )
     {
         beginRemoveRows( qIndex, 0, count - 1 );
-        item->removeChildren();
+        item->clearChildren();
         endRemoveRows( );
     }
 
@@ -1003,7 +1004,7 @@ void PLModel::search( const QString& search_text, const QModelIndex & idx, bool 
             PLItem *searchRoot = getItem( idx );
 
             beginRemoveRows( idx, 0, searchRoot->childCount() - 1 );
-            searchRoot->removeChildren();
+            searchRoot->clearChildren();
             endRemoveRows();
 
             beginInsertRows( idx, 0, searchRoot->childCount() - 1 );

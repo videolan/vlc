@@ -87,11 +87,12 @@ MLItem::MLItem( const MLModel *p_model,
                             intf_thread_t* _p_intf,
                             ml_media_t *p_media,
                             MLItem *p_parent )
-        : p_intf( _p_intf ), model( p_model ), children(), parentItem( p_parent )
+        : p_intf( _p_intf ), model( p_model )
 {
+    parentItem = p_parent;
     if( p_media )
         ml_gc_incref( p_media );
-    this->media = p_media;
+    media = p_media;
     p_ml = ml_Get( _p_intf );
 }
 
@@ -104,51 +105,19 @@ MLItem::~MLItem()
         clearChildren();
 }
 
-/**
- * @brief recursively delete all children of this node
- * @note must be entered after the appropriate beginRemoveRows()
- */
-void MLItem::clearChildren()
-{
-    // Recursively delete all children
-    qDeleteAll( children );
-    children.clear();
-}
-
-MLItem* MLItem::child( int row ) const
+AbstractPLItem* MLItem::child( int row ) const
 {
     if( row < 0 || row >= childCount() ) return NULL;
     else return children.at( row );
 }
 
-void MLItem::addChild( MLItem *child, int row )
-{
-    assert( child );
-    children.insert( row==-1 ? children.count() : row, child );
-}
-
 void MLItem::delChild( int row )
 {
     if( !childCount() ) return; // assert ?
-    MLItem *item =
+    AbstractPLItem *item =
             children.takeAt( ( row!=-1 ) ? row : ( children.count()-1 ) );
     assert( item );
     delete item;
-}
-
-int MLItem::rowOfChild( MLItem *item ) const
-{
-    return children.indexOf( item );
-}
-
-int MLItem::childCount() const
-{
-    return children.count();
-}
-
-MLItem* MLItem::parent() const
-{
-    return parentItem;
 }
 
 input_item_t* MLItem::inputItem()

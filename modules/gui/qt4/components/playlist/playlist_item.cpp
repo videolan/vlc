@@ -35,6 +35,12 @@
  * Playlist item implementation
  *************************************************************************/
 
+void AbstractPLItem::clearChildren()
+{
+    qDeleteAll( children );
+    children.clear();
+}
+
 /*
    Playlist item is just a wrapper, an abstraction of the playlist_item
    in order to be managed by PLModel
@@ -71,57 +77,40 @@ PLItem::~PLItem()
     children.clear();
 }
 
-void PLItem::insertChild( PLItem *item, int i_pos )
-{
-    children.insert( i_pos, item );
-}
-
-void PLItem::appendChild( PLItem *item )
-{
-    children.insert( children.count(), item );
-}
-
 void PLItem::removeChild( PLItem *item )
 {
     children.removeOne( item );
     delete item;
 }
 
-void PLItem::removeChildren()
-{
-    qDeleteAll( children );
-    children.clear();
-}
-
 void PLItem::takeChildAt( int index )
 {
-    PLItem *child = children[index];
+    AbstractPLItem *child = children[index];
     child->parentItem = NULL;
     children.removeAt( index );
 }
 
 /* This function is used to get one's parent's row number in the model */
-int PLItem::row() const
+int PLItem::row()
 {
     if( parentItem )
-        return parentItem->children.indexOf( const_cast<PLItem*>(this) );
-       // We don't ever inherit PLItem, yet, but it might come :D
+        return parentItem->indexOf( this );
     return 0;
 }
 
 bool PLItem::operator< ( PLItem& other )
 {
-    PLItem *item1 = this;
+    AbstractPLItem *item1 = this;
     while( item1->parentItem )
     {
-        PLItem *item2 = &other;
+        AbstractPLItem *item2 = &other;
         while( item2->parentItem )
         {
             if( item1 == item2->parentItem ) return true;
             if( item2 == item1->parentItem ) return false;
             if( item1->parentItem == item2->parentItem )
-                return item1->parentItem->children.indexOf( item1 ) <
-                       item1->parentItem->children.indexOf( item2 );
+                return item1->parentItem->indexOf( item1 ) <
+                       item1->parentItem->indexOf( item2 );
             item2 = item2->parentItem;
         }
         item1 = item1->parentItem;

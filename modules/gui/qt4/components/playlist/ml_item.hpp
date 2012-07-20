@@ -38,49 +38,40 @@
 #include <vlc_interface.h>
 #include <vlc_media_library.h>
 
+#include "playlist_item.hpp"
 #include "ml_model.hpp"
 #include "qt4.hpp"
 
 class MLModel;
 
-class MLItem
+class MLItem : public AbstractPLItem
 {
     friend class MLModel;
+
 public:
     MLItem( const MLModel *p_model, intf_thread_t *_p_intf,
             ml_media_t *p_media, MLItem *p_parent );
     virtual ~MLItem();
-
-protected:
-    void addChild( MLItem *child, int row = -1 );
-    void delChild( int row );
-    void clearChildren();
-
-    MLItem* child( int row ) const;
-    int childCount() const;
-
-    MLItem* parent() const;
-    input_item_t *inputItem();
-
-    QVariant data( int column ) const;
-    bool setData( ml_select_e meta, const QVariant &data );
-
-    int rowOfChild( MLItem *item ) const;
-
-    // Media structure connections
-    int id() const;
-    ml_media_t* getMedia() const;
-    QUrl getUri() const;
-
     bool operator<( MLItem* item );
 
 private:
+    /* AbstractPLItem */
+    int id() const;
+    input_item_t *inputItem();
+    AbstractPLItem* child( int row ) const;
+
+    /* Local */
+    void delChild( int row );
+    QVariant data( int column ) const;
+    bool setData( ml_select_e meta, const QVariant &data );
+    // Media structure connections
+    ml_media_t* getMedia() const;
+    QUrl getUri() const;
+
     ml_media_t* media;
     intf_thread_t* p_intf;
     const MLModel *model;
     media_library_t* p_ml;
-    QList< MLItem* > children;
-    MLItem *parentItem;
 };
 
 #endif
