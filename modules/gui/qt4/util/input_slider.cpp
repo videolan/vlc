@@ -439,7 +439,8 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step,
                           char *psz_colors )
                         : QAbstractSlider( _parent )
 {
-    f_step = ( _i_step * 100 ) / AOUT_VOLUME_MAX ;
+    f_step = (float)(_i_step * 10000)
+           / (float)((SOUNDMAX - SOUNDMIN) * AOUT_VOLUME_DEFAULT);
     setRange( SOUNDMIN, SOUNDMAX );
     setMouseTracking( true );
     isSliding = false;
