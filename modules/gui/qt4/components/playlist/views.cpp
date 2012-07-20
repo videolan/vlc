@@ -80,6 +80,7 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
     QFont font( index.data( Qt::FontRole ).value<QFont>() );
     font.setPointSize( __MAX( font.pointSize() + i_zoom, 4 ) );
+    font.setBold( option.state & QStyle::State_Selected );
     painter->setFont( font );
     QFontMetrics fm = painter->fontMetrics();
 
@@ -220,6 +221,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     //Draw title info
     f.setItalic( true );
     f.setPointSize( __MAX( f.pointSize() + i_zoom, 4 ) );
+    f.setBold( option.state & QStyle::State_Selected );
     painter->setFont( f );
     QFontMetrics fm( painter->fontMetrics() );
 

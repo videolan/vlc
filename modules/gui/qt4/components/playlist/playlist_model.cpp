@@ -363,10 +363,7 @@ QVariant PLModel::data( const QModelIndex &index, const int role ) const
     }
     else if( role == Qt::FontRole )
     {
-        QFont f;
-        if( isCurrent( index ) )
-            f.setBold( true );
-        return QVariant( f );
+        return QVariant( QFont() );
     }
     else if( role == Qt::ToolTipRole )
     {
