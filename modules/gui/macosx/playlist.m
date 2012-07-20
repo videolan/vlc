@@ -1363,7 +1363,7 @@
 
     pt = [o_outline_view convertPoint: [o_event locationInWindow] fromView: nil];
     int row = [o_outline_view rowAtPoint:pt];
-    if( row != -1 && [o_outline_view selectedRow] == -1)
+    if( row != -1 && ![[o_outline_view selectedRowIndexes] containsIndex: row] )
         [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 
     b_item_sel = ( row != -1 && [o_outline_view selectedRow] != -1 );
