@@ -69,6 +69,16 @@ public:
     virtual QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 };
 
+class PlTreeViewItemDelegate : public AbstractPlViewItemDelegate
+{
+    Q_OBJECT
+
+public:
+    PlTreeViewItemDelegate(QWidget *parent = 0) : AbstractPlViewItemDelegate(parent) {}
+
+    virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+};
+
 class PlIconView : public QListView
 {
     Q_OBJECT
@@ -98,6 +108,8 @@ class PlTreeView : public QTreeView
 {
     Q_OBJECT
 
+public:
+    PlTreeView( PLModel *, QWidget *parent = 0 );
 protected:
     virtual void startDrag ( Qt::DropActions supportedActions );
     virtual void dragMoveEvent ( QDragMoveEvent * event );

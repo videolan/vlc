@@ -525,25 +525,7 @@ void StandardPLPanel::createCoverView()
 void StandardPLPanel::createTreeView()
 {
     /* Create and configure the QTreeView */
-    treeView = new PlTreeView;
-
-    treeView->setIconSize( QSize( 20, 20 ) );
-    treeView->setAlternatingRowColors( true );
-    treeView->setAnimated( true );
-    treeView->setUniformRowHeights( true );
-    treeView->setSortingEnabled( true );
-    treeView->setAttribute( Qt::WA_MacShowFocusRect, false );
-    treeView->header()->setSortIndicator( -1 , Qt::AscendingOrder );
-    treeView->header()->setSortIndicatorShown( true );
-    treeView->header()->setClickable( true );
-    treeView->header()->setContextMenuPolicy( Qt::CustomContextMenu );
-
-    treeView->setSelectionBehavior( QAbstractItemView::SelectRows );
-    treeView->setSelectionMode( QAbstractItemView::ExtendedSelection );
-    treeView->setDragEnabled( true );
-    treeView->setAcceptDrops( true );
-    treeView->setDropIndicatorShown( true );
-    treeView->setContextMenuPolicy( Qt::CustomContextMenu );
+    treeView = new PlTreeView( model, this );
 
     /* setModel after setSortingEnabled(true), or the model will sort immediately! */
 

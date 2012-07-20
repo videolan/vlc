@@ -33,6 +33,7 @@
 #include <QDrag>
 #include <QDragMoveEvent>
 #include <QMetaType>
+#include <QHeaderView>
 
 #include "assert.h"
 
@@ -80,7 +81,7 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
     QFont font( index.data( Qt::FontRole ).value<QFont>() );
     font.setPointSize( __MAX( font.pointSize() + i_zoom, 4 ) );
-    font.setBold( option.state & QStyle::State_Selected );
+    font.setBold( index.data( PLModel::IsCurrentRole ).toBool() );
     painter->setFont( font );
     QFontMetrics fm = painter->fontMetrics();
 
@@ -221,7 +222,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     //Draw title info
     f.setItalic( true );
     f.setPointSize( __MAX( f.pointSize() + i_zoom, 4 ) );
-    f.setBold( option.state & QStyle::State_Selected );
+    f.setBold( index.data( PLModel::IsCurrentRole ).toBool() );
     painter->setFont( f );
     QFontMetrics fm( painter->fontMetrics() );
 
@@ -270,6 +271,21 @@ QSize PlListViewItemDelegate::sizeHint ( const QStyleOptionViewItem &, const QMo
     QFontMetrics fm( f );
     int height = qMax( LISTVIEW_ART_SIZE, 2 * fm.height() + 4 ) + 6;
     return QSize( 0, height );
+}
+
+
+void PlTreeViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
+{
+    if ( index.data( PLModel::IsCurrentRole ).toBool() )
+    {
+        QStyleOptionViewItem myoptions = option;
+        myoptions.font.setBold( true );
+        AbstractPlViewItemDelegate::paint( painter, myoptions, index );
+    }
+    else
+    {
+        AbstractPlViewItemDelegate::paint( painter, option, index );
+    }
 }
 
 static inline void plViewStartDrag( QAbstractItemView *view, const Qt::DropActions & supportedActions )
@@ -382,6 +398,29 @@ bool PlListView::viewportEvent ( QEvent * event )
     {
         return QAbstractItemView::viewportEvent( event );
     }
+}
+
+PlTreeView::PlTreeView( PLModel *, QWidget *parent ) : QTreeView( parent )
+{
+    setItemDelegate( new PlTreeViewItemDelegate( this ) );
+
+    setIconSize( QSize( 20, 20 ) );
+    setAlternatingRowColors( true );
+    setAnimated( true );
+    setUniformRowHeights( true );
+    setSortingEnabled( true );
+    setAttribute( Qt::WA_MacShowFocusRect, false );
+    header()->setSortIndicator( -1 , Qt::AscendingOrder );
+    header()->setSortIndicatorShown( true );
+    header()->setClickable( true );
+    header()->setContextMenuPolicy( Qt::CustomContextMenu );
+
+    setSelectionBehavior( QAbstractItemView::SelectRows );
+    setSelectionMode( QAbstractItemView::ExtendedSelection );
+    setDragEnabled( true );
+    setAcceptDrops( true );
+    setDropIndicatorShown( true );
+    setContextMenuPolicy( Qt::CustomContextMenu );
 }
 
 void PlTreeView::setModel( QAbstractItemModel * model )
