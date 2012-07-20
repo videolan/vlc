@@ -181,12 +181,12 @@ static float aout_ReplayGainSelect(vlc_object_t *obj, const char *str,
             gain = var_InheritFloat (obj, "audio-replay-gain-default");
 
         multiplier = pow (10., gain / 20.);
-    }
 
-    if (replay_gain->pb_peak[mode]
-     && var_InheritBool (obj, "audio-replay-gain-peak-protection")
-     && replay_gain->pf_peak[mode] * multiplier > 1.0)
-        multiplier = 1.0f / replay_gain->pf_peak[mode];
+        if (replay_gain->pb_peak[mode]
+         && var_InheritBool (obj, "audio-replay-gain-peak-protection")
+         && replay_gain->pf_peak[mode] * multiplier > 1.f)
+            multiplier = 1.f / replay_gain->pf_peak[mode];
+    }
 
     /* Command line / configuration gain */
     multiplier *= var_InheritFloat (obj, "gain");
