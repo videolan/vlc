@@ -33,9 +33,10 @@
 
 Volume::Volume( intf_thread_t *pIntf ): VarPercent( pIntf )
 {
-    m_step = (float)config_GetInt( pIntf, "volume-step" ) / AOUT_VOLUME_MAX;
     m_max = 200;
     m_volumeMax = AOUT_VOLUME_DEFAULT * 2;
+    m_step = (float)config_GetInt( pIntf, "volume-step" )
+           / (float)m_volumeMax;
 
     // Initial value
     float val = aout_VolumeGet( getIntf()->p_sys->p_playlist ) * 100.f;
