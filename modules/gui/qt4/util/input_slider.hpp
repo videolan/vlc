@@ -125,7 +125,7 @@ class SoundSlider : public QAbstractSlider
 {
     Q_OBJECT
 public:
-    SoundSlider( QWidget *_parent, int _i_step, bool b_softamp, char * );
+    SoundSlider( QWidget *_parent, int _i_step, char * );
     void setMuted( bool ); /* Set Mute status */
 
 protected:

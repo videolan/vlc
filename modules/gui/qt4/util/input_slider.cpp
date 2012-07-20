@@ -435,12 +435,12 @@ bool SeekSlider::isAnimationRunning() const
 #define SOUNDMIN  0   // %
 #define SOUNDMAX  200 // % OR 400 ?
 
-SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
+SoundSlider::SoundSlider( QWidget *_parent, int _i_step,
                           char *psz_colors )
                         : QAbstractSlider( _parent )
 {
     f_step = ( _i_step * 100 ) / AOUT_VOLUME_MAX ;
-    setRange( SOUNDMIN, b_hard ? (2 * SOUNDMAX) : SOUNDMAX  );
+    setRange( SOUNDMIN, SOUNDMAX );
     setMouseTracking( true );
     isSliding = false;
     b_mouseOutside = true;

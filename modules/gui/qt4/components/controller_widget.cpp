@@ -90,7 +90,6 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     {
         volumeSlider = new SoundSlider( this,
             config_GetInt( p_intf, "volume-step" ),
-            false,
             var_InheritString( p_intf, "qt-slider-colours" ) );
     }
     else
