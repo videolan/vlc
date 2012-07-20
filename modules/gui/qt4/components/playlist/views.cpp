@@ -65,7 +65,7 @@ void AbstractPlViewItemDelegate::paintBackground(
         painter->drawRect( r );
     }
     if( option.state & QStyle::State_MouseOver )
-    {
+    { /* requires WA_hover on viewport */
         painter->setOpacity( 0.5 );
         painter->setPen( Qt::NoPen );
         painter->setBrush( option.palette.color( QPalette::Highlight ).lighter( 150 ) );
@@ -318,6 +318,7 @@ PlIconView::PlIconView( PLModel *, QWidget *parent ) : QListView( parent )
     setSelectionBehavior( QAbstractItemView::SelectRows );
     setDragEnabled(true);
     setAttribute( Qt::WA_MacShowFocusRect, false );
+    viewport()->setAttribute( Qt::WA_Hover );
     /* dropping in QListView::IconMode does not seem to work */
     //setAcceptDrops( true );
     //setDropIndicatorShown(true);
@@ -363,6 +364,7 @@ PlListView::PlListView( PLModel *, QWidget *parent ) : QListView( parent )
     PlListViewItemDelegate *delegate = new PlListViewItemDelegate( this );
     setItemDelegate( delegate );
     setAttribute( Qt::WA_MacShowFocusRect, false );
+    viewport()->setAttribute( Qt::WA_Hover );
 }
 
 void PlListView::startDrag ( Qt::DropActions supportedActions )
@@ -410,6 +412,7 @@ PlTreeView::PlTreeView( PLModel *, QWidget *parent ) : QTreeView( parent )
     setUniformRowHeights( true );
     setSortingEnabled( true );
     setAttribute( Qt::WA_MacShowFocusRect, false );
+    viewport()->setAttribute( Qt::WA_Hover );
     header()->setSortIndicator( -1 , Qt::AscendingOrder );
     header()->setSortIndicatorShown( true );
     header()->setClickable( true );
