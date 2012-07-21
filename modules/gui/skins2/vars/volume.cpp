@@ -6,6 +6,7 @@
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
+ *          Erwan Tulou      <erwan10 aT videolan Dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,17 +31,18 @@
 #include <vlc_aout_intf.h>
 #include <vlc_playlist.h>
 #include "volume.hpp"
+#include <math.h>
 
 Volume::Volume( intf_thread_t *pIntf ): VarPercent( pIntf )
 {
-    m_max = 200;
-    m_volumeMax = AOUT_VOLUME_DEFAULT * 2;
+    // compute preferred step in [0.,1.] range
     m_step = (float)config_GetInt( pIntf, "volume-step" )
-           / (float)m_volumeMax;
+             / (float)AOUT_VOLUME_MAX;
 
-    // Initial value
-    float val = aout_VolumeGet( getIntf()->p_sys->p_playlist ) * 100.f;
-    set( val, false );
+    // set current volume from the playlist
+    playlist_t* pPlaylist = pIntf->p_sys->p_playlist;
+    int volume = var_GetInteger( pPlaylist, "volume" );
+    set( volume, false );
 }
 
 
@@ -48,22 +50,34 @@ void Volume::set( float percentage, bool updateVLC )
 {
     VarPercent::set( percentage );
     if( updateVLC )
-        aout_VolumeSet( getIntf()->p_sys->p_playlist, get() * m_volumeMax );
+    {
+        playlist_t* pPlaylist = getIntf()->p_sys->p_playlist;
+        aout_VolumeSet( pPlaylist, getVolume() );
+    }
 }
 
 
-void Volume::set( int val, bool updateVLC )
+void Volume::set( int volume, bool updateVLC )
 {
-    set( (float)val / m_volumeMax, updateVLC );
+    // volume is kept by the playlist in [0,AOUT_VOLUME_MAX] range
+    // this class keeps it in [0.,1.] range
+    set( (float)volume/(float)AOUT_VOLUME_MAX, updateVLC );
+}
+
+
+float Volume::getVolume() const
+{
+    // translate from [0.,1.] into [0.,AOUT_VOLUME_MAX/AOUT_VOLUME_DEFAULT]
+    return get() * AOUT_VOLUME_MAX/AOUT_VOLUME_DEFAULT;
 }
 
 
 string Volume::getAsStringPercent() const
 {
-    int value = (int)(m_max * VarPercent::get());
+    int value = lround( getVolume() * 100. );
     // 0 <= value <= 200, so we need 4 chars
     char str[4];
-    snprintf( str, 4, "%d", value );
+    snprintf( str, 4, "%i", value );
     return string(str);
 }
 
