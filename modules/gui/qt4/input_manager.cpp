@@ -958,7 +958,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     repeat.addCallback( this, SLOT(notifyRepeatLoop(bool)) );
     loop.addCallback( this, SLOT(notifyRepeatLoop(bool)) );
 
-    volume.addCallback( this, SLOT(notifyVolume(qlonglong)) );
+    volume.addCallback( this, SLOT(notifyVolume(float)) );
     mute.addCallback( this, SLOT(notifyMute(bool)) );
 
     /* Warn our embedded IM about input changes */
@@ -1217,9 +1217,9 @@ static int LeafToParent( vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
-void MainInputManager::notifyVolume( qlonglong volume )
+void MainInputManager::notifyVolume( float volume )
 {
-    emit volumeChanged( volume / (float)AOUT_VOLUME_DEFAULT );
+    emit volumeChanged( volume );
 }
 
 void MainInputManager::notifyMute( bool mute )

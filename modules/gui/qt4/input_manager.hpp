@@ -274,7 +274,7 @@ private:
     input_thread_t          *p_input;
     intf_thread_t           *p_intf;
     QVLCBool random, repeat, loop;
-    QVLCInteger volume;
+    QVLCFloat volume;
     QVLCBool mute;
 
 public slots:
@@ -292,7 +292,7 @@ public slots:
 private slots:
     void notifyRandom( bool );
     void notifyRepeatLoop( bool );
-    void notifyVolume( qlonglong );
+    void notifyVolume( float );
     void notifyMute( bool );
 signals:
     void inputChanged( input_thread_t * );

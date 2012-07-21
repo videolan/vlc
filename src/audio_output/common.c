@@ -55,16 +55,6 @@ static int var_Copy (vlc_object_t *src, const char *name, vlc_value_t prev,
     return var_Set (dst, name, value);
 }
 
-static int var_CopyVolume (vlc_object_t *src, const char *name,
-                           vlc_value_t prev, vlc_value_t value, void *data)
-{
-    vlc_object_t *dst = data;
-    long volume = lroundf (value.f_float * (float)AOUT_VOLUME_DEFAULT);
-
-    (void) src; (void) prev;
-    return var_SetInteger (dst, name, volume);
-}
-
 #undef aout_New
 /*****************************************************************************
  * aout_New: initialize aout structure
@@ -95,7 +85,7 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
     char *str;
 
     var_Create (aout, "volume", VLC_VAR_FLOAT);
-    var_AddCallback (aout, "volume", var_CopyVolume, p_parent);
+    var_AddCallback (aout, "volume", var_Copy, p_parent);
     var_Create (aout, "mute", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     var_AddCallback (aout, "mute", var_Copy, p_parent);
 
@@ -206,7 +196,8 @@ void aout_Destroy (audio_output_t *aout)
         aout_Shutdown (aout);
 
     var_DelCallback (aout, "mute", var_Copy, aout->p_parent);
-    var_DelCallback (aout, "volume", var_CopyVolume, aout->p_parent);
+    var_SetFloat (aout, "volume", -1.f);
+    var_DelCallback (aout, "volume", var_Copy, aout->p_parent);
     vlc_object_release (aout);
 }
 
