@@ -14068,14 +14068,14 @@ msgid ""
 msgstr ""
 "Ce fichier AVI a un index éronné ou absent, il ne sera pas possible de se "
 "déplacer dedans correctement.\n"
-"VLC ne réparera pas le fichier mais peu temporairement contourner ce "
+"VLC ne réparera pas le fichier mais peut temporairement contourner ce "
 "problème en construisant un index en mémoire.\n"
 "Cette opération peut prendre du temps sur des gros fichiers.\n"
-"Souhaitez-vous essayer de le réparer ?"
+"Que souhaitez-vous faire ?"
 
 #: modules/demux/avi/avi.c:682
 msgid "Build index then play"
-msgstr "Contruire l'index pendant la lecture"
+msgstr "Construire l'index et lire"
 
 #: modules/demux/avi/avi.c:682
 msgid "Play as is"
