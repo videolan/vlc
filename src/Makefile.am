@@ -242,6 +242,7 @@ SOURCES_libvlc_darwin = \
 	posix/filesystem.c \
 	posix/plugin.c \
 	posix/thread.c \
+	posix/timer.c \
 	posix/darwin_specific.c \
 	posix/rand.c \
 	$(NULL)
@@ -251,6 +252,7 @@ SOURCES_libvlc_linux = \
 	posix/filesystem.c \
 	posix/plugin.c \
 	posix/thread.c \
+	posix/timer.c \
 	posix/linux_cpu.c \
 	posix/linux_specific.c \
 	posix/specific.c \
@@ -288,6 +290,7 @@ SOURCES_libvlc_other = \
 	posix/dirs.c \
 	posix/filesystem.c \
 	posix/thread.c \
+	posix/timer.c \
 	posix/plugin.c \
 	posix/specific.c \
 	posix/rand.c \
