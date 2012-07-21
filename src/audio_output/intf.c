@@ -96,11 +96,6 @@ int aout_VolumeSet (vlc_object_t *obj, float vol)
         aout_unlock (aout);
         vlc_object_release (aout);
     }
-
-    if (ret == 0)
-    {   /* update caller (input manager) volume */
-        var_SetInteger (obj, "volume", volume);
-    }
     return ret;
 }
 
