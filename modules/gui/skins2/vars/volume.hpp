@@ -38,12 +38,10 @@ public:
     virtual ~Volume() { }
 
     virtual void set( float percentage, bool updateVLC );
-
-    virtual void set( int volume, bool updateVLC );
-
     virtual void set( float percentage ) { set( percentage, true ); }
 
     virtual float getVolume() const;
+    virtual void setVolume( float volume, bool updateVLC );
 
     virtual float getStep() const { return m_step; }
 

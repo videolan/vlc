@@ -79,7 +79,7 @@ void VlcProc::destroy( intf_thread_t *pIntf )
 #define SET_STREAMTIME(m,v,b) ((StreamTime*)(m).get())->set(v,b)
 #define SET_TEXT(m,v)         ((VarText*)(m).get())->set(v)
 #define SET_STRING(m,v)       ((VarString*)(m).get())->set(v)
-#define SET_VOLUME(m,v,b)     ((Volume*)(m).get())->set(v,b)
+#define SET_VOLUME(m,v,b)     ((Volume*)(m).get())->setVolume(v,b)
 
 VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     m_varEqBands( pIntf ), m_pVout( NULL ), m_pAout( NULL ),
@@ -693,8 +693,7 @@ void VlcProc::on_volume_changed( vlc_object_t* p_obj, vlc_value_t newVal )
     (void)p_obj; (void)newVal;
     playlist_t* pPlaylist = getIntf()->p_sys->p_playlist;
 
-    int volume = var_GetInteger( pPlaylist, "volume" );
-    SET_VOLUME( m_cVarVolume, volume, false );
+    SET_VOLUME( m_cVarVolume, var_GetFloat( pPlaylist, "volume" ), false );
     bool b_is_muted = aout_MuteGet( pPlaylist ) > 0;
     SET_BOOL( m_cVarMute, b_is_muted );
 }
@@ -798,8 +797,7 @@ void VlcProc::init_variables()
     SET_BOOL( m_cVarLoop, var_GetBool( pPlaylist, "loop" ) );
     SET_BOOL( m_cVarRepeat, var_GetBool( pPlaylist, "repeat" ) );
 
-    int volume = var_GetInteger( pPlaylist, "volume" );
-    SET_VOLUME( m_cVarVolume, volume, false );
+    SET_VOLUME( m_cVarVolume, var_GetFloat( pPlaylist, "volume" ), false );
     bool b_is_muted = aout_MuteGet( pPlaylist ) > 0;
     SET_BOOL( m_cVarMute, b_is_muted );
 
