@@ -433,7 +433,7 @@ bool SeekSlider::isAnimationRunning() const
 #define WLENGTH   80 // px
 #define WHEIGHT   22  // px
 #define SOUNDMIN  0   // %
-#define SOUNDMAX  200 // % OR 400 ?
+#define SOUNDMAX  125 // % (+6dB)
 
 SoundSlider::SoundSlider( QWidget *_parent, int _i_step,
                           char *psz_colors )
