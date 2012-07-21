@@ -364,16 +364,6 @@ VLC_API void osd_MenuDown( vlc_object_t * );
 #define osd_MenuDown(object) osd_MenuDown( VLC_OBJECT(object) )
 
 /**
- * Display the audio volume bitmap.
- *
- * Display the correct audio volume bitmap that corresponds to the
- * current Audio Volume setting.
- */
-VLC_API void osd_Volume( vlc_object_t * );
-
-#define osd_Volume(object)     osd_Volume( VLC_OBJECT(object) )
-
-/**
  * Retrieve a non modifyable pointer to the OSD Menu state
  *
  */

@@ -573,48 +573,6 @@ static int osd_VolumeStep( vlc_object_t *p_this, int i_volume, int i_steps )
     return (i_volume/i_volume_step);
 }
 
-#undef osd_Volume
-/**
- * Display current audio volume bitmap
- *
- * The OSD Menu audio volume bar is updated to reflect the new audio volume. Call this function
- * when the audio volume is updated outside the OSD menu command "menu up", "menu down" or "menu select".
- */
-void osd_Volume( vlc_object_t *p_this )
-{
-    osd_button_t *p_button = NULL;
-    int i_volume = 0;
-    int i_steps = 0;
-
-    osd_menu_t *p_osd = osd_FindVisible( p_this );
-    if( p_osd == NULL )
-        return;
-
-    if( p_osd->p_state && p_osd->p_state->p_volume )
-    {
-
-        p_button = p_osd->p_state->p_volume;
-        if( p_osd->p_state->p_volume )
-            p_osd->p_state->p_visible = p_osd->p_state->p_volume;
-        if( p_button && p_button->b_range )
-        {
-            /* Update the volume state images to match the current volume */
-            i_volume = config_GetInt( p_this, "volume" );
-            i_steps = osd_VolumeStep( p_this, i_volume, p_button->i_ranges );
-            p_button->p_current_state = osd_VolumeStateChange( p_button->p_states, i_steps );
-
-            osd_UpdateState( p_osd->p_state,
-                    p_button->i_x, p_button->i_y,
-                    p_button->p_current_state->i_width,
-                    p_button->p_current_state->i_height,
-                    p_button->p_current_state->p_pic );
-            osd_SetMenuUpdate( p_osd, true );
-            osd_SetMenuVisible( p_osd, true );
-        }
-    }
-    vlc_mutex_unlock( &osd_mutex );
-}
-
 #undef osd_ButtonFind
 osd_button_t *osd_ButtonFind( vlc_object_t *p_this, int i_x, int i_y,
     int i_window_height, int i_window_width,
