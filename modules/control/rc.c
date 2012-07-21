@@ -1508,7 +1508,6 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
                              i_volume / (float)AOUT_VOLUME_DEFAULT ) )
             i_error = VLC_SUCCESS;
         aout_MuteSet( p_playlist, i_volume == 0 );
-        osd_Volume( p_this );
         msg_rc( STATUS_CHANGE "( audio volume: %d )", i_volume );
     }
     else
@@ -1548,7 +1547,6 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
         i_nb_steps *= -1;
     if( aout_VolumeUp( p_intf->p_sys->p_playlist, i_nb_steps, &volume ) < 0 )
         i_error = VLC_EGENERIC;
-    osd_Volume( p_this );
 
     if ( !i_error )
         msg_rc( STATUS_CHANGE "( audio volume: %ld )",
