@@ -502,8 +502,6 @@ static void Run( intf_thread_t *p_intf )
                             input_item_GetURI( input_GetItem( p_input ) );
                     msg_rc( STATUS_CHANGE "( new input: %s )", psz_uri );
                     free( psz_uri );
-                    msg_rc( STATUS_CHANGE "( audio volume: %d )",
-                            (int)config_GetInt( p_intf, "volume" ));
                 }
                 var_AddCallback( p_input, "intf-event", InputEvent, p_intf );
             }
@@ -1416,30 +1414,37 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             /* Replay the current state of the system. */
             char *psz_uri =
                     input_item_GetURI( input_GetItem( p_input ) );
-            msg_rc( STATUS_CHANGE "( new input: %s )", psz_uri );
-            free( psz_uri );
-            msg_rc( STATUS_CHANGE "( audio volume: %d )",
-                    (int)config_GetInt( p_intf, "volume" ));
-
-            PL_LOCK;
-            int status = playlist_Status(p_playlist);
-            PL_UNLOCK;
-            switch( status )
-            {
-                case PLAYLIST_STOPPED:
-                    msg_rc( STATUS_CHANGE "( stop state: 5 )" );
-                    break;
-                case PLAYLIST_RUNNING:
-                    msg_rc( STATUS_CHANGE "( play state: 3 )" );
-                    break;
-                case PLAYLIST_PAUSED:
-                    msg_rc( STATUS_CHANGE "( pause state: 4 )" );
-                    break;
-                default:
-                    msg_rc( STATUS_CHANGE "( unknown state: -1 )" );
-                    break;
-            }
             vlc_object_release( p_input );
+            if( likely(psz_uri != NULL) )
+            {
+                msg_rc( STATUS_CHANGE "( new input: %s )", psz_uri );
+                free( psz_uri );
+            }
+        }
+
+        float volume = aout_VolumeGet( p_playlist );
+        if( volume >= 0.f )
+            msg_rc( STATUS_CHANGE "( audio volume: %ld )",
+                    lroundf(volume * AOUT_VOLUME_DEFAULT) );
+
+        int status;
+        PL_LOCK;
+        status = playlist_Status(p_playlist);
+        PL_UNLOCK;
+        switch( status )
+        {
+            case PLAYLIST_STOPPED:
+                msg_rc( STATUS_CHANGE "( stop state: 5 )" );
+                break;
+            case PLAYLIST_RUNNING:
+                msg_rc( STATUS_CHANGE "( play state: 3 )" );
+                break;
+            case PLAYLIST_PAUSED:
+                msg_rc( STATUS_CHANGE "( pause state: 4 )" );
+                break;
+            default:
+                msg_rc( STATUS_CHANGE "( unknown state: -1 )" );
+                break;
         }
     }
 
