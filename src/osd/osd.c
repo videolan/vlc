@@ -29,11 +29,13 @@
 # include "config.h"
 #endif
 
+#include <math.h>
 #include <vlc_common.h>
 #include <vlc_keys.h>
 #include <vlc_osd.h>
 #include <vlc_image.h>
 #include <vlc_modules.h>
+#include <vlc_aout_intf.h>
 
 #include "libvlc.h"
 
@@ -45,7 +47,6 @@
 
 static void osd_UpdateState( osd_menu_state_t *, int, int, int, int, picture_t * );
 static inline osd_state_t *osd_VolumeStateChange( osd_state_t *, int );
-static int osd_VolumeStep( vlc_object_t *, int, int );
 static bool osd_ParserLoad( osd_menu_t *, const char * );
 static void osd_ParserUnload( osd_menu_t * );
 
@@ -139,8 +140,6 @@ osd_menu_t *osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
 {
     osd_menu_t  *p_osd = NULL;
     vlc_value_t val;
-    int         i_volume = 0;
-    int         i_steps = 0;
 
     /* to be sure to avoid multiple creation */
     vlc_mutex_lock( &osd_mutex );
@@ -172,10 +171,15 @@ osd_menu_t *osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
         if( p_osd->p_state->p_volume )
         {
             /* Update the volume state images to match the current volume */
-            i_volume = config_GetInt( p_this, "volume" );
-            i_steps = osd_VolumeStep( p_this, i_volume, p_osd->p_state->p_volume->i_ranges );
-            p_osd->p_state->p_volume->p_current_state = osd_VolumeStateChange(
-                                    p_osd->p_state->p_volume->p_states, i_steps );
+            float vol = aout_VolumeGet( p_this );
+            if( vol >= 0.f )
+            {
+                vol *= (float)AOUT_VOLUME_DEFAULT;
+                vol /= var_InheritInteger( p_this, "volume-step" );
+                p_osd->p_state->p_volume->p_current_state =
+                    osd_VolumeStateChange( p_osd->p_state->p_volume->p_states,
+                                           lroundf(vol) );
+            }
         }
         /* Initialize OSD state */
         osd_UpdateState( p_osd->p_state, p_osd->i_x, p_osd->i_y,
@@ -562,15 +566,6 @@ void osd_MenuDown( vlc_object_t *p_this )
 #endif
 
     vlc_mutex_unlock( &osd_mutex );
-}
-
-static int osd_VolumeStep( vlc_object_t *p_this, int i_volume, int i_steps )
-{
-    int i_volume_step = 0;
-    (void)i_steps;
-
-    i_volume_step = config_GetInt( p_this->p_libvlc, "volume-step" );
-    return (i_volume/i_volume_step);
 }
 
 #undef osd_ButtonFind
