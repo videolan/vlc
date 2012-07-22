@@ -1271,8 +1271,9 @@ static int get_HTTPLiveMetaPlaylist(stream_t *s, vlc_array_t **streams)
     return err;
 }
 
-/* Reload playlist */
-static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t **hls)
+/* Update hls_old (an existing member of p_sys->hls_stream) to match hls_new 
+   (which represents a downloaded, perhaps newer version of the same playlist) */
+static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *hls_old)
 {
     int count = vlc_array_count(hls_new->segments);
 
@@ -1284,8 +1285,7 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
         segment_t *p = segment_GetSegment(hls_new, n);
         if (p == NULL) return VLC_EGENERIC;
 
-        vlc_mutex_lock(&(*hls)->lock);
-        segment_t *segment = segment_Find(*hls, p->sequence);
+        segment_t *segment = segment_Find(hls_old, p->sequence);
         if (segment)
         {
             vlc_mutex_lock(&segment->lock);
@@ -1331,32 +1331,29 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
         }
         else
         {
-            int last = vlc_array_count((*hls)->segments) - 1;
-            segment_t *l = segment_GetSegment(*hls, last);
-            if (l == NULL) goto fail_and_unlock;
+            int last = vlc_array_count(hls_old->segments) - 1;
+            segment_t *l = segment_GetSegment(hls_old, last);
+            if (l == NULL) assert(0);
 
             if ((l->sequence + 1) != p->sequence)
             {
                 msg_Err(s, "gap in sequence numbers found: new=%d expected %d",
                         p->sequence, l->sequence+1);
             }
-            vlc_array_append((*hls)->segments, p);
+            vlc_array_append(hls_old->segments, p);
             msg_Info(s, "- segment %d appended", p->sequence);
         }
-        vlc_mutex_unlock(&(*hls)->lock);
     }
 
     /* update meta information */
-    vlc_mutex_lock(&(*hls)->lock);
-    (*hls)->sequence = hls_new->sequence;
-    (*hls)->duration = (hls_new->duration == -1) ? (*hls)->duration : hls_new->duration;
-    (*hls)->b_cache = hls_new->b_cache;
-    vlc_mutex_unlock(&(*hls)->lock);
+    hls_old->sequence = hls_new->sequence;
+    hls_old->duration = (hls_new->duration == -1) ? hls_old->duration : hls_new->duration;
+    hls_old->b_cache = hls_new->b_cache;
+    vlc_mutex_unlock(&hls_old->lock);
     return VLC_SUCCESS;
 
 fail_and_unlock:
-    assert(0);
-    vlc_mutex_unlock(&(*hls)->lock);
+    vlc_mutex_unlock(&hls_old->lock);
     return VLC_EGENERIC;
 }
 
@@ -1400,7 +1397,7 @@ static int hls_ReloadPlaylist(stream_t *s)
             msg_Info(s, "new HLS stream appended (id=%d, bandwidth=%"PRIu64")",
                      hls_new->id, hls_new->bandwidth);
         }
-        else if (hls_UpdatePlaylist(s, hls_new, &hls_old) != VLC_SUCCESS)
+        else if (hls_UpdatePlaylist(s, hls_new, hls_old) != VLC_SUCCESS)
             msg_Info(s, "failed updating HLS stream (id=%d, bandwidth=%"PRIu64")",
                      hls_new->id, hls_new->bandwidth);
     }
@@ -1463,7 +1460,7 @@ static int hls_DownloadSegmentData(stream_t *s, hls_stream_t *hls, segment_t *se
         int estimated = (int)(size / p_sys->bandwidth);
         if (estimated > segment->duration)
         {
-            msg_Warn(s,"downloading of segment %d takes %ds, which is longer than its playback (%ds)",
+            msg_Warn(s,"downloading segment %d predicted to take %ds, which exceeds its length (%ds)",
                         segment->sequence, estimated, segment->duration);
         }
     }
@@ -1471,7 +1468,7 @@ static int hls_DownloadSegmentData(stream_t *s, hls_stream_t *hls, segment_t *se
     mtime_t start = mdate();
     if (hls_Download(s, segment) != VLC_SUCCESS)
     {
-        msg_Err(s, "downloaded segment %d from stream %d failed",
+        msg_Err(s, "downloading segment %d from stream %d failed",
                     segment->sequence, *cur_stream);
         vlc_mutex_unlock(&segment->lock);
         return VLC_EGENERIC;
@@ -1923,11 +1920,6 @@ static int Open(vlc_object_t *p_this)
 
     /* manage encryption key if needed */
     hls_ManageSegmentKeys(s, hls_Get(p_sys->hls_stream, current));
-
-    if (p_sys->b_live && (p_sys->playback.segment < 0))
-    {
-        msg_Warn(s, "less data than 3 times 'target duration' available for live playback, playback may stall");
-    }
 
     if (Prefetch(s, &current) != VLC_SUCCESS)
     {
