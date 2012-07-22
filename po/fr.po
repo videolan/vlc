@@ -9849,7 +9849,7 @@ msgid ""
 "The audio device \"%s\" could not be used:\n"
 "%s."
 msgstr ""
-"Le périphérique audio « %s » ne peut pas êtr utilisé:\n"
+"Le périphérique audio « %s » ne peut pas être utilisé:\n"
 "%s."
 
 #: modules/audio_output/amem.c:34
