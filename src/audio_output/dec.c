@@ -97,10 +97,7 @@ int aout_DecNew( audio_output_t *p_aout,
     vlc_atomic_set (&owner->restart, 0);
     owner->volume = aout_volume_New (p_aout, p_replay_gain);
     if( aout_OutputNew( p_aout, p_format ) < 0 )
-    {
-        ret = -1;
         goto error;
-    }
     aout_volume_SetFormat (owner->volume, owner->mixer_format.i_format);
 
     /* Create the audio filtering "input" pipeline */
@@ -113,11 +110,10 @@ int aout_DecNew( audio_output_t *p_aout,
     if (owner->input == NULL)
     {
         aout_OutputDelete (p_aout);
-        aout_volume_Delete (owner->volume);
-        aout_unlock (p_aout);
-        return -1;
-    }
 error:
+        aout_volume_Delete (owner->volume);
+        ret = -1;
+    }
     aout_unlock( p_aout );
     return ret;
 }
