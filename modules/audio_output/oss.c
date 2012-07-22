@@ -38,6 +38,10 @@
 # include <sys/soundcard.h>
 #endif
 
+#ifndef SNDCTL_DSP_HALT
+# define SNDCTL_DSP_HALT SNDCTL_DSP_RESET
+#endif
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_fs.h>
@@ -113,12 +117,14 @@ static int Open (vlc_object_t *obj)
 
     switch (fourcc)
     {
+#ifdef AFMT_FLOAT
         case VLC_CODEC_F64B:
         case VLC_CODEC_F64L:
         case VLC_CODEC_F32B:
         case VLC_CODEC_F32L:
             format = AFMT_FLOAT;
             break;
+#endif
         case VLC_CODEC_S32B:
             format = AFMT_S32_BE;
             break;
@@ -140,8 +146,10 @@ static int Open (vlc_object_t *obj)
                 spdif = var_InheritBool (aout, "spdif");
             if (spdif)
                 format = AFMT_AC3;
+#ifdef AFMT_FLOAT
             else if (HAVE_FPU)
                 format = AFMT_FLOAT;
+#endif
             else
                 format = AFMT_S16_NE;
     }
@@ -162,7 +170,9 @@ static int Open (vlc_object_t *obj)
         //case AFMT_S24_LE:
         case AFMT_S32_BE: fourcc = VLC_CODEC_S32B; break;
         case AFMT_S32_LE: fourcc = VLC_CODEC_S32L; break;
+#ifdef AFMT_FLOAT
         case AFMT_FLOAT:  fourcc = VLC_CODEC_FL32; break;
+#endif
         case AFMT_AC3:
             if (spdif)
             {
