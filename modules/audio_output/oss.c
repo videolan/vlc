@@ -81,6 +81,17 @@ static int VolumeSync (audio_output_t *);
 static int VolumeSet (audio_output_t *, float);
 static int MuteSet (audio_output_t *, bool);
 
+static int DeviceChanged (vlc_object_t *obj, const char *varname,
+                          vlc_value_t prev, vlc_value_t cur, void *data)
+{
+    aout_ChannelsRestart (obj, varname, prev, cur, data);
+
+    if (!var_Type (obj, "oss-audio-device"))
+        var_Create (obj, "oss-audio-device", VLC_VAR_STRING);
+    var_SetString (obj, "oss-audio-device", cur.psz_string);
+    return VLC_SUCCESS;
+}
+
 static int Open (vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
@@ -97,10 +108,10 @@ static int Open (vlc_object_t *obj)
     msg_Dbg (aout, "using OSS device: %s", device);
 
     int fd = vlc_open (device, O_WRONLY);
-    free (devicebuf);
     if (fd == -1)
     {
-        msg_Err (aout, "cannot open OSS device: %m");
+        msg_Err (aout, "cannot open OSS device %s: %m", device);
+        free (devicebuf);
         return VLC_EGENERIC;
     }
 
@@ -239,11 +250,51 @@ static int Open (vlc_object_t *obj)
             aout->mute_set = MuteSet;
         }
     }
-    return 0;
 
+    /* Build the devices list */
+    var_Create (aout, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
+    var_SetString (aout, "audio-device", device);
+    var_AddCallback (aout, "audio-device", DeviceChanged, NULL);
+
+    oss_sysinfo si;
+    if (ioctl (fd, SNDCTL_SYSINFO, &si) >= 0)
+    {
+        vlc_value_t val, text;
+
+        text.psz_string = _("Audio Device");
+        var_Change (aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL);
+
+        msg_Dbg (aout, "using %s version %s (0x%06X) under %s", si.product,
+                 si.version, si.versionnum, si.license);
+
+        for (int i = 0; i < si.numaudios; i++)
+        {
+            oss_audioinfo ai = { .dev = i };
+
+            if (ioctl (fd, SNDCTL_AUDIOINFO, &ai) < 0)
+            {
+                msg_Warn (aout, "cannot get device %d infos: %m", i);
+                continue;
+            }
+            if (ai.caps & (PCM_CAP_HIDDEN|PCM_CAP_MODEM))
+                continue;
+            if (!(ai.caps & PCM_CAP_OUTPUT))
+                continue;
+            if (!ai.enabled)
+                continue;
+
+            val.psz_string = ai.devnode;
+            text.psz_string = ai.name;
+            var_Change (aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text);
+        }
+    }
+
+    free (devicebuf);
+    return 0;
 error:
-    close (fd);
     free (sys);
+    close (fd);
+    free (devicebuf);
     return VLC_EGENERIC;
 }
 
@@ -256,20 +307,8 @@ static void Close (vlc_object_t *obj)
     aout_sys_t *sys = aout->sys;
     int fd = sys->fd;
 
-#if 0
-    /* FIXME: ugly hack so selected OSS device survives restart */
-    char *device = var_InheritString (obj, "audio-device");
-    if (device != NULL)
-    {
-        if (!var_Type (obj, "oss-audio-device"))
-            var_Create (obj, "oss-audio-device", VLC_VAR_STRING);
-        var_SetString (obj, "oss-audio-device", device);
-        free (device);
-    }
-
-    var_DelCallback (obj, "audio-device", aout_ChannelsRestart, NULL);
+    var_DelCallback (obj, "audio-device", DeviceChanged, NULL);
     var_Destroy (obj, "audio-device");
-#endif
 
     ioctl (fd, SNDCTL_DSP_HALT, NULL);
     close (fd);
