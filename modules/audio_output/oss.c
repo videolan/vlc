@@ -214,7 +214,6 @@ static int Open (vlc_object_t *obj)
 
     /* Setup audio_output_t */
     aout->format.i_format = fourcc;
-    aout->format.i_rate = rate;
     aout->pf_play = Play;
     aout->pf_pause = Pause;
     aout->pf_flush = Flush;
@@ -228,6 +227,7 @@ static int Open (vlc_object_t *obj)
     }
     else
     {
+        aout->format.i_rate = rate;
         aout->format.i_original_channels =
         aout->format.i_physical_channels = channels;
 
