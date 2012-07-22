@@ -149,22 +149,16 @@ static void DumpDeviceStatus (vlc_object_t *obj, snd_pcm_t *pcm)
 }
 #define DumpDeviceStatus(o, p) DumpDeviceStatus(VLC_OBJECT(o), p)
 
-/**
- * Initializes list of devices.
- */
-static void Probe (vlc_object_t *obj, const char *dev)
+static int DeviceChanged (vlc_object_t *obj, const char *varname,
+                          vlc_value_t prev, vlc_value_t cur, void *data)
 {
-    vlc_value_t text;
+    aout_ChannelsRestart (obj, varname, prev, cur, data);
 
-    var_Create (obj, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
-    text.psz_string = _("Audio Device");
-    var_Change (obj, "audio-device", VLC_VAR_SETTEXT, &text, NULL);
-
-    GetDevices (obj, NULL, dev);
-
-    var_AddCallback (obj, "audio-device", aout_ChannelsRestart, NULL);
+    if (!var_Type (obj, "alsa-audio-device"))
+        var_Create (obj, "alsa-audio-device", VLC_VAR_STRING);
+    var_SetString (obj, "alsa-audio-device", cur.psz_string);
+    return VLC_SUCCESS;
 }
-
 
 static void Play  (audio_output_t *, block_t *);
 static void Pause (audio_output_t *, bool, mtime_t);
@@ -546,7 +540,18 @@ static int Open (vlc_object_t *obj)
     }
     aout->pf_flush = Flush;
 
-    Probe (obj, device);
+    /* Setup audio-device choices */
+    {
+        vlc_value_t text;
+
+        var_Create (obj, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
+        text.psz_string = _("Audio Device");
+        var_Change (obj, "audio-device", VLC_VAR_SETTEXT, &text, NULL);
+
+        GetDevices (obj, NULL, device);
+    }
+    var_AddCallback (obj, "audio-device", DeviceChanged, NULL);
+
     free (device);
     return 0;
 
@@ -686,18 +691,9 @@ static void Close (vlc_object_t *obj)
     aout_sys_t *sys = aout->sys;
     snd_pcm_t *pcm = aout->sys->pcm;
 
-    /* FIXME: ugly hack so selected ALSA device survives restart */
-    char *device = var_InheritString (obj, "audio-device");
-    if (device != NULL)
-    {
-        if (!var_Type (obj, "alsa-audio-device"))
-            var_Create (obj, "alsa-audio-device", VLC_VAR_STRING);
-        var_SetString (obj, "alsa-audio-device", device);
-        free (device);
-    }
-
-    var_DelCallback (obj, "audio-device", aout_ChannelsRestart, NULL);
+    var_DelCallback (obj, "audio-device", DeviceChanged, NULL);
     var_Destroy (obj, "audio-device");
+
     snd_pcm_drop (pcm);
     snd_pcm_close (pcm);
     free (sys);
