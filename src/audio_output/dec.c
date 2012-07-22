@@ -133,8 +133,11 @@ void aout_Shutdown (audio_output_t *p_aout)
         aout_InputDelete (p_aout, input);
     owner->input = NULL;
 
-    aout_OutputDelete( p_aout );
-    aout_volume_Delete (owner->volume);
+    if (likely(owner->module != NULL))
+    {
+        aout_OutputDelete( p_aout );
+        aout_volume_Delete (owner->volume);
+    }
     var_Destroy( p_aout, "audio-device" );
     var_Destroy( p_aout, "audio-channels" );
 
