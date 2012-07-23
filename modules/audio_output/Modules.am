@@ -50,6 +50,14 @@ libjack_plugin_la_DEPENDENCIES =
 EXTRA_LTLIBRARIES += libjack_plugin.la
 libvlc_LTLIBRARIES += $(LTLIBjack)
 
+libwasapi_plugin_la_SOURCES = wasapi.c
+libwasapi_plugin_la_CFLAGS = $(AM_CFLAGS)
+libwasapi_plugin_la_LIBADD = $(AM_LIBADD) -lole32 -lksuser
+libwasapi_plugin_la_DEPENDENCIES =
+if HAVE_WASAPI
+libvlc_LTLIBRARIES += libwasapi_plugin.la
+endif
+
 libdirectsound_plugin_la_SOURCES = directx.c windows_audio_common.h packet.c
 libdirectsound_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdirectsound_plugin_la_LIBADD = $(AM_LIBADD)
