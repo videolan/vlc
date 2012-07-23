@@ -113,6 +113,9 @@ void WindowClose  ( vout_window_t * );
 #define PLAYMODEBUTTONS_TEXT N_( "Show play mode control buttons" )
 #define PLAYMODEBUTTONS_LONGTEXT N_( "Shows the shuffle and repeat buttons in the main window" )
 
+#define BACKGROUND_TEXT N_( "Use as desktop background" )
+#define BACKGROUND_LONGTEXT N_( "Use the video as the desktop background." )
+
 vlc_module_begin ()
     set_description( N_("Mac OS X interface") )
     set_capability( "interface", 200 )
@@ -129,7 +132,6 @@ vlc_module_begin ()
     add_bool( "macosx-interfacestyle", false, INTERFACE_STYLE_TEXT, INTERFACE_STYLE_LONGTEXT, false )
     add_bool( "macosx-nativefullscreenmode", false, NATIVE_FULLSCREEN_MODE_ON_LION_TEXT, NATIVE_FULLSCREEN_MODE_ON_LION_LONGTEXT, false )
     add_obsolete_bool( "macosx-stretch" ) /* since 2.0.0 */
-    add_obsolete_bool( "macosx-background" ) /* since 2.0.0 */
     add_obsolete_bool( "macosx-eq-keep" ) /* since 2.0.0 */
     add_obsolete_bool( "macosx-autosave-volume" ) /* since 2.1.0 */
     add_bool( "macosx-video-autoresize", true, KEEPSIZE_TEXT, KEEPSIZE_LONGTEXT, false )
@@ -138,6 +140,7 @@ vlc_module_begin ()
     add_bool( "macosx-icon-change", true, ICONCHANGE_TEXT, ICONCHANGE_LONGTEXT, true )
     add_bool( "macosx-show-playback-buttons", false, JUMPBUTTONS_TEXT, JUMPBUTTONS_LONGTEXT, false )
     add_bool( "macosx-show-playmode-buttons", true, PLAYMODEBUTTONS_TEXT, PLAYMODEBUTTONS_LONGTEXT, false )
+    add_bool( "macosx-background", false, BACKGROUND_TEXT, BACKGROUND_LONGTEXT, false )
 
     add_submodule ()
         set_description( "Mac OS X Video Output Provider" )

@@ -148,6 +148,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     [o_sidebaritems release];
+
+    if( o_extra_video_window )
+        [o_extra_video_window release];
+
     [super dealloc];
 }
 
@@ -1018,7 +1022,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [o_playlist_table setHidden: NO];
             [o_video_view setHidden: !b_activeVideo];
             if( b_activeVideo && [[o_video_view subviews] count] > 0 )
-                [o_detached_video_window makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
+                [[o_video_view window] makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
         }
     }
 }
@@ -1744,52 +1748,88 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (id)setupVideoView
 {
-    vout_thread_t *p_vout = getVout();
-    if ((config_GetInt( VLCIntf, "embedded-video" ) || b_nativeFullscreenMode) && b_video_deco)
+    if( config_GetInt( VLCIntf, "macosx-background" ) )
     {
-        if ([o_video_view window] != self)
-        {
+        msg_Dbg( VLCIntf, "Creating background window" );
+        NSScreen *screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)config_GetInt( VLCIntf, "macosx-vdev" )];
+        if( !screen )
+            screen = [self screen];
+        NSRect screen_rect = [screen frame];
+
+        if( o_extra_video_window )
+            [o_extra_video_window release];
+
+        o_extra_video_window = [[VLCWindow alloc] initWithContentRect:screen_rect styleMask: NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO];
+        [o_extra_video_window setLevel: CGWindowLevelForKey(kCGDesktopWindowLevelKey) + 1];
+        [o_extra_video_window setBackgroundColor: [NSColor blackColor]];
+        [o_extra_video_window setCanBecomeKeyWindow: NO];
+        [o_extra_video_window setCanBecomeMainWindow: NO];
+        [o_extra_video_window useOptimizedDrawing: YES];
+        [o_extra_video_window setMovableByWindowBackground: NO];
+        
+        [o_video_view retain];
+        if ([o_video_view superview] != NULL)
             [o_video_view removeFromSuperviewWithoutNeedingDisplay];
-            [o_video_view setFrame: [o_split_view frame]];
-            [[self contentView] addSubview:o_video_view positioned:NSWindowAbove relativeTo:nil];
-        }
-        b_nonembedded = NO;
+        screen_rect.origin.x = screen_rect.origin.y = 0;
+        [o_video_view setFrame: screen_rect];
+        [[o_extra_video_window contentView] addSubview: o_video_view positioned:NSWindowAbove relativeTo:nil];
+        [o_video_view release];
+
+        [o_extra_video_window orderBack:nil];
+
+        b_nonembedded = YES;
     }
     else
     {
-        if ([o_video_view superview] != NULL)
-            [o_video_view removeFromSuperviewWithoutNeedingDisplay];
-
-        NSRect frame = [o_detached_video_window frame];
-        NSRect videoFrame = [o_video_view frame];
-        frame.size.width = videoFrame.size.width;
-        if (b_video_deco)
-            frame.size.height = videoFrame.size.height + [o_detached_bottombar_view frame].size.height + [o_titlebar_view frame].size.height;
+        if ((config_GetInt( VLCIntf, "embedded-video" ) || b_nativeFullscreenMode) && b_video_deco)
+        {
+            if ([o_video_view window] != self)
+            {
+                [o_video_view removeFromSuperviewWithoutNeedingDisplay];
+                [o_video_view setFrame: [o_split_view frame]];
+                [[self contentView] addSubview:o_video_view positioned:NSWindowAbove relativeTo:nil];
+            }
+            b_nonembedded = NO;
+        }
         else
         {
-            frame.size.height = videoFrame.size.height;
-            videoFrame.origin.y = .0;
-            videoFrame.origin.x = .0;
-            [o_video_view setFrame: videoFrame];
-        }
-        [o_detached_video_window setFrame: frame display: NO];
-        [[o_detached_video_window contentView] addSubview: o_video_view positioned:NSWindowAbove relativeTo:nil];
-        [o_detached_video_window setLevel:NSNormalWindowLevel];
-        [o_detached_video_window useOptimizedDrawing: YES];
-        [o_detached_video_window center];
-        b_nonembedded = YES;
-    }
-    [[o_video_view window] makeKeyAndOrderFront: self];
-    [[o_video_view window] setAlphaValue: config_GetFloat( VLCIntf, "macosx-opaqueness" )];
+            if ([o_video_view superview] != NULL)
+                [o_video_view removeFromSuperviewWithoutNeedingDisplay];
 
-    if (p_vout)
-    {
-        if( var_GetBool( p_vout, "video-on-top" ) )
-            [[o_video_view window] setLevel: NSStatusWindowLevel];
-        else
-            [[o_video_view window] setLevel: NSNormalWindowLevel];
-        vlc_object_release( p_vout );
+            NSRect frame = [o_detached_video_window frame];
+            NSRect videoFrame = [o_video_view frame];
+            frame.size.width = videoFrame.size.width;
+            if (b_video_deco)
+                frame.size.height = videoFrame.size.height + [o_detached_bottombar_view frame].size.height + [o_titlebar_view frame].size.height;
+            else
+            {
+                frame.size.height = videoFrame.size.height;
+                videoFrame.origin.y = .0;
+                videoFrame.origin.x = .0;
+                [o_video_view setFrame: videoFrame];
+            }
+            [o_detached_video_window setFrame: frame display: NO];
+            [[o_detached_video_window contentView] addSubview: o_video_view positioned:NSWindowAbove relativeTo:nil];
+            [o_detached_video_window setLevel:NSNormalWindowLevel];
+            [o_detached_video_window useOptimizedDrawing: YES];
+            [o_detached_video_window center];
+            b_nonembedded = YES;
+        }
+
+        [[o_video_view window] makeKeyAndOrderFront: self];
+
+        vout_thread_t *p_vout = getVout();
+        if (p_vout)
+        {
+            if( var_GetBool( p_vout, "video-on-top" ) )
+                [[o_video_view window] setLevel: NSStatusWindowLevel];
+            else
+                [[o_video_view window] setLevel: NSNormalWindowLevel];
+            vlc_object_release( p_vout );
+        }
     }
+
+    [[o_video_view window] setAlphaValue: config_GetFloat( VLCIntf, "macosx-opaqueness" )];
     return o_video_view;
 }
 
@@ -1806,6 +1846,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     {
         [self makeFirstResponder: nil];
         [o_detached_video_window orderOut: nil];
+        if( o_extra_video_window )
+            [o_extra_video_window orderOut: nil];
 
         if( [self level] != NSNormalWindowLevel )
             [self setLevel: NSNormalWindowLevel];
@@ -1885,7 +1927,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     nativeVideoSize = size;
 
-    if( config_GetInt( VLCIntf, "macosx-video-autoresize" ) && !b_fullscreen )
+    if( config_GetInt( VLCIntf, "macosx-video-autoresize" ) && !b_fullscreen && !config_GetInt( VLCIntf, "macosx-background" ) )
         [self performSelectorOnMainThread:@selector(resizeWindow) withObject:nil waitUntilDone:NO];
 }
 

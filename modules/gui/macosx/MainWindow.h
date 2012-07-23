@@ -141,6 +141,8 @@
     VLCColorView * o_color_backdrop;
     NSInteger i_originalLevel;
     NSRect previousSavedFrame;
+
+    VLCWindow *o_extra_video_window;
 }
 + (VLCMainWindow *)sharedInstance;
 
