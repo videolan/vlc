@@ -1751,7 +1751,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (id)setupVideoView
 {
-    if( config_GetInt( VLCIntf, "macosx-background" ) )
+    // TODO: make lion fullscreen compatible with macosx-background and !embedded-video
+    if( config_GetInt( VLCIntf, "macosx-background" ) && !b_nativeFullscreenMode )
     {
         msg_Dbg( VLCIntf, "Creating background window" );
         NSScreen *screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)config_GetInt( VLCIntf, "macosx-vdev" )];
