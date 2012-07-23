@@ -208,6 +208,17 @@ static int SimpleMuteSet(audio_output_t *aout, bool mute)
     return FAILED(hr) ? -1 : 0;
 }
 
+static int DeviceChanged(vlc_object_t *obj, const char *varname,
+                         vlc_value_t prev, vlc_value_t cur, void *data)
+{
+    aout_ChannelsRestart(obj, varname, prev, cur, data);
+
+    if (!var_Type (obj, "wasapi-audio-device"))
+        var_Create (obj, "wasapi-audio-device", VLC_VAR_STRING);
+    var_SetString (obj, "wasapi-audio-device", cur.psz_string);
+    return VLC_SUCCESS;
+}
+
 static void vlc_ToWave(WAVEFORMATEXTENSIBLE *restrict wf,
                        audio_sample_format_t *restrict audio)
 {
@@ -389,6 +400,8 @@ static int Open(vlc_object_t *obj)
     }
 
     /* Get audio device according to policy */
+    var_Create (aout, "audio-device", VLC_VAR_STRING);
+
     IMMDeviceEnumerator *devs;
     hr = CoCreateInstance(&CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL,
                           &IID_IMMDeviceEnumerator, (void **)&devs);
@@ -398,9 +411,26 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
 
-    IMMDevice *dev;
-    hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(devs, eRender,
-                                                     eConsole, &dev);
+    // Without configuration item, the variable must be created explicitly.
+    var_Create (aout, "wasapi-audio-device", VLC_VAR_STRING);
+    LPWSTR devid = var_InheritWide (aout, "wasapi-audio-device");
+    var_Destroy (aout, "wasapi-audio-device");
+
+    IMMDevice *dev = NULL;
+    if (devid != NULL)
+    {
+        msg_Dbg (aout, "using selected device %ls", devid);
+        hr = IMMDeviceEnumerator_GetDevice (devs, devid, &dev);
+        if (FAILED(hr))
+            msg_Warn(aout, "cannot get audio endpoint (error 0x%lx)", hr);
+        free (devid);
+    }
+    if (dev == NULL)
+    {
+        msg_Dbg (aout, "using default device");
+        hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(devs, eRender,
+                                                         eConsole, &dev);
+    }
     IMMDeviceEnumerator_Release(devs);
     if (FAILED(hr))
     {
@@ -408,12 +438,12 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
 
-    LPWSTR str;
-    hr = IMMDevice_GetId(dev, &str);
+    hr = IMMDevice_GetId(dev, &devid);
     if (SUCCEEDED(hr))
     {
-        msg_Dbg(aout, "using device %ls", str);
-        CoTaskMemFree(str);
+        msg_Dbg(aout, "using device %ls", devid);
+        var_SetWide (aout, "audio-device", devid);
+        CoTaskMemFree(devid);
     }
 
     hr = IMMDevice_Activate(dev, &IID_IAudioClient, CLSCTX_ALL, NULL,
@@ -482,6 +512,8 @@ static int Open(vlc_object_t *obj)
     if (sys->render == NULL)
         goto error;
 
+    Leave();
+
     aout->format = format;
     aout->pf_play = Play;
     aout->pf_pause = Pause;
@@ -491,7 +523,8 @@ static int Open(vlc_object_t *obj)
         aout->volume_set = SimpleVolumeSet;
         aout->mute_set = SimpleMuteSet;
     }
-    Leave();
+    var_AddCallback (aout, "audio-device", DeviceChanged, NULL);
+
     return VLC_SUCCESS;
 error:
     if (sys->done != NULL)
@@ -501,6 +534,7 @@ error:
     if (sys->client != NULL)
         IAudioClient_Release(sys->client);
     Leave();
+    var_Destroy (aout, "audio-device");
     free(sys);
     return VLC_EGENERIC;
 }
@@ -516,6 +550,9 @@ static void Close (vlc_object_t *obj)
     IAudioClient_Stop(sys->client); /* should not be needed */
     IAudioClient_Release(sys->client);
     Leave();
+
+    var_DelCallback (aout, "audio-device", DeviceChanged, NULL);
+    var_Destroy (aout, "audio-device");
 
     CloseHandle(sys->done);
     CloseHandle(sys->ready);
