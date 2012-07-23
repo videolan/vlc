@@ -78,7 +78,6 @@
     BOOL b_isset_canBecomeKeyWindow;
     BOOL b_canBecomeMainWindow;
     BOOL b_isset_canBecomeMainWindow;
-    BOOL b_isFullscreen;
     NSViewAnimation *animation;
 }
 
@@ -98,9 +97,6 @@
 /* animate mode is only supported in >=10.4 */
 - (void)closeAndAnimate: (BOOL)animate;
 
-- (void)setFullscreen:(BOOL)b_var;
-
-- (BOOL)isFullscreen;
 @end
 
 

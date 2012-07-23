@@ -49,10 +49,6 @@
 #include <vlc_dialog.h>
 #include "opengl.h"
 
-@interface NSWindow (VLCCustomCode)
-- (BOOL)isFullscreen;
-@end
-
 /* compilation support for 10.5 and 10.6 */
 #define OSX_LION NSAppKitVersionNumber >= 1115.2
 #ifndef MAC_OS_X_VERSION_10_7
