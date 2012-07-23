@@ -507,6 +507,7 @@ static int Open (vlc_object_t *obj)
     /* Setup audio_output_t */
     aout->format.i_format = fourcc;
     aout->format.i_rate = rate;
+    sys->reorder = NULL;
     if (spdif)
     {
         aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
@@ -523,8 +524,6 @@ static int Open (vlc_object_t *obj)
             case 8:
                 sys->reorder = Reorder71;
                 break;
-            default:
-                sys->reorder = NULL;
         }
 
         aout_SoftVolumeInit (aout);
