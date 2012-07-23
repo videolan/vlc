@@ -292,6 +292,18 @@ static wchar_t *var_InheritWide(vlc_object_t *obj, const char *name)
 }
 #define var_InheritWide(o,n) var_InheritWide(VLC_OBJECT(o),n)
 
+static int var_SetWide(vlc_object_t *obj, const char *name, const wchar_t *val)
+{
+    char *str = FromWide(val);
+    if (unlikely(str == NULL))
+        return VLC_ENOMEM;
+
+    int ret = var_SetString(obj, name, str);
+    free(str);
+    return ret;
+}
+#define var_SetWide(o,n,v) var_SetWide(VLC_OBJECT(o),n,v)
+
 /* Dummy thread to create and release COM interfaces when needed. */
 static void MTAThread(void *data)
 {
