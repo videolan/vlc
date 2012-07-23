@@ -42,6 +42,7 @@
 #include <vlc_plugin.h>
 #include <vlc_aout_intf.h>
 #include <vlc_vout_window.h>
+#include <vlc_vout_display.h>
 #include <unistd.h> /* execl() */
 
 #import "CompatibilityFixes.h"
@@ -158,25 +159,33 @@ int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 
 static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
 {
-    /* TODO */
-    if( i_query == VOUT_WINDOW_SET_STATE )
-        msg_Dbg( p_wnd, "WindowControl:VOUT_WINDOW_SET_STATE" );
-    else if( i_query == VOUT_WINDOW_SET_SIZE )
+    switch( i_query )
     {
-        unsigned int i_width  = va_arg( args, unsigned int );
-        unsigned int i_height = va_arg( args, unsigned int );
-        [[VLCMain sharedInstance] setNativeVideoSize:NSMakeSize( i_width, i_height )];
+        case VOUT_WINDOW_SET_STATE:
+        {
+            unsigned i_state = va_arg( args, unsigned );
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(setWindowLevel:) withObject:[NSNumber numberWithUnsignedInt:i_state] waitUntilDone:NO];
+            return VLC_SUCCESS;
+        }
+        case VOUT_WINDOW_SET_SIZE:
+        {
+            unsigned int i_width  = va_arg( args, unsigned int );
+            unsigned int i_height = va_arg( args, unsigned int );
+            [[VLCMain sharedInstance] setNativeVideoSize:NSMakeSize( i_width, i_height )];
+            return VLC_SUCCESS;
+        }
+        case VOUT_WINDOW_SET_FULLSCREEN:
+        {
+            NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+            int i_full = va_arg( args, int );
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(checkFullscreenChange:) withObject:[NSNumber numberWithInt: i_full] waitUntilDone:NO];
+            [o_pool release];
+            return VLC_SUCCESS;
+        }
+        default:
+            msg_Warn( p_wnd, "unsupported control query" );
+            return VLC_EGENERIC;
     }
-    else if( i_query == VOUT_WINDOW_SET_FULLSCREEN )
-    {
-        NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-        int i_full = va_arg( args, int );
-        [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(checkFullscreenChange:) withObject:[NSNumber numberWithInt: i_full] waitUntilDone:NO];
-        [o_pool release];
-    }
-    else
-        msg_Dbg( p_wnd, "WindowControl: unknown query" );
-    return VLC_SUCCESS;
 }
 
 void WindowClose( vout_window_t *p_wnd )
@@ -1640,6 +1649,33 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     [o_mainmenu setShuffle];
 }
 
+
+#pragma mark -
+#pragma mark Window updater
+
+- (void)setWindowLevel:(NSNumber*)state
+{
+    if ([state unsignedIntValue] & VOUT_WINDOW_STATE_ABOVE)
+        [[[[VLCMainWindow sharedInstance] videoView] window] setLevel: NSStatusWindowLevel];
+    else
+        [[[[VLCMainWindow sharedInstance] videoView] window] setLevel: NSNormalWindowLevel];
+}
+
+- (void)setActiveVideoPlayback:(BOOL)b_value
+{
+    b_active_videoplayback = b_value;
+    if( o_mainwindow )
+    {
+        [o_mainwindow performSelectorOnMainThread:@selector(setVideoplayEnabled) withObject:nil waitUntilDone:YES];
+        [o_mainwindow performSelectorOnMainThread:@selector(togglePlaylist:) withObject:nil waitUntilDone:NO];
+    }
+}
+
+- (void)setNativeVideoSize:(NSSize)size
+{
+    [o_mainwindow setNativeVideoSize:size];
+}
+
 #pragma mark -
 #pragma mark Other objects getters
 
@@ -1753,11 +1789,6 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     return videoView;
 }
 
-- (void)setNativeVideoSize:(NSSize)size
-{
-    [o_mainwindow setNativeVideoSize:size];
-}
-
 - (id)embeddedList
 {
     if( o_embedded_list )
@@ -1785,16 +1816,6 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 - (id)appleRemoteController
 {
     return o_remote;
-}
-
-- (void)setActiveVideoPlayback:(BOOL)b_value
-{
-    b_active_videoplayback = b_value;
-    if( o_mainwindow )
-    {
-        [o_mainwindow performSelectorOnMainThread:@selector(setVideoplayEnabled) withObject:nil waitUntilDone:YES];
-        [o_mainwindow performSelectorOnMainThread:@selector(togglePlaylist:) withObject:nil waitUntilDone:NO];
-    }
 }
 
 - (BOOL)activeVideoPlayback

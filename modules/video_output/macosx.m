@@ -341,11 +341,8 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         }
         case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
         {
-            NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
             unsigned state = va_arg (ap, unsigned);
-            [sys->glView performSelectorOnMainThread:@selector(setWindowLevel:) withObject:[NSNumber numberWithUnsignedInt:state] waitUntilDone:NO];
-            [o_pool release];
-            return VLC_SUCCESS;
+            return vout_window_SetState (sys->embed, state);            
         }
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         case VOUT_DISPLAY_CHANGE_ZOOM:
@@ -715,14 +712,6 @@ static void OpenglSwap (vlc_gl_t *gl)
 - (BOOL)isOpaque
 {
     return YES;
-}
-
-- (void)setWindowLevel:(NSNumber*)state
-{
-    if ([state unsignedIntValue] & VOUT_WINDOW_STATE_ABOVE)
-        [[self window] setLevel: NSStatusWindowLevel];
-    else
-        [[self window] setLevel: NSNormalWindowLevel];
 }
 
 #pragma mark -
