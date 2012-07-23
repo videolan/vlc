@@ -219,6 +219,74 @@ static int DeviceChanged(vlc_object_t *obj, const char *varname,
     return VLC_SUCCESS;
 }
 
+static void GetDevices(vlc_object_t *obj, IMMDeviceEnumerator *it)
+{
+    HRESULT hr;
+    vlc_value_t val, text;
+
+    text.psz_string = _("Audio Device");
+    var_Change (obj, "audio-device", VLC_VAR_SETTEXT, &text, NULL);
+
+    IMMDeviceCollection *devs;
+    hr = IMMDeviceEnumerator_EnumAudioEndpoints(it, eRender,
+                                                DEVICE_STATE_ACTIVE, &devs);
+    if (FAILED(hr))
+    {
+        msg_Warn (obj, "cannot enumerate audio endpoints (error 0x%lx)", hr);
+        return;
+    }
+
+    UINT n;
+    hr = IMMDeviceCollection_GetCount(devs, &n);
+    if (FAILED(hr))
+        n = 0;
+    while (n > 0)
+    {
+        IMMDevice *dev;
+
+        hr = IMMDeviceCollection_Item(devs, --n, &dev);
+        if (FAILED(hr))
+            continue;
+
+        /* Unique device ID */
+        LPWSTR devid;
+        hr = IMMDevice_GetId(dev, &devid);
+        if (FAILED(hr))
+        {
+            IMMDevice_Release(dev);
+            continue;
+        }
+        val.psz_string = FromWide(devid);
+        CoTaskMemFree(devid);
+        text.psz_string = val.psz_string;
+
+        /* User-readable device name */
+        IPropertyStore *props;
+        hr = IMMDevice_OpenPropertyStore(dev, STGM_READ, &props);
+        if (SUCCEEDED(hr))
+        {
+            PROPVARIANT v;
+
+            PropVariantInit(&v);
+#ifdef FIXED
+            hr = IPropertyStore_GetValue(props, PKEY_Device_FriendlyName, &v);
+            if (SUCCEEDED(hr))
+                text.psz_string = FromWide(v.pwszVal);
+#endif
+            PropVariantClear(&v);
+            IPropertyStore_Release(props);
+        }
+        IMMDevice_Release(dev);
+
+        var_Change(obj, "audio-device", VLC_VAR_ADDCHOICE, &val, &text);
+        if (likely(text.psz_string != val.psz_string))
+            free(text.psz_string);
+        free(val.psz_string);
+    }
+    IMMDeviceCollection_Release(devs);
+}
+
+
 static void vlc_ToWave(WAVEFORMATEXTENSIBLE *restrict wf,
                        audio_sample_format_t *restrict audio)
 {
@@ -400,7 +468,7 @@ static int Open(vlc_object_t *obj)
     }
 
     /* Get audio device according to policy */
-    var_Create (aout, "audio-device", VLC_VAR_STRING);
+    var_Create (aout, "audio-device", VLC_VAR_STRING|VLC_VAR_HASCHOICE);
 
     IMMDeviceEnumerator *devs;
     hr = CoCreateInstance(&CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL,
@@ -431,6 +499,8 @@ static int Open(vlc_object_t *obj)
         hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(devs, eRender,
                                                          eConsole, &dev);
     }
+
+    GetDevices(VLC_OBJECT(aout), devs);
     IMMDeviceEnumerator_Release(devs);
     if (FAILED(hr))
     {
