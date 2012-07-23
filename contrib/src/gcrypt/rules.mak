@@ -11,6 +11,7 @@ $(TARBALLS)/libgcrypt-$(GCRYPT_VERSION).tar.bz2:
 
 libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2 .sum-gcrypt
 	$(UNPACK)
+	$(APPLY) $(SRC)/gcrypt/notests.patch
 	$(MOVE)
 
 DEPS_gcrypt = gpg-error
@@ -27,7 +28,7 @@ CONFIGURE_OPTS += --disable-asm --disable-aesni-support
 endif
 endif
 .gcrypt: libgcrypt
-	#$(RECONF)
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-ciphers=aes,des,rfc2268,arcfour --enable-digests=sha1,md5,rmd160,sha512 --enable-pubkey-ciphers=dsa,rsa,ecc $(CONFIGURE_OPTS)
 	cd $< && $(MAKE) install
 	touch $@
