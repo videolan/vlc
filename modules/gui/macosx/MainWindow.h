@@ -143,6 +143,7 @@
     NSRect previousSavedFrame;
 
     VLCWindow *o_extra_video_window;
+    id o_current_video_window;
 }
 + (VLCMainWindow *)sharedInstance;
 

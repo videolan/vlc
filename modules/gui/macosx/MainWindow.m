@@ -150,7 +150,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_sidebaritems release];
 
     if( o_extra_video_window )
+    {
         [o_extra_video_window release];
+        o_extra_video_window = nil;
+    }
 
     [super dealloc];
 }
@@ -1991,15 +1994,15 @@ static VLCMainWindow *_o_sharedInstance = nil;
     NSRect screen_rect;
     NSRect rect;
     BOOL blackout_other_displays = config_GetInt( VLCIntf, "macosx-black" );
-    id o_videoWindow = b_nonembedded ? o_detached_video_window : self;
-
+    o_current_video_window = [o_video_view window];
+    
     screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)config_GetInt( VLCIntf, "macosx-vdev" )];
     [self lockFullscreenAnimation];
 
     if (!screen)
     {
         msg_Dbg( VLCIntf, "chosen screen isn't present, using current screen for fullscreen mode" );
-        screen = [o_videoWindow screen];
+        screen = [o_current_video_window screen];
     }
     if (!screen)
     {
@@ -2019,8 +2022,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [screen blackoutOtherScreens];
 
     /* Make sure we don't see the window flashes in float-on-top mode */
-    i_originalLevel = [o_videoWindow level];
-    [o_videoWindow setLevel:NSNormalWindowLevel];
+    i_originalLevel = [o_current_video_window level];
+    [o_current_video_window setLevel:NSNormalWindowLevel];
 
     /* Only create the o_fullscreen_window if we are not in the middle of the zooming animation */
     if (!o_fullscreen_window)
@@ -2028,14 +2031,14 @@ static VLCMainWindow *_o_sharedInstance = nil;
         /* We can't change the styleMask of an already created NSWindow, so we create another window, and do eye catching stuff */
 
         rect = [[o_video_view superview] convertRect: [o_video_view frame] toView: nil]; /* Convert to Window base coord */
-        rect.origin.x += [o_videoWindow frame].origin.x;
-        rect.origin.y += [o_videoWindow frame].origin.y;
+        rect.origin.x += [o_current_video_window frame].origin.x;
+        rect.origin.y += [o_current_video_window frame].origin.y;
         o_fullscreen_window = [[VLCWindow alloc] initWithContentRect:rect styleMask: NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES];
         [o_fullscreen_window setBackgroundColor: [NSColor blackColor]];
         [o_fullscreen_window setCanBecomeKeyWindow: YES];
         [o_fullscreen_window setCanBecomeMainWindow: YES];
 
-        if (![o_videoWindow isVisible] || [o_videoWindow alphaValue] == 0.0)
+        if (![o_current_video_window isVisible] || [o_current_video_window alphaValue] == 0.0)
         {
             /* We don't animate if we are not visible, instead we
              * simply fade the display */
@@ -2090,7 +2093,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (b_fullscreen)
     {
         /* Make sure we are hidden */
-        [o_videoWindow orderOut: self];
+        [o_current_video_window orderOut: self];
 
         [self unlockFullscreenAnimation];
         return;
@@ -2118,7 +2121,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     dict1 = [[NSMutableDictionary alloc] initWithCapacity:2];
     dict2 = [[NSMutableDictionary alloc] initWithCapacity:3];
 
-    [dict1 setObject:o_videoWindow forKey:NSViewAnimationTargetKey];
+    [dict1 setObject:o_current_video_window forKey:NSViewAnimationTargetKey];
     [dict1 setObject:NSViewAnimationFadeOutEffect forKey:NSViewAnimationEffectKey];
 
     [dict2 setObject:o_fullscreen_window forKey:NSViewAnimationTargetKey];
@@ -2161,9 +2164,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_fspanel setVoutWasUpdated: (int)[[o_fullscreen_window screen] displayID]];
     [o_fspanel setActive: nil];
 
-    id o_videoWindow = b_nonembedded ? o_detached_video_window : self;
-    if( [o_videoWindow isVisible] )
-        [o_videoWindow orderOut: self];
+    if( [o_current_video_window isVisible] )
+        [o_current_video_window orderOut: self];
 
     b_fullscreen = YES;
     [self unlockFullscreenAnimation];
@@ -2179,6 +2181,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
     NSMutableDictionary *dict1, *dict2;
     NSRect frame;
     BOOL blackout_other_displays = config_GetInt( VLCIntf, "macosx-black" );
+
+    if( !o_current_video_window )
+        return;
 
     [self lockFullscreenAnimation];
 
@@ -2241,10 +2246,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         return;
     }
 
-    id o_videoWindow = b_nonembedded ? o_detached_video_window : self;
-
-    [o_videoWindow setAlphaValue: 0.0];
-    [o_videoWindow orderFront: self];
+    [o_current_video_window setAlphaValue: 0.0];
+    [o_current_video_window orderFront: self];
     [[o_video_view window] orderFront: self];
 
     [o_fspanel setNonActive: nil];
@@ -2265,11 +2268,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     frame = [[o_temp_view superview] convertRect: [o_temp_view frame] toView: nil]; /* Convert to Window base coord */
-    frame.origin.x += [o_videoWindow frame].origin.x;
-    frame.origin.y += [o_videoWindow frame].origin.y;
+    frame.origin.x += [o_current_video_window frame].origin.x;
+    frame.origin.y += [o_current_video_window frame].origin.y;
 
     dict2 = [[NSMutableDictionary alloc] initWithCapacity:2];
-    [dict2 setObject:o_videoWindow forKey:NSViewAnimationTargetKey];
+    [dict2 setObject:o_current_video_window forKey:NSViewAnimationTargetKey];
     [dict2 setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
 
     o_fullscreen_anim2 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict2, nil]];
@@ -2330,8 +2333,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     // if we quit fullscreen because there is no video anymore, make sure non-embedded window is not visible
     if( ![[VLCMain sharedInstance] activeVideoPlayback] && b_nonembedded )
-        [o_detached_video_window orderOut: self];
+        [o_current_video_window orderOut: self];
 
+    o_current_video_window = nil;
     [self unlockFullscreenAnimation];
 }
 
