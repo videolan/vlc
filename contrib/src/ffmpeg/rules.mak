@@ -61,6 +61,11 @@ FFMPEG_CFLAGS +=-mfloat-abi=softfp -mfpu=neon
 endif
 endif
 
+# x86 stuff
+ifeq ($(ARCH),i386)
+FFMPEGCONF += --arch=x86
+endif
+
 # Darwin
 ifdef HAVE_DARWIN_OS
 FFMPEGCONF += --arch=$(ARCH) --target-os=darwin

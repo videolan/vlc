@@ -30,6 +30,11 @@ POSTPROC_CFLAGS +=-mfloat-abi=softfp -mfpu=neon
 endif
 endif
 
+# x86 stuff
+ifeq ($(ARCH),i386)
+POSTPROCCONF += --arch=x86
+endif
+
 # Darwin
 ifdef HAVE_DARWIN_OS
 POSTPROCCONF += --arch=$(ARCH) --target-os=darwin
