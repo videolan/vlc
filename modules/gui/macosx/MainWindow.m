@@ -1807,6 +1807,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self makeFirstResponder: nil];
         [o_detached_video_window orderOut: nil];
 
+        if( [self level] != NSNormalWindowLevel )
+            [self setLevel: NSNormalWindowLevel];
+
         // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
         [self setAlphaValue:1.0];
     }
