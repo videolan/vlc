@@ -1859,6 +1859,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         if( [self level] != NSNormalWindowLevel )
             [self setLevel: NSNormalWindowLevel];
+        if( [o_detached_video_window level] != NSNormalWindowLevel )
+            [o_detached_video_window setLevel: NSNormalWindowLevel];
 
         // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
         [self setAlphaValue:1.0];

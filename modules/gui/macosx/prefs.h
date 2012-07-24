@@ -47,7 +47,7 @@
 
 - (void)initStrings;
 - (void)setTitle: (NSString *) o_title_name;
-- (void)showPrefs;
+- (void)showPrefsWithLevel:(NSInteger)i_window_level;
 - (IBAction)savePrefs: (id)sender;
 - (IBAction)closePrefs: (id)sender;
 - (IBAction)resetAll: (id)sender;

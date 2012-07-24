@@ -196,6 +196,7 @@ IBOutlet id o_intf_mediakeys_ckb;
 - (void)initStrings;
 - (void)resetControls;
 - (void)showSimplePrefs;
+- (void)showSimplePrefsWithLevel:(NSInteger)i_window_level;
 
 - (IBAction)buttonAction:(id)sender;
 - (void)sheetDidEnd:(NSWindow *)o_sheet

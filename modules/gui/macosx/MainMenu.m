@@ -855,7 +855,11 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (IBAction)viewPreferences:(id)sender
 {
-    [[[VLCMain sharedInstance] simplePreferences] showSimplePrefs];
+    NSInteger i_level = NSNormalWindowLevel;
+    NSInteger i_video_window_level = [[[[VLCMainWindow sharedInstance] videoView] window] level];
+    if( i_video_window_level == NSStatusWindowLevel )
+        i_level = NSStatusWindowLevel;
+    [[[VLCMain sharedInstance] simplePreferences] showSimplePrefsWithLevel:i_level];
 }
 
 #pragma mark -

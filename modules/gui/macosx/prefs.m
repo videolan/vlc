@@ -195,8 +195,9 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     [o_title setStringValue: o_title_name];
 }
 
-- (void)showPrefs
+- (void)showPrefsWithLevel:(NSInteger)i_window_level
 {
+    [o_prefs_window setLevel: i_window_level];
     [o_prefs_window center];
     [o_prefs_window makeKeyAndOrderFront:self];
     [_rootTreeItem resetView];
