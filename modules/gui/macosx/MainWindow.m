@@ -1800,23 +1800,27 @@ static VLCMainWindow *_o_sharedInstance = nil;
             if ([o_video_view superview] != NULL)
                 [o_video_view removeFromSuperviewWithoutNeedingDisplay];
 
-            NSRect frame = [o_detached_video_window frame];
-            NSRect videoFrame = [o_video_view frame];
-            frame.size.width = videoFrame.size.width;
+            NSRect videoFrame;
+            videoFrame.size = [[o_detached_video_window contentView] frame].size;
             if (b_video_deco)
-                frame.size.height = videoFrame.size.height + [o_detached_bottombar_view frame].size.height + [o_titlebar_view frame].size.height;
+            {
+                videoFrame.size.height -= [o_detached_bottombar_view frame].size.height;
+                if( b_dark_interface )
+                    videoFrame.size.height -= [o_detached_titlebar_view frame].size.height;
+
+                videoFrame.origin.x = .0;
+                videoFrame.origin.y = [o_detached_bottombar_view frame].size.height;
+            }
             else
             {
-                frame.size.height = videoFrame.size.height;
                 videoFrame.origin.y = .0;
                 videoFrame.origin.x = .0;
-                [o_video_view setFrame: videoFrame];
             }
-            [o_detached_video_window setFrame: frame display: NO];
+
+            [o_video_view setFrame: videoFrame];
             [[o_detached_video_window contentView] addSubview: o_video_view positioned:NSWindowAbove relativeTo:nil];
             [o_detached_video_window setLevel:NSNormalWindowLevel];
             [o_detached_video_window useOptimizedDrawing: YES];
-            [o_detached_video_window center];
             b_nonembedded = YES;
         }
 
