@@ -219,7 +219,7 @@ static const struct
     { ".wav",   "audio/wav" },
     { ".wma",   "audio/x-ms-wma" },
     { ".wmv",   "video/x-ms-wmv" },
-
+    { ".webm",  "video/webm" },
 
     /* end */
     { "",       "" }
