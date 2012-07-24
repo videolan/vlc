@@ -507,6 +507,7 @@ static char* FontConfig_Select( FcConfig* config, const char* family,
     FcPattern *pat, *p_pat;
     FcChar8* val_s;
     FcBool val_b;
+    char *ret = NULL;
 
     /* Create a pattern and fills it */
     pat = FcPatternCreate();
@@ -563,14 +564,11 @@ static char* FontConfig_Select( FcConfig* config, const char* family,
                             "the requested one: '%s' != '%s'\n",
                             (const char*)val_s, family );   */
 
-    if( FcResultMatch != FcPatternGetString( p_pat, FC_FILE, 0, &val_s ) )
-    {
-        FcPatternDestroy( p_pat );
-        return NULL;
-    }
+    if( FcResultMatch == FcPatternGetString( p_pat, FC_FILE, 0, &val_s ) )
+        ret = strdup( (const char*)val_s );
 
     FcPatternDestroy( p_pat );
-    return strdup( (const char*)val_s );
+    return ret;
 }
 #endif
 
