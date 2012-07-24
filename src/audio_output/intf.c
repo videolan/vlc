@@ -84,7 +84,6 @@ float aout_VolumeGet (vlc_object_t *obj)
  */
 int aout_VolumeSet (vlc_object_t *obj, float vol)
 {
-    long volume = lroundf (vol * AOUT_VOLUME_DEFAULT);
     int ret = -1;
 
     audio_output_t *aout = findAout (obj);
