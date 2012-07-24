@@ -81,7 +81,7 @@ struct aout_sys_t
     HANDLE done; /**< Semaphore to MTA thread */
 };
 
-static void Play(audio_output_t *aout, block_t *block)
+static void Play(audio_output_t *aout, block_t *block, mtime_t *restrict drift)
 {
     aout_sys_t *sys = aout->sys;
     HRESULT hr;
@@ -94,7 +94,7 @@ static void Play(audio_output_t *aout, block_t *block)
         IAudioClock_GetPosition(sys->clock, &pos, &qpcpos);
         qpcpos = (qpcpos + 5) / 10; /* 100ns -> 1µs */
         /* NOTE: this assumes mdate() uses QPC() (which it currently does). */
-        aout_TimeReport(aout, qpcpos);
+        *drift = mdate() - qpcpos;
     }
 
     for (;;)

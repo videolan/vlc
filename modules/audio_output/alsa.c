@@ -160,7 +160,7 @@ static int DeviceChanged (vlc_object_t *obj, const char *varname,
     return VLC_SUCCESS;
 }
 
-static void Play  (audio_output_t *, block_t *);
+static void Play (audio_output_t *, block_t *, mtime_t *);
 static void Pause (audio_output_t *, bool, mtime_t);
 static void PauseDummy (audio_output_t *, bool, mtime_t);
 static void Flush (audio_output_t *, bool);
@@ -564,7 +564,8 @@ error:
 /**
  * Queues one audio buffer to the hardware.
  */
-static void Play (audio_output_t *aout, block_t *block)
+static void Play (audio_output_t *aout, block_t *block,
+                  mtime_t *restrict drift)
 {
     aout_sys_t *sys = aout->sys;
 
@@ -579,15 +580,15 @@ static void Play (audio_output_t *aout, block_t *block)
     if (snd_pcm_delay (pcm, &frames) == 0)
     {
         mtime_t delay = frames * CLOCK_FREQ / aout->format.i_rate;
+        delay += mdate () - block->i_pts;
 
         if (state != SND_PCM_STATE_RUNNING)
         {
-            delay = block->i_pts - (mdate () + delay);
-            if (delay > 0)
+            if (delay < 0)
             {
                 if (aout->format.i_format != VLC_CODEC_SPDIFL)
                 {
-                    frames = (delay * aout->format.i_rate) / CLOCK_FREQ;
+                    frames = (delay * aout->format.i_rate) / -CLOCK_FREQ;
                     msg_Dbg (aout, "prepending %ld zeroes", frames);
 
                     void *z = calloc (frames, aout->format.i_bytes_per_frame);
@@ -599,17 +600,17 @@ static void Play (audio_output_t *aout, block_t *block)
                     }
                 }
                 /* Lame fallback if zero padding does not work */
-                if (delay > 0)
+                if (delay < 0)
                 {
-                    msg_Dbg (aout, "deferring start (%"PRId64" us)", delay);
-                    msleep (delay);
+                    msg_Dbg (aout, "deferring start (%"PRId64" us)", -delay);
+                    msleep (-delay);
                 }
             }
             else
                 msg_Dbg (aout, "starting late (%"PRId64" us)", delay);
         }
         else
-            aout_TimeReport (aout, block->i_pts - delay);
+            *drift = delay;
     }
 
     /* TODO: better overflow handling */

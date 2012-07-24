@@ -66,13 +66,15 @@ struct aout_sys_t
     bool mute;
 };
 
-static void Play (audio_output_t *aout, block_t *block)
+static void Play (audio_output_t *aout, block_t *block,
+                  mtime_t *restrict drift)
 {
     aout_sys_t *sys = aout->sys;
 
     sys->play (sys->opaque, block->p_buffer, block->i_nb_samples,
                block->i_pts);
     block_Release (block);
+    (void) drift;
 }
 
 static void Pause (audio_output_t *aout, bool paused, mtime_t date)

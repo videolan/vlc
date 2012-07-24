@@ -49,7 +49,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static void Play( audio_output_t *, block_t * );
+static void Play( audio_output_t *, block_t *, mtime_t * );
 
 /*****************************************************************************
  * OpenAudio: open a dummy audio device
@@ -80,8 +80,9 @@ static int Open( vlc_object_t * p_this )
 /*****************************************************************************
  * Play: pretend to play a sound
  *****************************************************************************/
-static void Play( audio_output_t *aout, block_t *block )
+static void Play( audio_output_t *aout, block_t *block, mtime_t *drift )
 {
     block_Release( block );
     (void) aout;
+    (void) drift;
 }

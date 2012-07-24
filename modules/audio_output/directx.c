@@ -100,7 +100,7 @@ struct aout_sys_t
  *****************************************************************************/
 static int  OpenAudio  ( vlc_object_t * );
 static void CloseAudio ( vlc_object_t * );
-static void Play       ( audio_output_t *, block_t * );
+static void Play       ( audio_output_t *, block_t *, mtime_t * );
 static int  VolumeSet  ( audio_output_t *, float );
 static int  MuteSet    ( audio_output_t *, bool );
 
@@ -576,7 +576,8 @@ static void Probe( audio_output_t * p_aout )
  *       we know the first buffer has been put in the aout fifo and we also
  *       know its date.
  *****************************************************************************/
-static void Play( audio_output_t *p_aout, block_t *p_buffer )
+static void Play( audio_output_t *p_aout, block_t *p_buffer,
+                  mtime_t *restrict drift )
 {
     /* get the playing date of the first aout buffer */
     p_aout->sys->notif.start_date = p_buffer->i_pts;
@@ -587,7 +588,7 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer )
     /* wake up the audio output thread */
     SetEvent( p_aout->sys->notif.event );
 
-    aout_PacketPlay( p_aout, p_buffer );
+    aout_PacketPlay( p_aout, p_buffer, drift );
     p_aout->pf_play = aout_PacketPlay;
 }
 

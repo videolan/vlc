@@ -37,49 +37,6 @@
 #include "aout_internal.h"
 
 /**
- * Notifies the audio input of the drift from the requested audio
- * playback timestamp (@ref block_t.i_pts) to the anticipated playback time
- * as reported by the audio output hardware.
- * Depending on the drift amplitude, the input core may ignore the drift
- * trigger upsampling or downsampling, or even discard samples.
- * Future VLC versions may instead adjust the input decoding speed.
- *
- * The audio output plugin is responsible for estimating the ideal current
- * playback time defined as follows:
- *  ideal time = buffer timestamp - (output latency + pending buffer duration)
- *
- * Practically, this is the PTS (block_t.i_pts) of the current buffer minus
- * the latency reported by the output programming interface.
- * Computing the estimated drift directly would probably be more intuitive.
- * However the use of an absolute time value does not introduce extra
- * measurement errors due to the CPU scheduling jitter and clock resolution.
- * Furthermore, the ideal while it is an abstract value, is easy for most
- * audio output plugins to compute.
- * The following definition is equivalent but depends on the clock time:
- *  ideal time = real time + drift
-
- * @note If aout_LatencyReport() is never called, the core will assume that
- * there is no drift.
- *
- * @param ideal estimated ideal time as defined above.
- */
-static void aout_OutputTimeReport (audio_output_t *aout, mtime_t ideal)
-{
-    mtime_t delta = mdate() - ideal /* = -drift */;
-
-    aout_assert_locked (aout);
-    if (delta < -AOUT_MAX_PTS_ADVANCE || +AOUT_MAX_PTS_DELAY < delta)
-    {
-        aout_owner_t *owner = aout_owner (aout);
-
-        msg_Warn (aout, "not synchronized (%"PRId64" us), resampling",
-                  delta);
-        if (date_Get (&owner->sync.date) != VLC_TS_INVALID)
-            date_Move (&owner->sync.date, delta);
-    }
-}
-
-/**
  * Supply or update the current custom ("hardware") volume.
  * @note This only makes sense after calling aout_VolumeHardInit().
  * @param volume current custom volume
@@ -123,7 +80,6 @@ int aout_OutputNew( audio_output_t *p_aout,
     p_aout->format = *p_format;
     aout_FormatPrepare( &p_aout->format );
 
-    p_aout->event.time_report = aout_OutputTimeReport;
     p_aout->event.volume_report = aout_OutputVolumeReport;
     p_aout->event.mute_report = aout_OutputMuteReport;
     p_aout->event.gain_request = aout_OutputGainRequest;
@@ -275,10 +231,6 @@ void aout_OutputDelete (audio_output_t *aout)
         return;
 
     module_unneed (aout, owner->module);
-    /* Clear callbacks */
-    aout->pf_play = aout_DecDeleteBuffer; /* gruik */
-    aout->pf_pause = NULL;
-    aout->pf_flush = NULL;
     aout->volume_set = NULL;
     aout->mute_set = NULL;
     owner->module = NULL;
@@ -291,6 +243,7 @@ void aout_OutputDelete (audio_output_t *aout)
 void aout_OutputPlay (audio_output_t *aout, block_t *block)
 {
     aout_owner_t *owner = aout_owner (aout);
+    mtime_t drift = 0;
 
     aout_assert_locked (aout);
 
@@ -303,7 +256,34 @@ void aout_OutputPlay (audio_output_t *aout, block_t *block)
         return;
     }
 
-    aout->pf_play (aout, block);
+    if (likely(owner->module != NULL))
+        aout->pf_play (aout, block, &drift);
+    else
+        block_Release (block);
+/**
+ * Notifies the audio input of the drift from the requested audio
+ * playback timestamp (@ref block_t.i_pts) to the anticipated playback time
+ * as reported by the audio output hardware.
+ * Depending on the drift amplitude, the input core may ignore the drift
+ * trigger upsampling or downsampling, or even discard samples.
+ * Future VLC versions may instead adjust the input decoding speed.
+ *
+ * The audio output plugin is responsible for estimating the drift. A negative
+ * value means playback is ahead of the intended time and a positive value
+ * means playback is late from the intended time. In most cases, the audio
+ * output can estimate the delay until playback of the next sample to be
+ * queued. Then, before the block is queued:
+ *    drift = mdate() + delay - block->i_pts
+ * where mdate() + delay is the estimated time when the sample will be rendered
+ * and block->i_pts is the intended time.
+ */
+    if (drift < -AOUT_MAX_PTS_ADVANCE || +AOUT_MAX_PTS_DELAY < drift)
+    {
+        msg_Warn (aout, "not synchronized (%"PRId64" us), resampling",
+                  drift);
+        if (date_Get (&owner->sync.date) != VLC_TS_INVALID)
+            date_Move (&owner->sync.date, drift);
+    }
 }
 
 /**

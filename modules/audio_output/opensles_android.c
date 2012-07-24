@@ -141,7 +141,8 @@ static void Pause(audio_output_t *p_aout, bool pause, mtime_t date)
 /*****************************************************************************
  * Play: play a sound
  *****************************************************************************/
-static void Play( audio_output_t *p_aout, block_t *p_buffer )
+static void Play( audio_output_t *p_aout, block_t *p_buffer,
+                  mtime_t *restrict drift )
 {
     aout_sys_t *p_sys = p_aout->sys;
     int tries = 5;
@@ -170,9 +171,8 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer )
     block_ChainLastAppend( &p_sys->pp_last, p_buffer );
     vlc_mutex_unlock( &p_sys->lock );
 
-    if (delay && st.count) {
-        aout_TimeReport(p_aout, p_buffer->i_pts - delay);
-    }
+    if (delay && st.count)
+        *drift = mdate() + delay - p_buffer->i_pts;
 
     for (;;)
     {

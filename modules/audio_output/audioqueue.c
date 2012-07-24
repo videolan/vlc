@@ -57,7 +57,7 @@ struct aout_sys_t
  *****************************************************************************/
 static int  Open               ( vlc_object_t * );
 static void Close              ( vlc_object_t * );
-static void Play               ( audio_output_t *, block_t * );
+static void Play               ( audio_output_t *, block_t *, mtime_t * );
 static void AudioQueueCallback (void *, AudioQueueRef, AudioQueueBufferRef);
 
 #include "volume.h"

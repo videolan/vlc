@@ -515,7 +515,7 @@ static void *data_convert(block_t **pp)
 /**
  * Queue one audio frame to the playabck stream
  */
-static void Play(audio_output_t *aout, block_t *block)
+static void Play(audio_output_t *aout, block_t *block, mtime_t *restrict drift)
 {
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
@@ -554,6 +554,7 @@ static void Play(audio_output_t *aout, block_t *block)
     }
 
     pa_threaded_mainloop_unlock(sys->mainloop);
+    (void) drift;
 }
 
 /**

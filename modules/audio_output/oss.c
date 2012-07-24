@@ -74,7 +74,7 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 vlc_module_end ()
 
-static void Play (audio_output_t *, block_t *);
+static void Play (audio_output_t *, block_t *, mtime_t *);
 static void Pause (audio_output_t *, bool, mtime_t);
 static void Flush (audio_output_t *, bool);
 static int VolumeSync (audio_output_t *);
@@ -318,7 +318,8 @@ static void Close (vlc_object_t *obj)
 /**
  * Queues one audio buffer to the hardware.
  */
-static void Play (audio_output_t *aout, block_t *block)
+static void Play (audio_output_t *aout, block_t *block,
+                  mtime_t *restrict drift)
 {
     aout_sys_t *sys = aout->sys;
     int fd = sys->fd;
@@ -329,7 +330,7 @@ static void Play (audio_output_t *aout, block_t *block)
         mtime_t latency = (delay * CLOCK_FREQ * aout->format.i_frame_length)
                       / (aout->format.i_rate * aout->format.i_bytes_per_frame);
         /* TODO: insert zeroes when starting playback */
-        aout_TimeReport (aout, block->i_pts - latency);
+        *drift = mdate () + latency - block->i_pts;
     }
     else
         msg_Warn (aout, "cannot get delay: %m");

@@ -143,7 +143,8 @@ struct audio_output
         only when succesfully probed and not afterward) */
 
     struct aout_sys_t *sys; /**< Output plugin private data */
-    void (*pf_play)(audio_output_t *, block_t *); /**< Audio buffer callback */
+    void (*pf_play)(audio_output_t *, block_t *, mtime_t *); /**< Play callback
+        - queue a block for playback */
     void (* pf_pause)( audio_output_t *, bool, mtime_t ); /**< Pause/resume
         callback (optional, may be NULL) */
     void (* pf_flush)( audio_output_t *, bool ); /**< Flush/drain callback
@@ -152,7 +153,6 @@ struct audio_output
     int (*mute_set)(audio_output_t *, bool); /**< Mute setter (or NULL) */
 
     struct {
-        void (*time_report)(audio_output_t *, mtime_t);
         void (*volume_report)(audio_output_t *, float);
         void (*mute_report)(audio_output_t *, bool);
         int (*gain_request)(audio_output_t *, float);
@@ -223,11 +223,6 @@ VLC_API void aout_FormatPrint(vlc_object_t *, const char *,
 #define aout_FormatPrint(o, t, f) aout_FormatPrint(VLC_OBJECT(o), t, f)
 VLC_API const char * aout_FormatPrintChannels( const audio_sample_format_t * ) VLC_USED;
 
-static inline void aout_TimeReport(audio_output_t *aout, mtime_t date)
-{
-    aout->event.time_report(aout, date);
-}
-
 static inline void aout_VolumeReport(audio_output_t *aout, float volume)
 {
     aout->event.volume_report(aout, volume);
@@ -271,7 +266,7 @@ typedef struct
 VLC_DEPRECATED void aout_PacketInit(audio_output_t *, aout_packet_t *, unsigned);
 VLC_DEPRECATED void aout_PacketDestroy(audio_output_t *);
 
-VLC_DEPRECATED void aout_PacketPlay(audio_output_t *, block_t *);
+VLC_DEPRECATED void aout_PacketPlay(audio_output_t *, block_t *, mtime_t *);
 VLC_DEPRECATED void aout_PacketPause(audio_output_t *, bool, mtime_t);
 VLC_DEPRECATED void aout_PacketFlush(audio_output_t *, bool);
 

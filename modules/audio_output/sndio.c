@@ -43,7 +43,7 @@ vlc_module_begin ()
     set_callbacks (Open, Close )
 vlc_module_end ()
 
-static void Play (audio_output_t *, block_t *);
+static void Play (audio_output_t *, block_t *, mtime_t *);
 static void Pause (audio_output_t *, bool, mtime_t);
 static int VolumeSet (audio_output_t *, float);
 static int MuteSet (audio_output_t *, bool);
@@ -183,7 +183,8 @@ static void Close (vlc_object_t *obj)
     free (sys);
 }
 
-static void Play (audio_output_t *aout, block_t *block)
+static void Play (audio_output_t *aout, block_t *block,
+                  mtime_t *restrict drift)
 {
     aout_sys_t *sys = aout->sys;
     struct sio_par par;
@@ -192,8 +193,7 @@ static void Play (audio_output_t *aout, block_t *block)
     {
         mtime_t delay = par.bufsz * CLOCK_FREQ / aout->format.i_rate;
 
-        delay = block->i_pts - (mdate () - delay);
-        aout_TimeReport (aout, block->i_pts - delay);
+        *drift = mdate () + delay - block->i_pts;
     }
 
     while (block->i_buffer > 0 && !sio_eof (sys->hdl))

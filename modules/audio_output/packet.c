@@ -158,7 +158,8 @@ void aout_PacketDestroy (audio_output_t *aout)
 
 static block_t *aout_OutputSlice (audio_output_t *);
 
-void aout_PacketPlay (audio_output_t *aout, block_t *block)
+void aout_PacketPlay (audio_output_t *aout, block_t *block,
+                      mtime_t *restrict drift)
 {
     aout_packet_t *p = aout_packet (aout);
     mtime_t time_report;
@@ -173,7 +174,7 @@ void aout_PacketPlay (audio_output_t *aout, block_t *block)
     vlc_mutex_unlock (&p->lock);
 
     if (time_report != INT64_MIN)
-        aout_TimeReport (aout, mdate () - time_report);
+        *drift = time_report;
 }
 
 void aout_PacketPause (audio_output_t *aout, bool pause, mtime_t date)
