@@ -489,7 +489,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
             vlc_object_release( p_vout );
 
             [self refreshVoutDeviceMenu:nil];
-            [self setSubmenusEnabled: YES];
         }
         vlc_object_release( p_input );
     }
@@ -518,6 +517,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     NSArray * o_screens = [NSScreen screens];
     NSMenuItem * o_mitem;
     count = [o_screens count];
+    [o_mi_screen setEnabled: YES];
     [o_submenu addItemWithTitle: _NS("Default") action:@selector(toggleFullscreenDevice:) keyEquivalent:@""];
     o_mitem = [o_submenu itemAtIndex: 0];
     [o_mitem setTag: 0];
@@ -1007,17 +1007,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
             return;
     }
 
-    /* Make sure we want to display the variable
-     * special case for spu-es, which we want to display in any case */
-    if( i_type & VLC_VAR_HASCHOICE && strcmp( psz_variable, "spu-es" ) )
-    {
-        var_Change( p_object, psz_variable, VLC_VAR_CHOICESCOUNT, &val, NULL );
-        if( val.i_int == 0 )
-            return;
-        if( (i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE && val.i_int == 1 )
-            return;
-    }
-
     /* Get the descriptive name of the variable */
     var_Change( p_object, psz_variable, VLC_VAR_GETTEXT, &text, NULL );
     [o_mi setTitle: _NS( text.psz_string ? text.psz_string : psz_variable )];
@@ -1086,6 +1075,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
         /* this is more efficient then the legacy code, but 10.6+ only */
         [o_menu removeAllItems];
     }
+    /* we disable everything here, and enable it again when needed, below */
+    [o_parent setEnabled:NO];
 
     /* Aspect Ratio */
     if( [[o_parent title] isEqualToString: _NS("Aspect-ratio")] == YES )
@@ -1116,7 +1107,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     if( i_type & VLC_VAR_HASCHOICE )
     {
         var_Change( p_object, psz_variable, VLC_VAR_CHOICESCOUNT, &val, NULL );
-        if( val.i_int == 0 ) return;
+        if( val.i_int == 0 ) 
+            return;
         if( (i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE && val.i_int == 1 )
             return;
     }
