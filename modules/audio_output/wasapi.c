@@ -190,10 +190,8 @@ static int SimpleVolumeSet(audio_output_t *aout, float vol)
     aout_sys_t *sys = aout->sys;
     HRESULT hr;
 
-    if (vol > 1.)
-        vol = 1.;
-
-    Enter();
+    if (TryEnter(aout))
+        return -1;
     hr = ISimpleAudioVolume_SetMasterVolume(sys->volume.simple, vol, NULL);
     if (FAILED(hr))
         msg_Warn(aout, "cannot set session volume (error 0x%lx)", hr);
@@ -206,7 +204,8 @@ static int SimpleMuteSet(audio_output_t *aout, bool mute)
     aout_sys_t *sys = aout->sys;
     HRESULT hr;
 
-    Enter();
+    if (TryEnter(aout))
+        return -1;
     hr = ISimpleAudioVolume_SetMute(sys->volume.simple, mute, NULL);
     if (FAILED(hr))
         msg_Warn(aout, "cannot mute session (error 0x%lx)", hr);
