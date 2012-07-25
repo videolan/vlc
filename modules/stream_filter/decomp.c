@@ -52,17 +52,20 @@ static int  OpenXZ (vlc_object_t *);
 static void Close (vlc_object_t *);
 
 vlc_module_begin ()
-    set_description (N_("Decompression"))
     set_category (CAT_INPUT)
     set_subcategory (SUBCAT_INPUT_STREAM_FILTER)
     set_capability ("stream_filter", 20)
+
+    set_description (N_("LZMA decompression"))
     set_callbacks (OpenXZ, Close)
 
     add_submodule ()
+    set_description (N_("Burrows-Wheeler decompression"))
     set_callbacks (OpenBzip2, Close)
     /* TODO: access shortnames for stream_UrlNew() */
 
     add_submodule ()
+    set_description (N_("gzip decompression"))
     set_callbacks (OpenGzip, Close)
 vlc_module_end ()
 
