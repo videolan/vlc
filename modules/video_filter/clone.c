@@ -60,7 +60,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_integer( CFG_PREFIX "count", 2, COUNT_TEXT, COUNT_LONGTEXT, false )
-    add_string ( CFG_PREFIX "vout-list", NULL, VOUTLIST_TEXT, VOUTLIST_LONGTEXT, true )
+    add_module_list( CFG_PREFIX "vout-list", "vout display", NULL,
+                     VOUTLIST_TEXT, VOUTLIST_LONGTEXT, true )
 
     add_shortcut( "clone" )
     set_callbacks( Open, Close )
@@ -73,7 +74,7 @@ static const char *const ppsz_filter_options[] = {
     "count", "vout-list", NULL
 };
 
-#define VOUTSEPARATOR ','
+#define VOUTSEPARATOR ':'
 
 static int Filter( video_splitter_t *, picture_t *pp_dst[], picture_t * );
 
