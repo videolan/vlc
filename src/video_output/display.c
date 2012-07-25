@@ -1418,7 +1418,7 @@ static void SplitterEvent(vout_display_t *vd, int event, va_list args)
         break;
 
     default:
-        msg_Err(vd, "SplitterEvent TODO");
+        msg_Err(vd, "splitter event not implemented: %d", event);
         break;
     }
 }
