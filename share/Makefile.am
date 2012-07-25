@@ -50,7 +50,6 @@ EXTRA_DIST += \
 	$(DIST_lua) \
 	osdmenu/default.cfg.in \
 	$(DIST_osdmenu_default) \
-	$(DIST_maemo) \
 	$(DIST_solid)
 CLEANFILES += osdmenu/default.cfg
 
@@ -63,9 +62,6 @@ if BUILD_OSDMENU
 nobase_vlcdata_DATA += \
 	osdmenu/default.cfg \
 	$(DIST_osdmenu_default)
-endif
-if BUILD_HILDON
-nobase_vlcdata_DATA += $(DIST_maemo) $(maemo_FILES)
 endif
 if KDE_SOLID
 soliddata_DATA = $(DIST_solid)
@@ -387,20 +383,6 @@ DIST_http_lua = \
 	lua/http/js/controlers.js \
 	lua/http/js/jquery-ui-1.8.13.custom.min.js \
 	lua/http/old/style.css
-
-DIST_maemo = \
-	maemo/vlc_intf.rc \
-	maemo/vlc_left_tab_active.png \
-	maemo/vlc_left_tab_passive.png \
-	maemo/playlist.png \
-	maemo/play.png \
-	maemo/pause.png \
-	maemo/stop.png \
-	maemo/previous.png \
-	maemo/next.png
-
-maemo_FILES = \
-	icons/32x32/vlc.png
 
 DIST_solid = \
 	solid/vlc-opencda.desktop \

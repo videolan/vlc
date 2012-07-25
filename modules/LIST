@@ -143,7 +143,6 @@ $Id$
  * growl: announce currently playing stream to growl
  * h264: H264 decoder
  * headphone_channel_mixer:  headphone channel mixer with virtual spatialization effect
- * hildon: Maemo interface based on Hildon
  * hotkeys: hotkeys control module
  * hqdn3d: High Quality denoising filter
  * htcpcp: HTCPCP access module

@@ -3552,32 +3552,6 @@ dnl
 EXTEND_HELP_STRING([Interface plugins:])
 
 dnl
-dnl Hildon UI
-dnl
-AC_ARG_ENABLE(hildon,
-  [  --enable-hildon         Hildon touchscreen UI (default disabled)])
-AS_IF([test "${enable_hildon}" = "yes"], [
-  PKG_CHECK_MODULES(HILDON, [hildon-1], [
-    PKG_CHECK_MODULES(HILDON_FM, hildon-fm-2, [
-      VLC_ADD_CFLAGS([hildon],[${HILDON_FM_CFLAGS} -DHAVE_HILDON_FM])
-      VLC_ADD_LIBS([hildon],[${HILDON_FM_LIBS}])
-    ], [
-      AC_MSG_WARN([${HILDON_FM_PKG_ERRORS}.])
-    ])
-    VLC_ADD_CFLAGS([hildon],[${HILDON_CFLAGS} ${X_CFLAGS}])
-    VLC_ADD_LIBS([hildon],[${HILDON_LIBS} ${X_LIBS} ${X_PRE_LIBS} -lX11])
-    VLC_ADD_PLUGIN([hildon])
-    ALIASES="${ALIASES} mvlc"
-  ], [
-    AS_IF([test "${enable_hildon}" = "yes"],[
-      AC_MSG_ERROR([${HILDON_PKG_ERRORS}.])
-    ])
-    enable_hildon="no"
-  ])
-])
-AM_CONDITIONAL(BUILD_HILDON, [test "${enable_hildon}" = "yes"])
-
-dnl
 dnl QT
 dnl
 AC_ARG_ENABLE(qt, [
@@ -4190,7 +4164,6 @@ AC_CONFIG_FILES([
   modules/demux/playlist/Makefile
   modules/gui/Makefile
   modules/gui/macosx/Makefile
-  modules/gui/hildon/Makefile
   modules/gui/minimal_macosx/Makefile
   modules/gui/macosx_dialog_provider/Makefile
   modules/gui/qt4/Makefile

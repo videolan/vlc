@@ -568,7 +568,7 @@ doc:
 # Building aliases
 ###############################################################################
 
-ALL_ALIASES = cvlc rvlc svlc qvlc nvlc mvlc
+ALL_ALIASES = cvlc rvlc svlc qvlc nvlc
 bin_SCRIPTS = $(ALIASES)
 CLEANFILES += $(ALIASES) $(noinst_SCRIPTS)
 EXTRA_SCRIPTS = $(ALL_ALIASES)
@@ -591,9 +591,6 @@ qvlc: make-alias Makefile
 
 nvlc: make-alias Makefile
 	$(AM_V_GEN)$(MKALIAS) ncurses
-
-mvlc: make-alias Makefile
-	$(AM_V_GEN)$(MKALIAS) maemo
 
 if BUILD_VLC
 noinst_SCRIPTS = vlc$(EXEEXT)
