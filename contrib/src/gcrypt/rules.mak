@@ -26,6 +26,11 @@ ifdef HAVE_BSD
 CONFIGURE_OPTS += --disable-asm --disable-aesni-support
 endif
 endif
+ifdef HAVE_ANDROID
+ifeq ($(ANDROID_ABI), x86)
+CONFIGURE_OPTS += ac_cv_sys_symbol_underscore=no
+endif
+endif
 .gcrypt: libgcrypt
 	#$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-ciphers=aes,des,rfc2268,arcfour --enable-digests=sha1,md5,rmd160,sha512 --enable-pubkey-ciphers=dsa,rsa,ecc $(CONFIGURE_OPTS)
