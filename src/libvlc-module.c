@@ -1678,10 +1678,10 @@ vlc_module_begin ()
     add_integer( "sub-margin", 0, SUB_MARGIN_TEXT,
                  SUB_MARGIN_LONGTEXT, true )
     set_section( N_( "Overlays" ) , NULL )
-    add_module_list_cat( "sub-source", SUBCAT_VIDEO_SUBPIC, NULL,
-                SUB_SOURCE_TEXT, SUB_SOURCE_LONGTEXT, false )
-    add_module_list_cat( "sub-filter", SUBCAT_VIDEO_SUBPIC, NULL,
-                SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT, false )
+    add_module_list( "sub-source", "sub source", NULL,
+                     SUB_SOURCE_TEXT, SUB_SOURCE_LONGTEXT, false )
+    add_module_list( "sub-filter", "sub filter", NULL,
+                     SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT, false )
 
 /* Input options */
     set_category( CAT_INPUT )
