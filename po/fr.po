@@ -2189,11 +2189,11 @@ msgstr ""
 
 #: src/libvlc-module.c:508
 msgid "Video splitter module"
-msgstr "Module de filtre vidéo"
+msgstr "Module de séparation vidéo"
 
 #: src/libvlc-module.c:510
 msgid "This adds video splitters like clone or wall"
-msgstr "Ajouter des filtres de sortie vidéo comme clone ou mur"
+msgstr "Ajouter des filtres de séparation vidéo comme clone ou mur.."
 
 #: src/libvlc-module.c:512
 msgid "Video filter module"
