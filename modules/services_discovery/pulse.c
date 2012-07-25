@@ -181,14 +181,10 @@ static int AddSource (services_discovery_t *sd, const pa_source_info *info)
         return 0;
     }
 
-    char *card;
-    if (info->card == PA_INVALID_INDEX
-     || unlikely(asprintf (&card, N_("Card %"PRIu32), info->card) == -1))
-        card = NULL;
+    const char *card = pa_proplist_gets(info->proplist, "device.product.name");
     services_discovery_AddItem (sd, item,
                                 (card != NULL) ? card : N_("Generic"));
     d->sd = sd;
-    free (card);
     return 0;
 }
 
