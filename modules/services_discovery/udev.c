@@ -24,16 +24,19 @@
 # include <config.h>
 #endif
 
+#include <errno.h>
+#include <search.h>
+#include <poll.h>
+
 #include <libudev.h>
+
 #include <vlc_common.h>
 #include <vlc_services_discovery.h>
 #include <vlc_plugin.h>
-#include <vlc_url.h>
-#ifdef HAVE_SEARCH_H
-# include <search.h>
+#ifdef HAVE_ALSA
+# include <vlc_modules.h>
 #endif
-#include <poll.h>
-#include <errno.h>
+#include <vlc_url.h>
 
 static int OpenV4L (vlc_object_t *);
 #ifdef HAVE_ALSA
@@ -91,8 +94,9 @@ static int vlc_sd_probe_Open (vlc_object_t *obj)
         vlc_sd_probe_Add (probe, "v4l{longname=\"Video capture\"}",
                           N_("Video capture"), SD_CAT_DEVICES);
 #ifdef HAVE_ALSA
-        vlc_sd_probe_Add (probe, "alsa{longname=\"Audio capture\"}",
-                          N_("Audio capture"), SD_CAT_DEVICES);
+        if (!module_exists ("pulselist"))
+            vlc_sd_probe_Add (probe, "alsa{longname=\"Audio capture\"}",
+                              N_("Audio capture"), SD_CAT_DEVICES);
 #endif
         vlc_sd_probe_Add (probe, "disc{longname=\"Discs\"}", N_("Discs"),
                           SD_CAT_DEVICES);
