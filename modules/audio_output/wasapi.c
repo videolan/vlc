@@ -48,11 +48,17 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 vlc_module_end()
 
-static int TryEnter(void)
+static int TryEnter(vlc_object_t *obj)
 {
     HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-    return -!!FAILED(hr);
+    if (unlikely(FAILED(hr)))
+    {
+        msg_Err (obj, "cannot initialize COM (error 0x%lx)", hr);
+        return -1;
+    }
+    return 0;
 }
+#define TryEnter(o) TryEnter(VLC_OBJECT(o))
 
 static void Enter(void)
 {
@@ -461,7 +467,7 @@ static int Open(vlc_object_t *obj)
     sys->done = NULL;
     aout->sys = sys;
 
-    if (TryEnter())
+    if (TryEnter(aout))
     {
         free(sys);
         return VLC_EGENERIC;
