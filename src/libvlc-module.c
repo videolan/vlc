@@ -1908,8 +1908,8 @@ vlc_module_begin ()
     add_obsolete_bool( "prefer-system-codecs" )
 
     set_subcategory( SUBCAT_INPUT_STREAM_FILTER )
-    add_module_list_cat( "stream-filter", SUBCAT_INPUT_STREAM_FILTER, NULL,
-                STREAM_FILTER_TEXT, STREAM_FILTER_LONGTEXT, false )
+    add_module_list( "stream-filter", "stream_filter", NULL,
+                     STREAM_FILTER_TEXT, STREAM_FILTER_LONGTEXT, false )
 
 
 /* Stream output options */
