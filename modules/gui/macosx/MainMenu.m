@@ -598,6 +598,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
     /* Let the ExtensionsManager itself build the menu */
     [o_extMgr buildMenu:o_mu_extensions];
+    [o_mi_extensions setEnabled: ( [o_mu_extensions numberOfItems] > 0 )];
 }
 
 #pragma mark -
