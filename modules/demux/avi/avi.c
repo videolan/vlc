@@ -329,6 +329,8 @@ static int Open( vlc_object_t * p_this )
     p_riff  = AVI_ChunkFind( &p_sys->ck_root, AVIFOURCC_RIFF, 0 );
     p_hdrl  = AVI_ChunkFind( p_riff, AVIFOURCC_hdrl, 0 );
     p_movi  = AVI_ChunkFind( p_riff, AVIFOURCC_movi, 0 );
+    if( !p_movi )
+        p_movi  = AVI_ChunkFind( &p_sys->ck_root, AVIFOURCC_movi, 0 );
 
     if( !p_hdrl || !p_movi )
     {
