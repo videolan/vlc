@@ -87,6 +87,17 @@ endif
 # Linux
 ifdef HAVE_LINUX
 FFMPEGCONF += --target-os=linux --enable-pic
+
+ifeq ($(ANDROID_ABI), x86)
+ifdef HAVE_ANDROID
+# Android-x86 gcc doesn't guarantee an aligned stack, but this is
+# handled by __attribute__((force_align_arg_pointer)) in libavcodec
+# already, so we tell gcc to assume this alignment, so we don't need
+# to waste a precious register in assembly functions to realign it.
+FFMPEG_CFLAGS += -mincoming-stack-boundary=4
+endif # HAVE_ANDROID
+endif # x86
+
 endif
 
 # Windows
