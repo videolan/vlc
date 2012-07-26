@@ -702,7 +702,6 @@ aviindex:
     {
         avi_track_t         *tk = p_sys->track[i];
         avi_chunk_list_t    *p_strl;
-        avi_chunk_strh_t    *p_strh;
         avi_chunk_strf_auds_t    *p_auds;
 
         if( tk->i_cat != AUDIO_ES )
@@ -716,7 +715,6 @@ aviindex:
             continue;
         }
         p_strl = AVI_ChunkFind( p_hdrl, AVIFOURCC_strl, i );
-        p_strh = AVI_ChunkFind( p_strl, AVIFOURCC_strh, 0 );
         p_auds = AVI_ChunkFind( p_strl, AVIFOURCC_strf, 0 );
 
         if( p_auds->p_wf->wFormatTag != WAVE_FORMAT_PCM &&
