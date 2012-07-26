@@ -26,13 +26,13 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_demux.h>
+#include <vlc_demux.h>                                   /* stream_*, *_ES */
 #include <vlc_codecs.h>                            /* VLC_BITMAPINFOHEADER */
 
 #include "libavi.h"
 
 #ifndef NDEBUG
-#define AVI_DEBUG 1
+# define AVI_DEBUG 1
 #endif
 
 #define __EVEN( x ) (((x) + 1) & ~1)
@@ -1044,5 +1044,4 @@ void *_AVI_ChunkFind( avi_chunk_t *p_chk,
     }
     return NULL;
 }
-
 

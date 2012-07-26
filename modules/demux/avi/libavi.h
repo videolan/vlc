@@ -38,10 +38,10 @@
                                         /* the keyframe flag isn't a true flag */
                                         /* but have to be verified */
 
-#define AVI_CHUNK_COMMON            \
-    vlc_fourcc_t i_chunk_fourcc;    \
-    uint64_t i_chunk_size;          \
-    uint64_t i_chunk_pos;           \
+#define AVI_CHUNK_COMMON           \
+    vlc_fourcc_t i_chunk_fourcc;   \
+    uint64_t i_chunk_size;         \
+    uint64_t i_chunk_pos;          \
     union  avi_chunk_u *p_next;    \
     union  avi_chunk_u *p_father;  \
     union  avi_chunk_u *p_first;   \
@@ -57,6 +57,7 @@ typedef struct idx1_entry_s
     uint32_t i_length;
 
 } idx1_entry_t;
+
 typedef struct avi_chunk_common_s
 {
     AVI_CHUNK_COMMON
@@ -247,15 +248,15 @@ typedef union avi_chunk_u
  * Stream(input) access functions
  ****************************************************************************/
 int     AVI_ChunkRead( stream_t *,
-                        avi_chunk_t *p_chk,
-                        avi_chunk_t *p_father );
+                       avi_chunk_t *p_chk,
+                       avi_chunk_t *p_father );
 void    AVI_ChunkFree( stream_t *, avi_chunk_t * );
 
 int     _AVI_ChunkCount( avi_chunk_t *, vlc_fourcc_t );
 void   *_AVI_ChunkFind ( avi_chunk_t *, vlc_fourcc_t, int );
 
 int     AVI_ChunkReadRoot( stream_t *, avi_chunk_t *p_root );
-void    AVI_ChunkFreeRoot( stream_t *, avi_chunk_t  *p_chk );
+void    AVI_ChunkFreeRoot( stream_t *, avi_chunk_t *p_chk  );
 
 #define AVI_ChunkCount( p_chk, i_fourcc ) \
     _AVI_ChunkCount( AVI_CHUNK(p_chk), i_fourcc )
@@ -349,9 +350,9 @@ void    AVI_ChunkFreeRoot( stream_t *, avi_chunk_t  *p_chk );
 #define AVITWOCC_tx            VLC_TWOCC('t','x')
 #define AVITWOCC_sb            VLC_TWOCC('s','b')
 
-    /* *** codex stuff ***  */
+/* *** codex stuff ***  */
 
-    /* DV */
+/* DV */
 #define FOURCC_dvsd         VLC_FOURCC('d','v','s','d')
 #define FOURCC_dvhd         VLC_FOURCC('d','v','h','d')
 #define FOURCC_dvsl         VLC_FOURCC('d','v','s','l')

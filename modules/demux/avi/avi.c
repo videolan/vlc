@@ -3,6 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2001-2009 the VideoLAN team
  * $Id$
+ *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,7 +51,6 @@
  *****************************************************************************/
 
 #define INTERLEAVE_TEXT N_("Force interleaved method" )
-#define INTERLEAVE_LONGTEXT N_( "Force interleaved method." )
 
 #define INDEX_TEXT N_("Force index creation")
 #define INDEX_LONGTEXT N_( \
@@ -75,7 +75,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
 
     add_bool( "avi-interleaved", false,
-              INTERLEAVE_TEXT, INTERLEAVE_LONGTEXT, true )
+              INTERLEAVE_TEXT, INTERLEAVE_TEXT, true )
     add_integer( "avi-index", 0,
               INDEX_TEXT, INDEX_LONGTEXT, false )
         change_integer_list( pi_index, ppsz_indexes )
@@ -577,10 +577,10 @@ static int Open( vlc_object_t * p_this )
                         fmt.video.p_palette = calloc( 1, sizeof(video_palette_t) );
                         fmt.video.p_palette->i_entries = __MIN(fmt.i_extra/4, 256);
 
-                        for( int i = 0; i < fmt.video.p_palette->i_entries; i++ )
+                        for( int k = 0; k < fmt.video.p_palette->i_entries; k++ )
                         {
                             for( int j = 0; j < 4; j++ )
-                                fmt.video.p_palette->palette[i][j] = p_pal[4*i+j];
+                                fmt.video.p_palette->palette[k][j] = p_pal[4*k+j];
                         }
                     }
                 }
@@ -775,10 +775,9 @@ error:
 static void Close ( vlc_object_t * p_this )
 {
     demux_t *    p_demux = (demux_t *)p_this;
-    unsigned int i;
     demux_sys_t *p_sys = p_demux->p_sys  ;
 
-    for( i = 0; i < p_sys->i_track; i++ )
+    for( unsigned int i = 0; i < p_sys->i_track; i++ )
     {
         if( p_sys->track[i] )
         {
@@ -787,8 +786,10 @@ static void Close ( vlc_object_t * p_this )
         }
     }
     free( p_sys->track );
+
     AVI_ChunkFreeRoot( p_demux->s, &p_sys->ck_root );
     vlc_meta_Delete( p_sys->meta );
+
     for( unsigned i = 0; i < p_sys->i_attachment; i++)
         vlc_input_attachment_Delete(p_sys->attachment[i]);
     free(p_sys->attachment);
@@ -1310,18 +1311,16 @@ static int Demux_UnSeekable( demux_t *p_demux )
  *****************************************************************************/
 static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
 {
-
     demux_sys_t *p_sys = p_demux->p_sys;
     msg_Dbg( p_demux, "seek requested: %"PRId64" seconds %d%%",
              i_date / 1000000, i_percent );
 
     if( p_sys->b_seekable )
     {
-        unsigned i_stream;
-
         if( !p_sys->i_length )
         {
             avi_track_t *p_stream = NULL;
+            unsigned i_stream;
             int64_t i_pos;
 
             /* use i_percent to create a true i_date */
@@ -1380,7 +1379,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
         }
 
         /* */
-        for( i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
+        for( unsigned i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
         {
             avi_track_t *p_stream = p_sys->track[i_stream];
 
