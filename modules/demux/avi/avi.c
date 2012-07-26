@@ -275,14 +275,9 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    /* Initialize input  structures. */
-    p_sys = p_demux->p_sys = malloc( sizeof(demux_sys_t) );
-    memset( p_sys, 0, sizeof( demux_sys_t ) );
-    p_sys->i_time   = 0;
-    p_sys->i_length = 0;
-    p_sys->i_movi_lastchunk_pos = 0;
+    /* Initialize input structures. */
+    p_sys = p_demux->p_sys = calloc( 1, sizeof(demux_sys_t) );
     p_sys->b_odml   = false;
-    p_sys->i_track  = 0;
     p_sys->track    = NULL;
     p_sys->meta     = NULL;
     TAB_INIT(p_sys->i_attachment, p_sys->attachment);
@@ -372,8 +367,8 @@ static int Open( vlc_object_t * p_this )
     /* now read info on each stream and create ES */
     for( i = 0 ; i < i_track; i++ )
     {
-        avi_track_t           *tk     = malloc( sizeof( avi_track_t ) );
-        if( !tk )
+        avi_track_t           *tk     = calloc( 1, sizeof( avi_track_t ) );
+        if( unlikely( !tk ) )
             goto error;
 
         avi_chunk_list_t      *p_strl = AVI_ChunkFind( p_hdrl, AVIFOURCC_strl, i );
@@ -383,7 +378,6 @@ static int Open( vlc_object_t * p_this )
         avi_chunk_strf_vids_t *p_vids = NULL;
         es_format_t fmt;
 
-        memset( tk, 0, sizeof(*tk) );
         tk->b_eof = false;
         tk->b_activated = true;
 
