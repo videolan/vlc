@@ -43,6 +43,8 @@
     IBOutlet id _destination_icon_view;
     IBOutlet id _destination_filename_lbl;
     IBOutlet id _destination_filename_stub_lbl;
+    IBOutlet id _destination_stream_btn;
+    IBOutlet id _destination_stream_lbl;
 
     IBOutlet id _dropin_view;
     IBOutlet id _dropin_icon_view;
@@ -83,6 +85,26 @@
     IBOutlet id _customize_subs_pop;
     IBOutlet id _customize_subs_overlay_ckb;
 
+    IBOutlet id _stream_panel;
+    IBOutlet id _stream_ok_btn;
+    IBOutlet id _stream_cancel_btn;
+    IBOutlet id _stream_destination_lbl;
+    IBOutlet id _stream_announcement_lbl;
+    IBOutlet id _stream_type_lbl;
+    IBOutlet id _stream_type_pop;
+    IBOutlet id _stream_address_lbl;
+    IBOutlet id _stream_address_fld;
+    IBOutlet id _stream_ttl_lbl;
+    IBOutlet id _stream_ttl_fld;
+    IBOutlet id _stream_port_lbl;
+    IBOutlet id _stream_port_fld;
+    IBOutlet id _stream_sap_ckb;
+    IBOutlet id _stream_http_ckb;
+    IBOutlet id _stream_rtsp_ckb;
+    IBOutlet id _stream_sdp_ckb;
+    IBOutlet id _stream_channel_fld;
+    IBOutlet id _stream_sdp_fld;
+
     NSString * _MRL;
     NSString * _outputDestination;
     NSArray * _profileNames;
@@ -108,6 +130,8 @@
 - (IBAction)customizeProfile:(id)sender;
 - (IBAction)closeCustomizationSheet:(id)sender;
 - (IBAction)chooseDestination:(id)sender;
+- (IBAction)showStreamPanel:(id)sender;
+- (IBAction)closeStreamPanel:(id)sender;
 
 - (void)updateDropView;
 

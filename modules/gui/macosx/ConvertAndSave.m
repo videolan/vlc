@@ -143,6 +143,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_destination_lbl setStringValue: _NS("Choose Destination")];
     [_destination_filename_stub_lbl setStringValue: _NS("Choose an output location")];
     [_destination_filename_lbl setHidden: YES];
+    [_destination_stream_btn setTitle:_NS("Stream...")];
+    [_destination_stream_lbl setStringValue:@""];
     [_customize_ok_btn setTitle: _NS("Apply")];
     [_customize_cancel_btn setTitle: _NS("Cancel")];
     [[_customize_tabview tabViewItemAtIndex:0] setLabel: _NS("Encapsulation")];
@@ -168,6 +170,18 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_customize_aud_samplerate_lbl setStringValue: _NS("Sample Rate")];
     [_customize_subs_ckb setTitle: _NS("Subtitles")];
     [_customize_subs_overlay_ckb setTitle: _NS("Overlay subtitles on the video")];
+    [_stream_ok_btn setTitle:_NS("Set")];
+    [_stream_cancel_btn setTitle:_NS("Cancel")];
+    [_stream_destination_lbl setStringValue:_NS("Stream Destination")];
+    [_stream_announcement_lbl setStringValue:_NS("Stream Announcement")];
+    [_stream_type_lbl setStringValue:_NS("Type")];
+    [_stream_address_lbl setStringValue:_NS("Address")];
+    [_stream_ttl_lbl setStringValue:_NS("TTL")];
+    [_stream_port_lbl setStringValue:_NS("Port")];
+    [_stream_sap_ckb setStringValue:_NS("SAP Announcement")];
+    [_stream_http_ckb setStringValue:_NS("HTTP Announcement")];
+    [_stream_rtsp_ckb setStringValue:_NS("RTSP Announcement")];
+    [_stream_sdp_ckb setStringValue:_NS("Export SDP as file")];
 
     /* there is no way to hide single cells, so replace the existing ones with empty cells.. */
     id blankCell = [[[NSCell alloc] init] autorelease];
@@ -369,6 +383,17 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         [[_destination_filename_stub_lbl animator] setHidden: NO];
     }
     [self updateOKButton];
+}
+
+- (IBAction)showStreamPanel:(id)sender
+{
+    [NSApp beginSheet:_stream_panel modalForWindow:_window modalDelegate:self didEndSelector:NULL contextInfo:nil];
+}
+
+- (IBAction)closeStreamPanel:(id)sender
+{
+    [_stream_panel orderOut:sender];
+    [NSApp endSheet: _stream_panel];
 }
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
