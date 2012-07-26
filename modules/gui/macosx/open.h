@@ -65,6 +65,11 @@
     IBOutlet id o_file_slave_icon_well;
     IBOutlet id o_file_subtitles_filename_lbl;
     IBOutlet id o_file_subtitles_icon_well;
+    IBOutlet id o_file_custom_timing_ckb;
+    IBOutlet id o_file_starttime_fld;
+    IBOutlet id o_file_starttime_lbl;
+    IBOutlet id o_file_stoptime_fld;
+    IBOutlet id o_file_stoptime_lbl;
 
     /* open disc */
     IBOutlet id o_disc_selector_pop;
@@ -258,6 +263,7 @@
 - (void)textFieldWasClicked:(NSNotification *)o_notification;
 - (IBAction)expandMRLfieldAction:(id)sender;
 - (IBAction)inputSlaveAction:(id)sender;
+- (IBAction)fileTimeCustomization:(id)sender;
 
 - (void)openFileGeneric;
 - (void)openFilePathChanged:(NSNotification *)o_notification;

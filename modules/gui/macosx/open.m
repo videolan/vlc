@@ -143,6 +143,11 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_file_slave_icon_well setImage: NULL];
     [o_file_subtitles_filename_lbl setStringValue: @""];
     [o_file_subtitles_icon_well setImage: NULL];
+    [o_file_custom_timing_ckb setTitle: _NS("Custom playback")];
+    [o_file_starttime_lbl setStringValue: _NS("Start time")];
+    [o_file_starttime_fld setStringValue: @""];
+    [o_file_stoptime_lbl setStringValue: _NS("Stop time")];
+    [o_file_stoptime_fld setStringValue: @""];
 
     [o_disc_selector_pop removeAllItems];
     [o_disc_selector_pop setHidden: NO];
@@ -450,6 +455,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
                     p_item->pi_list[[o_file_sub_size_pop indexOfSelectedItem]]]];
             }
         }
+        if ([o_file_starttime_fld intValue] > 0)
+            [o_options addObject: [NSString stringWithFormat:@"start-time=%@", [o_file_starttime_fld stringValue]]];
+        if ([o_file_stoptime_fld intValue] > 0)
+            [o_options addObject: [NSString stringWithFormat:@"stop-time=%@", [o_file_stoptime_fld stringValue]]];
         if( [o_output_ckbox state] == NSOnState )
         {
             NSUInteger count = [[o_sout_options mrl] count];
@@ -767,6 +776,15 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [o_file_slave_filename_lbl setStringValue: @""];
         [o_file_slave_icon_well setImage: NULL];
     }
+}
+
+- (IBAction)fileTimeCustomization:(id)sender
+{
+    BOOL b_value = [o_file_custom_timing_ckb state];
+    [o_file_starttime_fld setEnabled: b_value];
+    [o_file_starttime_lbl setEnabled: b_value];
+    [o_file_stoptime_fld setEnabled: b_value];
+    [o_file_stoptime_lbl setEnabled: b_value];
 }
 
 #pragma mark -
