@@ -31,7 +31,7 @@
 #define COUNT	ip
 #define YPAD	lr
 
-	.align
+	.align 2
 	.global yuyv_i422_neon
 	.type	yuyv_i422_neon, %function
 yuyv_i422_neon:

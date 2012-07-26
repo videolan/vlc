@@ -74,7 +74,7 @@ coefficients:
     .short    4992
     .short  -18432
 
-	.align
+	.align 2
 	.global i420_rgb_neon
 	.type	i420_rgb_neon, %function
 i420_rgb_neon:

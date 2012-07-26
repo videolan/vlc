@@ -74,7 +74,7 @@ coefficients:
     .short    4992
     .short  -18432
 
-	.align
+	.align 2
 	.global nv12_rgb_neon
 	.type	nv12_rgb_neon, %function
 nv12_rgb_neon:

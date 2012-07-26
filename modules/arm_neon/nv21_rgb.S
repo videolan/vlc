@@ -74,7 +74,7 @@ coefficients:
     .short    4992
     .short  -18432
 
-	.align
+	.align 2
 	.global nv21_rgb_neon
 	.type	nv21_rgb_neon, %function
 nv21_rgb_neon:

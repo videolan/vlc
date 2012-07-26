@@ -35,7 +35,7 @@
 #define COUNT	ip
 #define OPITCH	lr
 
-	.align
+	.align 2
 	.global i420_yuyv_neon
 	.type	i420_yuyv_neon, %function
 i420_yuyv_neon:

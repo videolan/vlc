@@ -27,7 +27,7 @@
 #define	BUF	r3
 #define HALF	ip
 
-	.align
+	.align 2
 	.global s32_s16_neon
 	.type	s32_s16_neon, %function
 	@ Converts fixed-point 32-bits to signed 16-bits
