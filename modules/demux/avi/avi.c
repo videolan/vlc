@@ -1312,7 +1312,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
         if( !p_sys->i_length )
         {
             avi_track_t *p_stream = NULL;
-            unsigned i_stream;
+            unsigned i_stream = 0;
             int64_t i_pos;
 
             /* use i_percent to create a true i_date */
