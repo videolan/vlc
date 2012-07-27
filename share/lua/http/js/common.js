@@ -6,7 +6,7 @@ var video_types = [
            "mp2", "mp4", "mpeg", "mpeg1",
            "mpeg2", "mpeg4", "mpg", "mts", "mtv", "mxf", "mxg", "nuv",
            "ogg", "ogm", "ogv", "ogx", "ps",
-           "rec", "rm", "rmvb", "ts", "vob", "wmv" ];
+           "rec", "rm", "rmvb", "ts", "vob", "wmv", "xesc" ];
 var audio_types = [
         "3ga", "a52", "aac", "ac3", "ape", "awb", "dts", "flac", "it",
         "m4a", "m4p", "mka", "mlp", "mod", "mp1", "mp2", "mp3",
