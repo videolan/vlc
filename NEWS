@@ -12,14 +12,18 @@ Codecs:
  * Support for CDXL, Ut Video, VBLE, Dxtory codecs via libavcodec.
  * Numerous improvements in OpenMAX IL codec
  * Support for Ulead DV audio
+ * Support for TechSmith Screen Codec 2, Microsoft Expression Encoder Screen,
+   Microsoft Application Screen Decoder 1 (MSS1)
+ * Support for Indeo Audio Coder, RealAudio Lossless
 
 Encoders:
- * high10,high422 and high444 encoding support in h264
+ * high10, high422 and high444 encoding support in h264
 
 Access:
  * Screen: Added support for OS X Lion
  * Major improvements in DASH support
  * Improvements in Blu-Ray module, notably for multiple video tracks support
+ * Important improvements and rewrite of the v4l2 access module
 
 Demuxers:
  * MP4: partial support for fragmented MP4
@@ -28,27 +32,39 @@ Demuxers:
  * Support for FLAC, Atrac and some ADPCM in AVI
  * Support for DV data type 1 in AVI and 12 bits DV Audio
  * Support for total number of tracks in major container
+ * Support for Cook and Atrac in MKV
+ * AVI: support for files produced by Nikon cameras
+ * Support for more MJPEG streams
 
 Audio output:
  * Windows Audio Session API audio output support
  * OpenBSD sndio audio output support
+ * Important improvements on the OpenSL ES module
 
 Audio Filters:
  * new remapping channel filter
  * new filter to enhance stereo effect by mono suppression and delay effect
  * new VSXu visualization plugin
 
+Video Outputs:
+ * OpenGL: use glsl instead of ARB to do the YUV->RGB conversions
+
 Video Filters:
  * new anaglyph video filter which transforms side by side 3D video streams in
    anaglyph glasses (aka red/blue) compatible images.
  * Support in deinterlacing filter for most 4:2:0, 4:2:2, 4:4:4 YUV formats
    and for bits depth higher than 8bits (like 10bits)
+ * Improvements on the transform filter, to support 10bits and RGB formats
+
+Stream Output:
+ * Extended support for recording, notably for MKV and AVI
 
 Interfaces:
  * configurable password for the HTTP server.
  * .hosts removed from the HTTP server.
  * fixed Lua command line interface console mode under Windows.
  * Better support for MCE remotes on Windows
+ * Partial support for Qt5.0
 
 Mac OS X Interface:
  * added a GUI for the QTSound access module to process audio captured locally
@@ -61,7 +77,7 @@ Mac OS X Interface:
  * add an option to play videos as a desktop background
 
 Removed modules:
- * portaudio audio output
+ * portaudio audio output: use the native audio output instead
  * X11 On Screen Display notifications (xosd)
  * Linux Framebuffer On Screen Display interface (fbosd)
  * RTMP access: use libavformat avio instead
