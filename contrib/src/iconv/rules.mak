@@ -24,7 +24,10 @@ ifdef HAVE_WINCE
 	$(APPLY) $(SRC)/iconv/libiconv-wince-hack.patch
 endif
 ifdef HAVE_ANDROID
-	$(APPLY) $(SRC)/iconv/libiconv-android.patch
+	$(APPLY) $(SRC)/iconv/libiconv-android-ios.patch
+endif
+ifdef HAVE_IOS
+	$(APPLY) $(SRC)/iconv/libiconv-android-ios.patch
 endif
 	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub build-aux
 	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub libcharset/build-aux
