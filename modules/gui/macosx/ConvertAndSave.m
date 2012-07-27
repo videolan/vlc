@@ -143,8 +143,12 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_destination_lbl setStringValue: _NS("Choose Destination")];
     [_destination_filename_stub_lbl setStringValue: _NS("Choose an output location")];
     [_destination_filename_lbl setHidden: YES];
-    [_destination_stream_btn setTitle:_NS("Stream...")];
+    [_destination_browse_btn setTitle:_NS("Browse...")];
+    [_destination_stream_btn setTitle:_NS("Setup Streaming...")];
     [_destination_stream_lbl setStringValue:@""];
+    [_destination_itwantafile_btn setTitle:_NS("Save as File")];
+    [_destination_itwantastream_btn setTitle:_NS("Stream")];
+    [_destination_cancel_btn setHidden:YES];
     [_customize_ok_btn setTitle: _NS("Apply")];
     [_customize_cancel_btn setTitle: _NS("Cancel")];
     [[_customize_tabview tabViewItemAtIndex:0] setLabel: _NS("Encapsulation")];
@@ -360,7 +364,45 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     }
 }
 
-- (IBAction)chooseDestination:(id)sender
+- (IBAction)iWantAFile:(id)sender
+{
+    NSRect boxFrame = [_destination_box frame];
+    NSRect subViewFrame = [_destination_itwantafile_view frame];
+    subViewFrame.origin.x = (boxFrame.size.width - subViewFrame.size.width) / 2;
+    subViewFrame.origin.y = ((boxFrame.size.height - subViewFrame.size.height) / 2) - 15.;
+    [_destination_itwantafile_view setFrame: subViewFrame];
+    [[_destination_itwantafile_btn animator] setHidden: YES];
+    [[_destination_itwantastream_btn animator] setHidden: YES];
+    [_destination_box performSelector:@selector(addSubview:) withObject:_destination_itwantafile_view afterDelay:0.2];
+    [[_destination_cancel_btn animator] setHidden:NO];
+}
+
+- (IBAction)iWantAStream:(id)sender
+{
+    NSRect boxFrame = [_destination_box frame];
+    NSRect subViewFrame = [_destination_itwantastream_view frame];
+    subViewFrame.origin.x = (boxFrame.size.width - subViewFrame.size.width) / 2;
+    subViewFrame.origin.y = ((boxFrame.size.height - subViewFrame.size.height) / 2) - 15.;
+    [_destination_itwantastream_view setFrame: subViewFrame];
+    [[_destination_itwantafile_btn animator] setHidden: YES];
+    [[_destination_itwantastream_btn animator] setHidden: YES];
+    [_destination_box performSelector:@selector(addSubview:) withObject:_destination_itwantastream_view afterDelay:0.2];
+    [[_destination_cancel_btn animator] setHidden:NO];
+}
+
+- (IBAction)cancelDestination:(id)sender
+{
+    if ([_destination_itwantastream_view superview] != nil)
+        [_destination_itwantastream_view removeFromSuperview];
+    if ([_destination_itwantafile_view superview] != nil)
+        [_destination_itwantafile_view removeFromSuperview];
+
+    [_destination_cancel_btn setHidden:YES];
+    [[_destination_itwantafile_btn animator] setHidden: NO];
+    [[_destination_itwantastream_btn animator] setHidden: NO];
+}
+
+- (IBAction)browseFileDestination:(id)sender
 {
     NSSavePanel * saveFilePanel = [NSSavePanel savePanel];
     [saveFilePanel setCanSelectHiddenExtension: YES];

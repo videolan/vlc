@@ -38,13 +38,19 @@
     IBOutlet id _profile_pop;
     IBOutlet id _profile_btn;
 
+    IBOutlet id _destination_box;
     IBOutlet id _destination_lbl;
-    IBOutlet id _destination_btn;
+    IBOutlet id _destination_browse_btn;
     IBOutlet id _destination_icon_view;
     IBOutlet id _destination_filename_lbl;
     IBOutlet id _destination_filename_stub_lbl;
     IBOutlet id _destination_stream_btn;
     IBOutlet id _destination_stream_lbl;
+    IBOutlet id _destination_itwantafile_btn;
+    IBOutlet id _destination_itwantastream_btn;
+    IBOutlet id _destination_itwantafile_view;
+    IBOutlet id _destination_itwantastream_view;
+    IBOutlet id _destination_cancel_btn;
 
     IBOutlet id _dropin_view;
     IBOutlet id _dropin_icon_view;
@@ -129,7 +135,10 @@
 - (IBAction)switchProfile:(id)sender;
 - (IBAction)customizeProfile:(id)sender;
 - (IBAction)closeCustomizationSheet:(id)sender;
-- (IBAction)chooseDestination:(id)sender;
+- (IBAction)iWantAFile:(id)sender;
+- (IBAction)iWantAStream:(id)sender;
+- (IBAction)cancelDestination:(id)sender;
+- (IBAction)browseFileDestination:(id)sender;
 - (IBAction)showStreamPanel:(id)sender;
 - (IBAction)closeStreamPanel:(id)sender;
 
