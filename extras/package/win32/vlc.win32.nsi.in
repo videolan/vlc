@@ -581,8 +581,6 @@ SectionEnd
 Section $Name_Section02a SEC02a
   SectionIn 1 2 3
   CreateDirectory "$SMPROGRAMS\VideoLAN"
-  CreateShortCut "$SMPROGRAMS\VideoLAN\Reset VLC media player preferences and cache files.lnk" \
-    "$INSTDIR\vlc.exe" "--reset-config --reset-plugins-cache vlc://quit"
   CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player.lnk" \
     "$INSTDIR\vlc.exe" ""
   CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player skinned.lnk" \
@@ -593,6 +591,8 @@ Section $Name_Section02a SEC02a
     "$INSTDIR\NEWS.txt" ""
   CreateShortCut "$SMPROGRAMS\VideoLAN\${PRODUCT_GROUP} Website.lnk" \
     "$INSTDIR\${PRODUCT_GROUP} Website.url"
+  CreateShortCut "$SMPROGRAMS\VideoLAN\Reset VLC media player preferences and cache files.lnk" \
+    "$INSTDIR\vlc.exe" "--reset-config --reset-plugins-cache vlc://quit"
 SectionEnd
 
 Section $Name_Section02b SEC02b
