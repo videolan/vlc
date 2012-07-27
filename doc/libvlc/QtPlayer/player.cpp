@@ -4,6 +4,7 @@
  *                            *
  * Under WTFPL                *
  ******************************/
+
 #include "player.h"
 #include <vlc/vlc.h>
 
@@ -14,63 +15,57 @@
 Mwindow::Mwindow() {
     vlcPlayer = NULL;
 
-    /* Init libVLC */
-    if((vlcObject = libvlc_new(0,NULL)) == NULL) {
-        printf("Could not init libVLC");
+    /* Initialize libVLC */
+    vlcInstance = libvlc_new(0, NULL);
+
+    /* Complain in case of broken installation */
+    if (vlcInstance == NULL) {
+        QMessageBox::critical(this, "Qt libVLC player", "Could not init libVLC");
         exit(1);
     }
 
-    /* Display libVLC version */
-    printf("libVLC version: %s\n",libvlc_get_version());
-
-    /* Interface initialisation */
-    initMenus();
-    initComponents();
+    /* Interface initialization */
+    initUI();
 }
 
 Mwindow::~Mwindow() {
-    if(vlcObject)
-        libvlc_release(vlcObject);
+    /* Release libVLC instance on quit */
+    if (vlcInstance)
+        libvlc_release(vlcInstance);
 }
 
-void Mwindow::initMenus() {
+void Mwindow::initUI() {
 
-    centralWidget = new QWidget;
-
-    videoWidget = new QWidget;
-    videoWidget->setAutoFillBackground( true );
-    QPalette plt = palette();
-    plt.setColor( QPalette::Window, Qt::black );
-    videoWidget->setPalette( plt );
-
+    /* Menu */
     QMenu *fileMenu = menuBar()->addMenu("&File");
     QMenu *editMenu = menuBar()->addMenu("&Edit");
 
-    QAction *Open = new QAction("&Open", this);
-    QAction *Quit = new QAction("&Quit", this);
-    QAction *playAc = new QAction("&Play/Pause", this);
+    QAction *Open    = new QAction("&Open", this);
+    QAction *Quit    = new QAction("&Quit", this);
+    QAction *playAc  = new QAction("&Play/Pause", this);
+    QAction *aboutAc = new QAction("&About", this);
 
     Open->setShortcut(QKeySequence("Ctrl+O"));
     Quit->setShortcut(QKeySequence("Ctrl+Q"));
 
     fileMenu->addAction(Open);
+    fileMenu->addAction(aboutAc);
     fileMenu->addAction(Quit);
     editMenu->addAction(playAc);
 
-    connect(Open, SIGNAL(triggered()), this, SLOT(openFile()));
-    connect(playAc, SIGNAL(triggered()), this, SLOT(play()));
-    connect(Quit, SIGNAL(triggered()), qApp, SLOT(quit()));
-}
+    connect(Open,    SIGNAL(triggered()), this, SLOT(openFile()));
+    connect(playAc,  SIGNAL(triggered()), this, SLOT(play()));
+    connect(aboutAc, SIGNAL(triggered()), this, SLOT(about()));
+    connect(Quit,    SIGNAL(triggered()), qApp, SLOT(quit()));
 
-void Mwindow::initComponents() {
-
+    /* Buttons for the UI */
     playBut = new QPushButton("Play");
     QObject::connect(playBut, SIGNAL(clicked()), this, SLOT(play()));
 
-    stopBut = new QPushButton("Stop");
+    QPushButton *stopBut = new QPushButton("Stop");
     QObject::connect(stopBut, SIGNAL(clicked()), this, SLOT(stop()));
 
-    muteBut = new QPushButton("Mute");
+    QPushButton *muteBut = new QPushButton("Mute");
     QObject::connect(muteBut, SIGNAL(clicked()), this, SLOT(mute()));
 
     volumeSlider = new QSlider(Qt::Horizontal);
@@ -81,10 +76,21 @@ void Mwindow::initComponents() {
     slider->setMaximum(1000);
     QObject::connect(slider, SIGNAL(sliderMoved(int)), this, SLOT(changePosition(int)));
 
+    /* A timer to update the sliders */
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateInterface()));
     timer->start(100);
 
+    /* Central Widgets */
+    QWidget* centralWidget = new QWidget;
+    videoWidget = new QWidget;
+
+    videoWidget->setAutoFillBackground( true );
+    QPalette plt = palette();
+    plt.setColor( QPalette::Window, Qt::black );
+    videoWidget->setPalette( plt );
+
+    /* Put all in layouts */
     QHBoxLayout *layout = new QHBoxLayout;
     layout->addWidget(playBut);
     layout->addWidget(stopBut);
@@ -102,90 +108,100 @@ void Mwindow::initComponents() {
 }
 
 void Mwindow::openFile() {
-    /* Just the basic file-select box */
-    QString fileOpen = QFileDialog::getOpenFileName(this,tr("Load a file"), "~");
+
+    /* The basic file-select box */
+    QString fileOpen = QFileDialog::getOpenFileName(this, tr("Load a file"), "~");
 
     /* Stop if something is playing */
-    if( vlcPlayer && libvlc_media_player_is_playing(vlcPlayer) )
+    if (vlcPlayer && libvlc_media_player_is_playing(vlcPlayer))
         stop();
 
-    /* New Media */
-    libvlc_media_t *vlcMedia = libvlc_media_new_path(vlcObject,qtu(fileOpen));
-    if( !vlcMedia )
+    /* Create a new Media */
+    libvlc_media_t *vlcMedia = libvlc_media_new_path(vlcInstance, qtu(fileOpen));
+    if (!vlcMedia)
         return;
 
+    /* Create a new libvlc player */
     vlcPlayer = libvlc_media_player_new_from_media (vlcMedia);
+
+    /* Release the media */
     libvlc_media_release(vlcMedia);
 
     /* Integrate the video in the interface */
 #if defined(Q_OS_MAC)
-    libvlc_media_player_set_nsobject(vlcPlayer, (void *) videoWidget->winId());
+    libvlc_media_player_set_nsobject(vlcPlayer, (void *)videoWidget->winId());
 #elif defined(Q_OS_UNIX)
     libvlc_media_player_set_xwindow(vlcPlayer, videoWidget->winId());
 #elif defined(Q_OS_WIN)
     libvlc_media_player_set_hwnd(vlcPlayer, videoWidget->winId());
 #endif
 
-    /* And play */
+    /* And start playback */
     libvlc_media_player_play (vlcPlayer);
 
-    //Set vars and text correctly
+    /* Update playback button */
     playBut->setText("Pause");
 }
 
 void Mwindow::play() {
+    if (!vlcPlayer)
+        return;
 
-    if(vlcPlayer)
+    if (libvlc_media_player_is_playing(vlcPlayer))
     {
-        if (libvlc_media_player_is_playing(vlcPlayer))
-        {
-            libvlc_media_player_pause(vlcPlayer);
-            playBut->setText("Play");
-        }
-        else
-        {
-            libvlc_media_player_play(vlcPlayer);
-            playBut->setText("Pause");
-        }
+        /* Pause */
+        libvlc_media_player_pause(vlcPlayer);
+        playBut->setText("Play");
+    }
+    else
+    {
+        /* Play again */
+        libvlc_media_player_play(vlcPlayer);
+        playBut->setText("Pause");
     }
 }
 
-int Mwindow::changeVolume(int vol) { //Called if you change the volume slider
+int Mwindow::changeVolume(int vol) { /* Called on volume slider change */
 
-    if(vlcPlayer)
+    if (vlcPlayer)
         return libvlc_audio_set_volume (vlcPlayer,vol);
 
     return 0;
 }
 
-void Mwindow::changePosition(int pos) { //Called if you change the position slider
+void Mwindow::changePosition(int pos) { /* Called on position slider change */
 
-    if(vlcPlayer) //It segfault if vlcPlayer don't exist
-        libvlc_media_player_set_position(vlcPlayer,(float)pos/(float)1000);
+    if (vlcPlayer)
+        libvlc_media_player_set_position(vlcPlayer, (float)pos/1000.0);
 }
 
 void Mwindow::updateInterface() { //Update interface and check if song is finished
 
-    if(vlcPlayer) //It segfault if vlcPlayer don't exist
-    {
-        /* update the timeline */
-        float pos = libvlc_media_player_get_position(vlcPlayer);
-        int siderPos=(int)(pos*(float)(1000));
-        slider->setValue(siderPos);
+    if (!vlcPlayer)
+        return;
 
-        /* Stop the media */
-        if (libvlc_media_player_get_state(vlcPlayer) == 6) { this->stop(); }
-    }
+    /* update the timeline */
+    float pos = libvlc_media_player_get_position(vlcPlayer);
+    slider->setValue((int)(pos*1000.0));
+
+    /* Stop the media */
+    if (libvlc_media_player_get_state(vlcPlayer) == libvlc_Ended)
+        this->stop();
 }
 
 void Mwindow::stop() {
     if(vlcPlayer) {
+        /* stop the media player */
         libvlc_media_player_stop(vlcPlayer);
+
+        /* release the media player */
         libvlc_media_player_release(vlcPlayer);
+
+        /* Reset application values */
+        vlcPlayer = NULL;
         slider->setValue(0);
         playBut->setText("Play");
     }
-    vlcPlayer = NULL;
 }
 
 void Mwindow::mute() {
@@ -202,6 +218,11 @@ void Mwindow::mute() {
 
         }
     }
+}
+
+void Mwindow::about()
+{
+    QMessageBox::about(this, "Qt libVLC player demo", QString::fromUtf8(libvlc_get_version()) );
 }
 
 void Mwindow::closeEvent(QCloseEvent *event) {
