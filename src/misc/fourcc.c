@@ -940,6 +940,9 @@ static const entry_t p_list_video[] = {
     B(VLC_CODEC_TSC2, "TechSmith Screen Codec 2"),
         A("MSA1"),
 
+    B(VLC_CODEC_MTS2, "Microsoft Expression Encoder Screen"),
+        A("MTS2"),
+
     B(0, "")
 };
 static const entry_t p_list_audio[] = {
