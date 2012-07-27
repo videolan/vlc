@@ -185,7 +185,8 @@ fi
     --disable-SDL_image \
     --disable-fontconfig \
     --disable-ass \
-    --disable-freetype2 \
+    --enable-freetype2 \
+    --enable-iconv \
     --disable-fribidi \
     --disable-zvbi \
     --disable-kate \
@@ -258,7 +259,7 @@ ${VLCROOT}/configure \
     --disable-shared \
     --disable-macosx-quartztext \
     --enable-avcodec \
-    --disable-mkv \
+    --enable-mkv \
     --enable-dvbpsi \
     --enable-swscale \
     --disable-projectm \
@@ -277,7 +278,7 @@ ${VLCROOT}/configure \
     --disable-httpd \
     --disable-nls \
     --disable-glx \
-    --enable-visual \
+    --disable-visual \
     --disable-lua \
     --disable-sse \
     --enable-neon \
