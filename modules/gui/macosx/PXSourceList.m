@@ -71,10 +71,6 @@ NSString * const PXSLDeleteKeyPressedOnRowsNotification = @"PXSourceListDeleteKe
 
 - (void)dealloc
 {
-    //Remove ourselves as the delegate and data source to be safe
-    [super setDataSource:nil];
-    [super setDelegate:nil];
-
     //Unregister the delegate from receiving notifications
     [[NSNotificationCenter defaultCenter] removeObserver:_secondaryDelegate name:nil object:self];
 
@@ -83,10 +79,6 @@ NSString * const PXSLDeleteKeyPressedOnRowsNotification = @"PXSourceListDeleteKe
 
 - (void)finalize
 {
-    //Remove ourselves as the delegate and data source to be safe
-    [super setDataSource:nil];
-    [super setDelegate:nil];
-
     //Unregister the delegate from receiving notifications
     [[NSNotificationCenter defaultCenter] removeObserver:_secondaryDelegate name:nil object:self];
 
@@ -117,7 +109,8 @@ NSString * const PXSLDeleteKeyPressedOnRowsNotification = @"PXSourceListDeleteKe
 {
     _secondaryDataSource = aDataSource;
 
-    [self reloadData];
+    if ([self respondsToSelector:@selector(reloadData)])
+        [self reloadData];
 }
 
 - (void)setIconSize:(NSSize)newIconSize
@@ -138,7 +131,8 @@ NSString * const PXSLDeleteKeyPressedOnRowsNotification = @"PXSourceListDeleteKe
 
 - (void)reloadData
 {
-    [super reloadData];
+    if ([super respondsToSelector:@selector(reloadData)])
+        [super reloadData];
 
     //Expand items that are displayed as always expanded
     if([_secondaryDataSource conformsToProtocol:@protocol(PXSourceListDataSource)] &&
