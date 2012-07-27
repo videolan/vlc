@@ -187,7 +187,7 @@ static int Open( vlc_object_t* p_this )
 
     libssh2_knownhost_free( ssh_knownhosts );
 
-    /* Check that it does match or at least that the host is unkown */
+    /* Check that it does match or at least that the host is unknown */
     switch(check)
     {
     case LIBSSH2_KNOWNHOST_CHECK_FAILURE:

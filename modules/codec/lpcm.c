@@ -134,7 +134,7 @@ struct encoder_sys_t
  * - padding(variable)
  *
  * LPCM BD header :
- * - unkown (16 bits)
+ * - unknown (16 bits)
  * - number of channels (4 bits)
  * - frequency (4 bits)
  * - bits per sample (2 bits)

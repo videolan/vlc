@@ -980,7 +980,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
         bo_addle_u32( &bo, p_fmt->i_bitrate );  /* Alternate Bitrate */
         bo_addle_u32( &bo, 0 );                 /* Alternate Buffer size */
         bo_addle_u32( &bo, 0 );                 /* Alternate Initial buffer fullness */
-        bo_addle_u32( &bo, 0 );                 /* Maximum object size (0 = unkown) */
+        bo_addle_u32( &bo, 0 );                 /* Maximum object size (0 = unknown) */
         bo_addle_u32( &bo, 0x02 );              /* Flags (seekable) */
         bo_addle_u16( &bo, p_track->i_id ); /* Stream number */
         bo_addle_u16( &bo, 0 ); /* Stream language index */
