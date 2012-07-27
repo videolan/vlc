@@ -313,6 +313,10 @@ out:
 
 #   endif
 
+#elif defined ( __arm__)
+    #ifdef __ARM_NEON__
+        i_capabilities |= CPU_CAPABILITY_NEON;
+    #endif
 #endif
 
     cpu_flags = i_capabilities;
