@@ -347,6 +347,7 @@ FunctionEnd
   !insertmacro ${_action} ".vro"
   !insertmacro ${_action} ".webm"
   !insertmacro ${_action} ".wmv"
+  !insertmacro ${_action} ".xesc"
 !macroend
 
 !macro MacroOtherExtensions _action
