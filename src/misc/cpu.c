@@ -49,6 +49,9 @@
 #ifdef __APPLE__
 #include <sys/sysctl.h>
 #endif
+#ifdef __ANDROID__
+#include <cpu-features.h>
+#endif
 
 #if defined(__OpenBSD__) && defined(__powerpc__)
 #include <sys/param.h>
@@ -316,6 +319,11 @@ out:
 #elif defined ( __arm__)
     #ifdef __ARM_NEON__
         i_capabilities |= CPU_CAPABILITY_NEON;
+    #elif defined (CAN_COMPILE_NEON)
+        #ifdef __ANDROID__
+            if (android_getCpuFeatures() & ANDROID_CPU_ARM_FEATURE_NEON)
+                i_capabilities |= CPU_CAPABILITY_NEON;
+        #endif
     #endif
 #endif
 
