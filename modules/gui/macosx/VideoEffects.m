@@ -25,6 +25,7 @@
 #import "intf.h"
 #import <vlc_common.h>
 #import <vlc_modules.h>
+#import <vlc_charset.h>
 #import "VideoEffects.h"
 
 #pragma mark -
@@ -539,7 +540,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     vlc_object_t *p_filter;
 
     if( p_vout == NULL ) {
-        config_PutPsz( p_intf, psz_name, psz_value );
+        config_PutPsz( p_intf, psz_name, EnsureUTF8(psz_value) );
     } else {
         p_filter = vlc_object_find_name( pl_Get(p_intf), psz_filter );
 
@@ -548,8 +549,8 @@ static VLCVideoEffects *_o_sharedInstance = nil;
             vlc_object_release( p_vout );
             return;
         }
-        var_SetString( p_filter, psz_name, psz_value );
-        config_PutPsz( p_intf, psz_name, psz_value );
+        var_SetString( p_filter, psz_name, EnsureUTF8(psz_value) );
+        config_PutPsz( p_intf, psz_name, EnsureUTF8(psz_value) );
         vlc_object_release( p_vout );
         vlc_object_release( p_filter );
 
