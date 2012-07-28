@@ -12,9 +12,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="388"/>
-      <integer value="387"/>
-      <integer value="2"/>
+      <integer value="309"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -52,7 +50,7 @@
         <string key="NSWindowContentMaxSize">{663, 490}</string>
         <string key="NSWindowContentMinSize">{663, 490}</string>
         <object class="NSView" key="NSWindowView" id="1006">
-          <reference key="NSNextResponder"/>
+          <nil key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -515,7 +513,6 @@
             </object>
           </object>
           <string key="NSFrameSize">{663, 490}</string>
-          <reference key="NSSuperview"/>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
         <string key="NSMinSize">{663, 512}</string>
@@ -2066,7 +2063,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         <nil key="NSUserInterfaceItemIdentifier"/>
         <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <object class="NSView" key="NSWindowView" id="575278109">
-          <nil key="NSNextResponder"/>
+          <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -2220,9 +2217,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                               <string key="NSAction">_popUpItemAction:</string>
                               <reference key="NSTarget" ref="220952697"/>
                             </object>
-                            <object class="NSMenuItem" id="571683179">
+                            <object class="NSMenuItem" id="1054061955">
                               <reference key="NSMenu" ref="818994718"/>
-                              <string key="NSTitle">UDP</string>
+                              <string key="NSTitle">RTP</string>
                               <string key="NSKeyEquiv"/>
                               <int key="NSKeyEquivModMask">1048576</int>
                               <int key="NSMnemonicLoc">2147483647</int>
@@ -2231,9 +2228,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                               <string key="NSAction">_popUpItemAction:</string>
                               <reference key="NSTarget" ref="220952697"/>
                             </object>
-                            <object class="NSMenuItem" id="1054061955">
+                            <object class="NSMenuItem" id="571683179">
                               <reference key="NSMenu" ref="818994718"/>
-                              <string key="NSTitle">RTP</string>
+                              <string key="NSTitle">UDP</string>
                               <string key="NSKeyEquiv"/>
                               <int key="NSKeyEquivModMask">1048576</int>
                               <int key="NSMnemonicLoc">2147483647</int>
@@ -2579,7 +2576,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
               <object class="NSButtonCell" key="NSCell" id="873992339">
                 <int key="NSCellFlags">67239424</int>
                 <int key="NSCellFlags2">134217728</int>
-                <string key="NSContents">OK</string>
+                <string key="NSContents">Close</string>
                 <reference key="NSSupport" ref="1024428774"/>
                 <string key="NSCellIdentifier">_NS:610</string>
                 <reference key="NSControlView" ref="524920181"/>
@@ -2591,30 +2588,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <int key="NSPeriodicInterval">25</int>
               </object>
             </object>
-            <object class="NSButton" id="410211230">
-              <reference key="NSNextResponder" ref="575278109"/>
-              <int key="NSvFlags">268</int>
-              <string key="NSFrame">{{326, 12}, {96, 32}}</string>
-              <reference key="NSSuperview" ref="575278109"/>
-              <string key="NSReuseIdentifierKey">_NS:610</string>
-              <bool key="NSEnabled">YES</bool>
-              <object class="NSButtonCell" key="NSCell" id="198722555">
-                <int key="NSCellFlags">67239424</int>
-                <int key="NSCellFlags2">134217728</int>
-                <string key="NSContents">Cancel</string>
-                <reference key="NSSupport" ref="1024428774"/>
-                <string key="NSCellIdentifier">_NS:610</string>
-                <reference key="NSControlView" ref="410211230"/>
-                <int key="NSButtonFlags">-2038284033</int>
-                <int key="NSButtonFlags2">129</int>
-                <string key="NSAlternateContents"/>
-                <string type="base64-UTF8" key="NSKeyEquivalent">Gw</string>
-                <int key="NSPeriodicDelay">200</int>
-                <int key="NSPeriodicInterval">25</int>
-              </object>
-            </object>
           </object>
           <string key="NSFrameSize">{532, 355}</string>
+          <reference key="NSSuperview"/>
           <string key="NSReuseIdentifierKey">_NS:122</string>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
@@ -2622,7 +2598,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         <bool key="NSWindowIsRestorable">NO</bool>
       </object>
       <object class="NSCustomView" id="19725126">
-        <reference key="NSNextResponder"/>
+        <nil key="NSNextResponder"/>
         <int key="NSvFlags">268</int>
         <object class="NSMutableArray" key="NSSubviews">
           <bool key="EncodedWithXMLCoder">YES</bool>
@@ -2728,12 +2704,11 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           </object>
         </object>
         <string key="NSFrameSize">{531, 72}</string>
-        <reference key="NSSuperview"/>
         <string key="NSReuseIdentifierKey">_NS:1109</string>
         <string key="NSClassName">NSView</string>
       </object>
       <object class="NSCustomView" id="501681605">
-        <reference key="NSNextResponder"/>
+        <nil key="NSNextResponder"/>
         <int key="NSvFlags">268</int>
         <object class="NSMutableArray" key="NSSubviews">
           <bool key="EncodedWithXMLCoder">YES</bool>
@@ -2784,7 +2759,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           </object>
         </object>
         <string key="NSFrameSize">{531, 72}</string>
-        <reference key="NSSuperview"/>
         <string key="NSReuseIdentifierKey">_NS:1109</string>
         <string key="NSClassName">NSView</string>
       </object>
@@ -3298,14 +3272,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
-            <string key="label">_stream_cancel_btn</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="410211230"/>
-          </object>
-          <int key="connectionID">365</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
             <string key="label">_stream_ok_btn</string>
             <reference key="source" ref="203744709"/>
             <reference key="destination" ref="524920181"/>
@@ -3450,14 +3416,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
-            <string key="label">closeStreamPanel:</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="410211230"/>
-          </object>
-          <int key="connectionID">384</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
             <string key="label">showStreamPanel:</string>
             <reference key="source" ref="203744709"/>
             <reference key="destination" ref="886208703"/>
@@ -3559,6 +3517,46 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <reference key="destination" ref="570131195"/>
           </object>
           <int key="connectionID">407</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">streamTypeToggle:</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="224873446"/>
+          </object>
+          <int key="connectionID">408</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">streamAnnouncementToggle:</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="706187556"/>
+          </object>
+          <int key="connectionID">409</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">streamAnnouncementToggle:</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="185939211"/>
+          </object>
+          <int key="connectionID">410</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">streamAnnouncementToggle:</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="882741680"/>
+          </object>
+          <int key="connectionID">411</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">streamAnnouncementToggle:</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="147954501"/>
+          </object>
+          <int key="connectionID">412</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -4758,7 +4756,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
               <reference ref="200204793"/>
               <reference ref="696647107"/>
               <reference ref="524920181"/>
-              <reference ref="410211230"/>
             </object>
             <reference key="parent" ref="939593274"/>
           </object>
@@ -4875,9 +4872,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <object class="NSMutableArray" key="children">
               <bool key="EncodedWithXMLCoder">YES</bool>
               <reference ref="53385571"/>
-              <reference ref="1054061955"/>
               <reference ref="571683179"/>
               <reference ref="859553375"/>
+              <reference ref="1054061955"/>
             </object>
             <reference key="parent" ref="220952697"/>
           </object>
@@ -5127,20 +5124,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <int key="objectID">361</int>
             <reference key="object" ref="873992339"/>
             <reference key="parent" ref="524920181"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">362</int>
-            <reference key="object" ref="410211230"/>
-            <object class="NSMutableArray" key="children">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="198722555"/>
-            </object>
-            <reference key="parent" ref="575278109"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">363</int>
-            <reference key="object" ref="198722555"/>
-            <reference key="parent" ref="410211230"/>
           </object>
           <object class="IBObjectRecord">
             <int key="objectID">387</int>
@@ -5575,9 +5558,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string>360.IBPluginDependency</string>
           <string>360.IBViewBoundsToFrameTransform</string>
           <string>361.IBPluginDependency</string>
-          <string>362.IBPluginDependency</string>
-          <string>362.IBViewBoundsToFrameTransform</string>
-          <string>363.IBPluginDependency</string>
           <string>387.IBEditorWindowLastContentRect</string>
           <string>387.IBPluginDependency</string>
           <string>388.IBEditorWindowLastContentRect</string>
@@ -5913,9 +5893,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <bytes key="NSTransformStruct">P4AAAL+AAABDvQAAwkQAAA</bytes>
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{350, 347}, {532, 355}}</string>
+          <string>{{366, 101}, {532, 355}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{350, 347}, {532, 355}}</string>
+          <string>{{366, 101}, {532, 355}}</string>
           <boolean value="NO"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -5967,7 +5947,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{443, 545}, {108, 83}}</string>
+          <string>{{493, 302}, {108, 83}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -6043,11 +6023,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABD0wAAwzMAAA</bytes>
-          </object>
-          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">P4AAAL+AAABD1YAAwy4AAA</bytes>
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>{{359, 563}, {531, 72}}</string>
@@ -6127,7 +6102,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">407</int>
+      <int key="maxID">412</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
@@ -6164,10 +6139,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
               <string>openMedia:</string>
               <string>saveFile:</string>
               <string>showStreamPanel:</string>
+              <string>streamAnnouncementToggle:</string>
+              <string>streamTypeToggle:</string>
               <string>switchProfile:</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -6195,6 +6174,8 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
               <string>openMedia:</string>
               <string>saveFile:</string>
               <string>showStreamPanel:</string>
+              <string>streamAnnouncementToggle:</string>
+              <string>streamTypeToggle:</string>
               <string>switchProfile:</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
@@ -6237,6 +6218,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
               </object>
               <object class="IBActionInfo">
                 <string key="name">showStreamPanel:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">streamAnnouncementToggle:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">streamTypeToggle:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">

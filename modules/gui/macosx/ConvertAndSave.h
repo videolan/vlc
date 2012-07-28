@@ -93,7 +93,6 @@
 
     IBOutlet id _stream_panel;
     IBOutlet id _stream_ok_btn;
-    IBOutlet id _stream_cancel_btn;
     IBOutlet id _stream_destination_lbl;
     IBOutlet id _stream_announcement_lbl;
     IBOutlet id _stream_type_lbl;
@@ -119,6 +118,8 @@
     NSArray * _audioCodecs;
     NSArray * _subsCodecs;
     NSMutableArray * _currentProfile;
+
+    BOOL b_streaming;
 }
 @property (readwrite, nonatomic, retain) NSString * MRL;
 @property (readwrite, nonatomic, retain) NSString * outputDestination;
@@ -141,6 +142,8 @@
 - (IBAction)browseFileDestination:(id)sender;
 - (IBAction)showStreamPanel:(id)sender;
 - (IBAction)closeStreamPanel:(id)sender;
+- (IBAction)streamTypeToggle:(id)sender;
+- (IBAction)streamAnnouncementToggle:(id)sender;
 
 - (void)updateDropView;
 

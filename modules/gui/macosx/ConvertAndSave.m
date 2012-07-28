@@ -174,8 +174,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_customize_aud_samplerate_lbl setStringValue: _NS("Sample Rate")];
     [_customize_subs_ckb setTitle: _NS("Subtitles")];
     [_customize_subs_overlay_ckb setTitle: _NS("Overlay subtitles on the video")];
-    [_stream_ok_btn setTitle:_NS("Set")];
-    [_stream_cancel_btn setTitle:_NS("Cancel")];
+    [_stream_ok_btn setTitle:_NS("Close")];
     [_stream_destination_lbl setStringValue:_NS("Stream Destination")];
     [_stream_announcement_lbl setStringValue:_NS("Stream Announcement")];
     [_stream_type_lbl setStringValue:_NS("Type")];
@@ -186,6 +185,10 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_stream_http_ckb setStringValue:_NS("HTTP Announcement")];
     [_stream_rtsp_ckb setStringValue:_NS("RTSP Announcement")];
     [_stream_sdp_ckb setStringValue:_NS("Export SDP as file")];
+    [_stream_sap_ckb setState:NSOffState];
+    [_stream_http_ckb setState:NSOffState];
+    [_stream_rtsp_ckb setState:NSOffState];
+    [_stream_sdp_ckb setState:NSOffState];
 
     /* there is no way to hide single cells, so replace the existing ones with empty cells.. */
     id blankCell = [[[NSCell alloc] init] autorelease];
@@ -375,6 +378,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [[_destination_itwantastream_btn animator] setHidden: YES];
     [_destination_box performSelector:@selector(addSubview:) withObject:_destination_itwantafile_view afterDelay:0.2];
     [[_destination_cancel_btn animator] setHidden:NO];
+    b_streaming = NO;
 }
 
 - (IBAction)iWantAStream:(id)sender
@@ -388,6 +392,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [[_destination_itwantastream_btn animator] setHidden: YES];
     [_destination_box performSelector:@selector(addSubview:) withObject:_destination_itwantastream_view afterDelay:0.2];
     [[_destination_cancel_btn animator] setHidden:NO];
+    b_streaming = NO;
 }
 
 - (IBAction)cancelDestination:(id)sender
@@ -400,6 +405,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_destination_cancel_btn setHidden:YES];
     [[_destination_itwantafile_btn animator] setHidden: NO];
     [[_destination_itwantastream_btn animator] setHidden: NO];
+    b_streaming = NO;
 }
 
 - (IBAction)browseFileDestination:(id)sender
@@ -436,6 +442,38 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 {
     [_stream_panel orderOut:sender];
     [NSApp endSheet: _stream_panel];
+}
+
+- (IBAction)streamTypeToggle:(id)sender
+{
+    NSUInteger index = [_stream_type_pop indexOfSelectedItem];
+    if (index <= 1) { // HTTP, MMSH
+        [_stream_ttl_fld setEnabled:NO];
+        [_stream_sap_ckb setEnabled:NO];
+        [_stream_rtsp_ckb setEnabled:NO];
+        [_stream_http_ckb setEnabled:NO];
+        [_stream_sdp_ckb setEnabled:NO];
+    } else if (index == 2) { // RTP
+        [_stream_ttl_fld setEnabled:YES];
+        [_stream_sap_ckb setEnabled:YES];
+        [_stream_rtsp_ckb setEnabled:YES];
+        [_stream_http_ckb setEnabled:YES];
+        [_stream_sdp_ckb setEnabled:YES];
+        [_stream_channel_fld setEnabled:YES];
+        [_stream_sdp_fld setEnabled:[_stream_sdp_ckb state]];
+    } else { // UDP
+        [_stream_ttl_fld setEnabled:YES];
+        [_stream_sap_ckb setEnabled:YES];
+        [_stream_rtsp_ckb setEnabled:NO];
+        [_stream_http_ckb setEnabled:NO];
+        [_stream_sdp_ckb setEnabled:NO];
+        [_stream_channel_fld setEnabled:YES];
+    }
+}
+
+- (IBAction)streamAnnouncementToggle:(id)sender
+{
+    [_stream_sdp_fld setEnabled:[_stream_sdp_ckb state]];
 }
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
