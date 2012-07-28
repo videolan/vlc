@@ -134,7 +134,6 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 - (void)awakeFromNib
 {
     [_window setTitle: _NS("Convert & Save")];
-    [_cancel_btn setTitle: _NS("Cancel")];
     [_ok_btn setTitle: _NS("Save")];
     [_drop_lbl setStringValue: _NS("Drop media here")];
     [_drop_btn setTitle: _NS("Open media...")];
@@ -145,7 +144,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_destination_filename_lbl setHidden: YES];
     [_destination_browse_btn setTitle:_NS("Browse...")];
     [_destination_stream_btn setTitle:_NS("Setup Streaming...")];
-    [_destination_stream_lbl setStringValue:@""];
+    [_destination_stream_lbl setStringValue:@"Select Streaming Method"];
     [_destination_itwantafile_btn setTitle:_NS("Save as File")];
     [_destination_itwantastream_btn setTitle:_NS("Stream")];
     [_destination_cancel_btn setHidden:YES];
@@ -180,6 +179,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_stream_type_lbl setStringValue:_NS("Type")];
     [_stream_address_lbl setStringValue:_NS("Address")];
     [_stream_ttl_lbl setStringValue:_NS("TTL")];
+    [_stream_ttl_fld setEnabled:NO];
+    [_stream_ttl_stepper setEnabled:NO];
     [_stream_port_lbl setStringValue:_NS("Port")];
     [_stream_sap_ckb setStringValue:_NS("SAP Announcement")];
     [_stream_http_ckb setStringValue:_NS("HTTP Announcement")];
@@ -260,7 +261,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 # pragma mark -
 # pragma mark User Interaction
 
-- (IBAction)saveFile:(id)sender
+- (IBAction)finalizePanel:(id)sender
 {
     playlist_t * p_playlist = pl_Get(VLCIntf);
 
@@ -379,6 +380,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_destination_box performSelector:@selector(addSubview:) withObject:_destination_itwantafile_view afterDelay:0.2];
     [[_destination_cancel_btn animator] setHidden:NO];
     b_streaming = NO;
+    [_ok_btn setTitle:_NS("Save")];
 }
 
 - (IBAction)iWantAStream:(id)sender
@@ -392,7 +394,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [[_destination_itwantastream_btn animator] setHidden: YES];
     [_destination_box performSelector:@selector(addSubview:) withObject:_destination_itwantastream_view afterDelay:0.2];
     [[_destination_cancel_btn animator] setHidden:NO];
-    b_streaming = NO;
+    b_streaming = YES;
+    [_ok_btn setTitle:_NS("Stream")];
 }
 
 - (IBAction)cancelDestination:(id)sender
@@ -440,6 +443,42 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (IBAction)closeStreamPanel:(id)sender
 {
+    NSMutableString * labelContent = [[NSMutableString alloc] initWithFormat:@"%@ @ %@:%@", [_stream_type_pop titleOfSelectedItem], [_stream_address_fld stringValue], [_stream_port_fld stringValue]];
+
+    if ([_stream_type_pop indexOfSelectedItem] > 1) {
+        [labelContent appendFormat:@" TTL:%@", [_stream_ttl_fld stringValue]];
+        if ([_stream_sap_ckb state] || [_stream_rtsp_ckb state] || [_stream_http_ckb state] || [_stream_sdp_ckb state])
+            [labelContent appendFormat:@" — %@:\"%@\" (", _NS("Channel"), [_stream_channel_fld stringValue]];
+
+        BOOL b_gotSomething;
+        if (_stream_sap_ckb) {
+            [labelContent appendString:@"SAP"];
+            b_gotSomething = YES;
+        }
+        if (_stream_rtsp_ckb) {
+            if (b_gotSomething)
+                [labelContent appendString:@", "];
+            [labelContent appendString:@"RTSP"];
+            b_gotSomething = YES;
+        }
+        if (_stream_http_ckb) {
+            if (b_gotSomething)
+                [labelContent appendString:@", "];
+            [labelContent appendString:@"HTTP"];
+            b_gotSomething = YES;
+        }
+        if ([_stream_sdp_ckb state]) {
+            if (b_gotSomething)
+                [labelContent appendString:@", "];
+            [labelContent appendString:@"SDP"];
+        }
+
+        if ([_stream_sap_ckb state] || [_stream_rtsp_ckb state] || [_stream_http_ckb state] || [_stream_sdp_ckb state])
+            [labelContent appendString:@")"];
+    }
+    [_destination_stream_lbl setStringValue:labelContent];
+    [labelContent release];
+
     [_stream_panel orderOut:sender];
     [NSApp endSheet: _stream_panel];
 }
@@ -449,12 +488,14 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     NSUInteger index = [_stream_type_pop indexOfSelectedItem];
     if (index <= 1) { // HTTP, MMSH
         [_stream_ttl_fld setEnabled:NO];
+        [_stream_ttl_stepper setEnabled:NO];
         [_stream_sap_ckb setEnabled:NO];
         [_stream_rtsp_ckb setEnabled:NO];
         [_stream_http_ckb setEnabled:NO];
         [_stream_sdp_ckb setEnabled:NO];
     } else if (index == 2) { // RTP
         [_stream_ttl_fld setEnabled:YES];
+        [_stream_ttl_stepper setEnabled:YES];
         [_stream_sap_ckb setEnabled:YES];
         [_stream_rtsp_ckb setEnabled:YES];
         [_stream_http_ckb setEnabled:YES];
@@ -463,6 +504,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         [_stream_sdp_fld setEnabled:[_stream_sdp_ckb state]];
     } else { // UDP
         [_stream_ttl_fld setEnabled:YES];
+        [_stream_ttl_stepper setEnabled:YES];
         [_stream_sap_ckb setEnabled:YES];
         [_stream_rtsp_ckb setEnabled:NO];
         [_stream_http_ckb setEnabled:NO];

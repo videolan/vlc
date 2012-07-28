@@ -26,7 +26,6 @@
 @interface VLCConvertAndSave : NSObject
 {
     IBOutlet id _window;
-    IBOutlet id _cancel_btn;
     IBOutlet id _ok_btn;
 
     IBOutlet id _drop_lbl;
@@ -101,6 +100,7 @@
     IBOutlet id _stream_address_fld;
     IBOutlet id _stream_ttl_lbl;
     IBOutlet id _stream_ttl_fld;
+    IBOutlet id _stream_ttl_stepper;
     IBOutlet id _stream_port_lbl;
     IBOutlet id _stream_port_fld;
     IBOutlet id _stream_sap_ckb;
@@ -131,7 +131,7 @@
 
 - (IBAction)toggleWindow;
 
-- (IBAction)saveFile:(id)sender;
+- (IBAction)finalizePanel:(id)sender;
 - (IBAction)openMedia:(id)sender;
 - (IBAction)switchProfile:(id)sender;
 - (IBAction)customizeProfile:(id)sender;
