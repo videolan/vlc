@@ -946,6 +946,8 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_addtext_text_lbl setEnabled: b_state];
     [o_addtext_text_fld setEnabled: b_state];
     [self setVideoFilter: "marq" on: b_state];
+    [self setVideoFilterProperty: "marq-marquee" forFilter: "marq" string: (char *)[[o_addtext_text_fld stringValue] UTF8String]];
+    [self setVideoFilterProperty: "marq-position" forFilter: "marq" integer: [[o_addtext_pos_pop selectedItem] tag]];
 }
 
 - (IBAction)addTextModifierChanged:(id)sender
