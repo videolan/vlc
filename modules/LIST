@@ -335,7 +335,6 @@ $Id$
  * t140: T.140 text encoder
  * taglib: Taglib tags parser and writer
  * tdummy: dummy text renderer
- * telepathy: Telepathy Presence information using MissionControl notification
  * telx: teletext subtitles decoder
  * theora: a theora video decoder/packetizer/encoder using the libtheora library
  * transform: filter for horizontal and vertical image flips and 90° rotations

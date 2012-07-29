@@ -951,7 +951,6 @@ modules/mux/ogg.c
 modules/mux/wav.c
 modules/notify/growl.m
 modules/notify/notify.c
-modules/notify/telepathy.c
 modules/packetizer/copy.c
 modules/packetizer/dirac.c
 modules/packetizer/flac.c

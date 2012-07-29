@@ -799,14 +799,6 @@ then
           VLC_ADD_LIBS([dbus],[$DBUS_LIBS])
           VLC_ADD_CFLAGS([dbus],[$DBUS_CFLAGS])
         fi
-      dnl Check for Telepathy
-        AC_ARG_ENABLE(telepathy,
-          AS_HELP_STRING([--enable-telepathy],[Telepathy Presence plugin through DBus(default enabled)]))
-        if test "${enable_telepathy}" != "no"; then
-          VLC_ADD_PLUGIN([telepathy])
-          VLC_ADD_LIBS([telepathy],[$DBUS_LIBS])
-          VLC_ADD_CFLAGS([telepathy],[$DBUS_CFLAGS])
-        fi
         dnl Power Management Inhibiter
         VLC_ADD_PLUGIN([inhibit])
         VLC_ADD_LIBS([inhibit],[$DBUS_LIBS])
