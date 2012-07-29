@@ -225,7 +225,7 @@ void X11Factory::getMonitorInfo( const GenericWindow &rWindow,
     if( info )
     {
         Region reg1 = XCreateRegion();
-        XRectangle rect1 = { x, y, w, h };
+        XRectangle rect1 = { (short)x, (short)y, (unsigned short)w, (unsigned short)h };
         XUnionRectWithRegion( &rect1, reg1, reg1 );
 
         unsigned int surface = 0;
@@ -233,7 +233,7 @@ void X11Factory::getMonitorInfo( const GenericWindow &rWindow,
         {
             Region reg2 = XCreateRegion();
             XRectangle rect2 = { info[i].x_org, info[i].y_org,
-                                 info[i].width, info[i].height };
+                                 (unsigned short)info[i].width, (unsigned short)info[i].height };
             XUnionRectWithRegion( &rect2, reg2, reg2 );
 
             Region reg = XCreateRegion();
