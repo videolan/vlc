@@ -137,6 +137,7 @@ package-win32-exe: package-win-strip
 # Script installer
 	cd "$(top_builddir)/extras/package/win32" && cp vlc.win32.nsi spad.nsi "$(win32_destdir)/"
 	cp -r $(srcdir)/extras/package/win32/languages/ "$(win32_destdir)/"
+	cp -r $(srcdir)/extras/package/win32/helpers/ "$(win32_destdir)/"
 	mkdir -p "$(win32_destdir)/NSIS/"
 	cd "$(top_srcdir)/extras/package/win32/" && cp UAC.dll UAC.nsh "$(win32_destdir)/NSIS"
 
