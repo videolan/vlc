@@ -60,7 +60,7 @@ static sdpplin_stream_t *sdpplin_parse_stream(char **data) {
 
   sdpplin_stream_t *desc;
   char* buf = NULL;
-  char* decoded = NULL;
+  unsigned char* decoded = NULL;
   int handled;
 
   desc = calloc( 1, sizeof(sdpplin_stream_t) );
