@@ -639,7 +639,7 @@ int OpenEncoder( vlc_object_t *p_this )
     if( i_codec_id == CODEC_ID_VP8 )
     {
         /* Lets give bitrate tolerance */
-        p_context->bit_rate_tolerance = __MAX(2 * p_enc->fmt_out.i_bitrate, p_sys->i_vtolerance );
+        p_context->bit_rate_tolerance = __MAX(2 * (int)p_enc->fmt_out.i_bitrate, p_sys->i_vtolerance );
         /* default to 120 frames between keyframe */
         if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "keyint" ) )
             p_context->gop_size = 120;
