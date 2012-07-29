@@ -97,7 +97,10 @@ static void Close( vlc_object_t * );
 #define REFERER_LONGTEXT N_("Customize the HTTP referer, simulating a previous document")
 
 #define UA_TEXT N_("User Agent")
-#define UA_LONGTEXT N_("You can use a custom User agent or use a known one")
+#define UA_LONGTEXT N_("The name and version of the program will be " \
+    "provided to the HTTP server. They must be separated by a forward " \
+    "slash, e.g. FooBar/1.2.3. This option can only be specified per input " \
+    "item, not globally.")
 
 vlc_module_begin ()
     set_description( N_("HTTP input") )
