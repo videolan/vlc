@@ -769,8 +769,8 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
     const int32_t i_seek_elements = fh.i_length / 12;
 
     /* Get keyframe adjust offsets */
-    int32_t i_kfa_elements;
-    uint8_t *p_kfa_table;
+    int32_t i_kfa_elements = 0;
+    uint8_t *p_kfa_table = NULL;
 
     if( p_sys->exh.i_keyframe_adjust_offset > 0 )
     {
@@ -806,16 +806,7 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
 
             i_kfa_elements = fh.i_length / 8;
         }
-        else
-        {
-            i_kfa_elements = 0;
-        }
     }
-    else
-    {
-        i_kfa_elements = 0;
-    }
-
 
     if( i_kfa_elements > 0 )
         msg_Warn( p_demux, "untested keyframe adjust support, upload samples" );
