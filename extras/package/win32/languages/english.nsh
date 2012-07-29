@@ -1,6 +1,7 @@
 StrCpy $Name_Section01 "Media Player (required)"
 StrCpy $Name_Section02a "Start Menu Shortcut"
 StrCpy $Name_Section02b "Desktop Shortcut"
+StrCpy $Name_Section34 "Web plugins"
 StrCpy $Name_Section03 "Mozilla plugin"
 StrCpy $Name_Section04 "ActiveX plugin"
 StrCpy $Name_Section05 "Discs Playback"
