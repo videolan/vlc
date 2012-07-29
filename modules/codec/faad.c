@@ -315,7 +315,6 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         void *samples;
         faacDecFrameInfo frame;
         block_t *p_out;
-        int i, j;
 
         samples = faacDecDecode( p_sys->hfaad, &frame,
                                  p_sys->p_buffer, p_sys->i_buffer );
@@ -434,7 +433,8 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         /* Convert frame.channel_position to our own channel values */
         p_dec->fmt_out.audio.i_physical_channels = 0;
         const uint32_t nbChannels = frame.channels;
-        for( i = 0; i < nbChannels; i++ )
+        unsigned j;
+        for( unsigned i = 0; i < nbChannels; i++ )
         {
             /* Find the channel code */
             for( j = 0; j < MAX_CHANNEL_POSITIONS; j++ )
