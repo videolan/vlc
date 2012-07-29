@@ -83,6 +83,7 @@ Removed modules:
  * RTMP access: use libavformat avio instead
  * RTMP access_output: use libavformat avio instead
  * Hildon GUI
+ * MSN messenger "now playing" (broken and unmaintained since VLC 1.0.0)
 
 
 Changes between 2.0.2 and 2.0.3:

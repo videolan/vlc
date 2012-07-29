@@ -207,7 +207,6 @@ $Id$
  * mpeg_audio: MPEG audio parser/packetizer
  * mpgatofixed32: MPEG-1 & 2 audio layer I,II,III audio decoder using MAD
  * mpgv: MPEG-I/II Video demuxer
- * msn: announce currently playing stream to MSN
  * mtp: MTP interface module
  * mux_asf: ASF muxer
  * mux_avi: AVI muxer

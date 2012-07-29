@@ -3,13 +3,6 @@
 # obviously does not. Here is a fix for that.
 LIBTOOL=@LIBTOOL@ --tag=CC
 
-SOURCES_msn = msn.c
 SOURCES_growl = growl.m
 SOURCES_notify = notify.c
 SOURCES_telepathy = telepathy.c
-
-if HAVE_WIN32
-if !HAVE_WINCE
-libvlc_LTLIBRARIES += libmsn_plugin.la
-endif
-endif
