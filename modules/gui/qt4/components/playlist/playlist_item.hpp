@@ -58,7 +58,7 @@ class PLItem : public AbstractPLItem
     friend class PLModel;
 
 public:
-    ~PLItem();
+    virtual ~PLItem();
     bool hasSameParent( PLItem *other ) { return parent() == other->parent(); }
     bool operator< ( PLItem& );
 
