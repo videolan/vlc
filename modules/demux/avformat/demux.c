@@ -143,7 +143,7 @@ int OpenDemux( vlc_object_t *p_this )
     char *psz_format = var_InheritString( p_this, "avformat-format" );
     if( psz_format )
     {
-        if( fmt = av_find_input_format(psz_format) )
+        if( (fmt = av_find_input_format(psz_format)) )
             msg_Dbg( p_demux, "forcing format: %s", fmt->name );
         free( psz_format );
     }
@@ -670,7 +670,7 @@ static int Demux( demux_t *p_demux )
             p_stream->time_base.num /
             p_stream->time_base.den;
 
-    if( pkt.dts != AV_NOPTS_VALUE && pkt.dts == pkt.pts &&
+    if( pkt.dts != (int64_t)AV_NOPTS_VALUE && pkt.dts == pkt.pts &&
         p_stream->codec->codec_type == AVMEDIA_TYPE_VIDEO )
     {
         /* Add here notoriously bugged file formats/samples regarding PTS */
