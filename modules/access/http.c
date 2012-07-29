@@ -827,7 +827,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     if( i_len == 0 )
         goto fatal;
 
-    if( p_sys->i_icy_meta > 0 && p_access->info.i_pos-p_sys->i_icy_offset > 0 )
+    if( p_sys->i_icy_meta > 0 && p_access->info.i_pos - p_sys->i_icy_offset > 0 )
     {
         int64_t i_next = p_sys->i_icy_meta -
                                     (p_access->info.i_pos - p_sys->i_icy_offset ) % p_sys->i_icy_meta;
