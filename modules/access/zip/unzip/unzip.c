@@ -1172,7 +1172,7 @@ extern int ZEXPORT unzOpenCurrentFile3 (file, method, level, raw, password)
     if (password != NULL)
     {
         int i;
-        s->pcrc_32_tab = get_crc_table();
+        s->pcrc_32_tab = (unsigned long*)get_crc_table();
         init_keys(password,s->keys,s->pcrc_32_tab);
         if (ZSEEK(s->z_filefunc, s->filestream,
                   s->pfile_in_zip_read->pos_in_zipfile +
