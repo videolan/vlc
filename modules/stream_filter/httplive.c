@@ -1280,6 +1280,7 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
     msg_Info(s, "updating hls stream (program-id=%d, bandwidth=%"PRIu64") has %d segments",
              hls_new->id, hls_new->bandwidth, count);
 
+    vlc_mutex_lock(&hls_old->lock);
     for (int n = 0; n < count; n++)
     {
         segment_t *p = segment_GetSegment(hls_new, n);
@@ -1333,7 +1334,10 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
         {
             int last = vlc_array_count(hls_old->segments) - 1;
             segment_t *l = segment_GetSegment(hls_old, last);
-            if (l == NULL) assert(0);
+            if (l == NULL) {
+                vlc_mutex_unlock(&hls_old->lock);
+                return VLC_EGENERIC;
+            }
 
             if ((l->sequence + 1) != p->sequence)
             {
@@ -1352,9 +1356,6 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
     vlc_mutex_unlock(&hls_old->lock);
     return VLC_SUCCESS;
 
-fail_and_unlock:
-    vlc_mutex_unlock(&hls_old->lock);
-    return VLC_EGENERIC;
 }
 
 static int hls_ReloadPlaylist(stream_t *s)
