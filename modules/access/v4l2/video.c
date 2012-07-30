@@ -213,7 +213,7 @@ static int SetupTuner (vlc_object_t *obj, int fd,
 
         if (v4l2_ioctl (fd, VIDIOC_S_FREQUENCY, &frequency) < 0)
         {
-            msg_Err (obj, "cannot tuner tuner %u to frequency %u %sHz: %m",
+            msg_Err (obj, "cannot tune tuner %u to frequency %u %sHz: %m",
                      input->tuner, freq, mult);
             return -1;
         }
