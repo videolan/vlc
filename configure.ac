@@ -1759,7 +1759,7 @@ AS_IF([test "$enable_v4l2" != "no"], [
   AC_CHECK_HEADERS([linux/videodev2.h sys/videoio.h], [
     have_v4l2="yes"
   ])
-  AC_CHECK_DECLS([V4L2_CTRL_TYPE_BITMASK],,, [
+  AC_CHECK_DECLS([V4L2_CTRL_TYPE_BITMASK,V4L2_CTRL_TYPE_INTEGER_MENU],,, [
 #ifdef HAVE_LINUX_VIDEODEV2_H
 # include <linux/videodev2.h>
 #endif

@@ -25,7 +25,7 @@
 #else
 # error "No Video4Linux2 headers found."
 #endif
-#ifndef V4L2_CAP_DEVICE_CAPS
+#if !HAVE_DECL_V4L2_CTRL_TYPE_INTEGER_MENU
 # warning Please update Video4Linux2 headers!
 #endif
 

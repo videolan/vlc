@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include <stdio.h>
 #include <ctype.h>
 #include <assert.h>
 #include <sys/ioctl.h>
@@ -156,6 +157,9 @@ static int ControlSetCallback (vlc_object_t *obj, const char *var,
 #if HAVE_DECL_V4L2_CTRL_TYPE_BITMASK
         case V4L2_CTRL_TYPE_BITMASK:
 #endif
+#if HAVE_DECL_V4L2_CTRL_TYPE_INTEGER_MENU
+        case V4L2_CTRL_TYPE_INTEGER_MENU:
+#endif
             ret = ControlSet (ctrl, cur.i_int);
             break;
         case V4L2_CTRL_TYPE_BOOLEAN:
@@ -191,6 +195,9 @@ static void ControlsReset (vlc_object_t *obj, vlc_v4l2_ctrl_t *list)
         {
             case V4L2_CTRL_TYPE_INTEGER:
             case V4L2_CTRL_TYPE_MENU:
+#if HAVE_DECL_V4L2_CTRL_TYPE_INTEGER_MENU
+            case V4L2_CTRL_TYPE_INTEGER_MENU:
+#endif
                 var_SetInteger (obj, list->name, list->default_value);
                 break;
             case V4L2_CTRL_TYPE_BOOLEAN:
@@ -253,6 +260,9 @@ next:
                     case V4L2_CTRL_TYPE_INTEGER:
                     case V4L2_CTRL_TYPE_BOOLEAN:
                     case V4L2_CTRL_TYPE_MENU:
+#if HAVE_DECL_V4L2_CTRL_TYPE_INTEGER_MENU
+                    case V4L2_CTRL_TYPE_INTEGER_MENU:
+#endif
                     {
                         long val = strtol (value, &end, 0);
                         if (*end)
@@ -638,6 +648,64 @@ static vlc_v4l2_ctrl_t *ControlAddBitMask (vlc_object_t *obj, int fd,
 }
 #endif
 
+#if HAVE_DECL_V4L2_CTRL_TYPE_INTEGER_MENU
+static vlc_v4l2_ctrl_t *ControlAddIntMenu (vlc_object_t *obj, int fd,
+                                           const struct v4l2_queryctrl *query)
+{
+    msg_Dbg (obj, " int menu %s (%08"PRIX32")", query->name, query->id);
+    if (query->flags & (CTRL_FLAGS_IGNORE | V4L2_CTRL_FLAG_WRITE_ONLY))
+        return NULL;
+
+    vlc_v4l2_ctrl_t *c = ControlCreate (fd, query);
+    if (unlikely(c == NULL))
+        return NULL;
+
+    if (var_Create (obj, c->name, VLC_VAR_INTEGER | VLC_VAR_HASCHOICE
+                                                  | VLC_VAR_ISCOMMAND))
+    {
+        free (c);
+        return NULL;
+    }
+
+    vlc_value_t val;
+    struct v4l2_control ctrl = { .id = query->id };
+
+    if (v4l2_ioctl (fd, VIDIOC_G_CTRL, &ctrl) >= 0)
+    {
+        msg_Dbg (obj, "  current: %"PRId32", default: %"PRId32,
+                 ctrl.value, query->default_value);
+        val.i_int = ctrl.value;
+        var_Change (obj, c->name, VLC_VAR_SETVALUE, &val, NULL);
+    }
+    val.i_int = query->minimum;
+    var_Change (obj, c->name, VLC_VAR_SETMIN, &val, NULL);
+    val.i_int = query->maximum;
+    var_Change (obj, c->name, VLC_VAR_SETMAX, &val, NULL);
+    val.i_int = query->default_value;
+    var_Change (obj, c->name, VLC_VAR_SETDEFAULT, &val, NULL);
+
+    /* Import menu choices */
+    for (uint_fast32_t idx = query->minimum;
+         idx <= (uint_fast32_t)query->maximum;
+         idx++)
+    {
+        struct v4l2_querymenu menu = { .id = query->id, .index = idx };
+        char name[sizeof ("-9223372036854775808")];
+
+        if (v4l2_ioctl (fd, VIDIOC_QUERYMENU, &menu) < 0)
+            continue;
+        msg_Dbg (obj, "  choice %"PRIu32") %"PRId64, menu.index, menu.value);
+
+        vlc_value_t text;
+        val.i_int = menu.index;
+        sprintf (name, "%"PRId64, menu.value);
+        text.psz_string = name;
+        var_Change (obj, c->name, VLC_VAR_ADDCHOICE, &val, &text);
+    }
+    return c;
+}
+#endif
+
 static vlc_v4l2_ctrl_t *ControlAddUnknown (vlc_object_t *obj, int fd,
                                            const struct v4l2_queryctrl *query)
 {
@@ -671,6 +739,9 @@ vlc_v4l2_ctrl_t *ControlsInit (vlc_object_t *obj, int fd)
         [V4L2_CTRL_TYPE_STRING] = ControlAddString,
 #if HAVE_DECL_V4L2_CTRL_TYPE_BITMASK
         [V4L2_CTRL_TYPE_BITMASK] = ControlAddBitMask,
+#endif
+#if HAVE_DECL_V4L2_CTRL_TYPE_INTEGER_MENU
+        [V4L2_CTRL_TYPE_INTEGER_MENU] = ControlAddIntMenu,
 #endif
     };
 
