@@ -464,12 +464,12 @@ static vlc_v4l2_ctrl_t *ControlAddMenu (vlc_object_t *obj, int fd,
         val.i_int = ctrl.value;
         var_Change (obj, c->name, VLC_VAR_SETVALUE, &val, NULL);
     }
-    val.b_bool = query->default_value;
-    var_Change (obj, c->name, VLC_VAR_SETDEFAULT, &val, NULL);
     val.i_int = query->minimum;
     var_Change (obj, c->name, VLC_VAR_SETMIN, &val, NULL);
     val.i_int = query->maximum;
     var_Change (obj, c->name, VLC_VAR_SETMAX, &val, NULL);
+    val.i_int = query->default_value;
+    var_Change (obj, c->name, VLC_VAR_SETDEFAULT, &val, NULL);
 
     /* Import menu choices */
     for (uint_fast32_t idx = query->minimum;
