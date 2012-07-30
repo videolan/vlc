@@ -59,9 +59,8 @@
 #define SIZE_LONGTEXT N_( \
     "The specified pixel resolution is forced " \
     "(if both width and height are strictly positive)." )
-#define FPS_TEXT N_( "Framerate" )
-#define FPS_LONGTEXT N_( "Framerate to capture, if applicable " \
-    "(0 for autodetect)." )
+/*#define FPS_TEXT N_( "Frame rate" )
+#define FPS_LONGTEXT N_( "Maximum frame rate to use (0 = no limits)." )*/
 
 #define CTRL_RESET_TEXT N_( "Reset controls" )
 #define CTRL_RESET_LONGTEXT N_( "Reset controls to defaults." )
@@ -300,8 +299,9 @@ vlc_module_begin ()
     add_string( CFG_PREFIX "aspect-ratio", "4:3", ASPECT_TEXT,
               ASPECT_LONGTEXT, true )
         change_safe()
-    add_float( CFG_PREFIX "fps", 0, FPS_TEXT, FPS_LONGTEXT, true )
-        change_safe()
+    /*add_float( CFG_PREFIX "fps", 0, FPS_TEXT, FPS_LONGTEXT, true )*/
+    add_obsolete_float( CFG_PREFIX "fps" )
+        change_safe() /* since 2.1.0 */
     add_obsolete_bool( CFG_PREFIX "use-libv4l2" ) /* since 2.1.0 */
 
     set_section( N_( "Tuner" ), NULL )
