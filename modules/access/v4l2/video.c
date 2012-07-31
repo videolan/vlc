@@ -497,7 +497,7 @@ int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
     if (v4l2_ioctl (fd, VIDIOC_G_PARM, parm) < 0)
     {
         msg_Err (obj, "cannot get streaming parameters: %m");
-        memset (parm, 0, sizeof (parm));
+        memset (parm, 0, sizeof (*parm));
         parm->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     }
     parm->parm.capture.capturemode = 0; /* normal video mode */
