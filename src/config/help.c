@@ -167,20 +167,20 @@ static void Help (vlc_object_t *p_this, char const *psz_help_name)
 
     if( psz_help_name && !strcmp( psz_help_name, "help" ) )
     {
-        utf8_fprintf( stdout, vlc_usage, "vlc" );
+        utf8_fprintf( stdout, _(vlc_usage), "vlc" );
         Usage( p_this, "=help" );
         Usage( p_this, "=main" );
         print_help_on_full_help();
     }
     else if( psz_help_name && !strcmp( psz_help_name, "longhelp" ) )
     {
-        utf8_fprintf( stdout, vlc_usage, "vlc" );
+        utf8_fprintf( stdout, _(vlc_usage), "vlc" );
         Usage( p_this, NULL );
         print_help_on_full_help();
     }
     else if( psz_help_name && !strcmp( psz_help_name, "full-help" ) )
     {
-        utf8_fprintf( stdout, vlc_usage, "vlc" );
+        utf8_fprintf( stdout, _(vlc_usage), "vlc" );
         Usage( p_this, NULL );
     }
     else if( psz_help_name )
