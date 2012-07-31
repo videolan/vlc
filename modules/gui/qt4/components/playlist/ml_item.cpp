@@ -91,11 +91,9 @@ static int compareMeta( ml_media_t *a, ml_media_t *b, ml_select_e meta )
 }
 
 
-MLItem::MLItem( const MLModel *p_model,
-                            intf_thread_t* _p_intf,
+MLItem::MLItem( intf_thread_t* _p_intf,
                             ml_media_t *p_media,
                             MLItem *p_parent )
-        : p_intf( _p_intf ), model( p_model )
 {
     parentItem = p_parent;
     if( p_media )
@@ -119,18 +117,9 @@ AbstractPLItem* MLItem::child( int row ) const
     else return children.at( row );
 }
 
-void MLItem::delChild( int row )
-{
-    if( !childCount() ) return; // assert ?
-    AbstractPLItem *item =
-            children.takeAt( ( row!=-1 ) ? row : ( children.count()-1 ) );
-    assert( item );
-    delete item;
-}
-
 input_item_t* MLItem::inputItem()
 {
-    return ml_CreateInputItem( p_ml,  id() );
+    return ml_CreateInputItem( p_ml,  id( MLMEDIA_ID ) );
 }
 
 /**
@@ -139,13 +128,12 @@ input_item_t* MLItem::inputItem()
  * @return The QVariant may be formed of a int, QString
  *         Use toString() to print it on the screen, except for pixmaps
  */
-QVariant MLItem::data( int column ) const
+QVariant MLItem::data( ml_select_e columntype ) const
 {
-    ml_select_e type = model->columnType( column );
     ml_person_t *p_people = NULL, *p_person = NULL;
     QString qsz_return;
 #define sreturn(a) if(media->a) return qfu(media->a); break
-    switch( type )
+    switch( columntype )
     {
         case ML_ALBUM: sreturn( psz_album );
         case ML_ALBUM_ID: return media->i_album_id;
@@ -166,7 +154,10 @@ QVariant MLItem::data( int column ) const
             break;
         case ML_COVER: sreturn( psz_cover );
         case ML_DURATION:
-            return QTime().addSecs( media->i_duration/1000000 ).toString( "HH:mm:ss" );
+            if ( media->i_duration )
+                return QTime().addSecs( media->i_duration/1000000 ).toString( "HH:mm:ss" );
+            else
+                return QString();
         case ML_EXTRA: sreturn( psz_extra );
         case ML_GENRE: sreturn( psz_genre );
         case ML_ID: return media->i_id;
@@ -194,9 +185,11 @@ QVariant MLItem::data( int column ) const
                 return qsz_return;
             else
             {
-                vlc_mutex_lock( &media->lock );
-                QFileInfo p_file = QFileInfo( qfu( media->psz_uri ) );
-                vlc_mutex_unlock( &media->lock );
+                QUrl uri = getURI();
+                if ( uri.scheme() != "file" )
+                    return QUrl::fromPercentEncoding( getURI().toString().toUtf8() );
+
+                QFileInfo p_file( uri.toLocalFile() );
                 return p_file.fileName().isEmpty() ? p_file.absoluteFilePath()
                     : p_file.fileName();
             }
@@ -249,20 +242,21 @@ bool MLItem::setData( ml_select_e meta, const QVariant &data )
         case ML_ARTIST: ml_DeletePersonTypeFromMedia( media, ML_PERSON_ARTIST );
                         ml_CreateAppendPersonAdv( &media->p_people,
                                 ML_PERSON_ARTIST, (char*)qtu(data.toString()), 0 );
-                        return ml_UpdateSimple( p_ml, ML_MEDIA, NULL, id(),
+                        return ml_UpdateSimple( p_ml, ML_MEDIA, NULL, id( MLMEDIA_ID ),
                                 ML_PEOPLE, ML_PERSON_ARTIST, qtu( data.toString() ) ) == VLC_SUCCESS;
         case ML_EXTRA: setmeta( psz_extra );
         case ML_GENRE: setmeta( psz_genre );
         case ML_ORIGINAL_TITLE: setmeta( psz_orig_title );
         case ML_TITLE: setmeta( psz_title );
 update:
-            return ml_UpdateSimple( p_ml, ML_MEDIA, NULL, id(),
+        Q_ASSERT( qtu( data.toString() ) );
+            return ml_UpdateSimple( p_ml, ML_MEDIA, NULL, id( MLMEDIA_ID ),
                                     meta, qtu( data.toString() ) ) == VLC_SUCCESS;
 
         /* Modifiable integers */
         case ML_TRACK_NUMBER:
         case ML_YEAR:
-            return ml_UpdateSimple( p_ml, ML_MEDIA, NULL, id(),
+            return ml_UpdateSimple( p_ml, ML_MEDIA, NULL, id( MLMEDIA_ID ),
                                     meta, data.toInt() ) == VLC_SUCCESS;
 
         // TODO case ML_VOTE:
@@ -274,9 +268,19 @@ update:
 #   undef setmeta
 }
 
-int MLItem::id() const
+int MLItem::id( int type )
 {
-    return media->i_id;
+    switch( type )
+    {
+    case INPUTITEM_ID:
+        return inputItem()->i_id;
+    case MLMEDIA_ID:
+        return media->i_id;
+    default:
+    case PLAYLIST_ID:
+        assert( NULL );
+        return -1;
+    }
 }
 
 ml_media_t* MLItem::getMedia() const
@@ -284,17 +288,26 @@ ml_media_t* MLItem::getMedia() const
     return media;
 }
 
-QUrl MLItem::getUri() const
+QUrl MLItem::getURI() const
 {
     QString uri;
     vlc_mutex_lock( &media->lock );
-    uri = QString( media->psz_uri );
+    uri = qfu( media->psz_uri );
     vlc_mutex_unlock( &media->lock );
     if ( uri.isEmpty() ) return QUrl(); // This should be rootItem
 
-    QUrl url( uri );
+    QUrl url = QUrl::fromEncoded( uri.toUtf8(), QUrl::TolerantMode );
     if ( url.scheme().isEmpty() ) url.setScheme( "file" );
     return url;
+}
+
+QString MLItem::getTitle() const
+{
+    QString title;
+    vlc_mutex_lock( &media->lock );
+    title = QString( media->psz_title );
+    vlc_mutex_unlock( &media->lock );
+    return title;
 }
 
 bool MLItem::operator<( MLItem* item )

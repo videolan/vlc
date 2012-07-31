@@ -81,7 +81,7 @@ public:
     /*!
       Creates a new PictureFlow widget.
     */
-    PictureFlow(QWidget* parent = 0, VLCModel *model = 0);
+    PictureFlow(QWidget* parent = 0, QAbstractItemModel *model = 0);
 
     /*!
       Destroys the widget.

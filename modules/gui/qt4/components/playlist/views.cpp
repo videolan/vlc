@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 #include "components/playlist/views.hpp"
-#include "components/playlist/playlist_model.hpp" /* PLModel */
+#include "components/playlist/vlc_model.hpp"      /* VLCModel */
 #include "components/playlist/sorting.h"          /* Columns List */
 #include "input_manager.hpp"                      /* THEMIM */
 
@@ -58,7 +58,7 @@ void AbstractPlViewItemDelegate::paintBackground(
         painter->setPen( option.palette.color( QPalette::Highlight ).darker( 150 ) );
         painter->drawRect( r );
     }
-    else if( index.data( PLModel::IsCurrentRole ).toBool() )
+    else if( index.data( VLCModel::IsCurrentRole ).toBool() )
     {
         painter->setBrush( QBrush( Qt::lightGray ) );
         painter->setPen( QColor( Qt::darkGray ) );
@@ -81,7 +81,7 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
     QFont font( index.data( Qt::FontRole ).value<QFont>() );
     font.setPointSize( __MAX( font.pointSize() + i_zoom, 4 ) );
-    font.setBold( index.data( PLModel::IsCurrentRole ).toBool() );
+    font.setBold( index.data( VLCModel::IsCurrentRole ).toBool() );
     painter->setFont( font );
     QFontMetrics fm = painter->fontMetrics();
 
@@ -120,12 +120,12 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
 
     //Draw children indicator
-    if( !index.data( PLModel::IsLeafNodeRole ).toBool() )
+    if( !index.data( VLCModel::IsLeafNodeRole ).toBool() )
     {
         QRect r( option.rect );
         r.setSize( QSize( 25, 25 ) );
         r.translate( 5, 5 );
-        if( index.data( PLModel::IsCurrentsParentNodeRole ).toBool() )
+        if( index.data( VLCModel::IsCurrentsParentNodeRole ).toBool() )
         {
             painter->setOpacity( 0.75 );
             QPainterPath nodeRectPath;
@@ -222,7 +222,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     //Draw title info
     f.setItalic( true );
     f.setPointSize( __MAX( f.pointSize() + i_zoom, 4 ) );
-    f.setBold( index.data( PLModel::IsCurrentRole ).toBool() );
+    f.setBold( index.data( VLCModel::IsCurrentRole ).toBool() );
     painter->setFont( f );
     QFontMetrics fm( painter->fontMetrics() );
 
@@ -234,7 +234,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     }
 
     //Draw children indicator
-    if( !index.data( PLModel::IsLeafNodeRole ).toBool() )
+    if( !index.data( VLCModel::IsLeafNodeRole ).toBool() )
     {
         QPixmap dirPix = QPixmap( ":/type/node" );
         painter->drawPixmap( QPoint( textRect.x(), textRect.center().y() - dirPix.height() / 2 ),
@@ -276,7 +276,7 @@ QSize PlListViewItemDelegate::sizeHint ( const QStyleOptionViewItem &, const QMo
 
 void PlTreeViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-    if ( index.data( PLModel::IsCurrentRole ).toBool() )
+    if ( index.data( VLCModel::IsCurrentRole ).toBool() )
     {
         QStyleOptionViewItem myoptions = option;
         myoptions.font.setBold( true );
@@ -305,7 +305,7 @@ static void plViewDragMoveEvent( QAbstractItemView *, QDragMoveEvent * event )
     else event->acceptProposedAction();
 }
 
-PlIconView::PlIconView( PLModel *, QWidget *parent ) : QListView( parent )
+PlIconView::PlIconView( QAbstractItemModel *, QWidget *parent ) : QListView( parent )
 {
     PlIconViewItemDelegate *delegate = new PlIconViewItemDelegate( this );
 
@@ -355,7 +355,7 @@ bool PlIconView::viewportEvent ( QEvent * event )
     return QAbstractItemView::viewportEvent( event );
 }
 
-PlListView::PlListView( PLModel *, QWidget *parent ) : QListView( parent )
+PlListView::PlListView( QAbstractItemModel *, QWidget *parent ) : QListView( parent )
 {
     setViewMode( QListView::ListMode );
     setUniformItemSizes( true );
@@ -412,7 +412,7 @@ bool PlListView::viewportEvent ( QEvent * event )
     return QAbstractItemView::viewportEvent( event );
 }
 
-PlTreeView::PlTreeView( PLModel *, QWidget *parent ) : QTreeView( parent )
+PlTreeView::PlTreeView( QAbstractItemModel *, QWidget *parent ) : QTreeView( parent )
 {
     setItemDelegate( new PlTreeViewItemDelegate( this ) );
 
@@ -443,8 +443,9 @@ PlTreeView::PlTreeView( PLModel *, QWidget *parent ) : QTreeView( parent )
 void PlTreeView::setModel( QAbstractItemModel * model )
 {
     QTreeView::setModel( model );
+    VLCModel *m = static_cast<VLCModel*>(model);
     CONNECT( this, expanded( const QModelIndex & ),
-             model, ensureArtRequested( const QModelIndex & ) );
+             m->sigs, ensureArtRequestedSlot( const QModelIndex & ) );
 }
 
 void PlTreeView::startDrag ( Qt::DropActions supportedActions )
@@ -470,7 +471,7 @@ void PlTreeView::keyPressEvent( QKeyEvent *event )
 }
 
 #include <QHBoxLayout>
-PicFlowView::PicFlowView( PLModel *p_model, QWidget *parent ) : QAbstractItemView( parent )
+PicFlowView::PicFlowView( QAbstractItemModel *p_model, QWidget *parent ) : QAbstractItemView( parent )
 {
     QHBoxLayout *layout = new QHBoxLayout( this );
     layout->setMargin( 0 );

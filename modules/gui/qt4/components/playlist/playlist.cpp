@@ -94,13 +94,18 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
 
     setMinimumWidth( 400 );
 
-    PLModel *model = PLModel::getPLModel( p_intf );
+    VLCProxyModel *model = new VLCProxyModel( this );
+
+    PLModel *plmodel = PLModel::getPLModel( p_intf );
+    model->setModel( VLCProxyModel::PL_MODEL, plmodel );
+    model->switchToModel( VLCProxyModel::PL_MODEL );
+
 #ifdef MEDIA_LIBRARY
-    MLModel *mlmodel = new MLModel( p_intf, this );
-    mainView = new StandardPLPanel( this, p_intf, p_root, selector, model, mlmodel );
-#else
-    mainView = new StandardPLPanel( this, p_intf, p_root, selector, model, NULL );
+    MLModel *mlmodel = new MLModel( p_intf, model );
+    model->setModel( VLCProxyModel::SQLML_MODEL, mlmodel );
 #endif
+
+    mainView = new StandardPLPanel( this, p_intf, p_root, selector, model );
 
     /* Location Bar */
     locationBar = new LocationBar( model );
@@ -228,20 +233,15 @@ void PlaylistWidget::forceShow()
 
 void PlaylistWidget::changeView( const QModelIndex& index )
 {
-    searchEdit->clear();
     locationBar->setIndex( index );
 }
 
-void PlaylistWidget::clearPlaylist()
-{
-    PLModel::getPLModel( p_intf )->clearPlaylist();
-}
 #include <QSignalMapper>
 #include <QMenu>
 #include <QPainter>
-LocationBar::LocationBar( PLModel *m )
+LocationBar::LocationBar( VLCProxyModel *m )
 {
-    model = m;
+    setModel( m );
     mapper = new QSignalMapper( this );
     CONNECT( mapper, mapped( int ), this, invoke( int ) );
 
@@ -272,7 +272,7 @@ void LocationBar::setIndex( const QModelIndex &index )
         actions.append( action );
         CONNECT( btn, clicked(), action, trigger() );
 
-        mapper->setMapping( action, model->itemId( i ) );
+        mapper->setMapping( action, model->itemId( i, PLAYLIST_ID ) );
         CONNECT( action, triggered(), mapper, map() );
 
         first = false;
@@ -298,7 +298,7 @@ void LocationBar::setRootIndex()
 
 void LocationBar::invoke( int i_id )
 {
-    QModelIndex index = model->index( i_id, 0 );
+    QModelIndex index = model->indexByPLID( i_id, 0 );
     emit invoked ( index );
 }
 

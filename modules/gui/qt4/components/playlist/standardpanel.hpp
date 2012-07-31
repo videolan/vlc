@@ -30,6 +30,7 @@
 
 #include "qt4.hpp"
 #include "components/playlist/playlist.hpp"
+#include "components/playlist/vlc_model.hpp"
 
 #include <QWidget>
 #include <QModelIndexList>
@@ -37,8 +38,7 @@
 #include <vlc_playlist.h> /* playlist_item_t */
 
 class QSignalMapper;
-class PLModel;
-class MLModel;
+class VLCProxyModel;
 class QKeyEvent;
 class QWheelEvent;
 class QStackedLayout;
@@ -50,7 +50,6 @@ class PlIconView;
 class PlListView;
 class PicFlowView;
 
-class LocationBar;
 class PLSelector;
 class PlaylistWidget;
 class PixmapAnimator;
@@ -61,7 +60,7 @@ class StandardPLPanel: public QWidget
 
 public:
     StandardPLPanel( PlaylistWidget *, intf_thread_t *,
-                     playlist_item_t *, PLSelector *, PLModel *, MLModel * );
+                     playlist_item_t *, PLSelector *, VLCProxyModel * );
     virtual ~StandardPLPanel();
 
     enum { ICON_VIEW = 0,
@@ -75,10 +74,9 @@ public:
     static QMenu *viewSelectionMenu(StandardPLPanel *obj);
 
 protected:
-    PLModel *model;
-    MLModel *mlmodel;
+    VLCProxyModel *model;
     virtual void wheelEvent( QWheelEvent *e );
-    bool popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &selectionlist );
+    bool popup( const QPoint &point );
 
 private:
     intf_thread_t *p_intf;
@@ -97,19 +95,15 @@ private:
 
     QSignalMapper *selectColumnsSigMapper;
 
-    int lastActivatedId;
-    int currentRootIndexId;
+    int lastActivatedPLItemId;
+    int currentRootIndexPLId;
 
     void createTreeView();
     void createIconView();
     void createListView();
     void createCoverView();
     void updateZoom( int i_zoom );
-    void changeModel ( bool b_ml );
     bool eventFilter ( QObject * watched, QEvent * event );
-
-    /* for popup */
-    QModelIndex popupIndex;  /* FIXME: don't store here, pass as Action param */
 
     /* Wait spinner */
     PixmapAnimator *spinnerAnimation;
@@ -140,6 +134,7 @@ private slots:
     void popupExplore();
     void popupStream();
     void popupSave();
+    void popupAction( QAction * );
     void increaseZoom() { updateZoom( i_zoom + 1 ); };
     void decreaseZoom() { updateZoom( i_zoom - 1 ); };
     void toggleColumnShown( int );

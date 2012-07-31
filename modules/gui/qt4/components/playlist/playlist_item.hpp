@@ -29,11 +29,21 @@
 #endif
 
 #include <QList>
+#include <QString>
+#include <QUrl>
+
+enum
+{
+    INPUTITEM_ID = 1,
+    PLAYLIST_ID,
+    MLMEDIA_ID
+};
 
 class AbstractPLItem
 {
     friend class PLItem; /* super ugly glue stuff */
     friend class MLItem;
+    friend class VLCModel;
     friend class PLModel;
     friend class MLModel;
 
@@ -41,7 +51,7 @@ public:
     virtual ~AbstractPLItem() {}
 
 protected:
-    virtual int id() const = 0;
+    virtual int id( int type ) = 0;
     int childCount() const { return children.count(); }
     int indexOf( AbstractPLItem *item ) const { return children.indexOf( item ); };
     int lastIndexOf( AbstractPLItem *item ) const { return children.lastIndexOf( item ); };
@@ -50,7 +60,10 @@ protected:
     void insertChild( AbstractPLItem *item, int pos = -1 ) { children.insert( pos, item ); }
     void appendChild( AbstractPLItem *item ) { insertChild( item, children.count() ); } ;
     virtual AbstractPLItem *child( int id ) const = 0;
+    void removeChild( AbstractPLItem *item );
     void clearChildren();
+    virtual QUrl getURI() const = 0;
+    virtual QString getTitle() const = 0;
 
     QList<AbstractPLItem *> children;
     AbstractPLItem *parentItem;
@@ -63,23 +76,24 @@ class PLItem : public AbstractPLItem
 public:
     virtual ~PLItem();
     bool hasSameParent( PLItem *other ) { return parent() == other->parent(); }
-    bool operator< ( PLItem& );
+    bool operator< ( AbstractPLItem& );
 
 private:
     /* AbstractPLItem */
-    int id() const { return i_id; };
+    int id( int type );
     input_item_t *inputItem() { return p_input; }
     AbstractPLItem *child( int id ) const { return children.value( id ); };
+    virtual QUrl getURI() const;
+    virtual QString getTitle() const;
 
     /* Local */
     PLItem( playlist_item_t *, PLItem *parent );
     int row();
-    void removeChild( PLItem * );
     void takeChildAt( int );
 
     PLItem( playlist_item_t * );
     void init( playlist_item_t *, PLItem * );
-    int i_id;
+    int i_playlist_id;
     input_item_t *p_input;
 };
 

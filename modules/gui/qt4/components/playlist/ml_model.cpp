@@ -34,6 +34,7 @@
 #include <QUrl>
 #include <QMenu>
 #include <QMimeData>
+#include <QApplication>
 #include "ml_item.hpp"
 #include "ml_model.hpp"
 #include "dialogs/playlist.hpp"
@@ -54,6 +55,14 @@ static int mediaUpdated( vlc_object_t *p_this, char const *psz_var,
                                   vlc_value_t oldval, vlc_value_t newval,
                                   void *data );
 
+/* Register ML Events */
+const QEvent::Type MLEvent::MediaAdded_Type =
+        (QEvent::Type)QEvent::registerEventType();
+const QEvent::Type MLEvent::MediaRemoved_Type =
+        (QEvent::Type)QEvent::registerEventType();
+const QEvent::Type MLEvent::MediaUpdated_Type =
+        (QEvent::Type)QEvent::registerEventType();
+
 /**
  * @brief Definition of the result item model for the result tree
  * @param parent the parent Qt object
@@ -65,6 +74,7 @@ MLModel::MLModel( intf_thread_t* _p_intf, QObject *parent )
     if ( !p_ml ) return;
 
     vlc_array_t *p_result_array = vlc_array_new();
+
     if ( p_result_array )
     {
         ml_Find( p_ml, p_result_array, ML_MEDIA );
@@ -89,16 +99,35 @@ MLModel::~MLModel()
     var_DelCallback( p_ml, "media-added", mediaAdded, this );
 }
 
-void MLModel::clear()
+void MLModel::clearPlaylist()
 {
+    vlc_array_t* p_where = vlc_array_new();
+    if ( !p_where ) return;
+
     int rows = rowCount();
     if( rows > 0 )
     {
         beginRemoveRows( createIndex( 0, 0 ), 0, rows-1 );
+
+        QList< MLItem* >::iterator it = items.begin();
+        ml_element_t p_find[ items.count() ];
+        int i = 0;
+        while( it != items.end() )
+        {
+            p_find[i].criteria = ML_ID;
+            p_find[i].value.i = (*it)->id( MLMEDIA_ID );
+            vlc_array_append( p_where, & p_find[i++] );
+            delete *it;
+            it++;
+        }
+
+        ml_Delete( p_ml, p_where );
         items.clear();
         endRemoveRows();
-        emit layoutChanged();
     }
+
+    vlc_array_destroy( p_where );
+    reset();
 }
 
 QModelIndex MLModel::index( int row, int column,
@@ -118,6 +147,17 @@ QModelIndex MLModel::parent(const QModelIndex & ) const
     return QModelIndex();
 }
 
+void MLModel::filter( const QString& search_text, const QModelIndex & root, bool b_recursive )
+{
+    Q_UNUSED( search_text ); Q_UNUSED( root ); Q_UNUSED( b_recursive );
+    /* FIXME */
+}
+
+void MLModel::sort( const int column, Qt::SortOrder order )
+{
+    Q_UNUSED( column ); Q_UNUSED( order );
+}
+
 /**
  * @brief Return the index of currently playing item
  */
@@ -126,14 +166,31 @@ QModelIndex MLModel::currentIndex() const
     input_thread_t *p_input_thread = THEMIM->getInput();
     if( !p_input_thread ) return QModelIndex();
 
-    /*TODO: O(n) not good */
     input_item_t* p_iitem = input_GetItem( p_input_thread );
+    int i = 0;
     foreach( MLItem* item, items )
     {
-        if( !QString::compare( item->getUri().toString(),
-                    QString::fromAscii( p_iitem->psz_uri ) ) )
-            return index( items.indexOf( item ), 0 );
+        if ( item->inputItem() == p_iitem )
+            return index( i, 0 );
+        i++;
     }
+    return QModelIndex();
+}
+
+QModelIndex MLModel::indexByPLID( const int i_plid, const int c ) const
+{
+    Q_UNUSED( i_plid ); Q_UNUSED( c );
+    return QModelIndex(); /* FIXME ? */
+}
+
+QModelIndex MLModel::indexByInputItemID( const int i_inputitem_id, const int c ) const
+{
+    Q_UNUSED( c );
+    foreach( MLItem* item, items )
+        if ( item->id( INPUTITEM_ID ) == i_inputitem_id )
+        {
+            return index( items.indexOf( item ), 0 );
+        }
     return QModelIndex();
 }
 /**
@@ -145,15 +202,6 @@ ml_select_e MLModel::columnType( int logicalindex ) const
 {
     if( logicalindex < 0 || logicalindex >= columnCount() ) return ML_END;
     return meta_to_mlmeta( columnToMeta( logicalindex ) );
-}
-
-QVariant MLModel::headerData( int section, Qt::Orientation orientation,
-                                    int role ) const
-{
-    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-        return QVariant( qfu( psz_column_title( columnToMeta( section ) ) ) );
-    else
-        return QVariant();
 }
 
 Qt::ItemFlags MLModel::flags(const QModelIndex &index) const
@@ -214,8 +262,8 @@ QMimeData* MLModel::mimeData( const QModelIndexList &indexes ) const
         if( rows.contains( idx.row() ) )
             continue;
         rows.append( idx.row() );
-        MLItem* item = static_cast<MLItem*>( idx.internalPointer() );
-        urls.append( item->getUri() );
+        AbstractPLItem* item = static_cast<AbstractPLItem*>( idx.internalPointer() );
+        urls.append( item->getURI() );
     }
     QMimeData *data = new QMimeData;
     data->setUrls( urls );
@@ -229,41 +277,34 @@ int MLModel::rowCount( const QModelIndex & parent ) const
     return 0;
 }
 
-void MLModel::remove( MLItem *item )
+void MLModel::rebuild( playlist_item_t *p )
 {
-    int row = items.indexOf( item );
-    remove( createIndex( row, 0 ) );
+    Q_UNUSED( p );
+    emit layoutChanged();
 }
 
 void MLModel::doDelete( QModelIndexList list )
 {
     for (int i = 0; i < list.count(); ++i)
     {
-        int id = itemId( list.at(i) );
+        const QModelIndex &index = list.at( i );
+        if ( !index.isValid() ) break;
+        int id = itemId( list.at(i), MLMEDIA_ID );
         ml_DeleteSimple( p_ml, id );
+        /* row will be removed by the lib callback */
     }
 }
 
-void MLModel::remove( QModelIndex idx )
+bool MLModel::removeRows( int row, int count, const QModelIndex &parent )
 {
-    if( !idx.isValid() )
-        return;
-    else
-    {
-        beginRemoveRows( createIndex( 0, 0 ), idx.row(), idx.row() );
-        items.removeAt( idx.row() );
-        endRemoveRows();
-    }
-}
-
-int MLModel::itemId( const QModelIndex &index ) const
-{
-    return getItem( index )->id();
-}
-
-input_item_t * MLModel::getInputItem( const QModelIndex &index ) const
-{
-    return getItem( index )->inputItem();
+    /* !warn probably not a good idea to expose this as public method */
+    if ( row < 0 || count < 0 ) return false;
+    beginRemoveRows( parent, row, row );
+    MLItem *item = items.takeAt( row );
+    assert( item );
+    if ( likely( item ) ) delete item;
+    endRemoveRows();
+    return true;
 }
 
 QVariant MLModel::data( const QModelIndex &index, const int role ) const
@@ -274,13 +315,25 @@ QVariant MLModel::data( const QModelIndex &index, const int role ) const
         {
             MLItem *it = static_cast<MLItem*>( index.internalPointer() );
             if( !it ) return QVariant();
-            QVariant tmp = it->data( index.column() );
+            QVariant tmp = it->data( columnType( index.column() ) );
             return tmp;
         }
+        else if( role == Qt::DecorationRole && index.column() == 0  )
+        {
+            /*
+                FIXME: (see ml_type_e)
+                media->type uses flags for media type information
+            */
+            return QVariant( icons[ getInputItem(index)->i_type ] );
+        }
         else if( role == IsLeafNodeRole )
-            return QVariant( true );
+            return isLeaf( index );
         else if( role == IsCurrentsParentNodeRole )
-            return QVariant( false );
+            return isParent( index, currentIndex() );
+        else if( role == IsCurrentRole )
+        {
+            return QVariant( isCurrent( index ) );
+        }
     }
     return QVariant();
 }
@@ -299,12 +352,9 @@ bool MLModel::setData( const QModelIndex &idx, const QVariant &value,
  * @brief Insert a media to the model in a given row
  * @param p_media the media to append
  * @param row the future row for this media, -1 to append at the end
- * @param bSignal signal Qt that the model has been modified,
- *                should NOT be used by the user
  * @return a VLC error code
  */
-int MLModel::insertMedia( ml_media_t *p_media, int row,
-                                bool bSignal )
+int MLModel::insertMedia( ml_media_t *p_media, int row )
 {
     // Some checks
     if( !p_media || row < -1 || row > rowCount() )
@@ -313,105 +363,19 @@ int MLModel::insertMedia( ml_media_t *p_media, int row,
     if( row == -1 )
         row = rowCount();
 
-    if( bSignal )
-        beginInsertRows( createIndex( -1, -1 ), row, row );
-
     // Create and insert the item
-    MLItem *item = new MLItem( this, p_intf, p_media, NULL );
+    MLItem *item = new MLItem( p_intf, p_media, NULL );
     items.append( item );
 
-    if( bSignal )
-        endInsertRows();
-
     return VLC_SUCCESS;
-}
-
-/**
- * @brief Append a media to the model
- * @param p_media the media to append
- * @return see insertMedia
- * @note Always signals. Do not use in a loop.
- */
-int MLModel::appendMedia( ml_media_t *p_media )
-{
-    return insertMedia( p_media, -1, true );
-}
-
-/**
- * @brief Insert all medias from an array to the model
- * @param p_media_array the medias to append
- * @return see insertMedia
- * @note if bSignal==true, then it signals only once
- */
-int MLModel::insertMediaArray( vlc_array_t *p_media_array,
-                                     int row, bool bSignal )
-{
-    int i_ok = VLC_SUCCESS;
-    int count = vlc_array_count( p_media_array );
-
-    if( !count )
-        return i_ok;
-
-    if( row == -1 )
-        row = rowCount();
-
-    // Signal Qt that we will insert rows
-    if( bSignal )
-        beginInsertRows( createIndex( -1, -1 ), row, row + count-1 );
-
-    // Loop
-    for( int i = 0; i < count; ++i )
-    {
-        i_ok = insertMedia( (ml_media_t*)
-            vlc_array_item_at_index( p_media_array, i ), row + i, false );
-        if( i_ok != VLC_SUCCESS )
-            break;
-    }
-
-    if( bSignal )
-        endInsertRows();
-
-    return i_ok;
-}
-
-/**
- * @brief Insert the media contained in a result to the model
- * @param p_result the media to append is p_result->value.p_media
- * @param row the future row for this media
- * @param bSignal signal Qt that the model has been modified,
- *                should NOT be used by the user
- * @return a VLC error code
- */
-int MLModel::insertResult( const ml_result_t *p_result, int row,
-                                 bool bSignal )
-{
-    if( !p_result || p_result->type != ML_TYPE_MEDIA )
-        return VLC_EGENERIC;
-    else
-        return insertMedia( p_result->value.p_media, row, bSignal );
-}
-
-/**
- * @brief Append the media contained in a result to the model
- * @param p_result the media to append is p_result->value.p_media
- * @param row the future row for this media
- * @return a VLC error code
- * @note Always signals. Do not use in a loop.
- */
-inline int MLModel::appendResult( const ml_result_t *p_result )
-{
-    return insertResult( p_result, -1, true );
 }
 
 /**
  * @brief Insert all medias from a result array to the model
  * @param p_result_array the medias to append
  * @return see insertMedia
- * @note if bSignal==true, then it signals only once
- *       not media or NULL items are skipped
  */
-int MLModel::insertResultArray( vlc_array_t *p_result_array,
-                                      int row, bool bSignal )
+int MLModel::insertResultArray( vlc_array_t *p_result_array, int row )
 {
     int i_ok = VLC_SUCCESS;
     int count = vlc_array_count( p_result_array );
@@ -419,12 +383,12 @@ int MLModel::insertResultArray( vlc_array_t *p_result_array,
     if( !count )
         return i_ok;
 
+    emit layoutAboutToBeChanged();
     if( row == -1 )
         row = rowCount();
 
     // Signal Qt that we will insert rows
-    if( bSignal )
-        beginInsertRows( createIndex( -1, -1 ), row, row + count-1 );
+    beginInsertRows( createIndex( -1, -1 ), row, row + count-1 );
 
     // Loop and insert
     for( int i = 0; i < count; ++i )
@@ -433,15 +397,48 @@ int MLModel::insertResultArray( vlc_array_t *p_result_array,
                         vlc_array_item_at_index( p_result_array, i );
         if( !p_result || p_result->type != ML_TYPE_MEDIA )
             continue;
-        i_ok = insertMedia( p_result->value.p_media, row + i, false );
+        i_ok = insertMedia( p_result->value.p_media, row + i );
         if( i_ok != VLC_SUCCESS )
             break;
     }
     // Signal we're done
-    if( bSignal )
-        endInsertRows();
+    endInsertRows();
+
+    emit layoutChanged();
 
     return i_ok;
+}
+
+bool MLModel::event( QEvent *event )
+{
+    if ( event->type() == MLEvent::MediaAdded_Type )
+    {
+        event->accept();
+        MLEvent *e = static_cast<MLEvent *>(event);
+        vlc_array_t* p_result = vlc_array_new();
+        if ( ml_FindMedia( e->p_ml, p_result, ML_ID, e->ml_media_id ) == VLC_SUCCESS )
+        {
+            insertResultArray( p_result );
+            ml_DestroyResultArray( p_result );
+        }
+        vlc_array_destroy( p_result );
+        return true;
+    }
+    else if( event->type() == MLEvent::MediaRemoved_Type )
+    {
+        event->accept();
+        MLEvent *e = static_cast<MLEvent *>(event);
+        removeRow( getIndexByMLID( e->ml_media_id ).row() );
+        return true;
+    }
+    else if( event->type() == MLEvent::MediaUpdated_Type )
+    {
+        event->accept();
+        /* Never implemented... */
+        return true;
+    }
+
+    return VLCModel::event( event );
 }
 
 /** **************************************************************************
@@ -496,46 +493,33 @@ static void AddItemToPlaylist( int i_media_id, bool bPlay, media_library_t* p_ml
     vlc_gc_decref( p_item );
 }
 
-void MLModel::activateItem( const QModelIndex &index )
+void MLModel::activateItem( const QModelIndex &idx )
 {
-    play( index );
+    if( !idx.isValid() ) return;
+    AddItemToPlaylist( itemId( idx, MLMEDIA_ID ), true, p_ml, true );
 }
 
-void MLModel::play( const QModelIndex &idx )
+void MLModel::action( QAction *action, const QModelIndexList &indexes )
 {
-    if( !idx.isValid() )
-        return;
-    MLItem *item = static_cast< MLItem* >( idx.internalPointer() );
-    if( !item )
-        return;
-    AddItemToPlaylist( item->id(), true, p_ml, true );
-}
-
-QString MLModel::getURI( const QModelIndex &index ) const
-{
-    return QString();
-}
-
-void MLModel::actionSlot( QAction *action )
-{
-    QString name;
-    QStringList mrls;
-    QModelIndex index;
-    playlist_item_t *p_item;
-
     actionsContainerType a = action->data().value<actionsContainerType>();
     switch ( a.action )
     {
 
     case actionsContainerType::ACTION_PLAY:
-        play( a.indexes.first() );
+        if ( ! indexes.empty() && indexes.first().isValid() )
+            activateItem( indexes.first() );
         break;
 
     case actionsContainerType::ACTION_ADDTOPLAYLIST:
+        foreach( const QModelIndex &index, indexes )
+        {
+            if( !index.isValid() ) break;
+            AddItemToPlaylist( itemId( index, MLMEDIA_ID ), false, p_ml, true );
+        }
         break;
 
     case actionsContainerType::ACTION_REMOVE:
-        doDelete( a.indexes );
+        doDelete( indexes );
         break;
 
     case actionsContainerType::ACTION_SORT:
@@ -563,9 +547,8 @@ bool MLModel::canEdit() const
 
 bool MLModel::isCurrentItem( const QModelIndex &index, playLocation where ) const
 {
-    Q_UNUSED( index );
-    if ( where == IN_MEDIALIBRARY )
-        return true;
+    if ( where == IN_SQLMEDIALIB )
+        return index.isValid();
     return false;
 }
 
@@ -575,10 +558,31 @@ QModelIndex MLModel::getIndexByMLID( int id ) const
     {
         QModelIndex idx = index( i, 0 );
         MLItem *item = static_cast< MLItem* >( idx.internalPointer() );
-        if( item->id() == id )
-            return idx;
+        if( item->id( MLMEDIA_ID ) == id ) return idx;
     }
+
     return QModelIndex();
+}
+
+bool MLModel::isParent( const QModelIndex &index, const QModelIndex &current) const
+{
+    Q_UNUSED( index ); Q_UNUSED( current );
+    return false;
+}
+
+bool MLModel::isLeaf( const QModelIndex &index ) const
+{
+    Q_UNUSED( index );
+    return true;
+}
+
+/* ML Callbacks handling */
+
+inline void postMLEvent( vlc_object_t *p_this, QEvent::Type type, void *data, int32_t i )
+{
+    MLModel* p_model = static_cast<MLModel*>(data);
+    media_library_t *p_ml = (media_library_t *) p_this;
+    QApplication::postEvent( p_model, new MLEvent( type, p_ml, i ) );
 }
 
 static int mediaAdded( vlc_object_t *p_this, char const *psz_var,
@@ -586,20 +590,7 @@ static int mediaAdded( vlc_object_t *p_this, char const *psz_var,
                                   void *data )
 {
     VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
-
-    int ret = VLC_SUCCESS;
-    media_library_t *p_ml = ( media_library_t* )p_this;
-    MLModel* p_model = ( MLModel* )data;
-    vlc_array_t* p_result = vlc_array_new();
-    ret = ml_FindMedia( p_ml, p_result, ML_ID, newval.i_int );
-    if( ret != VLC_SUCCESS )
-    {
-        vlc_array_destroy( p_result );
-        return VLC_EGENERIC;
-    }
-    p_model->insertResultArray( p_result );
-    ml_DestroyResultArray( p_result );
-    vlc_array_destroy( p_result );
+    postMLEvent( p_this, MLEvent::MediaAdded_Type, data, newval.i_int );
     return VLC_SUCCESS;
 }
 
@@ -607,12 +598,8 @@ static int mediaDeleted( vlc_object_t *p_this, char const *psz_var,
                                   vlc_value_t oldval, vlc_value_t newval,
                                   void *data )
 {
-    VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
-
-    MLModel* p_model = ( MLModel* )data;
-    QModelIndex remove_idx = p_model->getIndexByMLID( newval.i_int );
-    if( remove_idx.isValid() )
-        p_model->remove( remove_idx );
+    VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
+    postMLEvent( p_this, MLEvent::MediaRemoved_Type, data, newval.i_int );
     return VLC_SUCCESS;
 }
 
@@ -620,9 +607,8 @@ static int mediaUpdated( vlc_object_t *p_this, char const *psz_var,
                                   vlc_value_t oldval, vlc_value_t newval,
                                   void *data )
 {
-    VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
-    VLC_UNUSED( newval ); VLC_UNUSED( data );
-
+    VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
+    postMLEvent( p_this, MLEvent::MediaUpdated_Type, data, newval.i_int );
     return VLC_SUCCESS;
 }
 

@@ -77,7 +77,6 @@ protected:
     virtual void closeEvent( QCloseEvent * );
 private slots:
     void changeView( const QModelIndex& index );
-    void clearPlaylist();
 
     friend class PlaylistDialog;
 };
@@ -119,14 +118,16 @@ private:
     bool b_arrow;
 };
 
-class PLModel;
+class VLCProxyModel;
 class QHBoxLayout;
+
 class LocationBar : public QWidget
 {
     Q_OBJECT
 public:
-    LocationBar( PLModel * );
+    LocationBar( VLCProxyModel * );
     void setIndex( const QModelIndex & );
+    void setModel( VLCProxyModel * _model ) { model = _model; };
     virtual QSize sizeHint() const;
 protected:
     virtual void resizeEvent ( QResizeEvent * event );
@@ -134,7 +135,7 @@ protected:
 private:
     void layOut( const QSize& size );
 
-    PLModel *model;
+    VLCProxyModel *model;
     QSignalMapper *mapper;
     QWidgetList buttons;
     QList<QAction*> actions;

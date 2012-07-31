@@ -64,15 +64,16 @@
 
 #include <assert.h>
 
+/* local helper */
+inline QModelIndex popupIndex( QAbstractItemView *view );
+
 StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   intf_thread_t *_p_intf,
                                   playlist_item_t *p_root,
                                   PLSelector *_p_selector,
-                                  PLModel *_p_model,
-                                  MLModel *_p_plmodel)
+                                  VLCProxyModel *_p_model )
                 : QWidget( _parent ),
                   model( _p_model ),
-                  mlmodel( _p_plmodel),
                   p_intf( _p_intf ),
                   p_selector( _p_selector )
 {
@@ -85,8 +86,8 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     listView    = NULL;
     picFlowView = NULL;
 
-    currentRootIndexId  = -1;
-    lastActivatedId     = -1;
+    currentRootIndexPLId  = -1;
+    lastActivatedPLItemId     = -1;
 
     QList<QString> frames;
     frames << ":/util/wait1";
@@ -105,9 +106,9 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     DCONNECT( THEMIM, leafBecameParent( int ),
               this, browseInto( int ) );
 
-    CONNECT( model, currentIndexChanged( const QModelIndex& ),
+    CONNECT( model->sigs, currentIndexChanged( const QModelIndex& ),
              this, handleExpansion( const QModelIndex& ) );
-    CONNECT( model, rootIndexChanged(), this, browseInto() );
+    CONNECT( model->sigs, rootIndexChanged(), this, browseInto() );
 
     setRootItem( p_root, false );
 }
@@ -131,46 +132,36 @@ void StandardPLPanel::gotoPlayingItem()
 void StandardPLPanel::handleExpansion( const QModelIndex& index )
 {
     assert( currentView );
-    if( currentRootIndexId != -1 && currentRootIndexId != model->itemId( index.parent() ) )
+    if( currentRootIndexPLId != -1 && currentRootIndexPLId != model->itemId( index.parent(), PLAYLIST_ID ) )
         browseInto( index.parent() );
     currentView->scrollTo( index );
 }
 
 void StandardPLPanel::popupPlView( const QPoint &point )
 {
-    QModelIndex index = currentView->indexAt( point );
     QPoint globalPoint = currentView->viewport()->mapToGlobal( point );
-    QItemSelectionModel *selection = currentView->selectionModel();
-    QModelIndexList list = selection->selectedRows();
-
-    if( !popup( index, globalPoint, list ) )
-        VLCMenuBar::PopupMenu( p_intf, true );
+    if( !popup( globalPoint ) ) VLCMenuBar::PopupMenu( p_intf, true );
 }
 
 /*********** Popup *********/
-bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &selectionlist )
+bool StandardPLPanel::popup( const QPoint &point )
 {
-    VLCModel *model = qobject_cast<VLCModel*>(currentView->model());
-    QModelIndexList callerAsList;
-    callerAsList << ( index.isValid() ? index : QModelIndex() );
-    popupIndex = index; /* suitable for modal only */
-
-#define ADD_MENU_ENTRY( icon, title, act, data ) \
+    QModelIndex index = popupIndex( currentView ); /* index for menu logic only. Do not store.*/
+#define ADD_MENU_ENTRY( icon, title, act ) \
     action = menu.addAction( icon, title ); \
     container.action = act; \
-    container.indexes = data; \
     action->setData( QVariant::fromValue( container ) )
 
     /* */
     QMenu menu;
     QAction *action;
-    PLModel::actionsContainerType container;
+    VLCModelSubInterface::actionsContainerType container;
 
     /* Play/Stream/Info static actions */
     if( index.isValid() )
     {
         ADD_MENU_ENTRY( QIcon( ":/menu/play" ), qtr(I_POP_PLAY),
-                        container.ACTION_PLAY, callerAsList );
+                        container.ACTION_PLAY );
 
         menu.addAction( QIcon( ":/menu/stream" ), qtr(I_POP_STREAM),
                         this, SLOT( popupStream() ) );
@@ -198,13 +189,13 @@ bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, con
                             this, SLOT( popupPromptAndCreateNode() ) );
 
         menu.addSeparator();
-        if( model->isCurrentItem( model->rootIndex(), PLModel::IN_PLAYLIST ) )
+        if( model->isCurrentItem( model->rootIndex(), VLCModelSubInterface::IN_PLAYLIST ) )
         {
             menu.addAction( addIcon, qtr(I_PL_ADDF), THEDP, SLOT( simplePLAppendDialog()) );
             menu.addAction( addIcon, qtr(I_PL_ADDDIR), THEDP, SLOT( PLAppendDir()) );
             menu.addAction( addIcon, qtr(I_OP_ADVOP), THEDP, SLOT( PLAppendDialog()) );
         }
-        else if( model->isCurrentItem( model->rootIndex(), PLModel::IN_MEDIALIBRARY ) )
+        else if( model->isCurrentItem( model->rootIndex(), VLCModelSubInterface::IN_MEDIALIBRARY ) )
         {
             menu.addAction( addIcon, qtr(I_PL_ADDF), THEDP, SLOT( simpleMLAppendDialog()) );
             menu.addAction( addIcon, qtr(I_PL_ADDDIR), THEDP, SLOT( MLAppendDir() ) );
@@ -214,10 +205,10 @@ bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, con
 
     if( index.isValid() )
     {
-        if( !model->isCurrentItem( model->rootIndex(), PLModel::IN_PLAYLIST ) )
+        if( !model->isCurrentItem( model->rootIndex(), VLCModelSubInterface::IN_PLAYLIST ) )
         {
             ADD_MENU_ENTRY( QIcon(), qtr(I_PL_ADDPL),
-                            container.ACTION_ADDTOPLAYLIST, selectionlist );
+                            container.ACTION_ADDTOPLAYLIST );
         }
     }
 
@@ -227,12 +218,12 @@ bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, con
     if( index.isValid() )
     {
         ADD_MENU_ENTRY( QIcon( ":/buttons/playlist/playlist_remove" ), qtr(I_POP_DEL),
-                        container.ACTION_REMOVE, selectionlist );
+                        container.ACTION_REMOVE );
     }
 
     if( model->canEdit() ) {
         menu.addAction( QIcon( ":/toolbar/clear" ), qtr("Clear the playlist"),
-                        model, SLOT( clearPlaylist() ) );
+                        model->sigs, SLOT( clearPlaylistSlot() ) );
     }
 
     menu.addSeparator();
@@ -243,7 +234,6 @@ bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, con
     QList<int> sortingColumns;
     sortingColumns << COLUMN_TITLE << COLUMN_ARTIST << COLUMN_ALBUM << COLUMN_TRACK_NUMBER << COLUMN_URI;
     container.action = container.ACTION_SORT;
-    container.indexes = callerAsList;
     foreach( int Column, sortingColumns )
     {
         action = sortingMenu->addAction( qfu( psz_column_title( Column ) ) + " " + qtr("Ascending") );
@@ -262,7 +252,7 @@ bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, con
     zoomMenu->addAction( qtr( "Decrease" ), this, SLOT( decreaseZoom() ) );
     menu.addMenu( zoomMenu );
 
-    CONNECT( &menu, triggered( QAction * ), model, actionSlot( QAction * ) );
+    CONNECT( &menu, triggered( QAction * ), this, popupAction( QAction * ) );
 
     menu.addMenu( StandardPLPanel::viewSelectionMenu( this ) );
 
@@ -274,6 +264,12 @@ bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, con
     else return false;
 
 #undef ADD_MENU_ENTRY
+}
+
+void StandardPLPanel::popupAction( QAction *action )
+{
+    QModelIndexList list = currentView->selectionModel()->selectedRows();
+    model->action( action, list );
 }
 
 QMenu* StandardPLPanel::viewSelectionMenu( StandardPLPanel *panel )
@@ -295,6 +291,15 @@ QMenu* StandardPLPanel::viewSelectionMenu( StandardPLPanel *panel )
             action->setChecked( true );
     }
     return viewMenu;
+}
+
+inline QModelIndex popupIndex( QAbstractItemView *view )
+{
+    QModelIndexList list = view->selectionModel()->selectedIndexes();
+    if ( list.isEmpty() )
+        return QModelIndex();
+    else
+        return list.first();
 }
 
 void StandardPLPanel::popupSelectColumn( QPoint )
@@ -322,15 +327,16 @@ void StandardPLPanel::popupPromptAndCreateNode()
         qtr( I_NEW_DIR ), qtr( I_NEW_DIR_NAME ),
         QLineEdit::Normal, QString(), &ok);
     if ( !ok ) return;
-    qobject_cast<VLCModel *>(currentView->model())->createNode( popupIndex, name );
+    qobject_cast<VLCProxyModel *>(currentView->model())->createNode( popupIndex( currentView ), name );
 }
 
 void StandardPLPanel::popupInfoDialog()
 {
-    if( popupIndex.isValid() )
+    QModelIndex index = popupIndex( currentView );
+    if( index.isValid() )
     {
-        VLCModel *model = qobject_cast<VLCModel *>(currentView->model());
-        input_item_t* p_input = model->getInputItem( popupIndex );
+        VLCProxyModel *model = qobject_cast<VLCProxyModel *>(currentView->model());
+        input_item_t* p_input = model->getInputItem( index );
         MediaInfoDialog *mid = new MediaInfoDialog( p_intf, p_input );
         mid->setParent( PlaylistDialog::getInstance( p_intf ),
                         Qt::Dialog );
@@ -340,8 +346,8 @@ void StandardPLPanel::popupInfoDialog()
 
 void StandardPLPanel::popupExplore()
 {
-    VLCModel *model = qobject_cast<VLCModel *>(currentView->model());
-    QString uri = model->getURI( popupIndex );
+    VLCProxyModel *model = qobject_cast<VLCProxyModel *>(currentView->model());
+    QString uri = model->getURI( popupIndex( currentView ) );
     char *path = NULL;
 
     if( ! uri.isEmpty() )
@@ -358,16 +364,16 @@ void StandardPLPanel::popupExplore()
 
 void StandardPLPanel::popupStream()
 {
-    VLCModel *model = qobject_cast<VLCModel *>(currentView->model());
-    QString uri = model->getURI( popupIndex );
+    VLCProxyModel *model = qobject_cast<VLCProxyModel *>(currentView->model());
+    QString uri = model->getURI( popupIndex( currentView ) );
     if ( ! uri.isEmpty() )
         THEDP->streamingDialog( NULL, uri, false );
 }
 
 void StandardPLPanel::popupSave()
 {
-    VLCModel *model = qobject_cast<VLCModel *>(currentView->model());
-    QString uri = model->getURI( popupIndex );
+    VLCProxyModel *model = qobject_cast<VLCProxyModel *>(currentView->model());
+    QString uri = model->getURI( popupIndex( currentView ) );
     if ( ! uri.isEmpty() )
         THEDP->streamingDialog( NULL, uri );
 }
@@ -390,7 +396,7 @@ void StandardPLPanel::search( const QString& searchText )
         bool flat = ( currentView == iconView ||
                       currentView == listView ||
                       currentView == picFlowView );
-        model->search( searchText,
+        model->filter( searchText,
                        flat ? currentView->rootIndex() : QModelIndex(),
                        !flat );
     }
@@ -419,16 +425,16 @@ void StandardPLPanel::setRootItem( playlist_item_t *p_item, bool b )
     if( b )
     {
         msg_Dbg( p_intf, "Setting the SQL ML" );
-        currentView->setModel( mlmodel );
+        if ( model->switchToModel( VLCProxyModel::SQLML_MODEL ) )
+            currentView->setModel( model );
     }
     else
 #else
     Q_UNUSED( b );
 #endif
     {
-        if( currentView->model() != model )
-            currentView->setModel( model );
-        model->rebuild( p_item );
+        if ( model->switchToModel( VLCProxyModel::PL_MODEL ) )
+            model->rebuild( p_item );
     }
 }
 
@@ -441,14 +447,15 @@ void StandardPLPanel::browseInto( const QModelIndex &index )
 
         /* When going toward root in LocationBar, scroll to the item
            that was previously as root */
-        QModelIndex newIndex = model->index(currentRootIndexId,0);
+        QModelIndex newIndex = model->indexByPLID(currentRootIndexPLId,0);
         while( newIndex.isValid() && (newIndex.parent() != index) )
             newIndex = newIndex.parent();
         if( newIndex.isValid() )
             currentView->scrollTo( newIndex );
 
         /* Store new rootindexid*/
-        currentRootIndexId = model->itemId( index );
+        currentRootIndexPLId = model->itemId( index, PLAYLIST_ID );
+
         model->ensureArtRequested( index );
     }
 
@@ -457,8 +464,8 @@ void StandardPLPanel::browseInto( const QModelIndex &index )
 
 void StandardPLPanel::browseInto()
 {
-    browseInto( (currentRootIndexId != -1 && currentView != treeView) ?
-                 model->index( currentRootIndexId, 0 ) :
+    browseInto( (currentRootIndexPLId != -1 && currentView != treeView) ?
+                 model->indexByPLID( currentRootIndexPLId, 0 ) :
                  QModelIndex() );
 }
 
@@ -532,8 +539,7 @@ bool StandardPLPanel::eventFilter ( QObject *obj, QEvent * event )
 
 void StandardPLPanel::deleteSelection()
 {
-    QItemSelectionModel *selection = currentView->selectionModel();
-    QModelIndexList list = selection->selectedIndexes();
+    QModelIndexList list = currentView->selectionModel()->selectedIndexes();
     model->doDelete( list );
 }
 
@@ -614,23 +620,6 @@ void StandardPLPanel::updateZoom( int i )
 #undef A_ZOOM
 }
 
-void StandardPLPanel::changeModel( bool b_ml )
-{
-#ifdef MEDIA_LIBRARY
-    VLCModel *mod;
-    if( b_ml )
-        mod = mlmodel;
-    else
-        mod = model;
-    if( currentView->model() != mod )
-        currentView->setModel( mod );
-#else
-    Q_UNUSED( b_ml );
-    if( currentView->model() != model )
-        currentView->setModel( model );
-#endif
-}
-
 void StandardPLPanel::showView( int i_view )
 {
     bool b_treeViewCreated = false;
@@ -671,7 +660,7 @@ void StandardPLPanel::showView( int i_view )
     }
     }
 
-    changeModel( false );
+    currentView->setModel( model );
 
     /* Restoring the header Columns must come after changeModel */
     if( b_treeViewCreated )
@@ -755,7 +744,7 @@ void StandardPLPanel::activate( const QModelIndex &index )
     if( currentView->model() == model )
     {
         /* If we are not a leaf node */
-        if( !index.data( PLModel::IsLeafNodeRole ).toBool() )
+        if( !index.data( VLCModelSubInterface::IsLeafNodeRole ).toBool() )
         {
             if( currentView != treeView )
                 browseInto( index );
@@ -763,25 +752,26 @@ void StandardPLPanel::activate( const QModelIndex &index )
         else
         {
             playlist_Lock( THEPL );
-            playlist_item_t *p_item = playlist_ItemGetById( THEPL, model->itemId( index ) );
+            playlist_item_t *p_item = playlist_ItemGetById( THEPL, model->itemId( index, PLAYLIST_ID ) );
             p_item->i_flags |= PLAYLIST_SUBITEM_STOP_FLAG;
-            lastActivatedId = p_item->i_id;
+            lastActivatedPLItemId = p_item->i_id;
             playlist_Unlock( THEPL );
-            model->activateItem( index );
+            if ( index.isValid() )
+                model->activateItem( index );
         }
     }
 }
 
-void StandardPLPanel::browseInto( int i_id )
+void StandardPLPanel::browseInto( int i_pl_item_id )
 {
-    if( i_id != lastActivatedId ) return;
+    if( i_pl_item_id != lastActivatedPLItemId ) return;
 
-    QModelIndex index = model->index( i_id, 0 );
+    QModelIndex index = model->indexByPLID( i_pl_item_id, 0 );
 
     if( currentView == treeView )
         treeView->setExpanded( index, true );
     else
         browseInto( index );
 
-    lastActivatedId = -1;
+    lastActivatedPLItemId = -1;
 }
