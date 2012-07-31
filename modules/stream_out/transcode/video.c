@@ -601,15 +601,16 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
 
         if( p_sys->b_master_sync )
         {
-            mtime_t i_video_drift;
             mtime_t i_master_drift = p_sys->i_master_drift;
-            mtime_t i_pts;
+            mtime_t i_pts = date_Get( &id->interpolated_pts ) + 1;
+            mtime_t i_video_drift = p_pic->date - i_pts;
 
-            i_pts = date_Get( &id->interpolated_pts ) + 1;
-            if ( unlikely( p_pic->date - i_pts > MASTER_SYNC_MAX_DRIFT
-                  || p_pic->date - i_pts < -MASTER_SYNC_MAX_DRIFT ) )
+            if ( unlikely( i_video_drift > MASTER_SYNC_MAX_DRIFT
+                  || i_video_drift < -MASTER_SYNC_MAX_DRIFT ) )
             {
-                msg_Dbg( p_stream, "drift is too high, resetting master sync" );
+                msg_Dbg( p_stream,
+                    "drift is too high (%"PRId64", resetting master sync",
+                    i_video_drift );
                 date_Set( &id->interpolated_pts, p_pic->date );
                 i_pts = p_pic->date + 1;
             }
@@ -717,10 +718,13 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
         if( p_sys->b_master_sync )
         {
             mtime_t i_pts = date_Get( &id->interpolated_pts ) + 1;
-            if (unlikely ( p_pic->date - i_pts > MASTER_SYNC_MAX_DRIFT
-                  || p_pic->date - i_pts < -MASTER_SYNC_MAX_DRIFT ) )
+            mtime_t i_video_drift = p_pic->date - i_pts;
+            if (unlikely ( i_video_drift  > MASTER_SYNC_MAX_DRIFT
+                  || i_video_drift < -MASTER_SYNC_MAX_DRIFT ) )
             {
-                msg_Dbg( p_stream, "drift is too high, resetting master sync" );
+                msg_Dbg( p_stream,
+                    "drift is too high (%"PRId64"), resetting master sync",
+                    i_video_drift );
                 date_Set( &id->interpolated_pts, p_pic->date );
                 i_pts = p_pic->date + 1;
             }
