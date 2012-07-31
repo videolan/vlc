@@ -1000,7 +1000,7 @@ static VLCWizard *_o_sharedInstance = nil;
             NSBeginInformationalAlertSheet(_NS("Invalid selection"), _NS("OK"),
                 @"", @"", o_wizard_window, nil, nil, nil, nil, _NS("The "
                 "chosen codecs are not compatible with each other. For example: "
-                "It is impossible to mix uncompressed audio with any video codec.\n\n"
+                "It is not possible to mix uncompressed audio with any video codec.\n\n"
                 "Correct your selection and try again."));
         }
 
