@@ -62,6 +62,8 @@ MLModel::MLModel( intf_thread_t* _p_intf, QObject *parent )
         :VLCModel( _p_intf, parent )
 {
     p_ml = ml_Get( p_intf );
+    if ( !p_ml ) return;
+
     vlc_array_t *p_result_array = vlc_array_new();
     ml_Find( p_ml, p_result_array, ML_MEDIA );
     insertResultArray( p_result_array );
@@ -76,6 +78,7 @@ MLModel::MLModel( intf_thread_t* _p_intf, QObject *parent )
  */
 MLModel::~MLModel()
 {
+    if ( !p_ml ) return;
     var_DelCallback( p_ml, "media-meta-change", mediaUpdated, this );
     var_DelCallback( p_ml, "media-deleted", mediaDeleted, this );
     var_DelCallback( p_ml, "media-added", mediaAdded, this );
