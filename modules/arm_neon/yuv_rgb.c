@@ -125,7 +125,7 @@ static int Open (vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
 
-    if (!(vlc_CPU() & CPU_CAPABILITY_NEON))
+    if (!vlc_CPU_ARM_NEON())
         return VLC_EGENERIC;
 
     if (((filter->fmt_in.video.i_width | filter->fmt_in.video.i_height) & 1)

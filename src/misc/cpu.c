@@ -317,14 +317,11 @@ out:
 #   endif
 
 #elif defined ( __arm__)
-    #ifdef __ARM_NEON__
-        i_capabilities |= CPU_CAPABILITY_NEON;
-    #elif defined (CAN_COMPILE_NEON)
-        #ifdef __ANDROID__
-            if (android_getCpuFeatures() & ANDROID_CPU_ARM_FEATURE_NEON)
-                i_capabilities |= CPU_CAPABILITY_NEON;
-        #endif
-    #endif
+# ifdef __ANDROID__
+    if (android_getCpuFeatures() & ANDROID_CPU_ARM_FEATURE_NEON)
+        i_capabilities |= VLC_CPU_ARM_NEON;
+# endif
+
 #endif
 
     cpu_flags = i_capabilities;
@@ -347,14 +344,14 @@ unsigned vlc_CPU (void)
 
 void vlc_CPU_dump (vlc_object_t *obj)
 {
-    const unsigned flags = vlc_CPU();
     char buf[200], *p = buf;
 
+#if defined (__i386__) || defined (__x86_64__)
+    const unsigned flags = vlc_CPU();
 #define PRINT_CAPABILITY( capability, string ) \
     if (flags & (capability)) \
         p += sprintf (p, "%s ", (string) )
 
-#if defined (__i386__) || defined (__x86_64__)
     PRINT_CAPABILITY(CPU_CAPABILITY_MMX, "MMX");
     PRINT_CAPABILITY(CPU_CAPABILITY_3DNOW, "3DNow!");
     PRINT_CAPABILITY(CPU_CAPABILITY_MMXEXT, "MMXEXT");
@@ -367,13 +364,11 @@ void vlc_CPU_dump (vlc_object_t *obj)
     PRINT_CAPABILITY(CPU_CAPABILITY_SSE4A,  "SSE4A");
 
 #elif defined (__powerpc__) || defined (__ppc__) || defined (__ppc64__)
-    PRINT_CAPABILITY(CPU_CAPABILITY_ALTIVEC, "AltiVec");
+    if (vlc_CPU() & CPU_CAPABILITY_ALTIVEC)
+        p += sprintf (p, "AltiVec");
 
 #elif defined (__arm__)
-    PRINT_CAPABILITY(CPU_CAPABILITY_NEON, "NEONv1");
-
-#else
-    (void) flags;
+    if (vlc_CPU_ARM_NEON()) p += sprintf (p, "ARM_NEON ");
 
 #endif
 

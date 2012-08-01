@@ -1330,7 +1330,6 @@ asm volatile("ssat r0, #1, r0":::"r0"); /* assume ARMv6 */
   VLC_RESTORE_FLAGS
   AS_IF([test "$ac_cv_neon_inline" != "no"], [
     NEON_CFLAGS="$ac_cv_neon_inline"
-    AC_DEFINE([CAN_COMPILE_NEON], 1, [Define to 1 if NEON (and ARMv6) assembly is available with NEON_CFLAGS.])
   ])
 ], [
   ac_cv_neon_inline="no"

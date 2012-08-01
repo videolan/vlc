@@ -67,7 +67,13 @@ VLC_API unsigned vlc_CPU(void);
 #  else
 #   define HAVE_FPU 0
 #  endif
-#  define CPU_CAPABILITY_NEON    (1<<24)
+#  define VLC_CPU_ARM_NEON 2
+
+#  ifdef __ARM_NEON__
+#   define vlc_CPU_ARM_NEON() (1)
+#  else
+#   define vlc_CPU_ARM_NEON() ((vlc_CPU() & VLC_CPU_ARM_NEON) != 0)
+#  endif
 
 # elif defined (__sparc__)
 #  define HAVE_FPU 1

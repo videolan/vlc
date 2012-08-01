@@ -63,10 +63,8 @@ static void vlc_CPU_init (void)
         while ((cap = strsep (&p, " ")) != NULL)
         {
 #if defined (__arm__)
-# ifndef __ARM_NEON__
             if (!strcmp (cap, "neon"))
-                core_caps |= CPU_CAPABILITY_NEON;
-# endif
+                core_caps |= VLC_CPU_ARM_NEON;
 
 #elif defined (__i386__) || defined (__x86_64__)
 # ifndef __MMX__
@@ -122,12 +120,7 @@ static void vlc_CPU_init (void)
         all_caps = 0; /* Do not assume any capability! */
 
     /* Always enable capabilities that were forced during compilation */
-#if defined (__arm__)
-# ifdef __ARM_NEON__
-    all_caps |= CPU_CAPABILITY_NEON;
-# endif
-
-#elif defined (__i386__) || defined (__x86_64__)
+#if defined (__i386__) || defined (__x86_64__)
 # ifdef __MMX__
     all_caps |= CPU_CAPABILITY_MMX;
 # endif

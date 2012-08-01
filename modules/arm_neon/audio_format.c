@@ -45,7 +45,7 @@ static int Open (vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
 
-    if (!(vlc_CPU() & CPU_CAPABILITY_NEON))
+    if (!vlc_CPU_ARM_NEON())
         return VLC_EGENERIC;
     if (!AOUT_FMTS_SIMILAR (&filter->fmt_in.audio, &filter->fmt_out.audio))
         return VLC_EGENERIC;
