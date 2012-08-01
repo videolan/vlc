@@ -180,7 +180,7 @@ struct vlm_message_t
 };
 
 
-#ifdef __cpluplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -360,7 +360,7 @@ static inline void vlm_media_instance_Delete( vlm_media_instance_t *p_instance )
     free( p_instance );
 }
 
-#ifdef __cpluplus
+#ifdef __cplusplus
 }
 #endif
 
