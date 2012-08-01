@@ -151,7 +151,7 @@ struct block_sys_t
 
 static void CaptureBlockRelease( block_t *p_block )
 {
-    DeleteObject( ((block_sys_t *)p_block)->hbmp );
+    DeleteObject( ((struct block_sys_t *)p_block)->hbmp );
     free( p_block );
 }
 
@@ -159,7 +159,7 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     screen_data_t *p_data = p_sys->p_data;
-    block_sys_t *p_block;
+    struct block_sys_t *p_block;
     void *p_buffer;
     int i_buffer;
     HBITMAP hbmp;
@@ -214,7 +214,7 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
     }
 
     /* Build block */
-    if( !(p_block = malloc( sizeof( block_t ) + sizeof( block_sys_t ) )) )
+    if( !(p_block = malloc( sizeof( block_t ) + sizeof( struct block_sys_t ) )) )
         goto error;
 
     /* Fill all fields */
