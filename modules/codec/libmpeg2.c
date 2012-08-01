@@ -200,7 +200,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( cpu & CPU_CAPABILITY_MMXEXT )
         i_accel |= MPEG2_ACCEL_X86_MMXEXT;
 #elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
-    if( vlc_CPU() & CPU_CAPABILITY_ALTIVEC )
+    if( vlc_CPU_ALTIVEC() )
         i_accel |= MPEG2_ACCEL_PPC_ALTIVEC;
 
 #elif defined(__arm__)

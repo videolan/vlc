@@ -628,7 +628,7 @@ int Open( vlc_object_t *p_this )
     IVTCClearState( p_filter );
 
 #if defined(CAN_COMPILE_C_ALTIVEC)
-    if( chroma->pixel_size == 1 && (vlc_CPU() & CPU_CAPABILITY_ALTIVEC) )
+    if( chroma->pixel_size == 1 && vlc_CPU_ALTIVEC() )
     {
         p_sys->pf_merge = MergeAltivec;
         p_sys->pf_end_merge = NULL;

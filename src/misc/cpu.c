@@ -308,11 +308,11 @@ out:
     int i_error = sysctl( selectors, 2, &i_has_altivec, &i_length, NULL, 0);
 
     if( i_error == 0 && i_has_altivec != 0 )
-        i_capabilities |= CPU_CAPABILITY_ALTIVEC;
+        i_capabilities |= VLC_CPU_ALTIVEC;
 
 #   elif defined( CAN_COMPILE_ALTIVEC )
     if (vlc_CPU_check ("Altivec", Altivec_test))
-        i_capabilities |= CPU_CAPABILITY_ALTIVEC;
+        i_capabilities |= VLC_CPU_ALTIVEC;
 
 #   endif
 
@@ -364,8 +364,7 @@ void vlc_CPU_dump (vlc_object_t *obj)
     PRINT_CAPABILITY(CPU_CAPABILITY_SSE4A,  "SSE4A");
 
 #elif defined (__powerpc__) || defined (__ppc__) || defined (__ppc64__)
-    if (vlc_CPU() & CPU_CAPABILITY_ALTIVEC)
-        p += sprintf (p, "AltiVec");
+    if (vlc_CPU_ALTIVEC())  p += sprintf (p, "AltiVec");
 
 #elif defined (__arm__)
     if (vlc_CPU_ARM_NEON()) p += sprintf (p, "ARM_NEON ");

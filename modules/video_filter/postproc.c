@@ -142,7 +142,7 @@ static int OpenPostproc( vlc_object_t *p_this )
     if( i_cpu & CPU_CAPABILITY_3DNOW )
         i_flags |= PP_CPU_CAPS_3DNOW;
 #elif defined(__ppc__) || defined(__ppc64__) || defined(__powerpc__)
-    if( vlc_CPU() & CPU_CAPABILITY_ALTIVEC )
+    if( vlc_CPU_ALTIVEC() )
         i_flags |= PP_CPU_CAPS_ALTIVEC;
 #endif
 

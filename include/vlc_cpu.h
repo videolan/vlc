@@ -59,7 +59,13 @@ VLC_API unsigned vlc_CPU(void);
 
 # elif defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)
 #  define HAVE_FPU 1
-#  define CPU_CAPABILITY_ALTIVEC (1<<16)
+#  define VLC_CPU_ALTIVEC 2
+
+#  ifdef ALTIVEC
+#   define vlc_CPU_ALTIVEC() (1)
+#  else
+#   define vlc_CPU_ALTIVEC() ((vlc_CPU() & VLC_CPU_ALTIVEC) != 0)
+#  endif
 
 # elif defined (__arm__)
 #  if defined (__VFP_FP__) && !defined (__SOFTFP__)

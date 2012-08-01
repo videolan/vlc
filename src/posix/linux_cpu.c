@@ -106,7 +106,7 @@ static void vlc_CPU_init (void)
 
 #elif defined (__powerpc__) || defined (__powerpc64__)
             if (!strcmp (cap, "altivec supported"))
-                core_caps |= CPU_CAPABILITY_ALTIVEC;
+                core_caps |= VLC_CPU_ALTIVEC;
 #endif
         }
 
