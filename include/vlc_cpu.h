@@ -20,13 +20,16 @@
 
 /**
  * \file
- * This file provides CPU-specific optimization flags.
+ * This file provides CPU features detection.
  */
 
 #ifndef VLC_CPU_H
 # define VLC_CPU_H 1
 
+VLC_API unsigned vlc_CPU(void);
+
 # if defined (__i386__) || defined (__x86_64__)
+#  define HAVE_FPU 1
 #  define CPU_CAPABILITY_MMX     (1<<3)
 #  define CPU_CAPABILITY_3DNOW   (1<<4)
 #  define CPU_CAPABILITY_MMXEXT  (1<<5)
@@ -54,41 +57,9 @@
 #  define VLC_SSE VLC_SSE_is_not_implemented_on_this_compiler
 # endif
 
-# else
-#  define CPU_CAPABILITY_MMX     (0)
-#  define CPU_CAPABILITY_3DNOW   (0)
-#  define CPU_CAPABILITY_MMXEXT  (0)
-#  define CPU_CAPABILITY_SSE     (0)
-#  define CPU_CAPABILITY_SSE2    (0)
-#  define CPU_CAPABILITY_SSE3    (0)
-#  define CPU_CAPABILITY_SSSE3   (0)
-#  define CPU_CAPABILITY_SSE4_1  (0)
-#  define CPU_CAPABILITY_SSE4_2  (0)
-#  define CPU_CAPABILITY_SSE4A   (0)
-# endif
-
-# if defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)
+# elif defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)
+#  define HAVE_FPU 1
 #  define CPU_CAPABILITY_ALTIVEC (1<<16)
-# else
-#  define CPU_CAPABILITY_ALTIVEC (0)
-# endif
-
-# if defined (__arm__)
-#  define CPU_CAPABILITY_NEON    (1<<24)
-# else
-#  define CPU_CAPABILITY_NEON    (0)
-# endif
-
-VLC_API unsigned vlc_CPU( void );
-
-/** Are floating point operations fast?
- * If this bit is not set, you should try to use fixed-point instead.
- */
-# if defined (__i386__) || defined (__x86_64__)
-#  define HAVE_FPU 1
-
-# elif defined (__powerpc__) || defined (__ppc__) || defined (__ppc64__)
-#  define HAVE_FPU 1
 
 # elif defined (__arm__)
 #  if defined (__VFP_FP__) && !defined (__SOFTFP__)
@@ -96,14 +67,19 @@ VLC_API unsigned vlc_CPU( void );
 #  else
 #   define HAVE_FPU 0
 #  endif
+#  define CPU_CAPABILITY_NEON    (1<<24)
 
 # elif defined (__sparc__)
 #  define HAVE_FPU 1
 
 # else
+/**
+ * Are single precision floating point operations "fast"?
+ * If this preprocessor constant is zero, floating point should be avoided
+ * (especially relevant for audio codecs).
+ */
 #  define HAVE_FPU 0
 
 # endif
 
 #endif /* !VLC_CPU_H */
-

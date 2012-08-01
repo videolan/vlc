@@ -229,9 +229,10 @@ static void CloseScaler( vlc_object_t *p_this )
  *****************************************************************************/
 static int GetSwsCpuMask(void)
 {
-    const unsigned int i_cpu = vlc_CPU();
     int i_sws_cpu = 0;
 
+#if defined(__i386__) || defined(__x86_64__)
+    const unsigned int i_cpu = vlc_CPU();
     if( i_cpu & CPU_CAPABILITY_MMX )
         i_sws_cpu |= SWS_CPU_CAPS_MMX;
 #if (LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0))
@@ -240,9 +241,10 @@ static int GetSwsCpuMask(void)
 #endif
     if( i_cpu & CPU_CAPABILITY_3DNOW )
         i_sws_cpu |= SWS_CPU_CAPS_3DNOW;
-
-    if( i_cpu & CPU_CAPABILITY_ALTIVEC )
+#elif defined(__ppc__) || defined(__ppc64__) || defined(__powerpc__)
+    if( vlc_CPU() & CPU_CAPABILITY_ALTIVEC )
         i_sws_cpu |= SWS_CPU_CAPS_ALTIVEC;
+#endif
 
     return i_sws_cpu;
 }

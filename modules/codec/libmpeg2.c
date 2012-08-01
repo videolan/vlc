@@ -192,35 +192,27 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_gop_user_data = 0;
 
 #if defined( __i386__ ) || defined( __x86_64__ )
-    if( vlc_CPU() & CPU_CAPABILITY_MMX )
-    {
+    unsigned cpu = vlc_CPU();
+    if( cpu & CPU_CAPABILITY_MMX )
         i_accel |= MPEG2_ACCEL_X86_MMX;
-    }
-
-    if( vlc_CPU() & CPU_CAPABILITY_3DNOW )
-    {
+    if( cpu & CPU_CAPABILITY_3DNOW )
         i_accel |= MPEG2_ACCEL_X86_3DNOW;
-    }
-
-    if( vlc_CPU() & CPU_CAPABILITY_MMXEXT )
-    {
+    if( cpu & CPU_CAPABILITY_MMXEXT )
         i_accel |= MPEG2_ACCEL_X86_MMXEXT;
-    }
-
 #elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
     if( vlc_CPU() & CPU_CAPABILITY_ALTIVEC )
-    {
         i_accel |= MPEG2_ACCEL_PPC_ALTIVEC;
-    }
 
-#elif defined(__arm__) && defined(MPEG2_ACCEL_ARM)
+#elif defined(__arm__)
+# ifdef MPEG2_ACCEL_ARM
     i_accel |= MPEG2_ACCEL_ARM;
-
+# endif
 # ifdef MPEG2_ACCEL_ARM_NEON
     if( vlc_CPU() & CPU_CAPABILITY_NEON )
 	i_accel |= MPEG2_ACCEL_ARM_NEON;
 # endif
 
+    /* TODO: sparc */
 #else
     /* If we do not know this CPU, trust libmpeg2's feature detection */
     i_accel = MPEG2_ACCEL_DETECT;
