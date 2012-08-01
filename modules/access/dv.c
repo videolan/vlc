@@ -57,7 +57,7 @@ static block_t *Block( access_t * );
 static int Control( access_t *, int, va_list );
 
 vlc_module_begin ()
-    set_description( N_("Digital Video (Firewire/ieee1394)  input") )
+    set_description( N_("Digital Video (Firewire/ieee1394) input") )
     set_shortname( N_("DV") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )

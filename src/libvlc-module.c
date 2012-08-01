@@ -963,7 +963,7 @@ static const char *const ppsz_prefres[] = {
 #define SOUT_MUX_CACHING_TEXT N_("Stream output muxer caching (ms)")
 #define SOUT_MUX_CACHING_LONGTEXT N_( \
     "This allow you to configure the initial caching amount for stream output " \
-    " muxer. This value should be set in milliseconds." )
+    "muxer. This value should be set in milliseconds." )
 
 #define PACKETIZER_TEXT N_("Preferred packetizer list")
 #define PACKETIZER_LONGTEXT N_( \

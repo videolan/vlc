@@ -43,7 +43,7 @@ static void Close( vlc_object_t * );
 
 #define FPS_TEXT N_("Frames per Second")
 #define FPS_LONGTEXT N_("This is the desired frame rate when " \
-    "playing raw video streams.  In the form 30000/1001 or 29.97")
+    "playing raw video streams. In the form 30000/1001 or 29.97")
 
 #define WIDTH_TEXT N_("Width")
 #define WIDTH_LONGTEXT N_("This specifies the width in pixels of the raw " \
