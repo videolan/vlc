@@ -35,7 +35,6 @@
 /****************************************************************************
  * block:
  ****************************************************************************
- * - block_sys_t is opaque and thus block_t->p_sys is PRIVATE
  * - i_flags may not always be set (ie could be 0, even for a key frame
  *      it depends where you receive the buffer (before/after a packetizer
  *      and the demux/packetizer implementations.
@@ -51,7 +50,6 @@
  *   (don't duplicate yourself in a bigger buffer, block_Realloc is
  *   optimised for preheader/postdatas increase)
  ****************************************************************************/
-typedef struct block_sys_t block_sys_t;
 
 /** The content doesn't follow the last block, or is probably broken */
 #define BLOCK_FLAG_DISCONTINUITY 0x0001
