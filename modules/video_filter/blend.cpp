@@ -607,6 +607,12 @@ static void Blend(filter_t *filter,
 {
     filter_sys_t *sys = filter->p_sys;
 
+    if( x_offset < 0 || y_offset < 0 )
+    {
+        msg_Err( filter, "Blend cannot process negative offsets" );
+        return;
+    }
+
     int width  = __MIN((int)filter->fmt_out.video.i_visible_width - x_offset,
                        (int)filter->fmt_in.video.i_visible_width);
     int height = __MIN((int)filter->fmt_out.video.i_visible_height - y_offset,
