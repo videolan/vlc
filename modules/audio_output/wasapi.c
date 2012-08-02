@@ -35,6 +35,9 @@
 #include <vlc_aout.h>
 #include <vlc_charset.h>
 
+DEFINE_GUID (GUID_VLC_AUD_OUT, 0x4533f59d, 0x59ee, 0x00c6,
+   0xad, 0xb2, 0xc6, 0x8b, 0x50, 0x1a, 0x66, 0x55);
+
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
@@ -560,7 +563,8 @@ static int Open(vlc_object_t *obj)
         assert(pwf == NULL);
     hr = IAudioClient_Initialize(sys->client, AUDCLNT_SHAREMODE_SHARED, 0,
                                  AOUT_MAX_PREPARE_TIME * 10, 0,
-                                 (hr == S_OK) ? &wf.Format : pwf, NULL);
+                                 (hr == S_OK) ? &wf.Format : pwf,
+                                 &GUID_VLC_AUD_OUT);
     CoTaskMemFree(pwf);
     if (FAILED(hr))
     {
