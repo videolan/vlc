@@ -111,7 +111,10 @@ MarshalCanSetFullscreen( intf_thread_t *p_intf, DBusMessageIter *container )
         vlc_object_release( p_input );
 
         if ( p_vout )
+        {
             b_ret = TRUE;
+            vlc_object_release( p_vout );
+        }
     }
 
     dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN, &b_ret );
