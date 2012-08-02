@@ -132,6 +132,9 @@ static const char *const ppsz_adev_text[] = {"default", };
 #define SPEAKER_LONGTEXT N_("Select speaker configuration you want to use. " \
     "This option doesn't upmix! So NO e.g. Stereo -> 5.1 conversion." )
 
+#define VOLUME_TEXT N_("Audio volume")
+#define VOLUME_LONGTEXT N_("Audio volume in hundredths of decibels (dB).")
+
 vlc_module_begin ()
     set_description( N_("DirectX audio output") )
     set_shortname( "DirectX" )
@@ -150,6 +153,9 @@ vlc_module_begin ()
     add_string( "directx-audio-speaker", "Windows default",
                  SPEAKER_TEXT, SPEAKER_LONGTEXT, true )
         change_string_list( speaker_list, 0, 0 )
+    add_integer( "directx-volume", DSBVOLUME_MAX,
+                 VOLUME_TEXT, VOLUME_LONGTEXT, true )
+        change_integer_range( DSBVOLUME_MIN, DSBVOLUME_MAX )
 
     set_callbacks( OpenAudio, CloseAudio )
 vlc_module_end ()
@@ -326,10 +332,13 @@ static int OpenAudio( vlc_object_t *p_this )
     }
     else
     {
-        p_aout->sys->volume.mb = 0;
-        p_aout->sys->volume.mute = false;
+        LONG mb = var_InheritInteger( p_aout, "directx-volume" );
+
         p_aout->volume_set = VolumeSet;
         p_aout->mute_set = MuteSet;
+        p_aout->sys->volume.mb = mb;
+        aout_VolumeReport( p_aout, cbrtf(powf(10.f, ((float)mb) / 2000.f)) );
+        MuteSet( p_aout, var_InheritBool( p_aout, "mute" ) );
     }
     return VLC_SUCCESS;
 
@@ -620,6 +629,9 @@ static int VolumeSet( audio_output_t *p_aout, float vol )
     /* Convert back to UI volume */
     vol = cbrtf(powf(10.f, ((float)mb) / 2000.f));
     aout_VolumeReport( p_aout, vol );
+
+    if( var_InheritBool( p_aout, "volume-save" ) )
+        config_PutInt( p_aout, "directx-volume", mb );
     return ret;
 }
 
