@@ -618,7 +618,7 @@ static int VolumeSet( audio_output_t *p_aout, float vol )
         InterlockedExchange(&sys->volume.volume, mb);
 
     /* Convert back to UI volume */
-    vol = cbrtf(powf(10.f, ((float)mb) / -2000.f));
+    vol = cbrtf(powf(10.f, ((float)mb) / 2000.f));
     aout_VolumeReport( p_aout, vol );
     return ret;
 }
