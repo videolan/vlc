@@ -79,9 +79,6 @@ endif
 endif
 ifdef HAVE_IOS
 FFMPEGCONF += --enable-pic --as="$(AS)" --disable-decoder=snow
-ifeq ($(ARCH), arm)
-FFMPEGCONF += --cpu=cortex-a8
-endif
 endif
 
 # Linux
