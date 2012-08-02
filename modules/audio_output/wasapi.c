@@ -479,7 +479,7 @@ static int Open(vlc_object_t *obj)
         free(sys);
         return VLC_EGENERIC;
     }
-
+retry:
     /* Get audio device according to policy */
     var_Create (aout, "audio-device", VLC_VAR_STRING|VLC_VAR_HASCHOICE);
 
@@ -546,7 +546,6 @@ static int Open(vlc_object_t *obj)
     vlc_ToWave(&wf, &format);
     hr = IAudioClient_IsFormatSupported(sys->client, AUDCLNT_SHAREMODE_SHARED,
                                         &wf.Format, &pwf);
-    // TODO: deal with (hr == AUDCLNT_E_DEVICE_INVALIDATED) ?
     if (FAILED(hr))
     {
         msg_Err(aout, "cannot negotiate audio format (error 0x%lx)", hr);
@@ -617,8 +616,13 @@ error:
         CloseHandle(sys->done);
     if (sys->client != NULL)
         IAudioClient_Release(sys->client);
+    var_Destroy(aout, "audio-device");
+    if (hr == AUDCLNT_E_DEVICE_INVALIDATED)
+    {
+        msg_Warn(aout, "device invalidated, retrying");
+        goto retry;
+    }
     Leave();
-    var_Destroy (aout, "audio-device");
     free(sys);
     return VLC_EGENERIC;
 }
