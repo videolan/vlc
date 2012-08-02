@@ -1,6 +1,3 @@
-if !HAVE_MINIZIP
-SUBDIRS = unzip
-endif
 DIST_SUBDIRS = unzip
 
 libzip_plugin_la_SOURCES = zip.h zipstream.c zipaccess.c
@@ -8,5 +5,8 @@ libzip_plugin_la_CFLAGS = $(AM_CFLAGS) $(MINIZIP_CFLAGS)
 libzip_plugin_la_LIBADD = $(AM_LIBADD) $(MINIZIP_LIBS)
 
 if HAVE_ZLIB
+if !HAVE_MINIZIP
+SUBDIRS = unzip
+endif
 libvlc_LTLIBRARIES += libzip_plugin.la
 endif
