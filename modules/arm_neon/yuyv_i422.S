@@ -18,6 +18,7 @@
  @ Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  @****************************************************************************/
 
+	.syntax unified
 	.fpu neon
 	.text
 
@@ -42,7 +43,7 @@ yuyv_i422_neon:
 	sub		YPAD,	YPAD,	WIDTH
 	sub		IPAD,	IPAD,	WIDTH,	lsl #1
 1:
-	movgts		COUNT,	WIDTH
+	movsgt		COUNT,	WIDTH
 	pople		{r4-r6,pc}
 2:
 	pld		[I, #64]
@@ -73,7 +74,7 @@ uyvy_i422_neon:
 	sub		YPAD,	YPAD,	WIDTH
 	sub		IPAD,	IPAD,	WIDTH,	lsl #1
 1:
-	movgts		COUNT,	WIDTH
+	movsgt		COUNT,	WIDTH
 	pople		{r4-r6,pc}
 2:
 	pld		[I, #64]
