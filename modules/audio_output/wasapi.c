@@ -100,10 +100,15 @@ static void Play(audio_output_t *aout, block_t *block, mtime_t *restrict drift)
     {
         UINT64 pos, qpcpos;
 
-        IAudioClock_GetPosition(sys->clock, &pos, &qpcpos);
-        qpcpos = (qpcpos + 5) / 10; /* 100ns -> 1µs */
         /* NOTE: this assumes mdate() uses QPC() (which it currently does). */
-        *drift = mdate() - qpcpos;
+        hr = IAudioClock_GetPosition(sys->clock, &pos, &qpcpos);
+        if (SUCCEEDED(hr))
+        {
+            qpcpos = (qpcpos + 5) / 10; /* 100ns -> 1µs */
+            *drift = mdate() - qpcpos;
+        }
+        else
+            msg_Warn(aout, "cannot get position (error 0x%lx)", hr);
     }
 
     for (;;)
