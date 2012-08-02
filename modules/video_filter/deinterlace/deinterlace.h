@@ -91,7 +91,7 @@ struct filter_sys_t
 {
     const vlc_chroma_description_t *chroma;
 
-    int  i_mode;              /**< Deinterlace mode */
+    uint8_t  i_mode;              /**< Deinterlace mode */
 
     /* Algorithm behaviour flags */
     bool b_double_rate;       /**< Shall we double the framerate? */
@@ -100,8 +100,10 @@ struct filter_sys_t
 
     /** Merge routine: C, MMX, SSE, ALTIVEC, NEON, ... */
     void (*pf_merge) ( void *, const void *, const void *, size_t );
-    /** Merge finalization routine: C, MMX, SSE, ALTIVEC, NEON, ... */
+#if defined (__i386__) || defined (__x86_64__)
+    /** Merge finalization routine for SSE */
     void (*pf_end_merge) ( void );
+#endif
 
     /**
      * Metadata history (PTS, nb_fields, TFF). Used for framerate doublers.

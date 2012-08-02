@@ -629,10 +629,7 @@ int Open( vlc_object_t *p_this )
 
 #if defined(CAN_COMPILE_C_ALTIVEC)
     if( chroma->pixel_size == 1 && vlc_CPU_ALTIVEC() )
-    {
         p_sys->pf_merge = MergeAltivec;
-        p_sys->pf_end_merge = NULL;
-    }
     else
 #endif
 #if defined(CAN_COMPILE_SSE)
@@ -661,15 +658,14 @@ int Open( vlc_object_t *p_this )
 #endif
 #if defined __ARM_NEON__ // FIXME: runtime detect support
     if( chroma->pixel_size == 1 && vlc_CPU_ARM_NEON() )
-    {
         p_sys->pf_merge = MergeNEON;
-        p_sys->pf_end_merge = NULL;
-    }
     else
 #endif
     {
         p_sys->pf_merge = chroma->pixel_size == 1 ? Merge8BitGeneric : Merge16BitGeneric;
+#if defined(__i386__) || defined(__x86_64__)
         p_sys->pf_end_merge = NULL;
+#endif
     }
 
     /* */

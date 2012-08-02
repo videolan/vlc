@@ -64,7 +64,12 @@
  * EndMerge() macro, which must be called after the merge is
  * finished, if the Merge() macro was used to perform the merge.
  */
-#define EndMerge if(p_filter->p_sys->pf_end_merge) p_filter->p_sys->pf_end_merge
+#if defined(__i386__) || defined(__x86_64__)
+# define EndMerge() \
+    if(p_filter->p_sys->pf_end_merge) (p_filter->p_sys->pf_end_merge)()
+#else
+# define EndMerge() (void)0
+#endif
 
 /*****************************************************************************
  * Merge routines
