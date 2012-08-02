@@ -93,7 +93,7 @@ struct aout_sys_t
 static void Play(audio_output_t *aout, block_t *block, mtime_t *restrict drift)
 {
     aout_sys_t *sys = aout->sys;
-    HRESULT hr;
+    HRESULT hr = S_OK;
 
     Enter();
     if (likely(sys->clock != NULL))
@@ -158,6 +158,10 @@ static void Play(audio_output_t *aout, block_t *block, mtime_t *restrict drift)
 
     Leave();
     block_Release(block);
+
+    /* Restart on unplug */
+    if (unlikely(hr == AUDCLNT_E_DEVICE_INVALIDATED))
+        var_TriggerCallback(aout, "audio-device");
 }
 
 static void Pause(audio_output_t *aout, bool paused, mtime_t date)
