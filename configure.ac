@@ -1314,28 +1314,21 @@ AC_ARG_ENABLE(neon,
 ])
 AS_IF([test "${enable_neon}" != "no"], [
   VLC_SAVE_FLAGS
-  CFLAGS="${CFLAGS} -mfpu=neon"
-  AC_CACHE_CHECK([if $CC groks NEON inline assembly], [ac_cv_neon_inline], [
+  CFLAGS="${CFLAGS} -mfpu=neon -mhard-float"
+  AC_CACHE_CHECK([if $CCAS groks ARM NEON assembly], [ac_cv_arm_neon], [
     AC_COMPILE_IFELSE([
       AC_LANG_PROGRAM(,[[
 asm volatile("vqmovun.s64 d0, q1":::"d0");
-asm volatile("ssat r0, #1, r0":::"r0"); /* assume ARMv6 */
 ]])
     ], [
-      ac_cv_neon_inline="-mfpu=neon"
+      ac_cv_arm_neon="yes"
     ], [
-      ac_cv_neon_inline="no"
+      ac_cv_arm_neon="no"
     ])
   ])
   VLC_RESTORE_FLAGS
-  AS_IF([test "$ac_cv_neon_inline" != "no"], [
-    NEON_CFLAGS="$ac_cv_neon_inline"
-  ])
-], [
-  ac_cv_neon_inline="no"
 ])
-AC_SUBST(NEON_CFLAGS)
-AM_CONDITIONAL(HAVE_NEON, [test "${ac_cv_neon_inline}" != "no"])
+AM_CONDITIONAL(HAVE_NEON, [test "${ac_cv_arm_neon}" = "yes"])
 
 
 AC_ARG_ENABLE(altivec,
