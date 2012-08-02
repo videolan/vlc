@@ -153,7 +153,7 @@ LD=xcrun ld
 STRIP=xcrun strip
 RANLIB=xcrun ranlib
 ifeq ($(ARCH), arm)
-EXTRA_CFLAGS += -arch armv7 -mno-thumb -mcpu=cortex-a8
+EXTRA_CFLAGS += -arch armv7 -mcpu=cortex-a8
 EXTRA_LDFLAGS += -arch armv7
 else
 EXTRA_CFLAGS += -m32
