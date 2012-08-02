@@ -11,7 +11,14 @@ SOURCES_crop = crop.c
 SOURCES_motionblur = motionblur.c
 SOURCES_logo = logo.c
 SOURCES_audiobargraph_v = audiobargraph_v.c
-SOURCES_deinterlace = deinterlace/deinterlace.c deinterlace/deinterlace.h \
+SOURCES_blend = blend.cpp
+SOURCES_scale = scale.c
+SOURCES_marq = marq.c
+SOURCES_rss = rss.c
+SOURCES_motiondetect = motiondetect.c
+
+libdeinterlace_plugin_la_SOURCES = \
+	deinterlace/deinterlace.c deinterlace/deinterlace.h \
 	deinterlace/mmx.h deinterlace/common.h \
 	deinterlace/merge.c deinterlace/merge.h \
 	deinterlace/helpers.c deinterlace/helpers.h \
@@ -21,11 +28,10 @@ SOURCES_deinterlace = deinterlace/deinterlace.c deinterlace/deinterlace.h \
 	deinterlace/yadif.h deinterlace/yadif_template.h \
 	deinterlace/algo_phosphor.c deinterlace/algo_phosphor.h \
 	deinterlace/algo_ivtc.c deinterlace/algo_ivtc.h
-SOURCES_blend = blend.cpp
-SOURCES_scale = scale.c
-SOURCES_marq = marq.c
-SOURCES_rss = rss.c
-SOURCES_motiondetect = motiondetect.c
+libdeinterlace_plugin_la_CFLAGS = $(AM_CFLAGS)
+libdeinterlace_plugin_la_LIBADD = $(AM_LIBADD)
+libdeinterlace_plugin_la_DEPENDENCIES =
+libvlc_LTLIBRARIES += libdeinterlace_plugin.la
 
 libosdmenu_plugin_la_SOURCES = osdmenu.c
 libosdmenu_plugin_la_CFLAGS = $(AM_CFLAGS) -DPKGDATADIR=\"$(vlcdatadir)\"
@@ -113,7 +119,6 @@ libvlc_LTLIBRARIES += \
 	libclone_plugin.la \
 	libcolorthres_plugin.la \
 	libcroppadd_plugin.la \
-	libdeinterlace_plugin.la \
 	liberase_plugin.la \
 	libextract_plugin.la \
 	libgradient_plugin.la \
