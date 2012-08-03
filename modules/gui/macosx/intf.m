@@ -1350,62 +1350,66 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         val.i_int |= KEY_MODIFIER_COMMAND;
     }
 
-    key = [[[o_event charactersIgnoringModifiers] lowercaseString] characterAtIndex: 0];
-
-    /* handle Lion's default key combo for fullscreen-toggle in addition to our own hotkeys */
-    if( key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask )
+    NSString * characters = [o_event charactersIgnoringModifiers];
+    if ([characters length] > 0)
     {
-        [[VLCCoreInteraction sharedInstance] toggleFullscreen];
-        return YES;
-    }
+        key = [[characters lowercaseString] characterAtIndex: 0];
 
-    if( !b_force )
-    {
-        switch( key )
+        /* handle Lion's default key combo for fullscreen-toggle in addition to our own hotkeys */
+        if( key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask )
         {
-            case NSDeleteCharacter:
-            case NSDeleteFunctionKey:
-            case NSDeleteCharFunctionKey:
-            case NSBackspaceCharacter:
-            case NSUpArrowFunctionKey:
-            case NSDownArrowFunctionKey:
-            case NSRightArrowFunctionKey:
-            case NSLeftArrowFunctionKey:
-            case NSEnterCharacter:
-            case NSCarriageReturnCharacter:
-                return NO;
+            [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+            return YES;
         }
-    }
 
-    if( key == 0x0020 ) // space key
-    {
-        [[VLCCoreInteraction sharedInstance] play];
-        return YES;
-    }
-
-    val.i_int |= CocoaKeyToVLC( key );
-
-    BOOL b_found_key = NO;
-    for( int i = 0; i < [o_usedHotkeys count]; i++ )
-    {
-        NSString *str = [o_usedHotkeys objectAtIndex: i];
-        unsigned int i_keyModifiers = [self VLCModifiersToCocoa: str];
-
-        if( [[[o_event charactersIgnoringModifiers] lowercaseString] isEqualToString: [self VLCKeyToString: str]] &&
-           (i_keyModifiers & NSShiftKeyMask)     == (i_pressed_modifiers & NSShiftKeyMask) &&
-           (i_keyModifiers & NSControlKeyMask)   == (i_pressed_modifiers & NSControlKeyMask) &&
-           (i_keyModifiers & NSAlternateKeyMask) == (i_pressed_modifiers & NSAlternateKeyMask) &&
-           (i_keyModifiers & NSCommandKeyMask)   == (i_pressed_modifiers & NSCommandKeyMask) )
+        if( !b_force )
         {
-            b_found_key = YES;
-            break;
+            switch( key )
+            {
+                case NSDeleteCharacter:
+                case NSDeleteFunctionKey:
+                case NSDeleteCharFunctionKey:
+                case NSBackspaceCharacter:
+                case NSUpArrowFunctionKey:
+                case NSDownArrowFunctionKey:
+                case NSRightArrowFunctionKey:
+                case NSLeftArrowFunctionKey:
+                case NSEnterCharacter:
+                case NSCarriageReturnCharacter:
+                    return NO;
+            }
         }
-    }
 
-    if( b_found_key )
-    {
-        var_SetInteger( p_intf->p_libvlc, "key-pressed", val.i_int );
-        return YES;
+        if( key == 0x0020 ) // space key
+        {
+            [[VLCCoreInteraction sharedInstance] play];
+            return YES;
+        }
+
+        val.i_int |= CocoaKeyToVLC( key );
+
+        BOOL b_found_key = NO;
+        for( int i = 0; i < [o_usedHotkeys count]; i++ )
+        {
+            NSString *str = [o_usedHotkeys objectAtIndex: i];
+            unsigned int i_keyModifiers = [self VLCModifiersToCocoa: str];
+
+            if( [[characters lowercaseString] isEqualToString: [self VLCKeyToString: str]] &&
+               (i_keyModifiers & NSShiftKeyMask)     == (i_pressed_modifiers & NSShiftKeyMask) &&
+               (i_keyModifiers & NSControlKeyMask)   == (i_pressed_modifiers & NSControlKeyMask) &&
+               (i_keyModifiers & NSAlternateKeyMask) == (i_pressed_modifiers & NSAlternateKeyMask) &&
+               (i_keyModifiers & NSCommandKeyMask)   == (i_pressed_modifiers & NSCommandKeyMask) )
+            {
+                b_found_key = YES;
+                break;
+            }
+        }
+
+        if( b_found_key )
+        {
+            var_SetInteger( p_intf->p_libvlc, "key-pressed", val.i_int );
+            return YES;
+        }
     }
 
     return NO;
@@ -1487,10 +1491,10 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
 - (void)checkFullscreenChange:(NSNumber *)o_full
 {
-    BOOL b_full = [o_full boolValue];    
+    BOOL b_full = [o_full boolValue];
     if( p_intf && !var_GetBool( pl_Get( p_intf ), "fullscreen" ) != !b_full )
     {
-        var_SetBool( pl_Get(p_intf), "fullscreen", b_full );        
+        var_SetBool( pl_Get(p_intf), "fullscreen", b_full );
     }
 }
 

@@ -345,34 +345,38 @@
 - (BOOL)keyEvent:(NSEvent *)o_event
 {
     BOOL eventHandled = NO;
-    unichar key = [[o_event charactersIgnoringModifiers] characterAtIndex: 0];
-
-    if( key )
+    NSString * characters = [o_event charactersIgnoringModifiers];
+    if ([characters length] > 0)
     {
-        input_thread_t * p_input = pl_CurrentInput( VLCIntf );
-        if( p_input != NULL )
-        {
-            vout_thread_t *p_vout = input_GetVout( p_input );
+        unichar key = [characters characterAtIndex: 0];
 
-            if( p_vout != NULL )
+        if( key )
+        {
+            input_thread_t * p_input = pl_CurrentInput( VLCIntf );
+            if( p_input != NULL )
             {
-                /* Escape */
-                if( key == (unichar) 0x1b )
+                vout_thread_t *p_vout = input_GetVout( p_input );
+
+                if( p_vout != NULL )
                 {
-                    if (var_GetBool( p_vout, "fullscreen" ))
+                    /* Escape */
+                    if( key == (unichar) 0x1b )
                     {
-                        [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+                        if (var_GetBool( p_vout, "fullscreen" ))
+                        {
+                            [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+                            eventHandled = YES;
+                        }
+                    }
+                    else if( key == ' ' )
+                    {
+                        [self play:self];
                         eventHandled = YES;
                     }
+                    vlc_object_release( p_vout );
                 }
-                else if( key == ' ' )
-                {
-                    [self play:self];
-                    eventHandled = YES;
-                }
-                vlc_object_release( p_vout );
+                vlc_object_release( p_input );
             }
-            vlc_object_release( p_input );
         }
     }
     return eventHandled;

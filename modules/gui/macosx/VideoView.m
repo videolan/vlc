@@ -142,41 +142,46 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     if( i_pressed_modifiers & NSCommandKeyMask )
         val.i_int |= KEY_MODIFIER_COMMAND;
 
-    key = [[[o_event charactersIgnoringModifiers] lowercaseString] characterAtIndex: 0];
-
-    if( key )
+    NSString * characters = [o_event charactersIgnoringModifiers];
+    if ([characters length] > 0)
     {
-        vout_thread_t * p_vout = getVout();
-        /* Escape should always get you out of fullscreen */
-        if( key == (unichar) 0x1b )
+        key = [[characters lowercaseString] characterAtIndex: 0];
+
+        if( key )
         {
-            playlist_t * p_playlist = pl_Get( VLCIntf );
-            if( var_GetBool( p_playlist, "fullscreen" ) )
-                 [[VLCCoreInteraction sharedInstance] toggleFullscreen];
-        }
-        /* handle Lion's default key combo for fullscreen-toggle in addition to our own hotkeys */
-        else if( key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask )
-            [[VLCCoreInteraction sharedInstance] toggleFullscreen];
-        else if ( p_vout )
-        {
-            if( key == ' ' )
+            vout_thread_t * p_vout = getVout();
+            /* Escape should always get you out of fullscreen */
+            if( key == (unichar) 0x1b )
             {
-                [[VLCCoreInteraction sharedInstance] play];
+                playlist_t * p_playlist = pl_Get( VLCIntf );
+                 if( var_GetBool( p_playlist, "fullscreen") )
+                     [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+            }
+            /* handle Lion's default key combo for fullscreen-toggle in addition to our own hotkeys */
+            else if( key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask )
+                [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+            else if ( p_vout )
+            {
+                if( key == ' ' )
+                {
+                    [[VLCCoreInteraction sharedInstance] play];
+                }
+                else
+                {
+                    val.i_int |= (int)CocoaKeyToVLC( key );
+                    var_Set( p_vout->p_libvlc, "key-pressed", val );
+                }
             }
             else
-            {
-                val.i_int |= (int)CocoaKeyToVLC( key );
-                var_Set( p_vout->p_libvlc, "key-pressed", val );
-            }
-        }
-        else
-            msg_Dbg( VLCIntf, "could not send keyevent to VLC core" );
+                msg_Dbg( VLCIntf, "could not send keyevent to VLC core" );
 
-        if (p_vout)
-            vlc_object_release( p_vout );
+            if (p_vout)
+                vlc_object_release( p_vout );
+
+            return;
+        }
     }
-    else
-        [super keyDown: o_event];
+    [super keyDown: o_event];
 }
 
 - (BOOL)performKeyEquivalent:(NSEvent *)o_event
