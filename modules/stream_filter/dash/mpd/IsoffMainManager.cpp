@@ -43,10 +43,14 @@ std::vector<Segment*>       IsoffMainManager::getSegments           (const Repre
 {
     std::vector<Segment *>  retSegments;
     SegmentList*            list= rep->getSegmentList();
-    Segment*                initSegment = rep->getSegmentBase()->getInitSegment();
 
-    if(initSegment)
-        retSegments.push_back(initSegment);
+    if(rep->getSegmentBase())
+    {
+        Segment* initSegment = rep->getSegmentBase()->getInitSegment();
+
+        if(initSegment)
+            retSegments.push_back(initSegment);
+    }
 
     retSegments.insert(retSegments.end(), list->getSegments().begin(), list->getSegments().end());
     return retSegments;
