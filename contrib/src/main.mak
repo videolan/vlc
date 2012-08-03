@@ -102,8 +102,6 @@ endif
 ifdef HAVE_ANDROID
 CC :=  $(HOST)-gcc --sysroot=$(ANDROID_NDK)/platforms/android-9/arch-$(PLATFORM_SHORT_ARCH)
 CXX := $(HOST)-g++ --sysroot=$(ANDROID_NDK)/platforms/android-9/arch-$(PLATFORM_SHORT_ARCH)
-EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/include
-EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/libs/$(ANDROID_ABI)/include
 endif
 
 ifdef HAVE_MACOSX

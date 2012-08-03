@@ -221,15 +221,12 @@ case "${OS}" in
 		add_make_enabled "HAVE_LINUX" "HAVE_ANDROID"
 		case "${HOST}" in
 			*arm*)
-			add_make "PATH = ${ANDROID_NDK}/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86/bin/:${PATH}"
 			add_make "PLATFORM_SHORT_ARCH := arm"
 			;;
 			*i686*)
-			add_make "PATH = ${ANDROID_NDK}/toolchains/x86-4.4.3/prebuilt/linux-x86/bin/:${PATH}"
 			add_make "PLATFORM_SHORT_ARCH := x86"
 			;;
 			*mipsel*)
-			add_make "PATH = ${ANDROID_NDK}/toolchains/mipsel-linux-android-4.4.3/prebuilt/linux-x86/bin/:${PATH}"
 			add_make "PLATFORM_SHORT_ARCH := mips"
 			;;
 		esac
