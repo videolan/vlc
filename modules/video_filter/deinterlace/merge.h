@@ -158,16 +158,16 @@ void Merge8BitSSE2( void *, const void *, const void *, size_t );
 void Merge16BitSSE2( void *, const void *, const void *, size_t );
 #endif
 
-#if defined __ARM_NEON__
+#ifdef __arm__
 /**
  * ARM NEON routine to blend pixels from two picture lines.
- *
- * @param _p_dest Target
- * @param _p_s1 Source line A
- * @param _p_s2 Source line B
- * @param i_bytes Number of bytes to merge
  */
-void MergeNEON (void *, const void *, const void *, size_t);
+void merge8_arm_neon (void *, const void *, const void *, size_t);
+
+/**
+ * ARMv6 SIMD routine to blend pixels from two picture lines.
+ */
+void merge8_armv6 (void *, const void *, const void *, size_t);
 #endif
 
 /*****************************************************************************

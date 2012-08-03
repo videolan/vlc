@@ -7,7 +7,6 @@
  * Author: Sam Hocevar <sam@zoy.org>                      (generic C routine)
  *         Sigmund Augdal Helberg <sigmunau@videolan.org> (MMXEXT, 3DNow, SSE2)
  *         Eric Petit <eric.petit@lapsus.org>             (Altivec)
- *         Rémi Denis-Courmont <remi@remlab.net>          (ARM NEON)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -240,66 +239,6 @@ void MergeAltivec( void *_p_dest, const void *_p_s1,
 
     while( p_dest < p_end )
         *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
-}
-#endif
-
-#ifdef __ARM_NEON__
-void MergeNEON (void *restrict out, const void *in1,
-                const void *in2, size_t n)
-{
-    uint8_t *outp = out;
-    const uint8_t *in1p = in1;
-    const uint8_t *in2p = in2;
-    size_t mis = __MIN((16 - ((uintptr_t)outp & 15)) & 15, n);
-
-    if (mis)
-    {
-        Merge8BitGeneric (outp, in1p, in2p, mis);
-        outp += mis;
-        in1p += mis;
-        in2p += mis;
-        n -= mis;
-    }
-
-    uint8_t *end = outp + (n & ~15);
-
-    if ((((uintptr_t)in1p)|((uintptr_t)in2p)) & 15)
-        while (outp < end)
-            asm volatile (
-                "vld1.u8  {q0-q1}, [%[in1]]!\n"
-                "vld1.u8  {q2-q3}, [%[in2]]!\n"
-                "vhadd.u8 q4, q0, q2\n"
-                "vld1.u8  {q6-q7}, [%[in1]]!\n"
-                "vhadd.u8 q5, q1, q3\n"
-                "vld1.u8  {q8-q9}, [%[in2]]!\n"
-                "vhadd.u8 q10, q6, q8\n"
-                "vhadd.u8 q11, q7, q9\n"
-                "vst1.u8  {q4-q5}, [%[out],:128]!\n"
-                "vst1.u8  {q10-q11}, [%[out],:128]!\n"
-                : [out] "+r" (outp), [in1] "+r" (in1p), [in2] "+r" (in2p)
-                :
-                : "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7",
-                  "q8", "q9", "q10", "q11", "memory");
-    else
-         while (outp < end)
-            asm volatile (
-                "vld1.u8  {q0-q1}, [%[in1],:128]!\n"
-                "vld1.u8  {q2-q3}, [%[in2],:128]!\n"
-                "vhadd.u8 q4, q0, q2\n"
-                "vld1.u8  {q6-q7}, [%[in1],:128]!\n"
-                "vhadd.u8 q5, q1, q3\n"
-                "vld1.u8  {q8-q9}, [%[in2],:128]!\n"
-                "vhadd.u8 q10, q6, q8\n"
-                "vhadd.u8 q11, q7, q9\n"
-                "vst1.u8  {q4-q5}, [%[out],:128]!\n"
-                "vst1.u8  {q10-q11}, [%[out],:128]!\n"
-                : [out] "+r" (outp), [in1] "+r" (in1p), [in2] "+r" (in2p)
-                :
-                : "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7",
-                  "q8", "q9", "q10", "q11", "memory");
-    n &= 15;
-    if (n)
-        Merge8BitGeneric (outp, in1p, in2p, n);
 }
 #endif
 
