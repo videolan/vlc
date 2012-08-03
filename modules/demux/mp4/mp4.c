@@ -1622,8 +1622,8 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 p_sample->data.p_sample_soun->i_qt_version == 1 &&
                 p_sample->data.p_sample_soun->i_sample_per_packet <= 0 )
         {
-            msg_Err( p_demux, "Invalid sample per packet value for qt_version 1" );
-            return VLC_EGENERIC;
+            msg_Err( p_demux, "Invalid sample per packet value for qt_version 1. Broken muxer!" );
+            p_sample->data.p_sample_soun->i_qt_version = 0;
         }
         break;
 
