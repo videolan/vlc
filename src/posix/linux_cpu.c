@@ -54,11 +54,16 @@ static void vlc_CPU_init (void)
 
     while (getline (&line, &linelen, info) != -1)
     {
-        if (strncmp (line, CPU_FLAGS, strlen (CPU_FLAGS)))
-            continue;
-
         char *p = line, *cap;
         uint_fast32_t core_caps = 0;
+
+#if defined (__arm__)
+        unsigned ver;
+        if (sscanf (line, "Processor\t: ARMv%u", &ver) >= 1 && ver >= 6)
+            core_caps |= VLC_CPU_ARMv6;
+#endif
+        if (strncmp (line, CPU_FLAGS, strlen (CPU_FLAGS)))
+            continue;
 
         while ((cap = strsep (&p, " ")) != NULL)
         {
