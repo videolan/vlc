@@ -1261,7 +1261,7 @@ static int  Open ( vlc_object_t *p_this )
 
 #if defined (__i386__) || defined (__x86_64__)
     unsigned i_cpu = vlc_CPU();
-    if( !(i_cpu & CPU_CAPABILITY_MMX) )
+    if( !vlc_CPU_MMX() )
         p_sys->param.cpu &= ~X264_CPU_MMX;
     if( !(i_cpu & CPU_CAPABILITY_MMXEXT) )
         p_sys->param.cpu &= ~X264_CPU_MMXEXT;

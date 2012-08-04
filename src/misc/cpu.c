@@ -221,7 +221,7 @@ void vlc_CPU_init (void)
     if( ! (i_edx & 0x00800000) )
         goto out;
 # endif
-    i_capabilities |= CPU_CAPABILITY_MMX;
+    i_capabilities |= VLC_CPU_MMX;
 
 # if defined (__SSE__)
     i_capabilities |= CPU_CAPABILITY_MMXEXT | CPU_CAPABILITY_SSE;
@@ -352,7 +352,7 @@ void vlc_CPU_dump (vlc_object_t *obj)
     if (flags & (capability)) \
         p += sprintf (p, "%s ", (string) )
 
-    PRINT_CAPABILITY(CPU_CAPABILITY_MMX, "MMX");
+    if (vlc_CPU_MMX()) p += sprintf (p, "MMX ");
     PRINT_CAPABILITY(CPU_CAPABILITY_3DNOW, "3DNow!");
     PRINT_CAPABILITY(CPU_CAPABILITY_MMXEXT, "MMXEXT");
     PRINT_CAPABILITY(CPU_CAPABILITY_SSE, "SSE");

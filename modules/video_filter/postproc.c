@@ -135,7 +135,7 @@ static int OpenPostproc( vlc_object_t *p_this )
     /* Set CPU capabilities */
 #if defined(__i386__) || defined(__x86_64__)
     unsigned i_cpu = vlc_CPU();
-    if( i_cpu & CPU_CAPABILITY_MMX )
+    if( vlc_CPU_MMX() )
         i_flags |= PP_CPU_CAPS_MMX;
     if( i_cpu & CPU_CAPABILITY_MMXEXT )
         i_flags |= PP_CPU_CAPS_MMX2;

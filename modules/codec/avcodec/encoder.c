@@ -326,7 +326,7 @@ int OpenEncoder( vlc_object_t *p_this )
     p_context->dsp_mask = 0;
 #if defined (__i386__) || defined (__x86_64__)
     unsigned i_cpu = vlc_CPU();
-    if( !(i_cpu & CPU_CAPABILITY_MMX) )
+    if( !vlc_CPU_MMX() )
         p_context->dsp_mask |= AV_CPU_FLAG_MMX;
     if( !(i_cpu & CPU_CAPABILITY_MMXEXT) )
         p_context->dsp_mask |= AV_CPU_FLAG_MMX2;

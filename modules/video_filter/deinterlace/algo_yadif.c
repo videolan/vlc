@@ -110,7 +110,7 @@ int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src,
 
         filter = yadif_filter_line_c;
 #if defined(HAVE_YADIF_MMX)
-        if( vlc_CPU() & CPU_CAPABILITY_MMX )
+        if( vlc_CPU_MMX() )
             filter = yadif_filter_line_mmx;
 #endif
 #if defined(HAVE_YADIF_SSE2)

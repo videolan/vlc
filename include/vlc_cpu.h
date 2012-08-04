@@ -30,7 +30,7 @@ VLC_API unsigned vlc_CPU(void);
 
 # if defined (__i386__) || defined (__x86_64__)
 #  define HAVE_FPU 1
-#  define CPU_CAPABILITY_MMX     (1<<3)
+#  define VLC_CPU_MMX    8
 #  define CPU_CAPABILITY_3DNOW   (1<<4)
 #  define CPU_CAPABILITY_MMXEXT  (1<<5)
 #  define CPU_CAPABILITY_SSE     (1<<6)
@@ -42,11 +42,15 @@ VLC_API unsigned vlc_CPU(void);
 #  define CPU_CAPABILITY_SSE4A   (1<<12)
 
 # if defined (__MMX__)
+#  define vlc_CPU_MMX() (1)
 #  define VLC_MMX
-# elif VLC_GCC_VERSION(4, 4)
-#  define VLC_MMX __attribute__ ((__target__ ("mmx")))
 # else
-#  define VLC_MMX VLC_MMX_is_not_implemented_on_this_compiler
+#  define vlc_CPU_MMX() ((vlc_CPU() & VLC_CPU_MMX) != 0)
+#  if VLC_GCC_VERSION(4, 4)
+#   define VLC_MMX __attribute__ ((__target__ ("mmx")))
+#  else
+#   define VLC_MMX VLC_MMX_is_not_implemented_on_this_compiler
+#  endif
 # endif
 
 # if defined (__SSE__)
