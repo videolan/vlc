@@ -558,7 +558,6 @@ void StandardPLPanel::updateZoom( int i )
     A_ZOOM( iconView );
     A_ZOOM( listView );
 #undef A_ZOOM
-    currentView->reset();
 }
 
 void StandardPLPanel::changeModel( bool b_ml )
