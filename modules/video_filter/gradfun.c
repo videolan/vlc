@@ -141,7 +141,7 @@ static int Open(vlc_object_t *object)
 #endif
         cfg->blur_line   = blur_line_c;
 #if HAVE_SSSE3
-    if (vlc_CPU() & CPU_CAPABILITY_SSSE3)
+    if (vlc_CPU_SSSE3())
         cfg->filter_line = filter_line_ssse3;
     else
 #endif

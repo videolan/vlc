@@ -47,6 +47,11 @@
         store " %%xmm4,   48(%[dst])\n" \
         : : [dst]"r"(dstp), [src]"r"(srcp) : "memory")
 
+#ifndef __SSSE3__
+# undef vlc_CPU_SSSE3
+# define vlc_CPU_SSSE3() ((cpu & VLC_CPU_SSSE3) != 0)
+#endif
+
 /* Execute the instruction op only if SSE2 is supported. */
 #ifdef CAN_COMPILE_SSE2
 # ifdef __SSE2__
@@ -180,7 +185,8 @@ static void SplitUV(uint8_t *dstu, size_t dstu_pitch,
     "movhpd %%xmm3,  24(%[dst2])\n"
 
 #ifdef CAN_COMPILE_SSSE3
-        if (cpu & CPU_CAPABILITY_SSSE3) {
+        if (vlc_CPU_SSE3())
+        {
             for (x = 0; x < (width & ~31); x += 32) {
                 asm volatile (
                     "movdqu (%[shuffle]), %%xmm7\n"

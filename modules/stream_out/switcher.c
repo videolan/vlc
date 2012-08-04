@@ -396,7 +396,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_SSE3;
 # endif
 # ifdef AV_CPU_FLAG_SSSE3
-        if( !(i_cpu & CPU_CAPABILITY_SSSE3) )
+        if( !vlc_CPU_SSSE3() )
             id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_SSSE3;
 # endif
 # ifdef AV_CPU_FLAG_SSE4
@@ -817,7 +817,7 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
             id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_SSE3;
 # endif
 # ifdef AV_CPU_FLAG_SSSE3
-        if( !(i_cpu & CPU_CAPABILITY_SSSE3) )
+        if( !vlc_CPU_SSSE3() )
             id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_SSSE3;
 # endif
 # ifdef AV_CPU_FLAG_SSE4

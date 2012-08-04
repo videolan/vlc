@@ -109,7 +109,7 @@ int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src,
                        int w, int prefs, int mrefs, int parity, int mode);
 
 #if defined(HAVE_YADIF_SSSE3)
-        if( vlc_CPU() & CPU_CAPABILITY_SSSE3 )
+        if( vlc_CPU_SSSE3() )
             filter = yadif_filter_line_ssse3;
         else
 #endif

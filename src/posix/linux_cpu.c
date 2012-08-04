@@ -77,10 +77,8 @@ static void vlc_CPU_init (void)
                 core_caps |= VLC_CPU_SSE2;
             if (!strcmp (cap, "pni"))
                 core_caps |= VLC_CPU_SSE3;
-# ifndef __SSSE3__
             if (!strcmp (cap, "ssse3"))
-                core_caps |= CPU_CAPABILITY_SSSE3;
-# endif
+                core_caps |= VLC_CPU_SSSE3;
 # ifndef __SSE4_1__
             if (!strcmp (cap, "sse4_1"))
                 core_caps |= CPU_CAPABILITY_SSE4_1;
@@ -113,9 +111,6 @@ static void vlc_CPU_init (void)
 
     /* Always enable capabilities that were forced during compilation */
 #if defined (__i386__) || defined (__x86_64__)
-# ifdef __SSSE3__
-    all_caps |= CPU_CAPABILITY_SSSE3;
-# endif
 # ifdef __SSE4_1__
     all_caps |= CPU_CAPABILITY_SSE4_1;
 # endif
