@@ -196,7 +196,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         SetUnhandledExceptionFilter(vlc_exception_filter);
     }
 
-    _setmode( _fileno( stdin ), _O_BINARY ); /* Needed for pipes */
+    _setmode( STDIN_FILENO, _O_BINARY ); /* Needed for pipes */
 
 #else /* UNDER_CE */
     char **argv, psz_cmdline[wcslen(lpCmdLine) * 4];

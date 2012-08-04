@@ -39,6 +39,7 @@ void vlc_enable_override (void);
 #include <pthread.h>
 #ifdef HAVE_EXECINFO_H
 # include <execinfo.h>
+# include <unistd.h>
 #endif
 #ifdef NDEBUG
 # undef HAVE_BACKTRACE
@@ -75,7 +76,7 @@ static void vlogbug (unsigned *pc, const char *level, const char *func,
         fputs (")\n", stderr);
         fflush (stderr);
 #ifdef HAVE_BACKTRACE
-        backtrace_symbols_fd (framev + 2, framec - 2, fileno (stderr));
+        backtrace_symbols_fd (framev + 2, framec - 2, STDERR_FILENO);
 #endif
     }
     funlockfile (stderr);

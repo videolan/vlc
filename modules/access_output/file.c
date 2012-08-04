@@ -139,9 +139,9 @@ static int Open( vlc_object_t *p_this )
     if( !strcmp( p_access->psz_path, "-" ) )
     {
 #if defined( WIN32 ) || defined( __OS2__ )
-        setmode (fileno (stdout), O_BINARY);
+        setmode (STDOUT_FILENO, O_BINARY);
 #endif
-        fd = vlc_dup (fileno (stdout));
+        fd = vlc_dup (STDOUT_FILENO);
         if (fd == -1)
         {
             msg_Err (p_access, "cannot use standard output: %m");
