@@ -657,11 +657,13 @@ int Open( vlc_object_t *p_this )
     else
 #endif
 #if defined(__arm__)
-    if( chroma->pixel_size == 1 && vlc_CPU_ARM_NEON() )
-        p_sys->pf_merge = merge8_arm_neon;
+    if( vlc_CPU_ARM_NEON() )
+        p_sys->pf_merge =
+            (chroma->pixel_size == 1) ? merge8_arm_neon : merge16_arm_neon;
     else
-    if( chroma->pixel_size == 1 && vlc_CPU_ARMv6() )
-        p_sys->pf_merge = merge8_armv6;
+    if( vlc_CPU_ARMv6() )
+        p_sys->pf_merge =
+            (chroma->pixel_size == 1) ? merge8_armv6 : merge16_armv6;
     else
 #endif
     {

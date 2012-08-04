@@ -72,6 +72,47 @@ merge8_arm_neon:
 	bx		lr
 
 	.align 2
+	.global merge16_arm_neon
+	.type	merge16_arm_neon, %function
+merge16_arm_neon:
+	cmp		SIZE,	#64
+	blo		2f
+1:
+	pld		[SRC1, #64]
+	vld1.u16	{q0-q1},	[SRC1,:128]!
+	pld		[SRC2, #64]
+	vld1.u16	{q8-q9},	[SRC2,:128]!
+	vhadd.u16	q0,	q0,	q8
+	sub		SIZE,	SIZE,	#64
+	vld1.u16	{q2-q3},	[SRC1,:128]!
+	vhadd.u16	q1,	q1,	q9
+	vld1.u16	{q10-q11},	[SRC2,:128]!
+	vhadd.u16	q2,	q2,	q10
+	cmp		SIZE,	#64
+	vhadd.u16	q3,	q3,	q11
+	vst1.u16	{q0-q1},	[DEST,:128]!
+	vst1.u16	{q2-q3},	[DEST,:128]!
+	bhs		1b
+2:
+	cmp		SIZE,	#32
+	blo		3f
+	vld1.u16	{q0-q1},	[SRC1,:128]!
+	sub		SIZE,	SIZE,	#32
+	vld1.u16	{q8-q9},	[SRC2,:128]!
+	vhadd.u16	q0,	q0,	q8
+	vhadd.u16	q1,	q1,	q9
+	vst1.u16	{q0-q1},	[DEST,:128]!
+3:
+	cmp		SIZE,	#16
+	bxlo		lr
+	vld1.u16	{q0},		[SRC1,:128]!
+	sub		SIZE,	SIZE,	#16
+	vld1.u16	{q8},		[SRC2,:128]!
+	vhadd.u16	q0,	q0,	q8
+	vst1.u16	{q0},		[DEST,:128]!
+	bx		lr
+
+	.align 2
 	.global merge8_armv6
 	.type	merge8_armv6, %function
 merge8_armv6:
@@ -89,6 +130,28 @@ merge8_armv6:
 	uhadd8		r6,	r6,	ip
 	stm		DEST!,	{r4-r5}
 	uhadd8		r7,	r7,	lr
+	stm		DEST!,	{r6-r7}
+	popeq		{r4-r9,pc}
+	b		1b
+
+	.align 2
+	.global merge16_armv6
+	.type	merge16_armv6, %function
+merge16_armv6:
+	push		{r4-r9,lr}
+1:
+	pld		[SRC1, #64]
+	ldm		SRC1!,	{r4-r5}
+	pld		[SRC2, #64]
+	ldm		SRC2!,	{r8-r9}
+	subs		SIZE,	SIZE,	#16
+	uhadd16		r4,	r4,	r8
+	ldm		SRC1!,	{r6-r7}
+	uhadd16		r5,	r5,	r9
+	ldm		SRC2!,	{ip,lr}
+	uhadd16		r6,	r6,	ip
+	stm		DEST!,	{r4-r5}
+	uhadd16		r7,	r7,	lr
 	stm		DEST!,	{r6-r7}
 	popeq		{r4-r9,pc}
 	b		1b
