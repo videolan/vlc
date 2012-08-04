@@ -1266,7 +1266,7 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.cpu &= ~X264_CPU_MMXEXT;
     if( !vlc_CPU_SSE() )
         p_sys->param.cpu &= ~X264_CPU_SSE;
-    if( !(vlc_CPU() & CPU_CAPABILITY_SSE2) )
+    if( !vlc_CPU_SSE2() )
         p_sys->param.cpu &= ~X264_CPU_SSE2;
 #endif
 

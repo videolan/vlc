@@ -409,7 +409,7 @@ static int Open(vlc_object_t *object)
     sys->blend = BlockBlendC;
     sys->emms  = NULL;
 #if defined(CAN_COMPILE_SSE2) && 1
-    if (vlc_CPU() & CPU_CAPABILITY_SSE2) {
+    if (vlc_CPU_SSE2()) {
         sys->blend = BlockBlendSse2;
         sys->emms  = Emms;
     }

@@ -135,7 +135,7 @@ static int Open(vlc_object_t *object)
     cfg->buf         = NULL;
 
 #if HAVE_SSE2 && HAVE_6REGS
-    if (vlc_CPU() & CPU_CAPABILITY_SSE2)
+    if (vlc_CPU_SSE2())
         cfg->blur_line = blur_line_sse2;
     else
 #endif

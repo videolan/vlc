@@ -340,7 +340,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         p_context->dsp_mask |= AV_CPU_FLAG_3DNOW;
     if( !vlc_CPU_SSE() )
         p_context->dsp_mask |= AV_CPU_FLAG_SSE;
-    if( !(i_cpu & CPU_CAPABILITY_SSE2) )
+    if( !vlc_CPU_SSE2() )
         p_context->dsp_mask |= AV_CPU_FLAG_SSE2;
 # ifdef AV_CPU_FLAG_SSE3
     if( !(i_cpu & CPU_CAPABILITY_SSE3) )

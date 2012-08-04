@@ -94,7 +94,7 @@ vlc_module_begin ()
     set_description( N_( "SSE2 I420,IYUV,YV12 to "
                         "RV15,RV16,RV24,RV32 conversions") )
     set_capability( "video filter2", 120 )
-# define vlc_CPU_capable() ((vlc_CPU() & CPU_CAPABILITY_SSE2) != 0)
+# define vlc_CPU_capable() vlc_CPU_SSE2()
 #endif
     set_callbacks( Activate, Deactivate )
 vlc_module_end ()

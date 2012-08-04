@@ -245,7 +245,7 @@ static void PlanarI420Sepia( picture_t *p_pic, picture_t *p_outpic,
     const uint8_t filling_const_8v = 128 + i_intensity / 14;
 
 #if defined(CAN_COMPILE_SSE2)
-    if (vlc_CPU() & CPU_CAPABILITY_SSE2)
+    if (vlc_CPU_SSE2())
     {
         /* prepared value for faster broadcasting in xmm register */
         int i_intensity_spread = 0x10001 * (uint8_t) i_intensity;

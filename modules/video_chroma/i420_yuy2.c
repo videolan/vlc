@@ -96,12 +96,12 @@ vlc_module_begin ()
 #elif defined (MODULE_NAME_IS_i420_yuy2_sse2)
     set_description( N_("SSE2 conversions from " SRC_FOURCC " to " DEST_FOURCC) )
     set_capability( "video filter2", 250 )
-# define vlc_CPU_capable() (vlc_CPU() & CPU_CAPABILITY_SSE2)
+# define vlc_CPU_capable() vlc_CPU_SSE2()
 #elif defined (MODULE_NAME_IS_i420_yuy2_altivec)
     set_description(
             _("AltiVec conversions from " SRC_FOURCC " to " DEST_FOURCC) );
     set_capability( "video filter2", 250 )
-# define vlc_CPU_capable() (vlc_CPU_ALTIVEC())
+# define vlc_CPU_capable() vlc_CPU_ALTIVEC()
 #endif
     set_callbacks( Activate, NULL )
 vlc_module_end ()

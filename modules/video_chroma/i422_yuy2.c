@@ -81,7 +81,7 @@ vlc_module_begin ()
 #elif defined (MODULE_NAME_IS_i422_yuy2_sse2)
     set_description( N_("SSE2 conversions from " SRC_FOURCC " to " DEST_FOURCC) )
     set_capability( "video filter2", 120 )
-# define vlc_CPU_capable() ((vlc_CPU() & CPU_CAPABILITY_SSE2) != 0)
+# define vlc_CPU_capable() vlc_CPU_SSE2()
 # define VLC_TARGET VLC_SSE
 #endif
     set_callbacks( Activate, NULL )
