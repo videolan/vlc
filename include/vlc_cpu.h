@@ -153,7 +153,22 @@ VLC_API unsigned vlc_CPU(void);
 #  else
 #   define HAVE_FPU 0
 #  endif
+#  define VLC_CPU_ARMv6    4
 #  define VLC_CPU_ARM_NEON 2
+
+#  if defined (__ARM_ARCH_7A__)
+#   define VLC_CPU_ARM_ARCH 7
+#  elif defined (__ARM_ARCH_6__) || defined (__ARM_ARCH_6T2__)
+#   define VLC_CPU_ARM_ARCH 6
+#  else
+#   define VLC_CPU_ARM_ARCH 4
+#  endif
+
+#  if (VLC_CPU_ARM_ARCH >= 6)
+#   define vlc_CPU_ARMv6() (1)
+#  else
+#   define vlc_CPU_ARMv6() ((vlc_CPU() & VLC_CPU_ARMv6) != 0)
+#  endif
 
 #  ifdef __ARM_NEON__
 #   define vlc_CPU_ARM_NEON() (1)
