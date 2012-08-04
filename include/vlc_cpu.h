@@ -40,6 +40,10 @@ VLC_API unsigned vlc_CPU(void);
 #  define VLC_CPU_SSE4_1 1024
 #  define VLC_CPU_SSE4_2 2048
 #  define VLC_CPU_SSE4A  4096
+#  define VLC_CPU_AVX    8192
+#  define VLC_CPU_AVX2   16384
+#  define VLC_CPU_XOP    32768
+#  define VLC_CPU_FMA4   65536
 
 # if defined (__MMX__)
 #  define vlc_CPU_MMX() (1)
@@ -103,10 +107,34 @@ VLC_API unsigned vlc_CPU(void);
 #  define vlc_CPU_SSE4A() ((vlc_CPU() & VLC_CPU_SSE4A) != 0)
 # endif
 
+# ifdef __AVX__
+#  define vlc_CPU_AVX() (1)
+# else
+#  define vlc_CPU_AVX() ((vlc_CPU() & VLC_CPU_AVX) != 0)
+# endif
+
+# ifdef __AVX2__
+#  define vlc_CPU_AVX2() (1)
+# else
+#  define vlc_CPU_AVX2() ((vlc_CPU() & VLC_CPU_AVX2) != 0)
+# endif
+
 # ifdef __3dNOW__
 #  define vlc_CPU_3dNOW() (1)
 # else
 #  define vlc_CPU_3dNOW() ((vlc_CPU() & VLC_CPU_3dNOW) != 0)
+# endif
+
+# ifdef __XOP__
+#  define vlc_CPU_XOP() (1)
+# else
+#  define vlc_CPU_XOP() ((vlc_CPU() & VLC_CPU_XOP) != 0)
+# endif
+
+# ifdef __FMA4__
+#  define vlc_CPU_FMA4() (1)
+# else
+#  define vlc_CPU_FMA4() ((vlc_CPU() & VLC_CPU_FMA4) != 0)
 # endif
 
 # elif defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)
