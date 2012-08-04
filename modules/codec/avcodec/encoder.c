@@ -337,7 +337,7 @@ int OpenEncoder( vlc_object_t *p_this )
     if( !vlc_CPU_SSE2() )
         p_context->dsp_mask |= AV_CPU_FLAG_SSE2;
 # ifdef AV_CPU_FLAG_SSE3
-    if( !(i_cpu & CPU_CAPABILITY_SSE3) )
+    if( !vlc_CPU_SSE3() )
         p_context->dsp_mask |= AV_CPU_FLAG_SSE3;
 # endif
 # ifdef AV_CPU_FLAG_SSSE3

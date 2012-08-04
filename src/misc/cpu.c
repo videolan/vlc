@@ -237,11 +237,9 @@ void vlc_CPU_init (void)
         i_capabilities |= VLC_CPU_SSE2;
 # endif
 
-# if defined (__SSE3__)
-    i_capabilities |= CPU_CAPABILITY_SSE3;
-# elif defined (CAN_COMPILE_SSE3)
+# if defined (CAN_COMPILE_SSE3)
     if ((i_ecx & 0x00000001) && vlc_CPU_check ("SSE3", SSE3_test))
-        i_capabilities |= CPU_CAPABILITY_SSE3;
+        i_capabilities |= VLC_CPU_SSE3;
 # endif
 
 # if defined (__SSSE3__)
@@ -347,7 +345,7 @@ void vlc_CPU_dump (vlc_object_t *obj)
     if (vlc_CPU_MMXEXT()) p += sprintf (p, "MMXEXT ");
     if (vlc_CPU_SSE()) p += sprintf (p, "SSE ");;
     if (vlc_CPU_SSE2()) p += sprintf (p, "SSE2 ");;
-    PRINT_CAPABILITY(CPU_CAPABILITY_SSE3, "SSE3");
+    if (vlc_CPU_SSE3()) p += sprintf (p, "SSE2 ");;
     PRINT_CAPABILITY(CPU_CAPABILITY_SSSE3, "SSSE3");
     PRINT_CAPABILITY(CPU_CAPABILITY_SSE4_1, "SSE4.1");
     PRINT_CAPABILITY(CPU_CAPABILITY_SSE4_2, "SSE4.2");

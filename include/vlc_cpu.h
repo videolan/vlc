@@ -35,7 +35,7 @@ VLC_API unsigned vlc_CPU(void);
 #  define VLC_CPU_MMXEXT 32
 #  define VLC_CPU_SSE    64
 #  define VLC_CPU_SSE2   128
-#  define CPU_CAPABILITY_SSE3    (1<<8)
+#  define VLC_CPU_SSE3   256
 #  define CPU_CAPABILITY_SSSE3   (1<<9)
 #  define CPU_CAPABILITY_SSE4_1  (1<<10)
 #  define CPU_CAPABILITY_SSE4_2  (1<<11)
@@ -71,6 +71,12 @@ VLC_API unsigned vlc_CPU(void);
 #  define vlc_CPU_SSE2() (1)
 # else
 #  define vlc_CPU_SSE2() ((vlc_CPU() & VLC_CPU_SSE2) != 0)
+# endif
+
+# ifdef __SSE3__
+#  define vlc_CPU_SSE3() (1)
+# else
+#  define vlc_CPU_SSE3() ((vlc_CPU() & VLC_CPU_SSE3) != 0)
 # endif
 
 # elif defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)
