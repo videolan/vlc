@@ -67,7 +67,18 @@ unsigned GetVlcDspMask( void )
     if( !vlc_CPU_SSE4_2() )
         mask |= AV_CPU_FLAG_SSE42;
 # endif
-    // TODO: AVX
+# ifdef AV_CPU_FLAG_AVX
+    if( !vlc_CPU_AVX() )
+        mask |= AV_CPU_FLAG_AVX;
+# endif
+# ifdef AV_CPU_FLAG_XOP
+    if( !vlc_CPU_XOP() )
+        mask |= AV_CPU_FLAG_XOP;
+# endif
+# ifdef AV_CPU_FLAG_FMA4
+    if( !vlc_CPU_FMA4() )
+        mask |= AV_CPU_FLAG_FMA4;
+# endif
 #endif
 
 #if defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)
