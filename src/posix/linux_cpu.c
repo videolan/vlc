@@ -79,16 +79,12 @@ static void vlc_CPU_init (void)
                 core_caps |= VLC_CPU_SSE3;
             if (!strcmp (cap, "ssse3"))
                 core_caps |= VLC_CPU_SSSE3;
-# ifndef __SSE4_1__
             if (!strcmp (cap, "sse4_1"))
-                core_caps |= CPU_CAPABILITY_SSE4_1;
-# endif
-# ifndef __SSE4_2__
+                core_caps |= VLC_CPU_SSE4_1;
             if (!strcmp (cap, "sse4_2"))
-                core_caps |= CPU_CAPABILITY_SSE4_1;
-# endif
+                core_caps |= VLC_CPU_SSE4_1;
             if (!strcmp (cap, "sse4a"))
-                core_caps |= CPU_CAPABILITY_SSE4A;
+                core_caps |= VLC_CPU_SSE4A;
 # ifndef __3dNOW__
             if (!strcmp (cap, "3dnow"))
                 core_caps |= CPU_CAPABILITY_3DNOW;
@@ -111,12 +107,6 @@ static void vlc_CPU_init (void)
 
     /* Always enable capabilities that were forced during compilation */
 #if defined (__i386__) || defined (__x86_64__)
-# ifdef __SSE4_1__
-    all_caps |= CPU_CAPABILITY_SSE4_1;
-# endif
-# ifdef __SSE4_2__
-    all_caps |= CPU_CAPABILITY_SSE4_2;
-# endif
 # ifdef __3dNOW__
     all_caps |= CPU_CAPABILITY_3DNOW;
 # endif

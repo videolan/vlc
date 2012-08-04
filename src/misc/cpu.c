@@ -247,18 +247,14 @@ void vlc_CPU_init (void)
         i_capabilities |= VLC_CPU_SSSE3;
 # endif
 
-# if defined (__SSE4_1__)
-    i_capabilities |= CPU_CAPABILITY_SSE4_1;
-# elif defined (CAN_COMPILE_SSE4_1)
+# if defined (CAN_COMPILE_SSE4_1)
     if ((i_ecx & 0x00080000) && vlc_CPU_check ("SSE4.1", SSE4_1_test))
-        i_capabilities |= CPU_CAPABILITY_SSE4_1;
+        i_capabilities |= VLC_CPU_SSE4_1;
 # endif
 
-# if defined (__SSE4_2__)
-    i_capabilities |= CPU_CAPABILITY_SSE4_2;
-# elif defined (CAN_COMPILE_SSE4_2)
+# if defined (CAN_COMPILE_SSE4_2)
     if ((i_ecx & 0x00100000) && vlc_CPU_check ("SSE4.2", SSE4_2_test))
-        i_capabilities |= CPU_CAPABILITY_SSE4_2;
+        i_capabilities |= VLC_CPU_SSE4_2;
 # endif
 
     /* test for additional capabilities */
@@ -345,9 +341,9 @@ void vlc_CPU_dump (vlc_object_t *obj)
     if (vlc_CPU_SSE2()) p += sprintf (p, "SSE2 ");;
     if (vlc_CPU_SSE3()) p += sprintf (p, "SSE2 ");;
     if (vlc_CPU_SSSE3()) p += sprintf (p, "SSSE3 ");;
-    PRINT_CAPABILITY(CPU_CAPABILITY_SSE4_1, "SSE4.1");
-    PRINT_CAPABILITY(CPU_CAPABILITY_SSE4_2, "SSE4.2");
-    PRINT_CAPABILITY(CPU_CAPABILITY_SSE4A,  "SSE4A");
+    if (vlc_CPU_SSE4_1()) p += sprintf (p, "SSE4.1 ");;
+    if (vlc_CPU_SSE4_2()) p += sprintf (p, "SSE4.2 ");;
+    if (vlc_CPU_SSE4A()) p += sprintf (p, "SSE4A ");;
     PRINT_CAPABILITY(CPU_CAPABILITY_3DNOW, "3DNow!");
 
 #elif defined (__powerpc__) || defined (__ppc__) || defined (__ppc64__)

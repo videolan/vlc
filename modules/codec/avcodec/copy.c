@@ -47,6 +47,11 @@
         store " %%xmm4,   48(%[dst])\n" \
         : : [dst]"r"(dstp), [src]"r"(srcp) : "memory")
 
+#ifndef __SSE4A__
+# undef vlc_CPU_SSE4A
+# define vlc_CPU_SSE4A() ((cpu & VLC_CPU_SSE4A) != 0)
+#endif
+
 #ifndef __SSSE3__
 # undef vlc_CPU_SSSE3
 # define vlc_CPU_SSSE3() ((cpu & VLC_CPU_SSSE3) != 0)
@@ -88,7 +93,7 @@ static void CopyFromUswc(uint8_t *dst, size_t dst_pitch,
             dst[x] = src[x];
 
 #ifdef CAN_COMPILE_SSE4_1
-        if (cpu & CPU_CAPABILITY_SSE4_1) {
+        if (vlc_CPU_SSE4_1()) {
             if (!unaligned) {
                 for (; x+63 < width; x += 64)
                     COPY64(&dst[x], &src[x], "movntdqa", "movdqa");
