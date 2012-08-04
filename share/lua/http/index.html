@@ -122,7 +122,10 @@
 					sendCommand({'command':'pl_random'});
 					return false;
 				})
-				$('#buttonRefresh').click(updatePlayList);
+				$('#buttonRefresh').click(function(){
+				    updatePlayList(true);
+				    return false;
+				});
 				$('#buttonPlPlay').click(function(){
 					sendCommand({
 						'command': 'pl_play',

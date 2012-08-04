@@ -1,6 +1,8 @@
 var current_id = 1;
 var currentArt = null;
 var current_que = 'main';
+var previous_title = null;
+var current_title = null;
 
 function updateArt(url) {
     $('#albumArt').fadeOut(500, function () {
@@ -72,6 +74,13 @@ function updateStatus() {
                     currentArt = 'images/vlc-48.png';
                     updateArt(currentArt);
                 }
+
+                current_title = $('[name="filename"]', data).text();
+                if (previous_title != current_title) {
+                    updatePlayList();
+                }
+                previous_title = current_title;
+
                 if (pollStatus) {
                     setTimeout(updateStatus, 1000);
                 }
@@ -119,8 +128,30 @@ function updateStatus() {
     });
 }
 
-function updatePlayList() {
-    $('#libraryTree').jstree('refresh', -1);
+function updatePlayList(force_refresh) {
+    if (force_refresh) {
+        //refresh playlist..
+        $('#libraryTree').jstree('refresh', -1);
+    } else {
+        //iterate through playlist..
+        $('.jstree-leaf').each(function(){
+            var id = $(this).attr('id');
+            if (id != null && id.substr(0,5) == 'plid_') {
+                var name = $(this).attr('name');
+                if (name != null && name == current_title) {
+                    $(this).addClass('ui-state-highlight');
+                    $(this).attr('current', 'current');
+                    this.scrollIntoView(true);
+                } else {
+                    $(this).removeClass('ui-state-highlight');
+                    $(this).removeAttr('current');
+                }
+                if ($(this).children('a').size() > 0) {
+                    $($(this).children('a')[0]).removeClass('ui-state-active');
+                }
+            }
+    	});
+    }
 }
 
 function sendCommand(params, append) {
@@ -133,7 +164,6 @@ function sendCommand(params, append) {
                     eval(append);
                 }
                 updateStatus();
-                updatePlayList();
             }
         });
     } else {
@@ -155,7 +185,6 @@ function sendCommand(params, append) {
                     if (append != undefined) {
                         eval(append);
                     }
-                    updatePlayList();
                 }
             });
         }
@@ -490,7 +519,6 @@ $(function () {
         event.preventDefault();
         current_id = $(this).parent().attr('id').substr(5);
         sendCommand('command=pl_play&id=' + current_id);
-        updatePlayList();
     });
     updateStatus();
     updateStreams();
