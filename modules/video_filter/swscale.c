@@ -238,7 +238,7 @@ static int GetSwsCpuMask(void)
     if( vlc_CPU_MMXEXT() )
         i_sws_cpu |= SWS_CPU_CAPS_MMX2;
 #endif
-    if( vlc_CPU() & CPU_CAPABILITY_3DNOW )
+    if( vlc_CPU_3dNOW() )
         i_sws_cpu |= SWS_CPU_CAPS_3DNOW;
 #elif defined(__ppc__) || defined(__ppc64__) || defined(__powerpc__)
     if( vlc_CPU_ALTIVEC() )

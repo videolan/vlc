@@ -195,7 +195,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     unsigned cpu = vlc_CPU();
     if( vlc_CPU_MMX() )
         i_accel |= MPEG2_ACCEL_X86_MMX;
-    if( cpu & CPU_CAPABILITY_3DNOW )
+    if( vlc_CPU_3dNOW() )
         i_accel |= MPEG2_ACCEL_X86_3DNOW;
     if( vlc_CPU_MMXEXT() )
         i_accel |= MPEG2_ACCEL_X86_MMXEXT;

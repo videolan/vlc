@@ -266,9 +266,7 @@ void vlc_CPU_init (void)
     /* list these additional capabilities */
     cpuid( 0x80000001 );
 
-# if defined (__3dNOW__)
-    i_capabilities |= CPU_CAPABILITY_3DNOW;
-# elif defined (CAN_COMPILE_3DNOW)
+# if defined (CAN_COMPILE_3DNOW)
     if ((i_edx & 0x80000000) && vlc_CPU_check ("3D Now!", ThreeD_Now_test))
         i_capabilities |= CPU_CAPABILITY_3DNOW;
 # endif
@@ -330,11 +328,6 @@ void vlc_CPU_dump (vlc_object_t *obj)
     char buf[200], *p = buf;
 
 #if defined (__i386__) || defined (__x86_64__)
-    const unsigned flags = vlc_CPU();
-#define PRINT_CAPABILITY( capability, string ) \
-    if (flags & (capability)) \
-        p += sprintf (p, "%s ", (string) )
-
     if (vlc_CPU_MMX()) p += sprintf (p, "MMX ");
     if (vlc_CPU_MMXEXT()) p += sprintf (p, "MMXEXT ");
     if (vlc_CPU_SSE()) p += sprintf (p, "SSE ");;
@@ -344,7 +337,7 @@ void vlc_CPU_dump (vlc_object_t *obj)
     if (vlc_CPU_SSE4_1()) p += sprintf (p, "SSE4.1 ");;
     if (vlc_CPU_SSE4_2()) p += sprintf (p, "SSE4.2 ");;
     if (vlc_CPU_SSE4A()) p += sprintf (p, "SSE4A ");;
-    PRINT_CAPABILITY(CPU_CAPABILITY_3DNOW, "3DNow!");
+    if (vlc_CPU_3dNOW()) p += sprintf (p, "3DNow! ");;
 
 #elif defined (__powerpc__) || defined (__ppc__) || defined (__ppc64__)
     if (vlc_CPU_ALTIVEC())  p += sprintf (p, "AltiVec");

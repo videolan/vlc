@@ -649,7 +649,7 @@ int Open( vlc_object_t *p_this )
     else
 #endif
 #if defined(CAN_COMPILE_3DNOW)
-    if( chroma->pixel_size == 1 && (vlc_CPU() & CPU_CAPABILITY_3DNOW) )
+    if( chroma->pixel_size == 1 && vlc_CPU_3dNOW() )
     {
         p_sys->pf_merge = Merge3DNow;
         p_sys->pf_end_merge = End3DNow;

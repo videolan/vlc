@@ -31,7 +31,7 @@ VLC_API unsigned vlc_CPU(void);
 # if defined (__i386__) || defined (__x86_64__)
 #  define HAVE_FPU 1
 #  define VLC_CPU_MMX    8
-#  define CPU_CAPABILITY_3DNOW   (1<<4)
+#  define VLC_CPU_3dNOW  16
 #  define VLC_CPU_MMXEXT 32
 #  define VLC_CPU_SSE    64
 #  define VLC_CPU_SSE2   128
@@ -101,6 +101,12 @@ VLC_API unsigned vlc_CPU(void);
 #  define vlc_CPU_SSE4A() (1)
 # else
 #  define vlc_CPU_SSE4A() ((vlc_CPU() & VLC_CPU_SSE4A) != 0)
+# endif
+
+# ifdef __3dNOW__
+#  define vlc_CPU_3dNOW() (1)
+# else
+#  define vlc_CPU_3dNOW() ((vlc_CPU() & VLC_CPU_3dNOW) != 0)
 # endif
 
 # elif defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)

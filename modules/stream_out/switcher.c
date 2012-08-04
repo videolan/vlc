@@ -380,12 +380,11 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         /* Set CPU capabilities */
         id->ff_enc_c->dsp_mask = 0;
 #if defined (__i386__) || defined (__x86_64__)
-        unsigned i_cpu = vlc_CPU();
         if( !vlc_CPU_MMX() )
             id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_MMX;
         if( !vlc_CPU_MMXEXT() )
             id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_MMX2;
-        if( !(i_cpu & CPU_CAPABILITY_3DNOW) )
+        if( !vlc_CPU_3dNOW() )
             id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_3DNOW;
         if( !vlc_CPU_SSE() )
             id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_SSE;
@@ -801,12 +800,11 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
         /* Set CPU capabilities */
         id->ff_enc_c->dsp_mask = 0;
 #if defined (__i386__) || defined (__x86_64__)
-        unsigned i_cpu = vlc_CPU();
         if( !vlc_CPU_MMX() )
             id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_MMX;
         if( !vlc_CPU_MMXEXT() )
             id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_MMX2;
-        if( !(i_cpu & CPU_CAPABILITY_3DNOW) )
+        if( !vlc_CPU_3dNOW() )
             id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_3DNOW;
         if( !vlc_CPU_SSE() )
             id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_SSE;

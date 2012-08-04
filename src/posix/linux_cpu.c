@@ -85,10 +85,8 @@ static void vlc_CPU_init (void)
                 core_caps |= VLC_CPU_SSE4_1;
             if (!strcmp (cap, "sse4a"))
                 core_caps |= VLC_CPU_SSE4A;
-# ifndef __3dNOW__
             if (!strcmp (cap, "3dnow"))
-                core_caps |= CPU_CAPABILITY_3DNOW;
-# endif
+                core_caps |= VLC_CPU_3dNOW;
 
 #elif defined (__powerpc__) || defined (__powerpc64__)
             if (!strcmp (cap, "altivec supported"))
@@ -105,13 +103,6 @@ static void vlc_CPU_init (void)
     if (all_caps == 0xFFFFFFFF) /* Error parsing of cpuinfo? */
         all_caps = 0; /* Do not assume any capability! */
 
-    /* Always enable capabilities that were forced during compilation */
-#if defined (__i386__) || defined (__x86_64__)
-# ifdef __3dNOW__
-    all_caps |= CPU_CAPABILITY_3DNOW;
-# endif
-
-#endif
     cpu_flags = all_caps;
 }
 
