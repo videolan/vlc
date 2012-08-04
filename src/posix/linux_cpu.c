@@ -85,8 +85,16 @@ static void vlc_CPU_init (void)
                 core_caps |= VLC_CPU_SSE4_1;
             if (!strcmp (cap, "sse4a"))
                 core_caps |= VLC_CPU_SSE4A;
+            if (!strcmp (cap, "avx"))
+                core_caps |= VLC_CPU_AVX;
+            if (!strcmp (cap, "avx2"))
+                core_caps |= VLC_CPU_AVX2;
             if (!strcmp (cap, "3dnow"))
                 core_caps |= VLC_CPU_3dNOW;
+            if (!strcmp (cap, "xop"))
+                core_caps |= VLC_CPU_XOP;
+            if (!strcmp (cap, "fma4"))
+                core_caps |= VLC_CPU_FMA4;
 
 #elif defined (__powerpc__) || defined (__powerpc64__)
             if (!strcmp (cap, "altivec supported"))
