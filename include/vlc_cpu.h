@@ -32,8 +32,8 @@ VLC_API unsigned vlc_CPU(void);
 #  define HAVE_FPU 1
 #  define VLC_CPU_MMX    8
 #  define CPU_CAPABILITY_3DNOW   (1<<4)
-#  define CPU_CAPABILITY_MMXEXT  (1<<5)
-#  define CPU_CAPABILITY_SSE     (1<<6)
+#  define VLC_CPU_MMXEXT 32
+#  define VLC_CPU_SSE    64
 #  define CPU_CAPABILITY_SSE2    (1<<7)
 #  define CPU_CAPABILITY_SSE3    (1<<8)
 #  define CPU_CAPABILITY_SSSE3   (1<<9)
@@ -54,11 +54,17 @@ VLC_API unsigned vlc_CPU(void);
 # endif
 
 # if defined (__SSE__)
+#  define vlc_CPU_MMXEXT() (1)
+#  define vlc_CPU_SSE() (1)
 #  define VLC_SSE
-# elif VLC_GCC_VERSION(4, 4)
-#  define VLC_SSE __attribute__ ((__target__ ("sse")))
 # else
-#  define VLC_SSE VLC_SSE_is_not_implemented_on_this_compiler
+#  define vlc_CPU_MMXEXT() ((vlc_CPU() & VLC_CPU_MMXEXT) != 0)
+#  define vlc_CPU_SSE() ((vlc_CPU() & VLC_CPU_SSE) != 0)
+#  if VLC_GCC_VERSION(4, 4)
+#   define VLC_SSE __attribute__ ((__target__ ("sse")))
+#  else
+#   define VLC_SSE VLC_SSE_is_not_implemented_on_this_compiler
+#  endif
 # endif
 
 # elif defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)

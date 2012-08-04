@@ -328,11 +328,11 @@ int OpenEncoder( vlc_object_t *p_this )
     unsigned i_cpu = vlc_CPU();
     if( !vlc_CPU_MMX() )
         p_context->dsp_mask |= AV_CPU_FLAG_MMX;
-    if( !(i_cpu & CPU_CAPABILITY_MMXEXT) )
+    if( !vlc_CPU_MMXEXT() )
         p_context->dsp_mask |= AV_CPU_FLAG_MMX2;
     if( !(i_cpu & CPU_CAPABILITY_3DNOW) )
         p_context->dsp_mask |= AV_CPU_FLAG_3DNOW;
-    if( !(i_cpu & CPU_CAPABILITY_SSE) )
+    if( !vlc_CPU_SSE() )
         p_context->dsp_mask |= AV_CPU_FLAG_SSE;
     if( !(i_cpu & CPU_CAPABILITY_SSE2) )
         p_context->dsp_mask |= AV_CPU_FLAG_SSE2;

@@ -113,7 +113,7 @@ static void FieldFromPlane( plane_t *p_dst, const plane_t *p_src, int i_field )
  * @param[in] p_pix_c Base pointer to the same block in current picture
  * @param i_pitch_prev i_pitch of previous picture
  * @param i_pitch_curr i_pitch of current picture
- * @param b_mmx (vlc_CPU() & CPU_CAPABILITY_MMXEXT) or false.
+ * @param b_mmx (vlc_CPU() & VLC_CPU_MMXEXT) or false.
  * @param[out] pi_top 1 if top field of the block had motion, 0 if no
  * @param[out] pi_bot 1 if bottom field of the block had motion, 0 if no
  * @return 1 if the block had motion, 0 if no
@@ -388,9 +388,9 @@ int EstimateNumBlocksWithMotion( const picture_t* p_prev,
 
     /* We must tell our inline helper whether to use MMX acceleration. */
 #ifdef CAN_COMPILE_MMXEXT
-    bool b_mmx = ( vlc_CPU() & CPU_CAPABILITY_MMXEXT );
+    const bool b_mmx = vlc_CPU_MMXEXT();
 #else
-    bool b_mmx = false;
+    const bool b_mmx = false;
 #endif
 
     int i_score = 0;
@@ -466,9 +466,11 @@ int CalculateInterlaceScore( const picture_t* p_pic_top,
     int32_t i_score_c   = 0; /* this counts as-is (used for non-MMX parts) */
 
 #ifdef CAN_COMPILE_MMXEXT
-    unsigned u_cpu = vlc_CPU();
+# ifndef __SSE__
+    const unsigned u_cpu = vlc_CPU();
 
-    if( u_cpu & CPU_CAPABILITY_MMXEXT )
+    if( u_cpu & VLC_CPU_MMXEXT )
+# endif
         pxor_r2r( mm7, mm7 ); /* we will keep score in mm7 */
 #endif
 
@@ -512,7 +514,9 @@ int CalculateInterlaceScore( const picture_t* p_pic_top,
                             # of pixels < (2^32)/255
                Note: calculates score * 255
             */
-            if( u_cpu & CPU_CAPABILITY_MMXEXT )
+# ifndef __SSE__
+            if( u_cpu & VLC_CPU_MMXEXT )
+# endif
             {
                 static const mmx_t b0   = { .uq = 0x0000000000000000ULL };
                 static const mmx_t b128 = { .uq = 0x8080808080808080ULL };
@@ -591,7 +595,9 @@ int CalculateInterlaceScore( const picture_t* p_pic_top,
     }
 
 #ifdef CAN_COMPILE_MMXEXT
-    if( u_cpu & CPU_CAPABILITY_MMXEXT )
+# ifndef __SSE__
+    if( u_cpu & VLC_CPU_MMXEXT )
+# endif
     {
         movd_r2m( mm7, i_score_mmx );
         emms();

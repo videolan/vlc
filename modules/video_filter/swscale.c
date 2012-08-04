@@ -232,14 +232,13 @@ static int GetSwsCpuMask(void)
     int i_sws_cpu = 0;
 
 #if defined(__i386__) || defined(__x86_64__)
-    const unsigned int i_cpu = vlc_CPU();
     if( vlc_CPU_MMX() )
         i_sws_cpu |= SWS_CPU_CAPS_MMX;
 #if (LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0))
-    if( i_cpu & CPU_CAPABILITY_MMXEXT )
+    if( vlc_CPU_MMXEXT() )
         i_sws_cpu |= SWS_CPU_CAPS_MMX2;
 #endif
-    if( i_cpu & CPU_CAPABILITY_3DNOW )
+    if( vlc_CPU() & CPU_CAPABILITY_3DNOW )
         i_sws_cpu |= SWS_CPU_CAPS_3DNOW;
 #elif defined(__ppc__) || defined(__ppc64__) || defined(__powerpc__)
     if( vlc_CPU_ALTIVEC() )

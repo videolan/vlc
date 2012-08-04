@@ -1260,14 +1260,13 @@ static int  Open ( vlc_object_t *p_this )
     free( psz_val );
 
 #if defined (__i386__) || defined (__x86_64__)
-    unsigned i_cpu = vlc_CPU();
     if( !vlc_CPU_MMX() )
         p_sys->param.cpu &= ~X264_CPU_MMX;
-    if( !(i_cpu & CPU_CAPABILITY_MMXEXT) )
+    if( !vlc_CPU_MMXEXT() )
         p_sys->param.cpu &= ~X264_CPU_MMXEXT;
-    if( !(i_cpu & CPU_CAPABILITY_SSE) )
+    if( !vlc_CPU_SSE() )
         p_sys->param.cpu &= ~X264_CPU_SSE;
-    if( !(i_cpu & CPU_CAPABILITY_SSE2) )
+    if( !(vlc_CPU() & CPU_CAPABILITY_SSE2) )
         p_sys->param.cpu &= ~X264_CPU_SSE2;
 #endif
 

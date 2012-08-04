@@ -69,12 +69,10 @@ static void vlc_CPU_init (void)
 #elif defined (__i386__) || defined (__x86_64__)
             if (!strcmp (cap, "mmx"))
                 core_caps |= VLC_CPU_MMX;
-# ifndef __SSE__
             if (!strcmp (cap, "sse"))
-                core_caps |= CPU_CAPABILITY_SSE | CPU_CAPABILITY_MMXEXT;
+                core_caps |= VLC_CPU_SSE | VLC_CPU_MMXEXT;
             if (!strcmp (cap, "mmxext"))
-                core_caps |= CPU_CAPABILITY_MMXEXT;
-# endif
+                core_caps |= VLC_CPU_MMXEXT;
 # ifndef __SSE2__
             if (!strcmp (cap, "sse2"))
                 core_caps |= CPU_CAPABILITY_SSE2;
@@ -119,9 +117,6 @@ static void vlc_CPU_init (void)
 
     /* Always enable capabilities that were forced during compilation */
 #if defined (__i386__) || defined (__x86_64__)
-# ifdef __SSE__
-    all_caps |= CPU_CAPABILITY_SSE | CPU_CAPABILITY_MMXEXT;
-# endif
 # ifdef __SSE2__
     all_caps |= CPU_CAPABILITY_SSE2;
 # endif

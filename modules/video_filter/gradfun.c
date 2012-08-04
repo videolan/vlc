@@ -133,21 +133,24 @@ static int Open(vlc_object_t *object)
     cfg->thresh      = 0.0;
     cfg->radius      = 0;
     cfg->buf         = NULL;
-    cfg->filter_line = filter_line_c;
-    cfg->blur_line   = blur_line_c;
 
 #if HAVE_SSE2 && HAVE_6REGS
     if (vlc_CPU() & CPU_CAPABILITY_SSE2)
         cfg->blur_line = blur_line_sse2;
+    else
 #endif
-#if HAVE_MMX2
-    if (vlc_CPU() & CPU_CAPABILITY_MMXEXT)
-        cfg->filter_line = filter_line_mmx2;
-#endif
+        cfg->blur_line   = blur_line_c;
 #if HAVE_SSSE3
     if (vlc_CPU() & CPU_CAPABILITY_SSSE3)
         cfg->filter_line = filter_line_ssse3;
+    else
 #endif
+#if HAVE_MMX2
+    if (vlc_CPU_MMXEXT())
+        cfg->filter_line = filter_line_mmx2;
+    else
+#endif
+        cfg->filter_line = filter_line_c;
 
     filter->p_sys           = sys;
     filter->pf_video_filter = Filter;

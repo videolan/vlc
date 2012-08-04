@@ -223,19 +223,14 @@ void vlc_CPU_init (void)
 # endif
     i_capabilities |= VLC_CPU_MMX;
 
-# if defined (__SSE__)
-    i_capabilities |= CPU_CAPABILITY_MMXEXT | CPU_CAPABILITY_SSE;
-# else
     if( i_edx & 0x02000000 )
     {
-        i_capabilities |= CPU_CAPABILITY_MMXEXT;
-
+        i_capabilities |= VLC_CPU_MMXEXT;
 #   ifdef CAN_COMPILE_SSE
         if (vlc_CPU_check ("SSE", SSE_test))
-            i_capabilities |= CPU_CAPABILITY_SSE;
+            i_capabilities |= VLC_CPU_SSE;
 #   endif
     }
-# endif
 
 # if defined (__SSE2__)
     i_capabilities |= CPU_CAPABILITY_SSE2;
@@ -289,9 +284,7 @@ void vlc_CPU_init (void)
 # endif
 
     if( b_amd && ( i_edx & 0x00400000 ) )
-    {
-        i_capabilities |= CPU_CAPABILITY_MMXEXT;
-    }
+        i_capabilities |= VLC_CPU_MMXEXT;
 out:
 
 #elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __powerpc64__ ) \
@@ -353,15 +346,15 @@ void vlc_CPU_dump (vlc_object_t *obj)
         p += sprintf (p, "%s ", (string) )
 
     if (vlc_CPU_MMX()) p += sprintf (p, "MMX ");
-    PRINT_CAPABILITY(CPU_CAPABILITY_3DNOW, "3DNow!");
-    PRINT_CAPABILITY(CPU_CAPABILITY_MMXEXT, "MMXEXT");
-    PRINT_CAPABILITY(CPU_CAPABILITY_SSE, "SSE");
+    if (vlc_CPU_MMXEXT()) p += sprintf (p, "MMXEXT ");
+    if (vlc_CPU_SSE()) p += sprintf (p, "SSE ");;
     PRINT_CAPABILITY(CPU_CAPABILITY_SSE2, "SSE2");
     PRINT_CAPABILITY(CPU_CAPABILITY_SSE3, "SSE3");
     PRINT_CAPABILITY(CPU_CAPABILITY_SSSE3, "SSSE3");
     PRINT_CAPABILITY(CPU_CAPABILITY_SSE4_1, "SSE4.1");
     PRINT_CAPABILITY(CPU_CAPABILITY_SSE4_2, "SSE4.2");
     PRINT_CAPABILITY(CPU_CAPABILITY_SSE4A,  "SSE4A");
+    PRINT_CAPABILITY(CPU_CAPABILITY_3DNOW, "3DNow!");
 
 #elif defined (__powerpc__) || defined (__ppc__) || defined (__ppc64__)
     if (vlc_CPU_ALTIVEC())  p += sprintf (p, "AltiVec");

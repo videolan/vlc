@@ -641,7 +641,7 @@ int Open( vlc_object_t *p_this )
     else
 #endif
 #if defined(CAN_COMPILE_MMXEXT)
-    if( chroma->pixel_size == 1 && (vlc_CPU() & CPU_CAPABILITY_MMXEXT) )
+    if( chroma->pixel_size == 1 && vlc_CPU_MMXEXT() )
     {
         p_sys->pf_merge = MergeMMXEXT;
         p_sys->pf_end_merge = EndMMX;
