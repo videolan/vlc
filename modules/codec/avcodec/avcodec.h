@@ -29,6 +29,8 @@ int GetVlcFourcc( int i_ffmpeg_codec, int *pi_cat,
                   vlc_fourcc_t *pi_fourcc, const char **ppsz_name );
 void GetVlcAudioFormat( vlc_fourcc_t *, unsigned *pi_bits, int i_sample_fmt );
 
+unsigned GetVlcDspMask( void );
+
 picture_t * DecodeVideo( decoder_t *, block_t ** );
 block_t * DecodeAudio( decoder_t *, block_t ** );
 subpicture_t *DecodeSubtitle( decoder_t *p_dec, block_t ** );

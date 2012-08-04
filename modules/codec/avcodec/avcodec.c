@@ -327,37 +327,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_context->debug = var_InheritInteger( p_dec, "avcodec-debug" );
     p_context->opaque = (void *)p_this;
-
-    /* Set CPU capabilities */
-    p_context->dsp_mask = 0;
-#if defined (__i386__) || defined (__x86_64__)
-    if( !vlc_CPU_MMX() )
-        p_context->dsp_mask |= AV_CPU_FLAG_MMX;
-    if( !vlc_CPU_MMXEXT() )
-        p_context->dsp_mask |= AV_CPU_FLAG_MMX2;
-    if( !vlc_CPU_3dNOW() )
-        p_context->dsp_mask |= AV_CPU_FLAG_3DNOW;
-    if( !vlc_CPU_SSE() )
-        p_context->dsp_mask |= AV_CPU_FLAG_SSE;
-    if( !vlc_CPU_SSE2() )
-        p_context->dsp_mask |= AV_CPU_FLAG_SSE2;
-# ifdef AV_CPU_FLAG_SSE3
-    if( !vlc_CPU_SSE3() )
-        p_context->dsp_mask |= AV_CPU_FLAG_SSE3;
-# endif
-# ifdef AV_CPU_FLAG_SSSE3
-    if( !vlc_CPU_SSE3() )
-        p_context->dsp_mask |= AV_CPU_FLAG_SSSE3;
-# endif
-# ifdef AV_CPU_FLAG_SSE4
-    if( !vlc_CPU_SSE4_1() )
-        p_context->dsp_mask |= AV_CPU_FLAG_SSE4;
-# endif
-# ifdef AV_CPU_FLAG_SSE42
-    if( !vlc_CPU_SSE4_2() )
-        p_context->dsp_mask |= AV_CPU_FLAG_SSE42;
-# endif
-#endif
+    p_context->dsp_mask = GetVlcDspMask(); /* set CPU capabilities */
 
     p_dec->b_need_packetized = true;
     switch( i_cat )
