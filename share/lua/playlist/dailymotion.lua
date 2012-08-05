@@ -53,7 +53,7 @@ function parse()
         if not line then
             break
         end
-        if string.match( line, "\"sequence\",")
+        if string.match( line, "\"sequence\"")
         then
             line = vlc.strings.decode_uri(line):gsub("\\/", "/")
 
