@@ -99,36 +99,6 @@ VLC_SSE static void SSE_test (void)
     asm volatile ("xorps %%xmm0,%%xmm0\n" : : : "xmm0", "xmm1");
 }
 #endif
-#if defined (CAN_COMPILE_SSE2) && !defined (__SSE2__)
-VLC_SSE static void SSE2_test (void)
-{
-    asm volatile ("movupd %%xmm0, %%xmm0\n" : : : "xmm0", "xmm1");
-}
-#endif
-#if defined (CAN_COMPILE_SSE3) && !defined (__SSE3__)
-VLC_SSE static void SSE3_test (void)
-{
-    asm volatile ("movsldup %%xmm1, %%xmm0\n" : : : "xmm0", "xmm1");
-}
-#endif
-#if defined (CAN_COMPILE_SSSE3) && !defined (__SSSE3__)
-VLC_SSE static void SSSE3_test (void)
-{
-    asm volatile ("pabsw %%xmm1, %%xmm0\n" : : : "xmm0", "xmm1");
-}
-#endif
-#if defined (CAN_COMPILE_SSE4_1) && !defined (__SSE4_1__)
-VLC_SSE static void SSE4_1_test (void)
-{
-    asm volatile ("pmaxsb %%xmm1, %%xmm0\n" : : : "xmm0", "xmm1");
-}
-#endif
-#if defined (CAN_COMPILE_SSE4_2) && !defined (__SSE4_2__)
-VLC_SSE static void SSE4_2_test (void)
-{
-    asm volatile ("pcmpgtq %%xmm1, %%xmm0\n" : : : "xmm0", "xmm1");
-}
-#endif
 #if defined (CAN_COMPILE_3DNOW) && !defined (__3dNOW__)
 VLC_MMX static void ThreeD_Now_test (void)
 {
@@ -224,38 +194,24 @@ void vlc_CPU_init (void)
     i_capabilities |= VLC_CPU_MMX;
 
     if( i_edx & 0x02000000 )
-    {
         i_capabilities |= VLC_CPU_MMXEXT;
-#   ifdef CAN_COMPILE_SSE
-        if (vlc_CPU_check ("SSE", SSE_test))
+# if defined (CAN_COMPILE_SSE) && !defined (__SSE__)
+    if (( i_edx & 0x02000000 ) && vlc_CPU_check ("SSE", SSE_test))
+# endif
+    {
+        /*if( i_edx & 0x02000000 )*/
             i_capabilities |= VLC_CPU_SSE;
-#   endif
+        if (i_edx & 0x04000000)
+            i_capabilities |= VLC_CPU_SSE2;
+        if (i_ecx & 0x00000001)
+            i_capabilities |= VLC_CPU_SSE3;
+        if (i_ecx & 0x00000200)
+            i_capabilities |= VLC_CPU_SSSE3;
+        if (i_ecx & 0x00080000)
+            i_capabilities |= VLC_CPU_SSE4_1;
+        if (i_ecx & 0x00100000)
+            i_capabilities |= VLC_CPU_SSE4_2;
     }
-
-# if defined (CAN_COMPILE_SSE2)
-    if ((i_edx & 0x04000000) && vlc_CPU_check ("SSE2", SSE2_test))
-        i_capabilities |= VLC_CPU_SSE2;
-# endif
-
-# if defined (CAN_COMPILE_SSE3)
-    if ((i_ecx & 0x00000001) && vlc_CPU_check ("SSE3", SSE3_test))
-        i_capabilities |= VLC_CPU_SSE3;
-# endif
-
-# if defined (CAN_COMPILE_SSSE3)
-    if ((i_ecx & 0x00000200) && vlc_CPU_check ("SSSE3", SSSE3_test))
-        i_capabilities |= VLC_CPU_SSSE3;
-# endif
-
-# if defined (CAN_COMPILE_SSE4_1)
-    if ((i_ecx & 0x00080000) && vlc_CPU_check ("SSE4.1", SSE4_1_test))
-        i_capabilities |= VLC_CPU_SSE4_1;
-# endif
-
-# if defined (CAN_COMPILE_SSE4_2)
-    if ((i_ecx & 0x00100000) && vlc_CPU_check ("SSE4.2", SSE4_2_test))
-        i_capabilities |= VLC_CPU_SSE4_2;
-# endif
 
     /* test for additional capabilities */
     cpuid( 0x80000000 );
