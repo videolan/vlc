@@ -1009,7 +1009,7 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle,
     {
         const char *s = TextGetLine( txt );
         int h1, m1, s1, c1, h2, m2, s2, c2;
-        char *psz_text;
+        char *psz_text, *psz_temp;
         char temp[16];
 
         if( !s )
@@ -1052,9 +1052,14 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle,
                 int i_layer = ( p_sys->i_type == SUB_TYPE_ASS ) ? atoi( temp ) : 0;
 
                 /* ReadOrder, Layer, %s(rest of fields) */
-                snprintf( temp, sizeof(temp), "%d,%d,", i_idx, i_layer );
-                memmove( psz_text + strlen(temp), psz_text, strlen(psz_text)+1 );
-                memcpy( psz_text, temp, strlen(temp) );
+                if( asprintf( &psz_temp, "%d,%d,%s", i_idx, i_layer, psz_text ) == -1 )
+                {
+                    free( psz_text );
+                    return VLC_ENOMEM;
+                }
+
+                free( psz_text );
+                psz_text = psz_temp;
             }
 
             p_subtitle->i_start = ( (int64_t)h1 * 3600*1000 +
