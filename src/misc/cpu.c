@@ -332,7 +332,7 @@ void vlc_CPU_dump (vlc_object_t *obj)
     if (vlc_CPU_MMXEXT()) p += sprintf (p, "MMXEXT ");
     if (vlc_CPU_SSE()) p += sprintf (p, "SSE ");
     if (vlc_CPU_SSE2()) p += sprintf (p, "SSE2 ");
-    if (vlc_CPU_SSE3()) p += sprintf (p, "SSE2 ");
+    if (vlc_CPU_SSE3()) p += sprintf (p, "SSE3 ");
     if (vlc_CPU_SSSE3()) p += sprintf (p, "SSSE3 ");
     if (vlc_CPU_SSE4_1()) p += sprintf (p, "SSE4.1 ");
     if (vlc_CPU_SSE4_2()) p += sprintf (p, "SSE4.2 ");
