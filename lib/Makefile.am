@@ -56,7 +56,7 @@ libvlc_la_SOURCES = \
 EXTRA_DIST = libvlc.pc.in libvlc.sym ../include/vlc/libvlc_version.h.in
 
 libvlc_la_LIBADD = $(LIBS_libvlc) \
-	../src/libvlccore.la ../compat/libcompat.la
+	../src/libvlccore.la ../compat/libcompat.la $(LIBM)
 libvlc_la_LDFLAGS = \
 	$(LDFLAGS_libvlc) \
 	-no-undefined \
