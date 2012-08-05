@@ -134,6 +134,7 @@ function updatePlayList(force_refresh) {
         $('#libraryTree').jstree('refresh', -1);
     } else {
         //iterate through playlist..
+        var match = false;
         $('.jstree-leaf').each(function(){
             var id = $(this).attr('id');
             if (id != null && id.substr(0,5) == 'plid_') {
@@ -142,6 +143,7 @@ function updatePlayList(force_refresh) {
                     $(this).addClass('ui-state-highlight');
                     $(this).attr('current', 'current');
                     this.scrollIntoView(true);
+                    match = true;
                 } else {
                     $(this).removeClass('ui-state-highlight');
                     $(this).removeAttr('current');
@@ -151,6 +153,8 @@ function updatePlayList(force_refresh) {
                 }
             }
     	});
+    	//local title wasn't found - refresh playlist..
+    	if (!match) updatePlayList(true);
     }
 }
 
@@ -226,6 +230,7 @@ function browse(dir) {
                     break;
                 default:
                     sendCommand('command=in_play&input=' + encodeURIComponent($(this).attr('openfile')));
+                    updatePlayList(true);
                     break;
                 }
                 $('#window_browse').dialog('close');

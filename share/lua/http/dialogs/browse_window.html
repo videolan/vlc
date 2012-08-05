@@ -20,6 +20,7 @@
 						switch(browse_target){
 							default:
 								sendCommand('command=in_enqueue&input='+encodeURI(path));
+								setTimeout(function(){updatePlayList(true);},1000);
 								break;
 						}
 					});
