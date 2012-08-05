@@ -174,7 +174,7 @@ public:
     virtual ~DiscOpenPanel();
     virtual void clear() ;
     virtual void accept() ;
-#ifdef WIN32
+#if defined( WIN32 ) || defined( __OS2__ )
     virtual void onFocus();
 #endif
 private:
