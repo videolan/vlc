@@ -79,9 +79,7 @@ static void DarkenField( picture_t *p_dst,
     /* Bitwise ANDing with this clears the i_strength highest bits
        of each byte */
 #ifdef CAN_COMPILE_MMXEXT
-# ifndef __SSE__
-    const unsigned u_cpu = vlc_CPU();
-# endif
+    const bool mmxext = vlc_CPU_MMXEXT();
     uint64_t i_strength_u64 = i_strength; /* for MMX version (needs to know
                                              number of bits) */
 #endif
@@ -115,9 +113,7 @@ static void DarkenField( picture_t *p_dst,
         int x = 0;
 
 #ifdef CAN_COMPILE_MMXEXT
-# ifndef __SSE__
-        if( u_cpu & VLC_CPU_MMXEXT )
-# endif
+        if( mmxext )
         {
             movq_m2r( i_strength_u64,  mm1 );
             movq_m2r( remove_high_u64, mm2 );
@@ -133,12 +129,10 @@ static void DarkenField( picture_t *p_dst,
         }
         else
 #endif
-#if !defined (CAN_COMPILE_MMXEXT) || !defined (__SSE__)
         {
             for( ; x < w8; x += 8, ++po )
                 (*po) = ( ((*po) >> i_strength) & remove_high_u64 );
         }
-#endif
 
         /* handle the width remainder */
         uint8_t *po_temp = (uint8_t *)po;
@@ -178,9 +172,7 @@ static void DarkenField( picture_t *p_dst,
 
 #ifdef CAN_COMPILE_MMXEXT
                 /* See also easy-to-read C version below. */
-# ifndef __SSE__
-                if( u_cpu & VLC_CPU_MMXEXT )
-# endif
+                if( mmxext )
                 {
                     static const mmx_t b128 = { .uq = 0x8080808080808080ULL };
                     movq_m2r( b128, mm5 );
@@ -222,9 +214,7 @@ static void DarkenField( picture_t *p_dst,
     } /* if process_chroma */
 
 #ifdef CAN_COMPILE_MMXEXT
-# ifndef __SSE__
-    if( u_cpu & VLC_CPU_MMXEXT )
-# endif
+    if( mmxext )
         emms();
 #endif
 }
