@@ -1,0 +1,25 @@
+From c329045758ccd614284f0b7cca859bc046ba1ae3 Mon Sep 17 00:00:00 2001
+From: Gregory Maxwell <greg@xiph.org>
+Date: Sat, 7 Jul 2012 02:29:56 -0400
+Subject: [PATCH] Make stack-protector check use AC_LINK_IFELSE.
+
+---
+ configure.ac |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4a2499f..330cfde 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -224,7 +224,7 @@ if test "x$ac_cv_c_compiler_gnu" = "xyes" ; then
+ saved_CFLAGS="$CFLAGS"
+ CFLAGS="$CFLAGS -fstack-protector-all"
+ AC_MSG_CHECKING([if ${CC} supports -fstack-protector-all])
+-AC_COMPILE_IFELSE([AC_LANG_SOURCE([char foo;])],
++AC_LINK_IFELSE([AC_LANG_SOURCE([void main(void){char foo;}])],
+       [ AC_MSG_RESULT([yes])
+         STACK_PROTECTOR="-fstack-protector-all" ],
+         AC_MSG_RESULT([no]))
+-- 
+1.7.10.4
+

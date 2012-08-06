@@ -1,0 +1,29 @@
+From f16543b65a7f91a38ca3fa1a4944599440608daf Mon Sep 17 00:00:00 2001
+From: Gregory Maxwell <greg@xiph.org>
+Date: Mon, 6 Aug 2012 11:45:58 -0400
+Subject: [PATCH] =?UTF-8?q?Avoid=20C99=20log2=20invocation=20in=20tests=20re?=
+ =?UTF-8?q?ported=20by=20Rafa=C3=ABl=20Carr=C3=A9=20on=20android.?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ celt/tests/test_unit_mathops.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/celt/tests/test_unit_mathops.c b/celt/tests/test_unit_mathops.c
+index 8119bc1..e33d3ae 100644
+--- a/celt/tests/test_unit_mathops.c
++++ b/celt/tests/test_unit_mathops.c
+@@ -209,7 +209,7 @@ void testilog2(void)
+    opus_val32 x;
+    for (x=1;x<=268435455;x+=127)
+    {
+-      opus_val32 error = abs(celt_ilog2(x)-(int)floor(log2(x)));
++      opus_val32 error = abs(celt_ilog2(x)-(int)floor(celt_log2(x)));
+       if (error!=0)
+       {
+          printf("celt_ilog2 failed: celt_ilog2(x)!=floor(log2(x)) (x = %d, error = %d)\n",x,error);
+-- 
+1.7.10.4
+
