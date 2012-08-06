@@ -79,12 +79,6 @@ struct sout_mux_sys_t
     int pi_chan_table[AOUT_CHAN_MAX];
 };
 
-
-static const uint32_t pi_channels_src[] =
-    { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
-      AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
-      AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, AOUT_CHAN_REARCENTER,
-      AOUT_CHAN_CENTER, AOUT_CHAN_LFE, 0 };
 static const uint32_t pi_channels_in[] =
     { WAVE_SPEAKER_FRONT_LEFT, WAVE_SPEAKER_FRONT_RIGHT,
       WAVE_SPEAKER_SIDE_LEFT, WAVE_SPEAKER_SIDE_RIGHT,
@@ -187,13 +181,9 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     p_sys->i_channel_mask = 0;
     if( p_input->p_fmt->audio.i_physical_channels )
     {
-        unsigned int i;
- 
-        for( i = 0; i < sizeof(pi_channels_in)/sizeof(uint32_t); i++ )
-        {
-            if( p_input->p_fmt->audio.i_physical_channels & pi_channels_src[i])
+        for( unsigned i = 0; i < pi_vlc_chan_order_wg4[i]; i++ )
+            if( p_input->p_fmt->audio.i_physical_channels & pi_vlc_chan_order_wg4[i])
                 p_sys->i_channel_mask |= pi_channels_in[i];
-        }
 
         p_sys->b_chan_reorder =
             aout_CheckChannelReorder( pi_channels_in, pi_channels_out,

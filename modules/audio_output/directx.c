@@ -820,11 +820,9 @@ static int CreateDSBuffer( audio_output_t *p_aout, int i_format,
 
     /* First set the sound buffer format */
     waveformat.dwChannelMask = 0;
-    for( i = 0; i < sizeof(pi_channels_src)/sizeof(uint32_t); i++ )
-    {
-        if( i_channels & pi_channels_src[i] )
+    for( unsigned i = 0; pi_vlc_chan_order_wg4[i]; i++ )
+        if( i_channels & pi_vlc_chan_order_wg4[i] )
             waveformat.dwChannelMask |= pi_channels_in[i];
-    }
 
     switch( i_format )
     {
