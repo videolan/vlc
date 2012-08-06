@@ -328,7 +328,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #undef audioCommon
 
             /* Audio Options */
-            ui.volumeValue->setMaximum( (AOUT_VOLUME_DEFAULT * 2) / AOUT_VOLUME_DEFAULT * 100 );
+            ui.volumeValue->setMaximum( 200 );
             CONFIG_GENERIC_NO_BOOL( "volume" , IntegerRangeSlider, NULL,
                                      defaultVolume );
             CONNECT( ui.defaultVolume, valueChanged( int ),
