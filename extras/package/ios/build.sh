@@ -178,7 +178,7 @@ fi
     --disable-SDL_image \
     --disable-fontconfig \
     --disable-ass \
-    --enable-freetype2 \
+    --disable-freetype2 \
     --enable-iconv \
     --disable-fribidi \
     --disable-zvbi \
@@ -198,7 +198,7 @@ fi
     --disable-orc \
     --disable-schroedinger \
     --disable-libmpeg2 \
-    --disable-mad > ${out}
+    --enable-mad > ${out}
 make
 spopd
 
@@ -259,7 +259,7 @@ ${VLCROOT}/configure \
     --disable-sout \
     --disable-faad \
     --disable-lua \
-    --disable-mad \
+    --enable-mad \
     --disable-a52 \
     --disable-fribidi \
     --disable-macosx-audio \
@@ -299,7 +299,6 @@ ${VLCROOT}/configure \
     --disable-sout \
     --disable-faad \
     --disable-lua \
-    --disable-mad \
     --disable-mtp \
     --disable-ogg \
     --disable-speex \
