@@ -522,38 +522,41 @@ static int ParseVobSubIDX( demux_t *p_demux )
 
             /* Lets start a new track */
             if( sscanf( line, "id: %32[^ ,], index: %d",
-                        language, &i_track_id ) == 2 )
+                        language, &i_track_id ) != 2 )
             {
-                p_sys->i_tracks++;
-                p_sys->track = xrealloc( p_sys->track,
-                          sizeof( vobsub_track_t ) * (p_sys->i_tracks + 1 ) );
-
-                /* Init the track */
-                current_tk = &p_sys->track[p_sys->i_tracks - 1];
-                memset( current_tk, 0, sizeof( vobsub_track_t ) );
-                current_tk->i_current_subtitle = 0;
-                current_tk->i_subtitles = 0;
-                current_tk->p_subtitles = xmalloc( sizeof( subtitle_t ) );
-                current_tk->i_track_id = i_track_id;
-                current_tk->i_delay = (int64_t)0;
-
-                es_format_Init( &fmt, SPU_ES, VLC_CODEC_SPU );
-                fmt.subs.spu.i_original_frame_width = p_sys->i_original_frame_width;
-                fmt.subs.spu.i_original_frame_height = p_sys->i_original_frame_height;
-                fmt.psz_language = language;
-                if( p_sys->b_palette )
+                if( sscanf( line, "id: , index: %d", &i_track_id ) != 1 )
                 {
-                    fmt.subs.spu.palette[0] = 0xBeef;
-                    memcpy( &fmt.subs.spu.palette[1], p_sys->palette, 16 * sizeof( uint32_t ) );
+                    msg_Warn( p_demux, "reading new track failed" );
+                    continue;
                 }
+                language[0] = '\0';
+            }
 
-                current_tk->p_es = es_out_Add( p_demux->out, &fmt );
-                msg_Dbg( p_demux, "new vobsub track detected" );
-            }
-            else
+            p_sys->i_tracks++;
+            p_sys->track = xrealloc( p_sys->track,
+                    sizeof( vobsub_track_t ) * (p_sys->i_tracks + 1 ) );
+
+            /* Init the track */
+            current_tk = &p_sys->track[p_sys->i_tracks - 1];
+            memset( current_tk, 0, sizeof( vobsub_track_t ) );
+            current_tk->i_current_subtitle = 0;
+            current_tk->i_subtitles = 0;
+            current_tk->p_subtitles = xmalloc( sizeof( subtitle_t ) );
+            current_tk->i_track_id = i_track_id;
+            current_tk->i_delay = (int64_t)0;
+
+            es_format_Init( &fmt, SPU_ES, VLC_CODEC_SPU );
+            fmt.subs.spu.i_original_frame_width = p_sys->i_original_frame_width;
+            fmt.subs.spu.i_original_frame_height = p_sys->i_original_frame_height;
+            fmt.psz_language = language;
+            if( p_sys->b_palette )
             {
-                msg_Warn( p_demux, "reading new track failed" );
+                fmt.subs.spu.palette[0] = 0xBeef;
+                memcpy( &fmt.subs.spu.palette[1], p_sys->palette, 16 * sizeof( uint32_t ) );
             }
+
+            current_tk->p_es = es_out_Add( p_demux->out, &fmt );
+            msg_Dbg( p_demux, "new vobsub track detected" );
         }
         else if( !strncmp( line, "timestamp:", 10 ) )
         {
