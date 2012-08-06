@@ -15,11 +15,14 @@ $(TARBALLS)/libmad-$(MAD_VERSION).tar.gz:
 
 libmad: libmad-$(MAD_VERSION).tar.gz .sum-mad
 	$(UNPACK)
-ifdef HAVE_MACOSX
+ifdef HAVE_DARWIN_OS
 	cd $@-$(MAD_VERSION) && sed \
 		-e 's%-march=i486%$(EXTRA_CFLAGS) $(EXTRA_LDFLAGS)%' \
 		-e 's%-dynamiclib%-dynamiclib -arch $(ARCH)%' \
 		-i.orig configure
+endif
+ifdef HAVE_IOS
+	$(APPLY) $(SRC)/mad/mad-ios-asm.patch
 endif
 	$(APPLY) $(SRC)/mad/mad-noopt.patch
 	$(MOVE)
@@ -27,6 +30,10 @@ endif
 .mad: libmad
 	touch libmad/NEWS libmad/AUTHORS libmad/ChangeLog
 	$(RECONF)
-	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -O3 $(NOTHUMB)" ./configure $(HOSTCONF)
+ifdef HAVE_IOS
+	cd $< && $(HOSTVARS) CCAS="$(AS)" CFLAGS="$(CFLAGS) -O4 -marm $(NOTHUMB)" ./configure $(HOSTCONF) $(MAD_CONF)
+else
+	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -O3 $(NOTHUMB)" ./configure $(HOSTCONF) $(MAD_CONF)
+endif
 	cd $< && $(MAKE) install
 	touch $@

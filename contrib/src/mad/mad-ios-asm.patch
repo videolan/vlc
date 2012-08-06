@@ -1,0 +1,21 @@
+diff -ru libmad/imdct_l_arm.S libmad-fixed/imdct_l_arm.S
+--- libmad/imdct_l_arm.S	2001-03-25 22:03:34.000000000 +0200
++++ libmad-fixed/imdct_l_arm.S	2012-08-06 18:16:49.000000000 +0200
+@@ -202,7 +202,7 @@
+ 
+ 
+     .text
+-    .align
++    .align 2
+ 
+     .global III_imdct_l
+     .global _III_imdct_l
+@@ -468,7 +468,7 @@
+ 
+     @----
+ 
+-    add     r2, pc, #(imdct36_long_karray-.-8)  @ r2 = base address of Knn array (PIC safe ?)
++    adr     r2, imdct36_long_karray
+ 
+ 
+ loop:
