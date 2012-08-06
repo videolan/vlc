@@ -257,6 +257,7 @@
 #define VLC_CODEC_TRUEHD    VLC_FOURCC('t','r','h','d')
 #define VLC_CODEC_DVAUDIO   VLC_FOURCC('d','v','a','u')
 #define VLC_CODEC_SPEEX     VLC_FOURCC('s','p','x',' ')
+#define VLC_CODEC_OPUS      VLC_FOURCC('O','p','u','s')
 #define VLC_CODEC_VORBIS    VLC_FOURCC('v','o','r','b')
 #define VLC_CODEC_MACE3     VLC_FOURCC('M','A','C','3')
 #define VLC_CODEC_MACE6     VLC_FOURCC('M','A','C','6')
