@@ -28,12 +28,13 @@ libdeinterlace_plugin_la_SOURCES = \
 	deinterlace/yadif.h deinterlace/yadif_template.h \
 	deinterlace/algo_phosphor.c deinterlace/algo_phosphor.h \
 	deinterlace/algo_ivtc.c deinterlace/algo_ivtc.h
-if HAVE_NEON
-libdeinterlace_plugin_la_SOURCES += deinterlace/merge_arm.S
-endif
 libdeinterlace_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdeinterlace_plugin_la_LIBADD = $(AM_LIBADD)
 libdeinterlace_plugin_la_DEPENDENCIES =
+if HAVE_NEON
+libdeinterlace_plugin_la_SOURCES += deinterlace/merge_arm.S
+libdeinterlace_plugin_la_CFLAGS += -DCAN_COMPILE_ARM
+endif
 libvlc_LTLIBRARIES += libdeinterlace_plugin.la
 
 libosdmenu_plugin_la_SOURCES = osdmenu.c
