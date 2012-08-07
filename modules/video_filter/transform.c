@@ -132,7 +132,7 @@ static void Plane##bits##_##f(plane_t *restrict dst, const plane_t *restrict src
     } \
 }
 
-#define PLANE_YUY2(f) \
+#define YUY2(f) \
 static void PlaneYUY2_##f(plane_t *restrict dst, const plane_t *restrict src) \
 { \
     unsigned dst_visible_width = dst->i_visible_pitch / 2; \
@@ -168,7 +168,7 @@ static void PlaneYUY2_##f(plane_t *restrict dst, const plane_t *restrict src) \
 }
 
 #define PLANES(f) \
-PLANE(f,8) PLANE(f,16) PLANE(f,32) PLANE_YUY2(f)
+PLANE(f,8) PLANE(f,16) PLANE(f,32)
 
 PLANES(HFlip)
 PLANES(VFlip)
@@ -178,9 +178,16 @@ PLANES(R90)
 PLANES(R180)
 PLANES(R270)
 
+#define PlaneYUY2_HFlip Plane32_HFlip
+#define PlaneYUY2_VFlip Plane32_VFlip
+#define PlaneYUY2_R180  Plane32_R180
+YUY2(Transpose)
+YUY2(AntiTranspose)
+YUY2(R90)
+YUY2(R270)
+
 typedef struct {
     char      name[16];
-    bool      is_rotated;
     convert_t convert;
     convert_t iconvert;
     void      (*plane8) (plane_t *dst, const plane_t *src);
@@ -189,18 +196,23 @@ typedef struct {
     void      (*yuyv)(plane_t *dst, const plane_t *src);
 } transform_description_t;
 
-#define DESC(str, rotated, f, invf) \
-    { str, rotated, f, invf, Plane8_##f, Plane16_##f, Plane32_##f, PlaneYUY2_##f }
+#define DESC(str, f, invf) \
+    { str, f, invf, Plane8_##f, Plane16_##f, Plane32_##f, PlaneYUY2_##f }
 
 static const transform_description_t descriptions[] = {
-    DESC("90",            true,  R90,           R270),
-    DESC("180",           false, R180,          R180),
-    DESC("270",           true,  R270,          R90),
-    DESC("hflip",         false, HFlip,         HFlip),
-    DESC("vflip",         false, VFlip,         VFlip),
-    DESC("transpose",     true,  Transpose,     Transpose),
-    DESC("antitranspose", true,  AntiTranspose, AntiTranspose),
+    DESC("90",            R90,           R270),
+    DESC("180",           R180,          R180),
+    DESC("270",           R270,          R90),
+    DESC("hflip",         HFlip,         HFlip),
+    DESC("vflip",         VFlip,         VFlip),
+    DESC("transpose",     Transpose,     Transpose),
+    DESC("antitranspose", AntiTranspose, AntiTranspose),
 };
+
+static bool dsc_is_rotated(const transform_description_t *dsc)
+{
+    return dsc->plane32 != dsc->yuyv;
+}
 
 static const size_t n_transforms =
     sizeof (descriptions) / sizeof (descriptions[0]);
@@ -295,7 +307,7 @@ static int Open(vlc_object_t *object)
     }
 
     sys->convert = dsc->convert;
-    if (dsc->is_rotated) {
+    if (dsc_is_rotated(dsc)) {
         for (unsigned i = 0; i < chroma->plane_count; i++) {
             if (chroma->p[i].w.num * chroma->p[i].h.den
              != chroma->p[i].h.num * chroma->p[i].w.den) {
@@ -320,18 +332,17 @@ static int Open(vlc_object_t *object)
 
     /* Deal with weird packed formats */
     switch (src->i_chroma) {
-        case VLC_CODEC_YUYV:
-        case VLC_CODEC_YVYU:
-            sys->plane = dsc->is_rotated ? dsc->yuyv : dsc->plane32;
-            break;
         case VLC_CODEC_UYVY:
         case VLC_CODEC_VYUY:
-            if (dsc->is_rotated) {
+            if (dsc_is_rotated(dsc)) {
                 msg_Err(filter, "Format rotation not possible (chroma %4.4s)",
                         (char *)&src->i_chroma);
                 goto error;
             }
-            sys->plane = dsc->plane32; /* 32-bits, not 16-bits! */
+            /* fallthrough */
+        case VLC_CODEC_YUYV:
+        case VLC_CODEC_YVYU:
+            sys->plane = dsc->yuyv; /* 32-bits, not 16-bits! */
             break;
         case VLC_CODEC_NV12:
         case VLC_CODEC_NV21:
