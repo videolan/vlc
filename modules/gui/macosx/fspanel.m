@@ -429,6 +429,8 @@
 /*
     addButton( o_button, @"image (off state)", @"image (on state)", 38, 51, something );
  */
+    [o_fwd setContinuous:YES];
+    [o_bwd setContinuous:YES];
 
     /* time slider */
     s_rc = [self frame];
@@ -543,12 +545,22 @@
 
 - (IBAction)forward:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] forward];
+    if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) > 0.16 )
+    {
+        // we just skipped 4 "continous" events, otherwise we are too fast
+        [[VLCCoreInteraction sharedInstance] forwardExtraShort];
+        last_fwd_event = [NSDate timeIntervalSinceReferenceDate];
+    }
 }
 
 - (IBAction)backward:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] backward];
+    if (([NSDate timeIntervalSinceReferenceDate] - last_bwd_event) > 0.16 )
+    {
+        // we just skipped 4 "continous" events, otherwise we are too fast
+        [[VLCCoreInteraction sharedInstance] backwardExtraShort];
+        last_bwd_event = [NSDate timeIntervalSinceReferenceDate];
+    }
 }
 
 - (IBAction)prev:(id)sender
