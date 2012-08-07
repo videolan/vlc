@@ -132,6 +132,19 @@ static void Plane##bits##_##f(plane_t *restrict dst, const plane_t *restrict src
     } \
 }
 
+static void Plane_VFlip(plane_t *restrict dst, const plane_t *restrict src)
+{
+    const uint8_t *src_pixels = src->p_pixels;
+    uint8_t *restrict dst_pixels = dst->p_pixels;
+
+    dst_pixels += dst->i_pitch * dst->i_visible_lines;
+    for (int y = 0; y < dst->i_visible_lines; y++) {
+        dst_pixels -= dst->i_pitch;
+        memcpy(dst_pixels, src_pixels, dst->i_visible_pitch);
+        src_pixels += src->i_pitch;
+    }
+}
+
 #define YUY2(f) \
 static void PlaneYUY2_##f(plane_t *restrict dst, const plane_t *restrict src) \
 { \
@@ -171,7 +184,9 @@ static void PlaneYUY2_##f(plane_t *restrict dst, const plane_t *restrict src) \
 PLANE(f,8) PLANE(f,16) PLANE(f,32)
 
 PLANES(HFlip)
-PLANES(VFlip)
+#define Plane8_VFlip Plane_VFlip
+#define Plane16_VFlip Plane_VFlip
+#define Plane32_VFlip Plane_VFlip
 PLANES(Transpose)
 PLANES(AntiTranspose)
 PLANES(R90)
@@ -179,7 +194,7 @@ PLANES(R180)
 PLANES(R270)
 
 #define PlaneYUY2_HFlip Plane32_HFlip
-#define PlaneYUY2_VFlip Plane32_VFlip
+#define PlaneYUY2_VFlip Plane_VFlip
 #define PlaneYUY2_R180  Plane32_R180
 YUY2(Transpose)
 YUY2(AntiTranspose)
