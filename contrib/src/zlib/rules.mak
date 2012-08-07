@@ -1,5 +1,5 @@
 # ZLIB
-ZLIB_VERSION := 1.2.6
+ZLIB_VERSION := 1.2.7
 ZLIB_URL := $(SF)/libpng/zlib-$(ZLIB_VERSION).tar.gz
 
 PKGS += zlib
@@ -15,7 +15,6 @@ $(TARBALLS)/zlib-$(ZLIB_VERSION).tar.gz:
 zlib: zlib-$(ZLIB_VERSION).tar.gz .sum-zlib
 	$(UNPACK)
 	$(APPLY) $(SRC)/zlib/zlib-wince.patch
-	$(APPLY) $(SRC)/zlib/zlib-osx.patch
 	$(MOVE)
 
 .zlib: zlib
