@@ -65,6 +65,8 @@ typedef struct logical_stream_s
     /* Misc */
     bool b_reinit;
     int i_granule_shift;
+    /* Opus has a starting offset in the headers. */
+    int i_pre_skip;
 
     /* offset of first keyframe for theora; can be 0 or 1 depending on version number */
     int64_t i_keyframe_offset;

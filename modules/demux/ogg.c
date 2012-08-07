@@ -139,6 +139,7 @@ static void Ogg_ExtractMeta( demux_t *p_demux, vlc_fourcc_t i_codec, const uint8
 static void Ogg_ReadTheoraHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadVorbisHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadSpeexHeader( logical_stream_t *, ogg_packet * );
+static void Ogg_ReadOpusHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadKateHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadFlacHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_ReadAnnodexHeader( vlc_object_t *, logical_stream_t *, ogg_packet * );
@@ -349,6 +350,7 @@ static int Demux( demux_t * p_demux )
                 /* An Ogg/vorbis packet contains an end date granulepos */
                 if( p_stream->fmt.i_codec == VLC_CODEC_VORBIS ||
                     p_stream->fmt.i_codec == VLC_CODEC_SPEEX ||
+                    p_stream->fmt.i_codec == VLC_CODEC_OPUS ||
                     p_stream->fmt.i_codec == VLC_CODEC_FLAC )
                 {
                     if( ogg_stream_packetout( &p_stream->os, &oggpacket ) > 0 )
@@ -602,6 +604,11 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             b_xiph = true;
             break;
 
+        case VLC_CODEC_OPUS:
+            if( p_stream->i_packets_backup == 2 ) p_stream->b_force_backup = 0;
+            b_xiph = true;
+            break;
+
         case VLC_CODEC_FLAC:
             if( !p_stream->fmt.audio.i_rate && p_stream->i_packets_backup == 2 )
             {
@@ -690,7 +697,19 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     /* Convert the pcr into a pts */
     if( p_stream->fmt.i_codec == VLC_CODEC_VORBIS ||
         p_stream->fmt.i_codec == VLC_CODEC_SPEEX ||
+        p_stream->fmt.i_codec == VLC_CODEC_OPUS ||
         p_stream->fmt.i_codec == VLC_CODEC_FLAC )
+        if (p_stream->i_pre_skip)
+        {
+            if( i_pts > p_stream->i_pre_skip )
+            {
+                i_pts -= - p_stream->i_pre_skip;
+            }
+            else
+            {
+                i_pts = 0;
+            }
+        }
     {
         if( p_stream->i_pcr >= 0 )
         {
@@ -708,7 +727,18 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             p_stream->i_previous_pcr = p_stream->i_pcr;
 
             /* The granulepos is the end date of the sample */
-            i_pts =  p_stream->i_pcr;
+            i_pts = p_stream->i_pcr;
+            if (p_stream->i_pre_skip)
+            {
+                if( i_pts > p_stream->i_pre_skip )
+                {
+                    i_pts -= - p_stream->i_pre_skip;
+                }
+                else
+                {
+                    i_pts = 0;
+                }
+            }
         }
     }
 
@@ -735,6 +765,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
 
     if( p_stream->fmt.i_codec != VLC_CODEC_VORBIS &&
         p_stream->fmt.i_codec != VLC_CODEC_SPEEX &&
+        p_stream->fmt.i_codec != VLC_CODEC_OPUS &&
         p_stream->fmt.i_codec != VLC_CODEC_FLAC &&
         p_stream->i_pcr >= 0 )
     {
@@ -808,6 +839,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
 
     if( p_stream->fmt.i_codec != VLC_CODEC_VORBIS &&
         p_stream->fmt.i_codec != VLC_CODEC_SPEEX &&
+        p_stream->fmt.i_codec != VLC_CODEC_OPUS &&
         p_stream->fmt.i_codec != VLC_CODEC_FLAC &&
         p_stream->fmt.i_codec != VLC_CODEC_TARKIN &&
         p_stream->fmt.i_codec != VLC_CODEC_THEORA &&
@@ -946,6 +978,16 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                              "rate: %i,  bitrate: %i",
                              p_stream->fmt.audio.i_channels,
                              (int)p_stream->f_rate, p_stream->fmt.i_bitrate );
+                }
+                /* Check for Opus header */
+                else if( oggpacket.bytes >= 8 &&
+                    ! memcmp( oggpacket.packet, "OpusHead", 8 ) )
+                {
+                    Ogg_ReadOpusHeader( p_stream, &oggpacket );
+                    msg_Dbg( p_demux, "found opus header, channels: %i, "
+                             "pre-skip: %i",
+                             p_stream->fmt.audio.i_channels,
+                             (int)p_stream->i_pre_skip);
                 }
                 /* Check for Flac header (< version 1.1.1) */
                 else if( oggpacket.bytes >= 4 &&
@@ -1545,6 +1587,9 @@ static void Ogg_ExtractMeta( demux_t *p_demux, vlc_fourcc_t i_codec, const uint8
     case VLC_CODEC_SPEEX:
         Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 0 );
         break;
+    case VLC_CODEC_OPUS:
+        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 0 );
+        break;
 
     /* N headers with the 2° one being the comments */
     case VLC_CODEC_KATE:
@@ -1682,6 +1727,32 @@ static void Ogg_ReadSpeexHeader( logical_stream_t *p_stream,
     oggpack_adv( &opb, 32 ); /* mode_bitstream_version */
     p_stream->fmt.audio.i_channels = oggpack_read( &opb, 32 );
     p_stream->fmt.i_bitrate = oggpack_read( &opb, 32 );
+}
+
+static void Ogg_ReadOpusHeader( logical_stream_t *p_stream,
+                                 ogg_packet *p_oggpacket )
+{
+    oggpack_buffer opb;
+
+    p_stream->fmt.i_cat = AUDIO_ES;
+    p_stream->fmt.i_codec = VLC_CODEC_OPUS;
+
+    /* Signal that we want to keep a backup of the opus
+     * stream headers. They will be used when switching between
+     * audio streams. */
+    p_stream->b_force_backup = 1;
+
+    /* All OggOpus streams are timestamped at 48kHz and
+     * can be played at 48kHz. */
+    p_stream->f_rate = p_stream->fmt.audio.i_rate = 48000;
+    p_stream->fmt.i_bitrate = 0;
+
+    /* Cheat and get additionnal info ;) */
+    oggpack_readinit( &opb, p_oggpacket->packet, p_oggpacket->bytes);
+    oggpack_adv( &opb, 64 );
+    oggpack_adv( &opb, 8 ); /* version_id */
+    p_stream->fmt.audio.i_channels = oggpack_read( &opb, 8 );
+    p_stream->i_pre_skip = oggpack_read( &opb, 16 );
 }
 
 static void Ogg_ReadFlacHeader( demux_t *p_demux, logical_stream_t *p_stream,
