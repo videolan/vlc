@@ -1,6 +1,6 @@
 # shout
 
-SHOUT_VERSION := 2.2.2
+SHOUT_VERSION := 2.3.1
 SHOUT_URL := http://downloads.us.xiph.org/releases/libshout/libshout-$(SHOUT_VERSION).tar.gz
 
 ifdef BUILD_ENCODERS
