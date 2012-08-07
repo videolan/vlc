@@ -113,26 +113,14 @@ static void R270(int *sx, int *sy, int w, int h, int dx, int dy)
 }
 typedef void (*convert_t)(int *, int *, int, int, int, int);
 
-#define PLANAR(f) \
-static void Plane8_##f(plane_t *restrict dst, const plane_t *restrict src) \
+#define PLANE(f,bits) \
+static void Plane##bits##_##f(plane_t *restrict dst, const plane_t *restrict src) \
 { \
-    for (int y = 0; y < dst->i_visible_lines; y++) { \
-        for (int x = 0; x < dst->i_visible_pitch; x++) { \
-            int sx, sy; \
-            (f)(&sx, &sy, dst->i_visible_pitch, dst->i_visible_lines, x, y); \
-            dst->p_pixels[y * dst->i_pitch + x] = \
-                src->p_pixels[sy * src->i_pitch + sx]; \
-        } \
-    } \
-} \
- \
-static void Plane16_##f(plane_t *restrict dst, const plane_t *restrict src) \
-{ \
-    const uint16_t *src_pixels = (const uint16_t *)src->p_pixels; \
-    uint16_t *restrict dst_pixels = (uint16_t *)dst->p_pixels; \
-    unsigned src_width = src->i_pitch / 2; \
-    unsigned dst_width = dst->i_pitch / 2; \
-    unsigned dst_visible_width = dst->i_visible_pitch / 2; \
+    const uint##bits##_t *src_pixels = (const void *)src->p_pixels; \
+    uint##bits##_t *restrict dst_pixels = (void *)dst->p_pixels; \
+    const unsigned src_width = src->i_pitch / sizeof (*src_pixels); \
+    const unsigned dst_width = dst->i_pitch / sizeof (*dst_pixels); \
+    const unsigned dst_visible_width = dst->i_visible_pitch / sizeof (*dst_pixels); \
  \
     for (int y = 0; y < dst->i_visible_lines; y++) { \
         for (unsigned x = 0; x < dst_visible_width; x++) { \
@@ -142,27 +130,10 @@ static void Plane16_##f(plane_t *restrict dst, const plane_t *restrict src) \
                 src_pixels[sy * src_width + sx]; \
         } \
     } \
-} \
- \
-static void Plane32_##f(plane_t *restrict dst, const plane_t *restrict src) \
-{ \
-    const uint32_t *src_pixels = (const uint32_t *)src->p_pixels; \
-    uint32_t *restrict dst_pixels = (uint32_t *)dst->p_pixels; \
-    unsigned src_width = src->i_pitch / 4; \
-    unsigned dst_width = dst->i_pitch / 4; \
-    unsigned dst_visible_width = dst->i_visible_pitch / 4; \
- \
-    for (int y = 0; y < dst->i_visible_lines; y++) { \
-        for (unsigned x = 0; x < dst_visible_width; x++) { \
-            int sx, sy; \
-            (f)(&sx, &sy, dst_visible_width, dst->i_visible_lines, x, y); \
-            dst_pixels[y * dst_width + x] = \
-                src_pixels[sy * src_width + sx]; \
-        } \
-    } \
-} \
- \
-static void YUYV_##f(plane_t *restrict dst, const plane_t *restrict src) \
+}
+
+#define PLANE_YUY2(f) \
+static void PlaneYUY2_##f(plane_t *restrict dst, const plane_t *restrict src) \
 { \
     unsigned dst_visible_width = dst->i_visible_pitch / 2; \
  \
@@ -196,13 +167,16 @@ static void YUYV_##f(plane_t *restrict dst, const plane_t *restrict src) \
     } \
 }
 
-PLANAR(HFlip)
-PLANAR(VFlip)
-PLANAR(Transpose)
-PLANAR(AntiTranspose)
-PLANAR(R90)
-PLANAR(R180)
-PLANAR(R270)
+#define PLANES(f) \
+PLANE(f,8) PLANE(f,16) PLANE(f,32) PLANE_YUY2(f)
+
+PLANES(HFlip)
+PLANES(VFlip)
+PLANES(Transpose)
+PLANES(AntiTranspose)
+PLANES(R90)
+PLANES(R180)
+PLANES(R270)
 
 typedef struct {
     char      name[16];
@@ -216,7 +190,7 @@ typedef struct {
 } transform_description_t;
 
 #define DESC(str, rotated, f, invf) \
-    { str, rotated, f, invf, Plane8_##f, Plane16_##f, Plane32_##f, YUYV_##f }
+    { str, rotated, f, invf, Plane8_##f, Plane16_##f, Plane32_##f, PlaneYUY2_##f }
 
 static const transform_description_t descriptions[] = {
     DESC("90",            true,  R90,           R270),
