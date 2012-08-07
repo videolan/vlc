@@ -624,6 +624,14 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self hideSplitView];
         i_lastSplitViewHeight = 300;
     }
+
+    /* sanity check for the window size */
+    frame = [self frame];
+    NSSize screenSize = [[self screen] frame].size;
+    if (screenSize.width <= frame.size.width || screenSize.height <= frame.size.height) {
+        nativeVideoSize = screenSize;
+        [self resizeWindow];
+    }
 }
 
 #pragma mark -
