@@ -732,7 +732,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
         }
     }
 
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__ANDROID__)
     /* Don't try complex seek if we seek to 0 */
     if( i_date == 0 )
     {
