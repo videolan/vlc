@@ -50,14 +50,6 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 vlc_module_end ()
 
-/* TODO:
- * - pause input on policy event
- * - resample to compensate for long term drift
- * - select music or video stream property correctly (?)
- * - set further appropriate stream properties
- * - update output devices list dynamically
- */
-
 /* NOTE:
  * Be careful what you do when the PulseAudio mainloop is held, which is to say
  * within PulseAudio callbacks, or after pa_threaded_mainloop_lock().
@@ -888,9 +880,15 @@ static int Open(vlc_object_t *obj)
 
     /* Create a playback stream */
     pa_stream *s;
+    pa_proplist *props = pa_proplist_new();
+    if (likely(props != NULL))
+        /* TODO: set other stream properties */
+        pa_proplist_sets (props, PA_PROP_MEDIA_ROLE, "video");
 
     pa_threaded_mainloop_lock(sys->mainloop);
-    s = pa_stream_new_extended(ctx, "audio stream", formatv, formatc, NULL);
+    s = pa_stream_new_extended(ctx, "audio stream", formatv, formatc, props);
+    if (likely(props != NULL))
+        pa_proplist_free(props);
 
     for (unsigned i = 0; i < formatc; i++)
         pa_format_info_free(formatv[i]);
