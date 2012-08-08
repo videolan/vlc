@@ -447,7 +447,6 @@ static int Validate( demux_t *p_demux, const char *psz_ext )
         {  0, "Extended Module" },      /* XM */
         { 44, "SCRM" },                 /* S3M */
         {  0, "IMPM" },                 /* IT */
-        {  0, "MThd" },                 /* MID */
         {  0, "GF1PATCH110" },          /* PAT */
         { 20, "!SCREAM!" },             /* STM */
         { 20, "!Scream!" },             /* STM */
