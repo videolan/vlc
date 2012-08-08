@@ -259,7 +259,7 @@ static int net_SetMcastOut (vlc_object_t *p_this, int fd, int family,
 #ifdef IPV6_MULTICAST_IF
         case AF_INET6:
             if (setsockopt (fd, SOL_IPV6, IPV6_MULTICAST_IF,
-                            &scope, sizeof (scope) == 0))
+                            &scope, sizeof (scope)) == 0)
                 return 0;
 #endif
 
