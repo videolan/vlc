@@ -136,13 +136,13 @@ static bool Ogg_LogicalStreamResetEsFormat( demux_t *p_demux, logical_stream_t *
 static void Ogg_ExtractMeta( demux_t *p_demux, vlc_fourcc_t i_codec, const uint8_t *p_headers, int i_headers );
 
 /* Logical bitstream headers */
-static void Ogg_ReadTheoraHeader( logical_stream_t *, ogg_packet * );
+static void Ogg_ReadTheoraHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_ReadVorbisHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadSpeexHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadOpusHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadKateHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadFlacHeader( demux_t *, logical_stream_t *, ogg_packet * );
-static void Ogg_ReadAnnodexHeader( vlc_object_t *, logical_stream_t *, ogg_packet * );
+static void Ogg_ReadAnnodexHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static bool Ogg_ReadDiracHeader( logical_stream_t *, ogg_packet * );
 
 /*****************************************************************************
@@ -177,6 +177,8 @@ static int Open( vlc_object_t * p_this )
     /* Begnning of stream, tell the demux to look for elementary streams. */
     p_sys->i_bos = 0;
     p_sys->i_eos = 0;
+
+    p_sys->i_length = -1;
 
     /* Initialize the Ogg physical bitstream parser */
     ogg_sync_init( &p_sys->oy );
@@ -306,7 +308,7 @@ static int Demux( demux_t * p_demux )
                         oggpacket.bytes >= 7 &&
                         ! memcmp( oggpacket.packet, "\x80theora", 7 ) )
                 {
-                    Ogg_ReadTheoraHeader( p_stream, &oggpacket );
+                    Ogg_ReadTheoraHeader( p_demux, p_stream, &oggpacket );
                     p_stream->i_secondary_header_packets = 0;
                 }
                 else if( p_stream->fmt.i_codec == VLC_CODEC_VORBIS &&
@@ -464,8 +466,16 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 ogg_stream_reset( &p_stream->os );
             }
             ogg_sync_reset( &p_sys->oy );
-            /* XXX The break/return is missing on purpose as
-             * demux_vaControlHelper will do the last part of the job */
+            return demux_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
+                                          1, i_query, args );
+        case DEMUX_GET_LENGTH:
+            if ( p_sys->i_length < 0 )
+                return demux_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
+                                              1, i_query, args );
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            *pi64 = p_sys->i_length * 1000000;
+            return VLC_SUCCESS;
+
 
         default:
             return demux_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
@@ -1026,7 +1036,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 else if( oggpacket.bytes >= 7 &&
                          ! memcmp( oggpacket.packet, "\x80theora", 7 ) )
                 {
-                    Ogg_ReadTheoraHeader( p_stream, &oggpacket );
+                    Ogg_ReadTheoraHeader( p_demux, p_stream, &oggpacket );
 
                     msg_Dbg( p_demux,
                              "found theora header, bitrate: %i, rate: %f",
@@ -1071,8 +1081,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 else if( oggpacket.bytes >= 7 &&
                          ! memcmp( oggpacket.packet, "Annodex", 7 ) )
                 {
-                    Ogg_ReadAnnodexHeader( VLC_OBJECT(p_demux), p_stream,
-                                           &oggpacket );
+                    Ogg_ReadAnnodexHeader( p_demux, p_stream, &oggpacket );
                     /* kill annodex track */
                     free( p_stream );
                     p_ogg->i_streams--;
@@ -1081,8 +1090,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 else if( oggpacket.bytes >= 7 &&
                          ! memcmp( oggpacket.packet, "AnxData", 7 ) )
                 {
-                    Ogg_ReadAnnodexHeader( VLC_OBJECT(p_demux), p_stream,
-                                           &oggpacket );
+                    Ogg_ReadAnnodexHeader( p_demux, p_stream, &oggpacket );
                 }
                 /* Check for Kate header */
                 else if( oggpacket.bytes >= 8 &&
@@ -1612,7 +1620,7 @@ static void Ogg_ExtractMeta( demux_t *p_demux, vlc_fourcc_t i_codec, const uint8
         p_demux->info.i_update |= INPUT_UPDATE_META;
 }
 
-static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
+static void Ogg_ReadTheoraHeader( demux_t *p_demux, logical_stream_t *p_stream,
                                   ogg_packet *p_oggpacket )
 {
     bs_t bitstream;
@@ -1676,6 +1684,21 @@ static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
     if ( i_version >= 3002001 )
     {
         p_stream->i_keyframe_offset = 1;
+    }
+    if ( p_demux->p_sys->i_length < 0 )
+    {
+        int64_t last_frame = oggseek_get_last_frame( p_demux, p_stream );
+        /*
+         * Since there's quite a good chance that ogg_stream_packetout was called,
+         * the given p_oggpacket may point to invalid data. Fill it with some valid ones
+         */
+        ogg_stream_packetpeek( &p_stream->os, p_oggpacket );
+
+        if ( last_frame >= 0 )
+        {
+            p_demux->p_sys->i_length = last_frame / ((float)i_fps_numerator /
+                                                     (float)i_fps_denominator);
+        }
     }
 
     p_stream->f_rate = ((float)i_fps_numerator) / i_fps_denominator;
@@ -1852,7 +1875,7 @@ static void Ogg_ReadKateHeader( logical_stream_t *p_stream,
     }
 }
 
-static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
+static void Ogg_ReadAnnodexHeader( demux_t *p_demux,
                                    logical_stream_t *p_stream,
                                    ogg_packet *p_oggpacket )
 {
@@ -1866,7 +1889,7 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
         uint64_t timebase_numerator;
         uint64_t timebase_denominator;
 
-        Ogg_ReadTheoraHeader( p_stream, p_oggpacket );
+        Ogg_ReadTheoraHeader( p_demux, p_stream, p_oggpacket );
 
         oggpack_readinit( &opb, p_oggpacket->packet, p_oggpacket->bytes);
         oggpack_adv( &opb, 8*8 ); /* "Annodex\0" header */
@@ -1901,7 +1924,7 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
                         content_type_string );
         }
 
-        msg_Dbg( p_this, "AnxData packet info: %"PRId64" / %"PRId64", %d, ``%s''",
+        msg_Dbg( p_demux, "AnxData packet info: %"PRId64" / %"PRId64", %d, ``%s''",
                  granule_rate_numerator, granule_rate_denominator,
                  p_stream->i_secondary_header_packets, content_type_string );
 

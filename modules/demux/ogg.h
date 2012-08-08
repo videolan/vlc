@@ -137,4 +137,7 @@ struct demux_sys_t
     /* */
     int                i_attachments;
     input_attachment_t **attachments;
+
+    /* Length, if available. */
+    int64_t i_length;
 };
