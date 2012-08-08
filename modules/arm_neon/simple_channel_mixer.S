@@ -21,7 +21,7 @@
 
 	.fpu neon
 	.text
-	.align
+	.align 2
 
 #define DST		r0
 #define SRC		r1
