@@ -372,6 +372,12 @@ static void stream_event_cb(pa_stream *s, const char *name, pa_proplist *pl,
 {
     audio_output_t *aout = userdata;
 
+    if (!strcmp(name, PA_STREAM_EVENT_REQUEST_CORK))
+        aout_PolicyReport(aout, true);
+    else
+    if (!strcmp(name, PA_STREAM_EVENT_REQUEST_UNCORK))
+        aout_PolicyReport(aout, false);
+    else
 #if PA_CHECK_VERSION(1,0,0)
     /* FIXME: expose aout_Restart() directly */
     if (!strcmp(name, PA_STREAM_EVENT_FORMAT_LOST)) {
