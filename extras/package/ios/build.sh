@@ -3,8 +3,8 @@ set -e
 
 PLATFORM=OS
 VERBOSE=no
-SDK_VERSION=5.1
-SDK_MIN=5.0
+SDK_VERSION=6.0
+SDK_MIN=5.1
 
 usage()
 {
@@ -69,11 +69,12 @@ if [ "$VERBOSE" = "yes" ]; then
    out="/dev/stdout"
 fi
 
-info "Building libvlc for the iOS"
+info "Building libvlc for iOS"
 
 if [ "$PLATFORM" = "Simulator" ]; then
     TARGET="i686-apple-darwin11"
     ARCH="i386"
+    OPTIM="-O3"
 else
     TARGET="arm-apple-darwin11"
     ARCH="armv7"
@@ -150,9 +151,9 @@ if [ "$PLATFORM" = "Simulator" ]; then
 fi
 
 if [ "$PLATFORM" = "OS" ]; then
-  export LDFLAGS="-L${SDKROOT}/usr/lib -arch ${ARCH}  -isysroot ${SDKROOT}  -miphoneos-version-min=${SDK_MIN} "
+  export LDFLAGS="-L${SDKROOT}/usr/lib -arch ${ARCH} -isysroot ${SDKROOT} -miphoneos-version-min=${SDK_MIN}"
 else
-  export LDFLAGS="-syslibroot=${SDKROOT}/ -arch ${ARCH} "
+  export LDFLAGS="-syslibroot=${SDKROOT}/ -arch ${ARCH} -miphoneos-version-min=${SDK_MIN}"
 fi
 
 info "LD FLAGS SELECTED = '${LDFLAGS}'"
@@ -179,7 +180,7 @@ fi
     --disable-fontconfig \
     --disable-ass \
     --disable-freetype2 \
-    --enable-iconv \
+    --disable-iconv \
     --disable-fribidi \
     --disable-zvbi \
     --disable-kate \
@@ -225,8 +226,6 @@ export DVBPSI_LIBS="-L${VLCROOT}/contrib-ios-${TARGET}/lib "
 export SWSCALE_CFLAGS="-I${VLCROOT}/contrib-ios-${TARGET}/include "
 export SWSCALE_LIBS="-L${VLCROOT}/contrib-ios-${TARGET}/lib "
 
-
-
 mkdir -p ${BUILDDIR}
 spushd ${BUILDDIR}
 
@@ -253,6 +252,7 @@ ${VLCROOT}/configure \
     --disable-macosx-quartztext \
     --enable-avcodec \
     --enable-mkv \
+    --enable-opus \
     --enable-dvbpsi \
     --enable-swscale \
     --disable-projectm \
@@ -271,7 +271,6 @@ ${VLCROOT}/configure \
     --disable-httpd \
     --disable-nls \
     --disable-glx \
-    --disable-visual \
     --disable-lua \
     --disable-sse \
     --enable-neon \
@@ -300,11 +299,12 @@ ${VLCROOT}/configure \
     --disable-faad \
     --disable-lua \
     --disable-mtp \
-    --disable-ogg \
-    --disable-speex \
-    --disable-theora \
-    --disable-flac \
+    --enable-ogg \
+    --enable-speex \
+    --enable-theora \
+    --enable-flac \
     --disable-freetype \
+    --disable-taglib \
     --disable-mmx > ${out} # MMX and SSE support requires llvm which is broken on Simulator
 fi
 
@@ -316,4 +316,82 @@ make -j$MAKE_JOBS > ${out}
 
 info "Installing libvlc"
 make install > ${out}
+find ${PREFIX}/lib/vlc/plugins -name *.a -type f -exec cp '{}' ${PREFIX}/lib/vlc/plugins \;
+
+info "Removing unneeded modules"
+blacklist="
+stats
+access_bd
+shm
+access_imem
+oldrc
+real
+hotkeys
+gestures
+sap
+dynamicoverlay
+rss
+ball
+marq
+magnify
+audiobargraph_
+clone
+mosaic
+osdmenu
+puzzle
+mediadirs
+t140
+ripple
+motion
+sharpen
+grain
+posterize
+mirror
+wall
+scene
+blendbench
+psychedelic
+alphamask
+netsync
+audioscrobbler
+motiondetect
+motionblur
+export
+smf
+podcast
+bluescreen
+erase
+stream_filter_record
+speex_resampler
+remoteosd
+magnify
+gradient
+tospdif
+dtstofloat32
+logger
+visual
+fb
+aout_file
+yuv
+dummy
+invert
+sepia
+wave
+hqdn3d
+headphone_channel_mixer
+gaussianblur
+gradfun
+extract
+colorthres
+antiflicker
+anaglyph
+adjust
+remap
+"
+
+for i in ${blacklist}
+do
+    find ${PREFIX}/lib/vlc/plugins -name *$i* -type f -exec rm '{}' \;
+done
+
 popd
