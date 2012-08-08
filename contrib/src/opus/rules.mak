@@ -22,7 +22,7 @@ opus: opus-$(OPUS_VERSION).tar.gz .sum-opus
 	$(MOVE)
 
 OPUS_CONF=
-ifdef HAVE_FPU
+ifndef HAVE_FPU
 OPUS_CONF += --enable-fixed-point
 endif
 
