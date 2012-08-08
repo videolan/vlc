@@ -413,20 +413,19 @@ static void VariablesInit( playlist_t *p_playlist )
     var_Create( p_playlist, "play-and-stop", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_playlist, "play-and-exit", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_playlist, "random", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_AddCallback( p_playlist, "random", RandomCallback, NULL );
     var_Create( p_playlist, "repeat", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_playlist, "loop", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     var_Create( p_playlist, "rate", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Create( p_playlist, "rate-slower", VLC_VAR_VOID );
-    var_Create( p_playlist, "rate-faster", VLC_VAR_VOID );
     var_AddCallback( p_playlist, "rate", RateCallback, NULL );
+    var_Create( p_playlist, "rate-slower", VLC_VAR_VOID );
     var_AddCallback( p_playlist, "rate-slower", RateOffsetCallback, NULL );
+    var_Create( p_playlist, "rate-faster", VLC_VAR_VOID );
     var_AddCallback( p_playlist, "rate-faster", RateOffsetCallback, NULL );
 
     var_Create( p_playlist, "video-splitter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_AddCallback( p_playlist, "video-splitter", VideoSplitterCallback, NULL );
-
-    var_AddCallback( p_playlist, "random", RandomCallback, NULL );
 
     /* */
     var_Create( p_playlist, "album-art", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
