@@ -224,21 +224,36 @@ VLC_API void aout_FormatPrint(vlc_object_t *, const char *,
 #define aout_FormatPrint(o, t, f) aout_FormatPrint(VLC_OBJECT(o), t, f)
 VLC_API const char * aout_FormatPrintChannels( const audio_sample_format_t * ) VLC_USED;
 
+/**
+ * Report change of configured audio volume to the core and UI.
+ */
 static inline void aout_VolumeReport(audio_output_t *aout, float volume)
 {
     aout->event.volume_report(aout, volume);
 }
 
+/**
+ * Report change of muted flag to the core and UI.
+ */
 static inline void aout_MuteReport(audio_output_t *aout, bool mute)
 {
     aout->event.mute_report(aout, mute);
 }
 
+/**
+ * Report audio policy status.
+ * \parm cork true to request a cork, false to undo any pending cork.
+ */
 static inline void aout_PolicyReport(audio_output_t *aout, bool cork)
 {
     aout->event.policy_report(aout, cork);
 }
 
+/**
+ * Request a change of software audio amplification.
+ * \param gain linear amplitude gain (must be positive)
+ * \warning Values in excess 1.0 may cause overflow and distorsion.
+ */
 static inline int aout_GainRequest(audio_output_t *aout, float gain)
 {
     return aout->event.gain_request(aout, gain);
