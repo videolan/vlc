@@ -56,6 +56,11 @@ static void aout_OutputMuteReport (audio_output_t *aout, bool mute)
     var_SetBool (aout, "mute", mute);
 }
 
+static void aout_OutputPolicyReport (audio_output_t *aout, bool cork)
+{
+    (cork ? var_IncInteger : var_DecInteger) (aout->p_parent, "corks");
+}
+
 static int aout_OutputGainRequest (audio_output_t *aout, float gain)
 {
     aout_owner_t *owner = aout_owner (aout);
@@ -82,6 +87,7 @@ int aout_OutputNew( audio_output_t *p_aout,
 
     p_aout->event.volume_report = aout_OutputVolumeReport;
     p_aout->event.mute_report = aout_OutputMuteReport;
+    p_aout->event.policy_report = aout_OutputPolicyReport;
     p_aout->event.gain_request = aout_OutputGainRequest;
 
     /* Find the best output plug-in. */

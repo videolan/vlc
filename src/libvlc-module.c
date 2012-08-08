@@ -1184,6 +1184,11 @@ static const char *const ppsz_albumart_descriptions[] =
 #define AUTOSTART_LONGTEXT N_( "Automatically start playing the playlist " \
                 "content once it's loaded." )
 
+#define CORK_TEXT N_("Pause on audio communication")
+#define CORK_LONGTEXT N_( \
+    "If pending audio communication is detected, playback will be paused " \
+    "automatically." )
+
 #define ML_TEXT N_("Use media library")
 #define ML_LONGTEXT N_( \
     "The media library is automatically saved and reloaded each time you " \
@@ -2048,6 +2053,7 @@ vlc_module_begin ()
         change_safe()
     add_bool( "playlist-autostart", true,
               AUTOSTART_TEXT, AUTOSTART_LONGTEXT, false )
+    add_bool( "playlist-cork", true, CORK_TEXT, CORK_LONGTEXT, false )
     add_bool( "media-library", 0, ML_TEXT, ML_LONGTEXT, false )
 #if defined( MEDIA_LIBRARY )
     add_bool( "load-media-library-on-startup", 1, LOAD_ML_TEXT,

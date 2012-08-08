@@ -68,6 +68,38 @@ static int RandomCallback( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
+/**
+ * When there are one or more pending corks, playback should be paused.
+ * This is used for audio policy.
+ * \warning Always add and remove a cork with var_IncInteger() and var_DecInteger().
+ * var_Get() and var_Set() are prone to race conditions.
+ */
+static int CorksCallback( vlc_object_t *obj, char const *var,
+                          vlc_value_t old, vlc_value_t cur, void *dummy )
+{
+    playlist_t *pl = (playlist_t *)obj;
+
+    msg_Dbg( obj, "corks count: %"PRId64" -> %"PRId64, old.i_int, cur.i_int );
+    if( !old.i_int == !cur.i_int )
+        return VLC_SUCCESS; /* nothing to do */
+
+    if( cur.i_int )
+    {
+        if( var_InheritBool( obj, "playlist-cork" ) )
+        {
+            msg_Dbg( obj, "corked" );
+            playlist_Pause( pl );
+        }
+        else
+            msg_Dbg( obj, "not corked" );
+    }
+    else
+        msg_Dbg( obj, "uncorked" );
+
+    (void) var; (void) dummy;
+    return VLC_SUCCESS;
+}
+
 static int RateCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p )
 {
@@ -416,6 +448,8 @@ static void VariablesInit( playlist_t *p_playlist )
     var_AddCallback( p_playlist, "random", RandomCallback, NULL );
     var_Create( p_playlist, "repeat", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_playlist, "loop", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_playlist, "corks", VLC_VAR_INTEGER );
+    var_AddCallback( p_playlist, "corks", CorksCallback, NULL );
 
     var_Create( p_playlist, "rate", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_AddCallback( p_playlist, "rate", RateCallback, NULL );

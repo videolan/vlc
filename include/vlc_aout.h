@@ -155,6 +155,7 @@ struct audio_output
     struct {
         void (*volume_report)(audio_output_t *, float);
         void (*mute_report)(audio_output_t *, bool);
+        void (*policy_report)(audio_output_t *, bool);
         int (*gain_request)(audio_output_t *, float);
     } event;
 };
@@ -231,6 +232,11 @@ static inline void aout_VolumeReport(audio_output_t *aout, float volume)
 static inline void aout_MuteReport(audio_output_t *aout, bool mute)
 {
     aout->event.mute_report(aout, mute);
+}
+
+static inline void aout_PolicyReport(audio_output_t *aout, bool cork)
+{
+    aout->event.policy_report(aout, cork);
 }
 
 static inline int aout_GainRequest(audio_output_t *aout, float gain)

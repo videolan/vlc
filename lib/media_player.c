@@ -468,6 +468,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "volume", VLC_VAR_FLOAT);
     var_Create (mp, "find-input-callback", VLC_VAR_ADDRESS);
     var_SetAddress (mp, "find-input-callback", find_input);
+    var_Create (mp, "corks", VLC_VAR_INTEGER);
     var_Create (mp, "amem-data", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-setup", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-cleanup", VLC_VAR_ADDRESS);
