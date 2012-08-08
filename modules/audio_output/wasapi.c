@@ -83,10 +83,6 @@ struct aout_sys_t
     IAudioRenderClient *render;
     IAudioClock *clock;
 
-    union
-    {
-        ISimpleAudioVolume *simple;
-    } volume;
     IAudioSessionControl *control;
     struct IAudioSessionEvents events;
     LONG refs;
@@ -207,30 +203,50 @@ static void Flush(audio_output_t *aout, bool wait)
 
 static int SimpleVolumeSet(audio_output_t *aout, float vol)
 {
-    aout_sys_t *sys = aout->sys;
+    ISimpleAudioVolume *simple;
     HRESULT hr;
 
     if (TryEnter(aout))
         return -1;
-    hr = ISimpleAudioVolume_SetMasterVolume(sys->volume.simple, vol, NULL);
-    if (FAILED(hr))
-        msg_Warn(aout, "cannot set session volume (error 0x%lx)", hr);
+    hr = IAudioClient_GetService(aout->sys->client, &IID_ISimpleAudioVolume,
+                                 (void **)&simple);
+    if (SUCCEEDED(hr))
+    {
+        hr = ISimpleAudioVolume_SetMasterVolume(simple, vol, NULL);
+        ISimpleAudioVolume_Release(simple);
+    }
     Leave();
-    return FAILED(hr) ? -1 : 0;
+
+    if (FAILED(hr))
+    {
+        msg_Err(aout, "cannot set volume (error 0x%lx)", hr);
+        return -1;
+    }
+    return 0;
 }
 
 static int SimpleMuteSet(audio_output_t *aout, bool mute)
 {
-    aout_sys_t *sys = aout->sys;
+    ISimpleAudioVolume *simple;
     HRESULT hr;
 
     if (TryEnter(aout))
         return -1;
-    hr = ISimpleAudioVolume_SetMute(sys->volume.simple, mute, NULL);
-    if (FAILED(hr))
-        msg_Warn(aout, "cannot mute session (error 0x%lx)", hr);
+    hr = IAudioClient_GetService(aout->sys->client, &IID_ISimpleAudioVolume,
+                                 (void **)&simple);
+    if (SUCCEEDED(hr))
+    {
+        hr = ISimpleAudioVolume_SetMute(simple, mute, NULL);
+        ISimpleAudioVolume_Release(simple);
+    }
     Leave();
-    return FAILED(hr) ? -1 : 0;
+
+    if (FAILED(hr))
+    {
+        msg_Err(aout, "cannot set mute (error 0x%lx)", hr);
+        return -1;
+    }
+    return 0;
 }
 
 
@@ -576,12 +592,6 @@ static void MTAThread(void *data)
     if (FAILED(hr))
         msg_Warn(aout, "cannot get audio clock (error 0x%lx)", hr);
 
-    /*if (AOUT_FMT_LINEAR(&format) && !exclusive)*/
-    {
-        hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume,
-                                     (void **)&sys->volume.simple);
-    }
-
     hr = IAudioClient_GetService(sys->client, &IID_IAudioSessionControl,
                                  (void **)&sys->control);
     if (FAILED(hr))
@@ -599,11 +609,6 @@ static void MTAThread(void *data)
 
     if (sys->control != NULL)
         IAudioSessionControl_Release(sys->control);
-    /*if (AOUT_FMT_LINEAR(&format) && !exclusive)*/
-    {
-        if (sys->volume.simple != NULL)
-            ISimpleAudioVolume_Release(sys->volume.simple);
-    }
     if (sys->clock != NULL)
         IAudioClock_Release(sys->clock);
     IAudioRenderClient_Release(sys->render);
