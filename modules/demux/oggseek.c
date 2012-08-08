@@ -86,11 +86,11 @@ static demux_index_entry_t *index_entry_new( void )
 
 
 
-/* add a theora entry to our list; format is highest granulepos -> page offset of 
+/* add a theora entry to our list; format is highest granulepos -> page offset of
    keyframe start */
 
-const demux_index_entry_t *oggseek_theora_index_entry_add ( logical_stream_t *p_stream, 
-                                                            int64_t i_granule, 
+const demux_index_entry_t *oggseek_theora_index_entry_add ( logical_stream_t *p_stream,
+                                                            int64_t i_granule,
                                                             int64_t i_pagepos)
 {
     /* add or update entry for keyframe */
@@ -237,8 +237,8 @@ static int64_t get_data( demux_t *p_demux, int64_t i_bytes_to_read )
 /* Find the first first ogg page for p_stream between offsets i_pos1 and i_pos2,
    return file offset in bytes; -1 is returned on failure */
 
-static int64_t find_first_page( demux_t *p_demux, int64_t i_pos1, int64_t i_pos2, 
-                                logical_stream_t *p_stream, 
+static int64_t find_first_page( demux_t *p_demux, int64_t i_pos1, int64_t i_pos2,
+                                logical_stream_t *p_stream,
                                 int64_t *pi_kframe, int64_t *pi_frame )
 {
     int64_t i_result;
@@ -296,7 +296,7 @@ static int64_t find_first_page( demux_t *p_demux, int64_t i_pos1, int64_t i_pos2
             continue;
         }
 
-        if ( i_result > 0 || ( i_result == 0 && p_sys->oy.fill > 3 && 
+        if ( i_result > 0 || ( i_result == 0 && p_sys->oy.fill > 3 &&
                                ! strncmp( (char *)p_sys->oy.data, "OggS" , 4 ) ) )
         {
             i_pos1 = p_sys->i_input_position;
@@ -444,7 +444,7 @@ static int64_t find_last_frame (demux_t *p_demux, logical_stream_t *p_stream)
 
 /* convert a theora frame to a granulepos */
 
-static inline int64_t frame_to_gpos( logical_stream_t *p_stream, int64_t i_kframe, 
+static inline int64_t frame_to_gpos( logical_stream_t *p_stream, int64_t i_kframe,
                                      int64_t i_frame )
 {
     if ( p_stream->fmt.i_codec == VLC_CODEC_THEORA )
@@ -459,28 +459,28 @@ static inline int64_t frame_to_gpos( logical_stream_t *p_stream, int64_t i_kfram
 
 
 
-/* seek to a suitable point to begin decoding for i_tframe. We can pre-set bounding positions 
+/* seek to a suitable point to begin decoding for i_tframe. We can pre-set bounding positions
    i_pos_lower and i_pos_higher to narrow the search domain. */
 
 
-static int64_t ogg_seek( demux_t *p_demux, logical_stream_t *p_stream, int64_t i_tframe, 
-                         int64_t i_pos_lower, int64_t i_pos_upper, int64_t *pi_pagepos, 
+static int64_t ogg_seek( demux_t *p_demux, logical_stream_t *p_stream, int64_t i_tframe,
+                         int64_t i_pos_lower, int64_t i_pos_upper, int64_t *pi_pagepos,
                          bool b_exact )
 {
     /* For theora:
      * We do two passes here, first with b_exact set, then with b_exact unset.
      *
      * If b_exact is set, we find the highest granulepos <= the target granulepos
-     * from this we extract an estimate of the keyframe (note that there could be other 
+     * from this we extract an estimate of the keyframe (note that there could be other
      * "hidden" keyframes between the found granulepos and the target).
      *
-     * On the second pass we find the highest granulepos < target. This places us just before or 
+     * On the second pass we find the highest granulepos < target. This places us just before or
      * at the start of the target keyframe.
      *
-     * When we come to decode, we start from this second position, discarding any completed 
+     * When we come to decode, we start from this second position, discarding any completed
      * packets on that page, and read pages discarding packets until we get to the target frame.
      *
-     * The function returns the granulepos which is found, 
+     * The function returns the granulepos which is found,
      * sets the page offset in pi_pagepos. -1 is returned on error.
      *
      * for dirac:
@@ -495,7 +495,7 @@ static int64_t ogg_seek( demux_t *p_demux, logical_stream_t *p_stream, int64_t i
      * if > target, or we find no keyframes, we go to the lower segment
      * if < target we divide the segment in two and check the upper half
      *
-     * This is then repeated until the segment size is too small to hold a packet, 
+     * This is then repeated until the segment size is too small to hold a packet,
      * at which point we return our best match
      *
      * Two optimisations are made: - anything we discover about keyframes is added to our index
@@ -574,7 +574,7 @@ static int64_t ogg_seek( demux_t *p_demux, logical_stream_t *p_stream, int64_t i
 
         if ( p_stream->fmt.i_codec == VLC_CODEC_THEORA )
         {
-            i_pagepos = find_first_page( p_demux, i_start_pos, i_end_pos, p_stream, 
+            i_pagepos = find_first_page( p_demux, i_start_pos, i_end_pos, p_stream,
                                          &i_kframe, &i_frame );
         }
         else return -1;
@@ -590,7 +590,7 @@ static int64_t ogg_seek( demux_t *p_demux, logical_stream_t *p_stream, int64_t i
                 return frame_to_gpos( p_stream, i_kframe, i_frame );
             }
 
-            if ( ( i_kframe < i_tframe || ( b_exact && i_kframe == i_tframe ) ) 
+            if ( ( i_kframe < i_tframe || ( b_exact && i_kframe == i_tframe ) )
                  && i_kframe > i_best_kframe )
             {
                 i_best_kframe = i_kframe;
@@ -640,7 +640,7 @@ static int64_t ogg_seek( demux_t *p_demux, logical_stream_t *p_stream, int64_t i
 
 /* find upper and lower pagepos for i_tframe; if we find an exact match, we return it */
 
-static demux_index_entry_t *get_bounds_for ( logical_stream_t *p_stream, int64_t i_tframe, 
+static demux_index_entry_t *get_bounds_for ( logical_stream_t *p_stream, int64_t i_tframe,
                                              int64_t *pi_pos_lower, int64_t *pi_pos_upper)
 {
     int64_t i_kframe;
@@ -699,7 +699,7 @@ static int64_t find_last_theora_frame ( demux_t *p_demux, logical_stream_t *p_st
     i_frame = find_last_frame ( p_demux, p_stream );
 
     /* We need to reset back to the start here, otherwise packets cannot be decoded.
-     * I think this is due to the fact that we seek to the end and then we must reset 
+     * I think this is due to the fact that we seek to the end and then we must reset
      * all logical streams, which causes remaining headers not to be read correctly.
      * Seeking to 0 is the only value which seems to work, and it appears to have no
      * adverse effects. */
@@ -779,7 +779,7 @@ int oggseek_find_frame ( demux_t *p_demux, logical_stream_t *p_stream, int64_t i
     {
         /* no exact match found; search the domain for highest keyframe <= i_tframe */
 
-        i_granulepos = ogg_seek ( p_demux, p_stream, i_tframe, i_pos_lower, i_pos_upper, 
+        i_granulepos = ogg_seek ( p_demux, p_stream, i_tframe, i_pos_lower, i_pos_upper,
                                   &i_pagepos, true );
         if ( i_granulepos == -1 )
         {
@@ -799,13 +799,13 @@ int oggseek_find_frame ( demux_t *p_demux, logical_stream_t *p_stream, int64_t i
             i_kframe = p_stream->i_keyframe_offset;
         }
 
-        /* we found a keyframe, but we don't know where its packet starts, so search for a 
+        /* we found a keyframe, but we don't know where its packet starts, so search for a
            frame just before it */
 
         /* reduce search domain */
         get_bounds_for( p_stream, i_kframe-1, &i_pos_lower, &i_pos_upper );
 
-        i_granulepos = ogg_seek( p_demux, p_stream, i_kframe-1, i_pos_lower, i_pos_upper, 
+        i_granulepos = ogg_seek( p_demux, p_stream, i_kframe-1, i_pos_lower, i_pos_upper,
                                  &i_pagepos, false );
 
         /* i_cframe will be the next frame we decode */
@@ -893,7 +893,7 @@ int64_t oggseek_read_page( demux_t *p_demux )
 
     memcpy( buf, header, PAGE_HEADER_BYTES + i_nsegs );
 
-    i_result = stream_Read ( p_demux->s, (uint8_t*)buf + PAGE_HEADER_BYTES + i_nsegs, 
+    i_result = stream_Read ( p_demux->s, (uint8_t*)buf + PAGE_HEADER_BYTES + i_nsegs,
                              i_page_size - PAGE_HEADER_BYTES - i_nsegs );
 
     ogg_sync_wrote( &p_ogg->oy, i_result + PAGE_HEADER_BYTES + i_nsegs );
