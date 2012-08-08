@@ -24,6 +24,7 @@
 
 #define INITGUID
 #define COBJMACROS
+#define CONST_VTABLE
 
 #include <assert.h>
 #include <audioclient.h>
@@ -77,19 +78,26 @@ static void Leave(void)
 
 struct aout_sys_t
 {
+    audio_output_t *aout;
     IAudioClient *client;
     IAudioRenderClient *render;
     IAudioClock *clock;
+
     union
     {
         ISimpleAudioVolume *simple;
     } volume;
     IAudioSessionControl *control;
+    struct IAudioSessionEvents events;
+    LONG refs;
+
     UINT32 frames; /**< Total buffer size (frames) */
     HANDLE ready; /**< Semaphore from MTA thread */
     HANDLE done; /**< Semaphore to MTA thread */
 };
 
+
+/*** VLC audio output callbacks ***/
 static void Play(audio_output_t *aout, block_t *block, mtime_t *restrict drift)
 {
     aout_sys_t *sys = aout->sys;
@@ -225,6 +233,8 @@ static int SimpleMuteSet(audio_output_t *aout, bool mute)
     return FAILED(hr) ? -1 : 0;
 }
 
+
+/*** Audio devices ***/
 static int DeviceChanged(vlc_object_t *obj, const char *varname,
                          vlc_value_t prev, vlc_value_t cur, void *data)
 {
@@ -304,6 +314,150 @@ static void GetDevices(vlc_object_t *obj, IMMDeviceEnumerator *it)
 }
 
 
+/*** Audio session events ***/
+static inline aout_sys_t *vlc_AudioSessionEvents_sys(IAudioSessionEvents *this)
+{
+    return (aout_sys_t *)(((char *)this) - offsetof(aout_sys_t, events));
+}
+
+static STDMETHODIMP
+vlc_AudioSessionEvents_QueryInterface(IAudioSessionEvents *this, REFIID riid,
+                                      void **ppv)
+{
+    if (IsEqualIID(riid, &IID_IUnknown)
+     || IsEqualIID(riid, &IID_IAudioSessionEvents))
+    {
+        *ppv = this;
+        IUnknown_AddRef(this);
+        return S_OK;
+    }
+    else
+    {
+       *ppv = NULL;
+        return E_NOINTERFACE;
+    }
+}
+
+static STDMETHODIMP_(ULONG)
+vlc_AudioSessionEvents_AddRef(IAudioSessionEvents *this)
+{
+    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    return InterlockedIncrement(&sys->refs);
+}
+
+static STDMETHODIMP_(ULONG)
+vlc_AudioSessionEvents_Release(IAudioSessionEvents *this)
+{
+    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    return InterlockedDecrement(&sys->refs);
+}
+
+static STDMETHODIMP
+vlc_AudioSessionEvents_OnDisplayNameChanged(IAudioSessionEvents *this,
+                                            LPCWSTR wname, LPCGUID ctx)
+{
+    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    audio_output_t *aout = sys->aout;
+
+    msg_Dbg(aout, "display name changed: %ls", wname);
+    (void) ctx;
+    return S_OK;
+}
+
+static STDMETHODIMP
+vlc_AudioSessionEvents_OnIconPathChanged(IAudioSessionEvents *this,
+                                         LPCWSTR wpath, LPCGUID ctx)
+{
+    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    audio_output_t *aout = sys->aout;
+
+    msg_Dbg(aout, "icon path changed: %ls", wpath);
+    (void) ctx;
+    return S_OK;
+}
+
+static STDMETHODIMP
+vlc_AudioSessionEvents_OnSimpleVolumeChanged(IAudioSessionEvents *this, float vol,
+                                             WINBOOL mute, LPCGUID ctx)
+{
+    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    audio_output_t *aout = sys->aout;
+
+    msg_Dbg(aout, "simple volume changed: %f, muting %sabled", vol,
+            mute ? "en" : "dis");
+    aout_VolumeReport(aout, vol);
+    aout_MuteReport(aout, mute == TRUE);
+    (void) ctx;
+    return S_OK;
+}
+
+static STDMETHODIMP
+vlc_AudioSessionEvents_OnChannelVolumeChanged(IAudioSessionEvents *this,
+                                              DWORD count, float *vols,
+                                              DWORD changed, LPCGUID ctx)
+{
+    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    audio_output_t *aout = sys->aout;
+
+    msg_Dbg(aout, "channel volume %lu of %lu changed: %f", changed, count,
+            vols[changed]);
+    (void) ctx;
+    return S_OK;
+}
+
+static STDMETHODIMP
+vlc_AudioSessionEvents_OnGroupingParamChanged(IAudioSessionEvents *this,
+                                              LPCGUID param, LPCGUID ctx)
+
+{
+    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    audio_output_t *aout = sys->aout;
+
+    msg_Dbg(aout, "grouping parameter changed");
+    (void) param;
+    (void) ctx;
+    return S_OK;
+}
+
+static STDMETHODIMP
+vlc_AudioSessionEvents_OnStateChanged(IAudioSessionEvents *this,
+                                      AudioSessionState state)
+{
+    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    audio_output_t *aout = sys->aout;
+
+    msg_Dbg(aout, "state changed: %d", state);
+    return S_OK;
+}
+
+static STDMETHODIMP
+vlc_AudioSessionEvents_OnSessionDisconnected(IAudioSessionEvents *this,
+                                             AudioSessionDisconnectReason reason)
+{
+    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    audio_output_t *aout = sys->aout;
+
+    msg_Dbg(aout, "session disconnected: reason %d", reason);
+    return S_OK;
+}
+
+static const struct IAudioSessionEventsVtbl vlc_AudioSessionEvents =
+{
+    vlc_AudioSessionEvents_QueryInterface,
+    vlc_AudioSessionEvents_AddRef,
+    vlc_AudioSessionEvents_Release,
+
+    vlc_AudioSessionEvents_OnDisplayNameChanged,
+    vlc_AudioSessionEvents_OnIconPathChanged,
+    vlc_AudioSessionEvents_OnSimpleVolumeChanged,
+    vlc_AudioSessionEvents_OnChannelVolumeChanged,
+    vlc_AudioSessionEvents_OnGroupingParamChanged,
+    vlc_AudioSessionEvents_OnStateChanged,
+    vlc_AudioSessionEvents_OnSessionDisconnected,
+};
+
+
+/*** Initialization / deinitialization **/
 static void vlc_ToWave(WAVEFORMATEXTENSIBLE *restrict wf,
                        audio_sample_format_t *restrict audio)
 {
@@ -471,9 +625,12 @@ static int Open(vlc_object_t *obj)
     aout_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
+    sys->aout = aout;
     sys->client = NULL;
     sys->render = NULL;
     sys->clock = NULL;
+    sys->events.lpVtbl = &vlc_AudioSessionEvents;
+    sys->refs = 1;
     sys->ready = NULL;
     sys->done = NULL;
     aout->sys = sys;
@@ -610,6 +767,9 @@ retry:
         aout->volume_set = SimpleVolumeSet;
         aout->mute_set = SimpleMuteSet;
     }
+    if (likely(sys->control != NULL))
+       IAudioSessionControl_RegisterAudioSessionNotification(sys->control,
+                                                             &sys->events);
     var_AddCallback (aout, "audio-device", DeviceChanged, NULL);
 
     return VLC_SUCCESS;
@@ -637,6 +797,9 @@ static void Close (vlc_object_t *obj)
     aout_sys_t *sys = aout->sys;
 
     Enter();
+    if (likely(sys->control != NULL))
+       IAudioSessionControl_UnregisterAudioSessionNotification(sys->control,
+                                                               &sys->events);
     ReleaseSemaphore(sys->done, 1, NULL); /* tell MTA thread to finish */
     WaitForSingleObject(sys->ready, INFINITE); /* wait for that ^ */
     IAudioClient_Stop(sys->client); /* should not be needed */
