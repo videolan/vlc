@@ -68,6 +68,16 @@ static bool context_wait (pa_context *ctx, pa_threaded_mainloop *mainloop)
     return 0;
 }
 
+static void context_event_cb(pa_context *c, const char *name, pa_proplist *pl,
+                             void *userdata)
+{
+    vlc_object_t *obj = userdata;
+
+    msg_Warn (obj, "unhandled context event \"%s\"", name);
+    (void) c;
+    (void) pl;
+}
+
 /**
  * Initializes the PulseAudio main loop and connects to the PulseAudio server.
  * @return a PulseAudio context on success, or NULL on error
@@ -144,6 +154,7 @@ pa_context *vlc_pa_connect (vlc_object_t *obj, pa_threaded_mainloop **mlp)
         goto fail;
 
     pa_context_set_state_callback (ctx, context_state_cb, mainloop);
+    pa_context_set_event_callback (ctx, context_event_cb, obj);
     if (pa_context_connect (ctx, NULL, 0, NULL) < 0
      || context_wait (ctx, mainloop))
     {
@@ -177,6 +188,7 @@ void vlc_pa_disconnect (vlc_object_t *obj, pa_context *ctx,
 {
     pa_threaded_mainloop_lock (mainloop);
     pa_context_disconnect (ctx);
+    pa_context_set_event_callback (ctx, NULL, NULL);
     pa_context_set_state_callback (ctx, NULL, NULL);
     pa_context_unref (ctx);
     pa_threaded_mainloop_unlock (mainloop);

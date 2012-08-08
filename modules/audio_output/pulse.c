@@ -382,7 +382,7 @@ static void stream_event_cb(pa_stream *s, const char *name, pa_proplist *pl,
                               dummy, dummy, NULL);
     } else
 #endif
-        msg_Warn (aout, "unhandled event %s", name);
+        msg_Warn (aout, "unhandled stream event \"%s\"", name);
     (void) s;
     (void) pl;
 }
