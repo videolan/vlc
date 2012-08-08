@@ -705,6 +705,10 @@ static int64_t find_last_theora_frame ( demux_t *p_demux, logical_stream_t *p_st
      * adverse effects. */
 
     seek_byte( p_demux, 0 );
+    /* Reset stream states */
+    p_stream->i_serial_no = ogg_page_serialno( &p_demux->p_sys->current_page );
+    ogg_stream_init( &p_stream->os, p_stream->i_serial_no );
+    ogg_stream_pagein( &p_stream->os, &p_demux->p_sys->current_page );
 
     return i_frame;
 }
