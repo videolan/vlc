@@ -75,7 +75,6 @@ typedef struct
 
 typedef struct
 {
-    es_format_t fmt;
     es_out_id_t *p_es;
     int         i_track_id;
 
