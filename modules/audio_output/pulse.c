@@ -195,10 +195,7 @@ static void stream_start(pa_stream *s, audio_output_t *aout)
     aout_sys_t *sys = aout->sys;
     pa_operation *op;
 
-    if (sys->trigger != NULL) {
-        vlc_pa_rttime_free(sys->mainloop, sys->trigger);
-        sys->trigger = NULL;
-    }
+    assert (sys->trigger == NULL);
 
     op = pa_stream_cork(s, 0, NULL, NULL);
     if (op != NULL)
@@ -229,8 +226,11 @@ static void stream_trigger_cb(pa_mainloop_api *api, pa_time_event *e,
     audio_output_t *aout = userdata;
     aout_sys_t *sys = aout->sys;
 
-    msg_Dbg(aout, "starting deferred");
     assert (sys->trigger == e);
+
+    msg_Dbg(aout, "starting deferred");
+    vlc_pa_rttime_free(sys->mainloop, sys->trigger);
+    sys->trigger = NULL;
     stream_start(sys->stream, aout);
     (void) api; (void) e; (void) tv;
 }
@@ -248,18 +248,21 @@ static void stream_resync(audio_output_t *aout, pa_stream *s)
 
     assert (sys->pts != VLC_TS_INVALID);
 
+    if (sys->trigger != NULL) {
+        vlc_pa_rttime_free(sys->mainloop, sys->trigger);
+        sys->trigger = NULL;
+    }
+
     delta = vlc_pa_get_latency(aout, sys->context, s);
     if (unlikely(delta == VLC_TS_INVALID))
         delta = 0; /* screwed */
 
     delta = (sys->pts - mdate()) - delta;
     if (delta > 0) {
-        if (sys->trigger == NULL) {
-            msg_Dbg(aout, "deferring start (%"PRId64" us)", delta);
-            delta += pa_rtclock_now();
-            sys->trigger = pa_context_rttime_new(sys->context, delta,
-                                                 stream_trigger_cb, aout);
-        }
+        msg_Dbg(aout, "deferring start (%"PRId64" us)", delta);
+        delta += pa_rtclock_now();
+        sys->trigger = pa_context_rttime_new(sys->context, delta,
+                                             stream_trigger_cb, aout);
     } else {
         msg_Warn(aout, "starting late (%"PRId64" us)", delta);
         stream_start(s, aout);
@@ -272,11 +275,14 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
     aout_sys_t *sys = aout->sys;
     mtime_t delta, change;
 
-    if (pa_stream_is_corked(s))
-        return;
-    if (sys->pts == VLC_TS_INVALID)
-    {
+    if (sys->paused != VLC_TS_INVALID)
+        return; /* nothing to do while paused */
+    if (sys->pts == VLC_TS_INVALID) {
         msg_Dbg(aout, "missing latency from input");
+        return;
+    }
+    if (pa_stream_is_corked(s) > 0) {
+        stream_resync(aout, s);
         return;
     }
 
