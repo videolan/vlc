@@ -254,8 +254,10 @@ static void stream_resync(audio_output_t *aout, pa_stream *s)
     }
 
     delta = vlc_pa_get_latency(aout, sys->context, s);
-    if (unlikely(delta == VLC_TS_INVALID))
+    if (unlikely(delta == VLC_TS_INVALID)) {
+        msg_Dbg(aout, "cannot synchronize start");
         delta = 0; /* screwed */
+    }
 
     delta = (sys->pts - mdate()) - delta;
     if (delta > 0) {
