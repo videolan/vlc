@@ -25,15 +25,16 @@ ifdef HAVE_IOS
 	$(APPLY) $(SRC)/mad/mad-ios-asm.patch
 endif
 	$(APPLY) $(SRC)/mad/mad-noopt.patch
+	$(APPLY) $(SRC)/mad/Provide-Thumb-2-alternative-code-for-MAD_F_MLN.diff
 	$(MOVE)
 
 .mad: libmad
 	touch libmad/NEWS libmad/AUTHORS libmad/ChangeLog
 	$(RECONF)
 ifdef HAVE_IOS
-	cd $< && $(HOSTVARS) CCAS="$(AS)" CFLAGS="$(CFLAGS) -O4 -marm $(NOTHUMB)" ./configure $(HOSTCONF) $(MAD_CONF)
+	cd $< && $(HOSTVARS) CCAS="$(AS)" CFLAGS="$(CFLAGS) -O4" ./configure $(HOSTCONF) $(MAD_CONF)
 else
-	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -O3 $(NOTHUMB)" ./configure $(HOSTCONF) $(MAD_CONF)
+	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -O3" ./configure $(HOSTCONF) $(MAD_CONF)
 endif
 	cd $< && $(MAKE) install
 	touch $@
