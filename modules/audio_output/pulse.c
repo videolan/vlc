@@ -820,6 +820,7 @@ static int Open(vlc_object_t *obj)
     /* Stream parameters */
     const pa_stream_flags_t flags = PA_STREAM_START_CORKED
                                   //| PA_STREAM_INTERPOLATE_TIMING
+                                    | PA_STREAM_NOT_MONOTONIC
                                   | PA_STREAM_AUTO_TIMING_UPDATE
                                   | PA_STREAM_VARIABLE_RATE;
 
