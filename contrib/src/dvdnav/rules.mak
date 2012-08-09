@@ -18,6 +18,7 @@ $(TARBALLS)/libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2:
 dvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2 .sum-dvdnav
 	$(UNPACK)
 	$(APPLY) $(SRC)/dvdnav/dvdnav.patch
+	$(APPLY) $(SRC)/dvdnav/libdvdnav-searching.c-check-cellnr-before-indexing.patch
 	$(MOVE)
 
 DEPS_dvdnav = dvdcss dvdread
