@@ -147,10 +147,7 @@ aout_input_t *aout_InputNew (audio_output_t * p_aout,
                 psz_parser = psz_next;
                 continue;
             }
-
-            p_filter->p_owner = malloc( sizeof(*p_filter->p_owner) );
-            p_filter->p_owner->p_aout  = p_aout;
-            p_filter->p_owner->p_input = p_input;
+            p_filter->p_owner = (filter_owner_sys_t *)p_input;
 
             /* request format */
             memcpy( &p_filter->fmt_in.audio, &chain_output_format,
@@ -205,7 +202,6 @@ aout_input_t *aout_InputNew (audio_output_t * p_aout,
                 msg_Err( p_aout, "cannot add user filter %s (skipped)",
                          psz_parser );
 
-                free( p_filter->p_owner );
                 vlc_object_release( p_filter );
 
                 psz_parser = psz_next;
@@ -222,7 +218,6 @@ aout_input_t *aout_InputNew (audio_output_t * p_aout,
                          psz_parser );
 
                 module_unneed( p_filter, p_filter->p_module );
-                free( p_filter->p_owner );
                 vlc_object_release( p_filter );
 
                 psz_parser = psz_next;
@@ -553,7 +548,7 @@ static vout_thread_t *RequestVout( void *p_private,
 vout_thread_t *aout_filter_RequestVout( filter_t *p_filter,
                                         vout_thread_t *p_vout, video_format_t *p_fmt )
 {
-    aout_input_t *p_input = p_filter->p_owner->p_input;
+    aout_input_t *p_input = (aout_input_t *)p_filter->p_owner;
     aout_request_vout_t *p_request = &p_input->request_vout;
 
     /* XXX: this only works from audio input */

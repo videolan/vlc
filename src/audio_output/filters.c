@@ -59,7 +59,6 @@ static filter_t * FindFilter( vlc_object_t *obj,
     p_filter->fmt_in.i_codec = infmt->i_format;
     p_filter->fmt_out.audio = *outfmt;
     p_filter->fmt_out.i_codec = outfmt->i_format;
-    p_filter->p_owner = NULL;
 
     if( infmt->i_format == outfmt->i_format
      && infmt->i_physical_channels == outfmt->i_physical_channels
@@ -202,7 +201,6 @@ void aout_FiltersDestroyPipeline( filter_t *const *filters, unsigned n )
         filter_t *p_filter = filters[i];
 
         module_unneed( p_filter, p_filter->p_module );
-        free( p_filter->p_owner );
         vlc_object_release( p_filter );
     }
 }

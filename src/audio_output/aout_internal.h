@@ -42,12 +42,6 @@ typedef struct
     void *p_private;
 } aout_request_vout_t;
 
-struct filter_owner_sys_t
-{
-    audio_output_t *p_aout;
-    aout_input_t    *p_input;
-};
-
 typedef struct aout_volume aout_volume_t;
 
 /** an input stream for the audio output */
