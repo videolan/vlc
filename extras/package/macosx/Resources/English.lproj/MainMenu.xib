@@ -2,7 +2,7 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">11E53</string>
+    <string key="IBDocument.SystemVersion">11G15</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
     <string key="IBDocument.AppKitVersion">1138.47</string>
     <string key="IBDocument.HIToolboxVersion">569.00</string>
@@ -21,15 +21,16 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="2770"/>
-      <integer value="2730"/>
-      <integer value="4948"/>
-      <integer value="29"/>
-      <integer value="1617"/>
+      <integer value="21"/>
+      <integer value="4845"/>
       <integer value="4722"/>
+      <integer value="1617"/>
       <integer value="4850"/>
-      <integer value="4756"/>
       <integer value="915"/>
+      <integer value="29"/>
+      <integer value="2770"/>
+      <integer value="4948"/>
+      <integer value="2730"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -513,7 +514,6 @@
                   </object>
                   <string key="NSFrame">{{201, 0}, {403, 274}}</string>
                   <reference key="NSSuperview" ref="302568132"/>
-                  <bool key="NSViewIsLayerTreeHost">YES</bool>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <string key="NSClassName">NSView</string>
                 </object>
@@ -4430,7 +4430,6 @@ LCAuLi4</string>
         </object>
         <string key="NSFrameSize">{402, 252}</string>
         <reference key="NSSuperview"/>
-        <bool key="NSViewIsLayerTreeHost">YES</bool>
         <object class="CIDarkenBlendMode" key="NSViewCompositeFilter">
           <bool key="CIEnabled">YES</bool>
         </object>
@@ -4438,9 +4437,10 @@ LCAuLi4</string>
         <string key="NSClassName">VLCMainWindowTitleView</string>
       </object>
       <object class="NSCustomView" id="767040302">
-        <nil key="NSNextResponder"/>
+        <reference key="NSNextResponder"/>
         <int key="NSvFlags">256</int>
         <string key="NSFrameSize">{100, 100}</string>
+        <reference key="NSSuperview"/>
         <string key="NSClassName">NSView</string>
       </object>
       <object class="NSDrawer" id="689081542">
@@ -11830,6 +11830,7 @@ LCAuLi4</string>
           <string>4839.IBPluginDependency</string>
           <string>4839.IBViewBoundsToFrameTransform</string>
           <string>4840.IBPluginDependency</string>
+          <string>4845.IBEditorWindowLastContentRect</string>
           <string>4845.IBPluginDependency</string>
           <string>4846.IBPluginDependency</string>
           <string>4850.IBEditorWindowLastContentRect</string>
@@ -12738,6 +12739,7 @@ LCAuLi4</string>
             <bytes key="NSTransformStruct">AUQTwAAAAAAAA</bytes>
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>{{329, 634}, {100, 100}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>{{564, 654}, {400, 22}}</string>
