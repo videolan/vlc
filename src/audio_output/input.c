@@ -329,8 +329,6 @@ int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input )
  *****************************************************************************
  * This function must be entered with the input lock.
  *****************************************************************************/
-/* XXX Do not activate it !! */
-//#define AOUT_PROCESS_BEFORE_CHEKS
 block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
                         block_t *p_buffer, int i_input_rate, date_t *date )
 {
@@ -343,31 +341,6 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
         inputDrop( p_input, p_buffer );
         return NULL;
     }
-
-#ifdef AOUT_PROCESS_BEFORE_CHEKS
-    /* Run pre-filters. */
-    aout_FiltersPlay( p_aout, p_input->pp_filters, p_input->i_nb_filters,
-                      &p_buffer );
-    if( !p_buffer )
-        return NULL;
-
-    /* Actually run the resampler now. */
-    if ( p_input->i_nb_resamplers > 0 )
-    {
-        const mtime_t i_date = p_buffer->i_pts;
-        aout_FiltersPlay( p_aout, p_input->pp_resamplers,
-                          p_input->i_nb_resamplers,
-                          &p_buffer );
-    }
-
-    if( !p_buffer )
-        return NULL;
-    if( p_buffer->i_nb_samples <= 0 )
-    {
-        block_Release( p_buffer );
-        return NULL;
-    }
-#endif
 
     /* Handle input rate change, but keep drift correction */
     if( i_input_rate != p_input->i_last_input_rate )
@@ -445,12 +418,10 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
         return NULL;
     }
 
-#ifndef AOUT_PROCESS_BEFORE_CHEKS
     /* Run pre-filters. */
     aout_FiltersPlay( p_input->pp_filters, p_input->i_nb_filters, &p_buffer );
     if( !p_buffer )
         return NULL;
-#endif
 
     /* Run the resampler if needed.
      * We first need to calculate the output rate of this resampler. */
@@ -522,7 +493,6 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
         }
     }
 
-#ifndef AOUT_PROCESS_BEFORE_CHEKS
     /* Actually run the resampler now. */
     if ( p_input->i_nb_resamplers > 0 )
     {
@@ -537,7 +507,6 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
         block_Release( p_buffer );
         return NULL;
     }
-#endif
 
     p_buffer->i_pts = start_date;
     return p_buffer;
