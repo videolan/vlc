@@ -25,7 +25,6 @@ OPUS_CONF += --enable-fixed-point
 endif
 
 .opus: opus
-	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(OPUS_CONF)
 	cd $< && $(MAKE) install
 	touch $@
