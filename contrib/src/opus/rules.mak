@@ -1,6 +1,6 @@
 # opus
 
-OPUS_VERSION := 0.9.14
+OPUS_VERSION := 1.0.1-rc
 
 OPUS_URL := http://downloads.xiph.org/releases/opus/opus-$(OPUS_VERSION).tar.gz
 
@@ -16,8 +16,6 @@ $(TARBALLS)/opus-$(OPUS_VERSION).tar.gz:
 
 opus: opus-$(OPUS_VERSION).tar.gz .sum-opus
 	$(UNPACK)
-	$(APPLY) $(SRC)/opus/0001-Make-stack-protector-check-use-AC_LINK_IFELSE.patch
-	$(APPLY) $(SRC)/opus/0001-Avoid-C99-log2-invocation-in-tests-reported-by-Rafa-.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
