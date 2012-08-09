@@ -272,7 +272,6 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_intf_embedded_ckb setTitle: _NS("Show video within the main window")];
     [o_intf_nativefullscreen_ckb setTitle: _NS("Use the native fullscreen mode on OS X Lion")];
     [o_intf_fspanel_ckb setTitle: _NS("Show Fullscreen Controller")];
-    [o_intf_lang_txt setStringValue: _NS("Language")];
     [o_intf_network_box setTitle: _NS("Privacy / Network Interaction")];
 
     [o_intf_appleremote_ckb setTitle: _NS("Control playback with the Apple Remote")];
@@ -470,7 +469,6 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     /**********************
      * interface settings *
      **********************/
-    [self setupButton: o_intf_lang_pop forStringList: "language"];
     [self setupButton: o_intf_art_pop forIntList: "album-art"];
 
     [self setupButton: o_intf_fspanel_ckb forBoolValue: "macosx-fspanel"];
@@ -854,7 +852,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
      **********************/
     if( b_intfSettingChanged )
     {
-        SaveStringList( o_intf_lang_pop, "language" );
         SaveIntList( o_intf_art_pop, "album-art" );
 
         config_PutInt( p_intf, "macosx-fspanel", [o_intf_fspanel_ckb state] );
