@@ -49,6 +49,7 @@
 
     input_thread_t *p_old_input;
 }
++ (VLCBookmarks *)sharedInstance;
 
 - (IBAction)add:(id)sender;
 - (IBAction)clear:(id)sender;
@@ -60,9 +61,6 @@
 - (IBAction)edit_cancel:(id)sender;
 - (IBAction)edit_ok:(id)sender;
 
-+ (VLCBookmarks *)sharedInstance;
-
-- (void)initStrings;
 - (void)showBookmarks;
 - (id)dataTable;
 @end
