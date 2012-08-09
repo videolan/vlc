@@ -23,7 +23,7 @@ endif
 
 .faad2: faad2
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure --without-drm $(HOSTCONF) CFLAGS="$(NOTHUMB)"
+	cd $< && $(HOSTVARS) ./configure --without-drm $(HOSTCONF)
 	cd $< && sed -i.orig "s/shrext_cmds/shrext/g" libtool
 	cd $</libfaad && $(MAKE) install
 	touch $@
