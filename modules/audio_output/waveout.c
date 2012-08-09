@@ -843,7 +843,7 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
 
 
 /****************************************************************************
- * WaveOutClearDoneBuffers: Clear all done marked buffers, and free aout_bufer
+ * WaveOutClearDoneBuffers: Clear all done marked buffers, and free buffer
  ****************************************************************************
  * return value is the number of still playing buffers in the queue
  ****************************************************************************/

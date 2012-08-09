@@ -287,7 +287,7 @@ static int Open (vlc_object_t *obj)
         GLXFBConfig *confs = glXChooseFBConfig (dpy, snum, attr, &nelem);
         if (confs == NULL)
         {
-            msg_Err (vd, "no GLX frame bufer configurations");
+            msg_Err (vd, "no GLX frame buffer configurations");
             goto error;
         }
 
