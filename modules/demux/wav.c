@@ -341,6 +341,7 @@ static int Open( vlc_object_t * p_this )
         goto error;
     case VLC_CODEC_GSM_MS:
     case VLC_CODEC_ADPCM_G726:
+    case VLC_CODEC_TRUESPEECH:
         if( FrameInfo_MSGSM( &p_sys->i_frame_size, &p_sys->i_frame_samples,
                              &p_sys->fmt ) )
             goto error;
