@@ -160,7 +160,7 @@ static int load( vlc_object_t *obj )
     if ( InitDatabase( p_ml ) != VLC_SUCCESS )
     {
         vlc_mutex_destroy( &p_ml->p_sys->lock );
-        //free( p_ml->p_sys ); // FIXME: Freed in InitDatase ?!?
+        free( p_ml->p_sys );
         return VLC_EGENERIC;
     }
 
@@ -1064,11 +1064,7 @@ int InitDatabase( media_library_t *p_ml )
     p_ml->p_sys->p_sql = sql_Create( p_ml, NULL, psz_dbhost, i_port, psz_user,
                                      psz_pass );
     if( !p_ml->p_sys->p_sql )
-    {
-        vlc_mutex_destroy( &p_ml->p_sys->lock );
-        free( p_ml->p_sys );
         return VLC_EGENERIC;
-    }
 
     /* Let's check if tables exist */
     int i_version = GetDatabaseVersion( p_ml );
