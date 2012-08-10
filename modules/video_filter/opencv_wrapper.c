@@ -366,8 +366,12 @@ static void VlcPictureToIplImage( filter_t* p_filter, picture_t* p_in )
     }
     else    //((p_sys->f_scale != 1) || (p_sys->i_internal_chroma != CINPUT))
     {
-        //use the input image without conversion
-        p_sys->p_proc_image = p_in;
+        // In theory, you could use the input image without conversion,
+        // but it seems to cause weird picture effects (like repeated
+        // image filtering) and picture leaking.
+        p_sys->p_proc_image = filter_NewPicture( p_filter ); //p_in
+        picture_Copy( p_sys->p_proc_image, p_in );
+        p_sys->p_to_be_freed = p_sys->p_proc_image;
     }
 
     //Convert to the IplImage array that is to be processed.
@@ -413,6 +417,8 @@ static picture_t* Filter( filter_t* p_filter, picture_t* p_pic )
         return NULL;
     }
 
+    video_format_t fmt_out;
+
     // Make a copy if we want to show the original input
     if (p_filter->p_sys->i_wrapper_output == VINPUT)
         picture_Copy( p_outpic, p_pic );
@@ -424,9 +430,31 @@ static picture_t* Filter( filter_t* p_filter, picture_t* p_pic )
 
     if(p_filter->p_sys->i_wrapper_output == PROCESSED) {
         // Processed video
-        if ((p_filter->p_sys->p_proc_image) && (p_filter->p_sys->p_proc_image->i_planes > 0)) {
+        if( (p_filter->p_sys->p_proc_image) &&
+            (p_filter->p_sys->p_proc_image->i_planes > 0) &&
+            (p_filter->p_sys->i_internal_chroma != CINPUT) ) {
+            //p_filter->p_sys->p_proc_image->format.i_chroma = VLC_CODEC_RGB24;
+
+            memset( &fmt_out, 0, sizeof(video_format_t) );
+            fmt_out = p_pic->format;
+            //picture_Release( p_outpic );
+
+            /*
+             * We have to copy out the image from image_Convert(), otherwise
+             * you leak pictures for some reason:
+             * main video output error: pictures leaked, trying to workaround
+             */
+            picture_t* p_outpic_tmp = image_Convert(
+                        p_filter->p_sys->p_image,
+                        p_filter->p_sys->p_proc_image,
+                        &(p_filter->p_sys->p_proc_image->format),
+                        &fmt_out );
+
+            picture_CopyPixels( p_outpic, p_outpic_tmp );
+            CopyInfoAndRelease( p_outpic, p_outpic_tmp );
+        } else if( p_filter->p_sys->i_internal_chroma == CINPUT ) {
             picture_CopyPixels( p_outpic, p_filter->p_sys->p_proc_image );
-            CopyInfoAndRelease( p_outpic, p_pic );
+            picture_CopyProperties( p_outpic, p_filter->p_sys->p_proc_image );
         }
     }
 
