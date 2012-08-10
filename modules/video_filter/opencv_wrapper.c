@@ -431,18 +431,15 @@ static picture_t* Filter( filter_t* p_filter, picture_t* p_pic )
     }
 
     ReleaseImages( p_filter );
+    picture_Release( p_pic );
 
 #ifndef NDEBUG
     msg_Dbg( p_filter, "Filter() done" );
 #endif
 
-    if( p_filter->p_sys->i_wrapper_output == VINPUT ) {
-        picture_Release( p_pic );
-        return p_outpic;
-    } else if( p_filter->p_sys->i_wrapper_output == PROCESSED ) {
+    if( p_filter->p_sys->i_wrapper_output != NONE ) {
         return p_outpic;
     } else { // NONE
-        picture_Release( p_pic );
         picture_Release( p_outpic );
         return NULL;
     }
