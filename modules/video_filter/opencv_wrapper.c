@@ -93,10 +93,6 @@ vlc_module_begin ()
                           N_("Wrapper filter output"),
                           N_("Determines what (if any) video is displayed by the wrapper filter"), false);
         change_string_list( output_list, output_list_text, 0);
-    add_string( "opencv-verbosity", "error",
-                          N_("Wrapper filter verbosity"),
-                          N_("Determines wrapper filter verbosity level"), false);
-        change_string_list( verbosity_list, verbosity_list_text, 0);
     add_string( "opencv-filter-name", "none",
                           N_("OpenCV internal filter name"),
                           N_("Name of internal OpenCV plugin filter to use"), false);
@@ -124,16 +120,6 @@ enum internal_chroma_t
 };
 
 /*****************************************************************************
- * verbosity_t:
- *****************************************************************************/
-enum verbosity_t
-{
-   VERB_ERROR,
-   VERB_WARN,
-   VERB_DEBUG
-};
-
-/*****************************************************************************
  * filter_sys_t: opencv_wrapper video output method descriptor
  *****************************************************************************
  * This structure is part of the video output thread descriptor.
@@ -152,7 +138,6 @@ struct filter_sys_t
 
     int i_wrapper_output;
     int i_internal_chroma;
-    int i_verbosity;
 
     IplImage *p_cv_image[VOUT_MAX_PLANES];
 
@@ -258,44 +243,19 @@ static int Create( vlc_object_t *p_this )
     }
     free( psz_output );
 
-    psz_verbosity = var_InheritString( p_filter, "opencv-verbosity" );
-    if( psz_verbosity == NULL )
-    {
-        msg_Err( p_filter, "configuration variable %s empty, using 'input'",
-                         "opencv-verbosity" );
-        p_filter->p_sys->i_verbosity = VERB_ERROR;
-    }
-    else
-    {
-        if( !strcmp( psz_verbosity, "error" ) )
-            p_filter->p_sys->i_verbosity = VERB_ERROR;
-        else if( !strcmp( psz_verbosity, "warning" ) )
-            p_filter->p_sys->i_verbosity = VERB_WARN;
-        else if( !strcmp( psz_verbosity, "debug" ) )
-            p_filter->p_sys->i_verbosity = VERB_DEBUG;
-        else
-        {
-            msg_Err( p_filter, "no valid opencv-verbosity provided, using 'error'" );
-            p_filter->p_sys->i_verbosity = VERB_ERROR;
-        }
-    }
-    free( psz_verbosity);
-
     p_filter->p_sys->f_scale =
         var_InheritFloat( p_filter, "opencv-scale" );
 
-    if (p_filter->p_sys->i_verbosity > VERB_WARN)
-        msg_Info(p_filter, "Configuration: opencv-scale: %f, opencv-chroma: %d, "
-            "opencv-output: %d, opencv-verbosity %d, opencv-filter %s",
-            p_filter->p_sys->f_scale,
-            p_filter->p_sys->i_internal_chroma,
-            p_filter->p_sys->i_wrapper_output,
-            p_filter->p_sys->i_verbosity,
-            p_filter->p_sys->psz_inner_name);
+    msg_Info(p_filter, "Configuration: opencv-scale: %f, opencv-chroma: %d, "
+        "opencv-output: %d, opencv-filter %s",
+        p_filter->p_sys->f_scale,
+        p_filter->p_sys->i_internal_chroma,
+        p_filter->p_sys->i_wrapper_output,
+        p_filter->p_sys->psz_inner_name);
 
-    /* Try to open the real video output */
-    if (p_filter->p_sys->i_verbosity > VERB_WARN)
-        msg_Dbg( p_filter, "spawning the real video output" );
+#ifndef NDEBUG
+    msg_Dbg( p_filter, "opencv_wrapper successfully started" );
+#endif
 
     p_filter->pf_video_filter = Filter;
 
@@ -345,8 +305,10 @@ static void ReleaseImages( filter_t* p_filter )
         picture_Release( p_sys->p_to_be_freed );
         p_sys->p_to_be_freed = NULL;
     }
-    if (p_sys->i_verbosity > VERB_WARN)
-        msg_Dbg( p_filter, "images released" );
+
+#ifndef NDEBUG
+    msg_Dbg( p_filter, "images released" );
+#endif
 }
 
 /*****************************************************************************
@@ -361,13 +323,10 @@ static void VlcPictureToIplImage( filter_t* p_filter, picture_t* p_in )
     // input video size
     CvSize sz = cvSize(abs(p_in->format.i_width), abs(p_in->format.i_height));
     video_format_t fmt_out;
-    clock_t start, finish;  //performance measures
     double  duration;
     filter_sys_t* p_sys = p_filter->p_sys;
 
     memset( &fmt_out, 0, sizeof(video_format_t) );
-
-    start = clock();
 
     //do scale / color conversion according to p_sys config
     if ((p_sys->f_scale != 1) || (p_sys->i_internal_chroma != CINPUT))
@@ -434,11 +393,9 @@ static void VlcPictureToIplImage( filter_t* p_filter, picture_t* p_in )
     p_sys->hacked_pic.i_planes = planes;
     p_sys->hacked_pic.format.i_chroma = fmt_out.i_chroma;
 
-    //calculate duration of conversion
-    finish = clock();
-    duration = (double)(finish - start) / CLOCKS_PER_SEC;
-    if (p_sys->i_verbosity > VERB_WARN)
-        msg_Dbg( p_filter, "VlcPictureToIplImageRgb took %2.4f seconds", duration );
+#ifndef NDEBUG
+    msg_Dbg( p_filter, "VlcPictureToIplImageRgb() completed" );
+#endif
 }
 
 /*****************************************************************************
@@ -450,8 +407,6 @@ static void VlcPictureToIplImage( filter_t* p_filter, picture_t* p_in )
 static picture_t* Filter( filter_t* p_filter, picture_t* p_pic )
 {
     picture_t* p_outpic = filter_NewPicture( p_filter );
-
-    clock_t start = clock();
 
     // Make a copy if we want to show the original input
     if (p_filter->p_sys->i_wrapper_output == VINPUT)
@@ -472,11 +427,9 @@ static picture_t* Filter( filter_t* p_filter, picture_t* p_pic )
 
     ReleaseImages( p_filter );
 
-    //calculate duration
-    clock_t finish = clock();
-    double duration = (double)(finish - start) / CLOCKS_PER_SEC;
-    if (p_filter->p_sys->i_verbosity > VERB_WARN)
-        msg_Dbg( p_filter, "Filter took %2.4f seconds", duration );
+#ifndef NDEBUG
+    msg_Dbg( p_filter, "Filter() done" );
+#endif
 
     if( p_filter->p_sys->i_wrapper_output == VINPUT ) {
         picture_Release( p_pic );
