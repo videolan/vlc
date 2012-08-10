@@ -407,6 +407,11 @@ static void VlcPictureToIplImage( filter_t* p_filter, picture_t* p_in )
 static picture_t* Filter( filter_t* p_filter, picture_t* p_pic )
 {
     picture_t* p_outpic = filter_NewPicture( p_filter );
+    if( p_outpic == NULL ) {
+        msg_Err( p_filter, "couldn't get a p_outpic!" );
+        picture_Release( p_pic );
+        return NULL;
+    }
 
     // Make a copy if we want to show the original input
     if (p_filter->p_sys->i_wrapper_output == VINPUT)
