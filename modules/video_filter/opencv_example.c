@@ -3,9 +3,11 @@
  * (performs face identification).  Mostly taken from the facedetect.c
  * OpenCV sample.
  *****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2012 the VideoLAN team
+ * Copyright (C) 2012 Edward Wang
  *
  * Authors: Dugal Harris <dugalh@protoclea.co.za>
+ *          Edward Wang <edward.c.wang@compdigitec.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,7 +67,7 @@ static picture_t *Filter( filter_t *, picture_t * );
 vlc_module_begin ()
     set_description( N_("OpenCV face detection example filter") )
     set_shortname( N_( "OpenCV example" ))
-    set_capability( "opencv example", 1 )
+    set_capability( "opencv internal filter", 1 )
     add_shortcut( "opencv_example" )
 
     set_category( CAT_VIDEO )
@@ -154,23 +156,13 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
     //(hack) cast the picture_t to array of IplImage*
-    p_img = (IplImage**) p_pic->p[0].p_pixels;
+    p_img = (IplImage**) p_pic;
     i_planes = p_pic->i_planes;
 
     //check the image array for validity
     if ((!p_img[0]))    //1st plane is 'I' i.e. greyscale
     {
         msg_Err( p_filter, "no image" );
-        return NULL;
-    }
-    if ((p_pic->format.i_chroma != VLC_CODEC_I420))
-    {
-        msg_Err( p_filter, "wrong chroma - use I420" );
-        return NULL;
-    }
-    if (i_planes<1)
-    {
-        msg_Err( p_filter, "no image planes" );
         return NULL;
     }
 
