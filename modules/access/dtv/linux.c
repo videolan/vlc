@@ -785,6 +785,7 @@ known:
                    | ((voltage == SEC_VOLTAGE_18) << 1) /* polarization */
                    | (tone == SEC_TONE_ON); /* option */
         cmd.msg[4] = cmd.msg[5] = 0; /* unused */
+        cmd.msg_len = 4; /* length*/
         msleep (15000); /* wait 15 ms before DiSEqC command */
         if (ioctl (d->frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd) < 0)
         {
