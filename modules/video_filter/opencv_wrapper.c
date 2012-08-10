@@ -1,9 +1,11 @@
 /*****************************************************************************
  * opencv_wrapper.c : OpenCV wrapper video filter
  *****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2012 the VideoLAN team
+ * Copyright (C) 2012 Edward Wang
  *
  * Authors: Dugal Harris <dugalh@protoclea.co.za>
+ *          Edward Wang <edward.c.wang@compdigitec.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,10 +41,10 @@
 #include <vlc_filter.h>
 #include <vlc_image.h>
 #include <vlc_input.h>
+#include "filter_picture.h"
 
 #include <cxcore.h>
 #include <cv.h>
-
 
 /*****************************************************************************
  * Local prototypes
@@ -50,12 +52,10 @@
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
-static int  Init      ( vout_thread_t * );
-static void End       ( vout_thread_t * );
-static void Render    ( vout_thread_t *, picture_t * );
+static picture_t* Filter( filter_t*, picture_t* );
 
-static void ReleaseImages( vout_thread_t *p_vout );
-static void VlcPictureToIplImage( vout_thread_t *p_vout, picture_t *p_in );
+static void ReleaseImages( filter_t* p_filter );
+static void VlcPictureToIplImage( filter_t* p_filter, picture_t* p_in );
 
 /*****************************************************************************
  * Module descriptor
@@ -78,7 +78,7 @@ vlc_module_begin ()
     set_shortname( N_("OpenCV" ))
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_capability( "video filter", 0 )
+    set_capability( "video filter2", 0 )
     add_shortcut( "opencv_wrapper" )
     set_callbacks( Create, Destroy )
     add_float_with_range( "opencv-scale", 1.0, 0.1, 2.0,
@@ -108,7 +108,7 @@ vlc_module_end ()
  *****************************************************************************/
 enum wrapper_output_t
 {
-   NONE,    //not working yet
+   NONE,
    VINPUT,
    PROCESSED
 };
@@ -134,15 +134,13 @@ enum verbosity_t
 };
 
 /*****************************************************************************
- * vout_sys_t: opencv_wrapper video output method descriptor
+ * filter_sys_t: opencv_wrapper video output method descriptor
  *****************************************************************************
  * This structure is part of the video output thread descriptor.
  * It describes the opencv_wrapper specific properties of an output thread.
  *****************************************************************************/
-struct vout_sys_t
+struct filter_sys_t
 {
-    vout_thread_t *p_vout;
-
     image_handler_t *p_image;
 
     int i_cv_image_size;
@@ -165,220 +163,143 @@ struct vout_sys_t
 };
 
 /*****************************************************************************
- * Control: control facility for the vout (forwards to child vout)
- *****************************************************************************/
-static int Control( vout_thread_t *p_vout, int i_query, va_list args )
-{
-    return vout_vaControl( p_vout->p_sys->p_vout, i_query, args );
-}
-
-/*****************************************************************************
  * Create: allocates opencv_wrapper video thread output method
  *****************************************************************************
  * This function allocates and initializes a opencv_wrapper vout method.
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    filter_t* p_filter = (filter_t*)p_this;
     char *psz_chroma, *psz_output, *psz_verbosity;
-    int i = 0;
 
     /* Allocate structure */
-    p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
-    if( p_vout->p_sys == NULL )
+    p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
+    if( p_filter->p_sys == NULL )
         return VLC_ENOMEM;
 
-    /* Init structure */
-    p_vout->p_sys->p_image = image_HandlerCreate( p_vout );
-    for (i = 0; i < VOUT_MAX_PLANES; i++)
-        p_vout->p_sys->p_cv_image[i] = NULL;
-    p_vout->p_sys->p_proc_image = NULL;
-    p_vout->p_sys->p_to_be_freed = NULL;
-    p_vout->p_sys->i_cv_image_size = 0;
+    /* Load the internal OpenCV filter.
+     *
+     * This filter object is needed to call the internal OpenCV filter
+     * for processing, the wrapper just converts into an IplImage* for
+     * the other filter.
+     *
+     * We don't need to set up video formats for this filter as it not
+     * actually using a picture_t.
+     */
+    p_filter->p_sys->p_opencv = vlc_object_create( p_filter, sizeof(filter_t) );
+    if( !p_filter->p_sys->p_opencv ) {
+        free( p_filter->p_sys );
+        return VLC_ENOMEM;
+    }
 
-    p_vout->pf_init = Init;
-    p_vout->pf_end = End;
-    p_vout->pf_manage = NULL;
-    p_vout->pf_render = Render;
-    p_vout->pf_display = NULL;
-    p_vout->pf_control = Control;
+    p_filter->p_sys->psz_inner_name = var_InheritString( p_filter, "opencv-filter-name" );
+    if( p_filter->p_sys->psz_inner_name )
+        p_filter->p_sys->p_opencv->p_module =
+            module_need( p_filter->p_sys->p_opencv,
+                         "opencv internal filter",
+                         p_filter->p_sys->psz_inner_name,
+                         true );
+
+    if( !p_filter->p_sys->p_opencv->p_module )
+    {
+        msg_Err( p_filter, "can't open internal opencv filter: %s", p_filter->p_sys->psz_inner_name );
+        free( p_filter->p_sys->psz_inner_name );
+        p_filter->p_sys->psz_inner_name = NULL;
+        vlc_object_release( p_filter->p_sys->p_opencv );
+        free( p_filter->p_sys );
+
+        return VLC_ENOMOD;
+    }
+
+
+    /* Init structure */
+    p_filter->p_sys->p_image = image_HandlerCreate( p_filter );
+    for( int i = 0; i < VOUT_MAX_PLANES; i++ )
+        p_filter->p_sys->p_cv_image[i] = NULL;
+    p_filter->p_sys->p_proc_image = NULL;
+    p_filter->p_sys->p_to_be_freed = NULL;
+    p_filter->p_sys->i_cv_image_size = 0;
 
     /* Retrieve and apply config */
-    psz_chroma = var_InheritString( p_vout, "opencv-chroma" );
+    psz_chroma = var_InheritString( p_filter, "opencv-chroma" );
     if( psz_chroma == NULL )
     {
-        msg_Err( p_vout, "configuration variable %s empty, using 'grey'",
+        msg_Err( p_filter, "configuration variable %s empty, using 'grey'",
                          "opencv-chroma" );
-        p_vout->p_sys->i_internal_chroma = GREY;
+        p_filter->p_sys->i_internal_chroma = GREY;
+    } else if( !strcmp( psz_chroma, "input" ) )
+        p_filter->p_sys->i_internal_chroma = CINPUT;
+    else if( !strcmp( psz_chroma, "I420" ) )
+        p_filter->p_sys->i_internal_chroma = GREY;
+    else if( !strcmp( psz_chroma, "RGB32" ) )
+        p_filter->p_sys->i_internal_chroma = RGB;
+    else {
+        msg_Err( p_filter, "no valid opencv-chroma provided, using 'grey'" );
+        p_filter->p_sys->i_internal_chroma = GREY;
     }
-    else
-    {
-        if( !strcmp( psz_chroma, "input" ) )
-            p_vout->p_sys->i_internal_chroma = CINPUT;
-        else if( !strcmp( psz_chroma, "I420" ) )
-            p_vout->p_sys->i_internal_chroma = GREY;
-        else if( !strcmp( psz_chroma, "RGB32" ) )
-            p_vout->p_sys->i_internal_chroma = RGB;
-        else
-        {
-            msg_Err( p_vout, "no valid opencv-chroma provided, using 'grey'" );
-            p_vout->p_sys->i_internal_chroma = GREY;
-        }
-    }
-    free( psz_chroma);
 
-    psz_output = var_InheritString( p_vout, "opencv-output" );
+    free( psz_chroma );
+
+    psz_output = var_InheritString( p_filter, "opencv-output" );
     if( psz_output == NULL )
     {
-        msg_Err( p_vout, "configuration variable %s empty, using 'input'",
+        msg_Err( p_filter, "configuration variable %s empty, using 'input'",
                          "opencv-output" );
-        p_vout->p_sys->i_wrapper_output = VINPUT;
+        p_filter->p_sys->i_wrapper_output = VINPUT;
+    } else if( !strcmp( psz_output, "none" ) )
+        p_filter->p_sys->i_wrapper_output = NONE;
+    else if( !strcmp( psz_output, "input" ) )
+        p_filter->p_sys->i_wrapper_output = VINPUT;
+    else if( !strcmp( psz_output, "processed" ) )
+        p_filter->p_sys->i_wrapper_output = PROCESSED;
+    else {
+        msg_Err( p_filter, "no valid opencv-output provided, using 'input'" );
+        p_filter->p_sys->i_wrapper_output = VINPUT;
     }
-    else
-    {
-        if( !strcmp( psz_output, "none" ) )
-            p_vout->p_sys->i_wrapper_output = NONE;
-        else if( !strcmp( psz_output, "input" ) )
-            p_vout->p_sys->i_wrapper_output = VINPUT;
-        else if( !strcmp( psz_output, "processed" ) )
-            p_vout->p_sys->i_wrapper_output = PROCESSED;
-        else
-        {
-            msg_Err( p_vout, "no valid opencv-output provided, using 'input'" );
-            p_vout->p_sys->i_wrapper_output = VINPUT;
-        }
-    }
-    free( psz_output);
+    free( psz_output );
 
-    psz_verbosity = var_InheritString( p_vout, "opencv-verbosity" );
+    psz_verbosity = var_InheritString( p_filter, "opencv-verbosity" );
     if( psz_verbosity == NULL )
     {
-        msg_Err( p_vout, "configuration variable %s empty, using 'input'",
+        msg_Err( p_filter, "configuration variable %s empty, using 'input'",
                          "opencv-verbosity" );
-        p_vout->p_sys->i_verbosity = VERB_ERROR;
+        p_filter->p_sys->i_verbosity = VERB_ERROR;
     }
     else
     {
         if( !strcmp( psz_verbosity, "error" ) )
-            p_vout->p_sys->i_verbosity = VERB_ERROR;
+            p_filter->p_sys->i_verbosity = VERB_ERROR;
         else if( !strcmp( psz_verbosity, "warning" ) )
-            p_vout->p_sys->i_verbosity = VERB_WARN;
+            p_filter->p_sys->i_verbosity = VERB_WARN;
         else if( !strcmp( psz_verbosity, "debug" ) )
-            p_vout->p_sys->i_verbosity = VERB_DEBUG;
+            p_filter->p_sys->i_verbosity = VERB_DEBUG;
         else
         {
-            msg_Err( p_vout, "no valid opencv-verbosity provided, using 'error'" );
-            p_vout->p_sys->i_verbosity = VERB_ERROR;
+            msg_Err( p_filter, "no valid opencv-verbosity provided, using 'error'" );
+            p_filter->p_sys->i_verbosity = VERB_ERROR;
         }
     }
     free( psz_verbosity);
 
-    p_vout->p_sys->psz_inner_name =
-        var_InheritString( p_vout, "opencv-filter-name" );
-    p_vout->p_sys->f_scale =
-        var_InheritFloat( p_vout, "opencv-scale" );
+    p_filter->p_sys->f_scale =
+        var_InheritFloat( p_filter, "opencv-scale" );
 
-    if (p_vout->p_sys->i_verbosity > VERB_WARN)
-        msg_Info(p_vout, "Configuration: opencv-scale: %f, opencv-chroma: %d, "
+    if (p_filter->p_sys->i_verbosity > VERB_WARN)
+        msg_Info(p_filter, "Configuration: opencv-scale: %f, opencv-chroma: %d, "
             "opencv-output: %d, opencv-verbosity %d, opencv-filter %s",
-            p_vout->p_sys->f_scale,
-            p_vout->p_sys->i_internal_chroma,
-            p_vout->p_sys->i_wrapper_output,
-            p_vout->p_sys->i_verbosity,
-            p_vout->p_sys->psz_inner_name);
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Init: initialize opencv_wrapper video thread output method
- *****************************************************************************/
-static int Init( vout_thread_t *p_vout )
-{
-    video_format_t fmt;
-    vout_sys_t *p_sys = p_vout->p_sys;
-    I_OUTPUTPICTURES = 0;
-
-    /* Initialize the output video format */
-    memset( &fmt, 0, sizeof(video_format_t) );
-    p_vout->output.i_chroma = p_vout->render.i_chroma;
-    p_vout->output.i_width  = p_vout->render.i_width;
-    p_vout->output.i_height = p_vout->render.i_height;
-    p_vout->output.i_aspect = p_vout->render.i_aspect;
-    p_vout->fmt_out = p_vout->fmt_in;           //set to input video format
-
-    fmt = p_vout->fmt_out;
-    if (p_sys->i_wrapper_output == PROCESSED)   //set to processed video format
-    {
-        fmt.i_width = fmt.i_width * p_sys->f_scale;
-        fmt.i_height = fmt.i_height * p_sys->f_scale;
-        fmt.i_visible_width = fmt.i_visible_width * p_sys->f_scale;
-        fmt.i_visible_height = fmt.i_visible_height * p_sys->f_scale;
-        fmt.i_x_offset = fmt.i_x_offset * p_sys->f_scale;
-        fmt.i_y_offset = fmt.i_y_offset * p_sys->f_scale;
-
-        if (p_sys->i_internal_chroma == GREY)
-            fmt.i_chroma = VLC_CODEC_I420;
-        else if (p_sys->i_internal_chroma == RGB)
-            fmt.i_chroma = VLC_CODEC_RGB32;
-    }
-
-    /* Load the internal opencv filter */
-    /* We don't need to set up video formats for this filter as it not actually using a picture_t */
-    p_sys->p_opencv = vlc_object_create( p_vout, sizeof(filter_t) );
-
-    if (p_vout->p_sys->psz_inner_name)
-        p_sys->p_opencv->p_module =
-            module_need( p_sys->p_opencv, p_sys->psz_inner_name, NULL, false );
-
-    if( !p_sys->p_opencv->p_module )
-    {
-        msg_Err( p_vout, "can't open internal opencv filter: %s", p_vout->p_sys->psz_inner_name );
-        p_vout->p_sys->psz_inner_name = NULL;
-        vlc_object_release( p_sys->p_opencv );
-        p_sys->p_opencv = NULL;
-    }
+            p_filter->p_sys->f_scale,
+            p_filter->p_sys->i_internal_chroma,
+            p_filter->p_sys->i_wrapper_output,
+            p_filter->p_sys->i_verbosity,
+            p_filter->p_sys->psz_inner_name);
 
     /* Try to open the real video output */
-    if (p_sys->i_verbosity > VERB_WARN)
-        msg_Dbg( p_vout, "spawning the real video output" );
+    if (p_filter->p_sys->i_verbosity > VERB_WARN)
+        msg_Dbg( p_filter, "spawning the real video output" );
 
-    p_vout->p_sys->p_vout = vout_Create( p_vout, &fmt );
-
-    /* Everything failed */
-    if( p_vout->p_sys->p_vout == NULL )
-    {
-        msg_Err( p_vout, "can't open vout, aborting" );
-        return VLC_EGENERIC;
-    }
-
-    vout_filter_AllocateDirectBuffers( p_vout, VOUT_MAX_PICTURES );
-
-    vout_filter_AddChild( p_vout, p_vout->p_sys->p_vout, NULL );
+    p_filter->pf_video_filter = Filter;
 
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * End: terminate opencv_wrapper video thread output method
- *****************************************************************************/
-static void End( vout_thread_t *p_vout )
-{
-    vout_sys_t *p_sys = p_vout->p_sys;
-
-    vout_filter_DelChild( p_vout, p_sys->p_vout, NULL );
-    vout_CloseAndRelease( p_sys->p_vout );
-
-    vout_filter_ReleaseDirectBuffers( p_vout );
-
-    if( p_sys->p_opencv )
-    {
-        //release the internal opencv filter
-        if( p_sys->p_opencv->p_module )
-            module_unneed( p_sys->p_opencv, p_sys->p_opencv->p_module );
-        vlc_object_release( p_sys->p_opencv );
-        p_sys->p_opencv = NULL;
-    }
 }
 
 /*****************************************************************************
@@ -388,41 +309,44 @@ static void End( vout_thread_t *p_vout )
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    filter_t* p_filter = (filter_t*)p_this;
+    ReleaseImages( p_filter );
 
-    ReleaseImages(p_vout);
+    // Release the internal OpenCV filter.
+    module_unneed( p_filter->p_sys->p_opencv, p_filter->p_sys->p_opencv->p_module );
+    vlc_object_release( p_filter->p_sys->p_opencv );
+    p_filter->p_sys->p_opencv = NULL;
 
-    if( p_vout->p_sys->p_image )
-        image_HandlerDelete( p_vout->p_sys->p_image );
-
-    free( p_vout->p_sys );
+    free( p_filter->p_sys );
 }
 
 /*****************************************************************************
- * ReleaseImages: Release OpenCV images in vout_sys_t.
+ * ReleaseImages: Release OpenCV images in filter_sys_t.
  *****************************************************************************/
-static void ReleaseImages(vout_thread_t *p_vout)
+static void ReleaseImages( filter_t* p_filter )
 {
-    int i = 0;
-    if (p_vout->p_sys->p_cv_image)
+    filter_sys_t* p_sys = p_filter->p_sys;
+
+    if (p_sys->p_cv_image)
     {
-        for (i = 0; i < VOUT_MAX_PLANES; i++)
+        for( int i = 0; i < VOUT_MAX_PLANES; i++ )
         {
-            if (p_vout->p_sys->p_cv_image[i])
-                cvReleaseImageHeader(&(p_vout->p_sys->p_cv_image[i]));
-            p_vout->p_sys->p_cv_image[i] = NULL;
+            if (p_sys->p_cv_image[i]) {
+                cvReleaseImageHeader(&(p_sys->p_cv_image[i]));
+                p_sys->p_cv_image[i] = NULL;
+            }
         }
     }
-    p_vout->p_sys->i_cv_image_size = 0;
+    p_sys->i_cv_image_size = 0;
 
     /* Release temp picture_t if it exists */
-    if (p_vout->p_sys->p_to_be_freed)
+    if (p_sys->p_to_be_freed)
     {
-        picture_Release( p_vout->p_sys->p_to_be_freed );
-        p_vout->p_sys->p_to_be_freed = NULL;
+        picture_Release( p_sys->p_to_be_freed );
+        p_sys->p_to_be_freed = NULL;
     }
-    if (p_vout->p_sys->i_verbosity > VERB_WARN)
-        msg_Dbg( p_vout, "images released" );
+    if (p_sys->i_verbosity > VERB_WARN)
+        msg_Dbg( p_filter, "images released" );
 }
 
 /*****************************************************************************
@@ -431,7 +355,7 @@ static void ReleaseImages(vout_thread_t *p_vout)
  * Converts given picture_t into IplImage(s) according to module config.
  * IplImage(s) are stored in vout_sys_t.
  *****************************************************************************/
-static void VlcPictureToIplImage( vout_thread_t *p_vout, picture_t *p_in )
+static void VlcPictureToIplImage( filter_t* p_filter, picture_t* p_in )
 {
     int planes = p_in->i_planes;    //num input video planes
     // input video size
@@ -439,8 +363,7 @@ static void VlcPictureToIplImage( vout_thread_t *p_vout, picture_t *p_in )
     video_format_t fmt_out;
     clock_t start, finish;  //performance measures
     double  duration;
-    int i = 0;
-    vout_sys_t* p_sys = p_vout->p_sys;
+    filter_sys_t* p_sys = p_filter->p_sys;
 
     memset( &fmt_out, 0, sizeof(video_format_t) );
 
@@ -475,7 +398,7 @@ static void VlcPictureToIplImage( vout_thread_t *p_vout, picture_t *p_in )
 
         if (!p_sys->p_proc_image)
         {
-            msg_Err(p_vout, "can't convert (unsupported formats?), aborting...");
+            msg_Err(p_filter, "can't convert (unsupported formats?), aborting...");
             return;
         }
 
@@ -493,7 +416,7 @@ static void VlcPictureToIplImage( vout_thread_t *p_vout, picture_t *p_in )
     //is created for each plane.
     planes = p_sys->p_proc_image->i_planes;
     p_sys->i_cv_image_size = planes;
-    for ( i = 0; i < planes; i++ )
+    for( int i = 0; i < planes; i++ )
     {
         sz = cvSize(abs(p_sys->p_proc_image->p[i].i_visible_pitch /
             p_sys->p_proc_image->p[i].i_pixel_pitch),
@@ -515,65 +438,55 @@ static void VlcPictureToIplImage( vout_thread_t *p_vout, picture_t *p_in )
     finish = clock();
     duration = (double)(finish - start) / CLOCKS_PER_SEC;
     if (p_sys->i_verbosity > VERB_WARN)
-        msg_Dbg( p_vout, "VlcPictureToIplImageRgb took %2.4f seconds", duration );
+        msg_Dbg( p_filter, "VlcPictureToIplImageRgb took %2.4f seconds", duration );
 }
 
 /*****************************************************************************
- * Render: displays previously rendered output
+ * Filter: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to the internal opencv
  * filter for processing.
  *****************************************************************************/
-static void Render( vout_thread_t *p_vout, picture_t *p_pic )
+static picture_t* Filter( filter_t* p_filter, picture_t* p_pic )
 {
-    picture_t *p_outpic = NULL;
-    clock_t start, finish;
-    double  duration;
+    picture_t* p_outpic = filter_NewPicture( p_filter );
 
-    while( ( p_outpic = vout_CreatePicture( p_vout->p_sys->p_vout, 0, 0, 0 ) )
-              == NULL )
-    {
-        if( !vlc_object_alive (p_vout) || p_vout->b_error )
-        {   return; }
-        msleep( VOUT_OUTMEM_SLEEP );
-    }
+    clock_t start = clock();
 
-    vout_LinkPicture( p_vout->p_sys->p_vout, p_outpic );
-
-    start = clock();
-
-    if (p_vout->p_sys->i_wrapper_output == VINPUT)  //output = input video
-    {
-        //This copy is a bit unfortunate but image_Convert can't write into an existing image so it is better to copy the
-        //(say) 16bit YUV image here than a 32bit RGB image somehwere else.
-        //It is also not that expensive in time.
+    // Make a copy if we want to show the original input
+    if (p_filter->p_sys->i_wrapper_output == VINPUT)
         picture_Copy( p_outpic, p_pic );
-        VlcPictureToIplImage( p_vout, p_pic);
-        //pass the image to the internal opencv filter for processing
-        if ((p_vout->p_sys->p_opencv) && (p_vout->p_sys->p_opencv->p_module))
-            p_vout->p_sys->p_opencv->pf_video_filter( p_vout->p_sys->p_opencv, &(p_vout->p_sys->hacked_pic));
+
+    VlcPictureToIplImage( p_filter, p_pic );
+    // Pass the image (as a pointer to the first IplImage*) to the
+    // internal OpenCV filter for processing.
+    p_filter->p_sys->p_opencv->pf_video_filter( p_filter->p_sys->p_opencv, &(p_filter->p_sys->p_cv_image[0]) );
+
+    if(p_filter->p_sys->i_wrapper_output == PROCESSED) {
+        // Processed video
+        if ((p_filter->p_sys->p_proc_image) && (p_filter->p_sys->p_proc_image->i_planes > 0)) {
+            picture_CopyPixels( p_outpic, p_filter->p_sys->p_proc_image );
+            CopyInfoAndRelease( p_outpic, p_pic );
+        }
     }
-    else    //output = processed video (NONE option not working yet)
-    {
-        VlcPictureToIplImage( p_vout, p_pic);
-        //pass the image to the internal opencv filter for processing
-        if ((p_vout->p_sys->p_opencv) && (p_vout->p_sys->p_opencv->p_module))
-            p_vout->p_sys->p_opencv->pf_video_filter( p_vout->p_sys->p_opencv, &(p_vout->p_sys->hacked_pic));
-        //copy the processed image into the output image
-        if ((p_vout->p_sys->p_proc_image) && (p_vout->p_sys->p_proc_image->i_planes > 0))
-            picture_Copy( p_outpic, p_vout->p_sys->p_proc_image );
-    }
+
+    ReleaseImages( p_filter );
 
     //calculate duration
-    finish = clock();
-    duration = (double)(finish - start) / CLOCKS_PER_SEC;
-    if (p_vout->p_sys->i_verbosity > VERB_WARN)
-        msg_Dbg( p_vout, "Render took %2.4f seconds", duration );
+    clock_t finish = clock();
+    double duration = (double)(finish - start) / CLOCKS_PER_SEC;
+    if (p_filter->p_sys->i_verbosity > VERB_WARN)
+        msg_Dbg( p_filter, "Filter took %2.4f seconds", duration );
 
-    ReleaseImages(p_vout);
-    p_outpic->date  = p_pic->date;
-    
-    vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
-    vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
+    if( p_filter->p_sys->i_wrapper_output == VINPUT ) {
+        picture_Release( p_pic );
+        return p_outpic;
+    } else if( p_filter->p_sys->i_wrapper_output == PROCESSED ) {
+        return p_outpic;
+    } else { // NONE
+        picture_Release( p_pic );
+        picture_Release( p_outpic );
+        return NULL;
+    }
 }
 
