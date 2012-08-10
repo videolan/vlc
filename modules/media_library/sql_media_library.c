@@ -157,7 +157,12 @@ static int load( vlc_object_t *obj )
     vlc_mutex_init( &p_ml->p_sys->lock );
 
     /* Initialise Sql module */
-    InitDatabase( p_ml );
+    if ( InitDatabase( p_ml ) != VLC_SUCCESS )
+    {
+        vlc_mutex_destroy( &p_ml->p_sys->lock );
+        //free( p_ml->p_sys ); // FIXME: Freed in InitDatase ?!?
+        return VLC_EGENERIC;
+    }
 
     /* Initialise the media pool */
     ARRAY_INIT( p_ml->p_sys->mediapool );
