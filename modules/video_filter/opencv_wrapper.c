@@ -342,7 +342,7 @@ static void VlcPictureToIplImage( filter_t* p_filter, picture_t* p_in )
             //rgb2 gives 3 separate planes, this gives 1 interleaved plane
             //rv24 gives is about 20% faster but gives r&b the wrong way round
             //and I can't think of an easy way to fix this
-            fmt_out.i_chroma = VLC_CODEC_RGB32;
+            fmt_out.i_chroma = VLC_CODEC_RGB24;
         }
         else if (p_sys->i_internal_chroma == GREY)
         {
