@@ -35,12 +35,8 @@
 #include <vlc_vout.h>
 #include <vlc_modules.h>
 
-#include <math.h>
-#include <time.h>
-
 #include <vlc_filter.h>
 #include <vlc_image.h>
-#include <vlc_input.h>
 #include "filter_picture.h"
 
 #include <cxcore.h>
@@ -155,7 +151,7 @@ struct filter_sys_t
 static int Create( vlc_object_t *p_this )
 {
     filter_t* p_filter = (filter_t*)p_this;
-    char *psz_chroma, *psz_output, *psz_verbosity;
+    char *psz_chroma, *psz_output;
 
     /* Allocate structure */
     p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
@@ -323,7 +319,6 @@ static void VlcPictureToIplImage( filter_t* p_filter, picture_t* p_in )
     // input video size
     CvSize sz = cvSize(abs(p_in->format.i_width), abs(p_in->format.i_height));
     video_format_t fmt_out;
-    double  duration;
     filter_sys_t* p_sys = p_filter->p_sys;
 
     memset( &fmt_out, 0, sizeof(video_format_t) );
