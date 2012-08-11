@@ -172,7 +172,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         CvSeq *faces = cvHaarDetectObjects( p_img[0], p_sys->p_cascade,
                                             p_sys->p_storage, 1.15, 5,
                                             CV_HAAR_DO_CANNY_PRUNING,
-                                            cvSize(20, 20) );
+                                            cvSize(20, 20), cvSize(0,0) );
         //create the video_filter_region_info_t struct
         if (faces && (faces->total > 0))
         {
