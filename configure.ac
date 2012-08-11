@@ -1749,7 +1749,7 @@ PKG_ENABLE_MODULES_VLC([BLURAY], [libbluray], [libbluray >= 0.2.1], (libbluray f
 dnl
 dnl  OpenCV wrapper and example filters
 dnl
-PKG_ENABLE_MODULES_VLC([OPENCV], [opencv_example opencv_wrapper], [opencv], (OpenCV (computer vision) filter), [off])
+PKG_ENABLE_MODULES_VLC([OPENCV], [opencv_example opencv_wrapper], [opencv], (OpenCV (computer vision) filter), [auto])
 
 
 dnl
