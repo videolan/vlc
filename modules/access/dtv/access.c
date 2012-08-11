@@ -396,8 +396,10 @@ vlc_module_begin ()
 #ifdef HAVE_LINUX_DVB
     add_integer ("dvb-satno", 0, SATNO_TEXT, SATNO_LONGTEXT, true)
         change_integer_list (satno_vlc, satno_user)
+        change_safe ()
     add_integer ("dvb-uncommitted", 0, UNCOMMITTED_TEXT, UNCOMMITTED_LONGTEXT, true)
         change_integer_list (satno_vlc, satno_user)
+        change_safe ()
     add_integer ("dvb-tone", -1, TONE_TEXT, TONE_LONGTEXT, true)
         change_integer_list (auto_off_on_vlc, auto_off_on_user)
 #endif
