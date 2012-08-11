@@ -675,6 +675,8 @@ static int DemuxVobSub( demux_t *p_demux, block_t *p_bk )
 
         /* Create a block */
         p_pkt = block_New( p_demux, i_size );
+        if( unlikely(p_pkt == NULL) )
+            break;
         memcpy( p_pkt->p_buffer, p, i_size);
         p += i_size;
 
