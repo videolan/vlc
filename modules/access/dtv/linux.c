@@ -772,21 +772,56 @@ known:
     unsigned satno = var_InheritInteger (d->obj, "dvb-satno");
     if (satno > 0)
     {
-        /* DiSEqC 1.0 */
 #undef msleep /* we know what we are doing! */
+
+        /* DiSEqC Bus Specification:
+ http://www.eutelsat.com/satellites/pdf/Diseqc/Reference%20docs/bus_spec.pdf */
+
+        /* DiSEqC 1.1 */
+        struct dvb_diseqc_master_cmd uncmd;
+
+        /* DiSEqC 1.0 */
         struct dvb_diseqc_master_cmd cmd;
 
         satno = (satno - 1) & 3;
         cmd.msg[0] = 0xE0; /* framing: master, no reply, 1st TX */
         cmd.msg[1] = 0x10; /* address: all LNB/switch */
-        cmd.msg[2] = 0x38; /* command: Write Port Group 0 */
+        cmd.msg[2] = 0x38; /* command: Write Port Group 0 (committed) */
         cmd.msg[3] = 0xF0  /* data[0]: clear all bits */
                    | (satno << 2) /* LNB (A, B, C or D) */
                    | ((voltage == SEC_VOLTAGE_18) << 1) /* polarization */
                    | (tone == SEC_TONE_ON); /* option */
         cmd.msg[4] = cmd.msg[5] = 0; /* unused */
         cmd.msg_len = 4; /* length*/
+
         msleep (15000); /* wait 15 ms before DiSEqC command */
+        unsigned uncommitted = var_InheritInteger (d->obj, "dvb-uncommitted");
+        if (uncommitted > 0)
+        {
+          uncommitted = (uncommitted - 1) & 3;
+          uncmd.msg[0] = 0xE0; /* framing: master, no reply, 1st TX */
+          uncmd.msg[1] = 0x10; /* address: all LNB/switch */
+          uncmd.msg[2] = 0x39; /* command: Write Port Group 1 (uncommitted) */
+          uncmd.msg[3] = 0xF0  /* data[0]: clear all bits */
+                       | (uncommitted << 2) /* LNB (A, B, C or D) */
+                       | ((voltage == SEC_VOLTAGE_18) << 1) /* polarization */
+                       | (tone == SEC_TONE_ON); /* option */
+          uncmd.msg[4] = uncmd.msg[5] = 0; /* unused */
+          uncmd.msg_len = 4; /* length*/
+          if (ioctl (d->frontend, FE_DISEQC_SEND_MASTER_CMD, &uncmd) < 0)
+          {
+              msg_Err (d->obj, "cannot send DiSEqC command: %m");
+              return -1;
+          }
+          /* Repeat uncommitted command */
+          uncmd.msg[0] = 0xE1; /* framing: master, no reply, repeated TX */
+          if (ioctl (d->frontend, FE_DISEQC_SEND_MASTER_CMD, &uncmd) < 0)
+          {
+              msg_Err (d->obj, "cannot send DiSEqC command: %m");
+              return -1;
+          }
+          msleep(125000); /* wait 125 ms before committed DiSEqC command */
+        }
         if (ioctl (d->frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd) < 0)
         {
             msg_Err (d->obj, "cannot send DiSEqC command: %m");

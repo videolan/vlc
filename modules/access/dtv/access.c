@@ -206,6 +206,14 @@ static const char *const satno_user[] = { N_("Unspecified"),
     "A/1", "B/2", "C/3", "D/4" };
 #endif
 
+#define UNCOMMITTED_TEXT N_("Uncommitted DiSEqC LNB number")
+#define UNCOMMITTED_LONGTEXT N_( \
+    "If the satellite receiver is connected to multiple " \
+    "low noise block-downconverters (LNB) through a cascade formed from " \
+    "DiSEqC 1.1 uncommitted switch and DiSEqC 1.0 committed switch, " \
+    "the correct uncommitted LNB can be selected (1 to 4). " \
+    "If there is no uncommitted switch, this parameter should be 0.")
+
 /* BDA module additional DVB-S Parameters */
 #define NETID_TEXT N_("Network identifier")
 #define AZIMUTH_TEXT N_("Satellite azimuth")
@@ -387,6 +395,8 @@ vlc_module_begin ()
     add_obsolete_integer ("dvb-lnb-slof") /* since 2.0.0 */
 #ifdef __linux__
     add_integer ("dvb-satno", 0, SATNO_TEXT, SATNO_LONGTEXT, true)
+        change_integer_list (satno_vlc, satno_user)
+    add_integer ("dvb-uncommitted", 0, UNCOMMITTED_TEXT, UNCOMMITTED_LONGTEXT, true)
         change_integer_list (satno_vlc, satno_user)
     add_integer ("dvb-tone", -1, TONE_TEXT, TONE_LONGTEXT, true)
         change_integer_list (auto_off_on_vlc, auto_off_on_user)
