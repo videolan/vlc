@@ -30,6 +30,7 @@
 #include <audioclient.h>
 #include <audiopolicy.h>
 #include <mmdeviceapi.h>
+#include <Functiondiscoverykeys_devpkey.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -283,6 +284,8 @@ static void GetDevices(vlc_object_t *obj, IMMDeviceEnumerator *it)
     hr = IMMDeviceCollection_GetCount(devs, &n);
     if (FAILED(hr))
         n = 0;
+    else
+        msg_Dbg(obj, "Available Windows Audio devices:");
     while (n > 0)
     {
         IMMDevice *dev;
@@ -311,16 +314,15 @@ static void GetDevices(vlc_object_t *obj, IMMDeviceEnumerator *it)
             PROPVARIANT v;
 
             PropVariantInit(&v);
-#ifdef FIXED
-            hr = IPropertyStore_GetValue(props, PKEY_Device_FriendlyName, &v);
+            hr = IPropertyStore_GetValue(props, &PKEY_Device_FriendlyName, &v);
             if (SUCCEEDED(hr))
                 text.psz_string = FromWide(v.pwszVal);
-#endif
             PropVariantClear(&v);
             IPropertyStore_Release(props);
         }
         IMMDevice_Release(dev);
 
+        msg_Dbg(obj, "%s (%s)", val.psz_string, text.psz_string);
         var_Change(obj, "audio-device", VLC_VAR_ADDCHOICE, &val, &text);
         if (likely(text.psz_string != val.psz_string))
             free(text.psz_string);
