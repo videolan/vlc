@@ -682,6 +682,7 @@ static const entry_t p_list_video[] = {
         A("iv50"),
 
     B(VLC_CODEC_PRORES, "Apple ProRes 422"),
+        E("apcn", "Apple ProRes 422 Standard"),
         E("apch", "Apple ProRes 422 HQ"),
         E("apcs", "Apple ProRes 422 LT"),
         E("apco", "Apple ProRes 422 Proxy"),
