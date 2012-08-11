@@ -145,7 +145,6 @@ static void CloseFilter( vlc_object_t *p_this )
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     IplImage** p_img = NULL;
-    int i_planes = 0;
     CvPoint pt1, pt2;
     int i, scale = 1;
     filter_sys_t *p_sys = p_filter->p_sys;
@@ -157,7 +156,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     }
     //(hack) cast the picture_t to array of IplImage*
     p_img = (IplImage**) p_pic;
-    i_planes = p_pic->i_planes;
 
     //check the image array for validity
     if ((!p_img[0]))    //1st plane is 'I' i.e. greyscale
