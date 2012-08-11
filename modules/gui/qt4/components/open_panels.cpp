@@ -968,7 +968,7 @@ void CaptureOpenPanel::initialize()
 
     dvbCard = new QSpinBox;
     dvbCard->setAlignment( Qt::AlignRight );
-#ifdef __linux__
+#ifdef __unix__
     dvbCard->setPrefix( "/dev/dvb/adapter" );
 #endif
     dvbDevLayout->addWidget( dvbDeviceLabel, 0, 0 );
