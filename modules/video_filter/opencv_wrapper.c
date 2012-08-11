@@ -421,7 +421,7 @@ static picture_t* Filter( filter_t* p_filter, picture_t* p_pic )
     VlcPictureToIplImage( p_filter, p_pic );
     // Pass the image (as a pointer to the first IplImage*) to the
     // internal OpenCV filter for processing.
-    p_filter->p_sys->p_opencv->pf_video_filter( p_filter->p_sys->p_opencv, &(p_filter->p_sys->p_cv_image[0]) );
+    p_filter->p_sys->p_opencv->pf_video_filter( p_filter->p_sys->p_opencv, (picture_t*)&(p_filter->p_sys->p_cv_image[0]) );
 
     if(p_filter->p_sys->i_wrapper_output == PROCESSED) {
         // Processed video
