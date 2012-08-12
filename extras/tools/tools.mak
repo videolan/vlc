@@ -213,6 +213,22 @@ CLEAN_FILE += .gas
 CLEAN_PKG += gas
 DISTCLEAN_PKG += yuvi-gas-preprocessor-$(GAS_VERSION).tar.gz
 
+# Ragel State Machine Compiler
+ragel-$(RAGEL_VERSION).tar.gz:
+	$(call download,$(RAGEL_URL))
+
+ragel: ragel-$(RAGEL_VERSION).tar.gz
+	$(UNPACK)
+	$(MOVE)
+
+.ragel: ragel
+	(cd ragel; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
+	touch $@
+
+CLEAN_FILE += .ragel
+CLEAN_PKG += ragel
+DISTCLEAN_PKG += ragel-$(RAGEL_VERSION).tar.gz
+
 #
 #
 #

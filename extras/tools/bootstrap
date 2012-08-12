@@ -61,6 +61,7 @@ check pkg-config
 check cmake
 check yasm
 check_tar
+check ragel
 
 [ -n "$NEEDED" ] && mkdir -p build/
 
