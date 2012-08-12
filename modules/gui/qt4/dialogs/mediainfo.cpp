@@ -48,7 +48,10 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
 {
     isMainInputInfo = ( p_item == NULL );
 
-    setWindowTitle( qtr( "Media Information" ) );
+    if ( isMainInputInfo )
+        setWindowTitle( qtr( "Current Media Information" ) );
+    else
+        setWindowTitle( qtr( "Media Information" ) );
     setWindowRole( "vlc-media-info" );
 
     setWindowFlags( Qt::Window | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint );
