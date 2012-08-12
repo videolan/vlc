@@ -58,7 +58,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
 
     MP = new MetaPanel( infoTabW, p_intf );
     infoTabW->addTab( MP, qtr( "&General" ) );
-    EMP = new ExtraMetaPanel( infoTabW, p_intf );
+    EMP = new ExtraMetaPanel( infoTabW );
     infoTabW->addTab( EMP, qtr( "&Metadata" ) );
     IP = new InfoPanel( infoTabW );
     infoTabW->addTab( IP, qtr( "Co&dec" ) );

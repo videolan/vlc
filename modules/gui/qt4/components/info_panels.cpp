@@ -339,9 +339,7 @@ void MetaPanel::clear()
 /**
  * Second Panel - Shows the extra metadata in a tree, non editable.
  **/
-ExtraMetaPanel::ExtraMetaPanel( QWidget *parent,
-                                intf_thread_t *_p_intf )
-                                : QWidget( parent ), p_intf( _p_intf )
+ExtraMetaPanel::ExtraMetaPanel( QWidget *parent ) : QWidget( parent )
 {
      QGridLayout *layout = new QGridLayout(this);
 
