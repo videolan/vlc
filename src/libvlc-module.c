@@ -2278,7 +2278,7 @@ vlc_module_begin ()
      */
 #   define KEY_TOGGLE_FULLSCREEN  "f"
 #   define KEY_LEAVE_FULLSCREEN   "Esc"
-#   define KEY_PLAY_PAUSE         "Space"
+#   define KEY_PLAY_PAUSE         "Space\tMedia Play Pause"
 #   define KEY_PAUSE              NULL
 #   define KEY_PLAY               NULL
 #   define KEY_FASTER             "+"
@@ -2286,9 +2286,9 @@ vlc_module_begin ()
 #   define KEY_RATE_NORMAL        "="
 #   define KEY_RATE_FASTER_FINE   "]"
 #   define KEY_RATE_SLOWER_FINE   "["
-#   define KEY_NEXT               "n"
-#   define KEY_PREV               "p"
-#   define KEY_STOP               "s"
+#   define KEY_NEXT               "n\tMedia Next Track"
+#   define KEY_PREV               "p\tMedia Prev Track"
+#   define KEY_STOP               "s\tMedia Stop"
 #   define KEY_POSITION           "t"
 #   define KEY_JUMP_MEXTRASHORT   "Shift+Left"
 #   define KEY_JUMP_PEXTRASHORT   "Shift+Right"
@@ -2305,9 +2305,9 @@ vlc_module_begin ()
 #   define KEY_NAV_LEFT           "Left"
 #   define KEY_NAV_RIGHT          "Right"
 #   define KEY_QUIT               "Ctrl+q"
-#   define KEY_VOL_UP             "Ctrl+Up"
-#   define KEY_VOL_DOWN           "Ctrl+Down"
-#   define KEY_VOL_MUTE           "m"
+#   define KEY_VOL_UP             "Ctrl+Up\tVolume Up"
+#   define KEY_VOL_DOWN           "Ctrl+Down\tVolume Down"
+#   define KEY_VOL_MUTE           "m\tVolume Mute"
 #   define KEY_SUBDELAY_UP        "h"
 #   define KEY_SUBDELAY_DOWN      "g"
 #   define KEY_SUBPOS_DOWN        NULL
