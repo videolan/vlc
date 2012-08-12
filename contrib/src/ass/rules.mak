@@ -13,6 +13,8 @@ else
 WITH_FONTCONFIG = 1
 endif
 
+WITH_HARFBUZZ = 1
+
 $(TARBALLS)/libass-$(ASS_VERSION).tar.gz:
 	$(call download,$(ASS_URL))
 
@@ -30,6 +32,12 @@ ifneq ($(WITH_FONTCONFIG), 0)
 DEPS_ass += fontconfig $(DEPS_fontconfig)
 else
 ASS_CONF += --disable-fontconfig
+endif
+
+ifneq ($(WITH_HARFBUZZ), 0)
+DEPS_ass += harfbuzz $(DEPS_harfbuzz)
+else
+ASS_CONF += --disable-harfbuzz
 endif
 
 .ass: libass
