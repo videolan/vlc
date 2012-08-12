@@ -411,9 +411,7 @@ void ExtraMetaPanel::clear()
  * Third panel - Stream info
  * Display all codecs and muxers info that we could gather.
  **/
-InfoPanel::InfoPanel( QWidget *parent,
-                      intf_thread_t *_p_intf )
-                      : QWidget( parent ), p_intf( _p_intf )
+InfoPanel::InfoPanel( QWidget *parent ) : QWidget( parent )
 {
      QGridLayout *layout = new QGridLayout(this);
 

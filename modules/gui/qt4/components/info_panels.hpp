@@ -155,9 +155,8 @@ class InfoPanel: public QWidget
 {
     Q_OBJECT
 public:
-    InfoPanel( QWidget *, struct intf_thread_t * );
+    InfoPanel( QWidget * );
 private:
-    struct intf_thread_t *p_intf;
     QTreeWidget *InfoTree;
 public slots:
     void update( input_item_t * );
