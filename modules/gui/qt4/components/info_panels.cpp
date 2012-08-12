@@ -330,6 +330,7 @@ void MetaPanel::clear()
     language_text->clear();
     nowplaying_text->clear();
     publisher_text->clear();
+    encodedby_text->clear();
 
     setEditMode( false );
     emit uriSet( "" );
