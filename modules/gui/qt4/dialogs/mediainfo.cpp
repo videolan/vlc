@@ -64,7 +64,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
     infoTabW->addTab( IP, qtr( "Co&dec" ) );
     if( isMainInputInfo )
     {
-        ISP = new InputStatsPanel( infoTabW, p_intf );
+        ISP = new InputStatsPanel( infoTabW );
         infoTabW->addTab( ISP, qtr( "S&tatistics" ) );
     }
 

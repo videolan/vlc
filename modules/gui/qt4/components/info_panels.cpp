@@ -486,9 +486,7 @@ void InfoPanel::saveCodecsInfo()
  * Fourth Panel - Stats
  * Displays the Statistics for reading/streaming/encoding/displaying in a tree
  */
-InputStatsPanel::InputStatsPanel( QWidget *parent,
-                                  intf_thread_t *_p_intf )
-                                  : QWidget( parent ), p_intf( _p_intf )
+InputStatsPanel::InputStatsPanel( QWidget *parent ): QWidget( parent )
 {
      QGridLayout *layout = new QGridLayout(this);
 

@@ -117,10 +117,8 @@ class InputStatsPanel: public QWidget
 {
     Q_OBJECT
 public:
-    InputStatsPanel( QWidget *, struct intf_thread_t * );
+    InputStatsPanel( QWidget * );
 private:
-    struct intf_thread_t *p_intf;
-
     QTreeWidget *StatsTree;
     QTreeWidgetItem *input;
     QTreeWidgetItem *read_media_stat;
