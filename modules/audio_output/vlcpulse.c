@@ -117,18 +117,27 @@ pa_context *vlc_pa_connect (vlc_object_t *obj, pa_threaded_mainloop **mlp)
         //pa_proplist_sets (props, PA_PROP_APPLICATION_PROCESS_BINARY,
         //                  PACKAGE_NAME);
 
-        char buf[sysconf (_SC_GETPW_R_SIZE_MAX)];
-        struct passwd pwbuf, *pw;
+        for (size_t max = sysconf (_SC_GETPW_R_SIZE_MAX), len = max % 1024 + 1024;
+             len < max; len += 1024)
+        {
+            struct passwd pwbuf, *pw;
+            char buf[len];
 
-        if (getpwuid_r (getuid (), &pwbuf, buf, sizeof (buf), &pw) == 0
-         && pw != NULL)
-            pa_proplist_sets (props, PA_PROP_APPLICATION_PROCESS_USER,
-                              pw->pw_name);
+            if (getpwuid_r (getuid (), &pwbuf, buf, sizeof (buf), &pw) == 0
+             && pw != NULL)
+                pa_proplist_sets (props, PA_PROP_APPLICATION_PROCESS_USER,
+                                  pw->pw_name);
+        }
 
-        char hostname[sysconf (_SC_HOST_NAME_MAX)];
-        if (gethostname (hostname, sizeof (hostname)) == 0)
-            pa_proplist_sets (props, PA_PROP_APPLICATION_PROCESS_HOST,
-                              hostname);
+        for (size_t max = sysconf (_SC_HOST_NAME_MAX), len = max % 1024 + 1024;
+             len < max; len += 1024)
+        {
+            char hostname[len];
+
+            if (gethostname (hostname, sizeof (hostname)) == 0)
+                pa_proplist_sets (props, PA_PROP_APPLICATION_PROCESS_HOST,
+                                  hostname);
+        }
 
         const char *session = getenv ("XDG_SESSION_COOKIE");
         if (session != NULL)
