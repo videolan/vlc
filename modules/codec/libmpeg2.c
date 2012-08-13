@@ -209,7 +209,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 # endif
 # ifdef MPEG2_ACCEL_ARM_NEON
     if( vlc_CPU_ARM_NEON() )
-	i_accel |= MPEG2_ACCEL_ARM_NEON;
+        i_accel |= MPEG2_ACCEL_ARM_NEON;
 # endif
 
     /* TODO: sparc */
