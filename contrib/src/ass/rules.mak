@@ -9,11 +9,11 @@ endif
 
 ifdef HAVE_ANDROID
 WITH_FONTCONFIG = 0
+WITH_HARFBUZZ = 0
 else
 WITH_FONTCONFIG = 1
-endif
-
 WITH_HARFBUZZ = 1
+endif
 
 $(TARBALLS)/libass-$(ASS_VERSION).tar.gz:
 	$(call download,$(ASS_URL))
