@@ -501,6 +501,46 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                                 list2.p_list->p_values[i].psz_string );
                 var_FreeList( &list, &list2 );
             }
+            else if( i_action == ACTIONID_PROGRAM_SID )
+            {
+                vlc_value_t val, list, list2;
+                int i_count, i;
+                var_Get( p_input, "program", &val );
+
+                var_Change( p_input, "program", VLC_VAR_GETCHOICES,
+                            &list, &list2 );
+                i_count = list.p_list->i_count;
+                if( i_count <= 1 )
+                {
+                    DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
+                                    _("Program Service ID: %s"), _("N/A") );
+                    var_FreeList( &list, &list2 );
+                    goto cleanup_and_continue;
+                }
+                for( i = 0; i < i_count; i++ )
+                {
+                    if( val.i_int == list.p_list->p_values[i].i_int )
+                    {
+                        break;
+                    }
+                }
+                /* value of program was not in choices list */
+                if( i == i_count )
+                {
+                    msg_Warn( p_input,
+                              "invalid current program SID, selecting 0" );
+                    i = 0;
+                }
+                else if( i == i_count - 1 )
+                    i = 0;
+                else
+                    i++;
+                var_Set( p_input, "program", list.p_list->p_values[i] );
+                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
+                                _("Program Service ID: %s"),
+                                list2.p_list->p_values[i].psz_string );
+                var_FreeList( &list, &list2 );
+            }
             else if( i_action == ACTIONID_ASPECT_RATIO && p_vout )
             {
                 vlc_value_t val={0}, val_list, text_list;

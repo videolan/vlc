@@ -307,6 +307,7 @@ static const struct action actions[] =
     { "play-pause", ACTIONID_PLAY_PAUSE, },
     { "position", ACTIONID_POSITION, },
     { "prev", ACTIONID_PREV, },
+    { "program-sid", ACTIONID_PROGRAM_SID, },
     { "quit", ACTIONID_QUIT, },
     { "random", ACTIONID_RANDOM, },
     { "rate-faster-fine", ACTIONID_RATE_FASTER_FINE, },

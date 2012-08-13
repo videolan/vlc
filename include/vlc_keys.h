@@ -200,6 +200,8 @@ typedef enum vlc_action {
     ACTIONID_RATE_NORMAL,
     ACTIONID_RATE_SLOWER_FINE,
     ACTIONID_RATE_FASTER_FINE,
+    /* Cycle Through Program Service IDs */
+    ACTIONID_PROGRAM_SID,
 
 } vlc_action_t;
 
