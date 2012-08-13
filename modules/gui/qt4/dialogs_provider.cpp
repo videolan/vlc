@@ -247,12 +247,12 @@ void DialogsProvider::aboutDialog()
 
 void DialogsProvider::mediaInfoDialog()
 {
-    MediaInfoDialog::getInstance( p_intf )->showTab( 0 );
+    MediaInfoDialog::getInstance( p_intf )->showTab( MediaInfoDialog::META_PANEL );
 }
 
 void DialogsProvider::mediaCodecDialog()
 {
-    MediaInfoDialog::getInstance( p_intf )->showTab( 2 );
+    MediaInfoDialog::getInstance( p_intf )->showTab( MediaInfoDialog::INFO_PANEL );
 }
 
 void DialogsProvider::bookmarksDialog()

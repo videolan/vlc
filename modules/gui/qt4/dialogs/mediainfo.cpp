@@ -60,15 +60,15 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
     infoTabW = new QTabWidget;
 
     MP = new MetaPanel( infoTabW, p_intf );
-    infoTabW->addTab( MP, qtr( "&General" ) );
+    infoTabW->insertTab( META_PANEL, MP, qtr( "&General" ) );
     EMP = new ExtraMetaPanel( infoTabW );
-    infoTabW->addTab( EMP, qtr( "&Metadata" ) );
+    infoTabW->insertTab( EXTRAMETA_PANEL, EMP, qtr( "&Metadata" ) );
     IP = new InfoPanel( infoTabW );
-    infoTabW->addTab( IP, qtr( "Co&dec" ) );
+    infoTabW->insertTab( INFO_PANEL, IP, qtr( "Co&dec" ) );
     if( isMainInputInfo )
     {
         ISP = new InputStatsPanel( infoTabW );
-        infoTabW->addTab( ISP, qtr( "S&tatistics" ) );
+        infoTabW->insertTab( INPUTSTATS_PANEL, ISP, qtr( "S&tatistics" ) );
     }
 
     QGridLayout *layout = new QGridLayout( this );
@@ -136,7 +136,7 @@ MediaInfoDialog::~MediaInfoDialog()
     saveWidgetPosition( "Mediainfo" );
 }
 
-void MediaInfoDialog::showTab( int i_tab = 0 )
+void MediaInfoDialog::showTab( panel i_tab = META_PANEL )
 {
     infoTabW->setCurrentIndex( i_tab );
     show();

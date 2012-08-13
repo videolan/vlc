@@ -38,7 +38,15 @@ public:
     MediaInfoDialog( intf_thread_t *,
                      input_item_t * input = NULL );
 
-    void showTab( int );
+    enum panel
+    {
+        META_PANEL = 0,
+        EXTRAMETA_PANEL,
+        INFO_PANEL,
+        INPUTSTATS_PANEL
+    };
+
+    void showTab( panel );
 #if 0
     void setInput( input_item_t * );
 #endif
