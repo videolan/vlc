@@ -30,7 +30,6 @@
 #include <audioclient.h>
 #include <audiopolicy.h>
 #include <mmdeviceapi.h>
-#include <Functiondiscoverykeys_devpkey.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -39,6 +38,9 @@
 
 DEFINE_GUID (GUID_VLC_AUD_OUT, 0x4533f59d, 0x59ee, 0x00c6,
    0xad, 0xb2, 0xc6, 0x8b, 0x50, 0x1a, 0x66, 0x55);
+
+DEFINE_PROPERTYKEY(PKEY_Device_FriendlyName, 0xa45c254e, 0xdf1c, 0x4efd,
+   0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0, 14);
 
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
