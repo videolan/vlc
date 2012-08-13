@@ -72,22 +72,22 @@ static char *config_GetHomeDir (void)
 {
     /* 1/ Try $HOME  */
     const char *home = getenv ("HOME");
+    if (home != NULL)
+        return strdup (home);
 #if defined(HAVE_GETPWUID_R)
     /* 2/ Try /etc/passwd */
-    char buf[sysconf (_SC_GETPW_R_SIZE_MAX)];
-    if (home == NULL)
+    long max = sysconf (_SC_GETPW_R_SIZE_MAX);
+    if (max != -1)
     {
-        struct passwd pw, *res;
+        char buf[max];
+        struct passwd pwbuf, *pw;
 
-        if (!getpwuid_r (getuid (), &pw, buf, sizeof (buf), &res) && res)
-            home = pw.pw_dir;
+        if (getpwuid_r (getuid (), &pwbuf, buf, sizeof (buf), &pw) == 0
+          && pw != NULL)
+            return strdup (pw->pw_dir);
     }
 #endif
-
-    if (!home)
-        return NULL;
-
-    return strdup (home);
+    return NULL;
 }
 
 static char *config_GetAppDir (const char *xdg_name, const char *xdg_default)
