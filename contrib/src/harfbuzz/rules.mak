@@ -17,6 +17,7 @@ harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.bz2 .sum-harfbuzz
 ifdef HAVE_MACOSX
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-osx.patch
 endif
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
