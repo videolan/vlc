@@ -152,10 +152,11 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
         IF_EXTRACT("TITLE=", Title )
         else IF_EXTRACT("ALBUM=", Album )
         else IF_EXTRACT("TRACKNUMBER=", TrackNumber )
-        else if( !hasTrackTotal )
-        { IF_EXTRACT("TRACKTOTAL=", TrackTotal ) }
-        else if( !hasTrackTotal )
-        { IF_EXTRACT("TOTALTRACKS=", TrackTotal ) }
+        else if( !strncasecmp(psz_comment, "TRACKTOTAL=", strlen("TRACKTOTAL=")))
+            vlc_meta_Set( p_meta, vlc_meta_TrackTotal, &psz_comment[strlen("TRACKTOTAL=")] );
+        else if( !strncasecmp(psz_comment, "TOTALTRACKS=", strlen("TOTALTRACKS=")))
+            vlc_meta_Set( p_meta, vlc_meta_TrackTotal, &psz_comment[strlen("TOTALTRACKS=")] );
+        else IF_EXTRACT("TOTALTRACKS=", TrackTotal )
         else IF_EXTRACT("ARTIST=", Artist )
         else IF_EXTRACT("COPYRIGHT=", Copyright )
         else IF_EXTRACT("ORGANIZATION=", Publisher )
