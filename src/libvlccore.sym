@@ -45,6 +45,7 @@ config_GetFloat
 config_GetUserDir
 config_GetInt
 config_GetPsz
+config_GetPszChoices
 config_GetType
 config_PutFloat
 config_PutInt

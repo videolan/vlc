@@ -32,6 +32,7 @@
 
 #include "vlc_configuration.h"
 
+#include <errno.h>
 #include <assert.h>
 
 #include "configuration.h"
@@ -327,6 +328,57 @@ void config_PutFloat( vlc_object_t *p_this,
     p_config->value.f = f_value;
     config_dirty = true;
     vlc_rwlock_unlock (&config_lock);
+}
+
+/**
+ * Determines a list of suggested values for a configuration item.
+ * \param values pointer to a table of value strings [OUT]
+ * \param texts pointer to a table of descriptions strings [OUT]
+ * \return number of choices, or -1 on error
+ * \note the caller is responsible for calling free() on all values, on all
+ * descriptions and on both tables.
+ * In case of error, both pointers are set to NULL.
+ */
+ssize_t config_GetPszChoices (vlc_object_t *obj, const char *name,
+                              char ***restrict values, char ***restrict texts)
+{
+    *values = *texts = NULL;
+
+    module_config_t *cfg = config_FindConfig (obj, name);
+    if (cfg == NULL)
+    {
+        msg_Warn (obj, "option %s does not exist", name);
+        errno = ENOENT;
+        return -1;
+    }
+
+    if (cfg->pf_update_list != NULL)
+    {
+        /* FIXME: not thread-safe */
+        vlc_value_t dummy = { .psz_string = (char *)"" };
+        cfg->pf_update_list (obj, name, dummy, dummy, NULL);
+    }
+
+    size_t count = cfg->i_list;
+    if (count == 0)
+        return 0;
+
+    char **vals = malloc (sizeof (*vals) * count);
+    char **txts = malloc (sizeof (*txts) * count);
+    if (unlikely(vals == NULL || txts == NULL))
+        abort ();
+
+    for (size_t i = 0; i < count; i++)
+    {
+        vals[i] = strdup (cfg->ppsz_list[i]);
+        txts[i] = strdup (cfg->ppsz_list_text[i]);
+        if (unlikely(vals[i] == NULL || txts[i] == NULL))
+            abort ();
+    }
+
+    *values = vals;
+    *texts = txts;
+    return count;
 }
 
 static int confcmp (const void *a, const void *b)
