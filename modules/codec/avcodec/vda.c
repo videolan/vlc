@@ -51,8 +51,6 @@ typedef struct
 
     copy_cache_t        image_cache;
 
-    vda_frame           *top_frame;
-
     vlc_object_t        *p_log;
 
 } vlc_va_vda_t;
@@ -143,6 +141,7 @@ static int Setup( vlc_va_t *p_external, void **pp_hw_ctx, vlc_fourcc_t *pi_chrom
     p_va->hw_ctx.width = i_width;
     p_va->hw_ctx.height = i_height;
     p_va->hw_ctx.format = 'avc1';
+    p_va->hw_ctx.use_sync_decoding = 1;
 
     int i_pix_fmt = var_CreateGetInteger( p_va->p_log, "avcodec-vda-pix-fmt" );
 
@@ -179,12 +178,7 @@ ok:
 
 static int Get( vlc_va_t *p_external, AVFrame *p_ff )
 {
-    vlc_va_vda_t *p_va = vlc_va_vda_Get( p_external );
-
-    if( p_va->top_frame )
-        ff_vda_release_vda_frame( p_va->top_frame );
-
-    p_va->top_frame = ff_vda_queue_pop( &p_va->hw_ctx );
+    VLC_UNUSED( p_external );
 
     /* */
     for( int i = 0; i < 4; i++ )
@@ -201,16 +195,14 @@ static int Get( vlc_va_t *p_external, AVFrame *p_ff )
 
 static int Extract( vlc_va_t *p_external, picture_t *p_picture, AVFrame *p_ff )
 {
-    VLC_UNUSED( p_ff );
     vlc_va_vda_t *p_va = vlc_va_vda_Get( p_external );
+    CVPixelBufferRef cv_buffer = ( CVPixelBufferRef )p_ff->data[3];
 
-    if( !p_va->top_frame )
+    if( !cv_buffer )
     {
-        msg_Dbg( p_va->p_log, "Decoder is buffering...");
+        msg_Dbg( p_va->p_log, "Frame buffer is empty.");
         return VLC_EGENERIC;
     }
-
-    CVPixelBufferRef cv_buffer = p_va->top_frame->cv_buffer;
 
     if( p_va->hw_ctx.cv_pix_fmt_type == kCVPixelFormatType_420YpCbCr8Planar )
     {
@@ -226,15 +218,16 @@ static int Extract( vlc_va_t *p_external, picture_t *p_picture, AVFrame *p_ff )
     else
         vda_Copy422YpCbCr8( p_picture, cv_buffer );
 
-    p_picture->date = p_va->top_frame->pts;
-
     return VLC_SUCCESS;
 }
 
 static void Release( vlc_va_t *p_external, AVFrame *p_ff )
 {
-    VLC_UNUSED( p_ff );
     VLC_UNUSED( p_external );
+    CVPixelBufferRef cv_buffer = ( CVPixelBufferRef )p_ff->data[3];
+
+    if ( cv_buffer )
+        CFRelease( cv_buffer );
 }
 
 static void Close( vlc_va_t *p_external )
@@ -242,9 +235,6 @@ static void Close( vlc_va_t *p_external )
     vlc_va_vda_t *p_va = vlc_va_vda_Get( p_external );
 
     ff_vda_destroy_decoder( &p_va->hw_ctx ) ;
-
-    if( p_va->top_frame )
-        ff_vda_release_vda_frame( p_va->top_frame );
 
     if( p_va->hw_ctx.cv_pix_fmt_type == kCVPixelFormatType_420YpCbCr8Planar )
         CopyCleanCache( &p_va->image_cache );
@@ -270,7 +260,6 @@ vlc_va_t *vlc_va_NewVDA( vlc_object_t *p_log, int i_codec_id, void *p_extra, int
     p_va->p_log = p_log;
     p_va->p_extradata = p_extra;
     p_va->i_extradata = i_extra;
-    p_va->top_frame = NULL;
 
     p_va->va.setup = Setup;
     p_va->va.get = Get;
