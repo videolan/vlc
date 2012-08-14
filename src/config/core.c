@@ -331,7 +331,52 @@ void config_PutFloat( vlc_object_t *p_this,
 }
 
 /**
- * Determines a list of suggested values for a configuration item.
+ * Determines a list of suggested values for an integer configuration item.
+ * \param values pointer to a table of integer values [OUT]
+ * \param texts pointer to a table of descriptions strings [OUT]
+ * \return number of choices, or -1 on error
+ * \note the caller is responsible for calling free() on all descriptions and
+ * on both tables. In case of error, both pointers are set to NULL.
+ */
+ssize_t config_GetIntChoices (vlc_object_t *obj, const char *name,
+                             int64_t **restrict values, char ***restrict texts)
+{
+    *values = NULL;
+    *texts = NULL;
+
+    module_config_t *cfg = config_FindConfig (obj, name);
+    if (cfg == NULL)
+    {
+        msg_Warn (obj, "option %s does not exist", name);
+        errno = ENOENT;
+        return -1;
+    }
+
+    size_t count = cfg->i_list;
+    if (count == 0)
+        return 0;
+
+    int64_t *vals = malloc (sizeof (*vals) * count);
+    char **txts = malloc (sizeof (*txts) * count);
+    if (unlikely(vals == NULL || txts == NULL))
+        abort ();
+
+    for (size_t i = 0; i < count; i++)
+    {
+        vals[i] = cfg->pi_list[i];
+        txts[i] = strdup (cfg->ppsz_list_text[i]);
+        if (unlikely(txts[i] == NULL))
+            abort ();
+    }
+
+    *values = vals;
+    *texts = txts;
+    return count;
+}
+
+
+/**
+ * Determines a list of suggested values for a string configuration item.
  * \param values pointer to a table of value strings [OUT]
  * \param texts pointer to a table of descriptions strings [OUT]
  * \return number of choices, or -1 on error

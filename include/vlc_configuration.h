@@ -96,6 +96,8 @@ VLC_API float config_GetFloat(vlc_object_t *, const char *) VLC_USED;
 VLC_API void config_PutFloat(vlc_object_t *, const char *, float);
 VLC_API char * config_GetPsz(vlc_object_t *, const char *) VLC_USED VLC_MALLOC;
 VLC_API void config_PutPsz(vlc_object_t *, const char *, const char *);
+VLC_API ssize_t config_GetIntChoices(vlc_object_t *, const char *,
+                                     int64_t **, char ***) VLC_USED;
 VLC_API ssize_t config_GetPszChoices(vlc_object_t *, const char *,
                                      char ***, char ***) VLC_USED;
 
