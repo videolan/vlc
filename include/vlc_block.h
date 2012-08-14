@@ -298,8 +298,6 @@ static inline block_t *block_ChainGather( block_t *p_list )
  *      needed), be carefull, you can use it ONLY if you are sure to be the
  *      only one getting data from the fifo.
  * - block_FifoCount : how many packets are waiting in the fifo
- * - block_FifoWake : wake ups a thread with block_FifoGet() = NULL
- *   (this is used to wakeup a thread when there is no data to queue)
  *
  * block_FifoGet and block_FifoShow are cancellation points.
  ****************************************************************************/
@@ -309,7 +307,7 @@ VLC_API void block_FifoRelease( block_fifo_t * );
 VLC_API void block_FifoPace( block_fifo_t *fifo, size_t max_depth, size_t max_size );
 VLC_API void block_FifoEmpty( block_fifo_t * );
 VLC_API size_t block_FifoPut( block_fifo_t *, block_t * );
-VLC_API void block_FifoWake( block_fifo_t * );
+void block_FifoWake( block_fifo_t * );
 VLC_API block_t * block_FifoGet( block_fifo_t * ) VLC_USED;
 VLC_API block_t * block_FifoShow( block_fifo_t * );
 size_t block_FifoSize( const block_fifo_t *p_fifo ) VLC_USED;

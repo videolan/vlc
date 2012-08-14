@@ -25,7 +25,6 @@ block_FifoPace
 block_FifoPut
 block_FifoRelease
 block_FifoShow
-block_FifoWake
 block_File
 block_heap_Alloc
 block_Init
