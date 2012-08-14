@@ -455,10 +455,27 @@ static VLCOpen *_o_sharedMainInstance = nil;
                     p_item->pi_list[[o_file_sub_size_pop indexOfSelectedItem]]]];
             }
         }
-        if ([o_file_starttime_fld intValue] > 0)
-            [o_options addObject: [NSString stringWithFormat:@"start-time=%@", [o_file_starttime_fld stringValue]]];
-        if ([o_file_stoptime_fld intValue] > 0)
-            [o_options addObject: [NSString stringWithFormat:@"stop-time=%@", [o_file_stoptime_fld stringValue]]];
+        NSArray * components = [[o_file_starttime_fld stringValue] componentsSeparatedByString:@":"];
+        NSUInteger componentCount = [components count];
+        NSInteger tempValue;
+        if( componentCount == 1 )
+            tempValue = 1000000 * ( [[components objectAtIndex:0] intValue] );
+        else if( componentCount == 2 )
+            tempValue = 1000000 * ( [[components objectAtIndex:0] intValue] * 60 + [[components objectAtIndex:1] intValue] );
+        else if( componentCount == 3 )
+            tempValue = 1000000 * ( [[components objectAtIndex:0] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue] );
+        if (tempValue > 0)
+            [o_options addObject: [NSString stringWithFormat:@"start-time=%li", tempValue]];
+        components = [[o_file_stoptime_fld stringValue] componentsSeparatedByString:@":"];
+        componentCount = [components count];
+        if( componentCount == 1 )
+            tempValue = 1000000 * ( [[components objectAtIndex:0] intValue] );
+        else if( componentCount == 2 )
+            tempValue = 1000000 * ( [[components objectAtIndex:0] intValue] * 60 + [[components objectAtIndex:1] intValue] );
+        else if( componentCount == 3 )
+            tempValue = 1000000 * ( [[components objectAtIndex:0] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue] );
+        if (tempValue > 0)
+            [o_options addObject: [NSString stringWithFormat:@"stop-time=%li", tempValue]];
         if( [o_output_ckbox state] == NSOnState )
         {
             NSUInteger count = [[o_sout_options mrl] count];
