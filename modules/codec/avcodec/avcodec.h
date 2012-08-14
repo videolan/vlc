@@ -260,7 +260,8 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 #define ENC_PROFILE_TEXT N_( "Specify AAC audio profile to use" )
 #define ENC_PROFILE_LONGTEXT N_( "Specify the AAC audio profile to use " \
    "for encoding the audio bitstream. It takes the following options: " \
-   "main, low, ssr (not supported) and ltp (default: main)" )
+   "main, low, ssr (not supported),ltp, hev1, hev2 (default: low). " \
+   "hev1  and hev2 are currently only with libfdk-aac enable ffmpeg/libav" )
 
 #define AVCODEC_COMMON_MEMBERS   \
     int i_cat;                  \
