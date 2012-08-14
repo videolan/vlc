@@ -409,19 +409,14 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
 
             /* Copy textual descriptions */
             const char *const *text = va_arg (ap, const char *const *);
-            if (text != NULL)
+            char **dtext = malloc (sizeof (char *) * (len + 1));
+            if( dtext != NULL )
             {
-                char **dtext = malloc (sizeof (char *) * (len + 1));
-                if( dtext != NULL )
-                {
-                    for (size_t i = 0; i < len; i++)
-                        dtext[i] = text[i] ? strdup (text[i]) : NULL;
-                    dtext[len] = NULL;
-                }
-                item->ppsz_list_text = dtext;
+                for (size_t i = 0; i < len; i++)
+                    dtext[i] = text[i] ? strdup (text[i]) : NULL;
+                dtext[len] = NULL;
             }
-            else
-                item->ppsz_list_text = NULL;
+            item->ppsz_list_text = dtext;
 
             item->i_list = len;
             item->pf_update_list = va_arg (ap, vlc_callback_t);
