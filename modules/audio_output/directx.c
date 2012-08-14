@@ -152,7 +152,7 @@ vlc_module_begin ()
               FLOAT_LONGTEXT, true )
     add_string( "directx-audio-speaker", "Windows default",
                  SPEAKER_TEXT, SPEAKER_LONGTEXT, true )
-        change_string_list( speaker_list, 0, 0 )
+        change_string_list( speaker_list, speaker_list, NULL )
     add_integer( "directx-volume", DSBVOLUME_MAX,
                  VOLUME_TEXT, VOLUME_LONGTEXT, true )
         change_integer_range( DSBVOLUME_MIN, DSBVOLUME_MAX )
