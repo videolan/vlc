@@ -98,19 +98,7 @@ static void DoWork( filter_t * p_filter,
 
     if( p_sys->i_reject_count > 0 )
     {
-        if( p_filter->fmt_out.audio.i_format == VLC_CODEC_FL32 )
-        {
-            int i;
-            int i_size = p_out_buf->i_buffer / sizeof(float);
-
-            float * a = (float *)p_out_buf->p_buffer;
-            for ( i = 0 ; i < i_size ; i++ )
-                *a++ = 0.0;
-        }
-        else
-        {
-            memset( p_out_buf->p_buffer, 0, p_out_buf->i_buffer );
-        }
+        memset( p_out_buf->p_buffer, 0, p_out_buf->i_buffer );
         p_sys->i_reject_count--;
         return;
     }
@@ -122,49 +110,22 @@ static void DoWork( filter_t * p_filter,
     unsigned int i_samples = p_pcm->length;
     mad_fixed_t const * p_left = p_pcm->samples[0];
     mad_fixed_t const * p_right = p_pcm->samples[1];
+    mad_fixed_t * p_samples = (mad_fixed_t *)p_out_buf->p_buffer;
 
     assert( i_samples == p_out_buf->i_nb_samples );
-    if ( p_filter->fmt_out.audio.i_format == VLC_CODEC_FI32 )
+    /* Interleave and keep buffers in mad_fixed_t format */
+    if ( p_pcm->channels == 2 )
     {
-        /* Interleave and keep buffers in mad_fixed_t format */
-        mad_fixed_t * p_samples = (mad_fixed_t *)p_out_buf->p_buffer;
-
-        if ( p_pcm->channels == 2 )
+        while ( i_samples-- )
         {
-            while ( i_samples-- )
-            {
-                *p_samples++ = *p_left++;
-                *p_samples++ = *p_right++;
-            }
-        }
-        else
-        {
-            assert( p_pcm->channels == 1 );
-            memcpy( p_samples, p_left, i_samples * sizeof(mad_fixed_t) );
+            *p_samples++ = *p_left++;
+            *p_samples++ = *p_right++;
         }
     }
     else
     {
-        /* float32 */
-        float * p_samples = (float *)p_out_buf->p_buffer;
-        const float f_temp = (float)FIXED32_ONE;
-
-        if ( p_pcm->channels == 2 )
-        {
-            while ( i_samples-- )
-            {
-                *p_samples++ = (float)*p_left++ / f_temp;
-                *p_samples++ = (float)*p_right++ / f_temp;
-            }
-        }
-        else
-        {
-            assert( p_pcm->channels == 1 );
-            while ( i_samples-- )
-            {
-                *p_samples++ = (float)*p_left++ / f_temp;
-            }
-        }
+        assert( p_pcm->channels == 1 );
+        memcpy( p_samples, p_left, i_samples * sizeof(mad_fixed_t) );
     }
 }
 
@@ -180,8 +141,7 @@ static int OpenFilter( vlc_object_t *p_this )
         p_filter->fmt_in.audio.i_format != VLC_FOURCC('m','p','g','3') )
         return VLC_EGENERIC;
 
-    if( p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32
-     && p_filter->fmt_out.audio.i_format != VLC_CODEC_FI32 )
+    if( p_filter->fmt_out.audio.i_format != VLC_CODEC_FI32 )
         return VLC_EGENERIC;
 
     if( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
