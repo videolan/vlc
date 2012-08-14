@@ -469,33 +469,19 @@ void StringListConfigControl::finish(module_config_t *p_module_config )
 
     if(!p_module_config) return;
 
-    if( p_module_config->pf_update_list )
+    char **values, **texts;
+    ssize_t count = config_GetPszChoices( p_this, p_item->psz_name,
+                                          &values, &texts );
+    for( ssize_t i = 0; i < count; i++ )
     {
-        vlc_value_t val;
-        val.psz_string = strdup(p_module_config->value.psz);
-
-        p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
-        free( val.psz_string );
-    }
-
-    for( int i_index = 0; i_index < p_module_config->i_list; i_index++ )
-    {
-        if( !p_module_config->ppsz_list[i_index] )
-        {
-              combo->addItem( "", QVariant(""));
-              if( !p_item->value.psz )
-                 combo->setCurrentIndex( combo->count() - 1 );
-              continue;
-        }
-        combo->addItem( qfu((p_module_config->ppsz_list_text &&
-                            p_module_config->ppsz_list_text[i_index])?
-                            _(p_module_config->ppsz_list_text[i_index]) :
-                            p_module_config->ppsz_list[i_index] ),
-                   QVariant( qfu(p_module_config->ppsz_list[i_index] )) );
-        if( p_item->value.psz && !strcmp( p_module_config->value.psz,
-                                          p_module_config->ppsz_list[i_index] ) )
+        combo->addItem( qfu(texts[i]), QVariant( qfu(values[i])) );
+        if( !strcmp( p_item->value.psz ? p_item->value.psz : "", values[i] ) )
             combo->setCurrentIndex( combo->count() - 1 );
+        free( texts[i] );
+        free( values[i] );
     }
+    free( texts );
+    free( values );
 
     if( p_module_config->psz_longtext  )
     {
@@ -518,39 +504,43 @@ void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
 {
     module_config_t *p_config =
                       config_FindConfig( VLC_OBJECT(p_intf), configname );
-    if( p_config )
+    if( p_config == NULL )
+        return;
+
+    if( (p_config->i_type & 0xF0) == CONFIG_ITEM_STRING )
     {
-        QVariant def;
-        bool string = (p_config->i_type & 0xF0) == CONFIG_ITEM_STRING;
-
-        if( string )
-            def = QVariant( qfu(p_config->value.psz) );
-        else
-            def = QVariant( qlonglong( p_config->value.i ) );
-
-        if(p_config->pf_update_list)
+        char **values, **texts;
+        ssize_t count = config_GetPszChoices(VLC_OBJECT(p_intf),
+                                             configname, &values, &texts);
+        for( ssize_t i = 0; i < count; i++ )
         {
-            vlc_value_t val;
-            val.i_int = p_config->value.i;
-            p_config->pf_update_list(VLC_OBJECT(p_intf), configname, val, val, NULL);
+            combo->addItem( qtr(texts[i]), QVariant(qfu(values[i])) );
+            if( !strcmp(p_config->value.psz, values[i]) )
+                combo->setCurrentIndex( i );
+            free( texts[i] );
+            free( values[i] );
         }
-
-        for ( int i_index = 0; i_index < p_config->i_list; i_index++ )
-        {
-            QVariant value;
-
-            if( string )
-                value = QVariant( qfu(p_config->ppsz_list[i_index]) );
-            else
-                value =QVariant( p_config->pi_list[i_index] );
-            combo->addItem( qtr(p_config->ppsz_list_text[i_index]), value );
-            if( def == value )
-                combo->setCurrentIndex( i_index );
-        }
-
-        if( p_config->psz_longtext )
-            combo->setToolTip( qfu( p_config->psz_longtext ) );
+        free( texts );
+        free( values );
     }
+    else
+    {
+        int64_t *values;
+        char **texts;
+        ssize_t count = config_GetIntChoices(VLC_OBJECT(p_intf), configname,
+                                             &values, &texts);
+        for( ssize_t i = 0; i < count; i++ )
+        {
+            combo->addItem( qtr(texts[i]), QVariant(qlonglong(values[i])) );
+            if( p_config->value.i == values[i] )
+                combo->setCurrentIndex( i );
+            free( texts[i] );
+        }
+        free( texts );
+    }
+
+    if( p_config->psz_longtext != NULL )
+        combo->setToolTip( qfu( p_config->psz_longtext ) );
 }
 
 /********* Module **********/

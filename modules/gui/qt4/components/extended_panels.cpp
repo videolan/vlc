@@ -440,23 +440,41 @@ void ExtVideo::initComboBoxItems( QObject *widget )
     QString option = OptionFromWidgetName( widget );
     module_config_t *p_item = config_FindConfig( VLC_OBJECT( p_intf ),
                                                  qtu( option ) );
-    if( p_item )
-    {
-        int i_type = p_item->i_type;
-        for( int i_index = 0; i_index < p_item->i_list; i_index++ )
-        {
-            if( i_type == CONFIG_ITEM_INTEGER
-             || i_type == CONFIG_ITEM_BOOL )
-                combobox->addItem( qtr( p_item->ppsz_list_text[i_index] ),
-                                   p_item->pi_list[i_index] );
-            else if( i_type == CONFIG_ITEM_STRING )
-                combobox->addItem( qtr( p_item->ppsz_list_text[i_index] ),
-                                   p_item->ppsz_list[i_index] );
-        }
-    }
-    else
+    if( p_item == NULL )
     {
         msg_Err( p_intf, "Couldn't find option \"%s\".", qtu( option ) );
+        return;
+    }
+
+    if( p_item->i_type == CONFIG_ITEM_INTEGER
+     || p_item->i_type == CONFIG_ITEM_BOOL )
+    {
+        int64_t *values;
+        char **texts;
+        ssize_t count = config_GetIntChoices( VLC_OBJECT( p_intf ),
+                                              qtu( option ), &values, &texts );
+        for( ssize_t i = 0; i < count; i++ )
+        {
+            combobox->addItem( qtr( texts[i] ), values[i] );
+            free( texts[i] );
+        }
+        free( texts );
+        free( values );
+    }
+    else if( p_item->i_type == CONFIG_ITEM_STRING )
+    {
+        char **values;
+        char **texts;
+        ssize_t count = config_GetPszChoices( VLC_OBJECT( p_intf ),
+                                              qtu( option ), &values, &texts );
+        for( ssize_t i = 0; i < count; i++ )
+        {
+            combobox->addItem( qtr( texts[i] ), values[i] );
+            free( texts[i] );
+            free( values[i] );
+        }
+        free( texts );
+        free( values );
     }
 }
 
