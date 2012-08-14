@@ -59,7 +59,7 @@ static int    CacheLoadConfig  ( module_t *, FILE * );
 
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 18
+#define CACHE_SUBVERSION_NUM 19
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -321,48 +321,26 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
             p_module->p_config[i].value.psz =
                     (p_module->p_config[i].orig.psz != NULL)
                         ? strdup (p_module->p_config[i].orig.psz) : NULL;
+
+            p_module->p_config[i].ppsz_list =
+                      xmalloc( p_module->p_config[i].i_list * sizeof(char *) );
+            for( int j = 0; j < p_module->p_config[i].i_list; j++ )
+                LOAD_STRING( p_module->p_config[i].ppsz_list[j] );
         }
         else
+        {
             memcpy (&p_module->p_config[i].value, &p_module->p_config[i].orig,
                     sizeof (p_module->p_config[i].value));
-
-        if( p_module->p_config[i].i_list )
-        {
-            if( p_module->p_config[i].ppsz_list )
-            {
-                p_module->p_config[i].ppsz_list =
-                    xmalloc( (p_module->p_config[i].i_list+1) * sizeof(char *));
-                if( p_module->p_config[i].ppsz_list )
-                {
-                    int j;
-                    for( j = 0; j < p_module->p_config[i].i_list; j++ )
-                        LOAD_STRING( p_module->p_config[i].ppsz_list[j] );
-                    p_module->p_config[i].ppsz_list[j] = NULL;
-                }
-            }
-            if( p_module->p_config[i].ppsz_list_text )
-            {
-                p_module->p_config[i].ppsz_list_text =
-                    xmalloc( (p_module->p_config[i].i_list+1) * sizeof(char *));
-                if( p_module->p_config[i].ppsz_list_text )
-                {
-                    int j;
-                    for( j = 0; j < p_module->p_config[i].i_list; j++ )
-                        LOAD_STRING( p_module->p_config[i].ppsz_list_text[j] );
-                    p_module->p_config[i].ppsz_list_text[j] = NULL;
-                }
-            }
-            if( p_module->p_config[i].pi_list )
-            {
-                p_module->p_config[i].pi_list =
-                    xmalloc( (p_module->p_config[i].i_list + 1) * sizeof(int) );
-                if( p_module->p_config[i].pi_list )
-                {
-                    for (int j = 0; j < p_module->p_config[i].i_list; j++)
-                        LOAD_IMMEDIATE( p_module->p_config[i].pi_list[j] );
-                }
-            }
+            p_module->p_config[i].pi_list =
+                         xmalloc( p_module->p_config[i].i_list * sizeof(int) );
+            for( int j = 0; j < p_module->p_config[i].i_list; j++ )
+                LOAD_IMMEDIATE( p_module->p_config[i].pi_list[j] );
         }
+
+        p_module->p_config[i].ppsz_list_text =
+                      xmalloc( p_module->p_config[i].i_list * sizeof(char *) );
+        for( int j = 0; j < p_module->p_config[i].i_list; j++ )
+            LOAD_STRING( p_module->p_config[i].ppsz_list_text[j] );
 
         if( p_module->p_config[i].i_action )
         {
@@ -468,7 +446,7 @@ static int CacheSaveBank (FILE *file, const module_cache_t *cache,
         goto error;
 
 #define SAVE_IMMEDIATE( a ) \
-    if (fwrite (&a, sizeof(a), 1, file) != 1) \
+    if (fwrite (&(a), sizeof(a), 1, file) != 1) \
         goto error
 #define SAVE_STRING( a ) \
     { \
@@ -560,27 +538,19 @@ static int CacheSaveConfig (FILE *file, const module_t *p_module)
         SAVE_STRING( p_module->p_config[i].psz_longtext );
 
         if (IsConfigStringType (p_module->p_config[i].i_type))
-            SAVE_STRING( p_module->p_config[i].orig.psz );
-
-        if( p_module->p_config[i].i_list )
         {
-            if( p_module->p_config[i].ppsz_list )
-            {
-                for (int j = 0; j < p_module->p_config[i].i_list; j++)
-                    SAVE_STRING( p_module->p_config[i].ppsz_list[j] );
-            }
-
-            if( p_module->p_config[i].ppsz_list_text )
-            {
-                for (int j = 0; j < p_module->p_config[i].i_list; j++)
-                    SAVE_STRING( p_module->p_config[i].ppsz_list_text[j] );
-            }
-            if( p_module->p_config[i].pi_list )
-            {
-                for (int j = 0; j < p_module->p_config[i].i_list; j++)
-                    SAVE_IMMEDIATE( p_module->p_config[i].pi_list[j] );
-            }
+            SAVE_STRING( p_module->p_config[i].orig.psz );
+            for (int j = 0; j < p_module->p_config[i].i_list; j++)
+                SAVE_STRING( p_module->p_config[i].ppsz_list[j] );
         }
+        else
+        {
+            for (int j = 0; j < p_module->p_config[i].i_list; j++)
+                SAVE_IMMEDIATE( p_module->p_config[i].pi_list[j] );
+        }
+
+        for (int j = 0; j < p_module->p_config[i].i_list; j++)
+            SAVE_STRING( p_module->p_config[i].ppsz_list_text[j] );
 
         for (int j = 0; j < p_module->p_config[i].i_action; j++)
             SAVE_STRING( p_module->p_config[i].ppsz_action_text[j] );
