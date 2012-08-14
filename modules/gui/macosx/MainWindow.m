@@ -321,6 +321,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (b_show_jump_buttons)
         [self addJumpButtons];
 
+    b_show_playmode_buttons = config_GetInt( VLCIntf, "macosx-show-playmode-buttons" );
+    if (!b_show_playmode_buttons)
+        [self removePlaymodeButtons];
+
     /* interface builder action */
     float f_threshold_height = f_min_video_height + [o_bottombar_view frame].size.height;
     if( b_dark_interface )
