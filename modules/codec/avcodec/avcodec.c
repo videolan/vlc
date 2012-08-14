@@ -148,7 +148,13 @@ vlc_module_begin ()
     add_string( "avcodec-codec", NULL, CODEC_TEXT, CODEC_LONGTEXT, true )
 #if defined(HAVE_AVCODEC_VAAPI) || defined(HAVE_AVCODEC_DXVA2) || defined(HAVE_AVCODEC_VDA)
     add_obsolete_bool( "ffmpeg-hw" ) /* removed since 2.1.0 */
-    add_bool( "avcodec-hw", false, HW_TEXT, HW_LONGTEXT, false )
+    add_bool( "avcodec-hw",
+#if !defined(HAVE_AVCODEC_VDA)
+    false
+#else
+    true
+#endif
+    , HW_TEXT, HW_LONGTEXT, false )
 #if defined(HAVE_AVCODEC_VDA)
     add_integer ( "avcodec-vda-pix-fmt", 0, VDA_PIX_FMT_TEXT,
                   VDA_PIX_FMT_LONGTEXT, false)
