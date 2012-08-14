@@ -160,7 +160,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->i_seglen = var_GetInteger( p_access, SOUT_CFG_PREFIX "seglen" );
-    p_sys->i_seglenm = CLOCK_FREQ * p_sys->i_seglen;
+    /* Try to get within +-10% of asked segment length, so lower limit is 90% of segment length*/
+    p_sys->i_seglenm = CLOCK_FREQ * p_sys->i_seglen * 0.9;
 
     p_sys->i_numsegs = var_GetInteger( p_access, SOUT_CFG_PREFIX "numsegs" );
     p_sys->b_splitanywhere = var_GetBool( p_access, SOUT_CFG_PREFIX "splitanywhere" );
