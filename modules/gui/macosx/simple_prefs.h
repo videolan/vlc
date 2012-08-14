@@ -77,6 +77,7 @@
     IBOutlet id o_input_httpproxypwd_txt;
     IBOutlet id o_input_mux_box;
     IBOutlet id o_input_net_box;
+    IBOutlet id o_input_avcodec_hw_ckb;
     IBOutlet id o_input_postproc_fld;
     IBOutlet id o_input_postproc_txt;
     IBOutlet id o_input_rtsp_ckb;

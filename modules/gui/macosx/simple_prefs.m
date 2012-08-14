@@ -259,6 +259,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_input_httpproxypwd_txt setStringValue: _NS("Password for HTTP Proxy")];
     [o_input_mux_box setTitle: _NS("Codecs / Muxers")];
     [o_input_net_box setTitle: _NS("Network")];
+    [o_input_avcodec_hw_ckb setTitle: _NS("Hardware Acceleration")];
     [o_input_postproc_txt setStringValue: _NS("Post-Processing Quality")];
     [o_input_rtsp_ckb setTitle: _NS("Use RTP over RTSP (TCP)")];
     [o_input_skipLoop_txt setStringValue: _NS("Skip the loop filter for H.264 decoding")];
@@ -273,9 +274,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_intf_nativefullscreen_ckb setTitle: _NS("Use the native fullscreen mode on OS X Lion")];
     [o_intf_fspanel_ckb setTitle: _NS("Show Fullscreen Controller")];
     [o_intf_network_box setTitle: _NS("Privacy / Network Interaction")];
-
     [o_intf_appleremote_ckb setTitle: _NS("Control playback with the Apple Remote")];
-
     [o_intf_mediakeys_ckb setTitle: _NS("Control playback with media keys")];
     [o_intf_update_ckb setTitle: _NS("Automatically check for updates")];
     [o_intf_last_update_lbl setStringValue: @""];
@@ -614,6 +613,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     [self setupField: o_input_httpproxypwd_sfld forOption:"http-proxy-pwd"];
     [o_input_postproc_fld setIntValue: config_GetInt( p_intf, "postproc-q")];
     [o_input_postproc_fld setToolTip: _NS(config_GetLabel( p_intf, "postproc-q"))];
+    [self setupButton: o_input_avcodec_hw_ckb forBoolValue:"avcodec-hw"];
 
     [self setupButton: o_input_avi_pop forIntList: "avi-index"];
 
@@ -966,6 +966,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         SaveIntList( o_input_avi_pop, "avi-index" );
 
         config_PutInt( p_intf, "rtsp-tcp", [o_input_rtsp_ckb state] );
+        config_PutInt( p_intf, "avcodec-hw", [o_input_avcodec_hw_ckb state] );
         SaveIntList( o_input_skipLoop_pop, "avcodec-skiploopfilter" );
 
         config_PutInt( p_intf, "mkv-preload-local-dir", [o_input_mkv_preload_dir_ckb state] );
