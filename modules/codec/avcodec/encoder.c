@@ -391,8 +391,15 @@ int OpenEncoder( vlc_object_t *p_this )
         else if( !strncmp( psz_val, "ssr", 3 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_SSR;
 #endif
-        else  if( !strncmp( psz_val, "ltp", 3 ) )
+        else if( !strncmp( psz_val, "ltp", 3 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_LTP;
+#if LIBAVCODEC_VERSION_CHECK( 54, 19, 0, 35, 100 )
+/* These require ffmpeg with libfdk-aac */
+        else if( !strncmp( psz_val, "hev2", 4 ) )
+            p_sys->i_aac_profile = FF_PROFILE_AAC_HE_V2;
+        else if( !strncmp( psz_val, "hev1", 4 ) )
+            p_sys->i_aac_profile = FF_PROFILE_AAC_HE;
+#endif
         else
         {
             msg_Warn( p_enc, "unknown AAC profile requested, setting it to low" );
