@@ -67,15 +67,22 @@ Interfaces:
  * Better support for MCE remotes on Windows
  * Partial support for Qt5.0
 
+Mac OS X Port:
+ * Discontinued support for PowerPC-based Macs
+
 Mac OS X Interface:
- * added a GUI for the QTSound access module to process audio captured locally
- * added an option to let the Apple Remote control the system volume instead of
+ * add a GUI for the QTSound access module to process audio captured locally
+ * add an option to let the Apple Remote control the system volume instead of
    VLC's internal volume level
- * added an option to show next / previous buttons
- * added an option to hide the shuffle and repeat buttons
- * added optional playlist columns for track number, genre, album, description,
+ * add an option to show next / previous buttons
+ * add an option to hide the shuffle and repeat buttons
+ * add optional playlist columns for track number, genre, album, description,
    date and language.
+ * add options to the Advanced Open File dialog for start and stop time
  * add an option to play videos as a desktop background
+ * add a new panel for media conversation and streaming
+ * The Streaming/Transcoding wizard and the open dialog's output panel are
+   deprecated now
 
 Removed modules:
  * portaudio audio output: use the native audio output instead
