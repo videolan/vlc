@@ -252,7 +252,7 @@ static void *EventThread( void *p_this )
 
 #ifndef UNDER_CE
     /* Prevent monitor from powering off */
-    SetThreadExecutionState( ES_DISPLAY_REQUIRED | ES_CONTINUOUS );
+    SetThreadExecutionState( ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED | ES_CONTINUOUS );
 #endif
 
     /* Main loop */

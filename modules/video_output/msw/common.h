@@ -96,9 +96,7 @@ struct vout_display_sys_t
 #ifndef UNDER_CE
 
     /* screensaver system settings to be restored when vout is closed */
-    UINT i_spi_lowpowertimeout;
-    UINT i_spi_powerofftimeout;
-    UINT i_spi_screensavetimeout;
+    UINT i_spi_screensaveactive;
 
 #endif
 

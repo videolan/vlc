@@ -694,25 +694,29 @@ static void DisableScreensaver(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     /* disable screensaver by temporarily changing system settings */
-    sys->i_spi_lowpowertimeout = 0;
-    sys->i_spi_powerofftimeout = 0;
-    sys->i_spi_screensavetimeout = 0;
+    sys->i_spi_screensaveactive = 0;
     if (var_GetBool(vd, "disable-screensaver")) {
         msg_Dbg(vd, "disabling screen saver");
-        SystemParametersInfo(SPI_GETLOWPOWERTIMEOUT, 0,
-                             &sys->i_spi_lowpowertimeout, 0);
-        if (0 != sys->i_spi_lowpowertimeout) {
-            SystemParametersInfo(SPI_SETLOWPOWERTIMEOUT, 0, NULL, 0);
+        SystemParametersInfo(SPI_GETSCREENSAVEACTIVE, 0,
+                             &sys->i_spi_screensaveactive, 0);
+
+        if (LOWORD(GetVersion()) == 0x0005) {
+            /* If this is NT 5.0 (i.e., Win2K), we need to hack around
+             * KB318781 (see http://support.microsoft.com/kb/318781) */
+
+            HKEY hKeyCP = NULL;
+
+            if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER,
+                                              TEXT("Control Panel\\Desktop"),
+                                              0, KEY_QUERY_VALUE, &hKeyCP) &&
+                ERROR_SUCCESS != RegQueryValueEx(hKeyCP, TEXT("SCRNSAVE.EXE"),
+                                                 NULL, NULL, NULL, NULL)) {
+                sys->i_spi_screensaveactive = FALSE;
+            }
         }
-        SystemParametersInfo(SPI_GETPOWEROFFTIMEOUT, 0,
-                             &sys->i_spi_powerofftimeout, 0);
-        if (0 != sys->i_spi_powerofftimeout) {
-            SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, 0, NULL, 0);
-        }
-        SystemParametersInfo(SPI_GETSCREENSAVETIMEOUT, 0,
-                             &sys->i_spi_screensavetimeout, 0);
-        if (0 != sys->i_spi_screensavetimeout) {
-            SystemParametersInfo(SPI_SETSCREENSAVETIMEOUT, 0, NULL, 0);
+
+        if (FALSE != sys->i_spi_screensaveactive) {
+            SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, 0, NULL, 0);
         }
     }
 }
@@ -722,17 +726,9 @@ static void RestoreScreensaver(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     /* restore screensaver system settings */
-    if (0 != sys->i_spi_lowpowertimeout) {
-        SystemParametersInfo(SPI_SETLOWPOWERTIMEOUT,
-                             sys->i_spi_lowpowertimeout, NULL, 0);
-    }
-    if (0 != sys->i_spi_powerofftimeout) {
-        SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT,
-                             sys->i_spi_powerofftimeout, NULL, 0);
-    }
-    if (0 != sys->i_spi_screensavetimeout) {
-        SystemParametersInfo(SPI_SETSCREENSAVETIMEOUT,
-                             sys->i_spi_screensavetimeout, NULL, 0);
+    if (0 != sys->i_spi_screensaveactive) {
+        SystemParametersInfo(SPI_SETSCREENSAVEACTIVE,
+                             sys->i_spi_screensaveactive, NULL, 0);
     }
 }
 #endif
