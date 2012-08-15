@@ -961,21 +961,19 @@ void IntegerListConfigControl::finish(module_config_t *p_module_config )
 
     if(!p_module_config) return;
 
-    if( p_module_config->pf_update_list )
+    int64_t *values;
+    char **texts;
+    ssize_t count = config_GetIntChoices( p_this, p_module_config->psz_name,
+                                          &values, &texts );
+    for( ssize_t i = 0; i < count; i++ )
     {
-       vlc_value_t val;
-       val.i_int = p_module_config->value.i;
-
-       p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
-    }
-
-    for( int i_index = 0; i_index < p_module_config->i_list; i_index++ )
-    {
-        combo->addItem( qtr(p_module_config->ppsz_list_text[i_index] ),
-                        QVariant( p_module_config->pi_list[i_index] ) );
-        if( p_module_config->value.i == p_module_config->pi_list[i_index] )
+        combo->addItem( qtr(texts[i]), qlonglong(values[i]) );
+        if( p_module_config->value.i == values[i] )
             combo->setCurrentIndex( combo->count() - 1 );
+        free( texts[i] );
     }
+    free( texts );
+    free( values );
     if( p_item->psz_longtext )
     {
         QString tipText = qtr(p_item->psz_longtext );
