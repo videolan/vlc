@@ -73,6 +73,17 @@ typedef struct libvlc_audio_output_t
 } libvlc_audio_output_t;
 
 /**
+ * Description for audio output device.
+ */
+typedef struct libvlc_audio_output_device_t
+{
+    struct libvlc_audio_output_device_t *p_next; /**< Next entry in list */
+    char *psz_device; /**< Device identifier string */
+    char *psz_description; /**< User-friendly device description */
+    /* More fields may be added here in later versions */
+} libvlc_audio_output_device_t;
+
+/**
  * Rectangle type for video geometry
  */
 typedef struct libvlc_rectangle_t
@@ -1362,7 +1373,7 @@ typedef enum libvlc_audio_output_channel_t {
 
 
 /**
- * Get the list of available audio outputs
+ * Gets the list of available audio outputs
  *
  * \param p_instance libvlc instance
  * \return list of available audio outputs. It must be freed it with
@@ -1370,18 +1381,20 @@ typedef enum libvlc_audio_output_channel_t {
  *         In case of error, NULL is returned.
  */
 LIBVLC_API libvlc_audio_output_t *
-        libvlc_audio_output_list_get( libvlc_instance_t *p_instance );
+libvlc_audio_output_list_get( libvlc_instance_t *p_instance );
 
 /**
- * Free the list of available audio outputs
+ * Frees the list of available audio outputs
  *
  * \param p_list list with audio outputs for release
  */
-LIBVLC_API void libvlc_audio_output_list_release( libvlc_audio_output_t *p_list );
+LIBVLC_API
+void libvlc_audio_output_list_release( libvlc_audio_output_t *p_list );
 
 /**
- * Set the audio output.
- * Change will be applied after stop and play.
+ * Sets the audio output.
+ * \note Any change will take be effect only after playback is stopped and
+ * restarted. Audio output cannot be changed while playing.
  *
  * \param p_mi media player
  * \param psz_name name of audio output,
@@ -1389,53 +1402,88 @@ LIBVLC_API void libvlc_audio_output_list_release( libvlc_audio_output_t *p_list 
  * \return 0 if function succeded, -1 on error
  */
 LIBVLC_API int libvlc_audio_output_set( libvlc_media_player_t *p_mi,
-                                            const char *psz_name );
+                                        const char *psz_name );
 
 /**
- * Get count of devices for audio output, these devices are hardware oriented
- * like analor or digital output of sound card
+ * Backward compatibility stub. Do not use in new code.
+ * Use libvlc_audio_output_device_list_get() instead.
+ * \return always 0.
+ */
+LIBVLC_DEPRECATED
+int libvlc_audio_output_device_count( libvlc_instance_t *, const char * );
+
+/**
+ * Backward compatibility stub. Do not use in new code.
+ * Use libvlc_audio_output_device_list_get() instead.
+ * \return always NULL.
+ */
+LIBVLC_DEPRECATED
+char *libvlc_audio_output_device_longname( libvlc_instance_t *, const char *,
+                                           int );
+
+/**
+ * Backward compatibility stub. Do not use in new code.
+ * Use libvlc_audio_output_device_list_get() instead.
+ * \return always NULL.
+ */
+LIBVLC_DEPRECATED
+char *libvlc_audio_output_device_id( libvlc_instance_t *, const char *, int );
+
+/**
+ * Gets a list of audio output devices for a given audio output.
+ * \see libvlc_audio_output_device_set().
+ *
+ * \note Not all audio outputs support this. In particular, an empty (NULL)
+ * list of devices does <b>not</b> imply that the specified audio output does
+ * not work.
+ *
+ * \note The list might not be exhaustive.
+ *
+ * \warning Some audio output devices in the list might not actually work in
+ * some circumstances. By default, it is recommended to not specify any
+ * explicit audio device.
  *
  * \param p_instance libvlc instance
- * \param psz_audio_output - name of audio output, \see libvlc_audio_output_t
- * \return number of devices
+ * \param psz_aout audio output name
+ *                 (as returned by libvlc_audio_output_list_get())
+ * \return A NULL-terminated linked list of potential audio output devices.
+ * It must be freed it with libvlc_audio_output_device_list_release()
+ * \version LibVLC 2.1.0 or later.
  */
-LIBVLC_API int libvlc_audio_output_device_count( libvlc_instance_t *p_instance,
-                                                     const char *psz_audio_output );
+LIBVLC_API libvlc_audio_output_device_t *
+libvlc_audio_output_device_list_get( libvlc_instance_t *p_instance,
+                                     const char *aout );
 
 /**
- * Get long name of device, if not available short name given
+ * Frees a list of available audio output devices.
  *
- * \param p_instance libvlc instance
- * \param psz_audio_output - name of audio output, \see libvlc_audio_output_t
- * \param i_device device index
- * \return long name of device
+ * \param p_list list with audio outputs for release
+ * \version LibVLC 2.1.0 or later.
  */
-LIBVLC_API char * libvlc_audio_output_device_longname( libvlc_instance_t *p_instance,
-                                                           const char *psz_audio_output,
-                                                           int i_device );
+LIBVLC_API void libvlc_audio_output_device_list_release(
+                                        libvlc_audio_output_device_t *p_list );
 
 /**
- * Get id name of device
+ * Configures an explicit audio output device for a given audio output plugin.
+ * A list of possible devices can be obtained with
+ * libvlc_audio_output_device_list_get().
  *
- * \param p_instance libvlc instance
- * \param psz_audio_output - name of audio output, \see libvlc_audio_output_t
- * \param i_device device index
- * \return id name of device, use for setting device, need to be free after use
- */
-LIBVLC_API char * libvlc_audio_output_device_id( libvlc_instance_t *p_instance,
-                                                     const char *psz_audio_output,
-                                                     int i_device );
-
-/**
- * Set audio output device. Changes are only effective after stop and play.
+ * \note This function does not select the specified audio output plugin.
+ * libvlc_audio_output_set() is used for that purpose.
+ *
+ * \warning The syntax for the device parameter depends on the audio output.
+ * This is not portable. Only use this function if you know what you are doing.
+ * Some audio outputs do not support this function (e.g. PulseAudio, WASAPI).
+ * Some audio outputs require further parameters (e.g. ALSA: channels map).
  *
  * \param p_mi media player
  * \param psz_audio_output - name of audio output, \see libvlc_audio_output_t
  * \param psz_device_id device
+ * \return Nothing. Errors are ignored.
  */
 LIBVLC_API void libvlc_audio_output_device_set( libvlc_media_player_t *p_mi,
-                                                    const char *psz_audio_output,
-                                                    const char *psz_device_id );
+                                                const char *psz_audio_output,
+                                                const char *psz_device_id );
 
 /**
  * Get current audio device type. Device type describes something like

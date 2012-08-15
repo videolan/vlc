@@ -135,119 +135,71 @@ int libvlc_audio_output_set( libvlc_media_player_t *mp, const char *psz_name )
     return 0;
 }
 
-/****************************
- * Get count of devices.
- *****************************/
+libvlc_audio_output_device_t *
+libvlc_audio_output_device_list_get( libvlc_instance_t *p_instance,
+                                     const char *aout )
+{
+    char varname[32];
+    if( (size_t)snprintf( varname, sizeof(varname), "%s-output-device", aout )
+                                                           >= sizeof(varname) )
+        return NULL;
+
+    libvlc_audio_output_device_t *list = NULL, **pp = &list;
+    char **values, **texts;
+    ssize_t count = config_GetPszChoices( VLC_OBJECT(p_instance->p_libvlc_int),
+                                          varname, &values, &texts );
+    for( ssize_t i = 0; i < count; i++ )
+    {
+        libvlc_audio_output_device_t *item = malloc( sizeof(*item) );
+        if( unlikely(item == NULL) )
+            break;
+
+        *pp = item;
+        pp = &item->p_next;
+        item->psz_device = values[i];
+        item->psz_description = texts[i];
+    }
+
+    *pp = NULL;
+    free( texts );
+    free( values );
+    (void) p_instance;
+    return list;
+}
+
+void libvlc_audio_output_device_list_release( libvlc_audio_output_device_t *l )
+{
+    while( l != NULL )
+    {
+        libvlc_audio_output_device_t *next = l->p_next;
+
+        free( l->psz_description );
+        free( l->psz_device );
+        free( l );
+        l = next;
+    }
+}
+
 int libvlc_audio_output_device_count( libvlc_instance_t *p_instance,
                                       const char *psz_audio_output )
 {
-    char *psz_config_name;
-    if( !psz_audio_output )
-        return 0;
-    if( asprintf( &psz_config_name, "%s-audio-device", psz_audio_output ) == -1 )
-        return 0;
-
-    module_config_t *p_module_config = config_FindConfig(
-        VLC_OBJECT( p_instance->p_libvlc_int ), psz_config_name );
-
-    if( p_module_config && p_module_config->pf_update_list )
-    {
-        vlc_value_t val;
-        val.psz_string = strdup( p_module_config->value.psz );
-
-        p_module_config->pf_update_list(
-            VLC_OBJECT( p_instance->p_libvlc_int ), psz_config_name, val, val, NULL );
-        free( val.psz_string );
-        free( psz_config_name );
-
-        return p_module_config->i_list;
-    }
-
-    free( psz_config_name );
+    (void) p_instance; (void) psz_audio_output;
     return 0;
 }
 
-/********************************
- * Get long name of device
- *********************************/
-char * libvlc_audio_output_device_longname( libvlc_instance_t *p_instance,
-                                            const char *psz_audio_output,
-                                            int i_device )
+char *libvlc_audio_output_device_longname( libvlc_instance_t *p_instance,
+                                           const char *psz_audio_output,
+                                           int i_device )
 {
-    char *psz_config_name;
-    if( !psz_audio_output )
-        return NULL;
-    if( asprintf( &psz_config_name, "%s-audio-device", psz_audio_output ) == -1 )
-        return NULL;
-
-    module_config_t *p_module_config = config_FindConfig(
-        VLC_OBJECT( p_instance->p_libvlc_int ), psz_config_name );
-
-    if( p_module_config )
-    {
-        // refresh if there arent devices
-        if( p_module_config->i_list < 2 && p_module_config->pf_update_list )
-        {
-            vlc_value_t val;
-            val.psz_string = strdup( p_module_config->value.psz );
-
-            p_module_config->pf_update_list(
-                VLC_OBJECT( p_instance->p_libvlc_int ), psz_config_name, val, val, NULL );
-            free( val.psz_string );
-        }
-
-        if( i_device >= 0 && i_device < p_module_config->i_list )
-        {
-            free( psz_config_name );
-
-            if( p_module_config->ppsz_list_text[i_device] )
-                return strdup( p_module_config->ppsz_list_text[i_device] );
-            else
-                return strdup( p_module_config->ppsz_list[i_device] );
-        }
-    }
-
-    free( psz_config_name );
+    (void) p_instance; (void) psz_audio_output; (void) i_device;
     return NULL;
 }
 
-/********************************
- * Get id name of device
- *********************************/
-char * libvlc_audio_output_device_id( libvlc_instance_t *p_instance,
-                                      const char *psz_audio_output,
-                                      int i_device )
+char *libvlc_audio_output_device_id( libvlc_instance_t *p_instance,
+                                     const char *psz_audio_output,
+                                     int i_device )
 {
-    char *psz_config_name;
-    if( !psz_audio_output )
-        return NULL;
-    if( asprintf( &psz_config_name, "%s-audio-device", psz_audio_output ) == -1)
-        return NULL;
-
-    module_config_t *p_module_config = config_FindConfig(
-        VLC_OBJECT( p_instance->p_libvlc_int ), psz_config_name );
-
-    if( p_module_config )
-    {
-        // refresh if there arent devices
-        if( p_module_config->i_list < 2 && p_module_config->pf_update_list )
-        {
-            vlc_value_t val;
-            val.psz_string = strdup( p_module_config->value.psz );
-
-            p_module_config->pf_update_list(
-                VLC_OBJECT( p_instance->p_libvlc_int ), psz_config_name, val, val, NULL );
-            free( val.psz_string );
-        }
-
-        if( i_device >= 0 && i_device < p_module_config->i_list )
-        {
-            free( psz_config_name );
-            return strdup( p_module_config->ppsz_list[i_device] );
-        }
-    }
-
-    free( psz_config_name );
+    (void) p_instance; (void) psz_audio_output; (void) i_device;
     return NULL;
 }
 
