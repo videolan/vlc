@@ -455,7 +455,7 @@ void ExtVideo::initComboBoxItems( QObject *widget )
                                               qtu( option ), &values, &texts );
         for( ssize_t i = 0; i < count; i++ )
         {
-            combobox->addItem( qtr( texts[i] ), values[i] );
+            combobox->addItem( qtr( texts[i] ), qlonglong(values[i]) );
             free( texts[i] );
         }
         free( texts );
@@ -469,7 +469,7 @@ void ExtVideo::initComboBoxItems( QObject *widget )
                                               qtu( option ), &values, &texts );
         for( ssize_t i = 0; i < count; i++ )
         {
-            combobox->addItem( qtr( texts[i] ), values[i] );
+            combobox->addItem( qtr( texts[i] ), qfu(values[i]) );
             free( texts[i] );
             free( values[i] );
         }
