@@ -606,10 +606,10 @@ static int D3dCreateDevice(vlc_va_dxva2_t *va)
 
     /* Direct3D needs a HWND to create a device, even without using ::Present
     this HWND is used to alert Direct3D when there's a change of focus window.
-    For now, use GetShellWindow, as it looks harmless */
+    For now, use GetDesktopWindow, as it looks harmless */
     LPDIRECT3DDEVICE9 d3ddev;
     if (FAILED(IDirect3D9_CreateDevice(d3dobj, D3DADAPTER_DEFAULT,
-                                       D3DDEVTYPE_HAL, GetShellWindow(),
+                                       D3DDEVTYPE_HAL, GetDesktopWindow(),
                                        D3DCREATE_SOFTWARE_VERTEXPROCESSING |
                                        D3DCREATE_MULTITHREADED,
                                        d3dpp, &d3ddev))) {
