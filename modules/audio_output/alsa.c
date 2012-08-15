@@ -82,7 +82,6 @@ vlc_module_begin ()
     add_string ("alsa-audio-device", "default",
                 AUDIO_DEV_TEXT, AUDIO_DEV_LONGTEXT, false)
         change_string_cb( FindDevicesCallback )
-        change_action_add( FindDevicesCallback, N_("Refresh list") )
     add_integer ("alsa-audio-channels", AOUT_CHANS_FRONT,
                  AUDIO_CHAN_TEXT, AUDIO_CHAN_LONGTEXT, false)
         change_integer_list (channels, channels_text)

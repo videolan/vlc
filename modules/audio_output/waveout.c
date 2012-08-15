@@ -145,7 +145,6 @@ vlc_module_begin ()
     add_string( "waveout-audio-device", "wavemapper",
                  DEVICE_TEXT, DEVICE_LONG, false )
        change_string_cb( ReloadWaveoutDevices )
-       change_action_add( ReloadWaveoutDevices, N_("Refresh list") )
     add_sw_gain( )
 
     add_bool( "waveout-float32", true, FLOAT_TEXT, FLOAT_LONGTEXT, true )

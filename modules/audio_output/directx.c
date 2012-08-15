@@ -144,7 +144,6 @@ vlc_module_begin ()
     add_string( "directx-audio-device", "default",
              DEVICE_TEXT, DEVICE_LONGTEXT, false )
         change_string_cb( ReloadDirectXDevices )
-        change_action_add( ReloadDirectXDevices, N_("Refresh list") )
     add_obsolete_string( "directx-audio-device-name")
     add_bool( "directx-audio-float32", false, FLOAT_TEXT,
               FLOAT_LONGTEXT, true )

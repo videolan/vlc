@@ -223,12 +223,10 @@ vlc_module_begin ()
 
     add_string( CFG_PREFIX "vdev", NULL, VDEV_TEXT, VDEV_LONGTEXT, false)
         change_string_cb( FindDevicesCallback )
-        change_action_add( FindDevicesCallback, N_("Refresh list") )
         change_action_add( ConfigDevicesCallback, N_("Configure") )
 
     add_string( CFG_PREFIX "adev", NULL, ADEV_TEXT, ADEV_LONGTEXT, false)
         change_string_cb( FindDevicesCallback )
-        change_action_add( FindDevicesCallback, N_("Refresh list") )
         change_action_add( ConfigDevicesCallback, N_("Configure") )
 
     add_string( CFG_PREFIX "size", NULL, SIZE_TEXT, SIZE_LONGTEXT, false)

@@ -103,7 +103,6 @@ vlc_module_begin()
               TRIPLEBUF_LONGTEXT, true)
     add_string("directx-device", "", DEVICE_TEXT, DEVICE_LONGTEXT, true)
         change_string_cb(FindDevicesCallback)
-        change_action_add(FindDevicesCallback, N_("Refresh list"))
 
     set_capability("vout display", 230)
     add_shortcut("directx")
