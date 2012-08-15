@@ -62,8 +62,8 @@ endif
 if BUILD_OSDMENU
 	cp -r $(prefix)/share/vlc/osdmenu "$(win32_destdir)/"
 	for file in $(win32_destdir)/osdmenu/*.cfg; do \
-		sed -i.orig -e 's%share/osdmenu%osdmenu%g' -e 's%/%\\%g' "$$file"; \
-		rm -f -- "$${file}.orig"; \
+		sed -e 's%share/osdmenu%osdmenu%g' -e 's%/%\\%g' "$$file" > "$${file}.tmp"; \
+		mv -f "$${file}.tmp" "$${file}"; \
 	done
 endif
 
