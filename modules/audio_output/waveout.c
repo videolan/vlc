@@ -79,9 +79,6 @@ static uint32_t findDeviceID(char *);
 
 static const wchar_t device_name_fmt[] = L"%ls ($%x,$%x)";
 
-static const char *const ppsz_adev[] = { "wavemapper", };
-static const char *const ppsz_adev_text[] = { N_("Microsoft Soundmapper") };
-
 /*****************************************************************************
  * aout_sys_t: waveOut audio output method descriptor
  *****************************************************************************
@@ -147,7 +144,7 @@ vlc_module_begin ()
 
     add_string( "waveout-audio-device", "wavemapper",
                  DEVICE_TEXT, DEVICE_LONG, false )
-       change_string_list( ppsz_adev, ppsz_adev_text, ReloadWaveoutDevices )
+       change_string_cb( ReloadWaveoutDevices )
        change_action_add( ReloadWaveoutDevices, N_("Refresh list") )
     add_sw_gain( )
 

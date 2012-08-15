@@ -67,8 +67,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VOUT )
     add_string( "kva-video-mode", ppsz_kva_video_mode[0], KVA_VIDEO_MODE_TEXT,
                 KVA_VIDEO_MODE_LONGTEXT, false )
-        change_string_list( ppsz_kva_video_mode, ppsz_kva_video_mode_text, 0 )
-    add_bool( "kva-fixt23", false, KVA_FIXT23_TEXT, KVA_FIXT23_LONGTEXT, true );
+        change_string_list( ppsz_kva_video_mode, ppsz_kva_video_mode_text )
+    add_bool( "kva-fixt23", false, KVA_FIXT23_TEXT, KVA_FIXT23_LONGTEXT, true )
     set_description( N_("K Video Acceleration video output") )
     set_capability( "vout display", 100 )
     add_shortcut( "kva" )

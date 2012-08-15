@@ -113,7 +113,7 @@ vlc_module_begin ()
                   FILE_LONGTEXT, false )
     add_string( "audiofile-format", "s16",
                 FORMAT_TEXT, FORMAT_TEXT, true )
-        change_string_list( format_list, format_list, NULL )
+        change_string_list( format_list, format_list )
     add_integer( "audiofile-channels", 0,
                  CHANNELS_TEXT, CHANNELS_LONGTEXT, true )
         change_integer_range( 0, 6 )

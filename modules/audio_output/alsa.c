@@ -60,12 +60,6 @@ static void GetDevices (vlc_object_t *, module_config_t *, const char *);
 
 #define AUDIO_DEV_TEXT N_("Audio output device")
 #define AUDIO_DEV_LONGTEXT N_("Audio output device (using ALSA syntax).")
-static const char *const devices[] = {
-    "default",
-};
-static const char *const devices_text[] = {
-    N_("Default"),
-};
 
 #define AUDIO_CHAN_TEXT N_("Audio output channels")
 #define AUDIO_CHAN_LONGTEXT N_("Channels available for audio output." \
@@ -87,7 +81,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_string ("alsa-audio-device", "default",
                 AUDIO_DEV_TEXT, AUDIO_DEV_LONGTEXT, false)
-        change_string_list( devices, devices_text, FindDevicesCallback )
+        change_string_cb( FindDevicesCallback )
         change_action_add( FindDevicesCallback, N_("Refresh list") )
     add_integer ("alsa-audio-channels", AOUT_CHANS_FRONT,
                  AUDIO_CHAN_TEXT, AUDIO_CHAN_LONGTEXT, false)

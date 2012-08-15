@@ -75,7 +75,7 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_capability("video filter2", 0)
     add_string(FILTER_PREFIX "scheme", "red-cyan", SCHEME_TEXT, SCHEME_LONGTEXT, false)
-        change_string_list(ppsz_scheme_values, ppsz_scheme_descriptions, 0)
+        change_string_list(ppsz_scheme_values, ppsz_scheme_descriptions)
     set_callbacks(Create, Destroy)
 vlc_module_end()
 

@@ -89,8 +89,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_string( "kai-audio-device", ppsz_kai_audio_device[0],
                 KAI_AUDIO_DEVICE_TEXT, KAI_AUDIO_DEVICE_LONGTEXT, false )
-        change_string_list( ppsz_kai_audio_device, ppsz_kai_audio_device_text,
-                            0 )
+        change_string_list( ppsz_kai_audio_device, ppsz_kai_audio_device_text )
     add_sw_gain( )
     add_bool( "kai-audio-exclusive-mode", false,
               KAI_AUDIO_EXCLUSIVE_MODE_TEXT, KAI_AUDIO_EXCLUSIVE_MODE_LONGTEXT,

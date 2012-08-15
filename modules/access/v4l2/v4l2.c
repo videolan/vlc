@@ -276,7 +276,7 @@ vlc_module_begin ()
         change_safe()
     add_string( CFG_PREFIX "standard", "",
                 STANDARD_TEXT, STANDARD_LONGTEXT, false )
-        change_string_list( standards_vlc, standards_user, NULL )
+        change_string_list( standards_vlc, standards_user )
         change_safe()
     add_string( CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 true )

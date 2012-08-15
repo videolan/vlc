@@ -100,7 +100,7 @@ vlc_module_begin ()
 
         add_string ("gnutls-priorities", "NORMAL", PRIORITIES_TEXT,
                     PRIORITIES_LONGTEXT, false)
-            change_string_list (priorities_values, priorities_text, NULL)
+            change_string_list (priorities_values, priorities_text)
 vlc_module_end ()
 
 static vlc_mutex_t gnutls_mutex = VLC_STATIC_MUTEX;

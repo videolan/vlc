@@ -87,12 +87,6 @@ static void ConfigTuner( vlc_object_t *, ICaptureGraphBuilder2 *,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static const char *const ppsz_vdev[] = { "", "none" };
-static const char *const ppsz_vdev_text[] = { N_("Default"), N_("None") };
-
-static const char *const ppsz_adev[] = { "", "none" };
-static const char *const ppsz_adev_text[] = { N_("Default"), N_("None") };
-
 static const int pi_tuner_input[] = { 0, 1, 2 };
 static const char *const ppsz_tuner_input_text[] =
     {N_("Default"), N_("Cable"), N_("Antenna")};
@@ -228,12 +222,12 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_string( CFG_PREFIX "vdev", NULL, VDEV_TEXT, VDEV_LONGTEXT, false)
-        change_string_list( ppsz_vdev, ppsz_vdev_text, FindDevicesCallback )
+        change_string_cb( FindDevicesCallback )
         change_action_add( FindDevicesCallback, N_("Refresh list") )
         change_action_add( ConfigDevicesCallback, N_("Configure") )
 
     add_string( CFG_PREFIX "adev", NULL, ADEV_TEXT, ADEV_LONGTEXT, false)
-        change_string_list( ppsz_adev, ppsz_adev_text, FindDevicesCallback )
+        change_string_cb( FindDevicesCallback )
         change_action_add( FindDevicesCallback, N_("Refresh list") )
         change_action_add( ConfigDevicesCallback, N_("Configure") )
 

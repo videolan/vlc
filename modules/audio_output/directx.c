@@ -119,8 +119,6 @@ static int ReloadDirectXDevices( vlc_object_t *, char const *,
 /* Speaker setup override options list */
 static const char *const speaker_list[] = { "Windows default", "Mono", "Stereo",
                                             "Quad", "5.1", "7.1" };
-static const char *const ppsz_adev[] = {"default",  };
-static const char *const ppsz_adev_text[] = {"default", };
 
 /*****************************************************************************
  * Module descriptor
@@ -145,14 +143,14 @@ vlc_module_begin ()
 
     add_string( "directx-audio-device", "default",
              DEVICE_TEXT, DEVICE_LONGTEXT, false )
-        change_string_list( ppsz_adev, ppsz_adev_text, ReloadDirectXDevices )
+        change_string_cb( ReloadDirectXDevices )
         change_action_add( ReloadDirectXDevices, N_("Refresh list") )
     add_obsolete_string( "directx-audio-device-name")
     add_bool( "directx-audio-float32", false, FLOAT_TEXT,
               FLOAT_LONGTEXT, true )
     add_string( "directx-audio-speaker", "Windows default",
                  SPEAKER_TEXT, SPEAKER_LONGTEXT, true )
-        change_string_list( speaker_list, speaker_list, NULL )
+        change_string_list( speaker_list, speaker_list )
     add_integer( "directx-volume", DSBVOLUME_MAX,
                  VOLUME_TEXT, VOLUME_LONGTEXT, true )
         change_integer_range( DSBVOLUME_MIN, DSBVOLUME_MAX )

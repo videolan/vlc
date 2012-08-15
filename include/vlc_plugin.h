@@ -470,12 +470,15 @@ VLC_METADATA_EXPORTS
 #define change_short( ch ) \
     vlc_config_set (VLC_CONFIG_SHORTCUT, (int)(ch));
 
-#define change_string_list( list, list_text, list_update_func ) \
+#define change_string_list( list, list_text ) \
     vlc_config_set (VLC_CONFIG_LIST, \
                     (size_t)(sizeof (list) / sizeof (char *)), \
                     (const char *const *)(list), \
                     (const char *const *)(list_text), \
-                    (vlc_callback_t)(list_update_func));
+                    (vlc_callback_t)NULL);
+
+#define change_string_cb( cb ) \
+    vlc_config_set (VLC_CONFIG_LIST, 0, NULL, NULL, (vlc_callback_t)(cb));
 
 #define change_integer_list( list, list_text ) \
     vlc_config_set (VLC_CONFIG_LIST, \

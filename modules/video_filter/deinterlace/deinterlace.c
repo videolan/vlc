@@ -102,7 +102,7 @@ vlc_module_begin ()
 
     add_string( FILTER_CFG_PREFIX "mode", "blend", SOUT_MODE_TEXT,
                 SOUT_MODE_LONGTEXT, false )
-        change_string_list( mode_list, mode_list_text, 0 )
+        change_string_list( mode_list, mode_list_text )
         change_safe ()
     add_integer( FILTER_CFG_PREFIX "phosphor-chroma", 2, PHOSPHOR_CHROMA_TEXT,
                 PHOSPHOR_CHROMA_LONGTEXT, true )

@@ -87,7 +87,7 @@ vlc_module_begin ()
 
     add_string( FILTER_PREFIX "mode", "gradient",
                 MODE_TEXT, MODE_LONGTEXT, false )
-        change_string_list( mode_list, mode_list_text, 0 )
+        change_string_list( mode_list, mode_list_text )
 
     add_integer_with_range( FILTER_PREFIX "type", 0, 0, 1,
                 GRADIENT_TEXT, GRADIENT_LONGTEXT, false )

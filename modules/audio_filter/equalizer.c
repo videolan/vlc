@@ -85,7 +85,7 @@ vlc_module_begin ()
 
     add_string( "equalizer-preset", "flat", PRESET_TEXT,
                 PRESET_LONGTEXT, false )
-        change_string_list( preset_list, preset_list_text, 0 )
+        change_string_list( preset_list, preset_list_text )
     add_string( "equalizer-bands", NULL, BANDS_TEXT,
                 BANDS_LONGTEXT, true )
     add_bool( "equalizer-2pass", false, TWOPASS_TEXT,

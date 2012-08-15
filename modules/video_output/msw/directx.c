@@ -84,9 +84,6 @@
 #define DX_HELP N_("Recommended video output for Windows XP. " \
     "Incompatible with Vista's Aero interface" )
 
-static const char * const device[] = { "" };
-static const char * const device_text[] = { N_("Default") };
-
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
 
@@ -105,7 +102,7 @@ vlc_module_begin()
     add_bool("directx-3buffering", true, TRIPLEBUF_TEXT,
               TRIPLEBUF_LONGTEXT, true)
     add_string("directx-device", "", DEVICE_TEXT, DEVICE_LONGTEXT, true)
-        change_string_list(device, device_text, FindDevicesCallback)
+        change_string_cb(FindDevicesCallback)
         change_action_add(FindDevicesCallback, N_("Refresh list"))
 
     set_capability("vout display", 230)

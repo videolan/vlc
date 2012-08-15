@@ -459,7 +459,7 @@ vlc_module_begin ()
 #if X264_BUILD >= 102 && X264_BUILD <= 114
     add_string( SOUT_CFG_PREFIX "opengop", "none", OPENGOP_TEXT,
                OPENGOP_LONGTEXT, true )
-        change_string_list( x264_open_gop_names, x264_open_gop_names, 0 );
+        change_string_list( x264_open_gop_names, x264_open_gop_names )
 #elif X264_BUILD > 114
     add_bool( SOUT_CFG_PREFIX "opengop", false, OPENGOP_TEXT,
                OPENGOP_LONGTEXT, true )
@@ -492,7 +492,7 @@ vlc_module_begin ()
     add_string( SOUT_CFG_PREFIX "bpyramid", "none", BPYRAMID_TEXT,
               BPYRAMID_LONGTEXT, true )
 #endif
-        change_string_list( bpyramid_list, bpyramid_list, 0 );
+        change_string_list( bpyramid_list, bpyramid_list )
 
     add_bool( SOUT_CFG_PREFIX "cabac", true, CABAC_TEXT, CABAC_LONGTEXT,
               true )
@@ -517,7 +517,7 @@ vlc_module_begin ()
 
     add_string( SOUT_CFG_PREFIX "profile", "high", PROFILE_TEXT,
                PROFILE_LONGTEXT, false )
-        change_string_list( x264_profile_names, x264_profile_names, 0 );
+        change_string_list( x264_profile_names, x264_profile_names )
 
     add_bool( SOUT_CFG_PREFIX "interlaced", false, INTERLACED_TEXT, INTERLACED_LONGTEXT,
               true )
@@ -534,7 +534,7 @@ vlc_module_begin ()
 
 #if X264_BUILD >= 89
     add_string( SOUT_CFG_PREFIX "hrd", "none", HRD_TEXT, HRD_TEXT, true )
-        change_string_list( x264_nal_hrd_names, x264_nal_hrd_names, 0 );
+        change_string_list( x264_nal_hrd_names, x264_nal_hrd_names )
 #endif
 
 
@@ -610,11 +610,11 @@ vlc_module_begin ()
     /* x264 partitions = none (default). set at least "normal" mode. */
     add_string( SOUT_CFG_PREFIX "partitions", "normal", ANALYSE_TEXT,
                 ANALYSE_LONGTEXT, true )
-        change_string_list( enc_analyse_list, enc_analyse_list_text, 0 );
+        change_string_list( enc_analyse_list, enc_analyse_list_text )
 
     add_string( SOUT_CFG_PREFIX "direct", "spatial", DIRECT_PRED_TEXT,
                 DIRECT_PRED_LONGTEXT, true )
-        change_string_list( direct_pred_list, direct_pred_list_text, 0 );
+        change_string_list( direct_pred_list, direct_pred_list_text )
 
     add_integer( SOUT_CFG_PREFIX "direct-8x8", 1, DIRECT_PRED_SIZE_TEXT,
                  DIRECT_PRED_SIZE_LONGTEXT, true )
@@ -629,7 +629,7 @@ vlc_module_begin ()
 
     add_string( SOUT_CFG_PREFIX "me", "hex", ME_TEXT,
                 ME_LONGTEXT, true )
-        change_string_list( enc_me_list, enc_me_list_text, 0 );
+        change_string_list( enc_me_list, enc_me_list_text )
 
     add_integer( SOUT_CFG_PREFIX "merange", 16, MERANGE_TEXT,
                  MERANGE_LONGTEXT, true )
@@ -720,9 +720,9 @@ vlc_module_begin ()
                 STATS_LONGTEXT, true )
 
     add_string( SOUT_CFG_PREFIX "preset", NULL , PRESET_TEXT , PRESET_TEXT, false )
-        change_string_list( x264_preset_names, x264_preset_names, 0 );
+        change_string_list( x264_preset_names, x264_preset_names )
     add_string( SOUT_CFG_PREFIX "tune", NULL , TUNE_TEXT, TUNE_TEXT, false )
-        change_string_list( x264_tune_names, x264_tune_names, 0 );
+        change_string_list( x264_tune_names, x264_tune_names )
 
     add_string( SOUT_CFG_PREFIX "options", NULL, X264_OPTIONS_TEXT,
                 X264_OPTIONS_LONGTEXT, true )

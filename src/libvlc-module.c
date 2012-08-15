@@ -1501,7 +1501,7 @@ vlc_module_begin ()
     /* FIXME TODO create a subcat replay gain ? */
     add_string( "audio-replay-gain-mode", ppsz_replay_gain_mode[0], AUDIO_REPLAY_GAIN_MODE_TEXT,
                 AUDIO_REPLAY_GAIN_MODE_LONGTEXT, false )
-        change_string_list( ppsz_replay_gain_mode, ppsz_replay_gain_mode_text, 0 )
+        change_string_list( ppsz_replay_gain_mode, ppsz_replay_gain_mode_text )
     add_float( "audio-replay-gain-preamp", 0.0,
                AUDIO_REPLAY_GAIN_PREAMP_TEXT, AUDIO_REPLAY_GAIN_PREAMP_LONGTEXT, false )
     add_float( "audio-replay-gain-default", -7.0,
@@ -1589,7 +1589,7 @@ vlc_module_begin ()
                    SNAP_PREFIX_LONGTEXT, false )
     add_string( "snapshot-format", "png", SNAP_FORMAT_TEXT,
                    SNAP_FORMAT_LONGTEXT, false )
-        change_string_list( ppsz_snap_formats, ppsz_snap_formats, NULL )
+        change_string_list( ppsz_snap_formats, ppsz_snap_formats )
     add_bool( "snapshot-preview", true, SNAP_PREVIEW_TEXT,
               SNAP_PREVIEW_LONGTEXT, false )
     add_bool( "snapshot-sequential", false, SNAP_SEQUENTIAL_TEXT,
@@ -1637,7 +1637,7 @@ vlc_module_begin ()
         change_safe()
     add_string( "deinterlace-mode", "blend",
                 DEINTERLACE_MODE_TEXT, DEINTERLACE_MODE_LONGTEXT, false )
-        change_string_list( ppsz_deinterlace_mode, ppsz_deinterlace_mode_text, 0 )
+        change_string_list( ppsz_deinterlace_mode, ppsz_deinterlace_mode_text )
         change_safe()
 
     set_subcategory( SUBCAT_VIDEO_VOUT )

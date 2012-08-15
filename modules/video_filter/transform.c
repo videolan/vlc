@@ -61,7 +61,7 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VFILTER)
 
     add_string(CFG_PREFIX "type", "90", TYPE_TEXT, TYPE_TEXT, false)
-        change_string_list(type_list, type_list_text, 0)
+        change_string_list(type_list, type_list_text)
         change_safe()
 
     add_shortcut("transform")

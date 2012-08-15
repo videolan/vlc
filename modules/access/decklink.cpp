@@ -104,14 +104,14 @@ vlc_module_begin ()
                  MODE_TEXT, MODE_LONGTEXT, true )
     add_string( "decklink-audio-connection", 0,
                  AUDIO_CONNECTION_TEXT, AUDIO_CONNECTION_LONGTEXT, true )
-        change_string_list( ppsz_audioconns, ppsz_audioconns_text, 0 )
+        change_string_list( ppsz_audioconns, ppsz_audioconns_text )
     add_integer( "decklink-audio-rate", 48000,
                  RATE_TEXT, RATE_LONGTEXT, true )
     add_integer( "decklink-audio-channels", 2,
                  CHANNELS_TEXT, CHANNELS_LONGTEXT, true )
     add_string( "decklink-video-connection", 0,
                  VIDEO_CONNECTION_TEXT, VIDEO_CONNECTION_LONGTEXT, true )
-        change_string_list( ppsz_videoconns, ppsz_videoconns_text, 0 )
+        change_string_list( ppsz_videoconns, ppsz_videoconns_text )
     add_string( "decklink-aspect-ratio", NULL,
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, true )
 

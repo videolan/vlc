@@ -162,11 +162,11 @@ vlc_module_begin ()
              N_("Log filename"), N_("Specify the log filename."), false )
     add_string( "logmode", "text", LOGMODE_TEXT, LOGMODE_LONGTEXT,
                 false )
-        change_string_list( mode_list, mode_list_text, 0 )
+        change_string_list( mode_list, mode_list_text )
 #ifdef HAVE_SYSLOG_H
     add_string( "syslog-facility", fac_name[0], SYSLOG_FACILITY_TEXT,
                 SYSLOG_FACILITY_LONGTEXT, true )
-        change_string_list( fac_name, fac_name, 0 )
+        change_string_list( fac_name, fac_name )
 #endif
     add_integer( "log-verbose", -1, LOGVERBOSE_TEXT, LOGVERBOSE_LONGTEXT,
            false )

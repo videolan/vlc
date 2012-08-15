@@ -375,7 +375,7 @@ vlc_module_begin ()
 
     add_string( ENC_CFG_PREFIX ENC_RATE_CONTROL, NULL,
                  ENC_RATE_CONTROL_TEXT, ENC_RATE_CONTROL_LONGTEXT, false )
-    change_string_list( enc_rate_control_list, enc_rate_control_list_text, 0 );
+    change_string_list( enc_rate_control_list, enc_rate_control_list_text )
 
     add_float( ENC_CFG_PREFIX ENC_QUALITY, -1.,
                ENC_QUALITY_TEXT, ENC_QUALITY_LONGTEXT, false )
@@ -399,7 +399,7 @@ vlc_module_begin ()
 
     add_string( ENC_CFG_PREFIX ENC_GOP_STRUCTURE, NULL,
                  ENC_GOP_STRUCTURE_TEXT, ENC_GOP_STRUCTURE_LONGTEXT, false )
-    change_string_list( enc_gop_structure_list, enc_gop_structure_list_text, 0 );
+    change_string_list( enc_gop_structure_list, enc_gop_structure_list_text )
 
     add_integer( ENC_CFG_PREFIX ENC_AU_DISTANCE, -1,
                  ENC_AU_DISTANCE_TEXT, ENC_AU_DISTANCE_LONGTEXT, false )
@@ -407,26 +407,26 @@ vlc_module_begin ()
 
     add_string( ENC_CFG_PREFIX ENC_CHROMAFMT, "420",
                 ENC_CHROMAFMT_TEXT, ENC_CHROMAFMT_LONGTEXT, false )
-    change_string_list( enc_chromafmt_list, enc_chromafmt_list_text, 0 );
+    change_string_list( enc_chromafmt_list, enc_chromafmt_list_text )
 
     add_string( ENC_CFG_PREFIX ENC_CODINGMODE, "auto",
                 ENC_CODINGMODE_TEXT, ENC_CODINGMODE_LONGTEXT, false )
-    change_string_list( enc_codingmode_list, enc_codingmode_list_text, 0 );
+    change_string_list( enc_codingmode_list, enc_codingmode_list_text )
 
     add_string( ENC_CFG_PREFIX ENC_MVPREC, NULL,
                 ENC_MVPREC_TEXT, ENC_MVPREC_LONGTEXT, false )
-    change_string_list( enc_mvprec_list, enc_mvprec_list, 0 );
+    change_string_list( enc_mvprec_list, enc_mvprec_list )
 
     /* advanced option only */
     add_string( ENC_CFG_PREFIX ENC_MCBLK_SIZE, NULL,
                 ENC_MCBLK_SIZE_TEXT, ENC_MCBLK_SIZE_TEXT, true )
-    change_string_list( enc_block_size_list, enc_block_size_list_text, 0 );
+    change_string_list( enc_block_size_list, enc_block_size_list_text )
 
 
     /* advanced option only */
     add_string( ENC_CFG_PREFIX ENC_MCBLK_OVERLAP, NULL,
                 ENC_MCBLK_OVERLAP_TEXT, ENC_MCBLK_OVERLAP_TEXT, true )
-    change_string_list( enc_block_overlap_list, enc_block_overlap_list_text, 0 );
+    change_string_list( enc_block_overlap_list, enc_block_overlap_list_text )
 
     /* advanced option only */
     add_integer( ENC_CFG_PREFIX ENC_ME_COMBINED, -1,
@@ -455,11 +455,11 @@ vlc_module_begin ()
 
     add_string( ENC_CFG_PREFIX ENC_DWTINTRA, NULL,
                 ENC_DWTINTRA_TEXT, ENC_DWTINTRA_TEXT, false )
-    change_string_list( enc_wavelet_list, enc_wavelet_list_text, 0 );
+    change_string_list( enc_wavelet_list, enc_wavelet_list_text )
 
     add_string( ENC_CFG_PREFIX ENC_DWTINTER, NULL,
                 ENC_DWTINTER_TEXT, ENC_DWTINTER_TEXT, false )
-    change_string_list( enc_wavelet_list, enc_wavelet_list_text, 0 );
+    change_string_list( enc_wavelet_list, enc_wavelet_list_text )
 
     add_integer( ENC_CFG_PREFIX ENC_DWTDEPTH, -1,
                  ENC_DWTDEPTH_TEXT, ENC_DWTDEPTH_LONGTEXT, false )
@@ -473,11 +473,11 @@ vlc_module_begin ()
     /* advanced option only */
     add_string( ENC_CFG_PREFIX ENC_SCBLK_SIZE, NULL,
                 ENC_SCBLK_SIZE_TEXT, ENC_SCBLK_SIZE_TEXT, true )
-    change_string_list( enc_codeblock_size_list, enc_codeblock_size_list_text, 0 );
+    change_string_list( enc_codeblock_size_list, enc_codeblock_size_list_text )
 
     add_string( ENC_CFG_PREFIX ENC_PREFILTER, NULL,
                 ENC_PREFILTER_TEXT, ENC_PREFILTER_LONGTEXT, false )
-    change_string_list( enc_filtering_list, enc_filtering_list_text, 0 );
+    change_string_list( enc_filtering_list, enc_filtering_list_text )
 
     add_float( ENC_CFG_PREFIX ENC_PREFILTER_STRENGTH, -1.,
                  ENC_PREFILTER_STRENGTH_TEXT, ENC_PREFILTER_STRENGTH_LONGTEXT, false )
@@ -491,7 +491,7 @@ vlc_module_begin ()
     /* advanced option only */
     add_string( ENC_CFG_PREFIX ENC_PWT, NULL,
                 ENC_PWT_TEXT, ENC_PWT_TEXT, true )
-    change_string_list( enc_perceptual_weighting_list, enc_perceptual_weighting_list, 0 );
+    change_string_list( enc_perceptual_weighting_list, enc_perceptual_weighting_list )
 
     /* advanced option only */
     add_float( ENC_CFG_PREFIX ENC_PDIST, -1,
@@ -516,7 +516,7 @@ vlc_module_begin ()
     /* advanced option only */
     add_string( ENC_CFG_PREFIX ENC_FORCE_PROFILE, NULL,
                 ENC_FORCE_PROFILE_TEXT, ENC_FORCE_PROFILE_TEXT, true )
-    change_string_list( enc_profile_list, enc_profile_list_text, 0 );
+    change_string_list( enc_profile_list, enc_profile_list_text )
 
 vlc_module_end ()
 

@@ -125,7 +125,7 @@ vlc_module_begin ()
         change_integer_range (0, 32767)
     add_string ("rtp-dynamic-pt", NULL, RTP_DYNAMIC_PT_TEXT,
                 RTP_DYNAMIC_PT_LONGTEXT, true)
-        change_string_list (dynamic_pt_list, dynamic_pt_list_text, NULL)
+        change_string_list (dynamic_pt_list, dynamic_pt_list_text)
 
     /*add_shortcut ("sctp")*/
     add_shortcut ("dccp", "rtptcp", /* "tcp" is already taken :( */

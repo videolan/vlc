@@ -129,7 +129,7 @@ vlc_module_begin ()
 
     add_string( FILTER_PREFIX "color", "red",
                 BALL_COLOR_TEXT, BALL_COLOR_TEXT, false )
-    change_string_list( mode_list, mode_list_text, 0 )
+    change_string_list( mode_list, mode_list_text )
 
     add_integer_with_range( FILTER_PREFIX "speed", 4, 1, 15,
                             BALL_SPEED_TEXT, BALL_SPEED_LONGTEXT, false )

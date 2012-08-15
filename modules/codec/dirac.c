@@ -221,7 +221,7 @@ vlc_module_begin()
 
     add_string( ENC_CFG_PREFIX ENC_PREFILTER, "diaglp",
                 ENC_PREFILTER_TEXT, ENC_PREFILTER_LONGTEXT, false )
-    change_string_list( enc_prefilter_list, enc_prefilter_list_text, 0 );
+    change_string_list( enc_prefilter_list, enc_prefilter_list_text );
 
     add_integer( ENC_CFG_PREFIX ENC_PREFILTER_STRENGTH, 1,
                  ENC_PREFILTER_STRENGTH_TEXT, ENC_PREFILTER_STRENGTH_LONGTEXT, false )
@@ -229,7 +229,7 @@ vlc_module_begin()
 
     add_string( ENC_CFG_PREFIX ENC_CHROMAFMT, "420",
                 ENC_CHROMAFMT_TEXT, ENC_CHROMAFMT_LONGTEXT, false )
-    change_string_list( enc_chromafmt_list, enc_chromafmt_list_text, 0 );
+    change_string_list( enc_chromafmt_list, enc_chromafmt_list_text );
 
     add_integer( ENC_CFG_PREFIX ENC_L1SEP, -1,
                  ENC_L1SEP_TEXT, ENC_L1SEP_LONGTEXT, false )
@@ -241,11 +241,11 @@ vlc_module_begin()
 
     add_string( ENC_CFG_PREFIX ENC_CODINGMODE, "auto",
                 ENC_CODINGMODE_TEXT, ENC_CODINGMODE_LONGTEXT, false )
-    change_string_list( enc_codingmode_list, enc_codingmode_list_text, 0 );
+    change_string_list( enc_codingmode_list, enc_codingmode_list_text );
 
     add_string( ENC_CFG_PREFIX ENC_MVPREC, "1/2",
                 ENC_MVPREC_TEXT, ENC_MVPREC_LONGTEXT, false )
-    change_string_list( enc_mvprec_list, enc_mvprec_list, 0 );
+    change_string_list( enc_mvprec_list, enc_mvprec_list );
 
     add_integer( ENC_CFG_PREFIX ENC_MCBLK_WIDTH, -1,
                  ENC_MCBLK_WIDTH_TEXT, ENC_MCBLK_WIDTH_LONGTEXT, false )
