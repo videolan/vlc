@@ -68,64 +68,54 @@ libvlc_audio_output_t *
         libvlc_audio_output_list_get( libvlc_instance_t *p_instance )
 {
     VLC_UNUSED( p_instance );
-    libvlc_audio_output_t *p_list = NULL,
-                          *p_actual = NULL,
-                          *p_previous = NULL;
+    libvlc_audio_output_t *list = NULL;
     module_t **module_list = module_list_get( NULL );
 
     for (size_t i = 0; module_list[i]; i++)
     {
-        module_t *p_module = module_list[i];
+        module_t *module = module_list[i];
 
-        if( module_provides( p_module, "audio output" ) )
+        if( !module_provides( module, "audio output" ) )
+            continue;
+
+        libvlc_audio_output_t *item = malloc( sizeof( *item ) );
+        if( unlikely(item == NULL) )
         {
-            if( p_actual == NULL)
-            {
-                p_actual = ( libvlc_audio_output_t * )
-                    malloc( sizeof( libvlc_audio_output_t ) );
-                if( p_actual == NULL )
-                {
-                    libvlc_printerr( "Not enough memory" );
-                    libvlc_audio_output_list_release( p_list );
-                    module_list_free( module_list );
-                    return NULL;
-                }
-                if( p_list == NULL )
-                {
-                    p_list = p_actual;
-                    p_previous = p_actual;
-                }
-            }
-            p_actual->psz_name = strdup( module_get_object( p_module ) );
-            p_actual->psz_description = strdup( module_get_name( p_module, true )  );
-            p_actual->p_next = NULL;
-            if( p_previous != p_actual ) /* not first item */
-                p_previous->p_next = p_actual;
-            p_previous = p_actual;
-            p_actual = p_actual->p_next;
+    error:
+            libvlc_printerr( "Not enough memory" );
+            libvlc_audio_output_list_release( list );
+            list = NULL;
+            break;
         }
-    }
 
+        item->psz_name = strdup( module_get_object( module ) );
+        item->psz_description = strdup( module_get_name( module, true ) );
+        if( unlikely(item->psz_name == NULL || item->psz_description == NULL) )
+        {
+            free( item );
+            goto error;
+        }
+        item->p_next = list;
+        list = item;
+    }
     module_list_free( module_list );
 
-    return p_list;
+    return list;
 }
 
 /********************************************
  * Free the list of available audio outputs
  ***********************************************/
-void libvlc_audio_output_list_release( libvlc_audio_output_t *p_list )
+void libvlc_audio_output_list_release( libvlc_audio_output_t *list )
 {
-    libvlc_audio_output_t *p_actual, *p_before;
-    p_actual = p_list;
-
-    while ( p_actual )
+    while( list != NULL )
     {
-        free( p_actual->psz_name );
-        free( p_actual->psz_description );
-        p_before = p_actual;
-        p_actual = p_before->p_next;
-        free( p_before );
+        libvlc_audio_output_t *next = list->p_next;
+
+        free( list->psz_name );
+        free( list->psz_description );
+        free( list );
+        list = next;
     }
 }
 
