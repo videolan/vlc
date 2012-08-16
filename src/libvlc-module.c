@@ -2204,6 +2204,7 @@ vlc_module_begin ()
 #   define KEY_AUDIODELAY_DOWN    "f"
 #   define KEY_AUDIO_TRACK        "l"
 #   define KEY_SUBTITLE_TRACK     "s"
+#   define KEY_PROGRAM_SID        "x"
 #   define KEY_ASPECT_RATIO       "a"
 #   define KEY_CROP               "c"
 #   define KEY_TOGGLE_AUTOSCALE   "o"
