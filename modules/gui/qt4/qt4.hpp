@@ -43,10 +43,10 @@
 #define HAS_QT47 ( QT_VERSION >= 0x040700 )
 
 enum {
-    DialogEventType = 0,
-    IMEventType     = 100,
-    PLEventType     = 200,
-    MsgEventType    = 300,
+    DialogEventTypeOffset = 0,
+    IMEventTypeOffset     = 100,
+    PLEventTypeOffset     = 200,
+    MsgEventTypeOffset    = 300,
 };
 
 enum{

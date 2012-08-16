@@ -58,10 +58,10 @@ enum {
 };
 
 enum {
-    DialogEvent_Type = QEvent::User + DialogEventType + 1,
+    DialogEvent_Type = QEvent::User + DialogEventTypeOffset + 1,
     //PLUndockEvent_Type = QEvent::User + DialogEventType + 2;
     //PLDockEvent_Type = QEvent::User + DialogEventType + 3;
-    SetVideoOnTopEvent_Type = QEvent::User + DialogEventType + 4,
+    SetVideoOnTopEvent_Type = QEvent::User + DialogEventTypeOffset + 4,
 };
 
 class QEvent;

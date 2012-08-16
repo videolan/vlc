@@ -44,7 +44,7 @@
 #include <assert.h>
 
 enum {
-    MsgEvent_Type = QEvent::User + MsgEventType + 1,
+    MsgEvent_Type = QEvent::User + MsgEventTypeOffset + 1,
 };
 
 class MsgEvent : public QEvent

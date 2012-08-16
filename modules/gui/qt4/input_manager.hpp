@@ -40,7 +40,7 @@
 #include <QEvent>
 
 enum {
-    PositionUpdate_Type = QEvent::User + IMEventType + 1,
+    PositionUpdate_Type = QEvent::User + IMEventTypeOffset + 1,
     ItemChanged_Type,
     ItemStateChanged_Type,
     ItemTitleChanged_Type,
@@ -63,7 +63,7 @@ enum {
     EPGEvent_Type,
 /*    SignalChanged_Type, */
 
-    FullscreenControlToggle_Type = QEvent::User + IMEventType + 20,
+    FullscreenControlToggle_Type = QEvent::User + IMEventTypeOffset + 20,
     FullscreenControlShow_Type,
     FullscreenControlHide_Type,
     FullscreenControlPlanHide_Type,
@@ -103,7 +103,7 @@ class PLEvent : public QEvent
 public:
     enum PLEventTypes
     {
-        PLItemAppended_Type = QEvent::User + PLEventType + 1,
+        PLItemAppended_Type = QEvent::User + PLEventTypeOffset + 1,
         PLItemRemoved_Type,
         LeafToParent_Type,
         PLEmpty_Type
