@@ -398,11 +398,7 @@ ssize_t config_GetPszChoices (vlc_object_t *obj, const char *name,
     }
 
     if (cfg->pf_update_list != NULL)
-    {
-        /* FIXME: not thread-safe */
-        vlc_value_t dummy = { .psz_string = (char *)"" };
-        cfg->pf_update_list (obj, name, dummy, dummy, NULL);
-    }
+        return cfg->pf_update_list (obj, name, values, texts);
 
     size_t count = cfg->i_list;
     if (count == 0)

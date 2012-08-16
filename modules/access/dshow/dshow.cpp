@@ -36,6 +36,7 @@
 #include <inttypes.h>
 #include <list>
 #include <string>
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -71,8 +72,7 @@ static size_t EnumDeviceCaps( vlc_object_t *, IBaseFilter *,
                               AM_MEDIA_TYPE *mt, size_t );
 static bool ConnectFilters( vlc_object_t *, access_sys_t *,
                             IBaseFilter *, CaptureFilter * );
-static int FindDevicesCallback( vlc_object_t *, char const *,
-                                vlc_value_t, vlc_value_t, void * );
+static int FindDevices( vlc_object_t *, const char *, char ***, char *** );
 static int ConfigDevicesCallback( vlc_object_t *, char const *,
                                   vlc_value_t, vlc_value_t, void * );
 
@@ -222,11 +222,11 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_string( CFG_PREFIX "vdev", NULL, VDEV_TEXT, VDEV_LONGTEXT, false)
-        change_string_cb( FindDevicesCallback )
+        change_string_cb( FindDevices )
         change_action_add( ConfigDevicesCallback, N_("Configure") )
 
     add_string( CFG_PREFIX "adev", NULL, ADEV_TEXT, ADEV_LONGTEXT, false)
-        change_string_cb( FindDevicesCallback )
+        change_string_cb( FindDevices )
         change_action_add( ConfigDevicesCallback, N_("Configure") )
 
     add_string( CFG_PREFIX "size", NULL, SIZE_TEXT, SIZE_LONGTEXT, false)
@@ -2010,32 +2010,10 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 /*****************************************************************************
  * config variable callback
  *****************************************************************************/
-static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
-                               vlc_value_t, vlc_value_t, void * )
+static int FindDevices( vlc_object_t *p_this, const char *psz_name,
+                            char ***vp, char ***tp )
 {
-    module_config_t *p_item;
-    bool b_audio = false;
-    int i;
-
-    p_item = config_FindConfig( p_this, psz_name );
-    if( !p_item ) return VLC_SUCCESS;
-
-    if( !strcmp( psz_name, CFG_PREFIX "adev" ) ) b_audio = true;
-
-    /* Clear-up the current list */
-    if( p_item->i_list )
-    {
-        /* Keep the 2 first entries */
-        for( i = 2; i < p_item->i_list; i++ )
-        {
-            free( p_item->ppsz_list[i] );
-            free( p_item->ppsz_list_text[i] );
-        }
-        /* TODO: Remove when no more needed */
-        p_item->ppsz_list[i] = NULL;
-        p_item->ppsz_list_text[i] = NULL;
-    }
-    p_item->i_list = 2;
+    bool b_audio = !strcmp( psz_name, CFG_PREFIX "adev" );
 
     /* Find list of devices */
     list<string> list_devices;
@@ -2048,25 +2026,28 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     /* Uninitialize OLE/COM */
     CoUninitialize();
 
-    if( list_devices.empty() ) return VLC_SUCCESS;
+    unsigned count = 2 + list_devices.size(), i = 2;
+    char **values = (char **)xmalloc( count * sizeof(*values) );
+    char **texts = (char **)xmalloc( count * sizeof(*texts) );
 
-    p_item->ppsz_list = (char**)xrealloc( p_item->ppsz_list,
-                          (list_devices.size()+3) * sizeof(char *) );
-    p_item->ppsz_list_text = (char**)xrealloc( p_item->ppsz_list_text,
-                          (list_devices.size()+3) * sizeof(char *) );
+    values[0] = strdup( "" );
+    texts[0] = strdup( N_("Default") );
+    values[1] = strdup( "none" );
+    texts[1] = strdup( N_("None") );
 
-    list<string>::iterator iter;
-    for( iter = list_devices.begin(), i = 2; iter != list_devices.end();
-         ++iter, i++ )
+    for( list<string>::iterator iter = list_devices.begin();
+         iter != list_devices.end();
+         ++iter )
     {
-        p_item->ppsz_list[i] = strdup( iter->c_str() );
-        p_item->ppsz_list_text[i] = NULL;
-        p_item->i_list++;
+        assert( i < count );
+        values[i] = strdup( iter->c_str() );
+        texts[i] = strdup( iter->c_str() );
+        i++;
     }
-    p_item->ppsz_list[i] = NULL;
-    p_item->ppsz_list_text[i] = NULL;
 
-    return VLC_SUCCESS;
+    *vp = values;
+    *tp = texts;
+    return count;
 }
 
 static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,

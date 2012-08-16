@@ -113,8 +113,8 @@ static void DestroyDSBuffer   ( audio_output_t * );
 static void* DirectSoundThread( void * );
 static int  FillBuffer        ( audio_output_t *, int, block_t * );
 
-static int ReloadDirectXDevices( vlc_object_t *, char const *,
-                                vlc_value_t, vlc_value_t, void * );
+static int ReloadDirectXDevices( vlc_object_t *, const char *,
+                                 char ***, char *** );
 
 /* Speaker setup override options list */
 static const char *const speaker_list[] = { "Windows default", "Mono", "Stereo",
@@ -1165,12 +1165,12 @@ static void* DirectSoundThread( void *data )
  * CallBackConfigNBEnum: callback to get the number of available devices
  *****************************************************************************/
 static int CALLBACK CallBackConfigNBEnum( LPGUID p_guid, LPCWSTR psz_desc,
-                                             LPCWSTR psz_mod, LPVOID p_nb )
+                                          LPCWSTR psz_mod, LPVOID data )
 {
-    VLC_UNUSED( psz_mod ); VLC_UNUSED( psz_desc ); VLC_UNUSED( p_guid );
+    int *p_nb = data;
 
-    int * a = (int *)p_nb;
-    (*a)++;
+    (*p_nb)++;
+    VLC_UNUSED( psz_mod ); VLC_UNUSED( psz_desc ); VLC_UNUSED( p_guid );
     return true;
 }
 
@@ -1178,15 +1178,15 @@ static int CALLBACK CallBackConfigNBEnum( LPGUID p_guid, LPCWSTR psz_desc,
  * CallBackConfigEnum: callback to add available devices to the preferences list
  *****************************************************************************/
 static int CALLBACK CallBackConfigEnum( LPGUID p_guid, LPCWSTR psz_desc,
-                                             LPCWSTR psz_mod, LPVOID _p_item )
+                                        LPCWSTR psz_mod, LPVOID data )
 {
+    char **values = data;
+
+    while( *values != NULL )
+        values++;
+    *values = FromWide( psz_desc );
+
     VLC_UNUSED( psz_mod ); VLC_UNUSED( p_guid );
-
-    module_config_t *p_item = (module_config_t *) _p_item;
-
-    p_item->ppsz_list[p_item->i_list] = FromWide( psz_desc );
-    p_item->ppsz_list_text[p_item->i_list] = FromWide( psz_desc );
-    p_item->i_list++;
     return true;
 }
 
@@ -1194,54 +1194,34 @@ static int CALLBACK CallBackConfigEnum( LPGUID p_guid, LPCWSTR psz_desc,
  * ReloadDirectXDevices: store the list of devices in preferences
  *****************************************************************************/
 static int ReloadDirectXDevices( vlc_object_t *p_this, char const *psz_name,
-                                 vlc_value_t newval, vlc_value_t oldval, void *data )
+                                 char ***values, char ***descs )
 {
-    VLC_UNUSED( newval ); VLC_UNUSED( oldval ); VLC_UNUSED( data );
+    int nb_devices = 0;
 
-    module_config_t *p_item = config_FindConfig( p_this, psz_name );
-    if( !p_item ) return VLC_SUCCESS;
+    (void) psz_name;
 
-    /* Clear-up the current list */
-    if( p_item->i_list )
-    {
-        for( int i = 0; i < p_item->i_list; i++ )
-        {
-            free((char *)(p_item->ppsz_list[i]) );
-            free((char *)(p_item->ppsz_list_text[i]) );
-        }
-    }
-
-    HRESULT (WINAPI *OurDirectSoundEnumerate)(LPDSENUMCALLBACKW, LPVOID);
-
-    HANDLE hdsound_dll = LoadLibrary("DSOUND.DLL");
+    HANDLE hdsound_dll = LoadLibrary(_T("DSOUND.DLL"));
     if( hdsound_dll == NULL )
     {
         msg_Warn( p_this, "cannot open DSOUND.DLL" );
-        return VLC_SUCCESS;
+        goto error;
     }
 
     /* Get DirectSoundEnumerate */
-    OurDirectSoundEnumerate = (void *)
-                    GetProcAddress( hdsound_dll, "DirectSoundEnumerateW" );
-
+    HRESULT (WINAPI *OurDirectSoundEnumerate)(LPDSENUMCALLBACKW, LPVOID) =
+            (void *)GetProcAddress( hdsound_dll, _T("DirectSoundEnumerateW") );
     if( OurDirectSoundEnumerate == NULL )
         goto error;
 
-    int nb_devices = 0;
     OurDirectSoundEnumerate(CallBackConfigNBEnum, &nb_devices);
-    msg_Dbg(p_this,"found %d devices", nb_devices);
+    msg_Dbg(p_this, "found %d devices", nb_devices);
 
-    p_item->ppsz_list = xrealloc( p_item->ppsz_list,
-                                  nb_devices * sizeof(char *) );
-    p_item->ppsz_list_text = xrealloc( p_item->ppsz_list_text,
-                                  nb_devices * sizeof(char *) );
-
-    p_item->i_list = 0;
-    OurDirectSoundEnumerate(CallBackConfigEnum, p_item);
-
+    *values = xcalloc( nb_devices, sizeof(char *) );
+    OurDirectSoundEnumerate(CallBackConfigEnum, *values);
+    *descs = xcalloc( nb_devices, sizeof(char *) );
+    OurDirectSoundEnumerate(CallBackConfigEnum, *descs);
 error:
     FreeLibrary(hdsound_dll);
-
-    return VLC_SUCCESS;
+    return nb_devices;
 }
 

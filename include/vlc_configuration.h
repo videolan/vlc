@@ -50,6 +50,9 @@ typedef union
     float       f;
 } module_value_t;
 
+typedef int (*vlc_string_list_cb)(vlc_object_t *, const char *,
+                                  char ***, char ***);
+
 struct module_config_t
 {
     char        *psz_type;                          /* Configuration subtype */
@@ -66,7 +69,7 @@ struct module_config_t
     int         *pi_list;                              /* Idem for integers */
     char       **ppsz_list_text;          /* Friendly names for list values */
     int          i_list;                               /* Options list size */
-    vlc_callback_t pf_update_list; /* Callback to initialize dropdown lists */
+    vlc_string_list_cb pf_update_list;
     uint8_t      i_type;                              /* Configuration type */
     char         i_short;                     /* Optional short option name */
 

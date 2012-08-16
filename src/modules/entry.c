@@ -422,7 +422,7 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
         }
 
         case VLC_CONFIG_LIST_CB:
-            item->pf_update_list = va_arg (ap, vlc_callback_t);
+            item->pf_update_list = va_arg (ap, vlc_string_list_cb);
             break;
 
         default:

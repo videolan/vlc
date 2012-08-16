@@ -73,8 +73,8 @@ static int MuteSet( audio_output_t *, bool );
 
 static int WaveOutClearDoneBuffers(aout_sys_t *p_sys);
 
-static int ReloadWaveoutDevices( vlc_object_t *, char const *,
-                                vlc_value_t, vlc_value_t, void * );
+static int ReloadWaveoutDevices( vlc_object_t *, const char *,
+                                 char ***, char *** );
 static uint32_t findDeviceID(char *);
 
 static const wchar_t device_name_fmt[] = L"%ls ($%x,$%x)";
@@ -171,11 +171,6 @@ static int Open( vlc_object_t *p_this )
     p_aout->pf_play = Play;
     p_aout->pf_pause = aout_PacketPause;
     p_aout->pf_flush = aout_PacketFlush;
-
-    /*
-     initialize/update Device selection List
-    */
-    ReloadWaveoutDevices( p_this, "waveout-audio-device", val, val, NULL);
 
     /*
       check for configured audio device!
@@ -1041,39 +1036,20 @@ static int MuteSet( audio_output_t * p_aout, bool mute )
   reload the configuration drop down list, of the Audio Devices
 */
 static int ReloadWaveoutDevices( vlc_object_t *p_this, char const *psz_name,
-                                 vlc_value_t newval, vlc_value_t oldval, void *data )
+                                 char ***values, char ***descs )
 {
-    VLC_UNUSED( newval ); VLC_UNUSED( oldval ); VLC_UNUSED( data );
+    int n = 0, nb_devices = waveOutGetNumDevs();
 
-    module_config_t *p_item = config_FindConfig( p_this, psz_name );
-    if( !p_item ) return VLC_SUCCESS;
+    VLC_UNUSED( psz_name );
 
-    /* Clear-up the current list */
-    if( p_item->i_list )
-    {
-        int i;
+    *values = xmalloc( (nb_devices + 1) * sizeof(char *) );
+    *descs = xmalloc( (nb_devices + 1) * sizeof(char *) );
 
-        /* Keep the first entry */
-        for( i = 1; i < p_item->i_list; i++ )
-        {
-            free((char *)(p_item->ppsz_list[i]) );
-            free((char *)(p_item->ppsz_list_text[i]) );
-        }
-        /* TODO: Remove when no more needed */
-        p_item->ppsz_list[i] = NULL;
-        p_item->ppsz_list_text[i] = NULL;
-    }
-    p_item->i_list = 1;
+    (*values)[n] = strdup( "wavemapper" );
+    (*descs)[n] = strdup( _("Microsoft Soundmapper") );
+    n++;
 
-    int wave_devices = waveOutGetNumDevs();
-
-    p_item->ppsz_list = xrealloc( p_item->ppsz_list,
-                          (wave_devices+2) * sizeof(char *) );
-    p_item->ppsz_list_text = xrealloc( p_item->ppsz_list_text,
-                          (wave_devices+2) * sizeof(char *) );
-
-    int j=1;
-    for(int i=0; i<wave_devices; i++)
+    for(int i = 0; i < nb_devices; i++)
     {
         WAVEOUTCAPS caps;
         wchar_t dev_name[MAXPNAMELEN+32];
@@ -1083,16 +1059,13 @@ static int ReloadWaveoutDevices( vlc_object_t *p_this, char const *psz_name,
             continue;
 
         _snwprintf(dev_name, MAXPNAMELEN + 32, device_name_fmt,
-                 caps.szPname, caps.wMid, caps.wPid);
-        p_item->ppsz_list[j] = FromWide( dev_name );
-        p_item->ppsz_list_text[j] = FromWide( dev_name );
-        p_item->i_list++;
-        j++;
+                   caps.szPname, caps.wMid, caps.wPid);
+        (*values)[n] = FromWide( dev_name );
+        (*descs)[n] = strdup( (*values)[n] );
+        n++;
     }
-    p_item->ppsz_list[j] = NULL;
-    p_item->ppsz_list_text[j] = NULL;
 
-    return VLC_SUCCESS;
+    return n;
 }
 
 /*

@@ -43,6 +43,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_playlist.h>   /* needed for wallpaper */
+#include <vlc_charset.h>
 
 #include <windows.h>
 #include <winuser.h>
@@ -87,8 +88,8 @@
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
 
-static int  FindDevicesCallback(vlc_object_t *, char const *,
-                                vlc_value_t, vlc_value_t, void *);
+static int FindDevicesCallback(vlc_object_t *, const char *,
+                               char ***, char ***);
 vlc_module_begin()
     set_shortname("DirectX")
     set_description(N_("DirectX (DirectDraw) video output"))
@@ -1404,70 +1405,66 @@ static int WallpaperCallback(vlc_object_t *object, char const *cmd,
     return VLC_SUCCESS;
 }
 
+typedef struct
+{
+    char **values;
+    char **descs;
+    size_t count;
+} enum_context_t;
+
 /*****************************************************************************
  * config variable callback
  *****************************************************************************/
 static BOOL WINAPI DirectXEnumCallback2(GUID *guid, LPTSTR desc,
-                                        LPTSTR drivername, VOID *context,
+                                        LPTSTR drivername, VOID *data,
                                         HMONITOR hmon)
 {
+    enum_context_t *ctx = data;
+
     VLC_UNUSED(guid); VLC_UNUSED(desc); VLC_UNUSED(hmon);
 
-    module_config_t *item = context;
+    ctx->values = xrealloc(ctx->values, (ctx->count + 1) * sizeof(char *));
+    ctx->descs = xrealloc(ctx->descs, (ctx->count + 1) * sizeof(char *));
 
-    item->ppsz_list = xrealloc(item->ppsz_list,
-                               (item->i_list+2) * sizeof(char *));
-    item->ppsz_list_text = xrealloc(item->ppsz_list_text,
-                                    (item->i_list+2) * sizeof(char *));
-
-    item->ppsz_list[item->i_list] = strdup(drivername);
-    item->ppsz_list_text[item->i_list] = NULL;
-    item->i_list++;
-    item->ppsz_list[item->i_list] = NULL;
-    item->ppsz_list_text[item->i_list] = NULL;
+    /* TODO? Unicode APIs */
+    ctx->values[ctx->count] = FromANSI(drivername);
+    ctx->descs[ctx->count] = FromANSI(drivername);
+    ctx->count++;
 
     return TRUE; /* Keep enumerating */
 }
 
-static int FindDevicesCallback(vlc_object_t *object, char const *name,
-                               vlc_value_t newval, vlc_value_t oldval, void *data)
+static int FindDevicesCallback(vlc_object_t *object, const char *name,
+                               char ***values, char ***descs)
 {
-    VLC_UNUSED(newval); VLC_UNUSED(oldval); VLC_UNUSED(data);
+    enum_context_t ctx;
 
-    module_config_t *item = config_FindConfig(object, name);
-    if (!item)
-        return VLC_SUCCESS;
-
-    /* Clear-up the current list */
-    if (item->i_list > 0) {
-        int i;
-        /* Keep the first entry */
-        for (i = 1; i < item->i_list; i++) {
-            free(item->ppsz_list[i]);
-            free(item->ppsz_list_text[i]);
-        }
-        /* TODO: Remove when no more needed */
-        item->ppsz_list[i] = NULL;
-        item->ppsz_list_text[i] = NULL;
-    }
-    item->i_list = 1;
+    ctx.values = xmalloc(sizeof(char *));
+    ctx.descs = xmalloc(sizeof(char *));
+    ctx.values[0] = strdup("");
+    ctx.descs[0] = strdup(_("Default"));
+    ctx.count = 1;
 
     /* Load direct draw DLL */
     HINSTANCE hddraw_dll = LoadLibrary(_T("DDRAW.DLL"));
-    if (!hddraw_dll)
-        return VLC_SUCCESS;
+    if (hddraw_dll != NULL)
+    {
+        /* Enumerate displays */
+        HRESULT (WINAPI *OurDirectDrawEnumerateEx)(LPDDENUMCALLBACKEXA,
+                                                   LPVOID, DWORD) =
+              (void *)GetProcAddress(hddraw_dll, _T("DirectDrawEnumerateExA"));
+        if (OurDirectDrawEnumerateEx != NULL)
+            OurDirectDrawEnumerateEx(DirectXEnumCallback2, &ctx,
+                                     DDENUM_ATTACHEDSECONDARYDEVICES);
+        FreeLibrary(hddraw_dll);
+    }
 
-    /* Enumerate displays */
-    HRESULT (WINAPI *OurDirectDrawEnumerateEx)(LPDDENUMCALLBACKEXA,
-                                               LPVOID, DWORD) =
-        (void *)GetProcAddress(hddraw_dll, _T("DirectDrawEnumerateExA"));
-    if (OurDirectDrawEnumerateEx)
-        OurDirectDrawEnumerateEx(DirectXEnumCallback2, item,
-                                 DDENUM_ATTACHEDSECONDARYDEVICES);
+    VLC_UNUSED(object);
+    VLC_UNUSED(name);
 
-    FreeLibrary(hddraw_dll);
-
-    return VLC_SUCCESS;
+    *values = ctx.values;
+    *descs = ctx.descs;
+    return ctx.count;
 }
 
 
