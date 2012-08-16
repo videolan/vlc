@@ -1,0 +1,11 @@
+--- libvpx/build/make/gen_asm_deps.sh.orig	2012-07-18 23:43:18.000000000 +0200
++++ libvpx.patched/build/make/gen_asm_deps.sh	2012-07-18 23:45:52.000000000 +0200
+@@ -42,7 +42,7 @@
+ 
+ [ -n "$srcfile" ] || show_help
+ sfx=${sfx:-asm}
+-includes=$(egrep -i "include +\"?+[a-z0-9_/]+\.${sfx}" $srcfile |
++includes=$(egrep -i "include +\"?[a-z0-9_/]+\.${sfx}" $srcfile |
+            perl -p -e "s;.*?([a-z0-9_/]+.${sfx}).*;\1;")
+ #" restore editor state
+ for inc in ${includes}; do

@@ -20,6 +20,7 @@ libvpx: libvpx-$(VPX_VERSION).tar.bz2 .sum-vpx
 	$(APPLY) $(SRC)/vpx/libvpx-no-abi.patch
 ifdef HAVE_MACOSX
 	$(APPLY) $(SRC)/vpx/libvpx-mac.patch
+	$(APPLY) $(SRC)/vpx/libvpx-mac-mountain-lion.patch
 endif
 	$(PATCH_BASH_LOCATION)
 	$(MOVE)
