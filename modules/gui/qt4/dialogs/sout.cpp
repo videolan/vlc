@@ -245,7 +245,7 @@ void SoutDialog::updateMRL()
 
     if( ui.soutAll->isChecked() ) mrl.append( " :sout-all" );
 
-    mrl.append( qfu( " :ttl=" ) + QString::number( ui.ttl->value() ) );
+    mrl.append( " :ttl=" + QString::number( ui.ttl->value() ) );
     mrl.append( " :sout-keep" );
 
     ui.mrlEdit->setPlainText( mrl );
