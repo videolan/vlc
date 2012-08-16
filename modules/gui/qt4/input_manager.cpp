@@ -79,10 +79,12 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
     timeA        = 0;
     timeB        = 0;
     f_cache      = -1.; /* impossible initial value, different from all */
+    rateLimitedEventPoster = new RateLimitedEventPoster();
 }
 
 InputManager::~InputManager()
 {
+    delete rateLimitedEventPoster;
     delInput();
 }
 
@@ -165,6 +167,11 @@ void InputManager::delInput()
     emit recordingStateChanged( false );
 
     emit cachingChanged( 1 );
+}
+
+void InputManager::postUniqueEvent( QObject *target, UniqueEvent *e )
+{
+    rateLimitedEventPoster->postEvent( e, target );
 }
 
 /* Convert the event from the callbacks in actions */
@@ -282,7 +289,7 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
     input_item_t *p_item = static_cast<input_item_t *>(newval.p_address);
 
     IMEvent *event = new IMEvent( ItemChanged_Type, p_item );
-    QApplication::postEvent( im, event );
+    im->postUniqueEvent( im, event );
     return VLC_SUCCESS;
 }
 
@@ -293,6 +300,7 @@ static int InputEvent( vlc_object_t *p_this, const char *,
 
     InputManager *im = (InputManager*)param;
     IMEvent *event;
+    bool b_unified = false;
 
     switch( newval.i_int )
     {
@@ -331,6 +339,7 @@ static int InputEvent( vlc_object_t *p_this, const char *,
         break;
 
     case INPUT_EVENT_ITEM_META: /* Codec MetaData + Art */
+        b_unified = true;
         event = new IMEvent( MetaChanged_Type );
         break;
     case INPUT_EVENT_ITEM_INFO: /* Codec Info */
@@ -377,7 +386,12 @@ static int InputEvent( vlc_object_t *p_this, const char *,
     }
 
     if( event )
-        QApplication::postEvent( im, event );
+    {
+        if ( b_unified )
+            im->postUniqueEvent( im, event );
+        else
+            QApplication::postEvent( im, event );
+    }
     return VLC_SUCCESS;
 }
 

@@ -73,6 +73,7 @@ nodist_SOURCES_qt4 = \
 		util/qmenuview.moc.cpp \
 		util/qvlcapp.moc.cpp \
 		util/pictureflow.moc.cpp \
+		util/uniqueevent.moc.cpp \
 		util/buttons/RoundButton.moc.cpp \
 		util/buttons/DeckButtonsLayout.moc.cpp \
 		util/buttons/BrowseButton.moc.cpp \
@@ -312,6 +313,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		util/qmenuview.cpp \
 		util/qt_dirs.cpp \
 		util/pictureflow.cpp \
+		util/uniqueevent.cpp \
 		util/buttons/BrowseButton.cpp \
 		util/buttons/DeckButtonsLayout.cpp \
 		util/buttons/RoundButton.cpp \
@@ -391,6 +393,7 @@ noinst_HEADERS = \
 	util/qt_dirs.hpp \
 	util/registry.hpp \
 	util/pictureflow.hpp \
+	util/uniqueevent.hpp \
 	util/singleton.hpp \
 	util/buttons/RoundButton.hpp \
 	util/buttons/DeckButtonsLayout.hpp \
