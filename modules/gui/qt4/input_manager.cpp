@@ -202,6 +202,7 @@ void InputManager::customEvent( QEvent *event )
             UpdateStatus();
             // UpdateName();
             UpdateArt();
+            UpdateMeta();
             /* Update duration of file */
         }
         break;
