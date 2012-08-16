@@ -255,6 +255,24 @@ bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, con
 
     CONNECT( &menu, triggered( QAction * ), model, actionSlot( QAction * ) );
 
+    QMenu *viewMenu = new QMenu( qtr( "Playlist View Mode" ) );
+
+    /* View selection menu */
+    QSignalMapper *viewSelectionMapper = new QSignalMapper( this );
+    CONNECT( viewSelectionMapper, mapped( int ), this, showView( int ) );
+
+# define MAX_VIEW StandardPLPanel::VIEW_COUNT
+    for( int i = 0; i < MAX_VIEW; i++ )
+    {
+        QAction *action = viewMenu->addAction( viewNames[i] );
+        action->setCheckable( true );
+        viewSelectionMapper->setMapping( action, i );
+        CONNECT( action, triggered(), viewSelectionMapper, map() );
+        if( currentViewIndex() == i )
+            action->setChecked( true );
+    }
+    menu.addMenu( viewMenu );
+
     /* Display and forward the result */
     if( !menu.isEmpty() )
     {
