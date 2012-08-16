@@ -181,7 +181,7 @@ void InputManager::customEvent( QEvent *event )
     IMEvent *ple = static_cast<IMEvent *>(event);
 
     if( i_type == ItemChanged_Type )
-        UpdateMeta( ple->p_item );
+        UpdateMeta( ple->item() );
 
     if( !hasInput() )
         return;
@@ -197,7 +197,7 @@ void InputManager::customEvent( QEvent *event )
         break;
     case ItemChanged_Type:
         /* Ignore ItemChanged_Type event that does not apply to our input */
-        if( p_item == ple->p_item )
+        if( p_item == ple->item() )
         {
             UpdateStatus();
             // UpdateName();

@@ -76,8 +76,6 @@ enum { NORMAL,    /* loop: 0, repeat: 0 */
 
 class IMEvent : public UniqueEvent
 {
-friend class InputManager;
-friend class MainInputManager;
     public:
     IMEvent( int type, input_item_t *p_input = NULL )
         : UniqueEvent( (QEvent::Type)(type) )
@@ -90,6 +88,7 @@ friend class MainInputManager;
         if( p_item )
             vlc_gc_decref( p_item );
     }
+    input_item_t *item() const { return p_item; };
     bool itemEquals( input_item_t *p_item_ ) const
     {
         return p_item_ == p_item;
