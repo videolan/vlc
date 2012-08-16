@@ -1082,7 +1082,7 @@ modules/video_filter/mosaic.c
 modules/video_filter/mosaic.h
 modules/video_filter/motionblur.c
 modules/video_filter/motiondetect.c
-modules/video_filter/opencv_example.c
+modules/video_filter/opencv_example.cpp
 modules/video_filter/opencv_wrapper.c
 modules/video_filter/osdmenu.c
 modules/video_filter/panoramix.c
