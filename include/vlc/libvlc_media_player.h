@@ -832,8 +832,8 @@ LIBVLC_API void libvlc_track_description_list_release( libvlc_track_description_
 /**
  * \deprecated Use libvlc_track_description_list_release instead
  */
-LIBVLC_DEPRECATED
-LIBVLC_API void libvlc_track_description_release( libvlc_track_description_t *p_track_description );
+LIBVLC_DEPRECATED LIBVLC_API
+void libvlc_track_description_release( libvlc_track_description_t *p_track_description );
 
 /** \defgroup libvlc_video LibVLC video controls
  * @{
