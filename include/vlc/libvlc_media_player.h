@@ -1409,7 +1409,7 @@ LIBVLC_API int libvlc_audio_output_set( libvlc_media_player_t *p_mi,
  * Use libvlc_audio_output_device_list_get() instead.
  * \return always 0.
  */
-LIBVLC_DEPRECATED
+LIBVLC_DEPRECATED LIBVLC_API
 int libvlc_audio_output_device_count( libvlc_instance_t *, const char * );
 
 /**
@@ -1417,7 +1417,7 @@ int libvlc_audio_output_device_count( libvlc_instance_t *, const char * );
  * Use libvlc_audio_output_device_list_get() instead.
  * \return always NULL.
  */
-LIBVLC_DEPRECATED
+LIBVLC_DEPRECATED LIBVLC_API
 char *libvlc_audio_output_device_longname( libvlc_instance_t *, const char *,
                                            int );
 
@@ -1426,7 +1426,7 @@ char *libvlc_audio_output_device_longname( libvlc_instance_t *, const char *,
  * Use libvlc_audio_output_device_list_get() instead.
  * \return always NULL.
  */
-LIBVLC_DEPRECATED
+LIBVLC_DEPRECATED LIBVLC_API
 char *libvlc_audio_output_device_id( libvlc_instance_t *, const char *, int );
 
 /**
