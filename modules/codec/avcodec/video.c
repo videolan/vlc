@@ -45,6 +45,7 @@
 
 /* ffmpeg header */
 #include <libavcodec/avcodec.h>
+#include <libavutil/mem.h>
 #ifdef HAVE_AVCODEC_VAAPI
 #    include <libavcodec/vaapi.h>
 #endif
