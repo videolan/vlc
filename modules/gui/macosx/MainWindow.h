@@ -148,7 +148,11 @@
 + (VLCMainWindow *)sharedInstance;
 
 - (IBAction)play:(id)sender;
+- (IBAction)prev:(id)sender;
+- (IBAction)backward:(id)sender;
 - (IBAction)bwd:(id)sender;
+- (IBAction)next:(id)sender;
+- (IBAction)forward:(id)sender;
 - (IBAction)fwd:(id)sender;
 - (IBAction)stop:(id)sender;
 - (IBAction)togglePlaylist:(id)sender;

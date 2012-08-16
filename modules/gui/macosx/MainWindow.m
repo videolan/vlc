@@ -42,6 +42,25 @@
 #import <vlc_services_discovery.h>
 #import <vlc_aout_intf.h>
 
+@interface VLCMainWindow ()
+- (void)addJumpButtons:(BOOL)b_fast;
+- (void)removeJumpButtons:(BOOL)b_fast;
+- (void)addPlaymodeButtons:(BOOL)b_fast;
+- (void)removePlaymodeButtons:(BOOL)b_fast;
+
+- (void)resetPreviousButton;
+- (void)resetBackwardSkip;
+- (void)resetNextButton;
+- (void)resetForwardSkip;
+- (void)resizePlaylistAfterCollapse;
+- (void)makeSplitViewVisible;
+- (void)makeSplitViewHidden;
+
+- (NSRect)customConstrainFrameRect: (NSRect)frameRect toScreen: (NSScreen*)screen;
+
+- (NSString *)getCurrentTimeAsString:(input_thread_t *)p_input;
+@end
+
 @implementation VLCMainWindow
 static const float f_min_video_height = 70.0;
 
