@@ -413,7 +413,7 @@ QMenu *VLCMenuBar::ToolsMenu( QMenu *menu )
 
 #ifdef ENABLE_VLM
     addDPStaticEntry( menu, qtr( I_MENU_VLM ), "", SLOT( vlmDialog() ),
-        "Ctrl+W" );
+        "Ctrl+Shift+W" );
 #endif
 
     addDPStaticEntry( menu, qtr( "Program Guide" ), "", SLOT( epgDialog() ),
