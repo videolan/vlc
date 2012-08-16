@@ -171,7 +171,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     b_nativeFullscreenMode = NO;
 #ifdef MAC_OS_X_VERSION_10_7
     if( OSX_LION && b_video_deco )
-        b_nativeFullscreenMode = config_GetInt( VLCIntf, "macosx-nativefullscreenmode" );
+        b_nativeFullscreenMode = var_InheritBool( VLCIntf, "macosx-nativefullscreenmode" );
 #endif
     t_hide_mouse_timer = nil;
     [o_detached_video_window setDelegate: self];
@@ -1786,10 +1786,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (id)setupVideoView
 {
     // TODO: make lion fullscreen compatible with macosx-background and !embedded-video
-    if( config_GetInt( VLCIntf, "macosx-background" ) && !b_nativeFullscreenMode )
+    if( var_InheritBool( VLCIntf, "macosx-background" ) && !b_nativeFullscreenMode )
     {
         msg_Dbg( VLCIntf, "Creating background window" );
-        NSScreen *screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)config_GetInt( VLCIntf, "macosx-vdev" )];
+        NSScreen *screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_InheritInteger( VLCIntf, "macosx-vdev" )];
         if( !screen )
             screen = [self screen];
         NSRect screen_rect = [screen frame];
@@ -1974,7 +1974,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     nativeVideoSize = size;
 
-    if( config_GetInt( VLCIntf, "macosx-video-autoresize" ) && !b_fullscreen && !config_GetInt( VLCIntf, "macosx-background" ) )
+    if( var_InheritBool( VLCIntf, "macosx-video-autoresize" ) && !b_fullscreen && !var_InheritBool( VLCIntf, "macosx-background" ) )
         [self performSelectorOnMainThread:@selector(resizeWindow) withObject:nil waitUntilDone:NO];
 }
 
@@ -2037,10 +2037,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     NSScreen *screen;
     NSRect screen_rect;
     NSRect rect;
-    BOOL blackout_other_displays = config_GetInt( VLCIntf, "macosx-black" );
+    BOOL blackout_other_displays = var_InheritBool( VLCIntf, "macosx-black" );
     o_current_video_window = [o_video_view window];
     
-    screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)config_GetInt( VLCIntf, "macosx-vdev" )];
+    screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_InheritInteger( VLCIntf, "macosx-vdev" )];
     [self lockFullscreenAnimation];
 
     if (!screen)
@@ -2224,7 +2224,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     NSMutableDictionary *dict1, *dict2;
     NSRect frame;
-    BOOL blackout_other_displays = config_GetInt( VLCIntf, "macosx-black" );
+    BOOL blackout_other_displays = var_InheritBool( VLCIntf, "macosx-black" );
 
     if( !o_current_video_window )
         return;

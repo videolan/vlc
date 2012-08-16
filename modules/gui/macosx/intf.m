@@ -625,12 +625,12 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [o_msgs_refresh_btn setImage: [NSImage imageNamed: NSImageNameRefreshTemplate]];
 
-     BOOL b_video_deco = config_GetInt( VLCIntf, "video-deco" );
+     BOOL b_video_deco = var_InheritBool( VLCIntf, "video-deco" );
     /* yeah, we are done */
     b_nativeFullscreenMode = NO;
 #ifdef MAC_OS_X_VERSION_10_7
     if( OSX_LION && b_video_deco )
-        b_nativeFullscreenMode = config_GetInt( p_intf, "macosx-nativefullscreenmode" );
+        b_nativeFullscreenMode = var_InheritBool( p_intf, "macosx-nativefullscreenmode" );
 #endif
 
     /* recover stored audio device, if set
@@ -669,7 +669,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mainwindow makeKeyAndOrderFront: self];
 
     /* init media key support */
-    b_mediaKeySupport = config_GetInt( VLCIntf, "macosx-mediakeys" );
+    b_mediaKeySupport = var_InheritBool( VLCIntf, "macosx-mediakeys" );
     if( b_mediaKeySupport )
     {
         o_mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
@@ -897,7 +897,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification
 {
     if( !p_intf ) return;
-    if( config_GetInt( p_intf, "macosx-appleremote" ) == YES )
+    if( var_InheritBool( p_intf, "macosx-appleremote" ) == YES )
         [o_remote startListening: self];
 }
 - (void)applicationDidResignActive:(NSNotification *)aNotification
@@ -1659,7 +1659,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
 - (void)setWindowLevel:(NSNumber*)state
 {
-    if( config_GetInt( p_intf, "macosx-background" ) )
+    if( var_InheritBool( p_intf, "macosx-background" ) )
         return;
 
     if ([state unsignedIntValue] & VOUT_WINDOW_STATE_ABOVE)
@@ -2179,7 +2179,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 }
 - (void)coreChangedMediaKeySupportSetting: (NSNotification *)o_notification
 {
-    b_mediaKeySupport = config_GetInt( VLCIntf, "macosx-mediakeys" );
+    b_mediaKeySupport = var_InheritBool( VLCIntf, "macosx-mediakeys" );
     if (b_mediaKeySupport)
     {
         if (!o_mediaKeyController)

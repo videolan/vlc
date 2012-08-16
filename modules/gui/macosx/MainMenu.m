@@ -534,7 +534,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         [o_mitem setEnabled: YES];
         [o_mitem setTarget: self];
     }
-    [[o_submenu itemWithTag: config_GetInt( VLCIntf, "macosx-vdev" )] setState: NSOnState];
+    [[o_submenu itemWithTag: var_InheritInteger( VLCIntf, "macosx-vdev" )] setState: NSOnState];
 }
 
 - (void)setSubmenusEnabled:(BOOL)b_enabled
