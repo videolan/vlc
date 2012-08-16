@@ -89,14 +89,10 @@ class IMEvent : public UniqueEvent
             vlc_gc_decref( p_item );
     }
     input_item_t *item() const { return p_item; };
-    bool itemEquals( input_item_t *p_item_ ) const
-    {
-        return p_item_ == p_item;
-    };
     virtual bool equals(UniqueEvent *e) const
     {
         IMEvent *ev = static_cast<IMEvent *>(e);
-        return ( ev->itemEquals( p_item ) && ev->type() == type() );
+        return ( ev->item() == p_item && ev->type() == type() );
     }
 private:
     input_item_t *p_item;
