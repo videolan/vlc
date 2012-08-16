@@ -42,15 +42,11 @@
 #include <vlc_cpu.h>
 #include <assert.h>
 
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
-#   include <libavcodec/avcodec.h>
-#   ifdef HAVE_AVCODEC_DXVA2
-#       define DXVA2API_USE_BITFIELDS
-#       define COBJMACROS
-#       include <libavcodec/dxva2.h>
-#   endif
-#else
-#   include <avcodec.h>
+#include <libavcodec/avcodec.h>
+#ifdef HAVE_AVCODEC_DXVA2
+#    define DXVA2API_USE_BITFIELDS
+#    define COBJMACROS
+#    include <libavcodec/dxva2.h>
 #endif
 
 #include "avcodec.h"

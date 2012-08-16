@@ -35,11 +35,7 @@
 #include <vlc_avcodec.h>
 
 /* ffmpeg header */
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
-#   include <libavcodec/avcodec.h>
-#else
-#   include <avcodec.h>
-#endif
+#include <libavcodec/avcodec.h>
 
 #if LIBAVUTIL_VERSION_INT >= ((50<<16)+(38<<8)+0)
 # include "libavutil/audioconvert.h"

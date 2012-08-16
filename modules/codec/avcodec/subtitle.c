@@ -34,13 +34,9 @@
 #include <vlc_avcodec.h>
 
 /* ffmpeg header */
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
-#   include <libavcodec/avcodec.h>
-#   ifdef HAVE_AVCODEC_VAAPI
-#       include <libavcodec/vaapi.h>
-#   endif
-#else
-#   include <avcodec.h>
+#include <libavcodec/avcodec.h>
+#ifdef HAVE_AVCODEC_VAAPI
+#    include <libavcodec/vaapi.h>
 #endif
 
 #include "avcodec.h"

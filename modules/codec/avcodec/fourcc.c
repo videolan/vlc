@@ -29,11 +29,7 @@
 #include <vlc_common.h>
 #include <vlc_codec.h>
 
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
-#   include <libavcodec/avcodec.h>
-#else
-#   include <avcodec.h>
-#endif
+#include <libavcodec/avcodec.h>
 #include "avcodec.h"
 
 /*****************************************************************************

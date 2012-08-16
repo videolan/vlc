@@ -44,21 +44,15 @@
 #include <assert.h>
 
 /* ffmpeg header */
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
-#   include <libavcodec/avcodec.h>
-#   ifdef HAVE_AVCODEC_VAAPI
-#       include <libavcodec/vaapi.h>
-#   endif
-#   ifdef HAVE_AVCODEC_DXVA2
-#       include <libavcodec/dxva2.h>
-#   endif
-#   ifdef HAVE_AVCODEC_VDA
-#       include <libavcodec/vda.h>
-#   endif
-#elif defined(HAVE_FFMPEG_AVCODEC_H)
-#   include <ffmpeg/avcodec.h>
-#else
-#   include <avcodec.h>
+#include <libavcodec/avcodec.h>
+#ifdef HAVE_AVCODEC_VAAPI
+#    include <libavcodec/vaapi.h>
+#endif
+#ifdef HAVE_AVCODEC_DXVA2
+#    include <libavcodec/dxva2.h>
+#endif
+#ifdef HAVE_AVCODEC_VDA
+#    include <libavcodec/vda.h>
 #endif
 
 #include "avcodec.h"
