@@ -1027,19 +1027,19 @@ void MainInputManager::customEvent( QEvent *event )
     // msg_Dbg( p_intf, "New MainIM Event of type: %i", type );
     switch( type )
     {
-    case PLItemAppended_Type:
+    case PLEvent::PLItemAppended_Type:
         plEv = static_cast<PLEvent*>( event );
         emit playlistItemAppended( plEv->i_item, plEv->i_parent );
         return;
-    case PLItemRemoved_Type:
+    case PLEvent::PLItemRemoved_Type:
         plEv = static_cast<PLEvent*>( event );
         emit playlistItemRemoved( plEv->i_item );
         return;
-    case PLEmpty_Type:
+    case PLEvent::PLEmpty_Type:
         plEv = static_cast<PLEvent*>( event );
         emit playlistNotEmpty( plEv->i_item >= 0 );
         return;
-    case LeafToParent_Type:
+    case PLEvent::LeafToParent_Type:
         plEv = static_cast<PLEvent*>( event );
         emit leafBecameParent( plEv->i_item );
         return;
@@ -1226,7 +1226,7 @@ static int LeafToParent( vlc_object_t *p_this, const char *psz_var,
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
     MainInputManager *mim = (MainInputManager*)param;
 
-    PLEvent *event = new PLEvent( LeafToParent_Type, newval.i_int );
+    PLEvent *event = new PLEvent( PLEvent::LeafToParent_Type, newval.i_int );
 
     QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
@@ -1249,9 +1249,9 @@ static int PLItemAppended
     MainInputManager *mim = static_cast<MainInputManager*>(data);
     playlist_add_t *p_add = static_cast<playlist_add_t*>( cur.p_address );
 
-    PLEvent *event = new PLEvent( PLItemAppended_Type, p_add->i_item, p_add->i_node  );
+    PLEvent *event = new PLEvent( PLEvent::PLItemAppended_Type, p_add->i_item, p_add->i_node  );
     QApplication::postEvent( mim, event );
-    event = new PLEvent( PLEmpty_Type, p_add->i_item, 0  );
+    event = new PLEvent( PLEvent::PLEmpty_Type, p_add->i_item, 0  );
     QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
 }
@@ -1263,12 +1263,12 @@ static int PLItemRemoved
     playlist_t *pl = (playlist_t *) obj;
     MainInputManager *mim = static_cast<MainInputManager*>(data);
 
-    PLEvent *event = new PLEvent( PLItemRemoved_Type, cur.i_int, 0  );
+    PLEvent *event = new PLEvent( PLEvent::PLItemRemoved_Type, cur.i_int, 0  );
     QApplication::postEvent( mim, event );
     // can't use playlist_IsEmpty(  ) as it isn't true yet
     if ( pl->items.i_size == 1 ) // lock is held
     {
-        event = new PLEvent( PLEmpty_Type, -1, 0 );
+        event = new PLEvent( PLEvent::PLEmpty_Type, -1, 0 );
         QApplication::postEvent( mim, event );
     }
     return VLC_SUCCESS;

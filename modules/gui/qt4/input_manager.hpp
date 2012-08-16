@@ -60,7 +60,6 @@ enum {
     ProgramChanged_Type,
     RandomChanged_Type,
     LoopOrRepeatChanged_Type,
-    LeafToParent_Type,
     EPGEvent_Type,
 /*    SignalChanged_Type, */
 
@@ -104,17 +103,17 @@ private:
     input_item_t *p_item;
 };
 
-enum PLEventTypes
-{
-    PLItemAppended_Type = QEvent::User + PLEventType + 1,
-    PLItemRemoved_Type,
-    PLEmpty_Type
-};
-
 class PLEvent : public QEvent
 {
 public:
-    PLEvent( int t, int i, int p = 0 )
+    enum PLEventTypes
+    {
+        PLItemAppended_Type = QEvent::User + PLEventType + 1,
+        PLItemRemoved_Type,
+        LeafToParent_Type,
+        PLEmpty_Type
+    };
+    PLEvent( PLEventTypes t, int i, int p = 0 )
         : QEvent( (QEvent::Type)(t) ), i_item(i), i_parent(p) {}
 
     /* Needed for "playlist-item*" and "leaf-to-parent" callbacks
