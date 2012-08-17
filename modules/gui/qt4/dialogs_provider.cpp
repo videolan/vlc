@@ -117,7 +117,7 @@ void DialogsProvider::quit()
 
 void DialogsProvider::customEvent( QEvent *event )
 {
-    if( event->type() == (int)DialogEvent_Type )
+    if( event->type() == DialogEvent::DialogEvent_Type )
     {
         DialogEvent *de = static_cast<DialogEvent*>(event);
         switch( de->i_dialog )
@@ -178,6 +178,9 @@ void DialogsProvider::customEvent( QEvent *event )
 /****************************************************************************
  * Individual simple dialogs
  ****************************************************************************/
+const QEvent::Type DialogEvent::DialogEvent_Type =
+        (QEvent::Type)QEvent::registerEventType();
+
 void DialogsProvider::playlistDialog()
 {
     PlaylistDialog::getInstance( p_intf )->toggleVisible();
