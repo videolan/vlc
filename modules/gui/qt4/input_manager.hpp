@@ -39,36 +39,6 @@
 #include <QObject>
 #include <QEvent>
 
-enum {
-    PositionUpdate_Type = QEvent::User + IMEventTypeOffset + 1,
-    ItemChanged_Type,
-    ItemStateChanged_Type,
-    ItemTitleChanged_Type,
-    ItemRateChanged_Type,
-    ItemEsChanged_Type,
-    ItemTeletextChanged_Type,
-    InterfaceVoutUpdate_Type,
-    StatisticsUpdate_Type, /*10*/
-    InterfaceAoutUpdate_Type,
-    MetaChanged_Type,
-    NameChanged_Type,
-    InfoChanged_Type,
-    SynchroChanged_Type,
-    CachingEvent_Type,
-    BookmarksChanged_Type,
-    RecordingEvent_Type,
-    ProgramChanged_Type,
-    RandomChanged_Type,
-    LoopOrRepeatChanged_Type,
-    EPGEvent_Type,
-/*    SignalChanged_Type, */
-
-    FullscreenControlToggle_Type = QEvent::User + IMEventTypeOffset + 20,
-    FullscreenControlShow_Type,
-    FullscreenControlHide_Type,
-    FullscreenControlPlanHide_Type,
-};
-
 enum { NORMAL,    /* loop: 0, repeat: 0 */
        REPEAT_ONE,/* loop: 0, repeat: 1 */
        REPEAT_ALL,/* loop: 1, repeat: 0 */
@@ -76,8 +46,37 @@ enum { NORMAL,    /* loop: 0, repeat: 0 */
 
 class IMEvent : public UniqueEvent
 {
-    public:
-    IMEvent( int type, input_item_t *p_input = NULL )
+public:
+    enum event_types {
+        PositionUpdate_Type = QEvent::User + IMEventTypeOffset + 1,
+        ItemChanged_Type,
+        ItemStateChanged_Type,
+        ItemTitleChanged_Type,
+        ItemRateChanged_Type,
+        ItemEsChanged_Type,
+        ItemTeletextChanged_Type,
+        InterfaceVoutUpdate_Type,
+        StatisticsUpdate_Type, /*10*/
+        InterfaceAoutUpdate_Type,
+        MetaChanged_Type,
+        NameChanged_Type,
+        InfoChanged_Type,
+        SynchroChanged_Type,
+        CachingEvent_Type,
+        BookmarksChanged_Type,
+        RecordingEvent_Type,
+        ProgramChanged_Type,
+        RandomChanged_Type,
+        LoopOrRepeatChanged_Type,
+        EPGEvent_Type,
+    /*    SignalChanged_Type, */
+
+        FullscreenControlToggle_Type = QEvent::User + IMEventTypeOffset + 20,
+        FullscreenControlShow_Type,
+        FullscreenControlHide_Type,
+        FullscreenControlPlanHide_Type,
+    };
+    IMEvent( event_types type, input_item_t *p_input = NULL )
         : UniqueEvent( (QEvent::Type)(type) )
     {
         if( (p_item = p_input) != NULL )

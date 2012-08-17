@@ -613,7 +613,7 @@ void MainInterface::toggleFSC()
 {
    if( !fullscreenControls ) return;
 
-   IMEvent *eShow = new IMEvent( FullscreenControlToggle_Type );
+   IMEvent *eShow = new IMEvent( IMEvent::FullscreenControlToggle_Type );
    QApplication::postEvent( fullscreenControls, eShow );
 }
 
