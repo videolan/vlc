@@ -106,12 +106,12 @@ endif
 
 ifdef HAVE_MACOSX
 MIN_OSX_VERSION=10.6
-CC=gcc-4.2
-CXX=g++-4.2
-AR=ar
-LD=ld
-STRIP=strip
-RANLIB=ranlib
+CC=xcrun gcc
+CXX=xcrun g++
+AR=xcrun ar
+LD=xcrun ld
+STRIP=xcrun strip
+RANLIB=xcrun ranlib
 EXTRA_CFLAGS += -isysroot $(MACOSX_SDK) -mmacosx-version-min=$(MIN_OSX_VERSION) -DMACOSX_DEPLOYMENT_TARGET=$(MIN_OSX_VERSION)
 EXTRA_LDFLAGS += -Wl,-syslibroot,$(MACOSX_SDK) -mmacosx-version-min=$(MIN_OSX_VERSION) -isysroot $(MACOSX_SDK) -DMACOSX_DEPLOYMENT_TARGET=$(MIN_OSX_VERSION)
 ifeq ($(ARCH),x86_64)
