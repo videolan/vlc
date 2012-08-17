@@ -180,7 +180,7 @@ void InputManager::customEvent( QEvent *event )
     int i_type = event->type();
     IMEvent *ple = static_cast<IMEvent *>(event);
 
-    if( i_type == IMEvent::ItemChanged_Type )
+    if( i_type == IMEvent::ItemChanged )
         UpdateMeta( ple->item() );
 
     if( !hasInput() )
@@ -189,13 +189,13 @@ void InputManager::customEvent( QEvent *event )
     /* Actions */
     switch( i_type )
     {
-    case IMEvent::PositionUpdate_Type:
+    case IMEvent::PositionUpdate:
         UpdatePosition();
         break;
-    case IMEvent::StatisticsUpdate_Type:
+    case IMEvent::StatisticsUpdate:
         UpdateStats();
         break;
-    case IMEvent::ItemChanged_Type:
+    case IMEvent::ItemChanged:
         /* Ignore ItemChanged_Type event that does not apply to our input */
         if( p_item == ple->item() )
         {
@@ -206,60 +206,60 @@ void InputManager::customEvent( QEvent *event )
             /* Update duration of file */
         }
         break;
-    case IMEvent::ItemStateChanged_Type:
+    case IMEvent::ItemStateChanged:
         // TODO: Fusion with above state
         UpdateStatus();
         // UpdateName();
         // UpdateNavigation(); This shouldn't be useful now
         // UpdateTeletext(); Same
         break;
-    case IMEvent::NameChanged_Type:
+    case IMEvent::NameChanged:
         UpdateName();
         break;
-    case IMEvent::MetaChanged_Type:
+    case IMEvent::MetaChanged:
         UpdateMeta();
         UpdateName(); /* Needed for NowPlaying */
         UpdateArt(); /* Art is part of meta in the core */
         break;
-    case IMEvent::InfoChanged_Type:
+    case IMEvent::InfoChanged:
         UpdateInfo();
         break;
-    case IMEvent::ItemTitleChanged_Type:
+    case IMEvent::ItemTitleChanged:
         UpdateNavigation();
         UpdateName(); /* Display the name of the Chapter, if exists */
         break;
-    case IMEvent::ItemRateChanged_Type:
+    case IMEvent::ItemRateChanged:
         UpdateRate();
         break;
-    case IMEvent::ItemEsChanged_Type:
+    case IMEvent::ItemEsChanged:
         UpdateTeletext();
         // We don't do anything ES related. Why ?
         break;
-    case IMEvent::ItemTeletextChanged_Type:
+    case IMEvent::ItemTeletextChanged:
         UpdateTeletext();
         break;
-    case IMEvent::InterfaceVoutUpdate_Type:
+    case IMEvent::InterfaceVoutUpdate:
         UpdateVout();
         break;
-    case IMEvent::SynchroChanged_Type:
+    case IMEvent::SynchroChanged:
         emit synchroChanged();
         break;
-    case IMEvent::CachingEvent_Type:
+    case IMEvent::CachingEvent:
         UpdateCaching();
         break;
-    case IMEvent::BookmarksChanged_Type:
+    case IMEvent::BookmarksChanged:
         emit bookmarksChanged();
         break;
-    case IMEvent::InterfaceAoutUpdate_Type:
+    case IMEvent::InterfaceAoutUpdate:
         UpdateAout();
         break;
-    case IMEvent::RecordingEvent_Type:
+    case IMEvent::RecordingEvent:
         UpdateRecord();
         break;
-    case IMEvent::ProgramChanged_Type:
+    case IMEvent::ProgramChanged:
         UpdateProgramEvent();
         break;
-    case IMEvent::EPGEvent_Type:
+    case IMEvent::EPGEvent:
         UpdateEPG();
         break;
     default:
@@ -289,7 +289,7 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
     InputManager *im = (InputManager*)param;
     input_item_t *p_item = static_cast<input_item_t *>(newval.p_address);
 
-    IMEvent *event = new IMEvent( IMEvent::ItemChanged_Type, p_item );
+    IMEvent *event = new IMEvent( IMEvent::ItemChanged, p_item );
     im->postUniqueEvent( im, event );
     return VLC_SUCCESS;
 }
@@ -306,75 +306,75 @@ static int InputEvent( vlc_object_t *p_this, const char *,
     switch( newval.i_int )
     {
     case INPUT_EVENT_STATE:
-        event = new IMEvent( IMEvent::ItemStateChanged_Type );
+        event = new IMEvent( IMEvent::ItemStateChanged );
         break;
     case INPUT_EVENT_RATE:
-        event = new IMEvent( IMEvent::ItemRateChanged_Type );
+        event = new IMEvent( IMEvent::ItemRateChanged );
         break;
     case INPUT_EVENT_POSITION:
     //case INPUT_EVENT_LENGTH:
-        event = new IMEvent( IMEvent::PositionUpdate_Type );
+        event = new IMEvent( IMEvent::PositionUpdate );
         break;
 
     case INPUT_EVENT_TITLE:
     case INPUT_EVENT_CHAPTER:
-        event = new IMEvent( IMEvent::ItemTitleChanged_Type );
+        event = new IMEvent( IMEvent::ItemTitleChanged );
         break;
 
     case INPUT_EVENT_ES:
-        event = new IMEvent( IMEvent::ItemEsChanged_Type );
+        event = new IMEvent( IMEvent::ItemEsChanged );
         break;
     case INPUT_EVENT_TELETEXT:
-        event = new IMEvent( IMEvent::ItemTeletextChanged_Type );
+        event = new IMEvent( IMEvent::ItemTeletextChanged );
         break;
 
     case INPUT_EVENT_STATISTICS:
-        event = new IMEvent( IMEvent::StatisticsUpdate_Type );
+        event = new IMEvent( IMEvent::StatisticsUpdate );
         break;
 
     case INPUT_EVENT_VOUT:
-        event = new IMEvent( IMEvent::InterfaceVoutUpdate_Type );
+        event = new IMEvent( IMEvent::InterfaceVoutUpdate );
         break;
     case INPUT_EVENT_AOUT:
-        event = new IMEvent( IMEvent::InterfaceAoutUpdate_Type );
+        event = new IMEvent( IMEvent::InterfaceAoutUpdate );
         break;
 
     case INPUT_EVENT_ITEM_META: /* Codec MetaData + Art */
         b_unified = true;
-        event = new IMEvent( IMEvent::MetaChanged_Type );
+        event = new IMEvent( IMEvent::MetaChanged );
         break;
     case INPUT_EVENT_ITEM_INFO: /* Codec Info */
-        event = new IMEvent( IMEvent::InfoChanged_Type );
+        event = new IMEvent( IMEvent::InfoChanged );
         break;
     case INPUT_EVENT_ITEM_NAME:
-        event = new IMEvent( IMEvent::NameChanged_Type );
+        event = new IMEvent( IMEvent::NameChanged );
         break;
 
     case INPUT_EVENT_AUDIO_DELAY:
     case INPUT_EVENT_SUBTITLE_DELAY:
-        event = new IMEvent( IMEvent::SynchroChanged_Type );
+        event = new IMEvent( IMEvent::SynchroChanged );
         break;
 
     case INPUT_EVENT_CACHE:
-        event = new IMEvent( IMEvent::CachingEvent_Type );
+        event = new IMEvent( IMEvent::CachingEvent );
         break;
 
     case INPUT_EVENT_BOOKMARK:
-        event = new IMEvent( IMEvent::BookmarksChanged_Type );
+        event = new IMEvent( IMEvent::BookmarksChanged );
         break;
 
     case INPUT_EVENT_RECORD:
-        event = new IMEvent( IMEvent::RecordingEvent_Type );
+        event = new IMEvent( IMEvent::RecordingEvent );
         break;
 
     case INPUT_EVENT_PROGRAM:
         /* This is for PID changes */
-        event = new IMEvent( IMEvent::ProgramChanged_Type );
+        event = new IMEvent( IMEvent::ProgramChanged );
         break;
 
     case INPUT_EVENT_ITEM_EPG:
         /* EPG data changed */
-        event = new IMEvent( IMEvent::EPGEvent_Type );
+        event = new IMEvent( IMEvent::EPGEvent );
         break;
 
     case INPUT_EVENT_SIGNAL:
@@ -400,7 +400,7 @@ static int VbiEvent( vlc_object_t *, const char *,
                      vlc_value_t, vlc_value_t, void *param )
 {
     InputManager *im = (InputManager*)param;
-    IMEvent *event = new IMEvent( IMEvent::ItemTeletextChanged_Type );
+    IMEvent *event = new IMEvent( IMEvent::ItemTeletextChanged );
 
     QApplication::postEvent( im, event );
     return VLC_SUCCESS;
@@ -1027,24 +1027,24 @@ void MainInputManager::customEvent( QEvent *event )
     // msg_Dbg( p_intf, "New MainIM Event of type: %i", type );
     switch( type )
     {
-    case PLEvent::PLItemAppended_Type:
+    case PLEvent::PLItemAppended:
         plEv = static_cast<PLEvent*>( event );
         emit playlistItemAppended( plEv->getItemId(), plEv->getParentId() );
         return;
-    case PLEvent::PLItemRemoved_Type:
+    case PLEvent::PLItemRemoved:
         plEv = static_cast<PLEvent*>( event );
         emit playlistItemRemoved( plEv->getItemId() );
         return;
-    case PLEvent::PLEmpty_Type:
+    case PLEvent::PLEmpty:
         plEv = static_cast<PLEvent*>( event );
         emit playlistNotEmpty( plEv->getItemId() >= 0 );
         return;
-    case PLEvent::LeafToParent_Type:
+    case PLEvent::LeafToParent:
         plEv = static_cast<PLEvent*>( event );
         emit leafBecameParent( plEv->getItemId() );
         return;
     default:
-        if( type != IMEvent::ItemChanged_Type ) return;
+        if( type != IMEvent::ItemChanged ) return;
     }
 
     /* Should be PLItemChanged Event */
@@ -1215,7 +1215,7 @@ static int PLItemChanged( vlc_object_t *p_this, const char *psz_var,
 
     MainInputManager *mim = (MainInputManager*)param;
 
-    IMEvent *event = new IMEvent( IMEvent::ItemChanged_Type );
+    IMEvent *event = new IMEvent( IMEvent::ItemChanged );
     QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
 }
@@ -1226,7 +1226,7 @@ static int LeafToParent( vlc_object_t *p_this, const char *psz_var,
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
     MainInputManager *mim = (MainInputManager*)param;
 
-    PLEvent *event = new PLEvent( PLEvent::LeafToParent_Type, newval.i_int );
+    PLEvent *event = new PLEvent( PLEvent::LeafToParent, newval.i_int );
 
     QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
@@ -1249,9 +1249,9 @@ static int PLItemAppended
     MainInputManager *mim = static_cast<MainInputManager*>(data);
     playlist_add_t *p_add = static_cast<playlist_add_t*>( cur.p_address );
 
-    PLEvent *event = new PLEvent( PLEvent::PLItemAppended_Type, p_add->i_item, p_add->i_node  );
+    PLEvent *event = new PLEvent( PLEvent::PLItemAppended, p_add->i_item, p_add->i_node  );
     QApplication::postEvent( mim, event );
-    event = new PLEvent( PLEvent::PLEmpty_Type, p_add->i_item, 0  );
+    event = new PLEvent( PLEvent::PLEmpty, p_add->i_item, 0  );
     QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
 }
@@ -1263,12 +1263,12 @@ static int PLItemRemoved
     playlist_t *pl = (playlist_t *) obj;
     MainInputManager *mim = static_cast<MainInputManager*>(data);
 
-    PLEvent *event = new PLEvent( PLEvent::PLItemRemoved_Type, cur.i_int, 0  );
+    PLEvent *event = new PLEvent( PLEvent::PLItemRemoved, cur.i_int, 0  );
     QApplication::postEvent( mim, event );
     // can't use playlist_IsEmpty(  ) as it isn't true yet
     if ( pl->items.i_size == 1 ) // lock is held
     {
-        event = new PLEvent( PLEvent::PLEmpty_Type, -1, 0 );
+        event = new PLEvent( PLEvent::PLEmpty, -1, 0 );
         QApplication::postEvent( mim, event );
     }
     return VLC_SUCCESS;

@@ -48,33 +48,33 @@ class IMEvent : public UniqueEvent
 {
 public:
     enum event_types {
-        PositionUpdate_Type = QEvent::User + IMEventTypeOffset + 1,
-        ItemChanged_Type,
-        ItemStateChanged_Type,
-        ItemTitleChanged_Type,
-        ItemRateChanged_Type,
-        ItemEsChanged_Type,
-        ItemTeletextChanged_Type,
-        InterfaceVoutUpdate_Type,
-        StatisticsUpdate_Type, /*10*/
-        InterfaceAoutUpdate_Type,
-        MetaChanged_Type,
-        NameChanged_Type,
-        InfoChanged_Type,
-        SynchroChanged_Type,
-        CachingEvent_Type,
-        BookmarksChanged_Type,
-        RecordingEvent_Type,
-        ProgramChanged_Type,
-        RandomChanged_Type,
-        LoopOrRepeatChanged_Type,
-        EPGEvent_Type,
-    /*    SignalChanged_Type, */
+        PositionUpdate = QEvent::User + IMEventTypeOffset + 1,
+        ItemChanged,
+        ItemStateChanged,
+        ItemTitleChanged,
+        ItemRateChanged,
+        ItemEsChanged,
+        ItemTeletextChanged,
+        InterfaceVoutUpdate,
+        StatisticsUpdate, /*10*/
+        InterfaceAoutUpdate,
+        MetaChanged,
+        NameChanged,
+        InfoChanged,
+        SynchroChanged,
+        CachingEvent,
+        BookmarksChanged,
+        RecordingEvent,
+        ProgramChanged,
+        RandomChanged,
+        LoopOrRepeatChanged,
+        EPGEvent,
+    /*    SignalChanged, */
 
-        FullscreenControlToggle_Type = QEvent::User + IMEventTypeOffset + 20,
-        FullscreenControlShow_Type,
-        FullscreenControlHide_Type,
-        FullscreenControlPlanHide_Type,
+        FullscreenControlToggle = QEvent::User + IMEventTypeOffset + 20,
+        FullscreenControlShow,
+        FullscreenControlHide,
+        FullscreenControlPlanHide,
     };
     IMEvent( event_types type, input_item_t *p_input = NULL )
         : UniqueEvent( (QEvent::Type)(type) )
@@ -102,10 +102,10 @@ class PLEvent : public QEvent
 public:
     enum PLEventTypes
     {
-        PLItemAppended_Type = QEvent::User + PLEventTypeOffset + 1,
-        PLItemRemoved_Type,
-        LeafToParent_Type,
-        PLEmpty_Type
+        PLItemAppended = QEvent::User + PLEventTypeOffset + 1,
+        PLItemRemoved,
+        LeafToParent,
+        PLEmpty
     };
     PLEvent( PLEventTypes t, int i, int p = 0 )
         : QEvent( (QEvent::Type)(t) ), i_item(i), i_parent(p) {}
