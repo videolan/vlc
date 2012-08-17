@@ -49,6 +49,7 @@ Audio Filters:
 
 Video Outputs:
  * OpenGL: use glsl instead of ARB to do the YUV->RGB conversions
+ * Fix the power management issue on Windows for standby management
 
 Video Filters:
  * new anaglyph video filter which transforms side by side 3D video streams in
@@ -56,6 +57,7 @@ Video Filters:
  * Support in deinterlacing filter for most 4:2:0, 4:2:2, 4:4:4 YUV formats
    and for bits depth higher than 8bits (like 10bits)
  * Improvements on the transform filter, to support 10bits and RGB formats
+ * Revival of the openCV and openCV example filters
 
 Stream Output:
  * Extended support for recording, notably for MKV and AVI
@@ -65,7 +67,7 @@ Interfaces:
  * .hosts removed from the HTTP server.
  * fixed Lua command line interface console mode under Windows.
  * Better support for MCE remotes on Windows
- * Partial support for Qt5.0
+ * Hotkey support for TS program selection
 
 Mac OS X Port:
  * Discontinued support for PowerPC-based Macs
@@ -83,6 +85,19 @@ Mac OS X Interface:
  * add a new panel for media conversation and streaming
  * The Streaming/Transcoding wizard and the open dialog's output panel are
    deprecated now
+
+Qt:
+ * Partial support for Qt5.0
+ * Menus modifications and improvements
+ * Playlist improvements and fixes, including PictureFlow view
+ * Streaming output wizard rewrite
+ * Numerous fixes
+
+libVLC:
+ * new libvlc_audio_output_device_list_get and libvlc_audio_output_device_list_release functions
+   to replace the deprecated libvlc_audio_output_device_count, libvlc_audio_output_device_longname
+   and libvlc_audio_output_device_id
+ * new libvlc_log_subscribe and libvlc_log_unsubscribe function to register logging callbacks
 
 Removed modules:
  * portaudio audio output: use the native audio output instead
