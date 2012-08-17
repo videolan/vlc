@@ -57,6 +57,12 @@ static int InputEvent( vlc_object_t *, const char *,
 static int VbiEvent( vlc_object_t *, const char *,
                      vlc_value_t, vlc_value_t, void * );
 
+/* Ensure arbitratry (not dynamically allocated) event IDs are not in use */
+static inline void registerAndCheckEventIds( int start, int end )
+{
+    for ( int i=start ; i<=end ; i++ )
+        Q_ASSERT( QEvent::registerEventType( i ) == i ); /* event ID collision ! */
+}
 
 /**********************************************************************
  * InputManager implementation
@@ -80,6 +86,8 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
     timeB        = 0;
     f_cache      = -1.; /* impossible initial value, different from all */
     rateLimitedEventPoster = new RateLimitedEventPoster();
+    registerAndCheckEventIds( IMEvent::PositionUpdate, IMEvent::FullscreenControlPlanHide );
+    registerAndCheckEventIds( PLEvent::PLItemAppended, PLEvent::PLEmpty );
 }
 
 InputManager::~InputManager()
