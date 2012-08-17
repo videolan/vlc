@@ -105,7 +105,7 @@ CXX := $(HOST)-g++ --sysroot=$(ANDROID_NDK)/platforms/android-9/arch-$(PLATFORM_
 endif
 
 ifdef HAVE_MACOSX
-MIN_OSX_VERSION=10.5
+MIN_OSX_VERSION=10.6
 CC=gcc-4.2
 CXX=g++-4.2
 AR=ar
