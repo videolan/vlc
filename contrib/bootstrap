@@ -163,6 +163,7 @@ check_macosx_sdk()
       exit 1
    fi
 
+   add_make "MACOSX_SDK=${SDKROOT}"
    add_make "OSX_VERSION ?= ${OSX_VERSION}"
 }
 
