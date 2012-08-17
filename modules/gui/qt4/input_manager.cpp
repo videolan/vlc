@@ -1029,19 +1029,19 @@ void MainInputManager::customEvent( QEvent *event )
     {
     case PLEvent::PLItemAppended_Type:
         plEv = static_cast<PLEvent*>( event );
-        emit playlistItemAppended( plEv->i_item, plEv->i_parent );
+        emit playlistItemAppended( plEv->getItemId(), plEv->getParentId() );
         return;
     case PLEvent::PLItemRemoved_Type:
         plEv = static_cast<PLEvent*>( event );
-        emit playlistItemRemoved( plEv->i_item );
+        emit playlistItemRemoved( plEv->getItemId() );
         return;
     case PLEvent::PLEmpty_Type:
         plEv = static_cast<PLEvent*>( event );
-        emit playlistNotEmpty( plEv->i_item >= 0 );
+        emit playlistNotEmpty( plEv->getItemId() >= 0 );
         return;
     case PLEvent::LeafToParent_Type:
         plEv = static_cast<PLEvent*>( event );
-        emit leafBecameParent( plEv->i_item );
+        emit leafBecameParent( plEv->getItemId() );
         return;
     default:
         if( type != ItemChanged_Type ) return;

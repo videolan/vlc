@@ -110,7 +110,9 @@ public:
     };
     PLEvent( PLEventTypes t, int i, int p = 0 )
         : QEvent( (QEvent::Type)(t) ), i_item(i), i_parent(p) {}
-
+    int getItemId() const { return i_item; };
+    int getParentId() const { return i_parent; };
+private:
     /* Needed for "playlist-item*" and "leaf-to-parent" callbacks
      * !! Can be a input_item_t->i_id or a playlist_item_t->i_id */
     int i_item;
