@@ -76,23 +76,28 @@ public:
         FullscreenControlHide,
         FullscreenControlPlanHide,
     };
+
     IMEvent( event_types type, input_item_t *p_input = NULL )
         : UniqueEvent( (QEvent::Type)(type) )
     {
         if( (p_item = p_input) != NULL )
             vlc_gc_incref( p_item );
     }
+
     virtual ~IMEvent()
     {
         if( p_item )
             vlc_gc_decref( p_item );
     }
+
     input_item_t *item() const { return p_item; };
+
     virtual bool equals(UniqueEvent *e) const
     {
         IMEvent *ev = static_cast<IMEvent *>(e);
         return ( ev->item() == p_item && ev->type() == type() );
     }
+
 private:
     input_item_t *p_item;
 };
@@ -107,10 +112,12 @@ public:
         LeafToParent,
         PLEmpty
     };
+
     PLEvent( PLEventTypes t, int i, int p = 0 )
         : QEvent( (QEvent::Type)(t) ), i_item(i), i_parent(p) {}
     int getItemId() const { return i_item; };
     int getParentId() const { return i_parent; };
+
 private:
     /* Needed for "playlist-item*" and "leaf-to-parent" callbacks
      * !! Can be a input_item_t->i_id or a playlist_item_t->i_id */
@@ -255,6 +262,7 @@ class MainInputManager : public QObject, public Singleton<MainInputManager>
 {
     Q_OBJECT
     friend class Singleton<MainInputManager>;
+
 public:
     input_thread_t *getInput() { return p_input; }
     InputManager *getIM() { return im; }
@@ -270,6 +278,7 @@ public:
     bool hasEmptyPlaylist();
 
     void requestVoutUpdate() { return im->UpdateVout(); }
+
 private:
     MainInputManager( intf_thread_t * );
     virtual ~MainInputManager();
@@ -295,11 +304,13 @@ public slots:
     void activatePlayQuit( bool );
 
     void loopRepeatLoopStatus();
+
 private slots:
     void notifyRandom( bool );
     void notifyRepeatLoop( bool );
     void notifyVolume( float );
     void notifyMute( bool );
+
 signals:
     void inputChanged( input_thread_t * );
     void volumeChanged( float );
