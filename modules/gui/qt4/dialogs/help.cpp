@@ -141,12 +141,17 @@ static void UpdateCallback( void *data, bool b_ret )
     QEvent* event;
 
     if( b_ret )
-        event = new QEvent( (QEvent::Type)UDOkEvent );
+        event = new QEvent( UpdateDialog::UDOkEvent );
     else
-        event = new QEvent( (QEvent::Type)UDErrorEvent );
+        event = new QEvent( UpdateDialog::UDErrorEvent );
 
     QApplication::postEvent( UDialog, event );
 }
+
+const QEvent::Type UpdateDialog::UDOkEvent =
+        (QEvent::Type)QEvent::registerEventType();
+const QEvent::Type UpdateDialog::UDErrorEvent =
+        (QEvent::Type)QEvent::registerEventType();
 
 UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {

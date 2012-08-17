@@ -65,13 +65,12 @@ public slots:
 
 #ifdef UPDATE_CHECK
 
-static const int UDOkEvent = QEvent::User + DialogEventTypeOffset + 21;
-static const int UDErrorEvent = QEvent::User + DialogEventTypeOffset + 22;
-
 class UpdateDialog : public QVLCFrame, public Singleton<UpdateDialog>
 {
     Q_OBJECT
 public:
+    static const QEvent::Type UDOkEvent;
+    static const QEvent::Type UDErrorEvent;
     void updateNotify( bool );
 
 private:
