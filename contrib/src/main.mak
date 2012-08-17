@@ -118,13 +118,8 @@ ifeq ($(ARCH),x86_64)
 EXTRA_CFLAGS += -m64
 EXTRA_LDFLAGS += -m64
 else
-ifeq ($(ARCH), ppc)
-EXTRA_CFLAGS += -arch ppc
-EXTRA_LDFLAGS += -arch ppc
-else
 EXTRA_CFLAGS += -m32
 EXTRA_LDFLAGS += -m32
-endif
 endif
 
 XCODE_FLAGS = -sdk macosx$(OSX_VERSION)
