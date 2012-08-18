@@ -42,6 +42,7 @@ private:
     QTreeWidget *bookmarksList;
     QPushButton *clearButton;
     QPushButton *delButton;
+    bool b_ignore_updates;
 
 private slots:
     void update();
