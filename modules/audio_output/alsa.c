@@ -62,8 +62,8 @@ static void GetDevices (vlc_object_t *, module_config_t *, const char *);
 #define AUDIO_DEV_LONGTEXT N_("Audio output device (using ALSA syntax).")
 
 #define AUDIO_CHAN_TEXT N_("Audio output channels")
-#define AUDIO_CHAN_LONGTEXT N_("Channels available for audio output." \
-    "If the input has more channels than the output, it will be down-mixed." \
+#define AUDIO_CHAN_LONGTEXT N_("Channels available for audio output. " \
+    "If the input has more channels than the output, it will be down-mixed. " \
     "This parameter is ignored when digital pass-through is active.")
 static const int channels[] = {
     AOUT_CHAN_CENTER, AOUT_CHANS_STEREO, AOUT_CHANS_4_0, AOUT_CHANS_4_1,

@@ -77,7 +77,7 @@ static void SavePicture( filter_t *, picture_t * );
                             "form if replace is not true." )
 
 #define PATH_TEXT N_( "Directory path prefix" )
-#define PATH_LONGTEXT N_( "Directory path where images files should be saved." \
+#define PATH_LONGTEXT N_( "Directory path where images files should be saved. " \
                           "If not set, then images will be automatically saved in " \
                           "users homedir." )
 
