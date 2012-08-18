@@ -196,7 +196,7 @@ static bool CheckMimeHeader( demux_t *p_demux, int *p_header_size )
         /* Some broken stream may lack the first boundary */
         if ( p_sys->psz_separator == NULL )
         {
-            msg_Warn( p_demux, "Misformed stream. Trying to work around");
+            msg_Warn( p_demux, "Malformed stream. Trying to work around");
             char *content_type = stream_ContentType( p_demux->s );
             if ( content_type == NULL )
                 return false;
