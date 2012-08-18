@@ -505,6 +505,8 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         if( !b )
         {
             tk->b_inited = false;
+            if( tk->fmt.i_cat == VIDEO_ES || tk->fmt.i_cat == AUDIO_ES )
+                tk->i_last_dts = i_pts;
             return;
         }
     }
