@@ -65,6 +65,22 @@ static VLCMainMenu *_o_sharedInstance = nil;
     else
     {
         _o_sharedInstance = [super init];
+
+        o_ptc_translation_dict = [NSDictionary dictionaryWithObjectsAndKeys:
+                      _NS("Track Number"),  TRACKNUM_COLUMN,
+                      _NS("Title"),         TITLE_COLUMN,
+                      _NS("Artist"),        ARTIST_COLUMN,
+                      _NS("Duration"),      DURATION_COLUMN,
+                      _NS("Genre"),         GENRE_COLUMN,
+                      _NS("Album"),         ALBUM_COLUMN,
+                      _NS("Description"),   DESCRIPTION_COLUMN,
+                      _NS("Date"),          DATE_COLUMN,
+                      _NS("Language"),      LANGUAGE_COLUMN,
+                      _NS("URI"),           URI_COLUMN,
+                      nil];
+        // this array also assigns tags (index) to type of menu item
+        o_ptc_menuorder = [NSArray arrayWithObjects:TRACKNUM_COLUMN, TITLE_COLUMN, ARTIST_COLUMN, DURATION_COLUMN,
+                       GENRE_COLUMN, ALBUM_COLUMN, DESCRIPTION_COLUMN, DATE_COLUMN, LANGUAGE_COLUMN, URI_COLUMN, nil];
     }
 
     return _o_sharedInstance;
@@ -90,6 +106,9 @@ static VLCMainMenu *_o_sharedInstance = nil;
         [o_convertandsave release];
 
     [o_extMgr release];
+
+    if( o_mu_playlistTableColumnsContextMenu )
+        [o_mu_playlistTableColumnsContextMenu release];
 
     [super dealloc];
 }
@@ -292,16 +311,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_togglePlaymodeButtons setTitle: _NS("Show Shuffle & Repeat Buttons")];
     [o_mi_togglePlaymodeButtons setState: config_GetInt( VLCIntf, "macosx-show-playmode-buttons")];
     [o_mu_playlistTableColumns setTitle: _NS("Playlist Table Columns")];
-    [o_mi_ptc_tracknum setTitle: _NS("Track Number")];
-    [o_mi_ptc_title setTitle: _NS("Title")];
-    [o_mi_ptc_artist setTitle: _NS("Artist")];
-    [o_mi_ptc_duration setTitle: _NS("Duration")];
-    [o_mi_ptc_genre setTitle: _NS("Genre")];
-    [o_mi_ptc_album setTitle: _NS("Album")];
-    [o_mi_ptc_description setTitle: _NS("Description")];
-    [o_mi_ptc_date setTitle: _NS("Date")];
-    [o_mi_ptc_language setTitle: _NS("Language")];
-    [o_mi_ptc_uri setTitle: _NS("URI")];
 
     [o_mi_program setTitle: _NS("Program")];
     [o_mu_program setTitle: _NS("Program")];
@@ -397,6 +406,31 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_vmi_mute setTitle: _NS("Mute")];
     [o_vmi_fullscreen setTitle: _NS("Fullscreen")];
     [o_vmi_snapshot setTitle: _NS("Snapshot")];
+}
+
+- (NSMenu *)setupPlaylistTableColumnsMenu
+{
+    NSMenu *o_context_menu = [[NSMenu alloc] init];
+
+    NSMenuItem *o_mi_tmp;
+    for( NSUInteger i = 0; i < [o_ptc_menuorder count]; i++ )
+    {
+        NSString *o_title = [o_ptc_translation_dict objectForKey:[o_ptc_menuorder objectAtIndex:i]];
+        o_mi_tmp = [o_mu_playlistTableColumns addItemWithTitle:o_title
+                                                        action:@selector(togglePlaylistColumnTable:)
+                                                 keyEquivalent:@""];
+        [o_mi_tmp setTarget:self];
+        [o_mi_tmp setTag:i];
+
+        o_mi_tmp = [o_context_menu addItemWithTitle:o_title
+                                             action:@selector(togglePlaylistColumnTable:)
+                                      keyEquivalent:@""];
+        [o_mi_tmp setTarget:self];
+        [o_mi_tmp setTag:i];
+    }
+    if( !o_mu_playlistTableColumnsContextMenu )
+        o_mu_playlistTableColumnsContextMenu = [o_context_menu retain];
+    return [o_context_menu autorelease];
 }
 
 #pragma mark -
@@ -636,56 +670,20 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (IBAction)togglePlaylistColumnTable:(id)sender
 {
-    [sender setState: ![sender state]];
+    NSInteger i_new_state = ![sender state];
+    NSInteger i_tag = [sender tag];
+    [[o_mu_playlistTableColumns            itemWithTag: i_tag] setState: i_new_state];
+    [[o_mu_playlistTableColumnsContextMenu itemWithTag: i_tag] setState: i_new_state];
 
-    NSString * o_column;
-
-    if (sender == o_mi_ptc_tracknum)
-        o_column = TRACKNUM_COLUMN;
-    else if (sender == o_mi_ptc_title)
-        o_column = TITLE_COLUMN;
-    else if (sender == o_mi_ptc_artist)
-        o_column = ARTIST_COLUMN;
-    else if (sender == o_mi_ptc_duration)
-        o_column = DURATION_COLUMN;
-    else if (sender == o_mi_ptc_genre)
-        o_column = GENRE_COLUMN;
-    else if (sender == o_mi_ptc_album)
-        o_column = ALBUM_COLUMN;
-    else if (sender == o_mi_ptc_description)
-        o_column = DESCRIPTION_COLUMN;
-    else if (sender == o_mi_ptc_date)
-        o_column = DATE_COLUMN;
-    else if (sender == o_mi_ptc_language)
-        o_column = LANGUAGE_COLUMN;
-    else if (sender == o_mi_ptc_uri)
-        o_column = URI_COLUMN;
-
-    [[[VLCMain sharedInstance] playlist] setColumn: o_column state: [sender state]];
+    NSString *o_column = [o_ptc_menuorder objectAtIndex: i_tag];
+    [[[VLCMain sharedInstance] playlist] setColumn: o_column state: i_new_state];
 }
 
 - (void)setPlaylistColumnTableState:(NSInteger)i_state forColumn:(NSString *)o_column
 {
-    if ([o_column isEqualToString: TRACKNUM_COLUMN])
-        [o_mi_ptc_tracknum setState: i_state];
-    else if ([o_column isEqualToString: TITLE_COLUMN])
-        [o_mi_ptc_title setState: i_state];
-    else if ([o_column isEqualToString: ARTIST_COLUMN])
-        [o_mi_ptc_artist setState: i_state];
-    else if ([o_column isEqualToString: DURATION_COLUMN])
-        [o_mi_ptc_duration setState: i_state];
-    else if ([o_column isEqualToString: GENRE_COLUMN])
-        [o_mi_ptc_genre setState: i_state];
-    else if ([o_column isEqualToString: ALBUM_COLUMN])
-        [o_mi_ptc_album setState: i_state];
-    else if ([o_column isEqualToString: DESCRIPTION_COLUMN])
-        [o_mi_ptc_description setState: i_state];
-    else if ([o_column isEqualToString: DATE_COLUMN])
-        [o_mi_ptc_date setState: i_state];
-    else if ([o_column isEqualToString: LANGUAGE_COLUMN])
-        [o_mi_ptc_language setState: i_state];
-    else if ([o_column isEqualToString: URI_COLUMN])
-        [o_mi_ptc_uri setState: i_state];
+    NSInteger i_tag = [o_ptc_menuorder indexOfObject: o_column];
+    [[o_mu_playlistTableColumns            itemWithTag: i_tag] setState: i_state];
+    [[o_mu_playlistTableColumnsContextMenu itemWithTag: i_tag] setState: i_state];
 }
 
 #pragma mark -

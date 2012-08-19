@@ -110,6 +110,7 @@
     IBOutlet id o_save_accessory_popup;
     IBOutlet id o_save_accessory_text;
 
+    IBOutlet id o_playlist_header;
 
     NSImage *o_descendingSortingImage;
     NSImage *o_ascendingSortingImage;

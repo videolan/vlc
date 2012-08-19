@@ -108,16 +108,7 @@
     IBOutlet NSMenuItem * o_mi_toggleJumpButtons;
     IBOutlet NSMenuItem * o_mi_togglePlaymodeButtons;
     IBOutlet NSMenu * o_mu_playlistTableColumns;
-    IBOutlet NSMenuItem * o_mi_ptc_tracknum;
-    IBOutlet NSMenuItem * o_mi_ptc_title;
-    IBOutlet NSMenuItem * o_mi_ptc_artist;
-    IBOutlet NSMenuItem * o_mi_ptc_duration;
-    IBOutlet NSMenuItem * o_mi_ptc_genre;
-    IBOutlet NSMenuItem * o_mi_ptc_album;
-    IBOutlet NSMenuItem * o_mi_ptc_description;
-    IBOutlet NSMenuItem * o_mi_ptc_date;
-    IBOutlet NSMenuItem * o_mi_ptc_language;
-    IBOutlet NSMenuItem * o_mi_ptc_uri;
+    NSMenu * o_mu_playlistTableColumnsContextMenu;
 
     IBOutlet NSMenu * o_mu_audio;
     IBOutlet NSMenuItem * o_mi_vol_up;
@@ -206,6 +197,10 @@
     IBOutlet NSMenuItem * o_vmi_mute;
     IBOutlet NSMenuItem * o_vmi_fullscreen;
     IBOutlet NSMenuItem * o_vmi_snapshot;
+
+    // information for playlist table columns menu
+    NSDictionary * o_ptc_translation_dict;
+    NSArray * o_ptc_menuorder;
 }
 + (VLCMainMenu *)sharedInstance;
 
@@ -232,6 +227,7 @@
 - (IBAction)togglePlaymodeButtons:(id)sender;
 - (IBAction)togglePlaylistColumnTable:(id)sender;
 - (void)setPlaylistColumnTableState:(NSInteger)i_state forColumn:(NSString *)o_column;
+- (NSMenu *)setupPlaylistTableColumnsMenu;
 
 - (IBAction)toggleFullscreen:(id)sender;
 - (IBAction)resizeVideoWindow:(id)sender;

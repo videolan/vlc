@@ -512,6 +512,10 @@
 
     id o_menu = [[VLCMain sharedInstance] mainMenu];
     NSString * o_column;
+
+    NSMenu *o_context_menu = [o_menu setupPlaylistTableColumnsMenu];
+    [o_playlist_header setMenu: o_context_menu];
+
     for (NSUInteger i = 0; i < count; i++)
     {
         o_column = [[o_columnArray objectAtIndex:i] objectAtIndex:0];
