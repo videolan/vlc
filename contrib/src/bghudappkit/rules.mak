@@ -17,6 +17,7 @@ $(TARBALLS)/bghudappkit-git.tar.xz:
 
 bghudappkit: bghudappkit-git.tar.xz .sum-bghudappkit
 	$(UNPACK)
+	$(APPLY) $(SRC)/bghudappkit/bghudappkit-xcode4.patch
 	$(MOVE)
 
 .bghudappkit: bghudappkit
