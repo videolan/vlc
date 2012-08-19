@@ -80,25 +80,30 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
  * On failure, *res is undefined. On success, it must be freed with
  * freeaddrinfo().
  */
-int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
-                     int i_port, const struct addrinfo *p_hints,
-                     struct addrinfo **res )
+int vlc_getaddrinfo (vlc_object_t *p_this, const char *node,
+                     unsigned port, const struct addrinfo *p_hints,
+                     struct addrinfo **res)
 {
     struct addrinfo hints;
-    char psz_buf[NI_MAXHOST], psz_service[6];
+    char psz_buf[NI_MAXHOST], portbuf[6], *servname;
 
     /*
      * In VLC, we always use port number as integer rather than strings
      * for historical reasons (and portability).
      */
-    if( ( i_port > 65535 ) || ( i_port < 0 ) )
+    if (port != 0)
     {
-        msg_Err( p_this, "invalid port number %d specified", i_port );
-        return EAI_SERVICE;
+        if (port > 65535)
+        {
+            msg_Err (p_this, "invalid port number %u specified", port);
+            return EAI_SERVICE;
+        }
+        /* cannot overflow */
+        snprintf (portbuf, sizeof (portbuf), "%u", port);
+        servname = portbuf;
     }
-
-    /* cannot overflow */
-    snprintf( psz_service, 6, "%d", i_port );
+    else
+        servname = NULL;
 
     /* Check if we have to force ipv4 or ipv6 */
     memset (&hints, 0, sizeof (hints));
@@ -164,7 +169,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     if ((hints.ai_flags & AI_NUMERICHOST) == 0)
     {
         hints.ai_flags |= AI_NUMERICHOST;
-        ret = getaddrinfo (node, psz_service, &hints, res);
+        ret = getaddrinfo (node, servname, &hints, res);
         if (ret == 0)
             goto out;
         hints.ai_flags &= ~AI_NUMERICHOST;
@@ -173,13 +178,13 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
 #ifdef AI_IDN
     /* Run-time I18n Domain Names support */
     hints.ai_flags |= AI_IDN;
-    ret = getaddrinfo (node, psz_service, &hints, res);
+    ret = getaddrinfo (node, servname, &hints, res);
     if (ret != EAI_BADFLAGS)
         goto out;
     /* IDN not available: disable and retry without it */
     hints.ai_flags &= ~AI_IDN;
 #endif
-    ret = getaddrinfo (node, psz_service, &hints, res);
+    ret = getaddrinfo (node, servname, &hints, res);
 
 #if defined(AI_IDN) || defined(WIN32)
 out:

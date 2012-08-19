@@ -260,7 +260,8 @@ VLC_API int  getnameinfo ( const struct sockaddr *, socklen_t,
 #endif
 
 VLC_API int vlc_getnameinfo( const struct sockaddr *, int, char *, int, int *, int );
-VLC_API int vlc_getaddrinfo( vlc_object_t *, const char *, int, const struct addrinfo *, struct addrinfo ** );
+VLC_API int vlc_getaddrinfo (vlc_object_t *, const char *, unsigned,
+                             const struct addrinfo *, struct addrinfo **);
 
 
 #ifdef __OS2__
