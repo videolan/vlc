@@ -192,7 +192,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_gop_user_data = 0;
 
 #if defined( __i386__ ) || defined( __x86_64__ )
-    unsigned cpu = vlc_CPU();
     if( vlc_CPU_MMX() )
         i_accel |= MPEG2_ACCEL_X86_MMX;
     if( vlc_CPU_3dNOW() )
