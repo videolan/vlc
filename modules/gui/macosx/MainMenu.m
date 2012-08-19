@@ -69,7 +69,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         o_ptc_translation_dict = [NSDictionary dictionaryWithObjectsAndKeys:
                       _NS("Track Number"),  TRACKNUM_COLUMN,
                       _NS("Title"),         TITLE_COLUMN,
-                      _NS("Artist"),        ARTIST_COLUMN,
+                      _NS("Author"),        ARTIST_COLUMN,
                       _NS("Duration"),      DURATION_COLUMN,
                       _NS("Genre"),         GENRE_COLUMN,
                       _NS("Album"),         ALBUM_COLUMN,
@@ -676,7 +676,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [[o_mu_playlistTableColumnsContextMenu itemWithTag: i_tag] setState: i_new_state];
 
     NSString *o_column = [o_ptc_menuorder objectAtIndex: i_tag];
-    [[[VLCMain sharedInstance] playlist] setColumn: o_column state: i_new_state];
+    [[[VLCMain sharedInstance] playlist] setColumn: o_column state: i_new_state translationDict: o_ptc_translation_dict];
 }
 
 - (void)setPlaylistColumnTableState:(NSInteger)i_state forColumn:(NSString *)o_column
@@ -684,6 +684,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     NSInteger i_tag = [o_ptc_menuorder indexOfObject: o_column];
     [[o_mu_playlistTableColumns            itemWithTag: i_tag] setState: i_state];
     [[o_mu_playlistTableColumnsContextMenu itemWithTag: i_tag] setState: i_state];
+    [[[VLCMain sharedInstance] playlist] setColumn: o_column state: i_state translationDict: o_ptc_translation_dict];
 }
 
 #pragma mark -

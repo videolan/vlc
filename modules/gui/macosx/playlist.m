@@ -522,7 +522,6 @@
         if ([o_column isEqualToString:@"status"])
             continue;
 
-        [self setColumn: o_column state: NSOnState];
         [o_menu setPlaylistColumnTableState: NSOnState forColumn: o_column];
         [[o_outline_view tableColumnWithIdentifier: o_column] setWidth: [[[o_columnArray objectAtIndex:i] objectAtIndex:1] floatValue]];
     }
@@ -1487,7 +1486,7 @@
     return [[o_nodes_array arrayByAddingObjectsFromArray: o_items_array] retain];
 }
 
-- (void)setColumn: (NSString *)o_column state: (NSInteger)i_state
+- (void)setColumn: (NSString *)o_column state: (NSInteger)i_state translationDict:(NSDictionary *)o_dict
 {
     NSTableColumn * o_work_tc;
 
@@ -1497,7 +1496,8 @@
         [o_work_tc setEditable: NO];
         [[o_work_tc dataCell] setFont: [NSFont controlContentFontOfSize:11.]];
 
-        /* we cannot use a makro here, because gettext isn't clever enough for that */
+        [[o_work_tc headerCell] setStringValue: [o_dict objectForKey:o_column]];
+
         if ([o_column isEqualToString: TRACKNUM_COLUMN])
         {
             [o_work_tc setMaxWidth: 20.];
@@ -1505,25 +1505,8 @@
         }
         else if ([o_column isEqualToString: TITLE_COLUMN])
         {
-            [[o_work_tc headerCell] setStringValue: _NS("Name")];
             [o_work_tc setResizingMask: NSTableColumnAutoresizingMask | NSTableColumnUserResizingMask];
         }
-        else if ([o_column isEqualToString: ARTIST_COLUMN])
-            [[o_work_tc headerCell] setStringValue: _NS("Author")];
-        else if ([o_column isEqualToString: DURATION_COLUMN])
-            [[o_work_tc headerCell] setStringValue: _NS("Duration")];
-        else if ([o_column isEqualToString: GENRE_COLUMN])
-            [[o_work_tc headerCell] setStringValue: _NS("Genre")];
-        else if ([o_column isEqualToString: ALBUM_COLUMN])
-            [[o_work_tc headerCell] setStringValue: _NS("Album")];
-        else if ([o_column isEqualToString: DESCRIPTION_COLUMN])
-            [[o_work_tc headerCell] setStringValue: _NS("Description")];
-        else if ([o_column isEqualToString: DATE_COLUMN])
-            [[o_work_tc headerCell] setStringValue: _NS("Date")];
-        else if ([o_column isEqualToString: LANGUAGE_COLUMN])
-            [[o_work_tc headerCell] setStringValue: _NS("Language")];
-        else if ([o_column isEqualToString: URI_COLUMN])
-            [[o_work_tc headerCell] setStringValue: _NS("URI")];
 
         [o_outline_view addTableColumn: o_work_tc];
         [o_work_tc release];
