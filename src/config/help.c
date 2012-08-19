@@ -453,7 +453,7 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
                     psz_bra = OPTION_VALUE_SEP "{";
                     psz_type = psz_buffer;
                     psz_buffer[0] = '\0';
-                    for( i = 0; p_item->ppsz_list[i]; i++ )
+                    for( i = 0; i < p_item->i_list; i++ )
                     {
                         if( i ) strcat( psz_buffer, "," );
                         strcat( psz_buffer, p_item->ppsz_list[i] );
@@ -481,7 +481,7 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
                     psz_bra = OPTION_VALUE_SEP "{";
                     psz_type = psz_buffer;
                     psz_buffer[0] = '\0';
-                    for( i = 0; p_item->ppsz_list_text[i]; i++ )
+                    for( i = 0; i < p_item->i_list; i++ )
                     {
                         if( i ) strcat( psz_buffer, ", " );
                         sprintf( psz_buffer + strlen(psz_buffer), "%i (%s)",
