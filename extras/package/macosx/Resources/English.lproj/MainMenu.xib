@@ -21,15 +21,15 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="4948"/>
       <integer value="915"/>
+      <integer value="5160"/>
+      <integer value="2730"/>
+      <integer value="21"/>
       <integer value="2770"/>
+      <integer value="4948"/>
       <integer value="4845"/>
       <integer value="4722"/>
-      <integer value="5160"/>
       <integer value="4850"/>
-      <integer value="4372"/>
-      <integer value="2730"/>
       <integer value="1617"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
@@ -451,7 +451,7 @@
                               <reference key="NSDelegate"/>
                               <reference key="NSDataSource"/>
                               <int key="NSGridStyleMask">1</int>
-                              <int key="NSColumnAutoresizingStyle">4</int>
+                              <int key="NSColumnAutoresizingStyle">3</int>
                               <int key="NSDraggingSourceMaskForLocal">15</int>
                               <int key="NSDraggingSourceMaskForNonLocal">0</int>
                               <bool key="NSAllowsTypeSelect">YES</bool>

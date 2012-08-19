@@ -1500,12 +1500,9 @@
 
         if ([o_column isEqualToString: TRACKNUM_COLUMN])
         {
-            [o_work_tc setMaxWidth: 20.];
+            [o_work_tc setWidth: 20.];
+            [o_work_tc setResizingMask: NSTableColumnNoResizing];
             [[o_work_tc headerCell] setStringValue: @"#"];
-        }
-        else if ([o_column isEqualToString: TITLE_COLUMN])
-        {
-            [o_work_tc setResizingMask: NSTableColumnAutoresizingMask | NSTableColumnUserResizingMask];
         }
 
         [o_outline_view addTableColumn: o_work_tc];
