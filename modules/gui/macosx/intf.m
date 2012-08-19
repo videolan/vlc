@@ -2117,13 +2117,12 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
     [saveFolderPanel setCanSelectHiddenExtension: NO];
     [saveFolderPanel setCanCreateDirectories: YES];
-    [saveFolderPanel setAllowedFileTypes: [NSArray arrayWithObject:@"rtfd"]];
-    [saveFolderPanel beginSheetForDirectory:nil file: [NSString stringWithFormat: _NS("VLC Debug Log (%s).rtfd"), VERSION_MESSAGE] modalForWindow: o_msgs_panel modalDelegate:self didEndSelector:@selector(saveDebugLogAsRTF:returnCode:contextInfo:) contextInfo:nil];
+    [saveFolderPanel setAllowedFileTypes: [NSArray arrayWithObject:@"rtf"]];
+    [saveFolderPanel beginSheetForDirectory:nil file: [NSString stringWithFormat: _NS("VLC Debug Log (%s).rtf"), VERSION_MESSAGE] modalForWindow: o_msgs_panel modalDelegate:self didEndSelector:@selector(saveDebugLogAsRTF:returnCode:contextInfo:) contextInfo:nil];
 }
 
 - (void)saveDebugLogAsRTF: (NSSavePanel *)sheet returnCode: (int)returnCode contextInfo: (void *)contextInfo
 {
-    BOOL b_returned;
     if( returnCode == NSOKButton )
     {
         NSUInteger count = [o_msg_arr count];
@@ -2132,11 +2131,14 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         {
             [string appendAttributedString: [o_msg_arr objectAtIndex: i]];
         }
-        b_returned = [[string RTFDFileWrapperFromRange:NSMakeRange( 0, [string length] ) documentAttributes:[NSDictionary dictionaryWithObject: NSRTFDTextDocumentType forKey: NSDocumentTypeDocumentAttribute]] writeToFile:[[sheet URL] path] atomically:YES updateFilenames:NO];
-        [string release];
 
-        if(! b_returned )
+        NSData *data = [string RTFFromRange:NSMakeRange( 0, [string length] )
+                         documentAttributes:[NSDictionary dictionaryWithObject: NSRTFTextDocumentType forKey: NSDocumentTypeDocumentAttribute]];        
+
+        if( [data writeToFile: [[sheet URL] path] atomically: YES] == NO )
             msg_Warn( p_intf, "Error while saving the debug log" );
+
+        [string release];
     }
 }
 
