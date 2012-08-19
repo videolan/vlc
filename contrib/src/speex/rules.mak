@@ -28,17 +28,17 @@ speex: speex-$(SPEEX_VERSION).tar.gz .sum-speex
 	$(APPLY) $(SRC)/speex/neon.patch
 	$(MOVE)
 
-CONFIG_OPTS := --without-ogg --enable-resample-full-sinc-table
+SPEEX_CONF := --without-ogg --enable-resample-full-sinc-table
 ifndef HAVE_FPU
-CONFIG_OPTS += --enable-fixed-point
+SPEEX_CONF += --enable-fixed-point
 ifeq ($(ARCH),arm)
-CONFIG_OPTS += --enable-arm5e-asm
+SPEEX_CONF += --enable-arm5e-asm
 endif
 endif
 
 .speex: speex
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(CONFIG_OPTS)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(SPEEX_CONF)
 	cd $< && $(MAKE) install
 	touch $@
 

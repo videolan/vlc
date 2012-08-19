@@ -15,29 +15,28 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2 .sum-gcrypt
 
 DEPS_gcrypt = gpg-error
 
-CONFIGURE_OPTS =
+GCRYPT_CONF = \
+	--enable-ciphers=aes,des,rfc2268,arcfour \
+	--enable-digests=sha1,md5,rmd160,sha512 \
+	--enable-pubkey-ciphers=dsa,rsa,ecc
 ifdef HAVE_WIN64
-CONFIGURE_OPTS += --disable-asm
+GCRYPT_CONF += --disable-asm
 endif
 ifdef HAVE_MACOSX
-CONFIGURE_OPTS += --disable-aesni-support
+GCRYPT_CONF += --disable-aesni-support
 else
 ifdef HAVE_BSD
-CONFIGURE_OPTS += --disable-asm --disable-aesni-support
+GCRYPT_CONF += --disable-asm --disable-aesni-support
 endif
 endif
 ifdef HAVE_ANDROID
 ifeq ($(ANDROID_ABI), x86)
-CONFIGURE_OPTS += ac_cv_sys_symbol_underscore=no
+GCRYPT_CONF += ac_cv_sys_symbol_underscore=no
 endif
 endif
 
 .gcrypt: libgcrypt
 	#$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) \
-		--enable-ciphers=aes,des,rfc2268,arcfour \
-		--enable-digests=sha1,md5,rmd160,sha512 \
-		--enable-pubkey-ciphers=dsa,rsa,ecc \
-		$(CONFIGURE_OPTS)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(GCRYPT_CONF)
 	cd $< && $(MAKE) install
 	touch $@

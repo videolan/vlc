@@ -24,12 +24,18 @@ ifdef HAVE_WIN32
 endif
 	$(MOVE)
 
-CONFIGURE_FLAGS := --disable-imlib2 --disable-doc --disable-ruby --disable-csharp --disable-cxx --disable-java
+CACA_CONF := \
+	--disable-imlib2 \
+	--disable-doc \
+	--disable-ruby \
+	--disable-csharp \
+	--disable-cxx \
+	--disable-java
 ifdef HAVE_MACOSX
-CONFIGURE_FLAGS += --disable-x11
+CACA_CONF += --disable-x11
 endif
 
 .caca: caca
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(CONFIGURE_FLAGS)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(CACA_CONF)
 	cd $< && $(MAKE) -C $< install
 	touch $@

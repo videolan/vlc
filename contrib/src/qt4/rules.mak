@@ -31,14 +31,14 @@ qt4: qt-$(QT4_VERSION).tar.gz .sum-qt4
 XTOOLS := XCC="$(CC)" XCXX="$(CXX)" XSTRIP="$(STRIP)" XAR="$(AR)"
 
 ifdef HAVE_MACOSX
-PLATFORM := -platform darwin-g++
+QT_PLATFORM := -platform darwin-g++
 endif
 ifdef HAVE_WIN32
-PLATFORM := -xplatform win32-g++
+QT_PLATFORM := -xplatform win32-g++
 endif
 
 .qt4: qt4
-	cd $< && $(XTOOLS) ./configure $(PLATFORM) -static -release -fast -no-exceptions -no-stl -no-sql-sqlite -no-qt3support -no-gif -no-libmng -qt-libjpeg -no-libtiff -no-qdbus -no-openssl -no-webkit -sse -no-script -no-multimedia -no-phonon -opensource -no-scripttools -no-opengl -no-script -no-scripttools -no-declarative -no-declarative-debug -opensource -no-s60 -host-little-endian -confirm-license
+	cd $< && $(XTOOLS) ./configure $(QT_PLATFORM) -static -release -fast -no-exceptions -no-stl -no-sql-sqlite -no-qt3support -no-gif -no-libmng -qt-libjpeg -no-libtiff -no-qdbus -no-openssl -no-webkit -sse -no-script -no-multimedia -no-phonon -opensource -no-scripttools -no-opengl -no-script -no-scripttools -no-declarative -no-declarative-debug -opensource -no-s60 -host-little-endian -confirm-license
 	cd $< && $(MAKE) $(XTOOLS) sub-src
 	# BUILDING QT BUILD TOOLS
 ifdef HAVE_CROSS_COMPILE
