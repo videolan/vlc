@@ -41,6 +41,7 @@
 #include <QFont>
 #include <QTimer>
 #include <QAction>
+#include <QBuffer>
 
 QIcon PLModel::icons[ITEM_TYPE_NUMBER];
 
@@ -390,8 +391,13 @@ QVariant PLModel::data( const QModelIndex &index, const int role ) const
         }
         name = qfu( p_item->psz_name );
         PL_UNLOCK;
-        return QVariant( QString("<img width=\"128\" height=\"128\" align=\"left\" src=\"%1\"/><div><b>%2</b><br/>%3</div>")
-                         .arg( artUrl )
+        QPixmap image = getArtPixmap( index, QSize( 128, 128 ) );
+        QByteArray bytes;
+        QBuffer buffer( &bytes );
+        buffer.open( QIODevice::WriteOnly );
+        image.save(&buffer, "BMP"); /* uncompressed, see qpixmap#reading-and-writing-image-files */
+        return QVariant( QString("<img width=\"128\" height=\"128\" align=\"left\" src=\"data:image/bmp;base64,%1\"/><div><b>%2</b><br/>%3</div>")
+                         .arg( bytes.toBase64().constData() )
                          .arg( name )
                          .arg( qtr("Duration") + ": " + duration )
                         );
