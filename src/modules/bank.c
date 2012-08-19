@@ -489,7 +489,8 @@ static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
     /* For now we force loading if the module's config contains callbacks.
      * Could be optimized by adding an API call.*/
     for (size_t n = module->confsize, i = 0; i < n; i++)
-         if (module->p_config[i].pf_update_list != NULL)
+         if (module->p_config[i].list_count == 0
+          && module->p_config[i].list.psz_cb != NULL)
          {
              /* !unloadable not allowed for plugins with callbacks */
              vlc_module_destroy (module);

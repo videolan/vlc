@@ -182,11 +182,12 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, bool is_interlaced)
 
     const module_config_t *optd = config_FindConfig(VLC_OBJECT(vout), "deinterlace");
     var_Change(vout, "deinterlace", VLC_VAR_CLEARCHOICES, NULL, NULL);
-    for (int i = 0; optd && i < optd->i_list; i++) {
-        val.i_int  = optd->pi_list[i];
-        text.psz_string = (char*)vlc_gettext(optd->ppsz_list_text[i]);
-        var_Change(vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text);
-    }
+    if (likely(optd != NULL))
+        for (unsigned i = 0; i < optd->list_count; i++) {
+            val.i_int = optd->list.i[i];
+            text.psz_string = vlc_gettext(optd->list_text[i]);
+            var_Change(vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text);
+        }
     var_AddCallback(vout, "deinterlace", DeinterlaceCallback, NULL);
     /* */
     var_Create(vout, "deinterlace-mode", VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_HASCHOICE);
@@ -197,14 +198,16 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, bool is_interlaced)
 
     const module_config_t *optm = config_FindConfig(VLC_OBJECT(vout), "deinterlace-mode");
     var_Change(vout, "deinterlace-mode", VLC_VAR_CLEARCHOICES, NULL, NULL);
-    for (int i = 0; optm && i < optm->i_list; i++) {
-        if (!DeinterlaceIsModeValid(optm->ppsz_list[i]))
-            continue;
+    if (likely(optm != NULL))
+        for (unsigned i = 0; i < optm->list_count; i++) {
+             if (!DeinterlaceIsModeValid(optm->list.psz[i]))
+                 continue;
 
-        val.psz_string  = optm->ppsz_list[i];
-        text.psz_string = (char*)vlc_gettext(optm->ppsz_list_text[i]);
-        var_Change(vout, "deinterlace-mode", VLC_VAR_ADDCHOICE, &val, &text);
-    }
+             val.psz_string  = optm->list.psz[i];
+             text.psz_string = vlc_gettext(optm->list_text[i]);
+             var_Change(vout, "deinterlace-mode", VLC_VAR_ADDCHOICE,
+                        &val, &text);
+         }
     var_AddCallback(vout, "deinterlace-mode", DeinterlaceCallback, NULL);
     /* */
     var_Create(vout, "deinterlace-needed", VLC_VAR_BOOL);

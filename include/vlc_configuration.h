@@ -55,32 +55,39 @@ typedef int (*vlc_string_list_cb)(vlc_object_t *, const char *,
 
 struct module_config_t
 {
-    char        *psz_type;                          /* Configuration subtype */
-    char        *psz_name;                                    /* Option name */
-    char        *psz_text;      /* Short comment on the configuration option */
-    char        *psz_longtext;   /* Long comment on the configuration option */
+    union
+    {
+        struct
+        {
+            uint8_t     i_type;                        /* Configuration type */
+            char        i_short;               /* Optional short option name */
+            unsigned    b_advanced:1;                     /* Advanced option */
+            unsigned    b_internal:1;          /* Hidden from prefs and help */
+            unsigned    b_unsaveable:1;       /* Not stored in configuration */
+            unsigned    b_safe:1;       /* Safe in web plugins and playlists */
+            unsigned    b_removed:1;                           /* Deprecated */
+        };
+        uint32_t flags;
+    };
+    char *psz_type;                                 /* Configuration subtype */
+    char *psz_name;                                           /* Option name */
+    char *psz_text;             /* Short comment on the configuration option */
+    char *psz_longtext;          /* Long comment on the configuration option */
+
     module_value_t value;                                    /* Option value */
     module_value_t orig;
     module_value_t min;
     module_value_t max;
 
     /* Values list */
-    char **      ppsz_list;       /* List of possible values for the option */
-    int         *pi_list;                              /* Idem for integers */
-    char       **ppsz_list_text;          /* Friendly names for list values */
-    int          i_list;                               /* Options list size */
-    vlc_string_list_cb pf_update_list;
-    uint8_t      i_type;                              /* Configuration type */
-    char         i_short;                     /* Optional short option name */
-
-    /* Misc */
-    unsigned    b_advanced:1;        /* Flag to indicate an advanced option */
-    unsigned    b_internal:1; /* Flag to indicate option is not to be shown */
-    unsigned    b_unsaveable:1;               /* Config should not be saved */
-    unsigned    b_safe:1;       /* Safe to use in web plugins and playlists */
-
-    /* Deprecated */
-    bool        b_removed;
+    uint16_t list_count;                                /* Options list size */
+    union
+    {
+        char **psz;               /* List of possible values for the option */
+        int   *i;
+        vlc_string_list_cb psz_cb;
+    } list;
+    char **list_text;                      /* Friendly names for list values */
 };
 
 /*****************************************************************************

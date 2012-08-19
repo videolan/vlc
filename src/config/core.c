@@ -352,7 +352,7 @@ ssize_t config_GetIntChoices (vlc_object_t *obj, const char *name,
         return -1;
     }
 
-    size_t count = cfg->i_list;
+    size_t count = cfg->list_count;
     if (count == 0)
         return 0;
 
@@ -363,8 +363,9 @@ ssize_t config_GetIntChoices (vlc_object_t *obj, const char *name,
 
     for (size_t i = 0; i < count; i++)
     {
-        vals[i] = cfg->pi_list[i];
-        txts[i] = strdup (cfg->ppsz_list_text[i]);
+        vals[i] = cfg->list.i[i];
+        /* FIXME: use module_gettext() instead */
+        txts[i] = strdup (vlc_gettext (cfg->list_text[i]));
         if (unlikely(txts[i] == NULL))
             abort ();
     }
@@ -397,12 +398,13 @@ ssize_t config_GetPszChoices (vlc_object_t *obj, const char *name,
         return -1;
     }
 
-    if (cfg->pf_update_list != NULL)
-        return cfg->pf_update_list (obj, name, values, texts);
-
-    size_t count = cfg->i_list;
+    size_t count = cfg->list_count;
     if (count == 0)
-        return 0;
+    {
+        if (cfg->list.psz_cb == NULL)
+            return 0;
+        return cfg->list.psz_cb(obj, name, values, texts);
+    }
 
     char **vals = malloc (sizeof (*vals) * count);
     char **txts = malloc (sizeof (*txts) * count);
@@ -411,8 +413,9 @@ ssize_t config_GetPszChoices (vlc_object_t *obj, const char *name,
 
     for (size_t i = 0; i < count; i++)
     {
-        vals[i] = strdup (cfg->ppsz_list[i]);
-        txts[i] = strdup (cfg->ppsz_list_text[i]);
+        vals[i] = strdup (cfg->list.psz[i]);
+        /* FIXME: use module_gettext() instead */
+        txts[i] = strdup (vlc_gettext(cfg->list_text[i]));
         if (unlikely(vals[i] == NULL || txts[i] == NULL))
             abort ();
     }
@@ -535,17 +538,19 @@ void config_Free (module_config_t *config, size_t confsize)
         {
             free (p_item->value.psz);
             free (p_item->orig.psz);
+            if (p_item->list_count)
+            {
+                for (size_t i = 0; i < p_item->list_count; i++)
+                    free (p_item->list.psz[i]);
+                free (p_item->list.psz);
+            }
         }
+        else
+            free (p_item->list.i);
 
-        if( p_item->ppsz_list )
-            for (int i = 0; i < p_item->i_list; i++)
-                free( p_item->ppsz_list[i] );
-        if( p_item->ppsz_list_text )
-            for (int i = 0; i < p_item->i_list; i++)
-                free( p_item->ppsz_list_text[i] );
-        free( p_item->ppsz_list );
-        free( p_item->ppsz_list_text );
-        free( p_item->pi_list );
+        for (size_t i = 0; i < p_item->list_count; i++)
+                free (p_item->list_text[i]);
+        free (p_item->list_text);
     }
 
     free (config);

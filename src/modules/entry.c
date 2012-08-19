@@ -377,6 +377,8 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
         {
             size_t len = va_arg (ap, size_t);
 
+            assert (item->list_count == 0); /* cannot replace choices */
+            assert (item->list.psz_cb == NULL);
             /* Copy values */
             if (IsConfigIntegerType (item->i_type))
             {
@@ -388,7 +390,7 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
                     memcpy (dst, src, sizeof (int) * len);
                     dst[len] = 0;
                 }
-                item->pi_list = dst;
+                item->list.i = dst;
             }
             else
             if (IsConfigStringType (item->i_type))
@@ -402,7 +404,7 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
                         dst[i] = src[i] ? strdup (src[i]) : NULL;
                     dst[len] = NULL;
                 }
-                item->ppsz_list = dst;
+                item->list.psz = dst;
             }
             else
                 break;
@@ -416,13 +418,13 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
                     dtext[i] = text[i] ? strdup (text[i]) : NULL;
                 dtext[len] = NULL;
             }
-            item->ppsz_list_text = dtext;
-            item->i_list = len;
+            item->list_text = dtext;
+            item->list_count = len;
             break;
         }
 
         case VLC_CONFIG_LIST_CB:
-            item->pf_update_list = va_arg (ap, vlc_string_list_cb);
+            item->list.psz_cb = va_arg (ap, vlc_string_list_cb);
             break;
 
         default:

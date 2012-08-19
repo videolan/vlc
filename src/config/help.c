@@ -448,15 +448,15 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
                 psz_type = _("string");
                 psz_ket = ">";
 
-                if( p_item->ppsz_list )
+                if( p_item->list_count )
                 {
                     psz_bra = OPTION_VALUE_SEP "{";
                     psz_type = psz_buffer;
                     psz_buffer[0] = '\0';
-                    for( i = 0; i < p_item->i_list; i++ )
+                    for( i = 0; i < p_item->list_count; i++ )
                     {
                         if( i ) strcat( psz_buffer, "," );
-                        strcat( psz_buffer, p_item->ppsz_list[i] );
+                        strcat( psz_buffer, p_item->list.psz[i] );
                     }
                     psz_ket = "}";
                 }
@@ -476,17 +476,17 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
                     psz_type = psz_buffer;
                 }
 
-                if( p_item->i_list )
+                if( p_item->list_count )
                 {
                     psz_bra = OPTION_VALUE_SEP "{";
                     psz_type = psz_buffer;
                     psz_buffer[0] = '\0';
-                    for( i = 0; i < p_item->i_list; i++ )
+                    for( i = 0; i < p_item->list_count; i++ )
                     {
                         if( i ) strcat( psz_buffer, ", " );
                         sprintf( psz_buffer + strlen(psz_buffer), "%i (%s)",
-                                 p_item->pi_list[i],
-                                 module_gettext( p_parser, p_item->ppsz_list_text[i] ) );
+                                 p_item->list.i[i],
+                                 module_gettext( p_parser, p_item->list_text[i] ) );
                     }
                     psz_ket = "}";
                 }

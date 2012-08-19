@@ -81,6 +81,7 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
      * Persistent audio output variables
      */
     vlc_value_t val, text;
+    module_config_t *cfg;
     char *str;
 
     var_Create (aout, "volume", VLC_VAR_FLOAT);
@@ -142,18 +143,14 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
     val.psz_string = (char*)"";
     text.psz_string = _("Disable");
     var_Change (aout, "equalizer", VLC_VAR_ADDCHOICE, &val, &text);
-    {
-        module_config_t *cfg = config_FindConfig (VLC_OBJECT(aout),
-                                                  "equalizer-preset");
-        if (cfg != NULL)
-            for (int i = 0; i < cfg->i_list; i++)
-            {
-                val.psz_string = (char *)cfg->ppsz_list[i];
-                text.psz_string = (char *)cfg->ppsz_list_text[i];
-                var_Change (aout, "equalizer", VLC_VAR_ADDCHOICE, &val, &text);
-            }
-    }
-
+    cfg = config_FindConfig (VLC_OBJECT(aout), "equalizer-preset");
+    if (likely(cfg != NULL))
+        for (unsigned i = 0; i < cfg->list_count; i++)
+        {
+            val.psz_string = cfg->list.psz[i];
+            text.psz_string = vlc_gettext(cfg->list_text[i]);
+            var_Change (aout, "equalizer", VLC_VAR_ADDCHOICE, &val, &text);
+        }
 
     var_Create (aout, "audio-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     text.psz_string = _("Audio filters");
@@ -170,19 +167,15 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
                 VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     text.psz_string = _("Replay gain");
     var_Change (aout, "audio-replay-gain-mode", VLC_VAR_SETTEXT, &text, NULL);
-    {
-        module_config_t *cfg = config_FindConfig (VLC_OBJECT(aout),
-                                                  "audio-replay-gain-mode");
-        if( cfg != NULL )
-            for (int i = 0; i < cfg->i_list; i++)
-            {
-                val.psz_string = (char *)cfg->ppsz_list[i];
-                text.psz_string = (char *)cfg->ppsz_list_text[i];
-                var_Change (aout, "audio-replay-gain-mode", VLC_VAR_ADDCHOICE,
+    cfg = config_FindConfig (VLC_OBJECT(aout), "audio-replay-gain-mode");
+    if (likely(cfg != NULL))
+        for (unsigned i = 0; i < cfg->list_count; i++)
+        {
+            val.psz_string = cfg->list.psz[i];
+            text.psz_string = vlc_gettext(cfg->list_text[i]);
+            var_Change (aout, "audio-replay-gain-mode", VLC_VAR_ADDCHOICE,
                             &val, &text);
-            }
-    }
-
+        }
 
     return aout;
 }
