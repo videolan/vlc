@@ -65,8 +65,8 @@
 # define IPPROTO_UDPLITE 136
 #endif
 
+#include <ctype.h>
 #include <errno.h>
-
 #include <assert.h>
 
 /*****************************************************************************

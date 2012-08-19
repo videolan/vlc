@@ -47,6 +47,8 @@ http://service.real.com/help/library/guides/realone/IntroGuide/HTML/htmfiles/ram
 # include "config.h"
 #endif
 
+#include <ctype.h>
+
 #include <vlc_common.h>
 #include <vlc_demux.h>
 #include <vlc_url.h>
