@@ -1,0 +1,14 @@
+diff -ru caca/caca/dither.c caca/caca/dither.c
+--- caca/caca/dither.c	2010-02-08 13:34:28.000000000 +0100
++++ caca/caca/dither.c	2012-08-21 17:39:49.000000000 +0200
+@@ -26,6 +26,10 @@
+ #   include <string.h>
+ #endif
+ 
++#if defined(__APPLE__) && defined(__llvm__)
++#undef HAVE_FLDLN2
++#endif
++
+ #include "caca.h"
+ #include "caca_internals.h"
+ 
