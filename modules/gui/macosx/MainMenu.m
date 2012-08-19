@@ -493,9 +493,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         vlc_object_release( p_input );
     }
     else
-    {
         [o_mi_record setEnabled: NO];
-    }
 }
 
 - (void)refreshVoutDeviceMenu:(NSNotification *)o_notification
@@ -503,16 +501,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     NSUInteger count = [o_mu_screen numberOfItems];
     NSMenu * o_submenu = o_mu_screen;
     if (count > 0)
-    {
-        if (OSX_LEOPARD)
-        {
-            NSUInteger count = [o_submenu numberOfItems];
-            for( NSUInteger i = 0; i < count; i++ )
-                [o_submenu removeItemAtIndex: 0];
-        }
-        else
-            [o_submenu removeAllItems];
-    }
+        [o_submenu removeAllItems];
 
     NSArray * o_screens = [NSScreen screens];
     NSMenuItem * o_mitem;
@@ -1064,18 +1053,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     int i_type, i;
 
     /* remove previous items */
-    if (OSX_LEOPARD)
-    {
-        int i_nb_items;
-        i_nb_items = [o_menu numberOfItems];
-        for( i = 0; i < i_nb_items; i++ )
-            [o_menu removeItemAtIndex: 0];
-    }
-    else
-    {
-        /* this is more efficient then the legacy code, but 10.6+ only */
-        [o_menu removeAllItems];
-    }
+    [o_menu removeAllItems];
+
     /* we disable everything here, and enable it again when needed, below */
     [o_parent setEnabled:NO];
 
@@ -1108,7 +1087,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     if( i_type & VLC_VAR_HASCHOICE )
     {
         var_Change( p_object, psz_variable, VLC_VAR_CHOICESCOUNT, &val, NULL );
-        if( val.i_int == 0 ) 
+        if( val.i_int == 0 )
             return;
         if( (i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE && val.i_int == 1 )
             return;

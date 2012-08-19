@@ -234,12 +234,7 @@ static NSMutableArray *blackoutWindows = NULL;
         [blackoutWindow release];
 
         if( [screen isMainScreen] )
-        {
-            if (OSX_LEOPARD)
-                SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
-            else
-                [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
-        }
+            [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
     }
 }
 
@@ -253,10 +248,7 @@ static NSMutableArray *blackoutWindows = NULL;
         [blackoutWindow closeAndAnimate: YES];
     }
 
-    if (OSX_LEOPARD)
-        SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
-    else
-        [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
+    [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
 }
 
 @end

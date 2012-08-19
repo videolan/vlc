@@ -177,9 +177,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_detached_video_window setDelegate: self];
     [self useOptimizedDrawing: YES];
 
-    if (!OSX_LEOPARD)
-        [o_right_split_view setWantsLayer:YES];
-
     [o_play_btn setToolTip: _NS("Play/Pause")];
     [o_detached_play_btn setToolTip: [o_play_btn toolTip]];
     [o_bwd_btn setToolTip: _NS("Backward")];
@@ -935,23 +932,17 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)resizePlaylistAfterCollapse
 {
-    id o_playlist_viewitem;
-    if (OSX_LEOPARD)
-        o_playlist_viewitem = o_playlist_table;
-    else
-        o_playlist_viewitem = [o_playlist_table animator];
-
     NSRect plrect;
     plrect = [o_playlist_table frame];
     plrect.size.height = i_lastSplitViewHeight - 19.0; // actual pl top bar height, which differs from its frame
-    [o_playlist_viewitem setFrame: plrect];
+    [[o_playlist_table animator] setFrame: plrect];
 
     NSRect rightSplitRect;
     rightSplitRect = [o_right_split_view frame];
     plrect = [o_dropzone_box frame];
     plrect.origin.x = (rightSplitRect.size.width - plrect.size.width) / 2;
     plrect.origin.y = (rightSplitRect.size.height - plrect.size.height) / 2;
-    [o_playlist_viewitem setFrame: plrect];
+    [[o_playlist_table animator] setFrame: plrect];
 }
 
 - (void)makeSplitViewVisible
@@ -969,9 +960,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         new_frame.origin.y = old_frame.origin.y + old_frame.size.height - newHeight;
         new_frame.size.height = newHeight;
 
-    if (OSX_LEOPARD)
-        [self setFrame: new_frame display: YES animate: YES];
-    else
         [[self animator] setFrame: new_frame display: YES animate: YES];
     }
 
@@ -1424,20 +1412,14 @@ static VLCMainWindow *_o_sharedInstance = nil;
     b_dropzone_active = YES;
     [o_right_split_view addSubview: o_dropzone_view positioned:NSWindowAbove relativeTo:o_playlist_table];
     [o_dropzone_view setFrame: [o_playlist_table frame]];
-    if (OSX_LEOPARD)
-        [o_playlist_table setHidden:YES];
-    else
-        [[o_playlist_table animator] setHidden:YES];
+    [[o_playlist_table animator] setHidden:YES];
 }
 
 - (void)hideDropZone
 {
     b_dropzone_active = NO;
     [o_dropzone_view removeFromSuperview];
-    if (OSX_LEOPARD)
-        [o_playlist_table setHidden: NO];
-    else
-        [[o_playlist_table animator] setHidden: NO];
+    [[o_playlist_table animator] setHidden: NO];
 }
 
 - (void)hideSplitView
@@ -1726,9 +1708,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)drawFancyGradientEffectForTimeSlider
 {
-    if (OSX_LEOPARD)
-        return;
-
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
     CGFloat f_value = [o_time_sld knobPosition];
     if (f_value > 7.5)
@@ -1964,10 +1943,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if( right_window_point > right_screen_point )
         new_frame.origin.x -= ( right_window_point - right_screen_point );
 
-    if (OSX_LEOPARD)
-        [o_videoWindow setFrame:new_frame display:YES];
-    else
-        [[o_videoWindow animator] setFrame:new_frame display:YES];
+    [[o_videoWindow animator] setFrame:new_frame display:YES];
 }
 
 - (void)setNativeVideoSize:(NSSize)size
@@ -2095,12 +2071,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             }
 
             if ([screen isMainScreen])
-            {
-                if (OSX_LEOPARD)
-                    SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
-                else
-                    [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
-            }
+                [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
 
             [[o_video_view superview] replaceSubview:o_video_view with:o_temp_view];
             [o_temp_view setFrame:[o_video_view frame]];
@@ -2155,12 +2126,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     if ([screen isMainScreen])
-    {
-        if (OSX_LEOPARD)
-            SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
-        else
-            [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
-    }
+        [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
 
     dict1 = [[NSMutableDictionary alloc] initWithCapacity:2];
     dict2 = [[NSMutableDictionary alloc] initWithCapacity:3];
@@ -2269,10 +2235,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         }
 
         [o_fspanel setNonActive: nil];
-        if (OSX_LEOPARD)
-            SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
-        else
-            [NSApp setPresentationOptions: NSApplicationPresentationDefault];
+        [NSApp setPresentationOptions: NSApplicationPresentationDefault];
 
         /* Will release the lock */
         [self hasEndedFullscreen];
@@ -2295,10 +2258,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[o_video_view window] orderFront: self];
 
     [o_fspanel setNonActive: nil];
-    if (OSX_LEOPARD)
-        SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
-    else
-        [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
+    [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
 
     if (o_fullscreen_anim1)
     {
