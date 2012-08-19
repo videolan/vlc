@@ -80,10 +80,9 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
  * freeaddrinfo().
  */
 int vlc_getaddrinfo (const char *node, unsigned port,
-                     const struct addrinfo *p_hints, struct addrinfo **res)
+                     const struct addrinfo *hints, struct addrinfo **res)
 {
-    struct addrinfo hints;
-    char psz_buf[NI_MAXHOST], portbuf[6], *servname;
+    char hostbuf[NI_MAXHOST], portbuf[6], *servname;
 
     /*
      * In VLC, we always use port number as integer rather than strings
@@ -100,77 +99,27 @@ int vlc_getaddrinfo (const char *node, unsigned port,
     else
         servname = NULL;
 
-    /* Check if we have to force ipv4 or ipv6 */
-    memset (&hints, 0, sizeof (hints));
-    if (p_hints != NULL)
-    {
-        const int safe_flags =
-            AI_PASSIVE |
-            AI_CANONNAME |
-            AI_NUMERICHOST |
-            AI_NUMERICSERV |
-#ifdef AI_ALL
-            AI_ALL |
-#endif
-#ifdef AI_ADDRCONFIG
-            AI_ADDRCONFIG |
-#endif
-#ifdef AI_V4MAPPED
-            AI_V4MAPPED |
-#endif
-            0;
-
-        hints.ai_family = p_hints->ai_family;
-        hints.ai_socktype = p_hints->ai_socktype;
-        hints.ai_protocol = p_hints->ai_protocol;
-        /* Unfortunately, some flags chang the layout of struct addrinfo, so
-         * they cannot be copied blindly from p_hints to &hints. Therefore, we
-         * only copy flags that we know for sure are "safe".
-         */
-        hints.ai_flags = p_hints->ai_flags & safe_flags;
-    }
-
     /*
      * VLC extensions :
-     * - accept "" as NULL
-     * - ignore square brackets
+     * - accept the empty string as unspecified host (i.e. NULL)
+     * - ignore square brackets (for IPv6 numerals)
      */
     if (node != NULL)
     {
         if (node[0] == '[')
         {
             size_t len = strlen (node + 1);
-            if ((len <= sizeof (psz_buf)) && (node[len] == ']'))
+            if ((len <= sizeof (hostbuf)) && (node[len] == ']'))
             {
                 assert (len > 0);
-                memcpy (psz_buf, node + 1, len - 1);
-                psz_buf[len - 1] = '\0';
-                node = psz_buf;
+                memcpy (hostbuf, node + 1, len - 1);
+                hostbuf[len - 1] = '\0';
+                node = hostbuf;
             }
         }
         if (node[0] == '\0')
             node = NULL;
     }
 
-    int ret;
-#ifdef WIN32
-    /*
-     * Winsock tries to resolve numerical IPv4 addresses as AAAA
-     * and IPv6 addresses as A... There comes the bug-to-bug fix.
-     */
-    if ((hints.ai_flags & AI_NUMERICHOST) == 0)
-    {
-        hints.ai_flags |= AI_NUMERICHOST;
-        ret = getaddrinfo (node, servname, &hints, res);
-        if (ret == 0)
-            goto out;
-        hints.ai_flags &= ~AI_NUMERICHOST;
-    }
-#endif
-    ret = getaddrinfo (node, servname, &hints, res);
-
-#if defined(WIN32)
-out:
-#endif
-    return ret;
+    return getaddrinfo (node, servname, hints, res);
 }
