@@ -341,20 +341,6 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
                       xmalloc( p_module->p_config[i].i_list * sizeof(char *) );
         for( int j = 0; j < p_module->p_config[i].i_list; j++ )
             LOAD_STRING( p_module->p_config[i].ppsz_list_text[j] );
-
-        if( p_module->p_config[i].i_action )
-        {
-            p_module->p_config[i].ppf_action =
-                xmalloc( p_module->p_config[i].i_action * sizeof(void *) );
-            p_module->p_config[i].ppsz_action_text =
-                xmalloc( p_module->p_config[i].i_action * sizeof(char *) );
-
-            for (int j = 0; j < p_module->p_config[i].i_action; j++)
-            {
-                p_module->p_config[i].ppf_action[j] = NULL;
-                LOAD_STRING( p_module->p_config[i].ppsz_action_text[j] );
-            }
-        }
     }
 
     return VLC_SUCCESS;
@@ -551,9 +537,6 @@ static int CacheSaveConfig (FILE *file, const module_t *p_module)
 
         for (int j = 0; j < p_module->p_config[i].i_list; j++)
             SAVE_STRING( p_module->p_config[i].ppsz_list_text[j] );
-
-        for (int j = 0; j < p_module->p_config[i].i_action; j++)
-            SAVE_STRING( p_module->p_config[i].ppsz_action_text[j] );
     }
     return 0;
 

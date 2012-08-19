@@ -25,7 +25,6 @@
 
 /**
  * Todo:
- *  - i_action handler for IntegerLists, but I don't see any module using it...
  *  - Validator for modulelist
  */
 #ifdef HAVE_CONFIG_H
@@ -394,23 +393,6 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
     module_config_t *p_module_config = config_FindConfig( p_this, p_item->psz_name );
 
     finish( p_module_config );
-
-    if( p_item->i_action )
-    {
-        QSignalMapper *signalMapper = new QSignalMapper(this);
-
-        /* Some stringLists like Capture listings have action associated */
-        for( int i = 0; i < p_item->i_action; i++ )
-        {
-            QPushButton *button =
-                new QPushButton( qtr( p_item->ppsz_action_text[i] ), p );
-            buttons << button;
-            CONNECT( button, clicked(), signalMapper, map() );
-            signalMapper->setMapping( button, i );
-        }
-        CONNECT( signalMapper, mapped( int ),
-                this, actionRequested( int ) );
-    }
 }
 
 void StringListConfigControl::fillGrid( QGridLayout *l, int line )
@@ -419,7 +401,7 @@ void StringListConfigControl::fillGrid( QGridLayout *l, int line )
     l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
     int i = 0;
     foreach( QPushButton *button, buttons )
-        l->addWidget( button, line, LAST_COLUMN - p_item->i_action + i++,
+        l->addWidget( button, line, LAST_COLUMN + i++,
                       Qt::AlignRight );
 }
 
@@ -427,24 +409,6 @@ void StringListConfigControl::comboIndexChanged( int i_index )
 {
     Q_UNUSED( i_index );
     emit changed();
-}
-
-void StringListConfigControl::actionRequested( int i_action )
-{
-    /* Supplementary check for boundaries */
-    if( i_action < 0 || i_action >= p_item->i_action ) return;
-
-    module_config_t *p_module_config = config_FindConfig( p_this, getName() );
-    if(!p_module_config) return;
-
-    vlc_value_t val;
-    val.psz_string = const_cast<char *>
-        qtu( (combo->itemData( combo->currentIndex() ).toString() ) );
-
-    p_module_config->ppf_action[i_action]( p_this, getName(), val, val, 0 );
-
-    combo->clear();
-    finish( p_module_config );
 }
 
 StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
@@ -910,24 +874,6 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
     module_config_t *p_module_config = config_FindConfig( p_this, p_item->psz_name );
 
     finish( p_module_config );
-
-    if( p_item->i_action )
-    {
-        QSignalMapper *signalMapper = new QSignalMapper(this);
-
-        /* Some stringLists like Capture listings have action associated */
-        for( int i = 0; i < p_item->i_action; i++ )
-        {
-            QPushButton *button =
-                    new QPushButton( qfu( p_item->ppsz_action_text[i] ), p );
-            buttons << button;
-            CONNECT( button, clicked(), signalMapper, map() );
-            signalMapper->setMapping( button, i );
-        }
-        CONNECT( signalMapper, mapped( int ),
-                this, actionRequested( int ) );
-    }
-
 }
 
 void IntegerListConfigControl::fillGrid( QGridLayout *l, int line )
@@ -936,7 +882,7 @@ void IntegerListConfigControl::fillGrid( QGridLayout *l, int line )
     l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
     int i = 0;
     foreach( QPushButton *button, buttons )
-        l->addWidget( button, line, LAST_COLUMN - p_item->i_action + i++,
+        l->addWidget( button, line, LAST_COLUMN + i++,
                       Qt::AlignRight );
 }
 
@@ -980,24 +926,6 @@ void IntegerListConfigControl::finish(module_config_t *p_module_config )
     }
     if( label )
         label->setBuddy( combo );
-}
-
-void IntegerListConfigControl::actionRequested( int i_action )
-{
-    /* Supplementary check for boundaries */
-    if( i_action < 0 || i_action >= p_item->i_action ) return;
-
-    module_config_t *p_module_config = config_FindConfig( p_this, getName() );
-    if(!p_module_config) return;
-
-
-    vlc_value_t val;
-    val.i_int = combo->itemData( combo->currentIndex() ).toInt();
-
-    p_module_config->ppf_action[i_action]( p_this, getName(), val, val, 0 );
-
-    combo->clear();
-    finish( p_module_config );
 }
 
 int IntegerListConfigControl::getValue() const

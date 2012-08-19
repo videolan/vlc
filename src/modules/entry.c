@@ -423,36 +423,6 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
             break;
         }
 
-        case VLC_CONFIG_ADD_ACTION:
-        {
-            vlc_callback_t cb = va_arg (ap, vlc_callback_t), *tabcb;
-            const char *name = va_arg (ap, const char *);
-            char **tabtext;
-
-            tabcb = realloc (item->ppf_action,
-                             (item->i_action + 2) * sizeof (cb));
-            if (tabcb == NULL)
-                break;
-            item->ppf_action = tabcb;
-            tabcb[item->i_action] = cb;
-            tabcb[item->i_action + 1] = NULL;
-
-            tabtext = realloc (item->ppsz_action_text,
-                               (item->i_action + 2) * sizeof (name));
-            if (tabtext == NULL)
-                break;
-            item->ppsz_action_text = tabtext;
-
-            if (name)
-                tabtext[item->i_action] = strdup (name);
-            else
-                tabtext[item->i_action] = NULL;
-            tabtext[item->i_action + 1] = NULL;
-
-            item->i_action++;
-            break;
-        }
-
         default:
             fprintf (stderr, "LibVLC: unknown module property %d\n", propid);
             fprintf (stderr, "LibVLC: too old to use this module?\n");

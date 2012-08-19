@@ -95,9 +95,8 @@ enum vlc_module_properties
     /* possible values list
      * (args=const char *, size_t, const <type> *, const char *const *) */
 
-    VLC_CONFIG_ADD_ACTION,
-    /* add value change callback
-     * (args=const char *, vlc_callback_t, const char *) */
+    VLC_CONFIG_ADD_ACTION_OBSOLETE,
+    /* unused (ignored) */
 
     /* Insert new VLC_CONFIG_* here */
 };
@@ -494,8 +493,7 @@ VLC_METADATA_EXPORTS
     vlc_config_set (VLC_CONFIG_RANGE, (double)(minv), (double)(maxv));
 
 #define change_action_add( pf_action, text ) \
-    vlc_config_set (VLC_CONFIG_ADD_ACTION, \
-                    (vlc_callback_t)(pf_action), (const char *)(text));
+    (void)(pf_action, text);
 
 /* For options that are saved but hidden from the preferences panel */
 #define change_private() \

@@ -550,14 +550,6 @@ void config_Free (module_config_t *config, size_t confsize)
         free( p_item->ppsz_list );
         free( p_item->ppsz_list_text );
         free( p_item->pi_list );
-
-        if( p_item->i_action )
-        {
-            for (int i = 0; i < p_item->i_action; i++)
-                free( p_item->ppsz_action_text[i] );
-            free( p_item->ppf_action );
-            free( p_item->ppsz_action_text );
-        }
     }
 
     free (config);

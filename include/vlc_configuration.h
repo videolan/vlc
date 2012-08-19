@@ -76,11 +76,6 @@ struct module_config_t
     unsigned    b_unsaveable:1;               /* Config should not be saved */
     unsigned    b_safe:1;       /* Safe to use in web plugins and playlists */
 
-    /* Actions list */
-    int            i_action;                           /* actions list size */
-    vlc_callback_t *ppf_action;    /* List of possible actions for a config */
-    char          **ppsz_action_text;         /* Friendly names for actions */
-
     /* Deprecated */
     bool        b_removed;
 };
