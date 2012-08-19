@@ -70,7 +70,8 @@ Interfaces:
  * Hotkey support for TS program selection
 
 Mac OS X Port:
- * Discontinued support for PowerPC-based Macs
+ * Discontinued support for PowerPC-based and 32bit Intel-based Macs
+ * VLC requires Mac OS X 10.6 or later now
 
 Mac OS X Interface:
  * add a GUI for the QTSound access module to process audio captured locally
