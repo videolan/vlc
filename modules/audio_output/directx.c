@@ -813,7 +813,6 @@ static int CreateDSBuffer( audio_output_t *p_aout, int i_format,
 {
     WAVEFORMATEXTENSIBLE waveformat;
     DSBUFFERDESC         dsbdesc;
-    unsigned int         i;
 
     /* First set the sound buffer format */
     waveformat.dwChannelMask = 0;
