@@ -130,9 +130,6 @@ int vlc_getaddrinfo (const char *node, unsigned port,
         hints.ai_flags = p_hints->ai_flags & safe_flags;
     }
 
-    /* We only ever use port *numbers* */
-    hints.ai_flags |= AI_NUMERICSERV;
-
     /*
      * VLC extensions :
      * - accept "" as NULL

@@ -94,7 +94,8 @@ extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
                        int i_protocol );
 
 /* */
-static int net_SetupDgramSocket( vlc_object_t *p_obj, int fd, const struct addrinfo *ptr )
+static int net_SetupDgramSocket (vlc_object_t *p_obj, int fd,
+                                 const struct addrinfo *ptr)
 {
 #ifdef SO_REUSEPORT
     setsockopt (fd, SOL_SOCKET, SO_REUSEPORT, &(int){ 1 }, sizeof (int));
@@ -137,12 +138,11 @@ static int net_SetupDgramSocket( vlc_object_t *p_obj, int fd, const struct addri
 static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
                              int protocol)
 {
-    struct addrinfo hints, *res;
-
-    memset (&hints, 0, sizeof( hints ));
-    hints.ai_socktype = SOCK_DGRAM;
-    hints.ai_protocol = protocol;
-    hints.ai_flags = AI_PASSIVE;
+    struct addrinfo hints = {
+        .ai_socktype = SOCK_DGRAM,
+        .ai_protocol = protocol,
+        .ai_flags = AI_PASSIVE | AI_NUMERICSERV,
+    }, *res;
 
     if (host && !*host)
         host = NULL;
@@ -503,16 +503,16 @@ static int net_SetDSCP( int fd, uint8_t dscp )
 int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
                       int i_hlim, int proto )
 {
-    struct addrinfo hints, *res, *ptr;
+    struct addrinfo hints = {
+        .ai_socktype = SOCK_DGRAM,
+        .ai_protocol = proto,
+        .ai_flags = AI_NUMERICSERV,
+    }, *res;
     int       i_handle = -1;
     bool      b_unreach = false;
 
     if( i_hlim < 0 )
         i_hlim = var_InheritInteger( p_this, "ttl" );
-
-    memset( &hints, 0, sizeof( hints ) );
-    hints.ai_socktype = SOCK_DGRAM;
-    hints.ai_protocol = proto;
 
     msg_Dbg( p_this, "net: connecting to [%s]:%d", psz_host, i_port );
 
@@ -524,7 +524,7 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
         return -1;
     }
 
-    for( ptr = res; ptr != NULL; ptr = ptr->ai_next )
+    for (struct addrinfo *ptr = res; ptr != NULL; ptr = ptr->ai_next)
     {
         char *str;
         int fd = net_Socket (p_this, ptr->ai_family, ptr->ai_socktype,
@@ -601,11 +601,11 @@ int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
     msg_Dbg (obj, "net: connecting to [%s]:%d from [%s]:%d",
              psz_server, i_server, psz_bind, i_bind);
 
-    struct addrinfo hints, *loc, *rem;
-
-    memset (&hints, 0, sizeof (hints));
-    hints.ai_socktype = SOCK_DGRAM;
-    hints.ai_protocol = protocol;
+    struct addrinfo hints = {
+        .ai_socktype = SOCK_DGRAM,
+        .ai_protocol = protocol,
+        .ai_flags = AI_NUMERICSERV,
+    }, *loc, *rem;
 
     int val = vlc_getaddrinfo (psz_server, i_server, &hints, &rem);
     if (val)
@@ -615,7 +615,7 @@ int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
         return -1;
     }
 
-    hints.ai_flags = AI_PASSIVE;
+    hints.ai_flags |= AI_PASSIVE;
     val = vlc_getaddrinfo (psz_bind, i_bind, &hints, &loc);
     if (val)
     {

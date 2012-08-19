@@ -75,7 +75,6 @@ extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
 int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
                  int type, int proto )
 {
-    struct addrinfo hints, *res, *ptr;
     const char      *psz_realhost;
     char            *psz_socks;
     int             i_realport, i_handle = -1;
@@ -83,10 +82,6 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
     int evfd = vlc_object_waitpipe (p_this);
     if (evfd == -1)
         return -1;
-
-    memset( &hints, 0, sizeof( hints ) );
-    hints.ai_socktype = type;
-    hints.ai_protocol = proto;
 
     psz_socks = var_InheritString( p_this, "socks" );
     if( psz_socks != NULL )
@@ -98,7 +93,6 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
 
         psz_realhost = psz_socks;
         i_realport = ( psz != NULL ) ? atoi( psz ) : 1080;
-        hints.ai_flags &= ~AI_NUMERICHOST;
 
         msg_Dbg( p_this, "net: connecting to %s port %d (SOCKS) "
                  "for %s port %d", psz_realhost, i_realport,
@@ -137,6 +131,12 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
                  i_realport );
     }
 
+    struct addrinfo hints = {
+        .ai_socktype = type,
+        .ai_protocol = proto,
+        .ai_flags = AI_NUMERICSERV,
+    }, *res;
+
     int val = vlc_getaddrinfo (psz_realhost, i_realport, &hints, &res);
     free( psz_socks );
 
@@ -151,7 +151,7 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
     if (timeout < 0)
         timeout = -1;
 
-    for( ptr = res; ptr != NULL; ptr = ptr->ai_next )
+    for (struct addrinfo *ptr = res; ptr != NULL; ptr = ptr->ai_next)
     {
         int fd = net_Socket( p_this, ptr->ai_family,
                              ptr->ai_socktype, ptr->ai_protocol );
@@ -445,13 +445,15 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
 
     if( i_socks_version == 4 )
     {
-        struct addrinfo hints, *res;
-
         /* v4 only support ipv4 */
-        memset (&hints, 0, sizeof (hints));
-        hints.ai_family = AF_INET;
-        hints.ai_socktype = SOCK_STREAM;
-        hints.ai_protocol = IPPROTO_TCP;
+        static const struct addrinfo hints = {
+            .ai_family = AF_INET,
+            .ai_socktype = SOCK_STREAM,
+            .ai_protocol = IPPROTO_TCP,
+            .ai_flags = 0,
+        };
+        struct addrinfo *res;
+
         if (vlc_getaddrinfo (psz_host, 0, &hints, &res))
             return VLC_EGENERIC;
 
