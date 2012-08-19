@@ -193,34 +193,4 @@ static inline void vlc_UrlClean( vlc_url_t *url )
 
     url->psz_buffer   = NULL;
 }
-
-#include <ctype.h>
-
-/** Check whether a given string is not a valid URL and must hence be
- *  encoded */
-static inline int vlc_UrlIsNotEncoded( const char *psz_url )
-{
-    const char *ptr;
-
-    for( ptr = psz_url; *ptr; ptr++ )
-    {
-        unsigned char c = *ptr;
-
-        if( c == '%' )
-        {
-            if( !isxdigit( (unsigned char)ptr[1] )
-             || !isxdigit( (unsigned char)ptr[2] ) )
-                return 1; /* not encoded */
-            ptr += 2;
-        }
-        else
-        if(  ( (unsigned char)( c - 'a' ) < 26 )
-          || ( (unsigned char)( c - 'A' ) < 26 )
-          || ( (unsigned char)( c - '0' ) < 10 )
-          || ( strchr( "-_.", c ) != NULL ) )
-            return 1;
-    }
-    return 0; /* looks fine - but maybe it is not encoded */
-}
-
 #endif
