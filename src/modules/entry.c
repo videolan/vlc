@@ -417,11 +417,13 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
                 dtext[len] = NULL;
             }
             item->ppsz_list_text = dtext;
-
             item->i_list = len;
-            item->pf_update_list = va_arg (ap, vlc_callback_t);
             break;
         }
+
+        case VLC_CONFIG_LIST_CB:
+            item->pf_update_list = va_arg (ap, vlc_callback_t);
+            break;
 
         default:
             fprintf (stderr, "LibVLC: unknown module property %d\n", propid);
