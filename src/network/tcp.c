@@ -78,7 +78,7 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
     struct addrinfo hints, *res, *ptr;
     const char      *psz_realhost;
     char            *psz_socks;
-    int             i_realport, i_val, i_handle = -1;
+    int             i_realport, i_handle = -1;
 
     int evfd = vlc_object_waitpipe (p_this);
     if (evfd == -1)
@@ -137,13 +137,13 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
                  i_realport );
     }
 
-    i_val = vlc_getaddrinfo( p_this, psz_realhost, i_realport, &hints, &res );
+    int val = vlc_getaddrinfo (psz_realhost, i_realport, &hints, &res);
     free( psz_socks );
 
-    if( i_val )
+    if (val)
     {
-        msg_Err( p_this, "cannot resolve %s port %d : %s", psz_realhost,
-                 i_realport, gai_strerror( i_val ) );
+        msg_Err (p_this, "cannot resolve %s port %d : %s", psz_realhost,
+                 i_realport, gai_strerror (val));
         return -1;
     }
 
@@ -445,22 +445,22 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
 
     if( i_socks_version == 4 )
     {
-        struct addrinfo hints, *p_res;
+        struct addrinfo hints, *res;
 
         /* v4 only support ipv4 */
         memset (&hints, 0, sizeof (hints));
         hints.ai_family = AF_INET;
         hints.ai_socktype = SOCK_STREAM;
         hints.ai_protocol = IPPROTO_TCP;
-        if( vlc_getaddrinfo( p_obj, psz_host, 0, &hints, &p_res ) )
+        if (vlc_getaddrinfo (psz_host, 0, &hints, &res))
             return VLC_EGENERIC;
 
         buffer[0] = i_socks_version;
         buffer[1] = 0x01;               /* CONNECT */
         SetWBE( &buffer[2], i_port );   /* Port */
-        memcpy( &buffer[4],             /* Address */
-                &((struct sockaddr_in *)(p_res->ai_addr))->sin_addr, 4 );
-        freeaddrinfo( p_res );
+        memcpy (&buffer[4],             /* Address */
+                &((struct sockaddr_in *)(res->ai_addr))->sin_addr, 4);
+        freeaddrinfo (res);
 
         buffer[8] = 0;                  /* Empty user id */
 

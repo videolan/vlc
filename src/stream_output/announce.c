@@ -68,7 +68,7 @@ sout_AnnounceRegisterSDP( vlc_object_t *obj, const char *psz_sdp,
 
     /* GRUIK. We should not convert back-and-forth from string to numbers */
     struct addrinfo *res;
-    if (vlc_getaddrinfo (obj, psz_dst, 0, NULL, &res) == 0)
+    if (vlc_getaddrinfo (psz_dst, 0, NULL, &res) == 0)
     {
         if (res->ai_addrlen <= sizeof (p_session->addr))
             memcpy (&p_session->addr, res->ai_addr,

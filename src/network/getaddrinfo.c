@@ -71,7 +71,6 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
 /**
  * Resolves a host name to a list of socket addresses (like getaddrinfo()).
  *
- * @param p_this a VLC object
  * @param node host name to resolve (encoded as UTF-8), or NULL
  * @param i_port port number for the socket addresses
  * @param p_hints parameters (see getaddrinfo() manual page)
@@ -80,9 +79,8 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
  * On failure, *res is undefined. On success, it must be freed with
  * freeaddrinfo().
  */
-int vlc_getaddrinfo (vlc_object_t *p_this, const char *node,
-                     unsigned port, const struct addrinfo *p_hints,
-                     struct addrinfo **res)
+int vlc_getaddrinfo (const char *node, unsigned port,
+                     const struct addrinfo *p_hints, struct addrinfo **res)
 {
     struct addrinfo hints;
     char psz_buf[NI_MAXHOST], portbuf[6], *servname;
@@ -94,10 +92,7 @@ int vlc_getaddrinfo (vlc_object_t *p_this, const char *node,
     if (port != 0)
     {
         if (port > 65535)
-        {
-            msg_Err (p_this, "invalid port number %u specified", port);
             return EAI_SERVICE;
-        }
         /* cannot overflow */
         snprintf (portbuf, sizeof (portbuf), "%u", port);
         servname = portbuf;

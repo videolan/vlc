@@ -150,7 +150,7 @@ static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
     msg_Dbg (obj, "net: opening %s datagram port %d",
              host ? host : "any", port);
 
-    int val = vlc_getaddrinfo (obj, host, port, &hints, &res);
+    int val = vlc_getaddrinfo (host, port, &hints, &res);
     if (val)
     {
         msg_Err (obj, "Cannot resolve %s port %d : %s", host, port,
@@ -504,7 +504,7 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
                       int i_hlim, int proto )
 {
     struct addrinfo hints, *res, *ptr;
-    int             i_val, i_handle = -1;
+    int       i_handle = -1;
     bool      b_unreach = false;
 
     if( i_hlim < 0 )
@@ -516,11 +516,11 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
 
     msg_Dbg( p_this, "net: connecting to [%s]:%d", psz_host, i_port );
 
-    i_val = vlc_getaddrinfo( p_this, psz_host, i_port, &hints, &res );
-    if( i_val )
+    int val = vlc_getaddrinfo (psz_host, i_port, &hints, &res);
+    if (val)
     {
-        msg_Err( p_this, "cannot resolve [%s]:%d : %s", psz_host, i_port,
-                 gai_strerror( i_val ) );
+        msg_Err (p_this, "cannot resolve [%s]:%d : %s", psz_host, i_port,
+                 gai_strerror (val));
         return -1;
     }
 
@@ -602,13 +602,12 @@ int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
              psz_server, i_server, psz_bind, i_bind);
 
     struct addrinfo hints, *loc, *rem;
-    int val;
 
     memset (&hints, 0, sizeof (hints));
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_protocol = protocol;
 
-    val = vlc_getaddrinfo (obj, psz_server, i_server, &hints, &rem);
+    int val = vlc_getaddrinfo (psz_server, i_server, &hints, &rem);
     if (val)
     {
         msg_Err (obj, "cannot resolve %s port %d : %s", psz_bind, i_bind,
@@ -617,7 +616,7 @@ int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
     }
 
     hints.ai_flags = AI_PASSIVE;
-    val = vlc_getaddrinfo (obj, psz_bind, i_bind, &hints, &loc);
+    val = vlc_getaddrinfo (psz_bind, i_bind, &hints, &loc);
     if (val)
     {
         msg_Err (obj, "cannot resolve %s port %d : %s", psz_bind, i_bind,
