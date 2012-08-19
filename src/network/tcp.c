@@ -134,7 +134,7 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
     struct addrinfo hints = {
         .ai_socktype = type,
         .ai_protocol = proto,
-        .ai_flags = AI_NUMERICSERV,
+        .ai_flags = AI_NUMERICSERV | AI_IDN,
     }, *res;
 
     int val = vlc_getaddrinfo (psz_realhost, i_realport, &hints, &res);
@@ -450,7 +450,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
             .ai_family = AF_INET,
             .ai_socktype = SOCK_STREAM,
             .ai_protocol = IPPROTO_TCP,
-            .ai_flags = 0,
+            .ai_flags = AI_IDN,
         };
         struct addrinfo *res;
 

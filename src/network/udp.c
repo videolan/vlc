@@ -141,7 +141,7 @@ static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
     struct addrinfo hints = {
         .ai_socktype = SOCK_DGRAM,
         .ai_protocol = protocol,
-        .ai_flags = AI_PASSIVE | AI_NUMERICSERV,
+        .ai_flags = AI_PASSIVE | AI_NUMERICSERV | AI_IDN,
     }, *res;
 
     if (host && !*host)
@@ -506,7 +506,7 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
     struct addrinfo hints = {
         .ai_socktype = SOCK_DGRAM,
         .ai_protocol = proto,
-        .ai_flags = AI_NUMERICSERV,
+        .ai_flags = AI_NUMERICSERV | AI_IDN,
     }, *res;
     int       i_handle = -1;
     bool      b_unreach = false;
@@ -604,7 +604,7 @@ int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
     struct addrinfo hints = {
         .ai_socktype = SOCK_DGRAM,
         .ai_protocol = protocol,
-        .ai_flags = AI_NUMERICSERV,
+        .ai_flags = AI_NUMERICSERV | AI_IDN,
     }, *loc, *rem;
 
     int val = vlc_getaddrinfo (psz_server, i_server, &hints, &rem);

@@ -167,18 +167,9 @@ int vlc_getaddrinfo (const char *node, unsigned port,
         hints.ai_flags &= ~AI_NUMERICHOST;
     }
 #endif
-#ifdef AI_IDN
-    /* Run-time I18n Domain Names support */
-    hints.ai_flags |= AI_IDN;
-    ret = getaddrinfo (node, servname, &hints, res);
-    if (ret != EAI_BADFLAGS)
-        goto out;
-    /* IDN not available: disable and retry without it */
-    hints.ai_flags &= ~AI_IDN;
-#endif
     ret = getaddrinfo (node, servname, &hints, res);
 
-#if defined(AI_IDN) || defined(WIN32)
+#if defined(WIN32)
 out:
 #endif
     return ret;

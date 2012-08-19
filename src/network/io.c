@@ -130,7 +130,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
     struct addrinfo hints = {
         .ai_socktype = type,
         .ai_protocol = protocol,
-        .ai_flags = AI_PASSIVE | AI_NUMERICSERV,
+        .ai_flags = AI_PASSIVE | AI_NUMERICSERV | AI_IDN,
     }, *res;
 
     msg_Dbg (p_this, "net: listening to %s port %d",

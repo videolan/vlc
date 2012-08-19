@@ -157,7 +157,7 @@ static void create_SDP(sout_stream_t *p_stream, sout_access_out_t *p_access)
         .ai_family = AF_UNSPEC,
         .ai_socktype = SOCK_DGRAM,
         .ai_protocol = 0,
-        .ai_flags = AI_NUMERICHOST | AI_NUMERICSERV
+        .ai_flags = AI_NUMERICHOST | AI_NUMERICSERV | AI_IDN,
     };
     char *shost = var_GetNonEmptyString (p_access, "src-addr");
     char *dhost = var_GetNonEmptyString (p_access, "dst-addr");
