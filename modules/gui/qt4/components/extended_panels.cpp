@@ -1277,8 +1277,6 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent )
 
         oldControlVars[i] = comp_controls[i].f_value;
 
-        CONNECT( compCtrl[i], valueChanged( int ), this, setInitValues() );
-
         ctrl_texts[i] = new QLabel( qtr( comp_controls[i].psz_descs ) + "\n" );
         ctrl_texts[i]->setFont( smallFont );
         ctrl_texts[i]->setAlignment( Qt::AlignHCenter );
@@ -1291,6 +1289,9 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent )
         layout->addWidget( ctrl_readout[i], 2, i, Qt::AlignHCenter );
         layout->addWidget( ctrl_texts[i],   3, i, Qt::AlignHCenter );
     }
+
+    for( int i = 0; i < NUM_CP_CTRL; i++ )
+        CONNECT( compCtrl[i], valueChanged( int ), this, setInitValues() );
 
     BUTTONACT( enableCheck, enable() );
 
@@ -1421,8 +1422,6 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
         spatCtrl[i]->setValue( (int)var_InheritFloat( p_intf, spat_controls[i].psz_name ) * 10. );
         oldControlVars[i] = spatCtrl[i]->value();
 
-        CONNECT( spatCtrl[i], valueChanged( int ), this, setInitValues() );
-
         ctrl_texts[i] = new QLabel( qtr( spat_controls[i].psz_desc ) + "\n" );
         ctrl_texts[i]->setFont( smallFont );
 
@@ -1435,6 +1434,9 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
         spatCtrl[i]->setRange( 0, 10 );
     }
     spatCtrl[0]->setRange( 0, 11 );
+
+    for( int i = 0; i < NUM_SP_CTRL; i++ )
+        CONNECT( spatCtrl[i], valueChanged( int ), this, setInitValues() );
 
     BUTTONACT( enableCheck, enable() );
 
