@@ -234,7 +234,8 @@ static const vlc_qt_key_t keys[] =
     // Qt::Key_LaunchMail
     // Qt::Key_LaunchMedia
     /* Qt::Key_Launch0 through Qt::Key_LaunchF */
-    // Qt::Key_MediaLast
+    /* ... */
+    { Qt::Key_Reload,                KEY_BROWSER_REFRESH },
 };
 
 static int keycmp( const void *a, const void *b )
