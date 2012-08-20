@@ -51,7 +51,6 @@ private:
     QVLCPointer question;
     QVLCPointer progressBar;
 signals:
-    void progressBarDestroyed (QWidget *);
     void error (const QString&, const QString&);
 
 private slots:
@@ -85,7 +84,7 @@ private slots:
 signals:
     void progressed (int);
     void described (const QString&);
-    void destroyed (void);
+    void released (void);
 };
 
 #endif
