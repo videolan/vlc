@@ -794,7 +794,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     {
     case CONFIG_ITEM_STRING:
     case CONFIG_ITEM_PASSWORD:
-        if( !_p_item->i_list )
+        if( !_p_item->list_count )
         {
             p_control = [[StringConfigControl alloc]
                     initWithItem: _p_item
@@ -821,7 +821,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
                     withView: o_parent_view];
         break;
     case CONFIG_ITEM_INTEGER:
-        if( _p_item->i_list )
+        if( _p_item->list_count )
         {
             p_control = [[IntegerListConfigControl alloc]
                         initWithItem: _p_item
@@ -1082,12 +1082,12 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         ADD_COMBO( o_combo, mainFrame, [o_label frame].size.width,
             -2, 0, o_textfieldTooltip )
         [o_combo setAutoresizingMask:NSViewWidthSizable ];
-        for( i_index = 0; i_index < p_item->i_list; i_index++ )
+        for( i_index = 0; i_index < p_item->list_count; i_index++ )
         {
-            if( !p_item->value.psz && !p_item->ppsz_list[i_index] )
+            if( !p_item->value.psz && !p_item->list.psz[i_index] )
                 [o_combo selectItemAtIndex: i_index];
-            else if( p_item->value.psz && p_item->ppsz_list[i_index] &&
-                !strcmp( p_item->value.psz, p_item->ppsz_list[i_index] ) )
+            else if( p_item->value.psz && p_item->list.psz[i_index] &&
+                !strcmp( p_item->value.psz, p_item->list.psz[i_index] ) )
                 [o_combo selectItemAtIndex: i_index];
        }
         [self addSubview: o_combo];
@@ -1118,8 +1118,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 - (char *)stringValue
 {
     if( [o_combo indexOfSelectedItem] >= 0 ) {
-        if( p_item->ppsz_list[[o_combo indexOfSelectedItem]] != NULL )
-            return strdup( p_item->ppsz_list[[o_combo indexOfSelectedItem]] );
+        if( p_item->list.psz[[o_combo indexOfSelectedItem]] != NULL )
+            return strdup( p_item->list.psz[[o_combo indexOfSelectedItem]] );
     } else {
         if( [[VLCMain sharedInstance] delocalizeString: [o_combo stringValue]] != NULL )
             return strdup( [[VLCMain sharedInstance] delocalizeString: [o_combo stringValue]] );
@@ -1133,12 +1133,12 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     [o_combo reloadData];
     char *psz_value = config_GetPsz( VLCIntf, p_item->psz_name );
 
-    for( i_index = 0; i_index < p_item->i_list; i_index++ )
+    for( i_index = 0; i_index < p_item->list_count; i_index++ )
     {
-        if( !psz_value && !p_item->ppsz_list[i_index] )
+        if( !psz_value && !p_item->list.psz[i_index] )
             [o_combo selectItemAtIndex: i_index];
-        else if( psz_value && p_item->ppsz_list[i_index] &&
-            !strcmp( psz_value, p_item->ppsz_list[i_index] ) )
+        else if( psz_value && p_item->list.psz[i_index] &&
+            !strcmp( psz_value, p_item->list.psz[i_index] ) )
             [o_combo selectItemAtIndex: i_index];
     }
 
@@ -1150,16 +1150,16 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 @implementation StringListConfigControl (NSComboBoxDataSource)
 - (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
-        return p_item->i_list;
+        return p_item->list_count;
 }
 
 - (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)i_index
 {
-    if( p_item->ppsz_list_text && p_item->ppsz_list_text[i_index] )
+    if( p_item->list_text && p_item->list_text[i_index] )
     {
-        return _NS((char *)p_item->ppsz_list_text[i_index]);
+        return _NS((char *)p_item->list_text[i_index]);
     } else
-        return _NS((char *)p_item->ppsz_list[i_index]);
+        return _NS((char *)p_item->list.psz[i_index]);
 }
 @end
 
@@ -1573,9 +1573,9 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         ADD_COMBO( o_combo, mainFrame, [o_label frame].size.width,
             -2, 0, o_textfieldTooltip )
         [o_combo setAutoresizingMask:NSViewWidthSizable ];
-        for( i_index = 0; i_index < p_item->i_list; i_index++ )
+        for( i_index = 0; i_index < p_item->list_count; i_index++ )
         {
-            if( p_item->value.i == p_item->pi_list[i_index] )
+            if( p_item->value.i == p_item->list.i[i_index] )
             {
                 [o_combo selectItemAtIndex: i_index];
             }
@@ -1608,7 +1608,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 - (int)intValue
 {
     if( [o_combo indexOfSelectedItem] >= 0 )
-        return p_item->pi_list[[o_combo indexOfSelectedItem]];
+        return p_item->list.i[[o_combo indexOfSelectedItem]];
     else
         return [o_combo intValue];
 }
@@ -1617,9 +1617,9 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 {
     int i_index;
     [o_combo reloadData];
-    for( i_index = 0; i_index < p_item->i_list; i_index++ )
+    for( i_index = 0; i_index < p_item->list_count; i_index++ )
     {
-        if( config_GetInt( VLCIntf, p_item->psz_name) == p_item->pi_list[i_index] )
+        if( config_GetInt( VLCIntf, p_item->psz_name) == p_item->list.i[i_index] )
         {
             [o_combo selectItemAtIndex: i_index];
         }
@@ -1631,15 +1631,15 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 @implementation IntegerListConfigControl (NSComboBoxDataSource)
 - (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
-    return p_item->i_list;
+    return p_item->list_count;
 }
 
 - (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)i_index
 {
-    if( p_item->ppsz_list_text && p_item->ppsz_list_text[i_index] )
-        return _NS((char *)p_item->ppsz_list_text[i_index]);
+    if( p_item->list_text && p_item->list_text[i_index] )
+        return _NS((char *)p_item->list_text[i_index]);
     else
-        return [NSString stringWithFormat: @"%i", p_item->pi_list[i_index]];
+        return [NSString stringWithFormat: @"%i", p_item->list.i[i_index]];
 }
 @end
 

@@ -373,11 +373,11 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     if( p_item )
     {
-        for( i_index = 0; p_item->ppsz_list && p_item->ppsz_list[i_index];
+        for( i_index = 0; p_item->list.psz && p_item->list.psz[i_index];
              i_index++ )
         {
             [o_file_sub_encoding_pop addItemWithTitle:
-                [NSString stringWithUTF8String: p_item->ppsz_list[i_index]]];
+                [NSString stringWithUTF8String: p_item->list.psz[i_index]]];
         }
         [o_file_sub_encoding_pop selectItemWithTitle:
                 [NSString stringWithUTF8String: p_item->value.psz]];
@@ -387,10 +387,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     if ( p_item )
     {
-        for ( i_index = 0; i_index < p_item->i_list; i_index++ )
+        for ( i_index = 0; i_index < p_item->list_count; i_index++ )
         {
             [o_file_sub_align_pop addItemWithTitle:
-             _NS(p_item->ppsz_list_text[i_index])];
+             _NS(p_item->list_text[i_index])];
         }
         [o_file_sub_align_pop selectItemAtIndex: p_item->value.i];
     }
@@ -399,10 +399,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     if ( p_item )
     {
-        for ( i_index = 0; i_index < p_item->i_list; i_index++ )
+        for ( i_index = 0; i_index < p_item->list_count; i_index++ )
         {
-            [o_file_sub_size_pop addItemWithTitle: _NS(p_item->ppsz_list_text[i_index])];
-            if ( p_item->value.i == p_item->pi_list[i_index] )
+            [o_file_sub_size_pop addItemWithTitle: _NS(p_item->list_text[i_index])];
+            if ( p_item->value.i == p_item->list.i[i_index] )
             {
                 [o_file_sub_size_pop selectItemAtIndex: i_index];
             }
@@ -452,7 +452,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
             {
                 [o_options addObject: [NSString stringWithFormat:
                     @"freetype-rel-fontsize=%i",
-                    p_item->pi_list[[o_file_sub_size_pop indexOfSelectedItem]]]];
+                    p_item->list.i[[o_file_sub_size_pop indexOfSelectedItem]]]];
             }
         }
         NSArray * components = [[o_file_starttime_fld stringValue] componentsSeparatedByString:@":"];

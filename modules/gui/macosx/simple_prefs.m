@@ -364,23 +364,23 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     /* serious problem, if no item found */
     assert( p_item );
 
-    for( int i = 0; i < p_item->i_list; i++ )
+    for( int i = 0; i < p_item->list_count; i++ )
     {
         NSMenuItem *mi;
-        if( p_item->ppsz_list_text != NULL )
-            mi = [[NSMenuItem alloc] initWithTitle: _NS( p_item->ppsz_list_text[i] ) action:NULL keyEquivalent: @""];
-        else if( p_item->ppsz_list[i] && strcmp(p_item->ppsz_list[i],"") == 0 )
+        if( p_item->list_text != NULL )
+            mi = [[NSMenuItem alloc] initWithTitle: _NS( p_item->list_text[i] ) action:NULL keyEquivalent: @""];
+        else if( p_item->list.psz[i] && strcmp(p_item->list.psz[i],"") == 0 )
         {
             [[object menu] addItem: [NSMenuItem separatorItem]];
             continue;
         }
-        else if( p_item->ppsz_list[i] )
-            mi = [[NSMenuItem alloc] initWithTitle: [NSString stringWithUTF8String: p_item->ppsz_list[i]] action:NULL keyEquivalent: @""];
+        else if( p_item->list.psz[i] )
+            mi = [[NSMenuItem alloc] initWithTitle: [NSString stringWithUTF8String: p_item->list.psz[i]] action:NULL keyEquivalent: @""];
         else
             msg_Err( p_intf, "item %d of pref %s failed to be created", i, name );
-        [mi setRepresentedObject:[NSString stringWithUTF8String: p_item->ppsz_list[i]]];
+        [mi setRepresentedObject:[NSString stringWithUTF8String: p_item->list.psz[i]]];
         [[object menu] addItem: [mi autorelease]];
-        if( p_item->value.psz && !strcmp( p_item->value.psz, p_item->ppsz_list[i] ) )
+        if( p_item->value.psz && !strcmp( p_item->value.psz, p_item->list.psz[i] ) )
             [object selectItem:[object lastItem]];
     }
     [object setToolTip: _NS( p_item->psz_longtext )];
@@ -396,18 +396,18 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     /* serious problem, if no item found */
     assert( p_item );
 
-    for( int i = 0; i < p_item->i_list; i++ )
+    for( int i = 0; i < p_item->list_count; i++ )
     {
         NSMenuItem *mi;
-        if( p_item->ppsz_list_text != NULL)
-            mi = [[NSMenuItem alloc] initWithTitle: _NS( p_item->ppsz_list_text[i] ) action:NULL keyEquivalent: @""];
-        else if( p_item->pi_list[i] )
-            mi = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%d", p_item->pi_list[i]] action:NULL keyEquivalent: @""];
+        if( p_item->list_text != NULL)
+            mi = [[NSMenuItem alloc] initWithTitle: _NS( p_item->list_text[i] ) action:NULL keyEquivalent: @""];
+        else if( p_item->list.i[i] )
+            mi = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%d", p_item->list.i[i]] action:NULL keyEquivalent: @""];
         else
             msg_Err( p_intf, "item %d of pref %s failed to be created", i, name);
-        [mi setRepresentedObject:[NSNumber numberWithInt: p_item->pi_list[i]]];
+        [mi setRepresentedObject:[NSNumber numberWithInt: p_item->list.i[i]]];
         [[object menu] addItem: [mi autorelease]];
-        if( p_item->value.i == p_item->pi_list[i] )
+        if( p_item->value.i == p_item->list.i[i] )
             [object selectItem:[object lastItem]];
     }
     [object setToolTip: _NS( p_item->psz_longtext )];
