@@ -81,9 +81,14 @@ static int vlclua_make_uri( lua_State *L )
 {
     const char *psz_input = luaL_checkstring( L, 1 );
     const char *psz_scheme = luaL_optstring( L, 2, NULL );
-    char *psz_uri = make_URI( psz_input, psz_scheme );
-    lua_pushstring( L, psz_uri );
-    free( psz_uri );
+    if( strstr( psz_input, "://" ) == NULL )
+    {
+        char *psz_uri = vlc_path2uri( psz_input, psz_scheme );
+        lua_pushstring( L, psz_uri );
+        free( psz_uri );
+    }
+    else
+        lua_pushstring( L, psz_input );
     return 1;
 }
 

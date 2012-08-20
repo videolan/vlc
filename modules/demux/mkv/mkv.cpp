@@ -189,7 +189,8 @@ static int Open( vlc_object_t * p_this )
                             // test whether this file belongs to our family
                             const uint8_t *p_peek;
                             bool          file_ok = false;
-                            std::string   s_url = make_URI( s_filename.c_str(), "file" );
+#warning Memory leak!
+                            std::string   s_url = vlc_path2uri( s_filename.c_str(), "file" );
                             stream_t      *p_file_stream = stream_UrlNew(
                                                             p_demux,
                                                             s_url.c_str() );

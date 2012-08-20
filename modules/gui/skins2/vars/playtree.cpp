@@ -326,21 +326,28 @@ void Playtree::insertItems( VarTree& elem, const list<string>& files, bool start
     for( list<string>::const_iterator it = files.begin();
          it != files.end(); ++it, i_pos++, first = false )
     {
-        char* psz_uri = make_URI( it->c_str(), NULL );
-        if( !psz_uri )
+        input_item_t *pItem;
+
+        if( strstr( it->c_str(), "://" ) )
+            pItem = input_item_New( it->c_str(), NULL );
+        else
+        {
+            char *psz_uri = vlc_path2uri( it->c_str(), NULL );
+            if( psz_uri == NULL )
+                continue;
+            pItem = input_item_New( psz_uri, NULL );
+            free( psz_uri );
+        }
+
+        if( pItem == NULL)
             continue;
 
-        input_item_t* pItem = input_item_New( psz_uri, NULL );
-        if( pItem )
-        {
-            int i_mode = PLAYLIST_APPEND;
-            if( first && start )
-                i_mode |= PLAYLIST_GO;
+        int i_mode = PLAYLIST_APPEND;
+        if( first && start )
+            i_mode |= PLAYLIST_GO;
 
-            playlist_NodeAddInput( m_pPlaylist, pItem, p_node,
-                                   i_mode, i_pos, pl_Locked );
-        }
-        free( psz_uri );
+        playlist_NodeAddInput( m_pPlaylist, pItem, p_node,
+                               i_mode, i_pos, pl_Locked );
     }
 
 fin:

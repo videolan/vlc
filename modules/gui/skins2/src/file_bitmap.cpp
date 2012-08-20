@@ -43,7 +43,7 @@ FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
     video_format_Init( &fmt_in, 0 );
     video_format_Init( &fmt_out, VLC_CODEC_RGBA );
 
-    char* psz_uri = make_URI( fileName.c_str(), NULL );
+    char* psz_uri = vlc_path2uri( fileName.c_str(), NULL );
     pPic = image_ReadUrl( pImageHandler, psz_uri, &fmt_in, &fmt_out );
     free( psz_uri );
 

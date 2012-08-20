@@ -85,7 +85,7 @@ int playlist_Import( playlist_t *p_playlist, const char *psz_file )
 {
     input_item_t *p_input;
     const char *const psz_option = "meta-file";
-    char *psz_uri = make_URI( psz_file, NULL );
+    char *psz_uri = vlc_path2uri( psz_file, NULL );
 
     if( psz_uri == NULL )
         return VLC_EGENERIC;
@@ -141,7 +141,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
         return VLC_EGENERIC;
     }
 
-    char *psz_uri = make_URI( psz_file, "file/xspf-open" );
+    char *psz_uri = vlc_path2uri( psz_file, "file/xspf-open" );
     free( psz_file );
     if( psz_uri == NULL )
         return VLC_ENOMEM;

@@ -37,13 +37,15 @@ void CmdAddItem::execute()
     if( !pPlaylist )
         return;
 
-    char* psz_uri = make_URI(  m_name.c_str(), NULL );
-    if( !psz_uri )
-        return;
-
-    playlist_Add( pPlaylist, psz_uri, NULL,
+    if( strstr( m_name.c_str(), "://" ) == NULL )
+    {
+        char *psz_uri = vlc_path2uri( m_name.c_str(), NULL );
+        if( !psz_uri )
+            return;
+        m_name = psz_uri;
+        free( psz_uri );
+    }
+    playlist_Add( pPlaylist, m_name.c_str(), NULL,
                   m_playNow ? PLAYLIST_APPEND | PLAYLIST_GO : PLAYLIST_APPEND,
                   PLAYLIST_END, true, false );
-
-    free( psz_uri );
 }

@@ -118,7 +118,7 @@ static int FindMeta( vlc_object_t *p_this )
         struct stat dummy;
         if( vlc_stat( filepath, &dummy ) == 0 )
         {
-            char *psz_uri = make_URI( filepath, "file" );
+            char *psz_uri = vlc_path2uri( filepath, "file" );
             if( psz_uri )
             {
                 input_item_SetArtURL( p_item, psz_uri );

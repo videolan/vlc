@@ -1098,7 +1098,7 @@ static void LoadSlaves( input_thread_t *p_input )
         if( *psz == 0 )
             break;
 
-        char *uri = make_URI( psz, NULL );
+        char *uri = vlc_path2uri( psz, NULL );
         psz = psz_delim;
         if( uri == NULL )
             continue;
@@ -2041,10 +2041,7 @@ static bool Control( input_thread_t *p_input,
         case INPUT_CONTROL_ADD_SLAVE:
             if( val.psz_string )
             {
-                char *uri = make_URI( val.psz_string, NULL );
-                if( uri == NULL )
-                    break;
-
+                const char *uri = val.psz_string;
                 input_source_t *slave = InputSourceNew( p_input );
 
                 if( slave && !InputSourceInit( p_input, slave, uri, NULL, false ) )
@@ -2089,7 +2086,6 @@ static bool Control( input_thread_t *p_input,
                     free( slave );
                     msg_Warn( p_input, "failed to add %s as slave", uri );
                 }
-                free( uri );
             }
             break;
 
@@ -3156,7 +3152,7 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, unsigned i
         free( psz_path );
     }
 
-    char *url = make_URI( psz_subtitle, "file" );
+    char *url = vlc_path2uri( psz_subtitle, NULL );
 
     var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &count, NULL );
 

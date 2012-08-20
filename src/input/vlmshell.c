@@ -525,7 +525,7 @@ error:
 
 static int ExecuteLoad( vlm_t *p_vlm, const char *psz_path, vlm_message_t **pp_status )
 {
-    char *psz_url = make_URI( psz_path, NULL );
+    char *psz_url = vlc_path2uri( psz_path, NULL );
     stream_t *p_stream = stream_UrlNew( p_vlm, psz_url );
     free( psz_url );
     uint64_t i_size;

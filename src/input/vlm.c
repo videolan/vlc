@@ -628,9 +628,16 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
 
             vlc_gc_decref( p_media->vod.p_item );
 
-            char *psz_uri = make_URI( p_cfg->ppsz_input[0], NULL );
-            p_media->vod.p_item = input_item_New( psz_uri, p_cfg->psz_name );
-            free( psz_uri );
+            if( strstr( p_cfg->ppsz_input[0], "://" ) == NULL )
+            {
+                char *psz_uri = vlc_path2uri( p_cfg->ppsz_input[0], NULL );
+                p_media->vod.p_item = input_item_New( psz_uri,
+                                                      p_cfg->psz_name );
+                free( psz_uri );
+            }
+            else
+                p_media->vod.p_item = input_item_New( p_cfg->ppsz_input[0],
+                                                      p_cfg->psz_name );
 
             if( p_cfg->psz_output )
             {
@@ -1029,10 +1036,15 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
 
     /* Start new one */
     p_instance->i_index = i_input_index;
-    char *psz_uri = make_URI( p_media->cfg.ppsz_input[p_instance->i_index],
-                              NULL );
-    input_item_SetURI( p_instance->p_item, psz_uri ) ;
-    free( psz_uri );
+    if( strstr( p_media->cfg.ppsz_input[p_instance->i_index], "://" ) == NULL )
+    {
+        char *psz_uri = vlc_path2uri(
+                          p_media->cfg.ppsz_input[p_instance->i_index], NULL );
+        input_item_SetURI( p_instance->p_item, psz_uri ) ;
+        free( psz_uri );
+    }
+    else
+        input_item_SetURI( p_instance->p_item, p_media->cfg.ppsz_input[p_instance->i_index] ) ;
 
     if( asprintf( &psz_log, _("Media: %s"), p_media->cfg.psz_name ) != -1 )
     {

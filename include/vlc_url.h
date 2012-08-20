@@ -30,6 +30,8 @@
  * This file defines functions for manipulating URL in vlc
  */
 
+VLC_API char *vlc_path2uri (const char *path, const char *scheme) VLC_MALLOC;
+
 struct vlc_url_t
 {
     char *psz_protocol;
@@ -48,7 +50,6 @@ struct vlc_url_t
 VLC_API char * decode_URI_duplicate( const char *psz ) VLC_MALLOC;
 VLC_API char * decode_URI( char *psz );
 VLC_API char * encode_URI_component( const char *psz ) VLC_MALLOC;
-VLC_API char * make_URI( const char *path, const char *scheme ) VLC_MALLOC;
 VLC_API char * make_path( const char *url ) VLC_MALLOC;
 
 /*****************************************************************************

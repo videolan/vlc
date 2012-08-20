@@ -1409,8 +1409,7 @@ static bool HandleBrowseKey(intf_thread_t *intf, int key)
             return true;
         }
 
-        char *uri = make_URI(path, dir_entry->file ? "file"
-                                                             : "directory");
+        char *uri = vlc_path2uri(path, "file");
         free(path);
         if (uri == NULL)
             return true;
@@ -1447,7 +1446,7 @@ static bool HandleBrowseKey(intf_thread_t *intf, int key)
 static void OpenSelection(intf_thread_t *intf)
 {
     intf_sys_t *sys = intf->p_sys;
-    char *uri = make_URI(sys->open_chain, NULL);
+    char *uri = vlc_path2uri(sys->open_chain, NULL);
     if (uri == NULL)
         return;
 

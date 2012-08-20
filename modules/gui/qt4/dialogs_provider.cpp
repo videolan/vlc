@@ -475,26 +475,27 @@ void DialogsProvider::simpleMLAppendDialog()
  **/
 void DialogsProvider::openUrlDialog()
 {
-    OpenUrlDialog *oud = new OpenUrlDialog( p_intf );
-    if( oud->exec() == QDialog::Accepted )
+    OpenUrlDialog oud( p_intf );
+    if( oud.exec() != QDialog::Accepted )
+        return;
+
+    QString url = oud.url();
+    if( url.isEmpty() )
+        return;
+
+    if( !url.contains( qfu( "://" ) ) )
     {
-        QString url = oud->url();
-        if( !url.isEmpty() )
-        {
-            char *uri = make_URI( qtu( url ), NULL );
-            if( likely( uri != NULL ) )
-            {
-                playlist_Add( THEPL, uri,
-                              NULL, !oud->shouldEnqueue() ?
-                                      ( PLAYLIST_APPEND | PLAYLIST_GO )
-                                    : ( PLAYLIST_APPEND | PLAYLIST_PREPARSE ),
-                              PLAYLIST_END, true, false );
-                RecentsMRL::getInstance( p_intf )->addRecent( url );
-                free( uri );
-            }
-        }
+        char *uri = vlc_path2uri( qtu( url ), NULL );
+        if( uri == NULL )
+            return;
+        url = qfu(uri);
+        free( uri );
     }
-    delete oud;
+    playlist_Add( THEPL, qtu(url), NULL,
+                  !oud.shouldEnqueue() ? ( PLAYLIST_APPEND | PLAYLIST_GO )
+                                     : ( PLAYLIST_APPEND | PLAYLIST_PREPARSE ),
+                  PLAYLIST_END, true, false );
+    RecentsMRL::getInstance( p_intf )->addRecent( url );
 }
 
 /* Directory */
@@ -521,7 +522,7 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
         dir.remove( "BDMV" );
     }
 
-    char *uri = make_URI( qtu( toNativeSeparators( dir ) ), scheme );
+    char *uri = vlc_path2uri( qtu( toNativeSeparators( dir ) ), scheme );
     if( unlikely(uri == NULL) )
         return;
 

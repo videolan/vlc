@@ -557,7 +557,7 @@ static char *disc_get_mrl (struct udev_device *dev)
         return NULL;
 
     val = udev_device_get_devnode (dev);
-    return make_URI (val, scheme);
+    return vlc_path2uri (val, scheme);
 }
 
 static char *disc_get_name (struct udev_device *dev)

@@ -625,7 +625,7 @@ static picture_t *LoadImage( vlc_object_t *p_this, const char *psz_filename )
     if( !p_image )
         return NULL;
 
-    char *psz_url = make_URI( psz_filename, NULL );
+    char *psz_url = vlc_path2uri( psz_filename, NULL );
     picture_t *p_pic = image_ReadUrl( p_image, psz_url, &fmt_in, &fmt_out );
     free( psz_url );
     image_HandlerDelete( p_image );

@@ -221,5 +221,5 @@ char *ProcessMRL( const char *psz_mrl, const char *psz_prefix )
     return ret;
 
 uri:
-    return make_URI( psz_mrl, NULL );
+    return vlc_path2uri( psz_mrl, NULL );
 }

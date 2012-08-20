@@ -563,7 +563,7 @@ void DiscOpenPanel::updateMRL()
     else
         scheme = "cdda";
 
-    char *mrl = make_URI( qtu(discPath), scheme );
+    char *mrl = vlc_path2uri( qtu(discPath), scheme );
     if( unlikely(mrl == NULL) )
         return;
 

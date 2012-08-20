@@ -148,20 +148,17 @@ char *encode_URI_component (const char *str)
 
 /**
  * Builds a URL representation from a local file path.
- * If already a URI, return a copy of the string.
  * @param path path to convert (or URI to copy)
  * @param scheme URI scheme to use (default is auto: "file", "fd" or "smb")
  * @return a nul-terminated URI string (use free() to release it),
  * or NULL in case of error
  */
-char *make_URI (const char *path, const char *scheme)
+char *vlc_path2uri (const char *path, const char *scheme)
 {
     if (path == NULL)
         return NULL;
     if (scheme == NULL && !strcmp (path, "-"))
         return strdup ("fd://0"); // standard input
-    if (strstr (path, "://") != NULL)
-        return strdup (path); /* Already a URI */
     /* Note: VLC cannot handle URI schemes without double slash after the
      * scheme name (such as mailto: or news:). */
 
@@ -207,7 +204,7 @@ char *make_URI (const char *path, const char *scheme)
                 if (dup[i] == '\\')
                     dup[i] = DIR_SEP_CHAR;
 
-            char *ret = make_URI (dup, scheme);
+            char *ret = vlc_path2uri (dup, scheme);
             free (dup);
             return ret;
         }
@@ -238,7 +235,7 @@ char *make_URI (const char *path, const char *scheme)
             buf = NULL;
 
         free (cwd);
-        ret = (buf != NULL) ? make_URI (buf, scheme) : NULL;
+        ret = (buf != NULL) ? vlc_path2uri (buf, scheme) : NULL;
         free (buf);
         return ret;
     }

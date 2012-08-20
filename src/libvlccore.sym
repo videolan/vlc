@@ -221,7 +221,7 @@ libvlc_InternalDestroy
 libvlc_InternalInit
 libvlc_Quit
 libvlc_SetExitHandler
-make_URI
+vlc_path2uri
 make_path
 mdate
 ml_Create

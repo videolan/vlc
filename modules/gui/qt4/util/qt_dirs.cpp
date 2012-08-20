@@ -28,7 +28,10 @@
 
 QString toURI( const QString& s )
 {
-    char *psz = make_URI( qtu(s), NULL );
+    if( s.contains( qfu("://") ) )
+        return s;
+
+    char *psz = vlc_path2uri( qtu(s), NULL );
     if( psz == NULL )
         return qfu("");
 

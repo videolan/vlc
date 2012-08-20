@@ -70,7 +70,7 @@ static inline void test_b64 (const char *in, const char *out)
 
 static char *make_URI_def (const char *in)
 {
-    return make_URI (in, NULL);
+    return vlc_path2uri (in, NULL);
 }
 
 static inline void test_path (const char *in, const char *out)
@@ -119,9 +119,6 @@ int main (void)
     test_b64 ("foobar", "Zm9vYmFy");
 
     /* Path test */
-    test_path ("file:///", "file:///");
-    test_path ("http://www.example.com/%7Ejohn/",
-               "http://www.example.com/%7Ejohn/");
     test_path ("/", "file:///");
     test_path ("/home/john/", "file:///home/john/");
     test_path ("/home/john//too///many//slashes",

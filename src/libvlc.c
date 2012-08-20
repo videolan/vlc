@@ -337,7 +337,11 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                     }
 
                     /* We need to resolve relative paths in this instance */
-                    char *psz_mrl = make_URI( ppsz_argv[i_input], NULL );
+                    char *psz_mrl;
+                    if( strstr( psz_mrl, "://" ) )
+                        psz_mrl = strdup( ppsz_argv[i_input] );
+                    else
+                        psz_mrl = vlc_path2uri( ppsz_argv[i_input], NULL );
                     const char *psz_after_track = MPRIS_APPEND;
 
                     if( psz_mrl == NULL )
@@ -815,13 +819,18 @@ static void GetFilenames( libvlc_int_t *p_vlc, unsigned n,
             }
         }
 
-        char *mrl = make_URI( args[n], NULL );
-        if( !mrl )
-            continue;
+        char *mrl = NULL;
+        if( strstr( args[n], "://" ) == NULL )
+        {
+            mrl = vlc_path2uri( args[n], NULL );
+            if( !mrl )
+                continue;
+        }
 
-        playlist_AddExt( pl_Get( p_vlc ), mrl, NULL, PLAYLIST_INSERT,
-                0, -1, i_options, ( i_options ? &args[n + 1] : NULL ),
-                VLC_INPUT_OPTION_TRUSTED, true, pl_Unlocked );
+        playlist_AddExt( pl_Get( p_vlc ), (mrl != NULL) ? mrl : args[n], NULL,
+                         PLAYLIST_INSERT, 0, -1, i_options,
+                         ( i_options ? &args[n + 1] : NULL ),
+                         VLC_INPUT_OPTION_TRUSTED, true, pl_Unlocked );
         free( mrl );
     }
 }
