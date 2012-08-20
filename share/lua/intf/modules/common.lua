@@ -150,7 +150,7 @@ function seek(value)
         if string.sub(value,-1) == "%" then
             local number = us_tonumber(string.sub(value,1,-2))
             if number ~= nil then
-                local posPercent = number/100.
+                local posPercent = number/100
                 if string.sub(value,1,1) == "+" or string.sub(value,1,1) == "-" then
                     vlc.var.set(input,"position",vlc.var.get(input,"position") + posPercent)
                 else
