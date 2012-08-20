@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_url.h>
 #include <vlc_fs.h>
+#include <ctype.h>
 
 /**
  * Decodes an encoded URI component. See also decode_URI().
