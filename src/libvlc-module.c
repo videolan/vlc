@@ -2282,8 +2282,8 @@ vlc_module_begin ()
 #   define KEY_TOGGLE_FULLSCREEN  "f"
 #   define KEY_LEAVE_FULLSCREEN   "Esc"
 #   define KEY_PLAY_PAUSE         "Space\tMedia Play Pause"
-#   define KEY_PAUSE              NULL
-#   define KEY_PLAY               NULL
+#   define KEY_PAUSE              "Browser Stop"
+#   define KEY_PLAY               "Browser Refresh"
 #   define KEY_FASTER             "+"
 #   define KEY_SLOWER             "-"
 #   define KEY_RATE_NORMAL        "="
@@ -2301,7 +2301,7 @@ vlc_module_begin ()
 #   define KEY_JUMP_PMEDIUM       "Ctrl+Right"
 #   define KEY_JUMP_MLONG         "Ctrl+Alt+Left"
 #   define KEY_JUMP_PLONG         "Ctrl+Alt+Right"
-#   define KEY_FRAME_NEXT         "e"
+#   define KEY_FRAME_NEXT         "e\tBrowser Next"
 #   define KEY_NAV_ACTIVATE       "Enter"
 #   define KEY_NAV_UP             "Up"
 #   define KEY_NAV_DOWN           "Down"
