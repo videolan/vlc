@@ -758,12 +758,7 @@ void DialogsProvider::SDMenuAction( const QString& data )
  **/
 void DialogsProvider::playMRL( const QString &mrl )
 {
-    char *uri = make_URI( qtu( mrl ), NULL );
-    if( unlikely( uri == NULL ) )
-        return;
-
-    playlist_Add( THEPL, uri, NULL,
-           PLAYLIST_APPEND | PLAYLIST_GO , PLAYLIST_END, true, false );
+    playlist_Add( THEPL, qtu(mrl), NULL,
+                  PLAYLIST_APPEND | PLAYLIST_GO , PLAYLIST_END, true, false );
     RecentsMRL::getInstance( p_intf )->addRecent( mrl );
-    free( uri );
 }
