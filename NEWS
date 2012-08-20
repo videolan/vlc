@@ -25,6 +25,7 @@ Access:
  * Major improvements in DASH support
  * Improvements in Blu-Ray module, notably for multiple video tracks support
  * Important improvements and rewrite of the v4l2 access module
+ * HTTP: support for Internationalized Domain Names
 
 Demuxers:
  * MP4: partial support for fragmented MP4
