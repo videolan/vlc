@@ -996,6 +996,8 @@
 { 0x00000ad3, 0x201d },
 /* XK_prescription        : PRESCRIPTION TAKE */
 { 0x00000ad4, 0x211e },
+/* XK_permille            : PER MILLE SIGN */
+{ 0x00000ad5, 0x2030 },
 /* XK_minutes             : PRIME */
 { 0x00000ad6, 0x2032 },
 /* XK_seconds             : DOUBLE PRIME */
