@@ -180,17 +180,13 @@ void DialogHandler::requestAnswer (void *value)
 
 QVLCProgressDialog::QVLCProgressDialog (DialogHandler *parent,
                                         struct dialog_progress_bar_t *data)
-    : QProgressDialog ( ),
+    : QProgressDialog (qfu(data->message),
+                       data->cancel ? ("&" + qfu(data->cancel)) : 0, 0, 1000),
       handler (parent),
       cancelled (false)
 {
-    setLabelText( qfu(data->message) );
-    setRange( 0, 0 );
-    if ( data->cancel )
-        setWindowModality ( Qt::ApplicationModal );
-
-    if( data->cancel )
-        setCancelButton( new QPushButton( "&" + qfu(data->cancel) ) );
+    if (data->cancel)
+        setWindowModality (Qt::ApplicationModal);
     if (data->title != NULL)
         setWindowTitle (qfu(data->title));
 
@@ -208,12 +204,10 @@ QVLCProgressDialog::QVLCProgressDialog (DialogHandler *parent,
     data->p_sys = this;
 }
 
-
 void QVLCProgressDialog::update (void *priv, const char *text, float value)
 {
     QVLCProgressDialog *self = static_cast<QVLCProgressDialog *>(priv);
-    if( value > 0 )
-        self->setRange( 0, 1000 );
+
     if (text != NULL)
         emit self->described (qfu(text));
     emit self->progressed ((int)(value * 1000.));
