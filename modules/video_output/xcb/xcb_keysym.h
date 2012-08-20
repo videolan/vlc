@@ -17,6 +17,7 @@
         { XK_Begin,         KEY_HOME, },
         { XK_Insert,        KEY_INSERT, },
         { XK_Menu,          KEY_MENU },
+        { XK_Cancel,        KEY_BROWSER_STOP },
 
         /* Numeric pad keys */
         { XK_KP_Space,      ' ', },
