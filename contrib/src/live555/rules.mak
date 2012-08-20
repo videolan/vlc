@@ -54,7 +54,7 @@ endif
 
 .live555: live555
 	cd $< && ./genMakefiles $(LIVE_TARGET)
-	cd $< && $(MAKE) $(HOSTVARS)
+	cd $< && $(MAKE) $(HOSTVARS) groupsock liveMedia UsageEnvironment BasicUsageEnvironment
 	mkdir -p -- "$(PREFIX)/lib" "$(PREFIX)/include"
 	cp \
 		$</groupsock/libgroupsock.a \
@@ -66,7 +66,7 @@ endif
 		$</groupsock/include/*.hh \
 		$</groupsock/include/*.h \
 		$</liveMedia/include/*.hh \
-        	$</UsageEnvironment/include/*.hh \
-        	$</BasicUsageEnvironment/include/*.hh \
+		$</UsageEnvironment/include/*.hh \
+		$</BasicUsageEnvironment/include/*.hh \
 		"$(PREFIX)/include/"
 	touch $@

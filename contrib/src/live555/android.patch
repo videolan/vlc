@@ -1,43 +1,21 @@
-diff -ur live.orig/groupsock/GroupsockHelper.cpp live/groupsock/GroupsockHelper.cpp
---- live.orig/groupsock/GroupsockHelper.cpp	2012-01-19 16:56:57.026348234 -0500
-+++ live/groupsock/GroupsockHelper.cpp	2012-01-19 16:57:10.470348233 -0500
-@@ -466,9 +466,9 @@
+diff -ruN live/groupsock/GroupsockHelper.cpp live.n/groupsock/GroupsockHelper.cpp
+--- live/groupsock/GroupsockHelper.cpp	2012-08-20 09:33:31.000000000 +0200
++++ live.n/groupsock/GroupsockHelper.cpp	2012-08-20 10:58:28.598217212 +0200
+@@ -466,7 +466,7 @@
    if (!IsMulticastAddress(groupAddress)) return True; // ignore this case
  
    struct ip_mreq_source imr;
--  imr.imr_multiaddr.s_addr = groupAddress;
--  imr.imr_sourceaddr.s_addr = sourceFilterAddr;
--  imr.imr_interface.s_addr = ReceivingInterfaceAddr;
-+  imr.imr_multiaddr = groupAddress;
-+  imr.imr_sourceaddr = sourceFilterAddr;
-+  imr.imr_interface = ReceivingInterfaceAddr;
-   if (setsockopt(socket, IPPROTO_IP, IP_ADD_SOURCE_MEMBERSHIP,
- 		 (const char*)&imr, sizeof (struct ip_mreq_source)) < 0) {
-     socketErr(env, "setsockopt(IP_ADD_SOURCE_MEMBERSHIP) error: ");
-@@ -484,9 +484,9 @@
+-#ifdef ANDROID
++#ifdef __ANDROID__
+     imr.imr_multiaddr = groupAddress;
+     imr.imr_sourceaddr = sourceFilterAddr;
+     imr.imr_interface = ReceivingInterfaceAddr;
+@@ -490,7 +490,7 @@
    if (!IsMulticastAddress(groupAddress)) return True; // ignore this case
  
    struct ip_mreq_source imr;
--  imr.imr_multiaddr.s_addr = groupAddress;
--  imr.imr_sourceaddr.s_addr = sourceFilterAddr;
--  imr.imr_interface.s_addr = ReceivingInterfaceAddr;
-+  imr.imr_multiaddr = groupAddress;
-+  imr.imr_sourceaddr = sourceFilterAddr;
-+  imr.imr_interface = ReceivingInterfaceAddr;
-   if (setsockopt(socket, IPPROTO_IP, IP_DROP_SOURCE_MEMBERSHIP,
- 		 (const char*)&imr, sizeof (struct ip_mreq_source)) < 0) {
-     return False;
-diff -ur live.orig/Makefile.tail live/Makefile.tail
---- live.orig/Makefile.tail	2012-01-19 16:56:57.038348232 -0500
-+++ live/Makefile.tail	2012-01-19 16:57:10.470348233 -0500
-@@ -14,8 +14,8 @@
- 	cd $(GROUPSOCK_DIR) ; $(MAKE)
- 	cd $(USAGE_ENVIRONMENT_DIR) ; $(MAKE)
- 	cd $(BASIC_USAGE_ENVIRONMENT_DIR) ; $(MAKE)
--	cd $(TESTPROGS_DIR) ; $(MAKE)
--	cd $(MEDIA_SERVER_DIR) ; $(MAKE)
-+#	cd $(TESTPROGS_DIR) ; $(MAKE)
-+#	cd $(MEDIA_SERVER_DIR) ; $(MAKE)
- 
- clean:
- 	cd $(LIVEMEDIA_DIR) ; $(MAKE) clean
+-#ifdef ANDROID
++#ifdef __ANDROID__
+     imr.imr_multiaddr = groupAddress;
+     imr.imr_sourceaddr = sourceFilterAddr;
+     imr.imr_interface = ReceivingInterfaceAddr;
