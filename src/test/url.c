@@ -101,8 +101,8 @@ int main (void)
     test_decode ("%7E", "~");
 
     /* tests with invalid input */
-    test_decode ("%", "%");
-    test_decode ("%2", "%2");
+    test_decode ("%", NULL);
+    test_decode ("%2", NULL);
     test_decode ("%0000", "");
 
     /* Non-ASCII tests */
