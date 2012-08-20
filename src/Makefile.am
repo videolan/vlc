@@ -401,6 +401,7 @@ SOURCES_libvlc_common = \
 	text/charset.c \
 	text/strings.c \
 	text/unicode.c \
+	text/url.c \
 	text/filesystem.c \
 	text/iso_lang.c \
 	text/iso-639_def.h \
