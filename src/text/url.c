@@ -370,6 +370,8 @@ out:
     return ret; /* unknown scheme */
 }
 
+static char *vlc_idna_to_ascii (const char *);
+
 /**
  * Splits an URL into parts.
  * \param url structure of URL parts [OUT]
@@ -459,7 +461,7 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str, unsigned char opt)
     }
     else
     {
-        url->psz_host = strdup (cur);
+        url->psz_host = vlc_idna_to_ascii (cur);
         next = strchr (cur, ':');
     }
 
@@ -481,4 +483,63 @@ void vlc_UrlClean (vlc_url_t *restrict url)
 {
     free (url->psz_host);
     free (url->psz_buffer);
+}
+
+#if defined (HAVE_IDN)
+# include <idna.h>
+#elif defined (WIN32)
+# include <windows.h>
+# include <vlc_charset.h>
+#endif
+
+/**
+ * Converts a UTF-8 nul-terminated IDN to nul-terminated ASCII domain name.
+ * \param idn UTF-8 Internationalized Domain Name to convert
+ * \return a heap-allocated string or NULL on error.
+ */
+static char *vlc_idna_to_ascii (const char *idn)
+{
+#if defined (HAVE_IDN)
+    char *adn;
+
+    if (idna_to_ascii_8z (idn, &adn, IDNA_ALLOW_UNASSIGNED) != IDNA_SUCCESS)
+        return NULL;
+    return adn;
+
+#elif defined (WIN32) && (_WIN32_WINNT >= 0x0601)
+    char *ret = NULL;
+
+    wchar_t *wide = ToWide (idn);
+    if (wide == NULL)
+        return NULL;
+
+    int len = IdnToAscii (IDN_ALLOW_UNASSIGNED, wide, -1, NULL, 0);
+    if (len == 0)
+        goto error;
+
+    wchar_t *buf = malloc (sizeof (*buf) * len);
+    if (unlikely(buf == NULL))
+        goto error;
+    if (!IdnToAscii (IDN_ALLOW_UNASSIGNED, wide, -1, buf, len))
+    {
+        free (buf);
+        goto error;
+    }
+    free (wide);
+
+    ret = FromWide (buf);
+    free (buf);
+error:
+    free (wide);
+    return ret;
+
+#else
+    /* No IDN support, filter out non-ASCII domain names */
+    for (const char *p = idn; *p; p++)
+        if (((unsigned char)*p) >= 0x80)
+            return NULL;
+
+    return strdup (idn);
+
+#endif
 }

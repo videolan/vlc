@@ -164,7 +164,7 @@ EXTRA_DIST += libvlc_win32_rc.rc.in
 
 lib_LTLIBRARIES = libvlccore.la
 
-AM_CPPFLAGS = $(INCICONV) \
+AM_CPPFLAGS = $(INCICONV) $(IDN_CFLAGS) \
 	-DMODULE_STRING=\"main\" \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
@@ -182,7 +182,7 @@ libvlccore_la_LDFLAGS = \
 libvlccore_la_LIBADD = $(LIBS_libvlccore) \
 	../compat/libcompat.la \
 	$(LTLIBINTL) $(LTLIBICONV) \
-	$(SOCKET_LIBS) $(LIBDL) $(LIBM)
+	$(IDN_LIBS) $(SOCKET_LIBS) $(LIBDL) $(LIBM)
 libvlccore_la_DEPENDENCIES = libvlccore.sym
 if HAVE_WIN32
 libvlccore_la_DEPENDENCIES += libvlc_win32_rc.$(OBJEXT)
