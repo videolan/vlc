@@ -776,6 +776,17 @@ fi
 AM_CONDITIONAL(HAVE_MINIZIP, [ test "${have_minizip}" = "yes" ])
 
 
+dnl
+dnl Domain name i18n support via GNU libidn
+dnl
+PKG_CHECK_MODULES([IDN], [libidn], [
+  have_libidn="yes"
+  AC_DEFINE([HAVE_IDN], 1, [Define to 1 if you have GNU libidn.])
+], [
+  have_libidn="no"
+])
+
+
 dnl Check for dbus
 AC_ARG_ENABLE(dbus,
   [AS_HELP_STRING([--enable-dbus],
