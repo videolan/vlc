@@ -194,11 +194,15 @@ void ActionsManager::AudioDown()
 
 void ActionsManager::skipForward()
 {
-    THEMIM->getIM()->jumpFwd();
+    input_thread_t *p_input = THEMIM->getInput();
+    if( p_input )
+        THEMIM->getIM()->jumpFwd();
 }
 
 void ActionsManager::skipBackward()
 {
-    THEMIM->getIM()->jumpBwd();
+    input_thread_t *p_input = THEMIM->getInput();
+    if( p_input )
+        THEMIM->getIM()->jumpBwd();
 }
 
