@@ -184,6 +184,7 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
        user might hit on delete a bit too much, but discussion is opened. -- jb */
     if( i_size == 0 )
     {
+        profileCombo->addItem( PROFILE_NAME_6, QString( VALUE_6 ) );
         profileCombo->addItem( PROFILE_NAME_1, QString( VALUE_1 ) );
         profileCombo->addItem( PROFILE_NAME_2, QString( VALUE_2 ) );
         profileCombo->addItem( PROFILE_NAME_3, QString( VALUE_3 ) );
