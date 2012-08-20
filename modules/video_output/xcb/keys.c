@@ -131,7 +131,8 @@ int ProcessKeyEvent (key_handler_t *ctx, xcb_generic_event_t *ev)
             xcb_keysym_t sym = xcb_key_press_lookup_keysym (ctx->syms, e, 0);
             uint_fast32_t vk = ConvertKeySym (sym);
 
-            msg_Dbg (ctx->obj, "key: 0x%08"PRIxFAST32, vk);
+            msg_Dbg (ctx->obj, "key: 0x%08"PRIxFAST32" (X11: 0x%04"PRIx32")",
+                     vk, sym);
             if (vk == KEY_UNSET)
                 break;
             if (e->state & XCB_MOD_MASK_SHIFT)
