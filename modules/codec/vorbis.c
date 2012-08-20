@@ -119,18 +119,18 @@ static const int pi_channels_maps[9] =
 static const uint32_t pi_8channels_in[] =
 { AOUT_CHAN_LEFT, AOUT_CHAN_CENTER, AOUT_CHAN_RIGHT,
   AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
-  AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,AOUT_CHAN_LFE,0 };
+  AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,AOUT_CHAN_LFE, 0 };
 
 /* recommended vorbis channel order for 7 channels */
 static const uint32_t pi_7channels_in[] =
 { AOUT_CHAN_LEFT, AOUT_CHAN_CENTER, AOUT_CHAN_RIGHT,
   AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
-  AOUT_CHAN_REARCENTER,AOUT_CHAN_LFE,0 };
+  AOUT_CHAN_REARCENTER, AOUT_CHAN_LFE, 0 };
 
 /* recommended vorbis channel order for 6 channels */
 static const uint32_t pi_6channels_in[] =
 { AOUT_CHAN_LEFT, AOUT_CHAN_CENTER, AOUT_CHAN_RIGHT,
-  AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,AOUT_CHAN_LFE,0 };
+  AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, AOUT_CHAN_LFE, 0 };
 
 /* recommended vorbis channel order for 4 channels */
 static const uint32_t pi_4channels_in[] =
