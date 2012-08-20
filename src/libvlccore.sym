@@ -221,6 +221,8 @@ libvlc_InternalDestroy
 libvlc_InternalInit
 libvlc_Quit
 libvlc_SetExitHandler
+vlc_UrlParse
+vlc_UrlClean
 vlc_path2uri
 make_path
 mdate
