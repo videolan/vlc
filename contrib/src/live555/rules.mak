@@ -1,8 +1,8 @@
 # live555
 
 #LIVEDOTCOM_URL := http://live555.com/liveMedia/public/live555-latest.tar.gz
-LIVE555_FILE := live.2011.12.23.tar.gz
-LIVEDOTCOM_URL := http://live555sourcecontrol.googlecode.com/files/$(LIVE555_FILE)
+LIVE555_FILE := live.2012.08.20.tar.gz
+LIVEDOTCOM_URL := http://download.videolan.org/pub/contrib/live555/$(LIVE555_FILE)
 
 PKGS += live555
 
