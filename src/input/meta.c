@@ -209,8 +209,6 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
         return;
     }
 
-    playlist_t *p_playlist = pl_Get( p_input );
-
     if( input_item_IsArtFetched( p_item ) )
     {
         /* XXX Weird, we should not have end up with attachment:// art url unless there is a race
@@ -251,7 +249,7 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
         psz_type = ".png";
 
     /* */
-    playlist_SaveArt( VLC_OBJECT(p_playlist), p_item,
+    playlist_SaveArt( VLC_OBJECT(p_input), p_item,
                       p_attachment->p_data, p_attachment->i_data, psz_type );
 
     vlc_input_attachment_Delete( p_attachment );
