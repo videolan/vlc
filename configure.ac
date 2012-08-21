@@ -231,7 +231,7 @@ case "${host_os}" in
         VLC_ADD_LIBS([libvlccore],[-lwinmm])
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
         VLC_ADD_LIBS([win32text],[-lgdi32])
-        VLC_ADD_LIBS([cdda vcdx sdl_image vout_sdl],[-lwinmm])
+        VLC_ADD_LIBS([vcdx],[-lwinmm])
         AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
         ac_default_prefix="`pwd`/_win32"
         DESTDIR="`pwd`/_win32/"
