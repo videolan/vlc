@@ -291,7 +291,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         }
     }
 
-    char *msg = str_format( p_filter, p_sys->format ? p_sys->format : "" );
+    char *msg = str_format_time( p_sys->format ? p_sys->format : "" );
     if( unlikely( msg == NULL ) )
         goto out;
     if( p_sys->message != NULL && !strcmp( msg, p_sys->message ) )

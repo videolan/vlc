@@ -173,7 +173,7 @@ static int Open( vlc_object_t *p_this )
     if ( psz_idx )
     {
         char *psz_tmp;
-        psz_tmp = str_format( p_access, psz_idx );
+        psz_tmp = str_format_time( psz_idx );
         free( psz_idx );
         if ( !psz_tmp )
         {
@@ -203,12 +203,12 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * formatSegmentPath: create segment path name based on seg #
  *****************************************************************************/
-static char *formatSegmentPath( sout_access_out_t *p_access, char *psz_path, uint32_t i_seg, bool b_sanitize )
+static char *formatSegmentPath( char *psz_path, uint32_t i_seg, bool b_sanitize )
 {
     char *psz_result;
     char *psz_firstNumSign;
 
-    if ( ! ( psz_result  = str_format( p_access, psz_path ) ) )
+    if ( ! ( psz_result  = str_format_time( psz_path ) ) )
         return NULL;
 
     psz_firstNumSign = psz_result + strcspn( psz_result, SEG_NUMBER_PLACEHOLDER );
@@ -272,7 +272,7 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
         for ( uint32_t i = i_firstseg; i <= p_sys->i_segment; i++ )
         {
             char *psz_name;
-            if ( ! ( psz_name = formatSegmentPath( p_access, psz_idxFormat, i, false ) ) )
+            if ( ! ( psz_name = formatSegmentPath( psz_idxFormat, i, false ) ) )
             {
                 free( psz_idxTmp );
                 fclose( fp );
@@ -316,7 +316,7 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
     // Then take care of deletion
     if ( p_sys->b_delsegs && i_firstseg > 1 )
     {
-        char *psz_name = formatSegmentPath( p_access, p_access->psz_path, i_firstseg-1, true );
+        char *psz_name = formatSegmentPath( p_access->psz_path, i_firstseg-1, true );
          if ( psz_name )
          {
              vlc_unlink( psz_name );
@@ -391,7 +391,7 @@ static ssize_t openNextFile( sout_access_out_t *p_access, sout_access_out_sys_t 
 
     uint32_t i_newseg = p_sys->i_segment + 1;
 
-    char *psz_seg = formatSegmentPath( p_access, p_access->psz_path, i_newseg, true );
+    char *psz_seg = formatSegmentPath( p_access->psz_path, i_newseg, true );
     if ( !psz_seg )
         return -1;
 

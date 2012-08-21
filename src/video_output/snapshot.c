@@ -149,7 +149,7 @@ int vout_snapshot_SaveImage(char **name, int *sequential,
         /* */
         char *prefix = NULL;
         if (cfg->prefix_fmt)
-            prefix = str_format(object, cfg->prefix_fmt);
+            prefix = str_format_time(cfg->prefix_fmt);
         if (prefix)
             filename_sanitize(prefix);
         else {
@@ -202,7 +202,7 @@ int vout_snapshot_SaveImage(char **name, int *sequential,
         free(prefix);
     } else {
         /* The user specified a full path name (including file name) */
-        filename = str_format(object, cfg->path);
+        filename = str_format_time(cfg->path);
         path_sanitize(filename);
     }
 

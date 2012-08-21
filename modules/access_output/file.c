@@ -152,7 +152,7 @@ static int Open( vlc_object_t *p_this )
 #endif
     else
     {
-        char *psz_tmp = str_format( p_access, p_access->psz_path );
+        char *psz_tmp = str_format_time( p_access->psz_path );
         path_sanitize( psz_tmp );
 
         fd = vlc_open( psz_tmp, O_RDWR | O_CREAT | O_LARGEFILE |
