@@ -235,7 +235,6 @@ ml_FtreeSpec
 ml_UpdateSimple
 ml_GetPersonsFromMedia
 ml_DeletePersonTypeFromMedia
-ml_PlaySmartPlaylistBasedOn
 module_config_free
 module_config_get
 module_exists

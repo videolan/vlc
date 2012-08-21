@@ -1173,16 +1173,6 @@ VLC_API void ml_DeletePersonTypeFromMedia( ml_media_t* p_media,
 
 
 /**
- * @brief Creates and adds the playlist based on a given find tree
- * @param p_ml Media library object
- * @param p_tree Find tree to create SELECT
- */
-
-VLC_API void ml_PlaySmartPlaylistBasedOn( media_library_t* p_ml,
-                                                ml_ftree_t* p_tree );
-
-
-/**
  * Convenience Macros
  */
 

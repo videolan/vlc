@@ -434,14 +434,6 @@ ml_ftree_t* ml_FtreeSpec( ml_ftree_t* tree, ml_select_e crit, int limit,
     return NULL;
 }
 
-void ml_PlaySmartPlaylistBasedOn( media_library_t* p_ml,
-                                                ml_ftree_t* p_tree )
-{
-    VLC_UNUSED( p_ml );
-    VLC_UNUSED( p_tree );
-    assert( 0 );
-}
-
 void ml_DeletePersonTypeFromMedia( ml_media_t* p_media, const char *psz_role )
 {
     VLC_UNUSED( p_media );
