@@ -113,7 +113,37 @@ struct access_sys_t
 #define GET_OUT_SYS( p_this ) \
     ((access_sys_t *)(((sout_access_out_t *)(p_this))->p_sys))
 
-static int ftp_SendCommand( vlc_object_t *, access_sys_t *, const char *, ... );
+static int ftp_SendCommand( vlc_object_t *obj, access_sys_t *sys,
+                            const char *fmt, ... )
+{
+    size_t fmtlen = strlen( fmt );
+    char fmtbuf[fmtlen + 3];
+
+    memcpy( fmtbuf, fmt, fmtlen );
+    memcpy( fmtbuf + fmtlen, "\r\n", 3 );
+
+    va_list args;
+    char *cmd;
+    int val;
+
+    va_start( args, fmt );
+    val = vasprintf( &cmd, fmtbuf, args );
+    va_end( args );
+    if( unlikely(val == -1) )
+        return -1;
+
+    msg_Dbg( obj, "sending request: \"%.*s\" (%d bytes)", val - 2, cmd, val );
+    if( net_Write( obj, sys->fd_cmd, NULL, cmd, val ) != val )
+    {
+        msg_Err( obj, "request failure" );
+        val = -1;
+    }
+    else
+        val = 0;
+    free( cmd );
+    return val;
+}
+
 static int ftp_ReadCommand( vlc_object_t *, access_sys_t *, int *, char ** );
 static int ftp_StartStream( vlc_object_t *, access_sys_t *, uint64_t );
 static int ftp_StopStream ( vlc_object_t *, access_sys_t * );
@@ -615,31 +645,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
             msg_Warn( p_access, "unimplemented query in control: %d", i_query);
             return VLC_EGENERIC;
 
-    }
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * ftp_*:
- *****************************************************************************/
-static int ftp_SendCommand( vlc_object_t *p_access, access_sys_t *p_sys,
-                            const char *psz_fmt, ... )
-{
-    va_list      args;
-    char         *psz_cmd;
-
-    va_start( args, psz_fmt );
-    if( vasprintf( &psz_cmd, psz_fmt, args ) == -1 )
-        return VLC_EGENERIC;
-
-    va_end( args );
-
-    msg_Dbg( p_access, "ftp_SendCommand:\"%s\"", psz_cmd);
-
-    if( net_Printf( p_access, p_sys->fd_cmd, NULL, "%s\r\n", psz_cmd ) < 0 )
-    {
-        msg_Err( p_access, "failed to send command" );
-        return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
 }
