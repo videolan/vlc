@@ -254,7 +254,6 @@ static int Demux( demux_t *p_demux )
 
     input_thread_t *p_input_thread = demux_GetParentInput( p_demux );
     input_item_t *p_current_input = input_GetItem( p_input_thread );
-    playlist_t *p_playlist = pl_Get( p_demux );
 
     luaL_register( L, "vlc", p_reg_parse );
 
@@ -278,8 +277,7 @@ static int Demux( demux_t *p_demux )
     }
 
     if( lua_gettop( L ) )
-        vlclua_playlist_add_internal( p_demux, L, p_playlist,
-                                      p_current_input, 0 );
+        vlclua_playlist_add_internal( p_demux, L, NULL, p_current_input, 0 );
     else
         msg_Err( p_demux, "Script went completely foobar" );
 
