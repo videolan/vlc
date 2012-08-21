@@ -170,9 +170,26 @@ static inline char *stream_ContentType( stream_t *s )
 VLC_API stream_t * stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *out );
 
 /**
- * Send data to a stream_t handle created by stream_DemuxNew.
+ * Send data to a stream handle created by stream_DemuxNew().
  */
 VLC_API void stream_DemuxSend( stream_t *s, block_t *p_block );
+
+/**
+ * Perform a <b>demux</b> (i.e. DEMUX_...) control request on a stream handle
+ * created by stream_DemuxNew().
+ */
+VLC_API int stream_DemuxControlVa( stream_t *s, int, va_list );
+
+static inline int stream_DemuxControl( stream_t *s, int query, ... )
+{
+    va_list ap;
+    int ret;
+
+    va_start( ap, query );
+    ret = stream_DemuxControlVa( s, query, ap );
+    va_end( ap );
+    return ret;
+}
 
 /**
  * Create a stream_t reading from memory.

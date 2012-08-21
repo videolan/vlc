@@ -46,6 +46,13 @@ struct stream_sys_t
     es_out_t    *out;
 
     vlc_thread_t thread;
+    vlc_mutex_t  lock;
+    struct
+    {
+        double  position;
+        int64_t length;
+        int64_t time;
+    } stats;
 };
 
 static int  DStreamRead   ( stream_t *, void *p_read, unsigned int i_read );
@@ -83,6 +90,9 @@ stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *ou
     p_sys->out = out;
     p_sys->p_block = NULL;
     p_sys->psz_name = strdup( psz_demux );
+    p_sys->stats.position = 0.;
+    p_sys->stats.length = 0;
+    p_sys->stats.time = 0;
 
     /* decoder fifo */
     if( ( p_sys->p_fifo = block_FifoNew() ) == NULL )
@@ -93,8 +103,11 @@ stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *ou
         return NULL;
     }
 
+    vlc_mutex_init( &p_sys->lock );
+
     if( vlc_clone( &p_sys->thread, DStreamThread, s, VLC_THREAD_PRIORITY_INPUT ) )
     {
+        vlc_mutex_destroy( &p_sys->lock );
         block_FifoRelease( p_sys->p_fifo );
         stream_CommonDelete( s );
         free( p_sys->psz_name );
@@ -111,6 +124,33 @@ void stream_DemuxSend( stream_t *s, block_t *p_block )
     block_FifoPut( p_sys->p_fifo, p_block );
 }
 
+int stream_DemuxControlVa( stream_t *s, int query, va_list args )
+{
+    stream_sys_t *sys = s->p_sys;
+
+    switch( query )
+    {
+        case DEMUX_GET_POSITION:
+            vlc_mutex_lock( &sys->lock );
+            *va_arg( args, double * ) = sys->stats.position;
+            vlc_mutex_unlock( &sys->lock );
+            break;
+        case DEMUX_GET_LENGTH:
+            vlc_mutex_lock( &sys->lock );
+            *va_arg( args, int64_t * ) = sys->stats.length;
+            vlc_mutex_unlock( &sys->lock );
+            break;
+        case DEMUX_GET_TIME:
+            vlc_mutex_lock( &sys->lock );
+            *va_arg( args, int64_t * ) = sys->stats.time;
+            vlc_mutex_unlock( &sys->lock );
+            break;
+        default:
+            return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+
 static void DStreamDelete( stream_t *s )
 {
     stream_sys_t *p_sys = s->p_sys;
@@ -120,6 +160,7 @@ static void DStreamDelete( stream_t *s )
     p_empty = block_Alloc( 0 );
     block_FifoPut( p_sys->p_fifo, p_empty );
     vlc_join( p_sys->thread, NULL );
+    vlc_mutex_destroy( &p_sys->lock );
 
     if( p_sys->p_block )
         block_Release( p_sys->p_block );
@@ -284,9 +325,33 @@ static void* DStreamThread( void *obj )
     demux_Control( p_demux, DEMUX_SET_GROUP, -1, NULL );
 
     /* Main loop */
+    mtime_t next_update = 0;
     while( vlc_object_alive( s ) )
     {
-        if( demux_Demux( p_demux ) <= 0 ) break;
+        if( p_demux->info.i_update || mdate() >= next_update )
+        {
+            double newpos;
+            int64_t newlen, newtime;
+
+            if( demux_Control( p_demux, DEMUX_GET_POSITION, &newpos ) )
+                newpos = 0.;
+            if( demux_Control( p_demux, DEMUX_GET_LENGTH, &newlen ) )
+                newlen = 0;
+            if( demux_Control( p_demux, DEMUX_GET_POSITION, &newtime ) )
+                newtime = 0;
+
+            vlc_mutex_lock( &p_sys->lock );
+            p_sys->stats.position = newpos;
+            p_sys->stats.length = newlen;
+            p_sys->stats.time = newtime;
+            vlc_mutex_unlock( &p_sys->lock );
+
+            p_demux->info.i_update = 0;
+            next_update = mdate() + (CLOCK_FREQ / 4);
+        }
+
+        if( demux_Demux( p_demux ) <= 0 )
+            break;
     }
 
     demux_Delete( p_demux );

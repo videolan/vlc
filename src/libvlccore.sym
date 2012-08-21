@@ -397,6 +397,7 @@ stream_Control
 stream_Delete
 stream_DemuxNew
 stream_DemuxSend
+stream_DemuxControlVa
 stream_FilterNew
 stream_MemoryNew
 stream_Peek
