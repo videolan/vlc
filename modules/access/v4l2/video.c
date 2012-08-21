@@ -116,28 +116,13 @@ static int SetupAudio (vlc_object_t *obj, int fd,
     return 0;
 }
 
-static int SetupTuner (vlc_object_t *obj, int fd,
-                       const struct v4l2_input *restrict input)
+static int SetupTuner (vlc_object_t *obj, int fd, uint32_t idx)
 {
-    switch (input->type)
-    {
-        case V4L2_INPUT_TYPE_TUNER:
-            msg_Dbg (obj, "tuning required: tuner %"PRIu32, input->tuner);
-            break;
-        case V4L2_INPUT_TYPE_CAMERA:
-            msg_Dbg (obj, "no tuning required (analog baseband input)");
-            return 0;
-        default:
-            msg_Err (obj, "unknown input tuning type %"PRIu32, input->type);
-            return 0; // hopefully we can stream regardless...
-    }
-
-    struct v4l2_tuner tuner = { .index = input->tuner };
+    struct v4l2_tuner tuner = { .index = idx };
 
     if (v4l2_ioctl (fd, VIDIOC_G_TUNER, &tuner) < 0)
     {
-        msg_Err (obj, "cannot get tuner %"PRIu32" properties: %m",
-                 input->tuner);
+        msg_Err (obj, "cannot get tuner %"PRIu32" properties: %m", idx);
         return -1;
     }
 
@@ -194,31 +179,29 @@ static int SetupTuner (vlc_object_t *obj, int fd,
 
     if (v4l2_ioctl (fd, VIDIOC_S_TUNER, &tuner) < 0)
     {
-        msg_Err (obj, "cannot set tuner %"PRIu32" audio mode: %m",
-                 input->tuner);
+        msg_Err (obj, "cannot set tuner %"PRIu32" audio mode: %m", idx);
         return -1;
     }
-    msg_Dbg (obj, "tuner %"PRIu32" audio mode %u set", input->tuner,
-             tuner.audmode);
+    msg_Dbg (obj, "tuner %"PRIu32" audio mode %u set", idx, tuner.audmode);
 
     /* Tune to the requested frequency */
     uint32_t freq = var_InheritInteger (obj, CFG_PREFIX"tuner-frequency");
     if (freq != (uint32_t)-1)
     {
         struct v4l2_frequency frequency = {
-            .tuner = input->tuner,
-            .type = V4L2_TUNER_ANALOG_TV,
+            .tuner = idx,
+            .type = tuner.type,
             .frequency = freq * 125 / 2
         };
 
         if (v4l2_ioctl (fd, VIDIOC_S_FREQUENCY, &frequency) < 0)
         {
-            msg_Err (obj, "cannot tune tuner %u to frequency %u %sHz: %m",
-                     input->tuner, freq, mult);
+            msg_Err (obj, "cannot tune tuner %"PRIu32
+                     " to frequency %u %sHz: %m", idx, freq, mult);
             return -1;
         }
         msg_Dbg (obj, "tuner %"PRIu32" tuned to frequency %"PRIu32" %sHz",
-                 input->tuner, freq, mult);
+                 idx, freq, mult);
     }
     else
         msg_Dbg (obj, "tuner not tuned");
@@ -285,7 +268,21 @@ int SetupInput (vlc_object_t *obj, int fd)
     msg_Dbg (obj, "selected input %"PRIu32, input.index);
 
     SetupStandard (obj, fd, &input);
-    SetupTuner (obj, fd, &input);
+
+    switch (input.type)
+    {
+        case V4L2_INPUT_TYPE_TUNER:
+            msg_Dbg (obj, "tuning required: tuner %"PRIu32, input.tuner);
+            SetupTuner (obj, fd, input.tuner);
+            break;
+        case V4L2_INPUT_TYPE_CAMERA:
+            msg_Dbg (obj, "no tuning required (analog baseband input)");
+            break;
+        default:
+            msg_Err (obj, "unknown input tuning type %"PRIu32, input.type);
+            break; // hopefully we can stream regardless...
+    }
+
     SetupAudio (obj, fd, &input);
     return 0;
 }
