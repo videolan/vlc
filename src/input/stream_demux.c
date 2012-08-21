@@ -95,6 +95,7 @@ stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *ou
 
     if( vlc_clone( &p_sys->thread, DStreamThread, s, VLC_THREAD_PRIORITY_INPUT ) )
     {
+        block_FifoRelease( p_sys->p_fifo );
         stream_CommonDelete( s );
         free( p_sys->psz_name );
         free( p_sys );
