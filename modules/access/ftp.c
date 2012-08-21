@@ -159,8 +159,9 @@ static int ftp_SendCommand( vlc_object_t *obj, access_sys_t *sys,
 
  These strings are not part of the requests, except in the case \377\377,
  where the request contains one \377. */
-static int ftp_RecvCommand( vlc_object_t *obj, access_sys_t *sys,
-                            int *restrict codep, char **restrict strp )
+static int ftp_RecvAnswer( vlc_object_t *obj, access_sys_t *sys,
+                           int *restrict codep, char **restrict strp,
+                           void (*cb)(void *, const char *), void *opaque )
 {
     if( codep != NULL )
         *codep = 500;
@@ -198,6 +199,8 @@ static int ftp_RecvCommand( vlc_object_t *obj, access_sys_t *sys,
             }
 
             done = !strncmp( resp, line, 4 );
+            if( !done )
+                cb( opaque, line );
             free( line );
         }
         while( !done );
@@ -213,6 +216,17 @@ static int ftp_RecvCommand( vlc_object_t *obj, access_sys_t *sys,
 error:
     free( resp );
     return -1;
+}
+
+static void DummyLine( void *data, const char *str )
+{
+    (void) data; (void) str;
+}
+
+static int ftp_RecvCommand( vlc_object_t *obj, access_sys_t *sys,
+                            int *restrict codep, char **restrict strp )
+{
+    return ftp_RecvAnswer( obj, sys, codep, strp, DummyLine, NULL );
 }
 
 static int ftp_StartStream( vlc_object_t *, access_sys_t *, uint64_t );
