@@ -1083,8 +1083,10 @@ cleanup:
 
 #undef var_LocationParse
 /**
- * Parses a set of colon-separated <variable name>=<value> pairs. Some access
- * (or access_demux) plugins uses this scheme in media resource location.
+ * Parses a set of colon-separated or semicolon-separated
+ * <variable name>=<value> pairs.
+ * Some access (or access_demux) plugins uses this scheme
+ * in media resource location.
  * @note Only trusted/safe variables are allowed. This is intended.
  *
  * @warning Only use this for plugins implementing VLC-specific resource
@@ -1104,9 +1106,9 @@ int var_LocationParse (vlc_object_t *obj, const char *mrl, const char *pref)
     assert(mrl != NULL);
     while (*mrl != '\0')
     {
-        mrl += strspn (mrl, ":"); /* skip leading colon(s) */
+        mrl += strspn (mrl, ":;"); /* skip leading colon(s) */
 
-        size_t len = strcspn (mrl, ":");
+        size_t len = strcspn (mrl, ":;");
         char *buf = malloc (preflen + len);
 
         if (likely(buf != NULL))
