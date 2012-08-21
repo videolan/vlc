@@ -372,25 +372,12 @@ static int extract_port (char **phost)
 /**
  * Control callback
  */
-static int Control (demux_t *demux, int i_query, va_list args)
+static int Control (demux_t *demux, int query, va_list args)
 {
-    switch (i_query)
+    demux_sys_t *sys = demux->p_sys;
+
+    switch (query)
     {
-        case DEMUX_GET_POSITION:
-        {
-            float *v = va_arg (args, float *);
-            *v = 0.;
-            return VLC_SUCCESS;
-        }
-
-        case DEMUX_GET_LENGTH:
-        case DEMUX_GET_TIME:
-        {
-            int64_t *v = va_arg (args, int64_t *);
-            *v = 0;
-            return VLC_SUCCESS;
-        }
-
         case DEMUX_GET_PTS_DELAY:
         {
             int64_t *v = va_arg (args, int64_t *);
@@ -404,6 +391,27 @@ static int Control (demux_t *demux, int i_query, va_list args)
         {
             bool *v = (bool*)va_arg( args, bool * );
             *v = false;
+            return VLC_SUCCESS;
+        }
+    }
+
+    if (sys->chained_demux != NULL)
+        return stream_DemuxControlVa (sys->chained_demux, query, args);
+
+    switch (query)
+    {
+        case DEMUX_GET_POSITION:
+        {
+            float *v = va_arg (args, float *);
+            *v = 0.;
+            return VLC_SUCCESS;
+        }
+
+        case DEMUX_GET_LENGTH:
+        case DEMUX_GET_TIME:
+        {
+            int64_t *v = va_arg (args, int64_t *);
+            *v = 0;
             return VLC_SUCCESS;
         }
     }
