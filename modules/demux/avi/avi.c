@@ -1405,25 +1405,8 @@ static double ControlGetPosition( demux_t *p_demux )
     }
     else if( stream_Size( p_demux->s ) > 0 )
     {
-        unsigned int i;
-        int64_t i_tmp;
-        int64_t i64 = 0;
-
-        /* search the more advanced selected es */
-        for( i = 0; i < p_sys->i_track; i++ )
-        {
-            avi_track_t *tk = p_sys->track[i];
-            if( tk->b_activated && tk->i_idxposc < tk->idx.i_size )
-            {
-                i_tmp = tk->idx.p_entry[tk->i_idxposc].i_pos +
-                        tk->idx.p_entry[tk->i_idxposc].i_length + 8;
-                if( i_tmp > i64 )
-                {
-                    i64 = i_tmp;
-                }
-            }
-        }
-        return (double)i64 / stream_Size( p_demux->s );
+        double i64 = (uint64_t)stream_Tell( p_demux->s );
+        return i64 / stream_Size( p_demux->s );
     }
     return 0.0;
 }
