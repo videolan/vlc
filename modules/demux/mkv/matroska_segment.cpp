@@ -241,6 +241,7 @@ static const struct {
                      {vlc_meta_TrackNumber, "PART_NUMBER"},
                      {vlc_meta_TrackTotal,  "TOTAL_PARTS"},
                      {vlc_meta_Date,        "DATE_RELEASE"},
+                     {vlc_meta_EncodedBy,   "ENCODED_BY"},
                      {vlc_meta_Title,       NULL},
 };
 
