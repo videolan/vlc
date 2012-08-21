@@ -484,7 +484,7 @@ void InputManager::UpdateName()
 
     /* Try to get the nowplaying */
     char *format = var_InheritString( p_intf, "input-title-format" );
-    char *formated = str_format_meta( p_input, format );
+    char *formated = str_format_meta( THEPL, format );
     free( format );
     name = qfu(formated);
     free( formated );

@@ -527,8 +527,7 @@ static void format_duration (char *buf, size_t len, int64_t duration)
                         memcpy( dst+d, string, len );               \
                         d += len;                                   \
                     }
-#undef str_format_meta
-char *str_format_meta( vlc_object_t *p_object, const char *string )
+char *str_format_meta( playlist_t *p_object, const char *string )
 {
     const char *s = string;
     bool b_is_format = false;
@@ -539,7 +538,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
     if( !dst ) return NULL;
     int d = 0;
 
-    input_thread_t *p_input = playlist_CurrentInput( pl_Get(p_object) );
+    input_thread_t *p_input = playlist_CurrentInput( p_object );
     input_item_t *p_item = NULL;
     if( p_input )
     {
@@ -846,19 +845,6 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
 }
 #undef INSERT_STRING
 #undef INSERT_STRING_NO_FREE
-
-#undef str_format
-/**
- * Apply str format time and str format meta
- */
-char *str_format( vlc_object_t *p_this, const char *psz_src )
-{
-    char *psz_buf1, *psz_buf2;
-    psz_buf1 = str_format_time( psz_src );
-    psz_buf2 = str_format_meta( p_this, psz_buf1 );
-    free( psz_buf1 );
-    return psz_buf2;
-}
 
 /**
  * Remove forbidden, potentially forbidden and otherwise evil characters from

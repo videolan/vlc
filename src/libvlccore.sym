@@ -402,7 +402,6 @@ stream_Read
 stream_ReadLine
 stream_UrlNew
 stream_vaControl
-str_format
 str_format_meta
 str_format_time
 str_duration

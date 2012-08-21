@@ -55,6 +55,7 @@
 #include <vlc_fs.h>
 #include <vlc_strings.h>
 #include <vlc_modules.h>
+#include <vlc_playlist.h> // FIXME
 
 /*****************************************************************************
  * Local prototypes
@@ -3237,7 +3238,7 @@ char *input_CreateFilename( vlc_object_t *p_obj, const char *psz_path, const cha
     {
         closedir( path );
 
-        char *psz_tmp = str_format( p_obj, psz_prefix );
+        char *psz_tmp = str_format( pl_Get(p_obj), psz_prefix );
         if( !psz_tmp )
             return NULL;
 
@@ -3253,7 +3254,7 @@ char *input_CreateFilename( vlc_object_t *p_obj, const char *psz_path, const cha
     }
     else
     {
-        psz_file = str_format( p_obj, psz_path );
+        psz_file = str_format( pl_Get(p_obj), psz_path );
         path_sanitize( psz_file );
         return psz_file;
     }
