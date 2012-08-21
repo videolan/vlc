@@ -670,7 +670,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         for( NSUInteger i = 0; i < count; i++ )
         {
             NSDictionary *o_dic;
-            char *psz_uri = make_URI([[o_values objectAtIndex:i] UTF8String], "file");
+            char *psz_uri = vlc_path2uri([[o_values objectAtIndex:i] UTF8String], "file");
             if( !psz_uri )
                 continue;
 
@@ -699,7 +699,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
         [[NSFileManager defaultManager] fileExistsAtPath:o_file_path isDirectory:&b_dir];
 
-        char *psz_uri = make_URI([o_file_path UTF8String], "file");
+        char *psz_uri = vlc_path2uri([o_file_path UTF8String], "file");
         if( !psz_uri ) return;
 
         NSMutableString *o_mrl_string = [NSMutableString stringWithUTF8String: psz_uri ];

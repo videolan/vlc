@@ -553,7 +553,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
             if( count == 1 && p_input )
             {
-                b_returned = input_AddSubtitle( p_input, make_URI([[o_values objectAtIndex:0] UTF8String], NULL), true );
+                b_returned = input_AddSubtitle( p_input, vlc_path2uri([[o_values objectAtIndex:0] UTF8String], NULL), true );
                 vlc_object_release( p_input );
                 if( !b_returned )
                     return YES;
@@ -564,7 +564,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
             for( NSUInteger i = 0; i < count; i++)
             {
                 NSDictionary *o_dic;
-                char *psz_uri = make_URI([[o_values objectAtIndex:i] UTF8String], NULL);
+                char *psz_uri = vlc_path2uri([[o_values objectAtIndex:i] UTF8String], NULL);
                 if( !psz_uri )
                     continue;
 

@@ -918,7 +918,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (void)application:(NSApplication *)o_app openFiles:(NSArray *)o_names
 {
     BOOL b_autoplay = config_GetInt( VLCIntf, "macosx-autoplay" );
-    char *psz_uri = make_URI([[o_names objectAtIndex:0] UTF8String], "file" );
+    char *psz_uri = vlc_path2uri([[o_names objectAtIndex:0] UTF8String], "file" );
 
     // try to add file as subtitle
     if( [o_names count] == 1 && psz_uri )
@@ -942,7 +942,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     NSMutableArray *o_result = [NSMutableArray arrayWithCapacity: [o_sorted_names count]];
     for( int i = 0; i < [o_sorted_names count]; i++ )
     {
-        psz_uri = make_URI([[o_sorted_names objectAtIndex: i] UTF8String], "file" );
+        psz_uri = vlc_path2uri([[o_sorted_names objectAtIndex: i] UTF8String], "file" );
         if( !psz_uri )
             continue;
 
