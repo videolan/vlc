@@ -38,17 +38,6 @@
 
 #include <vlc_input.h>
 #include <vlc_playlist.h>
-
-#if 0 //def HAVE_AVAHI_CLIENT
-    #include "bonjour.h"
-
-    #if defined( WIN32 )
-        #define DIRECTORY_SEPARATOR '\\'
-    #else
-        #define DIRECTORY_SEPARATOR '/'
-    #endif
-#endif
-
 #include <vlc_httpd.h>
 
 /*****************************************************************************
@@ -68,8 +57,6 @@ static void Close( vlc_object_t * );
 #define MIME_TEXT N_("Mime")
 #define MIME_LONGTEXT N_("MIME returned by the server (autodetected " \
                         "if not specified)." )
-#define BONJOUR_TEXT N_( "Advertise with Bonjour")
-#define BONJOUR_LONGTEXT N_( "Advertise the stream with the Bonjour protocol." )
 
 
 vlc_module_begin ()
@@ -85,10 +72,6 @@ vlc_module_begin ()
                   PASS_TEXT, PASS_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "mime", "",
                 MIME_TEXT, MIME_LONGTEXT, true )
-#if 0 //def HAVE_AVAHI_CLIENT
-    add_bool( SOUT_CFG_PREFIX "bonjour", false,
-              BONJOUR_TEXT, BONJOUR_LONGTEXT, true);
-#endif
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -117,10 +100,6 @@ struct sout_access_out_sys_t
     int                 i_header_size;
     uint8_t             *p_header;
     bool          b_header_complete;
-
-#if 0 //def HAVE_AVAHI_CLIENT
-    void                *p_bonjour;
-#endif
 };
 
 /*****************************************************************************
@@ -226,38 +205,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-#if 0 //def HAVE_AVAHI_CLIENT
-    if( var_InheritBool(p_this, SOUT_CFG_PREFIX "bonjour") )
-    {
-        char                *psz_txt, *psz_name;
-        playlist_t          *p_playlist = pl_Get( p_access );
-
-        char *psz_uri = input_item_GetURI( p_playlist->status.p_item->p_input );
-        char *psz_newuri = psz_uri;
-        psz_name = strrchr( psz_newuri, DIRECTORY_SEPARATOR );
-        if( psz_name != NULL ) psz_name++;
-        else psz_name = psz_newuri;
-
-        if( asprintf( &psz_txt, "path=%s", path ) == -1 )
-            {
-                free( psz_uri );
-                return VLC_ENOMEM;
-            }
-
-        p_sys->p_bonjour = bonjour_start_service( (vlc_object_t *)p_access,
-                                    strcmp( p_access->psz_access, "https" )
-                                       ? "_vlc-http._tcp" : "_vlc-https._tcp",
-                                             psz_name, i_bind_port, psz_txt );
-        free( psz_uri );
-        free( psz_txt );
-
-        if( p_sys->p_bonjour == NULL )
-            msg_Err( p_access, "unable to start requested Bonjour announce" );
-    }
-    else
-        p_sys->p_bonjour = NULL;
-#endif
-
     p_sys->i_header_allocated = 1024;
     p_sys->i_header_size      = 0;
     p_sys->p_header           = xmalloc( p_sys->i_header_allocated );
@@ -277,11 +224,6 @@ static void Close( vlc_object_t * p_this )
 {
     sout_access_out_t       *p_access = (sout_access_out_t*)p_this;
     sout_access_out_sys_t   *p_sys = p_access->p_sys;
-
-#if 0 //def HAVE_AVAHI_CLIENT
-    if( p_sys->p_bonjour != NULL )
-        bonjour_stop_service( p_sys->p_bonjour );
-#endif
 
     httpd_StreamDelete( p_sys->p_httpd_stream );
     httpd_HostDelete( p_sys->p_httpd_host );
