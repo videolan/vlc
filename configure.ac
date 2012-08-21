@@ -228,7 +228,7 @@ case "${host_os}" in
     esac
 
     if test "${SYS}" = "mingw32"; then
-        VLC_ADD_LIBS([libvlccore],[-lnetapi32 -lwinmm])
+        VLC_ADD_LIBS([libvlccore],[-lwinmm])
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
         VLC_ADD_LIBS([win32text],[-lgdi32])
         VLC_ADD_LIBS([cdda vcdx sdl_image vout_sdl],[-lwinmm])
