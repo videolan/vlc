@@ -348,62 +348,6 @@ static void FetchMeta( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
     vlc_object_release( p_demux_meta );
 }
 
-static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
-    vlc_cond_t *p_cond = p_data;
-
-    if( newval.i_int == INPUT_EVENT_ITEM_META ||
-        newval.i_int == INPUT_EVENT_DEAD )
-        vlc_cond_signal( p_cond );
-
-    return VLC_SUCCESS;
-}
-
-
-/* Check if it is not yet preparsed and if so wait for it
- * (at most 0.5s)
- * (This can happen if we fetch art on play)
- * FIXME this doesn't work if we need to fetch meta before art...
- */
-static void WaitPreparsed( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
-{
-    if( input_item_IsPreparsed( p_item ) )
-        return;
-
-    input_thread_t *p_input = playlist_CurrentInput( p_fetcher->p_playlist );
-    if( !p_input )
-        return;
-
-    if( input_GetItem( p_input ) != p_item )
-        goto exit;
-
-    vlc_cond_t cond;
-    vlc_cond_init( &cond );
-    var_AddCallback( p_input, "intf-event", InputEvent, &cond );
-
-    const mtime_t i_deadline = mdate() + 500*1000;
-    bool b_timeout = false;
-
-    while( !p_input->b_eof && !p_input->b_error
-        && !input_item_IsPreparsed( p_item ) && !b_timeout )
-    {
-        /* A bit weird, but input_item_IsPreparsed holds the protected value */
-        /* FIXME: locking looks wrong here */
-        vlc_mutex_lock( &p_fetcher->lock );
-        if( vlc_cond_timedwait( &cond, &p_fetcher->lock, i_deadline ) )
-            b_timeout = true;
-        vlc_mutex_unlock( &p_fetcher->lock );
-    }
-
-    var_DelCallback( p_input, "intf-event", InputEvent, &cond );
-    vlc_cond_destroy( &cond );
-
-exit:
-    vlc_object_release( p_input );
-}
-
 static void *Thread( void *p_data )
 {
     playlist_fetcher_t *p_fetcher = p_data;
@@ -428,11 +372,6 @@ static void *Thread( void *p_data )
 
         if( !p_item )
             break;
-
-        /* */
-
-        /* Wait that the input item is preparsed if it is being played */
-        WaitPreparsed( p_fetcher, p_item );
 
         /* Triggers "meta fetcher", eventually fetch meta on the network.
          * They are identical to "meta reader" expect that may actually
