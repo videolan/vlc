@@ -237,7 +237,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
         var_InheritBool( p_parent, "auto-preparse" );
 
     /* Fetcher */
-    p->p_fetcher = playlist_fetcher_New( p_playlist );
+    p->p_fetcher = playlist_fetcher_New( VLC_OBJECT(p_playlist) );
     if( unlikely(p->p_fetcher == NULL) )
     {
         msg_Err( p_playlist, "cannot create fetcher" );

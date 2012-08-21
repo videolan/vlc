@@ -36,7 +36,7 @@ typedef struct playlist_fetcher_t playlist_fetcher_t;
 /**
  * This function creates the fetcher object and thread.
  */
-playlist_fetcher_t *playlist_fetcher_New( playlist_t * );
+playlist_fetcher_t *playlist_fetcher_New( vlc_object_t * );
 
 /**
  * This function enqueues the provided item to be art fetched.
