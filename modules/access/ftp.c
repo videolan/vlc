@@ -342,6 +342,23 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
     return 0;
 }
 
+static void FeaturesCheck( void *opaque, const char *feature )
+{
+    bool *unicode = opaque;
+
+    if( strcasestr( feature, "UTF8" ) != NULL )
+        *unicode = true;
+}
+
+static const char *IsASCII( const char *str )
+{
+    int8_t c;
+    for( const char *p = str; (c = *p) != '\0'; p++ )
+        if( c < 0 )
+            return NULL;
+    return str;
+}
+
 static int Connect( vlc_object_t *p_access, access_sys_t *p_sys )
 {
     if( Login( p_access, p_sys ) < 0 )
@@ -351,17 +368,13 @@ static int Connect( vlc_object_t *p_access, access_sys_t *p_sys )
     if( ftp_SendCommand( p_access, p_sys, "EPSV ALL" ) < 0 )
     {
         msg_Err( p_access, "cannot request extended passive mode" );
-        net_Close( p_sys->fd_cmd );
-        return -1;
+        goto error;
     }
 
     if( ftp_RecvCommand( p_access, p_sys, NULL, NULL ) == 2 )
     {
         if( net_GetPeerAddress( p_sys->fd_cmd, p_sys->sz_epsv_ip, NULL ) )
-        {
-            net_Close( p_sys->fd_cmd );
-            return -1;
-        }
+            goto error;
     }
     else
     {
@@ -374,10 +387,23 @@ static int Connect( vlc_object_t *p_access, access_sys_t *p_sys )
         net_Close( p_sys->fd_cmd );
 
         if( Login( p_access, p_sys ) )
-        {
-            net_Close( p_sys->fd_cmd );
-            return -1;
-        }
+            goto error;
+    }
+
+    /* features check */
+    bool unicode = false;
+    if( ftp_SendCommand( p_access, p_sys, "FEAT" ) < 0
+     || ftp_RecvAnswer( p_access, p_sys, NULL, NULL,
+                        FeaturesCheck, &unicode ) < 0 )
+    {
+         msg_Err( p_access, "cannot get server features" );
+         goto error;
+    }
+
+    if( (unicode ? IsUTF8 : IsASCII)(p_sys->url.psz_path) == NULL )
+    {
+        msg_Err( p_access, "unsupported path: \"%s\"", p_sys->url.psz_path );
+        goto error;
     }
 
     /* check binary mode support */
@@ -385,11 +411,13 @@ static int Connect( vlc_object_t *p_access, access_sys_t *p_sys )
         ftp_RecvCommand( p_access, p_sys, NULL, NULL ) != 2 )
     {
         msg_Err( p_access, "cannot set binary transfer mode" );
-        net_Close( p_sys->fd_cmd );
-        return -1;
+        goto error;
     }
 
     return 0;
+error:
+    net_Close( p_sys->fd_cmd );
+    return -1;
 }
 
 
@@ -429,8 +457,6 @@ static int parseURL( vlc_url_t *url, const char *path )
             return VLC_EGENERIC; /* ASCII and directory not supported */
     }
     decode_URI( url->psz_path );
-    /* FIXME: check for UTF-8 support, otherwise only ASCII is allowed */
-    EnsureUTF8( url->psz_path );
     return VLC_SUCCESS;
 }
 
