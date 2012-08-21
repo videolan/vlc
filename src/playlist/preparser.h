@@ -37,7 +37,8 @@ typedef struct playlist_preparser_t playlist_preparser_t;
 /**
  * This function creates the preparser object and thread.
  */
-playlist_preparser_t *playlist_preparser_New( playlist_t *, playlist_fetcher_t * );
+playlist_preparser_t *playlist_preparser_New( vlc_object_t *,
+                                              playlist_fetcher_t * );
 
 /**
  * This function enqueues the provided item to be preparsed.
