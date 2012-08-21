@@ -160,15 +160,15 @@ void ResyncCurrentIndex( playlist_t *p_playlist, playlist_item_t *p_cur );
 //#undef PLAYLIST_DEBUG2
 
 #ifdef PLAYLIST_DEBUG
- #define PL_DEBUG( msg, args... ) msg_Dbg( p_playlist, msg, ## args )
+ #define PL_DEBUG( ... ) msg_Dbg( p_playlist, __VA_ARGS__ )
  #ifdef PLAYLIST_DEBUG2
-  #define PL_DEBUG2( msg, args... ) msg_Dbg( p_playlist, msg, ## args )
+  #define PL_DEBUG2( msg, ... ) msg_Dbg( p_playlist, __VA_ARGS__ )
  #else
-  #define PL_DEBUG2( msg, args... ) {}
+  #define PL_DEBUG2( msg, ... ) {}
  #endif
 #else
- #define PL_DEBUG( msg, args ... ) {}
- #define PL_DEBUG2( msg, args... ) {}
+ #define PL_DEBUG( msg, ... ) {}
+ #define PL_DEBUG2( msg, ... ) {}
 #endif
 
 #define PLI_NAME( p ) p && p->p_input ? p->p_input->psz_name : "null"
