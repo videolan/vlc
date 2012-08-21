@@ -226,8 +226,6 @@ vlc_UrlClean
 vlc_path2uri
 make_path
 mdate
-ml_Create
-ml_Destroy
 ml_Get
 media_New
 ml_OpConnectChilds

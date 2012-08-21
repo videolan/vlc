@@ -379,19 +379,6 @@ media_library_t* ml_Get ( vlc_object_t* p_this )
     return NULL;
 }
 
-media_library_t* ml_Create ( vlc_object_t *p_this, char* psz_name )
-{
-    VLC_UNUSED( p_this );
-    VLC_UNUSED( psz_name );
-    return NULL;
-}
-
-void ml_Destroy( vlc_object_t * p_this )
-{
-    VLC_UNUSED( p_this );
-    assert( 0 );
-}
-
 ml_media_t* media_New( media_library_t* p_ml, int id, ml_select_e select, bool reload )
 {
     VLC_UNUSED( p_ml );

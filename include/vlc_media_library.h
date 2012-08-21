@@ -406,13 +406,13 @@ VLC_API media_library_t* ml_Get( vlc_object_t* p_this );
  * @param psz_name Name for the module
  * @return The ML object.
  */
-VLC_API media_library_t* ml_Create( vlc_object_t *p_this, char* psz_name );
+media_library_t* ml_Create( vlc_object_t *p_this, char* psz_name );
 
 /**
  * @brief Destructor for the Media library singleton
  * @param p_this Parent the ML object is attached to
  */
-VLC_API void ml_Destroy( vlc_object_t* p_this );
+void ml_Destroy( vlc_object_t* p_this );
 
 /**
  * @brief Control the Media Library
