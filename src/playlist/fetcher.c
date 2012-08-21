@@ -314,7 +314,8 @@ static int DownloadArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
         if( psz_type && strlen( psz_type ) > 5 )
             psz_type = NULL; /* remove extension if it's > to 4 characters */
 
-        playlist_SaveArt( p_fetcher->p_playlist, p_item, p_data, i_data, psz_type );
+        playlist_SaveArt( VLC_OBJECT(p_fetcher->p_playlist), p_item,
+                          p_data, i_data, psz_type );
     }
 
     free( p_data );

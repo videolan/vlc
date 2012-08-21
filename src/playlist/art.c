@@ -266,8 +266,8 @@ int playlist_FindArtInCacheUsingItemUID( input_item_t *p_item )
 }
 
 /* */
-int playlist_SaveArt( playlist_t *p_playlist, input_item_t *p_item,
-                      const uint8_t *p_buffer, int i_buffer, const char *psz_type )
+int playlist_SaveArt( vlc_object_t *obj, input_item_t *p_item,
+                      const void *data, size_t length, const char *psz_type )
 {
     char *psz_filename = ArtCacheName( p_item, psz_type );
 
@@ -295,13 +295,13 @@ int playlist_SaveArt( playlist_t *p_playlist, input_item_t *p_item,
     FILE *f = vlc_fopen( psz_filename, "wb" );
     if( f )
     {
-        if( fwrite( p_buffer, i_buffer, 1, f ) != 1 )
+        if( fwrite( data, 1, length, f ) != length )
         {
-            msg_Err( p_playlist, "%s: %m", psz_filename );
+            msg_Err( obj, "%s: %m", psz_filename );
         }
         else
         {
-            msg_Dbg( p_playlist, "album art saved to %s", psz_filename );
+            msg_Dbg( obj, "album art saved to %s", psz_filename );
             input_item_SetArtURL( p_item, psz_uri );
         }
         fclose( f );
@@ -327,7 +327,7 @@ int playlist_SaveArt( playlist_t *p_playlist, input_item_t *p_item,
         if ( f )
         {
             if( fputs( "file://", f ) < 0 || fputs( psz_filename, f ) < 0 )
-                msg_Err( p_playlist, "Error writing %s: %m", psz_byuidfile );
+                msg_Err( obj, "Error writing %s: %m", psz_byuidfile );
             fclose( f );
         }
         free( psz_byuidfile );

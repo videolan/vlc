@@ -251,7 +251,7 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
         psz_type = ".png";
 
     /* */
-    playlist_SaveArt( p_playlist, p_item,
+    playlist_SaveArt( VLC_OBJECT(p_playlist), p_item,
                       p_attachment->p_data, p_attachment->i_data, psz_type );
 
     vlc_input_attachment_Delete( p_attachment );
