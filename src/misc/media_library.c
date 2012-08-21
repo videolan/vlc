@@ -213,16 +213,16 @@ int ml_UpdateSimple( media_library_t *p_media_library,
                                  "this argument is invalid for Update: %d",
                                  (int)sel );
 #endif
-                        i_ret = VLC_EGENERIC;
+                        i_ret = VLC_EBADVAR;
                     }
                     else if( sel == ML_END )
                         vlc_array_append( array, update );
                     break;
-                case 0:
+                case 1:
                     update->value.str = va_arg( args, char* );
                     vlc_array_append( array, update );
                     break;
-                case 1:
+                case 0:
                     update->value.i = va_arg( args, int );
                     vlc_array_append( array, update );
                     break;
