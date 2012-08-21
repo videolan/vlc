@@ -1564,7 +1564,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     {
         NSString *aString;
         char *format = var_InheritString( VLCIntf, "input-title-format" );
-        char *formated = str_format_meta( p_input, format );
+        char *formated = str_format_meta( pl_Get( VLCIntf ), format );
         free( format );
         aString = [NSString stringWithUTF8String:formated];
         free( formated );
