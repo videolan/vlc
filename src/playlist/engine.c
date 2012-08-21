@@ -412,7 +412,6 @@ void set_current_status_node( playlist_t * p_playlist,
 
 static input_thread_t *playlist_FindInput( vlc_object_t *object )
 {
-    assert( object == VLC_OBJECT(pl_Get(object)) );
     return playlist_CurrentInput( (playlist_t *)object );
 }
 
