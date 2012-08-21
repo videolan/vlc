@@ -144,7 +144,77 @@ static int ftp_SendCommand( vlc_object_t *obj, access_sys_t *sys,
     return val;
 }
 
-static int ftp_ReadCommand( vlc_object_t *, access_sys_t *, int *, char ** );
+/* TODO support this s**t :
+ RFC 959 allows the client to send certain TELNET strings at any moment,
+ even in the middle of a request:
+
+ * \377\377.
+ * \377\376x where x is one byte.
+ * \377\375x where x is one byte. The server is obliged to send \377\374x
+ *                                immediately after reading x.
+ * \377\374x where x is one byte.
+ * \377\373x where x is one byte. The server is obliged to send \377\376x
+ *                                immediately after reading x.
+ * \377x for any other byte x.
+
+ These strings are not part of the requests, except in the case \377\377,
+ where the request contains one \377. */
+static int ftp_RecvCommand( vlc_object_t *obj, access_sys_t *sys,
+                            int *restrict codep, char **restrict strp )
+{
+    if( codep != NULL )
+        *codep = 500;
+    if( strp != NULL )
+        *strp = NULL;
+
+    char *resp = net_Gets( obj, sys->fd_cmd, NULL );
+    if( resp == NULL )
+    {
+        msg_Err( obj, "response failure" );
+        goto error;
+    }
+
+    char *end;
+    unsigned code = strtoul( resp, &end, 10 );
+    if( (end - resp) != 3 || (*end != '-' && *end != ' ') )
+    {
+        msg_Err( obj, "malformatted response" );
+        goto error;
+    }
+    msg_Dbg( obj, "received response: \"%s\"", resp );
+
+    if( *end == '-' ) /* Multi-line response */
+    {
+        bool done;
+
+        *end = ' ';
+        do
+        {
+            char *line = net_Gets( obj, sys->fd_cmd, NULL );
+            if( line == NULL )
+            {
+                msg_Err( obj, "response failure" );
+                goto error;
+            }
+
+            done = !strncmp( resp, line, 4 );
+            free( line );
+        }
+        while( !done );
+    }
+
+    if( codep != NULL )
+        *codep = code;
+    if( strp != NULL )
+        *strp = resp;
+    else
+        free( resp );
+    return code / 100;
+error:
+    free( resp );
+    return -1;
+}
+
 static int ftp_StartStream( vlc_object_t *, access_sys_t *, uint64_t );
 static int ftp_StopStream ( vlc_object_t *, access_sys_t * );
 
@@ -164,7 +234,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
         return -1;
     }
 
-    while( ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) == 1 );
+    while( ftp_RecvCommand( p_access, p_sys, &i_answer, NULL ) == 1 );
 
     if( i_answer / 100 != 2 )
     {
@@ -184,7 +254,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
         return -1;
 
     if( ftp_SendCommand( p_access, p_sys, "USER %s", psz ) < 0 ||
-        ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) < 0 )
+        ftp_RecvCommand( p_access, p_sys, &i_answer, NULL ) < 0 )
     {
         free( psz );
         return -1;
@@ -206,7 +276,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
                 return -1;
 
             if( ftp_SendCommand( p_access, p_sys, "PASS %s", psz ) < 0 ||
-                ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) < 0 )
+                ftp_RecvCommand( p_access, p_sys, &i_answer, NULL ) < 0 )
             {
                 free( psz );
                 return -1;
@@ -223,7 +293,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
                     psz = var_InheritString( p_access, "ftp-account" );
                     if( ftp_SendCommand( p_access, p_sys, "ACCT %s",
                                          psz ) < 0 ||
-                        ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) < 0 )
+                        ftp_RecvCommand( p_access, p_sys, &i_answer, NULL ) < 0 )
                     {
                         free( psz );
                         return -1;
@@ -271,7 +341,7 @@ static int Connect( vlc_object_t *p_access, access_sys_t *p_sys )
         return -1;
     }
 
-    if( ftp_ReadCommand( p_access, p_sys, NULL, NULL ) == 2 )
+    if( ftp_RecvCommand( p_access, p_sys, NULL, NULL ) == 2 )
     {
         if( net_GetPeerAddress( p_sys->fd_cmd, p_sys->sz_epsv_ip, NULL ) )
         {
@@ -298,7 +368,7 @@ static int Connect( vlc_object_t *p_access, access_sys_t *p_sys )
 
     /* check binary mode support */
     if( ftp_SendCommand( p_access, p_sys, "TYPE I" ) < 0 ||
-        ftp_ReadCommand( p_access, p_sys, NULL, NULL ) != 2 )
+        ftp_RecvCommand( p_access, p_sys, NULL, NULL ) != 2 )
     {
         msg_Err( p_access, "cannot set binary transfer mode" );
         net_Close( p_sys->fd_cmd );
@@ -379,7 +449,7 @@ static int InOpen( vlc_object_t *p_this )
     if( ftp_SendCommand( p_this, p_sys, "SIZE %s", p_sys->url.psz_path ) < 0 )
         goto error;
     else
-    if ( ftp_ReadCommand( p_this, p_sys, NULL, &psz_arg ) == 2 )
+    if ( ftp_RecvCommand( p_this, p_sys, NULL, &psz_arg ) == 2 )
     {
         p_access->info.i_size = atoll( &psz_arg[4] );
         free( psz_arg );
@@ -389,7 +459,7 @@ static int InOpen( vlc_object_t *p_this )
     if( ftp_SendCommand( p_this, p_sys, "CWD %s", p_sys->url.psz_path ) < 0 )
         goto error;
     else
-    if( ftp_ReadCommand( p_this, p_sys, NULL, NULL ) != 2 )
+    if( ftp_RecvCommand( p_this, p_sys, NULL, NULL ) != 2 )
     {
         msg_Err( p_access, "file or directory does not exist" );
         goto error;
@@ -473,7 +543,7 @@ static void Close( vlc_object_t *p_access, access_sys_t *p_sys )
     }
     else
     {
-        ftp_ReadCommand( p_access, p_sys, NULL, NULL );
+        ftp_RecvCommand( p_access, p_sys, NULL, NULL );
     }
     net_Close( p_sys->fd_cmd );
 
@@ -649,75 +719,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
     return VLC_SUCCESS;
 }
 
-/* TODO support this s**t :
- RFC 959 allows the client to send certain TELNET strings at any moment,
- even in the middle of a request:
-
- * \377\377.
- * \377\376x where x is one byte.
- * \377\375x where x is one byte. The server is obliged to send \377\374x
- *                                immediately after reading x.
- * \377\374x where x is one byte.
- * \377\373x where x is one byte. The server is obliged to send \377\376x
- *                                immediately after reading x.
- * \377x for any other byte x.
-
- These strings are not part of the requests, except in the case \377\377,
- where the request contains one \377. */
-static int ftp_ReadCommand( vlc_object_t *p_access, access_sys_t *p_sys,
-                            int *pi_answer, char **ppsz_answer )
-{
-    char         *psz_line;
-    int          i_answer;
-
-    psz_line = net_Gets( p_access, p_sys->fd_cmd, NULL );
-    if( psz_line == NULL || strlen( psz_line ) < 3 )
-    {
-        msg_Err( p_access, "cannot get answer" );
-        free( psz_line );
-        if( pi_answer ) *pi_answer    = 500;
-        if( ppsz_answer ) *ppsz_answer  = NULL;
-        return -1;
-    }
-    msg_Dbg( p_access, "answer=%s", psz_line );
-
-    if( psz_line[3] == '-' )    /* Multiple response */
-    {
-        char end[4];
-
-        memcpy( end, psz_line, 3 );
-        end[3] = ' ';
-
-        for( ;; )
-        {
-            char *psz_tmp = net_Gets( p_access, p_sys->fd_cmd, NULL );
-
-            if( psz_tmp == NULL )   /* Error */
-                break;
-
-            if( !strncmp( psz_tmp, end, 4 ) )
-            {
-                free( psz_tmp );
-                break;
-            }
-            free( psz_tmp );
-        }
-    }
-
-    i_answer = atoi( psz_line );
-
-    if( pi_answer ) *pi_answer = i_answer;
-    if( ppsz_answer )
-    {
-        *ppsz_answer = psz_line;
-    }
-    else
-    {
-        free( psz_line );
-    }
-    return( i_answer / 100 );
-}
-
 static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
                             uint64_t i_start )
 {
@@ -729,7 +730,7 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
     assert( p_sys->fd_data == -1 );
 
     if( ( ftp_SendCommand( p_access, p_sys, *psz_ip ? "EPSV" : "PASV" ) < 0 )
-     || ( ftp_ReadCommand( p_access, p_sys, &i_answer, &psz_arg ) != 2 ) )
+     || ( ftp_RecvCommand( p_access, p_sys, &i_answer, &psz_arg ) != 2 ) )
     {
         msg_Err( p_access, "cannot set passive mode" );
         return VLC_EGENERIC;
@@ -777,7 +778,7 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
     msg_Dbg( p_access, "ip:%s port:%d", psz_ip, i_port );
 
     if( ftp_SendCommand( p_access, p_sys, "TYPE I" ) < 0 ||
-        ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) != 2 )
+        ftp_RecvCommand( p_access, p_sys, &i_answer, NULL ) != 2 )
     {
         msg_Err( p_access, "cannot set binary transfer mode" );
         return VLC_EGENERIC;
@@ -786,7 +787,7 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
     if( i_start > 0 )
     {
         if( ftp_SendCommand( p_access, p_sys, "REST %"PRIu64, i_start ) < 0 ||
-            ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) > 3 )
+            ftp_RecvCommand( p_access, p_sys, &i_answer, NULL ) > 3 )
         {
             msg_Err( p_access, "cannot set restart offset" );
             return VLC_EGENERIC;
@@ -806,7 +807,7 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
     if( p_sys->directory )
     {
         if( ftp_SendCommand( p_access, p_sys, "NLST" ) < 0 ||
-            ftp_ReadCommand( p_access, p_sys, NULL, &psz_arg ) > 2 )
+            ftp_RecvCommand( p_access, p_sys, NULL, &psz_arg ) > 2 )
         {
             msg_Err( p_access, "cannot list directory contents" );
         return VLC_EGENERIC;
@@ -819,7 +820,7 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
         if( ftp_SendCommand( p_access, p_sys, "%s %s",
                              p_sys->out ? "STOR" : "RETR",
                              p_sys->url.psz_path ) < 0
-         || ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) > 2 )
+         || ftp_RecvCommand( p_access, p_sys, &i_answer, NULL ) > 2 )
         {
             msg_Err( p_access, "cannot retrieve file" );
             return VLC_EGENERIC;
@@ -847,10 +848,10 @@ static int ftp_StopStream ( vlc_object_t *p_access, access_sys_t *p_sys )
         net_Close( p_sys->fd_data );
         p_sys->fd_data = -1;
         /* Read the final response from RETR/STOR, i.e. 426 or 226 */
-        ftp_ReadCommand( p_access, p_sys, NULL, NULL );
+        ftp_RecvCommand( p_access, p_sys, NULL, NULL );
     }
     /* Read the response from ABOR, i.e. 226 or 225 */
-    ftp_ReadCommand( p_access, p_sys, NULL, NULL );
+    ftp_RecvCommand( p_access, p_sys, NULL, NULL );
 
     return VLC_SUCCESS;
 }
