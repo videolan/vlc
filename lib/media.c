@@ -591,8 +591,8 @@ libvlc_media_get_duration( libvlc_media_t * p_md )
 static int media_parse(libvlc_media_t *media)
 {
     /* TODO: fetcher and parser independent of playlist */
-    playlist_t *playlist =
-        libvlc_priv (media->p_libvlc_instance->p_libvlc_int)->p_playlist;
+#warning FIXME: remove pl_Get
+    playlist_t *playlist = pl_Get(media->p_libvlc_instance->p_libvlc_int);
 
     /* TODO: Fetch art on need basis. But how not to break compatibility? */
     playlist_AskForArtEnqueue(playlist, media->p_input_item );
