@@ -454,24 +454,28 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str, unsigned char opt)
     }
 
     /* Host name */
-    if (*cur == '[' && (next = strstr (cur, "]:")) != NULL)
-    {
-        /* IPv6 numeral within brackets */
+    if (*cur == '[' && (next = strrchr (cur, ']')) != NULL)
+    {   /* Try IPv6 numeral within brackets */
         *(next++) = '\0';
         url->psz_host = strdup (cur + 1);
+
+        if (*next == ':')
+            next++;
+        else
+            next = NULL;
     }
     else
     {
-        url->psz_host = vlc_idna_to_ascii (cur);
         next = strchr (cur, ':');
+        if (next != NULL)
+            *(next++) = '\0';
+
+        url->psz_host = vlc_idna_to_ascii (cur);
     }
 
     /* Port number */
     if (next != NULL)
-    {
-        assert (*next == ':');
-        url->i_port = atoi (next + 1);
-    }
+        url->i_port = atoi (next);
 
     if (url->psz_path != NULL)
         *url->psz_path = '/'; /* restore leading slash */
