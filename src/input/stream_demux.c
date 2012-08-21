@@ -118,7 +118,7 @@ static void DStreamDelete( stream_t *s )
     block_t *p_empty;
 
     vlc_object_kill( s );
-    p_empty = block_New( s, 1 ); p_empty->i_buffer = 0;
+    p_empty = block_Alloc( 0 );
     block_FifoPut( p_sys->p_fifo, p_empty );
     vlc_join( p_sys->thread, NULL );
 
