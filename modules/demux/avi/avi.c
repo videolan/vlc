@@ -91,8 +91,6 @@ static int Seek            ( demux_t *, mtime_t, int );
 static int Demux_Seekable  ( demux_t * );
 static int Demux_UnSeekable( demux_t * );
 
-#define __ABS( x ) ( (x) < 0 ? (-(x)) : (x) )
-
 static char *FromACP( const char *str )
 {
     return FromCharset(vlc_pgettext("GetACP", "CP1252"), str, strlen(str));
@@ -893,11 +891,11 @@ static int Demux_Seekable( demux_t *p_demux )
 
         if( tk->i_samplesize )
         {
-            toread[i_track].i_toread = AVI_PTSToByte( tk, __ABS( i_dpts ) );
+            toread[i_track].i_toread = AVI_PTSToByte( tk, llabs( i_dpts ) );
         }
         else
         {
-            toread[i_track].i_toread = AVI_PTSToChunk( tk, __ABS( i_dpts ) );
+            toread[i_track].i_toread = AVI_PTSToChunk( tk, llabs( i_dpts ) );
         }
 
         if( i_dpts < 0 )
@@ -1248,7 +1246,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
         else
         {
             /* check for time */
-            if( __ABS( AVI_GetPTS( p_stream ) -
+            if( llabs( AVI_GetPTS( p_stream ) -
                         AVI_GetPTS( p_stream_master ) )< 600*1000 )
             {
                 /* load it and send to decoder */

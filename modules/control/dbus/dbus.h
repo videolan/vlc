@@ -38,7 +38,6 @@ static const DBusObjectPathVTable dbus_mpris_vtable = {
         NULL, NULL, NULL, NULL
 };
 
-#define ABS(x) ( ( x ) > 0 ? ( x ) : ( -1 * ( x ) ) )
 #define SEEK_THRESHOLD 1000 /* µsec */
 
 #endif //dbus.h

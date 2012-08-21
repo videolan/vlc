@@ -182,8 +182,6 @@ static void deNoise(unsigned char *Frame,        // mpi->planes[x]
 
 //===========================================================================//
 
-#define ABS(A) ( (A) > 0 ? (A) : -(A) )
-
 static void PrecalcCoefs(int *Ct, double Dist25)
 {
     int i;
@@ -193,7 +191,7 @@ static void PrecalcCoefs(int *Ct, double Dist25)
 
     for (i = -255*16; i <= 255*16; i++)
     {
-        Simil = 1.0 - ABS(i) / (16*255.0);
+        Simil = 1.0 - abs(i) / (16*255.0);
         C = pow(Simil, Gamma) * 65536.0 * (double)i / 16.0;
         Ct[16*256+i] = (C<0) ? (C-0.5) : (C+0.5);
     }
