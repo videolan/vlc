@@ -1878,7 +1878,11 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
 - (NSString *)latestCrashLogPathPreviouslySeen:(BOOL)previouslySeen
 {
-    NSString * crashReporter = [@"~/Library/Logs/CrashReporter" stringByExpandingTildeInPath];
+    NSString * crashReporter;
+    if( OSX_MOUNTAIN_LION )
+        crashReporter = [@"~/Library/Logs/DiagnosticReports" stringByExpandingTildeInPath];
+    else
+        crashReporter = [@"~/Library/Logs/CrashReporter" stringByExpandingTildeInPath];
     NSDirectoryEnumerator *direnum = [[NSFileManager defaultManager] enumeratorAtPath:crashReporter];
     NSString *fname;
     NSString * latestLog = nil;
