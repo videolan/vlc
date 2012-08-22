@@ -997,6 +997,10 @@
 
         PL_LOCK;
         playlist_item_t *p_item = [o_item pointerValue];
+        if (!p_item || !p_item->p_input) {
+            PL_UNLOCK;
+            continue;
+        }
 #ifndef NDEBUG
         msg_Dbg( p_intf, "deleting item %i (of %i) with id \"%i\", pointerValue \"%p\" and %i children", i+1, i_count,
                 p_item->p_input->i_id, [o_item pointerValue], p_item->i_children +1 );
