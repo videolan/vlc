@@ -113,6 +113,7 @@ struct intf_sys_t
     IBOutlet VLCControls * o_controls;     /* VLCControls    */
     IBOutlet VLCPlaylist * o_playlist;     /* VLCPlaylist    */
 
+    /* messages panel */
     IBOutlet NSWindow * o_msgs_panel;           /* messages panel */
     NSMutableArray * o_msg_arr;                 /* messages array */
     NSLock * o_msg_lock;                        /* messages lock */
@@ -130,6 +131,7 @@ struct intf_sys_t
     IBOutlet NSTextField * o_crashrep_desc_txt;
     IBOutlet NSWindow * o_crashrep_win;
     IBOutlet NSButton * o_crashrep_includeEmail_ckb;
+    IBOutlet NSButton * o_crashrep_dontaskagain_ckb;
     IBOutlet NSTextField * o_crashrep_includeEmail_txt;
     NSURLConnection * crashLogURLConnection;
 

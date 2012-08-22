@@ -710,6 +710,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_crashrep_desc_txt setStringValue: _NS("Do you want to send details on the crash to VLC's development team?\n\nIf you want, you can enter a few lines on what you did before VLC crashed along with other helpful information: a link to download a sample file, a URL of a network stream, ...")];
     [o_crashrep_includeEmail_ckb setTitle: _NS("I agree to be possibly contacted about this bugreport.")];
     [o_crashrep_includeEmail_txt setStringValue: _NS("Only your default E-Mail address will be submitted, including no further information.")];
+    [o_crashrep_dontaskagain_ckb setTitle: _NS("Don't ask again")];
 }
 
 #pragma mark -
@@ -1945,14 +1946,27 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     BOOL areCrashLogsTooOld = ![[NSUserDefaults standardUserDefaults] integerForKey:@"LatestCrashReportYear"];
     NSString * latestLog = [self latestCrashLogPathPreviouslySeen:NO];
     if( latestLog && !areCrashLogsTooOld )
-        [NSApp runModalForWindow: o_crashrep_win];
+    {
+        if ([[NSUserDefaults standardUserDefaults] integerForKey:@"AlwaysSendCrashReports"] > 0)
+            [self sendCrashLog:[NSString stringWithContentsOfFile: [self latestCrashLogPath] encoding: NSUTF8StringEncoding error: NULL] withUserComment: [o_crashrep_fld string]];
+        else if ([[NSUserDefaults standardUserDefaults] integerForKey:@"AlwaysSendCrashReports"] == 0)
+            [NSApp runModalForWindow: o_crashrep_win];
+        // bail out, the user doesn't want us to send reports
+    }
+
     [o_pool release];
 }
 
 - (IBAction)crashReporterAction:(id)sender
 {
-    if( sender == o_crashrep_send_btn )
+    if( sender == o_crashrep_send_btn ) {
         [self sendCrashLog:[NSString stringWithContentsOfFile: [self latestCrashLogPath] encoding: NSUTF8StringEncoding error: NULL] withUserComment: [o_crashrep_fld string]];
+        if ([o_crashrep_dontaskagain_ckb state])
+            [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"AlwaysSendCrashReports"];
+    } else {
+        if ([o_crashrep_dontaskagain_ckb state])
+            [[NSUserDefaults standardUserDefaults] setInteger:-1 forKey:@"AlwaysSendCrashReports"];
+    }
 
     [NSApp stopModal];
     [o_crashrep_win orderOut: sender];
@@ -2138,7 +2152,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         }
 
         NSData *data = [string RTFFromRange:NSMakeRange( 0, [string length] )
-                         documentAttributes:[NSDictionary dictionaryWithObject: NSRTFTextDocumentType forKey: NSDocumentTypeDocumentAttribute]];        
+                         documentAttributes:[NSDictionary dictionaryWithObject: NSRTFTextDocumentType forKey: NSDocumentTypeDocumentAttribute]];
 
         if( [data writeToFile: [[sheet URL] path] atomically: YES] == NO )
             msg_Warn( p_intf, "Error while saving the debug log" );
