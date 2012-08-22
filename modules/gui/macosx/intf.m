@@ -1834,7 +1834,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 #pragma mark Crash Log
 - (void)sendCrashLog:(NSString *)crashLog withUserComment:(NSString *)userComment
 {
-    NSString *urlStr = @"http://jones.videolan.org/crashlog/sendcrashreport.php";
+    NSString *urlStr = @"http://crash.videolan.org/crashlog/sendcrashreport.php";
     NSURL *url = [NSURL URLWithString:urlStr];
 
     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
