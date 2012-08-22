@@ -403,6 +403,10 @@ void DiscOpenPanel::onFocus()
         }
         SetErrorMode(oldMode);
     }
+
+    int temp = ui.deviceCombo->findData( config_GetPsz( p_intf, "dvd" ), Qt::UserRole, Qt::MatchStartsWith );
+    if( temp != -1 )
+        ui.deviceCombo->setCurrentIndex( temp );
 }
 #elif defined( __OS2__ ) /* Disc drives probing for OS/2 */
 void DiscOpenPanel::onFocus()
