@@ -220,8 +220,8 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
 -(void)destroyProgressPanel
 {
     b_progress_cancelled = YES;
-    [o_prog_bar stopAnimation: self];
-    [o_prog_win close];
+    [o_prog_bar performSelectorOnMainThread:@selector(stopAnimation:) withObject:self waitUntilDone:YES];
+    [o_prog_win performSelectorOnMainThread:@selector(close) withObject:nil waitUntilDone:YES];
 }
 
 -(IBAction)progDialogAction:(id)sender

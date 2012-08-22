@@ -453,7 +453,7 @@ void updateProgressPanel (void *priv, const char *text, float value)
 void destroyProgressPanel (void *priv)
 {
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-    [[[VLCMain sharedInstance] coreDialogProvider] performSelectorOnMainThread:@selector(destroyProgressPanel) withObject:nil waitUntilDone:NO];
+    [[[VLCMain sharedInstance] coreDialogProvider] destroyProgressPanel];
     [o_pool release];
 }
 
