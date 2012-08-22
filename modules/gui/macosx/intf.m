@@ -2112,7 +2112,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
         [o_msg_lock lock];
 
-        if( [o_msg_arr count] + 2 > 600 )
+        if( [o_msg_arr count] > 600 )
         {
             [o_msg_arr removeObjectAtIndex: 0];
             [o_msg_arr removeObjectAtIndex: 1];
