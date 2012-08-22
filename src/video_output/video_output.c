@@ -470,8 +470,8 @@ int vout_GetSnapshot(vout_thread_t *vout,
         if (type && image_Type2Fourcc(type))
             codec = image_Type2Fourcc(type);
 
-        const int override_width  = var_GetInteger(vout, "snapshot-width");
-        const int override_height = var_GetInteger(vout, "snapshot-height");
+        const int override_width  = var_InheritInteger(vout, "snapshot-width");
+        const int override_height = var_InheritInteger(vout, "snapshot-height");
 
         if (picture_Export(VLC_OBJECT(vout), image_dst, fmt,
                            picture, codec, override_width, override_height)) {

@@ -149,16 +149,8 @@ void vout_IntfInit( vout_thread_t *p_vout )
     char *psz_buf;
 
     /* Create a few object variables we'll need later on */
-    var_Create( p_vout, "snapshot-path", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "snapshot-prefix", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "snapshot-format", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "snapshot-preview", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "snapshot-sequential",
-                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "snapshot-num", VLC_VAR_INTEGER );
     var_SetInteger( p_vout, "snapshot-num", 1 );
-    var_Create( p_vout, "snapshot-width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "snapshot-height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     var_Create( p_vout, "width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -378,7 +370,7 @@ static void VoutOsdSnapshot( vout_thread_t *p_vout, picture_t *p_pic, const char
     msg_Dbg( p_vout, "snapshot taken (%s)", psz_filename );
     vout_OSDMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s", psz_filename );
 
-    if( var_GetBool( p_vout, "snapshot-preview" ) )
+    if( var_InheritBool( p_vout, "snapshot-preview" ) )
     {
         if( VoutSnapshotPip( p_vout, p_pic ) )
             msg_Warn( p_vout, "Failed to display snapshot" );
@@ -390,9 +382,9 @@ static void VoutOsdSnapshot( vout_thread_t *p_vout, picture_t *p_pic, const char
  */
 static void VoutSaveSnapshot( vout_thread_t *p_vout )
 {
-    char *psz_path = var_GetNonEmptyString( p_vout, "snapshot-path" );
-    char *psz_format = var_GetNonEmptyString( p_vout, "snapshot-format" );
-    char *psz_prefix = var_GetNonEmptyString( p_vout, "snapshot-prefix" );
+    char *psz_path = var_InheritString( p_vout, "snapshot-path" );
+    char *psz_format = var_InheritString( p_vout, "snapshot-format" );
+    char *psz_prefix = var_InheritString( p_vout, "snapshot-prefix" );
 
     /* */
     picture_t *p_picture;
@@ -420,7 +412,7 @@ static void VoutSaveSnapshot( vout_thread_t *p_vout )
 
     vout_snapshot_save_cfg_t cfg;
     memset( &cfg, 0, sizeof(cfg) );
-    cfg.is_sequential = var_GetBool( p_vout, "snapshot-sequential" );
+    cfg.is_sequential = var_InheritBool( p_vout, "snapshot-sequential" );
     cfg.sequence = var_GetInteger( p_vout, "snapshot-num" );
     cfg.path = psz_path;
     cfg.format = psz_format;

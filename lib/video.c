@@ -147,11 +147,17 @@ libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, unsigned num,
     if (p_vout == NULL)
         return -1;
 
-    /* FIXME: This is not atomic. Someone else could change the values,
-     * at least in theory. */
+    /* FIXME: This is not atomic. All parameters should be passed at once
+     * (obviously _not_ with var_*()). Also, the libvlc object should not be
+     * used for the callbacks: that breaks badly if there are concurrent
+     * media players in the instance. */
+    var_Create( p_vout, "snapshot-width", VLC_VAR_INTEGER );
     var_SetInteger( p_vout, "snapshot-width", i_width);
+    var_Create( p_vout, "snapshot-height", VLC_VAR_INTEGER );
     var_SetInteger( p_vout, "snapshot-height", i_height );
+    var_Create( p_vout, "snapshot-path", VLC_VAR_STRING );
     var_SetString( p_vout, "snapshot-path", psz_filepath );
+    var_Create( p_vout, "snapshot-format", VLC_VAR_STRING );
     var_SetString( p_vout, "snapshot-format", "png" );
     var_TriggerCallback( p_vout, "video-snapshot" );
     vlc_object_release( p_vout );
