@@ -1042,12 +1042,11 @@
     if( [o_outline_view selectedRow] > -1 )
     {
         p_item = [[o_outline_view itemAtRow: [o_outline_view selectedRow]] pointerValue];
+        if (!p_item)
+            return;
     }
     else
-    /*If no item is selected, sort the whole playlist*/
-    {
-        p_item = [self currentPlaylistRoot];
-    }
+        p_item = [self currentPlaylistRoot]; // If no item is selected, sort the whole playlist
 
     PL_LOCK;
     if( p_item->i_children > -1 ) // the item is a node
