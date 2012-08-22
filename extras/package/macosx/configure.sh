@@ -32,7 +32,6 @@ OPTIONS="
         --enable-realrtsp
         --enable-libass
         --enable-macosx-audio
-        --enable-macosx-dialog-provider
         --enable-macosx-eyetv
         --enable-macosx-qtkit
         --enable-macosx-vout
@@ -41,6 +40,7 @@ OPTIONS="
         --disable-caca
         --disable-sdl
         --disable-samplerate
+        --disable-macosx-dialog-provider
 "
 
 export CFLAGS
