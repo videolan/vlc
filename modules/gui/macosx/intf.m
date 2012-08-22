@@ -1865,13 +1865,14 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
+    msg_Dbg( p_intf, "crash report successfully sent" );
     [crashLogURLConnection release];
     crashLogURLConnection = nil;
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    NSRunCriticalAlertPanel(_NS("Error when sending the Crash Report"), [error localizedDescription], @"OK", nil, nil);
+    msg_Warn (p_intf, "Error when sending the crash report: %s (%li)", [[error localizedDescription] UTF8String], [error code]);
     [crashLogURLConnection release];
     crashLogURLConnection = nil;
 }
