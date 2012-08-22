@@ -21,17 +21,17 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="21"/>
-      <integer value="4850"/>
-      <integer value="1617"/>
-      <integer value="2730"/>
+      <integer value="5160"/>
       <integer value="4722"/>
       <integer value="3707"/>
-      <integer value="915"/>
+      <integer value="21"/>
+      <integer value="1617"/>
+      <integer value="2730"/>
       <integer value="2770"/>
-      <integer value="4845"/>
+      <integer value="915"/>
       <integer value="4948"/>
-      <integer value="5160"/>
+      <integer value="4850"/>
+      <integer value="4845"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -11939,7 +11939,7 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>{{329, 65}, {604, 310}}</string>
           <boolean value="YES"/>
-          <boolean value="NO"/>
+          <boolean value="YES"/>
           <boolean value="NO"/>
           <string>{604, 36}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12130,7 +12130,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{592, 715}, {468, 20}}</string>
+          <string>{{500, 715}, {468, 20}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12476,7 +12476,7 @@ LCAuLi4</string>
           <string>{{329, 634}, {100, 100}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{688, 601}, {400, 22}}</string>
+          <string>{{568, 601}, {400, 22}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform"/>
           <string>VLCCustomWindowCloseButton</string>
@@ -12640,7 +12640,7 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{736, 282}, {302, 433}}</string>
+          <string>{{644, 282}, {302, 433}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12692,7 +12692,7 @@ LCAuLi4</string>
           <string>{{1340, 354}, {64, 6}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{1038, 299}, {64, 6}}</string>
+          <string>{{946, 299}, {64, 6}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
