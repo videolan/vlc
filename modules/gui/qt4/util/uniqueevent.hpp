@@ -22,6 +22,7 @@
 #include <QEvent>
 #include <QList>
 class QTimer;
+class QMutex;
 
 class UniqueEvent : public QEvent
 {
@@ -50,6 +51,7 @@ private:
     };
     QList<event_tuple> eventsList;
     QTimer *timer;
+    QMutex *mutex;
 };
 
 #endif // UNIQUEEVENT_HPP

@@ -21,10 +21,12 @@
 
 #include <QTimer>
 #include <QApplication>
+#include <QMutex>
 
 RateLimitedEventPoster::RateLimitedEventPoster( int i_millisec_interval )
 {
     timer = new QTimer();
+    mutex = new QMutex();
     timer->setSingleShot( true );
     /* Assuming a 24fps event loop, delays at least events to the next frame */
     if ( i_millisec_interval < 1 )
@@ -38,28 +40,39 @@ RateLimitedEventPoster::~RateLimitedEventPoster()
     timer->stop();
     commit();
     delete timer;
+    delete mutex;
 }
 
 void RateLimitedEventPoster::postEvent( UniqueEvent *e, QObject *target )
 {
     event_tuple newtuple = { target, e };
-    foreach( event_tuple tuple, eventsList )
+    mutex->lock();
+    foreach( const event_tuple & tuple, eventsList )
     {
         if ( target == tuple.target && tuple.event->equals( e ) )
         {
             delete e;
+            mutex->unlock();
             return;
         }
     }
     eventsList << newtuple;
+    mutex->unlock();
+    if ( eventsList.count() >= 100 ) /* limit lookup time */
+    {
+        timer->stop();
+        commit();
+    }
     if ( !timer->isActive() ) timer->start();
 }
 
 void RateLimitedEventPoster::commit()
 {
-    foreach( event_tuple tuple, eventsList )
+    mutex->lock();
+    foreach( const event_tuple & tuple, eventsList )
     {
         QApplication::postEvent( tuple.target, tuple.event );
     }
     eventsList.clear();
+    mutex->unlock();
 }
