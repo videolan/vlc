@@ -654,6 +654,13 @@ static VLCMain *_o_sharedMainInstance = nil;
             [[VLCApplication sharedApplication] setApplicationIconImage: [NSImage imageNamed:@"vlc-xmas"]];
     }
 
+    [o_mainwindow updateWindow];
+    [o_mainwindow updateTimeSlider];
+    [o_mainwindow updateVolumeSlider];
+    [o_mainwindow makeKeyAndOrderFront: self];
+
+    [self initStrings];
+
     nib_main_loaded = TRUE;
 }
 
@@ -662,11 +669,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( !p_intf ) return;
 
     [self updateCurrentlyUsedHotkeys];
-
-    [o_mainwindow updateWindow];
-    [o_mainwindow updateTimeSlider];
-    [o_mainwindow updateVolumeSlider];
-    [o_mainwindow makeKeyAndOrderFront: self];
 
     /* init media key support */
     b_mediaKeySupport = var_InheritBool( VLCIntf, "macosx-mediakeys" );
@@ -690,7 +692,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* we will need this, so let's load it here so the interface appears to be more responsive */
     nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner: NSApp];
-    [self initStrings];
 }
 
 - (void)initStrings
