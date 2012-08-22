@@ -860,10 +860,13 @@ static VLCOpen *_o_sharedMainInstance = nil;
                                 NULL,
                                 NULL
                                 );
-        if ( noErr == err ) {
+        if ( noErr == err )
             actualVolume = catalogInfo.volume;
-        }
+        else
+            return @"";
     }
+    else
+        return @"";
 
     GetVolParmsInfoBuffer volumeParms;
     err = FSGetVolumeParms( actualVolume, &volumeParms, sizeof(volumeParms) );
@@ -893,16 +896,22 @@ static VLCOpen *_o_sharedMainInstance = nil;
                                 NULL,
                                 NULL
                                 );
-        if ( noErr == err ) {
+        if ( noErr == err )
             actualVolume = catalogInfo.volume;
-        }
+        else
+            return NULL;
     }
+    else
+        return NULL;
 
     GetVolParmsInfoBuffer volumeParms;
     err = FSGetVolumeParms( actualVolume, &volumeParms, sizeof(volumeParms) );
 
     CFMutableDictionaryRef matchingDict;
     io_service_t service;
+
+    if (!volumeParms.vMDeviceID)
+        return NULL;
 
     matchingDict = IOBSDNameMatching(kIOMasterPortDefault, 0, volumeParms.vMDeviceID);
     service = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict);
