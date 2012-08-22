@@ -1762,7 +1762,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     return o_video_view;
 }
 
-- (id)setupVideoView
+- (void)setupVideoView
 {
     // TODO: make lion fullscreen compatible with macosx-background and !embedded-video
     if( var_InheritBool( VLCIntf, "macosx-background" ) && !b_nativeFullscreenMode )
@@ -1851,7 +1851,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     [[o_video_view window] setAlphaValue: config_GetFloat( VLCIntf, "macosx-opaqueness" )];
-    return o_video_view;
 }
 
 - (void)setVideoplayEnabled

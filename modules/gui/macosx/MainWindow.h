@@ -184,7 +184,7 @@
 - (void)drawFancyGradientEffectForTimeSlider;
 
 - (id)videoView;
-- (id)setupVideoView;
+- (void)setupVideoView;
 - (void)setVideoplayEnabled;
 - (void)resizeWindow;
 - (void)setNativeVideoSize:(NSSize)size;

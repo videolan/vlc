@@ -1783,7 +1783,8 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
 - (id)getVideoViewAtPositionX: (int *)pi_x Y: (int *)pi_y withWidth: (unsigned int*)pi_width andHeight: (unsigned int*)pi_height
 {
-    id videoView = [o_mainwindow setupVideoView];
+    [o_mainwindow performSelectorOnMainThread:@selector(setupVideoView) withObject:nil waitUntilDone:YES];
+    id videoView = [o_mainwindow videoView];
     NSRect videoRect = [videoView frame];
     int i_x = (int)videoRect.origin.x;
     int i_y = (int)videoRect.origin.y;
