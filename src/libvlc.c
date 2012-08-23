@@ -125,7 +125,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
     else
         priv->i_verbose = 3;
 #if defined( HAVE_ISATTY ) && !defined( WIN32 )
-    priv->b_color = isatty( 2 ); /* 2 is for stderr */
+    priv->b_color = isatty( STDERR_FILENO ); /* 2 is for stderr */
 #else
     priv->b_color = false;
 #endif
