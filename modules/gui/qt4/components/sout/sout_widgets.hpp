@@ -121,7 +121,8 @@ class RTPDestBox: public VirtualDestBox
     private:
         QLineEdit *RTPEdit;
         QSpinBox *RTPPort;
-        const char *mux;
+        QLineEdit *SAPName;
+        QString mux;
 };
 
 class ICEDestBox: public VirtualDestBox

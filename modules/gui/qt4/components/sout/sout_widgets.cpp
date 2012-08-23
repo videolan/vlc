@@ -344,7 +344,7 @@ QString UDPDestBox::getMRL( const QString& mux )
 
 
 RTPDestBox::RTPDestBox( QWidget *_parent, const char *_mux )
-    : VirtualDestBox( _parent ), mux( _mux )
+    : VirtualDestBox( _parent ), mux( qfu(_mux) )
 {
     QGridLayout *layout = new QGridLayout( this );
 
@@ -354,37 +354,49 @@ RTPDestBox::RTPDestBox( QWidget *_parent, const char *_mux )
     layout->addWidget(rtpOutput, 0, 0, 1, -1);
 
     QLabel *RTPLabel = new QLabel( qtr("Address"), this );
-    QLabel *RTPPortLabel = new QLabel( qtr("Base port"), this );
-    layout->addWidget(RTPLabel, 1, 0, 1, 1);
-    layout->addWidget(RTPPortLabel, 2, 0, 1, 1);
-
     RTPEdit = new QLineEdit(this);
+    layout->addWidget(RTPLabel, 1, 0, 1, 1);
+    layout->addWidget(RTPEdit, 1, 1, 1, 1);
 
+    QLabel *RTPPortLabel = new QLabel( qtr("Base port"), this );
     RTPPort = new QSpinBox(this);
     RTPPort->setMaximumSize(QSize(90, 16777215));
     RTPPort->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
     RTPPort->setMinimum(1);
     RTPPort->setMaximum(65535);
     RTPPort->setValue(5004);
-
-    layout->addWidget(RTPEdit, 1, 1, 1, 1);
+    layout->addWidget(RTPPortLabel, 2, 0, 1, 1);
     layout->addWidget(RTPPort, 2, 1, 1, 1);
 
-    CS( RTPPort );
+    QLabel *SAPNameLabel = new QLabel( qtr("Stream name"), this );
+    SAPName = new QLineEdit(this);
+    layout->addWidget(SAPNameLabel, 3, 0, 1, 1);
+    layout->addWidget(SAPName, 3, 1, 1, 1);
+
     CT( RTPEdit );
+    CS( RTPPort );
+    CT( SAPName );
 }
 
 QString RTPDestBox::getMRL( const QString& )
 {
-    if( RTPEdit->text().isEmpty() ) return "";
+    QString addr = RTPEdit->text();
+    QString name = SAPName->text();
+
+    if( addr.isEmpty() ) return qfu("");
 
     SoutMrl m;
     m.begin( "rtp" );
     m.option( "dst", RTPEdit->text() );
     m.option( "port", RTPPort->value() );
     /* mp4-mux ain't usable in rtp-output either */
-    if( mux != NULL )
-        m.option( "mux", qfu( mux ) );
+    if( !mux.isEmpty() )
+        m.option( "mux", mux );
+    if( !name.isEmpty() )
+    {
+        m.option( "sap" );
+        m.option( "name", name );
+    }
     m.end();
 
     return m.getMrl();
