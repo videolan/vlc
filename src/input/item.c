@@ -812,7 +812,7 @@ input_item_NewWithType( const char *psz_uri, const char *psz_name,
                         int i_options, const char *const *ppsz_options,
                         unsigned flags, mtime_t duration, int type )
 {
-    static atomic_int last_input_id = ATOMIC_VAR_INIT(0);
+    static atomic_uint last_input_id = ATOMIC_VAR_INIT(0);
 
     input_item_owner_t *owner = calloc( 1, sizeof( *owner ) );
     if( unlikely(owner == NULL) )
