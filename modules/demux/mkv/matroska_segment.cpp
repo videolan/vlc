@@ -221,23 +221,25 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
 static const struct {
     vlc_meta_type_t type;
     const char *key;
-} metadata_map[] = { {vlc_meta_Title,       "TITLE"},
-                     {vlc_meta_Artist,      "ARTIST"},
-                     {vlc_meta_Genre,       "GENRE"},
-                     {vlc_meta_Copyright,   "COPYRIGHT"},
-                     {vlc_meta_TrackNumber, "PART_NUMBER"},
-                     {vlc_meta_Description, "DESCRIPTION"},
-                     {vlc_meta_Description, "COMMENT"},
-                     {vlc_meta_Rating,      "RATING"},
-                     {vlc_meta_Date,        "DATE_RELEASED"},
-                     {vlc_meta_URL,         "URL"},
-                     {vlc_meta_Publisher,   "PUBLISHER"},
-                     {vlc_meta_EncodedBy,   "ENCODED_BY"},
-                     {vlc_meta_TrackTotal,  "TOTAL_PARTS"},
-                     {vlc_meta_Title,       NULL},
+    int target_type; /* 0 is valid for all target_type */
+} metadata_map[] = { {vlc_meta_Title,       "TITLE",         50},
+                     {vlc_meta_Album,       "TITLE",         30},
+                     {vlc_meta_Artist,      "ARTIST",        0},
+                     {vlc_meta_Genre,       "GENRE",         0},
+                     {vlc_meta_Copyright,   "COPYRIGHT",     0},
+                     {vlc_meta_TrackNumber, "PART_NUMBER",   0},
+                     {vlc_meta_Description, "DESCRIPTION",   0},
+                     {vlc_meta_Description, "COMMENT",       0},
+                     {vlc_meta_Rating,      "RATING",        0},
+                     {vlc_meta_Date,        "DATE_RELEASED", 0},
+                     {vlc_meta_URL,         "URL",           0},
+                     {vlc_meta_Publisher,   "PUBLISHER",     0},
+                     {vlc_meta_EncodedBy,   "ENCODED_BY",    0},
+                     {vlc_meta_TrackTotal,  "TOTAL_PARTS",   0},
+                     {vlc_meta_Title,       NULL,            0},
 };
 
-void matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag )
+void matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag, int target_type )
 {
     EbmlElement *el;
     EbmlParser *ep = new EbmlParser( &es, tag, &sys.demuxer );
@@ -272,7 +274,8 @@ void matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag )
 
     for( int i = 0; metadata_map[i].key; i++ )
     {
-        if( !strcmp( k, metadata_map[i].key ) )
+        if( !strcmp( k, metadata_map[i].key ) &&
+            (metadata_map[i].target_type == 0 || target_type == metadata_map[i].target_type ) )
         {
             vlc_meta_Set( sys.meta, metadata_map[i].type, v );
             msg_Dbg( &sys.demuxer, "|   |   + Meta %s: %s", k, v);
@@ -310,10 +313,28 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
         {
             msg_Dbg( &sys.demuxer, "+ Tag" );
             ep->Down();
+            int target_type = 50;
             while( ( el = ep->Get() ) != NULL )
             {
                 if( MKV_IS_ID( el, KaxTagTargets ) )
-                    PARSE_TAG( "Targets" );
+                {
+                    msg_Dbg( &sys.demuxer, "|   + Targets" );
+                    ep->Down();
+                    while( ( el = ep->Get() ) != NULL )
+                    {
+                        if( MKV_IS_ID( el, KaxTagTargetTypeValue ) )
+                        {
+                            KaxTagTargetTypeValue &value = *(KaxTagTargetTypeValue*)el;
+                            value.ReadData( es.I_O() );
+
+                            msg_Dbg( &sys.demuxer, "|   |   + TargetTypeValue: %u", uint32(value));
+                            target_type = uint32(value);
+                        }
+                    }
+                    ep->Up();
+                }
+                else if( MKV_IS_ID( el, KaxTagSimple ) )
+                    ParseSimpleTags( static_cast<KaxTagSimple*>( el ), target_type );
 #if 0 // not valid anymore
                 else if( MKV_IS_ID( el, KaxTagGeneral ) )
                     PARSE_TAG( "General" );
@@ -352,8 +373,6 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                     msg_Dbg( &sys.demuxer, "|   + Multi Title" );
                 }
 #endif
-                else if( MKV_IS_ID( el, KaxTagSimple ) )
-                    ParseSimpleTags( static_cast<KaxTagSimple*>( el ) );
                 else
                 {
                     msg_Dbg( &sys.demuxer, "|   + LoadTag Unknown (%s)", typeid( *el ).name() );
