@@ -893,7 +893,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     return @"";
 }
 
-- (char *)getVolumeTypeFromMountPath:(NSString *)mountPath
+- (NSString *)getVolumeTypeFromMountPath:(NSString *)mountPath
 {
     OSStatus err;
     FSRef ref;
@@ -930,7 +930,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     matchingDict = IOBSDNameMatching(kIOMasterPortDefault, 0, volumeParms.vMDeviceID);
     service = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict);
 
-    char *returnValue;
+    NSString *returnValue;
     if (IO_OBJECT_NULL != service) {
         if (IOObjectConformsTo(service, kIOCDMediaClass)) {
             returnValue = kVLCMediaAudioCD;
@@ -998,14 +998,14 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
 
-    char *diskType = [self getVolumeTypeFromMountPath:o_opticalDevicePath];
+    NSString *diskType = [self getVolumeTypeFromMountPath:o_opticalDevicePath];
 
-    if (diskType == kVLCMediaDVD || diskType == kVLCMediaVideoTSFolder)
+    if ([diskType isEqualToString: kVLCMediaDVD] || [diskType isEqualToString: kVLCMediaVideoTSFolder])
     {
         [o_disc_dvd_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:o_opticalDevicePath]];
         [o_disc_dvdwomenus_lbl setStringValue: [o_disc_dvd_lbl stringValue]];
         NSString *pathToOpen;
-        if (diskType == kVLCMediaVideoTSFolder)
+        if ([diskType isEqualToString: kVLCMediaVideoTSFolder])
             pathToOpen = o_opticalDevicePath;
         else
             pathToOpen = [self getBSDNodeFromMountPath: o_opticalDevicePath];
@@ -1017,26 +1017,26 @@ static VLCOpen *_o_sharedMainInstance = nil;
             [self showOpticalMediaView: o_disc_dvdwomenus_view withIcon: [[NSWorkspace sharedWorkspace] iconForFile: o_opticalDevicePath]];
         }
     }
-    else if (diskType == kVLCMediaAudioCD)
+    else if ([diskType isEqualToString: kVLCMediaAudioCD])
     {
         [o_disc_audiocd_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath: o_opticalDevicePath]];
         [o_disc_audiocd_trackcount_lbl setStringValue: [NSString stringWithFormat:_NS("%i tracks"), [[[NSFileManager defaultManager] subpathsOfDirectoryAtPath: o_opticalDevicePath error:NULL] count] - 1]]; // minus .TOC.plist
         [self showOpticalMediaView: o_disc_audiocd_view withIcon: [[NSWorkspace sharedWorkspace] iconForFile: o_opticalDevicePath]];
         [self setMRL: [NSString stringWithFormat: @"cdda://%@", [self getBSDNodeFromMountPath: o_opticalDevicePath]]];
     }
-    else if (diskType == kVLCMediaVCD)
+    else if ([diskType isEqualToString: kVLCMediaVCD])
     {
         [o_disc_vcd_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath: o_opticalDevicePath]];
         [self showOpticalMediaView: o_disc_vcd_view withIcon: [[NSWorkspace sharedWorkspace] iconForFile: o_opticalDevicePath]];
         [self setMRL: [NSString stringWithFormat: @"vcd://%@#%i:%i", [self getBSDNodeFromMountPath: o_opticalDevicePath], [o_disc_vcd_title intValue], [o_disc_vcd_chapter intValue]]];
     }
-    else if (diskType == kVLCMediaSVCD)
+    else if ([diskType isEqualToString: kVLCMediaSVCD])
     {
         [o_disc_vcd_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath: o_opticalDevicePath]];
         [self showOpticalMediaView: o_disc_vcd_view withIcon: [[NSWorkspace sharedWorkspace] iconForFile: o_opticalDevicePath]];
         [self setMRL: [NSString stringWithFormat: @"vcd://%@@%i:%i", [self getBSDNodeFromMountPath: o_opticalDevicePath], [o_disc_vcd_title intValue], [o_disc_vcd_chapter intValue]]];
     }
-    else if (diskType == kVLCMediaBD || diskType == kVLCMediaBDMVFolder)
+    else if ([diskType isEqualToString: kVLCMediaBD] || [diskType isEqualToString: kVLCMediaBDMVFolder])
     {
         [o_disc_bd_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath: o_opticalDevicePath]];
         [self showOpticalMediaView: o_disc_bd_view withIcon: [[NSWorkspace sharedWorkspace] iconForFile: o_opticalDevicePath]];
@@ -1117,10 +1117,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (IBAction)dvdreadOptionChanged:(id)sender
 {
     NSString *o_device_path = [o_opticalDevices objectAtIndex: [o_disc_selector_pop indexOfSelectedItem]];
-    char *diskType = [self getVolumeTypeFromMountPath:o_device_path];
+    NSString *diskType = [self getVolumeTypeFromMountPath:o_device_path];
 
     NSString *pathToOpen;
-    if (diskType == kVLCMediaVideoTSFolder)
+    if ([diskType isEqualToString: kVLCMediaVideoTSFolder])
         pathToOpen = o_device_path;
     else
         pathToOpen = [self getBSDNodeFromMountPath: o_device_path];

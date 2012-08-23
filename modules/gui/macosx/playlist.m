@@ -1085,30 +1085,30 @@
 
         id o_vlc_open = [[VLCMain sharedInstance] open];
 
-        char *diskType = [o_vlc_open getVolumeTypeFromMountPath: o_path];
-        msg_Dbg( p_intf, "detected optical media of type '%s' in the file input", diskType );
+        NSString *diskType = [o_vlc_open getVolumeTypeFromMountPath: o_path];
+        msg_Dbg( p_intf, "detected optical media of type %s in the file input", [diskType UTF8String] );
 
-        if (diskType == kVLCMediaDVD)
+        if ([diskType isEqualToString: kVLCMediaDVD])
         {
             o_uri = [NSString stringWithFormat: @"dvdnav://%@", [o_vlc_open getBSDNodeFromMountPath: o_path]];
         }
-        else if (diskType == kVLCMediaVideoTSFolder)
+        else if ([diskType isEqualToString: kVLCMediaVideoTSFolder])
         {
             o_uri = [NSString stringWithFormat: @"dvdnav://%@", o_path];
         }
-        else if (diskType == kVLCMediaAudioCD)
+        else if ([diskType isEqualToString: kVLCMediaAudioCD])
         {
             o_uri = [NSString stringWithFormat: @"cdda://%@", [o_vlc_open getBSDNodeFromMountPath: o_path]];
         }
-        else if (diskType == kVLCMediaVCD)
+        else if ([diskType isEqualToString: kVLCMediaVCD])
         {
             o_uri = [NSString stringWithFormat: @"vcd://%@#0:0", [o_vlc_open getBSDNodeFromMountPath: o_path]];
         }
-        else if (diskType == kVLCMediaSVCD)
+        else if ([diskType isEqualToString: kVLCMediaSVCD])
         {
             o_uri = [NSString stringWithFormat: @"vcd://%@@0:0", [o_vlc_open getBSDNodeFromMountPath: o_path]];
         }
-        else if (diskType == kVLCMediaBD || diskType == kVLCMediaBDMVFolder)
+        else if ([diskType isEqualToString: kVLCMediaBD] || [diskType isEqualToString: kVLCMediaBDMVFolder])
         {
             o_uri = [NSString stringWithFormat: @"bluray://%@", o_path];
         }

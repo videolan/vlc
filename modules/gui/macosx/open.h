@@ -24,14 +24,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#define kVLCMediaAudioCD "AudioCD"
-#define kVLCMediaDVD "DVD"
-#define kVLCMediaVCD "VCD"
-#define kVLCMediaSVCD "SVCD"
-#define kVLCMediaBD "Bluray"
-#define kVLCMediaVideoTSFolder "VIDEO_TS"
-#define kVLCMediaBDMVFolder "BDMV"
-#define kVLCMediaUnknown "Unknown"
+#define kVLCMediaAudioCD @"AudioCD"
+#define kVLCMediaDVD @"DVD"
+#define kVLCMediaVCD @"VCD"
+#define kVLCMediaSVCD @"SVCD"
+#define kVLCMediaBD @"Bluray"
+#define kVLCMediaVideoTSFolder @"VIDEO_TS"
+#define kVLCMediaBDMVFolder @"BDMV"
+#define kVLCMediaUnknown @"Unknown"
 
 /*****************************************************************************
  * Intf_Open interface
@@ -274,7 +274,7 @@
 - (IBAction)openSpecialMediaFolder:(id)sender;
 - (IBAction)dvdreadOptionChanged:(id)sender;
 - (IBAction)vcdOptionChanged:(id)sender;
-- (char *)getVolumeTypeFromMountPath:(NSString *)mountPath;
+- (NSString *)getVolumeTypeFromMountPath:(NSString *)mountPath;
 - (NSString *)getBSDNodeFromMountPath:(NSString *)mountPath;
 
 - (void)openNet;
