@@ -42,6 +42,7 @@ void vlc_global_mutex (unsigned n, bool acquire)
         VLC_STATIC_MUTEX,
         VLC_STATIC_MUTEX,
         VLC_STATIC_MUTEX,
+        VLC_STATIC_MUTEX,
     };
     static_assert (VLC_MAX_MUTEX == (sizeof (locks) / sizeof (locks[0])),
                    "Wrong number of global mutexes");
