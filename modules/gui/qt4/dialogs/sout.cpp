@@ -225,7 +225,7 @@ void SoutDialog::updateMRL()
         QString name = ui.sapName->text();
 
         /* FIXME: This sucks. We should really return a QStringList instead of
-         * (mis)quoting, concatainating and split input item paramters. */
+         * (mis)quoting, concatenating and split input item paramters. */
         name = name.replace( " ", " " );
         group = group.replace( " ", " " );
 
