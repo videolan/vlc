@@ -254,7 +254,8 @@ static inline uintptr_t vlc_atomic_swap(vlc_atomic_t *atom, uintptr_t v)
 static inline uintptr_t vlc_atomic_compare_swap(vlc_atomic_t *atom,
                                                 uintptr_t u, uintptr_t v)
 {
-    return atomic_compare_exchange_strong(&atom->u, &u, v);
+    atomic_compare_exchange_strong(&atom->u, &u, v);
+    return u;
 }
 
 /** Helper to retrieve a single precision from an atom. */
