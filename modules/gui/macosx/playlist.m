@@ -760,9 +760,9 @@
     [o_save_panel setTitle: _NS("Save Playlist")];
     [o_save_panel setPrompt: _NS("Save")];
     [o_save_panel setAccessoryView: o_save_accessory_view];
+    [o_save_panel setNameFieldStringValue: o_name];
 
-    if( [o_save_panel runModalForDirectory: nil
-            file: o_name] == NSOKButton )
+    if( [o_save_panel runModal] == NSFileHandlingPanelOKButton )
     {
         NSString *o_filename = [[o_save_panel URL] path];
 
