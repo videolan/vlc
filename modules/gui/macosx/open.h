@@ -266,7 +266,6 @@
 - (void)openFileGeneric;
 - (void)openFilePathChanged:(NSNotification *)o_notification;
 - (IBAction)openFileBrowse:(id)sender;
-- (void)pathChosenInPanel: (NSOpenPanel *)sheet withReturn:(int)returnCode contextInfo:(void *)contextInfo;
 - (IBAction)openFileStreamChanged:(id)sender;
 
 - (void)openDisc;

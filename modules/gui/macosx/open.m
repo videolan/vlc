@@ -752,28 +752,16 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_open_panel setCanChooseDirectories: YES];
     [o_open_panel setTitle: _NS("Open File")];
     [o_open_panel setPrompt: _NS("Open")];
-
-    [o_open_panel beginSheetForDirectory:nil
-        file:nil
-        types:nil
-        modalForWindow:[sender window]
-        modalDelegate: self
-        didEndSelector: @selector(pathChosenInPanel:
-                        withReturn:
-                        contextInfo:)
-        contextInfo: nil];
-}
-
-- (void)pathChosenInPanel: (NSOpenPanel *) sheet withReturn:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if (returnCode == NSFileHandlingPanelOKButton)
-    {
-        if( o_file_path )
-            [o_file_path release];
-        o_file_path = [[[sheet URLs] objectAtIndex: 0] path];
-        [o_file_path retain];
-        [self openFilePathChanged: nil];
-    }
+    [o_open_panel beginSheetModalForWindow:[sender window] completionHandler:^(NSInteger returnCode) {
+        if (returnCode == NSFileHandlingPanelOKButton)
+        {
+            if( o_file_path )
+                [o_file_path release];
+            o_file_path = [[[o_open_panel URLs] objectAtIndex: 0] path];
+            [o_file_path retain];
+            [self openFilePathChanged: nil];
+        }
+    }];
 }
 
 - (IBAction)openFileStreamChanged:(id)sender
