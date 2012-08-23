@@ -102,7 +102,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
 {
     libvlc_int_t *p_libvlc;
     libvlc_priv_t *priv;
-    char *psz_env = NULL;
 
     /* Now that the thread system is initialized, we don't have much, but
      * at least we have variables */
@@ -117,13 +116,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
     priv->p_ml = NULL;
     priv->p_dialog_provider = NULL;
     priv->p_vlm = NULL;
-
-    /* Find verbosity from VLC_VERBOSE environment variable */
-    psz_env = getenv( "VLC_VERBOSE" );
-    if( psz_env != NULL )
-        priv->i_verbose = atoi( psz_env );
-    else
-        priv->i_verbose = 3;
+    priv->i_verbose = 3; /* initial value until config is loaded */
 #if defined( HAVE_ISATTY ) && !defined( WIN32 )
     priv->b_color = isatty( STDERR_FILENO ); /* 2 is for stderr */
 #else
@@ -171,6 +164,13 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         return VLC_EGENERIC;
     }
     priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
+
+    /* Find verbosity from VLC_VERBOSE environment variable */
+    {
+        char *env = getenv( "VLC_VERBOSE" );
+        if( env != NULL )
+            priv->i_verbose = atoi( env );
+    }
 
     /* Announce who we are (TODO: only first instance?) */
     msg_Dbg( p_libvlc, "VLC media player - %s", VERSION_MESSAGE );
