@@ -298,17 +298,14 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [openPanel setCanChooseDirectories:NO];
     [openPanel setResolvesAliases:YES];
     [openPanel setAllowsMultipleSelection:NO];
-    [openPanel beginSheetForDirectory:nil file:nil types:nil modalForWindow: _window modalDelegate:self didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:) contextInfo:nil];
-}
-
-- (void)openPanelDidEnd:(NSOpenPanel *)panel returnCode:(int)returnCode  contextInfo:(void  *)contextInfo
-{
-    if (returnCode == NSOKButton)
-    {
-        [self setMRL: [NSString stringWithUTF8String:vlc_path2uri([[[panel URL] path] UTF8String], NULL)]];
-        [self updateOKButton];
-        [self updateDropView];
-    }
+    [openPanel beginSheetModalForWindow:_window completionHandler:^(NSInteger returnCode) {
+        if (returnCode == NSOKButton)
+        {
+            [self setMRL: [NSString stringWithUTF8String:vlc_path2uri([[[openPanel URL] path] UTF8String], NULL)]];
+            [self updateOKButton];
+            [self updateDropView];
+        }
+    }];
 }
 
 - (IBAction)switchProfile:(id)sender
@@ -418,22 +415,19 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [saveFilePanel setCanCreateDirectories: YES];
     if ([[_customize_encap_matrix selectedCell] tag] != RAW) // there is no clever guess for this
         [saveFilePanel setAllowedFileTypes:[NSArray arrayWithObject:[self currentEncapsulationFormatAsFileExtension:YES]]];
-    [saveFilePanel beginSheetForDirectory:nil file:nil modalForWindow:_window modalDelegate:self didEndSelector:@selector(savePanelDidEnd:returnCode:contextInfo:) contextInfo:nil];
-}
-
-- (void)savePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
-{
-    if (returnCode == NSOKButton) {
-        [self setOutputDestination:[[sheet URL] path]];
-        [_destination_filename_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:_outputDestination]];
-        [[_destination_filename_stub_lbl animator] setHidden: YES];
-        [[_destination_filename_lbl animator] setHidden: NO];
-    } else {
-        [self setOutputDestination:@""];
-        [[_destination_filename_lbl animator] setHidden: YES];
-        [[_destination_filename_stub_lbl animator] setHidden: NO];
-    }
-    [self updateOKButton];
+    [saveFilePanel beginSheetModalForWindow:_window completionHandler:^(NSInteger returnCode) {
+        if (returnCode == NSOKButton) {
+            [self setOutputDestination:[[saveFilePanel URL] path]];
+            [_destination_filename_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:_outputDestination]];
+            [[_destination_filename_stub_lbl animator] setHidden: YES];
+            [[_destination_filename_lbl animator] setHidden: NO];
+        } else {
+            [self setOutputDestination:@""];
+            [[_destination_filename_lbl animator] setHidden: YES];
+            [[_destination_filename_stub_lbl animator] setHidden: NO];
+        }
+        [self updateOKButton];        
+    }];
 }
 
 - (IBAction)showStreamPanel:(id)sender
