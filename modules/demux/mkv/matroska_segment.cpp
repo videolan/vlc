@@ -218,16 +218,6 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
 }
 
 
-#define PARSE_TAG( type ) \
-    do { \
-    msg_Dbg( &sys.demuxer, "|   + " type ); \
-    ep->Down();                             \
-    while( ( el = ep->Get() ) != NULL )     \
-    {                                       \
-        msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid( *el ).name() ); \
-    }                                      \
-    ep->Up(); } while( 0 )
-
 static const struct {
     vlc_meta_type_t type;
     const char *key;
@@ -285,16 +275,28 @@ void matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag )
         if( !strcmp( k, metadata_map[i].key ) )
         {
             vlc_meta_Set( sys.meta, metadata_map[i].type, v );
+            msg_Dbg( &sys.demuxer, "|   |   + Meta %s: %s", k, v);
             goto done;
         }
     }
-    msg_Dbg( &sys.demuxer, "|   |   + %s: %s", k, v);
+    msg_Dbg( &sys.demuxer, "|   |   + Meta %s: %s", k, v);
     vlc_meta_AddExtra( sys.meta, k, v );
 done:
     free( k );
     free( v );
     return;
 }
+
+#define PARSE_TAG( type ) \
+    do { \
+    msg_Dbg( &sys.demuxer, "|   + " type ); \
+    ep->Down();                             \
+    while( ( el = ep->Get() ) != NULL )     \
+    {                                       \
+        msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid( *el ).name() ); \
+    }                                      \
+    ep->Up(); } while( 0 )
+
 
 void matroska_segment_c::LoadTags( KaxTags *tags )
 {
