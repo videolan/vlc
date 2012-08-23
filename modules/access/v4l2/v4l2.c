@@ -176,9 +176,6 @@ static const char *const colorfx_user[] = { N_("Unspecified"), N_("None"),
     "To list available controls, increase verbosity (-vvv) " \
     "or use the v4l2-ctl application." )
 
-#define TUNER_TEXT N_("Tuner id")
-#define TUNER_LONGTEXT N_( \
-    "Tuner id (see debug output)." )
 #define FREQUENCY_TEXT N_("Frequency")
 #define FREQUENCY_LONGTEXT N_( \
     "Tuner frequency in Hz or kHz (see debug output)" )
