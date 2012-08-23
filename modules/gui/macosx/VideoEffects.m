@@ -140,6 +140,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_watereffect_ckb setTitle:_NS("Water effect")];
     [o_waves_ckb setTitle:_NS("Waves")];
     [o_psychedelic_ckb setTitle:_NS("Psychedelic")];
+    [o_anaglyph_ckb setTitle:_NS("Anaglyph 3D")];
 
     [o_addtext_ckb setTitle:_NS("Add text")];
     [o_addtext_text_lbl setStringValue:_NS("Text")];
@@ -221,6 +222,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         [o_watereffect_ckb setState: (NSInteger)strstr( psz_vfilters, "ripple")];
         [o_waves_ckb setState: (NSInteger)strstr( psz_vfilters, "wave")];
         [o_psychedelic_ckb setState: (NSInteger)strstr( psz_vfilters, "psychedelic")];
+        [o_anaglyph_ckb setState: (NSInteger)strstr( psz_vfilters, "anaglyph")];
         free( psz_vfilters );
     }
     psz_vfilters = config_GetPsz( p_intf, "sub-source" );
