@@ -41,8 +41,8 @@
 
 #include "v4l2.h"
 
-#define DEVICE_TEXT N_( "Device" )
-#define DEVICE_LONGTEXT N_("Video device node." )
+#define VIDEO_DEVICE_TEXT N_( "Video capture device" )
+#define VIDEO_DEVICE_LONGTEXT N_("Video capture device node." )
 #define STANDARD_TEXT N_( "Standard" )
 #define STANDARD_LONGTEXT N_( \
     "Video standard (Default, SECAM, PAL, or NTSC)." )
@@ -65,6 +65,15 @@
     "(if both width and height are strictly positive)." )
 /*#define FPS_TEXT N_( "Frame rate" )
 #define FPS_LONGTEXT N_( "Maximum frame rate to use (0 = no limits)." )*/
+
+#define RADIO_DEVICE_TEXT N_( "Radio device" )
+#define RADIO_DEVICE_LONGTEXT N_("Radio tuner device node." )
+#define FREQUENCY_TEXT N_("Frequency")
+#define FREQUENCY_LONGTEXT N_( \
+    "Tuner frequency in Hz or kHz (see debug output)" )
+#define TUNER_AUDIO_MODE_TEXT N_("Audio mode")
+#define TUNER_AUDIO_MODE_LONGTEXT N_( \
+    "Tuner audio mono/stereo and track selection." )
 
 #define CTRL_RESET_TEXT N_( "Reset controls" )
 #define CTRL_RESET_LONGTEXT N_( "Reset controls to defaults." )
@@ -180,13 +189,6 @@ static const char *const colorfx_user[] = { N_("Unspecified"), N_("None"),
     "To list available controls, increase verbosity (-vvv) " \
     "or use the v4l2-ctl application." )
 
-#define FREQUENCY_TEXT N_("Frequency")
-#define FREQUENCY_LONGTEXT N_( \
-    "Tuner frequency in Hz or kHz (see debug output)" )
-#define TUNER_AUDIO_MODE_TEXT N_("Audio mode")
-#define TUNER_AUDIO_MODE_LONGTEXT N_( \
-    "Tuner audio mono/stereo and track selection." )
-
 #define ASPECT_TEXT N_("Picture aspect-ratio n:m")
 #define ASPECT_LONGTEXT N_("Define input picture aspect-ratio to use. Default is 4:3" )
 
@@ -266,14 +268,14 @@ static const char *const psz_tuner_audio_modes_list_text[] = {
 };
 
 vlc_module_begin ()
-    set_shortname( N_("Video4Linux2") )
-    set_description( N_("Video4Linux2 input") )
+    set_shortname( N_("V4L") )
+    set_description( N_("Video4Linux input") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     set_section( N_( "Video input" ), NULL )
     add_loadfile( CFG_PREFIX "dev", "/dev/video0",
-                  DEVICE_TEXT, DEVICE_LONGTEXT, false )
+                  VIDEO_DEVICE_TEXT, VIDEO_DEVICE_LONGTEXT, false )
         change_safe()
     add_string( CFG_PREFIX "standard", "",
                 STANDARD_TEXT, STANDARD_LONGTEXT, false )
@@ -306,6 +308,9 @@ vlc_module_begin ()
     add_obsolete_bool( CFG_PREFIX "use-libv4l2" ) /* since 2.1.0 */
 
     set_section( N_( "Tuner" ), NULL )
+    add_loadfile( CFG_PREFIX "radio-dev", "/dev/radio0",
+                  RADIO_DEVICE_TEXT, RADIO_DEVICE_LONGTEXT, false )
+        change_safe()
     add_obsolete_integer( CFG_PREFIX "tuner" ) /* since 2.1.0 */
     add_integer( CFG_PREFIX "tuner-frequency", -1, FREQUENCY_TEXT,
                  FREQUENCY_LONGTEXT, true )
@@ -409,10 +414,16 @@ vlc_module_begin ()
 
     add_submodule ()
     add_shortcut( "v4l", "v4l2", "v4l2c" )
-    set_description( N_("Video4Linux2 Compressed A/V") )
+    set_description( N_("Video4Linux compressed A/V input") )
     set_capability( "access", 0 )
     /* use these when open as access_demux fails; VLC will use another demux */
     set_callbacks( AccessOpen, AccessClose )
+
+    add_submodule ()
+    add_shortcut ("radio" /*, "fm", "am" */)
+    set_description (N_("Video4Linux radio tuner"))
+    set_capability ("access_demux", 0)
+    set_callbacks (RadioOpen, RadioClose)
 
 vlc_module_end ()
 

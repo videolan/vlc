@@ -88,6 +88,7 @@ int SetupFormat (vlc_object_t *, int, uint32_t,
                  struct v4l2_format *, struct v4l2_streamparm *);
 #define SetupFormat(o,fd,fcc,fmt,p) \
         SetupFormat(VLC_OBJECT(o),fd,fcc,fmt,p)
+int SetupTuner (vlc_object_t *, int fd, uint32_t);
 
 int StartUserPtr (vlc_object_t *, int);
 struct buffer_t *StartMmap (vlc_object_t *, int, uint32_t *);
@@ -105,6 +106,10 @@ void GetMaxDimensions(vlc_object_t *, int fd, uint32_t fmt, float fps_min,
 /* access.c */
 int AccessOpen(vlc_object_t *);
 void AccessClose(vlc_object_t *);
+
+/* radio.c */
+int RadioOpen(vlc_object_t *);
+void RadioClose(vlc_object_t *);
 
 /* controls.c */
 vlc_v4l2_ctrl_t *ControlsInit(vlc_object_t *, int fd);

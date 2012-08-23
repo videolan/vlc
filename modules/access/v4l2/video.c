@@ -116,7 +116,7 @@ static int SetupAudio (vlc_object_t *obj, int fd,
     return 0;
 }
 
-static int SetupTuner (vlc_object_t *obj, int fd, uint32_t idx)
+int SetupTuner (vlc_object_t *obj, int fd, uint32_t idx)
 {
     struct v4l2_tuner tuner = { .index = idx };
 
