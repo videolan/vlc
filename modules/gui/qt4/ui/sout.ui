@@ -168,26 +168,6 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="sap">
-         <property name="text">
-          <string>SAP announce</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="sapName"/>
-       </item>
-       <item row="1" column="2">
-        <widget class="QLabel" name="sapGroupLabel">
-         <property name="text">
-          <string>Group name</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="3">
-        <widget class="QLineEdit" name="sapGroup"/>
-       </item>
       </layout>
      </widget>
     </item>
