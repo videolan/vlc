@@ -1145,32 +1145,17 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         [o_selectFolderPanel setMessage: _NS("Choose the folder to save your video snapshots to.")];
         [o_selectFolderPanel setCanCreateDirectories: YES];
         [o_selectFolderPanel setPrompt: _NS("Choose")];
-        [o_selectFolderPanel beginSheetForDirectory: nil file: nil modalForWindow: o_sprefs_win
-                                      modalDelegate: self
-                                     didEndSelector: @selector(savePanelDidEnd:returnCode:contextInfo:)
-                                        contextInfo: o_video_snap_folder_btn];
+        [o_selectFolderPanel beginSheetModalForWindow: o_sprefs_win completionHandler: ^(NSInteger returnCode) {
+            if( returnCode == NSOKButton )
+            {
+                [o_video_snap_folder_fld setStringValue: [[o_selectFolderPanel URL] path]];
+                b_videoSettingChanged = YES;
+            }
+        }];
+        [o_selectFolderPanel release];
     }
     else
         b_videoSettingChanged = YES;
-}
-
-- (void)savePanelDidEnd:(NSOpenPanel * )panel returnCode: (int)returnCode contextInfo: (void *)contextInfo
-{
-    if( returnCode == NSOKButton )
-    {
-        if( contextInfo == o_video_snap_folder_btn )
-        {
-            [o_video_snap_folder_fld setStringValue: [[o_selectFolderPanel URL] path]];
-            b_videoSettingChanged = YES;
-        }
-        else if( contextInfo == o_input_record_btn )
-        {
-            [o_input_record_fld setStringValue: [[o_selectFolderPanel URL] path]];
-            b_inputSettingChanged = YES;
-        }
-    }
-
-    [o_selectFolderPanel release];
 }
 
 - (void)showVideoSettings
@@ -1256,10 +1241,15 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         [o_selectFolderPanel setMessage: _NS("Choose the directory or filename where the records will be stored.")];
         [o_selectFolderPanel setCanCreateDirectories: YES];
         [o_selectFolderPanel setPrompt: _NS("Choose")];
-        [o_selectFolderPanel beginSheetForDirectory: nil file: nil modalForWindow: o_sprefs_win
-                                      modalDelegate: self
-                                     didEndSelector: @selector(savePanelDidEnd:returnCode:contextInfo:)
-                                        contextInfo: o_input_record_btn];
+        [o_selectFolderPanel beginSheetModalForWindow: o_sprefs_win completionHandler: ^(NSInteger returnCode) {
+            if( returnCode == NSOKButton )
+            {
+                [o_input_record_fld setStringValue: [[o_selectFolderPanel URL] path]];
+                b_inputSettingChanged = YES;
+            }
+        }];
+        [o_selectFolderPanel release];
+
         return;
     }
 
