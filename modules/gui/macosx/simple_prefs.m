@@ -275,6 +275,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_intf_fspanel_ckb setTitle: _NS("Show Fullscreen Controller")];
     [o_intf_network_box setTitle: _NS("Privacy / Network Interaction")];
     [o_intf_appleremote_ckb setTitle: _NS("Control playback with the Apple Remote")];
+    [o_intf_appleremote_sysvol_ckb setTitle: _NS("Control system volume with the Apple Remote")];
     [o_intf_mediakeys_ckb setTitle: _NS("Control playback with media keys")];
     [o_intf_update_ckb setTitle: _NS("Automatically check for updates")];
     [o_intf_last_update_lbl setStringValue: @""];
@@ -486,6 +487,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     [self setupButton: o_intf_embedded_ckb forBoolValue: "embedded-video"];
 
     [self setupButton: o_intf_appleremote_ckb forBoolValue: "macosx-appleremote"];
+    [self setupButton: o_intf_appleremote_sysvol_ckb forBoolValue: "macosx-appleremote-sysvol"];
 
     [self setupButton: o_intf_mediakeys_ckb forBoolValue: "macosx-mediakeys"];
     if( [[SUUpdater sharedUpdater] lastUpdateCheckDate] != NULL )
@@ -858,6 +860,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         config_PutInt( p_intf, "embedded-video", [o_intf_embedded_ckb state] );
 
         config_PutInt( p_intf, "macosx-appleremote", [o_intf_appleremote_ckb state] );
+        config_PutInt( p_intf, "macosx-appleremote-sysvol", [o_intf_appleremote_sysvol_ckb state]);
         config_PutInt( p_intf, "macosx-mediakeys", [o_intf_mediakeys_ckb state] );
         config_PutInt( p_intf, "macosx-interfacestyle", [o_intf_style_dark_bcell state] );
         config_PutInt( p_intf, "macosx-nativefullscreenmode", [o_intf_nativefullscreen_ckb state] );
