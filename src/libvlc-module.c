@@ -1379,6 +1379,8 @@ static const char *const ppsz_albumart_descriptions[] =
 #define SCALE_DOWN_KEY_LONGTEXT N_("Decrease scale factor.")
 #define DEINTERLACE_KEY_TEXT N_("Toggle deinterlacing")
 #define DEINTERLACE_KEY_LONGTEXT N_("Activate or deactivate deinterlacing.")
+#define DEINTERLACE_MODE_KEY_TEXT N_("Cycle deinterlace modes")
+#define DEINTERLACE_MODE_KEY_LONGTEXT N_("Cycle through available deinterlace modes.")
 #define INTF_TOGGLE_FSC_KEY_TEXT N_("Show controller in fullscreen")
 #define INTF_SHOW_KEY_TEXT N_("Show interface")
 #define INTF_SHOW_KEY_LONGTEXT N_("Raise the interface above all other windows.")
@@ -2211,6 +2213,7 @@ vlc_module_begin ()
 #   define KEY_SCALE_UP           "Alt+o"
 #   define KEY_SCALE_DOWN         "Shift+Alt+o"
 #   define KEY_DEINTERLACE        "d"
+#   define KEY_DEINTERLACE_MODE   "Shift+d"
 #   define KEY_INTF_TOGGLE_FSC    "i"
 #   define KEY_INTF_BOSS          NULL
 #   define KEY_DISC_MENU          "Ctrl+m"
@@ -2329,6 +2332,7 @@ vlc_module_begin ()
 #   define KEY_SCALE_UP           "Alt+o"
 #   define KEY_SCALE_DOWN         "Alt+Shift+o"
 #   define KEY_DEINTERLACE        "d"
+#   define KEY_DEINTERLACE_MODE   "Shift+d"
 #   define KEY_INTF_TOGGLE_FSC    "i"
 #   define KEY_INTF_BOSS          NULL
 #   define KEY_DISC_MENU          "Shift+m"
@@ -2501,6 +2505,8 @@ vlc_module_begin ()
              SCALE_DOWN_KEY_TEXT, SCALE_DOWN_KEY_LONGTEXT, false )
     add_key( "key-deinterlace", KEY_DEINTERLACE,
              DEINTERLACE_KEY_TEXT, DEINTERLACE_KEY_LONGTEXT, false )
+    add_key( "key-deinterlace-mode", KEY_DEINTERLACE_MODE,
+             DEINTERLACE_MODE_KEY_TEXT, DEINTERLACE_MODE_KEY_LONGTEXT, false )
     add_key( "key-intf-show", KEY_INTF_TOGGLE_FSC,
              INTF_TOGGLE_FSC_KEY_TEXT, INTF_TOGGLE_FSC_KEY_TEXT, false )
     add_obsolete_inner( "key-intf-hide", CONFIG_ITEM_KEY )

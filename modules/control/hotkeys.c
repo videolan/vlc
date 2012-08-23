@@ -670,6 +670,42 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                     free( psz_mode );
                 }
             }
+            else if( i_action == ACTIONID_DEINTERLACE_MODE && p_vout )
+            {
+                char *psz_mode = var_GetString( p_vout, "deinterlace-mode" );
+                vlc_value_t vlist, tlist;
+                if( psz_mode && !var_Change( p_vout, "deinterlace-mode", VLC_VAR_GETCHOICES, &vlist, &tlist ) >= 0 )
+                {
+                    const char *psz_text = NULL;
+                    int i;
+                    for( i = 0; i < vlist.p_list->i_count; i++ )
+                    {
+                        if( !strcmp( vlist.p_list->p_values[i].psz_string, psz_mode ) )
+                        {
+                            i++;
+                            break;
+                        }
+                    }
+                    if( i == vlist.p_list->i_count ) i = 0;
+                    psz_text = tlist.p_list->p_values[i].psz_string;
+                    var_SetString( p_vout, "deinterlace-mode", vlist.p_list->p_values[i].psz_string );
+
+                    int i_deinterlace = var_GetInteger( p_vout, "deinterlace" );
+                    if( i_deinterlace != 0 )
+                    {
+                      DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
+                                      "%s (%s)", _("Deinterlace on"), psz_text ? psz_text : psz_mode );
+                    }
+                    else
+                    {
+                      DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
+                                      "%s (%s)", _("Deinterlace off"), psz_text ? psz_text : psz_mode );
+                    }
+
+                    var_FreeList( &vlist, &tlist );
+                }
+                free( psz_mode );
+            }
             else if( ( i_action == ACTIONID_ZOOM ||
                        i_action == ACTIONID_UNZOOM ) && p_vout )
             {

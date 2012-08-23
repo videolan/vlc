@@ -263,6 +263,7 @@ static const struct action actions[] =
     { "crop-top", ACTIONID_CROP_TOP, },
     { "decr-scalefactor", ACTIONID_SCALE_DOWN, },
     { "deinterlace", ACTIONID_DEINTERLACE, },
+    { "deinterlace-mode", ACTIONID_DEINTERLACE_MODE, },
     { "disc-menu", ACTIONID_DISC_MENU, },
     { "faster", ACTIONID_FASTER, },
     { "frame-next", ACTIONID_FRAME_NEXT, },
