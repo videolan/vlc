@@ -382,11 +382,11 @@ void matroska_segment_c::InformationCreate( )
     {
         vlc_meta_SetTitle( sys.meta, psz_title );
     }
+#if 0
     if( psz_date_utc )
     {
         vlc_meta_SetDate( sys.meta, psz_date_utc );
     }
-#if 0
 
     if( psz_segment_filename )
     {
