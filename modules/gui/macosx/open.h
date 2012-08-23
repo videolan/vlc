@@ -210,6 +210,8 @@
     IBOutlet id o_screen_height_lbl;
     IBOutlet id o_screen_height_stp;
     IBOutlet id o_screen_follow_mouse_ckb;
+    IBOutlet id o_screen_qtk_audio_pop;
+    IBOutlet id o_screen_qtk_audio_ckb;
 
     /* QTK support */
     IBOutlet id o_qtk_view;

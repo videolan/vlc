@@ -210,6 +210,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_screen_width_lbl setStringValue: _NS("Subscreen width:")];
     [o_screen_height_lbl setStringValue: _NS("Subscreen height:")];
     [o_screen_follow_mouse_ckb setTitle: _NS("Follow the mouse")];
+    [o_screen_qtk_audio_ckb setTitle: _NS("Capture Audio")];
     [o_eyetv_currentChannel_lbl setStringValue: _NS("Current channel:")];
     [o_eyetv_previousProgram_btn setTitle: _NS("Previous Channel")];
     [o_eyetv_nextProgram_btn setTitle: _NS("Next Channel")];
@@ -249,6 +250,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     [self qtkaudioDevices];
     [o_qtk_audio_device_pop removeAllItems];
+    [o_screen_qtk_audio_pop removeAllItems];
     msg_Dbg( VLCIntf, "Found %lu audio capture devices", [qtkaudioDevices count] );
 
     if([qtkaudioDevices count] >= 1)
@@ -262,14 +264,17 @@ static VLCOpen *_o_sharedMainInstance = nil;
             QTCaptureDevice *qtkaudio_device;
             qtkaudio_device = [qtkaudioDevices objectAtIndex:iaudio];
             [o_qtk_audio_device_pop addItemWithTitle: [qtkaudio_device localizedDisplayName]];
+            [o_screen_qtk_audio_pop addItemWithTitle: [qtkaudio_device localizedDisplayName]];
             if([[[qtkaudio_device uniqueID]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtkaudio_currdevice_uid]){
                 [o_qtk_audio_device_pop selectItemAtIndex:iaudio];
+                [o_screen_qtk_audio_pop selectItemAtIndex:iaudio];
             }
         }
     }
     else
     {
         [o_qtk_audio_device_pop addItemWithTitle: _NS("None")];
+        [o_screen_qtk_audio_pop addItemWithTitle: _NS("None")];
         [qtkaudio_currdevice_uid release];
     }
 
@@ -503,6 +508,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
                     [o_options addObject: @"screen-follow-mouse"];
                 else
                     [o_options addObject: @"no-screen-follow-mouse"];
+                if ([o_screen_qtk_audio_ckb state] && qtkaudio_currdevice_uid)
+                   [o_options addObject: [NSString stringWithFormat: @"input-slave=qtsound://%@", qtkaudio_currdevice_uid]];
             }
             else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Input Devices")] )
             {
@@ -537,6 +544,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_screen_top_stp setMaxValue: item->rect.size.height];
     [o_screen_width_stp setMaxValue: item->rect.size.width];
     [o_screen_height_stp setMaxValue: item->rect.size.height];
+
+    [o_screen_qtk_audio_pop setEnabled: [o_screen_qtk_audio_ckb state]];
 }
 
 - (IBAction)qtkChanged:(id)sender
@@ -556,11 +565,13 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (IBAction)qtkAudioChanged:(id)sender
 {
-    NSInteger i_selectedDevice = [o_qtk_audio_device_pop indexOfSelectedItem];
+    NSInteger i_selectedDevice = [sender indexOfSelectedItem];
     if( [qtkaudioDevices count] >= 1 )
     {
         qtkaudio_currdevice_uid = [[(QTCaptureDevice *)[qtkaudioDevices objectAtIndex:i_selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
+    [o_screen_qtk_audio_pop selectItemAtIndex: i_selectedDevice];
+    [o_qtk_audio_device_pop selectItemAtIndex: i_selectedDevice];
 }
 
 - (IBAction)qtkToggleUIElements:(id)sender
