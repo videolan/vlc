@@ -517,9 +517,9 @@
 
     [o_save_panel setTitle: _NS("Save File")];
     [o_save_panel setPrompt: _NS("Save")];
+    [o_save_panel setNameFieldStringValue: o_name];
 
-    if( [o_save_panel runModalForDirectory: nil
-            file: o_name] == NSOKButton )
+    if( [o_save_panel runModal] == NSFileHandlingPanelOKButton )
     {
         NSString *o_filename = [[o_save_panel URL] path];
         [o_file_field setStringValue: o_filename];
@@ -604,9 +604,8 @@
         [o_transcode_string appendString:@"}:"];
     }
     else
-    {
-        o_transcode_string = [NSString stringWithString:@""];
-    }
+        [o_transcode_string setString: @""];
+
     [self setTranscode: o_transcode_string];
     [self outputInfoChanged:nil];
 }
