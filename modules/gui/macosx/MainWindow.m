@@ -316,11 +316,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     b_show_jump_buttons = config_GetInt( VLCIntf, "macosx-show-playback-buttons" );
     if (b_show_jump_buttons)
-        [self addJumpButtons];
+        [self addJumpButtons:YES];
 
     b_show_playmode_buttons = config_GetInt( VLCIntf, "macosx-show-playmode-buttons" );
     if (!b_show_playmode_buttons)
-        [self removePlaymodeButtons];
+        [self removePlaymodeButtons:YES];
 
     /* interface builder action */
     float f_threshold_height = f_min_video_height + [o_bottombar_view frame].size.height;
@@ -645,12 +645,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
     b_show_jump_buttons = config_GetInt( VLCIntf, "macosx-show-playback-buttons" );
 
     if (b_show_jump_buttons)
-        [self addJumpButtons];
+        [self addJumpButtons:NO];
     else
-        [self removeJumpButtons];
+        [self removeJumpButtons:NO];
 }
 
-- (void)addJumpButtons
+- (void)addJumpButtons:(BOOL)b_fast
 {
     NSRect preliminaryFrame = [o_bwd_btn frame];
     BOOL b_enabled = [o_bwd_btn isEnabled];
@@ -682,7 +682,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     #define moveItem( item ) \
     frame = [item frame]; \
     frame.origin.x = frame.origin.x + f_space; \
-    [[item animator] setFrame: frame]
+    if( b_fast ) \
+        [item setFrame: frame]; \
+    else \
+        [[item animator] setFrame: frame]
 
     moveItem( o_bwd_btn );
     moveItem( o_play_btn );
@@ -698,7 +701,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     frame = [item frame]; \
     frame.size.width = frame.size.width - f_space; \
     frame.origin.x = frame.origin.x + f_space; \
-    [[item animator] setFrame: frame]
+    if( b_fast ) \
+        [item setFrame: frame]; \
+    else \
+        [[item animator] setFrame: frame]
 
     resizeItem( o_time_sld );
     resizeItem( o_progress_bar );
@@ -709,21 +715,31 @@ static VLCMainWindow *_o_sharedInstance = nil;
     preliminaryFrame.origin.x = [o_next_btn frame].origin.x + 80. + [o_fwd_btn frame].size.width;
     [o_next_btn setFrame: preliminaryFrame];
 
-    // wait until the animation is done
-    [[self contentView] performSelector:@selector(addSubview:) withObject:o_prev_btn afterDelay:.2];
-    [[self contentView] performSelector:@selector(addSubview:) withObject:o_next_btn afterDelay:.2];
+    // wait until the animation is done, if displayed
+    if (b_fast) {
+        [[self contentView] addSubview:o_prev_btn];
+        [[self contentView] addSubview:o_next_btn];
+    } else {
+        [[self contentView] performSelector:@selector(addSubview:) withObject:o_prev_btn afterDelay:.2];
+        [[self contentView] performSelector:@selector(addSubview:) withObject:o_next_btn afterDelay:.2];
+    }
 
     [o_fwd_btn setAction:@selector(forward:)];
     [o_bwd_btn setAction:@selector(backward:)];
 }
 
-- (void)removeJumpButtons
+- (void)removeJumpButtons:(BOOL)b_fast
 {
     if (!o_prev_btn || !o_next_btn )
         return;
 
-    [[o_prev_btn animator] setHidden: YES];
-    [[o_next_btn animator] setHidden: YES];
+    if( b_fast ) {
+        [o_prev_btn setHidden: YES];
+        [o_next_btn setHidden: YES];
+    } else {
+        [[o_prev_btn animator] setHidden: YES];
+        [[o_next_btn animator] setHidden: YES];
+    }
     [o_prev_btn removeFromSuperviewWithoutNeedingDisplay];
     [o_next_btn removeFromSuperviewWithoutNeedingDisplay];
     [o_prev_btn release];
@@ -734,7 +750,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     #define moveItem( item ) \
     frame = [item frame]; \
     frame.origin.x = frame.origin.x - f_space; \
-    [[item animator] setFrame: frame]
+    if( b_fast ) \
+        [item setFrame: frame]; \
+    else \
+        [[item animator] setFrame: frame]
 
     moveItem( o_bwd_btn );
     moveItem( o_play_btn );
@@ -750,7 +769,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     frame = [item frame]; \
     frame.size.width = frame.size.width + f_space; \
     frame.origin.x = frame.origin.x - f_space; \
-    [[item animator] setFrame: frame]
+    if( b_fast ) \
+        [item setFrame: frame]; \
+    else \
+        [[item animator] setFrame: frame]
 
     resizeItem( o_time_sld );
     resizeItem( o_progress_bar );
@@ -769,12 +791,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
     b_show_playmode_buttons = config_GetInt( VLCIntf, "macosx-show-playmode-buttons" );
 
     if (b_show_playmode_buttons)
-        [self addPlaymodeButtons];
+        [self addPlaymodeButtons:NO];
     else
-        [self removePlaymodeButtons];
+        [self removePlaymodeButtons:NO];
 }
 
-- (void)addPlaymodeButtons
+- (void)addPlaymodeButtons:(BOOL)b_fast
 {
     NSRect frame;
     float f_space = [o_repeat_btn frame].size.width + [o_shuffle_btn frame].size.width - 6.;
@@ -785,7 +807,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     frame = [item frame]; \
     frame.size.width = frame.size.width - f_space; \
     frame.origin.x = frame.origin.x + f_space; \
-    [[item animator] setFrame: frame]
+    if( b_fast ) \
+        [item setFrame: frame]; \
+    else \
+        [[item animator] setFrame: frame]
 
     resizeItem( o_time_sld );
     resizeItem( o_progress_bar );
@@ -793,11 +818,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
     resizeItem( o_time_sld_fancygradient_view );
     #undef resizeItem
 
-    [[o_repeat_btn animator] setHidden: NO];
-    [[o_shuffle_btn animator] setHidden: NO];
+    if (b_fast) {
+        [o_repeat_btn setHidden: NO];
+        [o_shuffle_btn setHidden: NO];
+    } else {
+        [[o_repeat_btn animator] setHidden: NO];
+        [[o_shuffle_btn animator] setHidden: NO];
+    }
 }
 
-- (void)removePlaymodeButtons
+- (void)removePlaymodeButtons:(BOOL)b_fast
 {
     NSRect frame;
     float f_space = [o_repeat_btn frame].size.width + [o_shuffle_btn frame].size.width - 6.;
@@ -810,7 +840,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     frame = [item frame]; \
     frame.size.width = frame.size.width + f_space; \
     frame.origin.x = frame.origin.x - f_space; \
-    [[item animator] setFrame: frame]
+    if( b_fast ) \
+        [item setFrame: frame]; \
+    else \
+        [[item animator] setFrame: frame]
 
     resizeItem( o_time_sld );
     resizeItem( o_progress_bar );
