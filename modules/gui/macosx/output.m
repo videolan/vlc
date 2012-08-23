@@ -571,12 +571,12 @@
 
 - (void)transcodeInfoChanged:(NSNotification *)o_notification
 {
-    NSMutableString *o_transcode_string;
+    NSMutableString *o_transcode_string = [NSMutableString stringWithCapacity:200];
 
     if( [o_transcode_video_chkbox state] == NSOnState ||
         [o_transcode_audio_chkbox state] == NSOnState )
     {
-        o_transcode_string = [NSMutableString stringWithString:@"transcode{"];
+        [o_transcode_string appendString:@"transcode{"];
         if ( [o_transcode_video_chkbox state] == NSOnState )
         {
             [o_transcode_string appendFormat: @"vcodec=\"%@\",vb=\"%@\"" \
