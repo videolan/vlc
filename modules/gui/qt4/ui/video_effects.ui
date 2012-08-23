@@ -1785,6 +1785,13 @@
       </property>
      </widget>
     </item>
+    <item row="8" column="2">
+     <widget class="QCheckBox" name="anaglyphEnable">
+      <property name="text">
+       <string>Anaglyph 3D</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
  </widget>
