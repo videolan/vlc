@@ -91,7 +91,7 @@ void RecentsMRL::addRecent( const QString &mrl )
     char* path = make_path( qtu( mrl ) );
     if( path )
     {
-        SHAddToRecentDocs( SHARD_PATHW, path );
+        SHAddToRecentDocs( SHARD_PATHW, mrl.utf16() );
         free( path );
     }
 #endif
