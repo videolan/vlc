@@ -1099,7 +1099,8 @@ static void LoadSlaves( input_thread_t *p_input )
         if( *psz == 0 )
             break;
 
-        char *uri = vlc_path2uri( psz, NULL );
+        char *uri = strstr(psz, "://")
+                                   ? strdup( psz ) : vlc_path2uri( psz, NULL );
         psz = psz_delim;
         if( uri == NULL )
             continue;
