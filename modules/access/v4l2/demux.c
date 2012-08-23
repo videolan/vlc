@@ -30,7 +30,6 @@
 #include <math.h>
 #include <errno.h>
 #include <assert.h>
-#include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #ifndef MAP_ANONYMOUS
@@ -40,7 +39,6 @@
 
 #include <vlc_common.h>
 #include <vlc_demux.h>
-#include <vlc_fs.h>
 
 #include "v4l2.h"
 
@@ -65,7 +63,7 @@ static void *UserPtrThread (void *);
 static void *MmapThread (void *);
 static void *ReadThread (void *);
 static int DemuxControl( demux_t *, int, va_list );
-static int InitVideo (demux_t *, int);
+static int InitVideo (demux_t *, int fd, uint32_t caps);
 
 int DemuxOpen( vlc_object_t *obj )
 {
@@ -81,27 +79,15 @@ int DemuxOpen( vlc_object_t *obj )
     char *path = var_InheritString (obj, CFG_PREFIX"dev");
     if (unlikely(path == NULL))
         goto error; /* probably OOM */
-    msg_Dbg (obj, "opening device '%s'", path);
 
-    int rawfd = vlc_open (path, O_RDWR);
-    if (rawfd == -1)
-    {
-        msg_Err (obj, "cannot open device '%s': %m", path);
-        free (path);
-        goto error;
-    }
+    uint32_t caps;
+    int fd = OpenDevice (obj, path, &caps);
     free (path);
-
-    int fd = v4l2_fd_open (rawfd, 0);
     if (fd == -1)
-    {
-        msg_Warn (obj, "cannot initialize user-space library: %m");
-        /* fallback to direct kernel mode anyway */
-        fd = rawfd;
-    }
+        goto error;
     sys->fd = fd;
 
-    if (InitVideo (demux, fd))
+    if (InitVideo (demux, fd, caps))
     {
         v4l2_close (fd);
         goto error;
@@ -275,37 +261,10 @@ static void GetAR (int fd, unsigned *restrict num, unsigned *restrict den)
     *den = cropcap.pixelaspect.denominator;
 }
 
-static int InitVideo (demux_t *demux, int fd)
+static int InitVideo (demux_t *demux, int fd, uint32_t caps)
 {
     demux_sys_t *sys = demux->p_sys;
 
-    /* Get device capabilites */
-    struct v4l2_capability cap;
-    if (v4l2_ioctl (fd, VIDIOC_QUERYCAP, &cap) < 0)
-    {
-        msg_Err (demux, "cannot get device capabilities: %m");
-        return -1;
-    }
-
-    msg_Dbg (demux, "device %s using driver %s (version %u.%u.%u) on %s",
-            cap.card, cap.driver, (cap.version >> 16) & 0xFF,
-            (cap.version >> 8) & 0xFF, cap.version & 0xFF, cap.bus_info);
-
-    uint32_t caps;
-#ifdef V4L2_CAP_DEVICE_CAPS
-    if (cap.capabilities & V4L2_CAP_DEVICE_CAPS)
-    {
-        msg_Dbg (demux, " with capabilities 0x%08"PRIX32" "
-                 "(overall 0x%08"PRIX32")", cap.device_caps, cap.capabilities);
-        caps = cap.device_caps;
-    }
-    else
-#endif
-    {
-        msg_Dbg (demux, " with unknown capabilities  "
-                 "(overall 0x%08"PRIX32")", cap.capabilities);
-        caps = cap.capabilities;
-    }
     if (!(caps & V4L2_CAP_VIDEO_CAPTURE))
     {
         msg_Err (demux, "not a video capture device");

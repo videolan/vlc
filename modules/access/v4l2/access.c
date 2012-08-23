@@ -29,12 +29,10 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <fcntl.h>
 #include <poll.h>
 
 #include <vlc_common.h>
 #include <vlc_access.h>
-#include <vlc_fs.h>
 
 #include "v4l2.h"
 
@@ -54,7 +52,7 @@ struct access_sys_t
 static block_t *AccessRead( access_t * );
 static ssize_t AccessReadStream( access_t *, uint8_t *, size_t );
 static int AccessControl( access_t *, int, va_list );
-static int InitVideo(access_t *, int);
+static int InitVideo(access_t *, int, uint32_t);
 
 int AccessOpen( vlc_object_t *obj )
 {
@@ -72,27 +70,15 @@ int AccessOpen( vlc_object_t *obj )
     char *path = var_InheritString (obj, CFG_PREFIX"dev");
     if (unlikely(path == NULL))
         goto error; /* probably OOM */
-    msg_Dbg (obj, "opening device '%s'", path);
 
-    int rawfd = vlc_open (path, O_RDWR);
-    if (rawfd == -1)
-    {
-        msg_Err (obj, "cannot open device '%s': %m", path);
-        free (path);
-        goto error;
-    }
+    uint32_t caps;
+    int fd = OpenDevice (obj, path, &caps);
     free (path);
-
-    int fd = v4l2_fd_open (rawfd, 0);
     if (fd == -1)
-    {
-        msg_Warn (obj, "cannot initialize user-space library: %m");
-        /* fallback to direct kernel mode anyway */
-        fd = rawfd;
-    }
+        goto error;
     sys->fd = fd;
 
-    if (InitVideo (access, fd))
+    if (InitVideo (access, fd, caps))
     {
         v4l2_close (fd);
         goto error;
@@ -106,34 +92,11 @@ error:
     return VLC_EGENERIC;
 }
 
-int InitVideo (access_t *access, int fd)
+int InitVideo (access_t *access, int fd, uint32_t caps)
 {
     access_sys_t *sys = access->p_sys;
 
-    /* Get device capabilites */
-    struct v4l2_capability cap;
-    if (v4l2_ioctl (fd, VIDIOC_QUERYCAP, &cap) < 0)
-    {
-        msg_Err (access, "cannot get device capabilities: %m");
-        return -1;
-    }
-
-    msg_Dbg (access, "device %s using driver %s (version %u.%u.%u) on %s",
-             cap.card, cap.driver, (cap.version >> 16) & 0xFF,
-             (cap.version >> 8) & 0xFF, cap.version & 0xFF, cap.bus_info);
-    msg_Dbg (access, "the device has the capabilities: 0x%08X",
-             cap.capabilities);
-    msg_Dbg (access, " (%c) Video Capture, (%c) Audio, (%c) Tuner, (%c) Radio",
-             (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE  ? 'X':' '),
-             (cap.capabilities & V4L2_CAP_AUDIO  ? 'X':' '),
-             (cap.capabilities & V4L2_CAP_TUNER  ? 'X':' '),
-             (cap.capabilities & V4L2_CAP_RADIO  ? 'X':' '));
-    msg_Dbg (access, " (%c) Read/Write, (%c) Streaming, (%c) Asynchronous",
-             (cap.capabilities & V4L2_CAP_READWRITE ? 'X':' '),
-             (cap.capabilities & V4L2_CAP_STREAMING ? 'X':' '),
-             (cap.capabilities & V4L2_CAP_ASYNCIO ? 'X':' '));
-
-    if (!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE))
+    if (!(caps & V4L2_CAP_VIDEO_CAPTURE))
     {
         msg_Err (access, "not a video capture device");
         return -1;
@@ -178,7 +141,7 @@ int InitVideo (access_t *access, int fd)
     }
 
     /* Init I/O method */
-    if (cap.capabilities & V4L2_CAP_STREAMING)
+    if (caps & V4L2_CAP_STREAMING)
     {
         sys->bufc = 4;
         sys->bufv = StartMmap (VLC_OBJECT(access), fd, &sys->bufc);
@@ -186,7 +149,7 @@ int InitVideo (access_t *access, int fd)
             return -1;
         access->pf_block = AccessRead;
     }
-    else if (cap.capabilities & V4L2_CAP_READWRITE)
+    else if (caps & V4L2_CAP_READWRITE)
     {
         sys->blocksize = fmt.fmt.pix.sizeimage;
         sys->bufv = NULL;

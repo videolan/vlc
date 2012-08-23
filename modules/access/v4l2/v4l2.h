@@ -79,6 +79,7 @@ struct buffer_t
 
 /* v4l2.c */
 void ParseMRL(vlc_object_t *, const char *);
+int OpenDevice (vlc_object_t *, const char *, uint32_t *);
 v4l2_std_id var_InheritStandard (vlc_object_t *, const char *);
 
 /* video.c */
