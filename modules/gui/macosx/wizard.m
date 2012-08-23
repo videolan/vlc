@@ -1626,18 +1626,10 @@ static VLCWizard *_o_sharedInstance = nil;
 {
     NSOpenPanel * openPanel = [NSOpenPanel openPanel];
     SEL sel = @selector(t2_getNewStreamFromDialog:returnCode:contextInfo:);
-    [openPanel beginSheetForDirectory:nil file:nil types:nil modalForWindow:
-        o_wizard_window modalDelegate:self didEndSelector:sel contextInfo:nil];
-}
-
-- (void)t2_getNewStreamFromDialog: (NSOpenPanel *)sheet
-                       returnCode: (int)returnCode
-                      contextInfo: (void *)contextInfo
-{
-    if (returnCode == NSOKButton)
-    {
-        [o_t2_fld_pathToNewStrm setStringValue: [[sheet URL] absoluteString]];
-    }
+    [openPanel beginSheetModalForWindow: o_wizard_window completionHandler: ^(NSInteger returnCode) {
+        if (returnCode == NSOKButton)
+            [o_t2_fld_pathToNewStrm setStringValue: [[openPanel URL] absoluteString]];
+    }];
 }
 
 - (IBAction)t2_chooseStreamOrPlst:(id)sender
@@ -1830,8 +1822,6 @@ static VLCWizard *_o_sharedInstance = nil;
      * his/her new file. We take a modified NSOpenPanel to select a folder
      * and a plain NSSavePanel to save a single file. */
 
-    SEL sel = @selector(t7_getTrnscdDestFile:returnCode:contextInfo:);
-
     if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
     {
         NSOpenPanel * saveFolderPanel = [[NSOpenPanel alloc] init];
@@ -1840,8 +1830,11 @@ static VLCWizard *_o_sharedInstance = nil;
         [saveFolderPanel setCanChooseFiles: NO];
         [saveFolderPanel setCanSelectHiddenExtension: NO];
         [saveFolderPanel setCanCreateDirectories: YES];
-        [saveFolderPanel beginSheetForDirectory:nil file:nil modalForWindow:
-        o_wizard_window modalDelegate:self didEndSelector:sel contextInfo:nil];
+        [saveFolderPanel beginSheetModalForWindow: o_wizard_window completionHandler:^(NSInteger returnCode) {
+            if (returnCode == NSOKButton)
+                [o_t7_fld_filePath setStringValue: [NSString stringWithFormat: @"%@/", [[saveFolderPanel URL] path]]];
+        }];
+        [saveFolderPanel release];
     }
     else
     {
@@ -1860,25 +1853,12 @@ static VLCWizard *_o_sharedInstance = nil;
 
         [saveFilePanel setCanSelectHiddenExtension: YES];
         [saveFilePanel setCanCreateDirectories: YES];
-        [saveFilePanel beginSheetForDirectory:nil file:nil modalForWindow:
-        o_wizard_window modalDelegate:self didEndSelector:sel contextInfo:nil];
+        [saveFilePanel beginSheetModalForWindow: o_wizard_window completionHandler:^(NSInteger returnCode) {
+            if (returnCode == NSOKButton)
+                [o_t7_fld_filePath setStringValue:[[saveFilePanel URL] path]];
+        }];
+        [saveFilePanel release];
     }
-}
-
-- (void)t7_getTrnscdDestFile: (NSOpenPanel *)sheet returnCode:
-    (int)returnCode contextInfo: (void *)contextInfo
-{
-    if (returnCode == NSOKButton)
-    {
-        /* output returned path to text-field, add a / to the end if the user
-         * selected a folder */
-        if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
-            [o_t7_fld_filePath setStringValue: [NSString stringWithFormat:
-                @"%@/", [[sheet URL] path]]];
-        else
-            [o_t7_fld_filePath setStringValue:[[sheet URL] path]];
-    }
-    [sheet release];
 }
 
 @end
