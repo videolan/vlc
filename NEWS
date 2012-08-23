@@ -76,6 +76,7 @@ Mac OS X Port:
 
 Mac OS X Interface:
  * add a GUI for the QTSound access module to process audio captured locally
+   - This also allows to capture input from a webcam and a mic at the same time.
  * add an option to let the Apple Remote control the system volume instead of
    VLC's internal volume level
  * add an option to show next / previous buttons
