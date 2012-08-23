@@ -1041,10 +1041,16 @@ static VLCMain *_o_sharedMainInstance = nil;
                     var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_VOL_DOWN );
             break;
         case kRemoteButtonRight:
-            [[VLCCoreInteraction sharedInstance] next];
+            if (config_GetInt( VLCIntf, "macosx-appleremote-prevnext"))
+                [[VLCCoreInteraction sharedInstance] forward];
+            else
+                [[VLCCoreInteraction sharedInstance] next];
             break;
         case kRemoteButtonLeft:
-            [[VLCCoreInteraction sharedInstance] previous];
+            if (config_GetInt( VLCIntf, "macosx-appleremote-prevnext"))
+                [[VLCCoreInteraction sharedInstance] backward];
+            else
+                [[VLCCoreInteraction sharedInstance] previous];
             break;
         case kRemoteButtonRight_Hold:
         case kRemoteButtonLeft_Hold:

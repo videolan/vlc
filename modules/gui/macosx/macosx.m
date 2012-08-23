@@ -82,6 +82,9 @@ void WindowClose  ( vout_window_t * );
 #define USE_APPLE_REMOTE_VOLUME_TEXT N_("Control system volume with the Apple Remote")
 #define USE_APPLE_REMOTE_VOLUME_LONGTEXT N_("By default, VLC will control its own volume with the Apple Remote. However, you can choose to control the global system volume instead.")
 
+#define USE_APPLE_REMOTE_PREVNEXT_TEXT N_("Control playlist items with the Apple Remote")
+#define USE_APPLE_REMOTE_PREVNEXT_LONGTEXT N_("By default, VLC will allow you to switch to the next or previous item with the Apple Remote. Remote. You can disable this behavior with this option.")
+
 #define USE_MEDIAKEYS_TEXT N_("Control playback with media keys")
 #define USE_MEDIAKEYS_LONGTEXT N_("By default, VLC can be controlled using the media keys on modern Apple " \
                                   "keyboards.")
@@ -128,6 +131,7 @@ vlc_module_begin ()
     add_bool( "macosx-fspanel", true, FSPANEL_TEXT, FSPANEL_LONGTEXT, false )
     add_bool( "macosx-appleremote", true, USE_APPLE_REMOTE_TEXT, USE_APPLE_REMOTE_LONGTEXT, false )
     add_bool( "macosx-appleremote-sysvol", false, USE_APPLE_REMOTE_VOLUME_TEXT, USE_APPLE_REMOTE_VOLUME_LONGTEXT, false )
+    add_bool( "macosx-appleremote-prevnext", false, USE_APPLE_REMOTE_PREVNEXT_TEXT, USE_APPLE_REMOTE_PREVNEXT_LONGTEXT, false )
     add_bool( "macosx-mediakeys", true, USE_MEDIAKEYS_TEXT, USE_MEDIAKEYS_LONGTEXT, false )
     add_bool( "macosx-interfacestyle", false, INTERFACE_STYLE_TEXT, INTERFACE_STYLE_LONGTEXT, false )
     add_bool( "macosx-nativefullscreenmode", false, NATIVE_FULLSCREEN_MODE_ON_LION_TEXT, NATIVE_FULLSCREEN_MODE_ON_LION_LONGTEXT, false )

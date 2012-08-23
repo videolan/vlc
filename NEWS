@@ -79,6 +79,7 @@ Mac OS X Interface:
    - This also allows to capture input from a webcam and a mic at the same time.
  * add an option to let the Apple Remote control the system volume instead of
    VLC's internal volume level
+ * add an option to disable skipping to next/previous file with the Apple Remote
  * add an option to show next / previous buttons
  * add an option to hide the shuffle and repeat buttons
  * add optional playlist columns for track number, genre, album, description,
