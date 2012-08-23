@@ -126,6 +126,7 @@
     IBOutlet id o_addlogo_pos_pop;
     IBOutlet id o_addlogo_transparency_lbl;
     IBOutlet id o_addlogo_transparency_sld;
+    IBOutlet id o_anaglyph_ckb;
 }
 
 /* generic */
@@ -184,4 +185,5 @@
 - (IBAction)addTextModifierChanged:(id)sender;
 - (IBAction)enableAddLogo:(id)sender;
 - (IBAction)addLogoModifierChanged:(id)sender;
+- (IBAction)enableAnaglyph:(id)sender;
 @end

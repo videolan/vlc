@@ -936,7 +936,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [self setVideoFilter: "psychedelic" on: [o_psychedelic_ckb state]];
 }
 
-
 #pragma mark -
 #pragma mark Miscellaneous
 - (IBAction)enableAddText:(id)sender
@@ -984,6 +983,11 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         [self setVideoFilterProperty: "logo-opacity" forFilter: "logo" integer: [o_addlogo_transparency_sld intValue]];
         [o_addlogo_transparency_sld setToolTip: [NSString stringWithFormat:@"%i", [o_addlogo_transparency_sld intValue]]];
     }
+}
+
+- (IBAction)enableAnaglyph:(id)sender
+{
+    [self setVideoFilter: "anaglyph" on: [o_anaglyph_ckb state]];
 }
 
 @end
