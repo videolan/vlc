@@ -215,7 +215,7 @@ typedef union
 # define VLC_ATOMIC_INIT(val) { (val) }
 
 /* All functions return the atom value _after_ the operation. */
-static inline uintptr_t vlc_atomic_get(const vlc_atomic_t *atom)
+static inline uintptr_t vlc_atomic_get(vlc_atomic_t *atom)
 {
     return atomic_load(&atom->u);
 }
@@ -258,7 +258,7 @@ static inline uintptr_t vlc_atomic_compare_swap(vlc_atomic_t *atom,
 }
 
 /** Helper to retrieve a single precision from an atom. */
-static inline float vlc_atomic_getf(const vlc_atomic_t *atom)
+static inline float vlc_atomic_getf(vlc_atomic_t *atom)
 {
     union { float f; uintptr_t i; } u;
     u.i = vlc_atomic_get(atom);
