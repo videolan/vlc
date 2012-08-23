@@ -84,7 +84,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
 #define CC( x ) CONNECT( ui.x, currentIndexChanged( int ), this, updateMRL() );
 
     /* Misc */
-    CB( soutAll );  CS( ttl ); CT( sapName ); CT( sapGroup );
+    CB( soutAll );  CT( sapName ); CT( sapGroup );
     CB( localOutput ); CB( transcodeBox );
     CONNECT( ui.profileSelect, optionsChanged(), this, updateMRL() );
 
@@ -245,7 +245,6 @@ void SoutDialog::updateMRL()
 
     if( ui.soutAll->isChecked() ) mrl.append( " :sout-all" );
 
-    mrl.append( " :ttl=" + QString::number( ui.ttl->value() ) );
     mrl.append( " :sout-keep" );
 
     ui.mrlEdit->setPlainText( mrl );

@@ -188,26 +188,6 @@
        <item row="1" column="3">
         <widget class="QLineEdit" name="sapGroup"/>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="ttlLabel">
-         <property name="text">
-          <string>Time-To-Live (TTL)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QSpinBox" name="ttl">
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>255</number>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
     </item>
