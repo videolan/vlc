@@ -69,16 +69,10 @@
 #include <oggflacfile.h>
 #include "../demux/vorbis.h"
 
-#if TAGLIB_VERSION >= VERSION_INT(1,6,0)
-# define TAGLIB_HAVE_AIFF_WAV_H
-# include <aifffile.h>
-# include <wavfile.h>
-#else
-# include <id3v2tag.h>
-#endif
+#include <aifffile.h>
+#include <wavfile.h>
 
-#if TAGLIB_VERSION >= VERSION_INT(1,6,1) && defined(TAGLIB_WITH_MP4)
-# define TAGLIB_HAVE_MP4COVERTART_H
+#if defined(TAGLIB_WITH_MP4)
 # include <mp4file.h>
 #endif
 
@@ -479,7 +473,7 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
 }
 
 
-#ifdef TAGLIB_HAVE_MP4COVERTART_H
+#if defined(TAGLIB_WITH_MP4)
 /**
  * Read the meta information from mp4 specific tags
  * @param tag: the mp4 tag
@@ -604,7 +598,7 @@ static int ReadMeta( vlc_object_t* p_this)
         else if( flac->xiphComment() )
             ReadMetaFromXiph( flac->xiphComment(), p_demux_meta, p_meta );
     }
-#ifdef TAGLIB_HAVE_MP4COVERTART_H
+#if defined(TAGLIB_WITH_MP4)
     else if( MP4::File *mp4 = dynamic_cast<MP4::File*>(f.file()) )
     {
         if( mp4->tag() )
@@ -632,7 +626,6 @@ static int ReadMeta( vlc_object_t* p_this)
         else if( Ogg::Vorbis::File* ogg_vorbis = dynamic_cast<Ogg::Vorbis::File*>(f.file()) )
             ReadMetaFromXiph( ogg_vorbis->tag(), p_demux_meta, p_meta );
     }
-#ifdef TAGLIB_HAVE_AIFF_WAV_H
     else if( dynamic_cast<RIFF::File*>(f.file()) )
     {
         if( RIFF::AIFF::File* riff_aiff = dynamic_cast<RIFF::AIFF::File*>(f.file()) )
@@ -640,7 +633,6 @@ static int ReadMeta( vlc_object_t* p_this)
         else if( RIFF::WAV::File* riff_wav = dynamic_cast<RIFF::WAV::File*>(f.file()) )
             ReadMetaFromId3v2( riff_wav->tag(), p_demux_meta, p_meta );
     }
-#endif
     else if( TrueAudio::File* trueaudio = dynamic_cast<TrueAudio::File*>(f.file()) )
     {
         if( trueaudio->ID3v2Tag() )
@@ -843,7 +835,6 @@ static int WriteMeta( vlc_object_t *p_this )
         else if( Ogg::Vorbis::File* ogg_vorbis = dynamic_cast<Ogg::Vorbis::File*>(f.file()) )
             WriteMetaToXiph( ogg_vorbis->tag(), p_item );
     }
-#ifdef TAGLIB_HAVE_AIFF_WAV_H
     else if( dynamic_cast<RIFF::File*>(f.file()) )
     {
         if( RIFF::AIFF::File* riff_aiff = dynamic_cast<RIFF::AIFF::File*>(f.file()) )
@@ -851,7 +842,6 @@ static int WriteMeta( vlc_object_t *p_this )
         else if( RIFF::WAV::File* riff_wav = dynamic_cast<RIFF::WAV::File*>(f.file()) )
             WriteMetaToId3v2( riff_wav->tag(), p_item );
     }
-#endif
     else if( TrueAudio::File* trueaudio = dynamic_cast<TrueAudio::File*>(f.file()) )
     {
         if( trueaudio->ID3v2Tag() )
