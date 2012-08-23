@@ -89,7 +89,6 @@ static NSMenu   *o_keys_menu = nil;
            withView: (NSView *)o_parent_view;
 
 - (IBAction)openFileDialog: (id)sender;
-- (void)pathChosenInPanel:(NSOpenPanel *)o_sheet withReturn:(int)i_return_code contextInfo:(void  *)o_context_info;
 
 @end
 

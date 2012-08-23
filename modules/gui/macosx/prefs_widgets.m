@@ -1235,25 +1235,13 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     [o_open_panel setAllowsMultipleSelection: NO];
     [o_open_panel setCanChooseFiles: !b_directory];
     [o_open_panel setCanChooseDirectories: b_directory];
-    [o_open_panel beginSheetForDirectory:nil
-        file:nil
-        types:nil
-        modalForWindow:[sender window]
-        modalDelegate: self
-        didEndSelector: @selector(pathChosenInPanel:
-                        withReturn:
-                        contextInfo:)
-        contextInfo: nil];
-}
-
-- (void)pathChosenInPanel:(NSOpenPanel *)o_sheet
-    withReturn:(int)i_return_code contextInfo:(void  *)o_context_info
-{
-    if( i_return_code == NSOKButton )
-    {
-        NSString *o_path = [[[o_sheet URLs] objectAtIndex: 0] path];
-        [o_textfield setStringValue: o_path];
-    }
+    [o_open_panel beginSheetModalForWindow:[sender window] completionHandler:^(NSInteger returnCode) {
+        if( returnCode == NSOKButton )
+        {
+            NSString *o_path = [[[o_open_panel URLs] objectAtIndex: 0] path];
+            [o_textfield setStringValue: o_path];
+        }        
+    }];
 }
 
 - (char *)stringValue
