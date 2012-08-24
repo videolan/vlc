@@ -30,6 +30,8 @@
 
 @implementation VLCEyeTVController
 
+@synthesize eyeTVRunning = b_eyeTVactive, deviceConnected = b_deviceConnected;
+
 static VLCEyeTVController *_o_sharedInstance = nil;
 
 + (VLCEyeTVController *)sharedInstance
@@ -70,17 +72,6 @@ static VLCEyeTVController *_o_sharedInstance = nil;
         b_eyeTVactive = NO;
 }
 
-- (BOOL)isEyeTVrunning
-{
-    return b_eyeTVactive;
-}
-
-- (BOOL)isDeviceConnected
-{
-    return b_deviceConnected;
-}
-
-
 - (void)launchEyeTV
 {
     NSAppleScript *script = [[NSAppleScript alloc] initWithSource:
@@ -97,7 +88,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     [script release];
 }
 
-- (int)currentChannel
+- (int)channel
 {
     int currentChannel = 0;
     NSAppleScript *script = [[NSAppleScript alloc] initWithSource:
@@ -108,11 +99,8 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
         NSLog( @"EyeTV channel inventory failed with error status '%@'", errorString );
-    }
-    else
-    {
+    } else
         currentChannel = (int)[descriptor int32Value];
-    }
     [script release];
     return currentChannel;
 }
@@ -157,7 +145,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     return currentChannel;
 }
 
-- (void)selectChannel: (int)theChannelNum
+- (void)setChannel: (int)theChannelNum
 {
     NSAppleScript *script;
     switch( theChannelNum )

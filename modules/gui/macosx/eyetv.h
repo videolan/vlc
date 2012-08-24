@@ -29,13 +29,13 @@
     BOOL b_eyeTVactive;
     BOOL b_deviceConnected;
 }
+@property (readonly) BOOL eyeTVRunning;
+@property (readonly) BOOL deviceConnected;
+@property (readwrite) int channel;
+
 - (void)globalNotificationReceived: (NSNotification *)theNotification;
-- (BOOL)isEyeTVrunning;
-- (BOOL)isDeviceConnected;
 - (void)launchEyeTV;
-- (int)currentChannel;
 - (int)switchChannelUp:(BOOL)b_yesOrNo;
-- (void)selectChannel:(int)theChannelNum;
 - (NSEnumerator *)allChannels;
 
 @end
