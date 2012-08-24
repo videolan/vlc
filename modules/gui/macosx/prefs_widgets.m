@@ -400,6 +400,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 }
 
 @implementation VLCConfigControl
+@synthesize type = i_type, viewType = i_view_type, advanced = b_advanced;
+
 - (id)initWithFrame: (NSRect)frame
 {
     return [self initWithFrame: frame
@@ -882,21 +884,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 - (NSString *)name
 {
     return _NS(psz_name);
-}
-
-- (int)type
-{
-    return i_type;
-}
-
-- (int)viewType
-{
-    return i_view_type;
-}
-
-- (BOOL)advanced
-{
-    return b_advanced;
 }
 
 - (int)intValue

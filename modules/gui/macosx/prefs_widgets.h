@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org>
- *          Felix Paul Kühne <fkuehne at videolan.org>
+ *          Felix Paul KÃ¼hne <fkuehne at videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ static NSMenu   *o_keys_menu = nil;
 @property (readonly) NSString * name;
 @property (readonly) int type;
 @property (readonly) int viewType;
-@property (readonly) BOOL advanced;
+@property (readonly) bool advanced;
 @property (readonly) int intValue;
 @property (readonly) float floatValue;
 @property (readonly) char * stringValue;
