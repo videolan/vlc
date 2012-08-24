@@ -41,6 +41,8 @@
 #import "misc.h"
 #import "MainWindow.h"
 
+#import <IOKit/pwr_mgt/IOPMLib.h>           /* for sleep prevention */
+
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -144,6 +146,9 @@ struct intf_sys_t
     SPMediaKeyTap * o_mediaKeyController;
 
     NSArray *o_usedHotkeys;
+
+    /* sleep management */
+    IOPMAssertionID systemSleepAssertionID;
 }
 
 + (VLCMain *)sharedInstance;
