@@ -425,6 +425,8 @@ error:
 
 @implementation VLCInfoTreeItem
 
+@synthesize name = o_name, value = o_value;
+
 #define IsALeafNode ((id)-1)
 
 - (id)initWithName: (NSString *)o_item_name value: (NSString *)o_item_value ID: (int)i_id
@@ -502,16 +504,6 @@ error:
         }
     }
     return o_children;
-}
-
-- (NSString *)name
-{
-    return [[o_name retain] autorelease];
-}
-
-- (NSString *)value
-{
-    return [[o_value retain] autorelease];
 }
 
 - (void)refresh

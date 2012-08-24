@@ -101,6 +101,7 @@
 
     BOOL b_awakeFromNib;
 }
+@property (readonly) input_item_t * item;
 
 - (void)initPanel;
 
@@ -109,7 +110,6 @@
 - (IBAction)downloadCoverArt:(id)sender;
 - (void)initMediaPanelStats;
 - (void)updatePanelWithItem:(input_item_t *)_p_item;
-- (input_item_t *)item;
 - (void)setMeta: (char *)meta forLabel: (id)theItem;
 - (void)updateStatistics;
 
@@ -126,10 +126,11 @@
     NSMutableArray *o_children;
 }
 
-- (int)numberOfChildren;
+@property (readonly) int numberOfChildren;
+@property (readonly) NSString * name;
+@property (readonly) NSString * value;
+
 - (VLCInfoTreeItem *)childAtIndex:(NSUInteger)i_index;
-- (NSString *)name;
-- (NSString *)value;
 - (void)refresh;
 
 @end
