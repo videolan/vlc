@@ -977,7 +977,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         else
             i_view_type = CONFIG_ITEM_STRING;
 
-        o_textfieldTooltip = [[VLCMain sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_textfieldTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
         if( p_item->psz_text )
@@ -1034,7 +1034,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 
 - (char *)stringValue
 {
-    return [[VLCMain sharedInstance] delocalizeString:
+    return [[VLCStringUtility sharedInstance] delocalizeString:
                         [o_textfield stringValue]];
 }
 
@@ -1067,7 +1067,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         int i_index;
         i_view_type = CONFIG_ITEM_STRING_LIST;
 
-        o_textfieldTooltip = [[VLCMain sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_textfieldTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
         if( p_item->psz_text )
@@ -1121,8 +1121,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         if( p_item->list.psz[[o_combo indexOfSelectedItem]] != NULL )
             return strdup( p_item->list.psz[[o_combo indexOfSelectedItem]] );
     } else {
-        if( [[VLCMain sharedInstance] delocalizeString: [o_combo stringValue]] != NULL )
-            return strdup( [[VLCMain sharedInstance] delocalizeString: [o_combo stringValue]] );
+        if( [[VLCStringUtility sharedInstance] delocalizeString: [o_combo stringValue]] != NULL )
+            return strdup( [[VLCStringUtility sharedInstance] delocalizeString: [o_combo stringValue]] );
     }
     return NULL;
 }
@@ -1178,8 +1178,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     {
         i_view_type = CONFIG_ITEM_LOADFILE;
 
-        o_itemTooltip = [[VLCMain sharedInstance]
-                           wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_itemTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* is it a directory */
         b_directory = ( [self type] == CONFIG_ITEM_DIRECTORY ) ? YES : NO;
@@ -1281,7 +1280,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     {
         i_view_type = CONFIG_ITEM_MODULE;
 
-        o_popupTooltip = [[VLCMain sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_popupTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
         if( p_item->psz_text )
@@ -1451,7 +1450,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     {
         i_view_type = CONFIG_ITEM_INTEGER;
 
-        o_tooltip = [[VLCMain sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_tooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
         if( p_item->psz_text )
@@ -1546,7 +1545,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         int i_index;
         i_view_type = CONFIG_ITEM_STRING_LIST;
 
-        o_textfieldTooltip = [[VLCMain sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_textfieldTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
         if( p_item->psz_text )
@@ -1646,7 +1645,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     {
         i_view_type = CONFIG_ITEM_RANGED_INTEGER;
 
-        o_tooltip = [[VLCMain sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_tooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
         if( p_item->psz_text )
@@ -1762,7 +1761,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     {
         i_view_type = CONFIG_ITEM_INTEGER;
 
-        o_tooltip = [[VLCMain sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_tooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
         if( p_item->psz_text )
@@ -1855,7 +1854,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     {
         i_view_type = CONFIG_ITEM_RANGED_INTEGER;
 
-        o_tooltip = [[VLCMain sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_tooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
         if( p_item->psz_text )
@@ -1972,7 +1971,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         i_view_type = CONFIG_ITEM_BOOL;
 
         /* add the checkbox */
-        o_tooltip = [[VLCMain sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_tooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
         ADD_CHECKBOX( o_checkbox, mainFrame, 0,
                         0, @"", o_tooltip, p_item->value.i, NSImageLeft)
         [o_checkbox setAutoresizingMask:NSViewNotSizable ];
@@ -2022,7 +2021,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     {
         i_view_type = CONFIG_ITEM_KEY;
 
-        o_tooltip = [[VLCMain sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_tooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
         if( p_item->psz_text )
@@ -2159,7 +2158,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     {
         i_view_type = CONFIG_ITEM_MODULE_LIST;
 
-        o_tooltip = [[VLCMain sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_tooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
         if( p_item->psz_text )

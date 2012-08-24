@@ -131,11 +131,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
     o_key = [NSString stringWithFormat:@"%s", key];
     FREENULL( key );
 
-    unsigned int i_keyModifiers = [[VLCMain sharedInstance] VLCModifiersToCocoa:o_key];
+    unsigned int i_keyModifiers = [[VLCStringUtility sharedInstance] VLCModifiersToCocoa:o_key];
 
     NSString * characters = [o_event charactersIgnoringModifiers];
     if ([characters length] > 0) {
-        return [[characters lowercaseString] isEqualToString: [[VLCMain sharedInstance] VLCKeyToString: o_key]] &&
+        return [[characters lowercaseString] isEqualToString: [[VLCStringUtility sharedInstance] VLCKeyToString: o_key]] &&
                 (i_keyModifiers & NSShiftKeyMask)     == ([o_event modifierFlags] & NSShiftKeyMask) &&
                 (i_keyModifiers & NSControlKeyMask)   == ([o_event modifierFlags] & NSControlKeyMask) &&
                 (i_keyModifiers & NSAlternateKeyMask) == ([o_event modifierFlags] & NSAlternateKeyMask) &&

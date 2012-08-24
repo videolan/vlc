@@ -40,6 +40,7 @@
 #import "SPMediaKeyTap.h"                   /* for the media key support */
 #import "misc.h"
 #import "MainWindow.h"
+#import "StringUtility.h"
 
 #import <IOKit/pwr_mgt/IOPMLib.h>           /* for sleep prevention */
 
@@ -49,13 +50,6 @@
 unsigned int CocoaKeyToVLC( unichar i_key );
 
 #define VLCIntf [[VLCMain sharedInstance] intf]
-
-#define _NS(s) [[VLCMain sharedInstance] localizedString: s]
-/* Get an alternate version of the string.
- * This string is stored as '1:string' but when displayed it only displays
- * the translated string. the translation should be '1:translatedstring' though */
-#define _ANS(s) [[[VLCMain sharedInstance] localizedString: _(s)] substringFromIndex:2]
-
 
 // You need to release those objects after use
 input_thread_t *getInput(void);
@@ -175,14 +169,9 @@ struct intf_sys_t
 - (void)setActiveVideoPlayback:(BOOL)b_value;
 - (BOOL)activeVideoPlayback;
 - (void)applicationWillTerminate:(NSNotification *)notification;
-- (NSString *)localizedString:(const char *)psz;
-- (char *)delocalizeString:(NSString *)psz;
-- (NSString *)wrapString: (NSString *)o_in_string toWidth: (int)i_width;
-- (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event force:(BOOL)b_force;
-- (NSString *)VLCKeyToString:(NSString *)theString;
-- (unsigned int)VLCModifiersToCocoa:(NSString *)theString;
 - (void)updateCurrentlyUsedHotkeys;
 - (void)fullscreenChanged;
+- (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event force:(BOOL)b_force;
 - (void)checkFullscreenChange:(NSNumber *)o_full;
 - (void)PlaylistItemChanged;
 - (void)playbackStatusUpdated;

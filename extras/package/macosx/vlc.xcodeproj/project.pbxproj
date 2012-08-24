@@ -657,6 +657,8 @@
 		CC206B6B14AD0A5D007935C6 /* window-fullscreen-on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-fullscreen-on.png"; path = "Resources/mainwindow_dark/window-fullscreen-on.png"; sourceTree = "<group>"; };
 		CC206B6C14AD0A5D007935C6 /* window-fullscreen-over.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-fullscreen-over.png"; path = "Resources/mainwindow_dark/window-fullscreen-over.png"; sourceTree = "<group>"; };
 		CC206B6D14AD0A5D007935C6 /* window-fullscreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-fullscreen.png"; path = "Resources/mainwindow_dark/window-fullscreen.png"; sourceTree = "<group>"; };
+		CC269A4615E7947F00F2FDC9 /* StringUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StringUtility.h; path = ../../../modules/gui/macosx/StringUtility.h; sourceTree = "<group>"; };
+		CC269A4715E7947F00F2FDC9 /* StringUtility.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = StringUtility.m; path = ../../../modules/gui/macosx/StringUtility.m; sourceTree = "<group>"; };
 		CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
 		CC3F9F851350B2A000B0E885 /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = ../../../contrib/Growl.framework; sourceTree = "<absolute>"; };
 		CC402F4B0E00ABBB006A4BA4 /* VLC.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VLC.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1018,6 +1020,8 @@
 				CCCE366E13817E4500694F2A /* VideoEffects.m */,
 				CC0663341566C34C003A411C /* ConvertAndSave.h */,
 				CC0663351566C34C003A411C /* ConvertAndSave.m */,
+				CC269A4615E7947F00F2FDC9 /* StringUtility.h */,
+				CC269A4715E7947F00F2FDC9 /* StringUtility.m */,
 				CC017A0E14A4C8B600C09A4F /* custom UI code */,
 				CC0CD0E513DE0FC600B0D90D /* Imported Code */,
 			);

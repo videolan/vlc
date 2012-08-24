@@ -5,6 +5,8 @@ LIBTOOL=@LIBTOOL@ --tag=CC
 
 SOURCES_macosx = \
 	CompatibilityFixes.h \
+	StringUtility.h \
+	StringUtility.m \
 	AppleRemote.h \
 	AppleRemote.m \
 	SPInvocationGrabbing.h \
