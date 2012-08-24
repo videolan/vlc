@@ -223,7 +223,7 @@ static const struct {
     const char *key;
     int target_type; /* 0 is valid for all target_type */
 } metadata_map[] = {
-                     {vlc_meta_Album,       "TITLE",         30},
+                     {vlc_meta_Album,       "TITLE",         50},
                      {vlc_meta_Title,       "TITLE",         0},
                      {vlc_meta_Artist,      "ARTIST",        0},
                      {vlc_meta_Genre,       "GENRE",         0},
@@ -234,6 +234,7 @@ static const struct {
                      {vlc_meta_Rating,      "RATING",        0},
                      {vlc_meta_Date,        "DATE_RELEASED", 0},
                      {vlc_meta_Date,        "DATE_RELEASE",  0},
+                     {vlc_meta_Date,        "DATE_RECORDED", 0},
                      {vlc_meta_URL,         "URL",           0},
                      {vlc_meta_Publisher,   "PUBLISHER",     0},
                      {vlc_meta_EncodedBy,   "ENCODED_BY",    0},
