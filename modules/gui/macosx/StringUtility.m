@@ -145,6 +145,43 @@ static VLCStringUtility *_o_sharedInstance = nil;
     return o_out_string;
 }
 
+- (NSString *)OSXStringKeyToString:(NSString *)theString
+{
+    if (![theString isEqualToString:@""]) {
+        /* remove cruft */
+        if ([theString characterAtIndex:([theString length] - 1)] != 0x2b)
+            theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
+        else
+        {
+            theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
+            theString = [NSString stringWithFormat:@"%@+", theString];
+        }
+        if ([theString characterAtIndex:([theString length] - 1)] != 0x2d)
+            theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
+        else
+        {
+            theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
+            theString = [NSString stringWithFormat:@"%@-", theString];
+        }
+        /* modifiers */
+        theString = [theString stringByReplacingOccurrencesOfString:@"Command" withString: [NSString stringWithUTF8String: "\xE2\x8C\x98"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Alt" withString: [NSString stringWithUTF8String: "\xE2\x8C\xA5"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Shift" withString: [NSString stringWithUTF8String: "\xE2\x87\xA7"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Ctrl" withString: [NSString stringWithUTF8String: "\xE2\x8C\x83"]];
+        /* show non-character keys correctly */
+        theString = [theString stringByReplacingOccurrencesOfString:@"Right" withString:[NSString stringWithUTF8String:"\xE2\x86\x92"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Left" withString:[NSString stringWithUTF8String:"\xE2\x86\x90"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Up" withString:[NSString stringWithUTF8String:"\xE2\x86\x91"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Down" withString:[NSString stringWithUTF8String:"\xE2\x86\x93"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Enter" withString:[NSString stringWithUTF8String:"\xe2\x86\xb5"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Tab" withString:[NSString stringWithUTF8String:"\xe2\x87\xa5"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Delete" withString:[NSString stringWithUTF8String:"\xe2\x8c\xab"]];        /* capitalize plain characters to suit the menubar's look */
+        theString = [theString capitalizedString];
+    }
+    else
+        theString = [NSString stringWithString:_NS("Not Set")];
+    return theString;
+}
 
 #pragma mark -
 #pragma mark Key Shortcuts

@@ -182,7 +182,6 @@
     intf_thread_t *p_intf;
 }
 + (VLCSimplePrefs *)sharedInstance;
-- (NSString *)OSXStringKeyToString:(NSString *)theString;
 
 /* toolbar */
 - (NSToolbarItem *) toolbar: (NSToolbar *)o_toolbar

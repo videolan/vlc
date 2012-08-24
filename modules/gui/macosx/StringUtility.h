@@ -39,6 +39,7 @@
 - (NSString *)localizedString:(const char *)psz;
 - (char *)delocalizeString:(NSString *)psz;
 - (NSString *)wrapString: (NSString *)o_in_string toWidth: (int)i_width;
+- (NSString *)OSXStringKeyToString:(NSString *)theString;
 
 - (NSString *)VLCKeyToString:(NSString *)theString;
 - (unsigned int)VLCModifiersToCocoa:(NSString *)theString;

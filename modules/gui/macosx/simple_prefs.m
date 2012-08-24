@@ -86,44 +86,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [super dealloc];
 }
 
-- (NSString *)OSXStringKeyToString:(NSString *)theString
-{
-    if (![theString isEqualToString:@""]) {
-        /* remove cruft */
-        if ([theString characterAtIndex:([theString length] - 1)] != 0x2b)
-            theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
-        else
-        {
-            theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
-            theString = [NSString stringWithFormat:@"%@+", theString];
-        }
-        if ([theString characterAtIndex:([theString length] - 1)] != 0x2d)
-            theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
-        else
-        {
-            theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
-            theString = [NSString stringWithFormat:@"%@-", theString];
-        }
-        /* modifiers */
-        theString = [theString stringByReplacingOccurrencesOfString:@"Command" withString: [NSString stringWithUTF8String: "\xE2\x8C\x98"]];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Alt" withString: [NSString stringWithUTF8String: "\xE2\x8C\xA5"]];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Shift" withString: [NSString stringWithUTF8String: "\xE2\x87\xA7"]];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Ctrl" withString: [NSString stringWithUTF8String: "\xE2\x8C\x83"]];
-        /* show non-character keys correctly */
-        theString = [theString stringByReplacingOccurrencesOfString:@"Right" withString:[NSString stringWithUTF8String:"\xE2\x86\x92"]];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Left" withString:[NSString stringWithUTF8String:"\xE2\x86\x90"]];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Up" withString:[NSString stringWithUTF8String:"\xE2\x86\x91"]];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Down" withString:[NSString stringWithUTF8String:"\xE2\x86\x93"]];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Enter" withString:[NSString stringWithUTF8String:"\xe2\x86\xb5"]];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Tab" withString:[NSString stringWithUTF8String:"\xe2\x87\xa5"]];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Delete" withString:[NSString stringWithUTF8String:"\xe2\x8c\xab"]];        /* capitalize plain characters to suit the menubar's look */
-        theString = [theString capitalizedString];
-    }
-    else
-        theString = [NSString stringWithString:_NS("Not Set")];
-    return theString;
-}
-
 - (void)awakeFromNib
 {
     [self initStrings];
@@ -1277,7 +1239,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     {
         [o_hotkeys_change_lbl setStringValue: [NSString stringWithFormat: _NS("Press new keys for\n\"%@\""),
                                                [o_hotkeyDescriptions objectAtIndex: [o_hotkeys_listbox selectedRow]]]];
-        [o_hotkeys_change_keys_lbl setStringValue: [self OSXStringKeyToString:[o_hotkeySettings objectAtIndex: [o_hotkeys_listbox selectedRow]]]];
+        [o_hotkeys_change_keys_lbl setStringValue: [[VLCStringUtility sharedInstance] OSXStringKeyToString:[o_hotkeySettings objectAtIndex: [o_hotkeys_listbox selectedRow]]]];
         [o_hotkeys_change_taken_lbl setStringValue: @""];
         [o_hotkeys_change_win setInitialFirstResponder: [o_hotkeys_change_win contentView]];
         [o_hotkeys_change_win makeFirstResponder: [o_hotkeys_change_win contentView]];
@@ -1346,7 +1308,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     if( [identifier isEqualToString: @"action"] )
         return [o_hotkeyDescriptions objectAtIndex: rowIndex];
     else if( [identifier isEqualToString: @"shortcut"] )
-        return [self OSXStringKeyToString:[o_hotkeySettings objectAtIndex: rowIndex]];
+        return [[VLCStringUtility sharedInstance] OSXStringKeyToString:[o_hotkeySettings objectAtIndex: rowIndex]];
     else
     {
         msg_Err( p_intf, "unknown TableColumn identifier (%s)!", [identifier UTF8String] );
@@ -1368,7 +1330,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     }
     else
     {
-        [o_hotkeys_change_keys_lbl setStringValue: [self OSXStringKeyToString:theKey]];
+        [o_hotkeys_change_keys_lbl setStringValue: [[VLCStringUtility sharedInstance] OSXStringKeyToString:theKey]];
 
         i_returnValue = [o_hotkeySettings indexOfObject: theKey];
         i_returnValue2 = [o_hotkeySettings indexOfObject: [theKey stringByReplacingOccurrencesOfString:@"-" withString:@"+"]];
