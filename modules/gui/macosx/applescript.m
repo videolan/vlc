@@ -39,13 +39,11 @@
     NSString *o_command = [[self commandDescription] commandName];
     NSString *o_urlString = [self directParameter];
 
-    if ( [o_command isEqualToString:@"GetURL"] || [o_command isEqualToString:@"OpenURL"] )
-    {
+    if ( [o_command isEqualToString:@"GetURL"] || [o_command isEqualToString:@"OpenURL"] ) {
         intf_thread_t * p_intf = VLCIntf;
         playlist_t * p_playlist = pl_Get( p_intf );
 
-        if ( o_urlString )
-        {
+        if ( o_urlString ) {
             NSURL * o_url;
             input_item_t *p_input;
             int returnValue;
@@ -89,51 +87,28 @@
 
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = pl_Get( p_intf );
-    if( p_playlist == NULL )
-    {
-        return nil;
-    }
 
     if ( [o_command isEqualToString:@"play"] )
-    {
         [[VLCCoreInteraction sharedInstance] play];
-    }
     else if ( [o_command isEqualToString:@"stop"] )
-    {
         [[VLCCoreInteraction sharedInstance] stop];
-    }
     else if ( [o_command isEqualToString:@"previous"] )
-    {
         [[VLCCoreInteraction sharedInstance] previous];
-    }
     else if ( [o_command isEqualToString:@"next"] )
-    {
         [[VLCCoreInteraction sharedInstance] next];
-    }
     else if ( [o_command isEqualToString:@"fullscreen"] )
-    {
         [[VLCCoreInteraction sharedInstance] toggleFullscreen];
-    }
     else if ( [o_command isEqualToString:@"mute"] )
-    {
         [[VLCCoreInteraction sharedInstance] setMute: YES];
-    }
     else if ( [o_command isEqualToString:@"volumeUp"] )
-    {
         [[VLCCoreInteraction sharedInstance] volumeUp];
-    }
     else if ( [o_command isEqualToString:@"volumeDown"] )
-    {
         [[VLCCoreInteraction sharedInstance] volumeDown];
-    }
-        else if ( [o_command isEqualToString:@"stepForward"] )
-    {
+    else if ( [o_command isEqualToString:@"stepForward"] ) {
         //default: forwardShort
-        if (o_parameter)
-        {
+        if (o_parameter) {
             int i_parameter = [o_parameter intValue];
-            switch (i_parameter)
-            {
+            switch (i_parameter) {
                 case 1:
                     [[VLCCoreInteraction sharedInstance] forwardExtraShort];
                     break;
@@ -150,20 +125,13 @@
                     [[VLCCoreInteraction sharedInstance] forwardShort];
                     break;
             }
-        }
-        else
-        {
+        } else
             [[VLCCoreInteraction sharedInstance] forwardShort];
-        }
-    }
-    else if ( [o_command isEqualToString:@"stepBackward"] )
-    {
+    } else if ( [o_command isEqualToString:@"stepBackward"] ) {
         //default: backwardShort
-        if (o_parameter)
-        {
+        if (o_parameter) {
             int i_parameter = [o_parameter intValue];
-            switch (i_parameter)
-            {
+            switch (i_parameter) {
                 case 1:
                     [[VLCCoreInteraction sharedInstance] backwardExtraShort];
                     break;
@@ -180,11 +148,8 @@
                     [[VLCCoreInteraction sharedInstance] backwardShort];
                     break;
             }
-        }
-        else
-        {
+        } else
             [[VLCCoreInteraction sharedInstance] backwardShort];
-        }
     }
    return nil;
 }
@@ -208,8 +173,7 @@
     vout_thread_t * p_vout = getVout();
     if( !p_vout )
         return;
-    if (var_GetBool( p_vout, "fullscreen") == mode)
-    {
+    if (var_GetBool( p_vout, "fullscreen") == mode) {
         vlc_object_release( p_vout );
         return;
     }
@@ -271,8 +235,6 @@
     }
 }
 
-#pragma mark -
-//TODO:whenever VLC should implement NSDocument, the methods below should move or be additionaly implemented in the NSDocument category
 - (int) durationOfCurrentItem {
     return [[VLCCoreInteraction sharedInstance] durationOfCurrentPlaylistItem];
 }
