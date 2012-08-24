@@ -248,13 +248,11 @@
 
 + (VLCOpen *)sharedInstance;
 
-- (void)setMRL:(NSString *)mrl;
-- (NSString *)MRL;
+@property (readwrite) NSString *mrl;
+@property (readonly) NSArray *qtkvideoDevices;
+@property (readonly) NSArray *qtkaudioDevices;
 
-- (NSArray *)qtkvideoDevices;
 - (void)qtkrefreshVideoDevices;
-
-- (NSArray *)qtkaudioDevices;
 - (void)qtkrefreshAudioDevices;
 
 - (void)setSubPanel;
