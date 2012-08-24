@@ -100,6 +100,7 @@ struct services_discovery_sys_t
     vlc_mutex_t lock;
     vlc_cond_t  wait;
     bool b_update;
+    bool b_savedurls_loaded;
     char *psz_request;
     int update_type;
 };
@@ -136,6 +137,7 @@ static int Open( vlc_object_t *p_this )
     vlc_mutex_init( &p_sys->lock );
     vlc_cond_init( &p_sys->wait );
     p_sys->b_update = true;
+    p_sys->b_savedurls_loaded = false;
     p_sys->psz_request = NULL;
     p_sys->update_type = UPDATE_URLS;
 
@@ -293,6 +295,7 @@ static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
 
     int i_new_urls = 0;
     char **ppsz_new_urls = NULL;
+    p_sys->b_savedurls_loaded = true;
 
     int i, j;
 
@@ -363,6 +366,14 @@ static void ParseRequest( services_discovery_t *p_sd )
     char *psz_tok = strchr( psz_request, ':' );
     if( !psz_tok ) return;
     *psz_tok = '\0';
+
+    if ( ! p_sys->b_savedurls_loaded )
+    {
+        char* psz_urls = var_GetNonEmptyString( p_sd, "podcast-urls" );
+        ParseUrls( p_sd, psz_urls );
+        free( psz_urls );
+    }
+
     if( !strcmp( psz_request, "ADD" ) )
     {
         psz_request = psz_tok + 1;
