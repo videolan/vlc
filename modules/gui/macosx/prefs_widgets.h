@@ -1,10 +1,11 @@
 /*****************************************************************************
  * prefs_widgets.h: Preferences controls
  *****************************************************************************
- * Copyright (C) 2002-2007 VLC authors and VideoLAN
+ * Copyright (C) 2002-2012 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org>
+ *          Felix Paul Kühne <fkuehne at videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,23 +39,26 @@ static NSMenu   *o_keys_menu = nil;
     bool      b_advanced;
 }
 
+@property (readonly) NSString * name;
+@property (readonly) int type;
+@property (readonly) int viewType;
+@property (readonly) BOOL advanced;
+@property (readonly) int intValue;
+@property (readonly) float floatValue;
+@property (readonly) char * stringValue;
+@property (readonly) int labelSize;
+
 + (VLCConfigControl *)newControl: (module_config_t *)_p_item
         withView: (NSView *)o_parent_view;
++ (int)calcVerticalMargin: (int)i_curItem lastItem:(int)i_lastItem;
+
 - (id)initWithFrame: (NSRect)frame item: (module_config_t *)p_item;
-- (NSString *)name;
-- (int)type;
-- (int)viewType;
-- (BOOL)isAdvanced;
+
 - (void)setYPos:(int)i_yPos;
-- (int)intValue;
-- (float)floatValue;
-- (char *)stringValue;
+- (void)alignWithXPosition:(int)i_xPos;
+
 - (void)applyChanges;
 - (void)resetValues;
-- (int)labelSize;
-- (void) alignWithXPosition:(int)i_xPos;
-
-+ (int)calcVerticalMargin: (int)i_curItem lastItem:(int)i_lastItem;
 
 @end
 

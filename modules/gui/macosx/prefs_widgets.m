@@ -894,7 +894,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     return i_view_type;
 }
 
-- (BOOL)isAdvanced
+- (BOOL)advanced
 {
     return b_advanced;
 }
