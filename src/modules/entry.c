@@ -379,31 +379,25 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
 
             assert (item->list_count == 0); /* cannot replace choices */
             assert (item->list.psz_cb == NULL);
+            if (len == 0)
+                break; /* nothing to do */
             /* Copy values */
             if (IsConfigIntegerType (item->i_type))
             {
                 const int *src = va_arg (ap, const int *);
-                int *dst = malloc (sizeof (int) * (len + 1));
+                int *dst = xmalloc (sizeof (int) * len);
 
-                if (dst != NULL)
-                {
-                    memcpy (dst, src, sizeof (int) * len);
-                    dst[len] = 0;
-                }
+                memcpy (dst, src, sizeof (int) * len);
                 item->list.i = dst;
             }
             else
             if (IsConfigStringType (item->i_type))
             {
                 const char *const *src = va_arg (ap, const char *const *);
-                char **dst = malloc (sizeof (char *) * (len + 1));
+                char **dst = xmalloc (sizeof (char *) * len);
 
-                if (dst != NULL)
-                {
-                    for (size_t i = 0; i < len; i++)
-                        dst[i] = src[i] ? strdup (src[i]) : NULL;
-                    dst[len] = NULL;
-                }
+                for (size_t i = 0; i < len; i++)
+                     dst[i] = src[i] ? strdup (src[i]) : NULL;
                 item->list.psz = dst;
             }
             else
@@ -411,13 +405,9 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
 
             /* Copy textual descriptions */
             const char *const *text = va_arg (ap, const char *const *);
-            char **dtext = malloc (sizeof (char *) * (len + 1));
-            if( dtext != NULL )
-            {
-                for (size_t i = 0; i < len; i++)
-                    dtext[i] = text[i] ? strdup (text[i]) : NULL;
-                dtext[len] = NULL;
-            }
+            char **dtext = xmalloc (sizeof (char *) * (len + 1));
+            for (size_t i = 0; i < len; i++)
+                dtext[i] = text[i] ? strdup (text[i]) : NULL;
             item->list_text = dtext;
             item->list_count = len;
             break;

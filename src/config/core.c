@@ -356,10 +356,8 @@ ssize_t config_GetIntChoices (vlc_object_t *obj, const char *name,
     if (count == 0)
         return 0;
 
-    int64_t *vals = malloc (sizeof (*vals) * count);
-    char **txts = malloc (sizeof (*txts) * count);
-    if (unlikely(vals == NULL || txts == NULL))
-        abort ();
+    int64_t *vals = xmalloc (sizeof (*vals) * count);
+    char **txts = xmalloc (sizeof (*txts) * count);
 
     for (size_t i = 0; i < count; i++)
     {
@@ -406,10 +404,8 @@ ssize_t config_GetPszChoices (vlc_object_t *obj, const char *name,
         return cfg->list.psz_cb(obj, name, values, texts);
     }
 
-    char **vals = malloc (sizeof (*vals) * count);
-    char **txts = malloc (sizeof (*txts) * count);
-    if (unlikely(vals == NULL || txts == NULL))
-        abort ();
+    char **vals = xmalloc (sizeof (*vals) * count);
+    char **txts = xmalloc (sizeof (*txts) * count);
 
     for (size_t i = 0; i < count; i++)
     {
