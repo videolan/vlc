@@ -1,8 +1,0 @@
-//
-// Prefix header for all source files of the 'FRVLC' target in the 'FRVLC' project.
-//
-
-#ifdef __OBJC__
-    #import <Cocoa/Cocoa.h>
-	#import "VLCDebug.h"
-#endif

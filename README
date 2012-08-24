@@ -50,7 +50,6 @@ include/           - Header files.
 lib/               - libVLC source code.
 modules/           - VLC plugins and modules. Most of the code is here.
 po/                - VLC translations.
-projects/          - projects that uses libVLC
 share/             - Common Resources files.
 src/               - libvlccore source code.
 test/              - testing system.
