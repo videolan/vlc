@@ -64,6 +64,8 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 
 @implementation AppleRemote
 
+@synthesize openInExclusiveMode = _openInExclusiveMode, clickCountEnabledButtons = _clickCountEnabledButtons, maximumClickCountTimeDifference = _maxClickTimeDifference, processesBacklog=_processesBacklog, simulatesPlusMinusHold = _simulatePlusMinusHold;
+
 #pragma public interface
 
 static AppleRemote *_o_sharedInstance = nil;
@@ -79,7 +81,7 @@ static AppleRemote *_o_sharedInstance = nil;
         [self dealloc];
     } else {
         _o_sharedInstance = [super init];
-        openInExclusiveMode = YES;
+        _openInExclusiveMode = YES;
         queue = NULL;
         hidDeviceInterface = NULL;
         cookieToButtonMapping = [[NSMutableDictionary alloc] init];
@@ -139,7 +141,7 @@ static AppleRemote *_o_sharedInstance = nil;
 
         /* defaults */
         [self setSimulatesPlusMinusHold: YES];
-        maxClickTimeDifference = DEFAULT_MAXIMUM_CLICK_TIME_DIFFERENCE;
+        _maxClickTimeDifference = DEFAULT_MAXIMUM_CLICK_TIME_DIFFERENCE;
     }
 
     return _o_sharedInstance;
@@ -155,7 +157,7 @@ static AppleRemote *_o_sharedInstance = nil;
     return remoteId;
 }
 
-- (BOOL) isRemoteAvailable {
+- (BOOL) remoteAvailable {
     io_object_t hidDevice = [self findAppleRemoteDevice];
     if (hidDevice != 0) {
         IOObjectRelease(hidDevice);
@@ -165,7 +167,7 @@ static AppleRemote *_o_sharedInstance = nil;
     }
 }
 
-- (BOOL) isListeningToRemote {
+- (BOOL) listeningToRemote {
     return (hidDeviceInterface != NULL && allCookies != NULL && queue != NULL);
 }
 
@@ -191,15 +193,8 @@ static AppleRemote *_o_sharedInstance = nil;
     return delegate;
 }
 
-- (BOOL) isOpenInExclusiveMode {
-    return openInExclusiveMode;
-}
-- (void) setOpenInExclusiveMode: (BOOL) value {
-    openInExclusiveMode = value;
-}
-
 - (BOOL) clickCountingEnabled {
-    return clickCountEnabledButtons != 0;
+    return self.clickCountEnabledButtons != 0;
 }
 - (void) setClickCountingEnabled: (BOOL) value {
     if (value) {
@@ -207,27 +202,6 @@ static AppleRemote *_o_sharedInstance = nil;
     } else {
         [self setClickCountEnabledButtons: 0];
     }
-}
-
-- (unsigned int) clickCountEnabledButtons {
-    return clickCountEnabledButtons;
-}
-- (void) setClickCountEnabledButtons: (unsigned int)value {
-    clickCountEnabledButtons = value;
-}
-
-- (NSTimeInterval) maximumClickCountTimeDifference {
-    return maxClickTimeDifference;
-}
-- (void) setMaximumClickCountTimeDifference: (NSTimeInterval) timeDiff {
-    maxClickTimeDifference = timeDiff;
-}
-
-- (BOOL) processesBacklog {
-    return processesBacklog;
-}
-- (void) setProcessesBacklog: (BOOL) value {
-    processesBacklog = value;
 }
 
 - (BOOL) listeningOnAppActivate {
@@ -249,15 +223,8 @@ static AppleRemote *_o_sharedInstance = nil;
     }
 }
 
-- (BOOL) simulatesPlusMinusHold {
-    return simulatePlusMinusHold;
-}
-- (void) setSimulatesPlusMinusHold: (BOOL) value {
-    simulatePlusMinusHold = value;
-}
-
 - (IBAction) startListening: (id) sender {
-    if ([self isListeningToRemote]) return;
+    if ([self listeningToRemote]) return;
 
     io_object_t hidDevice = [self findAppleRemoteDevice];
     if (hidDevice == 0) return;
@@ -401,7 +368,7 @@ static AppleRemote* sharedInstance=nil;
 
 - (void) sendRemoteButtonEvent: (AppleRemoteEventIdentifier) event pressedDown: (BOOL) pressedDown {
     if (delegate) {
-        if (simulatePlusMinusHold) {
+        if (self.simulatesPlusMinusHold) {
             if (event == kRemoteButtonVolume_Plus || event == kRemoteButtonVolume_Minus) {
                 if (pressedDown) {
                     lastPlusMinusEvent = event;
@@ -425,7 +392,7 @@ static AppleRemote* sharedInstance=nil;
             }
         }
 
-        if (([self clickCountEnabledButtons] & event) == event) {
+        if ((self.clickCountEnabledButtons & event) == event) {
             if (pressedDown==NO && (event == kRemoteButtonVolume_Minus || event == kRemoteButtonVolume_Plus)) {
                 return; // this one is triggered automatically by the handler
             }
@@ -444,7 +411,7 @@ static AppleRemote* sharedInstance=nil;
             }
             [self performSelector: @selector(executeClickCountEvent:)
                        withObject: [NSArray arrayWithObjects:eventNumber, timeNumber, nil]
-                       afterDelay: maxClickTimeDifference];
+                       afterDelay: _maxClickTimeDifference];
         } else {
             [delegate appleRemoteButton:event pressedDown: pressedDown clickCount:1];
         }
@@ -493,9 +460,9 @@ static AppleRemote* sharedInstance=nil;
         while((subCookieString = [self validCookieSubstring: cookieString])) {
             cookieString = [cookieString substringFromIndex: [subCookieString length]];
             lastSubCookieString = subCookieString;
-            if (processesBacklog) [self handleEventWithCookieString: subCookieString sumOfValues:sumOfValues];
+            if (self.processesBacklog) [self handleEventWithCookieString: subCookieString sumOfValues:sumOfValues];
         }
-        if (processesBacklog == NO && lastSubCookieString != nil) {
+        if (self.processesBacklog == NO && lastSubCookieString != nil) {
             // process the last event of the backlog and assume that the button is not pressed down any longer.
             // The events in the backlog do not seem to be in order and therefore (in rare cases) the last event might be
             // a button pressed down event while in reality the user has released it.
@@ -661,7 +628,7 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
     HRESULT  result;
 
     IOHIDOptionsType openMode = kIOHIDOptionsTypeNone;
-    if ([self isOpenInExclusiveMode]) openMode = kIOHIDOptionsTypeSeizeDevice;
+    if ([self openInExclusiveMode]) openMode = kIOHIDOptionsTypeSeizeDevice;
     IOReturn ioReturnValue = (*hidDeviceInterface)->open(hidDeviceInterface, openMode);
 
     if (ioReturnValue == KERN_SUCCESS) {
