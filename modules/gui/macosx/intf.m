@@ -822,9 +822,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* write cached user defaults to disk */
     [[NSUserDefaults standardUserDefaults] synchronize];
 
-    /* Make sure the Menu doesn't have any references to vlc objects anymore */
-    //FIXME: this should be moved to VLCMainMenu
-    [o_mainmenu releaseRepresentedObjects:[NSApp mainMenu]];
     [o_mainmenu release];
 
     libvlc_Quit( p_intf->p_libvlc );

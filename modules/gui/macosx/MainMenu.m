@@ -110,6 +110,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     if( o_mu_playlistTableColumnsContextMenu )
         [o_mu_playlistTableColumnsContextMenu release];
 
+    [self releaseRepresentedObjects:[NSApp mainMenu]];
+
     [super dealloc];
 }
 
