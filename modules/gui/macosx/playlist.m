@@ -1163,15 +1163,14 @@
         o_one_item = [o_array objectAtIndex: i_item];
         p_input = [self createItem: o_one_item];
         if( !p_input )
-        {
             continue;
-        }
 
         /* Add the item */
-        /* FIXME: playlist_AddInput() can fail */
-
-        playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT, i_position == -1 ? PLAYLIST_END : i_position + i_item, b_usingPlaylist,
-         pl_Locked );
+        int returnValue = playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT, i_position == -1 ? PLAYLIST_END : i_position + i_item, b_usingPlaylist, pl_Locked );
+        if (returnValue != VLC_SUCCESS) {
+            vlc_gc_decref( p_input );
+            continue;
+        }
 
         if( i_item == 0 && !b_enqueue )
         {
