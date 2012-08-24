@@ -69,7 +69,6 @@
 - (void)mouseDown: (NSEvent *)theEvent;
 - (void)mouseDragged: (NSEvent *)theEvent;
 
-- (BOOL)isDisplayed;
 - (void)setVoutWasUpdated: (int)i_screen;
 @end
 

@@ -367,11 +367,6 @@
     [self setFrameOrigin:point];
 }
 
-- (BOOL)isDisplayed
-{
-    return b_displayed;
-}
-
 - (void)setVoutWasUpdated: (int)i_newdevice;
 {
     b_voutWasUpdated = YES;
