@@ -146,6 +146,7 @@
     id o_current_video_window;
 }
 + (VLCMainWindow *)sharedInstance;
+@property (readonly) BOOL fullscreen;
 
 - (IBAction)play:(id)sender;
 - (IBAction)prev:(id)sender;
@@ -165,7 +166,7 @@
 - (IBAction)dropzoneButtonAction:(id)sender;
 
 - (void)setTitle:(NSString *)title;
-- (void) customZoom:(id)sender;
+- (void)customZoom:(id)sender;
 - (void)windowResizedOrMoved:(NSNotification *)notification;
 
 - (void)showDropZone;
@@ -198,7 +199,6 @@
 
 /* fullscreen handling */
 - (void)showFullscreenController;
-- (BOOL)isFullscreen;
 - (void)lockFullscreenAnimation;
 - (void)unlockFullscreenAnimation;
 - (void)enterFullscreen;

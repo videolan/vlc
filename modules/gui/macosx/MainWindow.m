@@ -2043,7 +2043,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_fspanel fadeIn];
 }
 
-- (BOOL)isFullscreen
+- (BOOL)fullscreen
 {
     return b_fullscreen;
 }

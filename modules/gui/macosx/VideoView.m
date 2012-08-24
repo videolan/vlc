@@ -268,7 +268,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     // This is the result of [NSEvent standardMagnificationThreshold].
     // Unfortunately, this is a private API, currently.
     CGFloat f_threshold = 0.3;
-    BOOL b_fullscreen = [[VLCMainWindow sharedInstance] isFullscreen];
+    BOOL b_fullscreen = [[VLCMainWindow sharedInstance] fullscreen];
 
     if( ( f_cumulated_magnification > f_threshold && !b_fullscreen ) || ( f_cumulated_magnification < -f_threshold && b_fullscreen ) )
     {
