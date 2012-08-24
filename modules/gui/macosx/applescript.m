@@ -43,31 +43,29 @@
     {
         intf_thread_t * p_intf = VLCIntf;
         playlist_t * p_playlist = pl_Get( p_intf );
-        if( p_playlist == NULL )
-        {
-            return nil;
-        }
 
         if ( o_urlString )
         {
             NSURL * o_url;
             input_item_t *p_input;
+            int returnValue;
 
             p_input = input_item_New( [o_urlString fileSystemRepresentation],
                                     [[[NSFileManager defaultManager]
                                     displayNameAtPath: o_urlString] UTF8String] );
-            /* FIXME: playlist_AddInput() can fail */
-            playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT,
-                               PLAYLIST_END, true, pl_Unlocked );
+            if (!p_input)
+                return nil;
 
+            returnValue = playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT,
+                               PLAYLIST_END, true, pl_Unlocked );
             vlc_gc_decref( p_input );
+
+            if (returnValue != VLC_SUCCESS)
+                return nil;
 
             o_url = [NSURL fileURLWithPath: o_urlString];
             if( o_url != nil )
-            {
-                [[NSDocumentController sharedDocumentController]
-                    noteNewRecentDocumentURL: o_url];
-            }
+                [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: o_url];
         }
     }
     return nil;
