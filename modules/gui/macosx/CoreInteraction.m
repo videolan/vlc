@@ -261,7 +261,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
     NSString *o_name;
     char *format = var_InheritString( VLCIntf, "input-title-format" );
-    char *formated = str_format_meta( p_input, format );
+    char *formated = str_format_meta( pl_Get( VLCIntf ), format );
     free( format );
     o_name = [NSString stringWithUTF8String:formated];
     free( formated );
