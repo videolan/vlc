@@ -482,11 +482,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
             [o_options addObject: [NSString stringWithFormat:@"stop-time=%li", tempValue]];
         if( [o_output_ckbox state] == NSOnState )
         {
-            NSUInteger count = [[o_sout_options soutMRL] count];
+            NSArray * soutMRL = [o_sout_options soutMRL];
+            NSUInteger count = [soutMRL count];
             for (NSUInteger i = 0 ; i < count ; i++)
-            {
-                [o_options addObject: [NSString stringWithString: [[(VLCOutput *)o_sout_options soutMRL] objectAtIndex: i]]];
-            }
+                [o_options addObject: [NSString stringWithString: [soutMRL objectAtIndex: i]]];
         }
         if( [o_file_slave_ckbox state] && o_file_slave_path )
            [o_options addObject: [NSString stringWithFormat: @"input-slave=%@", o_file_slave_path]];
