@@ -187,49 +187,6 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_NEXT );
 }
 
-- (BOOL)isPlaying
-{
-    intf_thread_t *p_intf = VLCIntf;
-    if( !p_intf )
-        return NO;
-
-    input_thread_t * p_input = pl_CurrentInput( p_intf );
-    if( !p_input )
-        return NO;
-
-    input_state_e i_state = ERROR_S;
-    input_Control( p_input, INPUT_GET_STATE, &i_state );
-    vlc_object_release( p_input );
-
-    return ( ( i_state == OPENING_S ) || ( i_state == PLAYING_S ) );
-}
-
-- (int)currentTime
-{
-    input_thread_t * p_input = pl_CurrentInput( VLCIntf );
-    int64_t i_currentTime = -1;
-
-    if( !p_input )
-        return i_currentTime;
-
-    input_Control( p_input, INPUT_GET_TIME, &i_currentTime );
-    vlc_object_release( p_input );
-
-    return (int)( i_currentTime / 1000000 );
-}
-
-- (void)setCurrentTime:(int)i_value
-{
-    int64_t i64_value = (int64_t)i_value;
-    input_thread_t * p_input = pl_CurrentInput( VLCIntf );
-
-    if ( !p_input )
-        return;
-
-    input_Control( p_input, INPUT_SET_TIME, (int64_t)(i64_value * 1000000) );
-    vlc_object_release( p_input );
-}
-
 - (int)durationOfCurrentPlaylistItem
 {
     intf_thread_t *p_intf = VLCIntf;

@@ -41,9 +41,6 @@
 - (int)playbackRate;
 - (void)next;
 - (void)previous;
-- (BOOL)isPlaying;
-- (int)currentTime;
-- (void)setCurrentTime:(int)i_value;
 - (int)durationOfCurrentPlaylistItem;
 - (NSURL*)URLOfCurrentPlaylistItem;
 - (NSString*)nameOfCurrentPlaylistItem;
