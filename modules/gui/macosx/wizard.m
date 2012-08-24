@@ -1239,11 +1239,9 @@ static VLCWizard *_o_sharedInstance = nil;
                 UTF8String],
                 VLC_INPUT_OPTION_TRUSTED );
 
-            /* FIXME: playlist_AddInput() can fail */
-            playlist_AddInput( p_playlist, p_input, PLAYLIST_STOP,
-                PLAYLIST_END, true, pl_Unlocked );
+            int returnValue = playlist_AddInput( p_playlist, p_input, PLAYLIST_STOP, PLAYLIST_END, true, pl_Unlocked );
 
-            if( x == 0 )
+            if( x == 0 && returnValue != VLC_SUCCESS)
             {
                 /* play the first item and add the others afterwards */
                 PL_LOCK;
