@@ -24,9 +24,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import <vlc_input.h>
+#import <vlc_keys.h>
 #import "StringUtility.h"
 #import "intf.h"
-#import <vlc_keys.h>
 
 @implementation VLCStringUtility
 
@@ -181,6 +182,27 @@ static VLCStringUtility *_o_sharedInstance = nil;
     else
         theString = [NSString stringWithString:_NS("Not Set")];
     return theString;
+}
+
+- (NSString *)getCurrentTimeAsString:(input_thread_t *)p_input negative:(BOOL)b_negative
+{
+    assert( p_input != nil );
+    
+    vlc_value_t time;
+    char psz_time[MSTRTIME_MAX_SIZE];
+    
+    var_Get( p_input, "time", &time );
+    
+    mtime_t dur = input_item_GetDuration( input_GetItem( p_input ) );
+    if( b_negative && dur > 0 )
+    {
+        mtime_t remaining = 0;
+        if( dur > time.i_time )
+            remaining = dur - time.i_time;
+        return [NSString stringWithFormat: @"-%s", secstotimestr( psz_time, ( remaining / 1000000 ) )];
+    }
+    else
+        return [NSString stringWithUTF8String: secstotimestr( psz_time, ( time.i_time / 1000000 ) )];
 }
 
 #pragma mark -

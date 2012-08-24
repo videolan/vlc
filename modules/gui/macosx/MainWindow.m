@@ -57,8 +57,6 @@
 - (void)makeSplitViewHidden;
 
 - (NSRect)customConstrainFrameRect: (NSRect)frameRect toScreen: (NSScreen*)screen;
-
-- (NSString *)getCurrentTimeAsString:(input_thread_t *)p_input;
 @end
 
 @implementation VLCMainWindow
@@ -1194,7 +1192,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         var_Set( p_input, "position", pos );
         [o_time_sld setFloatValue: f_updated];
 
-        o_time = [self getCurrentTimeAsString: p_input];
+        o_time = [[VLCStringUtility sharedInstance] getCurrentTimeAsString: p_input negative:[o_time_fld timeRemaining]];
         [o_time_fld setStringValue: o_time];
         [o_fspanel setStreamPos: f_updated andTime: o_time];
         vlc_object_release( p_input );
@@ -1516,27 +1514,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     b_splitview_removed = NO;
 }
 
-- (NSString *)getCurrentTimeAsString:(input_thread_t *)p_input
-{
-    assert( p_input != nil );
-
-    vlc_value_t time;
-    char psz_time[MSTRTIME_MAX_SIZE];
-
-    var_Get( p_input, "time", &time );
-
-    mtime_t dur = input_item_GetDuration( input_GetItem( p_input ) );
-    if( [o_time_fld timeRemaining] && dur > 0 )
-    {
-        mtime_t remaining = 0;
-        if( dur > time.i_time )
-            remaining = dur - time.i_time;
-        return [NSString stringWithFormat: @"-%s", secstotimestr( psz_time, ( remaining / 1000000 ) )];
-    }
-    else
-        return [NSString stringWithUTF8String: secstotimestr( psz_time, ( time.i_time / 1000000 ) )];
-}
-
 - (void)updateTimeSlider
 {
     input_thread_t * p_input;
@@ -1551,7 +1528,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         f_updated = 10000. * pos.f_float;
         [o_time_sld setFloatValue: f_updated];
 
-        o_time = [self getCurrentTimeAsString: p_input];
+        o_time = [[VLCStringUtility sharedInstance] getCurrentTimeAsString: p_input negative:[o_time_fld timeRemaining]];
 
         mtime_t dur = input_item_GetDuration( input_GetItem( p_input ) );
         if (dur == -1) {

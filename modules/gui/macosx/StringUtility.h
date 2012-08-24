@@ -40,6 +40,7 @@
 - (char *)delocalizeString:(NSString *)psz;
 - (NSString *)wrapString: (NSString *)o_in_string toWidth: (int)i_width;
 - (NSString *)OSXStringKeyToString:(NSString *)theString;
+- (NSString *)getCurrentTimeAsString:(input_thread_t *)p_input negative:(BOOL)b_negative;
 
 - (NSString *)VLCKeyToString:(NSString *)theString;
 - (unsigned int)VLCModifiersToCocoa:(NSString *)theString;
