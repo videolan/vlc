@@ -77,6 +77,12 @@
     IBOutlet NSMenuItem * o_mi_clear;
     IBOutlet NSMenuItem * o_mi_select_all;
 
+    IBOutlet NSMenu * o_mu_view;
+    IBOutlet NSMenuItem * o_mi_toggleJumpButtons;
+    IBOutlet NSMenuItem * o_mi_togglePlaymodeButtons;
+    IBOutlet NSMenu * o_mu_playlistTableColumns;
+    NSMenu * o_mu_playlistTableColumnsContextMenu;
+
     IBOutlet NSMenu * o_mu_controls;
     IBOutlet NSMenuItem * o_mi_play;
     IBOutlet NSMenuItem * o_mi_stop;
@@ -105,10 +111,6 @@
     IBOutlet NSMenu * o_mu_title;
     IBOutlet NSMenuItem * o_mi_chapter;
     IBOutlet NSMenu * o_mu_chapter;
-    IBOutlet NSMenuItem * o_mi_toggleJumpButtons;
-    IBOutlet NSMenuItem * o_mi_togglePlaymodeButtons;
-    IBOutlet NSMenu * o_mu_playlistTableColumns;
-    NSMenu * o_mu_playlistTableColumnsContextMenu;
 
     IBOutlet NSMenu * o_mu_audio;
     IBOutlet NSMenuItem * o_mi_vol_up;

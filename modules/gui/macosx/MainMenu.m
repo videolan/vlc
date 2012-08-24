@@ -287,6 +287,13 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_clear setTitle: _NS("Clear")];
     [o_mi_select_all setTitle: _NS("Select All")];
 
+    [o_mu_view setTitle: _NS("View")];
+    [o_mi_toggleJumpButtons setTitle: _NS("Show Previous & Next Buttons")];
+    [o_mi_toggleJumpButtons setState: config_GetInt( VLCIntf, "macosx-show-playback-buttons")];
+    [o_mi_togglePlaymodeButtons setTitle: _NS("Show Shuffle & Repeat Buttons")];
+    [o_mi_togglePlaymodeButtons setState: config_GetInt( VLCIntf, "macosx-show-playmode-buttons")];
+    [o_mu_playlistTableColumns setTitle: _NS("Playlist Table Columns")];
+
     [o_mu_controls setTitle: _NS("Playback")];
     [o_mi_play setTitle: _NS("Play")];
     [o_mi_stop setTitle: _NS("Stop")];
@@ -306,11 +313,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_quitAfterPB setTitle: _NS("Quit after Playback")];
     [o_mi_fwd setTitle: _NS("Step Forward")];
     [o_mi_bwd setTitle: _NS("Step Backward")];
-    [o_mi_toggleJumpButtons setTitle: _NS("Show Previous & Next Buttons")];
-    [o_mi_toggleJumpButtons setState: config_GetInt( VLCIntf, "macosx-show-playback-buttons")];
-    [o_mi_togglePlaymodeButtons setTitle: _NS("Show Shuffle & Repeat Buttons")];
-    [o_mi_togglePlaymodeButtons setState: config_GetInt( VLCIntf, "macosx-show-playmode-buttons")];
-    [o_mu_playlistTableColumns setTitle: _NS("Playlist Table Columns")];
 
     [o_mi_program setTitle: _NS("Program")];
     [o_mu_program setTitle: _NS("Program")];
