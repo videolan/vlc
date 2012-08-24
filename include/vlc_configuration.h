@@ -32,6 +32,8 @@
  * It includes functions allowing to declare, get or set configuration options.
  */
 
+#include <sys/types.h>  /* for ssize_t */
+
 # ifdef __cplusplus
 extern "C" {
 # endif
