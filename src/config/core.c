@@ -363,7 +363,8 @@ ssize_t config_GetIntChoices (vlc_object_t *obj, const char *name,
     {
         vals[i] = cfg->list.i[i];
         /* FIXME: use module_gettext() instead */
-        txts[i] = strdup (vlc_gettext (cfg->list_text[i]));
+        txts[i] = strdup ((cfg->list_text[i] != NULL)
+                                       ? vlc_gettext (cfg->list_text[i]) : "");
         if (unlikely(txts[i] == NULL))
             abort ();
     }
@@ -409,9 +410,10 @@ ssize_t config_GetPszChoices (vlc_object_t *obj, const char *name,
 
     for (size_t i = 0; i < count; i++)
     {
-        vals[i] = strdup (cfg->list.psz[i]);
+        vals[i] = strdup ((cfg->list.psz[i] != NULL) ? cfg->list.psz[i] : "");
         /* FIXME: use module_gettext() instead */
-        txts[i] = strdup (vlc_gettext(cfg->list_text[i]));
+        txts[i] = strdup ((cfg->list_text[i] != NULL)
+                                       ? vlc_gettext (cfg->list_text[i]) : "");
         if (unlikely(vals[i] == NULL || txts[i] == NULL))
             abort ();
     }
