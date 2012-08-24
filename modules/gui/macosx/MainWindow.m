@@ -2121,7 +2121,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
                 CGDisplayFade( token, 0.5, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
             }
 
-            if ([screen isMainScreen])
+            if ([screen mainScreen])
                 [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
 
             [[o_video_view superview] replaceSubview:o_video_view with:o_temp_view];
@@ -2176,7 +2176,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_fullscreen_anim2 release];
     }
 
-    if ([screen isMainScreen])
+    if ([screen mainScreen])
         [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
 
     dict1 = [[NSMutableDictionary alloc] initWithCapacity:2];

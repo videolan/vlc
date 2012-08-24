@@ -184,7 +184,7 @@ static NSMutableArray *blackoutWindows = NULL;
     return nil;
 }
 
-- (BOOL)isMainScreen
+- (BOOL)mainScreen
 {
     return ([self displayID] == [[[NSScreen screens] objectAtIndex:0] displayID]);
 }
@@ -233,7 +233,7 @@ static NSMutableArray *blackoutWindows = NULL;
         [blackoutWindows addObject: blackoutWindow];
         [blackoutWindow release];
 
-        if( [screen isMainScreen] )
+        if( [screen mainScreen] )
             [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
     }
 }

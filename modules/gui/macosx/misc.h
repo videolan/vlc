@@ -46,8 +46,8 @@
  *****************************************************************************/
 
 @interface NSAnimation (VLCAdditions)
-- (void)setUserInfo: (void *)userInfo;
-- (void *)userInfo;
+@property (readwrite) void * userInfo;
+
 @end
 
 /*****************************************************************************
@@ -58,8 +58,9 @@
 
 @interface NSScreen (VLCAdditions)
 
+@property (readonly) BOOL mainScreen;
+
 + (NSScreen *)screenWithDisplayID: (CGDirectDisplayID)displayID;
-- (BOOL)isMainScreen;
 - (BOOL)isScreen: (NSScreen*)screen;
 - (CGDirectDisplayID)displayID;
 - (void)blackoutOtherScreens;
@@ -80,10 +81,8 @@
     BOOL b_isset_canBecomeMainWindow;
     NSViewAnimation *animation;
 }
-
-- (void)setCanBecomeKeyWindow: (BOOL)canBecomeKey;
-
-- (void)setCanBecomeMainWindow: (BOOL)canBecomeMain;
+@property (readwrite) BOOL canBecomeKeyWindow;
+@property (readwrite) BOOL canBecomeMainWindow;
 
 /* animate mode is only supported in >=10.4 */
 - (void)orderFront: (id)sender animate: (BOOL)animate;
@@ -105,9 +104,6 @@
  *****************************************************************************/
 
 @interface VLBrushedMetalImageView : NSImageView
-{
-
-}
 
 @end
 
@@ -117,8 +113,6 @@
  *****************************************************************************/
 
 @interface MPSlider : NSSlider
-{
-}
 
 @end
 
@@ -132,7 +126,7 @@
     NSRect img_rect;
     BOOL b_dark;
 }
-- (CGFloat)knobPosition;
+@property (readonly) CGFloat knobPosition;
 
 - (void)drawRect:(NSRect)rect;
 - (void)drawKnobInRect:(NSRect)knobRect;
@@ -166,16 +160,13 @@
     NSDictionary * o_string_attributes_dict;
     NSTextAlignment textAlignment;
 }
-
-- (BOOL)timeRemaining;
+@property (readonly) BOOL timeRemaining;
 @end
 
 /*****************************************************************************
  * VLCMainWindowSplitView interface
  *****************************************************************************/
 @interface VLCMainWindowSplitView : NSSplitView
-{
-}
 
 @end
 
@@ -196,8 +187,5 @@
  * VLCThreePartDropView interface
  *****************************************************************************/
 @interface VLCThreePartDropView : VLCThreePartImageView
-{
-
-}
 
 @end
