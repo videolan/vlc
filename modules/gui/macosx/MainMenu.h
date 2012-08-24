@@ -221,15 +221,16 @@
 - (IBAction)intfOpenNet:(id)sender;
 - (IBAction)intfOpenCapture:(id)sender;
 
-- (IBAction)toggleRecord:(id)sender;
-- (void)updateRecordState:(BOOL)b_value;
-- (IBAction)setPlaybackRate:(id)sender;
-- (void)updatePlaybackRate;
 - (IBAction)toggleJumpButtons:(id)sender;
 - (IBAction)togglePlaymodeButtons:(id)sender;
 - (IBAction)togglePlaylistColumnTable:(id)sender;
 - (void)setPlaylistColumnTableState:(NSInteger)i_state forColumn:(NSString *)o_column;
 - (NSMenu *)setupPlaylistTableColumnsMenu;
+
+- (IBAction)toggleRecord:(id)sender;
+- (void)updateRecordState:(BOOL)b_value;
+- (IBAction)setPlaybackRate:(id)sender;
+- (void)updatePlaybackRate;
 
 - (IBAction)toggleFullscreen:(id)sender;
 - (IBAction)resizeVideoWindow:(id)sender;

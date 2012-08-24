@@ -627,33 +627,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 }
 
 #pragma mark -
-#pragma mark Playback
-- (IBAction)toggleRecord:(id)sender
-{
-    [[VLCCoreInteraction sharedInstance] toggleRecord];
-}
-
-- (void)updateRecordState:(BOOL)b_value
-{
-    [o_mi_record setState:b_value];
-}
-
-- (IBAction)setPlaybackRate:(id)sender
-{
-    [[VLCCoreInteraction sharedInstance] setPlaybackRate: [o_mi_rate_sld intValue]];
-    int i = [[VLCCoreInteraction sharedInstance] playbackRate];
-    double speed =  pow( 2, (double)i / 17 );
-    [o_mi_rate_fld setStringValue: [NSString stringWithFormat:@"%.2fx", speed]];
-}
-
-- (void)updatePlaybackRate
-{
-    int i = [[VLCCoreInteraction sharedInstance] playbackRate];
-    double speed =  pow( 2, (double)i / 17 );
-    [o_mi_rate_fld setStringValue: [NSString stringWithFormat:@"%.2fx", speed]];
-    [o_mi_rate_sld setIntValue: i];
-}
-
+#pragma mark View
 - (IBAction)toggleJumpButtons:(id)sender
 {
     BOOL b_value = !config_GetInt( VLCIntf, "macosx-show-playback-buttons" );
@@ -687,6 +661,34 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [[o_mu_playlistTableColumns            itemWithTag: i_tag] setState: i_state];
     [[o_mu_playlistTableColumnsContextMenu itemWithTag: i_tag] setState: i_state];
     [[[VLCMain sharedInstance] playlist] setColumn: o_column state: i_state translationDict: o_ptc_translation_dict];
+}
+
+#pragma mark -
+#pragma mark Playback
+- (IBAction)toggleRecord:(id)sender
+{
+    [[VLCCoreInteraction sharedInstance] toggleRecord];
+}
+
+- (void)updateRecordState:(BOOL)b_value
+{
+    [o_mi_record setState:b_value];
+}
+
+- (IBAction)setPlaybackRate:(id)sender
+{
+    [[VLCCoreInteraction sharedInstance] setPlaybackRate: [o_mi_rate_sld intValue]];
+    int i = [[VLCCoreInteraction sharedInstance] playbackRate];
+    double speed =  pow( 2, (double)i / 17 );
+    [o_mi_rate_fld setStringValue: [NSString stringWithFormat:@"%.2fx", speed]];
+}
+
+- (void)updatePlaybackRate
+{
+    int i = [[VLCCoreInteraction sharedInstance] playbackRate];
+    double speed =  pow( 2, (double)i / 17 );
+    [o_mi_rate_fld setStringValue: [NSString stringWithFormat:@"%.2fx", speed]];
+    [o_mi_rate_sld setIntValue: i];
 }
 
 #pragma mark -
