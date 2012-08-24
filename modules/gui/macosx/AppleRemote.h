@@ -89,8 +89,8 @@ The class is not thread safe
 @interface AppleRemote : NSObject {
     IOHIDDeviceInterface** hidDeviceInterface;
     IOHIDQueueInterface**  queue;
-    NSMutableArray*        allCookies;
-    NSMutableDictionary*   cookieToButtonMapping;
+    NSArray*        _allCookies;
+    NSDictionary*   _cookieToButtonMapping;
     CFRunLoopSourceRef     eventSource;
 
     BOOL _openInExclusiveMode;
@@ -168,8 +168,9 @@ The class is not thread safe
 @end
 
 @interface AppleRemote (PrivateMethods)
+@property (readonly) NSDictionary * cookieToButtonMapping;
+
 - (void) setRemoteId: (int) aValue;
-- (NSDictionary*) cookieToButtonMapping;
 - (IOHIDQueueInterface**) queue;
 - (IOHIDDeviceInterface**) hidDeviceInterface;
 - (void) handleEventWithCookieString: (NSString*) cookieString sumOfValues: (SInt32) sumOfValues;
