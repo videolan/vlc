@@ -517,9 +517,9 @@ void PLSelector::podcastRemove( PLSelItem* item )
     question = question.arg( item->text() );
     QMessageBox::StandardButton res =
         QMessageBox::question( this, qtr( "Unsubscribe" ), question,
-                               QMessageBox::Ok | QMessageBox::Cancel,
-                               QMessageBox::Cancel );
-    if( res == QMessageBox::Cancel ) return;
+                               QMessageBox::Yes | QMessageBox::No,
+                               QMessageBox::No );
+    if( res == QMessageBox::No ) return;
 
     input_item_t *input = item->treeItem()->data( 0, IN_ITEM_ROLE ).value<input_item_t*>();
     if( !input ) return;
