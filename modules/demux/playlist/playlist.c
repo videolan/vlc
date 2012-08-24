@@ -32,8 +32,9 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
 #include <vlc_url.h>
-#ifdef WIN32
-# include <ctype.h>
+
+#if defined( WIN32 ) || defined( __OS2__ )
+# include <ctype.h>                          /* isalpha */
 #endif
 #include <assert.h>
 
