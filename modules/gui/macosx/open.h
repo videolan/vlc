@@ -248,7 +248,7 @@
 
 + (VLCOpen *)sharedInstance;
 
-@property (readwrite) NSString *mrl;
+@property (readwrite, assign) NSString *MRL;
 @property (readonly) NSArray *qtkvideoDevices;
 @property (readonly) NSArray *qtkaudioDevices;
 
