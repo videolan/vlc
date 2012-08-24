@@ -82,9 +82,8 @@
     NSArray *o_mrl;
     NSString *o_transcode;
 }
+@property (readwrite, assign) NSArray * soutMRL;
 
-- (void)setMRL:(NSArray *)o_mrl_string;
-- (NSArray *)mrl;
 - (void)setTranscode:(NSString *)o_transcode_string;
 
 - (void)initStrings;

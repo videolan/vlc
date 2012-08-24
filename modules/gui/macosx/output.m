@@ -37,6 +37,7 @@
  * VLCOutput implementation
  *****************************************************************************/
 @implementation VLCOutput
+@synthesize soutMRL=o_mrl;
 
 - (id)init
 {
@@ -51,17 +52,6 @@
     [o_mrl release];
     [o_transcode release];
     [super dealloc];
-}
-
-- (void)setMRL:(NSArray *)o_mrl_array
-{
-    [o_mrl autorelease];
-    o_mrl = [o_mrl_array copy];
-}
-
-- (NSArray *)mrl
-{
-    return [o_mrl copy];
 }
 
 - (void)setTranscode:(NSString *)o_transcode_string
@@ -377,7 +367,7 @@
                                     @":demuxdump-file=%@",
                                     [o_file_field stringValue]],
                                     nil];
-            [self setMRL:o_sout_options];
+            [self setSoutMRL:o_sout_options];
             return;
         }
         else
@@ -480,7 +470,7 @@
         [o_mrl_string appendString: @"}"];
     }
     o_sout_options = [NSArray arrayWithObjects: o_mrl_string,nil];
-    [self setMRL:o_sout_options];
+    [self setSoutMRL:o_sout_options];
 }
 
 - (void)TTLChanged:(NSNotification *)o_notification
