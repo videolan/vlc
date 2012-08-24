@@ -44,7 +44,9 @@
 
 #if defined( WIN32 ) || defined( __OS2__ )
 #   include <io.h>
-#else
+#endif
+
+#ifndef WIN32
 #   include <unistd.h>
 #endif
 
