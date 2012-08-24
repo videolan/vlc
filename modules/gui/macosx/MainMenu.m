@@ -1293,7 +1293,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     }
     else if( [o_title isEqualToString: _NS("Mute")] )
     {
-        [o_mi setState: [[VLCCoreInteraction sharedInstance] isMuted] ? NSOnState : NSOffState];
+        [o_mi setState: [[VLCCoreInteraction sharedInstance] mute] ? NSOnState : NSOffState];
         [self setupMenus]; /* Make sure audio menu is up to date */
     }
     else if( [o_title isEqualToString: _NS("Half Size")] ||

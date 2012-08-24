@@ -146,7 +146,7 @@
 
 - (IBAction)mute:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] mute];
+    [[VLCCoreInteraction sharedInstance] setMute: YES];
 }
 
 - (IBAction)volumeSliderUpdated:(id)sender
@@ -209,7 +209,7 @@
 
 - (IBAction)lockVideosAspectRatio:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setAspectRatioLocked: ![sender state]];
+    [[VLCCoreInteraction sharedInstance] setAspectRatioIsLocked: ![sender state]];
     [sender setState: [[VLCCoreInteraction sharedInstance] aspectRatioIsLocked]];
 }
 

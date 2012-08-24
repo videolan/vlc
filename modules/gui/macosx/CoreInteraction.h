@@ -29,6 +29,13 @@
     int i_currentPlaybackRate;
 }
 + (VLCCoreInteraction *)sharedInstance;
+@property (readwrite) int volume;
+@property (readwrite) int playbackRate;
+@property (nonatomic, readwrite) BOOL aspectRatioIsLocked;
+@property (readonly) int durationOfCurrentPlaylistItem;
+@property (readonly) NSURL * URLOfCurrentPlaylistItem;
+@property (readonly) NSString * nameOfCurrentPlaylistItem;
+@property (nonatomic, readwrite) BOOL mute;
 
 - (void)play;
 - (void)pause;
@@ -37,13 +44,8 @@
 - (void)slower;
 - (void)normalSpeed;
 - (void)toggleRecord;
-- (void)setPlaybackRate:(int)i_value;
-- (int)playbackRate;
 - (void)next;
 - (void)previous;
-- (int)durationOfCurrentPlaylistItem;
-- (NSURL*)URLOfCurrentPlaylistItem;
-- (NSString*)nameOfCurrentPlaylistItem;
 - (void)forward;        //LEGACY SUPPORT
 - (void)backward;       //LEGACY SUPPORT
 - (void)forwardExtraShort;
@@ -62,15 +64,9 @@
 
 - (void)volumeUp;
 - (void)volumeDown;
-- (void)mute;
-- (BOOL)isMuted;
-- (int)volume;
-- (void)setVolume:(int)i_value;
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
 
-- (void)setAspectRatioLocked:(BOOL)b_value;
-- (BOOL)aspectRatioIsLocked;
 - (void)toggleFullscreen;
 
 - (BOOL)fixPreferences;

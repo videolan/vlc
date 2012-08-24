@@ -446,16 +446,16 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     aout_VolumeDown( pl_Get( p_intf ), 1, NULL );
 }
 
-- (void)mute
+- (void)setMute:(BOOL)b_value
 {
     intf_thread_t *p_intf = VLCIntf;
     if( !p_intf )
         return;
 
-    aout_MuteToggle( pl_Get( p_intf ) );
+    aout_MuteSet( pl_Get( p_intf ), b_value );
 }
 
-- (BOOL)isMuted
+- (BOOL)mute
 {
     intf_thread_t *p_intf = VLCIntf;
     if( !p_intf )
@@ -544,7 +544,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 #pragma mark -
 #pragma mark video output stuff
 
-- (void)setAspectRatioLocked:(BOOL)b_value
+- (void)setAspectRatioIsLocked:(BOOL)b_value
 {
     config_PutInt( VLCIntf, "macosx-lock-aspect-ratio", b_value );
 }

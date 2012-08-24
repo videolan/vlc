@@ -118,7 +118,7 @@
     }
     else if ( [o_command isEqualToString:@"mute"] )
     {
-        [[VLCCoreInteraction sharedInstance] mute];
+        [[VLCCoreInteraction sharedInstance] setMute: YES];
     }
     else if ( [o_command isEqualToString:@"volumeUp"] )
     {
@@ -220,7 +220,7 @@
 }
 
 - (BOOL) muted {
-    return [[VLCCoreInteraction sharedInstance] isMuted];
+    return [[VLCCoreInteraction sharedInstance] mute];
 }
 
 - (BOOL) playing {

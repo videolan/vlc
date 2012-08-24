@@ -329,7 +329,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_play_btn setAlternateImage: o_play_pressed_img];
     [o_detached_play_btn setImage: o_play_img];
     [o_detached_play_btn setAlternateImage: o_play_pressed_img];
-    BOOL b_mute = ![[VLCCoreInteraction sharedInstance] isMuted];
+    BOOL b_mute = ![[VLCCoreInteraction sharedInstance] mute];
     [o_volume_sld setEnabled: b_mute];
     [o_volume_up_btn setEnabled: b_mute];
 
@@ -1207,7 +1207,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [[VLCCoreInteraction sharedInstance] setVolume: [sender intValue]];
     else if (sender == o_volume_down_btn)
     {
-        [[VLCCoreInteraction sharedInstance] mute];
+        [[VLCCoreInteraction sharedInstance] setMute: YES];
     }
     else
         [[VLCCoreInteraction sharedInstance] setVolume: AOUT_VOLUME_MAX];
@@ -1593,7 +1593,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     playlist_t * p_playlist = pl_Get( VLCIntf );
     int i_volume = lroundf(aout_VolumeGet( p_playlist ) * AOUT_VOLUME_DEFAULT);
-    BOOL b_muted = [[VLCCoreInteraction sharedInstance] isMuted];
+    BOOL b_muted = [[VLCCoreInteraction sharedInstance] mute];
 
     if( !b_muted )
     {
