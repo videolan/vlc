@@ -86,23 +86,7 @@ static AppleRemote *_o_sharedInstance = nil;
         hidDeviceInterface = NULL;
         cookieToButtonMapping = [[NSMutableDictionary alloc] init];
 
-        if( NSAppKitVersionNumber < 1038.13 )
-        {
-            /* Leopard and early Snow Leopard Cookies */
-            msg_Dbg( VLCIntf, "using Leopard AR cookies" );
-            [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonVolume_Plus]  forKey:@"31_29_28_18_"];
-            [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonVolume_Minus] forKey:@"31_30_28_18_"];
-            [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu]         forKey:@"31_20_18_31_20_18_"];
-            [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay]         forKey:@"31_21_18_31_21_18_"];
-            [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonRight]        forKey:@"31_22_18_31_22_18_"];
-            [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonLeft]         forKey:@"31_23_18_31_23_18_"];
-            [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonRight_Hold]   forKey:@"31_18_4_2_"];
-            [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonLeft_Hold]    forKey:@"31_18_3_2_"];
-            [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu_Hold]    forKey:@"31_18_31_18_"];
-            [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Sleep]   forKey:@"35_31_18_35_31_18_"];
-            [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]   forKey:@"19_"];
-        }
-        else if( OSX_LION )
+        if( OSX_LION )
         {
             /* Lion cookies */
             msg_Dbg( VLCIntf, "using future AR cookies" );
@@ -119,9 +103,7 @@ static AppleRemote *_o_sharedInstance = nil;
             [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]     forKey:@"42_33_23_21_20_2_33_23_21_20_2_"];
             [cookieToButtonMapping setObject:[NSNumber numberWithInt:k2009RemoteButtonPlay]       forKey:@"33_21_20_8_2_33_21_20_8_2_"];
             [cookieToButtonMapping setObject:[NSNumber numberWithInt:k2009RemoteButtonFullscreen] forKey:@"33_21_20_3_2_33_21_20_3_2_"];
-        }
-        else
-        {
+        } else {
             /* 10.6.2+ Snow Leopard cookies */
             msg_Dbg( VLCIntf, "using Snow Leopard AR cookies" );
             [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonVolume_Plus]    forKey:@"33_31_30_21_20_2_"];
