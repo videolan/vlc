@@ -397,6 +397,7 @@
     [o_button setTarget: self];                                                                 \
     [o_button setAction: @selector(action:)];                                                   \
     [[o_button cell] accessibilitySetOverrideValue:AXDesc forAttribute:NSAccessibilityDescriptionAttribute]; \
+    [[o_button cell] accessibilitySetOverrideValue:ToolTip forAttribute:NSAccessibilityTitleAttribute]; \
     [o_button setToolTip: ToolTip]; \
     [self addSubview:o_button];
 
@@ -442,6 +443,7 @@
     [o_fs_timeSlider setContinuous: YES];
     [o_fs_timeSlider setTarget: self];
     [o_fs_timeSlider setAction: @selector(fsTimeSliderUpdate:)];
+    [[o_fs_volumeSlider cell] accessibilitySetOverrideValue:_NS("Position") forAttribute:NSAccessibilityTitleAttribute];
     [[o_fs_timeSlider cell] accessibilitySetOverrideValue:_NS("Click and move the mouse while keeping the button pressed to use this slider to change current playback position.") forAttribute:NSAccessibilityDescriptionAttribute];
     [self addSubview: o_fs_timeSlider];
 
@@ -458,6 +460,7 @@
     [o_fs_volumeSlider setContinuous: YES];
     [o_fs_volumeSlider setTarget: self];
     [o_fs_volumeSlider setAction: @selector(fsVolumeSliderUpdate:)];
+    [[o_fs_volumeSlider cell] accessibilitySetOverrideValue:_NS("Volume") forAttribute:NSAccessibilityTitleAttribute];
     [[o_fs_volumeSlider cell] accessibilitySetOverrideValue:_NS("Click and move the mouse while keeping the button pressed to use this slider to change the volume.") forAttribute:NSAccessibilityDescriptionAttribute];
     [self addSubview: o_fs_volumeSlider];
 
