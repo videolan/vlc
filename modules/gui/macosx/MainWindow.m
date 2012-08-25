@@ -984,7 +984,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     NSRect plrect;
     plrect = [o_playlist_table frame];
-    plrect.size.height = i_lastSplitViewHeight - 19.0; // actual pl top bar height, which differs from its frame
+    plrect.size.height = i_lastSplitViewHeight - 20.0; // actual pl top bar height, which differs from its frame
     [[o_playlist_table animator] setFrame: plrect];
 
     NSRect rightSplitRect;
@@ -992,7 +992,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     plrect = [o_dropzone_box frame];
     plrect.origin.x = (rightSplitRect.size.width - plrect.size.width) / 2;
     plrect.origin.y = (rightSplitRect.size.height - plrect.size.height) / 2;
-    [[o_playlist_table animator] setFrame: plrect];
+    [[o_dropzone_box animator] setFrame: plrect];
 }
 
 - (void)makeSplitViewVisible
