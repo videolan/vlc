@@ -77,6 +77,8 @@ Mac OS X Port:
 Mac OS X Interface:
  * add accessibility support to playback windows, open panel and fullscreen
    controller
+ * add a GUI to manage podcasts
+ * add customizable playlist table columns
  * add a GUI for the QTSound access module to process audio captured locally
    - This also allows to capture input from a webcam and a mic at the same time.
  * add a GUI to capture QTSound data along with the current screen content
@@ -90,6 +92,8 @@ Mac OS X Interface:
  * add options to the Advanced Open File dialog for start and stop time
  * add an option to play videos as a desktop background
  * add a new panel for media conversation and streaming
+ * allow the OS to turn off the screen(s) when playing audio-only media while the user
+   is idle.
  * The Streaming/Transcoding wizard and the open dialog's output panel are
    deprecated now
 
