@@ -236,7 +236,7 @@
     id o_currentOpticalMediaView;
     id o_currentOpticalMediaIconView;
     NSMutableArray *o_allMediaDevices;
-    NSMutableArray *o_opticalDevices;
+    NSArray *o_opticalDevices;
     NSMutableArray *o_specialMediaFolders;
     NSString *o_file_path;
     id o_currentCaptureView;

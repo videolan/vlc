@@ -96,7 +96,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     [o_allMediaDevices release];
     [o_specialMediaFolders release];
-    [o_opticalDevices release];
+    if (o_opticalDevices)
+        [o_opticalDevices release];
     if( o_file_slave_path )
         [o_file_slave_path release];
     [o_mrl release];
@@ -321,7 +322,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
     /* we want to be notified about removed or added media */
     o_allMediaDevices = [[NSMutableArray alloc] init];
     o_specialMediaFolders = [[NSMutableArray alloc] init];
-    o_opticalDevices = [[NSMutableArray alloc] init];
     o_displayInfos = [[NSMutableArray alloc] init];
     NSWorkspace *sharedWorkspace = [NSWorkspace sharedWorkspace];
 
@@ -1078,21 +1078,27 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (void)scanDevicesWithPaths:(NSArray *)o_paths
 {
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+
     NSUInteger count = [o_paths count];
     NSMutableArray *o_result = [NSMutableArray arrayWithCapacity:count];
     for (NSUInteger i = 0; i < count; i++)
         [o_result addObject: [self scanPath:[o_paths objectAtIndex:i]]];
 
     @synchronized (self) {
-        [o_opticalDevices removeAllObjects];
-        [o_opticalDevices addObjectsFromArray: o_result];
+        if (o_opticalDevices)
+            [o_opticalDevices release];
+        o_opticalDevices = [[NSArray alloc] initWithArray: o_result];
     }
 
     [self performSelectorOnMainThread:@selector(updateMediaSelector:) withObject:nil waitUntilDone:NO];
+    [o_pool release];
 }
 
 - (void)scanSpecialPath:(NSString *)o_path
 {
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+
     NSDictionary *o_dict = [self scanPath:o_path];
 
     @synchronized (self) {
@@ -1100,6 +1106,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     }
 
     [self performSelectorOnMainThread:@selector(updateMediaSelector:) withObject:[NSNumber numberWithBool:YES] waitUntilDone:NO];
+    [o_pool release];
 }
 
 - (void)scanOpticalMedia:(NSNotification *)o_notification
