@@ -417,7 +417,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     NSMenu *o_context_menu = [[NSMenu alloc] init];
 
     NSMenuItem *o_mi_tmp;
-    for( NSUInteger i = 0; i < [o_ptc_menuorder count]; i++ )
+    NSUInteger count = [o_ptc_menuorder count];
+    for( NSUInteger i = 0; i < count; i++ )
     {
         NSString *o_title = [o_ptc_translation_dict objectForKey:[o_ptc_menuorder objectAtIndex:i]];
         o_mi_tmp = [o_mu_playlistTableColumns addItemWithTitle:o_title
