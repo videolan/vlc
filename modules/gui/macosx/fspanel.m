@@ -441,8 +441,8 @@
     [o_fs_timeSlider setFloatValue: 0];
     [o_fs_timeSlider setContinuous: YES];
     [o_fs_timeSlider setTarget: self];
-    [o_fs_volumeSlider setAction: @selector(fsTimeSliderUpdate:)];
-    [[o_fs_volumeSlider cell] accessibilitySetOverrideValue:_NS("Click and move the mouse while keeping the button pressed to use this slider to change current playback position.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [o_fs_timeSlider setAction: @selector(fsTimeSliderUpdate:)];
+    [[o_fs_timeSlider cell] accessibilitySetOverrideValue:_NS("Click and move the mouse while keeping the button pressed to use this slider to change current playback position.") forAttribute:NSAccessibilityDescriptionAttribute];
     [self addSubview: o_fs_timeSlider];
 
     /* volume slider */
