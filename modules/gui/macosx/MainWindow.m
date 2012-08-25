@@ -254,11 +254,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[o_dropzone_btn cell] accessibilitySetOverrideValue:_NS("Click to open an advanced dialog to select the media to play. You can also drop files here to play.") forAttribute:NSAccessibilityDescriptionAttribute];
     [o_dropzone_lbl setStringValue: _NS("Drop media here")];
 
-    [o_podcast_add_btn setTitle: _NS("Add Podcast")];
+    [o_podcast_add_btn setTitle: _NS("Subscribe")];
+    [o_podcast_remove_btn setTitle: _NS("Unsubscribe")];
     [o_podcast_subscribe_title_lbl setStringValue: _NS("Subscribe to a podcast")];
     [o_podcast_subscribe_subtitle_lbl setStringValue: _NS("Enter URL of the podcast to subscribe to:")];
     [o_podcast_subscribe_cancel_btn setTitle: _NS("Cancel")];
     [o_podcast_subscribe_ok_btn setTitle: _NS("Subscribe")];
+    [o_podcast_unsubscribe_title_lbl setStringValue: _NS("Unsubscribe from a podcast")];
+    [o_podcast_unsubscribe_subtitle_lbl setStringValue: _NS("Select the podcast you would like to unsubscribe from:")];
+    [o_podcast_unsubscribe_ok_btn setTitle: _NS("Unsubscribe")];
+    [o_podcast_unsubscribe_cancel_btn setTitle: _NS("Cancel")];
 
     if (!b_dark_interface) {
         [o_bottombar_view setImagesLeft: [NSImage imageNamed:@"bottom-background"] middle: [NSImage imageNamed:@"bottom-background"] right: [NSImage imageNamed:@"bottom-background"]];
