@@ -446,6 +446,15 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     aout_VolumeDown( pl_Get( p_intf ), 1, NULL );
 }
 
+- (void)toggleMute
+{
+    intf_thread_t *p_intf = VLCIntf;
+    if( !p_intf )
+        return;
+
+    aout_MuteToggle( pl_Get( p_intf ) );
+}
+
 - (void)setMute:(BOOL)b_value
 {
     intf_thread_t *p_intf = VLCIntf;

@@ -64,6 +64,7 @@
 
 - (void)volumeUp;
 - (void)volumeDown;
+- (void)toggleMute;
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
 

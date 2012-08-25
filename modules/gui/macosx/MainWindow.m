@@ -1204,9 +1204,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (sender == o_volume_sld)
         [[VLCCoreInteraction sharedInstance] setVolume: [sender intValue]];
     else if (sender == o_volume_down_btn)
-    {
-        [[VLCCoreInteraction sharedInstance] setMute: YES];
-    }
+        [[VLCCoreInteraction sharedInstance] toggleMute];
     else
         [[VLCCoreInteraction sharedInstance] setVolume: AOUT_VOLUME_MAX];
 }
@@ -1568,8 +1566,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)updateVolumeSlider
 {
-    playlist_t * p_playlist = pl_Get( VLCIntf );
-    int i_volume = lroundf(aout_VolumeGet( p_playlist ) * AOUT_VOLUME_DEFAULT);
+    int i_volume = [[VLCCoreInteraction sharedInstance] volume];
     BOOL b_muted = [[VLCCoreInteraction sharedInstance] mute];
 
     if( !b_muted )
