@@ -383,7 +383,7 @@
  *****************************************************************************/
 @implementation VLCFSPanelView
 
-#define addButton( o_button, imageOff, imageOn, _x, _y, action )                                \
+#define addButton( o_button, imageOff, imageOn, _x, _y, action, AXDesc, ToolTip )               \
     s_rc.origin.x = _x;                                                                         \
     s_rc.origin.y = _y;                                                                         \
     o_button = [[NSButton alloc] initWithFrame: s_rc];                                 \
@@ -396,6 +396,8 @@
     [o_button sizeToFit];                                                                       \
     [o_button setTarget: self];                                                                 \
     [o_button setAction: @selector(action:)];                                                   \
+    [[o_button cell] accessibilitySetOverrideValue:AXDesc forAttribute:NSAccessibilityDescriptionAttribute]; \
+    [o_button setToolTip: ToolTip]; \
     [self addSubview:o_button];
 
 #define addTextfield( class, o_text, align, font, color )                                    \
@@ -415,14 +417,14 @@
     id view = [super initWithFrame:frameRect];
     fillColor = [[NSColor clearColor] retain];
     NSRect s_rc = [self frame];
-    addButton( o_prev, @"fs_skip_previous" , @"fs_skip_previous_highlight", 174, 15, prev );
-    addButton( o_bwd, @"fs_rewind"        , @"fs_rewind_highlight"       , 211, 14, backward );
-    addButton( o_play, @"fs_play"          , @"fs_play_highlight"         , 267, 10, play );
-    addButton( o_fwd, @"fs_forward"       , @"fs_forward_highlight"      , 313, 14, forward );
-    addButton( o_next, @"fs_skip_next"     , @"fs_skip_next_highlight"    , 365, 15, next );
-    addButton( o_fullscreen, @"fs_exit_fullscreen", @"fs_exit_fullscreen_hightlight", 507, 13, toggleFullscreen );
+    addButton( o_prev, @"fs_skip_previous" , @"fs_skip_previous_highlight", 174, 15, prev, _NS("Click to go to the previous playlist item."), _NS("Previous") );
+    addButton( o_bwd, @"fs_rewind"        , @"fs_rewind_highlight"       , 211, 14, backward, _NS("Click and hold to skip backward through the current media."), _NS("Backward") );
+    addButton( o_play, @"fs_play"          , @"fs_play_highlight"         , 267, 10, play, _NS("Click to play or pause the current media."), _NS("Play/Pause") );
+    addButton( o_fwd, @"fs_forward"       , @"fs_forward_highlight"      , 313, 14, forward, _NS("Click and hold to skip forward through the current media."), _NS("Forward") );
+    addButton( o_next, @"fs_skip_next"     , @"fs_skip_next_highlight"    , 365, 15, next, _NS("Click to go to the next playlist item."), _NS("Next") );
+    addButton( o_fullscreen, @"fs_exit_fullscreen", @"fs_exit_fullscreen_hightlight", 507, 13, toggleFullscreen, _NS("Click to exit fullscreen playback."), _NS("Toggle Fullscreen mode") );
 /*
-    addButton( o_button, @"image (off state)", @"image (on state)", 38, 51, something );
+    addButton( o_button, @"image (off state)", @"image (on state)", 38, 51, something, accessibility help string, usual tool tip );
  */
     [o_fwd setContinuous:YES];
     [o_bwd setContinuous:YES];
@@ -439,7 +441,8 @@
     [o_fs_timeSlider setFloatValue: 0];
     [o_fs_timeSlider setContinuous: YES];
     [o_fs_timeSlider setTarget: self];
-    [o_fs_timeSlider setAction: @selector(fsTimeSliderUpdate:)];
+    [o_fs_volumeSlider setAction: @selector(fsTimeSliderUpdate:)];
+    [[o_fs_volumeSlider cell] accessibilitySetOverrideValue:_NS("Click and move the mouse while keeping the button pressed to use this slider to change current playback position.") forAttribute:NSAccessibilityDescriptionAttribute];
     [self addSubview: o_fs_timeSlider];
 
     /* volume slider */
@@ -455,6 +458,7 @@
     [o_fs_volumeSlider setContinuous: YES];
     [o_fs_volumeSlider setTarget: self];
     [o_fs_volumeSlider setAction: @selector(fsVolumeSliderUpdate:)];
+    [[o_fs_volumeSlider cell] accessibilitySetOverrideValue:_NS("Click and move the mouse while keeping the button pressed to use this slider to change the volume.") forAttribute:NSAccessibilityDescriptionAttribute];
     [self addSubview: o_fs_volumeSlider];
 
     /* time counter and stream title output fields */
