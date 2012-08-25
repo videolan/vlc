@@ -199,13 +199,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_detached_play_btn setToolTip: [o_play_btn toolTip]];
     [[o_detached_play_btn cell] accessibilitySetOverrideValue:_NS("Click to play or pause the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
     [o_bwd_btn setToolTip: _NS("Backward")];
-    [[o_bwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item. Hold pressed to skip backwards through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[o_bwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item. Hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
     [o_detached_bwd_btn setToolTip: [o_bwd_btn toolTip]];
-    [[o_detached_bwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item. Hold pressed to skip backwards through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[o_detached_bwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item. Hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
     [o_fwd_btn setToolTip: _NS("Forward")];
-    [[o_fwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item. Hold pressed to skip forwards through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[o_fwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item. Hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
     [o_detached_fwd_btn setToolTip: [o_fwd_btn toolTip]];
-    [[o_detached_fwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item. Hold pressed to skip forwards through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[o_detached_fwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item. Hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
     [o_stop_btn setToolTip: _NS("Stop")];
     [[o_stop_btn cell] accessibilitySetOverrideValue:_NS("Click to stop playback.") forAttribute:NSAccessibilityDescriptionAttribute];
     [o_playlist_btn setToolTip: _NS("Show/Hide Playlist")];
@@ -701,6 +701,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_prev_btn setTarget:self];
     [o_prev_btn setAction:@selector(prev:)];
     [o_prev_btn setToolTip: _NS("Previous")];
+    [[o_prev_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item.") forAttribute:NSAccessibilityDescriptionAttribute];
     [o_prev_btn setEnabled: b_enabled];
 
     o_next_btn = [[NSButton alloc] initWithFrame:preliminaryFrame];
@@ -712,7 +713,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_next_btn setTarget:self];
     [o_next_btn setAction:@selector(next:)];
     [o_next_btn setToolTip: _NS("Next")];
+    [[o_next_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item.") forAttribute:NSAccessibilityDescriptionAttribute];
     [o_next_btn setEnabled: b_enabled];
+
+    /* change the accessibility help for the backward/forward buttons accordingly */
+    [[o_bwd_btn cell] accessibilitySetOverrideValue:_NS("Click and hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[o_fwd_btn cell] accessibilitySetOverrideValue:_NS("Click and hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
 
     NSRect frame;
     float f_space = 32.;
@@ -781,6 +787,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_next_btn removeFromSuperviewWithoutNeedingDisplay];
     [o_prev_btn release];
     [o_next_btn release];
+
+    /* change the accessibility help for the backward/forward buttons accordingly */
+    [[o_bwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item. Hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[o_fwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item. Hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
 
     NSRect frame;
     float f_space = 32.;
