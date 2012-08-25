@@ -21,11 +21,11 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="4682"/>
       <integer value="5260"/>
       <integer value="3707"/>
       <integer value="5238"/>
-      <integer value="5266"/>
+      <integer value="5306"/>
+      <integer value="5265"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -58,7 +58,7 @@
         <nil key="NSUserInterfaceItemIdentifier"/>
         <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <object class="NSView" key="NSWindowView" id="429932428">
-          <reference key="NSNextResponder"/>
+          <nil key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -274,7 +274,7 @@
                     <object class="NSSearchField" id="596740638">
                       <reference key="NSNextResponder" ref="440594360"/>
                       <int key="NSvFlags">265</int>
-                      <string key="NSFrame">{{293, 253}, {110, 19}}</string>
+                      <string key="NSFrame">{{293, 254}, {110, 19}}</string>
                       <reference key="NSSuperview" ref="440594360"/>
                       <bool key="NSEnabled">YES</bool>
                       <object class="NSSearchFieldCell" key="NSCell" id="600721723">
@@ -1055,7 +1055,6 @@
             </object>
           </object>
           <string key="NSFrameSize">{604, 310}</string>
-          <reference key="NSSuperview"/>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
@@ -4954,20 +4953,46 @@ LCAuLi4</string>
       </object>
       <object class="NSCustomView" id="115834448">
         <reference key="NSNextResponder"/>
-        <int key="NSvFlags">-2147483358</int>
+        <int key="NSvFlags">290</int>
         <object class="NSMutableArray" key="NSSubviews">
           <bool key="EncodedWithXMLCoder">YES</bool>
+          <object class="NSButton" id="545072553">
+            <reference key="NSNextResponder" ref="115834448"/>
+            <int key="NSvFlags">265</int>
+            <string key="NSFrame">{{298, 1}, {101, 17}}</string>
+            <reference key="NSSuperview" ref="115834448"/>
+            <string key="NSReuseIdentifierKey">_NS:125</string>
+            <bool key="NSEnabled">YES</bool>
+            <object class="BGHUDButtonCell" key="NSCell" id="748519518">
+              <int key="NSCellFlags">67108864</int>
+              <int key="NSCellFlags2">134348800</int>
+              <string key="NSContents">Unsubscribe</string>
+              <reference key="NSSupport" ref="26"/>
+              <string key="NSCellIdentifier">_NS:125</string>
+              <reference key="NSControlView" ref="545072553"/>
+              <int key="NSButtonFlags">-2038284288</int>
+              <int key="NSButtonFlags2">36</int>
+              <reference key="NSAlternateImage" ref="747390061"/>
+              <string key="NSAlternateContents"/>
+              <string key="NSKeyEquivalent"/>
+              <int key="NSPeriodicDelay">200</int>
+              <int key="NSPeriodicInterval">25</int>
+              <string key="themeKey">gradientTheme</string>
+              <int key="BGButtonType">0</int>
+            </object>
+            <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+          </object>
           <object class="NSButton" id="882473348">
             <reference key="NSNextResponder" ref="115834448"/>
             <int key="NSvFlags">268</int>
-            <string key="NSFrame">{{5, 1}, {98, 17}}</string>
+            <string key="NSFrame">{{5, 1}, {101, 17}}</string>
             <reference key="NSSuperview" ref="115834448"/>
             <string key="NSReuseIdentifierKey">_NS:125</string>
             <bool key="NSEnabled">YES</bool>
             <object class="BGHUDButtonCell" key="NSCell" id="590507939">
               <int key="NSCellFlags">67108864</int>
               <int key="NSCellFlags2">134348800</int>
-              <string key="NSContents">Add Podcast</string>
+              <string key="NSContents">Subscribe</string>
               <reference key="NSSupport" ref="26"/>
               <string key="NSCellIdentifier">_NS:125</string>
               <reference key="NSControlView" ref="882473348"/>
@@ -5131,6 +5156,178 @@ LCAuLi4</string>
                 <bool key="NSDrawsBackground">YES</bool>
                 <reference key="NSBackgroundColor" ref="166084101"/>
                 <reference key="NSTextColor" ref="824843486"/>
+              </object>
+              <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+            </object>
+          </object>
+          <string key="NSFrameSize">{612, 159}</string>
+          <reference key="NSSuperview"/>
+        </object>
+        <string key="NSScreenRect">{{0, 0}, {2560, 1418}}</string>
+        <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
+        <bool key="NSWindowIsRestorable">YES</bool>
+      </object>
+      <object class="NSWindowTemplate" id="638212147">
+        <int key="NSWindowStyleMask">9</int>
+        <int key="NSWindowBacking">2</int>
+        <string key="NSWindowRect">{{265, 520}, {612, 159}}</string>
+        <int key="NSWTFlags">1886912512</int>
+        <string key="NSWindowTitle">Unsubscribe from a podcast</string>
+        <string key="NSWindowClass">NSWindow</string>
+        <object class="NSMutableString" key="NSViewClass">
+          <characters key="NS.bytes">View</characters>
+        </object>
+        <nil key="NSUserInterfaceItemIdentifier"/>
+        <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
+        <object class="NSView" key="NSWindowView" id="306630988">
+          <reference key="NSNextResponder"/>
+          <int key="NSvFlags">256</int>
+          <object class="NSMutableArray" key="NSSubviews">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSTextField" id="235212760">
+              <reference key="NSNextResponder" ref="306630988"/>
+              <int key="NSvFlags">266</int>
+              <string key="NSFrame">{{17, 122}, {578, 17}}</string>
+              <reference key="NSSuperview" ref="306630988"/>
+              <bool key="NSEnabled">YES</bool>
+              <object class="NSTextFieldCell" key="NSCell" id="78686668">
+                <int key="NSCellFlags">69206017</int>
+                <int key="NSCellFlags2">272629760</int>
+                <string key="NSContents">Unsubscribe from a podcast</string>
+                <reference key="NSSupport" ref="103182952"/>
+                <reference key="NSControlView" ref="235212760"/>
+                <reference key="NSBackgroundColor" ref="3414043"/>
+                <reference key="NSTextColor" ref="306532497"/>
+              </object>
+              <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+            </object>
+            <object class="NSTextField" id="926334721">
+              <reference key="NSNextResponder" ref="306630988"/>
+              <int key="NSvFlags">266</int>
+              <string key="NSFrame">{{17, 97}, {578, 17}}</string>
+              <reference key="NSSuperview" ref="306630988"/>
+              <bool key="NSEnabled">YES</bool>
+              <object class="NSTextFieldCell" key="NSCell" id="684801277">
+                <int key="NSCellFlags">69206017</int>
+                <int key="NSCellFlags2">272629824</int>
+                <string key="NSContents">Select the podcast you would like to unsubscribe from:</string>
+                <reference key="NSSupport" ref="26"/>
+                <reference key="NSControlView" ref="926334721"/>
+                <reference key="NSBackgroundColor" ref="3414043"/>
+                <reference key="NSTextColor" ref="306532497"/>
+              </object>
+              <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+            </object>
+            <object class="NSButton" id="956657117">
+              <reference key="NSNextResponder" ref="306630988"/>
+              <int key="NSvFlags">257</int>
+              <string key="NSFrame">{{475, 12}, {123, 32}}</string>
+              <reference key="NSSuperview" ref="306630988"/>
+              <bool key="NSEnabled">YES</bool>
+              <object class="NSButtonCell" key="NSCell" id="1041148904">
+                <int key="NSCellFlags">67108864</int>
+                <int key="NSCellFlags2">134217728</int>
+                <string key="NSContents">Unsubscribe</string>
+                <reference key="NSSupport" ref="841513812"/>
+                <reference key="NSControlView" ref="956657117"/>
+                <int key="NSButtonFlags">-2038284288</int>
+                <int key="NSButtonFlags2">1</int>
+                <reference key="NSAlternateImage" ref="841513812"/>
+                <string key="NSAlternateContents"/>
+                <string type="base64-UTF8" key="NSKeyEquivalent">DQ</string>
+                <int key="NSPeriodicDelay">200</int>
+                <int key="NSPeriodicInterval">25</int>
+              </object>
+              <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+            </object>
+            <object class="NSButton" id="917533641">
+              <reference key="NSNextResponder" ref="306630988"/>
+              <int key="NSvFlags">257</int>
+              <string key="NSFrame">{{352, 12}, {123, 32}}</string>
+              <reference key="NSSuperview" ref="306630988"/>
+              <bool key="NSEnabled">YES</bool>
+              <object class="NSButtonCell" key="NSCell" id="1061681216">
+                <int key="NSCellFlags">67108864</int>
+                <int key="NSCellFlags2">134217728</int>
+                <string key="NSContents">Cancel</string>
+                <reference key="NSSupport" ref="841513812"/>
+                <reference key="NSControlView" ref="917533641"/>
+                <int key="NSButtonFlags">-2038284288</int>
+                <int key="NSButtonFlags2">1</int>
+                <reference key="NSAlternateImage" ref="841513812"/>
+                <string key="NSAlternateContents"/>
+                <string type="base64-UTF8" key="NSKeyEquivalent">Gw</string>
+                <int key="NSPeriodicDelay">200</int>
+                <int key="NSPeriodicInterval">25</int>
+              </object>
+              <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+            </object>
+            <object class="NSPopUpButton" id="321940037">
+              <reference key="NSNextResponder" ref="306630988"/>
+              <int key="NSvFlags">268</int>
+              <string key="NSFrame">{{17, 64}, {578, 26}}</string>
+              <reference key="NSSuperview" ref="306630988"/>
+              <string key="NSReuseIdentifierKey">_NS:791</string>
+              <bool key="NSEnabled">YES</bool>
+              <object class="NSPopUpButtonCell" key="NSCell" id="651417520">
+                <int key="NSCellFlags">-2076180416</int>
+                <int key="NSCellFlags2">2048</int>
+                <reference key="NSSupport" ref="841513812"/>
+                <string key="NSCellIdentifier">_NS:791</string>
+                <reference key="NSControlView" ref="321940037"/>
+                <int key="NSButtonFlags">109199360</int>
+                <int key="NSButtonFlags2">129</int>
+                <string key="NSAlternateContents"/>
+                <string key="NSKeyEquivalent"/>
+                <int key="NSPeriodicDelay">400</int>
+                <int key="NSPeriodicInterval">75</int>
+                <object class="NSMenuItem" key="NSMenuItem" id="935890237">
+                  <reference key="NSMenu" ref="546815605"/>
+                  <string key="NSTitle">Item 1</string>
+                  <string key="NSKeyEquiv"/>
+                  <int key="NSKeyEquivModMask">1048576</int>
+                  <int key="NSMnemonicLoc">2147483647</int>
+                  <int key="NSState">1</int>
+                  <reference key="NSOnImage" ref="447396056"/>
+                  <reference key="NSMixedImage" ref="100133332"/>
+                  <string key="NSAction">_popUpItemAction:</string>
+                  <reference key="NSTarget" ref="651417520"/>
+                </object>
+                <bool key="NSMenuItemRespectAlignment">YES</bool>
+                <object class="NSMenu" key="NSMenu" id="546815605">
+                  <string key="NSTitle">OtherViews</string>
+                  <object class="NSMutableArray" key="NSMenuItems">
+                    <bool key="EncodedWithXMLCoder">YES</bool>
+                    <reference ref="935890237"/>
+                    <object class="NSMenuItem" id="179672234">
+                      <reference key="NSMenu" ref="546815605"/>
+                      <string key="NSTitle">Item 2</string>
+                      <string key="NSKeyEquiv"/>
+                      <int key="NSKeyEquivModMask">1048576</int>
+                      <int key="NSMnemonicLoc">2147483647</int>
+                      <reference key="NSOnImage" ref="447396056"/>
+                      <reference key="NSMixedImage" ref="100133332"/>
+                      <string key="NSAction">_popUpItemAction:</string>
+                      <reference key="NSTarget" ref="651417520"/>
+                    </object>
+                    <object class="NSMenuItem" id="880026468">
+                      <reference key="NSMenu" ref="546815605"/>
+                      <string key="NSTitle">Item 3</string>
+                      <string key="NSKeyEquiv"/>
+                      <int key="NSKeyEquivModMask">1048576</int>
+                      <int key="NSMnemonicLoc">2147483647</int>
+                      <reference key="NSOnImage" ref="447396056"/>
+                      <reference key="NSMixedImage" ref="100133332"/>
+                      <string key="NSAction">_popUpItemAction:</string>
+                      <reference key="NSTarget" ref="651417520"/>
+                    </object>
+                  </object>
+                  <reference key="NSMenuFont" ref="841513812"/>
+                </object>
+                <int key="NSPreferredEdge">1</int>
+                <bool key="NSUsesItemFromMenu">YES</bool>
+                <bool key="NSAltersState">YES</bool>
+                <int key="NSArrowPosition">2</int>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
             </object>
@@ -8306,6 +8503,78 @@ LCAuLi4</string>
           </object>
           <int key="connectionID">5301</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_podcast_unsubscribe_cancel_btn</string>
+            <reference key="source" ref="498338108"/>
+            <reference key="destination" ref="917533641"/>
+          </object>
+          <int key="connectionID">5325</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_podcast_unsubscribe_ok_btn</string>
+            <reference key="source" ref="498338108"/>
+            <reference key="destination" ref="956657117"/>
+          </object>
+          <int key="connectionID">5326</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_podcast_unsubscribe_pop</string>
+            <reference key="source" ref="498338108"/>
+            <reference key="destination" ref="321940037"/>
+          </object>
+          <int key="connectionID">5327</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_podcast_unsubscribe_subtitle_lbl</string>
+            <reference key="source" ref="498338108"/>
+            <reference key="destination" ref="926334721"/>
+          </object>
+          <int key="connectionID">5328</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_podcast_unsubscribe_title_lbl</string>
+            <reference key="source" ref="498338108"/>
+            <reference key="destination" ref="235212760"/>
+          </object>
+          <int key="connectionID">5329</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_podcast_unsubscribe_window</string>
+            <reference key="source" ref="498338108"/>
+            <reference key="destination" ref="638212147"/>
+          </object>
+          <int key="connectionID">5330</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">removePodcastWindowAction:</string>
+            <reference key="source" ref="498338108"/>
+            <reference key="destination" ref="956657117"/>
+          </object>
+          <int key="connectionID">5332</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">removePodcastWindowAction:</string>
+            <reference key="source" ref="498338108"/>
+            <reference key="destination" ref="917533641"/>
+          </object>
+          <int key="connectionID">5333</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">removePodcast:</string>
+            <reference key="source" ref="498338108"/>
+            <reference key="destination" ref="545072553"/>
+          </object>
+          <int key="connectionID">5334</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -11363,6 +11632,7 @@ LCAuLi4</string>
               <bool key="EncodedWithXMLCoder">YES</bool>
               <reference ref="157740914"/>
               <reference ref="882473348"/>
+              <reference ref="545072553"/>
             </object>
             <reference key="parent" ref="0"/>
             <string key="objectName">podcast</string>
@@ -11487,6 +11757,143 @@ LCAuLi4</string>
             <int key="objectID">5290</int>
             <reference key="object" ref="999644371"/>
             <reference key="parent" ref="150027265"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5302</int>
+            <reference key="object" ref="545072553"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="748519518"/>
+            </object>
+            <reference key="parent" ref="115834448"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5303</int>
+            <reference key="object" ref="748519518"/>
+            <reference key="parent" ref="545072553"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5305</int>
+            <reference key="object" ref="638212147"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="306630988"/>
+            </object>
+            <reference key="parent" ref="0"/>
+            <string key="objectName">Remove Podcast</string>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5306</int>
+            <reference key="object" ref="306630988"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="917533641"/>
+              <reference ref="956657117"/>
+              <reference ref="926334721"/>
+              <reference ref="235212760"/>
+              <reference ref="321940037"/>
+            </object>
+            <reference key="parent" ref="638212147"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5307</int>
+            <reference key="object" ref="917533641"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="1061681216"/>
+            </object>
+            <reference key="parent" ref="306630988"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5308</int>
+            <reference key="object" ref="956657117"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="1041148904"/>
+            </object>
+            <reference key="parent" ref="306630988"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5310</int>
+            <reference key="object" ref="926334721"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="684801277"/>
+            </object>
+            <reference key="parent" ref="306630988"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5311</int>
+            <reference key="object" ref="235212760"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="78686668"/>
+            </object>
+            <reference key="parent" ref="306630988"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5312</int>
+            <reference key="object" ref="78686668"/>
+            <reference key="parent" ref="235212760"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5313</int>
+            <reference key="object" ref="684801277"/>
+            <reference key="parent" ref="926334721"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5315</int>
+            <reference key="object" ref="1041148904"/>
+            <reference key="parent" ref="956657117"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5316</int>
+            <reference key="object" ref="1061681216"/>
+            <reference key="parent" ref="917533641"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5319</int>
+            <reference key="object" ref="321940037"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="651417520"/>
+            </object>
+            <reference key="parent" ref="306630988"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5320</int>
+            <reference key="object" ref="651417520"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="546815605"/>
+            </object>
+            <reference key="parent" ref="321940037"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5321</int>
+            <reference key="object" ref="546815605"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="935890237"/>
+              <reference ref="179672234"/>
+              <reference ref="880026468"/>
+            </object>
+            <reference key="parent" ref="651417520"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5322</int>
+            <reference key="object" ref="935890237"/>
+            <reference key="parent" ref="546815605"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5323</int>
+            <reference key="object" ref="179672234"/>
+            <reference key="parent" ref="546815605"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5324</int>
+            <reference key="object" ref="880026468"/>
+            <reference key="parent" ref="546815605"/>
           </object>
         </object>
       </object>
@@ -12329,6 +12736,38 @@ LCAuLi4</string>
           <string>5289.IBPluginDependency</string>
           <string>5289.IBViewBoundsToFrameTransform</string>
           <string>5290.IBPluginDependency</string>
+          <string>5302.IBPluginDependency</string>
+          <string>5302.IBViewBoundsToFrameTransform</string>
+          <string>5303.IBPluginDependency</string>
+          <string>5305.IBEditorWindowLastContentRect</string>
+          <string>5305.IBPluginDependency</string>
+          <string>5305.IBWindowTemplateEditedContentRect</string>
+          <string>5305.ImportedFromIB2</string>
+          <string>5306.IBPluginDependency</string>
+          <string>5306.ImportedFromIB2</string>
+          <string>5307.IBPluginDependency</string>
+          <string>5307.IBViewBoundsToFrameTransform</string>
+          <string>5307.ImportedFromIB2</string>
+          <string>5308.IBPluginDependency</string>
+          <string>5308.IBViewBoundsToFrameTransform</string>
+          <string>5308.ImportedFromIB2</string>
+          <string>5310.IBPluginDependency</string>
+          <string>5310.IBViewBoundsToFrameTransform</string>
+          <string>5310.ImportedFromIB2</string>
+          <string>5311.IBPluginDependency</string>
+          <string>5311.IBViewBoundsToFrameTransform</string>
+          <string>5311.ImportedFromIB2</string>
+          <string>5312.IBPluginDependency</string>
+          <string>5313.IBPluginDependency</string>
+          <string>5315.IBPluginDependency</string>
+          <string>5316.IBPluginDependency</string>
+          <string>5319.IBPluginDependency</string>
+          <string>5319.IBViewBoundsToFrameTransform</string>
+          <string>5320.IBPluginDependency</string>
+          <string>5321.IBPluginDependency</string>
+          <string>5322.IBPluginDependency</string>
+          <string>5323.IBPluginDependency</string>
+          <string>5324.IBPluginDependency</string>
           <string>56.IBPluginDependency</string>
           <string>56.ImportedFromIB2</string>
           <string>57.IBEditorWindowLastContentRect</string>
@@ -13304,7 +13743,7 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">P4AAAL+AAABChgAAwzcAAA</bytes>
+            <bytes key="NSTransformStruct">P4AAAL+AAABAoAAAwYAAAA</bytes>
           </object>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>{{789, 812}, {612, 159}}</string>
@@ -13341,6 +13780,50 @@ LCAuLi4</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABC3AAAwz8AAA</bytes>
           </object>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABBIAAAwTAAAA</bytes>
+          </object>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <string>{{789, 812}, {612, 159}}</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>{{789, 812}, {612, 159}}</string>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABDsAAAw2EAAA</bytes>
+          </object>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABD7YAAw2EAAA</bytes>
+          </object>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABCsgAAw4oAAA</bytes>
+          </object>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABCsgAAw5aAAA</bytes>
+          </object>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABBsAAAwmwAAA</bytes>
+          </object>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
@@ -13399,7 +13882,7 @@ LCAuLi4</string>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">5301</int>
+      <int key="maxID">5334</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -17896,6 +18379,8 @@ LCAuLi4</string>
               <string>next:</string>
               <string>play:</string>
               <string>prev:</string>
+              <string>removePodcast:</string>
+              <string>removePodcastWindowAction:</string>
               <string>repeat:</string>
               <string>shuffle:</string>
               <string>stop:</string>
@@ -17905,6 +18390,8 @@ LCAuLi4</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -17943,6 +18430,8 @@ LCAuLi4</string>
               <string>next:</string>
               <string>play:</string>
               <string>prev:</string>
+              <string>removePodcast:</string>
+              <string>removePodcastWindowAction:</string>
               <string>repeat:</string>
               <string>shuffle:</string>
               <string>stop:</string>
@@ -18005,6 +18494,14 @@ LCAuLi4</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
+                <string key="name">removePodcast:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">removePodcastWindowAction:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
                 <string key="name">repeat:</string>
                 <string key="candidateClassName">id</string>
               </object>
@@ -18064,12 +18561,19 @@ LCAuLi4</string>
               <string>o_playlist_btn</string>
               <string>o_playlist_table</string>
               <string>o_podcast_add_btn</string>
+              <string>o_podcast_remove_btn</string>
               <string>o_podcast_subscribe_cancel_btn</string>
               <string>o_podcast_subscribe_ok_btn</string>
               <string>o_podcast_subscribe_subtitle_lbl</string>
               <string>o_podcast_subscribe_title_lbl</string>
               <string>o_podcast_subscribe_url_fld</string>
               <string>o_podcast_subscribe_window</string>
+              <string>o_podcast_unsubscribe_cancel_btn</string>
+              <string>o_podcast_unsubscribe_ok_btn</string>
+              <string>o_podcast_unsubscribe_pop</string>
+              <string>o_podcast_unsubscribe_subtitle_lbl</string>
+              <string>o_podcast_unsubscribe_title_lbl</string>
+              <string>o_podcast_unsubscribe_window</string>
               <string>o_podcast_view</string>
               <string>o_progress_bar</string>
               <string>o_repeat_btn</string>
@@ -18153,6 +18657,13 @@ LCAuLi4</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
             </object>
           </object>
           <object class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -18189,12 +18700,19 @@ LCAuLi4</string>
               <string>o_playlist_btn</string>
               <string>o_playlist_table</string>
               <string>o_podcast_add_btn</string>
+              <string>o_podcast_remove_btn</string>
               <string>o_podcast_subscribe_cancel_btn</string>
               <string>o_podcast_subscribe_ok_btn</string>
               <string>o_podcast_subscribe_subtitle_lbl</string>
               <string>o_podcast_subscribe_title_lbl</string>
               <string>o_podcast_subscribe_url_fld</string>
               <string>o_podcast_subscribe_window</string>
+              <string>o_podcast_unsubscribe_cancel_btn</string>
+              <string>o_podcast_unsubscribe_ok_btn</string>
+              <string>o_podcast_unsubscribe_pop</string>
+              <string>o_podcast_unsubscribe_subtitle_lbl</string>
+              <string>o_podcast_unsubscribe_title_lbl</string>
+              <string>o_podcast_unsubscribe_window</string>
               <string>o_podcast_view</string>
               <string>o_progress_bar</string>
               <string>o_repeat_btn</string>
@@ -18341,6 +18859,10 @@ LCAuLi4</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
+                <string key="name">o_podcast_remove_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
                 <string key="name">o_podcast_subscribe_cancel_btn</string>
                 <string key="candidateClassName">id</string>
               </object>
@@ -18362,6 +18884,30 @@ LCAuLi4</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_podcast_subscribe_window</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_podcast_unsubscribe_cancel_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_podcast_unsubscribe_ok_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_podcast_unsubscribe_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_podcast_unsubscribe_subtitle_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_podcast_unsubscribe_title_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_podcast_unsubscribe_window</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">

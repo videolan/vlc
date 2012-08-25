@@ -2900,6 +2900,59 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     [o_podcast_subscribe_window orderOut:sender];
     [NSApp endSheet: o_podcast_subscribe_window];
+
+    if (sender == o_podcast_subscribe_ok_btn && [[o_podcast_subscribe_url_fld stringValue] length] > 0) {
+        NSMutableString * podcastConf = [[NSMutableString alloc] init];
+        if (config_GetPsz( VLCIntf, "podcast-urls" ) != NULL)
+            [podcastConf appendFormat:@"%s|", config_GetPsz( VLCIntf, "podcast-urls" )];
+
+        [podcastConf appendString: [o_podcast_subscribe_url_fld stringValue]];
+        config_PutPsz( VLCIntf, "podcast-urls", [podcastConf UTF8String] );
+
+        vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( VLCIntf->p_libvlc, "podcast" );
+        if( p_obj ) {
+            var_SetString( p_obj, "podcast-urls", [podcastConf UTF8String] );
+            vlc_object_release( p_obj );
+        }
+        [podcastConf release];
+    }
+}
+
+- (IBAction)removePodcast:(id)sender
+{
+    if (config_GetPsz( VLCIntf, "podcast-urls" ) != NULL) {
+        [o_podcast_unsubscribe_pop removeAllItems];
+        [o_podcast_unsubscribe_pop addItemsWithTitles:[[NSString stringWithUTF8String:config_GetPsz( VLCIntf, "podcast-urls" )] componentsSeparatedByString:@"|"]];
+        [NSApp beginSheet:o_podcast_unsubscribe_window modalForWindow:self modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    }
+}
+
+- (IBAction)removePodcastWindowAction:(id)sender
+{
+    [o_podcast_unsubscribe_window orderOut:sender];
+    [NSApp endSheet: o_podcast_unsubscribe_window];
+
+    if (sender == o_podcast_unsubscribe_ok_btn) {
+        NSMutableArray * urls = [[NSMutableArray alloc] initWithArray:[[NSString stringWithUTF8String:config_GetPsz( VLCIntf, "podcast-urls" )] componentsSeparatedByString:@"|"]];
+        [urls removeObjectAtIndex: [o_podcast_unsubscribe_pop indexOfSelectedItem]];
+        config_PutPsz( VLCIntf, "podcast-urls", [[urls componentsJoinedByString:@"|"] UTF8String] );
+        [urls release];
+
+        vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( VLCIntf->p_libvlc, "podcast" );
+        if( p_obj ) {
+            var_SetString( p_obj, "podcast-urls", config_GetPsz( VLCIntf, "podcast-urls" ) );
+            vlc_object_release( p_obj );
+        }
+
+        /* reload the podcast module, since it won't update its list when removing podcasts */
+        playlist_t * p_playlist = pl_Get( VLCIntf );
+        if( playlist_IsServicesDiscoveryLoaded( p_playlist, "podcast{longname=\"Podcasts\"}" ) ) {
+            playlist_ServicesDiscoveryRemove( p_playlist, "podcast{longname=\"Podcasts\"}" );
+            playlist_ServicesDiscoveryAdd( p_playlist, "podcast{longname=\"Podcasts\"}" );
+            [o_playlist_table reloadData];
+        }
+
+    }
 }
 
 - (void)showPodcastControls
@@ -2918,7 +2971,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_playlist_table setNeedsDisplay:YES];
 
     [o_right_split_view addSubview: o_podcast_view positioned: NSWindowAbove relativeTo: o_right_split_view];
-    [[o_podcast_view animator] setHidden:NO];
     b_podcastView_displayed = YES;
 }
 

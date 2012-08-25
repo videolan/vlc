@@ -89,12 +89,19 @@
 
     IBOutlet id o_podcast_view;
     IBOutlet id o_podcast_add_btn;
+    IBOutlet id o_podcast_remove_btn;
     IBOutlet id o_podcast_subscribe_window;
     IBOutlet id o_podcast_subscribe_title_lbl;
     IBOutlet id o_podcast_subscribe_subtitle_lbl;
     IBOutlet id o_podcast_subscribe_url_fld;
     IBOutlet id o_podcast_subscribe_cancel_btn;
     IBOutlet id o_podcast_subscribe_ok_btn;
+    IBOutlet id o_podcast_unsubscribe_window;
+    IBOutlet id o_podcast_unsubscribe_title_lbl;
+    IBOutlet id o_podcast_unsubscribe_subtitle_lbl;
+    IBOutlet id o_podcast_unsubscribe_pop;
+    IBOutlet id o_podcast_unsubscribe_ok_btn;
+    IBOutlet id o_podcast_unsubscribe_cancel_btn;
 
     BOOL b_dark_interface;
     BOOL b_nativeFullscreenMode;
@@ -177,6 +184,8 @@
 
 - (IBAction)addPodcast:(id)sender;
 - (IBAction)addPodcastWindowAction:(id)sender;
+- (IBAction)removePodcast:(id)sender;
+- (IBAction)removePodcastWindowAction:(id)sender;
 
 - (void)setTitle:(NSString *)title;
 - (void)customZoom:(id)sender;
