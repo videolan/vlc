@@ -898,7 +898,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (IBAction)posterizeModifierChanged:(id)sender
 {
-    [self setVideoFilterProperty: "posterize-level" forFilter: "posterize" integer: [o_extract_fld intValue]];
+    [self setVideoFilterProperty: "posterize-level" forFilter: "posterize" integer: [o_posterize_fld intValue]];
 }
 
 - (IBAction)enableBlur:(id)sender
