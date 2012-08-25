@@ -254,6 +254,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[o_dropzone_btn cell] accessibilitySetOverrideValue:_NS("Click to open an advanced dialog to select the media to play. You can also drop files here to play.") forAttribute:NSAccessibilityDescriptionAttribute];
     [o_dropzone_lbl setStringValue: _NS("Drop media here")];
 
+    [o_podcast_add_btn setTitle: _NS("Add Podcast")];
+    [o_podcast_subscribe_title_lbl setStringValue: _NS("Subscribe to a podcast")];
+    [o_podcast_subscribe_subtitle_lbl setStringValue: _NS("Enter URL of the podcast to subscribe to:")];
+    [o_podcast_subscribe_cancel_btn setTitle: _NS("Cancel")];
+    [o_podcast_subscribe_ok_btn setTitle: _NS("Subscribe")];
+
     if (!b_dark_interface) {
         [o_bottombar_view setImagesLeft: [NSImage imageNamed:@"bottom-background"] middle: [NSImage imageNamed:@"bottom-background"] right: [NSImage imageNamed:@"bottom-background"]];
         [o_detached_bottombar_view setImagesLeft: [NSImage imageNamed:@"bottom-background"] middle: [NSImage imageNamed:@"bottom-background"] right: [NSImage imageNamed:@"bottom-background"]];
@@ -499,8 +505,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
                 {
                     [internetItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                     if (!strncmp( *ppsz_name, "podcast", 7 ))
-                        [internetItems removeLastObject]; // we don't support podcasts at this point (see #6017)
-//                        [[internetItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-podcast"]];
+                        [[internetItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-podcast"]];
                     else
                         [[internetItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
                     [[internetItems lastObject] setSdtype: SD_CAT_INTERNET];
@@ -1859,7 +1864,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_extra_video_window setCanBecomeMainWindow: NO];
         [o_extra_video_window useOptimizedDrawing: YES];
         [o_extra_video_window setMovableByWindowBackground: NO];
-        
+
         [o_video_view retain];
         if ([o_video_view superview] != NULL)
             [o_video_view removeFromSuperviewWithoutNeedingDisplay];
@@ -2090,7 +2095,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     NSRect rect;
     BOOL blackout_other_displays = var_InheritBool( VLCIntf, "macosx-black" );
     o_current_video_window = [o_video_view window];
-    
+
     screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_InheritInteger( VLCIntf, "macosx-vdev" )];
     [self lockFullscreenAnimation];
 
@@ -2784,6 +2789,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
     else
         [self showDropZone];
     PL_UNLOCK;
+
+    if ([[item identifier] isEqualToString:@"podcast{longname=\"Podcasts\"}"])
+        [self showPodcastControls];
+    else
+        [self hidePodcastControls];
 }
 
 - (NSDragOperation)sourceList:(PXSourceList *)aSourceList validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
@@ -2876,6 +2886,55 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     return nil;
+}
+
+#pragma mark -
+#pragma mark Podcast
+
+- (IBAction)addPodcast:(id)sender
+{
+    [NSApp beginSheet:o_podcast_subscribe_window modalForWindow:self modalDelegate:self didEndSelector:NULL contextInfo:nil];
+}
+
+- (IBAction)addPodcastWindowAction:(id)sender
+{
+    [o_podcast_subscribe_window orderOut:sender];
+    [NSApp endSheet: o_podcast_subscribe_window];
+}
+
+- (void)showPodcastControls
+{
+    NSRect podcastViewDimensions = [o_podcast_view frame];
+    NSRect rightSplitRect = [o_right_split_view frame];
+    NSRect playlistTableRect = [o_playlist_table frame];
+
+    podcastViewDimensions.size.width = rightSplitRect.size.width;
+    podcastViewDimensions.origin.x = podcastViewDimensions.origin.y = .0;
+    [o_podcast_view setFrame:podcastViewDimensions];
+
+    playlistTableRect.origin.y = playlistTableRect.origin.y + podcastViewDimensions.size.height;
+    playlistTableRect.size.height = playlistTableRect.size.height - podcastViewDimensions.size.height;
+    [o_playlist_table setFrame:playlistTableRect];
+    [o_playlist_table setNeedsDisplay:YES];
+
+    [o_right_split_view addSubview: o_podcast_view positioned: NSWindowAbove relativeTo: o_right_split_view];
+    [[o_podcast_view animator] setHidden:NO];
+    b_podcastView_displayed = YES;
+}
+
+- (void)hidePodcastControls
+{
+    if (b_podcastView_displayed) {
+        NSRect podcastViewDimensions = [o_podcast_view frame];
+        NSRect playlistTableRect = [o_playlist_table frame];
+
+        playlistTableRect.origin.y = playlistTableRect.origin.y - podcastViewDimensions.size.height;
+        playlistTableRect.size.height = playlistTableRect.size.height + podcastViewDimensions.size.height;
+
+        [o_podcast_view removeFromSuperviewWithoutNeedingDisplay];
+        [o_playlist_table setFrame: playlistTableRect];
+        b_podcastView_displayed = NO;
+    }
 }
 
 #pragma mark -

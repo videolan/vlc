@@ -87,6 +87,15 @@
     IBOutlet id o_detached_titlebar_view;
     IBOutlet id o_detached_video_window;
 
+    IBOutlet id o_podcast_view;
+    IBOutlet id o_podcast_add_btn;
+    IBOutlet id o_podcast_subscribe_window;
+    IBOutlet id o_podcast_subscribe_title_lbl;
+    IBOutlet id o_podcast_subscribe_subtitle_lbl;
+    IBOutlet id o_podcast_subscribe_url_fld;
+    IBOutlet id o_podcast_subscribe_cancel_btn;
+    IBOutlet id o_podcast_subscribe_ok_btn;
+
     BOOL b_dark_interface;
     BOOL b_nativeFullscreenMode;
     BOOL b_video_playback_enabled;
@@ -124,6 +133,7 @@
     NSMutableArray *o_sidebaritems;
 
     BOOL              b_nonembedded;
+    BOOL              b_podcastView_displayed;
 
     VLCWindow       * o_fullscreen_window;
     NSViewAnimation * o_fullscreen_anim1;
@@ -164,6 +174,9 @@
 - (IBAction)effects:(id)sender;
 - (IBAction)fullscreen:(id)sender;
 - (IBAction)dropzoneButtonAction:(id)sender;
+
+- (IBAction)addPodcast:(id)sender;
+- (IBAction)addPodcastWindowAction:(id)sender;
 
 - (void)setTitle:(NSString *)title;
 - (void)customZoom:(id)sender;
