@@ -58,6 +58,7 @@
     IBOutlet id _customize_panel;
     IBOutlet id _customize_ok_btn;
     IBOutlet id _customize_cancel_btn;
+    IBOutlet id _customize_newProfile_btn;
     IBOutlet id _customize_tabview;
     IBOutlet id _customize_encap_matrix;
     IBOutlet id _customize_vid_ckb;
@@ -89,6 +90,20 @@
     IBOutlet id _customize_subs_ckb;
     IBOutlet id _customize_subs_pop;
     IBOutlet id _customize_subs_overlay_ckb;
+
+    IBOutlet id _addProfile_panel;
+    IBOutlet id _addProfile_title_lbl;
+    IBOutlet id _addProfile_subtitle_lbl;
+    IBOutlet id _addProfile_name_fld;
+    IBOutlet id _addProfile_cancel_btn;
+    IBOutlet id _addProfile_ok_btn;
+
+    IBOutlet id _deleteProfile_panel;
+    IBOutlet id _deleteProfile_title_lbl;
+    IBOutlet id _deleteProfile_subtitle_lbl;
+    IBOutlet id _deleteProfile_pop;
+    IBOutlet id _deleteProfile_cancel_btn;
+    IBOutlet id _deleteProfile_ok_btn;
 
     IBOutlet id _stream_panel;
     IBOutlet id _stream_ok_btn;
@@ -136,6 +151,8 @@
 - (IBAction)switchProfile:(id)sender;
 - (IBAction)customizeProfile:(id)sender;
 - (IBAction)closeCustomizationSheet:(id)sender;
+- (IBAction)newProfileAction:(id)sender;
+- (IBAction)deleteProfileAction:(id)sender;
 - (IBAction)iWantAFile:(id)sender;
 - (IBAction)iWantAStream:(id)sender;
 - (IBAction)cancelDestination:(id)sender;
