@@ -355,6 +355,7 @@ static int InputEvent( vlc_object_t *p_this, const char *,
         event = new IMEvent( IMEvent::InfoChanged );
         break;
     case INPUT_EVENT_ITEM_NAME:
+        b_unified = true;
         event = new IMEvent( IMEvent::NameChanged );
         break;
 
