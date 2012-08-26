@@ -1656,10 +1656,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     NSDirectoryEnumerator *direnum = [[NSFileManager defaultManager] enumeratorAtPath:crashReporter];
     NSString *fname;
     NSString * latestLog = nil;
-    int year  = !previouslySeen ? [[NSUserDefaults standardUserDefaults] integerForKey:@"LatestCrashReportYear"] : 0;
-    int month = !previouslySeen ? [[NSUserDefaults standardUserDefaults] integerForKey:@"LatestCrashReportMonth"]: 0;
-    int day   = !previouslySeen ? [[NSUserDefaults standardUserDefaults] integerForKey:@"LatestCrashReportDay"]  : 0;
-    int hours = !previouslySeen ? [[NSUserDefaults standardUserDefaults] integerForKey:@"LatestCrashReportHours"]: 0;
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+    int year  = !previouslySeen ? [defaults integerForKey:@"LatestCrashReportYear"] : 0;
+    int month = !previouslySeen ? [defaults integerForKey:@"LatestCrashReportMonth"]: 0;
+    int day   = !previouslySeen ? [defaults integerForKey:@"LatestCrashReportDay"]  : 0;
+    int hours = !previouslySeen ? [defaults integerForKey:@"LatestCrashReportHours"]: 0;
 
     while (fname = [direnum nextObject])
     {
@@ -1694,10 +1695,10 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     if( !previouslySeen )
     {
-        [[NSUserDefaults standardUserDefaults] setInteger:year  forKey:@"LatestCrashReportYear"];
-        [[NSUserDefaults standardUserDefaults] setInteger:month forKey:@"LatestCrashReportMonth"];
-        [[NSUserDefaults standardUserDefaults] setInteger:day   forKey:@"LatestCrashReportDay"];
-        [[NSUserDefaults standardUserDefaults] setInteger:hours forKey:@"LatestCrashReportHours"];
+        [defaults setInteger:year  forKey:@"LatestCrashReportYear"];
+        [defaults setInteger:month forKey:@"LatestCrashReportMonth"];
+        [defaults setInteger:day   forKey:@"LatestCrashReportDay"];
+        [defaults setInteger:hours forKey:@"LatestCrashReportHours"];
     }
     return latestLog;
 }
@@ -1711,13 +1712,14 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     // This pref key doesn't exists? this VLC is an upgrade, and this crash log come from previous version
-    BOOL areCrashLogsTooOld = ![[NSUserDefaults standardUserDefaults] integerForKey:@"LatestCrashReportYear"];
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+    BOOL areCrashLogsTooOld = ![defaults integerForKey:@"LatestCrashReportYear"];
     NSString * latestLog = [self latestCrashLogPathPreviouslySeen:NO];
     if( latestLog && !areCrashLogsTooOld )
     {
-        if ([[NSUserDefaults standardUserDefaults] integerForKey:@"AlwaysSendCrashReports"] > 0)
+        if ([defaults integerForKey:@"AlwaysSendCrashReports"] > 0)
             [self sendCrashLog:[NSString stringWithContentsOfFile: [self latestCrashLogPath] encoding: NSUTF8StringEncoding error: NULL] withUserComment: [o_crashrep_fld string]];
-        else if ([[NSUserDefaults standardUserDefaults] integerForKey:@"AlwaysSendCrashReports"] == 0)
+        else if ([defaults integerForKey:@"AlwaysSendCrashReports"] == 0)
             [NSApp runModalForWindow: o_crashrep_win];
         // bail out, the user doesn't want us to send reports
     }
@@ -1760,13 +1762,14 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     static NSString * kVLCPreferencesVersion = @"VLCPreferencesVersion";
     static const int kCurrentPreferencesVersion = 2;
-    int version = [[NSUserDefaults standardUserDefaults] integerForKey:kVLCPreferencesVersion];
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+    int version = [defaults integerForKey:kVLCPreferencesVersion];
     if( version >= kCurrentPreferencesVersion ) return;
 
     if( version == 1 )
     {
-        [[NSUserDefaults standardUserDefaults] setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+        [defaults setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
+        [defaults synchronize];
 
         if (![[VLCCoreInteraction sharedInstance] fixPreferences])
             return;
@@ -1784,7 +1787,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         if(![[NSFileManager defaultManager] fileExistsAtPath:[preferences stringByAppendingPathComponent:@"org.videolan.vlc"]] &&
            ![[NSFileManager defaultManager] fileExistsAtPath:[preferences stringByAppendingPathComponent:@"org.videolan.vlc.plist"]] )
         {
-            [[NSUserDefaults standardUserDefaults] setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
+            [defaults setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
             return;
         }
 
@@ -1793,7 +1796,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                     _NS("Move To Trash and Relaunch VLC"), _NS("Ignore"), nil, nil);
         if( res != NSOKButton )
         {
-            [[NSUserDefaults standardUserDefaults] setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
+            [defaults setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
             return;
         }
 
@@ -1805,8 +1808,8 @@ static VLCMain *_o_sharedMainInstance = nil;
         /* really reset the defaults from now on */
         [NSUserDefaults resetStandardUserDefaults];
 
-        [[NSUserDefaults standardUserDefaults] setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+        [defaults setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
+        [defaults synchronize];
     }
 
     /* Relaunch now */
