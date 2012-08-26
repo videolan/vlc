@@ -1201,6 +1201,7 @@ static const entry_t p_list_audio[] = {
 
     B(VLC_CODEC_VORBIS, "Vorbis Audio"),
         A("vorb"),
+        A("vor1"),
 
     B(VLC_CODEC_OPUS, "Opus Audio"),
         A("Opus"),
