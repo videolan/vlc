@@ -240,8 +240,14 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 {
     if( i_return == NSAlertAlternateReturn )
     {
+        /* reset VLC's config */
         config_ResetAll( p_intf );
         [_rootTreeItem resetView];
+        config_SaveConfigFile( p_intf );
+
+        /* reset OS X defaults */
+        [NSUserDefaults resetStandardUserDefaults];
+        [[NSUserDefaults standardUserDefaults] synchronize];
     }
 }
 

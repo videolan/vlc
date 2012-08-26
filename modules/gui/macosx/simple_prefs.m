@@ -742,9 +742,14 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
 {
     if( i_return == NSAlertAlternateReturn )
     {
+        /* reset VLC's config */
         config_ResetAll( p_intf );
         [self resetControls];
         config_SaveConfigFile( p_intf );
+
+        /* reset OS X defaults */
+        [NSUserDefaults resetStandardUserDefaults];
+        [[NSUserDefaults standardUserDefaults] synchronize];
     }
 }
 
