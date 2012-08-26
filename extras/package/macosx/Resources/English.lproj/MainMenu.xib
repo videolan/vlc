@@ -24,8 +24,8 @@
       <integer value="5260"/>
       <integer value="3707"/>
       <integer value="5238"/>
-      <integer value="5306"/>
       <integer value="5265"/>
+      <integer value="5306"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -5045,7 +5045,7 @@ LCAuLi4</string>
         <string key="NSClassName">NSView</string>
       </object>
       <object class="NSWindowTemplate" id="663412952">
-        <int key="NSWindowStyleMask">9</int>
+        <int key="NSWindowStyleMask">1</int>
         <int key="NSWindowBacking">2</int>
         <string key="NSWindowRect">{{265, 520}, {612, 159}}</string>
         <int key="NSWTFlags">1886912512</int>
@@ -5055,7 +5055,8 @@ LCAuLi4</string>
           <characters key="NS.bytes">View</characters>
         </object>
         <nil key="NSUserInterfaceItemIdentifier"/>
-        <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
+        <string key="NSWindowContentMaxSize">{612, 159}</string>
+        <string key="NSWindowContentMinSize">{612, 159}</string>
         <object class="NSView" key="NSWindowView" id="383192078">
           <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
@@ -5164,11 +5165,12 @@ LCAuLi4</string>
           <reference key="NSSuperview"/>
         </object>
         <string key="NSScreenRect">{{0, 0}, {2560, 1418}}</string>
-        <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
+        <string key="NSMinSize">{612, 181}</string>
+        <string key="NSMaxSize">{612, 181}</string>
         <bool key="NSWindowIsRestorable">YES</bool>
       </object>
       <object class="NSWindowTemplate" id="638212147">
-        <int key="NSWindowStyleMask">9</int>
+        <int key="NSWindowStyleMask">1</int>
         <int key="NSWindowBacking">2</int>
         <string key="NSWindowRect">{{265, 520}, {612, 159}}</string>
         <int key="NSWTFlags">1886912512</int>
@@ -5178,7 +5180,8 @@ LCAuLi4</string>
           <characters key="NS.bytes">View</characters>
         </object>
         <nil key="NSUserInterfaceItemIdentifier"/>
-        <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
+        <string key="NSWindowContentMaxSize">{612, 159}</string>
+        <string key="NSWindowContentMinSize">{612, 159}</string>
         <object class="NSView" key="NSWindowView" id="306630988">
           <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
@@ -5336,7 +5339,8 @@ LCAuLi4</string>
           <reference key="NSSuperview"/>
         </object>
         <string key="NSScreenRect">{{0, 0}, {2560, 1418}}</string>
-        <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
+        <string key="NSMinSize">{612, 181}</string>
+        <string key="NSMaxSize">{612, 181}</string>
         <bool key="NSWindowIsRestorable">YES</bool>
       </object>
     </object>
@@ -12715,6 +12719,10 @@ LCAuLi4</string>
           <string>5265.IBPluginDependency</string>
           <string>5265.IBWindowTemplateEditedContentRect</string>
           <string>5265.ImportedFromIB2</string>
+          <string>5265.windowTemplate.hasMaxSize</string>
+          <string>5265.windowTemplate.hasMinSize</string>
+          <string>5265.windowTemplate.maxSize</string>
+          <string>5265.windowTemplate.minSize</string>
           <string>5266.IBPluginDependency</string>
           <string>5266.ImportedFromIB2</string>
           <string>5268.IBPluginDependency</string>
@@ -12743,6 +12751,10 @@ LCAuLi4</string>
           <string>5305.IBPluginDependency</string>
           <string>5305.IBWindowTemplateEditedContentRect</string>
           <string>5305.ImportedFromIB2</string>
+          <string>5305.windowTemplate.hasMaxSize</string>
+          <string>5305.windowTemplate.hasMinSize</string>
+          <string>5305.windowTemplate.maxSize</string>
+          <string>5305.windowTemplate.minSize</string>
           <string>5306.IBPluginDependency</string>
           <string>5306.ImportedFromIB2</string>
           <string>5307.IBPluginDependency</string>
@@ -13750,6 +13762,10 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>{{789, 812}, {612, 159}}</string>
           <boolean value="YES"/>
+          <boolean value="YES"/>
+          <boolean value="YES"/>
+          <string>{612, 159}</string>
+          <string>{612, 159}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -13790,6 +13806,10 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>{{789, 812}, {612, 159}}</string>
           <boolean value="YES"/>
+          <boolean value="YES"/>
+          <boolean value="YES"/>
+          <string>{612, 159}</string>
+          <string>{612, 159}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
