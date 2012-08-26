@@ -94,6 +94,8 @@ static int OpenDecoder( vlc_object_t *p_this )
         /* Planar YUV */
         case VLC_CODEC_I444:
         case VLC_CODEC_J444:
+        case VLC_CODEC_I440:
+        case VLC_CODEC_J440:
         case VLC_CODEC_I422:
         case VLC_CODEC_J422:
         case VLC_CODEC_I420:
