@@ -71,6 +71,7 @@ public:
 
     int currentViewIndex() const;
 
+    static QMenu *viewSelectionMenu(StandardPLPanel *obj);
 protected:
     PLModel *model;
     MLModel *mlmodel;
@@ -111,6 +112,7 @@ private:
 public slots:
     void setRootItem( playlist_item_t *, bool );
     void browseInto( const QModelIndex& );
+    void showView( int );
 
 private slots:
     void deleteSelection();
@@ -136,7 +138,6 @@ private slots:
     void decreaseZoom() { updateZoom( i_zoom - 1 ); };
     void toggleColumnShown( int );
 
-    void showView( int );
     void cycleViews();
 
 signals:

@@ -255,25 +255,7 @@ bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, con
 
     CONNECT( &menu, triggered( QAction * ), model, actionSlot( QAction * ) );
 
-    QMenu *viewMenu = new QMenu( qtr( "Playlist View Mode" ) );
-
-    /* View selection menu */
-    QSignalMapper *viewSelectionMapper = new QSignalMapper( this );
-    CONNECT( viewSelectionMapper, mapped( int ), this, showView( int ) );
-
-    QActionGroup *viewGroup = new QActionGroup( this );
-# define MAX_VIEW StandardPLPanel::VIEW_COUNT
-    for( int i = 0; i < MAX_VIEW; i++ )
-    {
-        QAction *action = viewMenu->addAction( viewNames[i] );
-        action->setCheckable( true );
-        viewGroup->addAction( action );
-        viewSelectionMapper->setMapping( action, i );
-        CONNECT( action, triggered(), viewSelectionMapper, map() );
-        if( currentViewIndex() == i )
-            action->setChecked( true );
-    }
-    menu.addMenu( viewMenu );
+    menu.addMenu( StandardPLPanel::viewSelectionMenu( this ) );
 
     /* Display and forward the result */
     if( !menu.isEmpty() )
@@ -283,6 +265,27 @@ bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, con
     else return false;
 
 #undef ADD_MENU_ENTRY
+}
+
+QMenu* StandardPLPanel::viewSelectionMenu( StandardPLPanel *panel )
+{
+    QMenu *viewMenu = new QMenu( qtr( "Playlist View Mode" ) );
+    QSignalMapper *viewSelectionMapper = new QSignalMapper( viewMenu );
+    CONNECT( viewSelectionMapper, mapped( int ), panel, showView( int ) );
+
+    QActionGroup *viewGroup = new QActionGroup( viewMenu );
+# define MAX_VIEW StandardPLPanel::VIEW_COUNT
+    for( int i = 0; i < MAX_VIEW; i++ )
+    {
+        QAction *action = viewMenu->addAction( viewNames[i] );
+        action->setCheckable( true );
+        viewGroup->addAction( action );
+        viewSelectionMapper->setMapping( action, i );
+        CONNECT( action, triggered(), viewSelectionMapper, map() );
+        if( panel->currentViewIndex() == i )
+            action->setChecked( true );
+    }
+    return viewMenu;
 }
 
 void StandardPLPanel::popupSelectColumn( QPoint )
