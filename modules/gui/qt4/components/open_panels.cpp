@@ -348,6 +348,9 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     };
     QComboBox *discCombo = ui.deviceCombo; /* avoid namespacing in macro */
     POPULATE_WITH_DEVS( ppsz_discdevices, discCombo );
+    int temp = ui.deviceCombo->findData( config_GetPsz( p_intf, "dvd" ), Qt::UserRole, Qt::MatchStartsWith );
+    if( temp != -1 )
+        ui.deviceCombo->setCurrentIndex( temp );
 #endif
 
     /* CONNECTs */
