@@ -72,6 +72,7 @@ public:
     int currentViewIndex() const;
 
     static QMenu *viewSelectionMenu(StandardPLPanel *obj);
+
 protected:
     PLModel *model;
     MLModel *mlmodel;

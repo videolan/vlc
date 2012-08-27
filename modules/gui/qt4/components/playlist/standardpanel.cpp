@@ -455,6 +455,13 @@ void StandardPLPanel::browseInto()
 
 void StandardPLPanel::wheelEvent( QWheelEvent *e )
 {
+    if( e->modifiers() & Qt::ControlModifier ) {
+        int numSteps = e->delta() / 8 / 15;
+        if( numSteps > 0)
+            increaseZoom();
+        else if( numSteps < 0)
+            decreaseZoom();
+    }
     // Accept this event in order to prevent unwanted volume up/down changes
     e->accept();
 }

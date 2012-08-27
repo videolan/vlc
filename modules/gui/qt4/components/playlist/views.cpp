@@ -344,10 +344,15 @@ bool PlIconView::viewportEvent ( QEvent * event )
         event->ignore();
         return true;
     }
-    else
+    else if ( event->type() == QEvent::Wheel )
     {
-        return QAbstractItemView::viewportEvent( event );
+        QWheelEvent *wEvent = static_cast<QWheelEvent *>(event);
+        if( wEvent->modifiers() & Qt::ControlModifier ) {
+            event->ignore();
+            return true;
+        }
     }
+    return QAbstractItemView::viewportEvent( event );
 }
 
 PlListView::PlListView( PLModel *, QWidget *parent ) : QListView( parent )
@@ -396,10 +401,15 @@ bool PlListView::viewportEvent ( QEvent * event )
         event->ignore();
         return true;
     }
-    else
+    else if ( event->type() == QEvent::Wheel )
     {
-        return QAbstractItemView::viewportEvent( event );
+        QWheelEvent *wEvent = static_cast<QWheelEvent *>(event);
+        if( wEvent->modifiers() & Qt::ControlModifier ) {
+            event->ignore();
+            return true;
+        }
     }
+    return QAbstractItemView::viewportEvent( event );
 }
 
 PlTreeView::PlTreeView( PLModel *, QWidget *parent ) : QTreeView( parent )
@@ -560,8 +570,13 @@ bool PicFlowView::viewportEvent ( QEvent * event )
         event->ignore();
         return true;
     }
-    else
+    else if ( event->type() == QEvent::Wheel )
     {
-        return QAbstractItemView::viewportEvent( event );
+        QWheelEvent *wEvent = static_cast<QWheelEvent *>(event);
+        if( wEvent->modifiers() & Qt::ControlModifier ) {
+            event->ignore();
+            return true;
+        }
     }
+    return QAbstractItemView::viewportEvent( event );
 }
