@@ -579,7 +579,8 @@ void StandardPLPanel::createTreeView()
 
 void StandardPLPanel::updateZoom( int i )
 {
-    if ( i < 4 - QApplication::font().pointSize() ) return;
+    if ( i < 5 - QApplication::font().pointSize() ) return;
+    if ( i > 3 + QApplication::font().pointSize() ) return;
     i_zoom = i;
 #define A_ZOOM( view ) \
     if ( view ) \
