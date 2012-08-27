@@ -933,7 +933,13 @@ int MainInterface::getControlsVisibilityStatus()
 {
     if( !controls ) return 0;
     return( (controls->isVisible() ? CONTROLS_VISIBLE : CONTROLS_HIDDEN )
-                + CONTROLS_ADVANCED * controls->b_advancedVisible );
+            + CONTROLS_ADVANCED * controls->b_advancedVisible );
+}
+
+StandardPLPanel *MainInterface::getPlaylistView()
+{
+    if( !playlistWidget ) return NULL;
+    else return playlistWidget->mainView;
 }
 
 void MainInterface::setStatusBarVisibility( bool b_visible )

@@ -49,6 +49,7 @@
 #include "extensions_manager.hpp"                 /* Extensions menu */
 #include "util/qmenuview.hpp"                     /* Simple Playlist menu */
 #include "components/playlist/playlist_model.hpp" /* PLModel getter */
+#include "components/playlist/standardpanel.hpp"  /* PLView getter */
 
 #include <QMenu>
 #include <QMenuBar>
@@ -474,6 +475,8 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
             qtr( "Play&list" ), mi,
             SLOT( togglePlaylist() ), qtr( "Ctrl+L" ) );
 
+    if( mi->getPlaylistView() )
+        menu->addMenu( StandardPLPanel::viewSelectionMenu( mi->getPlaylistView() ) );
     menu->addSeparator();
 
     /* Minimal View */

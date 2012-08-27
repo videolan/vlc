@@ -57,10 +57,12 @@ public:
     void forceHide();
     void forceShow();
     QStackedWidget *artContainer;
+    StandardPLPanel      *mainView;
+
 private:
     QSplitter            *leftSplitter;
     QSplitter            *split;
-    StandardPLPanel      *mainView;
+
     PLSelector           *selector;
 
     LocationBar          *locationBar;

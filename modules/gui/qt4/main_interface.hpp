@@ -54,6 +54,7 @@ class SpeedControlWidget;
 class QVBoxLayout;
 class QMenu;
 class QSize;
+class StandardPLPanel;
 
 enum {
     CONTROLS_VISIBLE  = 0x1,
@@ -87,6 +88,7 @@ public:
     int getControlsVisibilityStatus();
     bool isPlDocked() { return ( b_plDocked != false ); }
     bool isInterfaceFullScreen() { return b_interfaceFullScreen; }
+    StandardPLPanel* getPlaylistView();
 
 protected:
     void dropEventPlay( QDropEvent* event, bool b_play ) { dropEventPlay(event, b_play, true); }
