@@ -120,25 +120,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     viewButton->setToolTip( qtr("Change playlistview") );
     topbarLayout->addWidget( viewButton );
 
-    /* View selection menu */
-    QSignalMapper *viewSelectionMapper = new QSignalMapper( this );
-    CONNECT( viewSelectionMapper, mapped( int ), mainView, showView( int ) );
-
-    QActionGroup *actionGroup = new QActionGroup( this );
-
-# define MAX_VIEW StandardPLPanel::VIEW_COUNT
-    for( int i = 0; i < MAX_VIEW; i++ )
-    {
-        viewActions[i] = actionGroup->addAction( viewNames[i] );
-        viewActions[i]->setCheckable( true );
-        viewSelectionMapper->setMapping( viewActions[i], i );
-        CONNECT( viewActions[i], triggered(), viewSelectionMapper, map() );
-    }
-    viewActions[mainView->currentViewIndex()]->setChecked( true );
-
-    QMenu *viewMenu = new QMenu( viewButton );
-    viewMenu->addActions( actionGroup->actions() );
-    viewButton->setMenu( viewMenu );
+    viewButton->setMenu( StandardPLPanel::viewSelectionMenu( mainView ));
     CONNECT( viewButton, clicked(), mainView, cycleViews() );
 
     /* Search */
@@ -247,7 +229,6 @@ void PlaylistWidget::changeView( const QModelIndex& index )
 {
     searchEdit->clear();
     locationBar->setIndex( index );
-    viewActions[mainView->currentViewIndex()]->setChecked( true );
 }
 
 void PlaylistWidget::clearPlaylist()

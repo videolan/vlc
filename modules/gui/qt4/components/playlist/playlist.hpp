@@ -63,8 +63,6 @@ private:
     StandardPLPanel      *mainView;
     PLSelector           *selector;
 
-    QAction *viewActions[ 4 /* StandardPLPanel::VIEW_COUNT*/ ];
-
     LocationBar          *locationBar;
     SearchLineEdit       *searchEdit;
 
