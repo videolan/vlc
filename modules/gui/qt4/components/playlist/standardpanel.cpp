@@ -261,11 +261,13 @@ bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, con
     QSignalMapper *viewSelectionMapper = new QSignalMapper( this );
     CONNECT( viewSelectionMapper, mapped( int ), this, showView( int ) );
 
+    QActionGroup *viewGroup = new QActionGroup( this );
 # define MAX_VIEW StandardPLPanel::VIEW_COUNT
     for( int i = 0; i < MAX_VIEW; i++ )
     {
         QAction *action = viewMenu->addAction( viewNames[i] );
         action->setCheckable( true );
+        viewGroup->addAction( action );
         viewSelectionMapper->setMapping( action, i );
         CONNECT( action, triggered(), viewSelectionMapper, map() );
         if( currentViewIndex() == i )
