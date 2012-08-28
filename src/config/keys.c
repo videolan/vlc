@@ -53,6 +53,8 @@ typedef struct key_descriptor_s
 static const struct key_descriptor_s vlc_keys[] =
 {   /* Alphabetical order */
     { N_("Backspace"),         KEY_BACKSPACE         },
+    { N_("Brightness Down"),   KEY_BRIGHTNESS_DOWN   },
+    { N_("Brightness Up"),     KEY_BRIGHTNESS_UP     },
     { N_("Browser Back"),      KEY_BROWSER_BACK      },
     { N_("Browser Favorites"), KEY_BROWSER_FAVORITES },
     { N_("Browser Forward"),   KEY_BROWSER_FORWARD   },
@@ -80,10 +82,24 @@ static const struct key_descriptor_s vlc_keys[] =
     { N_("Home"),              KEY_HOME              },
     { N_("Insert"),            KEY_INSERT            },
     { N_("Left"),              KEY_LEFT              },
+    { N_("Media Angle"),       KEY_MEDIA_ANGLE       },
+    { N_("Media Audio Track"), KEY_MEDIA_AUDIO       },
+    { N_("Media Forward"),     KEY_MEDIA_FORWARD     },
+    { N_("Media Menu"),        KEY_MEDIA_MENU        },
+    { N_("Media Next Frame"),  KEY_MEDIA_FRAME_NEXT  },
     { N_("Media Next Track"),  KEY_MEDIA_NEXT_TRACK  },
     { N_("Media Play Pause"),  KEY_MEDIA_PLAY_PAUSE  },
+    { N_("Media Prev Frame"),  KEY_MEDIA_FRAME_PREV  },
     { N_("Media Prev Track"),  KEY_MEDIA_PREV_TRACK  },
+    { N_("Media Record"),      KEY_MEDIA_RECORD      },
+    { N_("Media Repeat"),      KEY_MEDIA_REPEAT      },
+    { N_("Media Rewind"),      KEY_MEDIA_REWIND      },
+    { N_("Media Select"),      KEY_MEDIA_SELECT      },
+    { N_("Media Shuffle"),     KEY_MEDIA_SHUFFLE     },
     { N_("Media Stop"),        KEY_MEDIA_STOP        },
+    { N_("Media Subtitle"),    KEY_MEDIA_SUBTITLE    },
+    { N_("Media Time"),        KEY_MEDIA_TIME        },
+    { N_("Media View"),        KEY_MEDIA_VIEW        },
     { N_("Menu"),              KEY_MENU              },
     { N_("Mouse Wheel Down"),  KEY_MOUSEWHEELDOWN    },
     { N_("Mouse Wheel Left"),  KEY_MOUSEWHEELLEFT    },
@@ -99,6 +115,8 @@ static const struct key_descriptor_s vlc_keys[] =
     { N_("Volume Down"),       KEY_VOLUME_DOWN       },
     { N_("Volume Mute"),       KEY_VOLUME_MUTE       },
     { N_("Volume Up"),         KEY_VOLUME_UP         },
+    { N_("Zoom In"),           KEY_ZOOM_IN           },
+    { N_("Zoom Out"),          KEY_ZOOM_OUT          },
 };
 #define KEYS_COUNT (sizeof(vlc_keys)/sizeof(vlc_keys[0]))
 
