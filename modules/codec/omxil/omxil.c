@@ -318,8 +318,9 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
 
         if(def->eDir == OMX_DirInput || p_dec->p_sys->b_enc)
         {
-            def->nBufferSize = def->format.video.nFrameWidth *
-              def->format.video.nFrameHeight * 2;
+            if (def->eDir == OMX_DirInput && p_dec->p_sys->b_enc)
+                def->nBufferSize = def->format.video.nFrameWidth *
+                  def->format.video.nFrameHeight * 2;
             p_port->i_frame_size = def->nBufferSize;
 
             if(!GetOmxVideoFormat(p_fmt->i_codec,
