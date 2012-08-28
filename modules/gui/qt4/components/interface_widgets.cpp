@@ -521,7 +521,7 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, intf_thread_t *_p_i )
     CONNECT( action, triggered(), this, askForUpdate() );
     addAction( action );
 
-    action = new QAction( qtr( "Cover art from file" ), this );
+    action = new QAction( qtr( "Add cover art from file" ), this );
     CONNECT( action, triggered(), this, setArtFromFile() );
     addAction( action );
 
@@ -580,7 +580,7 @@ void CoverArtLabel::setArtFromFile()
     if( !p_item )
         return;
 
-    QString filePath = QFileDialog::getOpenFileName( this, qtr( "Choose Image" ),
+    QString filePath = QFileDialog::getOpenFileName( this, qtr( "Choose Cover Art" ),
         p_intf->p_sys->filepath, qtr( "Image Files (*.gif *.jpg *.jpeg *.png)" ) );
 
     if( filePath.isEmpty() )
