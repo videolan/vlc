@@ -1,6 +1,6 @@
 diff -ru bghudappkit/BGHUDAppKit.xcodeproj/project.pbxproj bghudappkit-fixed/BGHUDAppKit.xcodeproj/project.pbxproj
 --- bghudappkit/BGHUDAppKit.xcodeproj/project.pbxproj	2012-08-19 13:14:17.000000000 +0200
-+++ bghudappkit-fixed/BGHUDAppKit.xcodeproj/project.pbxproj	2012-08-19 14:42:43.000000000 +0200
++++ bghudappkit-fixed/BGHUDAppKit.xcodeproj/project.pbxproj	2012-08-28 17:40:22.000000000 +0200
 @@ -3,7 +3,7 @@
  	archiveVersion = 1;
  	classes = {
@@ -91,7 +91,13 @@ diff -ru bghudappkit/BGHUDAppKit.xcodeproj/project.pbxproj bghudappkit-fixed/BGH
  				GCC_ENABLE_OBJC_GC = supported;
  				GCC_MODEL_TUNING = G5;
  				GCC_OPTIMIZATION_LEVEL = 0;
-@@ -1130,6 +1139,7 @@
+@@ -1125,11 +1134,13 @@
+ 				GCC_WARN_UNUSED_VALUE = NO;
+ 				INFOPLIST_FILE = "BGHUDAppKitFramework-Info.plist";
+ 				INSTALL_PATH = "@executable_path/../Frameworks";
++				MACOSX_DEPLOYMENT_TARGET = 10.6;
+ 				OTHER_LDFLAGS = (
+ 					"-seg1addr",
  					0xb0440100,
  				);
  				PRODUCT_NAME = BGHUDAppKit;
@@ -99,7 +105,7 @@ diff -ru bghudappkit/BGHUDAppKit.xcodeproj/project.pbxproj bghudappkit-fixed/BGH
  				SKIP_INSTALL = NO;
  			};
  			name = Debug;
-@@ -1138,6 +1148,7 @@
+@@ -1138,6 +1149,7 @@
  			isa = XCBuildConfiguration;
  			buildSettings = {
  				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
@@ -107,7 +113,13 @@ diff -ru bghudappkit/BGHUDAppKit.xcodeproj/project.pbxproj bghudappkit-fixed/BGH
  				DEBUG_INFORMATION_FORMAT = dwarf;
  				DEPLOYMENT_POSTPROCESSING = YES;
  				DYLIB_COMPATIBILITY_VERSION = 1;
-@@ -1155,6 +1166,7 @@
+@@ -1150,11 +1162,13 @@
+ 				INFOPLIST_FILE = "BGHUDAppKitFramework-Info.plist";
+ 				INSTALL_PATH = "@executable_path/../Frameworks";
+ 				LD_DYLIB_INSTALL_NAME = "$(DYLIB_INSTALL_NAME_BASE:standardizepath)/$(EXECUTABLE_PATH)";
++				MACOSX_DEPLOYMENT_TARGET = 10.6;
+ 				OTHER_LDFLAGS = (
+ 					"-seg1addr",
  					0xb0000000,
  				);
  				PRODUCT_NAME = BGHUDAppKit;
@@ -115,7 +127,7 @@ diff -ru bghudappkit/BGHUDAppKit.xcodeproj/project.pbxproj bghudappkit-fixed/BGH
  				SEPARATE_STRIP = YES;
  				SKIP_INSTALL = NO;
  				STRIP_INSTALLED_PRODUCT = YES;
-@@ -1165,6 +1177,7 @@
+@@ -1165,6 +1179,7 @@
  			isa = XCBuildConfiguration;
  			buildSettings = {
  				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
@@ -123,7 +135,7 @@ diff -ru bghudappkit/BGHUDAppKit.xcodeproj/project.pbxproj bghudappkit-fixed/BGH
  				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)/BGHUDAppKit.framework/Resources/";
  				COPY_PHASE_STRIP = NO;
  				FRAMEWORK_SEARCH_PATHS = (
-@@ -1177,7 +1190,6 @@
+@@ -1177,14 +1192,15 @@
  				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(DEVELOPER_DIR)/Library/Frameworks\"";
  				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(BUILD_DIR)/$(CONFIGURATION)\"";
  				GCC_DYNAMIC_NO_PIC = NO;
@@ -131,15 +143,16 @@ diff -ru bghudappkit/BGHUDAppKit.xcodeproj/project.pbxproj bghudappkit-fixed/BGH
  				GCC_ENABLE_OBJC_GC = supported;
  				GCC_MODEL_TUNING = G5;
  				GCC_OPTIMIZATION_LEVEL = 0;
-@@ -1185,6 +1197,7 @@
+ 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
  				GCC_PREFIX_HEADER = BGHUDAppKitPlugin_Prefix.pch;
  				INFOPLIST_FILE = Info.plist;
++				MACOSX_DEPLOYMENT_TARGET = 10.6;
  				PRODUCT_NAME = BGHUDAppKitPlugin;
 +				SDKROOT = "";
  				WRAPPER_EXTENSION = ibplugin;
  				ZERO_LINK = YES;
  			};
-@@ -1194,6 +1207,7 @@
+@@ -1194,6 +1210,7 @@
  			isa = XCBuildConfiguration;
  			buildSettings = {
  				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
@@ -147,15 +160,17 @@ diff -ru bghudappkit/BGHUDAppKit.xcodeproj/project.pbxproj bghudappkit-fixed/BGH
  				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)/BGHUDAppKit.framework/Resources/";
  				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/$(CONFIGURATION)";
  				COPY_PHASE_STRIP = NO;
-@@ -1214,6 +1228,7 @@
+@@ -1213,7 +1230,9 @@
+ 				GCC_PREFIX_HEADER = BGHUDAppKitPlugin_Prefix.pch;
  				INFOPLIST_FILE = Info.plist;
  				INSTALL_PATH = "@loader_path/../Frameworks";
++				MACOSX_DEPLOYMENT_TARGET = 10.6;
  				PRODUCT_NAME = BGHUDAppKitPlugin;
 +				SDKROOT = "";
  				WRAPPER_EXTENSION = ibplugin;
  			};
  			name = Release;
-@@ -1221,12 +1236,13 @@
+@@ -1221,12 +1240,14 @@
  		C056398808A954F8003078D8 /* Debug */ = {
  			isa = XCBuildConfiguration;
  			buildSettings = {
@@ -165,24 +180,26 @@ diff -ru bghudappkit/BGHUDAppKit.xcodeproj/project.pbxproj bghudappkit-fixed/BGH
 -				GCC_ENABLE_FIX_AND_CONTINUE = YES;
  				GCC_MODEL_TUNING = G5;
  				GCC_OPTIMIZATION_LEVEL = 0;
++				MACOSX_DEPLOYMENT_TARGET = 10.6;
  				PRODUCT_NAME = All;
 +				SDKROOT = "";
  				WARNING_CFLAGS = (
  					"-Wmost",
  					"-Wno-four-char-constants",
-@@ -1239,9 +1255,11 @@
+@@ -1239,9 +1260,12 @@
  		C056398908A954F8003078D8 /* Release */ = {
  			isa = XCBuildConfiguration;
  			buildSettings = {
 +				COMBINE_HIDPI_IMAGES = YES;
  				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
  				GCC_MODEL_TUNING = G5;
++				MACOSX_DEPLOYMENT_TARGET = 10.6;
  				PRODUCT_NAME = All;
 +				SDKROOT = "";
  				WARNING_CFLAGS = (
  					"-Wmost",
  					"-Wno-four-char-constants",
-@@ -1258,8 +1276,7 @@
+@@ -1258,8 +1282,7 @@
  				GCC_MODEL_TUNING = "";
  				GCC_WARN_ABOUT_RETURN_TYPE = YES;
  				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -192,7 +209,7 @@ diff -ru bghudappkit/BGHUDAppKit.xcodeproj/project.pbxproj bghudappkit-fixed/BGH
  			};
  			name = Debug;
  		};
-@@ -1274,8 +1291,7 @@
+@@ -1274,8 +1297,7 @@
  				GCC_MODEL_TUNING = "";
  				GCC_WARN_ABOUT_RETURN_TYPE = YES;
  				GCC_WARN_UNUSED_VARIABLE = YES;
