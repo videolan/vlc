@@ -169,6 +169,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     CONNECT( seqtot_text, textEdited( QString ), this, enterEditMode() );
 
     CONNECT( date_text, textEdited( QString ), this, enterEditMode() );
+    CONNECT( THEMIM->getIM(), artChanged( QString ), this, enterEditMode() );
 /*    CONNECT( rating_text, valueChanged( QString ), this, enterEditMode( QString ) );*/
 
     /* We are not yet in Edit Mode */

@@ -149,6 +149,7 @@ public:
     bool hasVideo() { return hasInput() && b_video; }
     bool hasVisualisation();
     void requestArtUpdate( input_item_t *p_item );
+    void setArt( input_item_t *p_item, QString fileUrl );
 
     QString getName() { return oldName; }
     static const QString decodeArtURL( input_item_t *p_item );

@@ -38,6 +38,7 @@
 #include <vlc_aout_intf.h>
 
 #include <QApplication>
+#include <QFile>
 
 #include <assert.h>
 
@@ -717,6 +718,23 @@ void InputManager::UpdateArt()
     /* Update Art meta */
     artUrl = url;
     emit artChanged( artUrl );
+}
+
+void InputManager::setArt( input_item_t *p_item, QString fileUrl )
+{
+    if( hasInput() )
+    {
+        char *psz_cachedir = config_GetUserDir( VLC_CACHE_DIR );
+        QString old_url = THEMIM->getIM()->decodeArtURL( p_item );
+
+        if( old_url.startsWith( QString::fromUtf8( psz_cachedir ) ) )
+            QFile( old_url ).remove(); /* Purge cached artwork */
+
+        free( psz_cachedir );
+
+        input_item_SetArtURL( p_item , fileUrl.toUtf8().constData() );
+        UpdateArt();
+    }
 }
 
 inline void InputManager::UpdateStats()

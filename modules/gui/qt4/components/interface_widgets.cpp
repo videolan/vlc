@@ -50,6 +50,7 @@
 #include <QTimer>
 #include <QSlider>
 #include <QBitmap>
+#include <QUrl>
 
 #ifdef Q_WS_X11
 #   include <X11/Xlib.h>
@@ -520,6 +521,10 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, intf_thread_t *_p_i )
     CONNECT( action, triggered(), this, askForUpdate() );
     addAction( action );
 
+    action = new QAction( qtr( "Cover art from file" ), this );
+    CONNECT( action, triggered(), this, setArtFromFile() );
+    addAction( action );
+
     showArtUpdate( "" );
 }
 
@@ -568,6 +573,22 @@ void CoverArtLabel::showArtUpdate( input_item_t *_p_item )
 void CoverArtLabel::askForUpdate()
 {
     THEMIM->getIM()->requestArtUpdate( p_item );
+}
+
+void CoverArtLabel::setArtFromFile()
+{
+    if( !p_item )
+        return;
+
+    QString filePath = QFileDialog::getOpenFileName( this, qtr( "Choose Image" ),
+        p_intf->p_sys->filepath, qtr( "Image Files (*.gif *.jpg *.jpeg *.png)" ) );
+
+    if( filePath.isEmpty() )
+        return;
+
+    QString fileUrl = QUrl::fromLocalFile( filePath ).toString();
+
+    THEMIM->getIM()->setArt( p_item, fileUrl );
 }
 
 TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
