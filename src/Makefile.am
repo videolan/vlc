@@ -64,6 +64,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_messages.h \
 	../include/vlc_meta.h \
 	../include/vlc_media_library.h \
+	../include/vlc_mime.h \
 	../include/vlc_modules.h \
 	../include/vlc_mouse.h \
 	../include/vlc_mtime.h \
@@ -438,6 +439,7 @@ SOURCES_libvlc_common = \
 	misc/events.c \
 	misc/image.c \
 	misc/messages.c \
+	misc/mime.c \
 	misc/objects.c \
 	misc/variables.h \
 	misc/variables.c \

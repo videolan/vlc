@@ -118,6 +118,7 @@ set( SOURCES_libvlccore_common
     misc/events.c
     misc/image.c
     misc/messages.c
+    misc/mime.c
     misc/objects.c
     misc/variables.h
     misc/variables.c

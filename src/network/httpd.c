@@ -38,6 +38,7 @@
 #include <vlc_rand.h>
 #include <vlc_charset.h>
 #include <vlc_url.h>
+#include <vlc_mime.h>
 #include "../libvlc.h"
 
 #include <string.h>
@@ -172,81 +173,6 @@ struct httpd_client_t
 /*****************************************************************************
  * Various functions
  *****************************************************************************/
-static const struct
-{
-    const char psz_ext[8];
-    const char *psz_mime;
-} http_mime[] =
-{
-    { ".htm",   "text/html" },
-    { ".html",  "text/html" },
-    { ".txt",   "text/plain" },
-    { ".xml",   "text/xml" },
-    { ".dtd",   "text/dtd" },
-
-    { ".css",   "text/css" },
-
-    /* image mime */
-    { ".gif",   "image/gif" },
-    { ".jpe",   "image/jpeg" },
-    { ".jpg",   "image/jpeg" },
-    { ".jpeg",  "image/jpeg" },
-    { ".png",   "image/png" },
-    /* same as modules/mux/mpjpeg.c here: */
-    { ".mpjpeg","multipart/x-mixed-replace; boundary=7b3cc56e5f51db803f790dad720ed50a" },
-
-    /* media mime */
-    { ".avi",   "video/avi" },
-    { ".asf",   "video/x-ms-asf" },
-    { ".m1a",   "audio/mpeg" },
-    { ".m2a",   "audio/mpeg" },
-    { ".m1v",   "video/mpeg" },
-    { ".m2v",   "video/mpeg" },
-    { ".mp2",   "audio/mpeg" },
-    { ".mp3",   "audio/mpeg" },
-    { ".mpa",   "audio/mpeg" },
-    { ".mpg",   "video/mpeg" },
-    { ".mpeg",  "video/mpeg" },
-    { ".mpe",   "video/mpeg" },
-    { ".mov",   "video/quicktime" },
-    { ".moov",  "video/quicktime" },
-    { ".oga",   "audio/ogg" },
-    { ".ogg",   "application/ogg" },
-    { ".ogm",   "application/ogg" },
-    { ".ogv",   "video/ogg" },
-    { ".ogx",   "application/ogg" },
-    { ".spx",   "audio/ogg" },
-    { ".wav",   "audio/wav" },
-    { ".wma",   "audio/x-ms-wma" },
-    { ".wmv",   "video/x-ms-wmv" },
-    { ".webm",  "video/webm" },
-
-    /* end */
-    { "",       "" }
-};
-
-static const char *httpd_MimeFromUrl( const char *psz_url )
-{
-
-    char *psz_ext;
-
-    psz_ext = strrchr( psz_url, '.' );
-    if( psz_ext )
-    {
-        int i;
-
-        for( i = 0; http_mime[i].psz_ext[0] ; i++ )
-        {
-            if( !strcasecmp( http_mime[i].psz_ext, psz_ext ) )
-            {
-                return http_mime[i].psz_mime;
-            }
-        }
-    }
-    return "application/octet-stream";
-}
-
-
 typedef struct
 {
     unsigned   i_code;
@@ -459,7 +385,7 @@ httpd_file_t *httpd_FileNew( httpd_host_t *host,
     }
     else
     {
-        file->psz_mime = strdup( httpd_MimeFromUrl( psz_url ) );
+        file->psz_mime = strdup( vlc_mime_Ext2Mime( psz_url ) );
     }
 
     file->pf_fill = pf_fill;
@@ -857,7 +783,7 @@ httpd_stream_t *httpd_StreamNew( httpd_host_t *host,
     }
     else
     {
-        stream->psz_mime = strdup( httpd_MimeFromUrl( psz_url ) );
+        stream->psz_mime = strdup( vlc_mime_Ext2Mime( psz_url ) );
     }
     stream->i_header = 0;
     stream->p_header = NULL;

@@ -535,6 +535,7 @@ vlc_meta_New
 vlc_meta_Set
 vlc_meta_SetStatus
 vlc_meta_TypeToLocalizedString
+vlc_mime_Ext2Mime
 vlc_mutex_destroy
 vlc_mutex_init
 vlc_mutex_init_recursive
