@@ -541,6 +541,7 @@ void CAtmoTools::SaveBitmap(HDC hdc,HBITMAP hBmp,char *fileName) {
      fwrite(&bmpInfo.bmiHeader,sizeof(BITMAPINFOHEADER),1,fp);
      fwrite(pBuf,bmpInfo.bmiHeader.biSizeImage,1,fp);
      fclose(fp);
+     free(pBuf);
 }
 
 

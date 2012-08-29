@@ -134,6 +134,7 @@ void CAtmoZoneDefinition::SaveZoneBitmap(char *fileName)
      fwrite(&bmpInfo.bmiHeader,sizeof(BITMAPINFOHEADER),1,fp);
      fwrite(pBuf,bmpInfo.bmiHeader.biSizeImage,1,fp);
      fclose(fp);
+     free(pBuf);
 }
 
 void CAtmoZoneDefinition::SaveWeightBitmap(char *fileName,int *weight)
@@ -179,6 +180,7 @@ void CAtmoZoneDefinition::SaveWeightBitmap(char *fileName,int *weight)
      fwrite(&bmpInfo.bmiHeader,sizeof(BITMAPINFOHEADER),1,fp);
      fwrite(pBuf,bmpInfo.bmiHeader.biSizeImage,1,fp);
      fclose(fp);
+     free(pBuf);
 }
 
 
@@ -252,6 +254,7 @@ int CAtmoZoneDefinition::LoadGradientFromBitmap(char *pszBitmap)
     unsigned char *pixelBuffer = (unsigned char *)malloc(imageSize);
     if(fread(pixelBuffer,imageSize,1,bmp) != 1)
     {
+        free(pixelBuffer);
         fclose(bmp);
         return ATMO_LOAD_GRADIENT_FAILED_SIZE;
     }
