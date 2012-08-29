@@ -1,0 +1,14 @@
+--- libass/libass/ass_fontconfig.c	2011-09-01 23:26:35.000000000 +0200
++++ libass-fixed/libass/ass_fontconfig.c	2012-09-01 14:34:17.000000000 +0200
+@@ -442,6 +442,11 @@
+                 "file found, using fallback.");
+         FcConfigDestroy(priv->config);
+         priv->config = FcInitLoadConfig();
++#ifdef __APPLE__
++        FcConfigAppFontAddDir(priv->config, "~/Library/Fonts");
++        FcConfigAppFontAddDir(priv->config, "/Library/Fonts");
++        FcConfigAppFontAddDir(priv->config, "/Network/Library/Fonts");
++#endif
+         rc++;
+     }
+     if (rc && update) {
