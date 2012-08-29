@@ -1313,7 +1313,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         p_header->nFilledLen = p_block->i_buffer;
         p_header->nOffset = 0;
         p_header->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
-        if (p_sys->b_use_pts)
+        if (p_sys->b_use_pts && p_block->i_pts)
             p_header->nTimeStamp = p_block->i_pts;
         else
             p_header->nTimeStamp = p_block->i_dts;
