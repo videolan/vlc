@@ -385,10 +385,14 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_meta_t* p_demux_meta, vlc_
 
         p_attachment = vlc_input_attachment_New( psz_name, psz_mime,
                                 psz_description, p_data, i_data );
-        if( p_attachment )
-            TAB_APPEND_CAST( (input_attachment_t**),
-                             p_demux_meta->i_attachments, p_demux_meta->attachments,
-                             p_attachment );
+        if( !p_attachment )
+        {
+            free( psz_description );
+            continue;
+        }
+        TAB_APPEND_CAST( (input_attachment_t**),
+                         p_demux_meta->i_attachments, p_demux_meta->attachments,
+                         p_attachment );
         free( psz_description );
 
         unsigned i_pic_type = p_apic->type();
