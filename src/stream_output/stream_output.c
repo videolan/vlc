@@ -100,7 +100,10 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
     /* *** Allocate descriptor *** */
     p_sout = vlc_custom_create( p_parent, sizeof( *p_sout ), "stream output" );
     if( p_sout == NULL )
+    {
+        free( psz_chain );
         return NULL;
+    }
 
     msg_Dbg( p_sout, "using sout chain=`%s'", psz_chain );
 
