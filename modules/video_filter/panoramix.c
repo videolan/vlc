@@ -799,7 +799,7 @@ static int Mouse( video_splitter_t *p_splitter, vlc_mouse_t *p_mouse,
     {
         for( int x = 0; x < p_sys->i_col; x++ )
         {
-            const panoramix_output_t *p_output = p_output = &p_sys->pp_output[x][y];
+            const panoramix_output_t *p_output = &p_sys->pp_output[x][y];
             if( p_output->b_active && p_output->i_output == i_index )
             {
                 const int i_x = p_new->i_x - p_output->filter.black.i_left;
