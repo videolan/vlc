@@ -1197,9 +1197,8 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
             }
             var_FreeList( &val, &text );
             msg_rc( "+----[ end of %s ]", val_name.psz_string );
-
-            free( val_name.psz_string );
         }
+        free( val_name.psz_string );
     }
 out:
     vlc_object_release( p_input );
@@ -1733,6 +1732,7 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
         if ( var_Get( p_aout, psz_variable, &val ) < 0 )
         {
             vlc_object_release( p_aout );
+            free( val_name.psz_string );
             return VLC_EGENERIC;
         }
         i_value = val.i_int;
@@ -1741,6 +1741,7 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
                          VLC_VAR_GETLIST, &val, &text ) < 0 )
         {
             vlc_object_release( p_aout );
+            free( val_name.psz_string );
             return VLC_EGENERIC;
         }
 
@@ -1757,7 +1758,6 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
         var_FreeList( &val, &text );
         msg_rc( "+----[ end of %s ]", val_name.psz_string );
 
-        free( val_name.psz_string );
         i_error = VLC_SUCCESS;
     }
     else
@@ -1767,6 +1767,7 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
 
         i_error = var_Set( p_aout, psz_variable, val );
     }
+    free( val_name.psz_string );
     vlc_object_release( p_aout );
 
     return i_error;
