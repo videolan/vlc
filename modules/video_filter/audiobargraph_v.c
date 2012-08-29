@@ -461,7 +461,6 @@ static int BarGraphCallback( vlc_object_t *p_this, char const *psz_var,
     VLC_UNUSED(oldval);
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
     BarGraph_t *p_BarGraph = &(p_sys->p_BarGraph);
-    char* i_values;
     char* res = NULL;
 
     vlc_mutex_lock( &p_sys->lock );
@@ -488,15 +487,16 @@ static int BarGraphCallback( vlc_object_t *p_this, char const *psz_var,
             picture_Release( p_BarGraph->p_pic );
             p_BarGraph->p_pic = NULL;
         }
-        i_values = strdup( newval.psz_string );
+        char *psz_i_values = strdup( newval.psz_string );
         free(p_BarGraph->i_values);
         //p_BarGraph->i_values = NULL;
         //p_BarGraph->nbChannels = 0;
         // in case many answer are received at the same time, only keep one
-        res = strchr(i_values, '@');
+        res = strchr(psz_i_values, '@');
         if (res)
             *res = 0;
-        parse_i_values( p_BarGraph, i_values);
+        parse_i_values( p_BarGraph, psz_i_values);
+        free( psz_i_values );
         LoadBarGraph(p_this,p_BarGraph);
     }
     else if ( !strcmp( psz_var, "audiobargraph_v-alarm" ) )
