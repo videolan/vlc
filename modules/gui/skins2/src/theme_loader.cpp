@@ -231,6 +231,7 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir,
             if( n < 0 )
             {
                 msg_Err( getIntf(), "error while reading zip file" );
+                fclose(fout);
                 free( pBuffer );
                 return false;
             }
@@ -240,6 +241,7 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir,
                 {
                     msg_Err( getIntf(), "error while writing %s",
                              fullPath.c_str() );
+                    fclose(fout);
                     free( pBuffer );
                     return false;
                 }
