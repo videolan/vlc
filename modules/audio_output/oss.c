@@ -55,6 +55,7 @@ struct aout_sys_t
     int fd;
     uint8_t level;
     bool mute;
+    bool starting;
 };
 
 static int Open (vlc_object_t *);
@@ -250,6 +251,7 @@ static int Open (vlc_object_t *obj)
             aout->mute_set = MuteSet;
         }
     }
+    sys->starting = true;
 
     /* Build the devices list */
     var_Create (aout, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
@@ -329,11 +331,23 @@ static void Play (audio_output_t *aout, block_t *block,
     {
         mtime_t latency = (delay * CLOCK_FREQ * aout->format.i_frame_length)
                       / (aout->format.i_rate * aout->format.i_bytes_per_frame);
-        /* TODO: insert zeroes when starting playback */
         *drift = mdate () + latency - block->i_pts;
     }
     else
         msg_Warn (aout, "cannot get delay: %m");
+
+    if (sys->starting)
+    {   /* Start on time */
+        /* TODO: resync on pause resumption and underflow recovery */
+        mtime_t delta = -*drift;
+        if (delta > 0) {
+            msg_Dbg(aout, "deferring start (%"PRId64" us)", delta);
+            msleep(delta);
+            *drift = 0;
+        } else
+            msg_Warn(aout, "starting late (%"PRId64" us)", delta);
+        sys->starting = false;
+    }
 
     while (block->i_buffer > 0)
     {
