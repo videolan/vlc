@@ -1271,7 +1271,7 @@ static int get_HTTPLiveMetaPlaylist(stream_t *s, vlc_array_t **streams)
     return err;
 }
 
-/* Update hls_old (an existing member of p_sys->hls_stream) to match hls_new 
+/* Update hls_old (an existing member of p_sys->hls_stream) to match hls_new
    (which represents a downloaded, perhaps newer version of the same playlist) */
 static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *hls_old)
 {
@@ -1836,7 +1836,7 @@ static char *ReadLine(uint8_t *buffer, uint8_t **pos, const size_t len)
             /* next pass start after \r and \n */
             p++;
             *pos = p;
-        }   
+        }
     }
 
     return line;
@@ -2423,7 +2423,7 @@ static int segment_Seek(stream_t *s, const uint64_t pos)
         /* Wait for download to be finished */
         msg_Info(s, "seek to segment %d", p_sys->playback.segment);
         while ((p_sys->download.seek != -1) ||
-	       ((p_sys->download.segment - p_sys->playback.segment < 3) &&
+           ((p_sys->download.segment - p_sys->playback.segment < 3) &&
                 (p_sys->download.segment < count)))
         {
             vlc_cond_wait(&p_sys->download.wait, &p_sys->download.lock_wait);
