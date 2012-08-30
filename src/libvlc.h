@@ -176,7 +176,6 @@ typedef struct libvlc_priv_t
     bool               b_stats;     ///< Whether to collect stats
 
     /* Singleton objects */
-    module_t          *p_memcpy_module;  ///< Fast memcpy plugin used
     playlist_t        *p_playlist; ///< the playlist singleton
     struct media_library_t *p_ml;    ///< the ML singleton
     vlc_mutex_t       ml_lock; ///< Mutex for ML creation

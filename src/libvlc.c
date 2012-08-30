@@ -450,11 +450,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         priv->b_color = var_InheritBool( p_libvlc, "color" );
 
     vlc_CPU_dump( VLC_OBJECT(p_libvlc) );
-    /*
-     * Choose the best memcpy module
-     */
-    priv->p_memcpy_module = module_need( p_libvlc, "memcpy", "$memcpy", false );
-    /* Avoid being called "memcpy":*/
     vlc_object_set_name( p_libvlc, "main" );
 
     priv->b_stats = var_InheritBool( p_libvlc, "stats" );
@@ -491,10 +486,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( !p_playlist )
     {
         msg_Err( p_libvlc, "playlist initialization failed" );
-        if( priv->p_memcpy_module != NULL )
-        {
-            module_unneed( p_libvlc, priv->p_memcpy_module );
-        }
         module_EndBank (true);
         return VLC_EGENERIC;
     }
@@ -715,12 +706,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         free( psz_pidfile );
     }
 #endif
-
-    if( priv->p_memcpy_module )
-    {
-        module_unneed( p_libvlc, priv->p_memcpy_module );
-        priv->p_memcpy_module = NULL;
-    }
 
     /* Save the configuration */
     if( !var_InheritBool( p_libvlc, "ignore-config" ) )
