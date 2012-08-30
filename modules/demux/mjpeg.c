@@ -324,11 +324,14 @@ static int SendBlock( demux_t *p_demux, int i )
 static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
-    demux_sys_t *p_sys;
     int         i_size;
     bool        b_matched = false;
 
-    p_sys = malloc( sizeof( demux_sys_t ) );
+    if( IsMxpeg( p_demux->s ) && !p_demux->b_force )
+        // let avformat handle this case
+        return VLC_EGENERIC;
+
+    demux_sys_t *p_sys = malloc( sizeof( demux_sys_t ) );
     if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 
@@ -340,12 +343,6 @@ static int Open( vlc_object_t * p_this )
 
     p_sys->psz_separator = NULL;
     p_sys->i_frame_size_estimate = 15 * 1024;
-
-    if( IsMxpeg( p_demux->s ) && !p_demux->b_force )
-    {
-        // let avformat handle this case
-        goto error;
-    }
 
     b_matched = CheckMimeHeader( p_demux, &i_size);
     if( b_matched )
