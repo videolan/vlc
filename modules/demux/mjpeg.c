@@ -70,10 +70,8 @@ struct demux_sys_t
     es_format_t     fmt;
     es_out_id_t     *p_es;
 
-    bool      b_still;
+    bool            b_still;
     mtime_t         i_still_end;
-    mtime_t         i_still_length;
-
     mtime_t         i_time;
     mtime_t         i_frame_length;
     char            *psz_separator;
@@ -299,24 +297,23 @@ static int SendBlock( demux_t *p_demux, int i )
         return 0;
     }
 
-    if( !p_sys->i_frame_length || !p_sys->i_time )
+    if( p_sys->i_frame_length )
     {
-        p_sys->i_time = p_block->i_dts = p_block->i_pts = mdate();
+        p_block->i_pts = p_sys->i_time;
+        p_sys->i_time += p_sys->i_frame_length;
     }
     else
     {
-        p_block->i_dts = p_block->i_pts = VLC_TS_0 + p_sys->i_time;
-        p_sys->i_time += p_sys->i_frame_length;
+        p_block->i_pts = mdate();
     }
+    p_block->i_dts = p_block->i_pts;
 
     /* set PCR */
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
     es_out_Send( p_demux->out, p_sys->p_es, p_block );
 
     if( p_sys->b_still )
-    {
-        p_sys->i_still_end = mdate() + p_sys->i_still_length;
-    }
+        p_sys->i_still_end = mdate() + p_sys->i_frame_length;
 
     return 1;
 }
@@ -330,7 +327,6 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t *p_sys;
     int         i_size;
     bool        b_matched = false;
-    float       f_fps;
 
     p_sys = malloc( sizeof( demux_sys_t ) );
     if( unlikely(p_sys == NULL) )
@@ -339,7 +335,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys;
     p_sys->p_es         = NULL;
-    p_sys->i_time       = 0;
+    p_sys->i_time       = VLC_TS_0;
     p_sys->i_level      = 0;
 
     p_sys->psz_separator = NULL;
@@ -376,31 +372,22 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
+    /* Frame rate */
+    float f_fps = var_InheritFloat( p_demux, "mjpeg-fps" );
 
-    f_fps = var_CreateGetFloat( p_demux, "mjpeg-fps" );
-    p_sys->i_frame_length = 0;
-
-    /* Check for jpeg file extension */
-    p_sys->b_still = false;
     p_sys->i_still_end = 0;
     if( demux_IsPathExtension( p_demux, ".jpeg" ) ||
         demux_IsPathExtension( p_demux, ".jpg" ) )
     {
+        /* Plain JPEG file = single still picture */
         p_sys->b_still = true;
-        if( f_fps )
-        {
-            p_sys->i_still_length = 1000000.0 / f_fps;
-        }
-        else
-        {
+        if( f_fps == 0.f )
             /* Defaults to 1fps */
-            p_sys->i_still_length = 1000000;
-        }
+            f_fps = 1.f;
     }
-    else if ( f_fps )
-    {
-        p_sys->i_frame_length = 1000000.0 / f_fps;
-    }
+    else
+        p_sys->b_still = false;
+    p_sys->i_frame_length = f_fps ? (CLOCK_FREQ / f_fps) : 0;
 
     es_format_Init( &p_sys->fmt, VIDEO_ES, 0 );
     p_sys->fmt.i_codec = VLC_CODEC_MJPG;
