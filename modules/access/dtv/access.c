@@ -696,7 +696,7 @@ static int Tune (vlc_object_t *obj, dvb_device_t *dev, const delsys_t *delsys,
 static uint64_t var_InheritFrequency (vlc_object_t *obj)
 {
     uint64_t freq = var_InheritInteger (obj, "dvb-frequency");
-    if (freq != 0 && freq <= 108000000)
+    if (freq != 0 && freq < 30000000)
     {
         msg_Err (obj, "%"PRIu64" Hz carrier frequency is too low.", freq);
         freq *= 1000;
