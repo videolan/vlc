@@ -3795,26 +3795,18 @@ dnl  ncurses module
 dnl
 AC_ARG_ENABLE(ncurses,
 [AS_HELP_STRING([--disable-ncurses],[ncurses text-based interface (default auto)])])
-if test "${enable_ncurses}" != "no"; then
-  VLC_SAVE_FLAGS
-  LIBS=""
-  AC_CHECK_HEADER(ncurses.h, [
-    AC_CHECK_LIB(ncursesw, mvprintw, [
-      AC_SEARCH_LIBS([tgetent], [ncursesw tinfow tinfo], [
-        VLC_ADD_PLUGIN([ncurses])
-        ALIASES="${ALIASES} nvlc"
-        VLC_ADD_LIBS([ncurses],[-lncursesw ${LIBS}])
-      ], [
-        AS_IF([test "${enable_ncurses}" = "yes"], [AC_MSG_ERROR([tgetent not found])])
-      ])
-    ], [
-      AS_IF([test "${enable_ncurses}" = "yes"], [AC_MSG_ERROR([libncursesw not found])])
-    ])
+AS_IF([test "${enable_ncurses}" != "no"] ,[
+  PKG_CHECK_MODULES([NCURSES], [ncursesw], [
+    VLC_ADD_PLUGIN([ncurses])
+    VLC_ADD_CFLAGS([ncurses],[${NCURSES_CFLAGS}])
+    VLC_ADD_LIBS([ncurses],[${NCURSES_LIBS}])
+    ALIASES="${ALIASES} nvlc"
   ], [
-    AS_IF([test "${enable_ncurses}" = "yes"], [AC_MSG_ERROR([ncurses.h not found])])
+    AS_IF([test -n "${enable_ncurses}"], [
+      AC_MSG_ERROR([${NCURSES_PKG_ERRORS}.])
+    ])
   ])
-  VLC_RESTORE_FLAGS
-fi
+])
 
 dnl
 dnl  Lirc plugin
