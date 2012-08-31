@@ -39,6 +39,7 @@
 
 #include <QApplication>
 #include <QFile>
+#include <QDir>
 
 #include <assert.h>
 
@@ -726,6 +727,7 @@ void InputManager::setArt( input_item_t *p_item, QString fileUrl )
     {
         char *psz_cachedir = config_GetUserDir( VLC_CACHE_DIR );
         QString old_url = THEMIM->getIM()->decodeArtURL( p_item );
+        old_url = QDir( old_url ).canonicalPath();
 
         if( old_url.startsWith( QString::fromUtf8( psz_cachedir ) ) )
             QFile( old_url ).remove(); /* Purge cached artwork */
