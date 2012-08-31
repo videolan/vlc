@@ -518,7 +518,7 @@
                 <object class="NSProgressIndicator" id="664576649">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">-2147482334</int>
-                  <string key="NSFrame">{{217, 12}, {185, 12}}</string>
+                  <string key="NSFrame">{{220, 11}, {182, 12}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <int key="NSpiFlags">16650</int>
                   <double key="NSMaxValue">100</double>
@@ -560,14 +560,14 @@
                 <object class="NSCustomView" id="202538583">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">-2147483356</int>
-                  <string key="NSFrame">{{218, 11}, {60, 12}}</string>
+                  <string key="NSFrame">{{219, 11}, {60, 12}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <string key="NSClassName">VLCThreePartImageView</string>
                 </object>
                 <object class="NSButton" id="707945673">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">260</int>
-                  <string key="NSFrame">{{33, 6}, {27, 23}}</string>
+                  <string key="NSFrame">{{35, 6}, {27, 23}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <bool key="NSEnabled">YES</bool>
                   <object class="NSButtonCell" key="NSCell" id="826103597">
@@ -599,7 +599,7 @@
                 <object class="NSButton" id="291209196">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">292</int>
-                  <string key="NSFrame">{{180, 6}, {33, 23}}</string>
+                  <string key="NSFrame">{{182, 6}, {33, 23}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <bool key="NSEnabled">YES</bool>
                   <object class="NSButtonCell" key="NSCell" id="482976610">
@@ -631,7 +631,7 @@
                 <object class="NSSlider" id="704525034">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">290</int>
-                  <string key="NSFrame">{{218, 10}, {182, 15}}</string>
+                  <string key="NSFrame">{{221, 10}, {179, 15}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <bool key="NSViewCanDrawConcurrently">YES</bool>
                   <bool key="NSEnabled">YES</bool>
@@ -694,7 +694,7 @@
                 <object class="NSButton" id="955174811">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">292</int>
-                  <string key="NSFrame">{{126, 6}, {28, 23}}</string>
+                  <string key="NSFrame">{{128, 6}, {28, 23}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <bool key="NSEnabled">YES</bool>
                   <object class="NSButtonCell" key="NSCell" id="717770677">
@@ -722,7 +722,7 @@
                 <object class="NSButton" id="1051664676">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">292</int>
-                  <string key="NSFrame">{{154, 6}, {28, 23}}</string>
+                  <string key="NSFrame">{{156, 6}, {28, 23}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <bool key="NSEnabled">YES</bool>
                   <object class="NSButtonCell" key="NSCell" id="844988869">
@@ -761,13 +761,13 @@
                     <reference key="NSControlView" ref="1023610457"/>
                     <int key="NSButtonFlags">138674176</int>
                     <int key="NSButtonFlags2">2</int>
-                    <object class="NSCustomResource" key="NSNormalImage" id="60530249">
+                    <object class="NSCustomResource" key="NSNormalImage">
                       <string key="NSClassName">NSImage</string>
-                      <string key="NSResourceName">back</string>
+                      <string key="NSResourceName">back-3btns-dark</string>
                     </object>
-                    <object class="NSCustomResource" key="NSAlternateImage" id="62767174">
+                    <object class="NSCustomResource" key="NSAlternateImage">
                       <string key="NSClassName">NSImage</string>
-                      <string key="NSResourceName">back-pressed</string>
+                      <string key="NSResourceName">back-3btns-dark-pressed</string>
                     </object>
                     <string key="NSAlternateContents"/>
                     <object class="NSMutableString" key="NSKeyEquivalent">
@@ -948,7 +948,7 @@
                 <object class="NSButton" id="809192538">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">260</int>
-                  <string key="NSFrame">{{89, 6}, {33, 23}}</string>
+                  <string key="NSFrame">{{93, 6}, {33, 23}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <bool key="NSEnabled">YES</bool>
                   <object class="NSButtonCell" key="NSCell" id="670927311">
@@ -978,7 +978,7 @@
                 <object class="NSButton" id="828315098">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">260</int>
-                  <string key="NSFrame">{{58, 6}, {27, 23}}</string>
+                  <string key="NSFrame">{{62, 6}, {29, 23}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <bool key="NSEnabled">YES</bool>
                   <object class="NSButtonCell" key="NSCell" id="577223856">
@@ -989,13 +989,13 @@
                     <reference key="NSControlView" ref="828315098"/>
                     <int key="NSButtonFlags">138674176</int>
                     <int key="NSButtonFlags2">2</int>
-                    <object class="NSCustomResource" key="NSNormalImage" id="622132765">
+                    <object class="NSCustomResource" key="NSNormalImage">
                       <string key="NSClassName">NSImage</string>
-                      <string key="NSResourceName">forward</string>
+                      <string key="NSResourceName">forward-3btns-dark</string>
                     </object>
-                    <object class="NSCustomResource" key="NSAlternateImage" id="32734241">
+                    <object class="NSCustomResource" key="NSAlternateImage">
                       <string key="NSClassName">NSImage</string>
-                      <string key="NSResourceName">forward-pressed</string>
+                      <string key="NSResourceName">forward-3btns-dark-pressed</string>
                     </object>
                     <string key="NSAlternateContents"/>
                     <string key="NSKeyEquivalent"/>
@@ -1006,7 +1006,7 @@
                 <object class="NSCustomView" id="304081293">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">290</int>
-                  <string key="NSFrame">{{217, 10}, {185, 14}}</string>
+                  <string key="NSFrame">{{219, 10}, {183, 14}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <string key="NSReuseIdentifierKey">_NS:1109</string>
                   <string key="NSClassName">VLCThreePartImageView</string>
@@ -4654,8 +4654,14 @@ LCAuLi4</string>
                     <reference key="NSControlView" ref="647546256"/>
                     <int key="NSButtonFlags">138674176</int>
                     <int key="NSButtonFlags2">2</int>
-                    <reference key="NSNormalImage" ref="60530249"/>
-                    <reference key="NSAlternateImage" ref="62767174"/>
+                    <object class="NSCustomResource" key="NSNormalImage">
+                      <string key="NSClassName">NSImage</string>
+                      <string key="NSResourceName">back</string>
+                    </object>
+                    <object class="NSCustomResource" key="NSAlternateImage">
+                      <string key="NSClassName">NSImage</string>
+                      <string key="NSResourceName">back-pressed</string>
+                    </object>
                     <string key="NSAlternateContents"/>
                     <object class="NSMutableString" key="NSKeyEquivalent">
                       <characters key="NS.bytes"/>
@@ -4678,8 +4684,14 @@ LCAuLi4</string>
                     <reference key="NSControlView" ref="966784985"/>
                     <int key="NSButtonFlags">138674176</int>
                     <int key="NSButtonFlags2">2</int>
-                    <reference key="NSNormalImage" ref="622132765"/>
-                    <reference key="NSAlternateImage" ref="32734241"/>
+                    <object class="NSCustomResource" key="NSNormalImage">
+                      <string key="NSClassName">NSImage</string>
+                      <string key="NSResourceName">forward</string>
+                    </object>
+                    <object class="NSCustomResource" key="NSAlternateImage">
+                      <string key="NSClassName">NSImage</string>
+                      <string key="NSResourceName">forward-pressed</string>
+                    </object>
                     <string key="NSAlternateContents"/>
                     <string key="NSKeyEquivalent"/>
                     <int key="NSPeriodicDelay">200</int>
@@ -19965,12 +19977,16 @@ LCAuLi4</string>
         <string>NSMenuCheckmark</string>
         <string>NSMenuMixedState</string>
         <string>back</string>
+        <string>back-3btns-dark</string>
+        <string>back-3btns-dark-pressed</string>
         <string>back-pressed</string>
         <string>dropzone</string>
         <string>dropzone-background</string>
         <string>effects-double-buttons</string>
         <string>effects-double-buttons-pressed</string>
         <string>forward</string>
+        <string>forward-3btns-dark</string>
+        <string>forward-3btns-dark-pressed</string>
         <string>forward-pressed</string>
         <string>fs_background</string>
         <string>fs_exit_fullscreen</string>
@@ -20007,12 +20023,16 @@ LCAuLi4</string>
         <string>{11, 11}</string>
         <string>{10, 3}</string>
         <string>{35, 23}</string>
+        <string>{128, 128}</string>
+        <string>{128, 128}</string>
         <string>{35, 23}</string>
         <string>{112, 112}</string>
         <string>{4, 4}</string>
         <string>{29, 23}</string>
         <string>{29, 23}</string>
         <string>{35, 23}</string>
+        <string>{128, 128}</string>
+        <string>{128, 128}</string>
         <string>{35, 23}</string>
         <string>{549, 87}</string>
         <string>{22, 22}</string>
