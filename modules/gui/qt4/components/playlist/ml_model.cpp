@@ -146,7 +146,7 @@ QVariant MLModel::headerData( int section, Qt::Orientation orientation,
                                     int role ) const
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-        return QVariant( psz_column_title( columnToMeta( section ) ) );
+        return QVariant( qfu( psz_column_title( columnToMeta( section ) ) ) );
     else
         return QVariant();
 }
