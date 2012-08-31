@@ -2345,7 +2345,7 @@ static int InputSourceInit( input_thread_t *p_input,
                             input_source_t *in, const char *psz_mrl,
                             const char *psz_forced_demux, bool b_in_can_fail )
 {
-    const char *psz_access, *psz_demux, *psz_path, *psz_anchor;
+    const char *psz_access, *psz_demux, *psz_path, *psz_anchor = NULL;
     char *psz_var_demux = NULL;
     double f_fps;
 
