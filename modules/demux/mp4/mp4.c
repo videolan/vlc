@@ -1953,8 +1953,10 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
 
             case VLC_CODEC_AMR_NB:
                 p_track->fmt.audio.i_rate = 8000;
+                break;
             case VLC_CODEC_AMR_WB:
                 p_track->fmt.audio.i_rate = 16000;
+                break;
             case VLC_FOURCC( 'Q', 'D', 'M', 'C' ):
             case VLC_CODEC_QDM2:
             case VLC_CODEC_ALAC:
