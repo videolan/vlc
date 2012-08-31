@@ -21,7 +21,8 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="21"/>
+      <integer value="4950"/>
+      <integer value="4756"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -4486,7 +4487,7 @@ LCAuLi4</string>
         <nil key="NSUserInterfaceItemIdentifier"/>
         <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <object class="NSView" key="NSWindowView" id="598483044">
-          <nil key="NSNextResponder"/>
+          <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -4553,7 +4554,7 @@ LCAuLi4</string>
                 <object class="NSProgressIndicator" id="506657677">
                   <reference key="NSNextResponder" ref="984096082"/>
                   <int key="NSvFlags">-2147482334</int>
-                  <string key="NSFrame">{{92, 12}, {186, 12}}</string>
+                  <string key="NSFrame">{{96, 12}, {184, 12}}</string>
                   <reference key="NSSuperview" ref="984096082"/>
                   <int key="NSpiFlags">16650</int>
                   <double key="NSMaxValue">100</double>
@@ -4561,14 +4562,14 @@ LCAuLi4</string>
                 <object class="NSCustomView" id="1037621901">
                   <reference key="NSNextResponder" ref="984096082"/>
                   <int key="NSvFlags">-2147483356</int>
-                  <string key="NSFrame">{{93, 11}, {60, 12}}</string>
+                  <string key="NSFrame">{{97, 11}, {60, 12}}</string>
                   <reference key="NSSuperview" ref="984096082"/>
                   <string key="NSClassName">VLCThreePartImageView</string>
                 </object>
                 <object class="NSSlider" id="672269443">
                   <reference key="NSNextResponder" ref="984096082"/>
                   <int key="NSvFlags">290</int>
-                  <string key="NSFrame">{{93, 10}, {183, 15}}</string>
+                  <string key="NSFrame">{{97, 10}, {181, 15}}</string>
                   <reference key="NSSuperview" ref="984096082"/>
                   <bool key="NSViewCanDrawConcurrently">YES</bool>
                   <bool key="NSEnabled">YES</bool>
@@ -4613,7 +4614,7 @@ LCAuLi4</string>
                 <object class="NSCustomView" id="640104047">
                   <reference key="NSNextResponder" ref="984096082"/>
                   <int key="NSvFlags">290</int>
-                  <string key="NSFrame">{{92, 10}, {186, 14}}</string>
+                  <string key="NSFrame">{{96, 10}, {184, 14}}</string>
                   <reference key="NSSuperview" ref="984096082"/>
                   <string key="NSReuseIdentifierKey">_NS:1109</string>
                   <string key="NSClassName">VLCThreePartImageView</string>
@@ -4621,7 +4622,7 @@ LCAuLi4</string>
                 <object class="NSButton" id="467826358">
                   <reference key="NSNextResponder" ref="984096082"/>
                   <int key="NSvFlags">260</int>
-                  <string key="NSFrame">{{30, 3}, {30, 30}}</string>
+                  <string key="NSFrame">{{35, 6}, {27, 23}}</string>
                   <reference key="NSSuperview" ref="984096082"/>
                   <bool key="NSEnabled">YES</bool>
                   <object class="NSButtonCell" key="NSCell" id="729652753">
@@ -4643,7 +4644,7 @@ LCAuLi4</string>
                 <object class="NSButton" id="647546256">
                   <reference key="NSNextResponder" ref="984096082"/>
                   <int key="NSvFlags">260</int>
-                  <string key="NSFrame">{{6, 6}, {35, 23}}</string>
+                  <string key="NSFrame">{{6, 6}, {29, 23}}</string>
                   <reference key="NSSuperview" ref="984096082"/>
                   <bool key="NSEnabled">YES</bool>
                   <object class="NSButtonCell" key="NSCell" id="706989790">
@@ -4673,7 +4674,7 @@ LCAuLi4</string>
                 <object class="NSButton" id="966784985">
                   <reference key="NSNextResponder" ref="984096082"/>
                   <int key="NSvFlags">260</int>
-                  <string key="NSFrame">{{50, 6}, {35, 23}}</string>
+                  <string key="NSFrame">{{62, 6}, {29, 23}}</string>
                   <reference key="NSSuperview" ref="984096082"/>
                   <bool key="NSEnabled">YES</bool>
                   <object class="NSButtonCell" key="NSCell" id="7047">
@@ -4706,6 +4707,7 @@ LCAuLi4</string>
             </object>
           </object>
           <string key="NSFrameSize">{363, 239}</string>
+          <reference key="NSSuperview"/>
           <string key="NSReuseIdentifierKey">_NS:122</string>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
@@ -12840,9 +12842,9 @@ LCAuLi4</string>
           <string>{{600, 612}, {137, 103}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{329, 74}, {604, 310}}</string>
+          <string>{{336, 446}, {604, 310}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{329, 74}, {604, 310}}</string>
+          <string>{{336, 446}, {604, 310}}</string>
           <boolean value="YES"/>
           <boolean value="YES"/>
           <boolean value="NO"/>

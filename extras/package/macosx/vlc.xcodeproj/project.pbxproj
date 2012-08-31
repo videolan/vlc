@@ -7,15 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		CC04323B13B246DF00D7D52E /* back_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04321113B246DF00D7D52E /* back_dark.png */; };
-		CC04323C13B246DF00D7D52E /* back-pressed_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04321213B246DF00D7D52E /* back-pressed_dark.png */; };
 		CC04323D13B246DF00D7D52E /* effects-double-buttons_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04321313B246DF00D7D52E /* effects-double-buttons_dark.png */; };
 		CC04323E13B246DF00D7D52E /* effects-double-buttons-blue_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04321413B246DF00D7D52E /* effects-double-buttons-blue_dark.png */; };
 		CC04323F13B246DF00D7D52E /* effects-double-buttons-pressed_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04321513B246DF00D7D52E /* effects-double-buttons-pressed_dark.png */; };
 		CC04324013B246DF00D7D52E /* effects-one-button_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04321613B246DF00D7D52E /* effects-one-button_dark.png */; };
 		CC04324113B246DF00D7D52E /* effects-one-button-blue_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04321713B246DF00D7D52E /* effects-one-button-blue_dark.png */; };
-		CC04324213B246DF00D7D52E /* forward_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04321813B246DF00D7D52E /* forward_dark.png */; };
-		CC04324313B246DF00D7D52E /* forward-pressed_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04321913B246DF00D7D52E /* forward-pressed_dark.png */; };
 		CC04324413B246DF00D7D52E /* fullscreen-double-buttons_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04321A13B246DF00D7D52E /* fullscreen-double-buttons_dark.png */; };
 		CC04324513B246DF00D7D52E /* fullscreen-double-buttons-pressed_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04321B13B246DF00D7D52E /* fullscreen-double-buttons-pressed_dark.png */; };
 		CC04324613B246DF00D7D52E /* pause_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04321C13B246DF00D7D52E /* pause_dark.png */; };
@@ -265,13 +261,9 @@
 		CC919092159B4BB800E634A7 /* effects-double-buttons-pressed_dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC919060159B4BB800E634A7 /* effects-double-buttons-pressed_dark@2x.png */; };
 		CC919093159B4BB800E634A7 /* effects-one-button_dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC919061159B4BB800E634A7 /* effects-one-button_dark@2x.png */; };
 		CC919094159B4BB800E634A7 /* effects-one-button-blue_dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC919062159B4BB800E634A7 /* effects-one-button-blue_dark@2x.png */; };
-		CC919095159B4BB800E634A7 /* forward_dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC919063159B4BB800E634A7 /* forward_dark@2x.png */; };
-		CC919096159B4BB800E634A7 /* forward-pressed_dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC919064159B4BB800E634A7 /* forward-pressed_dark@2x.png */; };
 		CC919097159B4BB800E634A7 /* fullscreen-double-buttons_dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC919065159B4BB800E634A7 /* fullscreen-double-buttons_dark@2x.png */; };
 		CC919098159B4BB800E634A7 /* fullscreen-double-buttons-pressed_dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC919066159B4BB800E634A7 /* fullscreen-double-buttons-pressed_dark@2x.png */; };
 		CC919099159B4BB800E634A7 /* fullscreen-one-button-pressed_dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC919067159B4BB800E634A7 /* fullscreen-one-button-pressed_dark@2x.png */; };
-		CC91909A159B4BB800E634A7 /* back_dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC919068159B4BB800E634A7 /* back_dark@2x.png */; };
-		CC91909B159B4BB800E634A7 /* back-pressed_dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC919069159B4BB800E634A7 /* back-pressed_dark@2x.png */; };
 		CC91909C159B4BB800E634A7 /* bottom-background_dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC91906A159B4BB800E634A7 /* bottom-background_dark@2x.png */; };
 		CC91909D159B4BB800E634A7 /* bottomdark-left@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC91906B159B4BB800E634A7 /* bottomdark-left@2x.png */; };
 		CC91909E159B4BB800E634A7 /* bottomdark-right@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC91906C159B4BB800E634A7 /* bottomdark-right@2x.png */; };
@@ -458,15 +450,11 @@
 		8EE1AFA0044465080059A3A7 /* about.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = about.m; path = ../../../modules/gui/macosx/about.m; sourceTree = SOURCE_ROOT; };
 		CC017A0B14A4C8AF00C09A4F /* MainWindowTitle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainWindowTitle.h; path = ../../../modules/gui/macosx/MainWindowTitle.h; sourceTree = "<group>"; };
 		CC017A0C14A4C8AF00C09A4F /* MainWindowTitle.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MainWindowTitle.m; path = ../../../modules/gui/macosx/MainWindowTitle.m; sourceTree = "<group>"; };
-		CC04321113B246DF00D7D52E /* back_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = back_dark.png; path = Resources/mainwindow_dark/back_dark.png; sourceTree = "<group>"; };
-		CC04321213B246DF00D7D52E /* back-pressed_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "back-pressed_dark.png"; path = "Resources/mainwindow_dark/back-pressed_dark.png"; sourceTree = "<group>"; };
 		CC04321313B246DF00D7D52E /* effects-double-buttons_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-double-buttons_dark.png"; path = "Resources/mainwindow_dark/effects-double-buttons_dark.png"; sourceTree = "<group>"; };
 		CC04321413B246DF00D7D52E /* effects-double-buttons-blue_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-double-buttons-blue_dark.png"; path = "Resources/mainwindow_dark/effects-double-buttons-blue_dark.png"; sourceTree = "<group>"; };
 		CC04321513B246DF00D7D52E /* effects-double-buttons-pressed_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-double-buttons-pressed_dark.png"; path = "Resources/mainwindow_dark/effects-double-buttons-pressed_dark.png"; sourceTree = "<group>"; };
 		CC04321613B246DF00D7D52E /* effects-one-button_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button_dark.png"; path = "Resources/mainwindow_dark/effects-one-button_dark.png"; sourceTree = "<group>"; };
 		CC04321713B246DF00D7D52E /* effects-one-button-blue_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-blue_dark.png"; path = "Resources/mainwindow_dark/effects-one-button-blue_dark.png"; sourceTree = "<group>"; };
-		CC04321813B246DF00D7D52E /* forward_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = forward_dark.png; path = Resources/mainwindow_dark/forward_dark.png; sourceTree = "<group>"; };
-		CC04321913B246DF00D7D52E /* forward-pressed_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "forward-pressed_dark.png"; path = "Resources/mainwindow_dark/forward-pressed_dark.png"; sourceTree = "<group>"; };
 		CC04321A13B246DF00D7D52E /* fullscreen-double-buttons_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "fullscreen-double-buttons_dark.png"; path = "Resources/mainwindow_dark/fullscreen-double-buttons_dark.png"; sourceTree = "<group>"; };
 		CC04321B13B246DF00D7D52E /* fullscreen-double-buttons-pressed_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "fullscreen-double-buttons-pressed_dark.png"; path = "Resources/mainwindow_dark/fullscreen-double-buttons-pressed_dark.png"; sourceTree = "<group>"; };
 		CC04321C13B246DF00D7D52E /* pause_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = pause_dark.png; path = Resources/mainwindow_dark/pause_dark.png; sourceTree = "<group>"; };
@@ -751,13 +739,9 @@
 		CC919060159B4BB800E634A7 /* effects-double-buttons-pressed_dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-double-buttons-pressed_dark@2x.png"; path = "Resources/mainwindow_dark/effects-double-buttons-pressed_dark@2x.png"; sourceTree = "<group>"; };
 		CC919061159B4BB800E634A7 /* effects-one-button_dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button_dark@2x.png"; path = "Resources/mainwindow_dark/effects-one-button_dark@2x.png"; sourceTree = "<group>"; };
 		CC919062159B4BB800E634A7 /* effects-one-button-blue_dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-blue_dark@2x.png"; path = "Resources/mainwindow_dark/effects-one-button-blue_dark@2x.png"; sourceTree = "<group>"; };
-		CC919063159B4BB800E634A7 /* forward_dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "forward_dark@2x.png"; path = "Resources/mainwindow_dark/forward_dark@2x.png"; sourceTree = "<group>"; };
-		CC919064159B4BB800E634A7 /* forward-pressed_dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "forward-pressed_dark@2x.png"; path = "Resources/mainwindow_dark/forward-pressed_dark@2x.png"; sourceTree = "<group>"; };
 		CC919065159B4BB800E634A7 /* fullscreen-double-buttons_dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "fullscreen-double-buttons_dark@2x.png"; path = "Resources/mainwindow_dark/fullscreen-double-buttons_dark@2x.png"; sourceTree = "<group>"; };
 		CC919066159B4BB800E634A7 /* fullscreen-double-buttons-pressed_dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "fullscreen-double-buttons-pressed_dark@2x.png"; path = "Resources/mainwindow_dark/fullscreen-double-buttons-pressed_dark@2x.png"; sourceTree = "<group>"; };
 		CC919067159B4BB800E634A7 /* fullscreen-one-button-pressed_dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "fullscreen-one-button-pressed_dark@2x.png"; path = "Resources/mainwindow_dark/fullscreen-one-button-pressed_dark@2x.png"; sourceTree = "<group>"; };
-		CC919068159B4BB800E634A7 /* back_dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "back_dark@2x.png"; path = "Resources/mainwindow_dark/back_dark@2x.png"; sourceTree = "<group>"; };
-		CC919069159B4BB800E634A7 /* back-pressed_dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "back-pressed_dark@2x.png"; path = "Resources/mainwindow_dark/back-pressed_dark@2x.png"; sourceTree = "<group>"; };
 		CC91906A159B4BB800E634A7 /* bottom-background_dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "bottom-background_dark@2x.png"; path = "Resources/mainwindow_dark/bottom-background_dark@2x.png"; sourceTree = "<group>"; };
 		CC91906B159B4BB800E634A7 /* bottomdark-left@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "bottomdark-left@2x.png"; path = "Resources/mainwindow_dark/bottomdark-left@2x.png"; sourceTree = "<group>"; };
 		CC91906C159B4BB800E634A7 /* bottomdark-right@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "bottomdark-right@2x.png"; path = "Resources/mainwindow_dark/bottomdark-right@2x.png"; sourceTree = "<group>"; };
@@ -1177,20 +1161,14 @@
 				CC919060159B4BB800E634A7 /* effects-double-buttons-pressed_dark@2x.png */,
 				CC919061159B4BB800E634A7 /* effects-one-button_dark@2x.png */,
 				CC919062159B4BB800E634A7 /* effects-one-button-blue_dark@2x.png */,
-				CC919063159B4BB800E634A7 /* forward_dark@2x.png */,
-				CC919064159B4BB800E634A7 /* forward-pressed_dark@2x.png */,
 				CC919065159B4BB800E634A7 /* fullscreen-double-buttons_dark@2x.png */,
 				CC919066159B4BB800E634A7 /* fullscreen-double-buttons-pressed_dark@2x.png */,
 				CC919067159B4BB800E634A7 /* fullscreen-one-button-pressed_dark@2x.png */,
-				CC919068159B4BB800E634A7 /* back_dark@2x.png */,
-				CC919069159B4BB800E634A7 /* back-pressed_dark@2x.png */,
 				CC91906A159B4BB800E634A7 /* bottom-background_dark@2x.png */,
 				CC91906B159B4BB800E634A7 /* bottomdark-left@2x.png */,
 				CC91906C159B4BB800E634A7 /* bottomdark-right@2x.png */,
 				CC91906D159B4BB800E634A7 /* effects-double-buttons-blue_dark@2x.png */,
 				CC206B1114ACFEAC007935C6 /* titlebar */,
-				CC04321113B246DF00D7D52E /* back_dark.png */,
-				CC04321213B246DF00D7D52E /* back-pressed_dark.png */,
 				CC9B43B013B29FCF000205AE /* bottom-background_dark.png */,
 				CC5800F61423A81500166912 /* bottombar-mini.png */,
 				CC1655D114EEA1DE00FAA66F /* bottomdark-left.png */,
@@ -1200,8 +1178,6 @@
 				CC04321513B246DF00D7D52E /* effects-double-buttons-pressed_dark.png */,
 				CC04321613B246DF00D7D52E /* effects-one-button_dark.png */,
 				CC04321713B246DF00D7D52E /* effects-one-button-blue_dark.png */,
-				CC04321813B246DF00D7D52E /* forward_dark.png */,
-				CC04321913B246DF00D7D52E /* forward-pressed_dark.png */,
 				CC04321A13B246DF00D7D52E /* fullscreen-double-buttons_dark.png */,
 				CC04321B13B246DF00D7D52E /* fullscreen-double-buttons-pressed_dark.png */,
 				CC0F725515063C980086B6A0 /* fullscreen-one-button_dark.png */,
@@ -1697,15 +1673,11 @@
 				CC402EBA0E00ABBB006A4BA4 /* vlc.scriptTerminology in Resources */,
 				CC402EBB0E00ABBB006A4BA4 /* README.MacOSX.rtf in Resources */,
 				CC402F3C0E00ABBB006A4BA4 /* noart.png in Resources */,
-				CC04323B13B246DF00D7D52E /* back_dark.png in Resources */,
-				CC04323C13B246DF00D7D52E /* back-pressed_dark.png in Resources */,
 				CC04323D13B246DF00D7D52E /* effects-double-buttons_dark.png in Resources */,
 				CC04323E13B246DF00D7D52E /* effects-double-buttons-blue_dark.png in Resources */,
 				CC04323F13B246DF00D7D52E /* effects-double-buttons-pressed_dark.png in Resources */,
 				CC04324013B246DF00D7D52E /* effects-one-button_dark.png in Resources */,
 				CC04324113B246DF00D7D52E /* effects-one-button-blue_dark.png in Resources */,
-				CC04324213B246DF00D7D52E /* forward_dark.png in Resources */,
-				CC04324313B246DF00D7D52E /* forward-pressed_dark.png in Resources */,
 				CC04324413B246DF00D7D52E /* fullscreen-double-buttons_dark.png in Resources */,
 				CC04324513B246DF00D7D52E /* fullscreen-double-buttons-pressed_dark.png in Resources */,
 				CC04324613B246DF00D7D52E /* pause_dark.png in Resources */,
@@ -2037,13 +2009,9 @@
 				CC919092159B4BB800E634A7 /* effects-double-buttons-pressed_dark@2x.png in Resources */,
 				CC919093159B4BB800E634A7 /* effects-one-button_dark@2x.png in Resources */,
 				CC919094159B4BB800E634A7 /* effects-one-button-blue_dark@2x.png in Resources */,
-				CC919095159B4BB800E634A7 /* forward_dark@2x.png in Resources */,
-				CC919096159B4BB800E634A7 /* forward-pressed_dark@2x.png in Resources */,
 				CC919097159B4BB800E634A7 /* fullscreen-double-buttons_dark@2x.png in Resources */,
 				CC919098159B4BB800E634A7 /* fullscreen-double-buttons-pressed_dark@2x.png in Resources */,
 				CC919099159B4BB800E634A7 /* fullscreen-one-button-pressed_dark@2x.png in Resources */,
-				CC91909A159B4BB800E634A7 /* back_dark@2x.png in Resources */,
-				CC91909B159B4BB800E634A7 /* back-pressed_dark@2x.png in Resources */,
 				CC91909C159B4BB800E634A7 /* bottom-background_dark@2x.png in Resources */,
 				CC91909D159B4BB800E634A7 /* bottomdark-left@2x.png in Resources */,
 				CC91909E159B4BB800E634A7 /* bottomdark-right@2x.png in Resources */,
