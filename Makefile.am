@@ -295,10 +295,10 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/volume-slider-knob@2x.png \
 	extras/package/macosx/Resources/mainwindow/volume-slider-track.png \
 	extras/package/macosx/Resources/mainwindow/volume-slider-track@2x.png \
-	extras/package/macosx/Resources/mainwindow_dark/back-pressed_dark.png \
-	extras/package/macosx/Resources/mainwindow_dark/back-pressed_dark@2x.png \
-	extras/package/macosx/Resources/mainwindow_dark/back_dark.png \
-	extras/package/macosx/Resources/mainwindow_dark/back_dark@2x.png \
+	extras/package/macosx/Resources/mainwindow_dark/back-3btns-dark-pressed.png \
+	extras/package/macosx/Resources/mainwindow_dark/back-3btns-dark-pressed@2x.png \
+	extras/package/macosx/Resources/mainwindow_dark/back-3btns-dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/back-3btns-dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottom-background_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottom-background_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottombar-mini.png \
@@ -316,10 +316,10 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/effects-one-button-blue_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-one-button_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-one-button_dark@2x.png \
-	extras/package/macosx/Resources/mainwindow_dark/forward-pressed_dark.png \
-	extras/package/macosx/Resources/mainwindow_dark/forward-pressed_dark@2x.png \
-	extras/package/macosx/Resources/mainwindow_dark/forward_dark.png \
-	extras/package/macosx/Resources/mainwindow_dark/forward_dark@2x.png \
+	extras/package/macosx/Resources/mainwindow_dark/forward-3btns-dark-pressed.png \
+	extras/package/macosx/Resources/mainwindow_dark/forward-3btns-dark-pressed@2x.png \
+	extras/package/macosx/Resources/mainwindow_dark/forward-3btns-dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/forward-3btns-dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/fullscreen-double-buttons-pressed_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/fullscreen-double-buttons-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/fullscreen-double-buttons_dark.png \
