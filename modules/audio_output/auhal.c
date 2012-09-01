@@ -1,7 +1,7 @@
 /*****************************************************************************
  * auhal.c: AUHAL and Coreaudio output plugin
  *****************************************************************************
- * Copyright (C) 2005, 2011 the VideoLAN team
+ * Copyright (C) 2005, 2012 the VideoLAN team
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
@@ -187,15 +187,11 @@ static int Open( vlc_object_t * p_this )
 
     /* Persistent device variable */
     if( var_Type( p_aout->p_libvlc, "macosx-audio-device" ) == 0 )
-    {
         var_Create( p_aout->p_libvlc, "macosx-audio-device", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    }
 
     /* Build a list of devices */
     if( var_Type( p_aout, "audio-device" ) == 0 )
-    {
         Probe( p_aout );
-    }
 
     /* What device do we want? */
     if( var_Get( p_aout, "audio-device", &val ) < 0 )
@@ -478,47 +474,29 @@ static int OpenAnalog( audio_output_t *p_aout )
             break;
         case 3:
             if( p_aout->format.i_physical_channels & AOUT_CHAN_CENTER )
-            {
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_7; // L R C
-            }
             else if( p_aout->format.i_physical_channels & AOUT_CHAN_LFE )
-            {
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_4; // L R LFE
-            }
             break;
         case 4:
             if( p_aout->format.i_physical_channels & ( AOUT_CHAN_CENTER | AOUT_CHAN_LFE ) )
-            {
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_10; // L R C LFE
-            }
             else if( p_aout->format.i_physical_channels & ( AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT ) )
-            {
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_3; // L R Ls Rs
-            }
             else if( p_aout->format.i_physical_channels & ( AOUT_CHAN_CENTER | AOUT_CHAN_REARCENTER ) )
-            {
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_3; // L R C Cs
-            }
             break;
         case 5:
             if( p_aout->format.i_physical_channels & ( AOUT_CHAN_CENTER ) )
-            {
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_19; // L R Ls Rs C
-            }
             else if( p_aout->format.i_physical_channels & ( AOUT_CHAN_LFE ) )
-            {
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_18; // L R Ls Rs LFE
-            }
             break;
         case 6:
             if( p_aout->format.i_physical_channels & ( AOUT_CHAN_LFE ) )
-            {
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_20; // L R Ls Rs C LFE
-            }
             else
-            {
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_AudioUnit_6_0; // L R Ls Rs C Cs
-            }
             break;
         case 7:
             /* FIXME: This is incorrect. VLC uses the internal ordering: L R Lm Rm Lr Rr C LFE but this is wrong */
@@ -760,9 +738,7 @@ static int OpenSPDIF( audio_output_t * p_aout )
                         break;
                     }
                     else if( p_format_list[j].mFormat.mSampleRate == p_sys->sfmt_revert.mSampleRate )
-                    {
                         i_current_rate_format = j;
-                    }
                     else
                     {
                         if( i_backup_rate_format < 0 || p_format_list[j].mFormat.mSampleRate > p_format_list[i_backup_rate_format].mFormat.mSampleRate )
@@ -826,9 +802,8 @@ static int OpenSPDIF( audio_output_t * p_aout )
         err = AudioDeviceDestroyIOProcID( p_sys->i_selected_dev,
                                           p_sys->i_procID );
         if( err != noErr )
-        {
             msg_Err( p_aout, "AudioDeviceDestroyIOProcID failed: [%4.4s]", (char *)&err );
-        }
+
         aout_PacketDestroy (p_aout);
         return false;
     }
@@ -850,9 +825,7 @@ static void Close( vlc_object_t * p_this )
     AudioObjectPropertyAddress deviceAliveAddress = { kAudioDevicePropertyDeviceIsAlive, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
     err = AudioObjectRemovePropertyListener( p_sys->i_selected_dev, &deviceAliveAddress, HardwareListener, NULL );
     if( err != noErr )
-    {
         msg_Err( p_aout, "failed to remove audio device life checker: [%4.4s]", (char *)&err );
-    }
 
     if( p_sys->au_unit )
     {
@@ -867,22 +840,16 @@ static void Close( vlc_object_t * p_this )
         err = AudioDeviceStop( p_sys->i_selected_dev,
                                p_sys->i_procID );
         if( err != noErr )
-        {
             msg_Err( p_aout, "AudioDeviceStop failed: [%4.4s]", (char *)&err );
-        }
 
         /* Remove IOProc callback */
         err = AudioDeviceDestroyIOProcID( p_sys->i_selected_dev,
                                           p_sys->i_procID );
         if( err != noErr )
-        {
             msg_Err( p_aout, "AudioDeviceDestroyIOProcID failed: [%4.4s]", (char *)&err );
-        }
 
         if( p_sys->b_revert )
-        {
             AudioStreamChangeFormat( p_aout, p_sys->i_stream_id, p_sys->sfmt_revert );
-        }
 
         if( p_sys->b_changed_mixing && p_sys->sfmt_revert.mFormatID != kAudioFormat60958AC3 )
         {
@@ -901,9 +868,7 @@ static void Close( vlc_object_t * p_this )
             }
 
             if( err != noErr )
-            {
                 msg_Err( p_aout, "failed to set mixmode: [%4.4s]", (char *)&err );
-            }
         }
     }
 
@@ -911,9 +876,7 @@ static void Close( vlc_object_t * p_this )
     err = AudioObjectRemovePropertyListener( kAudioObjectSystemObject, &audioDevicesAddress, HardwareListener, NULL );
 
     if( err != noErr )
-    {
         msg_Err( p_aout, "AudioHardwareRemovePropertyListener failed: [%4.4s]", (char *)&err );
-    }
 
     if( p_sys->i_hog_pid == getpid() )
     {
@@ -1000,12 +963,14 @@ static void Probe( audio_output_t * p_aout )
 
         /* Retrieve the length of the device name */
         err = AudioObjectGetPropertyDataSize( p_devices[i], &deviceNameAddress, 0, NULL, &i_param_size );
-        if( err ) goto error;
+        if( err != noErr )
+            goto error;
 
         /* Retrieve the name of the device */
         psz_name = (char *)malloc( i_param_size );
         err = AudioObjectGetPropertyData( p_devices[i], &deviceNameAddress, 0, NULL, &i_param_size, psz_name );
-        if( err ) goto error;
+        if( err != noErr )
+            goto error;
 
         msg_Dbg( p_aout, "DevID: %u DevName: %s", (unsigned)p_devices[i], psz_name );
 
@@ -1060,7 +1025,8 @@ static void Probe( audio_output_t * p_aout )
 
     /* Attach a Listener so that we are notified of a change in the Device setup */
     err = AudioObjectAddPropertyListener( kAudioObjectSystemObject, &audioDevicesAddress, HardwareListener, (void *)p_aout );
-    if( err != noErr ) {
+    if( err != noErr )
+    {
         msg_Warn( p_aout, "failed to add listener for audio device configuration (%i)", err );
         goto error;
     }
@@ -1174,9 +1140,7 @@ static int AudioStreamSupportsDigital( audio_output_t *p_aout, AudioStreamID i_s
            p_format_list[i].mFormat.mFormatID == 'iac3' ||
            p_format_list[i].mFormat.mFormatID == kAudioFormat60958AC3 ||
            p_format_list[i].mFormat.mFormatID == kAudioFormatAC3 )
-        {
             b_return = true;
-        }
     }
 
     free( p_format_list );
