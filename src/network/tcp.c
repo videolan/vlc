@@ -43,7 +43,7 @@
 #endif
 
 #include <vlc_network.h>
-#if defined (WIN32) || defined (UNDER_CE)
+#if defined (WIN32)
 #   undef EINPROGRESS
 #   define EINPROGRESS WSAEWOULDBLOCK
 #   undef EWOULDBLOCK

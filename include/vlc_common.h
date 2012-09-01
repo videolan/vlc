@@ -140,7 +140,7 @@
 /*****************************************************************************
  * Basic types definitions
  *****************************************************************************/
-#if defined( WIN32 ) || defined( UNDER_CE )
+#if defined( WIN32 )
 #   include <malloc.h>
 #   ifndef PATH_MAX
 #       define PATH_MAX MAX_PATH
@@ -426,7 +426,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 /*****************************************************************************
  * OS-specific headers and thread types
  *****************************************************************************/
-#if defined( WIN32 ) || defined( UNDER_CE )
+#if defined( WIN32 )
 # include <windows.h>
 #endif
 
@@ -783,7 +783,7 @@ static inline void SetQWLE (void *p, uint64_t qw)
 
 /* Stuff defined in src/extras/libc.c */
 
-#if defined(WIN32) || defined(UNDER_CE)
+#if defined(WIN32)
 /* win32, cl and icl support */
 #   if defined( _MSC_VER ) || !defined( __MINGW32__ )
 #       define __attribute__(x)
@@ -937,7 +937,7 @@ VLC_API const char * VLC_Compiler( void ) VLC_USED;
 #include "vlc_main.h"
 #include "vlc_configuration.h"
 
-#if defined( WIN32 ) || defined( UNDER_CE ) || defined( __SYMBIAN32__ ) || defined( __OS2__ )
+#if defined( WIN32 ) || defined( __SYMBIAN32__ ) || defined( __OS2__ )
 #   define DIR_SEP_CHAR '\\'
 #   define DIR_SEP "\\"
 #   define PATH_SEP_CHAR ';'

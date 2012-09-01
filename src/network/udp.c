@@ -110,7 +110,7 @@ static int net_SetupDgramSocket (vlc_object_t *p_obj, int fd,
                 (void *)&(int){ 0x80000 }, sizeof (int));
 #endif
 
-#if defined (WIN32) || defined (UNDER_CE)
+#if defined (WIN32)
     if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen)
      && (sizeof (struct sockaddr_storage) >= ptr->ai_addrlen))
     {
@@ -559,7 +559,7 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
             break;
         }
 
-#if defined( WIN32 ) || defined( UNDER_CE )
+#if defined( WIN32 )
         if( WSAGetLastError () == WSAENETUNREACH )
 #else
         if( errno == ENETUNREACH )

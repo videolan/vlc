@@ -93,7 +93,7 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
          * so PATH_MAX-2 is the bigest we can have */
         if( i_len > PATH_MAX - 2 )
             i_len = PATH_MAX - 2;
-#if defined(WIN32) || defined(UNDER_CE) || defined(__OS2__)
+#if defined(WIN32) || defined(__OS2__)
         if( (i_len > 0) && path[i_len] != '\\' )
             path[i_len] = '\\';
 #else

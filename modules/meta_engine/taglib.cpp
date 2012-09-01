@@ -533,7 +533,7 @@ static int ReadMeta( vlc_object_t* p_this)
     if( !psz_path )
         return VLC_ENOMEM;
 
-#if defined(WIN32) || defined (UNDER_CE)
+#if defined(WIN32)
     wchar_t *wpath = ToWide( psz_path );
     if( wpath == NULL )
     {
@@ -826,7 +826,7 @@ static int WriteMeta( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-#if defined(WIN32) || defined (UNDER_CE)
+#if defined(WIN32)
     wchar_t *wpath = ToWide( p_export->psz_file );
     if( wpath == NULL )
         return VLC_EGENERIC;

@@ -1733,7 +1733,7 @@ static void httpd_ClientRecv( httpd_client_t *cl )
     }
 
     /* check if the client is to be set to dead */
-#if defined( WIN32 ) || defined( UNDER_CE )
+#if defined( WIN32 )
     if( ( i_len < 0 && WSAGetLastError() != WSAEWOULDBLOCK ) || ( i_len == 0 ) )
 #else
     if( ( i_len < 0 && errno != EAGAIN ) || ( i_len == 0 ) )
@@ -1872,7 +1872,7 @@ static void httpd_ClientSend( httpd_client_t *cl )
     }
     else
     {
-#if defined( WIN32 ) || defined( UNDER_CE )
+#if defined( WIN32 )
         if( ( i_len < 0 && WSAGetLastError() != WSAEWOULDBLOCK ) || ( i_len == 0 ) )
 #else
         if( ( i_len < 0 && errno != EAGAIN ) || ( i_len == 0 ) )

@@ -103,7 +103,7 @@ static int MouseEvent( filter_t *,
 
 #define OSD_CFG "osdmenu-"
 
-#if defined( WIN32 ) || defined( UNDER_CE )
+#if defined( WIN32 )
 #define OSD_DEFAULT_CFG "osdmenu/default.cfg"
 #else
 #define OSD_DEFAULT_CFG PKGDATADIR"/osdmenu/default.cfg"

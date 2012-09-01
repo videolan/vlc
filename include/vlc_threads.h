@@ -82,7 +82,7 @@
 #   define VLC_THREAD_PRIORITY_OUTPUT  15
 #   define VLC_THREAD_PRIORITY_HIGHEST 20
 
-#elif defined(WIN32) || defined(UNDER_CE)
+#elif defined(WIN32)
 /* Define different priorities for WinNT/2K/XP and Win9x/Me */
 #   define VLC_THREAD_PRIORITY_LOW 0
 #   define VLC_THREAD_PRIORITY_INPUT \
