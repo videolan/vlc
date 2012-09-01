@@ -210,10 +210,9 @@ static int Open( vlc_object_t * p_this )
         msg_Dbg( p_aout, "audio device supports digital output" );
 
     /* Check if the desired device is alive and usable */
-    /* TODO: add a callback to the device to alert us if the device dies */
     i_param_size = sizeof( b_alive );
     AudioObjectPropertyAddress audioDeviceAliveAddress = { kAudioDevicePropertyDeviceIsAlive,
-                                              kAudioDevicePropertyScopeOutput,
+                                              kAudioObjectPropertyScopeGlobal,
                                               kAudioObjectPropertyElementMaster };
     err = AudioObjectGetPropertyData( p_sys->i_selected_dev, &audioDeviceAliveAddress, 0, NULL, &i_param_size, &b_alive );
 
@@ -229,6 +228,15 @@ static int Open( vlc_object_t * p_this )
     {
         msg_Warn( p_aout, "selected audio device is not alive, switching to default device" );
         p_sys->i_selected_dev = p_sys->i_default_dev;
+    }
+
+    /* add a callback to see if the device dies later on */
+    err = AudioObjectAddPropertyListener( p_sys->i_selected_dev, &audioDeviceAliveAddress, HardwareListener, (void *)p_aout );
+    if( err != noErr )
+    {
+        /* Be tolerant, only give a warning here */
+        msg_Warn( p_aout, "could not set alive check callback on device [0x%x]: %4.4s",
+                 (unsigned int)p_sys->i_selected_dev, (char *)&err );
     }
 
     AudioObjectPropertyAddress audioDeviceHogModeAddress = { kAudioDevicePropertyHogMode,
@@ -839,6 +847,13 @@ static void Close( vlc_object_t * p_this )
     OSStatus            err = noErr;
     UInt32              i_param_size = 0;
 
+    AudioObjectPropertyAddress deviceAliveAddress = { kAudioDevicePropertyDeviceIsAlive, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+    err = AudioObjectRemovePropertyListener( p_sys->i_selected_dev, &deviceAliveAddress, HardwareListener, NULL );
+    if( err != noErr )
+    {
+        msg_Err( p_aout, "failed to remove audio device life checker: [%4.4s]", (char *)&err );
+    }
+
     if( p_sys->au_unit )
     {
         verify_noerr( AudioOutputUnitStop( p_sys->au_unit ) );
@@ -892,7 +907,7 @@ static void Close( vlc_object_t * p_this )
         }
     }
 
-    AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
+    AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
     err = AudioObjectRemovePropertyListener( kAudioObjectSystemObject, &audioDevicesAddress, HardwareListener, NULL );
 
     if( err != noErr )
@@ -931,7 +946,7 @@ static void Probe( audio_output_t * p_aout )
     struct aout_sys_t   *p_sys = p_aout->sys;
 
     /* Get number of devices */
-    AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
+    AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
     err = AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &audioDevicesAddress, 0, NULL, &i_param_size);
     if( err != noErr )
     {
@@ -1038,14 +1053,17 @@ static void Probe( audio_output_t * p_aout )
     var_Get( p_aout->p_libvlc, "macosx-audio-device", &val );
     if( val.i_int > 0 )
     {
+        msg_Dbg( p_aout, "using preselected output device %#"PRIx64, val.i_int );
         var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
         var_Set( p_aout, "audio-device", val );
     }
 
     /* Attach a Listener so that we are notified of a change in the Device setup */
     err = AudioObjectAddPropertyListener( kAudioObjectSystemObject, &audioDevicesAddress, HardwareListener, (void *)p_aout );
-    if( err )
+    if( err != noErr ) {
+        msg_Warn( p_aout, "failed to add listener for audio device configuration (%i)", err );
         goto error;
+    }
 
     free( p_devices );
     return;
@@ -1337,9 +1355,9 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
         }
         else
         {
-             memset( (uint8_t *)ioData->mBuffers[0].mData +i_mData_bytes,
-                         0,ioData->mBuffers[0].mDataByteSize - i_mData_bytes );
-             i_mData_bytes += ioData->mBuffers[0].mDataByteSize - i_mData_bytes;
+            memset( (uint8_t *)ioData->mBuffers[0].mData +i_mData_bytes,
+                   0,ioData->mBuffers[0].mDataByteSize - i_mData_bytes );
+            i_mData_bytes += ioData->mBuffers[0].mDataByteSize - i_mData_bytes;
         }
     }
     return( noErr );
@@ -1411,6 +1429,13 @@ static OSStatus HardwareListener( AudioObjectID inObjectID,  UInt32 inNumberAddr
         {
             /* something changed in the list of devices */
             /* We trigger the audio-device's aout_ChannelsRestart callback */
+            msg_Warn( p_aout, "audio device configuration changed, resetting cache" );
+            var_TriggerCallback( p_aout, "audio-device" );
+            var_Destroy( p_aout, "audio-device" );
+        }
+        else if( inAddresses[i].mSelector == kAudioDevicePropertyDeviceIsAlive )
+        {
+            msg_Warn( p_aout, "audio device died, resetting aout" );
             var_TriggerCallback( p_aout, "audio-device" );
             var_Destroy( p_aout, "audio-device" );
         }
@@ -1462,7 +1487,7 @@ static int VolumeSet( audio_output_t * p_aout, float volume )
 {
     struct   aout_sys_t *p_sys = p_aout->sys;
     OSStatus ostatus;
-    
+
     aout_VolumeReport( p_aout, volume );
 
     volume = volume * volume * volume; // cubic mapping from output.c
