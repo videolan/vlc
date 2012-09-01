@@ -1281,7 +1281,7 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
                    AudioConvertHostTimeToNanos( host_time.mHostTime ) / 1000;
                    //- ((mtime_t) 1000000 / p_aout->format.i_rate * 31 ); // 31 = Latency in Frames. retrieve somewhere
 
-    if( ioData == NULL && ioData->mNumberBuffers < 1 )
+    if( ioData == NULL || ioData->mNumberBuffers < 1 )
     {
         msg_Err( p_aout, "no iodata or buffers");
         return 0;
