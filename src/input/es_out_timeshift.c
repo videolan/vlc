@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#if defined (WIN32) && !defined (UNDER_CE)
+#if defined (WIN32)
 #  include <direct.h>
 #endif
 #include <sys/stat.h>
@@ -1552,7 +1552,7 @@ static char *GetTmpPath( char *psz_path )
     free( psz_path );
 
     /* Create a suitable path */
-#if defined (WIN32) && !defined (UNDER_CE)
+#if defined (WIN32)
     const DWORD dwCount = GetTempPathW( 0, NULL );
     wchar_t *psw_path = calloc( dwCount + 1, sizeof(wchar_t) );
     if( psw_path )

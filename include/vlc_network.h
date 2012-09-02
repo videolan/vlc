@@ -33,10 +33,8 @@
  */
 
 #if defined( WIN32 )
-#   if !defined(UNDER_CE)
-#       define _NO_OLDNAMES 1
-#       include <io.h>
-#   endif
+#   define _NO_OLDNAMES 1
+#   include <io.h>
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #   define net_errno (WSAGetLastError())

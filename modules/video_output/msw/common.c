@@ -54,22 +54,13 @@
 
 #include "common.h"
 
-#ifndef UNDER_CE
 #include <vlc_windows_interfaces.h>
-#endif
-
-#ifdef UNDER_CE
-#include <aygshell.h>
-    //WINSHELLAPI BOOL WINAPI SHFullScreen(HWND hwndRequester, DWORD dwState);
-#endif
 
 static void CommonChangeThumbnailClip(vout_display_t *, bool show);
 static int CommonControlSetFullscreen(vout_display_t *, bool is_fullscreen);
 
-#if !defined(UNDER_CE)
 static void DisableScreensaver(vout_display_t *);
 static void RestoreScreensaver(vout_display_t *);
-#endif
 
 /* */
 int CommonInit(vout_display_t *vd)
@@ -124,10 +115,8 @@ int CommonInit(vout_display_t *vd)
     }
 
     /* Why not with glwin32 */
-#if !defined(UNDER_CE)
     var_Create(vd, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     DisableScreensaver (vd);
-#endif
 
     return VLC_SUCCESS;
 }
@@ -143,9 +132,7 @@ void CommonClean(vout_display_t *vd)
         EventThreadDestroy(sys->event);
     }
 
-#if !defined(UNDER_CE)
     RestoreScreensaver(vd);
-#endif
 }
 
 void CommonManage(vout_display_t *vd)
@@ -279,7 +266,6 @@ void AlignRect(RECT *r, int align_boundary, int align_size)
 /* */
 static void CommonChangeThumbnailClip(vout_display_t *vd, bool show)
 {
-#ifndef UNDER_CE
     vout_display_sys_t *sys = vd->sys;
 
     /* Windows 7 taskbar thumbnail code */
@@ -317,7 +303,6 @@ static void CommonChangeThumbnailClip(vout_display_t *vd, bool show)
         taskbl->lpVtbl->Release(taskbl);
     }
     CoUninitialize();
-#endif
 }
 
 /*****************************************************************************
@@ -527,15 +512,6 @@ static int CommonControlSetFullscreen(vout_display_t *vd, bool is_fullscreen)
         SetWindowLong(hwnd, GWL_STYLE, WS_CLIPCHILDREN | WS_VISIBLE);
 
         if (sys->hparent) {
-#ifdef UNDER_CE
-            POINT point = {0,0};
-            RECT rect;
-            ClientToScreen(sys->hwnd, &point);
-            GetClientRect(sys->hwnd, &rect);
-            SetWindowPos(hwnd, 0, point.x, point.y,
-                         rect.right, rect.bottom,
-                         SWP_NOZORDER|SWP_FRAMECHANGED);
-#else
             /* Retrieve current window position so fullscreen will happen
             *on the right screen */
             HMONITOR hmon = MonitorFromWindow(sys->hparent,
@@ -549,7 +525,6 @@ static int CommonControlSetFullscreen(vout_display_t *vd, bool is_fullscreen)
                              mi.rcMonitor.right - mi.rcMonitor.left,
                              mi.rcMonitor.bottom - mi.rcMonitor.top,
                              SWP_NOZORDER|SWP_FRAMECHANGED);
-#endif
         } else {
             /* Maximize non embedded window */
             ShowWindow(hwnd, SW_SHOWMAXIMIZED);
@@ -564,11 +539,7 @@ static int CommonControlSetFullscreen(vout_display_t *vd, bool is_fullscreen)
                          rect.right, rect.bottom,
                          SWP_NOZORDER|SWP_FRAMECHANGED);
 
-#ifdef UNDER_CE
-            HWND topLevelParent = GetParent(sys->hparent);
-#else
             HWND topLevelParent = GetAncestor(sys->hparent, GA_ROOT);
-#endif
             ShowWindow(topLevelParent, SW_HIDE);
         }
         SetForegroundWindow(hwnd);
@@ -586,11 +557,7 @@ static int CommonControlSetFullscreen(vout_display_t *vd, bool is_fullscreen)
                          rect.right, rect.bottom,
                          SWP_NOZORDER|SWP_FRAMECHANGED);
 
-#ifdef UNDER_CE
-            HWND topLevelParent = GetParent(sys->hparent);
-#else
             HWND topLevelParent = GetAncestor(sys->hparent, GA_ROOT);
-#endif
             ShowWindow(topLevelParent, SW_SHOW);
             SetForegroundWindow(sys->hparent);
             ShowWindow(hwnd, SW_HIDE);
@@ -688,7 +655,6 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
     }
 }
 
-#if !defined(UNDER_CE)
 static void DisableScreensaver(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -731,5 +697,3 @@ static void RestoreScreensaver(vout_display_t *vd)
                              sys->i_spi_screensaveactive, NULL, 0);
     }
 }
-#endif
-

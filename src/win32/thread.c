@@ -36,9 +36,6 @@
 #include <assert.h>
 #include <limits.h>
 #include <errno.h>
-#ifdef UNDER_CE
-# include <mmsystem.h>
-#endif
 
 static vlc_threadvar_t thread_key;
 
@@ -48,9 +45,6 @@ static vlc_threadvar_t thread_key;
 struct vlc_thread
 {
     HANDLE         id;
-#ifdef UNDER_CE
-    HANDLE         cancel_event;
-#endif
 
     bool           detached;
     bool           killable;
@@ -107,31 +101,6 @@ static DWORD vlc_WaitForMultipleObjects (DWORD count, const HANDLE *handles,
                                          DWORD delay)
 {
     DWORD ret;
-#ifdef UNDER_CE
-    HANDLE buf[count + 1];
-
-    struct vlc_thread *th = vlc_threadvar_get (thread_key);
-    if (th != NULL)
-    {
-        memcpy (buf, handles, count * sizeof(HANDLE));
-        buf[count++] = th->cancel_event;
-        handles = buf;
-    }
-
-    if (count == 0)
-    {
-         Sleep (delay);
-         ret = WAIT_TIMEOUT;
-    }
-    else
-        ret = WaitForMultipleObjects (count, handles, FALSE, delay);
-
-    if ((th != NULL) && (ret == WAIT_OBJECT_0 + count - 1))
-    {
-        vlc_cancel_self ((uintptr_t)th);
-        ret = WAIT_IO_COMPLETION;
-    }
-#else
     if (count == 0)
     {
         ret = SleepEx (delay, TRUE);
@@ -140,7 +109,7 @@ static DWORD vlc_WaitForMultipleObjects (DWORD count, const HANDLE *handles,
     }
     else
         ret = WaitForMultipleObjectsEx (count, handles, FALSE, delay, TRUE);
-#endif
+
     /* We do not abandon objects... this would be a bug */
     assert (ret < WAIT_ABANDONED_0 || WAIT_ABANDONED_0 + count - 1 < ret);
 
@@ -558,9 +527,6 @@ retry:
     if (th->detached)
     {
         CloseHandle (th->id);
-#ifdef UNDER_CE
-        CloseHandle (th->cancel_event);
-#endif
         free (th);
     }
 }
@@ -590,7 +556,6 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
     th->cleaners = NULL;
 
     HANDLE hThread;
-#ifndef UNDER_CE
     /* When using the MSVCRT C library you have to use the _beginthreadex
      * function instead of CreateThread, otherwise you'll end up with
      * memory leaks and the signal functions not working (see Microsoft
@@ -606,26 +571,6 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
     }
     hThread = (HANDLE)h;
 
-#else
-    th->cancel_event = CreateEvent (NULL, FALSE, FALSE, NULL);
-    if (th->cancel_event == NULL)
-    {
-        free (th);
-        return ENOMEM;
-    }
-
-    /* Not sure if CREATE_SUSPENDED + ResumeThread() is any useful on WinCE.
-     * Thread handles act up, too. */
-    hThread = CreateThread (NULL, 128*1024, vlc_entry, th,
-                            CREATE_SUSPENDED, NULL);
-    if (hThread == NULL)
-    {
-        CloseHandle (th->cancel_event);
-        free (th);
-        return ENOMEM;
-    }
-
-#endif
     /* Thread is suspended, so we can safely set th->id */
     th->id = hThread;
     if (p_handle != NULL)
@@ -655,9 +600,6 @@ void vlc_join (vlc_thread_t th, void **result)
     if (result != NULL)
         *result = th->data;
     CloseHandle (th->id);
-#ifdef UNDER_CE
-    CloseHandle (th->cancel_event);
-#endif
     free (th);
 }
 
@@ -691,11 +633,7 @@ static void CALLBACK vlc_cancel_self (ULONG_PTR self)
 
 void vlc_cancel (vlc_thread_t th)
 {
-#ifndef UNDER_CE
     QueueUserAPC (vlc_cancel_self, th->id, (uintptr_t)th);
-#else
-    SetEvent (th->cancel_event);
-#endif
 }
 
 int vlc_savecancel (void)
@@ -734,11 +672,7 @@ void vlc_testcancel (void)
 
         th->data = NULL; /* TODO: special value? */
         vlc_thread_cleanup (th);
-#ifndef UNDER_CE
         _endthreadex(0);
-#else
-        ExitThread(0);
-#endif
     }
 }
 
@@ -824,17 +758,11 @@ void msleep (mtime_t delay)
 /*** Timers ***/
 struct vlc_timer
 {
-#ifndef UNDER_CE
     HANDLE handle;
-#else
-    unsigned id;
-    unsigned interval;
-#endif
     void (*func) (void *);
     void *data;
 };
 
-#ifndef UNDER_CE
 static void CALLBACK vlc_timer_do (void *val, BOOLEAN timeout)
 {
     struct vlc_timer *timer = val;
@@ -842,26 +770,6 @@ static void CALLBACK vlc_timer_do (void *val, BOOLEAN timeout)
     assert (timeout);
     timer->func (timer->data);
 }
-#else
-static void CALLBACK vlc_timer_do (unsigned timer_id, unsigned msg,
-                                   DWORD_PTR user, DWORD_PTR unused1,
-                                   DWORD_PTR unused2)
-{
-    struct vlc_timer *timer = (struct vlc_timer *) user;
-    assert (timer_id == timer->id);
-    (void) msg;
-    (void) unused1;
-    (void) unused2;
-
-    timer->func (timer->data);
-
-    if (timer->interval)
-    {
-        mtime_t interval = timer->interval * 1000;
-        vlc_timer_schedule (timer, false, interval, interval);
-    }
-}
-#endif
 
 int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
 {
@@ -871,46 +779,26 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
         return ENOMEM;
     timer->func = func;
     timer->data = data;
-#ifndef UNDER_CE
     timer->handle = INVALID_HANDLE_VALUE;
-#else
-    timer->id = 0;
-    timer->interval = 0;
-#endif
     *id = timer;
     return 0;
 }
 
 void vlc_timer_destroy (vlc_timer_t timer)
 {
-#ifndef UNDER_CE
     if (timer->handle != INVALID_HANDLE_VALUE)
         DeleteTimerQueueTimer (NULL, timer->handle, INVALID_HANDLE_VALUE);
-#else
-    if (timer->id)
-        timeKillEvent (timer->id);
-    /* FIXME: timers that have not yet completed will trigger use-after-free */
-#endif
     free (timer);
 }
 
 void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
                          mtime_t value, mtime_t interval)
 {
-#ifndef UNDER_CE
     if (timer->handle != INVALID_HANDLE_VALUE)
     {
         DeleteTimerQueueTimer (NULL, timer->handle, NULL);
         timer->handle = INVALID_HANDLE_VALUE;
     }
-#else
-    if (timer->id)
-    {
-        timeKillEvent (timer->id);
-        timer->id = 0;
-        timer->interval = 0;
-    }
-#endif
     if (value == 0)
         return; /* Disarm */
 
@@ -919,28 +807,8 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
     value = (value + 999) / 1000;
     interval = (interval + 999) / 1000;
 
-#ifndef UNDER_CE
     if (!CreateTimerQueueTimer (&timer->handle, NULL, vlc_timer_do, timer,
                                 value, interval, WT_EXECUTEDEFAULT))
-#else
-    TIMECAPS caps;
-    timeGetDevCaps (&caps, sizeof(caps));
-
-    unsigned delay = value;
-    delay = __MAX(delay, caps.wPeriodMin);
-    delay = __MIN(delay, caps.wPeriodMax);
-
-    unsigned event = TIME_ONESHOT;
-
-    if (interval == delay)
-        event = TIME_PERIODIC;
-    else if (interval)
-        timer->interval = interval;
-
-    timer->id = timeSetEvent (delay, delay / 20, vlc_timer_do, (DWORD) timer,
-                              event);
-    if (!timer->id)
-#endif
         abort ();
 }
 
@@ -954,12 +822,10 @@ unsigned vlc_timer_getoverrun (vlc_timer_t timer)
 /*** CPU ***/
 unsigned vlc_GetCPUCount (void)
 {
-#ifndef UNDER_CE
     DWORD_PTR process;
     DWORD_PTR system;
 
     if (GetProcessAffinityMask (GetCurrentProcess(), &process, &system))
         return popcount (system);
-#endif
      return 1;
 }

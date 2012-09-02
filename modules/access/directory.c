@@ -40,7 +40,7 @@
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #   include <fcntl.h>
-#elif defined( WIN32 ) && !defined( UNDER_CE )
+#elif defined( WIN32 )
 #   include <io.h>
 #endif
 

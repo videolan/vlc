@@ -71,9 +71,7 @@ typedef struct {
 } WAVEFORMATEXTENSIBLE, *PWAVEFORMATEXTENSIBLE;
 #endif
 
-#ifndef UNDER_CE
-#   include <dsound.h>
-#endif
+#include <dsound.h>
 
 #ifndef SPEAKER_FRONT_LEFT
 #   define SPEAKER_FRONT_LEFT             0x1

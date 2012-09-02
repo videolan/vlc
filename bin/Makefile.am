@@ -14,19 +14,14 @@ AM_CFLAGS = $(CFLAGS_vlc)
 
 
 if !HAVE_WIN32
-if !HAVE_WINCE
 bin_PROGRAMS += vlc-wrapper
 vlc_SOURCES = vlc.c override.c
-endif
 endif
 
 EXTRA_vlc_SOURCES = vlc.c winvlc.c
 if HAVE_WIN32
 vlc_SOURCES = winvlc.c
 noinst_DATA += vlc_win32_rc.rc
-endif
-if HAVE_WINCE
-vlc_SOURCES = winvlc.c
 endif
 
 vlc_wrapper_SOURCES = rootwrap.c

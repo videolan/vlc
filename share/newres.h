@@ -1,10 +1,6 @@
 #ifndef __NEWRES_H__
 #define __NEWRES_H__
 
-#if !defined(UNDER_CE)
-    #define UNDER_CE _WIN32_WCE
-#endif
-
 #if defined(_WIN32_WCE)
     #if !defined(WCEOLE_ENABLE_DIALOGEX)
         #define DIALOGEX DIALOG DISCARDABLE

@@ -43,12 +43,8 @@
 #   include <sys/time.h>                                   /* gettimeofday() */
 #endif
 
-#ifdef UNDER_CE
-#include <sys/time.h>                                      /* gettimeofday() */
-#endif
-
 #include <time.h>                                                 /* ctime() */
-#if defined (WIN32) && !defined (UNDER_CE)
+#if defined (WIN32)
 #include <sys/timeb.h>                                            /* ftime() */
 #endif
 #include <limits.h>
@@ -276,7 +272,7 @@ int vlm_ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
 
 int64_t vlm_Date(void)
 {
-#if defined (WIN32) && !defined (UNDER_CE)
+#if defined (WIN32)
     struct timeb tm;
     ftime( &tm );
     return ((int64_t)tm.time) * 1000000 + ((int64_t)tm.millitm) * 1000;

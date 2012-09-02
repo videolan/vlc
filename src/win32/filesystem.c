@@ -37,11 +37,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <winsock2.h>
-#ifndef UNDER_CE
-# include <direct.h>
-#else
-# include <tchar.h>
-#endif
+#include <direct.h>
 
 #include <vlc_common.h>
 #include <vlc_charset.h>
@@ -82,10 +78,6 @@ int vlc_open (const char *filename, int flags, ...)
     if ((flags & O_TEXT) == 0)
         flags |= O_BINARY;
 
-#ifdef UNDER_CE
-    /*_open translates to wchar internally on WinCE*/
-    return _open (filename, flags, mode);
-#else
     /*
      * open() cannot open files with non-“ANSI” characters on Windows.
      * We use _wopen() instead. Same thing for mkdir() and stat().
@@ -97,7 +89,6 @@ int vlc_open (const char *filename, int flags, ...)
     int fd = _wopen (wpath, flags, mode);
     free (wpath);
     return fd;
-#endif
 }
 
 int vlc_openat (int dir, const char *filename, int flags, ...)
@@ -109,11 +100,6 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
 
 int vlc_mkdir( const char *dirname, mode_t mode )
 {
-#if defined (UNDER_CE)
-    (void) mode;
-    /* mkdir converts internally to wchar */
-    return _mkdir(dirname);
-#else
     wchar_t *wpath = widen_path (dirname);
     if (wpath == NULL)
         return -1;
@@ -122,12 +108,10 @@ int vlc_mkdir( const char *dirname, mode_t mode )
     free (wpath);
     (void) mode;
     return ret;
-#endif
 }
 
 char *vlc_getcwd (void)
 {
-#ifndef UNDER_CE
     wchar_t *wdir = _wgetcwd (NULL, 0);
     if (wdir == NULL)
         return NULL;
@@ -135,9 +119,6 @@ char *vlc_getcwd (void)
     char *dir = FromWide (wdir);
     free (wdir);
     return dir;
-#else
-    return NULL;
-#endif
 }
 
 /* Under Windows, these wrappers return the list of drive letters
@@ -171,11 +152,7 @@ DIR *vlc_opendir (const char *dirname)
         free (wpath);
         /* Special mode to list drive letters */
         p_dir->wdir = NULL;
-#ifdef UNDER_CE
-        p_dir->u.drives = 1;
-#else
         p_dir->u.drives = GetLogicalDrives ();
-#endif
         return (void *)p_dir;
     }
 
@@ -203,10 +180,7 @@ char *vlc_readdir (DIR *dir)
         DWORD drives = p_dir->u.drives;
         if (drives == 0)
             return NULL; /* end */
-#ifdef UNDER_CE
-        p_dir->u.drives = 0;
-        return strdup ("\\");
-#else
+
         unsigned int i;
         for (i = 0; !(drives & 1); i++)
             drives >>= 1;
@@ -217,7 +191,6 @@ char *vlc_readdir (DIR *dir)
         if (asprintf (&ret, "%c:\\", 'A' + i) == -1)
             return NULL;
         return ret;
-#endif
     }
 
     if (p_dir->u.insert_dot_dot)
@@ -235,10 +208,6 @@ char *vlc_readdir (DIR *dir)
 
 int vlc_stat (const char *filename, struct stat *buf)
 {
-#ifdef UNDER_CE
-    /* _stat translates to wchar internally on WinCE */
-    return _stat (filename, buf);
-#else
     wchar_t *wpath = widen_path (filename);
     if (wpath == NULL)
         return -1;
@@ -249,7 +218,6 @@ int vlc_stat (const char *filename, struct stat *buf)
     int ret = _wstati64 (wpath, buf);
     free (wpath);
     return ret;
-#endif
 }
 
 int vlc_lstat (const char *filename, struct stat *buf)
@@ -259,10 +227,6 @@ int vlc_lstat (const char *filename, struct stat *buf)
 
 int vlc_unlink (const char *filename)
 {
-#ifdef UNDER_CE
-    /*_open translates to wchar internally on WinCE*/
-    return _unlink( filename );
-#else
     wchar_t *wpath = widen_path (filename);
     if (wpath == NULL)
         return -1;
@@ -270,7 +234,6 @@ int vlc_unlink (const char *filename)
     int ret = _wunlink (wpath);
     free (wpath);
     return ret;
-#endif
 }
 
 int vlc_rename (const char *oldpath, const char *newpath)
@@ -281,11 +244,6 @@ int vlc_rename (const char *oldpath, const char *newpath)
     if (wold == NULL || wnew == NULL)
         goto out;
 
-# ifdef UNDER_CE
-    /* FIXME: errno support */
-    if (MoveFileW (wold, wnew))
-        ret = 0;
-#else
     if (_wrename (wold, wnew) && (errno == EACCES || errno == EEXIST))
     {   /* Windows does not allow atomic file replacement */
         if (_wremove (wnew))
@@ -297,7 +255,6 @@ int vlc_rename (const char *oldpath, const char *newpath)
             goto out;
     }
     ret = 0;
-#endif
 out:
     free (wnew);
     free (wold);
@@ -306,24 +263,12 @@ out:
 
 int vlc_dup (int oldfd)
 {
-#ifdef UNDER_CE
-    (void) oldfd;
-    errno = ENOSYS;
-    return -1;
-#else
     return dup (oldfd);
-#endif
 }
 
 int vlc_pipe (int fds[2])
 {
-#ifdef UNDER_CE
-    (void) fds;
-    errno = ENOSYS;
-    return -1;
-#else
     return _pipe (fds, 32768, O_BINARY);
-#endif
 }
 
 #include <vlc_network.h>

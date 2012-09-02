@@ -5,6 +5,3 @@ SOURCES_tdummy = tdummy.c
 SOURCES_win32text = win32text.c
 
 libvlc_LTLIBRARIES += libtdummy_plugin.la
-if HAVE_WINCE
-libvlc_LTLIBRARIES += libwin32text_plugin.la
-endif

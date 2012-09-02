@@ -338,9 +338,6 @@ block_t *block_mmap_Alloc (void *addr, size_t length)
 
 #ifdef WIN32
 # include <io.h>
-# ifdef UNDER_CE
-#  define _get_osfhandle(a) ((long) (a))
-# endif
 
 static
 ssize_t pread (int fd, void *buf, size_t count, off_t offset)

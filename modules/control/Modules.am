@@ -20,9 +20,7 @@ libvlc_LTLIBRARIES += \
 	libdummy_plugin.la \
 	libgestures_plugin.la \
 	libnetsync_plugin.la \
-	libhotkeys_plugin.la
-if !HAVE_WINCE
-libvlc_LTLIBRARIES += \
+	libhotkeys_plugin.la \
 	liboldrc_plugin.la
 if !HAVE_WIN32
 libvlc_LTLIBRARIES += \
@@ -30,5 +28,4 @@ libvlc_LTLIBRARIES += \
 else
 libvlc_LTLIBRARIES += \
 	libntservice_plugin.la
-endif
 endif	

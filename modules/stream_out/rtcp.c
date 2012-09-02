@@ -84,9 +84,6 @@ rtcp_sender_t *OpenRTCP (vlc_object_t *obj, int rtp_fd, int proto,
         /* RTP/RTCP mux: duplicate the socket */
 #ifndef WIN32
         fd = vlc_dup (rtp_fd);
-#elif defined(UNDER_CE)
- #warning Muxed RTP/RTCP unimplemented!
-        fd = -1;
 #else
         WSAPROTOCOL_INFO info;
         WSADuplicateSocket (rtp_fd, GetCurrentProcessId (), &info);

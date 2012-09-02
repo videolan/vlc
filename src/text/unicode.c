@@ -39,9 +39,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#ifdef UNDER_CE
-#  include <tchar.h>
-#elif defined(WIN32)
+#if defined(WIN32)
 #  include <io.h>
 #endif
 #include <errno.h>
@@ -61,7 +59,6 @@ int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
     if (unlikely(res == -1))
         return -1;
 
-# ifndef UNDER_CE
     /* Writing to the console is a lot of fun on Microsoft Windows.
      * If you use the standard I/O functions, you must use the OEM code page,
      * which is different from the usual ANSI code page. Or maybe not, if the
@@ -82,7 +79,7 @@ int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
                 goto out;
         }
     }
-# endif
+
     char *ansi = ToANSI (str);
     if (ansi != NULL)
     {

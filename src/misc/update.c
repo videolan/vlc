@@ -74,9 +74,7 @@
  * Remaining text is a required description of the update
  */
 
-#if defined( UNDER_CE )
-# define UPDATE_OS_SUFFIX "-ce"
-#elif defined( WIN64 )
+#if defined( WIN64 )
 # define UPDATE_OS_SUFFIX "-win-x64"
 #elif defined( WIN32 )
 # define UPDATE_OS_SUFFIX "-win-x86"

@@ -296,7 +296,6 @@ static int Open( vlc_object_t *p_this )
 
         aout_PacketInit( p_aout, &p_aout->sys->packet, FRAME_SIZE );
 
-#ifndef UNDER_CE
         /* Check for hardware volume support */
         if( waveOutGetDevCaps( (UINT_PTR)p_aout->sys->h_waveout,
                                &wocaps, sizeof(wocaps) ) == MMSYSERR_NOERROR
@@ -308,7 +307,6 @@ static int Open( vlc_object_t *p_this )
             p_aout->sys->mute = false;
         }
         else
-#endif
             aout_SoftVolumeInit( p_aout );
     }
 
@@ -1000,7 +998,6 @@ static void* WaveOutThread( void *data )
     return NULL;
 }
 
-#ifndef UNDER_CE
 static int VolumeSet( audio_output_t *aout, float volume )
 {
     aout_sys_t *sys = aout->sys;
@@ -1030,7 +1027,6 @@ static int MuteSet( audio_output_t * p_aout, bool mute )
     waveOutSetVolume( hwo, vol | (vol << 16) );
     return 0;
 }
-#endif
 
 /*
   reload the configuration drop down list, of the Audio Devices

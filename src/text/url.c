@@ -307,7 +307,7 @@ char *make_path (const char *url)
 
     if (schemelen == 4 && !strncasecmp (url, "file", 4))
     {
-#if (!defined (WIN32) && !defined (__OS2__)) || defined (UNDER_CE)
+#if !defined (WIN32) && !defined (__OS2__)
         /* Leading slash => local path */
         if (*path == '/')
             return path;

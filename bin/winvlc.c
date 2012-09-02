@@ -33,23 +33,20 @@
 #include <windows.h>
 #include <shellapi.h>
 
-#if !defined(UNDER_CE)
-# ifndef _WIN32_IE
-#   define  _WIN32_IE 0x501
-# endif
-# include <fcntl.h>
-# include <io.h>
-# include <shlobj.h>
-# include <wininet.h>
-# define PSAPI_VERSION 1
-# include <psapi.h>
-# define HeapEnableTerminationOnCorruption (HEAP_INFORMATION_CLASS)1
+#ifndef _WIN32_IE
+#  define  _WIN32_IE 0x501
+#endif
+#include <fcntl.h>
+#include <io.h>
+#include <shlobj.h>
+#include <wininet.h>
+#define PSAPI_VERSION 1
+#include <psapi.h>
+#define HeapEnableTerminationOnCorruption (HEAP_INFORMATION_CLASS)1
 static void check_crashdump(void);
 LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo);
 static const wchar_t *crashdump_path;
-#endif
 
-#ifndef UNDER_CE
 static char *FromWide (const wchar_t *wide)
 {
     size_t len;
@@ -60,67 +57,13 @@ static char *FromWide (const wchar_t *wide)
         WideCharToMultiByte (CP_UTF8, 0, wide, -1, out, len, NULL, NULL);
     return out;
 }
-#else
-static int parse_cmdline (char *line, char ***argvp)
-{
-    char **argv = malloc (sizeof (char *));
-    int argc = 0;
-
-    while (*line != '\0')
-    {
-        char quote = 0;
-
-        /* Skips white spaces */
-        while (strchr ("\t ", *line))
-            line++;
-        if (!*line)
-            break;
-
-        /* Starts a new parameter */
-        argv = realloc (argv, (argc + 2) * sizeof (char *));
-        if (*line == '"')
-        {
-            quote = '"';
-            line++;
-        }
-        argv[argc++] = line;
-
-    more:
-            while (*line && !strchr ("\t ", *line))
-            line++;
-
-    if (line > argv[argc - 1] && line[-1] == quote)
-        /* End of quoted parameter */
-        line[-1] = 0;
-    else
-        if (*line && quote)
-    {
-        /* Space within a quote */
-        line++;
-        goto more;
-    }
-    else
-        /* End of unquoted parameter */
-        if (*line)
-            *line++ = 0;
-    }
-    argv[argc] = NULL;
-    *argvp = argv;
-    return argc;
-}
-#endif
 
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
-#ifndef UNDER_CE
                     LPSTR lpCmdLine,
-#else
-                    LPWSTR lpCmdLine,
-#endif
                     int nCmdShow )
 {
     int argc;
 
-#ifndef UNDER_CE
     /* VLC does not change the thread locale, so gettext/libintil will use the
      * user default locale as reference. */
     /* gettext versions 0.18-0.18.1 will use the Windows Vista locale name
@@ -198,15 +141,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     _setmode( STDIN_FILENO, _O_BINARY ); /* Needed for pipes */
 
-#else /* UNDER_CE */
-    char **argv, psz_cmdline[wcslen(lpCmdLine) * 4];
-
-    WideCharToMultiByte( CP_UTF8, 0, lpCmdLine, -1,
-                         psz_cmdline, sizeof (psz_cmdline), NULL, NULL );
-
-    argc = parse_cmdline (psz_cmdline, &argv);
-#endif
-
     /* Initialize libvlc */
     libvlc_instance_t *vlc;
     vlc = libvlc_new (argc, (const char **)argv);
@@ -227,7 +161,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     return 0;
 }
 
-#if !defined( UNDER_CE )
 /* Crashdumps handling */
 static void check_crashdump(void)
 {
@@ -402,4 +335,3 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
         exit( 1 );
     }
 }
-#endif

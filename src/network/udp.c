@@ -39,12 +39,6 @@
 #include <vlc_network.h>
 
 #ifdef WIN32
-#   if defined(UNDER_CE)
-#       undef IP_MULTICAST_TTL
-#       define IP_MULTICAST_TTL 3
-#       undef IP_ADD_MEMBERSHIP
-#       define IP_ADD_MEMBERSHIP 5
-#   endif
 #   define EAFNOSUPPORT WSAEAFNOSUPPORT
 #else
 #   include <unistd.h>

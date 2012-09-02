@@ -34,8 +34,7 @@
  *
  */
 
-#if defined( UNDER_CE )
-#elif defined( WIN32 )
+#if defined( WIN32 )
 #   include <process.h>                                         /* Win32 API */
 
 #elif defined( __OS2__ )                                        /* OS/2 API  */
@@ -456,7 +455,7 @@ static inline void vlc_spin_destroy (vlc_spinlock_t *spin)
     pthread_spin_destroy (spin);
 }
 
-#elif defined (WIN32) && !defined (UNDER_CE)
+#elif defined (WIN32)
 
 typedef CRITICAL_SECTION vlc_spinlock_t;
 

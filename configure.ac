@@ -209,10 +209,6 @@ case "${host_os}" in
     AC_DEFINE([_WIN32_IE], 0x0600, [Define to '0x0600' for IE 6.0 (and shell) APIs.])
 
     case "${host_os}" in
-      *wince* | *mingwce* | *mingw32ce*)
-        SYS=mingwce
-        dnl Sadly CeGCC still needs non-wince macros
-        ;;
       *mingw32*)
         SYS=mingw32
         ;;
@@ -251,12 +247,6 @@ case "${host_os}" in
         AC_SUBST(PROGRAMFILES)
 
     fi
-    if test "${SYS}" = "mingwce"; then
-        VLC_ADD_LIBS([libvlccore],[-lmmtimer])
-        AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
-        ac_default_prefix="`pwd`/_wince"
-        DESTDIR="`pwd`/_wince/"
-    fi
     ;;
   *nto*)
     SYS=nto
@@ -283,7 +273,6 @@ AM_CONDITIONAL(HAVE_LINUX,   test "${SYS}" = "linux")
 AM_CONDITIONAL(HAVE_OS2,     test "${SYS}" = "os2")
 AM_CONDITIONAL(HAVE_WIN32,   test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WIN64,   test "${HAVE_WIN64}" = "1")
-AM_CONDITIONAL(HAVE_WINCE,   test "${SYS}" = "mingwce")
 AM_CONDITIONAL(HAVE_SYMBIAN, test "${SYS}" = "symbian")
 
 dnl
@@ -422,7 +411,7 @@ dnl
 AM_ICONV
 
 dnl Check for broken versions of mingw-runtime compatability library
-AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
+AS_IF([test "${SYS}" = "mingw32"], [
     AC_MSG_CHECKING(for broken mingw-runtime)
     AC_PREPROC_IFELSE([AC_LANG_SOURCE([
 #include <_mingw.h>
@@ -567,9 +556,6 @@ AC_SEARCH_LIBS(connect, [socket], [
   AS_IF([test "${SYS}" = "mingw32"], [
     SOCKET_LIBS="-lws2_32"
   ])
-  AS_IF([test "${SYS}" = "mingwce"], [
-    SOCKET_LIBS="-lws2"
-  ])
 ])
 
 AC_SEARCH_LIBS([getaddrinfo], [nsl], [
@@ -609,9 +595,7 @@ AH_TEMPLATE(ss_family, [Define to `sa_family' if <sys/socket.h> does not define.
 AC_CACHE_CHECK([for struct sockaddr_storage], ac_cv_struct_sockaddr_storage,
   [AC_TRY_COMPILE(
     [#include <sys/types.h>
-     #if defined( UNDER_CE )
-     # include <winsock2.h>
-     #elif defined( WIN32 )
+     #if defined( WIN32 )
      # include <winsock2.h>
      #else
      # include <sys/socket.h>
@@ -658,7 +642,7 @@ AC_SEARCH_LIBS(dlopen, [dl svld], [
 VLC_RESTORE_FLAGS
 
 # Windows
-AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
+AS_IF([test "${SYS}" = "mingw32"], [
   LIBDL=""
   have_dynamic_objects="yes" #assume we can use shared objects
 ])
@@ -678,7 +662,7 @@ AC_SUBST(LIBDL)
 VLC_ADD_LIBS([lua],[$LIBDL])
 
 dnl Check for thread library
-if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
+if test "${SYS}" != "mingw32"; then
 
   VLC_SAVE_FLAGS
   LIBS=""
@@ -702,7 +686,7 @@ if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
     dnl HP/UX port
     AC_CHECK_LIB(rt,sem_init, [VLC_ADD_LIBS([libvlccore],[-lrt])])
   ])
-fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
+fi # end "${SYS}" != "mingw32"
 
 dnl Check for headers
 AC_CHECK_HEADERS([search.h])
@@ -719,11 +703,11 @@ AC_CHECK_HEADERS([sys/mount.h], [], [],
     #include <sys/param.h>
   ])
 
-if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
+if test "${SYS}" != "mingw32"; then
   AC_CHECK_HEADERS(machine/param.h sys/shm.h)
   AC_CHECK_HEADERS([linux/version.h linux/dccp.h scsi/scsi.h linux/magic.h])
   AC_CHECK_HEADERS(syslog.h mntent.h)
-fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
+fi # end "${SYS}" != "mingw32"
 
 dnl LP64 and LLP64 architectures had better define ssize_t by themselves...
 AH_TEMPLATE(ssize_t, [Define to `int' if <stddef.h> does not define.]) dnl ` (fix VIM syntax highlight
@@ -732,9 +716,9 @@ AC_CHECK_TYPE(ssize_t,, [
 ])
 
 dnl Check for threads library
-if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
+if test "${SYS}" != "mingw32"; then
   AC_CHECK_HEADERS(pthread.h)
-fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
+fi # end "${SYS}" != "mingw32"
 
 dnl It seems that autoconf detects pkg-config only during the first
 dnl PKG_CHECK_MODULES from configure.ac - which makes sense. But in our case,
@@ -746,7 +730,7 @@ PKG_PROG_PKG_CONFIG()
 
 dnl On some OS we need static linking
 AS_IF([test -n "${PKG_CONFIG}" ],[
-    AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce" -o "${SYS}" = "darwin" -o "${SYS}" = "os2" ],[
+    AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "darwin" -o "${SYS}" = "os2" ],[
         PKG_CONFIG="${PKG_CONFIG} --static"
     ])
 ])
@@ -793,7 +777,7 @@ AC_ARG_ENABLE(dbus,
     [compile D-Bus message bus support (default enabled)])])
 case "${SYS}" in
     linux*|*bsd*)
-if test "${enable_dbus}" != "no" -a "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
+if test "${enable_dbus}" != "no" -a "${SYS}" != "mingw32"
 then
   dnl api stable dbus
   PKG_CHECK_MODULES(DBUS, [dbus-1 >= 1.0.0],
@@ -896,7 +880,7 @@ AS_IF([test "${enable_coverage}" != "no"], [
   LDFLAGS="-lgcov ${LDFLAGS}"
 ])
 
-AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"], [
+AS_IF([test "${SYS}" != "mingw32"], [
   VLC_SAVE_FLAGS
   CFLAGS="${CFLAGS} -fvisibility=hidden"
   CXXFLAGS="${CXXFLAGS} -fvisibility=hidden"
@@ -1076,13 +1060,9 @@ dnl Some plugins aren't useful on some platforms
 dnl
 if test "${SYS}" = "os2"; then
     VLC_ADD_PLUGIN([dynamicoverlay])
-elif test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
+elif test "${SYS}" != "mingw32"; then
     VLC_ADD_PLUGIN([dynamicoverlay access_shm])
-elif test "${SYS}" != "mingwce"; then
-    VLC_ADD_PLUGIN([access_smb dmo globalhotkeys])
-    VLC_ADD_LIBS([dmo],[-lole32 -luuid])
-fi
-if test "${SYS}" = "darwin"; then
+elif test "${SYS}" = "darwin"; then
     VLC_ADD_LIBS([quartztext],[-Wl,-framework,ApplicationServices])
 fi
 
@@ -1664,9 +1644,6 @@ You can get an updated one from http://www.live555.com/liveMedia .])
     AS_IF([test "${SYS}" = "mingw32"], [
       # add ws2_32 for closesocket, select, recv
       other_libs="$other_libs -lws2_32"
-    ], [test "${SYS}" = "mingwce"], [
-      # add ws2 for closesocket, select, recv
-      other_libs="$other_libs -lws2"
     ])
 
     dnl We need to check for pic because live555 don't provide shared libs
@@ -3011,7 +2988,7 @@ dnl  X C Bindings modules
 dnl
 AC_ARG_ENABLE(xcb,
   [  --enable-xcb            X11 support with XCB (default enabled)],, [
-  AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "darwin" -a "${SYS}" != "symbian"], [
+  AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "darwin" -a "${SYS}" != "symbian"], [
     enable_xcb="yes"
   ], [
     enable_xcb="no"
@@ -3214,7 +3191,7 @@ dnl
 dnl  Windows DirectX module
 dnl
 
-if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"
+if test "${SYS}" = "mingw32"
 then
   VLC_ADD_PLUGIN([panoramix])
 fi
@@ -3222,7 +3199,7 @@ fi
 AC_ARG_ENABLE(directx,
   [AS_HELP_STRING([--enable-directx],
     [Microsoft DirectX support (default enabled on Windows)])],, [
-  AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
+  AS_IF([test "${SYS}" = "mingw32"], [
     enable_directx="yes"
   ], [
     enable_directx="no"
@@ -3260,7 +3237,7 @@ dnl  Windows Direct2D plugin
 dnl
 AC_ARG_ENABLE(direct2d,
   [  --enable-direct2d       Win7/VistaPU Direct2D support (default auto on Win32)],, [
-  AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"], [
+  AS_IF([test "${SYS}" != "mingw32"], [
     enable_direct2d="no"
   ])
 ])
@@ -3282,11 +3259,6 @@ if test "${enable_wingdi}" != "no"; then
   if test "${SYS}" = "mingw32"; then
     VLC_ADD_PLUGIN([wingdi])
     VLC_ADD_LIBS([wingdi],[-lgdi32 -lole32 -luuid])
-  fi
-  if test "${SYS}" = "mingwce"; then
-    VLC_ADD_PLUGIN([wingdi wingapi])
-    VLC_ADD_LIBS([wingdi],[-laygshell])
-    VLC_ADD_LIBS([wingapi],[-laygshell])
   fi
 fi
 
@@ -3473,7 +3445,7 @@ dnl
 AC_ARG_ENABLE(oss,
   [AS_HELP_STRING([--enable-oss],
     [support the Open Sound System OSS (default enabled on FreeBSD/NetBSD/DragonFlyBSD)])],, [
-  AS_IF([test "$SYS" = "mingw32" -o "$SYS" = "mingwce" -o "$SYS" = "linux" -o "$SYS" = "openbsd"], [
+  AS_IF([test "$SYS" = "mingw32" -o "$SYS" = "linux" -o "$SYS" = "openbsd"], [
     enable_oss="no"
   ])
 ])
@@ -3536,9 +3508,6 @@ if test "${enable_waveout}" != "no"; then
   if test "${SYS}" = "mingw32"; then
     VLC_ADD_PLUGIN([waveout])
     VLC_ADD_LIBS([waveout],[-lwinmm])
-  fi
-  if test "${SYS}" = "mingwce"; then
-    VLC_ADD_PLUGIN([waveout])
   fi
 fi
 
@@ -3667,7 +3636,7 @@ AS_IF([test "${enable_qt}" != "no"], [
   VLC_RESTORE_FLAGS
   AC_LANG_POP([C++])
 
-  AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
+  AS_IF([test "${SYS}" = "mingw32"], [
       VLC_ADD_LIBS([qt4],[-lole32])
   ])
   AS_IF([test "${SYS}" = "darwin" ],[
@@ -4082,7 +4051,7 @@ AC_ARG_WITH(kde-solid,
   AS_HELP_STRING([--with-kde-solid=PATH],
                  [KDE Solid actions directory (auto)]),, [
 
-if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "darwin" ; then
+if test "${SYS}" != "mingw32" -a "${SYS}" != "darwin" ; then
   with_kde_solid="yes"
 fi
 ])

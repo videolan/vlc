@@ -16,7 +16,5 @@ libvlc_LTLIBRARIES += libstream_filter_httplive_plugin.la
 endif
 
 if !HAVE_WIN32
-if !HAVE_WINCE
 libvlc_LTLIBRARIES += libdecomp_plugin.la
-endif
 endif

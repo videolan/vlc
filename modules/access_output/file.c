@@ -136,7 +136,6 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
     }
-#ifndef UNDER_CE
     else
     if( !strcmp( p_access->psz_path, "-" ) )
     {
@@ -151,7 +150,6 @@ static int Open( vlc_object_t *p_this )
         }
         msg_Dbg( p_access, "using stdout" );
     }
-#endif
     else
     {
         char *psz_tmp = str_format_time( p_access->psz_path );

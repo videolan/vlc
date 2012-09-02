@@ -33,10 +33,7 @@
 
 #include "../config/vlc_getopt.h"
 
-#if !defined( UNDER_CE )
-#   include  <mmsystem.h>
-#endif
-
+#include <mmsystem.h>
 #include <winsock.h>
 
 
@@ -59,9 +56,7 @@ static int system_InitWSA(int hi, int lo)
  */
 void system_Init(void)
 {
-#if !defined( UNDER_CE )
     timeBeginPeriod(5);
-#endif
 
     if (system_InitWSA(2, 2) && system_InitWSA(1, 1))
         fputs("Error: cannot initialize Winsocks\n", stderr);
@@ -85,7 +80,6 @@ typedef struct
 
 void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_argv[] )
 {
-#if !defined( UNDER_CE )
     /* Raise default priority of the current process */
 #ifndef ABOVE_NORMAL_PRIORITY_CLASS
 #   define ABOVE_NORMAL_PRIORITY_CLASS 0x00008000
@@ -212,8 +206,6 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
             exit( 0 );
         }
     }
-
-#endif
 }
 
 static unsigned __stdcall IPCHelperThread( void *data )
@@ -340,9 +332,7 @@ void system_End(void)
         p_helper = NULL;
     }
 
-#if !defined( UNDER_CE )
     timeEndPeriod(5);
-#endif
 
     /* XXX: In theory, we should not call this if WSAStartup() failed. */
     WSACleanup();

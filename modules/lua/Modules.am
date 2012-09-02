@@ -38,10 +38,6 @@ SOURCES_lua = \
 
 if HAVE_WIN32
 SOURCES_lua += libs/win.c
-else
-if HAVE_WINCE
-SOURCES_lua += libs/win.c
-endif
 endif
 
 libvlc_LTLIBRARIES += liblua_plugin.la

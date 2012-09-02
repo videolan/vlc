@@ -40,7 +40,7 @@ static inline void *realloc_down( void *ptr, size_t size )
 /**
  * Simple dynamic array handling. Array is realloced at each insert/removal
  */
-#if defined( _MSC_VER ) && _MSC_VER < 1300 && !defined( UNDER_CE )
+#if defined( _MSC_VER ) && _MSC_VER < 1300
 #   define VLCCVP (void**) /* Work-around for broken compiler */
 #else
 #   define VLCCVP

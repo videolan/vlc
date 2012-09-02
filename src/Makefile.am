@@ -212,9 +212,6 @@ else
 if HAVE_WIN32
 libvlccore_la_SOURCES += $(SOURCES_libvlc_win32)
 else
-if HAVE_WINCE
-libvlccore_la_SOURCES += $(SOURCES_libvlc_win32)
-else
 if HAVE_SYMBIAN
 #libvlccore_la_SOURCES += $(SOURCES_libvlc_symbian)
 else
@@ -222,7 +219,6 @@ if HAVE_OS2
 libvlccore_la_SOURCES += $(SOURCES_libvlc_os2)
 else
 libvlccore_la_SOURCES += $(SOURCES_libvlc_other)
-endif
 endif
 endif
 endif

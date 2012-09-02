@@ -10,13 +10,8 @@ win32_xpi_destdir=$(abs_top_builddir)/vlc-plugin-$(VERSION)
 7Z_OPTS=-t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on
 
 
-if HAVE_WINCE
-build-npapi:
-	touch $@
-else
 if HAVE_WIN32
 include extras/package/npapi.am
-endif
 endif
 
 if HAVE_WIN64
@@ -67,12 +62,10 @@ if BUILD_OSDMENU
 	done
 endif
 
-if !HAVE_WINCE
 	cp "$(top_builddir)/npapi-vlc/activex/axvlc.dll.manifest" "$(win32_destdir)/"
 	cp "$(top_builddir)/npapi-vlc/installed/lib/axvlc.dll" "$(win32_destdir)/"
 	cp "$(top_builddir)/npapi-vlc/npapi/npvlc.dll.manifest" "$(win32_destdir)/"
 	cp "$(top_builddir)/npapi-vlc/installed/lib/npvlc.dll" "$(win32_destdir)/"
-endif
 
 # Compiler shared DLLs, when using compilers built with --enable-shared
 # If gcc_s_sjlj/stdc++-6 DLLs exist, our C++ modules were linked to them
@@ -84,13 +77,11 @@ endif
 	cp -r $(prefix)/include "$(win32_destdir)/sdk"
 	cp -r $(prefix)/lib/pkgconfig "$(win32_destdir)/sdk/lib"
 	cd $(prefix)/lib && cp -rv libvlc.dll.a libvlc.la libvlccore.dll.a libvlccore.la "$(win32_destdir)/sdk/lib/"
-if !HAVE_WINCE
 	$(DLLTOOL) -D libvlc.dll -l "$(win32_destdir)/sdk/lib/libvlc.lib" -d "$(top_builddir)/lib/.libs/libvlc.dll.def" "$(prefix)/bin/libvlc.dll"
 	$(DLLTOOL) -D libvlccore.dll -l "$(win32_destdir)/sdk/lib/libvlccore.lib" -d "$(top_builddir)/src/.libs/libvlccore.dll.def" "$(prefix)/bin/libvlccore.dll"
 
 	mkdir -p "$(win32_destdir)/sdk/activex/"
 	cd $(top_builddir)/npapi-vlc && cp activex/README.TXT share/test.html $(win32_destdir)/sdk/activex/
-endif
 
 # Convert to DOS line endings
 	find $(win32_destdir) -type f \( -name "*xml" -or -name "*html" -or -name '*js' -or -name '*css' -or -name '*hosts' -or -iname '*txt' -or -name '*.cfg' -or -name '*.lua' \) -exec $(U2D) {} \;

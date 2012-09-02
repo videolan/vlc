@@ -422,7 +422,7 @@ static void RtspClientAlive( rtsp_session_t *session )
 static int dup_socket(int oldfd)
 {
     int newfd;
-#if !defined(WIN32) || defined(UNDER_CE)
+#ifndef WIN32
     newfd = vlc_dup(oldfd);
 #else
     WSAPROTOCOL_INFO info;

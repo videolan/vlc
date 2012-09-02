@@ -1023,10 +1023,6 @@ static int mms_CommandSend( access_t *p_access, int i_command,
 
 static int NetFillBuffer( access_t *p_access )
 {
-#ifdef UNDER_CE
-    return -1;
-
-#else
     access_sys_t    *p_sys = p_access->p_sys;
     int             i_ret;
     struct pollfd   ufd[2];
@@ -1143,7 +1139,6 @@ static int NetFillBuffer( access_t *p_access )
     if( i_udp_read > 0 ) p_sys->i_buffer_udp += i_udp_read;
 
     return i_tcp_read + i_udp_read;
-#endif
 }
 
 static int  mms_ParseCommand( access_t *p_access,

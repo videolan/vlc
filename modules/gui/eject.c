@@ -35,7 +35,7 @@
 #include <vlc_common.h>
 #include <vlc_fs.h>
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
+#if defined( WIN32 )
 #   include <mmsystem.h>
 #elif defined(__linux__)
 #   include <sys/types.h>

@@ -28,7 +28,7 @@
 
 int fsync (int fd)
 {
-#if defined(WIN32) && !defined(UNDER_CE)
+#if defined(WIN32)
     /* WinCE can use FlushFileBuffers() but it operates on file handles */
     return _commit (fd);
 #else

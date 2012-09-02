@@ -126,7 +126,7 @@ VLC_API void vlc_Unsubscribe(msg_subscription_t *);
 
 /*@}*/
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
+#if defined( WIN32 )
 #    define CONSOLE_INTRO_MSG \
          if( !getenv( "PWD" ) ) /* detect Cygwin shell or Wine */ \
          { \

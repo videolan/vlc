@@ -95,7 +95,7 @@ static int Open(vlc_object_t *object)
 # endif
 #endif
 
-#if defined(WIN32) && !defined(UNDER_CE)
+#if defined(WIN32)
     CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
     SMALL_RECT rect;
     COORD coord;
@@ -216,7 +216,7 @@ error:
 
         free(sys);
     }
-#if defined(WIN32) && !defined(UNDER_CE)
+#if defined(WIN32)
     FreeConsole();
 #endif
     return VLC_EGENERIC;
@@ -237,7 +237,7 @@ static void Close(vlc_object_t *object)
     caca_free_display(sys->dp);
     cucul_free_canvas(sys->cv);
 
-#if defined(WIN32) && !defined(UNDER_CE)
+#if defined(WIN32)
     FreeConsole();
 #endif
 
