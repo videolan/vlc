@@ -776,14 +776,26 @@ int oggseek_find_frame ( demux_t *p_demux, logical_stream_t *p_stream, int64_t i
 
     i_tframe += p_stream->i_keyframe_offset;
 
+    i_cframe = i_tframe;
+    /* For Opus, seek back 80 ms before the target playback position. */
+    if ( p_stream->fmt.i_codec == VLC_CODEC_OPUS )
+    {
+        if ( i_tframe <= p_stream->i_pre_skip )
+            i_cframe = 0;
+        else if ( i_tframe < 80*48 )
+            i_cframe = 0;
+        else
+            i_cframe = i_tframe - 80*48;
+    }
+
     /* reduce the search domain */
-    fidx = get_bounds_for( p_stream, i_tframe, &i_pos_lower, &i_pos_upper );
+    fidx = get_bounds_for( p_stream, i_cframe, &i_pos_lower, &i_pos_upper );
 
     if ( fidx == NULL )
     {
-        /* no exact match found; search the domain for highest keyframe <= i_tframe */
+        /* no exact match found; search the domain for highest keyframe <= i_cframe */
 
-        i_granulepos = ogg_seek ( p_demux, p_stream, i_tframe, i_pos_lower, i_pos_upper,
+        i_granulepos = ogg_seek ( p_demux, p_stream, i_cframe, i_pos_lower, i_pos_upper,
                                   &i_pagepos, true );
         if ( i_granulepos == -1 )
         {
