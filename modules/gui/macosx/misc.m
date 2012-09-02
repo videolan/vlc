@@ -28,6 +28,8 @@
 #import "controls.h"
 #import "CoreInteraction.h"
 #import <CoreAudio/CoreAudio.h>
+#import <vlc_keys.h>
+
 
 /*****************************************************************************
  * NSSound (VLCAdditions)
@@ -559,6 +561,48 @@ void _drawFrameInRect(NSRect frameRect)
 @end
 
 /*****************************************************************************
+ * ProgressView
+ *****************************************************************************/
+
+@implementation VLCProgressView : NSView
+
+- (void)scrollWheel:(NSEvent *)o_event
+{
+    intf_thread_t * p_intf = VLCIntf;
+    CGFloat f_deltaY = [o_event deltaY];
+    CGFloat f_deltaX = [o_event deltaX];
+
+    if (!OSX_SNOW_LEOPARD && [o_event isDirectionInvertedFromDevice])
+        f_deltaX = -f_deltaX; // optimisation, actually double invertion of f_deltaY here
+    else
+        f_deltaY = -f_deltaY;
+
+    // positive for left / down, negative otherwise
+    CGFloat f_delta = f_deltaX + f_deltaY;
+    CGFloat f_abs;
+    int i_vlckey;
+
+    if (f_delta > 0.0f) {
+        i_vlckey = ACTIONID_JUMP_BACKWARD_EXTRASHORT;
+        f_abs = f_delta;
+    }
+    else {
+        i_vlckey = ACTIONID_JUMP_FORWARD_EXTRASHORT;
+        f_abs = -f_delta;
+    }
+
+    for (NSUInteger i = 0; i < (int)(f_abs/4.+1.) && f_abs > 0.05 ; i++)
+        var_SetInteger( p_intf->p_libvlc, "key-action", i_vlckey );
+}
+
+- (BOOL)acceptsFirstResponder
+{
+    return YES;
+}
+
+@end
+
+/*****************************************************************************
  * TimeLineSlider
  *****************************************************************************/
 
@@ -663,6 +707,35 @@ void _drawFrameInRect(NSRect frameRect)
     [self drawKnobInRect: knobRect];
 }
 
+- (void)scrollWheel:(NSEvent *)o_event
+{
+    intf_thread_t * p_intf = VLCIntf;
+    CGFloat f_deltaY = [o_event deltaY];
+    CGFloat f_deltaX = [o_event deltaX];
+
+    if (!OSX_SNOW_LEOPARD && [o_event isDirectionInvertedFromDevice])
+        f_deltaX = -f_deltaX; // optimisation, actually double invertion of f_deltaY here
+    else
+        f_deltaY = -f_deltaY;
+
+    // positive for left / down, negative otherwise
+    CGFloat f_delta = f_deltaX + f_deltaY;
+    CGFloat f_abs;
+    int i_vlckey;
+
+    if (f_delta > 0.0f) {
+        i_vlckey = ACTIONID_VOL_DOWN;
+        f_abs = f_delta;
+    }
+    else {
+        i_vlckey = ACTIONID_VOL_UP;
+        f_abs = -f_delta;
+    }
+
+    for (NSUInteger i = 0; i < (int)(f_abs/4.+1.) && f_abs > 0.05 ; i++)
+        var_SetInteger( p_intf->p_libvlc, "key-action", i_vlckey );
+}
+
 @end
 
 /*****************************************************************************
@@ -765,6 +838,7 @@ void _drawFrameInRect(NSRect frameRect)
  * VLCThreePartImageView interface
  *****************************************************************************/
 @implementation VLCThreePartImageView
+
 - (void)dealloc
 {
     [o_left_img release];
