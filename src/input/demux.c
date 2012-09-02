@@ -132,6 +132,7 @@ demux_t *demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
             { "ogg",  "ogg" }, { "ogm",  "ogg" }, /* legacy Ogg */
             { "oga",  "ogg" }, { "spx",  "ogg" }, { "ogv", "ogg" },
             { "ogx",  "ogg" }, /*RFC5334*/
+            { "opus", "ogg" }, /*draft-terriberry-oggopus-01*/
             { "pva",  "pva" },
             { "rm",   "avformat" },
             { "m4v",  "m4v" },

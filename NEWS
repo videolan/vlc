@@ -9,6 +9,7 @@ Important changes for packagers:
  * /extras/contrib has been replaced by a better system in /contrib
 
 Codecs:
+ * Support for OPUS via libopus.
  * Support for CDXL, Ut Video, VBLE, Dxtory codecs via libavcodec.
  * Numerous improvements in OpenMAX IL codec
  * Support for Ulead DV audio

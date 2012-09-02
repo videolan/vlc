@@ -9,6 +9,7 @@ SOURCES_theora = theora.c
 SOURCES_tremor = vorbis.c
 SOURCES_speex = speex.c
 SOURCES_adpcm = adpcm.c
+SOURCES_opus = opus.c opus_header.c opus_header.h
 SOURCES_uleaddvaudio = uleaddvaudio.c
 SOURCES_mpeg_audio = mpeg_audio.c
 SOURCES_libmpeg2 = libmpeg2.c

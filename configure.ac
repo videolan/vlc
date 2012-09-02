@@ -617,7 +617,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua chorus_flanger freetype avcodec avformat access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo mp4 quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a speex mono colorthres extract ball access_imem hotkeys mosaic gaussianblur dbus x26410b hqdn3d anaglyph oldrc ncurses],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua chorus_flanger freetype avcodec avformat access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo mp4 quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a speex opus mono colorthres extract ball access_imem hotkeys mosaic gaussianblur dbus x26410b hqdn3d anaglyph oldrc ncurses],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -2710,6 +2710,11 @@ AS_IF([test "${enable_speex}" != "no"], [
   ])
 ])
 AM_CONDITIONAL([HAVE_SPEEXDSP], [test "$have_speexdsp" = "yes"])
+
+dnl
+dnl  Opus plugin
+dnl
+PKG_ENABLE_MODULES_VLC([OPUS], [], [ogg opus], [Opus support], [auto])
 
 dnl
 dnl  theora decoder plugin
