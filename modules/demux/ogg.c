@@ -644,13 +644,6 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     mtime_t i_pts = -1, i_interpolated_pts;
     demux_sys_t *p_ogg = p_demux->p_sys;
 
-    /* Sanity check */
-    if( !p_oggpacket->bytes )
-    {
-        msg_Dbg( p_demux, "discarding 0 sized packet" );
-        return;
-    }
-
     if( p_oggpacket->bytes >= 7 &&
         ! memcmp ( p_oggpacket->packet, "Annodex", 7 ) )
     {
@@ -664,7 +657,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         return;
     }
 
-    if( p_stream->fmt.i_codec == VLC_CODEC_SUBT &&
+    if( p_stream->fmt.i_codec == VLC_CODEC_SUBT && p_oggpacket->bytes > 0 &&
         p_oggpacket->packet[0] & PACKET_TYPE_BITS ) return;
 
     /* Check the ES is selected */
@@ -840,9 +833,6 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         return;
     }
 
-    if( p_oggpacket->bytes <= 0 )
-        return;
-
     if( !( p_block = block_New( p_demux, p_oggpacket->bytes ) ) ) return;
 
 
@@ -883,8 +873,11 @@ static void Ogg_DecodePacket( demux_t *p_demux,
 
 
     /* Normalize PTS */
-    if( i_pts == 0 ) i_pts = VLC_TS_0;
-    else if( i_pts == -1 && i_interpolated_pts == 0 ) i_pts = VLC_TS_0;
+    if( i_pts == VLC_TS_INVALID ) i_pts = VLC_TS_0;
+    else if( i_pts == -1 && i_interpolated_pts == VLC_TS_INVALID )
+        i_pts = VLC_TS_0;
+    else if( i_pts == -1 && p_stream->fmt.i_cat == VIDEO_ES )
+        i_pts = i_interpolated_pts;
     else if( i_pts == -1 ) i_pts = VLC_TS_INVALID;
 
     if( p_stream->fmt.i_cat == AUDIO_ES )
@@ -937,6 +930,12 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         p_stream->fmt.i_codec != VLC_CODEC_DIRAC &&
         p_stream->fmt.i_codec != VLC_CODEC_KATE )
     {
+        if( p_oggpacket->bytes <= 0 )
+        {
+            msg_Dbg( p_demux, "discarding 0 sized packet" );
+            block_Release( p_block );
+            return;
+        }
         /* We remove the header from the packet */
         i_header_len = (*p_oggpacket->packet & PACKET_LEN_BITS01) >> 6;
         i_header_len |= (*p_oggpacket->packet & PACKET_LEN_BITS2) << 1;
@@ -1325,8 +1324,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         p_ogg->i_streams--;
                     }
                 }
-                else if( (*oggpacket.packet & PACKET_TYPE_BITS ) == PACKET_TYPE_HEADER &&
-                         oggpacket.bytes >= 44+1 )
+                else if( oggpacket.bytes >= 44+1 &&
+                         (*oggpacket.packet & PACKET_TYPE_BITS ) == PACKET_TYPE_HEADER )
                 {
                     stream_header_t tmp;
                     stream_header_t *st = &tmp;
@@ -1994,7 +1993,7 @@ static void Ogg_ReadFlacHeader( demux_t *p_demux, logical_stream_t *p_stream,
     bs_init( &s, p_oggpacket->packet, p_oggpacket->bytes );
 
     bs_read( &s, 1 );
-    if( bs_read( &s, 7 ) == 0 )
+    if( p_oggpacket->bytes > 0 && bs_read( &s, 7 ) == 0 )
     {
         if( bs_read( &s, 24 ) >= 34 /*size STREAMINFO*/ )
         {

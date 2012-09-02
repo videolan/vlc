@@ -454,7 +454,9 @@ static picture_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 
     /* TODO: Implement _granpos (3rd parameter here) and add the
      * call to TH_DECCTL_SET_GRANDPOS after seek */
-    if (th_decode_packetin( p_sys->tcx, p_oggpacket, NULL )) /* 0 on success */
+    /* TODO: If the return is TH_DUPFRAME, we don't need to display a new
+     * frame, but we do need to keep displaying the previous one. */
+    if (th_decode_packetin( p_sys->tcx, p_oggpacket, NULL ) < 0)
         return NULL; /* bad packet */
 
     /* Check for keyframe */
