@@ -303,6 +303,7 @@ void PLSelector::setSource( QTreeWidgetItem *item )
     else if( i_type == SQL_ML_TYPE )
     {
         emit categoryActivated( NULL, true );
+        curItem = item;
         return;
     }
 #endif
