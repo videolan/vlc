@@ -70,7 +70,7 @@ static VLCInfo *_o_sharedInstance = nil;
 {
     [o_info_window setExcludedFromWindowsMenu: YES];
     [o_info_window setFloatingPanel: NO];
-    if (OSX_LION)
+    if (!OSX_SNOW_LEOPARD)
         [o_info_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [o_info_window setTitle: _NS("Media Information")];

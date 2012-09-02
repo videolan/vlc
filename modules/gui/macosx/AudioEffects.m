@@ -105,7 +105,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"filter"]] setLabel:_NS("Filter")];
     [o_window setTitle:_NS("Audio Effects")];
     [o_window setExcludedFromWindowsMenu:YES];
-    if (OSX_LION)
+    if (!OSX_SNOW_LEOPARD)
         [o_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [self setupEqualizer];

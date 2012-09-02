@@ -111,7 +111,7 @@
 
 - (void)loadButtonIcons
 {
-    if (OSX_LION)
+    if (!OSX_SNOW_LEOPARD)
     {
         if( [NSColor currentControlTint] == NSBlueControlTint )
         {
@@ -495,11 +495,7 @@
         return;
 
     NSArray * pathComponents;
-
-    if (OSX_SNOW_LEOPARD || OSX_LION)
-        pathComponents = [representedURL pathComponents];
-    else
-        pathComponents = [[representedURL path] pathComponents];
+    pathComponents = [representedURL pathComponents];
 
     if (!pathComponents)
         return;
@@ -573,10 +569,7 @@
     }
 
     NSArray * pathComponents;
-    if (OSX_SNOW_LEOPARD || OSX_LION)
-        pathComponents = [representedURL pathComponents];
-    else
-        pathComponents = [[representedURL path] pathComponents];
+    pathComponents = [representedURL pathComponents];
     if (!pathComponents)
         return;
 

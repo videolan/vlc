@@ -93,7 +93,7 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
     [[o_sv_dur_value_fld formatter] setFormat:[NSString stringWithFormat:@"#,##0.000%@", o_suffix]];
     [o_sv_dur_value_fld setToolTip: o_toolTip];
 
-    if (OSX_LION)
+    if (!OSX_SNOW_LEOPARD)
         [o_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [self resetValues:self];

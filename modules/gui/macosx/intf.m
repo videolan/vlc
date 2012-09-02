@@ -597,7 +597,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_AddCallback(p_playlist, "volume", VolumeUpdated, self);
     var_AddCallback(p_playlist, "mute", VolumeUpdated, self);
 
-    if (OSX_LION)
+    if (!OSX_SNOW_LEOPARD)
     {
         if ([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen)
             var_SetBool( p_playlist, "fullscreen", YES );
@@ -630,7 +630,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* yeah, we are done */
     b_nativeFullscreenMode = NO;
 #ifdef MAC_OS_X_VERSION_10_7
-    if( OSX_LION && b_video_deco )
+    if( !OSX_SNOW_LEOPARD && b_video_deco )
         b_nativeFullscreenMode = var_InheritBool( p_intf, "macosx-nativefullscreenmode" );
 #endif
 

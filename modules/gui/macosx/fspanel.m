@@ -51,7 +51,7 @@
     [win setOpaque:NO];
     [win setHasShadow: NO];
     [win setBackgroundColor:[NSColor clearColor]];
-    if (OSX_LION)
+    if (!OSX_SNOW_LEOPARD)
         [win setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     /* let the window sit on top of everything else and start out completely transparent */

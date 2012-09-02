@@ -179,7 +179,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 {
     p_intf = VLCIntf;
 
-    if (OSX_LION)
+    if (!OSX_SNOW_LEOPARD)
         [o_prefs_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [self initStrings];

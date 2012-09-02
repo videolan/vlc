@@ -269,7 +269,7 @@
     BOOL b_invertedEventFromDevice = NO;
     CGFloat f_deltaY, f_deltaX = .0;
 
-    if (OSX_LION)
+    if (!OSX_SNOW_LEOPARD)
     {
         if ([theEvent isDirectionInvertedFromDevice])
             b_invertedEventFromDevice = YES;

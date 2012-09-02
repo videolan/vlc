@@ -71,7 +71,7 @@ static VLAboutBox *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
-    if (OSX_LION)
+    if (!OSX_SNOW_LEOPARD)
         [o_about_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     /* add a colored backdrop to get a white window background */

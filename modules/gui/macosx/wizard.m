@@ -73,7 +73,7 @@ static VLCWizard *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
-    if (OSX_LION)
+    if (!OSX_SNOW_LEOPARD)
         [o_wizard_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     /* some minor cleanup */

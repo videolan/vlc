@@ -119,7 +119,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (void)awakeFromNib
 {
-    if (OSX_LION)
+    if (!OSX_SNOW_LEOPARD)
         [o_panel setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [o_panel setTitle: _NS("Open Source")];

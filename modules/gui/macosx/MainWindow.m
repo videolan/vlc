@@ -95,7 +95,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (b_dark_interface)
     {
 #ifdef MAC_OS_X_VERSION_10_7
-        if (OSX_LION)
+        if (!OSX_SNOW_LEOPARD)
             styleMask = NSBorderlessWindowMask | NSResizableWindowMask;
         else
             styleMask = NSBorderlessWindowMask;
@@ -114,7 +114,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self setMovableByWindowBackground: YES];
 
     /* we don't want this window to be restored on relaunch */
-    if (OSX_LION)
+    if (!OSX_SNOW_LEOPARD)
         [self setRestorable:NO];
 
     return self;
@@ -187,7 +187,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     b_video_deco = var_InheritBool( VLCIntf, "video-deco" );
     b_nativeFullscreenMode = NO;
 #ifdef MAC_OS_X_VERSION_10_7
-    if( OSX_LION && b_video_deco )
+    if( !OSX_SNOW_LEOPARD && b_video_deco )
         b_nativeFullscreenMode = var_InheritBool( VLCIntf, "macosx-nativefullscreenmode" );
 #endif
     t_hide_mouse_timer = nil;
@@ -467,7 +467,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [o_detached_titlebar_view setFullscreenButtonHidden: YES];
     }
 
-    if (OSX_LION)
+    if (!OSX_SNOW_LEOPARD)
     {
         /* the default small size of the search field is slightly different on Lion, let's work-around that */
         NSRect frame;
@@ -670,7 +670,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     frame.size.width = 0;
     [o_detached_time_sld_fancygradient_view setFrame: frame];
 
-    if (OSX_LION)
+    if (!OSX_SNOW_LEOPARD)
     {
         [o_resize_view setImage: NULL];
         [o_detached_resize_view setImage: NULL];
@@ -3059,7 +3059,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (b_dark_interface || !b_video_deco)
     {
 #ifdef MAC_OS_X_VERSION_10_7
-        if (OSX_LION)
+        if (!OSX_SNOW_LEOPARD)
             styleMask = NSBorderlessWindowMask | NSResizableWindowMask;
         else
             styleMask = NSBorderlessWindowMask;
@@ -3075,7 +3075,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self setMovableByWindowBackground: YES];
 
     /* we don't want this window to be restored on relaunch */
-    if (OSX_LION)
+    if (!OSX_SNOW_LEOPARD)
         [self setRestorable:NO];
 
     return self;
