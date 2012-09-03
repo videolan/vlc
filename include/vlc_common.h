@@ -35,10 +35,6 @@
 /*****************************************************************************
  * Required vlc headers
  *****************************************************************************/
-#if defined( _MSC_VER )
-#   pragma warning( disable : 4244 )
-#endif
-
 #include "vlc_config.h"
 
 /*****************************************************************************
@@ -784,15 +780,6 @@ static inline void SetQWLE (void *p, uint64_t qw)
 /* Stuff defined in src/extras/libc.c */
 
 #if defined(WIN32)
-/* win32, cl and icl support */
-#   if defined( _MSC_VER ) || !defined( __MINGW32__ )
-#       define __attribute__(x)
-#       define S_IFBLK         0x3000  /* Block */
-#       define S_ISBLK(m)      (0)
-#       define S_ISCHR(m)      (0)
-#       define S_ISFIFO(m)     (((m)&_S_IFMT) == _S_IFIFO)
-#       define S_ISREG(m)      (((m)&_S_IFMT) == _S_IFREG)
-#   endif
 
 /* several type definitions */
 #   if defined( __MINGW32__ )
@@ -806,21 +793,6 @@ static inline void SetQWLE (void *p, uint64_t qw)
 #           endif
 #           define off_t long long
 #       endif
-#   endif
-
-#   if defined( _MSC_VER )
-#       if !defined( _OFF_T_DEFINED )
-            typedef __int64 off_t;
-#           define _OFF_T_DEFINED
-#       else
-            /* for wx compatibility typedef long off_t; */
-#           define off_t __int64
-#       endif
-#   endif
-
-#   if defined( __BORLANDC__ )
-#       undef off_t
-#       define off_t unsigned __int64
 #   endif
 
 #   ifndef O_NONBLOCK
