@@ -161,6 +161,8 @@
 
     VLCWindow *o_extra_video_window;
     id o_current_video_window;
+
+    NSRect frameBeforePlayback;
 }
 + (VLCMainWindow *)sharedInstance;
 @property (readonly) BOOL fullscreen;

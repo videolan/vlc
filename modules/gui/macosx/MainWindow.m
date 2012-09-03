@@ -1887,9 +1887,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
     BOOL b_videoPlayback = [[VLCMain sharedInstance] activeVideoPlayback];
 
     if (b_videoPlayback) {
+        frameBeforePlayback = [self frame];
+
         // look for 'start at fullscreen'
         [[VLCMain sharedInstance] fullscreenChanged];
     } else {
+        [[self animator] setFrame:frameBeforePlayback display:YES];
+
         [self makeFirstResponder: nil];
         [o_detached_video_window orderOut: nil];
         if (o_extra_video_window)
