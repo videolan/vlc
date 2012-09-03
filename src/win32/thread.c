@@ -55,7 +55,7 @@ struct vlc_thread
     void          *data;
 };
 
-#if (_WIN32_WINNT < 0x0601)
+#if (_WIN32_WINNT < 0x0600)
 static LARGE_INTEGER freq;
 #endif
 static vlc_mutex_t super_mutex;
@@ -72,7 +72,7 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
     switch (fdwReason)
     {
         case DLL_PROCESS_ATTACH:
-#if (_WIN32_WINNT < 0x0601)
+#if (_WIN32_WINNT < 0x0600)
             if (!QueryPerformanceFrequency (&freq))
                 return FALSE;
 #endif
@@ -717,7 +717,17 @@ mtime_t mdate (void)
     if (unlikely(!QueryUnbiasedInterruptTime (&ts)))
         abort ();
 
-    return ts / 10; /* hundreds of nanoseconds */
+    /* hundreds of nanoseconds */
+    static_assert ((10000000 % CLOCK_FREQ) == 0, "Broken frequencies ratio");
+    return ts / (10000000 / CLOCK_FREQ);
+
+#elif (_WIN32_WINNT >= 0x0600)
+     ULONGLONG ts = GetTickCount64 ();
+
+    /* milliseconds */
+    static_assert ((CLOCK_FREQ % 1000) == 0, "Broken frequencies ratio");
+    return ts * (CLOCK_FREQ / 1000);
+
 #else
     /* We don't need the real date, just the value of a high precision timer */
     LARGE_INTEGER counter;
