@@ -32,6 +32,8 @@
  * the translated string. the translation should be '1:translatedstring' though */
 #define _ANS(s) [[[VLCStringUtility sharedInstance] localizedString: _(s)] substringFromIndex:2]
 
+unsigned int CocoaKeyToVLC(unichar i_key);
+
 @interface VLCStringUtility : NSObject
 
 + (VLCStringUtility *)sharedInstance;

@@ -47,8 +47,6 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-unsigned int CocoaKeyToVLC( unichar i_key );
-
 #define VLCIntf [[VLCMain sharedInstance] intf]
 
 // You need to release those objects after use
