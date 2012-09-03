@@ -195,8 +195,6 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/backward-3btns-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/backward-3btns.png \
 	extras/package/macosx/Resources/mainwindow/backward-3btns@2x.png \
-	extras/package/macosx/Resources/mainwindow/back-pressed-single.png \
-	extras/package/macosx/Resources/mainwindow/back-single.png \
 	extras/package/macosx/Resources/mainwindow/bottom-background.png \
 	extras/package/macosx/Resources/mainwindow/bottom-background@2x.png \
 	extras/package/macosx/Resources/mainwindow/bottombar-mini.png \
@@ -217,8 +215,6 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/forward-3btns-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/forward-3btns.png \
 	extras/package/macosx/Resources/mainwindow/forward-3btns@2x.png \
-	extras/package/macosx/Resources/mainwindow/forward-pressed-single.png \
-	extras/package/macosx/Resources/mainwindow/forward-single.png \
 	extras/package/macosx/Resources/mainwindow/fullscreen-double-buttons-pressed.png \
 	extras/package/macosx/Resources/mainwindow/fullscreen-double-buttons-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/fullscreen-double-buttons.png \
