@@ -191,14 +191,10 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/icons/wav.icns \
 	extras/package/macosx/Resources/icons/wma.icns \
 	extras/package/macosx/Resources/icons/wmv.icns \
-	extras/package/macosx/Resources/mainwindow/back-3btns-pressed.png \
-	extras/package/macosx/Resources/mainwindow/back-3btns-pressed@2x.png \
-	extras/package/macosx/Resources/mainwindow/back-3btns.png \
-	extras/package/macosx/Resources/mainwindow/back-3btns@2x.png \
-	extras/package/macosx/Resources/mainwindow/back-6btns-pressed.png \
-	extras/package/macosx/Resources/mainwindow/back-6btns-pressed@2x.png \
-	extras/package/macosx/Resources/mainwindow/back-6btns.png \
-	extras/package/macosx/Resources/mainwindow/back-6btns@2x.png \
+	extras/package/macosx/Resources/mainwindow/backward-3btns-pressed.png \
+	extras/package/macosx/Resources/mainwindow/backward-3btns-pressed@2x.png \
+	extras/package/macosx/Resources/mainwindow/backward-3btns.png \
+	extras/package/macosx/Resources/mainwindow/backward-3btns@2x.png \
 	extras/package/macosx/Resources/mainwindow/back-pressed-single.png \
 	extras/package/macosx/Resources/mainwindow/back-single.png \
 	extras/package/macosx/Resources/mainwindow/bottom-background.png \
@@ -221,10 +217,6 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/forward-3btns-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/forward-3btns.png \
 	extras/package/macosx/Resources/mainwindow/forward-3btns@2x.png \
-	extras/package/macosx/Resources/mainwindow/forward-6btns-pressed.png \
-	extras/package/macosx/Resources/mainwindow/forward-6btns-pressed@2x.png \
-	extras/package/macosx/Resources/mainwindow/forward-6btns.png \
-	extras/package/macosx/Resources/mainwindow/forward-6btns@2x.png \
 	extras/package/macosx/Resources/mainwindow/forward-pressed-single.png \
 	extras/package/macosx/Resources/mainwindow/forward-single.png \
 	extras/package/macosx/Resources/mainwindow/fullscreen-double-buttons-pressed.png \
@@ -307,10 +299,10 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/volume-slider-knob@2x.png \
 	extras/package/macosx/Resources/mainwindow/volume-slider-track.png \
 	extras/package/macosx/Resources/mainwindow/volume-slider-track@2x.png \
-	extras/package/macosx/Resources/mainwindow_dark/back-3btns-dark-pressed.png \
-	extras/package/macosx/Resources/mainwindow_dark/back-3btns-dark-pressed@2x.png \
-	extras/package/macosx/Resources/mainwindow_dark/back-3btns-dark.png \
-	extras/package/macosx/Resources/mainwindow_dark/back-3btns-dark@2x.png \
+	extras/package/macosx/Resources/mainwindow_dark/backward-3btns-dark-pressed.png \
+	extras/package/macosx/Resources/mainwindow_dark/backward-3btns-dark-pressed@2x.png \
+	extras/package/macosx/Resources/mainwindow_dark/backward-3btns-dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/backward-3btns-dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottom-background_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottom-background_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottombar-mini.png \
