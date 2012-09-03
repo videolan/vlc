@@ -37,15 +37,14 @@
  * VLCExtensionsDialogProvider implementation
  *****************************************************************************/
 
-static int dialogCallback( vlc_object_t *p_this, const char *psz_variable,
+static int dialogCallback(vlc_object_t *p_this, const char *psz_variable,
                            vlc_value_t old_val, vlc_value_t new_val,
-                           void *param );
+                           void *param);
 
 static NSView *createControlFromWidget(extension_widget_t *widget, id self)
 {
     assert(!widget->p_sys_intf);
-    switch (widget->type)
-    {
+    switch (widget->type) {
         case EXTENSION_WIDGET_HTML:
         {
             WebView *webView = [[WebView alloc] initWithFrame:NSMakeRect (0,0,1,1)];
@@ -137,8 +136,7 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
 
 static void updateControlFromWidget(NSView *control, extension_widget_t *widget, id self)
 {
-    switch (widget->type)
-    {
+    switch (widget->type) {
         case EXTENSION_WIDGET_HTML:
         {
             // Get the web view
@@ -192,7 +190,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
             NSPopUpButton *popup = (NSPopUpButton *)control;
             [popup removeAllItems];
             struct extension_widget_value_t *value;
-            for(value = widget->p_values; value != NULL; value = value->p_next)
+            for (value = widget->p_values; value != NULL; value = value->p_next)
             {
                 [popup addItemWithTitle:[NSString stringWithUTF8String:value->psz_text]];
             }
@@ -200,7 +198,6 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
             [self popUpSelectionChanged:popup];
             break;
         }
-
         case EXTENSION_WIDGET_LIST:
         {
             assert([control isKindOfClass:[NSScrollView class]]);
@@ -210,7 +207,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
 
             NSMutableArray *contentArray = [NSMutableArray array];
             struct extension_widget_value_t *value;
-            for(value = widget->p_values; value != NULL; value = value->p_next)
+            for (value = widget->p_values; value != NULL; value = value->p_next)
             {
                 NSDictionary *entry = [NSDictionary dictionaryWithObjectsAndKeys:
                                        [NSNumber numberWithInt:value->i_id], @"id",
@@ -238,7 +235,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
         {
             assert([control isKindOfClass:[NSProgressIndicator class]]);
             NSProgressIndicator *progressIndicator = (NSProgressIndicator *)control;
-            if( widget->i_spin_loops != 0 )
+            if (widget->i_spin_loops != 0)
                 [progressIndicator startAnimation:self];
             else
                 [progressIndicator stopAnimation:self];
@@ -251,9 +248,9 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
 /**
  * Ask the dialogs provider to create a new dialog
  **/
-static int dialogCallback( vlc_object_t *p_this, const char *psz_variable,
+static int dialogCallback(vlc_object_t *p_this, const char *psz_variable,
                            vlc_value_t old_val, vlc_value_t new_val,
-                           void *param )
+                           void *param)
 {
     (void) p_this;
     (void) psz_variable;
@@ -261,12 +258,12 @@ static int dialogCallback( vlc_object_t *p_this, const char *psz_variable,
     (void) param;
 
     ExtensionsDialogProvider *p_edp = [ExtensionsDialogProvider sharedInstance:(intf_thread_t *)p_this];
-    if( !p_edp )
+    if (!p_edp)
         return VLC_EGENERIC;
-    if( !new_val.p_address )
+    if (!new_val.p_address)
         return VLC_EGENERIC;
 
-    extension_dialog_t *p_dialog = ( extension_dialog_t* ) new_val.p_address;
+    extension_dialog_t *p_dialog = (extension_dialog_t*) new_val.p_address;
     [p_edp manageDialog:p_dialog];
     return VLC_SUCCESS;
 }
@@ -282,25 +279,23 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
 
 + (void)killInstance
 {
-    if (_o_sharedInstance)
-    {
+    if (_o_sharedInstance) {
         [_o_sharedInstance release];
     }
 }
 
 - (id)initWithIntf:(intf_thread_t *)_p_intf
 {
-    if( _o_sharedInstance )
+    if (_o_sharedInstance)
         [self dealloc];
 
-    if ((self = [super init]))
-    {
+    if ((self = [super init])) {
         _o_sharedInstance = self;
         p_intf = _p_intf;
 
         // The Cocoa interface already called dialog_Register()
-        var_Create( p_intf, "dialog-extension", VLC_VAR_ADDRESS );
-        var_AddCallback( p_intf, "dialog-extension", dialogCallback, NULL );
+        var_Create(p_intf, "dialog-extension", VLC_VAR_ADDRESS);
+        var_AddCallback(p_intf, "dialog-extension", dialogCallback, NULL);
     }
 
     return _o_sharedInstance;
@@ -308,8 +303,8 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
 
 - (void)dealloc
 {
-    msg_Dbg( p_intf, "ExtensionsDialogProvider is quitting..." );
-    var_DelCallback( p_intf, "dialog-extension", dialogCallback, NULL );
+    msg_Dbg(p_intf, "ExtensionsDialogProvider is quitting...");
+    var_DelCallback(p_intf, "dialog-extension", dialogCallback, NULL);
 
     [super dealloc];
 }
@@ -318,15 +313,14 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
 {
     NSString *o_type = [NSString stringWithUTF8String:type];
 
-    if( [o_type isEqualToString: @"dialog-extension"] )
-    {
+    if ([o_type isEqualToString: @"dialog-extension"]) {
         [self performSelectorOnMainThread:@selector(updateExtensionDialog:)
                                withObject:o_value
                             waitUntilDone:YES];
 
     }
     else
-        msg_Err( VLCIntf, "unhandled dialog type: '%s'", type );
+        msg_Err(VLCIntf, "unhandled dialog type: '%s'", type);
 }
 
 - (void)triggerClick:(id)sender
@@ -361,7 +355,7 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
 
     struct extension_widget_value_t *value;
     unsigned i = 0;
-    for(value = [list widget]->p_values; value != NULL; value = value->p_next, i++)
+    for (value = [list widget]->p_values; value != NULL; value = value->p_next, i++)
         value->b_selected = (i == [list selectedRow]);
 }
 
@@ -371,7 +365,7 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
     VLCDialogPopUpButton *popup = sender;
     struct extension_widget_value_t *value;
     unsigned i = 0;
-    for(value = [popup widget]->p_values; value != NULL; value = value->p_next, i++)
+    for (value = [popup widget]->p_values; value != NULL; value = value->p_next, i++)
         value->b_selected = (i == [popup indexOfSelectedItem]);
 
 }
@@ -405,8 +399,7 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
     extension_widget_t *widget;
     VLCDialogWindow *dialogWindow = dialog->p_sys_intf;
 
-    FOREACH_ARRAY(widget, dialog->widgets)
-    {
+    FOREACH_ARRAY(widget, dialog->widgets) {
         if (!widget)
             continue; /* Some widgets may be NULL@this point */
 
@@ -414,8 +407,7 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
         NSView *control = widget->p_sys_intf;
         BOOL update = widget->b_update;
 
-        if (!control && !shouldDestroy)
-        {
+        if (!control && !shouldDestroy) {
             control = createControlFromWidget(widget, self);
             updateControlFromWidget(control, widget, self);
             widget->p_sys_intf = control;
@@ -423,17 +415,15 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
             [control setHidden:widget->b_hide];
         }
 
-        if (update && !shouldDestroy)
-        {
+        if (update && !shouldDestroy) {
             updateControlFromWidget(control, widget, self);
             [control setHidden:widget->b_hide];
 
             int row = widget->i_row - 1;
             int col = widget->i_column - 1;
-            int hsp = __MAX( 1, widget->i_horiz_span );
-            int vsp = __MAX( 1, widget->i_vert_span );
-            if( row < 0 )
-            {
+            int hsp = __MAX(1, widget->i_horiz_span);
+            int vsp = __MAX(1, widget->i_vert_span);
+            if (row < 0) {
                 row = 4;
                 col = 0;
             }
@@ -444,8 +434,7 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
             widget->b_update = false;
         }
 
-        if (shouldDestroy)
-        {
+        if (shouldDestroy) {
             VLCDialogGridView *gridView = (VLCDialogGridView *)[dialogWindow contentView];
             [gridView removeSubview:control];
             [control release];
@@ -462,8 +451,7 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
     VLCDialogWindow *dialogWindow = nil;
 
     BOOL shouldDestroy = p_dialog->b_kill;
-    if (!shouldDestroy)
-    {
+    if (!shouldDestroy) {
         NSRect content = NSMakeRect(0, 0, 1, 1);
         dialogWindow = [[VLCDialogWindow alloc] initWithContentRect:content
                                                           styleMask:NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask
@@ -483,8 +471,7 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
 
     [self updateWidgets:p_dialog];
 
-    if (shouldDestroy)
-    {
+    if (shouldDestroy) {
         [dialogWindow setDelegate:nil];
         [dialogWindow close];
         p_dialog->p_sys_intf = NULL;
@@ -498,16 +485,16 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
  * Note: Lock on p_dialog->lock must be held. */
 - (int)destroyExtensionDialog:(extension_dialog_t *)p_dialog
 {
-    assert( p_dialog );
+    assert(p_dialog);
 
-    VLCDialogWindow *dialogWindow = ( VLCDialogWindow* ) p_dialog->p_sys_intf;
-    if( !dialogWindow )
+    VLCDialogWindow *dialogWindow = (VLCDialogWindow*) p_dialog->p_sys_intf;
+    if (!dialogWindow)
         return VLC_EGENERIC;
 
     [VLCDialogWindow release];
 
     p_dialog->p_sys_intf = NULL;
-    vlc_cond_signal( &p_dialog->cond );
+    vlc_cond_signal(&p_dialog->cond);
     return VLC_SUCCESS;
 }
 
@@ -518,39 +505,31 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
 {
     extension_dialog_t *p_dialog = [o_value pointerValue];
 
-    VLCDialogWindow *dialogWindow = ( VLCDialogWindow* ) p_dialog->p_sys_intf;
-    if( p_dialog->b_kill && !dialogWindow )
-    {
+    VLCDialogWindow *dialogWindow = (VLCDialogWindow*) p_dialog->p_sys_intf;
+    if (p_dialog->b_kill && !dialogWindow) {
         /* This extension could not be activated properly but tried
            to create a dialog. We must ignore it. */
         return NULL;
     }
 
     vlc_mutex_lock(&p_dialog->lock);
-    if( !p_dialog->b_kill && !dialogWindow )
-    {
+    if (!p_dialog->b_kill && !dialogWindow) {
         dialogWindow = [self createExtensionDialog:p_dialog];
 
         BOOL visible = !p_dialog->b_hide;
-        if (visible)
-        {
+        if (visible) {
             [dialogWindow center];
             [dialogWindow makeKeyAndOrderFront:self];
-        }
-        else
-        {
+        } else
             [dialogWindow orderOut:nil];
-        }
 
         [dialogWindow setHas_lock:NO];
     }
-    else if( !p_dialog->b_kill && dialogWindow )
-    {
+    else if (!p_dialog->b_kill && dialogWindow) {
         [dialogWindow setHas_lock:YES];
         [self updateWidgets:p_dialog];
-        if( strcmp( [[dialogWindow title] UTF8String],
-                    p_dialog->psz_title ) != 0 )
-        {
+        if (strcmp([[dialogWindow title] UTF8String],
+                    p_dialog->psz_title) != 0) {
             NSString *titleString = [NSString stringWithCString:p_dialog->psz_title
                                                        encoding:NSUTF8StringEncoding];
 
@@ -560,33 +539,29 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
         [dialogWindow setHas_lock:NO];
 
         BOOL visible = !p_dialog->b_hide;
-        if (visible)
-        {
+        if (visible) {
             [dialogWindow center];
             [dialogWindow makeKeyAndOrderFront:self];
         }
         else
-        {
             [dialogWindow orderOut:nil];
-        }
     }
-    else if( p_dialog->b_kill )
-    {
+    else if (p_dialog->b_kill) {
         [self destroyExtensionDialog:p_dialog];
     }
-    vlc_cond_signal( &p_dialog->cond );
-    vlc_mutex_unlock( &p_dialog->lock );
+    vlc_cond_signal(&p_dialog->cond);
+    vlc_mutex_unlock(&p_dialog->lock);
     return dialogWindow;
 }
 
 /**
  * Ask the dialog manager to create/update/kill the dialog. Thread-safe.
  **/
-- (void)manageDialog:( extension_dialog_t *)p_dialog
+- (void)manageDialog:(extension_dialog_t *)p_dialog
 {
-    assert( p_dialog );
+    assert(p_dialog);
     ExtensionsManager *extMgr = [ExtensionsManager getInstance:p_intf];
-    assert( extMgr != NULL );
+    assert(extMgr != NULL);
 
     NSValue *o_value = [NSValue valueWithPointer:p_dialog];
     [self performSelectorOnMainThread:@selector(updateExtensionDialog:)

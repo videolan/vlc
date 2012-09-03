@@ -41,9 +41,9 @@ static VLCEyeTVController *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedInstance) {
+    if (_o_sharedInstance)
         [self dealloc];
-    } else {
+    else {
         _o_sharedInstance = [super init];
 
         [[NSDistributedNotificationCenter defaultCenter]
@@ -60,15 +60,15 @@ static VLCEyeTVController *_o_sharedInstance = nil;
 - (void)globalNotificationReceived: (NSNotification *)theNotification
 {
     /* update our info on the used device */
-    if( [[theNotification name] isEqualToString: @"DeviceAdded"] )
+    if ([[theNotification name] isEqualToString: @"DeviceAdded"])
         b_deviceConnected = YES;
-    if( [[theNotification name] isEqualToString: @"DeviceRemoved"] )
+    if ([[theNotification name] isEqualToString: @"DeviceRemoved"])
         b_deviceConnected = NO;
 
     /* is eyetv running? */
-    if( [[theNotification name] isEqualToString: @"PluginInit"] )
+    if ([[theNotification name] isEqualToString: @"PluginInit"])
         b_eyeTVactive = YES;
-    if( [[theNotification name] isEqualToString: @"PluginQuit"] )
+    if ([[theNotification name] isEqualToString: @"PluginQuit"])
         b_eyeTVactive = NO;
 }
 
@@ -80,10 +80,9 @@ static VLCEyeTVController *_o_sharedInstance = nil;
                  "end tell"];
     NSDictionary *errorDict;
     NSAppleEventDescriptor *descriptor = [script executeAndReturnError:&errorDict];
-    if( nil == descriptor )
-    {
+    if (nil == descriptor) {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
-        NSLog( @"opening EyeTV failed with error status '%@'", errorString );
+        NSLog(@"opening EyeTV failed with error status '%@'", errorString);
     }
     [script release];
 }
@@ -95,10 +94,9 @@ static VLCEyeTVController *_o_sharedInstance = nil;
             @"tell application \"EyeTV\" to get current channel"];
     NSDictionary *errorDict;
     NSAppleEventDescriptor *descriptor = [script executeAndReturnError:&errorDict];
-    if( nil == descriptor )
-    {
+    if (nil == descriptor) {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
-        NSLog( @"EyeTV channel inventory failed with error status '%@'", errorString );
+        NSLog(@"EyeTV channel inventory failed with error status '%@'", errorString);
     } else
         currentChannel = (int)[descriptor int32Value];
     [script release];
@@ -112,35 +110,29 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     NSDictionary *errorDict;
     NSAppleEventDescriptor *descriptor;
 
-    if( b_yesOrNo == YES )
-    {
+    if (b_yesOrNo == YES) {
         script = [[NSAppleScript alloc] initWithSource:
                     @"tell application \"EyeTV\"\n"
                        "channel_up\n"
                        "get current channel\n"
                      "end tell"];
-        NSLog( @"telling eyetv to switch 1 channel up" );
-    }
-    else
-    {
+        NSLog(@"telling eyetv to switch 1 channel up");
+    } else {
         script = [[NSAppleScript alloc] initWithSource:
                     @"tell application \"EyeTV\"\n"
                        "channel_down\n"
                        "get current channel\n"
                      "end tell"];
-        NSLog( @"telling eyetv to switch 1 channel down" );
+        NSLog(@"telling eyetv to switch 1 channel down");
     }
 
     descriptor = [script executeAndReturnError:&errorDict];
-    if( nil == descriptor )
-    {
+    if (nil == descriptor) {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
-        NSLog( @"EyeTV channel change failed with error status '%@'", errorString );
-    }
-    else
-    {
+        NSLog(@"EyeTV channel change failed with error status '%@'", errorString);
+    } else
         currentChannel = (int)[descriptor int32Value];
-    }
+
     [script release];
     return currentChannel;
 }
@@ -148,8 +140,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
 - (void)setChannel: (int)theChannelNum
 {
     NSAppleScript *script;
-    switch( theChannelNum )
-    {
+    switch(theChannelNum) {
         case -2: // Composite
             script = [[NSAppleScript alloc] initWithSource:
                         @"tell application \"EyeTV\"\n"
@@ -171,8 +162,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
                          "end tell"];
             break;
         default:
-            if( theChannelNum > 0 )
-            {
+            if (theChannelNum > 0) {
                 NSString *channel_change = [NSString stringWithFormat:
                     @"tell application \"EyeTV\"\n"
                      "  channel_change channel number %d\n"
@@ -185,10 +175,9 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     }
     NSDictionary *errorDict;
     NSAppleEventDescriptor *descriptor = [script executeAndReturnError:&errorDict];
-    if( nil == descriptor )
-    {
+    if (nil == descriptor) {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
-        NSLog( @"EyeTV source change failed with error status '%@'", errorString );
+        NSLog(@"EyeTV source change failed with error status '%@'", errorString);
     }
     [script release];
 }
@@ -200,19 +189,16 @@ static VLCEyeTVController *_o_sharedInstance = nil;
             @"tell application \"EyeTV\" to get name of every channel"];
     NSDictionary *errorDict;
     NSAppleEventDescriptor *descriptor = [script executeAndReturnError:&errorDict];
-    if( nil == descriptor )
-    {
+    if (nil == descriptor) {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
-        NSLog( @"EyeTV channel inventory failed with error status '%@'", errorString );
-    }
-    else
-    {
+        NSLog(@"EyeTV channel inventory failed with error status '%@'", errorString);
+    } else {
         int count = [descriptor numberOfItems];
         int x=0;
         NSMutableArray *channelArray = [NSMutableArray arrayWithCapacity:count];
-        while( x++ < count ) {
+        while(x++ < count)
             [channelArray addObject:[[descriptor descriptorAtIndex:x] stringValue]];
-        }
+
         channels = [channelArray objectEnumerator];
     }
     [script release];

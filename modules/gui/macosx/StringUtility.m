@@ -40,11 +40,10 @@ static VLCStringUtility *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedInstance) {
+    if (_o_sharedInstance)
         [self dealloc];
-    } else {
+    else
         _o_sharedInstance = [super init];
-    }
 
     return _o_sharedInstance;
 }
@@ -56,23 +55,19 @@ static VLCStringUtility *_o_sharedInstance = nil;
 {
     NSString * o_str = nil;
 
-    if( psz != NULL )
-    {
+    if (psz != NULL) {
         o_str = [NSString stringWithCString: _(psz) encoding:NSUTF8StringEncoding];
 
-        if( o_str == NULL )
-        {
-            msg_Err( VLCIntf, "could not translate: %s", psz );
-            return( @"" );
+        if (o_str == NULL) {
+            msg_Err(VLCIntf, "could not translate: %s", psz);
+            return(@"");
         }
-    }
-    else
-    {
-        msg_Warn( VLCIntf, "can't translate empty strings" );
-        return( @"" );
+    } else {
+        msg_Warn(VLCIntf, "can't translate empty strings");
+        return(@"");
     }
 
-    return( o_str );
+    return(o_str);
 }
 
 
@@ -83,19 +78,16 @@ static VLCStringUtility *_o_sharedInstance = nil;
                        allowLossyConversion: NO];
     char * psz_string;
 
-    if( o_data == nil )
-    {
+    if (o_data == nil) {
         o_data = [id dataUsingEncoding: NSUTF8StringEncoding
                   allowLossyConversion: YES];
-        psz_string = malloc( [o_data length] + 1 );
+        psz_string = malloc([o_data length] + 1);
         [o_data getBytes: psz_string];
         psz_string[ [o_data length] ] = '\0';
-        msg_Err( VLCIntf, "cannot convert to the requested encoding: %s",
-                psz_string );
-    }
-    else
-    {
-        psz_string = malloc( [o_data length] + 1 );
+        msg_Err(VLCIntf, "cannot convert to the requested encoding: %s",
+                psz_string);
+    } else {
+        psz_string = malloc([o_data length] + 1);
         [o_data getBytes: psz_string];
         psz_string[ [o_data length] ] = '\0';
     }
@@ -127,13 +119,13 @@ static VLCStringUtility *_o_sharedInstance = nil;
     o_wrapped = [o_in_string mutableCopy];
     glyphRange = [o_layout_manager glyphRangeForTextContainer: o_container];
 
-    for( glyphIndex = glyphRange.location ; glyphIndex < NSMaxRange(glyphRange) ;
+    for (glyphIndex = glyphRange.location ; glyphIndex < NSMaxRange(glyphRange) ;
         glyphIndex += effectiveRange.length) {
         lineFragmentRect = [o_layout_manager lineFragmentRectForGlyphAtIndex: glyphIndex
                                                               effectiveRange: &effectiveRange];
         charRange = [o_layout_manager characterRangeForGlyphRange: effectiveRange
                                                  actualGlyphRange: &effectiveRange];
-        if([o_wrapped lineRangeForRange:
+        if ([o_wrapped lineRangeForRange:
             NSMakeRange(charRange.location + breaksInserted, charRange.length)].length > charRange.length) {
             [o_wrapped insertString: @"\n" atIndex: NSMaxRange(charRange) + breaksInserted];
             breaksInserted++;
@@ -152,15 +144,13 @@ static VLCStringUtility *_o_sharedInstance = nil;
         /* remove cruft */
         if ([theString characterAtIndex:([theString length] - 1)] != 0x2b)
             theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
-        else
-        {
+        else {
             theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
             theString = [NSString stringWithFormat:@"%@+", theString];
         }
         if ([theString characterAtIndex:([theString length] - 1)] != 0x2d)
             theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
-        else
-        {
+        else {
             theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
             theString = [NSString stringWithFormat:@"%@-", theString];
         }
@@ -186,23 +176,21 @@ static VLCStringUtility *_o_sharedInstance = nil;
 
 - (NSString *)getCurrentTimeAsString:(input_thread_t *)p_input negative:(BOOL)b_negative
 {
-    assert( p_input != nil );
+    assert(p_input != nil);
     
     vlc_value_t time;
     char psz_time[MSTRTIME_MAX_SIZE];
     
-    var_Get( p_input, "time", &time );
+    var_Get(p_input, "time", &time);
     
-    mtime_t dur = input_item_GetDuration( input_GetItem( p_input ) );
-    if( b_negative && dur > 0 )
-    {
+    mtime_t dur = input_item_GetDuration(input_GetItem(p_input));
+    if (b_negative && dur > 0) {
         mtime_t remaining = 0;
-        if( dur > time.i_time )
+        if (dur > time.i_time)
             remaining = dur - time.i_time;
-        return [NSString stringWithFormat: @"-%s", secstotimestr( psz_time, ( remaining / 1000000 ) )];
-    }
-    else
-        return [NSString stringWithUTF8String: secstotimestr( psz_time, ( time.i_time / 1000000 ) )];
+        return [NSString stringWithFormat: @"-%s", secstotimestr(psz_time, (remaining / 1000000))];
+    } else
+        return [NSString stringWithUTF8String: secstotimestr(psz_time, (time.i_time / 1000000))];
 }
 
 #pragma mark -
@@ -244,14 +232,12 @@ static struct
     {0,0}
 };
 
-unsigned int CocoaKeyToVLC( unichar i_key )
+unsigned int CocoaKeyToVLC(unichar i_key)
 {
     unsigned int i;
 
-    for( i = 0; nskeys_to_vlckeys[i].i_nskey != 0; i++ )
-    {
-        if( nskeys_to_vlckeys[i].i_nskey == i_key )
-        {
+    for (i = 0; nskeys_to_vlckeys[i].i_nskey != 0; i++) {
+        if (nskeys_to_vlckeys[i].i_nskey == i_key) {
             return nskeys_to_vlckeys[i].i_vlckey;
         }
     }
@@ -262,13 +248,13 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 {
     unsigned int new = 0;
 
-    if([theString rangeOfString:@"Command"].location != NSNotFound)
+    if ([theString rangeOfString:@"Command"].location != NSNotFound)
         new |= NSCommandKeyMask;
-    if([theString rangeOfString:@"Alt"].location != NSNotFound)
+    if ([theString rangeOfString:@"Alt"].location != NSNotFound)
         new |= NSAlternateKeyMask;
-    if([theString rangeOfString:@"Shift"].location != NSNotFound)
+    if ([theString rangeOfString:@"Shift"].location != NSNotFound)
         new |= NSShiftKeyMask;
-    if([theString rangeOfString:@"Ctrl"].location != NSNotFound)
+    if ([theString rangeOfString:@"Ctrl"].location != NSNotFound)
         new |= NSControlKeyMask;
     return new;
 }
@@ -278,15 +264,13 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     if (![theString isEqualToString:@""]) {
         if ([theString characterAtIndex:([theString length] - 1)] != 0x2b)
             theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
-        else
-        {
+        else {
             theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
             theString = [NSString stringWithFormat:@"%@+", theString];
         }
         if ([theString characterAtIndex:([theString length] - 1)] != 0x2d)
             theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
-        else
-        {
+        else {
             theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
             theString = [NSString stringWithFormat:@"%@-", theString];
         }
@@ -295,59 +279,58 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         theString = [theString stringByReplacingOccurrencesOfString:@"Shift" withString:@""];
         theString = [theString stringByReplacingOccurrencesOfString:@"Ctrl" withString:@""];
     }
-    if ([theString length] > 1)
-    {
-        if([theString rangeOfString:@"Up"].location != NSNotFound)
+    if ([theString length] > 1) {
+        if ([theString rangeOfString:@"Up"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSUpArrowFunctionKey];
-        else if([theString rangeOfString:@"Down"].location != NSNotFound)
+        else if ([theString rangeOfString:@"Down"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSDownArrowFunctionKey];
-        else if([theString rangeOfString:@"Right"].location != NSNotFound)
+        else if ([theString rangeOfString:@"Right"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSRightArrowFunctionKey];
-        else if([theString rangeOfString:@"Left"].location != NSNotFound)
+        else if ([theString rangeOfString:@"Left"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSLeftArrowFunctionKey];
-        else if([theString rangeOfString:@"Enter"].location != NSNotFound)
+        else if ([theString rangeOfString:@"Enter"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSEnterCharacter]; // we treat NSCarriageReturnCharacter as aquivalent
-        else if([theString rangeOfString:@"Insert"].location != NSNotFound)
+        else if ([theString rangeOfString:@"Insert"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSInsertFunctionKey];
-        else if([theString rangeOfString:@"Home"].location != NSNotFound)
+        else if ([theString rangeOfString:@"Home"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSHomeFunctionKey];
-        else if([theString rangeOfString:@"End"].location != NSNotFound)
+        else if ([theString rangeOfString:@"End"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSEndFunctionKey];
-        else if([theString rangeOfString:@"Pageup"].location != NSNotFound)
+        else if ([theString rangeOfString:@"Pageup"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSPageUpFunctionKey];
-        else if([theString rangeOfString:@"Pagedown"].location != NSNotFound)
+        else if ([theString rangeOfString:@"Pagedown"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSPageDownFunctionKey];
-        else if([theString rangeOfString:@"Menu"].location != NSNotFound)
+        else if ([theString rangeOfString:@"Menu"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSMenuFunctionKey];
-        else if([theString rangeOfString:@"Tab"].location != NSNotFound)
+        else if ([theString rangeOfString:@"Tab"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSTabCharacter];
-        else if([theString rangeOfString:@"Backspace"].location != NSNotFound)
+        else if ([theString rangeOfString:@"Backspace"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSBackspaceCharacter];
-        else if([theString rangeOfString:@"Delete"].location != NSNotFound)
+        else if ([theString rangeOfString:@"Delete"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSDeleteCharacter];
-        else if([theString rangeOfString:@"F12"].location != NSNotFound)
+        else if ([theString rangeOfString:@"F12"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSF12FunctionKey];
-        else if([theString rangeOfString:@"F11"].location != NSNotFound)
+        else if ([theString rangeOfString:@"F11"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSF11FunctionKey];
-        else if([theString rangeOfString:@"F10"].location != NSNotFound)
+        else if ([theString rangeOfString:@"F10"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSF10FunctionKey];
-        else if([theString rangeOfString:@"F9"].location != NSNotFound)
+        else if ([theString rangeOfString:@"F9"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSF9FunctionKey];
-        else if([theString rangeOfString:@"F8"].location != NSNotFound)
+        else if ([theString rangeOfString:@"F8"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSF8FunctionKey];
-        else if([theString rangeOfString:@"F7"].location != NSNotFound)
+        else if ([theString rangeOfString:@"F7"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSF7FunctionKey];
-        else if([theString rangeOfString:@"F6"].location != NSNotFound)
+        else if ([theString rangeOfString:@"F6"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSF6FunctionKey];
-        else if([theString rangeOfString:@"F5"].location != NSNotFound)
+        else if ([theString rangeOfString:@"F5"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSF5FunctionKey];
-        else if([theString rangeOfString:@"F4"].location != NSNotFound)
+        else if ([theString rangeOfString:@"F4"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSF4FunctionKey];
-        else if([theString rangeOfString:@"F3"].location != NSNotFound)
+        else if ([theString rangeOfString:@"F3"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSF3FunctionKey];
-        else if([theString rangeOfString:@"F2"].location != NSNotFound)
+        else if ([theString rangeOfString:@"F2"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSF2FunctionKey];
-        else if([theString rangeOfString:@"F1"].location != NSNotFound)
+        else if ([theString rangeOfString:@"F1"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSF1FunctionKey];
         /* note that we don't support esc here, since it is reserved for leaving fullscreen */
     }

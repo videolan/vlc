@@ -39,30 +39,30 @@
     NSString *o_command = [[self commandDescription] commandName];
     NSString *o_urlString = [self directParameter];
 
-    if ( [o_command isEqualToString:@"GetURL"] || [o_command isEqualToString:@"OpenURL"] ) {
+    if ([o_command isEqualToString:@"GetURL"] || [o_command isEqualToString:@"OpenURL"]) {
         intf_thread_t * p_intf = VLCIntf;
-        playlist_t * p_playlist = pl_Get( p_intf );
+        playlist_t * p_playlist = pl_Get(p_intf);
 
-        if ( o_urlString ) {
+        if (o_urlString) {
             NSURL * o_url;
             input_item_t *p_input;
             int returnValue;
 
-            p_input = input_item_New( [o_urlString fileSystemRepresentation],
+            p_input = input_item_New([o_urlString fileSystemRepresentation],
                                     [[[NSFileManager defaultManager]
-                                    displayNameAtPath: o_urlString] UTF8String] );
+                                    displayNameAtPath: o_urlString] UTF8String]);
             if (!p_input)
                 return nil;
 
-            returnValue = playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT,
-                               PLAYLIST_END, true, pl_Unlocked );
-            vlc_gc_decref( p_input );
+            returnValue = playlist_AddInput(p_playlist, p_input, PLAYLIST_INSERT,
+                               PLAYLIST_END, true, pl_Unlocked);
+            vlc_gc_decref(p_input);
 
             if (returnValue != VLC_SUCCESS)
                 return nil;
 
             o_url = [NSURL fileURLWithPath: o_urlString];
-            if( o_url != nil )
+            if (o_url != nil)
                 [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: o_url];
         }
     }
@@ -86,25 +86,25 @@
     NSString *o_parameter = [self directParameter];
 
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Get( p_intf );
+    playlist_t * p_playlist = pl_Get(p_intf);
 
-    if ( [o_command isEqualToString:@"play"] )
+    if ([o_command isEqualToString:@"play"])
         [[VLCCoreInteraction sharedInstance] play];
-    else if ( [o_command isEqualToString:@"stop"] )
+    else if ([o_command isEqualToString:@"stop"])
         [[VLCCoreInteraction sharedInstance] stop];
-    else if ( [o_command isEqualToString:@"previous"] )
+    else if ([o_command isEqualToString:@"previous"])
         [[VLCCoreInteraction sharedInstance] previous];
-    else if ( [o_command isEqualToString:@"next"] )
+    else if ([o_command isEqualToString:@"next"])
         [[VLCCoreInteraction sharedInstance] next];
-    else if ( [o_command isEqualToString:@"fullscreen"] )
+    else if ([o_command isEqualToString:@"fullscreen"])
         [[VLCCoreInteraction sharedInstance] toggleFullscreen];
-    else if ( [o_command isEqualToString:@"mute"] )
+    else if ([o_command isEqualToString:@"mute"])
         [[VLCCoreInteraction sharedInstance] setMute: YES];
-    else if ( [o_command isEqualToString:@"volumeUp"] )
+    else if ([o_command isEqualToString:@"volumeUp"])
         [[VLCCoreInteraction sharedInstance] volumeUp];
-    else if ( [o_command isEqualToString:@"volumeDown"] )
+    else if ([o_command isEqualToString:@"volumeDown"])
         [[VLCCoreInteraction sharedInstance] volumeDown];
-    else if ( [o_command isEqualToString:@"stepForward"] ) {
+    else if ([o_command isEqualToString:@"stepForward"]) {
         //default: forwardShort
         if (o_parameter) {
             int i_parameter = [o_parameter intValue];
@@ -127,7 +127,7 @@
             }
         } else
             [[VLCCoreInteraction sharedInstance] forwardShort];
-    } else if ( [o_command isEqualToString:@"stepBackward"] ) {
+    } else if ([o_command isEqualToString:@"stepBackward"]) {
         //default: backwardShort
         if (o_parameter) {
             int i_parameter = [o_parameter intValue];
@@ -161,23 +161,24 @@
  *****************************************************************************/
 @implementation NSApplication(ScriptSupport)
 
-- (BOOL) scriptFullscreenMode {
+- (BOOL)scriptFullscreenMode {
     vout_thread_t * p_vout = getVout();
-    if( !p_vout )
+    if (!p_vout)
         return NO;
-    BOOL b_value = var_GetBool( p_vout, "fullscreen");
-    vlc_object_release( p_vout );
+    BOOL b_value = var_GetBool(p_vout, "fullscreen");
+    vlc_object_release(p_vout);
     return b_value;
 }
-- (void) setScriptFullscreenMode: (BOOL) mode {
+
+- (void)setScriptFullscreenMode:(BOOL)mode {
     vout_thread_t * p_vout = getVout();
-    if( !p_vout )
+    if (!p_vout)
         return;
-    if (var_GetBool( p_vout, "fullscreen") == mode) {
-        vlc_object_release( p_vout );
+    if (var_GetBool(p_vout, "fullscreen") == mode) {
+        vlc_object_release(p_vout);
         return;
     }
-    vlc_object_release( p_vout );
+    vlc_object_release(p_vout);
     [[VLCCoreInteraction sharedInstance] toggleFullscreen];
 }
 
@@ -187,51 +188,51 @@
 
 - (BOOL) playing {
     intf_thread_t *p_intf = VLCIntf;
-    if( !p_intf )
+    if (!p_intf)
         return NO;
 
-    input_thread_t * p_input = pl_CurrentInput( p_intf );
-    if( !p_input )
+    input_thread_t * p_input = pl_CurrentInput(p_intf);
+    if (!p_input)
         return NO;
 
     input_state_e i_state = ERROR_S;
-    input_Control( p_input, INPUT_GET_STATE, &i_state );
-    vlc_object_release( p_input );
+    input_Control(p_input, INPUT_GET_STATE, &i_state);
+    vlc_object_release(p_input);
 
-    return ( ( i_state == OPENING_S ) || ( i_state == PLAYING_S ) );
+    return ((i_state == OPENING_S) || (i_state == PLAYING_S));
 }
 
 - (int) audioVolume {
-    return ( [[VLCCoreInteraction sharedInstance] volume] );
+    return ([[VLCCoreInteraction sharedInstance] volume]);
 }
 
-- (void) setAudioVolume: (int) i_audioVolume {
+- (void) setAudioVolume:(int)i_audioVolume {
     [[VLCCoreInteraction sharedInstance] setVolume:(int)i_audioVolume];
 }
 
 - (int) currentTime {
-    input_thread_t * p_input = pl_CurrentInput( VLCIntf );
+    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
     int64_t i_currentTime = -1;
 
-    if( !p_input )
+    if (!p_input)
         return i_currentTime;
 
-    input_Control( p_input, INPUT_GET_TIME, &i_currentTime );
-    vlc_object_release( p_input );
+    input_Control(p_input, INPUT_GET_TIME, &i_currentTime);
+    vlc_object_release(p_input);
 
-    return (int)( i_currentTime / 1000000 );
+    return (int)(i_currentTime / 1000000);
 }
 
-- (void) setCurrentTime: (int) i_currentTime {
+- (void) setCurrentTime:(int)i_currentTime {
     if (i_currentTime) {
         int64_t i64_value = (int64_t)i_currentTime;
-        input_thread_t * p_input = pl_CurrentInput( VLCIntf );
+        input_thread_t * p_input = pl_CurrentInput(VLCIntf);
 
-        if ( !p_input )
+        if (!p_input)
             return;
 
-        input_Control( p_input, INPUT_SET_TIME, (int64_t)(i64_value * 1000000) );
-        vlc_object_release( p_input );
+        input_Control(p_input, INPUT_SET_TIME, (int64_t)(i64_value * 1000000));
+        vlc_object_release(p_input);
     }
 }
 

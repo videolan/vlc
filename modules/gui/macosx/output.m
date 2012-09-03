@@ -180,13 +180,9 @@
 - (IBAction)outputChanged:(id)sender;
 {
     if ([o_output_ckbox state] == NSOnState)
-    {
         [o_output_settings setEnabled:YES];
-    }
     else
-    {
         [o_output_settings setEnabled:NO];
-    }
 }
 
 - (IBAction)outputSettings:(id)sender
@@ -217,8 +213,7 @@
     [o_sdp_url setEnabled: NO];
     [[o_mux_selector itemAtIndex: 0] setEnabled: YES];
 
-    if( [o_mode isEqualToString: _NS("File")] )
-    {
+    if ([o_mode isEqualToString: _NS("File")]) {
         [o_file_field setEnabled: YES];
         [o_btn_browse setEnabled: YES];
         [o_dump_chkbox setEnabled: YES];
@@ -237,9 +232,7 @@
         [[o_mux_selector itemAtIndex: 6] setEnabled: YES]; // MPEG 4
         [[o_mux_selector itemAtIndex: 7] setEnabled: YES]; // QuickTime
         [[o_mux_selector itemAtIndex: 8] setEnabled: YES]; // Raw
-    }
-    else if( [o_mode isEqualToString: _NS("Stream")] )
-    {
+    } else if ([o_mode isEqualToString: _NS("Stream")]) {
         [o_file_field setEnabled: NO];
         [o_dump_chkbox setEnabled: NO];
         [o_btn_browse setEnabled: NO];
@@ -250,8 +243,7 @@
 
         o_mode = [o_stream_type titleOfSelectedItem];
 
-        if( [o_mode isEqualToString: @"HTTP"] )
-        {
+        if ([o_mode isEqualToString: @"HTTP"]) {
             [o_stream_address setEnabled: YES];
             [o_stream_ttl setEnabled: NO];
             [o_stream_ttl_stp setEnabled: NO];
@@ -263,9 +255,7 @@
             [[o_mux_selector itemAtIndex: 6] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 7] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 8] setEnabled: YES];
-        }
-        else if( [o_mode isEqualToString: @"MMSH"] )
-        {
+        } else if ([o_mode isEqualToString: @"MMSH"]) {
             [o_stream_address setEnabled: YES];
             [o_stream_ttl setEnabled: NO];
             [o_stream_ttl_stp setEnabled: NO];
@@ -279,9 +269,7 @@
             [[o_mux_selector itemAtIndex: 7] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 8] setEnabled: NO];
             [o_mux_selector selectItemAtIndex: 5];
-        }
-        else if( [o_mode isEqualToString: @"UDP"] )
-        {
+        } else if ([o_mode isEqualToString: @"UDP"]) {
             [o_stream_address setEnabled: YES];
             [o_stream_ttl setEnabled: YES];
             [o_stream_ttl_stp setEnabled: YES];
@@ -295,9 +283,7 @@
             [[o_mux_selector itemAtIndex: 8] setEnabled: YES];
             [o_sap_chkbox setEnabled: YES];
             [o_channel_name setEnabled: YES];
-        }
-        else if( [o_mode isEqualToString: @"RTP"] )
-        {
+        } else if ([o_mode isEqualToString: @"RTP"]) {
             [o_stream_address setEnabled: YES];
             [o_stream_ttl setEnabled: YES];
             [o_stream_ttl_stp setEnabled: YES];
@@ -319,14 +305,11 @@
         }
     }
 
-    if( ![[o_mux_selector selectedItem] isEnabled] && ![o_mode isEqualToString: @"RTP"] )
-    {
+    if (![[o_mux_selector selectedItem] isEnabled] && ![o_mode isEqualToString: @"RTP"])
         [o_mux_selector selectItemAtIndex: 0];
-    }
-    else if (![[o_mux_selector selectedItem] isEnabled] && [o_mode isEqualToString: @"RTP"] )
-    {
+    else if (![[o_mux_selector selectedItem] isEnabled] && [o_mode isEqualToString: @"RTP"])
         [o_mux_selector selectItemAtIndex: 8];
-    }
+
     [self outputInfoChanged: nil];
 }
 
@@ -338,28 +321,24 @@
     NSArray *o_sout_options;
 
     [o_mrl_string appendString: o_transcode];
-    if( [o_display state] == NSOnState )
-    {
+    if ([o_display state] == NSOnState)
         [o_mrl_string appendString: @"duplicate{dst=display,dst="];
-    }
 
     o_mode = [[o_method selectedCell] title];
     o_mux = [o_mux_selector titleOfSelectedItem];
 
-    if ( [o_mux isEqualToString: @"AVI"] ) o_mux_string = @"avi";
-    else if ( [o_mux isEqualToString: @"Ogg"] ) o_mux_string = @"ogg";
-    else if ( [o_mux isEqualToString: @"MPEG PS"] ) o_mux_string = @"ps";
-    else if ( [o_mux isEqualToString: @"MPEG 4"] ) o_mux_string = @"mp4";
-    else if ( [o_mux isEqualToString: @"MPEG 1"] ) o_mux_string = @"mpeg1";
-    else if ( [o_mux isEqualToString: @"Quicktime"] ) o_mux_string = @"mov";
-    else if ( [o_mux isEqualToString: @"ASF"] ) o_mux_string = @"asf";
-    else if ( [o_mux isEqualToString: @"Raw"] ) o_mux_string = @"raw";
+    if ([o_mux isEqualToString: @"AVI"]) o_mux_string = @"avi";
+    else if ([o_mux isEqualToString: @"Ogg"]) o_mux_string = @"ogg";
+    else if ([o_mux isEqualToString: @"MPEG PS"]) o_mux_string = @"ps";
+    else if ([o_mux isEqualToString: @"MPEG 4"]) o_mux_string = @"mp4";
+    else if ([o_mux isEqualToString: @"MPEG 1"]) o_mux_string = @"mpeg1";
+    else if ([o_mux isEqualToString: @"Quicktime"]) o_mux_string = @"mov";
+    else if ([o_mux isEqualToString: @"ASF"]) o_mux_string = @"asf";
+    else if ([o_mux isEqualToString: @"Raw"]) o_mux_string = @"raw";
     else o_mux_string = @"ts";
 
-    if( [o_mode isEqualToString: _NS("File")] )
-    {
-        if( [o_dump_chkbox state] == NSOnState )
-        {
+    if ([o_mode isEqualToString: _NS("File")]) {
+        if ([o_dump_chkbox state] == NSOnState) {
             NSMutableArray * o_sout_options;
             o_sout_options = [NSArray arrayWithObjects:
                                     @":demux=dump",
@@ -369,39 +348,28 @@
                                     nil];
             [self setSoutMRL:o_sout_options];
             return;
-        }
-        else
-        {
-                [o_mrl_string appendFormat:
-                        @"std{access=file,mux=%@,dst=\"%@\"}",
-                        o_mux_string, [o_file_field stringValue]];
-        }
+        } else
+                [o_mrl_string appendFormat: @"std{access=file,mux=%@,dst=\"%@\"}", o_mux_string, [o_file_field stringValue]];
     }
-    else if( [o_mode isEqualToString: _NS("Stream")] )
-    {
+    else if ([o_mode isEqualToString: _NS("Stream")]) {
         o_mode = [o_stream_type titleOfSelectedItem];
 
-        if ( [o_mode isEqualToString: @"HTTP"] )
+        if ([o_mode isEqualToString: @"HTTP"])
             o_mode = @"http";
-        else if ( [o_mode isEqualToString: @"MMSH"] )
-        {
-            if ( [o_mux isEqualToString: @"ASF"] ) o_mux_string = @"asfh";
+        else if ([o_mode isEqualToString: @"MMSH"]) {
+            if ([o_mux isEqualToString: @"ASF"])
+                o_mux_string = @"asfh";
             o_mode = @"mmsh";
-        }
-        else if ( [o_mode isEqualToString: @"UDP"] )
-        {
+        } else if ([o_mode isEqualToString: @"UDP"]) {
             o_mode = @"udp";
-            if( [o_sap_chkbox state] == NSOnState )
-            {
-                if ( ![[o_channel_name stringValue] isEqualToString: @""] )
-                    [o_announce appendFormat:
-                        @",sap,name=%@", [o_channel_name stringValue]];
+            if ([o_sap_chkbox state] == NSOnState) {
+                if (![[o_channel_name stringValue] isEqualToString: @""])
+                    [o_announce appendFormat:@",sap,name=%@", [o_channel_name stringValue]];
                 else
                     [o_announce appendFormat:@",sap"];
             }
         }
-        if ( ![o_mode isEqualToString: @"RTP"] )
-        {
+        if (![o_mode isEqualToString: @"RTP"]) {
             /* split up the hostname and the following path to paste the
              * port correctly. Not need, if there isn't any path following the
              * hostname. */
@@ -410,65 +378,47 @@
             o_finalStreamAddress = [[NSMutableString alloc] init];
 
             if ([o_urlItems count] == 1)
-            {
                 [o_finalStreamAddress appendFormat: @"\"%@:%@\"", [o_stream_address stringValue],[o_stream_port stringValue]];
-            }
-            else
-            {
+            else {
                 [o_finalStreamAddress appendFormat: @"\"%@:%@", [o_urlItems objectAtIndex: 0], [o_stream_port stringValue]];
                 NSUInteger itemCount = [o_urlItems count];
                 for (NSUInteger x = 0; x < itemCount; x++)
-                {
                     [o_finalStreamAddress appendFormat: @"/%@", [o_urlItems objectAtIndex: x]];
-                }
                 [o_finalStreamAddress appendString: @"\""];
             }
 
             [o_mrl_string appendFormat:
                         @"std{access=%@,mux=%@,dst=%@%@}",
                         o_mode, o_mux_string, o_finalStreamAddress, o_announce];
-        }
-        else
-        {
+        } else {
             NSString * o_stream_name;
 
-            if (![[o_channel_name stringValue] isEqualToString: @""] )
-            {
-                o_stream_name = [NSString stringWithFormat:@",name=%@",
-                                [o_channel_name stringValue]];
-            }
+            if (![[o_channel_name stringValue] isEqualToString: @""])
+                o_stream_name = [NSString stringWithFormat:@",name=%@", [o_channel_name stringValue]];
             else
-            {
                 o_stream_name = @"";
-            }
 
-            if ( [o_sap_chkbox state] == NSOnState )
-            {
+            if ([o_sap_chkbox state] == NSOnState)
                 [o_announce appendString: @",sdp=sap"];
-            }
-            if ([o_rtsp_chkbox state] == NSOnState )
-            {
+
+            if ([o_rtsp_chkbox state] == NSOnState)
                 [o_announce appendFormat:@",sdp=\"rtsp://%@\"",[o_sdp_url stringValue]];
 
-            }
-            if ([o_http_chkbox state] == NSOnState )
-            {
+            if ([o_http_chkbox state] == NSOnState)
                 [o_announce appendFormat:@",sdp=\"http://%@\"",[o_sdp_url stringValue]];
-            }
-            if ([o_file_chkbox state] == NSOnState )
-            {
+
+            if ([o_file_chkbox state] == NSOnState)
                 [o_announce appendFormat:@",sdp=\"file://%@\"",[o_sdp_url stringValue]];
-            }
+
             [o_mrl_string appendFormat:
                         @"rtp{dst=\"%@\",port=%@%@%@}",[o_stream_address stringValue],
                         [o_stream_port stringValue], o_stream_name, o_announce];
         }
 
     }
-    if( [o_display state] == NSOnState )
-    {
+    if ([o_display state] == NSOnState)
         [o_mrl_string appendString: @"}"];
-    }
+
     o_sout_options = [NSArray arrayWithObjects: o_mrl_string,nil];
     [self setSoutMRL:o_sout_options];
 }
@@ -476,28 +426,28 @@
 - (void)TTLChanged:(NSNotification *)o_notification
 {
     intf_thread_t * p_intf = VLCIntf;
-    config_PutInt( p_intf, "ttl", [o_stream_ttl intValue] );
+    config_PutInt(p_intf, "ttl", [o_stream_ttl intValue]);
 }
 
 - (IBAction)outputFileBrowse:(id)sender
 {
     NSSavePanel *o_save_panel = [NSSavePanel savePanel];
     NSString *o_mux_string;
-    if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: @"MPEG PS"] )
+    if ([[o_mux_selector titleOfSelectedItem] isEqualToString: @"MPEG PS"])
         o_mux_string = @"vob";
-    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: @"MPEG 1"] )
+    else if ([[o_mux_selector titleOfSelectedItem] isEqualToString: @"MPEG 1"])
         o_mux_string = @"mpg";
-    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: @"AVI"] )
+    else if ([[o_mux_selector titleOfSelectedItem] isEqualToString: @"AVI"])
         o_mux_string = @"avi";
-    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: @"ASF"] )
+    else if ([[o_mux_selector titleOfSelectedItem] isEqualToString: @"ASF"])
         o_mux_string = @"asf";
-    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: @"Ogg"] )
+    else if ([[o_mux_selector titleOfSelectedItem] isEqualToString: @"Ogg"])
         o_mux_string = @"ogm";
-    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: @"MPEG 4"] )
+    else if ([[o_mux_selector titleOfSelectedItem] isEqualToString: @"MPEG 4"])
         o_mux_string = @"mp4";
-    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: @"Quicktime"] )
+    else if ([[o_mux_selector titleOfSelectedItem] isEqualToString: @"Quicktime"])
         o_mux_string = @"mov";
-    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: @"Raw"] )
+    else if ([[o_mux_selector titleOfSelectedItem] isEqualToString: @"Raw"])
         o_mux_string = @"raw";
     else
         o_mux_string = @"ts";
@@ -509,8 +459,7 @@
     [o_save_panel setPrompt: _NS("Save")];
     [o_save_panel setNameFieldStringValue: o_name];
 
-    if( [o_save_panel runModal] == NSFileHandlingPanelOKButton )
-    {
+    if ([o_save_panel runModal] == NSFileHandlingPanelOKButton) {
         NSString *o_filename = [[o_save_panel URL] path];
         [o_file_field setStringValue: o_filename];
         [self outputInfoChanged: nil];
@@ -531,26 +480,20 @@
 
 - (void)transcodeChanged:(NSNotification *)o_notification
 {
-    if( [o_transcode_video_chkbox state] == NSOnState )
-    {
+    if ([o_transcode_video_chkbox state] == NSOnState) {
         [o_transcode_video_selector setEnabled: YES];
         [o_transcode_video_bitrate setEnabled: YES];
         [o_transcode_video_scale setEnabled: YES];
-    }
-    else
-    {
+    } else {
         [o_transcode_video_selector setEnabled: NO];
         [o_transcode_video_bitrate setEnabled: NO];
         [o_transcode_video_scale setEnabled: NO];
     }
-    if( [o_transcode_audio_chkbox state] == NSOnState )
-    {
+    if ([o_transcode_audio_chkbox state] == NSOnState) {
         [o_transcode_audio_selector setEnabled: YES];
         [o_transcode_audio_bitrate setEnabled: YES];
         [o_transcode_audio_channels setEnabled: YES];
-    }
-    else
-    {
+    } else {
         [o_transcode_audio_selector setEnabled: NO];
         [o_transcode_audio_bitrate setEnabled: NO];
         [o_transcode_audio_channels setEnabled: NO];
@@ -563,33 +506,24 @@
 {
     NSMutableString *o_transcode_string = [NSMutableString stringWithCapacity:200];
 
-    if( [o_transcode_video_chkbox state] == NSOnState ||
-        [o_transcode_audio_chkbox state] == NSOnState )
-    {
+    if ([o_transcode_video_chkbox state] == NSOnState ||
+        [o_transcode_audio_chkbox state] == NSOnState) {
         [o_transcode_string appendString:@"transcode{"];
-        if ( [o_transcode_video_chkbox state] == NSOnState )
-        {
+        if ([o_transcode_video_chkbox state] == NSOnState) {
             [o_transcode_string appendFormat: @"vcodec=\"%@\",vb=\"%@\"" \
                                                             ",scale=\"%@\"",
                 [o_transcode_video_selector titleOfSelectedItem],
                 [o_transcode_video_bitrate stringValue],
                 [o_transcode_video_scale stringValue]];
-            if ( [o_transcode_audio_chkbox state] == NSOnState )
-            {
+            if ([o_transcode_audio_chkbox state] == NSOnState)
                 [o_transcode_string appendString: @","];
-            }
         }
-        if ( [o_transcode_audio_chkbox state] == NSOnState )
-        {
+        if ([o_transcode_audio_chkbox state] == NSOnState) {
             [o_transcode_string appendFormat: @"acodec=\"%@\",ab=\"%@\"",
                 [o_transcode_audio_selector titleOfSelectedItem],
                 [o_transcode_audio_bitrate stringValue]];
-            if ( ![[o_transcode_audio_channels stringValue]
-                                            isEqualToString: @""])
-            {
-                [o_transcode_string appendFormat: @",channels=\"%@\"",
-                                   [o_transcode_audio_channels stringValue]];
-            }
+            if (![[o_transcode_audio_channels stringValue] isEqualToString: @""])
+                [o_transcode_string appendFormat: @",channels=\"%@\"", [o_transcode_audio_channels stringValue]];
         }
         [o_transcode_string appendString:@"}:"];
     }
@@ -607,41 +541,30 @@
     [o_channel_name setEnabled: [o_sap_chkbox state] ||
                 [o_mode isEqualToString: @"RTP"]];
 
-    if ([o_mode isEqualToString: @"RTP"])
-    {
-/*        if ([[sender title] isEqualToString: _NS("SAP announce")])
-        {
+    if ([o_mode isEqualToString: @"RTP"]) {
+/*        if ([[sender title] isEqualToString: _NS("SAP announce")]) {
             [o_rtsp_chkbox setState:NSOffState];
             [o_http_chkbox setState:NSOffState];
         }*/
-        if ([[sender title] isEqualToString:_NS("RTSP announce")])
-        {
+        if ([[sender title] isEqualToString:_NS("RTSP announce")]) {
 //            [o_sap_chkbox setState:NSOffState];
             [o_http_chkbox setState:NSOffState];
             [o_file_chkbox setState:NSOffState];
-        }
-        else if ([[sender title] isEqualToString:_NS("HTTP announce")])
-        {
+        } else if ([[sender title] isEqualToString:_NS("HTTP announce")]) {
 //            [o_sap_chkbox setState:NSOffState];
             [o_rtsp_chkbox setState:NSOffState];
             [o_file_chkbox setState:NSOffState];
-        }
-        else if ([[sender title] isEqualToString:_NS("Export SDP as file")])
-        {
+        } else if ([[sender title] isEqualToString:_NS("Export SDP as file")]) {
             [o_rtsp_chkbox setState:NSOffState];
             [o_http_chkbox setState:NSOffState];
         }
 
-        if ( [o_rtsp_chkbox state] == NSOnState ||
-                            [o_http_chkbox state] == NSOnState ||
-                            [o_file_chkbox state] == NSOnState )
-        {
+        if ([o_rtsp_chkbox state] == NSOnState ||
+            [o_http_chkbox state] == NSOnState ||
+            [o_file_chkbox state] == NSOnState)
             [o_sdp_url setEnabled: YES];
-        }
         else
-        {
             [o_sdp_url setEnabled: NO];
-        }
     }
     [self outputInfoChanged: nil];
 }

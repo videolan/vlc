@@ -50,8 +50,7 @@
     i_size = sizeof( i_device );
     AudioObjectPropertyAddress deviceAddress = { kAudioHardwarePropertyDefaultOutputDevice, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
     err = AudioObjectGetPropertyData( kAudioObjectSystemObject, &deviceAddress, 0, NULL, &i_size, &i_device );
-    if (err != noErr)
-    {
+    if (err != noErr) {
         msg_Warn( VLCIntf, "couldn't get main audio output device" );
         return .0;
     }
@@ -59,8 +58,7 @@
     AudioObjectPropertyAddress propertyAddress = { kAudioDevicePropertyVolumeScalar, kAudioDevicePropertyScopeOutput, channel };
     i_size = sizeof( f_volume );
     err = AudioObjectGetPropertyData(i_device, &propertyAddress, 0, NULL, &i_size, &f_volume);
-    if (err != noErr)
-    {
+    if (err != noErr) {
         msg_Warn( VLCIntf, "couldn't get volume value" );
         return .0;
     }
@@ -80,8 +78,7 @@
     i_size = sizeof( i_device );
     AudioObjectPropertyAddress deviceAddress = { kAudioHardwarePropertyDefaultOutputDevice, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
     err = AudioObjectGetPropertyData( kAudioObjectSystemObject, &deviceAddress, 0, NULL, &i_size, &i_device );
-    if (err != noErr)
-    {
+    if (err != noErr) {
         msg_Warn( VLCIntf, "couldn't get main audio output device" );
         return NO;
     }
@@ -175,10 +172,9 @@ static NSMutableArray *blackoutWindows = NULL;
 {
     NSUInteger count = [[NSScreen screens] count];
 
-    for( NSUInteger i = 0; i < count; i++ )
-    {
+    for ( NSUInteger i = 0; i < count; i++ ) {
         NSScreen *screen = [[NSScreen screens] objectAtIndex: i];
-        if([screen displayID] == displayID)
+        if ([screen displayID] == displayID)
             return screen;
     }
     return nil;
@@ -206,13 +202,12 @@ static NSMutableArray *blackoutWindows = NULL;
     [blackoutWindows removeAllObjects];
 
     NSUInteger screenCount = [[NSScreen screens] count];
-    for(NSUInteger i = 0; i < screenCount; i++)
-    {
+    for (NSUInteger i = 0; i < screenCount; i++) {
         NSScreen *screen = [[NSScreen screens] objectAtIndex: i];
         VLCWindow *blackoutWindow;
         NSRect screen_rect;
 
-        if([self isScreen: screen])
+        if ([self isScreen: screen])
             continue;
 
         screen_rect = [screen frame];
@@ -233,7 +228,7 @@ static NSMutableArray *blackoutWindows = NULL;
         [blackoutWindows addObject: blackoutWindow];
         [blackoutWindow release];
 
-        if( [screen mainScreen] )
+        if ( [screen mainScreen] )
             [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
     }
 }
@@ -242,8 +237,7 @@ static NSMutableArray *blackoutWindows = NULL;
 {
     NSUInteger blackoutWindowCount = [blackoutWindows count];
 
-    for(NSUInteger i = 0; i < blackoutWindowCount; i++)
-    {
+    for (NSUInteger i = 0; i < blackoutWindowCount; i++) {
         VLCWindow *blackoutWindow = [blackoutWindows objectAtIndex: i];
         [blackoutWindow closeAndAnimate: YES];
     }
@@ -264,8 +258,7 @@ static NSMutableArray *blackoutWindows = NULL;
     backing:(NSBackingStoreType)backingType defer:(BOOL)flag
 {
     self = [super initWithContentRect:contentRect styleMask:styleMask backing:backingType defer:flag];
-    if( self )
-    {
+    if ( self ) {
         b_isset_canBecomeKeyWindow = NO;
         /* we don't want this window to be restored on relaunch */
         if (!OSX_SNOW_LEOPARD)
@@ -282,7 +275,7 @@ static NSMutableArray *blackoutWindows = NULL;
 
 - (BOOL)canBecomeKeyWindow
 {
-    if(b_isset_canBecomeKeyWindow)
+    if (b_isset_canBecomeKeyWindow)
         return b_canBecomeKeyWindow;
 
     return [super canBecomeKeyWindow];
@@ -296,7 +289,7 @@ static NSMutableArray *blackoutWindows = NULL;
 
 - (BOOL)canBecomeMainWindow
 {
-    if(b_isset_canBecomeMainWindow)
+    if (b_isset_canBecomeMainWindow)
         return b_canBecomeMainWindow;
 
     return [super canBecomeMainWindow];
@@ -306,8 +299,7 @@ static NSMutableArray *blackoutWindows = NULL;
 {
     NSInvocation *invoc;
 
-    if (!animate)
-    {
+    if (!animate) {
         [super close];
         return;
     }
@@ -315,8 +307,7 @@ static NSMutableArray *blackoutWindows = NULL;
     invoc = [NSInvocation invocationWithMethodSignature:[super methodSignatureForSelector:@selector(close)]];
     [invoc setTarget: self];
 
-    if (![self isVisible] || [self alphaValue] == 0.0)
-    {
+    if (![self isVisible] || [self alphaValue] == 0.0) {
         [super close];
         return;
     }
@@ -338,8 +329,7 @@ static NSMutableArray *blackoutWindows = NULL;
     NSViewAnimation *current_anim;
     NSMutableDictionary *dict;
 
-    if (!animate)
-    {
+    if (!animate) {
         [self orderOut: sender];
         return;
     }
@@ -360,14 +350,10 @@ static NSMutableArray *blackoutWindows = NULL;
     @synchronized(self) {
         current_anim = self->animation;
 
-        if ([[[current_anim viewAnimations] objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeOutEffect && [current_anim isAnimating])
-        {
+        if ([[[current_anim viewAnimations] objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeOutEffect && [current_anim isAnimating]) {
             [anim release];
-        }
-        else
-        {
-            if (current_anim)
-            {
+        } else {
+            if (current_anim) {
                 [current_anim stopAnimation];
                 [anim setCurrentProgress:1.0-[current_anim currentProgress]];
                 [current_anim release];
@@ -387,20 +373,17 @@ static NSMutableArray *blackoutWindows = NULL;
     NSViewAnimation *current_anim;
     NSMutableDictionary *dict;
 
-    if (!animate)
-    {
+    if (!animate) {
         [super orderFront: sender];
         [self setAlphaValue: 1.0];
         return;
     }
 
-    if (![self isVisible])
-    {
+    if (![self isVisible]) {
         [self setAlphaValue: 0.0];
         [super orderFront: sender];
     }
-    else if ([self alphaValue] == 1.0)
-    {
+    else if ([self alphaValue] == 1.0) {
         [super orderFront: self];
         return;
     }
@@ -420,14 +403,10 @@ static NSMutableArray *blackoutWindows = NULL;
     @synchronized(self) {
         current_anim = self->animation;
 
-        if ([[[current_anim viewAnimations] objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeInEffect && [current_anim isAnimating])
-        {
+        if ([[[current_anim viewAnimations] objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeInEffect && [current_anim isAnimating]) {
             [anim release];
-        }
-        else
-        {
-            if (current_anim)
-            {
+        } else {
+            if (current_anim) {
                 [current_anim stopAnimation];
                 [anim setCurrentProgress:1.0 - [current_anim currentProgress]];
                 [current_anim release];
@@ -444,8 +423,7 @@ static NSMutableArray *blackoutWindows = NULL;
 
 - (void)animationDidEnd:(NSAnimation*)anim
 {
-    if ([self alphaValue] <= 0.0)
-    {
+    if ([self alphaValue] <= 0.0) {
         NSInvocation * invoc;
         [super orderOut: nil];
         [self setAlphaValue: 1.0];
@@ -728,8 +706,7 @@ void _drawFrameInRect(NSRect frameRect)
 
 - (void)setStringValue:(NSString *)string
 {
-    if (!o_string_shadow)
-    {
+    if (!o_string_shadow) {
         o_string_shadow = [[NSShadow alloc] init];
         [o_string_shadow setShadowColor: [NSColor colorWithCalibratedWhite:1.0 alpha:0.5]];
         [o_string_shadow setShadowOffset:NSMakeSize(0.0, -1.5)];
@@ -747,7 +724,7 @@ void _drawFrameInRect(NSRect frameRect)
 
 - (void)mouseDown: (NSEvent *)ourEvent
 {
-    if( [ourEvent clickCount] > 1 )
+    if ( [ourEvent clickCount] > 1 )
         [[[VLCMain sharedInstance] controls] goToSpecificTime: nil];
     else
     {

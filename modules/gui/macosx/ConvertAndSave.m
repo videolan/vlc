@@ -289,21 +289,21 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     input_item_AddOption(p_input, [[self composedOptions] UTF8String], VLC_INPUT_OPTION_TRUSTED);
 
     int returnValue;
-    returnValue = playlist_AddInput( p_playlist, p_input, PLAYLIST_STOP, PLAYLIST_END, true, pl_Unlocked );
+    returnValue = playlist_AddInput(p_playlist, p_input, PLAYLIST_STOP, PLAYLIST_END, true, pl_Unlocked);
 
     if (returnValue == VLC_SUCCESS) {
         /* let's "play" */
         PL_LOCK;
-        playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input );
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, NULL,
-                         p_item );
+        playlist_item_t *p_item = playlist_ItemGetByInput(p_playlist, p_input);
+        playlist_Control(p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, NULL,
+                         p_item);
         PL_UNLOCK;
     }
     else
-        msg_Err( VLCIntf, "CAS: playlist add input failed :(");
+        msg_Err(VLCIntf, "CAS: playlist add input failed :(");
 
     /* we're done with this input */
-    vlc_gc_decref( p_input );
+    vlc_gc_decref(p_input);
 
     [_window performClose:sender];
 }
@@ -575,8 +575,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     NSString *desired_type = [paste availableTypeFromArray: types];
     NSData *carried_data = [paste dataForType: desired_type];
 
-    if( carried_data ) {
-        if( [desired_type isEqualToString:NSFilenamesPboardType] ) {
+    if (carried_data) {
+        if ([desired_type isEqualToString:NSFilenamesPboardType]) {
             NSArray *values = [[paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 
             if ([values count] > 0) {
@@ -585,11 +585,11 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
                 [self updateDropView];
                 return YES;
             }
-        } else if( [desired_type isEqualToString:@"VLCPlaylistItemPboardType"] ) {
+        } else if ([desired_type isEqualToString:@"VLCPlaylistItemPboardType"]) {
             NSArray * array = [[[VLCMain sharedInstance] playlist] draggedItems];
             NSUInteger count = [array count];
             if (count > 0) {
-                playlist_t * p_playlist = pl_Get( VLCIntf );
+                playlist_t * p_playlist = pl_Get(VLCIntf);
                 playlist_item_t * p_item = NULL;
 
                 PL_LOCK;
@@ -729,35 +729,35 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 {
     if ([format isEqualToString:@"ts"])
         [_customize_encap_matrix selectCellWithTag:MPEGTS];
-    else if([format isEqualToString:@"webm"])
+    else if ([format isEqualToString:@"webm"])
         [_customize_encap_matrix selectCellWithTag:WEBM];
-    else if([format isEqualToString:@"ogg"])
+    else if ([format isEqualToString:@"ogg"])
         [_customize_encap_matrix selectCellWithTag:OGG];
-    else if([format isEqualToString:@"ogm"])
+    else if ([format isEqualToString:@"ogm"])
         [_customize_encap_matrix selectCellWithTag:OGG];
-    else if([format isEqualToString:@"mp4"])
+    else if ([format isEqualToString:@"mp4"])
         [_customize_encap_matrix selectCellWithTag:MP4];
-    else if([format isEqualToString:@"mov"])
+    else if ([format isEqualToString:@"mov"])
         [_customize_encap_matrix selectCellWithTag:MP4];
-    else if([format isEqualToString:@"ps"])
+    else if ([format isEqualToString:@"ps"])
         [_customize_encap_matrix selectCellWithTag:MPEGPS];
-    else if([format isEqualToString:@"mpjpeg"])
+    else if ([format isEqualToString:@"mpjpeg"])
         [_customize_encap_matrix selectCellWithTag:MJPEG];
-    else if([format isEqualToString:@"wav"])
+    else if ([format isEqualToString:@"wav"])
         [_customize_encap_matrix selectCellWithTag:WAV];
-    else if([format isEqualToString:@"flv"])
+    else if ([format isEqualToString:@"flv"])
         [_customize_encap_matrix selectCellWithTag:FLV];
-    else if([format isEqualToString:@"mpeg1"])
+    else if ([format isEqualToString:@"mpeg1"])
         [_customize_encap_matrix selectCellWithTag:MPEG1];
-    else if([format isEqualToString:@"mkv"])
+    else if ([format isEqualToString:@"mkv"])
         [_customize_encap_matrix selectCellWithTag:MKV];
-    else if([format isEqualToString:@"raw"])
+    else if ([format isEqualToString:@"raw"])
         [_customize_encap_matrix selectCellWithTag:RAW];
-    else if([format isEqualToString:@"avi"])
+    else if ([format isEqualToString:@"avi"])
         [_customize_encap_matrix selectCellWithTag:AVI];
-    else if([format isEqualToString:@"asf"])
+    else if ([format isEqualToString:@"asf"])
         [_customize_encap_matrix selectCellWithTag:ASF];
-    else if([format isEqualToString:@"wmv"])
+    else if ([format isEqualToString:@"wmv"])
         [_customize_encap_matrix selectCellWithTag:ASF];
     else
         msg_Err(VLCIntf, "CAS: unknown encap format requested for customization");

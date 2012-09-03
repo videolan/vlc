@@ -43,18 +43,18 @@
 /*****************************************************************************
  * DeviceCallback: Callback triggered when the video-device variable is changed
  *****************************************************************************/
-int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
-                     vlc_value_t old_val, vlc_value_t new_val, void *param )
+int DeviceCallback(vlc_object_t *p_this, const char *psz_variable,
+                     vlc_value_t old_val, vlc_value_t new_val, void *param)
 {
     vlc_value_t val;
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-    msg_Dbg( p_vout, "set %"PRId64, new_val.i_int );
-    var_Create( p_vout->p_libvlc, "video-device", VLC_VAR_INTEGER );
-    var_Set( p_vout->p_libvlc, "video-device", new_val );
+    msg_Dbg(p_vout, "set %"PRId64, new_val.i_int);
+    var_Create(p_vout->p_libvlc, "video-device", VLC_VAR_INTEGER);
+    var_Set(p_vout->p_libvlc, "video-device", new_val);
 
     val.b_bool = true;
-    var_Set( p_vout, "intf-change", val );
+    var_Set(p_vout, "intf-change", val);
     return VLC_SUCCESS;
 }
 
@@ -111,10 +111,10 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 - (void)closeVout
 {
     vout_thread_t * p_vout = getVout();
-    if( p_vout )
+    if (p_vout)
     {
-        var_DelCallback( p_vout, "video-device", DeviceCallback, NULL );
-        vlc_object_release( p_vout );
+        var_DelCallback(p_vout, "video-device", DeviceCallback, NULL);
+        vlc_object_release(p_vout);
     }
 }
 
@@ -133,50 +133,43 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
     i_pressed_modifiers = [o_event modifierFlags];
 
-    if( i_pressed_modifiers & NSShiftKeyMask )
+    if (i_pressed_modifiers & NSShiftKeyMask)
         val.i_int |= KEY_MODIFIER_SHIFT;
-    if( i_pressed_modifiers & NSControlKeyMask )
+    if (i_pressed_modifiers & NSControlKeyMask)
         val.i_int |= KEY_MODIFIER_CTRL;
-    if( i_pressed_modifiers & NSAlternateKeyMask )
+    if (i_pressed_modifiers & NSAlternateKeyMask)
         val.i_int |= KEY_MODIFIER_ALT;
-    if( i_pressed_modifiers & NSCommandKeyMask )
+    if (i_pressed_modifiers & NSCommandKeyMask)
         val.i_int |= KEY_MODIFIER_COMMAND;
 
     NSString * characters = [o_event charactersIgnoringModifiers];
-    if ([characters length] > 0)
-    {
+    if ([characters length] > 0) {
         key = [[characters lowercaseString] characterAtIndex: 0];
 
-        if( key )
-        {
+        if (key) {
             vout_thread_t * p_vout = getVout();
             /* Escape should always get you out of fullscreen */
-            if( key == (unichar) 0x1b )
-            {
-                playlist_t * p_playlist = pl_Get( VLCIntf );
-                 if( var_GetBool( p_playlist, "fullscreen") )
+            if (key == (unichar) 0x1b) {
+                playlist_t * p_playlist = pl_Get(VLCIntf);
+                 if (var_GetBool(p_playlist, "fullscreen"))
                      [[VLCCoreInteraction sharedInstance] toggleFullscreen];
             }
             /* handle Lion's default key combo for fullscreen-toggle in addition to our own hotkeys */
-            else if( key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask )
+            else if (key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask)
                 [[VLCCoreInteraction sharedInstance] toggleFullscreen];
-            else if ( p_vout )
-            {
-                if( key == ' ' )
-                {
+            else if (p_vout) {
+                if (key == ' ')
                     [[VLCCoreInteraction sharedInstance] play];
-                }
-                else
-                {
-                    val.i_int |= (int)CocoaKeyToVLC( key );
-                    var_Set( p_vout->p_libvlc, "key-pressed", val );
+                else {
+                    val.i_int |= (int)CocoaKeyToVLC(key);
+                    var_Set(p_vout->p_libvlc, "key-pressed", val);
                 }
             }
             else
-                msg_Dbg( VLCIntf, "could not send keyevent to VLC core" );
+                msg_Dbg(VLCIntf, "could not send keyevent to VLC core");
 
             if (p_vout)
-                vlc_object_release( p_vout );
+                vlc_object_release(p_vout);
 
             return;
         }
@@ -191,28 +184,20 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)mouseDown:(NSEvent *)o_event
 {
-    if( ( [o_event type] == NSLeftMouseDown ) &&
-       ( ! ( [o_event modifierFlags] &  NSControlKeyMask ) ) )
-    {
-        if( [o_event clickCount] > 1 )
-        {
-            /* multiple clicking */
+    if (([o_event type] == NSLeftMouseDown) && (! ([o_event modifierFlags] &  NSControlKeyMask))) {
+        if ([o_event clickCount] > 1)
             [[VLCCoreInteraction sharedInstance] toggleFullscreen];
-        }
-    }
-    else if( ( [o_event type] == NSRightMouseDown ) ||
-            ( ( [o_event type] == NSLeftMouseDown ) &&
-             ( [o_event modifierFlags] &  NSControlKeyMask ) ) )
-    {
+    } else if (([o_event type] == NSRightMouseDown) ||
+               (([o_event type] == NSLeftMouseDown) &&
+               ([o_event modifierFlags] &  NSControlKeyMask)))
         [NSMenu popUpContextMenu: [[VLCMainMenu sharedInstance] voutMenu] withEvent: o_event forView: self];
-    }
 
     [super mouseDown: o_event];
 }
 
 - (void)rightMouseDown:(NSEvent *)o_event
 {
-    if( [o_event type] == NSRightMouseDown )
+    if ([o_event type] == NSRightMouseDown)
         [NSMenu popUpContextMenu: [[VLCMainMenu sharedInstance] voutMenu] withEvent: o_event forView: self];
 
     [super mouseDown: o_event];
@@ -220,7 +205,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)rightMouseUp:(NSEvent *)o_event
 {
-    if( [o_event type] == NSRightMouseUp )
+    if ([o_event type] == NSRightMouseUp)
         [NSMenu popUpContextMenu: [[VLCMainMenu sharedInstance] voutMenu] withEvent: o_event forView: self];
 
     [super mouseUp: o_event];
@@ -229,7 +214,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 - (void)mouseMoved:(NSEvent *)o_event
 {
     NSPoint ml = [self convertPoint: [o_event locationInWindow] fromView: nil];
-    if( [self mouse: ml inRect: [self bounds]] )
+    if ([self mouse: ml inRect: [self bounds]])
         [[VLCMain sharedInstance] showFullscreenController];
 
     [super mouseMoved: o_event];
@@ -270,8 +255,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     CGFloat f_threshold = 0.3;
     BOOL b_fullscreen = [[VLCMainWindow sharedInstance] fullscreen];
 
-    if( ( f_cumulated_magnification > f_threshold && !b_fullscreen ) || ( f_cumulated_magnification < -f_threshold && b_fullscreen ) )
-    {
+    if ((f_cumulated_magnification > f_threshold && !b_fullscreen) || (f_cumulated_magnification < -f_threshold && b_fullscreen)) {
         f_cumulated_magnification = 0.0;
         [[VLCCoreInteraction sharedInstance] toggleFullscreen];
     }

@@ -313,7 +313,5 @@
 @end
 
 @interface VLCOpenTextField : NSTextField
-{
-}
 - (void)mouseDown:(NSEvent *)theEvent;
 @end

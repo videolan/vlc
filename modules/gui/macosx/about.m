@@ -53,11 +53,10 @@ static VLAboutBox *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedInstance) {
+    if (_o_sharedInstance)
         [self dealloc];
-    } else {
+    else
         _o_sharedInstance = [super init];
-    }
 
     return _o_sharedInstance;
 }
@@ -85,8 +84,7 @@ static VLAboutBox *_o_sharedInstance = nil;
 
 - (void)showAbout
 {
-    if(! b_isSetUp )
-    {
+    if (! b_isSetUp) {
         /* Get the localized info dictionary (InfoPlist.strings) */
         NSDictionary *o_local_dict;
         o_local_dict = [[NSBundle mainBundle] localizedInfoDictionary];
@@ -113,8 +111,7 @@ static VLAboutBox *_o_sharedInstance = nil;
 
         NSMutableArray *tmpArray = [NSMutableArray arrayWithArray: [[NSString stringWithUTF8String: psz_authors]componentsSeparatedByString:@"\n\n"]];
         NSUInteger count = [tmpArray count];
-        for( NSUInteger i = 0; i < count; i++ )
-        {
+        for (NSUInteger i = 0; i < count; i++) {
             [tmpArray replaceObjectAtIndex:i withObject:[[tmpArray objectAtIndex:i]stringByReplacingOccurrencesOfString:@"\n" withString:@", "]];
             [tmpArray replaceObjectAtIndex:i withObject:[[tmpArray objectAtIndex:i]stringByReplacingOccurrencesOfString:@", -" withString:@"\n-" options:0 range:NSRangeFromString(@"0 30")]];
             [tmpArray replaceObjectAtIndex:i withObject:[[tmpArray objectAtIndex:i]stringByReplacingOccurrencesOfString:@"-, " withString:@"-\n" options:0 range:NSRangeFromString(@"0 30")]];
@@ -141,7 +138,7 @@ static VLAboutBox *_o_sharedInstance = nil;
 
     /* Show the window */
     b_restart = YES;
-    [o_credits_textview scrollPoint:NSMakePoint( 0, 0 )];
+    [o_credits_textview scrollPoint:NSMakePoint(0, 0)];
     [o_about_window makeKeyAndOrderFront: nil];
 }
 
@@ -161,8 +158,7 @@ static VLAboutBox *_o_sharedInstance = nil;
 
 - (void)scrollCredits:(NSTimer *)timer
 {
-    if( b_restart )
-    {
+    if (b_restart) {
         /* Reset the starttime */
         i_start = [NSDate timeIntervalSinceReferenceDate] + 4.0;
         f_current = 0;
@@ -170,24 +166,20 @@ static VLAboutBox *_o_sharedInstance = nil;
         b_restart = NO;
     }
 
-    if( [NSDate timeIntervalSinceReferenceDate] >= i_start )
-    {
+    if ([NSDate timeIntervalSinceReferenceDate] >= i_start) {
         /* Increment the scroll position */
         f_current += 0.005;
 
         /* Scroll to the position */
-        [o_credits_textview scrollPoint:NSMakePoint( 0, f_current )];
+        [o_credits_textview scrollPoint:NSMakePoint(0, f_current)];
 
         /* If at end, restart at the top */
-        if( f_current >= f_end )
-        {
+        if (f_current >= f_end) {
             /* f_end may be wrong on first run, so don't trust it too much */
-            if( f_end == [o_credits_textview bounds].size.height - [o_credits_scrollview bounds].size.height )
-            {
+            if (f_end == [o_credits_textview bounds].size.height - [o_credits_scrollview bounds].size.height) {
                 b_restart = YES;
-                [o_credits_textview scrollPoint:NSMakePoint( 0, 0 )];
-            }
-            else
+                [o_credits_textview scrollPoint:NSMakePoint(0, 0)];
+            } else
                 f_end = [o_credits_textview bounds].size.height - [o_credits_scrollview bounds].size.height;
         }
     }

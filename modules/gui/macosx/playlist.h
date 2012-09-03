@@ -41,8 +41,6 @@
  * VLCPlaylistView interface
  *****************************************************************************/
 @interface VLCPlaylistView : NSOutlineView
-{
-}
 
 @end
 
@@ -72,9 +70,6 @@
  * VLCPlaylistWizard interface
  *****************************************************************************/
 @interface VLCPlaylistWizard : VLCPlaylistCommon
-{
-}
-
 - (IBAction)reloadOutlineView;
 
 @end

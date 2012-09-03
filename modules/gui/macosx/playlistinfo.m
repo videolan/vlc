@@ -48,15 +48,11 @@ static VLCInfo *_o_sharedInstance = nil;
 - (id)init
 {
     if( _o_sharedInstance )
-    {
         [self dealloc];
-    }
-    else
-    {
+    else {
         _o_sharedInstance = [super init];
 
-        if( _o_sharedInstance != nil )
-        {
+        if( _o_sharedInstance != nil ) {
             p_item = NULL;
             [self updatePanelWithItem: NULL];
             rootItem = [[VLCInfoTreeItem alloc] init];
@@ -133,7 +129,8 @@ static VLCInfo *_o_sharedInstance = nil;
 {
     [rootItem release];
 
-    if( p_item ) vlc_gc_decref( p_item );
+    if( p_item )
+        vlc_gc_decref( p_item );
 
     [super dealloc];
 }
@@ -141,8 +138,7 @@ static VLCInfo *_o_sharedInstance = nil;
 - (void)initPanel
 {
     BOOL b_stats = config_GetInt(VLCIntf, "stats");
-    if( !b_stats )
-    {
+    if( !b_stats ) {
         if( [o_tab_view numberOfTabViewItems] > 2 )
             [o_tab_view removeTabViewItem: [o_tab_view tabViewItemAtIndex: 2]];
     }
@@ -179,16 +175,14 @@ static VLCInfo *_o_sharedInstance = nil;
 - (void)updatePanelWithItem:(input_item_t *)_p_item;
 {
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-    if( _p_item != p_item )
-    {
+    if( _p_item != p_item ) {
         if( p_item ) vlc_gc_decref( p_item );
         [o_saveMetaData_btn setEnabled: NO];
         if( _p_item ) vlc_gc_incref( _p_item );
         p_item = _p_item;
     }
 
-    if( !p_item )
-    {
+    if( !p_item ) {
         /* Erase */
     #define SET( foo ) \
         [self setMeta: "" forLabel: o_##foo##_txt];
@@ -207,13 +201,9 @@ static VLCInfo *_o_sharedInstance = nil;
         SET( encodedby );
     #undef SET
         [o_image_well setImage: [NSImage imageNamed: @"noart.png"]];
-    }
-    else
-    {
+    } else {
         if( !input_item_IsPreparsed( p_item ) )
-        {
             playlist_PreparseEnqueue( pl_Get( VLCIntf ), p_item );
-        }
 
         /* fill uri info */
         char * psz_url = decode_URI( input_item_GetURI( p_item ) );
@@ -283,10 +273,8 @@ static VLCInfo *_o_sharedInstance = nil;
     if (!b_awakeFromNib)
         return;
 
-    if ([o_info_window isVisible])
-    {
-        if( !p_item || !p_item->p_stats )
-        {
+    if ([o_info_window isVisible]) {
+        if( !p_item || !p_item->p_stats ) {
             [self initMediaPanelStats];
             return;
         }
@@ -331,7 +319,8 @@ static VLCInfo *_o_sharedInstance = nil;
 
 - (IBAction)saveMetaData:(id)sender
 {
-    if( !p_item ) goto error;
+    if( !p_item )
+        goto error;
 
     #define utf8( o_blub ) \
         [[o_blub stringValue] UTF8String]
@@ -383,8 +372,7 @@ error:
 {
     BOOL bEnabled = TRUE;
 
-    if( [[o_mi title] isEqualToString: _NS("Information")] )
-    {
+    if( [[o_mi title] isEqualToString: _NS("Information")] ) {
         return ![[[VLCMain sharedInstance] playlist] isSelectionEmpty];
     }
 
@@ -412,13 +400,9 @@ error:
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
     if ([[tableColumn identifier] isEqualToString:@"0"])
-    {
         return (item == nil) ? @"" : (id)[item name];
-    }
     else
-    {
         return (item == nil) ? @"" : (id)[item value];
-    }
 }
 
 @end
@@ -434,8 +418,7 @@ error:
 {
     self = [super init];
 
-    if( self != nil )
-    {
+    if( self != nil ) {
         o_name = [o_item_name copy];
         o_value = [o_item_value copy];
         i_object_id = i_id;
@@ -466,16 +449,11 @@ error:
 {
     if( !p_item ) return nil;
 
-    if (o_children == NULL)
-    {
-        int i;
-
-        if( i_object_id == -1 )
-        {
+    if (o_children == NULL) {
+        if( i_object_id == -1 ) {
             vlc_mutex_lock( &p_item->lock );
             o_children = [[NSMutableArray alloc] initWithCapacity: p_item->i_categories];
-            for (i = 0 ; i < p_item->i_categories ; i++)
-            {
+            for (int i = 0 ; i < p_item->i_categories ; i++) {
                 NSString * name = [NSString stringWithUTF8String: p_item->pp_categories[i]->psz_name];
                 VLCInfoTreeItem * item = [[VLCInfoTreeItem alloc] initWithName:name value:@"" ID:i parent:self];
                 [item autorelease];
@@ -483,13 +461,11 @@ error:
             }
             vlc_mutex_unlock( &p_item->lock );
         }
-        else if( o_parent->i_object_id == -1 )
-        {
+        else if( o_parent->i_object_id == -1 ) {
             vlc_mutex_lock( &p_item->lock );
             info_category_t * cat = p_item->pp_categories[i_object_id];
             o_children = [[NSMutableArray alloc] initWithCapacity: cat->i_infos];
-            for (i = 0 ; i < cat->i_infos ; i++)
-            {
+            for (int i = 0 ; i < cat->i_infos ; i++) {
                 NSString * name = [NSString stringWithUTF8String: cat->pp_infos[i]->psz_name];
                 NSString * value = [NSString stringWithUTF8String: cat->pp_infos[i]->psz_value ? : ""];
                 VLCInfoTreeItem * item = [[VLCInfoTreeItem alloc] initWithName:name value:value ID:i parent:self];
@@ -499,9 +475,7 @@ error:
             vlc_mutex_unlock( &p_item->lock );
         }
         else
-        {
             o_children = IsALeafNode;
-        }
     }
     return o_children;
 }
