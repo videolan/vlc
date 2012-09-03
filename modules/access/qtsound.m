@@ -47,23 +47,23 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int Open( vlc_object_t *p_this );
-static void Close( vlc_object_t *p_this );
-static int Demux( demux_t *p_demux );
-static int Control( demux_t *, int, va_list );
+static int Open(vlc_object_t *p_this);
+static void Close(vlc_object_t *p_this);
+static int Demux(demux_t *p_demux);
+static int Control(demux_t *, int, va_list);
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 
 vlc_module_begin()
-set_shortname( N_("QTSound") )
-set_description( N_("QuickTime Sound Capture") )
-set_category( CAT_INPUT )
-set_subcategory( SUBCAT_INPUT_ACCESS )
-add_shortcut( "qtsound" )
-set_capability( "access_demux", 0 )
-set_callbacks( Open, Close )
+set_shortname(N_("QTSound"))
+set_description(N_("QuickTime Sound Capture"))
+set_category(CAT_INPUT)
+set_subcategory(SUBCAT_INPUT_ACCESS)
+add_shortcut("qtsound")
+set_capability("access_demux", 0)
+set_callbacks(Open, Close)
 vlc_module_end ()
 
 
@@ -94,8 +94,7 @@ vlc_module_end ()
 @implementation VLCDecompressedAudioOutput : QTCaptureDecompressedAudioOutput
 - (id)initWithDemux:(demux_t *)p_demux
 {
-    if( self = [super init] )
-    {
+    if (self = [super init]) {
         p_qtsound = p_demux;
         currentAudioBuffer = nil;
         date_Init(&date, 44100, 1);
@@ -116,36 +115,30 @@ vlc_module_end ()
     UInt32 totalDataSize = 0;
     UInt32 count = 0;
 
-    @synchronized (self)
-    {
+    @synchronized (self) {
         numberOfSamples = [sampleBuffer numberOfSamples];
         date_Increment(&date,numberOfSamples);
         currentPts = date_Get(&date);
 
         tempAudioBufferList = [sampleBuffer audioBufferListWithOptions:0];
-        if (tempAudioBufferList->mNumberBuffers == 2)
-        {
+        if (tempAudioBufferList->mNumberBuffers == 2) {
             /*
              * Compute totalDataSize as sum of all data blocks in the
              * audio buffer list:
              */
-            for ( count = 0; count < tempAudioBufferList->mNumberBuffers; count++ )
-            {
+            for (count = 0; count < tempAudioBufferList->mNumberBuffers; count++)
                 totalDataSize += tempAudioBufferList->mBuffers[count].mDataByteSize;
-            }
+
             /*
              * Allocate storage for the interleaved audio data
              */
             rawAudioData = block_Alloc(totalDataSize * sizeof(float));
-            if (NULL == rawAudioData)
-            {
-                msg_Err( p_qtsound, "Raw audiodata could not be allocated" );
+            if (NULL == rawAudioData) {
+                msg_Err(p_qtsound, "Raw audiodata could not be allocated");
                 return;
             }
-        }
-        else
-        {
-            msg_Err( p_qtsound, "Too many or only one channel found." );
+        } else {
+            msg_Err(p_qtsound, "Too many or only one channel found.");
             return;
         }
 
@@ -153,8 +146,7 @@ vlc_module_end ()
          * Interleave raw data (provided in two separate channels as
          * F32L) with 2 samples per frame
          */
-        if ( totalDataSize )
-        {
+        if (totalDataSize) {
             unsigned short i;
             const float *b1Ptr, *b2Ptr;
             float *uPtr;
@@ -163,18 +155,15 @@ vlc_module_end ()
                  uPtr = (float *)rawAudioData,
                  b1Ptr = (const float *) tempAudioBufferList->mBuffers[0].mData,
                  b2Ptr = (const float *) tempAudioBufferList->mBuffers[1].mData;
-                 i < numberOfSamples; i++)
-            {
+                 i < numberOfSamples; i++) {
                 *uPtr++ = *b1Ptr++;
                 *uPtr++ = *b2Ptr++;
             }
 
-            if (currentAudioBuffer == nil)
-            {
+            if (currentAudioBuffer == nil) {
                 currentAudioBuffer = (AudioBuffer *)malloc(sizeof(AudioBuffer));
-                if (NULL == currentAudioBuffer)
-                {
-                    msg_Err( p_qtsound, "AudioBuffer could not be allocated." );
+                if (NULL == currentAudioBuffer) {
+                    msg_Err(p_qtsound, "AudioBuffer could not be allocated.");
                     return;
                 }
             }
@@ -192,11 +181,9 @@ vlc_module_end ()
 
 - (void)freeAudioMem
 {
-    @synchronized (self)
-    {
-        if (rawAudioData) {
+    @synchronized (self) {
+        if (rawAudioData)
             free(rawAudioData);
-        }
     }
 }
 
@@ -205,13 +192,10 @@ vlc_module_end ()
     /* FIXME: can this getter be minimized? */
     mtime_t pts;
 
-    if( !currentAudioBuffer || currentPts == previousPts )
-    {
+    if(!currentAudioBuffer || currentPts == previousPts)
         return 0;
-    }
 
-    @synchronized (self)
-    {
+    @synchronized (self) {
         pts = previousPts = currentPts;
     }
 
@@ -250,7 +234,7 @@ struct demux_sys_t {
 /*****************************************************************************
  * Open: initialize interface
  *****************************************************************************/
-static int Open( vlc_object_t *p_this )
+static int Open(vlc_object_t *p_this)
 {
     demux_t *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
@@ -265,83 +249,74 @@ static int Open( vlc_object_t *p_this )
     QTCaptureDeviceInput *audioInput;
     NSError *o_returnedAudioError;
 
-    if( p_demux->psz_location && *p_demux->psz_location )
-    {
+    if(p_demux->psz_location && *p_demux->psz_location)
         psz_uid = p_demux->psz_location;
-    }
-    msg_Dbg( p_demux, "qtsound uid = %s", psz_uid );
+
+    msg_Dbg(p_demux, "qtsound uid = %s", psz_uid);
     qtk_curraudiodevice_uid = [[NSString alloc] initWithFormat:@"%s", psz_uid];
 
     pool = [[NSAutoreleasePool alloc] init];
 
-    p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
-    if( !p_sys )
+    p_demux->p_sys = p_sys = calloc(1, sizeof(demux_sys_t));
+    if(!p_sys)
         return VLC_ENOMEM;
 
-    msg_Dbg( p_demux, "qtsound : uid = %s", [qtk_curraudiodevice_uid UTF8String]);
+    msg_Dbg(p_demux, "qtsound : uid = %s", [qtk_curraudiodevice_uid UTF8String]);
     myAudioDevices = [[[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeSound] arrayByAddingObjectsFromArray:[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeMuxed]] retain];
-    if([myAudioDevices count] == 0)
-    {
-        dialog_FatalWait( p_demux, _("No Audio Input device found"),
+    if([myAudioDevices count] == 0) {
+        dialog_FatalWait(p_demux, _("No Audio Input device found"),
                          _("Your Mac does not seem to be equipped with a suitable audio input device."
-                     "Please check your connectors and drivers.") );
-        msg_Err( p_demux, "Can't find any Audio device" );
+                     "Please check your connectors and drivers."));
+        msg_Err(p_demux, "Can't find any Audio device");
 
         goto error;
     }
     unsigned iaudio;
-    for(iaudio = 0; iaudio < [myAudioDevices count]; iaudio++){
+    for (iaudio = 0; iaudio < [myAudioDevices count]; iaudio++) {
         QTCaptureDevice *qtk_audioDevice;
         qtk_audioDevice = [myAudioDevices objectAtIndex:iaudio];
-        msg_Dbg( p_demux, "qtsound audio %u/%lu localizedDisplayName: %s uniqueID: %s", iaudio, [myAudioDevices count], [[qtk_audioDevice localizedDisplayName] UTF8String], [[qtk_audioDevice uniqueID] UTF8String]);
-        if([[[qtk_audioDevice uniqueID]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtk_curraudiodevice_uid]){
-            msg_Dbg( p_demux, "Device found" );
+        msg_Dbg(p_demux, "qtsound audio %u/%lu localizedDisplayName: %s uniqueID: %s", iaudio, [myAudioDevices count], [[qtk_audioDevice localizedDisplayName] UTF8String], [[qtk_audioDevice uniqueID] UTF8String]);
+        if ([[[qtk_audioDevice uniqueID]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtk_curraudiodevice_uid]) {
+            msg_Dbg(p_demux, "Device found");
             break;
         }
     }
 
     audioInput = nil;
-    if(iaudio < [myAudioDevices count]){
+    if(iaudio < [myAudioDevices count])
         p_sys->audiodevice = [myAudioDevices objectAtIndex:iaudio];
-    }
-    else
-    {
+    else {
         /* cannot find designated audio device, fall back to open default audio device */
         msg_Dbg(p_demux, "Cannot find designated uid audio device as %s. Fall back to open default audio device.", [qtk_curraudiodevice_uid UTF8String]);
         p_sys->audiodevice = [QTCaptureDevice defaultInputDeviceWithMediaType: QTMediaTypeSound];
     }
-    if( !p_sys->audiodevice )
-    {
-        dialog_FatalWait( p_demux, _("No audio input device found"),
+    if(!p_sys->audiodevice) {
+        dialog_FatalWait(p_demux, _("No audio input device found"),
                          _("Your Mac does not seem to be equipped with a suitable audio input device."
-                     "Please check your connectors and drivers.") );
-        msg_Err( p_demux, "Can't find any Audio device" );
+                     "Please check your connectors and drivers."));
+        msg_Err(p_demux, "Can't find any Audio device");
 
         goto error;
     }
 
-    if( ![p_sys->audiodevice open: &o_returnedAudioError] )
-    {
-        msg_Err( p_demux, "Unable to open the audio capture device (%ld)", [o_returnedAudioError code] );
+    if(![p_sys->audiodevice open: &o_returnedAudioError]) {
+        msg_Err(p_demux, "Unable to open the audio capture device (%ld)", [o_returnedAudioError code]);
         goto error;
     }
 
-    if( [p_sys->audiodevice isInUseByAnotherApplication] == YES )
-    {
-        msg_Err( p_demux, "default audio capture device is exclusively in use by another application" );
+    if([p_sys->audiodevice isInUseByAnotherApplication] == YES) {
+        msg_Err(p_demux, "default audio capture device is exclusively in use by another application");
         goto error;
     }
     audioInput = [[QTCaptureDeviceInput alloc] initWithDevice: p_sys->audiodevice];
-    if( !audioInput )
-    {
-        msg_Err( p_demux, "can't create a valid audio capture input facility" );
+    if(!audioInput) {
+        msg_Err(p_demux, "can't create a valid audio capture input facility");
         goto error;
-    } else {
-        msg_Dbg( p_demux, "created valid audio capture input facility" );
-    }
+    } else
+        msg_Dbg(p_demux, "created valid audio capture input facility");
 
     p_sys->audiooutput = [[VLCDecompressedAudioOutput alloc] initWithDemux:p_demux];
-    msg_Dbg ( p_demux, "initialized audio output" );
+    msg_Dbg (p_demux, "initialized audio output");
 
     /* Get the formats */
     /*
@@ -380,12 +355,11 @@ static int Open( vlc_object_t *p_this )
      */
     audioformat_array = [p_sys->audiodevice formatDescriptions];
     audio_format = NULL;
-    for( int k = 0; k < [audioformat_array count]; k++ )
-    {
+    for(int k = 0; k < [audioformat_array count]; k++) {
         audio_format = (QTFormatDescription *)[audioformat_array objectAtIndex: k];
 
-        msg_Dbg( p_demux, "Audio localized format summary: %s", [[audio_format localizedFormatSummary] UTF8String]);
-        msg_Dbg( p_demux, "Audio format description attributes: %s",[[[audio_format formatDescriptionAttributes] description] UTF8String]);
+        msg_Dbg(p_demux, "Audio localized format summary: %s", [[audio_format localizedFormatSummary] UTF8String]);
+        msg_Dbg(p_demux, "Audio format description attributes: %s",[[[audio_format formatDescriptionAttributes] description] UTF8String]);
 
         AudioStreamBasicDescription asbd = {0};
         NSValue *asbdValue =  [audio_format attributeForKey:QTFormatDescriptionAudioStreamBasicDescriptionAttribute];
@@ -398,7 +372,7 @@ static int Open( vlc_object_t *p_this )
 
         /* kept for development purposes */
 #if 0
-        msg_Dbg( p_demux, "Sample Rate: %.0lf; Format ID: %s; Format Flags: %.8x; Bytes per Packet: %d; Frames per Packet: %d; Bytes per Frame: %d; Channels per Frame: %d; Bits per Channel: %d",
+        msg_Dbg(p_demux, "Sample Rate: %.0lf; Format ID: %s; Format Flags: %.8x; Bytes per Packet: %d; Frames per Packet: %d; Bytes per Frame: %d; Channels per Frame: %d; Bits per Channel: %d",
                 asbd.mSampleRate,
                 formatIDString,
                 asbd.mFormatFlags,
@@ -408,7 +382,7 @@ static int Open( vlc_object_t *p_this )
                 asbd.mChannelsPerFrame,
                 asbd.mBitsPerChannel);
 
-        msg_Dbg( p_demux, "Flag float %d bigEndian %d signedInt %d packed %d alignedHigh %d non interleaved %d non mixable %d\ncanonical %d nativeFloatPacked %d nativeEndian %d",
+        msg_Dbg(p_demux, "Flag float %d bigEndian %d signedInt %d packed %d alignedHigh %d non interleaved %d non mixable %d\ncanonical %d nativeFloatPacked %d nativeEndian %d",
                 (asbd.mFormatFlags & kAudioFormatFlagIsFloat) != 0,
                 (asbd.mFormatFlags & kAudioFormatFlagIsBigEndian) != 0,
                 (asbd.mFormatFlags & kAudioFormatFlagIsSignedInteger) != 0,
@@ -420,17 +394,18 @@ static int Open( vlc_object_t *p_this )
                 (asbd.mFormatFlags & kAudioFormatFlagsCanonical) != 0,
                 (asbd.mFormatFlags & kAudioFormatFlagsNativeFloatPacked) != 0,
                 (asbd.mFormatFlags & kAudioFormatFlagsNativeEndian) != 0
-                );
+               );
 #endif
     }
 
-    if( [audioformat_array count] )
+    if([audioformat_array count])
         audio_format = [audioformat_array objectAtIndex: 0];
-    else goto error;
+    else
+        goto error;
 
     /* Now we can init */
     audiocodec = VLC_CODEC_FL32;
-    es_format_Init( &audiofmt, AUDIO_ES, audiocodec);
+    es_format_Init(&audiofmt, AUDIO_ES, audiocodec);
 
     audiofmt.audio.i_format = audiocodec;
     audiofmt.audio.i_rate = 44100;
@@ -460,16 +435,14 @@ static int Open( vlc_object_t *p_this )
     p_sys->session = [[QTCaptureSession alloc] init];
 
     success = [p_sys->session addInput:audioInput error: &o_returnedAudioError];
-    if( !success )
-    {
-        msg_Err( p_demux, "the audio capture device could not be added to capture session (%ld)", [o_returnedAudioError code] );
+    if(!success) {
+        msg_Err(p_demux, "the audio capture device could not be added to capture session (%ld)", [o_returnedAudioError code]);
         goto error;
     }
 
     success = [p_sys->session addOutput:p_sys->audiooutput error: &o_returnedAudioError];
-    if( !success )
-    {
-        msg_Err( p_demux, "audio output could not be added to capture session (%ld)", [o_returnedAudioError code] );
+    if(!success) {
+        msg_Err(p_demux, "audio output could not be added to capture session (%ld)", [o_returnedAudioError code]);
         goto error;
     }
 
@@ -482,22 +455,22 @@ static int Open( vlc_object_t *p_this )
     p_demux->info.i_title = 0;
     p_demux->info.i_seekpoint = 0;
 
-    msg_Dbg( p_demux, "New audio es %d channels %dHz",
-            audiofmt.audio.i_channels, audiofmt.audio.i_rate );
+    msg_Dbg(p_demux, "New audio es %d channels %dHz",
+            audiofmt.audio.i_channels, audiofmt.audio.i_rate);
 
-    p_sys->p_es_audio = es_out_Add( p_demux->out, &audiofmt );
+    p_sys->p_es_audio = es_out_Add(p_demux->out, &audiofmt);
 
     [audioInput release];
     [pool release];
 
-    msg_Dbg( p_demux, "QTSound: We have an audio device ready!" );
+    msg_Dbg(p_demux, "QTSound: We have an audio device ready!");
 
     return VLC_SUCCESS;
 error:
     [audioInput release];
     [pool release];
 
-    free( p_sys );
+    free(p_sys);
 
     return VLC_EGENERIC;
 }
@@ -505,7 +478,7 @@ error:
 /*****************************************************************************
  * Close: destroy interface
  *****************************************************************************/
-static void Close( vlc_object_t *p_this )
+static void Close(vlc_object_t *p_this)
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     demux_t *p_demux = (demux_t*)p_this;
@@ -515,7 +488,7 @@ static void Close( vlc_object_t *p_this )
     [p_sys->audiooutput performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
     [p_sys->session performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
 
-    free( p_sys );
+    free(p_sys);
 
     [pool release];
 }
@@ -523,24 +496,21 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Demux:
  *****************************************************************************/
-static int Demux( demux_t *p_demux )
+static int Demux(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_blocka;
     NSAutoreleasePool *pool;
 
-    p_blocka = block_New( p_demux, p_sys->i_audio_max_buffer_size );
+    p_blocka = block_New(p_demux, p_sys->i_audio_max_buffer_size);
 
-    if( !p_blocka )
-    {
-        msg_Err( p_demux, "cannot get audio block" );
+    if(!p_blocka) {
+        msg_Err(p_demux, "cannot get audio block");
         return 0;
     }
 
-    @synchronized (p_sys->audiooutput)
-    {
-        if ( [p_sys->audiooutput checkCurrentAudioBuffer] )
-        {
+    @synchronized (p_sys->audiooutput) {
+        if ([p_sys->audiooutput checkCurrentAudioBuffer]) {
             p_blocka->i_buffer = p_blocka->i_size = [p_sys->audiooutput getCurrentTotalDataSize];
             p_blocka->p_buffer = p_blocka->p_start = [p_sys->audiooutput getCurrentAudioBufferData];
             p_blocka->i_nb_samples = [p_sys->audiooutput getNumberOfSamples];
@@ -548,22 +518,19 @@ static int Demux( demux_t *p_demux )
         }
     }
 
-    if( !p_blocka->i_pts )
-    {
+    if(!p_blocka->i_pts) {
         // Nothing to transfer yet, just forget
-        block_Release( p_blocka );
-        msleep( 10000 );
+        block_Release(p_blocka);
+        msleep(10000);
         return 1;
     }
 
-    if( p_blocka )
-    {
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_blocka->i_pts );
-        es_out_Send( p_demux->out, p_sys->p_es_audio, p_blocka );
+    if(p_blocka) {
+        es_out_Control(p_demux->out, ES_OUT_SET_PCR, p_blocka->i_pts);
+        es_out_Send(p_demux->out, p_sys->p_es_audio, p_blocka);
     }
 
-    @synchronized (p_sys->audiooutput)
-    {
+    @synchronized (p_sys->audiooutput) {
         [p_sys->audiooutput freeAudioMem];
     }
 
@@ -573,25 +540,24 @@ static int Demux( demux_t *p_demux )
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int Control( demux_t *p_demux, int i_query, va_list args )
+static int Control(demux_t *p_demux, int i_query, va_list args)
 {
     bool *pb;
     int64_t *pi64;
 
-    switch( i_query )
-    {
+    switch(i_query) {
             /* Special for access_demux */
         case DEMUX_CAN_PAUSE:
         case DEMUX_CAN_SEEK:
         case DEMUX_SET_PAUSE_STATE:
         case DEMUX_CAN_CONTROL_PACE:
-            pb = (bool*)va_arg( args, bool * );
+            pb = (bool*)va_arg(args, bool *);
             *pb = false;
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = INT64_C(1000) * var_InheritInteger( p_demux, "live-caching" );
+            pi64 = (int64_t*)va_arg(args, int64_t *);
+            *pi64 = INT64_C(1000) * var_InheritInteger(p_demux, "live-caching");
             return VLC_SUCCESS;
 
         default:
