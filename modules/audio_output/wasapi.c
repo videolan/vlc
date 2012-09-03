@@ -26,6 +26,7 @@
 #define COBJMACROS
 #define CONST_VTABLE
 
+#include <stdlib.h>
 #include <assert.h>
 #include <audioclient.h>
 #include <audiopolicy.h>
@@ -54,6 +55,36 @@ vlc_module_begin()
     add_shortcut("was", "audioclient")
     set_callbacks(Open, Close)
 vlc_module_end()
+
+static LARGE_INTEGER freq; /* performance counters frequency */
+
+BOOL WINAPI DllMain(HINSTANCE, DWORD, LPVOID); /* avoid warning */
+
+BOOL WINAPI DllMain(HINSTANCE dll, DWORD reason, LPVOID reserved)
+{
+    (void) dll;
+    (void) reserved;
+
+    switch (reason)
+    {
+        case DLL_PROCESS_ATTACH:
+            if (!QueryPerformanceFrequency(&freq))
+                return FALSE;
+            break;
+    }
+    return TRUE;
+}
+
+static UINT64 GetQPC(void)
+{
+    LARGE_INTEGER counter;
+
+    if (!QueryPerformanceCounter(&counter))
+        abort();
+
+    lldiv_t d = lldiv(counter.QuadPart, freq.QuadPart);
+    return (d.quot * 10000000) + ((d.rem * 10000000) / freq.QuadPart);
+}
 
 static int TryEnter(vlc_object_t *obj)
 {
@@ -107,12 +138,13 @@ static void Play(audio_output_t *aout, block_t *block, mtime_t *restrict drift)
     {
         UINT64 pos, qpcpos;
 
-        /* NOTE: this assumes mdate() uses QPC() (which it currently does). */
         hr = IAudioClock_GetPosition(sys->clock, &pos, &qpcpos);
         if (SUCCEEDED(hr))
         {
-            qpcpos = (qpcpos + 5) / 10; /* 100ns -> 1µs */
-            *drift = mdate() - qpcpos;
+            qpcpos = GetQPC() - qpcpos;
+            static_assert((10000000 % CLOCK_FREQ) == 0,
+                          "Frequency conversion broken");
+            *drift = qpcpos / (10000000 / CLOCK_FREQ);
         }
         else
             msg_Warn(aout, "cannot get position (error 0x%lx)", hr);
