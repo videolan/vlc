@@ -827,10 +827,6 @@ static inline void SetQWLE (void *p, uint64_t qw)
 #       define O_NONBLOCK 0
 #   endif
 
-#   ifndef alloca
-#       define alloca _alloca
-#   endif
-
 #   include <tchar.h>
 #endif
 
