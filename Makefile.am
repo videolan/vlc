@@ -250,6 +250,10 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/play-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/play.png \
 	extras/package/macosx/Resources/mainwindow/play@2x.png \
+	extras/package/macosx/Resources/mainwindow/playlist-1btn-pressed.png \
+	extras/package/macosx/Resources/mainwindow/playlist-1btn-pressed@2x.png \
+	extras/package/macosx/Resources/mainwindow/playlist-1btn.png \
+	extras/package/macosx/Resources/mainwindow/playlist-1btn@2x.png \
 	extras/package/macosx/Resources/mainwindow/playlist-btn-blue.png \
 	extras/package/macosx/Resources/mainwindow/playlist-btn-blue@2x.png \
 	extras/package/macosx/Resources/mainwindow/playlist-btn-pressed.png \
@@ -344,6 +348,10 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/play-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/play_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/play_dark@2x.png \
+	extras/package/macosx/Resources/mainwindow_dark/playlist-1btn-dark-pressed.png \
+	extras/package/macosx/Resources/mainwindow_dark/playlist-1btn-dark-pressed@2x.png \
+	extras/package/macosx/Resources/mainwindow_dark/playlist-1btn-dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/playlist-1btn-dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/playlist-blue-pressed_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/playlist-blue-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/playlist-blue_dark.png \

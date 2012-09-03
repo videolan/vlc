@@ -878,7 +878,24 @@ static VLCMainWindow *_o_sharedInstance = nil;
     NSRect frame;
     float f_space = [o_repeat_btn frame].size.width + [o_shuffle_btn frame].size.width - 6.;
 
-    // FIXME: switch o_playlist_btn artwork
+    if (b_dark_interface) {
+        [[o_playlist_btn animator] setImage:[NSImage imageNamed:@"playlist_dark"]];
+        [[o_playlist_btn animator] setAlternateImage:[NSImage imageNamed:@"playlist-pressed_dark"]];
+    } else {
+        [[o_playlist_btn animator] setImage:[NSImage imageNamed:@"playlist-btn"]];
+        [[o_playlist_btn animator] setAlternateImage:[NSImage imageNamed:@"playlist-btn-pressed"]];
+    }
+    frame = [o_playlist_btn frame];
+    frame.size.width--;
+    [o_playlist_btn setFrame:frame];
+
+    if (b_fast) {
+        [o_repeat_btn setHidden: NO];
+        [o_shuffle_btn setHidden: NO];
+    } else {
+        [[o_repeat_btn animator] setHidden: NO];
+        [[o_shuffle_btn animator] setHidden: NO];
+    }
 
     #define resizeItem( item ) \
     frame = [item frame]; \
@@ -894,14 +911,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     resizeItem( o_time_sld_background );
     resizeItem( o_time_sld_fancygradient_view );
     #undef resizeItem
-
-    if (b_fast) {
-        [o_repeat_btn setHidden: NO];
-        [o_shuffle_btn setHidden: NO];
-    } else {
-        [[o_repeat_btn animator] setHidden: NO];
-        [[o_shuffle_btn animator] setHidden: NO];
-    }
 }
 
 - (void)removePlaymodeButtons:(BOOL)b_fast
@@ -911,7 +920,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_repeat_btn setHidden: YES];
     [o_shuffle_btn setHidden: YES];
 
-    // FIXME: switch o_playlist_btn artwork
+    if (b_dark_interface) {
+        [[o_playlist_btn animator] setImage:[NSImage imageNamed:@"playlist-1btn-dark"]];
+        [[o_playlist_btn animator] setAlternateImage:[NSImage imageNamed:@"playlist-1btn-dark-pressed"]];
+    } else {
+        [[o_playlist_btn animator] setImage:[NSImage imageNamed:@"playlist-1btn"]];
+        [[o_playlist_btn animator] setAlternateImage:[NSImage imageNamed:@"playlist-1btn-pressed"]];
+    }
+    frame = [o_playlist_btn frame];
+    frame.size.width++;
+    [o_playlist_btn setFrame:frame];
 
     #define resizeItem( item ) \
     frame = [item frame]; \
