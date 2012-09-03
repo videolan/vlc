@@ -40,16 +40,11 @@ static inline void *realloc_down( void *ptr, size_t size )
 /**
  * Simple dynamic array handling. Array is realloced at each insert/removal
  */
-#if defined( _MSC_VER ) && _MSC_VER < 1300
-#   define VLCCVP (void**) /* Work-around for broken compiler */
-#else
-#   define VLCCVP
-#endif
 #define INSERT_ELEM( p_ar, i_oldsize, i_pos, elem )                           \
     do                                                                        \
     {                                                                         \
         if( !(i_oldsize) ) (p_ar) = NULL;                                       \
-        (p_ar) = VLCCVP realloc( p_ar, ((i_oldsize) + 1) * sizeof(*(p_ar)) ); \
+        (p_ar) = realloc( p_ar, ((i_oldsize) + 1) * sizeof(*(p_ar)) ); \
         if( !(p_ar) ) abort();                                                \
         if( (i_oldsize) - (i_pos) )                                           \
         {                                                                     \
@@ -193,8 +188,8 @@ static inline void *realloc_down( void *ptr, size_t size )
 /* Internal functions */
 #define _ARRAY_ALLOC(array, newsize) {                                      \
     (array).i_alloc = newsize;                                              \
-    (array).p_elems = VLCCVP realloc( (array).p_elems, (array).i_alloc *    \
-                                    sizeof(*(array).p_elems) );             \
+    (array).p_elems = realloc( (array).p_elems, (array).i_alloc *           \
+                               sizeof(*(array).p_elems) );                  \
     if( !(array).p_elems ) abort();                                         \
 }
 
