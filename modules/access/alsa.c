@@ -128,6 +128,7 @@ struct demux_sys_t
     es_out_id_t *es;
     vlc_thread_t thread;
 
+    mtime_t start;
     mtime_t caching;
     snd_pcm_uframes_t period_size;
     unsigned rate;
@@ -224,7 +225,7 @@ static int Control (demux_t *demux, int query, va_list ap)
     switch (query)
     {
         case DEMUX_GET_TIME:
-            *va_arg (ap, int64_t *) = mdate();
+            *va_arg (ap, int64_t *) = mdate () - sys->start;
             break;
 
         case DEMUX_GET_PTS_DELAY:
@@ -442,6 +443,7 @@ static int Open (vlc_object_t *obj)
     fmt.audio.i_rate = param;
     sys->rate = param;
 
+    sys->start = mdate ();
     sys->caching = INT64_C(1000) * var_InheritInteger (demux, "live-caching");
     param = sys->caching;
     val = snd_pcm_hw_params_set_buffer_time_near (pcm, hw, &param, NULL);
