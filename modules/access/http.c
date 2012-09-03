@@ -1249,8 +1249,9 @@ static int Request( access_t *p_access, uint64_t i_tell )
         psz_path = "/";
     if( p_sys->b_proxy && pvs == NULL )
         net_Printf( p_access, p_sys->fd, NULL,
-                    "GET http://%s:%d HTTP/1.%d\r\n",
-                    p_sys->url.psz_host, p_sys->url.i_port, p_sys->i_version );
+                    "GET http://%s:%d%s HTTP/1.%d\r\n",
+                    p_sys->url.psz_host, p_sys->url.i_port,
+                    psz_path, p_sys->i_version );
     else
         net_Printf( p_access, p_sys->fd, pvs, "GET %s HTTP/1.%d\r\n",
                     psz_path, p_sys->i_version );
