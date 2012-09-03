@@ -759,7 +759,14 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[o_fwd_btn cell] accessibilitySetOverrideValue:_NS("Click and hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
 
     NSRect frame;
-    float f_space = 30.;
+    frame = [o_bwd_btn frame];
+    frame.size.width++;
+    [o_bwd_btn setFrame:frame];
+    frame = [o_fwd_btn frame];
+    frame.size.width++;
+    [o_fwd_btn setFrame:frame];
+
+    float f_space = 29.;
     #define moveItem( item ) \
     frame = [item frame]; \
     frame.origin.x = frame.origin.x + f_space; \
@@ -770,8 +777,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     moveItem( o_bwd_btn );
     moveItem( o_play_btn );
+    f_space = 28.;
     moveItem( o_fwd_btn );
-    f_space = 59.;
+    f_space = 57.;
     moveItem( o_stop_btn );
     moveItem( o_playlist_btn );
     moveItem( o_repeat_btn );
@@ -793,7 +801,19 @@ static VLCMainWindow *_o_sharedInstance = nil;
     resizeItem( o_time_sld_fancygradient_view );
     #undef resizeItem
 
-    preliminaryFrame.origin.x = [o_next_btn frame].origin.x + 85. + [o_fwd_btn frame].size.width;
+    if (b_dark_interface) {
+        [[o_fwd_btn animator] setImage:[NSImage imageNamed:@"forward-6btns-dark"]];
+        [[o_fwd_btn animator] setAlternateImage:[NSImage imageNamed:@"forward-6btns-dark-pressed"]];
+        [[o_bwd_btn animator] setImage:[NSImage imageNamed:@"backward-6btns-dark"]];
+        [[o_bwd_btn animator] setAlternateImage:[NSImage imageNamed:@"backward-6btns-dark-pressed"]];
+    } else {
+        [[o_fwd_btn animator] setImage:[NSImage imageNamed:@"forward-6btns"]];
+        [[o_fwd_btn animator] setAlternateImage:[NSImage imageNamed:@"forward-6btns-pressed"]];
+        [[o_bwd_btn animator] setImage:[NSImage imageNamed:@"backward-6btns"]];
+        [[o_bwd_btn animator] setAlternateImage:[NSImage imageNamed:@"backward-6btns-pressed"]];
+    }
+
+    preliminaryFrame.origin.x = [o_next_btn frame].origin.x + 82. + [o_fwd_btn frame].size.width;
     [o_next_btn setFrame: preliminaryFrame];
 
     // wait until the animation is done, if displayed
@@ -831,7 +851,14 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[o_fwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item. Hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
 
     NSRect frame;
-    float f_space = 30.;
+    frame = [o_bwd_btn frame];
+    frame.size.width--;
+    [o_bwd_btn setFrame:frame];
+    frame = [o_fwd_btn frame];
+    frame.size.width--;
+    [o_fwd_btn setFrame:frame];
+
+    float f_space = 29.;
     #define moveItem( item ) \
     frame = [item frame]; \
     frame.origin.x = frame.origin.x - f_space; \
@@ -842,8 +869,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     moveItem( o_bwd_btn );
     moveItem( o_play_btn );
+    f_space = 28.;
     moveItem( o_fwd_btn );
-    f_space = 59.;
+    f_space = 57.;
     moveItem( o_stop_btn );
     moveItem( o_playlist_btn );
     moveItem( o_repeat_btn );
@@ -864,6 +892,18 @@ static VLCMainWindow *_o_sharedInstance = nil;
     resizeItem( o_time_sld_background );
     resizeItem( o_time_sld_fancygradient_view );
     #undef resizeItem
+
+    if (b_dark_interface) {
+        [[o_fwd_btn animator] setImage:[NSImage imageNamed:@"forward-3btns-dark"]];
+        [[o_fwd_btn animator] setAlternateImage:[NSImage imageNamed:@"forward-3btns-dark-pressed"]];
+        [[o_bwd_btn animator] setImage:[NSImage imageNamed:@"backward-3btns-dark"]];
+        [[o_bwd_btn animator] setAlternateImage:[NSImage imageNamed:@"backward-3btns-dark-pressed"]];
+    } else {
+        [[o_fwd_btn animator] setImage:[NSImage imageNamed:@"forward-3btns"]];
+        [[o_fwd_btn animator] setAlternateImage:[NSImage imageNamed:@"forward-3btns-pressed"]];
+        [[o_bwd_btn animator] setImage:[NSImage imageNamed:@"backward-3btns"]];
+        [[o_bwd_btn animator] setAlternateImage:[NSImage imageNamed:@"backward-3btns-pressed"]];
+    }
 
     [o_bottombar_view setNeedsDisplay:YES];
 

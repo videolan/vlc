@@ -195,6 +195,10 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/backward-3btns-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/backward-3btns.png \
 	extras/package/macosx/Resources/mainwindow/backward-3btns@2x.png \
+	extras/package/macosx/Resources/mainwindow/backward-6btns-pressed.png \
+	extras/package/macosx/Resources/mainwindow/backward-6btns-pressed@2x.png \
+	extras/package/macosx/Resources/mainwindow/backward-6btns.png \
+	extras/package/macosx/Resources/mainwindow/backward-6btns@2x.png \
 	extras/package/macosx/Resources/mainwindow/bottom-background.png \
 	extras/package/macosx/Resources/mainwindow/bottom-background@2x.png \
 	extras/package/macosx/Resources/mainwindow/bottombar-mini.png \
@@ -215,6 +219,10 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/forward-3btns-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/forward-3btns.png \
 	extras/package/macosx/Resources/mainwindow/forward-3btns@2x.png \
+	extras/package/macosx/Resources/mainwindow/forward-6btns-pressed.png \
+	extras/package/macosx/Resources/mainwindow/forward-6btns-pressed@2x.png \
+	extras/package/macosx/Resources/mainwindow/forward-6btns.png \
+	extras/package/macosx/Resources/mainwindow/forward-6btns@2x.png \
 	extras/package/macosx/Resources/mainwindow/fullscreen-double-buttons-pressed.png \
 	extras/package/macosx/Resources/mainwindow/fullscreen-double-buttons-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/fullscreen-double-buttons.png \
@@ -307,6 +315,10 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/backward-3btns-dark-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/backward-3btns-dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/backward-3btns-dark@2x.png \
+	extras/package/macosx/Resources/mainwindow_dark/backward-6btns-dark-pressed.png \
+	extras/package/macosx/Resources/mainwindow_dark/backward-6btns-dark-pressed@2x.png \
+	extras/package/macosx/Resources/mainwindow_dark/backward-6btns-dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/backward-6btns-dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottom-background_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottom-background_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottombar-mini.png \
@@ -328,6 +340,10 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/forward-3btns-dark-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/forward-3btns-dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/forward-3btns-dark@2x.png \
+	extras/package/macosx/Resources/mainwindow_dark/forward-6btns-dark-pressed.png \
+	extras/package/macosx/Resources/mainwindow_dark/forward-6btns-dark-pressed@2x.png \
+	extras/package/macosx/Resources/mainwindow_dark/forward-6btns-dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/forward-6btns-dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/fullscreen-double-buttons-pressed_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/fullscreen-double-buttons-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/fullscreen-double-buttons_dark.png \
