@@ -61,6 +61,9 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 #define SOUT_CFG_PREFIX "sout-file-"
+#define OVERWRITE_TEXT N_("Overwrite existing file")
+#define OVERWRITE_LONGTEXT N_( \
+    "If the file already exists, it will be overwritten.")
 #define APPEND_TEXT N_("Append to file")
 #define APPEND_LONGTEXT N_( "Append to file if it exists instead " \
                             "of replacing it.")
@@ -74,6 +77,8 @@ vlc_module_begin ()
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_ACO )
     add_shortcut( "file", "stream", "fd" )
+    add_bool( SOUT_CFG_PREFIX "overwrite", true, OVERWRITE_TEXT,
+              OVERWRITE_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "append", false, APPEND_TEXT,APPEND_LONGTEXT,
               true )
 #ifdef O_SYNC
@@ -89,6 +94,7 @@ vlc_module_end ()
  *****************************************************************************/
 static const char *const ppsz_sout_options[] = {
     "append",
+    "overwrite",
 #ifdef O_SYNC
     "sync",
 #endif
@@ -116,6 +122,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    bool overwrite = var_GetBool (p_access, SOUT_CFG_PREFIX"overwrite");
     bool append = var_GetBool( p_access, SOUT_CFG_PREFIX "append" );
 
     if (!strcmp (p_access->psz_access, "fd"))
@@ -152,20 +159,24 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
-        char *psz_tmp = str_format_time( p_access->psz_path );
-        path_sanitize( psz_tmp );
+        char *path = str_format_time (p_access->psz_path);
+        path_sanitize (path);
 
-        fd = vlc_open( psz_tmp, O_RDWR | O_CREAT | O_LARGEFILE |
+        int flags = O_RDWR | O_CREAT | O_LARGEFILE;
+        if (!overwrite)
+            flags |= O_EXCL;
+        if (!append)
+            flags |= O_TRUNC;
 #ifdef O_SYNC
-                (var_GetBool( p_access, SOUT_CFG_PREFIX "sync" ) ? O_SYNC : 0) |
+        if (var_GetBool (p_access, SOUT_CFG_PREFIX"sync"))
+            flags |= O_SYNC;
 #endif
-                (append ? 0 : O_TRUNC), 0666 );
-        free( psz_tmp );
+        fd = vlc_open (path, flags, 0666);
         if (fd == -1)
-        {
-            msg_Err (p_access, "cannot create %s: %m", p_access->psz_path);
+            msg_Err (p_access, "cannot create %s: %m", path);
+        free (path);
+        if (fd == -1)
             return VLC_EGENERIC;
-        }
     }
 
     p_access->pf_write = Write;
