@@ -234,6 +234,10 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/mini-progressbar-wrapper-left.png \
 	extras/package/macosx/Resources/mainwindow/mini-progressbar-wrapper-middle.png \
 	extras/package/macosx/Resources/mainwindow/mini-progressbar-wrapper-right.png \
+	extras/package/macosx/Resources/mainwindow/next-6btns-pressed.png \
+	extras/package/macosx/Resources/mainwindow/next-6btns-pressed@2x.png \
+	extras/package/macosx/Resources/mainwindow/next-6btns.png \
+	extras/package/macosx/Resources/mainwindow/next-6btns@2x.png \
 	extras/package/macosx/Resources/mainwindow/pause-pressed.png \
 	extras/package/macosx/Resources/mainwindow/pause-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/pause.png \
@@ -252,6 +256,10 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/playlist-btn-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/playlist-btn.png \
 	extras/package/macosx/Resources/mainwindow/playlist-btn@2x.png \
+	extras/package/macosx/Resources/mainwindow/previous-6btns-pressed.png \
+	extras/package/macosx/Resources/mainwindow/previous-6btns-pressed@2x.png \
+	extras/package/macosx/Resources/mainwindow/previous-6btns.png \
+	extras/package/macosx/Resources/mainwindow/previous-6btns@2x.png \
 	extras/package/macosx/Resources/mainwindow/progression-fill-left.png \
 	extras/package/macosx/Resources/mainwindow/progression-fill-left@2x.png \
 	extras/package/macosx/Resources/mainwindow/progression-fill-middle.png \
@@ -332,6 +340,10 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/fullscreen-one-button-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/fullscreen-one-button_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/fullscreen-one-button_dark@2x.png \
+	extras/package/macosx/Resources/mainwindow_dark/next-6btns-dark-pressed.png \
+	extras/package/macosx/Resources/mainwindow_dark/next-6btns-dark-pressed@2x.png \
+	extras/package/macosx/Resources/mainwindow_dark/next-6btns-dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/next-6btns-dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/pause-pressed_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/pause-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/pause_dark.png \
@@ -352,6 +364,10 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/playlist-pressed_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/playlist_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/playlist_dark@2x.png \
+	extras/package/macosx/Resources/mainwindow_dark/previous-6btns-dark-pressed.png \
+	extras/package/macosx/Resources/mainwindow_dark/previous-6btns-dark-pressed@2x.png \
+	extras/package/macosx/Resources/mainwindow_dark/previous-6btns-dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/previous-6btns-dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/progressbar-fill-left_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/progressbar-fill-left_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/progressbar-fill-middle_dark.png \

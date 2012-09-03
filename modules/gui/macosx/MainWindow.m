@@ -719,11 +719,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     NSRect preliminaryFrame = [o_bwd_btn frame];
     BOOL b_enabled = [o_bwd_btn isEnabled];
-    preliminaryFrame.size.width = 26.;
+    preliminaryFrame.size.width = 29.;
     o_prev_btn = [[NSButton alloc] initWithFrame:preliminaryFrame];
     [o_prev_btn setButtonType: NSMomentaryChangeButton];
-    [o_prev_btn setImage: [NSImage imageNamed:@"back-single"]];
-    [o_prev_btn setAlternateImage: [NSImage imageNamed:@"back-pressed-single"]];
     [o_prev_btn setBezelStyle:NSRegularSquareBezelStyle];
     [o_prev_btn setBordered:NO];
     [o_prev_btn setTarget:self];
@@ -735,8 +733,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     o_next_btn = [[NSButton alloc] initWithFrame:preliminaryFrame];
     [o_next_btn setButtonType: NSMomentaryChangeButton];
-    [o_next_btn setImage: [NSImage imageNamed:@"forward-single"]];
-    [o_next_btn setAlternateImage: [NSImage imageNamed:@"forward-pressed-single"]];
     [o_next_btn setBezelStyle:NSRegularSquareBezelStyle];
     [o_next_btn setBordered:NO];
     [o_next_btn setTarget:self];
@@ -746,12 +742,24 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[o_next_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item.") forAttribute:NSAccessibilityDescriptionAttribute];
     [o_next_btn setEnabled: b_enabled];
 
+    if (b_dark_interface) {
+        [o_prev_btn setImage: [NSImage imageNamed:@"previous-6btns-dark"]];
+        [o_prev_btn setAlternateImage: [NSImage imageNamed:@"previous-6btns-dark-pressed"]];
+        [o_next_btn setImage: [NSImage imageNamed:@"next-6btns-dark"]];
+        [o_next_btn setAlternateImage: [NSImage imageNamed:@"next-6btns-dark-pressed"]];
+    } else {
+        [o_prev_btn setImage: [NSImage imageNamed:@"previous-6btns"]];
+        [o_prev_btn setAlternateImage: [NSImage imageNamed:@"previous-6btns-pressed"]];
+        [o_next_btn setImage: [NSImage imageNamed:@"next-6btns"]];
+        [o_next_btn setAlternateImage: [NSImage imageNamed:@"next-6btns-pressed"]];
+    }
+
     /* change the accessibility help for the backward/forward buttons accordingly */
     [[o_bwd_btn cell] accessibilitySetOverrideValue:_NS("Click and hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
     [[o_fwd_btn cell] accessibilitySetOverrideValue:_NS("Click and hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
 
     NSRect frame;
-    float f_space = 32.;
+    float f_space = 30.;
     #define moveItem( item ) \
     frame = [item frame]; \
     frame.origin.x = frame.origin.x + f_space; \
@@ -763,7 +771,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     moveItem( o_bwd_btn );
     moveItem( o_play_btn );
     moveItem( o_fwd_btn );
-    f_space = 62.;
+    f_space = 59.;
     moveItem( o_stop_btn );
     moveItem( o_playlist_btn );
     moveItem( o_repeat_btn );
@@ -785,7 +793,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     resizeItem( o_time_sld_fancygradient_view );
     #undef resizeItem
 
-    preliminaryFrame.origin.x = [o_next_btn frame].origin.x + 80. + [o_fwd_btn frame].size.width;
+    preliminaryFrame.origin.x = [o_next_btn frame].origin.x + 85. + [o_fwd_btn frame].size.width;
     [o_next_btn setFrame: preliminaryFrame];
 
     // wait until the animation is done, if displayed
@@ -823,7 +831,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[o_fwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item. Hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
 
     NSRect frame;
-    float f_space = 32.;
+    float f_space = 30.;
     #define moveItem( item ) \
     frame = [item frame]; \
     frame.origin.x = frame.origin.x - f_space; \
@@ -835,7 +843,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     moveItem( o_bwd_btn );
     moveItem( o_play_btn );
     moveItem( o_fwd_btn );
-    f_space = 62.;
+    f_space = 59.;
     moveItem( o_stop_btn );
     moveItem( o_playlist_btn );
     moveItem( o_repeat_btn );
