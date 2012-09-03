@@ -57,6 +57,7 @@ struct demux_sys_t
 
     es_out_id_t *es;
     vlc_v4l2_ctrl_t *controls;
+    mtime_t start;
 };
 
 static void *UserPtrThread (void *);
@@ -94,6 +95,7 @@ int DemuxOpen( vlc_object_t *obj )
     }
 
     sys->controls = ControlsInit (VLC_OBJECT(demux), fd);
+    sys->start = mdate ();
     demux->pf_demux = NULL;
     demux->pf_control = DemuxControl;
     demux->info.i_update = 0;
@@ -628,6 +630,8 @@ static void *ReadThread (void *data)
 
 static int DemuxControl( demux_t *demux, int query, va_list args )
 {
+    demux_sys_t *sys = demux->p_sys;
+
     switch( query )
     {
         /* Special for access_demux */
@@ -643,7 +647,7 @@ static int DemuxControl( demux_t *demux, int query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            *va_arg( args, int64_t * ) = mdate();
+            *va_arg (args, int64_t *) = mdate() - sys->start;
             return VLC_SUCCESS;
 
         /* TODO implement others */
