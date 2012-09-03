@@ -1804,8 +1804,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)setupVideoView
 {
-    // TODO: make lion fullscreen compatible with macosx-background and !embedded-video
-    if (var_InheritBool(VLCIntf, "macosx-background") && !b_nativeFullscreenMode) {
+    // TODO: make lion fullscreen compatible with video-wallpaper and !embedded-video
+    if (var_InheritBool(VLCIntf, "video-wallpaper") && !b_nativeFullscreenMode) {
         msg_Dbg(VLCIntf, "Creating background window");
         NSScreen *screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_InheritInteger(VLCIntf, "macosx-vdev")];
         if (!screen)
@@ -1971,7 +1971,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     nativeVideoSize = size;
 
-    if (var_InheritBool(VLCIntf, "macosx-video-autoresize") && !b_fullscreen && !var_InheritBool(VLCIntf, "macosx-background"))
+    if (var_InheritBool(VLCIntf, "macosx-video-autoresize") && !b_fullscreen && !var_InheritBool(VLCIntf, "video-wallpaper"))
         [self performSelectorOnMainThread:@selector(resizeWindow) withObject:nil waitUntilDone:NO];
 }
 

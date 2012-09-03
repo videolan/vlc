@@ -116,9 +116,6 @@ void WindowClose  (vout_window_t *);
 #define PLAYMODEBUTTONS_TEXT N_("Show play mode control buttons")
 #define PLAYMODEBUTTONS_LONGTEXT N_("Shows the shuffle and repeat buttons in the main window")
 
-#define BACKGROUND_TEXT N_("Use as desktop background")
-#define BACKGROUND_LONGTEXT N_("Use the video as the desktop background.")
-
 vlc_module_begin ()
     set_description(N_("Mac OS X interface"))
     set_capability("interface", 200)
@@ -144,7 +141,6 @@ vlc_module_begin ()
     add_bool("macosx-icon-change", true, ICONCHANGE_TEXT, ICONCHANGE_LONGTEXT, true)
     add_bool("macosx-show-playback-buttons", false, JUMPBUTTONS_TEXT, JUMPBUTTONS_LONGTEXT, false)
     add_bool("macosx-show-playmode-buttons", true, PLAYMODEBUTTONS_TEXT, PLAYMODEBUTTONS_LONGTEXT, false)
-    add_bool("macosx-background", false, BACKGROUND_TEXT, BACKGROUND_LONGTEXT, false)
 
     add_submodule ()
         set_description("Mac OS X Video Output Provider")
