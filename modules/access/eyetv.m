@@ -50,26 +50,26 @@
 /*****************************************************************************
  * Module descriptior
  *****************************************************************************/
-static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
+static int  Open (vlc_object_t *);
+static void Close(vlc_object_t *);
 
 #define CHANNEL_TEXT N_("Channel number")
-#define CHANNEL_LONGTEXT N_( \
+#define CHANNEL_LONGTEXT N_(\
     "EyeTV program number, or use 0 for last channel, " \
-    "-1 for S-Video input, -2 for Composite input" )
+    "-1 for S-Video input, -2 for Composite input")
 
 vlc_module_begin ()
-    set_shortname( "EyeTV" )
-    set_description( N_("EyeTV input") )
-    set_category( CAT_INPUT )
-    set_subcategory( SUBCAT_INPUT_ACCESS )
+    set_shortname("EyeTV")
+    set_description(N_("EyeTV input"))
+    set_category(CAT_INPUT)
+    set_subcategory(SUBCAT_INPUT_ACCESS)
 
-    add_integer( "eyetv-channel", 0,
-                 CHANNEL_TEXT, CHANNEL_LONGTEXT, false )
+    add_integer("eyetv-channel", 0,
+                 CHANNEL_TEXT, CHANNEL_LONGTEXT, false)
 
-    set_capability( "access", 0 )
-    add_shortcut( "eyetv" )
-    set_callbacks( Open, Close )
+    set_capability("access", 0)
+    add_shortcut("eyetv")
+    set_callbacks(Open, Close)
 vlc_module_end ()
 
 /*****************************************************************************
@@ -80,15 +80,14 @@ struct access_sys_t
     int eyetvSock;
 };
 
-static block_t *BlockRead( access_t *);
-static int Control( access_t *, int, va_list );
+static block_t *BlockRead(access_t *);
+static int Control(access_t *, int, va_list);
 
-static void selectChannel( vlc_object_t *p_this, int theChannelNum )
+static void selectChannel(vlc_object_t *p_this, int theChannelNum)
 {
     NSAppleScript *script;
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    switch( theChannelNum )
-    {
+    switch(theChannelNum) {
         case -2: // Composite
             script = [[NSAppleScript alloc] initWithSource:
                         @"tell application \"EyeTV\"\n"
@@ -116,8 +115,7 @@ static void selectChannel( vlc_object_t *p_this, int theChannelNum )
                          "end tell"];
             break;
         default:
-            if( theChannelNum > 0 )
-            {
+            if (theChannelNum > 0) {
                 NSString *channel_change = [NSString stringWithFormat:
                     @"tell application \"EyeTV\"\n"
                      "  channel_change channel number %d\n"
@@ -132,10 +130,9 @@ static void selectChannel( vlc_object_t *p_this, int theChannelNum )
     }
     NSDictionary *errorDict;
     NSAppleEventDescriptor *descriptor = [script executeAndReturnError:&errorDict];
-    if( nil == descriptor ) 
-    {
+    if (nil == descriptor) {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
-        msg_Err( p_this, "EyeTV source change failed with error status '%s'", [errorString UTF8String] );
+        msg_Err(p_this, "EyeTV source change failed with error status '%s'", [errorString UTF8String]);
     }
     [script release];
     [pool release];
@@ -144,84 +141,77 @@ static void selectChannel( vlc_object_t *p_this, int theChannelNum )
 /*****************************************************************************
  * Open: sets up the module and its threads
  *****************************************************************************/
-static int Open( vlc_object_t *p_this )
+static int Open(vlc_object_t *p_this)
 {
     access_t        *p_access = (access_t *)p_this;
     access_sys_t    *p_sys;
 
     struct sockaddr_un publicAddr, peerAddr;
     int publicSock;
- 
+
     /* Init p_access */
-    access_InitFields( p_access );
-    ACCESS_SET_CALLBACKS( NULL, BlockRead, Control, NULL );
-    p_sys = p_access->p_sys = calloc( 1, sizeof( access_sys_t ) );
-    if( !p_sys )
+    access_InitFields(p_access);
+    ACCESS_SET_CALLBACKS(NULL, BlockRead, Control, NULL);
+    p_sys = p_access->p_sys = calloc(1, sizeof(access_sys_t));
+    if (!p_sys)
         return VLC_ENOMEM;
 
-    msg_Dbg( p_access, "coming up" );
-    selectChannel( p_this, var_InheritInteger( p_access, "eyetv-channel" ) );
+    msg_Dbg(p_access, "coming up");
+    selectChannel(p_this, var_InheritInteger(p_access, "eyetv-channel"));
 
     /* socket */
     memset(&publicAddr, 0, sizeof(publicAddr));
     publicAddr.sun_family = AF_UNIX;
     strncpy(publicAddr.sun_path, "/tmp/.vlc-eyetv-bridge", sizeof(publicAddr.sun_path)-1);
     /* remove previous public path if it wasn't cleanly removed */
-    if( (0 != unlink(publicAddr.sun_path)) && (ENOENT != errno) )
-    {
-        msg_Err( p_access, "local socket path is not usable (errno=%d)", errno );
-        free( p_sys );
+    if ((0 != unlink(publicAddr.sun_path)) && (ENOENT != errno)) {
+        msg_Err(p_access, "local socket path is not usable (errno=%d)", errno);
+        free(p_sys);
         return VLC_EGENERIC;
     }
 
     publicSock = socket(PF_UNIX, SOCK_STREAM, 0);
-    if( publicSock == -1 )
-    {
-        msg_Err( p_access, "create local socket failed (errno=%d)", errno );
-        free( p_sys );
+    if (publicSock == -1) {
+        msg_Err(p_access, "create local socket failed (errno=%d)", errno);
+        free(p_sys);
         return VLC_EGENERIC;
     }
 
-    if( bind(publicSock, (struct sockaddr *)&publicAddr, sizeof(struct sockaddr_un)) == -1 )
-    {
-        msg_Err( p_access, "bind local socket failed (errno=%d)", errno );
-        close( publicSock );
-        free( p_sys );
+    if (bind(publicSock, (struct sockaddr *)&publicAddr, sizeof(struct sockaddr_un)) == -1) {
+        msg_Err(p_access, "bind local socket failed (errno=%d)", errno);
+        close(publicSock);
+        free(p_sys);
         return VLC_EGENERIC;
     }
 
     /* we are not expecting more than one connection */
-    if( listen(publicSock, 1) == -1 )
-    {
-        msg_Err( p_access, "cannot accept connection (errno=%d)", errno );
-        close( publicSock );
-        free( p_sys );
+    if (listen(publicSock, 1) == -1) {
+        msg_Err(p_access, "cannot accept connection (errno=%d)", errno);
+        close(publicSock);
+        free(p_sys);
         return VLC_EGENERIC;
-    }
-    else
-    {
+    } else {
         socklen_t peerSockLen = sizeof(struct sockaddr_un);
         int peerSock;
 
         /* tell the EyeTV plugin to open start sending */
-        CFNotificationCenterPostNotification( CFNotificationCenterGetDistributedCenter (),
+        CFNotificationCenterPostNotification(CFNotificationCenterGetDistributedCenter (),
                                               CFSTR("VLCAccessStartDataSending"),
                                               CFSTR("VLCEyeTVSupport"),
                                               /*userInfo*/ NULL,
-                                              TRUE );
+                                              TRUE);
 
-        msg_Dbg( p_access, "plugin notified" );
+        msg_Dbg(p_access, "plugin notified");
 
         peerSock = accept(publicSock, (struct sockaddr *)&peerAddr, &peerSockLen);
-        if( peerSock == -1 )
-        {
-            msg_Err( p_access, "cannot wait for connection (errno=%d)", errno );
-            close( publicSock );
-            free( p_sys );
+        if (peerSock == -1) {
+            msg_Err(p_access, "cannot wait for connection (errno=%d)", errno);
+            close(publicSock);
+            free(p_sys);
             return VLC_EGENERIC;
         }
 
-        msg_Dbg( p_access, "plugin connected" );
+        msg_Dbg(p_access, "plugin connected");
 
         p_sys->eyetvSock = peerSock;
 
@@ -235,87 +225,82 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Close: closes msg-port, free resources
  *****************************************************************************/
-static void Close( vlc_object_t *p_this )
+static void Close(vlc_object_t *p_this)
 {
     access_t     *p_access = (access_t *)p_this;
     access_sys_t *p_sys = p_access->p_sys;
- 
-    msg_Dbg( p_access, "closing" );
- 
+
+    msg_Dbg(p_access, "closing");
+
     /* tell the EyeTV plugin to close its msg port and stop sending */
-    CFNotificationCenterPostNotification( CFNotificationCenterGetDistributedCenter (),
+    CFNotificationCenterPostNotification(CFNotificationCenterGetDistributedCenter (),
                                           CFSTR("VLCAccessStopDataSending"),
                                           CFSTR("VLCEyeTVSupport"),
                                           /*userInfo*/ NULL,
-                                          TRUE );
- 
-    msg_Dbg( p_access, "plugin notified" );
+                                          TRUE);
+    msg_Dbg(p_access, "plugin notified");
 
+    close(p_sys->eyetvSock);
+    msg_Dbg(p_access, "msg port closed and freed");
 
-close(p_sys->eyetvSock);
- 
-    msg_Dbg( p_access, "msg port closed and freed" );
- 
-    free( p_sys );
+    free(p_sys);
 }
 
 /*****************************************************************************
 * BlockRead: forwarding data from EyeTV plugin which was received above
 *****************************************************************************/
-static block_t *BlockRead( access_t *p_access )
+static block_t *BlockRead(access_t *p_access)
 {
     access_sys_t *p_sys = p_access->p_sys;
     block_t      *p_block;
     ssize_t len;
 
-    if( p_access->info.b_eof )
+    if (p_access->info.b_eof)
         return NULL;
 
     /* Read data */
-    p_block = block_New( p_access, MTU );
-    len = net_Read( p_access, p_sys->eyetvSock, NULL,
-                    p_block->p_buffer, MTU, false );
+    p_block = block_New(p_access, MTU);
+    len = net_Read(p_access, p_sys->eyetvSock, NULL,
+                    p_block->p_buffer, MTU, false);
 
-    if( len < 0 )
-    {
-        block_Release( p_block );
+    if (len < 0) {
+        block_Release(p_block);
         return NULL;
     }
 
-    return block_Realloc( p_block, 0, p_block->i_buffer = len );
+    return block_Realloc(p_block, 0, p_block->i_buffer = len);
 }
 
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int Control( access_t *p_access, int i_query, va_list args )
+static int Control(access_t *p_access, int i_query, va_list args)
 {
     bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
     access_sys_t  *p_sys = (access_sys_t *) p_access->p_sys;
- 
-    switch( i_query )
-    {
+
+    switch(i_query) {
         case ACCESS_CAN_SEEK:
         case ACCESS_CAN_FASTSEEK:
-            pb_bool = (bool*)va_arg( args, bool* );
+            pb_bool = (bool*)va_arg(args, bool*);
             *pb_bool = false;
             break;
         case ACCESS_CAN_PAUSE:
-            pb_bool = (bool*)va_arg( args, bool* );
+            pb_bool = (bool*)va_arg(args, bool*);
             *pb_bool = false;
             break;
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (bool*)va_arg( args, bool* );
+            pb_bool = (bool*)va_arg(args, bool*);
             *pb_bool = false;
             break;
 
         /* */
         case ACCESS_GET_PTS_DELAY:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            pi_64 = (int64_t*)va_arg(args, int64_t *);
             *pi_64 =
-                INT64_C(1000) * var_InheritInteger( p_access, "live-caching" );
+                INT64_C(1000) * var_InheritInteger(p_access, "live-caching");
             break;
 
         case ACCESS_SET_PAUSE_STATE:
@@ -325,11 +310,11 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_SET_PRIVATE_ID_STATE:
         case ACCESS_GET_CONTENT_TYPE:
             return VLC_EGENERIC;
- 
+
         default:
-            msg_Warn( p_access, "unimplemented query in control" );
+            msg_Warn(p_access, "unimplemented query in control");
             return VLC_EGENERIC;
- 
+
     }
     return VLC_SUCCESS;
 }
