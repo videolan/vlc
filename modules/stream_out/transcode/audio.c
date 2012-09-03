@@ -114,8 +114,25 @@ static int transcode_audio_filter_chain_build( sout_stream_t *p_stream, filter_c
 
         if( !filter_chain_AppendFilter( p_chain, NULL, NULL, NULL, &current ) )
         {
-            msg_Err( p_stream, "Failed to find conversion filter to fl32" );
-            return VLC_EGENERIC;
+            /* If that fails, try going through fi32 */
+            current.i_codec =
+                current.audio.i_format = VLC_CODEC_FI32;
+            aout_FormatPrepare( &current.audio );
+
+            if( !filter_chain_AppendFilter( p_chain, NULL, NULL, NULL, &current ) )
+            {
+                msg_Err( p_stream, "Failed to find conversion filter to fi32" );
+                return VLC_EGENERIC;
+            }
+            current = *filter_chain_GetFmtOut( p_chain );
+            current.i_codec =
+                current.audio.i_format = VLC_CODEC_FL32;
+            aout_FormatPrepare( &current.audio );
+            if( !filter_chain_AppendFilter( p_chain, NULL, NULL, NULL, &current ) )
+            {
+                msg_Err( p_stream, "Failed to find conversion filter to fl32" );
+                return VLC_EGENERIC;
+            }
         }
         current = *filter_chain_GetFmtOut( p_chain );
     }
