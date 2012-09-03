@@ -762,13 +762,13 @@
                     <reference key="NSControlView" ref="1023610457"/>
                     <int key="NSButtonFlags">138674176</int>
                     <int key="NSButtonFlags2">2</int>
-                    <object class="NSCustomResource" key="NSNormalImage">
+                    <object class="NSCustomResource" key="NSNormalImage" id="1045625320">
                       <string key="NSClassName">NSImage</string>
-                      <string key="NSResourceName">back-3btns-dark</string>
+                      <string key="NSResourceName">backward-3btns</string>
                     </object>
-                    <object class="NSCustomResource" key="NSAlternateImage">
+                    <object class="NSCustomResource" key="NSAlternateImage" id="221198018">
                       <string key="NSClassName">NSImage</string>
-                      <string key="NSResourceName">back-3btns-dark-pressed</string>
+                      <string key="NSResourceName">backward-3btns-pressed</string>
                     </object>
                     <string key="NSAlternateContents"/>
                     <object class="NSMutableString" key="NSKeyEquivalent">
@@ -3879,6 +3879,7 @@ LCAuLi4</string>
                   </object>
                   <string key="NSFrame">{{1, 1}, {498, 102}}</string>
                   <reference key="NSSuperview" ref="563453281"/>
+                  <reference key="NSNextKeyView" ref="550703508"/>
                   <reference key="NSDocView" ref="550703508"/>
                   <reference key="NSBGColor" ref="712893775"/>
                   <object class="NSCursor" key="NSCursor">
@@ -3910,6 +3911,7 @@ LCAuLi4</string>
               </object>
               <string key="NSFrame">{{92, 95}, {500, 104}}</string>
               <reference key="NSSuperview" ref="366395044"/>
+              <reference key="NSNextKeyView" ref="1059447005"/>
               <int key="NSsFlags">133650</int>
               <reference key="NSVScroller" ref="444566474"/>
               <reference key="NSHScroller" ref="599664251"/>
@@ -4655,14 +4657,8 @@ LCAuLi4</string>
                     <reference key="NSControlView" ref="647546256"/>
                     <int key="NSButtonFlags">138674176</int>
                     <int key="NSButtonFlags2">2</int>
-                    <object class="NSCustomResource" key="NSNormalImage">
-                      <string key="NSClassName">NSImage</string>
-                      <string key="NSResourceName">back</string>
-                    </object>
-                    <object class="NSCustomResource" key="NSAlternateImage">
-                      <string key="NSClassName">NSImage</string>
-                      <string key="NSResourceName">back-pressed</string>
-                    </object>
+                    <reference key="NSNormalImage" ref="1045625320"/>
+                    <reference key="NSAlternateImage" ref="221198018"/>
                     <string key="NSAlternateContents"/>
                     <object class="NSMutableString" key="NSKeyEquivalent">
                       <characters key="NS.bytes"/>
@@ -4687,11 +4683,11 @@ LCAuLi4</string>
                     <int key="NSButtonFlags2">2</int>
                     <object class="NSCustomResource" key="NSNormalImage">
                       <string key="NSClassName">NSImage</string>
-                      <string key="NSResourceName">forward</string>
+                      <string key="NSResourceName">forward-3btns</string>
                     </object>
                     <object class="NSCustomResource" key="NSAlternateImage">
                       <string key="NSClassName">NSImage</string>
-                      <string key="NSResourceName">forward-pressed</string>
+                      <string key="NSResourceName">forward-3btns-pressed</string>
                     </object>
                     <string key="NSAlternateContents"/>
                     <string key="NSKeyEquivalent"/>
@@ -19978,18 +19974,16 @@ LCAuLi4</string>
         <string>NSApplicationIcon</string>
         <string>NSMenuCheckmark</string>
         <string>NSMenuMixedState</string>
-        <string>back</string>
-        <string>back-3btns-dark</string>
-        <string>back-3btns-dark-pressed</string>
-        <string>back-pressed</string>
+        <string>backward-3btns</string>
+        <string>backward-3btns-pressed</string>
         <string>dropzone</string>
         <string>dropzone-background</string>
         <string>effects-double-buttons</string>
         <string>effects-double-buttons-pressed</string>
-        <string>forward</string>
+        <string>forward-3btns</string>
         <string>forward-3btns-dark</string>
         <string>forward-3btns-dark-pressed</string>
-        <string>forward-pressed</string>
+        <string>forward-3btns-pressed</string>
         <string>fs_background</string>
         <string>fs_exit_fullscreen</string>
         <string>fs_forward</string>
@@ -20024,18 +20018,16 @@ LCAuLi4</string>
         <string>{128, 128}</string>
         <string>{11, 11}</string>
         <string>{10, 3}</string>
-        <string>{35, 23}</string>
         <string>{128, 128}</string>
         <string>{128, 128}</string>
-        <string>{35, 23}</string>
         <string>{112, 112}</string>
         <string>{4, 4}</string>
         <string>{29, 23}</string>
         <string>{29, 23}</string>
-        <string>{35, 23}</string>
         <string>{128, 128}</string>
         <string>{128, 128}</string>
-        <string>{35, 23}</string>
+        <string>{128, 128}</string>
+        <string>{128, 128}</string>
         <string>{549, 87}</string>
         <string>{22, 22}</string>
         <string>{42, 20}</string>
