@@ -85,7 +85,7 @@ vlc_module_begin ()
     set_shortname ("Mac OS X")
     set_description (N_("Mac OS X OpenGL video output (requires drawable-nsobject)"))
     set_category (CAT_VIDEO)
-    set_subcategory (SUBCAT_VIDEO_VOUT )
+    set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("vout display", 300)
     set_callbacks (Open, Close)
 
@@ -143,12 +143,10 @@ static int Open (vlc_object_t *this)
     if (!sys)
         return VLC_ENOMEM;
 
-    if (!CGDisplayUsesOpenGLAcceleration (kCGDirectMainDisplay))
-    {
+    if (!CGDisplayUsesOpenGLAcceleration (kCGDirectMainDisplay)) {
         msg_Err (this, "no OpenGL hardware acceleration found. this can lead to slow output and unexpected results");
         dialog_Fatal (this, _("OpenGL acceleration is not supported on your Mac"), _("Your Mac lacks Quartz Extreme acceleration, which is required for video output. It will still work, but much slower and with possibly unexpected results."));
-    }
-    else
+    } else
         msg_Dbg (this, "Quartz Extreme acceleration is active");
 
     vd->sys = sys;
@@ -159,11 +157,8 @@ static int Open (vlc_object_t *this)
     /* Get the drawable object */
     id container = var_CreateGetAddress (vd, "drawable-nsobject");
     if (container)
-    {
         vout_display_DeleteWindow (vd, NULL);
-    }
-    else
-    {
+    else {
         vout_window_cfg_t wnd_cfg;
 
         memset (&wnd_cfg, 0, sizeof (wnd_cfg));
@@ -177,8 +172,7 @@ static int Open (vlc_object_t *this)
         if (sys->embed)
             container = sys->embed->handle.nsobject;
 
-        if (!container)
-        {
+        if (!container) {
             msg_Dbg(vd, "No drawable-nsobject nor vout_window_t found, passing over.");
             goto error;
         }
@@ -202,14 +196,11 @@ static int Open (vlc_object_t *this)
      * That's why we'll release on main thread in Close(). */
     if ([(id)container respondsToSelector:@selector(addVoutSubview:)])
         [(id)container performSelectorOnMainThread:@selector(addVoutSubview:) withObject:sys->glView waitUntilDone:NO];
-    else if ([container isKindOfClass:[NSView class]])
-    {
+    else if ([container isKindOfClass:[NSView class]]) {
         NSView *parentView = container;
         [parentView performSelectorOnMainThread:@selector(addSubview:) withObject:sys->glView waitUntilDone:NO];
         [sys->glView performSelectorOnMainThread:@selector(setFrameToBoundsOfView:) withObject:[NSValue valueWithPointer:parentView] waitUntilDone:NO];
-    }
-    else
-    {
+    } else {
         msg_Err(vd, "Invalid drawable-nsobject object. drawable-nsobject must either be an NSView or comply to the @protocol VLCOpenGLVideoViewEmbedding.");
         goto error;
     }
@@ -228,8 +219,7 @@ static int Open (vlc_object_t *this)
     video_format_t fmt = vd->fmt;
 
     sys->vgl = vout_display_opengl_New (&vd->fmt, &subpicture_chromas, &sys->gl);
-    if (!sys->vgl)
-    {
+    if (!sys->vgl) {
         sys->gl.sys = NULL;
         goto error;
     }
@@ -269,10 +259,9 @@ void Close (vlc_object_t *this)
 
     var_Destroy (vd, "drawable-nsobject");
     if ([(id)sys->container respondsToSelector:@selector(removeVoutSubview:)])
-    {
         /* This will retain sys->glView */
         [(id)sys->container performSelectorOnMainThread:@selector(removeVoutSubview:) withObject:sys->glView waitUntilDone:NO];
-    }
+
     /* release on main thread as explained in Open() */
     [(id)sys->container performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
     [sys->glView performSelectorOnMainThread:@selector(removeFromSuperview) withObject:nil waitUntilDone:NO];
@@ -362,13 +351,10 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             const video_format_t *source;
             bool is_forced = false;
 
-            if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP)
-            {
+            if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
                 source = (const video_format_t *)va_arg (ap, const video_format_t *);
                 cfg = vd->cfg;
-            }
-            else
-            {
+            } else {
                 source = &vd->source;
                 cfg = (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
                 if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
@@ -402,10 +388,9 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             /* For resize, we call glViewport in reshape and not here.
                This has the positive side effect that we avoid erratic sizing as we animate every resize. */
             if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
-            {
                 // x / y are top left corner, but we need the lower left one
                 glViewport (place.x, cfg_tmp.display.height - (place.y + place.height), place.width, place.height);
-            }
+
 
             [o_pool release];
             return VLC_SUCCESS;
@@ -440,8 +425,7 @@ static int OpenglLock (vlc_gl_t *gl)
     vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
     NSOpenGLContext *context = [sys->glView openGLContext];
     CGLError err = CGLLockContext ([context CGLContextObj]);
-    if (kCGLNoError == err)
-    {
+    if (kCGLNoError == err) {
         [context makeCurrentContext];
         return 0;
     }
@@ -607,10 +591,9 @@ static void OpenglSwap (vlc_gl_t *gl)
         hasFirstFrame = vd && vd->sys->has_first_frame;
     }
 
-    if (hasFirstFrame) {
+    if (hasFirstFrame)
         // This will lock gl.
         vout_display_opengl_Display (vd->sys->vgl, &vd->source);
-    }
     else
         glClear (GL_COLOR_BUFFER_BIT);
 }
@@ -716,8 +699,7 @@ static void OpenglSwap (vlc_gl_t *gl)
 
 - (void)mouseDown:(NSEvent *)o_event
 {
-    if ([o_event type] == NSLeftMouseDown && !([o_event modifierFlags] &  NSControlKeyMask))
-    {
+    if ([o_event type] == NSLeftMouseDown && !([o_event modifierFlags] &  NSControlKeyMask)) {
         if ([o_event clickCount] <= 1)
             vout_display_SendEventMousePressed (vd, MOUSE_BUTTON_LEFT);
     }
@@ -761,16 +743,12 @@ static void OpenglSwap (vlc_gl_t *gl)
     ml = [self convertPoint: [o_event locationInWindow] fromView: nil];
     b_inside = [self mouse: ml inRect: s_rect];
     
-    if (b_inside)
-    {
-        @synchronized (self)
-        {
-            if (vd)
-            {
+    if (b_inside) {
+        @synchronized (self) {
+            if (vd) {
                 vout_display_place_t place = vd->sys->place;
 
-                if (place.width > 0 && place.height > 0)
-                {
+                if (place.width > 0 && place.height > 0) {
                     const int x = vd->source.i_x_offset +
                     (int64_t)(ml.x - place.x) * vd->source.i_visible_width / place.width;
                     const int y = vd->source.i_y_offset +
