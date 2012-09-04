@@ -4150,7 +4150,6 @@ AC_CONFIG_FILES([
   share/Makefile
   compat/Makefile
   src/Makefile
-  src/test/Makefile
   lib/Makefile
   bin/Makefile
   test/Makefile
