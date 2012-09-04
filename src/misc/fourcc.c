@@ -33,6 +33,14 @@
 #include <vlc_es.h>
 #include <assert.h>
 
+
+typedef struct
+{
+    char p_class[4];
+    char p_fourcc[4];
+    char psz_description[56];
+} staticentry_t;
+
 typedef struct
 {
     char p_class[4];
@@ -57,7 +65,7 @@ typedef struct
 
 
 /* */
-static const entry_t p_list_video[] = {
+static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_MPGV, "MPEG-1/2 Video"),
         A("mpgv"),
@@ -947,7 +955,7 @@ static const entry_t p_list_video[] = {
 
     B(0, "")
 };
-static const entry_t p_list_audio[] = {
+static const staticentry_t p_list_audio[] = {
 
     /* Windows Media Audio 1 */
     B(VLC_CODEC_WMA1, "Windows Media Audio 1"),
@@ -1321,7 +1329,7 @@ static const entry_t p_list_audio[] = {
 
     B(0, "")
 };
-static const entry_t p_list_spu[] = {
+static const staticentry_t p_list_spu[] = {
 
     B(VLC_CODEC_SPU, "DVD Subtitles"),
         A("spu "),
@@ -1383,7 +1391,7 @@ static inline vlc_fourcc_t CreateFourcc( const char *psz_fourcc )
 }
 
 /* */
-static entry_t Lookup( const entry_t p_list[], vlc_fourcc_t i_fourcc )
+static entry_t Lookup( const staticentry_t p_list[], vlc_fourcc_t i_fourcc )
 {
     const char *p_class = NULL;
     const char *psz_description = NULL;
@@ -1392,7 +1400,7 @@ static entry_t Lookup( const entry_t p_list[], vlc_fourcc_t i_fourcc )
 
     for( int i = 0; ; i++ )
     {
-        const entry_t *p = &p_list[i];
+        const staticentry_t *p = &p_list[i];
         const vlc_fourcc_t i_entry_fourcc = CreateFourcc( p->p_fourcc );
         const vlc_fourcc_t i_entry_class = CreateFourcc( p->p_class );
 
