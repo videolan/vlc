@@ -216,8 +216,8 @@ static int ResetCrop (vlc_object_t *obj, int fd)
      * In practice, it does not. */
     if (v4l2_ioctl (fd, VIDIOC_CROPCAP, &cropcap) < 0)
     {
-        msg_Warn (obj, "cannot get cropping properties: %m");
-        return -1;
+        msg_Dbg (obj, "cannot get cropping properties: %m");
+        return 0;
     }
 
     /* Reset to the default cropping rectangle */
