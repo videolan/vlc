@@ -649,14 +649,8 @@ AS_IF([test "${SYS}" = "mingw32"], [
   have_dynamic_objects="yes" #assume we can use shared objects
 ])
 
-test "${enable_shared}" = "no" && have_dynamic_objects=no
-
-AS_IF([test "${have_dynamic_objects}" != "no"], [
-  AC_DEFINE(HAVE_DYNAMIC_PLUGINS, 1,
-            [Define to 1 if dynamic plugins are supported.])
-], [
-  dnl Clear $LIBDL so as not to break linking
-  LIBDL=""
+AS_IF([test "${enable_shared}" = "no"], [
+  have_dynamic_objects=no
 ])
 AM_CONDITIONAL(HAVE_DYNAMIC_PLUGINS, [test "${have_dynamic_objects}" != "no"])
 

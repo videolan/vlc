@@ -171,6 +171,9 @@ AM_CPPFLAGS = $(INCICONV) $(IDN_CFLAGS) \
 	-DPKGDATADIR=\"$(vlcdatadir)\" \
 	-DPKGLIBDIR=\"$(vlclibdir)\"
 AM_CFLAGS = $(CFLAGS_libvlccore)
+if HAVE_DYNAMIC_PLUGINS
+AM_CPPFLAGS += -DHAVE_DYNAMIC_PLUGINS
+endif
 
 libvlccore_la_SOURCES = $(SOURCES_libvlc)
 libvlccore_la_LDFLAGS = \
