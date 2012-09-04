@@ -75,14 +75,8 @@ set -x
 ###  classic bootstrap stuff
 ###
 
-# Automake complains if these are not present
-echo > ABOUT-NLS
-cp -f INSTALL INSTALL.git
-
 autoreconf --install --force --verbose ${ACLOCAL_ARGS}
-rm -f po/Makevars.template ABOUT-NLS
-echo > ABOUT-NLS
-mv -f INSTALL.git INSTALL
+rm -f po/Makevars.template
 
 ##
 ##  files which need to be regenerated
