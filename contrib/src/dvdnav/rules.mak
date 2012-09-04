@@ -1,7 +1,9 @@
 # DVDNAV
 
-LIBDVDNAV_VERSION := 4.2.0
-LIBDVDNAV_URL := http://dvdnav.mplayerhq.hu/releases/libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
+# LIBDVDNAV_VERSION := 4.2.0
+# LIBDVDNAV_URL := http://dvdnav.mplayerhq.hu/releases/libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
+DVDNAV_GITURL := git://github.com/microe/libdvdnav
+LIBDVDNAV_VERSION := git
 
 ifdef BUILD_DISCS
 PKGS += dvdnav
@@ -10,15 +12,19 @@ ifeq ($(call need_pkg,"dvdnav"),)
 PKGS_FOUND += dvdnav
 endif
 
-$(TARBALLS)/libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2:
-	$(call download,$(LIBDVDNAV_URL))
+$(TARBALLS)/libdvdnav-git.tar.xz:
+	$(call download_git,$(DVDNAV_GITURL))
 
-.sum-dvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
+# $(TARBALLS)/libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2:
+# 	$(call download,$(LIBDVDNAV_URL))
 
-dvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2 .sum-dvdnav
+.sum-dvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.xz
+	$(warning $@ not implemented)
+	touch $@
+
+dvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.xz .sum-dvdnav
 	$(UNPACK)
 	$(APPLY) $(SRC)/dvdnav/dvdnav.patch
-	$(APPLY) $(SRC)/dvdnav/libdvdnav-searching.c-check-cellnr-before-indexing.patch
 	$(MOVE)
 
 DEPS_dvdnav = dvdcss dvdread
