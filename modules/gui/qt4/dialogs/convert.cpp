@@ -140,7 +140,7 @@ void ConvertDialog::close()
         mrl += ":";
         if( displayBox->isChecked() )
             mrl += "duplicate{dst=display,dst=";
-        mrl += "std{access=file,mux=" + profile->getMux()
+        mrl += "std{access=file{no-overwrite},mux=" + profile->getMux()
              + ",dst='" + fileLine->text() + "'}";
         if( displayBox->isChecked() )
             mrl += "}";

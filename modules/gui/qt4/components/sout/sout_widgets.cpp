@@ -128,6 +128,7 @@ QString FileDestBox::getMRL( const QString& mux )
         }
     }
     m.option( "dst", outputfile );
+    m.option( "no-overwrite" );
     m.end();
 
     return m.getMrl();
