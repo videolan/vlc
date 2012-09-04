@@ -446,7 +446,7 @@ int BuildUpdate( media_library_t *p_ml,
 exitfor:
 
     /* TODO: Album artist. Verify albumart */
-    if( i_album_id <= 0 || ( psz_album && *psz_album ) )
+    if( i_album_id <= 0 && psz_album )
     {
         i_album_id = ml_GetAlbumId( p_ml, psz_album );
         if( i_album_id < 0 ) //0 is Unknown
