@@ -355,19 +355,23 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 *ppp_title = (input_title_t**)malloc( sizeof( input_title_t**) * p_sys->titles.size() );
 
                 for( size_t i = 0; i < p_sys->titles.size(); i++ )
-                {
                     (*ppp_title)[i] = vlc_input_title_Duplicate( p_sys->titles[i] );
-                }
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
 
         case DEMUX_SET_TITLE:
-            /* TODO handle editions as titles */
+            /* handle editions as titles */
             i_idx = (int)va_arg( args, int );
-            if( i_idx < p_sys->used_segments.size() )
+            if(i_idx <  p_sys->titles.size() && p_sys->titles[i_idx]->i_seekpoint)
             {
-                p_sys->JumpTo( *p_sys->used_segments[i_idx], NULL );
+                p_sys->p_current_segment->i_current_edition = i_idx;
+                p_sys->i_current_title = i_idx;
+                p_sys->p_current_segment->p_current_chapter = p_sys->p_current_segment->editions[p_sys->p_current_segment->i_current_edition]->getChapterbyTimecode(0);
+
+                Seek( p_demux, (int64_t)p_sys->titles[i_idx]->seekpoint[0]->i_time_offset, -1, NULL);
+                p_demux->info.i_seekpoint |= INPUT_UPDATE_SEEKPOINT;
+                p_demux->info.i_seekpoint = 0;
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;

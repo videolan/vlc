@@ -653,18 +653,19 @@ bool demux_sys_t::PreloadLinked()
         p_seg = used_segments[i];
         if ( p_seg->Editions() != NULL )
         {
-            input_title_t *p_title = vlc_input_title_New();
-            p_seg->i_sys_title = i;
-            int i_chapters;
-
-            // TODO use a name for each edition, let the TITLE deal with a codec name
             for ( j=0; j<p_seg->Editions()->size(); j++ )
             {
+                input_title_t *p_title = vlc_input_title_New();
+                int i_chapters;
+
+                // TODO use a name for each edition, let the TITLE deal with a codec name
                 if ( p_title->psz_name == NULL )
                 {
                     const char* psz_tmp = (*p_seg->Editions())[j]->GetMainName().c_str();
                     if( *psz_tmp != '\0' )
                         p_title->psz_name = strdup( psz_tmp );
+                    else if( asprintf(&(p_title->psz_name), "%s %d", N_("Segment"), (int)i) == -1 )
+                        p_title->psz_name = NULL;
                 }
 
                 i_chapters = 0;
@@ -672,17 +673,11 @@ bool demux_sys_t::PreloadLinked()
 
                 // Input duration into i_length
                 p_title->i_length = ( *p_seg->Editions() )[j]->i_duration;
-            }
 
-            // create a name if there is none
-            if ( p_title->psz_name == NULL )
-            {
-                if( asprintf(&(p_title->psz_name), "%s %d", N_("Segment"), (int)i) == -1 )
-                    p_title->psz_name = NULL;
+                titles.push_back( p_title );
             }
-
-            titles.push_back( p_title );
         }
+        p_seg->i_sys_title = p_seg->i_current_edition;
     }
 
     // TODO decide which segment should be first used (VMG for DVD)
@@ -718,6 +713,10 @@ bool demux_sys_t::PreparePlayback( virtual_segment_c *p_new_segment )
     /* add information */
     p_current_segment->CurrentSegment()->InformationCreate( );
     p_current_segment->CurrentSegment()->Select( 0 );
+
+    /* Seek to the beginning */
+    p_current_segment->Seek(p_current_segment->CurrentSegment()->sys.demuxer,
+                            0, 0, NULL, -1);
 
     return true;
 }
