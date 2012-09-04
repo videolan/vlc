@@ -390,6 +390,8 @@ LT_INIT([dlopen win32-dll shared disable-static])
 LT_LANG([C++])
 LT_LANG([Windows Resource])
 
+DOLT
+
 m4_undefine([AC_DEPLIBS_CHECK_METHOD])
 m4_defun([AC_DEPLIBS_CHECK_METHOD],[])
 
