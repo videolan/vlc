@@ -178,12 +178,17 @@ QVariant MLItem::data( int column ) const
         case ML_SCORE: return media->i_score ? media->i_score : QVariant();
         case ML_TITLE:
         {
+            vlc_mutex_lock( &media->lock );
+            qsz_return = qfu( media->psz_title );
+            vlc_mutex_unlock( &media->lock );
             /* If no title, return filename */
-            if( !EMPTY_STR( media->psz_title ) )
-                return qfu( media->psz_title );
+            if( ! qsz_return.isEmpty() )
+                return qsz_return;
             else
             {
+                vlc_mutex_lock( &media->lock );
                 QFileInfo p_file = QFileInfo( qfu( media->psz_uri ) );
+                vlc_mutex_unlock( &media->lock );
                 return p_file.fileName().isEmpty() ? p_file.absoluteFilePath()
                     : p_file.fileName();
             }
