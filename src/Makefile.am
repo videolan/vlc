@@ -3,7 +3,6 @@
 ###############################################################################
 
 AUTOMAKE_OPTIONS = subdir-objects
-SUBDIRS = . test
 
 NULL =
 EXTRA_DIST = \
@@ -477,6 +476,38 @@ SOURCES_libvlc_vlm = \
 SOURCES_libvlc = \
 	$(SOURCES_libvlc_common) \
 	$(NULL)
+
+# Unit/regression tests
+#
+check_PROGRAMS = \
+	test_block \
+	test_dictionary \
+	test_i18n_atof \
+	test_md5 \
+	test_timer \
+	test_url \
+	test_utf8 \
+	test_xmlent \
+	test_headers
+
+TESTS = $(check_PROGRAMS)
+
+test_block_SOURCES = test/block_test.c
+test_block_LDADD = $(LDADD) $(LIBS_libvlccore)
+test_block_DEPENDENCIES =
+
+test_dictionary_SOURCES = test/dictionary.c
+test_i18n_atof_SOURCES = test/i18n_atof.c
+test_md5_SOURCES = test/md5.c
+test_timer_SOURCES = test/timer.c
+test_url_SOURCES = test/url.c
+test_utf8_SOURCES = test/utf8.c
+test_xmlent_SOURCES = test/xmlent.c
+test_headers_SOURCES = test/headers.c
+
+AM_LDFLAGS = -no-install
+LDADD = libvlccore.la \
+	../compat/libcompat.la
 
 ###############################################################################
 # GIT revision
