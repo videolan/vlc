@@ -48,38 +48,46 @@
  *       If a->meta > b->meta, return +1
  * @note If a->meta == NULL and b->meta != NULL (strings), then b>a
  */
-static int compareMeta( const ml_media_t *a, const ml_media_t *b,
-                        ml_select_e meta )
+static int compareMeta( ml_media_t *a, ml_media_t *b, ml_select_e meta )
 {
-#   define scomp(c) ((a->c&&b->c&&*a->c&&*b->c) ? strcasecmp(a->c,b->c) : \
-                     (a->c&&*a->c?-1:(b->c&&*b->c?1:0)))
-#   define icomp(c) (a->c<b->c?-1:(a->c==b->c?0:1))
+    bool i_ret = 0;
+#   define scomp(c) i_ret = ((a->c&&b->c&&*a->c&&*b->c) ?\
+                     strcasecmp(a->c,b->c) : \
+                     (a->c&&*a->c?-1:(b->c&&*b->c?1:0))); break;
+#   define icomp(c) i_ret = (a->c<b->c?-1:(a->c==b->c?0:1)); break;
+    if ( a == b ) return 0;
+    vlc_mutex_lock( &a->lock );
+    vlc_mutex_lock( &b->lock );
     switch( meta )
     {
-        case ML_ALBUM: return scomp( psz_album );
-        case ML_ALBUM_ID: return icomp( i_album_id );
-        //case ML_ARTIST: return scomp( psz_artist );
-        //case ML_ARTIST_ID: return icomp( i_artist_id );
-        case ML_COVER: return scomp( psz_cover );
-        case ML_DURATION: return icomp( i_duration );
-        case ML_EXTRA: return scomp( psz_extra );
-        case ML_GENRE: return scomp( psz_genre );
-        case ML_ID: return icomp( i_id );
-        case ML_LAST_PLAYED: return icomp( i_last_played );
-        case ML_ORIGINAL_TITLE: return scomp( psz_orig_title );
-        case ML_PLAYED_COUNT: return icomp( i_played_count );
-        // case ML_ROLE: return 0;
-        case ML_SCORE: return icomp( i_score );
-        case ML_TITLE: return scomp( psz_title );
-        case ML_TRACK_NUMBER: return icomp( i_track_number );
-        case ML_TYPE: return icomp( i_type );
-        case ML_URI: return scomp( psz_uri );
-        case ML_VOTE: return icomp( i_vote );
-        case ML_YEAR: return icomp( i_year );
-        default: return 0;
+    case ML_ALBUM: scomp( psz_album );
+    case ML_ALBUM_ID: icomp( i_album_id );
+        //case ML_ARTIST: scomp( psz_artist );
+        //case ML_ARTIST_ID: icomp( i_artist_id );
+    case ML_COVER: scomp( psz_cover );
+    case ML_DURATION: icomp( i_duration );
+    case ML_EXTRA: scomp( psz_extra );
+    case ML_GENRE: scomp( psz_genre );
+    case ML_ID: icomp( i_id );
+    case ML_LAST_PLAYED: icomp( i_last_played );
+    case ML_ORIGINAL_TITLE: scomp( psz_orig_title );
+    case ML_PLAYED_COUNT: icomp( i_played_count );
+        // case ML_ROLE:  0;
+    case ML_SCORE: icomp( i_score );
+    case ML_TITLE: scomp( psz_title );
+    case ML_TRACK_NUMBER: icomp( i_track_number );
+    case ML_TYPE: icomp( i_type );
+    case ML_URI: scomp( psz_uri );
+    case ML_VOTE: icomp( i_vote );
+    case ML_YEAR: icomp( i_year );
+    default:
+        break;
     }
 #   undef scomp
 #   undef icomp
+    vlc_mutex_unlock( &a->lock );
+    vlc_mutex_unlock( &b->lock );
+    return i_ret;
 }
 
 
