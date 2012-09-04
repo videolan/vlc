@@ -1210,7 +1210,7 @@ void CopyInputItemToMedia( ml_media_t *p_media, input_item_t *p_item )
     p_media->psz_title      = input_item_GetTitle       ( p_item );
     p_media->psz_uri        = input_item_GetURL         ( p_item );
     if( !p_media->psz_uri )
-        p_media->psz_uri    = strdup( p_item->psz_uri );
+        p_media->psz_uri = input_item_GetURI( p_item );
     p_media->psz_album      = input_item_GetAlbum       ( p_item );
     p_media->psz_cover      = input_item_GetArtURL      ( p_item );
     p_media->psz_genre      = input_item_GetGenre       ( p_item );
