@@ -18,46 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if defined (HAVE_LINUX_VIDEODEV2_H)
-# include <linux/videodev2.h>
-#elif defined (HAVE_SYS_VIDEOIO_H)
-# include <sys/videoio.h>
-#else
-# error "No Video4Linux2 headers found."
-#endif
-#if !HAVE_DECL_V4L2_CTRL_TYPE_INTEGER_MENU
-# warning Please update Video4Linux2 headers!
-#endif
-
-/* Hacks to compile with old headers */
-#ifndef V4L2_CTRL_FLAG_VOLATILE /* 3.2 */
-# define V4L2_CTRL_FLAG_VOLATILE 0x0080
-# define V4L2_CID_POWER_LINE_FREQUENCY_AUTO 3
-# define V4L2_STD_G (V4L2_STD_PAL_G|V4L2_STD_SECAM_G)
-# define V4L2_STD_H (V4L2_STD_PAL_H|V4L2_STD_SECAM_H)
-# define V4L2_STD_L (V4L2_STD_SECAM_L|V4L2_STD_SECAM_LC)
-# define V4L2_STD_BG (V4L2_STD_B|V4L2_STD_G)
-# define V4L2_STD_MTS (V4L2_STD_NTSC_M|V4L2_STD_PAL_M|V4L2_STD_PAL_N|\
-                       V4L2_STD_PAL_Nc)
-#endif
-#ifndef V4L2_CID_ILLUMINATORS_1 /* 2.6.37 */
-# define V4L2_CID_ILLUMINATORS_1 (V4L2_CID_BASE+38)
-# define V4L2_CID_ILLUMINATORS_2 (V4L2_CID_BASE+37)
-#endif
-#ifndef V4L2_CID_CHROMA_GAIN /* 2.6.35 */
-# define V4L2_CID_CHROMA_GAIN (V4L2_CID_BASE+36)
-# define V4L2_COLORFX_VIVID 9
-# define V4L2_COLORFX_SKIN_WHITEN 8
-# define V4L2_COLORFX_GRASS_GREEN 7
-# define V4L2_COLORFX_SKY_BLUE 6
-# define V4L2_COLORFX_SKETCH 5
-# define V4L2_COLORFX_EMBOSS 4
-# define V4L2_COLORFX_NEGATIVE 3
-#endif
-#ifndef V4L2_CID_ROTATE /* 2.6.33 */
-# define V4L2_CID_BG_COLOR (V4L2_CID_BASE+35)
-# define V4L2_CID_ROTATE (V4L2_CID_BASE+34)
-#endif
+#include "videodev2.h"
 
 /* libv4l2 functions */
 extern int v4l2_fd_open (int, int);

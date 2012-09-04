@@ -487,7 +487,6 @@ int OpenDevice (vlc_object_t *obj, const char *path, uint32_t *restrict caps)
             cap.card, cap.driver, (cap.version >> 16) & 0xFF,
             (cap.version >> 8) & 0xFF, cap.version & 0xFF, cap.bus_info);
 
-#ifdef V4L2_CAP_DEVICE_CAPS
     if (cap.capabilities & V4L2_CAP_DEVICE_CAPS)
     {
         msg_Dbg (obj, " with capabilities 0x%08"PRIX32" "
@@ -495,7 +494,6 @@ int OpenDevice (vlc_object_t *obj, const char *path, uint32_t *restrict caps)
         *caps = cap.device_caps;
     }
     else
-#endif
     {
         msg_Dbg (obj, " with unknown capabilities  "
                  "(overall 0x%08"PRIX32")", cap.capabilities);

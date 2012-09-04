@@ -190,7 +190,6 @@ static const vlc_v4l2_fmt_t v4l2_fmts[] =
 
     /* Compressed data types */
     { V4L2_PIX_FMT_JPEG,   VLC_CODEC_MJPG, 0, 0, 0 },
-#ifdef V4L2_PIX_FMT_H264
     { V4L2_PIX_FMT_H264,   VLC_CODEC_H264, 0, 0, 0 },
     /* FIXME: fill p_extra for avc1... */
 //  { V4L2_PIX_FMT_H264_NO_SC, VLC_FOURCC('a','v','c','1'), 0, 0, 0 }
@@ -201,7 +200,6 @@ static const vlc_v4l2_fmt_t v4l2_fmts[] =
     { V4L2_PIX_FMT_MPEG1,  VLC_CODEC_MPGV, 0, 0, 0 },
     { V4L2_PIX_FMT_VC1_ANNEX_G, VLC_CODEC_VC1, 0, 0, 0 },
     { V4L2_PIX_FMT_VC1_ANNEX_L, VLC_CODEC_VC1, 0, 0, 0 },
-#endif
     //V4L2_PIX_FMT_MPEG -> use access
 
     /* Reserved formats */
