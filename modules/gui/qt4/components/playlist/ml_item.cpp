@@ -286,12 +286,15 @@ ml_media_t* MLItem::getMedia() const
 
 QUrl MLItem::getUri() const
 {
-    if( !media->psz_uri ) return QUrl(); // This should be rootItem
-    QString uri = qfu( media->psz_uri );
-    if( uri.contains( "://" ) )
-        return QUrl( uri );
-    else
-        return QUrl( "file://" + uri );
+    QString uri;
+    vlc_mutex_lock( &media->lock );
+    uri = QString( media->psz_uri );
+    vlc_mutex_unlock( &media->lock );
+    if ( uri.isEmpty() ) return QUrl(); // This should be rootItem
+
+    QUrl url( uri );
+    if ( url.scheme().isEmpty() ) url.setScheme( "file" );
+    return url;
 }
 
 bool MLItem::operator<( MLItem* item )
