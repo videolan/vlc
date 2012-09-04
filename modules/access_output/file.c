@@ -41,6 +41,7 @@
 #include <vlc_block.h>
 #include <vlc_fs.h>
 #include <vlc_strings.h>
+#include <vlc_dialog.h>
 
 #if defined( WIN32 ) || defined( __OS2__ )
 #   include <io.h>
@@ -171,9 +172,23 @@ static int Open( vlc_object_t *p_this )
         if (var_GetBool (p_access, SOUT_CFG_PREFIX"sync"))
             flags |= O_SYNC;
 #endif
-        fd = vlc_open (path, flags, 0666);
-        if (fd == -1)
-            msg_Err (p_access, "cannot create %s: %m", path);
+        do
+        {
+            fd = vlc_open (path, flags, 0666);
+            if (fd != -1)
+                break;
+            if (fd == -1)
+                msg_Err (p_access, "cannot create %s: %m", path);
+            if (overwrite || errno != EEXIST)
+                break;
+            flags &= ~O_EXCL;
+        }
+        while (dialog_Question (p_access, path,
+                                N_("The output file already exists. "
+                                "If recording continues, the file will be "
+                                "overriden and its content will be lost."),
+                                N_("Keep existing file"),
+                                N_("Overwrite"), NULL) == 2);
         free (path);
         if (fd == -1)
             return VLC_EGENERIC;
