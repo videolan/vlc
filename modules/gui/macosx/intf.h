@@ -85,7 +85,6 @@ struct intf_sys_t
     id o_sprefs;                /* VLCSimplePrefs */
     id o_open;                  /* VLCOpen        */
     id o_wizard;                /* VLCWizard      */
-    id o_embedded_list;         /* VLCEmbeddedList*/
     id o_coredialogs;           /* VLCCoreDialogProvider */
     id o_info;                  /* VLCInformation */
     id o_eyetv;                 /* VLCEyeTVController */
@@ -158,7 +157,6 @@ struct intf_sys_t
 - (id)playlist;
 - (id)info;
 - (id)wizard;
-- (id)embeddedList;
 - (id)getVideoViewAtPositionX: (int *)pi_x Y: (int *)pi_y withWidth: (unsigned int*)pi_width andHeight: (unsigned int*)pi_height;
 - (void)setNativeVideoSize:(NSSize)size;
 - (id)coreDialogProvider;
@@ -214,6 +212,5 @@ struct intf_sys_t
  *****************************************************************************/
 
 @interface VLCApplication : NSApplication
-{
-}
+
 @end

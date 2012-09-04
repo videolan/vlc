@@ -524,7 +524,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_msg_arr = [[NSMutableArray arrayWithCapacity: 600] retain];
 
     o_open = [[VLCOpen alloc] init];
-    //o_embedded_list = [[VLCEmbeddedList alloc] init];
     o_coredialogs = [[VLCCoreDialogProvider alloc] init];
     o_info = [[VLCInfo alloc] init];
     o_mainmenu = [[VLCMainMenu alloc] init];
@@ -793,7 +792,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     [crashLogURLConnection cancel];
     [crashLogURLConnection release];
 
-    [o_embedded_list release];
     [o_coredialogs release];
     [o_eyetv release];
 
@@ -1507,14 +1505,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     pi_height = &i_height;
     msg_Dbg(VLCIntf, "returning videoview with x=%i, y=%i, width=%i, height=%i", i_x, i_y, i_width, i_height);
     return videoView;
-}
-
-- (id)embeddedList
-{
-    if (o_embedded_list)
-        return o_embedded_list;
-
-    return nil;
 }
 
 - (id)coreDialogProvider
