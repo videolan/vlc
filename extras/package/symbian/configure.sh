@@ -15,4 +15,4 @@ CPPFLAGS="-D_UNICODE -D__GCCE__ -D__SYMBIAN32__ -D__S60_3X__ -D__FreeBSD_cc_vers
 ../configure --host=arm-none-symbianelf --build=i386-linux \
   --disable-vlc --enable-static --disable-shared --enable-static-modules \
   --disable-mad --disable-avcodec --disable-a52 --disable-libgcrypt --disable-remoteosd \
-  --disable-lua --disable-swscale --disable-postproc --disable-qt4 --disable-skins2
+  --disable-lua --disable-swscale --disable-postproc --disable-qt --disable-skins2

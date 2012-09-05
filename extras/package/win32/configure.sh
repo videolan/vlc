@@ -21,7 +21,7 @@ OPTIONS="
       --enable-goom
       --enable-caca
       --disable-sdl
-      --enable-qt4
+      --enable-qt
       --enable-skins2
       --enable-sse --enable-mmx
       --enable-libcddb

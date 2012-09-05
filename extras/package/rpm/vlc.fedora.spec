@@ -450,7 +450,7 @@ export JAVA_HOME=%{_prefix}/lib/jvm/java
 	--disable-musicbrainz			\
 	--enable-taglib				\
 	--enable-dbus-control			\
-	--enable-qt4				\
+	--enable-qt				\
 	--disable-xvmc				\
 %endif
 
