@@ -68,9 +68,14 @@ endif
 	cp "$(top_builddir)/npapi-vlc/installed/lib/npvlc.dll" "$(win32_destdir)/"
 
 # Compiler shared DLLs, when using compilers built with --enable-shared
-# If gcc_s_sjlj/stdc++-6 DLLs exist, our C++ modules were linked to them
-	gcc_lib_dir=`$(CXX) -v /dev/null 2>&1 | grep ^LIBRARY_PATH|cut -d= -f2|cut -d: -f1` ; \
-	cp "$${gcc_lib_dir}/libstdc++-6.dll" "$${gcc_lib_dir}/libgcc_s_sjlj-1.dll" "$(win32_destdir)/" ; true
+# The shared DLLs may not necessarily be in the first LIBRARY_PATH, we
+# should check them all.
+	library_path_list=`$(CXX) -v /dev/null 2>&1 | grep ^LIBRARY_PATH|cut -d= -f2` ;\
+	IFS=':' ;\
+	for x in $$library_path_list ;\
+	do \
+		cp "$$x/libstdc++-6.dll" "$$x/libgcc_s_sjlj-1.dll" "$(win32_destdir)/" ; true ;\
+	done
 
 # SDK
 	mkdir -p "$(win32_destdir)/sdk/lib/"
