@@ -4,7 +4,7 @@ OPUS_VERSION := 1.0.1-rc3
 
 OPUS_URL := http://downloads.xiph.org/releases/opus/opus-$(OPUS_VERSION).tar.gz
 
-#PKGS += opus
+PKGS += opus
 ifeq ($(call need_pkg,"opus >= 0.9.14"),)
 PKGS_FOUND += opus
 endif
