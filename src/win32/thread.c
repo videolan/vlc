@@ -721,29 +721,39 @@ static union
 {
     struct
     {
-        LARGE_INTEGER freq;
-    } perf;
+#if (_WIN32_WINNT < 0x0601)
+        BOOL (*query) (PULONGLONG);
+#endif
+    } interrupt;
     struct
     {
 #if (_WIN32_WINNT < 0x0600)
         ULONGLONG (*get) (void);
 #endif
     } tick;
+    struct
+    {
+        LARGE_INTEGER freq;
+    } perf;
 } clk;
 
-#if (_WIN32_WINNT >= 0x0601)
 static mtime_t mdate_interrupt (void)
 {
     ULONGLONG ts;
+    BOOL ret;
 
-    if (unlikely(!QueryUnbiasedInterruptTime (&ts)))
+#if (_WIN32_WINNT >= 0x0601)
+    ret = QueryUnbiasedInterruptTime (&ts);
+#else
+    ret = clk.interrupt.query (&ts);
+#endif
+    if (unlikely(!ret))
         abort ();
 
     /* hundreds of nanoseconds */
     static_assert ((10000000 % CLOCK_FREQ) == 0, "Broken frequencies ratio");
     return ts / (10000000 / CLOCK_FREQ);
 }
-#endif
 
 static mtime_t mdate_tick (void)
 {
@@ -833,14 +843,21 @@ void SelectClockSource (vlc_object_t *obj)
     char *str = var_InheritString (obj, "clock-source");
     if (str != NULL)
         name = str;
-#if (_WIN32_WINNT >= 0x0601)
     if (!strcmp (name, "interrupt"))
     {
         msg_Dbg (obj, "using interrupt time as clock source");
+#if (_WIN32_WINNT < 0x0601)
+        HANDLE h = GetModuleHandle (_T("kernel32.dll"));
+        if (unlikely(h == NULL))
+            abort ();
+        clk.interrupt.query = (void *)GetProcAddress (h,
+                                                      _T("QueryUnbiasedInterruptTime"));
+        if (unlikely(clk.interrupt.query == NULL))
+            abort ();
+#endif
         mdate_selected = mdate_interrupt;
     }
     else
-#endif
     if (!strcmp (name, "tick"))
     {
         msg_Dbg (obj, "using Windows time as clock source");
@@ -899,7 +916,7 @@ size_t EnumClockSource (vlc_object_t *obj, char ***vp, char ***np)
     char **names = xmalloc (sizeof (*names) * max);
     size_t n = 0;
 
-#if (_WIN32_WINNT < 0x0600)
+#if (_WIN32_WINNT < 0x0601)
     DWORD version = LOWORD(GetVersion());
     version = (LOBYTE(version) << 8) | (HIBYTE(version) << 0);
 #endif
@@ -907,11 +924,14 @@ size_t EnumClockSource (vlc_object_t *obj, char ***vp, char ***np)
     values[n] = xstrdup ("");
     names[n] = xstrdup (_("Auto"));
     n++;
-#if (_WIN32_WINNT >= 0x0601)
-    values[n] = xstrdup ("interrupt");
-    names[n] = xstrdup ("Interrupt time");
-    n++;
+#if (_WIN32_WINNT < 0x0601)
+    if (version >= 0x0601)
 #endif
+    {
+        values[n] = xstrdup ("interrupt");
+        names[n] = xstrdup ("Interrupt time");
+        n++;
+    }
 #if (_WIN32_WINNT < 0x0600)
     if (version >= 0x0600)
 #endif
