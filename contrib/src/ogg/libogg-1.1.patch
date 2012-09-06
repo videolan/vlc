@@ -38,7 +38,7 @@
  	*-*-darwin*)
  		DEBUG="-fno-common -g -Wall -fsigned-char"
 -		CFLAGS="-fno-common -O4 -Wall -fsigned-char -ffast-math"
-+		EXTRA_CFLAGS="-fno-common -O4 -Wall -fsigned-char -ffast-math"
++		EXTRA_CFLAGS="-fno-common -O3 -Wall -fsigned-char -ffast-math"
  		PROFILE="-fno-common -O4 -Wall -pg -g -fsigned-char -ffast-math"
  		;;
          *)
