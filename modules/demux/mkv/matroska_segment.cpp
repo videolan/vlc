@@ -761,7 +761,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
 
 #if !defined(WIN32) && !defined(__ANDROID__)
     /* Don't try complex seek if we seek to 0 */
-    if( i_date == 0 )
+    if( i_date == 0 && i_time_offset == 0 )
     {
         es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, 0 );
         es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, VLC_TS_0 );
@@ -846,7 +846,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
 
     for(;;)
     {
-        while( i_pts < i_date )
+        do
         {
             bool b_key_picture;
             bool b_discardable_picture;
@@ -889,7 +889,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
             }
 
             delete block;
-        }
+        } while( i_pts < i_date );
         if( b_has_key || !i_idx )
             break;
 
