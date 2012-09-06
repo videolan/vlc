@@ -717,6 +717,20 @@ mtime_t mdate (void)
     return mdate_selected ();
 }
 
+static union
+{
+    struct
+    {
+        LARGE_INTEGER freq;
+    } perf;
+    struct
+    {
+#if (_WIN32_WINNT < 0x0600)
+        ULONGLONG (*get) (void);
+#endif
+    } tick;
+} clk;
+
 #if (_WIN32_WINNT >= 0x0601)
 static mtime_t mdate_interrupt (void)
 {
@@ -730,16 +744,19 @@ static mtime_t mdate_interrupt (void)
     return ts / (10000000 / CLOCK_FREQ);
 }
 #endif
-#if (_WIN32_WINNT >= 0x0600)
+
 static mtime_t mdate_tick (void)
 {
-     ULONGLONG ts = GetTickCount64 ();
+#if (_WIN32_WINNT >= 0x0600)
+    ULONGLONG ts = GetTickCount64 ();
+#else
+    ULONGLONG ts = clk.tick.get ();
+#endif
 
     /* milliseconds */
     static_assert ((CLOCK_FREQ % 1000) == 0, "Broken frequencies ratio");
     return ts * (CLOCK_FREQ / 1000);
 }
-#endif
 #include <mmsystem.h>
 static mtime_t mdate_multimedia (void)
 {
@@ -750,8 +767,6 @@ static mtime_t mdate_multimedia (void)
     return ts * (CLOCK_FREQ / 1000);
 }
 
-static LARGE_INTEGER perf_freq;
-
 static mtime_t mdate_perf (void)
 {
     /* We don't need the real date, just the value of a high precision timer */
@@ -761,9 +776,9 @@ static mtime_t mdate_perf (void)
 
     /* Convert to from (1/freq) to microsecond resolution */
     /* We need to split the division to avoid 63-bits overflow */
-    lldiv_t d = lldiv (counter.QuadPart, perf_freq.QuadPart);
+    lldiv_t d = lldiv (counter.QuadPart, clk.perf.freq.QuadPart);
 
-    return (d.quot * 1000000) + ((d.rem * 1000000) / perf_freq.QuadPart);
+    return (d.quot * 1000000) + ((d.rem * 1000000) / clk.perf.freq.QuadPart);
 }
 
 static mtime_t mdate_wall (void)
@@ -826,14 +841,20 @@ void SelectClockSource (vlc_object_t *obj)
     }
     else
 #endif
-#if (_WIN32_WINNT >= 0x0600)
     if (!strcmp (name, "tick"))
     {
         msg_Dbg (obj, "using Windows time as clock source");
+#if (_WIN32_WINNT < 0x0601)
+        HANDLE h = GetModuleHandle (_T("kernel32.dll"));
+        if (unlikely(h == NULL))
+            abort ();
+        clk.tick.get = (void *)GetProcAddress (h, _T("GetTickCount64"));
+        if (unlikely(clk.tick.get == NULL))
+            abort ();
+#endif
         mdate_selected = mdate_tick;
     }
     else
-#endif
     if (!strcmp (name, "multimedia"))
     {
         TIMECAPS caps;
@@ -849,9 +870,9 @@ void SelectClockSource (vlc_object_t *obj)
     if (!strcmp (name, "perf"))
     {
         msg_Dbg (obj, "using performance counters as clock source");
-        if (!QueryPerformanceFrequency (&perf_freq))
+        if (!QueryPerformanceFrequency (&clk.perf.freq))
             abort ();
-        msg_Dbg (obj, " frequency: %llu Hz", perf_freq.QuadPart);
+        msg_Dbg (obj, " frequency: %llu Hz", clk.perf.freq.QuadPart);
         mdate_selected = mdate_perf;
     }
     else
@@ -876,8 +897,12 @@ size_t EnumClockSource (vlc_object_t *obj, char ***vp, char ***np)
     const size_t max = 6;
     char **values = xmalloc (sizeof (*values) * max);
     char **names = xmalloc (sizeof (*names) * max);
-
     size_t n = 0;
+
+#if (_WIN32_WINNT < 0x0600)
+    DWORD version = LOWORD(GetVersion());
+    version = (LOBYTE(version) << 8) | (HIBYTE(version) << 0);
+#endif
 
     values[n] = xstrdup ("");
     names[n] = xstrdup (_("Auto"));
@@ -887,11 +912,14 @@ size_t EnumClockSource (vlc_object_t *obj, char ***vp, char ***np)
     names[n] = xstrdup ("Interrupt time");
     n++;
 #endif
-#if (_WIN32_WINNT >= 0x0600)
-    values[n] = xstrdup ("tick");
-    names[n] = xstrdup ("Windows time");
-    n++;
+#if (_WIN32_WINNT < 0x0600)
+    if (version >= 0x0600)
 #endif
+    {
+        values[n] = xstrdup ("tick");
+        names[n] = xstrdup ("Windows time");
+        n++;
+    }
     values[n] = xstrdup ("multimedia");
     names[n] = xstrdup ("Multimedia timers");
     n++;
