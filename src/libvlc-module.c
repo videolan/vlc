@@ -2037,6 +2037,12 @@ vlc_module_begin ()
               HPRIORITY_LONGTEXT, false )
 #endif
 
+#define CLOCK_SOURCE_TEXT N_("Clock source")
+#ifdef WIN32
+    add_string( "clock-source", NULL, CLOCK_SOURCE_TEXT, CLOCK_SOURCE_TEXT, true )
+        change_string_cb( EnumClockSource )
+#endif
+
 /* Playlist options */
     set_category( CAT_PLAYLIST )
     set_subcategory( SUBCAT_PLAYLIST_GENERAL )

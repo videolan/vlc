@@ -177,6 +177,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     msg_Dbg( p_libvlc, "%s", COPYRIGHT_MESSAGE );
     msg_Dbg( p_libvlc, "revision %s", psz_vlc_changeset );
     msg_Dbg( p_libvlc, "configured with %s", CONFIGURE_LINE );
+#ifdef WIN32
+    SelectClockSource (VLC_OBJECT(p_libvlc));
+#endif
 
     /* Load the builtins and plugins into the module_bank.
      * We have to do it before config_Load*() because this also gets the

@@ -55,9 +55,7 @@ struct vlc_thread
     void          *data;
 };
 
-#if (_WIN32_WINNT < 0x0600)
-static LARGE_INTEGER freq;
-#endif
+static CRITICAL_SECTION clock_lock;
 static vlc_mutex_t super_mutex;
 static vlc_cond_t  super_variable;
 extern vlc_rwlock_t config_lock, msg_lock;
@@ -72,10 +70,7 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
     switch (fdwReason)
     {
         case DLL_PROCESS_ATTACH:
-#if (_WIN32_WINNT < 0x0600)
-            if (!QueryPerformanceFrequency (&freq))
-                return FALSE;
-#endif
+            InitializeCriticalSection (&clock_lock);
             vlc_mutex_init (&super_mutex);
             vlc_cond_init (&super_variable);
             vlc_threadvar_create (&thread_key, NULL);
@@ -90,6 +85,7 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             vlc_threadvar_delete (&thread_key);
             vlc_cond_destroy (&super_variable);
             vlc_mutex_destroy (&super_mutex);
+            DeleteCriticalSection (&clock_lock);
             break;
     }
     return TRUE;
@@ -709,9 +705,21 @@ void vlc_control_cancel (int cmd, ...)
 }
 
 /*** Clock ***/
+static mtime_t mdate_giveup (void)
+{
+    abort ();
+}
+
+static mtime_t (*mdate_selected) (void) = mdate_giveup;
+
 mtime_t mdate (void)
 {
+    return mdate_selected ();
+}
+
 #if (_WIN32_WINNT >= 0x0601)
+static mtime_t mdate_interrupt (void)
+{
     ULONGLONG ts;
 
     if (unlikely(!QueryUnbiasedInterruptTime (&ts)))
@@ -720,15 +728,32 @@ mtime_t mdate (void)
     /* hundreds of nanoseconds */
     static_assert ((10000000 % CLOCK_FREQ) == 0, "Broken frequencies ratio");
     return ts / (10000000 / CLOCK_FREQ);
-
-#elif (_WIN32_WINNT >= 0x0600)
+}
+#endif
+#if (_WIN32_WINNT >= 0x0600)
+static mtime_t mdate_tick (void)
+{
      ULONGLONG ts = GetTickCount64 ();
 
     /* milliseconds */
     static_assert ((CLOCK_FREQ % 1000) == 0, "Broken frequencies ratio");
     return ts * (CLOCK_FREQ / 1000);
+}
+#endif
+#include <mmsystem.h>
+static mtime_t mdate_multimedia (void)
+{
+     DWORD ts = timeGetTime ();
 
-#else
+    /* milliseconds */
+    static_assert ((CLOCK_FREQ % 1000) == 0, "Broken frequencies ratio");
+    return ts * (CLOCK_FREQ / 1000);
+}
+
+static LARGE_INTEGER perf_freq;
+
+static mtime_t mdate_perf (void)
+{
     /* We don't need the real date, just the value of a high precision timer */
     LARGE_INTEGER counter;
     if (!QueryPerformanceCounter (&counter))
@@ -736,10 +761,26 @@ mtime_t mdate (void)
 
     /* Convert to from (1/freq) to microsecond resolution */
     /* We need to split the division to avoid 63-bits overflow */
-    lldiv_t d = lldiv (counter.QuadPart, freq.QuadPart);
+    lldiv_t d = lldiv (counter.QuadPart, perf_freq.QuadPart);
 
-    return (d.quot * 1000000) + ((d.rem * 1000000) / freq.QuadPart);
+    return (d.quot * 1000000) + ((d.rem * 1000000) / perf_freq.QuadPart);
+}
+
+static mtime_t mdate_wall (void)
+{
+    FILETIME ts;
+    ULARGE_INTEGER s;
+
+#if (_WIN32_WINNT >= 0x0602)
+    GetSystemTimePreciseAsFileTime (&ts);
+#else
+    GetSystemTimeAsFileTime (&ts);
 #endif
+    s.LowPart = ts.dwLowDateTime;
+    s.HighPart = ts.dwHighDateTime;
+    /* hundreds of nanoseconds */
+    static_assert ((10000000 % CLOCK_FREQ) == 0, "Broken frequencies ratio");
+    return s.QuadPart / (10000000 / CLOCK_FREQ);
 }
 
 #undef mwait
@@ -762,6 +803,109 @@ void mwait (mtime_t deadline)
 void msleep (mtime_t delay)
 {
     mwait (mdate () + delay);
+}
+
+void SelectClockSource (vlc_object_t *obj)
+{
+    EnterCriticalSection (&clock_lock);
+    if (mdate_selected != mdate_giveup)
+    {
+        LeaveCriticalSection (&clock_lock);
+        return;
+    }
+
+    const char *name = "perf";
+    char *str = var_InheritString (obj, "clock-source");
+    if (str != NULL)
+        name = str;
+#if (_WIN32_WINNT >= 0x0601)
+    if (!strcmp (name, "interrupt"))
+    {
+        msg_Dbg (obj, "using interrupt time as clock source");
+        mdate_selected = mdate_interrupt;
+    }
+    else
+#endif
+#if (_WIN32_WINNT >= 0x0600)
+    if (!strcmp (name, "tick"))
+    {
+        msg_Dbg (obj, "using Windows time as clock source");
+        mdate_selected = mdate_tick;
+    }
+    else
+#endif
+    if (!strcmp (name, "multimedia"))
+    {
+        TIMECAPS caps;
+
+        msg_Dbg (obj, "using multimedia timers as clock source");
+        if (timeGetDevCaps (&caps, sizeof (caps)) != MMSYSERR_NOERROR)
+            abort ();
+        msg_Dbg (obj, " min period: %u ms, max period: %u ms",
+                 caps.wPeriodMin, caps.wPeriodMax);
+        mdate_selected = mdate_multimedia;
+    }
+    else
+    if (!strcmp (name, "perf"))
+    {
+        msg_Dbg (obj, "using performance counters as clock source");
+        if (!QueryPerformanceFrequency (&perf_freq))
+            abort ();
+        msg_Dbg (obj, " frequency: %llu Hz", perf_freq.QuadPart);
+        mdate_selected = mdate_perf;
+    }
+    else
+    if (!strcmp (name, "wall"))
+    {
+        msg_Dbg (obj, "using system time as clock source");
+        mdate_selected = mdate_wall;
+    }
+    else
+    {
+        msg_Err (obj, "invalid clock source \"%s\"", name);
+        abort ();
+    }
+    LeaveCriticalSection (&clock_lock);
+    free (str);
+}
+
+#define xstrdup(str) (strdup(str) ?: (abort(), NULL))
+
+size_t EnumClockSource (vlc_object_t *obj, char ***vp, char ***np)
+{
+    const size_t max = 6;
+    char **values = xmalloc (sizeof (*values) * max);
+    char **names = xmalloc (sizeof (*names) * max);
+
+    size_t n = 0;
+
+    values[n] = xstrdup ("");
+    names[n] = xstrdup (_("Auto"));
+    n++;
+#if (_WIN32_WINNT >= 0x0601)
+    values[n] = xstrdup ("interrupt");
+    names[n] = xstrdup ("Interrupt time");
+    n++;
+#endif
+#if (_WIN32_WINNT >= 0x0600)
+    values[n] = xstrdup ("tick");
+    names[n] = xstrdup ("Windows time");
+    n++;
+#endif
+    values[n] = xstrdup ("multimedia");
+    names[n] = xstrdup ("Multimedia timers");
+    n++;
+    values[n] = xstrdup ("perf");
+    names[n] = xstrdup ("Performance counters");
+    n++;
+    values[n] = xstrdup ("wall");
+    names[n] = xstrdup ("System time (DANGEROUS!)");
+    n++;
+
+    *vp = values;
+    *np = names;
+    (void) obj;
+    return n;
 }
 
 
