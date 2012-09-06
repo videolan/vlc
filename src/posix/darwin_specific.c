@@ -83,11 +83,3 @@ void system_Configure( libvlc_int_t *p_this,
     (void)i_argc;
     (void)ppsz_argv;
 }
-
-/*****************************************************************************
- * system_End: free the program path.
- *****************************************************************************/
-void system_End( void )
-{
-}
-

@@ -357,7 +357,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                     {
                         msg_Err( p_libvlc, "D-Bus problem" );
                         free( psz_mrl );
-                        system_End( );
                         exit( 1 );
                     }
 
@@ -368,7 +367,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                     {
                         dbus_message_unref( p_dbus_msg );
                         free( psz_mrl );
-                        system_End( );
                         exit( 1 );
                     }
                     free( psz_mrl );
@@ -377,7 +375,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                                 DBUS_TYPE_OBJECT_PATH, &psz_after_track ) )
                     {
                         dbus_message_unref( p_dbus_msg );
-                        system_End( );
                         exit( 1 );
                     }
 
@@ -389,7 +386,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                                 DBUS_TYPE_BOOLEAN, &b_play ) )
                     {
                         dbus_message_unref( p_dbus_msg );
-                        system_End( );
                         exit( 1 );
                     }
 
@@ -399,7 +395,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                     {
                         msg_Err( p_libvlc, "D-Bus problem" );
                         dbus_message_unref( p_dbus_msg );
-                        system_End( );
                         exit( 1 );
                     }
 
@@ -407,7 +402,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                     {
                         msg_Err( p_libvlc, "D-Bus problem" );
                         dbus_message_unref( p_dbus_msg );
-                        system_End( );
                         exit( 1 );
                     }
                     dbus_connection_flush( p_conn );
@@ -418,7 +412,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                 } /* processes all command line MRLs */
 
                 /* bye bye */
-                system_End( );
                 exit( 0 );
             }
         }
@@ -715,6 +708,9 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     module_EndBank (true);
 
     vlc_DeinitActions( p_libvlc, priv->actions );
+#ifdef WIN32
+    system_End( );
+#endif
 }
 
 /**
@@ -727,8 +723,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
 {
     libvlc_priv_t *priv = libvlc_priv( p_libvlc );
-
-    system_End( );
 
     /* Destroy mutexes */
     vlc_ExitDestroy( &priv->exit );

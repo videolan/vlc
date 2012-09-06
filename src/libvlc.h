@@ -41,8 +41,9 @@ size_t vlc_towc (const char *str, uint32_t *restrict pwc);
  */
 void system_Init      ( void );
 void system_Configure ( libvlc_int_t *, int, const char *const [] );
-void system_End       ( void );
-
+#ifdef WIN32
+void system_End(void);
+#endif
 void vlc_CPU_init(void);
 void vlc_CPU_dump(vlc_object_t *);
 

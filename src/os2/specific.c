@@ -52,7 +52,3 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
         }
     }
 }
-
-void system_End( void )
-{
-}

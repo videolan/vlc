@@ -34,7 +34,3 @@ void system_Configure (libvlc_int_t *libvlc,
 {
     (void)libvlc; (void)argc; (void)argv;
 }
-
-void system_End (void)
-{
-}
