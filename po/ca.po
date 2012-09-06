@@ -31124,15 +31124,6 @@ msgstr ""
 #~ msgstr "Mode de transmissió terrestre"
 
 #, fuzzy
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "La mida de les lletres utilitzada pel mòdul OSD. Si està definit a un "
-#~ "valor diferent a 0 aquesta opció substituirà la mida relativa de la "
-#~ "lletra. "
-
-#, fuzzy
 #~ msgid "SessionManager"
 #~ msgstr "Nom de la sessió"
 

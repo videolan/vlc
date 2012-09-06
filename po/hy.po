@@ -33628,15 +33628,6 @@ msgstr "&Հերթի մեջ դնել"
 #~ msgstr "Լուսանկարը կոդավորմամբ ռեժիմ`"
 
 #, fuzzy
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "Սա հարաբերական լռությամբ չափը տառատեսաӀ¯ների, որ պետք է մատուցված վրա "
-#~ "վիդեո. Եթե բացարձակ տառաչափը է սահմաӀ¶ել, հարաբերակӀ¡ն չաԀը կլինի "
-#~ "overridden\"."
-
-#, fuzzy
 #~ msgid "Use media key control when VLC is in background"
 #~ msgstr "Օգտագործել մեդիա հիմնական վերահսկողությունը, երբ VLC է ֆոնային"
 

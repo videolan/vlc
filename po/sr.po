@@ -30817,14 +30817,6 @@ msgstr ""
 #~ msgid "Automate picture coding mode"
 #~ msgstr "Однос снимања"
 
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "Ово је релативна подразумевана величина фонтова који ће бити рендеровани "
-#~ "на видеу. Ако је подешена апсолутна величина фонта, релативна величина ће "
-#~ "бити преклопљена."
-
 #, fuzzy
 #~ msgid "SessionManager"
 #~ msgstr "Име сесије"

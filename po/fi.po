@@ -31058,13 +31058,6 @@ msgstr "&Lisää jonoon"
 #~ msgid "Automate picture coding mode"
 #~ msgstr "Kuvankoodauksen tila"
 
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "Videon päälle renderöitävän tekstin oletuskoko (suhteellinen). Jos "
-#~ "absoluuttinen koko on määrätty, suhteellinen koko yliajetaan."
-
 #~ msgid "Use media key control when VLC is in background"
 #~ msgstr "Käytä medianäppäinohjausta myös taustalla"
 

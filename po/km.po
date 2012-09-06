@@ -30098,13 +30098,6 @@ msgstr "ដាក់​ជា​ជួរ"
 #~ msgid "Automate picture coding mode"
 #~ msgstr "របៀប​ដាក់​កូដ​រូបភាព"
 
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "នេះ​ជា​ទំហំ​ពុម្ពអក្សរ​លំនាំដើម​ដែល​ទាក់ទង​ដែល​នឹង​ត្រូវបាន​បង្ហាញ​នៅលើ​វីដេអូ ។ ប្រសិន​បើ​បាន​កំណត់​ទំហំ​"
-#~ "ពុម្ពអក្សរ​ដាច់ខាត ទំហំ​ដែល​ទាក់ទង​នឹង​ត្រូវបាន​បដិសេធ ។"
-
 #~ msgid "Use media key control when VLC is in background"
 #~ msgstr "ប្រើ​វត្ថុ​បញ្ជា​សោ​មេឌៀ​ នៅពេល​ដែល VLC ស្ថិត​ក្នុង​ផ្ទៃ​ខាងក្រោយ"
 

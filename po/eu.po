@@ -30398,14 +30398,6 @@ msgstr "&Lerrokatu"
 #~ "Erabili sarrera irudia nola kodeatu erabakitzeko - elkarlotuta edo "
 #~ "aurrerakoi"
 
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "Hau da bideoan aurkeztuk diren hizkien berezko neurri erlatiboa. "
-#~ "Hizkiaren neurri osoa ezartzen bada, neurri erlatiboa baliogabetua izango "
-#~ "da. "
-
 #~ msgid "%s: option `%s' is ambiguous\n"
 #~ msgstr "%s: aukera `%s' okerra\n"
 

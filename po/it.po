@@ -30073,14 +30073,6 @@ msgstr "Acco&da"
 #~ msgid "Automate picture coding mode"
 #~ msgstr "modalità di resa video"
 
-#, fuzzy
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "La dimensione dei caratteri utilizzati dal modulo osd. Se impostata ad un "
-#~ "valore diverso da 0, modifica la dimensione relativa dei caratteri "
-
 #~ msgid "...when VLC is in background"
 #~ msgstr "...quando VLC è in esecuzione in background"
 

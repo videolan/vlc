@@ -29837,13 +29837,6 @@ msgstr "Изчакване на опашка"
 #~ msgid "Automate picture coding mode"
 #~ msgstr "Автоматичен режим на кодиране на изображението"
 
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "Задаване на относителния размер на шрифта. Ако стандартния размер \n"
-#~ "на шрифта е различен от нула, той ще подмени относителния размер."
-
 #~ msgid "...when VLC is in background"
 #~ msgstr "...когато VLC е във фонов режим"
 

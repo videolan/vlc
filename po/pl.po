@@ -30777,14 +30777,6 @@ msgstr "Do &kolejki"
 #~ "Użyj obrazu wejściowego w celu określenia jego kodowania - z przeplotem "
 #~ "lub progresywnie"
 
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "To jest względny domyślny rozmiar czcionki, który będzie renderowany na "
-#~ "obrazie. Jeśli podałeś całkowity rozmiar czcionki, względny rozmiar "
-#~ "zostanie pominięty."
-
 #~ msgid "Use media key control when VLC is in background"
 #~ msgstr "Używaj klawisza multimedialnego do sterowania, jeśli VLC jest w tle"
 

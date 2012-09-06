@@ -30562,13 +30562,6 @@ msgstr "Digilir"
 #~ msgid "Automate picture coding mode"
 #~ msgstr "Mod pengkodan gambar"
 
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "Ini adalah saiz lalai relatif font yang akan diberikan pada video. Jika "
-#~ "sai font mutlak ditetapkan, saiz font relatif akan ditindih."
-
 #~ msgid "GME demuxer (Game_Music_Emu)"
 #~ msgstr "Demuxer GME (Game_Music_Emu)"
 

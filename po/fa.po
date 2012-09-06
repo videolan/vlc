@@ -29914,14 +29914,6 @@ msgstr ""
 #~ msgstr "نسبت ضبط"
 
 #, fuzzy
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "این اندازهٔ پیش‌فرض قلم‌هایی است که روی ویدئو رسم خواهند شد. این گزینه اگر "
-#~ "چیزی غیر از ۰ تنظیم شود بر اندازهٔ نسبی قلم ارجحیت خواهد داشت."
-
-#, fuzzy
 #~ msgid "SessionManager"
 #~ msgstr "نام نشست"
 

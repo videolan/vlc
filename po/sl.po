@@ -30823,13 +30823,6 @@ msgstr "&Uvrsti predmete"
 #~ msgid "Automate picture coding mode"
 #~ msgstr "Način kodiranja slike"
 
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "Relativna velikost besedila, ki bo izrisano na posnetku. Vrednosti so "
-#~ "prezrte v primeru, da je določena absolutna vrednost."
-
 #~ msgid "Use media key control when VLC is in background"
 #~ msgstr "Uporabi medijske tipke za nadzor delovanja programa v ozadju."
 

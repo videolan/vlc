@@ -30318,12 +30318,6 @@ msgstr "&Encolar"
 #~ msgid "Automate picture coding mode"
 #~ msgstr "Modo de codificación de imagen"
 
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "Tamaño relativo predeterminado de las fuentes que se generan en el vídeo."
-
 #~ msgid "Use media key control when VLC is in background"
 #~ msgstr "Use las teclas multimedia cuando VLC este segundo plano"
 

@@ -29572,13 +29572,6 @@ msgstr "加入队列(&E)"
 #~ "progressive"
 #~ msgstr "根据输入画面决定如何编码——隔行或逐行"
 
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "这是一个将要在视频上渲染的相对字体默认大小。如果设置了绝对字体大小，相对大"
-#~ "小将被覆盖。"
-
 #~ msgid "Compiled by %s"
 #~ msgstr "由 %s 编译"
 

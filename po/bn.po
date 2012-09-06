@@ -30621,13 +30621,6 @@ msgstr "এনকিউ করা হবে (&E)"
 #~ "কিভাবে কোড করতে হবে তা জানার জন্য ইনপুট ছবি ব্যবহার - ইন্টারলেসেড অথবা "
 #~ "প্রগ্রেসিভ"
 
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "এটি ফন্টের আপেক্ষিক পূর্বনির্ধারিত আকার যা ভিডিওর ওপর রেন্ডার করা হবে। যদি "
-#~ "ফন্টের সম্পূর্ণ মান নির্ধারণ করা হয় তাহলে আপেক্ষিক আকার উপেক্ষিত হবে।"
-
 #~ msgid "Use media key control when VLC is in background"
 #~ msgstr "VLC পটভূমিতে থাকলে মিডিয়া কী কন্ট্রোল ব্যবহার করা"
 

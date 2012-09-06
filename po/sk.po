@@ -31045,15 +31045,6 @@ msgstr "&Zaradiť"
 
 #, fuzzy
 #~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "Toto je relatívna predvolená veľkosť písma, ktoré sa zobrazí na videu. Ak "
-#~ "je nastavená absolútna veľkosť písma, na relatívnu veľkosť program "
-#~ "neberie ohľad."
-
-#, fuzzy
-#~ msgid ""
 #~ "Address of the locking callback function. This function must fill in "
 #~ "valid plane memory address information for use by the video renderer."
 #~ msgstr ""

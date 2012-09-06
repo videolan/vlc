@@ -30846,13 +30846,6 @@ msgstr ""
 #~ msgstr "रेकर्डिङ अनुपात"
 
 #~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "भिडियोमा रेन्डर गरिनेसँग यो फन्टको सापेक्षिक पूर्वनिर्धारित साइज हो । यदि पूर्ण साइज "
-#~ "सेट गरेमा, सापेक्षिक साइज अधिरोहण हुन्छ ।"
-
-#~ msgid ""
 #~ "Address of the locking callback function. This function must fill in "
 #~ "valid plane memory address information for use by the video renderer."
 #~ msgstr ""

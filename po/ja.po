@@ -30184,12 +30184,5 @@ msgstr "再生キューに追加 (&E)"
 #~ "progressive"
 #~ msgstr "入力画像のコード化(インターレース/プログレッシブ)を自動判別します。"
 
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "これはビデオ上に表示されるフォントの相対的なデフォルトサイズです。絶対値で"
-#~ "フォントサイズが指定された場合、相対サイズは上書きされます。"
-
 #~ msgid "Automatic gain/exposure"
 #~ msgstr "自動ゲイン/露出"

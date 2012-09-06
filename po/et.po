@@ -29614,14 +29614,6 @@ msgstr "&Lisa ootejärjekorda"
 #~ msgid "Advanced video filter controls"
 #~ msgstr "Muud videofiltrite sätted"
 
-#, fuzzy
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "See on videol rendertatava teksti fondi suhteline suurus. Kui absoluutne "
-#~ "fondi suurus on määratud, siis suhteline suurus tühistatakse."
-
 #~ msgid "Automate picture coding mode"
 #~ msgstr "Automatiseeri pildi kodeerimise režiimi"
 

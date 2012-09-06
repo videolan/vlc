@@ -29957,12 +29957,6 @@ msgstr ""
 #~ msgstr "Y"
 
 #, fuzzy
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr "ნაგულისხმევი სიდიდე ის ვიდეო -სკენ სიდიდე "
-
-#, fuzzy
 #~ msgid "SessionManager"
 #~ msgstr "სესიის სახელი"
 

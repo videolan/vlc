@@ -30904,13 +30904,6 @@ msgstr "&Sorba állítás"
 #~ msgid "Automate picture coding mode"
 #~ msgstr "Képkódolási mód"
 
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "Ez a képen megjelenítendő betűk alapértelmezett viszonylagos mérete. Az "
-#~ "abszolút betűkészletméret felülbírálja a relatív méretet."
-
 #~ msgid "Use media key control when VLC is in background"
 #~ msgstr "Médiabillentyűs irányítás használata, ha a VLC a háttérben van"
 

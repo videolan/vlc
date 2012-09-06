@@ -30004,14 +30004,6 @@ msgstr "&Zařadit do fronty"
 #~ msgid "Automate picture coding mode"
 #~ msgstr "Nahrávání dokončeno"
 
-#~ msgid ""
-#~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overridden."
-#~ msgstr ""
-#~ "Toto je relativní výchozí velikost písma, které bude vykresleno na video. "
-#~ "Pokud je nastavena absolutní velikost, tak bude relativní velikost "
-#~ "potlačena."
-
 #~ msgid "GME demuxer (Game_Music_Emu)"
 #~ msgstr "GME demultiplexer (Game_Music_Emu)"
 
