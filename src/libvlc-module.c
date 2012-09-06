@@ -2019,19 +2019,6 @@ vlc_module_begin ()
               INHIBIT_LONGTEXT, true )
 #endif
 
-#if defined(WIN32) || defined(HAVE_DBUS)
-    add_bool( "one-instance", 0, ONEINSTANCE_TEXT,
-              ONEINSTANCE_LONGTEXT, true )
-    add_bool( "started-from-file", 0, STARTEDFROMFILE_TEXT,
-              STARTEDFROMFILE_LONGTEXT, true )
-        change_volatile ()
-    add_bool( "one-instance-when-started-from-file", 1,
-              ONEINSTANCEWHENSTARTEDFROMFILE_TEXT,
-              ONEINSTANCEWHENSTARTEDFROMFILE_LONGTEXT, true )
-    add_bool( "playlist-enqueue", 0, PLAYLISTENQUEUE_TEXT,
-              PLAYLISTENQUEUE_LONGTEXT, true )
-#endif
-
 #if defined(WIN32) || defined(__OS2__)
     add_bool( "high-priority", 0, HPRIORITY_TEXT,
               HPRIORITY_LONGTEXT, false )
@@ -2064,6 +2051,18 @@ vlc_module_begin ()
     add_bool( "playlist-autostart", true,
               AUTOSTART_TEXT, AUTOSTART_LONGTEXT, false )
     add_bool( "playlist-cork", true, CORK_TEXT, CORK_LONGTEXT, false )
+#if defined(WIN32) || defined(HAVE_DBUS)
+    add_bool( "one-instance", 0, ONEINSTANCE_TEXT,
+              ONEINSTANCE_LONGTEXT, true )
+    add_bool( "started-from-file", 0, STARTEDFROMFILE_TEXT,
+              STARTEDFROMFILE_LONGTEXT, true )
+        change_volatile ()
+    add_bool( "one-instance-when-started-from-file", 1,
+              ONEINSTANCEWHENSTARTEDFROMFILE_TEXT,
+              ONEINSTANCEWHENSTARTEDFROMFILE_LONGTEXT, true )
+    add_bool( "playlist-enqueue", 0, PLAYLISTENQUEUE_TEXT,
+              PLAYLISTENQUEUE_LONGTEXT, true )
+#endif
     add_bool( "media-library", 0, ML_TEXT, ML_LONGTEXT, false )
 #if defined( MEDIA_LIBRARY )
     add_bool( "load-media-library-on-startup", 1, LOAD_ML_TEXT,
