@@ -34,7 +34,7 @@
 #include "chroma.h"
 
 /*****************************************************************************
- * Chroma fourcc -> ffmpeg_id mapping
+ * Chroma fourcc -> libavutil pixfmt mapping
  *****************************************************************************/
 #if defined(WORDS_BIGENDIAN)
 #   define VLC_RGB_ES( fcc, leid, beid ) \

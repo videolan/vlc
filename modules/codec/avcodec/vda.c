@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vda.c: VDA helpers for the ffmpeg decoder
+ * vda.c: VDA helpers for the libavcodec decoder
  *****************************************************************************
  * Copyright © 2012 VideoLAN
  *
@@ -159,7 +159,7 @@ static int Setup( vlc_va_t *p_external, void **pp_hw_ctx, vlc_fourcc_t *pi_chrom
     }
 
 ok:
-    /* Setup the ffmpeg hardware context */
+    /* Setup the libavcodec hardware context */
     *pp_hw_ctx = &p_va->hw_ctx;
     *pi_chroma = p_va->i_chroma;
 

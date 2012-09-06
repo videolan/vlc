@@ -1,5 +1,5 @@
 /*****************************************************************************
- * encoder.c: video and audio encoder using the ffmpeg library
+ * encoder.c: video and audio encoder using the libavcodec library
  *****************************************************************************
  * Copyright (C) 1999-2004 the VideoLAN team
  * $Id$
@@ -7,7 +7,7 @@
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
- * Part of the file Copyright (C) FFMPEG Project Developers
+ * Part of the file Copyright (C) FFmpeg Project Developers
  * (mpeg4_default matrixes)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,6 @@
 #include <vlc_avcodec.h>
 #include <vlc_cpu.h>
 
-/* ffmpeg header */
 #define HAVE_MMX 1
 #include <libavcodec/avcodec.h>
 
@@ -84,12 +83,12 @@ struct thread_context_t
 };
 
 /*****************************************************************************
- * encoder_sys_t : ffmpeg encoder descriptor
+ * encoder_sys_t : libavcodec encoder descriptor
  *****************************************************************************/
 struct encoder_sys_t
 {
     /*
-     * Ffmpeg properties
+     * libavcodec properties
      */
     AVCodec         *p_codec;
     AVCodecContext  *p_context;
@@ -276,8 +275,8 @@ int OpenEncoder( vlc_object_t *p_this )
     if( !p_codec )
     {
         msg_Err( p_enc, "cannot find encoder %s\n"
-"*** Your FFMPEG installation is crippled.   ***\n"
-"*** Please check with your FFMPEG packager. ***\n"
+"*** Your Libav/FFmpeg installation is crippled.   ***\n"
+"*** Please check with your Libav/FFmpeg packager. ***\n"
 "*** This is NOT a VLC media player issue.   ***", psz_namecodec );
 
         dialog_Fatal( p_enc, _("Streaming / Transcoding failed"), _(
@@ -285,7 +284,7 @@ int OpenEncoder( vlc_object_t *p_this )
  * Downstream packager, you had better not patch this out, or I will be really
  * annoyed. Think about it - you don't want to fork the VLC translation files,
  * do you? -- Courmisch, 2008-10-22 */
-"It seems your FFMPEG (libavcodec) installation lacks the following encoder:\n"
+"It seems your Libav/FFmpeg (libavcodec) installation lacks the following encoder:\n"
 "%s.\n"
 "If you don't know how to fix this, ask for support from your distribution.\n"
 "\n"
@@ -374,7 +373,7 @@ int OpenEncoder( vlc_object_t *p_this )
     p_sys->i_chroma_elim = var_GetInteger( p_enc, ENC_CFG_PREFIX "chroma-elim-threshold" );
 
     psz_val = var_GetString( p_enc, ENC_CFG_PREFIX "aac-profile" );
-    /* ffmpeg uses faac encoder atm, and it has issues with
+    /* libavcodec uses faac encoder atm, and it has issues with
      * other than low-complexity profile, so default to that */
     p_sys->i_aac_profile = FF_PROFILE_AAC_LOW;
     if( psz_val && *psz_val )
@@ -390,7 +389,7 @@ int OpenEncoder( vlc_object_t *p_this )
         else if( !strncmp( psz_val, "ltp", 3 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_LTP;
 #if LIBAVCODEC_VERSION_CHECK( 54, 19, 0, 35, 100 )
-/* These require ffmpeg with libfdk-aac */
+/* These require libavcodec with libfdk-aac */
         else if( !strncmp( psz_val, "hev2", 4 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_HE_V2;
         else if( !strncmp( psz_val, "hev1", 4 ) )
@@ -627,10 +626,10 @@ int OpenEncoder( vlc_object_t *p_this )
         if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "keyint" ) )
             p_context->gop_size = 120;
         /* Don't set rc-values atm, they were from time before
-           libvpx was officially in ffmpeg */
+           libvpx was officially in FFmpeg */
         //p_context->rc_max_rate = 24 * 1000 * 1000; //24M
         //p_context->rc_min_rate = 40 * 1000; // 40k
-        /* seems that ffmpeg presets have 720p as divider for buffers */
+        /* seems that FFmpeg presets have 720p as divider for buffers */
         if( p_enc->fmt_out.video.i_height >= 720 )
         {
             /* Check that we don't overrun users qmin/qmax values */
@@ -874,7 +873,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             frame.linesize[i_plane] = p_pict->p[i_plane].i_pitch;
         }
 
-        /* Let ffmpeg select the frame type */
+        /* Let libavcodec select the frame type */
         frame.pict_type = 0;
 
         frame.repeat_pict = p_pict->i_nb_fields - 2;
@@ -1136,7 +1135,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
 }
 
 /*****************************************************************************
- * CloseEncoder: ffmpeg encoder destruction
+ * CloseEncoder: libavcodec encoder destruction
  *****************************************************************************/
 void CloseEncoder( vlc_object_t *p_this )
 {

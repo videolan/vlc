@@ -1,5 +1,5 @@
 /*****************************************************************************
- * subtitle.c: subtitle decoder using ffmpeg library
+ * subtitle.c: subtitle decoder using libavcodec library
  *****************************************************************************
  * Copyright (C) 2009 Laurent Aimar
  * $Id$
@@ -33,7 +33,6 @@
 #include <vlc_codec.h>
 #include <vlc_avcodec.h>
 
-/* ffmpeg header */
 #include <libavcodec/avcodec.h>
 #include <libavutil/mem.h>
 #ifdef HAVE_AVCODEC_VAAPI
@@ -101,7 +100,7 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
     }
 
     /* */
-    msg_Dbg(dec, "ffmpeg codec (%s) started", namecodec);
+    msg_Dbg(dec, "libavcodec codec (%s) started", namecodec);
     dec->fmt_out.i_cat = SPU_ES;
 
     return VLC_SUCCESS;
@@ -186,7 +185,7 @@ void EndSubtitleDec(decoder_t *dec)
 }
 
 /**
- * Convert a RGBA ffmpeg region to our format.
+ * Convert a RGBA libavcodec region to our format.
  */
 static subpicture_region_t *ConvertRegionRGBA(AVSubtitleRect *ffregion)
 {
@@ -233,7 +232,7 @@ static subpicture_region_t *ConvertRegionRGBA(AVSubtitleRect *ffregion)
 }
 
 /**
- * Convert a ffmpeg subtitle to our format.
+ * Convert a libavcodec subtitle to our format.
  */
 static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, mtime_t pts)
 {

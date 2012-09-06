@@ -35,7 +35,6 @@
 #include <vlc_avcodec.h>
 #include <vlc_cpu.h>
 
-/* ffmpeg header */
 #define HAVE_MMX 1
 #include <libavcodec/avcodec.h>
 
@@ -454,7 +453,7 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
     vlc_avcodec_unlock();
     if( ret < 0 )
         return VLC_EGENERIC;
-    msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
+    msg_Dbg( p_dec, "avcodec codec (%s) started", p_sys->psz_namecodec );
 
 #ifdef HAVE_AVCODEC_MT
     if( p_dec->fmt_in.i_cat == VIDEO_ES )

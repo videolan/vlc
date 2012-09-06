@@ -33,7 +33,7 @@
 #include "avcodec.h"
 
 /*****************************************************************************
- * Codec fourcc -> ffmpeg_id mapping
+ * Codec fourcc -> libavcodec Codec_id mapping
  *****************************************************************************/
 static const struct
 {

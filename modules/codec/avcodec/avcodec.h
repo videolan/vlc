@@ -74,7 +74,7 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 
 #define ERROR_TEXT N_("Error resilience")
 #define ERROR_LONGTEXT N_( \
-    "FFmpeg can do error resilience.\n" \
+    "libavcodec can do error resilience.\n" \
     "However, with a buggy encoder (such as the ISO MPEG-4 encoder from M$) " \
     "this can produce a lot of errors.\n" \
     "Valid values range from 0 to 4 (0 disables all errors resilience).")
@@ -261,7 +261,7 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 #define ENC_PROFILE_LONGTEXT N_( "Specify the AAC audio profile to use " \
    "for encoding the audio bitstream. It takes the following options: " \
    "main, low, ssr (not supported),ltp, hev1, hev2 (default: low). " \
-   "hev1  and hev2 are currently supported only with libfdk-aac enabled ffmpeg/libav" )
+   "hev1 and hev2 are currently supported only with libfdk-aac enabled libavcodec" )
 
 #define AVCODEC_COMMON_MEMBERS   \
     int i_cat;                  \

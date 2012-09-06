@@ -1,6 +1,6 @@
 /*****************************************************************************
  * deinterlace.c: video filter doing chroma conversion and resizing
- *               using the ffmpeg library
+ *               using the libavcodec library
  *****************************************************************************
  * Copyright (C) 1999-2001 the VideoLAN team
  * $Id$
@@ -33,7 +33,6 @@
 #include <vlc_codec.h>
 #include <vlc_filter.h>
 
-/* ffmpeg header */
 #include <libavcodec/avcodec.h>
 
 #include "avcodec.h"

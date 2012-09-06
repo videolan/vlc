@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vaapi.c: VAAPI helpers for the ffmpeg decoder
+ * vaapi.c: VAAPI helpers for the libavcodec decoder
  *****************************************************************************
  * Copyright (C) 2009 Laurent Aimar
  * $Id$

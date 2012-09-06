@@ -1,5 +1,5 @@
 /*****************************************************************************
- * audio.c: audio decoder using ffmpeg library
+ * audio.c: audio decoder using libavcodec library
  *****************************************************************************
  * Copyright (C) 1999-2003 the VideoLAN team
  * $Id$
@@ -34,7 +34,6 @@
 #include <vlc_codec.h>
 #include <vlc_avcodec.h>
 
-/* ffmpeg header */
 #include <libavcodec/avcodec.h>
 #include <libavutil/mem.h>
 
@@ -138,7 +137,7 @@ static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
 /*****************************************************************************
  * InitAudioDec: initialize audio decoder
  *****************************************************************************
- * The ffmpeg codec will be opened, some memory allocated.
+ * The avcodec codec will be opened, some memory allocated.
  *****************************************************************************/
 int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
                       AVCodec *p_codec, int i_codec_id, const char *psz_namecodec )

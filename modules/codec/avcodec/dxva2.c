@@ -433,7 +433,7 @@ static int Get(vlc_va_t *external, AVFrame *ff)
     }
 
     /* Grab an unused surface, in case none are, try the oldest
-     * XXX using the oldest is a workaround in case a problem happens with ffmpeg */
+     * XXX using the oldest is a workaround in case a problem happens with libavcodec */
     unsigned i, old;
     for (i = 0, old = 0; i < va->surface_count; i++) {
         vlc_va_surface_t *surface = &va->surface[i];
