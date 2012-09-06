@@ -280,150 +280,110 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #define MPRIS_OBJECT_PATH "/org/mpris/MediaPlayer2"
 #define MPRIS_TRACKLIST_INTERFACE "org.mpris.MediaPlayer2.TrackList"
 
-    dbus_threads_init_default();
-
     if( var_InheritBool( p_libvlc, "one-instance" )
     || ( var_InheritBool( p_libvlc, "one-instance-when-started-from-file" )
       && var_InheritBool( p_libvlc, "started-from-file" ) ) )
     {
-        /* Initialise D-Bus interface, check for other instances */
-        DBusConnection  *p_conn = NULL;
-        DBusError       dbus_error;
+        for( int i = vlc_optind; i < i_argc; i++ )
+            if( ppsz_argv[i][0] == ':' )
+            {
+                msg_Err( p_libvlc, "item option %s incompatible with single instance",
+                         ppsz_argv[i] );
+                goto dbus_out;
+            }
 
-        dbus_error_init( &dbus_error );
+        /* Initialise D-Bus interface, check for other instances */
+        dbus_threads_init_default();
+
+        DBusError err;
+        dbus_error_init( &err );
 
         /* connect to the session bus */
-        p_conn = dbus_bus_get( DBUS_BUS_SESSION, &dbus_error );
-        if( !p_conn )
+        DBusConnection  *conn = dbus_bus_get( DBUS_BUS_SESSION, &err );
+        if( conn == NULL )
         {
             msg_Err( p_libvlc, "Failed to connect to D-Bus session daemon: %s",
-                    dbus_error.message );
-            dbus_error_free( &dbus_error );
+                    err.message );
+            dbus_error_free( &err );
+            goto dbus_out;
         }
-        else
+
+        /* check if VLC is available on the bus
+         * if not: D-Bus control is not enabled on the other
+         * instance and we can't pass MRLs to it */
+        /* FIXME: This check is totally brain-dead and buggy. */
+        if( !dbus_bus_name_has_owner( conn, MPRIS_BUS_NAME, &err ) )
         {
-            /* check if VLC is available on the bus
-             * if not: D-Bus control is not enabled on the other
-             * instance and we can't pass MRLs to it */
-            if( !dbus_bus_name_has_owner( p_conn, MPRIS_BUS_NAME, &dbus_error ) )
+            dbus_connection_unref( conn );
+            if( dbus_error_is_set( &err ) )
             {
-                if( dbus_error_is_set( &dbus_error ) )
-                {
-                    msg_Err( p_libvlc, "D-Bus error: %s", dbus_error.message );
-                    dbus_error_free( &dbus_error );
-                }
-                else
-                    msg_Dbg( p_libvlc, "No Media Player is running. "
-                            "Continuing normally." );
+                msg_Err( p_libvlc, "D-Bus error: %s", err.message );
             }
             else
+                msg_Dbg( p_libvlc, "No media player running. Continuing normally." );
+            dbus_error_free( &err );
+            goto dbus_out;
+        }
+
+        const dbus_bool_t play = !var_InheritBool( p_libvlc, "playlist-enqueue" );
+
+        msg_Warn( p_libvlc, "media player running. Exiting...");
+        for( int i = vlc_optind; i < i_argc; i++ )
+        {
+            DBusMessage *msg = dbus_message_new_method_call(
+               MPRIS_BUS_NAME, MPRIS_OBJECT_PATH, MPRIS_TRACKLIST_INTERFACE, "AddTrack" );
+            if( unlikely(msg == NULL) )
+                continue;
+
+            /* We need to resolve relative paths in this instance */
+            char *mrl;
+            if( strstr( ppsz_argv[i], "://" ) )
+                mrl = strdup( ppsz_argv[i] );
+            else
+                mrl = vlc_path2uri( ppsz_argv[i], NULL );
+            if( mrl == NULL )
             {
-                int i_input;
-                DBusMessage* p_dbus_msg = NULL;
-                DBusMessageIter dbus_args;
-                DBusPendingCall* p_dbus_pending = NULL;
-                dbus_bool_t b_play;
-
-                msg_Warn( p_libvlc, "Another Media Player is running. Exiting");
-
-                for( i_input = vlc_optind; i_input < i_argc;i_input++ )
-                {
-                    /* Skip input options, we can't pass them through D-Bus */
-                    if( ppsz_argv[i_input][0] == ':' )
-                    {
-                        msg_Warn( p_libvlc, "Ignoring option %s",
-                                  ppsz_argv[i_input] );
-                        continue;
-                    }
-
-                    /* We need to resolve relative paths in this instance */
-                    char *psz_mrl;
-                    if( strstr( psz_mrl, "://" ) )
-                        psz_mrl = strdup( ppsz_argv[i_input] );
-                    else
-                        psz_mrl = vlc_path2uri( ppsz_argv[i_input], NULL );
-                    const char *psz_after_track = MPRIS_APPEND;
-
-                    if( psz_mrl == NULL )
-                        continue;
-                    msg_Dbg( p_libvlc, "Adds %s to the running Media Player",
-                             psz_mrl );
-
-                    p_dbus_msg = dbus_message_new_method_call(
-                        MPRIS_BUS_NAME, MPRIS_OBJECT_PATH,
-                        MPRIS_TRACKLIST_INTERFACE, "AddTrack" );
-
-                    if ( NULL == p_dbus_msg )
-                    {
-                        msg_Err( p_libvlc, "D-Bus problem" );
-                        free( psz_mrl );
-                        exit( 1 );
-                    }
-
-                    /* append MRLs */
-                    dbus_message_iter_init_append( p_dbus_msg, &dbus_args );
-                    if ( !dbus_message_iter_append_basic( &dbus_args,
-                                DBUS_TYPE_STRING, &psz_mrl ) )
-                    {
-                        dbus_message_unref( p_dbus_msg );
-                        free( psz_mrl );
-                        exit( 1 );
-                    }
-                    free( psz_mrl );
-
-                    if( !dbus_message_iter_append_basic( &dbus_args,
-                                DBUS_TYPE_OBJECT_PATH, &psz_after_track ) )
-                    {
-                        dbus_message_unref( p_dbus_msg );
-                        exit( 1 );
-                    }
-
-                    b_play = TRUE;
-                    if( var_InheritBool( p_libvlc, "playlist-enqueue" ) )
-                        b_play = FALSE;
-
-                    if ( !dbus_message_iter_append_basic( &dbus_args,
-                                DBUS_TYPE_BOOLEAN, &b_play ) )
-                    {
-                        dbus_message_unref( p_dbus_msg );
-                        exit( 1 );
-                    }
-
-                    /* send message and get a handle for a reply */
-                    if ( !dbus_connection_send_with_reply ( p_conn,
-                                p_dbus_msg, &p_dbus_pending, -1 ) )
-                    {
-                        msg_Err( p_libvlc, "D-Bus problem" );
-                        dbus_message_unref( p_dbus_msg );
-                        exit( 1 );
-                    }
-
-                    if ( NULL == p_dbus_pending )
-                    {
-                        msg_Err( p_libvlc, "D-Bus problem" );
-                        dbus_message_unref( p_dbus_msg );
-                        exit( 1 );
-                    }
-                    dbus_connection_flush( p_conn );
-                    dbus_message_unref( p_dbus_msg );
-                    /* block until we receive a reply */
-                    dbus_pending_call_block( p_dbus_pending );
-                    dbus_pending_call_unref( p_dbus_pending );
-                } /* processes all command line MRLs */
-
-                /* bye bye */
-                exit( 0 );
+                dbus_message_unref( msg );
+                continue;
             }
+
+            const char *after_track = MPRIS_APPEND;
+
+            /* append MRLs */
+            if( !dbus_message_append_args( msg, DBUS_TYPE_STRING, &mrl,
+                                                DBUS_TYPE_STRING, &after_track,
+                                                DBUS_TYPE_BOOLEAN, &play,
+                                                DBUS_TYPE_INVALID ) )
+            {
+                 dbus_message_unref( msg );
+                 msg = NULL;
+            }
+            free( mrl );
+            if( unlikely(msg == NULL) )
+                continue;
+
+            msg_Dbg( p_libvlc, "Adds %s to the running media player", mrl );
+
+            /* send message and get a handle for a reply */
+            DBusMessage *reply = dbus_connection_send_with_reply_and_block( conn, msg, -1,
+                                                                            &err );
+            dbus_message_unref( msg );
+            if( reply == NULL )
+            {
+                msg_Err( p_libvlc, "D-Bus error: %s", err.message );
+                continue;
+            }
+            dbus_message_unref( reply );
         }
         /* we unreference the connection when we've finished with it */
-        if( p_conn ) dbus_connection_unref( p_conn );
+        dbus_connection_unref( conn );
+        exit( 1 );
     }
-
 #undef MPRIS_APPEND
 #undef MPRIS_BUS_NAME
 #undef MPRIS_OBJECT_PATH
 #undef MPRIS_TRACKLIST_INTERFACE
-
+dbus_out:
 #endif // HAVE_DBUS
 
     /*
