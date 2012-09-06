@@ -959,11 +959,11 @@ static int FrontendSetQAM( access_t *p_access )
 static fe_bandwidth_t DecodeBandwidth( access_t *p_access )
 {
     fe_bandwidth_t      fe_bandwidth = 0;
-    int i_bandwith = var_GetInteger( p_access, "dvb-bandwidth" );
+    int i_bandwidth = var_GetInteger( p_access, "dvb-bandwidth" );
 
-    msg_Dbg( p_access, "using bandwidth=%d", i_bandwith );
+    msg_Dbg( p_access, "using bandwidth=%d", i_bandwidth );
 
-    switch( i_bandwith )
+    switch( i_bandwidth )
     {
         case 0: fe_bandwidth = BANDWIDTH_AUTO; break;
         case 6: fe_bandwidth = BANDWIDTH_6_MHZ; break;

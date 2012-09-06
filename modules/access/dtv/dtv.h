@@ -108,7 +108,7 @@ typedef struct isdbt_layer
     uint8_t time_interleaving;
 } isdbt_layer_t;
 
-int dvb_set_isdbt (dvb_device_t *, uint32_t freq, uint32_t bandwith,
+int dvb_set_isdbt (dvb_device_t *, uint32_t freq, uint32_t bandwidth,
                    int transmission, uint32_t guard, const isdbt_layer_t[3]);
 
 typedef struct isdbt_sound
