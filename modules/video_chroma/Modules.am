@@ -48,5 +48,4 @@ libvlc_LTLIBRARIES += \
 libchroma_omx_plugin_la_SOURCES = omxdl.c
 libchroma_omx_plugin_la_CFLAGS = $(AM_CFLAGS) $(OMXIP_CFLAGS)
 libchroma_omx_plugin_la_LIBADD = $(AM_LIBADD) $(OMXIP_LIBS)
-libchroma_omx_plugin_la_DEPENDENCIES =
 EXTRA_LTLIBRARIES += libchroma_omx_plugin.la

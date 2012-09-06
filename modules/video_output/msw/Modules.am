@@ -15,7 +15,6 @@ libdirectdraw_plugin_la_SOURCES = \
 	$(NULL)
 libdirectdraw_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdirectdraw_plugin_la_LIBADD = $(AM_LIBADD) -luser32 -lgdi32 -lole32 -luuid
-libdirectdraw_plugin_la_DEPENDENCIES =
 if HAVE_DIRECTX
 libvlc_LTLIBRARIES += libdirectdraw_plugin.la
 endif

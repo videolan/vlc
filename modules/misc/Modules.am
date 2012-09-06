@@ -15,18 +15,15 @@ libgnutls_plugin_la_LIBADD = $(AM_LIBADD) $(GNUTLS_LIBS) $(GCRYPT_LIBS)
 if HAVE_WIN32
 libgnutls_plugin_la_LIBADD += -lcrypt32 $(SOCKET_LIBS)
 endif
-libgnutls_plugin_la_DEPENDENCIES =
 EXTRA_LTLIBRARIES += libgnutls_plugin.la
 libvlc_LTLIBRARIES += $(LTLIBgnutls)
 
 libxdg_screensaver_plugin_la_SOURCES = inhibit/xdg.c
 libxdg_screensaver_plugin_la_CFLAGS = $(AM_CFLAGS)
 libxdg_screensaver_plugin_la_LIBADD = $(AM_LIBADD)
-libxdg_screensaver_plugin_la_DEPENDENCIES =
 libxscreensaver_plugin_la_SOURCES = inhibit/xscreensaver.c
 libxscreensaver_plugin_la_CFLAGS = $(AM_CFLAGS)
 libxscreensaver_plugin_la_LIBADD = $(AM_LIBADD)
-libxscreensaver_plugin_la_DEPENDENCIES =
 if HAVE_XCB
 libvlc_LTLIBRARIES += \
 	libxdg_screensaver_plugin.la \
@@ -36,7 +33,6 @@ endif
 libmce_plugin_la_SOURCES = inhibit/mce.c
 libmce_plugin_la_CFLAGS = $(AM_CLFAGS) $(DBUS_CFLAGS) $(MCE_CFLAGS)
 libmce_plugin_la_LIBADD = $(AM_LIBADD) $(DBUS_LIBS) $(MCE_LIBS)
-libmce_plugin_la_DEPENDENCIES =
 EXTRA_LTLIBRARIES += libmce_plugin.la
 libvlc_LTLIBRARIES += $(LTLIBmce)
 

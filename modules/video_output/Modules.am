@@ -19,17 +19,14 @@ SOURCES_android_surface = androidsurface.c
 libgles2_plugin_la_SOURCES = opengl.c opengl.h gl.c
 libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES=2
 libgles2_plugin_la_LIBADD = $(AM_LIBADD) $(GLES2_LIBS)
-libgles2_plugin_la_DEPENDENCIES =
 
 libgles1_plugin_la_SOURCES = opengl.c opengl.h gl.c
 libgles1_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES1_CFLAGS) -DUSE_OPENGL_ES=1
 libgles1_plugin_la_LIBADD = $(AM_LIBADD) $(GLES1_LIBS)
-libgles1_plugin_la_DEPENDENCIES =
 
 libgl_plugin_la_SOURCES = opengl.c opengl.h gl.c
 libgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
 libgl_plugin_la_LIBADD = $(AM_LIBADD) $(GL_LIBS)
-libgl_plugin_la_DEPENDENCIES =
 
 EXTRA_LTLIBRARIES += \
 	libgles2_plugin.la \
@@ -49,7 +46,6 @@ libxcb_x11_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(XCB_SHM_CFLAGS)
 libxcb_x11_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XCB_LIBS) $(XCB_SHM_LIBS)
-libxcb_x11_plugin_la_DEPENDENCIES =
 
 libxcb_xv_plugin_la_SOURCES = \
 	xcb/xcb_vlc.h \
@@ -60,7 +56,6 @@ libxcb_xv_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(XCB_SHM_CFLAGS) $(XCB_XV_CFLAGS)
 libxcb_xv_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XCB_LIBS) $(XCB_SHM_LIBS) $(XCB_XV_LIBS)
-libxcb_xv_plugin_la_DEPENDENCIES =
 
 libxcb_glx_plugin_la_SOURCES = \
 	xcb/xcb_vlc.h \
@@ -72,7 +67,6 @@ libxcb_glx_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(GL_CFLAGS)
 libxcb_glx_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XCB_LIBS) $(GL_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
-libxcb_glx_plugin_la_DEPENDENCIES =
 
 libxcb_window_plugin_la_SOURCES = xcb/window.c xcb/keys.c xcb/keysym.h xcb/xcb_keysym.h
 libxcb_window_plugin_la_CFLAGS = $(AM_CFLAGS) \
@@ -84,7 +78,6 @@ libxcb_window_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XPROTO_LIBS) \
 	$(XCB_LIBS) \
 	$(XCB_KEYSYMS_LIBS)
-libxcb_window_plugin_la_DEPENDENCIES =
 
 if HAVE_XCB
 libvlc_LTLIBRARIES += \
@@ -102,7 +95,6 @@ libvlc_LTLIBRARIES += \
 libdrawable_plugin_la_SOURCES = drawable.c
 libdrawable_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdrawable_plugin_la_LIBADD = $(AM_LIBADD)
-libdrawable_plugin_la_DEPENDENCIES =
 if HAVE_WIN32
 libvlc_LTLIBRARIES += libdrawable_plugin.la
 endif
@@ -115,7 +107,6 @@ endif
 libkva_plugin_la_SOURCES = kva.c
 libkva_plugin_la_CFLAGS = $(AM_CFLAGS)
 libkva_plugin_la_LIBADD = $(AM_LIBADD) $(KVA_LIBS)
-libkva_plugin_la_DEPENDENCIES =
 if HAVE_KVA
 libvlc_LTLIBRARIES += libkva_plugin.la
 endif
@@ -127,7 +118,6 @@ libegl_plugin_la_LIBADD = $(AM_LIBADD) $(EGL_LIBS)
 if !HAVE_WIN32
 libegl_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIBS) -lX11
 endif
-libegl_plugin_la_DEPENDENCIES =
 EXTRA_LTLIBRARIES += libegl_plugin.la
 libvlc_LTLIBRARIES += $(LTLIBegl)
 
@@ -140,7 +130,6 @@ if !HAVE_DARWIN
 libcaca_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIBS) -lX11
 endif
 endif
-libcaca_plugin_la_DEPENDENCIES =
 EXTRA_LTLIBRARIES += libcaca_plugin.la
 libvlc_LTLIBRARIES += $(LTLIBcaca)
 
@@ -148,7 +137,6 @@ libvlc_LTLIBRARIES += $(LTLIBcaca)
 libvdummy_plugin_la_SOURCES = vdummy.c
 libvdummy_plugin_la_CFLAGS = $(AM_CFLAGS)
 libvdummy_plugin_la_LIBADD = $(AM_LIBADD)
-libvdummy_plugin_la_DEPENDENCIES =
 
 libvlc_LTLIBRARIES += \
 	libvdummy_plugin.la \

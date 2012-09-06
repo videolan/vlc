@@ -7,7 +7,6 @@ libaudio_format_neon_plugin_la_SOURCES = \
 	audio_format.c
 libaudio_format_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
 libaudio_format_neon_plugin_la_LIBADD = $(AM_LIBADD)
-libaudio_format_neon_plugin_la_DEPENDENCIES =
 
 libchroma_yuv_neon_plugin_la_SOURCES = \
 	i420_yuyv.S \
@@ -16,12 +15,10 @@ libchroma_yuv_neon_plugin_la_SOURCES = \
 	chroma_yuv.c chroma_neon.h
 libchroma_yuv_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
 libchroma_yuv_neon_plugin_la_LIBADD = $(AM_LIBADD)
-libchroma_yuv_neon_plugin_la_DEPENDENCIES =
 
 libvolume_neon_plugin_la_SOURCES = volume.c amplify.S
 libvolume_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
 libvolume_neon_plugin_la_LIBADD = $(AM_LIBADD)
-libvolume_neon_plugin_la_DEPENDENCIES =
 
 libyuv_rgb_neon_plugin_la_SOURCES = \
 	i420_rgb.S \
@@ -30,7 +27,6 @@ libyuv_rgb_neon_plugin_la_SOURCES = \
 	yuv_rgb.c
 libyuv_rgb_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
 libyuv_rgb_neon_plugin_la_LIBADD = $(AM_LIBADD)
-libyuv_rgb_neon_plugin_la_DEPENDENCIES =
 
 libvlc_LTLIBRARIES += \
 	libaudio_format_neon_plugin.la \

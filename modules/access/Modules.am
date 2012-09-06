@@ -17,17 +17,14 @@ libfilesystem_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 libfilesystem_plugin_la_LIBADD += -lshlwapi
 endif
-libfilesystem_plugin_la_DEPENDENCIES =
 
 libidummy_plugin_la_SOURCES = idummy.c
 libidummy_plugin_la_CFLAGS = $(AM_CFLAGS)
 libidummy_plugin_la_LIBADD = $(AM_LIBADD)
-libidummy_plugin_la_DEPENDENCIES =
 
 libsdp_plugin_la_SOURCES = sdp.c
 libsdp_plugin_la_CFLAGS = $(AM_CFLAGS)
 libsdp_plugin_la_LIBADD = $(AM_LIBADD)
-libsdp_plugin_la_DEPENDENCIES =
 
 libaccess_smb_plugin_la_SOURCES = smb.c
 libaccess_smb_plugin_la_CFLAGS = $(AM_CFLAGS)
@@ -35,7 +32,6 @@ libaccess_smb_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_access_smb)
 if HAVE_WIN32
 libaccess_smb_plugin_la_LIBADD += -lmpr
 endif
-libaccess_smb_plugin_la_DEPENDENCIES =
 libvlc_LTLIBRARIES += $(LTLIBaccess_smb)
 
 SOURCES_access_directory = directory.c
@@ -81,12 +77,10 @@ if HAVE_QTKIT
 libqtcapture_plugin_la_SOURCES = qtcapture.m
 libqtcapture_plugin_la_LIBADDD = $(AM_LIBADD)
 libqtcapture_plugin_la_LDFLAGS = -Wl,-framework,Cocoa -Wl,-framework,QTKit -Wl,-framework,CoreVideo -Wl,-framework,QuartzCore
-libqtcapture_plugin_la_DEPENDENCIES =
 
 libqtsound_plugin_la_SOURCES = qtsound.m
 libqtsound_plugin_la_LIBADD = $(AM_LIBADD)
 libqtsound_plugin_la_LDFLAGS = -Wl,-framework,Cocoa -Wl,-framework,QTKit -Wl,-framework,CoreAudio
-libqtsound_plugin_la_DEPENDENCIES =
 
 libvlc_LTLIBRARIES += \
         libqtcapture_plugin.la \
@@ -112,7 +106,6 @@ libvlc_LTLIBRARIES += \
 libaccess_oss_plugin_la_SOURCES = oss.c
 libaccess_oss_plugin_la_CFLAGS = $(AM_CFLAGS)
 libaccess_oss_plugin_la_LIBADD = $(AM_LIBADD) $(OSS_LIBS)
-libaccess_oss_plugin_la_DEPENDENCIES =
 if HAVE_OSS
 libvlc_LTLIBRARIES += libaccess_oss_plugin.la
 endif
@@ -120,7 +113,6 @@ endif
 libaccess_alsa_plugin_la_SOURCES = alsa.c
 libaccess_alsa_plugin_la_CFLAGS = $(AM_CFLAGS) $(ALSA_CFLAGS)
 libaccess_alsa_plugin_la_LIBADD = $(AM_LIBADD) $(ALSA_LIBS)
-libaccess_alsa_plugin_la_DEPENDENCIES =
 if HAVE_ALSA
 libvlc_LTLIBRARIES += libaccess_alsa_plugin.la
 endif
@@ -131,7 +123,6 @@ libpulsesrc_plugin_la_SOURCES = \
 	pulse.c
 libpulsesrc_plugin_la_CFLAGS= $(AM_CFLAGS) $(PULSE_CFLAGS)
 libpulsesrc_plugin_la_LIBADD = $(AM_LIBADD) $(PULSE_LIBS)
-libpulsesrc_plugin_la_DEPENDENCIES =
 if HAVE_PULSE
 libvlc_LTLIBRARIES += libpulsesrc_plugin.la
 endif
@@ -139,7 +130,6 @@ endif
 libaccess_shm_plugin_la_SOURCES = shm.c
 libaccess_shm_plugin_la_CFLAGS = $(AM_CFLAGS)
 libaccess_shm_plugin_la_LIBADD = $(AM_LIBADD)
-libaccess_shm_plugin_la_DEPENDENCIES =
 libvlc_LTLIBRARIES += $(LTLIBaccess_shm)
 
 libv4l2_plugin_la_SOURCES = \
@@ -154,7 +144,6 @@ libv4l2_plugin_la_SOURCES = \
 	v4l2/v4l2.h
 libv4l2_plugin_la_CFLAGS = $(AM_CFLAGS)
 libv4l2_plugin_la_LIBADD = $(AM_LIBADD) $(LIBDL) $(LIBM)
-libv4l2_plugin_la_DEPENDENCIES =
 if HAVE_V4L2
 libvlc_LTLIBRARIES += libv4l2_plugin.la
 endif
@@ -164,7 +153,6 @@ libxcb_screen_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(XCB_COMPOSITE_CFLAGS)
 libxcb_screen_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XCB_LIBS) $(XCB_COMPOSITE_LIBS)
-libxcb_screen_plugin_la_DEPENDENCIES =
 if HAVE_XCB
 libvlc_LTLIBRARIES += libxcb_screen_plugin.la
 endif
@@ -177,7 +165,6 @@ libdtv_plugin_la_SOURCES = \
 	dtv/access.c
 libdtv_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdtv_plugin_la_LIBADD = $(AM_LIBADD)
-libdtv_plugin_la_DEPENDENCIES =
 
 if HAVE_LINUX_DVB
 libdtv_plugin_la_SOURCES += dtv/linux.c
@@ -199,7 +186,7 @@ libbda_la_LDFLAGS = -static
 libbda_la_LIBADD = -lstrmiids -lole32 -loleaut32 -luuid
 noinst_LTLIBRARIES = libbda.la
 
-libdtv_plugin_la_DEPENDENCIES += libbda.la
+libdtv_plugin_la_DEPENDENCIES = libbda.la
 libdtv_plugin_la_LIBADD += libbda.la -lstdc++
 libvlc_LTLIBRARIES += libdtv_plugin.la
 endif

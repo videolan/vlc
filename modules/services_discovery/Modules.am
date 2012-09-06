@@ -10,7 +10,6 @@ libpulselist_plugin_la_SOURCES = \
 	pulse.c
 libpulselist_plugin_la_CFLAGS = $(AM_CFLAGS) $(PULSE_CFLAGS)
 libpulselist_plugin_la_LIBADD = $(AM_LIBADD) $(PULSE_LIBS)
-libpulselist_plugin_la_DEPENDENCIES =
 if HAVE_PULSE
 libvlc_LTLIBRARIES += libpulselist_plugin.la
 endif
@@ -18,7 +17,6 @@ endif
 libudev_plugin_la_SOURCES = udev.c
 libudev_plugin_la_CFLAGS = $(AM_CFLAGS) $(UDEV_CFLAGS)
 libudev_plugin_la_LIBADD = $(AM_LIBADD) $(UDEV_LIBS)
-libudev_plugin_la_DEPENDENCIES =
 if HAVE_ALSA
 libudev_plugin_la_CFLAGS += $(ALSA_CFLAGS) -DHAVE_ALSA
 libudev_plugin_la_LIBADD += $(ALSA_LIBS)
@@ -29,7 +27,6 @@ libxcb_apps_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS)
 libxcb_apps_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XCB_LIBS)
-libxcb_apps_plugin_la_DEPENDENCIES =
 if HAVE_XCB
 libvlc_LTLIBRARIES += libxcb_apps_plugin.la
 endif
@@ -37,7 +34,6 @@ endif
 libwindrive_plugin_la_SOURCES = windrive.c
 libwindrive_plugin_la_CFLAGS = $(AM_CFLAGS)
 libwindrive_plugin_la_LIBADD = $(AM_LIBADD)
-libwindrive_plugin_la_DEPENDENCIES =
 if HAVE_WIN32
 libvlc_LTLIBRARIES += libwindrive_plugin.la
 endif
@@ -45,7 +41,6 @@ endif
 libos2drive_plugin_la_SOURCES = os2drive.c
 libos2drive_plugin_la_CFLAGS = $(AM_CFLAGS)
 libos2drive_plugin_la_LIBADD = $(AM_LIBADD)
-libos2drive_plugin_la_DEPENDENCIES =
 if HAVE_OS2
 libvlc_LTLIBRARIES += libos2drive_plugin.la
 endif

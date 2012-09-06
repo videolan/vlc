@@ -24,7 +24,6 @@ endif
 libavcodec_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_avcodec)
 libavcodec_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_avcodec)
 libavcodec_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_avcodec)
-libavcodec_plugin_la_DEPENDENCIES =
 
 if MERGE_FFMPEG
 libavcodec_plugin_la_SOURCES += \
