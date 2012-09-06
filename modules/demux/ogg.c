@@ -140,7 +140,7 @@ static void Ogg_ExtractMeta( demux_t *p_demux, vlc_fourcc_t i_codec, const uint8
 static void Ogg_ReadTheoraHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_ReadVorbisHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadSpeexHeader( logical_stream_t *, ogg_packet * );
-static void Ogg_ReadOpusHeader( logical_stream_t *, ogg_packet * );
+static void Ogg_ReadOpusHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_ReadKateHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadFlacHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_ReadAnnodexHeader( demux_t *, logical_stream_t *, ogg_packet * );
@@ -1113,7 +1113,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 else if( oggpacket.bytes >= 8 &&
                     ! memcmp( oggpacket.packet, "OpusHead", 8 ) )
                 {
-                    Ogg_ReadOpusHeader( p_stream, &oggpacket );
+                    Ogg_ReadOpusHeader( p_demux, p_stream, &oggpacket );
                     msg_Dbg( p_demux, "found opus header, channels: %i, "
                              "pre-skip: %i",
                              p_stream->fmt.audio.i_channels,
@@ -1958,7 +1958,8 @@ static void Ogg_ReadSpeexHeader( logical_stream_t *p_stream,
     p_stream->fmt.i_bitrate = oggpack_read( &opb, 32 );
 }
 
-static void Ogg_ReadOpusHeader( logical_stream_t *p_stream,
+static void Ogg_ReadOpusHeader( demux_t *p_demux,
+                                logical_stream_t *p_stream,
                                 ogg_packet *p_oggpacket )
 {
     oggpack_buffer opb;
@@ -1982,6 +1983,21 @@ static void Ogg_ReadOpusHeader( logical_stream_t *p_stream,
     oggpack_adv( &opb, 8 ); /* version_id */
     p_stream->fmt.audio.i_channels = oggpack_read( &opb, 8 );
     p_stream->i_pre_skip = oggpack_read( &opb, 16 );
+
+    if ( p_demux->p_sys->i_length < 0 )
+    {
+        int64_t last_frame = oggseek_get_last_frame( p_demux, p_stream );
+        /*
+         * Since there's quite a good chance that ogg_stream_packetout was called,
+         * the given p_oggpacket may point to invalid data. Fill it with some valid ones
+         */
+        ogg_stream_packetpeek( &p_stream->os, p_oggpacket );
+
+        if ( last_frame >= 0 )
+        {
+            p_demux->p_sys->i_length = last_frame / p_stream->f_rate;
+        }
+    }
 }
 
 static void Ogg_ReadFlacHeader( demux_t *p_demux, logical_stream_t *p_stream,

@@ -690,10 +690,11 @@ static demux_index_entry_t *get_bounds_for ( logical_stream_t *p_stream, int64_t
 }
 
 
-/* get highest frame in theora stream */
+/* get highest frame in theora and opus streams */
 
-static int64_t find_last_theora_frame ( demux_t *p_demux, logical_stream_t *p_stream )
+static int64_t get_last_frame ( demux_t *p_demux, logical_stream_t *p_stream )
 {
+    demux_sys_t *p_sys  = p_demux->p_sys;
     int64_t i_frame;
 
     i_frame = find_last_frame ( p_demux, p_stream );
@@ -706,9 +707,10 @@ static int64_t find_last_theora_frame ( demux_t *p_demux, logical_stream_t *p_st
 
     seek_byte( p_demux, 0 );
     /* Reset stream states */
-    p_stream->i_serial_no = ogg_page_serialno( &p_demux->p_sys->current_page );
+    p_sys->i_streams = 0;
+    p_stream->i_serial_no = ogg_page_serialno( &p_sys->current_page );
     ogg_stream_init( &p_stream->os, p_stream->i_serial_no );
-    ogg_stream_pagein( &p_stream->os, &p_demux->p_sys->current_page );
+    ogg_stream_pagein( &p_stream->os, &p_sys->current_page );
 
     return i_frame;
 }
@@ -722,15 +724,16 @@ static int64_t find_last_theora_frame ( demux_t *p_demux, logical_stream_t *p_st
 
 
 
-/* return highest frame number for p_stream (which must be a theora or dirac video stream) */
+/* return highest frame number for p_stream (which must be a theora, dirac or opus stream) */
 
 int64_t oggseek_get_last_frame ( demux_t *p_demux, logical_stream_t *p_stream )
 {
     int64_t i_frame = -1;
 
-    if ( p_stream->fmt.i_codec == VLC_CODEC_THEORA )
+    if ( p_stream->fmt.i_codec == VLC_CODEC_THEORA ||
+         p_stream->fmt.i_codec == VLC_CODEC_OPUS )
     {
-        i_frame = find_last_theora_frame ( p_demux, p_stream );
+        i_frame = get_last_frame ( p_demux, p_stream );
 
         if ( i_frame < 0 ) return -1;
         return i_frame;
