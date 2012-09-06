@@ -30400,7 +30400,7 @@ msgstr "&Lerrokatu"
 
 #~ msgid ""
 #~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overriden."
+#~ "the video. If absolute font size is set, relative size will be overridden."
 #~ msgstr ""
 #~ "Hau da bideoan aurkeztuk diren hizkien berezko neurri erlatiboa. "
 #~ "Hizkiaren neurri osoa ezartzen bada, neurri erlatiboa baliogabetua izango "

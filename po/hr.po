@@ -31175,7 +31175,7 @@ msgstr "&Uvrstiti za čekanje"
 
 #~ msgid ""
 #~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overriden."
+#~ "the video. If absolute font size is set, relative size will be overridden."
 #~ msgstr ""
 #~ "To je razmjerna polazna veličina fontova, koji će biti predočeni na video "
 #~ "slici. Ukoliko se postavi apsolutna veličina fonta, razmjerna veličina će "

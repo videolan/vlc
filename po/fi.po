@@ -31060,7 +31060,7 @@ msgstr "&Lisää jonoon"
 
 #~ msgid ""
 #~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overriden."
+#~ "the video. If absolute font size is set, relative size will be overridden."
 #~ msgstr ""
 #~ "Videon päälle renderöitävän tekstin oletuskoko (suhteellinen). Jos "
 #~ "absoluuttinen koko on määrätty, suhteellinen koko yliajetaan."

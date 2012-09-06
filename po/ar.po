@@ -30434,7 +30434,7 @@ msgstr ""
 
 #~ msgid ""
 #~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overriden."
+#~ "the video. If absolute font size is set, relative size will be overridden."
 #~ msgstr ""
 #~ "هذا هو التخلف النسبي في حجم الخطوط التي ستقدم على الفيديو. اذا حددت حجم "
 #~ "الخط المطلق ،الحجم نسبي سوف ينقضها."

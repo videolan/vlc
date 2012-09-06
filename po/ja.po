@@ -30186,7 +30186,7 @@ msgstr "再生キューに追加 (&E)"
 
 #~ msgid ""
 #~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overriden."
+#~ "the video. If absolute font size is set, relative size will be overridden."
 #~ msgstr ""
 #~ "これはビデオ上に表示されるフォントの相対的なデフォルトサイズです。絶対値で"
 #~ "フォントサイズが指定された場合、相対サイズは上書きされます。"

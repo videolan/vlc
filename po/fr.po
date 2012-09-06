@@ -30429,7 +30429,7 @@ msgstr "Mettre à la file"
 #, fuzzy
 #~ msgid ""
 #~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overriden."
+#~ "the video. If absolute font size is set, relative size will be overridden."
 #~ msgstr ""
 #~ "Taille par défaut relative des polices à afficher. Si une taille absolue "
 #~ "est spécifiée, la taille relative sera surchargée."

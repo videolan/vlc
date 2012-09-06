@@ -30644,7 +30644,7 @@ msgstr "Помістити у чергу"
 
 #~ msgid ""
 #~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overriden."
+#~ "the video. If absolute font size is set, relative size will be overridden."
 #~ msgstr ""
 #~ "Відносний розмір шрифтів, які буде виводитися на відео. Якщо зазначений "
 #~ "абсолютний розмір шрифту, відносний буде ігноровано."

@@ -30694,7 +30694,7 @@ msgstr "Добавить в &очередь"
 
 #~ msgid ""
 #~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overriden."
+#~ "the video. If absolute font size is set, relative size will be overridden."
 #~ msgstr ""
 #~ "Относительный размер шрифтов, которые будет выводиться на видео. Если "
 #~ "указан абсолютный размер шрифта, относительный будет проигнорирован."

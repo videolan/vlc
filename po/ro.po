@@ -30010,7 +30010,7 @@ msgstr "&Adaugă la coadă"
 
 #~ msgid ""
 #~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overriden."
+#~ "the video. If absolute font size is set, relative size will be overridden."
 #~ msgstr ""
 #~ "Dimensiunea relativă implicită a fonturilor care vor fi randate pe video. "
 #~ "Dacă valoarea absolută a fontului este stabilită, dimensiunea relativă va "

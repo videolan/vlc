@@ -30076,7 +30076,7 @@ msgstr "Acco&da"
 #, fuzzy
 #~ msgid ""
 #~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overriden."
+#~ "the video. If absolute font size is set, relative size will be overridden."
 #~ msgstr ""
 #~ "La dimensione dei caratteri utilizzati dal modulo osd. Se impostata ad un "
 #~ "valore diverso da 0, modifica la dimensione relativa dei caratteri "

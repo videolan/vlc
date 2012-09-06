@@ -30006,7 +30006,7 @@ msgstr "&Zařadit do fronty"
 
 #~ msgid ""
 #~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overriden."
+#~ "the video. If absolute font size is set, relative size will be overridden."
 #~ msgstr ""
 #~ "Toto je relativní výchozí velikost písma, které bude vykresleno na video. "
 #~ "Pokud je nastavena absolutní velikost, tak bude relativní velikost "

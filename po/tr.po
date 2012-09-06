@@ -30616,7 +30616,7 @@ msgstr "Kuyruğa &Ekle"
 
 #~ msgid ""
 #~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overriden."
+#~ "the video. If absolute font size is set, relative size will be overridden."
 #~ msgstr ""
 #~ "Bu değer görüntü üzerinde gösterilecek yazı tipinin varsayılan yaklaşık "
 #~ "büyüklüğüdür. Eğer kesin bir yazı tipi büyüklüğü belirtilirse, yaklaşık "

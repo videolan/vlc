@@ -30304,7 +30304,7 @@ msgstr "&Sæt i kø"
 
 #~ msgid ""
 #~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overriden."
+#~ "the video. If absolute font size is set, relative size will be overridden."
 #~ msgstr ""
 #~ "Dette er den relative standardstørrelse af de skrifttyper, der vil blive "
 #~ "anvendt på videoen. Hvis du angiver en fast skriftstørrelse, anvendes "

@@ -30737,7 +30737,7 @@ msgstr "Poñer na &fila"
 
 #~ msgid ""
 #~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overriden."
+#~ "the video. If absolute font size is set, relative size will be overridden."
 #~ msgstr ""
 #~ "Este e o tamaño predeterminado dos tipos de letra que se renderizarán no "
 #~ "vídeo. Se se estabelece un tamaño de tipo de letra absoluto, o tamaño "

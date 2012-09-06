@@ -30779,7 +30779,7 @@ msgstr "Do &kolejki"
 
 #~ msgid ""
 #~ "This is the relative default size of the fonts that will be rendered on "
-#~ "the video. If absolute font size is set, relative size will be overriden."
+#~ "the video. If absolute font size is set, relative size will be overridden."
 #~ msgstr ""
 #~ "To jest względny domyślny rozmiar czcionki, który będzie renderowany na "
 #~ "obrazie. Jeśli podałeś całkowity rozmiar czcionki, względny rozmiar "
