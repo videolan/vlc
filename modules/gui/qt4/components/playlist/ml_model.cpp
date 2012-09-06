@@ -65,8 +65,13 @@ MLModel::MLModel( intf_thread_t* _p_intf, QObject *parent )
     if ( !p_ml ) return;
 
     vlc_array_t *p_result_array = vlc_array_new();
-    ml_Find( p_ml, p_result_array, ML_MEDIA );
-    insertResultArray( p_result_array );
+    if ( p_result_array )
+    {
+        ml_Find( p_ml, p_result_array, ML_MEDIA );
+        insertResultArray( p_result_array );
+        ml_DestroyResultArray( p_result_array );
+        vlc_array_destroy( p_result_array );
+    }
 
     var_AddCallback( p_ml, "media-added", mediaAdded, this );
     var_AddCallback( p_ml, "media-deleted", mediaDeleted, this );
@@ -593,6 +598,7 @@ static int mediaAdded( vlc_object_t *p_this, char const *psz_var,
         return VLC_EGENERIC;
     }
     p_model->insertResultArray( p_result );
+    ml_DestroyResultArray( p_result );
     vlc_array_destroy( p_result );
     return VLC_SUCCESS;
 }
