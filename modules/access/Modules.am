@@ -1,8 +1,3 @@
-# Automake forgets to add a proper tag to libtool with Objective-C files.
-# Moreover Libtool should default tag to CC when none is specified but
-# obviously does not. Here is a fix for that.
-LIBTOOL=@LIBTOOL@ --tag=CC
-
 BASE_SUBDIRS = bd mms rtp rtsp screen vcd vcdx zip
 EXTRA_SUBDIRS = dshow
 SUBDIRS = $(BASE_SUBDIRS)
