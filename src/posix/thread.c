@@ -828,7 +828,7 @@ int vlc_set_priority (vlc_thread_t th, int priority)
             return VLC_EGENERIC;
     }
 #else
-    (void) priority;
+    (void) th; (void) priority;
 #endif
     return VLC_SUCCESS;
 }
