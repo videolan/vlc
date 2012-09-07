@@ -1371,7 +1371,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)setWindowLevel:(NSNumber*)state
 {
-    if (var_InheritBool(p_intf, "macosx-background") || [[[[VLCMainWindow sharedInstance] videoView] window] level] < NSNormalWindowLevel)
+    if (var_InheritBool(p_intf, "video-wallpaper") || [[[[VLCMainWindow sharedInstance] videoView] window] level] < NSNormalWindowLevel)
         return;
 
     if ([state unsignedIntValue] & VOUT_WINDOW_STATE_ABOVE)
