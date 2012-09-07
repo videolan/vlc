@@ -113,6 +113,7 @@ libVLC:
    to replace the deprecated libvlc_audio_output_device_count, libvlc_audio_output_device_longname
    and libvlc_audio_output_device_id
  * new libvlc_log_subscribe and libvlc_log_unsubscribe function to register logging callbacks
+ * new audio equalizer API
 
 Removed modules:
  * portaudio audio output: use the native audio output instead

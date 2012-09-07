@@ -34,6 +34,7 @@
 #include <vlc_input.h>
 #include <vlc_vout.h>
 #include <vlc_keys.h>
+#include <vlc_aout_intf.h>
 
 #include "libvlc_internal.h"
 #include "media_internal.h" // libvlc_media_set_state()
@@ -482,6 +483,9 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "amem-rate", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
     var_Create (mp, "amem-channels", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
 
+    var_Create (mp, "equalizer-preamp", VLC_VAR_FLOAT);
+    var_Create (mp, "equalizer-bands", VLC_VAR_STRING);
+
     mp->p_md = NULL;
     mp->state = libvlc_NothingSpecial;
     mp->p_libvlc_instance = instance;
@@ -746,6 +750,10 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
     }
     p_mi->input.p_thread = p_input_thread;
     unlock_input(p_mi);
+
+    if( strlen( var_GetString( p_mi, "equalizer-bands" ) ) > 0 )
+        aout_EnableFilter( p_mi, "equalizer", true );
+
     return 0;
 }
 
@@ -1408,4 +1416,34 @@ void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi )
         var_TriggerCallback( p_input_thread, "frame-next" );
         vlc_object_release( p_input_thread );
     }
+}
+
+int libvlc_media_player_set_equalizer( libvlc_media_player_t *p_mi, libvlc_equalizer_t *p_equalizer )
+{
+    if ( !p_equalizer )
+    {
+        aout_EnableFilter( p_mi, "equalizer", false );
+        var_SetString( p_mi, "equalizer-bands", NULL );
+        return 0;
+    }
+
+    var_SetFloat( p_mi, "equalizer-preamp", p_equalizer->f_preamp );
+
+    char *psz_bands = NULL;
+    for ( int i = 0; i < EQZ_BANDS_MAX; i++ )
+    {
+        char *psz;
+        if ( asprintf( &psz, "%s %.07f", psz_bands ? psz_bands : "", p_equalizer->f_amp[i] ) == -1 )
+        {
+            free( psz_bands );
+            return -1;
+        }
+        free( psz_bands );
+        psz_bands = psz;
+    }
+    var_SetString( p_mi, "equalizer-bands", psz_bands );
+    free( psz_bands );
+
+    aout_EnableFilter( p_mi, "equalizer", true );
+    return 0;
 }
