@@ -664,6 +664,43 @@ void _drawFrameInRect(NSRect frameRect)
 @end
 
 /*****************************************************************************
+ * VLCVolumeSliderCommon
+ *****************************************************************************/
+
+@implementation VLCVolumeSliderCommon : NSSlider
+
+- (void)scrollWheel:(NSEvent *)o_event
+{
+    intf_thread_t * p_intf = VLCIntf;
+    CGFloat f_deltaY = [o_event deltaY];
+    CGFloat f_deltaX = [o_event deltaX];
+
+    if (!OSX_SNOW_LEOPARD && [o_event isDirectionInvertedFromDevice])
+        f_deltaX = -f_deltaX; // optimisation, actually double invertion of f_deltaY here
+    else
+        f_deltaY = -f_deltaY;
+
+    // positive for left / down, negative otherwise
+    CGFloat f_delta = f_deltaX + f_deltaY;
+    CGFloat f_abs;
+    int i_vlckey;
+
+    if (f_delta > 0.0f) {
+        i_vlckey = ACTIONID_VOL_DOWN;
+        f_abs = f_delta;
+    }
+    else {
+        i_vlckey = ACTIONID_VOL_UP;
+        f_abs = -f_delta;
+    }
+
+    for (NSUInteger i = 0; i < (int)(f_abs/4.+1.) && f_abs > 0.05 ; i++)
+        var_SetInteger(p_intf->p_libvlc, "key-action", i_vlckey);
+}
+
+@end
+
+/*****************************************************************************
  * ITSlider
  *****************************************************************************/
 
@@ -705,35 +742,6 @@ void _drawFrameInRect(NSRect frameRect)
     NSRect knobRect = [[self cell] knobRectFlipped:NO];
     knobRect.origin.y+=2;
     [self drawKnobInRect: knobRect];
-}
-
-- (void)scrollWheel:(NSEvent *)o_event
-{
-    intf_thread_t * p_intf = VLCIntf;
-    CGFloat f_deltaY = [o_event deltaY];
-    CGFloat f_deltaX = [o_event deltaX];
-
-    if (!OSX_SNOW_LEOPARD && [o_event isDirectionInvertedFromDevice])
-        f_deltaX = -f_deltaX; // optimisation, actually double invertion of f_deltaY here
-    else
-        f_deltaY = -f_deltaY;
-
-    // positive for left / down, negative otherwise
-    CGFloat f_delta = f_deltaX + f_deltaY;
-    CGFloat f_abs;
-    int i_vlckey;
-
-    if (f_delta > 0.0f) {
-        i_vlckey = ACTIONID_VOL_DOWN;
-        f_abs = f_delta;
-    }
-    else {
-        i_vlckey = ACTIONID_VOL_UP;
-        f_abs = -f_delta;
-    }
-
-    for (NSUInteger i = 0; i < (int)(f_abs/4.+1.) && f_abs > 0.05 ; i++)
-        var_SetInteger( p_intf->p_libvlc, "key-action", i_vlckey );
 }
 
 @end

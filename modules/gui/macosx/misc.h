@@ -145,10 +145,20 @@
 @end
 
 /*****************************************************************************
+ * VLCVolumeSliderCommon
+ *****************************************************************************/
+
+@interface VLCVolumeSliderCommon : NSSlider
+
+- (void)scrollWheel:(NSEvent *)o_event;
+
+@end
+
+/*****************************************************************************
  * ITSlider
  *****************************************************************************/
 
-@interface ITSlider : NSSlider
+@interface ITSlider : VLCVolumeSliderCommon
 {
     NSImage *img;
     NSRect image_rect;

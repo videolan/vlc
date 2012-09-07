@@ -109,7 +109,7 @@
 
 @end
 
-@interface VLCFSVolumeSlider : NSSlider
+@interface VLCFSVolumeSlider : VLCVolumeSliderCommon
 {
 }
 - (void)drawKnobInRect: (NSRect)knobRect;
