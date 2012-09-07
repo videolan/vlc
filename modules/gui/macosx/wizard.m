@@ -1218,7 +1218,7 @@ static VLCWizard *_o_sharedInstance = nil;
 
             if(! [[o_userSelections objectForKey:@"partExtractFrom"]
                 isEqualToString:@""]) {
-                NSArray * components = [o_userSelections objectForKey: @"partExtractFrom"] componentsSeparatedByString:@":"];
+                NSArray * components = [[o_userSelections objectForKey: @"partExtractFrom"] componentsSeparatedByString:@":"];
                 NSUInteger componentCount = [components count];
                 NSUInteger time = 0;
                 if (componentCount == 1)
@@ -1234,8 +1234,7 @@ static VLCWizard *_o_sharedInstance = nil;
 
             if(! [[o_userSelections objectForKey:@"partExtractTo"]
                 isEqualToString:@""]) {
-                NSArray * components = [[o_userSelections
-                    objectForKey: @"partExtractTo"] componentsSeparatedByString:@":"];
+                NSArray * components = [[o_userSelections objectForKey: @"partExtractTo"] componentsSeparatedByString:@":"];
                 NSUInteger componentCount = [components count];
                 NSUInteger time = 0;
                 if (componentCount == 1)
