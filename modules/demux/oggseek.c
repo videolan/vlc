@@ -731,6 +731,7 @@ int64_t oggseek_get_last_frame ( demux_t *p_demux, logical_stream_t *p_stream )
     int64_t i_frame = -1;
 
     if ( p_stream->fmt.i_codec == VLC_CODEC_THEORA ||
+         p_stream->fmt.i_codec == VLC_CODEC_VORBIS ||
          p_stream->fmt.i_codec == VLC_CODEC_OPUS )
     {
         i_frame = get_last_frame ( p_demux, p_stream );
