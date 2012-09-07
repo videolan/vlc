@@ -207,6 +207,9 @@ static int OpenScaler( vlc_object_t *p_this )
              (char *)&p_filter->fmt_out.video.i_chroma,
              ppsz_mode_descriptions[i_sws_mode] );
 
+    p_filter->fmt_out.video.i_sar_num = p_filter->fmt_in.video.i_sar_num;
+    p_filter->fmt_out.video.i_sar_den = p_filter->fmt_in.video.i_sar_den;
+
     return VLC_SUCCESS;
 }
 

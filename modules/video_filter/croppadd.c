@@ -190,6 +190,9 @@ static int OpenFilter( vlc_object_t *p_this )
              p_filter->fmt_out.video.i_width,
              p_filter->fmt_out.video.i_height );
 
+    p_filter->fmt_out.video.i_sar_num = p_filter->fmt_in.video.i_sar_num * p_filter->fmt_out.video.i_visible_height;
+    p_filter->fmt_out.video.i_sar_den = p_filter->fmt_in.video.i_sar_den * p_filter->fmt_out.video.i_visible_width;
+
     return VLC_SUCCESS;
 }
 
