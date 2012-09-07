@@ -33,9 +33,9 @@
 #####################################################################
 
 VLC_VERSION         = "2.0.3"
-VLC_BIN             = "/home/videolan/vlc/2.0.3/vlc-2.0.3/vlc.exe"
-VLC_BASE_DIR        = "/home/videolan/vlc/2.0.3/vlc-2.0.3/"
-VLC_SYMBOLS_DIR     = "/home/videolan/vlc/2.0.3/symbols-2.0.3/"
+VLC_BIN             = "/home/videolan/vlc/" + VLC_VERSION + "/vlc-" VLC_VERSION + "/vlc.exe"
+VLC_BASE_DIR        = "/home/videolan/vlc/" + VLC_VERSION + "/vlc-" + VLC_VERSION + "/"
+VLC_SYMBOLS_DIR     = "/home/videolan/vlc/" + VLC_VERSION + "/symbols-" + VLC_VERSION + "/"
 WORKDIR             = "/srv/ftp/crashes-win32"
 FILE_MATCH          = r"^\d{14}$"
 FILE_MAX_SIZE       = 10000
@@ -271,14 +271,9 @@ def moveFile(filename, outdated = False):
 
 ### ENTRY POINT ###
 
-if len(sys.argv) == 1:
-    print("Folder mode")
-    batch = True
-if len(sys.argv) != 2:
+batch = len(sys.argv) != 2
+if batch:
     print("Running in batch mode")
-    batch = True
-else:
-    batch = False
 
 input_files = []
 if not batch:
@@ -311,4 +306,3 @@ for input_file in input_files:
         processFile(input_file)
     except Exception as ex:
         print(traceback.format_exc())
-
