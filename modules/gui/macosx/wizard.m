@@ -1217,21 +1217,36 @@ static VLCWizard *_o_sharedInstance = nil;
             input_item_AddOption( p_input, [[o_t8_fld_mrl stringValue] UTF8String], VLC_INPUT_OPTION_TRUSTED );
 
             if(! [[o_userSelections objectForKey:@"partExtractFrom"]
-                isEqualToString:@""] )
-            {
-                input_item_AddOption( p_input, [[NSString
-                    stringWithFormat: @"start-time=%@", [o_userSelections
-                    objectForKey: @"partExtractFrom"]] UTF8String],
-                    VLC_INPUT_OPTION_TRUSTED );
+                isEqualToString:@""]) {
+                NSArray * components = [o_userSelections objectForKey: @"partExtractFrom"] componentsSeparatedByString:@":"];
+                NSUInteger componentCount = [components count];
+                NSUInteger time = 0;
+                if (componentCount == 1)
+                    time = 1000000 * ([[components objectAtIndex:0] intValue]);
+                else if (componentCount == 2)
+                    time = 1000000 * ([[components objectAtIndex:0] intValue] * 60 + [[components objectAtIndex:1] intValue]);
+                else if (componentCount == 3)
+                    time = 1000000 * ([[components objectAtIndex:0] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue]);
+                else
+                    msg_Err(VLCIntf, "Invalid string format for time");
+                input_item_AddOption(p_input, [[NSString stringWithFormat: @"start-time=%lu", time] UTF8String], VLC_INPUT_OPTION_TRUSTED);
             }
 
             if(! [[o_userSelections objectForKey:@"partExtractTo"]
-                isEqualToString:@""] )
-            {
-                input_item_AddOption( p_input, [[NSString
-                    stringWithFormat: @"stop-time=%@", [o_userSelections
-                    objectForKey: @"partExtractTo"]] UTF8String],
-                    VLC_INPUT_OPTION_TRUSTED );
+                isEqualToString:@""]) {
+                NSArray * components = [[o_userSelections
+                    objectForKey: @"partExtractTo"] componentsSeparatedByString:@":"];
+                NSUInteger componentCount = [components count];
+                NSUInteger time = 0;
+                if (componentCount == 1)
+                    time = 1000000 * ([[components objectAtIndex:0] intValue]);
+                else if (componentCount == 2)
+                    time = 1000000 * ([[components objectAtIndex:0] intValue] * 60 + [[components objectAtIndex:1] intValue]);
+                else if (componentCount == 3)
+                    time = 1000000 * ([[components objectAtIndex:0] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue]);
+                else
+                    msg_Err(VLCIntf, "Invalid string format for time");
+                input_item_AddOption(p_input, [[NSString stringWithFormat: @"stop-time=%lu", time] UTF8String], VLC_INPUT_OPTION_TRUSTED);
             }
 
             input_item_AddOption( p_input, [[NSString stringWithFormat:
@@ -1311,7 +1326,7 @@ static VLCWizard *_o_sharedInstance = nil;
     if ([[o_userSelections objectForKey:@"partExtract"] isEqualToString: @"YES"])
     {
         [o_t8_fld_partExtract setStringValue: [NSString stringWithFormat:
-            _NS("yes: from %@ to %@ secs"),
+            _NS("yes: from %@ to %@"),
             [o_userSelections objectForKey:@"partExtractFrom"],
             [o_userSelections objectForKey:@"partExtractTo"]]];
     } else {
