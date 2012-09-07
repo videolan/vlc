@@ -30,6 +30,9 @@
  *****************************************************************************/
 @interface VLCVoutView : NSView
 {
+    NSInteger i_lastScrollWheelDirection;
+    NSTimeInterval t_lastScrollEvent;
+
     CGFloat f_cumulated_magnification;
 }
 @end

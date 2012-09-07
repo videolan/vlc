@@ -39,10 +39,8 @@
     IBOutlet id o_specificTime_sec_lbl;
     IBOutlet id o_specificTime_stepper;
     IBOutlet id o_specificTime_mi;
-
-    NSInteger i_lastScrollWheelDirection;
-    NSTimeInterval t_lastScrollEvent;
 }
+
 - (IBAction)play:(id)sender;
 - (IBAction)stop:(id)sender;
 
@@ -69,7 +67,6 @@
 - (IBAction)addSubtitleFile:(id)sender;
 
 - (BOOL)keyEvent:(NSEvent *)o_event;
-- (void)scrollWheel: (NSEvent *)theEvent;
 
 - (IBAction)goToSpecificTime:(id)sender;
 @end
