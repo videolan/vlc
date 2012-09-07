@@ -75,7 +75,7 @@ def processFile(filename):
 
     if os.path.getsize(filename) < 10:
         print("File empty")
-    os.remove(filename)
+        os.remove(filename)
         return
 
     # Check if VLC version match
@@ -91,7 +91,7 @@ def processFile(filename):
     mapping = mapLibraries(content)
     if not mapping:
         print("Stacktrace not found")
-    os.remove(filename)
+        os.remove(filename)
         return
 
     # Associate all eip to their respective lib
