@@ -71,7 +71,10 @@ typedef struct
 #endif
 
 #ifdef __cplusplus
+# define VLC_NOTHROW throw ()
 extern "C" {
+#else
+# define VLC_NOTHROW
 #endif
 
 /* stdio.h */
@@ -179,7 +182,7 @@ struct tm *localtime_r (const time_t *, struct tm *);
 
 /* unistd.h */
 #ifndef HAVE_GETPID
-pid_t getpid (void);
+pid_t getpid (void) VLC_NOTHROW;
 #endif
 
 #ifndef HAVE_FSYNC
