@@ -372,6 +372,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 Seek( p_demux, (int64_t)p_sys->titles[i_idx]->seekpoint[0]->i_time_offset, -1, NULL);
                 p_demux->info.i_seekpoint |= INPUT_UPDATE_SEEKPOINT;
                 p_demux->info.i_seekpoint = 0;
+                p_sys->f_duration = (float) p_sys->titles[i_idx]->i_length / 1000.f;
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;

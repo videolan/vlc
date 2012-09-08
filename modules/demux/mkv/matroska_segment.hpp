@@ -36,6 +36,39 @@ class chapter_item_c;
 struct mkv_track_t;
 struct mkv_index_t;
 
+typedef enum
+{
+    WHOLE_SEGMENT,
+    TRACK_UID,
+    EDITION_UID,
+    CHAPTER_UID,
+    ATTACHMENT_UID
+} tag_target_type;
+
+class SimpleTag
+{
+public:
+    SimpleTag():
+        psz_tag_name(NULL), psz_lang(NULL), b_default(true), p_value(NULL){}
+    ~SimpleTag();
+    char *psz_tag_name;
+    char *psz_lang; /* NULL value means "undf" */
+    bool b_default;
+    char * p_value;
+    std::vector<SimpleTag *> sub_tags;
+};
+
+class Tag
+{
+public:
+    Tag():i_tag_type(WHOLE_SEGMENT),i_target_type(50),i_uid(0){}
+    ~Tag();
+    tag_target_type i_tag_type;
+    uint64_t        i_target_type;
+    uint64_t        i_uid;
+    std::vector<SimpleTag*> simple_tags;
+};
+
 class matroska_segment_c
 {
 public:
@@ -93,6 +126,7 @@ public:
 
     std::vector<chapter_translation_c*> translations;
     std::vector<KaxSegmentFamily*>  families;
+    std::vector<Tag *>              tags;
 
     demux_sys_t                    & sys;
     EbmlParser                     *ep;
@@ -125,7 +159,7 @@ private:
     void ParseChapterAtom( int i_level, KaxChapterAtom *ca, chapter_item_c & chapters );
     void ParseTrackEntry( KaxTrackEntry *m );
     void ParseCluster( bool b_update_start_time = true );
-    void ParseSimpleTags( KaxTagSimple *tag, int level = 50 );
+    SimpleTag * ParseSimpleTags( KaxTagSimple *tag, int level = 50 );
     void IndexAppendCluster( KaxCluster *cluster );
 };
 

@@ -242,11 +242,17 @@ static const struct {
                      {vlc_meta_Title,       NULL,            0},
 };
 
-void matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag, int target_type )
+SimpleTag * matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag, int target_type )
 {
     EbmlElement *el;
     EbmlParser *ep = new EbmlParser( &es, tag, &sys.demuxer );
-    char *k = NULL, *v = NULL;
+    SimpleTag * p_simple = new SimpleTag;
+
+    if( !p_simple )
+    {
+        msg_Err( &sys.demuxer, "Couldn't allocate memory for Simple Tag... ignoring it");
+        return NULL;
+    }
 
     if( !sys.meta )
         sys.meta = vlc_meta_New();
@@ -258,39 +264,58 @@ void matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag, int target_type )
         {
             KaxTagName &key = *(KaxTagName*)el;
             key.ReadData( es.I_O(), SCOPE_ALL_DATA );
-            k = strdup( UTFstring( key ).GetUTF8().c_str() );
+            p_simple->psz_tag_name = strdup( UTFstring( key ).GetUTF8().c_str() );
         }
-        if( MKV_IS_ID( el, KaxTagString ) )
+        else if( MKV_IS_ID( el, KaxTagString ) )
         {
             KaxTagString &value = *(KaxTagString*)el;
             value.ReadData( es.I_O(), SCOPE_ALL_DATA );
-            v = strdup( UTFstring( value ).GetUTF8().c_str() );
+            p_simple->p_value = strdup( UTFstring( value ).GetUTF8().c_str() );
         }
+        else if(  MKV_IS_ID( el, KaxTagLangue ) )
+        {
+            KaxTagLangue &language = *(KaxTagLangue*) el;
+            language.ReadData( es.I_O(), SCOPE_ALL_DATA );
+            p_simple->psz_lang = strdup( string( language ).c_str());
+        }
+        else if(  MKV_IS_ID( el, KaxTagDefault ) )
+        {
+            KaxTagDefault & dft = *(KaxTagDefault*) el;
+            dft.ReadData( es.I_O(), SCOPE_ALL_DATA );
+            p_simple->b_default = (bool) uint8( dft );
+        }
+        /*Tags can be nested*/
+        else if( MKV_IS_ID( el, KaxTagSimple) )
+        {
+            SimpleTag * p_st = ParseSimpleTags( (KaxTagSimple*)el, target_type );
+            if( p_st )
+                p_simple->sub_tags.push_back( p_st );
+        }
+        /*TODO Handle binary tags*/
     }
     delete ep;
 
-    if( !k || !v )
+    if( !p_simple->psz_tag_name || !p_simple->p_value )
     {
         msg_Warn( &sys.demuxer, "Invalid MKV SimpleTag found.");
-        return;
+        delete p_simple;
+        return NULL;
     }
 
     for( int i = 0; metadata_map[i].key; i++ )
     {
-        if( !strcmp( k, metadata_map[i].key ) &&
+        if( !strcmp( p_simple->psz_tag_name, metadata_map[i].key ) &&
             (metadata_map[i].target_type == 0 || target_type == metadata_map[i].target_type ) )
         {
-            vlc_meta_Set( sys.meta, metadata_map[i].type, v );
-            msg_Dbg( &sys.demuxer, "|   |   + Meta %s: %s", k, v);
+            vlc_meta_Set( sys.meta, metadata_map[i].type, p_simple->p_value );
+            msg_Dbg( &sys.demuxer, "|   |   + Meta %s: %s", p_simple->psz_tag_name, p_simple->p_value);
             goto done;
         }
     }
-    msg_Dbg( &sys.demuxer, "|   |   + Meta %s: %s", k, v);
-    vlc_meta_AddExtra( sys.meta, k, v );
+    msg_Dbg( &sys.demuxer, "|   |   + Meta %s: %s", p_simple->psz_tag_name, p_simple->p_value);
+    vlc_meta_AddExtra( sys.meta, p_simple->psz_tag_name, p_simple->p_value);
 done:
-    free( k );
-    free( v );
-    return;
+    return p_simple;
 }
 
 #define PARSE_TAG( type ) \
@@ -314,6 +339,12 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
     {
         if( MKV_IS_ID( el, KaxTag ) )
         {
+            Tag * p_tag = new Tag;
+            if(!p_tag)
+            {
+                msg_Err( &sys.demuxer,"Couldn't allocate memory for tag... ignoring it");
+                continue;
+            }
             msg_Dbg( &sys.demuxer, "+ Tag" );
             ep->Down();
             int target_type = 50;
@@ -333,11 +364,50 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                             msg_Dbg( &sys.demuxer, "|   |   + TargetTypeValue: %u", uint32(value));
                             target_type = uint32(value);
                         }
+                        if( MKV_IS_ID( el, KaxTagTrackUID ) )
+                        {
+                            p_tag->i_tag_type = TRACK_UID;
+                            KaxTagTrackUID &uid = *(KaxTagTrackUID*) el;
+                            uid.ReadData( es.I_O() );
+                            p_tag->i_uid = uint64( uid );
+                            msg_Dbg( &sys.demuxer, "|   |   + TrackUID: %"PRIu64, p_tag->i_uid);
+
+                        }
+                        if( MKV_IS_ID( el, KaxTagEditionUID ) )
+                        {
+                            p_tag->i_tag_type = EDITION_UID;
+                            KaxTagEditionUID &uid = *(KaxTagEditionUID*) el;
+                            uid.ReadData( es.I_O() );
+                            p_tag->i_uid = uint64( uid );
+                            msg_Dbg( &sys.demuxer, "|   |   + EditionUID: %"PRIu64, p_tag->i_uid);
+                        }
+                        if( MKV_IS_ID( el, KaxTagChapterUID ) )
+                        {
+                            p_tag->i_tag_type = CHAPTER_UID;
+                            KaxTagChapterUID &uid = *(KaxTagChapterUID*) el;
+                            uid.ReadData( es.I_O() );
+                            p_tag->i_uid = uint64( uid );
+                            msg_Dbg( &sys.demuxer, "|   |   + ChapterUID: %"PRIu64, p_tag->i_uid);
+                        }
+                        if( MKV_IS_ID( el, KaxTagAttachmentUID ) )
+                        {
+                            p_tag->i_tag_type = ATTACHMENT_UID;
+                            KaxTagAttachmentUID &uid = *(KaxTagAttachmentUID*) el;
+                            uid.ReadData( es.I_O() );
+                            p_tag->i_uid = uint64( uid );
+                            msg_Dbg( &sys.demuxer, "|   |   + AttachmentUID: %"PRIu64, p_tag->i_uid);
+                        }
                     }
                     ep->Up();
                 }
                 else if( MKV_IS_ID( el, KaxTagSimple ) )
-                    ParseSimpleTags( static_cast<KaxTagSimple*>( el ), target_type );
+                {
+                    SimpleTag * p_simple =
+                        ParseSimpleTags( static_cast<KaxTagSimple*>( el ),
+                                         target_type );
+                    if( p_simple )
+                        p_tag->simple_tags.push_back( p_simple );
+                }
 #if 0 // not valid anymore
                 else if( MKV_IS_ID( el, KaxTagGeneral ) )
                     PARSE_TAG( "General" );
@@ -382,6 +452,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                 }
             }
             ep->Up();
+            this->tags.push_back(p_tag);
         }
         else
         {
@@ -773,7 +844,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
         sys.i_start_pts = 0;
         sys.i_pts = 0;
         sys.i_pcr = 0;
-        return;       
+        return;
     }
 #endif
 
@@ -821,7 +892,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
                     {
                         spoint * tmp = sp;
                         sp = sp->p_next;
-                        delete tmp;                    
+                        delete tmp;
                     }
                     return;
                 }
@@ -842,7 +913,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     }
     /*Neither video nor audio track... no seek further*/
     if( unlikely( !p_first ) )
-        return; 
+        return;
 
     for(;;)
     {
@@ -1611,7 +1682,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
 
                 ctc.ReadData( es.I_O(), SCOPE_ALL_DATA );
                 cluster->InitTimecode( uint64( ctc ), i_timescale );
- 
+
                 /* add it to the index */
                 if( i_index == 0 ||
                     ( i_index > 0 &&
@@ -1685,3 +1756,17 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
     }
 }
 
+SimpleTag::~SimpleTag()
+{
+    free(psz_tag_name);
+    free(psz_lang);
+    free(p_value);
+    for(size_t i = 0; i < sub_tags.size(); i++)
+        delete sub_tags[i];
+}
+
+Tag::~Tag()
+{
+    for(size_t i = 0; i < simple_tags.size(); i++)
+        delete simple_tags[i];
+}

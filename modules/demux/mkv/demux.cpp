@@ -655,24 +655,52 @@ bool demux_sys_t::PreloadLinked()
         {
             for ( j=0; j<p_seg->Editions()->size(); j++ )
             {
+                virtual_edition_c * p_ved = (*p_seg->Editions())[j];
                 input_title_t *p_title = vlc_input_title_New();
                 int i_chapters;
 
                 // TODO use a name for each edition, let the TITLE deal with a codec name
                 if ( p_title->psz_name == NULL )
                 {
-                    const char* psz_tmp = (*p_seg->Editions())[j]->GetMainName().c_str();
+                    const char* psz_tmp = p_ved->GetMainName().c_str();
                     if( *psz_tmp != '\0' )
                         p_title->psz_name = strdup( psz_tmp );
-                    else if( asprintf(&(p_title->psz_name), "%s %d", N_("Segment"), (int)i) == -1 )
-                        p_title->psz_name = NULL;
+                    else
+                    {
+                        /* Check in tags if the edition has a name */
+
+                        /* We use only the tags of the first segment as it contains the edition */
+                        std::vector<Tag*> &tags = opened_segments[0]->tags;
+                        uint64_t i_ed_uid = 0;
+                        if( p_ved->p_edition )
+                            i_ed_uid = (uint64_t) p_ved->p_edition->i_uid;
+
+                        for( size_t k = 0; k < tags.size(); k++ )
+                        {
+                            if( tags[k]->i_tag_type == EDITION_UID && tags[k]->i_uid == i_ed_uid )
+                                for( size_t l = 0; l < tags[k]->simple_tags.size(); l++ )
+                                {
+                                    SimpleTag * p_st = tags[k]->simple_tags[l];
+                                    if( !strcmp(p_st->psz_tag_name,"TITLE") )
+                                    {
+                                        msg_Dbg( &demuxer, "Using title \"%s\" from tag for edition %"PRIu64, p_st->p_value, i_ed_uid );
+                                        p_title->psz_name = strdup( p_st->p_value );
+                                        break;
+                                    }
+                                }
+                        }
+
+                        if( !p_title->psz_name &&
+                            asprintf(&(p_title->psz_name), "%s %d", N_("Segment"), (int)i) == -1 )
+                            p_title->psz_name = NULL;
+                    }
                 }
 
                 i_chapters = 0;
-                ( *p_seg->Editions() )[j]->PublishChapters( *p_title, i_chapters, 0 );
+                p_ved->PublishChapters( *p_title, i_chapters, 0 );
 
                 // Input duration into i_length
-                p_title->i_length = ( *p_seg->Editions() )[j]->i_duration;
+                p_title->i_length = p_ved->i_duration;
 
                 titles.push_back( p_title );
             }
