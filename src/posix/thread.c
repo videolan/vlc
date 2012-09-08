@@ -996,7 +996,7 @@ unsigned vlc_GetCPUCount(void)
     cpu_set_t cpu;
 
     CPU_ZERO(&cpu);
-    if (sched_getaffinity (getpid(), sizeof (cpu), &cpu) < 0)
+    if (sched_getaffinity (0, sizeof (cpu), &cpu) < 0)
         return 1;
 
     return CPU_COUNT (&cpu);
