@@ -355,28 +355,6 @@ ssize_t pread (int fd, void *buf, size_t count, off_t offset)
         return written;
     return -1;
 }
-#elif !defined( HAVE_PREAD )
-static
-ssize_t pread(int fd, const void * buf, size_t size, off_t offset) {
-    off_t offs0;
-    ssize_t rd;
-    if ((offs0 = lseek(fd, 0, SEEK_CUR)) == (off_t)-1) return -1;
-    if (lseek(fd, offset, SEEK_SET) == (off_t)-1) return -1;
-    rd = read(fd, (void *)buf, size);
-    if (lseek(fd, offs0, SEEK_SET) == (off_t)-1) return -1;
-    return rd;
-}
-
-static
-ssize_t pwrite(int fd, const void * buf, size_t size, off_t offset) {
-    off_t offs0;
-    ssize_t wr;
-    if ((offs0 = lseek(fd, 0, SEEK_CUR)) == (off_t)-1) return -1;
-    if (lseek(fd, offset, SEEK_SET) == (off_t)-1) return -1;
-    wr = write(fd, (void *)buf, size);
-    if (lseek(fd, offs0, SEEK_SET) == (off_t)-1) return -1;
-    return wr;
-}
 #endif
 
 /**
