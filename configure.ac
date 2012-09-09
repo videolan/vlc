@@ -155,7 +155,7 @@ case "${host_os}" in
     CPPFLAGS="${CPPFLAGS} ${ARCH_flag}"
     OBJCFLAGS="${OBJCFLAGS} -D_INTL_REDIRECT_MACROS -std=gnu99 ${ARCH_flag}"
     LDFLAGS="${LDFLAGS} -Wl,-headerpad_max_install_names ${ARCH_flag}"
-    VLC_ADD_LIBS([mkv motion], [-Wl,-framework,IOKit,-framework,CoreFoundation])
+    VLC_ADD_LIBS([motion], [-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup,-framework,Appkit])
     VLC_ADD_LIBS([avcodec avformat access_avio swscale postproc i420_rgb_mmx x264 x26410b],[-Wl,-read_only_relocs,suppress])
     VLC_ADD_CFLAGS([motion],[-fconstant-cfstrings])
@@ -739,7 +739,7 @@ AC_CHECK_HEADERS(zlib.h, [ have_zlib=yes ], [ have_zlib=no ])
 AM_CONDITIONAL(HAVE_ZLIB, [ test "${have_zlib}" = "yes" ])
 if test "${have_zlib}" = "yes"
 then
-  VLC_ADD_LIBS([access_http skins2 sap mkv unzip zip],[-lz])
+  VLC_ADD_LIBS([access_http skins2 sap unzip zip],[-lz])
   PKG_CHECK_MODULES([MINIZIP], [minizip] , [ have_minizip=yes ], [
     AC_CHECK_HEADERS([unzip.h], [
       have_minizip=yes
@@ -4076,7 +4076,6 @@ AC_CONFIG_FILES([
   modules/control/Makefile
   modules/demux/Makefile
   modules/demux/avformat/Makefile
-  modules/demux/mkv/Makefile
   modules/gui/Makefile
   modules/gui/macosx/Makefile
   modules/gui/minimal_macosx/Makefile

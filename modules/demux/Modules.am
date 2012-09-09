@@ -1,4 +1,4 @@
-SUBDIRS = avformat mkv
+SUBDIRS = avformat
 SOURCES_flacsys = flac.c
 SOURCES_ogg = ogg.c ogg.h oggseek.c oggseek.h vorbis.h kate_categories.c \
 	kate_categories.h xiph.h
@@ -49,6 +49,30 @@ libes_plugin_la_LIBADD = $(AM_LIBADD)
 libh264_plugin_la_SOURCES = mpeg/h264.c
 libh264_plugin_la_CFLAGS = $(AM_CFLAGS)
 libh264_plugin_la_LIBADD = $(AM_LIBADD)
+
+libmkv_plugin_la_SOURCES = \
+	mkv/util.hpp mkv/util.cpp \
+	mkv/virtual_segment.hpp mkv/virtual_segment.cpp \
+	mkv/matroska_segment.hpp mkv/matroska_segment.cpp \
+	mkv/matroska_segment_parse.cpp \
+	mkv/demux.hpp mkv/demux.cpp \
+	mkv/Ebml_parser.hpp mkv/Ebml_parser.cpp \
+	mkv/chapters.hpp mkv/chapters.cpp \
+	mkv/chapter_command.hpp mkv/chapter_command.cpp \
+	mkv/stream_io_callback.hpp mkv/stream_io_callback.cpp \
+	mp4/libmp4.c vobsub.h \
+	mkv/mkv.hpp mkv/mkv.cpp
+libmkv_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libmkv_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_mkv)
+libmkv_plugin_la_LDFLAGS = $(AM_LDFLAGS)
+if HAVE_ZLIB
+libmkv_plugin_la_LIBADD += -lz
+endif
+if HAVE_DARWIN
+libmkv_plugin_la_LDFLAGS += -Wl,-framework,IOKit,-framework,CoreFoundation
+endif
+libvlc_LTLIBRARIES += $(LTLIBmkv)
+EXTRA_LTLIBRARIES += libmkv_plugin.la
 
 libmp4_plugin_la_SOURCES = mp4/mp4.c mp4/libmp4.c mp4/libmp4.h mp4/id3genres.h
 libmp4_plugin_la_CFLAGS = $(AM_CFLAGS)
