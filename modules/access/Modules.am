@@ -1,5 +1,5 @@
 SUBDIRS = rtp
-DIST_SUBDIRS = $(SUBDIRS)
+noinst_LTLIBRARIES =
 
 libfilesystem_plugin_la_SOURCES = \
 	fs.h \
@@ -24,12 +24,16 @@ libzip_plugin_la_SOURCES = zip/zip.h zip/zipstream.c zip/zipaccess.c
 libzip_plugin_la_CFLAGS = $(AM_CFLAGS) $(MINIZIP_CFLAGS)
 libzip_plugin_la_LIBADD = $(AM_LIBADD) $(MINIZIP_LIBS)
 if HAVE_ZLIB
-if !HAVE_MINIZIP
-SUBDIRS += zip/unzip
-else
-DIST_SUBDIRS += zip/unzip
-endif
 libvlc_LTLIBRARIES += libzip_plugin.la
+if !HAVE_MINIZIP
+libunzip_la_SOURCES = zip/unzip/unzip.c zip/unzip/unzip.h zip/unzip/crypt.h \
+	zip/unzip/ioapi.c zip/unzip/ioapi.h
+libunzip_la_LIBADD = -lz
+libunzip_la_LDFLAGS = -static
+noinst_LTLIBRARIES += libunzip.la
+libzip_plugin_la_CFLAGS += -I$(srcdir)/zip/unzip
+libzip_plugin_la_LIBADD += libunzip.la
+endif
 endif
 
 SOURCES_access_directory = directory.c
@@ -225,7 +229,7 @@ libbda_la_SOURCES = dtv/bdadefs.h dtv/bdagraph.cpp dtv/bdagraph.hpp
 libbda_la_CXXFLAGS = $(AM_CXXFLAGS)
 libbda_la_LDFLAGS = -static
 libbda_la_LIBADD = -lstrmiids -lole32 -loleaut32 -luuid
-noinst_LTLIBRARIES = libbda.la
+noinst_LTLIBRARIES += libbda.la
 
 libdtv_plugin_la_DEPENDENCIES = libbda.la
 libdtv_plugin_la_LIBADD += libbda.la -lstdc++

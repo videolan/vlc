@@ -745,9 +745,9 @@ then
       have_minizip=yes
       MINIZIP_LIBS="-lminizip -lz"
     ], [
+      VLC_ADD_CPPFLAGS([skins2], [-I\\\$(top_srcdir)/modules/access/zip/unzip])
+      VLC_ADD_LIBS([skins2], [\\\$(top_builddir)/modules/access/libunzip.la])
       have_minizip=no
-      MINIZIP_CFLAGS="-I\\\${top_srcdir}/modules/access/zip/unzip"
-      MINIZIP_LIBS="\\\${top_builddir}/modules/access/zip/unzip/libunzip.la"
     ])
   ])
   VLC_ADD_CPPFLAGS([skins2],[$MINIZIP_CFLAGS])
@@ -4129,7 +4129,6 @@ AC_CONFIG_FILES([
   test/Makefile
   modules/access/Makefile
   modules/access/rtp/Makefile
-  modules/access/zip/unzip/Makefile
   modules/access_output/Makefile
   modules/audio_filter/Makefile
   modules/audio_mixer/Makefile
