@@ -1,4 +1,4 @@
-SUBDIRS = globalhotkeys dbus
+SUBDIRS = dbus
 SOURCES_dummy = dummy.c
 SOURCES_gestures = gestures.c
 SOURCES_netsync = netsync.c
@@ -23,9 +23,19 @@ libvlc_LTLIBRARIES += \
 	libhotkeys_plugin.la \
 	liboldrc_plugin.la
 if !HAVE_WIN32
+libglobalhotkeys_plugin_la_SOURCES = globalhotkeys/xcb.c
+libglobalhotkeys_plugin_la_CFLAGS = $(AM_CFLAGS) $(XCB_KEYSYMS_CFLAGS) $(XCB_CFLAGS)
+libglobalhotkeys_plugin_la_LIBADD = $(AM_LIBADD) $(XCB_KEYSYMS_LIBS) $(XCB_LIBS)
+
 libvlc_LTLIBRARIES += \
+	$(LTLIBglobalhotkeys) \
 	libmotion_plugin.la
 else
+libglobalhotkeys_plugin_la_SOURCES = globalhotkeys/win32.c
+libglobalhotkeys_plugin_la_CFLAGS = $(AM_CFLAGS)
+libglobalhotkeys_plugin_la_LIBADD = $(AM_LIBADD)
+
 libvlc_LTLIBRARIES += \
+	libglobalhotkeys_plugin.la \
 	libntservice_plugin.la
 endif	

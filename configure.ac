@@ -2989,8 +2989,6 @@ AS_IF([test "${enable_xcb}" != "no"], [
   PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms >= 0.3.4], [
     PKG_CHECK_MODULES(XPROTO, [xproto])
     VLC_ADD_PLUGIN([globalhotkeys])
-    VLC_ADD_CFLAGS([globalhotkeys], [${XCB_KEYSYMS_CFLAGS} ${XCB_CFLAGS}])
-    VLC_ADD_LIBS([globalhotkeys], [${XCB_KEYSYMS_LIBS} ${XCB_LIBS}])
     VLC_ADD_CFLAGS([xcb_window], [-DHAVE_XCB_KEYSYMS])
   ], [
     AC_MSG_WARN([${XCB_KEYSYMS_PKG_ERRORS}. Hotkeys will not work.])
@@ -4093,7 +4091,6 @@ AC_CONFIG_FILES([
   modules/codec/wmafixed/Makefile
   modules/control/Makefile
   modules/control/dbus/Makefile
-  modules/control/globalhotkeys/Makefile
   modules/demux/Makefile
   modules/demux/asf/Makefile
   modules/demux/avformat/Makefile
