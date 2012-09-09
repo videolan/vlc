@@ -4070,7 +4070,6 @@ AC_CONFIG_FILES([
   modules/codec/dmo/Makefile
   modules/codec/loader/Makefile
   modules/codec/omxil/Makefile
-  modules/codec/shine/Makefile
   modules/control/Makefile
   modules/demux/Makefile
   modules/gui/Makefile

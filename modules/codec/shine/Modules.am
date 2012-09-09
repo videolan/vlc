@@ -1,2 +1,0 @@
-SOURCES_shine = shine_mod.c enc_base.h
-EXTRA_DIST += shine.c
