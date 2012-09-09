@@ -1052,15 +1052,6 @@ dnl
 ALIASES="${ALIASES} cvlc rvlc"
 
 dnl
-dnl Some plugins aren't useful on some platforms
-dnl
-if test "${SYS}" != "mingw32"; then
-    VLC_ADD_PLUGIN([dynamicoverlay])
-elif test "${SYS}" = "darwin"; then
-    VLC_ADD_LIBS([quartztext],[-Wl,-framework,ApplicationServices])
-fi
-
-dnl
 dnl  Accelerated modules
 dnl
 
@@ -4134,7 +4125,6 @@ AC_CONFIG_FILES([
   modules/text_renderer/Makefile
   modules/video_chroma/Makefile
   modules/video_filter/Makefile
-  modules/video_filter/dynamicoverlay/Makefile
   modules/video_output/Makefile
   modules/visualization/Makefile
   modules/mmx/Makefile

@@ -1,5 +1,3 @@
-SUBDIRS = dynamicoverlay
-
 SOURCES_mosaic = mosaic.c mosaic.h
 SOURCES_transform = transform.c
 SOURCES_invert = invert.c
@@ -35,6 +33,18 @@ libdeinterlace_plugin_la_SOURCES += deinterlace/merge_arm.S
 libdeinterlace_plugin_la_CFLAGS += -DCAN_COMPILE_ARM
 endif
 libvlc_LTLIBRARIES += libdeinterlace_plugin.la
+
+libdynamicoverlay_plugin_la_SOURCES = \
+	dynamicoverlay/dynamicoverlay_buffer.c \
+	dynamicoverlay/dynamicoverlay_queue.c \
+	dynamicoverlay/dynamicoverlay_list.c \
+	dynamicoverlay/dynamicoverlay_commands.c \
+	dynamicoverlay/dynamicoverlay.c dynamicoverlay/dynamicoverlay.h
+libdynamicoverlay_plugin_la_CFLAGS = $(AM_CFLAGS)
+libdynamicoverlay_plugin_la_LIBADD = $(AM_LIBADD)
+if !HAVE_WIN32
+libvlc_LTLIBRARIES += libdynamicoverlay_plugin.la
+endif
 
 libosdmenu_plugin_la_SOURCES = osdmenu.c
 libosdmenu_plugin_la_CFLAGS = $(AM_CFLAGS) -DPKGDATADIR=\"$(vlcdatadir)\"
