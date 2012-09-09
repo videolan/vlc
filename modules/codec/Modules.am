@@ -1,4 +1,6 @@
-SUBDIRS = loader avcodec omxil
+SUBDIRS = loader avcodec
+noinst_HEADERS =
+
 SOURCES_a52 = a52.c a52.h
 SOURCES_dts = dts.c
 SOURCES_flac = flac.c
@@ -78,3 +80,30 @@ libvlc_LTLIBRARIES += \
 	libt140_plugin.la \
 	libstl_plugin.la \
 	$(NULL)
+
+### OpenMAX ###
+noinst_HEADERS += \
+	omxil/OMX_Component.h \
+	omxil/OMX_Core.h \
+	omxil/OMX_Image.h \
+	omxil/OMX_IVCommon.h \
+	omxil/OMX_Types.h \
+	omxil/OMX_Audio.h \
+	omxil/OMX_Index.h \
+	omxil/OMX_Other.h \
+	omxil/OMX_Video.h 
+
+libomxil_plugin_la_SOURCES = \
+	omxil/utils.c omxil_utils.h \
+	omxil/h264_nal.h \
+	omxil/qcom.c omxil/qcom.h \
+	omxil/omxil.c omxil/omxil.h
+libomxil_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/omxil
+libomxil_plugin_la_LIBADD = $(AM_LIBADD) $(LIBDL)
+
+libiomx_plugin_la_SOURCES = $(libomxil_plugin_la_SOURCES)
+libiomx_plugin_la_CPPFLAGS = $(libomxil_plugin_la_CPPFLAGS) -DUSE_IOMX
+libiomx_plugin_la_LIBADD = $(libomxil_plugin_la_LIBADD)
+
+libvlc_LTLIBRARIES += $(LTLIBomxil) $(LTLIBiomx)
+EXTRA_LTLIBRARIES += libomxil_plugin.la libiomx_plugin.la

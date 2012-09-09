@@ -2112,7 +2112,6 @@ AC_ARG_ENABLE(omxil,
 if test "${enable_omxil}" = "yes"
 then
   VLC_ADD_PLUGIN([omxil])
-  VLC_ADD_LIBS([omxil], [$LIBDL])
 fi
 
 dnl
@@ -4068,7 +4067,6 @@ AC_CONFIG_FILES([
   modules/codec/Makefile
   modules/codec/avcodec/Makefile
   modules/codec/loader/Makefile
-  modules/codec/omxil/Makefile
   modules/control/Makefile
   modules/demux/Makefile
   modules/gui/Makefile
