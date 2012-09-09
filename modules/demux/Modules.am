@@ -1,4 +1,4 @@
-SUBDIRS = avformat mkv playlist
+SUBDIRS = avformat mkv
 SOURCES_flacsys = flac.c
 SOURCES_ogg = ogg.c ogg.h oggseek.c oggseek.h vorbis.h kate_categories.c \
 	kate_categories.h xiph.h
@@ -65,6 +65,28 @@ libmpgv_plugin_la_SOURCES = mpeg/mpgv.c
 libmpgv_plugin_la_CFLAGS = $(AM_CFLAGS)
 libmpgv_plugin_la_LIBADD = $(AM_LIBADD)
 
+libplaylist_plugin_la_SOURCES = \
+	playlist/asx.c \
+	playlist/b4s.c \
+	playlist/dvb.c \
+	playlist/gvp.c \
+	playlist/ifo.c \
+	playlist/itml.c \
+	playlist/itml.h \
+	playlist/m3u.c \
+	playlist/pls.c \
+	playlist/podcast.c \
+	playlist/qtl.c \
+	playlist/ram.c \
+	playlist/sgimb.c \
+	playlist/shoutcast.c \
+	playlist/wpl.c \
+	playlist/xspf.c \
+	playlist/zpl.c \
+	playlist/playlist.c playlist/playlist.h
+libplaylist_plugin_la_CFLAGS = $(AM_CFLAGS)
+libplaylist_plugin_la_LIBADD = $(AM_LIBADD)
+
 libts_plugin_la_SOURCES = ts.c ../mux/mpeg/csa.c dvb-text.h
 libts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS)
 libts_plugin_la_LIBADD = $(AM_LIBADD) $(DVBPSI_LIBS) $(SOCKET_LIBS)
@@ -90,6 +112,7 @@ libvlc_LTLIBRARIES += \
 	libnsc_plugin.la \
 	libnsv_plugin.la \
 	libnuv_plugin.la \
+	libplaylist_plugin.la \
 	libpva_plugin.la \
 	libps_plugin.la \
 	librawdv_plugin.la \
