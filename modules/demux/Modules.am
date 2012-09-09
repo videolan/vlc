@@ -1,4 +1,4 @@
-SUBDIRS = asf avformat avi mkv mp4 mpeg playlist
+SUBDIRS = avformat avi mkv mp4 mpeg playlist
 SOURCES_flacsys = flac.c
 SOURCES_ogg = ogg.c ogg.h oggseek.c oggseek.h vorbis.h kate_categories.c \
 	kate_categories.h xiph.h
@@ -34,8 +34,20 @@ SOURCES_dirac = dirac.c
 SOURCES_image = image.c mxpeg_helper.h
 SOURCES_demux_stl = stl.c
 
+libasf_plugin_la_SOURCES = asf/asf.c asf/libasf.c asf/libasf.h asf/libasf_guid.h
+libasf_plugin_la_CFLAGS = $(AM_CFLAGS)
+libasf_plugin_la_LIBADD = $(AM_LIBADD)
+
+libts_plugin_la_SOURCES = ts.c ../mux/mpeg/csa.c dvb-text.h
+libts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS)
+libts_plugin_la_LIBADD = $(AM_LIBADD) $(DVBPSI_LIBS) $(SOCKET_LIBS)
+if HAVE_DVBPSI
+libvlc_LTLIBRARIES += libts_plugin.la
+endif
+
 libvlc_LTLIBRARIES += \
 	libaiff_plugin.la \
+	libasf_plugin.la \
 	libau_plugin.la \
 	librawaud_plugin.la \
 	libdirac_plugin.la \
@@ -63,13 +75,6 @@ libvlc_LTLIBRARIES += \
 	libimage_plugin.la \
 	libdemux_stl_plugin.la \
 	$(NULL)
-
-libts_plugin_la_SOURCES = ts.c ../mux/mpeg/csa.c dvb-text.h
-libts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS)
-libts_plugin_la_LIBADD = $(AM_LIBADD) $(DVBPSI_LIBS) $(SOCKET_LIBS)
-if HAVE_DVBPSI
-libvlc_LTLIBRARIES += libts_plugin.la
-endif
 
 BUILT_SOURCES += dummy.cpp
 
