@@ -1,7 +1,0 @@
-SOURCES_spudec = \
-	spudec.c \
-	parse.c \
-	spudec.h \
-	$(NULL)
-
-libvlc_LTLIBRARIES += libspudec_plugin.la
