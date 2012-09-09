@@ -49,8 +49,8 @@ struct access_sys_t
     vlc_v4l2_ctrl_t *controls;
 };
 
-static block_t *AccessRead( access_t * );
-static ssize_t AccessReadStream( access_t *, uint8_t *, size_t );
+static block_t *MMapBlock (access_t *);
+static block_t *ReadBlock (access_t *);
 static int AccessControl( access_t *, int, va_list );
 static int InitVideo(access_t *, int, uint32_t);
 
@@ -84,6 +84,7 @@ int AccessOpen( vlc_object_t *obj )
         goto error;
     }
 
+    sys->controls = ControlsInit (VLC_OBJECT(access), fd);
     access->pf_seek = NULL;
     access->pf_control = AccessControl;
     return VLC_SUCCESS;
@@ -104,8 +105,6 @@ int InitVideo (access_t *access, int fd, uint32_t caps)
 
     if (SetupInput (VLC_OBJECT(access), fd))
         return -1;
-
-    sys->controls = ControlsInit (VLC_OBJECT(access), fd);
 
     /* Try and find default resolution if not specified */
     struct v4l2_format fmt = { .type = V4L2_BUF_TYPE_VIDEO_CAPTURE };
@@ -147,19 +146,20 @@ int InitVideo (access_t *access, int fd, uint32_t caps)
         sys->bufv = StartMmap (VLC_OBJECT(access), fd, &sys->bufc);
         if (sys->bufv == NULL)
             return -1;
-        access->pf_block = AccessRead;
+        access->pf_block = MMapBlock;
     }
     else if (caps & V4L2_CAP_READWRITE)
     {
         sys->blocksize = fmt.fmt.pix.sizeimage;
         sys->bufv = NULL;
-        access->pf_read = AccessReadStream;
+        access->pf_block = ReadBlock;
     }
     else
     {
-        msg_Err (access, "no supported I/O method");
+        msg_Err (access, "no supported capture method");
         return -1;
     }
+
     return 0;
 }
 
@@ -175,18 +175,35 @@ void AccessClose( vlc_object_t *obj )
     free( sys );
 }
 
-static block_t *AccessRead( access_t *access )
+/* Wait for data */
+static int AccessPoll (access_t *access)
+{
+    access_sys_t *sys = access->p_sys;
+    struct pollfd ufd;
+
+    ufd.fd = sys->fd;
+    ufd.events = POLLIN;
+
+    switch (poll (&ufd, 1, 500))
+    {
+        case -1:
+            if (errno == EINTR)
+        case 0:
+            /* FIXME: kill this case (arbitrary timeout) */
+                return -1;
+            msg_Err (access, "poll error: %m");
+            access->info.b_eof = true;
+            return -1;
+    }
+    return 0;
+}
+
+
+static block_t *MMapBlock (access_t *access)
 {
     access_sys_t *sys = access->p_sys;
 
-    struct pollfd fd;
-    fd.fd = sys->fd;
-    fd.events = POLLIN;
-    fd.revents = 0;
-
-    /* Wait for data */
-    /* FIXME: kill timeout */
-    if( poll( &fd, 1, 500 ) <= 0 )
+    if (AccessPoll (access))
         return NULL;
 
     block_t *block = GrabVideo (VLC_OBJECT(access), sys->fd, sys->bufv);
@@ -198,42 +215,29 @@ static block_t *AccessRead( access_t *access )
     return block;
 }
 
-static ssize_t AccessReadStream( access_t *access, uint8_t *buf, size_t len )
+static block_t *ReadBlock (access_t *access)
 {
     access_sys_t *sys = access->p_sys;
-    struct pollfd ufd;
-    int i_ret;
 
-    ufd.fd = sys->fd;
-    ufd.events = POLLIN;
+    if (AccessPoll (access))
+        return NULL;
 
-    if( access->info.b_eof )
-        return 0;
+    block_t *block = block_Alloc (sys->blocksize);
+    if (unlikely(block == NULL))
+        return NULL;
 
-    /* FIXME: kill timeout and vlc_object_alive() */
-    do
+    ssize_t val = v4l2_read (sys->fd, block->p_buffer, block->i_buffer);
+    if (val < 0)
     {
-        if( !vlc_object_alive(access) )
-            return 0;
-
-        ufd.revents = 0;
-    }
-    while( ( i_ret = poll( &ufd, 1, 500 ) ) == 0 );
-
-    if( i_ret < 0 )
-    {
-        if( errno != EINTR )
-            msg_Err( access, "poll error: %m" );
-        return -1;
-    }
-
-    i_ret = v4l2_read (sys->fd, buf, len);
-    if( i_ret == 0 )
+        block_Release (block);
+        msg_Err (access, "cannot read buffer: %m");
         access->info.b_eof = true;
-    else if( i_ret > 0 )
-        access->info.i_pos += i_ret;
+        return NULL;
+    }
 
-    return i_ret;
+    block->i_buffer = val;
+    access->info.i_pos += val;
+    return block;
 }
 
 static int AccessControl( access_t *access, int query, va_list args )
