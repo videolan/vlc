@@ -1726,17 +1726,10 @@ dnl  Video4Linux 2
 dnl
 AC_ARG_ENABLE(v4l2, [AS_HELP_STRING([--disable-v4l2],
   [disable Video4Linux version 2 (default auto)])])
-AC_ARG_ENABLE(pvr, [AS_HELP_STRING([--enable-pvr],
-  [support PVR V4L2 cards (default disabled)])])
 have_v4l2="no"
 AS_IF([test "$enable_v4l2" != "no"], [
   AC_CHECK_HEADERS([linux/videodev2.h sys/videoio.h], [
     have_v4l2="yes"
-  ])
-])
-AS_IF([test "$have_v4l2" = "yes"], [
-  AS_IF([test "${enable_pvr}" = "yes"], [
-    VLC_ADD_PLUGIN([pvr])
   ])
 ])
 AM_CONDITIONAL(HAVE_V4L2, [test "${have_v4l2}" != "no"])

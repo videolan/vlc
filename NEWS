@@ -114,6 +114,7 @@ Removed modules:
  * portaudio audio output: use the native audio output instead
  * X11 On Screen Display notifications (xosd)
  * Linux Framebuffer On Screen Display interface (fbosd)
+ * PVR: IVTV analog TV encoder - use V4L instead
  * RTMP access: use libavformat avio instead
  * RTMP access_output: use libavformat avio instead
  * Hildon GUI

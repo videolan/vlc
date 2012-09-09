@@ -233,7 +233,6 @@ modules/access_output/livehttp.c
 modules/access_output/shout.c
 modules/access_output/udp.c
 modules/access/pulse.c
-modules/access/pvr.c
 modules/access/qtcapture.m
 modules/access/rar/access.c
 modules/access/rar/rar.c

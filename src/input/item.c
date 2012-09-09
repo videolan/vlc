@@ -947,7 +947,6 @@ static int GuessType( const input_item_t *p_item )
         { "ofdm",   ITEM_TYPE_CARD },
         { "oss",    ITEM_TYPE_CARD },
         { "pnm",    ITEM_TYPE_NET },
-        { "pvr",    ITEM_TYPE_CARD },
         { "qam",    ITEM_TYPE_CARD },
         { "qpsk",   ITEM_TYPE_CARD },
         { "qtcapt", ITEM_TYPE_CARD }, /* qtcapture */

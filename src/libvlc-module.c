@@ -1846,7 +1846,6 @@ vlc_module_begin ()
     add_obsolete_integer( "linsys-hdsdi-caching" ) /* 2.0.0 */
     add_obsolete_integer( "linsys-sdi-caching" ) /* 2.0.0 */
     add_obsolete_integer( "oss-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "pvr-caching" ) /* 2.0.0 */
     add_obsolete_integer( "screen-caching" ) /* 2.0.0 */
     add_obsolete_integer( "v4l2-caching" ) /* 2.0.0 */
     add_integer( "disc-caching", DEFAULT_PTS_DELAY / 1000,
