@@ -1,9 +1,0 @@
-SOURCES_stats = \
-	stats.c \
-	stats.h \
-	decoder.c \
-	demux.c \
-	encoder.c \
-	$(NULL)
-
-libvlc_LTLIBRARIES += libstats_plugin.la

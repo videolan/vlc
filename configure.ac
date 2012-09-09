@@ -4092,7 +4092,6 @@ AC_CONFIG_FILES([
   modules/meta_engine/Makefile
   modules/misc/Makefile
   modules/misc/osd/Makefile
-  modules/misc/stats/Makefile
   modules/media_library/Makefile
   modules/mux/Makefile
   modules/notify/Makefile
