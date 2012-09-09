@@ -1,4 +1,4 @@
-SUBDIRS = mms rtp
+SUBDIRS = rtp
 DIST_SUBDIRS = $(SUBDIRS)
 
 libfilesystem_plugin_la_SOURCES = \
@@ -250,6 +250,17 @@ SOURCES_access_http = http.c
 SOURCES_htcpcp = htcpcp.c
 SOURCES_access_ftp = ftp.c
 SOURCES_access_sftp = sftp.c
+
+libmms_plugin_la_SOURCES = \
+	mms/mms.c mms/mms.h \
+	mms/mmsh.c mms/mmsh.h \
+	mms/mmstu.c mms/mmstu.h \
+	mms/buffer.c mms/buffer.h \
+	mms/asf.h mms/asf.c \
+	../demux/asf/libasf_guid.h
+libmms_plugin_la_CFLAGS = $(AM_CFLAGS)
+libmms_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
+libvlc_LTLIBRARIES += libmms_plugin.la
 
 librealrtsp_plugin_la_SOURCES = \
 	rtsp/access.c \
