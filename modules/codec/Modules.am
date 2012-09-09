@@ -1,4 +1,4 @@
-SUBDIRS = loader avcodec
+SUBDIRS = loader
 noinst_HEADERS =
 
 SOURCES_a52 = a52.c a52.h
@@ -80,6 +80,45 @@ libvlc_LTLIBRARIES += \
 	libt140_plugin.la \
 	libstl_plugin.la \
 	$(NULL)
+
+### FFmpeg/libav ###
+libavcodec_plugin_la_SOURCES = \
+	avcodec/avcommon.h \
+	avcodec/video.c \
+	avcodec/subtitle.c \
+	avcodec/audio.c \
+	avcodec/cpu.c \
+	avcodec/deinterlace.c \
+	avcodec/fourcc.c \
+	avcodec/chroma.c avcodec/chroma.h \
+	avcodec/vaapi.c \
+	avcodec/dxva2.c \
+	avcodec/vda.c \
+	avcodec/copy.c avcodec/copy.h \
+	avcodec/va.h \
+	avcodec/avcodec.c avcodec/avcodec.h
+if ENABLE_SOUT
+libavcodec_plugin_la_SOURCES += \
+	avcodec/encoder.c
+endif
+libavcodec_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_avcodec)
+libavcodec_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_avcodec)
+libavcodec_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_avcodec)
+if MERGE_FFMPEG
+libavcodec_plugin_la_SOURCES += \
+	../demux/avformat/demux.c \
+	../access/avio.c
+if ENABLE_SOUT
+libavcodec_plugin_la_SOURCES += \
+	../demux/avformat/mux.c
+endif
+libavcodec_plugin_la_CFLAGS += -DMERGE_FFMPEG
+endif
+
+libvlc_LTLIBRARIES += \
+	$(LTLIBavcodec)
+EXTRA_LTLIBRARIES += \
+	libavcodec_plugin.la
 
 ### OpenMAX ###
 noinst_HEADERS += \

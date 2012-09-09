@@ -4065,7 +4065,6 @@ AC_CONFIG_FILES([
   modules/audio_mixer/Makefile
   modules/audio_output/Makefile
   modules/codec/Makefile
-  modules/codec/avcodec/Makefile
   modules/codec/loader/Makefile
   modules/control/Makefile
   modules/demux/Makefile
