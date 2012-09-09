@@ -3188,51 +3188,22 @@ AS_IF([test "${enable_directx}" != "no"], [
   dnl OpenGL
   AC_CHECK_HEADERS(GL/wglew.h, [
     VLC_ADD_PLUGIN([glwin32])
-    VLC_ADD_LIBS([glwin32],[-lopengl32 -lgdi32])
-   ],, [
-     #include <windows.h>
-     #include <GL/gl.h>
-   ])
-
-   dnl Direct3D
-   AC_CHECK_HEADERS(d3d9.h, [
-     VLC_ADD_PLUGIN([direct3d])
-     VLC_ADD_LIBS([direct3d],[-lgdi32])
-   ])
-   VLC_ADD_LIBS([direct3d glwin32],[-lole32 -luuid])
-])
-AM_CONDITIONAL([HAVE_DIRECTX], [test "$have_directx" = "yes"])
-
-dnl
-dnl  Windows Direct2D plugin
-dnl
-AC_ARG_ENABLE(direct2d,
-  [  --enable-direct2d       Win7/VistaPU Direct2D support (default auto on Win32)],, [
-  AS_IF([test "${SYS}" != "mingw32"], [
-    enable_direct2d="no"
+  ],, [
+    #include <windows.h>
+    #include <GL/gl.h>
   ])
-])
-AS_IF([test "${enable_direct2d}" != "no"], [
+
+  dnl Direct3D
+  AC_CHECK_HEADERS(d3d9.h, [
+    VLC_ADD_PLUGIN([direct3d])
+  ])
+
+  dnl Direct2D
   AC_CHECK_HEADERS(d2d1.h, [
     VLC_ADD_PLUGIN([direct2d])
-    VLC_ADD_LIBS([direct2d],[-lgdi32 -lole32 -luuid])
-  ], [
-    AC_MSG_WARN([Cannot find Direct2D headers!])
   ])
 ])
-
-dnl
-dnl  win32 GDI plugin
-dnl
-AC_ARG_ENABLE(wingdi,
-  [  --enable-wingdi         Win32 GDI module (default enabled on Win32)])
-if test "${enable_wingdi}" != "no"; then
-  if test "${SYS}" = "mingw32"; then
-    VLC_ADD_PLUGIN([wingdi])
-    VLC_ADD_LIBS([wingdi],[-lgdi32 -lole32 -luuid])
-  fi
-fi
-
+AM_CONDITIONAL([HAVE_DIRECTX], [test "$have_directx" = "yes"])
 
 dnl
 dnl  Linux framebuffer module
@@ -4167,7 +4138,6 @@ AC_CONFIG_FILES([
   modules/video_filter/Makefile
   modules/video_filter/dynamicoverlay/Makefile
   modules/video_output/Makefile
-  modules/video_output/msw/Makefile
   modules/visualization/Makefile
   modules/mmx/Makefile
   modules/sse2/Makefile
