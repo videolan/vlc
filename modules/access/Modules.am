@@ -1,4 +1,5 @@
-SUBDIRS = mms rtp zip
+SUBDIRS = mms rtp
+DIST_SUBDIRS = $(SUBDIRS)
 
 libfilesystem_plugin_la_SOURCES = \
 	fs.h \
@@ -18,6 +19,18 @@ libidummy_plugin_la_LIBADD = $(AM_LIBADD)
 libsdp_plugin_la_SOURCES = sdp.c
 libsdp_plugin_la_CFLAGS = $(AM_CFLAGS)
 libsdp_plugin_la_LIBADD = $(AM_LIBADD)
+
+libzip_plugin_la_SOURCES = zip/zip.h zip/zipstream.c zip/zipaccess.c
+libzip_plugin_la_CFLAGS = $(AM_CFLAGS) $(MINIZIP_CFLAGS)
+libzip_plugin_la_LIBADD = $(AM_LIBADD) $(MINIZIP_LIBS)
+if HAVE_ZLIB
+if !HAVE_MINIZIP
+SUBDIRS += zip/unzip
+else
+DIST_SUBDIRS += zip/unzip
+endif
+libvlc_LTLIBRARIES += libzip_plugin.la
+endif
 
 SOURCES_access_directory = directory.c
 SOURCES_access_gnomevfs = gnomevfs.c
