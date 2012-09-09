@@ -114,9 +114,11 @@ int InitVideo (access_t *access, int fd, uint32_t caps)
         return -1;
     }
 
-    /* Print extra info */
-    msg_Dbg (access, "%d bytes maximum for complete image",
-             fmt.fmt.pix.sizeimage );
+    struct v4l2_streamparm parm;
+    if (SetupFormat (access, fd, fmt.fmt.pix.pixelformat, &fmt, &parm))
+        return -1;
+
+    msg_Dbg (access, "%"PRIu32" bytes for complete image", fmt.fmt.pix.sizeimage);
     /* Check interlacing */
     switch (fmt.fmt.pix.field)
     {
