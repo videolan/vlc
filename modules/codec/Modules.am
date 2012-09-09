@@ -1,4 +1,4 @@
-SUBDIRS = loader dmo avcodec shine wmafixed omxil
+SUBDIRS = loader dmo avcodec shine omxil
 SOURCES_a52 = a52.c a52.h
 SOURCES_dts = dts.c
 SOURCES_flac = flac.c
@@ -12,6 +12,14 @@ SOURCES_adpcm = adpcm.c
 SOURCES_opus = opus.c opus_header.c opus_header.h
 SOURCES_uleaddvaudio = uleaddvaudio.c
 SOURCES_mpeg_audio = mpeg_audio.c
+SOURCES_wma_fixed = \
+	wmafixed/asf.h wmafixed/bswap.h \
+	wmafixed/fft.c wmafixed/fft.h \
+	wmafixed/mdct.c wmafixed/mdct.h \
+	wmafixed/wma.c wmafixed/wmadeci.c \
+	wmafixed/bitstream.c wmafixed/bitstream.h \
+	wmafixed/wmadata.h wmafixed/wmadec.h \
+	wmafixed/wmafixed.c wmafixed/wmafixed.h
 SOURCES_libmpeg2 = libmpeg2.c
 SOURCES_rawvideo = rawvideo.c
 SOURCES_quicktime = quicktime.c

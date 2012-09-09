@@ -4071,7 +4071,6 @@ AC_CONFIG_FILES([
   modules/codec/loader/Makefile
   modules/codec/omxil/Makefile
   modules/codec/shine/Makefile
-  modules/codec/wmafixed/Makefile
   modules/control/Makefile
   modules/demux/Makefile
   modules/gui/Makefile
