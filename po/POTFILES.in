@@ -397,7 +397,6 @@ modules/codec/x264.c
 modules/codec/zvbi.c
 modules/control/dbus/dbus.c
 modules/control/dbus/dbus_common.h
-modules/control/dbus/dbus.h
 modules/control/dbus/dbus_player.c
 modules/control/dbus/dbus_player.h
 modules/control/dbus/dbus_root.c
