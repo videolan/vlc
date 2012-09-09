@@ -1,5 +1,3 @@
-SUBDIRS = transcode
-
 SOURCES_stream_out_dummy = dummy.c
 SOURCES_stream_out_delay = delay.c
 SOURCES_stream_out_description = description.c
@@ -17,6 +15,12 @@ SOURCES_stream_out_smem = smem.c
 SOURCES_stream_out_setid = setid.c
 SOURCES_stream_out_langfromtelx = langfromtelx.c
 
+libstream_out_transcode_plugin_la_SOURCES = \
+	transcode/transcode.c transcode/transcode.h \
+	transcode/osd.c transcode/spu.c transcode/audio.c transcode/video.c
+libstream_out_transcode_plugin_la_CFLAGS = $(AM_CFLAGS)
+libstream_out_transcode_plugin_la_LIBADD = $(AM_LIBADD)
+
 libvlc_LTLIBRARIES += \
 	libstream_out_dummy_plugin.la \
 	libstream_out_delay_plugin.la \
@@ -33,7 +37,7 @@ libvlc_LTLIBRARIES += \
 	libstream_out_smem_plugin.la \
 	libstream_out_setid_plugin.la \
 	libstream_out_langfromtelx_plugin.la \
-	$(NULL)
+	libstream_out_transcode_plugin.la
 
 # RTP plugin
 libvlc_LTLIBRARIES += \

@@ -1,6 +1,0 @@
-SOURCES_stream_out_transcode = transcode.c transcode.h \
-	osd.c \
-	spu.c \
-	audio.c \
-	video.c
-libvlc_LTLIBRARIES += libstream_out_transcode_plugin.la
