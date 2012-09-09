@@ -1,4 +1,3 @@
-SUBDIRS = mpeg
 SOURCES_mux_dummy = dummy.c
 SOURCES_mux_avi = avi.c
 SOURCES_mux_ogg = ogg.c
@@ -15,6 +14,13 @@ libvlc_LTLIBRARIES += \
 	libmux_wav_plugin.la \
 	libmux_mpjpeg_plugin.la \
 	$(NULL)
+
+libmux_ps_plugin_la_SOURCES = \
+	mpeg/pes.c mpeg/pes.h \
+	mpeg/ps.c mpeg/bits.h
+libmux_ps_plugin_la_CFLAGS = $(AM_CLFAGS)
+libmux_ps_plugin_la_LIBADD = $(AM_LIBADD)
+libvlc_LTLIBRARIES += libmux_ps_plugin.la
 
 libmux_ts_plugin_la_SOURCES = \
 	mpeg/pes.c mpeg/pes.h \

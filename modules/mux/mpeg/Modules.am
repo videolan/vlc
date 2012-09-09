@@ -1,6 +1,0 @@
-SOURCES_mux_ps = ps.c \
-                 pes.c \
-                 pes.h \
-                 bits.h \
-                 $(NULL)
-libvlc_LTLIBRARIES += libmux_ps_plugin.la
