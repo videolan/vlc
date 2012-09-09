@@ -1,4 +1,4 @@
-SUBDIRS = mms rtp vcdx zip
+SUBDIRS = mms rtp zip
 
 libfilesystem_plugin_la_SOURCES = \
 	fs.h \
@@ -171,6 +171,11 @@ SOURCES_vcd = \
 	vcd/cdrom.c \
 	vcd/cdrom.h \
 	vcd/cdrom_internals.h
+SOURCES_vcdx = \
+	vcdx/access.h vcdx/access.c \
+	vcdx/vcd.c vcdx/vcd.h \
+	vcdx/vcdplayer.h vcdx/vcdplayer.c \
+	vcdx/info.c vcdx/info.h
 
 SOURCES_dvdnav = dvdnav.c
 SOURCES_dvdread = dvdread.c

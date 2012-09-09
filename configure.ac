@@ -4130,7 +4130,6 @@ AC_CONFIG_FILES([
   modules/access/Makefile
   modules/access/mms/Makefile
   modules/access/rtp/Makefile
-  modules/access/vcdx/Makefile
   modules/access/zip/Makefile
   modules/access/zip/unzip/Makefile
   modules/access_output/Makefile
