@@ -1,9 +1,0 @@
-SOURCES_es  = es.c
-SOURCES_mpgv = mpgv.c
-SOURCES_h264 = h264.c
-
-libvlc_LTLIBRARIES += \
-	libes_plugin.la \
-	libmpgv_plugin.la \
-	libh264_plugin.la \
-	$(NULL)
