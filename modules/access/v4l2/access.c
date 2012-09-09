@@ -106,16 +106,32 @@ int InitVideo (access_t *access, int fd, uint32_t caps)
     if (SetupInput (VLC_OBJECT(access), fd))
         return -1;
 
-    /* Try and find default resolution if not specified */
-    struct v4l2_format fmt = { .type = V4L2_BUF_TYPE_VIDEO_CAPTURE };
-    if (v4l2_ioctl (fd, VIDIOC_G_FMT, &fmt) < 0)
+    /* NOTE: The V4L access_demux expects a VLC FOURCC as "chroma". It is used to set the
+     * es_format_t structure correctly. However, the V4L access (*here*) has no use for a
+     * VLC FOURCC and expects a V4L2 format directly instead. That is confusing :-( */
+    uint32_t pixfmt = 0;
+    char *fmtstr = var_InheritString (access, CFG_PREFIX"chroma");
+    if (fmtstr != NULL && strlen (fmtstr) <= 4)
     {
-        msg_Err (access, "cannot get default format: %m");
-        return -1;
+        memcpy (&pixfmt, fmtstr, strlen (fmtstr));
+        free (fmtstr);
     }
+    else
+    /* Use the default^Wprevious format if none specified */
+    {
+        struct v4l2_format fmt = { .type = V4L2_BUF_TYPE_VIDEO_CAPTURE };
+        if (v4l2_ioctl (fd, VIDIOC_G_FMT, &fmt) < 0)
+        {
+            msg_Err (access, "cannot get default format: %m");
+            return -1;
+        }
+        pixfmt = fmt.fmt.pix.pixelformat;
+    }
+    msg_Dbg (access, "selected format %4.4s", (const char *)&pixfmt);
 
+    struct v4l2_format fmt;
     struct v4l2_streamparm parm;
-    if (SetupFormat (access, fd, fmt.fmt.pix.pixelformat, &fmt, &parm))
+    if (SetupFormat (access, fd, pixfmt, &fmt, &parm))
         return -1;
 
     msg_Dbg (access, "%"PRIu32" bytes for complete image", fmt.fmt.pix.sizeimage);
