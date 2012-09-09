@@ -132,8 +132,8 @@ noinst_HEADERS += \
 	omxil/OMX_Video.h 
 
 libomxil_plugin_la_SOURCES = \
-	omxil/utils.c omxil_utils.h \
-	omxil/h264_nal.h \
+	omxil/utils.c omxil/omxil_utils.h \
+	h264_nal.h \
 	omxil/qcom.c omxil/qcom.h \
 	omxil/omxil.c omxil/omxil.h
 libomxil_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/omxil

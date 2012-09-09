@@ -25,8 +25,8 @@ libvlc_LTLIBRARIES += \
 libdbus_plugin_la_SOURCES = \
 	dbus/dbus_introspect.h dbus/dbus_common.h \
 	dbus/dbus_root.c dbus/dbus_root.h \
-	dbus/dbus_player.c dbus/dbus/player.h \
-	dbus/dbus_tracklist.c dbus/dbus/tracklist.h \
+	dbus/dbus_player.c dbus/dbus_player.h \
+	dbus/dbus_tracklist.c dbus/dbus_tracklist.h \
 	dbus/dbus.c
 libdbus_plugin_la_CFLAGS = $(AM_CFLAGS) $(DBUS_CFLAGS)
 libdbus_plugin_la_LIBADD = $(AM_LIBADD) $(DBUS_LIBS) $(LIBM)
