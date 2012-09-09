@@ -1,11 +1,4 @@
-BASE_SUBDIRS = mms rtp rtsp screen vcd vcdx zip
-EXTRA_SUBDIRS = dshow
-SUBDIRS = $(BASE_SUBDIRS)
-DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
-
-if HAVE_WIN32
-SUBDIRS += dshow
-endif
+SUBDIRS = mms rtsp rtp screen vcd vcdx zip
 
 libfilesystem_plugin_la_SOURCES = \
 	fs.h \
@@ -95,6 +88,9 @@ libvlc_LTLIBRARIES += \
 	libaccess_vdr_plugin.la \
 	$(NULL)
 
+
+### Audio capture ###
+
 libaccess_oss_plugin_la_SOURCES = oss.c
 libaccess_oss_plugin_la_CFLAGS = $(AM_CFLAGS)
 libaccess_oss_plugin_la_LIBADD = $(AM_LIBADD) $(OSS_LIBS)
@@ -119,10 +115,14 @@ if HAVE_PULSE
 libvlc_LTLIBRARIES += libpulsesrc_plugin.la
 endif
 
+
+### Video capture ###
+
 libaccess_shm_plugin_la_SOURCES = shm.c
 libaccess_shm_plugin_la_CFLAGS = $(AM_CFLAGS)
 libaccess_shm_plugin_la_LIBADD = $(AM_LIBADD)
 libvlc_LTLIBRARIES += $(LTLIBaccess_shm)
+EXTRA_LTLIBRARIES += libaccess_shm_plugin.la
 
 libv4l2_plugin_la_SOURCES = \
 	v4l2/videodev2.h \
@@ -139,6 +139,17 @@ libv4l2_plugin_la_LIBADD = $(AM_LIBADD) $(LIBDL) $(LIBM)
 if HAVE_V4L2
 libvlc_LTLIBRARIES += libv4l2_plugin.la
 endif
+
+libdshow_plugin_la_SOURCES = dshow/vlc_dshow.h dshow/dshow.cpp dshow/access.h \
+	dshow/filter.cpp dshow/filter.h dshow/crossbar.cpp
+libdshow_plugin_la_CFLAGS = $(AM_CFLAGS)
+libdshow_plugin_la_LIBADD = $(AM_LIBADD) -lole32 -loleaut32 -luuid -lstrmiids -lksuser
+if HAVE_WIN32
+libvlc_LTLIBRARIES += libdshow_plugin.la
+endif
+
+
+### Screen grab ###
 
 libxcb_screen_plugin_la_SOURCES = screen/xcb.c
 libxcb_screen_plugin_la_CFLAGS = $(AM_CFLAGS) \

@@ -1707,25 +1707,6 @@ then
 fi
 
 dnl
-dnl  Windows DirectShow access module
-dnl
-AC_ARG_ENABLE(dshow,
-  [AS_HELP_STRING([--disable-dshow],
-    [support DirectShow (default auto)])])
-if test "${enable_dshow}" != "no"
-then
-  if test "${SYS}" = "mingw32"
-  then
-    AC_LANG_PUSH(C++)
-      AC_CHECK_HEADERS(dshow.h,
-      [ VLC_ADD_PLUGIN([dshow])
-        VLC_ADD_CXXFLAGS([dshow],[])
-        VLC_ADD_LIBS([dshow],[-lole32 -loleaut32 -luuid -lstrmiids -lksuser])])
-    AC_LANG_POP(C++)
-  fi
-fi
-
-dnl
 dnl  Blu-ray Disc Support with libbluray
 dnl
 PKG_ENABLE_MODULES_VLC([BLURAY], [libbluray], [libbluray >= 0.2.1], (libbluray for Blu-ray disc support ) )
@@ -4150,7 +4131,6 @@ AC_CONFIG_FILES([
   bin/Makefile
   test/Makefile
   modules/access/Makefile
-  modules/access/dshow/Makefile
   modules/access/mms/Makefile
   modules/access/rtp/Makefile
   modules/access/rtsp/Makefile

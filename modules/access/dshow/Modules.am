@@ -1,1 +1,0 @@
-SOURCES_dshow = vlc_dshow.h dshow.cpp access.h filter.cpp filter.h crossbar.cpp
