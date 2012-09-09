@@ -1,4 +1,4 @@
-SUBDIRS = mms rtsp rtp screen vcd vcdx zip
+SUBDIRS = mms rtp screen vcd vcdx zip
 
 libfilesystem_plugin_la_SOURCES = \
 	fs.h \
@@ -19,19 +19,7 @@ libsdp_plugin_la_SOURCES = sdp.c
 libsdp_plugin_la_CFLAGS = $(AM_CFLAGS)
 libsdp_plugin_la_LIBADD = $(AM_LIBADD)
 
-libaccess_smb_plugin_la_SOURCES = smb.c
-libaccess_smb_plugin_la_CFLAGS = $(AM_CFLAGS)
-libaccess_smb_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_access_smb)
-if HAVE_WIN32
-libaccess_smb_plugin_la_LIBADD += -lmpr
-endif
-libvlc_LTLIBRARIES += $(LTLIBaccess_smb)
-
 SOURCES_access_directory = directory.c
-SOURCES_access_udp = udp.c
-SOURCES_access_tcp = tcp.c
-SOURCES_access_http = http.c
-SOURCES_access_ftp = ftp.c
 SOURCES_access_gnomevfs = gnomevfs.c
 SOURCES_access_eyetv = eyetv.m
 SOURCES_dc1394 = dc1394.c
@@ -45,15 +33,12 @@ SOURCES_linsys_hdsdi = \
 	$(NULL)
 SOURCES_access_jack = jack.c
 SOURCES_access_mtp = mtp.c
-SOURCES_access_sftp = sftp.c
 SOURCES_access_imem = imem.c
 SOURCES_access_avio = avio.c avio.h
 SOURCES_access_attachment = attachment.c
 SOURCES_access_vdr = vdr.c
 SOURCES_libbluray = bluray.c
 SOURCES_decklink = decklink.cpp
-SOURCES_htcpcp = htcpcp.c
-
 
 SOURCES_access_rar = rar/rar.c rar/rar.h rar/access.c
 SOURCES_stream_filter_rar = rar/rar.c rar/rar.h rar/stream.c
@@ -213,7 +198,32 @@ libvlc_LTLIBRARIES += libdtv_plugin.la
 endif
 
 
-EXTRA_LTLIBRARIES += \
-	libaccess_shm_plugin.la \
-	libaccess_smb_plugin.la \
-	$(NULL)
+### Network streams ###
+
+libaccess_smb_plugin_la_SOURCES = smb.c
+libaccess_smb_plugin_la_CFLAGS = $(AM_CFLAGS)
+libaccess_smb_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_access_smb)
+if HAVE_WIN32
+libaccess_smb_plugin_la_LIBADD += -lmpr
+endif
+libvlc_LTLIBRARIES += $(LTLIBaccess_smb)
+EXTRA_LTLIBRARIES += libaccess_smb_plugin.la
+
+SOURCES_access_udp = udp.c
+SOURCES_access_tcp = tcp.c
+SOURCES_access_http = http.c
+SOURCES_htcpcp = htcpcp.c
+SOURCES_access_ftp = ftp.c
+SOURCES_access_sftp = sftp.c
+
+librealrtsp_plugin_la_SOURCES = \
+	rtsp/access.c \
+	rtsp/rtsp.c rtsp/rtsp.h \
+	rtsp/real.c rtsp/real.h \
+	rtsp/real_rmff.c rtsp/real_rmff.h \
+	rtsp/real_sdpplin.c rtsp/real_sdpplin.h \
+	rtsp/real_asmrp.c
+librealrtsp_plugin_la_CFLAGS = $(AM_CFLAGS)
+librealrtsp_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
+libvlc_LTLIBRARIES += $(LTLIBrealrtsp)
+EXTRA_LTLIBRARIES += librealrtsp_plugin.la
