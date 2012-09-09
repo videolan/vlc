@@ -619,7 +619,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua chorus_flanger freetype avcodec avformat access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo mp4 quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a speex opus mono colorthres extract ball access_imem hotkeys mosaic gaussianblur dbus x26410b hqdn3d anaglyph oldrc ncurses],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom panoramix rotate noise grain scene kate flac lua chorus_flanger freetype avcodec avformat access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo mp4 quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a speex opus mono colorthres extract ball access_imem hotkeys mosaic gaussianblur dbus x26410b hqdn3d anaglyph oldrc ncurses],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -3765,16 +3765,6 @@ fi
 
 EXTEND_HELP_STRING([Visualisations and Video filter plugins:])
 dnl
-dnl Visualisation plugin
-dnl
-AC_ARG_ENABLE(visual,
-  [  --enable-visual         visualisation plugin (default enabled)])
-if test "${enable_visual}" != "no"
-then
-    VLC_ADD_PLUGIN([visual])
-fi
-
-dnl
 dnl  goom visualization plugin
 dnl
 PKG_ENABLE_MODULES_VLC([GOOM], [], [libgoom2], [goom visualization plugin], [auto])
@@ -4181,7 +4171,6 @@ AC_CONFIG_FILES([
   modules/video_output/Makefile
   modules/video_output/msw/Makefile
   modules/visualization/Makefile
-  modules/visualization/visual/Makefile
   modules/mmx/Makefile
   modules/sse2/Makefile
   modules/altivec/Makefile
