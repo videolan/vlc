@@ -1,4 +1,4 @@
-BASE_SUBDIRS = bd mms rtp rtsp screen vcd vcdx zip
+BASE_SUBDIRS = mms rtp rtsp screen vcd vcdx zip
 EXTRA_SUBDIRS = dshow
 SUBDIRS = $(BASE_SUBDIRS)
 DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
@@ -41,8 +41,6 @@ SOURCES_access_http = http.c
 SOURCES_access_ftp = ftp.c
 SOURCES_access_gnomevfs = gnomevfs.c
 SOURCES_access_eyetv = eyetv.m
-SOURCES_dvdnav = dvdnav.c
-SOURCES_dvdread = dvdread.c
 SOURCES_dc1394 = dc1394.c
 SOURCES_dv1394 = dv.c
 SOURCES_pvr = pvr.c
@@ -52,12 +50,6 @@ SOURCES_linsys_hdsdi = \
 	linsys/linsys_sdiaudio.h \
 	linsys/linsys_sdivideo.h \
 	$(NULL)
-SOURCES_cdda = \
-        cdda.c \
-        vcd/cdrom.c \
-        vcd/cdrom.h \
-        vcd/cdrom_internals.h \
-        $(NULL)
 SOURCES_access_jack = jack.c
 SOURCES_access_mtp = mtp.c
 SOURCES_access_sftp = sftp.c
@@ -156,6 +148,24 @@ libxcb_screen_plugin_la_LIBADD = $(AM_LIBADD) \
 if HAVE_XCB
 libvlc_LTLIBRARIES += libxcb_screen_plugin.la
 endif
+
+
+### Optical media ###
+
+SOURCES_cdda = \
+        cdda.c \
+        vcd/cdrom.c \
+        vcd/cdrom.h \
+        vcd/cdrom_internals.h \
+        $(NULL)
+
+SOURCES_dvdnav = dvdnav.c
+SOURCES_dvdread = dvdread.c
+
+libaccess_bd_plugin_la_SOURCES = bd/bd.c bd/mpls.c bd/mpls.h bd/clpi.c bd/clpi.h
+libaccess_bd_plugin_la_CFLAGS = $(AM_CFLAGS)
+libaccess_bd_plugin_la_LIBADD = $(AM_LIBADD)
+libvlc_LTLIBRARIES += libaccess_bd_plugin.la
 
 
 ### Digital TV ###

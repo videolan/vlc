@@ -4150,7 +4150,6 @@ AC_CONFIG_FILES([
   bin/Makefile
   test/Makefile
   modules/access/Makefile
-  modules/access/bd/Makefile
   modules/access/dshow/Makefile
   modules/access/mms/Makefile
   modules/access/rtp/Makefile
