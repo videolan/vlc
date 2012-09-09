@@ -1,19 +1,105 @@
-SUBDIRS = dash
-
-SOURCES_decomp = decomp.c
-SOURCES_stream_filter_record = record.c
-
-libvlc_LTLIBRARIES += \
-   libstream_filter_record_plugin.la \
-   $(NULL)
-
-if HAVE_GCRYPT
-libstream_filter_httplive_plugin_la_SOURCES = httplive.c
-libstream_filter_httplive_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
-libstream_filter_httplive_plugin_la_LIBADD = $(AM_LIBADD) $(GCRYPT_LIBS) -lgpg-error
-libvlc_LTLIBRARIES += libstream_filter_httplive_plugin.la
-endif
-
+libdecomp_plugin_la_SOURCES = decomp.c
+libdecomp_plugin_la_CFLAGS = $(AM_CFLAGS)
+libdecomp_plugin_la_LIBADD = $(AM_LIBADD)
 if !HAVE_WIN32
 libvlc_LTLIBRARIES += libdecomp_plugin.la
 endif
+
+libdash_plugin_la_SOURCES = \
+    dash/adaptationlogic/AbstractAdaptationLogic.cpp \
+    dash/adaptationlogic/AbstractAdaptationLogic.h \
+    dash/adaptationlogic/AdaptationLogicFactory.cpp \
+    dash/adaptationlogic/AdaptationLogicFactory.h \
+    dash/adaptationlogic/AlwaysBestAdaptationLogic.cpp \
+    dash/adaptationlogic/AlwaysBestAdaptationLogic.h \
+    dash/adaptationlogic/IAdaptationLogic.h \
+    dash/adaptationlogic/IDownloadRateObserver.h \
+    dash/adaptationlogic/RateBasedAdaptationLogic.h \
+    dash/adaptationlogic/RateBasedAdaptationLogic.cpp \
+    dash/buffer/BlockBuffer.cpp \
+    dash/buffer/BlockBuffer.h \
+    dash/buffer/IBufferObserver.h \
+    dash/http/Chunk.cpp \
+    dash/http/Chunk.h \
+    dash/http/HTTPConnection.cpp \
+    dash/http/HTTPConnection.h \
+    dash/http/HTTPConnectionManager.cpp \
+    dash/http/HTTPConnectionManager.h \
+    dash/http/IHTTPConnection.h \
+    dash/http/PersistentConnection.cpp \
+    dash/http/PersistentConnection.h \
+    dash/mpd/AdaptationSet.cpp \
+    dash/mpd/AdaptationSet.h \
+    dash/mpd/BaseUrl.h \
+    dash/mpd/BasicCMManager.cpp \
+    dash/mpd/BasicCMManager.h \
+    dash/mpd/BasicCMParser.cpp \
+    dash/mpd/BasicCMParser.h \
+    dash/mpd/CommonAttributesElements.cpp \
+    dash/mpd/CommonAttributesElements.h \
+    dash/mpd/ContentDescription.cpp \
+    dash/mpd/ContentDescription.h \
+    dash/mpd/IMPDManager.h \
+    dash/mpd/IMPDParser.h \
+    dash/mpd/IsoffMainParser.cpp \
+    dash/mpd/IsoffMainParser.h \
+    dash/mpd/IsoffMainManager.cpp \
+    dash/mpd/IsoffMainManager.h \
+    dash/mpd/MPD.cpp \
+    dash/mpd/MPD.h \
+    dash/mpd/MPDFactory.cpp \
+    dash/mpd/MPDFactory.h \
+    dash/mpd/MPDManagerFactory.cpp \
+    dash/mpd/MPDManagerFactory.h \
+    dash/mpd/Period.cpp \
+    dash/mpd/Period.h \
+    dash/mpd/ProgramInformation.cpp \
+    dash/mpd/ProgramInformation.h \
+    dash/mpd/Representation.cpp \
+    dash/mpd/Representation.h \
+    dash/mpd/Segment.cpp \
+    dash/mpd/Segment.h \
+    dash/mpd/SegmentBase.cpp \
+    dash/mpd/SegmentBase.h \
+    dash/mpd/SegmentInfo.cpp \
+    dash/mpd/SegmentInfo.h \
+    dash/mpd/SegmentInfoCommon.cpp \
+    dash/mpd/SegmentInfoCommon.h \
+    dash/mpd/SegmentInfoDefault.cpp \
+    dash/mpd/SegmentInfoDefault.h \
+    dash/mpd/SegmentList.cpp \
+    dash/mpd/SegmentList.h \
+    dash/mpd/SegmentTemplate.cpp \
+    dash/mpd/SegmentTemplate.h \
+    dash/mpd/SegmentTimeline.cpp \
+    dash/mpd/SegmentTimeline.h \
+    dash/mpd/TrickModeType.cpp \
+    dash/mpd/TrickModeType.h \
+    dash/xml/DOMHelper.cpp \
+    dash/xml/DOMHelper.h \
+    dash/xml/DOMParser.cpp \
+    dash/xml/DOMParser.h \
+    dash/xml/Node.cpp \
+    dash/xml/Node.h \
+    dash/dash.cpp \
+    dash/DASHDownloader.cpp \
+    dash/DASHDownloader.h \
+    dash/DASHManager.cpp \
+    dash/DASHManager.h \
+    dash/Helper.cpp \
+    dash/Helper.h
+libdash_plugin_la_CXXFLAGS = $(AM_CFLAGS) -I$(srcdir)/dash
+libdash_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
+libvlc_LTLIBRARIES += libdash_plugin.la
+
+libhttplive_plugin_la_SOURCES = httplive.c
+libhttplive_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
+libhttplive_plugin_la_LIBADD = $(AM_LIBADD) $(GCRYPT_LIBS) -lgpg-error
+if HAVE_GCRYPT
+libvlc_LTLIBRARIES += libhttplive_plugin.la
+endif
+
+librecord_plugin_la_SOURCES = record.c
+librecord_plugin_la_CFLAGS = $(AM_CFLAGS)
+librecord_plugin_la_LIBADD = $(AM_LIBADD)
+libvlc_LTLIBRARIES += librecord_plugin.la

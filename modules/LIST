@@ -79,6 +79,7 @@ $Id$
  * croppadd: Crop/Padd image filter
  * crystalhd: crystalhd decoder
  * cvdsub: CVD subtitles decoder
+ * dash: MPEG DASH playback
  * dbus: D-Bus control interface
  * dc1394: IIDC (DCAM) FireWire input module
  * ddummy: dummy decoder
@@ -145,6 +146,7 @@ $Id$
  * hotkeys: hotkeys control module
  * hqdn3d: High Quality denoising filter
  * htcpcp: HTCPCP access module
+ * httplive: HTTP Live streaming for playback
  * i420_rgb: planar YUV to packed RGB conversion functions
  * i420_rgb_mmx: MMX accelerated version of i420_rgb
  * i420_rgb_sse2: sse2 accelerated version of i420_rgb
@@ -265,6 +267,7 @@ $Id$
  * rawvid: raw video input module for vlc
  * rawvideo: Pseudo audio-decoder for raw video
  * real: partial Real audio/video demuxer
+ * record: record any stream instantly
  * remap: audio channel remapping filter
  * remoteosd: Remote-OSD over VNC
  * ripple: Ripple video effect
@@ -298,10 +301,7 @@ $Id$
  * stats: Stats encoder function
  * stereo_widen: Enhances stereo effect
  * stl: EBU STL decoder
- * stream_filter_dash: MPEG DASH playback
- * stream_filter_httplive: HTTP Live streaming for playback
  * stream_filter_rar: Stream filter to read inside Rar files
- * stream_filter_record: record any stream instantly
  * stream_out_autodel: monitor mux inputs and automatically add/delete streams
  * stream_out_bridge: "exchange" streams between sout instances. To be used with VLM
  * stream_out_delay: introduce delay in an ES when streaming
