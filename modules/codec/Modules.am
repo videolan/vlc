@@ -1,4 +1,3 @@
-SUBDIRS = loader
 noinst_HEADERS =
 
 SOURCES_a52 = a52.c a52.h
@@ -146,3 +145,35 @@ libiomx_plugin_la_LIBADD = $(libomxil_plugin_la_LIBADD)
 
 libvlc_LTLIBRARIES += $(LTLIBomxil) $(LTLIBiomx)
 EXTRA_LTLIBRARIES += libomxil_plugin.la libiomx_plugin.la
+
+### Windows DLL loader ###
+
+# TODO: real check for vsscanf() and <sys/mmap.h>
+noinst_HEADERS += loader/com.h loader/driver.h loader/ext.h loader/ldt_keeper.h
+	loader/loader.h loader/registry.h \
+	loader/win32.h loader/wineacm.h loader/wrapper.h \
+	loader/qtx/qtxsdk/components.h \
+	loader/wine/avifmt.h loader/wine/basetsd.h loader/wine/debugtools.h \
+	loader/wine/driver.h loader/wine/heap.h loader/wine/mmreg.h \
+	loader/wine/module.h loader/wine/msacmdrv.h loader/wine/msacm.h \
+	loader/wine/pe_image.h loader/wine/poppack.h loader/wine/pshpack1.h \
+	loader/wine/pshpack2.h loader/wine/vfw.h loader/wine/winbase.h \
+	loader/wine/windef.h loader/wine/winerror.h \
+	loaeder/wine/winestring.h loader/wine/winnt.h loader/wine/winreg.h \
+	loader/wine/winuser.h
+
+libloader_la_CPPFLAGS = -D__WINE__ -DHAVE_SYS_MMAN_H=1 -DHAVE_VSSCANF=1 \
+	-DWIN32_PATH=\"\" -DTRACE\(...\)=\(void\)0
+libloader_la_CFLAGS = -fno-PIC -U_FILE_OFFSET_BITS \
+	-fno-omit-frame-pointer -mno-omit-leaf-frame-pointer
+libloader_la_SOURCES = loader/ldt_keeper.c loader/pe_image.c loader/module.c \
+	loader/ext.c loader/win32.c loader/driver.c loader/pe_resource.c \
+	loader/resource.c loader/registry.c loader/afl.c loader/vfl.c \
+	loader/wrapper.S loader/stubs.s loader/kludge.c
+libloader_la_LIBADD = -lpthread
+libloader_la_LDFLAGS = -static
+if LOADER
+noinst_LTLIBRARIES = libloader.la
+libdmo_plugin_la_DEPENDENCIES = libloader.la
+libquicktime_plugin_la_DEPENDENCIES = libloader.la
+endif

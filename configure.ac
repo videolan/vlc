@@ -3980,8 +3980,8 @@ AC_ARG_ENABLE(loader,
 AM_CONDITIONAL(LOADER, [test "${enable_loader}" = "yes"])
 AS_IF([test "${enable_loader}" = "yes"],
   [ VLC_ADD_PLUGIN([dmo])
-    VLC_ADD_CPPFLAGS([dmo quicktime ],[-I\\\${top_srcdir}/modules/codec/loader])
-    VLC_ADD_LIBS([dmo quicktime ],[\\\${top_builddir}/modules/codec/loader/libloader.la])
+    VLC_ADD_CPPFLAGS([dmo quicktime ],[-I\\\$(srcdir)/loader])
+    VLC_ADD_LIBS([dmo quicktime ],[libloader.la])
     VLC_ADD_LIBS([dmo quicktime], [-lpthread])
   ])
 
@@ -4065,7 +4065,6 @@ AC_CONFIG_FILES([
   modules/audio_mixer/Makefile
   modules/audio_output/Makefile
   modules/codec/Makefile
-  modules/codec/loader/Makefile
   modules/control/Makefile
   modules/demux/Makefile
   modules/gui/Makefile
