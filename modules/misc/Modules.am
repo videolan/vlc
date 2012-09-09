@@ -1,5 +1,3 @@
-SUBDIRS = osd
-
 SOURCES_vod_rtsp = rtsp.c
 SOURCES_audioscrobbler = audioscrobbler.c
 SOURCES_sqlite = sqlite.c
@@ -29,6 +27,13 @@ libinhibit_plugin_la_LIBADD = $(AM_LIBADD) $(DBUS_LIBS)
 if HAVE_DBUS
 libvlc_LTLIBRARIES += libinhibit_plugin.la
 endif
+
+libosd_parser_plugin_la_SOURCES = \
+	osd/parser.c osd/osd_menu.c osd/osd_menu.h osd/simple.c osd/xml.c
+libosd_parser_plugin_la_CFLAGS = $(AM_CFLAGS)
+libosd_parser_plugin_la_LIBADD = $(AM_LIBADD)
+EXTRA_LTLIBRARIES += libosd_parser_plugin.la
+libvlc_LTLIBRARIES += $(LTLIBosd_parser)
 
 libxdg_screensaver_plugin_la_SOURCES = inhibit/xdg.c
 libxdg_screensaver_plugin_la_CFLAGS = $(AM_CFLAGS)
