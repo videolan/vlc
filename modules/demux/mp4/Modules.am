@@ -1,8 +1,0 @@
-SOURCES_mp4 = \
-	mp4.c \
-	libmp4.c \
-	libmp4.h \
-	id3genres.h \
-	$(NULL)
-
-libvlc_LTLIBRARIES += libmp4_plugin.la

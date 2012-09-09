@@ -1,4 +1,4 @@
-SUBDIRS = avformat mkv mp4 mpeg playlist
+SUBDIRS = avformat mkv mpeg playlist
 SOURCES_flacsys = flac.c
 SOURCES_ogg = ogg.c ogg.h oggseek.c oggseek.h vorbis.h kate_categories.c \
 	kate_categories.h xiph.h
@@ -42,6 +42,17 @@ libavi_plugin_la_SOURCES = avi/avi.c avi/libavi.c avi/libavi.h
 libavi_plugin_la_CFLAGS = $(AM_CFLAGS)
 libavi_plugin_la_LIBADD = $(AM_LIBADD)
 
+libmp4_plugin_la_SOURCES = mp4/mp4.c mp4/libmp4.c mp4/libmp4.h mp4/id3genres.h
+libmp4_plugin_la_CFLAGS = $(AM_CFLAGS)
+libmp4_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
+libmp4_plugin_la_LDFLAGS = $(AM_LDFLAGS)
+if HAVE_ZLIB
+libmp4_plugin_la_LIBADD += -lz
+endif
+if HAVE_DARWIN
+libmp4_plugin_la_LDFLAGS += -Wl,-framework,IOKit,-framework,CoreFoundation
+endif
+
 libts_plugin_la_SOURCES = ts.c ../mux/mpeg/csa.c dvb-text.h
 libts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS)
 libts_plugin_la_LIBADD = $(AM_LIBADD) $(DVBPSI_LIBS) $(SOCKET_LIBS)
@@ -60,6 +71,7 @@ libvlc_LTLIBRARIES += \
 	libdemuxdump_plugin.la \
 	libflacsys_plugin.la \
 	libmjpeg_plugin.la \
+	libmp4_plugin.la \
 	libnsc_plugin.la \
 	libnsv_plugin.la \
 	libnuv_plugin.la \
