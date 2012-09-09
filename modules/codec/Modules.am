@@ -1,4 +1,4 @@
-SUBDIRS = loader dmo avcodec omxil
+SUBDIRS = loader avcodec omxil
 SOURCES_a52 = a52.c a52.h
 SOURCES_dts = dts.c
 SOURCES_flac = flac.c
@@ -51,6 +51,7 @@ SOURCES_t140 = t140.c
 SOURCES_crystalhd = crystalhd.c h264_nal.h
 SOURCES_spudec = spudec/spudec.c spudec/parse.c spudec/spudec.h
 SOURCES_stl = stl.c
+SOURCES_dmo = dmo/dmo.c dmo/dmo.h dmo/buffer.c
 SOURCES_ddummy = ddummy.c
 SOURCES_edummy = edummy.c
 

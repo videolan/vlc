@@ -1,1 +1,0 @@
-SOURCES_dmo = dmo.c dmo.h buffer.c
