@@ -5,7 +5,6 @@ DIST_SUBDIRS = $(BASE_SUBDIRS)
 
 SOURCES_vod_rtsp = rtsp.c
 SOURCES_audioscrobbler = audioscrobbler.c
-SOURCES_inhibit = inhibit.c
 SOURCES_sqlite = sqlite.c
 SOURCES_xml = xml/libxml.c
 
@@ -17,6 +16,13 @@ libgnutls_plugin_la_LIBADD += -lcrypt32 $(SOCKET_LIBS)
 endif
 EXTRA_LTLIBRARIES += libgnutls_plugin.la
 libvlc_LTLIBRARIES += $(LTLIBgnutls)
+
+libinhibit_plugin_la_SOURCES = inhibit.c
+libinhibit_plugin_la_CFLAGS = $(AM_CFLAGS) $(DBUS_CFLAGS)
+libinhibit_plugin_la_LIBADD = $(AM_LIBADD) $(DBUS_LIBS)
+if HAVE_DBUS
+libvlc_LTLIBRARIES += libinhibit_plugin.la
+endif
 
 libxdg_screensaver_plugin_la_SOURCES = inhibit/xdg.c
 libxdg_screensaver_plugin_la_CFLAGS = $(AM_CFLAGS)

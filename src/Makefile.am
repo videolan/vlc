@@ -174,6 +174,10 @@ AM_CFLAGS = $(CFLAGS_libvlccore)
 if HAVE_DYNAMIC_PLUGINS
 AM_CPPFLAGS += -DHAVE_DYNAMIC_PLUGINS
 endif
+if HAVE_DBUS
+AM_CPPFLAGS += -DHAVE_DBUS
+AM_CFLAGS += $(DBUS_CFLAGS)
+endif
 
 libvlccore_la_SOURCES = $(SOURCES_libvlc)
 libvlccore_la_LDFLAGS = \
@@ -190,6 +194,9 @@ libvlccore_la_DEPENDENCIES = libvlccore.sym
 if HAVE_WIN32
 libvlccore_la_DEPENDENCIES += libvlc_win32_rc.$(OBJEXT)
 libvlccore_la_LDFLAGS += -Wl,libvlc_win32_rc.$(OBJEXT) -avoid-version
+endif
+if HAVE_DBUS
+libvlccore_la_LIBADD += $(DBUS_LIBS)
 endif
 
 libvlc_win32_rc.$(OBJEXT): libvlc_win32_rc.rc

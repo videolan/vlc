@@ -11,7 +11,9 @@ SUFFIXES = .rc.in .rc
 
 AM_CPPFLAGS = $(CPPFLAGS_vlc)
 AM_CFLAGS = $(CFLAGS_vlc)
-
+if HAVE_DBUS
+AM_CPPFLAGS += -DHAVE_DBUS
+endif
 
 if !HAVE_WIN32
 bin_PROGRAMS += vlc-wrapper

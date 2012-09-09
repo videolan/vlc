@@ -619,7 +619,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom panoramix rotate noise grain scene kate flac lua chorus_flanger freetype avcodec avformat access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo mp4 quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a speex opus mono colorthres extract ball access_imem hotkeys mosaic gaussianblur dbus x26410b hqdn3d anaglyph oldrc ncurses],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom panoramix rotate noise grain scene kate flac lua chorus_flanger freetype avcodec avformat access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo mp4 quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a speex opus mono colorthres extract ball access_imem hotkeys mosaic gaussianblur x26410b hqdn3d anaglyph oldrc ncurses],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -771,35 +771,19 @@ dnl Check for dbus
 AC_ARG_ENABLE(dbus,
   [AS_HELP_STRING([--enable-dbus],
     [compile D-Bus message bus support (default enabled)])])
-case "${SYS}" in
-    linux*|*bsd*)
-if test "${enable_dbus}" != "no" -a "${SYS}" != "mingw32"
-then
-  dnl api stable dbus
-  PKG_CHECK_MODULES(DBUS, [dbus-1 >= 1.0.0],
-    [ AC_DEFINE( HAVE_DBUS, 1, [Define if you have the D-BUS library] )
-      VLC_ADD_LIBS([libvlccore],[$DBUS_LIBS])
-      VLC_ADD_CFLAGS([libvlccore],[$DBUS_CFLAGS])
-      dnl Check for dbus control interface
-        AC_ARG_ENABLE(dbus-control,
-          [AS_HELP_STRING([--disable-dbus-control],
-            [D-Bus control interface (default enabled)])])
-        if test "${enable_dbus_control}" != "no"
-        then
-          VLC_ADD_PLUGIN([dbus])
-          VLC_ADD_LIBS([dbus],[$DBUS_LIBS])
-          VLC_ADD_CFLAGS([dbus],[$DBUS_CFLAGS])
-        fi
-        dnl Power Management Inhibiter
-        VLC_ADD_PLUGIN([inhibit])
-        VLC_ADD_LIBS([inhibit],[$DBUS_LIBS])
-        VLC_ADD_CFLAGS([inhibit],[$DBUS_CFLAGS])
-    ],
-    [AC_MSG_ERROR([${DBUS_PKG_ERRORS}.])]
-  )
-fi
-;;
-esac
+have_dbus="no"
+AS_IF([test "${enable_dbus}" != "no"], [
+  PKG_CHECK_MODULES(DBUS, [dbus-1 >= 1.0.0], [
+    have_dbus="yes"
+  ], [
+    AS_IF([test -n "${enable_dbus}"], [
+      AC_MSG_ERROR([${DBUS_PKG_ERRORS}.])
+    ], [
+      AC_MSG_WARN([${DBUS_PKG_ERRORS}.])
+    ])
+  ])
+])
+AM_CONDITIONAL([HAVE_DBUS], [test "${have_dbus}" = "yes"])
 
 dnl Check for ntohl, etc.
 VLC_SAVE_FLAGS
@@ -4090,7 +4074,6 @@ AC_CONFIG_FILES([
   modules/codec/spudec/Makefile
   modules/codec/wmafixed/Makefile
   modules/control/Makefile
-  modules/control/dbus/Makefile
   modules/demux/Makefile
   modules/demux/asf/Makefile
   modules/demux/avformat/Makefile

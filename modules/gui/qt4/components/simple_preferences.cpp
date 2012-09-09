@@ -618,16 +618,20 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.updatesDays->hide();
 #endif
             /* ONE INSTANCE options */
-#if defined( WIN32 ) || defined( HAVE_DBUS ) || defined(__APPLE__)
-            CONFIG_BOOL( "one-instance", OneInterfaceMode );
-            CONFIG_BOOL( "playlist-enqueue",
-                    EnqueueOneInterfaceMode );
-            ui.EnqueueOneInterfaceMode->setEnabled( ui.OneInterfaceMode->isChecked() );
-            CONNECT( ui.OneInterfaceMode, toggled( bool ),
-                     ui.EnqueueOneInterfaceMode, setEnabled( bool ) );
-#else
-            ui.OneInterfaceBox->hide();
+#if !defined( WIN32 ) && !defined(__APPLE__)
+            if( !module_exists( "dbus" ) )
+                ui.OneInterfaceBox->hide();
+            else
 #endif
+            {
+                CONFIG_BOOL( "one-instance", OneInterfaceMode );
+                CONFIG_BOOL( "playlist-enqueue", EnqueueOneInterfaceMode );
+                ui.EnqueueOneInterfaceMode->setEnabled(
+                                                       ui.OneInterfaceMode->isChecked() );
+                CONNECT( ui.OneInterfaceMode, toggled( bool ),
+                         ui.EnqueueOneInterfaceMode, setEnabled( bool ) );
+            }
+
             /* RECENTLY PLAYED options */
             CONNECT( ui.saveRecentlyPlayed, toggled( bool ),
                      ui.recentlyPlayedFilters, setEnabled( bool ) );

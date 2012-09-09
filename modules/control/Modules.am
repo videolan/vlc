@@ -1,4 +1,3 @@
-SUBDIRS = dbus
 SOURCES_dummy = dummy.c
 SOURCES_gestures = gestures.c
 SOURCES_netsync = netsync.c
@@ -22,6 +21,19 @@ libvlc_LTLIBRARIES += \
 	libnetsync_plugin.la \
 	libhotkeys_plugin.la \
 	liboldrc_plugin.la
+
+libdbus_plugin_la_SOURCES = \
+	dbus/dbus_introspect.h dbus/dbus_common.h \
+	dbus/dbus_root.c dbus/dbus_root.h \
+	dbus/dbus_player.c dbus/dbus/player.h \
+	dbus/dbus_tracklist.c dbus/dbus/tracklist.h \
+	dbus/dbus.c
+libdbus_plugin_la_CFLAGS = $(AM_CFLAGS) $(DBUS_CFLAGS)
+libdbus_plugin_la_LIBADD = $(AM_LIBADD) $(DBUS_LIBS) $(LIBM)
+if HAVE_DBUS
+libvlc_LTLIBRARIES += libdbus_plugin.la
+endif
+
 if !HAVE_WIN32
 libglobalhotkeys_plugin_la_SOURCES = globalhotkeys/xcb.c
 libglobalhotkeys_plugin_la_CFLAGS = $(AM_CFLAGS) $(XCB_KEYSYMS_CFLAGS) $(XCB_CFLAGS)

@@ -45,7 +45,6 @@
 #endif
 
 #include <dbus/dbus.h>
-#include "dbus.h"
 #include "dbus_common.h"
 #include "dbus_root.h"
 #include "dbus_player.h"
@@ -67,9 +66,22 @@
 #include <errno.h>
 #include <unistd.h>
 
+#define DBUS_MPRIS_BUS_NAME "org.mpris.MediaPlayer2.vlc"
+#define DBUS_INSTANCE_ID_PREFIX "instance"
+
+#define SEEK_THRESHOLD 1000 /* µsec */
+
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
+
+static DBusHandlerResult
+MPRISEntryPoint ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this );
+
+static const DBusObjectPathVTable dbus_mpris_vtable = {
+        NULL, MPRISEntryPoint, /* handler function */
+        NULL, NULL, NULL, NULL
+};
 
 typedef struct
 {
