@@ -365,7 +365,6 @@ $Id$
  * waveout: simple audio output module for Windows
  * win32text: Text renderer using native Win32 API
  * windrive: Windows logical disc drives
- * wingapi: Win CE video output
  * wingdi: WIN 32 / WIN CE GDI video output
  * wma_fixed: wma decoder using integer decoder from Rockbox
  * x26410b: H264 10 bit video encoder using X264

@@ -870,15 +870,9 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         return DefWindowProc(hwnd, message, wParam, lParam);
 
     case WM_KILLFOCUS:
-#ifdef MODULE_NAME_IS_wingapi
-        GXSuspend();
-#endif
         return 0;
 
     case WM_SETFOCUS:
-#ifdef MODULE_NAME_IS_wingapi
-        GXResume();
-#endif
         return 0;
 
     default:

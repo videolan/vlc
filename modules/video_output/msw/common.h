@@ -28,40 +28,6 @@
 #include <vlc_picture_pool.h>
 #include "events.h"
 
-#ifdef MODULE_NAME_IS_wingapi
-    typedef struct GXDisplayProperties {
-        DWORD cxWidth;
-        DWORD cyHeight;
-        long cbxPitch;
-        long cbyPitch;
-        long cBPP;
-        DWORD ffFormat;
-    } GXDisplayProperties;
-
-    typedef struct GXScreenRect {
-        DWORD dwTop;
-        DWORD dwLeft;
-        DWORD dwWidth;
-        DWORD dwHeight;
-    } GXScreenRect;
-
-#   define GX_FULLSCREEN    0x01
-#   define GX_NORMALKEYS    0x02
-#   define GX_LANDSCAPEKEYS 0x03
-
-#   ifndef kfLandscape
-#       define kfLandscape      0x8
-#       define kfPalette        0x10
-#       define kfDirect         0x20
-#       define kfDirect555      0x40
-#       define kfDirect565      0x80
-#       define kfDirect888      0x100
-#       define kfDirect444      0x200
-#       define kfDirectInverted 0x400
-#   endif
-
-#endif
-
 /*****************************************************************************
  * vout_sys_t: video output method descriptor
  *****************************************************************************
@@ -193,7 +159,7 @@ struct vout_display_sys_t
     bool           desktop_requested;
 #endif
 
-#if defined(MODULE_NAME_IS_wingdi) || defined(MODULE_NAME_IS_wingapi)
+#if defined(MODULE_NAME_IS_wingdi)
     int  i_depth;
 
     /* Our offscreen bitmap and its framebuffer */
@@ -207,31 +173,8 @@ struct vout_display_sys_t
         RGBQUAD    green;
         RGBQUAD    blue;
     };
-
-#   ifdef MODULE_NAME_IS_wingapi
-    HINSTANCE  gapi_dll;                   /* handle of the opened gapi dll */
-
-    /* GAPI functions */
-    int (*GXOpenDisplay)(HWND hWnd, DWORD dwFlags);
-    int (*GXCloseDisplay)();
-    void *(*GXBeginDraw)();
-    int (*GXEndDraw)();
-    GXDisplayProperties (*GXGetDisplayProperties)();
-    int (*GXSuspend)();
-    int (*GXResume)();
-#   endif
 #endif
 };
-
-#ifdef MODULE_NAME_IS_wingapi
-#   define GXOpenDisplay          vd->sys->GXOpenDisplay
-#   define GXCloseDisplay         vd->sys->GXCloseDisplay
-#   define GXBeginDraw            vd->sys->GXBeginDraw
-#   define GXEndDraw              vd->sys->GXEndDraw
-#   define GXGetDisplayProperties vd->sys->GXGetDisplayProperties
-#   define GXSuspend              vd->sys->GXSuspend
-#   define GXResume               vd->sys->GXResume
-#endif
 
 /*****************************************************************************
  * Prototypes from common.c

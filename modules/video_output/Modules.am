@@ -129,9 +129,6 @@ if HAVE_WIN32
 libvlc_LTLIBRARIES += libwingdi_plugin.la
 endif
 
-SOURCES_wingapi = msw/wingdi.c \
-	msw/common.c msw/common.h msw/events.c msw/events.h
-
 libdrawable_plugin_la_SOURCES = drawable.c
 libdrawable_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdrawable_plugin_la_LIBADD = $(AM_LIBADD)

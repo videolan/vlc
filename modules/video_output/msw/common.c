@@ -359,10 +359,6 @@ void UpdateRects(vout_display_t *vd,
     vout_display_PlacePicture(&place, source, &place_cfg, false);
 
     EventThreadUpdateSourceAndPlace(sys->event, source, &place);
-#if defined(MODULE_NAME_IS_wingapi)
-    if (place.width != vd->fmt.i_width || place.height != vd->fmt.i_height)
-        vout_display_SendEventPicturesInvalid(vd);
-#endif
 
     if (sys->hvideownd)
         SetWindowPos(sys->hvideownd, 0,

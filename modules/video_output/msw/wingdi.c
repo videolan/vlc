@@ -53,15 +53,9 @@ static void Close(vlc_object_t *);
 vlc_module_begin ()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-#ifdef MODULE_NAME_IS_wingapi
-    set_shortname("GAPI")
-    set_description(N_("Windows GAPI video output"))
-    set_capability("vout display", 120)
-#else
     set_shortname("GDI")
     set_description(N_("Windows GDI video output"))
     set_capability("vout display", 110)
-#endif
     set_callbacks(Open, Close)
 vlc_module_end ()
 
@@ -86,41 +80,6 @@ static int Open(vlc_object_t *object)
     vd->sys = sys = calloc(1, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
-
-#ifdef MODULE_NAME_IS_wingapi
-    /* Load GAPI */
-    sys->gapi_dll = LoadLibrary(_T("GX.DLL"));
-    if (!sys->gapi_dll) {
-        msg_Warn(vd, "failed loading gx.dll");
-        free(sys);
-        return VLC_EGENERIC;
-    }
-
-    GXOpenDisplay = (void *)GetProcAddress(sys->gapi_dll,
-        _T("?GXOpenDisplay@@YAHPAUHWND__@@K@Z"));
-    GXCloseDisplay = (void *)GetProcAddress(sys->gapi_dll,
-        _T("?GXCloseDisplay@@YAHXZ"));
-    GXBeginDraw = (void *)GetProcAddress(sys->gapi_dll,
-        _T("?GXBeginDraw@@YAPAXXZ"));
-    GXEndDraw = (void *)GetProcAddress(sys->gapi_dll,
-        _T("?GXEndDraw@@YAHXZ"));
-    GXGetDisplayProperties = (void *)GetProcAddress(sys->gapi_dll,
-        _T("?GXGetDisplayProperties@@YA?AUGXDisplayProperties@@XZ"));
-    GXSuspend = (void *)GetProcAddress(sys->gapi_dll,
-        _T("?GXSuspend@@YAHXZ"));
-    GXResume = GetProcAddress(sys->gapi_dll,
-        _T("?GXResume@@YAHXZ"));
-
-    if (!GXOpenDisplay || !GXCloseDisplay ||
-        !GXBeginDraw || !GXEndDraw ||
-        !GXGetDisplayProperties || !GXSuspend || !GXResume) {
-        msg_Err(vd, "failed GetProcAddress on gapi.dll");
-        free(sys);
-        return VLC_EGENERIC;
-    }
-
-    msg_Dbg(vd, "GAPI DLL loaded");
-#endif
 
     if (CommonInit(vd))
         goto error;
@@ -161,10 +120,6 @@ static void Close(vlc_object_t *object)
 
     CommonClean(vd);
 
-#ifdef MODULE_NAME_IS_wingapi
-    FreeLibrary(vd->sys->gapi_dll);
-#endif
-
     free(vd->sys);
 }
 
@@ -178,9 +133,6 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 {
     vout_display_sys_t *sys = vd->sys;
 
-#ifdef MODULE_NAME_IS_wingapi
-    /* */
-#else
 #define rect_src vd->sys->rect_src
 #define rect_src_clipped vd->sys->rect_src_clipped
 #define rect_dest vd->sys->rect_dest
@@ -214,7 +166,6 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 #undef rect_src_clipped
 #undef rect_dest
 #undef rect_dest_clipped
-#endif
     /* TODO */
     picture_Release(picture);
     VLC_UNUSED(subpicture);
@@ -237,45 +188,6 @@ static void Manage(vout_display_t *vd)
     CommonManage(vd);
 }
 
-#ifdef MODULE_NAME_IS_wingapi
-struct picture_sys_t {
-    vout_display_t *vd;
-};
-
-static int Lock(picture_t *picture)
-{
-    vout_display_t *vd = picture->p_sys->vd;
-    vout_display_sys_t *sys = vd->sys;
-
-    /* */
-    if (sys->rect_dest_clipped.right  - sys->rect_dest_clipped.left != vd->fmt.i_width ||
-        sys->rect_dest_clipped.bottom - sys->rect_dest_clipped.top  != vd->fmt.i_height)
-        return VLC_EGENERIC;
-
-    /* */
-    GXDisplayProperties gxdisplayprop = GXGetDisplayProperties();
-    uint8_t *p_pic_buffer = GXBeginDraw();
-    if (!p_pic_buffer) {
-        msg_Err(vd, "GXBeginDraw error %d ", GetLastError());
-        return VLC_EGENERIC;
-    }
-    p_pic_buffer += sys->rect_dest.top  * gxdisplayprop.cbyPitch +
-                    sys->rect_dest.left * gxdisplayprop.cbxPitch;
-
-    /* */
-    picture->p[0].i_pitch  = gxdisplayprop.cbyPitch;
-    picture->p[0].p_pixels = p_pic_buffer;
-
-    return VLC_SUCCESS;
-}
-static void Unlock(picture_t *picture)
-{
-    vout_display_t *vd = picture->p_sys->vd;
-
-    GXEndDraw();
-}
-#endif
-
 static int Init(vout_display_t *vd,
                 video_format_t *fmt, int width, int height)
 {
@@ -285,13 +197,8 @@ static int Init(vout_display_t *vd,
     RECT *display = &sys->rect_display;
     display->left   = 0;
     display->top    = 0;
-#ifdef MODULE_NAME_IS_wingapi
-    display->right  = GXGetDisplayProperties().cxWidth;
-    display->bottom = GXGetDisplayProperties().cyHeight;
-#else
     display->right  = GetSystemMetrics(SM_CXSCREEN);;
     display->bottom = GetSystemMetrics(SM_CYSCREEN);;
-#endif
 
     /* Initialize an offscreen bitmap for direct buffer operations. */
 
@@ -299,14 +206,8 @@ static int Init(vout_display_t *vd,
     HDC window_dc = GetDC(sys->hvideownd);
 
     /* */
-#ifdef MODULE_NAME_IS_wingapi
-    GXDisplayProperties gx_displayprop = GXGetDisplayProperties();
-    sys->i_depth = gx_displayprop.cBPP;
-#else
-
     sys->i_depth = GetDeviceCaps(window_dc, PLANES) *
                    GetDeviceCaps(window_dc, BITSPIXEL);
-#endif
 
     /* */
     msg_Dbg(vd, "GDI depth is %i", sys->i_depth);
@@ -347,14 +248,6 @@ static int Init(vout_display_t *vd,
 
     void *p_pic_buffer;
     int     i_pic_pitch;
-#ifdef MODULE_NAME_IS_wingapi
-    GXOpenDisplay(sys->hvideownd, GX_FULLSCREEN);
-    EventThreadUpdateTitle(sys->event, VOUT_TITLE " (WinGAPI output)");
-
-    /* Filled by pool::lock() */
-    p_pic_buffer = NULL;
-    i_pic_pitch  = 0;
-#else
     /* Initialize offscreen bitmap */
     BITMAPINFO *bi = &sys->bitmapinfo;
     memset(bi, 0, sizeof(BITMAPINFO) + 3 * sizeof(RGBQUAD));
@@ -390,17 +283,10 @@ static int Init(vout_display_t *vd,
     ReleaseDC(sys->hvideownd, window_dc);
 
     EventThreadUpdateTitle(sys->event, VOUT_TITLE " (WinGDI output)");
-#endif
 
     /* */
     picture_resource_t rsc;
     memset(&rsc, 0, sizeof(rsc));
-#ifdef MODULE_NAME_IS_wingapi
-    rsc.p_sys = malloc(sizeof(*rsc.p_sys));
-    if (!rsc.p_sys)
-        return VLC_EGENERIC;
-    rsc.p_sys->vd = vd;
-#endif
     rsc.p[0].p_pixels = p_pic_buffer;
     rsc.p[0].i_lines  = fmt->i_height;
     rsc.p[0].i_pitch  = i_pic_pitch;;
@@ -411,10 +297,6 @@ static int Init(vout_display_t *vd,
         memset(&cfg, 0, sizeof(cfg));
         cfg.picture_count = 1;
         cfg.picture = &picture;
-#ifdef MODULE_NAME_IS_wingapi
-        cfg.lock    = Lock;
-        cfg.unlock  = Unlock;
-#endif
         sys->pool = picture_pool_NewExtended(&cfg);
     } else {
         free(rsc.p_sys);
@@ -434,13 +316,8 @@ static void Clean(vout_display_t *vd)
         picture_pool_Delete(sys->pool);
     sys->pool = NULL;
 
-#ifdef MODULE_NAME_IS_wingapi
-    GXCloseDisplay();
-#else
     if (sys->off_dc)
         DeleteDC(sys->off_dc);
     if (sys->off_bitmap)
         DeleteObject(sys->off_bitmap);
-#endif
 }
-
