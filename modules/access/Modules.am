@@ -1,4 +1,4 @@
-SUBDIRS = mms rtp screen vcd vcdx zip
+SUBDIRS = mms rtp vcd vcdx zip
 
 libfilesystem_plugin_la_SOURCES = \
 	fs.h \
@@ -143,6 +143,19 @@ libxcb_screen_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XCB_LIBS) $(XCB_COMPOSITE_LIBS)
 if HAVE_XCB
 libvlc_LTLIBRARIES += libxcb_screen_plugin.la
+endif
+
+libscreen_plugin_la_SOURCES = screen/screen.c screen/screen.h
+libscreen_plugin_la_CFLAGS = $(AM_CFLAGS)
+libscreen_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libscreen_plugin_la_SOURCES += screen/win32.c
+libscreen_plugin_la_LIBADD += -lgdi32
+libvlc_LTLIBRARIES += libscreen_plugin.la
+endif
+if HAVE_DARWIN
+libscreen_plugin_la_SOURCES += screen/mac.c
+libvlc_LTLIBRARIES += $(LTLIBscreen)
 endif
 
 

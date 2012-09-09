@@ -1911,9 +1911,6 @@ if test "${enable_screen}" != "no"; then
         VLC_ADD_LIBS([screen],[-Wl,-framework,OpenGL,-framework,ApplicationServices])
       ])
     ])
-  elif test "${SYS}" = "mingw32"; then
-    VLC_ADD_PLUGIN([screen])
-    VLC_ADD_LIBS([screen],[-lgdi32])
   fi
 fi
 
@@ -4135,7 +4132,6 @@ AC_CONFIG_FILES([
   modules/access/rtp/Makefile
   modules/access/vcd/Makefile
   modules/access/vcdx/Makefile
-  modules/access/screen/Makefile
   modules/access/zip/Makefile
   modules/access/zip/unzip/Makefile
   modules/access_output/Makefile
