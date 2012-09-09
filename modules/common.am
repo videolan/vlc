@@ -26,12 +26,13 @@ endif
 AM_CFLAGS =
 AM_CXXFLAGS =
 AM_OBJCFLAGS =
+AM_LIBADD = $(LIBPTHREAD)
 AM_LDFLAGS = -rpath '$(libvlcdir)' \
 	-avoid-version -module \
 	-export-symbols-regex ^vlc_entry \
 	-shrext $(LIBEXT) \
-	-no-undefined
-AM_LIBADD = $(LTLIBVLCCORE) $(top_builddir)/compat/libcompat.la $(LIBPTHREAD)
+	-no-undefined \
+	$(LTLIBVLCCORE) $(top_builddir)/compat/libcompat.la
 
 include $(srcdir)/Modules.am
 
