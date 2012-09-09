@@ -1,7 +1,0 @@
-SOURCES_avi = \
-	avi.c \
-	libavi.c \
-	libavi.h \
-	$(NULL)
-
-libvlc_LTLIBRARIES += libavi_plugin.la
