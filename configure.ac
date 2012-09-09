@@ -4091,7 +4091,6 @@ AC_CONFIG_FILES([
   modules/lua/Makefile
   modules/meta_engine/Makefile
   modules/misc/Makefile
-  modules/misc/playlist/Makefile
   modules/misc/osd/Makefile
   modules/misc/stats/Makefile
   modules/media_library/Makefile
