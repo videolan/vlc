@@ -1,6 +1,0 @@
-SOURCES_vcd = \
-	vcd.c \
-	cdrom.c \
-	cdrom.h \
-	cdrom_internals.h \
-	$(NULL)
