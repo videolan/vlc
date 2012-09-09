@@ -368,7 +368,7 @@ static vlc_v4l2_ctrl_t *ControlAddInteger (vlc_object_t *obj, int fd,
                                            const struct v4l2_queryctrl *query)
 {
     msg_Dbg (obj, " integer  %s (%08"PRIX32")", query->name, query->id);
-    if (query->flags & (CTRL_FLAGS_IGNORE | V4L2_CTRL_FLAG_WRITE_ONLY))
+    if (query->flags & CTRL_FLAGS_IGNORE)
         return NULL;
 
     vlc_v4l2_ctrl_t *c = ControlCreate (fd, query);
@@ -409,7 +409,7 @@ static vlc_v4l2_ctrl_t *ControlAddBoolean (vlc_object_t *obj, int fd,
                                            const struct v4l2_queryctrl *query)
 {
     msg_Dbg (obj, " boolean  %s (%08"PRIX32")", query->name, query->id);
-    if (query->flags & (CTRL_FLAGS_IGNORE | V4L2_CTRL_FLAG_WRITE_ONLY))
+    if (query->flags & CTRL_FLAGS_IGNORE)
         return NULL;
 
     vlc_v4l2_ctrl_t *c = ControlCreate (fd, query);
@@ -442,7 +442,7 @@ static vlc_v4l2_ctrl_t *ControlAddMenu (vlc_object_t *obj, int fd,
                                         const struct v4l2_queryctrl *query)
 {
     msg_Dbg (obj, " menu     %s (%08"PRIX32")", query->name, query->id);
-    if (query->flags & (CTRL_FLAGS_IGNORE | V4L2_CTRL_FLAG_WRITE_ONLY))
+    if (query->flags & CTRL_FLAGS_IGNORE)
         return NULL;
 
     vlc_v4l2_ctrl_t *c = ControlCreate (fd, query);
@@ -515,7 +515,7 @@ static vlc_v4l2_ctrl_t *ControlAddInteger64 (vlc_object_t *obj, int fd,
                                             const struct v4l2_queryctrl *query)
 {
     msg_Dbg (obj, " 64-bits  %s (%08"PRIX32")", query->name, query->id);
-    if (query->flags & (CTRL_FLAGS_IGNORE | V4L2_CTRL_FLAG_WRITE_ONLY))
+    if (query->flags & CTRL_FLAGS_IGNORE)
         return NULL;
 
     vlc_v4l2_ctrl_t *c = ControlCreate (fd, query);
@@ -559,8 +559,7 @@ static vlc_v4l2_ctrl_t *ControlAddString (vlc_object_t *obj, int fd,
                                           const struct v4l2_queryctrl *query)
 {
     msg_Dbg (obj, " string   %s (%08"PRIX32")", query->name, query->id);
-    if (query->flags & (CTRL_FLAGS_IGNORE | V4L2_CTRL_FLAG_WRITE_ONLY)
-     || query->maximum > 65535)
+    if ((query->flags & CTRL_FLAGS_IGNORE) || query->maximum > 65535)
         return NULL;
 
     vlc_v4l2_ctrl_t *c = ControlCreate (fd, query);
@@ -606,7 +605,7 @@ static vlc_v4l2_ctrl_t *ControlAddBitMask (vlc_object_t *obj, int fd,
                                            const struct v4l2_queryctrl *query)
 {
     msg_Dbg (obj, " bit mask %s (%08"PRIX32")", query->name, query->id);
-    if (query->flags & (CTRL_FLAGS_IGNORE | V4L2_CTRL_FLAG_WRITE_ONLY))
+    if (query->flags & CTRL_FLAGS_IGNORE)
         return NULL;
 
     vlc_v4l2_ctrl_t *c = ControlCreate (fd, query);
@@ -642,7 +641,7 @@ static vlc_v4l2_ctrl_t *ControlAddIntMenu (vlc_object_t *obj, int fd,
                                            const struct v4l2_queryctrl *query)
 {
     msg_Dbg (obj, " int menu %s (%08"PRIX32")", query->name, query->id);
-    if (query->flags & (CTRL_FLAGS_IGNORE | V4L2_CTRL_FLAG_WRITE_ONLY))
+    if (query->flags & CTRL_FLAGS_IGNORE)
         return NULL;
 
     vlc_v4l2_ctrl_t *c = ControlCreate (fd, query);
