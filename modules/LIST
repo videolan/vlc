@@ -27,7 +27,6 @@ $Id$
  * access_rar: RAR access
  * access_realrtsp: Real RTSP access
  * access_sftp: SFTP network access module
- * access_shm: Shared memory framebuffer access module
  * access_smb: SMB shares access module
  * access_tcp: TCP Network access module
  * access_udp: UDP Network access module
@@ -285,6 +284,7 @@ $Id$
  * sepia: Sepia video filter
  * sharpen: Sharpen video filter
  * shine: MP3 encoder using Shine, a fixed point implementation
+ * shm: Shared memory framebuffer access module
  * sid: Sidplay demuxer
  * simple_channel_mixer: channel mixer
  * skins2: Skinnable interface, new generation

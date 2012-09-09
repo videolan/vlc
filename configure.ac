@@ -1054,10 +1054,8 @@ ALIASES="${ALIASES} cvlc rvlc"
 dnl
 dnl Some plugins aren't useful on some platforms
 dnl
-if test "${SYS}" = "os2"; then
+if test "${SYS}" != "mingw32"; then
     VLC_ADD_PLUGIN([dynamicoverlay])
-elif test "${SYS}" != "mingw32"; then
-    VLC_ADD_PLUGIN([dynamicoverlay access_shm])
 elif test "${SYS}" = "darwin"; then
     VLC_ADD_LIBS([quartztext],[-Wl,-framework,ApplicationServices])
 fi
