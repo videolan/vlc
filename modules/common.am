@@ -31,7 +31,7 @@ AM_LDFLAGS = -rpath '$(libvlcdir)' \
 	-export-symbols-regex ^vlc_entry \
 	-shrext $(LIBEXT) \
 	-no-undefined
-AM_LIBADD = $(LTLIBVLCCORE) $(top_builddir)/compat/libcompat.la $(LIBS_plugin)
+AM_LIBADD = $(LTLIBVLCCORE) $(top_builddir)/compat/libcompat.la $(LIBPTHREAD)
 
 include $(srcdir)/Modules.am
 

@@ -30,7 +30,7 @@ vlc_wrapper_SOURCES = rootwrap.c
 vlc_wrapper_LDADD = $(SOCKET_LIBS)
 
 vlc_LDFLAGS = $(LDFLAGS_vlc)
-vlc_LDADD = ../lib/libvlc.la $(LIBS_vlc)
+vlc_LDADD = ../lib/libvlc.la $(LIBPTHREAD)
 
 vlc_static_SOURCES = $(vlc_SOURCES)
 vlc_static_CFLAGS = $(AM_CFLAGS) \

@@ -658,12 +658,14 @@ AC_SUBST(LIBDL)
 VLC_ADD_LIBS([lua],[$LIBDL])
 
 dnl Check for thread library
-if test "${SYS}" != "mingw32"; then
-
+LIBPTHREAD=""
+AS_IF([test "${SYS}" != "mingw32"], [
   VLC_SAVE_FLAGS
   LIBS=""
   AC_SEARCH_LIBS(pthread_rwlock_init, pthread pthreads c_r, [
-    VLC_ADD_LIBS([libvlccore libvlc vlc plugin],[${LIBS}])
+    AS_IF([test "$ac_cv_search_pthread_rwlock_init" != "none required"], [
+      LIBPTHREAD="$ac_cv_search_pthread_rwlock_init"
+    ])
   ])
   VLC_RESTORE_FLAGS
 
@@ -682,7 +684,8 @@ if test "${SYS}" != "mingw32"; then
     dnl HP/UX port
     AC_CHECK_LIB(rt,sem_init, [VLC_ADD_LIBS([libvlccore],[-lrt])])
   ])
-fi # end "${SYS}" != "mingw32"
+])
+AC_SUBST(LIBPTHREAD)
 
 dnl Check for headers
 AC_CHECK_HEADERS([search.h])

@@ -189,7 +189,7 @@ libvlccore_la_LDFLAGS = \
 libvlccore_la_LIBADD = $(LIBS_libvlccore) \
 	../compat/libcompat.la \
 	$(LTLIBINTL) $(LTLIBICONV) \
-	$(IDN_LIBS) $(SOCKET_LIBS) $(LIBDL) $(LIBM)
+	$(IDN_LIBS) $(LIBPTHREAD) $(SOCKET_LIBS) $(LIBDL) $(LIBM)
 libvlccore_la_DEPENDENCIES = libvlccore.sym
 if HAVE_WIN32
 libvlccore_la_DEPENDENCIES += libvlc_win32_rc.$(OBJEXT)
