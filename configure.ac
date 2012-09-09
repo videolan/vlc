@@ -157,7 +157,7 @@ case "${host_os}" in
     LDFLAGS="${LDFLAGS} -Wl,-headerpad_max_install_names ${ARCH_flag}"
     VLC_ADD_LIBS([motion], [-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup,-framework,Appkit])
-    VLC_ADD_LIBS([avcodec avformat access_avio swscale postproc i420_rgb_mmx x264 x26410b],[-Wl,-read_only_relocs,suppress])
+    VLC_ADD_LIBS([avcodec access_avio swscale postproc i420_rgb_mmx x264 x26410b],[-Wl,-read_only_relocs,suppress])
     VLC_ADD_CFLAGS([motion],[-fconstant-cfstrings])
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation])
 
@@ -619,7 +619,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom panoramix rotate noise grain scene kate flac lua chorus_flanger freetype avcodec avformat access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a speex opus mono colorthres extract ball access_imem hotkeys mosaic gaussianblur x26410b hqdn3d anaglyph oldrc ncurses],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom panoramix rotate noise grain scene kate flac lua chorus_flanger freetype avcodec access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a speex opus mono colorthres extract ball access_imem hotkeys mosaic gaussianblur x26410b hqdn3d anaglyph oldrc ncurses],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -2393,10 +2393,10 @@ then
       AC_CHECK_HEADERS(libavutil/avutil.h)
       AS_IF([test "$enable_merge_ffmpeg" = "no"], [
         VLC_ADD_PLUGIN([avformat access_avio])
-        VLC_ADD_LIBS([avformat access_avio],[$AVFORMAT_LIBS $AVUTIL_LIBS])
-        VLC_ADD_CFLAGS([avformat access_avio],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
+        VLC_ADD_LIBS([access_avio],[$AVFORMAT_LIBS $AVUTIL_LIBS])
+        VLC_ADD_CFLAGS([access_avio],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
         AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
-          VLC_ADD_LIBS([avformat access_avio],[-Wl,-Bsymbolic])
+          VLC_ADD_LDFLAGS([avformat access_avio],[-Wl,-Bsymbolic])
         ])
       ], [
         VLC_ADD_LIBS([avcodec],[$AVFORMAT_LIBS $AVUTIL_LIBS])
@@ -4075,7 +4075,6 @@ AC_CONFIG_FILES([
   modules/codec/wmafixed/Makefile
   modules/control/Makefile
   modules/demux/Makefile
-  modules/demux/avformat/Makefile
   modules/gui/Makefile
   modules/gui/macosx/Makefile
   modules/gui/minimal_macosx/Makefile

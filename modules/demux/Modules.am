@@ -1,4 +1,3 @@
-SUBDIRS = avformat
 SOURCES_flacsys = flac.c
 SOURCES_ogg = ogg.c ogg.h oggseek.c oggseek.h vorbis.h kate_categories.c \
 	kate_categories.h xiph.h
@@ -41,6 +40,29 @@ libasf_plugin_la_LIBADD = $(AM_LIBADD)
 libavi_plugin_la_SOURCES = avi/avi.c avi/libavi.c avi/libavi.h
 libavi_plugin_la_CFLAGS = $(AM_CFLAGS)
 libavi_plugin_la_LIBADD = $(AM_LIBADD)
+
+libavformat_plugin_la_SOURCES = avformat/demux.c \
+	../codec/avcodec/fourcc.c \
+	../codec/avcodec/chroma.c \
+	../codec/avcodec/avcommon.h \
+	vobsub.h \
+	avformat/avformat.c avformat/avformat.h
+if ENABLE_SOUT
+libavformat_plugin_la_SOURCES += avformat/mux.c
+endif
+libavformat_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVFORMAT_CFLAGS) $(AVUTIL_CFLAGS)
+libavformat_plugin_la_LIBADD = $(AM_LIBADD) $(AVFORMAT_LIBS) $(AVUTIL_LIBS) \
+				$(LIBM)
+libavformat_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_avformat)
+if HAVE_ZLIB
+libavformat_plugin_la_LIBADD += -lz
+endif
+if HAVE_DARWIN
+libavformat_plugin_la_LDFLAGS += -Wl,-read_only_relocs,suppress
+endif
+
+libvlc_LTLIBRARIES += $(LTLIBavformat)
+EXTRA_LTLIBRARIES += libavformat_plugin.la
 
 libes_plugin_la_SOURCES  = mpeg/es.c
 libes_plugin_la_CFLAGS = $(AM_CFLAGS)
