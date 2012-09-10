@@ -29,7 +29,7 @@ case $host in
 i?86-apple-darwin*)
     pic_options='-fno-common'
     ;;
-*mingw*)
+*mingw*|*nacl*)
     pic_options=''
     ;;
 *)
@@ -38,8 +38,9 @@ i?86-apple-darwin*)
 esac
 if test x$dolt_supported = xno ; then
     AC_MSG_RESULT([no, falling back to libtool])
-    LTCOMPILE='$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(COMPILE)'
-    LTCXXCOMPILE='$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXXCOMPILE)'
+    LTCOMPILE='$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(COMPILE)'
+    LTCXXCOMPILE='$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXXCOMPILE)'
+    m4_pattern_allow([AM_V_lt])
 else
     AC_MSG_RESULT([yes, replacing libtool])
 
