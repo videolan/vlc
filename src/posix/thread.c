@@ -143,7 +143,7 @@ static inline unsigned long vlc_threadid (void)
 {
 #if defined (__linux__)
      /* glibc does not provide a call for this */
-     return syscall (SYS_gettid);
+     return syscall (__NR_gettid);
 
 #else
      union { pthread_t th; unsigned long int i; } v = { };
