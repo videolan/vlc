@@ -276,6 +276,35 @@ AM_CONDITIONAL(HAVE_WIN64,   test "${HAVE_WIN64}" = "1")
 AM_CONDITIONAL(HAVE_SYMBIAN, test "${SYS}" = "symbian")
 
 dnl
+dnl Sadly autoconf does not think about testing foo.exe when ask to test
+dnl for program foo on win32
+case "${build_os}" in
+    cygwin|msys)
+        ac_executable_extensions=".exe"
+    ;;
+    *)
+    ;;
+esac
+
+dnl Android is linux, but a bit different
+AS_IF([test "$SYS" = linux],[
+    AC_MSG_CHECKING([for an Android system])
+    AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
+        [[#ifndef __ANDROID__
+         # error Not Android
+         #endif
+        ]],[[;]])
+    ],[
+      HAVE_ANDROID="1"
+      AC_MSG_RESULT([yes])
+    ],[
+      AC_MSG_RESULT([no])
+    ])
+])
+AM_CONDITIONAL(HAVE_ANDROID, test "${HAVE_ANDROID}" = "1")
+
+
+dnl
 dnl  Check for the contrib directory
 dnl
 AC_ARG_WITH(contrib,
@@ -344,35 +373,6 @@ AS_IF([test -n "${CONTRIB_DIR}"], [
   ])
 ])
 AC_SUBST(CONTRIB_DIR)
-
-dnl
-dnl Sadly autoconf does not think about testing foo.exe when ask to test
-dnl for program foo on win32
-
-case "${build_os}" in
-    cygwin|msys)
-        ac_executable_extensions=".exe"
-    ;;
-    *)
-    ;;
-esac
-
-dnl Android is linux, but a bit different
-AS_IF([test "$SYS" = linux],[
-    AC_MSG_CHECKING([for an Android system])
-    AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
-        [[#ifndef __ANDROID__
-         # error Not Android
-         #endif
-        ]],[[;]])
-    ],[
-      HAVE_ANDROID="1"
-      AC_MSG_RESULT([yes])
-    ],[
-      AC_MSG_RESULT([no])
-    ])
-])
-AM_CONDITIONAL(HAVE_ANDROID, test "${HAVE_ANDROID}" = "1")
 
 dnl
 dnl  Libtool
