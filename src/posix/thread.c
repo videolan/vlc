@@ -33,31 +33,26 @@
 
 #include "libvlc.h"
 #include <stdarg.h>
-#include <assert.h>
-#include <unistd.h> /* fsync() */
 #include <signal.h>
 #include <errno.h>
 #include <time.h>
+#include <assert.h>
 
+#include <sys/types.h>
+#include <unistd.h> /* fsync() */
 #include <pthread.h>
 #include <sched.h>
-#include <sys/time.h> /* gettimeofday() */
 
 #ifdef __linux__
 # include <sys/syscall.h> /* SYS_gettid */
 #endif
-
 #ifdef HAVE_EXECINFO_H
 # include <execinfo.h>
 #endif
-
 #ifdef __APPLE__
 # include <mach/mach_init.h> /* mach_task_self in semaphores */
 #endif
-
 #if defined(__SunOS)
-# include <unistd.h>
-# include <sys/types.h>
 # include <sys/processor.h>
 # include <sys/pset.h>
 #endif
