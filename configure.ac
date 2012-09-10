@@ -1877,7 +1877,6 @@ if test "${enable_screen}" != "no"; then
     AC_CHECK_HEADERS(OpenGL/gl.h, [
       AC_CHECK_HEADERS(ApplicationServices/ApplicationServices.h, [
         VLC_ADD_PLUGIN([screen])
-        VLC_ADD_LIBS([screen],[-Wl,-framework,OpenGL,-framework,ApplicationServices])
       ])
     ])
   fi
