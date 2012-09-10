@@ -136,7 +136,7 @@ if HAVE_WIN64
 	i686-w64-mingw32-g++ $^ -shared -o $@ -lole32
 	i686-w64-mingw32-strip $@
 else
-	$(CXX) $^ -shared -o $@ -lole32
+	$(CXX) $^ -D_WIN32_IE=0x0601 -D__forceinline=inline -shared -o $@ -lole32
 	$(STRIP) $@
 endif
 
