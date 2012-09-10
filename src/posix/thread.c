@@ -558,6 +558,7 @@ void vlc_rwlock_destroy (vlc_rwlock_t *lock)
 
 /**
  * Acquires a read/write lock for reading. Recursion is allowed.
+ * @note This function may be a point of cancellation.
  */
 void vlc_rwlock_rdlock (vlc_rwlock_t *lock)
 {
@@ -567,6 +568,7 @@ void vlc_rwlock_rdlock (vlc_rwlock_t *lock)
 
 /**
  * Acquires a read/write lock for writing. Recursion is not allowed.
+ * @note This function may be a point of cancellation.
  */
 void vlc_rwlock_wrlock (vlc_rwlock_t *lock)
 {
