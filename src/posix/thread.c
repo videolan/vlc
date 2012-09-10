@@ -154,11 +154,9 @@ static inline unsigned long vlc_threadid (void)
 }
 
 #ifndef NDEBUG
-/*****************************************************************************
- * vlc_thread_fatal: Report an error from the threading layer
- *****************************************************************************
- * This is mostly meant for debugging.
- *****************************************************************************/
+/**
+ * Reports a fatal error from the threading layer, for debugging purposes.
+ */
 static void
 vlc_thread_fatal (const char *action, int error,
                   const char *function, const char *file, unsigned line)
@@ -210,9 +208,9 @@ vlc_thread_fatal (const char *action, int error,
 int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
 #endif
 
-/*****************************************************************************
- * vlc_mutex_init: initialize a mutex
- *****************************************************************************/
+/**
+ * Initializes a fast mutex.
+ */
 void vlc_mutex_init( vlc_mutex_t *p_mutex )
 {
     pthread_mutexattr_t attr;
@@ -234,9 +232,10 @@ void vlc_mutex_init( vlc_mutex_t *p_mutex )
     pthread_mutexattr_destroy( &attr );
 }
 
-/*****************************************************************************
- * vlc_mutex_init: initialize a recursive mutex (Do not use)
- *****************************************************************************/
+/**
+ * Initializes a recursive mutex.
+ * \warning This is strongly discouraged. Please use normal mutexes.
+ */
 void vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 {
     pthread_mutexattr_t attr;
@@ -273,6 +272,9 @@ void vlc_mutex_destroy (vlc_mutex_t *p_mutex)
 #  define RUNNING_ON_VALGRIND (0)
 # endif
 
+/**
+ * Asserts that a mutex is locked by the calling thread.
+ */
 void vlc_assert_locked (vlc_mutex_t *p_mutex)
 {
     if (RUNNING_ON_VALGRIND > 0)
