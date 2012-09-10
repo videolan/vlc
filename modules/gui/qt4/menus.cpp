@@ -958,6 +958,7 @@ void VLCMenuBar::MiscPopupMenu( intf_thread_t *p_intf, bool show )
 {
     POPUP_BOILERPLATE
 
+    menu = new QMenu();
     if( p_input )
     {
         varnames.append( "audio-es" );
@@ -965,7 +966,6 @@ void VLCMenuBar::MiscPopupMenu( intf_thread_t *p_intf, bool show )
         menu->addSeparator();
     }
 
-    menu = new QMenu();
     Populate( p_intf, menu, varnames, objects );
 
     menu->addSeparator();
