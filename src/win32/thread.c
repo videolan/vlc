@@ -302,32 +302,6 @@ void vlc_sem_wait (vlc_sem_t *sem)
     while (result == WAIT_IO_COMPLETION);
 }
 
-/*** Read/write locks */
-#if 0
-/* SRW (Slim Read Write) locks are available in Vista+ only */
-void vlc_rwlock_init (vlc_rwlock_t *lock)
-{
-}
-
-void vlc_rwlock_destroy (vlc_rwlock_t *lock)
-{
-}
-
-void vlc_rwlock_rdlock (vlc_rwlock_t *lock)
-{
-}
-
-void vlc_rwlock_wrlock (vlc_rwlock_t *lock)
-{
-}
-
-void vlc_rwlock_unlock (vlc_rwlock_t *lock)
-{
-}
-#else
-# include "misc/rwlock.h"
-#endif
-
 /*** Thread-specific variables (TLS) ***/
 struct vlc_threadvar
 {

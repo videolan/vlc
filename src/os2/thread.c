@@ -428,8 +428,6 @@ void vlc_sem_wait (vlc_sem_t *sem)
     } while (rc == ERROR_INTERRUPT);
 }
 
-#include "misc/rwlock.h"
-
 /*** Thread-specific variables (TLS) ***/
 struct vlc_threadvar
 {
