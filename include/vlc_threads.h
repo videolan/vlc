@@ -159,17 +159,7 @@ typedef struct
 #define VLC_STATIC_COND { 0, 0 }
 
 typedef HANDLE  vlc_sem_t;
-
-typedef struct
-{
-    vlc_mutex_t   mutex;
-    vlc_cond_t    wait;
-    unsigned long readers;
-    DWORD         writer;
-} vlc_rwlock_t;
-#define VLC_STATIC_RWLOCK \
-    { VLC_STATIC_MUTEX, VLC_STATIC_COND, 0, 0 }
-
+typedef struct vlc_rwlock vlc_rwlock_t;
 typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 
@@ -189,7 +179,6 @@ typedef struct
         HMTX hmtx;
     };
 } vlc_mutex_t;
-
 #define VLC_STATIC_MUTEX { false, { { false, 0 } } }
 
 typedef struct
@@ -197,7 +186,6 @@ typedef struct
     HEV      hev;
     unsigned clock;
 } vlc_cond_t;
-
 #define VLC_STATIC_COND { 0, 0 }
 
 typedef struct
@@ -208,19 +196,20 @@ typedef struct
     int  count;
 } vlc_sem_t;
 
-typedef struct
-{
-    vlc_mutex_t   mutex;
-    vlc_cond_t    wait;
-    unsigned long readers;
-    int           writer;
-} vlc_rwlock_t;
-#define VLC_STATIC_RWLOCK \
-    { VLC_STATIC_MUTEX, VLC_STATIC_COND, 0, 0 }
-
+typedef struct vlc_rwlock vlc_rwlock_t;
 typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 
+#endif
+
+#ifndef VLC_STATIC_RWLOCK
+struct vlc_rwlock
+{
+    vlc_mutex_t   mutex;
+    vlc_cond_t    wait;
+    long          state;
+};
+# define VLC_STATIC_RWLOCK { VLC_STATIC_MUTEX, VLC_STATIC_COND, 0 }
 #endif
 
 #if defined( WIN32 ) && !defined ETIMEDOUT

@@ -269,6 +269,7 @@ SOURCES_libvlc_win32 = \
 	win32/dirs.c \
 	win32/filesystem.c \
 	win32/plugin.c \
+	misc/rwlock.h \
 	win32/thread.c \
 	win32/specific.c \
 	win32/winsock.c \
@@ -287,6 +288,7 @@ SOURCES_libvlc_os2 = \
 	os2/dirs.c \
 	os2/filesystem.c \
 	os2/plugin.c \
+	misc/rwlock.h \
 	os2/thread.c \
 	os2/specific.c \
 	os2/rand.c \

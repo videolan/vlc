@@ -303,81 +303,30 @@ void vlc_sem_wait (vlc_sem_t *sem)
 }
 
 /*** Read/write locks */
+#if 0
 /* SRW (Slim Read Write) locks are available in Vista+ only */
 void vlc_rwlock_init (vlc_rwlock_t *lock)
 {
-    vlc_mutex_init (&lock->mutex);
-    vlc_cond_init (&lock->wait);
-    lock->readers = 0; /* active readers */
-    lock->writer = 0; /* ID of active writer */
 }
 
 void vlc_rwlock_destroy (vlc_rwlock_t *lock)
 {
-    vlc_cond_destroy (&lock->wait);
-    vlc_mutex_destroy (&lock->mutex);
 }
 
 void vlc_rwlock_rdlock (vlc_rwlock_t *lock)
 {
-    vlc_mutex_lock (&lock->mutex);
-    /* Recursive read-locking is allowed. We only need to ensure that there is
-     * no active writer. */
-    while (lock->writer != 0)
-    {
-        assert (lock->readers == 0);
-        vlc_cond_wait (&lock->wait, &lock->mutex);
-    }
-    if (unlikely(lock->readers == ULONG_MAX))
-        abort ();
-    lock->readers++;
-    vlc_mutex_unlock (&lock->mutex);
-}
-
-static void vlc_rwlock_rdunlock (vlc_rwlock_t *lock)
-{
-    vlc_mutex_lock (&lock->mutex);
-    assert (lock->readers > 0);
-
-    /* If there are no readers left, wake up a writer. */
-    if (--lock->readers == 0)
-        vlc_cond_signal (&lock->wait);
-    vlc_mutex_unlock (&lock->mutex);
 }
 
 void vlc_rwlock_wrlock (vlc_rwlock_t *lock)
 {
-    vlc_mutex_lock (&lock->mutex);
-    /* Wait until nobody owns the lock in either way. */
-    while ((lock->readers > 0) || (lock->writer != 0))
-        vlc_cond_wait (&lock->wait, &lock->mutex);
-    assert (lock->writer == 0);
-    lock->writer = GetCurrentThreadId ();
-    vlc_mutex_unlock (&lock->mutex);
-}
-
-static void vlc_rwlock_wrunlock (vlc_rwlock_t *lock)
-{
-    vlc_mutex_lock (&lock->mutex);
-    assert (lock->writer == GetCurrentThreadId ());
-    assert (lock->readers == 0);
-    lock->writer = 0; /* Write unlock */
-
-    /* Let reader and writer compete. Scheduler decides who wins. */
-    vlc_cond_broadcast (&lock->wait);
-    vlc_mutex_unlock (&lock->mutex);
 }
 
 void vlc_rwlock_unlock (vlc_rwlock_t *lock)
 {
-    /* Note: If the lock is held for reading, lock->writer is nul.
-     * If the lock is held for writing, only this thread can store a value to
-     * lock->writer. Either way, lock->writer is safe to fetch here. */
-    if (lock->writer != 0)
-        vlc_rwlock_wrunlock (lock);
-    else
-        vlc_rwlock_rdunlock (lock);
 }
+#else
+# include "misc/rwlock.h"
+#endif
 
 /*** Thread-specific variables (TLS) ***/
 struct vlc_threadvar
