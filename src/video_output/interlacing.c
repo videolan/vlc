@@ -38,7 +38,7 @@
  * You can use the non vout filter if and only if the video properties stay the
  * same (width/height/chroma/fps), at least for now.
  */
-static const char *deinterlace_modes[] = {
+static const char deinterlace_modes[][9]= {
     ""
     "discard",
     "blend",
@@ -50,11 +50,11 @@ static const char *deinterlace_modes[] = {
     "yadif2x",
     "phosphor",
     "ivtc",
-    NULL
 };
+
 static bool DeinterlaceIsModeValid(const char *mode)
 {
-    for (unsigned i = 0; deinterlace_modes[i]; i++) {
+    for (unsigned i = 0; i < ARRAY_SIZE(deinterlace_modes); i++) {
         if (!strcmp(deinterlace_modes[i], mode))
             return true;
     }

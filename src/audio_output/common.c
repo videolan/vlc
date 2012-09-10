@@ -625,13 +625,12 @@ bool aout_CheckChannelExtraction( int *pi_selection,
 static int FilterOrder( const char *psz_name )
 {
     static const struct {
-        const char *psz_name;
+        const char psz_name[10];
         int        i_order;
     } filter[] = {
         { "equalizer",  0 },
-        { NULL,         INT_MAX },
     };
-    for( int i = 0; filter[i].psz_name; i++ )
+    for( unsigned i = 0; i < ARRAY_SIZE(filter); i++ )
     {
         if( !strcmp( filter[i].psz_name, psz_name ) )
             return filter[i].i_order;
@@ -742,6 +741,3 @@ bool aout_ChangeFilterString( vlc_object_t *p_obj, vlc_object_t *p_aout,
 
     return true;
 }
-
-
-

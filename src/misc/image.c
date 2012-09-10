@@ -531,7 +531,7 @@ static picture_t *ImageFilter( image_handler_t *p_image, picture_t *p_pic,
 static const struct
 {
     vlc_fourcc_t i_codec;
-    const char *psz_ext;
+    const char psz_ext[7];
 
 } ext_table[] =
 {
@@ -554,14 +554,11 @@ static const struct
     { VLC_CODEC_TIFF,              "tiff" },
     { VLC_FOURCC('l','b','m',' '), "lbm" },
     { VLC_CODEC_PPM,               "ppm" },
-    { 0, NULL }
 };
 
 vlc_fourcc_t image_Type2Fourcc( const char *psz_type )
 {
-    int i;
-
-    for( i = 0; ext_table[i].i_codec; i++ )
+    for( unsigned i = 0; i < ARRAY_SIZE(ext_table); i++ )
         if( !strcasecmp( ext_table[i].psz_ext, psz_type ) )
             return ext_table[i].i_codec;
 
@@ -580,12 +577,9 @@ vlc_fourcc_t image_Ext2Fourcc( const char *psz_name )
 /*
 static const char *Fourcc2Ext( vlc_fourcc_t i_codec )
 {
-    int i;
-
-    for( i = 0; ext_table[i].i_codec != 0; i++ )
-    {
-        if( ext_table[i].i_codec == i_codec ) return ext_table[i].psz_ext;
-    }
+    for( unsigned i = 0; i < ARRAY_SIZE(ext_table); i++ )
+        if( ext_table[i].i_codec == i_codec )
+            return ext_table[i].psz_ext;
 
     return NULL;
 }
