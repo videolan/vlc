@@ -203,11 +203,6 @@ vlc_thread_fatal (const char *action, int error,
 # define VLC_THREAD_ASSERT( action ) ((void)val)
 #endif
 
-#if defined (__GLIBC__) && (__GLIBC_MINOR__ < 6)
-/* This is not prototyped under glibc, though it exists. */
-int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
-#endif
-
 /**
  * Initializes a fast mutex.
  */
@@ -218,14 +213,9 @@ void vlc_mutex_init( vlc_mutex_t *p_mutex )
     if (unlikely(pthread_mutexattr_init (&attr)))
         abort();
 #ifdef NDEBUG
-    pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_NORMAL );
+    pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_DEFAULT);
 #else
-    /* Create error-checking mutex to detect problems more easily. */
-# if defined (__GLIBC__) && (__GLIBC__ == 2) && (__GLIBC_MINOR__ < 6)
-    pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_ERRORCHECK_NP );
-# else
-    pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_ERRORCHECK );
-# endif
+    pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_ERRORCHECK);
 #endif
     if (unlikely(pthread_mutex_init (p_mutex, &attr)))
         abort();
@@ -242,11 +232,7 @@ void vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 
     if (unlikely(pthread_mutexattr_init (&attr)))
         abort();
-#if defined (__GLIBC__) && (__GLIBC__ == 2) && (__GLIBC_MINOR__ < 6)
-    pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_RECURSIVE_NP );
-#else
-    pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_RECURSIVE );
-#endif
+    pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE);
     if (unlikely(pthread_mutex_init (p_mutex, &attr)))
         abort();
     pthread_mutexattr_destroy( &attr );
