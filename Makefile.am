@@ -576,7 +576,7 @@ EXTRA_DIST += \
 ###############################################################################
 
 CLEANFILES =
-DISTCLEANFILES = $(BUILT_SOURCES_distclean) compile
+DISTCLEANFILES = $(BUILT_SOURCES_distclean) compile doltcompile doltlibtool
 MAINTAINERCLEANFILES = ChangeLog
 
 # Shortcut for developers to rebuild the core (libvlc + vlc)
