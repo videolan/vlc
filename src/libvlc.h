@@ -43,7 +43,6 @@ void system_Init      ( void );
 void system_Configure ( libvlc_int_t *, int, const char *const [] );
 #ifdef WIN32
 void system_End(void);
-void SelectClockSource( vlc_object_t * );
 size_t EnumClockSource( vlc_object_t *, char ***, char *** );
 #endif
 void vlc_CPU_init(void);

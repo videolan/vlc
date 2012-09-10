@@ -177,9 +177,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     msg_Dbg( p_libvlc, "%s", COPYRIGHT_MESSAGE );
     msg_Dbg( p_libvlc, "revision %s", psz_vlc_changeset );
     msg_Dbg( p_libvlc, "configured with %s", CONFIGURE_LINE );
-#ifdef WIN32
-    SelectClockSource (VLC_OBJECT(p_libvlc));
-#endif
+    vlc_threads_setup (p_libvlc);
 
     /* Load the builtins and plugins into the module_bank.
      * We have to do it before config_Load*() because this also gets the
@@ -400,8 +398,6 @@ dbus_out:
         var_SetInteger( p_libvlc, "verbose", -1 );
         priv->i_verbose = -1;
     }
-    vlc_threads_setup( p_libvlc );
-
     if( priv->b_color )
         priv->b_color = var_InheritBool( p_libvlc, "color" );
 

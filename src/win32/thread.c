@@ -37,62 +37,12 @@
 #include <limits.h>
 #include <errno.h>
 
-static vlc_threadvar_t thread_key;
-
-/**
- * Per-thread data
- */
-struct vlc_thread
-{
-    HANDLE         id;
-
-    bool           detached;
-    bool           killable;
-    bool           killed;
-    vlc_cleanup_t *cleaners;
-
-    void        *(*entry) (void *);
-    void          *data;
-};
-
-static CRITICAL_SECTION clock_lock;
+/*** Static mutex and condition variable ***/
 static vlc_mutex_t super_mutex;
 static vlc_cond_t  super_variable;
-extern vlc_rwlock_t config_lock, msg_lock;
 
-BOOL WINAPI DllMain (HINSTANCE, DWORD, LPVOID);
 
-BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
-{
-    (void) hinstDll;
-    (void) lpvReserved;
-
-    switch (fdwReason)
-    {
-        case DLL_PROCESS_ATTACH:
-            InitializeCriticalSection (&clock_lock);
-            vlc_mutex_init (&super_mutex);
-            vlc_cond_init (&super_variable);
-            vlc_threadvar_create (&thread_key, NULL);
-            vlc_rwlock_init (&config_lock);
-            vlc_rwlock_init (&msg_lock);
-            vlc_CPU_init ();
-            break;
-
-        case DLL_PROCESS_DETACH:
-            vlc_rwlock_destroy (&msg_lock);
-            vlc_rwlock_destroy (&config_lock);
-            vlc_threadvar_delete (&thread_key);
-            vlc_cond_destroy (&super_variable);
-            vlc_mutex_destroy (&super_mutex);
-            DeleteCriticalSection (&clock_lock);
-            break;
-    }
-    return TRUE;
-}
-
-static void CALLBACK vlc_cancel_self (ULONG_PTR);
-
+/*** Common helpers ***/
 static DWORD vlc_WaitForMultipleObjects (DWORD count, const HANDLE *handles,
                                          DWORD delay)
 {
@@ -494,10 +444,21 @@ void *vlc_threadvar_get (vlc_threadvar_t key)
 }
 
 /*** Threads ***/
-void vlc_threads_setup (libvlc_int_t *p_libvlc)
+static vlc_threadvar_t thread_key;
+
+/** Per-thread data */
+struct vlc_thread
 {
-    (void) p_libvlc;
-}
+    HANDLE         id;
+
+    bool           detached;
+    bool           killable;
+    bool           killed;
+    vlc_cleanup_t *cleaners;
+
+    void        *(*entry) (void *);
+    void          *data;
+};
 
 static void vlc_thread_cleanup (struct vlc_thread *th)
 {
@@ -703,6 +664,8 @@ void vlc_control_cancel (int cmd, ...)
 }
 
 /*** Clock ***/
+static CRITICAL_SECTION clock_lock;
+
 static mtime_t mdate_giveup (void)
 {
     abort ();
@@ -828,7 +791,7 @@ void msleep (mtime_t delay)
     mwait (mdate () + delay);
 }
 
-void SelectClockSource (vlc_object_t *obj)
+static void SelectClockSource (vlc_object_t *obj)
 {
     EnterCriticalSection (&clock_lock);
     if (mdate_selected != mdate_giveup)
@@ -1028,4 +991,43 @@ unsigned vlc_GetCPUCount (void)
     if (GetProcessAffinityMask (GetCurrentProcess(), &process, &system))
         return popcount (system);
      return 1;
+}
+
+
+/*** Initialization ***/
+void vlc_threads_setup (libvlc_int_t *p_libvlc)
+{
+    SelectClockSource (VLC_OBJECT(p_libvlc));
+}
+
+extern vlc_rwlock_t config_lock, msg_lock;
+BOOL WINAPI DllMain (HINSTANCE, DWORD, LPVOID);
+
+BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
+{
+    (void) hinstDll;
+    (void) lpvReserved;
+
+    switch (fdwReason)
+    {
+        case DLL_PROCESS_ATTACH:
+            InitializeCriticalSection (&clock_lock);
+            vlc_mutex_init (&super_mutex);
+            vlc_cond_init (&super_variable);
+            vlc_threadvar_create (&thread_key, NULL);
+            vlc_rwlock_init (&config_lock);
+            vlc_rwlock_init (&msg_lock);
+            vlc_CPU_init ();
+            break;
+
+        case DLL_PROCESS_DETACH:
+            vlc_rwlock_destroy (&msg_lock);
+            vlc_rwlock_destroy (&config_lock);
+            vlc_threadvar_delete (&thread_key);
+            vlc_cond_destroy (&super_variable);
+            vlc_mutex_destroy (&super_mutex);
+            DeleteCriticalSection (&clock_lock);
+            break;
+    }
+    return TRUE;
 }
