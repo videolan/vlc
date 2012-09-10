@@ -30,7 +30,7 @@ OPENSSL_VERSION=1.0.0e
 OPENSSL_URL=http://www.openssl.org/source/openssl-$(OPENSSL_VERSION).tar.gz
 
 GAS_URL=https://github.com/mansr/gas-preprocessor/tarball/master
-GAS_VERSION=4ef872b
+GAS_VERSION=6b81e79
 
 RAGEL_VERSION=6.7
 RAGEL_URL=http://www.complang.org/ragel/ragel-$(RAGEL_VERSION).tar.gz
