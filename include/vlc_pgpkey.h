@@ -14,12 +14,12 @@
  * expirates on 2013-01-31
  */
 
-static uint8_t videolan_public_key_longid[8] = {
+static const uint8_t videolan_public_key_longid[8] = {
   0xA7, 0x41, 0x54, 0x9F, 0x59, 0xED, 0x29, 0x87
 };
 
 /* gpg --export --armor "<id>"|sed -e s/^/\"/ -e s/\$/\\\\n\"/ */
-static uint8_t videolan_public_key[] = {
+static const uint8_t videolan_public_key[] = {
     "-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
     "Version: GnuPG v1.4.11 (GNU/Linux)\n"
     "\n"
