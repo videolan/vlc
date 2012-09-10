@@ -61,6 +61,7 @@
 #include <commctrl.h>
 #include <shlwapi.h>
 #include <d3d9.h>
+#include <dxva2api.h>
 
 #include <initguid.h> /* must be last included to not redefine existing GUIDs */
 
@@ -75,6 +76,8 @@
 #  undef MS_GUID
 #  define MS_GUID DEFINE_GUID /* dxva2api.h fails to declare those, redefine as static */
 #  define DXVA2_E_NEW_VIDEO_DEVICE MAKE_HRESULT(1, 4, 4097)
+# else
+#  include <dxva.h>
 # endif
 
 #endif /* __MINGW32__ */
