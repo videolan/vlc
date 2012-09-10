@@ -1026,7 +1026,6 @@ void SPrefsPanel::assoDialog()
     CONNECT( clearButton, clicked(), d, reject() );
     d->resize( 300, 400 );
     d->exec();
-    delete d;
     delete qvReg;
     listAsso.clear();
 }
@@ -1041,7 +1040,7 @@ void addAsso( QVLCRegistry *qvReg, const char *psz_ext )
 
     if( !EMPTY_STR(psz_value) )
         qvReg->WriteRegistryString( psz_ext, "VLC.backup", psz_value );
-    delete psz_value;
+    free( psz_value );
 
     /* Put a "link" to VLC.EXT as default */
     qvReg->WriteRegistryString( psz_ext, "", qtu( s_path ) );
@@ -1083,7 +1082,7 @@ void delAsso( QVLCRegistry *qvReg, const char *psz_ext )
 
         qvReg->DeleteKey( psz_ext, "VLC.backup" );
     }
-    delete( psz_value );
+    free( psz_value );
 }
 void SPrefsPanel::saveAsso()
 {
