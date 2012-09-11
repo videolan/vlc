@@ -169,6 +169,7 @@ pkg-config-$(PKGCFG_VERSION).tar.gz:
 
 pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz
 	$(UNPACK)
+	mv pkg-config-lite-$(PKGCFG_VERSION) pkg-config-$(PKGCFG_VERSION)
 	$(MOVE)
 
 .pkg-config: pkgconfig
