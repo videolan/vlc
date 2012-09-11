@@ -67,7 +67,6 @@ osdmenu/default.cfg: osdmenu/default.cfg.in $(top_builddir)/config.status
 	  	   sed -e 's,\@vlcdatadir\@,$(vlcdatadir),g' < "$<" > $@
 
 DIST_icons = \
-	vlc48x48.ico \
 	vlc512x512.png
 
 DIST_skins2 = \
