@@ -39,7 +39,6 @@ endif
 
 EXTRA_DIST += \
 	$(skins2_default_vlt_FILES) \
-	$(DIST_rsrc) \
 	$(DIST_skins2) \
 	$(DIST_icons) \
 	$(DIST_http_lua) \
@@ -66,11 +65,6 @@ endif
 osdmenu/default.cfg: osdmenu/default.cfg.in $(top_builddir)/config.status
 	$(AM_V_GEN)mkdir -p osdmenu; \
 	  	   sed -e 's,\@vlcdatadir\@,$(vlcdatadir),g' < "$<" > $@
-
-DIST_rsrc = \
-	newres.h \
-	resource.h \
-	vlc_wince_rc.rc
 
 DIST_icons = \
 	vlc48x48.ico \
