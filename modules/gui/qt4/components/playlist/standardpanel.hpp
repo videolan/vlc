@@ -129,11 +129,6 @@ private slots:
 
     void popupPlView( const QPoint & );
     void popupSelectColumn( QPoint );
-    void popupPromptAndCreateNode();
-    void popupInfoDialog();
-    void popupExplore();
-    void popupStream();
-    void popupSave();
     void popupAction( QAction * );
     void increaseZoom() { updateZoom( i_zoom + 1 ); };
     void decreaseZoom() { updateZoom( i_zoom - 1 ); };

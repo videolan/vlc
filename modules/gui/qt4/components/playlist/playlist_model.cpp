@@ -30,6 +30,7 @@
 #include "qt4.hpp"
 #include "components/playlist/playlist_model.hpp"
 #include "input_manager.hpp"                            /* THEMIM */
+#include "util/qt_dirs.hpp"
 
 #include <vlc_intf_strings.h>                           /* I_DIR */
 
@@ -88,6 +89,16 @@ QModelIndexList VLCProxyModel::mapListToSource( const QModelIndexList& list )
             newlist << mapToSource( index );
     }
     return newlist;
+}
+
+void VLCProxyModel::sort( const int column, Qt::SortOrder order )
+{
+    /* sorting on PLModel affects playlist order. */
+    if ( model() == sourcemodels[ PL_MODEL ] )
+        model()->sort( column, order );
+    else
+    /* otherwise we just use native proxy sorting */
+        QSortFilterProxyModel::sort( column, order );
 }
 
 /*************************************************************************
@@ -479,20 +490,6 @@ PLItem* PLModel::getItem( const QModelIndex & index ) const
     return item;
 }
 
-bool PLModel::isCurrentItem( const QModelIndex &index, playLocation where ) const
-{
-    if ( where == IN_PLAYLIST )
-    {
-        return itemId( index, PLAYLIST_ID ) == THEPL->p_playing->i_id;
-    }
-    else if ( where == IN_MEDIALIBRARY )
-    {
-        return ( p_playlist->p_media_library &&
-                 rootItem->inputItem() == p_playlist->p_media_library->p_input );
-    }
-    return false;
-}
-
 QModelIndex PLModel::index( const int row, const int column, const QModelIndex &parent )
                   const
 {
@@ -613,6 +610,15 @@ PLItem * PLModel::findInner( PLItem *root, int i_id, bool b_isinputid ) const
         ++it;
     }
     return NULL;
+}
+
+PLModel::pl_nodetype PLModel::getPLRootType() const
+{
+    if ( rootItem->id( PLAYLIST_ID ) == 3 )
+        return ROOTTYPE_MEDIA_LIBRARY;
+    else
+        return ROOTTYPE_CURRENT_PLAYING; // id == 2
+    /* FIXME: handle all cases */
 }
 
 bool PLModel::canEdit() const
@@ -1006,7 +1012,7 @@ void PLModel::filter( const QString& search_text, const QModelIndex & idx, bool 
     rebuild();
 }
 
-void PLModel::clearPlaylist()
+void PLModel::removeAll()
 {
     if( rowCount() < 1 ) return;
 
@@ -1032,19 +1038,24 @@ void PLModel::createNode( QModelIndex index, QString name )
     PL_UNLOCK;
 }
 
-void PLModel::action( QAction *action, const QModelIndexList &indexes )
+bool PLModel::action( QAction *action, const QModelIndexList &indexes )
 {
     QModelIndex index;
     actionsContainerType a = action->data().value<actionsContainerType>();
+    input_item_t *p_input;
+
     switch ( a.action )
     {
 
-    case actionsContainerType::ACTION_PLAY:
+    case ACTION_PLAY:
         if ( !indexes.empty() && indexes.first().isValid() )
+        {
             activateItem( indexes.first() );
+            return true;
+        }
         break;
 
-    case actionsContainerType::ACTION_ADDTOPLAYLIST:
+    case ACTION_ADDTOPLAYLIST:
         PL_LOCK;
         foreach( const QModelIndex &currentIndex, indexes )
         {
@@ -1056,22 +1067,107 @@ void PLModel::action( QAction *action, const QModelIndexList &indexes )
                                   PLAYLIST_END );
         }
         PL_UNLOCK;
-        break;
+        return true;
 
-    case actionsContainerType::ACTION_REMOVE:
+    case ACTION_REMOVE:
         doDelete( indexes );
-        break;
+        return true;
 
-    case actionsContainerType::ACTION_SORT:
+    case ACTION_SORT:
         if ( indexes.empty() ) break;
         index = indexes.first().parent();
         if( !index.isValid() ) index = rootIndex();
         sort( indexes.first(), index,
               a.column > 0 ? a.column - 1 : -a.column - 1,
               a.column > 0 ? Qt::AscendingOrder : Qt::DescendingOrder );
-        break;
+        return true;
 
+    case ACTION_CLEAR:
+        removeAll();
+        return true;
+
+    case ACTION_ENQUEUEFILE:
+        foreach( const QString &uri, a.uris )
+            playlist_Add( THEPL, uri.toAscii().constData(),
+                          NULL, PLAYLIST_APPEND | PLAYLIST_PREPARSE,
+                          PLAYLIST_END,
+                          getPLRootType() == ROOTTYPE_CURRENT_PLAYING,
+                          pl_Unlocked );
+        return true;
+
+    case ACTION_ENQUEUEDIR:
+        if( a.uris.isEmpty() ) break;
+        p_input = input_item_New( a.uris.first().toAscii().constData(), NULL );
+        if( unlikely( p_input == NULL ) ) break;
+
+        /* FIXME: playlist_AddInput() can fail */
+        playlist_AddInput( THEPL, p_input,
+                           PLAYLIST_APPEND,
+                           PLAYLIST_END,
+                           getPLRootType() == ROOTTYPE_CURRENT_PLAYING,
+                           pl_Unlocked );
+        vlc_gc_decref( p_input );
+        return true;
+
+    case ACTION_ENQUEUEGENERIC:
+        foreach( const QString &uri, a.uris )
+        {
+            p_input = input_item_New( qtu( uri ), NULL );
+            /* Insert options */
+            foreach( const QString &option, a.options.split( " :" ) )
+            {
+                QString temp = colon_unescape( option );
+                if( !temp.isEmpty() )
+                    input_item_AddOption( p_input, qtu( temp ),
+                                          VLC_INPUT_OPTION_TRUSTED );
+            }
+
+            /* FIXME: playlist_AddInput() can fail */
+            playlist_AddInput( THEPL, p_input,
+                    PLAYLIST_APPEND | PLAYLIST_PREPARSE,
+                    PLAYLIST_END, true, pl_Unlocked );
+            vlc_gc_decref( p_input );
+        }
+        return true;
+
+    default:
+        break;
     }
+    return false;
+}
+
+bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) const
+{
+    switch ( action )
+    {
+    case ACTION_ADDTOPLAYLIST:
+        /* Only if we are not already in Current Playing */
+        if ( getPLRootType() == ROOTTYPE_CURRENT_PLAYING ) return false;
+        if( index.isValid() && index != rootIndex() )
+            return ( itemId( index, PLAYLIST_ID ) != THEPL->p_playing->i_id );
+    case ACTION_SORT:
+        return rowCount();
+    case ACTION_PLAY:
+    case ACTION_STREAM:
+    case ACTION_SAVE:
+    case ACTION_INFO:
+    case ACTION_REMOVE:
+        return index.isValid() && index != rootIndex();
+    case ACTION_EXPLORE:
+        if( index.isValid() )
+            return getURI( index ).startsWith( "file://" );
+    case ACTION_CREATENODE:
+        return ( canEdit() && isTree() );
+    case ACTION_CLEAR:
+        return rowCount() && canEdit();
+    case ACTION_ENQUEUEFILE:
+    case ACTION_ENQUEUEDIR:
+    case ACTION_ENQUEUEGENERIC:
+        return canEdit();
+    default:
+        return false;
+    }
+    return false;
 }
 
 /******************* Drag and Drop helper class ******************/

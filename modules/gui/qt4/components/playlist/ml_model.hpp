@@ -82,6 +82,7 @@ public:
     Qt::ItemFlags flags( const QModelIndex& ) const;
     QMimeData* mimeData( const QModelIndexList & indexes ) const;
     virtual bool removeRows( int row, int count, const QModelIndex & parent = QModelIndex() );
+    virtual void sort( const int column, Qt::SortOrder order = Qt::AscendingOrder );
 
     // Custom functions
     bool isEditable( const QModelIndex& ) const;
@@ -94,22 +95,21 @@ public:
     virtual void rebuild( playlist_item_t * p = NULL );
     virtual void doDelete( QModelIndexList selected );
     virtual void createNode( QModelIndex, QString ) {};
+    virtual void removeAll();
 
     virtual QModelIndex rootIndex() const;
     virtual void filter( const QString& search_text, const QModelIndex & root, bool b_recursive );
-    virtual void sort( const int column, Qt::SortOrder order = Qt::AscendingOrder );
     virtual QModelIndex currentIndex() const;
     virtual QModelIndex indexByPLID( const int i_plid, const int c ) const;
     virtual QModelIndex indexByInputItemID( const int i_inputitem_id, const int c ) const;
     virtual bool isTree() const;
     virtual bool canEdit() const;
 
-    virtual bool isCurrentItem( const QModelIndex &index, playLocation where ) const;
-    virtual void action( QAction *action, const QModelIndexList &indexes );
+    virtual bool action( QAction *action, const QModelIndexList &indexes );
+    virtual bool isSupportedAction( actions action, const QModelIndex & ) const;
 
     /* VLCModelSubInterface virtual slots */
     virtual void activateItem( const QModelIndex &index );
-    virtual void clearPlaylist();
 
 protected:
 

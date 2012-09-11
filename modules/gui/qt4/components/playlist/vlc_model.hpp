@@ -56,54 +56,59 @@ class VLCModelSubInterface
 public:
     VLCModelSubInterface();
     virtual ~VLCModelSubInterface();
+    enum nodeRole
+    {
+      IsCurrentRole = Qt::UserRole,
+      IsLeafNodeRole,
+      IsCurrentsParentNodeRole
+    };
     virtual void rebuild( playlist_item_t * p = NULL ) = 0;
     virtual void doDelete( QModelIndexList ) = 0;
     virtual void createNode( QModelIndex, QString ) = 0;
+    virtual void removeAll() = 0;
 
     virtual QModelIndex rootIndex() const = 0;
     virtual void filter( const QString& search_text, const QModelIndex & root, bool b_recursive ) = 0;
-    virtual void sort( const int column, Qt::SortOrder order = Qt::AscendingOrder ) = 0;
     virtual QModelIndex currentIndex() const = 0;
     virtual QModelIndex indexByPLID( const int i_plid, const int c ) const = 0;
     virtual QModelIndex indexByInputItemID( const int i_inputitem_id, const int c ) const = 0;
     virtual int itemId( const QModelIndex &, int type ) const = 0;
     virtual bool isTree() const = 0;
     virtual bool canEdit() const = 0;
-    enum playLocation
-    {
-        IN_PLAYLIST,
-        IN_MEDIALIBRARY,
-        IN_SQLMEDIALIB
-    };
-    virtual bool isCurrentItem( const QModelIndex &index, playLocation where ) const = 0;
     virtual QString getURI( const QModelIndex &index ) const = 0;
     virtual input_item_t *getInputItem( const QModelIndex & ) const = 0;
     virtual QString getTitle( const QModelIndex &index ) const = 0;
-    virtual void action( QAction *, const QModelIndexList & ) = 0;
-
-    enum nodeRole {
-      IsCurrentRole = Qt::UserRole,
-      IsLeafNodeRole,
-      IsCurrentsParentNodeRole
+    enum actions
+    {
+        ACTION_PLAY = 1,
+        ACTION_STREAM,
+        ACTION_SAVE,
+        ACTION_INFO,
+        ACTION_ADDTOPLAYLIST,
+        ACTION_REMOVE,
+        ACTION_SORT,
+        ACTION_EXPLORE,
+        ACTION_CREATENODE,
+        ACTION_CLEAR,
+        ACTION_ENQUEUEFILE,
+        ACTION_ENQUEUEDIR,
+        ACTION_ENQUEUEGENERIC
     };
     struct actionsContainerType
     {
-        enum
-        {
-            ACTION_PLAY = 1,
-            ACTION_ADDTOPLAYLIST,
-            ACTION_REMOVE,
-            ACTION_SORT
-        } action;
+        actions action;
         int column; /* for sorting */
+        QStringList uris; /* for enqueuing */
+        QString options;
     };
+    virtual bool action( QAction *, const QModelIndexList & ) = 0;
+    virtual bool isSupportedAction( actions action, const QModelIndex & ) const = 0;
     static int columnFromMeta( int meta_col );
 
-    VLCModelSignalsHandler *sigs;
     /* Indirect slots handlers */
+    VLCModelSignalsHandler *sigs;
     virtual void activateItem( const QModelIndex &index ) = 0;
     virtual void ensureArtRequested( const QModelIndex &index ) = 0;
-    virtual void clearPlaylist() = 0;
 };
 
 class VLCModelSignalsHandler : public QObject
@@ -119,7 +124,6 @@ public:
 public slots:
     void activateItemSlot( const QModelIndex &index ) { parent->activateItem( index ); }
     void ensureArtRequestedSlot( const QModelIndex &index ) { parent->ensureArtRequested( index ); }
-    void clearPlaylistSlot() { parent->clearPlaylist(); }
 
 signals:
     void currentIndexChanged( const QModelIndex& );

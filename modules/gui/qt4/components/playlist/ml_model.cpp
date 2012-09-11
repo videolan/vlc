@@ -41,6 +41,7 @@
 #include "components/playlist/sorting.h"
 #include "dialogs_provider.hpp"
 #include "input_manager.hpp"                            /* THEMIM */
+#include "util/qt_dirs.hpp"
 
 #include <assert.h>
 #include <vlc_intf_strings.h>
@@ -99,7 +100,7 @@ MLModel::~MLModel()
     var_DelCallback( p_ml, "media-added", mediaAdded, this );
 }
 
-void MLModel::clearPlaylist()
+void MLModel::removeAll()
 {
     vlc_array_t* p_where = vlc_array_new();
     if ( !p_where ) return;
@@ -499,32 +500,116 @@ void MLModel::activateItem( const QModelIndex &idx )
     AddItemToPlaylist( itemId( idx, MLMEDIA_ID ), true, p_ml, true );
 }
 
-void MLModel::action( QAction *action, const QModelIndexList &indexes )
+bool MLModel::action( QAction *action, const QModelIndexList &indexes )
 {
     actionsContainerType a = action->data().value<actionsContainerType>();
+    input_item_t *p_input;
+
     switch ( a.action )
     {
 
-    case actionsContainerType::ACTION_PLAY:
+    case ACTION_PLAY:
         if ( ! indexes.empty() && indexes.first().isValid() )
-            activateItem( indexes.first() );
-        break;
-
-    case actionsContainerType::ACTION_ADDTOPLAYLIST:
-        foreach( const QModelIndex &index, indexes )
         {
-            if( !index.isValid() ) break;
-            AddItemToPlaylist( itemId( index, MLMEDIA_ID ), false, p_ml, true );
+            activateItem( indexes.first() );
+            return true;
         }
         break;
 
-    case actionsContainerType::ACTION_REMOVE:
+    case ACTION_ADDTOPLAYLIST:
+        foreach( const QModelIndex &index, indexes )
+        {
+            if( !index.isValid() ) return false;
+            AddItemToPlaylist( itemId( index, MLMEDIA_ID ), false, p_ml, true );
+        }
+        return true;
+
+    case ACTION_REMOVE:
         doDelete( indexes );
+        return true;
+
+    case ACTION_SORT:
         break;
 
-    case actionsContainerType::ACTION_SORT:
+    case ACTION_CLEAR:
+        removeAll();
+        return true;
+
+    case ACTION_ENQUEUEFILE:
+        foreach( const QString &uri, a.uris )
+            playlist_Add( THEPL, uri.toAscii().constData(),
+                          NULL, PLAYLIST_APPEND | PLAYLIST_PREPARSE,
+                          PLAYLIST_END, false, pl_Unlocked );
+        return true;
+
+    case ACTION_ENQUEUEDIR:
+        if( a.uris.isEmpty() ) return false;
+        p_input = input_item_New( a.uris.first().toAscii().constData(), NULL );
+        if( unlikely( p_input == NULL ) ) return false;
+
+        /* FIXME: playlist_AddInput() can fail */
+        playlist_AddInput( THEPL, p_input,
+                           PLAYLIST_APPEND,
+                           PLAYLIST_END, true, pl_Unlocked );
+        vlc_gc_decref( p_input );
+        return true;
+
+    case ACTION_ENQUEUEGENERIC:
+        foreach( const QString &uri, a.uris )
+        {
+            p_input = input_item_New( qtu( uri ), NULL );
+            /* Insert options */
+            foreach( const QString &option, a.options.split( " :" ) )
+            {
+                QString temp = colon_unescape( option );
+                if( !temp.isEmpty() )
+                    input_item_AddOption( p_input, qtu( temp ),
+                                          VLC_INPUT_OPTION_TRUSTED );
+            }
+
+            /* FIXME: playlist_AddInput() can fail */
+            playlist_AddInput( THEPL, p_input,
+                    PLAYLIST_APPEND | PLAYLIST_PREPARSE,
+                    PLAYLIST_END, false, pl_Unlocked );
+            vlc_gc_decref( p_input );
+        }
+        return true;
+
+    default:
         break;
     }
+    return false;
+}
+
+bool MLModel::isSupportedAction( actions action, const QModelIndex &index ) const
+{
+    switch ( action )
+    {
+    case ACTION_ADDTOPLAYLIST:
+        return index.isValid();
+    case ACTION_SORT:
+        return false;
+    case ACTION_PLAY:
+    case ACTION_STREAM:
+    case ACTION_SAVE:
+    case ACTION_INFO:
+    case ACTION_REMOVE:
+        return index.isValid();
+    case ACTION_EXPLORE:
+        if( index.isValid() )
+            return getURI( index ).startsWith( "file://" );
+    case ACTION_CREATENODE:
+        return false;
+    case ACTION_CLEAR:
+        return rowCount() && canEdit();
+    case ACTION_ENQUEUEFILE:
+    case ACTION_ENQUEUEDIR:
+    case ACTION_ENQUEUEGENERIC:
+        return canEdit();
+    default:
+        return false;
+    }
+    return false;
 }
 
 QModelIndex MLModel::rootIndex() const
@@ -543,13 +628,6 @@ bool MLModel::canEdit() const
 {
     /* can always insert */
     return true;
-}
-
-bool MLModel::isCurrentItem( const QModelIndex &index, playLocation where ) const
-{
-    if ( where == IN_SQLMEDIALIB )
-        return index.isValid();
-    return false;
 }
 
 QModelIndex MLModel::getIndexByMLID( int id ) const

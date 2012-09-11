@@ -60,12 +60,13 @@ public:
         return qobject_cast<VLCModel *>( sourceModel() );
     }
 
+    /* Different Models Handling */
+
     enum models
     {
         PL_MODEL = 0,
         SQLML_MODEL /* note: keep it last */
     };
-
     bool switchToModel( models type );
     void setModel( models type, VLCModel *model )
     {
@@ -73,23 +74,16 @@ public:
     }
     QModelIndexList mapListToSource( const QModelIndexList& list );
 
-    /* Different Models Handling */
-
-
     /* VLCModelSubInterface Methods */
     virtual void rebuild( playlist_item_t * p = NULL ) { model()->rebuild( p ); }
     virtual void doDelete( QModelIndexList list ) { model()->doDelete( mapListToSource( list ) ); }
     virtual void createNode( QModelIndex a, QString b ) { model()->createNode( mapToSource( a ), b ); }
+    virtual void removeAll() { model()->removeAll(); }
 
     virtual QModelIndex rootIndex() const { return mapFromSource( model()->rootIndex() ); }
     virtual void filter( const QString& text, const QModelIndex & root, bool b_recursive )
     {
         model()->filter( text, mapToSource( root ), b_recursive );
-    }
-    virtual void sort( const int column, Qt::SortOrder order = Qt::AscendingOrder )
-    {
-        /* use native */
-        QSortFilterProxyModel::sort( column, order );
     }
 
     virtual QModelIndex currentIndex() const { return mapFromSource( model()->currentIndex() ); }
@@ -99,19 +93,20 @@ public:
     virtual bool isTree() const { return model()->isTree();  }
     virtual bool canEdit() const { return model()->canEdit(); }
 
-    virtual bool isCurrentItem( const QModelIndex &index, playLocation where ) const { return model()->isCurrentItem( mapToSource( index ), where ); }
     virtual QString getURI( const QModelIndex &index ) const { return model()->getURI( mapToSource( index ) ); }
     virtual input_item_t *getInputItem( const QModelIndex &index ) const { return model()->getInputItem( mapToSource( index ) ); }
     virtual QString getTitle( const QModelIndex &index ) const { return model()->getTitle( mapToSource( index ) ); }
-    virtual void action( QAction *action, const QModelIndexList &indexes )
+    virtual bool action( QAction *action, const QModelIndexList &indexes )
     {
-        model()->action( action, mapListToSource( indexes ) );
+        return model()->action( action, mapListToSource( indexes ) );
     }
-
+    virtual bool isSupportedAction( actions action, const QModelIndex &index ) const { return model()->isSupportedAction( action, mapToSource( index ) ); }
     /* Indirect slots handlers */
     virtual void activateItem( const QModelIndex &index ) { model()->activateItem( mapToSource( index ) ); }
     virtual void ensureArtRequested( const QModelIndex &index ) { model()->ensureArtRequested( mapToSource( index ) ); }
-    virtual void clearPlaylist() { model()->clearPlaylist(); }
+
+    /* AbstractItemModel subclassing */
+    virtual void sort( const int column, Qt::SortOrder order = Qt::AscendingOrder );
 
     /* Local signals for index conversion */
 public slots:
@@ -172,6 +167,7 @@ public:
     virtual void rebuild( playlist_item_t * p = NULL );
     virtual void doDelete( QModelIndexList selected );
     virtual void createNode( QModelIndex index, QString name );
+    virtual void removeAll();
 
     /* Lookups */
     virtual QModelIndex rootIndex() const;
@@ -181,12 +177,11 @@ public:
     virtual QModelIndex indexByInputItemID( const int i_inputitem_id, const int c ) const;
     virtual bool isTree() const;
     virtual bool canEdit() const;
-    virtual bool isCurrentItem( const QModelIndex &index, playLocation where ) const;
-    virtual void action( QAction *action, const QModelIndexList &indexes );
+    virtual bool action( QAction *action, const QModelIndexList &indexes );
+    virtual bool isSupportedAction( actions action, const QModelIndex & ) const;
 
     /* VLCModelSubInterface indirect slots */
     virtual void activateItem( const QModelIndex &index );
-    virtual void clearPlaylist();
 
 protected:
     /* VLCModel subclassing */
@@ -235,6 +230,12 @@ private:
     PLItem *findByPLId( PLItem *, int i_plitemid ) const;
     PLItem *findByInputId( PLItem *, int i_input_itemid ) const;
     PLItem *findInner(PLItem *, int i_id, bool b_isinputid ) const;
+    enum pl_nodetype
+    {
+        ROOTTYPE_CURRENT_PLAYING,
+        ROOTTYPE_MEDIA_LIBRARY
+    };
+    pl_nodetype getPLRootType() const;
 
     /* */
     QString latestSearch;

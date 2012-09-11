@@ -140,8 +140,6 @@ public slots:
     void openFileGenericDialog( intf_dialog_args_t * );
 
     void simpleOpenDialog();
-    void simplePLAppendDialog();
-    void simpleMLAppendDialog();
 
     void openDialog();
     void openDiscDialog();
@@ -150,12 +148,12 @@ public slots:
     void openNetDialog();
     void openCaptureDialog();
 
+    QString getDirectoryDialog();
     void PLAppendDialog( int tab = OPEN_FILE_TAB );
     void MLAppendDialog( int tab = OPEN_FILE_TAB );
 
     void PLOpenDir();
     void PLAppendDir();
-    void MLAppendDir();
 
     void streamingDialog( QWidget *parent, const QString& mrl, bool b_stream = true,
                           QStringList options = QStringList("") );

@@ -232,6 +232,15 @@ QString OpenDialog::getMRL( bool b_all )
                  : itemsMRL[0];
 }
 
+QStringList OpenDialog::getMRLs( bool b_with_options )
+{
+    if ( !b_with_options ) return itemsMRL;
+    QStringList postfixedMRLs;
+    foreach( const QString &mrl, itemsMRL )
+        postfixedMRLs << QString( mrl ).append( getOptions() );
+    return postfixedMRLs;
+}
+
 QString OpenDialog::getOptions()
 {
     return ui.advancedLineInput->text();

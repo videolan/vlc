@@ -71,6 +71,8 @@ public:
 
     void showTab( int = OPEN_FILE_TAB );
     QString getMRL( bool b = true );
+
+    QStringList getMRLs( bool b = true );
     QString getOptions();
 
 public slots:
