@@ -162,6 +162,23 @@ CLEAN_FILE += .automake
 CLEAN_PKG += automake
 DISTCLEAN_PKG += automake-$(AUTOMAKE_VERSION).tar.gz
 
+# m4
+
+m4-$(M4_VERSION).tar.gz:
+	$(call download,$(M4_URL))
+
+m4: m4-$(M4_VERSION).tar.gz
+	$(UNPACK)
+	$(MOVE)
+
+.m4: m4 .autoconf
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_FILE += .m4
+CLEAN_PKG += m4
+DISTCLEAN_PKG += m4-$(M4_VERSION).tar.gz
+
 # pkg-config
 
 pkg-config-$(PKGCFG_VERSION).tar.gz:
