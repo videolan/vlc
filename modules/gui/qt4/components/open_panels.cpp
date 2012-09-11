@@ -805,12 +805,11 @@ void CaptureOpenPanel::initialize()
     /*******
      * V4L2*
      *******/
-    if( module_exists( "v4l2" ) ){
-    addModuleAndLayouts( V4L2_DEVICE, v4l2, "Video for Linux 2", QGridLayout );
-
     char const * const ppsz_v4lvdevices[] = {
         "video*"
     };
+    if( module_exists( "v4l2" ) ){
+    addModuleAndLayouts( V4L2_DEVICE, v4l2, "Video camera", QGridLayout );
 
     /* V4L2 main panel */
     QLabel *v4l2VideoDeviceLabel = new QLabel( qtr( "Video device name" ) );
@@ -819,7 +818,6 @@ void CaptureOpenPanel::initialize()
     v4l2VideoDevice = new QComboBox( this );
     v4l2VideoDevice->setEditable( true );
     POPULATE_WITH_DEVS( ppsz_v4lvdevices, v4l2VideoDevice );
-    v4l2VideoDevice->clearEditText();
     v4l2DevLayout->addWidget( v4l2VideoDevice, 0, 1 );
 
     QLabel *v4l2AudioDeviceLabel = new QLabel( qtr( "Audio device name" ) );
@@ -857,8 +855,9 @@ void CaptureOpenPanel::initialize()
     CuMRL( v4l2AudioDevice->lineEdit(), textChanged( const QString& ) );
     CuMRL( v4l2AudioDevice,  currentIndexChanged ( int ) );
     CuMRL( v4l2StdBox,  currentIndexChanged ( int ) );
-    configList << "v4l2-standard" << "v4l2-dev";
+    configList << "v4l2-standard";
     }
+#endif
 
     /*******
      * JACK *
@@ -905,69 +904,11 @@ void CaptureOpenPanel::initialize()
     configList << "jack-input-use-vlc-pace" << "jack-input-auto-connect";
     }
 
-    /************
-     * PVR      *
-     ************/
-    if( module_exists( "pvr" ) ){
-    addModuleAndLayouts( PVR_DEVICE, pvr, "PVR", QGridLayout );
-
-    /* PVR Main panel */
-    QLabel *pvrDeviceLabel = new QLabel( qtr( "Device name" ) );
-    pvrDevLayout->addWidget( pvrDeviceLabel, 0, 0 );
-
-    pvrDevice = new QLineEdit;
-    pvrDevLayout->addWidget( pvrDevice, 0, 1 );
-
-    QLabel *pvrRadioDeviceLabel = new QLabel( qtr( "Radio device name" ) );
-    pvrDevLayout->addWidget( pvrRadioDeviceLabel, 1, 0 );
-
-    pvrRadioDevice = new QLineEdit;
-    pvrDevLayout->addWidget( pvrRadioDevice, 1, 1 );
-
-    /* PVR props panel */
-    QLabel *pvrNormLabel = new QLabel( qtr( "Norm" ) );
-    pvrPropLayout->addWidget( pvrNormLabel, 0, 0 );
-
-    pvrNormBox = new QComboBox;
-    setfillVLCConfigCombo( "pvr-norm", p_intf, pvrNormBox );
-    pvrPropLayout->addWidget( pvrNormBox, 0, 1 );
-
-    QLabel *pvrFreqLabel = new QLabel( qtr( "Frequency" ) );
-    pvrPropLayout->addWidget( pvrFreqLabel, 1, 0 );
-
-    pvrFreq = new QSpinBox;
-    pvrFreq->setAlignment( Qt::AlignRight );
-    pvrFreq->setSuffix(" kHz");
-    setSpinBoxFreq( pvrFreq );
-    pvrPropLayout->addWidget( pvrFreq, 1, 1 );
-
-    QLabel *pvrBitrLabel = new QLabel( qtr( "Bitrate" ) );
-    pvrPropLayout->addWidget( pvrBitrLabel, 2, 0 );
-
-    pvrBitr = new QSpinBox;
-    pvrBitr->setAlignment( Qt::AlignRight );
-    pvrBitr->setSuffix(" kHz");
-    setSpinBoxFreq( pvrBitr );
-    pvrPropLayout->addWidget( pvrBitr, 2, 1 );
-    pvrPropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
-            3, 0, 1, 1 );
-
-    /* PVR CONNECTs */
-    CuMRL( pvrDevice, textChanged( const QString& ) );
-    CuMRL( pvrRadioDevice, textChanged( const QString& ) );
-
-    CuMRL( pvrFreq, valueChanged ( int ) );
-    CuMRL( pvrBitr, valueChanged ( int ) );
-    CuMRL( pvrNormBox, currentIndexChanged ( int ) );
-    configList << "pvr-device" << "pvr-radio-device" << "pvr-norm"
-               << "pvr-frequency" << "pvr-bitrate";
-    }
-#endif
     /*************
      * DVB Stuff *
      *************/
     if( module_exists( "dtv" ) ){
-    addModuleAndLayouts( DTV_DEVICE, dvb, N_("TV (digital)"), QGridLayout );
+    addModuleAndLayouts( DTV_DEVICE, dvb, N_("TV - digital"), QGridLayout );
 
     /* DVB Main */
     QLabel *dvbDeviceLabel = new QLabel( qtr( "Tuner card" ) );
@@ -1083,6 +1024,70 @@ void CaptureOpenPanel::initialize()
                << "dvb-bandwidth";
     }
 
+#ifndef WIN32
+    /************
+     * PVR      *
+     ************/
+    if( module_exists( "v4l2" ) ){
+    addModuleAndLayouts( PVR_DEVICE, pvr, N_("TV - analog"), QGridLayout );
+
+    /* PVR Main panel */
+    QLabel *pvrDeviceLabel = new QLabel( qtr( "Device name" ) );
+    pvrDevLayout->addWidget( pvrDeviceLabel, 0, 0 );
+
+    pvrDevice = new QComboBox;
+    pvrDevice->setEditable( true );
+    POPULATE_WITH_DEVS( ppsz_v4lvdevices, pvrDevice );
+    v4l2VideoDevice->clearEditText();
+    pvrDevLayout->addWidget( pvrDevice, 0, 1 );
+
+    QLabel *pvrAudioDeviceLabel = new QLabel( qtr( "Audio device name" ) );
+    pvrDevLayout->addWidget( pvrAudioDeviceLabel, 1, 0 );
+
+    pvrAudioDevice = new QComboBox( this );
+    pvrAudioDevice->setEditable( true );
+    {
+        QStringList patterns = QStringList();
+        patterns << QString( "pcmC*D*c" );
+
+        QStringList nodes = QDir( "/dev/snd" ).entryList( patterns,
+                                                          QDir::System );
+        QStringList names = nodes.replaceInStrings( QRegExp("^pcmC"), "hw:" )
+                                 .replaceInStrings( QRegExp("c$"), "" )
+                                 .replaceInStrings( QRegExp("D"), "," );
+        pvrAudioDevice->addItems( names );
+    }
+    pvrAudioDevice->clearEditText();
+    pvrDevLayout->addWidget( pvrAudioDevice, 1, 1 );
+
+    /* PVR props panel */
+    QLabel *pvrNormLabel = new QLabel( qtr( "Video standard" ) );
+    pvrPropLayout->addWidget( pvrNormLabel, 0, 0 );
+
+    pvrNormBox = new QComboBox;
+    setfillVLCConfigCombo( "v4l2-standard", p_intf, pvrNormBox );
+    pvrPropLayout->addWidget( pvrNormBox, 0, 1 );
+
+    QLabel *pvrFreqLabel = new QLabel( qtr( "Frequency" ) );
+    pvrPropLayout->addWidget( pvrFreqLabel, 1, 0 );
+
+    pvrFreq = new QSpinBox;
+    pvrFreq->setAlignment( Qt::AlignRight );
+    pvrFreq->setSuffix(" kHz");
+    setSpinBoxFreq( pvrFreq );
+    pvrPropLayout->addWidget( pvrFreq, 1, 1 );
+
+    pvrPropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
+                            2, 0, 1, 1 );
+
+    /* PVR CONNECTs */
+    CuMRL( pvrDevice, textChanged( const QString& ) );
+    CuMRL( pvrAudioDevice, textChanged( const QString& ) );
+    CuMRL( pvrFreq, valueChanged ( int ) );
+    CuMRL( pvrNormBox, currentIndexChanged ( int ) );
+    }
+#endif
+
     /**********
      * Screen *
      **********/
@@ -1151,7 +1156,8 @@ void CaptureOpenPanel::updateMRL()
         fileList << "v4l2://" + v4l2VideoDevice->currentText();
         mrl += ":v4l2-standard="
             + v4l2StdBox->itemData( v4l2StdBox->currentIndex() ).toString();
-        mrl += " :input-slave=alsa://" + v4l2AudioDevice->currentText();
+        if( !v4l2AudioDevice->currentText().isEmpty() )
+            mrl += " :input-slave=alsa://" + v4l2AudioDevice->currentText();
         break;
     case JACK_DEVICE:
         mrl = "jack://";
@@ -1169,14 +1175,13 @@ void CaptureOpenPanel::updateMRL()
         }
         break;
     case PVR_DEVICE:
-        fileList << "pvr://";
-        mrl += " :pvr-device=" + pvrDevice->text();
-        mrl += " :pvr-radio-device=" + pvrRadioDevice->text();
-        mrl += " :pvr-norm=" + QString::number( pvrNormBox->currentIndex() );
+        fileList << "v4l2://" + pvrDevice->currentText();
+        mrl += ":v4l2-standard="
+            + pvrNormBox->itemData( pvrNormBox->currentIndex() ).toString();
         if( pvrFreq->value() )
-            mrl += " :pvr-frequency=" + QString::number( pvrFreq->value() );
-        if( pvrBitr->value() )
-            mrl += " :pvr-bitrate=" + QString::number( pvrBitr->value() );
+            mrl += ":v4l2-tuner-frequency=" + QString::number( pvrFreq->value() );
+        if( !pvrAudioDevice->currentText().isEmpty() )
+            mrl += " :input-slave=" + pvrAudioDevice->currentText();
         break;
 #endif
     case DTV_DEVICE:
