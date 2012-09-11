@@ -158,8 +158,8 @@ typedef struct
 } vlc_cond_t;
 #define VLC_STATIC_COND { 0, 0 }
 
-typedef HANDLE  vlc_sem_t;
-typedef struct vlc_rwlock vlc_rwlock_t;
+typedef HANDLE vlc_sem_t;
+#define LIBVLC_NEED_RWLOCK
 typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 
@@ -188,27 +188,29 @@ typedef struct
 } vlc_cond_t;
 #define VLC_STATIC_COND { 0, 0 }
 
-typedef struct
-{
-    HEV  hev;
-    HMTX wait_mutex;
-    HMTX count_mutex;
-    int  count;
-} vlc_sem_t;
-
-typedef struct vlc_rwlock vlc_rwlock_t;
+#define LIBVLC_NEED_SEMAPHORE
+#define LIBVLC_NEED_RWLOCK
 typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 
 #endif
 
-#ifndef VLC_STATIC_RWLOCK
-struct vlc_rwlock
+#ifdef LIBVLC_NEED_SEMAPHORE
+typedef struct vlc_sem
+{
+    vlc_mutex_t lock;
+    vlc_cond_t  wait;
+    unsigned    value;
+} vlc_sem_t;
+#endif
+
+#ifdef LIBVLC_NEED_RWLOCK
+typedef struct vlc_rwlock
 {
     vlc_mutex_t   mutex;
     vlc_cond_t    wait;
     long          state;
-};
+} vlc_rwlock_t;
 # define VLC_STATIC_RWLOCK { VLC_STATIC_MUTEX, VLC_STATIC_COND, 0 }
 #endif
 
