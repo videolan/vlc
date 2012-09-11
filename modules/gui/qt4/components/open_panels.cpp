@@ -857,7 +857,6 @@ void CaptureOpenPanel::initialize()
     CuMRL( v4l2StdBox,  currentIndexChanged ( int ) );
     configList << "v4l2-standard";
     }
-#endif
 
     /*******
      * JACK *
@@ -903,6 +902,7 @@ void CaptureOpenPanel::initialize()
     CuMRL( jackPortsSelected, textChanged( const QString& ) );
     configList << "jack-input-use-vlc-pace" << "jack-input-auto-connect";
     }
+#endif
 
     /*************
      * DVB Stuff *
