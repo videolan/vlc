@@ -487,10 +487,12 @@ static void Probe( audio_output_t * p_aout )
     switch( DSSPEAKER_CONFIG(ui_speaker_config) )
     {
     case DSSPEAKER_7POINT1:
+    case DSSPEAKER_7POINT1_SURROUND:
         msg_Dbg( p_aout, "Windows says your SpeakerConfig is 7.1" );
         val.i_int = AOUT_VAR_7_1;
         break;
     case DSSPEAKER_5POINT1:
+    case DSSPEAKER_5POINT1_SURROUND:
         msg_Dbg( p_aout, "Windows says your SpeakerConfig is 5.1" );
         val.i_int = AOUT_VAR_5_1;
         break;
