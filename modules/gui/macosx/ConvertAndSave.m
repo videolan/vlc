@@ -185,14 +185,6 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_customize_aud_samplerate_lbl setStringValue: _NS("Sample Rate")];
     [_customize_subs_ckb setTitle: _NS("Subtitles")];
     [_customize_subs_overlay_ckb setTitle: _NS("Overlay subtitles on the video")];
-    [_addProfile_title_lbl setStringValue:_NS("Save as new profile")];
-    [_addProfile_subtitle_lbl setStringValue:_NS("Enter a name for the new profile:")];
-    [_addProfile_cancel_btn setTitle:_NS("Cancel")];
-    [_addProfile_ok_btn setTitle:_NS("Save")];
-    [_deleteProfile_title_lbl setStringValue:_NS("Remove a profile")];
-    [_deleteProfile_subtitle_lbl setStringValue:_NS("Select the profile you would like to remove:")];
-    [_deleteProfile_cancel_btn setTitle:_NS("Cancel")];
-    [_deleteProfile_ok_btn setTitle:_NS("Remove")];
     [_stream_ok_btn setTitle:_NS("Close")];
     [_stream_destination_lbl setStringValue:_NS("Stream Destination")];
     [_stream_announcement_lbl setStringValue:_NS("Stream Announcement")];
@@ -348,77 +340,29 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (IBAction)newProfileAction:(id)sender
 {
-    if (sender == _customize_newProfile_btn) {
-        [_addProfile_name_fld setStringValue:@""];
-        [NSApp beginSheet:_addProfile_panel modalForWindow:_customize_panel modalDelegate:self didEndSelector:NULL contextInfo:nil];
-    } else {
-        [_addProfile_panel orderOut:sender];
-        [NSApp endSheet: _addProfile_panel];
+    /* show panel */
+    VLCEnterTextPanel * panel = [VLCEnterTextPanel sharedInstance];
+    [panel setTitle: _NS("Save as new profile")];
+    [panel setSubTitle: _NS("Enter a name for the new profile:")];
+    [panel setCancelButtonLabel: _NS("Cancel")];
+    [panel setOKButtonLabel: _NS("Save")];
+    [panel setTarget:self];
 
-        if (sender == _addProfile_ok_btn && [[_addProfile_name_fld stringValue] length] > 0) {
-            /* prepare current data */
-            [self updateCurrentProfile];
-
-            /* add profile to arrays */
-            NSMutableArray * workArray = [[NSMutableArray alloc] initWithArray:self.profileNames];
-            [workArray addObject:[_addProfile_name_fld stringValue]];
-            [self setProfileNames:[[[NSArray alloc] initWithArray:workArray] autorelease]];
-            [workArray release];
-            workArray = [[NSMutableArray alloc] initWithArray:self.profileValueList];
-            [workArray addObject:[[[NSArray alloc] initWithArray:self.currentProfile] autorelease]];
-            [self setProfileValueList:[[[NSArray alloc] initWithArray:workArray] autorelease]];
-            [workArray release];
-
-            /* update UI */
-            [self recreateProfilePopup];
-            [_profile_pop selectItemWithTitle:[_addProfile_name_fld stringValue]];
-
-            /* update internals */
-            [self switchProfile:sender];
-            [self storeProfilesOnDisk];
-        }
-    }
+    [panel runModalForWindow:_customize_panel];
 }
 
 - (IBAction)deleteProfileAction:(id)sender
 {
-    if (sender == _deleteProfile_cancel_btn) {
-        /* close panel */
-        [_deleteProfile_panel orderOut:sender];
-        [NSApp endSheet: _deleteProfile_panel];
-    } else if (sender == _deleteProfile_ok_btn) {
-        /* close panel */
-        [_deleteProfile_panel orderOut:sender];
-        [NSApp endSheet: _deleteProfile_panel];
+    /* show panel */
+    VLCSelectItemInPopupPanel * panel = [VLCSelectItemInPopupPanel sharedInstance];
+    [panel setTitle:_NS("Remove a profile")];
+    [panel setSubTitle:_NS("Select the profile you would like to remove:")];
+    [panel setOKButtonLabel:_NS("Remove")];
+    [panel setCancelButtonLabel:_NS("Cancel")];
+    [panel setPopupButtonContent:self.profileNames];
+    [panel setTarget:self];
 
-        /* remove requested profile from the arrays */
-        NSMutableArray * workArray = [[NSMutableArray alloc] initWithArray:self.profileNames];
-        [workArray removeObjectAtIndex:[_deleteProfile_pop indexOfSelectedItem]];
-        [self setProfileNames:[[[NSArray alloc] initWithArray:workArray] autorelease]];
-        [workArray release];
-        workArray = [[NSMutableArray alloc] initWithArray:self.profileValueList];
-        [workArray removeObjectAtIndex:[_deleteProfile_pop indexOfSelectedItem]];
-        [self setProfileValueList:[[[NSArray alloc] initWithArray:workArray] autorelease]];
-        [workArray release];
-
-        /* update UI */
-        [_profile_pop removeAllItems];
-        [_profile_pop addItemsWithTitles:self.profileNames];
-        [_profile_pop addItemWithTitle:_NS("Custom")];
-        [[_profile_pop menu] addItem:[NSMenuItem separatorItem]];
-        [_profile_pop addItemWithTitle:_NS("Organize Profiles")];
-        [[_profile_pop lastItem] setTarget: self];
-        [[_profile_pop lastItem] setAction: @selector(deleteProfileAction:)];
-
-        /* update internals */
-        [self switchProfile:sender];
-        [self storeProfilesOnDisk];
-    } else {
-        /* show panel */
-        [_deleteProfile_pop removeAllItems];
-        [_deleteProfile_pop addItemsWithTitles:self.profileNames];
-        [NSApp beginSheet:_deleteProfile_panel modalForWindow:_window modalDelegate:self didEndSelector:NULL contextInfo:nil];
-    }
+    [panel runModalForWindow:_window];
 }
 
 - (IBAction)iWantAFile:(id)sender
@@ -615,6 +559,62 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         }
     }
     return NO;
+}
+
+- (void)panel:(VLCEnterTextPanel *)panel returnValue:(NSUInteger)value text:(NSString *)text
+{
+    if (value == NSOKButton) {
+        if ([text length] > 0) {
+            /* prepare current data */
+            [self updateCurrentProfile];
+
+            /* add profile to arrays */
+            NSMutableArray * workArray = [[NSMutableArray alloc] initWithArray:self.profileNames];
+            [workArray addObject:text];
+            [self setProfileNames:[[[NSArray alloc] initWithArray:workArray] autorelease]];
+            [workArray release];
+            workArray = [[NSMutableArray alloc] initWithArray:self.profileValueList];
+            [workArray addObject:[[[NSArray alloc] initWithArray:self.currentProfile] autorelease]];
+            [self setProfileValueList:[[[NSArray alloc] initWithArray:workArray] autorelease]];
+            [workArray release];
+
+            /* update UI */
+            [self recreateProfilePopup];
+            [_profile_pop selectItemWithTitle:text];
+
+            /* update internals */
+            [self switchProfile:self];
+            [self storeProfilesOnDisk];
+        }
+    }
+}
+
+- (void)panel:(VLCSelectItemInPopupPanel *)panel returnValue:(NSUInteger)value item:(NSUInteger)item
+{
+    if (value == NSOKButton) {
+        /* remove requested profile from the arrays */
+        NSMutableArray * workArray = [[NSMutableArray alloc] initWithArray:self.profileNames];
+        [workArray removeObjectAtIndex:item];
+        [self setProfileNames:[[[NSArray alloc] initWithArray:workArray] autorelease]];
+        [workArray release];
+        workArray = [[NSMutableArray alloc] initWithArray:self.profileValueList];
+        [workArray removeObjectAtIndex:item];
+        [self setProfileValueList:[[[NSArray alloc] initWithArray:workArray] autorelease]];
+        [workArray release];
+
+        /* update UI */
+        [_profile_pop removeAllItems];
+        [_profile_pop addItemsWithTitles:self.profileNames];
+        [_profile_pop addItemWithTitle:_NS("Custom")];
+        [[_profile_pop menu] addItem:[NSMenuItem separatorItem]];
+        [_profile_pop addItemWithTitle:_NS("Organize Profiles...")];
+        [[_profile_pop lastItem] setTarget: self];
+        [[_profile_pop lastItem] setAction: @selector(deleteProfileAction:)];
+
+        /* update internals */
+        [self switchProfile:self];
+        [self storeProfilesOnDisk];
+    }
 }
 
 # pragma mark -

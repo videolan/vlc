@@ -111,6 +111,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/MediaInfo.xib \
 	extras/package/macosx/Resources/English.lproj/Open.xib \
 	extras/package/macosx/Resources/English.lproj/Preferences.xib \
+	extras/package/macosx/Resources/English.lproj/SharedDialogs.xib \
 	extras/package/macosx/Resources/English.lproj/SyncTracks.xib \
 	extras/package/macosx/Resources/English.lproj/VideoEffects.xib \
 	extras/package/macosx/Resources/English.lproj/Wizard.xib \
