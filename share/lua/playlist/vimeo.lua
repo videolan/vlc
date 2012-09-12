@@ -96,7 +96,7 @@ function parse()
                 _,_,height = string.find (line, "\"height\":([0-9]*)," )
             end
         end
-	
+
 		if not codec then
 			vlc.msg.warn("unable to find codec info")
 			return nil
