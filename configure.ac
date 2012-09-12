@@ -4091,8 +4091,8 @@ AC_CONFIG_FILES([
 
 AM_COND_IF([HAVE_WIN32], [
   AC_CONFIG_FILES([
-    extras/package/win32/spad.nsi
-    extras/package/win32/vlc.win32.nsi
+    extras/package/win32/NSIS/spad.nsi
+    extras/package/win32/NSIS/vlc.win32.nsi
   ])
 ])
 

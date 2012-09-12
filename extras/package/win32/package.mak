@@ -1,6 +1,6 @@
 if HAVE_WIN32
 BUILT_SOURCES_distclean += \
-	extras/package/win32/vlc.win32.nsi extras/package/win32/spad.nsi
+	extras/package/win32/NSIS/vlc.win32.nsi extras/package/win32/NSIS/spad.nsi
 endif
 
 win32_destdir=$(abs_top_builddir)/vlc-$(VERSION)
@@ -130,7 +130,7 @@ package-win32-crx: package-win32-webplugin-common
 
 
 # nsis is a 32-bits installer, we need to build a 32bits DLL
-$(win32_destdir)/NSIS/UAC.dll: extras/package/win32/UAC/runas.cpp extras/package/win32/UAC/uac.cpp
+$(win32_destdir)/NSIS/UAC.dll: extras/package/win32/NSIS/UAC/runas.cpp extras/package/win32/NSIS/UAC/uac.cpp
 	mkdir -p "$(win32_destdir)/NSIS/"
 if HAVE_WIN64
 	i686-w64-mingw32-g++ $^ -shared -o $@ -lole32
@@ -143,11 +143,12 @@ endif
 
 package-win32-exe: package-win-strip $(win32_destdir)/NSIS/UAC.dll
 # Script installer
-	cd "$(top_builddir)/extras/package/win32" && cp vlc.win32.nsi spad.nsi "$(win32_destdir)/"
-	cp -r $(srcdir)/extras/package/win32/languages/ "$(win32_destdir)/"
-	cp -r $(srcdir)/extras/package/win32/helpers/ "$(win32_destdir)/"
+	cp    $(top_builddir)/extras/package/win32/NSIS/vlc.win32.nsi "$(win32_destdir)/"
+	cp    $(top_builddir)/extras/package/win32/NSIS/spad.nsi      "$(win32_destdir)/"
+	cp -r $(srcdir)/extras/package/win32/NSIS/languages/    "$(win32_destdir)/"
+	cp -r $(srcdir)/extras/package/win32/NSIS/helpers/      "$(win32_destdir)/"
 	mkdir -p "$(win32_destdir)/NSIS/"
-	cp "$(top_srcdir)/extras/package/win32/UAC.nsh" "$(win32_destdir)/NSIS/"
+	cp "$(top_srcdir)/extras/package/win32/NSIS/UAC.nsh" "$(win32_destdir)/NSIS/"
 
 # Create package
 	if makensis -VERSION >/dev/null 2>&1; then \
