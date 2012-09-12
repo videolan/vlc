@@ -258,6 +258,7 @@
 		CC402F440E00ABBB006A4BA4 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC962E2C0CC7992800A56695 /* WebKit.framework */; };
 		CC426FD11020D44F00A32659 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC426FD01020D44F00A32659 /* Sparkle.framework */; };
 		CC426FD71020D47100A32659 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CC426FD01020D44F00A32659 /* Sparkle.framework */; };
+		CC461F75160084A10022423C /* SharedDialogs.xib in Resources */ = {isa = PBXBuildFile; fileRef = CC461F73160084A10022423C /* SharedDialogs.xib */; };
 		CC4EFC2D13E96BD00091D19A /* dropzone.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4EFC2C13E96BD00091D19A /* dropzone.png */; };
 		CC5800F51423A80400166912 /* bottombar-mini.png in Resources */ = {isa = PBXBuildFile; fileRef = CC5800F41423A80400166912 /* bottombar-mini.png */; };
 		CC5800F71423A81500166912 /* bottombar-mini.png in Resources */ = {isa = PBXBuildFile; fileRef = CC5800F61423A81500166912 /* bottombar-mini.png */; };
@@ -745,6 +746,9 @@
 		CC448A6113B68A0B009F72E0 /* CoreInteraction.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CoreInteraction.m; path = ../../../modules/gui/macosx/CoreInteraction.m; sourceTree = "<group>"; };
 		CC448A6213B68A0B009F72E0 /* MainWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainWindow.h; path = ../../../modules/gui/macosx/MainWindow.h; sourceTree = "<group>"; };
 		CC448A6313B68A0B009F72E0 /* MainWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MainWindow.m; path = ../../../modules/gui/macosx/MainWindow.m; sourceTree = "<group>"; };
+		CC461F6C160078340022423C /* SharedDialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SharedDialogs.h; path = ../../../modules/gui/macosx/SharedDialogs.h; sourceTree = "<group>"; };
+		CC461F6D160078340022423C /* SharedDialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SharedDialogs.m; path = ../../../modules/gui/macosx/SharedDialogs.m; sourceTree = "<group>"; };
+		CC461F74160084A10022423C /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/SharedDialogs.xib; sourceTree = "<group>"; };
 		CC4A33210F8CB017000FC4A7 /* coredialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = coredialogs.m; path = ../../../modules/gui/macosx/coredialogs.m; sourceTree = SOURCE_ROOT; };
 		CC4A33220F8CB017000FC4A7 /* coredialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = coredialogs.h; path = ../../../modules/gui/macosx/coredialogs.h; sourceTree = SOURCE_ROOT; };
 		CC4D67F71348F601003FCC5B /* darwin_specific.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = darwin_specific.c; path = ../../../src/posix/darwin_specific.c; sourceTree = "<group>"; };
@@ -1094,6 +1098,8 @@
 				CC0663351566C34C003A411C /* ConvertAndSave.m */,
 				CC269A4615E7947F00F2FDC9 /* StringUtility.h */,
 				CC269A4715E7947F00F2FDC9 /* StringUtility.m */,
+				CC461F6C160078340022423C /* SharedDialogs.h */,
+				CC461F6D160078340022423C /* SharedDialogs.m */,
 				CC017A0E14A4C8B600C09A4F /* custom UI code */,
 				CC0CD0E513DE0FC600B0D90D /* Imported Code */,
 			);
@@ -1718,6 +1724,7 @@
 				CCD83E4213FEA143004F1652 /* Wizard.xib */,
 				CCD83E2B13FE9B90004F1652 /* MainMenu.xib */,
 				CC0663371566CD5A003A411C /* ConvertAndSave.xib */,
+				CC461F73160084A10022423C /* SharedDialogs.xib */,
 			);
 			name = xibs;
 			sourceTree = "<group>";
@@ -2187,6 +2194,7 @@
 				CC16700215F5178B0088201B /* forward-6btns-dark-pressed@2x.png in Resources */,
 				CC16700315F5178B0088201B /* forward-6btns-dark.png in Resources */,
 				CC16700415F5178B0088201B /* forward-6btns-dark@2x.png in Resources */,
+				CC461F75160084A10022423C /* SharedDialogs.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2199,6 +2207,14 @@
 				CC0663381566CD5A003A411C /* English */,
 			);
 			name = ConvertAndSave.xib;
+			sourceTree = "<group>";
+		};
+		CC461F73160084A10022423C /* SharedDialogs.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CC461F74160084A10022423C /* English */,
+			);
+			name = SharedDialogs.xib;
 			sourceTree = "<group>";
 		};
 		CCD83E2B13FE9B90004F1652 /* MainMenu.xib */ = {

@@ -593,8 +593,9 @@ static VLCMain *_o_sharedMainInstance = nil;
             var_SetBool(p_playlist, "fullscreen", YES);
     }
 
-    /* load our Core Dialogs nib */
+    /* load our Core and Shared Dialogs nibs */
     nib_coredialogs_loaded = [NSBundle loadNibNamed:@"CoreDialogs" owner: NSApp];
+    [NSBundle loadNibNamed:@"SharedDialogs" owner: NSApp];
 
     /* subscribe to various interactive dialogues */
     var_Create(p_intf, "dialog-error", VLC_VAR_ADDRESS);
