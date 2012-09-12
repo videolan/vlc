@@ -104,5 +104,5 @@ function parse()
         quality = "hd"
     end
     path = "http://player.vimeo.com/play_redirect?quality="..quality.."&codecs="..codec.."&clip_id="..id.."&time="..tstamp.."&sig="..rsig.."&type=html5_desktop_local"
-    return { { path = path; name = name; arturl = arturl, duration = duration } }
+    return { { path = path; name = name; arturl = arturl; duration = duration } }
 end
