@@ -21,39 +21,39 @@ EXTRA_DIST = \
 	extras/package/win32/configure.sh \
 	extras/package/symbian/configure.sh \
 	extras/package/npapi.am \
-	extras/package/win32/vlc.win32.nsi.in \
-	extras/package/win32/spad.nsi.in \
-	extras/package/win32/UAC.nsh \
-	extras/package/win32/languages/declaration.nsh \
-	extras/package/win32/languages/bengali.nsh \
-	extras/package/win32/languages/basque.nsh \
-	extras/package/win32/languages/brazilian_portuguese.nsh \
-	extras/package/win32/languages/bulgarian.nsh \
-	extras/package/win32/languages/catalan.nsh \
-	extras/package/win32/languages/danish.nsh \
-	extras/package/win32/languages/dutch.nsh \
-	extras/package/win32/languages/english.nsh \
-	extras/package/win32/languages/estonian.nsh \
-	extras/package/win32/languages/finnish.nsh \
-	extras/package/win32/languages/french.nsh \
-	extras/package/win32/languages/galician.nsh \
-	extras/package/win32/languages/german.nsh \
-	extras/package/win32/languages/hebrew.nsh \
-	extras/package/win32/languages/hungarian.nsh \
-	extras/package/win32/languages/italian.nsh \
-	extras/package/win32/languages/japanese.nsh \
-	extras/package/win32/languages/lithuanian.nsh \
-	extras/package/win32/languages/occitan.nsh \
-	extras/package/win32/languages/polish.nsh \
-	extras/package/win32/languages/punjabi.nsh \
-	extras/package/win32/languages/russian.nsh
-	extras/package/win32/languages/romanian.nsh \
-	extras/package/win32/languages/schinese.nsh \
-	extras/package/win32/languages/slovak.nsh \
-	extras/package/win32/languages/slovenian.nsh \
-	extras/package/win32/languages/sorani.nsh \
-	extras/package/win32/languages/spanish.nsh \
-	extras/package/win32/languages/swedish.nsh
+	extras/package/win32/NSIS/vlc.win32.nsi.in \
+	extras/package/win32/NSIS/spad.nsi.in \
+	extras/package/win32/NSIS/UAC.nsh \
+	extras/package/win32/NSIS/languages/declaration.nsh \
+	extras/package/win32/NSIS/languages/bengali.nsh \
+	extras/package/win32/NSIS/languages/basque.nsh \
+	extras/package/win32/NSIS/languages/brazilian_portuguese.nsh \
+	extras/package/win32/NSIS/languages/bulgarian.nsh \
+	extras/package/win32/NSIS/languages/catalan.nsh \
+	extras/package/win32/NSIS/languages/danish.nsh \
+	extras/package/win32/NSIS/languages/dutch.nsh \
+	extras/package/win32/NSIS/languages/english.nsh \
+	extras/package/win32/NSIS/languages/estonian.nsh \
+	extras/package/win32/NSIS/languages/finnish.nsh \
+	extras/package/win32/NSIS/languages/french.nsh \
+	extras/package/win32/NSIS/languages/galician.nsh \
+	extras/package/win32/NSIS/languages/german.nsh \
+	extras/package/win32/NSIS/languages/hebrew.nsh \
+	extras/package/win32/NSIS/languages/hungarian.nsh \
+	extras/package/win32/NSIS/languages/italian.nsh \
+	extras/package/win32/NSIS/languages/japanese.nsh \
+	extras/package/win32/NSIS/languages/lithuanian.nsh \
+	extras/package/win32/NSIS/languages/occitan.nsh \
+	extras/package/win32/NSIS/languages/polish.nsh \
+	extras/package/win32/NSIS/languages/punjabi.nsh \
+	extras/package/win32/NSIS/languages/russian.nsh
+	extras/package/win32/NSIS/languages/romanian.nsh \
+	extras/package/win32/NSIS/languages/schinese.nsh \
+	extras/package/win32/NSIS/languages/slovak.nsh \
+	extras/package/win32/NSIS/languages/slovenian.nsh \
+	extras/package/win32/NSIS/languages/sorani.nsh \
+	extras/package/win32/NSIS/languages/spanish.nsh \
+	extras/package/win32/NSIS/languages/swedish.nsh
 
 dist_noinst_SCRIPTS = bootstrap
 nodist_noinst_SCRIPTS = compile
