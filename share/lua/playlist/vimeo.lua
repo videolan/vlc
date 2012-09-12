@@ -48,6 +48,7 @@ function parse()
         prefres = get_prefres()
 		ishd = false
 		quality = "sd"
+		codec = nil
         while true do
             line = vlc.readline()
             if not line then break end
@@ -77,6 +78,16 @@ function parse()
             if string.match( line, "{config:.*\"timestamp\":" ) then
                 _,_,tstamp = string.find (line, "\"timestamp\":([0-9]*)," )
             end
+            -- Try to find the available codecs
+            if string.match( line, "{config:.*,\"files\":{\"vp6\":" ) then
+				codec = "vp6"
+            end
+            if string.match( line, "{config:.*,\"files\":{\"vp8\":" ) then
+				codec = "vp8"
+            end
+            if string.match( line, "{config:.*,\"files\":{\"h264\":" ) then
+				codec = "h264"
+            end
             -- Try to find whether video is HD actually
             if string.match( line, "{config:.*,\"hd\":1" ) then
 				ishd = true
@@ -85,11 +96,16 @@ function parse()
                 _,_,height = string.find (line, "\"height\":([0-9]*)," )
             end
         end
+	
+		if not codec then
+			vlc.msg.warn("unable to find codec info")
+			return nil
+		end
 
         if ishd and ( not height or prefres < 0 or prefres >= tonumber(height) ) then
             quality = "hd"
         end
-		path = "http://player.vimeo.com/play_redirect?quality="..quality.."&codecs=h264&clip_id="..id.."&time="..tstamp.."&sig="..rsig.."&type=html5_desktop_local"
+		path = "http://player.vimeo.com/play_redirect?quality="..quality.."&codecs="..codec.."&clip_id="..id.."&time="..tstamp.."&sig="..rsig.."&type=html5_desktop_local"
         return { { path = path; name = name; arturl = arturl, duration = duration } }
     end
     return {}
