@@ -29,6 +29,7 @@ end
 -- Parse function.
 function parse()
     if string.match ( vlc.path, "soundcloud%.com" ) then
+        arturl = nil
         while true do
             line = vlc.readline()
             if not line then break end
@@ -42,9 +43,13 @@ function parse()
                 -- we only want the first one of these lines
                 break
             end
+            -- try to get the art url
+            if string.match( line, "artwork--download--link" ) then
+                _,_,arturl = string.find( line, " href=\"(.*)\" " )
+            end
         end
         path = "http://media.soundcloud.com/stream/"..uid.."?stream_token="..token
-        return { { path = path; name = name } }
+        return { { path = path; name = name; arturl = arturl } }
     end
     return {}
 end
