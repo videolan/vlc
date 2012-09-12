@@ -4,6 +4,7 @@
  Copyright © 2009 the VideoLAN team
 
  Authors: Konstantin Pavlov (thresh@videolan.org)
+          François Revol (revol@free.fr)
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -34,57 +35,62 @@ end
 -- Probe function.
 function probe()
     return vlc.access == "http"
-        and string.match( vlc.path, "vimeo.com/%d+" )
-            or string.match( vlc.path, "vimeo.com/moogaloop/load" )
+        and string.match( vlc.path, "vimeo.com/%d+$" )
+	-- do not match other addresses,
+	-- else we'll also try to decode the actual video url
 end
 
 -- Parse function.
 function parse()
-    if string.match ( vlc.path, "vimeo.com/%d+" ) then
-        _,_,id = string.find( vlc.path, "vimeo.com/(.*)")
-        -- Vimeo disables HD if the user-agent contains "VLC", so we
-        -- set it to something inconspicuous. We do it here because
-        -- they seem to do some detection across requests
-        return { { path = "http://vimeo.com/moogaloop/load/clip:" .. id .. "/local/", name = "Vimeo playlist", options = { ":http-user-agent=Mozilla/5.0 (Windows NT 6.1; rv:6.0.2) Gecko/20100101 Firefox/6.0.2" } } }
-    end
-
-    if string.match ( vlc.path, "vimeo.com/moogaloop" ) then
+    if string.match ( vlc.path, "vimeo.com/%d+$" ) then
+		vlc.msg.warn("matched "..vlc.path)
+        _,_,id = string.find( vlc.path, "vimeo.com/([0-9]*)")
         prefres = get_prefres()
-        ishd = false
-        -- Try to find id of the video
-        _,_,id = string.find (vlc.path, "vimeo.com/moogaloop/load/clip:(.*)/local/")
+		ishd = false
+		quality = "sd"
         while true do
-            -- Try to find the video's title
             line = vlc.readline()
             if not line then break end
-            if string.match( line, "<caption>(.*)</caption>" ) then
-                _,_,name = string.find (line, "<caption>(.*)</caption>" )
+            -- Try to find the video's title
+            if string.match( line, "<meta property=\"og:title\"" ) then
+                _,_,name = string.find (line, "content=\"(.*)\">" )
+            end
+            if string.match( line, "{config:.*\"title\":\"" ) then
+                _,_,name = string.find (line, "\"title\":\"([^\"]*)\"," )
             end
             -- Try to find image for thumbnail
-            if string.match( line, "<thumbnail>(.*)</thumbnail>" ) then
-                _,_,arturl = string.find (line, "<thumbnail>(.*)</thumbnail>" )
+            if string.match( line, "<meta property=\"og:image\"" ) then
+                _,_,arturl = string.find (line, "content=\"(.*)\">" )
+            end
+            if string.match( line, "<meta itemprop=\"thumbnailUrl\"" ) then
+                _,_,arturl = string.find (line, "content=\"(.*)\">" )
+            end
+            -- Try to find duration
+            if string.match( line, "{config:.*\"duration\":" ) then
+                _,_,duration = string.find (line, "\"duration\":([0-9]*)," )
             end
             -- Try to find request signature (needed to construct video url)
-            if string.match( line, "<request_signature>(.*)</request_signature>" ) then
-                _,_,rsig = string.find (line, "<request_signature>(.*)</request_signature>" )
+            if string.match( line, "{config:.*\"signature\":" ) then
+                _,_,rsig = string.find (line, "\"signature\":\"([0-9a-f]*)\"," )
             end
-            -- Try to find request signature expiration time (needed to construct video url)
-            if string.match( line, "<request_signature_expires>(.*)</request_signature_expires>" ) then
-                _,_,rsigtime = string.find (line, "<request_signature_expires>(.*)</request_signature_expires>" )
+            -- Try to find request signature time (needed to construct video url)
+            if string.match( line, "{config:.*\"timestamp\":" ) then
+                _,_,tstamp = string.find (line, "\"timestamp\":([0-9]*)," )
             end
             -- Try to find whether video is HD actually
-            if string.match( line, "<isHD>1</isHD>" ) then
-                ishd = true
+            if string.match( line, "{config:.*,\"hd\":1" ) then
+				ishd = true
             end
-            if string.match( line, "<height>%d+</height>" ) then
-                _,_,height = string.find( line, "<height>(%d+)</height>" )
+            if string.match( line, "{config:.*\"height\":" ) then
+                _,_,height = string.find (line, "\"height\":([0-9]*)," )
             end
         end
-        path = "http://vimeo.com/moogaloop/play/clip:"..id.."/"..rsig.."/"..rsigtime
+
         if ishd and ( not height or prefres < 0 or prefres >= tonumber(height) ) then
-            path = path.."/?q=hd"
+            quality = "hd"
         end
-        return { { path = path; name = name; arturl = arturl } }
+		path = "http://player.vimeo.com/play_redirect?quality="..quality.."&codecs=h264&clip_id="..id.."&time="..tstamp.."&sig="..rsig.."&type=html5_desktop_local"
+        return { { path = path; name = name; arturl = arturl, duration = duration } }
     end
     return {}
 end
