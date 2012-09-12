@@ -42,70 +42,67 @@ end
 
 -- Parse function.
 function parse()
-    if string.match ( vlc.path, "vimeo.com/%d+$" ) then
-        _,_,id = string.find( vlc.path, "vimeo.com/([0-9]*)")
-        prefres = get_prefres()
-        ishd = false
-        quality = "sd"
-        codec = nil
-        while true do
-            line = vlc.readline()
-            if not line then break end
-            -- Try to find the video's title
-            if string.match( line, "<meta property=\"og:title\"" ) then
-                _,_,name = string.find (line, "content=\"(.*)\">" )
-            end
-            if string.match( line, "{config:.*\"title\":\"" ) then
-                _,_,name = string.find (line, "\"title\":\"([^\"]*)\"," )
-            end
-            -- Try to find image for thumbnail
-            if string.match( line, "<meta property=\"og:image\"" ) then
-                _,_,arturl = string.find (line, "content=\"(.*)\">" )
-            end
-            if string.match( line, "<meta itemprop=\"thumbnailUrl\"" ) then
-                _,_,arturl = string.find (line, "content=\"(.*)\">" )
-            end
-            -- Try to find duration
-            if string.match( line, "{config:.*\"duration\":" ) then
-                _,_,duration = string.find (line, "\"duration\":([0-9]*)," )
-            end
-            -- Try to find request signature (needed to construct video url)
-            if string.match( line, "{config:.*\"signature\":" ) then
-                _,_,rsig = string.find (line, "\"signature\":\"([0-9a-f]*)\"," )
-            end
-            -- Try to find request signature time (needed to construct video url)
-            if string.match( line, "{config:.*\"timestamp\":" ) then
-                _,_,tstamp = string.find (line, "\"timestamp\":([0-9]*)," )
-            end
-            -- Try to find the available codecs
-            if string.match( line, "{config:.*,\"files\":{\"vp6\":" ) then
-                codec = "vp6"
-            end
-            if string.match( line, "{config:.*,\"files\":{\"vp8\":" ) then
-                codec = "vp8"
-            end
-            if string.match( line, "{config:.*,\"files\":{\"h264\":" ) then
-                codec = "h264"
-            end
-            -- Try to find whether video is HD actually
-            if string.match( line, "{config:.*,\"hd\":1" ) then
-                ishd = true
-            end
-            if string.match( line, "{config:.*\"height\":" ) then
-                _,_,height = string.find (line, "\"height\":([0-9]*)," )
-            end
+    _,_,id = string.find( vlc.path, "vimeo.com/([0-9]*)")
+    prefres = get_prefres()
+    ishd = false
+    quality = "sd"
+    codec = nil
+    while true do
+        line = vlc.readline()
+        if not line then break end
+        -- Try to find the video's title
+        if string.match( line, "<meta property=\"og:title\"" ) then
+            _,_,name = string.find (line, "content=\"(.*)\">" )
         end
-
-        if not codec then
-            vlc.msg.warn("unable to find codec info")
-            return nil
+        if string.match( line, "{config:.*\"title\":\"" ) then
+            _,_,name = string.find (line, "\"title\":\"([^\"]*)\"," )
         end
-
-        if ishd and ( not height or prefres < 0 or prefres >= tonumber(height) ) then
-            quality = "hd"
+        -- Try to find image for thumbnail
+        if string.match( line, "<meta property=\"og:image\"" ) then
+            _,_,arturl = string.find (line, "content=\"(.*)\">" )
         end
-        path = "http://player.vimeo.com/play_redirect?quality="..quality.."&codecs="..codec.."&clip_id="..id.."&time="..tstamp.."&sig="..rsig.."&type=html5_desktop_local"
-        return { { path = path; name = name; arturl = arturl, duration = duration } }
+        if string.match( line, "<meta itemprop=\"thumbnailUrl\"" ) then
+            _,_,arturl = string.find (line, "content=\"(.*)\">" )
+        end
+        -- Try to find duration
+        if string.match( line, "{config:.*\"duration\":" ) then
+            _,_,duration = string.find (line, "\"duration\":([0-9]*)," )
+        end
+        -- Try to find request signature (needed to construct video url)
+        if string.match( line, "{config:.*\"signature\":" ) then
+            _,_,rsig = string.find (line, "\"signature\":\"([0-9a-f]*)\"," )
+        end
+        -- Try to find request signature time (needed to construct video url)
+        if string.match( line, "{config:.*\"timestamp\":" ) then
+            _,_,tstamp = string.find (line, "\"timestamp\":([0-9]*)," )
+        end
+        -- Try to find the available codecs
+        if string.match( line, "{config:.*,\"files\":{\"vp6\":" ) then
+            codec = "vp6"
+        end
+        if string.match( line, "{config:.*,\"files\":{\"vp8\":" ) then
+            codec = "vp8"
+        end
+        if string.match( line, "{config:.*,\"files\":{\"h264\":" ) then
+            codec = "h264"
+        end
+        -- Try to find whether video is HD actually
+        if string.match( line, "{config:.*,\"hd\":1" ) then
+            ishd = true
+        end
+        if string.match( line, "{config:.*\"height\":" ) then
+            _,_,height = string.find (line, "\"height\":([0-9]*)," )
+        end
     end
-    return {}
+
+    if not codec then
+        vlc.msg.warn("unable to find codec info")
+        return nil
+    end
+
+    if ishd and ( not height or prefres < 0 or prefres >= tonumber(height) ) then
+        quality = "hd"
+    end
+    path = "http://player.vimeo.com/play_redirect?quality="..quality.."&codecs="..codec.."&clip_id="..id.."&time="..tstamp.."&sig="..rsig.."&type=html5_desktop_local"
+    return { { path = path; name = name; arturl = arturl, duration = duration } }
 end
