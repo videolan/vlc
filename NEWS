@@ -84,6 +84,8 @@ Mac OS X Interface:
  * add a GUI to capture QTSound data along with the current screen content
  * add an option to let the Apple Remote control the system volume instead of
    VLC's internal volume level
+ * add the ability to create custom equalizer presets based upon the current
+   selection and to manage the list of presets
  * add an option to disable skipping to next/previous file with the Apple Remote
  * add an option to show next / previous buttons
  * add an option to hide the shuffle and repeat buttons
