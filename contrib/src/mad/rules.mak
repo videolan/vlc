@@ -32,7 +32,7 @@ endif
 	touch libmad/NEWS libmad/AUTHORS libmad/ChangeLog
 	$(RECONF)
 ifdef HAVE_IOS
-	cd $< && $(HOSTVARS) CCAS="$(AS)" CFLAGS="$(CFLAGS) -O4" ./configure $(HOSTCONF) $(MAD_CONF)
+	cd $< && $(HOSTVARS) CCAS="$(AS)" CFLAGS="$(CFLAGS) -O3" ./configure $(HOSTCONF) $(MAD_CONF)
 else
 	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -O3" ./configure $(HOSTCONF) $(MAD_CONF)
 endif
