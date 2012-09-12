@@ -96,8 +96,8 @@ function parse()
     end
 
     if not codec then
-        vlc.msg.warn("unable to find codec info")
-        return nil
+        vlc.msg.err("unable to find codec info")
+        return {}
     end
 
     if ishd and ( not height or prefres < 0 or prefres >= tonumber(height) ) then
