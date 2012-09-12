@@ -110,6 +110,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
     [defaults registerDefaults:appDefaults];
     [defaultProfiles release];
+    [defaultProfileNames release];
 }
 
 + (VLCConvertAndSave *)sharedInstance
