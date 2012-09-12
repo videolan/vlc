@@ -47,6 +47,42 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
 }
 
++ (void)initialize{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+    NSString * workString;
+    NSMutableArray * workValues = [[NSMutableArray alloc] initWithCapacity:NB_PRESETS];
+    NSMutableArray * workPreamp = [[NSMutableArray alloc] initWithCapacity:NB_PRESETS];
+    NSMutableArray * workTitles = [[NSMutableArray alloc] initWithCapacity:NB_PRESETS];
+    NSMutableArray * workNames = [[NSMutableArray alloc] initWithCapacity:NB_PRESETS];
+
+    for(int i = 0 ; i < NB_PRESETS ; i++) {
+        workString = [NSString stringWithFormat:@"%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f",
+                      eqz_preset_10b[i].f_amp[0],
+                      eqz_preset_10b[i].f_amp[1],
+                      eqz_preset_10b[i].f_amp[2],
+                      eqz_preset_10b[i].f_amp[3],
+                      eqz_preset_10b[i].f_amp[4],
+                      eqz_preset_10b[i].f_amp[5],
+                      eqz_preset_10b[i].f_amp[6],
+                      eqz_preset_10b[i].f_amp[7],
+                      eqz_preset_10b[i].f_amp[8],
+                      eqz_preset_10b[i].f_amp[9]];
+        [workValues addObject:workString];
+        [workPreamp addObject:[NSString stringWithFormat:@"%1.f", eqz_preset_10b[i].f_preamp]];
+        [workTitles addObject:[NSString stringWithUTF8String:preset_list_text[i]]];
+        [workNames addObject:[NSString stringWithUTF8String:preset_list[i]]];
+    }
+
+    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithArray:workValues], @"EQValues", [NSArray arrayWithArray:workPreamp], @"EQPreampValues", [NSArray arrayWithArray:workTitles], @"EQTitles", [NSArray arrayWithArray:workNames], @"EQNames", nil];
+    [defaults registerDefaults:appDefaults];
+
+    [workValues release];
+    [workPreamp release];
+    [workTitles release];
+    [workNames release];
+}
+
 - (id)init
 {
     if (_o_sharedInstance)
@@ -67,10 +103,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     [o_eq_twopass_ckb setTitle:_NS("2 Pass")];
     [o_eq_preamp_lbl setStringValue:_NS("Preamp")];
     [o_eq_presets_popup removeAllItems];
-    for(int i = 0; i < NB_PRESETS ; i++) {
-        [o_eq_presets_popup addItemWithTitle: _NS(preset_list_text[i])];
-        [[o_eq_presets_popup lastItem] setTag: i];
-    }
+    [o_eq_presets_popup addItemsWithTitles:[[NSUserDefaults standardUserDefaults] objectForKey:@"EQTitles"]];
 
     /* Compressor */
     [o_comp_enable_ckb setTitle:_NS("Enable dynamic range compressor")];
@@ -188,44 +221,38 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     if (p_object == NULL)
         p_object = vlc_object_hold(pl_Get(p_intf));
 
-    char *psz_preset;
-
     var_Create(p_object, "equalizer-preset", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
-    psz_preset = var_GetNonEmptyString(p_object, "equalizer-preset");
 
-    for(int i = 0 ; i < NB_PRESETS ; i++) {
-        if (strcmp(preset_list[i], psz_preset))
-            continue;
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+    NSArray * presets = [defaults objectForKey:@"EQNames"];
+    NSString * currentPreset = [NSString stringWithUTF8String:var_GetNonEmptyString(p_object, "equalizer-preset")];
+    NSInteger currentPresetIndex = [presets indexOfObjectPassingTest:^(id obj, NSUInteger idx, BOOL *stop) {
+        return [obj isEqualToString:currentPreset];
+    }];
 
-        [o_eq_presets_popup selectItemWithTag:i];
+    [o_eq_presets_popup selectItemAtIndex:currentPresetIndex];
+    [o_eq_preamp_sld setFloatValue:[[[defaults objectForKey:@"EQPreampValues"] objectAtIndex:currentPresetIndex] floatValue]];
+    [self setBandSliderValuesForPreset:currentPresetIndex];
 
-        [o_eq_preamp_sld setFloatValue: eqz_preset_10b[i].f_preamp];
-        [self setBandSlidersValues: (float *)eqz_preset_10b[i].f_amp];
+    char psz_bands[100];
+    snprintf(psz_bands, sizeof(psz_bands),
+             "%.1f %.1f %.1f %.1f %.1f %.1f %.1f "
+             "%.1f %.1f %.1f",
+             eqz_preset_10b[currentPresetIndex].f_amp[0],
+             eqz_preset_10b[currentPresetIndex].f_amp[1],
+             eqz_preset_10b[currentPresetIndex].f_amp[2],
+             eqz_preset_10b[currentPresetIndex].f_amp[3],
+             eqz_preset_10b[currentPresetIndex].f_amp[4],
+             eqz_preset_10b[currentPresetIndex].f_amp[5],
+             eqz_preset_10b[currentPresetIndex].f_amp[6],
+             eqz_preset_10b[currentPresetIndex].f_amp[7],
+             eqz_preset_10b[currentPresetIndex].f_amp[8],
+             eqz_preset_10b[currentPresetIndex].f_amp[9]);
 
-        if (strcmp(psz_preset, "flat")) {
-            char psz_bands[100];
-
-            snprintf(psz_bands, sizeof(psz_bands),
-                     "%.1f %.1f %.1f %.1f %.1f %.1f %.1f "
-                     "%.1f %.1f %.1f",
-                     eqz_preset_10b[i].f_amp[0],
-                     eqz_preset_10b[i].f_amp[1],
-                     eqz_preset_10b[i].f_amp[2],
-                     eqz_preset_10b[i].f_amp[3],
-                     eqz_preset_10b[i].f_amp[4],
-                     eqz_preset_10b[i].f_amp[5],
-                     eqz_preset_10b[i].f_amp[6],
-                     eqz_preset_10b[i].f_amp[7],
-                     eqz_preset_10b[i].f_amp[8],
-                     eqz_preset_10b[i].f_amp[9]);
-
-            var_Create(p_object, "equalizer-preamp", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
-            var_Create(p_object, "equalizer-bands", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
-            var_SetFloat(p_object, "equalizer-preamp", eqz_preset_10b[i].f_preamp);
-            var_SetString(p_object, "equalizer-bands", psz_bands);
-        }
-    }
-    free(psz_preset);
+    var_Create(p_object, "equalizer-preamp", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
+    var_Create(p_object, "equalizer-bands", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    var_SetFloat(p_object, "equalizer-preamp", eqz_preset_10b[currentPresetIndex].f_preamp);
+    var_SetString(p_object, "equalizer-bands", psz_bands);
     vlc_object_release(p_object);
 
     [self equalizerUpdated];
@@ -302,6 +329,15 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         [self setValue:values[i] forSlider:i];
 }
 
+- (void)setBandSliderValuesForPreset:(NSInteger)presetID
+{
+    NSString * preset = [[[NSUserDefaults standardUserDefaults] objectForKey:@"EQValues"] objectAtIndex:presetID];
+    NSArray * values = [preset componentsSeparatedByString:@" "];
+    NSUInteger count = [values count];
+    for (NSUInteger x = 0; x < count; x++)
+        [self setValue:[[values objectAtIndex:x] floatValue] forSlider:x];
+}
+
 - (void)initBandSliders
 {
     for (int i = 0 ; i< 9 ; i++)
@@ -348,12 +384,13 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
     vlc_object_release(p_object);
 }
+
 - (IBAction)eq_changePreset:(id)sender
 {
     vlc_object_t *p_object= VLC_OBJECT(getAout());
     if (p_object == NULL)
         p_object = vlc_object_hold(pl_Get(p_intf));
-    NSInteger numberOfChosenPreset = [[sender selectedItem] tag];
+    NSInteger numberOfChosenPreset = [sender indexOfSelectedItem];
 
     var_SetString(p_object , "equalizer-preset" , preset_list[numberOfChosenPreset]);
 
@@ -366,9 +403,9 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     var_SetString(p_object, "equalizer-bands", psz_values);
     var_SetFloat(p_object, "equalizer-preamp", eqz_preset_10b[[[sender selectedItem] tag]].f_preamp);
 
-    [o_eq_preamp_sld setFloatValue: eqz_preset_10b[numberOfChosenPreset].f_preamp];
-
-    [self setBandSlidersValues:(float *)eqz_preset_10b[numberOfChosenPreset].f_amp];
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+    [o_eq_preamp_sld setFloatValue: [[[defaults objectForKey:@"EQPreampValues"] objectAtIndex:numberOfChosenPreset] floatValue]];
+    [self setBandSliderValuesForPreset:numberOfChosenPreset];
 
     /* save changed to config */
     config_PutPsz(p_intf, "equalizer-bands", psz_values);
@@ -377,6 +414,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
     vlc_object_release(p_object);
 }
+
 - (IBAction)eq_preampSliderUpdated:(id)sender
 {
     float f_preamp = [sender floatValue] ;
