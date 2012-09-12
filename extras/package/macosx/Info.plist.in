@@ -475,6 +475,7 @@
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>audio/opus</string>
+				<string>audio/ogg; codecs=opus</string>
 			</array>
 			<key>CFBundleTypeName</key>
 			<string>OPUS file</string>
