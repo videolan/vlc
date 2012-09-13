@@ -509,13 +509,21 @@ static int DecOpen( decoder_t *p_dec )
             {
                 i_chroma = mt.subtype.Data1;
                 i_bpp = 12;
+                DMOFreeMediaType( &mt );
+                break;
+            }
+            else if( (p_dec->fmt_in.i_codec == VLC_CODEC_MSS1 ||
+                      p_dec->fmt_in.i_codec == VLC_CODEC_MSS2 ) &&
+                      guidcmp( &mt.subtype, &MEDIASUBTYPE_RGB24 ) )
+            {
+                i_chroma = VLC_CODEC_RGB24;
+                i_bpp = 24;
             }
 
             DMOFreeMediaType( &mt );
         }
-
-        p_dec->fmt_out.i_codec = i_chroma == VLC_CODEC_YV12 ?
-            VLC_CODEC_I420 : i_chroma;
+        
+        p_dec->fmt_out.i_codec = i_chroma == VLC_CODEC_YV12 ? VLC_CODEC_I420 : i_chroma;
         p_dec->fmt_out.video.i_width = p_dec->fmt_in.video.i_width;
         p_dec->fmt_out.video.i_height = p_dec->fmt_in.video.i_height;
         p_dec->fmt_out.video.i_bits_per_pixel = i_bpp;
@@ -534,7 +542,7 @@ static int DecOpen( decoder_t *p_dec )
         }
 
         p_bih = &p_vih->bmiHeader;
-        p_bih->biCompression = i_chroma;
+        p_bih->biCompression = i_chroma == VLC_CODEC_RGB24 ? BI_RGB : i_chroma;
         p_bih->biHeight *= -1;
         p_bih->biBitCount = p_dec->fmt_out.video.i_bits_per_pixel;
         p_bih->biSizeImage = p_dec->fmt_in.video.i_width *
@@ -546,8 +554,15 @@ static int DecOpen( decoder_t *p_dec )
 
         dmo_output_type.majortype = MEDIATYPE_Video;
         dmo_output_type.formattype = FORMAT_VideoInfo;
-        dmo_output_type.subtype = dmo_output_type.majortype;
-        dmo_output_type.subtype.Data1 = p_bih->biCompression;
+        if( i_chroma == VLC_CODEC_RGB24 )
+        {
+            dmo_output_type.subtype = MEDIASUBTYPE_RGB24;
+        }
+        else 
+        {
+            dmo_output_type.subtype = dmo_output_type.majortype;
+            dmo_output_type.subtype.Data1 = p_bih->biCompression;
+        }
         dmo_output_type.bFixedSizeSamples = true;
         dmo_output_type.bTemporalCompression = 0;
         dmo_output_type.lSampleSize = p_bih->biSizeImage;
