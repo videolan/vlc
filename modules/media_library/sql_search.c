@@ -887,7 +887,8 @@ case casestr:                                                                 \
     assert( tree->comp == ML_COMP_HAS || tree->comp == ML_COMP_EQUAL          \
         || tree->comp == ML_COMP_STARTS_WITH                                  \
         || tree->comp == ML_COMP_ENDS_WITH );                                 \
-    *ppsz_where = sql_Printf( p_ml->p_sys->p_sql, "%s LIKE '%s%q%s'", fmt,    \
+    *ppsz_where = sql_Printf( p_ml->p_sys->p_sql, "%s %s '%s%q%s'", fmt,      \
+        (ML_COMP_EQUAL)?"=":"LIKE",                                           \
         tree->comp == ML_COMP_HAS                                             \
         || tree->comp == ML_COMP_STARTS_WITH? "%%" : "",                      \
             tree->value.str,                                                  \
