@@ -689,7 +689,7 @@ static const staticentry_t p_list_video[] = {
         A("IV50"),
         A("iv50"),
 
-    B(VLC_CODEC_PRORES, "Apple ProRes 422"),
+    B(VLC_CODEC_PRORES, "Apple ProRes"),
         E("apcn", "Apple ProRes 422 Standard"),
         E("apch", "Apple ProRes 422 HQ"),
         E("apcs", "Apple ProRes 422 LT"),
