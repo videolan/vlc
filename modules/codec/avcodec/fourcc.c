@@ -239,7 +239,7 @@ static const struct
 #endif
 
 #if LIBAVCODEC_VERSION_CHECK( 54, 27, 0, 55, 100 )
-    { VLC_CODEC_MSS2, CODEC_ID_MSS2, VIDEO_ES },
+    { VLC_CODEC_MSS2, AV_CODEC_ID_MSS2, VIDEO_ES },
 #endif
 
     /* Videogames Codecs */
