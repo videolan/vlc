@@ -167,7 +167,7 @@ package-win32-exe: package-win-strip $(win32_destdir)/NSIS/UAC.dll
 
 package-win32-zip: package-win-strip
 	rm -f -- $(WINVERSION).zip
-	zip -r -9 $(WINVERSION).zip vlc-$(VERSION)
+	zip -r -9 $(WINVERSION).zip vlc-$(VERSION) --exclude \*.nsi \*NSIS\* \*languages\* \*sdk\* \*helpers\* spad\*
 
 package-win32-debug-zip: package-win-common
 	rm -f -- $(WINVERSION)-debug.zip
