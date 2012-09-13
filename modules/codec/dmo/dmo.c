@@ -178,6 +178,10 @@ static const GUID guid_wmv_enc = { 0x3181343b, 0x94a2, 0x4feb, { 0xad, 0xef, 0x3
 static const GUID guid_wmv_enc2 = { 0x96b57cdd, 0x8966, 0x410c,{ 0xbb, 0x1f, 0xc9, 0x7e, 0xea, 0x76, 0x5c, 0x04 } };
 static const GUID guid_wma_enc = { 0x70f598e9, 0xf4ab, 0x495a, { 0x99, 0xe2, 0xa7, 0xc4, 0xd3, 0xd8, 0x9a, 0xbf } };
 
+#ifndef BI_RGB
+# define BI_RGB 0x0
+#endif
+
 typedef struct
 {
     vlc_fourcc_t i_fourcc;
@@ -525,7 +529,7 @@ static int DecOpen( decoder_t *p_dec )
 
             DMOFreeMediaType( &mt );
         }
-        
+
         p_dec->fmt_out.i_codec = i_chroma == VLC_CODEC_YV12 ? VLC_CODEC_I420 : i_chroma;
         p_dec->fmt_out.video.i_width = p_dec->fmt_in.video.i_width;
         p_dec->fmt_out.video.i_height = p_dec->fmt_in.video.i_height;
@@ -561,7 +565,7 @@ static int DecOpen( decoder_t *p_dec )
         {
             dmo_output_type.subtype = MEDIASUBTYPE_RGB24;
         }
-        else 
+        else
         {
             dmo_output_type.subtype = dmo_output_type.majortype;
             dmo_output_type.subtype.Data1 = p_bih->biCompression;
