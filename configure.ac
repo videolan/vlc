@@ -412,8 +412,10 @@ dnl Iconv stuff
 dnl
 AM_ICONV
 
-dnl Check for broken versions of mingw-runtime compatability library
+dnl
+dnl checks for mingw
 AS_IF([test "${SYS}" = "mingw32"], [
+dnl Check for broken versions of mingw-runtime compatability library
     AC_MSG_CHECKING(for broken mingw-runtime)
     AC_PREPROC_IFELSE([AC_LANG_SOURCE([
 #include <_mingw.h>
@@ -432,18 +434,14 @@ AS_IF([test "${SYS}" = "mingw32"], [
     ])
     dnl force use of mingw provided c99 *printf over msvcrt
     CPPFLAGS="${CPPFLAGS} -D__USE_MINGW_ANSI_STDIO=1"
-])
 
 dnl Check for the need to include the mingwex lib for mingw32
-if test "${SYS}" = "mingw32" ; then
     AC_CHECK_LIB(mingwex,opendir,
         AC_CHECK_LIB(mingw32,opendir,,
             [VLC_ADD_LIBS([libvlccore],[-lmingwex])])
     )
-fi
 
 dnl Check for fnative-struct or mms-bitfields support for mingw32
-if test "${SYS}" = "mingw32" ; then
     VLC_SAVE_FLAGS
     CFLAGS="${CFLAGS} -mms-bitfields"
     CXXFLAGS="${CXXFLAGS} -mms-bitfields"
@@ -459,7 +457,7 @@ if test "${SYS}" = "mingw32" ; then
             [AC_TRY_COMPILE([],,ac_cv_c_fnative_struct=yes, ac_cv_c_fnative_struct=no)])
         "${ac_cv_c_fnative_struct}" = "no" && VLC_RESTORE_FLAGS
     fi
-fi
+])
 
 dnl
 dnl Buggy glibc prevention. Purposedly not cached.
