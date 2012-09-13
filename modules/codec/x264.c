@@ -1247,7 +1247,7 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.i_fps_den = p_enc->fmt_in.video.i_frame_rate_base;
         p_sys->param.i_timebase_num = 1;
         p_sys->param.i_timebase_den = INT64_C(1000000);
-        p_sys->param.b_vfr_input = 1;
+        p_sys->param.b_vfr_input = 0;
     }
 
     /* Check slice-options */
