@@ -617,11 +617,10 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [o_msgs_refresh_btn setImage: [NSImage imageNamed: NSImageNameRefreshTemplate]];
 
-     BOOL b_video_deco = var_InheritBool(VLCIntf, "video-deco");
     /* yeah, we are done */
     b_nativeFullscreenMode = NO;
 #ifdef MAC_OS_X_VERSION_10_7
-    if (!OSX_SNOW_LEOPARD && b_video_deco)
+    if (!OSX_SNOW_LEOPARD)
         b_nativeFullscreenMode = var_InheritBool(p_intf, "macosx-nativefullscreenmode");
 #endif
 
