@@ -56,7 +56,6 @@
 - (void)makeSplitViewVisible;
 - (void)makeSplitViewHidden;
 
-- (NSRect)customConstrainFrameRect: (NSRect)frameRect toScreen: (NSScreen*)screen;
 @end
 
 @implementation VLCMainWindow
@@ -86,28 +85,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)styleMask
                   backing:(NSBackingStoreType)backingType defer:(BOOL)flag
 {
-    b_dark_interface = config_GetInt(VLCIntf, "macosx-interfacestyle");
-
-    if (b_dark_interface) {
-        styleMask = NSBorderlessWindowMask;
-#ifdef MAC_OS_X_VERSION_10_7
-        if (!OSX_SNOW_LEOPARD)
-            styleMask |= NSResizableWindowMask;
-#endif
-    }
-
     self = [super initWithContentRect:contentRect styleMask:styleMask
                               backing:backingType defer:flag];
     _o_sharedInstance = self;
 
     [[VLCMain sharedInstance] updateTogglePlaylistState];
-
-    /* we want to be moveable regardless of our style */
-    [self setMovableByWindowBackground: YES];
-
-    /* we don't want this window to be restored on relaunch */
-    if (!OSX_SNOW_LEOPARD)
-        [self setRestorable:NO];
 
     return self;
 }
@@ -1274,16 +1256,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     return YES;
 }
 
-- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
-{
-    SEL s_menuAction = [menuItem action];
-
-    if ((s_menuAction == @selector(performClose:)) || (s_menuAction == @selector(performMiniaturize:)) || (s_menuAction == @selector(performZoom:)))
-            return YES;
-
-    return [super validateMenuItem:menuItem];
-}
-
 - (void)setTitle:(NSString *)title
 {
     if (b_dark_interface) {
@@ -1293,136 +1265,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (b_nonembedded && [[VLCMain sharedInstance] activeVideoPlayback])
         [o_detached_video_window setTitle: title];
     [super setTitle: title];
-}
-
-- (void)performClose:(id)sender
-{
-    NSWindow *o_key_window = [NSApp keyWindow];
-
-    if (b_dark_interface) {
-        [o_key_window orderOut: sender];
-        if ([[VLCMain sharedInstance] activeVideoPlayback] && (!b_nonembedded || o_key_window != self))
-            [[VLCCoreInteraction sharedInstance] stop];
-    } else {
-        if (b_nonembedded && o_key_window != self)
-            [o_detached_video_window performClose: sender];
-        else
-            [super performClose: sender];
-    }
-}
-
-- (void)performMiniaturize:(id)sender
-{
-    if (b_dark_interface)
-        [self miniaturize: sender];
-    else
-        [super performMiniaturize: sender];
-}
-
-- (void)performZoom:(id)sender
-{
-    if (b_dark_interface)
-        [self customZoom: sender];
-    else
-        [super performZoom: sender];
-}
-
-- (void)zoom:(id)sender
-{
-    if (b_dark_interface)
-        [self customZoom: sender];
-    else
-        [super zoom: sender];
-}
-
-/**
- * Given a proposed frame rectangle, return a modified version
- * which will fit inside the screen.
- *
- * This method is based upon NSWindow.m, part of the GNUstep GUI Library, licensed under LGPLv2+.
- *    Authors:  Scott Christley <scottc@net-community.com>, Venkat Ajjanagadde <venkat@ocbi.com>,
- *              Felipe A. Rodriguez <far@ix.netcom.com>, Richard Frith-Macdonald <richard@brainstorm.co.uk>
- *    Copyright (C) 1996 Free Software Foundation, Inc.
- */
-- (NSRect) customConstrainFrameRect: (NSRect)frameRect toScreen: (NSScreen*)screen
-{
-    NSRect screenRect = [screen visibleFrame];
-    float difference;
-
-    /* Move top edge of the window inside the screen */
-    difference = NSMaxY (frameRect) - NSMaxY (screenRect);
-    if (difference > 0)
-        frameRect.origin.y -= difference;
-
-    /* If the window is resizable, resize it (if needed) so that the
-     bottom edge is on the screen or can be on the screen when the user moves
-     the window */
-    difference = NSMaxY (screenRect) - NSMaxY (frameRect);
-    if (_styleMask & NSResizableWindowMask) {
-        float difference2;
-
-        difference2 = screenRect.origin.y - frameRect.origin.y;
-        difference2 -= difference;
-        // Take in account the space between the top of window and the top of the
-        // screen which can be used to move the bottom of the window on the screen
-        if (difference2 > 0) {
-            frameRect.size.height -= difference2;
-            frameRect.origin.y += difference2;
-        }
-
-        /* Ensure that resizing doesn't makewindow smaller than minimum */
-        difference2 = [self minSize].height - frameRect.size.height;
-        if (difference2 > 0) {
-            frameRect.size.height += difference2;
-            frameRect.origin.y -= difference2;
-        }
-    }
-
-    return frameRect;
-}
-
-#define DIST 3
-
-/**
- Zooms the receiver.   This method calls the delegate method
- windowShouldZoom:toFrame: to determine if the window should
- be allowed to zoom to full screen.
- *
- * This method is based upon NSWindow.m, part of the GNUstep GUI Library, licensed under LGPLv2+.
- *    Authors:  Scott Christley <scottc@net-community.com>, Venkat Ajjanagadde <venkat@ocbi.com>,
- *              Felipe A. Rodriguez <far@ix.netcom.com>, Richard Frith-Macdonald <richard@brainstorm.co.uk>
- *    Copyright (C) 1996 Free Software Foundation, Inc.
- */
-- (void)customZoom:(id)sender
-{
-    NSRect maxRect = [[self screen] visibleFrame];
-    NSRect currentFrame = [self frame];
-
-    if ([[self delegate] respondsToSelector: @selector(windowWillUseStandardFrame:defaultFrame:)]) {
-        maxRect = [[self delegate] windowWillUseStandardFrame: self defaultFrame: maxRect];
-    }
-
-    maxRect = [self customConstrainFrameRect: maxRect toScreen: [self screen]];
-
-    // Compare the new frame with the current one
-    if ((abs(NSMaxX(maxRect) - NSMaxX(currentFrame)) < DIST)
-        && (abs(NSMaxY(maxRect) - NSMaxY(currentFrame)) < DIST)
-        && (abs(NSMinX(maxRect) - NSMinX(currentFrame)) < DIST)
-        && (abs(NSMinY(maxRect) - NSMinY(currentFrame)) < DIST)) {
-        // Already in zoomed mode, reset user frame, if stored
-        if ([self frameAutosaveName] != nil) {
-            [self setFrame: previousSavedFrame display: YES animate: YES];
-            [self saveFrameUsingName: [self frameAutosaveName]];
-        }
-        return;
-    }
-
-    if ([self frameAutosaveName] != nil) {
-        [self saveFrameUsingName: [self frameAutosaveName]];
-        previousSavedFrame = [self frame];
-    }
-
-    [self setFrame: maxRect display: YES animate: YES];
 }
 
 - (void)windowResizedOrMoved:(NSNotification *)notification
@@ -1435,9 +1277,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self saveFrameUsingName: [self frameAutosaveName]];
 }
 
+
 - (void)someWindowWillClose:(NSNotification *)notification
 {
-    if ([notification object] == o_detached_video_window || ([notification object] == self && !b_nonembedded)) {
+    id obj = [notification object];
+    if (obj == o_detached_video_window || obj == o_extra_video_window || (obj == self && !b_nonembedded)) {
         if ([[VLCMain sharedInstance] activeVideoPlayback])
             [[VLCCoreInteraction sharedInstance] stop];
     }
@@ -1446,7 +1290,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)someWindowWillMiniaturize:(NSNotification *)notification
 {
     if (config_GetInt(VLCIntf, "macosx-pause-minimized")) {
-        if ([notification object] == o_detached_video_window || ([notification object] == self && !b_nonembedded)) {
+        id obj = [notification object];
+        if (obj == o_detached_video_window || obj == o_extra_video_window || (obj == self && !b_nonembedded)) {
             if ([[VLCMain sharedInstance] activeVideoPlayback])
                 [[VLCCoreInteraction sharedInstance] pause];
         }
@@ -1802,7 +1647,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             mask |= NSResizableWindowMask;
 
         BOOL b_no_video_deco_only = !b_video_wallpaper;
-        o_extra_video_window = [[VLCWindow alloc] initWithContentRect:window_rect styleMask:mask backing:NSBackingStoreBuffered defer:YES];
+        o_extra_video_window = [[VLCVideoWindowCommon alloc] initWithContentRect:window_rect styleMask:mask backing:NSBackingStoreBuffered defer:YES];
         [o_extra_video_window setDelegate:self];
 
         if (b_video_wallpaper)
@@ -2935,32 +2780,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 @implementation VLCDetachedVideoWindow
 
-- (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)styleMask
-                  backing:(NSBackingStoreType)backingType defer:(BOOL)flag
-{
-    b_dark_interface = config_GetInt(VLCIntf, "macosx-interfacestyle");
-
-    if (b_dark_interface) {
-        styleMask = NSBorderlessWindowMask;
-#ifdef MAC_OS_X_VERSION_10_7
-        if (!OSX_SNOW_LEOPARD)
-            styleMask |= NSResizableWindowMask;
-#endif
-    }
-
-    self = [super initWithContentRect:contentRect styleMask:styleMask
-                                  backing:backingType defer:flag];
-
-    /* we want to be moveable regardless of our style */
-    [self setMovableByWindowBackground: YES];
-
-    /* we don't want this window to be restored on relaunch */
-    if (!OSX_SNOW_LEOPARD)
-        [self setRestorable:NO];
-
-    return self;
-}
-
 - (void)awakeFromNib
 {
     [self setAcceptsMouseMovedEvents: YES];
@@ -2979,142 +2798,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[VLCCoreInteraction sharedInstance] toggleFullscreen];
 }
 
-- (void)performClose:(id)sender
-{
-    if (b_dark_interface)
-        [[VLCMainWindow sharedInstance] performClose: sender];
-    else
-        [super performClose: sender];
-}
-
-- (void)performMiniaturize:(id)sender
-{
-    if (b_dark_interface)
-        [self miniaturize: sender];
-    else
-        [super performMiniaturize: sender];
-}
-
-- (void)performZoom:(id)sender
-{
-    if (b_dark_interface)
-        [self customZoom: sender];
-    else
-        [super performZoom: sender];
-}
-
-- (void)zoom:(id)sender
-{
-    if (b_dark_interface)
-        [self customZoom: sender];
-    else
-        [super zoom: sender];
-}
-
 - (BOOL)canBecomeKeyWindow
 {
     return YES;
-}
-
-- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
-{
-    SEL s_menuAction = [menuItem action];
-
-    if ((s_menuAction == @selector(performClose:)) || (s_menuAction == @selector(performMiniaturize:)) || (s_menuAction == @selector(performZoom:)))
-        return YES;
-
-    return [super validateMenuItem:menuItem];
-}
-
-/**
- * Given a proposed frame rectangle, return a modified version
- * which will fit inside the screen.
- *
- * This method is based upon NSWindow.m, part of the GNUstep GUI Library, licensed under LGPLv2+.
- *    Authors:  Scott Christley <scottc@net-community.com>, Venkat Ajjanagadde <venkat@ocbi.com>,
- *              Felipe A. Rodriguez <far@ix.netcom.com>, Richard Frith-Macdonald <richard@brainstorm.co.uk>
- *    Copyright (C) 1996 Free Software Foundation, Inc.
- */
-- (NSRect) customConstrainFrameRect: (NSRect)frameRect toScreen: (NSScreen*)screen
-{
-    NSRect screenRect = [screen visibleFrame];
-    float difference;
-
-    /* Move top edge of the window inside the screen */
-    difference = NSMaxY (frameRect) - NSMaxY (screenRect);
-    if (difference > 0) {
-        frameRect.origin.y -= difference;
-    }
-
-    /* If the window is resizable, resize it (if needed) so that the
-     bottom edge is on the screen or can be on the screen when the user moves
-     the window */
-    difference = NSMaxY (screenRect) - NSMaxY (frameRect);
-    if (_styleMask & NSResizableWindowMask) {
-        float difference2;
-
-        difference2 = screenRect.origin.y - frameRect.origin.y;
-        difference2 -= difference;
-        // Take in account the space between the top of window and the top of the
-        // screen which can be used to move the bottom of the window on the screen
-        if (difference2 > 0) {
-            frameRect.size.height -= difference2;
-            frameRect.origin.y += difference2;
-        }
-
-        /* Ensure that resizing doesn't makewindow smaller than minimum */
-        difference2 = [self minSize].height - frameRect.size.height;
-        if (difference2 > 0) {
-            frameRect.size.height += difference2;
-            frameRect.origin.y -= difference2;
-        }
-    }
-
-    return frameRect;
-}
-
-#define DIST 3
-
-/**
- Zooms the receiver.   This method calls the delegate method
- windowShouldZoom:toFrame: to determine if the window should
- be allowed to zoom to full screen.
- *
- * This method is based upon NSWindow.m, part of the GNUstep GUI Library, licensed under LGPLv2+.
- *    Authors:  Scott Christley <scottc@net-community.com>, Venkat Ajjanagadde <venkat@ocbi.com>,
- *              Felipe A. Rodriguez <far@ix.netcom.com>, Richard Frith-Macdonald <richard@brainstorm.co.uk>
- *    Copyright (C) 1996 Free Software Foundation, Inc.
- */
-- (void) customZoom: (id)sender
-{
-    NSRect maxRect = [[self screen] visibleFrame];
-    NSRect currentFrame = [self frame];
-
-    if ([[self delegate] respondsToSelector: @selector(windowWillUseStandardFrame:defaultFrame:)]) {
-        maxRect = [[self delegate] windowWillUseStandardFrame: self defaultFrame: maxRect];
-    }
-
-    maxRect = [self customConstrainFrameRect: maxRect toScreen: [self screen]];
-
-    // Compare the new frame with the current one
-    if ((abs(NSMaxX(maxRect) - NSMaxX(currentFrame)) < DIST)
-        && (abs(NSMaxY(maxRect) - NSMaxY(currentFrame)) < DIST)
-        && (abs(NSMinX(maxRect) - NSMinX(currentFrame)) < DIST)
-        && (abs(NSMinY(maxRect) - NSMinY(currentFrame)) < DIST)) {
-        // Already in zoomed mode, reset user frame, if stored
-        if ([self frameAutosaveName] != nil) {
-            [self setFrame: previousSavedFrame display: YES animate: YES];
-            [self saveFrameUsingName: [self frameAutosaveName]];
-        }
-        return;
-    }
-
-    if ([self frameAutosaveName] != nil) {
-        [self saveFrameUsingName: [self frameAutosaveName]];
-        previousSavedFrame = [self frame];
-    }
-
-    [self setFrame: maxRect display: YES animate: YES];
 }
 
 - (NSArray *)accessibilityAttributeNames

@@ -29,11 +29,12 @@
 #import "PXSourceList.h"
 #import "PXSourceListDataSource.h"
 #import <vlc_input.h>
+#import "Windows.h"
 #import "misc.h"
 #import "fspanel.h"
 #import "MainWindowTitle.h"
 
-@interface VLCMainWindow : NSWindow <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate> {
+@interface VLCMainWindow : VLCVideoWindowCommon <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate> {
     IBOutlet id o_play_btn;
     IBOutlet id o_bwd_btn;
     IBOutlet id o_fwd_btn;
@@ -103,7 +104,6 @@
     IBOutlet id o_podcast_unsubscribe_ok_btn;
     IBOutlet id o_podcast_unsubscribe_cancel_btn;
 
-    BOOL b_dark_interface;
     BOOL b_nativeFullscreenMode;
     BOOL b_video_playback_enabled;
     BOOL b_dropzone_active;
@@ -156,7 +156,6 @@
 
     VLCColorView * o_color_backdrop;
     NSInteger i_originalLevel;
-    NSRect previousSavedFrame;
 
     VLCWindow *o_extra_video_window;
     id o_current_video_window;
@@ -189,7 +188,6 @@
 - (IBAction)removePodcastWindowAction:(id)sender;
 
 - (void)setTitle:(NSString *)title;
-- (void)customZoom:(id)sender;
 - (void)windowResizedOrMoved:(NSNotification *)notification;
 
 - (void)showDropZone;
@@ -238,12 +236,6 @@
 - (id)detachedTitlebarView;
 @end
 
-@interface VLCDetachedVideoWindow : NSWindow
-{
-    BOOL b_dark_interface;
-    NSRect previousSavedFrame;
-}
-
-- (void)customZoom:(id)sender;
+@interface VLCDetachedVideoWindow : VLCVideoWindowCommon
 
 @end

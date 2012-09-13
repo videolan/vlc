@@ -80,4 +80,6 @@ SOURCES_macosx = \
 	ConvertAndSave.m \
 	SharedDialogs.h \
 	SharedDialogs.m \
+	Windows.h \
+	Windows.m \
 	$(NULL)

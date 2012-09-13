@@ -67,37 +67,6 @@
 + (void)unblackoutScreens;
 @end
 
-/*****************************************************************************
- * VLCWindow
- *
- *  Missing extension to NSWindow
- *****************************************************************************/
-
-@interface VLCWindow : NSWindow <NSWindowDelegate>
-{
-    BOOL b_canBecomeKeyWindow;
-    BOOL b_isset_canBecomeKeyWindow;
-    BOOL b_canBecomeMainWindow;
-    BOOL b_isset_canBecomeMainWindow;
-    NSViewAnimation *animation;
-}
-@property (readwrite) BOOL canBecomeKeyWindow;
-@property (readwrite) BOOL canBecomeMainWindow;
-
-/* animate mode is only supported in >=10.4 */
-- (void)orderFront: (id)sender animate: (BOOL)animate;
-
-/* animate mode is only supported in >=10.4 */
-- (void)orderOut: (id)sender animate: (BOOL)animate;
-
-/* animate mode is only supported in >=10.4 */
-- (void)orderOut: (id)sender animate: (BOOL)animate callback:(NSInvocation *)callback;
-
-/* animate mode is only supported in >=10.4 */
-- (void)closeAndAnimate: (BOOL)animate;
-
-@end
-
 
 /*****************************************************************************
  * VLBrushedMetalImageView
