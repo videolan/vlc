@@ -51,7 +51,9 @@
 #include <vlc_codecs.h>
 #include "dmo.h"
 
-//#define DMO_DEBUG 1
+#ifndef NDEBUG
+# define DMO_DEBUG 1
+#endif
 
 #ifdef LOADER
 /* Not Needed */
@@ -579,19 +581,19 @@ static int DecOpen( decoder_t *p_dec )
 
         while( !p_dmo->vt->GetOutputType( p_dmo, 0, i++, &mt ) )
         {
-            msg_Dbg( p_dec, "available output chroma: %4.4s",
-                     (char *)&mt.subtype.Data1 );
+            msg_Dbg( p_dec, "available output chroma: %4.4s", (char *)&mt.subtype.Data1 );
             DMOFreeMediaType( &mt );
         }
     }
 #endif
 
-    if( p_dmo->vt->SetOutputType( p_dmo, 0, &dmo_output_type, 0 ) )
+    unsigned i_err = p_dmo->vt->SetOutputType( p_dmo, 0, &dmo_output_type, 0 );
+    if( i_err )
     {
-        msg_Err( p_dec, "can't set DMO output type" );
+        msg_Err( p_dec, "can't set DMO output type for decoder: 0x%x", i_err );
         goto error;
     }
-    msg_Dbg( p_dec, "DMO output type set" );
+    msg_Dbg( p_dec, "DMO output type set for decoder" );
 
     /* Allocate the memory needed to store the decoder's structure */
     p_sys->hmsdmo_dll = hmsdmo_dll;
@@ -1270,11 +1272,11 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     DMOFreeMediaType( &dmo_type );
     if( i_err )
     {
-        msg_Err( p_enc, "can't set DMO output type: %i", i_err );
+        msg_Err( p_enc, "can't set DMO output type for encoder: 0x%x", i_err );
         return VLC_EGENERIC;
     }
 
-    msg_Dbg( p_enc, "successfully set output type" );
+    msg_Dbg( p_enc, "successfully set output type for encoder" );
     return VLC_SUCCESS;
 }
 
@@ -1400,7 +1402,7 @@ static int EncoderSetAudioType( encoder_t *p_enc, IMediaObject *p_dmo )
     DMOFreeMediaType( &dmo_type );
     if( i_err )
     {
-        msg_Err( p_enc, "can't set DMO input type: %x", i_err );
+        msg_Err( p_enc, "can't set DMO input type: 0x%x", i_err );
         return VLC_EGENERIC;
     }
     msg_Dbg( p_enc, "successfully set input type" );
