@@ -695,6 +695,7 @@ static const staticentry_t p_list_video[] = {
         E("apcs", "Apple ProRes 422 LT"),
         E("apco", "Apple ProRes 422 Proxy"),
         E("ap4c", "Apple ProRes 4444"),
+        E("ap4h", "Apple ProRes 4444"),
 
     /* */
     B(VLC_CODEC_YV12, "Planar 4:2:0 YVU"),
