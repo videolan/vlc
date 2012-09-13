@@ -1,0 +1,9 @@
+--- harfbuzz/harfbuzz.pc.in.orig	2012-09-13 16:21:46.883843416 +0200
++++ harfbuzz/harfbuzz.pc.in	2012-09-13 16:21:54.771843345 +0200
+@@ -7,5 +7,5 @@
+ Description: Text shaping library
+ Version: @VERSION@
+ 
+-Libs: -L${libdir} -lharfbuzz
++Libs: -L${libdir} -lharfbuzz -lusp10 -lgdi32
+ Cflags: -I${includedir}/harfbuzz

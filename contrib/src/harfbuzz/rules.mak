@@ -14,6 +14,9 @@ $(TARBALLS)/harfbuzz-$(HARFBUZZ_VERSION).tar.bz2:
 
 harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.bz2 .sum-harfbuzz
 	$(UNPACK)
+ifdef HAVE_WIN32
+	$(APPLY) $(SRC)/harfbuzz/win32.patch
+endif
 ifdef HAVE_MACOSX
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-osx.patch
 endif
