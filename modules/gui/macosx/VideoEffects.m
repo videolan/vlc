@@ -26,10 +26,12 @@
 #import <vlc_common.h>
 #import <vlc_modules.h>
 #import <vlc_charset.h>
+#import <vlc_strings.h>
 #import "VideoEffects.h"
+#import "SharedDialogs.h"
 
 #pragma mark -
-#pragma mark Initialization & Generic code
+#pragma mark Initialization
 
 @implementation VLCVideoEffects
 static VLCVideoEffects *_o_sharedInstance = nil;
@@ -37,6 +39,12 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 + (VLCVideoEffects *)sharedInstance
 {
     return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
+}
+
++ (void)initialize
+{
+    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:@";;0;1.000000;1.000000;1.000000;1.000000;0.050000;16;2.000000;OTA=;4;4;0;16711680;20;15;120;Z3JhZGllbnQ=;1;0;16711680;6;80;VkxD;-1;;-1;255"], @"VideoEffectProfiles", [NSArray arrayWithObject:_NS("Default")], @"VideoEffectProfileNames", nil];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
 }
 
 - (id)init
@@ -51,14 +59,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     return _o_sharedInstance;
 }
 
-- (IBAction)toggleWindow:(id)sender
-{
-    if ([o_window isVisible])
-        [o_window orderOut:sender];
-    else
-        [o_window makeKeyAndOrderFront:sender];
-}
-
 - (void)awakeFromNib
 {
     [o_window setTitle: _NS("Video Effects")];
@@ -71,6 +71,8 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"geometry"]] setLabel:_NS("Geometry")];
     [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"color"]] setLabel:_NS("Color")];
     [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"misc"]] setLabel:_NS("Miscellaneous")];
+
+    [self resetProfileSelector];
 
     [o_adjust_ckb setTitle:_NS("Image Adjust")];
     [o_adjust_hue_lbl setStringValue:_NS("Hue")];
@@ -193,6 +195,31 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [self resetValues];
 }
 
+#pragma mark -
+#pragma mark internal functions
+- (void)resetProfileSelector
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [o_profile_pop removeAllItems];
+
+    NSArray * profileNames = [defaults objectForKey:@"VideoEffectProfileNames"];
+    [o_profile_pop addItemsWithTitles:profileNames];
+
+    [[o_profile_pop menu] addItem:[NSMenuItem separatorItem]];
+    [o_profile_pop addItemWithTitle:_NS("Save selection as new profile...")];
+    [[o_profile_pop lastItem] setTarget: self];
+    [[o_profile_pop lastItem] setAction: @selector(addProfile:)];
+
+    if ([profileNames count] > 1) {
+        [o_profile_pop addItemWithTitle:_NS("Organize Profiles...")];
+        [[o_profile_pop lastItem] setTarget: self];
+        [[o_profile_pop lastItem] setAction: @selector(removeProfile:)];
+    }
+
+    [o_profile_pop selectItemAtIndex:[defaults integerForKey:@"VideoEffectSelectedProfile"]];
+    [self profileSelectorAction:self];
+}
+
 - (void)resetValues
 {
     NSString *tmpString;
@@ -224,12 +251,36 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         [o_psychedelic_ckb setState: (NSInteger)strstr(psz_vfilters, "psychedelic")];
         [o_anaglyph_ckb setState: (NSInteger)strstr(psz_vfilters, "anaglyph")];
         free(psz_vfilters);
+    } else {
+        [o_adjust_ckb setState: NSOffState];
+        [o_sharpen_ckb setState: NSOffState];
+        [o_banding_ckb setState: NSOffState];
+        [o_grain_ckb setState: NSOffState];
+        [o_transform_ckb setState: NSOffState];
+        [o_zoom_ckb setState: NSOffState];
+        [o_puzzle_ckb setState: NSOffState];
+        [o_threshold_ckb setState: NSOffState];
+        [o_sepia_ckb setState: NSOffState];
+        [o_noise_ckb setState: NSOffState];
+        [o_gradient_ckb setState: NSOffState];
+        [o_extract_ckb setState: NSOffState];
+        [o_invert_ckb setState: NSOffState];
+        [o_posterize_ckb setState: NSOffState];
+        [o_blur_ckb setState: NSOffState];
+        [o_motiondetect_ckb setState: NSOffState];
+        [o_watereffect_ckb setState: NSOffState];
+        [o_waves_ckb setState: NSOffState];
+        [o_psychedelic_ckb setState: NSOffState];
+        [o_anaglyph_ckb setState: NSOffState];
     }
     psz_vfilters = config_GetPsz(p_intf, "sub-source");
     if (psz_vfilters) {
         [o_addtext_ckb setState: (NSInteger)strstr(psz_vfilters, "marq")];
         [o_addlogo_ckb setState: (NSInteger)strstr(psz_vfilters, "logo")];
         free(psz_vfilters);
+    } else {
+        [o_addtext_ckb setState: NSOffState];
+        [o_addlogo_ckb setState: NSOffState];
     }
 
     /* fetch and show the various values */
@@ -342,7 +393,8 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     if (tmpChar) {
         [o_addtext_text_fld setStringValue: [NSString stringWithUTF8String: tmpChar]];
         FREENULL(tmpChar);
-    }
+    } else
+        [o_addtext_text_fld setStringValue: @""];
     [o_addtext_pos_pop selectItemWithTag: config_GetInt(p_intf, "marq-position")];
     b_state = [o_addtext_ckb state];
     [o_addtext_pos_pop setEnabled: b_state];
@@ -352,9 +404,10 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
     tmpChar = config_GetPsz(p_intf, "logo-file");
     if (tmpChar) {
-       [o_addlogo_logo_fld setStringValue: [NSString stringWithUTF8String: tmpChar]];
+        [o_addlogo_logo_fld setStringValue: [NSString stringWithUTF8String: tmpChar]];
         FREENULL(tmpChar);
-    }
+    } else
+        [o_addlogo_logo_fld setStringValue: @""];
     [o_addlogo_pos_pop selectItemWithTag: config_GetInt(p_intf, "logo-position")];
     [o_addlogo_transparency_sld setIntValue: config_GetInt(p_intf, "logo-opacity")];
     [o_addlogo_transparency_sld setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "logo-opacity")]];
@@ -466,23 +519,22 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     vout_thread_t *p_vout = getVout();
     vlc_object_t *p_filter;
 
-    if (p_vout == NULL) {
-        config_PutInt(p_intf , psz_name , i_value);
-    } else {
+    config_PutInt(p_intf , psz_name , i_value);
+
+    if (p_vout) {
         p_filter = vlc_object_find_name(pl_Get(p_intf), psz_filter);
 
         if (! p_filter) {
-            msg_Err(p_intf, "we're unable to find the filter '%s'", psz_filter);
+            msg_Warn(p_intf, "filter '%s' isn't enabled", psz_filter);
             vlc_object_release(p_vout);
             return;
         }
         var_SetInteger(p_filter, psz_name, i_value);
-        config_PutInt(p_intf, psz_name, i_value);
         vlc_object_release(p_vout);
         vlc_object_release(p_filter);
-    }
 
-    [self restartFilterIfNeeded:psz_filter option: psz_name];
+        [self restartFilterIfNeeded:psz_filter option: psz_name];
+    }
 }
 
 - (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter float: (float)f_value
@@ -490,18 +542,17 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     vout_thread_t *p_vout = getVout();
     vlc_object_t *p_filter;
 
-    if (p_vout == NULL) {
-        config_PutFloat(p_intf , psz_name , f_value);
-    } else {
+    config_PutFloat(p_intf , psz_name , f_value);
+
+    if (p_vout) {
         p_filter = vlc_object_find_name(pl_Get(p_intf), psz_filter);
 
         if (! p_filter) {
-            msg_Err(p_intf, "we're unable to find the filter '%s'", psz_filter);
+            msg_Warn(p_intf, "filter '%s' isn't enabled", psz_filter);
             vlc_object_release(p_vout);
             return;
         }
         var_SetFloat(p_filter, psz_name, f_value);
-        config_PutFloat(p_intf, psz_name, f_value);
         vlc_object_release(p_vout);
         vlc_object_release(p_filter);
 
@@ -514,18 +565,17 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     vout_thread_t *p_vout = getVout();
     vlc_object_t *p_filter;
 
-    if (p_vout == NULL) {
-        config_PutPsz(p_intf, psz_name, EnsureUTF8(psz_value));
-    } else {
+    config_PutPsz(p_intf, psz_name, EnsureUTF8(psz_value));
+
+    if (p_vout) {
         p_filter = vlc_object_find_name(pl_Get(p_intf), psz_filter);
 
         if (! p_filter) {
-            msg_Err(p_intf, "we're unable to find the filter '%s'", psz_filter);
+            msg_Warn(p_intf, "filter '%s' isn't enabled", psz_filter);
             vlc_object_release(p_vout);
             return;
         }
         var_SetString(p_filter, psz_name, EnsureUTF8(psz_value));
-        config_PutPsz(p_intf, psz_name, EnsureUTF8(psz_value));
         vlc_object_release(p_vout);
         vlc_object_release(p_filter);
 
@@ -538,20 +588,214 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     vout_thread_t *p_vout = getVout();
     vlc_object_t *p_filter;
 
-    if (p_vout == NULL) {
-        config_PutInt(p_intf, psz_name, b_value);
-    } else {
+    config_PutInt(p_intf, psz_name, b_value);
+
+    if (p_vout) {
         p_filter = vlc_object_find_name(pl_Get(p_intf), psz_filter);
 
         if (! p_filter) {
-            msg_Err(p_intf, "we're unable to find the filter '%s'", psz_filter);
+            msg_Warn(p_intf, "filter '%s' isn't enabled", psz_filter);
             vlc_object_release(p_vout);
             return;
         }
         var_SetBool(p_filter, psz_name, b_value);
-        config_PutInt(p_intf, psz_name, b_value);
         vlc_object_release(p_vout);
     }
+}
+
+- (NSString *)generateProfileString
+{
+    return [NSString stringWithFormat:@"%s;%s;%lli;%f;%f;%f;%f;%f;%lli;%f;%s;%lli;%lli;%lli;%lli;%lli;%lli;%lli;%s;%lli;%lli;%lli;%lli;%lli;%s;%lli;%s;%lli;%lli",
+            vlc_b64_encode(config_GetPsz(p_intf, "video-filter")),
+            vlc_b64_encode(config_GetPsz(p_intf, "sub-source")),
+            config_GetInt(p_intf, "hue"),
+            config_GetFloat(p_intf, "contrast"),
+            config_GetFloat(p_intf, "brightness"),
+            config_GetFloat(p_intf, "saturation"),
+            config_GetFloat(p_intf, "gamma"),
+            config_GetFloat(p_intf, "sharpen-sigma"),
+            config_GetInt(p_intf, "gradfun-radius"),
+            config_GetFloat(p_intf, "grain-variance"),
+            vlc_b64_encode(config_GetPsz(p_intf, "transform-type")),
+            config_GetInt(p_intf, "puzzle-rows"),
+            config_GetInt(p_intf, "puzzle-cols"),
+            config_GetInt(p_intf, "puzzle-black-slot"),
+            config_GetInt(p_intf, "colorthres-color"),
+            config_GetInt(p_intf, "colorthres-saturationthres"),
+            config_GetInt(p_intf, "colorthres-similaritythres"),
+            config_GetInt(p_intf, "sepia-intensity"),
+            vlc_b64_encode(config_GetPsz(p_intf, "gradient-mode")),
+            config_GetInt(p_intf, "gradient-cartoon"),
+            config_GetInt(p_intf, "gradient-type"),
+            config_GetInt(p_intf, "extract-component"),
+            config_GetInt(p_intf, "posterize-level"),
+            config_GetInt(p_intf, "blur-factor"),
+            vlc_b64_encode(config_GetPsz(p_intf, "marq-marquee")),
+            config_GetInt(p_intf, "marq-position"),
+            vlc_b64_encode(config_GetPsz(p_intf, "logo-file")),
+            config_GetInt(p_intf, "logo-position"),
+            config_GetInt(p_intf, "logo-opacity")
+            ];
+}
+
+#pragma mark -
+#pragma mark generic UI code
+- (IBAction)toggleWindow:(id)sender
+{
+    if ([o_window isVisible])
+        [o_window orderOut:sender];
+    else
+        [o_window makeKeyAndOrderFront:sender];
+}
+
+- (IBAction)profileSelectorAction:(id)sender
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSUInteger selectedProfile = [o_profile_pop indexOfSelectedItem];
+
+    /* disable all current video filters, if a vout is available */
+    vout_thread_t *p_vout = getVout();
+    if (p_vout) {
+        var_SetString(p_vout, "video-filter", "");
+        var_SetString(p_vout, "sub-source", "");
+        vlc_object_release(p_vout);
+    }
+
+    /* fetch preset */
+    NSArray *items = [[[defaults objectForKey:@"VideoEffectProfiles"] objectAtIndex:selectedProfile] componentsSeparatedByString:@";"];
+
+    /* filter handling */
+    NSString *tempString = [NSString stringWithFormat:@"%s", vlc_b64_decode([[items objectAtIndex:0] UTF8String])];
+    NSArray *tempArray;
+    NSUInteger count;
+    /* enable the new filters */
+    if ([tempString length] > 0) {
+        tempArray = [tempString componentsSeparatedByString:@":"];
+        count = [tempArray count];
+        for (NSUInteger x = 0; x < count; x++)
+            [self setVideoFilter:(char *)[[tempArray objectAtIndex:x] UTF8String] on:YES];
+    }
+    config_PutPsz(p_intf,"video-filter",[tempString UTF8String]);
+    tempString = [NSString stringWithFormat:@"%s", vlc_b64_decode([[items objectAtIndex:1] UTF8String])];
+    /* enable another round of new filters */
+    if ([tempString length] > 0) {
+        tempArray = [tempString componentsSeparatedByString:@":"];
+        count = [tempArray count];
+        for (NSUInteger x = 0; x < count; x++)
+            [self setVideoFilter:(char *)[[tempArray objectAtIndex:x] UTF8String] on:YES];
+    }
+    config_PutPsz(p_intf,"sub-source",[tempString UTF8String]);
+
+    /* try to set filter values on-the-fly and store them appropriately */
+    [self setVideoFilterProperty:"hue" forFilter:"adjust" integer:[[items objectAtIndex:2] intValue]];
+    [self setVideoFilterProperty:"contrast" forFilter:"adjust" float:[[items objectAtIndex:3] floatValue]];
+    [self setVideoFilterProperty:"brightness" forFilter:"adjust" float:[[items objectAtIndex:4] floatValue]];
+    [self setVideoFilterProperty:"saturation" forFilter:"adjust" float:[[items objectAtIndex:5] floatValue]];
+    [self setVideoFilterProperty:"gamma" forFilter:"adjust" float:[[items objectAtIndex:6] floatValue]];
+    [self setVideoFilterProperty:"sharpen-sigma" forFilter:"sharpen" float:[[items objectAtIndex:7] floatValue]];
+    [self setVideoFilterProperty:"gradfun-radius" forFilter:"gradfun" integer:[[items objectAtIndex:8] intValue]];
+    [self setVideoFilterProperty:"grain-variance" forFilter:"grain" float:[[items objectAtIndex:9] floatValue]];
+    [self setVideoFilterProperty:"transform-type" forFilter:"transform" string:vlc_b64_decode([[items objectAtIndex:10] UTF8String])];
+    [self setVideoFilterProperty:"puzzle-rows" forFilter:"puzzle" integer:[[items objectAtIndex:11] intValue]];
+    [self setVideoFilterProperty:"puzzle-cols" forFilter:"puzzle" integer:[[items objectAtIndex:12] intValue]];
+    [self setVideoFilterProperty:"puzzle-black-slot" forFilter:"puzzle" boolean:[[items objectAtIndex:13] intValue]];
+    [self setVideoFilterProperty:"colorthres-color" forFilter:"colorthres" integer:[[items objectAtIndex:14] intValue]];
+    [self setVideoFilterProperty:"colorthres-saturationthres" forFilter:"colorthres" integer:[[items objectAtIndex:15] intValue]];
+    [self setVideoFilterProperty:"colorthres-similaritythres" forFilter:"colorthres" integer:[[items objectAtIndex:16] intValue]];
+    [self setVideoFilterProperty:"sepia-intensity" forFilter:"sepia" integer:[[items objectAtIndex:17] intValue]];
+    [self setVideoFilterProperty:"gradient-mode" forFilter:"gradient" string:vlc_b64_decode([[items objectAtIndex:18] UTF8String])];
+    [self setVideoFilterProperty:"gradient-cartoon" forFilter:"gradient" integer:[[items objectAtIndex:19] intValue]];
+    [self setVideoFilterProperty:"gradient-type" forFilter:"gradient" integer:[[items objectAtIndex:20] intValue]];
+    [self setVideoFilterProperty:"extract-component" forFilter:"extract" integer:[[items objectAtIndex:21] intValue]];
+    [self setVideoFilterProperty:"posterize-level" forFilter:"posterize" integer:[[items objectAtIndex:22] intValue]];
+    [self setVideoFilterProperty:"blur-factor" forFilter:"motionblur" integer:[[items objectAtIndex:23] intValue]];
+    [self setVideoFilterProperty:"marq-marquee" forFilter:"marq" string:vlc_b64_decode([[items objectAtIndex:24] UTF8String])];
+    [self setVideoFilterProperty:"marq-position" forFilter:"marq" integer:[[items objectAtIndex:25] intValue]];
+    [self setVideoFilterProperty:"logo-file" forFilter:"logo" string:vlc_b64_decode([[items objectAtIndex:26] UTF8String])];
+    [self setVideoFilterProperty:"logo-position" forFilter:"logo" integer:[[items objectAtIndex:27] intValue]];
+    [self setVideoFilterProperty:"logo-opacity" forFilter:"logo" integer:[[items objectAtIndex:28] intValue]];
+
+    [defaults setInteger:selectedProfile forKey:@"VideoEffectSelectedProfile"];
+    [defaults synchronize];
+
+    [self resetValues];
+}
+
+- (IBAction)addProfile:(id)sender
+{
+    /* show panel */
+    VLCEnterTextPanel * panel = [VLCEnterTextPanel sharedInstance];
+    [panel setTitle: _NS("Save current selection as new profile")];
+    [panel setSubTitle: _NS("Enter a name for the new profile:")];
+    [panel setCancelButtonLabel: _NS("Cancel")];
+    [panel setOKButtonLabel: _NS("Save")];
+    [panel setTarget:self];
+
+    [panel runModalForWindow:o_window];
+}
+
+- (void)panel:(VLCEnterTextPanel *)panel returnValue:(NSUInteger)value text:(NSString *)text
+{
+    if (value == NSOKButton) {
+        if ([text length] > 0) {
+            /* fetch all the current settings in a uniform string */
+            NSString *newProfile = [self generateProfileString];
+
+            /* add string to user defaults as well as a label */
+            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+            NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"VideoEffectProfiles"]];
+            [workArray addObject:newProfile];
+            [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfiles"];
+            [defaults setInteger:[workArray count] - 1 forKey:@"VideoEffectSelectedProfile"];
+            [workArray release];
+            workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"VideoEffectProfileNames"]];
+            [workArray addObject:text];
+            [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfileNames"];
+            [workArray release];
+
+            /* save defaults */
+            [defaults synchronize];
+        }
+    }
+
+    /* refresh UI */
+    [self resetProfileSelector];
+}
+
+- (IBAction)removeProfile:(id)sender
+{
+    /* show panel */
+    VLCSelectItemInPopupPanel * panel = [VLCSelectItemInPopupPanel sharedInstance];
+    [panel setTitle:_NS("Remove a preset")];
+    [panel setSubTitle:_NS("Select the preset you would like to remove:")];
+    [panel setOKButtonLabel:_NS("Remove")];
+    [panel setCancelButtonLabel:_NS("Cancel")];
+    [panel setPopupButtonContent:[[NSUserDefaults standardUserDefaults] objectForKey:@"VideoEffectProfileNames"]];
+    [panel setTarget:self];
+
+    [panel runModalForWindow:o_window];
+}
+
+- (void)panel:(VLCSelectItemInPopupPanel *)panel returnValue:(NSUInteger)value item:(NSUInteger)item
+{
+    if (value == NSOKButton) {
+        /* remove selected profile from settings */
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        NSMutableArray *workArray = [defaults objectForKey:@"VideoEffectProfiles"];
+        [workArray removeObjectAtIndex:item];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfiles"];
+        [workArray release];
+        workArray = [defaults objectForKey:@"VideoEffectProfileNames"];
+        [workArray removeObjectAtIndex:item];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfileNames"];
+        [workArray release];
+
+        /* save defaults */
+        [defaults synchronize];
+    }
+
+    /* refresh UI */
+    [self resetProfileSelector];
 }
 
 #pragma mark -
