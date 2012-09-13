@@ -89,13 +89,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     b_dark_interface = config_GetInt(VLCIntf, "macosx-interfacestyle");
 
     if (b_dark_interface) {
+        styleMask = NSBorderlessWindowMask;
 #ifdef MAC_OS_X_VERSION_10_7
         if (!OSX_SNOW_LEOPARD)
-            styleMask = NSBorderlessWindowMask | NSResizableWindowMask;
-        else
-            styleMask = NSBorderlessWindowMask;
-#else
-        styleMask = NSBorderlessWindowMask;
+            styleMask |= NSResizableWindowMask;
 #endif
     }
 
@@ -2944,13 +2941,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     b_dark_interface = config_GetInt(VLCIntf, "macosx-interfacestyle");
 
     if (b_dark_interface) {
+        styleMask = NSBorderlessWindowMask;
 #ifdef MAC_OS_X_VERSION_10_7
         if (!OSX_SNOW_LEOPARD)
-            styleMask = NSBorderlessWindowMask | NSResizableWindowMask;
-        else
-            styleMask = NSBorderlessWindowMask;
-#else
-        styleMask = NSBorderlessWindowMask;
+            styleMask |= NSResizableWindowMask;
 #endif
     }
 
