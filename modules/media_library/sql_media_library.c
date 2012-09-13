@@ -801,6 +801,10 @@ int CreateEmptyDatabase( media_library_t *p_ml )
     if( i_ret != VLC_SUCCESS )
         goto quit_createemptydatabase;
 
+    i_ret = QuerySimple( p_ml, "CREATE INDEX album_title_index ON album (title);" );
+    if( i_ret != VLC_SUCCESS )
+        goto quit_createemptydatabase;
+
     /* Add "unknown" entry to albums */
     i_ret = QuerySimple( p_ml,
                         "INSERT INTO album ( id, title, cover, album_artist_id ) "
@@ -840,6 +844,10 @@ int CreateEmptyDatabase( media_library_t *p_ml )
                         "directory_id INTEGER,"
                         "CONSTRAINT associated_album FOREIGN KEY(album_id) "
             "REFERENCES album(id) ON DELETE SET DEFAULT ON UPDATE RESTRICT)" );
+    if( i_ret != VLC_SUCCESS )
+        goto quit_createemptydatabase;
+
+    i_ret = QuerySimple( p_ml, "CREATE INDEX media_ui_index ON media (uri);" );
     if( i_ret != VLC_SUCCESS )
         goto quit_createemptydatabase;
 
