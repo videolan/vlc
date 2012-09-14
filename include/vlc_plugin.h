@@ -491,6 +491,9 @@ VLC_METADATA_EXPORTS
                     (const int *)(list), \
                     (const char *const *)(list_text));
 
+#define change_integer_cb( cb ) \
+    vlc_config_set (VLC_CONFIG_LIST_CB, (cb));
+
 #define change_integer_range( minv, maxv ) \
     vlc_config_set (VLC_CONFIG_RANGE, (int64_t)(minv), (int64_t)(maxv));
 

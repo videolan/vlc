@@ -144,7 +144,10 @@ static int CacheLoadConfig (module_config_t *cfg, FILE *file)
         LOAD_IMMEDIATE (cfg->max);
         cfg->value = cfg->orig;
 
-        cfg->list.i = xmalloc (cfg->list_count * sizeof (int));
+        if (cfg->list_count)
+            cfg->list.i = xmalloc (cfg->list_count * sizeof (int));
+        else
+            cfg->list.i_cb = NULL;
         for (unsigned i = 0; i < cfg->list_count; i++)
              LOAD_IMMEDIATE (cfg->list.i[i]);
     }

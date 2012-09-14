@@ -414,7 +414,13 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
         }
 
         case VLC_CONFIG_LIST_CB:
-            item->list.psz_cb = va_arg (ap, vlc_string_list_cb);
+            if (IsConfigIntegerType (item->i_type))
+               item->list.i_cb = va_arg (ap, vlc_integer_list_cb);
+            else
+            if (IsConfigStringType (item->i_type))
+               item->list.psz_cb = va_arg (ap, vlc_string_list_cb);
+            else
+                break;
             break;
 
         default:

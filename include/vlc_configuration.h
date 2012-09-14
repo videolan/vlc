@@ -54,6 +54,8 @@ typedef union
 
 typedef int (*vlc_string_list_cb)(vlc_object_t *, const char *,
                                   char ***, char ***);
+typedef int (*vlc_integer_list_cb)(vlc_object_t *, const char *,
+                                   int64_t **, char ***);
 
 struct module_config_t
 {
@@ -88,6 +90,7 @@ struct module_config_t
         char **psz;               /* List of possible values for the option */
         int   *i;
         vlc_string_list_cb psz_cb;
+        vlc_integer_list_cb i_cb;
     } list;
     char **list_text;                      /* Friendly names for list values */
 };
