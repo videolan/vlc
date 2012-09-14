@@ -76,8 +76,8 @@ static VLCAudioEffects *_o_sharedInstance = nil;
         [workNames addObject:[NSString stringWithUTF8String:preset_list[i]]];
     }
 
-    NSString *defaultProfile = [NSString stringWithFormat:@"%i;;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%i",
-                            0,.0,25.,100.,-11.,8.,2.5,7.,.85,1.,.4,.5,.5,2.,0];
+    NSString *defaultProfile = [NSString stringWithFormat:@"ZmxhdA==;;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%i",
+                            .0,25.,100.,-11.,8.,2.5,7.,.85,1.,.4,.5,.5,2.,0];
 
     NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithArray:workValues], @"EQValues", [NSArray arrayWithArray:workPreamp], @"EQPreampValues", [NSArray arrayWithArray:workTitles], @"EQTitles", [NSArray arrayWithArray:workNames], @"EQNames", [NSArray arrayWithObject:defaultProfile], @"AudioEffectProfiles", [NSArray arrayWithObject:_NS("Default")], @"AudioEffectProfileNames", nil];
     [defaults registerDefaults:appDefaults];
@@ -242,11 +242,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     vlc_object_t *p_object = VLC_OBJECT(getAout());
     if (p_object == NULL)
         p_object = vlc_object_hold(pl_Get(p_intf));
-    /* sanity check here, since the user may have removed the custom preset in the mean time */
-    if ([[items objectAtIndex:0] intValue] < [[defaults objectForKey:@"EQNames"] count])
-        var_SetString(p_object,"equalizer-preset",[[[defaults objectForKey:@"EQNames"] objectAtIndex:[[items objectAtIndex:0] intValue]]UTF8String]);
-    else
-        var_SetString(p_object,"equalizer-preset","flat");
+    var_SetString(p_object,"equalizer-preset",vlc_b64_decode([[items objectAtIndex:0] UTF8String]));
     vlc_object_release(p_object);
 
     /* filter handling */
@@ -690,8 +686,8 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
                         return [obj isEqualToString:currentPreset];
                     }];
                 }
-                NSString *newProfile = [NSString stringWithFormat:@"%li;%s;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%lli",
-                                        currentPresetIndex,
+                NSString *newProfile = [NSString stringWithFormat:@"%s;%s;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%lli",
+                                        vlc_b64_encode(var_GetNonEmptyString(p_object, "equalizer-preset")),
                                         vlc_b64_encode(config_GetPsz(p_intf, "audio-filter")),
                                         config_GetFloat(p_intf, "compressor-rms-peak"),
                                         config_GetFloat(p_intf, "compressor-attack"),
