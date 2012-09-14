@@ -1715,7 +1715,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         // look for 'start at fullscreen'
         [[VLCMain sharedInstance] fullscreenChanged];
     } else {
-        [[self animator] setFrame:frameBeforePlayback display:YES];
+        if (!b_nonembedded)
+            [[self animator] setFrame:frameBeforePlayback display:YES];
 
         [self makeFirstResponder: nil];
         [o_detached_video_window orderOut: nil];
