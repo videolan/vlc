@@ -129,6 +129,8 @@ vlc_module_begin()
             RECURSIVE_LONGTEXT, false )
     add_bool( "ml-auto-add", true,  N_("Auto add new medias"),
             N_( "Automatically add new medias to ML" ), false )
+    add_bool( "ml-synchronous", true,  N_("Use transactions"),
+            N_( "Disabling transactions saves I/O but can corrupt database in case of crash" ), false )
 vlc_module_end()
 
 
@@ -1033,6 +1035,33 @@ quit_createemptydatabase:
     return VLC_SUCCESS;
 }
 
+/**
+ * @brief Journal and synchronous disc and writes
+ *
+ * @param p_ml media library object
+ * @param b_sync boolean
+ * @return <= 0 on error.
+ */
+static int SetSynchronous( media_library_t *p_ml, bool b_sync )
+{
+    int i_rows, i_cols;
+    char **pp_results;
+    int i_return;
+    if ( b_sync )
+        i_return = Query( p_ml, &pp_results, &i_rows, &i_cols,
+            "PRAGMA synchronous = ON;PRAGMA journal_mode = TRUNCATE" );
+    else
+        i_return = Query( p_ml, &pp_results, &i_rows, &i_cols,
+            "PRAGMA synchronous = OFF;PRAGMA journal_mode = MEMORY" );
+    if( i_return != VLC_SUCCESS )
+        i_return = -1;
+    else
+        i_return = atoi( pp_results[ 1 ] );
+
+    FreeSQLResult( p_ml, pp_results );
+
+    return i_return;
+}
 
 /**
  * @brief Initiates database (create the database and the tables if needed)
@@ -1048,10 +1077,12 @@ int InitDatabase( media_library_t *p_ml )
     /* Select database name */
     char *psz_dbhost = NULL, *psz_user = NULL, *psz_pass = NULL;
     int i_port = 0;
+    bool b_sync = false;
     psz_dbhost = config_GetPsz( p_ml, "ml-filename" );
     psz_user = config_GetPsz( p_ml, "ml-username" );
     psz_pass = config_GetPsz( p_ml, "ml-password" );
     i_port = config_GetInt( p_ml, "ml-port" );
+    b_sync = config_GetInt( p_ml, "ml-synchronous" );
 
     /* Let's consider that a filename with a DIR_SEP is a full URL */
     if( strchr( psz_dbhost, DIR_SEP_CHAR ) == NULL )
@@ -1089,6 +1120,8 @@ int InitDatabase( media_library_t *p_ml )
 #if ML_DBVERSION != 1
 #error "ML versioning code needs to be updated. Is this done correctly?"
 #endif
+
+    SetSynchronous( p_ml, b_sync );
 
     msg_Dbg( p_ml, "ML initialized" );
     return VLC_SUCCESS;

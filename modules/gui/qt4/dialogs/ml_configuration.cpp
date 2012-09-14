@@ -221,6 +221,8 @@ MLConfDialog::MLConfDialog( QWidget *parent, intf_thread_t *_p_intf )
     /* recursivity */
     recursivity = new QCheckBox( qtr( "Subdirectory recursive scanning" ) );
 
+    synchronous = new QCheckBox( qtr( "Use safe transactions" ) );
+
     /* Buttons */
     QDialogButtonBox *buttonsBox = new QDialogButtonBox();
     QPushButton *save = new QPushButton( qtr( "&Save" ) );
@@ -233,7 +235,8 @@ MLConfDialog::MLConfDialog( QWidget *parent, intf_thread_t *_p_intf )
 
     main_layout->addWidget( tree, 0, 0 );
     main_layout->addWidget( recursivity, 1, 0 );
-    main_layout->addWidget( buttonsBox, 2, 0 );
+    main_layout->addWidget( synchronous, 2, 0 );
+    main_layout->addWidget( buttonsBox, 3, 0 );
 
     p_ml = ml_Get( p_intf );
     init();
@@ -248,6 +251,9 @@ void MLConfDialog::init()
 {
     bool b_recursive = var_CreateGetBool( p_ml, "ml-recursive-scan" );
     recursivity->setChecked( b_recursive );
+
+    bool b_sync = var_CreateGetBool( p_ml, "ml-synchronous" );
+    synchronous->setChecked( b_sync );
 
     if( p_monitored_dirs )
         vlc_array_destroy( p_monitored_dirs );
@@ -281,6 +287,7 @@ void MLConfDialog::save()
     }
 
     var_SetBool( p_ml, "ml-recursive-scan", recursivity->isChecked() );
+    var_SetBool( p_ml, "ml-synchronous", synchronous->isChecked() );
 
     init();
     hide();

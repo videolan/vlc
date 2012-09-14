@@ -97,6 +97,7 @@ private:
 
     MLDirModel *model;
     QCheckBox *recursivity;
+    QCheckBox *synchronous;
 
     static MLConfDialog *instance;
 
