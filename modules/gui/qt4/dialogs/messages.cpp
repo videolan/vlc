@@ -99,6 +99,24 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     updateButton->setFlat( true );
     ui.mainTab->setCornerWidget( updateButton );
 
+#ifndef NDEBUG
+    QWidget *pldebugTab = new QWidget();
+    QVBoxLayout *pldebugTabLayout = new QVBoxLayout();
+    pldebugTab->setLayout( pldebugTabLayout );
+    ui.mainTab->addTab( pldebugTab, "Playlist Tree" );
+    pldebugTree = new QTreeWidget();
+    pldebugTree->headerItem()->setText( 0, "Name" );
+    pldebugTree->headerItem()->setText( 1, "PL id" );
+    pldebugTree->headerItem()->setText( 2, "Item id" );
+    pldebugTree->headerItem()->setText( 3, "PL flags" );
+    pldebugTree->headerItem()->setText( 4, "Item flags" );
+    pldebugTree->setColumnCount( 5 );
+    pldebugTabLayout->addWidget( pldebugTree );
+    QPushButton *pldebugUpdateButton = new QPushButton( "Update" );
+    pldebugTabLayout->addWidget( pldebugUpdateButton );
+    BUTTONACT( pldebugUpdateButton, updatePLTree() );
+#endif
+
     tabChanged(0);
 
     BUTTONACT( updateButton, updateOrClear() );
@@ -329,3 +347,31 @@ void MessagesDialog::MsgCallback( void *self, int type, const msg_item_t *item,
     vlc_restorecancel( canc );
     free( str );
 }
+
+#ifndef NDEBUG
+static QTreeWidgetItem * PLWalk( playlist_item_t *p_node )
+{
+    QTreeWidgetItem *current = new QTreeWidgetItem();
+    current->setText( 0, qfu( p_node->p_input->psz_name ) );
+    current->setToolTip( 0, qfu( p_node->p_input->psz_uri ) );
+    current->setText( 1, QString("%1").arg( p_node->i_id ) );
+    current->setText( 2, QString("%1").arg( p_node->p_input->i_id ) );
+    current->setText( 3, QString("0x%1").arg( p_node->i_flags, 0, 16 ) );
+    current->setText( 4, QString("0x%1").arg(  p_node->p_input->i_type, 0, 16 ) );
+    for ( int i = 0; p_node->i_children > 0 && i < p_node->i_children; i++ )
+        current->addChild( PLWalk( p_node->pp_children[ i ] ) );
+    return current;
+}
+
+void MessagesDialog::updatePLTree()
+{
+    playlist_t *p_playlist = THEPL;
+    pldebugTree->clear();
+    PL_LOCK;
+    pldebugTree->addTopLevelItem( PLWalk( p_playlist->p_root_category ) );
+    PL_UNLOCK;
+    pldebugTree->expandAll();
+    for ( int i=0; i< 5; i++ )
+        pldebugTree->resizeColumnToContents( i );
+}
+#endif

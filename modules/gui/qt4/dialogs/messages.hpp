@@ -67,6 +67,9 @@ private slots:
     void updateOrClear();
     void tabChanged( int );
     void filterMessages();
+#ifndef NDEBUG
+    void updatePLTree();
+#endif
 
 private:
     void buildTree( QTreeWidgetItem *, vlc_object_t * );
@@ -74,6 +77,9 @@ private:
     friend class    Singleton<MessagesDialog>;
     QPushButton *updateButton;
     QMutex messageLocker;
+#ifndef NDEBUG
+    QTreeWidget *pldebugTree;
+#endif
 };
 
 #endif
