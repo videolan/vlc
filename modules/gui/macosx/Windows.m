@@ -38,7 +38,6 @@
 {
     self = [super initWithContentRect:contentRect styleMask:styleMask backing:backingType defer:flag];
     if (self) {
-        b_isset_canBecomeKeyWindow = NO;
         /* we don't want this window to be restored on relaunch */
         if (!OSX_SNOW_LEOPARD)
             [self setRestorable:NO];
@@ -127,20 +126,19 @@
     [anim setUserInfo: callback];
 
     @synchronized(self) {
-        current_anim = self->animation;
+        current_anim = self->o_current_animation;
 
         if ([[[current_anim viewAnimations] objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeOutEffect && [current_anim isAnimating]) {
             [anim release];
         } else {
             if (current_anim) {
                 [current_anim stopAnimation];
-                [anim setCurrentProgress:1.0-[current_anim currentProgress]];
+                [anim setCurrentProgress:1.0 - [current_anim currentProgress]];
                 [current_anim release];
             }
             else
                 [anim setCurrentProgress:1.0 - [self alphaValue]];
-            self->animation = anim;
-            [self setDelegate: self];
+            self->o_current_animation = anim;
             [anim startAnimation];
         }
     }
@@ -180,7 +178,7 @@
     [anim setFrameRate:30];
 
     @synchronized(self) {
-        current_anim = self->animation;
+        current_anim = self->o_current_animation;
 
         if ([[[current_anim viewAnimations] objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeInEffect && [current_anim isAnimating]) {
             [anim release];
@@ -192,8 +190,7 @@
             }
             else
                 [anim setCurrentProgress:[self alphaValue]];
-            self->animation = anim;
-            [self setDelegate: self];
+            self->o_current_animation = anim;
             [self orderFront: sender];
             [anim startAnimation];
         }
@@ -209,11 +206,6 @@
         if ((invoc = [anim userInfo]))
             [invoc invoke];
     }
-}
-
-- (IBAction)fullscreen:(id)sender
-{
-    [[VLCCoreInteraction sharedInstance] toggleFullscreen];
 }
 
 @end

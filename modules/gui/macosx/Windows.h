@@ -31,13 +31,13 @@
  *  Missing extension to NSWindow
  *****************************************************************************/
 
-@interface VLCWindow : NSWindow <NSWindowDelegate>
+@interface VLCWindow : NSWindow
 {
     BOOL b_canBecomeKeyWindow;
     BOOL b_isset_canBecomeKeyWindow;
     BOOL b_canBecomeMainWindow;
     BOOL b_isset_canBecomeMainWindow;
-    NSViewAnimation *animation;
+    NSViewAnimation *o_current_animation;
 }
 @property (readwrite) BOOL canBecomeKeyWindow;
 @property (readwrite) BOOL canBecomeMainWindow;
