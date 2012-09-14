@@ -71,7 +71,6 @@
     IBOutlet id o_dropzone_box;
 
     IBOutlet VLCFSPanel *o_fspanel;
-    IBOutlet id o_titlebar_view;
     IBOutlet id o_resize_view;
     IBOutlet id o_detached_resize_view;
 
@@ -85,7 +84,6 @@
     IBOutlet id o_detached_progress_bar;
     IBOutlet id o_detached_time_sld_fancygradient_view;
     IBOutlet id o_detached_bottombar_view;
-    IBOutlet id o_detached_titlebar_view;
     IBOutlet id o_detached_video_window;
 
     IBOutlet id o_podcast_view;
@@ -187,7 +185,6 @@
 - (IBAction)removePodcast:(id)sender;
 - (IBAction)removePodcastWindowAction:(id)sender;
 
-- (void)setTitle:(NSString *)title;
 - (void)windowResizedOrMoved:(NSNotification *)notification;
 
 - (void)showDropZone;
@@ -233,7 +230,6 @@
 - (void)windowDidEnterFullScreen:(NSNotification *)notification;
 - (void)windowWillExitFullScreen:(NSNotification *)notification;
 
-- (id)detachedTitlebarView;
 @end
 
 @interface VLCDetachedVideoWindow : VLCVideoWindowCommon

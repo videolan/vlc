@@ -364,7 +364,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     // Set that here as IB seems to be buggy
     if (b_dark_interface) {
         [self setContentMinSize:NSMakeSize(604., 288. + [o_titlebar_view frame].size.height)];
-        [o_detached_video_window setContentMinSize: NSMakeSize(363., f_min_video_height + [o_detached_bottombar_view frame].size.height + [o_detached_titlebar_view frame].size.height)];
+        [o_detached_video_window setContentMinSize: NSMakeSize(363., f_min_video_height + [o_detached_bottombar_view frame].size.height + [o_titlebar_view frame].size.height)];
     } else {
         [self setContentMinSize:NSMakeSize(604., 288.)];
         [o_detached_video_window setContentMinSize: NSMakeSize(363., f_min_video_height + [o_detached_bottombar_view frame].size.height)];
@@ -410,7 +410,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_fullscreen_btn removeFromSuperviewWithoutNeedingDisplay];
     } else {
         [o_titlebar_view setFullscreenButtonHidden: YES];
-        [o_detached_titlebar_view setFullscreenButtonHidden: YES];
     }
 
     if (!OSX_SNOW_LEOPARD) {
@@ -563,11 +562,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         winrect.size.height = winrect.size.height - f_titleBarHeight;
         [o_split_view setFrame: winrect];
         [o_video_view setFrame: winrect];
-
-        /* detached video window */
-        winrect = [o_detached_video_window frame];
-        [o_detached_titlebar_view setFrame: NSMakeRect(0, winrect.size.height - f_titleBarHeight, winrect.size.width, f_titleBarHeight)];
-        [[o_detached_video_window contentView] addSubview: o_detached_titlebar_view positioned: NSWindowAbove relativeTo: nil];
 
         o_color_backdrop = [[VLCColorView alloc] initWithFrame: [o_split_view frame]];
         [[self contentView] addSubview: o_color_backdrop positioned: NSWindowBelow relativeTo: o_split_view];
@@ -1256,17 +1250,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     return YES;
 }
 
-- (void)setTitle:(NSString *)title
-{
-    if (b_dark_interface) {
-        [o_titlebar_view setWindowTitle: title];
-        [o_detached_titlebar_view setWindowTitle: title];
-    }
-    if (b_nonembedded && [[VLCMain sharedInstance] activeVideoPlayback])
-        [o_detached_video_window setTitle: title];
-    [super setTitle: title];
-}
-
 - (void)windowResizedOrMoved:(NSNotification *)notification
 {
     [self saveFrameUsingName: [self frameAutosaveName]];
@@ -1472,6 +1455,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
         }
 
         [self setTitle: aString];
+        if (b_nonembedded && [[VLCMain sharedInstance] activeVideoPlayback])
+            [o_detached_video_window setTitle: aString];
+
         [o_fspanel setStreamTitle: aString];
         vlc_object_release(p_input);
     } else {
@@ -1692,7 +1678,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             videoFrame.size = [[o_detached_video_window contentView] frame].size;
             videoFrame.size.height -= [o_detached_bottombar_view frame].size.height;
             if (b_dark_interface)
-                videoFrame.size.height -= [o_detached_titlebar_view frame].size.height;
+                videoFrame.size.height -= [o_titlebar_view frame].size.height;
 
             videoFrame.origin.x = .0;
             videoFrame.origin.y = [o_detached_bottombar_view frame].size.height;
@@ -2726,56 +2712,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 }
 
-#pragma mark -
-#pragma mark Accessibility stuff
-
-- (NSArray *)accessibilityAttributeNames
-{
-    if (!b_dark_interface)
-        return [super accessibilityAttributeNames];
-
-    static NSMutableArray *attributes = nil;
-    if (attributes == nil) {
-        attributes = [[super accessibilityAttributeNames] mutableCopy];
-        NSArray *appendAttributes = [NSArray arrayWithObjects: NSAccessibilitySubroleAttribute,
-                                     NSAccessibilityCloseButtonAttribute,
-                                     NSAccessibilityMinimizeButtonAttribute,
-                                     NSAccessibilityZoomButtonAttribute,
-                                     nil];
-
-        for(NSString *attribute in appendAttributes) {
-            if (![attributes containsObject:attribute])
-                [attributes addObject:attribute];
-        }
-    }
-    return attributes;
-}
-
-- (id)accessibilityAttributeValue: (NSString*)o_attribute_name
-{
-    if (b_dark_interface) {
-        VLCMainWindowTitleView *o_tbv = o_titlebar_view;
-
-        if ([o_attribute_name isEqualTo: NSAccessibilitySubroleAttribute])
-            return NSAccessibilityStandardWindowSubrole;
-
-        if ([o_attribute_name isEqualTo: NSAccessibilityCloseButtonAttribute])
-            return [[o_tbv closeButton] cell];
-
-        if ([o_attribute_name isEqualTo: NSAccessibilityMinimizeButtonAttribute])
-            return [[o_tbv minimizeButton] cell];
-
-        if ([o_attribute_name isEqualTo: NSAccessibilityZoomButtonAttribute])
-            return [[o_tbv zoomButton] cell];
-    }
-
-    return [super accessibilityAttributeValue: o_attribute_name];
-}
-
-- (id)detachedTitlebarView
-{
-    return o_detached_titlebar_view;
-}
 @end
 
 @implementation VLCDetachedVideoWindow
@@ -2790,6 +2726,17 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self display];
         [self setHasShadow:NO];
         [self setHasShadow:YES];
+
+        NSRect winrect = [self frame];
+        CGFloat f_titleBarHeight = [o_titlebar_view frame].size.height;
+
+        [self setTitle: _NS("VLC media player")];
+        [o_titlebar_view setFrame: NSMakeRect(0, winrect.size.height - f_titleBarHeight, winrect.size.width, f_titleBarHeight)];
+        [[self contentView] addSubview: o_titlebar_view positioned: NSWindowAbove relativeTo: nil];
+
+        // native fs not supported with detached view yet
+        [o_titlebar_view setFullscreenButtonHidden: YES];
+
     }
 }
 
@@ -2801,49 +2748,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (BOOL)canBecomeKeyWindow
 {
     return YES;
-}
-
-- (NSArray *)accessibilityAttributeNames
-{
-    if (!b_dark_interface)
-        return [super accessibilityAttributeNames];
-
-    static NSMutableArray *attributes = nil;
-    if (attributes == nil) {
-        attributes = [[super accessibilityAttributeNames] mutableCopy];
-        NSArray *appendAttributes = [NSArray arrayWithObjects: NSAccessibilitySubroleAttribute,
-                                     NSAccessibilityCloseButtonAttribute,
-                                     NSAccessibilityMinimizeButtonAttribute,
-                                     NSAccessibilityZoomButtonAttribute,
-                                     nil];
-
-        for(NSString *attribute in appendAttributes) {
-            if (![attributes containsObject:attribute])
-                [attributes addObject:attribute];
-        }
-    }
-    return attributes;
-}
-
-- (id)accessibilityAttributeValue: (NSString*)o_attribute_name
-{
-    if (b_dark_interface) {
-        VLCMainWindowTitleView *o_tbv = [[VLCMainWindow sharedInstance] detachedTitlebarView];
-
-        if ([o_attribute_name isEqualTo: NSAccessibilitySubroleAttribute])
-            return NSAccessibilityStandardWindowSubrole;
-
-        if ([o_attribute_name isEqualTo: NSAccessibilityCloseButtonAttribute])
-            return [[o_tbv closeButton] cell];
-
-        if ([o_attribute_name isEqualTo: NSAccessibilityMinimizeButtonAttribute])
-            return [[o_tbv minimizeButton] cell];
-
-        if ([o_attribute_name isEqualTo: NSAccessibilityZoomButtonAttribute])
-            return [[o_tbv zoomButton] cell];
-    }
-
-    return [super accessibilityAttributeValue: o_attribute_name];
 }
 
 @end

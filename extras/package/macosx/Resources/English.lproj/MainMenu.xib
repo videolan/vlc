@@ -8037,14 +8037,6 @@ LCAuLi4</string>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
-            <string key="label">o_detached_titlebar_view</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="117751361"/>
-          </object>
-          <int key="connectionID">5003</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
             <string key="label">o_detached_resize_view</string>
             <reference key="source" ref="498338108"/>
             <reference key="destination" ref="101195702"/>
@@ -8578,6 +8570,14 @@ LCAuLi4</string>
             <reference key="destination" ref="545072553"/>
           </object>
           <int key="connectionID">5334</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_titlebar_view</string>
+            <reference key="source" ref="429979276"/>
+            <reference key="destination" ref="117751361"/>
+          </object>
+          <int key="connectionID">5337</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -13921,14 +13921,14 @@ LCAuLi4</string>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">5336</int>
+      <int key="maxID">5337</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
         <bool key="EncodedWithXMLCoder">YES</bool>
         <object class="IBPartialClassDescription">
           <string key="className">ITSlider</string>
-          <string key="superclassName">NSSlider</string>
+          <string key="superclassName">VLCVolumeSliderCommon</string>
           <object class="IBClassDescriptionSource" key="sourceIdentifier" id="516086310">
             <string key="majorKey">IBProjectSource</string>
             <string key="minorKey">../../../modules/gui/macosx/misc.h</string>
@@ -14279,18 +14279,7 @@ LCAuLi4</string>
         </object>
         <object class="IBPartialClassDescription">
           <string key="className">VLCDetachedVideoWindow</string>
-          <string key="superclassName">NSWindow</string>
-          <object class="NSMutableDictionary" key="actions">
-            <string key="NS.key.0">customZoom:</string>
-            <string key="NS.object.0">id</string>
-          </object>
-          <object class="NSMutableDictionary" key="actionInfosByName">
-            <string key="NS.key.0">customZoom:</string>
-            <object class="IBActionInfo" key="NS.object.0">
-              <string key="name">customZoom:</string>
-              <string key="candidateClassName">id</string>
-            </object>
-          </object>
+          <string key="superclassName">VLCVideoWindowCommon</string>
           <object class="IBClassDescriptionSource" key="sourceIdentifier" id="348153990">
             <string key="majorKey">IBProjectSource</string>
             <string key="minorKey">../../../modules/gui/macosx/MainWindow.h</string>
@@ -15861,7 +15850,7 @@ LCAuLi4</string>
         </object>
         <object class="IBPartialClassDescription">
           <string key="className">VLCMainWindow</string>
-          <string key="superclassName">NSWindow</string>
+          <string key="superclassName">VLCVideoWindowCommon</string>
           <object class="NSMutableDictionary" key="actions">
             <bool key="EncodedWithXMLCoder">YES</bool>
             <object class="NSArray" key="dict.sortedKeys">
@@ -15870,7 +15859,6 @@ LCAuLi4</string>
               <string>addPodcastWindowAction:</string>
               <string>backward:</string>
               <string>bwd:</string>
-              <string>customZoom:</string>
               <string>dropzoneButtonAction:</string>
               <string>effects:</string>
               <string>forward:</string>
@@ -15910,7 +15898,6 @@ LCAuLi4</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
-              <string>id</string>
             </object>
           </object>
           <object class="NSMutableDictionary" key="actionInfosByName">
@@ -15921,7 +15908,6 @@ LCAuLi4</string>
               <string>addPodcastWindowAction:</string>
               <string>backward:</string>
               <string>bwd:</string>
-              <string>customZoom:</string>
               <string>dropzoneButtonAction:</string>
               <string>effects:</string>
               <string>forward:</string>
@@ -15955,10 +15941,6 @@ LCAuLi4</string>
               </object>
               <object class="IBActionInfo">
                 <string key="name">bwd:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">customZoom:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
@@ -16089,7 +16071,6 @@ LCAuLi4</string>
               <string>o_time_sld</string>
               <string>o_time_sld_background</string>
               <string>o_time_sld_fancygradient_view</string>
-              <string>o_titlebar_view</string>
               <string>o_topbar_view</string>
               <string>o_video_view</string>
               <string>o_volume_down_btn</string>
@@ -16122,7 +16103,6 @@ LCAuLi4</string>
               <string>id</string>
               <string>id</string>
               <string>VLCFSPanel</string>
-              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -16228,7 +16208,6 @@ LCAuLi4</string>
               <string>o_time_sld</string>
               <string>o_time_sld_background</string>
               <string>o_time_sld_fancygradient_view</string>
-              <string>o_titlebar_view</string>
               <string>o_topbar_view</string>
               <string>o_video_view</string>
               <string>o_volume_down_btn</string>
@@ -16468,10 +16447,6 @@ LCAuLi4</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_time_sld_fancygradient_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_titlebar_view</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
@@ -16954,12 +16929,41 @@ LCAuLi4</string>
           <reference key="sourceIdentifier" ref="516086310"/>
         </object>
         <object class="IBPartialClassDescription">
+          <string key="className">VLCVideoWindowCommon</string>
+          <string key="superclassName">VLCWindow</string>
+          <object class="NSMutableDictionary" key="outlets">
+            <string key="NS.key.0">o_titlebar_view</string>
+            <string key="NS.object.0">id</string>
+          </object>
+          <object class="NSMutableDictionary" key="toOneOutletInfosByName">
+            <string key="NS.key.0">o_titlebar_view</string>
+            <object class="IBToOneOutletInfo" key="NS.object.0">
+              <string key="name">o_titlebar_view</string>
+              <string key="candidateClassName">id</string>
+            </object>
+          </object>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="615738430">
+            <string key="majorKey">IBProjectSource</string>
+            <string key="minorKey">../../../modules/gui/macosx/Windows.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCVolumeSliderCommon</string>
+          <string key="superclassName">NSSlider</string>
+          <reference key="sourceIdentifier" ref="516086310"/>
+        </object>
+        <object class="IBPartialClassDescription">
           <string key="className">VLCVoutView</string>
           <string key="superclassName">NSView</string>
           <object class="IBClassDescriptionSource" key="sourceIdentifier">
             <string key="majorKey">IBProjectSource</string>
             <string key="minorKey">../../../modules/gui/macosx/VideoView.h</string>
           </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCWindow</string>
+          <string key="superclassName">NSWindow</string>
+          <reference key="sourceIdentifier" ref="615738430"/>
         </object>
         <object class="IBPartialClassDescription">
           <string key="className">VLCWindowButtonCell</string>

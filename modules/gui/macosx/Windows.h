@@ -67,6 +67,10 @@
 {
     NSRect previousSavedFrame;
     BOOL b_dark_interface;
+
+    IBOutlet id o_titlebar_view; // only set in main or detached window
 }
+
+- (void)setTitle:(NSString *)title;
 
 @end

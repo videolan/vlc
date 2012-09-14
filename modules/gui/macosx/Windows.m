@@ -219,6 +219,9 @@
 
 @implementation VLCVideoWindowCommon
 
+#pragma mark -
+#pragma mark Init
+
 - (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)styleMask
                   backing:(NSBackingStoreType)backingType defer:(BOOL)flag
 {
@@ -240,6 +243,17 @@
 
     return self;
 }
+
+- (void)setTitle:(NSString *)title
+{
+    if (b_dark_interface && o_titlebar_view)
+        [o_titlebar_view setWindowTitle: title];
+
+    [super setTitle: title];
+}
+
+#pragma mark -
+#pragma mark zoom / minimize / close
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
@@ -381,6 +395,50 @@
     [self setFrame: maxRect display: YES animate: YES];
 }
 
+#pragma mark -
+#pragma mark Accessibility stuff
 
+- (NSArray *)accessibilityAttributeNames
+{
+    if (!b_dark_interface || !o_titlebar_view)
+        return [super accessibilityAttributeNames];
+
+    static NSMutableArray *attributes = nil;
+    if (attributes == nil) {
+        attributes = [[super accessibilityAttributeNames] mutableCopy];
+        NSArray *appendAttributes = [NSArray arrayWithObjects: NSAccessibilitySubroleAttribute,
+                                     NSAccessibilityCloseButtonAttribute,
+                                     NSAccessibilityMinimizeButtonAttribute,
+                                     NSAccessibilityZoomButtonAttribute,
+                                     nil];
+
+        for(NSString *attribute in appendAttributes) {
+            if (![attributes containsObject:attribute])
+                [attributes addObject:attribute];
+        }
+    }
+    return attributes;
+}
+
+- (id)accessibilityAttributeValue: (NSString*)o_attribute_name
+{
+    if (b_dark_interface && o_titlebar_view) {
+        VLCMainWindowTitleView *o_tbv = o_titlebar_view;
+
+        if ([o_attribute_name isEqualTo: NSAccessibilitySubroleAttribute])
+            return NSAccessibilityStandardWindowSubrole;
+
+        if ([o_attribute_name isEqualTo: NSAccessibilityCloseButtonAttribute])
+            return [[o_tbv closeButton] cell];
+
+        if ([o_attribute_name isEqualTo: NSAccessibilityMinimizeButtonAttribute])
+            return [[o_tbv minimizeButton] cell];
+
+        if ([o_attribute_name isEqualTo: NSAccessibilityZoomButtonAttribute])
+            return [[o_tbv zoomButton] cell];
+    }
+
+    return [super accessibilityAttributeValue: o_attribute_name];
+}
 
 @end
