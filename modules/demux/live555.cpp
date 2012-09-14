@@ -533,17 +533,14 @@ static void continueAfterOPTIONS( RTSPClient* client, int result_code,
 {
     RTSPClientVlc *client_vlc = static_cast<RTSPClientVlc *> (client);
     demux_sys_t *p_sys = client_vlc->p_sys;
-    p_sys->i_live555_ret = result_code;
-    if ( result_code != 0 )
-    {
-        p_sys->b_error = true;
-        p_sys->event_rtsp = 1;
-    }
-    else
-    {
-        p_sys->b_get_param = result_string != NULL && strstr( result_string, "GET_PARAMETER" ) != NULL;
-        client->sendDescribeCommand( continueAfterDESCRIBE );
-    }
+    p_sys->b_get_param =
+      // If OPTIONS fails, assume GET_PARAMETER is not supported but
+      // still continue on with the stream.  Some servers (foscam)
+      // return 501/not implemented for OPTIONS.
+      result_code != 0
+      && result_string != NULL
+      && strstr( result_string, "GET_PARAMETER" ) != NULL;
+    client->sendDescribeCommand( continueAfterDESCRIBE );
     delete[] result_string;
 }
 
