@@ -1620,7 +1620,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         if (b_video_wallpaper)
             window_rect = [screen frame];
         else
-            window_rect = NSMakeRect(50, 50, 200, 200); // TODO: find something more sensible here
+            window_rect = [self frame];
 
         if (o_extra_video_window)
             [o_extra_video_window release];
@@ -1654,6 +1654,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         if (b_video_wallpaper)
             [o_extra_video_window orderBack:nil];
         else {
+            [o_extra_video_window center];
             [o_extra_video_window setFrameAutosaveName:@"extra-videowindow"];
             [o_detached_video_window setContentMinSize: NSMakeSize(f_min_video_height, f_min_video_height)];
         }
