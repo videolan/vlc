@@ -29,6 +29,8 @@
     IBOutlet id o_tableView;
     IBOutlet id o_window;
     intf_thread_t *p_intf;
+    IBOutlet id o_profile_pop;
+    BOOL b_genericAudioProfileInInteraction;
 
     /* Equalizer */
     IBOutlet id o_eq_enable_ckb;
@@ -102,6 +104,9 @@
 + (VLCAudioEffects *)sharedInstance;
 - (IBAction)toggleWindow:(id)sender;
 - (void)setAudioFilter: (char *)psz_name on:(BOOL)b_on;
+- (IBAction)profileSelectorAction:(id)sender;
+- (IBAction)addAudioEffectsProfile:(id)sender;
+- (IBAction)removeAudioEffectsProfile:(id)sender;
 
 /* Equalizer */
 - (void)setupEqualizer;

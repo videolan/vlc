@@ -86,16 +86,18 @@ Mac OS X Interface:
    VLC's internal volume level
  * add the ability to create custom equalizer presets based upon the current
    selection and to manage the list of presets
+ * add custom profiles for video and audio effects, which let the user keep
+   multiple configuration sets of all the individual filters
  * add an option to disable skipping to next/previous file with the Apple Remote
  * add an option to show next / previous buttons
  * add an option to hide the shuffle and repeat buttons
  * add optional playlist columns for track number, genre, album, description,
-   date and language.
+   date and language
  * add options to the Advanced Open File dialog for start and stop time
  * add an option to play videos as a desktop background
  * add a new panel for media conversation and streaming
- * allow the OS to turn off the screen(s) when playing audio-only media while the user
-   is idle.
+ * allow the OS to turn off the screen(s) when playing audio-only media while
+   the user is idle
  * The Streaming/Transcoding wizard and the open dialog's output panel are
    deprecated now
 
