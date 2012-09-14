@@ -1424,7 +1424,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)updateName
 {
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     input_thread_t * p_input;
     p_input = pl_CurrentInput(VLCIntf);
     if (p_input) {
@@ -1464,8 +1463,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self setTitle: _NS("VLC media player")];
         [self setRepresentedURL: nil];
     }
-
-    [o_pool release];
 }
 
 - (void)updateWindow
