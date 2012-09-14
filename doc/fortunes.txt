@@ -967,3 +967,19 @@ reactor leaks ionizing radiations."
 < jesuitx> consider unblocking safari. mac users are people too.
  -- #videolan, it's a conspiracy!
 %
+< edwardw> ENOSAMPLES
+< j-b> edwardw: https://people.xiph.org/~tterribe/opus/multichannel/test-1-mono.opus
+< j-b> ENOEXCUSE
+< edwardw> Excuse e = new Excuse();
+< edwardw> e.useOn(j-b);
+< mru> argument-oriented programming?
+< mru> where functions are called demands, variables claims, and errors excuses
+< edwardw> j-b: "centred"
+< funman> try { edward.fixit(); }
+< funman> catch { jb.fixit(); }
+< mru> !jb
+< Hector4212> Fix it!
+< edwardw> finally { funman.runAway() }
+< TypX> finally { featureit(); }
+ -- #videolan
+%
