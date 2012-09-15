@@ -33,7 +33,6 @@
 
 #include "qt4.hpp"
 #include "util/singleton.hpp"
-#include "util/uniqueevent.hpp"
 #include "variables.hpp"
 
 #include <QObject>
@@ -44,7 +43,7 @@ enum { NORMAL,    /* loop: 0, repeat: 0 */
        REPEAT_ALL,/* loop: 1, repeat: 0 */
 };
 
-class IMEvent : public UniqueEvent
+class IMEvent : public QEvent
 {
 public:
     enum event_types {
@@ -78,7 +77,7 @@ public:
     };
 
     IMEvent( event_types type, input_item_t *p_input = NULL )
-        : UniqueEvent( (QEvent::Type)(type) )
+        : QEvent( (QEvent::Type)(type) )
     {
         if( (p_item = p_input) != NULL )
             vlc_gc_incref( p_item );
@@ -91,12 +90,6 @@ public:
     }
 
     input_item_t *item() const { return p_item; };
-
-    virtual bool equals(UniqueEvent *e) const
-    {
-        IMEvent *ev = static_cast<IMEvent *>(e);
-        return ( ev->item() == p_item && ev->type() == type() );
-    }
 
 private:
     input_item_t *p_item;
@@ -153,7 +146,6 @@ public:
 
     QString getName() { return oldName; }
     static const QString decodeArtURL( input_item_t *p_item );
-    void postUniqueEvent( QObject *, UniqueEvent * );
 
 private:
     intf_thread_t  *p_intf;
@@ -169,7 +161,6 @@ private:
     mtime_t         timeA, timeB;
 
     void customEvent( QEvent * );
-    RateLimitedEventPoster *rateLimitedEventPoster;
 
     void addCallbacks();
     void delCallbacks();
