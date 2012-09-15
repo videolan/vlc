@@ -134,6 +134,7 @@ static void services_discovery_item_removed( const vlc_event_t * p_event,
 static void services_discovery_removeall( const vlc_event_t * p_event,
                                              void * user_data )
 {
+    VLC_UNUSED(p_event);
     libvlc_media_discoverer_t * p_mdis = user_data;
 
     libvlc_media_list_lock( p_mdis->p_mlist );
