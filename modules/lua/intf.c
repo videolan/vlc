@@ -89,7 +89,7 @@ static char *MakeConfig( intf_thread_t *p_intf, const char *name )
         {
             vlc_url_t url;
             vlc_UrlParse( &url, psz_host, 0 );
-            int i_port = var_InheritInteger( p_intf, "telnet-port" );
+            unsigned i_port = var_InheritInteger( p_intf, "telnet-port" );
             if ( url.i_port != 0 )
             {
                 if ( i_port == TELNETPORT_DEFAULT )
