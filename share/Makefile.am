@@ -194,12 +194,32 @@ nobase_vlclib_DATA = \
 	lua/sd/jamendo.luac \
 	lua/sd/metachannels.luac \
 	$(NULL)
+
+nobase_doc_DATA = \
+	lua/README.txt \
+	lua/extensions/README.txt \
+	lua/intf/README.txt \
+	lua/intf/dumpmeta.lua \
+	lua/meta/art/README.txt \
+	lua/meta/art/01_googleimage.lua \
+	lua/meta/fetcher/README.txt \
+	lua/meta/fetcher/tvrage.lua \
+	lua/meta/reader/README.txt \
+	lua/meta/reader/filename.lua \
+	lua/playlist/README.txt \
+	lua/playlist/soundcloud.lua \
+	lua/playlist/youtube.lua \
+	lua/sd/README.txt \
+	lua/sd/icecast.lua \
+	$(NULL)
+
 if BUILD_HTTPD
 nobase_vlclib_DATA += \
 	lua/intf/http.luac \
 	lua/intf/modules/httprequests.luac \
 	$(NULL)
 nobase_vlcdata_DATA += $(DIST_http_lua)
+nobase_doc_DATA += lua/http/requests/README.txt
 endif
 endif
 MOSTLYCLEANFILES += $(nobase_vlclib_DATA)
