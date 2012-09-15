@@ -725,7 +725,7 @@ void StandardPLPanel::activate( const QModelIndex &index )
             playlist_Lock( THEPL );
             playlist_item_t *p_item = playlist_ItemGetById( THEPL, model->itemId( index ) );
             p_item->i_flags |= PLAYLIST_SUBITEM_STOP_FLAG;
-            lastActivatedId = p_item->p_input->i_id;
+            lastActivatedId = p_item->i_id;
             playlist_Unlock( THEPL );
             model->activateItem( index );
         }
