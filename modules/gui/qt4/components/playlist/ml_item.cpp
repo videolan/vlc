@@ -206,11 +206,15 @@ QVariant MLItem::data( ml_select_e columntype ) const
                 QUrl uri = getURI();
                 vlc_mutex_lock( &media->lock );
                 if ( uri.scheme() != "file" )
+                {
                     ret = QUrl::fromPercentEncoding( uri.toString().toUtf8() );
-
-                QFileInfo p_file( uri.toLocalFile() );
-                ret = p_file.fileName().isEmpty() ? p_file.absoluteFilePath()
-                    : p_file.fileName();
+                }
+                else
+                {
+                    QFileInfo p_file( uri.toLocalFile() );
+                    ret = p_file.fileName().isEmpty() ? p_file.absoluteFilePath()
+                        : p_file.fileName();
+                }
             } else {
                 ret = temp;
             }
