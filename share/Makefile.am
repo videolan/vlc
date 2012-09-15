@@ -42,7 +42,6 @@ EXTRA_DIST += \
 	$(DIST_skins2) \
 	$(DIST_icons) \
 	$(DIST_http_lua) \
-	$(DIST_lua) \
 	osdmenu/default.cfg.in \
 	$(DIST_osdmenu_default) \
 	$(DIST_solid)
