@@ -42,8 +42,6 @@
 #include <QSortFilterProxyModel>
 #include <QVariant>
 #include <QModelIndex>
-#include <QTimer>
-#include <QMutex>
 #include <QAction>
 
 class PLItem;
@@ -195,16 +193,6 @@ private:
 
     playlist_t *p_playlist;
 
-    /* single row linear inserts agregation */
-    void bufferedRowInsert( PLItem *item, PLItem *parent, int pos );
-    bool isBufferedForInsert( PLItem *parent, int i_item );
-    PLItem *insertBufferRoot;
-    int insertbuffer_firstrow;
-    int insertbuffer_lastrow;
-    QTimer insertBufferCommitTimer;
-    QList<PLItem *> insertBuffer;
-    QMutex insertBufferMutex;
-
     /* Custom model private methods */
     /* Lookups */
     QModelIndex index( PLItem *, const int c ) const;
@@ -245,7 +233,6 @@ private slots:
     void processInputItemUpdate( input_thread_t* p_input );
     void processItemRemoval( int i_pl_itemid );
     void processItemAppend( int i_pl_itemid, int i_pl_itemidparent );
-    void commitBufferedRowInserts();
     void activateItem( playlist_item_t *p_item );
 };
 
