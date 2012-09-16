@@ -430,6 +430,8 @@
 		CCD83E4D13FEA143004F1652 /* VideoEffects.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E4013FEA143004F1652 /* VideoEffects.xib */; };
 		CCD83E4E13FEA143004F1652 /* Wizard.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E4213FEA143004F1652 /* Wizard.xib */; };
 		CCDB535D13E97D3500A1782F /* dropzone-background.png in Resources */ = {isa = PBXBuildFile; fileRef = CCDB535C13E97D3500A1782F /* dropzone-background.png */; };
+		CCE8BAC4160615D9006741FB /* effects-one-button-pressed.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE8BAC2160615D9006741FB /* effects-one-button-pressed.png */; };
+		CCE8BAC5160615D9006741FB /* effects-one-button-pressed@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE8BAC3160615D9006741FB /* effects-one-button-pressed@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -966,6 +968,8 @@
 		CCDBA3B313D32E200006127B /* macosx.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = macosx.m; path = ../../../modules/video_output/macosx.m; sourceTree = "<group>"; };
 		CCE8BABC16060542006741FB /* Windows.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Windows.h; path = ../../../modules/gui/macosx/Windows.h; sourceTree = "<group>"; };
 		CCE8BABD16060542006741FB /* Windows.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Windows.m; path = ../../../modules/gui/macosx/Windows.m; sourceTree = "<group>"; };
+		CCE8BAC2160615D9006741FB /* effects-one-button-pressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed.png"; path = "Resources/mainwindow/effects-one-button-pressed.png"; sourceTree = "<group>"; };
+		CCE8BAC3160615D9006741FB /* effects-one-button-pressed@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed@2x.png"; path = "Resources/mainwindow/effects-one-button-pressed@2x.png"; sourceTree = "<group>"; };
 		CCF0777913659A8000AF19FD /* SPInvocationGrabbing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPInvocationGrabbing.h; path = ../../../modules/gui/macosx/SPInvocationGrabbing.h; sourceTree = "<group>"; };
 		CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SPInvocationGrabbing.m; path = ../../../modules/gui/macosx/SPInvocationGrabbing.m; sourceTree = "<group>"; };
 		CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPMediaKeyTap.h; path = ../../../modules/gui/macosx/SPMediaKeyTap.h; sourceTree = "<group>"; };
@@ -1365,6 +1369,8 @@
 				CC04333013B28B8200D7D52E /* effects-double-buttons.png */,
 				CC04333113B28B8200D7D52E /* effects-one-button-blue.png */,
 				CC04333213B28B8200D7D52E /* effects-one-button.png */,
+				CCE8BAC2160615D9006741FB /* effects-one-button-pressed.png */,
+				CCE8BAC3160615D9006741FB /* effects-one-button-pressed@2x.png */,
 				CC04333713B28B8200D7D52E /* fullscreen-double-buttons-pressed.png */,
 				CC04333813B28B8200D7D52E /* fullscreen-double-buttons.png */,
 				CC0F725015063C820086B6A0 /* fullscreen-one-button-pressed.png */,
@@ -2203,6 +2209,8 @@
 				CC16700315F5178B0088201B /* forward-6btns-dark.png in Resources */,
 				CC16700415F5178B0088201B /* forward-6btns-dark@2x.png in Resources */,
 				CC461F75160084A10022423C /* SharedDialogs.xib in Resources */,
+				CCE8BAC4160615D9006741FB /* effects-one-button-pressed.png in Resources */,
+				CCE8BAC5160615D9006741FB /* effects-one-button-pressed@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

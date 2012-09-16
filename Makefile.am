@@ -213,6 +213,8 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/effects-double-buttons@2x.png \
 	extras/package/macosx/Resources/mainwindow/effects-one-button-blue.png \
 	extras/package/macosx/Resources/mainwindow/effects-one-button-blue@2x.png \
+	extras/package/macosx/Resources/mainwindow/effects-one-button-pressed.png \
+	extras/package/macosx/Resources/mainwindow/effects-one-button-pressed@2x.png \
 	extras/package/macosx/Resources/mainwindow/effects-one-button.png \
 	extras/package/macosx/Resources/mainwindow/effects-one-button@2x.png \
 	extras/package/macosx/Resources/mainwindow/forward-3btns-pressed.png \

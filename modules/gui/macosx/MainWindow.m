@@ -272,7 +272,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_volume_up_btn setImage: [NSImage imageNamed:@"volume-high"]];
         if (b_nativeFullscreenMode) {
             [o_effects_btn setImage: [NSImage imageNamed:@"effects-one-button"]];
-            [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-one-button-blue"]];
+            [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-one-button-pressed"]];
         } else {
             [o_effects_btn setImage: [NSImage imageNamed:@"effects-double-buttons"]];
             [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-double-buttons-pressed"]];
