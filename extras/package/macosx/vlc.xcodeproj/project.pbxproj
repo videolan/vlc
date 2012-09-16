@@ -964,6 +964,8 @@
 		CCD83E4313FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/Wizard.xib; sourceTree = "<group>"; };
 		CCDB535C13E97D3500A1782F /* dropzone-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "dropzone-background.png"; path = "Resources/mainwindow/dropzone-background.png"; sourceTree = "<group>"; };
 		CCDBA3B313D32E200006127B /* macosx.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = macosx.m; path = ../../../modules/video_output/macosx.m; sourceTree = "<group>"; };
+		CCE8BABC16060542006741FB /* Windows.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Windows.h; path = ../../../modules/gui/macosx/Windows.h; sourceTree = "<group>"; };
+		CCE8BABD16060542006741FB /* Windows.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Windows.m; path = ../../../modules/gui/macosx/Windows.m; sourceTree = "<group>"; };
 		CCF0777913659A8000AF19FD /* SPInvocationGrabbing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPInvocationGrabbing.h; path = ../../../modules/gui/macosx/SPInvocationGrabbing.h; sourceTree = "<group>"; };
 		CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SPInvocationGrabbing.m; path = ../../../modules/gui/macosx/SPInvocationGrabbing.m; sourceTree = "<group>"; };
 		CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPMediaKeyTap.h; path = ../../../modules/gui/macosx/SPMediaKeyTap.h; sourceTree = "<group>"; };
@@ -1102,6 +1104,8 @@
 				CC269A4715E7947F00F2FDC9 /* StringUtility.m */,
 				CC461F6C160078340022423C /* SharedDialogs.h */,
 				CC461F6D160078340022423C /* SharedDialogs.m */,
+				CCE8BABC16060542006741FB /* Windows.h */,
+				CCE8BABD16060542006741FB /* Windows.m */,
 				CC017A0E14A4C8B600C09A4F /* custom UI code */,
 				CC0CD0E513DE0FC600B0D90D /* Imported Code */,
 			);
