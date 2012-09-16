@@ -21,8 +21,9 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="4948"/>
       <integer value="21"/>
+      <integer value="4948"/>
+      <integer value="4596"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -4041,14 +4042,14 @@ LCAuLi4</string>
         <string key="NSClassName">SUUpdater</string>
       </object>
       <object class="NSCustomView" id="560875128">
-        <nil key="NSNextResponder"/>
+        <reference key="NSNextResponder"/>
         <int key="NSvFlags">268</int>
         <object class="NSMutableArray" key="NSSubviews">
           <bool key="EncodedWithXMLCoder">YES</bool>
           <object class="NSTextField" id="103751139">
             <reference key="NSNextResponder" ref="560875128"/>
             <int key="NSvFlags">268</int>
-            <string key="NSFrame">{{227, 35}, {62.796900000000001, 18}}</string>
+            <string key="NSFrame">{{19, 35}, {270.79689999999999, 18}}</string>
             <reference key="NSSuperview" ref="560875128"/>
             <bool key="NSEnabled">YES</bool>
             <object class="NSTextFieldCell" key="NSCell" id="385075814">
@@ -4164,7 +4165,7 @@ LCAuLi4</string>
             <bool key="NSEnabled">YES</bool>
             <object class="NSTextFieldCell" key="NSCell" id="647762012">
               <int key="NSCellFlags">605028416</int>
-              <int key="NSCellFlags2">272761856</int>
+              <int key="NSCellFlags2">4326400</int>
               <string key="NSContents">Slower</string>
               <reference key="NSSupport" ref="26"/>
               <reference key="NSControlView" ref="421148087"/>
@@ -4195,6 +4196,7 @@ LCAuLi4</string>
           </object>
         </object>
         <string key="NSFrameSize">{307, 53}</string>
+        <reference key="NSSuperview"/>
         <string key="NSClassName">NSView</string>
       </object>
       <object class="NSCustomView" id="256817023">

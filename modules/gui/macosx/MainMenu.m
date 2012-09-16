@@ -118,6 +118,15 @@ static VLCMainMenu *_o_sharedInstance = nil;
                                              selector: @selector(applicationWillFinishLaunching:)
                                                  name: NSApplicationWillFinishLaunchingNotification
                                                object: nil];
+
+    /* check whether the user runs OSX with a RTL language */
+    NSArray* languages = [NSLocale preferredLanguages];
+    NSString* preferredLanguage = [languages objectAtIndex:0];
+
+    if ([NSLocale characterDirectionForLanguage:preferredLanguage] == NSLocaleLanguageDirectionRightToLeft) {
+        msg_Dbg(VLCIntf, "adapting interface since '%s' is a RTL language", [preferredLanguage UTF8String]);
+        [o_mi_rate_fld setAlignment: NSLeftTextAlignment];
+    }
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)o_notification
