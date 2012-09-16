@@ -50,6 +50,7 @@
     IBOutlet id o_volume_track_view;
     IBOutlet id o_volume_down_btn;
     IBOutlet id o_volume_up_btn;
+    IBOutlet id o_progress_view;
     IBOutlet id o_time_sld;
     IBOutlet id o_time_sld_fancygradient_view;
     IBOutlet id o_time_fld;

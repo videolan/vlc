@@ -396,16 +396,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
         moveItem(o_time_fld);
         #undef moveItem
 
-        #define enlargeItem(item) \
-        frame = [item frame]; \
-        frame.size.width = f_width + frame.size.width; \
-        [item setFrame: frame]
-
-        enlargeItem(o_time_sld);
-        enlargeItem(o_progress_bar);
-        enlargeItem(o_time_sld_background);
-        enlargeItem(o_time_sld_fancygradient_view);
-        #undef enlargeItem
+        frame = [o_progress_view frame];
+        frame.size.width = f_width + frame.size.width;
+        [o_progress_view setFrame: frame];
 
         [o_fullscreen_btn removeFromSuperviewWithoutNeedingDisplay];
     } else {
@@ -705,20 +698,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
     moveItem(o_shuffle_btn);
     #undef moveItem
 
-    #define resizeItem(item) \
-    frame = [item frame]; \
-    frame.size.width = frame.size.width - f_space; \
-    frame.origin.x = frame.origin.x + f_space; \
-    if (b_fast) \
-        [item setFrame: frame]; \
-    else \
-        [[item animator] setFrame: frame]
-
-    resizeItem(o_time_sld);
-    resizeItem(o_progress_bar);
-    resizeItem(o_time_sld_background);
-    resizeItem(o_time_sld_fancygradient_view);
-    #undef resizeItem
+    frame = [o_progress_view frame];
+    frame.size.width = frame.size.width - f_space;
+    frame.origin.x = frame.origin.x + f_space;
+    if (b_fast)
+        [o_progress_view setFrame: frame];
+    else
+        [[o_progress_view animator] setFrame: frame];
 
     if (b_dark_interface) {
         [[o_fwd_btn animator] setImage:[NSImage imageNamed:@"forward-6btns-dark"]];
@@ -797,20 +783,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
     moveItem(o_shuffle_btn);
     #undef moveItem
 
-    #define resizeItem(item) \
-    frame = [item frame]; \
-    frame.size.width = frame.size.width + f_space; \
-    frame.origin.x = frame.origin.x - f_space; \
-    if (b_fast) \
-        [item setFrame: frame]; \
-    else \
-        [[item animator] setFrame: frame]
-
-    resizeItem(o_time_sld);
-    resizeItem(o_progress_bar);
-    resizeItem(o_time_sld_background);
-    resizeItem(o_time_sld_fancygradient_view);
-    #undef resizeItem
+    frame = [o_progress_view frame];
+    frame.size.width = frame.size.width + f_space;
+    frame.origin.x = frame.origin.x - f_space;
+    if (b_fast)
+        [o_progress_view setFrame: frame];
+    else
+        [[o_progress_view animator] setFrame: frame];
 
     if (b_dark_interface) {
         [[o_fwd_btn animator] setImage:[NSImage imageNamed:@"forward-3btns-dark"]];
@@ -864,20 +843,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [[o_shuffle_btn animator] setHidden: NO];
     }
 
-    #define resizeItem(item) \
-    frame = [item frame]; \
-    frame.size.width = frame.size.width - f_space; \
-    frame.origin.x = frame.origin.x + f_space; \
-    if (b_fast) \
-        [item setFrame: frame]; \
-    else \
-        [[item animator] setFrame: frame]
-
-    resizeItem(o_time_sld);
-    resizeItem(o_progress_bar);
-    resizeItem(o_time_sld_background);
-    resizeItem(o_time_sld_fancygradient_view);
-    #undef resizeItem
+    frame = [o_progress_view frame];
+    frame.size.width = frame.size.width - f_space;
+    frame.origin.x = frame.origin.x + f_space;
+    if (b_fast)
+        [o_progress_view setFrame: frame];
+    else
+        [[o_progress_view animator] setFrame: frame];
 }
 
 - (void)removePlaymodeButtons:(BOOL)b_fast
@@ -898,20 +870,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
     frame.size.width++;
     [o_playlist_btn setFrame:frame];
 
-    #define resizeItem(item) \
-    frame = [item frame]; \
-    frame.size.width = frame.size.width + f_space; \
-    frame.origin.x = frame.origin.x - f_space; \
-    if (b_fast) \
-        [item setFrame: frame]; \
-    else \
-        [[item animator] setFrame: frame]
-
-    resizeItem(o_time_sld);
-    resizeItem(o_progress_bar);
-    resizeItem(o_time_sld_background);
-    resizeItem(o_time_sld_fancygradient_view);
-    #undef resizeItem
+    frame = [o_progress_view frame];
+    frame.size.width = frame.size.width + f_space;
+    frame.origin.x = frame.origin.x - f_space;
+    if (b_fast)
+        [o_progress_view setFrame: frame];
+    else
+        [[o_progress_view animator] setFrame: frame];
 }
 
 #pragma mark -
