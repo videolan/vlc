@@ -349,7 +349,7 @@ vlc-contrib-$(HOST)-latest.tar.bz2:
 
 prebuilt: vlc-contrib-$(HOST)-latest.tar.bz2
 	$(UNPACK) && mv $(HOST) $(TOPDST)
-	cd $(TOPDST)/$(HOST) && ./change_prefix.sh
+	cd $(TOPDST)/$(HOST) && $(SRC)/change_prefix.sh
 
 package: install
 	rm -Rf tmp/
@@ -359,8 +359,7 @@ package: install
 	cd tmp/$(notdir $(PREFIX)); \
 		cd share; rm -Rf man doc gtk-doc info lua projectM gettext; cd ..; \
 		rm -Rf man sbin etc lib/lua lib/sidplay
-	cp $(SRC)/change_prefix.sh tmp/$(notdir $(PREFIX))/
-	cd tmp/$(notdir $(PREFIX)) && ./change_prefix.sh $(PREFIX) @@CONTRIB_PREFIX@@
+	cd tmp/$(notdir $(PREFIX)) && $(abspath $(SRC))/change_prefix.sh $(PREFIX) @@CONTRIB_PREFIX@@
 	(cd tmp && tar c $(notdir $(PREFIX))/) | bzip2 -c > ../vlc-contrib-$(HOST)-$(DATE).tar.bz2
 
 list:
