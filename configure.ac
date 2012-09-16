@@ -3978,6 +3978,8 @@ AS_IF([test "${enable_loader}" = "yes"],
     VLC_ADD_LIBS([dmo quicktime], [-lpthread])
   ])
 
+AS_IF([test "${SYS}" == "mingw32"], [VLC_ADD_PLUGIN([dmo]) VLC_ADD_LIBS([dmo],[-lole32 -luuid]) ])
+
 EXTEND_HELP_STRING([Components:])
 
 dnl
