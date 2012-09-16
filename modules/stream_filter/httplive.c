@@ -775,7 +775,7 @@ static int parse_Key(stream_t *s, hls_stream_t *hls, char *p_read)
             if (end != NULL)
                 *end = 0;
         }
-        hls->psz_current_key_path = strdup(uri);
+        hls->psz_current_key_path = relative_URI(hls->url, uri);
         free(value);
 
         value = iv = parse_Attributes(p_read, "IV");
