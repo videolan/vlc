@@ -11508,7 +11508,7 @@ msgstr "מפענח כתוביות DVB"
 #: modules/codec/subsdec.c:94
 #, fuzzy
 msgid "Default (Windows-1252)"
-msgstr "באלטית (_Windows-1257)"
+msgstr "בררת מחדל (Windows-1255)"
 
 #: modules/codec/subsdec.c:95
 #, fuzzy
@@ -11732,7 +11732,7 @@ msgstr "מפענח כתוביות טקסט"
 #: modules/codec/subsdec.c:290 modules/demux/avi/avi.c:96
 msgctxt "GetACP"
 msgid "CP1252"
-msgstr ""
+msgstr "CP1255"
 
 #: modules/codec/subsusf.c:46
 msgid "USFSubs"
