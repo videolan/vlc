@@ -67,9 +67,6 @@ private slots:
     void updateOrClear();
     void tabChanged( int );
     void filterMessages();
-#ifndef NDEBUG
-    void updatePLTree();
-#endif
 
 private:
     void buildTree( QTreeWidgetItem *, vlc_object_t * );
@@ -79,6 +76,7 @@ private:
     QMutex messageLocker;
 #ifndef NDEBUG
     QTreeWidget *pldebugTree;
+    void updatePLTree();
 #endif
 };
 

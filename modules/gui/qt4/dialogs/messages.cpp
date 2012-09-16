@@ -112,9 +112,6 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     pldebugTree->headerItem()->setText( 4, "Item flags" );
     pldebugTree->setColumnCount( 5 );
     pldebugTabLayout->addWidget( pldebugTree );
-    QPushButton *pldebugUpdateButton = new QPushButton( "Update" );
-    pldebugTabLayout->addWidget( pldebugUpdateButton );
-    BUTTONACT( pldebugUpdateButton, updatePLTree() );
 #endif
 
     tabChanged(0);
@@ -320,14 +317,18 @@ void MessagesDialog::updateOrClear()
         ui.modulesTree->clear();
         buildTree( NULL, VLC_OBJECT( p_intf->p_libvlc ) );
     }
-    else
+    else if( ui.mainTab->currentIndex() == 0 )
         ui.messages->clear();
+#ifndef NDEBUG
+    else
+        updatePLTree();
+#endif
 }
 
 void MessagesDialog::tabChanged( int i )
 {
-    updateButton->setIcon( i == 1 ? QIcon(":/update") : QIcon(":/toolbar/clear") );
-    updateButton->setToolTip( i == 1 ? qtr("Update the tree")
+    updateButton->setIcon( i != 0 ? QIcon(":/update") : QIcon(":/toolbar/clear") );
+    updateButton->setToolTip( i != 0 ? qtr("Update the tree")
                                      : qtr("Clear the messages") );
 }
 
