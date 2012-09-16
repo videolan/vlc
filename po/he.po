@@ -11508,7 +11508,7 @@ msgstr ""
 #. languages using the Latin alphabet.
 #: modules/codec/subsdec.c:97
 msgid "Default (Windows-1252)"
-msgstr ""
+msgstr "בררת מחדל (Windows-1255)"
 
 #: modules/codec/subsdec.c:98
 msgid "System codeset"
