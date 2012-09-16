@@ -50,6 +50,7 @@ private slots:
     virtual void cancel();
     void fileBrowse();
     void dumpChecked(bool);
+    void setDestinationFileExtension();
 };
 
 #endif

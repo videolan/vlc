@@ -106,14 +106,19 @@ ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
     BUTTONACT(cancelButton,cancel());
 
     CONNECT(dumpBox,toggled(bool),this,dumpChecked(bool));
+    CONNECT(profile, optionsChanged(), this, setDestinationFileExtension());
+    CONNECT(fileLine, editingFinished(), this, setDestinationFileExtension());
 }
 
 void ConvertDialog::fileBrowse()
 {
+    QString fileExtension = "." + profile->getMux();
+
     QString fileName = QFileDialog::getSaveFileName( this, qtr( "Save file..." ),
-            "",
- qtr( "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)" ) );
+        "",
+        QString( qtr( "Containers (*" ) + fileExtension + ")" ) );
     fileLine->setText( toNativeSeparators( fileName ) );
+    setDestinationFileExtension();
 }
 
 void ConvertDialog::cancel()
@@ -155,4 +160,20 @@ void ConvertDialog::dumpChecked( bool checked )
     deinterBox->setEnabled( !checked );
     displayBox->setEnabled( !checked );
     profile->setEnabled( !checked );
+}
+
+void ConvertDialog::setDestinationFileExtension()
+{
+    if( !fileLine->text().isEmpty() )
+    {
+        QString newFileExtension = "." + profile->getMux();
+        QString newFileName;
+        int index = fileLine->text().lastIndexOf( "." );
+        if( index != -1 ) {
+            newFileName = fileLine->text().left( index ).append( newFileExtension );
+        } else {
+            newFileName = fileLine->text().append( newFileExtension );
+        }
+        fileLine->setText( toNativeSeparators( newFileName ) );
+    }
 }
