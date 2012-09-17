@@ -249,7 +249,8 @@ VLCProfileEditor::VLCProfileEditor( const QString& qs_name, const QString& value
     setATranscodeOptions( false );
     setSTranscodeOptions( false );
 
-    QPushButton *saveButton = new QPushButton( qtr( "Save" ) );
+    QPushButton *saveButton = new QPushButton(
+                ( qs_name.isEmpty() ) ? qtr( "Create" ) : qtr( "Save" ) );
     ui.buttonBox->addButton( saveButton, QDialogButtonBox::AcceptRole );
     BUTTONACT( saveButton, close() );
     QPushButton *cancelButton = new QPushButton( qtr( "Cancel" ) );
