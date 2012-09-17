@@ -1568,10 +1568,15 @@ dnl
 AC_ARG_ENABLE(live555,
   [AS_HELP_STRING([--enable-live555],
     [enable RTSP input through live555 (default enabled)])])
+
 AS_IF([test "${enable_live555}" != "no" -a -n "${CXX}"], [
   AC_LANG_PUSH(C++)
   VLC_SAVE_FLAGS
-  AS_IF([test -z "${CONTRIB_DIR}"], [
+
+  dnl detect include paths
+  AS_IF([test -f "${CONTRIB_DIR}/include/UsageEnvironment.hh"], [
+    CPPFLAGS_live555="-I${CONTRIB_DIR}/include/liveMedia -I${CONTRIB_DIR}/include/groupsock -I${CONTRIB_DIR}/include/BasicUsageEnvironment -I${CONTRIB_DIR}/include/UsageEnvironment"
+  ], [
     AS_IF([test ${SYS} != "os2"], [
       LIVE555_PREFIX=${LIVE555_PREFIX-"/usr"}
       CPPFLAGS_live555="-I${LIVE555_PREFIX}/include/liveMedia -I${LIVE555_PREFIX}/include/groupsock -I${LIVE555_PREFIX}/include/BasicUsageEnvironment -I${LIVE555_PREFIX}/include/UsageEnvironment"
@@ -1580,15 +1585,16 @@ AS_IF([test "${enable_live555}" != "no" -a -n "${CXX}"], [
       CPPFLAGS_live555="-I${LIVE555_PREFIX}/liveMedia/include -I${LIVE555_PREFIX}/groupsock/include -I${LIVE555_PREFIX}/BasicUsageEnvironment/include -I${LIVE555_PREFIX}/UsageEnvironment/include"
       LDFLAGS_live555="-L${LIVE555_PREFIX}/liveMedia -L${LIVE555_PREFIX}/groupsock -L${LIVE555_PREFIX}/BasicUsageEnvironment -L${LIVE555_PREFIX}/UsageEnvironment"
     ])
-  ], [
-    CPPFLAGS_live555="-I${CONTRIB_DIR}/include/liveMedia -I${CONTRIB_DIR}/include/groupsock -I${CONTRIB_DIR}/include/BasicUsageEnvironment -I${CONTRIB_DIR}/include/UsageEnvironment"
   ])
+
+  dnl CPP Flags
   AS_IF([test "${SYS}" = "solaris"], [
     CPPFLAGS_live555="${CPPFLAGS_live555} -DSOLARIS"
   ])
   CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_live555}"
   LDFLAGS="${LDFLAGS} ${LDFLAGS_live555}"
 
+  dnl version check
   AC_CACHE_CHECK([for live555 version 1324598400 or later], [ac_cv_live555], [
     AC_PREPROC_IFELSE([AC_LANG_PROGRAM([
 [#include <liveMedia_version.hh>
@@ -1601,6 +1607,7 @@ AS_IF([test "${enable_live555}" != "no" -a -n "${CXX}"], [
       ac_cv_live555="no"
     ])
   ])
+
   AS_IF([test "$ac_cv_live555" = "no"], [
     AC_MSG_WARN([liveMedia is missing or its installed version is too old:
 Version 2011.12.23 or later is required to proceed.
