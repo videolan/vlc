@@ -1,7 +1,7 @@
 --[[
  $Id$
 
- Copyright © 2007-2011 the VideoLAN team
+ Copyright © 2007-2012 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -47,6 +47,50 @@ function get_prefres()
     return prefres
 end
 
+function get_fmt( fmt_list )
+    local prefres = get_prefres()
+    if prefres < 0 then
+        return nil
+    end
+
+    local fmt = nil
+    for itag,height in string.gmatch( fmt_list, "(%d+)/%d+x(%d+)/[^,]+" ) do
+        -- Apparently formats are listed in quality
+        -- order, so we take the first one that works,
+        -- or fallback to the lowest quality
+        fmt = itag
+        if tonumber(height) <= prefres then
+            break
+        end
+    end
+    return fmt
+end
+
+function pick_url( url_map, fmt )
+    local path = nil
+    -- Handle both orderings, as unfortunately both may appear
+    if string.match( url_map, "^url" ) then
+        for url,itag in string.gmatch( url_map, "url=([^&,]+)[^,]*&itag=(%d+)" ) do
+            -- Apparently formats are listed in quality order,
+            -- so we can afford to simply take the first one
+            if not fmt or tonumber( itag ) == tonumber( fmt ) then
+                url = vlc.strings.decode_uri( url )
+                path = url
+                break
+            end
+        end
+    else
+        for itag,url in string.gmatch( url_map, "itag=(%d+)&[^,]*url=([^&,]+)" ) do
+            if not fmt or tonumber( itag ) == tonumber( fmt ) then
+                url = vlc.strings.decode_uri( url )
+                path = url
+                break
+            end
+        end
+    end
+    return path
+end
+
 -- Probe function.
 function probe()
     if vlc.access ~= "http" and vlc.access ~= "https" then
@@ -62,6 +106,7 @@ function probe()
         end
     end
     return (  string.match( vlc.path, "/watch%?" ) -- the html page
+            or string.match( vlc.path, "/get_video_info%?" ) -- info API
             or string.match( vlc.path, "/v/" ) -- video in swf player
             or string.match( vlc.path, "/player2.swf" ) ) -- another player url
 end
@@ -73,6 +118,9 @@ function parse()
         -- fmt is the format of the video
         -- (cf. http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs)
         fmt = get_url_param( vlc.path, "fmt" )
+        -- URLs in the web page are no good since
+        -- they miss the "signature" parameter :/
+--[[
         while true do
             -- Try to find the video's title
             line = vlc.readline()
@@ -98,20 +146,10 @@ function parse()
             -- "SWF_ARGS", "swfArgs", "PLAYER_CONFIG" ...
             if string.match( line, "playerConfig" ) then
                 if not fmt then
-                    prefres = get_prefres()
-                    if prefres >= 0 then
-                        fmt_list = string.match( line, "\"fmt_list\": \"(.-)\"" )
-                        if fmt_list then
-                            for itag,height in string.gmatch( fmt_list, "(%d+)\\/%d+x(%d+)\\/[^,]+" ) do
-                                -- Apparently formats are listed in quality
-                                -- order, so we take the first one that works,
-                                -- or fallback to the lowest quality
-                                fmt = itag
-                                if tonumber(height) <= prefres then
-                                    break
-                                end
-                            end
-                        end
+                    fmt_list = string.match( line, "\"fmt_list\": \"(.-)\"" )
+                    if fmt_list then
+                        fmt_list = string.gsub( fmt_list, "\\/", "/" )
+                        fmt = get_fmt( fmt_list )
                     end
                 end
 
@@ -119,20 +157,23 @@ function parse()
                 if url_map then
                     -- FIXME: do this properly
                     url_map = string.gsub( url_map, "\\u0026", "&" )
-                    for url,itag in string.gmatch( url_map, "url=([^&,]+)[^,]*&itag=(%d+)" ) do
-                        -- Apparently formats are listed in quality order,
-                        -- so we can afford to simply take the first one
-                        if not fmt or tonumber( itag ) == tonumber( fmt ) then
-                            url = vlc.strings.decode_uri( url )
-                            path = url
-                            break
-                        end
-                    end
+                    path = pick_url( url_map, fmt )
                 end
             -- There is also another version of the parameters, encoded
             -- differently, as an HTML attribute of an <object> or <embed>
             -- tag; but we don't need it now
             end
+        end
+--]]
+
+        local video_id = get_url_param( vlc.path, "v" )
+        if video_id then
+            if fmt then
+                format = "&fmt=" .. fmt
+            else
+                format = ""
+            end
+            path = "http://www.youtube.com/get_video_info?video_id="..video_id..format.."&el=detailpage"
         end
 
         if not path then
@@ -145,6 +186,43 @@ function parse()
         end
 
         return { { path = path; name = name; description = description; artist = artist; arturl = arturl } }
+
+    elseif string.match( vlc.path, "/get_video_info%?" ) then
+        local line = vlc.readline() -- data is on one line only
+
+        local fmt = get_url_param( vlc.path, "fmt" )
+        if not fmt then
+            local fmt_list = string.match( line, "&fmt_list=([^&]*)" )
+            if fmt_list then
+                fmt_list = vlc.strings.decode_uri( fmt_list )
+                fmt = get_fmt( fmt_list )
+            end
+        end
+
+        local url_map = string.match( line, "&url_encoded_fmt_stream_map=([^&]*)" )
+        if url_map then
+            url_map = vlc.strings.decode_uri( url_map )
+            path = pick_url( url_map, fmt )
+        end
+
+        if not path then
+            vlc.msg.err( "Couldn't extract youtube video URL, please check for updates to this script" )
+            return { }
+        end
+
+        local title = string.match( line, "&title=([^&]*)" )
+        if title then
+            title = string.gsub( title, "+", " " )
+            title = vlc.strings.decode_uri( title )
+        end
+        local artist = string.match( line, "&author=([^&]*)" )
+        local arturl = string.match( line, "&thumbnail_url=([^&]*)" )
+        if arturl then
+            arturl = vlc.strings.decode_uri( arturl )
+        end
+
+        return { { path = path, title = title, artist = artist, arturl = arturl } }
+
     else -- This is the flash player's URL
         video_id = get_url_param( vlc.path, "video_id" )
         if not video_id then
