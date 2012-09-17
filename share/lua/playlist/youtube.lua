@@ -47,6 +47,7 @@ function get_prefres()
     return prefres
 end
 
+-- Pick the most suited format available
 function get_fmt( fmt_list )
     local prefres = get_prefres()
     if prefres < 0 then
@@ -66,6 +67,7 @@ function get_fmt( fmt_list )
     return fmt
 end
 
+-- Parse and pick our video URL
 function pick_url( url_map, fmt )
     local path = nil
     -- Handle both orderings, as unfortunately both may appear
@@ -173,6 +175,9 @@ function parse()
             else
                 format = ""
             end
+            -- Without "el=detailpage", /get_video_info fails for many
+            -- music videos with errors about copyrighted content being
+            -- "restricted from playback on certain sites"
             path = "http://www.youtube.com/get_video_info?video_id="..video_id..format.."&el=detailpage"
         end
 
@@ -187,7 +192,7 @@ function parse()
 
         return { { path = path; name = name; description = description; artist = artist; arturl = arturl } }
 
-    elseif string.match( vlc.path, "/get_video_info%?" ) then
+    elseif string.match( vlc.path, "/get_video_info%?" ) then -- video info API
         local line = vlc.readline() -- data is on one line only
 
         local fmt = get_url_param( vlc.path, "fmt" )
