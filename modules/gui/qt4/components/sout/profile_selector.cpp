@@ -349,8 +349,8 @@ void VLCProfileEditor::fillProfile( const QString& qs )
     ui.vBitrateSpin->setValue( options[5].toInt() );
     ui.vScaleBox->setEditText( options[6] );
     ui.vFrameBox->setValue( options[7].toDouble() );
-    ui.widthBox->setText( options[8] );
-    ui.heightBox->setText( options[9] );
+    ui.widthBox->setValue( options[8].toInt() );
+    ui.heightBox->setValue( options[9].toInt() );
 
     ui.aCodecBox->setCurrentIndex( ui.aCodecBox->findData( options[10] ) );
     ui.aBitrateSpin->setValue( options[11].toInt() );
@@ -448,8 +448,8 @@ QString VLCProfileEditor::transcodeValue()
             << QString::number( ui.vBitrateSpin->value() )
             << ui.vScaleBox->currentText()
             << QString::number( ui.vFrameBox->value() )
-            << ui.widthBox->text()
-            << ui.heightBox->text()
+            << QString::number( ui.widthBox->value() )
+            << QString::number( ui.heightBox->value() )
 
             << qs_acodec
             << QString::number( ui.aBitrateSpin->value() )

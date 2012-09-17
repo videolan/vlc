@@ -230,6 +230,9 @@
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
+         <property name="specialValueText">
+          <string>Same as source</string>
+         </property>
          <property name="prefix">
           <string/>
          </property>
@@ -287,25 +290,6 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="widthBox">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="inputMask">
-             <string>00000; </string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="2">
            <spacer name="horizontalSpacer">
             <property name="orientation">
@@ -332,22 +316,35 @@
             </property>
            </widget>
           </item>
+          <item row="2" column="1">
+           <widget class="QSpinBox" name="widthBox">
+            <property name="specialValueText">
+             <string>Auto</string>
+            </property>
+            <property name="suffix">
+             <string>px</string>
+            </property>
+            <property name="maximum">
+             <number>9999</number>
+            </property>
+            <property name="singleStep">
+             <number>8</number>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="4">
-           <widget class="QLineEdit" name="heightBox">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+           <widget class="QSpinBox" name="heightBox">
+            <property name="specialValueText">
+             <string>Auto</string>
             </property>
-            <property name="inputMask">
-             <string>00000; </string>
+            <property name="suffix">
+             <string>px</string>
             </property>
-            <property name="text">
-             <string/>
+            <property name="maximum">
+             <number>9999</number>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            <property name="singleStep">
+             <number>8</number>
             </property>
            </widget>
           </item>
@@ -510,7 +507,7 @@
   <tabstop>profileLine</tabstop>
   <tabstop>tabWidget</tabstop>
   <tabstop>TSMux</tabstop>
-  <tabstop>ASFMux</tabstop>
+  <tabstop>WEBMux</tabstop>
   <tabstop>OggMux</tabstop>
   <tabstop>MOVMux</tabstop>
   <tabstop>PSMux</tabstop>
@@ -521,7 +518,7 @@
   <tabstop>MKVMux</tabstop>
   <tabstop>RAWMux</tabstop>
   <tabstop>AVIMux</tabstop>
-  <tabstop>buttonBox</tabstop>
+  <tabstop>ASFMux</tabstop>
   <tabstop>transcodeVideo</tabstop>
   <tabstop>keepVideo</tabstop>
   <tabstop>vCodecBox</tabstop>
@@ -539,6 +536,7 @@
   <tabstop>transcodeSubs</tabstop>
   <tabstop>subsCodecBox</tabstop>
   <tabstop>subsOverlay</tabstop>
+  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>
