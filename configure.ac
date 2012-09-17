@@ -1641,13 +1641,14 @@ You can get an updated one from http://www.live555.com/liveMedia .])
 ])
 
 dnl
-dnl - special access module for dc1394 input
-dnl - dv module: digital video module check for libraw1394
-dnl - linsys modules: access module check for libzvbi
+dnl IIDC and DV FireWire input modules
 dnl
 PKG_ENABLE_MODULES_VLC([DC1394], [], [libdc1394-2 >= 2.1.0], [IIDC FireWire input module], [auto])
 PKG_ENABLE_MODULES_VLC([DV1394], [], [libraw1394 >= 2.0.1 libavc1394 >= 0.5.3], [DV FireWire input module], [auto])
 
+dnl
+dnl - linsys modules: access module check for libzvbi
+dnl
 AC_ARG_ENABLE(linsys,
   [AS_HELP_STRING([--enable-linsys],
     [Linux Linear Systems Ltd. SDI and HD-SDI input cards (default enabled)])])
