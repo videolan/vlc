@@ -401,3 +401,18 @@ void QToolButtonExt::clickedSlot()
     else if( shortClick )
         emit shortClicked();
 }
+
+YesNoCheckBox::YesNoCheckBox( QWidget *parent ) : QCheckBox( parent )
+{
+    setEnabled( false );
+    setStyleSheet("\
+                  QCheckBox::indicator:unchecked:hover,\
+                  QCheckBox::indicator:unchecked {\
+                      image: url(:/menu/quit);\
+                  }\
+                  QCheckBox::indicator:checked:hover,\
+                  QCheckBox::indicator:checked {\
+                      image: url(:/valid);\
+                  }\
+        ");
+}

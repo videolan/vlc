@@ -210,6 +210,7 @@ DEPS_res = \
 	pixmaps/win7/win7thumbnail_next.png \
 	pixmaps/win7/win7thumbnail_play.png \
 	pixmaps/update.png \
+	pixmaps/valid.png \
 	pixmaps/search_clear.png \
 	pixmaps/lock.png
 

@@ -32,12 +32,14 @@
 #include <QLabel>
 #include <QStackedWidget>
 #include <QSpinBox>
+#include <QCheckBox>
 #include <QList>
 #include <QTimer>
 #include <QToolButton>
 #include <QAbstractAnimation>
 
 class QPixmap;
+class QWidget;
 
 class QFramelessButton : public QPushButton
 {
@@ -147,6 +149,13 @@ public:
     bool isPlaying() { return animator->state() == PixmapAnimator::Running; }
 private:
     PixmapAnimator *animator;
+};
+
+class YesNoCheckBox : public QCheckBox
+{
+    Q_OBJECT
+public:
+    YesNoCheckBox( QWidget *parent );
 };
 
 /* VLC Key/Wheel hotkeys interactions */

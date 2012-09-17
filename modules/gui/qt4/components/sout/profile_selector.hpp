@@ -27,6 +27,8 @@
 #include "qt4.hpp"
 
 #include <QWidget>
+#include <QSet>
+#include <QHash>
 
 #include "util/qvlcframe.hpp"
 #include "ui/profiles.h"
@@ -70,12 +72,16 @@ public:
 private:
     void registerCodecs();
     void fillProfile( const QString& qs );
+    typedef QSet<QString> resultset;
+    QHash<QString, resultset> caps;
+    void loadCapabilities();
 protected slots:
     virtual void close();
 private slots:
     void setVTranscodeOptions( bool );
     void setATranscodeOptions( bool );
     void setSTranscodeOptions( bool );
+    void muxSelected();
 };
 
 #endif

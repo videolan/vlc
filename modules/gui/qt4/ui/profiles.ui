@@ -44,102 +44,205 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="muxer">
+     <widget class="QWidget" name="muxertab">
       <attribute name="title">
        <string>Encapsulation</string>
       </attribute>
-      <layout class="QGridLayout">
-       <item row="2" column="0">
-        <widget class="QRadioButton" name="TSMux">
-         <property name="text">
-          <string>MPEG-TS</string>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QWidget" name="muxer" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="0" column="0">
+           <widget class="QRadioButton" name="TSMux">
+            <property name="text">
+             <string>MPEG-TS</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QRadioButton" name="PSMux">
+            <property name="text">
+             <string>MPEG-PS</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QRadioButton" name="MPEG1Mux">
+            <property name="text">
+             <string>MPEG 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QRadioButton" name="ASFMux">
+            <property name="text">
+             <string>ASF/WMV</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QRadioButton" name="WEBMux">
+            <property name="text">
+             <string>Webm</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QRadioButton" name="MJPEGMux">
+            <property name="text">
+             <string>MJPEG</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QRadioButton" name="MKVMux">
+            <property name="text">
+             <string>MKV</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QRadioButton" name="OggMux">
+            <property name="text">
+             <string>Ogg/Ogm</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QRadioButton" name="WAVMux">
+            <property name="text">
+             <string>WAV</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QRadioButton" name="RAWMux">
+            <property name="text">
+             <string>RAW</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QRadioButton" name="MOVMux">
+            <property name="text">
+             <string>MP4/MOV</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QRadioButton" name="FLVMux">
+            <property name="text">
+             <string>FLV</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QRadioButton" name="AVIMux">
+            <property name="text">
+             <string>AVI</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QRadioButton" name="PSMux">
-         <property name="text">
-          <string>MPEG-PS</string>
+       <item>
+        <widget class="QGroupBox" name="muxcaps">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
+         <property name="title">
+          <string>Features</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_7">
+          <item row="0" column="3">
+           <widget class="YesNoCheckBox" name="capsubs">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="text">
+             <string>Subtitles</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4">
+           <widget class="YesNoCheckBox" name="capstream">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="text">
+             <string>Streamable</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="4">
+           <widget class="YesNoCheckBox" name="capchaps">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="text">
+             <string>Chapters</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="YesNoCheckBox" name="capaudio">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="text">
+             <string>Audio</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="YesNoCheckBox" name="capvideo">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="text">
+             <string>Video</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="YesNoCheckBox" name="capmenu">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="text">
+             <string>Menus</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
-       <item row="3" column="2">
-        <widget class="QRadioButton" name="WAVMux">
-         <property name="text">
-          <string>WAV</string>
+       <item>
+        <widget class="QLabel" name="muxerwarning">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QRadioButton" name="WEBMux">
-         <property name="text">
-          <string>Webm</string>
+         <property name="styleSheet">
+          <string notr="true"/>
          </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QRadioButton" name="ASFMux">
          <property name="text">
-          <string>ASF/WMV</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="2">
-        <widget class="QRadioButton" name="OggMux">
-         <property name="text">
-          <string>Ogg/Ogm</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="2">
-        <widget class="QRadioButton" name="RAWMux">
-         <property name="text">
-          <string>RAW</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QRadioButton" name="MPEG1Mux">
-         <property name="text">
-          <string>MPEG 1</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="3">
-        <widget class="QRadioButton" name="FLVMux">
-         <property name="text">
-          <string>FLV</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="3">
-        <widget class="QRadioButton" name="AVIMux">
-         <property name="text">
-          <string>AVI</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="3">
-        <widget class="QRadioButton" name="MOVMux">
-         <property name="text">
-          <string>MP4/MOV</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QRadioButton" name="MJPEGMux">
-         <property name="text">
-          <string>MJPEG</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QRadioButton" name="MKVMux">
-         <property name="text">
-          <string>MKV</string>
+          <string/>
          </property>
         </widget>
        </item>
@@ -503,22 +606,16 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>YesNoCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>../util/customwidgets.hpp</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>profileLine</tabstop>
   <tabstop>tabWidget</tabstop>
-  <tabstop>TSMux</tabstop>
-  <tabstop>WEBMux</tabstop>
-  <tabstop>OggMux</tabstop>
-  <tabstop>MOVMux</tabstop>
-  <tabstop>PSMux</tabstop>
-  <tabstop>MJPEGMux</tabstop>
-  <tabstop>WAVMux</tabstop>
-  <tabstop>FLVMux</tabstop>
-  <tabstop>MPEG1Mux</tabstop>
-  <tabstop>MKVMux</tabstop>
-  <tabstop>RAWMux</tabstop>
-  <tabstop>AVIMux</tabstop>
-  <tabstop>ASFMux</tabstop>
   <tabstop>transcodeVideo</tabstop>
   <tabstop>keepVideo</tabstop>
   <tabstop>vCodecBox</tabstop>

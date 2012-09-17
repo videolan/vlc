@@ -34,6 +34,7 @@
 #include <QRadioButton>
 
 #include <assert.h>
+#include <vlc_modules.h>
 
 VLCProfileSelector::VLCProfileSelector( QWidget *_parent ): QWidget( _parent )
 {
@@ -239,6 +240,7 @@ VLCProfileEditor::VLCProfileEditor( const QString& qs_name, const QString& value
         ui.profileLine->setText( qs_name );
         ui.profileLine->setReadOnly( true );
     }
+    loadCapabilities();
     registerCodecs();
     CONNECT( ui.transcodeVideo, toggled( bool ),
             this, setVTranscodeOptions( bool ) );
@@ -259,24 +261,50 @@ VLCProfileEditor::VLCProfileEditor( const QString& qs_name, const QString& value
     BUTTONACT( cancelButton, reject() );
 
     fillProfile( value );
+    muxSelected();
+}
+
+void VLCProfileEditor::loadCapabilities()
+{
+    size_t count;
+    module_t **p_all = module_list_get (&count);
+    module_t *p_module;
+
+    /* Parse the module list for capabilities and probe each of them */
+    for (size_t i = 0; (p_module = p_all[i]) != NULL; i++)
+    {
+            if( module_provides( p_module, "sout mux" ) )
+                caps["muxers"].insert( module_get_object( p_module ) );
+//            else if ( module_provides( p_module, "encoder" ) )
+//                caps["encoders"].insert( module_get_object( p_module ) );
+    }
+    module_list_free (p_all);
 }
 
 inline void VLCProfileEditor::registerCodecs()
 {
-#define SETMUX( button, val ) ui.button->setProperty( "sout", val );
-    SETMUX( PSMux, "ps" )
-    SETMUX( TSMux, "ts" )
-    SETMUX( WEBMux, "webm" )
-    SETMUX( MPEG1Mux, "mpeg1" )
-    SETMUX( OggMux, "ogg" )
-    SETMUX( ASFMux, "asf" )
-    SETMUX( MOVMux, "mp4" )
-    SETMUX( WAVMux, "wav" )
-    SETMUX( RAWMux, "raw" )
-    SETMUX( FLVMux, "flv" )
-    SETMUX( MKVMux, "mkv" )
-    SETMUX( AVIMux, "avi" )
-    SETMUX( MJPEGMux, "mpjpeg" )
+#define SETMUX( button, val,    vid, aud, men, sub, stream, chaps ) \
+    ui.button->setProperty( "sout", val );\
+    ui.button->setProperty( "capvideo", vid );\
+    ui.button->setProperty( "capaudio", aud );\
+    ui.button->setProperty( "capmenu", men );\
+    ui.button->setProperty( "capsubs", sub );\
+    ui.button->setProperty( "capstream", stream );\
+    ui.button->setProperty( "capchaps", chaps );\
+    CONNECT( ui.button, clicked(bool), this, muxSelected() );
+    SETMUX( PSMux, "ps",        true, true, false, true, false, true )
+    SETMUX( TSMux, "ts",        true, true, false, true, true, false )
+    SETMUX( WEBMux, "webm",     true, true, false, false, true, false )
+    SETMUX( MPEG1Mux, "mpeg1",  true, true, false, false, false, false )
+    SETMUX( OggMux, "ogg",      true, true, false, false, true, true )
+    SETMUX( ASFMux, "asf",      true, true, false, true, true, true )
+    SETMUX( MOVMux, "mp4",      true, true, true, true, true, false )
+    SETMUX( WAVMux, "wav",      false, true, false, false, false, false )
+    SETMUX( RAWMux, "raw",      true, true, false, false, false, false )
+    SETMUX( FLVMux, "flv",      true, true, false, false, true, false )
+    SETMUX( MKVMux, "mkv",      true, true, true, true, true, true )
+    SETMUX( AVIMux, "avi",      true, true, false, false, false, false )
+    SETMUX( MJPEGMux, "mpjpeg", true, false, false, false, false, false )
 #undef SETMUX
 
 #define ADD_VCODEC( name, fourcc ) ui.vCodecBox->addItem( name, QVariant( fourcc ) );
@@ -332,6 +360,38 @@ inline void VLCProfileEditor::registerCodecs()
     ADD_SCODEC( "DVB subtitle", "dvbs" )
     ADD_SCODEC( "T.140", "t140" )
 #undef ADD_SCODEC
+}
+
+void VLCProfileEditor::muxSelected()
+{
+#define SETYESNOSTATE( name, prop ) \
+    ui.name->setChecked( current->property( prop ).toBool() )
+
+    for ( int i=0; i< ui.muxer->layout()->count(); i++ )
+    {
+        QRadioButton *current =
+                qobject_cast<QRadioButton *>(ui.muxer->layout()->itemAt(i)->widget());
+        if ( unlikely( !current ) ) continue;
+        if ( !current->isChecked() ) continue;
+
+        /* dumb :/ */
+        SETYESNOSTATE( capvideo, "capvideo" );
+        SETYESNOSTATE( capaudio, "capaudio" );
+        SETYESNOSTATE( capmenu, "capmenu" );
+        SETYESNOSTATE( capsubs, "capsubs" );
+        SETYESNOSTATE( capstream, "capstream" );
+        SETYESNOSTATE( capchaps, "capchaps" );
+        bool b = caps["muxers"].contains( "mux_" + current->property("sout").toString() );
+        if ( b )
+            ui.muxerwarning->setText(
+            QString( "<img src=\":/menu/info\"/> %1" )
+            .arg( qtr( "This muxer is not provided directly by VLC: It could be missing." ) )
+            );
+        else
+            ui.muxerwarning->setText("");
+        return;
+    }
+#undef SETYESNOSTATE
 }
 
 void VLCProfileEditor::fillProfile( const QString& qs )
