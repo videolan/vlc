@@ -1716,15 +1716,7 @@ fi
 dnl
 dnl sftp access support
 dnl
-AC_ARG_ENABLE(sftp,
-  [AS_HELP_STRING([--enable-sftp],
-    [support SFTP file transfer via libssh2 (default disabled)])])
-if test "${enable_sftp}" = "yes"; then
-  AC_CHECK_HEADERS(libssh2.h, [
-    VLC_ADD_PLUGIN([access_sftp])
-    VLC_ADD_LIBS([access_sftp], [-lssh2])
-  ])
-fi
+PKG_ENABLE_MODULES_VLC([SFTP], [access_sftp], [libssh2], (support SFTP file transfer via libssh2), [auto])
 
 dnl
 dnl  Video4Linux 2
