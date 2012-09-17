@@ -1765,21 +1765,7 @@ PKG_ENABLE_MODULES_VLC([GNOMEVFS], [access_gnomevfs], [gnome-vfs-2.0], [GnomeVFS
 dnl
 dnl  VCDX modules
 dnl
-AC_ARG_ENABLE(vcdx,
-  [AS_HELP_STRING([--enable-vcdx],
-    [navigate VCD with libvcdinfo (default disabled)])])
-if test "${enable_vcdx}" = "yes"
-then
-    PKG_CHECK_MODULES(LIBCDIO, [libcdio >= 0.78.2 libiso9660 >= 0.72],
-      [VLC_ADD_LIBS([vcdx],[$LIBCDIO_LIBS])
-         VLC_ADD_CFLAGS([vcdx],[$LIBCDIO_CFLAGS])],
-        [AC_MSG_ERROR([${LIBCDIO_PKG_ERRORS} (required for vcdx plugin).])])
-    PKG_CHECK_MODULES(LIBVCDINFO, libvcdinfo >= 0.7.22,
-        [VLC_ADD_LIBS([vcdx],[$LIBVCDINFO_LIBS])
-         VLC_ADD_CFLAGS([vcdx],[$LIBVCDINFO_CFLAGS])],
-      [AC_MSG_ERROR([${LIBVCDINFO_PKG_ERRORS} (required for vcdx plugin).])])
-    VLC_ADD_PLUGIN([vcdx])
-fi
+PKG_ENABLE_MODULES_VLC([VCDX], [vcdx], [libcdio >= 0.78.2 libiso9660 >= 0.72], [navigate VCD with libvcdinfo], [no])
 
 dnl
 dnl  Built-in CD-DA and VCD module
