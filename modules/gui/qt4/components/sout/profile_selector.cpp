@@ -292,6 +292,7 @@ inline void VLCProfileEditor::registerCodecs()
 #undef ADD_ACODEC
 
 #define ADD_SCALING( factor ) ui.vScaleBox->addItem( factor );
+    ADD_SCALING( qtr("Auto") );
     ADD_SCALING( "1" )
     ADD_SCALING( "0.25" )
     ADD_SCALING( "0.5" )
@@ -302,12 +303,12 @@ inline void VLCProfileEditor::registerCodecs()
     ADD_SCALING( "2" )
 #undef ADD_SCALING
 
-#define ADD_SAMPLERATE( sample ) ui.aSampleBox->addItem( sample );
-    ADD_SAMPLERATE( "8000" )
-    ADD_SAMPLERATE( "11025" )
-    ADD_SAMPLERATE( "22050" )
-    ADD_SAMPLERATE( "44100" )
-    ADD_SAMPLERATE( "48000" )
+#define ADD_SAMPLERATE( sample, val ) ui.aSampleBox->addItem( sample, val );
+    ADD_SAMPLERATE( "8000 Hz", 8000 )
+    ADD_SAMPLERATE( "11025 Hz", 11025 )
+    ADD_SAMPLERATE( "22050 Hz", 22050 )
+    ADD_SAMPLERATE( "44100 Hz", 44100 )
+    ADD_SAMPLERATE( "48000 Hz", 48000 )
 #undef ADD_SAMPLERATE
 
 #define ADD_SCODEC( name, fourcc ) ui.subsCodecBox->addItem( name, QVariant( fourcc ) );
@@ -347,7 +348,10 @@ void VLCProfileEditor::fillProfile( const QString& qs )
 
     ui.vCodecBox->setCurrentIndex( ui.vCodecBox->findData( options[4] ) );
     ui.vBitrateSpin->setValue( options[5].toInt() );
-    ui.vScaleBox->setEditText( options[6] );
+    if ( options[6].toInt() > 0 )
+        ui.vScaleBox->setEditText( options[6] );
+    else
+        ui.vScaleBox->setCurrentIndex( 0 );
     ui.vFrameBox->setValue( options[7].toDouble() );
     ui.widthBox->setValue( options[8].toInt() );
     ui.heightBox->setValue( options[9].toInt() );
@@ -355,7 +359,10 @@ void VLCProfileEditor::fillProfile( const QString& qs )
     ui.aCodecBox->setCurrentIndex( ui.aCodecBox->findData( options[10] ) );
     ui.aBitrateSpin->setValue( options[11].toInt() );
     ui.aChannelsSpin->setValue( options[12].toInt() );
-    ui.aSampleBox->setCurrentIndex( ui.aSampleBox->findText( options[13] ) );
+
+    int index = ui.aSampleBox->findData( options[13] );
+    if ( index == -1 ) index = ui.aSampleBox->findData( 44100 );
+    ui.aSampleBox->setCurrentIndex( index );
 
     ui.subsCodecBox->setCurrentIndex( ui.subsCodecBox->findData( options[14] ) );
     ui.subsOverlay->setChecked( options[15].toInt() );
@@ -446,7 +453,7 @@ QString VLCProfileEditor::transcodeValue()
 
             << qs_vcodec
             << QString::number( ui.vBitrateSpin->value() )
-            << ui.vScaleBox->currentText()
+            << ( ( ui.vScaleBox->currentIndex() != 0 ) ? ui.vScaleBox->currentText() : QString("0") )
             << QString::number( ui.vFrameBox->value() )
             << QString::number( ui.widthBox->value() )
             << QString::number( ui.heightBox->value() )
@@ -454,7 +461,7 @@ QString VLCProfileEditor::transcodeValue()
             << qs_acodec
             << QString::number( ui.aBitrateSpin->value() )
             << QString::number( ui.aChannelsSpin->value() )
-            << ui.aSampleBox->currentText()
+            << currentData( ui.aSampleBox ).toString()
 
             << currentData( ui.subsCodecBox ).toString()
             << QString::number( ui.subsOverlay->isChecked() );
