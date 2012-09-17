@@ -31,6 +31,7 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QMessageBox>
+#include <QRadioButton>
 
 #include <assert.h>
 
@@ -262,6 +263,21 @@ VLCProfileEditor::VLCProfileEditor( const QString& qs_name, const QString& value
 
 inline void VLCProfileEditor::registerCodecs()
 {
+#define SETMUX( button, val ) ui.button->setProperty( "sout", val );
+    SETMUX( PSMux, "ps" )
+    SETMUX( TSMux, "ts" )
+    SETMUX( WEBMux, "webm" )
+    SETMUX( MPEG1Mux, "mpeg1" )
+    SETMUX( OggMux, "ogg" )
+    SETMUX( ASFMux, "asf" )
+    SETMUX( MOVMux, "mp4" )
+    SETMUX( WAVMux, "wav" )
+    SETMUX( RAWMux, "raw" )
+    SETMUX( FLVMux, "flv" )
+    SETMUX( MKVMux, "mkv" )
+    SETMUX( AVIMux, "avi" )
+    SETMUX( MJPEGMux, "mpjpeg" )
+#undef SETMUX
 
 #define ADD_VCODEC( name, fourcc ) ui.vCodecBox->addItem( name, QVariant( fourcc ) );
     ADD_VCODEC( "MPEG-1", "mp1v" )
@@ -325,21 +341,17 @@ void VLCProfileEditor::fillProfile( const QString& qs )
         return;
 
     const QString mux = options[0];
-#define CHECKMUX( button, text) if( text == mux ) ui.button->setChecked( true ); else
-    CHECKMUX( PSMux, "ps" )
-    CHECKMUX( TSMux, "ts" )
-    CHECKMUX( WEBMux, "webm" )
-    CHECKMUX( MPEG1Mux, "mpeg1" )
-    CHECKMUX( OggMux, "ogg" )
-    CHECKMUX( ASFMux, "asf" )
-    CHECKMUX( MOVMux, "mp4" )
-    CHECKMUX( WAVMux, "wav" )
-    CHECKMUX( RAWMux, "raw" )
-    CHECKMUX( FLVMux, "flv" )
-    CHECKMUX( MKVMux, "mkv" )
-    CHECKMUX( AVIMux, "avi" )
-    CHECKMUX( MJPEGMux, "mpjpeg" ){}
-#undef CHECKMUX
+    for ( int i=0; i< ui.muxer->layout()->count(); i++ )
+    {
+        QRadioButton *current =
+                qobject_cast<QRadioButton *>(ui.muxer->layout()->itemAt(i)->widget());
+        if ( unlikely( !current ) ) continue;/* someone is messing up with ui */
+        if ( current->property("sout").toString() == mux )
+        {
+            current->setChecked( true );
+            break;/* radios are exclusive */
+        }
+    }
 
     ui.keepVideo->setChecked( !options[1].toInt() );
     ui.transcodeVideo->setChecked( ( options[4] != "none" ) );
@@ -421,21 +433,17 @@ void VLCProfileEditor::close()
 
 QString VLCProfileEditor::transcodeValue()
 {
-#define SMUX( x, txt ) if( ui.x->isChecked() ) muxValue =  txt; else
-    SMUX( PSMux, "ps" )
-    SMUX( TSMux, "ts" )
-    SMUX( WEBMux, "webm" )
-    SMUX( MPEG1Mux, "mpeg1" )
-    SMUX( OggMux, "ogg" )
-    SMUX( ASFMux, "asf" )
-    SMUX( MOVMux, "mp4" )
-    SMUX( WAVMux, "wav" )
-    SMUX( RAWMux, "raw" )
-    SMUX( FLVMux, "flv" )
-    SMUX( MKVMux, "mkv" )
-    SMUX( AVIMux, "avi" )
-    SMUX( MJPEGMux, "mpjpeg" ){}
-#undef SMUX
+    for ( int i=0; i< ui.muxer->layout()->count(); i++ )
+    {
+        QRadioButton *current =
+                qobject_cast<QRadioButton *>(ui.muxer->layout()->itemAt(i)->widget());
+        if ( unlikely( !current ) ) continue;/* someone is messing up with ui */
+        if ( current->isChecked() )
+        {
+            muxValue = current->property("sout").toString();
+            break;/* radios are exclusive */
+        }
+    }
 
 #define currentData( box ) box->itemData( box->currentIndex() )
     QString qs_acodec, qs_vcodec;
