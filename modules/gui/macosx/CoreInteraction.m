@@ -76,17 +76,24 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
 - (void)play
 {
-    playlist_t * p_playlist = pl_Get(VLCIntf);
-    bool empty;
+    input_thread_t * p_input;
+    p_input = pl_CurrentInput(VLCIntf);
+    if (p_input) {
+        var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE);
+        vlc_object_release(p_input);
+    } else {
+        playlist_t * p_playlist = pl_Get(VLCIntf);
+        bool empty;
 
-    PL_LOCK;
-    empty = playlist_IsEmpty(p_playlist);
-    PL_UNLOCK;
+        PL_LOCK;
+        empty = playlist_IsEmpty(p_playlist);
+        PL_UNLOCK;
 
-    if (empty)
-        [[[VLCMain sharedInstance] open] openFileGeneric];
-
-    var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE);
+        if ([[[VLCMain sharedInstance] playlist] isSelectionEmpty] && ([[[VLCMain sharedInstance] playlist] currentPlaylistRoot] == p_playlist->p_local_category || [[[VLCMain sharedInstance] playlist] currentPlaylistRoot] == p_playlist->p_ml_category))
+            [[[VLCMain sharedInstance] open] openFileGeneric];
+        else
+            [[[VLCMain sharedInstance] playlist] playItem:nil];
+    }
 }
 
 - (void)pause
