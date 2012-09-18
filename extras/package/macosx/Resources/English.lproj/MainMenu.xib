@@ -21,10 +21,10 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="4756"/>
       <integer value="4596"/>
-      <integer value="5248"/>
+      <integer value="5335"/>
       <integer value="5336"/>
+      <integer value="5248"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1012,7 +1012,7 @@
                     </object>
                     <object class="NSSlider" id="704525034">
                       <reference key="NSNextResponder" ref="271396113"/>
-                      <int key="NSvFlags">290</int>
+                      <int key="NSvFlags">-2147483358</int>
                       <string key="NSFrame">{{1, 0}, {176, 15}}</string>
                       <reference key="NSSuperview" ref="271396113"/>
                       <bool key="NSViewCanDrawConcurrently">YES</bool>
@@ -4619,8 +4619,8 @@ LCAuLi4</string>
                     </object>
                     <object class="NSSlider" id="672269443">
                       <reference key="NSNextResponder" ref="999946268"/>
-                      <int key="NSvFlags">290</int>
-                      <string key="NSFrame">{{1, 0}, {181, 15}}</string>
+                      <int key="NSvFlags">-2147483358</int>
+                      <string key="NSFrame">{{1, 0}, {168, 15}}</string>
                       <reference key="NSSuperview" ref="999946268"/>
                       <bool key="NSViewCanDrawConcurrently">YES</bool>
                       <bool key="NSEnabled">YES</bool>
@@ -4646,7 +4646,7 @@ LCAuLi4</string>
                     <object class="NSProgressIndicator" id="506657677">
                       <reference key="NSNextResponder" ref="999946268"/>
                       <int key="NSvFlags">-2147483358</int>
-                      <string key="NSFrame">{{0, 2}, {184, 12}}</string>
+                      <string key="NSFrame">{{0, 2}, {171, 12}}</string>
                       <reference key="NSSuperview" ref="999946268"/>
                       <int key="NSpiFlags">16650</int>
                       <double key="NSMaxValue">100</double>
@@ -4654,13 +4654,13 @@ LCAuLi4</string>
                     <object class="NSCustomView" id="640104047">
                       <reference key="NSNextResponder" ref="999946268"/>
                       <int key="NSvFlags">290</int>
-                      <string key="NSFrameSize">{184, 14}</string>
+                      <string key="NSFrameSize">{171, 14}</string>
                       <reference key="NSSuperview" ref="999946268"/>
                       <string key="NSReuseIdentifierKey">_NS:1109</string>
                       <string key="NSClassName">VLCThreePartImageView</string>
                     </object>
                   </object>
-                  <string key="NSFrame">{{96, 10}, {184, 14}}</string>
+                  <string key="NSFrame">{{96, 10}, {171, 14}}</string>
                   <reference key="NSSuperview" ref="984096082"/>
                   <string key="NSReuseIdentifierKey">_NS:1109</string>
                   <string key="NSClassName">VLCProgressView</string>
@@ -4725,7 +4725,7 @@ LCAuLi4</string>
                 <object class="NSTextField" id="156940539">
                   <reference key="NSNextResponder" ref="984096082"/>
                   <int key="NSvFlags">289</int>
-                  <string key="NSFrame">{{276, 11}, {55, 13}}</string>
+                  <string key="NSFrame">{{269, 11}, {55, 13}}</string>
                   <reference key="NSSuperview" ref="984096082"/>
                   <bool key="NSEnabled">YES</bool>
                   <object class="NSTextFieldCell" key="NSCell" id="961589946">
