@@ -433,8 +433,11 @@ void StringListConfigControl::finish(module_config_t *p_module_config )
     char **values, **texts;
     ssize_t count = config_GetPszChoices( p_this, p_item->psz_name,
                                           &values, &texts );
-    for( ssize_t i = 0; i < count; i++ )
+    for( ssize_t i = 0; i < count && texts; i++ )
     {
+        if( texts[i] == NULL || values[i] == NULL )
+            continue;
+
         combo->addItem( qfu(texts[i]), QVariant( qfu(values[i])) );
         if( !strcmp( p_item->value.psz ? p_item->value.psz : "", values[i] ) )
             combo->setCurrentIndex( combo->count() - 1 );
