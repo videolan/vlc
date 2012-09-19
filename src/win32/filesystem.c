@@ -263,7 +263,10 @@ out:
 
 int vlc_dup (int oldfd)
 {
-    return dup (oldfd);
+    int fd = dup (oldfd);
+    if (fd != -1)
+        setmode (fd, O_BINARY);
+    return fd;
 }
 
 int vlc_pipe (int fds[2])
