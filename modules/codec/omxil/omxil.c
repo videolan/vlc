@@ -1070,7 +1070,7 @@ loaded:
         }
 
         p_header->nOffset = 0;
-        p_header->nFlags = OMX_BUFFERFLAG_CODECCONFIG;
+        p_header->nFlags = OMX_BUFFERFLAG_CODECCONFIG | OMX_BUFFERFLAG_ENDOFFRAME;
         msg_Dbg(p_dec, "sending codec config data %p, %p, %i", p_header,
                 p_header->pBuffer, (int)p_header->nFilledLen);
         OMX_EmptyThisBuffer(p_sys->omx_handle, p_header);
