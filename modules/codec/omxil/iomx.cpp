@@ -173,6 +173,8 @@ static int get_param_size(OMX_INDEXTYPE param_index)
         return sizeof(OMX_VIDEO_PARAM_MPEG4TYPE);
     case OMX_IndexParamVideoAvc:
         return sizeof(OMX_VIDEO_PARAM_AVCTYPE);
+    case OMX_IndexParamVideoWmv:
+        return sizeof(OMX_VIDEO_PARAM_WMVTYPE);
     default:
         return 0;
     }
