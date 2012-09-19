@@ -714,6 +714,13 @@ static int OpenSPDIF (audio_output_t * p_aout)
     }
     free(p_streams);
 
+    /* get notified when we don't have spdif-output anymore */
+    err = AudioObjectAddPropertyListener(p_sys->i_stream_id, &physicalFormatsAddress, HardwareListener, (void *)p_aout);
+    if (err != noErr) {
+        msg_Warn(p_aout, "could not set audio device property streams callback on device: %4.4s",
+                 (char *)&err);
+    }
+
     msg_Dbg(p_aout, STREAM_FORMAT_MSG("original stream format: ", p_sys->sfmt_revert));
 
     if (!AudioStreamChangeFormat(p_aout, p_sys->i_stream_id, p_sys->stream_format))
@@ -779,6 +786,13 @@ static void Close(vlc_object_t * p_this)
     err = AudioObjectRemovePropertyListener(p_sys->i_selected_dev, &deviceAliveAddress, HardwareListener, NULL);
     if (err != noErr)
         msg_Err(p_aout, "failed to remove audio device life checker: [%4.4s]", (char *)&err);
+
+    if (p_sys->b_digital) {
+        AudioObjectPropertyAddress physicalFormatsAddress = { kAudioStreamPropertyAvailablePhysicalFormats, kAudioObjectPropertyScopeGlobal, 0 };
+        err = AudioObjectRemovePropertyListener(p_sys->i_stream_id, &physicalFormatsAddress, HardwareListener, NULL);
+        if (err != noErr)
+            msg_Err(p_aout, "failed to remove audio device property streams callback: [%4.4s]", (char *)&err);
+    }
 
     if (p_sys->au_unit) {
         verify_noerr(AudioOutputUnitStop(p_sys->au_unit));
@@ -1309,6 +1323,10 @@ static OSStatus HardwareListener(AudioObjectID inObjectID,  UInt32 inNumberAddre
             var_Destroy(p_aout, "audio-device");
         } else if (inAddresses[i].mSelector == kAudioDevicePropertyDeviceIsAlive) {
             msg_Warn(p_aout, "audio device died, resetting aout");
+            var_TriggerCallback(p_aout, "audio-device");
+            var_Destroy(p_aout, "audio-device");
+        } else if (inAddresses[i].mSelector == kAudioStreamPropertyAvailablePhysicalFormats) {
+            msg_Warn(p_aout, "available physical formats for audio device changed, resetting aout");
             var_TriggerCallback(p_aout, "audio-device");
             var_Destroy(p_aout, "audio-device");
         }
