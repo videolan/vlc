@@ -431,6 +431,27 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
         def->nBufferSize *= 2;
     }
 
+    if (def->format.video.eCompressionFormat == OMX_VIDEO_CodingWMV) {
+        OMX_VIDEO_PARAM_WMVTYPE wmvtype = { 0 };
+        OMX_INIT_STRUCTURE(wmvtype);
+        wmvtype.nPortIndex = def->nPortIndex;
+        switch (p_dec->fmt_in.i_codec) {
+        case VLC_CODEC_WMV1:
+            wmvtype.eFormat = OMX_VIDEO_WMVFormat7;
+            break;
+        case VLC_CODEC_WMV2:
+            wmvtype.eFormat = OMX_VIDEO_WMVFormat8;
+            break;
+        case VLC_CODEC_WMV3:
+        case VLC_CODEC_VC1:
+            wmvtype.eFormat = OMX_VIDEO_WMVFormat9;
+            break;
+        }
+        omx_error = OMX_SetParameter(p_port->omx_handle, OMX_IndexParamVideoWmv, &wmvtype);
+        CHECK_ERROR(omx_error, "OMX_SetParameter OMX_IndexParamVideoWmv failed (%x : %s)",
+                    omx_error, ErrorToString(omx_error));
+    }
+
  error:
     return omx_error;
 }
