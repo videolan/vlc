@@ -281,7 +281,7 @@ static const struct
     { VLC_CODEC_WMV1, OMX_VIDEO_CodingWMV,   "video_decoder.wmv"   },
     { VLC_CODEC_WMV2, OMX_VIDEO_CodingWMV,   "video_decoder.wmv"   },
     { VLC_CODEC_WMV3, OMX_VIDEO_CodingWMV,   "video_decoder.wmv"   },
-    { VLC_CODEC_VC1,  OMX_VIDEO_CodingWMV,   "video_decoder.vc1"   },
+    { VLC_CODEC_VC1,  OMX_VIDEO_CodingWMV,   "video_decoder.wmv"   },
     { VLC_CODEC_MJPG, OMX_VIDEO_CodingMJPEG, "video_decoder.jpeg"  },
     { VLC_CODEC_MJPG, OMX_VIDEO_CodingMJPEG, "video_decoder.mjpeg" },
     { VLC_CODEC_RV10, OMX_VIDEO_CodingRV,    "video_decoder.rv"    },
