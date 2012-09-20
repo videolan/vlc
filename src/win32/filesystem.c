@@ -69,14 +69,15 @@ int vlc_open (const char *filename, int flags, ...)
     unsigned int mode = 0;
     va_list ap;
 
+    flags |= O_NOINHERIT; /* O_CLOEXEC */
+    /* Defaults to binary mode */
+    if ((flags & O_TEXT) == 0)
+        flags |= O_BINARY;
+
     va_start (ap, flags);
     if (flags & O_CREAT)
         mode = va_arg (ap, unsigned int);
     va_end (ap);
-
-    /* Defaults to binary mode */
-    if ((flags & O_TEXT) == 0)
-        flags |= O_BINARY;
 
     /*
      * open() cannot open files with non-“ANSI” characters on Windows.
@@ -271,7 +272,7 @@ int vlc_dup (int oldfd)
 
 int vlc_pipe (int fds[2])
 {
-    return _pipe (fds, 32768, O_BINARY);
+    return _pipe (fds, 32768, O_NOINHERIT | O_BINARY);
 }
 
 #include <vlc_network.h>
