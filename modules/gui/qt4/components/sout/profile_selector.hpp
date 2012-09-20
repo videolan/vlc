@@ -71,6 +71,7 @@ public:
     QString name;
     QString muxValue;
     QString transcodeValue();
+    QStringList qpcodecsList;
 private:
     void registerCodecs();
     void fillProfile( const QString& qs );
@@ -83,7 +84,10 @@ protected slots:
     virtual void close();
 private slots:
     void muxSelected();
+    void codecSelected();
     void activatePanels();
+    void fixBirateState();
+    void fixQPState();
 };
 
 #endif

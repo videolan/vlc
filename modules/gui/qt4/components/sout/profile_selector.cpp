@@ -35,6 +35,7 @@
 #include <QRegExp>
 #include <QButtonGroup>
 #include <QSpinBox>
+#include <QUrl>
 
 #include <assert.h>
 #include <vlc_modules.h>
@@ -240,7 +241,24 @@ void VLCProfileSelector::updateOptions( int i )
             smrl.option( "vcodec", value );
 
             HASHPICK( "vcodec", "bitrate" );
-            smrl.option( "vb", value.toInt() );
+            if ( value.toInt() > 0 )
+            {
+                smrl.option( "vb", value.toInt() );
+            } else {
+                /* special handling */
+                QStringList codecoptions;
+
+                HASHPICK( "vcodec", "qp" );
+                if( value.toInt() > 0 )
+                    codecoptions << QString( "qp=%1" ).arg( value );
+
+                HASHPICK( "vcodec", "custom" );
+                if( !value.isEmpty() )
+                    codecoptions << QUrl::fromPercentEncoding( value.toAscii() );
+
+                smrl.option( "venc",
+                    QString("x264{%1}").arg( codecoptions.join(",") ) );
+            }
 
             HASHPICK( "vcodec", "framerate" );
             if ( !value.isEmpty() && value.toInt() > 0 )
@@ -397,10 +415,17 @@ VLCProfileEditor::VLCProfileEditor( const QString& qs_name, const QString& value
              this, activatePanels() );
     CONNECT( ui.valueholder_audio_copy, stateChanged( int ),
              this, activatePanels() );
+    CONNECT( ui.valueholder_vcodec_bitrate, editingFinished( ),
+             this, fixBirateState() );
+    CONNECT( ui.valueholder_vcodec_qp, editingFinished( ),
+             this, fixQPState() );
+    CONNECT( ui.valueholder_video_codec, currentIndexChanged( int ),
+             this, codecSelected() );
     reset();
 
     fillProfile( value );
     muxSelected();
+    codecSelected();
 }
 
 void VLCProfileEditor::loadCapabilities()
@@ -463,6 +488,8 @@ inline void VLCProfileEditor::registerCodecs()
     ADD_VCODEC( "Theora", "theo" )
     ADD_VCODEC( "Dirac", "drac" )
 #undef ADD_VCODEC
+    /* can do quality */
+    qpcodecsList << "h264";
 
 #define ADD_ACODEC( name, fourcc ) ui.valueholder_audio_codec->addItem( name, QVariant( fourcc ) );
     ADD_ACODEC( "MPEG Audio", "mpga" )
@@ -504,34 +531,38 @@ inline void VLCProfileEditor::registerCodecs()
 
 void VLCProfileEditor::muxSelected()
 {
+    QRadioButton *current =
+            qobject_cast<QRadioButton *>( ui.buttonGroup->checkedButton() );
+
 #define SETYESNOSTATE( name, prop ) \
     ui.name->setChecked( current->property( prop ).toBool() )
 
-    for ( int i=0; i< ui.muxer->layout()->count(); i++ )
-    {
-        QRadioButton *current =
-                qobject_cast<QRadioButton *>(ui.muxer->layout()->itemAt(i)->widget());
-        if ( unlikely( !current ) ) continue;
-        if ( !current->isChecked() ) continue;
+    /* dumb :/ */
+    SETYESNOSTATE( capvideo, "capvideo" );
+    SETYESNOSTATE( capaudio, "capaudio" );
+    SETYESNOSTATE( capmenu, "capmenu" );
+    SETYESNOSTATE( capsubs, "capsubs" );
+    SETYESNOSTATE( capstream, "capstream" );
+    SETYESNOSTATE( capchaps, "capchaps" );
+    bool b = caps["muxers"].contains( "mux_" + current->property("sout").toString() );
+    if ( b )
+        ui.muxerwarning->setText(
+                    QString( "<img src=\":/menu/info\"/> %1" )
+                    .arg( qtr( "This muxer is not provided directly by VLC: It could be missing." ) )
+                    );
+    else
+        ui.muxerwarning->setText("");
+    return;
 
-        /* dumb :/ */
-        SETYESNOSTATE( capvideo, "capvideo" );
-        SETYESNOSTATE( capaudio, "capaudio" );
-        SETYESNOSTATE( capmenu, "capmenu" );
-        SETYESNOSTATE( capsubs, "capsubs" );
-        SETYESNOSTATE( capstream, "capstream" );
-        SETYESNOSTATE( capchaps, "capchaps" );
-        bool b = caps["muxers"].contains( "mux_" + current->property("sout").toString() );
-        if ( b )
-            ui.muxerwarning->setText(
-            QString( "<img src=\":/menu/info\"/> %1" )
-            .arg( qtr( "This muxer is not provided directly by VLC: It could be missing." ) )
-            );
-        else
-            ui.muxerwarning->setText("");
-        return;
-    }
 #undef SETYESNOSTATE
+}
+
+void VLCProfileEditor::codecSelected()
+{
+    /* Enable quality preset */
+    QString currentcodec = ui.valueholder_video_codec->
+            itemData(ui.valueholder_video_codec->currentIndex() ).toString();
+    ui.valueholder_vcodec_qp->setEnabled( qpcodecsList.contains( currentcodec ) );
 }
 
 void VLCProfileEditor::fillProfile( const QString& qs )
@@ -585,6 +616,11 @@ void VLCProfileEditor::fillProfile( const QString& qs )
             {
                 QComboBox *box = qobject_cast<QComboBox *>( object );
                 box->setCurrentIndex( box->findData( value ) );
+            }
+            else if( object->inherits( "QLineEdit" ) )
+            {
+                QLineEdit *box = qobject_cast<QLineEdit *>( object );
+                box->setText( QUrl::fromPercentEncoding( value.toAscii() ) );
             }
         }
     }
@@ -702,6 +738,11 @@ QString VLCProfileEditor::transcodeValue()
             const QComboBox *box = qobject_cast<const QComboBox *>( object );
             value = currentData( box ).toString();
         }
+        else if( object->inherits( "QLineEdit" ) )
+        {
+            const QLineEdit *box = qobject_cast<const QLineEdit *>( object );
+            value = QUrl::toPercentEncoding( box->text(), "", "_;" );
+        }
 
         if ( !value.isEmpty() )
             configuration << QString( "%1_%2=%3" )
@@ -717,6 +758,7 @@ void VLCProfileEditor::reset()
     ui.valueholder_video_copy->setChecked( false );
     ui.valueholder_audio_copy->setChecked( false );
     activatePanels();
+    fixBirateState(); /* defaults to bitrate, not qp */
     /* end with top level ones for cascaded setEnabled() */
     ui.valueholder_video_enable->setChecked( false );
     ui.valueholder_audio_enable->setChecked( false );
@@ -727,6 +769,18 @@ void VLCProfileEditor::activatePanels()
 {
     ui.transcodevideo->setEnabled( ! ui.valueholder_video_copy->isChecked() );
     ui.transcodeaudio->setEnabled( ! ui.valueholder_audio_copy->isChecked() );
+}
+
+void VLCProfileEditor::fixBirateState()
+{
+    /* exclusive bitrate choice */
+    ui.valueholder_vcodec_qp->setValue( 0 );
+}
+
+void VLCProfileEditor::fixQPState()
+{
+    /* exclusive bitrate choice */
+    ui.valueholder_vcodec_bitrate->setValue( 0 );
 }
 
 #undef CATPROP2NAME
