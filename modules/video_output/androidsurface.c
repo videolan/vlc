@@ -66,7 +66,7 @@ vlc_module_end()
 
 extern void *jni_LockAndGetAndroidSurface();
 extern void  jni_UnlockAndroidSurface();
-extern void  jni_SetAndroidSurfaceSize(int width, int height);
+extern void  jni_SetAndroidSurfaceSize(int width, int height, int sar_num, int sar_den);
 
 // _ZN7android7Surface4lockEPNS0_11SurfaceInfoEb
 typedef void (*Surface_lock)(void *, void *, int);
@@ -92,6 +92,10 @@ struct vout_display_sys_t {
     Surface_unlockAndPost s_unlockAndPost;
 
     picture_resource_t resource;
+
+    /* density */
+    int i_sar_num;
+    int i_sar_den;
 };
 
 /* */
@@ -218,6 +222,9 @@ static int Open(vlc_object_t *p_this) {
     /* Fix initial state */
     vout_display_SendEventFullscreen(vd, false);
 
+    sys->i_sar_num = vd->source.i_sar_num;
+    sys->i_sar_den = vd->source.i_sar_den;
+
     return VLC_SUCCESS;
 
 enomem:
@@ -270,7 +277,7 @@ static int  AndroidLockSurface(picture_t *picture) {
     // input size doesn't match the surface size,
     // request a resize
     if (info->w != sw || info->h != sh) {
-        jni_SetAndroidSurfaceSize(sw, sh);
+        jni_SetAndroidSurfaceSize(sw, sh, sys->i_sar_num, sys->i_sar_den);
         sys->s_unlockAndPost(surf);
         jni_UnlockAndroidSurface();
         return VLC_EGENERIC;
