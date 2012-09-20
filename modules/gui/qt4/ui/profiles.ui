@@ -66,6 +66,9 @@
             <property name="checked">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string>buttonGroup</string>
+            </attribute>
            </widget>
           </item>
           <item row="1" column="0">
@@ -73,6 +76,9 @@
             <property name="text">
              <string>MPEG-PS</string>
             </property>
+            <attribute name="buttonGroup">
+             <string>buttonGroup</string>
+            </attribute>
            </widget>
           </item>
           <item row="2" column="0">
@@ -80,6 +86,9 @@
             <property name="text">
              <string>MPEG 1</string>
             </property>
+            <attribute name="buttonGroup">
+             <string>buttonGroup</string>
+            </attribute>
            </widget>
           </item>
           <item row="3" column="0">
@@ -87,6 +96,9 @@
             <property name="text">
              <string>ASF/WMV</string>
             </property>
+            <attribute name="buttonGroup">
+             <string>buttonGroup</string>
+            </attribute>
            </widget>
           </item>
           <item row="0" column="1">
@@ -94,6 +106,9 @@
             <property name="text">
              <string>Webm</string>
             </property>
+            <attribute name="buttonGroup">
+             <string>buttonGroup</string>
+            </attribute>
            </widget>
           </item>
           <item row="1" column="1">
@@ -101,6 +116,9 @@
             <property name="text">
              <string>MJPEG</string>
             </property>
+            <attribute name="buttonGroup">
+             <string>buttonGroup</string>
+            </attribute>
            </widget>
           </item>
           <item row="2" column="1">
@@ -108,6 +126,9 @@
             <property name="text">
              <string>MKV</string>
             </property>
+            <attribute name="buttonGroup">
+             <string>buttonGroup</string>
+            </attribute>
            </widget>
           </item>
           <item row="0" column="2">
@@ -115,6 +136,9 @@
             <property name="text">
              <string>Ogg/Ogm</string>
             </property>
+            <attribute name="buttonGroup">
+             <string>buttonGroup</string>
+            </attribute>
            </widget>
           </item>
           <item row="1" column="2">
@@ -122,6 +146,9 @@
             <property name="text">
              <string>WAV</string>
             </property>
+            <attribute name="buttonGroup">
+             <string>buttonGroup</string>
+            </attribute>
            </widget>
           </item>
           <item row="2" column="2">
@@ -129,6 +156,9 @@
             <property name="text">
              <string>RAW</string>
             </property>
+            <attribute name="buttonGroup">
+             <string>buttonGroup</string>
+            </attribute>
            </widget>
           </item>
           <item row="0" column="3">
@@ -136,6 +166,9 @@
             <property name="text">
              <string>MP4/MOV</string>
             </property>
+            <attribute name="buttonGroup">
+             <string>buttonGroup</string>
+            </attribute>
            </widget>
           </item>
           <item row="1" column="3">
@@ -143,6 +176,9 @@
             <property name="text">
              <string>FLV</string>
             </property>
+            <attribute name="buttonGroup">
+             <string>buttonGroup</string>
+            </attribute>
            </widget>
           </item>
           <item row="2" column="3">
@@ -150,6 +186,9 @@
             <property name="text">
              <string>AVI</string>
             </property>
+            <attribute name="buttonGroup">
+             <string>buttonGroup</string>
+            </attribute>
            </widget>
           </item>
          </layout>
@@ -260,7 +299,7 @@
         <number>6</number>
        </property>
        <item row="0" column="0" colspan="2">
-        <widget class="QCheckBox" name="transcodeVideo">
+        <widget class="QCheckBox" name="valueholder_video_enable">
          <property name="text">
           <string>Video</string>
          </property>
@@ -275,12 +314,12 @@
           <string>Codec</string>
          </property>
          <property name="buddy">
-          <cstring>vCodecBox</cstring>
+          <cstring>valueholder_video_codec</cstring>
          </property>
         </widget>
        </item>
        <item row="2" column="1" colspan="2">
-        <widget class="QComboBox" name="vCodecBox">
+        <widget class="QComboBox" name="valueholder_video_codec">
          <property name="editable">
           <bool>false</bool>
          </property>
@@ -292,12 +331,12 @@
           <string>Bitrate</string>
          </property>
          <property name="buddy">
-          <cstring>vBitrateSpin</cstring>
+          <cstring>valueholder_vcodec_bitrate</cstring>
          </property>
         </widget>
        </item>
        <item row="3" column="2">
-        <widget class="QSpinBox" name="vBitrateSpin">
+        <widget class="QSpinBox" name="valueholder_vcodec_bitrate">
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
@@ -324,12 +363,12 @@
           <string>Frame Rate</string>
          </property>
          <property name="buddy">
-          <cstring>vFrameBox</cstring>
+          <cstring>valueholder_vcodec_framerate</cstring>
          </property>
         </widget>
        </item>
        <item row="4" column="2">
-        <widget class="QDoubleSpinBox" name="vFrameBox">
+        <widget class="QDoubleSpinBox" name="valueholder_vcodec_framerate">
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
@@ -372,12 +411,12 @@
              <string>Scale</string>
             </property>
             <property name="buddy">
-             <cstring>vScaleBox</cstring>
+             <cstring>valueholder_vcodec_scale</cstring>
             </property>
            </widget>
           </item>
           <item row="1" column="3" colspan="2">
-           <widget class="QComboBox" name="vScaleBox">
+           <widget class="QComboBox" name="valueholder_vcodec_scale">
             <property name="editable">
              <bool>true</bool>
             </property>
@@ -389,7 +428,7 @@
              <string>Width</string>
             </property>
             <property name="buddy">
-             <cstring>widthBox</cstring>
+             <cstring>valueholder_vcodec_width</cstring>
             </property>
            </widget>
           </item>
@@ -415,12 +454,12 @@
              <string>Height</string>
             </property>
             <property name="buddy">
-             <cstring>heightBox</cstring>
+             <cstring>valueholder_vcodec_height</cstring>
             </property>
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QSpinBox" name="widthBox">
+           <widget class="QSpinBox" name="valueholder_vcodec_width">
             <property name="specialValueText">
              <string>Auto</string>
             </property>
@@ -436,7 +475,7 @@
            </widget>
           </item>
           <item row="2" column="4">
-           <widget class="QSpinBox" name="heightBox">
+           <widget class="QSpinBox" name="valueholder_vcodec_height">
             <property name="specialValueText">
              <string>Auto</string>
             </property>
@@ -455,7 +494,7 @@
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QCheckBox" name="keepVideo">
+        <widget class="QCheckBox" name="valueholder_video_copy">
          <property name="text">
           <string>Keep original video track</string>
          </property>
@@ -469,14 +508,14 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="0" column="0">
-        <widget class="QCheckBox" name="transcodeAudio">
+        <widget class="QCheckBox" name="valueholder_audio_enable">
          <property name="text">
           <string>Audio</string>
          </property>
         </widget>
        </item>
        <item row="1" column="0" colspan="2">
-        <widget class="QCheckBox" name="keepAudio">
+        <widget class="QCheckBox" name="valueholder_audio_copy">
          <property name="text">
           <string>Keep original audio track</string>
          </property>
@@ -488,12 +527,12 @@
           <string>Codec</string>
          </property>
          <property name="buddy">
-          <cstring>aCodecBox</cstring>
+          <cstring>valueholder_audio_codec</cstring>
          </property>
         </widget>
        </item>
        <item row="2" column="2" colspan="2">
-        <widget class="QComboBox" name="aCodecBox"/>
+        <widget class="QComboBox" name="valueholder_audio_codec"/>
        </item>
        <item row="3" column="0">
         <widget class="QLabel" name="aBitrateLabel">
@@ -501,12 +540,12 @@
           <string>Bitrate</string>
          </property>
          <property name="buddy">
-          <cstring>aBitrateSpin</cstring>
+          <cstring>valueholder_acodec_bitrate</cstring>
          </property>
         </widget>
        </item>
        <item row="3" column="3">
-        <widget class="QSpinBox" name="aBitrateSpin">
+        <widget class="QSpinBox" name="valueholder_acodec_bitrate">
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
@@ -530,12 +569,12 @@
           <string>Channels</string>
          </property>
          <property name="buddy">
-          <cstring>aChannelsSpin</cstring>
+          <cstring>valueholder_acodec_channels</cstring>
          </property>
         </widget>
        </item>
        <item row="4" column="3">
-        <widget class="QSpinBox" name="aChannelsSpin">
+        <widget class="QSpinBox" name="valueholder_acodec_channels">
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
@@ -556,12 +595,12 @@
           <string>Sample Rate</string>
          </property>
          <property name="buddy">
-          <cstring>aSampleBox</cstring>
+          <cstring>valueholder_acodec_samplerate</cstring>
          </property>
         </widget>
        </item>
        <item row="5" column="3">
-        <widget class="QComboBox" name="aSampleBox"/>
+        <widget class="QComboBox" name="valueholder_acodec_samplerate"/>
        </item>
        <item row="6" column="2">
         <spacer name="verticalSpacer">
@@ -584,17 +623,17 @@
       </attribute>
       <layout class="QGridLayout" name="_4">
        <item row="0" column="0">
-        <widget class="QCheckBox" name="transcodeSubs">
+        <widget class="QCheckBox" name="valueholder_subtitles_enable">
          <property name="text">
           <string>Subtitles</string>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="subsCodecBox"/>
+        <widget class="QComboBox" name="valueholder_subtitles_codec"/>
        </item>
        <item row="1" column="1">
-        <widget class="QCheckBox" name="subsOverlay">
+        <widget class="QCheckBox" name="valueholder_subtitles_overlay">
          <property name="text">
           <string>Overlay subtitles on the video</string>
          </property>
@@ -616,25 +655,28 @@
  <tabstops>
   <tabstop>profileLine</tabstop>
   <tabstop>tabWidget</tabstop>
-  <tabstop>transcodeVideo</tabstop>
-  <tabstop>keepVideo</tabstop>
-  <tabstop>vCodecBox</tabstop>
-  <tabstop>vBitrateSpin</tabstop>
-  <tabstop>vFrameBox</tabstop>
-  <tabstop>vScaleBox</tabstop>
-  <tabstop>widthBox</tabstop>
-  <tabstop>heightBox</tabstop>
-  <tabstop>transcodeAudio</tabstop>
-  <tabstop>keepAudio</tabstop>
-  <tabstop>aCodecBox</tabstop>
-  <tabstop>aBitrateSpin</tabstop>
-  <tabstop>aChannelsSpin</tabstop>
-  <tabstop>aSampleBox</tabstop>
-  <tabstop>transcodeSubs</tabstop>
-  <tabstop>subsCodecBox</tabstop>
-  <tabstop>subsOverlay</tabstop>
+  <tabstop>valueholder_video_enable</tabstop>
+  <tabstop>valueholder_video_copy</tabstop>
+  <tabstop>valueholder_video_codec</tabstop>
+  <tabstop>valueholder_vcodec_bitrate</tabstop>
+  <tabstop>valueholder_vcodec_framerate</tabstop>
+  <tabstop>valueholder_vcodec_scale</tabstop>
+  <tabstop>valueholder_vcodec_width</tabstop>
+  <tabstop>valueholder_vcodec_height</tabstop>
+  <tabstop>valueholder_audio_enable</tabstop>
+  <tabstop>valueholder_audio_copy</tabstop>
+  <tabstop>valueholder_audio_codec</tabstop>
+  <tabstop>valueholder_acodec_bitrate</tabstop>
+  <tabstop>valueholder_acodec_channels</tabstop>
+  <tabstop>valueholder_acodec_samplerate</tabstop>
+  <tabstop>valueholder_subtitles_enable</tabstop>
+  <tabstop>valueholder_subtitles_codec</tabstop>
+  <tabstop>valueholder_subtitles_overlay</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>

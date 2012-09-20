@@ -34,6 +34,7 @@
 #include "ui/profiles.h"
 
 class QComboBox;
+
 class VLCProfileSelector : public QWidget
 {
     Q_OBJECT
@@ -54,6 +55,7 @@ private slots:
     void editProfile();
     void deleteProfile();
     void updateOptions( int i );
+    void updateOptionsOldFormat( int i );
 signals:
     void optionsChanged();
 };
@@ -72,6 +74,7 @@ public:
 private:
     void registerCodecs();
     void fillProfile( const QString& qs );
+    void fillProfileOldFormat( const QString& qs );
     typedef QSet<QString> resultset;
     QHash<QString, resultset> caps;
     void loadCapabilities();
