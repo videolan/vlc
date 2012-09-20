@@ -75,7 +75,6 @@ VLCProfileSelector::VLCProfileSelector( QWidget *_parent ): QWidget( _parent )
 
     CONNECT( profileBox, activated( int ),
              this, updateOptions( int ) );
-
     updateOptions( 0 );
 }
 
@@ -385,15 +384,6 @@ VLCProfileEditor::VLCProfileEditor( const QString& qs_name, const QString& value
     }
     loadCapabilities();
     registerCodecs();
-    CONNECT( ui.valueholder_video_enable, toggled( bool ),
-            this, setVTranscodeOptions( bool ) );
-    CONNECT( ui.valueholder_audio_enable, toggled( bool ),
-            this, setATranscodeOptions( bool ) );
-    CONNECT( ui.valueholder_subtitles_enable, toggled( bool ),
-            this, setSTranscodeOptions( bool ) );
-    setVTranscodeOptions( false );
-    setATranscodeOptions( false );
-    setSTranscodeOptions( false );
 
     QPushButton *saveButton = new QPushButton(
                 ( qs_name.isEmpty() ) ? qtr( "Create" ) : qtr( "Save" ) );
@@ -402,6 +392,12 @@ VLCProfileEditor::VLCProfileEditor( const QString& qs_name, const QString& value
     QPushButton *cancelButton = new QPushButton( qtr( "Cancel" ) );
     ui.buttonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
     BUTTONACT( cancelButton, reject() );
+
+    CONNECT( ui.valueholder_video_copy, stateChanged( int ),
+             this, activatePanels() );
+    CONNECT( ui.valueholder_audio_copy, stateChanged( int ),
+             this, activatePanels() );
+    reset();
 
     fillProfile( value );
     muxSelected();
@@ -570,6 +566,11 @@ void VLCProfileEditor::fillProfile( const QString& qs )
                 QCheckBox *box = qobject_cast<QCheckBox *>( object );
                 box->setChecked( ! value.isEmpty() );
             }
+            else if( object->inherits( "QGroupBox" ) )
+            {
+                QGroupBox *box = qobject_cast<QGroupBox *>( object );
+                box->setChecked( ! value.isEmpty() );
+            }
             else if( object->inherits( "QSpinBox" ) )
             {
                 QSpinBox *box = qobject_cast<QSpinBox *>( object );
@@ -636,42 +637,6 @@ void VLCProfileEditor::fillProfileOldFormat( const QString& qs )
     ui.valueholder_subtitles_overlay->setChecked( options[15].toInt() );
 }
 
-void VLCProfileEditor::setVTranscodeOptions( bool b_trans )
-{
-    ui.vCodecLabel->setEnabled( b_trans );
-    ui.valueholder_video_codec->setEnabled( b_trans );
-    ui.vBitrateLabel->setEnabled( b_trans );
-    ui.valueholder_vcodec_bitrate->setEnabled( b_trans );
-    ui.vScaleLabel->setEnabled( b_trans );
-    ui.valueholder_vcodec_scale->setEnabled( b_trans );
-    ui.valueholder_vcodec_height->setEnabled( b_trans );
-    ui.heightLabel->setEnabled( b_trans );
-    ui.valueholder_vcodec_width->setEnabled( b_trans );
-    ui.widthLabel->setEnabled( b_trans );
-    ui.valueholder_vcodec_framerate->setEnabled( b_trans );
-    ui.vFrameLabel->setEnabled( b_trans );
-    ui.valueholder_video_copy->setEnabled( b_trans );
-}
-
-void VLCProfileEditor::setATranscodeOptions( bool b_trans )
-{
-    ui.aCodecLabel->setEnabled( b_trans );
-    ui.valueholder_audio_codec->setEnabled( b_trans );
-    ui.aBitrateLabel->setEnabled( b_trans );
-    ui.valueholder_acodec_bitrate->setEnabled( b_trans );
-    ui.aChannelsLabel->setEnabled( b_trans );
-    ui.valueholder_acodec_channels->setEnabled( b_trans );
-    ui.aSampleLabel->setEnabled( b_trans );
-    ui.valueholder_acodec_samplerate->setEnabled( b_trans );
-    ui.valueholder_audio_copy->setEnabled( b_trans );
-}
-
-void VLCProfileEditor::setSTranscodeOptions( bool b_trans )
-{
-    ui.valueholder_subtitles_codec->setEnabled( b_trans );
-    ui.valueholder_subtitles_overlay->setEnabled( b_trans );
-}
-
 void VLCProfileEditor::close()
 {
     if( ui.profileLine->text().isEmpty() )
@@ -717,6 +682,11 @@ QString VLCProfileEditor::transcodeValue()
             const QCheckBox *box = qobject_cast<const QCheckBox *>( object );
             value = box->isChecked() ? "yes" : "";
         }
+        else if( object->inherits( "QGroupBox" ) )
+        {
+            const QGroupBox *box = qobject_cast<const QGroupBox *>( object );
+            value = box->isChecked() ? "yes" : "";
+        }
         else if( object->inherits( "QSpinBox" ) )
         {
             const QSpinBox *box = qobject_cast<const QSpinBox *>( object );
@@ -739,6 +709,24 @@ QString VLCProfileEditor::transcodeValue()
     }
 
     return configuration.join( ";" );
+}
+
+void VLCProfileEditor::reset()
+{
+    /* reset to default state as we can only check/enable existing values */
+    ui.valueholder_video_copy->setChecked( false );
+    ui.valueholder_audio_copy->setChecked( false );
+    activatePanels();
+    /* end with top level ones for cascaded setEnabled() */
+    ui.valueholder_video_enable->setChecked( false );
+    ui.valueholder_audio_enable->setChecked( false );
+    ui.valueholder_subtitles_enable->setChecked( false );
+}
+
+void VLCProfileEditor::activatePanels()
+{
+    ui.transcodevideo->setEnabled( ! ui.valueholder_video_copy->isChecked() );
+    ui.transcodeaudio->setEnabled( ! ui.valueholder_audio_copy->isChecked() );
 }
 
 #undef CATPROP2NAME

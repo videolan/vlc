@@ -78,13 +78,12 @@ private:
     typedef QSet<QString> resultset;
     QHash<QString, resultset> caps;
     void loadCapabilities();
+    void reset();
 protected slots:
     virtual void close();
 private slots:
-    void setVTranscodeOptions( bool );
-    void setATranscodeOptions( bool );
-    void setSTranscodeOptions( bool );
     void muxSelected();
+    void activatePanels();
 };
 
 #endif

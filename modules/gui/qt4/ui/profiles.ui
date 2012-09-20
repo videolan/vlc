@@ -13,27 +13,8 @@
   <property name="windowTitle">
    <string>Profile edition</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_4">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Profile Name</string>
-     </property>
-     <property name="margin">
-      <number>10</number>
-     </property>
-     <property name="buddy">
-      <cstring>profileLine</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="profileLine"/>
-   </item>
-   <item row="2" column="1">
-    <widget class="QDialogButtonBox" name="buttonBox"/>
-   </item>
-   <item row="1" column="0" colspan="2">
+  <layout class="QFormLayout" name="formLayout_4">
+   <item row="3" column="0" colspan="2">
     <widget class="QTabWidget" name="tabWidget">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -294,210 +275,234 @@
       <attribute name="title">
        <string>Video codec</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_2">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <property name="spacing">
         <number>6</number>
        </property>
-       <item row="0" column="0" colspan="2">
-        <widget class="QCheckBox" name="valueholder_video_enable">
-         <property name="text">
+       <item>
+        <widget class="QGroupBox" name="valueholder_video_enable">
+         <property name="title">
           <string>Video</string>
          </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="vCodecLabel">
-         <property name="enabled">
+         <property name="flat">
           <bool>true</bool>
          </property>
-         <property name="text">
-          <string>Codec</string>
-         </property>
-         <property name="buddy">
-          <cstring>valueholder_video_codec</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1" colspan="2">
-        <widget class="QComboBox" name="valueholder_video_codec">
-         <property name="editable">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="2">
-        <widget class="QLabel" name="vBitrateLabel">
-         <property name="text">
-          <string>Bitrate</string>
-         </property>
-         <property name="buddy">
-          <cstring>valueholder_vcodec_bitrate</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="2">
-        <widget class="QSpinBox" name="valueholder_vcodec_bitrate">
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-         <property name="accelerated">
+         <property name="checkable">
           <bool>true</bool>
          </property>
-         <property name="suffix">
-          <string> kb/s</string>
+         <property name="checked">
+          <bool>true</bool>
          </property>
-         <property name="minimum">
-          <number>0</number>
-         </property>
-         <property name="maximum">
-          <number>32768</number>
-         </property>
-         <property name="value">
-          <number>800</number>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0" colspan="2">
-        <widget class="QLabel" name="vFrameLabel">
-         <property name="text">
-          <string>Frame Rate</string>
-         </property>
-         <property name="buddy">
-          <cstring>valueholder_vcodec_framerate</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="2">
-        <widget class="QDoubleSpinBox" name="valueholder_vcodec_framerate">
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-         <property name="specialValueText">
-          <string>Same as source</string>
-         </property>
-         <property name="prefix">
-          <string/>
-         </property>
-         <property name="suffix">
-          <string> fps</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0" colspan="3">
-        <widget class="QGroupBox" name="groupBox">
-         <property name="title">
-          <string>Resolution</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="0" colspan="4">
-           <widget class="QLabel" name="label">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QCheckBox" name="valueholder_video_copy">
             <property name="text">
-             <string>You just need to fill one of the three following parameters, VLC will autodetect the other using the original aspect ratio</string>
-            </property>
-            <property name="wordWrap">
-             <bool>true</bool>
+             <string>Keep original video track</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="vScaleLabel">
-            <property name="text">
-             <string>Scale</string>
-            </property>
-            <property name="buddy">
-             <cstring>valueholder_vcodec_scale</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3" colspan="2">
-           <widget class="QComboBox" name="valueholder_vcodec_scale">
-            <property name="editable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="widthLabel">
-            <property name="text">
-             <string>Width</string>
-            </property>
-            <property name="buddy">
-             <cstring>valueholder_vcodec_width</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2">
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="2" column="3">
-           <widget class="QLabel" name="heightLabel">
-            <property name="text">
-             <string>Height</string>
-            </property>
-            <property name="buddy">
-             <cstring>valueholder_vcodec_height</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QSpinBox" name="valueholder_vcodec_width">
-            <property name="specialValueText">
-             <string>Auto</string>
-            </property>
-            <property name="suffix">
-             <string>px</string>
-            </property>
-            <property name="maximum">
-             <number>9999</number>
-            </property>
-            <property name="singleStep">
-             <number>8</number>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="4">
-           <widget class="QSpinBox" name="valueholder_vcodec_height">
-            <property name="specialValueText">
-             <string>Auto</string>
-            </property>
-            <property name="suffix">
-             <string>px</string>
-            </property>
-            <property name="maximum">
-             <number>9999</number>
-            </property>
-            <property name="singleStep">
-             <number>8</number>
-            </property>
+          <item>
+           <widget class="QWidget" name="transcodevideo" native="true">
+            <layout class="QFormLayout" name="formLayout_2">
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="vCodecLabel">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="text">
+                <string>Codec</string>
+               </property>
+               <property name="buddy">
+                <cstring>valueholder_video_codec</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="valueholder_video_codec">
+               <property name="editable">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="vBitrateLabel">
+               <property name="text">
+                <string>Bitrate</string>
+               </property>
+               <property name="buddy">
+                <cstring>valueholder_vcodec_bitrate</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="vFrameLabel">
+               <property name="text">
+                <string>Frame Rate</string>
+               </property>
+               <property name="buddy">
+                <cstring>valueholder_vcodec_framerate</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="valueholder_vcodec_bitrate">
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="accelerated">
+                <bool>true</bool>
+               </property>
+               <property name="suffix">
+                <string> kb/s</string>
+               </property>
+               <property name="minimum">
+                <number>0</number>
+               </property>
+               <property name="maximum">
+                <number>32768</number>
+               </property>
+               <property name="value">
+                <number>800</number>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QDoubleSpinBox" name="valueholder_vcodec_framerate">
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="specialValueText">
+                <string>Same as source</string>
+               </property>
+               <property name="prefix">
+                <string/>
+               </property>
+               <property name="suffix">
+                <string> fps</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0" colspan="2">
+              <widget class="QGroupBox" name="groupBox">
+               <property name="title">
+                <string>Resolution</string>
+               </property>
+               <property name="flat">
+                <bool>true</bool>
+               </property>
+               <layout class="QFormLayout" name="formLayout_3">
+                <item row="0" column="0" colspan="2">
+                 <widget class="QLabel" name="label">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>You just need to fill one of the three following parameters, VLC will autodetect the other using the original aspect ratio</string>
+                  </property>
+                  <property name="wordWrap">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="vScaleLabel">
+                  <property name="text">
+                   <string>Scale</string>
+                  </property>
+                  <property name="buddy">
+                   <cstring>valueholder_vcodec_scale</cstring>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QComboBox" name="valueholder_vcodec_scale">
+                  <property name="editable">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <layout class="QHBoxLayout" name="horizontalLayout">
+                  <item>
+                   <widget class="QLabel" name="widthLabel">
+                    <property name="text">
+                     <string>Width</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    </property>
+                    <property name="buddy">
+                     <cstring>valueholder_vcodec_width</cstring>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="valueholder_vcodec_width">
+                    <property name="specialValueText">
+                     <string>Auto</string>
+                    </property>
+                    <property name="suffix">
+                     <string>px</string>
+                    </property>
+                    <property name="maximum">
+                     <number>9999</number>
+                    </property>
+                    <property name="singleStep">
+                     <number>8</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="heightLabel">
+                    <property name="text">
+                     <string>Height</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    </property>
+                    <property name="buddy">
+                     <cstring>valueholder_vcodec_height</cstring>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="valueholder_vcodec_height">
+                    <property name="specialValueText">
+                     <string>Auto</string>
+                    </property>
+                    <property name="suffix">
+                     <string>px</string>
+                    </property>
+                    <property name="maximum">
+                     <number>9999</number>
+                    </property>
+                    <property name="singleStep">
+                     <number>8</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="Framesize">
+                  <property name="text">
+                   <string>Frame size</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="valueholder_video_copy">
-         <property name="text">
-          <string>Keep original video track</string>
-         </property>
         </widget>
        </item>
       </layout>
@@ -506,103 +511,120 @@
       <attribute name="title">
        <string>Audio codec</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="valueholder_audio_enable">
-         <property name="text">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QGroupBox" name="valueholder_audio_enable">
+         <property name="title">
           <string>Audio</string>
          </property>
+         <property name="flat">
+          <bool>true</bool>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="QCheckBox" name="valueholder_audio_copy">
+            <property name="text">
+             <string>Keep original audio track</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="transcodeaudio" native="true">
+            <layout class="QFormLayout" name="_2">
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="aCodecLabel">
+               <property name="text">
+                <string>Codec</string>
+               </property>
+               <property name="buddy">
+                <cstring>valueholder_audio_codec</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="valueholder_audio_codec"/>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="aBitrateLabel">
+               <property name="text">
+                <string>Bitrate</string>
+               </property>
+               <property name="buddy">
+                <cstring>valueholder_acodec_bitrate</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="aChannelsLabel">
+               <property name="text">
+                <string>Channels</string>
+               </property>
+               <property name="buddy">
+                <cstring>valueholder_acodec_channels</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="valueholder_acodec_bitrate">
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="suffix">
+                <string> kb/s</string>
+               </property>
+               <property name="minimum">
+                <number>8</number>
+               </property>
+               <property name="maximum">
+                <number>512</number>
+               </property>
+               <property name="value">
+                <number>128</number>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QSpinBox" name="valueholder_acodec_channels">
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>10</number>
+               </property>
+               <property name="value">
+                <number>2</number>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="aSampleLabel">
+               <property name="text">
+                <string>Sample Rate</string>
+               </property>
+               <property name="buddy">
+                <cstring>valueholder_acodec_samplerate</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QComboBox" name="valueholder_acodec_samplerate"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="QCheckBox" name="valueholder_audio_copy">
-         <property name="text">
-          <string>Keep original audio track</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="aCodecLabel">
-         <property name="text">
-          <string>Codec</string>
-         </property>
-         <property name="buddy">
-          <cstring>valueholder_audio_codec</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="2" colspan="2">
-        <widget class="QComboBox" name="valueholder_audio_codec"/>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="aBitrateLabel">
-         <property name="text">
-          <string>Bitrate</string>
-         </property>
-         <property name="buddy">
-          <cstring>valueholder_acodec_bitrate</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="3">
-        <widget class="QSpinBox" name="valueholder_acodec_bitrate">
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-         <property name="suffix">
-          <string> kb/s</string>
-         </property>
-         <property name="minimum">
-          <number>8</number>
-         </property>
-         <property name="maximum">
-          <number>512</number>
-         </property>
-         <property name="value">
-          <number>128</number>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="aChannelsLabel">
-         <property name="text">
-          <string>Channels</string>
-         </property>
-         <property name="buddy">
-          <cstring>valueholder_acodec_channels</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="3">
-        <widget class="QSpinBox" name="valueholder_acodec_channels">
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>10</number>
-         </property>
-         <property name="value">
-          <number>2</number>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="aSampleLabel">
-         <property name="text">
-          <string>Sample Rate</string>
-         </property>
-         <property name="buddy">
-          <cstring>valueholder_acodec_samplerate</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="3">
-        <widget class="QComboBox" name="valueholder_acodec_samplerate"/>
-       </item>
-       <item row="6" column="2">
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -621,27 +643,77 @@
       <attribute name="title">
        <string>Subtitles</string>
       </attribute>
-      <layout class="QGridLayout" name="_4">
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="valueholder_subtitles_enable">
-         <property name="text">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QGroupBox" name="valueholder_subtitles_enable">
+         <property name="title">
           <string>Subtitles</string>
          </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="valueholder_subtitles_codec"/>
-       </item>
-       <item row="1" column="1">
-        <widget class="QCheckBox" name="valueholder_subtitles_overlay">
-         <property name="text">
-          <string>Overlay subtitles on the video</string>
+         <property name="flat">
+          <bool>true</bool>
          </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <layout class="QFormLayout" name="formLayout_5">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Codec</string>
+            </property>
+            <property name="buddy">
+             <cstring>valueholder_subtitles_codec</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="valueholder_subtitles_codec"/>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="QCheckBox" name="valueholder_subtitles_overlay">
+            <property name="text">
+             <string>Overlay subtitles on the video</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
      </widget>
     </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QDialogButtonBox" name="buttonBox"/>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="profileLine"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Profile Name</string>
+     </property>
+     <property name="buddy">
+      <cstring>profileLine</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>5</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
@@ -655,6 +727,19 @@
  <tabstops>
   <tabstop>profileLine</tabstop>
   <tabstop>tabWidget</tabstop>
+  <tabstop>TSMux</tabstop>
+  <tabstop>WEBMux</tabstop>
+  <tabstop>OggMux</tabstop>
+  <tabstop>MOVMux</tabstop>
+  <tabstop>PSMux</tabstop>
+  <tabstop>MJPEGMux</tabstop>
+  <tabstop>WAVMux</tabstop>
+  <tabstop>FLVMux</tabstop>
+  <tabstop>MPEG1Mux</tabstop>
+  <tabstop>MKVMux</tabstop>
+  <tabstop>RAWMux</tabstop>
+  <tabstop>AVIMux</tabstop>
+  <tabstop>ASFMux</tabstop>
   <tabstop>valueholder_video_enable</tabstop>
   <tabstop>valueholder_video_copy</tabstop>
   <tabstop>valueholder_video_codec</tabstop>
