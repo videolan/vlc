@@ -244,7 +244,10 @@ void VLCProfileSelector::updateOptions( int i )
             if ( value.toInt() > 0 )
             {
                 smrl.option( "vb", value.toInt() );
-            } else {
+            }
+
+            /*if ( codec is h264 )*/
+            {
                 /* special handling */
                 QStringList codecoptions;
 
