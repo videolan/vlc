@@ -177,15 +177,6 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
                             &val, &text);
         }
 
-    if (var_Type (p_parent, "equalizer-bands"))
-    {
-        var_Create (aout, "equalizer-preamp", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
-        var_Create (aout, "equalizer-bands", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
-
-        var_AddCallback (p_parent, "equalizer-preamp", var_Copy, aout);
-        var_AddCallback (p_parent, "equalizer-bands", var_Copy, aout);
-    }
-
     return aout;
 }
 
@@ -199,13 +190,6 @@ void aout_Destroy (audio_output_t *aout)
     var_DelCallback (aout, "mute", var_Copy, aout->p_parent);
     var_SetFloat (aout, "volume", -1.f);
     var_DelCallback (aout, "volume", var_Copy, aout->p_parent);
-
-    if (var_Type (aout->p_parent, "equalizer-bands"))
-    {
-        var_DelCallback (aout->p_parent, "equalizer-preamp", var_Copy, aout);
-        var_DelCallback (aout->p_parent, "equalizer-bands", var_Copy, aout);
-    }
-
     vlc_object_release (aout);
 }
 
