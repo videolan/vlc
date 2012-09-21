@@ -149,7 +149,7 @@ static char* GetLine( demux_t *p_demux, int *p_pos )
         }
     }
     *p_pos += ( i + 1 );
-    if( i > 0 && '\r' == p_buf[i - 1] )
+    if( i > 0 && p_buf[i - 1] == '\r' )
     {
         i--;
     }
@@ -347,7 +347,7 @@ static int Open( vlc_object_t * p_this )
         p_demux->pf_demux = MimeDemux;
         stream_Read( p_demux->s, NULL, i_size );
     }
-    else if( 0 == i_size )
+    else if( i_size == 0 )
     {
         /* 0xffd8 identify a JPEG SOI */
         if( p_sys->p_peek[0] == 0xFF && p_sys->p_peek[1] == 0xD8 )
@@ -424,9 +424,9 @@ static int MjpgDemux( demux_t *p_demux )
     }
     i = 3;
 FIND_NEXT_EOI:
-    while( !( 0xFF == p_sys->p_peek[i-1] && 0xD9 == p_sys->p_peek[i] ) )
+    while( !( p_sys->p_peek[i-1] == 0xFF && p_sys->p_peek[i] == 0xD9 ) )
     {
-        if( 0xFF == p_sys->p_peek[i-1] && 0xD8 == p_sys->p_peek[i] )
+        if( p_sys->p_peek[i-1] == 0xFF && p_sys->p_peek[i] == 0xD9  )
         {
             p_sys->i_level++;
             msg_Dbg( p_demux, "we found another JPEG SOI at %d", i );
