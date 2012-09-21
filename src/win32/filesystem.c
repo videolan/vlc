@@ -66,7 +66,7 @@ static wchar_t *widen_path (const char *path)
 
 int vlc_open (const char *filename, int flags, ...)
 {
-    unsigned int mode = 0;
+    int mode = 0;
     va_list ap;
 
     flags |= O_NOINHERIT; /* O_CLOEXEC */
@@ -76,7 +76,7 @@ int vlc_open (const char *filename, int flags, ...)
 
     va_start (ap, flags);
     if (flags & O_CREAT)
-        mode = va_arg (ap, unsigned int);
+        mode = va_arg (ap, int);
     va_end (ap);
 
     /*
