@@ -977,6 +977,8 @@
 		DC769AB8085DF0DB001A838D /* wizard.h */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.h; name = wizard.h; path = ../../../modules/gui/macosx/wizard.h; sourceTree = SOURCE_ROOT; };
 		DCE7BD0608A5724D007B10AE /* bookmarks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = bookmarks.m; path = ../../../modules/gui/macosx/bookmarks.m; sourceTree = SOURCE_ROOT; };
 		DCE7BD0708A5724D007B10AE /* bookmarks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bookmarks.h; path = ../../../modules/gui/macosx/bookmarks.h; sourceTree = SOURCE_ROOT; };
+		E0382C00160BA09E0031D7FF /* ControlsBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ControlsBar.h; path = ../../../modules/gui/macosx/ControlsBar.h; sourceTree = SOURCE_ROOT; };
+		E0382C01160BA09E0031D7FF /* ControlsBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ControlsBar.m; path = ../../../modules/gui/macosx/ControlsBar.m; sourceTree = SOURCE_ROOT; };
 		E06CF7F416020F6200C698B7 /* Windows.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Windows.h; path = ../../../modules/gui/macosx/Windows.h; sourceTree = SOURCE_ROOT; };
 		E06CF7F516020F6200C698B7 /* Windows.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Windows.m; path = ../../../modules/gui/macosx/Windows.m; sourceTree = SOURCE_ROOT; };
 		F69B0CA702E24F6401A80112 /* English */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = text.plist.strings; name = English; path = Resources/English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -1056,6 +1058,8 @@
 				CC448A6113B68A0B009F72E0 /* CoreInteraction.m */,
 				CC448A6213B68A0B009F72E0 /* MainWindow.h */,
 				CC448A6313B68A0B009F72E0 /* MainWindow.m */,
+				E0382C00160BA09E0031D7FF /* ControlsBar.h */,
+				E0382C01160BA09E0031D7FF /* ControlsBar.m */,
 				CC4A33220F8CB017000FC4A7 /* coredialogs.h */,
 				CC4A33210F8CB017000FC4A7 /* coredialogs.m */,
 				5CCED71014C0D4A90057F8D1 /* ExtensionsDialogProvider.h */,

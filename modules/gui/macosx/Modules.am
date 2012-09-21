@@ -82,4 +82,6 @@ SOURCES_macosx = \
 	SharedDialogs.m \
 	Windows.h \
 	Windows.m \
+	ControlsBar.m \
+	ControlsBar.h \
 	$(NULL)

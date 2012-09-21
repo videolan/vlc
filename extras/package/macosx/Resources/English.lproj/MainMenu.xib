@@ -21,10 +21,10 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="4596"/>
-      <integer value="5335"/>
-      <integer value="5336"/>
+      <integer value="4948"/>
       <integer value="5248"/>
+      <integer value="21"/>
+      <integer value="4596"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1071,6 +1071,9 @@
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <string key="NSFrameAutosaveName">mainwindow</string>
         <bool key="NSWindowIsRestorable">YES</bool>
+      </object>
+      <object class="NSCustomObject" id="878580547">
+        <string key="NSClassName">VLCMainWindowControlsBar</string>
       </object>
       <object class="NSMenu" id="782168084">
         <string key="NSTitle">MainMenu</string>
@@ -4836,6 +4839,9 @@ LCAuLi4</string>
         <string key="NSFrameAutosaveName">detachedvideowindow</string>
         <bool key="NSWindowIsRestorable">NO</bool>
       </object>
+      <object class="NSCustomObject" id="573738745">
+        <string key="NSClassName">VLCControlsBarCommon</string>
+      </object>
       <object class="NSCustomView" id="117751361">
         <nil key="NSNextResponder"/>
         <int key="NSvFlags">266</int>
@@ -7208,211 +7214,11 @@ LCAuLi4</string>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
-            <string key="label">o_bwd_btn</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="1023610457"/>
-          </object>
-          <int key="connectionID">4628</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_effects_btn</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="38046606"/>
-          </object>
-          <int key="connectionID">4629</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_fullscreen_btn</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="714984330"/>
-          </object>
-          <int key="connectionID">4630</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_fwd_btn</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="828315098"/>
-          </object>
-          <int key="connectionID">4631</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_play_btn</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="707945673"/>
-          </object>
-          <int key="connectionID">4632</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_progress_bar</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="664576649"/>
-          </object>
-          <int key="connectionID">4635</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_repeat_btn</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="1051664676"/>
-          </object>
-          <int key="connectionID">4636</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
             <string key="label">o_search_fld</string>
             <reference key="source" ref="498338108"/>
             <reference key="destination" ref="596740638"/>
           </object>
           <int key="connectionID">4637</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_shuffle_btn</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="291209196"/>
-          </object>
-          <int key="connectionID">4638</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_stop_btn</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="809192538"/>
-          </object>
-          <int key="connectionID">4639</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_time_fld</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="533732100"/>
-          </object>
-          <int key="connectionID">4640</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_time_sld</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="704525034"/>
-          </object>
-          <int key="connectionID">4641</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_volume_down_btn</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="963106097"/>
-          </object>
-          <int key="connectionID">4645</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_volume_sld</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="788281303"/>
-          </object>
-          <int key="connectionID">4646</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_volume_track_view</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="784705424"/>
-          </object>
-          <int key="connectionID">4647</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_volume_up_btn</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="474770834"/>
-          </object>
-          <int key="connectionID">4648</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">bwd:</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="1023610457"/>
-          </object>
-          <int key="connectionID">4649</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">effects:</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="38046606"/>
-          </object>
-          <int key="connectionID">4650</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">fullscreen:</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="714984330"/>
-          </object>
-          <int key="connectionID">4651</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">play:</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="707945673"/>
-          </object>
-          <int key="connectionID">4653</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">repeat:</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="1051664676"/>
-          </object>
-          <int key="connectionID">4654</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">shuffle:</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="291209196"/>
-          </object>
-          <int key="connectionID">4655</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">stop:</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="809192538"/>
-          </object>
-          <int key="connectionID">4656</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">volumeAction:</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="474770834"/>
-          </object>
-          <int key="connectionID">4658</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">volumeAction:</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="788281303"/>
-          </object>
-          <int key="connectionID">4659</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">volumeAction:</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="963106097"/>
-          </object>
-          <int key="connectionID">4660</int>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
@@ -7448,22 +7254,6 @@ LCAuLi4</string>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
-            <string key="label">o_playlist_btn</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="955174811"/>
-          </object>
-          <int key="connectionID">4675</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">timeSliderAction:</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="704525034"/>
-          </object>
-          <int key="connectionID">4679</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
             <string key="label">o_split_view</string>
             <reference key="source" ref="498338108"/>
             <reference key="destination" ref="302568132"/>
@@ -7477,22 +7267,6 @@ LCAuLi4</string>
             <reference key="destination" ref="609070979"/>
           </object>
           <int key="connectionID">4696</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">fwd:</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="828315098"/>
-          </object>
-          <int key="connectionID">4697</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_time_sld_fancygradient_view</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="202538583"/>
-          </object>
-          <int key="connectionID">4702</int>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
@@ -7647,14 +7421,6 @@ LCAuLi4</string>
           <int key="connectionID">4752</int>
         </object>
         <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_bottombar_view</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="129808516"/>
-          </object>
-          <int key="connectionID">4757</int>
-        </object>
-        <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">clearRecentDocuments:</string>
             <reference key="source" ref="936559509"/>
@@ -7677,14 +7443,6 @@ LCAuLi4</string>
             <reference key="destination" ref="498338108"/>
           </object>
           <int key="connectionID">4842</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_resize_view</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="884724451"/>
-          </object>
-          <int key="connectionID">4843</int>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
@@ -7776,14 +7534,6 @@ LCAuLi4</string>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
-            <string key="label">o_time_sld_background</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="304081293"/>
-          </object>
-          <int key="connectionID">4920</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
             <string key="label">o_sidebar_scrollview</string>
             <reference key="source" ref="498338108"/>
             <reference key="destination" ref="979766179"/>
@@ -7839,132 +7589,12 @@ LCAuLi4</string>
           <int key="connectionID">4946</int>
         </object>
         <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">fwd:</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="966784985"/>
-          </object>
-          <int key="connectionID">4957</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">play:</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="467826358"/>
-          </object>
-          <int key="connectionID">4958</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">bwd:</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="647546256"/>
-          </object>
-          <int key="connectionID">4959</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">timeSliderAction:</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="672269443"/>
-          </object>
-          <int key="connectionID">4967</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">fullscreen:</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="750485577"/>
-          </object>
-          <int key="connectionID">4970</int>
-        </object>
-        <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_detached_video_window</string>
             <reference key="source" ref="498338108"/>
             <reference key="destination" ref="429979276"/>
           </object>
           <int key="connectionID">4971</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_detached_bottombar_view</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="984096082"/>
-          </object>
-          <int key="connectionID">4972</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_detached_time_sld_fancygradient_view</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="1037621901"/>
-          </object>
-          <int key="connectionID">4973</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_detached_progress_bar</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="506657677"/>
-          </object>
-          <int key="connectionID">4974</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_detached_time_sld</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="672269443"/>
-          </object>
-          <int key="connectionID">4975</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_detached_time_sld_background</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="640104047"/>
-          </object>
-          <int key="connectionID">4976</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_detached_fullscreen_btn</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="750485577"/>
-          </object>
-          <int key="connectionID">4977</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_detached_fwd_btn</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="966784985"/>
-          </object>
-          <int key="connectionID">4978</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_detached_play_btn</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="467826358"/>
-          </object>
-          <int key="connectionID">4979</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_detached_bwd_btn</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="647546256"/>
-          </object>
-          <int key="connectionID">4980</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_detached_time_fld</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="156940539"/>
-          </object>
-          <int key="connectionID">4981</int>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
@@ -8037,14 +7667,6 @@ LCAuLi4</string>
             <reference key="destination" ref="478641580"/>
           </object>
           <int key="connectionID">5002</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_detached_resize_view</string>
-            <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="101195702"/>
-          </object>
-          <int key="connectionID">5006</int>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
@@ -8584,11 +8206,435 @@ LCAuLi4</string>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
+            <string key="label">o_bwd_btn</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="1023610457"/>
+          </object>
+          <int key="connectionID">5340</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">bwd:</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="1023610457"/>
+          </object>
+          <int key="connectionID">5341</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_play_btn</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="707945673"/>
+          </object>
+          <int key="connectionID">5342</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">play:</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="707945673"/>
+          </object>
+          <int key="connectionID">5343</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_fwd_btn</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="828315098"/>
+          </object>
+          <int key="connectionID">5344</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">fwd:</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="828315098"/>
+          </object>
+          <int key="connectionID">5345</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_stop_btn</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="809192538"/>
+          </object>
+          <int key="connectionID">5346</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">stop:</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="809192538"/>
+          </object>
+          <int key="connectionID">5347</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_playlist_btn</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="955174811"/>
+          </object>
+          <int key="connectionID">5348</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_repeat_btn</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="1051664676"/>
+          </object>
+          <int key="connectionID">5349</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">repeat:</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="1051664676"/>
+          </object>
+          <int key="connectionID">5350</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_shuffle_btn</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="291209196"/>
+          </object>
+          <int key="connectionID">5351</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">shuffle:</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="291209196"/>
+          </object>
+          <int key="connectionID">5352</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_effects_btn</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="38046606"/>
+          </object>
+          <int key="connectionID">5353</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">effects:</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="38046606"/>
+          </object>
+          <int key="connectionID">5354</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_fullscreen_btn</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="714984330"/>
+          </object>
+          <int key="connectionID">5355</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">fullscreen:</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="714984330"/>
+          </object>
+          <int key="connectionID">5356</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_volume_sld</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="788281303"/>
+          </object>
+          <int key="connectionID">5357</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">volumeAction:</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="788281303"/>
+          </object>
+          <int key="connectionID">5358</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_bottombar_view</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="129808516"/>
+          </object>
+          <int key="connectionID">5359</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_volume_down_btn</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="963106097"/>
+          </object>
+          <int key="connectionID">5360</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">volumeAction:</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="963106097"/>
+          </object>
+          <int key="connectionID">5361</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_volume_up_btn</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="474770834"/>
+          </object>
+          <int key="connectionID">5362</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">volumeAction:</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="474770834"/>
+          </object>
+          <int key="connectionID">5363</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_resize_view</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="884724451"/>
+          </object>
+          <int key="connectionID">5364</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_associated_window</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="498338108"/>
+          </object>
+          <int key="connectionID">5365</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
             <string key="label">o_progress_view</string>
-            <reference key="source" ref="498338108"/>
+            <reference key="source" ref="878580547"/>
             <reference key="destination" ref="271396113"/>
           </object>
-          <int key="connectionID">5338</int>
+          <int key="connectionID">5366</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_time_sld_background</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="304081293"/>
+          </object>
+          <int key="connectionID">5367</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_progress_bar</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="664576649"/>
+          </object>
+          <int key="connectionID">5368</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_time_sld</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="704525034"/>
+          </object>
+          <int key="connectionID">5369</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">timeSliderAction:</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="704525034"/>
+          </object>
+          <int key="connectionID">5370</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_time_sld_fancygradient_view</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="202538583"/>
+          </object>
+          <int key="connectionID">5371</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_controls_bar</string>
+            <reference key="source" ref="498338108"/>
+            <reference key="destination" ref="878580547"/>
+          </object>
+          <int key="connectionID">5373</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_controls_bar</string>
+            <reference key="source" ref="429979276"/>
+            <reference key="destination" ref="573738745"/>
+          </object>
+          <int key="connectionID">5374</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_associated_window</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="429979276"/>
+          </object>
+          <int key="connectionID">5375</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_bottombar_view</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="984096082"/>
+          </object>
+          <int key="connectionID">5376</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_bwd_btn</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="647546256"/>
+          </object>
+          <int key="connectionID">5377</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">bwd:</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="647546256"/>
+          </object>
+          <int key="connectionID">5378</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">play:</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="467826358"/>
+          </object>
+          <int key="connectionID">5379</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_play_btn</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="467826358"/>
+          </object>
+          <int key="connectionID">5380</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_fwd_btn</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="966784985"/>
+          </object>
+          <int key="connectionID">5381</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">fwd:</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="966784985"/>
+          </object>
+          <int key="connectionID">5382</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_time_fld</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="156940539"/>
+          </object>
+          <int key="connectionID">5383</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_fullscreen_btn</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="750485577"/>
+          </object>
+          <int key="connectionID">5384</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">fullscreen:</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="750485577"/>
+          </object>
+          <int key="connectionID">5385</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_resize_view</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="101195702"/>
+          </object>
+          <int key="connectionID">5386</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_progress_view</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="999946268"/>
+          </object>
+          <int key="connectionID">5387</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_time_sld_background</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="640104047"/>
+          </object>
+          <int key="connectionID">5389</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_time_sld_fancygradient_view</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="1037621901"/>
+          </object>
+          <int key="connectionID">5390</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_progress_bar</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="506657677"/>
+          </object>
+          <int key="connectionID">5391</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_time_sld</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="672269443"/>
+          </object>
+          <int key="connectionID">5392</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_time_fld</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="533732100"/>
+          </object>
+          <int key="connectionID">5393</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">timeSliderAction:</string>
+            <reference key="source" ref="573738745"/>
+            <reference key="destination" ref="672269443"/>
+          </object>
+          <int key="connectionID">5394</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_volume_track_view</string>
+            <reference key="source" ref="878580547"/>
+            <reference key="destination" ref="784705424"/>
+          </object>
+          <int key="connectionID">5395</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -11144,7 +11190,7 @@ LCAuLi4</string>
               <reference ref="598483044"/>
             </object>
             <reference key="parent" ref="0"/>
-            <string key="objectName">Detached Video</string>
+            <string key="objectName">Detached Video Window</string>
           </object>
           <object class="IBObjectRecord">
             <int key="objectID">4949</int>
@@ -11924,6 +11970,17 @@ LCAuLi4</string>
             <int key="objectID">4425</int>
             <reference key="object" ref="276068486"/>
             <reference key="parent" ref="704525034"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5339</int>
+            <reference key="object" ref="878580547"/>
+            <reference key="parent" ref="0"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5372</int>
+            <reference key="object" ref="573738745"/>
+            <reference key="parent" ref="0"/>
+            <string key="objectName">Detached Window Controls Bar</string>
           </object>
         </object>
       </object>
@@ -12809,6 +12866,8 @@ LCAuLi4</string>
           <string>5335.IBPluginDependency</string>
           <string>5335.IBViewBoundsToFrameTransform</string>
           <string>5336.IBPluginDependency</string>
+          <string>5339.IBPluginDependency</string>
+          <string>5372.IBPluginDependency</string>
           <string>56.IBPluginDependency</string>
           <string>56.ImportedFromIB2</string>
           <string>57.IBEditorWindowLastContentRect</string>
@@ -13007,9 +13066,9 @@ LCAuLi4</string>
           <string>{{600, 612}, {137, 103}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{336, 446}, {604, 310}}</string>
+          <string>{{476, 681}, {604, 310}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{336, 446}, {604, 310}}</string>
+          <string>{{476, 681}, {604, 310}}</string>
           <boolean value="YES"/>
           <boolean value="YES"/>
           <boolean value="NO"/>
@@ -13607,9 +13666,9 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>{{596, 363}, {64, 6}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{532, 487}, {363, 239}}</string>
+          <string>{{558, 677}, {363, 239}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{532, 487}, {363, 239}}</string>
+          <string>{{558, 677}, {363, 239}}</string>
           <boolean value="NO"/>
           <boolean value="NO"/>
           <string>{363, 203}</string>
@@ -13880,6 +13939,8 @@ LCAuLi4</string>
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>{{329, 186}, {267, 263}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -13936,7 +13997,7 @@ LCAuLi4</string>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">5338</int>
+      <int key="maxID">5395</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -14262,6 +14323,176 @@ LCAuLi4</string>
           <object class="IBClassDescriptionSource" key="sourceIdentifier">
             <string key="majorKey">IBProjectSource</string>
             <string key="minorKey">../../../modules/gui/macosx/controls.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCControlsBarCommon</string>
+          <string key="superclassName">NSObject</string>
+          <object class="NSMutableDictionary" key="actions">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>bwd:</string>
+              <string>fullscreen:</string>
+              <string>fwd:</string>
+              <string>play:</string>
+              <string>timeSliderAction:</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="actionInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>bwd:</string>
+              <string>fullscreen:</string>
+              <string>fwd:</string>
+              <string>play:</string>
+              <string>timeSliderAction:</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBActionInfo">
+                <string key="name">bwd:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">fullscreen:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">fwd:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">play:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">timeSliderAction:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="outlets">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_associated_window</string>
+              <string>o_bottombar_view</string>
+              <string>o_bwd_btn</string>
+              <string>o_fullscreen_btn</string>
+              <string>o_fwd_btn</string>
+              <string>o_play_btn</string>
+              <string>o_progress_bar</string>
+              <string>o_progress_view</string>
+              <string>o_resize_view</string>
+              <string>o_time_fld</string>
+              <string>o_time_sld</string>
+              <string>o_time_sld_background</string>
+              <string>o_time_sld_fancygradient_view</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="toOneOutletInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_associated_window</string>
+              <string>o_bottombar_view</string>
+              <string>o_bwd_btn</string>
+              <string>o_fullscreen_btn</string>
+              <string>o_fwd_btn</string>
+              <string>o_play_btn</string>
+              <string>o_progress_bar</string>
+              <string>o_progress_view</string>
+              <string>o_resize_view</string>
+              <string>o_time_fld</string>
+              <string>o_time_sld</string>
+              <string>o_time_sld_background</string>
+              <string>o_time_sld_fancygradient_view</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_associated_window</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_bottombar_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_bwd_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_fullscreen_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_fwd_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_play_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_progress_bar</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_progress_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_resize_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_time_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_time_sld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_time_sld_background</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_time_sld_fancygradient_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="1060427770">
+            <string key="majorKey">IBProjectSource</string>
+            <string key="minorKey">../../../modules/gui/macosx/ControlsBar.h</string>
           </object>
         </object>
         <object class="IBPartialClassDescription">
@@ -15872,41 +16103,13 @@ LCAuLi4</string>
               <bool key="EncodedWithXMLCoder">YES</bool>
               <string>addPodcast:</string>
               <string>addPodcastWindowAction:</string>
-              <string>backward:</string>
-              <string>bwd:</string>
               <string>dropzoneButtonAction:</string>
-              <string>effects:</string>
-              <string>forward:</string>
-              <string>fullscreen:</string>
-              <string>fwd:</string>
-              <string>next:</string>
-              <string>play:</string>
-              <string>prev:</string>
               <string>removePodcast:</string>
               <string>removePodcastWindowAction:</string>
-              <string>repeat:</string>
-              <string>shuffle:</string>
-              <string>stop:</string>
-              <string>timeSliderAction:</string>
               <string>togglePlaylist:</string>
-              <string>volumeAction:</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -15921,24 +16124,10 @@ LCAuLi4</string>
               <bool key="EncodedWithXMLCoder">YES</bool>
               <string>addPodcast:</string>
               <string>addPodcastWindowAction:</string>
-              <string>backward:</string>
-              <string>bwd:</string>
               <string>dropzoneButtonAction:</string>
-              <string>effects:</string>
-              <string>forward:</string>
-              <string>fullscreen:</string>
-              <string>fwd:</string>
-              <string>next:</string>
-              <string>play:</string>
-              <string>prev:</string>
               <string>removePodcast:</string>
               <string>removePodcastWindowAction:</string>
-              <string>repeat:</string>
-              <string>shuffle:</string>
-              <string>stop:</string>
-              <string>timeSliderAction:</string>
               <string>togglePlaylist:</string>
-              <string>volumeAction:</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
@@ -15951,43 +16140,7 @@ LCAuLi4</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
-                <string key="name">backward:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">bwd:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
                 <string key="name">dropzoneButtonAction:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">effects:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">forward:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">fullscreen:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">fwd:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">next:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">play:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">prev:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
@@ -15999,27 +16152,7 @@ LCAuLi4</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
-                <string key="name">repeat:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">shuffle:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">stop:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">timeSliderAction:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
                 <string key="name">togglePlaylist:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">volumeAction:</string>
                 <string key="candidateClassName">id</string>
               </object>
             </object>
@@ -16028,34 +16161,15 @@ LCAuLi4</string>
             <bool key="EncodedWithXMLCoder">YES</bool>
             <object class="NSArray" key="dict.sortedKeys">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>o_bottombar_view</string>
-              <string>o_bwd_btn</string>
               <string>o_chosen_category_lbl</string>
               <string>o_current_video_window</string>
-              <string>o_detached_bottombar_view</string>
-              <string>o_detached_bwd_btn</string>
-              <string>o_detached_fullscreen_btn</string>
-              <string>o_detached_fwd_btn</string>
-              <string>o_detached_play_btn</string>
-              <string>o_detached_progress_bar</string>
-              <string>o_detached_resize_view</string>
-              <string>o_detached_time_fld</string>
-              <string>o_detached_time_sld</string>
-              <string>o_detached_time_sld_background</string>
-              <string>o_detached_time_sld_fancygradient_view</string>
-              <string>o_detached_titlebar_view</string>
               <string>o_detached_video_window</string>
               <string>o_dropzone_box</string>
               <string>o_dropzone_btn</string>
               <string>o_dropzone_lbl</string>
               <string>o_dropzone_view</string>
-              <string>o_effects_btn</string>
               <string>o_fspanel</string>
-              <string>o_fullscreen_btn</string>
-              <string>o_fwd_btn</string>
               <string>o_left_split_view</string>
-              <string>o_play_btn</string>
-              <string>o_playlist_btn</string>
               <string>o_playlist_table</string>
               <string>o_podcast_add_btn</string>
               <string>o_podcast_remove_btn</string>
@@ -16072,44 +16186,15 @@ LCAuLi4</string>
               <string>o_podcast_unsubscribe_title_lbl</string>
               <string>o_podcast_unsubscribe_window</string>
               <string>o_podcast_view</string>
-              <string>o_progress_bar</string>
-              <string>o_repeat_btn</string>
-              <string>o_resize_view</string>
               <string>o_right_split_view</string>
               <string>o_search_fld</string>
-              <string>o_shuffle_btn</string>
               <string>o_sidebar_scrollview</string>
               <string>o_sidebar_view</string>
               <string>o_split_view</string>
-              <string>o_stop_btn</string>
-              <string>o_time_fld</string>
-              <string>o_time_sld</string>
-              <string>o_time_sld_background</string>
-              <string>o_time_sld_fancygradient_view</string>
-              <string>o_topbar_view</string>
               <string>o_video_view</string>
-              <string>o_volume_down_btn</string>
-              <string>o_volume_sld</string>
-              <string>o_volume_track_view</string>
-              <string>o_volume_up_btn</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -16141,58 +16226,21 @@ LCAuLi4</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
             </object>
           </object>
           <object class="NSMutableDictionary" key="toOneOutletInfosByName">
             <bool key="EncodedWithXMLCoder">YES</bool>
             <object class="NSArray" key="dict.sortedKeys">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>o_bottombar_view</string>
-              <string>o_bwd_btn</string>
               <string>o_chosen_category_lbl</string>
               <string>o_current_video_window</string>
-              <string>o_detached_bottombar_view</string>
-              <string>o_detached_bwd_btn</string>
-              <string>o_detached_fullscreen_btn</string>
-              <string>o_detached_fwd_btn</string>
-              <string>o_detached_play_btn</string>
-              <string>o_detached_progress_bar</string>
-              <string>o_detached_resize_view</string>
-              <string>o_detached_time_fld</string>
-              <string>o_detached_time_sld</string>
-              <string>o_detached_time_sld_background</string>
-              <string>o_detached_time_sld_fancygradient_view</string>
-              <string>o_detached_titlebar_view</string>
               <string>o_detached_video_window</string>
               <string>o_dropzone_box</string>
               <string>o_dropzone_btn</string>
               <string>o_dropzone_lbl</string>
               <string>o_dropzone_view</string>
-              <string>o_effects_btn</string>
               <string>o_fspanel</string>
-              <string>o_fullscreen_btn</string>
-              <string>o_fwd_btn</string>
               <string>o_left_split_view</string>
-              <string>o_play_btn</string>
-              <string>o_playlist_btn</string>
               <string>o_playlist_table</string>
               <string>o_podcast_add_btn</string>
               <string>o_podcast_remove_btn</string>
@@ -16209,91 +16257,21 @@ LCAuLi4</string>
               <string>o_podcast_unsubscribe_title_lbl</string>
               <string>o_podcast_unsubscribe_window</string>
               <string>o_podcast_view</string>
-              <string>o_progress_bar</string>
-              <string>o_repeat_btn</string>
-              <string>o_resize_view</string>
               <string>o_right_split_view</string>
               <string>o_search_fld</string>
-              <string>o_shuffle_btn</string>
               <string>o_sidebar_scrollview</string>
               <string>o_sidebar_view</string>
               <string>o_split_view</string>
-              <string>o_stop_btn</string>
-              <string>o_time_fld</string>
-              <string>o_time_sld</string>
-              <string>o_time_sld_background</string>
-              <string>o_time_sld_fancygradient_view</string>
-              <string>o_topbar_view</string>
               <string>o_video_view</string>
-              <string>o_volume_down_btn</string>
-              <string>o_volume_sld</string>
-              <string>o_volume_track_view</string>
-              <string>o_volume_up_btn</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_bottombar_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_bwd_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_chosen_category_lbl</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_current_video_window</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_bottombar_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_bwd_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_fullscreen_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_fwd_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_play_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_progress_bar</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_resize_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_time_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_time_sld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_time_sld_background</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_time_sld_fancygradient_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_titlebar_view</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
@@ -16317,31 +16295,11 @@ LCAuLi4</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_effects_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
                 <string key="name">o_fspanel</string>
                 <string key="candidateClassName">VLCFSPanel</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_fullscreen_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_fwd_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
                 <string key="name">o_left_split_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_play_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_playlist_btn</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
@@ -16409,27 +16367,11 @@ LCAuLi4</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_progress_bar</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_repeat_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_resize_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
                 <string key="name">o_right_split_view</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_search_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_shuffle_btn</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
@@ -16445,31 +16387,130 @@ LCAuLi4</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_stop_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_time_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_time_sld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_time_sld_background</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_time_sld_fancygradient_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_topbar_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
                 <string key="name">o_video_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <reference key="sourceIdentifier" ref="348153990"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCMainWindowControlsBar</string>
+          <string key="superclassName">VLCControlsBarCommon</string>
+          <object class="NSMutableDictionary" key="actions">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>effects:</string>
+              <string>repeat:</string>
+              <string>shuffle:</string>
+              <string>stop:</string>
+              <string>volumeAction:</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="actionInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>effects:</string>
+              <string>repeat:</string>
+              <string>shuffle:</string>
+              <string>stop:</string>
+              <string>volumeAction:</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBActionInfo">
+                <string key="name">effects:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">repeat:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">shuffle:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">stop:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">volumeAction:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="outlets">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_effects_btn</string>
+              <string>o_playlist_btn</string>
+              <string>o_repeat_btn</string>
+              <string>o_shuffle_btn</string>
+              <string>o_stop_btn</string>
+              <string>o_volume_down_btn</string>
+              <string>o_volume_sld</string>
+              <string>o_volume_track_view</string>
+              <string>o_volume_up_btn</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="toOneOutletInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_effects_btn</string>
+              <string>o_playlist_btn</string>
+              <string>o_repeat_btn</string>
+              <string>o_shuffle_btn</string>
+              <string>o_stop_btn</string>
+              <string>o_volume_down_btn</string>
+              <string>o_volume_sld</string>
+              <string>o_volume_track_view</string>
+              <string>o_volume_up_btn</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_effects_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_playlist_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_repeat_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_shuffle_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_stop_btn</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
@@ -16490,7 +16531,7 @@ LCAuLi4</string>
               </object>
             </object>
           </object>
-          <reference key="sourceIdentifier" ref="348153990"/>
+          <reference key="sourceIdentifier" ref="1060427770"/>
         </object>
         <object class="IBPartialClassDescription">
           <string key="className">VLCMainWindowSplitView</string>
@@ -16947,14 +16988,35 @@ LCAuLi4</string>
           <string key="className">VLCVideoWindowCommon</string>
           <string key="superclassName">VLCWindow</string>
           <object class="NSMutableDictionary" key="outlets">
-            <string key="NS.key.0">o_titlebar_view</string>
-            <string key="NS.object.0">id</string>
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_controls_bar</string>
+              <string>o_titlebar_view</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+            </object>
           </object>
           <object class="NSMutableDictionary" key="toOneOutletInfosByName">
-            <string key="NS.key.0">o_titlebar_view</string>
-            <object class="IBToOneOutletInfo" key="NS.object.0">
-              <string key="name">o_titlebar_view</string>
-              <string key="candidateClassName">id</string>
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_controls_bar</string>
+              <string>o_titlebar_view</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_controls_bar</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_titlebar_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
             </object>
           </object>
           <object class="IBClassDescriptionSource" key="sourceIdentifier" id="615738430">
@@ -16989,646 +17051,6 @@ LCAuLi4</string>
           <string key="className">VLCWindowTitleTextField</string>
           <string key="superclassName">NSTextField</string>
           <reference key="sourceIdentifier" ref="925772039"/>
-        </object>
-      </object>
-      <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
-        <bool key="EncodedWithXMLCoder">YES</bool>
-        <object class="IBPartialClassDescription">
-          <string key="className">VLCDetachedVideoWindow</string>
-          <string key="superclassName">VLCVideoWindowCommon</string>
-          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="649501176">
-            <string key="majorKey">IBDocumentRelativeSource</string>
-            <string key="minorKey">../../../../../modules/gui/macosx/MainWindow.h</string>
-          </object>
-        </object>
-        <object class="IBPartialClassDescription">
-          <string key="className">VLCMainWindow</string>
-          <string key="superclassName">VLCVideoWindowCommon</string>
-          <object class="NSMutableDictionary" key="actions">
-            <bool key="EncodedWithXMLCoder">YES</bool>
-            <object class="NSArray" key="dict.sortedKeys">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>addPodcast:</string>
-              <string>addPodcastWindowAction:</string>
-              <string>backward:</string>
-              <string>bwd:</string>
-              <string>dropzoneButtonAction:</string>
-              <string>effects:</string>
-              <string>forward:</string>
-              <string>fullscreen:</string>
-              <string>fwd:</string>
-              <string>next:</string>
-              <string>play:</string>
-              <string>prev:</string>
-              <string>removePodcast:</string>
-              <string>removePodcastWindowAction:</string>
-              <string>repeat:</string>
-              <string>shuffle:</string>
-              <string>stop:</string>
-              <string>timeSliderAction:</string>
-              <string>togglePlaylist:</string>
-              <string>volumeAction:</string>
-            </object>
-            <object class="NSMutableArray" key="dict.values">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-            </object>
-          </object>
-          <object class="NSMutableDictionary" key="actionInfosByName">
-            <bool key="EncodedWithXMLCoder">YES</bool>
-            <object class="NSArray" key="dict.sortedKeys">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>addPodcast:</string>
-              <string>addPodcastWindowAction:</string>
-              <string>backward:</string>
-              <string>bwd:</string>
-              <string>dropzoneButtonAction:</string>
-              <string>effects:</string>
-              <string>forward:</string>
-              <string>fullscreen:</string>
-              <string>fwd:</string>
-              <string>next:</string>
-              <string>play:</string>
-              <string>prev:</string>
-              <string>removePodcast:</string>
-              <string>removePodcastWindowAction:</string>
-              <string>repeat:</string>
-              <string>shuffle:</string>
-              <string>stop:</string>
-              <string>timeSliderAction:</string>
-              <string>togglePlaylist:</string>
-              <string>volumeAction:</string>
-            </object>
-            <object class="NSMutableArray" key="dict.values">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <object class="IBActionInfo">
-                <string key="name">addPodcast:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">addPodcastWindowAction:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">backward:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">bwd:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">dropzoneButtonAction:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">effects:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">forward:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">fullscreen:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">fwd:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">next:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">play:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">prev:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">removePodcast:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">removePodcastWindowAction:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">repeat:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">shuffle:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">stop:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">timeSliderAction:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">togglePlaylist:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">volumeAction:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-            </object>
-          </object>
-          <object class="NSMutableDictionary" key="outlets">
-            <bool key="EncodedWithXMLCoder">YES</bool>
-            <object class="NSArray" key="dict.sortedKeys">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>o_bottombar_view</string>
-              <string>o_bwd_btn</string>
-              <string>o_chosen_category_lbl</string>
-              <string>o_current_video_window</string>
-              <string>o_detached_bottombar_view</string>
-              <string>o_detached_bwd_btn</string>
-              <string>o_detached_fullscreen_btn</string>
-              <string>o_detached_fwd_btn</string>
-              <string>o_detached_play_btn</string>
-              <string>o_detached_progress_bar</string>
-              <string>o_detached_resize_view</string>
-              <string>o_detached_time_fld</string>
-              <string>o_detached_time_sld</string>
-              <string>o_detached_time_sld_background</string>
-              <string>o_detached_time_sld_fancygradient_view</string>
-              <string>o_detached_video_window</string>
-              <string>o_dropzone_box</string>
-              <string>o_dropzone_btn</string>
-              <string>o_dropzone_lbl</string>
-              <string>o_dropzone_view</string>
-              <string>o_effects_btn</string>
-              <string>o_fspanel</string>
-              <string>o_fullscreen_btn</string>
-              <string>o_fwd_btn</string>
-              <string>o_left_split_view</string>
-              <string>o_play_btn</string>
-              <string>o_playlist_btn</string>
-              <string>o_playlist_table</string>
-              <string>o_podcast_add_btn</string>
-              <string>o_podcast_remove_btn</string>
-              <string>o_podcast_subscribe_cancel_btn</string>
-              <string>o_podcast_subscribe_ok_btn</string>
-              <string>o_podcast_subscribe_subtitle_lbl</string>
-              <string>o_podcast_subscribe_title_lbl</string>
-              <string>o_podcast_subscribe_url_fld</string>
-              <string>o_podcast_subscribe_window</string>
-              <string>o_podcast_unsubscribe_cancel_btn</string>
-              <string>o_podcast_unsubscribe_ok_btn</string>
-              <string>o_podcast_unsubscribe_pop</string>
-              <string>o_podcast_unsubscribe_subtitle_lbl</string>
-              <string>o_podcast_unsubscribe_title_lbl</string>
-              <string>o_podcast_unsubscribe_window</string>
-              <string>o_podcast_view</string>
-              <string>o_progress_bar</string>
-              <string>o_progress_view</string>
-              <string>o_repeat_btn</string>
-              <string>o_resize_view</string>
-              <string>o_right_split_view</string>
-              <string>o_search_fld</string>
-              <string>o_shuffle_btn</string>
-              <string>o_sidebar_scrollview</string>
-              <string>o_sidebar_view</string>
-              <string>o_split_view</string>
-              <string>o_stop_btn</string>
-              <string>o_time_fld</string>
-              <string>o_time_sld</string>
-              <string>o_time_sld_background</string>
-              <string>o_time_sld_fancygradient_view</string>
-              <string>o_topbar_view</string>
-              <string>o_video_view</string>
-              <string>o_volume_down_btn</string>
-              <string>o_volume_sld</string>
-              <string>o_volume_track_view</string>
-              <string>o_volume_up_btn</string>
-            </object>
-            <object class="NSMutableArray" key="dict.values">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>VLCFSPanel</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-            </object>
-          </object>
-          <object class="NSMutableDictionary" key="toOneOutletInfosByName">
-            <bool key="EncodedWithXMLCoder">YES</bool>
-            <object class="NSArray" key="dict.sortedKeys">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>o_bottombar_view</string>
-              <string>o_bwd_btn</string>
-              <string>o_chosen_category_lbl</string>
-              <string>o_current_video_window</string>
-              <string>o_detached_bottombar_view</string>
-              <string>o_detached_bwd_btn</string>
-              <string>o_detached_fullscreen_btn</string>
-              <string>o_detached_fwd_btn</string>
-              <string>o_detached_play_btn</string>
-              <string>o_detached_progress_bar</string>
-              <string>o_detached_resize_view</string>
-              <string>o_detached_time_fld</string>
-              <string>o_detached_time_sld</string>
-              <string>o_detached_time_sld_background</string>
-              <string>o_detached_time_sld_fancygradient_view</string>
-              <string>o_detached_video_window</string>
-              <string>o_dropzone_box</string>
-              <string>o_dropzone_btn</string>
-              <string>o_dropzone_lbl</string>
-              <string>o_dropzone_view</string>
-              <string>o_effects_btn</string>
-              <string>o_fspanel</string>
-              <string>o_fullscreen_btn</string>
-              <string>o_fwd_btn</string>
-              <string>o_left_split_view</string>
-              <string>o_play_btn</string>
-              <string>o_playlist_btn</string>
-              <string>o_playlist_table</string>
-              <string>o_podcast_add_btn</string>
-              <string>o_podcast_remove_btn</string>
-              <string>o_podcast_subscribe_cancel_btn</string>
-              <string>o_podcast_subscribe_ok_btn</string>
-              <string>o_podcast_subscribe_subtitle_lbl</string>
-              <string>o_podcast_subscribe_title_lbl</string>
-              <string>o_podcast_subscribe_url_fld</string>
-              <string>o_podcast_subscribe_window</string>
-              <string>o_podcast_unsubscribe_cancel_btn</string>
-              <string>o_podcast_unsubscribe_ok_btn</string>
-              <string>o_podcast_unsubscribe_pop</string>
-              <string>o_podcast_unsubscribe_subtitle_lbl</string>
-              <string>o_podcast_unsubscribe_title_lbl</string>
-              <string>o_podcast_unsubscribe_window</string>
-              <string>o_podcast_view</string>
-              <string>o_progress_bar</string>
-              <string>o_progress_view</string>
-              <string>o_repeat_btn</string>
-              <string>o_resize_view</string>
-              <string>o_right_split_view</string>
-              <string>o_search_fld</string>
-              <string>o_shuffle_btn</string>
-              <string>o_sidebar_scrollview</string>
-              <string>o_sidebar_view</string>
-              <string>o_split_view</string>
-              <string>o_stop_btn</string>
-              <string>o_time_fld</string>
-              <string>o_time_sld</string>
-              <string>o_time_sld_background</string>
-              <string>o_time_sld_fancygradient_view</string>
-              <string>o_topbar_view</string>
-              <string>o_video_view</string>
-              <string>o_volume_down_btn</string>
-              <string>o_volume_sld</string>
-              <string>o_volume_track_view</string>
-              <string>o_volume_up_btn</string>
-            </object>
-            <object class="NSMutableArray" key="dict.values">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_bottombar_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_bwd_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_chosen_category_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_current_video_window</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_bottombar_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_bwd_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_fullscreen_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_fwd_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_play_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_progress_bar</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_resize_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_time_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_time_sld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_time_sld_background</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_time_sld_fancygradient_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_detached_video_window</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_dropzone_box</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_dropzone_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_dropzone_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_dropzone_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_effects_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_fspanel</string>
-                <string key="candidateClassName">VLCFSPanel</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_fullscreen_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_fwd_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_left_split_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_play_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_playlist_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_playlist_table</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_podcast_add_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_podcast_remove_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_podcast_subscribe_cancel_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_podcast_subscribe_ok_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_podcast_subscribe_subtitle_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_podcast_subscribe_title_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_podcast_subscribe_url_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_podcast_subscribe_window</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_podcast_unsubscribe_cancel_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_podcast_unsubscribe_ok_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_podcast_unsubscribe_pop</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_podcast_unsubscribe_subtitle_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_podcast_unsubscribe_title_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_podcast_unsubscribe_window</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_podcast_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_progress_bar</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_progress_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_repeat_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_resize_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_right_split_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_search_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_shuffle_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_sidebar_scrollview</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_sidebar_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_split_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_stop_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_time_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_time_sld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_time_sld_background</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_time_sld_fancygradient_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_topbar_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_video_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_volume_down_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_volume_sld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_volume_track_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_volume_up_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-            </object>
-          </object>
-          <reference key="sourceIdentifier" ref="649501176"/>
         </object>
       </object>
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.2+">

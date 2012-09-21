@@ -25,6 +25,7 @@
 #import "misc.h"
 #import "intf.h"                                          /* VLCApplication */
 #import "MainWindow.h"
+#import "ControlsBar.h"
 #import "controls.h"
 #import "CoreInteraction.h"
 #import <CoreAudio/CoreAudio.h>
@@ -452,7 +453,7 @@ void _drawFrameInRect(NSRect frameRect)
 
 - (void)drawRect:(NSRect)rect
 {
-    [[[VLCMain sharedInstance] mainWindow] drawFancyGradientEffectForTimeSlider];
+    [[[[VLCMain sharedInstance] mainWindow] controlsBar] drawFancyGradientEffectForTimeSlider];
     msleep( 10000 ); //wait for the gradient to draw completely
 
     /* Draw default to make sure the slider behaves correctly */

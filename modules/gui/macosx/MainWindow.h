@@ -34,29 +34,12 @@
 #import "fspanel.h"
 #import "MainWindowTitle.h"
 
+@class VLCMainWindowControlsBar;
+
 @interface VLCMainWindow : VLCVideoWindowCommon <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate> {
-    IBOutlet id o_play_btn;
-    IBOutlet id o_bwd_btn;
-    IBOutlet id o_fwd_btn;
-    IBOutlet id o_stop_btn;
-    IBOutlet id o_playlist_btn;
-    IBOutlet id o_repeat_btn;
-    IBOutlet id o_shuffle_btn;
-    IBOutlet id o_effects_btn;
-    IBOutlet id o_fullscreen_btn;
+
     IBOutlet id o_search_fld;
-    IBOutlet id o_topbar_view;
-    IBOutlet id o_volume_sld;
-    IBOutlet id o_volume_track_view;
-    IBOutlet id o_volume_down_btn;
-    IBOutlet id o_volume_up_btn;
-    IBOutlet id o_progress_view;
-    IBOutlet id o_time_sld;
-    IBOutlet id o_time_sld_fancygradient_view;
-    IBOutlet id o_time_fld;
-    IBOutlet id o_progress_bar;
-    IBOutlet id o_bottombar_view;
-    IBOutlet id o_time_sld_background;
+    
     IBOutlet id o_playlist_table;
     IBOutlet id o_video_view;
     IBOutlet id o_split_view;
@@ -72,19 +55,7 @@
     IBOutlet id o_dropzone_box;
 
     IBOutlet VLCFSPanel *o_fspanel;
-    IBOutlet id o_resize_view;
-    IBOutlet id o_detached_resize_view;
 
-    IBOutlet id o_detached_play_btn;
-    IBOutlet id o_detached_fwd_btn;
-    IBOutlet id o_detached_bwd_btn;
-    IBOutlet id o_detached_fullscreen_btn;
-    IBOutlet id o_detached_time_fld;
-    IBOutlet id o_detached_time_sld;
-    IBOutlet id o_detached_time_sld_background;
-    IBOutlet id o_detached_progress_bar;
-    IBOutlet id o_detached_time_sld_fancygradient_view;
-    IBOutlet id o_detached_bottombar_view;
     IBOutlet id o_detached_video_window;
 
     IBOutlet id o_podcast_view;
@@ -108,32 +79,8 @@
     BOOL b_dropzone_active;
     BOOL b_splitview_removed;
     BOOL b_minimized_view;
-    BOOL b_show_jump_buttons;
-    BOOL b_show_playmode_buttons;
+
     int i_lastSplitViewHeight;
-    input_state_e cachedInputState;
-
-    NSImage * o_pause_img;
-    NSImage * o_pause_pressed_img;
-    NSImage * o_play_img;
-    NSImage * o_play_pressed_img;
-    NSImage * o_repeat_img;
-    NSImage * o_repeat_pressed_img;
-    NSImage * o_repeat_all_img;
-    NSImage * o_repeat_all_pressed_img;
-    NSImage * o_repeat_one_img;
-    NSImage * o_repeat_one_pressed_img;
-    NSImage * o_shuffle_img;
-    NSImage * o_shuffle_pressed_img;
-    NSImage * o_shuffle_on_img;
-    NSImage * o_shuffle_on_pressed_img;
-
-    NSTimeInterval last_fwd_event;
-    NSTimeInterval last_bwd_event;
-    BOOL just_triggered_next;
-    BOOL just_triggered_previous;
-    NSButton * o_prev_btn;
-    NSButton * o_next_btn;
 
     NSMutableArray *o_sidebaritems;
 
@@ -164,21 +111,10 @@
 + (VLCMainWindow *)sharedInstance;
 @property (readonly) BOOL fullscreen;
 
-- (IBAction)play:(id)sender;
-- (IBAction)prev:(id)sender;
-- (IBAction)backward:(id)sender;
-- (IBAction)bwd:(id)sender;
-- (IBAction)next:(id)sender;
-- (IBAction)forward:(id)sender;
-- (IBAction)fwd:(id)sender;
-- (IBAction)stop:(id)sender;
+- (VLCMainWindowControlsBar *)controlsBar;
+
 - (IBAction)togglePlaylist:(id)sender;
-- (IBAction)repeat:(id)sender;
-- (IBAction)shuffle:(id)sender;
-- (IBAction)timeSliderAction:(id)sender;
-- (IBAction)volumeAction:(id)sender;
-- (IBAction)effects:(id)sender;
-- (IBAction)fullscreen:(id)sender;
+
 - (IBAction)dropzoneButtonAction:(id)sender;
 
 - (IBAction)addPodcast:(id)sender;
@@ -193,19 +129,11 @@
 - (void)showSplitView;
 - (void)hideSplitView;
 - (void)updateTimeSlider;
-- (void)updateVolumeSlider;
 - (void)updateWindow;
 - (void)updateName;
 - (void)setPause;
 - (void)setPlay;
-- (void)setRepeatOne;
-- (void)setRepeatAll;
-- (void)setRepeatOff;
-- (void)setShuffle;
-- (void)toggleJumpButtons;
-- (void)togglePlaymodeButtons;
-
-- (void)drawFancyGradientEffectForTimeSlider;
+- (void)updateVolumeSlider;
 
 - (id)videoView;
 - (void)setupVideoView;

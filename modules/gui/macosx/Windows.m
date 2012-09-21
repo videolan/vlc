@@ -219,6 +219,8 @@
 
 @implementation VLCVideoWindowCommon
 
+@synthesize controlsBar=o_controls_bar;
+
 #pragma mark -
 #pragma mark Init
 

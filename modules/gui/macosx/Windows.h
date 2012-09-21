@@ -25,6 +25,7 @@
 #import <Cocoa/Cocoa.h>
 #import "CompatibilityFixes.h"
 
+
 /*****************************************************************************
  * VLCWindow
  *
@@ -56,6 +57,7 @@
 
 @end
 
+@class VLCControlsBarCommon;
 
 /*****************************************************************************
  * VLCVideoWindowCommon
@@ -69,7 +71,11 @@
     BOOL b_dark_interface;
 
     IBOutlet id o_titlebar_view; // only set in main or detached window
+
+    IBOutlet VLCControlsBarCommon* o_controls_bar;
 }
+
+@property (readonly) VLCControlsBarCommon* controlsBar;
 
 - (void)setTitle:(NSString *)title;
 

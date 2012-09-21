@@ -41,6 +41,7 @@
 #import "VideoView.h"
 #import "CoreInteraction.h"
 #import "MainWindow.h"
+#import "ControlsBar.h"
 #import "ExtensionsManager.h"
 #import "ConvertAndSave.h"
 
@@ -633,7 +634,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 {
     BOOL b_value = !config_GetInt(VLCIntf, "macosx-show-playback-buttons");
     config_PutInt(VLCIntf, "macosx-show-playback-buttons", b_value);
-    [[[VLCMain sharedInstance] mainWindow] toggleJumpButtons];
+    [[[[VLCMain sharedInstance] mainWindow] controlsBar] toggleJumpButtons];
     [o_mi_toggleJumpButtons setState: b_value];
 }
 
@@ -641,7 +642,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 {
     BOOL b_value = !config_GetInt(VLCIntf, "macosx-show-playmode-buttons");
     config_PutInt(VLCIntf, "macosx-show-playmode-buttons", b_value);
-    [[[VLCMain sharedInstance] mainWindow] togglePlaymodeButtons];
+    [[[[VLCMain sharedInstance] mainWindow] controlsBar] togglePlaymodeButtons];
     [o_mi_togglePlaymodeButtons setState: b_value];
 }
 

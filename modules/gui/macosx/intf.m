@@ -1351,17 +1351,17 @@ static VLCMain *_o_sharedMainInstance = nil;
     bool loop = var_GetBool(p_playlist, "loop");
     bool repeat = var_GetBool(p_playlist, "repeat");
     if (repeat) {
-        [o_mainwindow setRepeatOne];
+        [[o_mainwindow controlsBar] setRepeatOne];
         [o_mainmenu setRepeatOne];
     } else if (loop) {
-        [o_mainwindow setRepeatAll];
+        [[o_mainwindow controlsBar] setRepeatAll];
         [o_mainmenu setRepeatAll];
     } else {
-        [o_mainwindow setRepeatOff];
+        [[o_mainwindow controlsBar] setRepeatOff];
         [o_mainmenu setRepeatOff];
     }
 
-    [o_mainwindow setShuffle];
+    [[o_mainwindow controlsBar] setShuffle];
     [o_mainmenu setShuffle];
 }
 
@@ -1402,7 +1402,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     return o_mainmenu;
 }
 
-- (id)mainWindow
+- (VLCMainWindow *)mainWindow
 {
     return o_mainwindow;
 }
