@@ -545,7 +545,7 @@ void VLCProfileEditor::muxSelected()
     SETYESNOSTATE( capstream, "capstream" );
     SETYESNOSTATE( capchaps, "capchaps" );
     bool b = caps["muxers"].contains( "mux_" + current->property("sout").toString() );
-    if ( b )
+    if ( !b )
         ui.muxerwarning->setText(
                     QString( "<img src=\":/menu/info\"/> %1" )
                     .arg( qtr( "This muxer is not provided directly by VLC: It could be missing." ) )
