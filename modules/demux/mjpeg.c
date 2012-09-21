@@ -170,22 +170,21 @@ static char* GetLine( demux_t *p_demux, int *p_pos )
  *****************************************************************************/
 static bool CheckMimeHeader( demux_t *p_demux, int *p_header_size )
 {
-    bool  b_jpeg = false;
+    bool        b_jpeg = false;
     int         i_pos = 0;
     char        *psz_line;
     char        *p_ch;
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    *p_header_size = -1;
     if( !Peek( p_demux, true ) )
     {
         msg_Err( p_demux, "cannot peek" );
-        *p_header_size = -1;
         return false;
     }
     if( p_sys->i_data_peeked < 5)
     {
         msg_Err( p_demux, "data shortage" );
-        *p_header_size = -2;
         return false;
     }
     if( strncmp( (char *)p_sys->p_peek, "--", 2 ) != 0
@@ -226,7 +225,6 @@ static bool CheckMimeHeader( demux_t *p_demux, int *p_header_size )
         if( NULL == psz_line )
         {
             msg_Err( p_demux, "no EOL" );
-            *p_header_size = -3;
             return false;
         }
 
@@ -276,7 +274,6 @@ static bool CheckMimeHeader( demux_t *p_demux, int *p_header_size )
     if( NULL == psz_line )
     {
         msg_Err( p_demux, "no EOL" );
-        *p_header_size = -3;
         return false;
     }
 
