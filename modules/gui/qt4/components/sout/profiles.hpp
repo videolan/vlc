@@ -28,36 +28,31 @@ static const char video_profile_name_list[][37] = {
     "Video for Youtube HD",
 };
 
-static const char video_profile_value_list[][58] = {
-    /* Container(string), transcode video(bool), transcode audio(bool), */
-    /* use subtitles(bool), video codec(string), video bitrate(integer), */
-    /* scale(float), fps(float), width(integer, height(integer), */
-    /* audio codec(string), audio bitrate(integer), channels(integer), */
-    /* samplerate(integer), subtitle codec(string), subtitle overlay(bool) */
-    "mp4;1;1;0;h264;0;0;0;0;0;mpga;128;2;44100;0;1",
-    "webm;1;1;0;VP80;2000;0;0;0;0;vorb;128;2;44100;0;1",
-    "ts;1;1;0;h264;800;1;0;0;0;mpga;128;2;44100;0;0",
-    "ts;1;1;0;drac;800;1;0;0;0;mpga;128;2;44100;0;0",
-    "ogg;1;1;0;theo;800;1;0;0;0;vorb;128;2;44100;0;0",
-    "ogg;1;1;0;theo;800;1;0;0;0;flac;128;2;44100;0;0",
-    "ts;1;1;0;mp2v;800;1;0;0;0;mpga;128;2;44100;0;0",
-    "asf;1;1;0;WMV2;800;1;0;0;0;wma2;128;2;44100;0;0",
-    "asf;1;1;0;DIV3;800;1;0;0;0;mp3;128;2;44100;0;0",
-    "ogg;1;1;0;none;800;1;0;0;0;vorb;128;2;44100;none;0",
-    "raw;1;1;0;none;800;1;0;0;0;mp3;128;2;44100;none;0",
-    "mp4;1;1;0;none;800;1;0;0;0;mpga;128;2;44100;none;0",
-    "raw;1;1;0;none;800;1;0;0;0;flac;128;2;44100;none;0",
-    "wav;1;1;0;none;800;1;0;0;0;s16l;128;2;44100;none;0",
-    "mp4;1;1;0;h264;1500;1;0;1280;720;mp3;192;2;44100;none;0",
-    "mp4;1;1;0;h264;3500;1;0;1920;1080;mp3;192;2;44100;none;0",
-    "avi;1;1;0;DIV3;900;1;0;720;568;mp3;128;2;44100;0;0",
-    "mp4;1;1;0;h264;600;1;0;320;180;mp3;128;2;44100;none;0",
-    "mp4;1;1;0;h264;700;1;0;480;272;mp3;128;2;44100;none;0",
-    "mp4;1;1;0;h264;56;1;12;176;144;mp3;24;1;44100;none;0",
-    "mp4;1;1;0;h264;500;1;0;480;360;mp3;128;2;44100;none;0",
-    "mp4;1;1;0;h264;2000;1;0;1280;720;mp3;192;2;44100;none;0",
-    "mp4;1;1;0;h264;800;1;0;640;480;mp3;128;2;44100;none;0",
-    "mp4;1;1;0;h264;1500;1;0;1280;720;mp3;128;2;44100;none;0",
+static const char * video_profile_value_list[] = {
+    "audio_enable=yes;audio_codec=mpga;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=h264;vcodec_bitrate=0;vcodec_qp=0;vcodec_framerate=0;vcodec_width=0;vcodec_height=0;muxer_mux=mp4",
+    "video_enable=yes;video_codec=VP80;vcodec_bitrate=2000;vcodec_framerate=0;vcodec_width=0;vcodec_height=0;audio_enable=yes;audio_codec=vorb;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;muxer_mux=webm",
+    "audio_enable=yes;audio_codec=mpga;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=h264;vcodec_bitrate=800;vcodec_qp=0;vcodec_framerate=0;vcodec_width=0;vcodec_height=0;muxer_mux=ts",
+    "video_enable=yes;video_codec=drac;vcodec_bitrate=800;vcodec_framerate=0;vcodec_width=0;vcodec_height=0;audio_enable=yes;audio_codec=mpga;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;muxer_mux=ts",
+    "audio_enable=yes;audio_codec=vorb;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=theo;vcodec_bitrate=800;vcodec_framerate=0;vcodec_width=0;vcodec_height=0;muxer_mux=ogg",
+    "audio_enable=yes;audio_codec=flac;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=theo;vcodec_bitrate=800;vcodec_framerate=0;vcodec_width=0;vcodec_height=0;muxer_mux=ogg",
+    "audio_enable=yes;audio_codec=mpga;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=mp2v;vcodec_bitrate=800;vcodec_framerate=0;vcodec_width=0;vcodec_height=0;muxer_mux=ts",
+    "audio_enable=yes;audio_codec=wma2;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=WMV2;vcodec_bitrate=800;vcodec_framerate=0;vcodec_width=0;vcodec_height=0;muxer_mux=asf",
+    "audio_enable=yes;audio_codec=mp3;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=DIV3;vcodec_bitrate=800;vcodec_framerate=0;vcodec_width=0;vcodec_height=0;muxer_mux=asf",
+    "audio_enable=yes;audio_codec=vorb;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;muxer_mux=ogg",
+    "audio_enable=yes;audio_codec=mp3;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;muxer_mux=raw",
+    "audio_enable=yes;audio_codec=mpga;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;muxer_mux=mp4",
+    "audio_enable=yes;audio_codec=flac;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;muxer_mux=raw",
+    "audio_enable=yes;audio_codec=s16l;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;muxer_mux=wav",
+    "audio_enable=yes;audio_codec=mp3;acodec_bitrate=192;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=h264;vcodec_bitrate=1500;vcodec_qp=0;vcodec_framerate=0;vcodec_width=1280;vcodec_height=720;muxer_mux=mp4",
+    "audio_enable=yes;audio_codec=mp3;acodec_bitrate=192;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=h264;vcodec_bitrate=3500;vcodec_qp=0;vcodec_framerate=0;vcodec_width=1920;vcodec_height=1080;muxer_mux=mp4",
+    "video_enable=yes;video_codec=DIV3;vcodec_bitrate=900;vcodec_framerate=0;vcodec_width=720;vcodec_height=576;audio_enable=yes;audio_codec=mp3;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;muxer_mux=avi",
+    "audio_enable=yes;audio_codec=mp3;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=h264;vcodec_bitrate=600;vcodec_qp=0;vcodec_framerate=0;vcodec_width=320;vcodec_height=180;muxer_mux=mp4",
+    "audio_enable=yes;audio_codec=mp3;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=h264;vcodec_bitrate=700;vcodec_qp=0;vcodec_framerate=0;vcodec_width=480;vcodec_height=272;muxer_mux=mp4",
+    "audio_enable=yes;audio_codec=mp3;acodec_bitrate=24;acodec_channels=1;acodec_samplerate=44100;video_enable=yes;video_codec=h264;vcodec_bitrate=56;vcodec_qp=0;vcodec_framerate=12;vcodec_width=176;vcodec_height=144;vcodec_custom=profile%3Dbaseline;muxer_mux=mp4",
+    "audio_enable=yes;audio_codec=mp3;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=h264;vcodec_bitrate=500;vcodec_qp=0;vcodec_framerate=0;vcodec_width=480;vcodec_height=360;vcodec_custom=profile%3Dbaseline;muxer_mux=mp4",
+    "audio_enable=yes;audio_codec=mp3;acodec_bitrate=192;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=h264;vcodec_bitrate=2000;vcodec_qp=0;vcodec_framerate=0;vcodec_width=1280;vcodec_height=720;vcodec_custom=profile%3Dbaseline;muxer_mux=mp4",
+    "audio_enable=yes;audio_codec=mp3;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=h264;vcodec_bitrate=800;vcodec_qp=0;vcodec_framerate=0;vcodec_width=640;vcodec_height=480;muxer_mux=mp4",
+    "audio_enable=yes;audio_codec=mp3;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=h264;vcodec_bitrate=1500;vcodec_qp=0;vcodec_framerate=0;vcodec_width=1280;vcodec_height=720;muxer_mux=mp4",
 };
 
 
