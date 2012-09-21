@@ -279,6 +279,8 @@ unsigned int CocoaKeyToVLC(unichar i_key)
         theString = [theString stringByReplacingOccurrencesOfString:@"Shift" withString:@""];
         theString = [theString stringByReplacingOccurrencesOfString:@"Ctrl" withString:@""];
     }
+
+#pragma GCC diagnostic ignored "-Wformat"
     if ([theString length] > 1) {
         if ([theString rangeOfString:@"Up"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSUpArrowFunctionKey];
@@ -334,6 +336,7 @@ unsigned int CocoaKeyToVLC(unichar i_key)
             return [NSString stringWithFormat:@"%C", NSF1FunctionKey];
         /* note that we don't support esc here, since it is reserved for leaving fullscreen */
     }
+#pragma GCC diagnostic warning "-Wformat"
 
     return theString;
 }
