@@ -242,6 +242,7 @@
 
     /* we want to be moveable regardless of our style */
     [self setMovableByWindowBackground: YES];
+    [self setCanBecomeKeyWindow:YES];
 
     return self;
 }

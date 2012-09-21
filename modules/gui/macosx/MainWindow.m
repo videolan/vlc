@@ -511,10 +511,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 #pragma mark -
 #pragma mark overwritten default functionality
-- (BOOL)canBecomeKeyWindow
-{
-    return YES;
-}
 
 - (void)windowResizedOrMoved:(NSNotification *)notification
 {
@@ -787,7 +783,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         else {
             [o_extra_video_window center];
             [o_extra_video_window setFrameAutosaveName:@"extra-videowindow"];
-            [o_detached_video_window setContentMinSize: NSMakeSize(f_min_video_height, f_min_video_height)];
+            [o_extra_video_window setContentMinSize: NSMakeSize(f_min_video_height, f_min_video_height)];
         }
 
         b_nonembedded = YES;
@@ -1868,16 +1864,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_titlebar_view setFullscreenButtonHidden: YES];
 
     }
-}
-
-- (IBAction)fullscreen:(id)sender
-{
-    [[VLCCoreInteraction sharedInstance] toggleFullscreen];
-}
-
-- (BOOL)canBecomeKeyWindow
-{
-    return YES;
 }
 
 @end
