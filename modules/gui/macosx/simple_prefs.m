@@ -987,9 +987,6 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
     if (sender == o_intf_nativefullscreen_ckb && [o_intf_nativefullscreen_ckb state] == NSOnState)
         [o_intf_embedded_ckb setState: NSOnState];
 
-    if (sender == o_intf_embedded_ckb)
-        [[VLCCoreInteraction sharedInstance] stop];
-
     b_intfSettingChanged = YES;
 }
 
