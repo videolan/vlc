@@ -14,7 +14,6 @@ extra_check_verbose__0 = $(extra_check_verbose_0)
 ###############################################################################
 check_PROGRAMS = \
 	test_libvlc_core \
-	test_libvlc_equalizer \
 	test_libvlc_media \
 	test_libvlc_media_list \
 	test_libvlc_media_player \
@@ -59,8 +58,6 @@ LIBVLC = ../lib/libvlc.la
 
 test_libvlc_core_SOURCES = libvlc/core.c
 test_libvlc_core_LDADD = $(LIBVLC)
-test_libvlc_equalizer_SOURCES = libvlc/equalizer.c
-test_libvlc_equalizer_LDADD = $(LIBVLC)
 test_libvlc_media_SOURCES = libvlc/media.c
 test_libvlc_media_LDADD = $(LIBVLC)
 test_libvlc_media_list_player_SOURCES = libvlc/media_list_player.c
