@@ -256,8 +256,9 @@ void VLCProfileSelector::updateOptions( int i )
                 if( !value.isEmpty() )
                     codecoptions << QUrl::fromPercentEncoding( value.toAscii() );
 
-                smrl.option( "venc",
-                    QString("x264{%1}").arg( codecoptions.join(",") ) );
+                if ( codecoptions.count() )
+                    smrl.option( "venc",
+                        QString("x264{%1}").arg( codecoptions.join(",") ) );
             }
 
             HASHPICK( "vcodec", "framerate" );
