@@ -519,7 +519,7 @@ static void *data_convert(block_t **pp)
 }
 
 /**
- * Queue one audio frame to the playabck stream
+ * Queue one audio frame to the playback stream
  */
 static void Play(audio_output_t *aout, block_t *block, mtime_t *restrict drift)
 {
