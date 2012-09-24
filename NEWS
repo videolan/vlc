@@ -27,6 +27,7 @@ Access:
  * Improvements in Blu-Ray module, notably for multiple video tracks support
  * Important improvements and rewrite of the v4l2 access module
  * HTTP: support for Internationalized Domain Names
+ * Microsoft Smooth Streaming support (H264 and VC1) developped by Viotech.net
 
 Demuxers:
  * MP4: partial support for fragmented MP4

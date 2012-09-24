@@ -258,25 +258,25 @@ SOURCES_htcpcp = htcpcp.c
 SOURCES_access_ftp = ftp.c
 SOURCES_access_sftp = sftp.c
 
-libmms_plugin_la_SOURCES = \
+libaccess_mms_plugin_la_SOURCES = \
 	mms/mms.c mms/mms.h \
 	mms/mmsh.c mms/mmsh.h \
 	mms/mmstu.c mms/mmstu.h \
 	mms/buffer.c mms/buffer.h \
 	mms/asf.h mms/asf.c \
 	../demux/asf/libasf_guid.h
-libmms_plugin_la_CFLAGS = $(AM_CFLAGS)
-libmms_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
-libvlc_LTLIBRARIES += libmms_plugin.la
+libaccess_mms_plugin_la_CFLAGS = $(AM_CFLAGS)
+libaccess_mms_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
+libvlc_LTLIBRARIES += libaccess_mms_plugin.la
 
-librealrtsp_plugin_la_SOURCES = \
+libaccess_realrtsp_plugin_la_SOURCES = \
 	rtsp/access.c \
 	rtsp/rtsp.c rtsp/rtsp.h \
 	rtsp/real.c rtsp/real.h \
 	rtsp/real_rmff.c rtsp/real_rmff.h \
 	rtsp/real_sdpplin.c rtsp/real_sdpplin.h \
 	rtsp/real_asmrp.c
-librealrtsp_plugin_la_CFLAGS = $(AM_CFLAGS)
-librealrtsp_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
-libvlc_LTLIBRARIES += $(LTLIBrealrtsp)
-EXTRA_LTLIBRARIES += librealrtsp_plugin.la
+libaccess_realrtsp_plugin_la_CFLAGS = $(AM_CFLAGS)
+libaccess_realrtsp_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
+libvlc_LTLIBRARIES += $(LTLIBaccess_realrtsp)
+EXTRA_LTLIBRARIES += libaccess_realrtsp_plugin.la

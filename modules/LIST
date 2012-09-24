@@ -35,6 +35,7 @@ $Id$
  * adpcm: ADPCM audio decoder
  * adummy: dummy audio output
  * aes3: aes3 decoder/packetizer
+ * afile: Audio output to write to a file
  * aiff: AIFF demuxer
  * alphamask: Alpha layer mask video filter
  * alsa: audio output module using the ALSA API
@@ -42,7 +43,6 @@ $Id$
  * anaglyph: anaglyph 3d video filter
  * android_surface: video output for Android, based on Surface
  * antiflicker: anti-flicker video filter
- * aout_file: Audio output to write to a file
  * araw: Pseudo audio decoder for raw PCM
  * asf: ASF demuxer
  * atmo: Ambilight-like video-output
@@ -291,6 +291,7 @@ $Id$
  * simple_channel_mixer: channel mixer
  * skins2: Skinnable interface, new generation
  * smf: Standard MIDI file demuxer
+ * smooth: Microsoft Smooth Streaming input
  * sndio: OpenBSD sndio audio output
  * spatializer: A spatializer audio filter
  * speex: a speex audio decoder/packetizer using the libspeex library
@@ -341,6 +342,7 @@ $Id$
  * ty: TY demuxer
  * udev: udev probing module
  * ugly_resampler: Ugly audio resampler
+ * uleaddvaudio: codec for DV Audio from Ulead
  * upnp: libupnp UPNP service discovery
  * v4l2: Video 4 Linux 2 input module
  * vc1: VC-1 Video demuxer
@@ -352,6 +354,7 @@ $Id$
  * vobsub: VobSUB subtitles demuxer
  * voc: VOC demuxer
  * vod_rtsp: RTSP VoD module
+ * volume_neon: audio volume optimized for ARM NEON
  * vorbis: a vorbis audio decoder/packetizer using the libvorbis library
  * vout_ios: iOS video output
  * vout_macosx: MacOS X OpenGL provider
