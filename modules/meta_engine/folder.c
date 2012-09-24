@@ -41,8 +41,11 @@
 static const char* cover_files[] = {
     "Folder.jpg",           /* Windows */
     "AlbumArtSmall.jpg",    /* Windows */
+    "AlbumArt.jpg",         /* Windows */
+    "Album.jpg",
     ".folder.png",          /* KDE?    */
     "cover.jpg",            /* rockbox */
+    "thumb.jpg",
 };
 
 static const int i_covers = (sizeof(cover_files)/sizeof(cover_files[0]));
