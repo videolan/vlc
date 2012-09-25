@@ -336,6 +336,8 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/effects-double-buttons_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-one-button-blue_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-one-button-blue_dark@2x.png \
+	extras/package/macosx/Resources/mainwindow_dark/effects-one-button-pressed-dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/effects-one-button-pressed-dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-one-button_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-one-button_dark@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/forward-3btns-dark-pressed.png \

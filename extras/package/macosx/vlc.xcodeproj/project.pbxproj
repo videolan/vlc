@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7DFFA16C16124F38001AF89F /* effects-one-button-pressed-dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DFFA16A16124F38001AF89F /* effects-one-button-pressed-dark.png */; };
+		7DFFA16D16124F38001AF89F /* effects-one-button-pressed-dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DFFA16B16124F38001AF89F /* effects-one-button-pressed-dark@2x.png */; };
 		CC04323D13B246DF00D7D52E /* effects-double-buttons_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04321313B246DF00D7D52E /* effects-double-buttons_dark.png */; };
 		CC04323E13B246DF00D7D52E /* effects-double-buttons-blue_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04321413B246DF00D7D52E /* effects-double-buttons-blue_dark.png */; };
 		CC04323F13B246DF00D7D52E /* effects-double-buttons-pressed_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04321513B246DF00D7D52E /* effects-double-buttons-pressed_dark.png */; };
@@ -461,6 +463,8 @@
 		5CCED71314C0D4A90057F8D1 /* ExtensionsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExtensionsManager.m; path = ../../../modules/gui/macosx/ExtensionsManager.m; sourceTree = SOURCE_ROOT; };
 		5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCUIWidgets.h; path = ../../../modules/gui/macosx/VLCUIWidgets.h; sourceTree = SOURCE_ROOT; };
 		5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCUIWidgets.m; path = ../../../modules/gui/macosx/VLCUIWidgets.m; sourceTree = SOURCE_ROOT; };
+		7DFFA16A16124F38001AF89F /* effects-one-button-pressed-dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed-dark.png"; path = "Resources/mainwindow_dark/effects-one-button-pressed-dark.png"; sourceTree = "<group>"; };
+		7DFFA16B16124F38001AF89F /* effects-one-button-pressed-dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed-dark@2x.png"; path = "Resources/mainwindow_dark/effects-one-button-pressed-dark@2x.png"; sourceTree = "<group>"; };
 		8E49720006417F6800370C9F /* playlistinfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = playlistinfo.h; path = ../../../modules/gui/macosx/playlistinfo.h; sourceTree = SOURCE_ROOT; };
 		8E49720106417F6800370C9F /* playlistinfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = playlistinfo.m; path = ../../../modules/gui/macosx/playlistinfo.m; sourceTree = SOURCE_ROOT; };
 		8E55FB7F0459B0FD00FB3317 /* output.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = output.h; path = ../../../modules/gui/macosx/output.h; sourceTree = SOURCE_ROOT; };
@@ -1271,6 +1275,8 @@
 				CC919060159B4BB800E634A7 /* effects-double-buttons-pressed_dark@2x.png */,
 				CC919061159B4BB800E634A7 /* effects-one-button_dark@2x.png */,
 				CC919062159B4BB800E634A7 /* effects-one-button-blue_dark@2x.png */,
+				7DFFA16A16124F38001AF89F /* effects-one-button-pressed-dark.png */,
+				7DFFA16B16124F38001AF89F /* effects-one-button-pressed-dark@2x.png */,
 				CC919065159B4BB800E634A7 /* fullscreen-double-buttons_dark@2x.png */,
 				CC919066159B4BB800E634A7 /* fullscreen-double-buttons-pressed_dark@2x.png */,
 				CC919067159B4BB800E634A7 /* fullscreen-one-button-pressed_dark@2x.png */,
@@ -2211,6 +2217,8 @@
 				CC461F75160084A10022423C /* SharedDialogs.xib in Resources */,
 				CCE8BAC4160615D9006741FB /* effects-one-button-pressed.png in Resources */,
 				CCE8BAC5160615D9006741FB /* effects-one-button-pressed@2x.png in Resources */,
+				7DFFA16C16124F38001AF89F /* effects-one-button-pressed-dark.png in Resources */,
+				7DFFA16D16124F38001AF89F /* effects-one-button-pressed-dark@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
