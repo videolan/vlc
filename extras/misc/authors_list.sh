@@ -6,18 +6,78 @@
 # To be copied and run in the git directory for having "git shortlog -sn po/" find the logs.
 # It will generate a subdirectory temp_update_AUTHORS
 
+OLD_AUTHORS="AUTHORS_unmodified_by_No_se_script.txt"
+# The last version before modifying AUTHORS with this kind of script. Important, since the script shall not remove anyone.
+# Not even the manual editings delete anyone.
+# 4f696a88ec9544b98e22ee45e010869717608bd2  here did j-b start using the script
+
+if [ -f $OLD_AUTHORS ]; then
+ echo "Starting with credits from $OLD_AUTHORS ..."
+else
+ echo "You need an old AUTHORS file. Only if you know what you are doing, you can use the current AUTHORS."
+ echo "Aborting..."
+ exit
+fi
+
 
 mkdir -p temp_update_AUTHORS
 
 echo "Checking all git logs"
-git shortlog -sn > temp_update_AUTHORS/all_git.txt
+git shortlog -sn -- > temp_update_AUTHORS/all_git.txt
 
 echo "Checking "po only" git logs"
-git shortlog -sn po extras/package/win32/languages/ share/vlc.desktop.in > temp_update_AUTHORS/po_git.txt
-# Now, not only po/ is checked. This way, translators are identified better and we save some lines in coders (some translators-only are removed)
+#git shortlog -sn po/ > temp_update_AUTHORS/po_git.txt
+# This modified command identified more translators, leading to the removal of existing entries in AUTHORS, impossible by design.
+# So, start with a AUTHORS version with validated entries.
+# Only if the script is not modified (wrt finding translators) you can use the current AUTHORS
+git shortlog -sn -- po extras/package/win32/languages/ share/vlc.desktop.in  share/vlc.desktop share/applications/vlc.desktop extras/package/win32/vlc.win32.nsi.in > temp_update_AUTHORS/po_git_previous.txt
+
+# Some typical (ancient) l10n files:
+#share/applications/vlc.desktop
+#extras/package/win32/languages/declaration.nsh
+#extras/package/win32/languages/english.nsh
+#extras/package/win32/languages/french.nsh
+#extras/package/win32/vlc.win32.nsi.in
+
+sed -n '{
+s/.*Song Ye Wen.*//
+s/.*Florian Hubold.*//
+s/.*Sveinung Kvilhaugsvik.*//
+s/.*Julien Humbert.*//
+/^$/ !p
+}
+' <temp_update_AUTHORS/po_git_previous.txt >temp_update_AUTHORS/po_git.txt
+
+# Checking the logs, this ^^ persons did not do l10n
+# commited to share/vlc.desktop, but this seems to be media types, not l10n things.
+# Florian Hubold
+# share/applications/vlc.desktop
+# Sveinung Kvilhaugsvik
+# commited to extras/package/win32/vlc.win32.nsi.in   and   include/vlc_interface.h
+# Julien Humbert
+# comitted to po/POTFILES.in
+# Song Ye Wen
+
+# TODO: add this newly discovered translators
+# czech translator
+# Radek Vybiral <radek@ns.snake.cz>
+# zh_TW
+# Thanks to Hsi-Ching Chao
+# Thanks to Ruei-Yuan Lu <RueiYuan.Lu@gmail.com>
+#extras/package/win32/languages/schinese.nsh
+#share/vlc.desktop
+
+
+# there are some artwork designers in git log, too. If one of them wants to be mentioned in "Programmers" also, remove here:
+echo "Damien Erambert"  >  temp_update_AUTHORS/artwork_git.txt
+echo "Daniel Dreibrodt" >> temp_update_AUTHORS/artwork_git.txt
+echo "Dominic Spitaler" >> temp_update_AUTHORS/artwork_git.txt
+
+
+
 
 echo "reading AUTHORS"
-sed -n '/Programming/,/^$/  s/[^-].*/&/p' < AUTHORS | sed '1 d'  > temp_update_AUTHORS/programmers_part.txt
+sed -n '/Programming/,/^$/  s/[^-].*/&/p' < $OLD_AUTHORS | sed '1 d'  > temp_update_AUTHORS/programmers_part.txt
 # The part of AUTHORS between Programming and the first empty line, without the ---- line
 
 
@@ -30,6 +90,11 @@ echo "Removing translators from the git log"
 # Remove translators. (Commiters with the same count in /po and total and hence are listed twice). Then the commit counter is removed
 cat temp_update_AUTHORS/all_git.txt temp_update_AUTHORS/po_git.txt|sort|uniq -u |sed 's/[0-9 \t]*\(.*\)/\1/g' | sort|uniq> temp_update_AUTHORS/coders_only.txt
 
+
+####
+#For script tuning: Are there other files the translators modified? =>probably l10n files
+cat temp_update_AUTHORS/all_git.txt temp_update_AUTHORS/po_git.txt|sort|uniq -u| sed 's/[0-9 \t]*\(.*\)/\1/g' | sort|uniq -d> temp_update_AUTHORS/both_sides.txt
+####
 
 # Similar effect with second sed run:
 # Remove translators. I remove every line containing the name. Maybe the .* before and after the last \1 should be removed (i.e. for contributors "Firstname Secondname aka something_you_want_to_keep"
@@ -80,12 +145,13 @@ do
  else
 #  grep "$LINE" temp_update_AUTHORS/new_coders_only.txt >> temp_update_AUTHORS/ordering_log.txt
   grep "$LINE" temp_update_AUTHORS/coders_only.txt >> temp_update_AUTHORS/ordering_log.txt
+#  grep "$LINE" temp_update_AUTHORS/coders_only.txt >> temp_update_AUTHORS/ordering_log.txt
 # I want to keep the $? (it removes some broken names) but I could send the output to /dev/null
 # If someone's name is a prefix to some other's name, this diff will show it:
 # diff temp_update_AUTHORS/ordering_log.txt temp_update_AUTHORS/ordered_by_commits.txt
 # AFAIK this will not effect the output, since we don't use the grep output but only the git output
   if [ $? = "0" ]; then
-    echo "$LINE" >> temp_update_AUTHORS/ordered_by_commits.txt
+    grep "$LINE" temp_update_AUTHORS/artwork_git.txt ||  echo "$LINE" >> temp_update_AUTHORS/ordered_by_commits.txt
   fi
  fi
 done < $FileName
@@ -104,6 +170,9 @@ sed 's/\(.*\)/\1               ---XXX---NEW/g' < temp_update_AUTHORS/new_coders_
 echo
 echo "For the lazy ones: Have a look at temp_update_AUTHORS/final.txt"
 echo "Contains all git code commiters (the translators are stored somewhere else) sorted by commits, and the pre-git commiters"
+echo
+echo 'For the lazy and brave (stupid?) ones: "cp new_AUTHORS AUTHORS" and check "git diff AUTHORS"'
+
 echo "Programming" >  temp_update_AUTHORS/final.txt
 echo "-----------" >> temp_update_AUTHORS/final.txt
 cat temp_update_AUTHORS/ordered_by_commits.txt temp_update_AUTHORS/pre-git.txt >> temp_update_AUTHORS/final.txt
@@ -134,6 +203,11 @@ echo "If something was listed here you should probably modify .mailmap"
 #done < $FileName
 
 
-cp temp_update_AUTHORS/final.txt .
-rm -rf temp_update_AUTHORS/
 
+sed -n '1,2  p' < AUTHORS   > temp_update_AUTHORS/new_AUTHORS
+cat temp_update_AUTHORS/final.txt >> temp_update_AUTHORS/new_AUTHORS
+echo >>temp_update_AUTHORS/new_AUTHORS
+sed -n '/Artwork/,$ p' < AUTHORS >> temp_update_AUTHORS/new_AUTHORS
+
+cp temp_update_AUTHORS/new_AUTHORS .
+#rm -rf temp_update_AUTHORS/
