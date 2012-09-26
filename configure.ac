@@ -3535,9 +3535,9 @@ AS_IF([test "${enable_qt}" != "no"], [
   ])
 
   QT_PATH="$(eval $PKG_CONFIG --variable=exec_prefix QtCore)"
-  AC_PATH_PROGS(MOC, [moc-qt4 moc], moc, [${QT_PATH}/bin])
-  AC_PATH_PROG(RCC, rcc, rcc, [${QT_PATH}/bin])
-  AC_PATH_PROGS(UIC, [uic-qt4 uic], uic, [${QT_PATH}/bin])
+  AC_PATH_PROGS(MOC, [moc-qt4 moc], moc, [${QT_PATH}/bin ${CONTRIB_DIR}/bin])
+  AC_PATH_PROG(RCC, rcc, rcc, [${QT_PATH}/bin ${CONTRIB_DIR}/bin])
+  AC_PATH_PROGS(UIC, [uic-qt4 uic], uic, [${QT_PATH}/bin ${CONTRIB_DIR}/bin])
 ])
 AM_CONDITIONAL(ENABLE_QT4, [test "$enable_qt" != "no"])
 
