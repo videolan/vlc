@@ -216,7 +216,7 @@ static int LoadInitFrag( demux_t *p_demux, const bool b_smooth )
                 if( p_stra && p_stra->data.p_stra->i_track_ID )
                     p_sys->i_tracks++;
                 /* Get timescale and duration of the video track; */
-                if( i == 0 )
+                if( !p_sys->i_timescale )
                 {
                     p_sys->i_timescale = p_stra->data.p_stra->i_timescale;
                     p_sys->i_duration = p_stra->data.p_stra->i_duration;

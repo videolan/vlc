@@ -433,10 +433,10 @@ static int Open( vlc_object_t *p_this )
         if( vsms->type == VIDEO_ES )
         {
             msg_Dbg( s, "Video stream chosen is %s", vsms->name );
+            p_sys->vstream = vsms;
             break;
         }
     }
-    p_sys->vstream = vsms;
 
     /* Choose first audio stream available */
     sms_stream_t *asms = NULL;
@@ -447,10 +447,10 @@ static int Open( vlc_object_t *p_this )
         if( asms->type == AUDIO_ES )
         {
             msg_Dbg( s, "Audio stream chosen is %s", asms->name );
+            p_sys->astream = asms;
             break;
         }
     }
-    p_sys->astream = asms;
 
     /* Choose lowest quality for the first chunks */
     quality_level_t *wanted, *qlvl;
@@ -579,7 +579,7 @@ static int sms_Read( stream_t *s, uint8_t *p_read, int i_read )
 
         if( chunk->read_pos >= (int)chunk->size )
         {
-            if( chunk->type == VIDEO_ES )
+            if( chunk->type == VIDEO_ES || !p_sys->vstream )
             {
                 vlc_mutex_lock( &p_sys->download.lock_wait );
                 p_sys->playback.toffset += chunk->duration;
