@@ -282,8 +282,10 @@ void VLCProfileSelector::updateOptions( int i )
         } else {
             HASHPICK( "video", "copy" );
             if ( ! value.isEmpty() )
-                smrl.option( "vcodec", "none" );
+                smrl.option( "vcodec", "copy" );
         }
+    } else {
+        smrl.option( "vcodec", "none" );
     }
 
     HASHPICK( "audio", "enable" );
@@ -305,8 +307,10 @@ void VLCProfileSelector::updateOptions( int i )
         } else {
             HASHPICK( "audio", "copy" );
             if ( ! value.isEmpty() )
-                smrl.option( "acodec", "none" );
+                smrl.option( "acodec", "copy" );
         }
+    } else {
+        smrl.option( "acodec", "none" );
     }
 
     HASHPICK( "subtitles", "enable" );
