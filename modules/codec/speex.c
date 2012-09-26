@@ -48,8 +48,11 @@
 static int  OpenDecoder   ( vlc_object_t * );
 static int  OpenPacketizer( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
+
+#ifdef ENABLE_SOUT
 static int OpenEncoder   ( vlc_object_t * );
 static void CloseEncoder ( vlc_object_t * );
+#endif
 
 #define ENC_CFG_PREFIX "sout-speex-"
 
@@ -102,6 +105,7 @@ vlc_module_begin ()
     set_capability( "packetizer", 100 )
     set_callbacks( OpenPacketizer, CloseDecoder )
 
+#ifdef ENABLE_SOUT
     add_submodule ()
     set_description( N_("Speex audio encoder") )
     set_capability( "encoder", 100 )
@@ -132,6 +136,7 @@ vlc_module_begin ()
                  ENC_DTX_LONGTEXT, false )
 
     /* TODO agc, noise suppression, */
+#endif
 
 vlc_module_end ()
 
@@ -194,8 +199,6 @@ static block_t *DecodePacket( decoder_t *, ogg_packet * );
 static block_t *SendPacket( decoder_t *, block_t * );
 
 static void ParseSpeexComments( decoder_t *, ogg_packet * );
-
-static block_t *Encode   ( encoder_t *, block_t * );
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -819,6 +822,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     free( p_sys );
 }
 
+#ifdef ENABLE_SOUT
 /*****************************************************************************
  * encoder_sys_t: encoder descriptor
  *****************************************************************************/
@@ -848,6 +852,8 @@ struct encoder_sys_t
     int i_samples_delay;
     int i_frame_size;
 };
+
+static block_t *Encode   ( encoder_t *, block_t * );
 
 /*****************************************************************************
  * OpenEncoder: probe the encoder and return score
@@ -1084,3 +1090,4 @@ static void CloseEncoder( vlc_object_t *p_this )
     free( p_sys->p_buffer );
     free( p_sys );
 }
+#endif
