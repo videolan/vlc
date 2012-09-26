@@ -68,7 +68,6 @@ libvlc_LTLIBRARIES += \
 	libddummy_plugin.la \
 	libdts_plugin.la \
 	libdvbsub_plugin.la \
-	libedummy_plugin.la \
 	liblpcm_plugin.la \
 	libmpeg_audio_plugin.la \
 	librawvideo_plugin.la \
@@ -76,9 +75,14 @@ libvlc_LTLIBRARIES += \
 	libsvcdsub_plugin.la \
 	libsubsdec_plugin.la \
 	libsubsusf_plugin.la \
-	libt140_plugin.la \
 	libstl_plugin.la \
 	$(NULL)
+
+if ENABLE_SOUT
+libvlc_LTLIBRARIES += \
+	libt140_plugin.la \
+	libedummy_plugin.la
+endif
 
 ### FFmpeg/libav ###
 libavcodec_plugin_la_SOURCES = \
