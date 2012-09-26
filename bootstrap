@@ -61,7 +61,7 @@ fi
 ###
 
 echo "generating modules/**/Makefile.am"
-for d in modules/*/Modules.am modules/gui/*/Modules.am; do
+for d in modules/*/Modules.am modules/*/*/Modules.am; do
 	d="${d#modules/}"
 	d="${d%/Modules.am}"
 	${CONFIG_SHELL-sh} modules/genmf "$d"
