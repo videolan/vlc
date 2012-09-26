@@ -91,9 +91,11 @@ static picture_t *DecodePacket( decoder_t *, ogg_packet * );
 static void ParseTheoraComments( decoder_t * );
 static void theora_CopyPicture( picture_t *, th_ycbcr_buffer );
 
+#ifdef ENABLE_SOUT
 static int  OpenEncoder( vlc_object_t *p_this );
 static void CloseEncoder( vlc_object_t *p_this );
 static block_t *Encode( encoder_t *p_enc, picture_t *p_pict );
+#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -118,6 +120,7 @@ vlc_module_begin ()
     set_callbacks( OpenPacketizer, CloseDecoder )
     add_shortcut( "theora" )
 
+#ifdef ENABLE_SOUT
     add_submodule ()
     set_description( N_("Theora video encoder") )
     set_capability( "encoder", 150 )
@@ -127,6 +130,7 @@ vlc_module_begin ()
 #   define ENC_CFG_PREFIX "sout-theora-"
     add_integer( ENC_CFG_PREFIX "quality", 2, ENC_QUALITY_TEXT,
                  ENC_QUALITY_LONGTEXT, false )
+#endif
 vlc_module_end ()
 
 static const char *const ppsz_enc_options[] = {
@@ -598,6 +602,7 @@ static void theora_CopyPicture( picture_t *p_pic,
     }
 }
 
+#ifdef ENABLE_SOUT
 /*****************************************************************************
  * encoder_sys_t : theora encoder descriptor
  *****************************************************************************/
@@ -871,3 +876,4 @@ static void CloseEncoder( vlc_object_t *p_this )
     p_sys->tcx = NULL;
     free( p_sys );
 }
+#endif
