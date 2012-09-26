@@ -93,8 +93,10 @@ static const int pi_channels_maps[9] =
 static int  OpenDecoder   ( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 
+#ifdef ENABLE_SOUT
 static int OpenEncoder   ( vlc_object_t * );
 static void CloseEncoder ( vlc_object_t * );
+#endif
 
 static block_t *DecodeBlock( decoder_t *, block_t ** );
 
@@ -111,11 +113,13 @@ vlc_module_begin ()
     set_capability( "decoder", 100 )
     set_callbacks( OpenDecoder, CloseDecoder )
 
+#ifdef ENABLE_SOUT
     add_submodule ()
     add_shortcut( "flac" )
     set_description( N_("Flac audio encoder") )
     set_capability( "encoder", 100 )
     set_callbacks( OpenEncoder, CloseEncoder )
+#endif
 
 vlc_module_end ()
 
@@ -568,6 +572,8 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     return p_sys->p_aout_buffer;
 }
 
+#ifdef ENABLE_SOUT
+
 /*****************************************************************************
  * encoder_sys_t : flac encoder descriptor
  *****************************************************************************/
@@ -790,3 +796,4 @@ static void CloseEncoder( vlc_object_t *p_this )
     free( p_sys->p_buffer );
     free( p_sys );
 }
+#endif
