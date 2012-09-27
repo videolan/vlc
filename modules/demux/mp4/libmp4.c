@@ -514,9 +514,7 @@ static int MP4_ReadBox_stra( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET4BYTES( p_stra->SamplingRate );
     MP4_GET4BYTES( p_stra->Channels );
     MP4_GET4BYTES( p_stra->BitsPerSample );
-    MP4_GET4BYTES( p_stra->PacketSize );
     MP4_GET4BYTES( p_stra->AudioTag );
-    MP4_GET4BYTES( p_stra->AvgBytesPerSec );
     MP4_GET2BYTES( p_stra->nBlockAlign );
 
     MP4_GET1BYTE( i_reserved );

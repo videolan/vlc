@@ -247,6 +247,8 @@ static int parse_Manifest( stream_t *s )
                             ql->Index = strtol( value, NULL, 10 );
                         if( !strcmp( name, "Bitrate" ) )
                             ql->Bitrate = strtoull( value, NULL, 10 );
+                        if( !strcmp( name, "PacketSize" ) )
+                            ql->nBlockAlign = strtoull( value, NULL, 10 );
                         if( !strcmp( name, "FourCC" ) )
                             ql->FourCC = VLC_FOURCC( value[0], value[1],
                                                      value[2], value[3] );
@@ -263,7 +265,6 @@ static int parse_Manifest( stream_t *s )
 
                             ql->Channels = ((uint16_t *)WaveFormatEx)[1];
                             ql->SamplingRate = ((uint32_t *)WaveFormatEx)[1];
-                            ql->AvgBytesPerSec = ((uint32_t *)WaveFormatEx)[2];
                             ql->nBlockAlign = ((uint16_t *)WaveFormatEx)[6];
                             ql->BitsPerSample = ((uint16_t *)WaveFormatEx)[7];
                             free( WaveFormatEx );

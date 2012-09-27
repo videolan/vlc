@@ -3207,7 +3207,7 @@ static int MP4_frg_TrackCreate( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_
             fmt->audio.i_bitspersample = p_data->BitsPerSample;
             fmt->audio.i_blockalign = p_data->nBlockAlign;
 
-            fmt->i_bitrate = p_data->AvgBytesPerSec * 8;
+            fmt->i_bitrate = p_data->Bitrate;
 
             ret = MP4_SetCodecExtraData( fmt, p_data );
             if( ret != VLC_SUCCESS )

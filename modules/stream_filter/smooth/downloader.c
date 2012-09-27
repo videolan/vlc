@@ -277,8 +277,8 @@ static int get_new_chunks( stream_t *s, chunk_t *ck )
     return VLC_SUCCESS;
 }
 
-#define STRA_SIZE 342
-#define SMOO_SIZE (STRA_SIZE * 3 + 24) /* 1050 */
+#define STRA_SIZE 334
+#define SMOO_SIZE (STRA_SIZE * 3 + 24) /* 1026 */
 
 /* SmooBox is a very simple MP4 box, used only to pass information
  * to the demux layer. As this box is not aimed to travel accross networks,
@@ -356,16 +356,14 @@ static int build_smoo_box( stream_t *s, uint8_t *smoo_box )
         ((uint32_t *)stra_box)[20] = bswap32( qlvl->SamplingRate );
         ((uint32_t *)stra_box)[21] = bswap32( qlvl->Channels );
         ((uint32_t *)stra_box)[22] = bswap32( qlvl->BitsPerSample );
-        ((uint32_t *)stra_box)[23] = bswap32( qlvl->PacketSize );
-        ((uint32_t *)stra_box)[24] = bswap32( qlvl->AudioTag );
-        ((uint32_t *)stra_box)[25] = bswap32( qlvl->AvgBytesPerSec );
-        ((uint16_t *)stra_box)[52] = bswap16( qlvl->nBlockAlign );
+        ((uint32_t *)stra_box)[23] = bswap32( qlvl->AudioTag );
+        ((uint16_t *)stra_box)[48] = bswap16( qlvl->nBlockAlign );
 
-        stra_box[106] = stra_box[107] = stra_box[108] = 0; /* reserved */
+        stra_box[98] = stra_box[99] = stra_box[100] = 0; /* reserved */
         assert( strlen( qlvl->CodecPrivateData ) < 512 );
-        stra_box[109] = strlen( qlvl->CodecPrivateData ) / 2;
+        stra_box[101] = strlen( qlvl->CodecPrivateData ) / 2;
         uint8_t *binary_cpd = decode_string_hex_to_binary( qlvl->CodecPrivateData );
-        memcpy( stra_box + 110, binary_cpd, stra_box[109] );
+        memcpy( stra_box + 102, binary_cpd, stra_box[101] );
         free( binary_cpd );
     }
 

@@ -1140,10 +1140,8 @@ typedef struct
     uint32_t MaxWidth;
     uint32_t MaxHeight;
     uint32_t SamplingRate;
-    uint32_t AvgBytesPerSec;
     uint32_t Channels;
     uint32_t BitsPerSample;
-    uint32_t PacketSize;
     uint32_t AudioTag;
     uint16_t nBlockAlign;
     uint8_t  cpd_len;

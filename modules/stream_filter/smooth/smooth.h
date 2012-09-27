@@ -60,10 +60,8 @@ typedef struct quality_level_s
     unsigned        MaxWidth;
     unsigned        MaxHeight;
     unsigned        SamplingRate;
-    unsigned        AvgBytesPerSec;
     unsigned        Channels;
     unsigned        BitsPerSample;
-    unsigned        PacketSize;
     unsigned        AudioTag;
     unsigned        nBlockAlign;
     unsigned        id;
