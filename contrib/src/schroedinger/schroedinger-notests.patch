@@ -15,7 +15,7 @@
  
  AM_CFLAGS = $(SCHRO_CFLAGS) $(ERROR_CFLAGS) \
 -	$(ORC_CFLAGS) \
-+	-L$(PREFIX)/lib $(ORC_CFLAGS) \
++	-L$(prefix)/lib $(ORC_CFLAGS) \
  	-DSCHRO_ENABLE_UNSTABLE_API
  LDADD = $(SCHRO_LIBS)
  
