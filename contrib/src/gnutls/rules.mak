@@ -1,6 +1,6 @@
 # GnuTLS
 
-GNUTLS_VERSION := 2.12.7
+GNUTLS_VERSION := 2.12.20
 GNUTLS_URL := http://ftp.gnu.org/pub/gnu/gnutls/gnutls-$(GNUTLS_VERSION).tar.bz2
 
 PKGS += gnutls
@@ -28,6 +28,7 @@ endif
 
 GNUTLS_CONF := \
 	--disable-gtk-doc \
+	--without-p11-kit \
 	--disable-cxx \
 	--disable-srp-authentication \
 	--disable-psk-authentication-FIXME \
