@@ -1,6 +1,6 @@
 # tiff
 
-TIFF_VERSION := 4.0.2
+TIFF_VERSION := 4.0.3
 TIFF_URL := http://download.osgeo.org/libtiff/tiff-$(TIFF_VERSION).tar.gz
 
 $(TARBALLS)/tiff-$(TIFF_VERSION).tar.gz:
