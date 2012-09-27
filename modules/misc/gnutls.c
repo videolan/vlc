@@ -47,11 +47,9 @@
 #include <vlc_fs.h>
 #include <vlc_block.h>
 
-#include <gcrypt.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
-#include <vlc_gcrypt.h>
 #include "dhparams.h"
 
 #include <assert.h>
@@ -112,8 +110,6 @@ static vlc_mutex_t gnutls_mutex = VLC_STATIC_MUTEX;
 static int gnutls_Init (vlc_object_t *p_this)
 {
     int ret = VLC_EGENERIC;
-
-    vlc_gcrypt_init (); /* GnuTLS depends on gcrypt */
 
     vlc_mutex_lock (&gnutls_mutex);
     if (gnutls_global_init ())

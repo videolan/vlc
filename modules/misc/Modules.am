@@ -13,8 +13,8 @@ libexport_plugin_la_LIBADD = $(AM_LIBADD)
 libvlc_LTLIBRARIES += libexport_plugin.la
 
 libgnutls_plugin_la_SOURCES = gnutls.c dhparams.h
-libgnutls_plugin_la_CFLAGS = $(AM_CFLAGS) $(GNUTLS_CFLAGS) $(GCRYPT_CFLAGS)
-libgnutls_plugin_la_LIBADD = $(AM_LIBADD) $(GNUTLS_LIBS) $(GCRYPT_LIBS)
+libgnutls_plugin_la_CFLAGS = $(AM_CFLAGS) $(GNUTLS_CFLAGS)
+libgnutls_plugin_la_LIBADD = $(AM_LIBADD) $(GNUTLS_LIBS)
 if HAVE_WIN32
 libgnutls_plugin_la_LIBADD += -lcrypt32 $(SOCKET_LIBS)
 endif
