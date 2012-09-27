@@ -32,9 +32,7 @@
 
 #include <sys/stat.h>
 #ifdef WIN32
-# include <windows.h>
 # include <io.h>
-# include <wincrypt.h>
 #else
 # include <unistd.h>
 #endif
@@ -49,6 +47,10 @@
 
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
+#if (GNUTLS_VERSION_NUMBER < 0x030014)
+# define gnutls_certificate_set_x509_system_trust(c) \
+    (c, GNUTLS_E_UNIMPLEMENTED_FEATURE)
+#endif
 
 #include "dhparams.h"
 
@@ -459,36 +461,6 @@ static void gnutls_x509_AddPath (vlc_object_t *obj,
 
     gnutls_x509_AddFD (obj, cred, fd, priv, 5);
 }
-#else /* WIN32 */
-static int
-gnutls_loadOSCAList (vlc_object_t *p_this,
-                     gnutls_certificate_credentials cred)
-{
-    HCERTSTORE hCertStore = CertOpenSystemStoreA((HCRYPTPROV)NULL, "ROOT");
-    if (!hCertStore)
-    {
-        msg_Warn (p_this, "could not open the Cert SystemStore");
-        return VLC_EGENERIC;
-    }
-
-    PCCERT_CONTEXT pCertContext = CertEnumCertificatesInStore(hCertStore, NULL);
-    while( pCertContext )
-    {
-        gnutls_datum data = {
-            .data = pCertContext->pbCertEncoded,
-            .size = pCertContext->cbCertEncoded,
-        };
-
-        if(!gnutls_certificate_set_x509_trust_mem(cred, &data, GNUTLS_X509_FMT_DER))
-        {
-            msg_Warn (p_this, "cannot add x509 credential");
-            return VLC_EGENERIC;
-        }
-
-        pCertContext = CertEnumCertificatesInStore(hCertStore, pCertContext);
-    }
-    return VLC_SUCCESS;
-}
 #endif /* WIN32 */
 
 /**
@@ -520,6 +492,13 @@ static int OpenClient (vlc_tls_t *session, int fd, const char *hostname)
         goto error;
     }
 
+    val = gnutls_certificate_set_x509_system_trust (sys->x509_cred);
+    if (val < 0)
+        msg_Err (session, "cannot load trusted Certificate Authorities: %s",
+                 gnutls_strerror (val));
+    else
+        msg_Dbg (session, "loaded %d trusted CAs", val);
+
 #ifndef WIN32
     char *userdir = config_GetUserDir (VLC_DATA_DIR);
     if (userdir != NULL)
@@ -534,16 +513,6 @@ static int OpenClient (vlc_tls_t *session, int fd, const char *hostname)
         gnutls_x509_AddPath (VLC_OBJECT(session), sys->x509_cred, path, true);
         free (userdir);
     }
-
-    const char *confdir = config_GetConfDir ();
-    {
-        char path[strlen (confdir)
-                   + sizeof ("/ssl/certs/ca-certificates.crt")];
-        sprintf (path, "%s/ssl/certs/ca-certificates.crt", confdir);
-        gnutls_x509_AddPath (VLC_OBJECT(session), sys->x509_cred, path, false);
-    }
-#else /* WIN32 */
-    gnutls_loadOSCAList (VLC_OBJECT(session), sys->x509_cred);
 #endif
     gnutls_certificate_set_verify_flags (sys->x509_cred,
                                          GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
