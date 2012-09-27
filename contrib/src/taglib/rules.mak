@@ -1,6 +1,6 @@
 # TagLib
 
-TAGLIB_VERSION := 1.7.2
+TAGLIB_VERSION := 1.8
 TAGLIB_URL := https://github.com/downloads/taglib/taglib/taglib-$(TAGLIB_VERSION).tar.gz
 
 PKGS += taglib
@@ -12,12 +12,7 @@ $(TARBALLS)/taglib-$(TAGLIB_VERSION).tar.gz:
 
 taglib: taglib-$(TAGLIB_VERSION).tar.gz .sum-taglib
 	$(UNPACK)
-	$(APPLY) $(SRC)/taglib/taglib-static.patch
-	$(APPLY) $(SRC)/taglib/no-ansi.patch
-	$(APPLY) $(SRC)/taglib/7036.patch
-ifdef HAVE_WIN32
-	$(APPLY) $(SRC)/taglib/taglib-win32.patch
-endif
+	$(APPLY) $(SRC)/taglib/taglib-pc.patch
 	$(MOVE)
 
 .taglib: taglib toolchain.cmake
