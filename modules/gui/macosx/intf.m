@@ -1304,12 +1304,21 @@ static VLCMain *_o_sharedMainInstance = nil;
         if (state == PLAYING_S) {
             /* prevent the system from sleeping */
             IOReturn success;
-            CFStringRef reasonForActivity= CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
-            if ([self activeVideoPlayback])
-                success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
-            else
-                success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
-            CFRelease(reasonForActivity);
+            /* work-around a bug in 10.7.4 and 10.7.5, so check for 10.7.x < 10.7.4, 10.8 and 10.6 */
+            if ((NSAppKitVersionNumber >= 1115.2 && NSAppKitVersionNumber < 1138.45) || OSX_MOUNTAIN_LION || OSX_SNOW_LEOPARD) {
+                CFStringRef reasonForActivity= CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
+                if ([self activeVideoPlayback])
+                    success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
+                else
+                    success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
+                CFRelease(reasonForActivity);
+            } else {
+                /* fall-back on the 10.5 mode, which also works on 10.7.4 and 10.7.5 */
+                if ([self activeVideoPlayback])
+                    success = IOPMAssertionCreate(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, &systemSleepAssertionID);
+                else
+                    success = IOPMAssertionCreate(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, &systemSleepAssertionID);
+            }
 
             if (success == kIOReturnSuccess)
                 msg_Dbg(VLCIntf, "prevented sleep through IOKit (%i)", systemSleepAssertionID);
