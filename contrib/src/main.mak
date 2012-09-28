@@ -348,7 +348,8 @@ vlc-contrib-$(HOST)-latest.tar.bz2:
 	$(call download,$(PREBUILT_URL))
 
 prebuilt: vlc-contrib-$(HOST)-latest.tar.bz2
-	$(UNPACK) && mv $(HOST) $(TOPDST)
+	-$(UNPACK)
+	mv $(HOST) $(TOPDST)
 	cd $(TOPDST)/$(HOST) && $(SRC)/change_prefix.sh
 
 package: install
