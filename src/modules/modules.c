@@ -199,8 +199,6 @@ module_t *vlc_module_load(vlc_object_t *p_this, const char *psz_capability,
                           const char *psz_name, bool b_strict,
                           vlc_activate_t probe, ...)
 {
-    module_list_t *p_list;
-    module_t *p_module;
     int i_shortcuts = 0;
     char *psz_shortcuts = NULL, *psz_var = NULL, *psz_alias = NULL;
     bool b_force_backup = p_this->b_force;
@@ -250,14 +248,14 @@ module_t *vlc_module_load(vlc_object_t *p_this, const char *psz_capability,
     }
 
     /* Sort the modules and test them */
-    size_t count;
-    module_t **p_all = module_list_get (&count);
-    p_list = xmalloc( count * sizeof( module_list_t ) );
+    size_t total, match = 0;
+    module_t **p_all = module_list_get (&total);
+    module_list_t *p_list = xmalloc( total * sizeof( module_list_t ) );
 
     /* Parse the module list for capabilities and probe each of them */
-    count = 0;
-    for (size_t i = 0; (p_module = p_all[i]) != NULL; i++)
+    for (size_t i = 0; i < total; i++)
     {
+        module_t *p_module = p_all[i];
         int i_shortcut_bonus = 0;
 
         /* Test that this module can do what we need */
@@ -304,27 +302,34 @@ module_t *vlc_module_load(vlc_object_t *p_this, const char *psz_capability,
 
 found_shortcut:
         /* Store this new module */
-        p_list[count].p_module = p_module;
-        p_list[count].i_score = p_module->i_score + i_shortcut_bonus;
-        p_list[count].b_force = i_shortcut_bonus && b_strict;
-        count++;
+        p_list[match].p_module = p_module;
+        p_list[match].i_score = p_module->i_score + i_shortcut_bonus;
+        p_list[match].b_force = i_shortcut_bonus && b_strict;
+        match++;
     }
 
     /* We can release the list, interesting modules are held */
     module_list_free (p_all);
 
+    if( match == 0 )
+    {
+        msg_Dbg( p_this, "no %s module matched \"%s\"",
+                 psz_capability, (psz_name && *psz_name) ? psz_name : "any" );
+        return NULL; // shortcut
+    }
+
     /* Sort candidates by descending score */
-    qsort (p_list, count, sizeof (p_list[0]), modulecmp);
+    qsort (p_list, match, sizeof (p_list[0]), modulecmp);
     msg_Dbg( p_this, "looking for %s module: %zu candidate%s", psz_capability,
-             count, count == 1 ? "" : "s" );
+             match, match == 1 ? "" : "s" );
 
     /* Parse the linked list and use the first successful module */
+    module_t *p_module = NULL;
     va_list args;
 
     va_start(args, probe);
-    p_module = NULL;
 
-    for (size_t i = 0; (i < count) && (p_module == NULL); i++)
+    for (size_t i = 0; (i < match) && (p_module == NULL); i++)
     {
         module_t *p_cand = p_list[i].p_module;
 
@@ -372,9 +377,6 @@ found_shortcut:
         vlc_object_set_name( p_this, psz_alias ? psz_alias
                                                : module_get_object(p_module) );
     }
-    else if( count == 0 )
-        msg_Dbg( p_this, "no %s module matched \"%s\"",
-                 psz_capability, (psz_name && *psz_name) ? psz_name : "any" );
     else
         msg_Dbg( p_this, "no %s module matching \"%s\" could be loaded",
                   psz_capability, (psz_name && *psz_name) ? psz_name : "any" );
@@ -443,22 +445,25 @@ void module_unneed(vlc_object_t *obj, module_t *module)
  */
 module_t *module_find (const char *name)
 {
-    module_t **list, *module;
+    size_t count;
+    module_t **list = module_list_get (&count);
 
     assert (name != NULL);
-    list = module_list_get (NULL);
-    if (!list)
-        return NULL;
 
-    for (size_t i = 0; (module = list[i]) != NULL; i++)
+    for (size_t i = 0; i < count; i++)
     {
+        module_t *module = list[i];
+
         if (unlikely(module->i_shortcuts == 0))
             continue;
         if (!strcmp (module->pp_shortcuts[0], name))
-            break;
+        {
+            module_list_free (list);
+            return module;
+        }
     }
     module_list_free (list);
-    return module;
+    return NULL;
 }
 
 /**
@@ -483,19 +488,22 @@ bool module_exists (const char * psz_name)
  */
 module_t *module_find_by_shortcut (const char *psz_shortcut)
 {
-    module_t **list, *module;
+    size_t count;
+    module_t **list = module_list_get (&count);
 
-    list = module_list_get (NULL);
-    if (!list)
-        return NULL;
+    for (size_t i = 0; i < count; i++)
+    {
+        module_t *module = list[count];
 
-    for (size_t i = 0; (module = list[i]) != NULL; i++)
         for (size_t j = 0; j < module->i_shortcuts; j++)
             if (!strcmp (module->pp_shortcuts[j], psz_shortcut))
-                goto out;
-out:
+            {
+                module_list_free (list);
+                return module;
+            }
+    }
     module_list_free (list);
-    return module;
+    return NULL;
 }
 
 /**

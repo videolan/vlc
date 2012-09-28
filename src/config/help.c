@@ -293,9 +293,8 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
     }
 
     /* List all modules */
-    module_t **list = module_list_get (NULL);
-    if (!list)
-        return;
+    size_t count;
+    module_t **list = module_list_get (&count);
 
     /* Ugly hack to make sure that the help options always come first
      * (part 1) */
@@ -303,14 +302,14 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
         Usage( p_this, "help" );
 
     /* Enumerate the config for each module */
-    for (size_t i = 0; list[i]; i++)
+    for (size_t i = 0; i < count; i++)
     {
-        bool b_help_module;
         module_t *p_parser = list[i];
         module_config_t *p_item = NULL;
         module_config_t *p_section = NULL;
         module_config_t *p_end = p_parser->p_config + p_parser->confsize;
         const char *objname = module_get_object (p_parser);
+        bool b_help_module;
 
         if( psz_search &&
             ( b_strict ? strcmp( objname, psz_search )
@@ -722,8 +721,6 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
  *****************************************************************************/
 static void ListModules (vlc_object_t *p_this, bool b_verbose)
 {
-    module_t *p_parser;
-
     bool b_color = var_InheritBool( p_this, "color" );
 
     ShowConsole();
@@ -735,11 +732,13 @@ static void ListModules (vlc_object_t *p_this, bool b_verbose)
 #endif
 
     /* List all modules */
-    module_t **list = module_list_get (NULL);
+    size_t count;
+    module_t **list = module_list_get (&count);
 
     /* Enumerate each module */
-    for (size_t j = 0; (p_parser = list[j]) != NULL; j++)
+    for (size_t j = 0; j < count; j++)
     {
+        module_t *p_parser = list[j];
         const char *objname = module_get_object (p_parser);
         if( b_color )
             utf8_fprintf( stdout, GREEN"  %-22s "WHITE"%s\n"GRAY, objname,

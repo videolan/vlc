@@ -191,13 +191,13 @@ void libvlc_free( void *ptr )
 static libvlc_module_description_t *module_description_list_get(
                 libvlc_instance_t *p_instance, const char *capability )
 {
-    VLC_UNUSED( p_instance );
     libvlc_module_description_t *p_list = NULL,
                           *p_actual = NULL,
                           *p_previous = NULL;
-    module_t **module_list = module_list_get( NULL );
+    size_t count;
+    module_t **module_list = module_list_get( &count );
 
-    for (size_t i = 0; module_list[i]; i++)
+    for (size_t i = 0; i < count; i++)
     {
         module_t *p_module = module_list[i];
 
@@ -232,6 +232,7 @@ static libvlc_module_description_t *module_description_list_get(
     }
 
     module_list_free( module_list );
+    VLC_UNUSED( p_instance );
     return p_list;
 }
 

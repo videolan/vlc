@@ -425,10 +425,11 @@ int config_SaveConfigFile (vlc_object_t *p_this)
     vlc_rwlock_rdlock (&config_lock);*/
 
     /* Look for the selected module, if NULL then save everything */
-    module_t **list = module_list_get (NULL);
-    module_t *p_parser;
-    for (int i = 0; (p_parser = list[i]) != NULL; i++)
+    size_t count;
+    module_t **list = module_list_get (&count);
+    for (size_t i = 0; i < count; i++)
     {
+        module_t *p_parser = list[i];
         module_config_t *p_item, *p_end;
 
         if( !p_parser->i_config_items )

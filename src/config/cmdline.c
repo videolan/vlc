@@ -59,7 +59,6 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                         const char *ppsz_argv[], int *pindex )
 {
     int i_cmd, i_index, i_opts, i_shortopts, flag, i_verbose = 0;
-    module_t *p_parser;
     struct vlc_option *p_longopts;
     const char **argv_copy = NULL;
 #define b_ignore_errors (pindex == NULL)
@@ -69,18 +68,23 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
     char *psz_shortopts;
 
     /* List all modules */
-    module_t **list = module_list_get (NULL);
+    size_t count;
+    module_t **list = module_list_get (&count);
 
     /*
      * Generate the longopts and shortopts structures used by getopt_long
      */
 
     i_opts = 0;
-    for (size_t i = 0; (p_parser = list[i]) != NULL; i++)
+    for (size_t i = 0; i < count; i++)
+    {
         /* count the number of exported configuration options (to allocate
          * longopts). We also need to allocate space for two options when
          * dealing with boolean to allow for --foo and --no-foo */
+        module_t *p_parser = list[i];
+
         i_opts += p_parser->i_config_items + 2 * p_parser->i_bool_items;
+    }
 
     p_longopts = malloc( sizeof(*p_longopts) * (i_opts + 1) );
     if( p_longopts == NULL )
@@ -122,8 +126,9 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
 
     /* Fill the p_longopts and psz_shortopts structures */
     i_index = 0;
-    for (size_t i = 0; (p_parser = list[i]) != NULL; i++)
+    for (size_t i = 0; i < count; i++)
     {
+        module_t *p_parser = list[i];
         module_config_t *p_item, *p_end;
 
         if( !p_parser->i_config_items )

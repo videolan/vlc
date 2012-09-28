@@ -440,15 +440,16 @@ void VLCProfileEditor::loadCapabilities()
 {
     size_t count;
     module_t **p_all = module_list_get (&count);
-    module_t *p_module;
 
     /* Parse the module list for capabilities and probe each of them */
-    for (size_t i = 0; (p_module = p_all[i]) != NULL; i++)
+    for (size_t i = 0; i < count; i++)
     {
-            if( module_provides( p_module, "sout mux" ) )
-                caps["muxers"].insert( module_get_object( p_module ) );
-//            else if ( module_provides( p_module, "encoder" ) )
-//                caps["encoders"].insert( module_get_object( p_module ) );
+         module_t *p_module = p_all[i];
+
+         if( module_provides( p_module, "sout mux" ) )
+             caps["muxers"].insert( module_get_object( p_module ) );
+//        else if ( module_provides( p_module, "encoder" ) )
+//            caps["encoders"].insert( module_get_object( p_module ) );
     }
     module_list_free (p_all);
 }

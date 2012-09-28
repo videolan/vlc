@@ -452,12 +452,9 @@ static struct
  */
 int config_SortConfig (void)
 {
-    size_t nmod;
+    size_t nmod, nconf = 0;
     module_t **mlist = module_list_get (&nmod);
-    if (unlikely(mlist == NULL))
-        return VLC_ENOMEM;
 
-    size_t nconf = 0;
     for (size_t i = 0; i < nmod; i++)
          nconf  += mlist[i]->confsize;
 
@@ -568,12 +565,14 @@ void config_Free (module_config_t *config, size_t confsize)
  *****************************************************************************/
 void config_ResetAll( vlc_object_t *p_this )
 {
-    VLC_UNUSED(p_this);
-    module_t *p_module;
-    module_t **list = module_list_get (NULL);
+    size_t count;
+    module_t **list = module_list_get (&count);
 
     vlc_rwlock_wrlock (&config_lock);
-    for (size_t j = 0; (p_module = list[j]) != NULL; j++)
+    for (size_t j = 0; j < count; j++)
+    {
+        module_t *p_module = list[j];
+
         for (size_t i = 0; i < p_module->confsize; i++ )
         {
             module_config_t *p_config = p_module->p_config + i;
@@ -591,7 +590,9 @@ void config_ResetAll( vlc_object_t *p_this )
                         strdupnull (p_config->orig.psz);
             }
         }
+    }
     vlc_rwlock_unlock (&config_lock);
 
     module_list_free (list);
+    VLC_UNUSED(p_this);
 }

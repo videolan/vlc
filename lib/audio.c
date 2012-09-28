@@ -67,11 +67,11 @@ static audio_output_t *GetAOut( libvlc_media_player_t *mp )
 libvlc_audio_output_t *
         libvlc_audio_output_list_get( libvlc_instance_t *p_instance )
 {
-    VLC_UNUSED( p_instance );
+    size_t count;
+    module_t **module_list = module_list_get( &count );
     libvlc_audio_output_t *list = NULL;
-    module_t **module_list = module_list_get( NULL );
 
-    for (size_t i = 0; module_list[i]; i++)
+    for (size_t i = 0; i < count; i++)
     {
         module_t *module = module_list[i];
 
@@ -100,6 +100,7 @@ libvlc_audio_output_t *
     }
     module_list_free( module_list );
 
+    VLC_UNUSED( p_instance );
     return list;
 }
 

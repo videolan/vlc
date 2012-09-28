@@ -130,11 +130,13 @@ PluginTab::PluginTab( intf_thread_t *p_intf_ )
 
 inline void PluginTab::FillTree()
 {
-    module_t **p_list = module_list_get( NULL );
-    module_t *p_module;
+    size_t count;
+    module_t **p_list = module_list_get( &count );
 
-    for( unsigned int i = 0; (p_module = p_list[i] ) != NULL; i++ )
+    for( unsigned int i = 0; i < count; i++ )
     {
+        module_t *p_module = p_list[i];
+
         QStringList qs_item;
         qs_item << qfu( module_get_name( p_module, true ) )
                 << qfu( module_get_capability( p_module ) )

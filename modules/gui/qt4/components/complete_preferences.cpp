@@ -193,11 +193,12 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     }
     module_config_free( p_config );
 
-
-    module_t **p_list = module_list_get( NULL );
+    size_t count;
+    module_t **p_list = module_list_get( &count );
     /* Build the tree of plugins */
-    for( size_t i = 0; (p_module = p_list[i]) != NULL; i++ )
+    for( size_t i = 0; i < count; i++ )
     {
+        p_module = p_list[i];
         // Main module excluded
         if( module_is_main( p_module) ) continue;
 

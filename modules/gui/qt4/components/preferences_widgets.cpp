@@ -535,15 +535,16 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
 
 void ModuleConfigControl::finish( bool bycat )
 {
-    module_t *p_parser;
-
     combo->setEditable( false );
 
     /* build a list of available modules */
-    module_t **p_list = module_list_get( NULL );
+    size_t count;
+    module_t **p_list = module_list_get( &count );
     combo->addItem( qtr("Default") );
-    for( size_t i = 0; (p_parser = p_list[i]) != NULL; i++ )
+    for( size_t i = 0; i < count; i++ )
     {
+        module_t *p_parser = p_list[i];
+
         if( bycat )
         {
             if( !strcmp( module_get_object( p_parser ), "main" ) ) continue;
@@ -661,12 +662,13 @@ void ModuleListConfigControl::checkbox_lists( QString label, QString help, const
 
 void ModuleListConfigControl::finish( bool bycat )
 {
-    module_t *p_parser;
-
     /* build a list of available modules */
-    module_t **p_list = module_list_get( NULL );
-    for( size_t i = 0; (p_parser = p_list[i]) != NULL; i++ )
+    size_t count;
+    module_t **p_list = module_list_get( &count );
+    for( size_t i = 0; i < count; i++ )
     {
+        module_t *p_parser = p_list[i];
+
         if( bycat )
         {
             if( !strcmp( module_get_object( p_parser ), "main" ) ) continue;

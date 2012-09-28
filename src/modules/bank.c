@@ -211,9 +211,9 @@ void module_list_free (module_t **list)
 
 /**
  * Gets the flat list of VLC modules.
- * @param n [OUT] pointer to the number of modules or NULL
- * @return NULL-terminated table of module pointers
- *         (release with module_list_free()), or NULL in case of error.
+ * @param n [OUT] pointer to the number of modules
+ * @return table of module pointers (release with module_list_free()),
+ *         or NULL in case of error (in that case, *n is zeroed).
  */
 module_t **module_list_get (size_t *n)
 {
@@ -222,13 +222,16 @@ module_t **module_list_get (size_t *n)
     module_t **tab = NULL;
     size_t i = 0;
 
+    assert (n != NULL);
+
     for (module_t *mod = modules.head; mod; mod = mod->next)
     {
          module_t **nt;
-         nt  = realloc (tab, (i + 2 + mod->submodule_count) * sizeof (*tab));
-         if (nt == NULL)
+         nt  = realloc (tab, (i + 1 + mod->submodule_count) * sizeof (*tab));
+         if (unlikely(nt == NULL))
          {
-             module_list_free (tab);
+             free (tab);
+             *n = 0;
              return NULL;
          }
 
@@ -236,10 +239,8 @@ module_t **module_list_get (size_t *n)
          tab[i++] = mod;
          for (module_t *subm = mod->submodule; subm; subm = subm->next)
              tab[i++] = subm;
-         tab[i] = NULL;
     }
-    if (n != NULL)
-        *n = i;
+    *n = i;
     return tab;
 }
 
