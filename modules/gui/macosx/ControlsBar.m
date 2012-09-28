@@ -136,7 +136,7 @@
     if (!OSX_SNOW_LEOPARD)
         [o_resize_view setImage: NULL];
 
-    if ([o_associated_window styleMask] & NSResizableWindowMask)
+    if ([[o_bottombar_view window] styleMask] & NSResizableWindowMask)
         [o_resize_view removeFromSuperviewWithoutNeedingDisplay];
 
 }

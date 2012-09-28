@@ -36,8 +36,6 @@
 
 @interface VLCControlsBarCommon : NSObject
 {
-    IBOutlet id o_associated_window;
-    
     IBOutlet id o_bottombar_view;
 
     IBOutlet id o_play_btn;

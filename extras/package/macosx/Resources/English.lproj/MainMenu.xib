@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">12B19</string>
+    <string key="IBDocument.SystemVersion">12C54</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1187</string>
-    <string key="IBDocument.HIToolboxVersion">624.00</string>
+    <string key="IBDocument.AppKitVersion">1187.34</string>
+    <string key="IBDocument.HIToolboxVersion">625.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <object class="NSArray" key="dict.sortedKeys">
@@ -21,10 +21,10 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
+      <integer value="4596"/>
       <integer value="4948"/>
       <integer value="5248"/>
       <integer value="21"/>
-      <integer value="4596"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -8406,14 +8406,6 @@ LCAuLi4</string>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
-            <string key="label">o_associated_window</string>
-            <reference key="source" ref="878580547"/>
-            <reference key="destination" ref="498338108"/>
-          </object>
-          <int key="connectionID">5365</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
             <string key="label">o_progress_view</string>
             <reference key="source" ref="878580547"/>
             <reference key="destination" ref="271396113"/>
@@ -8475,14 +8467,6 @@ LCAuLi4</string>
             <reference key="destination" ref="573738745"/>
           </object>
           <int key="connectionID">5374</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_associated_window</string>
-            <reference key="source" ref="573738745"/>
-            <reference key="destination" ref="429979276"/>
-          </object>
-          <int key="connectionID">5375</int>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
@@ -14385,7 +14369,6 @@ LCAuLi4</string>
             <bool key="EncodedWithXMLCoder">YES</bool>
             <object class="NSArray" key="dict.sortedKeys">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>o_associated_window</string>
               <string>o_bottombar_view</string>
               <string>o_bwd_btn</string>
               <string>o_fullscreen_btn</string>
@@ -14401,7 +14384,6 @@ LCAuLi4</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -14420,7 +14402,6 @@ LCAuLi4</string>
             <bool key="EncodedWithXMLCoder">YES</bool>
             <object class="NSArray" key="dict.sortedKeys">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>o_associated_window</string>
               <string>o_bottombar_view</string>
               <string>o_bwd_btn</string>
               <string>o_fullscreen_btn</string>
@@ -14436,10 +14417,6 @@ LCAuLi4</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_associated_window</string>
-                <string key="candidateClassName">id</string>
-              </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_bottombar_view</string>
                 <string key="candidateClassName">id</string>
@@ -16996,7 +16973,7 @@ LCAuLi4</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>id</string>
+              <string>VLCControlsBarCommon</string>
               <string>id</string>
             </object>
           </object>
@@ -17011,7 +16988,7 @@ LCAuLi4</string>
               <bool key="EncodedWithXMLCoder">YES</bool>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_controls_bar</string>
-                <string key="candidateClassName">id</string>
+                <string key="candidateClassName">VLCControlsBarCommon</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_titlebar_view</string>
