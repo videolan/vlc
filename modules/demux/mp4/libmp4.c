@@ -3610,6 +3610,7 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *s )
         return p_root;
 
     p_root->i_size = stream_Size( s );
+    stream_Seek( p_stream, 0 );
     /* Get the rest of the file */
     i_result = MP4_ReadBoxContainerRaw( p_stream, p_root );
 
