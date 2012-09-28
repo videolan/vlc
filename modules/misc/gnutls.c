@@ -27,22 +27,11 @@
 #endif
 
 #include <errno.h>
-#include <sys/types.h>
-#include <errno.h>
-
-#include <sys/stat.h>
-#ifdef WIN32
-# include <io.h>
-#else
-# include <unistd.h>
-#endif
-#include <fcntl.h>
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_tls.h>
-#include <vlc_charset.h>
-#include <vlc_fs.h>
 #include <vlc_block.h>
 
 #include <gnutls/gnutls.h>
@@ -53,8 +42,6 @@
 #endif
 
 #include "dhparams.h"
-
-#include <assert.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -379,90 +366,6 @@ gnutls_SessionPrioritize (vlc_object_t *obj, gnutls_session_t session)
     return val;
 }
 
-#ifndef WIN32
-/**
- * Loads x509 credentials from a file descriptor (directory or regular file)
- * and closes the descriptor.
- */
-static void gnutls_x509_AddFD (vlc_object_t *obj,
-                               gnutls_certificate_credentials_t cred,
-                               int fd, bool priv, unsigned recursion)
-{
-    DIR *dir = fdopendir (fd);
-    if (dir != NULL)
-    {
-        if (recursion == 0)
-            goto skipdir;
-        recursion--;
-
-        for (;;)
-        {
-            char *ent = vlc_readdir (dir);
-            if (ent == NULL)
-                break;
-
-            if ((strcmp (ent, ".") == 0) || (strcmp (ent, "..") == 0))
-            {
-                free (ent);
-                continue;
-            }
-
-            int nfd = vlc_openat (fd, ent, O_RDONLY);
-            if (nfd != -1)
-            {
-                msg_Dbg (obj, "loading x509 credentials from %s...", ent);
-                gnutls_x509_AddFD (obj, cred, nfd, priv, recursion);
-            }
-            else
-                msg_Dbg (obj, "cannot access x509 credentials in %s", ent);
-            free (ent);
-        }
-    skipdir:
-        closedir (dir);
-        return;
-    }
-
-    block_t *block = block_File (fd);
-    if (block != NULL)
-    {
-        gnutls_datum_t data = {
-            .data = block->p_buffer,
-            .size = block->i_buffer,
-        };
-        int res = priv
-            ? gnutls_certificate_set_x509_key_mem (cred, &data, &data,
-                                                   GNUTLS_X509_FMT_PEM)
-            : gnutls_certificate_set_x509_trust_mem (cred, &data,
-                                                     GNUTLS_X509_FMT_PEM);
-        block_Release (block);
-
-        if (res < 0)
-            msg_Warn (obj, "cannot add x509 credentials: %s",
-                      gnutls_strerror (res));
-        else
-            msg_Dbg (obj, "added %d %s(s)", res, priv ? "key" : "certificate");
-    }
-    else
-        msg_Warn (obj, "cannot read x509 credentials: %m");
-    close (fd);
-}
-
-static void gnutls_x509_AddPath (vlc_object_t *obj,
-                                 gnutls_certificate_credentials_t cred,
-                                 const char *path, bool priv)
-{
-    msg_Dbg (obj, "loading x509 credentials in %s...", path);
-    int fd = vlc_open (path, O_RDONLY);
-    if (fd == -1)
-    {
-        msg_Warn (obj, "cannot access x509 in %s: %m", path);
-        return;
-    }
-
-    gnutls_x509_AddFD (obj, cred, fd, priv, 5);
-}
-#endif /* WIN32 */
-
 /**
  * Initializes a client-side TLS session.
  */
@@ -499,21 +402,6 @@ static int OpenClient (vlc_tls_t *session, int fd, const char *hostname)
     else
         msg_Dbg (session, "loaded %d trusted CAs", val);
 
-#ifndef WIN32
-    char *userdir = config_GetUserDir (VLC_DATA_DIR);
-    if (userdir != NULL)
-    {
-        char path[strlen (userdir) + sizeof ("/ssl/private/")];
-        sprintf (path, "%s/ssl", userdir);
-        vlc_mkdir (path, 0755);
-
-        sprintf (path, "%s/ssl/certs/", userdir);
-        gnutls_x509_AddPath (VLC_OBJECT(session), sys->x509_cred, path, false);
-        sprintf (path, "%s/ssl/private/", userdir);
-        gnutls_x509_AddPath (VLC_OBJECT(session), sys->x509_cred, path, true);
-        free (userdir);
-    }
-#endif
     gnutls_certificate_set_verify_flags (sys->x509_cred,
                                          GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
 
