@@ -40,23 +40,6 @@
 #import <vlc_common.h>
 #import <vlc_keys.h>
 
-/*****************************************************************************
- * DeviceCallback: Callback triggered when the video-device variable is changed
- *****************************************************************************/
-int DeviceCallback(vlc_object_t *p_this, const char *psz_variable,
-                     vlc_value_t old_val, vlc_value_t new_val, void *param)
-{
-    vlc_value_t val;
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-
-    msg_Dbg(p_vout, "set %"PRId64, new_val.i_int);
-    var_Create(p_vout->p_libvlc, "video-device", VLC_VAR_INTEGER);
-    var_Set(p_vout->p_libvlc, "video-device", new_val);
-
-    val.b_bool = true;
-    var_Set(p_vout, "intf-change", val);
-    return VLC_SUCCESS;
-}
 
 /*****************************************************************************
  * VLCVoutView implementation
@@ -108,16 +91,6 @@ int DeviceCallback(vlc_object_t *p_this, const char *psz_variable,
 
 #pragma mark -
 #pragma mark vout actions
-
-- (void)closeVout
-{
-    vout_thread_t * p_vout = getVout();
-    if (p_vout)
-    {
-        var_DelCallback(p_vout, "video-device", DeviceCallback, NULL);
-        vlc_object_release(p_vout);
-    }
-}
 
 - (void)keyDown:(NSEvent *)o_event
 {
