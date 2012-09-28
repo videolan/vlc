@@ -252,7 +252,7 @@ module_t *vlc_module_load(vlc_object_t *p_this, const char *psz_capability,
     /* Sort the modules and test them */
     size_t count;
     module_t **p_all = module_list_get (&count);
-    p_list = malloc( count * sizeof( module_list_t ) );
+    p_list = xmalloc( count * sizeof( module_list_t ) );
 
     /* Parse the module list for capabilities and probe each of them */
     count = 0;
