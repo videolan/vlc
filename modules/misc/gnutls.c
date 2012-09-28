@@ -333,7 +333,7 @@ static int gnutls_HandshakeAndValidate (vlc_tls_t *session)
     val = gnutls_x509_crt_init (&cert);
     if (val)
     {
-        msg_Err (session, "x509 fatal error: %s", gnutls_strerror (val));
+        msg_Err (session, "X.509 fatal error: %s", gnutls_strerror (val));
         return -1;
     }
 
@@ -353,7 +353,7 @@ static int gnutls_HandshakeAndValidate (vlc_tls_t *session)
     }
 
     gnutls_x509_crt_deinit (cert);
-    msg_Dbg (session, "TLS/x509 certificate verified");
+    msg_Dbg (session, "TLS/X.509 certificate verified");
     return 0;
 
 error:
@@ -520,7 +520,7 @@ static int OpenClient (vlc_tls_t *session, int fd, const char *hostname)
     int val = gnutls_certificate_allocate_credentials (&sys->x509_cred);
     if (val != 0)
     {
-        msg_Err (session, "cannot allocate X509 credentials: %s",
+        msg_Err (session, "cannot allocate credentials: %s",
                  gnutls_strerror (val));
         goto error;
     }
@@ -802,7 +802,7 @@ static int OpenServer (vlc_object_t *obj)
     val = gnutls_certificate_allocate_credentials (&sys->x509_cred);
     if (val != 0)
     {
-        msg_Err (server, "cannot allocate X509 credentials: %s",
+        msg_Err (server, "cannot allocate credentials: %s",
                  gnutls_strerror (val));
         goto error;
     }
