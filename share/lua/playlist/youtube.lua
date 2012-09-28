@@ -70,22 +70,22 @@ end
 -- Parse and pick our video URL
 function pick_url( url_map, fmt )
     local path = nil
-    -- Handle both orderings, as unfortunately both may appear
-    if string.match( url_map, "^url" ) then
-        for url,itag in string.gmatch( url_map, "url=([^&,]+)[^,]*&itag=(%d+)" ) do
-            -- Apparently formats are listed in quality order,
-            -- so we can afford to simply take the first one
-            if not fmt or tonumber( itag ) == tonumber( fmt ) then
+    for stream in string.gmatch( url_map, "[^,]+" ) do
+        -- Apparently formats are listed in quality order,
+        -- so we can afford to simply take the first one
+        local itag = string.match( stream, "itag=(%d+)" )
+        if not fmt or not itag or tonumber( itag ) == tonumber( fmt ) then
+            local url = string.match( stream, "url=([^&,]+)" )
+            if url then
                 url = vlc.strings.decode_uri( url )
-                path = url
-                break
-            end
-        end
-    else
-        for itag,url in string.gmatch( url_map, "itag=(%d+)&[^,]*url=([^&,]+)" ) do
-            if not fmt or tonumber( itag ) == tonumber( fmt ) then
-                url = vlc.strings.decode_uri( url )
-                path = url
+
+                local sig = string.match( stream, "sig=([^&,]+)" )
+                local signature = ""
+                if sig then
+                    signature = "&signature="..sig
+                end
+
+                path = url..signature
                 break
             end
         end
@@ -120,9 +120,6 @@ function parse()
         -- fmt is the format of the video
         -- (cf. http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs)
         fmt = get_url_param( vlc.path, "fmt" )
-        -- URLs in the web page are no good since
-        -- they miss the "signature" parameter :/
---[[
         while true do
             -- Try to find the video's title
             line = vlc.readline()
@@ -166,19 +163,21 @@ function parse()
             -- tag; but we don't need it now
             end
         end
---]]
 
-        local video_id = get_url_param( vlc.path, "v" )
-        if video_id then
-            if fmt then
-                format = "&fmt=" .. fmt
-            else
-                format = ""
+        if not path then
+            local video_id = get_url_param( vlc.path, "v" )
+            if video_id then
+                if fmt then
+                    format = "&fmt=" .. fmt
+                else
+                    format = ""
+                end 
+                -- Without "el=detailpage", /get_video_info fails for many
+                -- music videos with errors about copyrighted content being
+                -- "restricted from playback on certain sites"
+                path = "http://www.youtube.com/get_video_info?video_id="..video_id..format.."&el=detailpage"
+                vlc.msg.warn( "Couldn't extract video URL, falling back to alternate youtube API" )
             end
-            -- Without "el=detailpage", /get_video_info fails for many
-            -- music videos with errors about copyrighted content being
-            -- "restricted from playback on certain sites"
-            path = "http://www.youtube.com/get_video_info?video_id="..video_id..format.."&el=detailpage"
         end
 
         if not path then
