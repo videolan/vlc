@@ -112,8 +112,6 @@ void module_InitBank (void)
         module_t *module = module_InitStatic (vlc_entry__main);
         if (likely(module != NULL))
             module_StoreBank (module);
-
-        module_InitStaticModules();
         config_SortConfig ();
     }
     modules.usage++;
@@ -180,15 +178,16 @@ size_t module_LoadPlugins (vlc_object_t *obj)
 {
     /*vlc_assert_locked (&modules.lock); not for static mutexes :( */
 
-#ifdef HAVE_DYNAMIC_PLUGINS
     if (modules.usage == 1)
     {
+        module_InitStaticModules ();
+#ifdef HAVE_DYNAMIC_PLUGINS
         msg_Dbg (obj, "searching plug-in modules");
         AllocateAllPlugins (obj);
+#endif
         config_UnsortConfig ();
         config_SortConfig ();
     }
-#endif
     vlc_mutex_unlock (&modules.lock);
 
     size_t count;
