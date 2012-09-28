@@ -1270,6 +1270,9 @@ static int Request( access_t *p_access, uint64_t i_tell )
         net_Printf( p_access, p_sys->fd, pvs, "Referer: %s\r\n",
                     p_sys->psz_referrer);
     }
+#ifdef HAVE_ZLIB_H
+    net_Printf( p_access, p_sys->fd, pvs, "Accept-Encoding: gzip, deflate\r\n" );
+#endif
     /* Offset */
     if( p_sys->i_version == 1 && ! p_sys->b_continuous )
     {
