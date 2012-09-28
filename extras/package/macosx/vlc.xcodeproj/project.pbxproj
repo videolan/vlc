@@ -434,6 +434,7 @@
 		CCDB535D13E97D3500A1782F /* dropzone-background.png in Resources */ = {isa = PBXBuildFile; fileRef = CCDB535C13E97D3500A1782F /* dropzone-background.png */; };
 		CCE8BAC4160615D9006741FB /* effects-one-button-pressed.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE8BAC2160615D9006741FB /* effects-one-button-pressed.png */; };
 		CCE8BAC5160615D9006741FB /* effects-one-button-pressed@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE8BAC3160615D9006741FB /* effects-one-button-pressed@2x.png */; };
+		E0FB95CE1615B6DF0005069A /* DetachedVideoWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = E0FB95CC1615B6DF0005069A /* DetachedVideoWindow.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -985,6 +986,7 @@
 		E0382C01160BA09E0031D7FF /* ControlsBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ControlsBar.m; path = ../../../modules/gui/macosx/ControlsBar.m; sourceTree = SOURCE_ROOT; };
 		E06CF7F416020F6200C698B7 /* Windows.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Windows.h; path = ../../../modules/gui/macosx/Windows.h; sourceTree = SOURCE_ROOT; };
 		E06CF7F516020F6200C698B7 /* Windows.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Windows.m; path = ../../../modules/gui/macosx/Windows.m; sourceTree = SOURCE_ROOT; };
+		E0FB95CD1615B6DF0005069A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/DetachedVideoWindow.xib; sourceTree = "<group>"; };
 		F69B0CA702E24F6401A80112 /* English */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = text.plist.strings; name = English; path = Resources/English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1731,6 +1733,7 @@
 		DCF358BC077F1236007DB450 /* xibs */ = {
 			isa = PBXGroup;
 			children = (
+				E0FB95CC1615B6DF0005069A /* DetachedVideoWindow.xib */,
 				CCD83E2E13FEA143004F1652 /* About.xib */,
 				CCD83E3013FEA143004F1652 /* AudioEffects.xib */,
 				CCD83E3213FEA143004F1652 /* Bookmarks.xib */,
@@ -2219,6 +2222,7 @@
 				CCE8BAC5160615D9006741FB /* effects-one-button-pressed@2x.png in Resources */,
 				7DFFA16C16124F38001AF89F /* effects-one-button-pressed-dark.png in Resources */,
 				7DFFA16D16124F38001AF89F /* effects-one-button-pressed-dark@2x.png in Resources */,
+				E0FB95CE1615B6DF0005069A /* DetachedVideoWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2335,6 +2339,14 @@
 				CCD83E4313FEA143004F1652 /* English */,
 			);
 			name = Wizard.xib;
+			sourceTree = "<group>";
+		};
+		E0FB95CC1615B6DF0005069A /* DetachedVideoWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E0FB95CD1615B6DF0005069A /* English */,
+			);
+			name = DetachedVideoWindow.xib;
 			sourceTree = "<group>";
 		};
 		F69B0CA602E24F6401A80112 /* InfoPlist.strings */ = {

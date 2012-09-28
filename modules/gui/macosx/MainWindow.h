@@ -34,6 +34,7 @@
 #import "fspanel.h"
 #import "MainWindowTitle.h"
 
+@class VLCDetachedVideoWindow;
 @class VLCMainWindowControlsBar;
 
 @interface VLCMainWindow : VLCVideoWindowCommon <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate> {
@@ -56,7 +57,7 @@
 
     IBOutlet VLCFSPanel *o_fspanel;
 
-    IBOutlet id o_detached_video_window;
+    VLCDetachedVideoWindow *o_detached_video_window;
 
     IBOutlet id o_podcast_view;
     IBOutlet id o_podcast_add_btn;
