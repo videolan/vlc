@@ -20125,7 +20125,7 @@ msgstr "Ouvrir un périphérique de &capture…"
 
 #: modules/gui/qt4/menus.cpp:352
 msgid "&Open (advanced)..."
-msgstr "&Ouvrir un fichier…"
+msgstr "&Ouvrir (possibilités étendues)…"
 
 #: modules/gui/qt4/menus.cpp:356
 msgid "Open &Location from clipboard"
