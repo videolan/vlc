@@ -136,8 +136,8 @@ struct block_t
  * - block_Duplicate : create a copy of a block.
  ****************************************************************************/
 VLC_API void block_Init( block_t *, void *, size_t );
-VLC_API block_t * block_Alloc( size_t ) VLC_USED;
-VLC_API block_t * block_Realloc( block_t *, ssize_t i_pre, size_t i_body ) VLC_USED;
+VLC_API block_t *block_Alloc( size_t ) VLC_USED VLC_MALLOC;
+VLC_API block_t *block_Realloc( block_t *, ssize_t i_pre, size_t i_body ) VLC_USED;
 
 #define block_New( dummy, size ) block_Alloc(size)
 
@@ -163,9 +163,9 @@ static inline void block_Release( block_t *p_block )
     p_block->pf_release( p_block );
 }
 
-VLC_API block_t * block_heap_Alloc(void *, size_t) VLC_USED;
-VLC_API block_t * block_mmap_Alloc(void *addr, size_t length) VLC_USED;
-VLC_API block_t * block_File(int fd) VLC_USED;
+VLC_API block_t *block_heap_Alloc(void *, size_t) VLC_USED VLC_MALLOC;
+VLC_API block_t *block_mmap_Alloc(void *addr, size_t length) VLC_USED VLC_MALLOC;
+VLC_API block_t *block_File(int fd) VLC_USED VLC_MALLOC;
 
 static inline void block_Cleanup (void *block)
 {
@@ -302,7 +302,7 @@ static inline block_t *block_ChainGather( block_t *p_list )
  * block_FifoGet and block_FifoShow are cancellation points.
  ****************************************************************************/
 
-VLC_API block_fifo_t * block_FifoNew( void ) VLC_USED;
+VLC_API block_fifo_t *block_FifoNew( void ) VLC_USED VLC_MALLOC;
 VLC_API void block_FifoRelease( block_fifo_t * );
 VLC_API void block_FifoPace( block_fifo_t *fifo, size_t max_depth, size_t max_size );
 VLC_API void block_FifoEmpty( block_fifo_t * );
