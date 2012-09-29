@@ -36,6 +36,24 @@
 #include <vlc_tls.h>
 #include <vlc_modules.h>
 
+static int tls_server_load(void *func, va_list ap)
+{
+    int (*activate) (vlc_tls_creds_t *, const char *, const char *) = func;
+    vlc_tls_creds_t *crd = va_arg (ap, vlc_tls_creds_t *);
+    const char *cert = va_arg (ap, const char *);
+    const char *key = va_arg (ap, const char *);
+
+    return activate (crd, cert, key);
+}
+
+static void tls_unload(void *func, va_list ap)
+{
+    void (*deactivate) (vlc_tls_creds_t *) = func;
+    vlc_tls_creds_t *crd = va_arg (ap, vlc_tls_creds_t *);
+
+    deactivate (crd);
+}
+
 /**
  * Allocates a whole server's TLS credentials.
  *
@@ -54,19 +72,11 @@ vlc_tls_ServerCreate (vlc_object_t *obj, const char *cert_path,
     if (unlikely(srv == NULL))
         return NULL;
 
-    var_Create (srv, "tls-x509-cert", VLC_VAR_STRING);
-    var_Create (srv, "tls-x509-key", VLC_VAR_STRING);
+    if (key_path == NULL)
+        key_path = cert_path;
 
-    if (cert_path != NULL)
-    {
-        var_SetString (srv, "tls-x509-cert", cert_path);
-
-        if (key_path == NULL)
-            key_path = cert_path;
-        var_SetString (srv, "tls-x509-key", key_path);
-    }
-
-    srv->module = module_need (srv, "tls server", NULL, false );
+    srv->module = vlc_module_load (srv, "tls server", NULL, false,
+                                   tls_server_load, srv, cert_path, key_path);
     if (srv->module == NULL)
     {
         msg_Err (srv, "TLS server plugin not available");
@@ -83,13 +93,13 @@ vlc_tls_ServerCreate (vlc_object_t *obj, const char *cert_path,
  * Releases data allocated with vlc_tls_ServerCreate().
  * @param srv TLS server object to be destroyed, or NULL
  */
-void vlc_tls_ServerDelete (vlc_tls_creds_t *srv)
+void vlc_tls_Delete (vlc_tls_creds_t *crd)
 {
-    if (srv == NULL)
+    if (crd == NULL)
         return;
 
-    module_unneed (srv, srv->module);
-    vlc_object_release (srv);
+    vlc_module_unload (crd->module, tls_unload, crd);
+    vlc_object_release (crd);
 }
 
 

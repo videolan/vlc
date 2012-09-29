@@ -34,7 +34,7 @@ typedef struct vlc_tls_sys vlc_tls_sys_t;
 typedef struct vlc_tls_creds vlc_tls_creds_t;
 typedef struct vlc_tls_creds_sys vlc_tls_creds_sys_t;
 
-
+/** TLS session */
 struct vlc_tls
 {
     VLC_COMMON_MEMBERS
@@ -58,7 +58,7 @@ VLC_API void vlc_tls_ClientDelete (vlc_tls_t *);
 # define tls_Recv( a, b, c ) (((vlc_tls_t *)a)->sock.pf_recv (a, b, c))
 
 
-/** TLS (server-side) credentials */
+/** TLS credentials (certificate, private and trust settings) */
 struct vlc_tls_creds
 {
     VLC_COMMON_MEMBERS
@@ -75,7 +75,8 @@ struct vlc_tls_creds
 
 vlc_tls_creds_t *vlc_tls_ServerCreate (vlc_object_t *,
                                        const char *cert, const char *key);
-void vlc_tls_ServerDelete (vlc_tls_creds_t *);
+void vlc_tls_Delete (vlc_tls_creds_t *);
+#define vlc_tls_ServerDelete vlc_tls_Delete
 int vlc_tls_ServerAddCA (vlc_tls_creds_t *srv, const char *path);
 int vlc_tls_ServerAddCRL (vlc_tls_creds_t *srv, const char *path);
 

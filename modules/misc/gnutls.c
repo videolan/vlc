@@ -59,8 +59,8 @@
  *****************************************************************************/
 static int  OpenClient  (vlc_tls_t *, int, const char *);
 static void CloseClient (vlc_tls_t *);
-static int  OpenServer  (vlc_object_t *);
-static void CloseServer (vlc_object_t *);
+static int  OpenServer  (vlc_tls_creds_t *, const char *, const char *);
+static void CloseServer (vlc_tls_creds_t *);
 
 #define PRIORITIES_TEXT N_("TLS cipher priorities")
 #define PRIORITIES_LONGTEXT N_("Ciphers, key exchange methods, " \
@@ -762,25 +762,22 @@ static int gnutls_ServerAddCRL (vlc_tls_creds_t *server, const char *crl_path)
 /**
  * Allocates a whole server's TLS credentials.
  */
-static int OpenServer (vlc_object_t *obj)
+static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
 {
-    vlc_tls_creds_t *server = (vlc_tls_creds_t *)obj;
     int val;
 
-    if (gnutls_Init (obj))
+    if (gnutls_Init (VLC_OBJECT(crd)))
         return VLC_EGENERIC;
-
-    msg_Dbg (obj, "creating TLS server");
 
     vlc_tls_creds_sys_t *sys = malloc (sizeof (*sys));
     if (unlikely(sys == NULL))
         goto error;
 
-    server->sys     = sys;
-    server->add_CA  = gnutls_ServerAddCA;
-    server->add_CRL = gnutls_ServerAddCRL;
-    server->open    = gnutls_SessionOpen;
-    server->close   = gnutls_SessionClose;
+    crd->sys     = sys;
+    crd->add_CA  = gnutls_ServerAddCA;
+    crd->add_CRL = gnutls_ServerAddCRL;
+    crd->open    = gnutls_SessionOpen;
+    crd->close   = gnutls_SessionClose;
     /* No certificate validation by default */
     sys->handshake  = gnutls_ContinueHandshake;
 
@@ -788,25 +785,16 @@ static int OpenServer (vlc_object_t *obj)
     val = gnutls_certificate_allocate_credentials (&sys->x509_cred);
     if (val != 0)
     {
-        msg_Err (server, "cannot allocate credentials: %s",
+        msg_Err (crd, "cannot allocate credentials: %s",
                  gnutls_strerror (val));
         goto error;
     }
 
-    char *cert_path = var_GetNonEmptyString (obj, "tls-x509-cert");
-    char *key_path = var_GetNonEmptyString (obj, "tls-x509-key");
-    const char *lcert = ToLocale (cert_path);
-    const char *lkey = ToLocale (key_path);
-    val = gnutls_certificate_set_x509_key_file (sys->x509_cred, lcert, lkey,
+    val = gnutls_certificate_set_x509_key_file (sys->x509_cred, cert, key,
                                                 GNUTLS_X509_FMT_PEM);
-    LocaleFree (lkey);
-    LocaleFree (lcert);
-    free (key_path);
-    free (cert_path);
-
     if (val < 0)
     {
-        msg_Err (server, "cannot set certificate chain or private key: %s",
+        msg_Err (crd, "cannot set certificate chain or private key: %s",
                  gnutls_strerror (val));
         gnutls_certificate_free_credentials (sys->x509_cred);
         goto error;
@@ -831,7 +819,7 @@ static int OpenServer (vlc_object_t *obj)
     }
     if (val < 0)
     {
-        msg_Err (server, "cannot initialize DHE cipher suites: %s",
+        msg_Err (crd, "cannot initialize DHE cipher suites: %s",
                  gnutls_strerror (val));
     }
 
@@ -839,22 +827,21 @@ static int OpenServer (vlc_object_t *obj)
 
 error:
     free (sys);
-    gnutls_Deinit (obj);
+    gnutls_Deinit (VLC_OBJECT(crd));
     return VLC_EGENERIC;
 }
 
 /**
  * Destroys a TLS server object.
  */
-static void CloseServer (vlc_object_t *obj)
+static void CloseServer (vlc_tls_creds_t *crd)
 {
-    vlc_tls_creds_t *server = (vlc_tls_creds_t *)obj;
-    vlc_tls_creds_sys_t *sys = server->sys;
+    vlc_tls_creds_sys_t *sys = crd->sys;
 
     /* all sessions depending on the server are now deinitialized */
     gnutls_certificate_free_credentials (sys->x509_cred);
     gnutls_dh_params_deinit (sys->dh_params);
     free (sys);
 
-    gnutls_Deinit (obj);
+    gnutls_Deinit (VLC_OBJECT(crd));
 }
