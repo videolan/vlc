@@ -118,7 +118,7 @@ static int gnutls_Init (vlc_object_t *p_this)
         goto error;
     }
 
-    const char *psz_version = gnutls_check_version ("2.0.0");
+    const char *psz_version = gnutls_check_version ("2.6.6");
     if (psz_version == NULL)
     {
         msg_Err (p_this, "unsupported GnuTLS version");
