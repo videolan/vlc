@@ -166,6 +166,7 @@ static inline void block_Release( block_t *p_block )
 VLC_API block_t *block_heap_Alloc(void *, size_t) VLC_USED VLC_MALLOC;
 VLC_API block_t *block_mmap_Alloc(void *addr, size_t length) VLC_USED VLC_MALLOC;
 VLC_API block_t *block_File(int fd) VLC_USED VLC_MALLOC;
+VLC_API block_t *block_FilePath(const char *) VLC_USED VLC_MALLOC;
 
 static inline void block_Cleanup (void *block)
 {

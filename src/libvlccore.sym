@@ -26,6 +26,7 @@ block_FifoPut
 block_FifoRelease
 block_FifoShow
 block_File
+block_FilePath
 block_heap_Alloc
 block_Init
 block_mmap_Alloc

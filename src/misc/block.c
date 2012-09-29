@@ -34,10 +34,11 @@
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
+#include <fcntl.h>
 
 #include <vlc_common.h>
 #include <vlc_block.h>
-#include <vlc_fs.h> /* For 64-bits lseek() definition */
+#include <vlc_fs.h>
 
 /**
  * @section Block handling functions.
@@ -358,10 +359,13 @@ ssize_t pread (int fd, void *buf, size_t count, off_t offset)
 #endif
 
 /**
- * Loads a file into a block of memory. If possible a private file mapping is
- * created. Otherwise, the file is read normally. On 32-bits platforms, this
- * function will not work for very large files, due to memory space
- * constraints. Cancellation point.
+ * Loads a file into a block of memory through a file descriptor.
+ * If possible a private file mapping is created. Otherwise, the file is read
+ * normally. This function is a cancellation point.
+ *
+ * @note On 32-bits platforms,
+ * this function will not work for very large files,
+ * due to memory space constraints.
  *
  * @param fd file descriptor to load from
  * @return a new block with the file content at p_buffer, and file length at
@@ -430,6 +434,21 @@ block_t *block_File (int fd)
         i += len;
     }
     vlc_cleanup_pop ();
+    return block;
+}
+
+/**
+ * Loads a file into a block of memory from the file path.
+ * See also block_File().
+ */
+block_t *block_FilePath (const char *path)
+{
+    int fd = vlc_open (path, O_RDONLY);
+    if (fd == -1)
+        return NULL;
+
+    block_t *block = block_File (fd);
+    close (fd);
     return block;
 }
 
