@@ -184,7 +184,6 @@ static int gnutls_Error (vlc_object_t *obj, int val)
 }
 #define gnutls_Error(o, val) gnutls_Error(VLC_OBJECT(o), val)
 
-
 struct vlc_tls_sys
 {
     gnutls_session_t session;
@@ -702,59 +701,74 @@ error:
 
 
 /**
- * Adds one or more certificate authorities.
+ * Adds one or more Certificate Authorities to the trusted set.
  *
- * @param ca_path (Unicode) path to an x509 certificates list.
+ * @param path (UTF-8) path to an X.509 certificates list.
  *
  * @return -1 on error, 0 on success.
  */
-static int gnutls_ServerAddCA (vlc_tls_creds_t *server, const char *ca_path)
+static int gnutls_AddCA (vlc_tls_creds_t *crd, const char *path)
 {
-    vlc_tls_creds_sys_t *sys = server->sys;
-    const char *local_path = ToLocale (ca_path);
+    block_t *block = block_FilePath (path);
+    if (block == NULL)
+    {
+        msg_Err (crd, "cannot read trusted CA from %s: %m", path);
+        return VLC_EGENERIC;
+    }
 
-    int val = gnutls_certificate_set_x509_trust_file (sys->x509_cred,
-                                                      local_path,
-                                                      GNUTLS_X509_FMT_PEM );
-    LocaleFree (local_path);
+    gnutls_datum_t d = {
+       .data = block->p_buffer,
+       .size = block->i_buffer,
+    };
+
+    int val = gnutls_certificate_set_x509_trust_mem (crd->sys->x509_cred, &d,
+                                                     GNUTLS_X509_FMT_PEM);
+    block_Release (block);
     if (val < 0)
     {
-        msg_Err (server, "cannot add trusted CA (%s): %s", ca_path,
+        msg_Err (crd, "cannot load trusted CA from %s: %s", path,
                  gnutls_strerror (val));
         return VLC_EGENERIC;
     }
-    msg_Dbg (server, " %d trusted CA added (%s)", val, ca_path);
+    msg_Dbg (crd, " %d trusted CA%s added from %s", val, (val != 1) ? "s" : "",
+             path);
 
     /* enables peer's certificate verification */
-    sys->handshake = gnutls_HandshakeAndValidate;
-
+    crd->sys->handshake = gnutls_HandshakeAndValidate;
     return VLC_SUCCESS;
 }
 
 
 /**
- * Adds a certificates revocation list to be sent to TLS clients.
+ * Adds a Certificates Revocation List to be sent to TLS clients.
  *
- * @param crl_path (Unicode) path of the CRL file.
+ * @param path (UTF-8) path of the CRL file.
  *
  * @return -1 on error, 0 on success.
  */
-static int gnutls_ServerAddCRL (vlc_tls_creds_t *server, const char *crl_path)
+static int gnutls_AddCRL (vlc_tls_creds_t *crd, const char *path)
 {
-    vlc_tls_creds_sys_t *sys = server->sys;
-    const char *local_path = ToLocale (crl_path);
-
-    int val = gnutls_certificate_set_x509_crl_file (sys->x509_cred,
-                                                    local_path,
-                                                    GNUTLS_X509_FMT_PEM);
-    LocaleFree (local_path);
-    if (val < 0)
+    block_t *block = block_FilePath (path);
+    if (block == NULL)
     {
-        msg_Err (server, "cannot add CRL (%s): %s", crl_path,
-                 gnutls_strerror (val));
+        msg_Err (crd, "cannot read CRL from %s: %m", path);
         return VLC_EGENERIC;
     }
-    msg_Dbg (server, "%d CRL added (%s)", val, crl_path);
+
+    gnutls_datum_t d = {
+       .data = block->p_buffer,
+       .size = block->i_buffer,
+    };
+
+    int val = gnutls_certificate_set_x509_crl_mem (crd->sys->x509_cred, &d,
+                                                   GNUTLS_X509_FMT_PEM);
+    block_Release (block);
+    if (val < 0)
+    {
+        msg_Err (crd, "cannot add CRL (%s): %s", path, gnutls_strerror (val));
+        return VLC_EGENERIC;
+    }
+    msg_Dbg (crd, "%d CRL%s added from %s", val, (val != 1) ? "s" : "", path);
     return VLC_SUCCESS;
 }
 
@@ -774,8 +788,8 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
         goto error;
 
     crd->sys     = sys;
-    crd->add_CA  = gnutls_ServerAddCA;
-    crd->add_CRL = gnutls_ServerAddCRL;
+    crd->add_CA  = gnutls_AddCA;
+    crd->add_CRL = gnutls_AddCRL;
     crd->open    = gnutls_SessionOpen;
     crd->close   = gnutls_SessionClose;
     /* No certificate validation by default */
@@ -790,12 +804,36 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
         goto error;
     }
 
-    val = gnutls_certificate_set_x509_key_file (sys->x509_cred, cert, key,
+    block_t *certblock = block_FilePath (cert);
+    if (certblock == NULL)
+    {
+        msg_Err (crd, "cannot read certificate chain from %s: %m", cert);
+        return VLC_EGENERIC;
+    }
+
+    block_t *keyblock = block_FilePath (key);
+    if (keyblock == NULL)
+    {
+        msg_Err (crd, "cannot read private key from %s: %m", key);
+        block_Release (certblock);
+        return VLC_EGENERIC;
+    }
+
+    gnutls_datum_t pub = {
+       .data = certblock->p_buffer,
+       .size = certblock->i_buffer,
+    }, priv = {
+       .data = keyblock->p_buffer,
+       .size = keyblock->i_buffer,
+    };
+
+    val = gnutls_certificate_set_x509_key_mem (sys->x509_cred, &pub, &priv,
                                                 GNUTLS_X509_FMT_PEM);
+    block_Release (keyblock);
+    block_Release (certblock);
     if (val < 0)
     {
-        msg_Err (crd, "cannot set certificate chain or private key: %s",
-                 gnutls_strerror (val));
+        msg_Err (crd, "cannot load X.509 key: %s", gnutls_strerror (val));
         gnutls_certificate_free_credentials (sys->x509_cred);
         goto error;
     }
