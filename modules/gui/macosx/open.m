@@ -544,7 +544,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (IBAction)qtkAudioChanged:(id)sender
 {
-    NSInteger i_selectedDevice = [sender indexOfSelectedItem];
+    NSInteger i_selectedDevice = [o_qtk_audio_device_pop indexOfSelectedItem];
     if ([qtkaudioDevices count] >= 1) {
         qtkaudio_currdevice_uid = [[(QTCaptureDevice *)[qtkaudioDevices objectAtIndex:i_selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
