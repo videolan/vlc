@@ -39,9 +39,6 @@ struct vlc_tls
 {
     VLC_COMMON_MEMBERS
 
-    union {
-        module_t *module; /**< Plugin handle (client) */
-    } u;
     vlc_tls_sys_t *sys;
 
     struct virtual_socket_t sock;
@@ -69,7 +66,7 @@ struct vlc_tls_creds
     int (*add_CA) (vlc_tls_creds_t *, const char *path);
     int (*add_CRL) (vlc_tls_creds_t *, const char *path);
 
-    int (*open) (vlc_tls_creds_t *, vlc_tls_t *, int fd);
+    int (*open) (vlc_tls_creds_t *, vlc_tls_t *, int fd, const char *host);
     void (*close) (vlc_tls_creds_t *, vlc_tls_t *);
 };
 
@@ -82,6 +79,7 @@ int vlc_tls_ServerAddCRL (vlc_tls_creds_t *srv, const char *path);
 
 vlc_tls_t *vlc_tls_ServerSessionCreate (vlc_tls_creds_t *, int fd);
 int vlc_tls_ServerSessionHandshake (vlc_tls_t *);
-void vlc_tls_ServerSessionDelete (vlc_tls_t *);
+void vlc_tls_SessionDelete (vlc_tls_t *);
+#define vlc_tls_ServerSessionDelete vlc_tls_SessionDelete
 
 #endif
