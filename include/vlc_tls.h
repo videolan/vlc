@@ -45,9 +45,12 @@ struct vlc_tls
     int  (*handshake) (struct vlc_tls *);
 };
 
-VLC_API vlc_tls_t *vlc_tls_ClientCreate (vlc_object_t *, int fd,
-                                         const char *hostname);
-VLC_API void vlc_tls_ClientDelete (vlc_tls_t *);
+VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *, int fd,
+                                                const char *host);
+vlc_tls_t *vlc_tls_ServerSessionCreate (vlc_tls_creds_t *, int fd);
+int vlc_tls_ServerSessionHandshake (vlc_tls_t *);
+VLC_API void vlc_tls_SessionDelete (vlc_tls_t *);
+#define vlc_tls_ServerSessionDelete vlc_tls_SessionDelete
 
 /* NOTE: It is assumed that a->sock.p_sys = a */
 # define tls_Send( a, b, c ) (((vlc_tls_t *)a)->sock.pf_send (a, b, c))
@@ -70,16 +73,12 @@ struct vlc_tls_creds
     void (*close) (vlc_tls_creds_t *, vlc_tls_t *);
 };
 
+VLC_API vlc_tls_creds_t *vlc_tls_ClientCreate (vlc_object_t *);
 vlc_tls_creds_t *vlc_tls_ServerCreate (vlc_object_t *,
                                        const char *cert, const char *key);
-void vlc_tls_Delete (vlc_tls_creds_t *);
+VLC_API void vlc_tls_Delete (vlc_tls_creds_t *);
 #define vlc_tls_ServerDelete vlc_tls_Delete
 int vlc_tls_ServerAddCA (vlc_tls_creds_t *srv, const char *path);
 int vlc_tls_ServerAddCRL (vlc_tls_creds_t *srv, const char *path);
-
-vlc_tls_t *vlc_tls_ServerSessionCreate (vlc_tls_creds_t *, int fd);
-int vlc_tls_ServerSessionHandshake (vlc_tls_t *);
-void vlc_tls_SessionDelete (vlc_tls_t *);
-#define vlc_tls_ServerSessionDelete vlc_tls_SessionDelete
 
 #endif

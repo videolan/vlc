@@ -139,7 +139,8 @@ struct access_sys_t
 {
     int fd;
     bool b_error;
-    vlc_tls_t  *p_tls;
+    vlc_tls_creds_t *p_creds;
+    vlc_tls_t *p_tls;
     v_socket_t *p_vs;
 
     /* From uri */
@@ -164,7 +165,6 @@ struct access_sys_t
     char       *psz_location;
     bool b_mms;
     bool b_icecast;
-    bool b_ssl;
 #ifdef HAVE_ZLIB_H
     bool b_compressed;
     struct
@@ -269,7 +269,6 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
     p_sys->psz_user_agent = NULL;
     p_sys->psz_referrer = NULL;
     p_sys->b_pace_control = true;
-    p_sys->b_ssl = false;
 #ifdef HAVE_ZLIB_H
     p_sys->b_compressed = false;
     /* 15 is the max windowBits, +32 to enable optional gzip decoding */
@@ -314,7 +313,9 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
     if( !strncmp( psz_access, "https", 5 ) )
     {
         /* HTTP over SSL */
-        p_sys->b_ssl = true;
+        p_sys->p_creds = vlc_tls_ClientCreate( p_this );
+        if( p_sys->p_creds == NULL )
+            goto error;
         if( p_sys->url.i_port <= 0 )
             p_sys->url.i_port = 443;
     }
@@ -600,6 +601,7 @@ connect:
         free( p_sys->psz_referrer );
 
         Disconnect( p_access );
+        vlc_tls_Delete( p_sys->p_creds );
         cookies = p_sys->cookies;
 #ifdef HAVE_ZLIB_H
         inflateEnd( &p_sys->inflate.stream );
@@ -692,6 +694,7 @@ error:
     free( p_sys->psz_referrer );
 
     Disconnect( p_access );
+    vlc_tls_Delete( p_sys->p_creds );
 
     if( p_sys->cookies )
     {
@@ -733,6 +736,7 @@ static void Close( vlc_object_t *p_this )
     free( p_sys->psz_referrer );
 
     Disconnect( p_access );
+    vlc_tls_Delete( p_sys->p_creds );
 
     if( p_sys->cookies )
     {
@@ -1156,7 +1160,7 @@ static int Connect( access_t *p_access, uint64_t i_tell )
     setsockopt (p_sys->fd, SOL_SOCKET, SO_KEEPALIVE, &(int){ 1 }, sizeof (int));
 
     /* Initialize TLS/SSL session */
-    if( p_sys->b_ssl )
+    if( p_sys->p_creds != NULL )
     {
         /* CONNECT to establish TLS tunnel through HTTP proxy */
         if( p_sys->b_proxy )
@@ -1220,8 +1224,8 @@ static int Connect( access_t *p_access, uint64_t i_tell )
         }
 
         /* TLS/SSL handshake */
-        p_sys->p_tls = vlc_tls_ClientCreate( VLC_OBJECT(p_access), p_sys->fd,
-                                             p_sys->url.psz_host );
+        p_sys->p_tls = vlc_tls_ClientSessionCreate( p_sys->p_creds, p_sys->fd,
+                                                    p_sys->url.psz_host );
         if( p_sys->p_tls == NULL )
         {
             msg_Err( p_access, "cannot establish HTTP/TLS session" );
@@ -1450,9 +1454,9 @@ static int Request( access_t *p_access, uint64_t i_tell )
              * handle it as everyone does. */
             if( p[0] == '/' )
             {
-                const char *psz_http_ext = p_sys->b_ssl ? "s" : "" ;
+                const char *psz_http_ext = p_sys->p_tls ? "s" : "" ;
 
-                if( p_sys->url.i_port == ( p_sys->b_ssl ? 443 : 80 ) )
+                if( p_sys->url.i_port == ( p_sys->p_tls ? 443 : 80 ) )
                 {
                     if( asprintf(&psz_new_loc, "http%s://%s%s", psz_http_ext,
                                  p_sys->url.psz_host, p) < 0 )
@@ -1632,7 +1636,7 @@ static void Disconnect( access_t *p_access )
 
     if( p_sys->p_tls != NULL)
     {
-        vlc_tls_ClientDelete( p_sys->p_tls );
+        vlc_tls_SessionDelete( p_sys->p_tls );
         p_sys->p_tls = NULL;
         p_sys->p_vs = NULL;
     }

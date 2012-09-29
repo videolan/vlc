@@ -414,7 +414,9 @@ subpicture_region_ChainDelete
 subpicture_region_Delete
 subpicture_region_New
 vlc_tls_ClientCreate
-vlc_tls_ClientDelete
+vlc_tls_Delete
+vlc_tls_ClientSessionCreate
+vlc_tls_SessionDelete
 ToCharset
 update_Check
 update_Delete
