@@ -928,7 +928,7 @@ httpd_host_t *vlc_https_HostNew( vlc_object_t *obj )
     return httpd_HostCreate( obj, "http-host", "https-port", tls );
 
 error:
-    vlc_tls_ServerDelete( tls );
+    vlc_tls_Delete( tls );
     return NULL;
 }
 
@@ -987,8 +987,7 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
 
         vlc_mutex_unlock( &httpd.mutex );
         vlc_UrlClean( &url );
-        if( p_tls != NULL )
-            vlc_tls_ServerDelete( p_tls );
+        vlc_tls_Delete( p_tls );
         return host;
     }
 
@@ -1051,10 +1050,7 @@ error:
     }
 
     vlc_UrlClean( &url );
-
-    if( p_tls != NULL )
-        vlc_tls_ServerDelete( p_tls );
-
+    vlc_tls_Delete( p_tls );
     return NULL;
 }
 
@@ -1100,9 +1096,7 @@ void httpd_HostDelete( httpd_host_t *host )
         /* TODO */
     }
 
-    if( host->p_tls != NULL)
-        vlc_tls_ServerDelete( host->p_tls );
-
+    vlc_tls_Delete( host->p_tls );
     net_ListenClose( host->fds );
     vlc_cond_destroy( &host->wait );
     vlc_mutex_destroy( &host->lock );
@@ -1300,7 +1294,7 @@ static void httpd_ClientClean( httpd_client_t *cl )
     if( cl->fd >= 0 )
     {
         if( cl->p_tls != NULL )
-            vlc_tls_ServerSessionDelete( cl->p_tls );
+            vlc_tls_SessionDelete( cl->p_tls );
         net_Close( cl->fd );
         cl->fd = -1;
     }
@@ -1324,6 +1318,8 @@ static httpd_client_t *httpd_ClientNew( int fd, vlc_tls_t *p_tls, mtime_t now )
     cl->p_tls = p_tls;
 
     httpd_ClientInit( cl, now );
+    if( p_tls != NULL )
+        cl->i_state = HTTPD_CLIENT_TLS_HS_OUT;
 
     return cl;
 }
@@ -1882,9 +1878,9 @@ static void httpd_ClientSend( httpd_client_t *cl )
     }
 }
 
-static void httpd_ClientTlsHsIn( httpd_client_t *cl )
+static void httpd_ClientTlsHandshake( httpd_client_t *cl )
 {
-    switch( vlc_tls_ServerSessionHandshake( cl->p_tls ) )
+    switch( vlc_tls_SessionHandshake( cl->p_tls ) )
     {
         case 0:
             cl->i_state = HTTPD_CLIENT_RECEIVING;
@@ -1892,29 +1888,14 @@ static void httpd_ClientTlsHsIn( httpd_client_t *cl )
 
         case -1:
             cl->i_state = HTTPD_CLIENT_DEAD;
-            cl->p_tls = NULL;
-            break;
-
-        case 2:
-            cl->i_state = HTTPD_CLIENT_TLS_HS_OUT;
-    }
-}
-
-static void httpd_ClientTlsHsOut( httpd_client_t *cl )
-{
-    switch( vlc_tls_ServerSessionHandshake( cl->p_tls ) )
-    {
-        case 0:
-            cl->i_state = HTTPD_CLIENT_RECEIVING;
-            break;
-
-        case -1:
-            cl->i_state = HTTPD_CLIENT_DEAD;
-            cl->p_tls = NULL;
             break;
 
         case 1:
             cl->i_state = HTTPD_CLIENT_TLS_HS_IN;
+            break;
+
+        case 2:
+            cl->i_state = HTTPD_CLIENT_TLS_HS_OUT;
             break;
     }
 }
@@ -2303,13 +2284,10 @@ static void* httpd_HostThread( void *data )
             {
                 httpd_ClientSend( cl );
             }
-            else if( cl->i_state == HTTPD_CLIENT_TLS_HS_IN )
+            else if( cl->i_state == HTTPD_CLIENT_TLS_HS_IN
+                  || cl->i_state == HTTPD_CLIENT_TLS_HS_OUT )
             {
-                httpd_ClientTlsHsIn( cl );
-            }
-            else if( cl->i_state == HTTPD_CLIENT_TLS_HS_OUT )
-            {
-                httpd_ClientTlsHsOut( cl );
+                httpd_ClientTlsHandshake( cl );
             }
         }
 
@@ -2317,7 +2295,6 @@ static void* httpd_HostThread( void *data )
         for( nfd = 0; nfd < host->nfd; nfd++ )
         {
             httpd_client_t *cl;
-            int i_state = -1;
             int fd = ufd[nfd].fd;
 
             assert (fd == host->fds[nfd]);
@@ -2335,34 +2312,13 @@ static void* httpd_HostThread( void *data )
             vlc_tls_t *p_tls;
 
             if( host->p_tls != NULL )
-            {
                 p_tls = vlc_tls_ServerSessionCreate( host->p_tls, fd );
-                switch( vlc_tls_ServerSessionHandshake( p_tls ) )
-                {
-                    case -1:
-                        msg_Err( host, "Rejecting TLS connection" );
-                        /* p_tls is destroyed implicitly */
-                        net_Close( fd );
-                        fd = -1;
-                        p_tls = NULL;
-                        continue;
-
-                    case 1: /* missing input - most likely */
-                        i_state = HTTPD_CLIENT_TLS_HS_IN;
-                        break;
-
-                    case 2: /* missing output */
-                        i_state = HTTPD_CLIENT_TLS_HS_OUT;
-                        break;
-                }
-            }
             else
                 p_tls = NULL;
 
             cl = httpd_ClientNew( fd, p_tls, now );
+
             TAB_APPEND( host->i_client, host->client, cl );
-            if( i_state != -1 )
-                cl->i_state = i_state; // override state for TLS
         }
     }
     vlc_mutex_unlock( &host->lock );

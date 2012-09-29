@@ -185,12 +185,9 @@ vlc_tls_t *vlc_tls_ServerSessionCreate (vlc_tls_creds_t *crd, int fd)
     return vlc_tls_SessionCreate (crd, fd, NULL);
 }
 
-int vlc_tls_ServerSessionHandshake (vlc_tls_t *ses)
+int vlc_tls_SessionHandshake (vlc_tls_t *session)
 {
-    int val = ses->handshake (ses);
-    if (val < 0)
-        vlc_tls_ServerSessionDelete (ses);
-    return val;
+    return session->handshake (session);
 }
 
 /**
