@@ -132,6 +132,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     [o_filter_headPhone_ckb setTitle:_NS("Headphone virtualization")];
     [o_filter_normLevel_ckb setTitle:_NS("Volume normalization")];
     [o_filter_normLevel_lbl setStringValue:_NS("Maximum level")];
+    [o_filter_karaoke_ckb setTitle:_NS("Karaoke")];
 
     /* generic */
     [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"equalizer"]] setLabel:_NS("Equalizer")];
@@ -233,6 +234,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
         aout_EnableFilter(p_playlist, "compressor", false);
         aout_EnableFilter(p_playlist, "headphone", false);
         aout_EnableFilter(p_playlist, "normvol", false);
+        aout_EnableFilter(p_playlist, "karaoke", false);
     }
 
     /* fetch preset */
@@ -977,10 +979,12 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     if (psz_afilters) {
         [o_filter_headPhone_ckb setState: (NSInteger)strstr(psz_afilters, "headphone") ];
         [o_filter_normLevel_ckb setState: (NSInteger)strstr(psz_afilters, "normvol") ];
+        [o_filter_normLevel_ckb setState: (NSInteger)strstr(psz_afilters, "karaoke") ];
         free(psz_afilters);
     } else {
         [o_filter_headPhone_ckb setState: NSOffState];
         [o_filter_normLevel_ckb setState: NSOffState];
+        [o_filter_karaoke_ckb setState: NSOffState];
     }
     [o_filter_normLevel_sld setFloatValue: config_GetFloat(p_intf, "norm-max-level")];
 }
@@ -1005,6 +1009,11 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     }
 
     config_PutFloat(p_intf, "norm-max-level", [o_filter_normLevel_sld floatValue]);
+}
+
+- (IBAction)filter_enableKaraoke:(id)sender
+{
+    [self setAudioFilter: "karaoke" on:[sender state]];
 }
 
 @end

@@ -98,6 +98,7 @@
     IBOutlet id o_filter_normLevel_ckb;
     IBOutlet id o_filter_normLevel_sld;
     IBOutlet id o_filter_normLevel_lbl;
+    IBOutlet id o_filter_karaoke_ckb;
 }
 
 /* generic */
@@ -137,5 +138,6 @@
 - (IBAction)filter_enableHeadPhoneVirt:(id)sender;
 - (IBAction)filter_enableVolumeNorm:(id)sender;
 - (IBAction)filter_volNormSliderUpdated:(id)sender;
+- (IBAction)filter_enableKaraoke:(id)sender;
 
 @end
