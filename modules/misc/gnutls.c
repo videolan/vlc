@@ -785,7 +785,7 @@ static int OpenServer (vlc_object_t *obj)
 
     vlc_tls_creds_sys_t *sys = malloc (sizeof (*sys));
     if (unlikely(sys == NULL))
-        return VLC_ENOMEM;
+        goto error;
 
     server->sys     = sys;
     server->add_CA  = gnutls_ServerAddCA;
@@ -849,6 +849,7 @@ static int OpenServer (vlc_object_t *obj)
 
 error:
     free (sys);
+    gnutls_Deinit (obj);
     return VLC_EGENERIC;
 }
 
