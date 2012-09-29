@@ -113,15 +113,24 @@ int vlc_tls_ServerAddCRL (vlc_tls_creds_t *srv, const char *path)
 }
 
 
-vlc_tls_t *vlc_tls_ServerSessionCreate (vlc_tls_creds_t *srv, int fd)
+vlc_tls_t *vlc_tls_ServerSessionCreate (vlc_tls_creds_t *crd, int fd)
 {
-    return srv->open (srv, fd);
+    vlc_tls_t *session = vlc_custom_create (crd, sizeof (*session),
+                                            "tls server");
+    int val = crd->open (crd, session, fd);
+    if (val == VLC_SUCCESS)
+        return session;
+    vlc_object_release (session);
+    return NULL;
 }
 
 
-void vlc_tls_ServerSessionDelete (vlc_tls_t *ses)
+void vlc_tls_ServerSessionDelete (vlc_tls_t *session)
 {
-    ses->u.close (ses);
+    vlc_tls_creds_t *crd = (vlc_tls_creds_t *)(session->p_parent);
+
+    crd->close (crd, session);
+    vlc_object_release (session);
 }
 
 

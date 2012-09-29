@@ -635,7 +635,7 @@ struct vlc_tls_creds_sys
  * Terminates TLS session and releases session data.
  * You still have to close the socket yourself.
  */
-static void gnutls_SessionClose (vlc_tls_t *session)
+static void gnutls_SessionClose (vlc_tls_creds_t *crd, vlc_tls_t *session)
 {
     vlc_tls_sys_t *sys = session->sys;
 
@@ -643,57 +643,46 @@ static void gnutls_SessionClose (vlc_tls_t *session)
         gnutls_bye (sys->session, GNUTLS_SHUT_WR);
     gnutls_deinit (sys->session);
 
-    vlc_object_release (session);
     free (sys);
+    (void) crd;
 }
 
 
 /**
  * Initializes a server-side TLS session.
  */
-static vlc_tls_t *gnutls_SessionOpen (vlc_tls_creds_t *server, int fd)
+static int gnutls_SessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
+                               int fd)
 {
-    vlc_tls_creds_sys_t *ssys = server->sys;
-    int val;
-
-    vlc_tls_t *session = vlc_object_create (server, sizeof (*session));
-    if (unlikely(session == NULL))
-        return NULL;
-
     vlc_tls_sys_t *sys = malloc (sizeof (*session->sys));
     if (unlikely(sys == NULL))
-    {
-        vlc_object_release (session);
-        return NULL;
-    }
+        return VLC_ENOMEM;
 
     session->sys = sys;
     session->sock.p_sys = session;
     session->sock.pf_send = gnutls_Send;
     session->sock.pf_recv = gnutls_Recv;
-    session->handshake = ssys->handshake;
-    session->u.close = gnutls_SessionClose;
+    session->handshake = crd->sys->handshake;
     sys->handshaked = false;
     sys->hostname = NULL;
 
-    val = gnutls_init (&sys->session, GNUTLS_SERVER);
+    int val = gnutls_init (&sys->session, GNUTLS_SERVER);
     if (val != 0)
     {
-        msg_Err (server, "cannot initialize TLS session: %s",
+        msg_Err (session, "cannot initialize TLS session: %s",
                  gnutls_strerror (val));
         free (sys);
-        vlc_object_release (session);
-        return NULL;
+        return VLC_EGENERIC;
     }
 
-    if (gnutls_SessionPrioritize (VLC_OBJECT (server), sys->session))
+    if (gnutls_SessionPrioritize (VLC_OBJECT (crd), sys->session))
         goto error;
 
     val = gnutls_credentials_set (sys->session, GNUTLS_CRD_CERTIFICATE,
-                                  ssys->x509_cred);
+                                  crd->sys->x509_cred);
     if (val < 0)
     {
-        msg_Err (server, "cannot set TLS session credentials: %s",
+        msg_Err (session, "cannot set TLS session credentials: %s",
                  gnutls_strerror (val));
         goto error;
     }
@@ -704,11 +693,11 @@ static vlc_tls_t *gnutls_SessionOpen (vlc_tls_creds_t *server, int fd)
 
     gnutls_transport_set_ptr (sys->session,
                               (gnutls_transport_ptr_t)(intptr_t)fd);
-    return session;
+    return VLC_SUCCESS;
 
 error:
-    gnutls_SessionClose (session);
-    return NULL;
+    gnutls_SessionClose (crd, session);
+    return VLC_EGENERIC;
 }
 
 
@@ -791,6 +780,7 @@ static int OpenServer (vlc_object_t *obj)
     server->add_CA  = gnutls_ServerAddCA;
     server->add_CRL = gnutls_ServerAddCRL;
     server->open    = gnutls_SessionOpen;
+    server->close   = gnutls_SessionClose;
     /* No certificate validation by default */
     sys->handshake  = gnutls_ContinueHandshake;
 
