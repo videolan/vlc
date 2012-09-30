@@ -277,13 +277,13 @@ static int gnutls_CertSearch (vlc_tls_t *obj, const char *host,
             return -1;
     }
 
-    if (dialog_Question (obj, N_("Insecure site"),
-         N_("You attempted to reach %s, but security certificate presented by "
-            "the server could not be verified."
-            "This problem may be caused by a configuration error "
-            "on the server or by a serious breach of network security.\n\n"
-            "If in doubt, abort now.\n"),
-                         N_("Abort"), N_("View certificate"), NULL, host) != 2)
+    if (dialog_Question (obj, _("Insecure site"),
+         _("You attempted to reach %s, but security certificate presented by "
+           "the server could not be verified."
+           "This problem may be caused by a configuration error "
+           "on the server or by a serious breach of network security.\n\n"
+           "If in doubt, abort now.\n"),
+                         _("Abort"), _("View certificate"), NULL, host) != 2)
          return -1;
 
     gnutls_x509_crt_t cert;
@@ -299,11 +299,11 @@ static int gnutls_CertSearch (vlc_tls_t *obj, const char *host,
     }
     gnutls_x509_crt_deinit (cert);
 
-    val = dialog_Question (obj, N_("Insecure site"),
-         N_("This is the certificate presented by %s:\n%s\n\n"
-            "If in doubt, abort now.\n"),
-                           N_("Abort"), N_("Accept 24 hours"),
-                           N_("Accept permanently"), host, desc.data);
+    val = dialog_Question (obj, _("Insecure site"),
+         _("This is the certificate presented by %s:\n%s\n\n"
+           "If in doubt, abort now.\n"),
+                           _("Abort"), _("Accept 24 hours"),
+                           _("Accept permanently"), host, desc.data);
     gnutls_free (desc.data);
 
     time_t expiry = 0;
