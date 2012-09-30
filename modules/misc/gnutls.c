@@ -240,13 +240,11 @@ static int gnutls_ContinueHandshake (vlc_tls_t *session)
 }
 
 
-typedef struct
+static struct
 {
     int flag;
-    const char *msg;
-} error_msg_t;
-
-static const error_msg_t cert_errors[] =
+    const char msg[44];
+} cert_errs[] =
 {
     { GNUTLS_CERT_INVALID,
         "Certificate could not be verified" },
@@ -262,7 +260,6 @@ static const error_msg_t cert_errors[] =
         "Certificate is not yet activated" },
     { GNUTLS_CERT_EXPIRED,
         "Certificate has expired" },
-    { 0, NULL }
 };
 
 
@@ -280,26 +277,23 @@ static int gnutls_HandshakeAndValidate (vlc_tls_t *session)
     val = gnutls_certificate_verify_peers2 (sys->session, &status);
     if (val)
     {
-        msg_Err (session, "Certificate verification failed: %s",
+        msg_Err (session, "Certificate verification error: %s",
                  gnutls_strerror (val));
         return -1;
     }
 
     if (status)
     {
-        msg_Err (session, "TLS session: access denied (status 0x%X)", status);
-        for (const error_msg_t *e = cert_errors; e->flag; e++)
-        {
-            if (status & e->flag)
+        msg_Err (session, "Certificate verification failure:");
+        for (size_t i = 0; i < sizeof (cert_errs) / sizeof (cert_errs[0]); i++)
+            if (status & cert_errs[i].flag)
             {
-                msg_Err (session, "%s", e->msg);
-                status &= ~e->flag;
+                msg_Err (session, " * %s", cert_errs[i].msg);
+                status &= ~cert_errs[i].flag;
             }
-        }
 
         if (status)
-            msg_Err (session,
-                     "unknown certificate error (you found a bug in VLC)");
+            msg_Err (session, " * Unknown verification error 0x%04X", status);
         return -1;
     }
 
