@@ -180,9 +180,10 @@ void vlc_tls_SessionDelete (vlc_tls_t *session)
     vlc_object_release (session);
 }
 
-int vlc_tls_SessionHandshake (vlc_tls_t *session, const char *host)
+int vlc_tls_SessionHandshake (vlc_tls_t *session, const char *host,
+                              const char *service)
 {
-    return session->handshake (session, host);
+    return session->handshake (session, host, service);
 }
 
 /**
@@ -196,7 +197,7 @@ int vlc_tls_SessionHandshake (vlc_tls_t *session, const char *host)
  * @return NULL on error.
  **/
 vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *crd, int fd,
-                                        const char *host)
+                                        const char *host, const char *service)
 {
     vlc_tls_t *session = vlc_tls_SessionCreate (crd, fd, host);
     if (session == NULL)
@@ -204,7 +205,7 @@ vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *crd, int fd,
 
     int val;
     do
-        val = vlc_tls_SessionHandshake (session, host);
+        val = vlc_tls_SessionHandshake (session, host, service);
     while (val > 0);
 
     if (val != 0)

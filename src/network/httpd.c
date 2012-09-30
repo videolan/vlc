@@ -1880,7 +1880,7 @@ static void httpd_ClientSend( httpd_client_t *cl )
 
 static void httpd_ClientTlsHandshake( httpd_client_t *cl )
 {
-    switch( vlc_tls_SessionHandshake( cl->p_tls, NULL ) )
+    switch( vlc_tls_SessionHandshake( cl->p_tls, NULL, NULL ) )
     {
         case 0:
             cl->i_state = HTTPD_CLIENT_RECEIVING;

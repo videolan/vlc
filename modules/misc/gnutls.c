@@ -214,7 +214,8 @@ static int gnutls_Recv (void *opaque, void *buf, size_t length)
  * 1 if more would-be blocking recv is needed,
  * 2 if more would-be blocking send is required.
  */
-static int gnutls_ContinueHandshake (vlc_tls_t *session, const char *host)
+static int gnutls_ContinueHandshake (vlc_tls_t *session, const char *host,
+                                     const char *service)
 {
     vlc_tls_sys_t *sys = session->sys;
     int val;
@@ -236,7 +237,7 @@ static int gnutls_ContinueHandshake (vlc_tls_t *session, const char *host)
     }
 
     sys->handshaked = true;
-    (void) host;
+    (void) host; (void) service;
     return 0;
 }
 
@@ -307,11 +308,12 @@ static struct
 };
 
 
-static int gnutls_HandshakeAndValidate (vlc_tls_t *session, const char *host)
+static int gnutls_HandshakeAndValidate (vlc_tls_t *session, const char *host,
+                                        const char *service)
 {
     vlc_tls_sys_t *sys = session->sys;
 
-    int val = gnutls_ContinueHandshake (session, host);
+    int val = gnutls_ContinueHandshake (session, host, service);
     if (val)
         return val;
 
@@ -418,7 +420,8 @@ struct vlc_tls_creds_sys
 {
     gnutls_certificate_credentials_t x509_cred;
     gnutls_dh_params_t dh_params; /* XXX: used for server only */
-    int (*handshake) (vlc_tls_t *, const char *); /* XXX: useful for server only */
+    int (*handshake) (vlc_tls_t *, const char *, const char *);
+        /* ^^ XXX: useful for server only */
 };
 
 

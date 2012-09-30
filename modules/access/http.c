@@ -1225,7 +1225,7 @@ static int Connect( access_t *p_access, uint64_t i_tell )
 
         /* TLS/SSL handshake */
         p_sys->p_tls = vlc_tls_ClientSessionCreate( p_sys->p_creds, p_sys->fd,
-                                                    p_sys->url.psz_host );
+                                                p_sys->url.psz_host, "https" );
         if( p_sys->p_tls == NULL )
         {
             msg_Err( p_access, "cannot establish HTTP/TLS session" );
