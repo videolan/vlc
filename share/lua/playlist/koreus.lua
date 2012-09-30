@@ -47,7 +47,7 @@ function parse()
 			_,_,arturl = string.find( line, "href=\"(.-)\"" )
 		end
 
-        vid_url = string.match( line, '(http://media%d?%.koreus%.com/%d+/%d+/[%w-]*%.mp4)' )
+        vid_url = string.match( line, '(http://embed.koreus.com/%d+/%d+/[%w-]*%.mp4)' )
 		if vid_url then
 			return { { path = vid_url; name = name; description = description; artist = artist; arturl = arturl } }
 		end
