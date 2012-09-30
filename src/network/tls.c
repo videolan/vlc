@@ -30,6 +30,11 @@
 # include "config.h"
 #endif
 
+#ifdef HAVE_POLL
+# include <poll.h>
+#endif
+#include <assert.h>
+
 #include <vlc_common.h>
 #include "libvlc.h"
 
@@ -203,9 +208,29 @@ vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *crd, int fd,
     if (session == NULL)
         return NULL;
 
+    mtime_t deadline = mdate ();
+    deadline += var_InheritInteger (crd, "ipv4-timeout") * 1000;
+
+    struct pollfd ufd[1];
+    ufd[0].fd = fd;
+
     int val;
-    do
-        val = vlc_tls_SessionHandshake (session, host, service);
+    while ((val = vlc_tls_SessionHandshake (session, host, service)) > 0)
+    {
+        mtime_t now = mdate ();
+        if (now > deadline)
+           now = deadline;
+
+        assert (val <= 2);
+        ufd[0] .events = (val == 1) ? POLLIN : POLLOUT;
+
+        if (poll (ufd, 1, (deadline - now) / 1000) == 0)
+        {
+            msg_Err (session, "TLS client session handshake timeout");
+            val = -1;
+            break;
+        }
+    }
     while (val > 0);
 
     if (val != 0)
