@@ -574,20 +574,19 @@ connect:
             goto error;
         }
 
-
-        /* Do not accept redirection outside of HTTP works */
         const char *psz_protocol;
-        if( !strncmp( p_sys->psz_location, "http:", 5 ) )
+        if( !strncmp( p_sys->psz_location, "http://", 7 ) )
             psz_protocol = "http";
-        else if( !strncmp( p_sys->psz_location, "https:", 6 ) )
+        else if( !strncmp( p_sys->psz_location, "https://", 8 ) )
             psz_protocol = "https";
         else
-        {
-            msg_Err( p_access, "insecure redirection ignored" );
+        {   /* Do not accept redirection outside of HTTP */
+            msg_Err( p_access, "unsupported redirection ignored" );
             goto error;
         }
         free( p_access->psz_location );
-        p_access->psz_location = strdup( p_sys->psz_location );
+        p_access->psz_location = strdup( p_sys->psz_location
+                                       + strlen( psz_protocol ) + 3 );
         /* Clean up current Open() run */
         vlc_UrlClean( &p_sys->url );
         http_auth_Reset( &p_sys->auth );
