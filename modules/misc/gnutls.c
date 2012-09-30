@@ -26,6 +26,7 @@
 # include "config.h"
 #endif
 
+#include <time.h>
 #include <errno.h>
 #include <assert.h>
 
@@ -41,7 +42,12 @@
 # define gnutls_certificate_set_x509_system_trust(c) \
     (c, GNUTLS_E_UNIMPLEMENTED_FEATURE)
 #endif
-
+#if (GNUTLS_VERSION_NUMBER < 0x03000D)
+# define gnutls_verify_stored_pubkey(db,tdb,host,serv,ctype,cert,fl) \
+    (db, host, serv, ctype, cert, fl, GNUTLS_E_NO_CERTIFICATE_FOUND)
+# define gnutls_store_pubkey(db,tdb,host,serv,ctype,cert,e,fl) \
+    (db, host, serv, ctype, cert, fl, GNUTLS_E_UNIMPLEMENTED_FEATURE)
+#endif
 #include "dhparams.h"
 
 /*****************************************************************************
@@ -247,9 +253,29 @@ static int gnutls_ContinueHandshake (vlc_tls_t *session, const char *host,
  * @return 0 on success, -1 on failure.
  */
 static int gnutls_CertSearch (vlc_tls_t *obj, const char *host,
+                              const char *service,
                               const gnutls_datum_t *restrict datum)
 {
     assert (host != NULL);
+    /* Look up mismatching certificate in store */
+    int val = gnutls_verify_stored_pubkey (NULL, NULL, host, service,
+                                           GNUTLS_CRT_X509, datum, 0);
+    switch (val)
+    {
+        case 0:
+            msg_Dbg (obj, "certificate key match for %s", host);
+            return 0;
+        case GNUTLS_E_NO_CERTIFICATE_FOUND:
+            msg_Dbg (obj, "no known certificates for %s", host);
+            break;
+        case GNUTLS_E_CERTIFICATE_KEY_MISMATCH:
+            msg_Dbg (obj, "certificate keys mismatch for %s", host);
+            break;
+        default:
+            msg_Err (obj, "certificate key match error for %s: %s", host,
+                     gnutls_strerror (val));
+            return -1;
+    }
 
     if (dialog_Question (obj, N_("Insecure site"),
          N_("You attempted to reach %s, but security certificate presented by "
@@ -273,14 +299,25 @@ static int gnutls_CertSearch (vlc_tls_t *obj, const char *host,
     }
     gnutls_x509_crt_deinit (cert);
 
-    int val = dialog_Question (obj, N_("Insecure site"),
+    val = dialog_Question (obj, N_("Insecure site"),
          N_("This is the certificate presented by %s:\n%s\n\n"
             "If in doubt, abort now.\n"),
-                           N_("Abort"), N_("Proceed anyway"), NULL,
-                           host, desc.data);
+                           N_("Abort"), N_("Accept 24 hours"),
+                           N_("Accept permanently"), host, desc.data);
     gnutls_free (desc.data);
 
-    return (val == 2) ? 0 : -1;
+    time_t expiry = 0;
+    switch (val)
+    {
+        case 2:
+            time (&expiry);
+            expiry += 24 * 60 * 60;
+        case 3:
+            gnutls_store_pubkey (NULL, NULL, host, service, GNUTLS_CRT_X509,
+                                 datum, expiry, 0);
+            return 0;
+    }
+    return -1;
 }
 
 
@@ -361,7 +398,7 @@ static int gnutls_HandshakeAndValidate (vlc_tls_t *session, const char *host,
 
     if (val || host == NULL)
         return val;
-    if (status && gnutls_CertSearch (session, host, data))
+    if (status && gnutls_CertSearch (session, host, service, data))
         return -1;
 
     gnutls_x509_crt_t cert;
@@ -384,7 +421,7 @@ static int gnutls_HandshakeAndValidate (vlc_tls_t *session, const char *host,
     if (val)
     {
         msg_Err (session, "Certificate does not match \"%s\"", host);
-        val = gnutls_CertSearch (session, host, data);
+        val = gnutls_CertSearch (session, host, service, data);
     }
 error:
     gnutls_x509_crt_init (&cert);
