@@ -91,9 +91,11 @@ typedef struct dialog_question_t
     int answer;
 } dialog_question_t;
 
-VLC_API int dialog_Question(vlc_object_t *, const char *, const char *, const char *, const char *, const char *);
-#define dialog_Question(o, t, m, y, n, c) \
-        dialog_Question(VLC_OBJECT(o), t, m, y, n, c)
+VLC_API int dialog_Question(vlc_object_t *, const char *, const char *,
+                            const char *, const char *, const char *, ...)
+VLC_FORMAT(3, 7);
+#define dialog_Question(o, t, m, y, n, ...) \
+        dialog_Question(VLC_OBJECT(o), t, m, y, n, __VA_ARGS__)
 
 typedef struct dialog_progress_bar_t
 {   /* Request-time parameters */
