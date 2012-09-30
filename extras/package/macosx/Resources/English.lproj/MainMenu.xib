@@ -21,6 +21,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
+      <integer value="2"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -53,7 +54,7 @@
         <nil key="NSUserInterfaceItemIdentifier"/>
         <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <object class="NSView" key="NSWindowView" id="429932428">
-          <nil key="NSNextResponder"/>
+          <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -191,6 +192,7 @@
                           </object>
                           <string key="NSFrame">{{1, 1}, {199, 272}}</string>
                           <reference key="NSSuperview" ref="979766179"/>
+                          <reference key="NSNextKeyView" ref="1064884668"/>
                           <reference key="NSDocView" ref="1064884668"/>
                           <reference key="NSBGColor" ref="885475112"/>
                           <int key="NScvFlags">4</int>
@@ -219,6 +221,7 @@
                       </object>
                       <string key="NSFrameSize">{201, 274}</string>
                       <reference key="NSSuperview" ref="824340487"/>
+                      <reference key="NSNextKeyView" ref="18556274"/>
                       <int key="NSsFlags">133650</int>
                       <reference key="NSVScroller" ref="252983915"/>
                       <reference key="NSHScroller" ref="11557666"/>
@@ -449,6 +452,7 @@
                           </object>
                           <string key="NSFrame">{{1, 17}, {402, 236}}</string>
                           <reference key="NSSuperview" ref="915491793"/>
+                          <reference key="NSNextKeyView" ref="23448837"/>
                           <reference key="NSDocView" ref="23448837"/>
                           <reference key="NSBGColor" ref="885475112"/>
                           <int key="NScvFlags">4</int>
@@ -483,6 +487,7 @@
                           </object>
                           <string key="NSFrame">{{1, 0}, {402, 17}}</string>
                           <reference key="NSSuperview" ref="915491793"/>
+                          <reference key="NSNextKeyView" ref="823165105"/>
                           <reference key="NSDocView" ref="823165105"/>
                           <reference key="NSBGColor" ref="885475112"/>
                           <int key="NScvFlags">4</int>
@@ -490,6 +495,7 @@
                       </object>
                       <string key="NSFrameSize">{404, 254}</string>
                       <reference key="NSSuperview" ref="440594360"/>
+                      <reference key="NSNextKeyView" ref="343242432"/>
                       <int key="NSsFlags">133682</int>
                       <reference key="NSVScroller" ref="573737110"/>
                       <reference key="NSHScroller" ref="297523533"/>
@@ -1056,6 +1062,7 @@
             </object>
           </object>
           <string key="NSFrameSize">{604, 310}</string>
+          <reference key="NSSuperview"/>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
@@ -15118,7 +15125,6 @@ LCAuLi4</string>
               <string>o_sidebar_scrollview</string>
               <string>o_sidebar_view</string>
               <string>o_split_view</string>
-              <string>o_video_view</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
@@ -15129,7 +15135,6 @@ LCAuLi4</string>
               <string>id</string>
               <string>id</string>
               <string>VLCFSPanel</string>
-              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -15187,7 +15192,6 @@ LCAuLi4</string>
               <string>o_sidebar_scrollview</string>
               <string>o_sidebar_view</string>
               <string>o_split_view</string>
-              <string>o_video_view</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
@@ -15305,10 +15309,6 @@ LCAuLi4</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_split_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_video_view</string>
                 <string key="candidateClassName">id</string>
               </object>
             </object>
@@ -15917,11 +15917,13 @@ LCAuLi4</string>
               <bool key="EncodedWithXMLCoder">YES</bool>
               <string>o_controls_bar</string>
               <string>o_titlebar_view</string>
+              <string>o_video_view</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
               <string>VLCControlsBarCommon</string>
               <string>id</string>
+              <string>VLCVoutView</string>
             </object>
           </object>
           <object class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -15930,6 +15932,7 @@ LCAuLi4</string>
               <bool key="EncodedWithXMLCoder">YES</bool>
               <string>o_controls_bar</string>
               <string>o_titlebar_view</string>
+              <string>o_video_view</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
@@ -15940,6 +15943,10 @@ LCAuLi4</string>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_titlebar_view</string>
                 <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_view</string>
+                <string key="candidateClassName">VLCVoutView</string>
               </object>
             </object>
           </object>

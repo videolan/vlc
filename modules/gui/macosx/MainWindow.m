@@ -43,6 +43,7 @@
 #import <vlc_aout_intf.h>
 
 #import "ControlsBar.h"
+#import "VideoView.h"
 
 
 @interface VLCMainWindow ()
@@ -140,6 +141,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (o_extra_video_window) {
         [o_extra_video_window release];
         o_extra_video_window = nil;
+    }
+
+    if (o_detached_video_window) {
+        [o_detached_video_window release];
+        o_detached_video_window = nil;
     }
 
     [super dealloc];
@@ -727,15 +733,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 #pragma mark -
 #pragma mark Video Output handling
-- (id)videoView
-{
-    return o_video_view;
-}
 
-- (void)setupVideoView
+- (VLCVoutView *)setupVout:(vout_window_t *)p_wnd
 {
     BOOL b_video_deco = var_InheritBool(VLCIntf, "video-deco");
     BOOL b_video_wallpaper = var_InheritBool(VLCIntf, "video-wallpaper");
+    VLCVoutView *o_vout_view;
+    VLCVideoWindowCommon *o_new_video_window;
 
     // TODO: make lion fullscreen compatible with video-wallpaper and !embedded-video
     if ((b_video_wallpaper || !b_video_deco) && !b_nativeFullscreenMode) {
@@ -769,17 +773,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_extra_video_window setBackgroundColor: [NSColor blackColor]];
         [o_extra_video_window setCanBecomeKeyWindow: !b_video_wallpaper];
         [o_extra_video_window setCanBecomeMainWindow: !b_video_wallpaper];
-        [o_extra_video_window setAcceptsMouseMovedEvents:!b_video_wallpaper];
+        [o_extra_video_window setAcceptsMouseMovedEvents: !b_video_wallpaper];
         [o_extra_video_window setMovableByWindowBackground: !b_video_wallpaper];
         [o_extra_video_window useOptimizedDrawing: YES];
 
-        [o_video_view retain];
-        if ([o_video_view superview] != NULL)
-            [o_video_view removeFromSuperviewWithoutNeedingDisplay];
-        window_rect.origin.x = window_rect.origin.y = 0;
-        [o_video_view setFrame: window_rect];
-        [[o_extra_video_window contentView] addSubview: o_video_view positioned:NSWindowAbove relativeTo:nil];
-        [o_video_view release];
+        o_vout_view = [[VLCVoutView alloc] initWithFrame:[[o_extra_video_window contentView] bounds]];
+        [o_vout_view setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+        [[o_extra_video_window contentView] addSubview:o_vout_view positioned:NSWindowAbove relativeTo:nil];
+        [o_extra_video_window setVideoView:o_vout_view];
+
+        o_new_video_window = o_extra_video_window;
 
         if (b_video_wallpaper)
             [o_extra_video_window orderBack:nil];
@@ -792,20 +795,14 @@ static VLCMainWindow *_o_sharedInstance = nil;
         b_nonembedded = YES;
     } else {
         if (var_InheritBool(VLCIntf, "embedded-video") || b_nativeFullscreenMode) {
-            if ([o_video_view window] != self) {
-                [o_video_view removeFromSuperviewWithoutNeedingDisplay];
-                [o_video_view setFrame: [o_split_view frame]];
-                [[self contentView] addSubview:o_video_view positioned:NSWindowAbove relativeTo:nil];
-            }
+            o_vout_view = [o_video_view retain];
+            o_new_video_window = self;
             b_nonembedded = NO;
         } else {
-            if ([o_video_view superview] != NULL)
-                [o_video_view removeFromSuperviewWithoutNeedingDisplay];
-
             if (!o_detached_video_window) {
                 NSWindowController *o_controller = [[NSWindowController alloc] initWithWindowNibName:@"DetachedVideoWindow"];
                 [o_controller loadWindow];
-                o_detached_video_window = (VLCDetachedVideoWindow *)[o_controller window];
+                o_detached_video_window = [(VLCDetachedVideoWindow *)[o_controller window] retain];
                 [o_controller release];
 
                 // event occurs before window is created, so call again
@@ -819,38 +816,31 @@ static VLCMainWindow *_o_sharedInstance = nil;
                 [o_detached_video_window setContentMinSize: NSMakeSize(363., f_min_video_height + [[[o_detached_video_window controlsBar] bottomBarView] frame].size.height)];
             }
 
-            NSRect videoFrame;
-            videoFrame.size = [[o_detached_video_window contentView] frame].size;
-            videoFrame.size.height -= [[[o_detached_video_window controlsBar] bottomBarView] frame].size.height;
-            if (b_dark_interface)
-                videoFrame.size.height -= [o_titlebar_view frame].size.height;
-
-            videoFrame.origin.x = .0;
-            videoFrame.origin.y = [[[o_detached_video_window controlsBar] bottomBarView] frame].size.height;
-
-            [o_video_view setFrame: videoFrame];
-            [[o_detached_video_window contentView] addSubview: o_video_view positioned:NSWindowAbove relativeTo:nil];
             [o_detached_video_window setLevel:NSNormalWindowLevel];
             [o_detached_video_window useOptimizedDrawing: YES];
 
+            o_vout_view = [[o_detached_video_window videoView] retain];
+            o_new_video_window = o_detached_video_window;
             b_nonembedded = YES;
         }
     }
 
     if (!b_video_wallpaper) {
-        [[o_video_view window] makeKeyAndOrderFront: self];
+        [o_new_video_window makeKeyAndOrderFront: self];
 
         vout_thread_t *p_vout = getVout();
         if (p_vout) {
             if (var_GetBool(p_vout, "video-on-top"))
-                [[o_video_view window] setLevel: NSStatusWindowLevel];
+                [o_new_video_window setLevel: NSStatusWindowLevel];
             else
-                [[o_video_view window] setLevel: NSNormalWindowLevel];
+                [o_new_video_window setLevel: NSNormalWindowLevel];
             vlc_object_release(p_vout);
         }
     }
 
-    [[o_video_view window] setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
+    [o_new_video_window setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
+
+    return [o_vout_view autorelease];
 }
 
 - (void)setVideoplayEnabled
@@ -1886,8 +1876,15 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         // native fs not supported with detached view yet
         [o_titlebar_view setFullscreenButtonHidden: YES];
-
     }
+
+    NSRect videoViewRect = [[self contentView] bounds];
+    if (b_dark_interface)
+        videoViewRect.size.height -= [o_titlebar_view frame].size.height;
+    CGFloat f_bottomBarHeight = [[[self controlsBar] bottomBarView] frame].size.height;
+    videoViewRect.size.height -= f_bottomBarHeight;
+    videoViewRect.origin.y = f_bottomBarHeight;
+    [o_video_view setFrame: videoViewRect];
 }
 
 @end

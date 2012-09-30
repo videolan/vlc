@@ -28,7 +28,10 @@
 #import "CompatibilityFixes.h"
 #import "PXSourceList.h"
 #import "PXSourceListDataSource.h"
+
 #import <vlc_input.h>
+#import <vlc_vout_window.h>
+
 #import "Windows.h"
 #import "misc.h"
 #import "fspanel.h"
@@ -36,13 +39,13 @@
 
 @class VLCDetachedVideoWindow;
 @class VLCMainWindowControlsBar;
+@class VLCVoutView;
 
 @interface VLCMainWindow : VLCVideoWindowCommon <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate> {
 
     IBOutlet id o_search_fld;
     
     IBOutlet id o_playlist_table;
-    IBOutlet id o_video_view;
     IBOutlet id o_split_view;
     IBOutlet id o_left_split_view;
     IBOutlet id o_right_split_view;
@@ -104,7 +107,7 @@
     VLCColorView * o_color_backdrop;
     NSInteger i_originalLevel;
 
-    VLCWindow *o_extra_video_window;
+    VLCVideoWindowCommon *o_extra_video_window;
     id o_current_video_window;
 
     NSRect frameBeforePlayback;
@@ -136,8 +139,7 @@
 - (void)setPlay;
 - (void)updateVolumeSlider;
 
-- (id)videoView;
-- (void)setupVideoView;
+- (VLCVoutView *)setupVout:(vout_window_t *)p_wnd;
 - (void)setVideoplayEnabled;
 - (void)resizeWindow;
 - (void)setNativeVideoSize:(NSSize)size;

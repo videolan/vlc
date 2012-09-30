@@ -41,7 +41,6 @@
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
 #include <vlc_aout_intf.h>
-#include <vlc_vout_window.h>
 #include <vlc_vout_display.h>
 #include <unistd.h> /* execl() */
 
@@ -142,7 +141,7 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
     int i_y = cfg->y;
     unsigned i_width = cfg->width;
     unsigned i_height = cfg->height;
-    p_wnd->handle.nsobject = [[VLCMain sharedInstance] getVideoViewAtPositionX: &i_x Y: &i_y withWidth: &i_width andHeight: &i_height];
+    p_wnd->handle.nsobject = [[VLCMain sharedInstance] getVideoViewAtPositionX: &i_x Y: &i_y withWidth: &i_width andHeight: &i_height forWindow: p_wnd];
 
     if (!p_wnd->handle.nsobject) {
         msg_Err(p_wnd, "got no video view from the interface");
@@ -1499,10 +1498,20 @@ static VLCMain *_o_sharedMainInstance = nil;
     return o_wizard;
 }
 
-- (id)getVideoViewAtPositionX: (int *)pi_x Y: (int *)pi_y withWidth: (unsigned int*)pi_width andHeight: (unsigned int*)pi_height
+- (id)getVideoViewAtPositionX: (int *)pi_x Y: (int *)pi_y withWidth: (unsigned int*)pi_width andHeight: (unsigned int*)pi_height forWindow:(vout_window_t *)p_wnd
 {
-    [o_mainwindow performSelectorOnMainThread:@selector(setupVideoView) withObject:nil waitUntilDone:YES];
-    id videoView = [o_mainwindow videoView];
+    SEL sel = @selector(setupVout:);
+    NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[o_mainwindow methodSignatureForSelector:sel]];
+    [inv setTarget:o_mainwindow];
+    [inv setSelector:sel];
+    [inv setArgument:&p_wnd atIndex:2]; // starting at 2!
+
+    [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
+                       waitUntilDone:YES];
+
+    VLCVoutView *videoView;
+    [inv getReturnValue:&videoView];
+
     NSRect videoRect = [videoView frame];
     int i_x = (int)videoRect.origin.x;
     int i_y = (int)videoRect.origin.y;

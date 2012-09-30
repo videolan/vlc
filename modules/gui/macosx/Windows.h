@@ -57,6 +57,7 @@
 
 @end
 
+@class VLCVoutView;
 @class VLCControlsBarCommon;
 
 /*****************************************************************************
@@ -71,11 +72,14 @@
     BOOL b_dark_interface;
 
     IBOutlet id o_titlebar_view; // only set in main or detached window
+    IBOutlet VLCVoutView *o_video_view;
 
-    IBOutlet VLCControlsBarCommon* o_controls_bar;
+    IBOutlet VLCControlsBarCommon *o_controls_bar;
 }
 
+@property (nonatomic, assign) VLCVoutView* videoView;
 @property (readonly) VLCControlsBarCommon* controlsBar;
+
 
 - (void)setTitle:(NSString *)title;
 

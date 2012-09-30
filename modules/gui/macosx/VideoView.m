@@ -55,12 +55,16 @@
     [super dealloc];
 }
 
-- (void)awakeFromNib
+-(id)initWithFrame:(NSRect)frameRect
 {
-    [self registerForDraggedTypes:[NSArray arrayWithObject: NSFilenamesPboardType]];
+    if (self = [super initWithFrame:frameRect]) {
+        [self registerForDraggedTypes:[NSArray arrayWithObject: NSFilenamesPboardType]];
+    }
 
     i_lastScrollWheelDirection = 0;
     f_cumulated_magnification = 0.0;
+
+    return self;
 }
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender

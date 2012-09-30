@@ -219,6 +219,7 @@
 
 @implementation VLCVideoWindowCommon
 
+@synthesize videoView=o_video_view;
 @synthesize controlsBar=o_controls_bar;
 
 #pragma mark -

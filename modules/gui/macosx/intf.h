@@ -34,6 +34,7 @@
 #import <vlc_vout.h>
 #import <vlc_aout.h>
 #import <vlc_input.h>
+#import <vlc_vout_window.h>
 
 #import <Cocoa/Cocoa.h>
 #import "CompatibilityFixes.h"
@@ -157,7 +158,7 @@ struct intf_sys_t
 - (id)playlist;
 - (id)info;
 - (id)wizard;
-- (id)getVideoViewAtPositionX: (int *)pi_x Y: (int *)pi_y withWidth: (unsigned int*)pi_width andHeight: (unsigned int*)pi_height;
+- (id)getVideoViewAtPositionX: (int *)pi_x Y: (int *)pi_y withWidth: (unsigned int*)pi_width andHeight: (unsigned int*)pi_height forWindow:(vout_window_t *)p_wnd;
 - (void)setNativeVideoSize:(NSSize)size;
 - (id)coreDialogProvider;
 - (id)eyeTVController;
