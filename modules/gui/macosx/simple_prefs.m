@@ -370,7 +370,8 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     [object removeAllItems];
 
     p_item = config_FindConfig(VLC_OBJECT(p_intf), name);
-    p_list = module_list_get(NULL);
+    size_t count;
+    p_list = module_list_get(&count);
     if (!p_item ||!p_list) {
         if (p_list) module_list_free(p_list);
         msg_Err(p_intf, "serious problem, item or list not found");
@@ -378,7 +379,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     }
 
     [object addItemWithTitle: _NS("Default")];
-    for (size_t i_index = 0; p_list[i_index]; i_index++) {
+    for (size_t i_index = 0; i_index < count; i_index++) {
         p_parser = p_list[i_index];
         if (module_provides(p_parser, p_item->psz_type)) {
             [object addItemWithTitle: [NSString stringWithUTF8String: _(module_GetLongName(p_parser)) ?: ""]];
@@ -738,8 +739,9 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
 
     p_item = config_FindConfig(VLC_OBJECT(p_intf), name);
 
-    p_list = module_list_get(NULL);
-    for (size_t i_module_index = 0; p_list[i_module_index]; i_module_index++) {
+    size_t count;
+    p_list = module_list_get(&count);
+    for (size_t i_module_index = 0; i_module_index < count; i_module_index++) {
         p_parser = p_list[i_module_index];
 
         if (p_item->i_type == CONFIG_ITEM_MODULE && module_provides(p_parser, p_item->psz_type)) {

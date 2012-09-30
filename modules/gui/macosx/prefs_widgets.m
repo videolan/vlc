@@ -1269,8 +1269,9 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     size_t i_module_index;
     module_t *p_parser, **p_list;
 
-    p_list = module_list_get(NULL);
-    for (i_module_index = 0; p_list[i_module_index]; i_module_index++) {
+    size_t count;
+    p_list = module_list_get(&count);
+    for (i_module_index = 0; i_module_index < count; i_module_index++) {
         p_parser = p_list[i_module_index];
 
         if (p_item->i_type == CONFIG_ITEM_MODULE) {
@@ -1311,8 +1312,9 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     /* build a list of available modules */
     module_t *p_parser, **p_list;
 
-    p_list = module_list_get(NULL);
-    for (size_t i_index = 0; p_list[i_index]; i_index++) {
+    size_t count;
+    p_list = module_list_get(&count);
+    for (size_t i_index = 0; i_index < count; i_index++) {
         p_parser = p_list[i_index];
 
         if (p_item->i_type == CONFIG_ITEM_MODULE) {
@@ -2010,8 +2012,9 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
 
     o_modulearray = [[NSMutableArray alloc] initWithCapacity:10];
     /* build a list of available modules */
-    p_list = module_list_get(NULL);
-    for (i_module_index = 0; p_list[i_module_index]; i_module_index++) {
+    size_t count;
+    p_list = module_list_get(&count);
+    for (i_module_index = 0; i_module_index < count; i_module_index++) {
         int i;
         p_parser = p_list[i_module_index];
 
