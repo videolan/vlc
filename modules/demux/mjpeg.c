@@ -189,33 +189,8 @@ static bool CheckMimeHeader( demux_t *p_demux, int *p_header_size )
     if( strncmp( (char *)p_sys->p_peek, "--", 2 ) != 0
         && strncmp( (char *)p_sys->p_peek, "\r\n--", 4 ) != 0 )
     {
-        /* Some broken stream may lack the first boundary */
-        if ( p_sys->psz_separator == NULL )
-        {
-            msg_Warn( p_demux, "Malformed stream. Trying to work around");
-            char *content_type = stream_ContentType( p_demux->s );
-            if ( content_type == NULL )
-                return false;
-            const char* boundary = strstr( content_type, "boundary=--" );
-            if ( boundary != NULL )
-            {
-                p_sys->psz_separator = strdup( boundary + strlen( "boundary=--" ) );
-                msg_Dbg( p_demux, "Video boundary extracted from Content-Type: %s", p_sys->psz_separator );
-                free( content_type );
-                /* Skip to HTTP header parsing as there's no boundary to extract
-                 * from the stream */
-            }
-            else
-            {
-                free( content_type );
-                return false;
-            }
-        }
-        else
-        {
-            *p_header_size = 0;
-            return false;
-        }
+        *p_header_size = 0;
+        return false;
     }
     else
     {
@@ -340,6 +315,23 @@ static int Open( vlc_object_t * p_this )
     p_sys->psz_separator = NULL;
     p_sys->i_frame_size_estimate = 15 * 1024;
 
+    char *content_type = stream_ContentType( p_demux->s );
+    if ( content_type )
+    {
+        //FIXME: this is not fully match to RFC
+        char* boundary = strstr( content_type, "boundary=" );
+        if( boundary )
+        {
+            p_sys->psz_separator = strdup( boundary + strlen("boundary=") );
+            if( !p_sys->psz_separator )
+            {
+                free( content_type );
+                goto error;
+            }
+        }
+        free( content_type );
+    }
+
     b_matched = CheckMimeHeader( p_demux, &i_size);
     if( b_matched )
     {
@@ -389,6 +381,7 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
+    free( p_sys->psz_separator );
     free( p_sys );
     return VLC_EGENERIC;
 }
