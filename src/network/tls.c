@@ -160,12 +160,12 @@ int vlc_tls_ServerAddCRL (vlc_tls_creds_t *srv, const char *path)
 
 /*** TLS  session ***/
 
-static vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *crd, int fd,
-                                         const char *hostname)
+vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *crd, int fd,
+                                  const char *host)
 {
     vlc_tls_t *session = vlc_custom_create (crd, sizeof (*session),
                                             "tls session");
-    int val = crd->open (crd, session, fd, hostname);
+    int val = crd->open (crd, session, fd, host);
     if (val == VLC_SUCCESS)
         return session;
     vlc_object_release (session);
@@ -180,38 +180,31 @@ void vlc_tls_SessionDelete (vlc_tls_t *session)
     vlc_object_release (session);
 }
 
-vlc_tls_t *vlc_tls_ServerSessionCreate (vlc_tls_creds_t *crd, int fd)
+int vlc_tls_SessionHandshake (vlc_tls_t *session, const char *host)
 {
-    return vlc_tls_SessionCreate (crd, fd, NULL);
-}
-
-int vlc_tls_SessionHandshake (vlc_tls_t *session)
-{
-    return session->handshake (session);
+    return session->handshake (session, host);
 }
 
 /**
  * Performs client side of TLS handshake through a connected socket, and
  * establishes a secure channel. This is a blocking network operation.
  *
- * @param fd stream socket through which to establish the secure communication
- * layer.
+ * @param fd socket through which to establish the secure channel
  * @param hostname expected server name, used both as Server Name Indication
- *                 and as expected Common Name of the peer's certificate.
+ *                 and as expected Common Name of the peer certificate
  *
  * @return NULL on error.
  **/
 vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *crd, int fd,
-                                        const char *hostname)
+                                        const char *host)
 {
-    vlc_tls_t *session = vlc_tls_SessionCreate (crd, fd, hostname);
+    vlc_tls_t *session = vlc_tls_SessionCreate (crd, fd, host);
     if (session == NULL)
         return NULL;
 
-    /* TODO: do this directly in the TLS plugin */
     int val;
     do
-        val = session->handshake (session);
+        val = vlc_tls_SessionHandshake (session, host);
     while (val > 0);
 
     if (val != 0)

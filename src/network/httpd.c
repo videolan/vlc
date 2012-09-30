@@ -1880,7 +1880,7 @@ static void httpd_ClientSend( httpd_client_t *cl )
 
 static void httpd_ClientTlsHandshake( httpd_client_t *cl )
 {
-    switch( vlc_tls_SessionHandshake( cl->p_tls ) )
+    switch( vlc_tls_SessionHandshake( cl->p_tls, NULL ) )
     {
         case 0:
             cl->i_state = HTTPD_CLIENT_RECEIVING;
@@ -2312,7 +2312,7 @@ static void* httpd_HostThread( void *data )
             vlc_tls_t *p_tls;
 
             if( host->p_tls != NULL )
-                p_tls = vlc_tls_ServerSessionCreate( host->p_tls, fd );
+                p_tls = vlc_tls_SessionCreate( host->p_tls, fd, NULL );
             else
                 p_tls = NULL;
 

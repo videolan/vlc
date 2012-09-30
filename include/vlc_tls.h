@@ -42,13 +42,13 @@ struct vlc_tls
     vlc_tls_sys_t *sys;
 
     struct virtual_socket_t sock;
-    int  (*handshake) (struct vlc_tls *);
+    int  (*handshake) (vlc_tls_t *, const char *host);
 };
 
 VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *, int fd,
                                                 const char *host);
-vlc_tls_t *vlc_tls_ServerSessionCreate (vlc_tls_creds_t *, int fd);
-int vlc_tls_SessionHandshake (vlc_tls_t *);
+vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *, int fd, const char *host);
+int vlc_tls_SessionHandshake (vlc_tls_t *, const char *host);
 VLC_API void vlc_tls_SessionDelete (vlc_tls_t *);
 
 /* NOTE: It is assumed that a->sock.p_sys = a */

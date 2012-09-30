@@ -176,7 +176,6 @@ static int gnutls_Error (vlc_object_t *obj, int val)
 struct vlc_tls_sys
 {
     gnutls_session_t session;
-    char *hostname; /* XXX: client only */
     bool handshaked;
 };
 
@@ -214,7 +213,7 @@ static int gnutls_Recv (void *opaque, void *buf, size_t length)
  * 1 if more would-be blocking recv is needed,
  * 2 if more would-be blocking send is required.
  */
-static int gnutls_ContinueHandshake (vlc_tls_t *session)
+static int gnutls_ContinueHandshake (vlc_tls_t *session, const char *host)
 {
     vlc_tls_sys_t *sys = session->sys;
     int val;
@@ -236,6 +235,7 @@ static int gnutls_ContinueHandshake (vlc_tls_t *session)
     }
 
     sys->handshaked = true;
+    (void) host;
     return 0;
 }
 
@@ -263,11 +263,11 @@ static struct
 };
 
 
-static int gnutls_HandshakeAndValidate (vlc_tls_t *session)
+static int gnutls_HandshakeAndValidate (vlc_tls_t *session, const char *host)
 {
     vlc_tls_sys_t *sys = session->sys;
 
-    int val = gnutls_ContinueHandshake (session);
+    int val = gnutls_ContinueHandshake (session, host);
     if (val)
         return val;
 
@@ -322,15 +322,13 @@ static int gnutls_HandshakeAndValidate (vlc_tls_t *session)
         goto error;
     }
 
-    if (sys->hostname != NULL
-     && !gnutls_x509_crt_check_hostname (cert, sys->hostname))
+    if (host != NULL && !gnutls_x509_crt_check_hostname (cert, host))
     {
-        msg_Err (session, "Certificate does not match \"%s\"", sys->hostname);
+        msg_Err (session, "Certificate does not match \"%s\"", host);
         goto error;
     }
 
     gnutls_x509_crt_deinit (cert);
-    msg_Dbg (session, "TLS/X.509 certificate verified");
     return 0;
 
 error:
@@ -367,7 +365,7 @@ struct vlc_tls_creds_sys
 {
     gnutls_certificate_credentials_t x509_cred;
     gnutls_dh_params_t dh_params; /* XXX: used for server only */
-    int (*handshake) (vlc_tls_t *); /* XXX: useful for server only */
+    int (*handshake) (vlc_tls_t *, const char *); /* XXX: useful for server only */
 };
 
 
@@ -383,7 +381,6 @@ static void gnutls_SessionClose (vlc_tls_creds_t *crd, vlc_tls_t *session)
         gnutls_bye (sys->session, GNUTLS_SHUT_WR);
     gnutls_deinit (sys->session);
 
-    free (sys->hostname);
     free (sys);
     (void) crd;
 }
@@ -405,7 +402,6 @@ static int gnutls_SessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
     session->sock.pf_recv = gnutls_Recv;
     session->handshake = crd->sys->handshake;
     sys->handshaked = false;
-    sys->hostname = NULL;
 
     int val = gnutls_init (&sys->session, type);
     if (val != 0)
@@ -463,22 +459,12 @@ static int gnutls_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
     /* minimum DH prime bits */
     gnutls_dh_set_prime_bits (sys->session, 1024);
 
-    /* server name */
     if (likely(hostname != NULL))
-    {
         /* fill Server Name Indication */
         gnutls_server_name_set (sys->session, GNUTLS_NAME_DNS,
                                 hostname, strlen (hostname));
-        /* keep hostname to match CNAME after handshake */
-        sys->hostname = strdup (hostname);
-        if (unlikely(sys->hostname == NULL))
-            goto error;
-    }
 
     return VLC_SUCCESS;
-error:
-    gnutls_SessionClose (crd, session);
-    return VLC_EGENERIC;
 }
 
 
