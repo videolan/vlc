@@ -36,12 +36,15 @@ function parse()
 		if not line then break end
 		if string.match( line, "<meta name=\"title\"" ) then
 			_,_,name = string.find( line, "content=\"(.-)\"" )
+			name = vlc.strings.resolve_xml_special_chars( name )
 		end
 		if string.match( line, "<meta name=\"description\"" ) then
 			_,_,description = string.find( line, "content=\"(.-)\"" )
+			description = vlc.strings.resolve_xml_special_chars( description )
 		end
 		if string.match( line, "<meta name=\"author\"" ) then
 			_,_,artist = string.find( line, "content=\"(.-)\"" )
+			artist = vlc.strings.resolve_xml_special_chars( artist )
 		end
 		if string.match( line, "link rel=\"image_src\"" ) then
 			_,_,arturl = string.find( line, "href=\"(.-)\"" )
