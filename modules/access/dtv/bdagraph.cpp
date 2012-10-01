@@ -369,9 +369,7 @@ BDAGraph::BDAGraph( vlc_object_t *p_this ):
     p_scanning_tuner = NULL;
     p_grabber = NULL;
 
-    /* Initialize COM - MS says to use CoInitializeEx in preference to
-     * CoInitialize */
-    CoInitializeEx( 0, COINIT_APARTMENTTHREADED );
+    CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
 }
 
 /*****************************************************************************

@@ -379,7 +379,7 @@ static int DecOpen( decoder_t *p_dec )
     ldt_fs_t *ldt_fs = Setup_LDT_Keeper();
 #else
     /* Initialize OLE/COM */
-    CoInitialize( 0 );
+    CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
 #endif /* LOADER */
 
     if( LoadDMO( VLC_OBJECT(p_dec), &hmsdmo_dll, &p_dmo, &p_dec->fmt_in, false )

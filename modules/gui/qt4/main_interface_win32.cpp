@@ -79,7 +79,7 @@ void MainInterface::createTaskBarButtons()
     FIXME:the play button's picture doesn't changed to pause when clicked
     */
 
-    CoInitialize( 0 );
+    CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
 
     if( S_OK == CoCreateInstance( CLSID_TaskbarList,
                 NULL, CLSCTX_INPROC_SERVER,

@@ -274,7 +274,7 @@ static void CommonChangeThumbnailClip(vout_display_t *vd, bool show)
     if (!GetVersionEx(&winVer) || winVer.dwMajorVersion <= 5)
         return;
 
-    CoInitialize(0);
+    CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 
     void *ptr;
     if (S_OK == CoCreateInstance(&CLSID_TaskbarList,
