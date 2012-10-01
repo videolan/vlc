@@ -55,7 +55,7 @@
 #define packet_header_len( c ) ( ( c & 0x03 ) + 1 ) /* number of bytes in a packet header */
 
 
-static inline int scalar_number( uint8_t *p, int header_len )
+static inline int scalar_number( const uint8_t *p, int header_len )
 {
     assert( header_len == 1 || header_len == 2 || header_len == 4 );
 
@@ -88,8 +88,8 @@ static inline int scalar_number( uint8_t *p, int header_len )
  * fill a public_key_packet_t structure from public key packet data
  * verify that it is a version 4 public key packet, using DSA
  */
-static int parse_public_key_packet( public_key_packet_t *p_key, uint8_t *p_buf,
-                                    size_t i_packet_len )
+static int parse_public_key_packet( public_key_packet_t *p_key,
+                                    const uint8_t *p_buf, size_t i_packet_len )
 {
 
     if( i_packet_len > 418 || i_packet_len < 6 )
@@ -124,7 +124,7 @@ error:
 
 
 static size_t parse_signature_v3_packet( signature_packet_t *p_sig,
-                                      uint8_t *p_buf, size_t i_sig_len )
+                                      const uint8_t *p_buf, size_t i_sig_len )
 {
     size_t i_read = 1; /* we already read the version byte */
 
@@ -161,7 +161,7 @@ static size_t parse_signature_v3_packet( signature_packet_t *p_sig,
  * verify that it was used with a DSA public key, using SHA-1 digest
  */
 static size_t parse_signature_v4_packet( signature_packet_t *p_sig,
-                                      uint8_t *p_buf, size_t i_sig_len )
+                                      const uint8_t *p_buf, size_t i_sig_len )
 {
     size_t i_read = 1; /* we already read the version byte */
 
@@ -257,7 +257,7 @@ static size_t parse_signature_v4_packet( signature_packet_t *p_sig,
 
 
 static int parse_signature_packet( signature_packet_t *p_sig,
-                                   uint8_t *p_buf, size_t i_packet_len )
+                                   const uint8_t *p_buf, size_t i_packet_len )
 {
     if( !i_packet_len ) /* 1st sanity check, we need at least the version */
         return VLC_EGENERIC;
@@ -354,10 +354,10 @@ static long crc_octets( uint8_t *octets, size_t len )
  * Transform an armored document in binary format
  * Used on public keys and signatures
  */
-static int pgp_unarmor( char *p_ibuf, size_t i_ibuf_len,
+static int pgp_unarmor( const char *p_ibuf, size_t i_ibuf_len,
                         uint8_t *p_obuf, size_t i_obuf_len )
 {
-    char *p_ipos = p_ibuf;
+    const char *p_ipos = p_ibuf;
     uint8_t *p_opos = p_obuf;
     int i_end = 0;
     int i_header_skipped = 0;
@@ -485,8 +485,8 @@ problem:
 int parse_public_key( const uint8_t *p_key_data, size_t i_key_len,
                       public_key_t *p_key, const uint8_t *p_sig_issuer )
 {
-    uint8_t *pos = (uint8_t*) p_key_data;
-    uint8_t *max_pos = pos + i_key_len;
+    const uint8_t *pos = p_key_data;
+    const uint8_t *max_pos = pos + i_key_len;
 
     int i_status = 0;
 #define PUBLIC_KEY_FOUND    0x01
