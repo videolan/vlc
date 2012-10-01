@@ -423,6 +423,9 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 static int OpenglLock (vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
+    if (!sys->glView || ![sys->glView respondsToSelector:@selector(openGLContext)])
+        return 1;
+
     NSOpenGLContext *context = [sys->glView openGLContext];
     CGLError err = CGLLockContext ([context CGLContextObj]);
     if (kCGLNoError == err) {
