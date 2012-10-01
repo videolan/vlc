@@ -52,7 +52,7 @@ unsigned GetVlcDspMask( void )
         mask |= AV_CPU_FLAG_SSE3;
 # endif
 # ifdef AV_CPU_FLAG_SSSE3
-    if( !vlc_CPU_SSE3() )
+    if( !vlc_CPU_SSSE3() )
         mask |= AV_CPU_FLAG_SSSE3;
 # endif
 # ifdef AV_CPU_FLAG_SSE4
