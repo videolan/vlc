@@ -698,7 +698,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     [self updateTimeSlider];
-    [o_fspanel setSeekable: b_seekable];
+    if ([o_fspanel respondsToSelector:@selector(setSeekable:)])
+        [o_fspanel setSeekable: b_seekable];
 
     PL_LOCK;
     if ([[[VLCMain sharedInstance] playlist] currentPlaylistRoot] != p_playlist->p_local_category || p_playlist->p_local_category->i_children > 0)
