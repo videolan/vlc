@@ -392,10 +392,7 @@ static int pgp_unarmor( char *p_ibuf, size_t i_ibuf_len,
         if( p_ipos[i_line_len - 1] == '=' )
         {
             i_end = 1;
-            p_ipos[i_line_len - 1] = '\0';
         }
-        else
-            p_ipos[i_line_len] = '\0';
 
         p_opos += vlc_b64_decode_binary_to_buffer(  p_opos,
                         p_obuf - p_opos + i_obuf_len, p_ipos );
