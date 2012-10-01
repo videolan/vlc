@@ -314,6 +314,7 @@ static block_t *Convert( filter_t *p_filter, block_t *p_in_buf )
         }
     }
 
+    p_out_buf->i_buffer = p_in_buf->i_nb_samples * 4 * p_sys->i_nb_channels;
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_dts = p_in_buf->i_dts;
     p_out_buf->i_pts = p_in_buf->i_pts;
