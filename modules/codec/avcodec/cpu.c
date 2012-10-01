@@ -82,5 +82,10 @@ unsigned GetVlcDspMask( void )
         mask |= AV_CPU_FLAG_ALTIVEC;
 #endif
 
+#if defined ( __arm__)
+    if( !vlc_CPU_ARM_NEON() )
+        mask |= AV_CPU_FLAG_NEON;
+#endif
+
     return mask;
 }
