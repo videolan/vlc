@@ -26,15 +26,15 @@
  * inferred from the color subsampling ratio. */
 struct yuv_planes
 {
-	void *y, *u, *v;
-	size_t pitch;
+    void *y, *u, *v;
+    size_t pitch;
 };
 
 /* Packed picture buffer. Pitch is in bytes (_not_ pixels). */
 struct yuv_pack
 {
-	void *yuv;
-	size_t pitch;
+    void *yuv;
+    size_t pitch;
 };
 
 /* I420 to YUYV conversion. */
