@@ -87,7 +87,7 @@ static void vlc_CPU_init (void)
             if (!strcmp (cap, "sse4_1"))
                 core_caps |= VLC_CPU_SSE4_1;
             if (!strcmp (cap, "sse4_2"))
-                core_caps |= VLC_CPU_SSE4_1;
+                core_caps |= VLC_CPU_SSE4_2;
             if (!strcmp (cap, "sse4a"))
                 core_caps |= VLC_CPU_SSE4A;
             if (!strcmp (cap, "avx"))
