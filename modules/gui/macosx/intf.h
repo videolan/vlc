@@ -77,6 +77,8 @@ struct intf_sys_t
 @class VLCEmbeddedWindow;
 @class VLCControls;
 @class VLCPlaylist;
+@class VLCVoutWindowController;
+
 @interface VLCMain : NSObject <NSWindowDelegate, NSApplicationDelegate>
 {
     intf_thread_t *p_intf;      /* The main intf object */
@@ -141,7 +143,11 @@ struct intf_sys_t
 
     /* sleep management */
     IOPMAssertionID systemSleepAssertionID;
+
+    VLCVoutWindowController *o_vout_controller;
 }
+
+@property (readonly) VLCVoutWindowController* voutController;
 
 + (VLCMain *)sharedInstance;
 

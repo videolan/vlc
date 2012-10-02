@@ -44,6 +44,7 @@
 
 #import "ControlsBar.h"
 #import "VideoView.h"
+#import "VLCVoutWindowController.h"
 
 
 @interface VLCMainWindow ()
@@ -53,8 +54,9 @@
 
 @end
 
-@implementation VLCMainWindow
 static const float f_min_video_height = 70.0;
+
+@implementation VLCMainWindow
 
 static VLCMainWindow *_o_sharedInstance = nil;
 
@@ -137,16 +139,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     [o_sidebaritems release];
-
-    if (o_extra_video_window) {
-        [o_extra_video_window release];
-        o_extra_video_window = nil;
-    }
-
-    if (o_detached_video_window) {
-        [o_detached_video_window release];
-        o_detached_video_window = nil;
-    }
 
     [super dealloc];
 }
@@ -529,7 +521,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)someWindowWillClose:(NSNotification *)notification
 {
     id obj = [notification object];
-    if (obj == o_detached_video_window || obj == o_extra_video_window || (obj == self && !b_nonembedded)) {
+    BOOL b_is_mainwindow = [NSStringFromClass([obj class]) isEqualToString:@"VLCMainWindow"];
+    
+    if (!b_is_mainwindow || (b_is_mainwindow && !b_nonembedded)) {
         if ([[VLCMain sharedInstance] activeVideoPlayback])
             [[VLCCoreInteraction sharedInstance] stop];
     }
@@ -539,7 +533,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     if (config_GetInt(VLCIntf, "macosx-pause-minimized")) {
         id obj = [notification object];
-        if (obj == o_detached_video_window || obj == o_extra_video_window || (obj == self && !b_nonembedded)) {
+        BOOL b_is_mainwindow = [NSStringFromClass([obj class]) isEqualToString:@"VLCMainWindow"];
+
+        if (!b_is_mainwindow || (b_is_mainwindow && !b_nonembedded)) {
             if ([[VLCMain sharedInstance] activeVideoPlayback])
                 [[VLCCoreInteraction sharedInstance] pause];
         }
@@ -631,8 +627,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     [o_controls_bar updateTimeSlider];
     [[self controlsBar] updatePosAndTimeInFSPanel:o_fspanel];
-    if (o_detached_video_window)
-        [[o_detached_video_window controlsBar] updateTimeSlider];
+
+    [[[VLCMain sharedInstance] voutController] updateWindowsControlsBarWithSelector:@selector(updateTimeSlider)];
 }
 
 - (void)updateName
@@ -652,12 +648,14 @@ static VLCMainWindow *_o_sharedInstance = nil;
         NSURL * o_url = [NSURL URLWithString: [NSString stringWithUTF8String: uri]];
         if ([o_url isFileURL]) {
             [self setRepresentedURL: o_url];
-            if (o_detached_video_window)
-                [o_detached_video_window setRepresentedURL: o_url];
+            [[[VLCMain sharedInstance] voutController] updateWindowsUsingBlock:^(VLCVideoWindowCommon *o_window) {
+                [o_window setRepresentedURL:o_url];
+            }];
         } else {
             [self setRepresentedURL: nil];
-            if (o_detached_video_window)
-                [o_detached_video_window setRepresentedURL: nil];
+            [[[VLCMain sharedInstance] voutController] updateWindowsUsingBlock:^(VLCVideoWindowCommon *o_window) {
+                [o_window setRepresentedURL:nil];
+            }];
         }
         free(uri);
 
@@ -669,8 +667,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
         }
 
         [self setTitle: aString];
-        if (b_nonembedded && o_detached_video_window && [[VLCMain sharedInstance] activeVideoPlayback])
-            [o_detached_video_window setTitle: aString];
+        [[[VLCMain sharedInstance] voutController] updateWindowsUsingBlock:^(VLCVideoWindowCommon *o_window) {
+            [o_window setTitle:aString];
+        }];
 
         [o_fspanel setStreamTitle: aString];
         vlc_object_release(p_input);
@@ -683,8 +682,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)updateWindow
 {
     [o_controls_bar updateControls];
-    if (o_detached_video_window)
-        [[o_detached_video_window controlsBar] updateControls];
+    [[[VLCMain sharedInstance] voutController] updateWindowsControlsBarWithSelector:@selector(updateControls)];
 
     bool b_seekable = false;
 
@@ -713,17 +711,18 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)setPause
 {
     [o_controls_bar setPause];
-    if (o_detached_video_window)
-        [[o_detached_video_window controlsBar] setPause];
     [o_fspanel setPause];
+
+    [[[VLCMain sharedInstance] voutController] updateWindowsControlsBarWithSelector:@selector(setPause)];
 }
 
 - (void)setPlay
 {
     [o_controls_bar setPlay];
-    if (o_detached_video_window)
-        [[o_detached_video_window controlsBar] setPlay];
     [o_fspanel setPlay];
+
+    [[[VLCMain sharedInstance] voutController] updateWindowsControlsBarWithSelector:@selector(setPlay)];
+
 }
 
 - (void)updateVolumeSlider
@@ -757,40 +756,36 @@ static VLCMainWindow *_o_sharedInstance = nil;
         else
             window_rect = [self frame];
 
-        if (o_extra_video_window)
-            [o_extra_video_window release];
-
         NSUInteger mask = NSBorderlessWindowMask;
         if (!OSX_SNOW_LEOPARD && !b_video_deco)
             mask |= NSResizableWindowMask;
 
         BOOL b_no_video_deco_only = !b_video_wallpaper;
-        o_extra_video_window = [[VLCVideoWindowCommon alloc] initWithContentRect:window_rect styleMask:mask backing:NSBackingStoreBuffered defer:YES];
-        [o_extra_video_window setDelegate:self];
+        o_new_video_window = [[VLCVideoWindowCommon alloc] initWithContentRect:window_rect styleMask:mask backing:NSBackingStoreBuffered defer:YES];
+        [o_new_video_window setDelegate:self];
 
         if (b_video_wallpaper)
-            [o_extra_video_window setLevel:CGWindowLevelForKey(kCGDesktopWindowLevelKey) + 1];
+            [o_new_video_window setLevel:CGWindowLevelForKey(kCGDesktopWindowLevelKey) + 1];
 
-        [o_extra_video_window setBackgroundColor: [NSColor blackColor]];
-        [o_extra_video_window setCanBecomeKeyWindow: !b_video_wallpaper];
-        [o_extra_video_window setCanBecomeMainWindow: !b_video_wallpaper];
-        [o_extra_video_window setAcceptsMouseMovedEvents: !b_video_wallpaper];
-        [o_extra_video_window setMovableByWindowBackground: !b_video_wallpaper];
-        [o_extra_video_window useOptimizedDrawing: YES];
+        [o_new_video_window setBackgroundColor: [NSColor blackColor]];
+        [o_new_video_window setCanBecomeKeyWindow: !b_video_wallpaper];
+        [o_new_video_window setCanBecomeMainWindow: !b_video_wallpaper];
+        [o_new_video_window setAcceptsMouseMovedEvents: !b_video_wallpaper];
+        [o_new_video_window setMovableByWindowBackground: !b_video_wallpaper];
+        [o_new_video_window useOptimizedDrawing: YES];
 
-        o_vout_view = [[VLCVoutView alloc] initWithFrame:[[o_extra_video_window contentView] bounds]];
+        o_vout_view = [[VLCVoutView alloc] initWithFrame:[[o_new_video_window contentView] bounds]];
         [o_vout_view setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
-        [[o_extra_video_window contentView] addSubview:o_vout_view positioned:NSWindowAbove relativeTo:nil];
-        [o_extra_video_window setVideoView:o_vout_view];
+        [[o_new_video_window contentView] addSubview:o_vout_view positioned:NSWindowAbove relativeTo:nil];
+        [o_new_video_window setVideoView:o_vout_view];
 
-        o_new_video_window = o_extra_video_window;
 
         if (b_video_wallpaper)
-            [o_extra_video_window orderBack:nil];
+            [o_new_video_window orderBack:nil];
         else {
-            [o_extra_video_window center];
-            [o_extra_video_window setFrameAutosaveName:@"extra-videowindow"];
-            [o_extra_video_window setContentMinSize: NSMakeSize(f_min_video_height, f_min_video_height)];
+            [o_new_video_window center];
+            [o_new_video_window setFrameAutosaveName:@"extra-videowindow"];
+            [o_new_video_window setContentMinSize: NSMakeSize(f_min_video_height, f_min_video_height)];
         }
 
         b_nonembedded = YES;
@@ -800,28 +795,15 @@ static VLCMainWindow *_o_sharedInstance = nil;
             o_new_video_window = self;
             b_nonembedded = NO;
         } else {
-            if (!o_detached_video_window) {
-                NSWindowController *o_controller = [[NSWindowController alloc] initWithWindowNibName:@"DetachedVideoWindow"];
-                [o_controller loadWindow];
-                o_detached_video_window = [(VLCDetachedVideoWindow *)[o_controller window] retain];
-                [o_controller release];
+            NSWindowController *o_controller = [[NSWindowController alloc] initWithWindowNibName:@"DetachedVideoWindow"];
+            [o_controller loadWindow];
+            o_new_video_window = [(VLCDetachedVideoWindow *)[o_controller window] retain];
+            [o_controller release];
 
-                // event occurs before window is created, so call again
-                [[VLCMain sharedInstance] playbackStatusUpdated];
-            }
-
-            [o_detached_video_window setDelegate: self];
-            if (b_dark_interface) {
-                [o_detached_video_window setContentMinSize: NSMakeSize(363., f_min_video_height + [[[o_detached_video_window controlsBar] bottomBarView] frame].size.height + [o_titlebar_view frame].size.height)];
-            } else {
-                [o_detached_video_window setContentMinSize: NSMakeSize(363., f_min_video_height + [[[o_detached_video_window controlsBar] bottomBarView] frame].size.height)];
-            }
-
-            [o_detached_video_window setLevel:NSNormalWindowLevel];
-            [o_detached_video_window useOptimizedDrawing: YES];
-
-            o_vout_view = [[o_detached_video_window videoView] retain];
-            o_new_video_window = o_detached_video_window;
+            [o_new_video_window setDelegate: self];
+            [o_new_video_window setLevel:NSNormalWindowLevel];
+            [o_new_video_window useOptimizedDrawing: YES];
+            o_vout_view = [[o_new_video_window videoView] retain];
             b_nonembedded = YES;
         }
     }
@@ -840,6 +822,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     [o_new_video_window setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
+    [[[VLCMain sharedInstance] voutController] addVout:o_new_video_window forDisplay:p_wnd];
+
+    if(b_nonembedded) {
+        // event occurs before window is created, so call again
+        [[VLCMain sharedInstance] playbackStatusUpdated];
+    }
 
     return [o_vout_view autorelease];
 }
@@ -858,15 +846,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [[self animator] setFrame:frameBeforePlayback display:YES];
 
         [self makeFirstResponder: nil];
-        if (o_detached_video_window)
-            [o_detached_video_window orderOut: nil];
-        if (o_extra_video_window)
-            [o_extra_video_window orderOut: nil];
 
         if ([self level] != NSNormalWindowLevel)
             [self setLevel: NSNormalWindowLevel];
-        if (o_detached_video_window && [o_detached_video_window level] != NSNormalWindowLevel)
-            [o_detached_video_window setLevel: NSNormalWindowLevel];
 
         // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
         [self setAlphaValue:1.0];
@@ -1020,8 +1002,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     screen_rect = [screen frame];
 
     [o_controls_bar setFullscreenState:YES];
-    if (o_detached_video_window)
-        [[o_detached_video_window controlsBar] setFullscreenState:YES];
+    //if (o_detached_video_window)
+    //    [[o_detached_video_window controlsBar] setFullscreenState:YES];
 
     [self recreateHideMouseTimer];
 
@@ -1178,8 +1160,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self lockFullscreenAnimation];
 
     [o_controls_bar setFullscreenState:NO];
-    if (o_detached_video_window)
-        [[o_detached_video_window controlsBar] setFullscreenState:NO];
+    //if (o_detached_video_window)
+    //    [[o_detached_video_window controlsBar] setFullscreenState:NO];
 
     /* We always try to do so */
     [NSScreen unblackoutScreens];
@@ -1886,6 +1868,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
     videoViewRect.size.height -= f_bottomBarHeight;
     videoViewRect.origin.y = f_bottomBarHeight;
     [o_video_view setFrame: videoViewRect];
+
+    if (b_dark_interface) {
+        [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[[self controlsBar] bottomBarView] frame].size.height + [o_titlebar_view frame].size.height)];
+    } else {
+        [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[[self controlsBar] bottomBarView] frame].size.height)];
+    }
 }
 
 @end

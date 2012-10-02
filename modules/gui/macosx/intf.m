@@ -62,6 +62,7 @@
 #import "simple_prefs.h"
 #import "CoreInteraction.h"
 #import "TrackSynchronization.h"
+#import "VLCVoutWindowController.h"
 
 #import <AddressBook/AddressBook.h>         /* for crashlog send mechanism */
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */
@@ -141,6 +142,7 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
     int i_y = cfg->y;
     unsigned i_width = cfg->width;
     unsigned i_height = cfg->height;
+    NSLog(@"window open with x%i, y %i, wi %i, hei %i", i_x, i_y, i_width, i_height);
     p_wnd->handle.nsobject = [[VLCMain sharedInstance] getVideoViewAtPositionX: &i_x Y: &i_y withWidth: &i_width andHeight: &i_height forWindow: p_wnd];
 
     if (!p_wnd->handle.nsobject) {
@@ -191,6 +193,8 @@ void WindowClose(vout_window_t *p_wnd)
 {
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     [[VLCMain sharedInstance] setActiveVideoPlayback:NO];
+
+    [[[VLCMain sharedInstance] voutController] performSelectorOnMainThread:@selector(removeVoutforDisplay:) withObject:[NSValue valueWithPointer:p_wnd] waitUntilDone:NO];
 
     [o_pool release];
 }
@@ -498,6 +502,8 @@ audio_output_t *getAout(void)
  *****************************************************************************/
 @implementation VLCMain
 
+@synthesize voutController=o_vout_controller;
+
 #pragma mark -
 #pragma mark Initialization
 
@@ -540,7 +546,15 @@ static VLCMain *_o_sharedMainInstance = nil;
     NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:@"NO" forKey:@"LiveUpdateTheMessagesPanel"];
     [defaults registerDefaults:appDefaults];
 
+    o_vout_controller = [[VLCVoutWindowController alloc] init];
+
     return _o_sharedMainInstance;
+}
+
+- (void)dealloc
+{
+    [o_vout_controller release];
+    [super dealloc];
 }
 
 - (void)setIntf: (intf_thread_t *)p_mainintf

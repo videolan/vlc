@@ -986,6 +986,8 @@
 		E0382C01160BA09E0031D7FF /* ControlsBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ControlsBar.m; path = ../../../modules/gui/macosx/ControlsBar.m; sourceTree = SOURCE_ROOT; };
 		E06CF7F416020F6200C698B7 /* Windows.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Windows.h; path = ../../../modules/gui/macosx/Windows.h; sourceTree = SOURCE_ROOT; };
 		E06CF7F516020F6200C698B7 /* Windows.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Windows.m; path = ../../../modules/gui/macosx/Windows.m; sourceTree = SOURCE_ROOT; };
+		E0C2583E161B593D00185AAD /* VLCVoutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCVoutWindowController.h; path = ../../../modules/gui/macosx/VLCVoutWindowController.h; sourceTree = SOURCE_ROOT; };
+		E0C2583F161B593D00185AAD /* VLCVoutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCVoutWindowController.m; path = ../../../modules/gui/macosx/VLCVoutWindowController.m; sourceTree = SOURCE_ROOT; };
 		E0FB95CD1615B6DF0005069A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/DetachedVideoWindow.xib; sourceTree = "<group>"; };
 		F69B0CA702E24F6401A80112 /* English */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = text.plist.strings; name = English; path = Resources/English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1066,6 +1068,8 @@
 				CC448A6313B68A0B009F72E0 /* MainWindow.m */,
 				E0382C00160BA09E0031D7FF /* ControlsBar.h */,
 				E0382C01160BA09E0031D7FF /* ControlsBar.m */,
+				E0C2583E161B593D00185AAD /* VLCVoutWindowController.h */,
+				E0C2583F161B593D00185AAD /* VLCVoutWindowController.m */,
 				CC4A33220F8CB017000FC4A7 /* coredialogs.h */,
 				CC4A33210F8CB017000FC4A7 /* coredialogs.m */,
 				5CCED71014C0D4A90057F8D1 /* ExtensionsDialogProvider.h */,

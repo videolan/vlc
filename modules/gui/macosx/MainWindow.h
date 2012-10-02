@@ -60,8 +60,6 @@
 
     IBOutlet VLCFSPanel *o_fspanel;
 
-    VLCDetachedVideoWindow *o_detached_video_window;
-
     IBOutlet id o_podcast_view;
     IBOutlet id o_podcast_add_btn;
     IBOutlet id o_podcast_remove_btn;
@@ -107,7 +105,6 @@
     VLCColorView * o_color_backdrop;
     NSInteger i_originalLevel;
 
-    VLCVideoWindowCommon *o_extra_video_window;
     id o_current_video_window;
 
     NSRect frameBeforePlayback;

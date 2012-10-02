@@ -84,4 +84,6 @@ SOURCES_macosx = \
 	Windows.m \
 	ControlsBar.m \
 	ControlsBar.h \
+	VLCVoutWindowController.m \
+	VLCVoutWindowController.h \
 	$(NULL)
