@@ -182,17 +182,20 @@ typedef enum vlc_dialog {
 /* Useful text messages shared by interfaces */
 #define INTF_ABOUT_MSG LICENSE_MSG
 
-#define EXTENSIONS_AUDIO_CSV "3ga", "669", "a52", "aac", "ac3", "ape", "awb", "dts", "flac", "it", \
-                         "m4a", "m4p", "mka", "mlp", "mod", "mp1", "mp2", "mp3", "mpc", "mpga", \
-                         "oga", "ogg", "opus", "oma", "qcp", "ra", "rmi", "s3m", "spx", "thd", "tta", \
-                         "wav", "wma", "wv", "xm"
+#define EXTENSIONS_AUDIO_CSV "3ga", "669", "a52", "aac", "ac3", "adt", "adts", "aif", "aifc", "aiff", \
+                         "amr", "aob". "ape", "awb", "caf", "dts", "flac", "it", \
+                         "m4a", "m4p", "m5p", "mka", "mlp", "mod", "mpa", "mp1", "mp2", "mp3", "mpc", "mpga", \
+                         "oga", "ogg", "oma", "opus", "qcp", "ra", "rmi", "s3m", "spx", "thd", "tta", \
+                         "voc", "vqf", "w64", "wav", "wma", "wv", "xa", "xm"
 
-#define EXTENSIONS_VIDEO_CSV "asf", "avi", "divx", "drc", "dv", "f4v", "flv", "gvi", "gxf", "iso", \
+#define EXTENSIONS_VIDEO_CSV "3g2", "3gp", "3gp2", "3gpp", "amv", "asf", "avi", "divx", "drc", "dv", \
+                             "f4v", "flv", "gvi", "gxf", "iso", \
                              "m1v", "m2v", "m2t", "m2ts", "m4v", "mkv", "mov",\
-                             "mp2", "mp4", "mpeg", "mpeg1", \
-                             "mpeg2", "mpeg4", "mpg", "mts", "mtv", "mxf", "mxg", "nuv", \
+                             "mp2", "mp2v", "mp4", "mp4v", "mpe", "mpeg", "mpeg1", \
+                             "mpeg2", "mpeg4", "mpg", "mpv2", "mts", "mtv", "mxf", "mxg", "nsv", "nuv", \
                              "ogg", "ogm", "ogv", "ogx", "ps", \
-                             "rec", "rm", "rmvb", "ts", "vob", "wm", "wmv", "wtv", "xesc"
+                             "rec", "rm", "rmvb", "tod", "ts", "tts", "vob", "vro", \
+                             "webm", "wm", "wmv", "wtv", "xesc"
 
 #define EXTENSIONS_AUDIO \
     "*.3ga;" \
@@ -210,16 +213,17 @@ typedef enum vlc_dialog {
     "*.ape;" \
     "*.awb;" \
     "*.caf;" \
-    "*.cda;" \
     "*.dts;" \
     "*.flac;"\
     "*.it;"  \
     "*.m4a;" \
     "*.m4p;" \
+    "*.m5p;" \
     "*.mid;" \
     "*.mka;" \
     "*.mlp;" \
     "*.mod;" \
+    "*.mpa;" \
     "*.mp1;" \
     "*.mp2;" \
     "*.mp3;" \
@@ -245,8 +249,8 @@ typedef enum vlc_dialog {
     "*.xa;"  \
     "*.xm"
 
-#define EXTENSIONS_VIDEO "*.3g2;*.3gp;*.3gp2;*.3gpp;*.amv;*.asf;*.avi;*.bin;*.divx;*.drc;*.dv;*f4v;*.flv;*.gvi;*.gxf;*.iso;*.m1v;*.m2v;" \
-                         "*.m2t;*.m2ts;*.m4v;*.mkv;*.mov;*.mp2;*.mp2v;*.mp4;*.mp4v;*.mpa;*.mpe;*.mpeg;*.mpeg1;" \
+#define EXTENSIONS_VIDEO "*.3g2;*.3gp;*.3gp2;*.3gpp;*.amv;*.asf;*.avi;*.bin;*.divx;*.drc;*.dv;*f4v;*.flv;*.gvi;*.gvi;*.gxf;*.iso;*.m1v;*.m2v;" \
+                         "*.m2t;*.m2ts;*.m4v;*.mkv;*.mov;*.mp2;*.mp2v;*.mp4;*.mp4v;*.mpe;*.mpeg;*.mpeg1;" \
                          "*.mpeg2;*.mpeg4;*.mpg;*.mpv2;*.mts;*.mtv;*.mxf;*.mxg;*.nsv;*.nuv;" \
                          "*.ogg;*.ogm;*.ogv;*.ogx;*.ps;" \
                          "*.rec;*.rm;*.rmvb;*.tod;*.ts;*.tts;*.vob;*.vro;*.webm;*.wm;*.wmv;*.wtv;*.xesc"
