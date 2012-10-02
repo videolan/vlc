@@ -1,5 +1,5 @@
---- mkspecs/win32-g++/qmake.conf.orig    2011-09-28 14:32:02.709958498 -0400
-+++ mkspecs/win32-g++/qmake.conf 2011-09-28 14:36:32.529954583 -0400
+--- qt4/mkspecs/win32-g++/qmake.conf.orig    2011-09-28 14:32:02.709958498 -0400
++++ qt4/mkspecs/win32-g++/qmake.conf 2011-09-28 14:36:32.529954583 -0400
 @@ -14,7 +14,7 @@
  QMAKE_EXT_OBJ           = .o
  QMAKE_EXT_RES           = _res.o
@@ -42,8 +42,8 @@
 +QMAKE_STRIP		= $(XSTRIP)
  QMAKE_STRIPFLAGS_LIB 	+= --strip-unneeded
  load(qt_config)
---- configure.orig	2011-11-10 18:48:29.351058392 -0500
-+++ configure	2011-11-10 18:50:40.971711056 -0500
+--- qt4/configure.orig	2011-11-10 18:48:29.351058392 -0500
++++ qt4/configure	2011-11-10 18:50:40.971711056 -0500
 @@ -8255,11 +8255,13 @@
  fi
 

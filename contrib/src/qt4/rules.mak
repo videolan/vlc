@@ -21,12 +21,12 @@ $(TARBALLS)/qt-$(QT4_VERSION).tar.gz:
 
 qt4: qt-$(QT4_VERSION).tar.gz .sum-qt4
 	$(UNPACK)
-	cd qt-everywhere-opensource-src-$(QT4_VERSION) && \
-		patch -p0 < ../$(SRC)/qt4/cross.patch && \
-		patch -p0 < ../$(SRC)/qt4/styles.patch && \
-		patch -p0 < ../$(SRC)/qt4/chroot.patch && \
-		patch -p0 < ../$(SRC)/qt4/imageformats.patch
-	mv qt-everywhere-opensource-src-$(QT4_VERSION) $@ && touch $@
+	mv qt-everywhere-opensource-src-$(QT4_VERSION) qt-$(QT4_VERSION)
+	$(APPLY) $(SRC)/qt4/cross.patch
+	$(APPLY) $(SRC)/qt4/styles.patch
+	$(APPLY) $(SRC)/qt4/chroot.patch
+	$(APPLY) $(SRC)/qt4/imageformats.patch
+	$(MOVE)
 
 XTOOLS := XCC="$(CC)" XCXX="$(CXX)" XSTRIP="$(STRIP)" XAR="$(AR)"
 

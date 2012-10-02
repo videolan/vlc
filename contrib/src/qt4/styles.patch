@@ -1,5 +1,5 @@
---- configure.orig	2011-11-10 17:44:02.427883340 -0500
-+++ configure	2011-11-10 17:44:13.915940309 -0500
+--- qt4/configure.orig	2011-11-10 17:44:02.427883340 -0500
++++ qt4/configure	2011-11-10 17:44:13.915940309 -0500
 @@ -584,7 +584,7 @@
  rm -f "$outpath/config.tests/.qmake.cache"
  cp "$QMAKE_VARS_FILE" "$outpath/config.tests/.qmake.cache"
