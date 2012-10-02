@@ -98,7 +98,6 @@
     BOOL              b_fullscreen;
     BOOL              b_window_is_invisible;
     NSRecursiveLock * o_animation_lock;
-    NSSize nativeVideoSize;
 
     NSTimer *t_hide_mouse_timer;
 
@@ -138,8 +137,6 @@
 
 - (VLCVoutView *)setupVout:(vout_window_t *)p_wnd;
 - (void)setVideoplayEnabled;
-- (void)resizeWindow;
-- (void)setNativeVideoSize:(NSSize)size;
 
 - (void)hideMouseCursor:(NSTimer *)timer;
 - (void)recreateHideMouseTimer;

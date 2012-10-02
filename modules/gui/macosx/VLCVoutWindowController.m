@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "VLCVoutWindowController.h"
+#import "intf.h"
 #import "Windows.h"
 
 @implementation VLCVoutWindowController
@@ -48,6 +49,10 @@
 - (void)removeVoutforDisplay:(NSValue *)o_key
 {
     VLCVideoWindowCommon *o_window = [o_vout_dict objectForKey:o_key];
+    if(!o_window) {
+        msg_Err(VLCIntf, "Cannot close nonexisting window");
+        return;
+    }
 
     if (![NSStringFromClass([o_window class]) isEqualToString:@"VLCMainWindow"]) {
         [o_window orderOut:self];
@@ -70,6 +75,17 @@
     [o_vout_dict enumerateKeysAndObjectsUsingBlock:^(id key, VLCVideoWindowCommon *o_window, BOOL *stop) {
         windowUpdater(o_window);
     }];
+}
+
+- (void)setNativeVideoSize:(NSSize)size forWindow:(vout_window_t *)p_wnd
+{
+    VLCVideoWindowCommon *o_window = [o_vout_dict objectForKey:[NSValue valueWithPointer:p_wnd]];
+    if(!o_window) {
+        msg_Err(VLCIntf, "Cannot set size for nonexisting window");
+        return;
+    }
+
+    [o_window setNativeVideoSize:size];
 }
 
 @end

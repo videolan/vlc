@@ -40,4 +40,6 @@
 - (void)updateWindowsControlsBarWithSelector:(SEL)aSel;
 - (void)updateWindowsUsingBlock:(void (^)(VLCVideoWindowCommon *o_window))windowUpdater;
 
+- (void)setNativeVideoSize:(NSSize)size forWindow:(vout_window_t *)p_wnd;
+
 @end

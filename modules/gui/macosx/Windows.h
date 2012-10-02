@@ -57,6 +57,9 @@
 
 @end
 
+
+static const float f_min_video_height = 70.0;
+
 @class VLCVoutView;
 @class VLCControlsBarCommon;
 
@@ -66,7 +69,7 @@
  *  Common code for main window, detached window and extra video window
  *****************************************************************************/
 
-@interface VLCVideoWindowCommon : VLCWindow
+@interface VLCVideoWindowCommon : VLCWindow <NSWindowDelegate>
 {
     NSRect previousSavedFrame;
     BOOL b_dark_interface;
@@ -75,11 +78,15 @@
     IBOutlet VLCVoutView *o_video_view;
 
     IBOutlet VLCControlsBarCommon *o_controls_bar;
+
+    NSSize nativeVideoSize;
 }
 
 @property (nonatomic, assign) VLCVoutView* videoView;
 @property (readonly) VLCControlsBarCommon* controlsBar;
 
+- (void)resizeWindow;
+- (void)setNativeVideoSize:(NSSize)size;
 
 - (void)setTitle:(NSString *)title;
 

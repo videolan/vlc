@@ -142,7 +142,6 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
     int i_y = cfg->y;
     unsigned i_width = cfg->width;
     unsigned i_height = cfg->height;
-    NSLog(@"window open with x%i, y %i, wi %i, hei %i", i_x, i_y, i_width, i_height);
     p_wnd->handle.nsobject = [[VLCMain sharedInstance] getVideoViewAtPositionX: &i_x Y: &i_y withWidth: &i_width andHeight: &i_height forWindow: p_wnd];
 
     if (!p_wnd->handle.nsobject) {
@@ -151,7 +150,18 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
         return VLC_EGENERIC;
     }
 
-    [[VLCMain sharedInstance] setNativeVideoSize:NSMakeSize(cfg->width, cfg->height)];
+    // TODO: this seems to be strange. Why not just allocating in the right size?
+    // This could avoid strange resize-animations...
+    NSSize newSize = NSMakeSize(cfg->width, cfg->height);
+    SEL sel = @selector(setNativeVideoSize:forWindow:);
+    NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[[[VLCMain sharedInstance] voutController] methodSignatureForSelector:sel]];
+    [inv setTarget:[[VLCMain sharedInstance] voutController]];
+    [inv setSelector:sel];
+    [inv setArgument:&newSize atIndex:2]; // starting at 2!
+    [inv setArgument:&p_wnd atIndex:3];
+    [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
+                       waitUntilDone:NO];
+
     [[VLCMain sharedInstance] setActiveVideoPlayback: YES];
     p_wnd->control = WindowControl;
     p_wnd->sys = (vout_window_sys_t *)VLCIntf;
@@ -170,9 +180,22 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
         }
         case VOUT_WINDOW_SET_SIZE:
         {
+            NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+
             unsigned int i_width  = va_arg(args, unsigned int);
             unsigned int i_height = va_arg(args, unsigned int);
-            [[VLCMain sharedInstance] setNativeVideoSize:NSMakeSize(i_width, i_height)];
+
+            NSSize newSize = NSMakeSize(i_width, i_height);            
+            SEL sel = @selector(setNativeVideoSize:forWindow:);
+            NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[[[VLCMain sharedInstance] voutController] methodSignatureForSelector:sel]];
+            [inv setTarget:[[VLCMain sharedInstance] voutController]];
+            [inv setSelector:sel];
+            [inv setArgument:&newSize atIndex:2]; // starting at 2!
+            [inv setArgument:&p_wnd atIndex:3];
+            [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
+                               waitUntilDone:NO];
+
+            [o_pool release];
             return VLC_SUCCESS;
         }
         case VOUT_WINDOW_SET_FULLSCREEN:
@@ -1409,11 +1432,6 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_mainwindow performSelectorOnMainThread:@selector(setVideoplayEnabled) withObject:nil waitUntilDone:YES];
         [o_mainwindow performSelectorOnMainThread:@selector(togglePlaylist:) withObject:nil waitUntilDone:NO];
     }
-}
-
-- (void)setNativeVideoSize:(NSSize)size
-{
-    [o_mainwindow setNativeVideoSize:size];
 }
 
 #pragma mark -

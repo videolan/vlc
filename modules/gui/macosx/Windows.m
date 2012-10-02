@@ -400,6 +400,86 @@
 }
 
 #pragma mark -
+#pragma mark Video window resizing logic
+
+- (void)resizeWindow
+{
+    if ([[VLCMainWindow sharedInstance] fullscreen])
+        return;
+
+    NSSize windowMinSize = [self minSize];
+    NSRect screenFrame = [[self screen] visibleFrame];
+
+    NSPoint topleftbase = NSMakePoint(0, [self frame].size.height);
+    NSPoint topleftscreen = [self convertBaseToScreen: topleftbase];
+
+    unsigned int i_width = nativeVideoSize.width;
+    unsigned int i_height = nativeVideoSize.height;
+    if (i_width < windowMinSize.width)
+        i_width = windowMinSize.width;
+    if (i_height < f_min_video_height)
+        i_height = f_min_video_height;
+
+    /* Calculate the window's new size */
+    NSRect new_frame;
+    new_frame.size.width = [self frame].size.width - [o_video_view frame].size.width + i_width;
+    new_frame.size.height = [self frame].size.height - [o_video_view frame].size.height + i_height;
+    new_frame.origin.x = topleftscreen.x;
+    new_frame.origin.y = topleftscreen.y - new_frame.size.height;
+
+    /* make sure the window doesn't exceed the screen size the window is on */
+    if (new_frame.size.width > screenFrame.size.width) {
+        new_frame.size.width = screenFrame.size.width;
+        new_frame.origin.x = screenFrame.origin.x;
+    }
+    if (new_frame.size.height > screenFrame.size.height) {
+        new_frame.size.height = screenFrame.size.height;
+        new_frame.origin.y = screenFrame.origin.y;
+    }
+    if (new_frame.origin.y < screenFrame.origin.y)
+        new_frame.origin.y = screenFrame.origin.y;
+
+    CGFloat right_screen_point = screenFrame.origin.x + screenFrame.size.width;
+    CGFloat right_window_point = new_frame.origin.x + new_frame.size.width;
+    if (right_window_point > right_screen_point)
+        new_frame.origin.x -= (right_window_point - right_screen_point);
+
+    [[self animator] setFrame:new_frame display:YES];
+}
+
+- (void)setNativeVideoSize:(NSSize)size
+{
+    nativeVideoSize = size;
+
+    if (var_InheritBool(VLCIntf, "macosx-video-autoresize") && !var_InheritBool(VLCIntf, "video-wallpaper"))
+        [self resizeWindow];
+}
+
+- (NSSize)windowWillResize:(NSWindow *)window toSize:(NSSize)proposedFrameSize
+{
+    if (![[VLCMain sharedInstance] activeVideoPlayback] || nativeVideoSize.width == 0. || nativeVideoSize.height == 0. || window != self)
+        return proposedFrameSize;
+
+    // needed when entering lion fullscreen mode
+    if ([[VLCMainWindow sharedInstance] fullscreen])
+        return proposedFrameSize;
+
+    if ([[VLCCoreInteraction sharedInstance] aspectRatioIsLocked]) {
+        NSRect videoWindowFrame = [self frame];
+        NSRect viewRect = [o_video_view convertRect:[o_video_view bounds] toView: nil];
+        NSRect contentRect = [self contentRectForFrameRect:videoWindowFrame];
+        float marginy = viewRect.origin.y + videoWindowFrame.size.height - contentRect.size.height;
+        float marginx = contentRect.size.width - viewRect.size.width;
+        if (o_titlebar_view && b_dark_interface)
+            marginy += [o_titlebar_view frame].size.height;
+
+        proposedFrameSize.height = (proposedFrameSize.width - marginx) * nativeVideoSize.height / nativeVideoSize.width + marginy;
+    }
+
+    return proposedFrameSize;
+}
+
+#pragma mark -
 #pragma mark Accessibility stuff
 
 - (NSArray *)accessibilityAttributeNames

@@ -54,7 +54,6 @@
 
 @end
 
-static const float f_min_video_height = 70.0;
 
 @implementation VLCMainWindow
 
@@ -521,9 +520,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)someWindowWillClose:(NSNotification *)notification
 {
     id obj = [notification object];
-    BOOL b_is_mainwindow = [NSStringFromClass([obj class]) isEqualToString:@"VLCMainWindow"];
     
-    if (!b_is_mainwindow || (b_is_mainwindow && !b_nonembedded)) {
+    if ([obj class] == [VLCVideoWindowCommon class] || [obj class] == [VLCDetachedVideoWindow class] || ([obj class] == [VLCMainWindow class] && !b_nonembedded)) {
         if ([[VLCMain sharedInstance] activeVideoPlayback])
             [[VLCCoreInteraction sharedInstance] stop];
     }
@@ -533,38 +531,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     if (config_GetInt(VLCIntf, "macosx-pause-minimized")) {
         id obj = [notification object];
-        BOOL b_is_mainwindow = [NSStringFromClass([obj class]) isEqualToString:@"VLCMainWindow"];
 
-        if (!b_is_mainwindow || (b_is_mainwindow && !b_nonembedded)) {
+        if ([obj class] == [VLCVideoWindowCommon class] || [obj class] == [VLCDetachedVideoWindow class] || ([obj class] == [VLCMainWindow class] && !b_nonembedded)) {
             if ([[VLCMain sharedInstance] activeVideoPlayback])
                 [[VLCCoreInteraction sharedInstance] pause];
         }
     }
-}
-
-- (NSSize)windowWillResize:(NSWindow *)window toSize:(NSSize)proposedFrameSize
-{
-    id videoWindow = [o_video_view window];
-    if (![[VLCMain sharedInstance] activeVideoPlayback] || nativeVideoSize.width == 0. || nativeVideoSize.height == 0. || window != videoWindow)
-        return proposedFrameSize;
-
-    // needed when entering lion fullscreen mode
-    if (b_fullscreen)
-        return proposedFrameSize;
-
-    if ([[VLCCoreInteraction sharedInstance] aspectRatioIsLocked]) {
-        NSRect videoWindowFrame = [videoWindow frame];
-        NSRect viewRect = [o_video_view convertRect:[o_video_view bounds] toView: nil];
-        NSRect contentRect = [videoWindow contentRectForFrameRect:videoWindowFrame];
-        float marginy = viewRect.origin.y + videoWindowFrame.size.height - contentRect.size.height;
-        float marginx = contentRect.size.width - viewRect.size.width;
-        if (b_dark_interface)// && b_video_deco)
-            marginy += [o_titlebar_view frame].size.height;
-
-        proposedFrameSize.height = (proposedFrameSize.width - marginx) * nativeVideoSize.height / nativeVideoSize.width + marginy;
-    }
-
-    return proposedFrameSize;
 }
 
 #pragma mark -
@@ -762,7 +734,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         BOOL b_no_video_deco_only = !b_video_wallpaper;
         o_new_video_window = [[VLCVideoWindowCommon alloc] initWithContentRect:window_rect styleMask:mask backing:NSBackingStoreBuffered defer:YES];
-        [o_new_video_window setDelegate:self];
+        [o_new_video_window setDelegate:o_new_video_window];
 
         if (b_video_wallpaper)
             [o_new_video_window setLevel:CGWindowLevelForKey(kCGDesktopWindowLevelKey) + 1];
@@ -800,7 +772,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             o_new_video_window = [(VLCDetachedVideoWindow *)[o_controller window] retain];
             [o_controller release];
 
-            [o_new_video_window setDelegate: self];
+            [o_new_video_window setDelegate: o_new_video_window];
             [o_new_video_window setLevel:NSNormalWindowLevel];
             [o_new_video_window useOptimizedDrawing: YES];
             o_vout_view = [[o_new_video_window videoView] retain];
@@ -871,59 +843,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 }
 
-- (void)resizeWindow
-{
-    if (b_fullscreen || (b_nativeFullscreenMode && [NSApp presentationOptions] & NSApplicationPresentationFullScreen))
-        return;
-
-    id o_videoWindow = [o_video_view window];
-    NSSize windowMinSize = [o_videoWindow minSize];
-    NSRect screenFrame = [[o_videoWindow screen] visibleFrame];
-
-    NSPoint topleftbase = NSMakePoint(0, [o_videoWindow frame].size.height);
-    NSPoint topleftscreen = [o_videoWindow convertBaseToScreen: topleftbase];
-
-    unsigned int i_width = nativeVideoSize.width;
-    unsigned int i_height = nativeVideoSize.height;
-    if (i_width < windowMinSize.width)
-        i_width = windowMinSize.width;
-    if (i_height < f_min_video_height)
-        i_height = f_min_video_height;
-
-    /* Calculate the window's new size */
-    NSRect new_frame;
-    new_frame.size.width = [o_videoWindow frame].size.width - [o_video_view frame].size.width + i_width;
-    new_frame.size.height = [o_videoWindow frame].size.height - [o_video_view frame].size.height + i_height;
-    new_frame.origin.x = topleftscreen.x;
-    new_frame.origin.y = topleftscreen.y - new_frame.size.height;
-
-    /* make sure the window doesn't exceed the screen size the window is on */
-    if (new_frame.size.width > screenFrame.size.width) {
-        new_frame.size.width = screenFrame.size.width;
-        new_frame.origin.x = screenFrame.origin.x;
-    }
-    if (new_frame.size.height > screenFrame.size.height) {
-        new_frame.size.height = screenFrame.size.height;
-        new_frame.origin.y = screenFrame.origin.y;
-    }
-    if (new_frame.origin.y < screenFrame.origin.y)
-        new_frame.origin.y = screenFrame.origin.y;
-
-    CGFloat right_screen_point = screenFrame.origin.x + screenFrame.size.width;
-    CGFloat right_window_point = new_frame.origin.x + new_frame.size.width;
-    if (right_window_point > right_screen_point)
-        new_frame.origin.x -= (right_window_point - right_screen_point);
-
-    [[o_videoWindow animator] setFrame:new_frame display:YES];
-}
-
-- (void)setNativeVideoSize:(NSSize)size
-{
-    nativeVideoSize = size;
-
-    if (var_InheritBool(VLCIntf, "macosx-video-autoresize") && !b_fullscreen && !var_InheritBool(VLCIntf, "video-wallpaper"))
-        [self performSelectorOnMainThread:@selector(resizeWindow) withObject:nil waitUntilDone:NO];
-}
 
 //  Called automatically if window's acceptsMouseMovedEvents property is true
 - (void)mouseMoved:(NSEvent *)theEvent
