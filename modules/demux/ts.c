@@ -2498,6 +2498,13 @@ static char *EITConvertToUTF8( const unsigned char *psz_instring,
                                size_t i_length,
                                bool b_broken )
 {
+    /* Deal with no longer broken providers (no switch byte
+      but sending ISO_8859-1 instead of ISO_6937) without
+      removing them from the broken providers table
+      (keep the entry for correctly handling recorded TS).
+    */
+    b_broken = b_broken && i_length && *psz_instring > 0x20;
+
     if( b_broken )
         return FromCharset( "ISO_8859-1", psz_instring, i_length );
     return vlc_from_EIT( psz_instring, i_length );
