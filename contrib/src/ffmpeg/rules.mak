@@ -117,13 +117,6 @@ else
 FFMPEGCONF += --enable-pthreads
 endif
 
-ifdef HAVE_WINCE
-FFMPEGCONF += --target-os=mingw32ce --arch=armv4l --cpu=armv4t \
-	--disable-decoder=snow --disable-decoder=vc9 \
-	--disable-decoder=wmv3 --disable-decoder=vorbis \
-	--disable-decoder=dvdsub --disable-decoder=dvbsub
-endif
-
 FFMPEG_CFLAGS += --std=gnu99
 
 # Build
