@@ -2013,18 +2013,15 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 static int FindDevices( vlc_object_t *p_this, const char *psz_name,
                             char ***vp, char ***tp )
 {
-    bool b_audio = !strcmp( psz_name, CFG_PREFIX "adev" );
-
     /* Find list of devices */
     list<string> list_devices;
+    if( SUCCEEDED(CoInitializeEx( NULL, COINIT_APARTMENTTHREADED )) )
+    {
+        bool b_audio = !strcmp( psz_name, CFG_PREFIX "adev" );
 
-    /* Initialize OLE/COM */
-    CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
-
-    FindCaptureDevice( p_this, NULL, &list_devices, b_audio );
-
-    /* Uninitialize OLE/COM */
-    CoUninitialize();
+        FindCaptureDevice( p_this, NULL, &list_devices, b_audio );
+        CoUninitialize();
+    }
 
     unsigned count = 2 + list_devices.size(), i = 2;
     char **values = (char **)xmalloc( count * sizeof(*values) );
@@ -2058,11 +2055,12 @@ static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     char *psz_device = NULL;
     int i_ret = VLC_SUCCESS;
 
+    if( FAILED(CoInitializeEx( NULL, COINIT_APARTMENTTHREADED )) )
+        return VLC_EGENERIC;
+
     if( !EMPTY_STR( newval.psz_string ) )
         psz_device = strdup( newval.psz_string );
 
-    /* Initialize OLE/COM */
-    CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
 
     p_item = config_FindConfig( p_this, psz_name );
 
@@ -2109,9 +2107,7 @@ static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
         i_ret = VLC_EGENERIC;
     }
 
-    /* Uninitialize OLE/COM */
     CoUninitialize();
-
     free( psz_device );
     return i_ret;
 }
