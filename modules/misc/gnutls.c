@@ -313,8 +313,11 @@ static int gnutls_CertSearch (vlc_tls_t *obj, const char *host,
             time (&expiry);
             expiry += 24 * 60 * 60;
         case 3:
-            gnutls_store_pubkey (NULL, NULL, host, service, GNUTLS_CRT_X509,
-                                 datum, expiry, 0);
+            val = gnutls_store_pubkey (NULL, NULL, host, service,
+                                       GNUTLS_CRT_X509, datum, expiry, 0);
+            if (val)
+                msg_Err (obj, "cannot store X.509 certificate: %s",
+                         gnutls_strerror (val));
             return 0;
     }
     return -1;
