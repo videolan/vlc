@@ -2418,7 +2418,7 @@ dnl  postproc plugin
 dnl
 
 AC_ARG_ENABLE(postproc,
-[  --enable-postproc       libpostproc image post-processing (default enabled)])
+[  --enable-postproc       libpostproc image post-processing (default auto)])
 if test "${enable_postproc}" != "no"
 then
   PKG_CHECK_MODULES(POSTPROC,[libpostproc libavutil],
@@ -2432,7 +2432,7 @@ then
       VLC_ADD_CFLAGS([postproc],[$POSTPROC_CFLAGS $AVUTIL_CFLAGS])
       VLC_RESTORE_FLAGS
     ],[
-      AC_MSG_ERROR([${POSTPROC_PKG_ERRORS}. Pass --disable-postproc to ignore this error.])
+      AC_MSG_WARN([${POSTPROC_PKG_ERRORS}.])
   ])
 fi
 
