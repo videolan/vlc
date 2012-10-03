@@ -257,9 +257,11 @@ static int gnutls_CertSearch (vlc_tls_t *obj, const char *host,
                               const gnutls_datum_t *restrict datum)
 {
     assert (host != NULL);
+
     /* Look up mismatching certificate in store */
     int val = gnutls_verify_stored_pubkey (NULL, NULL, host, service,
                                            GNUTLS_CRT_X509, datum, 0);
+    const char *msg;
     switch (val)
     {
         case 0:
@@ -267,9 +269,24 @@ static int gnutls_CertSearch (vlc_tls_t *obj, const char *host,
             return 0;
         case GNUTLS_E_NO_CERTIFICATE_FOUND:
             msg_Dbg (obj, "no known certificates for %s", host);
+            msg = N_("You attempted to reach %s. "
+                "However the security certificate presented by the server "
+                "is unknown and could not be authenticated by any trusted "
+                "Certfication Authority. "
+                "This problem may be caused by a configuration error "
+                "or an attempt to breach your security or your privacy.\n\n"
+                "If in doubt, abort now.\n");
             break;
         case GNUTLS_E_CERTIFICATE_KEY_MISMATCH:
             msg_Dbg (obj, "certificate keys mismatch for %s", host);
+            msg = N_("You attempted to reach %s. "
+                "However the security certificate presented by the server "
+                "changed since the previous visit "
+                "and was not authentication by any trusted "
+                "Certfication Authority. "
+                "This problem may be caused by a configuration error "
+                "or an attempt to breach your security or your privacy.\n\n"
+                "If in doubt, abort now.\n");
             break;
         default:
             msg_Err (obj, "certificate key match error for %s: %s", host,
@@ -277,14 +294,9 @@ static int gnutls_CertSearch (vlc_tls_t *obj, const char *host,
             return -1;
     }
 
-    if (dialog_Question (obj, _("Insecure site"),
-         _("You attempted to reach %s, but security certificate presented by "
-           "the server could not be verified."
-           "This problem may be caused by a configuration error "
-           "on the server or by a serious breach of network security.\n\n"
-           "If in doubt, abort now.\n"),
+    if (dialog_Question (obj, _("Insecure site"), vlc_gettext (msg),
                          _("Abort"), _("View certificate"), NULL, host) != 2)
-         return -1;
+        return -1;
 
     gnutls_x509_crt_t cert;
     gnutls_datum_t desc;
