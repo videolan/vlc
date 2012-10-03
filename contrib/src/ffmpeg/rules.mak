@@ -57,7 +57,7 @@ ifeq ($(ARCH),arm)
 FFMPEGCONF += --arch=arm
 ifdef HAVE_NEON
 FFMPEGCONF += --cpu=cortex-a8 --enable-neon
-FFMPEG_CFLAGS +=-mfloat-abi=softfp -mfpu=neon
+FFMPEG_CFLAGS += -mfpu=neon
 endif
 endif
 
