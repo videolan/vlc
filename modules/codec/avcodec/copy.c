@@ -190,7 +190,7 @@ static void SplitUV(uint8_t *dstu, size_t dstu_pitch,
     "movhpd %%xmm3,  24(%[dst2])\n"
 
 #ifdef CAN_COMPILE_SSSE3
-        if (vlc_CPU_SSE3())
+        if (vlc_CPU_SSSE3())
         {
             for (x = 0; x < (width & ~31); x += 32) {
                 asm volatile (
