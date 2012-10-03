@@ -1429,7 +1429,7 @@ static int EncOpen( vlc_object_t *p_this )
     ldt_fs_t *ldt_fs = Setup_LDT_Keeper();
 #else
     /* Initialize OLE/COM */
-    CoInitialize( 0 );
+    CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
 #endif /* LOADER */
 
     if( LoadDMO( p_this, &hmsdmo_dll, &p_dmo, &p_enc->fmt_out, true )

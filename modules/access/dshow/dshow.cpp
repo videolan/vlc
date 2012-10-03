@@ -2019,7 +2019,7 @@ static int FindDevices( vlc_object_t *p_this, const char *psz_name,
     list<string> list_devices;
 
     /* Initialize OLE/COM */
-    CoInitialize( 0 );
+    CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
 
     FindCaptureDevice( p_this, NULL, &list_devices, b_audio );
 
@@ -2062,7 +2062,7 @@ static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
         psz_device = strdup( newval.psz_string );
 
     /* Initialize OLE/COM */
-    CoInitialize( 0 );
+    CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
 
     p_item = config_FindConfig( p_this, psz_name );
 
