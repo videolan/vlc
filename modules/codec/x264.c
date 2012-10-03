@@ -1264,7 +1264,7 @@ static int  Open ( vlc_object_t *p_this )
     /* Check if user has given some profile (baseline,main,high) to limit
      * settings, and apply those*/
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "profile" );
-    if( psz_val )
+    if( psz_val && *psz_val )
         x264_param_apply_profile( &p_sys->param, psz_val );
     free( psz_val );
 
