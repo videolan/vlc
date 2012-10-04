@@ -34,20 +34,13 @@
 
 #include <stdio.h>
 #include <ctype.h>                                              /* tolower() */
+#include <time.h>                                                 /* ctime() */
+#include <limits.h>
 #include <assert.h>
+#include <sys/time.h>                                      /* gettimeofday() */
 
 #include <vlc_vlm.h>
 #include <vlc_modules.h>
-
-#ifndef WIN32
-#   include <sys/time.h>                                   /* gettimeofday() */
-#endif
-
-#include <time.h>                                                 /* ctime() */
-#if defined (WIN32)
-#include <sys/timeb.h>                                            /* ftime() */
-#endif
-#include <limits.h>
 
 #include <vlc_input.h>
 #include <vlc_stream.h>
@@ -272,17 +265,10 @@ int vlm_ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
 
 int64_t vlm_Date(void)
 {
-#if defined (WIN32)
-    struct timeb tm;
-    ftime( &tm );
-    return ((int64_t)tm.time) * 1000000 + ((int64_t)tm.millitm) * 1000;
-#else
-    struct timeval tv_date;
+    struct timeval tv;
 
-    /* gettimeofday() cannot fail given &tv_date is a valid address */
-    (void)gettimeofday( &tv_date, NULL );
-    return (mtime_t) tv_date.tv_sec * 1000000 + (mtime_t) tv_date.tv_usec;
-#endif
+    (void)gettimeofday( &tv, NULL );
+    return tv.tv_sec * INT64_C(1000000) + tv.tv_usec;
 }
 
 
