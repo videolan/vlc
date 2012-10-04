@@ -42,21 +42,6 @@
 # define MAXPATHLEN 1024
 #endif
 
-static char *configdir = NULL;
-
-static pthread_once_t once = PTHREAD_ONCE_INIT;
-
-static void init_dirs( void )
-{
-    configdir = config_GetUserDir(VLC_CONFIG_DIR);
-}
-
-const char *config_GetConfDir( void )
-{
-    pthread_once(&once, init_dirs);
-    return configdir;
-}
-
 static char *config_GetLibPath (void)
 {
     /* Get the full program path and name */

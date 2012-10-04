@@ -39,7 +39,6 @@ config_ChainParse
 config_ChainParseOptions
 config_ExistIntf
 config_FindConfig
-config_GetConfDir
 config_GetDataDir
 config_GetLibDir
 config_GetFloat

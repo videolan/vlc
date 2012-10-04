@@ -58,16 +58,6 @@ char *config_GetLibDir (void)
 }
 #endif
 
-/**
- * Determines the system configuration directory.
- *
- * @return a string (always succeeds).
- */
-const char *config_GetConfDir( void )
-{
-    return SYSCONFDIR;
-}
-
 static char *config_GetHomeDir (void)
 {
     /* 1/ Try $HOME  */

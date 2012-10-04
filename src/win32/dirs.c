@@ -67,26 +67,6 @@ char *config_GetDataDir (void)
     return (path != NULL) ? strdup (path) : config_GetLibDir ();
 }
 
-const char *config_GetConfDir (void)
-{
-    static char appdir[PATH_MAX] = "";
-    wchar_t wdir[MAX_PATH];
-
-#warning FIXME: thread-safety!
-    if (*appdir)
-        return appdir;
-
-    /* Get the "Application Data" folder for all users */
-    if( S_OK == SHGetFolderPathW( NULL, CSIDL_COMMON_APPDATA
-              | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, wdir ) )
-    {
-        WideCharToMultiByte (CP_UTF8, 0, wdir, -1,
-                             appdir, PATH_MAX, NULL, NULL);
-        return appdir;
-    }
-    return NULL;
-}
-
 static char *config_GetShellDir (int csidl)
 {
     wchar_t wdir[MAX_PATH];

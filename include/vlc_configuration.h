@@ -120,7 +120,6 @@ VLC_API void config_ResetAll( vlc_object_t * );
 VLC_API module_config_t * config_FindConfig( vlc_object_t *, const char * ) VLC_USED;
 VLC_API char * config_GetDataDir(void) VLC_USED VLC_MALLOC;
 VLC_API char *config_GetLibDir(void) VLC_USED;
-VLC_API const char * config_GetConfDir( void ) VLC_USED;
 
 typedef enum vlc_userdir
 {

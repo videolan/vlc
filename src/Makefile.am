@@ -167,7 +167,6 @@ lib_LTLIBRARIES = libvlccore.la
 AM_CPPFLAGS = $(INCICONV) $(IDN_CFLAGS) \
 	-DMODULE_STRING=\"main\" \
 	-DLOCALEDIR=\"$(localedir)\" \
-	-DSYSCONFDIR=\"$(sysconfdir)\" \
 	-DPKGDATADIR=\"$(vlcdatadir)\" \
 	-DPKGLIBDIR=\"$(vlclibdir)\"
 AM_CFLAGS = $(CFLAGS_libvlccore)

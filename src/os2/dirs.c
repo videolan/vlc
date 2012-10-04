@@ -64,17 +64,6 @@ char *config_GetDataDir (void)
     return datadir;
 }
 
-/**
- * Determines the system configuration directory.
- *
- * @return a string (always succeeds).
- */
-const char *config_GetConfDir( void )
-{
-#warning FIXME: memory leak
-    return config_GetLibDir ();
-}
-
 char *config_GetUserDir (vlc_userdir_t type)
 {
     switch (type)

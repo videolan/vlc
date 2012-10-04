@@ -1,7 +1,6 @@
 
 add_definitions(-Dasm=__asm__ -D_INTL_REDIRECT_MACROS)
 add_definitions(-DLOCALEDIR="${CMAKE_INSTALL_PREFIX}/locale")
-add_definitions(-DSYSCONFDIR="${CMAKE_INSTALL_PREFIX}/etc")
 add_definitions(-DPLUGIN_PATH="${CMAKE_INSTALL_PREFIX}/lib/vlc")
 add_definitions(-DDATA_PATH="${CMAKE_INSTALL_PREFIX}/share/vlc")
 

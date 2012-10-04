@@ -55,16 +55,6 @@ const char *config_GetLibDir (void)
     return "C:\\Sys\\Bin";
 }
 
-/**
- * Determines the system configuration directory.
- *
- * @return a string (always succeeds).
- */
-const char *config_GetConfDir( void )
-{
-    return "C:\\Data\\Others";
-}
-
 char *config_GetUserDir (vlc_userdir_t type)
 {
     switch (type)
