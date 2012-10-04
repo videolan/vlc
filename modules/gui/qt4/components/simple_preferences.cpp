@@ -935,7 +935,7 @@ bool SPrefsPanel::addType( const char * psz_ext, QTreeWidgetItem* current,
 void SPrefsPanel::assoDialog()
 {
     IApplicationAssociationRegistrationUI *p_appassoc;
-    CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
+    CoInitializeEx( NULL, COINIT_MULTITTHREADED );
 
     if( S_OK == CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI,
                 NULL, CLSCTX_INPROC_SERVER,

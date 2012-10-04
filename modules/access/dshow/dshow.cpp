@@ -2015,7 +2015,8 @@ static int FindDevices( vlc_object_t *p_this, const char *psz_name,
 {
     /* Find list of devices */
     list<string> list_devices;
-    if( SUCCEEDED(CoInitializeEx( NULL, COINIT_APARTMENTTHREADED )) )
+    if( SUCCEEDED(CoInitializeEx( NULL, COINIT_MULTITTHREADED ))
+     || SUCCEEDED(CoInitializeEx( NULL, COINIT_APARTMENTTHREADED )) )
     {
         bool b_audio = !strcmp( psz_name, CFG_PREFIX "adev" );
 
@@ -2055,7 +2056,8 @@ static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     char *psz_device = NULL;
     int i_ret = VLC_SUCCESS;
 
-    if( FAILED(CoInitializeEx( NULL, COINIT_APARTMENTTHREADED )) )
+    if( FAILED(CoInitializeEx( NULL, COINIT_MULTITTHREADED ))
+     && FAILED(CoInitializeEx( NULL, COINIT_APARTMENTTHREADED )) )
         return VLC_EGENERIC;
 
     if( !EMPTY_STR( newval.psz_string ) )
