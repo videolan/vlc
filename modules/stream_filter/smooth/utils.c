@@ -202,3 +202,63 @@ uint64_t sms_queue_avg( sms_queue_t *queue )
     }
     return sum / queue->length;
 }
+
+sms_stream_t * sms_get_stream_by_cat( vlc_array_t *streams, int i_cat )
+{
+    sms_stream_t *ret = NULL;
+    int count = vlc_array_count( streams );
+    assert( count >= 0 && count <= 3 );
+
+    for( int i = 0; i < count; i++ )
+    {
+        ret = vlc_array_item_at_index( streams, i );
+        if( ret->type == i_cat )
+            return ret;
+    }
+    return NULL;
+}
+
+int es_cat_to_index( int i_cat )
+{
+    switch( i_cat )
+    {
+        case VIDEO_ES:
+            return 0;
+        case AUDIO_ES:
+            return 1;
+        case SPU_ES:
+            return 2;
+        default:
+            return -1;
+    }
+}
+
+int index_to_es_cat( int index )
+{
+    switch( index )
+    {
+        case 0:
+            return VIDEO_ES;
+        case 1:
+            return AUDIO_ES;
+        case 2:
+            return SPU_ES;
+        default:
+            return -1;
+    }
+}
+
+bool no_more_chunks( unsigned *indexes, vlc_array_t *streams )
+{
+    sms_stream_t *sms = NULL;
+    int count = vlc_array_count( streams );
+    unsigned ck_index;
+    for( int i = 0; i < count; i++ )
+    {
+        sms = vlc_array_item_at_index( streams, i );
+        ck_index = indexes[es_cat_to_index( sms->type )];
+        if( ck_index < sms->vod_chunks_nb - 1 )
+            return false;
+    }
+    return true;
+}

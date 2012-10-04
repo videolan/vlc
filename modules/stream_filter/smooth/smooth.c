@@ -404,8 +404,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_cache = false;
 
     p_sys->sms_streams = vlc_array_new();
+    p_sys->selected_st = vlc_array_new();
     p_sys->download.chunks = vlc_array_new();
-    if( unlikely( !p_sys->sms_streams || !p_sys->download.chunks ) )
+    if( unlikely( !p_sys->sms_streams || !p_sys->download.chunks ||
+                  !p_sys->selected_st ) )
     {
         free( p_sys );
         return VLC_ENOMEM;
@@ -423,34 +425,14 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_tracks = vlc_array_count( p_sys->sms_streams );
 
-    /* FIXME */
-    p_sys->i_selected_tracks = 2; /* one video track and one audio track */
-
-    /* Choose first video stream available */
-    sms_stream_t *vsms = NULL;
+    /* Choose first video / audio / subtitle stream available */
+    sms_stream_t *tmp = NULL, *selected = NULL;
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
-        vsms = vlc_array_item_at_index( p_sys->sms_streams, i );
-        if( vsms->type == VIDEO_ES )
-        {
-            msg_Dbg( s, "Video stream chosen is %s", vsms->name );
-            p_sys->vstream = vsms;
-            break;
-        }
-    }
-
-    /* Choose first audio stream available */
-    sms_stream_t *asms = NULL;
-    for( unsigned i = 0; i < p_sys->i_tracks; i++ )
-    {
-        asms = vlc_array_item_at_index( p_sys->sms_streams, i );
-        //if( asms->type == AUDIO_ES && !strcmp( asms->name, "audio_eng" ) )
-        if( asms->type == AUDIO_ES )
-        {
-            msg_Dbg( s, "Audio stream chosen is %s", asms->name );
-            p_sys->astream = asms;
-            break;
-        }
+        tmp = vlc_array_item_at_index( p_sys->sms_streams, i );
+        selected = SMS_GET_SELECTED_ST( tmp->type );
+        if( !selected )
+            vlc_array_append( p_sys->selected_st, tmp );
     }
 
     /* Choose lowest quality for the first chunks */
@@ -498,7 +480,8 @@ static void Close( vlc_object_t *p_this )
     vlc_mutex_lock( &p_sys->download.lock_wait );
     p_sys->b_close = true;
     /* Negate the condition variable's predicate */
-    p_sys->download.vlead = p_sys->download.alead = 0;
+    for( int i = 0; i < 3; i++ )
+        p_sys->download.lead[i] = 0;
     p_sys->playback.toffset = 0;
     vlc_cond_signal(&p_sys->download.wait);
     vlc_mutex_unlock( &p_sys->download.lock_wait );
@@ -544,9 +527,7 @@ static chunk_t *get_chunk( stream_t *s, const bool wait )
                     p_sys->playback.index );
             return NULL;
         }
-        if( !p_sys->b_live &&
-            p_sys->download.aindex >= (p_sys->vstream->vod_chunks_nb -1) &&
-            p_sys->download.vindex >= (p_sys->astream->vod_chunks_nb -1) )
+        if( NO_MORE_CHUNKS )
         {
             vlc_mutex_unlock( &p_sys->download.lock_wait );
             msg_Info( s, "No more chunks, end of the VOD" );
@@ -580,7 +561,8 @@ static int sms_Read( stream_t *s, uint8_t *p_read, int i_read )
 
         if( chunk->read_pos >= (int)chunk->size )
         {
-            if( chunk->type == VIDEO_ES || !p_sys->vstream )
+            if( chunk->type == VIDEO_ES ||
+                ( !SMS_GET_SELECTED_ST( VIDEO_ES ) && chunk->type == AUDIO_ES ) )
             {
                 vlc_mutex_lock( &p_sys->download.lock_wait );
                 p_sys->playback.toffset += chunk->duration;
@@ -727,7 +709,8 @@ static int chunk_Seek( stream_t *s, const uint64_t pos )
 
         p_sys->b_tseek = true;
         p_sys->time_pos = p_sys->vod_duration * pos / FAKE_STREAM_SIZE;
-        p_sys->download.vlead = p_sys->download.alead = 0;
+        for( int i = 0; i < 3; i++ )
+            p_sys->download.lead[i] = 0;
         p_sys->playback.toffset = 0;
 
         vlc_cond_signal( &p_sys->download.wait);

@@ -89,12 +89,9 @@ struct stream_sys_t
     char         *base_url;    /* URL common part for chunks */
     vlc_thread_t thread;       /* SMS chunk download thread */
 
-    vlc_array_t  *sms_streams; /* array of sms_stream_t */
-    sms_stream_t *vstream;     /* current video stream  */
-    sms_stream_t *astream;     /* current audio stream  */
-    sms_stream_t *tstream;     /* current text stream  */
+    vlc_array_t  *sms_streams; /* available streams */
+    vlc_array_t  *selected_st; /* selected streams */
     unsigned     i_tracks;     /* Total number of tracks in the Manifest */
-    unsigned     i_selected_tracks;
     sms_queue_t  *bws;         /* Measured bandwidths of the N last chunks */
     uint64_t     vod_duration; /* total duration of the VOD media */
     int64_t      time_pos;
@@ -103,13 +100,10 @@ struct stream_sys_t
     /* Download */
     struct sms_download_s
     {
-        uint64_t     alead;       // how much audio/video/text data is
-        uint64_t     vlead;       // available (downloaded),
-        uint64_t     tlead;       // in seconds / TimeScale
+        uint64_t     lead[3];     /* how much audio/video/text data is available
+                                     (downloaded), in seconds / TimeScale */
 
-        unsigned     aindex;      /* current audio chunk for download */
-        unsigned     vindex;      /*         video                    */
-        unsigned     sindex;      /*         spu                      */
+        unsigned     ck_index[3]; /* current chunk for download */
 
         uint64_t     next_chunk_offset;
         vlc_array_t  *chunks;     /* chunks that have been downloaded */
@@ -164,6 +158,12 @@ struct stream_sys_t
     slice += 4; \
   } while(0)
 
+#define SMS_GET_SELECTED_ST( cat ) \
+    sms_get_stream_by_cat( p_sys->selected_st, cat )
+
+#define NO_MORE_CHUNKS !p_sys->b_live && \
+    no_more_chunks( p_sys->download.ck_index, p_sys->selected_st )
+
 sms_queue_t *sms_queue_init( const int );
 int sms_queue_put( sms_queue_t *, const uint64_t );
 uint64_t sms_queue_avg( sms_queue_t *);
@@ -176,5 +176,9 @@ void chunk_Free( chunk_t *);
 sms_stream_t * sms_New( void );
 void sms_Free( sms_stream_t *);
 uint8_t *decode_string_hex_to_binary( const char * );
+sms_stream_t * sms_get_stream_by_cat( vlc_array_t *, int );
+bool no_more_chunks( unsigned[], vlc_array_t *);
+int index_to_es_cat( int );
+int es_cat_to_index( int );
 
 #endif
