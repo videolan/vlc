@@ -42,6 +42,7 @@
 #include <QFrame>
 #include <QLabel>
 #include <QMouseEvent>
+#include <QPropertyAnimation>
 
 class ResizeEvent;
 class QPixmap;
@@ -93,9 +94,11 @@ private:
     QString pixmapUrl;
     bool b_expandPixmap;
     bool b_withart;
+    QPropertyAnimation *fadeAnimation;
     virtual void contextMenuEvent( QContextMenuEvent *event );
 protected:
     void paintEvent( QPaintEvent *e );
+    virtual void showEvent( QShowEvent * e );
     static const int MARGIN = 5;
 public slots:
     void toggle(){ TOGGLEV( this ); }

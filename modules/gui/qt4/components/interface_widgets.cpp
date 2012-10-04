@@ -199,6 +199,16 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
     /* Init the cone art */
     updateArt( "" );
 
+    /* fade in animator */
+    setProperty( "opacity", 1.0 );
+    fadeAnimation = new QPropertyAnimation( this, "opacity", this );
+    fadeAnimation->setDuration( 1000 );
+    fadeAnimation->setStartValue( 0.0 );
+    fadeAnimation->setEndValue( 1.0 );
+    fadeAnimation->setEasingCurve( QEasingCurve::OutSine );
+    CONNECT( fadeAnimation, valueChanged( const QVariant & ),
+             this, update() );
+
     CONNECT( THEMIM->getIM(), artChanged( QString ),
              this, updateArt( const QString& ) );
 }
@@ -219,6 +229,12 @@ void BackgroundWidget::updateArt( const QString& url )
     update();
 }
 
+void BackgroundWidget::showEvent( QShowEvent * e )
+{
+    Q_UNUSED( e );
+    if ( b_withart ) fadeAnimation->start();
+}
+
 void BackgroundWidget::paintEvent( QPaintEvent *e )
 {
     if ( !b_withart )
@@ -236,6 +252,8 @@ void BackgroundWidget::paintEvent( QPaintEvent *e )
 
     i_maxwidth  = __MIN( maximumWidth(), width() ) - MARGIN * 2;
     i_maxheight = __MIN( maximumHeight(), height() ) - MARGIN * 2;
+
+    painter.setOpacity( property( "opacity" ).toFloat() );
 
     if ( height() > MARGIN * 2 )
     {
