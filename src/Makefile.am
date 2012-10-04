@@ -203,6 +203,7 @@ libvlc_win32_rc.$(OBJEXT): libvlc_win32_rc.rc
 
 EXTRA_libvlccore_la_SOURCES = \
 	$(SOURCES_libvlc_darwin) \
+	$(SOURCES_libvlc_android) \
 	$(SOURCES_libvlc_linux) \
 	$(SOURCES_libvlc_win32) \
 	$(SOURCES_libvlc_os2) \
@@ -213,6 +214,9 @@ EXTRA_libvlccore_la_SOURCES = \
 	$(NULL)
 if HAVE_DARWIN
 libvlccore_la_SOURCES += $(SOURCES_libvlc_darwin)
+else
+if HAVE_ANDROID
+libvlccore_la_SOURCES += $(SOURCES_libvlc_android)
 else
 if HAVE_LINUX
 libvlccore_la_SOURCES += $(SOURCES_libvlc_linux)
@@ -227,6 +231,7 @@ if HAVE_OS2
 libvlccore_la_SOURCES += $(SOURCES_libvlc_os2)
 else
 libvlccore_la_SOURCES += $(SOURCES_libvlc_other)
+endif
 endif
 endif
 endif
@@ -249,6 +254,18 @@ SOURCES_libvlc_darwin = \
 	posix/thread.c \
 	posix/timer.c \
 	posix/darwin_specific.c \
+	posix/rand.c \
+	$(NULL)
+
+SOURCES_libvlc_android = \
+	android/dirs.c \
+	posix/filesystem.c \
+	posix/plugin.c \
+	posix/thread.c \
+	posix/timer.c \
+	posix/linux_cpu.c \
+	posix/linux_specific.c \
+	posix/specific.c \
 	posix/rand.c \
 	$(NULL)
 
