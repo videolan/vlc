@@ -569,7 +569,7 @@ commands_ordered = {
     { "volup"; { func = ret_print(vlc.volume.up,"( audio volume: "," )"); args = "[X]"; help = "raise audio volume X steps" } };
     { "voldown"; { func = ret_print(vlc.volume.down,"( audio volume: "," )"); args = "[X]"; help = "lower audio volume X steps" } };
     { "adev"; { func = skip(listvalue("aout","audio-device")); args = "[X]"; help = "set/get audio device" } };
-    { "achan"; { func = skip(listvalue("aout","audio-channels")); args = "[X]"; help = "set/get audio channels" } };
+    { "achan"; { func = skip(listvalue("aout","stereo-mode")); args = "[X]"; help = "set/get stereo audio output mode" } };
     { "atrack"; { func = skip(listvalue("input","audio-es")); args = "[X]"; help = "set/get audio track" } };
     { "vtrack"; { func = skip(listvalue("input","video-es")); args = "[X]"; help = "set/get video track" } };
     { "vratio"; { func = skip(listvalue("vout","aspect-ratio")); args = "[X]"; help = "set/get video aspect ratio" } };

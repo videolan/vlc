@@ -115,6 +115,7 @@ typedef int32_t vlc_fixed_t;
 #define AOUT_VAR_7_1                8
 #define AOUT_VAR_SPDIF              10
 
+#define AOUT_VAR_CHAN_UNSET         0 /* must be zero */
 #define AOUT_VAR_CHAN_STEREO        1
 #define AOUT_VAR_CHAN_RSTEREO       2
 #define AOUT_VAR_CHAN_LEFT          3

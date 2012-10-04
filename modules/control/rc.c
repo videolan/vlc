@@ -1710,13 +1710,9 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
          return VLC_ENOOBJ;
 
     if ( !strcmp( psz_cmd, "adev" ) )
-    {
         psz_variable = "audio-device";
-    }
     else
-    {
-        psz_variable = "audio-channels";
-    }
+        psz_variable = "stereo-mode";
 
     /* Get the descriptive name of the variable */
     var_Change( p_aout, psz_variable, VLC_VAR_GETTEXT,

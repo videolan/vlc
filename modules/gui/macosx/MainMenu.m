@@ -498,7 +498,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         audio_output_t * p_aout = input_GetAout(p_input);
         if (p_aout != NULL) {
             [self setupVarMenuItem: o_mi_channels target: (vlc_object_t *)p_aout
-                                     var: "audio-channels" selector: @selector(toggleVar:)];
+                                     var: "stereo-mode" selector: @selector(toggleVar:)];
 
             [self setupVarMenuItem: o_mi_device target: (vlc_object_t *)p_aout
                                      var: "audio-device" selector: @selector(toggleVar:)];

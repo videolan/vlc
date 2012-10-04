@@ -43,6 +43,7 @@
 //#define Nothing here, this is just to prevent update-po from being stupid
 #include "vlc_keys.h"
 #include "vlc_meta.h"
+#include <vlc_aout.h>
 
 static const char *const ppsz_snap_formats[] =
 { "png", "jpg", "tiff" };
@@ -202,6 +203,15 @@ static const int pi_force_dolby_values[] = { 0, 1, 2 };
 static const char *const ppsz_force_dolby_descriptions[] = {
     N_("Auto"), N_("On"), N_("Off") };
 
+#define STEREO_MODE_TEXT N_("Stereo audio output mode")
+static const int pi_stereo_mode_values[] = { AOUT_VAR_CHAN_UNSET,
+    AOUT_VAR_CHAN_STEREO, AOUT_VAR_CHAN_RSTEREO,
+    AOUT_VAR_CHAN_LEFT, AOUT_VAR_CHAN_RIGHT, AOUT_VAR_CHAN_DOLBYS
+};
+static const char *const ppsz_stereo_mode_texts[] = { N_("Unset"),
+    N_("Stereo"), N_("Reverse stereo"),
+    N_("Left"), N_("Right"), N_("Dolby Surround")
+};
 
 #define AUDIO_FILTER_TEXT N_("Audio filters")
 #define AUDIO_FILTER_LONGTEXT N_( \
@@ -1495,6 +1505,8 @@ vlc_module_begin ()
     add_integer( "force-dolby-surround", 0, FORCE_DOLBY_TEXT,
                  FORCE_DOLBY_LONGTEXT, false )
         change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions )
+    add_integer( "stereo-mode", 0, STEREO_MODE_TEXT, STEREO_MODE_TEXT, true )
+        change_integer_list( pi_stereo_mode_values, ppsz_stereo_mode_texts )
     add_integer( "audio-desync", 0, DESYNC_TEXT,
                  DESYNC_LONGTEXT, true )
         change_safe ()

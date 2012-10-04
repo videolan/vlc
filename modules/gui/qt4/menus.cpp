@@ -255,7 +255,7 @@ static int AudioAutoMenuBuilder( audio_output_t *p_object,
         QVector<const char *> &varnames )
 {
     PUSH_INPUTVAR( "audio-es" );
-    PUSH_VAR( "audio-channels" );
+    PUSH_VAR( "stereo-mode" );
     PUSH_VAR( "audio-device" );
     PUSH_VAR( "visual" );
     return VLC_SUCCESS;
@@ -596,7 +596,7 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     if( current->isEmpty() )
     {
         addActionWithSubmenu( current, "audio-es", qtr( "Audio &Track" ) );
-        addActionWithSubmenu( current, "audio-channels", qtr( "Audio &Channels" ) );
+        addActionWithSubmenu( current, "stereo-mode", qtr( "&Stereo Mode" ) );
         addActionWithSubmenu( current, "audio-device", qtr( "Audio &Device" ) );
         current->addSeparator();
 

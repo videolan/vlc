@@ -91,7 +91,7 @@ int aout_DecNew( audio_output_t *p_aout,
 
     /* Create the audio output stream */
     var_Destroy( p_aout, "audio-device" );
-    var_Destroy( p_aout, "audio-channels" );
+    var_Destroy( p_aout, "stereo-mode" );
 
     owner->input_format = *p_format;
     vlc_atomic_set (&owner->restart, 0);
@@ -139,7 +139,7 @@ void aout_Shutdown (audio_output_t *p_aout)
         aout_volume_Delete (owner->volume);
     }
     var_Destroy( p_aout, "audio-device" );
-    var_Destroy( p_aout, "audio-channels" );
+    var_Destroy( p_aout, "stereo-mode" );
 
     aout_unlock( p_aout );
     free (input);

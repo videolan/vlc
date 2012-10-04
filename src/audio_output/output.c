@@ -98,96 +98,69 @@ int aout_OutputNew( audio_output_t *p_aout,
         return -1;
     }
 
-    if ( var_Type( p_aout, "audio-channels" ) ==
-             (VLC_VAR_INTEGER | VLC_VAR_HASCHOICE) )
+    if (!var_Type (p_aout, "stereo-mode"))
+        var_Create (p_aout, "stereo-mode",
+                    VLC_VAR_INTEGER | VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT);
+
+    /* The user may have selected a different channels configuration. */
+    var_AddCallback (p_aout, "stereo-mode", aout_ChannelsRestart, NULL);
+    switch (var_GetInteger (p_aout, "stereo-mode"))
     {
-        /* The user may have selected a different channels configuration. */
-        switch( var_InheritInteger( p_aout, "audio-channels" ) )
+        case AOUT_VAR_CHAN_RSTEREO:
+            p_aout->format.i_original_channels |= AOUT_CHAN_REVERSESTEREO;
+             break;
+        case AOUT_VAR_CHAN_STEREO:
+            p_aout->format.i_original_channels = AOUT_CHANS_STEREO;
+            break;
+        case AOUT_VAR_CHAN_LEFT:
+            p_aout->format.i_original_channels = AOUT_CHAN_LEFT;
+            break;
+        case AOUT_VAR_CHAN_RIGHT:
+            p_aout->format.i_original_channels = AOUT_CHAN_RIGHT;
+            break;
+        case AOUT_VAR_CHAN_DOLBYS:
+            p_aout->format.i_original_channels =
+                                     AOUT_CHANS_STEREO | AOUT_CHAN_DOLBYSTEREO;
+            break;
+        default:
         {
-            case AOUT_VAR_CHAN_RSTEREO:
-                p_aout->format.i_original_channels |= AOUT_CHAN_REVERSESTEREO;
-                break;
-            case AOUT_VAR_CHAN_STEREO:
-                p_aout->format.i_original_channels =
-                                              AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-                break;
-            case AOUT_VAR_CHAN_LEFT:
+            if ((p_aout->format.i_original_channels & AOUT_CHAN_PHYSMASK)
+                                                         != AOUT_CHANS_STEREO)
+                 break;
+
+            vlc_value_t val, txt;
+            val.i_int = 0;
+            var_Change (p_aout, "stereo-mode", VLC_VAR_DELCHOICE, &val, NULL);
+            txt.psz_string = _("Stereo audio mode");
+            var_Change (p_aout, "stereo-mode", VLC_VAR_SETTEXT, &txt, NULL);
+            if (p_aout->format.i_original_channels & AOUT_CHAN_DOLBYSTEREO)
+            {
+                val.i_int = AOUT_VAR_CHAN_DOLBYS;
+                txt.psz_string = _("Dolby Surround");
+            }
+            else
+            {
+                val.i_int = AOUT_VAR_CHAN_STEREO;
+                txt.psz_string = _("Stereo");
+            }
+            var_Change (p_aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+            var_Change (p_aout, "stereo-mode", VLC_VAR_SETVALUE, &val, NULL);
+            val.i_int = AOUT_VAR_CHAN_LEFT;
+            txt.psz_string = _("Left");
+            var_Change (p_aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+            if (p_aout->format.i_original_channels & AOUT_CHAN_DUALMONO)
+            {   /* Go directly to the left channel. */
                 p_aout->format.i_original_channels = AOUT_CHAN_LEFT;
-                break;
-            case AOUT_VAR_CHAN_RIGHT:
-                p_aout->format.i_original_channels = AOUT_CHAN_RIGHT;
-                break;
-            case AOUT_VAR_CHAN_DOLBYS:
-                p_aout->format.i_original_channels =
-                      AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_DOLBYSTEREO;
-                break;
+                var_Change (p_aout, "stereo-mode", VLC_VAR_SETVALUE, &val,
+                            NULL);
+            }
+            val.i_int = AOUT_VAR_CHAN_RIGHT;
+            txt.psz_string = _("Right");
+            var_Change (p_aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+            val.i_int = AOUT_VAR_CHAN_RSTEREO;
+            txt.psz_string = _("Reverse stereo");
+            var_Change (p_aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
         }
-    }
-    else if ( p_aout->format.i_physical_channels == AOUT_CHAN_CENTER
-              && (p_aout->format.i_original_channels
-                   & AOUT_CHAN_PHYSMASK) == (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
-    {
-        vlc_value_t val, text;
-
-        /* Mono - create the audio-channels variable. */
-        var_Create( p_aout, "audio-channels",
-                    VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-        text.psz_string = _("Audio Channels");
-        var_Change( p_aout, "audio-channels", VLC_VAR_SETTEXT, &text, NULL );
-
-        val.i_int = AOUT_VAR_CHAN_STEREO; text.psz_string = _("Stereo");
-        var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val, &text );
-        val.i_int = AOUT_VAR_CHAN_LEFT; text.psz_string = _("Left");
-        var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val, &text );
-        val.i_int = AOUT_VAR_CHAN_RIGHT; text.psz_string = _("Right");
-        var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val, &text );
-        if ( p_aout->format.i_original_channels & AOUT_CHAN_DUALMONO )
-        {
-            /* Go directly to the left channel. */
-            p_aout->format.i_original_channels = AOUT_CHAN_LEFT;
-            var_SetInteger( p_aout, "audio-channels", AOUT_VAR_CHAN_LEFT );
-        }
-        var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
-                         NULL );
-    }
-    else if ( p_aout->format.i_physical_channels ==
-               (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)
-                && (p_aout->format.i_original_channels &
-                     (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)) )
-    {
-        vlc_value_t val, text;
-
-        /* Stereo - create the audio-channels variable. */
-        var_Create( p_aout, "audio-channels",
-                    VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-        text.psz_string = _("Audio Channels");
-        var_Change( p_aout, "audio-channels", VLC_VAR_SETTEXT, &text, NULL );
-
-        if ( p_aout->format.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
-        {
-            val.i_int = AOUT_VAR_CHAN_DOLBYS;
-            text.psz_string = _("Dolby Surround");
-        }
-        else
-        {
-            val.i_int = AOUT_VAR_CHAN_STEREO;
-            text.psz_string = _("Stereo");
-        }
-        var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val, &text );
-        val.i_int = AOUT_VAR_CHAN_LEFT; text.psz_string = _("Left");
-        var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val, &text );
-        val.i_int = AOUT_VAR_CHAN_RIGHT; text.psz_string = _("Right");
-        var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val, &text );
-        val.i_int = AOUT_VAR_CHAN_RSTEREO; text.psz_string=_("Reverse stereo");
-        var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val, &text );
-        if ( p_aout->format.i_original_channels & AOUT_CHAN_DUALMONO )
-        {
-            /* Go directly to the left channel. */
-            p_aout->format.i_original_channels = AOUT_CHAN_LEFT;
-            var_SetInteger( p_aout, "audio-channels", AOUT_VAR_CHAN_LEFT );
-        }
-        var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
-                         NULL );
     }
 
     aout_FormatPrepare( &p_aout->format );
@@ -236,6 +209,7 @@ void aout_OutputDelete (audio_output_t *aout)
     if (owner->module == NULL)
         return;
 
+    var_DelCallback (aout, "stereo-mode", aout_ChannelsRestart, NULL);
     module_unneed (aout, owner->module);
     aout->volume_set = NULL;
     aout->mute_set = NULL;

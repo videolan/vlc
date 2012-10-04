@@ -181,7 +181,7 @@ int aout_ChannelsRestart( vlc_object_t * p_this, const char * psz_variable,
     {
         /* This is supposed to be a significant change and supposes
          * rebuilding the channel choices. */
-        var_Destroy( p_aout, "audio-channels" );
+        var_Destroy( p_aout, "stereo-mode" );
     }
     aout_RequestRestart (p_aout);
     return 0;

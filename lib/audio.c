@@ -392,7 +392,7 @@ int libvlc_audio_get_channel( libvlc_media_player_t *mp )
     if( !p_aout )
         return 0;
 
-    int val = var_GetInteger( p_aout, "audio-channels" );
+    int val = var_GetInteger( p_aout, "stereo-mode" );
     vlc_object_release( p_aout );
     return val;
 }
@@ -408,7 +408,7 @@ int libvlc_audio_set_channel( libvlc_media_player_t *mp, int channel )
     if( !p_aout )
         return -1;
 
-    if( var_SetInteger( p_aout, "audio-channels", channel ) < 0 )
+    if( var_SetInteger( p_aout, "stereo-mode", channel ) < 0 )
     {
         libvlc_printerr( "Audio channel out of range" );
         ret = -1;
