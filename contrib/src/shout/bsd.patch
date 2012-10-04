@@ -1,0 +1,13 @@
+--- libshout.orig/src/net/sock.c	2012-10-04 13:04:55.000000000 +0200
++++ libshout/src/net/sock.c	2012-10-04 13:05:18.000000000 +0200
+@@ -22,6 +22,10 @@
+  #include <config.h>
+ #endif
+ 
++#ifdef __FreeBSD__
++# define __BSD_VISIBLE 1
++#endif
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <stdarg.h>

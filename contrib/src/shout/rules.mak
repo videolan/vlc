@@ -19,6 +19,7 @@ $(TARBALLS)/libshout-$(SHOUT_VERSION).tar.gz:
 libshout: libshout-$(SHOUT_VERSION).tar.gz .sum-shout
 	$(UNPACK)
 	$(APPLY) $(SRC)/shout/libshout-win32.patch
+	$(APPLY) $(SRC)/shout/bsd.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
