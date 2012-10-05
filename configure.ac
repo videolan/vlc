@@ -2094,16 +2094,6 @@ then
 fi
 
 dnl
-dnl iomx codec plugin
-dnl
-AC_ARG_ENABLE(iomx,
-  [  --enable-iomx           iomx codec module (default disabled)])
-if test "${enable_iomx}" = "yes"
-then
-  VLC_ADD_PLUGIN([iomx])
-fi
-
-dnl
 dnl CrystalHD codec plugin
 dnl
 AC_ARG_ENABLE(crystalhd,
