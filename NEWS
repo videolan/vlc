@@ -44,6 +44,7 @@ Audio output:
  * Windows Audio Session API audio output support
  * OpenBSD sndio audio output support
  * Important improvements on the OpenSL ES module
+ * Android AudioTrack audio output support
 
 Audio Filters:
  * new remapping channel filter
