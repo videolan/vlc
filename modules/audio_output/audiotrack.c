@@ -219,7 +219,7 @@ static int Open(vlc_object_t *p_this)
     case 2:
     default:
         channel = CHANNEL_OUT_STEREO;
-        p_aout->format.i_physical_channels = AOUT_CHAN_STEREO;
+        p_aout->format.i_physical_channels = AOUT_CHANS_STEREO;
         break;
     }
 
