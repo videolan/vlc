@@ -325,6 +325,8 @@ static void Play(audio_output_t *p_aout, block_t *p_buffer)
 
 static void Pause(audio_output_t *p_aout, bool pause, mtime_t date)
 {
+    VLC_UNUSED(date);
+
     aout_sys_t *p_sys = p_aout->sys;
 
     if (pause) {
