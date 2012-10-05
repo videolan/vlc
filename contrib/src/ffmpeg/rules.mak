@@ -33,8 +33,8 @@ endif
 ifdef ENABLE_SMALL
 FFMPEGCONF += --enable-small --optflags=-O2
 ifeq ($(ARCH),arm)
-ifdef HAVE_NEON
-# XXX: assumes CPU >= cortex-a8, and thus thumb2 able
+ifdef HAVE_ARMV7A
+# XXX: assumes > ARMv7-A, and thus thumb2-able
 FFMPEGCONF += --enable-thumb
 endif
 endif
