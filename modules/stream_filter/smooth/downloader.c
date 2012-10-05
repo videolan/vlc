@@ -276,6 +276,7 @@ static int build_smoo_box( stream_t *s, uint8_t *smoo_box )
 {
     stream_sys_t *p_sys = s->p_sys;
     sms_stream_t *sms = NULL;
+    uint32_t FourCC;
 
     /* smoo */
     memset( smoo_box, 0, SMOO_SIZE );
@@ -327,7 +328,8 @@ static int build_smoo_box( stream_t *s, uint8_t *smoo_box )
 
         quality_level_t * qlvl = get_qlevel( sms, sms->download_qlvl );
 
-        ((uint32_t *)stra_box)[16] = bswap32( qlvl->FourCC );
+        FourCC = qlvl->FourCC ? qlvl->FourCC : sms->default_FourCC;
+        ((uint32_t *)stra_box)[16] = bswap32( FourCC );
         ((uint32_t *)stra_box)[17] = bswap32( qlvl->Bitrate );
         ((uint32_t *)stra_box)[18] = bswap32( qlvl->MaxWidth );
         ((uint32_t *)stra_box)[19] = bswap32( qlvl->MaxHeight );

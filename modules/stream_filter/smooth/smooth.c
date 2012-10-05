@@ -203,6 +203,9 @@ static int parse_Manifest( stream_t *s )
                             stream_name = strdup( value );
                         if( !strcmp( name, "TimeScale" ) )
                             sms->timescale = strtoull( value, NULL, 10 );
+                        if( !strcmp( name, "FourCC" ) )
+                            sms->default_FourCC =
+                                VLC_FOURCC( value[0], value[1], value[2], value[3] );
 
                         if( !strcmp( name, "Chunks" ) )
                         {

@@ -73,6 +73,7 @@ typedef struct sms_stream_s
 {
     vlc_array_t    *qlevels;       /* list of available Quality Levels */
     vlc_array_t    *chunks;        /* list of chunks */
+    uint32_t       default_FourCC;
     unsigned       vod_chunks_nb;  /* total num of chunks of the VOD stream */
     unsigned       timescale;
     unsigned       qlevel_nb;      /* number of quality levels */
