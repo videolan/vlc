@@ -133,6 +133,9 @@ int OpenMux( vlc_object_t *p_this )
 
     p_sys->oc = avformat_alloc_context();
     p_sys->oc->oformat = file_oformat;
+    /* If we use dummy access, let avformat write output */
+    if( !strcmp( p_mux->p_access->psz_access, "dummy") )
+        strcpy( p_sys->oc->filename, p_mux->p_access->psz_path );
 
     /* Create I/O wrapper */
     p_sys->io_buffer_size = 32768;  /* FIXME */
