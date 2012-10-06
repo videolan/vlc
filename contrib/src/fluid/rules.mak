@@ -6,7 +6,7 @@ FLUID_URL := $(SF)/fluidsynth/fluidsynth-$(FLUID_VERSION)/fluidsynth-$(FLUID_VER
 ifeq ($(call need_pkg,"glib-2.0 gthread-2.0"),)
 PKGS += fluid
 endif
-ifeq ($(call need_pkg,"fluidsynth"),)
+ifeq ($(call need_pkg,"fluidsynth >= 1.1.2"),)
 PKGS_FOUND += fluid
 endif
 
@@ -21,10 +21,9 @@ fluidsynth: fluidsynth-$(FLUID_VERSION).tar.bz2 .sum-fluid
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/fluid/fluid-static-win32.patch
 endif
-ifneq ($(FLUID_VERSION),1.0.9)
 	$(APPLY) $(SRC)/fluid/fluid-pkg-static.patch
-endif
-	cd $(UNPACK_DIR)/m4/ && rm -f libtool.m4 lt*m4 # 1.1.3 ships symlinks to /usr/share/aclocal
+	# Remove symbolic links to /usr/share/aclocal
+	cd $(UNPACK_DIR)/m4/ && rm -f libtool.m4 lt*m4
 	$(MOVE)
 
 FLUIDCONF := $(HOSTCONF) \
