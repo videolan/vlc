@@ -12,6 +12,8 @@ motion_extra = $(NULL)
 endif
 SOURCES_motion = \
         motion.c \
+        motionlib.c \
+        motionlib.h \
         $(motion_extra) \
         $(NULL)
 
