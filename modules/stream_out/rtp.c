@@ -397,7 +397,6 @@ struct sout_stream_id_t
 static int Open( vlc_object_t *p_this )
 {
     sout_stream_t       *p_stream = (sout_stream_t*)p_this;
-    sout_instance_t     *p_sout = p_stream->p_sout;
     sout_stream_sys_t   *p_sys = NULL;
     config_chain_t      *p_cfg = NULL;
     char                *psz;
@@ -571,7 +570,7 @@ static int Open( vlc_object_t *p_this )
         }
 
         p_sys->p_grab = GrabberCreate( p_stream );
-        p_sys->p_mux = sout_MuxNew( p_sout, psz, p_sys->p_grab );
+        p_sys->p_mux = sout_MuxNew( p_stream->p_sout, psz, p_sys->p_grab );
         free( psz );
 
         if( p_sys->p_mux == NULL )
@@ -1306,17 +1305,16 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 static int SapSetup( sout_stream_t *p_stream )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    sout_instance_t   *p_sout = p_stream->p_sout;
 
     /* Remove the previous session */
     if( p_sys->p_session != NULL)
     {
-        sout_AnnounceUnRegister( p_sout, p_sys->p_session);
+        sout_AnnounceUnRegister( p_stream, p_sys->p_session);
         p_sys->p_session = NULL;
     }
 
     if( p_sys->i_es > 0 && p_sys->psz_sdp && *p_sys->psz_sdp )
-        p_sys->p_session = sout_AnnounceRegisterSDP( p_sout,
+        p_sys->p_session = sout_AnnounceRegisterSDP( p_stream,
                                                      p_sys->psz_sdp,
                                                      p_sys->psz_destination );
 

@@ -197,7 +197,7 @@ static void create_SDP(sout_stream_t *p_stream, sout_access_out_t *p_access)
         {
             msg_Dbg (p_stream, "Generated SDP:\n%s", psz_sdp);
             p_sys->p_session =
-                sout_AnnounceRegisterSDP (p_stream->p_sout, psz_sdp, dhost);
+                sout_AnnounceRegisterSDP (p_stream, psz_sdp, dhost);
             free( psz_sdp );
         }
     }
@@ -321,7 +321,6 @@ static void checkAccessMux( sout_stream_t *p_stream, char *psz_access,
 static int Open( vlc_object_t *p_this )
 {
     sout_stream_t       *p_stream = (sout_stream_t*)p_this;
-    sout_instance_t     *p_sout = p_stream->p_sout;
     sout_stream_sys_t   *p_sys;
     char *psz_mux, *psz_access, *psz_url;
     sout_access_out_t   *p_access;
@@ -375,7 +374,7 @@ static int Open( vlc_object_t *p_this )
 
     checkAccessMux( p_stream, psz_access, psz_mux );
 
-    p_access = sout_AccessOutNew( p_sout, psz_access, psz_url );
+    p_access = sout_AccessOutNew( p_stream, psz_access, psz_url );
     if( p_access == NULL )
     {
         msg_Err( p_stream, "no suitable sout access module for `%s/%s://%s'",
@@ -383,7 +382,7 @@ static int Open( vlc_object_t *p_this )
         goto end;
     }
 
-    p_sys->p_mux = sout_MuxNew( p_sout, psz_mux, p_access );
+    p_sys->p_mux = sout_MuxNew( p_stream->p_sout, psz_mux, p_access );
     if( !p_sys->p_mux )
     {
         const char *psz_mux_guess = getMuxFromAlias( psz_mux );
@@ -391,7 +390,7 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Dbg( p_stream, "Couldn't open mux `%s', trying `%s' instead",
                 psz_mux, psz_mux_guess );
-            p_sys->p_mux = sout_MuxNew( p_sout, psz_mux_guess, p_access );
+            p_sys->p_mux = sout_MuxNew( p_stream->p_sout, psz_mux_guess, p_access );
         }
 
         if( !p_sys->p_mux )
@@ -408,7 +407,7 @@ static int Open( vlc_object_t *p_this )
         create_SDP( p_stream, p_access );
 
     if( !sout_AccessOutCanControlPace( p_access ) )
-        p_sout->i_out_pace_nocontrol++;
+        p_stream->p_sout->i_out_pace_nocontrol++;
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
@@ -438,7 +437,7 @@ static void Close( vlc_object_t * p_this )
     sout_access_out_t *p_access = p_sys->p_mux->p_access;
 
     if( p_sys->p_session != NULL )
-        sout_AnnounceUnRegister( p_stream->p_sout, p_sys->p_session );
+        sout_AnnounceUnRegister( p_stream, p_sys->p_session );
 
     sout_MuxDelete( p_sys->p_mux );
     if( !sout_AccessOutCanControlPace( p_access ) )

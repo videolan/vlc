@@ -272,7 +272,6 @@ static char * es_print_url( const char *psz_fmt, vlc_fourcc_t i_fourcc, int i_co
 static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    sout_instance_t   *p_sout = p_stream->p_sout;
     sout_stream_id_t  *id;
 
     const char        *psz_access;
@@ -354,7 +353,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
              psz_access, psz_mux, psz_dst );
 
     /* *** find and open appropriate access module *** */
-    p_access = sout_AccessOutNew( p_sout, psz_access, psz_dst );
+    p_access = sout_AccessOutNew( p_stream, psz_access, psz_dst );
     if( p_access == NULL )
     {
         msg_Err( p_stream, "no suitable sout access module for `%s/%s://%s'",
@@ -369,7 +368,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     }
 
     /* *** find and open appropriate mux module *** */
-    p_mux = sout_MuxNew( p_sout, psz_mux, p_access );
+    p_mux = sout_MuxNew( p_stream->p_sout, psz_mux, p_access );
     if( p_mux == NULL )
     {
         msg_Err( p_stream, "no suitable sout mux module for `%s/%s://%s'",
@@ -404,7 +403,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     }
 
     if( !sout_AccessOutCanControlPace( p_access ) )
-        p_sout->i_out_pace_nocontrol++;
+        p_stream->p_sout->i_out_pace_nocontrol++;
 
     return id;
 }
