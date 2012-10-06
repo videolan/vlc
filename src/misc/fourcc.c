@@ -1059,6 +1059,8 @@ static const staticentry_t p_list_audio[] = {
     B(VLC_CODEC_MP4A, "MPEG AAC Audio"),
         A("mp4a"),
         A("aac "),
+        A("AACL"),
+        A("AACH"),
 
     /* ALS audio */
     B(VLC_CODEC_ALS, "MPEG-4 Audio Lossless (ALS)"),
