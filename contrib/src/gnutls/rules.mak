@@ -23,6 +23,8 @@ ifdef HAVE_ANDROID
 endif
 	$(APPLY) $(SRC)/gnutls/gnutls-no-egd.patch
 	$(APPLY) $(SRC)/gnutls/read-file-limits.h.patch
+	$(call pkg_static,"lib/gnutls.pc.in")
+	$(call pkg_static,"libextra/gnutls-extra.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
