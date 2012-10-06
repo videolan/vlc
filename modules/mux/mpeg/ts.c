@@ -1331,7 +1331,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
                 p_spu->p_buffer[1] = 1;
                 p_spu->p_buffer[2] = ' ';
 
-                EStoPES( p_mux->p_sout, &p_spu, p_spu, p_input->p_fmt,
+                EStoPES( &p_spu, p_spu, p_input->p_fmt,
                              p_stream->i_stream_id, 1, 0, 0, 0 );
                 p_data->p_next = p_spu;
             }
@@ -1377,8 +1377,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
             i_max_pes_size = INT_MAX;
         }
 
-         EStoPES ( p_mux->p_sout, &p_data, p_data,
-                       p_input->p_fmt, p_stream->i_stream_id,
+         EStoPES ( &p_data, p_data, p_input->p_fmt, p_stream->i_stream_id,
                        1, b_data_alignment, i_header_size,
                        i_max_pes_size );
 
@@ -1872,11 +1871,9 @@ static void TSSetPCR( block_t *p_ts, mtime_t i_dts )
     p_ts->p_buffer[10]|= ( i_pcr << 7  )&0x80;
 }
 
-static void PEStoTS( sout_instance_t *p_sout,
-                     sout_buffer_chain_t *c, block_t *p_pes,
+static void PEStoTS( sout_buffer_chain_t *c, block_t *p_pes,
                      ts_stream_t *p_stream )
 {
-    VLC_UNUSED(p_sout);
     /* get PES total size */
     uint8_t *p_data = p_pes->p_buffer;
     int      i_size = p_pes->i_buffer;
@@ -1898,7 +1895,7 @@ static void PEStoTS( sout_instance_t *p_sout,
 
         int i_copy = __MIN( i_size, 184 );
         bool b_adaptation_field = i_size < 184;
-        block_t *p_ts = block_New( p_sout, 188 );
+        block_t *p_ts = block_Alloc( 188 );
 
         p_ts->p_buffer[0] = 0x47;
         p_ts->p_buffer[1] = ( b_new_pes ? 0x40 : 0x00 )|
@@ -1953,10 +1950,8 @@ static void PEStoTS( sout_instance_t *p_sout,
     }
 }
 
-static block_t *WritePSISection( sout_instance_t *p_sout,
-                                       dvbpsi_psi_section_t* p_section )
+static block_t *WritePSISection( dvbpsi_psi_section_t* p_section )
 {
-    VLC_UNUSED(p_sout);
     block_t   *p_psi, *p_first = NULL;
 
     while( p_section )
@@ -1964,7 +1959,7 @@ static block_t *WritePSISection( sout_instance_t *p_sout,
         int i_size = (uint32_t)(p_section->p_payload_end - p_section->p_data) +
                   (p_section->b_syntax_indicator ? 4 : 0);
 
-        p_psi = block_New( p_sout, i_size + 1 );
+        p_psi = block_Alloc( i_size + 1 );
         p_psi->i_pts = 0;
         p_psi->i_dts = 0;
         p_psi->i_length = 0;
@@ -2000,9 +1995,9 @@ static void GetPAT( sout_mux_t *p_mux,
 
     p_section = dvbpsi_GenPATSections( &pat, 0 /* max program per section */ );
 
-    p_pat = WritePSISection( p_mux->p_sout, p_section );
+    p_pat = WritePSISection( p_section );
 
-    PEStoTS( p_mux->p_sout, c, p_pat, &p_sys->pat );
+    PEStoTS( c, p_pat, &p_sys->pat );
 
     dvbpsi_DeletePSISections( p_section );
     dvbpsi_EmptyPAT( &pat );
@@ -2103,8 +2098,7 @@ static void GetPMTmpeg4(sout_mux_t *p_mux)
             bits_write( &bits, 8, 0x00 );
             bits_write( &bits, 6, 0x00 );
 
-            msg_Err( p_mux->p_sout,"Unsupported stream_type => "
-                     "broken IOD" );
+            msg_Err( p_mux, "Unsupported stream_type => broken IOD" );
         }
         bits_write( &bits, 1,   0x00 );         /* UpStream */
         bits_write( &bits, 1,   0x01 );         /* reserved */
@@ -2338,8 +2332,8 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
     for (unsigned i = 0; i < p_sys->i_num_pmt; i++ )
     {
         dvbpsi_psi_section_t *sect = dvbpsi_GenPMTSections( &p_sys->dvbpmt[i] );
-        block_t *pmt = WritePSISection( p_mux->p_sout, sect );
-        PEStoTS( p_mux->p_sout, c, pmt, &p_sys->pmt[i] );
+        block_t *pmt = WritePSISection( sect );
+        PEStoTS( c, pmt, &p_sys->pmt[i] );
         dvbpsi_DeletePSISections(sect);
         dvbpsi_EmptyPMT( &p_sys->dvbpmt[i] );
     }
@@ -2347,8 +2341,8 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
     if( p_sys->b_sdt )
     {
         dvbpsi_psi_section_t *sect = dvbpsi_GenSDTSections( &sdt );
-        block_t *p_sdt = WritePSISection( p_mux->p_sout, sect );
-        PEStoTS( p_mux->p_sout, c, p_sdt, &p_sys->sdt );
+        block_t *p_sdt = WritePSISection( sect );
+        PEStoTS( c, p_sdt, &p_sys->sdt );
         dvbpsi_DeletePSISections( sect );
         dvbpsi_EmptySDT( &sdt );
     }

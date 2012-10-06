@@ -313,12 +313,11 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
  *                       To allow unbounded PES packets in transport stream
  *                       VIDEO_ES, set to INT_MAX.
  */
-int  EStoPES ( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
+int  EStoPES ( block_t **pp_pes, block_t *p_es,
                    es_format_t *p_fmt, int i_stream_id,
                    int b_mpeg2, int b_data_alignment, int i_header_size,
                    int i_max_pes_size )
 {
-    VLC_UNUSED(p_sout);
     block_t *p_pes;
     mtime_t i_pts, i_dts, i_length;
 
@@ -407,7 +406,7 @@ int  EStoPES ( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
         }
         else
         {
-            p_pes->p_next = block_New( p_sout, i_pes_header + i_pes_payload );
+            p_pes->p_next = block_Alloc( i_pes_header + i_pes_payload );
             p_pes = p_pes->p_next;
 
             p_pes->i_dts    = 0;
