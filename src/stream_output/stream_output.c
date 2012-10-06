@@ -454,7 +454,6 @@ sout_input_t *sout_MuxAddStream( sout_mux_t *p_mux, es_format_t *p_fmt )
     p_input = malloc( sizeof( sout_input_t ) );
     if( !p_input )
         return NULL;
-    p_input->p_sout = p_mux->p_sout;
     p_input->p_fmt  = p_fmt;
     p_input->p_fifo = block_FifoNew();
     p_input->p_sys  = NULL;

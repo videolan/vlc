@@ -144,8 +144,6 @@ enum sout_mux_query_e
 
 struct sout_input_t
 {
-    sout_instance_t *p_sout;
-
     es_format_t     *p_fmt;
     block_fifo_t    *p_fifo;
 
