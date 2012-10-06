@@ -72,7 +72,7 @@ SOURCES_opencv_wrapper = opencv_wrapper.c
 SOURCES_opencv_example = opencv_example.cpp filter_event_info.h
 
 if HAVE_DARWIN
-motion_extra = unimotion.c unimotion.h
+motion_extra = ../control/unimotion.c ../control/unimotion.h
 else
 motion_extra = $(NULL)
 endif
