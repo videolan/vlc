@@ -70,7 +70,19 @@ SOURCES_ball = ball.c
 SOURCES_panoramix = panoramix.c
 SOURCES_opencv_wrapper = opencv_wrapper.c
 SOURCES_opencv_example = opencv_example.cpp filter_event_info.h
-SOURCES_rotate = rotate.c
+
+if HAVE_DARWIN
+motion_extra = unimotion.c unimotion.h
+else
+motion_extra = $(NULL)
+endif
+SOURCES_rotate = \
+	rotate.c \
+	../control/motionlib.c \
+	../control/motionlib.h \
+	$(motion_extra) \
+	$(NULL)
+
 SOURCES_puzzle = puzzle.c
 SOURCES_colorthres = colorthres.c
 SOURCES_extract = extract.c

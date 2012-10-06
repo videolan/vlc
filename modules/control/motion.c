@@ -46,7 +46,6 @@
 struct intf_sys_t
 {
     motion_sensors_t *p_motion;
-    bool b_use_rotate;
 };
 
 /*****************************************************************************
@@ -56,8 +55,6 @@ static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
 static void RunIntf( intf_thread_t *p_intf );
-
-#define USE_ROTATE_TEXT N_("Use the rotate video filter instead of transform")
 
 /*****************************************************************************
  * Module descriptor
@@ -70,8 +67,7 @@ vlc_module_begin ()
     set_help( N_("Use HDAPS, AMS, APPLESMC or UNIMOTION motion sensors " \
                  "to rotate the video") )
 
-    add_bool( "motion-use-rotate", false,
-              USE_ROTATE_TEXT, USE_ROTATE_TEXT, false )
+    add_obsolete_bool( "motion-use-rotate" ) /* since 2.1.0 */
 
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )
@@ -98,8 +94,6 @@ int Open ( vlc_object_t *p_this )
     }
 
     p_intf->pf_run = RunIntf;
-
-    p_intf->p_sys->b_use_rotate = var_InheritBool( p_intf, "motion-use-rotate" );
 
     return VLC_SUCCESS;
 }
@@ -135,24 +129,6 @@ static void RunIntf( intf_thread_t *p_intf )
 
         int canc = vlc_savecancel();
         i_x = motion_get_angle( p_intf->p_sys->p_motion );
-
-        if( p_intf->p_sys->b_use_rotate )
-        {
-            if( i_oldx != i_x )
-            {
-                /* TODO: cache object pointer */
-                vlc_object_t *p_obj =
-                vlc_object_find_name( p_intf->p_libvlc, "rotate" );
-                if( p_obj )
-                {
-                    var_SetInteger( p_obj, "rotate-deciangle",
-                            ((3600+i_x/2)%3600) );
-                    i_oldx = i_x;
-                    vlc_object_release( p_obj );
-                }
-            }
-            goto loop;
-        }
 
         if( i_x < -HIGH_THRESHOLD && i_oldx > -LOW_THRESHOLD )
         {
@@ -197,7 +173,7 @@ static void RunIntf( intf_thread_t *p_intf )
                 i_oldx = i_x;
             }
         }
-loop:
+
         vlc_restorecancel( canc );
     }
 }
