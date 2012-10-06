@@ -3152,6 +3152,9 @@ static int MP4_frg_TrackCreate( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_
     /* Set language FIXME */
     fmt->psz_language = strdup( "en" );
 
+    fmt->i_original_fourcc = p_data->FourCC;
+    fmt->i_codec = vlc_fourcc_GetCodec( fmt->i_cat, p_data->FourCC );
+
     uint8_t **p_extra = (uint8_t **)&fmt->p_extra;
     /* See http://msdn.microsoft.com/en-us/library/ff728116%28v=vs.90%29.aspx
      * for MS weird use of FourCC*/
@@ -3164,11 +3167,9 @@ static int MP4_frg_TrackCreate( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_
             {
                 fmt->i_extra = build_raw_avcC( p_extra,
                         p_data->CodecPrivateData, p_data->cpd_len );
-                fmt->i_codec = VLC_CODEC_H264;
             }
             else
             {
-                fmt->i_codec = p_data->FourCC;
                 ret = MP4_SetCodecExtraData( fmt, p_data );
                 if( ret != VLC_SUCCESS )
                     return ret;
@@ -3195,13 +3196,6 @@ static int MP4_frg_TrackCreate( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_
             break;
 
         case AUDIO_ES:
-            if( p_data->FourCC == VLC_FOURCC( 'A', 'A', 'C', 'H' ) ||
-                p_data->FourCC == VLC_FOURCC( 'A', 'A', 'C', 'L' ) )
-                fmt->i_codec = VLC_CODEC_MP4A;
-
-            else
-                fmt->i_codec = p_data->FourCC;
-
             fmt->audio.i_channels = p_data->Channels;
             fmt->audio.i_rate = p_data->SamplingRate;
             fmt->audio.i_bitspersample = p_data->BitsPerSample;
