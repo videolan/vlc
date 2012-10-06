@@ -1762,8 +1762,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     [self setAcceptsMouseMovedEvents: YES];
 
-    [self setBackgroundColor: [NSColor blackColor]];
     if (b_dark_interface) {
+        [self setBackgroundColor: [NSColor clearColor]];
+
         [self setOpaque: NO];
         [self display];
         [self setHasShadow:NO];
@@ -1778,6 +1779,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         // native fs not supported with detached view yet
         [o_titlebar_view setFullscreenButtonHidden: YES];
+    } else {
+        [self setBackgroundColor: [NSColor blackColor]];
     }
 
     NSRect videoViewRect = [[self contentView] bounds];
@@ -1789,10 +1792,22 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_video_view setFrame: videoViewRect];
 
     if (b_dark_interface) {
+        o_color_backdrop = [[VLCColorView alloc] initWithFrame: [o_video_view frame]];
+        [[self contentView] addSubview: o_color_backdrop positioned: NSWindowBelow relativeTo: o_video_view];
+        [o_color_backdrop setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
+
         [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[[self controlsBar] bottomBarView] frame].size.height + [o_titlebar_view frame].size.height)];
     } else {
         [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[[self controlsBar] bottomBarView] frame].size.height)];
     }
+}
+
+- (void)dealloc
+{
+    if (b_dark_interface)
+        [o_color_backdrop release];
+
+    [super dealloc];
 }
 
 @end

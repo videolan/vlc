@@ -159,5 +159,8 @@
 @end
 
 @interface VLCDetachedVideoWindow : VLCVideoWindowCommon
+{
+    VLCColorView * o_color_backdrop;
+}
 
 @end
