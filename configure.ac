@@ -155,10 +155,10 @@ case "${host_os}" in
     CPPFLAGS="${CPPFLAGS} ${ARCH_flag}"
     OBJCFLAGS="${OBJCFLAGS} -D_INTL_REDIRECT_MACROS -std=gnu99 ${ARCH_flag}"
     LDFLAGS="${LDFLAGS} -Wl,-headerpad_max_install_names ${ARCH_flag}"
-    VLC_ADD_LIBS([motion], [-Wl,-framework,IOKit,-framework,CoreFoundation])
+    VLC_ADD_LIBS([motion rotate], [-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup,-framework,AppKit])
     VLC_ADD_LIBS([avcodec access_avio swscale postproc i420_rgb_mmx x264 x26410b],[-Wl,-read_only_relocs,suppress])
-    VLC_ADD_CFLAGS([motion],[-fconstant-cfstrings])
+    VLC_ADD_CFLAGS([motion rotate],[-fconstant-cfstrings])
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation])
 
     dnl Allow binaries created on Lion to run on earlier releases
