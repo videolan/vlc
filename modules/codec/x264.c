@@ -939,6 +939,8 @@ static int  Open ( vlc_object_t *p_this )
 
     /* max bitrate = average bitrate -> CBR */
     p_sys->param.rc.i_vbv_max_bitrate = var_GetInteger( p_enc, SOUT_CFG_PREFIX "vbv-maxrate" );
+    if( p_sys->param.rc.i_vbv_max_bitrate && p_sys->param.rc.i_rc_method != X264_RC_ABR )
+        p_enc->fmt_out.i_bitrate = p_sys->param.rc.i_vbv_max_bitrate * 1000;
 
 
     if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "mbtree" ) )
