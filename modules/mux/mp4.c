@@ -165,7 +165,7 @@ static void  box_gather  ( bo_t *box, bo_t *box2 );
 
 static void box_send( sout_mux_t *p_mux,  bo_t *box );
 
-static block_t *bo_to_sout( sout_instance_t *p_sout,  bo_t *box );
+static block_t *bo_to_sout( bo_t *box );
 
 static bo_t *GetMoovBox( sout_mux_t *p_mux );
 
@@ -266,7 +266,7 @@ static void Close( vlc_object_t * p_this )
         bo_add_32be  ( &bo, p_sys->i_pos - p_sys->i_mdat_pos - 8 );
         bo_add_fourcc( &bo, "mdat" );
     }
-    p_hdr = bo_to_sout( p_mux->p_sout, &bo );
+    p_hdr = bo_to_sout( &bo );
     free( bo.p_buffer );
 
     sout_AccessOutSeek( p_mux->p_access, p_sys->i_mdat_pos );
@@ -2039,12 +2039,11 @@ static void box_gather ( bo_t *box, bo_t *box2 )
     box_free( box2 );
 }
 
-static block_t * bo_to_sout( sout_instance_t *p_sout,  bo_t *box )
+static block_t * bo_to_sout( bo_t *box )
 {
-    (void)p_sout;
     block_t *p_buf;
 
-    p_buf = block_New( p_sout, box->i_buffer );
+    p_buf = block_Alloc( box->i_buffer );
     if( box->i_buffer > 0 )
     {
         memcpy( p_buf->p_buffer, box->p_buffer, box->i_buffer );
@@ -2057,7 +2056,7 @@ static void box_send( sout_mux_t *p_mux,  bo_t *box )
 {
     block_t *p_buf;
 
-    p_buf = bo_to_sout( p_mux->p_sout, box );
+    p_buf = bo_to_sout( box );
     box_free( box );
 
     sout_AccessOutWrite( p_mux->p_access, p_buf );
