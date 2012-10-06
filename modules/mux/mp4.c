@@ -964,7 +964,6 @@ static bo_t *GetUdtaTag( sout_mux_t *p_mux )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     bo_t *udta = box_new( "udta" );
-    vlc_meta_t *p_meta = p_mux->p_sout->p_meta;
     int i_track;
 
     /* Requirements */
@@ -998,8 +997,9 @@ static bo_t *GetUdtaTag( sout_mux_t *p_mux )
         box_fix( box );
         box_gather( udta, box );
     }
-
+#if 0
     /* Misc atoms */
+    vlc_meta_t *p_meta = p_mux->p_sout->p_meta;
     if( p_meta )
     {
 #define ADD_META_BOX( type, box_string ) { \
@@ -1024,7 +1024,7 @@ static bo_t *GetUdtaTag( sout_mux_t *p_mux )
         ADD_META_BOX( URL, "url" );
 #undef ADD_META_BOX
     }
-
+#endif
     box_fix( udta );
     return udta;
 }

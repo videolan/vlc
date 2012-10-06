@@ -109,9 +109,7 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
 
     /* *** init descriptor *** */
     p_sout->psz_sout    = strdup( psz_dest );
-    p_sout->p_meta      = NULL;
     p_sout->i_out_pace_nocontrol = 0;
-    p_sout->p_sys       = NULL;
 
     vlc_mutex_init( &p_sout->lock );
     p_sout->p_stream = NULL;
@@ -144,12 +142,6 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
 
     /* *** free all string *** */
     FREENULL( p_sout->psz_sout );
-
-    /* delete meta */
-    if( p_sout->p_meta )
-    {
-        vlc_meta_Delete( p_sout->p_meta );
-    }
 
     vlc_mutex_destroy( &p_sout->lock );
 
@@ -268,9 +260,6 @@ sout_access_out_t *sout_AccessOutNew( vlc_object_t *p_sout,
     p_access->pf_write   = NULL;
     p_access->pf_control = NULL;
     p_access->p_module   = NULL;
-
-    p_access->i_writes = 0;
-    p_access->i_sent_bytes = 0;
 
     p_access->p_module   =
         module_need( p_access, "sout access", p_access->psz_access, true );

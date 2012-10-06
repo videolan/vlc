@@ -47,17 +47,11 @@ struct sout_instance_t
 
     char *psz_sout;
 
-    /* meta data (Read only) XXX it won't be set before the first packet received */
-    vlc_meta_t          *p_meta;
-
     /** count of output that can't control the space */
     int                 i_out_pace_nocontrol;
 
     vlc_mutex_t         lock;
     sout_stream_t       *p_stream;
-
-    /** Private */
-    sout_instance_sys_t *p_sys;
 };
 
 /****************************************************************************
@@ -72,10 +66,6 @@ struct sout_access_out_t
 
     module_t                *p_module;
     char                    *psz_access;
-
-    int                      i_writes;
-    /** Local counter reset each time it is transferred to stats */
-    int64_t                  i_sent_bytes;
 
     char                    *psz_path;
     sout_access_out_sys_t   *p_sys;
@@ -194,9 +184,6 @@ struct sout_stream_t
     char              *psz_name;
     config_chain_t        *p_cfg;
     sout_stream_t     *p_next;
-
-    /* Subpicture unit */
-    spu_t             *p_spu;
 
     /* add, remove a stream */
     sout_stream_id_t *(*pf_add)( sout_stream_t *, es_format_t * );
