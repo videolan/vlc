@@ -1363,26 +1363,11 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             block_Release(p_block);
         }
 
-        /* Convert H.264 NAL format to annex b */
-        if( p_sys->i_nal_size_length >= 3 && p_sys->i_nal_size_length <= 4 )
-        {
-            /* This only works for NAL sizes 3-4 */
-            int i_len = p_header->nFilledLen, i;
-            uint8_t* ptr = p_header->pBuffer;
-            while( i_len >= p_sys->i_nal_size_length )
-            {
-                uint32_t nal_len = 0;
-                for( i = 0; i < p_sys->i_nal_size_length; i++ ) {
-                    nal_len = (nal_len << 8) | ptr[i];
-                    ptr[i] = 0;
-                }
-                ptr[p_sys->i_nal_size_length - 1] = 1;
-                if( nal_len > INT_MAX || nal_len > (unsigned int) i_len )
-                    break;
-                ptr   += nal_len + p_sys->i_nal_size_length;
-                i_len -= nal_len + p_sys->i_nal_size_length;
-            }
-        }
+        /* Convert H.264 NAL format to annex b. Doesn't do anything if
+         * i_nal_size_length == 0, which is the case for codecs other
+         * than H.264 */
+        convert_h264_to_annexb( p_header->pBuffer, p_header->nFilledLen,
+                                p_sys->i_nal_size_length );
 #ifdef OMXIL_EXTRA_DEBUG
         msg_Dbg( p_dec, "EmptyThisBuffer %p, %p, %i", p_header, p_header->pBuffer,
                  (int)p_header->nFilledLen );
