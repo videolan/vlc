@@ -272,7 +272,7 @@ static int gnutls_CertSearch (vlc_tls_t *obj, const char *host,
             msg = N_("You attempted to reach %s. "
                 "However the security certificate presented by the server "
                 "is unknown and could not be authenticated by any trusted "
-                "Certfication Authority. "
+                "Certification Authority. "
                 "This problem may be caused by a configuration error "
                 "or an attempt to breach your security or your privacy.\n\n"
                 "If in doubt, abort now.\n");
@@ -282,8 +282,8 @@ static int gnutls_CertSearch (vlc_tls_t *obj, const char *host,
             msg = N_("You attempted to reach %s. "
                 "However the security certificate presented by the server "
                 "changed since the previous visit "
-                "and was not authentication by any trusted "
-                "Certfication Authority. "
+                "and was not authenticated by any trusted "
+                "Certification Authority. "
                 "This problem may be caused by a configuration error "
                 "or an attempt to breach your security or your privacy.\n\n"
                 "If in doubt, abort now.\n");
