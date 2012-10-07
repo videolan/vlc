@@ -42,6 +42,15 @@
 
 #   define pthread_sigmask  sigprocmask
 
+#elif defined( __ANDROID__ )      /* pthreads subset without pthread_cancel() */
+
+#   define LIBVLC_NEED_SEMAPHORE
+#   define LIBVLC_NEED_RWLOCK
+
+#   include <unistd.h> /* _POSIX_SPIN_LOCKS */
+#   include <pthread.h>
+#   include <poll.h>
+
 #else                                         /* pthreads (like Linux & BSD) */
 #   define LIBVLC_USE_PTHREAD 1
 #   define LIBVLC_USE_PTHREAD_CANCEL 1
@@ -73,7 +82,7 @@
 #   define VLC_THREAD_PRIORITY_OUTPUT  22
 #   define VLC_THREAD_PRIORITY_HIGHEST 22
 
-#elif defined(LIBVLC_USE_PTHREAD)
+#elif defined(LIBVLC_USE_PTHREAD) || defined(__ANDROID__)
 #   define VLC_THREAD_PRIORITY_LOW      0
 #   define VLC_THREAD_PRIORITY_INPUT   10
 #   define VLC_THREAD_PRIORITY_AUDIO    5
@@ -116,7 +125,17 @@
  * Type definitions
  *****************************************************************************/
 
-#if defined (LIBVLC_USE_PTHREAD)
+#if defined (__ANDROID__)
+typedef struct vlc_thread *vlc_thread_t;
+typedef pthread_mutex_t vlc_mutex_t;
+#define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
+typedef pthread_cond_t  vlc_cond_t;
+#define VLC_STATIC_COND  PTHREAD_COND_INITIALIZER
+
+typedef pthread_key_t   vlc_threadvar_t;
+typedef struct vlc_timer *vlc_timer_t;
+
+#elif defined (LIBVLC_USE_PTHREAD)
 typedef pthread_t       vlc_thread_t;
 typedef pthread_mutex_t vlc_mutex_t;
 #define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
@@ -332,7 +351,7 @@ VLC_API int vlc_savecancel(void);
 VLC_API void vlc_restorecancel(int state);
 VLC_API void vlc_testcancel(void);
 
-#if defined (LIBVLC_USE_PTHREAD_CANCEL)
+#if defined (LIBVLC_USE_PTHREAD_CANCEL) || defined(__ANDROID__)
 /**
  * Registers a new procedure to run if the thread is cancelled (or otherwise
  * exits prematurely). Any call to vlc_cleanup_push() <b>must</b> paired with a
@@ -383,7 +402,9 @@ struct vlc_cleanup_t
         vlc_control_cancel (VLC_CLEANUP_POP); \
         vlc_cleanup_data.proc (vlc_cleanup_data.data); \
     } while (0)
+#endif /* LIBVLC_USE_PTHREAD_CANCEL || __ANDROID__ */
 
+#if !defined (LIBVLC_USE_PTHREAD_CANCEL)
 /* poll() with cancellation */
 static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 {
