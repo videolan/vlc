@@ -811,9 +811,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     BOOL b_videoPlayback = [[VLCMain sharedInstance] activeVideoPlayback];
 
     if (b_videoPlayback) {
-        frameBeforePlayback = [self frame];
+        if (!b_fullscreen)
+            frameBeforePlayback = [self frame];
     } else {
-        if (!b_nonembedded && !b_fullscreen)
+        if (!b_nonembedded && !b_fullscreen && frameBeforePlayback.size.width > 0 && frameBeforePlayback.size.height > 0)
             [[self animator] setFrame:frameBeforePlayback display:YES];
 
         [self makeFirstResponder: nil];
