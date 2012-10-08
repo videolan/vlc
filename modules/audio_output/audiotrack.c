@@ -209,8 +209,8 @@ static int Open(vlc_object_t *p_this)
     format = (p_aout->format.i_format == VLC_CODEC_S16L) ? PCM_16_BIT : PCM_8_BIT;
 
     /* TODO: android supports more channels */
-    p_aout->format.i_original_channels = aout_FormatNbChannels(&p_aout->format);
-    switch(p_aout->format.i_original_channels)
+    p_aout->format.i_original_channels = p_aout->format.i_physical_channels;
+    switch(aout_FormatNbChannels(&p_aout->format))
     {
     case 1:
         channel = CHANNEL_OUT_MONO;
