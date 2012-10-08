@@ -89,27 +89,20 @@
     BOOL              b_nonembedded;
     BOOL              b_podcastView_displayed;
 
-    VLCWindow       * o_fullscreen_window;
-    NSViewAnimation * o_fullscreen_anim1;
-    NSViewAnimation * o_fullscreen_anim2;
-    NSViewAnimation * o_makekey_anim;
-    NSView          * o_temp_view;
     /* set to yes if we are fullscreen and all animations are over */
     BOOL              b_fullscreen;
-    BOOL              b_window_is_invisible;
-    NSRecursiveLock * o_animation_lock;
 
     NSTimer *t_hide_mouse_timer;
 
     VLCColorView * o_color_backdrop;
-    NSInteger i_originalLevel;
-
-    id o_current_video_window;
 
     NSRect frameBeforePlayback;
 }
 + (VLCMainWindow *)sharedInstance;
-@property (readonly) BOOL fullscreen;
+@property (readwrite) BOOL fullscreen;
+@property (readonly) BOOL nativeFullscreenMode;
+
+@property (readonly) VLCFSPanel* fsPanel;
 
 - (VLCMainWindowControlsBar *)controlsBar;
 
@@ -135,21 +128,13 @@
 - (void)setPlay;
 - (void)updateVolumeSlider;
 
+- (void)showFullscreenController;
+
 - (VLCVoutView *)setupVout:(vout_window_t *)p_wnd;
 - (void)setVideoplayEnabled;
 
 - (void)hideMouseCursor:(NSTimer *)timer;
 - (void)recreateHideMouseTimer;
-
-/* fullscreen handling */
-- (void)showFullscreenController;
-- (void)lockFullscreenAnimation;
-- (void)unlockFullscreenAnimation;
-- (void)enterFullscreen;
-- (void)leaveFullscreen;
-- (void)leaveFullscreenAndFadeOut: (BOOL)fadeout;
-- (void)hasEndedFullscreen;
-- (void)hasBecomeFullscreen;
 
 /* lion's native fullscreen handling */
 - (void)windowWillEnterFullScreen:(NSNotification *)notification;

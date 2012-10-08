@@ -69,7 +69,7 @@ static const float f_min_video_height = 70.0;
  *  Common code for main window, detached window and extra video window
  *****************************************************************************/
 
-@interface VLCVideoWindowCommon : VLCWindow <NSWindowDelegate>
+@interface VLCVideoWindowCommon : VLCWindow <NSWindowDelegate, NSAnimationDelegate>
 {
     NSRect previousSavedFrame;
     BOOL b_dark_interface;
@@ -80,6 +80,20 @@ static const float f_min_video_height = 70.0;
     IBOutlet VLCControlsBarCommon *o_controls_bar;
 
     NSSize nativeVideoSize;
+
+    // variables for fullscreen handling
+    VLCVideoWindowCommon *o_current_video_window;
+    VLCWindow       * o_fullscreen_window;
+    NSViewAnimation * o_fullscreen_anim1;
+    NSViewAnimation * o_fullscreen_anim2;
+    NSViewAnimation * o_makekey_anim;
+    NSView          * o_temp_view;
+
+    BOOL              b_window_is_invisible;
+    NSRecursiveLock * o_animation_lock;
+    NSInteger i_originalLevel;
+
+
 }
 
 @property (nonatomic, assign) VLCVoutView* videoView;
@@ -89,5 +103,9 @@ static const float f_min_video_height = 70.0;
 - (void)setNativeVideoSize:(NSSize)size;
 
 - (void)setTitle:(NSString *)title;
+
+/* fullscreen handling */
+- (void)enterFullscreen;
+- (void)leaveFullscreen;
 
 @end

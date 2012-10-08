@@ -25,6 +25,8 @@
 #import "Windows.h"
 #import "intf.h"
 #import "CoreInteraction.h"
+#import "ControlsBar.h"
+#import "VideoView.h"
 
 /*****************************************************************************
  * VLCWindow
@@ -245,7 +247,16 @@
     [self setMovableByWindowBackground: YES];
     [self setCanBecomeKeyWindow:YES];
 
+    o_temp_view = [[NSView alloc] init];
+    [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
+
     return self;
+}
+
+- (void)dealloc
+{
+    [o_temp_view release];
+    [super dealloc];
 }
 
 - (void)setTitle:(NSString *)title
@@ -477,6 +488,352 @@
     }
 
     return proposedFrameSize;
+}
+
+#pragma mark -
+#pragma mark Fullscreen Logic
+
+- (void)lockFullscreenAnimation
+{
+    [o_animation_lock lock];
+}
+
+- (void)unlockFullscreenAnimation
+{
+    [o_animation_lock unlock];
+}
+
+- (void)enterFullscreen
+{
+    NSMutableDictionary *dict1, *dict2;
+    NSScreen *screen;
+    NSRect screen_rect;
+    NSRect rect;
+    BOOL blackout_other_displays = var_InheritBool(VLCIntf, "macosx-black");
+
+    screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_InheritInteger(VLCIntf, "macosx-vdev")];
+    [self lockFullscreenAnimation];
+
+    if (!screen) {
+        msg_Dbg(VLCIntf, "chosen screen isn't present, using current screen for fullscreen mode");
+        screen = [self screen];
+    }
+    if (!screen) {
+        msg_Dbg(VLCIntf, "Using deepest screen");
+        screen = [NSScreen deepestScreen];
+    }
+
+    screen_rect = [screen frame];
+
+    if (o_controls_bar)
+        [o_controls_bar setFullscreenState:YES];
+
+    [[VLCMainWindow sharedInstance] recreateHideMouseTimer];
+
+    if (blackout_other_displays)
+        [screen blackoutOtherScreens];
+
+    /* Make sure we don't see the window flashes in float-on-top mode */
+    i_originalLevel = [self level];
+    [self setLevel:NSNormalWindowLevel];
+
+    /* Only create the o_fullscreen_window if we are not in the middle of the zooming animation */
+    if (!o_fullscreen_window) {
+        /* We can't change the styleMask of an already created NSWindow, so we create another window, and do eye catching stuff */
+
+        rect = [[o_video_view superview] convertRect: [o_video_view frame] toView: nil]; /* Convert to Window base coord */
+        rect.origin.x += [self frame].origin.x;
+        rect.origin.y += [self frame].origin.y;
+        o_fullscreen_window = [[VLCWindow alloc] initWithContentRect:rect styleMask: NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES];
+        [o_fullscreen_window setBackgroundColor: [NSColor blackColor]];
+        [o_fullscreen_window setCanBecomeKeyWindow: YES];
+        [o_fullscreen_window setCanBecomeMainWindow: YES];
+
+        if (![self isVisible] || [self alphaValue] == 0.0) {
+            /* We don't animate if we are not visible, instead we
+             * simply fade the display */
+            CGDisplayFadeReservationToken token;
+
+            if (blackout_other_displays) {
+                CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
+                CGDisplayFade(token, 0.5, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES);
+            }
+
+            if ([screen mainScreen])
+                [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
+
+            [[o_video_view superview] replaceSubview:o_video_view with:o_temp_view];
+            [o_temp_view setFrame:[o_video_view frame]];
+            [o_fullscreen_window setContentView:o_video_view];
+
+            [o_fullscreen_window makeKeyAndOrderFront:self];
+            [o_fullscreen_window orderFront:self animate:YES];
+
+            [o_fullscreen_window setFrame:screen_rect display:YES animate:YES];
+            [o_fullscreen_window setLevel:NSNormalWindowLevel];
+
+            if (blackout_other_displays) {
+                CGDisplayFade(token, 0.3, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, NO);
+                CGReleaseDisplayFadeReservation(token);
+            }
+
+            /* Will release the lock */
+            [self hasBecomeFullscreen];
+
+            return;
+        }
+
+        /* Make sure we don't see the o_video_view disappearing of the screen during this operation */
+        NSDisableScreenUpdates();
+        [[o_video_view superview] replaceSubview:o_video_view with:o_temp_view];
+        [o_temp_view setFrame:[o_video_view frame]];
+        [o_fullscreen_window setContentView:o_video_view];
+        [o_fullscreen_window makeKeyAndOrderFront:self];
+        NSEnableScreenUpdates();
+    }
+
+    /* We are in fullscreen (and no animation is running) */
+    if ([[VLCMainWindow sharedInstance] fullscreen]) {
+        /* Make sure we are hidden */
+        [self orderOut: self];
+
+        [self unlockFullscreenAnimation];
+        return;
+    }
+
+    if (o_fullscreen_anim1) {
+        [o_fullscreen_anim1 stopAnimation];
+        [o_fullscreen_anim1 release];
+    }
+    if (o_fullscreen_anim2) {
+        [o_fullscreen_anim2 stopAnimation];
+        [o_fullscreen_anim2 release];
+    }
+
+    if ([screen mainScreen])
+        [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
+
+    dict1 = [[NSMutableDictionary alloc] initWithCapacity:2];
+    dict2 = [[NSMutableDictionary alloc] initWithCapacity:3];
+
+    [dict1 setObject:self forKey:NSViewAnimationTargetKey];
+    [dict1 setObject:NSViewAnimationFadeOutEffect forKey:NSViewAnimationEffectKey];
+
+    [dict2 setObject:o_fullscreen_window forKey:NSViewAnimationTargetKey];
+    [dict2 setObject:[NSValue valueWithRect:[o_fullscreen_window frame]] forKey:NSViewAnimationStartFrameKey];
+    [dict2 setObject:[NSValue valueWithRect:screen_rect] forKey:NSViewAnimationEndFrameKey];
+
+    /* Strategy with NSAnimation allocation:
+     - Keep at most 2 animation at a time
+     - leaveFullscreen/enterFullscreen are the only responsible for releasing and alloc-ing
+     */
+    o_fullscreen_anim1 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict1]];
+    o_fullscreen_anim2 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict2]];
+
+    [dict1 release];
+    [dict2 release];
+
+    [o_fullscreen_anim1 setAnimationBlockingMode: NSAnimationNonblocking];
+    [o_fullscreen_anim1 setDuration: 0.3];
+    [o_fullscreen_anim1 setFrameRate: 30];
+    [o_fullscreen_anim2 setAnimationBlockingMode: NSAnimationNonblocking];
+    [o_fullscreen_anim2 setDuration: 0.2];
+    [o_fullscreen_anim2 setFrameRate: 30];
+
+    [o_fullscreen_anim2 setDelegate: self];
+    [o_fullscreen_anim2 startWhenAnimation: o_fullscreen_anim1 reachesProgress: 1.0];
+
+    [o_fullscreen_anim1 startAnimation];
+    /* fullscreenAnimation will be unlocked when animation ends */
+}
+
+- (void)hasBecomeFullscreen
+{
+    if ([[o_video_view subviews] count] > 0)
+        [o_fullscreen_window makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
+
+    [o_fullscreen_window makeKeyWindow];
+    [o_fullscreen_window setAcceptsMouseMovedEvents: YES];
+
+    /* tell the fspanel to move itself to front next time it's triggered */
+    [[[VLCMainWindow sharedInstance] fsPanel] setVoutWasUpdated: (int)[[o_fullscreen_window screen] displayID]];
+    [[[VLCMainWindow sharedInstance] fsPanel] setActive: nil];
+
+    if ([self isVisible])
+        [self orderOut: self];
+
+    [[VLCMainWindow sharedInstance] setFullscreen:YES];
+    [self unlockFullscreenAnimation];
+}
+
+- (void)leaveFullscreen
+{
+    [self leaveFullscreenAndFadeOut: NO];
+}
+
+- (void)leaveFullscreenAndFadeOut: (BOOL)fadeout
+{
+    NSMutableDictionary *dict1, *dict2;
+    NSRect frame;
+    BOOL blackout_other_displays = var_InheritBool(VLCIntf, "macosx-black");
+
+    [self lockFullscreenAnimation];
+
+    if (o_controls_bar)
+        [o_controls_bar setFullscreenState:NO];
+
+    /* We always try to do so */
+    [NSScreen unblackoutScreens];
+
+    vout_thread_t *p_vout = getVout();
+    if (p_vout) {
+        if (var_GetBool(p_vout, "video-on-top"))
+            [[o_video_view window] setLevel: NSStatusWindowLevel];
+        else
+            [[o_video_view window] setLevel: NSNormalWindowLevel];
+        vlc_object_release(p_vout);
+    }
+    [[o_video_view window] makeKeyAndOrderFront: nil];
+
+    /* Don't do anything if o_fullscreen_window is already closed */
+    if (!o_fullscreen_window) {
+        [self unlockFullscreenAnimation];
+        return;
+    }
+
+    if (fadeout) {
+        /* We don't animate if we are not visible, instead we
+         * simply fade the display */
+        CGDisplayFadeReservationToken token;
+
+        if (blackout_other_displays) {
+            CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
+            CGDisplayFade(token, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES);
+        }
+
+        [[[VLCMainWindow sharedInstance] fsPanel] setNonActive: nil];
+        [NSApp setPresentationOptions: NSApplicationPresentationDefault];
+
+        /* Will release the lock */
+        [self hasEndedFullscreen];
+
+        /* Our window is hidden, and might be faded. We need to workaround that, so note it
+         * here */
+        b_window_is_invisible = YES;
+
+        if (blackout_other_displays) {
+            CGDisplayFade(token, 0.5, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, NO);
+            CGReleaseDisplayFadeReservation(token);
+        }
+
+        return;
+    }
+
+    [self setAlphaValue: 0.0];
+    [self orderFront: self];
+    [[o_video_view window] orderFront: self];
+
+    [[[VLCMainWindow sharedInstance] fsPanel] setNonActive: nil];
+    [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
+
+    if (o_fullscreen_anim1) {
+        [o_fullscreen_anim1 stopAnimation];
+        [o_fullscreen_anim1 release];
+    }
+    if (o_fullscreen_anim2) {
+        [o_fullscreen_anim2 stopAnimation];
+        [o_fullscreen_anim2 release];
+    }
+
+    frame = [[o_temp_view superview] convertRect: [o_temp_view frame] toView: nil]; /* Convert to Window base coord */
+    frame.origin.x += [self frame].origin.x;
+    frame.origin.y += [self frame].origin.y;
+
+    dict2 = [[NSMutableDictionary alloc] initWithCapacity:2];
+    [dict2 setObject:self forKey:NSViewAnimationTargetKey];
+    [dict2 setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
+
+    o_fullscreen_anim2 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict2, nil]];
+    [dict2 release];
+
+    [o_fullscreen_anim2 setAnimationBlockingMode: NSAnimationNonblocking];
+    [o_fullscreen_anim2 setDuration: 0.3];
+    [o_fullscreen_anim2 setFrameRate: 30];
+
+    [o_fullscreen_anim2 setDelegate: self];
+
+    dict1 = [[NSMutableDictionary alloc] initWithCapacity:3];
+
+    [dict1 setObject:o_fullscreen_window forKey:NSViewAnimationTargetKey];
+    [dict1 setObject:[NSValue valueWithRect:[o_fullscreen_window frame]] forKey:NSViewAnimationStartFrameKey];
+    [dict1 setObject:[NSValue valueWithRect:frame] forKey:NSViewAnimationEndFrameKey];
+
+    o_fullscreen_anim1 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict1, nil]];
+    [dict1 release];
+
+    [o_fullscreen_anim1 setAnimationBlockingMode: NSAnimationNonblocking];
+    [o_fullscreen_anim1 setDuration: 0.2];
+    [o_fullscreen_anim1 setFrameRate: 30];
+    [o_fullscreen_anim2 startWhenAnimation: o_fullscreen_anim1 reachesProgress: 1.0];
+
+    /* Make sure o_fullscreen_window is the frontmost window */
+    [o_fullscreen_window orderFront: self];
+
+    [o_fullscreen_anim1 startAnimation];
+    /* fullscreenAnimation will be unlocked when animation ends */
+}
+
+- (void)hasEndedFullscreen
+{
+    [[VLCMainWindow sharedInstance] setFullscreen:NO];
+    
+    /* This function is private and should be only triggered at the end of the fullscreen change animation */
+    /* Make sure we don't see the o_video_view disappearing of the screen during this operation */
+    NSDisableScreenUpdates();
+    [o_video_view retain];
+    [o_video_view removeFromSuperviewWithoutNeedingDisplay];
+    [[o_temp_view superview] replaceSubview:o_temp_view with:o_video_view];
+    [o_video_view release];
+    [o_video_view setFrame:[o_temp_view frame]];
+    if ([[o_video_view subviews] count] > 0)
+        [self makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
+
+    [super makeKeyAndOrderFront:self]; /* our version (in main window) contains a workaround */
+
+    [o_fullscreen_window orderOut: self];
+    NSEnableScreenUpdates();
+
+    [o_fullscreen_window release];
+    o_fullscreen_window = nil;
+    [self setLevel:i_originalLevel];
+    [self setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
+
+    // if we quit fullscreen because there is no video anymore, make sure non-embedded window is not visible
+    if (![[VLCMain sharedInstance] activeVideoPlayback] && [self class] != [VLCMainWindow class])
+        [self orderOut: self];
+
+    [self unlockFullscreenAnimation];
+}
+
+- (void)animationDidEnd:(NSAnimation*)animation
+{
+    NSArray *viewAnimations;
+    if (o_makekey_anim == animation) {
+        [o_makekey_anim release];
+        return;
+    }
+    if ([animation currentValue] < 1.0)
+        return;
+
+    /* Fullscreen ended or started (we are a delegate only for leaveFullscreen's/enterFullscren's anim2) */
+    viewAnimations = [o_fullscreen_anim2 viewAnimations];
+    if ([viewAnimations count] >=1 &&
+        [[[viewAnimations objectAtIndex: 0] objectForKey: NSViewAnimationEffectKey] isEqualToString:NSViewAnimationFadeInEffect]) {
+        /* Fullscreen ended */
+        [self hasEndedFullscreen];
+    } else
+    /* Fullscreen started */
+        [self hasBecomeFullscreen];
 }
 
 #pragma mark -

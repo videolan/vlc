@@ -162,6 +162,20 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
     [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
                        waitUntilDone:NO];
 
+    // TODO: find a cleaner way for "start in fullscreen"
+    if (var_GetBool(pl_Get(VLCIntf), "fullscreen")) {
+        int i_full = 1;
+
+        SEL sel = @selector(setFullscreen:forWindow:);
+        NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[[VLCMain sharedInstance] methodSignatureForSelector:sel]];
+        [inv setTarget:[VLCMain sharedInstance]];
+        [inv setSelector:sel];
+        [inv setArgument:&i_full atIndex:2];
+        [inv setArgument:&p_wnd atIndex:3];
+        [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
+                           waitUntilDone:NO];
+    }
+
     [[VLCMain sharedInstance] setActiveVideoPlayback: YES];
     p_wnd->control = WindowControl;
     p_wnd->sys = (vout_window_sys_t *)VLCIntf;
@@ -202,7 +216,18 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
         {
             NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
             int i_full = va_arg(args, int);
-            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(checkFullscreenChange:) withObject:[NSNumber numberWithInt: i_full] waitUntilDone:NO];
+
+            SEL sel = @selector(setFullscreen:forWindow:);
+            NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[[VLCMain sharedInstance] methodSignatureForSelector:sel]];
+            [inv setTarget:[VLCMain sharedInstance]];
+            [inv setSelector:sel];
+            [inv setArgument:&i_full atIndex:2]; // starting at 2!
+            [inv setArgument:&p_wnd atIndex:3];
+            [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
+                               waitUntilDone:NO];
+
+
+            //[[VLCMain sharedInstance] performSelectorOnMainThread:@selector(fullscreenChanged:) withObject:[NSValue valueWithPointer:p_wnd] waitUntilDone:NO];
             [o_pool release];
             return VLC_SUCCESS;
         }
@@ -412,22 +437,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 }
 
 /*****************************************************************************
- * FullscreenChanged: Callback triggered by the fullscreen-change playlist
- * variable, to let the intf update the controller.
- *****************************************************************************/
-static int FullscreenChanged(vlc_object_t *p_this, const char *psz_variable,
-                     vlc_value_t old_val, vlc_value_t new_val, void *param)
-{
-    intf_thread_t * p_intf = VLCIntf;
-    if (p_intf) {
-        NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-        [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(fullscreenChanged) withObject:nil waitUntilDone:NO];
-        [o_pool release];
-    }
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
  * DialogCallback: Callback triggered by the "dialog-*" variables
  * to let the intf display error and interaction dialogs
  *****************************************************************************/
@@ -609,7 +618,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     val.b_bool = false;
 
-    var_AddCallback(p_playlist, "fullscreen", FullscreenChanged, self);
     var_AddCallback(p_intf->p_libvlc, "intf-toggle-fscontrol", ShowController, self);
     var_AddCallback(p_intf->p_libvlc, "intf-show", ShowController, self);
     //    var_AddCallback(p_playlist, "item-change", PLItemChanged, self);
@@ -796,7 +804,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_DelCallback(p_playlist, "loop", PlaybackModeUpdated, self);
     var_DelCallback(p_playlist, "volume", VolumeUpdated, self);
     var_DelCallback(p_playlist, "mute", VolumeUpdated, self);
-    var_DelCallback(p_playlist, "fullscreen", FullscreenChanged, self);
     var_DelCallback(p_intf->p_libvlc, "intf-toggle-fscontrol", ShowController, self);
     var_DelCallback(p_intf->p_libvlc, "intf-show", ShowController, self);
 
@@ -1204,10 +1211,16 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 #pragma mark -
 #pragma mark Interface updaters
-- (void)fullscreenChanged
+- (void)setFullscreen:(int)i_full forWindow:(vout_window_t *)p_wnd
 {
-    playlist_t * p_playlist = pl_Get(VLCIntf);
-    BOOL b_fullscreen = var_GetBool(p_playlist, "fullscreen");
+    if (!p_intf || (!b_nativeFullscreenMode && !p_wnd))
+        return;
+    playlist_t * p_playlist = pl_Get(p_intf);
+    BOOL b_fullscreen = i_full;
+
+    if (!var_GetBool(p_playlist, "fullscreen") != !b_fullscreen) {
+        var_SetBool(p_playlist, "fullscreen", b_fullscreen);
+    }
 
     if (b_nativeFullscreenMode) {
         // this is called twice in certain situations, so only toogle if we really need to
@@ -1220,27 +1233,22 @@ static VLCMain *_o_sharedMainInstance = nil;
         else
             [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
     } else {
+        assert(p_wnd);
+
         if (b_fullscreen) {
-            input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+            input_thread_t * p_input = pl_CurrentInput(p_intf);
             if (p_input != NULL && [self activeVideoPlayback]) {
                 // activate app, as method can also be triggered from outside the app (prevents nasty window layout)
                 [NSApp activateIgnoringOtherApps:YES];
-                [o_mainwindow performSelectorOnMainThread:@selector(enterFullscreen) withObject:nil waitUntilDone:NO];
+                [o_vout_controller updateWindow:p_wnd withSelector:@selector(enterFullscreen)];
+
             }
             if (p_input)
                 vlc_object_release(p_input);
         } else {
             // leaving fullscreen is always allowed
-            [o_mainwindow performSelectorOnMainThread:@selector(leaveFullscreen) withObject:nil waitUntilDone:NO];
+            [o_vout_controller updateWindow:p_wnd withSelector:@selector(leaveFullscreen)];
         }
-    }
-}
-
-- (void)checkFullscreenChange:(NSNumber *)o_full
-{
-    BOOL b_full = [o_full boolValue];
-    if (p_intf && !var_GetBool(pl_Get(p_intf), "fullscreen") != !b_full) {
-        var_SetBool(pl_Get(p_intf), "fullscreen", b_full);
     }
 }
 

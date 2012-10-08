@@ -54,10 +54,13 @@
         return;
     }
 
+    if ([[VLCMainWindow sharedInstance] fullscreen] && ![[VLCMainWindow sharedInstance] nativeFullscreenMode])
+        [o_window leaveFullscreen];
+
     if (![NSStringFromClass([o_window class]) isEqualToString:@"VLCMainWindow"]) {
         [o_window orderOut:self];
     }
-
+    
     [o_vout_dict removeObjectForKey:o_key];
 }
 
@@ -68,6 +71,17 @@
         if (o_controlsBar)
             [o_controlsBar performSelector:aSel];
     }];
+}
+
+- (void)updateWindow:(vout_window_t *)p_wnd withSelector:(SEL)aSel;
+{
+    VLCVideoWindowCommon *o_window = [o_vout_dict objectForKey:[NSValue valueWithPointer:p_wnd]];
+    if(!o_window) {
+        msg_Err(VLCIntf, "Cannot call selector for nonexisting window");
+        return;
+    }
+
+    [o_window performSelector:aSel];
 }
 
 - (void)updateWindowsUsingBlock:(void (^)(VLCVideoWindowCommon *o_window))windowUpdater

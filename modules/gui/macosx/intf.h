@@ -172,9 +172,10 @@ struct intf_sys_t
 - (BOOL)activeVideoPlayback;
 - (void)applicationWillTerminate:(NSNotification *)notification;
 - (void)updateCurrentlyUsedHotkeys;
-- (void)fullscreenChanged;
 - (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event force:(BOOL)b_force;
-- (void)checkFullscreenChange:(NSNumber *)o_full;
+
+- (void)setFullscreen:(int)i_full forWindow:(vout_window_t *)p_wnd;
+
 - (void)PlaylistItemChanged;
 - (void)playbackStatusUpdated;
 - (void)sendDistributedNotificationWithUpdatedPlaybackStatus;
