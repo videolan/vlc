@@ -18,6 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <limits.h>
+
 /* Parse the SPS/PPS Metadata and convert it to annex b format */
 static int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
                             uint32_t i_buf_size, uint8_t *p_out_buf,
