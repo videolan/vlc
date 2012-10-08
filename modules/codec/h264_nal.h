@@ -98,7 +98,7 @@ static int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
 
 /* Convert H.264 NAL format to annex b in-place */
 static void convert_h264_to_annexb( uint8_t *p_buf, uint32_t i_len,
-                                    int i_nal_size )
+                                    size_t i_nal_size )
 {
     if( i_nal_size < 3 || i_nal_size > 4 )
         return;
@@ -107,7 +107,7 @@ static void convert_h264_to_annexb( uint8_t *p_buf, uint32_t i_len,
     while( i_len >= i_nal_size )
     {
         uint32_t nal_len = 0;
-        for( int i = 0; i < i_nal_size; i++ ) {
+        for( unsigned int i = 0; i < i_nal_size; i++ ) {
             nal_len = (nal_len << 8) | p_buf[i];
             p_buf[i] = 0;
         }
