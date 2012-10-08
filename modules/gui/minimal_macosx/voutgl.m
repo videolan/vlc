@@ -33,72 +33,48 @@
 #include "intf.h"
 #include "voutgl.h"
 
-int OpenVideoGL  ( vlc_object_t * p_this )
+
+static int WindowControl( vout_window_t *, int i_query, va_list );
+
+int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 {
-    vout_thread_t * p_vout = (vout_thread_t *) p_this;
-    int i_drawable_agl;
-    int i_drawable_gl;
-
-    if( !CGDisplayUsesOpenGLAcceleration( kCGDirectMainDisplay ) )
-    {
-        msg_Warn( p_vout, "No OpenGL hardware acceleration found. "
-                          "Video display will be slow" );
-        return( 1 );
-    }
-
-    msg_Dbg( p_vout, "display is Quartz Extreme accelerated" );
-
-    p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
-    if( p_vout->p_sys == NULL )
+    p_wnd->sys = malloc( sizeof( vout_window_sys_t ) );
+    if( p_wnd->sys == NULL )
         return( 1 );
 
-    memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
+    memset( p_wnd->sys, 0, sizeof( vout_window_sys_t ) );
 
-    i_drawable_agl = var_GetInteger( p_vout->p_libvlc, "drawable-agl" );
-    i_drawable_gl = var_GetInteger( p_vout->p_libvlc, "drawable-gl" );
 
-    /* Are we in the mozilla plugin, which isn't 64bit compatible ? */
-#ifndef __x86_64__
-    if( i_drawable_agl > 0 )
-    {
-        p_vout->pf_init             = aglInit;
-        p_vout->pf_end              = aglEnd;
-        p_vout->pf_manage           = aglManage;
-        p_vout->pf_control          = aglControl;
-        p_vout->pf_swap             = aglSwap;
-        p_vout->pf_lock             = aglLock;
-        p_vout->pf_unlock           = aglUnlock;
+    if (cocoaglvoutviewInit(p_wnd, cfg)) {
+        msg_Err( p_wnd, "Mac OS X VoutGLView couldnt be initialized" );
+        return VLC_EGENERIC;
     }
-    else /*if( i_drawable_gl > 0 )*/
-    {
-        /* Let's use the VLCOpenGLVoutView.m class */
-        p_vout->pf_init   = cocoaglvoutviewInit;
-        p_vout->pf_end    = cocoaglvoutviewEnd;
-        p_vout->pf_manage = cocoaglvoutviewManage;
-        p_vout->pf_control= cocoaglvoutviewControl;
-        p_vout->pf_swap   = cocoaglvoutviewSwap;
-        p_vout->pf_lock   = cocoaglvoutviewLock;
-        p_vout->pf_unlock = cocoaglvoutviewUnlock;
-    }
-#else
-    /* Let's use the VLCOpenGLVoutView.m class */
-    p_vout->pf_init   = cocoaglvoutviewInit;
-    p_vout->pf_end    = cocoaglvoutviewEnd;
-    p_vout->pf_manage = cocoaglvoutviewManage;
-    p_vout->pf_control= cocoaglvoutviewControl;
-    p_vout->pf_swap   = cocoaglvoutviewSwap;
-    p_vout->pf_lock   = cocoaglvoutviewLock;
-    p_vout->pf_unlock = cocoaglvoutviewUnlock;
-#endif
-    p_vout->p_sys->b_got_frame = false;
 
+    p_wnd->control = WindowControl;
     return VLC_SUCCESS;
 }
 
-void CloseVideoGL ( vlc_object_t * p_this )
+static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
 {
-    vout_thread_t * p_vout = (vout_thread_t *) p_this;
-    cocoaglvoutviewEnd( p_vout );
+    /* TODO */
+    if( i_query == VOUT_WINDOW_SET_STATE )
+        msg_Dbg( p_wnd, "WindowControl:VOUT_WINDOW_SET_STATE" );
+    else if( i_query == VOUT_WINDOW_SET_SIZE )
+    {
+         msg_Dbg( p_wnd, "WindowControl:VOUT_WINDOW_SET_SIZE" );
+    }
+    else if( i_query == VOUT_WINDOW_SET_FULLSCREEN )
+    {
+        msg_Dbg( p_wnd, "WindowControl:VOUT_WINDOW_SET_FULLSCREEN" );
+    }
+    else
+        msg_Dbg( p_wnd, "WindowControl: unknown query" );
+    return VLC_SUCCESS;
+}
+
+void WindowClose( vout_window_t *p_wnd )
+{
+    cocoaglvoutviewEnd( p_wnd );
     /* Clean up */
-    free( p_vout->p_sys );
+    free( p_wnd->sys );
 }

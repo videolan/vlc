@@ -39,159 +39,74 @@
 #include <OpenGL/OpenGL.h>
 #include <OpenGL/gl.h>
 
+
 /*****************************************************************************
  * cocoaglvoutviewInit
  *****************************************************************************/
-int cocoaglvoutviewInit( vout_thread_t * p_vout )
+int cocoaglvoutviewInit( vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 {
     vlc_value_t value_drawable;
     id <VLCOpenGLVoutEmbedding> o_cocoaglview_container;
 
-    msg_Dbg( p_vout, "Mac OS X Vout is opening" );
+    msg_Dbg( p_wnd, "Mac OS X Vout is opening" );
 
-    var_Create( p_vout, "drawable-nsobject", VLC_VAR_DOINHERIT );
-    var_Get( p_vout, "drawable-nsobject", &value_drawable );
+    var_Create( p_wnd, "drawable-nsobject", VLC_VAR_DOINHERIT );
+    var_Get( p_wnd, "drawable-nsobject", &value_drawable );
 
-    p_vout->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
+    p_wnd->sys->o_pool = [[NSAutoreleasePool alloc] init];
 
     /* This will be released in cocoaglvoutviewEnd(), on
      * main thread, after we are done using it. */
     o_cocoaglview_container = [(id) value_drawable.p_address retain];
     if (!o_cocoaglview_container)
     {
-        msg_Warn( p_vout, "No drawable!, spawing a window" );
+        msg_Warn( p_wnd, "No drawable!, spawing a window" );
     }
 
-    p_vout->p_sys->b_embedded = false;
+    //p_vout->p_sys->b_embedded = false;
 
 
     /* Create the GL view */
-    struct args { vout_thread_t * p_vout; id <VLCOpenGLVoutEmbedding> container; } args = { p_vout, o_cocoaglview_container };
+    struct args { vout_window_t *p_wnd; const vout_window_cfg_t *cfg; id <VLCOpenGLVoutEmbedding> container; } args = { p_wnd, cfg, o_cocoaglview_container };
 
     [VLCOpenGLVoutView performSelectorOnMainThread:@selector(autoinitOpenGLVoutViewIntVoutWithContainer:)
                         withObject:[NSData dataWithBytes: &args length: sizeof(struct args)] waitUntilDone:YES];
 
-    [[p_vout->p_sys->o_glview openGLContext] makeCurrentContext];
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * cocoaglvoutviewEnd
  *****************************************************************************/
-void cocoaglvoutviewEnd( vout_thread_t * p_vout )
+void cocoaglvoutviewEnd( vout_window_t * p_wnd )
 {
     id <VLCOpenGLVoutEmbedding> o_cocoaglview_container;
 
-    if (!p_vout->p_sys->o_glview)
+    if (!p_wnd->handle.nsobject)
         return;
 
-    msg_Dbg( p_vout, "Mac OS X Vout is closing" );
-    var_Destroy( p_vout, "drawable-nsobject" );
+    msg_Dbg( p_wnd, "Mac OS X Vout is closing" );
+    var_Destroy( p_wnd, "drawable-nsobject" );
 
-    o_cocoaglview_container = [p_vout->p_sys->o_glview container];
+    o_cocoaglview_container = [(VLCOpenGLVoutView  *)p_wnd->handle.nsobject container];
 
     /* Make sure our view won't request the vout now */
-    [p_vout->p_sys->o_glview detachFromVout];
-    msg_Dbg( p_vout, "Mac OS X Vout is closing" );
+    [(VLCOpenGLVoutView  *)p_wnd->handle.nsobject detachFromVoutWindow];
+    msg_Dbg( p_wnd, "Mac OS X Vout is closing" );
 
     if( [(id)o_cocoaglview_container respondsToSelector:@selector(removeVoutSubview:)] )
-        [o_cocoaglview_container performSelectorOnMainThread:@selector(removeVoutSubview:) withObject:p_vout->p_sys->o_glview waitUntilDone:NO];
+        [o_cocoaglview_container performSelectorOnMainThread:@selector(removeVoutSubview:) withObject:p_wnd->handle.nsobject waitUntilDone:NO];
 
     /* Let the view go and release it, _without_blocking_ */
-    [p_vout->p_sys->o_glview performSelectorOnMainThread:@selector(removeFromSuperviewAndRelease) withObject:nil waitUntilDone:NO];
-    p_vout->p_sys->o_glview = nil;
+    [p_wnd->handle.nsobject performSelectorOnMainThread:@selector(removeFromSuperviewAndRelease) withObject:nil waitUntilDone:NO];
+    p_wnd->handle.nsobject = nil;
 
     /* Release the container now that we don't use it */
     [o_cocoaglview_container performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
 
-    [p_vout->p_sys->o_pool release];
-    p_vout->p_sys->o_pool = nil;
+    [p_wnd->sys->o_pool release];
+    p_wnd->sys->o_pool = nil;
  
-}
-
-/*****************************************************************************
- * cocoaglvoutviewManage
- *****************************************************************************/
-int cocoaglvoutviewManage( vout_thread_t * p_vout )
-{
-    if( p_vout->i_changes & VOUT_ASPECT_CHANGE )
-    {
-        [p_vout->p_sys->o_glview reshape];
-        p_vout->i_changes &= ~VOUT_ASPECT_CHANGE;
-    }
-    if( p_vout->i_changes & VOUT_CROP_CHANGE )
-    {
-        [p_vout->p_sys->o_glview reshape];
-        p_vout->i_changes &= ~VOUT_CROP_CHANGE;
-    }
-
-    if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
-    {
-        NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-
-        p_vout->b_fullscreen = !p_vout->b_fullscreen;
-
-        if( p_vout->b_fullscreen )
-            [[p_vout->p_sys->o_glview container] enterFullscreen];
-        else
-            [[p_vout->p_sys->o_glview container] leaveFullscreen];
-
-        [o_pool release];
-
-        p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
-    }
-
-    //[[p_vout->p_sys->o_glview container] manage];
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * cocoaglvoutviewControl: control facility for the vout
- *****************************************************************************/
-int cocoaglvoutviewControl( vout_thread_t *p_vout, int i_query, va_list args )
-{
-    bool b_arg;
-
-    switch( i_query )
-    {
-        case VOUT_SET_STAY_ON_TOP:
-            b_arg = (bool) va_arg( args, int );
-            [[p_vout->p_sys->o_glview container] setOnTop: b_arg];
-            return VLC_SUCCESS;
-
-        default:
-            return VLC_EGENERIC;
-    }
-}
-
-/*****************************************************************************
- * cocoaglvoutviewSwap
- *****************************************************************************/
-void cocoaglvoutviewSwap( vout_thread_t * p_vout )
-{
-    p_vout->p_sys->b_got_frame = true;
-    [[p_vout->p_sys->o_glview openGLContext] flushBuffer];
-}
-
-/*****************************************************************************
- * cocoaglvoutviewLock
- *****************************************************************************/
-int cocoaglvoutviewLock( vout_thread_t * p_vout )
-{
-    if( kCGLNoError == CGLLockContext([[p_vout->p_sys->o_glview openGLContext] CGLContextObj]) )
-    {
-        [[p_vout->p_sys->o_glview openGLContext] makeCurrentContext];
-        return 0;
-    }
-    return 1;
-}
-
-/*****************************************************************************
- * cocoaglvoutviewUnlock
- *****************************************************************************/
-void cocoaglvoutviewUnlock( vout_thread_t * p_vout )
-{
-    CGLUnlockContext([[p_vout->p_sys->o_glview openGLContext] CGLContextObj]);
 }
 
 /*****************************************************************************
@@ -203,22 +118,19 @@ void cocoaglvoutviewUnlock( vout_thread_t * p_vout )
  * vout_thread_t. Must be called from main thread. */
 + (void) autoinitOpenGLVoutViewIntVoutWithContainer: (NSData *) argsAsData
 {
-    NSAutoreleasePool   *pool = [[NSAutoreleasePool alloc] init];
-    struct args { vout_thread_t * p_vout; id <VLCOpenGLVoutEmbedding> container; } *
+    struct args { vout_window_t *p_wnd; vout_window_cfg_t *cfg; id <VLCOpenGLVoutEmbedding> container; } *
         args = (struct args *)[argsAsData bytes];
     VLCOpenGLVoutView * oglview;
 
     if( !args->container )
     {
-        args->container = [[VLCMinimalVoutWindow alloc] initWithContentRect: NSMakeRect( 0, 0, args->p_vout->i_window_width, args->p_vout->i_window_height )];
+        args->container = [[VLCMinimalVoutWindow alloc] initWithContentRect: NSMakeRect( 0, 0, args->cfg->width, args->cfg->height )];
         [(VLCMinimalVoutWindow *)args->container makeKeyAndOrderFront: nil];
     }
-    oglview = [[VLCOpenGLVoutView alloc] initWithVout: args->p_vout container: args->container];
+    oglview = [[VLCOpenGLVoutView alloc] initWithVoutWindow: args->p_wnd container: args->container];
 
-    args->p_vout->p_sys->o_glview = oglview;
+    args->p_wnd->handle.nsobject = oglview;
     [args->container addVoutSubview: oglview];
-
-    [pool release];
 }
 
 - (void)dealloc
@@ -233,54 +145,22 @@ void cocoaglvoutviewUnlock( vout_thread_t * p_vout )
     [self release];
 }
 
-- (id) initWithVout: (vout_thread_t *) vout container: (id <VLCOpenGLVoutEmbedding>) aContainer
+- (id) initWithVoutWindow: (vout_window_t *) wnd container: (id <VLCOpenGLVoutEmbedding>) aContainer
 {
-    NSOpenGLPixelFormatAttribute attribs[] =
+    if( self = [super initWithFrame: NSMakeRect(0,0,10,10)] )
     {
-        NSOpenGLPFADoubleBuffer,
-        NSOpenGLPFAAccelerated,
-        NSOpenGLPFANoRecovery,
-        NSOpenGLPFAColorSize, 24,
-        NSOpenGLPFAAlphaSize, 8,
-        NSOpenGLPFADepthSize, 24,
-        NSOpenGLPFAWindow,
-        0
-    };
-
-    NSOpenGLPixelFormat * fmt = [[NSOpenGLPixelFormat alloc]
-        initWithAttributes: attribs];
-
-    if( !fmt )
-    {
-        msg_Warn( p_vout, "could not create OpenGL video output" );
-        return nil;
-    }
-
-    if( self = [super initWithFrame: NSMakeRect(0,0,10,10) pixelFormat: fmt] )
-    {
-        p_vout = vout;
+        p_wnd = wnd;
         container = aContainer;
         objectLock = [[NSLock alloc] init];
 
-        [fmt release];
-
-        [[self openGLContext] makeCurrentContext];
-        [[self openGLContext] update];
-
-        /* Swap buffers only during the vertical retrace of the monitor.
-        http://developer.apple.com/documentation/GraphicsImaging/
-        Conceptual/OpenGL/chap5/chapter_5_section_44.html */
-        GLint params[] = { 1 };
-        CGLSetParameter( CGLGetCurrentContext(), kCGLCPSwapInterval,
-                     params );
     }
     return self;
 }
 
-- (void) detachFromVout
+- (void) detachFromVoutWindow
 {
     [objectLock lock];
-    p_vout = NULL;
+    p_wnd = NULL;
     [objectLock unlock];
 }
 
@@ -289,99 +169,17 @@ void cocoaglvoutviewUnlock( vout_thread_t * p_vout )
     return container;
 }
 
-- (void) destroyVout
+- (void) destroyVoutWindow
 {
     [objectLock lock];
-    if( p_vout )
+    if( p_wnd )
     {
-        vlc_object_release( p_vout );
-        vlc_object_release( p_vout );
+        vlc_object_release( p_wnd );
+        vlc_object_release( p_wnd );
     }
     [objectLock unlock];
 }
 
-- (void) reshape
-{
-    int x, y;
-    vlc_value_t val;
-
-    [objectLock lock];
-    if( !p_vout )
-    {
-        [objectLock unlock];
-        return;
-    }
-
-    cocoaglvoutviewLock( p_vout );
-    NSRect bounds = [self bounds];
-
-    if( [[self container] stretchesVideo] )
-    {
-        x = bounds.size.width;
-        y = bounds.size.height;
-    }
-    else if( bounds.size.height * p_vout->fmt_in.i_visible_width *
-             p_vout->fmt_in.i_sar_num <
-             bounds.size.width * p_vout->fmt_in.i_visible_height *
-             p_vout->fmt_in.i_sar_den )
-    {
-        x = ( bounds.size.height * p_vout->fmt_in.i_visible_width *
-              p_vout->fmt_in.i_sar_num ) /
-            ( p_vout->fmt_in.i_visible_height * p_vout->fmt_in.i_sar_den);
-
-        y = bounds.size.height;
-    }
-    else
-    {
-        x = bounds.size.width;
-        y = ( bounds.size.width * p_vout->fmt_in.i_visible_height *
-              p_vout->fmt_in.i_sar_den) /
-            ( p_vout->fmt_in.i_visible_width * p_vout->fmt_in.i_sar_num  );
-    }
-
-    glViewport( ( bounds.size.width - x ) / 2,
-                ( bounds.size.height - y ) / 2, x, y );
-
-    if( p_vout->p_sys->b_got_frame )
-    {
-        /* Ask the opengl module to redraw */
-        vout_thread_t * p_parent;
-        p_parent = (vout_thread_t *) p_vout->p_parent;
-        cocoaglvoutviewUnlock( p_vout );
-        if( p_parent && p_parent->pf_display )
-        {
-            p_parent->pf_display( p_parent, NULL );
-        }
-    }
-    else
-    {
-        glClear( GL_COLOR_BUFFER_BIT );
-        cocoaglvoutviewUnlock( p_vout );
-    }
-    [objectLock unlock];
-    [super reshape];
-}
-
-- (void) update
-{
-    if (!p_vout)
-        return;
-    if( kCGLNoError != CGLLockContext([[self openGLContext] CGLContextObj]) )
-        return;
-    [super update];
-    CGLUnlockContext([[p_vout->p_sys->o_glview openGLContext] CGLContextObj]);
-}
-
-- (void) drawRect: (NSRect) rect
-{
-    if (!p_vout)
-        return;
-    if( kCGLNoError != CGLLockContext([[self openGLContext] CGLContextObj]) )
-        return;
-    [[self openGLContext] flushBuffer];
-    [super drawRect:rect];
-    CGLUnlockContext([[p_vout->p_sys->o_glview openGLContext] CGLContextObj]);
-}
 
 - (BOOL)mouseDownCanMoveWindow
 {

@@ -54,7 +54,7 @@ static void Run ( intf_thread_t *p_intf );
 int OpenIntf ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
-
+	
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
     {
@@ -64,7 +64,6 @@ int OpenIntf ( vlc_object_t *p_this )
     memset( p_intf->p_sys, 0, sizeof( *p_intf->p_sys ) );
 
     p_intf->pf_run = Run;
-    p_intf->b_should_run_on_first_thread = true;
 
     return VLC_SUCCESS;
 }
@@ -109,8 +108,6 @@ static void * KillerThread( void *user_data )
 
     vlc_mutex_destroy( &p_intf->p_sys->lock );
     vlc_cond_destroy( &p_intf->p_sys->wait );
-
-    msg_Dbg( p_intf, "Killing the Minimal Mac OS X module" );
 
     /* We are dead, terminate */
     [NSApp terminate: nil];

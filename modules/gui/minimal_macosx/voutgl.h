@@ -27,7 +27,6 @@
 
 #import <Cocoa/Cocoa.h>
 #import "VLCOpenGLVoutView.h"
-#import "voutagl.h"
 
 struct vout_sys_t
 {
@@ -39,12 +38,16 @@ struct vout_sys_t
 
     /* Mozilla plugin-related variables */
     bool                b_embedded;
-    AGLContext          agl_ctx;
-    AGLDrawable         agl_drawable;
     int                 i_offx, i_offy;
     int                 i_width, i_height;
     WindowRef           theWindow;
-    WindowGroupRef      winGroup;
     bool                b_clipped_out;
     Rect                clipBounds, viewBounds;
 };
+
+struct vout_window_sys_t
+{
+    NSAutoreleasePool *o_pool;
+};
+
+

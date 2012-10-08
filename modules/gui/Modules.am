@@ -2,7 +2,7 @@ DIST_SUBDIRS = macosx minimal_macosx qt4 skins2 macosx_dialog_provider
 SUBDIRS =
 
 if HAVE_DARWIN
-SUBDIRS += macosx macosx_dialog_provider
+SUBDIRS += macosx macosx_dialog_provider minimal_macosx
 endif
 if ENABLE_QT4
 SUBDIRS += qt4

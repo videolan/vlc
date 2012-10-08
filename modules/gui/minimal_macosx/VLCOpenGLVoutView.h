@@ -33,15 +33,11 @@
 #include <OpenGL/gl.h>
 
 #include <vlc_common.h>
+#include <vlc_vout_window.h>
 
 /* Entry point */
-int  cocoaglvoutviewInit( vout_thread_t * p_vout );
-void cocoaglvoutviewEnd( vout_thread_t * p_vout );
-int  cocoaglvoutviewManage( vout_thread_t * p_vout );
-int  cocoaglvoutviewControl( vout_thread_t *p_vout, int i_query, va_list args );
-void cocoaglvoutviewSwap( vout_thread_t * p_vout );
-int  cocoaglvoutviewLock( vout_thread_t * p_vout );
-void cocoaglvoutviewUnlock( vout_thread_t * p_vout );
+int  cocoaglvoutviewInit( vout_window_t * p_vout, const vout_window_cfg_t *cfg );
+void cocoaglvoutviewEnd( vout_window_t * p_vout );
 
 /* To commmunicate with the VLC.framework */
 @protocol VLCOpenGLVoutEmbedding <NSObject>
@@ -57,23 +53,20 @@ void cocoaglvoutviewUnlock( vout_thread_t * p_vout );
 @end
 
 /* VLCOpenGLVoutView */
-@interface VLCOpenGLVoutView : NSOpenGLView
+@interface VLCOpenGLVoutView : NSView
 {
     id <VLCOpenGLVoutEmbedding> container;
-    vout_thread_t * p_vout;
+    vout_window_t * p_wnd;
     NSLock        * objectLock;
 }
 /* Init a new gl view and register it to both the framework and the
  * vout_thread_t. Must be called from main thread */
 + (void) autoinitOpenGLVoutViewIntVoutWithContainer: (NSData *) args;
 
-- (id) initWithVout: (vout_thread_t *) vout container: (id <VLCOpenGLVoutEmbedding>) container;
+- (id) initWithVoutWindow: (vout_window_t *) p_wnd container: (id <VLCOpenGLVoutEmbedding>) container;
 
-- (void) detachFromVout;
+- (void) detachFromVoutWindow;
 - (id <VLCOpenGLVoutEmbedding>) container;
 
-- (void) reshape;
-- (void) update;
-- (void) drawRect: (NSRect) rect;
 @end
 

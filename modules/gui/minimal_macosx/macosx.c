@@ -36,6 +36,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_vout_window.h>
 
 /*****************************************************************************
  * External prototypes
@@ -43,8 +44,8 @@
 int  OpenIntf     ( vlc_object_t * );
 void CloseIntf    ( vlc_object_t * );
 
-int  OpenVideoGL  ( vlc_object_t * );
-void CloseVideoGL ( vlc_object_t * );
+int  WindowOpen   ( vout_window_t *, const vout_window_cfg_t * );
+void WindowClose  ( vout_window_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -61,12 +62,9 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INTERFACE_MAIN )
 
     add_submodule ()
-        /* Will be loaded even without interface module. see voutgl.m */
-        add_shortcut( "minimal_macosx", "miosx" )
-        set_description( N_("Minimal Mac OS X OpenGL video output (opens a borderless window)") )
-        set_capability( "opengl provider", 50 )
-        set_category( CAT_VIDEO)
-        set_subcategory( SUBCAT_VIDEO_VOUT )
-        set_callbacks( OpenVideoGL, CloseVideoGL )
+    /* Will be loaded even without interface module. see voutgl.m */
+        set_description( "Minimal Mac OS X Video Output Provider" )
+        set_capability( "vout window nsobject", 100 )
+        set_callbacks( WindowOpen, WindowClose )
 vlc_module_end ()
 

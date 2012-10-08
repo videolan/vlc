@@ -9,12 +9,10 @@ SOURCES_minimal_macosx = \
 	VLCMinimalVoutWindow.m \
 	VLCOpenGLVoutView.m \
 	voutgl.m \
-	voutagl.m \
 	$(NULL)
 
 noinst_HEADERS = \
 	intf.h \
 	VLCMinimalVoutWindow.h \
 	VLCOpenGLVoutView.h \
-	voutagl.h \
 	voutgl.h
