@@ -188,6 +188,7 @@ $Id$
  * mash: OpenMash based decoder
  * mce: Nokia MCE screen unblanking module
  * media_library: a sql based media library
+ * mediacodec: Android Jelly Bean MediaCodec decoder module
  * mediadirs: Picture/Music/Video user directories as service discoveries
  * minimal_macosx: a minimal Mac OS X GUI, using the FrameWork
  * mirror: mirror video filter

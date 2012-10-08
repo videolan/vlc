@@ -369,6 +369,7 @@ modules/codec/libmpeg2.c
 modules/codec/lpcm.c
 modules/codec/mash.cpp
 modules/codec/mpeg_audio.c
+modules/codec/omxil/android_mediacodec.c
 modules/codec/omxil/omxil.c
 modules/codec/omxil/omxil.h
 modules/codec/omxil/omxil_utils.h
