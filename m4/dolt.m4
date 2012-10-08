@@ -26,7 +26,7 @@ case $host in
 |amd64-*-freebsd*|i?86-*-freebsd*|ia64-*-freebsd*)
     pic_options='-fPIC'
     ;;
-i?86-apple-darwin*)
+*-apple-darwin*)
     pic_options='-fno-common'
     ;;
 *mingw*|*nacl*)
