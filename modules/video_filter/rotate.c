@@ -95,7 +95,6 @@ struct filter_sys_t
     int            i_cos;
     int            i_sin;
     int            i_angle;
-    bool           b_motion;
     motion_sensors_t *p_motion;
 };
 
@@ -145,8 +144,8 @@ static int Create( vlc_object_t *p_this )
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
-    p_sys->b_motion = var_InheritBool( p_filter, FILTER_PREFIX "use-motion" );
-    if( p_sys->b_motion )
+    p_sys->p_motion = NULL;
+    if( var_InheritBool( p_filter, FILTER_PREFIX "use-motion" ) )
     {
         p_sys->p_motion = motion_create( VLC_OBJECT( p_filter ) );
         if( p_sys->p_motion == NULL )
@@ -180,7 +179,7 @@ static void Destroy( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( p_sys->b_motion )
+    if( p_sys->p_motion != NULL )
         motion_destroy( p_sys->p_motion );
     else
     {
@@ -210,7 +209,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    if( p_sys->b_motion )
+    if( p_sys->p_motion != NULL )
     {
         int i_angle = motion_get_angle( p_sys->p_motion );
         if( p_sys->i_angle != i_angle )
@@ -226,7 +225,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     const int i_sin = p_sys->i_sin;
     const int i_cos = p_sys->i_cos;
 
-    if( !p_sys->b_motion )
+    if( p_sys->p_motion == NULL )
         vlc_spin_unlock( &p_sys->lock );
 
     for( int i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
@@ -375,7 +374,7 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     const int i_line_center = i_visible_lines>>1;
     const int i_col_center  = i_visible_pitch>>1;
 
-    if( p_sys->b_motion )
+    if( p_sys->p_motion != NULL )
     {
         int i_angle = motion_get_angle( p_sys->p_motion );
         if( p_sys->i_angle != i_angle )
@@ -391,7 +390,7 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     const int i_sin = p_sys->i_sin;
     const int i_cos = p_sys->i_cos;
 
-    if( !p_sys->b_motion )
+    if( p_sys->p_motion == NULL )
         vlc_spin_unlock( &p_sys->lock );
 
     int i_col, i_line;
