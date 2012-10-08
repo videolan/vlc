@@ -147,10 +147,13 @@ libiomx_plugin_la_SOURCES = $(libomxil_plugin_la_SOURCES)
 libiomx_plugin_la_CPPFLAGS = $(libomxil_plugin_la_CPPFLAGS) -DUSE_IOMX
 libiomx_plugin_la_LIBADD = $(libomxil_plugin_la_LIBADD)
 
+libmediacodec_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/omxil
+libmediacodec_plugin_la_SOURCES = omxil/android_mediacodec.c omxil/utils.c
+
 libvlc_LTLIBRARIES += $(LTLIBomxil)
 EXTRA_LTLIBRARIES += libomxil_plugin.la
 if HAVE_ANDROID
-libvlc_LTLIBRARIES += libiomx_plugin.la
+libvlc_LTLIBRARIES += libiomx_plugin.la libmediacodec_plugin.la
 endif
 
 ### Windows DLL loader ###
