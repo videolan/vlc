@@ -134,9 +134,10 @@ static void Copy2d(uint8_t *dst, size_t dst_pitch,
 
     for (unsigned y = 0; y < height; y++) {
         unsigned x = 0;
-        bool unaligned = ((intptr_t)dst & 0x0f) != 0;
 
 #ifdef CAN_COMPILE_SSE2
+        bool unaligned = ((intptr_t)dst & 0x0f) != 0;
+
         if (vlc_CPU_SSE2()) {
             if (!unaligned) {
                 for (; x+63 < width; x += 64)
