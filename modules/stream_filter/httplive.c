@@ -653,13 +653,13 @@ static int parse_StreamInformation(stream_t *s, vlc_array_t **hls_stream,
     assert(*hls == NULL);
 
     attr = parse_Attributes(p_read, "PROGRAM-ID");
-    if (attr == NULL)
+    if (attr)
     {
-        msg_Err(s, "#EXT-X-STREAM-INF: expected PROGRAM-ID=<value>");
-        return VLC_EGENERIC;
+        id = atol(attr);
+        free(attr);
     }
-    id = atol(attr);
-    free(attr);
+    else
+        id = 0;
 
     attr = parse_Attributes(p_read, "BANDWIDTH");
     if (attr == NULL)
