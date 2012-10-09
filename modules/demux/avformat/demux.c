@@ -252,8 +252,9 @@ int OpenDemux( vlc_object_t *p_this )
 
 #if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(26<<8)+0)
     char *psz_opts = var_InheritString( p_demux, "avformat-options" );
-    AVDictionary *options[p_sys->ic->nb_streams];
-    for (unsigned i = 0; i < p_sys->ic->nb_streams; i++)
+    AVDictionary *options[p_sys->ic->nb_streams ? p_sys->ic->nb_streams : 1];
+    options[0] = NULL;
+    for (unsigned i = 1; i < p_sys->ic->nb_streams; i++)
         options[i] = NULL;
     if (psz_opts && *psz_opts) {
         options[0] = vlc_av_get_options(psz_opts);
@@ -269,7 +270,8 @@ int OpenDemux( vlc_object_t *p_this )
     while ((t = av_dict_get(options[0], "", t, AV_DICT_IGNORE_SUFFIX))) {
         msg_Err( p_demux, "Unknown option \"%s\"", t->key );
     }
-    for (unsigned i = 0; i < p_sys->ic->nb_streams; i++) {
+    av_dict_free(&options[0]);
+    for (unsigned i = 1; i < p_sys->ic->nb_streams; i++) {
         av_dict_free(&options[i]);
     }
 #else
