@@ -158,6 +158,16 @@ function parse()
                     url_map = string.gsub( url_map, "\\u0026", "&" )
                     path = pick_url( url_map, fmt )
                 end
+
+                if not path then
+                    -- If this is a live stream, the URL map will be empty
+                    -- and we get the URL from this field instead 
+                    local hlsvp = string.match( line, "\"hlsvp\": \"(.-)\"" )
+                    if hlsvp then
+                        hlsvp = string.gsub( hlsvp, "\\/", "/" )
+                        path = hlsvp
+                    end
+                end
             -- There is also another version of the parameters, encoded
             -- differently, as an HTML attribute of an <object> or <embed>
             -- tag; but we don't need it now
@@ -207,6 +217,16 @@ function parse()
         if url_map then
             url_map = vlc.strings.decode_uri( url_map )
             path = pick_url( url_map, fmt )
+        end
+
+        if not path then
+            -- If this is a live stream, the URL map will be empty
+            -- and we get the URL from this field instead 
+            local hlsvp = string.match( line, "&hlsvp=([^&]*)" )
+            if hlsvp then
+                hlsvp = vlc.strings.decode_uri( hlsvp )
+                path = hlsvp
+            end
         end
 
         if not path then
