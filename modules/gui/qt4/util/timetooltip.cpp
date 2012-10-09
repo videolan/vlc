@@ -142,6 +142,13 @@ void TimeTooltip::setTip( const QPoint& target, const QString& time, const QStri
 void TimeTooltip::show()
 {
     QWidget::setVisible( mInitialized );
+#ifdef Q_WS_PM
+    // Bring a tooltip on the top
+    // Without this, tooltip does not appear on fullscreen
+    // from the second fullscreen state change
+    if( mInitialized )
+        QWidget::raise();
+#endif
 }
 
 void TimeTooltip::paintEvent( QPaintEvent * )
