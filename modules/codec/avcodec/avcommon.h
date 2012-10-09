@@ -29,6 +29,8 @@
 #include <vlc_configuration.h>
 #include <vlc_variables.h>
 
+unsigned GetVlcDspMask( void );
+
 #ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
 # include <libavformat/avformat.h>
 static inline void vlc_init_avformat(void)

@@ -44,6 +44,7 @@ libavi_plugin_la_LIBADD = $(AM_LIBADD)
 libavformat_plugin_la_SOURCES = avformat/demux.c \
 	../codec/avcodec/fourcc.c \
 	../codec/avcodec/chroma.c \
+	../codec/avcodec/cpu.c \
 	../codec/avcodec/avcommon.h \
 	vobsub.h \
 	avformat/avformat.c avformat/avformat.h

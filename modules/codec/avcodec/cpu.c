@@ -27,7 +27,7 @@
 
 #define HAVE_MMX 1
 #include <libavcodec/avcodec.h>
-#include "avcodec.h"
+#include "avcommon.h"
 
 /**
  * Maps CPU capabilities computed by VLC to libav DSP mask.
