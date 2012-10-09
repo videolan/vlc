@@ -376,11 +376,15 @@ static VLCOpen *_o_sharedMainInstance = nil;
     p_item = config_FindConfig(VLC_OBJECT(p_intf), "subsdec-encoding");
 
     if (p_item) {
-        for (i_index = 0; p_item->list.psz && p_item->list.psz[i_index]; i_index++)
-            [o_file_sub_encoding_pop addItemWithTitle: [NSString stringWithUTF8String: p_item->list.psz[i_index]]];
+        for (int i = 0; i < p_item->list_count; i++) {
+            [o_file_sub_encoding_pop addItemWithTitle: _NS(p_item->list_text[i])];
+            [[o_file_sub_encoding_pop lastItem] setRepresentedObject:[NSString stringWithFormat:@"%s", p_item->list.psz[i]]];
+            if (p_item->value.psz && !strcmp(p_item->value.psz, p_item->list.psz[i]))
+                [o_file_sub_encoding_pop selectItem: [o_file_sub_encoding_pop lastItem]];
+        }
 
-        [o_file_sub_encoding_pop selectItemWithTitle:
-                [NSString stringWithUTF8String: p_item->value.psz]];
+        if ([o_file_sub_encoding_pop indexOfSelectedItem] < 0)
+            [o_file_sub_encoding_pop selectItemAtIndex:0];
     }
 
     p_item = config_FindConfig(VLC_OBJECT(p_intf), "subsdec-align");
@@ -430,11 +434,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
                 [o_options addObject: [NSString stringWithFormat: @"sub-fps=%f", [o_file_sub_fps floatValue]]];
             }
             [o_options addObject: [NSString stringWithFormat:
-                    @"subsdec-encoding=%@",
-                    [o_file_sub_encoding_pop titleOfSelectedItem]]];
+                    @"subsdec-encoding=%@", [[o_file_sub_encoding_pop selectedItem] representedObject]]];
             [o_options addObject: [NSString stringWithFormat:
-                    @"subsdec-align=%li",
-                    [o_file_sub_align_pop indexOfSelectedItem]]];
+                    @"subsdec-align=%li", [o_file_sub_align_pop indexOfSelectedItem]]];
 
             p_item = config_FindConfig(VLC_OBJECT(p_intf),
                                             "freetype-rel-fontsize");
