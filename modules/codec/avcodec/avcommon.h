@@ -29,6 +29,8 @@
 #include <vlc_configuration.h>
 #include <vlc_variables.h>
 
+#include <limits.h>
+
 unsigned GetVlcDspMask( void );
 
 #ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
@@ -36,6 +38,7 @@ unsigned GetVlcDspMask( void );
 static inline void vlc_init_avformat(void)
 {
     vlc_avcodec_lock();
+    av_set_cpu_flags_mask( INT_MAX & ~GetVlcDspMask() );
 
     av_register_all();
 
