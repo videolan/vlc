@@ -570,8 +570,8 @@ static int sms_Read( stream_t *s, uint8_t *p_read, int i_read )
             }
             if( !p_sys->b_cache || p_sys->b_live )
             {
-                block_Release( chunk->data );
-                chunk->data = NULL;
+                FREENULL( chunk->data );
+                chunk->read_pos = 0;
             }
 
             chunk->read_pos = 0;
@@ -589,14 +589,14 @@ static int sms_Read( stream_t *s, uint8_t *p_read, int i_read )
                         verb, chunk->sequence, i_read, chunk->type );
             /* check integrity */
             uint32_t type;
-            uint8_t *slice = chunk->data->p_buffer;
+            uint8_t *slice = chunk->data;
             SMS_GET4BYTES( type );
             SMS_GETFOURCC( type );
             assert( type == ATOM_moof || type == ATOM_uuid );
         }
 
         int len = -1;
-        uint8_t *src = chunk->data->p_buffer + chunk->read_pos;
+        uint8_t *src = chunk->data + chunk->read_pos;
         if( i_read <= chunk->size - chunk->read_pos )
             len = i_read;
         else
@@ -655,7 +655,7 @@ static int Peek( stream_t *s, const uint8_t **pp_peek, unsigned i_peek )
         msg_Err( s, "could not peek %u bytes, only %i!", i_peek, bytes );
     }
     msg_Dbg( s, "peeking at chunk %u!", chunk->sequence );
-    *pp_peek = chunk->data->p_buffer + chunk->read_pos;
+    *pp_peek = chunk->data + chunk->read_pos;
 
     return bytes;
 }

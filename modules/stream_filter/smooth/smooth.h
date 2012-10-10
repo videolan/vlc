@@ -49,7 +49,7 @@ typedef struct chunk_s
     int         read_pos;   /* position in the chunk */
     int         type;       /* video, audio, or subtitles */
 
-    block_t     *data;
+    uint8_t     *data;
 } chunk_t;
 
 typedef struct quality_level_s

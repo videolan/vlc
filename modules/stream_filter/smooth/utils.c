@@ -98,9 +98,8 @@ chunk_t *chunk_New( sms_stream_t* sms, uint64_t duration,\
 void chunk_Free( chunk_t *chunk )
 {
     if( chunk->data )
-        block_Release( chunk->data );
-    free( chunk );
-    chunk = NULL;
+        FREENULL( chunk->data );
+    FREENULL( chunk );
 }
 
 sms_stream_t * sms_New( void )

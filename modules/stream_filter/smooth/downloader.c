@@ -78,7 +78,7 @@ static unsigned set_track_id( chunk_t *chunk, const unsigned tid )
     uint32_t size, type;
     if( !chunk->data )
         return 0;
-    uint8_t *slice = chunk->data->p_buffer;
+    uint8_t *slice = chunk->data;
     if( !slice )
         return 0;
 
@@ -121,7 +121,7 @@ static int sms_Download( stream_t *s, chunk_t *chunk, char *url )
     chunk->offset = p_sys->download.next_chunk_offset;
     p_sys->download.next_chunk_offset += chunk->size;
 
-    chunk->data = block_Alloc( size );
+    chunk->data = malloc( size );
 
     if( chunk->data == NULL )
     {
@@ -129,12 +129,12 @@ static int sms_Download( stream_t *s, chunk_t *chunk, char *url )
         return VLC_ENOMEM;
     }
 
-    int read = stream_Read( p_ts, chunk->data->p_buffer, size );
+    int read = stream_Read( p_ts, chunk->data, size );
     if( read < size )
     {
         msg_Warn( s, "sms_Download: I requested %"PRIi64" bytes, "\
                 "but I got only %i", size, read );
-        chunk->data = block_Realloc( chunk->data, 0, read );
+        chunk->data = realloc( chunk->data, read );
     }
 
     stream_Delete( p_ts );
@@ -190,7 +190,7 @@ static int get_new_chunks( stream_t *s, chunk_t *ck )
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    uint8_t *slice = ck->data->p_buffer;
+    uint8_t *slice = ck->data;
     if( !slice )
         return VLC_EGENERIC;
     uint8_t version, fragment_count;
@@ -359,11 +359,11 @@ static chunk_t *build_init_chunk( stream_t *s )
         goto build_init_chunk_error;
 
     ret->size = SMOO_SIZE;
-    ret->data = block_Alloc( SMOO_SIZE );
+    ret->data = malloc( SMOO_SIZE );
     if( !ret->data )
         goto build_init_chunk_error;
 
-    int res = build_smoo_box( s, ret->data->p_buffer );
+    int res = build_smoo_box( s, ret->data );
     if( res != VLC_SUCCESS )
         goto build_init_chunk_error;
 
@@ -639,8 +639,7 @@ void* sms_Thread( void *p_this )
                 ck->read_pos = 0;
                 if( ck->data == NULL )
                     continue;
-                block_Release( ck->data );
-                ck->data = NULL;
+                FREENULL( ck->data );
             }
 
             vlc_array_destroy( p_sys->download.chunks );
