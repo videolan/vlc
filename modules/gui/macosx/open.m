@@ -410,6 +410,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (void)openTarget:(int)i_type
 {
+    /* check whether we already run a modal dialog */
+    if ([NSApp modalWindow] != nil)
+        return;
+
     int i_result;
 
     b_autoplay = config_GetInt(VLCIntf, "macosx-autoplay");
