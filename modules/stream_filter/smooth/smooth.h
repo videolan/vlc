@@ -92,6 +92,7 @@ struct stream_sys_t
 
     vlc_array_t  *sms_streams; /* available streams */
     vlc_array_t  *selected_st; /* selected streams */
+    vlc_array_t  *init_chunks;
     unsigned     i_tracks;     /* Total number of tracks in the Manifest */
     sms_queue_t  *bws;         /* Measured bandwidths of the N last chunks */
     uint64_t     vod_duration; /* total duration of the VOD media */

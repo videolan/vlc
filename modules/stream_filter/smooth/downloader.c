@@ -514,6 +514,7 @@ static int Download( stream_t *s, sms_stream_t *sms )
 
         vlc_mutex_lock( &p_sys->download.lock_wait );
         vlc_array_append( p_sys->download.chunks, new_init_ck );
+        vlc_array_append( p_sys->init_chunks, new_init_ck );
         vlc_mutex_unlock( &p_sys->download.lock_wait );
     }
     return VLC_SUCCESS;
@@ -578,6 +579,7 @@ void* sms_Thread( void *p_this )
 
     vlc_mutex_lock( &p_sys->download.lock_wait );
     vlc_array_append( p_sys->download.chunks, init_ck );
+    vlc_array_append( p_sys->init_chunks, init_ck );
     vlc_mutex_unlock( &p_sys->download.lock_wait );
 
     p_sys->download.next_chunk_offset = init_ck->size;
@@ -664,6 +666,7 @@ void* sms_Thread( void *p_this )
             p_sys->download.next_chunk_offset += new_init_ck->size;
 
             vlc_array_append( p_sys->download.chunks, new_init_ck );
+            vlc_array_append( p_sys->init_chunks, new_init_ck );
             p_sys->b_tseek = false;
         }
         vlc_mutex_unlock( &p_sys->download.lock_wait );

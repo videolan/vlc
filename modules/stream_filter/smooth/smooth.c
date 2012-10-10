@@ -403,8 +403,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->sms_streams = vlc_array_new();
     p_sys->selected_st = vlc_array_new();
     p_sys->download.chunks = vlc_array_new();
+    p_sys->init_chunks = vlc_array_new();
     if( unlikely( !p_sys->sms_streams || !p_sys->download.chunks ||
-                  !p_sys->selected_st ) )
+                  !p_sys->selected_st || !p_sys->init_chunks ) )
     {
         free( p_sys );
         return VLC_ENOMEM;
@@ -492,14 +493,22 @@ static void Close( vlc_object_t *p_this )
     for( int i = 0; i < vlc_array_count( p_sys->sms_streams ); i++ )
     {
         sms = vlc_array_item_at_index( p_sys->sms_streams, i );
-        if( sms)
+        if( sms )
             sms_Free( sms );
+    }
+    /* Free downloaded chunks */
+    chunk_t *chunk;
+    for( int i = 0; i < vlc_array_count( p_sys->init_chunks ); i++ )
+    {
+        chunk = vlc_array_item_at_index( p_sys->init_chunks, i );
+        chunk_Free( chunk );
     }
 
     sms_queue_free( p_sys->bws );
     vlc_array_destroy( p_sys->sms_streams );
     vlc_array_destroy( p_sys->selected_st );
     vlc_array_destroy( p_sys->download.chunks );
+    vlc_array_destroy( p_sys->init_chunks );
 
     free( p_sys->base_url );
     free( p_sys );
