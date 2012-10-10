@@ -1144,14 +1144,13 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         msg_Dbg( p_dec, "Available decoder output format %d (%s)", pi_fmt[i],
                  name ? name : "unknown" );
 
+        vlc_va_t *p_va = NULL;
 #ifdef HAVE_AVCODEC_VAAPI
         /* Only VLD supported */
         if( pi_fmt[i] == PIX_FMT_VAAPI_VLD )
         {
             msg_Dbg( p_dec, "Trying VA API" );
-            p_sys->p_va = vlc_va_NewVaapi( VLC_OBJECT(p_dec), p_sys->i_codec_id );
-            if( !p_sys->p_va )
-                msg_Warn( p_dec, "Failed to open VA API" );
+            p_va = vlc_va_NewVaapi( VLC_OBJECT(p_dec), p_sys->i_codec_id );
         }
 #endif
 
@@ -1159,9 +1158,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         if( pi_fmt[i] == PIX_FMT_DXVA2_VLD )
         {
             msg_Dbg( p_dec, "Trying DXVA2" );
-            p_sys->p_va = vlc_va_NewDxva2( VLC_OBJECT(p_dec), p_sys->i_codec_id );
-            if( !p_sys->p_va )
-                msg_Warn( p_dec, "Failed to open DXVA2" );
+            p_va = vlc_va_NewDxva2( VLC_OBJECT(p_dec), p_sys->i_codec_id );
         }
 #endif
 
@@ -1169,40 +1166,39 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         if( pi_fmt[i] == PIX_FMT_VDA_VLD )
         {
             msg_Dbg( p_dec, "Trying VDA" );
-            p_sys->p_va = vlc_va_NewVDA( VLC_OBJECT(p_dec), p_sys->i_codec_id, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
-            if( !p_sys->p_va )
-                msg_Warn( p_dec, "Failed to open VDA" );
+            p_va = vlc_va_NewVDA( VLC_OBJECT(p_dec), p_sys->i_codec_id, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
         }
 #endif
-
-        if( p_sys->p_va &&
-            p_context->width > 0 && p_context->height > 0 )
+        if( p_va == NULL )
+        {
+            msg_Dbg( p_dec, "acceleration not available" );
+            continue;
+        }
+        if( p_context->width > 0 && p_context->height > 0 )
         {
             /* We try to call vlc_va_Setup when possible to detect errors when
              * possible (later is too late) */
-            if( vlc_va_Setup( p_sys->p_va,
-                              &p_context->hwaccel_context,
+            if( vlc_va_Setup( p_va, &p_context->hwaccel_context,
                               &p_dec->fmt_out.video.i_chroma,
                               p_context->width, p_context->height ) )
             {
                 msg_Err( p_dec, "vlc_va_Setup failed" );
-                vlc_va_Delete( p_sys->p_va );
-                p_sys->p_va = NULL;
+                vlc_va_Delete( p_va );
+                continue;
             }
         }
 
-        if( p_sys->p_va )
-        {
-            if( p_sys->p_va->description )
-                msg_Info( p_dec, "Using %s for hardware decoding.", p_sys->p_va->description );
+        p_sys->p_va = p_va;
+        if( p_va->description )
+            msg_Info( p_dec, "Using %s for hardware decoding.",
+                      p_va->description );
 
-            /* FIXME this will disabled direct rendering
-             * even if a new pixel format is renegociated
-             */
-            p_sys->b_direct_rendering = false;
-            p_context->draw_horiz_band = NULL;
-            return pi_fmt[i];
-        }
+        /* FIXME this will disable direct rendering
+         * even if a new pixel format is renegotiated
+         */
+        p_sys->b_direct_rendering = false;
+        p_context->draw_horiz_band = NULL;
+        return pi_fmt[i];
     }
 
     /* Fallback to default behaviour */
