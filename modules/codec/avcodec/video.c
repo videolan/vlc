@@ -59,6 +59,7 @@
 #include "va.h"
 #if defined(HAVE_AVCODEC_VAAPI) || defined(HAVE_AVCODEC_DXVA2) || defined(HAVE_AVCODEC_VDA)
 #   define HAVE_AVCODEC_VA
+#   include <libavutil/pixdesc.h>
 #endif
 
 /*****************************************************************************
@@ -1156,21 +1157,9 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     /* Try too look for a supported hw acceleration */
     for( int i = 0; pi_fmt[i] != PIX_FMT_NONE; i++ )
     {
-        static const char *ppsz_name[PIX_FMT_NB] = {
-            [PIX_FMT_VDPAU_H264] = "PIX_FMT_VDPAU_H264",
-            [PIX_FMT_VAAPI_IDCT] = "PIX_FMT_VAAPI_IDCT",
-            [PIX_FMT_VAAPI_VLD] = "PIX_FMT_VAAPI_VLD",
-            [PIX_FMT_VAAPI_MOCO] = "PIX_FMT_VAAPI_MOCO",
-#ifdef HAVE_AVCODEC_DXVA2
-            [PIX_FMT_DXVA2_VLD] = "PIX_FMT_DXVA2_VLD",
-#endif
-#ifdef HAVE_AVCODEC_VDA
-            [PIX_FMT_VDA_VLD] = "PIX_FMT_VDA_VLD",
-#endif
-            [PIX_FMT_YUYV422] = "PIX_FMT_YUYV422",
-            [PIX_FMT_YUV420P] = "PIX_FMT_YUV420P",
-        };
-        msg_Dbg( p_dec, "Available decoder output format %d (%s)", pi_fmt[i], ppsz_name[pi_fmt[i]] ?: "Unknown" );
+        const char *name = av_get_pix_fmt_name(pi_fmt[i]);
+        msg_Dbg( p_dec, "Available decoder output format %d (%s)", pi_fmt[i],
+                 name ? name : "unknown" );
 
         /* Only VLD supported */
         if( pi_fmt[i] == PIX_FMT_VAAPI_VLD )
