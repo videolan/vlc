@@ -165,6 +165,7 @@ struct stream_sys_t
 #define NO_MORE_CHUNKS ( !p_sys->b_live && \
     no_more_chunks( p_sys->download.ck_index, p_sys->selected_st ) )
 
+void sms_queue_free( sms_queue_t* );
 sms_queue_t *sms_queue_init( const int );
 int sms_queue_put( sms_queue_t *, const uint64_t );
 uint64_t sms_queue_avg( sms_queue_t *);

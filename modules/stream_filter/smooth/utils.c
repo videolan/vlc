@@ -136,6 +136,8 @@ void sms_Free( sms_stream_t *sms )
         vlc_array_destroy( sms->chunks );
     }
 
+    free( sms->name );
+    free( sms->url_template );
     free( sms );
     sms = NULL;
 }
@@ -162,18 +164,37 @@ sms_queue_t *sms_queue_init( const int length )
     return ret;
 }
 
+void sms_queue_free( sms_queue_t* queue )
+{
+    item_t *item = queue->first, *next = NULL;
+    while( item )
+    {
+        next = item->next;
+        FREENULL( item );
+        item = next;
+    }
+    FREENULL( queue );
+}
+
 int sms_queue_put( sms_queue_t *queue, const uint64_t value )
 {
-    item_t *last = queue->first;
-    int i = 0;
-    for( i = 0; i < queue->length - 1; i++ )
+    /* Remove the last (and oldest) item */
+    item_t *item, *prev;
+    int count = 0;
+    for( item = queue->first; item != NULL; item = item->next )
     {
-        if( last )
-            last = last->next;
+        count++;
+        if( count == queue->length )
+        {
+            FREENULL( item );
+            if( prev ) prev->next = NULL;
+            break;
+        }
+        else
+            prev = item;
     }
-    if( i == queue->length - 1 )
-        FREENULL( last );
 
+    /* Now insert the new item */
     item_t *new = malloc( sizeof( item_t ) );
     if( unlikely( !new ) )
         return VLC_ENOMEM;

@@ -146,9 +146,7 @@ static int parse_Manifest( stream_t *s )
     }
 
     const char *node;
-    char *stream_name = NULL;
     uint8_t *WaveFormatEx;
-    int stream_type = UNKNOWN_ES;
     sms_stream_t *sms = NULL;
     quality_level_t *ql = NULL;
     int64_t start_time = 0, duration = 0;
@@ -192,15 +190,15 @@ static int parse_Manifest( stream_t *s )
                         if( !strcmp( name, "Type" ) )
                         {
                             if( !strcmp( value, "video" ) )
-                                stream_type = VIDEO_ES;
+                                sms->type = VIDEO_ES;
                             else if( !strcmp( value, "audio" ) )
-                                stream_type = AUDIO_ES;
+                                sms->type = AUDIO_ES;
                             else if( !strcmp( value, "text" ) )
-                                stream_type = SPU_ES;
+                                sms->type = SPU_ES;
                         }
 
                         if( !strcmp( name, "Name" ) )
-                            stream_name = strdup( value );
+                            sms->name = strdup( value );
                         if( !strcmp( name, "TimeScale" ) )
                             sms->timescale = strtoull( value, NULL, 10 );
                         if( !strcmp( name, "FourCC" ) )
@@ -222,18 +220,16 @@ static int parse_Manifest( stream_t *s )
 
                     if( sms && !sms->timescale )
                         sms->timescale = TIMESCALE;
-                    if( !stream_name )
+                    if( !sms->name )
                     {
-                        if( stream_type == VIDEO_ES )
-                            stream_name = strdup( "video" );
-                        else if( stream_type == AUDIO_ES )
-                            stream_name = strdup( "audio" );
-                        else if( stream_type == SPU_ES )
-                            stream_name = strdup( "text" );
+                        if( sms->type == VIDEO_ES )
+                            sms->name = strdup( "video" );
+                        else if( sms->type == AUDIO_ES )
+                            sms->name = strdup( "audio" );
+                        else if( sms->type == SPU_ES )
+                            sms->name = strdup( "text" );
                     }
 
-                    sms->name = stream_name;
-                    sms->type = stream_type;
                     vlc_array_append( p_sys->sms_streams, sms );
                 }
 
@@ -346,8 +342,6 @@ static int parse_Manifest( stream_t *s )
                 if( strcmp( node, "StreamIndex" ) )
                     break;
 
-                stream_name = NULL;
-                stream_type = UNKNOWN_ES;
                 computed_start_time = 0;
                 computed_duration = 0;
                 loop_count = 0;
@@ -502,7 +496,9 @@ static void Close( vlc_object_t *p_this )
             sms_Free( sms );
     }
 
+    sms_queue_free( p_sys->bws );
     vlc_array_destroy( p_sys->sms_streams );
+    vlc_array_destroy( p_sys->selected_st );
     vlc_array_destroy( p_sys->download.chunks );
 
     free( p_sys->base_url );
