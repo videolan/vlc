@@ -1161,23 +1161,17 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         msg_Dbg( p_dec, "Available decoder output format %d (%s)", pi_fmt[i],
                  name ? name : "unknown" );
 
+#ifdef HAVE_AVCODEC_VAAPI
         /* Only VLD supported */
         if( pi_fmt[i] == PIX_FMT_VAAPI_VLD )
         {
-            if( !var_InheritBool( p_dec, "xlib" ) )
-            {
-                msg_Warn( p_dec, "Ignoring VA API" );
-                continue;
-            }
-#ifdef HAVE_AVCODEC_VAAPI
             msg_Dbg( p_dec, "Trying VA API" );
             p_sys->p_va = vlc_va_NewVaapi( VLC_OBJECT(p_dec), p_sys->i_codec_id );
             if( !p_sys->p_va )
                 msg_Warn( p_dec, "Failed to open VA API" );
-#else
-            continue;
-#endif
         }
+#endif
+
 #ifdef HAVE_AVCODEC_DXVA2
         if( pi_fmt[i] == PIX_FMT_DXVA2_VLD )
         {

@@ -509,7 +509,10 @@ static void Delete( vlc_va_t *p_external )
 vlc_va_t *vlc_va_NewVaapi( vlc_object_t *obj, int i_codec_id )
 {
     if( !vlc_xlib_init( obj ) )
+    {
+        msg_Warn( obj, "Ignoring VA API" );
         return NULL;
+    }
 
     vlc_va_vaapi_t *p_va = calloc( 1, sizeof(*p_va) );
     if( !p_va )
