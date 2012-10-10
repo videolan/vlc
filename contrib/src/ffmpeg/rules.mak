@@ -6,7 +6,6 @@ FFMPEG_SNAPURL := http://git.libav.org/?p=libav.git;a=snapshot;h=HEAD;sf=tgz
 FFMPEGCONF = \
 	--cc="$(CC)" \
 	--disable-doc \
-	--disable-decoder=libvpx \
 	--disable-decoder=bink \
 	--enable-libgsm \
 	--enable-libopenjpeg \
@@ -24,7 +23,7 @@ DEPS_ffmpeg = zlib gsm openjpeg
 
 # Optional dependencies
 ifdef BUILD_ENCODERS
-FFMPEGCONF += --enable-libmp3lame --enable-libvpx
+FFMPEGCONF += --enable-libmp3lame --enable-libvpx --disable-decoder=libvpx
 DEPS_ffmpeg += lame $(DEPS_lame) vpx $(DEPS_vpx)
 else
 FFMPEGCONF += --disable-encoders --disable-muxers
@@ -39,11 +38,6 @@ FFMPEGCONF += --enable-thumb
 endif
 endif
 endif
-
-# XXX: REVISIT
-#ifndef HAVE_FPU
-#FFMPEGCONF += --disable-mpegaudio-hp
-#endif
 
 ifdef HAVE_CROSS_COMPILE
 FFMPEGCONF += --enable-cross-compile
@@ -117,8 +111,6 @@ else
 FFMPEGCONF += --enable-pthreads
 endif
 
-FFMPEG_CFLAGS += --std=gnu99
-
 # Build
 
 PKGS += ffmpeg
@@ -139,14 +131,10 @@ ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz .sum-ffmpeg
 	rm -Rf $@ $@-git
 	mkdir -p $@-git
 	$(ZCAT) "$<" | (cd $@-git && tar xv --strip-components=1)
-ifdef HAVE_WIN32
-	sed -i "s/std=c99/std=gnu99/" $@-$(FFMPEG_VERSION)/configure
-endif
 	$(MOVE)
 
 .ffmpeg: ffmpeg
 	cd $< && $(HOSTVARS) ./configure \
-		--extra-cflags="$(FFMPEG_CFLAGS) -DHAVE_STDINT_H"  \
 		--extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) \
 		--prefix="$(PREFIX)" --enable-static --disable-shared
 	cd $< && $(MAKE) install-libs install-headers
