@@ -648,6 +648,10 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                 HtmlCopy( &psz_html, &psz_subtitle, "<font " );
                 strcat( psz_tag, "f" );
 
+                /* <font       color= */
+                while (*psz_subtitle == ' ')
+                    psz_subtitle++;
+
                 while( *psz_subtitle != '>' )
                 {
                     int  k;
@@ -661,6 +665,10 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                             /* */
                             HtmlPut( &psz_html, psz_attribs[k] );
                             psz_subtitle += i_len;
+
+                            /* <font       color=   red */
+                            while (*psz_subtitle == ' ')
+                                psz_subtitle++;
 
                             /* */
                             if( *psz_subtitle == '"' )
@@ -699,15 +707,16 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                         }
                         /* Not a tag, something else we do not understand */
                         if( i_len == 0 )
-                            *psz_subtitle++;
+                            psz_subtitle++;
 
                         psz_subtitle += i_len;
                     }
+
                     while (*psz_subtitle == ' ')
                         *psz_html++ = *psz_subtitle++;
                 }
                 *psz_html++ = '>';
-                *psz_subtitle++;
+                psz_subtitle++;
             }
             else if( !strncmp( psz_subtitle, "</", 2 ))
             {
