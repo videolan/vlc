@@ -13,7 +13,9 @@ FFMPEGCONF = \
 	--disable-avdevice \
 	--disable-devices \
 	--disable-avfilter \
-	--disable-filters
+	--disable-filters \
+	--disable-bsfs \
+	--disable-bzlib
 
 # Those tools are named differently in FFmpeg and Libav
 #	--disable-ffserver \
@@ -29,6 +31,7 @@ else
 FFMPEGCONF += --disable-encoders --disable-muxers
 endif
 
+# Small size
 ifdef ENABLE_SMALL
 FFMPEGCONF += --enable-small --optflags=-O2
 ifeq ($(ARCH),arm)
@@ -63,7 +66,6 @@ endif
 # Darwin
 ifdef HAVE_DARWIN_OS
 FFMPEGCONF += --arch=$(ARCH) --target-os=darwin
-FFMPEG_CFLAGS += -DHAVE_LRINTF
 ifneq ($(findstring $(ARCH),i386 x86_64),)
 FFMPEGCONF += --enable-memalign-hack
 endif
@@ -79,6 +81,7 @@ endif
 ifdef HAVE_LINUX
 FFMPEGCONF += --target-os=linux --enable-pic
 
+# Android x86
 ifeq ($(ANDROID_ABI), x86)
 ifdef HAVE_ANDROID
 # Android-x86 gcc doesn't guarantee an aligned stack, but this is
@@ -97,22 +100,20 @@ ifndef HAVE_MINGW_W64
 DEPS_ffmpeg += directx
 endif
 FFMPEGCONF += --target-os=mingw32 --enable-memalign-hack
-FFMPEGCONF += --enable-w32threads \
-	--disable-bzlib --disable-bsfs \
+FFMPEGCONF += --enable-w32threads --enable-dxva2 \
 	--disable-decoder=dca --disable-encoder=vorbis \
-	--enable-dxva2
 
 ifdef HAVE_WIN64
 FFMPEGCONF += --cpu=athlon64 --arch=x86_64
 else # !WIN64
 FFMPEGCONF+= --cpu=i686 --arch=x86
 endif
-else
+
+else # !Windows
 FFMPEGCONF += --enable-pthreads
 endif
 
 # Build
-
 PKGS += ffmpeg
 ifeq ($(call need_pkg,"libavcodec >= 52.25.0 libavformat >= 52.30.0 libswscale"),)
 PKGS_FOUND += ffmpeg
