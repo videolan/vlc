@@ -269,14 +269,4 @@ vlc_va_t *vlc_va_NewVDA( vlc_object_t *p_log, int i_codec_id, void *p_extra, int
 
     return &p_va->va;
 }
-
-#else
-vlc_va_t *vlc_va_NewVDA( vlc_object_t *p_log, int i_codec_id, void *p_extra, int i_extra )
-{
-    VLC_UNUSED( p_log );
-    VLC_UNUSED( i_codec_id );
-    VLC_UNUSED( p_extra );
-    VLC_UNUSED( i_extra );
-    return NULL;
-}
 #endif
