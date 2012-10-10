@@ -44,7 +44,7 @@ typedef struct
     vlc_va_t            va;
     struct vda_context  hw_ctx;
 
-    uint8_t             *p_extradata;
+    const uint8_t       *p_extradata;
     int                 i_extradata;
 
     vlc_fourcc_t        i_chroma;
@@ -242,12 +242,13 @@ static void Close( vlc_va_t *p_external )
     free( p_va );
 }
 
-vlc_va_t *vlc_va_NewVDA( vlc_object_t *p_log, int i_codec_id, void *p_extra, int i_extra )
+vlc_va_t *vlc_va_New( vlc_object_t *p_log, int pixfmt, int i_codec_id,
+                      const es_format_t *fmt )
 {
-    if( i_codec_id != CODEC_ID_H264 )
+    if( pixfmt != PIX_FMT_VDA_VLD || i_codec_id != CODEC_ID_H264 )
         return NULL;
 
-    if( !p_extra || i_extra < 7 )
+    if( fmt->p_extra == NULL || fmt->i_extra < 7 )
     {
         msg_Warn( p_log, "VDA requires extradata." );
         return NULL;
@@ -258,8 +259,8 @@ vlc_va_t *vlc_va_NewVDA( vlc_object_t *p_log, int i_codec_id, void *p_extra, int
         return NULL;
 
     p_va->p_log = p_log;
-    p_va->p_extradata = p_extra;
-    p_va->i_extradata = i_extra;
+    p_va->p_extradata = fmt->p_extra;
+    p_va->i_extradata = fmt->i_extra;
 
     p_va->va.setup = Setup;
     p_va->va.get = Get;

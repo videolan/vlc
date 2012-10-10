@@ -506,8 +506,13 @@ static void Delete( vlc_va_t *p_external )
 }
 
 /* */
-vlc_va_t *vlc_va_NewVaapi( vlc_object_t *obj, int i_codec_id )
+vlc_va_t *vlc_va_New( vlc_object_t *obj, int pixfmt, int i_codec_id,
+                      const es_format_t *fmt )
 {
+    /* Only VLD supported */
+    if( pixfmt != PIX_FMT_VAAPI_VLD )
+        return NULL;
+
     if( !vlc_xlib_init( obj ) )
     {
         msg_Warn( obj, "Ignoring VA API" );
@@ -519,6 +524,7 @@ vlc_va_t *vlc_va_NewVaapi( vlc_object_t *obj, int i_codec_id )
         return NULL;
 
     p_va->log = obj;
+    (void) fmt;
 
     if( Open( p_va, i_codec_id ) )
     {

@@ -496,8 +496,12 @@ static void Close(vlc_va_t *external)
     free(va);
 }
 
-vlc_va_t *vlc_va_NewDxva2(vlc_object_t *log, int codec_id)
+vlc_va_t *vlc_va_New(vlc_object_t *log, int pixfmt, int codec_id,
+                     const es_format_t *fmt)
 {
+    if( pixfmt != PIX_FMT_DXVA2_VLD )
+        return NULL;
+
     vlc_va_dxva2_t *va = calloc(1, sizeof(*va));
     if (!va)
         return NULL;
@@ -505,6 +509,7 @@ vlc_va_t *vlc_va_NewDxva2(vlc_object_t *log, int codec_id)
     /* */
     va->log = log;
     va->codec_id = codec_id;
+    (void) fmt;
 
     /* Load dll*/
     va->hd3d9_dll = LoadLibrary(TEXT("D3D9.DLL"));

@@ -1144,31 +1144,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         msg_Dbg( p_dec, "Available decoder output format %d (%s)", pi_fmt[i],
                  name ? name : "unknown" );
 
-        vlc_va_t *p_va = NULL;
-#ifdef HAVE_AVCODEC_VAAPI
-        /* Only VLD supported */
-        if( pi_fmt[i] == PIX_FMT_VAAPI_VLD )
-        {
-            msg_Dbg( p_dec, "Trying VA API" );
-            p_va = vlc_va_NewVaapi( VLC_OBJECT(p_dec), p_sys->i_codec_id );
-        }
-#endif
-
-#ifdef HAVE_AVCODEC_DXVA2
-        if( pi_fmt[i] == PIX_FMT_DXVA2_VLD )
-        {
-            msg_Dbg( p_dec, "Trying DXVA2" );
-            p_va = vlc_va_NewDxva2( VLC_OBJECT(p_dec), p_sys->i_codec_id );
-        }
-#endif
-
-#ifdef HAVE_AVCODEC_VDA
-        if( pi_fmt[i] == PIX_FMT_VDA_VLD )
-        {
-            msg_Dbg( p_dec, "Trying VDA" );
-            p_va = vlc_va_NewVDA( VLC_OBJECT(p_dec), p_sys->i_codec_id, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
-        }
-#endif
+        vlc_va_t *p_va = vlc_va_New( VLC_OBJECT(p_dec), pi_fmt[i], p_sys->i_codec_id, &p_dec->fmt_in );
         if( p_va == NULL )
         {
             msg_Dbg( p_dec, "acceleration not available" );

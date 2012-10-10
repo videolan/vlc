@@ -58,9 +58,6 @@ static inline void vlc_va_Delete(vlc_va_t *va)
     va->close(va);
 }
 
-vlc_va_t *vlc_va_NewVaapi(vlc_object_t *obj, int codec_id);
-vlc_va_t *vlc_va_NewDxva2(vlc_object_t *log, int codec_id);
-vlc_va_t *vlc_va_NewVDA( vlc_object_t *log, int i_codec_id,void *p_extra, int i_extra);
+vlc_va_t *vlc_va_New(vlc_object_t *, int pix, int codec, const es_format_t *);
 
 #endif
-
