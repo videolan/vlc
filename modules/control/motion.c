@@ -163,9 +163,9 @@ static void RunIntf( intf_thread_t *p_intf )
                 p_vout = input_GetVout( p_input );
                 if( p_vout )
                 {
-#warning FIXME: do not override the permanent configuration!
 #warning FIXME: transform-type does not exist anymore
-                    config_PutPsz( p_vout, "transform-type", psz_type );
+                    var_Create( p_vout, "transform-type", VLC_VAR_STRING );
+                    var_SetString( p_vout, "transform-type", psz_type );
                     var_SetString( p_vout, "video-filter", psz_filter );
                     vlc_object_release( p_vout );
                 }
