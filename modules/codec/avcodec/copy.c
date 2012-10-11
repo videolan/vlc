@@ -32,8 +32,8 @@
 
 #include "copy.h"
 
-/* Copy 64 bytes from srcp to dsp loading data with the SSE>=2 instruction load and
- * storing data with the SSE>=2 instruction store.
+/* Copy 64 bytes from srcp to dstp loading data with the SSE>=2 instruction
+ * load and storing data with the SSE>=2 instruction store.
  */
 #define COPY64(dstp, srcp, load, store) \
     asm volatile (                      \
