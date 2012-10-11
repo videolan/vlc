@@ -135,7 +135,6 @@ typedef struct
 static void         Eia608Init( eia608_t * );
 static bool   Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_t data[2] );
 static char        *Eia608Text( eia608_t *h, bool b_html );
-static void         Eia608Exit( eia608_t * );
 
 /* It will be enough up to 63 B frames, which is far too high for
  * broadcast environment */
@@ -243,11 +242,9 @@ static void Close( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int i;
 
-    for( i = 0; i < p_sys->i_block; i++ )
+    for( int i = 0; i < p_sys->i_block; i++ )
         block_Release( p_sys->pp_block[i] );
-    Eia608Exit( &p_sys->eia608 );
     free( p_sys );
 }
 
@@ -271,7 +268,6 @@ static block_t *Pop( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_block;
     int i_index;
-    int i;
     /* XXX Cc captions data are OUT OF ORDER (because we receive them in the bitstream
      * order (ie ordered by video picture dts) instead of the display order.
      *  We will simulate a simple IPB buffer scheme
@@ -288,7 +284,7 @@ static block_t *Pop( decoder_t *p_dec )
     p_block = p_sys->pp_block[i_index = 0];
     if( p_block->i_pts > VLC_TS_INVALID )
     {
-        for( i = 1; i < p_sys->i_block-1; i++ )
+        for( int i = 1; i < p_sys->i_block-1; i++ )
         {
             if( p_sys->pp_block[i]->i_pts > VLC_TS_INVALID && p_block->i_pts > VLC_TS_INVALID &&
                 p_sys->pp_block[i]->i_pts < p_block->i_pts )
@@ -426,7 +422,6 @@ static void Eia608Cursor( eia608_t *h, int dx )
 static void Eia608ClearScreenRowX( eia608_t *h, int i_screen, int i_row, int x )
 {
     eia608_screen *screen = &h->screen[i_screen];
-    int i;
 
     if( x == 0 )
     {
@@ -435,7 +430,7 @@ static void Eia608ClearScreenRowX( eia608_t *h, int i_screen, int i_row, int x )
     else
     {
         screen->row_used[i_row] = false;
-        for( i = 0; i < x; i++ )
+        for( int i = 0; i < x; i++ )
         {
             if( screen->characters[i_row][i] != ' ' ||
                 screen->colors[i_row][i] != EIA608_COLOR_DEFAULT ||
@@ -462,8 +457,7 @@ static void Eia608ClearScreenRow( eia608_t *h, int i_screen, int i_row )
 
 static void Eia608ClearScreen( eia608_t *h, int i_screen )
 {
-    int i;
-    for( i = 0; i < EIA608_SCREEN_ROWS; i++ )
+    for( int i = 0; i < EIA608_SCREEN_ROWS; i++ )
         Eia608ClearScreenRow( h, i_screen, i );
 }
 
@@ -542,7 +536,6 @@ static void Eia608RollUp( eia608_t *h )
     eia608_screen *screen = &h->screen[i_screen];
 
     int keep_lines;
-    int i;
 
     /* Window size */
     if( h->mode == EIA608_MODE_ROLLUP_2 )
@@ -558,11 +551,11 @@ static void Eia608RollUp( eia608_t *h )
     h->cursor.i_column = 0;
 
     /* Erase lines above our window */
-    for( i = 0; i < h->cursor.i_row - keep_lines; i++ )
+    for( int i = 0; i < h->cursor.i_row - keep_lines; i++ )
         Eia608ClearScreenRow( h, i_screen, i );
 
     /* Move up */
-    for( i = 0; i < keep_lines-1; i++ )
+    for( int i = 0; i < keep_lines-1; i++ )
     {
         const int i_row = h->cursor.i_row - keep_lines + i + 1;
         if( i_row < 0 )
@@ -1087,7 +1080,6 @@ static char *Eia608Text( eia608_t *h, bool b_html )
     struct eia608_screen *screen = &h->screen[h->i_screen];
     bool b_first = true;
     char *psz;
-    int i;
 
     /* We allocate a buffer big enough for normal case */
     psz = malloc( i_size );
@@ -1096,7 +1088,7 @@ static char *Eia608Text( eia608_t *h, bool b_html )
     *psz = '\0';
     if( b_html )
         Eia608Strlcat( psz, "<text>", i_size );
-    for( i = 0; i < EIA608_SCREEN_ROWS; i++ )
+    for( int i = 0; i < EIA608_SCREEN_ROWS; i++ )
     {
         if( !screen->row_used[i] )
             continue;
@@ -1111,9 +1103,3 @@ static char *Eia608Text( eia608_t *h, bool b_html )
         Eia608Strlcat( psz, "</text>", i_size );
     return psz;
 }
-
-static void Eia608Exit( eia608_t *h )
-{
-    VLC_UNUSED( h );
-}
-
