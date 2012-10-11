@@ -26,6 +26,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <math.h>
 #include <unistd.h>
 
@@ -46,7 +47,7 @@
 
 struct motion_sensors_t
 {
-    enum { NO_SENSOR, HDAPS_SENSOR, AMS_SENSOR, APPLESMC_SENSOR,
+    enum { HDAPS_SENSOR, AMS_SENSOR, APPLESMC_SENSOR,
            UNIMOTION_SENSOR } sensor;
 #ifdef HAVE_MACOS_UNIMOTION
     enum sms_hardware unimotion_hw;
@@ -69,41 +70,27 @@ motion_sensors_t *motion_create( vlc_object_t *obj )
         return NULL;
     }
 
-    if( access( "/sys/devices/platform/hdaps/position", R_OK ) == 0 )
+    if( access( "/sys/devices/platform/hdaps/position", R_OK ) == 0 
+        && ( f = fopen( "/sys/devices/platform/hdaps/calibrate", "r" ) ) )
     {
         /* IBM HDAPS support */
-        f = fopen( "/sys/devices/platform/hdaps/calibrate", "r" );
-        if( f )
-        {
-            motion->i_calibrate = fscanf( f, "(%d,%d)", &i_x, &i_y ) == 2 ? i_x: 0;
-            fclose( f );
-            motion->sensor = HDAPS_SENSOR;
-        }
-        else
-        {
-            motion->sensor = NO_SENSOR;
-        }
+        motion->i_calibrate = fscanf( f, "(%d,%d)", &i_x, &i_y ) == 2 ? i_x: 0;
+        fclose( f );
+        motion->sensor = HDAPS_SENSOR;
     }
     else if( access( "/sys/devices/ams/x", R_OK ) == 0 )
     {
         /* Apple Motion Sensor support */
         motion->sensor = AMS_SENSOR;
     }
-    else if( access( "/sys/devices/platform/applesmc.768/position", R_OK ) == 0 )
+    else if( access( "/sys/devices/platform/applesmc.768/position", R_OK ) == 0 
+             && ( f = fopen( "/sys/devices/platform/applesmc.768/calibrate", "r" ) ) )
     {
         /* Apple SMC (newer macbooks) */
         /* Should be factorised with HDAPS */
-        f = fopen( "/sys/devices/platform/applesmc.768/calibrate", "r" );
-        if( f )
-        {
-            motion->i_calibrate = fscanf( f, "(%d,%d)", &i_x, &i_y ) == 2 ? i_x: 0;
-            fclose( f );
-            motion->sensor = APPLESMC_SENSOR;
-        }
-        else
-        {
-            motion->sensor = NO_SENSOR;
-        }
+        motion->i_calibrate = fscanf( f, "(%d,%d)", &i_x, &i_y ) == 2 ? i_x: 0;
+        fclose( f );
+        motion->sensor = APPLESMC_SENSOR;
     }
 #ifdef HAVE_MACOS_UNIMOTION
     else if( (motion->unimotion_hw = detect_sms()) )
@@ -112,7 +99,9 @@ motion_sensors_t *motion_create( vlc_object_t *obj )
     else
     {
         /* No motion sensor support */
-        motion->sensor = NO_SENSOR;
+        msg_Err( obj, "No motion sensor available" );
+        free( motion );
+        return NULL;
     }
 
     memset( motion->p_oldx, 0, sizeof( motion->p_oldx ) );
@@ -199,9 +188,8 @@ static int GetOrientation( motion_sensors_t *motion )
         else
             return 0;
 #endif
-    case NO_SENSOR:
     default:
-        return 0;
+        assert( 0 );
     }
 }
 
