@@ -3492,13 +3492,10 @@ error:
     return NULL;
 }
 
-#define MAX_SKIP 8
 MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
 {
     /* p_chunk is a virtual root container for the moof and mdat boxes */
     MP4_Box_t *p_chunk;
-    MP4_Box_t *p_moof = NULL;
-    MP4_Box_t *p_sidx = NULL;
     MP4_Box_t *p_tmp_box = NULL;
 
     p_tmp_box = calloc( 1, sizeof( MP4_Box_t ) );
@@ -3525,49 +3522,10 @@ MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
     p_chunk->i_type = ATOM_root;
     p_chunk->i_shortsize = 1;
 
-    /* there may be some boxes before moof,
-     * we skip them (but sidx) for now, but put a reasonable limit */
-    for( int i = 0 ; i < MAX_SKIP; i++ )
-    {
-        p_moof = MP4_ReadBox( s, p_chunk );
-        if( !p_moof )
-            goto error;
-        if( p_moof->i_type != ATOM_moof )
-        {
-            if( i == MAX_SKIP - 1 )
-            {
-                MP4_BoxFree( s, p_moof );
-                goto error;
-            }
-            if( p_moof->i_type != ATOM_sidx )
-            {
-                MP4_BoxFree( s, p_moof );
-                stream_Read( s, NULL, p_moof->i_size );
-            }
-            else
-                p_sidx = p_moof;
-        }
-        else
-            break;
-    }
-
-    p_chunk->p_first = p_moof;
-    p_chunk->p_last = p_moof;
-
-    if( p_sidx )
-    {
-        p_chunk->p_first = p_sidx;
-        p_sidx->p_next = p_moof;
-    }
+    MP4_ReadBoxContainerChildren( s, p_chunk, ATOM_moof );
 
     return p_chunk;
-
-error:
-    free( p_chunk );
-    return NULL;
 }
-
-#undef MAX_SKIP
 
 /*****************************************************************************
  * MP4_BoxGetRoot : Parse the entire file, and create all boxes in memory
