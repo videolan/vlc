@@ -105,7 +105,7 @@ void Close ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-    free( p_intf->p_sys->p_motion );
+    motion_destroy( p_intf->p_sys->p_motion );
     free( p_intf->p_sys );
 }
 
