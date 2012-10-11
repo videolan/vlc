@@ -899,23 +899,14 @@ static void Eia608TextUtf8( char *psz_utf8, uint8_t c ) // Returns number of byt
 #undef E2
 #undef E1
 
-    static const int i_c2utf8 = sizeof(c2utf8)/sizeof(*c2utf8);
-    int i;
+    for( size_t i = 0; i < ARRAY_SIZE(c2utf8) ; i++ )
+        if( c2utf8[i].c == c ) {
+            strcpy( psz_utf8, c2utf8[i].utf8 );
+            return;
+        }
 
-    for( i = 0; i < i_c2utf8; i++ )
-    {
-        if( c2utf8[i].c == c )
-            break;
-    }
-    if( i >= i_c2utf8 )
-    {
-        psz_utf8[0] = c < 0x80 ? c : '?';   /* Normal : Unsupported */
-        psz_utf8[1] = '\0';
-    }
-    else
-    {
-        strcpy( psz_utf8, c2utf8[i].utf8 );
-    }
+    psz_utf8[0] = c < 0x80 ? c : '?';   /* Normal : Unsupported */
+    psz_utf8[1] = '\0';
 }
 
 static void Eia608Strlcat( char *d, const char *s, int i_max )
