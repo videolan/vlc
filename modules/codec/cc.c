@@ -141,8 +141,6 @@ static char        *Eia608Text( eia608_t *h, bool b_html );
 #define CC_MAX_REORDER_SIZE (64)
 struct decoder_sys_t
 {
-    int i;
-
     int     i_block;
     block_t *pp_block[CC_MAX_REORDER_SIZE];
 
