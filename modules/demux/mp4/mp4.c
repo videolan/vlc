@@ -2663,6 +2663,20 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
 #endif
 }
 
+static int FreeAndResetChunk( mp4_chunk_t *ck )
+{
+    free( ck->p_sample_count_dts );
+    free( ck->p_sample_delta_dts );
+    free( ck->p_sample_count_pts );
+    free( ck->p_sample_offset_pts );
+    free( ck->p_sample_size );
+    for( uint32_t i = 0; i < ck->i_sample_count; i++ )
+        free( ck->p_sample_data[i] );
+    free( ck->p_sample_data );
+    memset( ck, 0, sizeof( mp4_chunk_t ) );
+    return VLC_SUCCESS;
+}
+
 /****************************************************************************
  * MP4_TrackDestroy:
  ****************************************************************************
@@ -2690,6 +2704,8 @@ static void MP4_TrackDestroy( mp4_track_t *p_track )
         }
     }
     FREENULL( p_track->chunk );
+    FreeAndResetChunk( p_track->cchunk );
+    FREENULL( p_track->cchunk );
 
     if( !p_track->i_sample_size )
     {
@@ -3236,20 +3252,6 @@ static mp4_track_t *MP4_frg_GetTrack( demux_t *p_demux, const uint16_t tid )
     return NULL;
 }
 
-static int FreeAndResetChunk( mp4_chunk_t *ck )
-{
-    free( ck->p_sample_count_dts );
-    free( ck->p_sample_delta_dts );
-    free( ck->p_sample_count_pts );
-    free( ck->p_sample_offset_pts );
-    free( ck->p_sample_size );
-    for( uint32_t i = 0; i < ck->i_sample_count; i++ )
-        free( ck->p_sample_data[i] );
-    free( ck->p_sample_data );
-    memset( ck, 0, sizeof( mp4_chunk_t ) );
-    return VLC_SUCCESS;
-}
-
 static void FlushChunk( demux_t *p_demux, mp4_track_t *tk )
 {
     msg_Dbg( p_demux, "Flushing chunk for track id %u", tk->i_track_ID );
@@ -3537,11 +3539,13 @@ static int MP4_frg_GetChunks( demux_t *p_demux, const unsigned i_tk_id )
         if( !p_chunk )
             return VLC_EGENERIC;
 
+        if( !p_chunk->p_first )
+            goto MP4_frg_GetChunks_Error;
         uint32_t i_type = p_chunk->p_first->i_type;
         uint16_t tid = 0;
         if( i_type == ATOM_uuid || i_type == ATOM_ftyp )
         {
-            free( p_sys->p_root );
+            MP4_BoxFree( p_demux->s, p_sys->p_root );
             p_sys->p_root = p_chunk;
 
             if( i_type == ATOM_ftyp ) /* DASH */
@@ -3550,8 +3554,7 @@ static int MP4_frg_GetChunks( demux_t *p_demux, const unsigned i_tk_id )
                 if( !p_tkhd )
                 {
                     msg_Warn( p_demux, "No tkhd found!" );
-                    free( p_chunk );
-                    return VLC_EGENERIC;
+                    goto MP4_frg_GetChunks_Error;
                 }
                 tid = p_tkhd->data.p_tkhd->i_track_ID;
             }
@@ -3562,25 +3565,32 @@ static int MP4_frg_GetChunks( demux_t *p_demux, const unsigned i_tk_id )
                 if( !p_stra || CmpUUID( &p_stra->i_uuid, &StraBoxUUID ) )
                 {
                     msg_Warn( p_demux, "No StraBox found!" );
-                    free( p_chunk );
-                    return VLC_EGENERIC;
+                    goto MP4_frg_GetChunks_Error;
                 }
                 tid = p_stra->data.p_stra->i_track_ID;
             }
 
             p_track = MP4_frg_GetTrack( p_demux, tid );
             if( !p_track )
-                return VLC_EGENERIC;
+                goto MP4_frg_GetChunks_Error;
             p_track->b_codec_need_restart = true;
 
             return MP4_frg_GetChunks( p_demux, i_tk_id );
         }
 
         if( MP4_frg_GetChunk( p_demux, p_chunk, (unsigned *)&tid ) != VLC_SUCCESS )
-            return VLC_EGENERIC;
+            goto MP4_frg_GetChunks_Error;
+
+        MP4_BoxFree( p_demux->s, p_chunk );
 
         if( tid == i_tk_id )
             break;
+        else
+            continue;
+
+MP4_frg_GetChunks_Error:
+        MP4_BoxFree( p_demux->s, p_chunk );
+        return VLC_EGENERIC;
     }
 
     return VLC_SUCCESS;
