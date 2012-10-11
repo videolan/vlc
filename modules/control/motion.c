@@ -116,11 +116,11 @@ void Close ( vlc_object_t *p_this )
 #define HIGH_THRESHOLD 1000
 static void RunIntf( intf_thread_t *p_intf )
 {
-    int i_x, i_oldx = 0;
+    int i_oldx = 0;
 
     for( ;; )
     {
-        const char *psz_filter, *psz_type;
+        const char *psz_type;
         bool b_change = false;
 
         /* Wait a bit, get orientation, change filter if necessary */
@@ -128,25 +128,22 @@ static void RunIntf( intf_thread_t *p_intf )
         msleep( INTF_IDLE_SLEEP );
 
         int canc = vlc_savecancel();
-        i_x = motion_get_angle( p_intf->p_sys->p_motion );
+        int i_x = motion_get_angle( p_intf->p_sys->p_motion );
 
         if( i_x < -HIGH_THRESHOLD && i_oldx > -LOW_THRESHOLD )
         {
             b_change = true;
-            psz_filter = "transform";
             psz_type = "270";
         }
         else if( ( i_x > -LOW_THRESHOLD && i_oldx < -HIGH_THRESHOLD )
                  || ( i_x < LOW_THRESHOLD && i_oldx > HIGH_THRESHOLD ) )
         {
             b_change = true;
-            psz_filter = "";
-            psz_type = "";
+            psz_type = NULL;
         }
         else if( i_x > HIGH_THRESHOLD && i_oldx < LOW_THRESHOLD )
         {
             b_change = true;
-            psz_filter = "transform";
             psz_type = "90";
         }
 
@@ -163,10 +160,10 @@ static void RunIntf( intf_thread_t *p_intf )
                 p_vout = input_GetVout( p_input );
                 if( p_vout )
                 {
-#warning FIXME: transform-type does not exist anymore
                     var_Create( p_vout, "transform-type", VLC_VAR_STRING );
                     var_SetString( p_vout, "transform-type", psz_type );
-                    var_SetString( p_vout, "video-filter", psz_filter );
+                    var_SetString( p_vout, "video-filter",
+                                   psz_type != NULL ? "transform" : "" );
                     vlc_object_release( p_vout );
                 }
                 vlc_object_release( p_input );
