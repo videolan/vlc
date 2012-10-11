@@ -160,8 +160,14 @@ static void RunIntf( intf_thread_t *p_intf )
                 p_vout = input_GetVout( p_input );
                 if( p_vout )
                 {
-                    var_Create( p_vout, "transform-type", VLC_VAR_STRING );
-                    var_SetString( p_vout, "transform-type", psz_type );
+                    if( psz_type != NULL )
+                    {
+                        var_Create( p_vout, "transform-type", VLC_VAR_STRING );
+                        var_SetString( p_vout, "transform-type", psz_type );
+                    }
+                    else
+                        var_Destroy( p_vout, "transform-type" );
+
                     var_SetString( p_vout, "video-filter",
                                    psz_type != NULL ? "transform" : "" );
                     vlc_object_release( p_vout );
