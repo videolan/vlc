@@ -86,10 +86,10 @@ static void CopyFromUswc(uint8_t *dst, size_t dst_pitch,
 
     ASM_SSE2(cpu, "mfence");
     for (unsigned y = 0; y < height; y++) {
-        const unsigned unaligned = (intptr_t)src & 0x0f;
-        unsigned x;
+        const unsigned unaligned = (-(uintptr_t)src) & 0x0f;
+        unsigned x = 0;
 
-        for (x = 0; x < unaligned; x++)
+        for (; x < unaligned; x++)
             dst[x] = src[x];
 
 #ifdef CAN_COMPILE_SSE4_1
