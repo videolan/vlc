@@ -501,7 +501,7 @@ static void Close(vlc_va_t *external)
     free(va);
 }
 
-static int Open(vlc_va_t *log, int pixfmt, int codec_id,
+static int Open(vlc_va_t *external, int pixfmt, int codec_id,
                 const es_format_t *fmt)
 {
     if( pixfmt != PIX_FMT_DXVA2_VLD )
@@ -559,7 +559,6 @@ static int Open(vlc_va_t *log, int pixfmt, int codec_id,
     external->get     = Get;
     external->release = Release;
     external->extract = Extract;
-    external->close   = Close;
     return VLC_SUCCESS;
 
 error:
