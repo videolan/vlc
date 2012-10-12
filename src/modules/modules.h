@@ -110,6 +110,8 @@ size_t module_LoadPlugins( vlc_object_t * );
 void module_EndBank (bool);
 int module_Map (vlc_object_t *, module_t *);
 
+ssize_t module_list_cap (module_t ***, const char *);
+
 int vlc_bindtextdomain (const char *);
 
 /* Low-level OS-dependent handler */

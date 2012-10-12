@@ -216,8 +216,6 @@ void module_list_free (module_t **list)
  */
 module_t **module_list_get (size_t *n)
 {
-    /* TODO: this whole module lookup is quite inefficient */
-    /* Remove this and improve module_need */
     module_t **tab = NULL;
     size_t i = 0;
 
@@ -241,6 +239,57 @@ module_t **module_list_get (size_t *n)
     }
     *n = i;
     return tab;
+}
+
+static int modulecmp (const void *a, const void *b)
+{
+    const module_t *const *ma = a, *const *mb = b;
+    /* Note that qsort() uses _ascending_ order,
+     * so the smallest module is the one with the biggest score. */
+    return (*mb)->i_score - (*ma)->i_score;
+}
+
+/**
+ * Builds a sorted list of all VLC modules with a given capability.
+ * The list is sorted from the highest module score to the lowest.
+ * @param list pointer to the table of modules [OUT]
+ * @param cap capability of modules to look for
+ * @return the number of matching found, or -1 on error (*list is then NULL).
+ * @note *list must be freed with module_list_free().
+ */
+ssize_t module_list_cap (module_t ***restrict list, const char *cap)
+{
+    /* TODO: This is quite inefficient. List should be sorted by capability. */
+    ssize_t n = 0;
+
+    assert (list != NULL);
+
+    for (module_t *mod = modules.head; mod != NULL; mod = mod->next)
+    {
+         if (module_provides (mod, cap))
+             n++;
+         for (module_t *subm = mod->submodule; subm != NULL; subm = subm->next)
+             if (module_provides (subm, cap))
+                 n++;
+    }
+
+    module_t **tab = malloc (sizeof (*tab) * n);
+    *list = tab;
+    if (unlikely(tab == NULL))
+        return -1;
+
+    for (module_t *mod = modules.head; mod != NULL; mod = mod->next)
+    {
+         if (module_provides (mod, cap))
+             *(tab++)= mod;
+         for (module_t *subm = mod->submodule; subm != NULL; subm = subm->next)
+             if (module_provides (subm, cap))
+                 *(tab++) = subm;
+    }
+
+    assert (tab == *list + n);
+    qsort (*list, n, sizeof (*tab), modulecmp);
+    return n;
 }
 
 #ifdef HAVE_DYNAMIC_PLUGINS
