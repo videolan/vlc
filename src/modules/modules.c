@@ -200,7 +200,7 @@ module_t *vlc_module_load(vlc_object_t *p_this, const char *psz_capability,
                           vlc_activate_t probe, ...)
 {
     int i_shortcuts = 0;
-    char *psz_shortcuts = NULL, *psz_var = NULL, *psz_alias = NULL;
+    char *psz_shortcuts = NULL, *psz_var = NULL;
     bool b_force_backup = p_this->b_force;
 
     /* Deal with variables */
@@ -271,15 +271,9 @@ module_t *vlc_module_load(vlc_object_t *p_this, const char *psz_capability,
             {
                 for( unsigned i = 0; i < p_module->i_shortcuts; i++ )
                 {
-                    char *c;
-                    if( ( c = strchr( name, '@' ) )
-                        ? !strncasecmp( name, p_module->pp_shortcuts[i],
-                                        c-name )
-                        : !strcasecmp( name, p_module->pp_shortcuts[i] ) )
+                    if( !strcasecmp( name, p_module->pp_shortcuts[i] ) )
                     {
                         /* Found it */
-                        if( c && c[1] )
-                            psz_alias = c+1;
                         i_shortcut_bonus = i_short * 10000;
                         goto found_shortcut;
                     }
@@ -374,8 +368,7 @@ found_shortcut:
     {
         msg_Dbg( p_this, "using %s module \"%s\"",
                  psz_capability, module_get_object(p_module) );
-        vlc_object_set_name( p_this, psz_alias ? psz_alias
-                                               : module_get_object(p_module) );
+        vlc_object_set_name( p_this, module_get_object(p_module) );
     }
     else
         msg_Dbg( p_this, "no %s module matching \"%s\" could be loaded",
