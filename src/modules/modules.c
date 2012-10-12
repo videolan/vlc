@@ -48,13 +48,11 @@
  *
  * \param m the module
  * \param cap the capability to check
- * \return TRUE if the module have the capability
+ * \return true if the module has the capability
  */
-bool module_provides( const module_t *m, const char *cap )
+bool module_provides (const module_t *m, const char *cap)
 {
-    if (unlikely(m->psz_capability == NULL))
-        return false;
-    return !strcmp( m->psz_capability, cap );
+    return !strcmp (module_get_capability (m), cap);
 }
 
 /**
@@ -99,14 +97,14 @@ const char *module_get_help( const module_t *m )
 }
 
 /**
- * Get the capability for a module
+ * Gets the capability of a module
  *
  * \param m the module
- * return the capability
+ * \return the capability, or "none" if unspecified
  */
-const char *module_get_capability( const module_t *m )
+const char *module_get_capability (const module_t *m)
 {
-    return m->psz_capability;
+    return (m->psz_capability != NULL) ? m->psz_capability : "none";
 }
 
 /**
