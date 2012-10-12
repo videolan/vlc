@@ -524,7 +524,8 @@ static int ScanDvbCNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf
             p_cfg->i_symbolrate = p_scan->pp_service[i]->cfg.i_symbolrate;
             p_cfg->i_modulation = p_scan->pp_service[i]->cfg.i_modulation;
             p_scan->i_index = i+1;
-            msg_Dbg( p_scan->p_obj, "iterating to freq: %u, symbolrate %u, modulation %u index %d/%d",
+            msg_Dbg( p_scan->p_obj, "iterating to freq: %u, symbolrate %u, "
+                     "modulation %u index %"PRId64"/%d",
                      p_cfg->i_frequency, p_cfg->i_symbolrate, p_cfg->i_modulation, p_scan->i_index, p_scan->i_service );
             *pf_pos = (double)i/p_scan->i_service;
             return VLC_SUCCESS;
@@ -581,7 +582,10 @@ static int ScanDvbCNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf
 
             /* if we rotated modulations, rotate symbolrate */
             if( b_rotate )
-               p_scan->parameter.i_symbolrate = (++p_scan->parameter.i_symbolrate % num_symbols );
+            {
+                p_scan->parameter.i_symbolrate++;
+                p_scan->parameter.i_symbolrate %= num_symbols;
+            }
             p_cfg->i_symbolrate = 1000 * (symbolrates[ p_scan->parameter.i_symbolrate ] );
             msg_Dbg( p_scan->p_obj, "symbolrate %d", p_cfg->i_symbolrate );
             if( p_scan->parameter.i_symbolrate )
@@ -846,7 +850,7 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
         uint32_t i_private_data_id = 0;
         dvbpsi_descriptor_t *p_dsc;
         scan_configuration_t *p_cfg = malloc(sizeof(*p_cfg));
-        if(!p_cfg) return VLC_ENOMEM;
+        if(!p_cfg) return;
         memset(p_cfg,0,sizeof(*p_cfg));
         for( p_dsc = p_ts->p_first_descriptor; p_dsc != NULL; p_dsc = p_dsc->p_next )
         {
@@ -890,7 +894,7 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
                 dvbpsi_cable_deliv_sys_dr_t *p_t = dvbpsi_DecodeCableDelivSysDr( p_dsc );
                 msg_Dbg( p_obj, "       * Cable delivery system");
 
-                pcfg->i_freqency =  decode_BCD( p_t->i_frequency ) * 100;
+                p_cfg->i_frequency =  decode_BCD( p_t->i_frequency ) * 100;
                 msg_Dbg( p_obj, "           * frequency %d", p_cfg->i_frequency );
                 p_cfg->i_symbolrate =  decode_BCD( p_t->i_symbol_rate ) * 100;
                 msg_Dbg( p_obj, "           * symbolrate %u", p_cfg->i_symbolrate );
