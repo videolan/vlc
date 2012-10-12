@@ -889,6 +889,14 @@ static inline void *xcalloc (size_t n, size_t size)
     return ptr;
 }
 
+static inline char *xstrdup (const char *str)
+{
+    char *ptr = strdup (str);
+    if (unlikely(ptr == NULL))
+        abort ();
+    return ptr;
+}
+
 /*****************************************************************************
  * libvlc features
  *****************************************************************************/

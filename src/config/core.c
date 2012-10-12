@@ -414,12 +414,10 @@ ssize_t config_GetPszChoices (vlc_object_t *obj, const char *name,
 
     for (size_t i = 0; i < count; i++)
     {
-        vals[i] = strdup ((cfg->list.psz[i] != NULL) ? cfg->list.psz[i] : "");
+        vals[i] = xstrdup ((cfg->list.psz[i] != NULL) ? cfg->list.psz[i] : "");
         /* FIXME: use module_gettext() instead */
-        txts[i] = strdup ((cfg->list_text[i] != NULL)
+        txts[i] = xstrdup ((cfg->list_text[i] != NULL)
                                        ? vlc_gettext (cfg->list_text[i]) : "");
-        if (unlikely(vals[i] == NULL || txts[i] == NULL))
-            abort ();
     }
 
     *values = vals;
