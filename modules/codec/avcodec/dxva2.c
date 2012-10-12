@@ -34,11 +34,13 @@
 #  define _WIN32_WINNT 0x600
 # endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_picture.h>
 #include <vlc_fourcc.h>
 #include <vlc_cpu.h>
-#include <assert.h>
+#include <vlc_plugin.h>
 
 #include <libavcodec/avcodec.h>
 #    define DXVA2API_USE_BITFIELDS
@@ -48,6 +50,17 @@
 #include "avcodec.h"
 #include "va.h"
 #include "copy.h"
+
+static int Open(vlc_va_t *, int, int, const es_format_t *);
+static void Close(vlc_va_t *);
+
+vlc_module_begin()
+    set_description(N_("DirectX Video Acceleration (DXVA) 2.0"))
+    set_capability("hw decoder", 50)
+    set_category(CAT_INPUT)
+    set_subcategory(SUBCAT_INPUT_VCODEC)
+    set_callbacks(Open, Close)
+vlc_module_end()
 
 #include <windows.h>
 #include <windowsx.h>
@@ -488,8 +501,8 @@ static void Close(vlc_va_t *external)
     free(va);
 }
 
-int vlc_va_New(vlc_va_t *log, int pixfmt, int codec_id,
-               const es_format_t *fmt)
+static int Open(vlc_va_t *log, int pixfmt, int codec_id,
+                const es_format_t *fmt)
 {
     if( pixfmt != PIX_FMT_DXVA2_VLD )
         return NULL;

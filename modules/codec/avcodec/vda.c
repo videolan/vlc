@@ -24,9 +24,11 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_vout.h>
-#include <assert.h>
+#include <vlc_plugin.h>
 
 #include <libavcodec/avcodec.h>
 
@@ -36,6 +38,24 @@
 
 #include <libavcodec/vda.h>
 #include <VideoDecodeAcceleration/VDADecoder.h>
+
+static int Open( vlc_va_t *, int, int, const es_format_t * );
+static void Close( vlc_va_t * );
+
+static const int  nvda_pix_fmt_list[] = { 0, 1 };
+static const char *const nvda_pix_fmt_list_text[] =
+  { N_("420YpCbCr8Planar"), N_("422YpCbCr8") };
+
+vlc_module_begin ()
+    set_description( N_("Video Decode Acceleration Framework (VDA)") )
+    set_capability( "hw decoder", 50 )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_VCODEC )
+    set_callbacks( Open, Close )
+    add_integer ( "avcodec-vda-pix-fmt", 0, VDA_PIX_FMT_TEXT,
+                  VDA_PIX_FMT_LONGTEXT, false)
+        change_integer_list( nvda_pix_fmt_list, nvda_pix_fmt_list_text )
+vlc_module_end ()
 
 struct vlc_va_sys_t
 {
@@ -241,15 +261,15 @@ static void Close( vlc_va_t *p_external )
     free( p_va );
 }
 
-int vlc_va_New( vlc_va_t *external, int pixfmt, int i_codec_id,
-                const es_format_t *fmt )
+static int Open( vlc_va_t *external, int pixfmt, int i_codec_id,
+                  const es_format_t *fmt )
 {
     if( pixfmt != PIX_FMT_VDA_VLD || i_codec_id != CODEC_ID_H264 )
         return NULL;
 
     if( fmt->p_extra == NULL || fmt->i_extra < 7 )
     {
-        msg_Warn( p_log, "VDA requires extradata." );
+        msg_Warn( external, "VDA requires extradata." );
         return NULL;
     }
 
@@ -267,7 +287,6 @@ int vlc_va_New( vlc_va_t *external, int pixfmt, int i_codec_id,
     external->get = Get;
     external->release = Release;
     external->extract = Extract;
-    external->close = Close;
 
     return VLC_SUCCESS;
 }

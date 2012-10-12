@@ -94,7 +94,6 @@ libavcodec_plugin_la_SOURCES = \
 	avcodec/deinterlace.c \
 	avcodec/fourcc.c \
 	avcodec/chroma.c avcodec/chroma.h \
-	avcodec/copy.c avcodec/copy.h \
 	avcodec/va.h \
 	avcodec/avcodec.c avcodec/avcodec.h
 if ENABLE_SOUT
@@ -104,21 +103,7 @@ endif
 libavcodec_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_avcodec)
 libavcodec_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_avcodec)
 libavcodec_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_avcodec)
-if HAVE_AVCODEC_VAAPI
-libavcodec_plugin_la_SOURCES += avcodec/vaapi.c
-libavcodec_plugin_la_CFLAGS += $(LIBVA_CFLAGS) $(X_CFLAGS) -DHAVE_AVCODEC_VAAPI
-libavcodec_plugin_la_LIBADD += $(LIBVA_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
-endif
-if HAVE_AVCODEC_DXVA2
-libavcodec_plugin_la_SOURCES += avcodec/dxva2.c
-libavcodec_plugin_la_CFLAGS += -DHAVE_AVCODEC_DXVA2
-libavcodec_plugin_la_LIBADD += -lole32 -lshlwapi -luuid
-endif
-if HAVE_AVCODEC_VDA
-libavcodec_plugin_la_SOURCES += avcodec/vda.c
-libavcodec_plugin_la_CFLAGS += -DHAVE_AVCODEC_VDA
-libavcodec_plugin_la_LDFLAGS += -Wl,-framework,CoreFoundation,-framework,VideoDecodeAcceleration,-framework,QuartzCore
-endif
+
 if MERGE_FFMPEG
 libavcodec_plugin_la_SOURCES += \
 	../demux/avformat/demux.c \
@@ -134,6 +119,34 @@ libvlc_LTLIBRARIES += \
 	$(LTLIBavcodec)
 EXTRA_LTLIBRARIES += \
 	libavcodec_plugin.la
+
+### avcodec hardware acceleration ###
+
+libvaapi_plugin_la_SOURCES = \
+	avcodec/copy.c avcodec/copy.h \
+	avcodec/vaapi.c
+libvaapi_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBVA_CFLAGS) $(X_CFLAGS)
+libvaapi_plugin_la_LIBADD = $(AM_LIBADD) $(LIBVA_LIBS) \
+                            $(X_LIBS) $(X_PRE_LIBS) -lX11
+if HAVE_AVCODEC_VAAPI
+libvlc_LTLIBRARIES += libvaapi_plugin.la
+endif
+
+libdxva2_plugin_la_SOURCES = \
+	avcodec/copy.c avcodec/copy.h \
+	avcodec/dxva2.c
+libdxva2_plugin_la_LIBADD = $(AM_LIBADD) -lole32 -lshlwapi -luuid
+if HAVE_AVCODEC_DXVA2
+libvlc_LTLIBRARIES += libdxva2_plugin.la
+endif
+
+libvda_plugin_la_SOURCES = \
+	avcodec/copy.c avcodec/copy.h \
+	avcodec/vda.c
+libvda_plugin_la_LDFLAGS = -Wl,-framework,CoreFoundation,-framework,VideoDecodeAcceleration,-framework,QuartzCore
+if HAVE_AVCODEC_VDA
+libvlc_LTLIBRARIES += libvda_plugin.la
+endif
 
 ### OpenMAX ###
 noinst_HEADERS += \

@@ -33,17 +33,15 @@
 #include <vlc_codec.h>
 #include <vlc_avcodec.h>
 #include <vlc_cpu.h>
+#include <vlc_modules.h>
 #include <assert.h>
 
 #include <libavcodec/avcodec.h>
 #include <libavutil/mem.h>
+#include <libavutil/pixdesc.h>
 
 #include "avcodec.h"
 #include "va.h"
-#if defined(HAVE_AVCODEC_VAAPI) || defined(HAVE_AVCODEC_DXVA2) || defined(HAVE_AVCODEC_VDA)
-#   define HAVE_AVCODEC_VA
-#   include <libavutil/pixdesc.h>
-#endif
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
@@ -108,11 +106,8 @@ static void ffmpeg_CopyPicture    ( decoder_t *, picture_t *, AVFrame * );
 static int  ffmpeg_GetFrameBuf    ( struct AVCodecContext *, AVFrame * );
 static int  ffmpeg_ReGetFrameBuf( struct AVCodecContext *, AVFrame * );
 static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVFrame * );
-
-#ifdef HAVE_AVCODEC_VA
 static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *,
                                           const enum PixelFormat * );
-#endif
 
 static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
 {
@@ -345,9 +340,8 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_context->thread_count = i_thread_count;
 #endif
 
-#ifdef HAVE_AVCODEC_VA
-    const bool b_use_hw = var_CreateGetBool( p_dec, "avcodec-hw" );
-    if( b_use_hw &&
+    char *hw = var_CreateGetString( p_dec, "avcodec-hw" ); /* FIXME */
+    if( (hw == NULL || strcasecmp( hw, "none" )) &&
         (i_codec_id == CODEC_ID_MPEG1VIDEO || i_codec_id == CODEC_ID_MPEG2VIDEO ||
          i_codec_id == CODEC_ID_MPEG4 ||
          i_codec_id == CODEC_ID_H264 ||
@@ -368,7 +362,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 #endif
         p_sys->p_context->get_format = ffmpeg_GetFormat;
     }
-#endif
+    free( hw );
 #ifdef HAVE_AVCODEC_MT
     if( p_sys->p_context->thread_type & FF_THREAD_FRAME )
         p_dec->i_extra_picture_buffers = 2 * p_sys->p_context->thread_count;
@@ -963,7 +957,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 
     if( p_sys->p_va )
     {
-#ifdef HAVE_AVCODEC_VA
+#if 1 // LIBAVCODEC_VERSION_MAJOR >= ? FIXME
         /* hwaccel_context is not present in old ffmpeg version */
         if( vlc_va_Setup( p_sys->p_va,
                           &p_context->hwaccel_context, &p_dec->fmt_out.video.i_chroma,
@@ -1124,7 +1118,49 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
         p_ff_pic->data[i] = NULL;
 }
 
-#ifdef HAVE_AVCODEC_VA
+static int ffmpeg_va_Start( void *func, va_list ap )
+{
+    vlc_va_t *va = va_arg( ap, vlc_va_t * );
+    int pix = va_arg( ap, int );
+    int codec = va_arg( ap, int );
+    const es_format_t *fmt = va_arg( ap, const es_format_t * );
+    int (*open)( vlc_va_t *, int, int, const es_format_t * ) = func;
+
+    return open( va, pix, codec, fmt );
+}
+
+static vlc_va_t *vlc_va_New( vlc_object_t *parent, int pixfmt, int codec_id,
+                             const es_format_t *fmt )
+{
+    vlc_va_t *p_va = vlc_object_create( parent, sizeof( *p_va ) );
+    if( unlikely(p_va == NULL) )
+        return NULL;
+
+    p_va->module = vlc_module_load( p_va, "hw decoder", "$avcodec-hw",
+                                    true, ffmpeg_va_Start, p_va, pixfmt,
+                                    codec_id, fmt );
+    if( p_va->module == NULL )
+    {
+        vlc_object_release( p_va );
+        p_va = NULL;
+    }
+    return p_va;
+}
+
+static void ffmpeg_va_Stop( void *func, va_list ap )
+{
+    vlc_va_t *va = va_arg( ap, vlc_va_t * );
+    void (*close)( vlc_va_t * ) = func;
+
+    close( va );
+}
+
+static void vlc_va_Delete( vlc_va_t *va )
+{
+    vlc_module_unload( va->module, ffmpeg_va_Stop, va );
+    vlc_object_release( va );
+}
+
 static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
                                           const enum PixelFormat *pi_fmt )
 {
@@ -1144,12 +1180,10 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         msg_Dbg( p_dec, "Available decoder output format %d (%s)", pi_fmt[i],
                  name ? name : "unknown" );
 
-        vlc_va_t *p_va = vlc_object_create( p_dec, sizeof( *p_va ) );
-        if( unlikely(p_va == NULL) )
-            continue;
-        if( vlc_va_New( p_va, pi_fmt[i], p_sys->i_codec_id, &p_dec->fmt_in ) )
+        vlc_va_t *p_va = vlc_va_New( VLC_OBJECT(p_dec), pi_fmt[i],
+                                     p_sys->i_codec_id, &p_dec->fmt_in );
+        if( p_va == NULL )
         {
-            vlc_object_release( p_va );
             msg_Dbg( p_dec, "acceleration not available" );
             continue;
         }
@@ -1183,5 +1217,3 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     /* Fallback to default behaviour */
     return avcodec_default_get_format( p_context, pi_fmt );
 }
-#endif
-

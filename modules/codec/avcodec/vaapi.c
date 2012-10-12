@@ -25,22 +25,32 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_fourcc.h>
 #include <assert.h>
 
+#include <vlc_common.h>
+#include <vlc_plugin.h>
+#include <vlc_fourcc.h>
+#include <vlc_xlib.h>
+
 #include <libavcodec/avcodec.h>
+#include <libavcodec/vaapi.h>
+#include <X11/Xlib.h>
+#include <va/va_x11.h>
 
 #include "avcodec.h"
 #include "va.h"
 #include "copy.h"
 
-#include <vlc_xlib.h>
+static int Create( vlc_va_t *, int, int, const es_format_t * );
+static void Delete( vlc_va_t * );
 
-#include <libavcodec/vaapi.h>
-
-#include <X11/Xlib.h>
-#include <va/va_x11.h>
+vlc_module_begin ()
+    set_description( N_("Video Acceleration (VA) API") )
+    set_capability( "hw decoder", 50 )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_VCODEC )
+    set_callbacks( Create, Delete )
+vlc_module_end ()
 
 typedef struct
 {
@@ -490,6 +500,7 @@ static void Close( vlc_va_sys_t *p_va )
     if( p_va->p_display_x11 )
         XCloseDisplay( p_va->p_display_x11 );
 }
+
 static void Delete( vlc_va_t *p_external )
 {
     vlc_va_sys_t *p_va = p_external->sys;
@@ -498,8 +509,7 @@ static void Delete( vlc_va_t *p_external )
     free( p_va );
 }
 
-/* */
-int vlc_va_New( vlc_va_t *p_va, int pixfmt, int i_codec_id,
+static int Create( vlc_va_t *p_va, int pixfmt, int i_codec_id,
                 const es_format_t *fmt )
 {
     /* Only VLD supported */
@@ -523,6 +533,5 @@ int vlc_va_New( vlc_va_t *p_va, int pixfmt, int i_codec_id,
     p_va->get = Get;
     p_va->release = Release;
     p_va->extract = Extract;
-    p_va->close = Delete;
     return VLC_SUCCESS;
 }

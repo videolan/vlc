@@ -31,6 +31,7 @@ struct vlc_va_t {
     VLC_COMMON_MEMBERS
 
     vlc_va_sys_t *sys;
+    module_t *module;
     char *description;
 
     int  (*setup)(vlc_va_t *, void **hw, vlc_fourcc_t *output,
@@ -38,7 +39,6 @@ struct vlc_va_t {
     int  (*get)(vlc_va_t *, AVFrame *frame);
     void (*release)(vlc_va_t *, AVFrame *frame);
     int  (*extract)(vlc_va_t *, picture_t *dst, AVFrame *src);
-    void (*close)(vlc_va_t *);
 };
 
 static inline int vlc_va_Setup(vlc_va_t *va, void **hw, vlc_fourcc_t *output,
@@ -58,12 +58,8 @@ static inline int vlc_va_Extract(vlc_va_t *va, picture_t *dst, AVFrame *src)
 {
     return va->extract(va, dst, src);
 }
-static inline void vlc_va_Delete(vlc_va_t *va)
-{
-    va->close(va);
-    vlc_object_release(va);
-}
 
-int vlc_va_New(vlc_va_t *, int pix, int codec, const es_format_t *);
+static vlc_va_t *vlc_va_New(vlc_object_t *, int, int, const es_format_t *);
+static void vlc_va_Delete(vlc_va_t *va);
 
 #endif
