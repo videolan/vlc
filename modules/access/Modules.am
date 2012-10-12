@@ -239,6 +239,21 @@ libdtv_plugin_la_LIBADD += libbda.la -lstdc++
 libvlc_LTLIBRARIES += libdtv_plugin.la
 endif
 
+# Old Linux DVB scanner
+libdvb_plugin_la_SOURCES = \
+	dvb/access.c \
+	dvb/linux_dvb.c \
+	dvb/scan.c dvb/scan.h \
+	dvb/dvb.h
+libdvb_plugin_la_CFLAGS = $(AM_CFLAGS)
+libdvb_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_LINUX_DVB
+libvlc_LTLIBRARIES += libdvb_plugin.la
+if HAVE_DVBPSI
+libdvb_plugin_la_CFLAGS += $(DVBPSI_CFLAGS)
+libdvb_plugin_la_LIBADD += $(DVBPSI_LIBS)
+endif
+endif
 
 ### Network streams ###
 

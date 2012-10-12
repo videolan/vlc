@@ -124,13 +124,6 @@ static int Open( vlc_object_t *p_this )
     if( *p_access->psz_access == '\0' )
         return VLC_EGENERIC;
 
-    /* Set up access */
-    p_access->pf_read = NULL;
-    p_access->pf_control = Control;
-    p_access->pf_seek = NULL;
-
-    access_InitFields( p_access );
-
     p_access->p_sys = p_sys = calloc( 1, sizeof( access_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
@@ -193,8 +186,14 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_read_once = DVB_READ_ONCE_SCAN;
     }
 
+    /* Set up access */
     free( p_access->psz_demux );
     p_access->psz_demux = strdup( "m3u8" );
+    p_access->pf_read = NULL;
+    p_access->pf_control = Control;
+    p_access->pf_seek = NULL;
+    access_InitFields( p_access );
+
     return VLC_SUCCESS;
 }
 
