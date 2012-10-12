@@ -939,6 +939,7 @@ static void ResourceManagerOpen( cam_t * p_cam, unsigned i_session_id )
  * Application Information
  */
 
+#ifdef ENABLE_HTTPD
 /*****************************************************************************
  * ApplicationInformationEnterMenu
  *****************************************************************************/
@@ -950,6 +951,7 @@ static void ApplicationInformationEnterMenu( cam_t * p_cam, int i_session_id )
     APDUSend( p_cam, i_session_id, AOT_ENTER_MENU, NULL, 0 );
     p_cam->pb_slot_mmi_expected[i_slot] = true;
 }
+#endif
 
 /*****************************************************************************
  * ApplicationInformationHandle
@@ -1610,7 +1612,7 @@ static void MMIFree( mmi_t *p_object )
     }
 }
 
-
+#ifdef ENABLE_HTTPD
 /*****************************************************************************
  * MMISendObject
  *****************************************************************************/
@@ -1660,6 +1662,7 @@ static void MMISendClose( cam_t *p_cam, int i_session_id )
 
     p_cam->pb_slot_mmi_expected[i_slot] = true;
 }
+#endif
 
 /*****************************************************************************
  * MMIDisplayReply
@@ -2282,6 +2285,7 @@ int en50221_SetCAPMT( cam_t * p_cam, dvbpsi_pmt_t *p_pmt )
     return VLC_SUCCESS;
 }
 
+#ifdef ENABLE_HTTPD
 /*****************************************************************************
  * en50221_OpenMMI :
  *****************************************************************************/
@@ -2394,7 +2398,6 @@ static void en50221_SendMMIObject( cam_t * p_cam, unsigned i_slot,
     msg_Err( p_cam->obj, "SendMMIObject when no MMI session is opened !" );
 }
 
-#ifdef ENABLE_HTTPD
 char *en50221_Status( cam_t *p_cam, char *psz_request )
 {
     if( psz_request != NULL && *psz_request )
