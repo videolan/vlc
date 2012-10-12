@@ -344,8 +344,11 @@ modules/codec/avcodec/avcodec.c
 modules/codec/avcodec/avcodec.h
 modules/codec/avcodec/chroma.c
 modules/codec/avcodec/deinterlace.c
+modules/codec/avcodec/dxva2.c
 modules/codec/avcodec/encoder.c
 modules/codec/avcodec/fourcc.c
+modules/codec/avcodec/vaapi.c
+modules/codec/avcodec/vda.c
 modules/codec/avcodec/video.c
 modules/codec/cc.c
 modules/codec/cc.h
