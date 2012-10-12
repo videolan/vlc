@@ -225,12 +225,8 @@ typedef struct {
 } vlc_va_surface_t;
 
 #define VA_DXVA2_MAX_SURFACE_COUNT (64)
-typedef struct
+struct vlc_va_sys_t
 {
-    /* */
-    vlc_va_t va;
-
-    /* */
     vlc_object_t *log;
     int          codec_id;
     int          width;
@@ -276,13 +272,15 @@ typedef struct
 
     vlc_va_surface_t surface[VA_DXVA2_MAX_SURFACE_COUNT];
     LPDIRECT3DSURFACE9 hw_surface[VA_DXVA2_MAX_SURFACE_COUNT];
-} vlc_va_dxva2_t;
+};
+typedef struct vlc_va_sys_t vlc_va_dxva2_t;
 
 /* */
-static vlc_va_dxva2_t *vlc_va_dxva2_Get(void *external)
+static vlc_va_dxva2_t *vlc_va_dxva2_Get(vlc_va_t *external)
 {
-    assert(external == (void*)(&((vlc_va_dxva2_t*)external)->va));
-    return external;
+    vlc_va_dxva2_t *va = external->sys;
+    assert(VLC_OBJECT(external) == va->log);
+    return va;
 }
 
 /* */
@@ -486,12 +484,12 @@ static void Close(vlc_va_t *external)
     if (va->hd3d9_dll)
         FreeLibrary(va->hd3d9_dll);
 
-    free(va->va.description);
+    free(external->description);
     free(va);
 }
 
-vlc_va_t *vlc_va_New(vlc_object_t *log, int pixfmt, int codec_id,
-                     const es_format_t *fmt)
+int vlc_va_New(vlc_va_t *log, int pixfmt, int codec_id,
+               const es_format_t *fmt)
 {
     if( pixfmt != PIX_FMT_DXVA2_VLD )
         return NULL;
@@ -500,8 +498,9 @@ vlc_va_t *vlc_va_New(vlc_object_t *log, int pixfmt, int codec_id,
     if (!va)
         return NULL;
 
+    external->sys = va;
     /* */
-    va->log = log;
+    va->log = VLC_OBJECT(external);
     va->codec_id = codec_id;
     (void) fmt;
 
@@ -542,17 +541,17 @@ vlc_va_t *vlc_va_New(vlc_object_t *log, int pixfmt, int codec_id,
     }
 
     /* TODO print the hardware name/vendor for debugging purposes */
-    va->va.description = DxDescribe(va);
-    va->va.setup   = Setup;
-    va->va.get     = Get;
-    va->va.release = Release;
-    va->va.extract = Extract;
-    va->va.close   = Close;
-    return &va->va;
+    external->description = DxDescribe(va);
+    external->setup   = Setup;
+    external->get     = Get;
+    external->release = Release;
+    external->extract = Extract;
+    external->close   = Close;
+    return VLC_SUCCESS;
 
 error:
-    Close(&va->va);
-    return NULL;
+    Close(va);
+    return VLC_EGENERIC;
 }
 /* */
 

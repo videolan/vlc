@@ -1144,9 +1144,12 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         msg_Dbg( p_dec, "Available decoder output format %d (%s)", pi_fmt[i],
                  name ? name : "unknown" );
 
-        vlc_va_t *p_va = vlc_va_New( VLC_OBJECT(p_dec), pi_fmt[i], p_sys->i_codec_id, &p_dec->fmt_in );
-        if( p_va == NULL )
+        vlc_va_t *p_va = vlc_object_create( p_dec, sizeof( *p_va ) );
+        if( unlikely(p_va == NULL) )
+            continue;
+        if( vlc_va_New( p_va, pi_fmt[i], p_sys->i_codec_id, &p_dec->fmt_in ) )
         {
+            vlc_object_release( p_va );
             msg_Dbg( p_dec, "acceleration not available" );
             continue;
         }

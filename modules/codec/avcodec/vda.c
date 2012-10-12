@@ -37,9 +37,8 @@
 #include <libavcodec/vda.h>
 #include <VideoDecodeAcceleration/VDADecoder.h>
 
-typedef struct
+struct vlc_va_sys_t
 {
-    vlc_va_t            va;
     struct vda_context  hw_ctx;
 
     const uint8_t       *p_extradata;
@@ -51,11 +50,13 @@ typedef struct
 
     vlc_object_t        *p_log;
 
-} vlc_va_vda_t;
+};
 
-static vlc_va_vda_t *vlc_va_vda_Get( void *p_va )
+typedef struct vlc_va_sys_t vlc_va_vda_t;
+
+static vlc_va_vda_t *vlc_va_vda_Get( vlc_va_t *p_va )
 {
-    return p_va;
+    return p_va->sys;
 }
 
 /*****************************************************************************
@@ -240,8 +241,8 @@ static void Close( vlc_va_t *p_external )
     free( p_va );
 }
 
-vlc_va_t *vlc_va_New( vlc_object_t *p_log, int pixfmt, int i_codec_id,
-                      const es_format_t *fmt )
+int vlc_va_New( vlc_va_t *external, int pixfmt, int i_codec_id,
+                const es_format_t *fmt )
 {
     if( pixfmt != PIX_FMT_VDA_VLD || i_codec_id != CODEC_ID_H264 )
         return NULL;
@@ -256,15 +257,17 @@ vlc_va_t *vlc_va_New( vlc_object_t *p_log, int pixfmt, int i_codec_id,
     if( !p_va )
         return NULL;
 
-    p_va->p_log = p_log;
+    p_va->p_log = VLC_OBJECT(external);
     p_va->p_extradata = fmt->p_extra;
     p_va->i_extradata = fmt->i_extra;
 
-    p_va->va.setup = Setup;
-    p_va->va.get = Get;
-    p_va->va.release = Release;
-    p_va->va.extract = Extract;
-    p_va->va.close = Close;
+    external->sys = p_va;
+    external->description = (char *)"VDA";
+    external->setup = Setup;
+    external->get = Get;
+    external->release = Release;
+    external->extract = Extract;
+    external->close = Close;
 
-    return &p_va->va;
+    return VLC_SUCCESS;
 }

@@ -25,7 +25,12 @@
 #define _VLC_VA_H 1
 
 typedef struct vlc_va_t vlc_va_t;
+typedef struct vlc_va_sys_t vlc_va_sys_t;
+
 struct vlc_va_t {
+    VLC_COMMON_MEMBERS
+
+    vlc_va_sys_t *sys;
     char *description;
 
     int  (*setup)(vlc_va_t *, void **hw, vlc_fourcc_t *output,
@@ -56,8 +61,9 @@ static inline int vlc_va_Extract(vlc_va_t *va, picture_t *dst, AVFrame *src)
 static inline void vlc_va_Delete(vlc_va_t *va)
 {
     va->close(va);
+    vlc_object_release(va);
 }
 
-vlc_va_t *vlc_va_New(vlc_object_t *, int pix, int codec, const es_format_t *);
+int vlc_va_New(vlc_va_t *, int pix, int codec, const es_format_t *);
 
 #endif
