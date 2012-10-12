@@ -168,12 +168,12 @@ struct vlc_thread
     pthread_t      thread;
     pthread_cond_t *cond; /// Non-null if thread waiting on cond
     vlc_mutex_t    lock ; /// Protects cond
+    vlc_sem_t      finished;
 
     void *(*entry)(void*);
     void *data;
 
     vlc_atomic_t killed;
-    vlc_atomic_t finished;
     bool killable;
 };
 
@@ -283,7 +283,7 @@ static void *joinable_thread(void *data)
 
     thread = th;
     ret = th->entry(th->data);
-    vlc_atomic_set(&th->finished, true);
+    vlc_sem_post(&th->finished);
     return ret;
 }
 
@@ -309,8 +309,9 @@ static int vlc_clone_attr (vlc_thread_t *th, void *(*entry) (void *),
         pthread_sigmask (SIG_BLOCK, &set, &oldset);
     }
 
+
+    vlc_sem_init(&thread->finished, 0);
     vlc_atomic_set(&thread->killed, false);
-    vlc_atomic_set(&thread->finished, false);
     thread->killable = true;
     thread->cond = NULL;
     thread->entry = entry;
@@ -340,9 +341,8 @@ int vlc_clone (vlc_thread_t *th, void *(*entry) (void *), void *data,
 
 void vlc_join (vlc_thread_t handle, void **result)
 {
-    vlc_testcancel();
-    while (!vlc_atomic_get(&handle->finished))
-        msleep(CLOCK_FREQ / 100);
+    vlc_sem_wait (&handle->finished);
+    vlc_sem_destroy (&handle->finished);
 
     int val = pthread_join (handle->thread, result);
     VLC_THREAD_ASSERT ("joining thread");
@@ -406,7 +406,7 @@ void vlc_testcancel (void)
     if (!vlc_atomic_get(&thread->killed))
         return;
 
-    vlc_atomic_set(&thread->finished, true);
+    vlc_sem_post(&thread->finished);
 #warning FIXME: memory leak for detached threads
     pthread_exit(NULL);
 }
