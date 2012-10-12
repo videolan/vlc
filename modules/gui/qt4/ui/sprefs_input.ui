@@ -69,10 +69,17 @@
       <item row="11" column="3">
        <widget class="QComboBox" name="tuneBox"/>
       </item>
-      <item row="4" column="0" colspan="3">
-       <widget class="QCheckBox" name="hwAccelBox">
+      <item row="4" column="1" colspan="2">
+       <widget class="QComboBox" name="hwAccelModule">
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="hwAccelLabel">
         <property name="text">
-         <string>Use GPU accelerated decoding</string>
+         <string>Hardware decoding acceleration</string>
+        </property>
+        <property name="buddy">
+         <cstring>hwAccelModule</cstring>
         </property>
        </widget>
       </item>
@@ -345,7 +352,7 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>hwAccelBox</tabstop>
+  <tabstop>hwAccelModule</tabstop>
   <tabstop>PostProcLevel</tabstop>
   <tabstop>loopFilterBox</tabstop>
   <tabstop>presetBox</tabstop>

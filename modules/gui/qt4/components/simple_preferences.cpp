@@ -471,11 +471,11 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 ui.live555TransportHTTPRadio->hide();
                 ui.live555TransportLabel->hide();
             }
-            CONFIG_BOOL( "avcodec-hw", hwAccelBox );
+            CONFIG_GENERIC( "avcodec-hw", StringList, ui.hwAccelLabel, hwAccelModule );
 #ifdef WIN32
             HINSTANCE hdxva2_dll = LoadLibrary(TEXT("DXVA2.DLL") );
             if( !hdxva2_dll )
-                ui.hwAccelBox->setEnabled( false );
+                ui.hwAccelModule->setEnabled( false );
             else
                 FreeLibrary( hdxva2_dll );
 #endif
