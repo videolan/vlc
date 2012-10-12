@@ -211,11 +211,10 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     if( p_sys->p_motion != NULL )
     {
-        int i_angle = motion_get_angle( p_sys->p_motion );
+        int i_angle = motion_get_angle( p_sys->p_motion ) / 2;
         if( p_sys->i_angle != i_angle )
         {
             p_sys->i_angle = i_angle;
-            i_angle = ((3600+i_angle/2)%3600);
             cache_trigo( i_angle, &p_sys->i_sin, &p_sys->i_cos );
         }
     }
@@ -376,11 +375,10 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
 
     if( p_sys->p_motion != NULL )
     {
-        int i_angle = motion_get_angle( p_sys->p_motion );
+        int i_angle = motion_get_angle( p_sys->p_motion ) / 2;
         if( p_sys->i_angle != i_angle )
         {
             p_sys->i_angle = i_angle;
-            i_angle = ((3600+i_angle/2)%3600);
             cache_trigo( i_angle, &p_sys->i_sin, &p_sys->i_cos );
         }
     }
