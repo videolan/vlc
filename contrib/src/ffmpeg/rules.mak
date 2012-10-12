@@ -7,6 +7,7 @@ FFMPEGCONF = \
 	--cc="$(CC)" \
 	--disable-doc \
 	--disable-decoder=bink \
+	--disable-encoder=vorbis \
 	--enable-libgsm \
 	--enable-libopenjpeg \
 	--disable-debug \
@@ -74,7 +75,7 @@ FFMPEGCONF += --cpu=core2
 endif
 endif
 ifdef HAVE_IOS
-FFMPEGCONF += --enable-pic --as="$(AS)" --disable-decoder=snow
+FFMPEGCONF += --enable-pic --as="$(AS)"
 endif
 
 # Linux
@@ -101,7 +102,7 @@ DEPS_ffmpeg += directx
 endif
 FFMPEGCONF += --target-os=mingw32 --enable-memalign-hack
 FFMPEGCONF += --enable-w32threads --enable-dxva2 \
-	--disable-decoder=dca --disable-encoder=vorbis \
+	--disable-decoder=dca
 
 ifdef HAVE_WIN64
 FFMPEGCONF += --cpu=athlon64 --arch=x86_64
