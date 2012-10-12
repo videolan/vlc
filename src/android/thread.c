@@ -408,6 +408,7 @@ void vlc_testcancel (void)
         return;
 
     vlc_atomic_set(&thread->finished, true);
+#warning FIXME: memory leak for detached threads
     pthread_exit(NULL);
 }
 
