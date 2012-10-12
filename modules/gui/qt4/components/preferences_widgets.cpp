@@ -81,10 +81,10 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
     switch( p_item->i_type )
     {
     case CONFIG_ITEM_MODULE:
-        p_control = new ModuleConfigControl( p_this, p_item, parent, false );
+        p_control = new StringListConfigControl( p_this, p_item, parent );
         break;
     case CONFIG_ITEM_MODULE_CAT:
-        p_control = new ModuleConfigControl( p_this, p_item, parent, true );
+        p_control = new ModuleConfigControl( p_this, p_item, parent );
         break;
     case CONFIG_ITEM_MODULE_LIST:
         p_control = new ModuleListConfigControl( p_this, p_item, parent, false );
@@ -509,13 +509,13 @@ void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
 
 /********* Module **********/
 ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
-               module_config_t *_p_item, QWidget *p, bool bycat ) :
+               module_config_t *_p_item, QWidget *p ) :
                VStringConfigControl( _p_this, _p_item )
 {
     label = new QLabel( qtr(p_item->psz_text), p );
     combo = new QComboBox( p );
     combo->setMinimumWidth( MINWIDTH_BOX );
-    finish( bycat );
+    finish( );
 }
 
 void ModuleConfigControl::fillGrid( QGridLayout *l, int line )
@@ -525,15 +525,15 @@ void ModuleConfigControl::fillGrid( QGridLayout *l, int line )
 }
 
 ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
-                module_config_t *_p_item, QLabel *_label, QComboBox *_combo,
-                bool bycat ) : VStringConfigControl( _p_this, _p_item )
+                module_config_t *_p_item, QLabel *_label, QComboBox *_combo )
+                : VStringConfigControl( _p_this, _p_item )
 {
     combo = _combo;
     label = _label;
-    finish( bycat );
+    finish( );
 }
 
-void ModuleConfigControl::finish( bool bycat )
+void ModuleConfigControl::finish( )
 {
     combo->setEditable( false );
 
@@ -545,36 +545,25 @@ void ModuleConfigControl::finish( bool bycat )
     {
         module_t *p_parser = p_list[i];
 
-        if( bycat )
-        {
-            if( !strcmp( module_get_object( p_parser ), "main" ) ) continue;
+        if( !strcmp( module_get_object( p_parser ), "main" ) ) continue;
 
-            unsigned confsize;
-            module_config_t *p_config;
+        unsigned confsize;
+        module_config_t *p_config;
 
-            p_config = module_config_get (p_parser, &confsize);
-            for (size_t i = 0; i < confsize; i++)
-            {
-                /* Hack: required subcategory is stored in i_min */
-                const module_config_t *p_cfg = p_config + i;
-                if( p_cfg->i_type == CONFIG_SUBCATEGORY &&
-                    p_cfg->value.i == p_item->min.i )
-                    combo->addItem( qtr( module_GetLongName( p_parser )),
-                                    QVariant( module_get_object( p_parser ) ) );
-                if( p_item->value.psz && !strcmp( p_item->value.psz,
-                                                  module_get_object( p_parser ) ) )
-                    combo->setCurrentIndex( combo->count() - 1 );
-            }
-            module_config_free (p_config);
-        }
-        else if( module_provides( p_parser, p_item->psz_type ) )
+        p_config = module_config_get (p_parser, &confsize);
+        for (size_t i = 0; i < confsize; i++)
         {
-            combo->addItem( qtr(module_GetLongName( p_parser ) ),
-                            QVariant( module_get_object( p_parser ) ) );
+            /* Hack: required subcategory is stored in i_min */
+            const module_config_t *p_cfg = p_config + i;
+            if( p_cfg->i_type == CONFIG_SUBCATEGORY &&
+                p_cfg->value.i == p_item->min.i )
+                combo->addItem( qtr( module_GetLongName( p_parser )),
+                                QVariant( module_get_object( p_parser ) ) );
             if( p_item->value.psz && !strcmp( p_item->value.psz,
                                               module_get_object( p_parser ) ) )
                 combo->setCurrentIndex( combo->count() - 1 );
         }
+        module_config_free (p_config);
     }
     module_list_free( p_list );
 

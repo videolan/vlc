@@ -221,7 +221,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_BOOL( "overlay", overlay );
             CONFIG_BOOL( "video-on-top", alwaysOnTop );
             CONFIG_BOOL( "video-deco", windowDecorations );
-            CONFIG_GENERIC( "vout", Module, ui.voutLabel, outputModule );
+            CONFIG_GENERIC( "vout", StringList, ui.voutLabel, outputModule );
 
 #ifdef WIN32
             CONFIG_GENERIC( "directx-device", StringList, ui.dxDeviceLabel,
@@ -350,12 +350,12 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                                     volNormSpin );
             CONFIG_GENERIC( "audio-replay-gain-mode", StringList, ui.replayLabel,
                             replayCombo );
-            CONFIG_GENERIC( "audio-visual" , Module , ui.visuLabel,
+            CONFIG_GENERIC( "audio-visual" , StringList, ui.visuLabel,
                             visualisation);
             CONFIG_BOOL( "audio-time-stretch", autoscaleBox );
 
             /* Audio Output Specifics */
-            CONFIG_GENERIC( "aout", Module, ui.outputLabel, outputModule );
+            CONFIG_GENERIC( "aout", StringList, ui.outputLabel, outputModule );
 
             CONNECT( ui.outputModule, currentIndexChanged( int ),
                      this, updateAudioOptions( int ) );

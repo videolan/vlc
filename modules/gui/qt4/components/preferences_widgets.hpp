@@ -386,9 +386,9 @@ protected:
 class ModuleConfigControl : public VStringConfigControl
 {
 public:
-    ModuleConfigControl( vlc_object_t *, module_config_t *, QWidget *, bool );
+    ModuleConfigControl( vlc_object_t *, module_config_t *, QWidget * );
     ModuleConfigControl( vlc_object_t *, module_config_t *, QLabel *,
-                         QComboBox*, bool );
+                         QComboBox* );
     virtual QString getValue() const;
 protected:
     virtual void changeVisibility( bool b )
@@ -398,7 +398,7 @@ protected:
     }
     virtual void fillGrid( QGridLayout*, int );
 private:
-    void finish( bool );
+    void finish( );
     QLabel *label;
     QComboBox *combo;
 };
