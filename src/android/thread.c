@@ -175,7 +175,6 @@ struct vlc_thread
     vlc_atomic_t killed;
     vlc_atomic_t finished;
     bool killable;
-    bool detached;
 };
 
 static __thread struct vlc_thread *thread = NULL;
@@ -183,21 +182,6 @@ static __thread struct vlc_thread *thread = NULL;
 void vlc_threads_setup (libvlc_int_t *p_libvlc)
 {
     (void)p_libvlc;
-}
-
-static void *andro_Thread(void *data)
-{
-    thread = data;
-    void *ret = thread->entry(thread->data);
-    if (thread->detached) {
-        /* release thread handle */
-        vlc_mutex_destroy(&thread->lock);
-        free(thread);
-    } else {
-        vlc_atomic_set(&thread->finished, true);
-        /* thread handle will be freed when vlc_join() is called */
-    }
-    return ret;
 }
 
 /* cond */
@@ -279,8 +263,32 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
 
 /* pthread */
 
-static int vlc_clone_attr (vlc_thread_t *th, pthread_attr_t *attr,
-                           void *(*entry) (void *), void *data, int priority)
+static void *detached_thread(void *data)
+{
+    vlc_thread_t th = data;
+
+    thread = th;
+    th->entry(th->data);
+
+    /* release thread handle */
+    vlc_mutex_destroy(&th->lock);
+    free(th);
+    return NULL;
+}
+
+static void *joinable_thread(void *data)
+{
+    vlc_thread_t th = data;
+    void *ret;
+
+    thread = th;
+    ret = th->entry(th->data);
+    vlc_atomic_set(&th->finished, true);
+    return ret;
+}
+
+static int vlc_clone_attr (vlc_thread_t *th, void *(*entry) (void *),
+                           void *data, bool detach)
 {
     int ret;
 
@@ -297,43 +305,37 @@ static int vlc_clone_attr (vlc_thread_t *th, pthread_attr_t *attr,
         pthread_sigmask (SIG_BLOCK, &set, &oldset);
     }
 
-    (void) priority;
-
     vlc_thread_t thread = malloc (sizeof (*thread));
-    if (unlikely(thread == NULL)) {
-        if (attr)
-            pthread_attr_destroy(attr);
+    if (unlikely(thread == NULL))
         return ENOMEM;
-    }
 
     vlc_atomic_set(&thread->killed, false);
     vlc_atomic_set(&thread->finished, false);
     thread->killable = true;
-    int state = PTHREAD_CREATE_JOINABLE;
-    if (attr)
-        pthread_attr_getdetachstate(attr, &state);
-    thread->detached = state == PTHREAD_CREATE_DETACHED;
     thread->cond = NULL;
     thread->entry = entry;
     thread->data = data;
     vlc_mutex_init(&thread->lock);
 
-    *th = thread;
-    ret = pthread_create (&thread->thread, attr, andro_Thread, thread);
+    pthread_attr_t attr;
+    pthread_attr_init (&attr);
+    pthread_attr_setdetachstate (&attr, detach ? PTHREAD_CREATE_DETACHED
+                                               : PTHREAD_CREATE_JOINABLE);
+
+    ret = pthread_create (&thread->thread, attr,
+                          detach ? detached_thread : joinable_thread, thread);
+    pthread_attr_destroy (&attr);
 
     pthread_sigmask (SIG_SETMASK, &oldset, NULL);
-    if (attr)
-        pthread_attr_destroy (attr);
+    *th = thread;
     return ret;
 }
 
 int vlc_clone (vlc_thread_t *th, void *(*entry) (void *), void *data,
                int priority)
 {
-    pthread_attr_t attr;
-
-    pthread_attr_init (&attr);
-    return vlc_clone_attr (th, &attr, entry, data, priority);
+    (void) priority;
+    return vlc_clone_attr (th, entry, data, false);
 }
 
 void vlc_join (vlc_thread_t handle, void **result)
@@ -352,14 +354,11 @@ int vlc_clone_detach (vlc_thread_t *th, void *(*entry) (void *), void *data,
                       int priority)
 {
     vlc_thread_t dummy;
-    pthread_attr_t attr;
-
     if (th == NULL)
         th = &dummy;
 
-    pthread_attr_init (&attr);
-    pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED);
-    return vlc_clone_attr (th, &attr, entry, data, priority);
+    (void) priority;
+    return vlc_clone_attr (th, entry, data, true);
 }
 
 int vlc_set_priority (vlc_thread_t th, int priority)
