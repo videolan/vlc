@@ -2232,16 +2232,15 @@ AC_ARG_ENABLE(libva,
 AS_IF([test "${enable_libva}" = "yes" -a "${have_avcodec}" != "yes" ], [
   AC_MSG_ERROR([--enable-libva and --disable-avcodec options are mutually exclusive. Use --enable-avcodec.])
 ])
+have_avcodec_vaapi="no"
 AS_IF([test "${enable_libva}" != "no"], [
   PKG_CHECK_MODULES(LIBVA, [libva libva-x11], [
     VLC_SAVE_FLAGS
     CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
     CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
     AC_CHECK_HEADERS(libavcodec/vaapi.h, [
-      VLC_ADD_LIBS([avcodec],[$LIBVA_LIBS ${X_LIBS} ${X_PRE_LIBS} -lX11])
-      VLC_ADD_CFLAGS([avcodec],[$LIBVA_CFLAGS ${X_CFLAGS}])
-      AC_DEFINE(HAVE_AVCODEC_VAAPI, 1, [Define if avcodec has to be built with VAAPI support.])
       AC_MSG_NOTICE([VAAPI acceleration activated])
+      have_avcodec_vaapi="yes"
     ],[
       AS_IF([test -n "${enable_libva}"], [
         AC_MSG_ERROR([libva is present but libavcodec/vaapi.h is missing])
@@ -2258,6 +2257,7 @@ AS_IF([test "${enable_libva}" != "no"], [
     ])
   ])
 ])
+AM_CONDITIONAL([HAVE_AVCODEC_VAAPI], [test "${have_avcodec_vaapi}" = "yes"])
 
 dnl
 dnl dxva2 needs avcodec
@@ -2265,15 +2265,15 @@ dnl
 AC_ARG_ENABLE(dxva2,
   [  --enable-dxva2          DxVA2 GPU decoding support (default auto)])
 
+have_avcodec_dxva2="no"
 AS_IF([test "${enable_dxva2}" != "no"], [
   if test "${SYS}" = "mingw32"; then
   AS_IF([test "x${have_avcodec}" = "xyes"], [
     AC_CHECK_HEADERS(dxva2api.h,
       [
         AC_CHECK_HEADERS(libavcodec/dxva2.h, [
-           VLC_ADD_LIBS([avcodec],[-lole32 -lshlwapi -luuid])
-           AC_DEFINE(HAVE_AVCODEC_DXVA2, 1, [Define if avcodec has to be built with DxVA2 support.])
-           echo "DxVA2 acceleration activated"
+           AC_MSG_NOTICE([DxVA2 acceleration activated])
+           have_avcodec_dxva2="yes"
         ],[
     AS_IF([test "${enable_dxva2}" = "yes"],
           [AC_MSG_ERROR([dxva2 is present but libavcodec/dxva2.h is missing])],
@@ -2293,6 +2293,7 @@ AS_IF([test "${enable_dxva2}" != "no"], [
   ])
   fi
 ])
+AM_CONDITIONAL([HAVE_AVCODEC_DXVA2], [test "${have_avcodec_dxva2}" = "yes"])
 
 dnl
 dnl vda needs avcodec
@@ -2300,15 +2301,14 @@ dnl
 AC_ARG_ENABLE(vda,
   [  --enable-vda          VDA  support (default auto)])
 
+have_avcodec_vda="no"
 AS_IF([test "${enable_vda}" != "no"], [
   if test "${SYS}" = "darwin"; then
   AS_IF([test "x${have_avcodec}" = "xyes"], [
     AC_CHECK_HEADERS(VideoDecodeAcceleration/VDADecoder.h,
       [
         AC_CHECK_HEADERS(libavcodec/vda.h, [
-           VLC_ADD_LIBS([avcodec],[-Wl,-framework,CoreFoundation,-framework,VideoDecodeAcceleration,-framework,QuartzCore])
-           VLC_ADD_LDFLAGS([vda],[-Wl,-framework,CoreFoundation,-framework,VideoDecodeAcceleration,-framework,QuartzCore])
-           AC_DEFINE(HAVE_AVCODEC_VDA, 1, [Define if avcodec has to be built with VDA support.])
+           have_avcodec_vda="yes"
         ],[
 	AS_IF([test "${enable_vda}" == "yes"],
 	      [AC_MSG_ERROR([vda is present but libavcodec/vda.h is missing])],
@@ -2326,6 +2326,7 @@ AS_IF([test "${enable_vda}" != "no"], [
  ])
   fi
 ])
+AM_CONDITIONAL([HAVE_AVCODEC_VDA], [test "${have_avcodec_vda}" = "yes"])
 
 dnl
 dnl stream_out switcher needs libavcodec

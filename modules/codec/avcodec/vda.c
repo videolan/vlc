@@ -34,8 +34,6 @@
 #include "va.h"
 #include "copy.h"
 
-#ifdef HAVE_AVCODEC_VDA
-
 #include <libavcodec/vda.h>
 #include <VideoDecodeAcceleration/VDADecoder.h>
 
@@ -270,4 +268,3 @@ vlc_va_t *vlc_va_New( vlc_object_t *p_log, int pixfmt, int i_codec_id,
 
     return &p_va->va;
 }
-#endif

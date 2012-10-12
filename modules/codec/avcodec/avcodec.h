@@ -287,12 +287,6 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
     (LIBAVCODEC_VERSION_MICRO >= 100 && LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( a, d, e ) )
 
 
-/* Uncomment it to enable compilation with vaapi/dxva2/vda (you also must change the build
- * system) */
-//#define HAVE_AVCODEC_VAAPI 1
-//#define HAVE_AVCODEC_DXVA2 1
-//#define HAVE_AVCODEC_VDA 1
-
 /* Ugly ifdefinitions to provide backwards compatibility with older ffmpeg/libav
  * versions */
 #ifndef AV_CPU_FLAG_FORCE

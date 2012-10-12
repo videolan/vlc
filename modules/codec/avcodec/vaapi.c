@@ -35,8 +35,6 @@
 #include "va.h"
 #include "copy.h"
 
-#ifdef HAVE_AVCODEC_VAAPI
-
 #include <vlc_xlib.h>
 
 #include <libavcodec/vaapi.h>
@@ -540,4 +538,3 @@ vlc_va_t *vlc_va_New( vlc_object_t *obj, int pixfmt, int i_codec_id,
     p_va->va.close = Delete;
     return &p_va->va;
 }
-#endif
