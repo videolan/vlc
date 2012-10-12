@@ -172,9 +172,9 @@ struct vlc_thread
     void *(*entry)(void*);
     void *data;
 
-    vlc_atomic_t killable;
     vlc_atomic_t killed;
     vlc_atomic_t finished;
+    bool killable;
     bool detached;
 };
 
@@ -306,9 +306,9 @@ static int vlc_clone_attr (vlc_thread_t *th, pthread_attr_t *attr,
         return ENOMEM;
     }
 
-    vlc_atomic_set(&thread->killable, true);
     vlc_atomic_set(&thread->killed, false);
     vlc_atomic_set(&thread->finished, false);
+    thread->killable = true;
     int state = PTHREAD_CREATE_JOINABLE;
     if (attr)
         pthread_attr_getdetachstate(attr, &state);
@@ -371,8 +371,6 @@ int vlc_set_priority (vlc_thread_t th, int priority)
 void vlc_cancel (vlc_thread_t thread_id)
 {
     vlc_atomic_set(&thread_id->killed, true);
-    if (!vlc_atomic_get(&thread_id->killable))
-        return;
 
     vlc_mutex_lock(&thread_id->lock);
     vlc_cond_t *cond = thread_id->cond;
@@ -388,7 +386,7 @@ int vlc_savecancel (void)
         return true;
 
     int oldstate = vlc_atomic_get(&thread->killable);
-    vlc_atomic_set(&thread->killable, false);
+    thread->killable = false;
     return oldstate;
 }
 
@@ -397,14 +395,14 @@ void vlc_restorecancel (int state)
     if (!thread) /* not created by VLC, can't be cancelled */
         return;
 
-    vlc_atomic_set(&thread->killable, state);
+    thread->killable = state;
 }
 
 void vlc_testcancel (void)
 {
     if (!thread) /* not created by VLC, can't be cancelled */
         return;
-    if (!vlc_atomic_get(&thread->killable))
+    if (!thread->killable)
         return;
     if (!vlc_atomic_get(&thread->killed))
         return;
