@@ -21,7 +21,7 @@
       <string>Codecs</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="8" column="2" colspan="2">
+      <item row="8" column="1" colspan="2">
        <widget class="QComboBox" name="loopFilterBox"/>
       </item>
       <item row="12" column="0">
@@ -56,7 +56,7 @@
         </property>
        </widget>
       </item>
-      <item row="11" column="1" colspan="2">
+      <item row="11" column="1">
        <widget class="QComboBox" name="presetBox">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -66,7 +66,7 @@
         </property>
        </widget>
       </item>
-      <item row="11" column="3">
+      <item row="11" column="2">
        <widget class="QComboBox" name="tuneBox"/>
       </item>
       <item row="4" column="1" colspan="2">
@@ -83,17 +83,17 @@
         </property>
        </widget>
       </item>
-      <item row="10" column="0" colspan="4">
+      <item row="10" column="0" colspan="3">
        <widget class="Line" name="line">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
-      <item row="12" column="3">
+      <item row="12" column="2">
        <widget class="QLineEdit" name="levelBox"/>
       </item>
-      <item row="12" column="1" colspan="2">
+      <item row="12" column="1">
        <widget class="QComboBox" name="profileBox">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -135,7 +135,7 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="2">
+      <item row="5" column="1">
        <widget class="QSpinBox" name="PostProcLevel">
         <property name="maximumSize">
          <size>
