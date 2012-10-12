@@ -290,6 +290,10 @@ static void *joinable_thread(void *data)
 static int vlc_clone_attr (vlc_thread_t *th, void *(*entry) (void *),
                            void *data, bool detach)
 {
+    vlc_thread_t thread = malloc (sizeof (*thread));
+    if (unlikely(thread == NULL))
+        return ENOMEM;
+
     int ret;
 
     sigset_t oldset;
@@ -304,10 +308,6 @@ static int vlc_clone_attr (vlc_thread_t *th, void *(*entry) (void *),
         sigaddset (&set, SIGPIPE); /* We don't want this one, really! */
         pthread_sigmask (SIG_BLOCK, &set, &oldset);
     }
-
-    vlc_thread_t thread = malloc (sizeof (*thread));
-    if (unlikely(thread == NULL))
-        return ENOMEM;
 
     vlc_atomic_set(&thread->killed, false);
     vlc_atomic_set(&thread->finished, false);
