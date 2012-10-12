@@ -379,6 +379,38 @@ ssize_t config_GetIntChoices (vlc_object_t *obj, const char *name,
 }
 
 
+static ssize_t config_ListModules (const char *cap, char ***restrict values,
+                                   char ***restrict texts)
+{
+    module_t **list;
+    ssize_t n = module_list_cap (&list, cap);
+    if (n <= 0)
+    {
+        *values = *texts = NULL;
+        return n;
+    }
+
+    char **vals = xmalloc ((n + 2) * sizeof (*vals));
+    char **txts = xmalloc ((n + 2) * sizeof (*txts));
+
+    vals[0] = xstrdup ("any");
+    txts[0] = xstrdup (_("Automatic"));
+
+    for (ssize_t i = 0; i < n; i++)
+    {
+        vals[i + 1] = xstrdup (module_get_object (list[i]));
+        txts[i + 1] = xstrdup (module_gettext (list[i],
+                               module_get_name (list[i], true)));
+    }
+
+    vals[n + 1] = xstrdup ("none");
+    txts[n + 1] = xstrdup (_("Disable"));
+
+    *values = vals;
+    *texts = txts;
+    return n + 2;
+}
+
 /**
  * Determines a list of suggested values for a string configuration item.
  * \param values pointer to a table of value strings [OUT]
@@ -396,9 +428,21 @@ ssize_t config_GetPszChoices (vlc_object_t *obj, const char *name,
     module_config_t *cfg = config_FindConfig (obj, name);
     if (cfg == NULL)
     {
-        msg_Warn (obj, "option %s does not exist", name);
         errno = ENOENT;
         return -1;
+    }
+
+    switch (cfg->i_type)
+    {
+        case CONFIG_ITEM_MODULE:
+            return config_ListModules (cfg->psz_type, values, texts);
+        default:
+            if (!IsConfigStringType (cfg->i_type))
+            {
+                errno = EINVAL;
+                return -1;
+            }
+            break;
     }
 
     size_t count = cfg->list_count;
