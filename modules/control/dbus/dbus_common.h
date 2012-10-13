@@ -108,6 +108,7 @@ struct intf_sys_t
 
 enum
 {
+    SIGNAL_NONE=0,
     SIGNAL_ITEM_CURRENT,
     SIGNAL_INTF_CHANGE,
     SIGNAL_PLAYLIST_ITEM_APPEND,

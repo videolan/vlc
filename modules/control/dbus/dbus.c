@@ -981,65 +981,61 @@ static int InputCallback( vlc_object_t *p_this, const char *psz_var,
 static int AllCallback( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    (void)p_this;
-    (void)oldval;
-
-    intf_thread_t *p_intf = (intf_thread_t*)p_data;
-    callback_info_t *info = calloc( 1, sizeof( callback_info_t ) );
-
-    if( !info )
-        return VLC_ENOMEM;
+    intf_thread_t *p_intf = p_data;
+    callback_info_t info = { .signal = SIGNAL_NONE };
 
     // Wich event is it ?
     if( !strcmp( "item-current", psz_var ) )
-        info->signal = SIGNAL_ITEM_CURRENT;
-
+        info.signal = SIGNAL_ITEM_CURRENT;
     else if( !strcmp( "volume", psz_var ) )
-        info->signal = SIGNAL_VOLUME_CHANGE;
-
+    {
+        if( oldval.f_float != newval.f_float )
+            info.signal = SIGNAL_VOLUME_CHANGE;
+    }
     else if( !strcmp( "mute", psz_var ) )
-        info->signal = SIGNAL_VOLUME_MUTED;
-
+    {
+        if( oldval.b_bool != newval.b_bool )
+            info.signal = SIGNAL_VOLUME_MUTED;
+    }
     else if( !strcmp( "intf-change", psz_var ) )
-        info->signal = SIGNAL_INTF_CHANGE;
-
+        info.signal = SIGNAL_INTF_CHANGE;
     else if( !strcmp( "playlist-item-append", psz_var ) )
     {
-        info->signal = SIGNAL_PLAYLIST_ITEM_APPEND;
-        info->i_node = ((playlist_add_t*)newval.p_address)->i_node;
+        info.signal = SIGNAL_PLAYLIST_ITEM_APPEND;
+        info.i_node = ((playlist_add_t*)newval.p_address)->i_node;
     }
-
     else if( !strcmp( "playlist-item-deleted", psz_var ) )
-        info->signal = SIGNAL_PLAYLIST_ITEM_DELETED;
-
+        info.signal = SIGNAL_PLAYLIST_ITEM_DELETED;
     else if( !strcmp( "random", psz_var ) )
-        info->signal = SIGNAL_RANDOM;
-
+        info.signal = SIGNAL_RANDOM;
     else if( !strcmp( "fullscreen", psz_var ) )
-        info->signal = SIGNAL_FULLSCREEN;
-
+        info.signal = SIGNAL_FULLSCREEN;
     else if( !strcmp( "repeat", psz_var ) )
-        info->signal = SIGNAL_REPEAT;
-
+        info.signal = SIGNAL_REPEAT;
     else if( !strcmp( "loop", psz_var ) )
-        info->signal = SIGNAL_LOOP;
-
+        info.signal = SIGNAL_LOOP;
     else if( !strcmp( "can-seek", psz_var ) )
-        info->signal = SIGNAL_CAN_SEEK;
-
+        info.signal = SIGNAL_CAN_SEEK;
     else if( !strcmp( "can-pause", psz_var ) )
-        info->signal = SIGNAL_CAN_PAUSE;
-
+        info.signal = SIGNAL_CAN_PAUSE;
     else
         assert(0);
 
+    if( info.signal == SIGNAL_NONE )
+        return VLC_SUCCESS;
+
+    callback_info_t *p_info = malloc( sizeof( *p_info ) );
+    if( unlikely(p_info == NULL) )
+        return VLC_ENOMEM;
+
     // Append the event
+    *p_info = info;
     vlc_mutex_lock( &p_intf->p_sys->lock );
-    vlc_array_append( p_intf->p_sys->p_events, info );
+    vlc_array_append( p_intf->p_sys->p_events, p_info );
     vlc_mutex_unlock( &p_intf->p_sys->lock );
 
     wakeup_main_loop( p_intf );
-
+    (void) p_this;
     return VLC_SUCCESS;
 }
 
