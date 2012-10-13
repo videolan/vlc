@@ -323,7 +323,7 @@ static int vlc_clone_attr (vlc_thread_t *th, void *(*entry) (void *),
     pthread_attr_setdetachstate (&attr, detach ? PTHREAD_CREATE_DETACHED
                                                : PTHREAD_CREATE_JOINABLE);
 
-    ret = pthread_create (&thread->thread, attr,
+    ret = pthread_create (&thread->thread, &attr,
                           detach ? detached_thread : joinable_thread, thread);
     pthread_attr_destroy (&attr);
 
@@ -384,7 +384,7 @@ int vlc_savecancel (void)
     if (!thread) /* not created by VLC, can't be cancelled */
         return true;
 
-    int oldstate = vlc_atomic_get(&thread->killable);
+    int oldstate = thread->killable;
     thread->killable = false;
     return oldstate;
 }
