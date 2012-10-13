@@ -39,12 +39,14 @@ movq       (%3), %%mm3  # Load 8 Y            Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
 " \
         :                                   \
         : "r" (p_u), "r" (p_v),             \
-          "r" (p_y1), "r" (p_y2) );         \
+          "r" (p_y1), "r" (p_y2)            \
+        : "mm0", "mm1", "mm2", "mm3");      \
     __asm__ __volatile__(                   \
         ".p2align 3 \n\t"                   \
         MMX_INSTRUCTIONS                    \
         :                                   \
-        : "r" (p_line1), "r" (p_line2) );   \
+        : "r" (p_line1), "r" (p_line2)      \
+        : "mm0", "mm1", "mm2", "mm3");      \
         p_line1 += 16; p_line2 += 16;       \
         p_y1 += 8; p_y2 += 8;               \
         p_u += 4; p_v += 4;                 \
@@ -199,13 +201,15 @@ movq        (%0), %%xmm1  # Load 8 Cb         u7 u6 u5 u4 u3 u2 u1 u0     \n\
 movq        (%1), %%xmm2  # Load 8 Cr         v7 06 v5 v4 v3 v2 v1 v0     \n\
 " \
         :                               \
-        : "r" (p_u),  "r" (p_v) );      \
+        : "r" (p_u),  "r" (p_v)         \
+        : "xmm1", "xmm2");              \
     __asm__ __volatile__(               \
         ".p2align 3 \n\t"               \
         SSE2_INSTRUCTIONS               \
         :                               \
         : "r" (p_line1), "r" (p_line2), \
-          "r" (p_y1),  "r" (p_y2) );    \
+          "r" (p_y1),  "r" (p_y2)       \
+        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4"); \
         p_line1 += 32; p_line2 += 32;   \
         p_y1 += 16; p_y2 += 16;         \
         p_u += 8; p_v += 8;             \

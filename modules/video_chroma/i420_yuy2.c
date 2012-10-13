@@ -45,12 +45,16 @@
 
 #if defined (MODULE_NAME_IS_i420_yuy2)
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV,cyuv,Y211"
+#    define VLC_TARGET
 #elif defined (MODULE_NAME_IS_i420_yuy2_mmx)
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV,cyuv"
+#    define VLC_TARGET VLC_MMX
 #elif defined (MODULE_NAME_IS_i420_yuy2_sse2)
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV,cyuv"
+#    define VLC_TARGET VLC_SSE
 #elif defined (MODULE_NAME_IS_i420_yuy2_altivec)
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422"
+#    define VLC_TARGET
 #endif
 
 /*****************************************************************************
@@ -184,12 +188,12 @@ static inline unsigned long long read_cycles(void)
 
 /* Following functions are local */
 
-VIDEO_FILTER_WRAPPER( I420_YUY2 )
-VIDEO_FILTER_WRAPPER( I420_YVYU )
-VIDEO_FILTER_WRAPPER( I420_UYVY )
+VLC_TARGET VIDEO_FILTER_WRAPPER( I420_YUY2 )
+VLC_TARGET VIDEO_FILTER_WRAPPER( I420_YVYU )
+VLC_TARGET VIDEO_FILTER_WRAPPER( I420_UYVY )
 #if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
-VIDEO_FILTER_WRAPPER( I420_IUYV )
-VIDEO_FILTER_WRAPPER( I420_cyuv )
+VLC_TARGET VIDEO_FILTER_WRAPPER( I420_IUYV )
+VLC_TARGET VIDEO_FILTER_WRAPPER( I420_cyuv )
 #endif
 #if defined (MODULE_NAME_IS_i420_yuy2)
 VIDEO_FILTER_WRAPPER( I420_Y211 )
