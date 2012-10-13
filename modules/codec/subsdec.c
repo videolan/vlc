@@ -262,23 +262,24 @@ static int OpenDecoder( vlc_object_t *p_this )
                  encoding);
     }
     else
-    /* Second, try configured encoding */
-    if ((var = var_InheritString (p_dec, "subsdec-encoding")) != NULL)
     {
-        msg_Dbg (p_dec, "trying configured character encoding: %s", var);
-        if (!strcmp (var, "system"))
+        /* Second, try configured encoding */
+        if ((var = var_InheritString (p_dec, "subsdec-encoding")) != NULL)
         {
-            free (var);
-            var = NULL;
-            encoding = "";
-            /* ^ iconv() treats "" as nl_langinfo(CODESET) */
+            msg_Dbg (p_dec, "trying configured character encoding: %s", var);
+            if (!strcmp (var, "system"))
+            {
+                free (var);
+                var = NULL;
+                encoding = "";
+                /* ^ iconv() treats "" as nl_langinfo(CODESET) */
+            }
+            else
+                encoding = var;
         }
         else
-            encoding = var;
-    }
-    else
-    /* Third, try "local" encoding with optional UTF-8 autodetection */
-    {
+        /* Third, try "local" encoding */
+        {
         /* xgettext:
            The Windows ANSI code page most commonly used for this language.
            VLC uses this as a guess of the subtitle files character set
@@ -289,8 +290,11 @@ static int OpenDecoder( vlc_object_t *p_this )
 
            This MUST be a valid iconv character set. If unsure, please refer
            the VideoLAN translators mailing list. */
-        encoding = vlc_pgettext("GetACP", "CP1252");
-        msg_Dbg (p_dec, "trying default character encoding: %s", encoding);
+            encoding = vlc_pgettext("GetACP", "CP1252");
+            msg_Dbg (p_dec, "trying default character encoding: %s", encoding);
+        }
+
+        /* Check UTF-8 autodetection */
         if (var_InheritBool (p_dec, "subsdec-autodetect-utf8"))
         {
             msg_Dbg (p_dec, "using automatic UTF-8 detection");
