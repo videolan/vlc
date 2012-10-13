@@ -1,5 +1,5 @@
 [Desktop Entry]
-X-KDE-Solid-Predicate=[ StorageVolume.ignored == false AND OpticalDisc.availableContent == 'Data|VideoDvd' ]
+X-KDE-Solid-Predicate=[ StorageVolume.ignored == false AND OpticalDisc.availableContent & 'VideoDvd' ]
 Type=Service
 Actions=open;
 
