@@ -42,10 +42,42 @@
 #include <unistd.h>
 
 #ifdef __OS2__
+# include <iconv.h>
+
 # define pthread_t      int
 # define pthread_self() _gettid()
-#endif
 
+static char *FromSystem(const void *str)
+{
+    iconv_t handle = iconv_open ("UTF-8", "");
+    if (handle == (iconv_t)(-1))
+        return NULL;
+
+    size_t str_len = strlen (str);
+    char *out = NULL;
+    for (unsigned mul = 4; mul < 8; mul++)
+    {
+        size_t in_size = str_len;
+        const char *in = str;
+        size_t out_max = mul * str_len;
+        char *tmp = out = malloc (1 + out_max);
+        if (!out)
+            break;
+
+        if (iconv (handle, &in, &in_size, &tmp, &out_max) != (size_t)(-1)) {
+            *tmp = '\0';
+            break;
+        }
+        free(out);
+        out = NULL;
+
+        if (errno != E2BIG)
+            break;
+    }
+    iconv_close(handle);
+    return out;
+}
+#endif
 
 extern void vlc_enable_override (void);
 
@@ -183,8 +215,18 @@ int main( int i_argc, const char *ppsz_argv[] )
     if (i_argc >= 1 && !strncmp (*ppsz_argv, "-psn" , 4))
         ppsz_argv++, i_argc--;
 #endif
+#ifdef __OS2__
+    for (int i = 0; i < i_argc; i++)
+        if ((argv[argc++] = FromSystem (ppsz_argv[i])) == NULL)
+        {
+            fprintf (stderr, "Converting '%s' to UTF-8 failed.\n",
+                     ppsz_argv[i]);
+            return 1;
+        }
+#else
     memcpy (argv + argc, ppsz_argv, i_argc * sizeof (*argv));
     argc += i_argc;
+#endif
     argv[argc] = NULL;
 
     vlc_enable_override ();
@@ -236,6 +278,11 @@ int main( int i_argc, const char *ppsz_argv[] )
 out:
     if (vlc != NULL)
         libvlc_release (vlc);
+
+#ifdef __OS2__
+    for (int i = 2; i < argc; i++)
+        free (argv[i]);
+#endif
 
     return 0;
 }
