@@ -393,6 +393,7 @@ DIST_http_lua = \
 	lua/http/old/style.css
 
 DIST_solid = \
+	solid/vlc-openbd.desktop \
 	solid/vlc-opencda.desktop \
 	solid/vlc-opendvd.desktop \
 	solid/vlc-openvcd.desktop

@@ -1,0 +1,9 @@
+[Desktop Entry]
+X-KDE-Solid-Predicate=[ StorageVolume.ignored == false AND OpticalDisc.availableContent & 'VideoBluRay' ]
+Type=Service
+Actions=open;
+
+[Desktop Action open]
+Name=Open with VLC media player
+Exec=vlc bluray://%d
+Icon=vlc
