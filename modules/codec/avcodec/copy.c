@@ -47,9 +47,9 @@
         store " %%xmm4,   48(%[dst])\n" \
         : : [dst]"r"(dstp), [src]"r"(srcp) : "memory")
 
-#ifndef __SSE4A__
-# undef vlc_CPU_SSE4A
-# define vlc_CPU_SSE4A() ((cpu & VLC_CPU_SSE4A) != 0)
+#ifndef __SSE4_1__
+# undef vlc_CPU_SSE4_1
+# define vlc_CPU_SSE4_1() ((cpu & VLC_CPU_SSE4_1) != 0)
 #endif
 
 #ifndef __SSSE3__
