@@ -25,8 +25,10 @@
 #define _VLC_AVCODEC_COPY_H 1
 
 typedef struct {
+# ifdef CAN_COMPILE_SSE2
     uint8_t *buffer;
     size_t  size;
+# endif
 } copy_cache_t;
 
 int  CopyInitCache(copy_cache_t *cache, unsigned width);

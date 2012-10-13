@@ -322,7 +322,8 @@ static int CreateSurfaces( vlc_va_sys_t *p_va, void **pp_hw_ctx, vlc_fourcc_t *p
         goto error;
     *pi_chroma = i_chroma;
 
-    CopyInitCache( &p_va->image_cache, i_width );
+    if( unlikely(CopyInitCache( &p_va->image_cache, i_width )) )
+        goto error;
 
     /* Setup the ffmpeg hardware context */
     *pp_hw_ctx = &p_va->hw_ctx;
@@ -369,9 +370,6 @@ static int Setup( vlc_va_t *p_external, void **pp_hw_ctx, vlc_fourcc_t *pi_chrom
 static int Extract( vlc_va_t *p_external, picture_t *p_picture, AVFrame *p_ff )
 {
     vlc_va_sys_t *p_va = p_external->sys;
-
-    if( !p_va->image_cache.buffer )
-        return VLC_EGENERIC;
 
     VASurfaceID i_surface_id = (VASurfaceID)(uintptr_t)p_ff->data[3];
 

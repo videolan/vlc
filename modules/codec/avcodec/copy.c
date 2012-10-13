@@ -32,6 +32,31 @@
 
 #include "copy.h"
 
+int CopyInitCache(copy_cache_t *cache, unsigned width)
+{
+#ifdef CAN_COMPILE_SSE2
+    cache->size = __MAX((width + 0x0f) & ~ 0x0f, 4096);
+    cache->buffer = vlc_memalign(16, cache->size);
+    if (!cache->buffer)
+        return VLC_EGENERIC;
+#else
+    (void) cache; (void) width;
+#endif
+    return VLC_SUCCESS;
+}
+
+void CopyCleanCache(copy_cache_t *cache)
+{
+#ifdef CAN_COMPILE_SSE2
+    vlc_free(cache->buffer);
+    cache->buffer = NULL;
+    cache->size   = 0;
+#else
+    (void) cache;
+#endif
+}
+
+#ifdef CAN_COMPILE_SSE2
 /* Copy 64 bytes from srcp to dstp loading data with the SSE>=2 instruction
  * load and storing data with the SSE>=2 instruction store.
  */
@@ -57,20 +82,9 @@
 # define vlc_CPU_SSSE3() ((cpu & VLC_CPU_SSSE3) != 0)
 #endif
 
-/* Execute the instruction op only if SSE2 is supported. */
-#ifdef CAN_COMPILE_SSE2
-# ifdef __SSE2__
-#  define ASM_SSE2(cpu, op) asm volatile (op)
-# else
-#  define ASM_SSE2(cpu, op) do { \
-    if (cpu & VLC_CPU_SSE2) \
-        asm volatile (op); \
-    } while (0)
-#  undef vlc_CPU_SSE2
-#  define vlc_CPU_SSE2() ((cpu & VLC_CPU_SSE2) != 0)
-# endif
-#else
-# define ASM_SSE2(cpu, op)
+#ifndef __SSE2__
+# undef vlc_CPU_SSE2
+# define vlc_CPU_SSE2() ((cpu & VLC_CPU_SSE2) != 0)
 #endif
 
 /* Optimized copy from "Uncacheable Speculative Write Combining" memory
@@ -84,7 +98,8 @@ static void CopyFromUswc(uint8_t *dst, size_t dst_pitch,
 {
     assert(((intptr_t)dst & 0x0f) == 0 && (dst_pitch & 0x0f) == 0);
 
-    ASM_SSE2(cpu, "mfence");
+    asm volatile ("mfence");
+
     for (unsigned y = 0; y < height; y++) {
         const unsigned unaligned = (-(uintptr_t)src) & 0x0f;
         unsigned x = 0;
@@ -103,8 +118,7 @@ static void CopyFromUswc(uint8_t *dst, size_t dst_pitch,
             }
         } else
 #endif
-#ifdef CAN_COMPILE_SSE2
-        if (vlc_CPU_SSE2()) {
+        {
             if (!unaligned) {
                 for (; x+63 < width; x += 64)
                     COPY64(&dst[x], &src[x], "movdqa", "movdqa");
@@ -113,7 +127,6 @@ static void CopyFromUswc(uint8_t *dst, size_t dst_pitch,
                     COPY64(&dst[x], &src[x], "movdqa", "movdqu");
             }
         }
-#endif
 
         for (; x < width; x++)
             dst[x] = src[x];
@@ -125,29 +138,23 @@ static void CopyFromUswc(uint8_t *dst, size_t dst_pitch,
 
 static void Copy2d(uint8_t *dst, size_t dst_pitch,
                    const uint8_t *src, size_t src_pitch,
-                   unsigned width, unsigned height,
-                   unsigned cpu)
+                   unsigned width, unsigned height)
 {
     assert(((intptr_t)src & 0x0f) == 0 && (src_pitch & 0x0f) == 0);
 
-    ASM_SSE2(cpu, "mfence");
+    asm volatile ("mfence");
 
     for (unsigned y = 0; y < height; y++) {
         unsigned x = 0;
 
-#ifdef CAN_COMPILE_SSE2
         bool unaligned = ((intptr_t)dst & 0x0f) != 0;
-
-        if (vlc_CPU_SSE2()) {
-            if (!unaligned) {
-                for (; x+63 < width; x += 64)
-                    COPY64(&dst[x], &src[x], "movdqa", "movntdq");
-            } else {
-                for (; x+63 < width; x += 64)
-                    COPY64(&dst[x], &src[x], "movdqa", "movdqu");
-            }
+        if (!unaligned) {
+            for (; x+63 < width; x += 64)
+                COPY64(&dst[x], &src[x], "movdqa", "movntdq");
+        } else {
+            for (; x+63 < width; x += 64)
+                COPY64(&dst[x], &src[x], "movdqa", "movdqu");
         }
-#endif
 
         for (; x < width; x++)
             dst[x] = src[x];
@@ -157,10 +164,10 @@ static void Copy2d(uint8_t *dst, size_t dst_pitch,
     }
 }
 
-static void SplitUV(uint8_t *dstu, size_t dstu_pitch,
-                    uint8_t *dstv, size_t dstv_pitch,
-                    const uint8_t *src, size_t src_pitch,
-                    unsigned width, unsigned height, unsigned cpu)
+static void SSE_SplitUV(uint8_t *dstu, size_t dstu_pitch,
+                        uint8_t *dstv, size_t dstv_pitch,
+                        const uint8_t *src, size_t src_pitch,
+                        unsigned width, unsigned height, unsigned cpu)
 {
     const uint8_t shuffle[] = { 0, 2, 4, 6, 8, 10, 12, 14,
                                 1, 3, 5, 7, 9, 11, 13, 15 };
@@ -169,7 +176,7 @@ static void SplitUV(uint8_t *dstu, size_t dstu_pitch,
 
     assert(((intptr_t)src & 0x0f) == 0 && (src_pitch & 0x0f) == 0);
 
-    ASM_SSE2(cpu, "mfence");
+    asm volatile ("mfence");
 
     for (unsigned y = 0; y < height; y++) {
         unsigned x = 0;
@@ -206,8 +213,7 @@ static void SplitUV(uint8_t *dstu, size_t dstu_pitch,
             }
         } else
 #endif
-#ifdef CAN_COMPILE_SSE2
-        if (vlc_CPU_SSE2()) {
+        {
             for (x = 0; x < (width & ~31); x += 32) {
                 asm volatile (
                     "movdqu (%[mask]), %%xmm7\n"
@@ -231,7 +237,6 @@ static void SplitUV(uint8_t *dstu, size_t dstu_pitch,
                     : : [dst2]"r"(&dstu[x]), [dst1]"r"(&dstv[x]), [src]"r"(&src[2*x]), [mask]"r"(mask) : "memory");
             }
         }
-#endif
 #undef STORE2X32
 #undef LOAD64
 
@@ -245,10 +250,10 @@ static void SplitUV(uint8_t *dstu, size_t dstu_pitch,
     }
 }
 
-static void CopyPlane(uint8_t *dst, size_t dst_pitch, const uint8_t *src, size_t src_pitch,
-                      uint8_t *cache, size_t cache_size,
-                      unsigned width, unsigned height,
-                      unsigned cpu)
+static void SSE_CopyPlane(uint8_t *dst, size_t dst_pitch,
+                          const uint8_t *src, size_t src_pitch,
+                          uint8_t *cache, size_t cache_size,
+                          unsigned width, unsigned height, unsigned cpu)
 {
     const unsigned w16 = (width+15) & ~15;
     const unsigned hstep = cache_size / w16;
@@ -265,21 +270,20 @@ static void CopyPlane(uint8_t *dst, size_t dst_pitch, const uint8_t *src, size_t
         /* Copy from our cache to the destination */
         Copy2d(dst, dst_pitch,
                cache, w16,
-               width, hblock, cpu);
+               width, hblock);
 
         /* */
         src += src_pitch * hblock;
         dst += dst_pitch * hblock;
     }
-
-    ASM_SSE2(cpu, "mfence");
+    asm volatile ("mfence");
 }
-static void SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
-                        uint8_t *dstv, size_t dstv_pitch,
-                        const uint8_t *src, size_t src_pitch,
-                        uint8_t *cache, size_t cache_size,
-                        unsigned width, unsigned height,
-                        unsigned cpu)
+
+static void SSE_SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
+                            uint8_t *dstv, size_t dstv_pitch,
+                            const uint8_t *src, size_t src_pitch,
+                            uint8_t *cache, size_t cache_size,
+                            unsigned width, unsigned height, unsigned cpu)
 {
     const unsigned w2_16 = (2*width+15) & ~15;
     const unsigned hstep = cache_size / w2_16;
@@ -289,76 +293,125 @@ static void SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
         const unsigned hblock =  __MIN(hstep, height - y);
 
         /* Copy a bunch of line into our cache */
-        CopyFromUswc(cache, w2_16,
-                     src, src_pitch,
+        CopyFromUswc(cache, w2_16, src, src_pitch,
                      2*width, hblock, cpu);
 
         /* Copy from our cache to the destination */
-        SplitUV(dstu, dstu_pitch,
-                dstv, dstv_pitch,
-                cache, w2_16,
-                width, hblock, cpu);
+        SSE_SplitUV(dstu, dstu_pitch, dstv, dstv_pitch,
+                    cache, w2_16, width, hblock, cpu);
 
         /* */
         src  += src_pitch  * hblock;
         dstu += dstu_pitch * hblock;
         dstv += dstv_pitch * hblock;
     }
-
-    ASM_SSE2(cpu, "mfence");
+    asm volatile ("mfence");
 }
 
-int CopyInitCache(copy_cache_t *cache, unsigned width)
-{
-    cache->size = __MAX((width + 0x0f) & ~ 0x0f, 4096);
-    cache->buffer = vlc_memalign(16, cache->size);
-    if (!cache->buffer)
-        return VLC_EGENERIC;
-    return VLC_SUCCESS;
-}
-void CopyCleanCache(copy_cache_t *cache)
-{
-    vlc_free(cache->buffer);
-    cache->buffer = NULL;
-    cache->size   = 0;
-}
-
-void CopyFromNv12(picture_t *dst, uint8_t *src[2], size_t src_pitch[2],
-                  unsigned width, unsigned height,
-                  copy_cache_t *cache)
+static void SSE_CopyFromNv12(picture_t *dst,
+                             uint8_t *src[2], size_t src_pitch[2],
+                             unsigned width, unsigned height,
+                             copy_cache_t *cache)
 {
     const unsigned cpu = vlc_CPU();
 
     /* */
-    CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch,
-              src[0], src_pitch[0],
-              cache->buffer, cache->size,
-              width, height, cpu);
-    SplitPlanes(dst->p[2].p_pixels, dst->p[2].i_pitch,
-                dst->p[1].p_pixels, dst->p[1].i_pitch,
-                src[1], src_pitch[1],
-                cache->buffer, cache->size,
-                width/2, height/2, cpu);
-
-    ASM_SSE2(cpu, "emms");
+    SSE_CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch,
+                  src[0], src_pitch[0],
+                  cache->buffer, cache->size,
+                  width, height, cpu);
+    SSE_SplitPlanes(dst->p[2].p_pixels, dst->p[2].i_pitch,
+                    dst->p[1].p_pixels, dst->p[1].i_pitch,
+                    src[1], src_pitch[1],
+                    cache->buffer, cache->size,
+                    width/2, height/2, cpu);
+    asm volatile ("emms");
 }
-void CopyFromYv12(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
-                  unsigned width, unsigned height,
-                  copy_cache_t *cache)
+
+static void SSE_CopyFromYv12(picture_t *dst,
+                             uint8_t *src[3], size_t src_pitch[3],
+                             unsigned width, unsigned height,
+                             copy_cache_t *cache)
 {
     const unsigned cpu = vlc_CPU();
 
     /* */
     for (unsigned n = 0; n < 3; n++) {
         const unsigned d = n > 0 ? 2 : 1;
-        CopyPlane(dst->p[n].p_pixels, dst->p[n].i_pitch,
-                  src[n], src_pitch[n],
-                  cache->buffer, cache->size,
-                  width/d, height/d, cpu);
+        SSE_CopyPlane(dst->p[n].p_pixels, dst->p[n].i_pitch,
+                      src[n], src_pitch[n],
+                      cache->buffer, cache->size,
+                      width/d, height/d, cpu);
     }
-    ASM_SSE2(cpu, "emms");
+    asm volatile ("emms");
+}
+#undef COPY64
+#endif /* CAN_COMPILE_SSE2 */
+
+static void CopyPlane(uint8_t *dst, size_t dst_pitch,
+                      const uint8_t *src, size_t src_pitch,
+                      unsigned width, unsigned height)
+{
+    for (unsigned y = 0; y < height; y++) {
+        memcpy(dst, src, width);
+        src += src_pitch;
+        dst += dst_pitch;
+    }
 }
 
-#undef ASM_SSE2
-#undef COPY64
+static void SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
+                        uint8_t *dstv, size_t dstv_pitch,
+                        const uint8_t *src, size_t src_pitch,
+                        unsigned width, unsigned height)
+{
+    for (unsigned y = 0; y < height; y++) {
+        for (unsigned x = 0; x < width; x++) {
+            dstu[x] = src[2*x+0];
+            dstv[x] = src[2*x+1];
+        }
+        src  += src_pitch;
+        dstu += dstu_pitch;
+        dstv += dstv_pitch;
+    }
+}
 
+void CopyFromNv12(picture_t *dst, uint8_t *src[2], size_t src_pitch[2],
+                  unsigned width, unsigned height,
+                  copy_cache_t *cache)
+{
+#ifdef CAN_COMPILE_SSE2
+    unsigned cpu = vlc_CPU();
+    if (vlc_CPU_SSE2())
+        return SSE_CopyFromNv12(dst, src, src_pitch, width, height, cache);
+#else
+    (void) cache;
+#endif
+
+    CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch,
+              src[0], src_pitch[0],
+              width, height);
+    SplitPlanes(dst->p[2].p_pixels, dst->p[2].i_pitch,
+                dst->p[1].p_pixels, dst->p[1].i_pitch,
+                src[1], src_pitch[1],
+                width/2, height/2);
+}
+
+void CopyFromYv12(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
+                  unsigned width, unsigned height,
+                  copy_cache_t *cache)
+{
+#ifdef CAN_COMPILE_SSE2
+    unsigned cpu = vlc_CPU();
+    if (vlc_CPU_SSE2())
+        return SSE_CopyFromYv12(dst, src, src_pitch, width, height, cache);
+#else
+    (void) cache;
+#endif
+
+     CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch,
+               src[0], src_pitch[0], width, height);
+     CopyPlane(dst->p[1].p_pixels, dst->p[1].i_pitch,
+               src[1], src_pitch[1], width / 2, height / 2);
+     CopyPlane(dst->p[2].p_pixels, dst->p[2].i_pitch,
+               src[1], src_pitch[2], width / 2, height / 2);
+}
