@@ -30,20 +30,20 @@ VLC_API unsigned vlc_CPU(void);
 
 # if defined (__i386__) || defined (__x86_64__)
 #  define HAVE_FPU 1
-#  define VLC_CPU_MMX    8
-#  define VLC_CPU_3dNOW  16
-#  define VLC_CPU_MMXEXT 32
-#  define VLC_CPU_SSE    64
-#  define VLC_CPU_SSE2   128
-#  define VLC_CPU_SSE3   256
-#  define VLC_CPU_SSSE3  512
-#  define VLC_CPU_SSE4_1 1024
-#  define VLC_CPU_SSE4_2 2048
-#  define VLC_CPU_SSE4A  4096
-#  define VLC_CPU_AVX    8192
-#  define VLC_CPU_AVX2   16384
-#  define VLC_CPU_XOP    32768
-#  define VLC_CPU_FMA4   65536
+#  define VLC_CPU_MMX    0x00000008
+#  define VLC_CPU_3dNOW  0x00000010
+#  define VLC_CPU_MMXEXT 0x00000020
+#  define VLC_CPU_SSE    0x00000040
+#  define VLC_CPU_SSE2   0x00000080
+#  define VLC_CPU_SSE3   0x00000100
+#  define VLC_CPU_SSSE3  0x00000200
+#  define VLC_CPU_SSE4_1 0x00000400
+#  define VLC_CPU_SSE4_2 0x00000800
+#  define VLC_CPU_SSE4A  0x00001000
+#  define VLC_CPU_AVX    0x00002000
+#  define VLC_CPU_AVX2   0x00004000
+#  define VLC_CPU_XOP    0x00008000
+#  define VLC_CPU_FMA4   0x00010000
 
 # if defined (__MMX__)
 #  define vlc_CPU_MMX() (1)
