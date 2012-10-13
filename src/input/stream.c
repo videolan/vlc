@@ -1597,16 +1597,20 @@ char *stream_ReadLine( stream_t *s )
         i_line += s->p_text->i_char_width; /* the added \0 */
         if( s->p_text->i_char_width > 1 )
         {
+            int i_new_line = 0;
             size_t i_in = 0, i_out = 0;
             const char * p_in = NULL;
             char * p_out = NULL;
             char * psz_new_line = NULL;
 
             /* iconv */
-            psz_new_line = malloc( i_line );
+            /* UTF-8 needs at most 150% of the buffer as many as UTF-16 */
+            i_new_line = i_line * 3 / 2;
+            psz_new_line = malloc( i_new_line );
             if( psz_new_line == NULL )
                 goto error;
-            i_in = i_out = (size_t)i_line;
+            i_in = (size_t)i_line;
+            i_out = (size_t)i_new_line;
             p_in = p_line;
             p_out = psz_new_line;
 
@@ -1617,7 +1621,7 @@ char *stream_ReadLine( stream_t *s )
             }
             free( p_line );
             p_line = psz_new_line;
-            i_line = (size_t)i_line - i_out; /* does not include \0 */
+            i_line = (size_t)i_new_line - i_out; /* does not include \0 */
         }
 
         /* Remove trailing LF/CR */
