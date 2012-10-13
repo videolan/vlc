@@ -34,127 +34,13 @@
  *
  */
 
-#if defined( WIN32 )
-#   include <process.h>                                         /* Win32 API */
+#if defined (WIN32)
+# include <process.h>
+# ifndef ETIMEDOUT
+#  define ETIMEDOUT 10060 /* This is the value in winsock.h. */
+# endif
 
-#elif defined( __OS2__ )                                        /* OS/2 API  */
-#   include <errno.h>
-
-#   define pthread_sigmask  sigprocmask
-
-#elif defined( __ANDROID__ )      /* pthreads subset without pthread_cancel() */
-
-#   define LIBVLC_NEED_SEMAPHORE
-#   define LIBVLC_NEED_RWLOCK
-
-#   include <unistd.h> /* _POSIX_SPIN_LOCKS */
-#   include <pthread.h>
-#   include <poll.h>
-
-#else                                         /* pthreads (like Linux & BSD) */
-#   define LIBVLC_USE_PTHREAD 1
-#   define LIBVLC_USE_PTHREAD_CANCEL 1
-#   define _APPLE_C_SOURCE    1 /* Proper pthread semantics on OSX */
-
-#   include <unistd.h> /* _POSIX_SPIN_LOCKS */
-#   include <pthread.h>
-
-/* Unnamed POSIX semaphores not supported on Mac OS X, use Mach semaphores instead */
-#   if defined (__APPLE__)
-#      include <mach/semaphore.h>
-#      include <mach/task.h>
-#   else
-#      include <semaphore.h>
-#   endif
-
-#endif
-
-/*****************************************************************************
- * Constants
- *****************************************************************************/
-
-/* Thread priorities */
-#ifdef __APPLE__
-#   define VLC_THREAD_PRIORITY_LOW      0
-#   define VLC_THREAD_PRIORITY_INPUT   22
-#   define VLC_THREAD_PRIORITY_AUDIO   22
-#   define VLC_THREAD_PRIORITY_VIDEO    0
-#   define VLC_THREAD_PRIORITY_OUTPUT  22
-#   define VLC_THREAD_PRIORITY_HIGHEST 22
-
-#elif defined(LIBVLC_USE_PTHREAD) || defined(__ANDROID__)
-#   define VLC_THREAD_PRIORITY_LOW      0
-#   define VLC_THREAD_PRIORITY_INPUT   10
-#   define VLC_THREAD_PRIORITY_AUDIO    5
-#   define VLC_THREAD_PRIORITY_VIDEO    0
-#   define VLC_THREAD_PRIORITY_OUTPUT  15
-#   define VLC_THREAD_PRIORITY_HIGHEST 20
-
-#elif defined(WIN32)
-/* Define different priorities for WinNT/2K/XP and Win9x/Me */
-#   define VLC_THREAD_PRIORITY_LOW 0
-#   define VLC_THREAD_PRIORITY_INPUT \
-        THREAD_PRIORITY_ABOVE_NORMAL
-#   define VLC_THREAD_PRIORITY_AUDIO \
-        THREAD_PRIORITY_HIGHEST
-#   define VLC_THREAD_PRIORITY_VIDEO 0
-#   define VLC_THREAD_PRIORITY_OUTPUT \
-        THREAD_PRIORITY_ABOVE_NORMAL
-#   define VLC_THREAD_PRIORITY_HIGHEST \
-        THREAD_PRIORITY_TIME_CRITICAL
-
-#elif defined(__OS2__)
-#   define VLC_THREAD_PRIORITY_LOW      0
-#   define VLC_THREAD_PRIORITY_INPUT    MAKESHORT( PRTYD_MAXIMUM / 2, PRTYC_REGULAR )
-#   define VLC_THREAD_PRIORITY_AUDIO    MAKESHORT( PRTYD_MAXIMUM, PRTYC_REGULAR )
-#   define VLC_THREAD_PRIORITY_VIDEO    0
-#   define VLC_THREAD_PRIORITY_OUTPUT   MAKESHORT( PRTYD_MAXIMUM / 2, PRTYC_REGULAR )
-#   define VLC_THREAD_PRIORITY_HIGHEST  MAKESHORT( 0, PRTYC_TIMECRITICAL )
-
-#else
-#   define VLC_THREAD_PRIORITY_LOW 0
-#   define VLC_THREAD_PRIORITY_INPUT 0
-#   define VLC_THREAD_PRIORITY_AUDIO 0
-#   define VLC_THREAD_PRIORITY_VIDEO 0
-#   define VLC_THREAD_PRIORITY_OUTPUT 0
-#   define VLC_THREAD_PRIORITY_HIGHEST 0
-
-#endif
-
-/*****************************************************************************
- * Type definitions
- *****************************************************************************/
-
-#if defined (__ANDROID__)
 typedef struct vlc_thread *vlc_thread_t;
-typedef pthread_mutex_t vlc_mutex_t;
-#define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
-typedef pthread_cond_t  vlc_cond_t;
-#define VLC_STATIC_COND  PTHREAD_COND_INITIALIZER
-
-typedef pthread_key_t   vlc_threadvar_t;
-typedef struct vlc_timer *vlc_timer_t;
-
-#elif defined (LIBVLC_USE_PTHREAD)
-typedef pthread_t       vlc_thread_t;
-typedef pthread_mutex_t vlc_mutex_t;
-#define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
-typedef pthread_cond_t  vlc_cond_t;
-#define VLC_STATIC_COND  PTHREAD_COND_INITIALIZER
-typedef pthread_rwlock_t vlc_rwlock_t;
-#define VLC_STATIC_RWLOCK PTHREAD_RWLOCK_INITIALIZER
-typedef pthread_key_t   vlc_threadvar_t;
-typedef struct vlc_timer *vlc_timer_t;
-
-#if defined (__APPLE__)
-typedef semaphore_t     vlc_sem_t;
-#else
-typedef sem_t           vlc_sem_t;
-#endif
-
-#elif defined( WIN32 )
-typedef struct vlc_thread *vlc_thread_t;
-
 typedef struct
 {
     bool dynamic;
@@ -169,22 +55,28 @@ typedef struct
     };
 } vlc_mutex_t;
 #define VLC_STATIC_MUTEX { false, { { false, 0 } } }
-
 typedef struct
 {
     HANDLE   handle;
     unsigned clock;
 } vlc_cond_t;
 #define VLC_STATIC_COND { 0, 0 }
-
 typedef HANDLE vlc_sem_t;
 #define LIBVLC_NEED_RWLOCK
 typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 
-#elif defined( __OS2__ )
-typedef struct vlc_thread *vlc_thread_t;
+# define VLC_THREAD_PRIORITY_LOW      0
+# define VLC_THREAD_PRIORITY_INPUT    THREAD_PRIORITY_ABOVE_NORMAL
+# define VLC_THREAD_PRIORITY_AUDIO    THREAD_PRIORITY_HIGHEST
+# define VLC_THREAD_PRIORITY_VIDEO    0
+# define VLC_THREAD_PRIORITY_OUTPUT   THREAD_PRIORITY_ABOVE_NORMAL
+# define VLC_THREAD_PRIORITY_HIGHEST  THREAD_PRIORITY_TIME_CRITICAL
 
+#elif defined (__OS2__)
+# include <errno.h>
+
+typedef struct vlc_thread *vlc_thread_t;
 typedef struct
 {
     bool dynamic;
@@ -199,18 +91,107 @@ typedef struct
     };
 } vlc_mutex_t;
 #define VLC_STATIC_MUTEX { false, { { false, 0 } } }
-
 typedef struct
 {
     HEV      hev;
     unsigned clock;
 } vlc_cond_t;
 #define VLC_STATIC_COND { 0, 0 }
-
 #define LIBVLC_NEED_SEMAPHORE
 #define LIBVLC_NEED_RWLOCK
 typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
+
+# define VLC_THREAD_PRIORITY_LOW      0
+# define VLC_THREAD_PRIORITY_INPUT \
+                                    MAKESHORT(PRTYD_MAXIMUM / 2, PRTYC_REGULAR)
+# define VLC_THREAD_PRIORITY_AUDIO    MAKESHORT(PRTYD_MAXIMUM, PRTYC_REGULAR)
+# define VLC_THREAD_PRIORITY_VIDEO    0
+# define VLC_THREAD_PRIORITY_OUTPUT \
+                                    MAKESHORT(PRTYD_MAXIMUM / 2, PRTYC_REGULAR)
+# define VLC_THREAD_PRIORITY_HIGHEST  MAKESHORT(0, PRTYC_TIMECRITICAL)
+
+# define pthread_sigmask  sigprocmask
+
+#elif defined (__ANDROID__)      /* pthreads subset without pthread_cancel() */
+# include <unistd.h>
+# include <pthread.h>
+# include <poll.h>
+# define LIBVLC_USE_PTHREAD_CLEANUP   1
+# define LIBVLC_NEED_SEMAPHORE
+# define LIBVLC_NEED_RWLOCK
+
+typedef struct vlc_thread *vlc_thread_t;
+typedef pthread_mutex_t vlc_mutex_t;
+#define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
+typedef pthread_cond_t  vlc_cond_t;
+#define VLC_STATIC_COND  PTHREAD_COND_INITIALIZER
+
+typedef pthread_key_t   vlc_threadvar_t;
+typedef struct vlc_timer *vlc_timer_t;
+
+# define VLC_THREAD_PRIORITY_LOW      0
+# define VLC_THREAD_PRIORITY_INPUT    0
+# define VLC_THREAD_PRIORITY_AUDIO    0
+# define VLC_THREAD_PRIORITY_VIDEO    0
+# define VLC_THREAD_PRIORITY_OUTPUT   0
+# define VLC_THREAD_PRIORITY_HIGHEST  0
+
+#elif defined (__APPLE__)
+# define _APPLE_C_SOURCE    1 /* Proper pthread semantics on OSX */
+# include <unistd.h>
+# include <pthread.h>
+/* Unnamed POSIX semaphores not supported on Mac OS X */
+# include <mach/semaphore.h>
+# include <mach/task.h>
+# include <libkern/OSAtomic.h> /* OSMemoryBarrier() */
+# define LIBVLC_USE_PTHREAD           1
+# define LIBVLC_USE_PTHREAD_CLEANUP   1
+# define LIBVLC_USE_PTHREAD_CANCEL    1
+
+typedef pthread_t       vlc_thread_t;
+typedef pthread_mutex_t vlc_mutex_t;
+#define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
+typedef pthread_cond_t  vlc_cond_t;
+#define VLC_STATIC_COND  PTHREAD_COND_INITIALIZER
+typedef semaphore_t     vlc_sem_t;
+typedef pthread_rwlock_t vlc_rwlock_t;
+#define VLC_STATIC_RWLOCK PTHREAD_RWLOCK_INITIALIZER
+typedef pthread_key_t   vlc_threadvar_t;
+typedef struct vlc_timer *vlc_timer_t;
+
+# define VLC_THREAD_PRIORITY_LOW      0
+# define VLC_THREAD_PRIORITY_INPUT   22
+# define VLC_THREAD_PRIORITY_AUDIO   22
+# define VLC_THREAD_PRIORITY_VIDEO    0
+# define VLC_THREAD_PRIORITY_OUTPUT  22
+# define VLC_THREAD_PRIORITY_HIGHEST 22
+
+#else /* POSIX threads */
+# include <unistd.h> /* _POSIX_SPIN_LOCKS */
+# include <pthread.h>
+# include <semaphore.h>
+# define LIBVLC_USE_PTHREAD           1
+# define LIBVLC_USE_PTHREAD_CLEANUP   1
+# define LIBVLC_USE_PTHREAD_CANCEL    1
+
+typedef pthread_t       vlc_thread_t;
+typedef pthread_mutex_t vlc_mutex_t;
+#define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
+typedef pthread_cond_t  vlc_cond_t;
+#define VLC_STATIC_COND  PTHREAD_COND_INITIALIZER
+typedef sem_t           vlc_sem_t;
+typedef pthread_rwlock_t vlc_rwlock_t;
+#define VLC_STATIC_RWLOCK PTHREAD_RWLOCK_INITIALIZER
+typedef pthread_key_t   vlc_threadvar_t;
+typedef struct vlc_timer *vlc_timer_t;
+
+# define VLC_THREAD_PRIORITY_LOW      0
+# define VLC_THREAD_PRIORITY_INPUT   10
+# define VLC_THREAD_PRIORITY_AUDIO    5
+# define VLC_THREAD_PRIORITY_VIDEO    0
+# define VLC_THREAD_PRIORITY_OUTPUT  15
+# define VLC_THREAD_PRIORITY_HIGHEST 20
 
 #endif
 
@@ -231,10 +212,6 @@ typedef struct vlc_rwlock
     long          state;
 } vlc_rwlock_t;
 # define VLC_STATIC_RWLOCK { VLC_STATIC_MUTEX, VLC_STATIC_COND, 0 }
-#endif
-
-#if defined( WIN32 ) && !defined ETIMEDOUT
-#  define ETIMEDOUT 10060 /* This is the value in winsock.h. */
 #endif
 
 /*****************************************************************************
@@ -340,18 +317,11 @@ VLC_API unsigned vlc_timer_getoverrun(vlc_timer_t) VLC_USED;
 
 VLC_API unsigned vlc_GetCPUCount(void);
 
-#ifndef LIBVLC_USE_PTHREAD_CANCEL
-enum {
-    VLC_CLEANUP_PUSH,
-    VLC_CLEANUP_POP,
-};
-#endif
-
 VLC_API int vlc_savecancel(void);
 VLC_API void vlc_restorecancel(int state);
 VLC_API void vlc_testcancel(void);
 
-#if defined (LIBVLC_USE_PTHREAD_CANCEL) || defined(__ANDROID__)
+#if defined (LIBVLC_USE_PTHREAD_CLEANUP)
 /**
  * Registers a new procedure to run if the thread is cancelled (or otherwise
  * exits prematurely). Any call to vlc_cleanup_push() <b>must</b> paired with a
@@ -376,7 +346,13 @@ VLC_API void vlc_testcancel(void);
  * vlc_cleanup_push(), and executes it.
  */
 # define vlc_cleanup_run( ) pthread_cleanup_pop (1)
+
 #else
+enum
+{
+    VLC_CLEANUP_PUSH,
+    VLC_CLEANUP_POP,
+};
 typedef struct vlc_cleanup_t vlc_cleanup_t;
 
 struct vlc_cleanup_t
@@ -402,9 +378,10 @@ struct vlc_cleanup_t
         vlc_control_cancel (VLC_CLEANUP_POP); \
         vlc_cleanup_data.proc (vlc_cleanup_data.data); \
     } while (0)
-#endif /* LIBVLC_USE_PTHREAD_CANCEL || __ANDROID__ */
 
-#if !defined (LIBVLC_USE_PTHREAD_CANCEL)
+#endif /* !LIBVLC_USE_PTHREAD_CLEANUO */
+
+#ifndef LIBVLC_USE_PTHREAD_CANCEL
 /* poll() with cancellation */
 static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 {
@@ -431,7 +408,7 @@ static inline void vlc_cleanup_lock (void *lock)
 }
 #define mutex_cleanup_push( lock ) vlc_cleanup_push (vlc_cleanup_lock, lock)
 
-# if defined (_POSIX_SPIN_LOCKS) && ((_POSIX_SPIN_LOCKS - 0) > 0)
+#if defined (_POSIX_SPIN_LOCKS) && ((_POSIX_SPIN_LOCKS - 0) > 0)
 typedef pthread_spinlock_t vlc_spinlock_t;
 
 /**
@@ -468,44 +445,30 @@ static inline void vlc_spin_destroy (vlc_spinlock_t *spin)
 }
 
 #elif defined (WIN32)
-
 typedef CRITICAL_SECTION vlc_spinlock_t;
 
-/**
- * Initializes a spinlock.
- */
 static inline void vlc_spin_init (vlc_spinlock_t *spin)
 {
     if (!InitializeCriticalSectionAndSpinCount(spin, 4000))
         abort ();
 }
 
-/**
- * Acquires a spinlock.
- */
 static inline void vlc_spin_lock (vlc_spinlock_t *spin)
 {
     EnterCriticalSection(spin);
 }
 
-/**
- * Releases a spinlock.
- */
 static inline void vlc_spin_unlock (vlc_spinlock_t *spin)
 {
     LeaveCriticalSection(spin);
 }
 
-/**
- * Deinitializes a spinlock.
- */
 static inline void vlc_spin_destroy (vlc_spinlock_t *spin)
 {
     DeleteCriticalSection(spin);
 }
 
 #else
-
 /* Fallback to plain mutexes if spinlocks are not available */
 typedef vlc_mutex_t vlc_spinlock_t;
 
@@ -522,9 +485,6 @@ static inline void vlc_spin_init (vlc_spinlock_t *spin)
 /**
  * Issues a full memory barrier.
  */
-#if defined (__APPLE__)
-# include <libkern/OSAtomic.h> /* OSMemoryBarrier() */
-#endif
 static inline void barrier (void)
 {
 #if defined (__GNUC__) && !defined (__APPLE__) && \
@@ -568,7 +528,8 @@ class vlc_mutex_locker
 };
 #endif
 
-enum {
+enum
+{
    VLC_AVCODEC_MUTEX = 0,
    VLC_GCRYPT_MUTEX,
    VLC_XLIB_MUTEX,
