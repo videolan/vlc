@@ -101,8 +101,9 @@ struct intf_sys_t
     int             p_pipe_fds[2];
     vlc_mutex_t     lock;
     input_thread_t *p_input;
-    mtime_t         i_last_input_pos; /* Only access it from the input thread */
-    mtime_t         i_last_input_pos_event; /* idem */
+
+    mtime_t         i_last_input_pos; /* Only access from input thread */
+    mtime_t         i_last_input_pos_event; /* Same as above */
 };
 
 enum
