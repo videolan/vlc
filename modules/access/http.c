@@ -1381,6 +1381,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
     {
         char *psz = net_Gets( p_access, p_sys->fd, pvs );
         char *p;
+        char *p_trailing;
 
         if( psz == NULL )
         {
@@ -1408,7 +1409,19 @@ static int Request( access_t *p_access, uint64_t i_tell )
             goto error;
         }
         *p++ = '\0';
-        while( *p == ' ' ) p++;
+        p += strspn( p, " \t" );
+
+        /* trim trailing white space */
+        p_trailing = p + strlen( p );
+        if( p_trailing > p )
+        {
+            p_trailing--;
+            while( ( *p_trailing == ' ' || *p_trailing == '\t' ) && p_trailing > p )
+            {
+                *p_trailing = '\0';
+                p_trailing--;
+            }
+        }
 
         if( !strcasecmp( psz, "Content-Length" ) )
         {
