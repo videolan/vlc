@@ -2663,7 +2663,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
 #endif
 }
 
-static int FreeAndResetChunk( mp4_chunk_t *ck )
+static void FreeAndResetChunk( mp4_chunk_t *ck )
 {
     free( ck->p_sample_count_dts );
     free( ck->p_sample_delta_dts );
@@ -2674,7 +2674,6 @@ static int FreeAndResetChunk( mp4_chunk_t *ck )
         free( ck->p_sample_data[i] );
     free( ck->p_sample_data );
     memset( ck, 0, sizeof( mp4_chunk_t ) );
-    return VLC_SUCCESS;
 }
 
 /****************************************************************************
@@ -2704,8 +2703,10 @@ static void MP4_TrackDestroy( mp4_track_t *p_track )
         }
     }
     FREENULL( p_track->chunk );
-    FreeAndResetChunk( p_track->cchunk );
-    FREENULL( p_track->cchunk );
+    if( p_track->cchunk ) {
+        FreeAndResetChunk( p_track->cchunk );
+        FREENULL( p_track->cchunk );
+    }
 
     if( !p_track->i_sample_size )
     {
