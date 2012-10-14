@@ -97,8 +97,10 @@ motion_sensors_t *motion_create( vlc_object_t *obj )
     }
 #ifdef HAVE_MACOS_UNIMOTION
     else if( (motion->unimotion_hw = detect_sms()) )
+    {
         motion->sensor = UNIMOTION_SENSOR;
         msg_Dbg( obj, "UniMotion motion detection correctly loaded" );
+    }
 #endif
     else
     {
