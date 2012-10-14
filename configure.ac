@@ -2310,12 +2310,12 @@ AS_IF([test "${enable_vda}" != "no"], [
         AC_CHECK_HEADERS(libavcodec/vda.h, [
            have_avcodec_vda="yes"
         ],[
-	AS_IF([test "${enable_vda}" == "yes"],
+	AS_IF([test "${enable_vda}" = "yes"],
 	      [AC_MSG_ERROR([vda is present but libavcodec/vda.h is missing])],
               [AC_MSG_WARN([vda is present but libavcodec/vda.h is missing ])])
         ])
   ],[
-	AS_IF([test "${enable_vda}" == "yes"],
+	AS_IF([test "${enable_vda}" = "yes"],
               [AC_MSG_ERROR([Could not find required VideoDecodeAcceleration/VDADecoder.h])],
               [AC_MSG_WARN([VideoDecodeAcceleration/VDADecoder.h not found])])
       ])
@@ -3948,7 +3948,7 @@ AS_IF([test "${enable_loader}" = "yes"],
     VLC_ADD_LIBS([dmo quicktime], [-lpthread])
   ])
 
-AS_IF([test "${SYS}" == "mingw32"], [VLC_ADD_PLUGIN([dmo]) VLC_ADD_LIBS([dmo],[-lole32 -luuid]) ])
+AS_IF([test "${SYS}" = "mingw32"], [VLC_ADD_PLUGIN([dmo]) VLC_ADD_LIBS([dmo],[-lole32 -luuid]) ])
 
 EXTEND_HELP_STRING([Components:])
 
