@@ -334,10 +334,16 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     (*env)->CallVoidMethod(env, p_sys->codec, p_sys->configure, format, NULL, NULL, 0);
     if ((*env)->ExceptionOccurred(env)) {
+        msg_Warn(p_dec, "Exception occurred in MediaCodec.configure");
         (*env)->ExceptionClear(env);
         goto error;
     }
     (*env)->CallVoidMethod(env, p_sys->codec, p_sys->start);
+    if ((*env)->ExceptionOccurred(env)) {
+        msg_Warn(p_dec, "Exception occurred in MediaCodec.start");
+        (*env)->ExceptionClear(env);
+        goto error;
+    }
     p_sys->started = 1;
 
     p_sys->input_buffers = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_input_buffers);
