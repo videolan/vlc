@@ -7,6 +7,7 @@ OPTIONS="
       --enable-live555
       --enable-dvdread
       --enable-dvdnav
+      --enable-sftp
       --enable-vcd
       --enable-libcddb
       --enable-realrtsp
