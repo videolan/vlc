@@ -494,34 +494,25 @@ mtime_t mdate (void)
 #undef mwait
 void mwait (mtime_t deadline)
 {
-    deadline -= mdate ();
-    if (deadline > 0)
-        msleep (deadline);
+    vlc_mutex_t lock;
+    vlc_cond_t wait;
+
+    vlc_mutex_init (&lock);
+    vlc_cond_init (&wait);
+
+    vlc_mutex_lock (&lock);
+    mutex_cleanup_push (&lock);
+    while (!vlc_cond_timedwait (&wait, &lock, deadline));
+    vlc_cleanup_run ();
+
+    vlc_cond_destroy (&wait);
+    vlc_mutex_destroy (&lock);
 }
 
 #undef msleep
 void msleep (mtime_t delay)
 {
-    struct timespec ts = mtime_to_ts (delay);
-
-    vlc_testcancel();
-    for (;;) {
-        /* FIXME: drift */
-        struct timespec t = { 0, 10 * 1000 * 1000 };
-        if (ts.tv_sec <= 0 && t.tv_nsec > ts.tv_nsec)
-            t.tv_nsec = ts.tv_nsec;
-        while (nanosleep (&t, &t) == -1) {
-            vlc_testcancel();
-            vlc_assert (errno == EINTR);
-        }
-
-        ts.tv_nsec -= 10 * 1000 * 1000;
-        if (ts.tv_nsec < 0) {
-            if (--ts.tv_sec < 0)
-                return;
-            ts.tv_nsec += 1000 * 1000 * 1000;
-        }
-    }
+    mwait (mdate () + delay);
 }
 
 /* cpu */
