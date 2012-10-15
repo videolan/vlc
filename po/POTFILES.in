@@ -165,6 +165,7 @@ src/video_output/vout_control.h
 src/video_output/vout_internal.h
 src/video_output/vout_intf.c
 src/video_output/vout_subpictures.c
+src/win32/thread.c
 
 lib/audio.c
 lib/core.c
@@ -264,7 +265,7 @@ modules/access/smb.c
 modules/access/tcp.c
 modules/access/udp.c
 modules/access/v4l2/controls.c
-modules/access/v4l2/video.c
+modules/access/v4l2/v4l2.c
 modules/access/vcd/cdrom.c
 modules/access/vcd/cdrom.h
 modules/access/vcd/cdrom_internals.h
@@ -280,6 +281,9 @@ modules/access/vdr.c
 modules/access/zip/zipstream.c
 modules/arm_neon/audio_format.c
 modules/arm_neon/chroma_yuv.c
+modules/arm_neon/simple_channel_mixer.c
+modules/arm_neon/volume.c
+modules/arm_neon/yuv_rgb.c
 modules/audio_filter/audiobargraph_a.c
 modules/audio_filter/channel_mixer/dolby.c
 modules/audio_filter/channel_mixer/headphone.c
@@ -316,12 +320,14 @@ modules/audio_filter/spatializer/revmodel.cpp
 modules/audio_filter/spatializer/revmodel.hpp
 modules/audio_filter/spatializer/spatializer.cpp
 modules/audio_filter/spatializer/tuning.h
+modules/audio_filter/stereo_widen.c
 modules/audio_mixer/float32.c
 modules/audio_mixer/integer.c
 modules/audio_output/adummy.c
 modules/audio_output/alsa.c
 modules/audio_output/amem.c
 modules/audio_output/audioqueue.c
+modules/audio_output/audiotrack.c
 modules/audio_output/auhal.c
 modules/audio_output/directx.c
 modules/audio_output/file.c
@@ -377,6 +383,7 @@ modules/codec/omxil/omxil.c
 modules/codec/omxil/omxil.h
 modules/codec/omxil/omxil_utils.h
 modules/codec/omxil/utils.c
+modules/codec/opus.c
 modules/codec/png.c
 modules/codec/quicktime.c
 modules/codec/rawvideo.c
@@ -395,6 +402,7 @@ modules/codec/t140.c
 modules/codec/telx.c
 modules/codec/theora.c
 modules/codec/twolame.c
+modules/codec/uleaddvaudio.c
 modules/codec/vorbis.c
 modules/codec/wmafixed/wma.c
 modules/codec/x264.c
@@ -965,6 +973,7 @@ modules/packetizer/vc1.c
 modules/services_discovery/bonjour.c
 modules/services_discovery/mediadirs.c
 modules/services_discovery/mtp.c
+modules/services_discovery/os2drive.c
 modules/services_discovery/podcast.c
 modules/services_discovery/pulse.c
 modules/services_discovery/sap.c
@@ -1022,6 +1031,7 @@ modules/video_chroma/yuy2_i420.c
 modules/video_chroma/yuy2_i422.c
 modules/video_filter/adjust.c
 modules/video_filter/alphamask.c
+modules/video_filter/anaglyph.c
 modules/video_filter/antiflicker.c
 modules/video_filter/atmo/AtmoCalculations.cpp
 modules/video_filter/atmo/AtmoCalculations.h
