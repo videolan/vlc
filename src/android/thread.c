@@ -216,36 +216,65 @@ void vlc_cond_broadcast (vlc_cond_t *condvar)
 
 void vlc_cond_wait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex)
 {
-    if (thread) {
-        vlc_testcancel();
-        vlc_mutex_lock(&thread->lock);
-        thread->cond = &condvar->cond;
-        vlc_mutex_unlock(&thread->lock);
+    vlc_thread_t th = thread;
+
+    if (th != NULL)
+    {
+        vlc_testcancel ();
+        if (vlc_mutex_trylock (&th->lock) == 0)
+        {
+            th->cond = &condvar->cond;
+            vlc_mutex_unlock (&th->lock);
+        }
+        else
+        {   /* The lock is already held by another thread.
+             * => That other thread has just cancelled this one. */
+            vlc_testcancel ();
+            /* Cancellation did not occur even though this thread is cancelled.
+             * => Cancellation is disabled. */
+            th = NULL;
+        }
     }
 
     int val = pthread_cond_wait (&condvar->cond, p_mutex);
+    VLC_THREAD_ASSERT ("waiting on condition");
 
-    if (thread) {
-        vlc_mutex_lock(&thread->lock);
-        thread->cond = NULL;
-        vlc_mutex_unlock(&thread->lock);
+    if (th != NULL)
+    {
+        if (vlc_mutex_trylock (&th->lock) == 0)
+        {
+            thread->cond = NULL;
+            vlc_mutex_unlock (&th->lock);
+        }
+        /* Else: This thread was cancelled and is cancellable.
+                 vlc_testcancel() will take of it right there: */
         vlc_testcancel();
     }
-
-    VLC_THREAD_ASSERT ("waiting on condition");
 }
 
 int vlc_cond_timedwait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex,
                         mtime_t deadline)
 {
     struct timespec ts = mtime_to_ts (deadline);
+    vlc_thread_t th = thread;
     int (*cb)(pthread_cond_t *, pthread_mutex_t *, const struct timespec *);
 
-    if (thread) {
-        vlc_testcancel();
-        vlc_mutex_lock(&thread->lock);
-        thread->cond = &condvar->cond;
-        vlc_mutex_unlock(&thread->lock);
+    if (th != NULL)
+    {
+        vlc_testcancel ();
+        if (vlc_mutex_trylock (&th->lock) == 0)
+        {
+            th->cond = &condvar->cond;
+            vlc_mutex_unlock (&th->lock);
+        }
+        else
+        {   /* The lock is already held by another thread.
+             * => That other thread has just cancelled this one. */
+            vlc_testcancel ();
+            /* Cancellation did not occur even though this thread is cancelled.
+             * => Cancellation is disabled. */
+            th = NULL;
+        }
     }
 
     switch (condvar->clock)
@@ -264,13 +293,17 @@ int vlc_cond_timedwait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex,
     if (val != ETIMEDOUT)
         VLC_THREAD_ASSERT ("timed-waiting on condition");
 
-    if (thread) {
-        vlc_mutex_lock(&thread->lock);
-        thread->cond = NULL;
-        vlc_mutex_unlock(&thread->lock);
+    if (th != NULL)
+    {
+        if (vlc_mutex_trylock (&th->lock) == 0)
+        {
+            thread->cond = NULL;
+            vlc_mutex_unlock (&th->lock);
+        }
+        /* Else: This thread was cancelled and is cancellable.
+                 vlc_testcancel() will take of it right there: */
         vlc_testcancel();
     }
-
     return val;
 }
 
