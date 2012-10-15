@@ -35,6 +35,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <time.h>
+#include <assert.h>
 
 #include <sys/types.h>
 #include <unistd.h> /* fsync() */
@@ -43,10 +44,6 @@
 
 #include <android/log.h>
 #include <sys/syscall.h> /* __NR_gettid */
-
-/* FIXME: Android has a monotonic clock
- * XXX : how to use it with pthread_cond_wait() ? */
-# warning Monotonic clock not available. Expect timing issues.
 
 /* helper */
 static struct timespec mtime_to_ts (mtime_t date)
@@ -186,44 +183,47 @@ void vlc_threads_setup (libvlc_int_t *p_libvlc)
 
 /* cond */
 
-void vlc_cond_init (vlc_cond_t *p_condvar)
+void vlc_cond_init (vlc_cond_t *condvar)
 {
-    if (unlikely(pthread_cond_init (p_condvar, NULL)))
+    if (unlikely(pthread_cond_init (&condvar->cond, NULL)))
         abort ();
+    condvar->clock = CLOCK_MONOTONIC;
 }
 
-void vlc_cond_init_daytime (vlc_cond_t *p_condvar)
+void vlc_cond_init_daytime (vlc_cond_t *condvar)
 {
-    vlc_cond_init(p_condvar);
+    if (unlikely(pthread_cond_init (&condvar->cond, NULL)))
+        abort ();
+    condvar->clock = CLOCK_REALTIME;
 }
 
-void vlc_cond_destroy (vlc_cond_t *p_condvar)
+void vlc_cond_destroy (vlc_cond_t *condvar)
 {
-    int val = pthread_cond_destroy( p_condvar );
+    int val = pthread_cond_destroy (&condvar->cond);
     VLC_THREAD_ASSERT ("destroying condition");
 }
 
-void vlc_cond_signal (vlc_cond_t *p_condvar)
+void vlc_cond_signal (vlc_cond_t *condvar)
 {
-    int val = pthread_cond_signal( p_condvar );
+    int val = pthread_cond_signal (&condvar->cond);
     VLC_THREAD_ASSERT ("signaling condition variable");
 }
 
-void vlc_cond_broadcast (vlc_cond_t *p_condvar)
+void vlc_cond_broadcast (vlc_cond_t *condvar)
 {
-    pthread_cond_broadcast (p_condvar);
+    pthread_cond_broadcast (&condvar->cond);
 }
 
-void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
+void vlc_cond_wait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex)
 {
     if (thread) {
         vlc_testcancel();
         vlc_mutex_lock(&thread->lock);
-        thread->cond = p_condvar;
+        thread->cond = &condvar->cond;
         vlc_mutex_unlock(&thread->lock);
     }
 
-    int val = pthread_cond_wait( p_condvar, p_mutex );
+    int val = pthread_cond_wait (&condvar->cond, p_mutex);
 
     if (thread) {
         vlc_mutex_lock(&thread->lock);
@@ -235,19 +235,32 @@ void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
     VLC_THREAD_ASSERT ("waiting on condition");
 }
 
-int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
+int vlc_cond_timedwait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex,
                         mtime_t deadline)
 {
     struct timespec ts = mtime_to_ts (deadline);
+    int (*cb)(pthread_cond_t *, pthread_mutex_t *, const struct timespec *);
 
     if (thread) {
         vlc_testcancel();
         vlc_mutex_lock(&thread->lock);
-        thread->cond = p_condvar;
+        thread->cond = &condvar->cond;
         vlc_mutex_unlock(&thread->lock);
     }
 
-    int val = pthread_cond_timedwait (p_condvar, p_mutex, &ts);
+    switch (condvar->clock)
+    {
+         case CLOCK_REALTIME:
+             cb = pthread_cond_timedwait;
+             break;
+         case CLOCK_MONOTONIC:
+             cb = pthread_cond_timedwait_monotonic_np;
+             break;
+         default:
+             assert (0);
+    }
+
+    int val = cb (&condvar->cond, p_mutex, &ts);
     if (val != ETIMEDOUT)
         VLC_THREAD_ASSERT ("timed-waiting on condition");
 
@@ -369,11 +382,12 @@ int vlc_set_priority (vlc_thread_t th, int priority)
 
 void vlc_cancel (vlc_thread_t thread_id)
 {
+    pthread_cond_t *cond;
+
     vlc_atomic_set(&thread_id->killed, true);
 
     vlc_mutex_lock(&thread_id->lock);
-    vlc_cond_t *cond = thread_id->cond;
-
+    cond = thread_id->cond;
     if (cond)
         pthread_cond_broadcast(cond);
     vlc_mutex_unlock(&thread_id->lock);
@@ -438,7 +452,7 @@ mtime_t mdate (void)
 {
     struct timespec ts;
 
-    if (unlikely(clock_gettime (CLOCK_REALTIME, &ts) != 0))
+    if (unlikely(clock_gettime (CLOCK_MONOTONIC, &ts) != 0))
         abort ();
 
     return (INT64_C(1000000) * ts.tv_sec) + (ts.tv_nsec / 1000);

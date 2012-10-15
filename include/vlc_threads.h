@@ -124,8 +124,12 @@ typedef struct vlc_timer *vlc_timer_t;
 typedef struct vlc_thread *vlc_thread_t;
 typedef pthread_mutex_t vlc_mutex_t;
 #define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
-typedef pthread_cond_t  vlc_cond_t;
-#define VLC_STATIC_COND  PTHREAD_COND_INITIALIZER
+typedef struct
+{
+    pthread_cond_t cond;
+    unsigned clock;
+} vlc_cond_t;
+#define VLC_STATIC_COND  { PTHREAD_COND_INITIALIZER, CLOCK_REALTIME }
 
 typedef pthread_key_t   vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
