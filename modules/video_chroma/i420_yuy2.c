@@ -188,12 +188,12 @@ static inline unsigned long long read_cycles(void)
 
 /* Following functions are local */
 
-VLC_TARGET VIDEO_FILTER_WRAPPER( I420_YUY2 )
-VLC_TARGET VIDEO_FILTER_WRAPPER( I420_YVYU )
-VLC_TARGET VIDEO_FILTER_WRAPPER( I420_UYVY )
+VIDEO_FILTER_WRAPPER( I420_YUY2 )
+VIDEO_FILTER_WRAPPER( I420_YVYU )
+VIDEO_FILTER_WRAPPER( I420_UYVY )
 #if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
-VLC_TARGET VIDEO_FILTER_WRAPPER( I420_IUYV )
-VLC_TARGET VIDEO_FILTER_WRAPPER( I420_cyuv )
+VIDEO_FILTER_WRAPPER( I420_IUYV )
+VIDEO_FILTER_WRAPPER( I420_cyuv )
 #endif
 #if defined (MODULE_NAME_IS_i420_yuy2)
 VIDEO_FILTER_WRAPPER( I420_Y211 )
@@ -202,6 +202,7 @@ VIDEO_FILTER_WRAPPER( I420_Y211 )
 /*****************************************************************************
  * I420_YUY2: planar YUV 4:2:0 to packed YUYV 4:2:2
  *****************************************************************************/
+VLC_TARGET
 static void I420_YUY2( filter_t *p_filter, picture_t *p_source,
                                            picture_t *p_dest )
 {
@@ -419,6 +420,7 @@ static void I420_YUY2( filter_t *p_filter, picture_t *p_source,
 /*****************************************************************************
  * I420_YVYU: planar YUV 4:2:0 to packed YVYU 4:2:2
  *****************************************************************************/
+VLC_TARGET
 static void I420_YVYU( filter_t *p_filter, picture_t *p_source,
                                            picture_t *p_dest )
 {
@@ -628,6 +630,7 @@ static void I420_YVYU( filter_t *p_filter, picture_t *p_source,
 /*****************************************************************************
  * I420_UYVY: planar YUV 4:2:0 to packed UYVY 4:2:2
  *****************************************************************************/
+VLC_TARGET
 static void I420_UYVY( filter_t *p_filter, picture_t *p_source,
                                            picture_t *p_dest )
 {
@@ -849,6 +852,7 @@ static void I420_IUYV( filter_t *p_filter, picture_t *p_source,
 /*****************************************************************************
  * I420_cyuv: planar YUV 4:2:0 to upside-down packed UYVY 4:2:2
  *****************************************************************************/
+VLC_TARGET
 static void I420_cyuv( filter_t *p_filter, picture_t *p_source,
                                            picture_t *p_dest )
 {
