@@ -119,6 +119,7 @@ struct demux_sys_t
 {
     const void  *addr;
     size_t       length;
+    size_t       size;
     es_out_id_t *es;
     mtime_t      pts, interval;
     /* pts is protected by the lock. The rest is read-only. */
@@ -169,7 +170,7 @@ static int Open (vlc_object_t *obj)
     if (sys->length == 0)
         goto error;
     pagesize--;
-    sys->length = (sys->length + pagesize) & ~pagesize; /* pad */
+    sys->size = (sys->length + pagesize) & ~pagesize; /* pad */
 
     char *path = var_InheritString (demux, "shm-file");
     if (path != NULL)
@@ -182,7 +183,7 @@ static int Open (vlc_object_t *obj)
             goto error;
         }
 
-        void *mem = mmap (NULL, sys->length, PROT_READ, MAP_SHARED, fd, 0);
+        void *mem = mmap (NULL, sys->size, PROT_READ, MAP_SHARED, fd, 0);
         close (fd);
         if (mem == MAP_FAILED)
         {
@@ -271,7 +272,7 @@ static void Close (vlc_object_t *obj)
 
 static void map_detach (demux_sys_t *sys)
 {
-    munmap ((void *)sys->addr, sys->length);
+    munmap ((void *)sys->addr, sys->size);
 }
 
 #ifdef HAVE_SYS_SHM_H
