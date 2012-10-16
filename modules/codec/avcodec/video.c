@@ -1121,15 +1121,14 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
 static int ffmpeg_va_Start( void *func, va_list ap )
 {
     vlc_va_t *va = va_arg( ap, vlc_va_t * );
-    int pix = va_arg( ap, int );
     int codec = va_arg( ap, int );
     const es_format_t *fmt = va_arg( ap, const es_format_t * );
-    int (*open)( vlc_va_t *, int, int, const es_format_t * ) = func;
+    int (*open)( vlc_va_t *, int, const es_format_t * ) = func;
 
-    return open( va, pix, codec, fmt );
+    return open( va, codec, fmt );
 }
 
-static vlc_va_t *vlc_va_New( vlc_object_t *parent, int pixfmt, int codec_id,
+static vlc_va_t *vlc_va_New( vlc_object_t *parent, int codec_id,
                              const es_format_t *fmt )
 {
     vlc_va_t *p_va = vlc_object_create( parent, sizeof( *p_va ) );
@@ -1137,7 +1136,7 @@ static vlc_va_t *vlc_va_New( vlc_object_t *parent, int pixfmt, int codec_id,
         return NULL;
 
     p_va->module = vlc_module_load( p_va, "hw decoder", "$avcodec-hw",
-                                    true, ffmpeg_va_Start, p_va, pixfmt,
+                                    true, ffmpeg_va_Start, p_va,
                                     codec_id, fmt );
     if( p_va->module == NULL )
     {
@@ -1166,53 +1165,51 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
 {
     decoder_t *p_dec = p_context->opaque;
     decoder_sys_t *p_sys = p_dec->p_sys;
+    vlc_va_t *p_va = p_sys->p_va;
 
-    if( p_sys->p_va )
+    if( p_va != NULL )
+        vlc_va_Delete( p_va );
+
+    p_va = vlc_va_New( VLC_OBJECT(p_dec), p_sys->i_codec_id, &p_dec->fmt_in );
+    if( p_va != NULL )
     {
-        vlc_va_Delete( p_sys->p_va );
-        p_sys->p_va = NULL;
-    }
-
-    /* Try too look for a supported hw acceleration */
-    for( int i = 0; pi_fmt[i] != PIX_FMT_NONE; i++ )
-    {
-        const char *name = av_get_pix_fmt_name(pi_fmt[i]);
-        msg_Dbg( p_dec, "Available decoder output format %d (%s)", pi_fmt[i],
-                 name ? name : "unknown" );
-
-        vlc_va_t *p_va = vlc_va_New( VLC_OBJECT(p_dec), pi_fmt[i],
-                                     p_sys->i_codec_id, &p_dec->fmt_in );
-        if( p_va == NULL )
+        /* Try too look for a supported hw acceleration */
+        for( size_t i = 0; pi_fmt[i] != PIX_FMT_NONE; i++ )
         {
-            msg_Dbg( p_dec, "acceleration not available" );
-            continue;
-        }
-        if( p_context->width > 0 && p_context->height > 0 )
-        {
+            const char *name = av_get_pix_fmt_name(pi_fmt[i]);
+            msg_Dbg( p_dec, "Available decoder output format %d (%s)",
+                     pi_fmt[i], name ? name : "unknown" );
+            if( p_va->pix_fmt != pi_fmt[i] )
+                continue;
+
             /* We try to call vlc_va_Setup when possible to detect errors when
              * possible (later is too late) */
-            if( vlc_va_Setup( p_va, &p_context->hwaccel_context,
+            if( p_context->width > 0 && p_context->height > 0
+             && vlc_va_Setup( p_va, &p_context->hwaccel_context,
                               &p_dec->fmt_out.video.i_chroma,
                               p_context->width, p_context->height ) )
             {
-                msg_Err( p_dec, "vlc_va_Setup failed" );
-                vlc_va_Delete( p_va );
-                continue;
+                msg_Err( p_dec, "acceleration setup failure" );
+                break;
             }
+
+            if( p_va->description )
+                msg_Info( p_dec, "Using %s for hardware decoding.",
+                          p_va->description );
+
+            /* FIXME this will disable direct rendering
+             * even if a new pixel format is renegotiated
+             */
+            p_sys->b_direct_rendering = false;
+            p_sys->p_va = p_va;
+            p_context->draw_horiz_band = NULL;
+            return pi_fmt[i];
         }
 
-        p_sys->p_va = p_va;
-        if( p_va->description )
-            msg_Info( p_dec, "Using %s for hardware decoding.",
-                      p_va->description );
-
-        /* FIXME this will disable direct rendering
-         * even if a new pixel format is renegotiated
-         */
-        p_sys->b_direct_rendering = false;
-        p_context->draw_horiz_band = NULL;
-        return pi_fmt[i];
+        msg_Err( p_dec, "acceleration not available" );
+        vlc_va_Delete( p_va );
     }
+    p_sys->p_va = NULL;
 
     /* Fallback to default behaviour */
     return avcodec_default_get_format( p_context, pi_fmt );

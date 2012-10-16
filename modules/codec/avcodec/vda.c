@@ -39,7 +39,7 @@
 #include <libavcodec/vda.h>
 #include <VideoDecodeAcceleration/VDADecoder.h>
 
-static int Open( vlc_va_t *, int, int, const es_format_t * );
+static int Open( vlc_va_t *, int, const es_format_t * );
 static void Close( vlc_va_t * );
 
 static const int  nvda_pix_fmt_list[] = { 0, 1 };
@@ -261,10 +261,9 @@ static void Close( vlc_va_t *p_external )
     free( p_va );
 }
 
-static int Open( vlc_va_t *external, int pixfmt, int i_codec_id,
-                  const es_format_t *fmt )
+static int Open( vlc_va_t *external, int i_codec_id, const es_format_t *fmt )
 {
-    if( pixfmt != PIX_FMT_VDA_VLD || i_codec_id != CODEC_ID_H264 )
+    if( i_codec_id != CODEC_ID_H264 )
         return NULL;
 
     if( fmt->p_extra == NULL || fmt->i_extra < 7 )
@@ -283,6 +282,7 @@ static int Open( vlc_va_t *external, int pixfmt, int i_codec_id,
 
     external->sys = p_va;
     external->description = (char *)"VDA";
+    external->pix_fmt = PIX_FMT_VDA_VLD;
     external->setup = Setup;
     external->get = Get;
     external->release = Release;

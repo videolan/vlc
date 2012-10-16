@@ -51,7 +51,7 @@
 #include "va.h"
 #include "copy.h"
 
-static int Open(vlc_va_t *, int, int, const es_format_t *);
+static int Open(vlc_va_t *, int, const es_format_t *);
 static void Close(vlc_va_t *);
 
 vlc_module_begin()
@@ -501,12 +501,8 @@ static void Close(vlc_va_t *external)
     free(va);
 }
 
-static int Open(vlc_va_t *external, int pixfmt, int codec_id,
-                const es_format_t *fmt)
+static int Open(vlc_va_t *external, int codec_id, const es_format_t *fmt)
 {
-    if( pixfmt != PIX_FMT_DXVA2_VLD )
-        return NULL;
-
     vlc_va_dxva2_t *va = calloc(1, sizeof(*va));
     if (!va)
         return NULL;
@@ -555,6 +551,7 @@ static int Open(vlc_va_t *external, int pixfmt, int codec_id,
 
     /* TODO print the hardware name/vendor for debugging purposes */
     external->description = DxDescribe(va);
+    external->pix_fmt = PIX_FMT_DXVA2_VLD;
     external->setup   = Setup;
     external->get     = Get;
     external->release = Release;

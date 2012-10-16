@@ -41,7 +41,7 @@
 #include "va.h"
 #include "copy.h"
 
-static int Create( vlc_va_t *, int, int, const es_format_t * );
+static int Create( vlc_va_t *, int, const es_format_t * );
 static void Delete( vlc_va_t * );
 
 vlc_module_begin ()
@@ -507,13 +507,8 @@ static void Delete( vlc_va_t *p_external )
     free( p_va );
 }
 
-static int Create( vlc_va_t *p_va, int pixfmt, int i_codec_id,
-                const es_format_t *fmt )
+static int Create( vlc_va_t *p_va, int i_codec_id, const es_format_t *fmt )
 {
-    /* Only VLD supported */
-    if( pixfmt != PIX_FMT_VAAPI_VLD )
-        return VLC_EGENERIC;
-
     if( !vlc_xlib_init( VLC_OBJECT(p_va) ) )
     {
         msg_Warn( p_va, "Ignoring VA API" );
@@ -526,7 +521,8 @@ static int Create( vlc_va_t *p_va, int pixfmt, int i_codec_id,
     if( err )
         return err;
 
-    /* */
+    /* Only VLD supported */
+    p_va->pix_fmt = PIX_FMT_VAAPI_VLD;
     p_va->setup = Setup;
     p_va->get = Get;
     p_va->release = Release;
