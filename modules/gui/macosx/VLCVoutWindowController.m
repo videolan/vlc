@@ -66,10 +66,12 @@
 
 - (void)updateWindowsControlsBarWithSelector:(SEL)aSel
 {
-    [o_vout_dict enumerateKeysAndObjectsUsingBlock:^(id key, VLCVideoWindowCommon *o_window, BOOL *stop) {
-        id o_controlsBar = [o_window controlsBar];
-        if (o_controlsBar)
-            [o_controlsBar performSelector:aSel];
+    [o_vout_dict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        if ([obj respondsToSelector:@selector(controlsBar)]) {
+            id o_controlsBar = [obj controlsBar];
+            if (o_controlsBar)
+                [o_controlsBar performSelector:aSel];
+        }
     }];
 }
 
@@ -86,8 +88,9 @@
 
 - (void)updateWindowsUsingBlock:(void (^)(VLCVideoWindowCommon *o_window))windowUpdater
 {
-    [o_vout_dict enumerateKeysAndObjectsUsingBlock:^(id key, VLCVideoWindowCommon *o_window, BOOL *stop) {
-        windowUpdater(o_window);
+    [o_vout_dict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        if ([obj isKindOfClass: [NSWindow class]])
+            windowUpdater(obj);
     }];
 }
 
