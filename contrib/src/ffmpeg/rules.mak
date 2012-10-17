@@ -61,7 +61,9 @@ endif
 
 # x86 stuff
 ifeq ($(ARCH),i386)
+ifndef HAVE_DARWIN_OS
 FFMPEGCONF += --arch=x86
+endif
 endif
 
 # Darwin
@@ -75,7 +77,9 @@ FFMPEGCONF += --cpu=core2
 endif
 endif
 ifdef HAVE_IOS
+ifeq ($(ARCH),arm)
 FFMPEGCONF += --enable-pic --as="$(AS)"
+endif
 endif
 
 # Linux
