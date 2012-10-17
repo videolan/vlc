@@ -308,17 +308,25 @@ int vlc_cond_timedwait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex,
 }
 
 /* pthread */
+static void clean_detached_thread(void *data)
+{
+    struct vlc_thread *thread = data;
+
+    /* release thread handle */
+    vlc_mutex_destroy(&thread->lock);
+    free(thread);
+}
 
 static void *detached_thread(void *data)
 {
     vlc_thread_t th = data;
 
     thread = th;
-    th->entry(th->data);
 
-    /* release thread handle */
-    vlc_mutex_destroy(&th->lock);
-    free(th);
+    vlc_cleanup_push(clean_detached_thread, data);
+    th->entry(th->data);
+    vlc_cleanup_run();
+
     return NULL;
 }
 
@@ -454,7 +462,6 @@ void vlc_testcancel (void)
         return;
 
     vlc_sem_post(&thread->finished);
-#warning FIXME: memory leak for detached threads
     pthread_exit(NULL);
 }
 
