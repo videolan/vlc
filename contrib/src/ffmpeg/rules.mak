@@ -34,7 +34,7 @@ endif
 
 # Small size
 ifdef ENABLE_SMALL
-FFMPEGCONF += --enable-small --optflags=-O2
+FFMPEGCONF += --enable-small
 ifeq ($(ARCH),arm)
 ifdef HAVE_ARMV7A
 # XXX: assumes > ARMv7-A, and thus thumb2-able
