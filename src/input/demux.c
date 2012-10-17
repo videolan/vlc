@@ -110,13 +110,11 @@ demux_t *demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
      && (psz_ext = strrchr( p_demux->psz_file, '.' )) )
     {
        /* XXX: add only file without any problem here and with strong detection.
-        *  - no .mp3, .a52, ... (aac is added as it works only by file ext
-        *     anyway
+        *  - no .mp3, .a52, ...
         *  - wav can't be added 'cause of a52 and dts in them as raw audio
          */
          static const struct { char ext[5]; char demux[9]; } exttodemux[] =
          {
-            { "aac",  "aac" },
             { "aiff", "aiff" },
             { "asf",  "asf" }, { "wmv",  "asf" }, { "wma",  "asf" },
             { "avi",  "avi" },
