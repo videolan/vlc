@@ -40,8 +40,8 @@ ifdef HAVE_DARWIN_OS
 POSTPROCCONF += --arch=$(ARCH) --target-os=darwin
 endif
 ifdef HAVE_IOS
-POSTPROCCONF += --as="$(AS)"
 ifeq ($(ARCH),arm)
+POSTPROCCONF += --as="$(AS)"
 POSTPROCCONF += --cpu=cortex-a8
 endif
 endif
