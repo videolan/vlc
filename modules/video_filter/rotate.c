@@ -209,6 +209,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
+    int s, c;
     if( p_sys->p_motion != NULL )
     {
         int i_angle = motion_get_angle( p_sys->p_motion ) / 2;
@@ -217,15 +218,20 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             p_sys->i_angle = i_angle;
             cache_trigo( i_angle, &p_sys->i_sin, &p_sys->i_cos );
         }
+
+        s = p_sys->i_sin;
+        c = p_sys->i_cos;
     }
     else
+    {
         vlc_spin_lock( &p_sys->lock );
-
-    const int i_sin = p_sys->i_sin;
-    const int i_cos = p_sys->i_cos;
-
-    if( p_sys->p_motion == NULL )
+        s = p_sys->i_sin;
+        c = p_sys->i_cos;
         vlc_spin_unlock( &p_sys->lock );
+    }
+
+    const int i_sin = s;
+    const int i_cos = c;
 
     for( int i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
@@ -373,6 +379,7 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     const int i_line_center = i_visible_lines>>1;
     const int i_col_center  = i_visible_pitch>>1;
 
+    int s, c;
     if( p_sys->p_motion != NULL )
     {
         int i_angle = motion_get_angle( p_sys->p_motion ) / 2;
@@ -381,15 +388,20 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
             p_sys->i_angle = i_angle;
             cache_trigo( i_angle, &p_sys->i_sin, &p_sys->i_cos );
         }
+
+        s = p_sys->i_sin;
+        c = p_sys->i_cos;
     }
     else
+    {
         vlc_spin_lock( &p_sys->lock );
-
-    const int i_sin = p_sys->i_sin;
-    const int i_cos = p_sys->i_cos;
-
-    if( p_sys->p_motion == NULL )
+        s = p_sys->i_sin;
+        c = p_sys->i_cos;
         vlc_spin_unlock( &p_sys->lock );
+    }
+
+    const int i_sin = s;
+    const int i_cos = c;
 
     int i_col, i_line;
     for( i_line = 0; i_line < i_visible_lines; i_line++ )
