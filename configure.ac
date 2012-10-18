@@ -531,7 +531,11 @@ AC_PREPROC_IFELSE([AC_LANG_SOURCE([
 AC_FUNC_STRCOLL
 
 dnl Check for non-standard system calls
-AC_CHECK_FUNCS([accept4 pipe2 eventfd vmsplice sched_getaffinity])
+case "$SYS" in
+  "linux")
+    AC_CHECK_FUNCS([accept4 pipe2 eventfd vmsplice sched_getaffinity])
+    ;;
+esac
 
 AH_BOTTOM([#include <vlc_fixups.h>])
 
