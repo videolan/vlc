@@ -216,8 +216,7 @@ static int OpenOut( vlc_object_t *p_this )
     p_stream->pf_send   = SendOut;
 
     p_stream->p_sys     = (sout_stream_sys_t *)p_sys;
-
-    p_stream->p_sout->i_out_pace_nocontrol++;
+    p_stream->pace_nocontrol = true;
 
     return VLC_SUCCESS;
 }
@@ -229,8 +228,6 @@ static void CloseOut( vlc_object_t * p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
-
-    p_stream->p_sout->i_out_pace_nocontrol--;
 
     free( p_sys->psz_name );
     free( p_sys );
@@ -435,9 +432,7 @@ static int OpenIn( vlc_object_t *p_this )
     p_stream->pf_send   = SendIn;
 
     p_stream->p_sys     = (sout_stream_sys_t *)p_sys;
-
-    /* update p_sout->i_out_pace_nocontrol */
-    p_stream->p_sout->i_out_pace_nocontrol++;
+    p_stream->pace_nocontrol = true;
 
     return VLC_SUCCESS;
 }
@@ -449,8 +444,6 @@ static void CloseIn( vlc_object_t * p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     in_sout_stream_sys_t *p_sys = (in_sout_stream_sys_t *)p_stream->p_sys;
-
-    p_stream->p_sout->i_out_pace_nocontrol--;
 
     free( p_sys->psz_name );
     free( p_sys );

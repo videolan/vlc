@@ -406,12 +406,11 @@ static int Open( vlc_object_t *p_this )
     if( var_GetBool( p_stream, SOUT_CFG_PREFIX"sap" ) )
         create_SDP( p_stream, p_access );
 
-    if( !sout_AccessOutCanControlPace( p_access ) )
-        p_stream->p_sout->i_out_pace_nocontrol++;
-
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
+    if( !sout_AccessOutCanControlPace( p_access ) )
+        p_stream->pace_nocontrol = true;
 
     ret = VLC_SUCCESS;
 
@@ -440,8 +439,6 @@ static void Close( vlc_object_t * p_this )
         sout_AnnounceUnRegister( p_stream, p_sys->p_session );
 
     sout_MuxDelete( p_sys->p_mux );
-    if( !sout_AccessOutCanControlPace( p_access ) )
-        p_stream->p_sout->i_out_pace_nocontrol--;
     sout_AccessOutDelete( p_access );
 
     free( p_sys );

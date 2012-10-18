@@ -601,6 +601,7 @@ static int Open( vlc_object_t *p_this )
         p_stream->pf_del    = Del;
         p_stream->pf_send   = Send;
     }
+    p_stream->pace_nocontrol = true;
 
     if( var_GetBool( p_stream, SOUT_CFG_PREFIX"sap" ) )
         SDPHandleUrl( p_stream, "sap" );
@@ -629,9 +630,6 @@ static int Open( vlc_object_t *p_this )
         free( psz );
     }
 
-    /* update p_sout->i_out_pace_nocontrol */
-    p_stream->p_sout->i_out_pace_nocontrol++;
-
     if( p_sys->p_mux != NULL )
     {
         sout_stream_id_t *id = Add( p_stream, NULL );
@@ -652,9 +650,6 @@ static void Close( vlc_object_t * p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    /* update p_sout->i_out_pace_nocontrol */
-    p_stream->p_sout->i_out_pace_nocontrol--;
 
     if( p_sys->p_mux )
     {

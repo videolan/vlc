@@ -717,9 +717,14 @@ static void mrl_Clean( mrl_t *p_mrl )
 /* Destroy a "stream_out" module */
 static void sout_StreamDelete( sout_stream_t *p_stream )
 {
+    sout_instance_t *p_sout = (sout_instance_t *)(p_stream->p_parent);
+
     msg_Dbg( p_stream, "destroying chain... (name=%s)", p_stream->psz_name );
 
-    if( p_stream->p_module ) module_unneed( p_stream, p_stream->p_module );
+    p_sout->i_out_pace_nocontrol -= p_stream->pace_nocontrol;
+
+    if( p_stream->p_module != NULL )
+        module_unneed( p_stream, p_stream->p_module );
 
     FREENULL( p_stream->psz_name );
 
@@ -765,10 +770,11 @@ static sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_name,
         return NULL;
 
     p_stream->p_sout   = p_sout;
-    p_stream->p_sys    = NULL;
     p_stream->psz_name = psz_name;
     p_stream->p_cfg    = p_cfg;
     p_stream->p_next   = p_next;
+    p_stream->pace_nocontrol = false;
+    p_stream->p_sys = NULL;
 
     msg_Dbg( p_sout, "stream=`%s'", p_stream->psz_name );
 
@@ -785,6 +791,7 @@ static sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_name,
         return NULL;
     }
 
+    p_sout->i_out_pace_nocontrol += p_stream->pace_nocontrol;
     return p_stream;
 }
 

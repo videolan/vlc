@@ -1390,11 +1390,11 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    p_stream->p_sys = p_sys;
     p_stream->pf_add = Add;
     p_stream->pf_del = Del;
     p_stream->pf_send = Send;
-    p_stream->p_sout->i_out_pace_nocontrol++;
+    p_stream->p_sys = p_sys;
+    p_stream->pace_nocontrol = true;
 
     p_sys->i_control_fd = -1;
     p_sys->i_stream_fd = -1;
@@ -1554,8 +1554,6 @@ static void Close( vlc_object_t *p_this )
     SendTeardown( p_this );
 
     FreeSys( p_this, p_sys );
-
-    p_stream->p_sout->i_out_pace_nocontrol--;
 }
 
 

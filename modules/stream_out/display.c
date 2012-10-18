@@ -118,9 +118,7 @@ static int Open( vlc_object_t *p_this )
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
     p_stream->p_sys     = p_sys;
-
-    /* update p_sout->i_out_pace_nocontrol */
-    p_stream->p_sout->i_out_pace_nocontrol++;
+    p_stream->pace_nocontrol = true;
 
     return VLC_SUCCESS;
 }
@@ -132,9 +130,6 @@ static void Close( vlc_object_t * p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    /* update p_sout->i_out_pace_nocontrol */
-    p_stream->p_sout->i_out_pace_nocontrol--;
 
     input_resource_Terminate( p_sys->p_resource );
     input_resource_Release( p_sys->p_resource );

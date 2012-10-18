@@ -40,7 +40,8 @@ extern "C" {
 #include <sys/types.h>
 #include <vlc_es.h>
 
-/** Stream output instance */
+/** Stream output instance (FIXME: should be private to src/ to avoid
+ * invalid unsycnrhonized access) */
 struct sout_instance_t
 {
     VLC_COMMON_MEMBERS
@@ -189,8 +190,8 @@ struct sout_stream_t
     /* manage a packet */
     int               (*pf_send)( sout_stream_t *, sout_stream_id_t *, block_t* );
 
-    /* private */
     sout_stream_sys_t *p_sys;
+    bool pace_nocontrol;
 };
 
 VLC_API void sout_StreamChainDelete(sout_stream_t *p_first, sout_stream_t *p_last );

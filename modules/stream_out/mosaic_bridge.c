@@ -249,8 +249,7 @@ static int Open( vlc_object_t *p_this )
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
-
-    p_stream->p_sout->i_out_pace_nocontrol++;
+    p_stream->pace_nocontrol = true;
 
     return VLC_SUCCESS;
 }
@@ -269,8 +268,6 @@ static void Close( vlc_object_t * p_this )
     var_DelCallback( p_stream, CFG_PREFIX "alpha", alphaCallback, p_stream );
     var_DelCallback( p_stream, CFG_PREFIX "x", xCallback, p_stream );
     var_DelCallback( p_stream, CFG_PREFIX "y", yCallback, p_stream );
-
-    p_stream->p_sout->i_out_pace_nocontrol--;
 
     free( p_sys->psz_id );
 

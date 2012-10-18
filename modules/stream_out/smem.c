@@ -191,10 +191,7 @@ static int Open( vlc_object_t *p_this )
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
-
-    /* Does the module need out_pace_control? */
-    if ( p_sys->time_sync )
-        p_stream->p_sout->i_out_pace_nocontrol++;
+    p_stream->pace_nocontrol = p_sys->time_sync;
 
     return VLC_SUCCESS;
 }
@@ -205,8 +202,6 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t * p_this )
 {
     sout_stream_t *p_stream = (sout_stream_t*)p_this;
-    if ( p_stream->p_sys->time_sync )
-        p_stream->p_sout->i_out_pace_nocontrol--;
     free( p_stream->p_sys );
 }
 
