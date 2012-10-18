@@ -117,13 +117,12 @@ static void no_detach (demux_sys_t *);
 
 struct demux_sys_t
 {
+    /* Everything is read-only when timer is armed. */
     const void  *addr;
     size_t       length;
     size_t       size;
     es_out_id_t *es;
-    mtime_t      pts, interval;
-    /* pts is protected by the lock. The rest is read-only. */
-    vlc_mutex_t  lock;
+    mtime_t      interval;
     vlc_timer_t  timer;
     void (*detach) (demux_sys_t *);
 };
@@ -223,7 +222,6 @@ static int Open (vlc_object_t *obj)
     sys->interval = (float)CLOCK_FREQ / rate;
     if (!sys->interval)
         goto error;
-    sys->pts = VLC_TS_INVALID;
 
     es_format_t fmt;
     es_format_Init (&fmt, VIDEO_ES, chroma);
@@ -238,7 +236,6 @@ static int Open (vlc_object_t *obj)
     sys->es = es_out_Add (demux->out, &fmt);
 
     /* Initializes demux */
-    vlc_mutex_init (&sys->lock);
     if (vlc_timer_create (&sys->timer, Demux, demux))
         goto error;
     vlc_timer_schedule (sys->timer, false, 1, sys->interval);
@@ -264,7 +261,6 @@ static void Close (vlc_object_t *obj)
     demux_sys_t *sys = demux->p_sys;
 
     vlc_timer_destroy (sys->timer);
-    vlc_mutex_destroy (&sys->lock);
     sys->detach (sys);
     free (sys);
 }
@@ -329,15 +325,7 @@ static int Control (demux_t *demux, int query, va_list args)
         {
             bool pausing = va_arg (args, int);
 
-            if (!pausing)
-            {
-                vlc_mutex_lock (&sys->lock);
-                sys->pts = VLC_TS_INVALID;
-                es_out_Control (demux->out, ES_OUT_RESET_PCR);
-                vlc_mutex_unlock (&sys->lock);
-            }
-            vlc_timer_schedule (sys->timer, false,
-                                pausing ? 0 : 1, sys->interval);
+            vlc_timer_schedule (sys->timer, false, !pausing, sys->interval);
             return VLC_SUCCESS;
         }
 
@@ -367,17 +355,10 @@ static void Demux (void *data)
     block_t *block = block_Alloc (sys->length);
     if (block == NULL)
         return;
-
     memcpy (block->p_buffer, sys->addr, sys->length);
+    block->i_pts = block->i_dts = mdate ();
 
     /* Send block */
-    vlc_mutex_lock (&sys->lock);
-    if (sys->pts == VLC_TS_INVALID)
-        sys->pts = mdate ();
-    block->i_pts = block->i_dts = sys->pts;
-
-    es_out_Control (demux->out, ES_OUT_SET_PCR, sys->pts);
+    es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts);
     es_out_Send (demux->out, sys->es, block);
-    sys->pts += sys->interval;
-    vlc_mutex_unlock (&sys->lock);
 }
