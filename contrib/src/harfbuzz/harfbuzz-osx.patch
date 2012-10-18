@@ -1,9 +1,0 @@
---- harfbuzz-0.9.2/harfbuzz.pc.in.orig	2012-08-12 12:05:38.000000000 +0900
-+++ harfbuzz-0.9.2/harfbuzz.pc.in	2012-08-12 12:15:08.000000000 +0900
-@@ -7,5 +7,5 @@
- Description: Text shaping library
- Version: @VERSION@
- 
--Libs: -L${libdir} -lharfbuzz
-+Libs: -L${libdir} -Wl,-framework,ApplicationServices -lharfbuzz
- Cflags: -I${includedir}/harfbuzz
