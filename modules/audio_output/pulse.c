@@ -450,7 +450,7 @@ static void stream_suspended_cb(pa_stream *s, void *userdata)
     audio_output_t *aout = userdata;
 
     msg_Dbg(aout, "suspended");
-    stream_reset_sync(s, aout);
+    (void) s;
 }
 
 static void stream_underflow_cb(pa_stream *s, void *userdata)
