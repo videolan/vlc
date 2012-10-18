@@ -101,7 +101,6 @@ struct demux_sys_t
     /* All owned by timer thread while timer is armed: */
     xcb_connection_t *conn;
     es_out_id_t      *es;
-    mtime_t           pts, interval;
     float             rate;
     xcb_window_t      window;
     xcb_pixmap_t      pixmap;
@@ -209,17 +208,17 @@ static int Open (vlc_object_t *obj)
     p_sys->rate = var_InheritFloat (obj, "screen-fps");
     if (!p_sys->rate)
         goto error;
-    p_sys->interval = (float)CLOCK_FREQ / p_sys->rate;
-    if (!p_sys->interval)
+
+    mtime_t interval = (float)CLOCK_FREQ / p_sys->rate;
+    if (!interval)
         goto error;
 
     p_sys->cur_w = 0;
     p_sys->cur_h = 0;
     p_sys->es = NULL;
-    p_sys->pts = VLC_TS_INVALID;
     if (vlc_timer_create (&p_sys->timer, Demux, demux))
         goto error;
-    vlc_timer_schedule (p_sys->timer, false, 1, p_sys->interval);
+    vlc_timer_schedule (p_sys->timer, false, 1, interval);
 
     /* Initializes demux */
     demux->pf_demux   = NULL;
@@ -422,13 +421,10 @@ discard:
     /* Send block - zero copy */
     if (sys->es != NULL)
     {
-        if (sys->pts == VLC_TS_INVALID)
-            sys->pts = mdate ();
-        block->i_pts = block->i_dts = sys->pts;
+        block->i_pts = block->i_dts = mdate ();
 
-        es_out_Control (demux->out, ES_OUT_SET_PCR, sys->pts);
+        es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts);
         es_out_Send (demux->out, sys->es, block);
-        sys->pts += sys->interval;
     }
 }
 
