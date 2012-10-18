@@ -535,6 +535,9 @@ case "$SYS" in
   "linux")
     AC_CHECK_FUNCS([accept4 pipe2 eventfd vmsplice sched_getaffinity])
     ;;
+  "mingw32")
+    AC_CHECK_FUNCS([_lock_file])
+    ;;
 esac
 
 AH_BOTTOM([#include <vlc_fixups.h>])

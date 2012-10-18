@@ -1,7 +1,7 @@
 /*****************************************************************************
  * flockfile.c: POSIX unlocked I/O stream stubs
  *****************************************************************************
- * Copyright © 2011 Rémi Denis-Courmont
+ * Copyright © 2011-2012 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -24,41 +24,49 @@
 
 #include <stdio.h>
 
-/* There is no way to implement this for real. We just pretend it works and
- * hope for the best (especially when outputting to stderr). */
+#ifdef WIN32
+# ifndef HAVE__LOCK_FILE
+#  warning Broken SDK: VLC logs will be garbage.
+#  define _lock_file(s) ((void)(s))
+#  define _unlock_file(s) ((void)(s))
+# endif
 
 void flockfile (FILE *stream)
 {
-    (void) stream;
+    _lock_file (stream);
 }
 
 int ftrylockfile (FILE *stream)
 {
-    (void) stream;
+    flockfile (stream); /* Move along people, there is nothing to see here. */
     return 0;
 }
 
 void funlockfile (FILE *stream)
 {
-    (void) stream;
+    _unlock_file (stream);
 }
 
 int getc_unlocked (FILE *stream)
 {
-    return getc (stream);
+    return _getc_nolock (stream);
 }
 
 int getchar_unlocked (void)
 {
-    return getchar ();
+    return _getchar_nolock ();
 }
 
 int putc_unlocked (int c, FILE *stream)
 {
-    return putc (c, stream);
+    return _putc_nolock (c, stream);
 }
 
 int putchar_unlocked (int c)
 {
-    return putchar (c);
+    return _putchar_nolock (c);
 }
+
+#else
+# error flockfile not implemented on your platform!
+#endif
