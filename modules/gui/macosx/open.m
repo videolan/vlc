@@ -985,7 +985,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [self showOpticalMediaView: o_disc_bd_view withIcon: o_image];
         [self setMRL: [NSString stringWithFormat: @"bluray://%@", o_opticalDevicePath]];
     } else {
-        msg_Warn(VLCIntf, "unknown disk type, no idea what to display");
+        if (VLCIntf)
+            msg_Warn(VLCIntf, "unknown disk type, no idea what to display");
+
         [self showOpticalMediaView: o_disc_nodisc_view withIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
     }
 }
