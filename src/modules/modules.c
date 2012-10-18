@@ -290,7 +290,7 @@ module_t *vlc_module_load(vlc_object_t *obj, const char *capability,
         for (ssize_t i = 0; i < total; i++)
         {
             module_t *cand = mods[i];
-            if (cand == NULL)
+            if (cand == NULL || module_get_score (cand) <= 0)
                 continue;
 
             int ret = module_load (obj, cand, probe, args);
