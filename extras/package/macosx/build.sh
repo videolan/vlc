@@ -10,7 +10,7 @@ info()
 }
 
 ARCH="x86_64"
-OSX_VERSION="10.6"
+OSX_VERSION="10.7"
 SDKROOT=`xcode-select -print-path`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$OSX_VERSION.sdk
 
 usage()
