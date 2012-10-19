@@ -601,6 +601,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         switch( id->p_decoder->fmt_in.i_cat )
         {
         case AUDIO_ES:
+            Send( p_stream, id, NULL );
             transcode_audio_close( id );
             break;
         case VIDEO_ES:

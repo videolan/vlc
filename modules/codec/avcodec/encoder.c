@@ -1061,6 +1061,9 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
 
     block_t *p_block, *p_chain = NULL;
 
+    /*FIXME: change to use  avcodec_encode_audio2 to be able to flush*/
+    if( unlikely( !p_aout_buf ) ) return NULL;
+
     uint8_t *p_buffer = p_aout_buf->p_buffer;
     int i_samples = p_aout_buf->i_nb_samples;
     int i_samples_delay = p_sys->i_samples_delay;

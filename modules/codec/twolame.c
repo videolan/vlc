@@ -261,6 +261,10 @@ static void Bufferize( encoder_t *p_enc, int16_t *p_in, int i_nb_samples )
 static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
+
+    /* FIXME:p_aout_buf is NULL when it's time to flush, does twolame has buffer to flush?*/
+    if( unlikely( !p_aout_buf ) ) return NULL;
+
     int16_t *p_buffer = (int16_t *)p_aout_buf->p_buffer;
     int i_nb_samples = p_aout_buf->i_nb_samples;
     block_t *p_chain = NULL;

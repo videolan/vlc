@@ -989,6 +989,9 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
     encoder_sys_t *p_sys = p_enc->p_sys;
     block_t *p_block, *p_chain = NULL;
 
+    /* Encoder gets NULL when it's time to flush */
+    if( unlikely( !p_aout_buf ) ) return NULL;
+
     unsigned char *p_buffer = p_aout_buf->p_buffer;
     int i_samples = p_aout_buf->i_nb_samples;
     int i_samples_delay = p_sys->i_samples_delay;
