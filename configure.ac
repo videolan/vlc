@@ -3614,9 +3614,9 @@ AC_ARG_ENABLE(macosx,
   [  --enable-macosx         Mac OS X gui support (default enabled on Mac OS X)])
 if test "x${enable_macosx}" != "xno" -a "${SYS}" = "darwin"
 then
-  VLC_ADD_LIBS([macosx minimal_macosx], [-Wl,-framework,Cocoa -Wl,-framework,OpenGL -Wl,-framework,Carbon -Wl,-framework,CoreServices -Wl,-framework,AGL])
-  VLC_ADD_OBJCFLAGS([macosx minimal_macosx], [-fobjc-exceptions] )
-  VLC_ADD_PLUGIN([macosx minimal_macosx])
+  VLC_ADD_LIBS([macosx], [-Wl,-framework,Cocoa -Wl,-framework,OpenGL -Wl,-framework,Carbon -Wl,-framework,CoreServices -Wl,-framework,AGL])
+  VLC_ADD_OBJCFLAGS([macosx], [-fobjc-exceptions] )
+  VLC_ADD_PLUGIN([macosx])
 
   VLC_ADD_LIBS([macosx], [-Wl,-framework,QTKit -Wl,-framework,IOKit -Wl,-framework,AddressBook -Wl,-framework,WebKit -Wl,-framework,CoreAudio -Wl,-framework,SystemConfiguration])
 
@@ -3633,11 +3633,24 @@ then
   fi
   VLC_ADD_LIBS([macosx], [-F${CONTRIB_DIR} -Wl,-framework,BGHUDAppKit])
   VLC_ADD_OBJCFLAGS([macosx], [-F${CONTRIB_DIR}])
-
 fi
+AM_CONDITIONAL(ENABLE_MACOSX_UI, [test "$enable_macosx" != "no"])
 
 dnl
-dnl  MacOS X dialor provider
+dnl  Minimal Mac OS X module
+dnl
+AC_ARG_ENABLE(minimal-macosx,
+  [  --enable-minimal-macosx Minimal Mac OS X support (default disabled)])
+if test "${enable_minimal_macosx}" = "yes" -a "${SYS}" = "darwin"
+then
+  VLC_ADD_LIBS([minimal_macosx], [-Wl,-framework,Cocoa -Wl,-framework,OpenGL -Wl,-framework,Carbon -Wl,-framework,CoreServices -Wl,-framework,AGL])
+  VLC_ADD_OBJCFLAGS([minimal_macosx], [-fobjc-exceptions] )
+  VLC_ADD_PLUGIN([minimal_macosx])
+fi
+AM_CONDITIONAL(ENABLE_MINIMAL_MACOSX, [test "$enable_minimal_macosx" != "no"])
+
+dnl
+dnl  MacOS X dialog provider
 dnl
 AC_ARG_ENABLE(macosx-dialog-provider,
   [  --enable-macosx-dialog-provider Mac OS X dialog module (default enabled on Mac OS X)])
@@ -3647,6 +3660,7 @@ then
   VLC_ADD_LIBS([macosx_dialog_provider],[-Wl,-framework,Cocoa])
   VLC_ADD_PLUGIN([macosx_dialog_provider])
 fi
+AM_CONDITIONAL(ENABLE_MACOSX_DIALOG_PROVIDER, [test "$enable_macosx_dialog_provider" != "no"])
 
 dnl
 dnl  ncurses module
