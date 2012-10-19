@@ -183,7 +183,7 @@ typedef enum vlc_dialog {
 #define INTF_ABOUT_MSG LICENSE_MSG
 
 #define EXTENSIONS_AUDIO_CSV "3ga", "669", "a52", "aac", "ac3", "adt", "adts", "aif", "aifc", "aiff", \
-                         "amr", "aob". "ape", "awb", "caf", "dts", "flac", "it", \
+                         "amr", "aob", "ape", "awb", "caf", "dts", "flac", "it", \
                          "m4a", "m4p", "m5p", "mka", "mlp", "mod", "mpa", "mp1", "mp2", "mp3", "mpc", "mpga", \
                          "oga", "ogg", "oma", "opus", "qcp", "ra", "rmi", "s3m", "spx", "thd", "tta", \
                          "voc", "vqf", "w64", "wav", "wma", "wv", "xa", "xm"
