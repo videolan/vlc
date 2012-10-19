@@ -97,7 +97,6 @@ struct encoder_sys_t
      * Common properties
      */
     char *p_buffer;
-    uint8_t *p_buffer_out;
     size_t i_buffer_out;
 
     /*
@@ -304,7 +303,6 @@ int OpenEncoder( vlc_object_t *p_this )
     p_enc->pf_encode_audio = EncodeAudio;
 
     p_sys->p_buffer = NULL;
-    p_sys->p_buffer_out = NULL;
     p_sys->i_buffer_out = 0;
 
 #if LIBAVCODEC_VERSION_MAJOR < 54
@@ -468,7 +466,6 @@ int OpenEncoder( vlc_object_t *p_this )
                    p_enc->fmt_in.video.i_sar_num,
                    p_enc->fmt_in.video.i_sar_den, 1 << 30 );
 
-        p_sys->p_buffer_out = NULL;
 
         p_enc->fmt_in.i_codec = VLC_CODEC_I420;
         p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec;
@@ -832,11 +829,6 @@ int OpenEncoder( vlc_object_t *p_this )
             p_sys->i_buffer_out = 8 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
         else
             p_sys->i_buffer_out = p_sys->i_frame_size * p_sys->i_sample_bytes;
-        p_sys->p_buffer_out = malloc( p_sys->i_buffer_out );
-        if ( p_sys->p_buffer_out == NULL )
-        {
-            goto error;
-        }
     }
 
     msg_Dbg( p_enc, "found encoder %s", psz_namecodec );
@@ -845,7 +837,6 @@ int OpenEncoder( vlc_object_t *p_this )
 error:
     free( p_enc->fmt_out.p_extra );
     free( p_sys->p_buffer );
-    free( p_sys->p_buffer_out );
     free( p_sys );
     return VLC_ENOMEM;
 }
@@ -1154,7 +1145,6 @@ void CloseEncoder( vlc_object_t *p_this )
     av_free( p_sys->p_context );
 
     free( p_sys->p_buffer );
-    free( p_sys->p_buffer_out );
 
     free( p_sys );
 }
