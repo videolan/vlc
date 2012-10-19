@@ -1004,11 +1004,6 @@ static const char *const ppsz_prefres[] = {
  ****************************************************************************/
 
 // DEPRECATED
-#define CPU_CAT_LONGTEXT N_( \
-    "These options allow you to enable special CPU optimizations. " \
-    "You should always leave all these enabled." )
-
-// DEPRECATED
 #define MISC_CAT_LONGTEXT N_( \
     "These options allow you to select default modules. Leave these " \
     "alone unless you really know what you are doing." )
@@ -1960,6 +1955,9 @@ vlc_module_begin ()
 
 
     set_subcategory( SUBCAT_SOUT_STREAM )
+    add_integer( "sap-interval", 5, ANN_SAPINTV_TEXT,
+                               ANN_SAPINTV_LONGTEXT, true )
+
     set_subcategory( SUBCAT_SOUT_MUX )
     add_module( "mux", "sout mux", NULL, MUX_TEXT, MUX_LONGTEXT, true )
     set_subcategory( SUBCAT_SOUT_ACO )
@@ -1974,16 +1972,10 @@ vlc_module_begin ()
     add_module( "packetizer", "packetizer", NULL,
                 PACKETIZER_TEXT, PACKETIZER_LONGTEXT, true )
 
-    set_subcategory( SUBCAT_SOUT_SAP )
-    add_integer( "sap-interval", 5, ANN_SAPINTV_TEXT,
-                               ANN_SAPINTV_LONGTEXT, true )
-
     set_subcategory( SUBCAT_SOUT_VOD )
 
 /* CPU options */
     set_category( CAT_ADVANCED )
-    set_subcategory( SUBCAT_ADVANCED_CPU )
-    add_category_hint( N_("CPU"), CPU_CAT_LONGTEXT, true )
     add_obsolete_bool( "fpu" )
 #if defined( __i386__ ) || defined( __x86_64__ )
     add_obsolete_bool( "mmx" ) /* since 2.0.0 */

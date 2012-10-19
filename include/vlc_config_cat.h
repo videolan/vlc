@@ -163,11 +163,6 @@
                 "more information. You can configure default options for " \
                 "each sout stream module here.")
 
-#define SOUT_SAP_TITLE N_( "SAP" )
-#define SOUT_SAP_HELP N_( \
-                 "SAP is a way to publically announce streams that are being "\
-                 "sent using multicast UDP or RTP." )
-
 #define SOUT_VOD_TITLE N_( "VOD" )
 #define SOUT_VOD_HELP N_( "VLC's implementation of Video On Demand" )
 
@@ -186,10 +181,6 @@
 /* Advanced */
 #define AADVANCED_TITLE N_( "Advanced" )
 #define AADVANCED_HELP N_( "Advanced settings. Use with care...")
-
-#define CPU_TITLE N_( "CPU features" )
-#define CPU_HELP N_( "You can choose to disable some CPU accelerations " \
-        "here. Use with extreme care!" )
 
 #define MISC_TITLE N_( "Advanced settings" )
 
@@ -267,7 +258,6 @@ static const struct config_category_t categories_array[] =
     { SUBCAT_SOUT_MUX, SOUT_MUX_TITLE, SOUT_MUX_HELP },
     { SUBCAT_SOUT_ACO, SOUT_ACO_TITLE, SOUT_ACO_HELP },
     { SUBCAT_SOUT_PACKETIZER, SOUT_PACKET_TITLE, SOUT_PACKET_HELP },
-    { SUBCAT_SOUT_SAP, SOUT_SAP_TITLE, SOUT_SAP_HELP },
     { SUBCAT_SOUT_VOD, SOUT_VOD_TITLE, SOUT_VOD_HELP },
 
     { CAT_PLAYLIST, PLAYLIST_TITLE , PLAYLIST_HELP },
@@ -275,7 +265,6 @@ static const struct config_category_t categories_array[] =
     { SUBCAT_PLAYLIST_SD, SD_TITLE, SD_HELP },
 
     { CAT_ADVANCED, AADVANCED_TITLE, AADVANCED_HELP },
-    { SUBCAT_ADVANCED_CPU, CPU_TITLE, CPU_HELP },
     { SUBCAT_ADVANCED_MISC, MISC_TITLE, AADVANCED_HELP },
 
     { -1, NULL, NULL }
