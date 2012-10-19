@@ -571,8 +571,6 @@ modules/gui/minimal_macosx/VLCMinimalVoutWindow.h
 modules/gui/minimal_macosx/VLCMinimalVoutWindow.m
 modules/gui/minimal_macosx/VLCOpenGLVoutView.h
 modules/gui/minimal_macosx/VLCOpenGLVoutView.m
-modules/gui/minimal_macosx/voutagl.h
-modules/gui/minimal_macosx/voutagl.m
 modules/gui/minimal_macosx/voutgl.h
 modules/gui/minimal_macosx/voutgl.m
 modules/gui/ncurses.c
