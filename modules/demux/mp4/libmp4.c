@@ -1448,9 +1448,10 @@ static int MP4_ReadBox_dvc1( stream_t *p_stream, MP4_Box_t *p_box )
     p_dvc1 = p_box->data.p_dvc1;
 
     MP4_GET1BYTE( p_dvc1->i_profile_level ); /* profile is on 4bits, level 3bits */
-    if( (p_dvc1->i_profile_level & 0xf0) >> 4 != 0x06 )
+    uint8_t i_profile = (p_dvc1->i_profile_level & 0xf0) >> 4;
+    if( i_profile != 0x06 && i_profile != 0x0c )
     {
-        msg_Warn( p_stream, "unsupported VC-1 profile, please report" );
+        msg_Warn( p_stream, "unsupported VC-1 profile (%"PRIu8"), please report", i_profile );
         MP4_READBOX_EXIT( 0 );
     }
 
@@ -1466,8 +1467,8 @@ static int MP4_ReadBox_dvc1( stream_t *p_stream, MP4_Box_t *p_box )
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream,
-             "read box: \"dvc1\" profile=%i level=%i",
-             p_dvc1->i_profile_level & 0xf0 >> 4, p_dvc1->i_profile_level & 0x0e >> 1 );
+             "read box: \"dvc1\" profile=%"PRIu8" level=%i",
+             i_profile, p_dvc1->i_profile_level & 0x0e >> 1 );
 #endif
 
     MP4_READBOX_EXIT( 1 );
