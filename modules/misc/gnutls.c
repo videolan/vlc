@@ -83,13 +83,13 @@ vlc_module_begin ()
     set_capability( "tls client", 1 )
     set_callbacks( OpenClient, CloseClient )
     set_category( CAT_ADVANCED )
-    set_subcategory( SUBCAT_ADVANCED_MISC )
+    set_subcategory( SUBCAT_ADVANCED_NETWORK )
 
     add_submodule ()
         set_description( N_("GNU TLS server") )
         set_capability( "tls server", 1 )
         set_category( CAT_ADVANCED )
-        set_subcategory( SUBCAT_ADVANCED_MISC )
+        set_subcategory( SUBCAT_ADVANCED_NETWORK )
         set_callbacks( OpenServer, CloseServer )
 
         add_string ("gnutls-priorities", "NORMAL", PRIORITIES_TEXT,
