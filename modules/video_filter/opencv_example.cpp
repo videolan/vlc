@@ -72,7 +72,7 @@ vlc_module_begin ()
     add_shortcut( "opencv_example" )
 
     set_category( CAT_VIDEO )
-    set_subcategory( SUBCAT_VIDEO_VFILTER2 )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_callbacks( OpenFilter, CloseFilter )
 
     add_string( "opencv-haarcascade-file", "c:\\haarcascade_frontalface_alt.xml",
