@@ -95,14 +95,14 @@ void cocoaglvoutviewEnd( vout_window_t * p_wnd )
     msg_Dbg( p_wnd, "Mac OS X Vout is closing" );
 
     if( [(id)o_cocoaglview_container respondsToSelector:@selector(removeVoutSubview:)] )
-        [o_cocoaglview_container performSelectorOnMainThread:@selector(removeVoutSubview:) withObject:p_wnd->handle.nsobject waitUntilDone:NO];
+        [(id)o_cocoaglview_container performSelectorOnMainThread:@selector(removeVoutSubview:) withObject:p_wnd->handle.nsobject waitUntilDone:NO];
 
     /* Let the view go and release it, _without_blocking_ */
-    [p_wnd->handle.nsobject performSelectorOnMainThread:@selector(removeFromSuperviewAndRelease) withObject:nil waitUntilDone:NO];
+    [(id)p_wnd->handle.nsobject performSelectorOnMainThread:@selector(removeFromSuperviewAndRelease) withObject:nil waitUntilDone:NO];
     p_wnd->handle.nsobject = nil;
 
     /* Release the container now that we don't use it */
-    [o_cocoaglview_container performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
+    [(id)o_cocoaglview_container performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
 
     [p_wnd->sys->o_pool release];
     p_wnd->sys->o_pool = nil;
