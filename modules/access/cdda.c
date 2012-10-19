@@ -160,11 +160,11 @@ static int Open( vlc_object_t *p_this )
     STANDARD_BLOCK_ACCESS_INIT
     p_sys->vcddev = vcddev;
 
-   /* Do we play a single track ? */
-   p_sys->i_track = var_InheritInteger( p_access, "cdda-track" ) - 1;
+    /* Do we play a single track ? */
+    p_sys->i_track = var_InheritInteger( p_access, "cdda-track" ) - 1;
 
-   if( p_sys->i_track < 0 )
-   {
+    if( p_sys->i_track < 0 )
+    {
         /* We only do separate items if the whole disc is requested */
         input_thread_t *p_input = access_GetParentInput( p_access );
 
