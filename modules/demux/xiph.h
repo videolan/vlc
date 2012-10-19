@@ -48,7 +48,7 @@ static inline int xiph_SplitHeaders(unsigned packet_size[], void *packet[], unsi
         }
         size += packet_size[i];
     }
-    if (end - current < (int)size)
+    if (end - current < size)
         return VLC_EGENERIC;
     packet_size[count - 1] = end - current - size;
 
