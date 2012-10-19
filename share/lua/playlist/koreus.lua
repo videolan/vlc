@@ -40,7 +40,9 @@ function parse()
 		end
 		if string.match( line, "<meta name=\"description\"" ) then
 			_,_,description = string.find( line, "content=\"(.-)\"" )
-			description = vlc.strings.resolve_xml_special_chars( description )
+            if (description ~= nil) then
+                description = vlc.strings.resolve_xml_special_chars( description )
+            end
 		end
 		if string.match( line, "<meta name=\"author\"" ) then
 			_,_,artist = string.find( line, "content=\"(.-)\"" )
