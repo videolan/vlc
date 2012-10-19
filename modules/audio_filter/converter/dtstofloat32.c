@@ -86,7 +86,7 @@ vlc_module_begin ()
     set_shortname( "DCA" )
     set_description( N_("DTS Coherent Acoustics audio decoder") )
     add_bool( "dts-dynrng", true, DYNRNG_TEXT, DYNRNG_LONGTEXT, false )
-    set_capability( "audio filter", 100 )
+    set_capability( "audio converter", 100 )
     set_callbacks( OpenFilter, CloseFilter )
 vlc_module_end ()
 

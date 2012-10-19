@@ -44,7 +44,7 @@ vlc_module_begin ()
     set_description( N_("Audio filter for simple channel mixing") )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_MISC )
-    set_capability( "audio filter", 10 )
+    set_capability( "audio converter", 10 )
     set_callbacks( OpenFilter, NULL )
 vlc_module_end ()
 

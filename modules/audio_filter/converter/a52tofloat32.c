@@ -97,7 +97,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACODEC )
     add_bool( "a52-dynrng", true, DYNRNG_TEXT, DYNRNG_LONGTEXT, false )
     add_bool( "a52-upmix", false, UPMIX_TEXT, UPMIX_LONGTEXT, true )
-    set_capability( "audio filter", 100 )
+    set_capability( "audio converter", 100 )
     set_callbacks( OpenFilter, CloseFilter )
 vlc_module_end ()
 

@@ -50,7 +50,7 @@ vlc_module_begin ()
     set_shortname( N_("Dolby Surround decoder") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACODEC )
-    set_capability( "audio filter", 5 )
+    set_capability( "audio converter", 5 )
     set_callbacks( Create, Destroy )
 vlc_module_end ()
 

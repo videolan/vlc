@@ -49,7 +49,7 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_MISC )
     set_description( N_("Audio filter for A/52->S/PDIF encapsulation") )
-    set_capability( "audio filter", 10 )
+    set_capability( "audio converter", 10 )
     set_callbacks( Create, NULL )
 vlc_module_end ()
 

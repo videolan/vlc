@@ -66,7 +66,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACODEC )
     set_description( N_("MPEG audio decoder") )
-    set_capability( "audio filter", 100 )
+    set_capability( "audio converter", 100 )
     set_callbacks( OpenFilter, CloseFilter )
 vlc_module_end ()
 

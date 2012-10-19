@@ -290,7 +290,7 @@ int transcode_audio_new( sout_stream_t *p_stream,
     }
 
     /* Load conversion filters */
-    id->p_f_chain = filter_chain_New( p_stream, "audio filter", true,
+    id->p_f_chain = filter_chain_New( p_stream, "audio converter", true,
                     transcode_audio_filter_allocation_init, NULL, NULL );
     filter_chain_Reset( id->p_f_chain, &fmt_last, &id->p_encoder->fmt_in );
 

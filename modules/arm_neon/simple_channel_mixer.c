@@ -47,7 +47,7 @@ vlc_module_begin ()
     set_description( N_("Audio filter for simple channel mixing using NEON assembly") )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_MISC )
-    set_capability( "audio filter", 20 )
+    set_capability( "audio converter", 20 )
     set_callbacks( OpenFilter, NULL )
 vlc_module_end ()
 

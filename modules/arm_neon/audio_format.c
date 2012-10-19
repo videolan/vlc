@@ -34,7 +34,7 @@ static int Open (vlc_object_t *);
 
 vlc_module_begin ()
     set_description (N_("ARM NEON audio format conversions") )
-    set_capability ("audio filter", 20)
+    set_capability ("audio converter", 20)
     set_callbacks (Open, NULL)
 vlc_module_end ()
 

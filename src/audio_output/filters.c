@@ -47,8 +47,8 @@ static filter_t * FindFilter( vlc_object_t *obj,
                               const audio_sample_format_t *infmt,
                               const audio_sample_format_t *outfmt )
 {
-    static const char typename[] = "audio filter";
-    const char *type = "audio filter", *name = NULL;
+    static const char typename[] = "audio converter";
+    const char *type = "audio converter", *name = NULL;
     filter_t * p_filter;
 
     p_filter = vlc_custom_create( obj, sizeof(*p_filter), typename );

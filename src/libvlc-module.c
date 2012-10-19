@@ -1533,8 +1533,8 @@ vlc_module_begin ()
                 true )
         change_short('A')
     set_subcategory( SUBCAT_AUDIO_AFILTER )
-    add_module_list_cat( "audio-filter", SUBCAT_AUDIO_AFILTER, NULL,
-                         AUDIO_FILTER_TEXT, AUDIO_FILTER_LONGTEXT, false )
+    add_module_list( "audio-filter", "audio filter", NULL,
+                     AUDIO_FILTER_TEXT, AUDIO_FILTER_LONGTEXT, false )
     set_subcategory( SUBCAT_AUDIO_VISUAL )
     add_module( "audio-visual", "visualization2", NULL,AUDIO_VISUAL_TEXT,
                 AUDIO_VISUAL_LONGTEXT, false )
