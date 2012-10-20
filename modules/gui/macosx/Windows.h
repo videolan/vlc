@@ -32,6 +32,8 @@
  *  Missing extension to NSWindow
  *****************************************************************************/
 
+@class VLCVoutView;
+
 @interface VLCWindow : NSWindow
 {
     BOOL b_canBecomeKeyWindow;
@@ -55,12 +57,13 @@
 /* animate mode is only supported in >=10.4 */
 - (void)closeAndAnimate: (BOOL)animate;
 
+- (VLCVoutView *)videoView;
+
 @end
 
 
 static const float f_min_video_height = 70.0;
 
-@class VLCVoutView;
 @class VLCControlsBarCommon;
 
 /*****************************************************************************

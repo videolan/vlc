@@ -25,6 +25,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import <vlc_vout.h>
+
+
 /*****************************************************************************
  * VLCVoutView interface
  *****************************************************************************/
@@ -34,5 +37,12 @@
     NSTimeInterval t_lastScrollEvent;
 
     CGFloat f_cumulated_magnification;
+
+    vout_thread_t *p_vout;
 }
+
+- (void)setVoutThread:(vout_thread_t *)p_vout_thread;
+- (vout_thread_t *)voutThread;
+- (void)releaseVoutThread;
+
 @end

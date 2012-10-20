@@ -508,7 +508,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
             vlc_object_release(p_aout);
         }
 
-        vout_thread_t * p_vout = input_GetVout(p_input);
+        vout_thread_t * p_vout = getVoutForActiveWindow();
 
         if (p_vout != NULL) {
             [self setupVarMenuItem: o_mi_aspect_ratio target: (vlc_object_t *)p_vout
@@ -695,6 +695,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 #pragma mark -
 #pragma mark video menu
+
 - (IBAction)toggleFullscreen:(id)sender
 {
     [[VLCCoreInteraction sharedInstance] toggleFullscreen];
@@ -704,7 +705,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 {
     input_thread_t *p_input = pl_CurrentInput(VLCIntf);
     if (p_input) {
-        vout_thread_t *p_vout = getVout();
+        vout_thread_t *p_vout = getVoutForActiveWindow();
         if (p_vout) {
             if (sender == o_mi_half_window)
                 var_SetFloat(p_vout, "zoom", 0.5);
@@ -714,7 +715,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
                 var_SetFloat(p_vout, "zoom", 2.0);
             else
             {
-                [[[[[VLCMain sharedInstance] mainWindow] videoView] window] performZoom:sender];
+                [[NSApp keyWindow] performZoom:sender];
             }
             vlc_object_release(p_vout);
         }
@@ -726,7 +727,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 {
     input_thread_t *p_input = pl_CurrentInput(VLCIntf);
     if (p_input) {
-        vout_thread_t *p_vout = getVout();
+        vout_thread_t *p_vout = getVoutForActiveWindow();
         if (p_vout) {
             var_ToggleBool(p_vout, "video-on-top");
             vlc_object_release(p_vout);
@@ -739,7 +740,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 {
     input_thread_t *p_input = pl_CurrentInput(VLCIntf);
     if (p_input) {
-        vout_thread_t *p_vout = getVout();
+        vout_thread_t *p_vout = getVoutForActiveWindow();
         if (p_vout) {
             var_TriggerCallback(p_vout, "video-snapshot");
             vlc_object_release(p_vout);
@@ -1270,7 +1271,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         bEnabled = FALSE;
 
         if (p_input != NULL) {
-            vout_thread_t *p_vout = input_GetVout(p_input);
+            vout_thread_t *p_vout = getVoutForActiveWindow();
             if (p_vout != NULL) {
                 if ([o_title isEqualToString: _NS("Float on Top")])
                     [o_mi setState: var_GetBool(p_vout, "video-on-top")];

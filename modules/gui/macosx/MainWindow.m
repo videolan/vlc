@@ -766,7 +766,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     } else {
         if (var_InheritBool(VLCIntf, "embedded-video") || b_nativeFullscreenMode) {
             o_vout_view = [o_video_view retain];
-            o_new_video_window = self;
+            o_new_video_window = [self retain];
             b_nonembedded = NO;
         } else {
             NSWindowController *o_controller = [[NSWindowController alloc] initWithWindowNibName:@"DetachedVideoWindow"];
@@ -796,7 +796,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     [o_new_video_window setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
-    [[[VLCMain sharedInstance] voutController] addVout:o_new_video_window forDisplay:p_wnd];
+    [[[VLCMain sharedInstance] voutController] addVout:[o_new_video_window autorelease] forDisplay:p_wnd];
 
     if(b_nonembedded) {
         // event occurs before window is created, so call again
@@ -868,8 +868,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [NSCursor setHiddenUntilMouseMoves: YES];
 }
 
+
 #pragma mark -
 #pragma mark Fullscreen support
+
 - (void)showFullscreenController
 {
      if (b_fullscreen && [[VLCMain sharedInstance] activeVideoPlayback])

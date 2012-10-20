@@ -53,6 +53,7 @@
 // You need to release those objects after use
 input_thread_t *getInput(void);
 vout_thread_t *getVout(void);
+vout_thread_t *getVoutForActiveWindow(void);
 audio_output_t *getAout(void);
 
 /*****************************************************************************

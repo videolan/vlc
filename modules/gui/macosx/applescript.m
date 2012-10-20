@@ -162,7 +162,7 @@
 @implementation NSApplication(ScriptSupport)
 
 - (BOOL)scriptFullscreenMode {
-    vout_thread_t * p_vout = getVout();
+    vout_thread_t * p_vout = getVoutForActiveWindow();
     if (!p_vout)
         return NO;
     BOOL b_value = var_GetBool(p_vout, "fullscreen");
@@ -171,7 +171,7 @@
 }
 
 - (void)setScriptFullscreenMode:(BOOL)mode {
-    vout_thread_t * p_vout = getVout();
+    vout_thread_t * p_vout = getVoutForActiveWindow();
     if (!p_vout)
         return;
     if (var_GetBool(p_vout, "fullscreen") == mode) {

@@ -210,6 +210,15 @@
     }
 }
 
+- (VLCVoutView *)videoView
+{
+    if ([[self contentView] class] == [VLCVoutView class])
+        return (VLCVoutView *)[self contentView];
+
+    return nil;
+}
+
+
 @end
 
 
@@ -685,7 +694,7 @@
     /* We always try to do so */
     [NSScreen unblackoutScreens];
 
-    vout_thread_t *p_vout = getVout();
+    vout_thread_t *p_vout = getVoutForActiveWindow();
     if (p_vout) {
         if (var_GetBool(p_vout, "video-on-top"))
             [[o_video_view window] setLevel: NSStatusWindowLevel];

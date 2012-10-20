@@ -51,6 +51,9 @@
 
 - (void)dealloc
 {
+    if (p_vout)
+        vlc_object_release(p_vout);
+
     [self unregisterDraggedTypes];
     [super dealloc];
 }
@@ -119,7 +122,6 @@
         key = [[characters lowercaseString] characterAtIndex: 0];
 
         if (key) {
-            vout_thread_t * p_vout = getVout();
             /* Escape should always get you out of fullscreen */
             if (key == (unichar) 0x1b) {
                 playlist_t * p_playlist = pl_Get(VLCIntf);
@@ -139,9 +141,6 @@
             }
             else
                 msg_Dbg(VLCIntf, "could not send keyevent to VLC core");
-
-            if (p_vout)
-                vlc_object_release(p_vout);
 
             return;
         }
@@ -255,6 +254,37 @@
                    afterDelay:1.00];
     }
 }
+
+#pragma mark -
+#pragma mark Handling of vout related actions
+
+- (void)setVoutThread:(vout_thread_t *)p_vout_thread
+{
+    assert(p_vout == NULL);
+    p_vout = p_vout_thread;
+    vlc_object_hold(p_vout);
+}
+
+- (vout_thread_t *)voutThread
+{
+    if (p_vout) {
+        vlc_object_hold(p_vout);
+        return p_vout;
+    }
+
+    return NULL;
+}
+
+- (void)releaseVoutThread
+{
+    if (p_vout) {
+        vlc_object_release(p_vout);
+        p_vout = NULL;
+    }
+}
+
+#pragma mark -
+#pragma mark Basic view behaviour and touch events handling
 
 - (BOOL)mouseDownCanMoveWindow
 {

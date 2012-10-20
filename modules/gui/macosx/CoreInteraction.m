@@ -557,7 +557,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
     BOOL b_fs = var_ToggleBool(pl_Get(p_intf), "fullscreen");
 
-    vout_thread_t *p_vout = getVout();
+    vout_thread_t *p_vout = getVoutForActiveWindow();
     if (p_vout) {
         var_SetBool(p_vout, "fullscreen", b_fs);
         vlc_object_release(p_vout);

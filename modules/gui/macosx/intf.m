@@ -512,6 +512,24 @@ vout_thread_t *getVout(void)
     return p_vout;
 }
 
+vout_thread_t *getVoutForActiveWindow(void)
+{
+    vout_thread_t *p_vout = nil;
+
+    id currentWindow = [NSApp keyWindow];
+    if ([currentWindow respondsToSelector:@selector(videoView)]) {
+        VLCVoutView *videoView = [currentWindow videoView];
+        if (videoView) {
+            p_vout = [videoView voutThread];
+        }
+    }
+
+    if (!p_vout)
+        p_vout = getVout();
+
+    return p_vout;
+}
+
 audio_output_t *getAout(void)
 {
     input_thread_t *p_input = getInput();
@@ -581,12 +599,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_vout_controller = [[VLCVoutWindowController alloc] init];
 
     return _o_sharedMainInstance;
-}
-
-- (void)dealloc
-{
-    [o_vout_controller release];
-    [super dealloc];
 }
 
 - (void)setIntf: (intf_thread_t *)p_mainintf
@@ -853,6 +865,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     [[NSUserDefaults standardUserDefaults] synchronize];
 
     [o_mainmenu release];
+
+    [o_vout_controller release];
+    o_vout_controller = nil;
 
     libvlc_Quit(p_intf->p_libvlc);
 

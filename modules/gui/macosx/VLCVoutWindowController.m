@@ -25,6 +25,7 @@
 #import "VLCVoutWindowController.h"
 #import "intf.h"
 #import "Windows.h"
+#import "VideoView.h"
 
 @implementation VLCVoutWindowController
 
@@ -37,12 +38,18 @@
 
 - (void)dealloc
 {
+    NSArray *keys = [o_vout_dict allKeys];
+    for (NSValue *key in keys)
+        [self removeVoutforDisplay:key];
+
     [o_vout_dict release];
     [super dealloc];
 }
 
 - (void)addVout:(VLCVideoWindowCommon *)o_window forDisplay:(vout_window_t *)p_wnd
 {
+    [[o_window videoView] setVoutThread:(vout_thread_t *)p_wnd->p_parent];
+
     [o_vout_dict setObject:o_window forKey:[NSValue valueWithPointer:p_wnd]];
 }
 
@@ -60,7 +67,8 @@
     if (![NSStringFromClass([o_window class]) isEqualToString:@"VLCMainWindow"]) {
         [o_window orderOut:self];
     }
-    
+
+    [[o_window videoView] releaseVoutThread];
     [o_vout_dict removeObjectForKey:o_key];
 }
 

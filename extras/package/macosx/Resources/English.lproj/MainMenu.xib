@@ -2,7 +2,7 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">12C54</string>
+    <string key="IBDocument.SystemVersion">12C60</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
     <string key="IBDocument.AppKitVersion">1187.34</string>
     <string key="IBDocument.HIToolboxVersion">625.00</string>
@@ -21,7 +21,9 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="2"/>
+      <integer value="2730"/>
+      <integer value="334"/>
+      <integer value="4756"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -2082,6 +2084,7 @@
                   <int key="NSMnemonicLoc">2147483647</int>
                   <reference key="NSOnImage" ref="447396056"/>
                   <reference key="NSMixedImage" ref="100133332"/>
+                  <int key="NSTag">1</int>
                 </object>
                 <object class="NSMenuItem" id="633479871">
                   <reference key="NSMenu" ref="598695780"/>
@@ -2091,6 +2094,7 @@
                   <int key="NSMnemonicLoc">2147483647</int>
                   <reference key="NSOnImage" ref="447396056"/>
                   <reference key="NSMixedImage" ref="100133332"/>
+                  <int key="NSTag">2</int>
                 </object>
                 <object class="NSMenuItem" id="115305473">
                   <reference key="NSMenu" ref="598695780"/>
@@ -2100,6 +2104,7 @@
                   <int key="NSMnemonicLoc">2147483647</int>
                   <reference key="NSOnImage" ref="447396056"/>
                   <reference key="NSMixedImage" ref="100133332"/>
+                  <int key="NSTag">3</int>
                 </object>
                 <object class="NSMenuItem" id="137277528">
                   <reference key="NSMenu" ref="598695780"/>
@@ -6955,46 +6960,6 @@ LCAuLi4</string>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
-            <string key="label">resizeVideoWindow:</string>
-            <reference key="source" ref="651263286"/>
-            <reference key="destination" ref="306486441"/>
-          </object>
-          <int key="connectionID">4741</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">resizeVideoWindow:</string>
-            <reference key="source" ref="651263286"/>
-            <reference key="destination" ref="848898341"/>
-          </object>
-          <int key="connectionID">4742</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">resizeVideoWindow:</string>
-            <reference key="source" ref="651263286"/>
-            <reference key="destination" ref="633479871"/>
-          </object>
-          <int key="connectionID">4743</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">resizeVideoWindow:</string>
-            <reference key="source" ref="651263286"/>
-            <reference key="destination" ref="115305473"/>
-          </object>
-          <int key="connectionID">4744</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">toggleFullscreen:</string>
-            <reference key="source" ref="651263286"/>
-            <reference key="destination" ref="606474125"/>
-          </object>
-          <int key="connectionID">4745</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
             <string key="label">floatOnTop:</string>
             <reference key="source" ref="651263286"/>
             <reference key="destination" ref="898223493"/>
@@ -7008,14 +6973,6 @@ LCAuLi4</string>
             <reference key="destination" ref="288132578"/>
           </object>
           <int key="connectionID">4747</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">toggleFullscreen:</string>
-            <reference key="source" ref="651263286"/>
-            <reference key="destination" ref="788765547"/>
-          </object>
-          <int key="connectionID">4748</int>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
@@ -8008,6 +7965,54 @@ LCAuLi4</string>
             <reference key="destination" ref="784705424"/>
           </object>
           <int key="connectionID">5395</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">resizeVideoWindow:</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="306486441"/>
+          </object>
+          <int key="connectionID">5403</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">resizeVideoWindow:</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="848898341"/>
+          </object>
+          <int key="connectionID">5404</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">resizeVideoWindow:</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="633479871"/>
+          </object>
+          <int key="connectionID">5405</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">resizeVideoWindow:</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="115305473"/>
+          </object>
+          <int key="connectionID">5406</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">toggleFullscreen:</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="606474125"/>
+          </object>
+          <int key="connectionID">5407</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">toggleFullscreen:</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="788765547"/>
+          </object>
+          <int key="connectionID">5408</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -12118,9 +12123,9 @@ LCAuLi4</string>
           <string>{{600, 612}, {137, 103}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{476, 681}, {604, 310}}</string>
+          <string>{{528, 635}, {604, 310}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{476, 681}, {604, 310}}</string>
+          <string>{{528, 635}, {604, 310}}</string>
           <boolean value="YES"/>
           <boolean value="YES"/>
           <boolean value="NO"/>
@@ -12206,12 +12211,12 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <boolean value="YES"/>
-          <string>{{816, 570}, {64, 6}}</string>
+          <string>{{1009, 808}, {64, 6}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{816, 550}, {64, 6}}</string>
+          <string>{{1009, 788}, {64, 6}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>{{340, 613}, {488, 40}}</string>
@@ -12229,7 +12234,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{390, 199}, {161, 223}}</string>
+          <string>{{838, 667}, {161, 223}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12313,14 +12318,14 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{450, 715}, {518, 20}}</string>
+          <string>{{472, 974}, {518, 20}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{829, 352}, {208, 363}}</string>
+          <string>{{801, 611}, {208, 363}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12947,7 +12952,7 @@ LCAuLi4</string>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">5395</int>
+      <int key="maxID">5408</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -15041,10 +15046,12 @@ LCAuLi4</string>
               <string>dropzoneButtonAction:</string>
               <string>removePodcast:</string>
               <string>removePodcastWindowAction:</string>
+              <string>toggleFullscreenForCurrentWindow:</string>
               <string>togglePlaylist:</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -15062,6 +15069,7 @@ LCAuLi4</string>
               <string>dropzoneButtonAction:</string>
               <string>removePodcast:</string>
               <string>removePodcastWindowAction:</string>
+              <string>toggleFullscreenForCurrentWindow:</string>
               <string>togglePlaylist:</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
@@ -15087,6 +15095,10 @@ LCAuLi4</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
+                <string key="name">toggleFullscreenForCurrentWindow:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
                 <string key="name">togglePlaylist:</string>
                 <string key="candidateClassName">id</string>
               </object>
@@ -15097,7 +15109,6 @@ LCAuLi4</string>
             <object class="NSArray" key="dict.sortedKeys">
               <bool key="EncodedWithXMLCoder">YES</bool>
               <string>o_chosen_category_lbl</string>
-              <string>o_current_video_window</string>
               <string>o_dropzone_box</string>
               <string>o_dropzone_btn</string>
               <string>o_dropzone_lbl</string>
@@ -15128,7 +15139,6 @@ LCAuLi4</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -15164,7 +15174,6 @@ LCAuLi4</string>
             <object class="NSArray" key="dict.sortedKeys">
               <bool key="EncodedWithXMLCoder">YES</bool>
               <string>o_chosen_category_lbl</string>
-              <string>o_current_video_window</string>
               <string>o_dropzone_box</string>
               <string>o_dropzone_btn</string>
               <string>o_dropzone_lbl</string>
@@ -15197,10 +15206,6 @@ LCAuLi4</string>
               <bool key="EncodedWithXMLCoder">YES</bool>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_chosen_category_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_current_video_window</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
@@ -15963,6 +15968,17 @@ LCAuLi4</string>
         <object class="IBPartialClassDescription">
           <string key="className">VLCVoutView</string>
           <string key="superclassName">NSView</string>
+          <object class="NSMutableDictionary" key="actions">
+            <string key="NS.key.0">toggleFullscreenForCurrentWindow:</string>
+            <string key="NS.object.0">id</string>
+          </object>
+          <object class="NSMutableDictionary" key="actionInfosByName">
+            <string key="NS.key.0">toggleFullscreenForCurrentWindow:</string>
+            <object class="IBActionInfo" key="NS.object.0">
+              <string key="name">toggleFullscreenForCurrentWindow:</string>
+              <string key="candidateClassName">id</string>
+            </object>
+          </object>
           <object class="IBClassDescriptionSource" key="sourceIdentifier">
             <string key="majorKey">IBProjectSource</string>
             <string key="minorKey">../../../modules/gui/macosx/VideoView.h</string>
