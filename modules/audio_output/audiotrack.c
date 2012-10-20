@@ -174,28 +174,16 @@ static void *InitLibrary(struct aout_sys_t *p_sys)
     return p_library;
 }
 
-static int Open(vlc_object_t *p_this)
+static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
-    struct aout_sys_t *p_sys;
-    audio_output_t *p_aout = (audio_output_t*)(p_this);
+    struct aout_sys_t *p_sys = aout->sys:
 
     int status, size;
     int afSampleRate, afFrameCount, afLatency, minBufCount, minFrameCount;
     int stream_type, channel, rate, format;
 
-    p_sys = (struct aout_sys_t*) malloc(sizeof(aout_sys_t));
-    if (!p_sys)
-        return VLC_ENOMEM;
-
-    p_sys->libmedia = InitLibrary(p_sys);
-    if (!p_sys->libmedia) {
-        msg_Err(p_aout, "Could not initialize libmedia.so!");
-        free(p_sys);
-        return VLC_EGENERIC;
-    }
-
     /* 4000 <= frequency <= 48000 */
-    rate = p_aout->format.i_rate;
+    rate = fmt->i_rate;
     if (rate < 4000)
         rate = 4000;
     if (rate > 48000)
@@ -204,22 +192,22 @@ static int Open(vlc_object_t *p_this)
     stream_type = MUSIC;
 
     /* We can only accept U8 and S16L */
-    if (p_aout->format.i_format != VLC_CODEC_U8 && p_aout->format.i_format != VLC_CODEC_S16L)
-        p_aout->format.i_format = VLC_CODEC_S16L;
-    format = (p_aout->format.i_format == VLC_CODEC_S16L) ? PCM_16_BIT : PCM_8_BIT;
+    if (fmt->i_format != VLC_CODEC_U8 && fmt->i_format != VLC_CODEC_S16L)
+        fmt->i_format = VLC_CODEC_S16L;
+    format = (fmt->i_format == VLC_CODEC_S16L) ? PCM_16_BIT : PCM_8_BIT;
 
     /* TODO: android supports more channels */
-    p_aout->format.i_original_channels = p_aout->format.i_physical_channels;
-    switch(aout_FormatNbChannels(&p_aout->format))
+    fmt->i_original_channels = fmt->i_physical_channels;
+    switch(aout_FormatNbChannels(fmt))
     {
     case 1:
         channel = CHANNEL_OUT_MONO;
-        p_aout->format.i_physical_channels = AOUT_CHAN_CENTER;
+        fmt->i_physical_channels = AOUT_CHAN_CENTER;
         break;
     case 2:
     default:
         channel = CHANNEL_OUT_STEREO;
-        p_aout->format.i_physical_channels = AOUT_CHANS_STEREO;
+        fmt->i_physical_channels = AOUT_CHANS_STEREO;
         break;
     }
 
@@ -230,8 +218,6 @@ static int Open(vlc_object_t *p_this)
         status ^= p_sys->as_getOutputLatency((uint32_t*)(&afLatency), stream_type);
         if (status != 0) {
             msg_Err(p_aout, "Could not query the AudioStream parameters");
-            dlclose(p_sys->libmedia);
-            free(p_sys);
             return VLC_EGENERIC;
         }
         minBufCount = afLatency / ((1000 * afFrameCount) / afSampleRate);
@@ -243,8 +229,6 @@ static int Open(vlc_object_t *p_this)
         status = p_sys->at_getMinFrameCount(&minFrameCount, stream_type, rate);
         if (status != 0) {
             msg_Err(p_aout, "Could not query the AudioTrack parameters");
-            dlclose(p_sys->libmedia);
-            free(p_sys);
             return VLC_EGENERIC;
         }
     }
@@ -253,11 +237,8 @@ static int Open(vlc_object_t *p_this)
 
     /* Sizeof(AudioTrack) == 0x58 (not sure) on 2.2.1, this should be enough */
     p_sys->AudioTrack = malloc(SIZE_OF_AUDIOTRACK);
-    if (!p_sys->AudioTrack) {
-        dlclose(p_sys->libmedia);
-        free(p_sys);
+    if (!p_sys->AudioTrack)
         return VLC_ENOMEM;
-    }
 
     *((uint32_t *) ((uint32_t)p_sys->AudioTrack + SIZE_OF_AUDIOTRACK - 4)) = 0xbaadbaad;
     // Higher than android 2.2
@@ -280,9 +261,7 @@ static int Open(vlc_object_t *p_this)
     }
     if (status != 0) {
         msg_Err(p_aout, "Cannot create AudioTrack!");
-        dlclose(p_sys->libmedia);
         free(p_sys->AudioTrack);
-        free(p_sys);
         return VLC_EGENERIC;
     }
 
@@ -292,7 +271,7 @@ static int Open(vlc_object_t *p_this)
 
     p_sys->at_start(p_sys->AudioTrack);
 
-    p_aout->format.i_rate = rate;
+    fmt->i_rate = rate;
 
     return VLC_SUCCESS;
 }
@@ -306,8 +285,6 @@ static void Close(vlc_object_t *p_this)
     p_sys->at_flush(p_sys->AudioTrack);
     p_sys->at_dtor(p_sys->AudioTrack);
     free(p_sys->AudioTrack);
-    dlclose(p_sys->libmedia);
-    free(p_sys);
 }
 
 /* FIXME: lipsync */
@@ -334,4 +311,35 @@ static void Pause(audio_output_t *p_aout, bool pause, mtime_t date)
     } else {
         p_sys->at_start(p_sys->AudioTrack);
     }
+}
+
+static int Open(vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = malloc(sizeof (*sys));
+
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+
+    sys->libmedia = InitLibrary(sys);
+    if (sys->libmedia == NULL) {
+        msg_Err(aout, "Could not initialize libmedia.so!");
+        free(sys);
+        return VLC_EGENERIC;
+    }
+
+    aout->sys = sys;
+    aout->start = Start;
+    aout->stop = Stop;
+    //aout_SoftVolumeInit(aout);
+    return VLC_SUCCESS;
+}
+
+static void Close(vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = aout->sys;
+
+    dlclose(sys->libmedia);
+    free(sys);
 }

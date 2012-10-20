@@ -59,7 +59,6 @@ struct aout_sys_t
 };
 
 static int Open (vlc_object_t *);
-static void Close (vlc_object_t *);
 
 #define AUDIO_DEV_TEXT N_("Audio output device")
 #define AUDIO_DEV_LONGTEXT N_("OSS device node path.")
@@ -72,7 +71,7 @@ vlc_module_begin ()
     add_string ("oss-audio-device", "",
                 AUDIO_DEV_TEXT, AUDIO_DEV_LONGTEXT, false)
     set_capability( "audio output", 100 )
-    set_callbacks( Open, Close )
+    set_callbacks (Open, NULL)
 vlc_module_end ()
 
 static void Play (audio_output_t *, block_t *, mtime_t *);
@@ -93,7 +92,7 @@ static int DeviceChanged (vlc_object_t *obj, const char *varname,
     return VLC_SUCCESS;
 }
 
-static int Open (vlc_object_t *obj)
+static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     audio_output_t *aout = (audio_output_t *)obj;
 
@@ -124,10 +123,9 @@ static int Open (vlc_object_t *obj)
 
     /* Select audio format */
     int format;
-    vlc_fourcc_t fourcc = aout->format.i_format;
     bool spdif = false;
 
-    switch (fourcc)
+    switch (fmt->i_format)
     {
 #ifdef AFMT_FLOAT
         case VLC_CODEC_F64B:
@@ -154,7 +152,7 @@ static int Open (vlc_object_t *obj)
             format = AFMT_U8;
             break;
         default:
-            if (AOUT_FMT_SPDIF(&aout->format))
+            if (AOUT_FMT_SPDIF(fmt))
                 spdif = var_InheritBool (aout, "spdif");
             if (spdif)
                 format = AFMT_AC3;
@@ -174,21 +172,21 @@ static int Open (vlc_object_t *obj)
 
     switch (format)
     {
-        case AFMT_S8:     fourcc = VLC_CODEC_S8;   break;
-        case AFMT_U8:     fourcc = VLC_CODEC_U8;   break;
-        case AFMT_S16_BE: fourcc = VLC_CODEC_S16B; break;
-        case AFMT_S16_LE: fourcc = VLC_CODEC_S16L; break;
+        case AFMT_S8:     fmt->i_format = VLC_CODEC_S8;   break;
+        case AFMT_U8:     fmt->i_format = VLC_CODEC_U8;   break;
+        case AFMT_S16_BE: fmt->i_format = VLC_CODEC_S16B; break;
+        case AFMT_S16_LE: fmt->i_format = VLC_CODEC_S16L; break;
         //case AFMT_S24_BE:
         //case AFMT_S24_LE:
-        case AFMT_S32_BE: fourcc = VLC_CODEC_S32B; break;
-        case AFMT_S32_LE: fourcc = VLC_CODEC_S32L; break;
+        case AFMT_S32_BE: fmt->i_format = VLC_CODEC_S32B; break;
+        case AFMT_S32_LE: fmt->i_format = VLC_CODEC_S32L; break;
 #ifdef AFMT_FLOAT
-        case AFMT_FLOAT:  fourcc = VLC_CODEC_FL32; break;
+        case AFMT_FLOAT:  fmt->i_format = VLC_CODEC_FL32; break;
 #endif
         case AFMT_AC3:
             if (spdif)
             {
-                fourcc = VLC_CODEC_SPDIFL;
+                fmt->i_format = VLC_CODEC_SPDIFL;
                 break;
             }
         default:
@@ -197,7 +195,7 @@ static int Open (vlc_object_t *obj)
     }
 
     /* Select channels count */
-    int channels = spdif ? 2 : aout_FormatNbChannels (&aout->format);
+    int channels = spdif ? 2 : aout_FormatNbChannels (fmt);
     if (ioctl (fd, SNDCTL_DSP_CHANNELS, &channels) < 0)
     {
         msg_Err (aout, "cannot set %d channels: %m", channels);
@@ -217,7 +215,7 @@ static int Open (vlc_object_t *obj)
     }
 
     /* Select sample rate */
-    int rate = spdif ? 48000 : aout->format.i_rate;
+    int rate = spdif ? 48000 : fmt->i_rate;
     if (ioctl (fd, SNDCTL_DSP_SPEED, &rate) < 0)
     {
         msg_Err (aout, "cannot set %d Hz sample rate: %m", rate);
@@ -225,7 +223,6 @@ static int Open (vlc_object_t *obj)
     }
 
     /* Setup audio_output_t */
-    aout->format.i_format = fourcc;
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
@@ -234,14 +231,14 @@ static int Open (vlc_object_t *obj)
 
     if (spdif)
     {
-        aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
-        aout->format.i_frame_length = A52_FRAME_NB;
+        fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE;
+        fmt->i_frame_length = A52_FRAME_NB;
     }
     else
     {
-        aout->format.i_rate = rate;
-        aout->format.i_original_channels =
-        aout->format.i_physical_channels = channels;
+        fmt->i_rate = rate;
+        fmt->i_original_channels =
+        fmt->i_physical_channels = channels;
 
         sys->level = 100;
         sys->mute = false;
@@ -303,9 +300,8 @@ error:
 /**
  * Releases the audio output.
  */
-static void Close (vlc_object_t *obj)
+static void Stop (audio_output_t *aout)
 {
-    audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
     int fd = sys->fd;
 
@@ -444,4 +440,14 @@ static int MuteSet (audio_output_t *aout, bool mute)
     sys->mute = mute;
     aout_MuteReport (aout, mute);
     return 0;
+}
+
+static int Open (vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+
+    /* FIXME: set volume/mute here */
+    aout->start = Start;
+    aout->stop = Stop;
+    return VLC_SUCCESS;
 }

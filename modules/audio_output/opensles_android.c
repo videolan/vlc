@@ -82,7 +82,6 @@ struct aout_sys_t
  * Local prototypes.
  *****************************************************************************/
 static int  Open        ( vlc_object_t * );
-static void Close       ( vlc_object_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -96,7 +95,7 @@ vlc_module_begin ()
 
     set_capability( "audio output", 170 )
     add_shortcut( "opensles", "android" )
-    set_callbacks( Open, Close )
+    set_callbacks( Open, NULL )
 vlc_module_end ()
 
 
@@ -235,9 +234,8 @@ static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext
 /*****************************************************************************
  * Open
  *****************************************************************************/
-static int Open( vlc_object_t *p_this )
+static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 {
-    audio_output_t *p_aout = (audio_output_t *)p_this;
     SLresult       result;
     SLEngineItf    engineEngine;
 
@@ -321,7 +319,7 @@ static int Open( vlc_object_t *p_this )
     SLDataFormat_PCM format_pcm;
     format_pcm.formatType       = SL_DATAFORMAT_PCM;
     format_pcm.numChannels      = 2;
-    format_pcm.samplesPerSec    = ((SLuint32) p_aout->format.i_rate * 1000) ;
+    format_pcm.samplesPerSec    = ((SLuint32) fmt->i_rate * 1000) ;
     format_pcm.bitsPerSample    = SL_PCMSAMPLEFORMAT_FIXED_16;
     format_pcm.containerSize    = SL_PCMSAMPLEFORMAT_FIXED_16;
     format_pcm.channelMask      = SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT;
@@ -368,13 +366,13 @@ static int Open( vlc_object_t *p_this )
     p_sys->pp_last = &p_sys->p_chain;
 
     // we want 16bit signed data little endian.
-    p_aout->format.i_format              = VLC_CODEC_S16L;
-    p_aout->format.i_physical_channels   = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-    p_aout->play                         = Play;
-    p_aout->pause                        = Pause;
-    p_aout->flush                        = Flush;
+    fmt->i_format              = VLC_CODEC_S16L;
+    fmt->i_physical_channels   = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+    p_aout->play               = Play;
+    p_aout->pause              = Pause;
+    p_aout->flush               = Flush;
 
-    aout_FormatPrepare( &p_aout->format );
+    aout_FormatPrepare( fmt );
 
     return VLC_SUCCESS;
 error:
@@ -385,9 +383,8 @@ error:
 /*****************************************************************************
  * Close
  *****************************************************************************/
-static void Close( vlc_object_t *p_this )
+static void Stop( audio_output_t *p_aout )
 {
-    audio_output_t *p_aout = (audio_output_t*)p_this;
     aout_sys_t     *p_sys = p_aout->sys;
 
     SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_STOPPED );
@@ -396,4 +393,14 @@ static void Close( vlc_object_t *p_this )
     block_ChainRelease( p_sys->p_chain );
     vlc_mutex_destroy( &p_sys->lock );
     Clean( p_sys );
+}
+
+static int Open (vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+
+    /* FIXME: set volume/mute here */
+    aout->start = Start;
+    aout->stop = Stop;
+    return VLC_SUCCESS;
 }

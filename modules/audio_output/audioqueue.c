@@ -79,11 +79,10 @@ vlc_module_end ()
  * Open: open the audio device
  *****************************************************************************/
 
-static int Open ( vlc_object_t *p_this )
+static int Start( audio_output_t *aout, audio_sample_format_t *restrict fmt )
 {
     audio_output_t *p_aout = (audio_output_t *)p_this;
-    struct aout_sys_t *p_sys = malloc(sizeof(aout_sys_t));
-    p_aout->sys = p_sys;
+    aout_sys_t *p_sys = aout->sys;
 
     OSStatus status = 0;
 
@@ -120,13 +119,10 @@ static int Open ( vlc_object_t *p_this )
         AudioQueueCallback(NULL, p_sys->audioQueue, buffer);
     }
 
-    /* Volume is entirely done in software. */
-    aout_SoftVolumeInit( p_aout );
-
-    p_aout->format.i_format = VLC_CODEC_S16L;
-    p_aout->format.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-    p_aout->format.i_rate = 44100;
-    aout_PacketInit(p_aout, &p_sys->packet, FRAME_SIZE);
+    fmt->i_format = VLC_CODEC_S16L;
+    fmt->i_physical_channels = AOUT_CHANS_STEREO;
+    fmt->i_rate = 44100;
+    aout_PacketInit(p_aout, &p_sys->packet, FRAME_SIZE, fmt);
     p_aout->play = aout_PacketPlay;
     p_aout->pause = aout_PacketPause;
     p_aout->flush = aout_PacketFlush;
@@ -156,9 +152,8 @@ static block_t *aout_FifoPop2( aout_fifo_t * p_fifo )
 /*****************************************************************************
  * Close: close the audio device
  *****************************************************************************/
-static void Close ( vlc_object_t *p_this )
+static void Stop ( audio_output_t *p_aout )
 {
-    audio_output_t *p_aout = (audio_output_t *)p_this;
     struct aout_sys_t * p_sys = p_aout->sys;
 
     msg_Dbg(p_aout, "Stopping AudioQueue");
@@ -166,7 +161,6 @@ static void Close ( vlc_object_t *p_this )
     msg_Dbg(p_aout, "Disposing of AudioQueue");
     AudioQueueDispose(p_sys->audioQueue, false);
     aout_PacketDestroy(p_aout);
-    free (p_sys);
 }
 
 void AudioQueueCallback(void * inUserData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
@@ -194,4 +188,26 @@ void AudioQueueCallback(void * inUserData, AudioQueueRef inAQ, AudioQueueBufferR
         inBuffer->mAudioDataByteSize = inBuffer->mAudioDataBytesCapacity;
     }
     AudioQueueEnqueueBuffer(inAQ, inBuffer, 0, NULL);
+}
+
+static int Open(vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = malloc(sizeof (*sys));
+
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+    aout->sys = sys;
+    aout->start = Start;
+    aout->stop = Stop;
+    aout_SoftVolumeInit(aout);
+    return VLC_SUCCESS;
+}
+
+static void Close(vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = aout->sys;
+
+    free(sys);
 }

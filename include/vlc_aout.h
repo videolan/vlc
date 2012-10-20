@@ -140,10 +140,9 @@ struct audio_output
 {
     VLC_COMMON_MEMBERS
 
-    audio_sample_format_t format; /**< Output format (plugin can modify it
-        only when succesfully probed and not afterward) */
-
     struct aout_sys_t *sys; /**< Output plugin private data */
+    int (*start) (audio_output_t *, audio_sample_format_t *);
+    void (*stop) (audio_output_t *);
     void (*play)(audio_output_t *, block_t *, mtime_t *); /**< Play callback
         - queue a block for playback */
     void (*pause)( audio_output_t *, bool, mtime_t ); /**< Pause/resume
@@ -277,6 +276,7 @@ struct aout_fifo_t
 typedef struct
 {
     vlc_mutex_t lock;
+    audio_sample_format_t format;
     aout_fifo_t partial; /**< Audio blocks before packetization */
     aout_fifo_t fifo; /**< Packetized audio blocks */
     mtime_t pause_date; /**< Date when paused or VLC_TS_INVALID */
@@ -285,7 +285,7 @@ typedef struct
     bool starving; /**< Whether currently starving (to limit error messages) */
 } aout_packet_t;
 
-VLC_DEPRECATED void aout_PacketInit(audio_output_t *, aout_packet_t *, unsigned);
+VLC_DEPRECATED void aout_PacketInit(audio_output_t *, aout_packet_t *, unsigned, const audio_sample_format_t *);
 VLC_DEPRECATED void aout_PacketDestroy(audio_output_t *);
 
 VLC_DEPRECATED void aout_PacketPlay(audio_output_t *, block_t *, mtime_t *);

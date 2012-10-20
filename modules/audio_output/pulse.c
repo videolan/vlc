@@ -68,7 +68,8 @@ struct aout_sys_t
     mtime_t last_pts; /**< Play time of buffer write offset */
     mtime_t paused; /**< Time when (last) paused */
     mtime_t desync; /**< Measured desynchronization */
-    unsigned rate; /**< Current stream sample rate */
+    unsigned nominal_rate; /**< Nominal stream sample rate */
+    unsigned actual_rate; /**< Current stream sample rate */
 };
 
 static void sink_list_cb(pa_context *, const pa_sink_info *, int, void *);
@@ -180,7 +181,7 @@ static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
 static void stream_reset_sync(pa_stream *s, audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
-    const unsigned rate = aout->format.i_rate;
+    const unsigned rate = sys->nominal_rate;
 
     sys->first_pts = VLC_TS_INVALID;
     sys->last_pts = VLC_TS_INVALID;
@@ -189,7 +190,7 @@ static void stream_reset_sync(pa_stream *s, audio_output_t *aout)
     if (unlikely(op == NULL))
         return;
     pa_operation_unref(op);
-    sys->rate = rate;
+    sys->actual_rate = rate;
 }
 
 static void stream_start_now(pa_stream *s, audio_output_t *aout)
@@ -302,8 +303,8 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
     //msg_Dbg(aout, "desync: %+"PRId64" us (variation: %+"PRId64" us)",
     //        delta, change);
 
-    const unsigned inrate = aout->format.i_rate;
-    unsigned outrate = sys->rate;
+    const unsigned inrate = sys->nominal_rate;
+    unsigned outrate = sys->actual_rate;
     bool sync = false;
 
     if (delta < -AOUT_MAX_PTS_DELAY)
@@ -325,7 +326,7 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
     int limit = inrate >> 10;
     /* However, to improve stability and try to converge, closing to the
      * nominal rate is favored over drifting from it. */
-    if ((adj > 0) == (sys->rate > inrate))
+    if ((adj > 0) == (sys->actual_rate > inrate))
         limit *= 2;
     if (adj > +limit)
         adj = +limit;
@@ -342,7 +343,7 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
         outrate = inrate - limit;
 
     /* Apply adjusted sample rate */
-    if (outrate == sys->rate)
+    if (outrate == sys->actual_rate)
         return;
     pa_operation *op = pa_stream_update_sample_rate(s, outrate, NULL, NULL);
     if (unlikely(op == NULL)) {
@@ -351,7 +352,7 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
     }
     pa_operation_unref(op);
     msg_Dbg(aout, "changed sample rate to %u Hz",outrate);
-    sys->rate = outrate;
+    sys->actual_rate = outrate;
 }
 
 
@@ -699,36 +700,31 @@ static int StreamMove(vlc_object_t *obj, const char *varname, vlc_value_t old,
     return (op != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
+static void Stop(audio_output_t *);
 
 /**
  * Create a PulseAudio playback stream, a.k.a. a sink input.
  */
-static int Open(vlc_object_t *obj)
+static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
-#if !PA_CHECK_VERSION(0,9,22)
-    if (!vlc_xlib_init(obj))
-        return VLC_EGENERIC;
-#endif
-
-    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = aout->sys;
     pa_operation *op;
 
     /* Sample format specification */
     struct pa_sample_spec ss;
-    vlc_fourcc_t format = aout->format.i_format;
 #if PA_CHECK_VERSION(1,0,0)
     pa_encoding_t encoding = PA_ENCODING_INVALID;
 #endif
 
-    switch(format)
+    switch (fmt->i_format)
     {
         case VLC_CODEC_F64B:
-            format = VLC_CODEC_F32B;
+            fmt->i_format = VLC_CODEC_F32B;
         case VLC_CODEC_F32B:
             ss.format = PA_SAMPLE_FLOAT32BE;
             break;
         case VLC_CODEC_F64L:
-            format = VLC_CODEC_F32L;
+            fmt->i_format = VLC_CODEC_F32L;
         case VLC_CODEC_F32L:
             ss.format = PA_SAMPLE_FLOAT32LE;
             break;
@@ -751,28 +747,28 @@ static int Open(vlc_object_t *obj)
             ss.format = PA_SAMPLE_S16LE;
             break;
         case VLC_CODEC_S8:
-            format = VLC_CODEC_U8;
+            fmt->i_format = VLC_CODEC_U8;
         case VLC_CODEC_U8:
             ss.format = PA_SAMPLE_U8;
             break;
 #if PA_CHECK_VERSION(1,0,0)
         case VLC_CODEC_A52:
-            format = VLC_CODEC_SPDIFL;
+            fmt->i_format = VLC_CODEC_SPDIFL;
             encoding = PA_ENCODING_AC3_IEC61937;
             ss.format = HAVE_FPU ? PA_SAMPLE_FLOAT32NE : PA_SAMPLE_S16NE;
             break;
         /*case VLC_CODEC_EAC3:
-            format = VLC_CODEC_SPDIFL FIXME;
+            fmt->i_format = VLC_CODEC_SPDIFL FIXME;
             encoding = PA_ENCODING_EAC3_IEC61937;
             ss.format = HAVE_FPU ? PA_SAMPLE_FLOAT32NE : PA_SAMPLE_S16NE;
             break;
         case VLC_CODEC_MPGA:
-            format = VLC_CODEC_SPDIFL FIXME;
+            fmt->i_format = VLC_CODEC_SPDIFL FIXME;
             encoding = PA_ENCODING_MPEG_IEC61937;
             ss.format = HAVE_FPU ? PA_SAMPLE_FLOAT32NE : PA_SAMPLE_S16NE;
             break;*/
         case VLC_CODEC_DTS:
-            format = VLC_CODEC_SPDIFL;
+            fmt->i_format = VLC_CODEC_SPDIFL;
             encoding = PA_ENCODING_DTS_IEC61937;
             ss.format = HAVE_FPU ? PA_SAMPLE_FLOAT32NE : PA_SAMPLE_S16NE;
             break;
@@ -780,19 +776,19 @@ static int Open(vlc_object_t *obj)
         default:
             if (HAVE_FPU)
             {
-                format = VLC_CODEC_FL32;
+                fmt->i_format = VLC_CODEC_FL32;
                 ss.format = PA_SAMPLE_FLOAT32NE;
             }
             else
             {
-                format = VLC_CODEC_S16N;
+                fmt->i_format = VLC_CODEC_S16N;
                 ss.format = PA_SAMPLE_S16NE;
             }
             break;
     }
 
-    ss.rate = aout->format.i_rate;
-    ss.channels = aout_FormatNbChannels(&aout->format);
+    ss.rate = fmt->i_rate;
+    ss.channels = aout_FormatNbChannels(fmt);
     if (!pa_sample_spec_valid(&ss)) {
         msg_Err(aout, "unsupported sample specification");
         return VLC_EGENERIC;
@@ -802,28 +798,28 @@ static int Open(vlc_object_t *obj)
     struct pa_channel_map map;
     map.channels = 0;
 
-    if (aout->format.i_physical_channels & AOUT_CHAN_LEFT)
+    if (fmt->i_physical_channels & AOUT_CHAN_LEFT)
         map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_LEFT;
-    if (aout->format.i_physical_channels & AOUT_CHAN_RIGHT)
+    if (fmt->i_physical_channels & AOUT_CHAN_RIGHT)
         map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_RIGHT;
-    if (aout->format.i_physical_channels & AOUT_CHAN_MIDDLELEFT)
+    if (fmt->i_physical_channels & AOUT_CHAN_MIDDLELEFT)
         map.map[map.channels++] = PA_CHANNEL_POSITION_SIDE_LEFT;
-    if (aout->format.i_physical_channels & AOUT_CHAN_MIDDLERIGHT)
+    if (fmt->i_physical_channels & AOUT_CHAN_MIDDLERIGHT)
         map.map[map.channels++] = PA_CHANNEL_POSITION_SIDE_RIGHT;
-    if (aout->format.i_physical_channels & AOUT_CHAN_REARLEFT)
+    if (fmt->i_physical_channels & AOUT_CHAN_REARLEFT)
         map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_LEFT;
-    if (aout->format.i_physical_channels & AOUT_CHAN_REARRIGHT)
+    if (fmt->i_physical_channels & AOUT_CHAN_REARRIGHT)
         map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_RIGHT;
-    if (aout->format.i_physical_channels & AOUT_CHAN_REARCENTER)
+    if (fmt->i_physical_channels & AOUT_CHAN_REARCENTER)
         map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_CENTER;
-    if (aout->format.i_physical_channels & AOUT_CHAN_CENTER)
+    if (fmt->i_physical_channels & AOUT_CHAN_CENTER)
     {
         if (ss.channels == 1)
             map.map[map.channels++] = PA_CHANNEL_POSITION_MONO;
         else
             map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_CENTER;
     }
-    if (aout->format.i_physical_channels & AOUT_CHAN_LFE)
+    if (fmt->i_physical_channels & AOUT_CHAN_LFE)
         map.map[map.channels++] = PA_CHANNEL_POSITION_LFE;
 
     for (unsigned i = 0; map.channels < ss.channels; i++) {
@@ -859,27 +855,14 @@ static int Open(vlc_object_t *obj)
     attr.minreq = -1;
     attr.fragsize = 0; /* not used for output */
 
-    /* Allocate structures */
-    aout_sys_t *sys = malloc(sizeof(*sys));
-    if (unlikely(sys == NULL))
-        return VLC_ENOMEM;
-
-    pa_context *ctx = vlc_pa_connect(obj, &sys->mainloop);
-    if (ctx == NULL)
-    {
-        free (sys);
-        return VLC_EGENERIC;
-    }
-
-    aout->sys = sys;
     sys->stream = NULL;
-    sys->context = ctx;
     sys->trigger = NULL;
     sys->first_pts = VLC_TS_INVALID;
     sys->last_pts = VLC_TS_INVALID;
     sys->paused = VLC_TS_INVALID;
     sys->desync = 0;
-    sys->rate = ss.rate;
+    sys->nominal_rate = ss.rate;
+    sys->actual_rate = ss.rate;
 
     /* Channel volume */
     sys->base_volume = PA_VOLUME_NORM;
@@ -916,7 +899,8 @@ static int Open(vlc_object_t *obj)
         pa_proplist_sets (props, PA_PROP_MEDIA_ROLE, "video");
 
     pa_threaded_mainloop_lock(sys->mainloop);
-    s = pa_stream_new_extended(ctx, "audio stream", formatv, formatc, props);
+    s = pa_stream_new_extended(sys->context, "audio stream", formatv, formatc,
+                               props);
     if (likely(props != NULL))
         pa_proplist_free(props);
 
@@ -924,11 +908,12 @@ static int Open(vlc_object_t *obj)
         pa_format_info_free(formatv[i]);
 #else
     pa_threaded_mainloop_lock(sys->mainloop);
-    pa_stream *s = pa_stream_new(ctx, "audio stream", &ss, &map);
+    pa_stream *s = pa_stream_new(sys->context, "audio stream", &ss, &map);
 #endif
     if (s == NULL) {
-        vlc_pa_error(obj, "stream creation failure", ctx);
-        goto fail;
+        pa_threaded_mainloop_unlock(sys->mainloop);
+        vlc_pa_error(aout, "stream creation failure", sys->context);
+        return VLC_EGENERIC;
     }
     sys->stream = s;
     pa_stream_set_state_callback(s, stream_state_cb, sys->mainloop);
@@ -943,7 +928,7 @@ static int Open(vlc_object_t *obj)
 
     if (pa_stream_connect_playback(s, NULL, &attr, flags, NULL, NULL) < 0
      || stream_wait(s, sys->mainloop)) {
-        vlc_pa_error(obj, "stream connection failure", ctx);
+        vlc_pa_error(aout, "stream connection failure", sys->context);
         goto fail;
     }
 
@@ -954,7 +939,7 @@ static int Open(vlc_object_t *obj)
         assert (info != NULL);
         if (pa_format_info_is_pcm (info)) {
             msg_Dbg(aout, "digital pass-through not available");
-            format = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_S16N;
+            fmt->i_format = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_S16N;
         } else {
             msg_Dbg(aout, "digital pass-through enabled");
             pa_stream_set_latency_update_callback(s, NULL, NULL);
@@ -968,7 +953,7 @@ static int Open(vlc_object_t *obj)
                &(vlc_value_t){ .psz_string = (char *)_("Audio device") },
                NULL);
     var_AddCallback (aout, "audio-device", StreamMove, s);
-    op = pa_context_get_sink_info_list(ctx, sink_list_cb, aout);
+    op = pa_context_get_sink_info_list(sys->context, sink_list_cb, aout);
     /* We may need to wait for completion... once LibVLC supports this */
     if (op != NULL)
         pa_operation_unref(op);
@@ -977,61 +962,90 @@ static int Open(vlc_object_t *obj)
     /* Context events */
     const pa_subscription_mask_t mask = PA_SUBSCRIPTION_MASK_SINK
                                       | PA_SUBSCRIPTION_MASK_SINK_INPUT;
-    pa_context_set_subscribe_callback(ctx, context_cb, aout);
-    op = pa_context_subscribe(ctx, mask, NULL, NULL);
+    pa_context_set_subscribe_callback(sys->context, context_cb, aout);
+    op = pa_context_subscribe(sys->context, mask, NULL, NULL);
     if (likely(op != NULL))
        pa_operation_unref(op);
     pa_threaded_mainloop_unlock(sys->mainloop);
 
-    aout->format.i_format = format;
-    aout->play = Play;
-    aout->pause = Pause;
-    aout->flush = Flush;
-    aout->volume_set = VolumeSet;
-    aout->mute_set = MuteSet;
     return VLC_SUCCESS;
 
 fail:
     pa_threaded_mainloop_unlock(sys->mainloop);
-    Close(obj);
+    Stop(aout);
     return VLC_EGENERIC;
 }
 
 /**
  * Removes a PulseAudio playback stream
  */
-static void Close (vlc_object_t *obj)
+static void Stop(audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+    pa_stream *s = sys->stream;
+
+    /* The callback takes mainloop lock, so it CANNOT be held here! */
+    var_DelCallback (aout, "audio-device", StreamMove, s);
+    var_Destroy (aout, "audio-device");
+
+    pa_threaded_mainloop_lock(sys->mainloop);
+    if (unlikely(sys->trigger != NULL))
+        vlc_pa_rttime_free(sys->mainloop, sys->trigger);
+    pa_stream_disconnect(s);
+
+    /* Clear all callbacks */
+    pa_stream_set_state_callback(s, NULL, NULL);
+    pa_stream_set_buffer_attr_callback(s, NULL, NULL);
+    pa_stream_set_event_callback(s, NULL, NULL);
+    pa_stream_set_latency_update_callback(s, NULL, NULL);
+    pa_stream_set_moved_callback(s, NULL, NULL);
+    pa_stream_set_overflow_callback(s, NULL, NULL);
+    pa_stream_set_started_callback(s, NULL, NULL);
+    pa_stream_set_suspended_callback(s, NULL, NULL);
+    pa_stream_set_underflow_callback(s, NULL, NULL);
+    pa_context_set_subscribe_callback(sys->context, NULL, NULL);
+
+    pa_stream_unref(s);
+    pa_threaded_mainloop_unlock(sys->mainloop);
+}
+
+static int Open(vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = malloc(sizeof (*sys));
+
+#if !PA_CHECK_VERSION(0,9,22)
+    if (!vlc_xlib_init(obj))
+        return VLC_EGENERIC;
+#endif
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+
+    /* Allocate structures */
+    pa_context *ctx = vlc_pa_connect(obj, &sys->mainloop);
+    if (ctx == NULL)
+    {
+        free(sys);
+        return VLC_EGENERIC;
+    }
+    sys->context = ctx;
+
+    aout->sys = sys;
+    aout->start = Start;
+    aout->stop = Stop;
+    aout->play = Play;
+    aout->pause = Pause;
+    aout->flush = Flush;
+    aout->volume_set = VolumeSet;
+    aout->mute_set = MuteSet;
+    return VLC_SUCCESS;
+}
+
+static void Close(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
     pa_context *ctx = sys->context;
-    pa_stream *s = sys->stream;
-
-    if (s != NULL) {
-        /* The callback takes mainloop lock, so it CANNOT be held here! */
-        var_DelCallback (aout, "audio-device", StreamMove, s);
-        var_Destroy (aout, "audio-device");
-
-        pa_threaded_mainloop_lock(sys->mainloop);
-        if (unlikely(sys->trigger != NULL))
-            vlc_pa_rttime_free(sys->mainloop, sys->trigger);
-        pa_stream_disconnect(s);
-
-        /* Clear all callbacks */
-        pa_stream_set_state_callback(s, NULL, NULL);
-        pa_stream_set_buffer_attr_callback(s, NULL, NULL);
-        pa_stream_set_event_callback(s, NULL, NULL);
-        pa_stream_set_latency_update_callback(s, NULL, NULL);
-        pa_stream_set_moved_callback(s, NULL, NULL);
-        pa_stream_set_overflow_callback(s, NULL, NULL);
-        pa_stream_set_started_callback(s, NULL, NULL);
-        pa_stream_set_suspended_callback(s, NULL, NULL);
-        pa_stream_set_underflow_callback(s, NULL, NULL);
-        pa_context_set_subscribe_callback(ctx, NULL, NULL);
-
-        pa_stream_unref(s);
-        pa_threaded_mainloop_unlock(sys->mainloop);
-    }
 
     vlc_pa_disconnect(obj, ctx, sys->mainloop);
     free(sys);

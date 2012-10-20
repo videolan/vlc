@@ -121,6 +121,8 @@ struct aout_sys_t
     struct IAudioSessionEvents events;
     LONG refs;
 
+    unsigned rate; /**< Sample rate */
+    unsigned bytes_per_frame;
     UINT32 frames; /**< Total buffer size (frames) */
     HANDLE ready; /**< Semaphore from MTA thread */
     HANDLE done; /**< Semaphore to MTA thread */
@@ -173,7 +175,7 @@ static void Play(audio_output_t *aout, block_t *block, mtime_t *restrict drift)
             break;
         }
 
-        const size_t copy = frames * (size_t)aout->format.i_bytes_per_frame;
+        const size_t copy = frames * sys->bytes_per_frame;
 
         memcpy(dst, block->p_buffer, copy);
         hr = IAudioRenderClient_ReleaseBuffer(sys->render, frames, 0);
@@ -192,7 +194,7 @@ static void Play(audio_output_t *aout, block_t *block, mtime_t *restrict drift)
 
         /* Out of buffer space, sleep */
         msleep(AOUT_MIN_PREPARE_TIME
-             + block->i_nb_samples * CLOCK_FREQ / aout->format.i_rate);
+             + block->i_nb_samples * CLOCK_FREQ / sys->rate);
     }
 
     Leave();
@@ -653,20 +655,11 @@ fail:
     ReleaseSemaphore(sys->ready, 1, NULL);
 }
 
-static int Open(vlc_object_t *obj)
+static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
-    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = aout->sys;
     HRESULT hr;
 
-    if (AOUT_FMT_SPDIF(&aout->format) && !aout->b_force
-     && var_InheritBool(aout, "spdif"))
-        /* Fallback to other plugin until pass-through is implemented */
-        return VLC_EGENERIC;
-
-    aout_sys_t *sys = malloc(sizeof (*sys));
-    if (unlikely(sys == NULL))
-        return VLC_ENOMEM;
-    sys->aout = aout;
     sys->client = NULL;
     sys->render = NULL;
     sys->clock = NULL;
@@ -674,17 +667,8 @@ static int Open(vlc_object_t *obj)
     sys->refs = 1;
     sys->ready = NULL;
     sys->done = NULL;
-    aout->sys = sys;
 
-    if (TryEnter(aout))
-    {
-        free(sys);
-        return VLC_EGENERIC;
-    }
-retry:
-    /* Get audio device according to policy */
-    var_Create (aout, "audio-device", VLC_VAR_STRING|VLC_VAR_HASCHOICE);
-
+    Enter();
     IMMDeviceEnumerator *devs;
     hr = CoCreateInstance(&CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL,
                           &IID_IMMDeviceEnumerator, (void **)&devs);
@@ -693,6 +677,9 @@ retry:
         msg_Dbg(aout, "cannot create device enumerator (error 0x%lx)", hr);
         goto error;
     }
+retry:
+    /* Get audio device according to policy */
+    var_Create (aout, "audio-device", VLC_VAR_STRING|VLC_VAR_HASCHOICE);
 
     // Without configuration item, the variable must be created explicitly.
     var_Create (aout, "wasapi-audio-device", VLC_VAR_STRING);
@@ -741,11 +728,10 @@ retry:
     }
 
     /* Configure audio stream */
-    audio_sample_format_t format = aout->format;
     WAVEFORMATEXTENSIBLE wf;
     WAVEFORMATEX *pwf;
 
-    vlc_ToWave(&wf, &format);
+    vlc_ToWave(&wf, fmt);
     hr = IAudioClient_IsFormatSupported(sys->client, AUDCLNT_SHAREMODE_SHARED,
                                         &wf.Format, &pwf);
     if (FAILED(hr))
@@ -757,7 +743,7 @@ retry:
     if (hr == S_FALSE)
     {
         assert(pwf != NULL);
-        if (vlc_FromWave(pwf, &format))
+        if (vlc_FromWave(pwf, fmt))
         {
             CoTaskMemFree(pwf);
             msg_Err(aout, "unsupported audio format");
@@ -799,15 +785,11 @@ retry:
 
     Leave();
 
-    aout->format = format;
+    sys->rate = fmt->i_rate;
+    sys->bytes_per_frame = fmt->i_bytes_per_frame;
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
-    /*if (AOUT_FMT_LINEAR(&format) && !exclusive)*/
-    {
-        aout->volume_set = SimpleVolumeSet;
-        aout->mute_set = SimpleMuteSet;
-    }
     if (likely(sys->control != NULL))
        IAudioSessionControl_RegisterAudioSessionNotification(sys->control,
                                                              &sys->events);
@@ -828,13 +810,11 @@ error:
         goto retry;
     }
     Leave();
-    free(sys);
     return VLC_EGENERIC;
 }
 
-static void Close (vlc_object_t *obj)
+static void Stop(audio_output_t *aout)
 {
-    audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
 
     Enter();
@@ -852,5 +832,40 @@ static void Close (vlc_object_t *obj)
 
     CloseHandle(sys->done);
     CloseHandle(sys->ready);
+}
+
+static int Open(vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+
+    if (!aout->b_force && var_InheritBool(aout, "spdif"))
+        /* Fallback to other plugin until pass-through is implemented */
+        return VLC_EGENERIC;
+
+    aout_sys_t *sys = malloc(sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+
+    if (TryEnter(aout))
+    {
+        free(sys);
+        return VLC_EGENERIC;
+    }
+    Leave();
+
+    sys->aout = aout;
+    aout->sys = sys;
+    aout->start = Start;
+    aout->stop = Stop;
+    aout->volume_set = SimpleVolumeSet; /* FIXME */
+    aout->mute_set = SimpleMuteSet;
+    return VLC_SUCCESS;
+}
+
+static void Close(vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = aout->sys;
+
     free(sys);
 }

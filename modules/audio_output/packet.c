@@ -134,13 +134,15 @@ static inline aout_packet_t *aout_packet (audio_output_t *aout)
     return (aout_packet_t *)(aout->sys);
 }
 
-void aout_PacketInit (audio_output_t *aout, aout_packet_t *p, unsigned samples)
+void aout_PacketInit (audio_output_t *aout, aout_packet_t *p, unsigned samples,
+                      const audio_sample_format_t *fmt)
 {
     assert (p == aout_packet (aout));
 
     vlc_mutex_init (&p->lock);
-    aout_FifoInit (&p->partial, aout->format.i_rate);
-    aout_FifoInit (&p->fifo, aout->format.i_rate);
+    p->format = *fmt;
+    aout_FifoInit (&p->partial, p->format.i_rate);
+    aout_FifoInit (&p->fifo, p->format.i_rate);
     p->pause_date = VLC_TS_INVALID;
     p->time_report = INT64_MIN;
     p->samples = samples;
@@ -253,9 +255,9 @@ static block_t *aout_OutputSlice (audio_output_t *p_aout)
         available += p_buffer->i_nb_samples;
     }
 
-    if( AOUT_FMT_LINEAR( &p_aout->format ) )
+    if( AOUT_FMT_LINEAR( &p->format ) )
     {
-        const unsigned framesize = p_aout->format.i_bytes_per_frame;
+        const unsigned framesize = p->format.i_bytes_per_frame;
         /* Build packet with adequate number of samples */
         unsigned needed = samples * framesize;
 
@@ -285,7 +287,7 @@ static block_t *aout_OutputSlice (audio_output_t *p_aout)
                 needed /= framesize;
                 p_fifo->p_first->i_nb_samples -= needed;
 
-                mtime_t t = needed * CLOCK_FREQ / p_aout->format.i_rate;
+                mtime_t t = needed * CLOCK_FREQ / p->format.i_rate;
                 p_fifo->p_first->i_pts += t;
                 p_fifo->p_first->i_length -= t;
                 break;
@@ -322,7 +324,7 @@ block_t *aout_PacketNext (audio_output_t *p_aout, mtime_t start_date)
     aout_packet_t *p = aout_packet (p_aout);
     aout_fifo_t *p_fifo = &p->fifo;
     block_t *p_buffer;
-    const bool b_can_sleek = !AOUT_FMT_LINEAR(&p_aout->format);
+    const bool b_can_sleek = !AOUT_FMT_LINEAR(&p->format);
     const mtime_t now = mdate ();
     const mtime_t threshold =
         (b_can_sleek ? start_date : now) - AOUT_MAX_PTS_DELAY;

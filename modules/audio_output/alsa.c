@@ -46,6 +46,7 @@ struct aout_sys_t
     void (*reorder) (void *, size_t, unsigned);
     float soft_gain;
     bool soft_mute;
+    audio_sample_format_t format;
 };
 
 #include "volume.h"
@@ -159,9 +160,9 @@ static void Flush (audio_output_t *, bool);
 static void Reorder71 (void *, size_t, unsigned);
 
 /** Initializes an ALSA playback stream */
-static int Open (vlc_object_t *obj)
+static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
-    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = aout->sys;
 
     /* Get device name */
     char *device = var_InheritString (aout, "alsa-audio-device");
@@ -169,7 +170,7 @@ static int Open (vlc_object_t *obj)
         return VLC_ENOMEM;
 
     snd_pcm_format_t pcm_format; /* ALSA sample format */
-    vlc_fourcc_t fourcc = aout->format.i_format;
+    vlc_fourcc_t fourcc = fmt->i_format;
     bool spdif = false;
 
     switch (fourcc)
@@ -223,7 +224,7 @@ static int Open (vlc_object_t *obj)
             pcm_format = SND_PCM_FORMAT_U8;
             break;
         default:
-            if (AOUT_FMT_SPDIF(&aout->format))
+            if (AOUT_FMT_SPDIF(fmt))
                 spdif = var_InheritBool (aout, "spdif");
             if (spdif)
             {
@@ -246,14 +247,14 @@ static int Open (vlc_object_t *obj)
     /* ALSA channels */
     /* XXX: maybe this should be shared with other dumb outputs */
     uint32_t map = var_InheritInteger (aout, "alsa-audio-channels");
-    map &= aout->format.i_physical_channels;
+    map &= fmt->i_physical_channels;
     if (unlikely(map == 0)) /* WTH? */
         map = AOUT_CHANS_STEREO;
 
     unsigned channels = popcount (map);
-    if (channels < aout_FormatNbChannels (&aout->format))
+    if (channels < aout_FormatNbChannels (fmt))
         msg_Dbg (aout, "downmixing from %u to %u channels",
-                 aout_FormatNbChannels (&aout->format), channels);
+                 aout_FormatNbChannels (fmt), channels);
     else
         msg_Dbg (aout, "keeping %u channels", channels);
 
@@ -264,7 +265,7 @@ static int Open (vlc_object_t *obj)
     {
         unsigned aes3;
 
-        switch (aout->format.i_rate)
+        switch (fmt->i_rate)
         {
 #define FS(freq) \
             case freq: aes3 = IEC958_AES3_CON_FS_ ## freq; break;
@@ -286,15 +287,6 @@ static int Open (vlc_object_t *obj)
                       0, aes3) == -1)
             return VLC_ENOMEM;
     }
-
-    /* Allocate structures */
-    aout_sys_t *sys = malloc (sizeof (*sys));
-    if (unlikely(sys == NULL))
-    {
-        free (device);
-        return VLC_ENOMEM;
-    }
-    aout->sys = sys;
 
     /* Open the device */
     snd_pcm_t *pcm;
@@ -332,7 +324,6 @@ static int Open (vlc_object_t *obj)
                       _("The audio device \"%s\" could not be used:\n%s."),
                       device, snd_strerror (val));
         free (device);
-        free (sys);
         return VLC_EGENERIC;
     }
     sys->pcm = pcm;
@@ -412,16 +403,15 @@ static int Open (vlc_object_t *obj)
     }
 
     /* Set sample rate */
-    unsigned rate = aout->format.i_rate;
+    unsigned rate = fmt->i_rate;
     val = snd_pcm_hw_params_set_rate_near (pcm, hw, &rate, NULL);
     if (val)
     {
         msg_Err (aout, "cannot set sample rate: %s", snd_strerror (val));
         goto error;
     }
-    if (aout->format.i_rate != rate)
-        msg_Dbg (aout, "resampling from %d Hz to %d Hz",
-                 aout->format.i_rate, rate);
+    if (fmt->i_rate != rate)
+        msg_Dbg (aout, "resampling from %d Hz to %d Hz", fmt->i_rate, rate);
 
     /* Set buffer size */
     param = AOUT_MAX_ADVANCE_TIME;
@@ -497,29 +487,26 @@ static int Open (vlc_object_t *obj)
     }
 
     /* Setup audio_output_t */
-    aout->format.i_format = fourcc;
-    aout->format.i_rate = rate;
+    fmt->i_format = fourcc;
+    fmt->i_rate = rate;
     sys->reorder = NULL;
     if (spdif)
     {
-        aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
-        aout->format.i_frame_length = A52_FRAME_NB;
-        aout->volume_set = NULL;
-        aout->mute_set = NULL;
+        fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE;
+        fmt->i_frame_length = A52_FRAME_NB;
     }
     else
     {
-        aout->format.i_original_channels =
-        aout->format.i_physical_channels = map;
+        fmt->i_original_channels =
+        fmt->i_physical_channels = map;
         switch (popcount (map))
         {
             case 8:
                 sys->reorder = Reorder71;
                 break;
         }
-
-        aout_SoftVolumeInit (aout);
     }
+    sys->format = *fmt;
 
     aout->play = Play;
     if (snd_pcm_hw_params_can_pause (hw))
@@ -535,13 +522,13 @@ static int Open (vlc_object_t *obj)
     {
         vlc_value_t text;
 
-        var_Create (obj, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
+        var_Create (aout, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
         text.psz_string = _("Audio Device");
-        var_Change (obj, "audio-device", VLC_VAR_SETTEXT, &text, NULL);
+        var_Change (aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL);
 
-        GetDevices (obj, device);
+        GetDevices (VLC_OBJECT(aout), device);
     }
-    var_AddCallback (obj, "audio-device", DeviceChanged, NULL);
+    var_AddCallback (aout, "audio-device", DeviceChanged, NULL);
 
     free (device);
     return 0;
@@ -549,7 +536,6 @@ static int Open (vlc_object_t *obj)
 error:
     snd_pcm_close (pcm);
     free (device);
-    free (sys);
     return VLC_EGENERIC;
 }
 
@@ -563,7 +549,7 @@ static void Play (audio_output_t *aout, block_t *block,
 
     if (sys->reorder != NULL)
         sys->reorder (block->p_buffer, block->i_nb_samples,
-                      aout->format.i_bitspersample / 8);
+                      sys->format.i_bitspersample / 8);
 
     snd_pcm_t *pcm = sys->pcm;
     snd_pcm_sframes_t frames;
@@ -571,19 +557,19 @@ static void Play (audio_output_t *aout, block_t *block,
 
     if (snd_pcm_delay (pcm, &frames) == 0)
     {
-        mtime_t delay = frames * CLOCK_FREQ / aout->format.i_rate;
+        mtime_t delay = frames * CLOCK_FREQ / sys->format.i_rate;
         delay += mdate () - block->i_pts;
 
         if (state != SND_PCM_STATE_RUNNING)
         {
             if (delay < 0)
             {
-                if (aout->format.i_format != VLC_CODEC_SPDIFL)
+                if (sys->format.i_format != VLC_CODEC_SPDIFL)
                 {
-                    frames = (delay * aout->format.i_rate) / -CLOCK_FREQ;
+                    frames = (delay * sys->format.i_rate) / -CLOCK_FREQ;
                     msg_Dbg (aout, "prepending %ld zeroes", frames);
 
-                    void *z = calloc (frames, aout->format.i_bytes_per_frame);
+                    void *z = calloc (frames, sys->format.i_bytes_per_frame);
                     if (likely(z != NULL))
                     {
                         snd_pcm_writei (pcm, z, frames);
@@ -677,18 +663,16 @@ static void Flush (audio_output_t *aout, bool wait)
 /**
  * Releases the audio output.
  */
-static void Close (vlc_object_t *obj)
+static void Stop (audio_output_t *aout)
 {
-    audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
-    snd_pcm_t *pcm = aout->sys->pcm;
+    snd_pcm_t *pcm = sys->pcm;
 
-    var_DelCallback (obj, "audio-device", DeviceChanged, NULL);
-    var_Destroy (obj, "audio-device");
+    var_DelCallback (aout, "audio-device", DeviceChanged, NULL);
+    var_Destroy (aout, "audio-device");
 
     snd_pcm_drop (pcm);
     snd_pcm_close (pcm);
-    free (sys);
 }
 
 /**
@@ -836,4 +820,26 @@ static void GetDevices(vlc_object_t *obj, const char *prefs_dev)
         var_Change(obj, "audio-device", VLC_VAR_ADDCHOICE, &val, &text);
     }
     var_Change(obj, "audio-device", VLC_VAR_SETVALUE, &val, NULL);
+}
+
+static int Open(vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = malloc (sizeof (*sys));
+
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+    aout->sys = sys;
+    aout->start = Start;
+    aout->stop = Stop;
+    aout_SoftVolumeInit (aout);
+    return VLC_SUCCESS;
+}
+
+static void Close(vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = aout->sys;
+
+    free(sys);
 }

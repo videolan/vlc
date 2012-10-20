@@ -55,13 +55,22 @@ vlc_module_end ()
 struct aout_sys_t
 {
     void *opaque;
+    int (*setup) (void **, char *, unsigned *, unsigned *);
+    union
+    {
+        void (*cleanup) (void *opaque);
+        struct
+        {
+             unsigned rate:18;
+             unsigned channels:14;
+        };
+    };
     void (*play) (void *opaque, const void *data, unsigned count, int64_t pts);
     void (*pause) (void *opaque, int64_t pts);
     void (*resume) (void *opaque, int64_t pts);
     void (*flush) (void *opaque);
     void (*drain) (void *opaque);
     int (*set_volume) (void *opaque, float vol, bool mute);
-    void (*cleanup) (void *opaque);
     float volume;
     bool mute;
 };
@@ -132,7 +141,82 @@ static int SoftMuteSet (audio_output_t *aout, bool mute)
     return 0;
 }
 
-typedef int (*vlc_audio_format_cb) (void **, char *, unsigned *, unsigned *);
+static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
+{
+    aout_sys_t *sys = aout->sys;
+    char format[5] = "S16N";
+    unsigned channels;
+
+    if (sys->setup != NULL)
+    {
+        channels = aout_FormatNbChannels(fmt);
+
+        if (sys->setup (&sys->opaque, format, &fmt->i_rate, &channels))
+            return VLC_EGENERIC;
+    }
+    else
+    {
+        fmt->i_rate = sys->rate;
+        channels = sys->channels;
+    }
+
+    if (fmt->i_rate == 0 || fmt->i_rate > 192000
+     || channels == 0 || channels > AOUT_CHAN_MAX)
+        return VLC_EGENERIC;
+
+    /* TODO: amem-format */
+    if (strcmp(format, "S16N"))
+    {
+        msg_Err (aout, "format not supported");
+        return VLC_EGENERIC;
+    }
+
+    /* channel mapping */
+    switch (channels)
+    {
+        case 1:
+            fmt->i_physical_channels = AOUT_CHAN_CENTER;
+            break;
+        case 2:
+            fmt->i_physical_channels = AOUT_CHANS_2_0;
+            break;
+        case 3:
+            fmt->i_physical_channels = AOUT_CHANS_2_1;
+            break;
+        case 4:
+            fmt->i_physical_channels = AOUT_CHANS_4_0;
+            break;
+        case 5:
+            fmt->i_physical_channels = AOUT_CHANS_5_0;
+            break;
+        case 6:
+            fmt->i_physical_channels = AOUT_CHANS_5_1;
+            break;
+        case 7:
+            fmt->i_physical_channels =
+                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
+                AOUT_CHAN_REARCENTER | AOUT_CHAN_MIDDLELEFT |
+                AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE;
+            break;
+        case 8:
+            fmt->i_physical_channels = AOUT_CHANS_7_1;
+            break;
+        default:
+            assert(0);
+    }
+
+    fmt->i_format = VLC_CODEC_S16N;
+    fmt->i_original_channels = fmt->i_physical_channels;
+    return VLC_SUCCESS;
+}
+
+static void Stop (audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+
+    if (sys->cleanup != NULL)
+        sys->cleanup (sys->opaque);
+}
 
 static int Open (vlc_object_t *obj)
 {
@@ -143,98 +227,30 @@ static int Open (vlc_object_t *obj)
 
     aout->sys = sys;
     sys->opaque = var_InheritAddress (obj, "amem-data");
+    sys->setup = var_InheritAddress (obj, "amem-setup");
+    if (sys->setup != NULL)
+        sys->cleanup = var_InheritAddress (obj, "amem-cleanup");
+    else
+    {
+        sys->rate = var_InheritInteger (obj, "amem-rate");
+        sys->channels = var_InheritInteger (obj, "amem-channels");
+    }
     sys->play = var_InheritAddress (obj, "amem-play");
     sys->pause = var_InheritAddress (obj, "amem-pause");
     sys->resume = var_InheritAddress (obj, "amem-resume");
     sys->flush = var_InheritAddress (obj, "amem-flush");
     sys->drain = var_InheritAddress (obj, "amem-drain");
     sys->set_volume = var_InheritAddress (obj, "amem-set-volume");
-    sys->cleanup = NULL; /* defer */
     sys->volume = 1.;
     sys->mute = false;
     if (sys->play == NULL)
-        goto error;
-
-    vlc_audio_format_cb setup = var_InheritAddress (obj, "amem-setup");
-    char format[5] = "S16N";
-    unsigned rate, channels;
-
-    if (setup != NULL)
     {
-        rate = aout->format.i_rate;
-        channels = aout_FormatNbChannels(&aout->format);
-
-        if (setup (&sys->opaque, format, &rate, &channels))
-            goto error;
-        /* Only call this callback if setup succeeded */
-        sys->cleanup = var_InheritAddress (obj, "amem-cleanup");
-    }
-    else
-    {
-        rate = var_InheritInteger (obj, "amem-rate");
-        channels = var_InheritInteger (obj, "amem-channels");
+        free (sys);
+        return VLC_EGENERIC;
     }
 
-    if (rate == 0 || rate > 192000
-     || channels == 0 || channels > AOUT_CHAN_MAX)
-        goto error;
-
-    /* TODO: amem-format */
-    if (strcmp(format, "S16N"))
-    {
-        msg_Err (aout, "format not supported");
-        goto error;
-    }
-
-    /* channel mapping */
-    switch (channels)
-    {
-        case 1:
-            aout->format.i_physical_channels = AOUT_CHAN_CENTER;
-            break;
-        case 2:
-            aout->format.i_physical_channels =
-                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-            break;
-        case 3:
-            aout->format.i_physical_channels =
-                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_LFE;
-            break;
-        case 4:
-            aout->format.i_physical_channels =
-                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
-                AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-            break;
-        case 5:
-            aout->format.i_physical_channels =
-                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
-                AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-            break;
-        case 6:
-            aout->format.i_physical_channels =
-                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
-                AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE;
-            break;
-        case 7:
-            aout->format.i_physical_channels =
-                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
-                AOUT_CHAN_REARCENTER | AOUT_CHAN_MIDDLELEFT |
-                AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE;
-            break;
-        case 8:
-            aout->format.i_physical_channels =
-                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
-                AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT |
-                AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE;
-            break;
-        default:
-            assert(0);
-    }
-
-    aout->format.i_format = VLC_CODEC_S16N;
-    aout->format.i_rate = rate;
-    aout->format.i_original_channels = aout->format.i_physical_channels;
-
+    aout->start = Start;
+    aout->stop = Stop;
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
@@ -249,10 +265,6 @@ static int Open (vlc_object_t *obj)
         aout->mute_set = SoftMuteSet;
     }
     return VLC_SUCCESS;
-
-error:
-    Close (obj);
-    return VLC_EGENERIC;
 }
 
 static void Close (vlc_object_t *obj)
@@ -260,7 +272,5 @@ static void Close (vlc_object_t *obj)
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
 
-    if (sys->cleanup != NULL)
-        sys->cleanup (sys->opaque);
     free (sys);
 }

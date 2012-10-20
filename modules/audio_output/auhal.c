@@ -145,22 +145,16 @@ vlc_module_end ()
 /*****************************************************************************
  * Open: open macosx audio output
  *****************************************************************************/
-static int Open(vlc_object_t * p_this)
+static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 {
     OSStatus                err = noErr;
     UInt32                  i_param_size = 0;
     struct aout_sys_t       *p_sys = NULL;
     vlc_value_t             val;
-    audio_output_t          *p_aout = (audio_output_t *)p_this;
 
     /* Use int here, to match kAudioDevicePropertyDeviceIsAlive
      * property size */
     int                     b_alive = false;
-
-    /* Allocate structure */
-    p_aout->sys = malloc(sizeof(aout_sys_t));
-    if (p_aout->sys == NULL)
-        return VLC_ENOMEM;
 
     p_sys = p_aout->sys;
     p_sys->i_default_dev = 0;
@@ -183,7 +177,7 @@ static int Open(vlc_object_t * p_this)
     p_aout->pause = aout_PacketPause;
     p_aout->flush = aout_PacketFlush;
 
-    aout_FormatPrint(p_aout, "VLC is looking for:", &p_aout->format);
+    aout_FormatPrint(p_aout, "VLC is looking for:", fmt);
 
     /* Persistent device variable */
     if (var_Type(p_aout->p_libvlc, "macosx-audio-device") == 0)
@@ -255,7 +249,7 @@ static int Open(vlc_object_t * p_this)
     var_AddCallback(p_aout, "audio-device", AudioDeviceCallback, NULL);
 
     /* Check for Digital mode or Analog output mode */
-    if (AOUT_FMT_SPDIF (&p_aout->format) && b_supports_digital) {
+    if (AOUT_FMT_SPDIF (fmt) && b_supports_digital) {
         if (OpenSPDIF (p_aout)) {
             msg_Dbg(p_aout, "digital output successfully opened");
             return VLC_SUCCESS;
@@ -271,14 +265,13 @@ error:
     /* If we reach this, this aout has failed */
     msg_Err(p_aout, "opening the auhal output failed");
     var_Destroy(p_aout, "audio-device");
-    free(p_sys);
     return VLC_EGENERIC;
 }
 
 /*****************************************************************************
  * Open: open and setup a HAL AudioUnit to do analog (multichannel) audio output
  *****************************************************************************/
-static int OpenAnalog(audio_output_t *p_aout)
+static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 {
     struct aout_sys_t           *p_sys = p_aout->sys;
     OSStatus                    err = noErr;
@@ -374,15 +367,15 @@ static int OpenAnalog(audio_output_t *p_aout)
         msg_Dbg(p_aout, "layout of AUHAL has %d channels" , (int)layout->mNumberChannelDescriptions);
 
         /* Initialize the VLC core channel count */
-        p_aout->format.i_physical_channels = 0;
-        i_original = p_aout->format.i_original_channels & AOUT_CHAN_PHYSMASK;
+        fmt->i_physical_channels = 0;
+        i_original = fmt->i_original_channels & AOUT_CHAN_PHYSMASK;
 
         if (i_original == AOUT_CHAN_CENTER || layout->mNumberChannelDescriptions < 2) {
             /* We only need Mono or cannot output more than 1 channel */
-            p_aout->format.i_physical_channels = AOUT_CHAN_CENTER;
+            fmt->i_physical_channels = AOUT_CHAN_CENTER;
         } else if (i_original == (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) || layout->mNumberChannelDescriptions < 3) {
             /* We only need Stereo or cannot output more than 2 channels */
-            p_aout->format.i_physical_channels = AOUT_CHAN_RIGHT | AOUT_CHAN_LEFT;
+            fmt->i_physical_channels = AOUT_CHANS_STEREO;
         } else {
             /* We want more than stereo and we can do that */
             for (unsigned int i = 0; i < layout->mNumberChannelDescriptions; i++) {
@@ -390,38 +383,38 @@ static int OpenAnalog(audio_output_t *p_aout)
 
                 switch(layout->mChannelDescriptions[i].mChannelLabel) {
                     case kAudioChannelLabel_Left:
-                        p_aout->format.i_physical_channels |= AOUT_CHAN_LEFT;
+                        fmt->i_physical_channels |= AOUT_CHAN_LEFT;
                         continue;
                     case kAudioChannelLabel_Right:
-                        p_aout->format.i_physical_channels |= AOUT_CHAN_RIGHT;
+                        fmt->i_physical_channels |= AOUT_CHAN_RIGHT;
                         continue;
                     case kAudioChannelLabel_Center:
-                        p_aout->format.i_physical_channels |= AOUT_CHAN_CENTER;
+                        fmt->i_physical_channels |= AOUT_CHAN_CENTER;
                         continue;
                     case kAudioChannelLabel_LFEScreen:
-                        p_aout->format.i_physical_channels |= AOUT_CHAN_LFE;
+                        fmt->i_physical_channels |= AOUT_CHAN_LFE;
                         continue;
                     case kAudioChannelLabel_LeftSurround:
-                        p_aout->format.i_physical_channels |= AOUT_CHAN_REARLEFT;
+                        fmt->i_physical_channels |= AOUT_CHAN_REARLEFT;
                         continue;
                     case kAudioChannelLabel_RightSurround:
-                        p_aout->format.i_physical_channels |= AOUT_CHAN_REARRIGHT;
+                        fmt->i_physical_channels |= AOUT_CHAN_REARRIGHT;
                         continue;
                     case kAudioChannelLabel_RearSurroundLeft:
-                        p_aout->format.i_physical_channels |= AOUT_CHAN_MIDDLELEFT;
+                        fmt->i_physical_channels |= AOUT_CHAN_MIDDLELEFT;
                         continue;
                     case kAudioChannelLabel_RearSurroundRight:
-                        p_aout->format.i_physical_channels |= AOUT_CHAN_MIDDLERIGHT;
+                        fmt->i_physical_channels |= AOUT_CHAN_MIDDLERIGHT;
                         continue;
                     case kAudioChannelLabel_CenterSurround:
-                        p_aout->format.i_physical_channels |= AOUT_CHAN_REARCENTER;
+                        fmt->i_physical_channels |= AOUT_CHAN_REARCENTER;
                         continue;
                     default:
                         msg_Warn(p_aout, "unrecognized channel form provided by driver: %d", (int)layout->mChannelDescriptions[i].mChannelLabel);
                 }
             }
-            if (p_aout->format.i_physical_channels == 0) {
-                p_aout->format.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+            if (fmt->i_physical_channels == 0) {
+                fmt->i_physical_channels = AOUT_CHANS_STEREO;
                 msg_Err(p_aout, "You should configure your speaker layout with Audio Midi Setup Utility in /Applications/Utilities. Now using Stereo mode.");
                 dialog_Fatal(p_aout, _("Audio device is not configured"), "%s",
                                 _("You should configure your speaker layout with "
@@ -432,14 +425,14 @@ static int OpenAnalog(audio_output_t *p_aout)
         free(layout);
     } else {
         msg_Warn(p_aout, "this driver does not support kAudioDevicePropertyPreferredChannelLayout. BAD DRIVER AUTHOR !!!");
-        p_aout->format.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+        fmt->i_physical_channels = AOUT_CHANS_STEREO;
     }
 
-    msg_Dbg(p_aout, "selected %d physical channels for device output", aout_FormatNbChannels(&p_aout->format));
-    msg_Dbg(p_aout, "VLC will output: %s", aout_FormatPrintChannels(&p_aout->format));
+    msg_Dbg(p_aout, "selected %d physical channels for device output", aout_FormatNbChannels(fmt));
+    msg_Dbg(p_aout, "VLC will output: %s", aout_FormatPrintChannels(fmt));
 
     memset (&new_layout, 0, sizeof(new_layout));
-    switch(aout_FormatNbChannels(&p_aout->format)) {
+    switch(aout_FormatNbChannels(fmt)) {
         case 1:
             new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
             break;
@@ -447,27 +440,27 @@ static int OpenAnalog(audio_output_t *p_aout)
             new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_Stereo;
             break;
         case 3:
-            if (p_aout->format.i_physical_channels & AOUT_CHAN_CENTER)
+            if (fmt->i_physical_channels & AOUT_CHAN_CENTER)
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_7; // L R C
-            else if (p_aout->format.i_physical_channels & AOUT_CHAN_LFE)
+            else if (fmt->i_physical_channels & AOUT_CHAN_LFE)
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_4; // L R LFE
             break;
         case 4:
-            if (p_aout->format.i_physical_channels & (AOUT_CHAN_CENTER | AOUT_CHAN_LFE))
+            if (fmt->i_physical_channels & (AOUT_CHAN_CENTER | AOUT_CHAN_LFE))
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_10; // L R C LFE
-            else if (p_aout->format.i_physical_channels & (AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT))
+            else if (fmt->i_physical_channels & (AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT))
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_3; // L R Ls Rs
-            else if (p_aout->format.i_physical_channels & (AOUT_CHAN_CENTER | AOUT_CHAN_REARCENTER))
+            else if (fmt->i_physical_channels & (AOUT_CHAN_CENTER | AOUT_CHAN_REARCENTER))
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_3; // L R C Cs
             break;
         case 5:
-            if (p_aout->format.i_physical_channels & (AOUT_CHAN_CENTER))
+            if (fmt->i_physical_channels & (AOUT_CHAN_CENTER))
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_19; // L R Ls Rs C
-            else if (p_aout->format.i_physical_channels & (AOUT_CHAN_LFE))
+            else if (fmt->i_physical_channels & (AOUT_CHAN_LFE))
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_18; // L R Ls Rs LFE
             break;
         case 6:
-            if (p_aout->format.i_physical_channels & (AOUT_CHAN_LFE))
+            if (fmt->i_physical_channels & (AOUT_CHAN_LFE))
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_20; // L R Ls Rs C LFE
             else
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_AudioUnit_6_0; // L R Ls Rs C Cs
@@ -483,14 +476,14 @@ static int OpenAnalog(audio_output_t *p_aout)
     }
 
     /* Set up the format to be used */
-    DeviceFormat.mSampleRate = p_aout->format.i_rate;
+    DeviceFormat.mSampleRate = fmt->i_rate;
     DeviceFormat.mFormatID = kAudioFormatLinearPCM;
 
     /* We use float 32. It's the best supported format by both VLC and Coreaudio */
-    p_aout->format.i_format = VLC_CODEC_FL32;
+    fmt->i_format = VLC_CODEC_FL32;
     DeviceFormat.mFormatFlags = kAudioFormatFlagsNativeFloatPacked;
     DeviceFormat.mBitsPerChannel = 32;
-    DeviceFormat.mChannelsPerFrame = aout_FormatNbChannels(&p_aout->format);
+    DeviceFormat.mChannelsPerFrame = aout_FormatNbChannels(fmt);
 
     /* Calculate framesizes and stuff */
     DeviceFormat.mFramesPerPacket = 1;
@@ -519,10 +512,8 @@ static int OpenAnalog(audio_output_t *p_aout)
     msg_Dbg(p_aout, STREAM_FORMAT_MSG("the actual set AU format is " , DeviceFormat));
 
     /* Do the last VLC aout setups */
-    aout_FormatPrepare(&p_aout->format);
-    aout_PacketInit(p_aout, &p_sys->packet, FRAMESIZE);
-    p_aout->volume_set = VolumeSet;
-    p_aout->mute_set = MuteSet;
+    aout_FormatPrepare(fmt);
+    aout_PacketInit(p_aout, &p_sys->packet, FRAMESIZE, fmt);
 
     /* set the IOproc callback */
     input.inputProc = (AURenderCallback) RenderCallbackAnalog;
@@ -562,7 +553,7 @@ static int OpenAnalog(audio_output_t *p_aout)
 /*****************************************************************************
  * Setup a encoded digital stream (SPDIF)
  *****************************************************************************/
-static int OpenSPDIF (audio_output_t * p_aout)
+static int OpenSPDIF (audio_output_t * p_aout, audio_sample_format_t *fmt)
 {
     struct aout_sys_t       *p_sys = p_aout->sys;
     OSStatus                err = noErr;
@@ -690,7 +681,7 @@ static int OpenSPDIF (audio_output_t * p_aout)
                    p_format_list[j].mFormat.mFormatID == 'iac3' ||
                    p_format_list[j].mFormat.mFormatID == kAudioFormat60958AC3 ||
                    p_format_list[j].mFormat.mFormatID == kAudioFormatAC3) {
-                    if (p_format_list[j].mFormat.mSampleRate == p_aout->format.i_rate) {
+                    if (p_format_list[j].mFormat.mSampleRate == fmt->i_rate) {
                         i_requested_rate_format = j;
                         break;
                     } else if (p_format_list[j].mFormat.mSampleRate == p_sys->sfmt_revert.mSampleRate)
@@ -728,16 +719,14 @@ static int OpenSPDIF (audio_output_t * p_aout)
 
     /* Set the format flags */
     if (p_sys->stream_format.mFormatFlags & kAudioFormatFlagIsBigEndian)
-        p_aout->format.i_format = VLC_CODEC_SPDIFB;
+        fmt->i_format = VLC_CODEC_SPDIFB;
     else
-        p_aout->format.i_format = VLC_CODEC_SPDIFL;
-    p_aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
-    p_aout->format.i_frame_length = A52_FRAME_NB;
-    p_aout->format.i_rate = (unsigned int)p_sys->stream_format.mSampleRate;
-    aout_FormatPrepare(&p_aout->format);
-    aout_PacketInit(p_aout, &p_sys->packet, A52_FRAME_NB);
-    p_aout->volume_set = NULL;
-    p_aout->mute_set = NULL;
+        fmt->i_format = VLC_CODEC_SPDIFL;
+    fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE;
+    fmt->i_frame_length = A52_FRAME_NB;
+    fmt->i_rate = (unsigned int)p_sys->stream_format.mSampleRate;
+    aout_FormatPrepare(fmt);
+    aout_PacketInit(p_aout, &p_sys->packet, A52_FRAME_NB, fmt);
 
     /* Add IOProc callback */
     err = AudioDeviceCreateIOProcID(p_sys->i_selected_dev,
@@ -775,9 +764,8 @@ static int OpenSPDIF (audio_output_t * p_aout)
 /*****************************************************************************
  * Close: Close HAL AudioUnit
  *****************************************************************************/
-static void Close(vlc_object_t * p_this)
+static void Stop(audio_output_t *p_aout)
 {
-    audio_output_t     *p_aout = (audio_output_t *)p_this;
     struct aout_sys_t   *p_sys = p_aout->sys;
     OSStatus            err = noErr;
     UInt32              i_param_size = 0;
@@ -855,7 +843,6 @@ static void Close(vlc_object_t * p_this)
     var_DelCallback(p_aout, "audio-device", AudioDeviceCallback, NULL);
 
     aout_PacketDestroy(p_aout);
-    free(p_sys);
 }
 
 /*****************************************************************************
@@ -1215,8 +1202,8 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *_p_aout,
                     &p_sys->p_remainder_buffer[p_sys->i_read_bytes],
                     i_mData_bytes);
         p_sys->i_read_bytes += i_mData_bytes;
-        current_date += (mtime_t) ((mtime_t) 1000000 / p_aout->format.i_rate) *
-                        (i_mData_bytes / 4 / aout_FormatNbChannels(&p_aout->format)); // 4 is fl32 specific
+        current_date += (mtime_t) ((mtime_t) 1000000 / p_sys->packet.format.i_rate) *
+                        (i_mData_bytes / 4 / aout_FormatNbChannels(&p_sys->packet.format)); // 4 is fl32 specific
 
         if (p_sys->i_read_bytes >= p_sys->i_total_bytes)
             p_sys->i_read_bytes = p_sys->i_total_bytes = 0;
@@ -1245,8 +1232,8 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *_p_aout,
                 break;
             } else
                 /* update current_date */
-                current_date += (mtime_t) ((mtime_t) 1000000 / p_aout->format.i_rate) *
-                                (i_second_mData_bytes / 4 / aout_FormatNbChannels(&p_aout->format)); // 4 is fl32 specific
+                current_date += (mtime_t) ((mtime_t) 1000000 / p_sys->packet.format.i_rate) *
+                                (i_second_mData_bytes / 4 / aout_FormatNbChannels(&p_sys->packet.format)); // 4 is fl32 specific
             block_Release(p_buffer);
         } else {
             memset((uint8_t *)ioData->mBuffers[0].mData +i_mData_bytes,
@@ -1397,4 +1384,27 @@ static int MuteSet(audio_output_t * p_aout, bool mute)
     aout_MuteReport(p_aout, mute);
 
     return 0;
+}
+
+static int Open(vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = malloc(sizeof (*sys));
+
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+    aout->sys = sys;
+    aout->start = Start;
+    aout->stop = Stop;
+    aout->volume_set = VolumeSet;
+    aout->mute_set = MuteSet;
+    return VLC_SUCCESS;
+}
+
+static void Close(vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = aout->sys;
+
+    free(sys);
 }

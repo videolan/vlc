@@ -55,7 +55,6 @@ struct aout_sys_t
  * Local prototypes
  *****************************************************************************/
 static int  Open  ( vlc_object_t * );
-static void Close ( vlc_object_t * );
 static void Play  ( audio_output_t *_p_aout, block_t *block, mtime_t * );
 
 static ULONG APIENTRY KaiCallback ( PVOID, PVOID, ULONG );
@@ -94,15 +93,14 @@ vlc_module_begin ()
     add_bool( "kai-audio-exclusive-mode", false,
               KAI_AUDIO_EXCLUSIVE_MODE_TEXT, KAI_AUDIO_EXCLUSIVE_MODE_LONGTEXT,
               true )
-    set_callbacks( Open, Close )
+    set_callbacks( Open, NULL )
 vlc_module_end ()
 
 /*****************************************************************************
  * Open: open the audio device
  *****************************************************************************/
-static int Open ( vlc_object_t *p_this )
+static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
 {
-    audio_output_t *p_aout = (audio_output_t *)p_this;
     aout_sys_t *p_sys;
     char *psz_mode;
     ULONG i_kai_mode;
@@ -110,7 +108,7 @@ static int Open ( vlc_object_t *p_this )
     int i_nb_channels;
     int i_bytes_per_frame;
     vlc_value_t val, text;
-    audio_format_t format =  p_aout->format;
+    audio_format_t format =  *format;
 
     /* Allocate structure */
     p_aout->sys = calloc( 1, sizeof( aout_sys_t ) );
@@ -201,7 +199,7 @@ static int Open ( vlc_object_t *p_this )
     msg_Dbg( p_aout, "obtained i_bytes_per_frame = %d",
              format.i_bytes_per_frame );
 
-    p_aout->format   = format;
+    *fmt = format;
 
     p_aout->play  = Play;
     p_aout->pause = aout_PacketPause;
@@ -267,9 +265,8 @@ static void Play (audio_output_t *p_aout, block_t *block,
 /*****************************************************************************
  * Close: close the audio device
  *****************************************************************************/
-static void Close ( vlc_object_t *p_this )
+static void Stop ( audio_output_t *p_aout )
 {
-    audio_output_t *p_aout = (audio_output_t *)p_this;
     aout_sys_t *p_sys = p_aout->sys;
 
     kaiClose( p_sys->hkai );
@@ -340,4 +337,14 @@ static ULONG APIENTRY KaiCallback( PVOID p_cb_data,
     }
 
     return i_buf_size;
+}
+
+static int Open (vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+
+    /* FIXME: set volume/mute here */
+    aout->start = Start;
+    aout->stop = Stop;
+    return VLC_SUCCESS;
 }

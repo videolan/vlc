@@ -76,64 +76,71 @@ static int aout_OutputGainRequest (audio_output_t *aout, float gain)
  *****************************************************************************
  * This function is entered with the mixer lock.
  *****************************************************************************/
-int aout_OutputNew( audio_output_t *p_aout,
-                    const audio_sample_format_t * p_format )
+int aout_OutputNew (audio_output_t *aout, const audio_sample_format_t *fmtp)
 {
-    aout_owner_t *owner = aout_owner (p_aout);
+    aout_owner_t *owner = aout_owner (aout);
 
-    aout_assert_locked( p_aout );
-    p_aout->format = *p_format;
-    aout_FormatPrepare( &p_aout->format );
+    audio_sample_format_t fmt = *fmtp;
+    aout_FormatPrepare (&fmt);
 
-    p_aout->event.volume_report = aout_OutputVolumeReport;
-    p_aout->event.mute_report = aout_OutputMuteReport;
-    p_aout->event.policy_report = aout_OutputPolicyReport;
-    p_aout->event.gain_request = aout_OutputGainRequest;
+    aout_assert_locked (aout);
+
+    aout->event.volume_report = aout_OutputVolumeReport;
+    aout->event.mute_report = aout_OutputMuteReport;
+    aout->event.policy_report = aout_OutputPolicyReport;
+    aout->event.gain_request = aout_OutputGainRequest;
 
     /* Find the best output plug-in. */
-    owner->module = module_need (p_aout, "audio output", "$aout", false);
+    owner->module = module_need (aout, "audio output", "$aout", false);
     if (owner->module == NULL)
     {
-        msg_Err( p_aout, "no suitable audio output module" );
+        msg_Err (aout, "no suitable audio output module");
         return -1;
     }
 
-    if (!var_Type (p_aout, "stereo-mode"))
-        var_Create (p_aout, "stereo-mode",
+    if (aout->start (aout, &fmt))
+    {
+        msg_Err (aout, "module not functional");
+        module_unneed (aout, owner->module);
+        owner->module = NULL;
+        return -1;
+    }
+
+    if (!var_Type (aout, "stereo-mode"))
+        var_Create (aout, "stereo-mode",
                     VLC_VAR_INTEGER | VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT);
 
     /* The user may have selected a different channels configuration. */
-    var_AddCallback (p_aout, "stereo-mode", aout_ChannelsRestart, NULL);
-    switch (var_GetInteger (p_aout, "stereo-mode"))
+    var_AddCallback (aout, "stereo-mode", aout_ChannelsRestart, NULL);
+    switch (var_GetInteger (aout, "stereo-mode"))
     {
         case AOUT_VAR_CHAN_RSTEREO:
-            p_aout->format.i_original_channels |= AOUT_CHAN_REVERSESTEREO;
+            fmt.i_original_channels |= AOUT_CHAN_REVERSESTEREO;
              break;
         case AOUT_VAR_CHAN_STEREO:
-            p_aout->format.i_original_channels = AOUT_CHANS_STEREO;
+            fmt.i_original_channels = AOUT_CHANS_STEREO;
             break;
         case AOUT_VAR_CHAN_LEFT:
-            p_aout->format.i_original_channels = AOUT_CHAN_LEFT;
+            fmt.i_original_channels = AOUT_CHAN_LEFT;
             break;
         case AOUT_VAR_CHAN_RIGHT:
-            p_aout->format.i_original_channels = AOUT_CHAN_RIGHT;
+            fmt.i_original_channels = AOUT_CHAN_RIGHT;
             break;
         case AOUT_VAR_CHAN_DOLBYS:
-            p_aout->format.i_original_channels =
-                                     AOUT_CHANS_STEREO | AOUT_CHAN_DOLBYSTEREO;
+            fmt.i_original_channels = AOUT_CHANS_STEREO|AOUT_CHAN_DOLBYSTEREO;
             break;
         default:
         {
-            if ((p_aout->format.i_original_channels & AOUT_CHAN_PHYSMASK)
+            if ((fmt.i_original_channels & AOUT_CHAN_PHYSMASK)
                                                          != AOUT_CHANS_STEREO)
                  break;
 
             vlc_value_t val, txt;
             val.i_int = 0;
-            var_Change (p_aout, "stereo-mode", VLC_VAR_DELCHOICE, &val, NULL);
+            var_Change (aout, "stereo-mode", VLC_VAR_DELCHOICE, &val, NULL);
             txt.psz_string = _("Stereo audio mode");
-            var_Change (p_aout, "stereo-mode", VLC_VAR_SETTEXT, &txt, NULL);
-            if (p_aout->format.i_original_channels & AOUT_CHAN_DOLBYSTEREO)
+            var_Change (aout, "stereo-mode", VLC_VAR_SETTEXT, &txt, NULL);
+            if (fmt.i_original_channels & AOUT_CHAN_DOLBYSTEREO)
             {
                 val.i_int = AOUT_VAR_CHAN_DOLBYS;
                 txt.psz_string = _("Dolby Surround");
@@ -143,33 +150,32 @@ int aout_OutputNew( audio_output_t *p_aout,
                 val.i_int = AOUT_VAR_CHAN_STEREO;
                 txt.psz_string = _("Stereo");
             }
-            var_Change (p_aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
-            var_Change (p_aout, "stereo-mode", VLC_VAR_SETVALUE, &val, NULL);
+            var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+            var_Change (aout, "stereo-mode", VLC_VAR_SETVALUE, &val, NULL);
             val.i_int = AOUT_VAR_CHAN_LEFT;
             txt.psz_string = _("Left");
-            var_Change (p_aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
-            if (p_aout->format.i_original_channels & AOUT_CHAN_DUALMONO)
+            var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+            if (fmt.i_original_channels & AOUT_CHAN_DUALMONO)
             {   /* Go directly to the left channel. */
-                p_aout->format.i_original_channels = AOUT_CHAN_LEFT;
-                var_Change (p_aout, "stereo-mode", VLC_VAR_SETVALUE, &val,
-                            NULL);
+                fmt.i_original_channels = AOUT_CHAN_LEFT;
+                var_Change (aout, "stereo-mode", VLC_VAR_SETVALUE, &val, NULL);
             }
             val.i_int = AOUT_VAR_CHAN_RIGHT;
             txt.psz_string = _("Right");
-            var_Change (p_aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+            var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
             val.i_int = AOUT_VAR_CHAN_RSTEREO;
             txt.psz_string = _("Reverse stereo");
-            var_Change (p_aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+            var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
         }
     }
 
-    aout_FormatPrepare( &p_aout->format );
-    aout_FormatPrint( p_aout, "output", &p_aout->format );
+    aout_FormatPrepare (&fmt);
+    aout_FormatPrint (aout, "output", &fmt );
 
     /* Choose the mixer format. */
-    owner->mixer_format = p_aout->format;
-    if (!AOUT_FMT_LINEAR(&p_aout->format))
-        owner->mixer_format.i_format = p_format->i_format;
+    owner->mixer_format = fmt;
+    if (!AOUT_FMT_LINEAR(&fmt))
+        owner->mixer_format.i_format = fmtp->i_format;
     else
     /* Most audio filters can only deal with single-precision,
      * so lets always use that when hardware supports floating point. */
@@ -181,16 +187,15 @@ int aout_OutputNew( audio_output_t *p_aout,
         owner->mixer_format.i_format = VLC_CODEC_S16N;
 
     aout_FormatPrepare (&owner->mixer_format);
-    aout_FormatPrint (p_aout, "mixer", &owner->mixer_format);
+    aout_FormatPrint (aout, "mixer", &owner->mixer_format);
 
     /* Create filters. */
     owner->nb_filters = 0;
-    if (aout_FiltersCreatePipeline (p_aout, owner->filters,
-                                    &owner->nb_filters, &owner->mixer_format,
-                                    &p_aout->format) < 0)
+    if (aout_FiltersCreatePipeline (aout, owner->filters, &owner->nb_filters,
+                                    &owner->mixer_format, &fmt) < 0)
     {
-        msg_Err( p_aout, "couldn't create audio output pipeline" );
-        module_unneed (p_aout, owner->module);
+        msg_Err (aout, "couldn't create audio output pipeline");
+        module_unneed (aout, owner->module);
         owner->module = NULL;
         return -1;
     }
@@ -210,6 +215,8 @@ void aout_OutputDelete (audio_output_t *aout)
         return;
 
     var_DelCallback (aout, "stereo-mode", aout_ChannelsRestart, NULL);
+    if (aout->stop != NULL)
+        aout->stop (aout);
     module_unneed (aout, owner->module);
     aout->volume_set = NULL;
     aout->mute_set = NULL;

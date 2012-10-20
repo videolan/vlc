@@ -32,7 +32,7 @@
 #include <sndio.h>
 
 static int Open (vlc_object_t *);
-static void Close (vlc_object_t *);
+static void Close (vlc_objec_t *);
 
 vlc_module_begin ()
     set_shortname ("sndio")
@@ -40,7 +40,7 @@ vlc_module_begin ()
     set_category (CAT_AUDIO)
     set_subcategory (SUBCAT_AUDIO_AOUT)
     set_capability ("audio output", 120)
-    set_callbacks (Open, Close )
+    set_callbacks (Open, Close)
 vlc_module_end ()
 
 static void Play (audio_output_t *, block_t *, mtime_t *);
@@ -57,12 +57,9 @@ struct aout_sys_t
 };
 
 /** Initializes an sndio playback stream */
-static int Open (vlc_object_t *obj)
+static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
-    audio_output_t *aout = (audio_output_t *)obj;
-    aout_sys_t *sys = malloc (sizeof (*sys));
-    if (unlikely(sys == NULL))
-        return VLC_EGENERIC;
+    aout_sys_t *sys = aout->sys;
 
     sys->hdl = sio_open (NULL, SIO_PLAY, 0 /* blocking */);
     if (sys->hdl == NULL)
@@ -79,8 +76,8 @@ static int Open (vlc_object_t *obj)
     par.bps = par.bits >> 3;
     par.sig = 1;
     par.le = SIO_LE_NATIVE;
-    par.pchan = aout_FormatNbChannels (&aout->format);
-    par.rate = aout->format.i_rate;
+    par.pchan = aout_FormatNbChannels (fmt);
+    par.rate = fmt->i_rate;
     par.xrun = SIO_SYNC;
 
     if (!sio_setpar (sys->hdl, &par) || !sio_getpar (sys->hdl, &par))
@@ -96,23 +93,24 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
 
-    audio_format_t f;
-
     switch (par.bits)
     {
         case 8:
-            f.i_format = par.sig ? VLC_CODEC_S8 : VLC_CODEC_U8;
+            fmt->i_format = par.sig ? VLC_CODEC_S8 : VLC_CODEC_U8;
             break;
         case 16:
-            f.i_format = par.sig ? (par.le ? VLC_CODEC_S16L : VLC_CODEC_S16B)
+            fmt->i_format = par.sig
+                                 ? (par.le ? VLC_CODEC_S16L : VLC_CODEC_S16B)
                                  : (par.le ? VLC_CODEC_U16L : VLC_CODEC_U16B);
             break;
         case 24:
-            f.i_format = par.sig ? (par.le ? VLC_CODEC_S24L : VLC_CODEC_S24B)
+            fmt->i_format = par.sig
+                                 ? (par.le ? VLC_CODEC_S24L : VLC_CODEC_S24B)
                                  : (par.le ? VLC_CODEC_U24L : VLC_CODEC_U24B);
             break;
         case 32:
-            f.i_format = par.sig ? (par.le ? VLC_CODEC_S32L : VLC_CODEC_S32B)
+            fmt->i_format = par.sig
+                                 ? (par.le ? VLC_CODEC_S32L : VLC_CODEC_S32B)
                                  : (par.le ? VLC_CODEC_U32L : VLC_CODEC_U32B);
             break;
         default:
@@ -121,7 +119,7 @@ static int Open (vlc_object_t *obj)
             goto error;
     }
 
-    f.i_rate = par.rate;
+    fmt->i_rate = par.rate;
 
     /* Channel map */
     unsigned chans;
@@ -147,10 +145,9 @@ static int Open (vlc_object_t *obj)
             goto error;
     }
 
-    f.i_original_channels = f.i_physical_channels = chans;
-    aout_FormatPrepare (&f);
+    fmt->i_original_channels = fmt->i_physical_channels = chans;
+    aout_FormatPrepare (fmt);
 
-    aout->format = f;
     aout->sys = sys;
     aout->play = Play;
     aout->pause = Pause;
@@ -170,7 +167,7 @@ static int Open (vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
-    Close (obj);
+    sio_close (sys->hdl);
     return VLC_EGENERIC;
 }
 
@@ -180,7 +177,6 @@ static void Close (vlc_object_t *obj)
     aout_sys_t *sys = aout->sys;
 
     sio_close (sys->hdl);
-    free (sys);
 }
 
 static void Play (audio_output_t *aout, block_t *block,
@@ -250,3 +246,26 @@ static int MuteSet (audio_output_t *aout, bool mute)
     sys->mute = mute;
     return 0;
 }
+
+static int Open (vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = malloc (sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+
+    aout->sys = sys;
+    aout->start = Start;
+    aout->stop = Stop;
+    /* FIXME: set volume/mute here */
+    return VLC_SUCCESS;
+}
+
+static int Close (vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = aout->sys;
+
+    free (sys);
+}
+
