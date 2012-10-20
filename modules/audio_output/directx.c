@@ -108,7 +108,7 @@ static int  MuteSet    ( audio_output_t *, bool );
 static void Probe             ( audio_output_t * );
 static int  InitDirectSound   ( audio_output_t * );
 static int  CreateDSBuffer    ( audio_output_t *, int, int, int, int, int, bool );
-static int  CreateDSBufferPCM ( audio_output_t *, vlc_fourcc_t*, int, int, int, bool );
+static int  CreateDSBufferPCM ( audio_output_t *, vlc_fourcc_t*, int, int, bool );
 static void DestroyDSBuffer   ( audio_output_t * );
 static void* DirectSoundThread( void * );
 static int  FillBuffer        ( audio_output_t *, int, block_t * );
@@ -245,45 +245,20 @@ static int OpenAudio( vlc_object_t *p_this )
     else
     {
         if( val.i_int == AOUT_VAR_5_1 )
-        {
-            p_aout->format.i_physical_channels
-                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-                   | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
-                   | AOUT_CHAN_LFE;
-        }
+            p_aout->format.i_physical_channels = AOUT_CHANS_5_0;
         else if( val.i_int == AOUT_VAR_7_1 )
-        {
-                    p_aout->format.i_physical_channels
-                        = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-                           | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
-                           | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT
-                           | AOUT_CHAN_LFE;
-        }
+            p_aout->format.i_physical_channels = AOUT_CHANS_7_1;
         else if( val.i_int == AOUT_VAR_3F2R )
-        {
-            p_aout->format.i_physical_channels
-                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-                   | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-        }
+            p_aout->format.i_physical_channels = AOUT_CHANS_5_0;
         else if( val.i_int == AOUT_VAR_2F2R )
-        {
-            p_aout->format.i_physical_channels
-                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-                   | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-        }
+            p_aout->format.i_physical_channels = AOUT_CHANS_4_0;
         else if( val.i_int == AOUT_VAR_MONO )
-        {
             p_aout->format.i_physical_channels = AOUT_CHAN_CENTER;
-        }
         else
-        {
-            p_aout->format.i_physical_channels
-                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-        }
+            p_aout->format.i_physical_channels = AOUT_CHANS_2_0;
 
         if( CreateDSBufferPCM( p_aout, &p_aout->format.i_format,
                                p_aout->format.i_physical_channels,
-                               aout_FormatNbChannels( &p_aout->format ),
                                p_aout->format.i_rate, false )
             != VLC_SUCCESS )
         {
@@ -351,7 +326,6 @@ static void Probe( audio_output_t * p_aout )
 {
     vlc_value_t val, text;
     vlc_fourcc_t i_format;
-    unsigned int i_physical_channels;
     DWORD ui_speaker_config;
     bool is_default_output_set = false;
 
@@ -360,14 +334,10 @@ static void Probe( audio_output_t * p_aout )
     var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
 
     /* Test for 5.1 support */
-    i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
-                          AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT |
-                          AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE;
-    if( p_aout->format.i_physical_channels == i_physical_channels )
+    if( p_aout->format.i_physical_channels == AOUT_CHANS_5_1 )
     {
-        if( CreateDSBufferPCM( p_aout, &i_format, i_physical_channels, 6,
-                               p_aout->format.i_rate, true )
-            == VLC_SUCCESS )
+        if( CreateDSBufferPCM( p_aout, &i_format, AOUT_CHANS_5_1,
+                               p_aout->format.i_rate, true ) == VLC_SUCCESS )
         {
             val.i_int = AOUT_VAR_5_1;
             text.psz_string = (char*) "5.1";
@@ -380,15 +350,10 @@ static void Probe( audio_output_t * p_aout )
     }
 
     /* Test for 7.1 support */
-    i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
-                             AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT |
-                             AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT |
-                             AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE;
-    if( p_aout->format.i_physical_channels == i_physical_channels )
+    if( p_aout->format.i_physical_channels == AOUT_CHANS_7_1 )
     {
-        if( CreateDSBufferPCM( p_aout, &i_format, i_physical_channels, 8,
-                                  p_aout->format.i_rate, true )
-            == VLC_SUCCESS )
+        if( CreateDSBufferPCM( p_aout, &i_format, AOUT_CHANS_7_1,
+                               p_aout->format.i_rate, true ) == VLC_SUCCESS )
         {
             val.i_int = AOUT_VAR_7_1;
             text.psz_string = (char*) "7.1";
@@ -401,14 +366,10 @@ static void Probe( audio_output_t * p_aout )
     }
 
     /* Test for 3 Front 2 Rear support */
-    i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
-                          AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT |
-                          AOUT_CHAN_REARRIGHT;
-    if( p_aout->format.i_physical_channels == i_physical_channels )
+    if( p_aout->format.i_physical_channels == AOUT_CHANS_5_0 )
     {
-        if( CreateDSBufferPCM( p_aout, &i_format, i_physical_channels, 5,
-                               p_aout->format.i_rate, true )
-            == VLC_SUCCESS )
+        if( CreateDSBufferPCM( p_aout, &i_format, AOUT_CHANS_5_0,
+                               p_aout->format.i_rate, true ) == VLC_SUCCESS )
         {
             val.i_int = AOUT_VAR_3F2R;
             text.psz_string = _("3 Front 2 Rear");
@@ -424,14 +385,11 @@ static void Probe( audio_output_t * p_aout )
     }
 
     /* Test for 2 Front 2 Rear support */
-    i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
-                          AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-    if( ( p_aout->format.i_physical_channels & i_physical_channels )
-        == i_physical_channels )
+    if( ( p_aout->format.i_physical_channels & AOUT_CHANS_4_0 )
+                                                            == AOUT_CHANS_4_0 )
     {
-        if( CreateDSBufferPCM( p_aout, &i_format, i_physical_channels, 4,
-                               p_aout->format.i_rate, true )
-            == VLC_SUCCESS )
+        if( CreateDSBufferPCM( p_aout, &i_format, AOUT_CHANS_4_0,
+                               p_aout->format.i_rate, true ) == VLC_SUCCESS )
         {
             val.i_int = AOUT_VAR_2F2R;
             text.psz_string = _("2 Front 2 Rear");
@@ -447,10 +405,8 @@ static void Probe( audio_output_t * p_aout )
     }
 
     /* Test for stereo support */
-    i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-    if( CreateDSBufferPCM( p_aout, &i_format, i_physical_channels, 2,
-                           p_aout->format.i_rate, true )
-        == VLC_SUCCESS )
+    if( CreateDSBufferPCM( p_aout, &i_format, AOUT_CHANS_2_0,
+                           p_aout->format.i_rate, true ) == VLC_SUCCESS )
     {
         val.i_int = AOUT_VAR_STEREO;
         text.psz_string = _("Stereo");
@@ -465,10 +421,8 @@ static void Probe( audio_output_t * p_aout )
     }
 
     /* Test for mono support */
-    i_physical_channels = AOUT_CHAN_CENTER;
-    if( CreateDSBufferPCM( p_aout, &i_format, i_physical_channels, 1,
-                           p_aout->format.i_rate, true )
-        == VLC_SUCCESS )
+    if( CreateDSBufferPCM( p_aout, &i_format, AOUT_CHAN_CENTER,
+                           p_aout->format.i_rate, true ) == VLC_SUCCESS )
     {
         val.i_int = AOUT_VAR_MONO;
         text.psz_string = _("Mono");
@@ -940,9 +894,10 @@ static int CreateDSBuffer( audio_output_t *p_aout, int i_format,
  * the hardware, otherwise we create a WAVE_FORMAT_PCM buffer.
  ****************************************************************************/
 static int CreateDSBufferPCM( audio_output_t *p_aout, vlc_fourcc_t *i_format,
-                              int i_channels, int i_nb_channels, int i_rate,
-                              bool b_probe )
+                              int i_channels, int i_rate, bool b_probe )
 {
+    unsigned i_nb_channels = popcount( i_channels );
+
     /* Float32 audio samples are not supported for 5.1 output on the emu101k */
     if( !var_GetBool( p_aout, "directx-audio-float32" ) ||
         i_nb_channels > 2 ||
