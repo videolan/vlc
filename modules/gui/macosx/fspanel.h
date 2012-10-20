@@ -22,6 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+@class VLCWindow;
 
 @interface VLCFSPanel : NSWindow
 {
@@ -36,6 +37,8 @@
     BOOL b_displayed;
     BOOL b_voutWasUpdated;
     int i_device;
+
+    VLCWindow *o_vout_window;
 }
 - (id)initWithContentRect: (NSRect)contentRect
                 styleMask: (NSUInteger)aStyle
@@ -70,7 +73,7 @@
 - (void)mouseDown: (NSEvent *)theEvent;
 - (void)mouseDragged: (NSEvent *)theEvent;
 
-- (void)setVoutWasUpdated: (int)i_screen;
+- (void)setVoutWasUpdated: (VLCWindow *)o_window;
 @end
 
 @interface VLCFSPanelView : NSView

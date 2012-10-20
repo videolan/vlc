@@ -108,6 +108,10 @@
         [hideAgainTimer invalidate];
         [hideAgainTimer release];
     }
+
+    if (o_vout_window)
+        [o_vout_window release];
+
     [self setFadeTimer:nil];
     [super dealloc];
 }
@@ -236,12 +240,8 @@
 - (void)mouseExited:(NSEvent *)theEvent
 {
     /* give up our focus, so the vout may show us again without letting the user clicking it */
-    vout_thread_t *p_vout = getVout();
-    if (p_vout) {
-        if (var_GetBool(p_vout, "fullscreen"))
-            [[[[VLCMainWindow sharedInstance] videoView] window] makeKeyWindow];
-        vlc_object_release(p_vout);
-    }
+    if (o_vout_window && var_GetBool(pl_Get(VLCIntf), "fullscreen"))
+        [o_vout_window makeKeyWindow];
 }
 
 - (void)hideMouse
@@ -351,9 +351,13 @@
     [self setFrameOrigin:point];
 }
 
-- (void)setVoutWasUpdated: (int)i_newdevice;
+- (void)setVoutWasUpdated: (VLCWindow *)o_window
 {
     b_voutWasUpdated = YES;
+    if (o_vout_window)
+        [o_vout_window release];
+    o_vout_window = [o_window retain];
+    int i_newdevice = (int)[[o_vout_window screen] displayID];
     if(i_newdevice != i_device) {
         i_device = i_newdevice;
         [self center];

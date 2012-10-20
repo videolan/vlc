@@ -958,7 +958,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     // But this creates some problems when leaving fs over remote intfs, so activate app here.
     [NSApp activateIgnoringOtherApps:YES];
 
-    [o_fspanel setVoutWasUpdated: (int)[[self screen] displayID]];
+    [o_fspanel setVoutWasUpdated: self];
     [o_fspanel setActive: nil];
 }
 

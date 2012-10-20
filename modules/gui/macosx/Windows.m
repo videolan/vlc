@@ -656,7 +656,7 @@
     [o_fullscreen_window setAcceptsMouseMovedEvents: YES];
 
     /* tell the fspanel to move itself to front next time it's triggered */
-    [[[VLCMainWindow sharedInstance] fsPanel] setVoutWasUpdated: (int)[[o_fullscreen_window screen] displayID]];
+    [[[VLCMainWindow sharedInstance] fsPanel] setVoutWasUpdated: o_fullscreen_window];
     [[[VLCMainWindow sharedInstance] fsPanel] setActive: nil];
 
     if ([self isVisible])
