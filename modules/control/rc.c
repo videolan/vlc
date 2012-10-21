@@ -1697,13 +1697,6 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
     if( !p_input )
         return VLC_ENOOBJ;
 
-    int state = var_GetInteger( p_input, "state" );
-    if( state == PAUSE_S )
-    {
-        msg_rc( "%s", _("Type 'menu select' or 'pause' to continue.") );
-        return VLC_EGENERIC;
-    }
-
     vlc_object_t * p_aout = (vlc_object_t *)input_GetAout( p_input );
     vlc_object_release( p_input );
     if ( p_aout == NULL )
