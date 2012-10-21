@@ -1,7 +1,7 @@
 /*****************************************************************************
  * kva.c: KVA video output plugin for vlc
  *****************************************************************************
- * Copyright (C) 2010, 2011 the VideoLAN team
+ * Copyright (C) 2010, 2011, 2012 the VideoLAN team
  *
  * Authors: KO Myung-Hun <komh@chollian.net>
  *
@@ -104,6 +104,7 @@ struct vout_display_sys_t
     picture_resource_t resource;
     unsigned           button_pressed;
     bool               is_mouse_hidden;
+    bool               is_on_top;
 };
 
 struct picture_sys_t
@@ -234,7 +235,7 @@ static void PMThread( void *arg )
 
     WinSetWindowPtr( sys->client, 0, vd );
 
-    if( sys->b_fixt23 )
+    if( !sys->parent_window )
     {
         WinSetWindowPtr( sys->frame, 0, vd );
         sys->p_old_frame = WinSubclassWindow( sys->frame, MyFrameWndProc );
@@ -300,8 +301,14 @@ static void PMThread( void *arg )
     sys->i_result = VLC_SUCCESS;
     DosPostEventSem( sys->ack_event );
 
+    if( !sys->parent_window )
+        WinSetVisibleRegionNotify( sys->frame, TRUE );
+
     while( WinGetMsg( sys->hab, &qm, NULLHANDLE, 0, 0 ))
         WinDispatchMsg( sys->hab, &qm );
+
+    if( !sys->parent_window )
+        WinSetVisibleRegionNotify( sys->frame, FALSE );
 
     kvaEnableScreenSaver();
 
@@ -313,7 +320,7 @@ exit_open_display :
     kvaDone();
 
 exit_kva_init :
-    if( sys->b_fixt23 )
+    if( !sys->parent_window )
         WinSubclassWindow( sys->frame, sys->p_old_frame );
 
     WinDestroyWindow( sys->frame );
@@ -460,6 +467,24 @@ static int Control( vout_display_t *vd, int query, va_list args )
         return VLC_SUCCESS;
     }
 
+    case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
+    {
+        const unsigned state = va_arg( args, unsigned );
+        const bool is_on_top = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
+
+        if( sys->parent_window )
+        {
+            if( vout_window_SetState( sys->parent_window, state ))
+                return VLC_EGENERIC;
+        }
+        else if( is_on_top )
+            WinSetWindowPos( sys->frame, HWND_TOP, 0, 0, 0, 0, SWP_ZORDER );
+
+        sys->is_on_top = is_on_top;
+
+        return VLC_SUCCESS;
+    }
+
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     {
         const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
@@ -517,7 +542,6 @@ static int Control( vout_display_t *vd, int query, va_list args )
     }
 
     case VOUT_DISPLAY_RESET_PICTURES:
-    case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
     case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_GET_OPENGL:
@@ -870,10 +894,14 @@ static MRESULT EXPENTRY MyFrameWndProc( HWND hwnd, ULONG msg, MPARAM mp1,
     {
         case WM_QUERYTRACKINFO :
         {
+            MRESULT mr;
+
+            mr = sys->p_old_frame( hwnd, msg, mp1, mp2 );
+            if( !sys->b_fixt23 )
+                return mr;
+
             PTRACKINFO pti = ( PTRACKINFO )mp2;
             RECTL      rcl;
-
-            sys->p_old_frame( hwnd, msg, mp1, mp2 );
 
             pti->rclBoundary.xLeft   = 0;
             pti->rclBoundary.yBottom = 0;
@@ -902,11 +930,15 @@ static MRESULT EXPENTRY MyFrameWndProc( HWND hwnd, ULONG msg, MPARAM mp1,
 
         case WM_ADJUSTWINDOWPOS :
         {
+            if( !sys->b_fixt23 )
+                break;
+
             PSWP  pswp = ( PSWP )mp1;
-            RECTL rcl;
 
             if( pswp->fl & SWP_SIZE )
             {
+                RECTL rcl;
+
                 rcl.xLeft   = pswp->x;
                 rcl.yBottom = pswp->y;
                 rcl.xRight  = rcl.xLeft + pswp->cx;
@@ -946,6 +978,12 @@ static MRESULT EXPENTRY MyFrameWndProc( HWND hwnd, ULONG msg, MPARAM mp1,
 
             break;
         }
+
+        //case WM_VRNDISABLED :
+        case WM_VRNENABLED :
+            if( !vd->cfg->is_fullscreen && sys->is_on_top )
+                WinSetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_ZORDER );
+            break;
     }
 
     return sys->p_old_frame( hwnd, msg, mp1, mp2 );
