@@ -789,11 +789,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     p_sys->i_cc_dts = p_pic->i_dts;
     p_sys->i_cc_flags = p_pic->i_flags;
 
-    /* Swap cc buffer */
-    cc_data_t cc_tmp = p_sys->cc;
     p_sys->cc = p_sys->cc_next;
-    p_sys->cc_next = cc_tmp;
-
     cc_Flush( &p_sys->cc_next );
 
     return p_pic;
