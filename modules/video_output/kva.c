@@ -437,7 +437,8 @@ static int Control( vout_display_t *vd, int query, va_list args )
         POINTL ptl;
 
         WinQueryPointerPos( HWND_DESKTOP, &ptl );
-        if( WinWindowFromPoint( HWND_DESKTOP, &ptl, TRUE ) == sys->client )
+        if( !sys->is_mouse_hidden &&
+            WinWindowFromPoint( HWND_DESKTOP, &ptl, TRUE ) == sys->client )
         {
             WinShowPointer( HWND_DESKTOP, FALSE );
             sys->is_mouse_hidden = true;
