@@ -17,7 +17,7 @@ DEPS_gcrypt = gpg-error
 
 GCRYPT_CONF = \
 	--enable-ciphers=aes,des,rfc2268,arcfour \
-	--enable-digests=sha1,md5,rmd160,sha512 \
+	--enable-digests=sha1,md5,rmd160,sha256,sha512 \
 	--enable-pubkey-ciphers=dsa,rsa,ecc
 ifdef HAVE_WIN64
 GCRYPT_CONF += --disable-asm
