@@ -793,7 +793,8 @@ static void SelectClockSource (vlc_object_t *obj)
 
 #define xstrdup(str) (strdup(str) ?: (abort(), NULL))
 
-size_t EnumClockSource (vlc_object_t *obj, char ***vp, char ***np)
+size_t EnumClockSource (vlc_object_t *obj, const char *var,
+                        char ***vp, char ***np)
 {
     const size_t max = 6;
     char **values = xmalloc (sizeof (*values) * max);
@@ -836,7 +837,7 @@ size_t EnumClockSource (vlc_object_t *obj, char ***vp, char ***np)
 
     *vp = values;
     *np = names;
-    (void) obj;
+    (void) obj; (void) var;
     return n;
 }
 
