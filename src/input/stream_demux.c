@@ -337,7 +337,7 @@ static void* DStreamThread( void *obj )
                 newpos = 0.;
             if( demux_Control( p_demux, DEMUX_GET_LENGTH, &newlen ) )
                 newlen = 0;
-            if( demux_Control( p_demux, DEMUX_GET_POSITION, &newtime ) )
+            if( demux_Control( p_demux, DEMUX_GET_TIME, &newtime ) )
                 newtime = 0;
 
             vlc_mutex_lock( &p_sys->lock );
