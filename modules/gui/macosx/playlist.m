@@ -792,7 +792,10 @@
         if (! p_item || !p_item->p_input)
             continue;
 
-        o_mrl = [[NSMutableString alloc] initWithFormat: @"%s", decode_URI(input_item_GetURI(p_item->p_input))];
+        char * psz_url = decode_URI(input_item_GetURI(p_item->p_input));
+        o_mrl = [[NSMutableString alloc] initWithString: [NSString stringWithUTF8String: psz_url ? psz_url : ""]];
+        if (psz_url != NULL)
+            free( psz_url );
 
         /* perform some checks whether it is a file and if it is local at all... */
         if ([o_mrl length] > 0) {
