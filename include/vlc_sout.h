@@ -41,7 +41,7 @@ extern "C" {
 #include <vlc_es.h>
 
 /** Stream output instance (FIXME: should be private to src/ to avoid
- * invalid unsycnrhonized access) */
+ * invalid unsynchronized access) */
 struct sout_instance_t
 {
     VLC_COMMON_MEMBERS
