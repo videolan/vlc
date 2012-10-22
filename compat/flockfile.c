@@ -29,6 +29,10 @@
 #  warning Broken SDK: VLC logs will be garbage.
 #  define _lock_file(s) ((void)(s))
 #  define _unlock_file(s) ((void)(s))
+#  undef _getc_nolock
+#  define _getc_nolock(s) getc(s)
+#  undef _putc_nolock
+#  define _putc_nolock(s,c) putc(s,c)
 # endif
 
 void flockfile (FILE *stream)
@@ -52,21 +56,21 @@ int getc_unlocked (FILE *stream)
     return _getc_nolock (stream);
 }
 
-int getchar_unlocked (void)
-{
-    return _getchar_nolock ();
-}
-
 int putc_unlocked (int c, FILE *stream)
 {
     return _putc_nolock (c, stream);
 }
 
-int putchar_unlocked (int c)
-{
-    return _putchar_nolock (c);
-}
-
 #else
 # error flockfile not implemented on your platform!
 #endif
+
+int getchar_unlocked (void)
+{
+    return getc_unlocked (stdin);
+}
+
+int putchar_unlocked (int c)
+{
+    return putc_unlocked (c, stdout);
+}
