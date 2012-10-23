@@ -181,7 +181,10 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
 
     if (eglChooseConfig (dpy, conf_attr, cfgv, 1, &cfgc) != EGL_TRUE
      || cfgc == 0)
+    {
+        msg_Err (obj, "cannot choose EGL configuration");
         goto error;
+    }
 
     /* Create a drawing surface */
     EGLNativeWindowType win = vlc_eglGetWindow(gl->surface);
