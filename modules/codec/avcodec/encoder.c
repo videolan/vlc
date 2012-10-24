@@ -1023,84 +1023,64 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     block_t *p_block, *p_chain = NULL;
+    AVFrame *frame;
+    AVPacket packet;
+    int got_packet,i_out;
 
     /*FIXME: change to use  avcodec_encode_audio2 to be able to flush*/
-    if( unlikely( !p_aout_buf ) ) return NULL;
-
-    uint8_t *p_buffer = p_aout_buf->p_buffer;
-    int i_samples = p_aout_buf->i_nb_samples;
-    int i_samples_delay = p_sys->i_samples_delay;
-
-    p_sys->i_pts = p_aout_buf->i_pts -
-                (mtime_t)1000000 * (mtime_t)p_sys->i_samples_delay /
-                (mtime_t)p_enc->fmt_in.audio.i_rate;
-
-    p_sys->i_samples_delay += i_samples;
-
-    while( p_sys->i_samples_delay >= p_sys->i_frame_size )
+    if( unlikely( !p_aout_buf ) )
     {
-        void *p_samples;
-        int i_out;
+        msg_Dbg(p_enc,"Flushing..");
+        do {
         p_block = block_New( p_enc, p_sys->i_buffer_out );
+        av_init_packet( &packet );
+        packet.data = p_block->p_buffer;
+        packet.size = p_block->i_buffer;
 
-        if( i_samples_delay )
-        {
-            /* Take care of the left-over from last time */
-            int i_delay_size = i_samples_delay;
-            int i_size = (p_sys->i_frame_size - i_delay_size) *
-                         p_sys->i_sample_bytes;
-
-            memcpy( p_sys->p_buffer + i_delay_size * p_sys->i_sample_bytes,
-                    p_buffer, i_size );
-            p_buffer -= i_delay_size * p_sys->i_sample_bytes;
-            i_samples += i_samples_delay;
-            i_samples_delay = 0;
-
-            p_samples = p_sys->p_buffer;
-        }
-        else
-        {
-            p_samples = p_buffer;
-        }
-
-        i_out = avcodec_encode_audio( p_sys->p_context, p_block->p_buffer,
-                                      p_block->i_buffer, p_samples );
-
-#if 0
-        msg_Warn( p_enc, "avcodec_encode_audio: %d", i_out );
-#endif
-        p_buffer += p_sys->i_frame_size * p_sys->i_sample_bytes;
-        p_sys->i_samples_delay -= p_sys->i_frame_size;
-        i_samples -= p_sys->i_frame_size;
-
-        if( i_out <= 0 )
-        {
-            block_Release( p_block );
-            continue;
-        }
-
-        p_block->i_buffer = i_out;
-
-        p_block->i_length = (mtime_t)1000000 *
-            (mtime_t)p_sys->i_frame_size /
-            (mtime_t)p_sys->p_context->sample_rate;
-
-        p_block->i_dts = p_block->i_pts = p_sys->i_pts;
-
-        /* Update pts */
-        p_sys->i_pts += p_block->i_length;
-        block_ChainAppend( &p_chain, p_block );
+        i_out = avcodec_encode_audio2( p_sys->p_context, &packet, NULL, &got_packet );
+        if( !i_out && got_packet )
+            block_ChainAppend( &p_chain, p_block );
+        } while( got_packet && !i_out );
+        return p_chain;
     }
 
-    /* Backup the remaining raw samples */
-    if( i_samples )
+    frame = avcodec_alloc_frame();
+
+    frame->nb_samples = p_aout_buf->i_nb_samples;
+    avcodec_fill_audio_frame( frame, p_enc->fmt_in.audio.i_channels,
+                              p_sys->p_context->sample_fmt, 
+                              p_aout_buf->p_buffer, p_aout_buf->i_buffer,
+                              0);
+
+
+    frame->pts = p_aout_buf->i_pts;
+
+    p_block = block_New( p_enc, p_sys->i_buffer_out );
+    av_init_packet( &packet );
+    packet.data = p_block->p_buffer;
+    packet.size = p_block->i_buffer;
+
+    i_out = avcodec_encode_audio2( p_sys->p_context, &packet, frame, &got_packet );
+    p_block->i_buffer = packet.size;
+    
+    avcodec_free_frame( &frame );
+    if( unlikely( !got_packet || i_out ) )
     {
-        memcpy( &p_sys->p_buffer[i_samples_delay * p_sys->i_sample_bytes],
-                p_buffer,
-                i_samples * p_sys->i_sample_bytes );
+        if( i_out )
+           msg_Err( p_enc,"Encoding problem..");
+        block_Release( p_block );
+        return NULL;
     }
 
-    return p_chain;
+    p_block->i_buffer = packet.size;
+
+    p_block->i_length = (mtime_t)1000000 *
+        (mtime_t)p_sys->i_frame_size /
+        (mtime_t)p_sys->p_context->sample_rate;
+
+    p_block->i_dts = p_block->i_pts = packet.pts;
+
+    return p_block;
 }
 
 /*****************************************************************************
