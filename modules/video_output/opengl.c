@@ -68,8 +68,6 @@
 #   define PFNGLUSEPROGRAMPROC               typeof(glUseProgram)*
 #   define PFNGLDELETEPROGRAMPROC            typeof(glDeleteProgram)*
 #   define PFNGLATTACHSHADERPROC             typeof(glAttachShader)*
-#   define PFNGLACTIVETEXTUREPROC            typeof(glActiveTexture)*
-#   define PFNGLCLIENTACTIVETEXTUREPROC      typeof(glClientActiveTexture)*
 #if USE_OPENGL_ES
 #   define GL_UNPACK_ROW_LENGTH 0
 #   import <CoreFoundation/CoreFoundation.h>
@@ -175,8 +173,6 @@ struct vout_display_opengl_t {
 
 
     /* multitexture */
-    PFNGLACTIVETEXTUREPROC  ActiveTexture;
-    PFNGLCLIENTACTIVETEXTUREPROC  ClientActiveTexture;
     bool use_multitexture;
 
     /* Non-power-of-2 texture size support */
@@ -326,8 +322,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->LinkProgram   = (PFNGLLINKPROGRAMPROC)vlc_gl_GetProcAddress(vgl->gl, "glLinkProgram");
     vgl->UseProgram    = (PFNGLUSEPROGRAMPROC)vlc_gl_GetProcAddress(vgl->gl, "glUseProgram");
     vgl->DeleteProgram = (PFNGLDELETEPROGRAMPROC)vlc_gl_GetProcAddress(vgl->gl, "glDeleteProgram");
-    vgl->ActiveTexture = (PFNGLACTIVETEXTUREPROC)vlc_gl_GetProcAddress(vgl->gl, "glActiveTexture");
-    vgl->ClientActiveTexture = (PFNGLCLIENTACTIVETEXTUREPROC)vlc_gl_GetProcAddress(vgl->gl, "glClientActiveTexture");
 
     vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
     vgl->use_multitexture = vgl->chroma->plane_count > 1;
@@ -599,8 +593,8 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
         for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
             if (vgl->use_multitexture)
             {
-                vgl->ActiveTexture(GL_TEXTURE0 + j);
-                vgl->ClientActiveTexture(GL_TEXTURE0 + j);
+                glActiveTexture(GL_TEXTURE0 + j);
+                glClientActiveTexture(GL_TEXTURE0 + j);
             }
             glBindTexture(vgl->tex_target, vgl->texture[i][j]);
 
@@ -658,8 +652,8 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
         if (vgl->use_multitexture)
         {
-            vgl->ActiveTexture(GL_TEXTURE0 + j);
-            vgl->ClientActiveTexture(GL_TEXTURE0 + j);
+            glActiveTexture(GL_TEXTURE0 + j);
+            glClientActiveTexture(GL_TEXTURE0 + j);
         }
         glBindTexture(vgl->tex_target, vgl->texture[0][j]);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, picture->p[j].i_pitch / picture->p[j].i_pixel_pitch);
@@ -687,8 +681,8 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
 
         if (vgl->use_multitexture)
         {
-            vgl->ActiveTexture(GL_TEXTURE0 + 0);
-            vgl->ClientActiveTexture(GL_TEXTURE0 + 0);
+            glActiveTexture(GL_TEXTURE0 + 0);
+            glClientActiveTexture(GL_TEXTURE0 + 0);
         }
         int i = 0;
         for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next, i++) {
@@ -778,8 +772,8 @@ static void draw_without_shaders( vout_display_opengl_t *vgl, float *left, float
     };
 
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-       vgl->ActiveTexture( GL_TEXTURE0 + j );
-       vgl->ClientActiveTexture( GL_TEXTURE0 + j );
+       glActiveTexture( GL_TEXTURE0 + j );
+       glClientActiveTexture( GL_TEXTURE0 + j );
 
        glEnableClientState(GL_VERTEX_ARRAY);
        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -789,22 +783,22 @@ static void draw_without_shaders( vout_display_opengl_t *vgl, float *left, float
        glBindTexture(vgl->tex_target, vgl->texture[0][j]);
        glTexCoordPointer(2, GL_FLOAT, 0, textureCoord);
     }
-    vgl->ActiveTexture( GL_TEXTURE0 );
-    vgl->ClientActiveTexture( GL_TEXTURE0 );
+    glActiveTexture( GL_TEXTURE0 );
+    glClientActiveTexture( GL_TEXTURE0 );
 
     glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-       vgl->ActiveTexture( GL_TEXTURE0 + j );
-       vgl->ClientActiveTexture( GL_TEXTURE0 + j );
+       glActiveTexture( GL_TEXTURE0 + j );
+       glClientActiveTexture( GL_TEXTURE0 + j );
        glDisable(vgl->tex_target);
        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
        glDisableClientState(GL_VERTEX_ARRAY);
     }
-    vgl->ActiveTexture( GL_TEXTURE0 );
-    vgl->ClientActiveTexture( GL_TEXTURE0 );
+    glActiveTexture( GL_TEXTURE0 );
+    glClientActiveTexture( GL_TEXTURE0 );
 }
 
 static void draw_with_shaders( vout_display_opengl_t *vgl, float *left, float *top, float *right, float *bottom )
@@ -826,8 +820,8 @@ static void draw_with_shaders( vout_display_opengl_t *vgl, float *left, float *t
             right[j], top[j],
             right[j], bottom[j],
         };
-        vgl->ActiveTexture( GL_TEXTURE0+j);
-        vgl->ClientActiveTexture( GL_TEXTURE0+j);
+        glActiveTexture( GL_TEXTURE0+j);
+        glClientActiveTexture( GL_TEXTURE0+j);
         glEnable(vgl->tex_target);
         glBindTexture(vgl->tex_target, vgl->texture[0][j]);
         if(asprintf( &attribute, "MultiTexCoord%1d", j ) == -1 )
@@ -838,8 +832,8 @@ static void draw_with_shaders( vout_display_opengl_t *vgl, float *left, float *t
         free( attribute );
         attribute = NULL;
     }
-    vgl->ActiveTexture(GL_TEXTURE0 + 0);
-    vgl->ClientActiveTexture(GL_TEXTURE0 + 0);
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glClientActiveTexture(GL_TEXTURE0 + 0);
     vgl->EnableVertexAttribArray( vgl->GetAttribLocation( vgl->program[0], "vertex_position"));
     vgl->VertexAttribPointer( vgl->GetAttribLocation( vgl->program[0], "vertex_position"), 2, GL_FLOAT, 0, 0, vertexCoord);
 
@@ -897,8 +891,8 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         draw_without_shaders( vgl, left, top, right, bottom );
     }
 
-    vgl->ActiveTexture(GL_TEXTURE0 + 0);
-    vgl->ClientActiveTexture(GL_TEXTURE0 + 0);
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glClientActiveTexture(GL_TEXTURE0 + 0);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
