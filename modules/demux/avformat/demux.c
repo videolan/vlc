@@ -59,19 +59,13 @@
 /* Version checking */
 #if defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_AVFORMAT_H)
 
-#if (LIBAVCODEC_VERSION_INT >= ((51<<16)+(50<<8)+0) )
-#   define HAVE_AVUTIL_CODEC_ATTACHMENT 1
-#endif
+# define HAVE_AVUTIL_CODEC_ATTACHMENT 1
 
 /*****************************************************************************
  * demux_sys_t: demux descriptor
  *****************************************************************************/
 struct demux_sys_t
 {
-#if LIBAVFORMAT_VERSION_INT < ((53<<16)+(2<<8)+0)
-    ByteIOContext   io;
-#endif
-
     int             io_buffer_size;
     uint8_t        *io_buffer;
 
@@ -224,21 +218,11 @@ int OpenDemux( vlc_object_t *p_this )
     p_sys->io_buffer_size = 32768;  /* FIXME */
     p_sys->io_buffer = malloc( p_sys->io_buffer_size );
 
-#if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(2<<8)+0)
     p_sys->ic = avformat_alloc_context();
     p_sys->ic->pb = avio_alloc_context( p_sys->io_buffer,
         p_sys->io_buffer_size, 0, p_demux, IORead, NULL, IOSeek );
     p_sys->ic->pb->seekable = b_can_seek ? AVIO_SEEKABLE_NORMAL : 0;
     error = avformat_open_input(&p_sys->ic, psz_url, p_sys->fmt, NULL);
-#else
-    init_put_byte( &p_sys->io, p_sys->io_buffer, p_sys->io_buffer_size, 0,
-        p_demux, IORead, NULL, IOSeek );
-    p_sys->io.is_streamed = !b_can_seek;
-# if defined(AVIO_SEEKABLE_NORMAL)
-    p_sys->io.seekable = !!b_can_seek;
-# endif
-    error = av_open_input_stream(&p_sys->ic, &p_sys->io, psz_url, p_sys->fmt, NULL);
-#endif
 
     free( psz_url );
     if( error < 0 )
@@ -561,9 +545,7 @@ void CloseDemux( vlc_object_t *p_this )
 
     if( p_sys->ic )
     {
-#if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(2<<8)+0)
         av_free( p_sys->ic->pb );
-#endif
 #if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(26<<8)+0)
         avformat_close_input( &p_sys->ic );
 #else

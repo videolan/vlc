@@ -2360,7 +2360,7 @@ AC_ARG_ENABLE(avformat,
 ])
 if test "${enable_avformat}" != "no"
 then
-  PKG_CHECK_MODULES(AVFORMAT,[libavformat > 52.30.0 libavcodec libavutil],
+  PKG_CHECK_MODULES(AVFORMAT,[libavformat >= 53.21.0 libavcodec libavutil],
     [
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${AVFORMAT_CFLAGS}"
