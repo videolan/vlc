@@ -340,6 +340,16 @@ int transcode_audio_process( sout_stream_t *p_stream,
     block_t *p_block, *p_audio_buf;
     *out = NULL;
 
+    if( unlikely( in == NULL ) )
+    {
+        block_t *p_block;
+        do {
+           p_block = id->p_encoder->pf_encode_audio(id->p_encoder, NULL );
+           block_ChainAppend( out, p_block );
+        } while( p_block );
+        return VLC_SUCCESS;
+    }
+
     while( (p_audio_buf = id->p_decoder->pf_decode_audio( id->p_decoder,
                                                           &in )) )
     {
