@@ -76,6 +76,7 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
     int n;
     int i_comment;
     int i_attach = 0;
+
     if( i_data < 8 )
         return;
 
@@ -106,16 +107,17 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
     if( !p_meta )
         return;
 
-    bool hasTitle = false;
-    bool hasAlbum = false;
-    bool hasTrackNumber = false;
-    bool hasTrackTotal = false;
-    bool hasArtist = false;
-    bool hasCopyright = false;
-    bool hasDescription = false;
-    bool hasGenre = false;
-    bool hasDate = false;
-    bool hasPublisher = false;
+    /* */
+    bool hasTitle        = false;
+    bool hasAlbum        = false;
+    bool hasTrackNumber  = false;
+    bool hasTrackTotal   = false;
+    bool hasArtist       = false;
+    bool hasCopyright    = false;
+    bool hasDescription  = false;
+    bool hasGenre        = false;
+    bool hasDate         = false;
+    bool hasPublisher    = false;
 
     for( ; i_comment > 0; i_comment-- )
     {
