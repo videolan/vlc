@@ -1063,7 +1063,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     i_out = avcodec_encode_audio2( p_sys->p_context, &packet, frame, &got_packet );
     p_block->i_buffer = packet.size;
     
-    avcodec_free_frame( &frame );
+    av_freep( &frame );
     if( unlikely( !got_packet || i_out ) )
     {
         if( i_out )
