@@ -856,31 +856,31 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     block_t *p_block = block_New( p_enc, blocksize );
 
     if( likely(p_pict) ) {
-        AVFrame frame;
-        memset( &frame, 0, sizeof( AVFrame ) );
+        AVFrame *frame;
+        frame = avcodec_alloc_frame();
         for( i_plane = 0; i_plane < p_pict->i_planes; i_plane++ )
         {
-            frame.data[i_plane] = p_pict->p[i_plane].p_pixels;
-            frame.linesize[i_plane] = p_pict->p[i_plane].i_pitch;
+            frame->data[i_plane] = p_pict->p[i_plane].p_pixels;
+            frame->linesize[i_plane] = p_pict->p[i_plane].i_pitch;
         }
 
         /* Let libavcodec select the frame type */
-        frame.pict_type = 0;
+        frame->pict_type = 0;
 
-        frame.repeat_pict = p_pict->i_nb_fields - 2;
-        frame.interlaced_frame = !p_pict->b_progressive;
-        frame.top_field_first = !!p_pict->b_top_field_first;
+        frame->repeat_pict = p_pict->i_nb_fields - 2;
+        frame->interlaced_frame = !p_pict->b_progressive;
+        frame->top_field_first = !!p_pict->b_top_field_first;
 
         /* Set the pts of the frame being encoded (segfaults with mpeg4!)*/
         if( p_enc->fmt_out.i_codec != VLC_CODEC_MP4V )
         {
-            frame.pts = p_pict->date ? p_pict->date : (int64_t)AV_NOPTS_VALUE;
+            frame->pts = p_pict->date ? p_pict->date : (int64_t)AV_NOPTS_VALUE;
 
-            if ( p_sys->b_hurry_up && frame.pts != (int64_t)AV_NOPTS_VALUE )
+            if ( p_sys->b_hurry_up && frame->pts != (int64_t)AV_NOPTS_VALUE )
             {
                 mtime_t current_date = mdate();
 
-                if ( current_date + HURRY_UP_GUARD3 > frame.pts )
+                if ( current_date + HURRY_UP_GUARD3 > frame->pts )
                 {
                     p_sys->p_context->mb_decision = FF_MB_DECISION_SIMPLE;
                     p_sys->p_context->trellis = 0;
@@ -890,11 +890,11 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
                 {
                     p_sys->p_context->mb_decision = p_sys->i_hq;
 
-                    if ( current_date + HURRY_UP_GUARD2 > frame.pts )
+                    if ( current_date + HURRY_UP_GUARD2 > frame->pts )
                     {
                         p_sys->p_context->trellis = 0;
                         p_sys->p_context->noise_reduction = p_sys->i_noise_reduction
-                            + (HURRY_UP_GUARD2 + current_date - frame.pts) / 500;
+                            + (HURRY_UP_GUARD2 + current_date - frame->pts) / 500;
                         msg_Dbg( p_enc, "hurry up mode 2" );
                     }
                     else
@@ -906,43 +906,46 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
                     }
                 }
 
-                if ( current_date + HURRY_UP_GUARD1 > frame.pts )
+                if ( current_date + HURRY_UP_GUARD1 > frame->pts )
                 {
-                    frame.pict_type = AV_PICTURE_TYPE_P;
+                    frame->pict_type = AV_PICTURE_TYPE_P;
                     /* msg_Dbg( p_enc, "hurry up mode 1 %lld", current_date + HURRY_UP_GUARD1 - frame.pts ); */
                 }
             }
         }
         else
         {
-            frame.pts = (int64_t)AV_NOPTS_VALUE;
+            frame->pts = (int64_t)AV_NOPTS_VALUE;
         }
 
-        if ( frame.pts != (int64_t)AV_NOPTS_VALUE && frame.pts != 0 )
+        if ( frame->pts != (int64_t)AV_NOPTS_VALUE && frame->pts != 0 )
         {
-            if ( p_sys->i_last_pts == frame.pts )
+            if ( p_sys->i_last_pts == frame->pts )
             {
                 msg_Warn( p_enc, "almost fed libavcodec with two frames with the "
-                         "same PTS (%"PRId64 ")", frame.pts );
+                         "same PTS (%"PRId64 ")", frame->pts );
+                avcodec_free_frame( &frame );
                 return NULL;
             }
-            else if ( p_sys->i_last_pts > frame.pts )
+            else if ( p_sys->i_last_pts > frame->pts )
             {
                 msg_Warn( p_enc, "almost fed libavcodec with a frame in the "
                          "past (current: %"PRId64 ", last: %"PRId64")",
-                         frame.pts, p_sys->i_last_pts );
+                         frame->pts, p_sys->i_last_pts );
+                avcodec_free_frame( &frame );
                 return NULL;
             }
             else
             {
-                p_sys->i_last_pts = frame.pts;
+                p_sys->i_last_pts = frame->pts;
             }
         }
 
         frame->quality = p_sys->i_quality;
 
         i_out = avcodec_encode_video( p_sys->p_context, p_block->p_buffer,
-                                     p_block->i_buffer, &frame );
+                                     p_block->i_buffer, frame );
+        avcodec_free_frame( &frame );
     }
     else
     {
