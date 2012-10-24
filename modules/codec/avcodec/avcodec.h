@@ -307,15 +307,6 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 #   define AV_CPU_FLAG_ALTIVEC     FF_MM_ALTIVEC
 #endif
 
-#if LIBAVCODEC_VERSION_MAJOR < 53
-#   define AVMediaType             CodecType
-#   define AVMEDIA_TYPE_AUDIO      CODEC_TYPE_AUDIO
-#   define AVMEDIA_TYPE_VIDEO      CODEC_TYPE_VIDEO
-#   define AVMEDIA_TYPE_SUBTITLE   CODEC_TYPE_SUBTITLE
-#   define AVMEDIA_TYPE_DATA       CODEC_TYPE_DATA
-#   define AVMEDIA_TYPE_ATTACHMENT CODEC_TYPE_ATTACHMENT
-#endif
-
 #if LIBAVCODEC_VERSION_MAJOR < 54
 #   define AV_PICTURE_TYPE_B        FF_B_TYPE
 #   define AV_PICTURE_TYPE_I        FF_I_TYPE

@@ -42,8 +42,8 @@
 #include "chroma.h"
 #include "avcommon.h"
 
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 52, 25, 0 )
-#   error You must update libavcodec to a version >= 52.25.0
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 53, 34, 0 )
+#   error You must update libavcodec to a version >= 53.34.0
 #endif
 
 /*****************************************************************************

@@ -612,7 +612,6 @@ int OpenEncoder( vlc_object_t *p_this )
     /* Misc parameters */
     p_context->bit_rate = p_enc->fmt_out.i_bitrate;
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 69, 2 )
     /* Set reasonable defaults to VP8, based on
        libvpx-720p preset from libvpx ffmpeg-patch */
     if( i_codec_id == CODEC_ID_VP8 )
@@ -660,7 +659,6 @@ int OpenEncoder( vlc_object_t *p_this )
         p_context->mb_static_threshold = 0;
 #endif
     }
-#endif
 
     if( i_codec_id == CODEC_ID_RAWVIDEO )
     {

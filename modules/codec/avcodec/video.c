@@ -293,11 +293,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
         /* No idea why ... but this fixes flickering on some TSCC streams */
         p_sys->i_codec_id != CODEC_ID_TSCC && p_sys->i_codec_id != CODEC_ID_CSCD &&
         p_sys->i_codec_id != CODEC_ID_CINEPAK &&
-#if (LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 68, 2 ) ) && (LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 52, 100, 1 ) )
-        /* avcodec native vp8 decode doesn't handle EMU_EDGE flag, and I
-           don't have idea howto implement fallback to libvpx decoder */
-        p_sys->i_codec_id != CODEC_ID_VP8 &&
-#endif
         !p_sys->p_context->debug_mv )
     {
         /* Some codecs set pix_fmt only after the 1st frame has been decoded,
@@ -957,7 +952,6 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 
     if( p_sys->p_va )
     {
-#if 1 // LIBAVCODEC_VERSION_MAJOR >= ? FIXME
         /* hwaccel_context is not present in old ffmpeg version */
         if( vlc_va_Setup( p_sys->p_va,
                           &p_context->hwaccel_context, &p_dec->fmt_out.video.i_chroma,
@@ -966,9 +960,6 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
             msg_Err( p_dec, "vlc_va_Setup failed" );
             return -1;
         }
-#else
-        assert(0);
-#endif
 
         /* */
         p_ff_pic->type = FF_BUFFER_TYPE_USER;

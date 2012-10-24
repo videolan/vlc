@@ -83,7 +83,7 @@ unsigned GetVlcDspMask( void )
 #endif
 
 #if defined ( __arm__)
-#if LIBAVUTIL_VERSION_INT >= ((51<<16)+(29<<8)+0)
+#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(51, 29, 0)
     if( !vlc_CPU_ARM_NEON() )
         mask |= AV_CPU_FLAG_NEON;
 #endif
