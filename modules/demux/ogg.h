@@ -133,9 +133,10 @@ struct demux_sys_t
 
     mtime_t i_st_pts;
 
-
     /* */
     vlc_meta_t *p_meta;
+    int                 i_seekpoints;
+    seekpoint_t         **pp_seekpoints;
 
     /* */
     int                i_attachments;

@@ -23,6 +23,7 @@
 
 #include <vlc_charset.h>
 #include <vlc_strings.h>
+#include <vlc_input.h>
 
 static input_attachment_t* ParseFlacPicture( const uint8_t *p_data, int i_data, int i_attachments, int *i_type )
 {
@@ -70,8 +71,10 @@ error:
     return p_attachment;
 }
 
-static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_data, int i_data,
-        int *i_attachments, input_attachment_t ***attachments)
+static inline void vorbis_ParseComment( vlc_meta_t **pp_meta,
+        const uint8_t *p_data, int i_data,
+        int *i_attachments, input_attachment_t ***attachments,
+        int *i_seekpoint, seekpoint_t ***ppp_seekpoint )
 {
     int n;
     int i_comment;
@@ -183,6 +186,31 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_d
                 i_attach++;
                 TAB_APPEND_CAST( (input_attachment_t**),
                     *i_attachments, *attachments, p_attachment );
+            }
+        }
+        else if( !strncasecmp(psz_comment, "chapter", strlen("chapter")) )
+        {
+            if( ppp_seekpoint == NULL )
+                continue;
+
+            int i_chapt;
+            if( strstr( psz_comment, "name") && sscanf( psz_comment, "chapter%i=", &i_chapt ) == 1 )
+            {
+                char *p = strchr( psz_comment, '=' );
+                *p++ = '\0';
+            }
+            else if( sscanf( psz_comment, "chapter %i=", &i_chapt ) == 1 )
+            {
+                int h, m, s, ms;
+                char *p = strchr( psz_comment, '=' );
+                *p++ = '\0';
+
+                if( sscanf( p, "%d:%d:%d.%d", &h, &m, &s, &ms ) == 4 )
+                {
+                    seekpoint_t *sk = vlc_seekpoint_New();
+                    sk->i_time_offset = ((h * 3600 + m * 60 + s) *1000 + ms) * 1000;
+                    TAB_APPEND_CAST( (seekpoint_t**), *i_seekpoint, *ppp_seekpoint, sk );
+                }
             }
         }
         else if( strchr( psz_comment, '=' ) )

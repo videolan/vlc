@@ -188,6 +188,7 @@ static int Open( vlc_object_t * p_this )
 
     /* */
     p_sys->p_meta = NULL;
+    TAB_INIT( p_sys->i_seekpoints, p_sys->pp_seekpoints );
 
     return VLC_SUCCESS;
 }
@@ -207,6 +208,8 @@ static void Close( vlc_object_t *p_this )
 
     if( p_sys->p_old_stream )
         Ogg_LogicalStreamDelete( p_demux, p_sys->p_old_stream );
+
+    TAB_CLEAN( p_sys->i_seekpoints, p_sys->pp_seekpoints );
 
     free( p_sys );
 }
@@ -1783,7 +1786,8 @@ static void Ogg_ExtractXiphMeta( demux_t *p_demux, const void *p_headers, unsign
     /* TODO how to handle multiple comments properly ? */
     if( i_count >= 2 && pi_size[1] > i_skip )
         vorbis_ParseComment( &p_ogg->p_meta, (uint8_t*)pp_data[1] + i_skip, pi_size[1] - i_skip,
-                             &p_ogg->i_attachments, &p_ogg->attachments );
+                             &p_ogg->i_attachments, &p_ogg->attachments,
+                             &p_ogg->i_seekpoints, &p_ogg->pp_seekpoints );
 
     for( unsigned i = 0; i < i_count; i++ )
         free( pp_data[i] );
