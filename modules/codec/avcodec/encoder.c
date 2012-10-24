@@ -135,9 +135,6 @@ struct encoder_sys_t
     float      f_lumi_masking, f_dark_masking, f_p_masking, f_border_masking;
     int        i_luma_elim, i_chroma_elim;
     int        i_aac_profile; /* AAC profile to use.*/
-    /* Used to work around stupid timestamping behaviour in libavcodec */
-    uint64_t i_framenum;
-    mtime_t  pi_delay_pts[MAX_FRAME_DELAY];
 };
 
 static const char *const ppsz_enc_options[] = {
@@ -942,16 +939,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             }
         }
 
-        frame.quality = p_sys->i_quality;
-
-        /* Ugly work-around for stupid libavcodec behaviour */
-        p_sys->i_framenum++;
-        p_sys->pi_delay_pts[p_sys->i_framenum % MAX_FRAME_DELAY] = frame.pts;
-        frame.pts = p_sys->i_framenum * AV_TIME_BASE *
-            p_enc->fmt_in.video.i_frame_rate_base;
-        frame.pts += p_enc->fmt_in.video.i_frame_rate - 1;
-        frame.pts /= p_enc->fmt_in.video.i_frame_rate;
-        /* End work-around */
+        frame->quality = p_sys->i_quality;
 
         i_out = avcodec_encode_video( p_sys->p_context, p_block->p_buffer,
                                      p_block->i_buffer, &frame );
@@ -988,16 +976,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     {
         p_sys->i_buggy_pts_detect = p_sys->p_context->coded_frame->pts;
         p_block->i_pts = p_sys->p_context->coded_frame->pts;
-
-        /* Ugly work-around for stupid libavcodec behaviour */
-        {
-            int64_t i_framenum = p_block->i_pts *
-                p_enc->fmt_in.video.i_frame_rate /
-                p_enc->fmt_in.video.i_frame_rate_base / AV_TIME_BASE;
-
-            p_block->i_pts = p_sys->pi_delay_pts[i_framenum % MAX_FRAME_DELAY];
-        }
-        /* End work-around */
 
         if( p_sys->p_context->coded_frame->pict_type != AV_PICTURE_TYPE_I &&
             p_sys->p_context->coded_frame->pict_type != AV_PICTURE_TYPE_P )
