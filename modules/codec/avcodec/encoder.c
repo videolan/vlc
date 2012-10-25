@@ -1035,14 +1035,14 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     {
         msg_Dbg(p_enc,"Flushing..");
         do {
-        p_block = block_New( p_enc, p_sys->i_buffer_out );
-        av_init_packet( &packet );
-        packet.data = p_block->p_buffer;
-        packet.size = p_block->i_buffer;
+            p_block = block_New( p_enc, p_sys->i_buffer_out );
+            av_init_packet( &packet );
+            packet.data = p_block->p_buffer;
+            packet.size = p_block->i_buffer;
 
-        i_out = avcodec_encode_audio2( p_sys->p_context, &packet, NULL, &got_packet );
-        if( !i_out && got_packet )
-            block_ChainAppend( &p_chain, p_block );
+            i_out = avcodec_encode_audio2( p_sys->p_context, &packet, NULL, &got_packet );
+            if( !i_out && got_packet )
+                block_ChainAppend( &p_chain, p_block );
         } while( got_packet && !i_out );
         return p_chain;
     }
