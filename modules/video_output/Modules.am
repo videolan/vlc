@@ -158,6 +158,13 @@ endif
 EXTRA_LTLIBRARIES += libegl_plugin.la
 libvlc_LTLIBRARIES += $(LTLIBegl)
 
+### GLX ###
+libglx_plugin_la_SOURCES = glx.c
+libglx_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
+libglx_plugin_la_LIBADD = $(AM_LIBADD) $(GL_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
+EXTRA_LTLIBRARIES += libglx_plugin.la
+libvlc_LTLIBRARIES += $(LTLIBglx)
+
 ### Coloured ASCII art ###
 libcaca_plugin_la_SOURCES = caca.c
 libcaca_plugin_la_CFLAGS = $(AM_CFLAGS) $(CACA_CFLAGS)
