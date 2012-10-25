@@ -55,6 +55,7 @@ SOURCES_stl = stl.c
 SOURCES_dmo = dmo/dmo.c dmo/dmo.h dmo/buffer.c
 SOURCES_ddummy = ddummy.c
 SOURCES_edummy = edummy.c
+SOURCES_fdkaac = fdkaac.c
 
 libvlc_LTLIBRARIES += \
 	liba52_plugin.la \

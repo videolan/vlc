@@ -2487,6 +2487,11 @@ dnl
 PKG_ENABLE_MODULES_VLC([TWOLAME], [], [twolame], [MPEG Audio Layer 2 encoder], [auto], [], [], [ -DLIBTWOLAME_STATIC])
 
 dnl
+dnl fdk-aac encoder plugin
+dnl
+PKG_ENABLE_MODULES_VLC([FDKAAC], [], [fdk-aac], [FDK-AAC encoder], [disabled])
+
+dnl
 dnl  QuickTime plugin
 dnl
 AC_ARG_ENABLE(quicktime,
