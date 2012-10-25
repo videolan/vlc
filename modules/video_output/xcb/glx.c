@@ -68,7 +68,6 @@ struct vout_display_sys_t
     xcb_window_t window; /* drawable X window */
     xcb_window_t glwin; /* GLX window */
     bool visible; /* whether to draw */
-    bool v1_3; /* whether GLX >= 1.3 is available */
 
     GLXContext ctx;
     vlc_gl_t gl;
@@ -151,7 +150,7 @@ FindWindow (vout_display_t *vd, xcb_connection_t *conn,
     return screen;
 }
 
-static bool CheckGLX (vout_display_t *vd, Display *dpy, bool *restrict pv13)
+static bool CheckGLX (vout_display_t *vd, Display *dpy)
 {
     int major, minor;
     bool ok = false;
@@ -162,13 +161,12 @@ static bool CheckGLX (vout_display_t *vd, Display *dpy, bool *restrict pv13)
     if (major != 1)
         msg_Dbg (vd, "GLX extension version %d.%d unknown", major, minor);
     else
-    if (minor < 2)
+    if (minor < 3)
         msg_Dbg (vd, "GLX extension version %d.%d too old", major, minor);
     else
     {
         msg_Dbg (vd, "using GLX extension version %d.%d", major, minor);
         ok = true;
-        *pv13 = minor >= 3;
     }
     return ok;
 }
@@ -246,7 +244,7 @@ static int Open (vlc_object_t *obj)
     sys->conn = conn;
     sys->ctx = NULL;
 
-    if (!CheckGLX (vd, dpy, &sys->v1_3))
+    if (!CheckGLX (vd, dpy))
         goto error;
 
     RegisterMouseEvents (obj, conn, sys->embed->handle.xid);
@@ -263,109 +261,74 @@ static int Open (vlc_object_t *obj)
     sys->window = xcb_generate_id (conn);
 
     /* Determine our pixel format */
-    if (sys->v1_3)
-    {   /* GLX 1.3 */
-        static const int attr[] = {
-            GLX_RED_SIZE, 5,
-            GLX_GREEN_SIZE, 5,
-            GLX_BLUE_SIZE, 5,
-            GLX_DOUBLEBUFFER, True,
-            GLX_X_RENDERABLE, True,
-            GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
-            None };
+    static const int attr[] = {
+        GLX_RED_SIZE, 5,
+        GLX_GREEN_SIZE, 5,
+        GLX_BLUE_SIZE, 5,
+        GLX_DOUBLEBUFFER, True,
+        GLX_X_RENDERABLE, True,
+        GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
+        None
+    };
 
-        xcb_get_window_attributes_reply_t *wa =
-            xcb_get_window_attributes_reply (conn,
-                xcb_get_window_attributes (conn, sys->embed->handle.xid),
-                NULL);
-        if (wa == NULL)
-            goto error;
-        xcb_visualid_t visual = wa->visual;
-        free (wa);
+    xcb_get_window_attributes_reply_t *wa =
+        xcb_get_window_attributes_reply (conn,
+            xcb_get_window_attributes (conn, sys->embed->handle.xid), NULL);
+    if (wa == NULL)
+        goto error;
+    xcb_visualid_t visual = wa->visual;
+    free (wa);
 
-        int nelem;
-        GLXFBConfig *confs = glXChooseFBConfig (dpy, snum, attr, &nelem);
-        if (confs == NULL)
-        {
-            msg_Err (vd, "no GLX frame buffer configurations");
-            goto error;
-        }
-
-        GLXFBConfig conf;
-        bool found = false;
-
-        for (int i = 0; i < nelem && !found; i++)
-        {
-            conf = confs[i];
-
-            XVisualInfo *vi = glXGetVisualFromFBConfig (dpy, conf);
-            if (vi == NULL)
-                continue;
-
-            if (vi->visualid == visual)
-                found = true;
-            XFree (vi);
-        }
-        XFree (confs);
-
-        if (!found)
-        {
-            msg_Err (vd, "no matching GLX frame buffer configuration");
-            goto error;
-        }
-
-        sys->glwin = None;
-        if (!CreateWindow (vd, conn, depth, 0 /* ??? */, width, height))
-            sys->glwin = glXCreateWindow (dpy, conf, sys->window, NULL );
-        if (sys->glwin == None)
-        {
-            msg_Err (vd, "cannot create GLX window");
-            goto error;
-        }
-
-        /* Create an OpenGL context */
-        sys->ctx = glXCreateNewContext (dpy, conf, GLX_RGBA_TYPE, NULL,
-                                        True);
-        if (sys->ctx == NULL)
-        {
-            msg_Err (vd, "cannot create GLX context");
-            goto error;
-        }
-
-        if (!glXMakeContextCurrent (dpy, sys->glwin, sys->glwin, sys->ctx))
-            goto error;
+    int nelem;
+    GLXFBConfig *confs = glXChooseFBConfig (dpy, snum, attr, &nelem);
+    if (confs == NULL)
+    {
+        msg_Err (vd, "no GLX frame buffer configurations");
+        goto error;
     }
-    else
-    {   /* GLX 1.2 */
-        int attr[] = {
-            GLX_RGBA,
-            GLX_RED_SIZE, 5,
-            GLX_GREEN_SIZE, 5,
-            GLX_BLUE_SIZE, 5,
-            GLX_DOUBLEBUFFER,
-            None };
 
-        XVisualInfo *vi = glXChooseVisual (dpy, snum, attr);
+    GLXFBConfig conf;
+    bool found = false;
+
+    for (int i = 0; i < nelem && !found; i++)
+    {
+        conf = confs[i];
+
+        XVisualInfo *vi = glXGetVisualFromFBConfig (dpy, conf);
         if (vi == NULL)
-        {
-            msg_Err (vd, "cannot find GLX 1.2 visual" );
-            goto error;
-        }
-        msg_Dbg (vd, "using GLX visual ID 0x%"PRIx32, (uint32_t)vi->visualid);
+            continue;
 
-        if (CreateWindow (vd, conn, depth, 0 /* ??? */, width, height) == 0)
-            sys->ctx = glXCreateContext (dpy, vi, 0, True);
+        if (vi->visualid == visual)
+            found = true;
         XFree (vi);
-        if (sys->ctx == NULL)
-        {
-            msg_Err (vd, "cannot create GLX context");
-            goto error;
-        }
-
-        if (glXMakeCurrent (dpy, sys->window, sys->ctx) == False)
-            goto error;
-        sys->glwin = sys->window;
     }
+    XFree (confs);
+
+    if (!found)
+    {
+        msg_Err (vd, "no matching GLX frame buffer configuration");
+        goto error;
+    }
+
+    sys->glwin = None;
+    if (!CreateWindow (vd, conn, depth, 0 /* ??? */, width, height))
+        sys->glwin = glXCreateWindow (dpy, conf, sys->window, NULL );
+    if (sys->glwin == None)
+    {
+        msg_Err (vd, "cannot create GLX window");
+        goto error;
+    }
+
+    /* Create an OpenGL context */
+    sys->ctx = glXCreateNewContext (dpy, conf, GLX_RGBA_TYPE, NULL, True);
+    if (sys->ctx == NULL)
+    {
+        msg_Err (vd, "cannot create GLX context");
+        goto error;
+    }
+
+    if (!glXMakeContextCurrent (dpy, sys->glwin, sys->glwin, sys->ctx))
+        goto error;
 
     const char *glx_extensions = glXQueryExtensionsString (dpy, snum);
 
@@ -450,13 +413,9 @@ static void Close (vlc_object_t *obj)
 
     if (sys->ctx != NULL)
     {
-        if (sys->v1_3)
-            glXMakeContextCurrent (dpy, None, None, NULL);
-        else
-            glXMakeCurrent (dpy, None, NULL);
+        glXMakeContextCurrent (dpy, None, None, NULL);
         glXDestroyContext (dpy, sys->ctx);
-        if (sys->v1_3)
-            glXDestroyWindow (dpy, sys->glwin);
+        glXDestroyWindow (dpy, sys->glwin);
     }
     XCloseDisplay (dpy);
 
