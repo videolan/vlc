@@ -77,9 +77,11 @@ static void Close        ( vlc_object_t * );
 #ifdef WIN32
 # define FONT_PATH      "C:\\WINDOWS\\Fonts\\arial.ttf"
 # define FONT_PATH_MENU "C:\\WINDOWS\\Fonts\\arial.ttf"
+# define PRESET_PATH    NULL
 #else
 # define FONT_PATH      "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf"
 # define FONT_PATH_MENU "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf"
+# define PRESET_PATH    "/usr/share/projectM/presets"
 #endif
 
 vlc_module_begin ()
@@ -92,11 +94,7 @@ vlc_module_begin ()
     add_loadfile( "projectm-config", "/usr/share/projectM/config.inp",
                   CONFIG_TEXT, CONFIG_LONGTEXT, true )
 #else
-#ifdef WIN32
-    add_directory( "projectm-preset-path", NULL,
-#else
-    add_directory( "projectm-preset-path", "/usr/share/projectM/presets",
-#endif
+    add_directory( "projectm-preset-path", PRESET_PATH,
                   PRESET_PATH_TXT, PRESET_PATH_LONGTXT, true )
     add_loadfile( "projectm-title-font", FONT_PATH,
                   TITLE_FONT_TXT, TITLE_FONT_LONGTXT, true )
