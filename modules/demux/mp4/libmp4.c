@@ -3571,12 +3571,14 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *s )
         return p_root;
 
     p_root->i_size = stream_Size( s );
-    stream_Seek( p_stream, 0 );
-    /* Get the rest of the file */
-    i_result = MP4_ReadBoxContainerRaw( p_stream, p_root );
+    if( stream_Tell( s ) < stream_Size( s ) )
+    {
+        /* Get the rest of the file */
+        i_result = MP4_ReadBoxContainerRaw( p_stream, p_root );
 
-    if( !i_result )
-        goto error;
+        if( !i_result )
+            goto error;
+    }
 
     MP4_Box_t *p_moov;
     MP4_Box_t *p_cmov;
