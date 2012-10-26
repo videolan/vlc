@@ -370,6 +370,16 @@ static void stream_state_cb(pa_stream *s, void *userdata)
     }
 }
 
+static void stream_buffer_attr_cb(pa_stream *s, void *userdata)
+{
+    audio_output_t *aout = userdata;
+    const pa_buffer_attr *pba = pa_stream_get_buffer_attr(s);
+
+    msg_Dbg(aout, "changed buffer metrics: maxlength=%u, tlength=%u, "
+            "prebuf=%u, minreq=%u",
+            pba->maxlength, pba->tlength, pba->prebuf, pba->minreq);
+}
+
 static void stream_event_cb(pa_stream *s, const char *name, pa_proplist *pl,
                             void *userdata)
 {
@@ -922,6 +932,7 @@ static int Open(vlc_object_t *obj)
     }
     sys->stream = s;
     pa_stream_set_state_callback(s, stream_state_cb, sys->mainloop);
+    pa_stream_set_buffer_attr_callback(s, stream_buffer_attr_cb, aout);
     pa_stream_set_event_callback(s, stream_event_cb, aout);
     pa_stream_set_latency_update_callback(s, stream_latency_cb, aout);
     pa_stream_set_moved_callback(s, stream_moved_cb, aout);
@@ -950,11 +961,7 @@ static int Open(vlc_object_t *obj)
         }
     }
 #endif
-
-    const struct pa_buffer_attr *pba = pa_stream_get_buffer_attr(s);
-    msg_Dbg(aout, "using buffer metrics: maxlength=%u, tlength=%u, "
-            "prebuf=%u, minreq=%u",
-            pba->maxlength, pba->tlength, pba->prebuf, pba->minreq);
+    stream_buffer_attr_cb(s, aout);
 
     var_Create(aout, "audio-device", VLC_VAR_INTEGER|VLC_VAR_HASCHOICE);
     var_Change(aout, "audio-device", VLC_VAR_SETTEXT,
@@ -1012,6 +1019,7 @@ static void Close (vlc_object_t *obj)
 
         /* Clear all callbacks */
         pa_stream_set_state_callback(s, NULL, NULL);
+        pa_stream_set_buffer_attr_callback(s, NULL, NULL);
         pa_stream_set_event_callback(s, NULL, NULL);
         pa_stream_set_latency_update_callback(s, NULL, NULL);
         pa_stream_set_moved_callback(s, NULL, NULL);
