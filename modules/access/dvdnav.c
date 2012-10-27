@@ -1465,14 +1465,11 @@ static int ProbeDVD( const char *psz_name )
         goto bailout;
     }
 
-    /* Match extension as the anchor exhibits too many false positives */
-    const char *ext = strrchr( psz_name, '.' );
-    if( ext == NULL )
-        goto bailout;
-    ext++;
-    if( strcasecmp( ext, "iso" ) && strcasecmp( ext, "img" ) &&
-        strcasecmp( ext, "mdf" ) && strcasecmp( ext, "dvd" ) &&
-        strcasecmp( ext, "bin" ) && strcasecmp( ext, "nrg" ) )
+    /* ISO 9660 volume descriptor */
+    char iso_dsc[6];
+    if( lseek( fd, 0x8000 + 1, SEEK_SET ) == -1
+     || read( fd, iso_dsc, sizeof (iso_dsc) ) < sizeof (iso_dsc)
+     || memcmp( iso_dsc, "CD001\x01", 6 ) )
         goto bailout;
 
     /* Try to find the anchor (2 bytes at LBA 256) */
@@ -1482,7 +1479,6 @@ static int ProbeDVD( const char *psz_name )
      && read( fd, &anchor, 2 ) == 2
      && GetWLE( &anchor ) == 2 )
         ret = VLC_SUCCESS; /* Found a potential anchor */
-
 bailout:
     close( fd );
     return ret;
