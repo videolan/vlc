@@ -370,6 +370,7 @@ modules/codec/dts.c
 modules/codec/dvbsub.c
 modules/codec/edummy.c
 modules/codec/faad.c
+modules/codec/fdkaac.c
 modules/codec/flac.c
 modules/codec/fluidsynth.c
 modules/codec/kate.c
@@ -1124,6 +1125,7 @@ modules/video_output/drawable.c
 modules/video_output/egl.c
 modules/video_output/fb.c
 modules/video_output/gl.c
+modules/video_output/glx.c
 modules/video_output/ios.m
 modules/video_output/kva.c
 modules/video_output/macosx.m
