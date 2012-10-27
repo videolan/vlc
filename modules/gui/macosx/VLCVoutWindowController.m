@@ -139,14 +139,14 @@
     }
     [o_new_video_window setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
 
-    if(b_nonembedded) {
-        // event occurs before window is created, so call again
-        [[VLCMain sharedInstance] playbackStatusUpdated];
-    }
-
     [[VLCMainWindow sharedInstance] setNonembedded:b_nonembedded];
     [o_vout_view setVoutThread:(vout_thread_t *)p_wnd->p_parent];
     [o_vout_dict setObject:[o_new_video_window autorelease] forKey:[NSValue valueWithPointer:p_wnd]];
+
+    if(b_nonembedded) {
+        // event occurs before window is created, so call again
+        [[VLCMain sharedInstance] playlistUpdated];
+    }
 
     return [o_vout_view autorelease];
 }
