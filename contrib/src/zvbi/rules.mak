@@ -27,7 +27,7 @@ DEPS_zvbi = pthreads iconv $(DEPS_iconv)
 
 ZVBI_CFLAGS := $(CFLAGS)
 ZVBICONF := \
-	--disable-v4l --disable-dvb --disable-bktr \
+	--disable-dvb --disable-bktr \
 	--disable-nls --disable-proxy \
 	--without-doxygen \
 	$(HOSTCONF)
