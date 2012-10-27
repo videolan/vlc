@@ -53,6 +53,7 @@
     BOOL b_nativeFullscreenMode = [[VLCMain sharedInstance] nativeFullscreenMode];
     BOOL b_video_deco = var_InheritBool(VLCIntf, "video-deco");
     BOOL b_video_wallpaper = var_InheritBool(VLCIntf, "video-wallpaper");
+    BOOL b_multiple_vout_windows = [o_vout_dict count] > 0;
     VLCVoutView *o_vout_view;
     VLCVideoWindowCommon *o_new_video_window;
 
@@ -106,7 +107,7 @@
         [[VLCMainWindow sharedInstance] setNonembedded:YES];
         b_nonembedded = YES;
     } else {
-        if (var_InheritBool(VLCIntf, "embedded-video") || b_nativeFullscreenMode) {
+        if ((var_InheritBool(VLCIntf, "embedded-video") && !b_multiple_vout_windows) || b_nativeFullscreenMode) {
             o_vout_view = [[[VLCMainWindow sharedInstance] videoView] retain];
             o_new_video_window = [[VLCMainWindow sharedInstance] retain];
             b_nonembedded = NO;
