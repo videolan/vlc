@@ -1239,6 +1239,10 @@ static const staticentry_t p_list_audio[] = {
     B(VLC_CODEC_RALF, "RealAudio Lossless"),
         A("LSD:"),
 
+    /* G.723.1 */
+    B(VLC_CODEC_G723_1, "G.723.1 Audio"),
+        A("g72\x31"),
+
     /* PCM */
     B(VLC_CODEC_S8, "PCM S8"),
         A("s8  "),

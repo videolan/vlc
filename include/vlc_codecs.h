@@ -285,6 +285,8 @@ ATTR_PACKED
 #define WAVE_FORMAT_VORB_2PLUS          0x6770
 #define WAVE_FORMAT_VORB_3PLUS          0x6771
 
+#define WAVE_FORMAT_G723_1              0xa100
+
 #define WAVE_FORMAT_SPEEX               0xa109 /* Speex audio */
 #define WAVE_FORMAT_FLAC                0xf1ac /* Xiph Flac */
 
@@ -353,6 +355,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_TRUESPEECH, VLC_CODEC_TRUESPEECH,             "Truespeech" },
     { WAVE_FORMAT_GSM610,     VLC_CODEC_GSM_MS,                 "Microsoft WAV GSM" },
     { WAVE_FORMAT_G726,       VLC_CODEC_ADPCM_G726,             "G.726 ADPCM" },
+    { WAVE_FORMAT_G723_1,     VLC_CODEC_G723_1,                 "G.723.1" },
     { WAVE_FORMAT_MPEGLAYER3, VLC_CODEC_MPGA,                   "Mpeg Audio" },
     { WAVE_FORMAT_MPEG,       VLC_CODEC_MPGA,                   "Mpeg Audio" },
     { WAVE_FORMAT_AMR_NB,     VLC_CODEC_AMR_NB,                 "AMR NB" },
