@@ -21,9 +21,10 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="2730"/>
+      <integer value="4850"/>
       <integer value="334"/>
       <integer value="4756"/>
+      <integer value="2730"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1075,7 +1076,7 @@
         <string key="NSClassName">VLCMainWindowControlsBar</string>
       </object>
       <object class="NSCustomView" id="661733562">
-        <nil key="NSNextResponder"/>
+        <reference key="NSNextResponder"/>
         <int key="NSvFlags">266</int>
         <object class="NSMutableArray" key="NSSubviews">
           <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1089,7 +1090,7 @@
             <object class="NSTextFieldCell" key="NSCell" id="645411226">
               <int key="NSCellFlags">67108928</int>
               <int key="NSCellFlags2">1212155968</int>
-              <string key="NSContents">Label</string>
+              <string key="NSContents">VLC media player</string>
               <object class="NSFont" key="NSSupport">
                 <string key="NSName">LucidaGrande</string>
                 <double key="NSSize">13</double>
@@ -1199,6 +1200,7 @@
           </object>
         </object>
         <string key="NSFrameSize">{400, 22}</string>
+        <reference key="NSSuperview"/>
         <string key="NSReuseIdentifierKey">_NS:1109</string>
         <string key="NSClassName">VLCMainWindowTitleView</string>
       </object>

@@ -2,7 +2,7 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1060</int>
-    <string key="IBDocument.SystemVersion">12C54</string>
+    <string key="IBDocument.SystemVersion">12C60</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
     <string key="IBDocument.AppKitVersion">1187.34</string>
     <string key="IBDocument.HIToolboxVersion">625.00</string>
@@ -12,7 +12,8 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="4"/>
+      <integer value="1"/>
+      <integer value="2"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -38,7 +39,7 @@
         <int key="NSWindowBacking">2</int>
         <string key="NSWindowRect">{{131, 97}, {363, 239}}</string>
         <int key="NSWTFlags">1954022400</int>
-        <string key="NSWindowTitle">Detached Video</string>
+        <string key="NSWindowTitle">VLC media player</string>
         <string key="NSWindowClass">VLCDetachedVideoWindow</string>
         <nil key="NSViewClass"/>
         <nil key="NSUserInterfaceItemIdentifier"/>
@@ -336,7 +337,7 @@
         <bool key="NSWindowIsRestorable">NO</bool>
       </object>
       <object class="NSCustomView" id="669633479">
-        <nil key="NSNextResponder"/>
+        <reference key="NSNextResponder"/>
         <int key="NSvFlags">266</int>
         <object class="NSMutableArray" key="NSSubviews">
           <bool key="EncodedWithXMLCoder">YES</bool>
@@ -350,7 +351,7 @@
             <object class="NSTextFieldCell" key="NSCell" id="300915789">
               <int key="NSCellFlags">67108928</int>
               <int key="NSCellFlags2">1212155968</int>
-              <string key="NSContents">Label</string>
+              <string key="NSContents">VLC media player</string>
               <object class="NSFont" key="NSSupport">
                 <string key="NSName">LucidaGrande</string>
                 <double key="NSSize">13</double>
@@ -472,6 +473,7 @@
           </object>
         </object>
         <string key="NSFrameSize">{400, 22}</string>
+        <reference key="NSSuperview"/>
         <string key="NSReuseIdentifierKey">_NS:1109</string>
         <string key="NSClassName">VLCMainWindowTitleView</string>
       </object>
