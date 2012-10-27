@@ -139,7 +139,9 @@
     }
     [o_new_video_window setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
 
-    [[VLCMainWindow sharedInstance] setNonembedded:b_nonembedded];
+    if (!b_multiple_vout_windows)
+        [[VLCMainWindow sharedInstance] setNonembedded:b_nonembedded];
+
     [o_vout_view setVoutThread:(vout_thread_t *)p_wnd->p_parent];
     [o_vout_dict setObject:[o_new_video_window autorelease] forKey:[NSValue valueWithPointer:p_wnd]];
 
