@@ -101,6 +101,7 @@
 + (VLCMainWindow *)sharedInstance;
 @property (readwrite) BOOL fullscreen;
 @property (readonly) BOOL nativeFullscreenMode;
+@property (readwrite) BOOL nonembedded;
 
 @property (readonly) VLCFSPanel* fsPanel;
 
@@ -130,7 +131,6 @@
 
 - (void)showFullscreenController;
 
-- (VLCVoutView *)setupVout:(vout_window_t *)p_wnd;
 - (void)setVideoplayEnabled;
 
 - (void)hideMouseCursor:(NSTimer *)timer;

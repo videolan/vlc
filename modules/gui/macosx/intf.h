@@ -149,6 +149,7 @@ struct intf_sys_t
 }
 
 @property (readonly) VLCVoutWindowController* voutController;
+@property (readonly) BOOL nativeFullscreenMode;
 
 + (VLCMain *)sharedInstance;
 

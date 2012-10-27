@@ -24,7 +24,7 @@
 
 #import "VLCVoutWindowController.h"
 #import "intf.h"
-#import "Windows.h"
+#import "MainWindow.h"
 #import "VideoView.h"
 
 @implementation VLCVoutWindowController
@@ -46,11 +46,108 @@
     [super dealloc];
 }
 
-- (void)addVout:(VLCVideoWindowCommon *)o_window forDisplay:(vout_window_t *)p_wnd
-{
-    [[o_window videoView] setVoutThread:(vout_thread_t *)p_wnd->p_parent];
 
-    [o_vout_dict setObject:o_window forKey:[NSValue valueWithPointer:p_wnd]];
+- (VLCVoutView *)setupVout:(vout_window_t *)p_wnd
+{
+    BOOL b_nonembedded = NO;
+    BOOL b_nativeFullscreenMode = [[VLCMain sharedInstance] nativeFullscreenMode];
+    BOOL b_video_deco = var_InheritBool(VLCIntf, "video-deco");
+    BOOL b_video_wallpaper = var_InheritBool(VLCIntf, "video-wallpaper");
+    VLCVoutView *o_vout_view;
+    VLCVideoWindowCommon *o_new_video_window;
+
+    // TODO: make lion fullscreen compatible with video-wallpaper and !embedded-video
+    if ((b_video_wallpaper || !b_video_deco) && !b_nativeFullscreenMode) {
+        // b_video_wallpaper is priorized over !b_video_deco
+
+        msg_Dbg(VLCIntf, "Creating background / blank window");
+        NSScreen *screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_InheritInteger(VLCIntf, "macosx-vdev")];
+        if (!screen)
+            screen = [[VLCMainWindow sharedInstance] screen];
+
+        NSRect window_rect;
+        if (b_video_wallpaper)
+            window_rect = [screen frame];
+        else
+            window_rect = [[VLCMainWindow sharedInstance] frame];
+
+        NSUInteger mask = NSBorderlessWindowMask;
+        if (!OSX_SNOW_LEOPARD && !b_video_deco)
+            mask |= NSResizableWindowMask;
+
+        BOOL b_no_video_deco_only = !b_video_wallpaper;
+        o_new_video_window = [[VLCVideoWindowCommon alloc] initWithContentRect:window_rect styleMask:mask backing:NSBackingStoreBuffered defer:YES];
+        [o_new_video_window setDelegate:o_new_video_window];
+
+        if (b_video_wallpaper)
+            [o_new_video_window setLevel:CGWindowLevelForKey(kCGDesktopWindowLevelKey) + 1];
+
+        [o_new_video_window setBackgroundColor: [NSColor blackColor]];
+        [o_new_video_window setCanBecomeKeyWindow: !b_video_wallpaper];
+        [o_new_video_window setCanBecomeMainWindow: !b_video_wallpaper];
+        [o_new_video_window setAcceptsMouseMovedEvents: !b_video_wallpaper];
+        [o_new_video_window setMovableByWindowBackground: !b_video_wallpaper];
+        [o_new_video_window useOptimizedDrawing: YES];
+
+        o_vout_view = [[VLCVoutView alloc] initWithFrame:[[o_new_video_window contentView] bounds]];
+        [o_vout_view setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+        [[o_new_video_window contentView] addSubview:o_vout_view positioned:NSWindowAbove relativeTo:nil];
+        [o_new_video_window setVideoView:o_vout_view];
+
+
+        if (b_video_wallpaper)
+            [o_new_video_window orderBack:nil];
+        else {
+            [o_new_video_window center];
+            [o_new_video_window setFrameAutosaveName:@"extra-videowindow"];
+            [o_new_video_window setContentMinSize: NSMakeSize(f_min_video_height, f_min_video_height)];
+        }
+
+        [[VLCMainWindow sharedInstance] setNonembedded:YES];
+        b_nonembedded = YES;
+    } else {
+        if (var_InheritBool(VLCIntf, "embedded-video") || b_nativeFullscreenMode) {
+            o_vout_view = [[[VLCMainWindow sharedInstance] videoView] retain];
+            o_new_video_window = [[VLCMainWindow sharedInstance] retain];
+            b_nonembedded = NO;
+        } else {
+            NSWindowController *o_controller = [[NSWindowController alloc] initWithWindowNibName:@"DetachedVideoWindow"];
+            [o_controller loadWindow];
+            o_new_video_window = [(VLCDetachedVideoWindow *)[o_controller window] retain];
+            [o_controller release];
+
+            [o_new_video_window setDelegate: o_new_video_window];
+            [o_new_video_window setLevel:NSNormalWindowLevel];
+            [o_new_video_window useOptimizedDrawing: YES];
+            o_vout_view = [[o_new_video_window videoView] retain];
+            b_nonembedded = YES;
+        }
+    }
+
+    if (!b_video_wallpaper) {
+        [o_new_video_window makeKeyAndOrderFront: self];
+
+        vout_thread_t *p_vout = getVout();
+        if (p_vout) {
+            if (var_GetBool(p_vout, "video-on-top"))
+                [o_new_video_window setLevel: NSStatusWindowLevel];
+            else
+                [o_new_video_window setLevel: NSNormalWindowLevel];
+            vlc_object_release(p_vout);
+        }
+    }
+    [o_new_video_window setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
+
+    if(b_nonembedded) {
+        // event occurs before window is created, so call again
+        [[VLCMain sharedInstance] playbackStatusUpdated];
+    }
+
+    [[VLCMainWindow sharedInstance] setNonembedded:b_nonembedded];
+    [o_vout_view setVoutThread:(vout_thread_t *)p_wnd->p_parent];
+    [o_vout_dict setObject:[o_new_video_window autorelease] forKey:[NSValue valueWithPointer:p_wnd]];
+
+    return [o_vout_view autorelease];
 }
 
 - (void)removeVoutforDisplay:(NSValue *)o_key

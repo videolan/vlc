@@ -553,6 +553,7 @@ audio_output_t *getAout(void)
 @implementation VLCMain
 
 @synthesize voutController=o_vout_controller;
+@synthesize nativeFullscreenMode=b_nativeFullscreenMode;
 
 #pragma mark -
 #pragma mark Initialization
@@ -1556,8 +1557,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (id)getVideoViewAtPositionX: (int *)pi_x Y: (int *)pi_y withWidth: (unsigned int*)pi_width andHeight: (unsigned int*)pi_height forWindow:(vout_window_t *)p_wnd
 {
     SEL sel = @selector(setupVout:);
-    NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[o_mainwindow methodSignatureForSelector:sel]];
-    [inv setTarget:o_mainwindow];
+    NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[o_vout_controller methodSignatureForSelector:sel]];
+    [inv setTarget:o_vout_controller];
     [inv setSelector:sel];
     [inv setArgument:&p_wnd atIndex:2]; // starting at 2!
 

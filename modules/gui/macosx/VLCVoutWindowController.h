@@ -28,13 +28,14 @@
 #import <vlc_vout_window.h>
 
 @class VLCVideoWindowCommon;
+@class VLCVoutView;
 
 @interface VLCVoutWindowController : NSObject
 {
     NSMutableDictionary *o_vout_dict;
 }
 
-- (void)addVout:(VLCVideoWindowCommon *)o_window forDisplay:(vout_window_t *)p_wnd;
+- (VLCVoutView *)setupVout:(vout_window_t *)p_wnd;
 - (void)removeVoutforDisplay:(NSValue *)o_key;
 
 - (void)updateWindowsControlsBarWithSelector:(SEL)aSel;
