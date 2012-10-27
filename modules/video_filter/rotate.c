@@ -153,6 +153,8 @@ static int Create( vlc_object_t *p_this )
             free( p_filter->p_sys );
             return VLC_EGENERIC;
         }
+        p_sys->i_angle = 0;
+        cache_trigo( p_sys->i_angle, &p_sys->i_sin, &p_sys->i_cos );
     }
     else
     {
