@@ -168,6 +168,9 @@
 
     [[o_window videoView] releaseVoutThread];
     [o_vout_dict removeObjectForKey:o_key];
+
+    if ([o_vout_dict count] == 0)
+        [[VLCMain sharedInstance] setActiveVideoPlayback:NO];
 }
 
 - (void)updateWindowsControlsBarWithSelector:(SEL)aSel

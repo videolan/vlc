@@ -240,7 +240,6 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
 void WindowClose(vout_window_t *p_wnd)
 {
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-    [[VLCMain sharedInstance] setActiveVideoPlayback:NO];
 
     [[[VLCMain sharedInstance] voutController] performSelectorOnMainThread:@selector(removeVoutforDisplay:) withObject:[NSValue valueWithPointer:p_wnd] waitUntilDone:NO];
 
