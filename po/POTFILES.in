@@ -352,6 +352,7 @@ modules/codec/avcodec/encoder.c
 modules/codec/avcodec/fourcc.c
 modules/codec/avcodec/vaapi.c
 modules/codec/avcodec/vda.c
+modules/codec/avcodec/vdpau.c
 modules/codec/avcodec/video.c
 modules/codec/cc.c
 modules/codec/cc.h

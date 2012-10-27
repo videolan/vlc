@@ -351,6 +351,7 @@ $Id$
  * vc1: VC-1 Video demuxer
  * vcd: input module for accessing Video CDs
  * vcdx: input module for accessing Video CDs with navigation & stills
+ * vdpau: VDPAU hardware-accelerated decoding
  * vdummy: dummy video display
  * visual: visualisation system
  * vmem: memory video driver
