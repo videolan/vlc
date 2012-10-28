@@ -138,13 +138,15 @@ static int Open (vlc_object_t *obj)
         goto error;
 
     /* Initialize video display */
-    sys->vgl = vout_display_opengl_New (&vd->fmt, NULL, sys->gl);
+    const vlc_fourcc_t *spu_chromas;
+    sys->vgl = vout_display_opengl_New (&vd->fmt, &spu_chromas, sys->gl);
     if (!sys->vgl)
         goto error;
 
     vd->sys = sys;
     vd->info.has_pictures_invalid = false;
     vd->info.has_event_thread = false;
+    vd->info.subpicture_chromas = spu_chromas;
     vd->pool = Pool;
     vd->prepare = PictureRender;
     vd->display = PictureDisplay;
