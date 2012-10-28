@@ -229,6 +229,7 @@ ATTR_PACKED
 #define WAVE_FORMAT_TRUESPEECH          0x0022 /* TrueSpeech */
 #define WAVE_FORMAT_GSM610              0x0031 /* Microsoft Corporation */
 #define WAVE_FORMAT_MSNAUDIO            0x0032 /* Microsoft Corporation */
+#define WAVE_FORMAT_MSG723              0x0042 /* Microsoft G.723 [G723.1] */
 #define WAVE_FORMAT_G726                0x0045 /* ITU-T standard  */
 #define WAVE_FORMAT_MPEG                0x0050 /* Microsoft Corporation */
 #define WAVE_FORMAT_MPEGLAYER3          0x0055 /* ISO/MPEG Layer3 Format Tag */
@@ -356,6 +357,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_GSM610,     VLC_CODEC_GSM_MS,                 "Microsoft WAV GSM" },
     { WAVE_FORMAT_G726,       VLC_CODEC_ADPCM_G726,             "G.726 ADPCM" },
     { WAVE_FORMAT_G723_1,     VLC_CODEC_G723_1,                 "G.723.1" },
+    { WAVE_FORMAT_MSG723,     VLC_CODEC_G723_1,                 "Microsoft G.723 [G723.1]" },
     { WAVE_FORMAT_MPEGLAYER3, VLC_CODEC_MPGA,                   "Mpeg Audio" },
     { WAVE_FORMAT_MPEG,       VLC_CODEC_MPGA,                   "Mpeg Audio" },
     { WAVE_FORMAT_AMR_NB,     VLC_CODEC_AMR_NB,                 "AMR NB" },
