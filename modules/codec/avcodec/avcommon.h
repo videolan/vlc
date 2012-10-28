@@ -1,5 +1,5 @@
 /*****************************************************************************
- * avinit.h: common code for libav* initialization
+ * avcommon.h: common code for libav*
  *****************************************************************************
  * Copyright (C) 2012 the VideoLAN team
  * $Id$
@@ -67,6 +67,10 @@ static inline void vlc_init_avcodec(void)
 #ifdef HAVE_LIBAVUTIL_AVUTIL_H
 # include <libavutil/avutil.h>
 # include <libavutil/dict.h>
+
+#if LIBAVUTIL_VERSION_MAJOR < 52 && !defined(AV_CPU_FLAG_MMXEXT)
+#   define AV_CPU_FLAG_MMXEXT       AV_CPU_FLAG_MMX2
+#endif
 
 #define AV_OPTIONS_TEXT     "Advanced options."
 #define AV_OPTIONS_LONGTEXT "Advanced options, in the form {opt=val,opt2=val2} ."
