@@ -307,6 +307,10 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 #   define AV_CPU_FLAG_ALTIVEC     FF_MM_ALTIVEC
 #endif
 
+#if LIBAVUTIL_VERSION_MAJOR < 52 && !defined(AV_CPU_FLAG_MMXEXT)
+#   define AV_CPU_FLAG_MMXEXT       AV_CPU_FLAG_MMX2
+#endif
+
 #if LIBAVCODEC_VERSION_MAJOR < 54
 #   define AV_PICTURE_TYPE_B        FF_B_TYPE
 #   define AV_PICTURE_TYPE_I        FF_I_TYPE

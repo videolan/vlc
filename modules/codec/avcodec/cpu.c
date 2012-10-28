@@ -40,7 +40,7 @@ unsigned GetVlcDspMask( void )
     if( !vlc_CPU_MMX() )
         mask |= AV_CPU_FLAG_MMX;
     if( !vlc_CPU_MMXEXT() )
-        mask |= AV_CPU_FLAG_MMX2;
+        mask |= AV_CPU_FLAG_MMXEXT;
     if( !vlc_CPU_3dNOW() )
         mask |= AV_CPU_FLAG_3DNOW;
     if( !vlc_CPU_SSE() )
