@@ -47,12 +47,6 @@ enum {
     VOUT_WINDOW_TYPE_NSOBJECT,
 };
 
-#if defined (WIN32) || defined (__OS2__)
-# define VOUT_WINDOW_TYPE_NATIVE VOUT_WINDOW_TYPE_HWND
-#elif defined (__unix__)
-# define VOUT_WINDOW_TYPE_NATIVE VOUT_WINDOW_TYPE_XID
-#endif
-
 /**
  * Control query for vout_window_t
  */
