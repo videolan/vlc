@@ -238,6 +238,7 @@ ATTR_PACKED
 #define WAVE_FORMAT_DOLBY_AC3_SPDIF     0x0092 /* Sonic Foundry */
 
 #define WAVE_FORMAT_AAC                 0x00FF /* */
+#define WAVE_FORMAT_AAC_MS              0xa106 /* Microsoft AAC */
 #define WAVE_FORMAT_SIPRO               0x0130 /* Sipro Lab Telecom Inc. */
 
 #define WAVE_FORMAT_WMA1                0x0160 /* WMA version 1 */
@@ -380,6 +381,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_AAC_2,      VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
     { WAVE_FORMAT_AAC_LATM,   VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
     { WAVE_FORMAT_FFMPEG_AAC, VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
+    { WAVE_FORMAT_AAC_MS,     VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
     { WAVE_FORMAT_VORBIS,     VLC_CODEC_VORBIS,                 "Vorbis Audio" },
     { WAVE_FORMAT_VORB_1,     VLC_FOURCC( 'v', 'o', 'r', '1' ), "Vorbis 1 Audio" },
     { WAVE_FORMAT_VORB_1PLUS, VLC_FOURCC( 'v', 'o', '1', '+' ), "Vorbis 1+ Audio" },
