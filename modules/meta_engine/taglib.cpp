@@ -47,6 +47,9 @@
 
 
 // Taglib headers
+#ifdef WIN32
+# define TAGLIB_STATIC
+#endif
 #include <taglib.h>
 #define VERSION_INT(a, b, c) ((a)<<16 | (b)<<8 | (c))
 #define TAGLIB_VERSION VERSION_INT(TAGLIB_MAJOR_VERSION, \
