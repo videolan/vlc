@@ -201,11 +201,6 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
 
         for( i = 0; i < i_count_cc; i++, cc += 3 )
         {
-            uint8_t i_field = cc[0] & 0x03;
-            if( ( cc[0] & 0xfc ) != 0xfc )
-                continue;
-            if( i_field != 0 && i_field != 1 )
-                continue;
             if( c->i_data + 3 > CC_MAX_DATA_SIZE )
                 break;
 
