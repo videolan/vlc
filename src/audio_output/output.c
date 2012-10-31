@@ -25,51 +25,12 @@
 # include "config.h"
 #endif
 
-#include <math.h>
-
 #include <vlc_common.h>
 #include <vlc_aout.h>
-#include <vlc_aout_intf.h>
 #include <vlc_cpu.h>
-#include <vlc_modules.h>
 
 #include "libvlc.h"
 #include "aout_internal.h"
-
-/**
- * Supply or update the current custom ("hardware") volume.
- * @note This only makes sense after calling aout_VolumeHardInit().
- * @param volume current custom volume
- *
- * @warning The caller (i.e. the audio output plug-in) is responsible for
- * interlocking and synchronizing call to this function and to the
- * audio_output_t.volume_set callback. This ensures that VLC gets correct
- * volume information (possibly with a latency).
- */
-static void aout_OutputVolumeReport (audio_output_t *aout, float volume)
-{
-    var_SetFloat (aout, "volume", volume);
-}
-
-static void aout_OutputMuteReport (audio_output_t *aout, bool mute)
-{
-    var_SetBool (aout, "mute", mute);
-}
-
-static void aout_OutputPolicyReport (audio_output_t *aout, bool cork)
-{
-    (cork ? var_IncInteger : var_DecInteger) (aout->p_parent, "corks");
-}
-
-static int aout_OutputGainRequest (audio_output_t *aout, float gain)
-{
-    aout_owner_t *owner = aout_owner (aout);
-
-    aout_assert_locked (aout);
-    aout_volume_SetVolume (owner->volume, gain);
-    /* XXX: ideally, return -1 if format cannot be amplified */
-    return 0;
-}
 
 /*****************************************************************************
  * aout_OutputNew : allocate a new output and rework the filter pipeline
@@ -85,24 +46,9 @@ int aout_OutputNew (audio_output_t *aout, const audio_sample_format_t *fmtp)
 
     aout_assert_locked (aout);
 
-    aout->event.volume_report = aout_OutputVolumeReport;
-    aout->event.mute_report = aout_OutputMuteReport;
-    aout->event.policy_report = aout_OutputPolicyReport;
-    aout->event.gain_request = aout_OutputGainRequest;
-
-    /* Find the best output plug-in. */
-    owner->module = module_need (aout, "audio output", "$aout", false);
-    if (owner->module == NULL)
-    {
-        msg_Err (aout, "no suitable audio output module");
-        return -1;
-    }
-
     if (aout->start (aout, &fmt))
     {
         msg_Err (aout, "module not functional");
-        module_unneed (aout, owner->module);
-        owner->module = NULL;
         return -1;
     }
 
@@ -195,8 +141,7 @@ int aout_OutputNew (audio_output_t *aout, const audio_sample_format_t *fmtp)
                                     &owner->mixer_format, &fmt) < 0)
     {
         msg_Err (aout, "couldn't create audio output pipeline");
-        module_unneed (aout, owner->module);
-        owner->module = NULL;
+        aout_OutputDelete (aout);
         return -1;
     }
     return 0;
@@ -211,16 +156,9 @@ void aout_OutputDelete (audio_output_t *aout)
 
     aout_assert_locked (aout);
 
-    if (owner->module == NULL)
-        return;
-
     var_DelCallback (aout, "stereo-mode", aout_ChannelsRestart, NULL);
     if (aout->stop != NULL)
         aout->stop (aout);
-    module_unneed (aout, owner->module);
-    aout->volume_set = NULL;
-    aout->mute_set = NULL;
-    owner->module = NULL;
     aout_FiltersDestroyPipeline (owner->filters, owner->nb_filters);
 }
 
@@ -243,10 +181,7 @@ void aout_OutputPlay (audio_output_t *aout, block_t *block)
         return;
     }
 
-    if (likely(owner->module != NULL))
-        aout->play (aout, block, &drift);
-    else
-        block_Release (block);
+    aout->play (aout, block, &drift);
 /**
  * Notifies the audio input of the drift from the requested audio
  * playback timestamp (@ref block_t.i_pts) to the anticipated playback time

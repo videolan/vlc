@@ -71,7 +71,6 @@ int aout_DecNew( audio_output_t *p_aout,
 
     /* TODO: reduce lock scope depending on decoder's real need */
     aout_lock( p_aout );
-    assert (owner->module == NULL);
 
     /* Create the audio output stream */
     var_Destroy( p_aout, "audio-device" );
@@ -117,11 +116,9 @@ void aout_DecDelete (audio_output_t *p_aout)
         aout_InputDelete (p_aout, input);
     owner->input = NULL;
 
-    if (likely(owner->module != NULL))
-    {
-        aout_OutputDelete( p_aout );
-        aout_volume_Delete (owner->volume);
-    }
+    aout_OutputDelete( p_aout );
+    aout_volume_Delete (owner->volume);
+
     var_Destroy( p_aout, "audio-device" );
     var_Destroy( p_aout, "stereo-mode" );
 

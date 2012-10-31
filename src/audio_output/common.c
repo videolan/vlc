@@ -55,6 +55,41 @@ static int var_Copy (vlc_object_t *src, const char *name, vlc_value_t prev,
     return var_Set (dst, name, value);
 }
 
+/**
+ * Supply or update the current custom ("hardware") volume.
+ * @note This only makes sense after calling aout_VolumeHardInit().
+ * @param volume current custom volume
+ *
+ * @warning The caller (i.e. the audio output plug-in) is responsible for
+ * interlocking and synchronizing call to this function and to the
+ * audio_output_t.volume_set callback. This ensures that VLC gets correct
+ * volume information (possibly with a latency).
+ */
+static void aout_VolumeNotify (audio_output_t *aout, float volume)
+{
+    var_SetFloat (aout, "volume", volume);
+}
+
+static void aout_MuteNotify (audio_output_t *aout, bool mute)
+{
+    var_SetBool (aout, "mute", mute);
+}
+
+static void aout_PolicyNotify (audio_output_t *aout, bool cork)
+{
+    (cork ? var_IncInteger : var_DecInteger) (aout->p_parent, "corks");
+}
+
+static int aout_GainNotify (audio_output_t *aout, float gain)
+{
+    aout_owner_t *owner = aout_owner (aout);
+
+    aout_assert_locked (aout);
+    aout_volume_SetVolume (owner->volume, gain);
+    /* XXX: ideally, return -1 if format cannot be amplified */
+    return 0;
+}
+
 #undef aout_New
 /*****************************************************************************
  * aout_New: initialize aout structure
@@ -70,12 +105,33 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
     aout_owner_t *owner = aout_owner (aout);
 
     vlc_mutex_init (&owner->lock);
-    owner->module = NULL;
+    vlc_object_set_destructor (aout, aout_Destructor);
+
     owner->input = NULL;
 
+    /* Audio output module callbacks */
+    var_Create (aout, "volume", VLC_VAR_FLOAT);
+    var_AddCallback (aout, "volume", var_Copy, p_parent);
+    var_Create (aout, "mute", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+    var_AddCallback (aout, "mute", var_Copy, p_parent);
+
+    aout->event.volume_report = aout_VolumeNotify;
+    aout->event.mute_report = aout_MuteNotify;
+    aout->event.policy_report = aout_PolicyNotify;
+    aout->event.gain_request = aout_GainNotify;
+
+    /* Audio output module initialization */
+    aout->start = NULL;
+    aout->stop = NULL;
     aout->volume_set = NULL;
     aout->mute_set = NULL;
-    vlc_object_set_destructor (aout, aout_Destructor);
+    owner->module = module_need (aout, "audio output", "$aout", false);
+    if (owner->module == NULL)
+    {
+        msg_Err (aout, "no suitable audio output module");
+        vlc_object_release (aout);
+        return NULL;
+    }
 
     /*
      * Persistent audio output variables
@@ -83,11 +139,6 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
     vlc_value_t val, text;
     module_config_t *cfg;
     char *str;
-
-    var_Create (aout, "volume", VLC_VAR_FLOAT);
-    var_AddCallback (aout, "volume", var_Copy, p_parent);
-    var_Create (aout, "mute", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
-    var_AddCallback (aout, "mute", var_Copy, p_parent);
 
     /* Visualizations */
     var_Create (aout, "visual", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
@@ -161,7 +212,6 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
     text.psz_string = _("Audio visualizations");
     var_Change (aout, "audio-visual", VLC_VAR_SETTEXT, &text, NULL);
 
-
     /* Replay gain */
     var_Create (aout, "audio-replay-gain-mode",
                 VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -184,7 +234,12 @@ void aout_Destroy (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    assert (owner->module == NULL);
+    aout_lock (aout);
+    module_unneed (aout, owner->module);
+    /* Protect against late call from intf.c */
+    aout->volume_set = NULL;
+    aout->mute_set = NULL;
+    aout_unlock (aout);
 
     var_DelCallback (aout, "mute", var_Copy, aout->p_parent);
     var_SetFloat (aout, "volume", -1.f);
