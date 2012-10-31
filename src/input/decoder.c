@@ -2075,7 +2075,7 @@ static void DeleteDecoder( decoder_t * p_dec )
         /* TODO: REVISIT gap-less audio */
         aout_DecFlush( p_owner->p_aout );
         aout_DecDelete( p_owner->p_aout );
-        input_resource_RequestAout( p_owner->p_resource, p_owner->p_aout );
+        input_resource_PutAout( p_owner->p_resource, p_owner->p_aout );
         if( p_owner->p_input != NULL )
             input_SendEventAout( p_owner->p_input );
     }
@@ -2196,7 +2196,7 @@ static block_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
         p_owner->p_aout = NULL;
 
         vlc_mutex_unlock( &p_owner->lock );
-        input_resource_RequestAout( p_owner->p_resource, p_aout );
+        input_resource_PutAout( p_owner->p_resource, p_aout );
     }
 
     if( p_owner->p_aout == NULL )
@@ -2230,7 +2230,7 @@ static block_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
         request_vout.p_private = p_dec;
 
         assert( p_owner->p_aout == NULL );
-        p_aout = input_resource_RequestAout( p_owner->p_resource, NULL );
+        p_aout = input_resource_GetAout( p_owner->p_resource );
         if( p_aout )
         {
             aout_FormatPrepare( &format );
@@ -2238,7 +2238,7 @@ static block_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
                              &p_dec->fmt_out.audio_replay_gain,
                              &request_vout ) )
             {
-                input_resource_RequestAout( p_owner->p_resource, p_aout );
+                input_resource_PutAout( p_owner->p_resource, p_aout );
                 p_aout = NULL;
             }
         }
