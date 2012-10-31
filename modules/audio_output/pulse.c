@@ -134,6 +134,7 @@ static void sink_list_cb(pa_context *c, const pa_sink_info *i, int eol,
                          void *userdata)
 {
     audio_output_t *aout = userdata;
+    aout_sys_t *sys = aout->sys;
     vlc_value_t val, text;
 
     if (eol)
@@ -150,8 +151,11 @@ static void sink_list_cb(pa_context *c, const pa_sink_info *i, int eol,
     /* FIXME: var_Change() can change the variable value if we remove the
      * current value from the choice list, or if we add a choice while there
      * was none. So force the correct value back. */
-    val.i_int = pa_stream_get_device_index(aout->sys->stream);
-    var_Change(aout, "audio-device", VLC_VAR_SETVALUE, &val, NULL);
+    if (sys->stream != NULL)
+    {
+        val.i_int = pa_stream_get_device_index(sys->stream);
+        var_Change(aout, "audio-device", VLC_VAR_SETVALUE, &val, NULL);
+    }
 }
 
 static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
