@@ -184,8 +184,7 @@ void aout_Destroy (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    if (owner->module != NULL)
-        aout_Shutdown (aout);
+    assert (owner->module == NULL);
 
     var_DelCallback (aout, "mute", var_Copy, aout->p_parent);
     var_SetFloat (aout, "volume", -1.f);

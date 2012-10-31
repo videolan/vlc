@@ -67,22 +67,6 @@ int aout_DecNew( audio_output_t *p_aout,
     }
 
     aout_owner_t *owner = aout_owner(p_aout);
-#ifdef RECYCLE
-    /* Calling decoder is responsible for serializing aout_DecNew() and
-     * aout_DecDelete(). So no need to lock to _read_ those properties. */
-    if (owner->module != NULL) /* <- output exists */
-    {   /* Check if we can recycle the existing output and pipelines */
-        if (AOUT_FMTS_IDENTICAL(&owner->input_format, p_format))
-            return 0;
-
-        /* TODO? If the new input format is closer to the output format than
-         * the old input format was, then the output could be recycled. The
-         * input pipeline however would need to be restarted. */
-
-        /* No recycling: delete everything and restart from scratch */
-        aout_Shutdown (p_aout);
-    }
-#endif
     int ret = 0;
 
     /* TODO: reduce lock scope depending on decoder's real need */
@@ -121,7 +105,7 @@ error:
 /**
  * Stops all plugins involved in the audio output.
  */
-void aout_Shutdown (audio_output_t *p_aout)
+void aout_DecDelete (audio_output_t *p_aout)
 {
     aout_owner_t *owner = aout_owner (p_aout);
     aout_input_t *input;
@@ -143,19 +127,6 @@ void aout_Shutdown (audio_output_t *p_aout)
 
     aout_unlock( p_aout );
     free (input);
-}
-
-/**
- * Stops the decoded audio input.
- * @note Due to output recycling, this function is esssentially a stub.
- */
-void aout_DecDelete (audio_output_t *aout)
-{
-#ifdef RECYCLE
-    (void) aout;
-#else
-    aout_Shutdown (aout);
-#endif
 }
 
 #define AOUT_RESTART_OUTPUT 1
