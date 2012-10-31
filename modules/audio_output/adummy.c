@@ -53,9 +53,9 @@ static int Open( vlc_object_t * p_this )
 {
     audio_output_t * p_aout = (audio_output_t *)p_this;
 
-    p_aout->pf_play = Play;
-    p_aout->pf_pause = NULL;
-    p_aout->pf_flush = NULL;
+    p_aout->play = Play;
+    p_aout->pause = NULL;
+    p_aout->flush = NULL;
     p_aout->volume_set = NULL;
     p_aout->mute_set = NULL;
 

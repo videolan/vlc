@@ -127,9 +127,9 @@ static int Open ( vlc_object_t *p_this )
     p_aout->format.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     p_aout->format.i_rate = 44100;
     aout_PacketInit(p_aout, &p_sys->packet, FRAME_SIZE);
-    p_aout->pf_play = aout_PacketPlay;
-    p_aout->pf_pause = aout_PacketPause;
-    p_aout->pf_flush = aout_PacketFlush;
+    p_aout->play = aout_PacketPlay;
+    p_aout->pause = aout_PacketPause;
+    p_aout->flush = aout_PacketFlush;
 
     msg_Dbg(p_aout, "Starting AudioQueue (status = %i)", status);
     status = AudioQueueStart(p_sys->audioQueue, NULL);

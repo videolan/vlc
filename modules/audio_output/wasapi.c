@@ -800,9 +800,9 @@ retry:
     Leave();
 
     aout->format = format;
-    aout->pf_play = Play;
-    aout->pf_pause = Pause;
-    aout->pf_flush = Flush;
+    aout->play = Play;
+    aout->pause = Pause;
+    aout->flush = Flush;
     /*if (AOUT_FMT_LINEAR(&format) && !exclusive)*/
     {
         aout->volume_set = SimpleVolumeSet;

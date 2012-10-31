@@ -287,8 +287,8 @@ static int Open(vlc_object_t *p_this)
     }
 
     p_aout->sys = p_sys;
-    p_aout->pf_play = Play;
-    p_aout->pf_pause = Pause;
+    p_aout->play = Play;
+    p_aout->pause = Pause;
 
     p_sys->at_start(p_sys->AudioTrack);
 

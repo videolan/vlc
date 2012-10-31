@@ -179,9 +179,9 @@ static int Open(vlc_object_t * p_this)
     p_sys->b_changed_mixing = false;
     memset(p_sys->p_remainder_buffer, 0, sizeof(uint8_t) * BUFSIZE);
 
-    p_aout->pf_play = aout_PacketPlay;
-    p_aout->pf_pause = aout_PacketPause;
-    p_aout->pf_flush = aout_PacketFlush;
+    p_aout->play = aout_PacketPlay;
+    p_aout->pause = aout_PacketPause;
+    p_aout->flush = aout_PacketFlush;
 
     aout_FormatPrint(p_aout, "VLC is looking for:", &p_aout->format);
 
@@ -1370,7 +1370,7 @@ static int AudioDeviceCallback(vlc_object_t *p_this, const char *psz_variable,
 
 
 /*****************************************************************************
- * VolumeSet: Implements pf_volume_set(). Update the CoreAudio AU volume immediately.
+ * VolumeSet: Implements volume_set(). Update the CoreAudio AU volume immediately.
  *****************************************************************************/
 static int VolumeSet(audio_output_t * p_aout, float volume)
 {

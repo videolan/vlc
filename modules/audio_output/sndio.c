@@ -152,9 +152,9 @@ static int Open (vlc_object_t *obj)
 
     aout->format = f;
     aout->sys = sys;
-    aout->pf_play = Play;
-    aout->pf_pause = Pause;
-    aout->pf_flush  = NULL; /* sndio sucks! */
+    aout->play = Play;
+    aout->pause = Pause;
+    aout->flush  = NULL; /* sndio sucks! */
     if (sio_onvol(sys->hdl, VolumeChanged, aout))
     {
         aout->volume_set = VolumeSet;

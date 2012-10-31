@@ -370,9 +370,9 @@ static int Open( vlc_object_t *p_this )
     // we want 16bit signed data little endian.
     p_aout->format.i_format              = VLC_CODEC_S16L;
     p_aout->format.i_physical_channels   = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-    p_aout->pf_play                      = Play;
-    p_aout->pf_pause                     = Pause;
-    p_aout->pf_flush                     = Flush;
+    p_aout->play                         = Play;
+    p_aout->pause                        = Pause;
+    p_aout->flush                        = Flush;
 
     aout_FormatPrepare( &p_aout->format );
 

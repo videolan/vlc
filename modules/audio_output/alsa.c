@@ -521,15 +521,15 @@ static int Open (vlc_object_t *obj)
         aout_SoftVolumeInit (aout);
     }
 
-    aout->pf_play = Play;
+    aout->play = Play;
     if (snd_pcm_hw_params_can_pause (hw))
-        aout->pf_pause = Pause;
+        aout->pause = Pause;
     else
     {
-        aout->pf_pause = PauseDummy;
+        aout->pause = PauseDummy;
         msg_Warn (aout, "device cannot be paused");
     }
-    aout->pf_flush = Flush;
+    aout->flush = Flush;
 
     /* Setup audio-device choices */
     {

@@ -144,11 +144,11 @@ struct audio_output
         only when succesfully probed and not afterward) */
 
     struct aout_sys_t *sys; /**< Output plugin private data */
-    void (*pf_play)(audio_output_t *, block_t *, mtime_t *); /**< Play callback
+    void (*play)(audio_output_t *, block_t *, mtime_t *); /**< Play callback
         - queue a block for playback */
-    void (* pf_pause)( audio_output_t *, bool, mtime_t ); /**< Pause/resume
+    void (*pause)( audio_output_t *, bool, mtime_t ); /**< Pause/resume
         callback (optional, may be NULL) */
-    void (* pf_flush)( audio_output_t *, bool ); /**< Flush/drain callback
+    void (*flush)( audio_output_t *, bool ); /**< Flush/drain callback
         (optional, may be NULL) */
     int (*volume_set)(audio_output_t *, float); /**< Volume setter (or NULL) */
     int (*mute_set)(audio_output_t *, bool); /**< Mute setter (or NULL) */

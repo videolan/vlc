@@ -235,9 +235,9 @@ static int Open (vlc_object_t *obj)
     aout->format.i_rate = rate;
     aout->format.i_original_channels = aout->format.i_physical_channels;
 
-    aout->pf_play = Play;
-    aout->pf_pause = Pause;
-    aout->pf_flush = Flush;
+    aout->play = Play;
+    aout->pause = Pause;
+    aout->flush = Flush;
     if (sys->set_volume != NULL)
     {
         aout->volume_set = VolumeSet;

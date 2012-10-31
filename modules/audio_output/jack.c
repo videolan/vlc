@@ -143,9 +143,9 @@ static int Open( vlc_object_t *p_this )
     // TODO add buffer size callback
     p_aout->format.i_rate = jack_get_sample_rate( p_sys->p_jack_client );
 
-    p_aout->pf_play = aout_PacketPlay;
-    p_aout->pf_pause = aout_PacketPause;
-    p_aout->pf_flush = aout_PacketFlush;
+    p_aout->play = aout_PacketPlay;
+    p_aout->pause = aout_PacketPause;
+    p_aout->flush = aout_PacketFlush;
     aout_PacketInit( p_aout, &p_sys->packet,
                      jack_get_buffer_size( p_sys->p_jack_client ) );
     aout_SoftVolumeInit( p_aout );

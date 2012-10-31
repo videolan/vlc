@@ -203,9 +203,9 @@ static int Open ( vlc_object_t *p_this )
 
     p_aout->format   = format;
 
-    p_aout->pf_play  = Play;
-    p_aout->pf_pause = aout_PacketPause;
-    p_aout->pf_flush = aout_PacketFlush;
+    p_aout->play  = Play;
+    p_aout->pause = aout_PacketPause;
+    p_aout->flush = aout_PacketFlush;
 
     aout_PacketInit( p_aout, &p_sys->packet,
                      ks_obtained.ulBufferSize / i_bytes_per_frame );

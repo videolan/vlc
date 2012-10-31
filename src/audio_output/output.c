@@ -43,7 +43,7 @@
  *
  * @warning The caller (i.e. the audio output plug-in) is responsible for
  * interlocking and synchronizing call to this function and to the
- * audio_output_t.pf_volume_set callback. This ensures that VLC gets correct
+ * audio_output_t.volume_set callback. This ensures that VLC gets correct
  * volume information (possibly with a latency).
  */
 static void aout_OutputVolumeReport (audio_output_t *aout, float volume)
@@ -237,7 +237,7 @@ void aout_OutputPlay (audio_output_t *aout, block_t *block)
     }
 
     if (likely(owner->module != NULL))
-        aout->pf_play (aout, block, &drift);
+        aout->play (aout, block, &drift);
     else
         block_Release (block);
 /**
@@ -274,8 +274,8 @@ void aout_OutputPlay (audio_output_t *aout, block_t *block)
 void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
 {
     aout_assert_locked( aout );
-    if( aout->pf_pause != NULL )
-        aout->pf_pause( aout, pause, date );
+    if( aout->pause != NULL )
+        aout->pause( aout, pause, date );
 }
 
 /**
@@ -288,6 +288,6 @@ void aout_OutputFlush( audio_output_t *aout, bool wait )
 {
     aout_assert_locked( aout );
 
-    if( aout->pf_flush != NULL )
-        aout->pf_flush( aout, wait );
+    if( aout->flush != NULL )
+        aout->flush( aout, wait );
 }

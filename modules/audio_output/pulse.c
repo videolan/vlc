@@ -984,9 +984,9 @@ static int Open(vlc_object_t *obj)
     pa_threaded_mainloop_unlock(sys->mainloop);
 
     aout->format.i_format = format;
-    aout->pf_play = Play;
-    aout->pf_pause = Pause;
-    aout->pf_flush = Flush;
+    aout->play = Play;
+    aout->pause = Pause;
+    aout->flush = Flush;
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
     return VLC_SUCCESS;

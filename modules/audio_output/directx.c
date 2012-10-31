@@ -292,9 +292,9 @@ static int OpenAudio( vlc_object_t *p_this )
         goto error;
     }
 
-    p_aout->pf_play = Play;
-    p_aout->pf_pause = aout_PacketPause;
-    p_aout->pf_flush = aout_PacketFlush;
+    p_aout->play = Play;
+    p_aout->pause = aout_PacketPause;
+    p_aout->flush = aout_PacketFlush;
 
     /* Volume */
     if( val.i_int == AOUT_VAR_SPDIF )
@@ -551,7 +551,7 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer,
     SetEvent( p_aout->sys->notif.event );
 
     aout_PacketPlay( p_aout, p_buffer, drift );
-    p_aout->pf_play = aout_PacketPlay;
+    p_aout->play = aout_PacketPlay;
 }
 
 static int VolumeSet( audio_output_t *p_aout, float vol )
@@ -615,7 +615,7 @@ static void CloseAudio( vlc_object_t *p_this )
     {
         vlc_atomic_set(&p_aout->sys->notif.abort, 1);
         /* wake up the audio thread if needed */
-        if( p_aout->pf_play == Play )
+        if( p_aout->play == Play )
             SetEvent( p_sys->notif.event );
 
         vlc_join( p_sys->notif.thread, NULL );

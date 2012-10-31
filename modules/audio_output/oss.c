@@ -226,9 +226,9 @@ static int Open (vlc_object_t *obj)
 
     /* Setup audio_output_t */
     aout->format.i_format = fourcc;
-    aout->pf_play = Play;
-    aout->pf_pause = Pause;
-    aout->pf_flush = Flush;
+    aout->play = Play;
+    aout->pause = Pause;
+    aout->flush = Flush;
     aout->volume_set = NULL;
     aout->mute_set = NULL;
 

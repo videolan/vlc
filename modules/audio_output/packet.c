@@ -310,7 +310,7 @@ static block_t *aout_OutputSlice (audio_output_t *p_aout)
 /**
  * Dequeues the next audio packet (a.k.a. audio fragment).
  * The audio output plugin must first call aout_PacketPlay() to queue the
- * decoded audio samples. Typically, audio_output_t.pf_play is set to, or calls
+ * decoded audio samples. Typically, audio_output_t.play is set to, or calls
  * aout_PacketPlay().
  * @note This function is considered legacy. Please do not use this function in
  * new audio output plugins.
