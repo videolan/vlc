@@ -104,7 +104,7 @@ static void context_cb(pa_context *ctx, pa_subscription_event_type_t type,
         break;
 
       case PA_SUBSCRIPTION_EVENT_SINK_INPUT:
-        if (idx != pa_stream_get_index(sys->stream))
+        if (sys->stream == NULL || idx != pa_stream_get_index(sys->stream))
             break; /* only interested in our sink input */
 
         /* Gee... PA will not provide the infos directly in the event. */
@@ -718,7 +718,6 @@ static void Stop(audio_output_t *);
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t *sys = aout->sys;
-    pa_operation *op;
 
     /* Sample format specification */
     struct pa_sample_spec ss;
@@ -957,25 +956,8 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
 #endif
     stream_buffer_attr_cb(s, aout);
-
-    var_Create(aout, "audio-device", VLC_VAR_INTEGER|VLC_VAR_HASCHOICE);
-    var_Change(aout, "audio-device", VLC_VAR_SETTEXT,
-               &(vlc_value_t){ .psz_string = (char *)_("Audio device") },
-               NULL);
     var_AddCallback (aout, "audio-device", StreamMove, s);
-    op = pa_context_get_sink_info_list(sys->context, sink_list_cb, aout);
-    /* We may need to wait for completion... once LibVLC supports this */
-    if (op != NULL)
-        pa_operation_unref(op);
     stream_moved_cb(s, aout);
-
-    /* Context events */
-    const pa_subscription_mask_t mask = PA_SUBSCRIPTION_MASK_SINK
-                                      | PA_SUBSCRIPTION_MASK_SINK_INPUT;
-    pa_context_set_subscribe_callback(sys->context, context_cb, aout);
-    op = pa_context_subscribe(sys->context, mask, NULL, NULL);
-    if (likely(op != NULL))
-       pa_operation_unref(op);
     pa_threaded_mainloop_unlock(sys->mainloop);
 
     return VLC_SUCCESS;
@@ -996,7 +978,6 @@ static void Stop(audio_output_t *aout)
 
     /* The callback takes mainloop lock, so it CANNOT be held here! */
     var_DelCallback (aout, "audio-device", StreamMove, s);
-    var_Destroy (aout, "audio-device");
 
     pa_threaded_mainloop_lock(sys->mainloop);
     if (unlikely(sys->trigger != NULL))
@@ -1013,9 +994,9 @@ static void Stop(audio_output_t *aout)
     pa_stream_set_started_callback(s, NULL, NULL);
     pa_stream_set_suspended_callback(s, NULL, NULL);
     pa_stream_set_underflow_callback(s, NULL, NULL);
-    pa_context_set_subscribe_callback(sys->context, NULL, NULL);
 
     pa_stream_unref(s);
+    sys->stream = NULL;
     pa_threaded_mainloop_unlock(sys->mainloop);
 }
 
@@ -1023,6 +1004,7 @@ static int Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = malloc(sizeof (*sys));
+    pa_operation *op;
 
 #if !PA_CHECK_VERSION(0,9,22)
     if (!vlc_xlib_init(obj))
@@ -1038,6 +1020,7 @@ static int Open(vlc_object_t *obj)
         free(sys);
         return VLC_EGENERIC;
     }
+    sys->stream = NULL;
     sys->context = ctx;
 
     aout->sys = sys;
@@ -1048,6 +1031,27 @@ static int Open(vlc_object_t *obj)
     aout->flush = Flush;
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
+
+    /* Devices (sinks) */
+    var_Create(aout, "audio-device", VLC_VAR_INTEGER|VLC_VAR_HASCHOICE);
+    var_Change(aout, "audio-device", VLC_VAR_SETTEXT,
+               &(vlc_value_t){ .psz_string = (char *)_("Audio device") },
+               NULL);
+
+    pa_threaded_mainloop_lock(sys->mainloop);
+    op = pa_context_get_sink_info_list(sys->context, sink_list_cb, aout);
+    if (op != NULL)
+        pa_operation_unref(op);
+
+    /* Context events */
+    const pa_subscription_mask_t mask = PA_SUBSCRIPTION_MASK_SINK
+                                      | PA_SUBSCRIPTION_MASK_SINK_INPUT;
+    pa_context_set_subscribe_callback(sys->context, context_cb, aout);
+    op = pa_context_subscribe(sys->context, mask, NULL, NULL);
+    if (likely(op != NULL))
+       pa_operation_unref(op);
+    pa_threaded_mainloop_unlock(sys->mainloop);
+
     return VLC_SUCCESS;
 }
 
@@ -1057,6 +1061,11 @@ static void Close(vlc_object_t *obj)
     aout_sys_t *sys = aout->sys;
     pa_context *ctx = sys->context;
 
+    pa_threaded_mainloop_lock(sys->mainloop);
+    pa_context_set_subscribe_callback(sys->context, NULL, NULL);
+    pa_threaded_mainloop_unlock(sys->mainloop);
     vlc_pa_disconnect(obj, ctx, sys->mainloop);
+
+    var_Destroy (aout, "audio-device");
     free(sys);
 }
