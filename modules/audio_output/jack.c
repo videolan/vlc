@@ -137,7 +137,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     p_aout->flush = aout_PacketFlush;
     aout_PacketInit( p_aout, &p_sys->packet,
                      jack_get_buffer_size( p_sys->p_jack_client ), fmt );
-    aout_SoftVolumeInit( p_aout );
+    aout_SoftVolumeStart( p_aout );
 
     p_sys->i_channels = aout_FormatNbChannels( fmt );
 

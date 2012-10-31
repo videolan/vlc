@@ -71,12 +71,6 @@ static void aout_SoftVolumeInit(audio_output_t *aout)
     float gain = var_InheritFloat(aout, MODULE_STRING"-gain");
     bool mute = var_InheritBool(aout, "mute");
 
-    if (aout_GainRequest(aout, mute ? 0.f : gain))
-    {
-        mute = false;
-        gain = 1.f;
-    }
-
     aout->volume_set = aout_SoftVolumeSet;
     aout->mute_set = aout_SoftMuteSet;
     sys->soft_gain = gain;
@@ -84,4 +78,15 @@ static void aout_SoftVolumeInit(audio_output_t *aout)
 
     aout_MuteReport(aout, mute);
     aout_VolumeReport(aout, cbrtf(gain));
+}
+
+static void aout_SoftVolumeStart (audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+
+    if (aout_GainRequest(aout, sys->soft_mute ? 0.f : sys->soft_gain))
+    {
+        aout_MuteReport(aout, false);
+        aout_VolumeReport(aout, 1.f);
+    }
 }

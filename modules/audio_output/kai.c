@@ -204,10 +204,10 @@ static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
     p_aout->play  = Play;
     p_aout->pause = aout_PacketPause;
     p_aout->flush = aout_PacketFlush;
+    aout_SoftVolumeStart( p_aout );
 
     aout_PacketInit( p_aout, &p_sys->packet,
                      ks_obtained.ulBufferSize / i_bytes_per_frame );
-    aout_SoftVolumeInit( p_aout );
 
     if ( var_Type( p_aout, "audio-device" ) == 0 )
     {
@@ -343,8 +343,8 @@ static int Open (vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
 
-    /* FIXME: set volume/mute here */
     aout->start = Start;
     aout->stop = Stop;
+    aout_SoftVolumeInit( p_aout );
     return VLC_SUCCESS;
 }

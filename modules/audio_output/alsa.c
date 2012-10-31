@@ -531,6 +531,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     var_AddCallback (aout, "audio-device", DeviceChanged, NULL);
 
     free (device);
+    aout_SoftVolumeStart (aout);
     return 0;
 
 error:

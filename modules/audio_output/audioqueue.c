@@ -126,6 +126,7 @@ static int Start( audio_output_t *aout, audio_sample_format_t *restrict fmt )
     p_aout->play = aout_PacketPlay;
     p_aout->pause = aout_PacketPause;
     p_aout->flush = aout_PacketFlush;
+    aout_SoftVolumeStart(p_aout);
 
     msg_Dbg(p_aout, "Starting AudioQueue (status = %i)", status);
     status = AudioQueueStart(p_sys->audioQueue, NULL);
