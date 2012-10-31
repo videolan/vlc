@@ -323,7 +323,6 @@ void playlist_Destroy( playlist_t *p_playlist )
 
     /* Already cleared when deactivating (if activated anyway) */
     assert( !p_sys->p_input );
-    assert( !p_sys->p_input_resource );
 
     vlc_cond_destroy( &p_sys->signal );
     vlc_mutex_destroy( &p_sys->lock );

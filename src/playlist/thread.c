@@ -58,6 +58,10 @@ void playlist_Activate( playlist_t *p_playlist )
     /* */
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
+    p_sys->p_input_resource = input_resource_New( VLC_OBJECT( p_playlist ) );
+    if( unlikely(p_sys->p_input_resource == NULL) )
+        abort();
+
     /* Start the playlist thread */
     if( vlc_clone( &p_sys->thread, Thread, p_playlist,
                    VLC_THREAD_PRIORITY_LOW ) )
@@ -83,12 +87,8 @@ void playlist_Deactivate( playlist_t *p_playlist )
     assert( !p_sys->p_input );
 
     /* release input resources */
-    if( p_sys->p_input_resource )
-    {
-        input_resource_Terminate( p_sys->p_input_resource );
-        input_resource_Release( p_sys->p_input_resource );
-    }
-    p_sys->p_input_resource = NULL;
+    input_resource_Terminate( p_sys->p_input_resource );
+    input_resource_Release( p_sys->p_input_resource );
 
     if( var_InheritBool( p_playlist, "media-library" ) )
         playlist_MLDump( p_playlist );
@@ -237,8 +237,6 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 
     assert( p_sys->p_input == NULL );
 
-    if( !p_sys->p_input_resource )
-        p_sys->p_input_resource = input_resource_New( VLC_OBJECT( p_playlist ) );
     input_thread_t *p_input_thread = input_Create( p_playlist, p_input, NULL, p_sys->p_input_resource );
     if( p_input_thread )
     {
@@ -523,8 +521,7 @@ static void LoopRequest( playlist_t *p_playlist )
     {
         p_sys->status.i_status = PLAYLIST_STOPPED;
 
-        if( p_sys->p_input_resource &&
-            input_resource_HasVout( p_sys->p_input_resource ) )
+        if( input_resource_HasVout( p_sys->p_input_resource ) )
         {
             /* XXX We can unlock if we don't issue the wait as we will be
              * call again without anything else done between the calls */
