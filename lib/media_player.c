@@ -486,12 +486,18 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     mp->state = libvlc_NothingSpecial;
     mp->p_libvlc_instance = instance;
     mp->input.p_thread = NULL;
-    mp->input.p_resource = NULL;
+    mp->input.p_resource = input_resource_New(VLC_OBJECT(mp));
+    if (unlikely(mp->input.p_resource == NULL))
+    {
+        vlc_object_release(mp);
+        return NULL;
+    }
     vlc_mutex_init (&mp->input.lock);
     mp->i_refcount = 1;
     mp->p_event_manager = libvlc_event_manager_new(mp, instance);
     if (unlikely(mp->p_event_manager == NULL))
     {
+        input_resource_Release(mp->input.p_resource);
         vlc_object_release(mp);
         return NULL;
     }
@@ -569,12 +575,8 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
     /* No need for lock_input() because no other threads knows us anymore */
     if( p_mi->input.p_thread )
         release_input_thread(p_mi, true);
-    if( p_mi->input.p_resource )
-    {
-        input_resource_Terminate( p_mi->input.p_resource );
-        input_resource_Release( p_mi->input.p_resource );
-        p_mi->input.p_resource = NULL;
-    }
+    input_resource_Terminate( p_mi->input.p_resource );
+    input_resource_Release( p_mi->input.p_resource );
     vlc_mutex_destroy( &p_mi->input.lock );
 
     libvlc_event_manager_release( p_mi->p_event_manager );
@@ -718,8 +720,6 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
         return -1;
     }
 
-    if( !p_mi->input.p_resource )
-        p_mi->input.p_resource = input_resource_New( VLC_OBJECT( p_mi ) );
     p_input_thread = input_Create( p_mi, p_mi->p_md->p_input_item, NULL,
                                    p_mi->input.p_resource );
     unlock(p_mi);
@@ -819,8 +819,7 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi )
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
 
-    if( p_mi->input.p_resource != NULL )
-        input_resource_Terminate( p_mi->input.p_resource );
+    input_resource_Terminate( p_mi->input.p_resource );
     unlock_input(p_mi);
 }
 
