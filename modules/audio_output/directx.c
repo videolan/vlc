@@ -263,7 +263,8 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
         aout_PacketInit( p_aout, &p_aout->sys->packet, fmt->i_rate / 20, fmt );
     }
 
-    p_aout->sys->volume.volume = -1;
+    /* Force volume update in thread. TODO: use session volume on Vista+ */
+    p_aout->sys->volume.volume = p_aout->sys->volume.mb;
 
     /* Now we need to setup our DirectSound play notification structure */
     vlc_atomic_set(&p_aout->sys->notif.abort, 0);
@@ -287,23 +288,6 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     p_aout->play = Play;
     p_aout->pause = aout_PacketPause;
     p_aout->flush = aout_PacketFlush;
-
-    /* Volume */
-    if( val.i_int == AOUT_VAR_SPDIF )
-    {
-        p_aout->volume_set = NULL;
-        p_aout->mute_set = NULL;
-    }
-    else
-    {
-        LONG mb = var_InheritInteger( p_aout, "directx-volume" );
-
-        p_aout->volume_set = VolumeSet;
-        p_aout->mute_set = MuteSet;
-        p_aout->sys->volume.mb = mb;
-        aout_VolumeReport( p_aout, cbrtf(powf(10.f, ((float)mb) / 2000.f)) );
-        MuteSet( p_aout, var_InheritBool( p_aout, "mute" ) );
-    }
     return VLC_SUCCESS;
 
  error:
@@ -1173,8 +1157,15 @@ static int Open(vlc_object_t *obj)
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
-    aout->volume_set = NULL; /* FIXME */
-    aout->mute_set = NULL;
+    aout->volume_set = VolumeSet;
+    aout->mute_set = MuteSet;
+
+    /* Volume */
+    LONG mb = var_InheritInteger(aout, "directx-volume");
+    sys->volume.mb = mb;
+    aout_VolumeReport(aout, cbrtf(powf(10.f, ((float)mb) / 2000.f)));
+    MuteSet(aout, var_InheritBool(aout, "mute"));
+
     return VLC_SUCCESS;
 }
 
