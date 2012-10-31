@@ -100,8 +100,8 @@ struct aout_sys_t
  * Local prototypes.
  *****************************************************************************/
 static int      Open                    (vlc_object_t *);
-static int      OpenAnalog              (audio_output_t *);
-static int      OpenSPDIF               (audio_output_t *);
+static int      OpenAnalog              (audio_output_t *, audio_sample_format_t *);
+static int      OpenSPDIF               (audio_output_t *, audio_sample_format_t *);
 static void     Close                   (vlc_object_t *);
 
 static void     Probe                   (audio_output_t *);
@@ -250,12 +250,12 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     /* Check for Digital mode or Analog output mode */
     if (AOUT_FMT_SPDIF (fmt) && b_supports_digital) {
-        if (OpenSPDIF (p_aout)) {
+        if (OpenSPDIF (p_aout, fmt)) {
             msg_Dbg(p_aout, "digital output successfully opened");
             return VLC_SUCCESS;
         }
     } else {
-        if (OpenAnalog(p_aout)) {
+        if (OpenAnalog(p_aout, fmt)) {
             msg_Dbg(p_aout, "analog output successfully opened");
             return VLC_SUCCESS;
         }
