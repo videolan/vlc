@@ -633,8 +633,11 @@ static void Flush(audio_output_t *aout, bool wait)
 static int VolumeSet(audio_output_t *aout, float vol)
 {
     aout_sys_t *sys = aout->sys;
-    pa_operation *op;
-    uint32_t idx = pa_stream_get_index(sys->stream);
+    if (sys->stream == NULL)
+    {
+        msg_Err (aout, "cannot change volume while not playing");
+        return -1;
+    }
 
     /* VLC provides the software volume so convert directly to PulseAudio
      * software volume, pa_volume_t. This is not a linear amplification factor
@@ -648,11 +651,13 @@ static int VolumeSet(audio_output_t *aout, float vol)
     pa_cvolume cvolume = sys->cvolume;
     pa_cvolume_scale(&cvolume, PA_VOLUME_NORM);
     pa_sw_cvolume_multiply_scalar(&cvolume, &cvolume, volume);
-
     assert(pa_cvolume_valid(&cvolume));
 
+    pa_operation *op;
+    uint32_t idx = pa_stream_get_index(sys->stream);
     pa_threaded_mainloop_lock(sys->mainloop);
-    op = pa_context_set_sink_input_volume(sys->context, idx, &cvolume, NULL, NULL);
+    op = pa_context_set_sink_input_volume(sys->context, idx, &cvolume,
+                                          NULL, NULL);
     if (likely(op != NULL))
         pa_operation_unref(op);
     pa_threaded_mainloop_unlock(sys->mainloop);
@@ -663,9 +668,14 @@ static int VolumeSet(audio_output_t *aout, float vol)
 static int MuteSet(audio_output_t *aout, bool mute)
 {
     aout_sys_t *sys = aout->sys;
+    if (sys->stream == NULL)
+    {
+        msg_Err (aout, "cannot change volume while not playing");
+        return -1;
+    }
+
     pa_operation *op;
     uint32_t idx = pa_stream_get_index(sys->stream);
-
     pa_threaded_mainloop_lock(sys->mainloop);
     op = pa_context_set_sink_input_mute(sys->context, idx, mute, NULL, NULL);
     if (likely(op != NULL))
