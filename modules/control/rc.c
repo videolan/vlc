@@ -39,7 +39,6 @@
 #include <math.h>
 
 #include <vlc_interface.h>
-#include <vlc_aout_intf.h>
 #include <vlc_vout.h>
 #include <vlc_osd.h>
 #include <vlc_playlist.h>
@@ -1422,7 +1421,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             }
         }
 
-        float volume = aout_VolumeGet( p_playlist );
+        float volume = playlist_VolumeGet( p_playlist );
         if( volume >= 0.f )
             msg_rc( STATUS_CHANGE "( audio volume: %ld )",
                     lroundf(volume * AOUT_VOLUME_DEFAULT) );
@@ -1504,17 +1503,17 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
     {
         /* Set. */
         int i_volume = atoi( newval.psz_string );
-        if( !aout_VolumeSet( p_playlist,
+        if( !playlist_VolumeSet( p_playlist,
                              i_volume / (float)AOUT_VOLUME_DEFAULT ) )
             i_error = VLC_SUCCESS;
-        aout_MuteSet( p_playlist, i_volume == 0 );
+        playlist_MuteSet( p_playlist, i_volume == 0 );
         msg_rc( STATUS_CHANGE "( audio volume: %d )", i_volume );
     }
     else
     {
         /* Get. */
         msg_rc( STATUS_CHANGE "( audio volume: %ld )",
-               lroundf( aout_VolumeGet( p_playlist ) * AOUT_VOLUME_DEFAULT ) );
+               lroundf( playlist_VolumeGet( p_playlist ) * AOUT_VOLUME_DEFAULT ) );
         i_error = VLC_SUCCESS;
     }
 
@@ -1545,7 +1544,7 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !strcmp(psz_cmd, "voldown") )
         i_nb_steps *= -1;
-    if( aout_VolumeUp( p_intf->p_sys->p_playlist, i_nb_steps, &volume ) < 0 )
+    if( playlist_VolumeUp( p_intf->p_sys->p_playlist, i_nb_steps, &volume ) < 0 )
         i_error = VLC_EGENERIC;
 
     if ( !i_error )

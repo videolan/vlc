@@ -27,7 +27,6 @@
 #endif
 
 #include <vlc_vout.h>
-#include <vlc_aout_intf.h>
 #include <vlc_keys.h>
 
 #include "actions_manager.hpp"
@@ -179,17 +178,17 @@ void ActionsManager::frame()
 
 void ActionsManager::toggleMuteAudio()
 {
-     aout_MuteToggle( THEPL );
+     playlist_MuteToggle( THEPL );
 }
 
 void ActionsManager::AudioUp()
 {
-    aout_VolumeUp( THEPL, 1, NULL );
+    playlist_VolumeUp( THEPL, 1, NULL );
 }
 
 void ActionsManager::AudioDown()
 {
-    aout_VolumeDown( THEPL, 1, NULL );
+    playlist_VolumeDown( THEPL, 1, NULL );
 }
 
 void ActionsManager::skipForward()

@@ -31,7 +31,6 @@
 #import "misc.h"
 #import "fspanel.h"
 #import "CompatibilityFixes.h"
-#import <vlc_aout_intf.h>
 
 @interface VLCFSPanel ()
 - (void)hideMouse;

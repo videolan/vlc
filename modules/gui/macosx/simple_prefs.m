@@ -29,7 +29,6 @@
 #import "prefs.h"
 #import <vlc_keys.h>
 #import <vlc_interface.h>
-#import <vlc_aout_intf.h>
 #import <vlc_dialog.h>
 #import <vlc_modules.h>
 #import <vlc_plugin.h>

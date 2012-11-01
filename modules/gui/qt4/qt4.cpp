@@ -39,7 +39,6 @@
 #include "recents.hpp"          /* Recents Item destruction */
 #include "util/qvlcapp.hpp"     /* QVLCApplication definition */
 #include "components/playlist/playlist_model.hpp" /* for ~PLModel() */
-#include <vlc_aout_intf.h>
 
 #ifdef Q_WS_X11
  #include <vlc_xlib.h>

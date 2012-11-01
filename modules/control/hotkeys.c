@@ -35,7 +35,6 @@
 #include <vlc_interface.h>
 #include <vlc_input.h>
 #include <vlc_vout.h>
-#include <vlc_aout_intf.h>
 #include <vlc_osd.h>
 #include <vlc_playlist.h>
 #include <vlc_keys.h>
@@ -187,7 +186,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         case ACTIONID_VOL_UP:
         {
             float vol;
-            if( aout_VolumeUp( p_playlist, 1, &vol ) == 0 )
+            if( playlist_VolumeUp( p_playlist, 1, &vol ) == 0 )
                 DisplayVolume( p_intf, p_vout, vol );
             break;
         }
@@ -195,16 +194,16 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         case ACTIONID_VOL_DOWN:
         {
             float vol;
-            if( aout_VolumeDown( p_playlist, 1, &vol ) == 0 )
+            if( playlist_VolumeDown( p_playlist, 1, &vol ) == 0 )
                 DisplayVolume( p_intf, p_vout, vol );
             break;
         }
 
         case ACTIONID_VOL_MUTE:
-            if( aout_MuteToggle( p_playlist ) == 0 )
+            if( playlist_MuteToggle( p_playlist ) == 0 )
             {
-                float vol = aout_VolumeGet( p_playlist );
-                if( aout_MuteGet( p_playlist ) > 0 || vol == 0.f )
+                float vol = playlist_VolumeGet( p_playlist );
+                if( playlist_MuteGet( p_playlist ) > 0 || vol == 0.f )
                 {
                     ClearChannels( p_intf, p_vout );
                     DisplayIcon( p_vout, OSD_MUTE_ICON );

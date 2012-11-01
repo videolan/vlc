@@ -33,7 +33,6 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_vout.h>
-#include <vlc_aout_intf.h>
 #include <vlc_playlist.h>
 #include <assert.h>
 
@@ -263,18 +262,18 @@ static void ProcessGesture( intf_thread_t *p_intf )
 
         case UP:
             msg_Dbg(p_intf, "Louder");
-            aout_VolumeUp( p_playlist, 1, NULL );
+            playlist_VolumeUp( p_playlist, 1, NULL );
             break;
 
         case DOWN:
             msg_Dbg(p_intf, "Quieter");
-            aout_VolumeDown( p_playlist, 1, NULL );
+            playlist_VolumeDown( p_playlist, 1, NULL );
             break;
 
         case GESTURE(UP,DOWN,NONE,NONE):
         case GESTURE(DOWN,UP,NONE,NONE):
             msg_Dbg( p_intf, "Mute sound" );
-            aout_MuteToggle( p_playlist );
+            playlist_MuteToggle( p_playlist );
             break;
 
         case GESTURE(UP,RIGHT,NONE,NONE):

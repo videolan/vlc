@@ -45,7 +45,6 @@
 #include "util/qt_dirs.hpp"
 
 #include "../../audio_filter/equalizer_presets.h"
-#include <vlc_aout_intf.h>
 #include <vlc_intf_strings.h>
 #include <vlc_vout.h>
 #include <vlc_osd.h>
@@ -1054,9 +1053,9 @@ void Equalizer::changeFreqLabels( bool b_useVlcBands )
 void Equalizer::enable()
 {
     bool en = ui.enableCheck->isChecked();
-    aout_EnableFilter( THEPL, "equalizer", en );
-//    aout_EnableFilter( THEPL, "upmixer", en );
-//     aout_EnableFilter( THEPL, "vsurround", en );
+    playlist_EnableAudioFilter( THEPL, "equalizer", en );
+    //playlist_EnableAudioFilter( THEPL, "upmixer", en );
+    //playlist_EnableAudioFilter( THEPL, "vsurround", en );
     enable( en );
 
     if( presetsComboBox->currentIndex() < 0 )
@@ -1334,7 +1333,7 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent )
 void Compressor::enable()
 {
     bool en = enableCheck->isChecked();
-    aout_EnableFilter( THEPL, "compressor", en );
+    playlist_EnableAudioFilter( THEPL, "compressor", en );
     enable( en );
 }
 
@@ -1474,7 +1473,7 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
 void Spatializer::enable()
 {
     bool en = enableCheck->isChecked();
-    aout_EnableFilter( THEPL, "spatializer", en );
+    playlist_EnableAudioFilter( THEPL, "spatializer", en );
     enable( en );
 }
 

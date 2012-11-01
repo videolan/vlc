@@ -35,7 +35,7 @@
 #include <vlc_osd.h>
 #include <vlc_image.h>
 #include <vlc_modules.h>
-#include <vlc_aout_intf.h>
+#include <vlc_playlist.h>
 
 #include "libvlc.h"
 
@@ -171,7 +171,7 @@ osd_menu_t *osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
         if( p_osd->p_state->p_volume )
         {
             /* Update the volume state images to match the current volume */
-            float vol = aout_VolumeGet( p_this );
+            float vol = playlist_VolumeGet( pl_Get(p_this) );
             if( vol >= 0.f )
             {
                 vol *= (float)AOUT_VOLUME_DEFAULT;

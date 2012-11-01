@@ -409,11 +409,6 @@ void set_current_status_node( playlist_t * p_playlist,
     pl_priv(p_playlist)->status.p_node = p_node;
 }
 
-static input_thread_t *playlist_FindInput( vlc_object_t *object )
-{
-    return playlist_CurrentInput( (playlist_t *)object );
-}
-
 static void VariablesInit( playlist_t *p_playlist )
 {
     /* These variables control updates */
@@ -466,9 +461,6 @@ static void VariablesInit( playlist_t *p_playlist )
     var_Create( p_playlist, "mute", VLC_VAR_BOOL );
     var_Create( p_playlist, "volume", VLC_VAR_FLOAT );
     var_SetFloat( p_playlist, "volume", -1.f );
-    /* FIXME: horrible hack for audio output interface code */
-    var_Create( p_playlist, "find-input-callback", VLC_VAR_ADDRESS );
-    var_SetAddress( p_playlist, "find-input-callback", playlist_FindInput );
 }
 
 playlist_item_t * playlist_CurrentPlayingItem( playlist_t * p_playlist )

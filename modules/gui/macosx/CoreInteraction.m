@@ -30,7 +30,6 @@
 #import <vlc_input.h>
 #import <vlc_keys.h>
 #import <vlc_osd.h>
-#import <vlc_aout_intf.h>
 #import <vlc/vlc.h>
 #import <vlc_strings.h>
 #import <vlc_url.h>
@@ -424,7 +423,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     if (!p_intf)
         return;
 
-    aout_VolumeUp(pl_Get(p_intf), 1, NULL);
+    playlist_VolumeUp(pl_Get(p_intf), 1, NULL);
 }
 
 - (void)volumeDown
@@ -433,7 +432,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     if (!p_intf)
         return;
 
-    aout_VolumeDown(pl_Get(p_intf), 1, NULL);
+    playlist_VolumeDown(pl_Get(p_intf), 1, NULL);
 }
 
 - (void)toggleMute
@@ -442,7 +441,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     if (!p_intf)
         return;
 
-    aout_MuteToggle(pl_Get(p_intf));
+    playlist_MuteToggle(pl_Get(p_intf));
 }
 
 - (void)setMute:(BOOL)b_value
@@ -451,7 +450,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     if (!p_intf)
         return;
 
-    aout_MuteSet(pl_Get(p_intf), b_value);
+    playlist_MuteSet(pl_Get(p_intf), b_value);
 }
 
 - (BOOL)mute
@@ -461,7 +460,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
         return NO;
 
     BOOL b_is_muted = NO;
-    b_is_muted = aout_MuteGet(pl_Get(p_intf)) > 0;
+    b_is_muted = playlist_MuteGet(pl_Get(p_intf)) > 0;
 
     return b_is_muted;
 }
@@ -472,7 +471,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     if (!p_intf)
         return 0;
 
-    float volume = aout_VolumeGet(pl_Get(p_intf));
+    float volume = playlist_VolumeGet(pl_Get(p_intf));
 
     return lroundf(volume * AOUT_VOLUME_DEFAULT);
 }
@@ -483,7 +482,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     if (!p_intf)
         return;
 
-    aout_VolumeSet(pl_Get(p_intf), i_value / (float)AOUT_VOLUME_DEFAULT);
+    playlist_VolumeSet(pl_Get(p_intf), i_value / (float)AOUT_VOLUME_DEFAULT);
 }
 
 #pragma mark -

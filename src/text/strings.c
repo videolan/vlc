@@ -43,7 +43,6 @@
 #include <vlc_input.h>
 #include <vlc_meta.h>
 #include <vlc_playlist.h>
-#include <vlc_aout_intf.h>
 
 #include <vlc_strings.h>
 #include <vlc_charset.h>
@@ -776,7 +775,7 @@ char *str_format_meta( playlist_t *p_object, const char *string )
                     break;
                 case 'V':
                 {
-                    float vol = aout_VolumeGet( p_object );
+                    float vol = playlist_VolumeGet( p_object );
                     if( vol >= 0. )
                     {
                         snprintf( buf, 10, "%ld",

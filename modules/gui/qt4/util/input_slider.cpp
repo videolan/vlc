@@ -31,7 +31,6 @@
 
 #include "util/input_slider.hpp"
 #include "adapters/seekpoints.hpp"
-#include <vlc_aout_intf.h>
 
 #include <QPaintEvent>
 #include <QPainter>

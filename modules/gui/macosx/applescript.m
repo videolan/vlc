@@ -28,7 +28,6 @@
 #include "intf.h"
 #include "applescript.h"
 #include "CoreInteraction.h"
-#include "vlc_aout_intf.h"
 
 /*****************************************************************************
  * VLGetURLScriptCommand implementation

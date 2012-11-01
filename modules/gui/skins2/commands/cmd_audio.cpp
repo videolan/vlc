@@ -25,14 +25,13 @@
 #include "../src/vlcproc.hpp"
 #include <vlc_playlist.h>
 #include <vlc_input.h>
-#include <vlc_aout_intf.h>
 #include <string>
 
 void CmdSetEqualizer::execute()
 {
     playlist_t* pPlaylist = getIntf()->p_sys->p_playlist;
 
-    aout_EnableFilter( pPlaylist, "equalizer", m_enable );
+    playlist_EnableAudioFilter( pPlaylist, "equalizer", m_enable );
     VlcProc::instance( getIntf() )->update_equalizer();
 }
 

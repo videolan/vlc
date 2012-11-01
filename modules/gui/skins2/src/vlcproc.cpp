@@ -29,7 +29,6 @@
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
-#include <vlc_aout_intf.h>
 #include <vlc_vout.h>
 #include <vlc_playlist.h>
 #include <vlc_url.h>
@@ -694,7 +693,7 @@ void VlcProc::on_volume_changed( vlc_object_t* p_obj, vlc_value_t newVal )
     playlist_t* pPlaylist = getIntf()->p_sys->p_playlist;
 
     SET_VOLUME( m_cVarVolume, var_GetFloat( pPlaylist, "volume" ), false );
-    bool b_is_muted = aout_MuteGet( pPlaylist ) > 0;
+    bool b_is_muted = playlist_MuteGet( pPlaylist ) > 0;
     SET_BOOL( m_cVarMute, b_is_muted );
 }
 
@@ -798,7 +797,7 @@ void VlcProc::init_variables()
     SET_BOOL( m_cVarRepeat, var_GetBool( pPlaylist, "repeat" ) );
 
     SET_VOLUME( m_cVarVolume, var_GetFloat( pPlaylist, "volume" ), false );
-    bool b_is_muted = aout_MuteGet( pPlaylist ) > 0;
+    bool b_is_muted = playlist_MuteGet( pPlaylist ) > 0;
     SET_BOOL( m_cVarMute, b_is_muted );
 
     update_equalizer();

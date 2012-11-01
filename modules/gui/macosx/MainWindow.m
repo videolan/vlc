@@ -36,11 +36,9 @@
 #import "SideBarItem.h"
 #import <math.h>
 #import <vlc_playlist.h>
-#import <vlc_aout_intf.h>
 #import <vlc_url.h>
 #import <vlc_strings.h>
 #import <vlc_services_discovery.h>
-#import <vlc_aout_intf.h>
 
 #import "ControlsBar.h"
 #import "VideoView.h"

@@ -24,7 +24,6 @@
 
 #include "cmd_input.hpp"
 #include "cmd_dialogs.hpp"
-#include <vlc_aout_intf.h>
 #include <vlc_input.h>
 #include <vlc_playlist.h>
 
@@ -102,18 +101,18 @@ void CmdFaster::execute()
 
 void CmdMute::execute()
 {
-    aout_MuteToggle( getIntf()->p_sys->p_playlist );
+    playlist_MuteToggle( getIntf()->p_sys->p_playlist );
 }
 
 
 void CmdVolumeUp::execute()
 {
-    aout_VolumeUp( getIntf()->p_sys->p_playlist, 1, NULL );
+    playlist_VolumeUp( getIntf()->p_sys->p_playlist, 1, NULL );
 }
 
 
 void CmdVolumeDown::execute()
 {
-    aout_VolumeDown( getIntf()->p_sys->p_playlist, 1, NULL );
+    playlist_VolumeDown( getIntf()->p_sys->p_playlist, 1, NULL );
 }
 

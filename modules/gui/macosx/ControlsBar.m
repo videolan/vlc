@@ -28,8 +28,6 @@
 #import "MainMenu.h"
 #import "fspanel.h"
 
-#import <vlc_aout_intf.h>
-
 /*****************************************************************************
  * VLCControlsBarCommon
  *

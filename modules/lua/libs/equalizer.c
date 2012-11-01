@@ -34,7 +34,6 @@
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
-#include <vlc_aout_intf.h>
 #include <vlc_input.h>
 #include <vlc_charset.h>
 
@@ -293,7 +292,7 @@ static int vlclua_equalizer_enable ( lua_State *L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     bool state = luaL_checkboolean ( L , 1 );
-    aout_EnableFilter( p_playlist, "equalizer", state );
+    playlist_EnableAudioFilter( p_playlist, "equalizer", state );
     return 0;
 }
 /*****************************************************************************

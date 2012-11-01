@@ -31,7 +31,6 @@
 #include <vlc_common.h>
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
-#include <vlc_aout_intf.h>
 
 #include <math.h>
 
@@ -167,7 +166,7 @@ DBUS_METHOD( Seek )
 static void
 MarshalVolume( intf_thread_t *p_intf, DBusMessageIter *container )
 {
-    float f_vol = aout_VolumeGet( p_intf->p_sys->p_playlist );
+    float f_vol = playlist_VolumeGet( p_intf->p_sys->p_playlist );
     if( f_vol < 0.f )
         f_vol = 1.f; /* ? */
 
@@ -204,7 +203,7 @@ DBUS_METHOD( VolumeSet )
     d_dbus_vol *= AOUT_VOLUME_DEFAULT;
     if( d_dbus_vol < 0. )
         d_dbus_vol = 0.;
-    aout_VolumeSet( PL, d_dbus_vol );
+    playlist_VolumeSet( PL, d_dbus_vol );
 
     REPLY_SEND;
 }

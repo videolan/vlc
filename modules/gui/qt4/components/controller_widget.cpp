@@ -32,7 +32,6 @@
 #include "util/input_slider.hpp"     /* SoundSlider */
 
 #include <math.h>
-#include <vlc_aout_intf.h>           /* Volume functions */
 
 #include <QLabel>
 #include <QHBoxLayout>
@@ -108,10 +107,10 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
         layout->addWidget( volumeSlider, 0, Qt::AlignBottom  );
 
     /* Set the volume from the config */
-    float volume = aout_VolumeGet( THEPL );
+    float volume = playlist_VolumeGet( THEPL );
     libUpdateVolume( (volume >= 0.f) ? volume : 1.f );
     /* Sync mute status */
-    if( aout_MuteGet( THEPL ) > 0 )
+    if( playlist_MuteGet( THEPL ) > 0 )
         updateMuteStatus( true );
 
     /* Volume control connection */
@@ -152,7 +151,7 @@ void SoundWidget::userUpdateVolume( int i_sliderVolume )
 {
     /* Only if volume is set by user action on slider */
     setMuted( false );
-    aout_VolumeSet( THEPL, i_sliderVolume / 100.f );
+    playlist_VolumeSet( THEPL, i_sliderVolume / 100.f );
     refreshLabels();
 }
 
@@ -197,7 +196,7 @@ void SoundWidget::setMuted( bool mute )
 {
     b_is_muted = mute;
     playlist_t *p_playlist = pl_Get( p_intf );
-    aout_MuteSet( VLC_OBJECT(p_playlist), mute );
+    playlist_MuteSet( p_playlist, mute );
 }
 
 bool SoundWidget::eventFilter( QObject *obj, QEvent *e )

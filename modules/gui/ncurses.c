@@ -48,7 +48,6 @@
 
 #include <vlc_interface.h>
 #include <vlc_vout.h>
-#include <vlc_aout_intf.h>
 #include <vlc_charset.h>
 #include <vlc_input.h>
 #include <vlc_es.h>
@@ -1090,7 +1089,7 @@ static int DrawStatus(intf_thread_t *intf)
 
             mvnprintw(y++, 0, COLS, _(" Position : %s/%s"), buf1, buf2);
 
-            volume = aout_VolumeGet(p_playlist);
+            volume =playlist_VolumeGet(p_playlist);
             if (volume >= 0.f)
                 mvnprintw(y++, 0, COLS, _(" Volume   : %3ld%%"),
                           lroundf(volume * 100.f));
@@ -1608,8 +1607,8 @@ static void HandleCommonKey(intf_thread_t *intf, int key)
 
     case 'p': playlist_Prev(p_playlist);            break;
     case 'n': playlist_Next(p_playlist);            break;
-    case 'a': aout_VolumeUp(p_playlist, 1, NULL);   break;
-    case 'z': aout_VolumeDown(p_playlist, 1, NULL); break;
+    case 'a': playlist_VolumeUp(p_playlist, 1, NULL);   break;
+    case 'z': playlist_VolumeDown(p_playlist, 1, NULL); break;
 
     case 0x0c:  /* ^l */
     case KEY_CLEAR:

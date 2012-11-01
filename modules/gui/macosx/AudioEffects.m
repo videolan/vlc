@@ -33,7 +33,6 @@
 #import "SharedDialogs.h"
 
 #import <vlc_common.h>
-#import <vlc_aout_intf.h>
 #import <vlc_strings.h>
 
 #import <math.h>
@@ -180,7 +179,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     }
 
     if (p_aout) {
-        aout_EnableFilter(pl_Get(p_intf), psz_name, b_on);
+        playlist_EnableAudioFilter(pl_Get(p_intf), psz_name, b_on);
         vlc_object_release(p_aout);
     }
 }
@@ -228,13 +227,13 @@ static VLCAudioEffects *_o_sharedInstance = nil;
 
     if (p_aout) {
         /* disable existing filters */
-        aout_EnableFilter(p_playlist, "equalizer", false);
-        aout_EnableFilter(p_playlist, "compressor", false);
-        aout_EnableFilter(p_playlist, "spatializer", false);
-        aout_EnableFilter(p_playlist, "compressor", false);
-        aout_EnableFilter(p_playlist, "headphone", false);
-        aout_EnableFilter(p_playlist, "normvol", false);
-        aout_EnableFilter(p_playlist, "karaoke", false);
+        playlist_EnableAudioFilter(p_playlist, "equalizer", false);
+        playlist_EnableAudioFilter(p_playlist, "compressor", false);
+        playlist_EnableAudioFilter(p_playlist, "spatializer", false);
+        playlist_EnableAudioFilter(p_playlist, "compressor", false);
+        playlist_EnableAudioFilter(p_playlist, "headphone", false);
+        playlist_EnableAudioFilter(p_playlist, "normvol", false);
+        playlist_EnableAudioFilter(p_playlist, "karaoke", false);
     }
 
     /* fetch preset */
@@ -257,7 +256,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
             tempArray = [tempString componentsSeparatedByString:@":"];
             count = [tempArray count];
             for (NSUInteger x = 0; x < count; x++)
-                aout_EnableFilter(p_playlist, (char *)[[tempArray objectAtIndex:x] UTF8String], true);
+                playlist_AudioEnableFilter(p_playlist, (char *)[[tempArray objectAtIndex:x] UTF8String], true);
         }
     }
     config_PutPsz(p_intf,"audio-filter",[tempString UTF8String]);
