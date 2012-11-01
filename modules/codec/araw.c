@@ -74,24 +74,12 @@ struct decoder_sys_t
     date_t end_date;
 };
 
-static const int pi_channels_maps[] =
+static const uint16_t pi_channels_maps[] =
 {
     0,
-    AOUT_CHAN_CENTER,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
-     | AOUT_CHAN_REARRIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
-     | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
-     | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE
+    AOUT_CHAN_CENTER, AOUT_CHANS_2_0, AOUT_CHANS_3_0,
+    AOUT_CHANS_4_0,   AOUT_CHANS_5_0, AOUT_CHANS_5_1,
+    AOUT_CHANS_7_0,   AOUT_CHANS_7_1, AOUT_CHANS_8_1,
 };
 
 static const int16_t ulawtos16[256] =
@@ -214,9 +202,9 @@ static int DecoderOpen( vlc_object_t *p_this )
     }
 
     if( p_dec->fmt_in.audio.i_channels <= 0 ||
-        p_dec->fmt_in.audio.i_channels > 8 )
+        p_dec->fmt_in.audio.i_channels > 9 )
     {
-        msg_Err( p_dec, "bad channels count (1-8): %i",
+        msg_Err( p_dec, "bad channels count (1-9): %i",
                  p_dec->fmt_in.audio.i_channels );
         return VLC_EGENERIC;
     }
