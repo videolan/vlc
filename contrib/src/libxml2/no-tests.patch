@@ -1,17 +1,17 @@
---- libxml2/Makefile.am.orig	2011-11-26 20:53:51.147060747 -0500
-+++ libxml2/Makefile.am	2011-11-26 20:52:36.013140366 -0500
-@@ -8,10 +8,10 @@
+--- libxml2-2.9.0/Makefile.am.orig	2012-11-01 18:55:04.214524833 +0100
++++ libxml2-2.9.0/Makefile.am	2012-11-01 18:55:56.838557494 +0100
+@@ -10,10 +10,10 @@
  
- INCLUDES = -I$(top_builddir)/include -I@srcdir@/include @THREAD_CFLAGS@ @Z_CFLAGS@ 
+ AM_CFLAGS = $(THREAD_CFLAGS) $(Z_CFLAGS) $(LZMA_CFLAGS)
  
 -noinst_PROGRAMS=testSchemas testRelax testSAX testHTML testXPath testURI \
 -                testThreads testC14N testAutomata testRegexp \
 -                testReader testapi testModule runtest runsuite testchar \
--		testdict runxmlconf testrecurse
-+#noinst_PROGRAMS=testSchemas testRelax testSAX testHTML testXPath testURI \
-+#                testThreads testC14N testAutomata testRegexp \
-+#                testReader testapi testModule runtest runsuite testchar \
-+#		testdict runxmlconf testrecurse
+-		testdict runxmlconf testrecurse testlimits
++# noinst_PROGRAMS=testSchemas testRelax testSAX testHTML testXPath testURI \
++#                 testThreads testC14N testAutomata testRegexp \
++#                 testReader testapi testModule runtest runsuite testchar \
++# 		testdict runxmlconf testrecurse testlimits
  
  bin_PROGRAMS = xmllint xmlcatalog
  
