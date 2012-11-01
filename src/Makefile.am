@@ -330,6 +330,7 @@ SOURCES_libvlc_common = \
 	playlist/playlist_internal.h \
 	playlist/art.c \
 	playlist/art.h \
+	playlist/aout.c \
 	playlist/thread.c \
 	playlist/control.c \
 	playlist/engine.c \

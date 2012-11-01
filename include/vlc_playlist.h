@@ -364,6 +364,30 @@ VLC_API int playlist_NodeDelete( playlist_t *, playlist_item_t *, bool , bool );
 VLC_API playlist_item_t * playlist_GetNextLeaf( playlist_t *p_playlist, playlist_item_t *p_root, playlist_item_t *p_item, bool b_ena, bool b_unplayed ) VLC_USED;
 VLC_API playlist_item_t * playlist_GetPrevLeaf( playlist_t *p_playlist, playlist_item_t *p_root, playlist_item_t *p_item, bool b_ena, bool b_unplayed ) VLC_USED;
 
+/**************************
+ * Audio output management
+ **************************/
+
+#define AOUT_VOLUME_DEFAULT             256
+#define AOUT_VOLUME_MAX                 512
+
+VLC_API float playlist_VolumeGet( playlist_t * );
+VLC_API int playlist_VolumeSet( playlist_t *, float );
+VLC_API int playlist_VolumeUp( playlist_t *, int, float * );
+#define playlist_VolumeDown(a, b, c) playlist_VolumeUp(a, -(b), c)
+VLC_API int playlist_MuteSet( playlist_t *, bool );
+VLC_API int playlist_MuteGet( playlist_t * );
+
+static inline int playlist_MuteToggle( playlist_t *pl )
+{
+    int val = playlist_MuteGet( pl );
+    if (val >= 0)
+        val = playlist_MuteSet( pl, !val );
+    return val;
+}
+
+VLC_API void playlist_EnableAudioFilter( playlist_t *, const char *, bool );
+
 /***********************************************************************
  * Inline functions
  ***********************************************************************/
