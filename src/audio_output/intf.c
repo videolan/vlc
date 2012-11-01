@@ -72,7 +72,7 @@ float aout_VolumeGet (vlc_object_t *obj)
     if (aout == NULL)
         return -1.f;
 
-    float volume = var_GetFloat (aout, "volume");
+    float volume = aout_OutputVolumeGet (aout);
     vlc_object_release (aout);
     return volume;
 }
@@ -89,10 +89,7 @@ int aout_VolumeSet (vlc_object_t *obj, float vol)
     audio_output_t *aout = findAout (obj);
     if (aout != NULL)
     {
-        aout_lock (aout);
-        if (aout->volume_set != NULL)
-            ret = aout->volume_set (aout, vol);
-        aout_unlock (aout);
+        ret = aout_OutputVolumeSet (aout, vol);
         vlc_object_release (aout);
     }
     return ret;
@@ -134,7 +131,7 @@ int aout_MuteGet (vlc_object_t *obj)
     if (aout == NULL)
         return -1.f;
 
-    bool mute = var_InheritBool (aout, "mute");
+    bool mute = aout_OutputMuteGet (aout);
     vlc_object_release (aout);
     return mute;
 }
@@ -150,15 +147,11 @@ int aout_MuteSet (vlc_object_t *obj, bool mute)
     audio_output_t *aout = findAout (obj);
     if (aout != NULL)
     {
-        aout_lock (aout);
-        if (aout->mute_set != NULL)
-            ret = aout->mute_set (aout, mute);
-        aout_unlock (aout);
+        ret = aout_OutputMuteSet (aout, mute);
         vlc_object_release (aout);
+        if (ret == 0)
+            var_SetBool (obj, "mute", mute);
     }
-
-    if (ret == 0)
-        var_SetBool (obj, "mute", mute);
     return ret;
 }
 

@@ -136,6 +136,14 @@ void aout_volume_Delete(aout_volume_t *);
 
 
 /* From output.c : */
+audio_output_t *aout_New (vlc_object_t *);
+#define aout_New(a) aout_New(VLC_OBJECT(a))
+void aout_Destroy (audio_output_t *);
+float aout_OutputVolumeGet (audio_output_t *);
+int aout_OutputVolumeSet (audio_output_t *, float);
+int aout_OutputMuteGet (audio_output_t *);
+int aout_OutputMuteSet (audio_output_t *, bool);
+
 int aout_OutputNew( audio_output_t * p_aout,
                     const audio_sample_format_t * p_format );
 void aout_OutputPlay( audio_output_t * p_aout, block_t * p_buffer );
@@ -145,10 +153,6 @@ void aout_OutputDelete( audio_output_t * p_aout );
 
 
 /* From common.c : */
-audio_output_t *aout_New (vlc_object_t *);
-#define aout_New(a) aout_New(VLC_OBJECT(a))
-void aout_Destroy (audio_output_t *);
-
 void aout_FormatsPrint(vlc_object_t *, const char *,
                        const audio_sample_format_t *,
                        const audio_sample_format_t *);

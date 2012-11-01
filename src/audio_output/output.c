@@ -251,6 +251,56 @@ static void aout_Destructor (vlc_object_t *obj)
 }
 
 /**
+ * Gets the volume of the audio output stream (independent of mute).
+ * \return Current audio volume (0. = silent, 1. = nominal),
+ * or a strictly negative value if undefined.
+ */
+float aout_OutputVolumeGet (audio_output_t *aout)
+{
+    return var_GetFloat (aout, "volume");
+}
+
+/**
+ * Sets the volume of the audio output stream.
+ * \note The mute status is not changed.
+ * \return 0 on success, -1 on failure.
+ */
+int aout_OutputVolumeSet (audio_output_t *aout, float vol)
+{
+    int ret = -1;
+
+    aout_lock (aout);
+    if (aout->volume_set != NULL)
+        ret = aout->volume_set (aout, vol);
+    aout_unlock (aout);
+    return ret;
+}
+
+/**
+ * Gets the audio output stream mute flag.
+ * \return 0 if not muted, 1 if muted, -1 if undefined.
+ */
+int aout_OutputMuteGet (audio_output_t *aout)
+{
+    return var_InheritBool (aout, "mute");
+}
+
+/**
+ * Sets the audio output stream mute flag.
+ * \return 0 on success, -1 on failure.
+ */
+int aout_OutputMuteSet (audio_output_t *aout, bool mute)
+{
+    int ret = -1;
+
+    aout_lock (aout);
+    if (aout->mute_set != NULL)
+        ret = aout->mute_set (aout, mute);
+    aout_unlock (aout);
+    return ret;
+}
+
+/**
  * Starts an audio output stream.
  * \param fmtp audio output stream format [IN/OUT]
  * \warning The caller must hold the audio output lock.
