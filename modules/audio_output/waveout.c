@@ -38,7 +38,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
-#include <vlc_aout_intf.h>
 #include <vlc_charset.h> /* FromWide() */
 #include <vlc_atomic.h>
 

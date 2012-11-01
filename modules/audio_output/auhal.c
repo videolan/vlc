@@ -34,7 +34,6 @@
 #import <vlc_plugin.h>
 #import <vlc_dialog.h>                   // dialog_Fatal
 #import <vlc_aout.h>                     // aout_*
-#import <vlc_aout_intf.h>
 
 #import <AudioUnit/AudioUnit.h>          // AudioUnit
 #import <CoreAudio/CoreAudio.h>      // AudioDeviceID
