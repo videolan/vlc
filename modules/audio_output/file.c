@@ -96,7 +96,7 @@ static const int format_int[] = { VLC_CODEC_U8,
                                   VLC_CODEC_S16L,
                                   VLC_CODEC_U16B,
                                   VLC_CODEC_S16B,
-                                  VLC_CODEC_FL32,
+                                  VLC_CODEC_F32L,
                                   VLC_CODEC_SPDIFL };
 
 #define FILE_TEXT N_("Output file")
@@ -208,7 +208,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 
         switch( fmt->i_format )
         {
-        case VLC_CODEC_FL32:
+        case VLC_CODEC_F32L:
             wh->Format     = WAVE_FORMAT_IEEE_FLOAT;
             wh->BitsPerSample = sizeof(float) * 8;
             break;
