@@ -525,11 +525,6 @@ dbus_out:
     free( psz_modules );
     free( psz_control );
 
-    /*
-     * Always load the hotkeys interface if it exists
-     */
-    intf_Create( p_libvlc, "hotkeys,none" );
-
     if( var_InheritBool( p_libvlc, "file-logging" )
 #ifdef HAVE_SYSLOG_H
         && !var_InheritBool( p_libvlc, "syslog" )
