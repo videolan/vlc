@@ -72,10 +72,9 @@ int aout_DecNew( audio_output_t *p_aout,
     /* TODO: reduce lock scope depending on decoder's real need */
     aout_lock( p_aout );
 
-    /* Create the audio output stream */
-    var_Destroy( p_aout, "audio-device" );
     var_Destroy( p_aout, "stereo-mode" );
 
+    /* Create the audio output stream */
     owner->input_format = *p_format;
     vlc_atomic_set (&owner->restart, 0);
     owner->volume = aout_volume_New (p_aout, p_replay_gain);
@@ -119,7 +118,6 @@ void aout_DecDelete (audio_output_t *p_aout)
     aout_OutputDelete( p_aout );
     aout_volume_Delete (owner->volume);
 
-    var_Destroy( p_aout, "audio-device" );
     var_Destroy( p_aout, "stereo-mode" );
 
     aout_unlock( p_aout );
