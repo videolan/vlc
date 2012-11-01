@@ -49,12 +49,14 @@ struct aout_sys_t
     HKAI            hkai;
     float           soft_gain;
     bool            soft_mute;
+    audio_sample_format_t format;
 };
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  Open  ( vlc_object_t * );
+static void Close ( vlc_object_t * );
 static void Play  ( audio_output_t *_p_aout, block_t *block, mtime_t * );
 
 static ULONG APIENTRY KaiCallback ( PVOID, PVOID, ULONG );
@@ -93,7 +95,7 @@ vlc_module_begin ()
     add_bool( "kai-audio-exclusive-mode", false,
               KAI_AUDIO_EXCLUSIVE_MODE_TEXT, KAI_AUDIO_EXCLUSIVE_MODE_LONGTEXT,
               true )
-    set_callbacks( Open, NULL )
+    set_callbacks( Open, Close )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -101,22 +103,14 @@ vlc_module_end ()
  *****************************************************************************/
 static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
 {
-    aout_sys_t *p_sys;
+    aout_sys_t *p_sys = p_aout->sys;
     char *psz_mode;
     ULONG i_kai_mode;
     KAISPEC ks_wanted, ks_obtained;
     int i_nb_channels;
     int i_bytes_per_frame;
     vlc_value_t val, text;
-    audio_format_t format =  *format;
-
-    /* Allocate structure */
-    p_aout->sys = calloc( 1, sizeof( aout_sys_t ) );
-
-    if( p_aout->sys == NULL )
-        return VLC_ENOMEM;
-
-    p_sys = p_aout->sys;
+    audio_sample_format_t format = *fmt;
 
     if( var_Get( p_aout, "audio-device", &val ) != VLC_ENOVAR )
     {
@@ -167,7 +161,7 @@ static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
     {
         msg_Err( p_aout, "cannot initialize KAI");
 
-        goto exit_free_sys;
+        return VLC_EGENERIC;
     }
 
     ks_wanted.usDeviceIndex   = 0;
@@ -199,15 +193,16 @@ static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
     msg_Dbg( p_aout, "obtained i_bytes_per_frame = %d",
              format.i_bytes_per_frame );
 
-    *fmt = format;
+    p_sys->format = *fmt = format;
 
     p_aout->play  = Play;
     p_aout->pause = aout_PacketPause;
     p_aout->flush = aout_PacketFlush;
+
     aout_SoftVolumeStart( p_aout );
 
     aout_PacketInit( p_aout, &p_sys->packet,
-                     ks_obtained.ulBufferSize / i_bytes_per_frame );
+                     ks_obtained.ulBufferSize / i_bytes_per_frame, &format );
 
     if ( var_Type( p_aout, "audio-device" ) == 0 )
     {
@@ -243,9 +238,6 @@ static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
 exit_kai_done :
     kaiDone();
 
-exit_free_sys :
-    free( p_sys );
-
     return VLC_EGENERIC;
 }
 
@@ -273,7 +265,6 @@ static void Stop ( audio_output_t *p_aout )
     kaiDone();
 
     aout_PacketDestroy( p_aout );
-    free( p_sys );
 }
 
 /*****************************************************************************
@@ -284,6 +275,7 @@ static ULONG APIENTRY KaiCallback( PVOID p_cb_data,
                                    ULONG i_buf_size )
 {
     audio_output_t *p_aout = (audio_output_t *)p_cb_data;
+    aout_sys_t *sys = p_aout->sys;
     block_t  *p_aout_buffer;
     mtime_t current_date, next_date;
     ULONG i_len;
@@ -293,9 +285,9 @@ static ULONG APIENTRY KaiCallback( PVOID p_cb_data,
      * remaining buffer.
      */
     next_date = mdate() + ( i_buf_size * 1000000LL
-                                       / p_aout->format.i_bytes_per_frame
-                                       / p_aout->format.i_rate
-                                       * p_aout->format.i_frame_length );
+                                       / sys->format.i_bytes_per_frame
+                                       / sys->format.i_rate
+                                       * sys->format.i_frame_length );
 
     for (i_len = 0; i_len < i_buf_size;)
     {
@@ -342,9 +334,22 @@ static ULONG APIENTRY KaiCallback( PVOID p_cb_data,
 static int Open (vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = calloc( 1, sizeof( aout_sys_t ) );
 
+    if( unlikely( sys == NULL ))
+        return VLC_ENOMEM;
+
+    aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
-    aout_SoftVolumeInit( p_aout );
+    aout_SoftVolumeInit( aout );
     return VLC_SUCCESS;
+}
+
+static void Close( vlc_object_t *obj )
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = aout->sys;
+
+    free(sys);
 }
