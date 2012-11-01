@@ -47,13 +47,6 @@ audio_output_t *input_resource_GetAout( input_resource_t * );
 void input_resource_PutAout( input_resource_t *, audio_output_t * );
 
 /**
- * This function returns the current aout if any.
- *
- * You must call vlc_object_release on the value returned (if non NULL).
- */
-audio_output_t *input_resource_HoldAout( input_resource_t *p_resource );
-
-/**
  * This function handles vout request.
  */
 vout_thread_t *input_resource_RequestVout( input_resource_t *, vout_thread_t *, video_format_t *, unsigned dpb_size, bool b_recycle );

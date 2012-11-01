@@ -50,12 +50,7 @@ static audio_output_t *GetAOut( libvlc_media_player_t *mp )
 {
     assert( mp != NULL );
 
-    input_thread_t *p_input = libvlc_get_input_thread( mp );
-    if( p_input == NULL )
-        return NULL;
-
-    audio_output_t * p_aout = input_GetAout( p_input );
-    vlc_object_release( p_input );
+    audio_output_t *p_aout = input_resource_HoldAout( mp->input.p_resource );
     if( p_aout == NULL )
         libvlc_printerr( "No active audio output" );
     return p_aout;

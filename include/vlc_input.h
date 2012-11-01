@@ -669,4 +669,10 @@ VLC_API void input_resource_TerminateVout( input_resource_t * );
  */
 VLC_API void input_resource_Terminate( input_resource_t * );
 
+/**
+ * \return the current audio output if any.
+ * Use vlc_object_release() to drop the reference.
+ */
+VLC_API audio_output_t *input_resource_HoldAout( input_resource_t * );
+
 #endif
