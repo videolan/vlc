@@ -33,9 +33,6 @@ VLC_API float aout_VolumeGet( vlc_object_t * );
 #define aout_VolumeGet(a) aout_VolumeGet(VLC_OBJECT(a))
 VLC_API int aout_VolumeSet( vlc_object_t *, float );
 #define aout_VolumeSet(a, b) aout_VolumeSet(VLC_OBJECT(a), b)
-VLC_API int aout_VolumeUp( vlc_object_t *, int, float * );
-#define aout_VolumeUp(a, b, c) aout_VolumeUp(VLC_OBJECT(a), b, c)
-#define aout_VolumeDown(a, b, c) aout_VolumeUp(a, -(b), c)
 VLC_API int aout_MuteSet( vlc_object_t *, bool );
 #define aout_MuteSet(a, b) aout_MuteSet(VLC_OBJECT(a), b)
 VLC_API int aout_MuteGet( vlc_object_t * );
@@ -49,9 +46,5 @@ static inline int aout_MuteToggle (vlc_object_t *obj)
     return val;
 }
 #define aout_MuteToggle(a) aout_MuteToggle(VLC_OBJECT(a))
-
-VLC_API void aout_EnableFilter( vlc_object_t *, const char *, bool );
-#define aout_EnableFilter( o, n, b ) \
-        aout_EnableFilter( VLC_OBJECT(o), n, b )
 
 #endif /* _VLC_AOUT_H */

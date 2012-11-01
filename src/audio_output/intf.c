@@ -95,31 +95,6 @@ int aout_VolumeSet (vlc_object_t *obj, float vol)
     return ret;
 }
 
-#undef aout_VolumeUp
-/**
- * Raises the volume.
- * \param value how much to increase (> 0) or decrease (< 0) the volume
- * \param volp if non-NULL, will contain contain the resulting volume
- */
-int aout_VolumeUp (vlc_object_t *obj, int value, float *volp)
-{
-    value *= var_InheritInteger (obj, "volume-step");
-
-    float vol = aout_VolumeGet (obj);
-    if (vol < 0.)
-        return -1;
-
-    vol += value / (float)AOUT_VOLUME_DEFAULT;
-    if (vol < 0.)
-        vol = 0.;
-    if (vol > 2.)
-        vol = 2.;
-    if (volp != NULL)
-        *volp = vol;
-
-    return aout_VolumeSet (obj, vol);
-}
-
 #undef aout_MuteGet
 /**
  * Gets the output mute status.
@@ -178,25 +153,4 @@ int aout_ChannelsRestart( vlc_object_t * p_this, const char * psz_variable,
     }
     aout_RequestRestart (p_aout);
     return 0;
-}
-
-#undef aout_EnableFilter
-/** Enable or disable an audio filter
- * \param p_this a vlc object
- * \param psz_name name of the filter
- * \param b_add are we adding or removing the filter ?
- */
-void aout_EnableFilter( vlc_object_t *p_this, const char *psz_name,
-                        bool b_add )
-{
-    audio_output_t *p_aout = findAout( p_this );
-
-    if( aout_ChangeFilterString( p_this, VLC_OBJECT(p_aout), "audio-filter", psz_name, b_add ) )
-    {
-        if( p_aout )
-            aout_InputRequestRestart( p_aout );
-    }
-
-    if( p_aout )
-        vlc_object_release( p_aout );
 }
