@@ -27,16 +27,234 @@
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
+#include <vlc_modules.h>
 #include <vlc_cpu.h>
 
 #include "libvlc.h"
 #include "aout_internal.h"
 
-/*****************************************************************************
- * aout_OutputNew : allocate a new output and rework the filter pipeline
- *****************************************************************************
- * This function is entered with the mixer lock.
- *****************************************************************************/
+/* Local functions */
+static void aout_Destructor( vlc_object_t * p_this );
+
+static int var_Copy (vlc_object_t *src, const char *name, vlc_value_t prev,
+                     vlc_value_t value, void *data)
+{
+    vlc_object_t *dst = data;
+
+    (void) src; (void) prev;
+    return var_Set (dst, name, value);
+}
+
+/**
+ * Supply or update the current custom ("hardware") volume.
+ * @note This only makes sense after calling aout_VolumeHardInit().
+ * @param volume current custom volume
+ *
+ * @warning The caller (i.e. the audio output plug-in) is responsible for
+ * interlocking and synchronizing call to this function and to the
+ * audio_output_t.volume_set callback. This ensures that VLC gets correct
+ * volume information (possibly with a latency).
+ */
+static void aout_VolumeNotify (audio_output_t *aout, float volume)
+{
+    var_SetFloat (aout, "volume", volume);
+}
+
+static void aout_MuteNotify (audio_output_t *aout, bool mute)
+{
+    var_SetBool (aout, "mute", mute);
+}
+
+static void aout_PolicyNotify (audio_output_t *aout, bool cork)
+{
+    (cork ? var_IncInteger : var_DecInteger) (aout->p_parent, "corks");
+}
+
+static int aout_GainNotify (audio_output_t *aout, float gain)
+{
+    aout_owner_t *owner = aout_owner (aout);
+
+    aout_assert_locked (aout);
+    aout_volume_SetVolume (owner->volume, gain);
+    /* XXX: ideally, return -1 if format cannot be amplified */
+    return 0;
+}
+
+#undef aout_New
+/**
+ * Creates an audio output object and initializes an output module.
+ */
+audio_output_t *aout_New (vlc_object_t *parent)
+{
+    audio_output_t *aout = vlc_custom_create (parent, sizeof (aout_instance_t),
+                                              "audio output");
+    if (unlikely(aout == NULL))
+        return NULL;
+
+    aout_owner_t *owner = aout_owner (aout);
+
+    vlc_mutex_init (&owner->lock);
+    vlc_object_set_destructor (aout, aout_Destructor);
+
+    owner->input = NULL;
+
+    /* Audio output module callbacks */
+    var_Create (aout, "volume", VLC_VAR_FLOAT);
+    var_AddCallback (aout, "volume", var_Copy, parent);
+    var_Create (aout, "mute", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+    var_AddCallback (aout, "mute", var_Copy, parent);
+
+    aout->event.volume_report = aout_VolumeNotify;
+    aout->event.mute_report = aout_MuteNotify;
+    aout->event.policy_report = aout_PolicyNotify;
+    aout->event.gain_request = aout_GainNotify;
+
+    /* Audio output module initialization */
+    aout->start = NULL;
+    aout->stop = NULL;
+    aout->volume_set = NULL;
+    aout->mute_set = NULL;
+    owner->module = module_need (aout, "audio output", "$aout", false);
+    if (owner->module == NULL)
+    {
+        msg_Err (aout, "no suitable audio output module");
+        vlc_object_release (aout);
+        return NULL;
+    }
+
+    /*
+     * Persistent audio output variables
+     */
+    vlc_value_t val, text;
+    module_config_t *cfg;
+    char *str;
+
+    /* Visualizations */
+    var_Create (aout, "visual", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
+    text.psz_string = _("Visualizations");
+    var_Change (aout, "visual", VLC_VAR_SETTEXT, &text, NULL);
+    val.psz_string = (char *)"";
+    text.psz_string = _("Disable");
+    var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    val.psz_string = (char *)"spectrometer";
+    text.psz_string = _("Spectrometer");
+    var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    val.psz_string = (char *)"scope";
+    text.psz_string = _("Scope");
+    var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    val.psz_string = (char *)"spectrum";
+    text.psz_string = _("Spectrum");
+    var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    val.psz_string = (char *)"vuMeter";
+    text.psz_string = _("Vu meter");
+    var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    /* Look for goom plugin */
+    if (module_exists ("goom"))
+    {
+        val.psz_string = (char *)"goom";
+        text.psz_string = (char *)"Goom";
+        var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    }
+    /* Look for libprojectM plugin */
+    if (module_exists ("projectm"))
+    {
+        val.psz_string = (char *)"projectm";
+        text.psz_string = (char*)"projectM";
+        var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    }
+    /* Look for VSXu plugin */
+    if (module_exists ("vsxu"))
+    {
+        val.psz_string = (char *)"vsxu";
+        text.psz_string = (char*)"Vovoid VSXu";
+        var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    }
+    str = var_GetNonEmptyString (aout, "effect-list");
+    if (str != NULL)
+    {
+        var_SetString (aout, "visual", str);
+        free (str);
+    }
+
+    /* Equalizer */
+    var_Create (aout, "equalizer", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
+    text.psz_string = _("Equalizer");
+    var_Change (aout, "equalizer", VLC_VAR_SETTEXT, &text, NULL);
+    val.psz_string = (char*)"";
+    text.psz_string = _("Disable");
+    var_Change (aout, "equalizer", VLC_VAR_ADDCHOICE, &val, &text);
+    cfg = config_FindConfig (VLC_OBJECT(aout), "equalizer-preset");
+    if (likely(cfg != NULL))
+        for (unsigned i = 0; i < cfg->list_count; i++)
+        {
+            val.psz_string = cfg->list.psz[i];
+            text.psz_string = vlc_gettext(cfg->list_text[i]);
+            var_Change (aout, "equalizer", VLC_VAR_ADDCHOICE, &val, &text);
+        }
+
+    var_Create (aout, "audio-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    text.psz_string = _("Audio filters");
+    var_Change (aout, "audio-filter", VLC_VAR_SETTEXT, &text, NULL);
+
+
+    var_Create (aout, "audio-visual", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    text.psz_string = _("Audio visualizations");
+    var_Change (aout, "audio-visual", VLC_VAR_SETTEXT, &text, NULL);
+
+    /* Replay gain */
+    var_Create (aout, "audio-replay-gain-mode",
+                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    text.psz_string = _("Replay gain");
+    var_Change (aout, "audio-replay-gain-mode", VLC_VAR_SETTEXT, &text, NULL);
+    cfg = config_FindConfig (VLC_OBJECT(aout), "audio-replay-gain-mode");
+    if (likely(cfg != NULL))
+        for (unsigned i = 0; i < cfg->list_count; i++)
+        {
+            val.psz_string = cfg->list.psz[i];
+            text.psz_string = vlc_gettext(cfg->list_text[i]);
+            var_Change (aout, "audio-replay-gain-mode", VLC_VAR_ADDCHOICE,
+                            &val, &text);
+        }
+
+    return aout;
+}
+
+/**
+ * Deinitializes an audio output module and destroys an audio output object.
+ */
+void aout_Destroy (audio_output_t *aout)
+{
+    aout_owner_t *owner = aout_owner (aout);
+
+    aout_lock (aout);
+    module_unneed (aout, owner->module);
+    /* Protect against late call from intf.c */
+    aout->volume_set = NULL;
+    aout->mute_set = NULL;
+    aout_unlock (aout);
+
+    var_DelCallback (aout, "mute", var_Copy, aout->p_parent);
+    var_SetFloat (aout, "volume", -1.f);
+    var_DelCallback (aout, "volume", var_Copy, aout->p_parent);
+    vlc_object_release (aout);
+}
+
+/**
+ * Destroys the audio output lock used (asynchronously) by interface functions.
+ */
+static void aout_Destructor (vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_owner_t *owner = aout_owner (aout);
+
+    vlc_mutex_destroy (&owner->lock);
+}
+
+/**
+ * Starts an audio output stream.
+ * \param fmtp audio output stream format [IN/OUT]
+ * \warning The caller must hold the audio output lock.
+ */
 int aout_OutputNew (audio_output_t *aout, const audio_sample_format_t *fmtp)
 {
     aout_owner_t *owner = aout_owner (aout);
@@ -148,7 +366,9 @@ int aout_OutputNew (audio_output_t *aout, const audio_sample_format_t *fmtp)
 }
 
 /**
- * Destroys the audio output plug-in instance.
+ * Stops the audio output stream (undoes aout_OutputNew()).
+ * \note This can only be called after a succesful aout_OutputNew().
+ * \warning The caller must hold the audio output lock.
  */
 void aout_OutputDelete (audio_output_t *aout)
 {
@@ -164,6 +384,8 @@ void aout_OutputDelete (audio_output_t *aout)
 
 /**
  * Plays a decoded audio buffer.
+ * \note This can only be called after a succesful aout_OutputNew().
+ * \warning The caller must hold the audio output lock.
  */
 void aout_OutputPlay (audio_output_t *aout, block_t *block)
 {
@@ -212,6 +434,8 @@ void aout_OutputPlay (audio_output_t *aout, block_t *block)
  * Notifies the audio output (if any) of pause/resume events.
  * This enables the output to expedite pause, instead of waiting for its
  * buffers to drain.
+ * \note This can only be called after a succesful aout_OutputNew().
+ * \warning The caller must hold the audio output lock.
  */
 void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
 {
@@ -223,8 +447,10 @@ void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
 /**
  * Flushes or drains the audio output buffers.
  * This enables the output to expedite seek and stop.
- * @param wait if true, wait for buffer playback (i.e. drain),
+ * \param wait if true, wait for buffer playback (i.e. drain),
  *             if false, discard the buffers immediately (i.e. flush)
+ * \note This can only be called after a succesful aout_OutputNew().
+ * \warning The caller must hold the audio output lock.
  */
 void aout_OutputFlush( audio_output_t *aout, bool wait )
 {
