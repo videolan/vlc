@@ -166,12 +166,28 @@ static void aout_CheckRestart (audio_output_t *aout)
  * Marks the audio output for restart, to update any parameter of the output
  * plug-in (e.g. output device or channel mapping).
  */
-void aout_RequestRestart (audio_output_t *aout)
+static void aout_RequestRestart (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 
     /* DO NOT remove AOUT_RESTART_INPUT. You need to change the atomic ops. */
     vlc_atomic_set (&owner->restart, AOUT_RESTART_OUTPUT|AOUT_RESTART_INPUT);
+}
+
+int aout_ChannelsRestart (vlc_object_t *obj, const char *varname,
+                          vlc_value_t oldval, vlc_value_t newval, void *data)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    (void)oldval; (void)newval; (void)data;
+
+    if (!strcmp (varname, "audio-device"))
+    {
+        /* This is supposed to be a significant change and supposes
+         * rebuilding the channel choices. */
+        var_Destroy (aout, "stereo-mode");
+    }
+    aout_RequestRestart (aout);
+    return 0;
 }
 
 /**

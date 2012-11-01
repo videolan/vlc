@@ -174,7 +174,6 @@ void aout_DecFlush(audio_output_t *);
 bool aout_DecIsEmpty(audio_output_t *);
 
 void aout_InputRequestRestart(audio_output_t *);
-void aout_RequestRestart(audio_output_t *);
 
 /* Audio output locking */
 static inline void aout_lock( audio_output_t *p_aout )

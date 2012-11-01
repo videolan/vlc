@@ -131,26 +131,4 @@ int aout_MuteSet (vlc_object_t *obj, bool mute)
 }
 
 
-/*
- * Pipelines management
- */
 
-/*****************************************************************************
- * aout_ChannelsRestart : change the audio device or channels and restart
- *****************************************************************************/
-int aout_ChannelsRestart( vlc_object_t * p_this, const char * psz_variable,
-                          vlc_value_t oldval, vlc_value_t newval,
-                          void *p_data )
-{
-    audio_output_t * p_aout = (audio_output_t *)p_this;
-    (void)oldval; (void)newval; (void)p_data;
-
-    if ( !strcmp( psz_variable, "audio-device" ) )
-    {
-        /* This is supposed to be a significant change and supposes
-         * rebuilding the channel choices. */
-        var_Destroy( p_aout, "stereo-mode" );
-    }
-    aout_RequestRestart (p_aout);
-    return 0;
-}
