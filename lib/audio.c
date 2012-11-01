@@ -35,7 +35,6 @@
 
 #include <vlc_common.h>
 #include <vlc_input.h>
-#include <vlc_aout_intf.h>
 #include <vlc_aout.h>
 #include <vlc_modules.h>
 
@@ -256,18 +255,39 @@ void libvlc_audio_toggle_mute( libvlc_media_player_t *mp )
 
 int libvlc_audio_get_mute( libvlc_media_player_t *mp )
 {
-    return aout_MuteGet( mp );
+    int mute = -1;
+
+    audio_output_t *aout = GetAOut( mp );
+    if( aout != NULL )
+    {
+        mute = aout_MuteGet( aout );
+        vlc_object_release( aout );
+    }
+    return mute;
 }
 
 void libvlc_audio_set_mute( libvlc_media_player_t *mp, int mute )
 {
-    aout_MuteSet( VLC_OBJECT(mp), mute != 0 );
+    audio_output_t *aout = GetAOut( mp );
+    if( aout != NULL )
+    {
+        mute = aout_MuteSet( aout, mute );
+        vlc_object_release( aout );
+    }
 }
 
 int libvlc_audio_get_volume( libvlc_media_player_t *mp )
 {
-    float vol = aout_VolumeGet( mp );
-    return ( vol >= 0.f ) ? lroundf( vol * 100.f ) : -1;
+    int volume = -1;
+
+    audio_output_t *aout = GetAOut( mp );
+    if( aout != NULL )
+    {
+        float vol = aout_VolumeGet( aout );
+        vlc_object_release( aout );
+        volume = lroundf( vol * 100.f );
+    }
+    return volume;
 }
 
 int libvlc_audio_set_volume( libvlc_media_player_t *mp, int volume )
@@ -278,8 +298,15 @@ int libvlc_audio_set_volume( libvlc_media_player_t *mp, int volume )
         libvlc_printerr( "Volume out of range" );
         return -1;
     }
-    aout_VolumeSet (mp, vol);
-    return 0;
+
+    int ret = -1;
+    audio_output_t *aout = GetAOut( mp );
+    if( aout != NULL )
+    {
+        ret = aout_VolumeSet( aout, vol );
+        vlc_object_release( aout );
+    }
+    return ret;
 }
 
 /*****************************************************************************

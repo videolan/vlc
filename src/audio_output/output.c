@@ -255,7 +255,7 @@ static void aout_Destructor (vlc_object_t *obj)
  * \return Current audio volume (0. = silent, 1. = nominal),
  * or a strictly negative value if undefined.
  */
-float aout_OutputVolumeGet (audio_output_t *aout)
+float aout_VolumeGet (audio_output_t *aout)
 {
     return var_GetFloat (aout, "volume");
 }
@@ -265,7 +265,7 @@ float aout_OutputVolumeGet (audio_output_t *aout)
  * \note The mute status is not changed.
  * \return 0 on success, -1 on failure.
  */
-int aout_OutputVolumeSet (audio_output_t *aout, float vol)
+int aout_VolumeSet (audio_output_t *aout, float vol)
 {
     int ret = -1;
 
@@ -280,7 +280,7 @@ int aout_OutputVolumeSet (audio_output_t *aout, float vol)
  * Gets the audio output stream mute flag.
  * \return 0 if not muted, 1 if muted, -1 if undefined.
  */
-int aout_OutputMuteGet (audio_output_t *aout)
+int aout_MuteGet (audio_output_t *aout)
 {
     return var_InheritBool (aout, "mute");
 }
@@ -289,7 +289,7 @@ int aout_OutputMuteGet (audio_output_t *aout)
  * Sets the audio output stream mute flag.
  * \return 0 on success, -1 on failure.
  */
-int aout_OutputMuteSet (audio_output_t *aout, bool mute)
+int aout_MuteSet (audio_output_t *aout, bool mute)
 {
     int ret = -1;
 

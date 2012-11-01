@@ -357,13 +357,6 @@ static int snapshot_was_taken(vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-static input_thread_t *find_input (vlc_object_t *obj)
-{
-    libvlc_media_player_t *mp = (libvlc_media_player_t *)obj;
-
-    return libvlc_get_input_thread (mp);
-}
-
 /* */
 static void libvlc_media_player_destroy( libvlc_media_player_t * );
 
@@ -466,8 +459,6 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "aout", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     var_Create (mp, "mute", VLC_VAR_BOOL);
     var_Create (mp, "volume", VLC_VAR_FLOAT);
-    var_Create (mp, "find-input-callback", VLC_VAR_ADDRESS);
-    var_SetAddress (mp, "find-input-callback", find_input);
     var_Create (mp, "corks", VLC_VAR_INTEGER);
     var_Create (mp, "amem-data", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-setup", VLC_VAR_ADDRESS);

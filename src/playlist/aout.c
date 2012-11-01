@@ -47,7 +47,7 @@ float playlist_VolumeGet (playlist_t *pl)
     audio_output_t *aout = findAout (pl);
     if (aout != NULL)
     {
-        volume = aout_OutputVolumeGet (aout);
+        volume = aout_VolumeGet (aout);
         vlc_object_release (aout);
     }
     return volume;
@@ -60,7 +60,7 @@ int playlist_VolumeSet (playlist_t *pl, float vol)
     audio_output_t *aout = findAout (pl);
     if (aout != NULL)
     {
-        ret = aout_OutputVolumeSet (aout, vol);
+        ret = aout_VolumeSet (aout, vol);
         vlc_object_release (aout);
     }
     return ret;
@@ -80,7 +80,7 @@ int playlist_VolumeUp (playlist_t *pl, int value, float *volp)
     audio_output_t *aout = findAout (pl);
     if (aout != NULL)
     {
-        float vol = aout_OutputVolumeGet (aout);
+        float vol = aout_VolumeGet (aout);
         if (vol >= 0.)
         {
             vol += value / (float)AOUT_VOLUME_DEFAULT;
@@ -90,7 +90,7 @@ int playlist_VolumeUp (playlist_t *pl, int value, float *volp)
                 vol = 2.;
             if (volp != NULL)
                 *volp = vol;
-            ret = aout_OutputVolumeSet (aout, vol);
+            ret = aout_VolumeSet (aout, vol);
         }
         vlc_object_release (aout);
     }
@@ -104,7 +104,7 @@ int playlist_MuteGet (playlist_t *pl)
     audio_output_t *aout = findAout (pl);
     if (aout != NULL)
     {
-        mute = aout_OutputMuteGet (aout);
+        mute = aout_MuteGet (aout);
         vlc_object_release (aout);
     }
     return mute;
@@ -117,7 +117,7 @@ int playlist_MuteSet (playlist_t *pl, bool mute)
     audio_output_t *aout = findAout (pl);
     if (aout != NULL)
     {
-        ret = aout_OutputMuteSet (aout, mute);
+        ret = aout_MuteSet (aout, mute);
         vlc_object_release (aout);
         if (ret == 0)
             var_SetBool (pl, "mute", mute);

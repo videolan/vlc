@@ -67,7 +67,6 @@ src/audio_output/common.c
 src/audio_output/dec.c
 src/audio_output/filters.c
 src/audio_output/input.c
-src/audio_output/intf.c
 src/audio_output/output.c
 src/config/chain.c
 src/config/cmdline.c
