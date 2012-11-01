@@ -1687,17 +1687,11 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
 {
     VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
-    input_thread_t *p_input =
-        playlist_CurrentInput( p_intf->p_sys->p_playlist );
     const char * psz_variable;
     vlc_value_t val_name;
     int i_error;
 
-    if( !p_input )
-        return VLC_ENOOBJ;
-
-    vlc_object_t * p_aout = (vlc_object_t *)input_GetAout( p_input );
-    vlc_object_release( p_input );
+    vlc_object_t *p_aout = (vlc_object_t *)playlist_GetAout( pl_Get(p_this) );
     if ( p_aout == NULL )
          return VLC_ENOOBJ;
 

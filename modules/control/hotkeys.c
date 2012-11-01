@@ -160,9 +160,6 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
     /* Update the vout */
     vout_thread_t *p_vout = p_input ? input_GetVout( p_input ) : NULL;
 
-    /* Update the aout */
-    vlc_object_t *p_aout = p_input ? (vlc_object_t *)input_GetAout( p_input ) : NULL;
-
     /* Register OSD channels */
     /* FIXME: this check can fail if the new vout is reallocated at the same
      * address as the old one... We should rather listen to vout events.
@@ -318,7 +315,9 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
 
         case ACTIONID_AUDIODEVICE_CYCLE:
         {
-            if( !p_aout )
+            vlc_object_t *p_aout =
+                                (vlc_object_t *)playlist_GetAout( p_playlist );
+            if( p_aout == NULL )
                 break;
 
             vlc_value_t val, list, list2;
@@ -363,6 +362,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                                 list2.p_list->p_values[i].psz_string);
             }
             var_FreeList( &list, &list2 );
+            vlc_object_release( p_aout );
             break;
         }
 
@@ -923,8 +923,6 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         }
     }
 cleanup_and_continue:
-    if( p_aout )
-        vlc_object_release( p_aout );
     if( p_vout )
         vlc_object_release( p_vout );
     if( p_input )

@@ -530,12 +530,10 @@ vout_thread_t *getVoutForActiveWindow(void)
 
 audio_output_t *getAout(void)
 {
-    input_thread_t *p_input = getInput();
-    if (!p_input)
+    intf_thread_t *p_intf = VLCIntf;
+    if (!p_intf)
         return NULL;
-    audio_output_t *p_aout = input_GetAout(p_input);
-    vlc_object_release(p_input);
-    return p_aout;
+    return playlist_GetAout(pl_Get(p_intf));
 }
 
 #pragma mark -

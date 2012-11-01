@@ -1028,7 +1028,7 @@ vout_thread_t* MainInputManager::getVout()
 
 audio_output_t * MainInputManager::getAout()
 {
-    return p_input ? input_GetAout( p_input ) : NULL;
+    return playlist_GetAout( THEPL );
 }
 
 void MainInputManager::customEvent( QEvent *event )
