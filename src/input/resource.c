@@ -71,7 +71,6 @@ struct input_resource_t
     vout_thread_t   **pp_vout;
     int             i_vout;
 
-    /* TODO? track more than one audio output (like video outputs) */
     bool            b_aout_busy;
     audio_output_t *p_aout;
 };
@@ -350,7 +349,6 @@ audio_output_t *input_resource_GetAout( input_resource_t *p_resource )
     if( p_aout != NULL )
     {
         vlc_mutex_lock( &p_resource->lock_hold );
-        assert( p_resource->p_aout == NULL );
         p_resource->p_aout = p_aout;
         vlc_mutex_unlock( &p_resource->lock_hold );
 
