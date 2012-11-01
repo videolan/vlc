@@ -76,6 +76,7 @@ struct aout_sys_t
     mtime_t                         length;
 
     void                           *p_so_handle;
+    audio_sample_format_t           format;
 };
 
 /*****************************************************************************
@@ -155,7 +156,7 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer,
     }
 
     if (!p_buffer->i_length) {
-        p_buffer->i_length = (mtime_t)(p_buffer->i_buffer / 2 / p_aout->format.i_channels) * CLOCK_FREQ / p_aout->format.i_rate;
+        p_buffer->i_length = (mtime_t)(p_buffer->i_buffer / 2 / p_sys->format.i_channels) * CLOCK_FREQ / p_sys->format.i_rate;
     }
 
     vlc_mutex_lock( &p_sys->lock );
@@ -373,6 +374,8 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     p_aout->flush               = Flush;
 
     aout_FormatPrepare( fmt );
+
+    p_sys->format = *fmt;
 
     return VLC_SUCCESS;
 error:

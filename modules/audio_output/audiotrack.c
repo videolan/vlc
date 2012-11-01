@@ -114,7 +114,7 @@ static void *InitLibrary(struct aout_sys_t *p_sys);
 
 static int  Open(vlc_object_t *);
 static void Close(vlc_object_t *);
-static void Play(audio_output_t *, block_t *);
+static void Play(audio_output_t*, block_t*, mtime_t* restrict);
 static void Pause (audio_output_t *, bool, mtime_t);
 
 vlc_module_begin ()
@@ -176,7 +176,7 @@ static void *InitLibrary(struct aout_sys_t *p_sys)
 
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
-    struct aout_sys_t *p_sys = aout->sys:
+    struct aout_sys_t *p_sys = aout->sys;
 
     int status, size;
     int afSampleRate, afFrameCount, afLatency, minBufCount, minFrameCount;
@@ -217,7 +217,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         status ^= p_sys->as_getOutputFrameCount(&afFrameCount, stream_type);
         status ^= p_sys->as_getOutputLatency((uint32_t*)(&afLatency), stream_type);
         if (status != 0) {
-            msg_Err(p_aout, "Could not query the AudioStream parameters");
+            msg_Err(aout, "Could not query the AudioStream parameters");
             return VLC_EGENERIC;
         }
         minBufCount = afLatency / ((1000 * afFrameCount) / afSampleRate);
@@ -228,7 +228,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     else {
         status = p_sys->at_getMinFrameCount(&minFrameCount, stream_type, rate);
         if (status != 0) {
-            msg_Err(p_aout, "Could not query the AudioTrack parameters");
+            msg_Err(aout, "Could not query the AudioTrack parameters");
             return VLC_EGENERIC;
         }
     }
@@ -260,14 +260,14 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         status = p_sys->at_initCheck(p_sys->AudioTrack);
     }
     if (status != 0) {
-        msg_Err(p_aout, "Cannot create AudioTrack!");
+        msg_Err(aout, "Cannot create AudioTrack!");
         free(p_sys->AudioTrack);
         return VLC_EGENERIC;
     }
 
-    p_aout->sys = p_sys;
-    p_aout->play = Play;
-    p_aout->pause = Pause;
+    aout->sys = p_sys;
+    aout->play = Play;
+    aout->pause = Pause;
 
     p_sys->at_start(p_sys->AudioTrack);
 
@@ -276,9 +276,8 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     return VLC_SUCCESS;
 }
 
-static void Close(vlc_object_t *p_this)
+static void Stop(audio_output_t* p_aout)
 {
-    audio_output_t *p_aout = (audio_output_t*)p_this;
     aout_sys_t *p_sys = p_aout->sys;
 
     p_sys->at_stop(p_sys->AudioTrack);
@@ -288,8 +287,9 @@ static void Close(vlc_object_t *p_this)
 }
 
 /* FIXME: lipsync */
-static void Play(audio_output_t *p_aout, block_t *p_buffer)
+static void Play(audio_output_t* p_aout, block_t* p_buffer, mtime_t* restrict drift)
 {
+    VLC_UNUSED(drift);
     aout_sys_t *p_sys = p_aout->sys;
 
     size_t length = 0;
