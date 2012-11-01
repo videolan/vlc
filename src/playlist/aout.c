@@ -31,7 +31,7 @@
 #include "../audio_output/aout_internal.h"
 #include "playlist_internal.h"
 
-static inline audio_output_t *findAout(playlist_t *pl)
+audio_output_t *playlist_GetAout(playlist_t *pl)
 {
     /* NOTE: it is assumed that the input resource exists. In practice,
      * the playlist must have been activated. This is automatic when calling         * pl_Get(). FIXME: input resources are deleted at deactivation, this can
@@ -44,7 +44,7 @@ float playlist_VolumeGet (playlist_t *pl)
 {
     float volume = -1.f;
 
-    audio_output_t *aout = findAout (pl);
+    audio_output_t *aout = playlist_GetAout (pl);
     if (aout != NULL)
     {
         volume = aout_VolumeGet (aout);
@@ -57,7 +57,7 @@ int playlist_VolumeSet (playlist_t *pl, float vol)
 {
     int ret = -1;
 
-    audio_output_t *aout = findAout (pl);
+    audio_output_t *aout = playlist_GetAout (pl);
     if (aout != NULL)
     {
         ret = aout_VolumeSet (aout, vol);
@@ -77,7 +77,7 @@ int playlist_VolumeUp (playlist_t *pl, int value, float *volp)
 
     value *= var_InheritInteger (pl, "volume-step");
 
-    audio_output_t *aout = findAout (pl);
+    audio_output_t *aout = playlist_GetAout (pl);
     if (aout != NULL)
     {
         float vol = aout_VolumeGet (aout);
@@ -101,7 +101,7 @@ int playlist_MuteGet (playlist_t *pl)
 {
     int mute = -1;
 
-    audio_output_t *aout = findAout (pl);
+    audio_output_t *aout = playlist_GetAout (pl);
     if (aout != NULL)
     {
         mute = aout_MuteGet (aout);
@@ -114,7 +114,7 @@ int playlist_MuteSet (playlist_t *pl, bool mute)
 {
     int ret = -1;
 
-    audio_output_t *aout = findAout (pl);
+    audio_output_t *aout = playlist_GetAout (pl);
     if (aout != NULL)
     {
         ret = aout_MuteSet (aout, mute);
@@ -127,7 +127,7 @@ int playlist_MuteSet (playlist_t *pl, bool mute)
 
 void playlist_EnableAudioFilter (playlist_t *pl, const char *name, bool add)
 {
-    audio_output_t *aout = findAout (pl);
+    audio_output_t *aout = playlist_GetAout (pl);
 
     if (aout_ChangeFilterString (VLC_OBJECT(pl), VLC_OBJECT(aout),
                                  "audio-filter", name, add))

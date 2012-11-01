@@ -350,6 +350,7 @@ playlist_Status
 playlist_TreeMove
 playlist_TreeMoveMany
 playlist_Unlock
+playlist_GetAout
 playlist_EnableAudioFilter
 playlist_VolumeGet
 playlist_VolumeSet

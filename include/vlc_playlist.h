@@ -368,6 +368,8 @@ VLC_API playlist_item_t * playlist_GetPrevLeaf( playlist_t *p_playlist, playlist
  * Audio output management
  **************************/
 
+VLC_API audio_output_t *playlist_GetAout( playlist_t * );
+
 #define AOUT_VOLUME_DEFAULT             256
 #define AOUT_VOLUME_MAX                 512
 
