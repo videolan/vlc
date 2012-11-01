@@ -169,7 +169,7 @@ vlc_module_begin ()
                SCALE_LONGTEXT, false )
     add_float( SOUT_CFG_PREFIX "fps", 0, FPS_TEXT,
                FPS_LONGTEXT, false )
-    add_bool( SOUT_CFG_PREFIX "hurry-up", true, HURRYUP_TEXT,
+    add_bool( SOUT_CFG_PREFIX "hurry-up", false, HURRYUP_TEXT,
                HURRYUP_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX "deinterlace", false, DEINTERLACE_TEXT,
               DEINTERLACE_LONGTEXT, false )
