@@ -38,13 +38,4 @@ VLC_API int aout_MuteSet( vlc_object_t *, bool );
 VLC_API int aout_MuteGet( vlc_object_t * );
 #define aout_MuteGet(a) aout_MuteGet(VLC_OBJECT(a))
 
-static inline int aout_MuteToggle (vlc_object_t *obj)
-{
-    int val = aout_MuteGet (obj);
-    if (val >= 0)
-        val = aout_MuteSet (obj, !val);
-    return val;
-}
-#define aout_MuteToggle(a) aout_MuteToggle(VLC_OBJECT(a))
-
 #endif /* _VLC_AOUT_H */

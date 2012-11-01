@@ -249,7 +249,9 @@ void libvlc_audio_output_set_device_type( libvlc_media_player_t *mp,
 
 void libvlc_audio_toggle_mute( libvlc_media_player_t *mp )
 {
-    aout_MuteToggle( mp );
+    int mute = libvlc_audio_get_mute( mp );
+    if( mute != -1 )
+        libvlc_audio_set_mute( mp, !mute );
 }
 
 int libvlc_audio_get_mute( libvlc_media_player_t *mp )
