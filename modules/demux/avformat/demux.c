@@ -238,24 +238,26 @@ int OpenDemux( vlc_object_t *p_this )
     char *psz_opts = var_InheritString( p_demux, "avformat-options" );
     AVDictionary *options[p_sys->ic->nb_streams ? p_sys->ic->nb_streams : 1];
     options[0] = NULL;
-    for (unsigned i = 1; i < p_sys->ic->nb_streams; i++)
+    unsigned int nb_streams = p_sys->ic->nb_streams;
+    for (unsigned i = 1; i < nb_streams; i++)
         options[i] = NULL;
     if (psz_opts && *psz_opts) {
         options[0] = vlc_av_get_options(psz_opts);
-        for (unsigned i = 1; i < p_sys->ic->nb_streams; i++) {
+        for (unsigned i = 1; i < nb_streams; i++) {
             av_dict_copy(&options[i], options[0], 0);
         }
     }
     free(psz_opts);
     vlc_avcodec_lock(); /* avformat calls avcodec behind our back!!! */
     error = avformat_find_stream_info( p_sys->ic, options );
+    /* FIXME: what if nb_streams change after that call? */
     vlc_avcodec_unlock();
     AVDictionaryEntry *t = NULL;
     while ((t = av_dict_get(options[0], "", t, AV_DICT_IGNORE_SUFFIX))) {
         msg_Err( p_demux, "Unknown option \"%s\"", t->key );
     }
     av_dict_free(&options[0]);
-    for (unsigned i = 1; i < p_sys->ic->nb_streams; i++) {
+    for (unsigned i = 1; i < nb_streams; i++) {
         av_dict_free(&options[i]);
     }
 #else
