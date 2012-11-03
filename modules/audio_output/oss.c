@@ -56,6 +56,7 @@ struct aout_sys_t
     uint8_t level;
     bool mute;
     bool starting;
+    audio_sample_format_t format;
 };
 
 static int Open (vlc_object_t *);
@@ -94,7 +95,7 @@ static int DeviceChanged (vlc_object_t *obj, const char *varname,
 
 static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
-    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t* sys = aout->sys;
 
     /* Open the device */
     const char *device;
@@ -114,11 +115,6 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         free (devicebuf);
         return VLC_EGENERIC;
     }
-
-    aout_sys_t *sys = malloc (sizeof (*sys));
-    if (unlikely(sys == NULL))
-        goto error;
-    aout->sys = sys;
     sys->fd = fd;
 
     /* Select audio format */
@@ -288,8 +284,10 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         }
     }
 
+    sys->format = *fmt;
+
     free (devicebuf);
-    return 0;
+    return VLC_SUCCESS;
 error:
     free (sys);
     close (fd);
@@ -305,8 +303,8 @@ static void Stop (audio_output_t *aout)
     aout_sys_t *sys = aout->sys;
     int fd = sys->fd;
 
-    var_DelCallback (obj, "audio-device", DeviceChanged, NULL);
-    var_Destroy (obj, "audio-device");
+    var_DelCallback (aout, "audio-device", DeviceChanged, NULL);
+    var_Destroy (aout, "audio-device");
 
     ioctl (fd, SNDCTL_DSP_HALT, NULL);
     close (fd);
@@ -325,8 +323,8 @@ static void Play (audio_output_t *aout, block_t *block,
     int delay;
     if (ioctl (sys->fd, SNDCTL_DSP_GETODELAY, &delay) >= 0)
     {
-        mtime_t latency = (delay * CLOCK_FREQ * aout->format.i_frame_length)
-                      / (aout->format.i_rate * aout->format.i_bytes_per_frame);
+        mtime_t latency = (delay * CLOCK_FREQ * sys->format.i_frame_length)
+                      / (sys->format.i_rate * sys->format.i_bytes_per_frame);
         *drift = mdate () + latency - block->i_pts;
     }
     else
@@ -446,7 +444,12 @@ static int Open (vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
 
+    aout_sys_t *sys = malloc (sizeof (*sys));
+    if(unlikely( sys == NULL ))
+        return VLC_ENOMEM;
+
     /* FIXME: set volume/mute here */
+    aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
     return VLC_SUCCESS;
