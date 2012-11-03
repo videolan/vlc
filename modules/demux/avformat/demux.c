@@ -224,15 +224,16 @@ int OpenDemux( vlc_object_t *p_this )
     p_sys->ic->pb->seekable = b_can_seek ? AVIO_SEEKABLE_NORMAL : 0;
     error = avformat_open_input(&p_sys->ic, psz_url, p_sys->fmt, NULL);
 
-    free( psz_url );
     if( error < 0 )
     {
         errno = AVUNERROR(error);
         msg_Err( p_demux, "Could not open %s: %m", psz_url );
         p_sys->ic = NULL;
+        free( psz_url );
         CloseDemux( p_this );
         return VLC_EGENERIC;
     }
+    free( psz_url );
 
 #if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(26<<8)+0)
     char *psz_opts = var_InheritString( p_demux, "avformat-options" );
