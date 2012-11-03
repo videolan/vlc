@@ -553,15 +553,20 @@ static void Play (audio_output_t *aout, block_t *block,
                       sys->format.i_bitspersample / 8);
 
     snd_pcm_t *pcm = sys->pcm;
-    snd_pcm_sframes_t frames;
-    snd_pcm_state_t state = snd_pcm_state (pcm);
+    snd_pcm_status_t *status;
+    int val;
 
-    if (snd_pcm_delay (pcm, &frames) == 0)
+    snd_pcm_status_alloca (&status);
+    val = snd_pcm_status (pcm, status);
+    if (val < 0)
+        msg_Err (aout, "cannot get status: %s", snd_strerror (val));
+    else
     {
+        snd_pcm_sframes_t frames = snd_pcm_status_get_delay (status);
         mtime_t delay = frames * CLOCK_FREQ / sys->format.i_rate;
         delay += mdate () - block->i_pts;
 
-        if (state != SND_PCM_STATE_RUNNING)
+        if (snd_pcm_status_get_state (status) != SND_PCM_STATE_RUNNING)
         {
             if (delay < 0)
             {
@@ -597,6 +602,8 @@ static void Play (audio_output_t *aout, block_t *block,
 
     while (block->i_nb_samples > 0)
     {
+        snd_pcm_sframes_t frames;
+
         frames = snd_pcm_writei (pcm, block->p_buffer, block->i_nb_samples);
         if (frames >= 0)
         {
