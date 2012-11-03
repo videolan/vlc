@@ -113,6 +113,7 @@ static void Leave(void)
 struct aout_sys_t
 {
     audio_output_t *aout;
+    IMMDeviceEnumerator *it;
     IAudioClient *client;
     IAudioRenderClient *render;
     IAudioClock *clock;
@@ -304,6 +305,7 @@ static void GetDevices(vlc_object_t *obj, IMMDeviceEnumerator *it)
     HRESULT hr;
     vlc_value_t val, text;
 
+    var_Create (obj, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
     text.psz_string = _("Audio Device");
     var_Change (obj, "audio-device", VLC_VAR_SETTEXT, &text, NULL);
 
@@ -319,9 +321,13 @@ static void GetDevices(vlc_object_t *obj, IMMDeviceEnumerator *it)
     UINT n;
     hr = IMMDeviceCollection_GetCount(devs, &n);
     if (FAILED(hr))
+    {
+        msg_Warn (obj, "cannot count audio endpoints (error 0x%lx)", hr);
         n = 0;
+    }
     else
         msg_Dbg(obj, "Available Windows Audio devices:");
+
     while (n > 0)
     {
         IMMDevice *dev;
@@ -669,18 +675,8 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     sys->done = NULL;
 
     Enter();
-    IMMDeviceEnumerator *devs;
-    hr = CoCreateInstance(&CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL,
-                          &IID_IMMDeviceEnumerator, (void **)&devs);
-    if (FAILED(hr))
-    {
-        msg_Dbg(aout, "cannot create device enumerator (error 0x%lx)", hr);
-        goto error;
-    }
 retry:
     /* Get audio device according to policy */
-    var_Create (aout, "audio-device", VLC_VAR_STRING|VLC_VAR_HASCHOICE);
-
     // Without configuration item, the variable must be created explicitly.
     var_Create (aout, "wasapi-audio-device", VLC_VAR_STRING);
     LPWSTR devid = var_InheritWide (aout, "wasapi-audio-device");
@@ -690,7 +686,7 @@ retry:
     if (devid != NULL)
     {
         msg_Dbg (aout, "using selected device %ls", devid);
-        hr = IMMDeviceEnumerator_GetDevice (devs, devid, &dev);
+        hr = IMMDeviceEnumerator_GetDevice (sys->it, devid, &dev);
         if (FAILED(hr))
             msg_Warn(aout, "cannot get audio endpoint (error 0x%lx)", hr);
         free (devid);
@@ -698,12 +694,9 @@ retry:
     if (dev == NULL)
     {
         msg_Dbg (aout, "using default device");
-        hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(devs, eRender,
+        hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(sys->it, eRender,
                                                          eConsole, &dev);
     }
-
-    GetDevices(VLC_OBJECT(aout), devs);
-    IMMDeviceEnumerator_Release(devs);
     if (FAILED(hr))
     {
         msg_Err(aout, "cannot get audio endpoint (error 0x%lx)", hr);
@@ -803,9 +796,9 @@ error:
         CloseHandle(sys->done);
     if (sys->client != NULL)
         IAudioClient_Release(sys->client);
-    var_Destroy(aout, "audio-device");
     if (hr == AUDCLNT_E_DEVICE_INVALIDATED)
     {
+        var_SetString(aout, "audio-device", "");
         msg_Warn(aout, "device invalidated, retrying");
         goto retry;
     }
@@ -828,7 +821,6 @@ static void Stop(audio_output_t *aout)
     Leave();
 
     var_DelCallback (aout, "audio-device", DeviceChanged, NULL);
-    var_Destroy (aout, "audio-device");
 
     CloseHandle(sys->done);
     CloseHandle(sys->ready);
@@ -837,6 +829,8 @@ static void Stop(audio_output_t *aout)
 static int Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
+    void *pv;
+    HRESULT hr;
 
     if (!aout->b_force && var_InheritBool(aout, "spdif"))
         /* Fallback to other plugin until pass-through is implemented */
@@ -845,27 +839,44 @@ static int Open(vlc_object_t *obj)
     aout_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
+    sys->aout = aout;
 
     if (TryEnter(aout))
+        goto error;
+
+    hr = CoCreateInstance(&CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL,
+                          &IID_IMMDeviceEnumerator, &pv);
+    if (FAILED(hr))
     {
-        free(sys);
-        return VLC_EGENERIC;
+        msg_Dbg(aout, "cannot create device enumerator (error 0x%lx)", hr);
+        Leave();
+        goto error;
     }
+    sys->it = pv;
+    GetDevices(obj, sys->it);
     Leave();
 
-    sys->aout = aout;
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
     aout->volume_set = SimpleVolumeSet; /* FIXME */
     aout->mute_set = SimpleMuteSet;
     return VLC_SUCCESS;
+error:
+    free(sys);
+    return VLC_EGENERIC;
 }
 
 static void Close(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
+
+    var_Destroy (aout, "audio-device");
+
+    Enter();
+    IMMDeviceEnumerator_Release(sys->it);
+    Leave();
 
     free(sys);
 }
