@@ -148,7 +148,17 @@ int OpenAvio(vlc_object_t *object)
         .callback = UrlInterruptCallback,
         .opaque = access,
     };
-    ret = avio_open2(&sys->context, url, AVIO_FLAG_READ, &cb, NULL /* options */);
+    AVDictionary *options = NULL;
+    char *psz_opts = var_InheritString(access, "avio-options");
+    if (psz_opts && *psz_opts) {
+        options = vlc_av_get_options(psz_opts);
+        free(psz_opts);
+    }
+    ret = avio_open2(&sys->context, url, AVIO_FLAG_READ, &cb, &options);
+    AVDictionaryEntry *t = NULL;
+    while ((t = av_dict_get(options, "", t, AV_DICT_IGNORE_SUFFIX)))
+        msg_Err( access, "unknown option \"%s\"", t->key );
+    av_dict_free(&options);
 #endif
     if (ret < 0) {
         errno = AVUNERROR(ret);
@@ -216,8 +226,18 @@ int OutOpenAvio(vlc_object_t *object)
         .callback = UrlInterruptCallback,
         .opaque = access,
     };
+    AVDictionary *options = NULL;
+    char *psz_opts = var_InheritString(access, "avio-options");
+    if (psz_opts && *psz_opts) {
+        options = vlc_av_get_options(psz_opts);
+        free(psz_opts);
+    }
     ret = avio_open2(&sys->context, access->psz_path, AVIO_FLAG_WRITE,
-                     &cb, NULL /* options */);
+                     &cb, &options);
+    AVDictionaryEntry *t = NULL;
+    while ((t = av_dict_get(options, "", t, AV_DICT_IGNORE_SUFFIX)))
+        msg_Err( access, "unknown option \"%s\"", t->key );
+    av_dict_free(&options);
 #endif
     if (ret < 0) {
         errno = AVUNERROR(ret);

@@ -43,6 +43,7 @@ void OutCloseAvio(vlc_object_t *);
     set_capability("access", -1)            \
     add_shortcut("avio", "rtmp", "rtmpe", "rtmps", "rtmpt", "rtmpte", "rtmpts") \
     set_callbacks(OpenAvio, CloseAvio) \
+    add_string("avio-options", NULL, AV_OPTIONS_TEXT, AV_OPTIONS_LONGTEXT, true) \
     add_submodule () \
         set_shortname( "libavformat" ) \
         set_description( N_("libavformat access output") ) \
@@ -50,4 +51,5 @@ void OutCloseAvio(vlc_object_t *);
         set_category( CAT_SOUT ) \
         set_subcategory( SUBCAT_SOUT_ACO ) \
         add_shortcut( "avio", "rtmp" ) \
-        set_callbacks( OutOpenAvio, OutCloseAvio)
+        set_callbacks( OutOpenAvio, OutCloseAvio) \
+        add_string("avio-options", NULL, AV_OPTIONS_TEXT, AV_OPTIONS_LONGTEXT, true)
