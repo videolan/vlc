@@ -130,30 +130,31 @@ static int SplitConversion( const audio_sample_format_t *restrict infmt,
  * @param obj parent VLC object for new filters
  * @param filters table of filters [IN/OUT]
  * @param nb_filters pointer to the number of filters in the table [IN/OUT]
+ * @param max_filters size of filters table [IN]
  * @param infmt input audio format
  * @param outfmt output audio format
  * @return 0 on success, -1 on failure
  */
-int aout_FiltersCreatePipeline( vlc_object_t *obj,
-                                filter_t **filters,
-                                int *nb_filters,
+int aout_FiltersCreatePipeline( vlc_object_t *obj, filter_t **filters,
+                                unsigned *nb_filters, unsigned max_filters,
                                 const audio_sample_format_t *restrict infmt,
                                 const audio_sample_format_t *restrict outfmt )
 {
     audio_sample_format_t curfmt = *outfmt;
-    unsigned i = 0, max = *nb_filters - AOUT_MAX_FILTERS;
+    unsigned i = 0;
 
+    max_filters -= *nb_filters;
     filters += *nb_filters;
     aout_FormatsPrint( obj, "filter(s)", infmt, outfmt );
 
     while( !AOUT_FMTS_IDENTICAL( infmt, &curfmt ) )
     {
-        if( i >= max )
+        if( i >= max_filters )
         {
-            msg_Err( obj, "max (%u) filters reached", AOUT_MAX_FILTERS );
+            msg_Err( obj, "maximum of %u filters reached", max_filters );
             dialog_Fatal( obj, _("Audio filtering failed"),
                           _("The maximum number of filters (%u) was reached."),
-                          AOUT_MAX_FILTERS );
+                          max_filters );
             goto rollback;
         }
 

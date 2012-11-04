@@ -211,6 +211,7 @@ aout_input_t *aout_InputNew (audio_output_t * p_aout,
             /* complete the filter chain if necessary */
             if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_filters,
                                              &p_input->i_nb_filters,
+                                             AOUT_MAX_FILTERS,
                                              &chain_input_format,
                                              &p_filter->fmt_in.audio ) < 0 )
             {
@@ -242,7 +243,7 @@ aout_input_t *aout_InputNew (audio_output_t * p_aout,
 
     /* complete the filter chain if necessary */
     if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_filters,
-                                     &p_input->i_nb_filters,
+                                     &p_input->i_nb_filters, AOUT_MAX_FILTERS,
                                      &chain_input_format,
                                      &chain_output_format ) < 0 )
     {
@@ -263,6 +264,8 @@ aout_input_t *aout_InputNew (audio_output_t * p_aout,
         }
         if (aout_FiltersCreatePipeline (p_aout, p_input->pp_resamplers,
                                         &p_input->i_nb_resamplers,
+                                        sizeof (p_input->pp_resamplers)
+                                          / sizeof (p_input->pp_resamplers[0]),
                                         &chain_output_format, outfmt) < 0)
         {
             msg_Err (p_aout, "cannot setup a resampling pipeline");

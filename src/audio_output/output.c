@@ -406,6 +406,8 @@ int aout_OutputNew (audio_output_t *aout, const audio_sample_format_t *fmtp)
     /* Create filters. */
     owner->nb_filters = 0;
     if (aout_FiltersCreatePipeline (aout, owner->filters, &owner->nb_filters,
+                                    sizeof (owner->filters)
+                                                  / sizeof (owner->filters[0]),
                                     &owner->mixer_format, &fmt) < 0)
     {
         msg_Err (aout, "couldn't create audio output pipeline");

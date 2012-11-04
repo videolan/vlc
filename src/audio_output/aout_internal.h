@@ -29,6 +29,8 @@
 /* Max input rate factor (1/4 -> 4) */
 # define AOUT_MAX_INPUT_RATE (4)
 
+# define AOUT_MAX_FILTERS 10
+
 enum {
     AOUT_RESAMPLING_NONE=0,
     AOUT_RESAMPLING_UP,
@@ -49,15 +51,15 @@ struct aout_input_t
 {
     unsigned            samplerate; /**< Input sample rate */
 
-    /* pre-filters */
+    /* filters */
     filter_t *              pp_filters[AOUT_MAX_FILTERS];
-    int                     i_nb_filters;
+    unsigned                i_nb_filters;
 
     filter_t *              p_playback_rate_filter;
 
-    /* resamplers */
-    filter_t *              pp_resamplers[AOUT_MAX_FILTERS];
-    int                     i_nb_resamplers;
+    /* Resampler + converter to mixer */
+    filter_t *              pp_resamplers[5];
+    unsigned                i_nb_resamplers;
     int                     i_resampling_type;
     mtime_t                 i_resamp_start_date;
     int                     i_resamp_start_drift;
@@ -89,8 +91,8 @@ typedef struct
     audio_sample_format_t input_format;
 
     /* Filters between mixer and output */
-    filter_t *filters[AOUT_MAX_FILTERS];
-    int       nb_filters;
+    filter_t *filters[5];
+    unsigned  nb_filters;
 
     vlc_atomic_t restart;
 } aout_owner_t;
@@ -119,10 +121,10 @@ block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
                          block_t *p_buffer, int i_input_rate, date_t * );
 
 /* From filters.c : */
-int aout_FiltersCreatePipeline( vlc_object_t *, filter_t **, int *,
-    const audio_sample_format_t *, const audio_sample_format_t * );
-#define aout_FiltersCreatePipeline(o, pv, pc, inf, outf) \
-        aout_FiltersCreatePipeline(VLC_OBJECT(o), pv, pc, inf, outf)
+int aout_FiltersCreatePipeline( vlc_object_t *, filter_t **, unsigned *,
+    unsigned, const audio_sample_format_t *, const audio_sample_format_t * );
+#define aout_FiltersCreatePipeline(o, pv, pc, max, inf, outf) \
+        aout_FiltersCreatePipeline(VLC_OBJECT(o), pv, pc, max, inf, outf)
 void aout_FiltersDestroyPipeline( filter_t *const *, unsigned );
 void aout_FiltersPlay( filter_t *const *, unsigned, block_t ** );
 

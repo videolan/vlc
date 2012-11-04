@@ -28,9 +28,6 @@
  * This file defines functions, structures and macros for audio output object
  */
 
-/* Max number of pre-filters per input, and max number of post-filters */
-#define AOUT_MAX_FILTERS                10
-
 /* Buffers which arrive in advance of more than AOUT_MAX_ADVANCE_TIME
  * will be considered as bogus and be trashed */
 #define AOUT_MAX_ADVANCE_TIME           (AOUT_MAX_PREPARE_TIME + CLOCK_FREQ)
