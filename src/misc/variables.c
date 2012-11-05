@@ -846,11 +846,9 @@ int var_AddCallback( vlc_object_t *p_this, const char *psz_name,
     p_var = Lookup( p_this, psz_name );
     if( p_var == NULL )
     {
-#ifndef NDEBUG
-        msg_Warn( p_this, "Failed to add a callback to the non-existing "
-                          "variable '%s'", psz_name );
-#endif
         vlc_mutex_unlock( &p_priv->var_lock );
+        msg_Err( p_this, "cannot add callback %p to nonexistent "
+                         "variable '%s'", pf_callback, psz_name );
         return VLC_ENOVAR;
     }
 
