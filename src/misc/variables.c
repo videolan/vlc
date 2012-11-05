@@ -1231,28 +1231,11 @@ static void CheckValue ( variable_t *p_var, vlc_value_t *p_val )
 int var_Inherit( vlc_object_t *p_this, const char *psz_name, int i_type,
                  vlc_value_t *p_val )
 {
-#ifndef NDEBUG
-    if (p_this != VLC_OBJECT(p_this->p_libvlc)
-     && unlikely(p_this->p_parent == NULL))
-    {
-        msg_Info (p_this, "%s(%s) on detached object", __func__, psz_name);
-        //vlc_backtrace ();
-    }
-#endif
     i_type &= VLC_VAR_CLASS;
     for( vlc_object_t *obj = p_this; obj != NULL; obj = obj->p_parent )
     {
         if( var_GetChecked( obj, psz_name, i_type, p_val ) == VLC_SUCCESS )
             return VLC_SUCCESS;
-#ifndef NDEBUG
-        if (obj != p_this && obj != VLC_OBJECT(p_this->p_libvlc)
-         && unlikely(obj->p_parent == NULL))
-        {
-            msg_Info (p_this, "%s(%s) on detached tree [%p] %s", __func__,
-                      psz_name, obj, obj->psz_object_type);
-            //vlc_backtrace ();
-        }
-#endif
     }
 
     /* else take value from config */
