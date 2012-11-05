@@ -266,13 +266,11 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
             p_var->ops = &addr_ops;
             p_var->val.p_address = NULL;
             break;
-        default:
+        case VLC_VAR_VOID:
             p_var->ops = &void_ops;
-#ifndef NDEBUG
-            if( (i_type & VLC_VAR_CLASS) != VLC_VAR_VOID )
-                msg_Err( p_this, "Creating the variable '%s' without a type",
-                          psz_name );
-#endif
+            break;
+        default:
+            assert (0);
     }
 
     if( i_type & VLC_VAR_DOINHERIT )
@@ -302,17 +300,11 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     pp_var = tsearch( p_var, &p_priv->var_root, varcmp );
     if( unlikely(pp_var == NULL) )
         ret = VLC_ENOMEM;
-    else if( (p_oldvar = *pp_var) == p_var )
-        p_var = NULL;
-    else if( unlikely((i_type ^ p_oldvar->i_type) & VLC_VAR_CLASS) )
-    {    /* If the types differ, variable creation failed. */
-         msg_Err( p_this, "Variable '%s' (0x%04x) already exist "
-                  "but with a different type (0x%04x)",
-                  psz_name, p_oldvar->i_type, i_type );
-         ret = VLC_EBADVAR;
-    }
-    else
+    else if( (p_oldvar = *pp_var) == p_var ) /* Variable create */
+        p_var = NULL; /* Variable created */
+    else /* Variable already exists */
     {
+        assert (((i_type ^ p_oldvar->i_type) & VLC_VAR_CLASS) == 0);
         p_oldvar->i_usage++;
         p_oldvar->i_type |= i_type & (VLC_VAR_ISCOMMAND|VLC_VAR_HASCHOICE);
     }
@@ -733,12 +725,7 @@ int var_SetChecked( vlc_object_t *p_this, const char *psz_name,
 
     assert( expected_type == 0 ||
             (p_var->i_type & VLC_VAR_CLASS) == expected_type );
-#ifndef NDEBUG
-        /* Alert if the type is VLC_VAR_VOID */
-        if( ( p_var->i_type & VLC_VAR_TYPE ) == VLC_VAR_VOID )
-            msg_Warn( p_this, "Calling var_Set on the void variable '%s' (0x%04x)", psz_name, p_var->i_type );
-#endif
-
+    assert ((p_var->i_type & VLC_VAR_CLASS) != VLC_VAR_VOID);
 
     WaitUnused( p_this, p_var );
 
@@ -795,15 +782,10 @@ int var_GetChecked( vlc_object_t *p_this, const char *psz_name,
     {
         assert( expected_type == 0 ||
                 (p_var->i_type & VLC_VAR_CLASS) == expected_type );
+        assert ((p_var->i_type & VLC_VAR_CLASS) != VLC_VAR_VOID);
 
         /* Really get the variable */
         *p_val = p_var->val;
-
-#ifndef NDEBUG
-        /* Alert if the type is VLC_VAR_VOID */
-        if( ( p_var->i_type & VLC_VAR_TYPE ) == VLC_VAR_VOID )
-            msg_Warn( p_this, "Calling var_Get on the void variable '%s' (0x%04x)", psz_name, p_var->i_type );
-#endif
 
         /* Duplicate value if needed */
         p_var->ops->pf_dup( p_val );
