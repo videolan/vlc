@@ -83,19 +83,21 @@ int aout_DecNew( audio_output_t *p_aout,
     aout_volume_SetFormat (owner->volume, owner->mixer_format.i_format);
 
     /* Create the audio filtering "input" pipeline */
-    date_Init (&owner->sync.date, owner->mixer_format.i_rate, 1);
-    date_Set (&owner->sync.date, VLC_TS_INVALID);
-
-    assert (owner->input == NULL);
-    owner->input = aout_InputNew (p_aout, p_format, &owner->mixer_format,
-                                  p_request_vout);
-    if (owner->input == NULL)
+    if (aout_FiltersNew (p_aout, p_format, &owner->mixer_format,
+                         p_request_vout))
     {
         aout_OutputDelete (p_aout);
 error:
         aout_volume_Delete (owner->volume);
         ret = -1;
+        goto error;
     }
+
+    date_Init (&owner->sync.date, owner->mixer_format.i_rate, 1);
+    date_Set (&owner->sync.date, VLC_TS_INVALID);
+
+    assert (owner->input == NULL);
+    owner->input = aout_InputNew (p_format);
     aout_unlock( p_aout );
     return ret;
 }
@@ -111,17 +113,16 @@ void aout_DecDelete (audio_output_t *p_aout)
     aout_lock( p_aout );
     /* Remove the input. */
     input = owner->input;
-    if (likely(input != NULL))
-        aout_InputDelete (p_aout, input);
+    aout_InputDelete (input);
     owner->input = NULL;
 
+    aout_FiltersDelete (p_aout);
     aout_OutputDelete( p_aout );
     aout_volume_Delete (owner->volume);
 
     var_Destroy( p_aout, "stereo-mode" );
 
     aout_unlock( p_aout );
-    free (input);
 }
 
 #define AOUT_RESTART_OUTPUT 1
@@ -140,9 +141,10 @@ static void aout_CheckRestart (audio_output_t *aout)
 
     const aout_request_vout_t request_vout = owner->request_vout;
 
-    if (likely(owner->input != NULL))
-        aout_InputDelete (aout, owner->input);
+    aout_InputDelete (owner->input);
     owner->input = NULL;
+
+    aout_FiltersDelete (aout);
 
     /* Reinitializes the output */
     if (restart & AOUT_RESTART_OUTPUT)
@@ -156,8 +158,9 @@ static void aout_CheckRestart (audio_output_t *aout)
         aout_volume_SetFormat (owner->volume, owner->mixer_format.i_format);
     }
 
-    owner->input = aout_InputNew (aout, &owner->input_format,
-                                  &owner->mixer_format, &request_vout);
+    if (aout_FiltersNew (aout, &owner->input_format, &owner->mixer_format,
+                         &request_vout) == 0)
+        owner->input = aout_InputNew (&owner->input_format);
 }
 
 /**

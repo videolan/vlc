@@ -108,10 +108,8 @@ static inline aout_owner_t *aout_owner (audio_output_t *aout)
  *****************************************************************************/
 
 /* From input.c : */
-aout_input_t *aout_InputNew(audio_output_t *, const audio_sample_format_t *,
-                            const audio_sample_format_t *,
-                            const aout_request_vout_t *);
-int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input );
+aout_input_t *aout_InputNew(const audio_sample_format_t *);
+void aout_InputDelete(aout_input_t *);
 block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
                          block_t *p_buffer, int i_input_rate, date_t * );
 
@@ -125,7 +123,7 @@ void aout_FiltersPlay( filter_t *const *, unsigned, block_t ** );
 
 int aout_FiltersNew(audio_output_t *, const audio_sample_format_t *,
                    const audio_sample_format_t *, const aout_request_vout_t *);
-void aout_FiltersDestroy(audio_output_t *);
+void aout_FiltersDelete(audio_output_t *);
 
 /* From mixer.c : */
 aout_volume_t *aout_volume_New(vlc_object_t *, const audio_replay_gain_t *);

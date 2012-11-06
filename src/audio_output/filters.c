@@ -518,7 +518,7 @@ error:
 /**
  * Destroys the audio filters.
  */
-void aout_FiltersDestroy (audio_output_t *aout)
+void aout_FiltersDelete (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 

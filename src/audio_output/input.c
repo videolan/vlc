@@ -43,22 +43,11 @@ static void inputResamplingStop( audio_output_t *, aout_input_t * );
 /*****************************************************************************
  * aout_InputNew : allocate a new input and rework the filter pipeline
  *****************************************************************************/
-aout_input_t *aout_InputNew (audio_output_t * p_aout,
-                             const audio_sample_format_t *restrict infmt,
-                             const audio_sample_format_t *restrict outfmt,
-                             const aout_request_vout_t *p_request_vout)
+aout_input_t *aout_InputNew (const audio_sample_format_t *restrict infmt)
 {
-    aout_input_t *p_input = malloc (sizeof (*p_input));
-    if (unlikely(p_input == NULL))
-        return NULL;
+    aout_input_t *p_input = xmalloc (sizeof (*p_input));
 
     p_input->samplerate = infmt->i_rate;
-
-    if (aout_FiltersNew (p_aout, infmt, outfmt, p_request_vout))
-    {
-        free(p_input);
-        return NULL;
-    }
 
     p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
     p_input->i_last_input_rate = INPUT_RATE_DEFAULT;
@@ -71,11 +60,9 @@ aout_input_t *aout_InputNew (audio_output_t * p_aout,
  *****************************************************************************
  * This function must be entered with the mixer lock.
  *****************************************************************************/
-int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input )
+void aout_InputDelete (aout_input_t * p_input )
 {
-    aout_FiltersDestroy (p_aout);
-    (void) p_input;
-    return 0;
+    free (p_input);
 }
 
 /*****************************************************************************
