@@ -338,7 +338,6 @@ static int OpenFilter( vlc_object_t *p_this )
              aout_FormatPrintChannels( audio_in ),
              aout_FormatPrintChannels( audio_out ) );
 
-    p_filter->pf_audio_filter = Remap;
     p_sys->pf_remap = GetRemapFun( audio_in, b_multiple );
     if( !p_sys->pf_remap )
     {
@@ -347,7 +346,8 @@ static int OpenFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    return 0;
+    p_filter->pf_audio_filter = Remap;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
