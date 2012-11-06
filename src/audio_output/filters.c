@@ -404,7 +404,8 @@ int aout_FiltersNew (audio_output_t *aout,
     var_AddCallback (aout, "visual", VisualizationCallback, NULL);
     var_AddCallback (aout, "equalizer", EqualizerCallback, NULL);
 
-    bool scaletempo = var_InheritBool (aout, "audio-time-stretch");
+    const char *scaletempo =
+        var_InheritBool (aout, "audio-time-stretch") ? "scaletempo" : NULL;
     char *filters = var_InheritString (aout, "audio-filter");
     char *visual = var_InheritString (aout, "audio-visual");
 
@@ -421,8 +422,8 @@ int aout_FiltersNew (audio_output_t *aout,
     const char *list[AOUT_MAX_FILTERS];
     unsigned n = 0;
 
-    if (scaletempo)
-        list[n++] = "scaletempo";
+    if (scaletempo != NULL)
+        list[n++] = scaletempo;
     if (filters != NULL)
     {
         char *p = filters, *name;
@@ -445,7 +446,7 @@ int aout_FiltersNew (audio_output_t *aout,
 
         filter_t *filter = CreateFilter (VLC_OBJECT(aout), name,
                                          &input_format, &output_format,
-                                         i == (n - (visual != NULL)));
+                                         name == visual);
         if (filter == NULL)
         {
             msg_Err (aout, "cannot add user filter %s (skipped)", name);
@@ -468,7 +469,7 @@ int aout_FiltersNew (audio_output_t *aout,
         owner->filters[owner->nb_filters++] = filter;
         input_format = filter->fmt_out.audio;
 
-        if (i == 0 && scaletempo) /* scaletempo */
+        if (name == scaletempo)
             owner->rate_filter = filter;
     }
     free (visual);
