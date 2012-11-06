@@ -112,25 +112,7 @@ static inline float small_value()
 static int Open( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
-    filter_sys_t *p_sys;
-
-    if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
-    {
-        msg_Err( p_filter, "input and output formats are not similar" );
-        return VLC_EGENERIC;
-    }
-
-    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 ||
-        p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
-    {
-        p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
-        p_filter->fmt_out.audio.i_format = VLC_CODEC_FL32;
-        msg_Warn( p_filter, "bad input or output format" );
-    }
-
-    p_filter->pf_audio_filter = DoWork;
-
-    p_sys = p_filter->p_sys = malloc( sizeof( *p_sys ) );
+    filter_sys_t *p_sys = p_filter->p_sys = malloc( sizeof( *p_sys ) );
     if( !p_sys )
         return VLC_ENOMEM;
 
@@ -208,6 +190,10 @@ static int Open( vlc_object_t *p_this )
             ( 7 * p_sys->f_sweepDepth * p_filter->fmt_in.audio.i_rate ) ;
     }
     p_sys->i_sampleRate = p_filter->fmt_in.audio.i_rate;
+
+    p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
+    p_filter->fmt_out.audio = p_filter->fmt_in.audio;
+    p_filter->pf_audio_filter = DoWork;
 
     return VLC_SUCCESS;
 }
