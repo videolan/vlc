@@ -79,15 +79,7 @@ vlc_module_end()
 static int Open( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
-    filter_sys_t *p_sys;
-
-    if ( !AOUT_FMTS_IDENTICAL( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
-    {
-        msg_Warn( p_filter, "bad input or output format" );
-        return VLC_EGENERIC;
-    }
-
-    p_sys = vlc_object_create( p_this, sizeof( *p_sys ) );
+    filter_sys_t *p_sys = vlc_object_create( p_this, sizeof( *p_sys ) );
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
@@ -104,6 +96,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->f_gain = var_InheritFloat( p_filter->p_parent, "gain-value" );
     msg_Dbg( p_filter, "gain multiplier sets to %.2fx", p_sys->f_gain );
 
+    p_filter->fmt_out.audio = p_filter->fmt_in.audio;
     p_filter->pf_audio_filter = Process;
     return VLC_SUCCESS;
 }
