@@ -368,23 +368,6 @@ static int OpenFilter( vlc_object_t *p_this )
     p_sys->i_channel_selected =
             (unsigned int) var_CreateGetInteger( p_this, MONO_CFG "channel" );
 
-    if( p_sys->b_downmix )
-    {
-        msg_Dbg( p_this, "using stereo to mono downmix" );
-        p_filter->fmt_out.audio.i_physical_channels = AOUT_CHAN_CENTER;
-        p_filter->fmt_out.audio.i_channels = 1;
-    }
-    else
-    {
-        msg_Dbg( p_this, "using pseudo mono" );
-        p_filter->fmt_out.audio.i_physical_channels =
-                            (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT);
-        p_filter->fmt_out.audio.i_channels = 2;
-    }
-
-    p_filter->fmt_out.audio.i_rate = p_filter->fmt_in.audio.i_rate;
-    p_filter->fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
-
     p_sys->i_nb_channels = aout_FormatNbChannels( &(p_filter->fmt_in.audio) );
     p_sys->i_bitspersample = p_filter->fmt_out.audio.i_bitspersample;
 
@@ -404,6 +387,19 @@ static int OpenFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    if( p_sys->b_downmix )
+    {
+        msg_Dbg( p_this, "using stereo to mono downmix" );
+        p_filter->fmt_out.audio.i_physical_channels = AOUT_CHAN_CENTER;
+        p_filter->fmt_out.audio.i_channels = 1;
+    }
+    else
+    {
+        msg_Dbg( p_this, "using pseudo mono" );
+        p_filter->fmt_out.audio.i_physical_channels = AOUT_CHANS_STEREO;
+        p_filter->fmt_out.audio.i_channels = 2;
+    }
+    p_filter->fmt_out.audio.i_rate = p_filter->fmt_in.audio.i_rate;
     p_filter->pf_audio_filter = Convert;
 
     msg_Dbg( p_this, "%4.4s->%4.4s, channels %d->%d, bits per sample: %i->%i",
