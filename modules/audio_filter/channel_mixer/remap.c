@@ -1,7 +1,7 @@
 /*****************************************************************************
  * remap.c : simple channel remapper plug-in
  *****************************************************************************
- * Copyright (C) 2011 the VideoLAN team
+ * Copyright (C) 2011 VLC authors and VideoLAN
  *
  * Authors: Cheng Sun <chengsun9@gmail.com>
  *
