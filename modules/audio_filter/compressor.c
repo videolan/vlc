@@ -209,27 +209,10 @@ static int Open( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t*)p_this;
     vlc_object_t *p_aout = p_filter->p_parent;
     float f_sample_rate = p_filter->fmt_in.audio.i_rate;
-    filter_sys_t *p_sys;
     float f_num;
 
-    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 ||
-        p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
-    {
-        p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
-        p_filter->fmt_out.audio.i_format = VLC_CODEC_FL32;
-        msg_Warn( p_filter, "bad input or output format" );
-        return VLC_EGENERIC;
-    }
-    if( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio,
-                            &p_filter->fmt_out.audio ) )
-    {
-        p_filter->fmt_out.audio = p_filter->fmt_in.audio;
-        msg_Warn( p_filter, "input and output formats are not similar" );
-        return VLC_EGENERIC;
-    }
-
     /* Initialize the filter parameter structure */
-    p_sys = p_filter->p_sys = calloc( 1, sizeof(*p_sys) );
+    filter_sys_t *p_sys = p_filter->p_sys = calloc( 1, sizeof(*p_sys) );
     if( !p_sys )
     {
         return VLC_ENOMEM;
@@ -273,6 +256,8 @@ static int Open( vlc_object_t *p_this )
     var_AddCallback( p_aout, "compressor-makeup-gain", MakeupGainCallback, p_sys );
 
     /* Set the filter function */
+    p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
+    p_filter->fmt_out.audio = p_filter->fmt_in.audio;
     p_filter->pf_audio_filter = DoWork;
 
     /* At this stage, we are ready! */
