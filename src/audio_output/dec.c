@@ -138,7 +138,7 @@ static void aout_CheckRestart (audio_output_t *aout)
 
     assert (restart & AOUT_RESTART_INPUT);
 
-    const aout_request_vout_t request_vout = owner->input->request_vout;
+    const aout_request_vout_t request_vout = owner->request_vout;
 
     if (likely(owner->input != NULL))
         aout_InputDelete (aout, owner->input);

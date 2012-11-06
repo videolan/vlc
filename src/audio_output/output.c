@@ -403,11 +403,11 @@ int aout_OutputNew (audio_output_t *aout, const audio_sample_format_t *fmtp)
     aout_FormatPrepare (&owner->mixer_format);
     aout_FormatPrint (aout, "mixer", &owner->mixer_format);
 
-    /* Create filters. */
-    owner->nb_filters = 0;
-    if (aout_FiltersCreatePipeline (aout, owner->filters, &owner->nb_filters,
-                                    sizeof (owner->filters)
-                                                  / sizeof (owner->filters[0]),
+    /* Create converters. */
+    owner->nb_converters = 0;
+    if (aout_FiltersCreatePipeline (aout, owner->converters,
+                                    &owner->nb_converters,
+                    sizeof (owner->converters) / sizeof (owner->converters[0]),
                                     &owner->mixer_format, &fmt) < 0)
     {
         msg_Err (aout, "couldn't create audio output pipeline");
@@ -431,7 +431,7 @@ void aout_OutputDelete (audio_output_t *aout)
     var_DelCallback (aout, "stereo-mode", aout_ChannelsRestart, NULL);
     if (aout->stop != NULL)
         aout->stop (aout);
-    aout_FiltersDestroyPipeline (owner->filters, owner->nb_filters);
+    aout_FiltersDestroyPipeline (owner->converters, owner->nb_converters);
 }
 
 /**
@@ -446,7 +446,7 @@ void aout_OutputPlay (audio_output_t *aout, block_t *block)
 
     aout_assert_locked (aout);
 
-    aout_FiltersPlay (owner->filters, owner->nb_filters, &block);
+    aout_FiltersPlay (owner->converters, owner->nb_converters, &block);
     if (block == NULL)
         return;
     if (block->i_buffer == 0)

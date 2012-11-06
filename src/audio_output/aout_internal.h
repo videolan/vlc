@@ -51,15 +51,6 @@ struct aout_input_t
 {
     unsigned            samplerate; /**< Input sample rate */
 
-    /* filters */
-    filter_t *              pp_filters[AOUT_MAX_FILTERS];
-    unsigned                i_nb_filters;
-
-    filter_t *              p_playback_rate_filter;
-
-    /* Resampler + converter to mixer */
-    filter_t *              pp_resamplers[5];
-    unsigned                i_nb_resamplers;
     int                     i_resampling_type;
     mtime_t                 i_resamp_start_date;
     int                     i_resamp_start_drift;
@@ -69,10 +60,6 @@ struct aout_input_t
 
     /* */
     int               i_buffer_lost;
-
-    /* */
-    bool                b_recycle_vout;
-    aout_request_vout_t request_vout;
 };
 
 typedef struct
@@ -87,12 +74,20 @@ typedef struct
         date_t date;
     } sync;
 
-    audio_sample_format_t mixer_format;
     audio_sample_format_t input_format;
+    audio_sample_format_t mixer_format;
 
-    /* Filters between mixer and output */
-    filter_t *filters[5];
-    unsigned  nb_filters;
+    filter_t *rate_filter; /**< The filter adjusting samples count
+        (either the scaletempo filter or a resampler) */
+    filter_t *resampler; /**< The resampler */
+    filter_t *filters[AOUT_MAX_FILTERS]; /**< Configured user filters
+        (e.g. equalization) and their conversions */
+    unsigned nb_filters;
+    unsigned nb_converters;
+    filter_t *converters[5]; /**< Converters to the output */
+
+    aout_request_vout_t request_vout;
+    bool recycle_vout;
 
     vlc_atomic_t restart;
 } aout_owner_t;
@@ -127,6 +122,10 @@ int aout_FiltersCreatePipeline( vlc_object_t *, filter_t **, unsigned *,
         aout_FiltersCreatePipeline(VLC_OBJECT(o), pv, pc, max, inf, outf)
 void aout_FiltersDestroyPipeline( filter_t *const *, unsigned );
 void aout_FiltersPlay( filter_t *const *, unsigned, block_t ** );
+
+int aout_FiltersNew(audio_output_t *, const audio_sample_format_t *,
+                   const audio_sample_format_t *, const aout_request_vout_t *);
+void aout_FiltersDestroy(audio_output_t *);
 
 /* From mixer.c : */
 aout_volume_t *aout_volume_New(vlc_object_t *, const audio_replay_gain_t *);
