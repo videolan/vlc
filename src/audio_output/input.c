@@ -38,7 +38,7 @@
 #include "aout_internal.h"
 
 static void inputDrop( aout_input_t *, block_t * );
-static void inputResamplingStop( audio_output_t *, aout_input_t * );
+static void inputResamplingStop( audio_output_t *, aout_input_t *, int );
 
 /*****************************************************************************
  * aout_InputNew : allocate a new input and rework the filter pipeline
@@ -112,7 +112,7 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
         aout_OutputFlush( p_aout, false );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
-        inputResamplingStop( p_aout, p_input );
+        inputResamplingStop( p_aout, p_input, i_input_rate );
         p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         start_date = VLC_TS_INVALID;
     }
@@ -124,7 +124,7 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
         msg_Warn( p_aout, "PTS is out of range (%"PRId64"), dropping buffer",
                   now - p_buffer->i_pts );
         inputDrop( p_input, p_buffer );
-        inputResamplingStop( p_aout, p_input );
+        inputResamplingStop( p_aout, p_input, i_input_rate );
         return NULL;
     }
 
@@ -145,7 +145,7 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
         aout_OutputFlush( p_aout, false );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
-        inputResamplingStop( p_aout, p_input );
+        inputResamplingStop( p_aout, p_input, i_input_rate );
         p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         start_date = p_buffer->i_pts;
         date_Set (date, start_date);
@@ -228,7 +228,7 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
             /* If the drift is increasing and not decreasing, than something
              * is bad. We'd better stop the resampling right now. */
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
-            inputResamplingStop( p_aout, p_input );
+            inputResamplingStop( p_aout, p_input, i_input_rate );
             p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         }
     }
@@ -260,7 +260,8 @@ static void inputDrop( aout_input_t *p_input, block_t *p_buffer )
     p_input->i_buffer_lost++;
 }
 
-static void inputResamplingStop( audio_output_t *p_aout, aout_input_t *p_input )
+static void inputResamplingStop( audio_output_t *p_aout, aout_input_t *p_input,
+                                 int input_rate )
 {
     aout_owner_t *owner = aout_owner(p_aout);
 
@@ -269,7 +270,7 @@ static void inputResamplingStop( audio_output_t *p_aout, aout_input_t *p_input )
     {
         owner->resampler->fmt_in.audio.i_rate =
             ( owner->resampler == owner->rate_filter )
-            ? INPUT_RATE_DEFAULT * p_input->samplerate / p_input->i_last_input_rate
+            ? INPUT_RATE_DEFAULT * p_input->samplerate / input_rate
             : p_input->samplerate;
     }
 }
