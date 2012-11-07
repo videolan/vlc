@@ -515,11 +515,8 @@ AC_LINK_IFELSE([
 
 dnl C11 static_assert()
 AC_MSG_CHECKING([for static_assert in assert.h])
-AC_PREPROC_IFELSE([AC_LANG_SOURCE([
-#include <assert.h>
-#ifndef static_assert
-# error BOOM!
-#endif
+AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <assert.h>], [
+static_assert(1, "The impossible happened.");
 ])], [
   AC_MSG_RESULT([yes])
   AC_DEFINE([HAVE_STATIC_ASSERT], [1], [Define to 1 if <assert.h> defines static_assert.])
