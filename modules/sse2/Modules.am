@@ -2,7 +2,7 @@ libi420_rgb_sse2_plugin_la_SOURCES = \
         ../video_chroma/i420_rgb.c \
 	../video_chroma/i420_rgb.h \
         ../video_chroma/i420_rgb16.c \
-        ../mmx/i420_rgb_mmx.h
+        ../sse2/i420_rgb_sse2.h
 libi420_rgb_sse2_plugin_la_CFLAGS = $(AM_CFLAGS)
 libi420_rgb_sse2_plugin_la_LIBADD = $(AM_LIBADD)
 

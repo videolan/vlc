@@ -42,7 +42,7 @@
 #   include "../mmx/i420_rgb_mmx.h"
 #   define VLC_TARGET VLC_MMX
 #elif defined (MODULE_NAME_IS_i420_rgb_sse2)
-#   include "../mmx/i420_rgb_mmx.h"
+#   include "../sse2/i420_rgb_sse2.h"
 #   define VLC_TARGET VLC_SSE
 #endif
 
