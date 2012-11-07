@@ -125,7 +125,6 @@ static int SplitConversion( const audio_sample_format_t *restrict infmt,
     return 0;
 }
 
-#undef aout_FiltersCreatePipeline
 /**
  * Allocates audio format conversion filters
  * @param obj parent VLC object for new filters
@@ -136,10 +135,10 @@ static int SplitConversion( const audio_sample_format_t *restrict infmt,
  * @param outfmt output audio format
  * @return 0 on success, -1 on failure
  */
-int aout_FiltersCreatePipeline( vlc_object_t *obj, filter_t **filters,
-                                unsigned *nb_filters, unsigned max_filters,
-                                const audio_sample_format_t *restrict infmt,
-                                const audio_sample_format_t *restrict outfmt )
+int (aout_FiltersPipelineCreate)(vlc_object_t *obj, filter_t **filters,
+                                 unsigned *nb_filters, unsigned max_filters,
+                                 const audio_sample_format_t *restrict infmt,
+                                 const audio_sample_format_t *restrict outfmt)
 {
     audio_sample_format_t curfmt = *outfmt;
     unsigned i = 0;
@@ -194,14 +193,14 @@ int aout_FiltersCreatePipeline( vlc_object_t *obj, filter_t **filters,
     return 0;
 
 rollback:
-    aout_FiltersDestroyPipeline( filters, i );
+    aout_FiltersPipelineDestroy (filters, i);
     return -1;
 }
 
 /**
  * Destroys a chain of audio filters.
  */
-void aout_FiltersDestroyPipeline( filter_t *const *filters, unsigned n )
+void aout_FiltersPipelineDestroy(filter_t *const *filters, unsigned n)
 {
     for( unsigned i = 0; i < n; i++ )
     {
@@ -221,21 +220,19 @@ static inline bool ChangeFiltersString (vlc_object_t *aout, const char *var,
 /**
  * Filters an audio buffer through a chain of filters.
  */
-void aout_FiltersPlay( filter_t *const *pp_filters,
-                       unsigned i_nb_filters, block_t ** pp_block )
+block_t *aout_FiltersPipelinePlay(filter_t *const *filters, unsigned count,
+                                  block_t *block)
 {
-    block_t *p_block = *pp_block;
-
     /* TODO: use filter chain */
-    for( unsigned i = 0; (i < i_nb_filters) && (p_block != NULL); i++ )
+    for (unsigned i = 0; (i < count) && (block != NULL); i++)
     {
-        filter_t * p_filter = pp_filters[i];
+        filter_t *filter = filters[i];
 
         /* Please note that p_block->i_nb_samples & i_buffer
          * shall be set by the filter plug-in. */
-        p_block = p_filter->pf_audio_filter( p_filter, p_block );
+        block = filter->pf_audio_filter (filter, block);
     }
-    *pp_block = p_block;
+    return block;
 }
 
 /** Callback for visualization selection */
@@ -454,7 +451,7 @@ int aout_FiltersNew (audio_output_t *aout,
         }
 
         /* convert to the filter input format if necessary */
-        if (aout_FiltersCreatePipeline (VLC_OBJECT(aout), owner->filters,
+        if (aout_FiltersPipelineCreate (aout, owner->filters,
                                         &owner->nb_filters,
                                         AOUT_MAX_FILTERS - 1,
                                         &input_format, &filter->fmt_in.audio))
@@ -477,8 +474,8 @@ int aout_FiltersNew (audio_output_t *aout,
 
     /* convert to the output format (minus resampling) if necessary */
     output_format.i_rate = input_format.i_rate;
-    if (aout_FiltersCreatePipeline (VLC_OBJECT(aout), owner->filters,
-                                    &owner->nb_filters, AOUT_MAX_FILTERS,
+    if (aout_FiltersPipelineCreate (aout, owner->filters, &owner->nb_filters,
+                                    AOUT_MAX_FILTERS,
                                     &input_format, &output_format))
     {
         msg_Err (aout, "cannot setup filtering pipeline");
@@ -509,7 +506,7 @@ int aout_FiltersNew (audio_output_t *aout,
     return 0;
 
 error:
-    aout_FiltersDestroyPipeline (owner->filters, owner->nb_filters);
+    aout_FiltersPipelineDestroy (owner->filters, owner->nb_filters);
     var_DelCallback (aout, "equalizer", EqualizerCallback, NULL);
     var_DelCallback (aout, "visual", VisualizationCallback, NULL);
     return -1;
@@ -523,13 +520,13 @@ void aout_FiltersDelete (audio_output_t *aout)
     aout_owner_t *owner = aout_owner (aout);
 
     if (owner->resampler != NULL)
-        aout_FiltersDestroyPipeline (&owner->resampler, 1);
-    aout_FiltersDestroyPipeline (owner->filters, owner->nb_filters);
+        aout_FiltersPipelineDestroy (&owner->resampler, 1);
+    aout_FiltersPipelineDestroy (owner->filters, owner->nb_filters);
     var_DelCallback (aout, "equalizer", EqualizerCallback, NULL);
     var_DelCallback (aout, "visual", VisualizationCallback, NULL);
 
     /* XXX We need to update recycle_vout before calling
-     * aout_FiltersDestroyPipeline().
+     * aout_FiltersPipelineDestroy().
      * FIXME There may be a race condition if audio-visual is updated between
      * aout_FiltersDestroy() and the next aout_FiltersNew().
      */

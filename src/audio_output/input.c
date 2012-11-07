@@ -161,7 +161,8 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
     }
 
     /* Run pre-filters. */
-    aout_FiltersPlay( owner->filters, owner->nb_filters, &p_buffer );
+    p_buffer = aout_FiltersPipelinePlay( owner->filters, owner->nb_filters,
+                                         p_buffer );
     if( !p_buffer )
         return NULL;
 
@@ -234,7 +235,7 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
 
     /* Actually run the resampler now. */
     if ( owner->resampler != NULL )
-        aout_FiltersPlay( &owner->resampler, 1, &p_buffer );
+        p_buffer = aout_FiltersPipelinePlay( &owner->resampler, 1, p_buffer );
 
     if( !p_buffer )
         return NULL;

@@ -405,7 +405,7 @@ int aout_OutputNew (audio_output_t *aout, const audio_sample_format_t *fmtp)
 
     /* Create converters. */
     owner->nb_converters = 0;
-    if (aout_FiltersCreatePipeline (aout, owner->converters,
+    if (aout_FiltersPipelineCreate (aout, owner->converters,
                                     &owner->nb_converters,
                     sizeof (owner->converters) / sizeof (owner->converters[0]),
                                     &owner->mixer_format, &fmt) < 0)
@@ -431,7 +431,7 @@ void aout_OutputDelete (audio_output_t *aout)
     var_DelCallback (aout, "stereo-mode", aout_ChannelsRestart, NULL);
     if (aout->stop != NULL)
         aout->stop (aout);
-    aout_FiltersDestroyPipeline (owner->converters, owner->nb_converters);
+    aout_FiltersPipelineDestroy (owner->converters, owner->nb_converters);
 }
 
 /**
@@ -446,7 +446,8 @@ void aout_OutputPlay (audio_output_t *aout, block_t *block)
 
     aout_assert_locked (aout);
 
-    aout_FiltersPlay (owner->converters, owner->nb_converters, &block);
+    block = aout_FiltersPipelinePlay (owner->converters, owner->nb_converters,
+                                      block);
     if (block == NULL)
         return;
     if (block->i_buffer == 0)

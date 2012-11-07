@@ -113,12 +113,12 @@ block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
                          block_t *p_buffer, int i_input_rate, date_t * );
 
 /* From filters.c : */
-int aout_FiltersCreatePipeline( vlc_object_t *, filter_t **, unsigned *,
-    unsigned, const audio_sample_format_t *, const audio_sample_format_t * );
-#define aout_FiltersCreatePipeline(o, pv, pc, max, inf, outf) \
-        aout_FiltersCreatePipeline(VLC_OBJECT(o), pv, pc, max, inf, outf)
-void aout_FiltersDestroyPipeline( filter_t *const *, unsigned );
-void aout_FiltersPlay( filter_t *const *, unsigned, block_t ** );
+int aout_FiltersPipelineCreate(vlc_object_t *, filter_t **, unsigned *,
+    unsigned, const audio_sample_format_t *, const audio_sample_format_t *);
+#define aout_FiltersPipelineCreate(o, pv, pc, max, inf, outf) \
+        aout_FiltersPipelineCreate(VLC_OBJECT(o), pv, pc, max, inf, outf)
+void aout_FiltersPipelineDestroy(filter_t *const *, unsigned);
+block_t *aout_FiltersPipelinePlay(filter_t *const *, unsigned, block_t *);
 
 int aout_FiltersNew(audio_output_t *, const audio_sample_format_t *,
                    const audio_sample_format_t *, const aout_request_vout_t *);
