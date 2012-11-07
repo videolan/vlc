@@ -178,7 +178,6 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
          *    synchronization
          * Solution : resample the buffer to avoid a scratch.
          */
-        p_input->i_resamp_start_date = now;
         p_input->i_resamp_start_drift = (int)-drift;
         p_input->i_resampling_type = (drift < 0) ? AOUT_RESAMPLING_DOWN
                                                  : AOUT_RESAMPLING_UP;
@@ -207,9 +206,7 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
         if( owner->resampler->fmt_in.audio.i_rate == i_nominal_rate )
         {
             p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
-            msg_Warn( p_aout, "resampling stopped after %"PRIi64" usec "
-                      "(drift: %"PRIi64")",
-                      now - p_input->i_resamp_start_date,
+            msg_Warn( p_aout, "resampling stopped (drift: %"PRIi64")",
                       p_buffer->i_pts - start_date);
         }
         else if( abs( (int)(p_buffer->i_pts - start_date) ) <

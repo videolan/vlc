@@ -52,7 +52,6 @@ struct aout_input_t
     unsigned            samplerate; /**< Input sample rate */
 
     int                     i_resampling_type;
-    mtime_t                 i_resamp_start_date;
     int                     i_resamp_start_drift;
 
     /* last rate from input */
