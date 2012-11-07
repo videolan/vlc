@@ -398,11 +398,11 @@ int aout_FiltersNew (audio_output_t *aout,
     owner->rate_filter = NULL;
     owner->resampler = NULL;
 
-    if (!AOUT_FMT_LINEAR(outfmt))
-        return 0;
-
     var_AddCallback (aout, "visual", VisualizationCallback, NULL);
     var_AddCallback (aout, "equalizer", EqualizerCallback, NULL);
+
+    if (!AOUT_FMT_LINEAR(outfmt))
+        return 0;
 
     const char *scaletempo =
         var_InheritBool (aout, "audio-time-stretch") ? "scaletempo" : NULL;
