@@ -549,32 +549,13 @@ libvlc_track_description_t *
 int libvlc_video_get_track( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
-    vlc_value_t val_list;
-    vlc_value_t val;
-    int i_track = -1;
 
     if( !p_input_thread )
         return -1;
 
-    if( var_Get( p_input_thread, "video-es", &val ) < 0 )
-    {
-        libvlc_printerr( "Video track information not found" );
-        vlc_object_release( p_input_thread );
-        return -1;
-    }
-
-    var_Change( p_input_thread, "video-es", VLC_VAR_GETCHOICES, &val_list, NULL );
-    for( int i = 0; i < val_list.p_list->i_count; i++ )
-    {
-        if( val_list.p_list->p_values[i].i_int == val.i_int )
-        {
-            i_track = i;
-            break;
-        }
-    }
-    var_FreeList( &val_list, NULL );
+    int id = var_GetInteger( p_input_thread, "video-es" );
     vlc_object_release( p_input_thread );
-    return i_track;
+    return id;
 }
 
 int libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track )
@@ -597,7 +578,7 @@ int libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track )
             goto end;
         }
     }
-    libvlc_printerr( "Video track number out of range" );
+    libvlc_printerr( "Track identifier not found" );
 end:
     var_FreeList( &val_list, NULL );
     vlc_object_release( p_input_thread );
