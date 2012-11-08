@@ -1,6 +1,4 @@
-# When using a specific AS tool instead of gcc libtool goes mad
-# without this. (This is the case with iOS).
-LIBTOOL=@LIBTOOL@ --tag=CC
+AM_LIBTOOLFLAGS=--tag=CC
 
 libaudio_format_neon_plugin_la_SOURCES = \
 	s32_s16.S \

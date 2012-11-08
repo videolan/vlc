@@ -1,7 +1,4 @@
-# Automake forgets to add a proper tag to libtool with Objective-C files.
-# Moreocer Libtool should default tag to CC when none is specified but
-# obviously does not. Here is a fix for that.
-LIBTOOL=@LIBTOOL@ --tag=CC
+AM_LIBTOOLFLAGS=--tag=CC
 
 SOURCES_macosx_dialog_provider = \
     VLCLoginPanel.m \
