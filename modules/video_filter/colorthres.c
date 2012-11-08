@@ -35,7 +35,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
-
+#include <vlc_atomic.h>
 #include <vlc_filter.h>
 #include "filter_picture.h"
 
@@ -98,10 +98,9 @@ static int FilterCallback( vlc_object_t *, char const *,
  *****************************************************************************/
 struct filter_sys_t
 {
-    int i_simthres;
-    int i_satthres;
-    int i_color;
-    vlc_spinlock_t lock;
+    atomic_int i_simthres;
+    atomic_int i_satthres;
+    atomic_int i_color;
 };
 
 /*****************************************************************************
@@ -143,17 +142,16 @@ static int Create( vlc_object_t *p_this )
 
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
-    p_sys->i_color = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "color" );
-    p_sys->i_simthres = var_CreateGetIntegerCommand( p_filter,
-                                                     CFG_PREFIX "similaritythres" );
-    p_sys->i_satthres = var_CreateGetIntegerCommand( p_filter,
-                                                     CFG_PREFIX "saturationthres" );
+    atomic_init( &p_sys->i_color,
+                 var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "color" ) );
+    atomic_init( &p_sys->i_simthres,
+       var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "similaritythres" ) );
+    atomic_init( &p_sys->i_satthres,
+       var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "saturationthres" ) );
 
-    vlc_spin_init( &p_sys->lock );
-
-    var_AddCallback( p_filter, CFG_PREFIX "color", FilterCallback, NULL );
-    var_AddCallback( p_filter, CFG_PREFIX "similaritythres", FilterCallback, NULL );
-    var_AddCallback( p_filter, CFG_PREFIX "saturationthres", FilterCallback, NULL );
+    var_AddCallback( p_filter, CFG_PREFIX "color", FilterCallback, p_sys );
+    var_AddCallback( p_filter, CFG_PREFIX "similaritythres", FilterCallback, p_sys );
+    var_AddCallback( p_filter, CFG_PREFIX "saturationthres", FilterCallback, p_sys );
 
     return VLC_SUCCESS;
 }
@@ -166,13 +164,12 @@ static int Create( vlc_object_t *p_this )
 static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
-    var_DelCallback( p_filter, CFG_PREFIX "color", FilterCallback, NULL );
-    var_DelCallback( p_filter, CFG_PREFIX "similaritythres", FilterCallback, NULL );
-    var_DelCallback( p_filter, CFG_PREFIX "saturationthres", FilterCallback, NULL );
-
-    vlc_spin_destroy( &p_filter->p_sys->lock );
-    free( p_filter->p_sys );
+    var_DelCallback( p_filter, CFG_PREFIX "color", FilterCallback, p_sys );
+    var_DelCallback( p_filter, CFG_PREFIX "similaritythres", FilterCallback, p_sys );
+    var_DelCallback( p_filter, CFG_PREFIX "saturationthres", FilterCallback, p_sys );
+    free( p_sys );
 }
 
 static void GetReference( int *refu, int *refv, int *reflength,
@@ -212,12 +209,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
-
-    vlc_spin_lock( &p_sys->lock );
-    int i_simthres = p_sys->i_simthres;
-    int i_satthres = p_sys->i_satthres;
-    int i_color = p_sys->i_color;
-    vlc_spin_unlock( &p_sys->lock );
+    int i_simthres = atomic_load( &p_sys->i_simthres );
+    int i_satthres = atomic_load( &p_sys->i_satthres );
+    int i_color = atomic_load( &p_sys->i_color );
 
     if( !p_pic ) return NULL;
 
@@ -271,12 +265,9 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
-
-    vlc_spin_lock( &p_sys->lock );
-    int i_simthres = p_sys->i_simthres;
-    int i_satthres = p_sys->i_satthres;
-    int i_color = p_sys->i_color;
-    vlc_spin_unlock( &p_sys->lock );
+    int i_simthres = atomic_load( &p_sys->i_simthres );
+    int i_satthres = atomic_load( &p_sys->i_satthres );
+    int i_color = atomic_load( &p_sys->i_color );
 
     if( !p_pic ) return NULL;
 
@@ -334,30 +325,17 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
 }
 
 static int FilterCallback ( vlc_object_t *p_this, char const *psz_var,
-                            vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    (void)oldval;    (void)p_data;
-    filter_t *p_filter = (filter_t*)p_this;
-    filter_sys_t *p_sys = p_filter->p_sys;
+    filter_sys_t *p_sys = p_data;
 
     if( !strcmp( psz_var, CFG_PREFIX "color" ) )
-    {
-        vlc_spin_lock( &p_sys->lock );
-        p_sys->i_color = newval.i_int;
-        vlc_spin_unlock( &p_sys->lock );
-    }
+        atomic_store( &p_sys->i_color, newval.i_int );
     else if( !strcmp( psz_var, CFG_PREFIX "similaritythres" ) )
-    {
-        vlc_spin_lock( &p_sys->lock );
-        p_sys->i_simthres = newval.i_int;
-        vlc_spin_unlock( &p_sys->lock );
-    }
+        atomic_store( &p_sys->i_simthres, newval.i_int );
     else /* CFG_PREFIX "saturationthres" */
-    {
-        vlc_spin_lock( &p_sys->lock );
-        p_sys->i_satthres = newval.i_int;
-        vlc_spin_unlock( &p_sys->lock );
-    }
+        atomic_store( &p_sys->i_satthres, newval.i_int );
 
+    (void)p_this; (void)oldval;
     return VLC_SUCCESS;
 }
