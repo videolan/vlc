@@ -509,9 +509,8 @@ static int Open( vlc_object_t *p_this )
 
     if( !b_found_mode )
     {
-        msg_Err( p_demux, "Unknown video mode specified. " \
-                          "Run VLC with -v --verbose-objects=-all,+decklink " \
-                          "to get a list of supported modes." );
+        msg_Err( p_demux, "Unknown video mode specified. "
+                 "Run VLC with -vv to get a list of supported modes." );
         goto finish;
     }
 
