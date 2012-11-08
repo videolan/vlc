@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_filter.h>
+#include <vlc_atomic.h>
 #include "filter_picture.h"
 
 /*****************************************************************************
@@ -80,9 +81,7 @@ struct filter_sys_t
 {
     picture_t *p_tmp;
     bool      b_first;
-
-    vlc_spinlock_t lock;
-    int        i_factor;
+    atomic_int i_factor;
 };
 
 /*****************************************************************************
@@ -110,9 +109,8 @@ static int Create( vlc_object_t *p_this )
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
-    p_filter->p_sys->i_factor =
-        var_CreateGetIntegerCommand( p_filter, FILTER_PREFIX "factor" );
-    vlc_spin_init( &p_filter->p_sys->lock );
+    atomic_init( &p_filter->p_sys->i_factor,
+             var_CreateGetIntegerCommand( p_filter, FILTER_PREFIX "factor" ) );
     var_AddCallback( p_filter, FILTER_PREFIX "factor",
                      MotionBlurCallback, p_filter->p_sys );
 
@@ -129,7 +127,6 @@ static void Destroy( vlc_object_t *p_this )
 
     var_DelCallback( p_filter, FILTER_PREFIX "factor",
                      MotionBlurCallback, p_filter->p_sys );
-    vlc_spin_destroy( &p_filter->p_sys->lock );
 
     picture_Release( p_filter->p_sys->p_tmp );
     free( p_filter->p_sys );
@@ -173,9 +170,7 @@ static void RenderBlur( filter_sys_t *p_sys, picture_t *p_newpic,
                         picture_t *p_outpic )
 {
     int i_plane;
-    vlc_spin_lock( &p_sys->lock );
-    const int i_oldfactor = p_sys->i_factor;
-    vlc_spin_unlock( &p_sys->lock );
+    const int i_oldfactor = atomic_load( &p_sys->i_factor );
     int i_newfactor = 128 - i_oldfactor;
 
     for( i_plane = 0; i_plane < p_outpic->i_planes; i_plane++ )
@@ -209,14 +204,9 @@ static int MotionBlurCallback( vlc_object_t *p_this, char const *psz_var,
                                vlc_value_t oldval, vlc_value_t newval,
                                void *p_data )
 {
-    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
 
-    if( !strcmp( psz_var, FILTER_PREFIX "factor" ) )
-    {
-        vlc_spin_lock( &p_sys->lock );
-        p_sys->i_factor = VLC_CLIP( newval.i_int, 1, 127 );
-        vlc_spin_unlock( &p_sys->lock );
-    }
+    atomic_store( &p_sys->i_factor, VLC_CLIP( newval.i_int, 1, 127 ) );
     return VLC_SUCCESS;
 }
