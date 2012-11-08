@@ -49,19 +49,17 @@ static const luaL_Reg p_reg[] =
  * Extensions capabilities
  * Note: #define and ppsz_capabilities must be in sync
  */
+static const char const caps[][20] = {
 #define EXT_HAS_MENU          (1 << 0)   ///< Hook: menu
-#define EXT_TRIGGER_ONLY      (1 << 1)   ///< Hook: trigger. Not activable
-#define EXT_INPUT_LISTENER    (1 << 2)   ///< Hook: input_changed
-#define EXT_META_LISTENER     (1 << 3)   ///< Hook: meta_changed
-#define EXT_PLAYING_LISTENER  (1 << 4)   ///< Hook: status_changed
-
-static const char* const ppsz_capabilities[] = {
     "menu",
+#define EXT_TRIGGER_ONLY      (1 << 1)   ///< Hook: trigger. Not activable
     "trigger",
+#define EXT_INPUT_LISTENER    (1 << 2)   ///< Hook: input_changed
     "input-listener",
+#define EXT_META_LISTENER     (1 << 3)   ///< Hook: meta_changed
     "meta-listener",
+#define EXT_PLAYING_LISTENER  (1 << 4)   ///< Hook: status_changed
     "playing-listener",
-    NULL
 };
 
 #define WATCH_TIMER_PERIOD    (10 * CLOCK_FREQ) ///< 10s period for the timer
@@ -381,17 +379,14 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
                 {
                     /* Key is at index -2 and value at index -1. Discard key */
                     const char *psz_cap = luaL_checkstring( L, -1 );
-                    int i_cap = 0;
                     bool b_ok = false;
                     /* Find this capability's flag */
-                    for( const char *iter = *ppsz_capabilities;
-                         iter != NULL;
-                         iter = ppsz_capabilities[ ++i_cap ])
+                    for( size_t i = 0; i < sizeof(caps)/sizeof(caps[0]); i++ )
                     {
-                        if( !strcmp( iter, psz_cap ) )
+                        if( !strcmp( caps[i], psz_cap ) )
                         {
                             /* Flag it! */
-                            p_ext->p_sys->i_capabilities |= 1 << i_cap;
+                            p_ext->p_sys->i_capabilities |= 1 << i;
                             b_ok = true;
                             break;
                         }
