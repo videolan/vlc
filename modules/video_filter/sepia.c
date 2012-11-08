@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_cpu.h>
+#include <vlc_atomic.h>
 
 #include <assert.h>
 #include "filter_picture.h"
@@ -101,8 +102,7 @@ static const struct
 struct filter_sys_t
 {
     SepiaFunction pf_sepia;
-    int i_intensity;
-    vlc_spinlock_t lock;
+    atomic_int i_intensity;
 };
 
 /*****************************************************************************
@@ -139,11 +139,8 @@ static int Create( vlc_object_t *p_this )
 
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
-    p_sys->i_intensity= var_CreateGetIntegerCommand( p_filter,
-                       CFG_PREFIX "intensity" );
-
-    vlc_spin_init( &p_sys->lock );
-
+    atomic_init( &p_sys->i_intensity,
+             var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "intensity" ) );
     var_AddCallback( p_filter, CFG_PREFIX "intensity", FilterCallback, NULL );
 
     p_filter->pf_video_filter = Filter;
@@ -162,7 +159,6 @@ static void Destroy( vlc_object_t *p_this )
 
     var_DelCallback( p_filter, CFG_PREFIX "intensity", FilterCallback, NULL );
 
-    vlc_spin_destroy( &p_filter->p_sys->lock );
     free( p_filter->p_sys );
 }
 
@@ -176,14 +172,11 @@ static void Destroy( vlc_object_t *p_this )
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
-    int intensity;
 
     if( !p_pic ) return NULL;
 
     filter_sys_t *p_sys = p_filter->p_sys;
-    vlc_spin_lock( &p_sys->lock );
-    intensity = p_sys->i_intensity;
-    vlc_spin_unlock( &p_sys->lock );
+    int intensity = atomic_load( &p_sys->i_intensity );
 
     p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
@@ -494,9 +487,6 @@ static int FilterCallback ( vlc_object_t *p_this, char const *psz_var,
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    vlc_spin_lock( &p_sys->lock );
-    p_sys->i_intensity = newval.i_int;
-    vlc_spin_unlock( &p_sys->lock );
-
+    atomic_store( &p_sys->i_intensity, newval.i_int );
     return VLC_SUCCESS;
 }
