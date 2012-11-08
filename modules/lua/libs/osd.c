@@ -94,7 +94,7 @@ static int vlc_osd_position_from_string( const char *psz_name )
     } pp_icons[] =
         { { 0,                                              "center"       },
           { SUBPICTURE_ALIGN_LEFT,                          "left"         },
-          { SUBPICTURE_ALIGN_RIGHT,                         "rigth"        },
+          { SUBPICTURE_ALIGN_RIGHT,                         "right"        },
           { SUBPICTURE_ALIGN_TOP,                           "top"          },
           { SUBPICTURE_ALIGN_BOTTOM,                        "bottom"       },
           { SUBPICTURE_ALIGN_TOP   |SUBPICTURE_ALIGN_LEFT,  "top-left"     },
