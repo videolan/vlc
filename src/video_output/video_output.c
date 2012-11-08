@@ -862,7 +862,7 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool is_
 
     vlc_mutex_unlock(&vout->p->filter.lock);
 
-    vout_statistic_Update(&vout->p->statistic, 0, lost_count);
+    vout_statistic_AddLost(&vout->p->statistic, lost_count);
     if (!picture)
         return VLC_EGENERIC;
 
@@ -1056,7 +1056,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
                          subpic);
     sys->display.filtered = NULL;
 
-    vout_statistic_Update(&vout->p->statistic, 1, 0);
+    vout_statistic_AddDisplayed(&vout->p->statistic, 1);
 
     return VLC_SUCCESS;
 }
