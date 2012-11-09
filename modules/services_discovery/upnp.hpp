@@ -120,6 +120,7 @@ public:
     Item( Container*  parent,
           const char* objectID,
           const char* title,
+          const char* subtitles,
           const char* resource,
           mtime_t duration );
     ~Item();
@@ -127,6 +128,9 @@ public:
     const char* getObjectID() const;
     const char* getTitle() const;
     const char* getResource() const;
+    const char* getSubtitles() const;
+    char* buildInputSlaveOption() const;
+    char* buildSubTrackIdOption() const;
     mtime_t getDuration() const;
 
     void setInputItem( input_item_t* p_input_item );
@@ -139,6 +143,7 @@ private:
     std::string _objectID;
     std::string _title;
     std::string _resource;
+    std::string _subtitles;
     mtime_t _duration;
 };
 
