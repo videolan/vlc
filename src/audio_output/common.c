@@ -280,69 +280,80 @@ int aout_CheckChannelReorder( const uint32_t *pi_chan_order_in,
 /*****************************************************************************
  * aout_ChannelReorder :
  *****************************************************************************/
-void aout_ChannelReorder( uint8_t *p_buf, int i_buffer,
-                          int i_channels, const int *pi_chan_table,
-                          int i_bits_per_sample )
+void aout_ChannelReorder( void *ptr, size_t bytes, unsigned channels,
+                          const int *pi_chan_table, unsigned bits_per_sample )
 {
-    uint8_t p_tmp[AOUT_CHAN_MAX * 4];
-    int i, j;
+    size_t samples = bytes / (channels * (bits_per_sample >> 3));
 
-    if( i_bits_per_sample == 8 )
+    assert( channels <= AOUT_CHAN_MAX );
+
+    switch( bits_per_sample )
     {
-        for( i = 0; i < i_buffer / i_channels; i++ )
+        case 32:
         {
-            for( j = 0; j < i_channels; j++ )
-            {
-                p_tmp[pi_chan_table[j]] = p_buf[j];
-            }
+            uint32_t *buf = ptr;
 
-            memcpy( p_buf, p_tmp, i_channels );
-            p_buf += i_channels;
+            for( size_t i = 0; i < samples; i++ )
+            {
+                uint32_t tmp[AOUT_CHAN_MAX];
+
+                for( size_t j = 0; j < channels; j++ )
+                    tmp[pi_chan_table[j]] = buf[j];
+
+                memcpy( buf, tmp, 4 * channels );
+                buf += channels;
+            }
+            break;
         }
-    }
-    else if( i_bits_per_sample == 16 )
-    {
-        for( i = 0; i < i_buffer / i_channels / 2; i++ )
-        {
-            for( j = 0; j < i_channels; j++ )
-            {
-                p_tmp[2 * pi_chan_table[j]]     = p_buf[2 * j];
-                p_tmp[2 * pi_chan_table[j] + 1] = p_buf[2 * j + 1];
-            }
 
-            memcpy( p_buf, p_tmp, 2 * i_channels );
-            p_buf += 2 * i_channels;
+        case 16:
+        {
+            uint16_t *buf = ptr;
+
+            for( size_t i = 0; i < samples; i++ )
+            {
+                uint16_t tmp[AOUT_CHAN_MAX];
+
+                for( size_t j = 0; j < channels; j++ )
+                    tmp[pi_chan_table[j]] = buf[j];
+
+                memcpy( buf, tmp, 2 * channels );
+                buf += channels;
+            }
+            break;
         }
-    }
-    else if( i_bits_per_sample == 24 )
-    {
-        for( i = 0; i < i_buffer / i_channels / 3; i++ )
-        {
-            for( j = 0; j < i_channels; j++ )
-            {
-                p_tmp[3 * pi_chan_table[j]]     = p_buf[3 * j];
-                p_tmp[3 * pi_chan_table[j] + 1] = p_buf[3 * j + 1];
-                p_tmp[3 * pi_chan_table[j] + 2] = p_buf[3 * j + 2];
-            }
 
-            memcpy( p_buf, p_tmp, 3 * i_channels );
-            p_buf += 3 * i_channels;
+        case 8:
+        {
+            uint8_t *buf = ptr;
+
+            for( size_t i = 0; i < samples; i++ )
+            {
+                uint8_t tmp[AOUT_CHAN_MAX];
+
+                for( size_t j = 0; j < channels; j++ )
+                    tmp[pi_chan_table[j]] = buf[j];
+
+                memcpy( buf, tmp, channels );
+                buf += channels;
+            }
+            break;
         }
-    }
-    else if( i_bits_per_sample == 32 )
-    {
-        for( i = 0; i < i_buffer / i_channels / 4; i++ )
-        {
-            for( j = 0; j < i_channels; j++ )
-            {
-                p_tmp[4 * pi_chan_table[j]]     = p_buf[4 * j];
-                p_tmp[4 * pi_chan_table[j] + 1] = p_buf[4 * j + 1];
-                p_tmp[4 * pi_chan_table[j] + 2] = p_buf[4 * j + 2];
-                p_tmp[4 * pi_chan_table[j] + 3] = p_buf[4 * j + 3];
-            }
 
-            memcpy( p_buf, p_tmp, 4 * i_channels );
-            p_buf += 4 * i_channels;
+        case 24:
+        {
+            uint8_t *buf = ptr;
+
+            for( size_t i = 0; i < samples; i++ )
+            {
+                uint8_t tmp[3 * AOUT_CHAN_MAX];
+
+                for( size_t j = 0; j < channels; j++ )
+                    memcpy( tmp + (3 * pi_chan_table[j]), buf + (3 * j), 3 );
+
+                memcpy( buf, tmp, 3 * channels );
+                buf += 3 * channels;
+            }
         }
     }
 }
