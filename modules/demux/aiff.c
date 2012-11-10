@@ -143,7 +143,8 @@ static int Open( vlc_object_t *p_this )
             p_sys->fmt.audio.i_rate     = GetF80BE( &p_peek[16] );
 
             msg_Dbg( p_demux, "COMM: channels=%d samples_frames=%d bits=%d rate=%d",
-                     GetWBE( &p_peek[8] ), GetDWBE( &p_peek[10] ), GetWBE( &p_peek[14] ), GetF80BE( &p_peek[16] ) );
+                     GetWBE( &p_peek[8] ), GetDWBE( &p_peek[10] ), GetWBE( &p_peek[14] ),
+                     GetF80BE( &p_peek[16] ) );
         }
         else if( !memcmp( p_peek, "SSND", 4 ) )
         {
@@ -181,7 +182,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_ssnd_fsize = p_sys->fmt.audio.i_channels *
                           ((p_sys->fmt.audio.i_bitspersample + 7) / 8);
 
-    if( p_sys->i_ssnd_fsize <= 0 )
+    if( p_sys->i_ssnd_fsize <= 0 || p_sys->fmt.audio.i_rate == 0 )
     {
         msg_Err( p_demux, "invalid audio parameters" );
         goto error;
