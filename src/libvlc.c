@@ -70,8 +70,8 @@
 #include <vlc_modules.h>
 
 #include "libvlc.h"
-
 #include "playlist/playlist_internal.h"
+#include "misc/variables.h"
 
 #include <vlc_vlm.h>
 

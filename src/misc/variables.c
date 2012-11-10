@@ -28,23 +28,21 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_charset.h>
-#include "variables.h"
-
 #ifdef HAVE_SEARCH_H
 # include <search.h>
 #endif
-
-#include "libvlc.h"
-#include "config/configuration.h"
-
 #include <assert.h>
 #include <math.h>
 #include <limits.h>
 #ifdef __GLIBC__
 # include <dlfcn.h>
 #endif
+
+#include <vlc_common.h>
+#include <vlc_charset.h>
+#include "libvlc.h"
+#include "variables.h"
+#include "config/configuration.h"
 
 /*****************************************************************************
  * Private types

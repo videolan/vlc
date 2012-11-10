@@ -124,42 +124,11 @@ void vlc_object_set_destructor (vlc_object_t *, vlc_destructor_t);
  */
 module_t *module_find_by_shortcut (const char *psz_shortcut);
 
-/**
- * Private LibVLC data for each object.
- */
-typedef struct vlc_object_internals vlc_object_internals_t;
-
-struct vlc_object_internals
-{
-    char           *psz_name; /* given name */
-
-    /* Object variables */
-    void           *var_root;
-    vlc_mutex_t     var_lock;
-    vlc_cond_t      var_wait;
-
-    /* Objects thread synchronization */
-    int             pipes[2];
-
-    /* Objects management */
-    vlc_spinlock_t   ref_spin;
-    unsigned         i_refcount;
-    vlc_destructor_t pf_destructor;
-
-    /* Objects tree structure */
-    vlc_object_internals_t *next;  /* next sibling */
-    vlc_object_internals_t *prev;  /* previous sibling */
-    vlc_object_internals_t *first; /* first child */
-};
-
 #define ZOOM_SECTION N_("Zoom")
 #define ZOOM_QUARTER_KEY_TEXT N_("1:4 Quarter")
 #define ZOOM_HALF_KEY_TEXT N_("1:2 Half")
 #define ZOOM_ORIGINAL_KEY_TEXT N_("1:1 Original")
 #define ZOOM_DOUBLE_KEY_TEXT N_("2:1 Double")
-
-#define vlc_internals( obj ) (((vlc_object_internals_t*)(VLC_OBJECT(obj)))-1)
-#define vlc_externals( priv ) ((vlc_object_t *)((priv) + 1))
 
 typedef struct sap_handler_t sap_handler_t;
 
