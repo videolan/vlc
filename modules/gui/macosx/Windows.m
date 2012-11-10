@@ -542,6 +542,7 @@
 
     if (o_controls_bar)
         [o_controls_bar setFullscreenState:YES];
+    [[[VLCMainWindow sharedInstance] controlsBar] setFullscreenState:YES];
 
     [[VLCMainWindow sharedInstance] recreateHideMouseTimer];
 
@@ -696,6 +697,7 @@
 
     if (o_controls_bar)
         [o_controls_bar setFullscreenState:NO];
+    [[[VLCMainWindow sharedInstance] controlsBar] setFullscreenState:NO];
 
     /* We always try to do so */
     [NSScreen unblackoutScreens];

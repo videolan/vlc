@@ -383,6 +383,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
         nativeVideoSize = screenSize;
         [self resizeWindow];
     }
+
+    // update fs button to reflect state for next startup
+    if (var_InheritBool(pl_Get(VLCIntf), "fullscreen")) {
+        [o_controls_bar setFullscreenState:YES];
+    }
 }
 
 #pragma mark -
@@ -717,6 +722,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
     } else {
         if (!b_nonembedded && !b_fullscreen && frameBeforePlayback.size.width > 0 && frameBeforePlayback.size.height > 0)
             [[self animator] setFrame:frameBeforePlayback display:YES];
+
+        // update fs button to reflect state for next startup
+        if (var_InheritBool(pl_Get(VLCIntf), "fullscreen")) {
+            [o_controls_bar setFullscreenState:YES];
+        }
 
         [self makeFirstResponder: nil];
 
