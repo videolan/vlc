@@ -148,7 +148,6 @@ typedef struct vlc_timer *vlc_timer_t;
 /* Unnamed POSIX semaphores not supported on Mac OS X */
 # include <mach/semaphore.h>
 # include <mach/task.h>
-# include <libkern/OSAtomic.h> /* OSMemoryBarrier() */
 # define LIBVLC_USE_PTHREAD           1
 # define LIBVLC_USE_PTHREAD_CLEANUP   1
 # define LIBVLC_USE_PTHREAD_CANCEL    1
@@ -485,29 +484,6 @@ static inline void vlc_spin_init (vlc_spinlock_t *spin)
 # define vlc_spin_unlock  vlc_mutex_unlock
 # define vlc_spin_destroy vlc_mutex_destroy
 #endif
-
-/**
- * Issues a full memory barrier.
- */
-static inline void barrier (void)
-{
-#if defined (__GNUC__) && !defined (__APPLE__) && \
-            ((__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1))
-    __sync_synchronize ();
-#elif defined(__APPLE__)
-    OSMemoryBarrier ();
-#elif defined(__powerpc__)
-    asm volatile ("sync":::"memory");
-#elif 0 // defined(__i386__) /*  Requires SSE2 support */
-    asm volatile ("mfence":::"memory");
-#else
-    vlc_spinlock_t spin;
-    vlc_spin_init (&spin);
-    vlc_spin_lock (&spin);
-    vlc_spin_unlock (&spin);
-    vlc_spin_destroy (&spin);
-#endif
-}
 
 #ifdef __cplusplus
 /**

@@ -75,7 +75,6 @@ static void block_Invalidate (block_t *block)
     block->p_next = NULL;
     block_Check (block);
     block->pf_release = BlockNoRelease;
-    barrier (); /* prevent compiler from optimizing this assignment out */
 }
 #else
 # define block_Check(b) ((void)(b))
