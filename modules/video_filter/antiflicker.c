@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
+#include <vlc_atomic.h>
 #include "filter_picture.h"
 
 /*****************************************************************************
@@ -86,10 +87,9 @@ vlc_module_end ()
  *****************************************************************************/
 struct filter_sys_t
 {
+    atomic_int i_window_size;
+    atomic_int i_softening;
     int ia_luminance_data[MAX_WINDOW_SZ];
-    vlc_mutex_t lock;
-    int i_window_size;
-    int i_softening;
     uint8_t *p_old_data;
 };
 
@@ -121,10 +121,12 @@ static int Create( vlc_object_t *p_this )
     p_filter->pf_video_filter = Filter;
 
     /* Initialize the arguments */
-    p_filter->p_sys->i_window_size = var_CreateGetIntegerCommand( p_filter,
-                                               FILTER_PREFIX "window-size" );
-    p_filter->p_sys->i_softening = var_CreateGetIntegerCommand( p_filter,
-                                               FILTER_PREFIX "softening-size" );
+    atomic_init( &p_filter->p_sys->i_window_size,
+                var_CreateGetIntegerCommand( p_filter,
+                                             FILTER_PREFIX"window-size" ) );
+    atomic_init( &p_filter->p_sys->i_softening,
+                 var_CreateGetIntegerCommand( p_filter,
+                                             FILTER_PREFIX"softening-size" ) );
 
     p_filter->p_sys->p_old_data = calloc( p_filter->fmt_in.video.i_width *
      (p_filter->fmt_in.video.i_height+1),sizeof(*p_filter->p_sys->p_old_data) );
@@ -136,7 +138,6 @@ static int Create( vlc_object_t *p_this )
                     sizeof(p_filter->p_sys->ia_luminance_data) );
     p_filter->p_sys->ia_luminance_data[p_filter->p_sys->i_window_size - 1] = 256;
 
-    vlc_mutex_init( &p_filter->p_sys->lock );
     var_AddCallback(p_filter,FILTER_PREFIX "window-size",
         AntiFlickerCallback, p_filter->p_sys);
     var_AddCallback(p_filter,FILTER_PREFIX "softening-size",
@@ -158,7 +159,6 @@ static void Destroy( vlc_object_t *p_this )
         AntiFlickerCallback, p_filter->p_sys);
     var_DelCallback(p_filter,FILTER_PREFIX "softening-size",
         AntiFlickerCallback, p_filter->p_sys);
-    vlc_mutex_destroy( &p_filter->p_sys->lock );
     free(p_filter->p_sys->p_old_data);
     free( p_filter->p_sys );
 }
@@ -208,13 +208,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     /****************** Get variables *************************/
 
-    int i_window_size;
-    int i_softening;
-
-    vlc_mutex_lock( &p_filter->p_sys->lock );
-    i_window_size = p_filter->p_sys->i_window_size;
-    i_softening = p_filter->p_sys->i_softening;
-    vlc_mutex_unlock( &p_filter->p_sys->lock );
+    int i_window_size = atomic_load( &p_filter->p_sys->i_window_size );
+    int i_softening = atomic_load( &p_filter->p_sys->i_softening );
 
     uint8_t *p_yplane_in = p_pic->p[Y_PLANE].p_pixels;
     uint8_t *p_yplane_out = p_outpic->p[Y_PLANE].p_pixels;
@@ -332,12 +327,10 @@ static int AntiFlickerCallback( vlc_object_t *p_this, char const *psz_var,
     VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
 
-    vlc_mutex_lock( &p_sys->lock );
     if( !strcmp( psz_var, FILTER_PREFIX "window-size" ) )
-        p_sys->i_window_size = newval.i_int;
+        atomic_store( &p_sys->i_window_size, newval.i_int );
     else if( !strcmp( psz_var, FILTER_PREFIX "softening-size" ) )
-        p_sys->i_softening = newval.i_int;
-    vlc_mutex_unlock( &p_sys->lock );
+        atomic_store( &p_sys->i_softening, newval.i_int );
 
     return VLC_SUCCESS;
 }
