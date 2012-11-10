@@ -453,7 +453,6 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
     int  i_flags;                                                           \
                                                                             \
     /* Object properties */                                                 \
-    volatile bool b_die;                   /**< set by the outside */ \
     bool b_force;      /**< set by the outside (eg. module_need()) */ \
                                                                             \
     /* Stuff related to the libvlc structure */                             \

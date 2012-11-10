@@ -133,6 +133,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     vlc_mutex_init (&priv->var_lock);
     vlc_cond_init (&priv->var_wait);
     priv->pipes[0] = priv->pipes[1] = -1;
+    atomic_init (&priv->alive, true);
     atomic_init (&priv->refs, 1);
     priv->pf_destructor = NULL;
     priv->prev = NULL;
@@ -141,7 +142,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     vlc_object_t *obj = (vlc_object_t *)(priv + 1);
     obj->psz_object_type = typename;
     obj->psz_header = NULL;
-    obj->b_die = false;
     obj->b_force = false;
     memset (obj + 1, 0, length - sizeof (*obj)); /* type-specific stuff */
 
@@ -367,7 +367,7 @@ int vlc_object_waitpipe( vlc_object_t *obj )
                 internals->pipes[0] = internals->pipes[1] = -1;
         }
 
-        if (internals->pipes[0] != -1 && obj->b_die)
+        if (internals->pipes[0] != -1 && !atomic_load (&internals->alive))
         {   /* Race condition: vlc_object_kill() already invoked! */
             msg_Dbg (obj, "waitpipe: object already dying");
             write (internals->pipes[1], &(uint64_t){ 1 }, sizeof (uint64_t));
@@ -388,15 +388,12 @@ void vlc_object_kill( vlc_object_t *p_this )
     vlc_object_internals_t *priv = vlc_internals( p_this );
     int fd = -1;
 
-    vlc_mutex_lock( &pipe_lock );
-    if( !p_this->b_die )
+    if (atomic_exchange (&priv->alive, false))
     {
+        vlc_mutex_lock (&pipe_lock);
         fd = priv->pipes[1];
-        p_this->b_die = true;
+        vlc_mutex_unlock (&pipe_lock);
     }
-
-    /* This also serves as a memory barrier toward vlc_object_alive(): */
-    vlc_mutex_unlock( &pipe_lock );
 
     if (fd != -1)
     {
@@ -510,6 +507,17 @@ void vlc_object_release( vlc_object_t *p_this )
         if (parent)
             vlc_object_release (parent);
     }
+}
+
+#undef vlc_object_alive
+/**
+ * This function returns true, except when it returns false.
+ * \warning Do not use this function. Ever. You were warned.
+ */
+bool vlc_object_alive(vlc_object_t *obj)
+{
+    vlc_object_internals_t *internals = vlc_internals (obj);
+    return atomic_load (&internals->alive);
 }
 
 #undef vlc_list_children

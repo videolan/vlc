@@ -556,6 +556,7 @@ vlc_object_find_name
 vlc_object_hold
 vlc_object_release
 vlc_object_get_name
+vlc_object_alive
 vlc_rand_bytes
 vlc_drand48
 vlc_lrand48

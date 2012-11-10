@@ -41,6 +41,7 @@ struct vlc_object_internals
 
     /* Objects thread synchronization */
     int             pipes[2];
+    atomic_bool     alive;
 
     /* Objects management */
     atomic_uint     refs;
