@@ -29,6 +29,8 @@
 # include "config.h"
 #endif
 
+#include <math.h>
+
 #include <QLabel>
 #include <QVariant>
 #include <QString>
@@ -551,6 +553,7 @@ void ExtVideo::setWidgetValue( QObject *widget )
     {
         if( slider ) slider->setValue( ( int )( val.f_float*( double )slider->tickInterval() ) ); /* hack alert! */
         else if( doublespinbox ) doublespinbox->setValue( val.f_float );
+        else if( dial ) dial->setValue( (540 - lroundf(val.f_float)) % 360 );
         else msg_Warn( p_intf, "Could not find the correct Float widget" );
     }
     else if( i_type == VLC_VAR_STRING )
@@ -631,6 +634,7 @@ void ExtVideo::updateFilterOptions()
         if( slider )             f_float = ( double )slider->value()
                                          / ( double )slider->tickInterval(); /* hack alert! */
         else if( doublespinbox ) f_float = doublespinbox->value();
+        else if( dial ) f_float = (540 - dial->value()) % 360;
         else if( lineedit ) f_float = lineedit->text().toDouble();
         else msg_Warn( p_intf, "Could not find the correct Float widget" );
         config_PutFloat( p_intf, qtu( option ), f_float );
