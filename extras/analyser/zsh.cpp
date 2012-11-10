@@ -140,29 +140,29 @@ static void ParseOption(const module_config_t *item)
 
     case CONFIG_ITEM_STRING:
     case CONFIG_ITEM_INTEGER:
-        if (item->i_list == 0)
+        if (item->list_count == 0)
             break;
 
-        for (int i = 0; i < item->i_list; i++) {
+        for (int i = 0; i < item->list_count; i++) {
             std::string val;
-            if (item->ppsz_list_text) {
-                const char *text = item->ppsz_list_text[i];
+            if (item->list_text) {
+                const char *text = item->list_text[i];
                 if (item->i_type == CONFIG_ITEM_INTEGER) {
                     std::stringstream s;
-                    s << item->pi_list[i];
+                    s << item->list.i[i];
                     val = s.str() + "\\:\\\"" + text;
                 } else {
-                    if (!item->ppsz_list[i] || !text)
+                    if (!item->list.psz[i] || !text)
                         continue;
-                    val = item->ppsz_list[i] + std::string("\\:\\\"") + text;
+                    val = item->list.psz[i] + std::string("\\:\\\"") + text;
                 }
             } else
-                val = std::string("\\\"") + item->ppsz_list[i];
+                val = std::string("\\\"") + item->list.psz[i];
 
             list = val + "\\\" " + list;
         }
 
-        if (item->ppsz_list_text)
+        if (item->list_text)
             args = std::string("((") + list + "))";
         else
             args = std::string("(") + list + ")";
