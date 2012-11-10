@@ -133,8 +133,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     vlc_mutex_init (&priv->var_lock);
     vlc_cond_init (&priv->var_wait);
     priv->pipes[0] = priv->pipes[1] = -1;
-    vlc_spin_init (&priv->ref_spin);
-    priv->i_refcount = 1;
+    atomic_init (&priv->refs, 1);
     priv->pf_destructor = NULL;
     priv->prev = NULL;
     priv->first = NULL;
@@ -213,9 +212,7 @@ void vlc_object_set_destructor( vlc_object_t *p_this,
 {
     vlc_object_internals_t *p_priv = vlc_internals(p_this );
 
-    vlc_spin_lock( &p_priv->ref_spin );
     p_priv->pf_destructor = pf_destructor;
-    vlc_spin_unlock( &p_priv->ref_spin );
 }
 
 static vlc_mutex_t name_lock = VLC_STATIC_MUTEX;
@@ -279,7 +276,6 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
     free( p_priv->psz_name );
 
-    vlc_spin_destroy( &p_priv->ref_spin );
     if( p_priv->pipes[1] != -1 && p_priv->pipes[1] != p_priv->pipes[0] )
         close( p_priv->pipes[1] );
     if( p_priv->pipes[0] != -1 )
@@ -452,13 +448,9 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this, const char *psz_name )
 void * vlc_object_hold( vlc_object_t *p_this )
 {
     vlc_object_internals_t *internals = vlc_internals( p_this );
+    unsigned refs = atomic_fetch_add (&internals->refs, 1);
 
-    vlc_spin_lock( &internals->ref_spin );
-    /* Avoid obvious freed object uses */
-    assert( internals->i_refcount > 0 );
-    /* Increment the counter */
-    internals->i_refcount++;
-    vlc_spin_unlock( &internals->ref_spin );
+    assert (refs > 0); /* Avoid obvious freed object uses */ (void) refs;
     return p_this;
 }
 
@@ -471,43 +463,38 @@ void vlc_object_release( vlc_object_t *p_this )
 {
     vlc_object_internals_t *internals = vlc_internals( p_this );
     vlc_object_t *parent = NULL;
-    bool b_should_destroy;
+    unsigned refs = atomic_load (&internals->refs);
 
-    vlc_spin_lock( &internals->ref_spin );
-    assert( internals->i_refcount > 0 );
-
-    if( internals->i_refcount > 1 )
+    /* Fast path */
+    while (refs > 1)
     {
-        /* Fast path */
-        /* There are still other references to the object */
-        internals->i_refcount--;
-        vlc_spin_unlock( &internals->ref_spin );
-        return;
+        if (atomic_compare_exchange_weak (&internals->refs, &refs, refs - 1))
+            return; /* There are still other references to the object */
+
+        assert (refs > 0);
     }
-    vlc_spin_unlock( &internals->ref_spin );
 
     /* Slow path */
-    /* Remember that we cannot hold the spin while waiting on the mutex */
     libvlc_lock (p_this->p_libvlc);
-    /* Take the spin again. Note that another thread may have held the
-     * object in the (very short) mean time. */
-    vlc_spin_lock( &internals->ref_spin );
-    b_should_destroy = --internals->i_refcount == 0;
-    vlc_spin_unlock( &internals->ref_spin );
+    refs = atomic_fetch_sub (&internals->refs, 1);
+    assert (refs > 0);
 
-    if( b_should_destroy )
+    if (likely(refs == 1))
     {
         /* Detach from parent to protect against vlc_object_find_name() */
         parent = p_this->p_parent;
         if (likely(parent))
         {
            /* Unlink */
-           if (internals->prev != NULL)
-               internals->prev->next = internals->next;
+           vlc_object_internals_t *prev = internals->prev;
+           vlc_object_internals_t *next = internals->next;
+
+           if (prev != NULL)
+               prev->next = next;
            else
-               vlc_internals(parent)->first = internals->next;
-           if (internals->next != NULL)
-               internals->next->prev = internals->prev;
+               vlc_internals (parent)->first = next;
+           if (next != NULL)
+               next->prev = prev;
         }
 
         /* We have no children */
@@ -515,11 +502,9 @@ void vlc_object_release( vlc_object_t *p_this )
     }
     libvlc_unlock (p_this->p_libvlc);
 
-    if( b_should_destroy )
+    if (likely(refs == 1))
     {
-        int canc;
-
-        canc = vlc_savecancel ();
+        int canc = vlc_savecancel ();
         vlc_object_destroy( p_this );
         vlc_restorecancel (canc);
         if (parent)
@@ -727,9 +712,7 @@ static void PrintObject( vlc_object_internals_t *priv,
     }
     vlc_mutex_unlock (&name_lock);
 
-    psz_refcount[0] = '\0';
-    if( priv->i_refcount > 0 )
-        snprintf( psz_refcount, 19, ", %u refs", priv->i_refcount );
+    snprintf( psz_refcount, 19, ", %u refs", atomic_load( &priv->refs ) );
 
     psz_parent[0] = '\0';
     /* FIXME: need structure lock!!! */

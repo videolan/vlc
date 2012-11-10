@@ -23,6 +23,8 @@
 #ifndef LIBVLC_VARIABLES_H
 # define LIBVLC_VARIABLES_H 1
 
+# include <vlc_atomic.h>
+
 /**
  * Private LibVLC data for each object.
  */
@@ -41,8 +43,7 @@ struct vlc_object_internals
     int             pipes[2];
 
     /* Objects management */
-    vlc_spinlock_t   ref_spin;
-    unsigned         i_refcount;
+    atomic_uint     refs;
     vlc_destructor_t pf_destructor;
 
     /* Objects tree structure */
