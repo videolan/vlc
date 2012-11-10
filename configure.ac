@@ -2653,18 +2653,17 @@ dnl  PNG decoder module
 dnl
 AC_ARG_ENABLE(png,
   [  --enable-png            PNG support (default enabled)])
-if test "${enable_png}" != "no"; then
+AS_IF([test "${enable_png}" != "no"], [
 AC_CHECK_HEADERS(png.h, [
   VLC_SAVE_FLAGS
   LDFLAGS="${LDFLAGS} -lz $LIBM"
   AC_CHECK_LIB(png, png_set_rows, [
     VLC_ADD_LIBS([png],[-lpng -lz $LIBM])
-    VLC_ADD_PLUGIN([png osdmenu osd_parser])],
-    [],[-lz $LIBM] )
+    VLC_ADD_PLUGIN([png])
+  ], [], [-lz $LIBM])
   VLC_RESTORE_FLAGS
   ])
-fi
-AM_CONDITIONAL(BUILD_OSDMENU, [test "${enable_png}" != "no"])
+])
 
 dnl
 dnl H264 encoder plugin (10-bit lib264)
@@ -3756,6 +3755,13 @@ AS_IF([test "${enable_atmo}" != no], [
     AC_LANG_POP(C++)
   ])
 ])
+
+AC_ARG_ENABLE(osdmenu,
+  AS_HELP_STRING([--enable-osdmenu],[OSD menu (default disabled)]),, [
+  enable_osdmenu="no"
+])
+AM_CONDITIONAL(BUILD_OSDMENU, [test "${enable_osdmenu}" != "no"])
+
 
 EXTEND_HELP_STRING([Service Discovery plugins:])
 dnl

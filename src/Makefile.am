@@ -245,6 +245,10 @@ if ENABLE_VLM
 libvlccore_la_SOURCES += $(SOURCES_libvlc_vlm)
 endif
 endif
+if BUILD_OSDMENU
+libvlccore_la_SOURCES += osd/osd.c
+AM_CPPFLAGS += -DOSDMENU
+endif
 
 SOURCES_libvlc_darwin = \
 	posix/darwin_dirs.c \
@@ -412,7 +416,6 @@ SOURCES_libvlc_common = \
 	audio_output/input.c \
 	audio_output/output.c \
 	audio_output/volume.c \
-	osd/osd.c \
 	network/getaddrinfo.c \
 	network/io.c \
 	network/tcp.c \
