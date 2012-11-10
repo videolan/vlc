@@ -57,10 +57,6 @@ static void *ml_gc_init (ml_gc_object_t *p_gc, void (*pf_destruct) (ml_gc_object
 
     p_gc->pool = false;
     p_gc->refs = 1;
-    /* Nobody else can possibly lock the spin - it's there as a barrier */
-    vlc_spin_init (&p_gc->spin);
-    vlc_spin_lock (&p_gc->spin);
-    vlc_spin_unlock (&p_gc->spin);
     return p_gc;
 }
 

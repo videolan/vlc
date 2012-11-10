@@ -181,7 +181,6 @@ typedef struct ml_ftree_t      ml_ftree_t;
 
 typedef struct ml_gc_object_t
 {
-    vlc_spinlock_t spin;
     bool           pool;
     uintptr_t      refs;
     void          (*pf_destructor) (struct ml_gc_object_t *);
@@ -514,9 +513,7 @@ static inline void ml_gc_incref( ml_media_t* p_media )
     if( p_gc == NULL )
         return;
 
-    vlc_spin_lock (&p_gc->spin);
     ++p_gc->refs;
-    vlc_spin_unlock (&p_gc->spin);
 }
 
 /**
@@ -532,14 +529,11 @@ static inline void ml_gc_decref( ml_media_t* p_media )
     if( p_gc == NULL )
         return;
 
-    vlc_spin_lock (&p_gc->spin);
     refs = --p_gc->refs;
     pool = p_gc->pool;
-    vlc_spin_unlock (&p_gc->spin);
 
     if( refs == 0 && !pool )
     {
-        vlc_spin_destroy (&p_gc->spin);
         p_gc->pf_destructor (p_gc);
     }
 }

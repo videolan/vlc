@@ -66,7 +66,6 @@ int pool_InsertMedia( media_library_t* p_ml, ml_media_t* p_media, bool locked )
         ml_LockMedia( p_media );
     assert( p_media );
     assert( p_media->i_id > 0 );
-    vlc_spin_lock( &p_media->ml_gc_data.spin );
     if( p_media->ml_gc_data.pool )
     {
         msg_Dbg( p_ml, "Already in pool! %s %d", p_media->psz_uri, p_media->i_id );
@@ -74,7 +73,6 @@ int pool_InsertMedia( media_library_t* p_ml, ml_media_t* p_media, bool locked )
         return VLC_EGENERIC;
     }
     p_media->ml_gc_data.pool = true;
-    vlc_spin_unlock( &p_media->ml_gc_data.spin );
     int i_ret = VLC_SUCCESS;
     vlc_mutex_lock( &p_ml->p_sys->pool_mutex );
     mp_foreachlist( p_ml->p_sys->p_mediapool[ (mediapool_hash(p_media->i_id)) ], p_item )
@@ -128,18 +126,14 @@ void pool_GC( media_library_t* p_ml )
         {
             p_media = p_item->p_media;
             int refs;
-            vlc_spin_lock( &p_media->ml_gc_data.spin );
             refs = p_media->ml_gc_data.refs;
-            vlc_spin_unlock( &p_media->ml_gc_data.spin );
             if( refs == 1 )
             {
                 if( p_prev == NULL )
                     p_ml->p_sys->p_mediapool[i_idx] = p_item->p_next;
                 else
                     p_prev->p_next = p_item->p_next;
-                vlc_spin_lock( &p_media->ml_gc_data.spin );
                 p_media->ml_gc_data.pool = false;
-                vlc_spin_unlock( &p_media->ml_gc_data.spin );
                 ml_gc_decref( p_item->p_media );//This should destroy the object
                 free( p_item );
             }
