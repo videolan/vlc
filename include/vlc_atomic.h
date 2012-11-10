@@ -58,45 +58,45 @@
 /* In principles, __sync_*() only supports int, long and long long and their
  * unsigned equivalents, i.e. 4-bytes and 8-bytes types, although GCC also
  * supports 1 and 2-bytes types. Some non-x86 architectures do not support
- * 8-byte atomic types (or not efficiently). So lets stick to (u)intptr_t. */
-typedef  intptr_t atomic_flag;
-typedef  intptr_t atomic_bool;
-typedef  intptr_t atomic_char;
-typedef  intptr_t atomic_schar;
-typedef uintptr_t atomic_uchar;
-typedef  intptr_t atomic_short;
-typedef uintptr_t atomic_ushort;
-typedef  intptr_t atomic_int;
-typedef uintptr_t atomic_uint;
-typedef  intptr_t atomic_long;
-typedef uintptr_t atomic_ulong;
-//atomic_llong
-//atomic_ullong
-typedef uintptr_t atomic_char16_t;
-typedef uintptr_t atomic_char32_t;
-typedef uintptr_t atomic_wchar_t;
-typedef  intptr_t atomic_int_least8_t;
-typedef uintptr_t atomic_uint_least8_t;
-typedef  intptr_t atomic_int_least16_t;
-typedef uintptr_t atomic_uint_least16_t;
-typedef  intptr_t atomic_int_least32_t;
-typedef uintptr_t atomic_uint_least32_t;
-//atomic_int_least64_t
-//atomic_uint_least64_t
-typedef  intptr_t atomic_int_fast8_t;
-typedef uintptr_t atomic_uint_fast8_t;
-typedef  intptr_t atomic_int_fast16_t;
-typedef uintptr_t atomic_uint_fast16_t;
-typedef  intptr_t atomic_int_fast32_t;
-typedef uintptr_t atomic_uint_fast32_t;
-//atomic_int_fast64_t
-//atomic_uint_fast64_t
-typedef  intptr_t atomic_intptr_t;
-typedef uintptr_t atomic_uintptr_t;
-typedef uintptr_t atomic_size_t;
-typedef  intptr_t atomic_ptrdiff_t;
-//atomic_intmax_t
-//atomic_uintmax_t
+ * 8-byte atomic types (or not efficiently). */
+typedef          bool      atomic_flag;
+typedef          bool      atomic_bool;
+typedef          char      atomic_char;
+typedef   signed char      atomic_schar;
+typedef unsigned char      atomic_uchar;
+typedef          short     atomic_short;
+typedef unsigned short     atomic_ushort;
+typedef          int       atomic_int;
+typedef unsigned int       atomic_uint;
+typedef          long      atomic_long;
+typedef unsigned long      atomic_ulong;
+typedef          long long atomic_llong;
+typedef unsigned long long atomic_ullong;
+//typedef          char16_t  atomic_char16_t;
+//typedef          char32_t  atomic_char32_t;
+typedef          wchar_t   atomic_wchar_t;
+typedef       int_least8_t atomic_int_least8_t;
+typedef      uint_least8_t atomic_uint_least8_t;
+typedef      int_least16_t atomic_int_least16_t;
+typedef     uint_least16_t atomic_uint_least16_t;
+typedef      int_least32_t atomic_int_least32_t;
+typedef     uint_least32_t atomic_uint_least32_t;
+typedef      int_least64_t atomic_int_least64_t;
+typedef     uint_least64_t atomic_uint_least64_t;
+typedef       int_fast8_t atomic_int_fast8_t;
+typedef      uint_fast8_t atomic_uint_fast8_t;
+typedef      int_fast16_t atomic_int_fast16_t;
+typedef     uint_fast16_t atomic_uint_fast16_t;
+typedef      int_fast32_t atomic_int_fast32_t;
+typedef     uint_fast32_t atomic_uint_fast32_t;
+typedef      int_fast64_t atomic_int_fast64_t;
+typedef     uint_fast64_t atomic_uint_fast64_t;
+typedef          intptr_t atomic_intptr_t;
+typedef         uintptr_t atomic_uintptr_t;
+typedef            size_t atomic_size_t;
+typedef         ptrdiff_t atomic_ptrdiff_t;
+typedef          intmax_t atomic_intmax_t;
+typedef         uintmax_t atomic_uintmax_t;
 
 #  define atomic_store(object,desired) \
     do { \
@@ -113,52 +113,35 @@ typedef  intptr_t atomic_ptrdiff_t;
 #  define atomic_load_explicit(object,order) \
     atomic_load(object)
 
-static inline
-intptr_t vlc_atomic_exchange(volatile void *object, intptr_t desired)
-{
-    volatile intptr_t *ptr = (volatile intptr_t *)object;
-    intptr_t old;
-    /* NOTE: while __sync_lock_test_and_set() is an atomic exchange, its memory
-     * order is too weak (acquire instead of sequentially consistent).
-     * Because of that, for lack of both C11 _Generic() and GNU C compound
-     * statements, atomic exchange needs a helper function.
-     * Thus all atomic types must have the same size. */
-    do
-        old = atomic_load(ptr);
-    while (!__sync_bool_compare_and_swap(ptr, old, desired));
-
-    return old;
-}
-
 #  define atomic_exchange(object,desired) \
-    vlc_atomic_exchange(object,desired)
+({  \
+    typeof (object) _obj = (object); \
+    typeof (*object) _old; \
+    do \
+        _old = atomic_load(_obj); \
+    while (!__sync_bool_compare_and_swap(_obj, _old, (desired))); \
+    _old; \
+})
 
 #  define atomic_exchange_explicit(object,desired,order) \
     atomic_exchange(object,desired)
 
-static inline
-bool vlc_atomic_compare_exchange(volatile void *object, void *expected,
-                                 intptr_t desired)
-{
-    volatile intptr_t *ptr = (volatile intptr_t *)object;
-    intptr_t old = *(intptr_t *)expected;
-    intptr_t val = __sync_val_compare_and_swap(ptr, old, desired);
-    if (old != val)
-    {
-        *(intptr_t *)expected = val;
-        return false;
-    }
-    return true;
-}
+#  define atomic_compare_exchange(object,expected,desired) \
+({  \
+    typeof (object) _exp = (expected); \
+    typeof (*object) _old = *_exp; \
+    *_exp = __sync_val_compare_and_swap((object), _old, (desired)); \
+    *_exp == _old; \
+})
 
 #  define atomic_compare_exchange_strong(object,expected,desired) \
-    vlc_atomic_compare_exchange(object, expected, desired)
+    atomic_compare_exchange(object, expected, desired)
 
 #  define atomic_compare_exchange_strong_explicit(object,expected,desired,order) \
     atomic_compare_exchange_strong(object, expected, desired)
 
 #  define atomic_compare_exchange_weak(object,expected,desired) \
-    vlc_atomic_compare_exchange(object, expected, desired)
+    atomic_compare_exchange(object, expected, desired)
 
 #  define atomic_compare_exchange_weak_explicit(object,expected,desired,order) \
     atomic_compare_exchange_weak(object, expected, desired)
