@@ -422,19 +422,16 @@
 #pragma mark -
 #pragma mark Video window resizing logic
 
-- (void)resizeWindow
+- (NSRect)getWindowRectForProposedVideoViewSize:(NSSize)size
 {
-    if ([[VLCMainWindow sharedInstance] fullscreen])
-        return;
-
     NSSize windowMinSize = [self minSize];
     NSRect screenFrame = [[self screen] visibleFrame];
 
     NSPoint topleftbase = NSMakePoint(0, [self frame].size.height);
     NSPoint topleftscreen = [self convertBaseToScreen: topleftbase];
 
-    unsigned int i_width = nativeVideoSize.width;
-    unsigned int i_height = nativeVideoSize.height;
+    unsigned int i_width = size.width;
+    unsigned int i_height = size.height;
     if (i_width < windowMinSize.width)
         i_width = windowMinSize.width;
     if (i_height < f_min_video_height)
@@ -464,7 +461,16 @@
     if (right_window_point > right_screen_point)
         new_frame.origin.x -= (right_window_point - right_screen_point);
 
-    [[self animator] setFrame:new_frame display:YES];
+    return new_frame;
+}
+
+- (void)resizeWindow
+{
+    if ([[VLCMainWindow sharedInstance] fullscreen])
+        return;
+
+    NSRect window_rect = [self getWindowRectForProposedVideoViewSize:nativeVideoSize];
+    [[self animator] setFrame:window_rect display:YES];
 }
 
 - (void)setNativeVideoSize:(NSSize)size

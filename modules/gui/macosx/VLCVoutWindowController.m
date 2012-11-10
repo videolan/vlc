@@ -47,7 +47,7 @@
 }
 
 
-- (VLCVoutView *)setupVout:(vout_window_t *)p_wnd
+- (VLCVoutView *)setupVoutForWindow:(vout_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition
 {
     BOOL b_nonembedded = NO;
     BOOL b_nativeFullscreenMode = [[VLCMain sharedInstance] nativeFullscreenMode];
@@ -56,6 +56,7 @@
     BOOL b_multiple_vout_windows = [o_vout_dict count] > 0;
     VLCVoutView *o_vout_view;
     VLCVideoWindowCommon *o_new_video_window;
+
 
     // TODO: make lion fullscreen compatible with video-wallpaper and !embedded-video
     if ((b_video_wallpaper || !b_video_deco) && !b_nativeFullscreenMode) {
@@ -126,6 +127,15 @@
     }
 
     if (!b_video_wallpaper) {
+        // set window size
+        NSSize videoViewSize = NSMakeSize(videoViewPosition.size.width, videoViewPosition.size.height);
+
+        if (b_nonembedded) {
+            NSRect window_rect = [o_new_video_window getWindowRectForProposedVideoViewSize:videoViewSize];
+            [o_new_video_window setFrame:window_rect display:YES];
+        }
+        [o_new_video_window setNativeVideoSize:videoViewSize];
+
         [o_new_video_window makeKeyAndOrderFront: self];
 
         vout_thread_t *p_vout = getVout();
@@ -137,6 +147,7 @@
             vlc_object_release(p_vout);
         }
     }
+
     [o_new_video_window setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
 
     if (!b_multiple_vout_windows)

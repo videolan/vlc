@@ -35,7 +35,7 @@
     NSMutableDictionary *o_vout_dict;
 }
 
-- (VLCVoutView *)setupVout:(vout_window_t *)p_wnd;
+- (VLCVoutView *)setupVoutForWindow:(vout_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition;
 - (void)removeVoutforDisplay:(NSValue *)o_key;
 
 - (void)updateWindowsControlsBarWithSelector:(SEL)aSel;

@@ -137,29 +137,31 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
         return VLC_EGENERIC;
     }
 
-    int i_x = cfg->x;
-    int i_y = cfg->y;
-    unsigned i_width = cfg->width;
-    unsigned i_height = cfg->height;
-    p_wnd->handle.nsobject = [[VLCMain sharedInstance] getVideoViewAtPositionX: &i_x Y: &i_y withWidth: &i_width andHeight: &i_height forWindow: p_wnd];
+    NSRect proposedVideoViewPosition = NSMakeRect(cfg->x, cfg->y, cfg->width, cfg->height);
 
-    if (!p_wnd->handle.nsobject) {
+    VLCVoutWindowController *o_vout_controller = [[VLCMain sharedInstance] voutController];
+    SEL sel = @selector(setupVoutForWindow:withProposedVideoViewPosition:);
+    NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[o_vout_controller methodSignatureForSelector:sel]];
+    [inv setTarget:o_vout_controller];
+    [inv setSelector:sel];
+    [inv setArgument:&p_wnd atIndex:2]; // starting at 2!
+    [inv setArgument:&proposedVideoViewPosition atIndex:3];
+
+    [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
+                       waitUntilDone:YES];
+
+    VLCVoutView *videoView = nil;
+    [inv getReturnValue:&videoView];
+
+    if (!videoView) {
         msg_Err(p_wnd, "got no video view from the interface");
         [o_pool release];
         return VLC_EGENERIC;
     }
 
-    // TODO: this seems to be strange. Why not just allocating in the right size?
-    // This could avoid strange resize-animations...
-    NSSize newSize = NSMakeSize(cfg->width, cfg->height);
-    SEL sel = @selector(setNativeVideoSize:forWindow:);
-    NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[[[VLCMain sharedInstance] voutController] methodSignatureForSelector:sel]];
-    [inv setTarget:[[VLCMain sharedInstance] voutController]];
-    [inv setSelector:sel];
-    [inv setArgument:&newSize atIndex:2]; // starting at 2!
-    [inv setArgument:&p_wnd atIndex:3];
-    [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
-                       waitUntilDone:NO];
+    msg_Dbg(VLCIntf, "returning videoview with proposed position x=%i, y=%i, width=%i, height=%i", cfg->x, cfg->y, cfg->width, cfg->height);
+    p_wnd->handle.nsobject = videoView;
+
 
     // TODO: find a cleaner way for "start in fullscreen"
     if (var_GetBool(pl_Get(VLCIntf), "fullscreen")) {
@@ -177,7 +179,7 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 
     [[VLCMain sharedInstance] setActiveVideoPlayback: YES];
     p_wnd->control = WindowControl;
-    p_wnd->sys = (vout_window_sys_t *)VLCIntf;
+
     [o_pool release];
     return VLC_SUCCESS;
 }
@@ -225,8 +227,6 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
             [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
                                waitUntilDone:NO];
 
-
-            //[[VLCMain sharedInstance] performSelectorOnMainThread:@selector(fullscreenChanged:) withObject:[NSValue valueWithPointer:p_wnd] waitUntilDone:NO];
             [o_pool release];
             return VLC_SUCCESS;
         }
@@ -1548,33 +1548,6 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_wizard initStrings];
     }
     return o_wizard;
-}
-
-- (id)getVideoViewAtPositionX: (int *)pi_x Y: (int *)pi_y withWidth: (unsigned int*)pi_width andHeight: (unsigned int*)pi_height forWindow:(vout_window_t *)p_wnd
-{
-    SEL sel = @selector(setupVout:);
-    NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[o_vout_controller methodSignatureForSelector:sel]];
-    [inv setTarget:o_vout_controller];
-    [inv setSelector:sel];
-    [inv setArgument:&p_wnd atIndex:2]; // starting at 2!
-
-    [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
-                       waitUntilDone:YES];
-
-    VLCVoutView *videoView;
-    [inv getReturnValue:&videoView];
-
-    NSRect videoRect = [videoView frame];
-    int i_x = (int)videoRect.origin.x;
-    int i_y = (int)videoRect.origin.y;
-    unsigned int i_width = (int)videoRect.size.width;
-    unsigned int i_height = (int)videoRect.size.height;
-    pi_x = &i_x;
-    pi_y = &i_y;
-    pi_width = &i_width;
-    pi_height = &i_height;
-    msg_Dbg(VLCIntf, "returning videoview with x=%i, y=%i, width=%i, height=%i", i_x, i_y, i_width, i_height);
-    return videoView;
 }
 
 - (id)coreDialogProvider

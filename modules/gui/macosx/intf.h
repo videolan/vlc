@@ -166,7 +166,6 @@ struct intf_sys_t
 - (id)playlist;
 - (id)info;
 - (id)wizard;
-- (id)getVideoViewAtPositionX: (int *)pi_x Y: (int *)pi_y withWidth: (unsigned int*)pi_width andHeight: (unsigned int*)pi_height forWindow:(vout_window_t *)p_wnd;
 - (id)coreDialogProvider;
 - (id)eyeTVController;
 - (id)appleRemoteController;
