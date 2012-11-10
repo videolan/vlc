@@ -451,7 +451,8 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
                        bool b_locked )
 {
     playlist_item_t *p_item;
-    if( p_playlist->b_die ) return VLC_EGENERIC;
+    /* FIXME: use b_killed instead: */
+    if( !vlc_object_alive(p_playlist) ) return VLC_EGENERIC;
     if( !pl_priv(p_playlist)->b_doing_ml )
         PL_DEBUG( "adding item `%s' ( %s )", p_input->psz_name,
                                              p_input->psz_uri );
@@ -493,8 +494,10 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
     assert( p_input );
     assert( p_parent && p_parent->i_children != -1 );
 
-    if( p_playlist->b_die )
+    /* FIXME: use b_killed instead: */
+    if( !vlc_object_alive(p_playlist) )
         return NULL;
+
     PL_LOCK_IF( !b_locked );
 
     p_item = playlist_ItemNewFromInput( p_playlist, p_input );

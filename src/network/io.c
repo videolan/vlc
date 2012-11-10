@@ -288,7 +288,6 @@ net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
         {
             if (ufd[1].revents)
             {
-                assert (p_this->b_die);
                 msg_Dbg (p_this, "socket %d polling interrupted", fd);
 #if defined(WIN32)
                 WSASetLastError (WSAEINTR);
@@ -442,7 +441,6 @@ ssize_t net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
         {
             if (ufd[1].revents)
             {
-                assert (p_this->b_die);
                 errno = EINTR;
                 goto error;
             }

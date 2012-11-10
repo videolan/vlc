@@ -669,7 +669,7 @@ static int InitCapture( demux_t *p_demux )
     }
 
     /* Wait for standard to settle down */
-    while ( !p_demux->b_die )
+    while ( vlc_object_alive(p_demux) )
     {
         struct pollfd pfd[1];
 
@@ -707,7 +707,7 @@ static int InitCapture( demux_t *p_demux )
             }
         }
     }
-    if ( p_demux->b_die )
+    if ( !vlc_object_alive(p_demux) )
     {
         close( p_sys->i_vfd );
         return VLC_EGENERIC;

@@ -140,7 +140,7 @@ int  MMSTUOpen( access_t *p_access )
     {   /* first try with TCP and then UDP*/
         if( ( i_status = MMSOpen( p_access, &p_sys->url, MMS_PROTO_TCP ) ) )
         {
-            if( !p_access->b_die )
+            if( vlc_object_alive(p_access) )
                 i_status = MMSOpen( p_access, &p_sys->url, MMS_PROTO_UDP );
         }
     }

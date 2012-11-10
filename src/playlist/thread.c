@@ -459,7 +459,7 @@ static int LoopInput( playlist_t *p_playlist )
     if( !p_input )
         return VLC_EGENERIC;
 
-    if( ( p_sys->request.b_request || p_sys->killed ) && !p_input->b_die )
+    if( ( p_sys->request.b_request || p_sys->killed ) && vlc_object_alive(p_input) )
     {
         PL_DEBUG( "incoming request - stopping current input" );
         input_Stop( p_input, true );
@@ -490,7 +490,7 @@ static int LoopInput( playlist_t *p_playlist )
         return VLC_EGENERIC;
     }
     /* This input is dying, let it do */
-    else if( p_input->b_die )
+    else if( !vlc_object_alive(p_input) )
     {
         PL_DEBUG( "dying input" );
     }

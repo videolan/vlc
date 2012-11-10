@@ -1230,7 +1230,7 @@ int libvlc_media_player_will_play( libvlc_media_player_t *p_mi )
     if ( !p_input_thread )
         return false;
 
-    b_will_play = !p_input_thread->b_die && !p_input_thread->b_dead;
+    b_will_play = !p_input_thread->b_dead;
     vlc_object_release( p_input_thread );
 
     return b_will_play;

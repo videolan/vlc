@@ -662,7 +662,7 @@ static void AStreamPrebufferBlock( stream_t *s )
         bool b_eof;
         block_t *b;
 
-        if( s->b_die || p_sys->block.i_size > STREAM_CACHE_PREBUFFER_SIZE )
+        if( !vlc_object_alive(s) || p_sys->block.i_size > STREAM_CACHE_PREBUFFER_SIZE )
         {
             int64_t i_byterate;
 
@@ -1000,7 +1000,7 @@ static int AStreamRefillBlock( stream_t *s )
     {
         bool b_eof;
 
-        if( s->b_die )
+        if( !vlc_object_alive(s) )
             return VLC_EGENERIC;
 
         /* Fetch a block */
@@ -1356,7 +1356,7 @@ static int AStreamRefillStream( stream_t *s )
         int i_off = tk->i_end % STREAM_CACHE_TRACK_SIZE;
         int i_read;
 
-        if( s->b_die )
+        if( !vlc_object_alive(s) )
             return VLC_EGENERIC;
 
         i_read = __MIN( i_toread, STREAM_CACHE_TRACK_SIZE - i_off );
@@ -1417,7 +1417,7 @@ static void AStreamPrebufferStream( stream_t *s )
         int i_read;
         int i_buffered = tk->i_end - tk->i_start;
 
-        if( s->b_die || i_buffered >= STREAM_CACHE_PREBUFFER_SIZE )
+        if( !vlc_object_alive(s) || i_buffered >= STREAM_CACHE_PREBUFFER_SIZE )
         {
             int64_t i_byterate;
 

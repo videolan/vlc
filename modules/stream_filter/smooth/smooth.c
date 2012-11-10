@@ -528,7 +528,7 @@ static chunk_t *get_chunk( stream_t *s, const bool wait )
          * that's why vlc_object_alive() has been deprecated. But if I
          * understood well, there is no good solution with a stream_filter
          * module anyaway. */
-        if( !wait || s->b_die || p_sys->b_error )
+        if( !wait || p_sys->b_error )
         {
             vlc_mutex_unlock( &p_sys->download.lock_wait );
             msg_Warn( s, "get_chunk failed! (playback index %u)",
