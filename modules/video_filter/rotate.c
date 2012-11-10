@@ -33,7 +33,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-
+#include <vlc_atomic.h>
 #include <vlc_filter.h>
 #include "filter_picture.h"
 #include "../control/motionlib.h"
@@ -91,18 +91,25 @@ static const char *const ppsz_filter_options[] = {
  *****************************************************************************/
 struct filter_sys_t
 {
-    vlc_spinlock_t lock;
-    int            i_cos;
-    int            i_sin;
-    int            i_angle;
+    atomic_uint_fast32_t sincos;
     motion_sensors_t *p_motion;
 };
 
-static inline void cache_trigo( int i_angle, int *i_sin, int *i_cos )
+static void store_trigo( struct filter_sys_t *sys, int i_angle )
 {
     const double f_angle = (((double)i_angle)*M_PI)/1800.;
-    *i_sin = (int)(sin( f_angle )*4096.);
-    *i_cos = (int)(cos( f_angle )*4096.);
+    uint16_t i_sin = lround(sin( f_angle )*4096.);
+    uint16_t i_cos = lround(cos( f_angle )*4096.);
+
+    atomic_store( &sys->sincos, (i_cos << 16) | (i_sin << 0));
+}
+
+static void fetch_trigo( struct filter_sys_t *sys, int *i_sin, int *i_cos )
+{
+    uint32_t sincos = atomic_load( &sys->sincos );
+
+    *i_sin = (int16_t)(sincos & 0xFFFF);
+    *i_cos = (int16_t)(sincos >> 16);
 }
 
 /*****************************************************************************
@@ -153,17 +160,14 @@ static int Create( vlc_object_t *p_this )
             free( p_filter->p_sys );
             return VLC_EGENERIC;
         }
-        p_sys->i_angle = 0;
-        cache_trigo( p_sys->i_angle, &p_sys->i_sin, &p_sys->i_cos );
     }
     else
     {
         int i_angle = var_CreateGetIntegerCommand( p_filter,
                                                    FILTER_PREFIX "angle" ) * 10;
-        cache_trigo( i_angle, &p_sys->i_sin, &p_sys->i_cos );
+        store_trigo( p_sys, i_angle );
         var_Create( p_filter, FILTER_PREFIX "deciangle",
                     VLC_VAR_INTEGER|VLC_VAR_ISCOMMAND );
-        vlc_spin_init( &p_sys->lock );
         var_AddCallback( p_filter, FILTER_PREFIX "angle",
                          RotateCallback, p_sys );
         var_AddCallback( p_filter, FILTER_PREFIX "deciangle",
@@ -189,7 +193,6 @@ static void Destroy( vlc_object_t *p_this )
                          RotateCallback, p_sys );
         var_DelCallback( p_filter, FILTER_PREFIX "deciangle",
                          PreciseRotateCallback, p_sys );
-        vlc_spin_destroy( &p_sys->lock );
     }
     free( p_sys );
 }
@@ -211,29 +214,14 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    int s, c;
     if( p_sys->p_motion != NULL )
     {
         int i_angle = motion_get_angle( p_sys->p_motion ) / 2;
-        if( p_sys->i_angle != i_angle )
-        {
-            p_sys->i_angle = i_angle;
-            cache_trigo( i_angle, &p_sys->i_sin, &p_sys->i_cos );
-        }
-
-        s = p_sys->i_sin;
-        c = p_sys->i_cos;
-    }
-    else
-    {
-        vlc_spin_lock( &p_sys->lock );
-        s = p_sys->i_sin;
-        c = p_sys->i_cos;
-        vlc_spin_unlock( &p_sys->lock );
+        store_trigo( p_sys, i_angle );
     }
 
-    const int i_sin = s;
-    const int i_cos = c;
+    int i_sin, i_cos;
+    fetch_trigo( p_sys, &i_sin, &i_cos );
 
     for( int i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
@@ -381,29 +369,14 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     const int i_line_center = i_visible_lines>>1;
     const int i_col_center  = i_visible_pitch>>1;
 
-    int s, c;
     if( p_sys->p_motion != NULL )
     {
         int i_angle = motion_get_angle( p_sys->p_motion ) / 2;
-        if( p_sys->i_angle != i_angle )
-        {
-            p_sys->i_angle = i_angle;
-            cache_trigo( i_angle, &p_sys->i_sin, &p_sys->i_cos );
-        }
-
-        s = p_sys->i_sin;
-        c = p_sys->i_cos;
-    }
-    else
-    {
-        vlc_spin_lock( &p_sys->lock );
-        s = p_sys->i_sin;
-        c = p_sys->i_cos;
-        vlc_spin_unlock( &p_sys->lock );
+        store_trigo( p_sys, i_angle );
     }
 
-    const int i_sin = s;
-    const int i_cos = c;
+    int i_sin, i_cos;
+    fetch_trigo( p_sys, &i_sin, &i_cos );
 
     int i_col, i_line;
     for( i_line = 0; i_line < i_visible_lines; i_line++ )
@@ -477,13 +450,8 @@ static int PreciseRotateCallback( vlc_object_t *p_this, char const *psz_var,
                            void *p_data )
 {
     VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
-    filter_sys_t *p_sys = (filter_sys_t *)p_data;
-    int i_sin, i_cos;
+    filter_sys_t *p_sys = p_data;
 
-    cache_trigo( newval.i_int, &i_sin, &i_cos );
-    vlc_spin_lock( &p_sys->lock );
-    p_sys->i_sin = i_sin;
-    p_sys->i_cos = i_cos;
-    vlc_spin_unlock( &p_sys->lock );
+    store_trigo( p_sys, newval.i_int );
     return VLC_SUCCESS;
 }
