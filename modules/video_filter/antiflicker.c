@@ -132,7 +132,10 @@ static int Create( vlc_object_t *p_this )
      (p_filter->fmt_in.video.i_height+1),sizeof(*p_filter->p_sys->p_old_data) );
 
     if( p_filter->p_sys->p_old_data == NULL )
+    {
+        free( p_filter->p_sys );
         return VLC_ENOMEM;
+    }
 
     memset( p_filter->p_sys->ia_luminance_data, 0,
                     sizeof(p_filter->p_sys->ia_luminance_data) );
