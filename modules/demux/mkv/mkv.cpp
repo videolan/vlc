@@ -674,9 +674,6 @@ static int Demux( demux_t *p_demux)
 
     for( ;; )
     {
-        if ( p_sys->demuxer.b_die )
-            break;
-
         if( p_sys->i_pts >= p_sys->i_start_pts  )
             if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
             {
