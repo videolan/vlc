@@ -45,16 +45,6 @@
 #include <linux/dvb/dmx.h>
 #include <linux/dvb/frontend.h>
 
-/* Include dvbpsi headers */
-# include <dvbpsi/dvbpsi.h>
-# include <dvbpsi/descriptor.h>
-# include <dvbpsi/pat.h>
-# include <dvbpsi/pmt.h>
-# include <dvbpsi/dr.h>
-# include <dvbpsi/psi.h>
-# include <dvbpsi/demux.h>
-# include <dvbpsi/sdt.h>
-
 #include "dvb.h"
 #include "scan.h"
 
