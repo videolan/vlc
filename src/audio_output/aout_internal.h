@@ -46,26 +46,17 @@ typedef struct
 
 typedef struct aout_volume aout_volume_t;
 
-/** an input stream for the audio output */
-struct aout_input_t
-{
-    int                     i_resampling_type;
-    int                     i_resamp_start_drift;
-
-    /* */
-    int               i_buffer_lost;
-};
-
 typedef struct
 {
     vlc_mutex_t lock;
     module_t *module; /**< Output plugin (or NULL if inactive) */
-    aout_input_t *input;
     aout_volume_t *volume;
 
     struct
     {
         date_t date;
+        int resamp_type;
+        int resamp_start_drift;
     } sync;
 
     audio_sample_format_t input_format;
@@ -84,6 +75,8 @@ typedef struct
     aout_request_vout_t request_vout;
     bool recycle_vout;
 
+    unsigned buffers_lost;
+
     vlc_atomic_t restart;
 } aout_owner_t;
 
@@ -101,12 +94,6 @@ static inline aout_owner_t *aout_owner (audio_output_t *aout)
 /****************************************************************************
  * Prototypes
  *****************************************************************************/
-
-/* From input.c : */
-aout_input_t *aout_InputNew(void);
-void aout_InputDelete(aout_input_t *);
-block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
-                         block_t *p_buffer, int i_input_rate, date_t * );
 
 /* From filters.c : */
 int aout_FiltersPipelineCreate(vlc_object_t *, filter_t **, unsigned *,

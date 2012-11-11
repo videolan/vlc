@@ -96,8 +96,6 @@ audio_output_t *aout_New (vlc_object_t *parent)
     vlc_mutex_init (&owner->lock);
     vlc_object_set_destructor (aout, aout_Destructor);
 
-    owner->input = NULL;
-
     /* Audio output module callbacks */
     var_Create (aout, "volume", VLC_VAR_FLOAT);
     var_AddCallback (aout, "volume", var_Copy, parent);

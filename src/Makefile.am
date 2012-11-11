@@ -413,7 +413,6 @@ SOURCES_libvlc_common = \
 	audio_output/common.c \
 	audio_output/dec.c \
 	audio_output/filters.c \
-	audio_output/input.c \
 	audio_output/output.c \
 	audio_output/volume.c \
 	network/getaddrinfo.c \
