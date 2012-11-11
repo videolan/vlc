@@ -79,9 +79,10 @@ typedef struct
     filter_t *rate_filter; /**< The filter adjusting samples count
         (either the scaletempo filter or a resampler) */
     filter_t *resampler; /**< The resampler */
+    int resampling; /**< Current resampling (Hz) */
+    unsigned nb_filters;
     filter_t *filters[AOUT_MAX_FILTERS]; /**< Configured user filters
         (e.g. equalization) and their conversions */
-    unsigned nb_filters;
     unsigned nb_converters;
     filter_t *converters[5]; /**< Converters to the output */
 
@@ -123,6 +124,8 @@ block_t *aout_FiltersPipelinePlay(filter_t *const *, unsigned, block_t *);
 int aout_FiltersNew(audio_output_t *, const audio_sample_format_t *,
                    const audio_sample_format_t *, const aout_request_vout_t *);
 void aout_FiltersDelete(audio_output_t *);
+bool aout_FiltersAdjustResampling(audio_output_t *, int);
+block_t *aout_FiltersPlay(audio_output_t *, block_t *, int rate);
 
 /* From mixer.c : */
 aout_volume_t *aout_volume_New(vlc_object_t *, const audio_replay_gain_t *);

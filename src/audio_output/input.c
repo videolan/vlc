@@ -38,7 +38,7 @@
 #include "aout_internal.h"
 
 static void inputDrop( aout_input_t *, block_t * );
-static void inputResamplingStop( audio_output_t *, aout_input_t *, int );
+static void inputResamplingStop( audio_output_t *, aout_input_t * );
 
 /*****************************************************************************
  * aout_InputNew : allocate a new input and rework the filter pipeline
@@ -74,26 +74,8 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
                         block_t *p_buffer, int i_input_rate, date_t *date )
 {
     mtime_t start_date;
-    aout_owner_t *owner = aout_owner(p_aout);
 
     aout_assert_locked( p_aout );
-
-    if( i_input_rate != INPUT_RATE_DEFAULT && owner->rate_filter == NULL )
-    {
-        inputDrop( p_input, p_buffer );
-        return NULL;
-    }
-
-    /* Handle input rate change, but keep drift correction */
-    if( i_input_rate != p_input->i_last_input_rate )
-    {
-        unsigned int * const pi_rate = &owner->rate_filter->fmt_in.audio.i_rate;
-#define F(r,ir) ( INPUT_RATE_DEFAULT * (r) / (ir) )
-        const int i_delta = *pi_rate - F(p_input->samplerate,p_input->i_last_input_rate);
-        *pi_rate = F(p_input->samplerate + i_delta, i_input_rate);
-#undef F
-        p_input->i_last_input_rate = i_input_rate;
-    }
 
     mtime_t now = mdate();
 
@@ -112,7 +94,7 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
         aout_OutputFlush( p_aout, false );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
-        inputResamplingStop( p_aout, p_input, i_input_rate );
+        inputResamplingStop( p_aout, p_input );
         p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         start_date = VLC_TS_INVALID;
     }
@@ -124,7 +106,7 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
         msg_Warn( p_aout, "PTS is out of range (%"PRId64"), dropping buffer",
                   now - p_buffer->i_pts );
         inputDrop( p_input, p_buffer );
-        inputResamplingStop( p_aout, p_input, i_input_rate );
+        inputResamplingStop( p_aout, p_input );
         return NULL;
     }
 
@@ -145,7 +127,7 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
         aout_OutputFlush( p_aout, false );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
-        inputResamplingStop( p_aout, p_input, i_input_rate );
+        inputResamplingStop( p_aout, p_input );
         p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         start_date = p_buffer->i_pts;
         date_Set (date, start_date);
@@ -160,17 +142,14 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
         return NULL;
     }
 
-    /* Run pre-filters. */
-    p_buffer = aout_FiltersPipelinePlay( owner->filters, owner->nb_filters,
-                                         p_buffer );
+    p_buffer = aout_FiltersPlay( p_aout, p_buffer, i_input_rate );
     if( !p_buffer )
         return NULL;
 
     /* Run the resampler if needed.
      * We first need to calculate the output rate of this resampler. */
     if ( ( p_input->i_resampling_type == AOUT_RESAMPLING_NONE ) &&
-         ( drift < -AOUT_MAX_PTS_ADVANCE || drift > +AOUT_MAX_PTS_DELAY ) &&
-         owner->resampler != NULL )
+         ( drift < -AOUT_MAX_PTS_ADVANCE || drift > +AOUT_MAX_PTS_DELAY ) )
     {
         /* Can happen in several circumstances :
          * 1. A problem at the input (clock drift)
@@ -192,19 +171,12 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
         /* Resampling has been triggered previously (because of dates
          * mismatch). We want the resampling to happen progressively so
          * it isn't too audible to the listener. */
-
-        if( p_input->i_resampling_type == AOUT_RESAMPLING_UP )
-            owner->resampler->fmt_in.audio.i_rate += 2; /* Hz */
-        else
-            owner->resampler->fmt_in.audio.i_rate -= 2; /* Hz */
+        const int adjust = ( p_input->i_resampling_type == AOUT_RESAMPLING_UP )
+            ? +2 : -2;
 
         /* Check if everything is back to normal, in which case we can stop the
          * resampling */
-        unsigned int i_nominal_rate =
-          (owner->resampler == owner->rate_filter)
-          ? INPUT_RATE_DEFAULT * p_input->samplerate / i_input_rate
-          : p_input->samplerate;
-        if( owner->resampler->fmt_in.audio.i_rate == i_nominal_rate )
+        if( !aout_FiltersAdjustResampling( p_aout, adjust ) )
         {
             p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
             msg_Warn( p_aout, "resampling stopped (drift: %"PRIi64")",
@@ -228,21 +200,9 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
             /* If the drift is increasing and not decreasing, than something
              * is bad. We'd better stop the resampling right now. */
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
-            inputResamplingStop( p_aout, p_input, i_input_rate );
+            inputResamplingStop( p_aout, p_input );
             p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         }
-    }
-
-    /* Actually run the resampler now. */
-    if ( owner->resampler != NULL )
-        p_buffer = aout_FiltersPipelinePlay( &owner->resampler, 1, p_buffer );
-
-    if( !p_buffer )
-        return NULL;
-    if( p_buffer->i_nb_samples <= 0 )
-    {
-        block_Release( p_buffer );
-        return NULL;
     }
 
     p_buffer->i_pts = start_date;
@@ -260,17 +220,8 @@ static void inputDrop( aout_input_t *p_input, block_t *p_buffer )
     p_input->i_buffer_lost++;
 }
 
-static void inputResamplingStop( audio_output_t *p_aout, aout_input_t *p_input,
-                                 int input_rate )
+static void inputResamplingStop( audio_output_t *p_aout, aout_input_t *p_input )
 {
-    aout_owner_t *owner = aout_owner(p_aout);
-
     p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
-    if( owner->resampler != NULL )
-    {
-        owner->resampler->fmt_in.audio.i_rate =
-            ( owner->resampler == owner->rate_filter )
-            ? INPUT_RATE_DEFAULT * p_input->samplerate / input_rate
-            : p_input->samplerate;
-    }
+    aout_FiltersAdjustResampling( p_aout, 0 );
 }

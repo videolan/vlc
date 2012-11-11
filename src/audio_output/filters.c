@@ -37,6 +37,7 @@
 #include <vlc_aout.h>
 #include <vlc_filter.h>
 #include <vlc_vout.h>                  /* for vout_Request */
+#include <vlc_input.h>
 
 #include <libvlc.h>
 #include "aout_internal.h"
@@ -502,6 +503,7 @@ int aout_FiltersNew (audio_output_t *aout,
     owner->resampler->fmt_in.audio.i_rate = rate_bak;
     if (owner->rate_filter == NULL)
         owner->rate_filter = owner->resampler;
+   owner->resampling = 0;
 
     return 0;
 
@@ -533,4 +535,58 @@ void aout_FiltersDelete (audio_output_t *aout)
     char *visual = var_InheritString (aout, "audio-visual");
     owner->recycle_vout = (visual != NULL) && *visual;
     free (visual);
+}
+
+bool aout_FiltersAdjustResampling (audio_output_t *aout, int adjust)
+{
+    aout_owner_t *owner = aout_owner (aout);
+
+    if (owner->resampler == NULL)
+        return false;
+
+    if (adjust)
+        owner->resampling += adjust;
+    else
+        owner->resampling = 0;
+    return !owner->resampling;
+}
+
+block_t *aout_FiltersPlay (audio_output_t *aout, block_t *block, int rate)
+{
+    aout_owner_t *owner = aout_owner (aout);
+    int nominal_rate = 0;
+
+    if (rate != INPUT_RATE_DEFAULT)
+    {
+        filter_t *rate_filter = owner->rate_filter;
+
+        if (rate_filter == NULL)
+            goto drop; /* Without linear, non-nominal rate is impossible. */
+
+        /* Override input rate */
+        nominal_rate = rate_filter->fmt_in.audio.i_rate;
+        rate_filter->fmt_in.audio.i_rate =
+            (nominal_rate * INPUT_RATE_DEFAULT) / rate;
+    }
+
+    block = aout_FiltersPipelinePlay (owner->filters, owner->nb_filters,
+                                      block);
+    if (owner->resampler != NULL)
+    {   /* NOTE: the resampler needs to run even if resampling is 0.
+         * The decoder and output rates can still be different. */
+        owner->resampler->fmt_in.audio.i_rate += owner->resampling;
+        block = aout_FiltersPipelinePlay (&owner->resampler, 1, block);
+        owner->resampler->fmt_in.audio.i_rate -= owner->resampling;
+    }
+
+    if (nominal_rate != 0)
+    {   /* Restore input rate */
+        assert (owner->rate_filter != NULL);
+        owner->rate_filter->fmt_in.audio.i_rate = nominal_rate;
+    }
+    return block;
+
+drop:
+    block_Release (block);
+    return NULL;
 }
