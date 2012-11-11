@@ -32,7 +32,6 @@
 #include <vlc_common.h>
 #include <vlc_input.h>
 #include <vlc_aout.h>
-#include <vlc_filter.h>
 
 #include <libvlc.h>
 #include "aout_internal.h"
@@ -48,7 +47,6 @@ aout_input_t *aout_InputNew (void)
     aout_input_t *p_input = xmalloc (sizeof (*p_input));
 
     p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
-    p_input->i_last_input_rate = INPUT_RATE_DEFAULT;
     p_input->i_buffer_lost = 0;
     return p_input;
 }

@@ -52,9 +52,6 @@ struct aout_input_t
     int                     i_resampling_type;
     int                     i_resamp_start_drift;
 
-    /* last rate from input */
-    int               i_last_input_rate;
-
     /* */
     int               i_buffer_lost;
 };
