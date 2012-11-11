@@ -41,9 +41,11 @@ size_t vlc_towc (const char *str, uint32_t *restrict pwc);
  */
 void system_Init      ( void );
 void system_Configure ( libvlc_int_t *, int, const char *const [] );
-#ifdef WIN32
+#if defined(WIN32) || defined(__OS2__)
 void system_End(void);
+#ifndef __OS2__
 size_t EnumClockSource( vlc_object_t *, const char *, char ***, char *** );
+#endif
 #endif
 void vlc_CPU_init(void);
 void vlc_CPU_dump(vlc_object_t *);

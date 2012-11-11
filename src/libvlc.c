@@ -662,7 +662,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     module_EndBank (true);
 
     vlc_DeinitActions( p_libvlc, priv->actions );
-#ifdef WIN32
+#if defined(WIN32) || defined(__OS2__)
     system_End( );
 #endif
 }

@@ -1078,12 +1078,12 @@ static const char *const ppsz_prefres[] = {
     "Log all VLC messages to syslog (UNIX systems)." )
 
 #define ONEINSTANCE_TEXT N_("Allow only one running instance")
-#if defined( WIN32 )
+#if defined( WIN32 ) || defined( __OS2__ )
 #define ONEINSTANCE_LONGTEXT N_( \
     "Allowing only one running instance of VLC can sometimes be useful, " \
     "for example if you associated VLC with some media types and you " \
     "don't want a new instance of VLC to be opened each time you " \
-    "double-click on a file in the explorer. This option will allow you " \
+    "open a file in your file manager. This option will allow you " \
     "to play the file with the already running instance or enqueue it.")
 #elif defined( HAVE_DBUS )
 #define ONEINSTANCE_LONGTEXT N_( \
@@ -2044,7 +2044,7 @@ vlc_module_begin ()
     add_bool( "playlist-autostart", true,
               AUTOSTART_TEXT, AUTOSTART_LONGTEXT, false )
     add_bool( "playlist-cork", true, CORK_TEXT, CORK_LONGTEXT, false )
-#if defined(WIN32) || defined(HAVE_DBUS)
+#if defined(WIN32) || defined(HAVE_DBUS) || defined(__OS2__)
     add_bool( "one-instance", 0, ONEINSTANCE_TEXT,
               ONEINSTANCE_LONGTEXT, true )
     add_bool( "started-from-file", 0, STARTEDFROMFILE_TEXT,
