@@ -1000,7 +1000,7 @@ static int ReloadWaveoutDevices( vlc_object_t *p_this, char const *psz_name,
 {
     int n = 0, nb_devices = waveOutGetNumDevs();
 
-    VLC_UNUSED( psz_name );
+    VLC_UNUSED( p_this); VLC_UNUSED( psz_name );
 
     *values = xmalloc( (nb_devices + 1) * sizeof(char *) );
     *descs = xmalloc( (nb_devices + 1) * sizeof(char *) );
