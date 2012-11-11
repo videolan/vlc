@@ -32,7 +32,7 @@
 /*** Native C11 atomics ***/
 #  include <stdatomic.h>
 
-# elif defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
+# elif defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4) || (defined (__clang__) && (defined (__x86_64__) || defined (__i386__)))
 
 /*** Intel/GCC atomics ***/
 
