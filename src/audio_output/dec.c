@@ -96,10 +96,10 @@ error:
     date_Init (&owner->sync.date, owner->mixer_format.i_rate, 1);
     date_Set (&owner->sync.date, VLC_TS_INVALID);
     owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
-
-    owner->buffers_lost = 0;
-
     aout_unlock( p_aout );
+
+    atomic_init (&owner->buffers_lost, 0);
+
     return ret;
 }
 
@@ -317,7 +317,7 @@ int aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
     block = aout_FiltersPlay (aout, block, input_rate);
     if (block == NULL)
     {
-        owner->buffers_lost++;
+        atomic_fetch_add(&owner->buffers_lost, 1);
         goto out;
     }
 
@@ -386,21 +386,14 @@ out:
     return 0;
 drop:
     block_Release (block);
-    owner->buffers_lost++;
+    atomic_fetch_add(&owner->buffers_lost, 1);
     goto out;
 }
 
 int aout_DecGetResetLost (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
-    unsigned val;
-
-    aout_lock (aout);
-    val = owner->buffers_lost;
-    owner->buffers_lost = 0;
-    aout_unlock (aout);
-
-    return val;
+    return atomic_exchange(&owner->buffers_lost, 0);
 }
 
 void aout_DecChangePause (audio_output_t *aout, bool paused, mtime_t date)
