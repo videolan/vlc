@@ -644,12 +644,18 @@ static VLCMainWindow *_o_sharedInstance = nil;
                 aString = [o_url absoluteString];
         }
 
-        [self setTitle: aString];
-        [[[VLCMain sharedInstance] voutController] updateWindowsUsingBlock:^(VLCVideoWindowCommon *o_window) {
-            [o_window setTitle:aString];
-        }];
+        if ([aString length] > 0) {
+            [self setTitle: aString];
+            [[[VLCMain sharedInstance] voutController] updateWindowsUsingBlock:^(VLCVideoWindowCommon *o_window) {
+                [o_window setTitle:aString];
+            }];
 
-        [o_fspanel setStreamTitle: aString];
+            [o_fspanel setStreamTitle: aString];
+        } else {
+           [self setTitle: _NS("VLC media player")];
+            [self setRepresentedURL: nil];
+        }
+
         vlc_object_release(p_input);
     } else {
         [self setTitle: _NS("VLC media player")];
