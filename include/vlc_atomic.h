@@ -32,9 +32,7 @@
 /*** Native C11 atomics ***/
 #  include <stdatomic.h>
 
-# elif defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4) || (defined (__clang__) && (defined (__x86_64__) || defined (__i386__)))
-
-/*** Intel/GCC atomics ***/
+# else
 
 #  define ATOMIC_FLAG_INIT false
 
@@ -97,6 +95,10 @@ typedef            size_t atomic_size_t;
 typedef         ptrdiff_t atomic_ptrdiff_t;
 typedef          intmax_t atomic_intmax_t;
 typedef         uintmax_t atomic_uintmax_t;
+
+# if defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4) || (defined (__clang__) && (defined (__x86_64__) || defined (__i386__)))
+
+/*** Intel/GCC atomics ***/
 
 #  define atomic_store(object,desired) \
     do { \
@@ -188,196 +190,103 @@ typedef         uintmax_t atomic_uintmax_t;
 #  define atomic_flag_clear_explicit(object,order) \
     atomic_flag_clear(object)
 
-# else
+# elif defined (__GNUC__)
 
 /*** No atomics ***/
 
-#  define ATOMIC_FLAG_INIT false
-
-#  define ATOMIC_VAR_INIT(value) (value)
-
-#  define atomic_init(obj, value) \
-    do { *(obj) = (value); } while(0)
-
-#  define kill_dependency(y) \
-    ((void)0)
-
-#  define atomic_thread_fence(order) \
-    __sync_synchronize()
-
-#  define atomic_signal_fence(order) \
-    ((void)0)
-
-#  define atomic_is_lock_free(obj) \
-    false
-
-typedef uintptr_t atomic_generic_t;
-typedef atomic_generic_t atomic_flag;
-typedef atomic_generic_t atomic_bool;
-//typedef atomic_generic_t atomic_char;
-//typedef atomic_generic_t atomic_schar;
-typedef atomic_generic_t atomic_uchar;
-//typedef atomic_generic_t atomic_short;
-typedef atomic_generic_t atomic_ushort;
-//typedef atomic_generic_t atomic_int;
-typedef atomic_generic_t atomic_uint;
-//typedef atomic_generic_t atomic_long;
-typedef atomic_generic_t atomic_ulong;
-//typedef atomic_generic_t atomic_llong;
-//typedef atomic_generic_t atomic_ullong;
-//typedef atomic_generic_t atomic_char16_t;
-//typedef atomic_generic_t atomic_char32_t;
-//typedef atomic_generic_t atomic_wchar_t;
-//typedef atomic_generic_t atomic_int_least8_t;
-typedef atomic_generic_t atomic_uint_least8_t;
-//typedef atomic_generic_t atomic_int_least16_t;
-typedef atomic_generic_t atomic_uint_least16_t;
-//typedef atomic_generic_t atomic_int_least32_t;
-typedef atomic_generic_t atomic_uint_least32_t;
-//typedef atomic_generic_t atomic_int_least64_t;
-//typedef atomic_generic_t atomic_uint_least64_t;
-//typedef atomic_generic_t atomic_int_fast8_t;
-typedef atomic_generic_t atomic_uint_fast8_t;
-//typedef atomic_generic_t atomic_int_fast16_t;
-typedef atomic_generic_t atomic_uint_fast16_t;
-//typedef atomic_generic_t atomic_int_fast32_t;
-typedef atomic_generic_t atomic_uint_fast32_t;
-//typedef atomic_generic_t atomic_int_fast64_t
-//typedef atomic_generic_t atomic_uint_fast64_t;
-//typedef atomic_generic_t atomic_intptr_t;
-typedef atomic_generic_t atomic_uintptr_t;
-typedef atomic_generic_t atomic_size_t;
-//typedef atomic_generic_t atomic_ptrdiff_t;
-//typedef atomic_generic_t atomic_intmax_t;
-//typedef atomic_generic_t atomic_uintmax_t;
-
-#define atomic_store(object,desired) \
+#  define atomic_store(object,desired) \
     do { \
+        typeof (object) _obj = (object); \
+        typeof (*object) _des = (desired); \
         vlc_global_lock(VLC_ATOMIC_MUTEX); \
-        *(object) = (desired); \
+        *_obj = _des; \
         vlc_global_unlock(VLC_ATOMIC_MUTEX); \
     } while (0)
-
 #  define atomic_store_explicit(object,desired,order) \
     atomic_store(object,desired)
 
-static inline uintptr_t atomic_load(atomic_generic_t *object)
-{
-    uintptr_t value;
-
-    vlc_global_lock(VLC_ATOMIC_MUTEX);
-    value = *object;
-    vlc_global_unlock(VLC_ATOMIC_MUTEX);
-    return value;
-}
+#  define atomic_load(object) \
+({ \
+    typeof (object) _obj = (object); \
+    typeof (*object) _old; \
+    vlc_global_lock(VLC_ATOMIC_MUTEX); \
+    _old = *_obj; \
+    vlc_global_unlock(VLC_ATOMIC_MUTEX); \
+    _old; \
+})
 #  define atomic_load_explicit(object,order) \
     atomic_load(object)
 
-static inline
-uintptr_t atomic_exchange(atomic_generic_t *object, uintptr_t desired)
-{
-    uintptr_t value;
-
-    vlc_global_lock(VLC_ATOMIC_MUTEX);
-    value = *object;
-    *object = desired;
-    vlc_global_unlock(VLC_ATOMIC_MUTEX);
-    return value;
-}
+#  define atomic_exchange(object,desired) \
+({ \
+    typeof (object) _obj = (object); \
+    typeof (*object) _des = (desired); \
+    typeof (*object) _old; \
+    vlc_global_lock(VLC_ATOMIC_MUTEX); \
+    _old = *_obj; \
+    *_obj = _des; \
+    vlc_global_unlock(VLC_ATOMIC_MUTEX); \
+    _old; \
+})
 #  define atomic_exchange_explicit(object,desired,order) \
     atomic_exchange(object,desired)
 
-static inline
-bool vlc_atomic_compare_exchange(atomic_generic_t *object,
-                                 uintptr_t *expected, uintptr_t desired)
-{
-    bool ret;
-
-    vlc_global_lock(VLC_ATOMIC_MUTEX);
-    ret = *object == *expected;
-    if (ret)
-        *object = desired;
-    else
-        *expected = *object;
-    vlc_global_unlock(VLC_ATOMIC_MUTEX);
-    return ret;
-}
 #  define atomic_compare_exchange_strong(object,expected,desired) \
-    vlc_atomic_compare_exchange(object, expected, desired)
+({ \
+    typeof (object) _obj = (object); \
+    typeof (object) _exp = (expected); \
+    typeof (*object) _des = (desired); \
+    bool ret; \
+    vlc_global_lock(VLC_ATOMIC_MUTEX); \
+    ret = *_obj == *_exp; \
+    if (ret) \
+        *_obj = _des; \
+    else \
+        *_exp = *_obj; \
+    vlc_global_unlock(VLC_ATOMIC_MUTEX); \
+    ret; \
+})
 #  define atomic_compare_exchange_strong_explicit(object,expected,desired,order) \
     atomic_compare_exchange_strong(object, expected, desired)
 #  define atomic_compare_exchange_weak(object,expected,desired) \
-    vlc_atomic_compare_exchange(object, expected, desired)
+    atomic_compare_exchange_strong(object, expected, desired)
 #  define atomic_compare_exchange_weak_explicit(object,expected,desired,order) \
     atomic_compare_exchange_weak(object, expected, desired)
 
-static inline
-uintmax_t atomic_fetch_add(atomic_generic_t *object, uintptr_t operand)
-{
-    uintptr_t value;
+#  define atomic_fetch_OP(object,desired,op) \
+({ \
+    typeof (object) _obj = (object); \
+    typeof (*object) _des = (desired); \
+    typeof (*object) _old; \
+    vlc_global_lock(VLC_ATOMIC_MUTEX); \
+    _old = *_obj; \
+    *_obj = (*_obj) op (_des); \
+    vlc_global_unlock(VLC_ATOMIC_MUTEX); \
+    _old; \
+})
 
-    vlc_global_lock(VLC_ATOMIC_MUTEX);
-    value = *object;
-    *object += operand;
-    vlc_global_unlock(VLC_ATOMIC_MUTEX);
-    return value;
-}
+#  define atomic_fetch_add(object,operand) \
+    atomic_fetch_OP(object,operand,+)
 #  define atomic_fetch_add_explicit(object,operand,order) \
     atomic_fetch_add(object,operand)
 
-static inline
-uintptr_t atomic_fetch_sub(atomic_generic_t *object, uintptr_t operand)
-{
-    uintptr_t value;
-
-    vlc_global_lock(VLC_ATOMIC_MUTEX);
-    value = *object;
-    *object -= operand;
-    vlc_global_unlock(VLC_ATOMIC_MUTEX);
-    return value;
-}
+#  define atomic_fetch_sub(object,operand) \
+    atomic_fetch_OP(object,operand,-)
 #  define atomic_fetch_sub_explicit(object,operand,order) \
     atomic_fetch_sub(object,operand)
 
-static inline
-uintptr_t atomic_fetch_or(atomic_generic_t *object, uintptr_t operand)
-{
-    uintptr_t value;
-
-    vlc_global_lock(VLC_ATOMIC_MUTEX);
-    value = *object;
-    *object |= operand;
-    vlc_global_unlock(VLC_ATOMIC_MUTEX);
-    return value;
-}
+#  define atomic_fetch_or(object,operand) \
+    atomic_fetch_OP(object,operand,|)
 #  define atomic_fetch_or_explicit(object,operand,order) \
     atomic_fetch_or(object,operand)
 
-static inline
-uintptr_t atomic_fetch_xor(atomic_generic_t *object, uintptr_t operand)
-{
-    uintptr_t value;
-
-    vlc_global_lock(VLC_ATOMIC_MUTEX);
-    value = *object;
-    *object ^= operand;
-    vlc_global_unlock(VLC_ATOMIC_MUTEX);
-    return value;
-}
+#  define atomic_fetch_xor(object,operand) \
+    atomic_fetch_OP(object,operand,^)
 #  define atomic_fetch_xor_explicit(object,operand,order) \
     atomic_fetch_sub(object,operand)
 
-static inline
-uintptr_t atomic_fetch_and(atomic_generic_t *object, uintptr_t operand)
-{
-    uintptr_t value;
-
-    vlc_global_lock(VLC_ATOMIC_MUTEX);
-    value = *object;
-    *object &= operand;
-    vlc_global_unlock(VLC_ATOMIC_MUTEX);
-    return value;
-}
+#  define atomic_fetch_and(object,operand) \
+    atomic_fetch_OP(object,operand,&)
 #  define atomic_fetch_and_explicit(object,operand,order) \
     atomic_fetch_and(object,operand)
 
@@ -393,6 +302,9 @@ uintptr_t atomic_fetch_and(atomic_generic_t *object, uintptr_t operand)
 #  define atomic_flag_clear_explicit(object,order) \
     atomic_flag_clear(object)
 
+# else
+#  error FIXME: implement atomic operations for this compiler.
+# endif
 # endif
 
 /**
