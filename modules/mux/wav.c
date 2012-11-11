@@ -188,7 +188,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         p_sys->b_chan_reorder =
             aout_CheckChannelReorder( pi_channels_in, pi_channels_out,
                                       p_sys->i_channel_mask,
-                                      p_input->p_fmt->audio.i_channels,
                                       p_sys->pi_chan_table );
 
         msg_Dbg( p_mux, "channel mask: %x, reordering: %i",

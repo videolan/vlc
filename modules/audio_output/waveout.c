@@ -659,7 +659,7 @@ static int OpenWaveOut( audio_output_t *p_aout, uint32_t i_device_id, int i_form
 
     p_aout->sys->b_chan_reorder =
         aout_CheckChannelReorder( pi_channels_in, pi_channels_out,
-                                  waveformat.dwChannelMask, i_nb_channels,
+                                  waveformat.dwChannelMask,
                                   p_aout->sys->pi_chan_table );
 
     if( p_aout->sys->b_chan_reorder )

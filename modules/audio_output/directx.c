@@ -787,7 +787,7 @@ static int CreateDSBuffer( audio_output_t *p_aout, int i_format,
     p_aout->sys->i_channel_mask = waveformat.dwChannelMask;
     p_aout->sys->b_chan_reorder =
         aout_CheckChannelReorder( pi_channels_in, pi_channels_out,
-                                  waveformat.dwChannelMask, i_nb_channels,
+                                  waveformat.dwChannelMask,
                                   p_aout->sys->pi_chan_table );
 
     if( p_aout->sys->b_chan_reorder )

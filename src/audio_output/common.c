@@ -241,40 +241,35 @@ void aout_FormatsPrint( vlc_object_t *obj, const char * psz_text,
 /*****************************************************************************
  * aout_CheckChannelReorder : Check if we need to do some channel re-ordering
  *****************************************************************************/
-int aout_CheckChannelReorder( const uint32_t *pi_chan_order_in,
-                              const uint32_t *pi_chan_order_out,
-                              uint32_t i_channel_mask,
-                              int i_channels, int *pi_chan_table )
+unsigned aout_CheckChannelReorder( const uint32_t *chans_in,
+                                   const uint32_t *chans_out,
+                                   uint32_t mask, int *restrict table )
 {
-    bool b_chan_reorder = false;
-    int i, j, k, l;
+    unsigned channels = 0;
 
-    if( i_channels > AOUT_CHAN_MAX )
-        return false;
+    if( chans_in == NULL )
+        chans_in = pi_vlc_chan_order_wg4;
+    if( chans_out == NULL )
+        chans_out = pi_vlc_chan_order_wg4;
 
-    if( pi_chan_order_in == NULL )
-        pi_chan_order_in = pi_vlc_chan_order_wg4;
-    if( pi_chan_order_out == NULL )
-        pi_chan_order_out = pi_vlc_chan_order_wg4;
-
-    for( i = 0, j = 0; pi_chan_order_in[i]; i++ )
+    for( unsigned i = 0; chans_in[i]; i++ )
     {
-        if( !(i_channel_mask & pi_chan_order_in[i]) ) continue;
+        const uint32_t chan = chans_in[i];
+        if( !(mask & chan) )
+            continue;
 
-        for( k = 0, l = 0; pi_chan_order_in[i] != pi_chan_order_out[k]; k++ )
-        {
-            if( i_channel_mask & pi_chan_order_out[k] ) l++;
-        }
+        unsigned index = 0;
+        for( unsigned j = 0; chan != chans_out[j]; j++ )
+            if( mask & chans_out[j] )
+                index++;
 
-        pi_chan_table[j++] = l;
+        table[channels++] = index;
     }
 
-    for( i = 0; i < i_channels; i++ )
-    {
-        if( pi_chan_table[i] != i ) b_chan_reorder = true;
-    }
-
-    return b_chan_reorder;
+    for( unsigned i = 0; i < channels; i++ )
+        if( table[i] != i )
+            return channels;
+    return 0;
 }
 
 /*****************************************************************************

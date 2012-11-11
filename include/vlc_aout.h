@@ -178,7 +178,8 @@ static const uint32_t pi_vlc_chan_order_wg4[] =
  * If pi_chan_order_in or pi_chan_order_out is NULL, it will assume that vlc
  * internal (WG4) order is requested.
  */
-VLC_API int aout_CheckChannelReorder( const uint32_t *pi_chan_order_in, const uint32_t *pi_chan_order_out, uint32_t i_channel_mask, int i_channels, int *pi_chan_table );
+VLC_API unsigned aout_CheckChannelReorder( const uint32_t *, const uint32_t *,
+                                           uint32_t mask, int *table );
 VLC_API void aout_ChannelReorder( void *, size_t, unsigned, const int *, unsigned );
 
 /**

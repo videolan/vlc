@@ -273,7 +273,6 @@ static int Open( vlc_object_t * p_this )
             p_sys->b_chan_reorder =
                 aout_CheckChannelReorder( pi_channels_in, NULL,
                                           p_sys->i_channel_mask,
-                                          p_sys->fmt.audio.i_channels,
                                           p_sys->pi_chan_table );
 
         msg_Dbg( p_demux, "channel mask: %x, reordering: %i",

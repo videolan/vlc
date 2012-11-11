@@ -214,7 +214,6 @@ static int Open( vlc_object_t *p_this, filter_sys_t *p_sys,
 
     aout_CheckChannelReorder( pi_channels_in, NULL,
                               output->i_physical_channels,
-                              p_sys->i_nb_channels,
                               p_sys->pi_chan_table );
 
     return VLC_SUCCESS;

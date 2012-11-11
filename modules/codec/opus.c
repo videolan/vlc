@@ -298,7 +298,6 @@ static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
                                             pi_7channels_in, pi_8channels_in };
         aout_CheckChannelReorder( pi_ch[p_header->channels-3], NULL,
                                   p_dec->fmt_out.audio.i_physical_channels,
-                                  p_header->channels,
                                   pi_chan_table );
         for(int i=0;i<p_header->channels;i++)
             new_stream_map[pi_chan_table[i]]=p_header->stream_map[i];
