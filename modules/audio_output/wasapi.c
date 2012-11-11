@@ -122,9 +122,13 @@ struct aout_sys_t
     struct IAudioSessionEvents events;
     LONG refs;
 
+    uint8_t chans_table[AOUT_CHAN_MAX];
+    uint8_t chans_to_reorder;
+    uint8_t bits; /**< Bits per sample */
     unsigned rate; /**< Sample rate */
     unsigned bytes_per_frame;
     UINT32 frames; /**< Total buffer size (frames) */
+
     HANDLE ready; /**< Semaphore from MTA thread */
     HANDLE done; /**< Semaphore to MTA thread */
 };
@@ -135,6 +139,10 @@ static void Play(audio_output_t *aout, block_t *block, mtime_t *restrict drift)
 {
     aout_sys_t *sys = aout->sys;
     HRESULT hr = S_OK;
+
+    if (sys->chans_to_reorder)
+        aout_ChannelReorder(block->p_buffer, block->i_buffer,
+                          sys->chans_to_reorder, sys->chans_table, sys->bits);
 
     Enter();
     if (likely(sys->clock != NULL))
@@ -518,6 +526,19 @@ static const struct IAudioSessionEventsVtbl vlc_AudioSessionEvents =
 
 
 /*** Initialization / deinitialization **/
+static const uint32_t chans_out[] = {
+    SPEAKER_FRONT_LEFT, SPEAKER_FRONT_RIGHT,
+    SPEAKER_FRONT_CENTER, SPEAKER_LOW_FREQUENCY,
+    SPEAKER_BACK_LEFT, SPEAKER_BACK_RIGHT, SPEAKER_BACK_CENTER,
+    SPEAKER_SIDE_LEFT, SPEAKER_SIDE_RIGHT, 0
+};
+static const uint32_t chans_in[] = {
+    SPEAKER_FRONT_LEFT, SPEAKER_FRONT_RIGHT,
+    SPEAKER_SIDE_LEFT, SPEAKER_SIDE_RIGHT,
+    SPEAKER_BACK_LEFT, SPEAKER_BACK_RIGHT, SPEAKER_BACK_CENTER,
+    SPEAKER_FRONT_CENTER, SPEAKER_LOW_FREQUENCY, 0
+};
+
 static void vlc_ToWave(WAVEFORMATEXTENSIBLE *restrict wf,
                        audio_sample_format_t *restrict audio)
 {
@@ -554,38 +575,31 @@ static void vlc_ToWave(WAVEFORMATEXTENSIBLE *restrict wf,
     wf->Samples.wValidBitsPerSample = audio->i_bitspersample;
 
     wf->dwChannelMask = 0;
-    if (audio->i_physical_channels & AOUT_CHAN_LEFT)
-        wf->dwChannelMask |= SPEAKER_FRONT_LEFT;
-    if (audio->i_physical_channels & AOUT_CHAN_RIGHT)
-        wf->dwChannelMask |= SPEAKER_FRONT_RIGHT;
-    if (audio->i_physical_channels & AOUT_CHAN_CENTER)
-        wf->dwChannelMask |= SPEAKER_FRONT_CENTER;
-    if (audio->i_physical_channels & AOUT_CHAN_LFE)
-        wf->dwChannelMask |= SPEAKER_LOW_FREQUENCY;
-    if (audio->i_physical_channels & AOUT_CHAN_REARLEFT)
-        wf->dwChannelMask |= SPEAKER_BACK_LEFT;
-    if (audio->i_physical_channels & AOUT_CHAN_REARRIGHT)
-        wf->dwChannelMask |= SPEAKER_BACK_RIGHT;
-    /* ... */
-    if (audio->i_physical_channels & AOUT_CHAN_REARCENTER)
-        wf->dwChannelMask |= SPEAKER_BACK_CENTER;
-    if (audio->i_physical_channels & AOUT_CHAN_MIDDLELEFT)
-        wf->dwChannelMask |= SPEAKER_SIDE_LEFT;
-    if (audio->i_physical_channels & AOUT_CHAN_MIDDLERIGHT)
-        wf->dwChannelMask |= SPEAKER_SIDE_RIGHT;
-    /* ... */
+    for (unsigned i = 0; pi_vlc_chan_order_wg4[i]; i++)
+        if (audio->i_physical_channels & pi_vlc_chan_order_wg4[i])
+            wf->dwChannelMask |= chans_in[i];
 }
 
 static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
                         audio_sample_format_t *restrict audio)
 {
-    /* FIXME? different sample format? possible? */
     audio->i_rate = wf->nSamplesPerSec;
-    /* FIXME */
+
+    if (wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
+    {
+        const WAVEFORMATEXTENSIBLE *wfe = (void *)wf;
+
+        audio->i_physical_channels = 0;
+        for (unsigned i = 0; chans_in[i]; i++)
+            if (wfe->dwChannelMask & chans_in[i])
+                audio->i_physical_channels |= pi_vlc_chan_order_wg4[i];
+    }
+
+    audio->i_original_channels = audio->i_physical_channels;
+    aout_FormatPrepare (audio);
+
     if (wf->nChannels != audio->i_channels)
         return -1;
-
-    aout_FormatPrepare(audio);
     return 0;
 }
 
@@ -745,6 +759,12 @@ retry:
     }
     else
         assert(pwf == NULL);
+
+    sys->chans_to_reorder = aout_CheckChannelReorder(chans_in, chans_out,
+                                                     fmt->i_physical_channels,
+                                                     sys->chans_table);
+    sys->bits = fmt->i_bitspersample;
+
     hr = IAudioClient_Initialize(sys->client, AUDCLNT_SHAREMODE_SHARED, 0,
                                  AOUT_MAX_PREPARE_TIME * 10, 0,
                                  (hr == S_OK) ? &wf.Format : pwf,
