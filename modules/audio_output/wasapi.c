@@ -540,41 +540,40 @@ static void vlc_ToWave(WAVEFORMATEXTENSIBLE *restrict wf,
             audio->i_format = VLC_CODEC_FL32;
             wf->SubFormat = KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
             break;
-     }
-     aout_FormatPrepare (audio);
+    }
+    aout_FormatPrepare (audio);
 
-     wf->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
-     wf->Format.nChannels = audio->i_channels;
-     wf->Format.nSamplesPerSec = audio->i_rate;
-     wf->Format.nAvgBytesPerSec = audio->i_bytes_per_frame * audio->i_rate;
-     wf->Format.nBlockAlign = audio->i_bytes_per_frame;
-     wf->Format.wBitsPerSample = audio->i_bitspersample;
-     wf->Format.cbSize = sizeof (*wf) - sizeof (wf->Format);
+    wf->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
+    wf->Format.nChannels = audio->i_channels;
+    wf->Format.nSamplesPerSec = audio->i_rate;
+    wf->Format.nAvgBytesPerSec = audio->i_bytes_per_frame * audio->i_rate;
+    wf->Format.nBlockAlign = audio->i_bytes_per_frame;
+    wf->Format.wBitsPerSample = audio->i_bitspersample;
+    wf->Format.cbSize = sizeof (*wf) - sizeof (wf->Format);
 
-     wf->Samples.wValidBitsPerSample = audio->i_bitspersample;
+    wf->Samples.wValidBitsPerSample = audio->i_bitspersample;
 
-     wf->dwChannelMask = 0;
-     if (audio->i_physical_channels & AOUT_CHAN_LEFT)
-         wf->dwChannelMask |= SPEAKER_FRONT_LEFT;
-     if (audio->i_physical_channels & AOUT_CHAN_RIGHT)
-         wf->dwChannelMask |= SPEAKER_FRONT_RIGHT;
-     if (audio->i_physical_channels & AOUT_CHAN_CENTER)
-         wf->dwChannelMask |= SPEAKER_FRONT_CENTER;
-     if (audio->i_physical_channels & AOUT_CHAN_LFE)
-         wf->dwChannelMask |= SPEAKER_LOW_FREQUENCY;
-     // TODO: reorder
-     if (audio->i_physical_channels & AOUT_CHAN_REARLEFT)
-         wf->dwChannelMask |= SPEAKER_BACK_LEFT;
-     if (audio->i_physical_channels & AOUT_CHAN_REARRIGHT)
-         wf->dwChannelMask |= SPEAKER_BACK_RIGHT;
-     /* ... */
-     if (audio->i_physical_channels & AOUT_CHAN_REARCENTER)
-         wf->dwChannelMask |= SPEAKER_BACK_CENTER;
-     if (audio->i_physical_channels & AOUT_CHAN_MIDDLELEFT)
-         wf->dwChannelMask |= SPEAKER_SIDE_LEFT;
-     if (audio->i_physical_channels & AOUT_CHAN_MIDDLERIGHT)
-         wf->dwChannelMask |= SPEAKER_SIDE_RIGHT;
-     /* ... */
+    wf->dwChannelMask = 0;
+    if (audio->i_physical_channels & AOUT_CHAN_LEFT)
+        wf->dwChannelMask |= SPEAKER_FRONT_LEFT;
+    if (audio->i_physical_channels & AOUT_CHAN_RIGHT)
+        wf->dwChannelMask |= SPEAKER_FRONT_RIGHT;
+    if (audio->i_physical_channels & AOUT_CHAN_CENTER)
+        wf->dwChannelMask |= SPEAKER_FRONT_CENTER;
+    if (audio->i_physical_channels & AOUT_CHAN_LFE)
+        wf->dwChannelMask |= SPEAKER_LOW_FREQUENCY;
+    if (audio->i_physical_channels & AOUT_CHAN_REARLEFT)
+        wf->dwChannelMask |= SPEAKER_BACK_LEFT;
+    if (audio->i_physical_channels & AOUT_CHAN_REARRIGHT)
+        wf->dwChannelMask |= SPEAKER_BACK_RIGHT;
+    /* ... */
+    if (audio->i_physical_channels & AOUT_CHAN_REARCENTER)
+        wf->dwChannelMask |= SPEAKER_BACK_CENTER;
+    if (audio->i_physical_channels & AOUT_CHAN_MIDDLELEFT)
+        wf->dwChannelMask |= SPEAKER_SIDE_LEFT;
+    if (audio->i_physical_channels & AOUT_CHAN_MIDDLERIGHT)
+        wf->dwChannelMask |= SPEAKER_SIDE_RIGHT;
+    /* ... */
 }
 
 static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
