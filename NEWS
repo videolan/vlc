@@ -79,6 +79,7 @@ Mac OS X Port:
  * VLC requires Mac OS X 10.6 or later now
 
 Mac OS X Interface:
+ * add support for multiple video outputs
  * add accessibility support to playback windows, open panel and fullscreen
    controller
  * add a GUI to manage podcasts
