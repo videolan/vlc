@@ -243,7 +243,7 @@ void aout_FormatsPrint( vlc_object_t *obj, const char * psz_text,
  *****************************************************************************/
 unsigned aout_CheckChannelReorder( const uint32_t *chans_in,
                                    const uint32_t *chans_out,
-                                   uint32_t mask, int *restrict table )
+                                   uint32_t mask, uint8_t *restrict table )
 {
     unsigned channels = 0;
 
@@ -276,7 +276,7 @@ unsigned aout_CheckChannelReorder( const uint32_t *chans_in,
  * aout_ChannelReorder :
  *****************************************************************************/
 void aout_ChannelReorder( void *ptr, size_t bytes, unsigned channels,
-                          const int *pi_chan_table, unsigned bits_per_sample )
+                          const uint8_t *chans_table, unsigned bits_per_sample )
 {
     size_t samples = bytes / (channels * (bits_per_sample >> 3));
 
@@ -293,7 +293,7 @@ void aout_ChannelReorder( void *ptr, size_t bytes, unsigned channels,
                 uint32_t tmp[AOUT_CHAN_MAX];
 
                 for( size_t j = 0; j < channels; j++ )
-                    tmp[pi_chan_table[j]] = buf[j];
+                    tmp[chans_table[j]] = buf[j];
 
                 memcpy( buf, tmp, 4 * channels );
                 buf += channels;
@@ -310,7 +310,7 @@ void aout_ChannelReorder( void *ptr, size_t bytes, unsigned channels,
                 uint16_t tmp[AOUT_CHAN_MAX];
 
                 for( size_t j = 0; j < channels; j++ )
-                    tmp[pi_chan_table[j]] = buf[j];
+                    tmp[chans_table[j]] = buf[j];
 
                 memcpy( buf, tmp, 2 * channels );
                 buf += channels;
@@ -327,7 +327,7 @@ void aout_ChannelReorder( void *ptr, size_t bytes, unsigned channels,
                 uint8_t tmp[AOUT_CHAN_MAX];
 
                 for( size_t j = 0; j < channels; j++ )
-                    tmp[pi_chan_table[j]] = buf[j];
+                    tmp[chans_table[j]] = buf[j];
 
                 memcpy( buf, tmp, channels );
                 buf += channels;
@@ -344,7 +344,7 @@ void aout_ChannelReorder( void *ptr, size_t bytes, unsigned channels,
                 uint8_t tmp[3 * AOUT_CHAN_MAX];
 
                 for( size_t j = 0; j < channels; j++ )
-                    memcpy( tmp + (3 * pi_chan_table[j]), buf + (3 * j), 3 );
+                    memcpy( tmp + (3 * chans_table[j]), buf + (3 * j), 3 );
 
                 memcpy( buf, tmp, 3 * channels );
                 buf += 3 * channels;

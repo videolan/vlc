@@ -66,7 +66,7 @@ struct filter_sys_t
     bool b_dontwarn;
     int i_nb_channels; /* number of float32 per sample */
 
-    int pi_chan_table[AOUT_CHAN_MAX]; /* channel reordering */
+    uint8_t pi_chan_table[AOUT_CHAN_MAX]; /* channel reordering */
 };
 
 /*****************************************************************************
@@ -185,7 +185,7 @@ static int Open( vlc_object_t *p_this, filter_sys_t *p_sys,
  * Interleave: helper function to interleave channels
  *****************************************************************************/
 static void Interleave( float * p_out, const float * p_in, int i_nb_channels,
-                        int *pi_chan_table )
+                        uint8_t *pi_chan_table )
 {
     /* We do not only have to interleave, but also reorder the channels. */
 

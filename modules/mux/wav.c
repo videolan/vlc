@@ -75,8 +75,8 @@ struct sout_mux_sys_t
     uint32_t waveheader2[2];
 
     uint32_t i_channel_mask;
-    bool b_chan_reorder;              /* do we need channel reordering */
-    int pi_chan_table[AOUT_CHAN_MAX];
+    uint8_t i_chans_to_reorder;            /* do we need channel reordering */
+    uint8_t pi_chan_table[AOUT_CHAN_MAX];
 };
 
 static const uint32_t pi_channels_in[] =
@@ -111,7 +111,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_header = true;
     p_sys->i_data   = 0;
 
-    p_sys->b_chan_reorder = 0;
+    p_sys->i_chans_to_reorder = 0;
 
     return VLC_SUCCESS;
 }
@@ -185,13 +185,13 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             if( p_input->p_fmt->audio.i_physical_channels & pi_vlc_chan_order_wg4[i])
                 p_sys->i_channel_mask |= pi_channels_in[i];
 
-        p_sys->b_chan_reorder =
+        p_sys->i_chans_to_reorder =
             aout_CheckChannelReorder( pi_channels_in, pi_channels_out,
                                       p_sys->i_channel_mask,
                                       p_sys->pi_chan_table );
 
-        msg_Dbg( p_mux, "channel mask: %x, reordering: %i",
-                 p_sys->i_channel_mask, (int)p_sys->b_chan_reorder );
+        msg_Dbg( p_mux, "channel mask: %x, reordering: %u",
+                 p_sys->i_channel_mask, p_sys->i_chans_to_reorder );
     }
 
     fourcc_to_wf_tag( p_input->p_fmt->i_codec, &i_format );
@@ -290,9 +290,9 @@ static int Mux( sout_mux_t *p_mux )
         p_sys->i_data += p_block->i_buffer;
 
         /* Do the channel reordering */
-        if( p_sys->b_chan_reorder )
+        if( p_sys->i_chans_to_reorder )
             aout_ChannelReorder( p_block->p_buffer, p_block->i_buffer,
-                                 p_input->p_fmt->audio.i_channels,
+                                 p_sys->i_chans_to_reorder,
                                  p_sys->pi_chan_table,
                                  p_input->p_fmt->audio.i_bitspersample );
 

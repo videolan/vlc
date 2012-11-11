@@ -69,8 +69,8 @@ struct demux_sys_t
     date_t          pts;
 
     uint32_t i_channel_mask;
-    bool b_chan_reorder;              /* do we need channel reordering */
-    int pi_chan_table[AOUT_CHAN_MAX];
+    uint8_t i_chans_to_reorder;            /* do we need channel reordering */
+    uint8_t pi_chan_table[AOUT_CHAN_MAX];
 };
 
 static int ChunkFind( demux_t *, const char *, unsigned int * );
@@ -123,7 +123,7 @@ static int Open( vlc_object_t * p_this )
         return VLC_ENOMEM;
 
     p_sys->p_es           = NULL;
-    p_sys->b_chan_reorder = false;
+    p_sys->i_chans_to_reorder = 0;
     p_sys->i_channel_mask = 0;
 
     /* skip riff header */
@@ -270,13 +270,13 @@ static int Open( vlc_object_t * p_this )
         if( p_sys->fmt.i_codec == VLC_FOURCC('a','r','a','w') ||
             p_sys->fmt.i_codec == VLC_FOURCC('p','c','m',' ') ||
             p_sys->fmt.i_codec == VLC_FOURCC('a','f','l','t') )
-            p_sys->b_chan_reorder =
+            p_sys->i_chans_to_reorder =
                 aout_CheckChannelReorder( pi_channels_in, NULL,
                                           p_sys->i_channel_mask,
                                           p_sys->pi_chan_table );
 
-        msg_Dbg( p_demux, "channel mask: %x, reordering: %i",
-                 p_sys->i_channel_mask, (int)p_sys->b_chan_reorder );
+        msg_Dbg( p_demux, "channel mask: %x, reordering: %u",
+                 p_sys->i_channel_mask, p_sys->i_chans_to_reorder );
     }
 
     p_sys->fmt.audio.i_physical_channels =
@@ -427,7 +427,7 @@ static int Demux( demux_t *p_demux )
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
 
     /* Do the channel reordering */
-    if( p_sys->b_chan_reorder )
+    if( p_sys->i_chans_to_reorder )
         aout_ChannelReorder( p_block->p_buffer, p_block->i_buffer,
                              p_sys->fmt.audio.i_channels,
                              p_sys->pi_chan_table,

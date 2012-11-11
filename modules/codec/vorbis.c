@@ -88,7 +88,7 @@ struct decoder_sys_t
     /*
     ** Channel reordering
     */
-    int pi_chan_table[AOUT_CHAN_MAX];
+    uint8_t pi_chan_table[AOUT_CHAN_MAX];
 };
 
 static const int pi_channels_maps[9] =
@@ -658,12 +658,15 @@ static void ConfigureChannelOrder(int *pi_chan_table, int i_channels, uint32_t i
             }
     }
 
+    uint8_t tab[AOUT_CHAN_MAX];
     if( b_decode )
         aout_CheckChannelReorder( pi_channels_in, NULL,
-                                  i_channel_mask, pi_chan_table );
+                                  i_channel_mask, tab );
     else
         aout_CheckChannelReorder( NULL, pi_channels_in,
-                                  i_channel_mask, pi_chan_table );
+                                  i_channel_mask, tab );
+    for( int i = 0; i < i_channels; i++)
+         pi_chan_table[i] = tab[i];
 }
 
 /*****************************************************************************

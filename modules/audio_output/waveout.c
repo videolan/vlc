@@ -119,8 +119,8 @@ struct aout_sys_t
         bool soft_mute;
     };
 
-    bool b_chan_reorder;              /* do we need channel reordering */
-    int pi_chan_table[AOUT_CHAN_MAX];
+    uint8_t chans_to_reorder;              /* do we need channel reordering */
+    uint8_t chan_table[AOUT_CHAN_MAX];
 };
 
 #include "volume.h"
@@ -657,15 +657,12 @@ static int OpenWaveOut( audio_output_t *p_aout, uint32_t i_device_id, int i_form
         return VLC_EGENERIC;
     }
 
-    p_aout->sys->b_chan_reorder =
+    p_aout->sys->chans_to_reorder =
         aout_CheckChannelReorder( pi_channels_in, pi_channels_out,
                                   waveformat.dwChannelMask,
-                                  p_aout->sys->pi_chan_table );
-
-    if( p_aout->sys->b_chan_reorder )
-    {
+                                  p_aout->sys->chan_table );
+    if( p_aout->sys->chans_to_reorder )
         msg_Dbg( p_aout, "channel reordering needed" );
-    }
 
     return VLC_SUCCESS;
 
@@ -924,12 +921,12 @@ static void* WaveOutThread( void *data )
                 }
 
                 /* Do the channel reordering */
-                if( p_buffer && p_sys->b_chan_reorder )
+                if( p_buffer && p_sys->chans_to_reorder )
                 {
                     aout_ChannelReorder( p_buffer->p_buffer,
                         p_buffer->i_buffer,
                         p_sys->waveformat.Format.nChannels,
-                        p_sys->pi_chan_table,
+                        p_sys->chan_table,
                         p_sys->waveformat.Format.wBitsPerSample );
                 }
 

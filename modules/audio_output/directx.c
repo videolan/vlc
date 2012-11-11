@@ -83,8 +83,8 @@ struct aout_sys_t
 
     int      i_speaker_setup;                      /* Speaker setup override */
 
-    bool     b_chan_reorder;                /* do we need channel reordering */
-    int      pi_chan_table[AOUT_CHAN_MAX];
+    uint8_t  chans_to_reorder;              /* do we need channel reordering */
+    uint8_t  chan_table[AOUT_CHAN_MAX];
     uint32_t i_channel_mask;
     uint32_t i_bits_per_sample;
     uint32_t i_channels;
@@ -785,12 +785,11 @@ static int CreateDSBuffer( audio_output_t *p_aout, int i_format,
 
     p_aout->sys->i_frame_size = i_bytes_per_frame;
     p_aout->sys->i_channel_mask = waveformat.dwChannelMask;
-    p_aout->sys->b_chan_reorder =
+    p_aout->sys->chans_to_reorder =
         aout_CheckChannelReorder( pi_channels_in, pi_channels_out,
                                   waveformat.dwChannelMask,
-                                  p_aout->sys->pi_chan_table );
-
-    if( p_aout->sys->b_chan_reorder )
+                                  p_aout->sys->chan_table );
+    if( p_aout->sys->chans_to_reorder )
     {
         msg_Dbg( p_aout, "channel reordering needed" );
     }
@@ -900,13 +899,11 @@ static int FillBuffer( audio_output_t *p_aout, int i_frame, block_t *p_buffer )
     }
     else
     {
-        if( p_sys->b_chan_reorder )
-        {
+        if( p_sys->chans_to_reorder )
             /* Do the channel reordering here */
             aout_ChannelReorder( p_buffer->p_buffer, p_buffer->i_buffer,
-                                 p_sys->i_channels, p_sys->pi_chan_table,
+                                 p_sys->chans_to_reorder, p_sys->chan_table,
                                  p_sys->i_bits_per_sample );
-        }
 
         memcpy( p_write_position, p_buffer->p_buffer, l_bytes1 );
         block_Release( p_buffer );

@@ -263,7 +263,6 @@ end:
 static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
 {
     int err;
-    int pi_chan_table[AOUT_CHAN_MAX];
     unsigned char new_stream_map[8];
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -296,6 +295,8 @@ static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
         static const uint32_t *pi_ch[6] = { pi_3channels_in, pi_4channels_in,
                                             pi_5channels_in, pi_6channels_in,
                                             pi_7channels_in, pi_8channels_in };
+        uint8_t pi_chan_table[AOUT_CHAN_MAX];
+
         aout_CheckChannelReorder( pi_ch[p_header->channels-3], NULL,
                                   p_dec->fmt_out.audio.i_physical_channels,
                                   pi_chan_table );
