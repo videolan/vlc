@@ -248,8 +248,8 @@ libdvb_plugin_la_SOURCES = \
 libdvb_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdvb_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_LINUX_DVB
-libvlc_LTLIBRARIES += libdvb_plugin.la
 if HAVE_DVBPSI
+libvlc_LTLIBRARIES += libdvb_plugin.la
 libdvb_plugin_la_CFLAGS += $(DVBPSI_CFLAGS)
 libdvb_plugin_la_LIBADD += $(DVBPSI_LIBS)
 endif
