@@ -43,11 +43,9 @@ static void inputResamplingStop( audio_output_t *, aout_input_t * );
 /*****************************************************************************
  * aout_InputNew : allocate a new input and rework the filter pipeline
  *****************************************************************************/
-aout_input_t *aout_InputNew (const audio_sample_format_t *restrict infmt)
+aout_input_t *aout_InputNew (void)
 {
     aout_input_t *p_input = xmalloc (sizeof (*p_input));
-
-    p_input->samplerate = infmt->i_rate;
 
     p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
     p_input->i_last_input_rate = INPUT_RATE_DEFAULT;

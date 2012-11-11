@@ -49,8 +49,6 @@ typedef struct aout_volume aout_volume_t;
 /** an input stream for the audio output */
 struct aout_input_t
 {
-    unsigned            samplerate; /**< Input sample rate */
-
     int                     i_resampling_type;
     int                     i_resamp_start_drift;
 
@@ -108,7 +106,7 @@ static inline aout_owner_t *aout_owner (audio_output_t *aout)
  *****************************************************************************/
 
 /* From input.c : */
-aout_input_t *aout_InputNew(const audio_sample_format_t *);
+aout_input_t *aout_InputNew(void);
 void aout_InputDelete(aout_input_t *);
 block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
                          block_t *p_buffer, int i_input_rate, date_t * );

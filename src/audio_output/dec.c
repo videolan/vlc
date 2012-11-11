@@ -97,7 +97,7 @@ error:
     date_Set (&owner->sync.date, VLC_TS_INVALID);
 
     assert (owner->input == NULL);
-    owner->input = aout_InputNew (p_format);
+    owner->input = aout_InputNew ();
     aout_unlock( p_aout );
     return ret;
 }
@@ -160,7 +160,7 @@ static void aout_CheckRestart (audio_output_t *aout)
 
     if (aout_FiltersNew (aout, &owner->input_format, &owner->mixer_format,
                          &request_vout) == 0)
-        owner->input = aout_InputNew (&owner->input_format);
+        owner->input = aout_InputNew ();
 }
 
 /**
