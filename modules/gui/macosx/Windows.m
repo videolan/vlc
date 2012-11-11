@@ -270,6 +270,9 @@
 
 - (void)setTitle:(NSString *)title
 {
+    if (!title || [title length] < 1)
+        return;
+
     if (b_dark_interface && o_titlebar_view)
         [o_titlebar_view setWindowTitle: title];
 
