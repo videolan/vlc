@@ -1,10 +1,15 @@
 /*****************************************************************************
  * dtstospdif.c : encapsulates DTS frames into S/PDIF packets
  *****************************************************************************
- * Copyright (C) 2003, 2006 the VideoLAN team
+ * Copyright (C) 2003-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
+ *          Gildas Bazin
+ *          Derk-Jan Hartman
+ *          Pierre d'Herbemont
+ *          Rémi Denis-Courmont
+ *          Rafaël Carré
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +46,7 @@ struct filter_sys_t
 {
     mtime_t start_date;
 
-    /* 3 DTS frames have to be packed into an S/PDIF frame.
+    /* 3 DTS frames (max 2048) have to be packed into an S/PDIF frame (6144).
      * We accumulate DTS frames from the decoder until we have enough to
      * send. */
     size_t i_frame_size;
@@ -86,6 +91,7 @@ static int Create( vlc_object_t *p_this )
     p_sys = p_filter->p_sys = malloc( sizeof(*p_sys) );
     if( !p_sys )
         return VLC_ENOMEM;
+
     p_sys->p_buf = NULL;
     p_sys->i_frame_size = 0;
     p_sys->i_frames = 0;
