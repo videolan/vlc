@@ -137,18 +137,46 @@ struct audio_output
 {
     VLC_COMMON_MEMBERS
 
-    struct aout_sys_t *sys; /**< Output plugin private data */
-    int (*start) (audio_output_t *, audio_sample_format_t *);
-    void (*stop) (audio_output_t *);
-    void (*play)(audio_output_t *, block_t *, mtime_t *); /**< Play callback
-        - queue a block for playback */
-    void (*pause)( audio_output_t *, bool, mtime_t ); /**< Pause/resume
-        callback (optional, may be NULL) */
-    void (*flush)( audio_output_t *, bool ); /**< Flush/drain callback
-        (optional, may be NULL) */
-    int (*volume_set)(audio_output_t *, float); /**< Volume setter (or NULL) */
-    int (*mute_set)(audio_output_t *, bool); /**< Mute setter (or NULL) */
+    struct aout_sys_t *sys; /**< Private data for callbacks */
 
+    int (*start)(audio_output_t *, audio_sample_format_t *fmt);
+    /**< Starts a new stream (mandatory, cannot be NULL).
+      * \param fmt input stream sample format upon entry,
+      *            output stream sample format upon return [IN/OUT]
+      * \return VLC_SUCCESS on success, non-zero on failure
+      * \note No other stream may be already started when called.
+      */
+    void (*stop)(audio_output_t *);
+    /**< Stops the existing stream (optional, may be NULL).
+      * \note A stream must have been started when called.
+      */
+    void (*play)(audio_output_t *, block_t *, mtime_t *);
+    /**< Queues a block of samples for playback (mandatory, cannot be NULL).
+      * \note A stream must have been started when called.
+      */
+    void (*pause)( audio_output_t *, bool pause, mtime_t date);
+    /**< Pauses or resumes playback (optional, may be NULL).
+      * \param pause pause if true, resume from pause if false
+      * \param date timestamp when the pause or resume was requested
+      * \note A stream must have been started when called.
+      */
+    void (*flush)( audio_output_t *, bool wait);
+    /**< Flushes or drains the playback buffers (optional, may be NULL).
+      * \param wait true to wait for playback of pending buffers (drain),
+      *             false to discard pending buffers (flush)
+      * \note A stream must have been started when called.
+      */
+    int (*volume_set)(audio_output_t *, float volume);
+    /**< Changes playback volume (optional, may be NULL).
+      * \param volume requested volume (0. = mute, 1. = nominal)
+      * \note The volume is always a positive number.
+      * \warning A stream may or may not have been started when called.
+      */
+    int (*mute_set)(audio_output_t *, bool mute);
+    /**< Changes muting (optinal, may be NULL).
+      * \param mute true to mute, false to unmute
+      * \warning A stream may or may not have been started when called.
+      */
     struct {
         void (*volume_report)(audio_output_t *, float);
         void (*mute_report)(audio_output_t *, bool);
