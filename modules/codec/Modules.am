@@ -1,7 +1,7 @@
 noinst_HEADERS =
 
 SOURCES_a52 = a52.c a52.h
-SOURCES_dts = dts.c
+SOURCES_dts = dts.c dts_header.h dts_header.c
 SOURCES_flac = flac.c
 SOURCES_lpcm = lpcm.c
 SOURCES_araw = araw.c
