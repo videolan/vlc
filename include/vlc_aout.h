@@ -150,7 +150,14 @@ struct audio_output
     /**< Stops the existing stream (optional, may be NULL).
       * \note A stream must have been started when called.
       */
-    void (*play)(audio_output_t *, block_t *, mtime_t *);
+    int (*time_get)(audio_output_t *, mtime_t *write_pts);
+    /**< Estimates the date/time of the playback buffer write offset
+      * (optional, may be NULL). The read offset is not returned since it is
+      * always implicitly equal to the current time (mdate()).
+      * \param write_pts timestamp of the write offset [OUT]
+      * \note A stream must have been started when called.
+      */
+    void (*play)(audio_output_t *, block_t *);
     /**< Queues a block of samples for playback (mandatory, cannot be NULL).
       * \note A stream must have been started when called.
       */
@@ -311,7 +318,6 @@ typedef struct
     aout_fifo_t partial; /**< Audio blocks before packetization */
     aout_fifo_t fifo; /**< Packetized audio blocks */
     mtime_t pause_date; /**< Date when paused or VLC_TS_INVALID */
-    mtime_t time_report; /**< Desynchronization estimate or VLC_TS_INVALID */
     unsigned samples; /**< Samples per packet */
     bool starving; /**< Whether currently starving (to limit error messages) */
 } aout_packet_t;
@@ -319,7 +325,8 @@ typedef struct
 VLC_DEPRECATED void aout_PacketInit(audio_output_t *, aout_packet_t *, unsigned, const audio_sample_format_t *);
 VLC_DEPRECATED void aout_PacketDestroy(audio_output_t *);
 
-VLC_DEPRECATED void aout_PacketPlay(audio_output_t *, block_t *, mtime_t *);
+VLC_DEPRECATED int aout_PacketTimeGet(audio_output_t *, mtime_t *);
+VLC_DEPRECATED void aout_PacketPlay(audio_output_t *, block_t *);
 VLC_DEPRECATED void aout_PacketPause(audio_output_t *, bool, mtime_t);
 VLC_DEPRECATED void aout_PacketFlush(audio_output_t *, bool);
 

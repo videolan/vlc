@@ -132,6 +132,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     // TODO add buffer size callback
     fmt->i_rate = jack_get_sample_rate( p_sys->p_jack_client );
 
+    p_aout->time_get = aout_PacketTimeGet;
     p_aout->play = aout_PacketPlay;
     p_aout->pause = aout_PacketPause;
     p_aout->flush = aout_PacketFlush;

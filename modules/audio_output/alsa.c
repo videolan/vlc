@@ -153,7 +153,8 @@ static int DeviceChanged (vlc_object_t *obj, const char *varname,
     return VLC_SUCCESS;
 }
 
-static void Play (audio_output_t *, block_t *, mtime_t *);
+static int TimeGet (audio_output_t *aout, mtime_t *);
+static void Play (audio_output_t *, block_t *);
 static void Pause (audio_output_t *, bool, mtime_t);
 static void PauseDummy (audio_output_t *, bool, mtime_t);
 static void Flush (audio_output_t *, bool);
@@ -508,6 +509,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
     sys->format = *fmt;
 
+    aout->time_get = TimeGet;
     aout->play = Play;
     if (snd_pcm_hw_params_can_pause (hw))
         aout->pause = Pause;
@@ -540,11 +542,33 @@ error:
     return VLC_EGENERIC;
 }
 
+static int TimeGet (audio_output_t *aout, mtime_t *restrict pts)
+{
+    aout_sys_t *sys = aout->sys;
+    snd_pcm_t *pcm = sys->pcm;
+    snd_pcm_status_t *status;
+    int val;
+
+    snd_pcm_status_alloca (&status);
+    val = snd_pcm_status (pcm, status);
+    if (val < 0)
+    {
+        msg_Err (aout, "cannot get status: %s", snd_strerror (val));
+        return -1;
+    }
+
+    if (snd_pcm_status_get_state (status) != SND_PCM_STATE_RUNNING)
+        return -1;
+
+    snd_pcm_sframes_t frames = snd_pcm_status_get_delay (status);
+    *pts = mdate () + (frames * CLOCK_FREQ / sys->format.i_rate);
+    return 0;
+}
+
 /**
  * Queues one audio buffer to the hardware.
  */
-static void Play (audio_output_t *aout, block_t *block,
-                  mtime_t *restrict drift)
+static void Play (audio_output_t *aout, block_t *block)
 {
     aout_sys_t *sys = aout->sys;
 
@@ -561,40 +585,36 @@ static void Play (audio_output_t *aout, block_t *block,
     if (val < 0)
         msg_Err (aout, "cannot get status: %s", snd_strerror (val));
     else
+    if (snd_pcm_status_get_state (status) != SND_PCM_STATE_RUNNING)
     {
         snd_pcm_sframes_t frames = snd_pcm_status_get_delay (status);
         mtime_t delay = frames * CLOCK_FREQ / sys->format.i_rate;
+
         delay += mdate () - block->i_pts;
-
-        if (snd_pcm_status_get_state (status) != SND_PCM_STATE_RUNNING)
+        if (delay < 0)
         {
-            if (delay < 0)
+            if (sys->format.i_format != VLC_CODEC_SPDIFL)
             {
-                if (sys->format.i_format != VLC_CODEC_SPDIFL)
-                {
-                    frames = (delay * sys->format.i_rate) / -CLOCK_FREQ;
-                    msg_Dbg (aout, "prepending %ld zeroes", frames);
+                frames = (delay * sys->format.i_rate) / -CLOCK_FREQ;
+                msg_Dbg (aout, "prepending %ld zeroes", frames);
 
-                    void *z = calloc (frames, sys->format.i_bytes_per_frame);
-                    if (likely(z != NULL))
-                    {
-                        snd_pcm_writei (pcm, z, frames);
-                        free (z);
-                        delay = 0;
-                    }
-                }
-                /* Lame fallback if zero padding does not work */
-                if (delay < 0)
+                void *z = calloc (frames, sys->format.i_bytes_per_frame);
+                if (likely(z != NULL))
                 {
-                    msg_Dbg (aout, "deferring start (%"PRId64" us)", -delay);
-                    msleep (-delay);
+                    snd_pcm_writei (pcm, z, frames);
+                    free (z);
+                    delay = 0;
                 }
             }
-            else
-                msg_Dbg (aout, "starting late (%"PRId64" us)", delay);
+            /* Lame fallback if zero padding does not work */
+            if (delay < 0)
+            {
+                msg_Dbg (aout, "deferring start (%"PRId64" us)", -delay);
+                msleep (-delay);
+            }
         }
         else
-            *drift = delay;
+            msg_Dbg (aout, "starting late (%"PRId64" us)", delay);
     }
 
     /* TODO: better overflow handling */

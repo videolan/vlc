@@ -96,7 +96,7 @@ struct aout_sys_t
 static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 static void Stop( audio_output_t * );
-static void Play       ( audio_output_t *, block_t *, mtime_t * );
+static void Play       ( audio_output_t *, block_t * );
 static int  VolumeSet  ( audio_output_t *, float );
 static int  MuteSet    ( audio_output_t *, bool );
 
@@ -282,6 +282,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
         goto error;
     }
 
+    p_aout->time_get = aout_PacketTimeGet;
     p_aout->play = Play;
     p_aout->pause = aout_PacketPause;
     p_aout->flush = aout_PacketFlush;
@@ -509,8 +510,7 @@ static void Probe( audio_output_t * p_aout, const audio_sample_format_t *fmt )
  *       we know the first buffer has been put in the aout fifo and we also
  *       know its date.
  *****************************************************************************/
-static void Play( audio_output_t *p_aout, block_t *p_buffer,
-                  mtime_t *restrict drift )
+static void Play( audio_output_t *p_aout, block_t *p_buffer )
 {
     /* get the playing date of the first aout buffer */
     p_aout->sys->notif.start_date = p_buffer->i_pts;
@@ -521,7 +521,7 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer,
     /* wake up the audio output thread */
     SetEvent( p_aout->sys->notif.event );
 
-    aout_PacketPlay( p_aout, p_buffer, drift );
+    aout_PacketPlay( p_aout, p_buffer );
     p_aout->play = aout_PacketPlay;
 }
 

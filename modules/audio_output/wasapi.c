@@ -135,7 +135,34 @@ struct aout_sys_t
 
 
 /*** VLC audio output callbacks ***/
-static void Play(audio_output_t *aout, block_t *block, mtime_t *restrict drift)
+static int TimeGet(audio_output_t *aout, mtime_t *restrict pts)
+{
+    aout_sys_t *sys = aout->sys;
+    UINT64 pos, qpcpos;
+    HRESULT hr;
+
+    if (sys->clock == NULL)
+        return -1;
+
+    Enter();
+    hr = IAudioClock_GetPosition(sys->clock, &pos, &qpcpos);
+    Leave();
+    if (FAILED(hr))
+    {
+        msg_Err(aout, "cannot get position (error 0x%lx)", hr);
+        return -1;
+    }
+
+    mtime_t delay =  ((GetQPC() - qpcpos) / (10000000 / CLOCK_FREQ));
+    static_assert((10000000 % CLOCK_FREQ) == 0, "Frequency conversion broken");
+
+    if (delay < 1000) /* device is still buffering, time is screwed */
+        return -1;
+    *pts += mdate () + delay;
+    return 0;
+}
+
+static void Play(audio_output_t *aout, block_t *block)
 {
     aout_sys_t *sys = aout->sys;
     HRESULT hr = S_OK;
@@ -145,22 +172,6 @@ static void Play(audio_output_t *aout, block_t *block, mtime_t *restrict drift)
                           sys->chans_to_reorder, sys->chans_table, sys->bits);
 
     Enter();
-    if (likely(sys->clock != NULL))
-    {
-        UINT64 pos, qpcpos;
-
-        hr = IAudioClock_GetPosition(sys->clock, &pos, &qpcpos);
-        if (SUCCEEDED(hr))
-        {
-            qpcpos = GetQPC() - qpcpos;
-            static_assert((10000000 % CLOCK_FREQ) == 0,
-                          "Frequency conversion broken");
-            *drift = qpcpos / (10000000 / CLOCK_FREQ);
-        }
-        else
-            msg_Warn(aout, "cannot get position (error 0x%lx)", hr);
-    }
-
     for (;;)
     {
         UINT32 frames;
@@ -799,6 +810,7 @@ retry:
 
     sys->rate = fmt->i_rate;
     sys->bytes_per_frame = fmt->i_bytes_per_frame;
+    aout->time_get = TimeGet;
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;

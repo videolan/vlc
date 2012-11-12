@@ -75,7 +75,8 @@ vlc_module_begin ()
     set_callbacks (Open, NULL)
 vlc_module_end ()
 
-static void Play (audio_output_t *, block_t *, mtime_t *);
+static int TimeGet (audio_output_t *, mtime_t *);
+static void Play (audio_output_t *, block_t *);
 static void Pause (audio_output_t *, bool, mtime_t);
 static void Flush (audio_output_t *, bool);
 static int VolumeSync (audio_output_t *);
@@ -219,6 +220,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
 
     /* Setup audio_output_t */
+    aout->time_get = TimeGet;
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
@@ -311,37 +313,29 @@ static void Stop (audio_output_t *aout)
     free (sys);
 }
 
+static int TimeGet (audio_output_t *aout, mtime_t *restrict pts)
+{
+    aout_sys_t *sys = aout->sys;
+    int delay;
+
+    if (ioctl (sys->fd, SNDCTL_DSP_GETODELAY, &delay) < 0)
+    {
+        msg_Warn (aout, "cannot get delay: %m");
+        return -1;
+    }
+
+    *pts = mdate () + ((delay * CLOCK_FREQ * sys->format.i_frame_length)
+                      / (sys->format.i_rate * sys->format.i_bytes_per_frame));
+    return 0;
+}
+
 /**
  * Queues one audio buffer to the hardware.
  */
-static void Play (audio_output_t *aout, block_t *block,
-                  mtime_t *restrict drift)
+static void Play (audio_output_t *aout, block_t *block)
 {
     aout_sys_t *sys = aout->sys;
     int fd = sys->fd;
-
-    int delay;
-    if (ioctl (sys->fd, SNDCTL_DSP_GETODELAY, &delay) >= 0)
-    {
-        mtime_t latency = (delay * CLOCK_FREQ * sys->format.i_frame_length)
-                      / (sys->format.i_rate * sys->format.i_bytes_per_frame);
-        *drift = mdate () + latency - block->i_pts;
-    }
-    else
-        msg_Warn (aout, "cannot get delay: %m");
-
-    if (sys->starting)
-    {   /* Start on time */
-        /* TODO: resync on pause resumption and underflow recovery */
-        mtime_t delta = -*drift;
-        if (delta > 0) {
-            msg_Dbg(aout, "deferring start (%"PRId64" us)", delta);
-            msleep(delta);
-            *drift = 0;
-        } else
-            msg_Warn(aout, "starting late (%"PRId64" us)", delta);
-        sys->starting = false;
-    }
 
     while (block->i_buffer > 0)
     {

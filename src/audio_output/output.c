@@ -440,7 +440,7 @@ void aout_OutputDelete (audio_output_t *aout)
 void aout_OutputPlay (audio_output_t *aout, block_t *block)
 {
     aout_owner_t *owner = aout_owner (aout);
-    mtime_t drift = 0;
+    mtime_t drift;
 
     aout_assert_locked (aout);
 
@@ -454,7 +454,12 @@ void aout_OutputPlay (audio_output_t *aout, block_t *block)
         return;
     }
 
-    aout->play (aout, block, &drift);
+    if (aout->time_get != NULL && aout->time_get (aout, &drift) == 0)
+        drift -= block->i_pts;
+    else
+        drift = 0;
+
+    aout->play (aout, block);
 /**
  * Notifies the audio input of the drift from the requested audio
  * playback timestamp (@ref block_t.i_pts) to the anticipated playback time
@@ -463,14 +468,9 @@ void aout_OutputPlay (audio_output_t *aout, block_t *block)
  * trigger upsampling or downsampling, or even discard samples.
  * Future VLC versions may instead adjust the input decoding speed.
  *
- * The audio output plugin is responsible for estimating the drift. A negative
- * value means playback is ahead of the intended time and a positive value
- * means playback is late from the intended time. In most cases, the audio
- * output can estimate the delay until playback of the next sample to be
- * queued. Then, before the block is queued:
- *    drift = mdate() + delay - block->i_pts
- * where mdate() + delay is the estimated time when the sample will be rendered
- * and block->i_pts is the intended time.
+ * The audio output plugin is responsible for estimating the time. Typically,
+ * the audio output can estimate the total buffer delay. Then:
+ *    pts = mdate() + delay
  */
     if (drift < -AOUT_MAX_PTS_ADVANCE || +AOUT_MAX_PTS_DELAY < drift)
     {

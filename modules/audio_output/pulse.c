@@ -539,7 +539,7 @@ static void *data_convert(block_t **pp)
 /**
  * Queue one audio frame to the playback stream
  */
-static void Play(audio_output_t *aout, block_t *block, mtime_t *restrict drift)
+static void Play(audio_output_t *aout, block_t *block)
 {
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
@@ -581,7 +581,6 @@ static void Play(audio_output_t *aout, block_t *block, mtime_t *restrict drift)
     }
 
     pa_threaded_mainloop_unlock(sys->mainloop);
-    (void) drift;
 }
 
 /**
@@ -1030,6 +1029,7 @@ static int Open(vlc_object_t *obj)
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
+    aout->time_get = NULL;
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;

@@ -57,7 +57,7 @@ struct aout_sys_t
  *****************************************************************************/
 static int  Open  ( vlc_object_t * );
 static void Close ( vlc_object_t * );
-static void Play  ( audio_output_t *_p_aout, block_t *block, mtime_t * );
+static void Play  ( audio_output_t *_p_aout, block_t *block );
 
 static ULONG APIENTRY KaiCallback ( PVOID, PVOID, ULONG );
 
@@ -195,6 +195,7 @@ static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
 
     p_sys->format = *fmt = format;
 
+    p_aout->time_get = aout_PacketTimeGet;
     p_aout->play  = Play;
     p_aout->pause = aout_PacketPause;
     p_aout->flush = aout_PacketFlush;
@@ -244,14 +245,13 @@ exit_kai_done :
 /*****************************************************************************
  * Play: play a sound samples buffer
  *****************************************************************************/
-static void Play (audio_output_t *p_aout, block_t *block,
-                  mtime_t *restrict drift)
+static void Play (audio_output_t *p_aout, block_t *block)
 {
     aout_sys_t *p_sys = p_aout->sys;
 
     kaiPlay( p_sys->hkai );
 
-    aout_PacketPlay( p_aout, block, drift );
+    aout_PacketPlay( p_aout, block );
 }
 
 /*****************************************************************************

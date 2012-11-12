@@ -43,7 +43,8 @@ vlc_module_begin ()
     set_callbacks (Open, Close)
 vlc_module_end ()
 
-static void Play (audio_output_t *, block_t *, mtime_t *);
+static int TimeGet (audio_output, mtime_t *);
+static void Play (audio_output_t *, block_t *);
 static void Pause (audio_output_t *, bool, mtime_t);
 static int VolumeSet (audio_output_t *, float);
 static int MuteSet (audio_output_t *, bool);
@@ -149,6 +150,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     aout_FormatPrepare (fmt);
 
     aout->sys = sys;
+    aout->time_get = TimeGet;
     aout->play = Play;
     aout->pause = Pause;
     aout->flush  = NULL; /* sndio sucks! */
@@ -179,18 +181,21 @@ static void Close (vlc_object_t *obj)
     sio_close (sys->hdl);
 }
 
-static void Play (audio_output_t *aout, block_t *block,
-                  mtime_t *restrict drift)
+static int TimeGet (audio_output_t *aout, mtime_t *restrict pts)
 {
     aout_sys_t *sys = aout->sys;
     struct sio_par par;
 
-    if (sio_getpar (sys->hdl, &par) == 0)
-    {
-        mtime_t delay = par.bufsz * CLOCK_FREQ / aout->format.i_rate;
+    if (sio_getpar (sys->hdl, &par))
+        return -1;
 
-        *drift = mdate () + delay - block->i_pts;
-    }
+    *pts = mdate () + (par.bufsz * CLOCK_FREQ / aout->format.i_rate);
+    return 0;
+}
+
+static void Play (audio_output_t *aout, block_t *block)
+{
+    aout_sys_t *sys = aout->sys;
 
     while (block->i_buffer > 0 && !sio_eof (sys->hdl))
     {

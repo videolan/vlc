@@ -144,7 +144,6 @@ void aout_PacketInit (audio_output_t *aout, aout_packet_t *p, unsigned samples,
     aout_FifoInit (&p->partial, p->format.i_rate);
     aout_FifoInit (&p->fifo, p->format.i_rate);
     p->pause_date = VLC_TS_INVALID;
-    p->time_report = INT64_MIN;
     p->samples = samples;
     p->starving = true;
 }
@@ -158,25 +157,32 @@ void aout_PacketDestroy (audio_output_t *aout)
     vlc_mutex_destroy (&p->lock);
 }
 
-static block_t *aout_OutputSlice (audio_output_t *);
-
-void aout_PacketPlay (audio_output_t *aout, block_t *block,
-                      mtime_t *restrict drift)
+int aout_PacketTimeGet (audio_output_t *aout,  mtime_t *restrict pts)
 {
     aout_packet_t *p = aout_packet (aout);
     mtime_t time_report;
 
     vlc_mutex_lock (&p->lock);
+    time_report = date_Get (&p->fifo.end_date);
+    vlc_mutex_unlock (&p->lock);
+
+    if (time_report == VLC_TS_INVALID)
+        return -1;
+    *pts = time_report;
+    return 0;
+}
+
+static block_t *aout_OutputSlice (audio_output_t *);
+
+void aout_PacketPlay (audio_output_t *aout, block_t *block)
+{
+    aout_packet_t *p = aout_packet (aout);
+
+    vlc_mutex_lock (&p->lock);
     aout_FifoPush (&p->partial, block);
     while ((block = aout_OutputSlice (aout)) != NULL)
         aout_FifoPush (&p->fifo, block);
-
-    time_report = p->time_report;
-    p->time_report = INT64_MIN;
     vlc_mutex_unlock (&p->lock);
-
-    if (time_report != INT64_MIN)
-        *drift = time_report;
 }
 
 void aout_PacketPause (audio_output_t *aout, bool pause, mtime_t date)
@@ -375,7 +381,6 @@ block_t *aout_PacketNext (audio_output_t *p_aout, mtime_t start_date)
                           "adjusting dates (%"PRId64" us)", delta);
         aout_FifoMoveDates (&p->partial, delta);
         aout_FifoMoveDates (p_fifo, delta);
-        p->time_report = delta;
     }
     vlc_mutex_unlock( &p->lock );
     return p_buffer;

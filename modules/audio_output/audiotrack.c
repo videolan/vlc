@@ -266,6 +266,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
 
     aout->sys = p_sys;
+    aout->time_get = NULL;
     aout->play = Play;
     aout->pause = Pause;
 
@@ -287,9 +288,8 @@ static void Stop(audio_output_t* p_aout)
 }
 
 /* FIXME: lipsync */
-static void Play(audio_output_t* p_aout, block_t* p_buffer, mtime_t* restrict drift)
+static void Play(audio_output_t* p_aout, block_t* p_buffer)
 {
-    VLC_UNUSED(drift);
     aout_sys_t *p_sys = p_aout->sys;
 
     size_t length = 0;

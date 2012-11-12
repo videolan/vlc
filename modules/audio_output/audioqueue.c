@@ -123,6 +123,7 @@ static int Start( audio_output_t *aout, audio_sample_format_t *restrict fmt )
     fmt->i_physical_channels = AOUT_CHANS_STEREO;
     fmt->i_rate = 44100;
     aout_PacketInit(p_aout, &p_sys->packet, FRAME_SIZE, fmt);
+    p_aout->time_get = aout_PacketTimeGet;
     p_aout->play = aout_PacketPlay;
     p_aout->pause = aout_PacketPause;
     p_aout->flush = aout_PacketFlush;
