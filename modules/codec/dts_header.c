@@ -195,11 +195,9 @@ int GetSyncInfo( const uint8_t *p_buf,
                                      pi_bit_rate, pi_frame_length );
     }
     /* DTS-HD */
-    else
+    else if( p_buf[0] == 0x64 && p_buf[1] ==  0x58 &&
+                p_buf[2] == 0x20 && p_buf[3] ==  0x25 )
     {
-        assert( p_buf[0] == 0x64 && p_buf[1] ==  0x58 &&
-                p_buf[2] == 0x20 && p_buf[3] ==  0x25 );
-
         int i_dts_hd_size;
         bs_t s;
         bs_init( &s, &p_buf[4], DTS_HEADER_SIZE - 4 );
@@ -229,6 +227,10 @@ int GetSyncInfo( const uint8_t *p_buf,
         *pi_frame_length = ;
         */
         return i_dts_hd_size;
+    }
+    else
+    {
+        return VLC_EGENERIC;
     }
 
     *pb_dts_hd = false;

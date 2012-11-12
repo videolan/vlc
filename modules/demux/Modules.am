@@ -65,7 +65,7 @@ endif
 libvlc_LTLIBRARIES += $(LTLIBavformat)
 EXTRA_LTLIBRARIES += libavformat_plugin.la
 
-libes_plugin_la_SOURCES  = mpeg/es.c
+libes_plugin_la_SOURCES  = mpeg/es.c ../codec/dts_header.c ../codec/dts_header.h ../codec/a52.h
 libes_plugin_la_CFLAGS = $(AM_CFLAGS)
 libes_plugin_la_LIBADD = $(AM_LIBADD)
 

@@ -38,6 +38,7 @@
 #include <vlc_input.h>
 
 #include "../../codec/a52.h"
+#include "../../codec/dts_header.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -920,36 +921,7 @@ static int A52Init( demux_t *p_demux )
 static int DtsCheckSync( const uint8_t *p_peek, int *pi_samples )
 {
     /* TODO return frame size for robustness */
-
-    /* 14 bits, little endian version of the bitstream */
-    if( p_peek[0] == 0xff && p_peek[1] == 0x1f &&
-        p_peek[2] == 0x00 && p_peek[3] == 0xe8 &&
-        (p_peek[4] & 0xf0) == 0xf0 && p_peek[5] == 0x07 )
-    {
-        return 0;
-    }
-    /* 14 bits, big endian version of the bitstream */
-    else if( p_peek[0] == 0x1f && p_peek[1] == 0xff &&
-             p_peek[2] == 0xe8 && p_peek[3] == 0x00 &&
-             p_peek[4] == 0x07 && (p_peek[5] & 0xf0) == 0xf0)
-    {
-        return 0;
-    }
-    /* 16 bits, big endian version of the bitstream */
-    else if( p_peek[0] == 0x7f && p_peek[1] == 0xfe &&
-             p_peek[2] == 0x80 && p_peek[3] == 0x01 )
-    {
-        return 0;
-    }
-    /* 16 bits, little endian version of the bitstream */
-    else if( p_peek[0] == 0xfe && p_peek[1] == 0x7f &&
-             p_peek[2] == 0x01 && p_peek[3] == 0x80 )
-    {
-        return 0;
-    }
-
-    VLC_UNUSED(pi_samples);
-    return VLC_EGENERIC;
+    return SyncCode( p_peek );
 }
 
 static int DtsProbe( demux_t *p_demux, int64_t *pi_offset )
