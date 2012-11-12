@@ -432,6 +432,15 @@ void aout_OutputDelete (audio_output_t *aout)
     aout_FiltersPipelineDestroy (owner->converters, owner->nb_converters);
 }
 
+int aout_OutputTimeGet (audio_output_t *aout, mtime_t *pts)
+{
+    aout_assert_locked (aout);
+
+    if (aout->time_get == NULL)
+        return -1;
+    return aout->time_get (aout, pts);
+}
+
 /**
  * Plays a decoded audio buffer.
  * \note This can only be called after a succesful aout_OutputNew().
@@ -440,7 +449,6 @@ void aout_OutputDelete (audio_output_t *aout)
 void aout_OutputPlay (audio_output_t *aout, block_t *block)
 {
     aout_owner_t *owner = aout_owner (aout);
-    mtime_t drift;
 
     aout_assert_locked (aout);
 
@@ -454,31 +462,7 @@ void aout_OutputPlay (audio_output_t *aout, block_t *block)
         return;
     }
 
-    if (aout->time_get != NULL && aout->time_get (aout, &drift) == 0)
-        drift -= block->i_pts;
-    else
-        drift = 0;
-
     aout->play (aout, block);
-/**
- * Notifies the audio input of the drift from the requested audio
- * playback timestamp (@ref block_t.i_pts) to the anticipated playback time
- * as reported by the audio output hardware.
- * Depending on the drift amplitude, the input core may ignore the drift
- * trigger upsampling or downsampling, or even discard samples.
- * Future VLC versions may instead adjust the input decoding speed.
- *
- * The audio output plugin is responsible for estimating the time. Typically,
- * the audio output can estimate the total buffer delay. Then:
- *    pts = mdate() + delay
- */
-    if (drift < -AOUT_MAX_PTS_ADVANCE || +AOUT_MAX_PTS_DELAY < drift)
-    {
-        msg_Warn (aout, "not synchronized (%"PRId64" us), resampling",
-                  drift);
-        if (date_Get (&owner->sync.date) != VLC_TS_INVALID)
-            date_Move (&owner->sync.date, drift);
-    }
 }
 
 /**

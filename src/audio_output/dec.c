@@ -93,9 +93,9 @@ error:
         goto error;
     }
 
-    date_Init (&owner->sync.date, owner->mixer_format.i_rate, 1);
-    date_Set (&owner->sync.date, VLC_TS_INVALID);
+    owner->sync.end = VLC_TS_INVALID;
     owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
+    owner->sync.discontinuity = true;
     aout_unlock( p_aout );
 
     atomic_init (&owner->buffers_lost, 0);
@@ -147,6 +147,7 @@ static int aout_CheckRestart (audio_output_t *aout)
         aout_volume_SetFormat (owner->volume, owner->mixer_format.i_format);
     }
 
+    owner->sync.end = VLC_TS_INVALID;
     owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
 
     if (aout_FiltersNew (aout, &owner->input_format, &owner->mixer_format,
@@ -237,6 +238,138 @@ static void aout_StopResampling (audio_output_t *aout)
     aout_FiltersAdjustResampling (aout, 0);
 }
 
+static void aout_DecSilence (audio_output_t *aout, mtime_t length)
+{
+    aout_owner_t *owner = aout_owner (aout);
+    const audio_sample_format_t *fmt = &owner->mixer_format;
+    size_t frames = (fmt->i_rate * length) / CLOCK_FREQ;
+    block_t *block;
+
+    if (AOUT_FMT_SPDIF(fmt))
+        block = block_Alloc (4 * frames);
+    else
+        block = block_Alloc (frames * fmt->i_bytes_per_frame);
+    if (unlikely(block == NULL))
+        return; /* uho! */
+
+    msg_Dbg (aout, "inserting %zu zeroes", frames);
+    memset (block->p_buffer, 0, block->i_buffer);
+    block->i_nb_samples = frames;
+    block->i_length = length;
+    /* FIXME: PTS... */
+    aout_OutputPlay (aout, block);
+}
+
+static void aout_DecSynchronize (audio_output_t *aout, mtime_t dec_pts,
+                                 int input_rate)
+{
+    aout_owner_t *owner = aout_owner (aout);
+    mtime_t aout_pts, drift;
+
+retry:
+    /**
+     * Depending on the drift between the actual and intended playback times,
+     * the audio core may ignore the drift, trigger upsampling or downsampling,
+     * insert silence or even discard samples.
+     * Future VLC versions may instead adjust the input rate.
+     *
+     * The audio output plugin is responsible for estimating its actual
+     * playback time, or rather the estimated time when the next sample will
+     * be played. (The actual playback time is always the current time, that is
+     * to say mdate(). It is not an useful statistic.)
+     *
+     * Most audio output plugins can estimate the delay until playback of
+     * the next sample to be written to the buffer, or equally the time until
+     * all samples in the buffer will have been played. Then:
+     *    pts = mdate() + delay
+     */
+    if (aout_OutputTimeGet (aout, &aout_pts) != 0)
+        return; /* nothing can be done if timing is unknown */
+
+    drift = aout_pts - dec_pts;
+
+    if (drift < (owner->sync.discontinuity ? 0
+                : -3 * input_rate * AOUT_MAX_PTS_ADVANCE / INPUT_RATE_DEFAULT))
+    {   /* If the audio output is very early (which is rare other than during
+         * prebuffering), hold with silence. */
+        if (!owner->sync.discontinuity)
+            msg_Err (aout, "playback way too early (%"PRId64"): "
+                     "playing silence", drift);
+        aout_StopResampling (aout);
+        aout_DecSilence (aout, -drift);
+        owner->sync.discontinuity = false;
+        drift = 0;
+    }
+    else
+    if (drift > (owner->sync.discontinuity ? 0
+                  : +3 * input_rate * AOUT_MAX_PTS_DELAY / INPUT_RATE_DEFAULT))
+    {   /* If the audio output is very late, drop the buffers.
+         * This should make some room and advance playback quickly. */
+        if (!owner->sync.discontinuity)
+            msg_Err (aout, "playback way too late (%"PRId64"): "
+                     "flushing buffers", drift);
+        aout_StopResampling (aout);
+        owner->sync.end = VLC_TS_INVALID;
+        aout_OutputFlush (aout, false);
+        goto retry; /* may be too early now... retry */
+    }
+
+    if (drift < -AOUT_MAX_PTS_ADVANCE)
+    {
+        if (owner->sync.resamp_type == AOUT_RESAMPLING_NONE)
+        {
+            msg_Warn (aout, "playback too early (%"PRId64"): down-sampling",
+                      drift);
+            owner->sync.resamp_start_drift = -drift;
+        }
+        owner->sync.resamp_type = AOUT_RESAMPLING_DOWN;
+    }
+    else
+    if (drift > +AOUT_MAX_PTS_DELAY)
+    {
+        if (owner->sync.resamp_type == AOUT_RESAMPLING_NONE)
+        {
+            msg_Warn (aout, "playback too late (%"PRId64"): up-sampling",
+                      drift);
+            owner->sync.resamp_start_drift = +drift;
+        }
+        owner->sync.resamp_type = AOUT_RESAMPLING_UP;
+    }
+
+    if (owner->sync.resamp_type == AOUT_RESAMPLING_NONE)
+        return; /* Everything is fine. Nothing to do. */
+
+    /* Resampling has been triggered earlier. This checks if it needs to be
+     * increased or decreased. Resampling rate changes must be kept slow for
+     * the comfort of listeners. */
+    const int adj = (owner->sync.resamp_type == AOUT_RESAMPLING_UP) ? +2 : -2;
+
+    /* Check if everything is back to normal, then stop resampling. */
+    if (!aout_FiltersAdjustResampling (aout, adj))
+    {
+        owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
+        msg_Dbg (aout, "resampling stopped (drift: %"PRId64" us)", drift);
+    }
+    else
+    if (2 * llabs (drift) <= owner->sync.resamp_start_drift)
+    {   /* If the drift has been reduced from more than half its initial
+         * value, then it is time to switch back the resampling direction. */
+        if (owner->sync.resamp_type == AOUT_RESAMPLING_UP)
+            owner->sync.resamp_type = AOUT_RESAMPLING_DOWN;
+        else
+            owner->sync.resamp_type = AOUT_RESAMPLING_UP;
+        owner->sync.resamp_start_drift = 0;
+    }
+    else
+    if (llabs (drift) > 2 * owner->sync.resamp_start_drift)
+    {   /* If the drift is ever increasing, then something is seriously wrong.
+         * Cease resampling and hope for the best. */
+        msg_Err (aout, "timing screwed (drift: %"PRId64" us): "
+                 "stopping resampling", drift);
+        aout_StopResampling (aout);
+    }
+}
+
 /*****************************************************************************
  * aout_DecPlay : filter & mix the decoded buffer
  *****************************************************************************/
@@ -255,137 +388,40 @@ int aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
     if (unlikely(aout_CheckRestart (aout)))
         goto drop; /* Pipeline is unrecoverably broken :-( */
 
-    /* We don't care if someone changes the start date behind our back after
-     * this. We'll deal with that when pushing the buffer, and compensate
-     * with the next incoming buffer. */
-    mtime_t start_date = date_Get (&owner->sync.date);
-    const mtime_t now = mdate ();
-
-    if (start_date != VLC_TS_INVALID && start_date < now)
-    {   /* The decoder is _very_ late. This can only happen if the user
-         * pauses the stream (or if the decoder is buggy, which cannot
-         * happen :). */
-        msg_Warn (aout, "computed PTS is out of range (%"PRId64"), "
-                  "clearing out", now - start_date);
-        aout_OutputFlush (aout, false);
-        if (owner->sync.resamp_type != AOUT_RESAMPLING_NONE)
-            msg_Warn (aout, "timing screwed, stopping resampling");
-        aout_StopResampling (aout);
-        block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-        start_date = VLC_TS_INVALID;
-    }
-
-    if (block->i_pts < now + AOUT_MIN_PREPARE_TIME)
-    {   /* The decoder gives us f*cked up PTS. It's its business, but we
-         * can't present it anyway, so drop the buffer. */
-        msg_Warn (aout, "PTS is out of range (%"PRId64"), dropping buffer",
-                  now - block->i_pts);
-        aout_StopResampling (aout);
+    const mtime_t now = mdate (), advance = block->i_pts - now;
+    if (advance < AOUT_MIN_PREPARE_TIME)
+    {   /* Late buffer can be caused by bugs in the decoder, by scheduling
+         * latency spikes (excessive load, SIGSTOP, etc.) or if buffering is
+         * insufficient. We assume the PTS is wrong and play the buffer anyway:
+         * Hopefully video has encountered a similar PTS problem as audio. */
+        msg_Warn (aout, "buffer too late (%"PRId64" us): dropped", advance);
         goto drop;
     }
-
-    /* If the audio drift is too big then it's not worth trying to resample
-     * the audio. */
-    if (start_date == VLC_TS_INVALID)
-    {
-        start_date = block->i_pts;
-        date_Set (&owner->sync.date, start_date);
-    }
-
-    mtime_t drift = start_date - block->i_pts;
-    if (drift < -input_rate * 3 * AOUT_MAX_PTS_ADVANCE / INPUT_RATE_DEFAULT)
-    {
-        msg_Warn (aout, "buffer way too early (%"PRId64"), clearing queue",
-                  drift);
-        aout_OutputFlush (aout, false);
-        if (owner->sync.resamp_type != AOUT_RESAMPLING_NONE)
-            msg_Warn (aout, "timing screwed, stopping resampling");
-        aout_StopResampling (aout);
-        block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-        start_date = block->i_pts;
-        date_Set (&owner->sync.date, start_date);
-        drift = 0;
-    }
-    else
-    if (drift > +input_rate * 3 * AOUT_MAX_PTS_DELAY / INPUT_RATE_DEFAULT)
-    {
-        msg_Warn (aout, "buffer way too late (%"PRId64"), dropping buffer",
-                  drift);
+    if (advance > AOUT_MAX_ADVANCE_TIME)
+    {   /* Early buffers can only be caused by bugs in the decoder. */
+        msg_Err (aout, "buffer too early (%"PRId64" us): dropped", advance);
         goto drop;
     }
 
     block = aout_FiltersPlay (aout, block, input_rate);
     if (block == NULL)
-    {
-        atomic_fetch_add(&owner->buffers_lost, 1);
-        goto out;
-    }
-
-    /* Adjust the resampler if needed.
-     * We first need to calculate the output rate of this resampler. */
-    if ((owner->sync.resamp_type == AOUT_RESAMPLING_NONE)
-     && (drift < -AOUT_MAX_PTS_ADVANCE || drift > +AOUT_MAX_PTS_DELAY))
-    {   /* Can happen in several circumstances :
-         * 1. A problem at the input (clock drift)
-         * 2. A small pause triggered by the user
-         * 3. Some delay in the output stage, causing a loss of lip
-         *    synchronization
-         * Solution : resample the buffer to avoid a scratch.
-         */
-        owner->sync.resamp_start_drift = (int)-drift;
-        owner->sync.resamp_type = (drift < 0) ? AOUT_RESAMPLING_DOWN
-                                             : AOUT_RESAMPLING_UP;
-        msg_Warn (aout, (drift < 0)
-                  ? "buffer too early (%"PRId64"), down-sampling"
-                  : "buffer too late  (%"PRId64"), up-sampling", drift);
-    }
-    if (owner->sync.resamp_type != AOUT_RESAMPLING_NONE)
-    {   /* Resampling has been triggered previously (because of dates
-         * mismatch). We want the resampling to happen progressively so
-         * it isn't too audible to the listener. */
-        const int adjust = (owner->sync.resamp_type == AOUT_RESAMPLING_UP)
-            ? +2 : -2;
-        /* Check if everything is back to normal, then stop resampling. */
-        if (!aout_FiltersAdjustResampling (aout, adjust))
-        {
-            owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
-            msg_Warn (aout, "resampling stopped (drift: %"PRIi64")",
-                      block->i_pts - start_date);
-        }
-        else if (abs ((int)(block->i_pts - start_date))
-                                    < abs (owner->sync.resamp_start_drift) / 2)
-        {   /* If we reduced the drift from half, then it is time to switch
-             * back the resampling direction. */
-            if (owner->sync.resamp_type == AOUT_RESAMPLING_UP)
-                owner->sync.resamp_type = AOUT_RESAMPLING_DOWN;
-            else
-                owner->sync.resamp_type = AOUT_RESAMPLING_UP;
-            owner->sync.resamp_start_drift = 0;
-        }
-        else if (owner->sync.resamp_start_drift
-              && (abs ((int)(block->i_pts - start_date))
-                               > abs (owner->sync.resamp_start_drift) * 3 / 2))
-        {   /* If the drift is increasing and not decreasing, than something
-             * is bad. We'd better stop the resampling right now. */
-            msg_Warn (aout, "timing screwed, stopping resampling");
-            aout_StopResampling (aout);
-            block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-        }
-    }
-
-    block->i_pts = start_date;
-    date_Increment (&owner->sync.date, block->i_nb_samples);
+        goto lost;
 
     /* Software volume */
     aout_volume_Amplify (owner->volume, block);
 
+    /* Drift correction */
+    aout_DecSynchronize (aout, block->i_pts, input_rate);
+
     /* Output */
+    owner->sync.end = block->i_pts + block->i_length + 1;
     aout_OutputPlay (aout, block);
 out:
     aout_unlock (aout);
     return 0;
 drop:
     block_Release (block);
+lost:
     atomic_fetch_add(&owner->buffers_lost, 1);
     goto out;
 }
@@ -401,8 +437,13 @@ void aout_DecChangePause (audio_output_t *aout, bool paused, mtime_t date)
     aout_owner_t *owner = aout_owner (aout);
 
     aout_lock (aout);
-    /* XXX: Should the date be offset by the pause duration instead? */
-    date_Set (&owner->sync.date, VLC_TS_INVALID);
+    if (owner->sync.end != VLC_TS_INVALID)
+    {
+        if (paused)
+            owner->sync.end -= date;
+        else
+            owner->sync.end += date;
+    }
     aout_OutputPause (aout, paused, date);
     aout_unlock (aout);
 }
@@ -412,7 +453,7 @@ void aout_DecFlush (audio_output_t *aout)
     aout_owner_t *owner = aout_owner (aout);
 
     aout_lock (aout);
-    date_Set (&owner->sync.date, VLC_TS_INVALID);
+    owner->sync.end = VLC_TS_INVALID;
     aout_OutputFlush (aout, false);
     aout_unlock (aout);
 }
@@ -420,12 +461,12 @@ void aout_DecFlush (audio_output_t *aout)
 bool aout_DecIsEmpty (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
-    mtime_t end_date, now = mdate ();
-    bool empty;
+    mtime_t now = mdate ();
+    bool empty = true;
 
     aout_lock (aout);
-    end_date = date_Get (&owner->sync.date);
-    empty = end_date == VLC_TS_INVALID || end_date <= now;
+    if (owner->sync.end != VLC_TS_INVALID)
+        empty = owner->sync.end <= now;
     if (empty)
         /* The last PTS has elapsed already. So the underlying audio output
          * buffer should be empty or almost. Thus draining should be fast

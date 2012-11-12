@@ -54,9 +54,10 @@ typedef struct
 
     struct
     {
-        date_t date;
-        int resamp_type;
-        int resamp_start_drift;
+        mtime_t end; /**< Last seen PTS */
+        unsigned resamp_start_drift; /**< Resampler drift absolute value */
+        int resamp_type; /**< Resampler mode (FIXME: redundant / resampling) */
+        bool discontinuity;
     } sync;
 
     audio_sample_format_t input_format;
@@ -124,7 +125,8 @@ void aout_Destroy (audio_output_t *);
 
 int aout_OutputNew( audio_output_t * p_aout,
                     const audio_sample_format_t * p_format );
-void aout_OutputPlay( audio_output_t * p_aout, block_t * p_buffer );
+int aout_OutputTimeGet(audio_output_t *, mtime_t *);
+void aout_OutputPlay(audio_output_t *, block_t *);
 void aout_OutputPause( audio_output_t * p_aout, bool, mtime_t );
 void aout_OutputFlush( audio_output_t * p_aout, bool );
 void aout_OutputDelete( audio_output_t * p_aout );
