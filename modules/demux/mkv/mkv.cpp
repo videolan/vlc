@@ -641,7 +641,7 @@ msg_Dbg( p_demux, "block i_dts: %"PRId64" / i_pts: %"PRId64, p_block->i_dts, p_b
 #endif
         if( strcmp( tk->psz_codec, "S_VOBSUB" ) )
         {
-            p_block->i_length = i_duration * 1000;
+            p_block->i_length = i_duration * tk-> f_timecodescale * (double) p_segment->i_timescale / 1000.0;
         }
 
         /* FIXME remove when VLC_TS_INVALID work is done */
