@@ -114,7 +114,7 @@ static void *InitLibrary(struct aout_sys_t *p_sys);
 
 static int  Open(vlc_object_t *);
 static void Close(vlc_object_t *);
-static void Play(audio_output_t*, block_t*, mtime_t* restrict);
+static void Play(audio_output_t*, block_t*);
 static void Pause (audio_output_t *, bool, mtime_t);
 
 vlc_module_begin ()
