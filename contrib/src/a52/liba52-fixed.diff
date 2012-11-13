@@ -1,6 +1,93 @@
-diff -ruN a52dec.orig/liba52.orig/a52_internal.h a52dec/liba52/a52_internal.h
---- a52dec.orig/liba52/a52_internal.h	2002-07-28 03:52:06.000000000 +0200
-+++ a52dec/liba52/a52_internal.h	2008-07-23 14:03:02.000000000 +0200
+diff -ruN a52dec.orig/include/a52.h a52dec/include/a52.h
+--- a52dec.orig/include/a52.h	2012-11-13 17:25:33.438758556 +0100
++++ a52dec/include/a52.h	2012-11-13 17:27:31.143704187 +0100
+@@ -1,6 +1,6 @@
+ /*
+  * a52.h
+- * Copyright (C) 2000-2002 Michel Lespinasse <walken@zoy.org>
++ * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
+  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
+  *
+  * This file is part of a52dec, a free ATSC A-52 stream decoder.
+@@ -24,10 +24,15 @@
+ #ifndef A52_H
+ #define A52_H
+ 
+-#ifndef LIBA52_DOUBLE
+-typedef float sample_t;
+-#else
++#if defined(LIBA52_FIXED)
++typedef int32_t sample_t;
++typedef int32_t level_t;
++#elif defined(LIBA52_DOUBLE)
+ typedef double sample_t;
++typedef double level_t;
++#else
++typedef float sample_t;
++typedef float level_t;
+ #endif
+ 
+ typedef struct a52_state_s a52_state_t;
+@@ -53,9 +58,9 @@
+ int a52_syncinfo (uint8_t * buf, int * flags,
+ 		  int * sample_rate, int * bit_rate);
+ int a52_frame (a52_state_t * state, uint8_t * buf, int * flags,
+-	       sample_t * level, sample_t bias);
++	       level_t * level, sample_t bias);
+ void a52_dynrng (a52_state_t * state,
+-		 sample_t (* call) (sample_t, void *), void * data);
++		 level_t (* call) (level_t, void *), void * data);
+ int a52_block (a52_state_t * state);
+ void a52_free (a52_state_t * state);
+ 
+diff -ruN a52dec.orig/include/attributes.h a52dec/include/attributes.h
+--- a52dec.orig/include/attributes.h	2012-11-13 17:25:33.438758556 +0100
++++ a52dec/include/attributes.h	2012-11-13 17:27:31.147037566 +0100
+@@ -1,6 +1,6 @@
+ /*
+  * attributes.h
+- * Copyright (C) 2000-2002 Michel Lespinasse <walken@zoy.org>
++ * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
+  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
+  *
+  * This file is part of a52dec, a free ATSC A-52 stream decoder.
+@@ -27,3 +27,11 @@
+ #else
+ #define ATTR_ALIGN(align)
+ #endif
++
++#ifdef HAVE_BUILTIN_EXPECT
++#define likely(x) __builtin_expect ((x) != 0, 1)
++#define unlikely(x) __builtin_expect ((x) != 0, 0)
++#else
++#define likely(x) (x)
++#define unlikely(x) (x)
++#endif
+diff -ruN a52dec.orig/include/mm_accel.h a52dec/include/mm_accel.h
+--- a52dec.orig/include/mm_accel.h	2012-11-13 17:25:33.438758556 +0100
++++ a52dec/include/mm_accel.h	2012-11-13 17:27:31.147037566 +0100
+@@ -1,6 +1,6 @@
+ /*
+  * mm_accel.h
+- * Copyright (C) 2000-2002 Michel Lespinasse <walken@zoy.org>
++ * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
+  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
+  *
+  * This file is part of a52dec, a free ATSC A-52 stream decoder.
+diff -ruN a52dec.orig/include/tendra.h a52dec/include/tendra.h
+--- a52dec.orig/include/tendra.h	2012-11-13 17:25:33.438758556 +0100
++++ a52dec/include/tendra.h	2012-11-13 17:27:31.147037566 +0100
+@@ -1,6 +1,6 @@
+ /*
+  * tendra.h
+- * Copyright (C) 2000-2002 Michel Lespinasse <walken@zoy.org>
++ * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
+  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
+  *
+  * This file is part of a52dec, a free ATSC A-52 stream decoder.
+diff -ruN a52dec.orig/liba52/a52_internal.h a52dec/liba52/a52_internal.h
+--- a52dec.orig/liba52/a52_internal.h	2012-11-13 17:25:33.438758556 +0100
++++ a52dec/liba52/a52_internal.h	2012-11-13 17:27:31.147037566 +0100
 @@ -1,6 +1,6 @@
  /*
   * a52_internal.h
@@ -125,9 +212,9 @@ diff -ruN a52dec.orig/liba52.orig/a52_internal.h a52dec/liba52/a52_internal.h
 +#define BIAS(x) ((x) + (bias*0))
 +
 +#endif
-diff -ruN a52dec.orig/liba52.orig/bit_allocate.c a52dec/liba52/bit_allocate.c
---- a52dec.orig/liba52/bit_allocate.c	2002-02-19 07:20:20.000000000 +0100
-+++ a52dec/liba52/bit_allocate.c	2008-07-23 14:03:01.000000000 +0200
+diff -ruN a52dec.orig/liba52/bit_allocate.c a52dec/liba52/bit_allocate.c
+--- a52dec.orig/liba52/bit_allocate.c	2012-11-13 17:25:33.438758556 +0100
++++ a52dec/liba52/bit_allocate.c	2012-11-13 17:27:31.147037566 +0100
 @@ -1,6 +1,6 @@
  /*
   * bit_allocate.c
@@ -185,9 +272,9 @@ diff -ruN a52dec.orig/liba52.orig/bit_allocate.c a52dec/liba52/bit_allocate.c
  	psd = 128 * exp[j++];
  	while (j < endband) {
  	    int next, delta;
-diff -ruN a52dec.orig/liba52.orig/bitstream.c a52dec/liba52/bitstream.c
---- a52dec.orig/liba52/bitstream.c	2002-07-28 03:52:06.000000000 +0200
-+++ a52dec/liba52/bitstream.c	2008-07-23 14:03:01.000000000 +0200
+diff -ruN a52dec.orig/liba52/bitstream.c a52dec/liba52/bitstream.c
+--- a52dec.orig/liba52/bitstream.c	2012-11-13 17:25:33.442091935 +0100
++++ a52dec/liba52/bitstream.c	2012-11-13 17:27:31.147037566 +0100
 @@ -1,6 +1,6 @@
  /*
   * bitstream.c
@@ -215,9 +302,9 @@ diff -ruN a52dec.orig/liba52.orig/bitstream.c a52dec/liba52/bitstream.c
  }
  
  static inline void bitstream_fill_current (a52_state_t * state)
-diff -ruN a52dec.orig/liba52.orig/bitstream.h a52dec/liba52/bitstream.h
---- a52dec.orig/liba52/bitstream.h	2002-07-28 03:52:07.000000000 +0200
-+++ a52dec/liba52/bitstream.h	2008-07-23 14:03:02.000000000 +0200
+diff -ruN a52dec.orig/liba52/bitstream.h a52dec/liba52/bitstream.h
+--- a52dec.orig/liba52/bitstream.h	2012-11-13 17:25:33.442091935 +0100
++++ a52dec/liba52/bitstream.h	2012-11-13 17:27:31.147037566 +0100
 @@ -1,6 +1,6 @@
  /*
   * bitstream.h
@@ -268,9 +355,9 @@ diff -ruN a52dec.orig/liba52.orig/bitstream.h a52dec/liba52/bitstream.h
  #endif
  
  void a52_bitstream_set_ptr (a52_state_t * state, uint8_t * buf);
-diff -ruN a52dec.orig/liba52.orig/config-a52.h a52dec/liba52/config-a52.h
+diff -ruN a52dec.orig/liba52/config-a52.h a52dec/liba52/config-a52.h
 --- a52dec.orig/liba52/config-a52.h	1970-01-01 01:00:00.000000000 +0100
-+++ a52dec/liba52/config-a52.h	2008-07-23 14:03:01.000000000 +0200
++++ a52dec/liba52/config-a52.h	2012-11-13 17:27:31.150370945 +0100
 @@ -0,0 +1,26 @@
 +#define IDATA_ATTR
 +#define IBSS_ATTR
@@ -298,9 +385,9 @@ diff -ruN a52dec.orig/liba52.orig/config-a52.h a52dec/liba52/config-a52.h
 +#define WORDS_BIGENDIAN 1
 +#endif
 +
-diff -ruN a52dec.orig/liba52.orig/downmix.c a52dec/liba52/downmix.c
---- a52dec.orig/liba52/downmix.c	2002-01-28 06:37:54.000000000 +0100
-+++ a52dec/liba52/downmix.c	2008-07-23 14:03:02.000000000 +0200
+diff -ruN a52dec.orig/liba52/downmix.c a52dec/liba52/downmix.c
+--- a52dec.orig/liba52/downmix.c	2012-11-13 17:25:33.442091935 +0100
++++ a52dec/liba52/downmix.c	2012-11-13 17:27:31.150370945 +0100
 @@ -1,6 +1,6 @@
  /*
   * downmix.c
@@ -780,9 +867,9 @@ diff -ruN a52dec.orig/liba52.orig/downmix.c a52dec/liba52/downmix.c
  	break;
      }
  }
-diff -ruN a52dec.orig/liba52.orig/imdct.c a52dec/liba52/imdct.c
---- a52dec.orig/liba52/imdct.c	2002-07-28 03:52:07.000000000 +0200
-+++ a52dec/liba52/imdct.c	2008-07-23 14:03:01.000000000 +0200
+diff -ruN a52dec.orig/liba52/imdct.c a52dec/liba52/imdct.c
+--- a52dec.orig/liba52/imdct.c	2012-11-13 17:25:33.438758556 +0100
++++ a52dec/liba52/imdct.c	2012-11-13 17:27:31.150370945 +0100
 @@ -1,6 +1,6 @@
  /*
   * imdct.c
@@ -1103,7 +1190,7 @@ diff -ruN a52dec.orig/liba52.orig/imdct.c a52dec/liba52/imdct.c
  static double besselI0 (double x)
  {
      double bessel = 1;
-@@ -361,71 +356,121 @@
+@@ -361,66 +356,118 @@
      while (--i);
      return bessel;
  }
@@ -1232,7 +1319,6 @@ diff -ruN a52dec.orig/liba52.orig/imdct.c a52dec/liba52/imdct.c
 +
  #ifdef LIBA52_DJBFFT
      if (mm_accel & MM_ACCEL_DJBFFT) {
--	fprintf (stderr, "Using djbfft for IMDCT transform\n");
 +#ifndef LIBA52_DOUBLE
  	ifft128 = (void (*) (complex_t *)) fftc4_un128;
  	ifft64 = (void (*) (complex_t *)) fftc4_un64;
@@ -1243,13 +1329,9 @@ diff -ruN a52dec.orig/liba52.orig/imdct.c a52dec/liba52/imdct.c
      } else
  #endif
      {
--	fprintf (stderr, "No accelerated IMDCT transform found\n");
- 	ifft128 = ifft128_c;
- 	ifft64 = ifft64_c;
-     }
-diff -ruN a52dec.orig/liba52.orig/imdct_lookups.h a52dec/liba52/imdct_lookups.h
+diff -ruN a52dec.orig/liba52/imdct_lookups.h a52dec/liba52/imdct_lookups.h
 --- a52dec.orig/liba52/imdct_lookups.h	1970-01-01 01:00:00.000000000 +0100
-+++ a52dec/liba52/imdct_lookups.h	2008-07-23 14:03:02.000000000 +0200
++++ a52dec/liba52/imdct_lookups.h	2012-11-13 17:27:31.150370945 +0100
 @@ -0,0 +1,15 @@
 +static sample_t a52_imdct_window[256]IDATA_ATTR={
 +				       146020,261886,393529,545197,719447,918478,1144416,1399394,1685589,2005234,2360623,2754115,3188134,3665170,4187773,4758556, 5380193,6055411,6786995,7577779,8430645,9348521,10334375,11391212,12522071,13730020,15018150,16389576,17847424,19394833,21034947,22770912, 24605865,26542938,28585242,30735872,32997891,35374332,37868188,40482408,43219889,46083473,49075937,52199993,55458273,58853331,62387636,66063559, 69883377,73849259,77963266,82227341,86643307,91212859,95937560,100818835,105857968,111056092,116414194,121933098,127613474,133455822,139460477,145627601, 151957182,158449029,165102772,171917855,178893540,186028900,193322822,200774000,208380940,216141958,224055176,232118527,240329753,248686407,257185854,265825270, 274601649,283511802,292552357,301719768,311010314,320420105,329945084,339581031,349323572,359168178,369110174,379144743,389266934,399471665,409753732,420107815, 430528483,441010205,451547355,462134219,472765003,483433845,494134818,504861939,515609181,526370480,537139740,547910849,558677680,569434108,580174011,590891284, 601579849,612233658,622846709,633413050,643926788,654382103,664773249,675094567,685340494,695505569,705584441,715571877,725462772,735252152,744935184,754507184, 763963620,773300119,782512477,791596659,800548807,809365245,818042484,826577226,834966364,843206992,851296404,859232096,867011771,874633340,882094922,889394844, 896531647,903504079,910311101,916951881,923425798,929732436,935871584,941843233,947647575,953284997,958756080,964061593,969202490,974179906,978995149,983649698, 988145195,992483442,996666390,1000696136,1004574919,1008305104,1011889185,1015329772,1018629583,1021791439,1024818257,1027713038,1030478862,1033118881,1035636308,1038034411, 1040316504,1042485942,1044546109,1046500412,1048352275,1050105129,1051762405,1053327531,1054803917,1056194958,1057504020,1058734435,1059889501,1060972468,1061986539,1062934861, 1063820523,1064646551,1065415903,1066131467,1066796055,1067412403,1067983168,1068510924,1068998160,1069447282,1069860607,1070240366,1070588702,1070907668,1071199230,1071465266, 1071707567,1071927836,1072127692,1072308670,1072472221,1072619716,1072752449,1072871635,1072978415,1073073858,1073158963,1073234663,1073301826,1073361257,1073413702,1073459852, 1073500344,1073535763,1073566646,1073593486,1073616731,1073636791,1073654036,1073668804,1073681398,1073692090,1073701126,1073708726,1073715084,1073720373,1073724748,1073728344, 1073731279,1073733657,1073735568,1073737090,1073738291,1073739229,1073739951,1073740500,1073740912,1073741214,1073741431,1073741582,1073741685,1073741751,1073741792,1073741814
@@ -1266,9 +1348,9 @@ diff -ruN a52dec.orig/liba52.orig/imdct_lookups.h a52dec/liba52/imdct_lookups.h
 +
 +static complex_t pre2[64]IDATA_ATTR={{1073721611,-6588355},{763894503,754577161},{994510674,404808624},{416982318,989468165},{1054375675,203010932},{602005783,889106597},{215934457,1051805026},{896427186,591049747},{1069197119,98686490},{686254647,825818420},{950043650,500338452},{317989594,1025575020},{111799753,1067905576},{834177638,676068911},{1029400017,305380267},{511959274,943832191},{1072751541,46104602},{725949012,791150766},{973449725,453119340},{367929143,1008736660},{1043144359,254502159},{557654248,917574653},{164064728,1061133483},{866345963,634323399},{59265442,1072104991},{799999705,716185713},{1013175760,355522688},{465030947,967815955},{1063066908,151030634},{644907034,858496605},{267283981,1039942680},{924348836,546352205},{1073559912,19764075},{745146182,773096806},{984276645,429093217},{392573967,999403414},{1049075979,228825463},{580004702,903612776},{190056834,1056787539},{881652112,612871159},{1066453209,124896178},{665781361,842411231},{937478594,523502998},{292724951,1033069991},{85558366,1070327646},{817334837,696337035},{1021595574,330551034},{488642280,956112036},{32936819,1073236539},{782182683,735602987},{1004145647,380280189},{441139495,978936897},{1059040255,177074114},{623644238,874064853},{241682009,1046188946},{910662286,568872310},{1071296985,72417357},{706314558,808728167},{962036435,476872521},{343062693,1017462280},{137973795,1064840239},{850517961,655393547},{1036584388,280025551},{534967883,930983817}};
 +static complex_t post2[32]IDATA_ATTR={{1073660973,13176463},{1073014239,39521454},{1071721163,65842639},{1069782521,92124162},{1067199482,118350193},{1063973603,144504935},{1060106825,170572632},{1055601479,196537583},{1050460278,222384146},{1044686318,248096754},{1038283079,273659918},{1031254417,299058239},{1023604566,324276418},{1015338134,349299266},{1006460100,374111709},{996975812,398698801},{986890983,423045731},{976211688,447137835},{964944359,470960600},{953095785,494499675},{940673100,517740882},{927683790,540670222},{914135677,563273882},{900036924,585538247},{885396022,607449906},{870221790,628995659},{854523369,650162530},{838310215,670937766},{821592095,691308855},{804379078,711263525},{786681534,730789756},{768510121,749875787}};
-diff -ruN a52dec.orig/liba52.orig/parse.c a52dec/liba52/parse.c
---- a52dec.orig/liba52/parse.c	2002-07-28 03:52:07.000000000 +0200
-+++ a52dec/liba52/parse.c	2008-07-23 14:03:02.000000000 +0200
+diff -ruN a52dec.orig/liba52/parse.c a52dec/liba52/parse.c
+--- a52dec.orig/liba52/parse.c	2012-11-13 17:25:33.438758556 +0100
++++ a52dec/liba52/parse.c	2012-11-13 17:27:31.150370945 +0100
 @@ -1,6 +1,6 @@
  /*
   * parse.c
@@ -1785,9 +1867,9 @@ diff -ruN a52dec.orig/liba52.orig/parse.c a52dec/liba52/parse.c
      free (state);
 +    */
  }
-diff -ruN a52dec.orig/liba52.orig/tables.h a52dec/liba52/tables.h
---- a52dec.orig/liba52/tables.h	2002-03-05 09:10:43.000000000 +0100
-+++ a52dec/liba52/tables.h	2008-07-23 14:03:01.000000000 +0200
+diff -ruN a52dec.orig/liba52/tables.h a52dec/liba52/tables.h
+--- a52dec.orig/liba52/tables.h	2012-11-13 17:25:33.438758556 +0100
++++ a52dec/liba52/tables.h	2012-11-13 17:27:31.150370945 +0100
 @@ -1,6 +1,6 @@
  /*
   * tables.h
@@ -1967,90 +2049,3 @@ diff -ruN a52dec.orig/liba52.orig/tables.h a52dec/liba52/tables.h
  
  static const uint16_t dither_lut[256] = {
      0x0000, 0xa011, 0xe033, 0x4022, 0x6077, 0xc066, 0x8044, 0x2055,
-diff -ruN a52dec.orig/include.orig/a52.h a52dec/include/a52.h
---- a52dec.orig/include/a52.h	2008-07-23 14:10:23.000000000 +0200
-+++ a52dec/include/a52.h	2008-07-23 14:10:36.000000000 +0200
-@@ -1,6 +1,6 @@
- /*
-  * a52.h
-- * Copyright (C) 2000-2002 Michel Lespinasse <walken@zoy.org>
-+ * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
-  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
-  *
-  * This file is part of a52dec, a free ATSC A-52 stream decoder.
-@@ -24,10 +24,15 @@
- #ifndef A52_H
- #define A52_H
- 
--#ifndef LIBA52_DOUBLE
--typedef float sample_t;
--#else
-+#if defined(LIBA52_FIXED)
-+typedef int32_t sample_t;
-+typedef int32_t level_t;
-+#elif defined(LIBA52_DOUBLE)
- typedef double sample_t;
-+typedef double level_t;
-+#else
-+typedef float sample_t;
-+typedef float level_t;
- #endif
- 
- typedef struct a52_state_s a52_state_t;
-@@ -53,9 +58,9 @@
- int a52_syncinfo (uint8_t * buf, int * flags,
- 		  int * sample_rate, int * bit_rate);
- int a52_frame (a52_state_t * state, uint8_t * buf, int * flags,
--	       sample_t * level, sample_t bias);
-+	       level_t * level, sample_t bias);
- void a52_dynrng (a52_state_t * state,
--		 sample_t (* call) (sample_t, void *), void * data);
-+		 level_t (* call) (level_t, void *), void * data);
- int a52_block (a52_state_t * state);
- void a52_free (a52_state_t * state);
- 
-diff -ruN a52dec.orig/include.orig/attributes.h a52dec/include/attributes.h
---- a52dec.orig/include/attributes.h	2008-07-23 14:10:23.000000000 +0200
-+++ a52dec/include/attributes.h	2008-07-23 14:10:36.000000000 +0200
-@@ -1,6 +1,6 @@
- /*
-  * attributes.h
-- * Copyright (C) 2000-2002 Michel Lespinasse <walken@zoy.org>
-+ * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
-  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
-  *
-  * This file is part of a52dec, a free ATSC A-52 stream decoder.
-@@ -27,3 +27,11 @@
- #else
- #define ATTR_ALIGN(align)
- #endif
-+
-+#ifdef HAVE_BUILTIN_EXPECT
-+#define likely(x) __builtin_expect ((x) != 0, 1)
-+#define unlikely(x) __builtin_expect ((x) != 0, 0)
-+#else
-+#define likely(x) (x)
-+#define unlikely(x) (x)
-+#endif
-diff -ruN a52dec.orig/include.orig/mm_accel.h a52dec/include/mm_accel.h
---- a52dec.orig/include/mm_accel.h	2008-07-23 14:10:23.000000000 +0200
-+++ a52dec/include/mm_accel.h	2008-07-23 14:10:36.000000000 +0200
-@@ -1,6 +1,6 @@
- /*
-  * mm_accel.h
-- * Copyright (C) 2000-2002 Michel Lespinasse <walken@zoy.org>
-+ * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
-  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
-  *
-  * This file is part of a52dec, a free ATSC A-52 stream decoder.
-diff -ruN a52dec.orig/include.orig/tendra.h a52dec/include/tendra.h
---- a52dec.orig/include/tendra.h	2008-07-23 14:10:23.000000000 +0200
-+++ a52dec/include/tendra.h	2008-07-23 14:10:36.000000000 +0200
-@@ -1,6 +1,6 @@
- /*
-  * tendra.h
-- * Copyright (C) 2000-2002 Michel Lespinasse <walken@zoy.org>
-+ * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
-  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
-  *
-  * This file is part of a52dec, a free ATSC A-52 stream decoder.
