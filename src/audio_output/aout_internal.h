@@ -70,8 +70,6 @@ typedef struct
     unsigned nb_filters;
     filter_t *filters[AOUT_MAX_FILTERS]; /**< Configured user filters
         (e.g. equalization) and their conversions */
-    unsigned nb_converters;
-    filter_t *converters[5]; /**< Converters to the output */
 
     aout_request_vout_t request_vout;
     bool recycle_vout;
@@ -123,8 +121,7 @@ audio_output_t *aout_New (vlc_object_t *);
 #define aout_New(a) aout_New(VLC_OBJECT(a))
 void aout_Destroy (audio_output_t *);
 
-int aout_OutputNew( audio_output_t * p_aout,
-                    const audio_sample_format_t * p_format );
+int aout_OutputNew(audio_output_t *, audio_sample_format_t *);
 int aout_OutputTimeGet(audio_output_t *, mtime_t *);
 void aout_OutputPlay(audio_output_t *, block_t *);
 void aout_OutputPause( audio_output_t * p_aout, bool, mtime_t );

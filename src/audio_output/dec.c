@@ -75,10 +75,13 @@ int aout_DecNew( audio_output_t *p_aout,
     var_Destroy( p_aout, "stereo-mode" );
 
     /* Create the audio output stream */
-    owner->input_format = *p_format;
-    vlc_atomic_set (&owner->restart, 0);
     owner->volume = aout_volume_New (p_aout, p_replay_gain);
-    if( aout_OutputNew( p_aout, p_format ) < 0 )
+
+    vlc_atomic_set (&owner->restart, 0);
+    owner->input_format = *p_format;
+    owner->mixer_format = owner->input_format;
+
+    if (aout_OutputNew (p_aout, &owner->mixer_format))
         goto error;
     aout_volume_SetFormat (owner->volume, owner->mixer_format.i_format);
 
@@ -142,7 +145,8 @@ static int aout_CheckRestart (audio_output_t *aout)
     if (restart & AOUT_RESTART_OUTPUT)
     {
         aout_OutputDelete (aout);
-        if (aout_OutputNew (aout, &owner->input_format))
+        owner->mixer_format = owner->input_format;
+        if (aout_OutputNew (aout, &owner->mixer_format))
             abort (); /* FIXME we are officially screwed */
         aout_volume_SetFormat (owner->volume, owner->mixer_format.i_format);
     }

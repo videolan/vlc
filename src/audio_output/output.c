@@ -28,7 +28,6 @@
 #include <vlc_common.h>
 #include <vlc_aout.h>
 #include <vlc_modules.h>
-#include <vlc_cpu.h>
 
 #include "libvlc.h"
 #include "aout_internal.h"
@@ -300,19 +299,24 @@ int aout_MuteSet (audio_output_t *aout, bool mute)
 
 /**
  * Starts an audio output stream.
- * \param fmtp audio output stream format [IN/OUT]
+ * \param fmt audio output stream format [IN/OUT]
  * \warning The caller must hold the audio output lock.
  */
-int aout_OutputNew (audio_output_t *aout, const audio_sample_format_t *fmtp)
+int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
-    aout_owner_t *owner = aout_owner (aout);
-
-    audio_sample_format_t fmt = *fmtp;
-    aout_FormatPrepare (&fmt);
-
     aout_assert_locked (aout);
 
-    if (aout->start (aout, &fmt))
+    /* Ideally, the audio filters would be created before the audio output,
+     * and the ideal audio format would be the output of the filters chain.
+     * But that scheme would not really play well with digital pass-through. */
+    if (AOUT_FMT_LINEAR(fmt))
+    {   /* Try to stay in integer domain if possible for no/slow FPU. */
+        fmt->i_format = (fmt->i_bitspersample > 16) ? VLC_CODEC_FL32
+                                                    : VLC_CODEC_S16N;
+        aout_FormatPrepare (fmt);
+    }
+
+    if (aout->start (aout, fmt))
     {
         msg_Err (aout, "module not functional");
         return -1;
@@ -327,24 +331,24 @@ int aout_OutputNew (audio_output_t *aout, const audio_sample_format_t *fmtp)
     switch (var_GetInteger (aout, "stereo-mode"))
     {
         case AOUT_VAR_CHAN_RSTEREO:
-            fmt.i_original_channels |= AOUT_CHAN_REVERSESTEREO;
-             break;
+            fmt->i_original_channels |= AOUT_CHAN_REVERSESTEREO;
+            break;
         case AOUT_VAR_CHAN_STEREO:
-            fmt.i_original_channels = AOUT_CHANS_STEREO;
+            fmt->i_original_channels = AOUT_CHANS_STEREO;
             break;
         case AOUT_VAR_CHAN_LEFT:
-            fmt.i_original_channels = AOUT_CHAN_LEFT;
+            fmt->i_original_channels = AOUT_CHAN_LEFT;
             break;
         case AOUT_VAR_CHAN_RIGHT:
-            fmt.i_original_channels = AOUT_CHAN_RIGHT;
+            fmt->i_original_channels = AOUT_CHAN_RIGHT;
             break;
         case AOUT_VAR_CHAN_DOLBYS:
-            fmt.i_original_channels = AOUT_CHANS_STEREO|AOUT_CHAN_DOLBYSTEREO;
+            fmt->i_original_channels = AOUT_CHANS_STEREO|AOUT_CHAN_DOLBYSTEREO;
             break;
         default:
         {
-            if ((fmt.i_original_channels & AOUT_CHAN_PHYSMASK)
-                                                         != AOUT_CHANS_STEREO)
+            if ((fmt->i_original_channels & AOUT_CHAN_PHYSMASK)
+                                                          != AOUT_CHANS_STEREO)
                  break;
 
             vlc_value_t val, txt;
@@ -352,7 +356,7 @@ int aout_OutputNew (audio_output_t *aout, const audio_sample_format_t *fmtp)
             var_Change (aout, "stereo-mode", VLC_VAR_DELCHOICE, &val, NULL);
             txt.psz_string = _("Stereo audio mode");
             var_Change (aout, "stereo-mode", VLC_VAR_SETTEXT, &txt, NULL);
-            if (fmt.i_original_channels & AOUT_CHAN_DOLBYSTEREO)
+            if (fmt->i_original_channels & AOUT_CHAN_DOLBYSTEREO)
             {
                 val.i_int = AOUT_VAR_CHAN_DOLBYS;
                 txt.psz_string = _("Dolby Surround");
@@ -367,9 +371,9 @@ int aout_OutputNew (audio_output_t *aout, const audio_sample_format_t *fmtp)
             val.i_int = AOUT_VAR_CHAN_LEFT;
             txt.psz_string = _("Left");
             var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
-            if (fmt.i_original_channels & AOUT_CHAN_DUALMONO)
+            if (fmt->i_original_channels & AOUT_CHAN_DUALMONO)
             {   /* Go directly to the left channel. */
-                fmt.i_original_channels = AOUT_CHAN_LEFT;
+                fmt->i_original_channels = AOUT_CHAN_LEFT;
                 var_Change (aout, "stereo-mode", VLC_VAR_SETVALUE, &val, NULL);
             }
             val.i_int = AOUT_VAR_CHAN_RIGHT;
@@ -381,37 +385,8 @@ int aout_OutputNew (audio_output_t *aout, const audio_sample_format_t *fmtp)
         }
     }
 
-    aout_FormatPrepare (&fmt);
-    aout_FormatPrint (aout, "output", &fmt );
-
-    /* Choose the mixer format. */
-    owner->mixer_format = fmt;
-    if (!AOUT_FMT_LINEAR(&fmt))
-        owner->mixer_format.i_format = fmtp->i_format;
-    else
-    /* Most audio filters can only deal with single-precision,
-     * so lets always use that when hardware supports floating point. */
-    if( HAVE_FPU )
-        owner->mixer_format.i_format = VLC_CODEC_FL32;
-    else
-    /* Fallback to 16-bits. This avoids pointless conversion to and from
-     * 32-bits samples for the sole purpose of software mixing. */
-        owner->mixer_format.i_format = VLC_CODEC_S16N;
-
-    aout_FormatPrepare (&owner->mixer_format);
-    aout_FormatPrint (aout, "mixer", &owner->mixer_format);
-
-    /* Create converters. */
-    owner->nb_converters = 0;
-    if (aout_FiltersPipelineCreate (aout, owner->converters,
-                                    &owner->nb_converters,
-                    sizeof (owner->converters) / sizeof (owner->converters[0]),
-                                    &owner->mixer_format, &fmt) < 0)
-    {
-        msg_Err (aout, "couldn't create audio output pipeline");
-        aout_OutputDelete (aout);
-        return -1;
-    }
+    aout_FormatPrepare (fmt);
+    aout_FormatPrint (aout, "output", fmt);
     return 0;
 }
 
@@ -422,14 +397,11 @@ int aout_OutputNew (audio_output_t *aout, const audio_sample_format_t *fmtp)
  */
 void aout_OutputDelete (audio_output_t *aout)
 {
-    aout_owner_t *owner = aout_owner (aout);
-
     aout_assert_locked (aout);
 
     var_DelCallback (aout, "stereo-mode", aout_ChannelsRestart, NULL);
     if (aout->stop != NULL)
         aout->stop (aout);
-    aout_FiltersPipelineDestroy (owner->converters, owner->nb_converters);
 }
 
 int aout_OutputTimeGet (audio_output_t *aout, mtime_t *pts)
@@ -448,20 +420,7 @@ int aout_OutputTimeGet (audio_output_t *aout, mtime_t *pts)
  */
 void aout_OutputPlay (audio_output_t *aout, block_t *block)
 {
-    aout_owner_t *owner = aout_owner (aout);
-
     aout_assert_locked (aout);
-
-    block = aout_FiltersPipelinePlay (owner->converters, owner->nb_converters,
-                                      block);
-    if (block == NULL)
-        return;
-    if (block->i_buffer == 0)
-    {
-        block_Release (block);
-        return;
-    }
-
     aout->play (aout, block);
 }
 
