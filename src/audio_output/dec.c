@@ -67,7 +67,6 @@ int aout_DecNew( audio_output_t *p_aout,
     }
 
     aout_owner_t *owner = aout_owner(p_aout);
-    int ret = 0;
 
     /* TODO: reduce lock scope depending on decoder's real need */
     aout_lock( p_aout );
@@ -92,8 +91,8 @@ int aout_DecNew( audio_output_t *p_aout,
         aout_OutputDelete (p_aout);
 error:
         aout_volume_Delete (owner->volume);
-        ret = -1;
-        goto error;
+        aout_unlock (p_aout);
+        return -1;
     }
 
     owner->sync.end = VLC_TS_INVALID;
@@ -102,8 +101,7 @@ error:
     aout_unlock( p_aout );
 
     atomic_init (&owner->buffers_lost, 0);
-
-    return ret;
+    return 0;
 }
 
 /**
