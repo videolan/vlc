@@ -270,7 +270,6 @@ static void aout_DecSynchronize (audio_output_t *aout, mtime_t dec_pts,
     aout_owner_t *owner = aout_owner (aout);
     mtime_t aout_pts, drift;
 
-retry:
     /**
      * Depending on the drift between the actual and intended playback times,
      * the audio core may ignore the drift, trigger upsampling or downsampling,
@@ -289,33 +288,61 @@ retry:
      */
     if (aout_OutputTimeGet (aout, &aout_pts) != 0)
         return; /* nothing can be done if timing is unknown */
-
     drift = aout_pts - dec_pts;
 
-    if (drift < (owner->sync.discontinuity ? 0
-                : -3 * input_rate * AOUT_MAX_PTS_ADVANCE / INPUT_RATE_DEFAULT))
-    {   /* If the audio output is very early (which is rare other than during
-         * prebuffering), hold with silence. */
-        if (!owner->sync.discontinuity)
-            msg_Err (aout, "playback way too early (%"PRId64"): "
-                     "playing silence", drift);
-        aout_StopResampling (aout);
-        aout_DecSilence (aout, -drift);
-        owner->sync.discontinuity = false;
-        drift = 0;
-    }
-    else
+    /* Late audio output.
+     * This can happen due to insufficient caching, scheduling jitter
+     * or bug in the decoder. Ideally, the output would seek backward. But that
+     * is not portable, not supported by some hardware and often unsafe/buggy
+     * where supported. The other alternative is to flush the buffers
+     * completely. */
     if (drift > (owner->sync.discontinuity ? 0
                   : +3 * input_rate * AOUT_MAX_PTS_DELAY / INPUT_RATE_DEFAULT))
-    {   /* If the audio output is very late, drop the buffers.
-         * This should make some room and advance playback quickly. */
+    {
         if (!owner->sync.discontinuity)
-            msg_Err (aout, "playback way too late (%"PRId64"): "
+            msg_Warn (aout, "playback way too late (%"PRId64"): "
+                      "flushing buffers", drift);
+        else
+            msg_Dbg (aout, "playback too late (%"PRId64"): "
                      "flushing buffers", drift);
+        aout_OutputFlush (aout, false);
+
         aout_StopResampling (aout);
         owner->sync.end = VLC_TS_INVALID;
-        aout_OutputFlush (aout, false);
-        goto retry; /* may be too early now... retry */
+        owner->sync.discontinuity = true;
+
+        /* Now the output might be too early... Recheck. */
+        if (aout_OutputTimeGet (aout, &aout_pts) != 0)
+            return; /* nothing can be done if timing is unknown */
+        drift = aout_pts - dec_pts;
+    }
+
+    /* Early audio output.
+     * This is rare except at startup when the buffers are still empty. */
+    if (drift < (owner->sync.discontinuity ? 0
+                : -3 * input_rate * AOUT_MAX_PTS_ADVANCE / INPUT_RATE_DEFAULT))
+    {
+        if (!owner->sync.discontinuity)
+            msg_Warn (aout, "playback way too early (%"PRId64"): "
+                      "playing silence", drift);
+        aout_DecSilence (aout, -drift);
+
+        aout_StopResampling (aout);
+        owner->sync.discontinuity = true;
+        drift = 0;
+    }
+
+    /* Resampling */
+
+    if (drift > +AOUT_MAX_PTS_DELAY)
+    {
+        if (owner->sync.resamp_type == AOUT_RESAMPLING_NONE)
+        {
+            msg_Warn (aout, "playback too late (%"PRId64"): up-sampling",
+                      drift);
+            owner->sync.resamp_start_drift = +drift;
+        }
+        owner->sync.resamp_type = AOUT_RESAMPLING_UP;
     }
 
     if (drift < -AOUT_MAX_PTS_ADVANCE)
@@ -327,17 +354,6 @@ retry:
             owner->sync.resamp_start_drift = -drift;
         }
         owner->sync.resamp_type = AOUT_RESAMPLING_DOWN;
-    }
-    else
-    if (drift > +AOUT_MAX_PTS_DELAY)
-    {
-        if (owner->sync.resamp_type == AOUT_RESAMPLING_NONE)
-        {
-            msg_Warn (aout, "playback too late (%"PRId64"): up-sampling",
-                      drift);
-            owner->sync.resamp_start_drift = +drift;
-        }
-        owner->sync.resamp_type = AOUT_RESAMPLING_UP;
     }
 
     if (owner->sync.resamp_type == AOUT_RESAMPLING_NONE)
@@ -368,8 +384,8 @@ retry:
     if (llabs (drift) > 2 * owner->sync.resamp_start_drift)
     {   /* If the drift is ever increasing, then something is seriously wrong.
          * Cease resampling and hope for the best. */
-        msg_Err (aout, "timing screwed (drift: %"PRId64" us): "
-                 "stopping resampling", drift);
+        msg_Warn (aout, "timing screwed (drift: %"PRId64" us): "
+                  "stopping resampling", drift);
         aout_StopResampling (aout);
     }
 }
