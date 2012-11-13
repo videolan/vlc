@@ -1,6 +1,6 @@
 # REGEX
-REGEX_VERSION := 0.12
-REGEX_URL := http://ftp.gnu.org/old-gnu/regex/regex-$(REGEX_VERSION).tar.gz
+REGEX_VERSION := 0.13
+REGEX_URL := $(CONTRIB_VIDEOLAN)/regex-$(REGEX_VERSION).tar.gz
 
 ifndef HAVE_WIN32
 # Part of POSIX.2001
