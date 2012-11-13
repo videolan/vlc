@@ -94,13 +94,6 @@ static inline aout_owner_t *aout_owner (audio_output_t *aout)
  *****************************************************************************/
 
 /* From filters.c : */
-int aout_FiltersPipelineCreate(vlc_object_t *, filter_t **, unsigned *,
-    unsigned, const audio_sample_format_t *, const audio_sample_format_t *);
-#define aout_FiltersPipelineCreate(o, pv, pc, max, inf, outf) \
-        aout_FiltersPipelineCreate(VLC_OBJECT(o), pv, pc, max, inf, outf)
-void aout_FiltersPipelineDestroy(filter_t *const *, unsigned);
-block_t *aout_FiltersPipelinePlay(filter_t *const *, unsigned, block_t *);
-
 int aout_FiltersNew(audio_output_t *, const audio_sample_format_t *,
                    const audio_sample_format_t *, const aout_request_vout_t *);
 void aout_FiltersDelete(audio_output_t *);

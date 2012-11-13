@@ -127,6 +127,20 @@ static int SplitConversion( const audio_sample_format_t *restrict infmt,
 }
 
 /**
+ * Destroys a chain of audio filters.
+ */
+static void aout_FiltersPipelineDestroy(filter_t *const *filters, unsigned n)
+{
+    for( unsigned i = 0; i < n; i++ )
+    {
+        filter_t *p_filter = filters[i];
+
+        module_unneed( p_filter, p_filter->p_module );
+        vlc_object_release( p_filter );
+    }
+}
+
+/**
  * Allocates audio format conversion filters
  * @param obj parent VLC object for new filters
  * @param filters table of filters [IN/OUT]
@@ -136,7 +150,7 @@ static int SplitConversion( const audio_sample_format_t *restrict infmt,
  * @param outfmt output audio format
  * @return 0 on success, -1 on failure
  */
-int (aout_FiltersPipelineCreate)(vlc_object_t *obj, filter_t **filters,
+static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
                                  unsigned *nb_filters, unsigned max_filters,
                                  const audio_sample_format_t *restrict infmt,
                                  const audio_sample_format_t *restrict outfmt)
@@ -197,20 +211,8 @@ rollback:
     aout_FiltersPipelineDestroy (filters, i);
     return -1;
 }
-
-/**
- * Destroys a chain of audio filters.
- */
-void aout_FiltersPipelineDestroy(filter_t *const *filters, unsigned n)
-{
-    for( unsigned i = 0; i < n; i++ )
-    {
-        filter_t *p_filter = filters[i];
-
-        module_unneed( p_filter, p_filter->p_module );
-        vlc_object_release( p_filter );
-    }
-}
+#define aout_FiltersPipelineCreate(obj,f,n,m,i,o) \
+        aout_FiltersPipelineCreate(VLC_OBJECT(obj),f,n,m,i,o)
 
 static inline bool ChangeFiltersString (vlc_object_t *aout, const char *var,
                                         const char *filter, bool add)
@@ -221,8 +223,8 @@ static inline bool ChangeFiltersString (vlc_object_t *aout, const char *var,
 /**
  * Filters an audio buffer through a chain of filters.
  */
-block_t *aout_FiltersPipelinePlay(filter_t *const *filters, unsigned count,
-                                  block_t *block)
+static block_t *aout_FiltersPipelinePlay(filter_t *const *filters,
+                                         unsigned count, block_t *block)
 {
     /* TODO: use filter chain */
     for (unsigned i = 0; (i < count) && (block != NULL); i++)
