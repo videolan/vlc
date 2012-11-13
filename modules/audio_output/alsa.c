@@ -577,45 +577,6 @@ static void Play (audio_output_t *aout, block_t *block)
                       sys->format.i_bitspersample / 8);
 
     snd_pcm_t *pcm = sys->pcm;
-    snd_pcm_status_t *status;
-    int val;
-
-    snd_pcm_status_alloca (&status);
-    val = snd_pcm_status (pcm, status);
-    if (val < 0)
-        msg_Err (aout, "cannot get status: %s", snd_strerror (val));
-    else
-    if (snd_pcm_status_get_state (status) != SND_PCM_STATE_RUNNING)
-    {
-        snd_pcm_sframes_t frames = snd_pcm_status_get_delay (status);
-        mtime_t delay = frames * CLOCK_FREQ / sys->format.i_rate;
-
-        delay += mdate () - block->i_pts;
-        if (delay < 0)
-        {
-            if (sys->format.i_format != VLC_CODEC_SPDIFL)
-            {
-                frames = (delay * sys->format.i_rate) / -CLOCK_FREQ;
-                msg_Dbg (aout, "prepending %ld zeroes", frames);
-
-                void *z = calloc (frames, sys->format.i_bytes_per_frame);
-                if (likely(z != NULL))
-                {
-                    snd_pcm_writei (pcm, z, frames);
-                    free (z);
-                    delay = 0;
-                }
-            }
-            /* Lame fallback if zero padding does not work */
-            if (delay < 0)
-            {
-                msg_Dbg (aout, "deferring start (%"PRId64" us)", -delay);
-                msleep (-delay);
-            }
-        }
-        else
-            msg_Dbg (aout, "starting late (%"PRId64" us)", delay);
-    }
 
     /* TODO: better overflow handling */
     /* TODO: no period wake ups */
