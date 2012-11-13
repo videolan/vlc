@@ -113,6 +113,13 @@ extern "C" {
 #define MATROSKA_COMPRESSION_LZOX   2
 #define MATROSKA_COMPRESSION_HEADER 3
 
+enum
+{
+    MATROSKA_ENCODING_SCOPE_ALL_FRAMES = 1,
+    MATROSKA_ENCODING_SCOPE_PRIVATE = 2,
+    MATROSKA_ENCODING_SCOPE_NEXT = 4 /* unsupported */
+};
+
 #define MKVD_TIMECODESCALE 1000000
 
 #define MKV_IS_ID( el, C ) ( el != NULL && typeid( *el ) == typeid( C ) )
@@ -229,6 +236,7 @@ struct mkv_track_t
 
     /* encryption/compression */
     int                    i_compression_type;
+    uint32_t               i_encoding_scope;
     KaxContentCompSettings *p_compression_data;
 
 };

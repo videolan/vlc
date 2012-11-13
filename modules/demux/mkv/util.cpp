@@ -21,6 +21,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#include "mkv.hpp"
 #include "util.hpp"
 #include "demux.hpp"
 
@@ -30,6 +31,77 @@
  *****************************************************************************/
 
 #ifdef HAVE_ZLIB_H
+int32_t zlib_decompress_extra( demux_t * p_demux, mkv_track_t * tk )
+{
+    int result;
+    z_stream d_stream;
+    size_t n = 0;
+    uint8_t * p_new_extra = NULL;
+
+    msg_Dbg(p_demux,"Inflating private data");
+
+    d_stream.zalloc = Z_NULL;
+    d_stream.zfree = Z_NULL;
+    d_stream.opaque = Z_NULL;
+    if( inflateInit( &d_stream ) != Z_OK )
+    {
+        msg_Err( p_demux, "Couldn't initiate inflation ignore track %d",
+                 tk->i_number );
+        free(tk->p_extra_data);
+        delete tk;
+        return 1;
+    }
+
+    d_stream.next_in = tk->p_extra_data;
+    d_stream.avail_in = tk->i_extra_data;
+    do
+    {
+        n++;
+        p_new_extra = (uint8_t *) realloc(p_new_extra, n*1024);
+        if( !p_new_extra )
+        {
+            msg_Err( p_demux, "Couldn't allocate buffer to inflate data, ignore track %d",
+                      tk->i_number );
+            inflateEnd( &d_stream );
+            free(tk->p_extra_data);
+            delete tk;
+            return 1;
+        }
+        d_stream.next_out = &p_new_extra[(n - 1) * 1024];
+        d_stream.avail_out = 1024;
+        result = inflate(&d_stream, Z_NO_FLUSH);
+        if( result != Z_OK && result != Z_STREAM_END )
+        {
+            msg_Err( p_demux, "Zlib decompression failed. Result: %d", result );
+            inflateEnd( &d_stream );
+            free(p_new_extra);
+            free(tk->p_extra_data);
+            delete tk;
+            return 1;
+        }
+    }
+    while ( d_stream.avail_out == 0 && d_stream.avail_in != 0  &&
+            result != Z_STREAM_END );
+
+    free( tk->p_extra_data );
+    tk->i_extra_data = d_stream.total_out;
+    p_new_extra = (uint8_t *) realloc(p_new_extra, tk->i_extra_data);
+    if( !p_new_extra )
+    {
+        msg_Err( p_demux, "Couldn't allocate buffer to inflate data, ignore track %d",
+                 tk->i_number );
+        inflateEnd( &d_stream );
+        free(p_new_extra);
+        delete tk;
+        return 1;
+    }
+
+    tk->p_extra_data = p_new_extra;
+    
+    inflateEnd( &d_stream );
+    return 0;
+}
+
 block_t *block_zlib_decompress( vlc_object_t *p_this, block_t *p_in_block ) {
     int result, dstsize, n;
     unsigned char *dst;
@@ -61,8 +133,10 @@ block_t *block_zlib_decompress( vlc_object_t *p_this, block_t *p_in_block ) {
         result = inflate(&d_stream, Z_NO_FLUSH);
         if( ( result != Z_OK ) && ( result != Z_STREAM_END ) )
         {
-            msg_Dbg( p_this, "Zlib decompression failed. Result: %d", result );
-            return NULL;
+            msg_Err( p_this, "Zlib decompression failed. Result: %d", result );
+            inflateEnd( &d_stream );
+            block_Release( p_block );
+            return p_in_block;
         }
     }
     while( ( d_stream.avail_out == 0 ) && ( d_stream.avail_in != 0 ) &&

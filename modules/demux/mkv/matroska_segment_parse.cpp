@@ -30,6 +30,8 @@
 
 #include "Ebml_parser.hpp"
 
+#include "util.hpp"
+
 /*****************************************************************************
  * Some functions to manipulate memory
  *****************************************************************************/
@@ -199,6 +201,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
     tk->psz_codec_download_url = NULL;
 
     tk->i_compression_type     = MATROSKA_COMPRESSION_NONE;
+    tk->i_encoding_scope       = MATROSKA_ENCODING_SCOPE_ALL_FRAMES;
     tk->p_compression_data     = NULL;
 
     msg_Dbg( &sys.demuxer, "|   |   + Track Entry" );
@@ -392,6 +395,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                         else if( MKV_IS_ID( l3, KaxContentEncodingScope ) )
                         {
                             KaxContentEncodingScope &encscope = *(KaxContentEncodingScope*)l3;
+                            tk->i_encoding_scope = uint32( encscope );
                             MkvTree( sys.demuxer, 5, "Scope: %i", uint32( encscope ) );
                         }
                         else if( MKV_IS_ID( l3, KaxContentEncodingType ) )
@@ -654,11 +658,20 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 
     if ( bSupported )
     {
+#ifdef HAVE_ZLIB_H
+        if( tk->i_compression_type == MATROSKA_COMPRESSION_ZLIB &&
+            tk->i_encoding_scope & MATROSKA_ENCODING_SCOPE_PRIVATE &&
+            tk->i_extra_data && tk->p_extra_data &&
+            zlib_decompress_extra( &sys.demuxer, tk) )
+            return;
+#endif
+
         tracks.push_back( tk );
     }
     else
     {
         msg_Err( &sys.demuxer, "Track Entry %d not supported", tk->i_number );
+        free(tk->p_extra_data);
         delete tk;
     }
 }

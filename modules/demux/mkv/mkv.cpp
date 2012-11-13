@@ -561,7 +561,9 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             break;
         }
 
-        if( tk->i_compression_type == MATROSKA_COMPRESSION_HEADER && tk->p_compression_data != NULL )
+        if( tk->i_compression_type == MATROSKA_COMPRESSION_HEADER &&
+            tk->p_compression_data != NULL &&
+            tk->i_encoding_scope & MATROSKA_ENCODING_SCOPE_ALL_FRAMES )
             p_block = MemToBlock( data->Buffer(), data->Size(), tk->p_compression_data->GetSize() );
         else
             p_block = MemToBlock( data->Buffer(), data->Size(), 0 );
@@ -572,7 +574,8 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         }
 
 #if defined(HAVE_ZLIB_H)
-        if( tk->i_compression_type == MATROSKA_COMPRESSION_ZLIB )
+        if( tk->i_compression_type == MATROSKA_COMPRESSION_ZLIB &&
+            tk->i_encoding_scope & MATROSKA_ENCODING_SCOPE_ALL_FRAMES )
         {
             p_block = block_zlib_decompress( VLC_OBJECT(p_demux), p_block );
             if( p_block == NULL )
@@ -580,7 +583,8 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         }
         else
 #endif
-        if( tk->i_compression_type == MATROSKA_COMPRESSION_HEADER )
+        if( tk->i_compression_type == MATROSKA_COMPRESSION_HEADER &&
+            tk->i_encoding_scope & MATROSKA_ENCODING_SCOPE_ALL_FRAMES )
         {
             memcpy( p_block->p_buffer, tk->p_compression_data->GetBuffer(), tk->p_compression_data->GetSize() );
         }
