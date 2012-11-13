@@ -333,60 +333,49 @@ static void aout_DecSynchronize (audio_output_t *aout, mtime_t dec_pts,
     }
 
     /* Resampling */
-
-    if (drift > +AOUT_MAX_PTS_DELAY)
+    if (drift > +AOUT_MAX_PTS_DELAY
+     && owner->sync.resamp_type != AOUT_RESAMPLING_UP)
     {
-        if (owner->sync.resamp_type == AOUT_RESAMPLING_NONE)
-        {
-            msg_Warn (aout, "playback too late (%"PRId64"): up-sampling",
-                      drift);
-            owner->sync.resamp_start_drift = +drift;
-        }
+        msg_Warn (aout, "playback too late (%"PRId64"): up-sampling",
+                  drift);
         owner->sync.resamp_type = AOUT_RESAMPLING_UP;
+        owner->sync.resamp_start_drift = +drift;
     }
-
-    if (drift < -AOUT_MAX_PTS_ADVANCE)
+    if (drift < -AOUT_MAX_PTS_ADVANCE
+     && owner->sync.resamp_type != AOUT_RESAMPLING_DOWN)
     {
-        if (owner->sync.resamp_type == AOUT_RESAMPLING_NONE)
-        {
-            msg_Warn (aout, "playback too early (%"PRId64"): down-sampling",
-                      drift);
-            owner->sync.resamp_start_drift = -drift;
-        }
+        msg_Warn (aout, "playback too early (%"PRId64"): down-sampling",
+                  drift);
         owner->sync.resamp_type = AOUT_RESAMPLING_DOWN;
+        owner->sync.resamp_start_drift = -drift;
     }
 
     if (owner->sync.resamp_type == AOUT_RESAMPLING_NONE)
         return; /* Everything is fine. Nothing to do. */
 
-    /* Resampling has been triggered earlier. This checks if it needs to be
-     * increased or decreased. Resampling rate changes must be kept slow for
-     * the comfort of listeners. */
-    const int adj = (owner->sync.resamp_type == AOUT_RESAMPLING_UP) ? +2 : -2;
-
-    /* Check if everything is back to normal, then stop resampling. */
-    if (!aout_FiltersAdjustResampling (aout, adj))
-    {
-        owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
-        msg_Dbg (aout, "resampling stopped (drift: %"PRId64" us)", drift);
-    }
-    else
-    if (2 * llabs (drift) <= owner->sync.resamp_start_drift)
-    {   /* If the drift has been reduced from more than half its initial
-         * value, then it is time to switch back the resampling direction. */
-        if (owner->sync.resamp_type == AOUT_RESAMPLING_UP)
-            owner->sync.resamp_type = AOUT_RESAMPLING_DOWN;
-        else
-            owner->sync.resamp_type = AOUT_RESAMPLING_UP;
-        owner->sync.resamp_start_drift = 0;
-    }
-    else
     if (llabs (drift) > 2 * owner->sync.resamp_start_drift)
     {   /* If the drift is ever increasing, then something is seriously wrong.
          * Cease resampling and hope for the best. */
         msg_Warn (aout, "timing screwed (drift: %"PRId64" us): "
                   "stopping resampling", drift);
         aout_StopResampling (aout);
+        return;
+    }
+
+    /* Resampling has been triggered earlier. This checks if it needs to be
+     * increased or decreased. Resampling rate changes must be kept slow for
+     * the comfort of listeners. */
+    int adj = (owner->sync.resamp_type == AOUT_RESAMPLING_UP) ? +2 : -2;
+
+    if (2 * llabs (drift) <= owner->sync.resamp_start_drift)
+        /* If the drift has been reduced from more than half its initial
+         * value, then it is time to switch back the resampling direction. */
+        adj *= -1;
+
+    if (!aout_FiltersAdjustResampling (aout, adj))
+    {   /* Everything is back to normal: stop resampling. */
+        owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
+        msg_Dbg (aout, "resampling stopped (drift: %"PRId64" us)", drift);
     }
 }
 

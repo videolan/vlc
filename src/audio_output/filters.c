@@ -550,7 +550,7 @@ bool aout_FiltersAdjustResampling (audio_output_t *aout, int adjust)
         owner->resampling += adjust;
     else
         owner->resampling = 0;
-    return !owner->resampling;
+    return owner->resampling != 0;
 }
 
 block_t *aout_FiltersPlay (audio_output_t *aout, block_t *block, int rate)
