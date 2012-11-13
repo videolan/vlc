@@ -138,11 +138,26 @@ static void Pause(audio_output_t *p_aout, bool pause, mtime_t date)
         pause ? SL_PLAYSTATE_PAUSED : SL_PLAYSTATE_PLAYING );
 }
 
+static int TimeGet(audio_output_t* p_aout, mtime_t* restrict drift)
+{
+    aout_sys_t *p_sys = p_aout->sys;
+    mtime_t delay = p_sys->length;
+    SLAndroidSimpleBufferQueueState st;
+    SLresult res = GetState(p_sys->playerBufferQueue, &st);
+    if (unlikely(res != SL_RESULT_SUCCESS)) {
+        msg_Err(p_aout, "Could not query buffer queue state in TimeGet (%lu)", res);
+        return -1;
+    }
+
+    if (delay && st.count)
+        *drift = mdate() + delay;
+    return 0;
+}
+
 /*****************************************************************************
  * Play: play a sound
  *****************************************************************************/
-static void Play( audio_output_t *p_aout, block_t *p_buffer,
-                  mtime_t *restrict drift )
+static void Play( audio_output_t *p_aout, block_t *p_buffer )
 {
     aout_sys_t *p_sys = p_aout->sys;
     int tries = 5;
@@ -161,7 +176,6 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer,
 
     vlc_mutex_lock( &p_sys->lock );
 
-    mtime_t delay = p_sys->length;
     p_sys->length += p_buffer->i_length;
 
     /* If something bad happens, we must remove this buffer from the FIFO */
@@ -170,9 +184,6 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer,
 
     block_ChainLastAppend( &p_sys->pp_last, p_buffer );
     vlc_mutex_unlock( &p_sys->lock );
-
-    if (delay && st.count)
-        *drift = mdate() + delay - p_buffer->i_pts;
 
     for (;;)
     {
@@ -405,5 +416,6 @@ static int Open (vlc_object_t *obj)
     /* FIXME: set volume/mute here */
     aout->start = Start;
     aout->stop = Stop;
+    aout->time_get = TimeGet;
     return VLC_SUCCESS;
 }
