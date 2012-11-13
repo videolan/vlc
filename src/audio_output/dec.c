@@ -406,6 +406,8 @@ int aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
         msg_Err (aout, "buffer too early (%"PRId64" us): dropped", advance);
         goto drop;
     }
+    if (block->i_flags & BLOCK_FLAG_DISCONTINUITY)
+        owner->sync.discontinuity = true;
 
     block = aout_FiltersPlay (aout, block, input_rate);
     if (block == NULL)
@@ -419,11 +421,13 @@ int aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
 
     /* Output */
     owner->sync.end = block->i_pts + block->i_length + 1;
+    owner->sync.discontinuity = false;
     aout_OutputPlay (aout, block);
 out:
     aout_unlock (aout);
     return 0;
 drop:
+    owner->sync.discontinuity = true;
     block_Release (block);
 lost:
     atomic_fetch_add(&owner->buffers_lost, 1);
