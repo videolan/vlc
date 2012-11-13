@@ -153,12 +153,16 @@ static int TimeGet(audio_output_t *aout, mtime_t *restrict pts)
         return -1;
     }
 
+    if (pos == 0)
+    {
+        msg_Dbg(aout, "cannot compute position: still propagating buffers");
+        return -1;
+    }
+
     mtime_t delay =  ((GetQPC() - qpcpos) / (10000000 / CLOCK_FREQ));
     static_assert((10000000 % CLOCK_FREQ) == 0, "Frequency conversion broken");
 
-    if (delay < 1000) /* device is still buffering, time is screwed */
-        return -1;
-    *pts += mdate () + delay;
+    *pts += mdate() + delay;
     return 0;
 }
 
