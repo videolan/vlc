@@ -43,7 +43,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 + (void)initialize
 {
-    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:@";;0;1.000000;1.000000;1.000000;1.000000;0.050000;16;2.000000;OTA=;4;4;0;16711680;20;15;120;Z3JhZGllbnQ=;1;0;16711680;6;80;VkxD;-1;;-1;255"], @"VideoEffectProfiles", [NSArray arrayWithObject:_NS("Default")], @"VideoEffectProfileNames", nil];
+    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:@";;0;1.000000;1.000000;1.000000;1.000000;0.050000;16;2.000000;OTA=;4;4;0;16711680;20;15;120;Z3JhZGllbnQ=;1;0;16711680;6;80;VkxD;-1;;-1;255;2;3;3"], @"VideoEffectProfiles", [NSArray arrayWithObject:_NS("Default")], @"VideoEffectProfileNames", nil];
     [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
 }
 
@@ -112,6 +112,11 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_puzzle_rows_lbl setStringValue:_NS("Rows")];
     [o_puzzle_columns_lbl setStringValue:_NS("Columns")];
     [o_puzzle_blackslot_ckb setTitle:_NS("Black Slot")];
+    [o_clone_ckb setTitle:_NS("Clone")];
+    [o_clone_number_lbl setStringValue:_NS("Number of clones")];
+    [o_wall_ckb setTitle:_NS("Wall")];
+    [o_wall_numofrows_lbl setStringValue:_NS("Rows")];
+    [o_wall_numofcols_lbl setStringValue:_NS("Columns")];
 
     [o_threshold_ckb setTitle:_NS("Color threshold")];
     [o_threshold_color_lbl setStringValue:_NS("Color")];
@@ -237,6 +242,8 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         [o_transform_ckb setState: (NSInteger)strstr(psz_vfilters, "transform")];
         [o_zoom_ckb setState: (NSInteger)strstr(psz_vfilters, "magnify")];
         [o_puzzle_ckb setState: (NSInteger)strstr(psz_vfilters, "puzzle")];
+        [o_clone_ckb setState: (NSInteger)strstr(psz_vfilters, "clone")];
+        [o_wall_ckb setState: (NSInteger)strstr(psz_vfilters, "wall")];
         [o_threshold_ckb setState: (NSInteger)strstr(psz_vfilters, "colorthres")];
         [o_sepia_ckb setState: (NSInteger)strstr(psz_vfilters, "sepia")];
         [o_noise_ckb setState: (NSInteger)strstr(psz_vfilters, "noise")];
@@ -259,6 +266,8 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         [o_transform_ckb setState: NSOffState];
         [o_zoom_ckb setState: NSOffState];
         [o_puzzle_ckb setState: NSOffState];
+        [o_clone_ckb setState: NSOffState];
+        [o_wall_ckb setState: NSOffState];
         [o_threshold_ckb setState: NSOffState];
         [o_sepia_ckb setState: NSOffState];
         [o_noise_ckb setState: NSOffState];
@@ -346,6 +355,9 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_puzzle_columns_fld setEnabled: b_state];
     [o_puzzle_columns_lbl setEnabled: b_state];
     [o_puzzle_blackslot_ckb setEnabled: b_state];
+    [o_clone_number_fld setIntValue: config_GetInt(p_intf, "clone-count")];
+    [o_wall_numofrows_fld setIntValue: config_GetInt(p_intf, "wall-rows")];
+    [o_wall_numofcols_fld setIntValue: config_GetInt(p_intf, "wall-cols")];
 
     [o_threshold_color_fld setStringValue: [[NSString stringWithFormat:@"%llx", config_GetInt(p_intf, "colorthres-color")] uppercaseString]];
     [o_threshold_saturation_sld setIntValue: config_GetInt(p_intf, "colorthres-saturationthres")];
@@ -605,7 +617,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (NSString *)generateProfileString
 {
-    return [NSString stringWithFormat:@"%s;%s;%lli;%f;%f;%f;%f;%f;%lli;%f;%s;%lli;%lli;%lli;%lli;%lli;%lli;%lli;%s;%lli;%lli;%lli;%lli;%lli;%s;%lli;%s;%lli;%lli",
+    return [NSString stringWithFormat:@"%s;%s;%lli;%f;%f;%f;%f;%f;%lli;%f;%s;%lli;%lli;%lli;%lli;%lli;%lli;%lli;%s;%lli;%lli;%lli;%lli;%lli;%s;%lli;%s;%lli;%lli;%lli;%lli;%lli",
             vlc_b64_encode(config_GetPsz(p_intf, "video-filter")),
             vlc_b64_encode(config_GetPsz(p_intf, "sub-source")),
             config_GetInt(p_intf, "hue"),
@@ -634,7 +646,10 @@ static VLCVideoEffects *_o_sharedInstance = nil;
             config_GetInt(p_intf, "marq-position"),
             vlc_b64_encode(config_GetPsz(p_intf, "logo-file")),
             config_GetInt(p_intf, "logo-position"),
-            config_GetInt(p_intf, "logo-opacity")
+            config_GetInt(p_intf, "logo-opacity"),
+            config_GetInt(p_intf, "clone-count"),
+            config_GetInt(p_intf, "wall-rows"),
+            config_GetInt(p_intf, "wall-cols")
             ];
 }
 
@@ -714,6 +729,9 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [self setVideoFilterProperty:"logo-file" forFilter:"logo" string:vlc_b64_decode([[items objectAtIndex:26] UTF8String])];
     [self setVideoFilterProperty:"logo-position" forFilter:"logo" integer:[[items objectAtIndex:27] intValue]];
     [self setVideoFilterProperty:"logo-opacity" forFilter:"logo" integer:[[items objectAtIndex:28] intValue]];
+    [self setVideoFilterProperty:"clone-count" forFilter:"clone" integer:[[items objectAtIndex:29] intValue]];
+    [self setVideoFilterProperty:"wall-rows" forFilter:"wall" integer:[[items objectAtIndex:30] intValue]];
+    [self setVideoFilterProperty:"wall-cols" forFilter:"wall" integer:[[items objectAtIndex:31] intValue]];
 
     [defaults setInteger:selectedProfile forKey:@"VideoEffectSelectedProfile"];
     [defaults synchronize];
@@ -1002,6 +1020,36 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         [self setVideoFilterProperty: "puzzle-rows" forFilter: "puzzle" integer: [o_puzzle_rows_fld intValue]];
 }
 
+- (IBAction)enableClone:(id)sender
+{
+    BOOL b_state = [o_clone_ckb state];
+
+    [self setVideoFilter: "clone" on: b_state];
+    [o_clone_number_lbl setEnabled: b_state];
+    [o_clone_number_fld setEnabled: b_state];
+}
+
+- (IBAction)cloneModifierChanged:(id)sender
+{
+    [self setVideoFilterProperty: "clone-count" forFilter: "clone" integer: [o_clone_number_fld intValue]];
+}
+
+- (IBAction)enableWall:(id)sender
+{
+    BOOL b_state = [o_wall_ckb state];
+
+    [self setVideoFilter: "wall" on: b_state];
+    [o_wall_numofcols_fld setEnabled: b_state];
+    [o_wall_numofcols_lbl setEnabled: b_state];
+    [o_wall_numofrows_fld setEnabled: b_state];
+    [o_wall_numofrows_lbl setEnabled: b_state];
+}
+
+- (IBAction)wallModifierChanged:(id)sender
+{
+    [self setVideoFilterProperty: "wall-cols" forFilter: "wall" integer: [o_wall_numofcols_fld intValue]];
+    [self setVideoFilterProperty: "wall-rows" forFilter: "wall" integer: [o_wall_numofrows_fld intValue]];
+}
 
 #pragma mark -
 #pragma mark color

@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">11G45</string>
+    <string key="IBDocument.SystemVersion">12C60</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1138.51</string>
-    <string key="IBDocument.HIToolboxVersion">569.00</string>
+    <string key="IBDocument.AppKitVersion">1187.34</string>
+    <string key="IBDocument.HIToolboxVersion">625.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <object class="NSArray" key="dict.sortedKeys">
@@ -103,6 +103,7 @@
                                   <bool key="NSVertical">NO</bool>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSSlider" id="714538558">
                                 <reference key="NSNextResponder" ref="627843039"/>
@@ -125,6 +126,7 @@
                                   <bool key="NSVertical">NO</bool>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSButton" id="372967191">
                                 <reference key="NSNextResponder" ref="627843039"/>
@@ -158,6 +160,7 @@
                                   <string key="themeKey">gradientTheme</string>
                                   <int key="BGButtonType">3</int>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSTextField" id="1023605254">
                                 <reference key="NSNextResponder" ref="627843039"/>
@@ -190,6 +193,7 @@
                                     </object>
                                   </object>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSTextField" id="1769326">
                                 <reference key="NSNextResponder" ref="627843039"/>
@@ -206,6 +210,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="314723737"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSTextField" id="685913676">
                                 <reference key="NSNextResponder" ref="627843039"/>
@@ -222,6 +227,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="314723737"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSTextField" id="396951138">
                                 <reference key="NSNextResponder" ref="627843039"/>
@@ -238,6 +244,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="314723737"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSTextField" id="279446133">
                                 <reference key="NSNextResponder" ref="627843039"/>
@@ -254,6 +261,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="314723737"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSSlider" id="1033837370">
                                 <reference key="NSNextResponder" ref="627843039"/>
@@ -276,6 +284,7 @@
                                   <bool key="NSVertical">NO</bool>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSSlider" id="376722054">
                                 <reference key="NSNextResponder" ref="627843039"/>
@@ -298,6 +307,7 @@
                                   <bool key="NSVertical">NO</bool>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSSlider" id="760066178">
                                 <reference key="NSNextResponder" ref="627843039"/>
@@ -320,6 +330,7 @@
                                   <bool key="NSVertical">NO</bool>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSButton" id="370408073">
                                 <reference key="NSNextResponder" ref="627843039"/>
@@ -353,6 +364,7 @@
                                   <string key="themeKey">gradientTheme</string>
                                   <int key="BGButtonType">0</int>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                             </object>
                             <string key="NSFrame">{{1, 1}, {308, 164}}</string>
@@ -410,6 +422,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSButton" id="828169901">
                         <reference key="NSNextResponder" ref="1044285835"/>
@@ -434,6 +447,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSBox" id="187753464">
                         <reference key="NSNextResponder" ref="1044285835"/>
@@ -460,6 +474,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="314723737"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSSlider" id="75681829">
                                 <reference key="NSNextResponder" ref="147543206"/>
@@ -482,6 +497,7 @@
                                   <bool key="NSVertical">NO</bool>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                             </object>
                             <string key="NSFrame">{{1, 1}, {308, 40}}</string>
@@ -531,6 +547,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSBox" id="545518538">
                         <reference key="NSNextResponder" ref="1044285835"/>
@@ -557,6 +574,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="314723737"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSSlider" id="484297776">
                                 <reference key="NSNextResponder" ref="832363197"/>
@@ -579,6 +597,7 @@
                                   <bool key="NSVertical">NO</bool>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                             </object>
                             <string key="NSFrame">{{1, 1}, {308, 40}}</string>
@@ -628,6 +647,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSBox" id="647966195">
                         <reference key="NSNextResponder" ref="1044285835"/>
@@ -654,6 +674,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="314723737"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSSlider" id="288762928">
                                 <reference key="NSNextResponder" ref="38396992"/>
@@ -676,6 +697,7 @@
                                   <bool key="NSVertical">NO</bool>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                             </object>
                             <string key="NSFrame">{{1, 1}, {308, 40}}</string>
@@ -807,6 +829,7 @@
                           <reference key="NSTextColor" ref="329898124"/>
                           <string key="themeKey">gradientTheme</string>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="BGHUDLabel" id="290531254">
                         <reference key="NSNextResponder" ref="838226260"/>
@@ -823,6 +846,7 @@
                           <reference key="NSBackgroundColor" ref="279270326"/>
                           <reference key="NSTextColor" ref="329898124"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSStepper" id="726085921">
@@ -840,6 +864,7 @@
                           <double key="NSIncrement">1</double>
                           <bool key="NSAutorepeat">YES</bool>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSTextField" id="190644777">
                         <reference key="NSNextResponder" ref="838226260"/>
@@ -915,6 +940,7 @@
                           <reference key="NSTextColor" ref="329898124"/>
                           <string key="themeKey">gradientTheme</string>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="BGHUDLabel" id="647574939">
                         <reference key="NSNextResponder" ref="838226260"/>
@@ -931,6 +957,7 @@
                           <reference key="NSBackgroundColor" ref="279270326"/>
                           <reference key="NSTextColor" ref="329898124"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSStepper" id="308507287">
@@ -948,6 +975,7 @@
                           <double key="NSIncrement">1</double>
                           <bool key="NSAutorepeat">YES</bool>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSTextField" id="950709956">
                         <reference key="NSNextResponder" ref="838226260"/>
@@ -1023,6 +1051,7 @@
                           <reference key="NSTextColor" ref="329898124"/>
                           <string key="themeKey">gradientTheme</string>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="BGHUDLabel" id="76138714">
                         <reference key="NSNextResponder" ref="838226260"/>
@@ -1039,6 +1068,7 @@
                           <reference key="NSBackgroundColor" ref="279270326"/>
                           <reference key="NSTextColor" ref="329898124"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSStepper" id="1010555455">
@@ -1056,6 +1086,7 @@
                           <double key="NSIncrement">1</double>
                           <bool key="NSAutorepeat">YES</bool>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSTextField" id="785525140">
                         <reference key="NSNextResponder" ref="838226260"/>
@@ -1131,6 +1162,7 @@
                           <reference key="NSTextColor" ref="329898124"/>
                           <string key="themeKey">gradientTheme</string>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="BGHUDLabel" id="299779593">
                         <reference key="NSNextResponder" ref="838226260"/>
@@ -1147,6 +1179,7 @@
                           <reference key="NSBackgroundColor" ref="279270326"/>
                           <reference key="NSTextColor" ref="329898124"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSStepper" id="764981534">
@@ -1164,6 +1197,7 @@
                           <double key="NSIncrement">1</double>
                           <bool key="NSAutorepeat">YES</bool>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSButton" id="973277604">
                         <reference key="NSNextResponder" ref="838226260"/>
@@ -1188,6 +1222,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSButton" id="447321799">
                         <reference key="NSNextResponder" ref="838226260"/>
@@ -1212,6 +1247,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {638, 197}}</string>
@@ -1223,7 +1259,7 @@
                 <object class="NSTabViewItem" id="160045531">
                   <string key="NSIdentifier">geometry</string>
                   <object class="NSView" key="NSView" id="934925915">
-                    <nil key="NSNextResponder"/>
+                    <reference key="NSNextResponder" ref="898819366"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1250,11 +1286,12 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSButton" id="767337060">
                         <reference key="NSNextResponder" ref="934925915"/>
                         <int key="NSvFlags">268</int>
-                        <string key="NSFrame">{{8, 114}, {170, 18}}</string>
+                        <string key="NSFrame">{{8, 110}, {170, 18}}</string>
                         <reference key="NSSuperview" ref="934925915"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDButtonCell" key="NSCell" id="541338988">
@@ -1274,6 +1311,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSBox" id="322802751">
                         <reference key="NSNextResponder" ref="934925915"/>
@@ -1292,7 +1330,7 @@
                                 <reference key="NSSuperview" ref="604515236"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDPopUpButtonCell" key="NSCell" id="108513680">
-                                  <int key="NSCellFlags">-2076049856</int>
+                                  <int key="NSCellFlags">-2076180416</int>
                                   <int key="NSCellFlags2">133120</int>
                                   <reference key="NSSupport" ref="26"/>
                                   <reference key="NSControlView" ref="401651452"/>
@@ -1356,6 +1394,7 @@
                                   <int key="NSArrowPosition">2</int>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                             </object>
                             <string key="NSFrame">{{1, 1}, {308, 44}}</string>
@@ -1405,6 +1444,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSBox" id="915406024">
                         <reference key="NSNextResponder" ref="934925915"/>
@@ -1439,6 +1479,7 @@
                                   <string key="themeKey">gradientTheme</string>
                                   <int key="BGButtonType">3</int>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSTextField" id="357710165">
                                 <reference key="NSNextResponder" ref="390350599"/>
@@ -1514,6 +1555,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSStepper" id="444599762">
                                 <reference key="NSNextResponder" ref="390350599"/>
@@ -1532,6 +1574,7 @@
                                   <double key="NSIncrement">1</double>
                                   <bool key="NSAutorepeat">YES</bool>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="BGHUDLabel" id="422916449">
                                 <reference key="NSNextResponder" ref="390350599"/>
@@ -1548,6 +1591,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="NSTextField" id="227755793">
@@ -1622,6 +1666,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSStepper" id="814287388">
                                 <reference key="NSNextResponder" ref="390350599"/>
@@ -1640,6 +1685,7 @@
                                   <double key="NSIncrement">1</double>
                                   <bool key="NSAutorepeat">YES</bool>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="BGHUDLabel" id="56743507">
                                 <reference key="NSNextResponder" ref="390350599"/>
@@ -1656,6 +1702,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
@@ -1683,8 +1730,472 @@
                         <int key="NSTitlePosition">0</int>
                         <bool key="NSTransparent">NO</bool>
                       </object>
+                      <object class="NSButton" id="1038213364">
+                        <reference key="NSNextResponder" ref="934925915"/>
+                        <int key="NSvFlags">268</int>
+                        <string key="NSFrame">{{8, 84}, {170, 18}}</string>
+                        <reference key="NSSuperview" ref="934925915"/>
+                        <bool key="NSEnabled">YES</bool>
+                        <object class="BGHUDButtonCell" key="NSCell" id="192718726">
+                          <int key="NSCellFlags">67108864</int>
+                          <int key="NSCellFlags2">131072</int>
+                          <string key="NSContents">Wall</string>
+                          <reference key="NSSupport" ref="26"/>
+                          <reference key="NSControlView" ref="1038213364"/>
+                          <int key="NSButtonFlags">1211912448</int>
+                          <int key="NSButtonFlags2">2</int>
+                          <reference key="NSNormalImage" ref="908559007"/>
+                          <reference key="NSAlternateImage" ref="223641879"/>
+                          <string key="NSAlternateContents"/>
+                          <string key="NSKeyEquivalent"/>
+                          <int key="NSPeriodicDelay">200</int>
+                          <int key="NSPeriodicInterval">25</int>
+                          <string key="themeKey">gradientTheme</string>
+                          <int key="BGButtonType">3</int>
+                        </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                      </object>
+                      <object class="NSBox" id="292241539">
+                        <reference key="NSNextResponder" ref="934925915"/>
+                        <int key="NSvFlags">36</int>
+                        <object class="NSMutableArray" key="NSSubviews">
+                          <bool key="EncodedWithXMLCoder">YES</bool>
+                          <object class="NSView" id="143693211">
+                            <reference key="NSNextResponder" ref="292241539"/>
+                            <int key="NSvFlags">274</int>
+                            <object class="NSMutableArray" key="NSSubviews">
+                              <bool key="EncodedWithXMLCoder">YES</bool>
+                              <object class="NSTextField" id="642230523">
+                                <reference key="NSNextResponder" ref="143693211"/>
+                                <int key="NSvFlags">268</int>
+                                <object class="NSMutableArray" key="NSSubviews">
+                                  <bool key="EncodedWithXMLCoder">YES</bool>
+                                </object>
+                                <string key="NSFrame">{{170, 41}, {96, 19}}</string>
+                                <reference key="NSSuperview" ref="143693211"/>
+                                <bool key="NSEnabled">YES</bool>
+                                <object class="BGHUDTextFieldCell" key="NSCell" id="133526103">
+                                  <int key="NSCellFlags">-1804599231</int>
+                                  <int key="NSCellFlags2">71435264</int>
+                                  <integer value="4" key="NSContents"/>
+                                  <reference key="NSSupport" ref="26"/>
+                                  <object class="NSNumberFormatter" key="NSFormatter" id="901768241">
+                                    <object class="NSMutableDictionary" key="NS.attributes">
+                                      <bool key="EncodedWithXMLCoder">YES</bool>
+                                      <object class="NSArray" key="dict.sortedKeys">
+                                        <bool key="EncodedWithXMLCoder">YES</bool>
+                                        <string>allowsFloats</string>
+                                        <string>formatterBehavior</string>
+                                        <string>locale</string>
+                                        <string>minimum</string>
+                                        <string>negativeFormat</string>
+                                        <string>negativeInfinitySymbol</string>
+                                        <string>nilSymbol</string>
+                                        <string>positiveFormat</string>
+                                        <string>positiveInfinitySymbol</string>
+                                        <string>roundingIncrement</string>
+                                        <string>roundingMode</string>
+                                      </object>
+                                      <object class="NSMutableArray" key="dict.values">
+                                        <bool key="EncodedWithXMLCoder">YES</bool>
+                                        <boolean value="NO"/>
+                                        <integer value="1040"/>
+                                        <reference ref="1015810800"/>
+                                        <real value="1"/>
+                                        <string>0</string>
+                                        <string>-∞</string>
+                                        <string/>
+                                        <string>0</string>
+                                        <string>+∞</string>
+                                        <real value="1"/>
+                                        <integer value="1"/>
+                                      </object>
+                                    </object>
+                                    <string key="NS.positiveformat">0</string>
+                                    <string key="NS.negativeformat">0</string>
+                                    <nil key="NS.positiveattrs"/>
+                                    <nil key="NS.negativeattrs"/>
+                                    <nil key="NS.zero"/>
+                                    <object class="NSAttributedString" key="NS.nil">
+                                      <string key="NSString"/>
+                                    </object>
+                                    <object class="NSAttributedString" key="NS.nan">
+                                      <string key="NSString">NaN</string>
+                                      <reference key="NSAttributes" ref="639313226"/>
+                                    </object>
+                                    <real value="1" key="NS.min"/>
+                                    <reference key="NS.max" ref="1005529056"/>
+                                    <object class="NSDecimalNumberHandler" key="NS.rounding">
+                                      <int key="NS.roundingmode">1</int>
+                                      <bool key="NS.raise.overflow">YES</bool>
+                                      <bool key="NS.raise.underflow">YES</bool>
+                                      <bool key="NS.raise.dividebyzero">YES</bool>
+                                    </object>
+                                    <string key="NS.decimal">.</string>
+                                    <string key="NS.thousand">,</string>
+                                    <bool key="NS.hasthousands">NO</bool>
+                                    <bool key="NS.localized">NO</bool>
+                                    <bool key="NS.allowsfloats">NO</bool>
+                                  </object>
+                                  <reference key="NSControlView" ref="642230523"/>
+                                  <reference key="NSBackgroundColor" ref="433541719"/>
+                                  <reference key="NSTextColor" ref="329898124"/>
+                                  <string key="themeKey">gradientTheme</string>
+                                </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                              </object>
+                              <object class="NSStepper" id="979664043">
+                                <reference key="NSNextResponder" ref="143693211"/>
+                                <int key="NSvFlags">268</int>
+                                <string key="NSFrame">{{271, 39}, {15, 22}}</string>
+                                <reference key="NSSuperview" ref="143693211"/>
+                                <bool key="NSEnabled">YES</bool>
+                                <object class="BGHUDStepperCell" key="NSCell" id="505774956">
+                                  <int key="NSCellFlags">67895328</int>
+                                  <int key="NSCellFlags2">131072</int>
+                                  <reference key="NSSupport" ref="26"/>
+                                  <reference key="NSControlView" ref="979664043"/>
+                                  <double key="NSValue">4</double>
+                                  <double key="NSMinValue">1</double>
+                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSIncrement">1</double>
+                                  <bool key="NSAutorepeat">YES</bool>
+                                </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                              </object>
+                              <object class="BGHUDLabel" id="132104569">
+                                <reference key="NSNextResponder" ref="143693211"/>
+                                <int key="NSvFlags">268</int>
+                                <string key="NSFrame">{{15, 44}, {86, 14}}</string>
+                                <reference key="NSSuperview" ref="143693211"/>
+                                <bool key="NSEnabled">YES</bool>
+                                <object class="NSTextFieldCell" key="NSCell" id="735158151">
+                                  <int key="NSCellFlags">68157504</int>
+                                  <int key="NSCellFlags2">272761856</int>
+                                  <string key="NSContents">Rows</string>
+                                  <reference key="NSSupport" ref="26"/>
+                                  <reference key="NSControlView" ref="132104569"/>
+                                  <reference key="NSBackgroundColor" ref="279270326"/>
+                                  <reference key="NSTextColor" ref="329898124"/>
+                                </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <string key="themeKey">gradientTheme</string>
+                              </object>
+                              <object class="NSTextField" id="147071705">
+                                <reference key="NSNextResponder" ref="143693211"/>
+                                <int key="NSvFlags">268</int>
+                                <object class="NSMutableArray" key="NSSubviews">
+                                  <bool key="EncodedWithXMLCoder">YES</bool>
+                                </object>
+                                <string key="NSFrame">{{170, 14}, {96, 19}}</string>
+                                <reference key="NSSuperview" ref="143693211"/>
+                                <bool key="NSEnabled">YES</bool>
+                                <object class="BGHUDTextFieldCell" key="NSCell" id="409274972">
+                                  <int key="NSCellFlags">-1804599231</int>
+                                  <int key="NSCellFlags2">71435264</int>
+                                  <integer value="2" key="NSContents"/>
+                                  <reference key="NSSupport" ref="26"/>
+                                  <object class="NSNumberFormatter" key="NSFormatter" id="960932952">
+                                    <object class="NSMutableDictionary" key="NS.attributes">
+                                      <bool key="EncodedWithXMLCoder">YES</bool>
+                                      <object class="NSArray" key="dict.sortedKeys">
+                                        <bool key="EncodedWithXMLCoder">YES</bool>
+                                        <string>allowsFloats</string>
+                                        <string>formatterBehavior</string>
+                                        <string>locale</string>
+                                        <string>minimum</string>
+                                        <string>negativeFormat</string>
+                                        <string>negativeInfinitySymbol</string>
+                                        <string>nilSymbol</string>
+                                        <string>positiveFormat</string>
+                                        <string>positiveInfinitySymbol</string>
+                                        <string>roundingIncrement</string>
+                                      </object>
+                                      <object class="NSMutableArray" key="dict.values">
+                                        <bool key="EncodedWithXMLCoder">YES</bool>
+                                        <boolean value="NO"/>
+                                        <integer value="1040"/>
+                                        <reference ref="1015810800"/>
+                                        <real value="1"/>
+                                        <string>0</string>
+                                        <string>-∞</string>
+                                        <string/>
+                                        <string>0</string>
+                                        <string>+∞</string>
+                                        <real value="1"/>
+                                      </object>
+                                    </object>
+                                    <string key="NS.positiveformat">0</string>
+                                    <string key="NS.negativeformat">0</string>
+                                    <nil key="NS.positiveattrs"/>
+                                    <nil key="NS.negativeattrs"/>
+                                    <nil key="NS.zero"/>
+                                    <object class="NSAttributedString" key="NS.nil">
+                                      <string key="NSString"/>
+                                    </object>
+                                    <object class="NSAttributedString" key="NS.nan">
+                                      <string key="NSString">NaN</string>
+                                      <reference key="NSAttributes" ref="639313226"/>
+                                    </object>
+                                    <real value="1" key="NS.min"/>
+                                    <reference key="NS.max" ref="1005529056"/>
+                                    <object class="NSDecimalNumberHandler" key="NS.rounding">
+                                      <int key="NS.roundingmode">3</int>
+                                      <bool key="NS.raise.overflow">YES</bool>
+                                      <bool key="NS.raise.underflow">YES</bool>
+                                      <bool key="NS.raise.dividebyzero">YES</bool>
+                                    </object>
+                                    <string key="NS.decimal">.</string>
+                                    <string key="NS.thousand">,</string>
+                                    <bool key="NS.hasthousands">NO</bool>
+                                    <bool key="NS.localized">NO</bool>
+                                    <bool key="NS.allowsfloats">NO</bool>
+                                  </object>
+                                  <reference key="NSControlView" ref="147071705"/>
+                                  <reference key="NSBackgroundColor" ref="433541719"/>
+                                  <reference key="NSTextColor" ref="329898124"/>
+                                  <string key="themeKey">gradientTheme</string>
+                                </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                              </object>
+                              <object class="NSStepper" id="228437242">
+                                <reference key="NSNextResponder" ref="143693211"/>
+                                <int key="NSvFlags">268</int>
+                                <string key="NSFrame">{{271, 12}, {15, 22}}</string>
+                                <reference key="NSSuperview" ref="143693211"/>
+                                <bool key="NSEnabled">YES</bool>
+                                <object class="BGHUDStepperCell" key="NSCell" id="926764826">
+                                  <int key="NSCellFlags">67895328</int>
+                                  <int key="NSCellFlags2">131072</int>
+                                  <reference key="NSSupport" ref="26"/>
+                                  <reference key="NSControlView" ref="228437242"/>
+                                  <double key="NSValue">4</double>
+                                  <double key="NSMinValue">1</double>
+                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSIncrement">1</double>
+                                  <bool key="NSAutorepeat">YES</bool>
+                                </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                              </object>
+                              <object class="BGHUDLabel" id="159284559">
+                                <reference key="NSNextResponder" ref="143693211"/>
+                                <int key="NSvFlags">268</int>
+                                <string key="NSFrame">{{15, 17}, {86, 14}}</string>
+                                <reference key="NSSuperview" ref="143693211"/>
+                                <bool key="NSEnabled">YES</bool>
+                                <object class="NSTextFieldCell" key="NSCell" id="609445311">
+                                  <int key="NSCellFlags">68157504</int>
+                                  <int key="NSCellFlags2">272761856</int>
+                                  <string key="NSContents">Columns</string>
+                                  <reference key="NSSupport" ref="26"/>
+                                  <reference key="NSControlView" ref="159284559"/>
+                                  <reference key="NSBackgroundColor" ref="279270326"/>
+                                  <reference key="NSTextColor" ref="329898124"/>
+                                </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <string key="themeKey">gradientTheme</string>
+                              </object>
+                            </object>
+                            <string key="NSFrame">{{1, 1}, {308, 72}}</string>
+                            <reference key="NSSuperview" ref="292241539"/>
+                          </object>
+                        </object>
+                        <string key="NSFrame">{{8, 12}, {310, 74}}</string>
+                        <reference key="NSSuperview" ref="934925915"/>
+                        <string key="NSOffsets">{0, 0}</string>
+                        <object class="NSTextFieldCell" key="NSTitleCell">
+                          <int key="NSCellFlags">67108864</int>
+                          <int key="NSCellFlags2">0</int>
+                          <string key="NSContents">Box</string>
+                          <reference key="NSSupport" ref="26"/>
+                          <reference key="NSBackgroundColor" ref="433541719"/>
+                          <object class="NSColor" key="NSTextColor">
+                            <int key="NSColorSpace">3</int>
+                            <bytes key="NSWhite">MCAwLjgwMDAwMDAxMTkAA</bytes>
+                          </object>
+                        </object>
+                        <reference key="NSContentView" ref="143693211"/>
+                        <int key="NSBorderType">1</int>
+                        <int key="NSBoxType">0</int>
+                        <int key="NSTitlePosition">0</int>
+                        <bool key="NSTransparent">NO</bool>
+                      </object>
+                      <object class="NSButton" id="415395095">
+                        <reference key="NSNextResponder" ref="934925915"/>
+                        <int key="NSvFlags">268</int>
+                        <string key="NSFrame">{{320, 57}, {170, 18}}</string>
+                        <reference key="NSSuperview" ref="934925915"/>
+                        <bool key="NSEnabled">YES</bool>
+                        <object class="BGHUDButtonCell" key="NSCell" id="453694164">
+                          <int key="NSCellFlags">67108864</int>
+                          <int key="NSCellFlags2">131072</int>
+                          <string key="NSContents">Clone</string>
+                          <reference key="NSSupport" ref="26"/>
+                          <reference key="NSControlView" ref="415395095"/>
+                          <int key="NSButtonFlags">1211912448</int>
+                          <int key="NSButtonFlags2">2</int>
+                          <reference key="NSNormalImage" ref="908559007"/>
+                          <reference key="NSAlternateImage" ref="223641879"/>
+                          <string key="NSAlternateContents"/>
+                          <string key="NSKeyEquivalent"/>
+                          <int key="NSPeriodicDelay">200</int>
+                          <int key="NSPeriodicInterval">25</int>
+                          <string key="themeKey">gradientTheme</string>
+                          <int key="BGButtonType">3</int>
+                        </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                      </object>
+                      <object class="NSBox" id="1040338176">
+                        <reference key="NSNextResponder" ref="934925915"/>
+                        <int key="NSvFlags">36</int>
+                        <object class="NSMutableArray" key="NSSubviews">
+                          <bool key="EncodedWithXMLCoder">YES</bool>
+                          <object class="NSView" id="631019302">
+                            <reference key="NSNextResponder" ref="1040338176"/>
+                            <int key="NSvFlags">274</int>
+                            <object class="NSMutableArray" key="NSSubviews">
+                              <bool key="EncodedWithXMLCoder">YES</bool>
+                              <object class="NSTextField" id="559295681">
+                                <reference key="NSNextResponder" ref="631019302"/>
+                                <int key="NSvFlags">268</int>
+                                <string key="NSFrame">{{170, 14}, {96, 19}}</string>
+                                <reference key="NSSuperview" ref="631019302"/>
+                                <bool key="NSEnabled">YES</bool>
+                                <object class="BGHUDTextFieldCell" key="NSCell" id="863799586">
+                                  <int key="NSCellFlags">-1804599231</int>
+                                  <int key="NSCellFlags2">71435264</int>
+                                  <integer value="4" key="NSContents"/>
+                                  <reference key="NSSupport" ref="26"/>
+                                  <object class="NSNumberFormatter" key="NSFormatter" id="1023099027">
+                                    <object class="NSMutableDictionary" key="NS.attributes">
+                                      <bool key="EncodedWithXMLCoder">YES</bool>
+                                      <object class="NSArray" key="dict.sortedKeys">
+                                        <bool key="EncodedWithXMLCoder">YES</bool>
+                                        <string>allowsFloats</string>
+                                        <string>formatterBehavior</string>
+                                        <string>locale</string>
+                                        <string>minimum</string>
+                                        <string>negativeFormat</string>
+                                        <string>negativeInfinitySymbol</string>
+                                        <string>nilSymbol</string>
+                                        <string>positiveFormat</string>
+                                        <string>positiveInfinitySymbol</string>
+                                        <string>roundingIncrement</string>
+                                        <string>roundingMode</string>
+                                      </object>
+                                      <object class="NSMutableArray" key="dict.values">
+                                        <bool key="EncodedWithXMLCoder">YES</bool>
+                                        <boolean value="NO"/>
+                                        <integer value="1040"/>
+                                        <reference ref="1015810800"/>
+                                        <real value="1"/>
+                                        <string>0</string>
+                                        <string>-∞</string>
+                                        <string/>
+                                        <string>0</string>
+                                        <string>+∞</string>
+                                        <real value="1"/>
+                                        <integer value="1"/>
+                                      </object>
+                                    </object>
+                                    <string key="NS.positiveformat">0</string>
+                                    <string key="NS.negativeformat">0</string>
+                                    <nil key="NS.positiveattrs"/>
+                                    <nil key="NS.negativeattrs"/>
+                                    <nil key="NS.zero"/>
+                                    <object class="NSAttributedString" key="NS.nil">
+                                      <string key="NSString"/>
+                                    </object>
+                                    <object class="NSAttributedString" key="NS.nan">
+                                      <string key="NSString">NaN</string>
+                                      <reference key="NSAttributes" ref="639313226"/>
+                                    </object>
+                                    <real value="1" key="NS.min"/>
+                                    <reference key="NS.max" ref="1005529056"/>
+                                    <object class="NSDecimalNumberHandler" key="NS.rounding">
+                                      <int key="NS.roundingmode">1</int>
+                                      <bool key="NS.raise.overflow">YES</bool>
+                                      <bool key="NS.raise.underflow">YES</bool>
+                                      <bool key="NS.raise.dividebyzero">YES</bool>
+                                    </object>
+                                    <string key="NS.decimal">.</string>
+                                    <string key="NS.thousand">,</string>
+                                    <bool key="NS.hasthousands">NO</bool>
+                                    <bool key="NS.localized">NO</bool>
+                                    <bool key="NS.allowsfloats">NO</bool>
+                                  </object>
+                                  <reference key="NSControlView" ref="559295681"/>
+                                  <reference key="NSBackgroundColor" ref="433541719"/>
+                                  <reference key="NSTextColor" ref="329898124"/>
+                                  <string key="themeKey">gradientTheme</string>
+                                </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                              </object>
+                              <object class="NSStepper" id="1003951278">
+                                <reference key="NSNextResponder" ref="631019302"/>
+                                <int key="NSvFlags">268</int>
+                                <string key="NSFrame">{{271, 12}, {15, 22}}</string>
+                                <reference key="NSSuperview" ref="631019302"/>
+                                <bool key="NSEnabled">YES</bool>
+                                <object class="BGHUDStepperCell" key="NSCell" id="667079428">
+                                  <int key="NSCellFlags">67895328</int>
+                                  <int key="NSCellFlags2">131072</int>
+                                  <reference key="NSSupport" ref="26"/>
+                                  <reference key="NSControlView" ref="1003951278"/>
+                                  <double key="NSValue">4</double>
+                                  <double key="NSMinValue">1</double>
+                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSIncrement">1</double>
+                                  <bool key="NSAutorepeat">YES</bool>
+                                </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                              </object>
+                              <object class="BGHUDLabel" id="984148455">
+                                <reference key="NSNextResponder" ref="631019302"/>
+                                <int key="NSvFlags">268</int>
+                                <string key="NSFrame">{{15, 17}, {99, 14}}</string>
+                                <reference key="NSSuperview" ref="631019302"/>
+                                <bool key="NSEnabled">YES</bool>
+                                <object class="NSTextFieldCell" key="NSCell" id="809644140">
+                                  <int key="NSCellFlags">68157504</int>
+                                  <int key="NSCellFlags2">272761856</int>
+                                  <string key="NSContents">Number of clones</string>
+                                  <reference key="NSSupport" ref="26"/>
+                                  <reference key="NSControlView" ref="984148455"/>
+                                  <reference key="NSBackgroundColor" ref="279270326"/>
+                                  <reference key="NSTextColor" ref="329898124"/>
+                                </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <string key="themeKey">gradientTheme</string>
+                              </object>
+                            </object>
+                            <string key="NSFrame">{{1, 1}, {308, 45}}</string>
+                            <reference key="NSSuperview" ref="1040338176"/>
+                          </object>
+                        </object>
+                        <string key="NSFrame">{{320, 12}, {310, 47}}</string>
+                        <reference key="NSSuperview" ref="934925915"/>
+                        <string key="NSOffsets">{0, 0}</string>
+                        <object class="NSTextFieldCell" key="NSTitleCell">
+                          <int key="NSCellFlags">67108864</int>
+                          <int key="NSCellFlags2">0</int>
+                          <string key="NSContents">Box</string>
+                          <reference key="NSSupport" ref="26"/>
+                          <reference key="NSBackgroundColor" ref="433541719"/>
+                          <object class="NSColor" key="NSTextColor">
+                            <int key="NSColorSpace">3</int>
+                            <bytes key="NSWhite">MCAwLjgwMDAwMDAxMTkAA</bytes>
+                          </object>
+                        </object>
+                        <reference key="NSContentView" ref="631019302"/>
+                        <int key="NSBorderType">1</int>
+                        <int key="NSBoxType">0</int>
+                        <int key="NSTitlePosition">0</int>
+                        <bool key="NSTransparent">NO</bool>
+                      </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {638, 197}}</string>
+                    <reference key="NSSuperview" ref="898819366"/>
                   </object>
                   <string key="NSLabel">Geometry</string>
                   <reference key="NSColor" ref="279270326"/>
@@ -1714,7 +2225,7 @@
                                 <reference key="NSSuperview" ref="1016560287"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDPopUpButtonCell" key="NSCell" id="582129691">
-                                  <int key="NSCellFlags">-2076049856</int>
+                                  <int key="NSCellFlags">-2076180416</int>
                                   <int key="NSCellFlags2">133120</int>
                                   <reference key="NSSupport" ref="26"/>
                                   <reference key="NSControlView" ref="856105297"/>
@@ -1772,6 +2283,7 @@
                                   <int key="NSArrowPosition">2</int>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSButton" id="121731822">
                                 <reference key="NSNextResponder" ref="1016560287"/>
@@ -1796,6 +2308,7 @@
                                   <string key="themeKey">gradientTheme</string>
                                   <int key="BGButtonType">3</int>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSButton" id="275724926">
                                 <reference key="NSNextResponder" ref="1016560287"/>
@@ -1820,6 +2333,7 @@
                                   <string key="themeKey">gradientTheme</string>
                                   <int key="BGButtonType">3</int>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="BGHUDLabel" id="239172455">
                                 <reference key="NSNextResponder" ref="1016560287"/>
@@ -1836,6 +2350,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
@@ -1886,6 +2401,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSButton" id="677375378">
                         <reference key="NSNextResponder" ref="10628740"/>
@@ -1910,6 +2426,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSButton" id="679961475">
                         <reference key="NSNextResponder" ref="10628740"/>
@@ -1934,6 +2451,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSButton" id="834758738">
                         <reference key="NSNextResponder" ref="10628740"/>
@@ -1958,6 +2476,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSButton" id="663519093">
                         <reference key="NSNextResponder" ref="10628740"/>
@@ -1982,6 +2501,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSButton" id="158304666">
                         <reference key="NSNextResponder" ref="10628740"/>
@@ -2006,6 +2526,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSButton" id="531092636">
                         <reference key="NSNextResponder" ref="10628740"/>
@@ -2030,6 +2551,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSButton" id="699678759">
                         <reference key="NSNextResponder" ref="10628740"/>
@@ -2054,6 +2576,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSBox" id="1073709691">
                         <reference key="NSNextResponder" ref="10628740"/>
@@ -2139,6 +2662,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSStepper" id="357676033">
                                 <reference key="NSNextResponder" ref="921442235"/>
@@ -2157,6 +2681,7 @@
                                   <double key="NSIncrement">1</double>
                                   <bool key="NSAutorepeat">YES</bool>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="BGHUDLabel" id="292300172">
                                 <reference key="NSNextResponder" ref="921442235"/>
@@ -2173,6 +2698,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
@@ -2223,6 +2749,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSBox" id="585430826">
                         <reference key="NSNextResponder" ref="10628740"/>
@@ -2314,6 +2841,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSStepper" id="614130362">
                                 <reference key="NSNextResponder" ref="32843737"/>
@@ -2332,6 +2860,7 @@
                                   <bool key="NSValueWraps">YES</bool>
                                   <bool key="NSAutorepeat">YES</bool>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="BGHUDLabel" id="1042139911">
                                 <reference key="NSNextResponder" ref="32843737"/>
@@ -2348,6 +2877,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
@@ -2398,6 +2928,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSBox" id="136570371">
                         <reference key="NSNextResponder" ref="10628740"/>
@@ -2424,6 +2955,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="NSTextField" id="79386836">
@@ -2442,6 +2974,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                             </object>
                             <string key="NSFrame">{{1, 1}, {187, 45}}</string>
@@ -2491,6 +3024,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSBox" id="1003121382">
                         <reference key="NSNextResponder" ref="10628740"/>
@@ -2523,6 +3057,7 @@
                                   <bool key="NSVertical">NO</bool>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="BGHUDLabel" id="51109381">
                                 <reference key="NSNextResponder" ref="661515527"/>
@@ -2539,6 +3074,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
@@ -2589,6 +3125,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSBox" id="387682604">
                         <reference key="NSNextResponder" ref="10628740"/>
@@ -2621,6 +3158,7 @@
                                   <bool key="NSVertical">NO</bool>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="BGHUDLabel" id="1067643079">
                                 <reference key="NSNextResponder" ref="777354439"/>
@@ -2637,6 +3175,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="NSSlider" id="538371352">
@@ -2660,6 +3199,7 @@
                                   <bool key="NSVertical">NO</bool>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="BGHUDLabel" id="130646279">
                                 <reference key="NSNextResponder" ref="777354439"/>
@@ -2676,6 +3216,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="152203922">
@@ -2693,6 +3234,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="NSTextField" id="1069462988">
@@ -2710,6 +3252,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                             </object>
                             <string key="NSFrame">{{1, 1}, {212, 88}}</string>
@@ -2746,7 +3289,7 @@
                 <object class="NSTabViewItem" id="657146767">
                   <string key="NSIdentifier">misc</string>
                   <object class="NSView" key="NSView" id="542129148">
-                    <reference key="NSNextResponder" ref="898819366"/>
+                    <nil key="NSNextResponder"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -2773,6 +3316,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSBox" id="152169790">
                         <reference key="NSNextResponder" ref="542129148"/>
@@ -2799,6 +3343,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="509844824">
@@ -2816,6 +3361,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="NSPopUpButton" id="135717749">
@@ -2825,7 +3371,7 @@
                                 <reference key="NSSuperview" ref="917161400"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDPopUpButtonCell" key="NSCell" id="21531827">
-                                  <int key="NSCellFlags">-2076049856</int>
+                                  <int key="NSCellFlags">-2076180416</int>
                                   <int key="NSCellFlags2">133120</int>
                                   <reference key="NSSupport" ref="26"/>
                                   <reference key="NSControlView" ref="135717749"/>
@@ -2883,6 +3429,7 @@
                                   <int key="NSArrowPosition">2</int>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSTextField" id="341775592">
                                 <reference key="NSNextResponder" ref="917161400"/>
@@ -2900,6 +3447,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                             </object>
                             <string key="NSFrame">{{1, 1}, {308, 70}}</string>
@@ -2949,6 +3497,7 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="NSBox" id="151632734">
                         <reference key="NSNextResponder" ref="542129148"/>
@@ -2975,6 +3524,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="951174239">
@@ -2992,6 +3542,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="20899909">
@@ -3009,6 +3560,7 @@
                                   <reference key="NSBackgroundColor" ref="279270326"/>
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="NSTextField" id="831721084">
@@ -3027,6 +3579,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSSlider" id="1005375083">
                                 <reference key="NSNextResponder" ref="232040287"/>
@@ -3049,6 +3602,7 @@
                                   <bool key="NSVertical">NO</bool>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                               <object class="NSPopUpButton" id="724587152">
                                 <reference key="NSNextResponder" ref="232040287"/>
@@ -3057,7 +3611,7 @@
                                 <reference key="NSSuperview" ref="232040287"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDPopUpButtonCell" key="NSCell" id="788250936">
-                                  <int key="NSCellFlags">-2076049856</int>
+                                  <int key="NSCellFlags">-2076180416</int>
                                   <int key="NSCellFlags2">133120</int>
                                   <reference key="NSSupport" ref="26"/>
                                   <reference key="NSControlView" ref="724587152"/>
@@ -3115,6 +3669,7 @@
                                   <int key="NSArrowPosition">2</int>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                               </object>
                             </object>
                             <string key="NSFrame">{{1, 1}, {310, 93}}</string>
@@ -3164,17 +3719,17 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">3</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {638, 197}}</string>
-                    <reference key="NSSuperview" ref="898819366"/>
                   </object>
                   <string key="NSLabel">Miscellaneous</string>
                   <reference key="NSColor" ref="279270326"/>
                   <reference key="NSTabView" ref="898819366"/>
                 </object>
               </object>
-              <reference key="NSSelectedTabViewItem" ref="657146767"/>
+              <reference key="NSSelectedTabViewItem" ref="160045531"/>
               <object class="NSFont" key="NSFont">
                 <string key="NSName">LucidaGrande</string>
                 <double key="NSSize">13</double>
@@ -3186,7 +3741,7 @@
               <nil key="themeKey"/>
               <object class="NSMutableArray" key="NSSubviews">
                 <bool key="EncodedWithXMLCoder">YES</bool>
-                <reference ref="542129148"/>
+                <reference ref="934925915"/>
               </object>
             </object>
             <object class="NSPopUpButton" id="1044210417">
@@ -3196,7 +3751,7 @@
               <reference key="NSSuperview" ref="1006"/>
               <bool key="NSEnabled">YES</bool>
               <object class="BGHUDPopUpButtonCell" key="NSCell" id="445716282">
-                <int key="NSCellFlags">-2076049856</int>
+                <int key="NSCellFlags">-2076180416</int>
                 <int key="NSCellFlags2">133120</int>
                 <reference key="NSSupport" ref="26"/>
                 <reference key="NSControlView" ref="1044210417"/>
@@ -3254,6 +3809,7 @@
                 <int key="NSArrowPosition">2</int>
                 <string key="themeKey">gradientTheme</string>
               </object>
+              <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
             </object>
           </object>
           <string key="NSFrameSize">{642, 274}</string>
@@ -4527,6 +5083,134 @@
           </object>
           <int key="connectionID">728</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">takeIntegerValueFrom:</string>
+            <reference key="source" ref="559295681"/>
+            <reference key="destination" ref="1003951278"/>
+          </object>
+          <int key="connectionID">748</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">takeIntegerValueFrom:</string>
+            <reference key="source" ref="147071705"/>
+            <reference key="destination" ref="228437242"/>
+          </object>
+          <int key="connectionID">773</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">takeIntegerValueFrom:</string>
+            <reference key="source" ref="642230523"/>
+            <reference key="destination" ref="979664043"/>
+          </object>
+          <int key="connectionID">774</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_clone_ckb</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="415395095"/>
+          </object>
+          <int key="connectionID">779</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_clone_number_fld</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="559295681"/>
+          </object>
+          <int key="connectionID">780</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_clone_number_lbl</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="984148455"/>
+          </object>
+          <int key="connectionID">781</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_wall_ckb</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="1038213364"/>
+          </object>
+          <int key="connectionID">782</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_wall_numofcols_fld</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="147071705"/>
+          </object>
+          <int key="connectionID">783</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_wall_numofcols_lbl</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="159284559"/>
+          </object>
+          <int key="connectionID">784</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_wall_numofrows_fld</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="642230523"/>
+          </object>
+          <int key="connectionID">785</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_wall_numofrows_lbl</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="132104569"/>
+          </object>
+          <int key="connectionID">786</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">enableClone:</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="415395095"/>
+          </object>
+          <int key="connectionID">787</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">enableWall:</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="1038213364"/>
+          </object>
+          <int key="connectionID">788</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">wallModifierChanged:</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="147071705"/>
+          </object>
+          <int key="connectionID">789</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">wallModifierChanged:</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="642230523"/>
+          </object>
+          <int key="connectionID">790</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">cloneModifierChanged:</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="559295681"/>
+          </object>
+          <int key="connectionID">791</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -4662,6 +5346,10 @@
               <reference ref="351076845"/>
               <reference ref="322802751"/>
               <reference ref="767337060"/>
+              <reference ref="415395095"/>
+              <reference ref="1040338176"/>
+              <reference ref="1038213364"/>
+              <reference ref="292241539"/>
             </object>
             <reference key="parent" ref="160045531"/>
           </object>
@@ -6422,6 +7110,212 @@
             <reference key="object" ref="610515288"/>
             <reference key="parent" ref="545082102"/>
           </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">729</int>
+            <reference key="object" ref="415395095"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="453694164"/>
+            </object>
+            <reference key="parent" ref="934925915"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">730</int>
+            <reference key="object" ref="1040338176"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="984148455"/>
+              <reference ref="1003951278"/>
+              <reference ref="559295681"/>
+            </object>
+            <reference key="parent" ref="934925915"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">734</int>
+            <reference key="object" ref="984148455"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="809644140"/>
+            </object>
+            <reference key="parent" ref="1040338176"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">735</int>
+            <reference key="object" ref="1003951278"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="667079428"/>
+            </object>
+            <reference key="parent" ref="1040338176"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">736</int>
+            <reference key="object" ref="559295681"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="863799586"/>
+            </object>
+            <reference key="parent" ref="1040338176"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">739</int>
+            <reference key="object" ref="863799586"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="1023099027"/>
+            </object>
+            <reference key="parent" ref="559295681"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">740</int>
+            <reference key="object" ref="1023099027"/>
+            <reference key="parent" ref="863799586"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">741</int>
+            <reference key="object" ref="667079428"/>
+            <reference key="parent" ref="1003951278"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">742</int>
+            <reference key="object" ref="809644140"/>
+            <reference key="parent" ref="984148455"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">747</int>
+            <reference key="object" ref="453694164"/>
+            <reference key="parent" ref="415395095"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">754</int>
+            <reference key="object" ref="1038213364"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="192718726"/>
+            </object>
+            <reference key="parent" ref="934925915"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">755</int>
+            <reference key="object" ref="292241539"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="159284559"/>
+              <reference ref="228437242"/>
+              <reference ref="147071705"/>
+              <reference ref="132104569"/>
+              <reference ref="979664043"/>
+              <reference ref="642230523"/>
+            </object>
+            <reference key="parent" ref="934925915"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">756</int>
+            <reference key="object" ref="159284559"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="609445311"/>
+            </object>
+            <reference key="parent" ref="292241539"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">757</int>
+            <reference key="object" ref="228437242"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="926764826"/>
+            </object>
+            <reference key="parent" ref="292241539"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">758</int>
+            <reference key="object" ref="147071705"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="409274972"/>
+            </object>
+            <reference key="parent" ref="292241539"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">759</int>
+            <reference key="object" ref="132104569"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="735158151"/>
+            </object>
+            <reference key="parent" ref="292241539"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">760</int>
+            <reference key="object" ref="979664043"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="505774956"/>
+            </object>
+            <reference key="parent" ref="292241539"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">761</int>
+            <reference key="object" ref="642230523"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="133526103"/>
+            </object>
+            <reference key="parent" ref="292241539"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">764</int>
+            <reference key="object" ref="133526103"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="901768241"/>
+            </object>
+            <reference key="parent" ref="642230523"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">765</int>
+            <reference key="object" ref="901768241"/>
+            <reference key="parent" ref="133526103"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">766</int>
+            <reference key="object" ref="505774956"/>
+            <reference key="parent" ref="979664043"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">767</int>
+            <reference key="object" ref="735158151"/>
+            <reference key="parent" ref="132104569"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">768</int>
+            <reference key="object" ref="409274972"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="960932952"/>
+            </object>
+            <reference key="parent" ref="147071705"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">769</int>
+            <reference key="object" ref="960932952"/>
+            <reference key="parent" ref="409274972"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">770</int>
+            <reference key="object" ref="926764826"/>
+            <reference key="parent" ref="228437242"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">771</int>
+            <reference key="object" ref="609445311"/>
+            <reference key="parent" ref="159284559"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">772</int>
+            <reference key="object" ref="192718726"/>
+            <reference key="parent" ref="1038213364"/>
+          </object>
         </object>
       </object>
       <object class="NSMutableDictionary" key="flattenedProperties">
@@ -6780,13 +7674,59 @@
           <string>723.IBPluginDependency</string>
           <string>724.IBPluginDependency</string>
           <string>725.IBPluginDependency</string>
+          <string>729.IBPluginDependency</string>
+          <string>729.IBViewBoundsToFrameTransform</string>
           <string>73.IBPluginDependency</string>
+          <string>730.IBPluginDependency</string>
+          <string>730.IBViewBoundsToFrameTransform</string>
+          <string>734.IBPluginDependency</string>
+          <string>734.IBViewBoundsToFrameTransform</string>
+          <string>735.IBPluginDependency</string>
+          <string>735.IBViewBoundsToFrameTransform</string>
+          <string>736.IBPluginDependency</string>
+          <string>736.IBViewBoundsToFrameTransform</string>
+          <string>739.IBPluginDependency</string>
           <string>74.IBPluginDependency</string>
           <string>74.IBViewBoundsToFrameTransform</string>
+          <string>740.IBNumberFormatterBehaviorMetadataKey</string>
+          <string>740.IBNumberFormatterLocalizesFormatMetadataKey</string>
+          <string>740.IBPluginDependency</string>
+          <string>741.IBPluginDependency</string>
+          <string>742.IBPluginDependency</string>
+          <string>747.IBPluginDependency</string>
           <string>75.IBPluginDependency</string>
+          <string>754.IBPluginDependency</string>
+          <string>754.IBViewBoundsToFrameTransform</string>
+          <string>755.IBPluginDependency</string>
+          <string>755.IBViewBoundsToFrameTransform</string>
+          <string>756.IBPluginDependency</string>
+          <string>756.IBViewBoundsToFrameTransform</string>
+          <string>757.IBPluginDependency</string>
+          <string>757.IBViewBoundsToFrameTransform</string>
+          <string>758.IBPluginDependency</string>
+          <string>758.IBViewBoundsToFrameTransform</string>
+          <string>759.IBPluginDependency</string>
+          <string>759.IBViewBoundsToFrameTransform</string>
           <string>76.IBPluginDependency</string>
           <string>76.IBViewBoundsToFrameTransform</string>
+          <string>760.IBPluginDependency</string>
+          <string>760.IBViewBoundsToFrameTransform</string>
+          <string>761.IBPluginDependency</string>
+          <string>761.IBViewBoundsToFrameTransform</string>
+          <string>764.IBPluginDependency</string>
+          <string>765.IBNumberFormatterBehaviorMetadataKey</string>
+          <string>765.IBNumberFormatterLocalizesFormatMetadataKey</string>
+          <string>765.IBPluginDependency</string>
+          <string>766.IBPluginDependency</string>
+          <string>767.IBPluginDependency</string>
+          <string>768.IBPluginDependency</string>
+          <string>769.IBNumberFormatterBehaviorMetadataKey</string>
+          <string>769.IBNumberFormatterLocalizesFormatMetadataKey</string>
+          <string>769.IBPluginDependency</string>
           <string>77.IBPluginDependency</string>
+          <string>770.IBPluginDependency</string>
+          <string>771.IBPluginDependency</string>
+          <string>772.IBPluginDependency</string>
           <string>78.IBPluginDependency</string>
           <string>78.IBViewBoundsToFrameTransform</string>
           <string>79.IBPluginDependency</string>
@@ -7374,15 +8314,87 @@
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABBAAAAwtAAAA</bytes>
+          </object>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">AUEAAABCLAAAA</bytes>
+          </object>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABBcAAAwqoAAA</bytes>
+          </object>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">AUOHgABCiAAAA</bytes>
+          </object>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABDKgAAwq4AAA</bytes>
+          </object>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABDh4AAwzoAAA</bytes>
           </object>
+          <integer value="1040"/>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABBAAAAws4AAA</bytes>
+          </object>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">AUEAAABBcAAAA</bytes>
+          </object>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABBoAAAwqAAAA</bytes>
+          </object>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">AUOKAABCfAAAA</bytes>
+          </object>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABDLwAAwqQAAA</bytes>
+          </object>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABBcAAAwqoAAA</bytes>
+          </object>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABDUQAAwzgAAA</bytes>
           </object>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">AUOHgABCiAAAA</bytes>
+          </object>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABDKgAAwq4AAA</bytes>
+          </object>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <integer value="1040"/>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <integer value="1040"/>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <object class="NSAffineTransform">
@@ -7449,7 +8461,7 @@
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">728</int>
+      <int key="maxID">791</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
@@ -7462,10 +8474,12 @@
             <object class="NSArray" key="dict.sortedKeys">
               <bool key="EncodedWithXMLCoder">YES</bool>
               <string>addLogoModifierChanged:</string>
+              <string>addProfile:</string>
               <string>addTextModifierChanged:</string>
               <string>adjustSliderChanged:</string>
               <string>bandingSliderChanged:</string>
               <string>blurModifierChanged:</string>
+              <string>cloneModifierChanged:</string>
               <string>cropObjectChanged:</string>
               <string>enableAddLogo:</string>
               <string>enableAddText:</string>
@@ -7474,6 +8488,7 @@
               <string>enableAnaglyph:</string>
               <string>enableBanding:</string>
               <string>enableBlur:</string>
+              <string>enableClone:</string>
               <string>enableExtract:</string>
               <string>enableGradient:</string>
               <string>enableGrain:</string>
@@ -7487,6 +8502,7 @@
               <string>enableSharpen:</string>
               <string>enableThreshold:</string>
               <string>enableTransform:</string>
+              <string>enableWall:</string>
               <string>enableWaterEffect:</string>
               <string>enableWaves:</string>
               <string>enableZoom:</string>
@@ -7496,14 +8512,22 @@
               <string>posterizeModifierChanged:</string>
               <string>profileSelectorAction:</string>
               <string>puzzleModifierChanged:</string>
+              <string>removeProfile:</string>
               <string>sepiaModifierChanged:</string>
               <string>sharpenSliderChanged:</string>
               <string>thresholdModifierChanged:</string>
               <string>toggleWindow:</string>
               <string>transformModifierChanged:</string>
+              <string>wallModifierChanged:</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -7551,10 +8575,12 @@
             <object class="NSArray" key="dict.sortedKeys">
               <bool key="EncodedWithXMLCoder">YES</bool>
               <string>addLogoModifierChanged:</string>
+              <string>addProfile:</string>
               <string>addTextModifierChanged:</string>
               <string>adjustSliderChanged:</string>
               <string>bandingSliderChanged:</string>
               <string>blurModifierChanged:</string>
+              <string>cloneModifierChanged:</string>
               <string>cropObjectChanged:</string>
               <string>enableAddLogo:</string>
               <string>enableAddText:</string>
@@ -7563,6 +8589,7 @@
               <string>enableAnaglyph:</string>
               <string>enableBanding:</string>
               <string>enableBlur:</string>
+              <string>enableClone:</string>
               <string>enableExtract:</string>
               <string>enableGradient:</string>
               <string>enableGrain:</string>
@@ -7576,6 +8603,7 @@
               <string>enableSharpen:</string>
               <string>enableThreshold:</string>
               <string>enableTransform:</string>
+              <string>enableWall:</string>
               <string>enableWaterEffect:</string>
               <string>enableWaves:</string>
               <string>enableZoom:</string>
@@ -7585,16 +8613,22 @@
               <string>posterizeModifierChanged:</string>
               <string>profileSelectorAction:</string>
               <string>puzzleModifierChanged:</string>
+              <string>removeProfile:</string>
               <string>sepiaModifierChanged:</string>
               <string>sharpenSliderChanged:</string>
               <string>thresholdModifierChanged:</string>
               <string>toggleWindow:</string>
               <string>transformModifierChanged:</string>
+              <string>wallModifierChanged:</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
               <object class="IBActionInfo">
                 <string key="name">addLogoModifierChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">addProfile:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
@@ -7611,6 +8645,10 @@
               </object>
               <object class="IBActionInfo">
                 <string key="name">blurModifierChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">cloneModifierChanged:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
@@ -7643,6 +8681,10 @@
               </object>
               <object class="IBActionInfo">
                 <string key="name">enableBlur:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">enableClone:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
@@ -7698,6 +8740,10 @@
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
+                <string key="name">enableWall:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
                 <string key="name">enableWaterEffect:</string>
                 <string key="candidateClassName">id</string>
               </object>
@@ -7734,6 +8780,10 @@
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
+                <string key="name">removeProfile:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
                 <string key="name">sepiaModifierChanged:</string>
                 <string key="candidateClassName">id</string>
               </object>
@@ -7751,6 +8801,10 @@
               </object>
               <object class="IBActionInfo">
                 <string key="name">transformModifierChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">wallModifierChanged:</string>
                 <string key="candidateClassName">id</string>
               </object>
             </object>
@@ -7791,6 +8845,9 @@
               <string>o_blur_ckb</string>
               <string>o_blur_lbl</string>
               <string>o_blur_sld</string>
+              <string>o_clone_ckb</string>
+              <string>o_clone_number_fld</string>
+              <string>o_clone_number_lbl</string>
               <string>o_crop_bottom_fld</string>
               <string>o_crop_bottom_lbl</string>
               <string>o_crop_bottom_stp</string>
@@ -7846,6 +8903,11 @@
               <string>o_threshold_similarity_sld</string>
               <string>o_transform_ckb</string>
               <string>o_transform_pop</string>
+              <string>o_wall_ckb</string>
+              <string>o_wall_numofcols_fld</string>
+              <string>o_wall_numofcols_lbl</string>
+              <string>o_wall_numofrows_fld</string>
+              <string>o_wall_numofrows_lbl</string>
               <string>o_watereffect_ckb</string>
               <string>o_waves_ckb</string>
               <string>o_window</string>
@@ -7853,6 +8915,14 @@
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -7982,6 +9052,9 @@
               <string>o_blur_ckb</string>
               <string>o_blur_lbl</string>
               <string>o_blur_sld</string>
+              <string>o_clone_ckb</string>
+              <string>o_clone_number_fld</string>
+              <string>o_clone_number_lbl</string>
               <string>o_crop_bottom_fld</string>
               <string>o_crop_bottom_lbl</string>
               <string>o_crop_bottom_stp</string>
@@ -8037,6 +9110,11 @@
               <string>o_threshold_similarity_sld</string>
               <string>o_transform_ckb</string>
               <string>o_transform_pop</string>
+              <string>o_wall_ckb</string>
+              <string>o_wall_numofcols_fld</string>
+              <string>o_wall_numofcols_lbl</string>
+              <string>o_wall_numofrows_fld</string>
+              <string>o_wall_numofrows_lbl</string>
               <string>o_watereffect_ckb</string>
               <string>o_waves_ckb</string>
               <string>o_window</string>
@@ -8170,6 +9248,18 @@
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_blur_sld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_clone_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_clone_number_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_clone_number_lbl</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
@@ -8390,6 +9480,26 @@
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_transform_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_wall_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_wall_numofcols_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_wall_numofcols_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_wall_numofrows_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_wall_numofrows_lbl</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">

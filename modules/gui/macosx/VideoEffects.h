@@ -81,6 +81,14 @@
     IBOutlet id o_puzzle_columns_lbl;
     IBOutlet id o_puzzle_columns_fld;
     IBOutlet id o_puzzle_blackslot_ckb;
+    IBOutlet id o_clone_ckb;
+    IBOutlet id o_clone_number_fld;
+    IBOutlet id o_clone_number_lbl;
+    IBOutlet id o_wall_ckb;
+    IBOutlet id o_wall_numofrows_fld;
+    IBOutlet id o_wall_numofrows_lbl;
+    IBOutlet id o_wall_numofcols_fld;
+    IBOutlet id o_wall_numofcols_lbl;
 
     /* color */
     IBOutlet id o_threshold_ckb;
@@ -165,6 +173,10 @@
 - (IBAction)enableZoom:(id)sender;
 - (IBAction)enablePuzzle:(id)sender;
 - (IBAction)puzzleModifierChanged:(id)sender;
+- (IBAction)enableClone:(id)sender;
+- (IBAction)cloneModifierChanged:(id)sender;
+- (IBAction)enableWall:(id)sender;
+- (IBAction)wallModifierChanged:(id)sender;
 
 /* color */
 - (IBAction)enableThreshold:(id)sender;
