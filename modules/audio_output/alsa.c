@@ -545,22 +545,14 @@ error:
 static int TimeGet (audio_output_t *aout, mtime_t *restrict pts)
 {
     aout_sys_t *sys = aout->sys;
-    snd_pcm_t *pcm = sys->pcm;
-    snd_pcm_status_t *status;
-    int val;
+    snd_pcm_sframes_t frames;
 
-    snd_pcm_status_alloca (&status);
-    val = snd_pcm_status (pcm, status);
-    if (val < 0)
+    int val = snd_pcm_delay (sys->pcm, &frames);
+    if (val)
     {
-        msg_Err (aout, "cannot get status: %s", snd_strerror (val));
+        msg_Err (aout, "cannot estimate delay: %s", snd_strerror (val));
         return -1;
     }
-
-    if (snd_pcm_status_get_state (status) != SND_PCM_STATE_RUNNING)
-        return -1;
-
-    snd_pcm_sframes_t frames = snd_pcm_status_get_delay (status);
     *pts = mdate () + (frames * CLOCK_FREQ / sys->format.i_rate);
     return 0;
 }
