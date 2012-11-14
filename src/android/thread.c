@@ -330,14 +330,23 @@ static void *detached_thread(void *data)
     return NULL;
 }
 
+static void finish_joinable_thread(void *data)
+{
+    vlc_thread_t th = data;
+
+    vlc_sem_post(&th->finished);
+}
+
 static void *joinable_thread(void *data)
 {
     vlc_thread_t th = data;
     void *ret;
 
+    vlc_cleanup_push(finish_joinable_thread, th);
     thread = th;
     ret = th->entry(th->data);
-    vlc_sem_post(&th->finished);
+    vlc_cleanup_run();
+
     return ret;
 }
 
@@ -461,7 +470,6 @@ void vlc_testcancel (void)
     if (!vlc_atomic_get(&thread->killed))
         return;
 
-    vlc_sem_post(&thread->finished);
     pthread_exit(NULL);
 }
 
