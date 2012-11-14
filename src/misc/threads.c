@@ -166,9 +166,10 @@ int vlc_sem_post (vlc_sem_t *sem)
 void vlc_sem_wait (vlc_sem_t *sem)
 {
     vlc_mutex_lock (&sem->lock);
+    mutex_cleanup_push (&lock->mutex);
     while (!sem->value)
         vlc_cond_wait (&sem->wait, &sem->lock);
     sem->value--;
-    vlc_mutex_unlock (&sem->lock);
+    vlc_cleanup_run ();
 }
 #endif /* LIBVLC_NEED_SEMAPHORE */
