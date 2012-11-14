@@ -100,6 +100,7 @@
     input_item_t * p_item;
 
     BOOL b_awakeFromNib;
+    BOOL b_stats;
 }
 @property (readonly) input_item_t * item;
 

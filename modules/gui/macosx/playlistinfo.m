@@ -137,13 +137,14 @@ static VLCInfo *_o_sharedInstance = nil;
 
 - (void)initPanel
 {
-    BOOL b_stats = config_GetInt(VLCIntf, "stats");
+    b_stats = config_GetInt(VLCIntf, "stats");
     if( !b_stats ) {
         if( [o_tab_view numberOfTabViewItems] > 2 )
             [o_tab_view removeTabViewItem: [o_tab_view tabViewItemAtIndex: 2]];
     }
+    else
+        [self initMediaPanelStats];
 
-    [self initMediaPanelStats];
     [o_info_window makeKeyAndOrderFront: self];
 }
 
@@ -270,7 +271,7 @@ static VLCInfo *_o_sharedInstance = nil;
 
 - (void)updateStatistics
 {
-    if (!b_awakeFromNib)
+    if (!b_awakeFromNib || !b_stats)
         return;
 
     if ([o_info_window isVisible]) {
