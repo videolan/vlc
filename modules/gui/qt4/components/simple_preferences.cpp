@@ -617,7 +617,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.updatesDays->hide();
 #endif
             /* ONE INSTANCE options */
-#if !defined( WIN32 ) && !defined(__APPLE__)
+#if !defined( WIN32 ) && !defined(__APPLE__) && !defined(__OS2__)
             if( !module_exists( "dbus" ) )
                 ui.OneInterfaceBox->hide();
             else
