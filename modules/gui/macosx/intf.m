@@ -1298,6 +1298,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     [o_mainmenu setupMenus];
     [o_mainmenu updatePlaybackRate];
+    [[VLCCoreInteraction sharedInstance] resetAtoB];
 }
 
 - (void)updateMainWindow

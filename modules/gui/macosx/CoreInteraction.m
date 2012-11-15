@@ -431,10 +431,14 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
             timeB = var_GetTime(p_input, "time");
             vlc_object_release(p_input);
         }
-    } else {
-        timeA = 0;
-        timeB = 0;
-    }
+    } else
+        [self resetAtoB];
+}
+
+- (void)resetAtoB
+{
+    timeA = 0;
+    timeB = 0;
 }
 
 - (void)updateAtoB
