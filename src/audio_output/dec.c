@@ -397,7 +397,7 @@ int aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
         goto drop; /* Pipeline is unrecoverably broken :-( */
 
     const mtime_t now = mdate (), advance = block->i_pts - now;
-    if (advance < AOUT_MIN_PREPARE_TIME)
+    if (advance < -AOUT_MAX_PTS_DELAY)
     {   /* Late buffer can be caused by bugs in the decoder, by scheduling
          * latency spikes (excessive load, SIGSTOP, etc.) or if buffering is
          * insufficient. We assume the PTS is wrong and play the buffer anyway:
