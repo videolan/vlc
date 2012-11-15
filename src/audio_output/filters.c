@@ -83,50 +83,6 @@ static filter_t * FindFilter( vlc_object_t *obj,
 }
 
 /**
- * Splits audio format conversion in two simpler conversions
- * @return 0 on successful split, -1 if the input and output formats are too
- * similar to split the conversion.
- */
-static int SplitConversion( const audio_sample_format_t *restrict infmt,
-                            const audio_sample_format_t *restrict outfmt,
-                            audio_sample_format_t *midfmt )
-{
-    *midfmt = *outfmt;
-
-    /* Lastly: resample (after format conversion and remixing) */
-    if( infmt->i_rate != outfmt->i_rate )
-        midfmt->i_rate = infmt->i_rate;
-    else
-    /* Penultimately: remix channels (after format conversion) */
-    if( infmt->i_physical_channels != outfmt->i_physical_channels
-     || infmt->i_original_channels != outfmt->i_original_channels )
-    {
-        midfmt->i_physical_channels = infmt->i_physical_channels;
-        midfmt->i_original_channels = infmt->i_original_channels;
-    }
-    else
-    /* Second: convert linear to S16N as intermediate format */
-    if( AOUT_FMT_LINEAR( infmt ) )
-    {
-        /* All conversion from linear to S16N must be supported directly. */
-        if( outfmt->i_format == VLC_CODEC_S16N )
-            return -1;
-        midfmt->i_format = VLC_CODEC_S16N;
-    }
-    else
-    /* First: convert non-linear to FI32 as intermediate format */
-    {
-        if( outfmt->i_format == VLC_CODEC_FI32 )
-            return -1;
-        midfmt->i_format = VLC_CODEC_FI32;
-    }
-
-    assert( !AOUT_FMTS_IDENTICAL( infmt, midfmt ) );
-    aout_FormatPrepare( midfmt );
-    return 0;
-}
-
-/**
  * Destroys a chain of audio filters.
  */
 static void aout_FiltersPipelineDestroy(filter_t *const *filters, unsigned n)
@@ -140,77 +96,175 @@ static void aout_FiltersPipelineDestroy(filter_t *const *filters, unsigned n)
     }
 }
 
+static filter_t *TryFormat (vlc_object_t *obj, vlc_fourcc_t codec,
+                            audio_sample_format_t *restrict fmt)
+{
+    audio_sample_format_t output = *fmt;
+
+    assert (codec != fmt->i_format);
+    output.i_format = codec;
+    aout_FormatPrepare (&output);
+
+    filter_t *filter = FindFilter (obj, fmt, &output);
+    if (filter != NULL)
+        *fmt = output;
+    return filter;
+}
+
 /**
  * Allocates audio format conversion filters
  * @param obj parent VLC object for new filters
  * @param filters table of filters [IN/OUT]
- * @param nb_filters pointer to the number of filters in the table [IN/OUT]
- * @param max_filters size of filters table [IN]
+ * @param count pointer to the number of filters in the table [IN/OUT]
+ * @param max size of filters table [IN]
  * @param infmt input audio format
  * @param outfmt output audio format
  * @return 0 on success, -1 on failure
  */
 static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
-                                 unsigned *nb_filters, unsigned max_filters,
+                                      unsigned *count, unsigned max,
                                  const audio_sample_format_t *restrict infmt,
                                  const audio_sample_format_t *restrict outfmt)
 {
-    audio_sample_format_t curfmt = *outfmt;
-    unsigned i = 0;
+    aout_FormatsPrint (obj, "conversion:", infmt, outfmt);
+    max -= *count;
+    filters += *count;
 
-    max_filters -= *nb_filters;
-    filters += *nb_filters;
-    aout_FormatsPrint( obj, "filter(s)", infmt, outfmt );
+    /* There is a lot of second guessing on what the conversion plugins can
+     * and cannot do. This seems hardly avoidable, the conversion problem need
+     * to be reduced somehow. */
+    audio_sample_format_t input = *infmt;
+    bool same_codec = infmt->i_format == outfmt->i_format;
+    bool same_rate = infmt->i_rate == outfmt->i_rate;
+    bool same_mix = infmt->i_physical_channels == outfmt->i_physical_channels
+                 && infmt->i_original_channels == outfmt->i_original_channels;
+    unsigned n = 0;
 
-    while( !AOUT_FMTS_IDENTICAL( infmt, &curfmt ) )
+    /* Encapsulate or decode non-linear formats */
+    if (!AOUT_FMT_LINEAR(infmt) && !same_codec)
     {
-        if( i >= max_filters )
+        if (n == max)
+            goto overflow;
+
+        filter_t *f = NULL;
+        if (!AOUT_FMT_LINEAR(outfmt))
+           f = TryFormat (obj, outfmt->i_format, &input);
+        if (f == NULL)
+            f = TryFormat (obj, VLC_CODEC_FI32, &input);
+        if (f == NULL)
+            f = TryFormat (obj, VLC_CODEC_FL32, &input);
+        if (f == NULL)
         {
-            msg_Err( obj, "maximum of %u filters reached", max_filters );
-            dialog_Fatal( obj, _("Audio filtering failed"),
-                          _("The maximum number of filters (%u) was reached."),
-                          max_filters );
-            goto rollback;
+            msg_Err (obj, "cannot find %s for conversion pipeline",
+                     "decoder");
+            goto error;
         }
 
-        /* Make room and prepend a filter */
-        memmove( filters + 1, filters, i * sizeof( *filters ) );
-
-        *filters = FindFilter( obj, infmt, &curfmt );
-        if( *filters != NULL )
-        {
-            i++;
-            break; /* done! */
-        }
-
-        audio_sample_format_t midfmt;
-        /* Split the conversion */
-        if( SplitConversion( infmt, &curfmt, &midfmt ) )
-        {
-            msg_Err( obj, "conversion pipeline failed: %4.4s -> %4.4s",
-                     (const char *)&infmt->i_format,
-                     (const char *)&outfmt->i_format );
-            goto rollback;
-        }
-
-        *filters = FindFilter( obj, &midfmt, &curfmt );
-        if( *filters == NULL )
-        {
-            msg_Err( obj, "cannot find filter for simple conversion" );
-            goto rollback;
-        }
-        curfmt = midfmt;
-        i++;
+        filters[n++] = f;
+        same_codec = input.i_format == outfmt->i_format;
     }
 
-    msg_Dbg( obj, "conversion pipeline completed" );
-    *nb_filters += i;
+    assert (AOUT_FMT_LINEAR(&input));
+
+    /* Conversion cannot be done in foreign endianess. */
+    /* TODO: convert to native endian if needed */
+
+    /* Remix channels */
+    if (!same_mix)
+    {   /* Remixing currently requires FL32... TODO: S16N */
+        if (input.i_format != VLC_CODEC_FL32)
+        {
+            if (n == max)
+                goto overflow;
+
+            filter_t *f = TryFormat (obj, VLC_CODEC_FL32, &input);
+            if (f == NULL)
+            {
+                msg_Err (obj, "cannot find %s for conversion pipeline",
+                         "pre-mix converter");
+                goto error;
+            }
+
+            filters[n++] = f;
+            same_codec = input.i_format == outfmt->i_format;
+        }
+
+        if (n == max)
+            goto overflow;
+
+        audio_sample_format_t output;
+        output.i_format = input.i_format;
+        output.i_rate = input.i_rate;
+        output.i_physical_channels = outfmt->i_physical_channels;
+        output.i_original_channels = outfmt->i_original_channels;
+        aout_FormatPrepare (&output);
+
+        filter_t *f = FindFilter (obj, &input, &output);
+        if (f == NULL)
+        {
+            msg_Err (obj, "cannot find %s for conversion pipeline",
+                     "remixer");
+            goto error;
+        }
+
+        input = output;
+        filters[n++] = f;
+        //same_mix = true;
+    }
+
+    /* Resample */
+    if (!same_rate)
+    {   /* Resampling works with any linear format, but may be ugly. */
+        if (n == max)
+            goto overflow;
+
+        audio_sample_format_t output = input;
+        output.i_rate = outfmt->i_rate;
+
+        filter_t *f = FindFilter (obj, &input, &output);
+        if (f == NULL)
+        {
+            msg_Err (obj, "cannot find %s for conversion pipeline",
+                     "resampler");
+            goto error;
+        }
+
+        input = output;
+        filters[n++] = f;
+        //same_rate = true;
+    }
+
+    if (!same_codec)
+    {
+        if (max == 0)
+            goto overflow;
+
+        filter_t *f = TryFormat (obj, outfmt->i_format, &input);
+        if (f == NULL)
+        {
+            msg_Err (obj, "cannot find %s for conversion pipeline",
+                     "post-mix converter");
+            goto error;
+        }
+        filters[n++] = f;
+        //same_codec = true;
+    }
+
+    /* TODO: convert to foreign endian if needed */
+
+    msg_Dbg (obj, "conversion pipeline complete");
+    *count += n;
     return 0;
 
-rollback:
-    aout_FiltersPipelineDestroy (filters, i);
+overflow:
+    msg_Err (obj, "maximum of %u conversion filters reached", max);
+    dialog_Fatal (obj, _("Audio filtering failed"),
+                  _("The maximum number of filters (%u) was reached."), max);
+error:
+    aout_FiltersPipelineDestroy (filters, n);
     return -1;
 }
+
 #define aout_FiltersPipelineCreate(obj,f,n,m,i,o) \
         aout_FiltersPipelineCreate(VLC_OBJECT(obj),f,n,m,i,o)
 
