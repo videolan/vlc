@@ -87,12 +87,12 @@
     NSMutableArray *o_sidebaritems;
 
     /* this is only true, when we have NO video playing inside the main window */
-    BOOL              b_nonembedded;
+    BOOL b_nonembedded;
 
-    BOOL              b_podcastView_displayed;
+    BOOL b_podcastView_displayed;
 
     /* set to yes if we are fullscreen and all animations are over */
-    BOOL              b_fullscreen;
+    BOOL b_fullscreen;
 
     NSTimer *t_hide_mouse_timer;
 

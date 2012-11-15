@@ -272,7 +272,7 @@ static VLCWizard *_o_sharedInstance = nil;
         "computers using the Microsoft MMS protocol. This protocol is used as "
         "transport method by many Microsoft's softwares. Note that only a "
         "small part of the MMS protocol is supported (MMS encapsulated in "
-        "HTTP)." ), nil];
+        "HTTP)."), nil];
     o_udp_uni = [NSArray arrayWithObjects: @"udp", @"UDP-Unicast", _NS("Enter "
         "the address of the computer to stream to."), _NS("Use this to stream "
         "to a single computer."), nil];
@@ -494,7 +494,7 @@ static VLCWizard *_o_sharedInstance = nil;
          * store information for later usage */
         NSString *o_mode;
         o_mode = [[o_t1_matrix_strmgOrTrnscd selectedCell] title];
-        if( [o_mode isEqualToString: _NS("Stream to network")] )
+        if ([o_mode isEqualToString: _NS("Stream to network")])
         {
             /* we will be streaming */
             [o_userSelections setObject:@"strmg" forKey:@"trnscdOrStrmg"];
@@ -532,7 +532,7 @@ static VLCWizard *_o_sharedInstance = nil;
         BOOL stop;
         stop = NO;
         o_mode = [[o_t2_matrix_inputSourceType selectedCell] title];
-        if( [o_mode isEqualToString: _NS("Select a stream")] )
+        if ([o_mode isEqualToString: _NS("Select a stream")])
         {
             [o_userSelections setObject:@"YES" forKey:@"newStrm"];
             if ([[o_t2_fld_pathToNewStrm stringValue] isEqualToString: @""])
@@ -553,15 +553,15 @@ static VLCWizard *_o_sharedInstance = nil;
                 NSIndexSet * selectedIndexes = [o_t2_tbl_plst selectedRowIndexes];
                 NSUInteger count = [selectedIndexes count];
                 NSMutableArray * tempArray = [[NSMutableArray alloc] init];
-                for( NSUInteger x = 0; x < count; x++ )
+                for( NSUInteger x = 0; x < count; x++)
                 {
                     playlist_item_t *p_item = [[o_t2_tbl_plst itemAtRow: [selectedIndexes indexGreaterThanOrEqualToIndex: x]] pointerValue];
 
-                    if( p_item->i_children <= 0 )
+                    if (p_item->i_children <= 0)
                     {
-                        char *psz_uri = input_item_GetURI( p_item->p_input );
+                        char *psz_uri = input_item_GetURI( p_item->p_input);
                         [tempArray addObject: [NSString stringWithUTF8String: psz_uri]];
-                        free( psz_uri );
+                        free( psz_uri);
                         stop = NO;
                     }
                     else
@@ -609,7 +609,7 @@ static VLCWizard *_o_sharedInstance = nil;
         /* check which streaming method is selected and store it */
         int mode;
         mode = [[o_t3_matrix_stmgMhd selectedCell] tag];
-        if( mode == 0 )
+        if (mode == 0)
         {
             /* HTTP Streaming */
             [o_userSelections setObject:@"0" forKey:@"stmgMhd"];
@@ -619,7 +619,7 @@ static VLCWizard *_o_sharedInstance = nil;
             [o_t4_pop_audioCodec removeItemWithTitle:@"Uncompressed, integer"];
             [o_t4_pop_audioCodec removeItemWithTitle:@"Uncompressed, floating point"];
 
-        } else if ( mode == 1 )
+        } else if ( mode == 1)
         {
             /* MMS Streaming */
             [o_userSelections setObject:@"1" forKey:@"stmgMhd"];
@@ -651,10 +651,10 @@ static VLCWizard *_o_sharedInstance = nil;
         }
 
         /* store the destination and check whether is it empty */
-        if([[o_userSelections objectForKey:@"stmgMhd"] intValue] >=2 )
+        if([[o_userSelections objectForKey:@"stmgMhd"] intValue] >=2)
         {
            /* empty field is valid for HTTP and MMS */
-            if( [[o_t3_fld_address stringValue] isEqualToString: @""] )
+            if ([[o_t3_fld_address stringValue] isEqualToString: @""])
             {
                 /* complain to the user that "" is no valid dest. */
                 NSBeginInformationalAlertSheet(_NS("No valid destination"),
@@ -938,7 +938,7 @@ static VLCWizard *_o_sharedInstance = nil;
         }
 
         NSInteger i_streamingMethod = [[o_userSelections objectForKey:@"stmgMhd"] intValue];
-        if ( i_streamingMethod == 1 )
+        if ( i_streamingMethod == 1)
         {
             /* if MMS is the streaming protocol, only ASFH is available */
             [[o_t5_matrix_encap cellAtRow:0 column:0] setEnabled:NO];
@@ -953,7 +953,7 @@ static VLCWizard *_o_sharedInstance = nil;
             [[o_t5_matrix_encap cellAtRow:9 column:0] setEnabled:YES];
             [o_t5_matrix_encap selectCellAtRow:9 column:0];
         }
-        else if ( i_streamingMethod == 0 )
+        else if ( i_streamingMethod == 0)
         {
             /* if HTTP is the streaming protocol, disable all unsupported
              * encap-formats, but don't touch the other ones selected above */
@@ -962,7 +962,7 @@ static VLCWizard *_o_sharedInstance = nil;
             [[o_t5_matrix_encap cellAtRow:8 column:0] setEnabled:NO];
             [[o_t5_matrix_encap cellAtRow:9 column:0] setEnabled:NO];
         }
-        else if ( i_streamingMethod >= 2 )
+        else if ( i_streamingMethod >= 2)
         {
             /* if UDP/RTP is the streaming protocol, only MPEG-TS is available */
             [[o_t5_matrix_encap cellAtRow:0 column:0] setEnabled:NO];
@@ -981,7 +981,7 @@ static VLCWizard *_o_sharedInstance = nil;
         BOOL anythingEnabled;
         anythingEnabled = NO;
         NSUInteger count = [o_t5_matrix_encap numberOfRows];
-        for (NSUInteger x = 0; x < count; x++ )
+        for (NSUInteger x = 0; x < count; x++)
         {
             if ([[o_t5_matrix_encap cellAtRow:x column:0] isEnabled])
                 anythingEnabled = YES;
@@ -990,7 +990,7 @@ static VLCWizard *_o_sharedInstance = nil;
         if (anythingEnabled == YES)
         {
             /* re-select the previously chosen item, if available */
-            if( [[o_t5_matrix_encap cellWithTag: i_temp] isEnabled] )
+            if ([[o_t5_matrix_encap cellWithTag: i_temp] isEnabled])
                 [o_t5_matrix_encap selectCellWithTag: i_temp];
 
             /* go the encap-tab */
@@ -1022,7 +1022,7 @@ static VLCWizard *_o_sharedInstance = nil;
             [o_tab_pageHolder selectTabViewItemAtIndex:6];
             /* in case that we are processing multiple items, let the user
              * select a folder instead of a localtion for a single item */
-            if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
+            if ([[o_userSelections objectForKey:@"pathToStrm"] count] > 1)
             {
                 [o_t7_txt_saveFileTo setStringValue:
                     _NS("Select the directory to save to")];
@@ -1075,10 +1075,10 @@ static VLCWizard *_o_sharedInstance = nil;
         }
 
         /* check whether the path != "" and store it */
-        if( [[o_t7_fld_filePath stringValue] isEqualToString: @""] )
+        if ([[o_t7_fld_filePath stringValue] isEqualToString: @""])
         {
             /* complain to the user that "" is no valid path for a folder/file */
-            if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
+            if ([[o_userSelections objectForKey:@"pathToStrm"] count] > 1)
                 NSBeginInformationalAlertSheet(_NS("No folder selected"),
                     _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil,
                     @"%@\n\n%@", _NS("A directory "
@@ -1097,27 +1097,27 @@ static VLCWizard *_o_sharedInstance = nil;
             NSString * theEncapFormat = [[o_encapFormats objectAtIndex:
                 [[o_userSelections objectForKey:@"encapFormat"] intValue]]
                 objectAtIndex:0];
-            if( theEncapFormat == @"ps" )
+            if (theEncapFormat == @"ps")
                 theEncapFormat = @"mpg";
 
             /* look whether we need to process multiple items or not.
              * choose a faster variant if we just want a single item */
-            if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
+            if ([[o_userSelections objectForKey:@"pathToStrm"] count] > 1)
             {
                 NSMutableArray * tempArray = [[NSMutableArray alloc] init];
                 int x = 0;
                 int y = [[o_userSelections objectForKey:@"pathToStrm"] count];
                 NSMutableString * tempString = [[NSMutableString alloc] init];
-                while( x != y )
+                while( x != y)
                 {
                     NSString * fileNameToUse;
                     /* check whether the extension is hidden or not.
                      * if not, remove it
                      * we need the casting to make GCC4 happy */
-                    if( [[[NSFileManager defaultManager] attributesOfItemAtPath:
+                    if ([[[NSFileManager defaultManager] attributesOfItemAtPath:
                         [[o_userSelections objectForKey:@"pathToStrm"]
                          objectAtIndex: x] error:nil] objectForKey:
-                        NSFileExtensionHidden] )
+                        NSFileExtensionHidden])
                         fileNameToUse = [NSString stringWithString:
                             [[NSFileManager defaultManager] displayNameAtPath:
                             [[o_userSelections objectForKey:@"pathToStrm"]
@@ -1131,7 +1131,7 @@ static VLCWizard *_o_sharedInstance = nil;
                             objectAtIndex: x]]
                             componentsSeparatedByString: @"."] count];
                         fileNameToUse = @"";
-                        while( z < (count - 1) )
+                        while( z < (count - 1))
                         {
                             fileNameToUse = [fileNameToUse stringByAppendingString:
                                 [[[[NSFileManager defaultManager]
@@ -1146,26 +1146,26 @@ static VLCWizard *_o_sharedInstance = nil;
                     tempString = [NSString stringWithFormat: @"%@%@.%@",
                         [o_t7_fld_filePath stringValue],
                         fileNameToUse, theEncapFormat];
-                    if( [[NSFileManager defaultManager] fileExistsAtPath:
-                        tempString] )
+                    if ([[NSFileManager defaultManager] fileExistsAtPath:
+                        tempString])
                     {
                         /* we don't wanna overwrite existing files, so add an
                          * int to the file-name */
                         int additionalInt = 1;
-                        while( additionalInt < 100 )
+                        while( additionalInt < 100)
                         {
                             tempString = [NSString stringWithFormat:@"%@%@ %i.%@",
                                 [o_t7_fld_filePath stringValue],
                                 fileNameToUse, additionalInt, theEncapFormat];
                             if(! [[NSFileManager defaultManager]
-                                fileExistsAtPath: tempString] )
+                                fileExistsAtPath: tempString])
                                 break;
                             additionalInt += 1;
                         }
-                        if( additionalInt >= 100 )
+                        if (additionalInt >= 100)
                             msg_Err( VLCIntf, "Files with the same name are "
                                 "already present in the destination directory. "
-                                "Delete these files or choose a different directory." );
+                                "Delete these files or choose a different directory.");
                     }
                     [tempArray addObject: [tempString retain]];
                     x += 1;
@@ -1197,24 +1197,24 @@ static VLCWizard *_o_sharedInstance = nil;
     {
         intf_thread_t * p_intf = VLCIntf;
 
-        playlist_t * p_playlist = pl_Get( p_intf );
+        playlist_t * p_playlist = pl_Get( p_intf);
 
         int x = 0;
         int y = [[o_userSelections objectForKey:@"pathToStrm"] count];
-        while( x != y )
+        while( x != y)
         {
             /* we need a temp. variable here to work-around a GCC4-bug */
             NSString *tempString = [NSString stringWithFormat:
                 @"%@ (%i/%i)", _NS("Streaming/Transcoding Wizard"),
-                ( x + 1 ), y];
+                ( x + 1), y];
             input_item_t *p_input = input_item_New(
                 [[[o_userSelections objectForKey:@"pathToStrm"]
                 objectAtIndex:x] UTF8String],
-                [tempString UTF8String] );
+                [tempString UTF8String]);
 
             /* use the MRL from the text field, in case the user
              * modified it */
-            input_item_AddOption( p_input, [[o_t8_fld_mrl stringValue] UTF8String], VLC_INPUT_OPTION_TRUSTED );
+            input_item_AddOption( p_input, [[o_t8_fld_mrl stringValue] UTF8String], VLC_INPUT_OPTION_TRUSTED);
 
             if(! [[o_userSelections objectForKey:@"partExtractFrom"]
                 isEqualToString:@""]) {
@@ -1251,21 +1251,21 @@ static VLCWizard *_o_sharedInstance = nil;
             input_item_AddOption( p_input, [[NSString stringWithFormat:
                 @"ttl=%@", [o_userSelections objectForKey:@"ttl"]]
                 UTF8String],
-                VLC_INPUT_OPTION_TRUSTED );
+                VLC_INPUT_OPTION_TRUSTED);
 
-            int returnValue = playlist_AddInput( p_playlist, p_input, PLAYLIST_STOP, PLAYLIST_END, true, pl_Unlocked );
+            int returnValue = playlist_AddInput( p_playlist, p_input, PLAYLIST_STOP, PLAYLIST_END, true, pl_Unlocked);
 
-            if( x == 0 && returnValue != VLC_SUCCESS)
+            if (x == 0 && returnValue != VLC_SUCCESS)
             {
                 /* play the first item and add the others afterwards */
                 PL_LOCK;
-                playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input );
+                playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input);
                 playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, NULL,
-                          p_item );
+                          p_item);
                 PL_UNLOCK;
             }
 
-            vlc_gc_decref( p_input );
+            vlc_gc_decref( p_input);
             x += 1;
         }
 
@@ -1280,13 +1280,13 @@ static VLCWizard *_o_sharedInstance = nil;
     savePreviousSel = [o_t4_pop_videoCodec indexOfSelectedItem];
     [o_t4_pop_videoCodec removeAllItems];
     NSUInteger count = [o_videoCodecs count];
-    for (NSUInteger x = 0; x < count; x++ )
+    for (NSUInteger x = 0; x < count; x++)
     {
         [o_t4_pop_videoCodec addItemWithTitle:[[o_videoCodecs objectAtIndex:x]
             objectAtIndex:0]];
         [[o_t4_pop_videoCodec lastItem] setTag:x];
     }
-    if( savePreviousSel >= 0 )
+    if (savePreviousSel >= 0)
         [o_t4_pop_videoCodec selectItemAtIndex: savePreviousSel];
 
     savePreviousSel = [o_t4_pop_audioCodec indexOfSelectedItem];
@@ -1298,7 +1298,7 @@ static VLCWizard *_o_sharedInstance = nil;
             objectAtIndex:0]];
         [[o_t4_pop_audioCodec lastItem] setTag:x];
     }
-    if( savePreviousSel >= 0 )
+    if (savePreviousSel >= 0)
         [o_t4_pop_audioCodec selectItemAtIndex: savePreviousSel];
 }
 
@@ -1307,7 +1307,7 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_btn_forward setTitle: _NS("Finish")];
     /* if we will transcode multiple items, just give their number; otherwise
      * print the URI of the single item */
-    if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
+    if ([[o_userSelections objectForKey:@"pathToStrm"] count] > 1)
         [o_t8_fld_inptStream setStringValue: [NSString stringWithFormat:
             _NS("%i items"),
             [[o_userSelections objectForKey:@"pathToStrm"] count]]];
@@ -1388,7 +1388,7 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t8_fld_ttl setStringValue: @"-"];
         [o_t8_fld_sap setStringValue: @"-"];
         /* do only show the destination of the first item and add a counter, if needed */
-        if( [[o_userSelections objectForKey: @"trnscdFilePath"] count] > 1 )
+        if ([[o_userSelections objectForKey: @"trnscdFilePath"] count] > 1)
             [o_t8_fld_saveFileTo setStringValue:
                 [NSString stringWithFormat: @"%@ (+%li)",
                 [[o_userSelections objectForKey: @"trnscdFilePath"] objectAtIndex:0],
@@ -1417,7 +1417,7 @@ static VLCWizard *_o_sharedInstance = nil;
     NSMutableArray * tempArray = [[NSMutableArray alloc] init];
 
     /* loop to create an opt-string for each item we're processing */
-    while( x != y )
+    while( x != y)
     {
         /* check whether we transcode the audio and/or the video and compose a
          * string reflecting the settings, if needed */
@@ -1483,7 +1483,7 @@ static VLCWizard *_o_sharedInstance = nil;
                     [o_sap_option appendFormat: @"sap,name=\"%@\"",
                         [o_userSelections objectForKey:@"sapText"]];
                 }
-                if( [[o_strmgMthds objectAtIndex: [[o_userSelections objectForKey: @"stmgMhd"] intValue]] objectAtIndex:0] == @"rtp" )
+                if ([[o_strmgMthds objectAtIndex: [[o_userSelections objectForKey: @"stmgMhd"] intValue]] objectAtIndex:0] == @"rtp")
                 {
                     /* RTP is no access out, but a stream out module */
                     [o_opts_string appendFormat:
@@ -1507,7 +1507,7 @@ static VLCWizard *_o_sharedInstance = nil;
             else
             {
                 /* no SAP, just streaming */
-                if( [[o_strmgMthds objectAtIndex: [[o_userSelections objectForKey: @"stmgMhd"] intValue]] objectAtIndex:0] == @"rtp" )
+                if ([[o_strmgMthds objectAtIndex: [[o_userSelections objectForKey: @"stmgMhd"] intValue]] objectAtIndex:0] == @"rtp")
                 {
                     /* RTP is different from the other protocols, as it isn't provided through an access out module anymore */
                     [o_opts_string appendFormat:
@@ -1650,7 +1650,7 @@ static VLCWizard *_o_sharedInstance = nil;
     NSString *o_mode;
     o_mode = [[o_t2_matrix_inputSourceType selectedCell] title];
 
-    if( [o_mode isEqualToString: _NS("Select a stream")] )
+    if ([o_mode isEqualToString: _NS("Select a stream")])
     {
         [o_t2_btn_chooseFile setEnabled:YES];
         [o_t2_fld_pathToNewStrm setEnabled:YES];
@@ -1683,7 +1683,7 @@ static VLCWizard *_o_sharedInstance = nil;
      * streaming method */
     int mode;
     mode = [[o_t3_matrix_stmgMhd selectedCell] tag];
-    if( mode == 0 )
+    if (mode == 0)
     {
         /* HTTP */
         [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:0]
@@ -1691,7 +1691,7 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:0]
             objectAtIndex:3]];
     }
-    else if( mode == 1 )
+    else if (mode == 1)
     {
         /* MMS */
         [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:1]
@@ -1699,7 +1699,7 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:1]
             objectAtIndex:3]];
     }
-    else if( mode == 2 )
+    else if (mode == 2)
     {
         /* UDP-Unicast */
         [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:2]
@@ -1707,7 +1707,7 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:2]
         objectAtIndex:3]];
     }
-    else if( mode == 3 )
+    else if (mode == 3)
     {
         /* UDP-Multicast */
         [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:3]
@@ -1715,7 +1715,7 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:3]
         objectAtIndex:3]];
     }
-    else if( mode == 4 )
+    else if (mode == 4)
     {
         /* RTP-Unicast */
         [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:4]
@@ -1723,7 +1723,7 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:4]
             objectAtIndex:3]];
     }
-    else if( mode == 5 )
+    else if (mode == 5)
     {
         /* RTP-Multicast */
         [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:5]
@@ -1834,7 +1834,7 @@ static VLCWizard *_o_sharedInstance = nil;
      * his/her new file. We take a modified NSOpenPanel to select a folder
      * and a plain NSSavePanel to save a single file. */
 
-    if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
+    if ([[o_userSelections objectForKey:@"pathToStrm"] count] > 1)
     {
         NSOpenPanel * saveFolderPanel = [[NSOpenPanel alloc] init];
 
@@ -1858,7 +1858,7 @@ static VLCWizard *_o_sharedInstance = nil;
         NSString * theEncapFormat = [[o_encapFormats objectAtIndex:
         [[o_userSelections objectForKey:@"encapFormat"] intValue]]
         objectAtIndex:0];
-        if( theEncapFormat != @"ps" )
+        if (theEncapFormat != @"ps")
             [saveFilePanel setAllowedFileTypes: [NSArray arrayWithObject:theEncapFormat]];
         else
             [saveFilePanel setAllowedFileTypes: [NSArray arrayWithObject:@"mpg"]];

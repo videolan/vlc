@@ -25,7 +25,6 @@
 #import <Cocoa/Cocoa.h>
 #import "CompatibilityFixes.h"
 
-
 /*****************************************************************************
  * VLCWindow
  *

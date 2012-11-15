@@ -49,11 +49,8 @@
     IBOutlet id o_progress_bar;
 
     IBOutlet id o_time_fld;
-
     IBOutlet id o_fullscreen_btn;
-
     IBOutlet id o_resize_view;
-
 
     NSImage * o_pause_img;
     NSImage * o_pause_pressed_img;
@@ -67,7 +64,7 @@
 
     BOOL b_nativeFullscreenMode;
     BOOL b_dark_interface;
-    
+
 }
 
 @property (readonly) id bottomBarView;

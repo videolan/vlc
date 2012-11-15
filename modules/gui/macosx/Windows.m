@@ -806,7 +806,7 @@
 - (void)hasEndedFullscreen
 {
     [[VLCMainWindow sharedInstance] setFullscreen:NO];
-    
+
     /* This function is private and should be only triggered at the end of the fullscreen change animation */
     /* Make sure we don't see the o_video_view disappearing of the screen during this operation */
     NSDisableScreenUpdates();

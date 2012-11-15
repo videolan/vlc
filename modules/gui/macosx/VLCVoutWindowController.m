@@ -156,7 +156,7 @@
     [o_vout_view setVoutThread:(vout_thread_t *)p_wnd->p_parent];
     [o_vout_dict setObject:[o_new_video_window autorelease] forKey:[NSValue valueWithPointer:p_wnd]];
 
-    if(b_nonembedded) {
+    if (b_nonembedded) {
         // event occurs before window is created, so call again
         [[VLCMain sharedInstance] playlistUpdated];
     }
@@ -167,7 +167,7 @@
 - (void)removeVoutforDisplay:(NSValue *)o_key
 {
     VLCVideoWindowCommon *o_window = [o_vout_dict objectForKey:o_key];
-    if(!o_window) {
+    if (!o_window) {
         msg_Err(VLCIntf, "Cannot close nonexisting window");
         return;
     }
@@ -200,7 +200,7 @@
 - (void)updateWindow:(vout_window_t *)p_wnd withSelector:(SEL)aSel;
 {
     VLCVideoWindowCommon *o_window = [o_vout_dict objectForKey:[NSValue valueWithPointer:p_wnd]];
-    if(!o_window) {
+    if (!o_window) {
         msg_Err(VLCIntf, "Cannot call selector for nonexisting window");
         return;
     }
@@ -219,7 +219,7 @@
 - (void)setNativeVideoSize:(NSSize)size forWindow:(vout_window_t *)p_wnd
 {
     VLCVideoWindowCommon *o_window = [o_vout_dict objectForKey:[NSValue valueWithPointer:p_wnd]];
-    if(!o_window) {
+    if (!o_window) {
         msg_Err(VLCIntf, "Cannot set size for nonexisting window");
         return;
     }

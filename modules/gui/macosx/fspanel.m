@@ -103,7 +103,7 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
-    if(hideAgainTimer) {
+    if (hideAgainTimer) {
         [hideAgainTimer invalidate];
         [hideAgainTimer release];
     }
@@ -190,18 +190,18 @@
 - (void)focus:(NSTimer *)timer
 {
     /* we need to push ourselves to front if the vout window was closed since our last display */
-    if(b_voutWasUpdated) {
+    if (b_voutWasUpdated) {
         [self orderFront: self];
         b_voutWasUpdated = NO;
     }
 
-    if([self alphaValue] < 1.0)
+    if ([self alphaValue] < 1.0)
         [self setAlphaValue:[self alphaValue]+0.1];
-    if([self alphaValue] >= 1.0) {
+    if ([self alphaValue] >= 1.0) {
         b_displayed = YES;
         [self setAlphaValue: 1.0];
         [self setFadeTimer:nil];
-        if(b_fadeQueued) {
+        if (b_fadeQueued) {
             b_fadeQueued=NO;
             [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(unfocus:) userInfo:NULL repeats:YES]];
         }
@@ -211,20 +211,20 @@
 /* This routine is called repeatedly to hide the window */
 - (void)unfocus:(NSTimer *)timer
 {
-    if(b_keptVisible) {
+    if (b_keptVisible) {
         b_keptVisible = NO;
         b_fadeQueued = NO;
         [self setFadeTimer: NULL];
         [self fadeIn];
         return;
     }
-    if([self alphaValue] > 0.0)
+    if ([self alphaValue] > 0.0)
         [self setAlphaValue:[self alphaValue]-0.05];
-    if([self alphaValue] <= 0.05) {
+    if ([self alphaValue] <= 0.05) {
         b_displayed = NO;
         [self setAlphaValue:0.0];
         [self setFadeTimer:nil];
-        if(b_fadeQueued) {
+        if (b_fadeQueued) {
             b_fadeQueued=NO;
             [self setFadeTimer:
                 [NSTimer scheduledTimerWithTimeInterval:0.1
@@ -252,18 +252,18 @@
 {
     /* in case that the user don't want us to appear, make sure we hide the mouse */
 
-    if(!config_GetInt(VLCIntf, "macosx-fspanel")) {
+    if (!config_GetInt(VLCIntf, "macosx-fspanel")) {
         float time = (float)var_CreateGetInteger(VLCIntf, "mouse-hide-timeout") / 1000.;
         [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:time target:self selector:@selector(hideMouse) userInfo:nil repeats:NO]];
         return;
     }
 
-    if(b_nonActive)
+    if (b_nonActive)
         return;
 
     [self orderFront: nil];
 
-    if([self alphaValue] < 1.0 || b_displayed != YES) {
+    if ([self alphaValue] < 1.0 || b_displayed != YES) {
         if (![self fadeTimer])
             [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(focus:) userInfo:[NSNumber numberWithShort:1] repeats:YES]];
         else if ([[[self fadeTimer] userInfo] shortValue]==0)
@@ -274,10 +274,10 @@
 
 - (void)fadeOut
 {
-    if(NSPointInRect([NSEvent mouseLocation],[self frame]))
+    if (NSPointInRect([NSEvent mouseLocation],[self frame]))
         return;
 
-    if(([self alphaValue] > 0.0)) {
+    if (([self alphaValue] > 0.0)) {
         if (![self fadeTimer])
             [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(unfocus:) userInfo:[NSNumber numberWithShort:0] repeats:YES]];
         else if ([[[self fadeTimer] userInfo] shortValue]==1)
@@ -292,9 +292,9 @@
     b_keptVisible = YES;
 
     /* get us a valid timer */
-    if(! b_alreadyCounting) {
+    if (! b_alreadyCounting) {
         i_timeToKeepVisibleInSec = var_CreateGetInteger(VLCIntf, "mouse-hide-timeout") / 500;
-        if(hideAgainTimer) {
+        if (hideAgainTimer) {
             [hideAgainTimer invalidate];
             [hideAgainTimer autorelease];
         }
@@ -311,11 +311,11 @@
 - (void)keepVisible:(NSTimer *)timer
 {
     /* if the user triggered an action, start over again */
-    if(b_keptVisible)
+    if (b_keptVisible)
         b_keptVisible = NO;
 
     /* count down until we hide ourselfes again and do so if necessary */
-    if(--i_timeToKeepVisibleInSec < 1) {
+    if (--i_timeToKeepVisibleInSec < 1) {
         [self hideMouse];
         [self fadeOut];
         [hideAgainTimer invalidate]; /* released in -autoHide and -dealloc */
@@ -357,7 +357,7 @@
         [o_vout_window release];
     o_vout_window = [o_window retain];
     int i_newdevice = (int)[[o_vout_window screen] displayID];
-    if(i_newdevice != i_device) {
+    if (i_newdevice != i_device) {
         i_device = i_newdevice;
         [self center];
     }
@@ -568,7 +568,7 @@
 {
     input_thread_t * p_input;
     p_input = pl_CurrentInput(VLCIntf);
-    if(p_input != NULL) {
+    if (p_input != NULL) {
         vlc_value_t pos;
 
         pos.f_float = [o_fs_timeSlider floatValue] / 10000.;
