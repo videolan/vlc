@@ -596,7 +596,7 @@ static VLCWizard *_o_sharedInstance = nil;
         } else {
             /* show a sheet that the user didn't select a file */
             NSBeginInformationalAlertSheet(_NS("No input selected"),
-                _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil,
+                _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, @"%@",
                 _NS("No new stream or valid playlist item has been selected.\n\n"
                 "Choose one before going to the next page."));
         }
@@ -658,7 +658,7 @@ static VLCWizard *_o_sharedInstance = nil;
             {
                 /* complain to the user that "" is no valid dest. */
                 NSBeginInformationalAlertSheet(_NS("No valid destination"),
-                    _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil,
+                    _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, @"%@",
                     _NS("A valid destination has to be selected "
                     "Enter either a Unicast-IP or a Multicast-IP."
                     "\n\nIf you don't know what this means, have a look at "
@@ -998,7 +998,7 @@ static VLCWizard *_o_sharedInstance = nil;
         } else {
             /* show a sheet that the selected codecs are not compatible */
             NSBeginInformationalAlertSheet(_NS("Invalid selection"), _NS("OK"),
-                @"", @"", o_wizard_window, nil, nil, nil, nil, _NS("The "
+                @"", @"", o_wizard_window, nil, nil, nil, nil, @"%@", _NS("The "
                 "chosen codecs are not compatible with each other. For example: "
                 "It is not possible to mix uncompressed audio with any video codec.\n\n"
                 "Correct your selection and try again."));
@@ -1618,7 +1618,7 @@ static VLCWizard *_o_sharedInstance = nil;
 {
     /* show a sheet for the help */
     NSBeginInformationalAlertSheet(_NS("Stream to network"),
-        _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil,
+        _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, @"%@",
         _NS("This allows streaming on a network."));
 }
 
@@ -1626,7 +1626,7 @@ static VLCWizard *_o_sharedInstance = nil;
 {
     /* show a sheet for the help */
     NSBeginInformationalAlertSheet(_NS("Transcode/Save to file"),
-        _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil,
+        _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, @"%@",
         _NS("This allows saving a stream to a file. The "
         "can be reencoded on the fly. Whatever "
         "VLC can read can be saved.\nPlease note that VLC is not very suited "
@@ -1798,7 +1798,7 @@ static VLCWizard *_o_sharedInstance = nil;
 {
     /* show a sheet for the help */
     NSBeginInformationalAlertSheet(_NS("Time-To-Live (TTL)"),
-        _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil,
+        _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, @"%@",
         _NS("This allows defining the TTL (Time-To-Live) of the stream. "
             "This parameter is the maximum number of routers your stream can "
             "go through. If you don't know what it means, or if you want to "
@@ -1809,7 +1809,7 @@ static VLCWizard *_o_sharedInstance = nil;
 {
     /* show a sheet for the help */
     NSBeginInformationalAlertSheet(_NS("SAP Announce"),
-        _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil,
+        _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, @"%@",
         _NS("When streaming using UDP, the streams can be "
         "announced using the SAP/SDP announcing protocol. This "
         "way, the clients won't have to type in the multicast address, it "
@@ -1822,7 +1822,7 @@ static VLCWizard *_o_sharedInstance = nil;
 {
     /* show a sheet for the help */
     NSBeginInformationalAlertSheet(_NS("Local playback"),
-            _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil,
+            _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, @"%@",
             _NS("When this option is enabled, the stream will be both played "
             "and transcoded/streamed.\n\nNote that this requires much more "
             "CPU power than simple transcoding or streaming."));

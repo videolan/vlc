@@ -228,7 +228,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 {
     NSBeginInformationalAlertSheet(_NS("Reset Preferences"), _NS("Cancel"),
         _NS("Continue"), nil, o_prefs_window, self,
-        @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil,
+        @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, @"%@",
         _NS("Beware this will reset the VLC media player preferences.\n"
             "Are you sure you want to continue?"));
 }

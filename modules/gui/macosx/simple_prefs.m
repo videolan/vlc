@@ -682,7 +682,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     } else if (sender == o_sprefs_reset_btn)
         NSBeginInformationalAlertSheet(_NS("Reset Preferences"), _NS("Cancel"),
                                         _NS("Continue"), nil, o_sprefs_win, self,
-                                        @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil,
+                                        @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, @"%@",
                                         _NS("Beware this will reset the VLC media player preferences.\n"
                                             "Are you sure you want to continue?"));
     else if (sender == o_sprefs_showAll_btn) {

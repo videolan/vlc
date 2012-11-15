@@ -1725,7 +1725,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     if (latestLog) {
         [[NSWorkspace sharedWorkspace] openFile: latestLog withApplication: @"Console"];
     } else {
-        NSBeginInformationalAlertSheet(_NS("No CrashLog found"), _NS("Continue"), nil, nil, o_msgs_panel, self, NULL, NULL, nil, _NS("Couldn't find any trace of a previous crash."));
+        NSBeginInformationalAlertSheet(_NS("No CrashLog found"), _NS("Continue"), nil, nil, o_msgs_panel, self, NULL, NULL, nil, @"%@", _NS("Couldn't find any trace of a previous crash."));
     }
 }
 

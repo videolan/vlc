@@ -207,11 +207,11 @@ static VLCBookmarks *_o_sharedInstance = nil;
     input_thread_t * p_input = pl_CurrentInput(VLCIntf);
 
     if (!p_input) {
-        NSBeginCriticalAlertSheet(_NS("No input"), _NS("OK"), @"", @"", o_bookmarks_window, nil, nil, nil, nil, _NS("No input found. A stream must be playing or paused for bookmarks to work."));
+        NSBeginCriticalAlertSheet(_NS("No input"), _NS("OK"), @"", @"", o_bookmarks_window, nil, nil, nil, nil, @"%@",_NS("No input found. A stream must be playing or paused for bookmarks to work."));
         return;
     }
     if (p_old_input != p_input) {
-        NSBeginCriticalAlertSheet(_NS("Input has changed"), _NS("OK"), @"", @"", o_bookmarks_window, nil, nil, nil, nil, _NS("Input has changed, unable to save bookmark. Suspending playback with \"Pause\" while editing bookmarks to ensure to keep the same input."));
+        NSBeginCriticalAlertSheet(_NS("Input has changed"), _NS("OK"), @"", @"", o_bookmarks_window, nil, nil, nil, nil, @"%@",_NS("Input has changed, unable to save bookmark. Suspending playback with \"Pause\" while editing bookmarks to ensure to keep the same input."));
         vlc_object_release(p_input);
         return;
     }
@@ -262,12 +262,12 @@ clear:
 - (IBAction)extract:(id)sender
 {
     if ([o_tbl_dataTable numberOfSelectedRows] < 2) {
-        NSBeginAlertSheet(_NS("Invalid selection"), _NS("OK"), @"", @"", o_bookmarks_window, nil, nil, nil, nil, _NS("Two bookmarks have to be selected."));
+        NSBeginAlertSheet(_NS("Invalid selection"), _NS("OK"), @"", @"", o_bookmarks_window, nil, nil, nil, nil, @"%@",_NS("Two bookmarks have to be selected."));
         return;
     }
     input_thread_t * p_input = pl_CurrentInput(VLCIntf);
     if (!p_input) {
-        NSBeginCriticalAlertSheet(_NS("No input found"), _NS("OK"), @"", @"", o_bookmarks_window, nil, nil, nil, nil, _NS("The stream must be playing or paused for bookmarks to work."));
+        NSBeginCriticalAlertSheet(_NS("No input found"), _NS("OK"), @"", @"", o_bookmarks_window, nil, nil, nil, nil, @"%@",_NS("The stream must be playing or paused for bookmarks to work."));
         return;
     }
 
