@@ -123,41 +123,41 @@ void aout_DecDelete (audio_output_t *p_aout)
 
 #define AOUT_RESTART_OUTPUT 1
 #define AOUT_RESTART_INPUT  2
-static int aout_CheckRestart (audio_output_t *aout)
+static int aout_CheckReady (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 
     aout_assert_locked (aout);
 
     int restart = vlc_atomic_swap (&owner->restart, 0);
-    if (likely(restart == 0))
-        return 0;
-
-    assert (restart & AOUT_RESTART_INPUT);
-
-    const aout_request_vout_t request_vout = owner->request_vout;
-
-    aout_FiltersDelete (aout);
-
-    /* Reinitializes the output */
-    if (restart & AOUT_RESTART_OUTPUT)
+    if (unlikely(restart))
     {
-        aout_OutputDelete (aout);
-        owner->mixer_format = owner->input_format;
-        if (aout_OutputNew (aout, &owner->mixer_format))
-            abort (); /* FIXME we are officially screwed */
-        aout_volume_SetFormat (owner->volume, owner->mixer_format.i_format);
-    }
+        assert (restart & AOUT_RESTART_INPUT);
 
-    owner->sync.end = VLC_TS_INVALID;
-    owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
+        const aout_request_vout_t request_vout = owner->request_vout;
 
-    if (aout_FiltersNew (aout, &owner->input_format, &owner->mixer_format,
-                         &request_vout))
-    {
-        abort (); /* FIXME */
+        aout_FiltersDelete (aout);
+        if (restart & AOUT_RESTART_OUTPUT)
+        {   /* Reinitializes the output */
+            aout_OutputDelete (aout);
+            owner->mixer_format = owner->input_format;
+            if (aout_OutputNew (aout, &owner->mixer_format))
+                owner->mixer_format.i_format = 0;
+            aout_volume_SetFormat (owner->volume,
+                                   owner->mixer_format.i_format);
+        }
+
+        owner->sync.end = VLC_TS_INVALID;
+        owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
+
+        if (aout_FiltersNew (aout, &owner->input_format, &owner->mixer_format,
+                             &request_vout))
+        {
+            aout_OutputDelete (aout);
+            owner->mixer_format.i_format = 0;
+        }
     }
-    return 0;
+    return (owner->mixer_format.i_format) ? 0 : -1;
 }
 
 /**
@@ -393,7 +393,7 @@ int aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
                                  / owner->input_format.i_rate;
 
     aout_lock (aout);
-    if (unlikely(aout_CheckRestart (aout)))
+    if (unlikely(aout_CheckReady (aout)))
         goto drop; /* Pipeline is unrecoverably broken :-( */
 
     const mtime_t now = mdate (), advance = block->i_pts - now;
