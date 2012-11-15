@@ -171,14 +171,14 @@ void SetFilterMethod( filter_t *p_filter, const char *psz_method )
         p_sys->b_half_height = false;
         p_sys->b_use_frame_history = false;
     }
-    else if( !strcmp( psz_method, "yadif" ) && p_sys->chroma->pixel_size == 1 )
+    else if( !strcmp( psz_method, "yadif" ) )
     {
         p_sys->i_mode = DEINTERLACE_YADIF;
         p_sys->b_double_rate = false;
         p_sys->b_half_height = false;
         p_sys->b_use_frame_history = true;
     }
-    else if( !strcmp( psz_method, "yadif2x" ) && p_sys->chroma->pixel_size == 1 )
+    else if( !strcmp( psz_method, "yadif2x" ) )
     {
         p_sys->i_mode = DEINTERLACE_YADIF2X;
         p_sys->b_double_rate = true;

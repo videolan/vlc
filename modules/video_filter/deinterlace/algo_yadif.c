@@ -125,6 +125,9 @@ int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src,
 #endif
             filter = yadif_filter_line_c;
 
+        if( p_sys->chroma->pixel_size == 2 )
+            filter = yadif_filter_line_c_16bit;
+
         for( int n = 0; n < p_dst->i_planes; n++ )
         {
             const plane_t *prevp = &p_prev->p[n];
