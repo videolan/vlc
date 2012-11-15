@@ -29,7 +29,7 @@
 /* Max input rate factor (1/4 -> 4) */
 # define AOUT_MAX_INPUT_RATE (4)
 
-# define AOUT_MAX_FILTERS 10
+# define AOUT_MAX_FILTERS 12
 
 enum {
     AOUT_RESAMPLING_NONE=0,
