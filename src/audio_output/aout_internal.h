@@ -123,6 +123,7 @@ void aout_OutputDelete( audio_output_t * p_aout );
 
 
 /* From common.c : */
+vlc_fourcc_t aout_NativeEndian(vlc_fourcc_t);
 void aout_FormatsPrint(vlc_object_t *, const char *,
                        const audio_sample_format_t *,
                        const audio_sample_format_t *);
