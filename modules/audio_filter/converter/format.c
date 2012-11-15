@@ -61,19 +61,15 @@ static block_t *Filter(filter_t *, block_t *);
 
 typedef block_t *(*cvt_direct_t)(filter_t *, block_t *);
 typedef void (*cvt_indirect_t)(block_t *, const block_t *);
-typedef void (*cvt_swap_t)(block_t *);
 
 struct filter_sys_t {
-    cvt_swap_t     pre;
     cvt_direct_t   directs[2];
     cvt_indirect_t indirects[2];
     unsigned       indirects_ratio[2][2];
-    cvt_swap_t     post;
 };
 
 static cvt_direct_t FindDirect(vlc_fourcc_t src, vlc_fourcc_t dst);
 static cvt_indirect_t FindIndirect(vlc_fourcc_t src, vlc_fourcc_t dst);
-static cvt_swap_t FindSwap(vlc_fourcc_t *dst, vlc_fourcc_t src);
 
 /* */
 static int Open(vlc_object_t *object)
@@ -101,24 +97,13 @@ static int Open(vlc_object_t *object)
         return VLC_ENOMEM;
 
     /* Find the cost minimal conversion */
-    for (unsigned mask = 0; mask <= 0x07; mask++) {
+    for (unsigned mask = 0; mask <= 0x01; mask ++) {
         memset(sys, 0, sizeof(*sys));
 
         vlc_fourcc_t fsrc = src->i_codec;
         vlc_fourcc_t fdst = dst->i_codec;
 
-        if (mask & 0x01) {
-            sys->pre = FindSwap(&fsrc, fsrc);
-            if (!sys->pre)
-                continue;
-        }
-        if (mask & 0x02) {
-            sys->post = FindSwap(&fdst, fdst);
-            if (!sys->post)
-                continue;
-        }
-
-        const bool has_middle = mask & 0x04;
+        const bool has_middle = mask & 0x01;
         for (int i = 0; fsrc != fdst && i < 1 + has_middle; i++) {
             /* XXX Hardcoded middle format: native 16 bits */
             vlc_fourcc_t ftarget = has_middle && i == 0 ? VLC_CODEC_S16N : fdst;
@@ -166,9 +151,6 @@ static block_t *Filter(filter_t *filter, block_t *block)
 {
     filter_sys_t *sys = filter->p_sys;
 
-    if (sys->pre)
-        sys->pre(block);
-
     for (int i = 0; i < 2; i++) {
         if (sys->directs[i]) {
             block = sys->directs[i](filter, block);
@@ -192,8 +174,6 @@ static block_t *Filter(filter_t *filter, block_t *block)
         }
     }
 
-    if (sys->post)
-        sys->post(block);
     return block;
 }
 
@@ -480,42 +460,6 @@ static void S24toFl32(block_t *bdst, const block_t *bsrc)
 }
 
 /* */
-static void Swap64(block_t *b)
-{
-    uint64_t *data = (uint64_t *)b->p_buffer;
-    for (size_t i = 0; i < b->i_buffer / 8; i++) {
-        *data = bswap64 (*data);
-        data++;
-    }
-}
-static void Swap32(block_t *b)
-{
-    uint32_t *data = (uint32_t *)b->p_buffer;
-    for (size_t i = 0; i < b->i_buffer / 4; i++) {
-        *data = bswap32 (*data);
-        data++;
-    }
-}
-static void Swap24(block_t *b)
-{
-    uint8_t *data = (uint8_t *)b->p_buffer;
-    for (size_t i = 0; i < b->i_buffer / 3; i++) {
-        uint8_t buf = data[0];
-        data[0] = data[2];
-        data[2] = buf;
-        data += 3;
-    }
-}
-static void Swap16(block_t *b)
-{
-    uint16_t *data = (uint16_t *)b->p_buffer;
-    for (size_t i = 0; i < b->i_buffer / 2; i++) {
-        *data = bswap16 (*data);
-        data++;
-    }
-}
-
-/* */
 static const struct {
     vlc_fourcc_t src;
     vlc_fourcc_t dst;
@@ -561,21 +505,6 @@ static const struct {
     { VLC_CODEC_U8,   VLC_CODEC_S16N, U8toS16 },
     { 0, 0, NULL }
 };
-static const struct {
-    vlc_fourcc_t a;
-    vlc_fourcc_t b;
-    cvt_swap_t   convert;
-} cvt_swaps[] = {
-    { VLC_CODEC_F64L, VLC_CODEC_F64B, Swap64 },
-    { VLC_CODEC_F32L, VLC_CODEC_F32B, Swap32 },
-    { VLC_CODEC_S32L, VLC_CODEC_S32B, Swap32 },
-    { VLC_CODEC_U32L, VLC_CODEC_U32B, Swap32 },
-    { VLC_CODEC_S24L, VLC_CODEC_S24B, Swap24 },
-    { VLC_CODEC_U24L, VLC_CODEC_U24B, Swap24 },
-    { VLC_CODEC_S16L, VLC_CODEC_S16B, Swap16 },
-    { VLC_CODEC_U16L, VLC_CODEC_U16B, Swap16 },
-    { 0, 0, NULL }
-};
 
 static cvt_direct_t FindDirect(vlc_fourcc_t src, vlc_fourcc_t dst)
 {
@@ -592,19 +521,6 @@ static cvt_indirect_t FindIndirect(vlc_fourcc_t src, vlc_fourcc_t dst)
         if (cvt_indirects[i].src == src &&
             cvt_indirects[i].dst == dst)
             return cvt_indirects[i].convert;
-    }
-    return NULL;
-}
-static cvt_swap_t FindSwap(vlc_fourcc_t *dst, vlc_fourcc_t src)
-{
-    for (int i = 0; cvt_swaps[i].convert; i++) {
-        if (cvt_swaps[i].a == src) {
-            *dst = cvt_swaps[i].b;
-            return cvt_swaps[i].convert;
-        } else if (cvt_swaps[i].b == src) {
-            *dst = cvt_swaps[i].a;
-            return cvt_swaps[i].convert;
-        }
     }
     return NULL;
 }
