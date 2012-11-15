@@ -23,7 +23,7 @@ Encoders:
  * high10, high422 and high444 encoding support in h264
 
 Access:
- * Screen: Added support for OS X Lion
+ * Screen: add support for OS X Lion, remove support for previous OS releases
  * Major improvements in DASH support
  * Improvements in Blu-Ray module, notably for multiple video tracks support
  * Important improvements and rewrite of the v4l2 access module
@@ -83,6 +83,7 @@ Mac OS X Interface:
  * add accessibility support to playback windows, open panel and fullscreen
    controller
  * add a GUI to manage podcasts
+ * add a new panel for media conversation and streaming
  * add a GUI for the QTSound access module to process audio captured locally
    - This also allows to capture input from a webcam and a mic at the same time.
  * add a GUI to capture QTSound data along with the current screen content
@@ -92,6 +93,8 @@ Mac OS X Interface:
    selection and to manage the list of presets
  * add custom profiles for video and audio effects, which let the user keep
    multiple configuration sets of all the individual filters
+ * add support for video filters to clone the video output or split it in parts
+ * add A->B loop feature known from the Qt interface
  * add an option to disable skipping to next/previous file with the Apple Remote
  * add an option to show next / previous buttons
  * add an option to hide the shuffle and repeat buttons
@@ -99,9 +102,6 @@ Mac OS X Interface:
    date and language
  * add options to the Advanced Open File dialog for start and stop time
  * add an option to play videos as a desktop background
- * add a new panel for media conversation and streaming
- * allow the OS to turn off the screen(s) when playing audio-only media while
-   the user is idle
  * The Streaming/Transcoding wizard and the open dialog's output panel are
    deprecated now
 
