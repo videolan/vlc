@@ -167,7 +167,7 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
     if (input.i_format != outfmt->i_format || !same_mix)
     {
         vlc_fourcc_t native = aout_NativeEndian (input.i_format);
-        if (native != input.i_format)
+        if (native != 0 && native != input.i_format)
         {
             if (n == max)
                 goto overflow;
@@ -248,6 +248,8 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
 
     /* Format */
     vlc_fourcc_t native = aout_NativeEndian (outfmt->i_format);
+    if (native == 0)
+        native = outfmt->i_format;
     if (input.i_format != native)
     {
         if (max == 0)
