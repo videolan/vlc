@@ -134,14 +134,10 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
      * and cannot do. This seems hardly avoidable, the conversion problem need
      * to be reduced somehow. */
     audio_sample_format_t input = *infmt;
-    bool same_codec = infmt->i_format == outfmt->i_format;
-    bool same_rate = infmt->i_rate == outfmt->i_rate;
-    bool same_mix = infmt->i_physical_channels == outfmt->i_physical_channels
-                 && infmt->i_original_channels == outfmt->i_original_channels;
     unsigned n = 0;
 
     /* Encapsulate or decode non-linear formats */
-    if (!AOUT_FMT_LINEAR(infmt) && !same_codec)
+    if (!AOUT_FMT_LINEAR(infmt) && infmt->i_format != outfmt->i_format)
     {
         if (n == max)
             goto overflow;
@@ -161,13 +157,32 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
         }
 
         filters[n++] = f;
-        same_codec = input.i_format == outfmt->i_format;
     }
-
     assert (AOUT_FMT_LINEAR(&input));
 
-    /* Conversion cannot be done in foreign endianess. */
-    /* TODO: convert to native endian if needed */
+    bool same_mix = infmt->i_physical_channels == outfmt->i_physical_channels
+                 && infmt->i_original_channels == outfmt->i_original_channels;
+
+    /* Native endianess */
+    if (input.i_format != outfmt->i_format || !same_mix)
+    {
+        vlc_fourcc_t native = aout_NativeEndian (input.i_format);
+        if (native != input.i_format)
+        {
+            if (n == max)
+                goto overflow;
+
+            filter_t *f = TryFormat (obj, native, &input);
+            if (f == NULL)
+            {
+                msg_Err (obj, "cannot find %s for conversion pipeline",
+                         "native endian converter");
+                goto error;
+            }
+
+            filters[n++] = f;
+        }
+    }
 
     /* Remix channels */
     if (!same_mix)
@@ -186,7 +201,6 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
             }
 
             filters[n++] = f;
-            same_codec = input.i_format == outfmt->i_format;
         }
 
         if (n == max)
@@ -209,11 +223,10 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
 
         input = output;
         filters[n++] = f;
-        //same_mix = true;
     }
 
     /* Resample */
-    if (!same_rate)
+    if (input.i_rate != outfmt->i_rate)
     {   /* Resampling works with any linear format, but may be ugly. */
         if (n == max)
             goto overflow;
@@ -231,15 +244,16 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
 
         input = output;
         filters[n++] = f;
-        //same_rate = true;
     }
 
-    if (!same_codec)
+    /* Format */
+    vlc_fourcc_t native = aout_NativeEndian (outfmt->i_format);
+    if (input.i_format != native)
     {
         if (max == 0)
             goto overflow;
 
-        filter_t *f = TryFormat (obj, outfmt->i_format, &input);
+        filter_t *f = TryFormat (obj, native, &input);
         if (f == NULL)
         {
             msg_Err (obj, "cannot find %s for conversion pipeline",
@@ -247,10 +261,24 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
             goto error;
         }
         filters[n++] = f;
-        //same_codec = true;
     }
 
-    /* TODO: convert to foreign endian if needed */
+    /* Foreign endianess */
+    if (native != outfmt->i_format)
+    {
+        if (n == max)
+            goto overflow;
+
+        filter_t *f = TryFormat (obj, outfmt->i_format, &input);
+        if (f == NULL)
+        {
+            msg_Err (obj, "cannot find %s for conversion pipeline",
+                     "foreign endian converter");
+            goto error;
+        }
+
+        filters[n++] = f;
+    }
 
     msg_Dbg (obj, "conversion pipeline complete");
     *count += n;
