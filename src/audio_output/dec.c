@@ -240,7 +240,7 @@ static void aout_StopResampling (audio_output_t *aout)
     aout_FiltersAdjustResampling (aout, 0);
 }
 
-static void aout_DecSilence (audio_output_t *aout, mtime_t length)
+static void aout_DecSilence (audio_output_t *aout, mtime_t length, mtime_t pts)
 {
     aout_owner_t *owner = aout_owner (aout);
     const audio_sample_format_t *fmt = &owner->mixer_format;
@@ -257,8 +257,9 @@ static void aout_DecSilence (audio_output_t *aout, mtime_t length)
     msg_Dbg (aout, "inserting %zu zeroes", frames);
     memset (block->p_buffer, 0, block->i_buffer);
     block->i_nb_samples = frames;
+    block->i_pts = pts;
+    block->i_dts = pts;
     block->i_length = length;
-    /* FIXME: PTS... */
     aout_OutputPlay (aout, block);
 }
 
@@ -323,7 +324,7 @@ static void aout_DecSynchronize (audio_output_t *aout, mtime_t dec_pts,
         if (!owner->sync.discontinuity)
             msg_Warn (aout, "playback way too early (%"PRId64"): "
                       "playing silence", drift);
-        aout_DecSilence (aout, -drift);
+        aout_DecSilence (aout, -drift, dec_pts);
 
         aout_StopResampling (aout);
         owner->sync.discontinuity = true;
