@@ -1097,7 +1097,7 @@ static VLCWizard *_o_sharedInstance = nil;
             NSString * theEncapFormat = [[o_encapFormats objectAtIndex:
                 [[o_userSelections objectForKey:@"encapFormat"] intValue]]
                 objectAtIndex:0];
-            if (theEncapFormat == @"ps")
+            if ([theEncapFormat isEqualToString:@"ps"])
                 theEncapFormat = @"mpg";
 
             /* look whether we need to process multiple items or not.
@@ -1483,7 +1483,7 @@ static VLCWizard *_o_sharedInstance = nil;
                     [o_sap_option appendFormat: @"sap,name=\"%@\"",
                         [o_userSelections objectForKey:@"sapText"]];
                 }
-                if ([[o_strmgMthds objectAtIndex: [[o_userSelections objectForKey: @"stmgMhd"] intValue]] objectAtIndex:0] == @"rtp")
+                if ([[[o_strmgMthds objectAtIndex: [[o_userSelections objectForKey: @"stmgMhd"] intValue]] objectAtIndex:0] isEqualToString:@"rtp"])
                 {
                     /* RTP is no access out, but a stream out module */
                     [o_opts_string appendFormat:
@@ -1507,7 +1507,7 @@ static VLCWizard *_o_sharedInstance = nil;
             else
             {
                 /* no SAP, just streaming */
-                if ([[o_strmgMthds objectAtIndex: [[o_userSelections objectForKey: @"stmgMhd"] intValue]] objectAtIndex:0] == @"rtp")
+                if ([[[o_strmgMthds objectAtIndex: [[o_userSelections objectForKey: @"stmgMhd"] intValue]] objectAtIndex:0] isEqualToString:@"rtp"])
                 {
                     /* RTP is different from the other protocols, as it isn't provided through an access out module anymore */
                     [o_opts_string appendFormat:
@@ -1858,7 +1858,7 @@ static VLCWizard *_o_sharedInstance = nil;
         NSString * theEncapFormat = [[o_encapFormats objectAtIndex:
         [[o_userSelections objectForKey:@"encapFormat"] intValue]]
         objectAtIndex:0];
-        if (theEncapFormat != @"ps")
+        if (![theEncapFormat isEqualToString:@"ps"])
             [saveFilePanel setAllowedFileTypes: [NSArray arrayWithObject:theEncapFormat]];
         else
             [saveFilePanel setAllowedFileTypes: [NSArray arrayWithObject:@"mpg"]];
