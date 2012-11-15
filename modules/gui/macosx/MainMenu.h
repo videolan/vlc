@@ -102,6 +102,7 @@
     IBOutlet NSMenuItem * o_mi_random;
     IBOutlet NSMenuItem * o_mi_repeat;
     IBOutlet NSMenuItem * o_mi_loop;
+    IBOutlet NSMenuItem * o_mi_AtoBloop;
     IBOutlet NSMenuItem * o_mi_quitAfterPB;
     IBOutlet NSMenuItem * o_mi_fwd;
     IBOutlet NSMenuItem * o_mi_bwd;
@@ -231,6 +232,7 @@
 - (void)updateRecordState:(BOOL)b_value;
 - (IBAction)setPlaybackRate:(id)sender;
 - (void)updatePlaybackRate;
+- (IBAction)toggleAtoBloop:(id)sender;
 
 - (IBAction)toggleFullscreen:(id)sender;
 - (IBAction)resizeVideoWindow:(id)sender;

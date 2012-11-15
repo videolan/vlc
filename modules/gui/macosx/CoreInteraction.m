@@ -417,6 +417,39 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     }
 }
 
+- (void)setAtoB
+{
+    if (!timeA) {
+        input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+        if (p_input) {
+            timeA = var_GetTime(p_input, "time");
+            vlc_object_release(p_input);
+        }
+    } else if (!timeB) {
+        input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+        if (p_input) {
+            timeB = var_GetTime(p_input, "time");
+            vlc_object_release(p_input);
+        }
+    } else {
+        timeA = 0;
+        timeB = 0;
+    }
+}
+
+- (void)updateAtoB
+{
+    if (timeB) {
+        input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+        if (p_input) {
+            mtime_t currentTime = var_GetTime(p_input, "time");
+            if ( currentTime >= timeB || currentTime < timeA)
+                var_SetTime(p_input, "time", timeA);
+            vlc_object_release(p_input);
+        }
+    }
+}
+
 - (void)volumeUp
 {
     intf_thread_t *p_intf = VLCIntf;

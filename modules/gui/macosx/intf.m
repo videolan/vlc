@@ -1328,6 +1328,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (void)updatePlaybackPosition
 {
     [o_mainwindow updateTimeSlider];
+    [[VLCCoreInteraction sharedInstance] updateAtoB];
 }
 
 - (void)updateVolume

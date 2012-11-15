@@ -320,6 +320,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_random setTitle: _NS("Random")];
     [o_mi_repeat setTitle: _NS("Repeat One")];
     [o_mi_loop setTitle: _NS("Repeat All")];
+    [o_mi_AtoBloop setTitle: _NS("A→B Loop")];
     [o_mi_quitAfterPB setTitle: _NS("Quit after Playback")];
     [o_mi_fwd setTitle: _NS("Step Forward")];
     [o_mi_bwd setTitle: _NS("Step Backward")];
@@ -691,6 +692,11 @@ static VLCMainMenu *_o_sharedInstance = nil;
     double speed =  pow(2, (double)i / 17);
     [o_mi_rate_fld setStringValue: [NSString stringWithFormat:@"%.2fx", speed]];
     [o_mi_rate_sld setIntValue: i];
+}
+
+- (IBAction)toggleAtoBloop:(id)sender
+{
+    [[VLCCoreInteraction sharedInstance] setAtoB];
 }
 
 #pragma mark -
