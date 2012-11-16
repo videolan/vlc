@@ -155,6 +155,7 @@ struct audio_output
       * (optional, may be NULL). The read offset is not returned since it is
       * always implicitly equal to the current time (mdate()).
       * \param write_pts timestamp of the write offset [OUT]
+      * \return 0 on success, non-zero on failure or lack of data
       * \note A stream must have been started when called.
       */
     void (*play)(audio_output_t *, block_t *);
