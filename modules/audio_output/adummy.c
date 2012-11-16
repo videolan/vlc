@@ -48,6 +48,11 @@ static void Play(audio_output_t *aout, block_t *block)
     (void) aout;
 }
 
+static void Flush(audio_output_t *aout, bool wait)
+{
+    (void) aout; (void) wait;
+}
+
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     if (AOUT_FMT_SPDIF(fmt) && var_InheritBool(aout, "spdif"))
@@ -70,7 +75,7 @@ static int Open(vlc_object_t *obj)
     aout->time_get = NULL;
     aout->play = Play;
     aout->pause = NULL;
-    aout->flush = NULL;
+    aout->flush = Flush;
     aout->stop = NULL;
     aout->volume_set = NULL;
     aout->mute_set = NULL;

@@ -169,7 +169,7 @@ struct audio_output
       * \note A stream must have been started when called.
       */
     void (*flush)( audio_output_t *, bool wait);
-    /**< Flushes or drains the playback buffers (optional, may be NULL).
+    /**< Flushes or drains the playback buffers (mandatoryl, cannot be NULL).
       * \param wait true to wait for playback of pending buffers (drain),
       *             false to discard pending buffers (flush)
       * \note A stream must have been started when called.

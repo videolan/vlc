@@ -449,7 +449,5 @@ void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
 void aout_OutputFlush( audio_output_t *aout, bool wait )
 {
     aout_assert_locked( aout );
-
-    if( aout->flush != NULL )
-        aout->flush( aout, wait );
+    aout->flush (aout, wait);
 }
