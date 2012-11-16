@@ -130,6 +130,75 @@ Removed modules:
  * Telepathy framework "now playing" (broken and unmaintained since VLC 1.0.0)
 
 
+Changes between 2.0.3 and 2.0.4:
+--------------------------------
+
+Audio Output:
+ * Improve playback synchronization with PulseAudio.
+ * Fix ALSA digital pass-through ("S/PDIF").
+ * Fix live audio device selection on Mac OS X
+ * Fix detection of some 5.1 and 7.1 kits on Windows.
+ * Fix audio output behavior when the output device is plugged or unplugged
+   during playback on Mac OS X
+
+Access:
+ * Fix numerous DVD (dvdnav) crashes
+ * Fix HTTP playback through proxy and advertise gzip correctly
+ * Fix TLS busy-loop during client-side handshake
+
+Codecs:
+ * Support for Opus decoding via libopus, including multi-channel files
+ * Support MSS1 and MSS2 decoding through DMO libraries
+ * Fix Hebrew and Greek subtitles encoding
+ * Fix crashes on malformed subtitles and malformed png files
+ * Fix crashes when using hardware decoding
+
+Demuxers:
+ * Fix issues in Ogg with zero length packets
+ * Fix file duration of Ogg/Theora and Ogg/Vorbis files
+ * Fix vimeo, koreus and youtube lua parsers
+ * Support Youtube live streams
+
+Windows:
+ * Fix Wallpaper mode on Windows 7/8
+
+Qt:
+ * Fix media info dialog update
+ * Fix random/repeat preferences saving
+ * Fix crashes when opening audio effects dialog, with skins and playlist
+ * Fix crash on association dialog on Windows XP
+ * Fix album art display at start
+
+Mac OS X:
+ * Fix command-line options to control the interface behavior
+ * Deactivate CoreAnimation effects on Leopard
+ * Fix menus display and behavior
+ * Fix various crashes and small issues including bookmarks, playlist, buttons,
+   streaming wizard, video size, hotkeys and fullscreen controller
+ * Fix font selection for Unicode subtitles
+ * Improve system sleep behavior when playing audio-only media. The screen is
+   allowed to sleep while the system is kept awake during playback.
+ * Fix code signing of Delete Preferences application
+ * Add option to Audio Effects panel to activate the Karaoke filter
+
+Miscellaneous:
+ * Fix Notify (D-Bus) plugin deadlock.
+ * Fix buffer corruption in freetype and subtitles modules
+ * Improve Blu-Ray and HLS support
+ * Fix issues on selection of playlist items for WebUI
+ * Codec and other 3rd party library updates
+ * Fix swscale and canvas behavior with Aspect Ratio
+ * Fix mime-type when streaming Webm over HTTP
+ * Fix recording behaviour in Windows network environments
+ * Codecs and 3rd party libary updates
+
+Translations:
+ * Updates of Norwegian Bokmål, Korean, Slovak, Serbian, Russian, Traditional
+   Chinese, Simplified Chinese, Portuguese, Walloon, Turkish, Thai, Polish,
+   Dutch, Khmer, Hindi, Japanese, Galician, Hebrew, German, Breton, Scottish
+   Gaelic, Czech, Estonian translations
+
+
 Changes between 2.0.2 and 2.0.3:
 --------------------------------
 
