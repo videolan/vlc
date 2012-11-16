@@ -49,10 +49,14 @@ static void Pause (audio_output_t *, bool, mtime_t);
 static int VolumeSet (audio_output_t *, float);
 static int MuteSet (audio_output_t *, bool);
 static void VolumeChanged (void *, unsigned);
+static void PositionChanged (void *, int);
 
 struct aout_sys_t
 {
     struct sio_hdl *hdl;
+    unsigned long long read_offset;
+    unsigned long long write_offset;
+    unsigned rate;
     unsigned volume;
     bool mute;
 };
@@ -121,6 +125,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
 
     fmt->i_rate = par.rate;
+    sys->rate = par.rate;
 
     /* Channel map */
     unsigned chans;
@@ -165,6 +170,9 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         aout->mute_set = NULL;
     }
 
+    sys->read_offset = 0;
+    sys->write_offset = 0;
+    sio_onmove (sys->hdl, PositionChanged, aout);
     sio_start (sys->hdl);
     return VLC_SUCCESS;
 
@@ -181,15 +189,23 @@ static void Close (vlc_object_t *obj)
     sio_close (sys->hdl);
 }
 
+static void PositionChanged (void *arg, int delta)
+{
+    audio_output_t *aout = arg;
+    aout_sys_t *sys = aout->sys;
+
+    sys->read_offset += delta;
+}
+
 static int TimeGet (audio_output_t *aout, mtime_t *restrict pts)
 {
     aout_sys_t *sys = aout->sys;
-    struct sio_par par;
+    long long frames = sys->write_offset - sys->read_offset;
 
-    if (sio_getpar (sys->hdl, &par))
+    if (frames == 0)
         return -1;
 
-    *pts = mdate () + (par.bufsz * CLOCK_FREQ / aout->format.i_rate);
+    *pts = mdate () + (frames * CLOCK_FREQ / sys->rate);
     return 0;
 }
 
@@ -197,13 +213,15 @@ static void Play (audio_output_t *aout, block_t *block)
 {
     aout_sys_t *sys = aout->sys;
 
+    sys->write_offset += block->i_nb_samples;
+
     while (block->i_buffer > 0 && !sio_eof (sys->hdl))
     {
         size_t bytes = sio_write (sys->hdl, block->p_buffer, block->i_buffer);
 
         block->p_buffer += bytes;
         block->i_buffer -= bytes;
-        /* Note that i_nb_samples and i_pts are corrupted here. */
+        /* Note that i_nb_samples and i_pts are not updated here. */
     }
     block_Release (block);
 }
