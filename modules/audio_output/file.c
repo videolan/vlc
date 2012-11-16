@@ -72,6 +72,7 @@ static const int pi_channels_maps[CHANNELS_MAX+1] =
  *****************************************************************************/
 static int     Open        ( vlc_object_t * );
 static void    Play        ( audio_output_t *, block_t * );
+static void    Flush       ( audio_output_t *, bool );
 
 /*****************************************************************************
  * Module descriptor
@@ -157,7 +158,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     p_aout->time_get = NULL;
     p_aout->play = Play;
     p_aout->pause = NULL;
-    p_aout->flush = NULL;
+    p_aout->flush = Flush;
 
     /* Audio format */
     psz_format = var_InheritString( p_aout, "audiofile-format" );
@@ -312,6 +313,13 @@ static void Play( audio_output_t * p_aout, block_t *p_buffer )
     }
 
     block_Release( p_buffer );
+}
+
+static void Flush( audio_output_t *aout, bool wait )
+{
+    if( fflush( aout->sys->p_file ) )
+        msg_Err( aout, "flush error (%m)" );
+    (void) wait;
 }
 
 static int Open(vlc_object_t *obj)
