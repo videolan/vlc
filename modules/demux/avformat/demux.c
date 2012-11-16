@@ -286,6 +286,12 @@ int OpenDemux( vlc_object_t *p_this )
         if( !GetVlcFourcc( cc->codec_id, NULL, &fcc, NULL ) )
             fcc = VLC_FOURCC( 'u', 'n', 'd', 'f' );
 
+#if LIBAVFORMAT_VERSION_INT >= ((54<<16)+(2<<8)+0)
+        /* Do not use the cover art as a stream */
+        if( s->disposition == AV_DISPOSITION_ATTACHED_PIC )
+            continue;
+#endif
+
         switch( cc->codec_type )
         {
         case AVMEDIA_TYPE_AUDIO:
