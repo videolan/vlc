@@ -233,7 +233,11 @@ static void Pause (audio_output_t *aout, bool pause, mtime_t date)
     if (pause)
         sio_stop (sys->hdl);
     else
+    {
+        sys->read_offset = 0;
+        sys->write_offset = 0;
         sio_start (sys->hdl);
+    }
     (void) date;
 }
 
