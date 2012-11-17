@@ -574,7 +574,7 @@ int aout_FiltersNew (audio_output_t *aout,
     assert (AOUT_FMTS_IDENTICAL(&output_format, outfmt));
     owner->resampler = FindResampler (VLC_OBJECT(aout), &input_format,
                                       &output_format);
-    if (owner->resampler == NULL)
+    if (owner->resampler == NULL && input_format.i_rate != outfmt->i_rate)
     {
         msg_Err (aout, "cannot setup a resampler");
         goto error;
