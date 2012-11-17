@@ -1,7 +1,7 @@
 /*****************************************************************************
  * src.c : Secret Rabbit Code (a.k.a. libsamplerate) resampler
  *****************************************************************************
- * Copyright (C) 2011 Rémi Denis-Courmont
+ * Copyright (C) 2011-2012 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -51,6 +51,7 @@ static const char *const conv_type_texts[] = {
 };
 
 static int Open (vlc_object_t *);
+static int OpenResampler (vlc_object_t *);
 static void Close (vlc_object_t *);
 
 vlc_module_begin ()
@@ -66,12 +67,22 @@ vlc_module_begin ()
 
     add_submodule ()
     set_capability ("audio resampler", 50)
-    set_callbacks (Open, Close)
+    set_callbacks (OpenResampler, Close)
 vlc_module_end ()
 
 static block_t *Resample (filter_t *, block_t *);
 
 static int Open (vlc_object_t *obj)
+{
+    filter_t *filter = (filter_t *)obj;
+
+    /* Will change rate */
+    if (filter->fmt_in.audio.i_rate == filter->fmt_out.audio.i_rate)
+        return VLC_EGENERIC;
+    return OpenResampler (obj);
+}
+
+static int OpenResampler (vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
 
@@ -82,9 +93,7 @@ static int Open (vlc_object_t *obj)
      || filter->fmt_in.audio.i_physical_channels
                                   != filter->fmt_out.audio.i_physical_channels
      || filter->fmt_in.audio.i_original_channels
-                                  != filter->fmt_out.audio.i_original_channels
-    /* Different sample rate */
-     || filter->fmt_in.audio.i_rate == filter->fmt_out.audio.i_rate)
+                                  != filter->fmt_out.audio.i_original_channels)
         return VLC_EGENERIC;
 
     int type = var_InheritInteger (obj, "src-converter-type");

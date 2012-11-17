@@ -1,5 +1,5 @@
 /*****************************************************************************
- * ugly.c : ugly resampler (changes pitch)
+ * ugly.c : zero-order hold "ugly" resampler
  *****************************************************************************
  * Copyright (C) 2002, 2006 VLC authors and VideoLAN
  * $Id$
@@ -37,7 +37,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Create    ( vlc_object_t * );
+static int Create (vlc_object_t *);
+static int CreateResampler (vlc_object_t *);
 
 static block_t *DoWork( filter_t *, block_t * );
 
@@ -53,7 +54,7 @@ vlc_module_begin ()
 
     add_submodule()
     set_capability( "audio resampler", 2 )
-    set_callbacks( Create, NULL )
+    set_callbacks( CreateResampler, NULL )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -63,8 +64,16 @@ static int Create( vlc_object_t *p_this )
 {
     filter_t * p_filter = (filter_t *)p_this;
 
-    if( p_filter->fmt_in.audio.i_rate == p_filter->fmt_out.audio.i_rate
-     || p_filter->fmt_in.audio.i_format != p_filter->fmt_out.audio.i_format
+    if( p_filter->fmt_in.audio.i_rate == p_filter->fmt_out.audio.i_rate )
+        return VLC_EGENERIC;
+    return CreateResampler( p_this );
+}
+
+static int CreateResampler( vlc_object_t *p_this )
+{
+    filter_t * p_filter = (filter_t *)p_this;
+
+    if( p_filter->fmt_in.audio.i_format != p_filter->fmt_out.audio.i_format
      || p_filter->fmt_in.audio.i_physical_channels
                                  != p_filter->fmt_out.audio.i_physical_channels
      || p_filter->fmt_in.audio.i_original_channels
