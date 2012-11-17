@@ -45,7 +45,6 @@ vlc_module_end ()
 
 static int TimeGet (audio_output, mtime_t *);
 static void Play (audio_output_t *, block_t *);
-static void Pause (audio_output_t *, bool, mtime_t);
 static void Flush (audio_output_t *, bool);
 static int VolumeSet (audio_output_t *, float);
 static int MuteSet (audio_output_t *, bool);
@@ -60,7 +59,6 @@ struct aout_sys_t
     unsigned rate;
     unsigned volume;
     bool mute;
-    bool paused;
 };
 
 /** Initializes an sndio playback stream */
@@ -159,7 +157,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     aout->sys = sys;
     aout->time_get = TimeGet;
     aout->play = Play;
-    aout->pause = Pause;
+    aout->pause = NULL;
     aout->flush = Flush;
     if (sio_onvol(sys->hdl, VolumeChanged, aout))
     {
@@ -174,7 +172,6 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     sys->read_offset = 0;
     sys->write_offset = 0;
-    sys->paused = false;
     sio_onmove (sys->hdl, PositionChanged, aout);
     sio_start (sys->hdl);
     return VLC_SUCCESS;
@@ -229,42 +226,21 @@ static void Play (audio_output_t *aout, block_t *block)
     block_Release (block);
 }
 
-static void Pause (audio_output_t *aout, bool pause, mtime_t date)
-{
-    aout_sys_t *sys = aout->sys;
-
-    if (pause)
-        sio_stop (sys->hdl);
-    else
-    {
-        sys->read_offset = 0;
-        sys->write_offset = 0;
-        sio_start (sys->hdl);
-    }
-    sys->paused = pause;
-    (void) date;
-}
-
-static void Drain (audio_output_t *aout)
-{
-    long long frames = sys->write_offset - sys->read_offset;
-
-    if (frames > 0)
-        msleep (frames * CLOCK_FREQ / sys->rate);
-}
-
 static void Flush (audio_output_t *aout, bool wait)
 {
     if (wait)
     {
-        Drain (aout);
+        long long frames = sys->write_offset - sys->read_offset;
+
+        if (frames > 0)
+            msleep (frames * CLOCK_FREQ / sys->rate);
     }
     else
     {
-        if (sys->paused)
-            return;
-        Pause (aout, true);
-        Pause (aout, false);
+        sio_stop (sys->hdl);
+        sys->read_offset = 0;
+        sys->write_offset = 0;
+        sio_start (sys->hdl);
     }
 }
 
