@@ -989,7 +989,7 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                     HtmlPut( &psz_html, "</s>" );
                     break;
                 case 'f':
-                    HtmlPut( &psz_html, "/font>" );
+                    HtmlPut( &psz_html, "</font>" );
                     break;
                 case 'I':
                     break;
