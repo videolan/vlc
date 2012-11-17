@@ -261,6 +261,9 @@ module_t *vlc_module_load(vlc_object_t *obj, const char *capability,
         const char *shortcut = buf;
         assert (shortcut != NULL);
 
+        if (!strcasecmp ("none", shortcut))
+            goto done;
+
         obj->b_force = strict && strcasecmp ("any", shortcut);
         for (ssize_t i = 0; i < total; i++)
         {
