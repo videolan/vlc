@@ -190,11 +190,19 @@ void aout_PacketFlush (audio_output_t *aout, bool drain)
     aout_packet_t *p = aout_packet (aout);
 
     vlc_mutex_lock (&p->lock);
-    aout_FifoReset (&p->partial);
-    aout_FifoReset (&p->fifo);
-    vlc_mutex_unlock (&p->lock);
-
-    (void) drain; /* TODO */
+    if (drain)
+    {
+        mtime_t pts = date_Get (&p->fifo.end_date);
+        vlc_mutex_unlock (&p->lock);
+        if (pts != VLC_TS_INVALID)
+            mwait (pts);
+    }
+    else
+    {
+        aout_FifoReset (&p->partial);
+        aout_FifoReset (&p->fifo);
+        vlc_mutex_unlock (&p->lock);
+    }
 }
 
 
