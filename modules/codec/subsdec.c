@@ -31,6 +31,8 @@
 # include "config.h"
 #endif
 
+#include <limits.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
@@ -565,19 +567,32 @@ static char *StripTags( char *psz_subtitle )
  * returned, and the rendering engine will fall back to the
  * plain text version of the subtitle.
  */
+/* TODO: highly suboptimal, offset should be cached */
 static void HtmlNPut( char **ppsz_html, const char *psz_text, int i_max )
 {
-    const int i_len = strlen(psz_text);
+    char *psz_html = *ppsz_html;
+    if( psz_html == NULL )
+        return;
 
-    strncpy( *ppsz_html, psz_text, i_max );
-    *ppsz_html += __MIN(i_max,i_len);
+    const size_t i_offset = strlen(psz_html);
+    const size_t i_len = strnlen(psz_text, i_max);
+
+    psz_html = realloc( psz_html, i_offset + i_len + 1 );
+    if( psz_html != NULL )
+    {
+        memcpy( psz_html + i_offset, psz_text, i_len );
+        psz_html[i_offset + i_len] = '\0';
+    }
+    else
+        free( *ppsz_html );
+    *ppsz_html = psz_html;
 }
 
 static void HtmlPut( char **ppsz_html, const char *psz_text )
 {
-    strcpy( *ppsz_html, psz_text );
-    *ppsz_html += strlen(psz_text);
+    HtmlNPut( ppsz_html, psz_text, INT_MAX );
 }
+
 static void HtmlCopy( char **ppsz_html, char **ppsz_subtitle, const char *psz_text )
 {
     HtmlPut( ppsz_html, psz_text );
@@ -586,22 +601,17 @@ static void HtmlCopy( char **ppsz_html, char **ppsz_subtitle, const char *psz_te
 
 static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
 {
-    /* */
-    char *psz_tag = malloc( ( strlen( psz_subtitle ) / 3 ) + 1 );
-    if( !psz_tag )
+    char *psz_tag = malloc( 1 );
+    if( psz_tag == NULL )
         return NULL;
-    psz_tag[ 0 ] = '\0';
 
-    /* */
-    //Oo + 100 ???
-    size_t i_buf_size = strlen( psz_subtitle ) + 100;
-    char   *psz_html_start = malloc( i_buf_size );
-    char   *psz_html = psz_html_start;
-    if( psz_html_start == NULL )
+    char *psz_html = malloc( 1 );
+    if( psz_html == NULL )
     {
         free( psz_tag );
         return NULL;
     }
+    psz_tag[0] = '\0';
     psz_html[0] = '\0';
 
     bool b_has_align = false;
@@ -625,22 +635,22 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
             else if( !strncasecmp( psz_subtitle, "<b>", 3 ) )
             {
                 HtmlCopy( &psz_html, &psz_subtitle, "<b>" );
-                strcat( psz_tag, "b" );
+                HtmlPut( &psz_tag, "b" );
             }
             else if( !strncasecmp( psz_subtitle, "<i>", 3 ) )
             {
                 HtmlCopy( &psz_html, &psz_subtitle, "<i>" );
-                strcat( psz_tag, "i" );
+                HtmlPut( &psz_tag, "i" );
             }
             else if( !strncasecmp( psz_subtitle, "<u>", 3 ) )
             {
                 HtmlCopy( &psz_html, &psz_subtitle, "<u>" );
-                strcat( psz_tag, "u" );
+                HtmlPut( &psz_tag, "u" );
             }
             else if( !strncasecmp( psz_subtitle, "<s>", 3 ) )
             {
                 HtmlCopy( &psz_html, &psz_subtitle, "<s>" );
-                strcat( psz_tag, "s" );
+                HtmlPut( &psz_tag, "s" );
             }
             else if( !strncasecmp( psz_subtitle, "<font ", 6 ))
             {
@@ -650,7 +660,7 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                         "alpha=", NULL };
 
                 HtmlCopy( &psz_html, &psz_subtitle, "<font " );
-                strcat( psz_tag, "f" );
+                HtmlPut( &psz_tag, "f" );
 
                 /* <font       color= */
                 while (*psz_subtitle == ' ')
@@ -716,10 +726,9 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                         psz_subtitle += i_len;
                     }
 
-                    while (*psz_subtitle == ' ')
-                        *psz_html++ = *psz_subtitle++;
+                    HtmlNPut( &psz_html, psz_subtitle, strspn(psz_subtitle, " ") );
                 }
-                *psz_html++ = '>';
+                HtmlPut( &psz_html, ">" );
                 psz_subtitle++;
             }
             else if( !strncmp( psz_subtitle, "</", 2 ))
@@ -768,8 +777,8 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                 if( !b_match )
                 {
                     /* Not well formed -- kill everything */
-                    free( psz_html_start );
-                    psz_html_start = NULL;
+                    free( psz_html );
+                    psz_html = NULL;
                     break;
                 }
                 *psz_lastTag = '\0';
@@ -809,7 +818,7 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                     {
                         /* We have the closing tag, ignore it TODO */
                         psz_subtitle = &psz_stop[1];
-                        strcat( psz_tag, "I" );
+                        HtmlPut( &psz_tag, "I" );
                     }
                     else
                     {
@@ -823,7 +832,7 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                             else if( *psz_subtitle == '>' )
                                 HtmlPut( &psz_html, "&gt;" );
                             else
-                                *psz_html++ = *psz_subtitle;
+                                HtmlNPut( &psz_html, psz_subtitle, 1 );
                         }
                     }
                 }
@@ -887,17 +896,17 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
             if( psz_subtitle[3] == 'i' )
             {
                 HtmlPut( &psz_html, "<i>" );
-                strcat( psz_tag, "i" );
+                HtmlPut( &psz_tag, "i" );
             }
             if( psz_subtitle[3] == 'b' )
             {
                 HtmlPut( &psz_html, "<b>" );
-                strcat( psz_tag, "b" );
+                HtmlPut( &psz_tag, "b" );
             }
             if( psz_subtitle[3] == 'u' )
             {
                 HtmlPut( &psz_html, "<u>" );
-                strcat( psz_tag, "u" );
+                HtmlPut( &psz_tag, "u" );
             }
             psz_subtitle = strchr( psz_subtitle, '}' ) + 1;
         }
@@ -927,10 +936,12 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
         }
         else
         {
-            *psz_html = *psz_subtitle;
-            if( psz_html > psz_html_start )
+            HtmlNPut( &psz_html, psz_subtitle, 1 );
+#if 0
+            if( *psz_html )
             {
                 /* Check for double whitespace */
+# error This test does not make sense.
                 if( ( *psz_html == ' '  || *psz_html == '\t' ) &&
                     ( *(psz_html-1) == ' ' || *(psz_html-1) == '\t' ) )
                 {
@@ -938,70 +949,41 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                     psz_html--;
                 }
             }
-            psz_html++;
+#endif
             psz_subtitle++;
         }
-
-        if( ( size_t )( psz_html - psz_html_start ) > i_buf_size - 50 )
-        {
-            const int i_len = psz_html - psz_html_start;
-
-            i_buf_size += 200;
-            char *psz_new = realloc( psz_html_start, i_buf_size );
-            if( !psz_new )
-                break;
-            psz_html_start = psz_new;
-            psz_html = &psz_new[i_len];
-        }
     }
-    if( psz_html_start )
+
+    while( *psz_tag )
     {
-        static const char *psz_text_close = "</text>";
-        static const char *psz_tag_long = "/font>";
-
-        /* Realloc for closing tags and shrink memory */
-        const size_t i_length = (size_t)( psz_html - psz_html_start );
-
-        const size_t i_size = i_length + strlen(psz_tag_long) * strlen(psz_tag) + strlen(psz_text_close) + 1;
-        char *psz_new = realloc( psz_html_start, i_size );
-        if( psz_new )
+        /* */
+        char *psz_last = &psz_tag[strlen(psz_tag)-1];
+        switch( *psz_last )
         {
-            psz_html_start = psz_new;
-            psz_html = &psz_new[i_length];
-
-            /* Close not well formed subtitle */
-            while( *psz_tag )
-            {
-                /* */
-                char *psz_last = &psz_tag[strlen(psz_tag)-1];
-                switch( *psz_last )
-                {
-                case 'b':
-                    HtmlPut( &psz_html, "</b>" );
-                    break;
-                case 'i':
-                    HtmlPut( &psz_html, "</i>" );
-                    break;
-                case 'u':
-                    HtmlPut( &psz_html, "</u>" );
-                    break;
-                case 's':
-                    HtmlPut( &psz_html, "</s>" );
-                    break;
-                case 'f':
-                    HtmlPut( &psz_html, "</font>" );
-                    break;
-                case 'I':
-                    break;
-                }
-
-                *psz_last = '\0';
-            }
-            HtmlPut( &psz_html, psz_text_close );
+            case 'b':
+                HtmlPut( &psz_html, "</b>" );
+                break;
+            case 'i':
+                HtmlPut( &psz_html, "</i>" );
+                break;
+            case 'u':
+                HtmlPut( &psz_html, "</u>" );
+                break;
+            case 's':
+                HtmlPut( &psz_html, "</s>" );
+                break;
+            case 'f':
+                HtmlPut( &psz_html, "</font>" );
+                break;
+            case 'I':
+                break;
         }
+        *psz_last = '\0';
     }
+    /* Close not well formed subtitle */
+    HtmlPut( &psz_html, "</text>" );
+
     free( psz_tag );
 
-    return psz_html_start;
+    return psz_html;
 }
-
