@@ -473,14 +473,16 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
     }
 
     TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
-    TAB_APPEND_CAST( (input_attachment_t**),
-                     p_demux_meta->i_attachments, p_demux_meta->attachments,
-                     p_attachment );
+    if (p_attachment) {
+        TAB_APPEND_CAST( (input_attachment_t**),
+                p_demux_meta->i_attachments, p_demux_meta->attachments,
+                p_attachment );
 
-    char *psz_url;
-    if( asprintf( &psz_url, "attachment://%s", p_attachment->psz_name ) != -1 ) {
-        vlc_meta_SetArtURL( p_meta, psz_url );
-        free( psz_url );
+        char *psz_url;
+        if( asprintf( &psz_url, "attachment://%s", p_attachment->psz_name ) != -1 ) {
+            vlc_meta_SetArtURL( p_meta, psz_url );
+            free( psz_url );
+        }
     }
 }
 
