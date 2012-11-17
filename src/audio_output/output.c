@@ -424,6 +424,13 @@ void aout_OutputPlay (audio_output_t *aout, block_t *block)
     aout->play (aout, block);
 }
 
+static void PauseDefault (audio_output_t *aout, bool pause, mtime_t date)
+{
+    if (pause)
+        aout_OutputFlush (aout, false);
+    (void) date;
+}
+
 /**
  * Notifies the audio output (if any) of pause/resume events.
  * This enables the output to expedite pause, instead of waiting for its
@@ -433,9 +440,8 @@ void aout_OutputPlay (audio_output_t *aout, block_t *block)
  */
 void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
 {
-    aout_assert_locked( aout );
-    if( aout->pause != NULL )
-        aout->pause( aout, pause, date );
+    aout_assert_locked (aout);
+    ((aout->pause != NULL) ? aout->pause : PauseDefault) (aout, pause, date);
 }
 
 /**
