@@ -328,7 +328,6 @@ VLC_DEPRECATED void aout_PacketDestroy(audio_output_t *);
 
 VLC_DEPRECATED int aout_PacketTimeGet(audio_output_t *, mtime_t *);
 VLC_DEPRECATED void aout_PacketPlay(audio_output_t *, block_t *);
-VLC_DEPRECATED void aout_PacketPause(audio_output_t *, bool, mtime_t);
 VLC_DEPRECATED void aout_PacketFlush(audio_output_t *, bool);
 
 VLC_DEPRECATED block_t *aout_PacketNext(audio_output_t *, mtime_t) VLC_USED;

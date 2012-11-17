@@ -185,29 +185,6 @@ void aout_PacketPlay (audio_output_t *aout, block_t *block)
     vlc_mutex_unlock (&p->lock);
 }
 
-void aout_PacketPause (audio_output_t *aout, bool pause, mtime_t date)
-{
-    aout_packet_t *p = aout_packet (aout);
-
-    if (pause)
-    {
-        assert (p->pause_date == VLC_TS_INVALID);
-        p->pause_date = date;
-    }
-    else
-    {
-        assert (p->pause_date != VLC_TS_INVALID);
-
-        mtime_t duration = date - p->pause_date;
-
-        p->pause_date = VLC_TS_INVALID;
-        vlc_mutex_lock (&p->lock);
-        aout_FifoMoveDates (&p->partial, duration);
-        aout_FifoMoveDates (&p->fifo, duration);
-        vlc_mutex_unlock (&p->lock);
-    }
-}
-
 void aout_PacketFlush (audio_output_t *aout, bool drain)
 {
     aout_packet_t *p = aout_packet (aout);

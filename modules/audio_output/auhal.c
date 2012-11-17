@@ -174,7 +174,7 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     p_aout->time_get = aout_PacketTimeGet;
     p_aout->play = aout_PacketPlay;
-    p_aout->pause = aout_PacketPause;
+    p_aout->pause = NULL;
     p_aout->flush = aout_PacketFlush;
 
     aout_FormatPrint(p_aout, "VLC is looking for:", fmt);

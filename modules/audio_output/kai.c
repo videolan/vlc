@@ -197,7 +197,7 @@ static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
 
     p_aout->time_get = aout_PacketTimeGet;
     p_aout->play  = Play;
-    p_aout->pause = aout_PacketPause;
+    p_aout->pause = NULL;
     p_aout->flush = aout_PacketFlush;
 
     aout_SoftVolumeStart( p_aout );
