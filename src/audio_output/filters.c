@@ -42,44 +42,43 @@
 #include <libvlc.h>
 #include "aout_internal.h"
 
-/*****************************************************************************
- * FindFilter: find an audio filter for a specific transformation
- *****************************************************************************/
-static filter_t * FindFilter( vlc_object_t *obj,
-                              const audio_sample_format_t *infmt,
-                              const audio_sample_format_t *outfmt )
+static filter_t *FindFilter (vlc_object_t *obj, const char *type,
+                             const char *name,
+                             const audio_sample_format_t *infmt,
+                             const audio_sample_format_t *outfmt)
 {
-    static const char typename[] = "audio converter";
-    const char *type = "audio converter", *name = NULL;
-    filter_t * p_filter;
-
-    p_filter = vlc_custom_create( obj, sizeof(*p_filter), typename );
-
-    if ( p_filter == NULL ) return NULL;
-
-    p_filter->fmt_in.audio = *infmt;
-    p_filter->fmt_in.i_codec = infmt->i_format;
-    p_filter->fmt_out.audio = *outfmt;
-    p_filter->fmt_out.i_codec = outfmt->i_format;
-
-    if( infmt->i_format == outfmt->i_format
-     && infmt->i_physical_channels == outfmt->i_physical_channels
-     && infmt->i_original_channels == outfmt->i_original_channels )
-    {
-        assert( infmt->i_rate != outfmt->i_rate );
-        type = "audio resampler";
-        name = "$audio-resampler";
-    }
-
-    p_filter->p_module = module_need( p_filter, type, name, false );
-    if ( p_filter->p_module == NULL )
-    {
-        vlc_object_release( p_filter );
+    filter_t *filter = vlc_custom_create (obj, sizeof (*filter), type);
+    if (unlikely(filter == NULL))
         return NULL;
-    }
 
-    assert( p_filter->pf_audio_filter );
-    return p_filter;
+    filter->fmt_in.audio = *infmt;
+    filter->fmt_in.i_codec = infmt->i_format;
+    filter->fmt_out.audio = *outfmt;
+    filter->fmt_out.i_codec = outfmt->i_format;
+    filter->p_module = module_need (filter, type, name, false);
+    if (filter->p_module == NULL)
+    {
+        vlc_object_release (filter);
+        filter = NULL;
+    }
+    else
+        assert (filter->pf_audio_filter != NULL);
+    return filter;
+}
+
+static filter_t *FindConverter (vlc_object_t *obj,
+                                const audio_sample_format_t *infmt,
+                                const audio_sample_format_t *outfmt)
+{
+    return FindFilter (obj, "audio converter", NULL, infmt, outfmt);
+}
+
+static filter_t *FindResampler (vlc_object_t *obj,
+                                const audio_sample_format_t *infmt,
+                                const audio_sample_format_t *outfmt)
+{
+    return FindFilter (obj, "audio resampler", "$audio-resampler",
+                       infmt, outfmt);
 }
 
 /**
@@ -105,7 +104,7 @@ static filter_t *TryFormat (vlc_object_t *obj, vlc_fourcc_t codec,
     output.i_format = codec;
     aout_FormatPrepare (&output);
 
-    filter_t *filter = FindFilter (obj, fmt, &output);
+    filter_t *filter = FindConverter (obj, fmt, &output);
     if (filter != NULL)
         *fmt = output;
     return filter;
@@ -213,7 +212,7 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
         output.i_original_channels = outfmt->i_original_channels;
         aout_FormatPrepare (&output);
 
-        filter_t *f = FindFilter (obj, &input, &output);
+        filter_t *f = FindConverter (obj, &input, &output);
         if (f == NULL)
         {
             msg_Err (obj, "cannot find %s for conversion pipeline",
@@ -234,7 +233,7 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
         audio_sample_format_t output = input;
         output.i_rate = outfmt->i_rate;
 
-        filter_t *f = FindFilter (obj, &input, &output);
+        filter_t *f = FindConverter (obj, &input, &output);
         if (f == NULL)
         {
             msg_Err (obj, "cannot find %s for conversion pipeline",
@@ -573,23 +572,16 @@ int aout_FiltersNew (audio_output_t *aout,
     /* insert the resampler */
     output_format.i_rate = outfmt->i_rate;
     assert (AOUT_FMTS_IDENTICAL(&output_format, outfmt));
-
-    unsigned rate_bak = input_format.i_rate;
-    if (output_format.i_rate == input_format.i_rate)
-        /* For historical reasons, a different rate is required to probe
-         * resampling filters. */
-        input_format.i_rate++;
-    owner->resampler = FindFilter (VLC_OBJECT(aout), &input_format,
-                                   &output_format);
+    owner->resampler = FindResampler (VLC_OBJECT(aout), &input_format,
+                                      &output_format);
     if (owner->resampler == NULL)
     {
         msg_Err (aout, "cannot setup a resampler");
         goto error;
     }
-    owner->resampler->fmt_in.audio.i_rate = rate_bak;
     if (owner->rate_filter == NULL)
         owner->rate_filter = owner->resampler;
-   owner->resampling = 0;
+    owner->resampling = 0;
 
     return 0;
 
