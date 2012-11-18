@@ -3321,11 +3321,11 @@ AC_ARG_ENABLE(alsa,
 ])
 have_alsa="no"
 AS_IF([test "${enable_alsa}" != "no"], [
-  PKG_CHECK_MODULES([ALSA], [alsa >= 1.0.16], [
+  PKG_CHECK_MODULES([ALSA], [alsa >= 1.0.24], [
     have_alsa="yes"
   ], [
     AS_IF([test "x${enable_alsa}" != "x"], [
-      AC_MSG_ERROR([$ALSA_PKG_ERRORS. alsa-lib 1.0.16 or later required.])
+      AC_MSG_ERROR([$ALSA_PKG_ERRORS. alsa-lib 1.0.24 or later required.])
     ])
   ])
 ])

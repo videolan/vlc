@@ -295,30 +295,8 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     const int mode = SND_PCM_NO_AUTO_RESAMPLE;
 
     int val = snd_pcm_open (&pcm, device, SND_PCM_STREAM_PLAYBACK, mode);
-#if (SND_LIB_VERSION <= 0x010015)
-# warning Please update alsa-lib to version > 1.0.21a.
-    var_Create (aout->p_libvlc, "alsa-working", VLC_VAR_BOOL);
-    if (val != 0 && var_GetBool (aout->p_libvlc, "alsa-working"))
-        dialog_Fatal (aout, "ALSA version problem",
-            "VLC failed to re-initialize your audio output device.\n"
-            "Please update alsa-lib to version 1.0.22 or higher "
-            "to fix this issue.");
-    var_SetBool (aout->p_libvlc, "alsa-working", !val);
-#endif
     if (val != 0)
     {
-#if (SND_LIB_VERSION <= 0x010017)
-# warning Please update alsa-lib to version > 1.0.23.
-        var_Create (aout->p_libvlc, "alsa-broken", VLC_VAR_BOOL);
-        if (!var_GetBool (aout->p_libvlc, "alsa-broken"))
-        {
-            var_SetBool (aout->p_libvlc, "alsa-broken", true);
-            dialog_Fatal (aout, "Potential ALSA version problem",
-                "VLC failed to initialize your audio output device (if any).\n"
-                "Please update alsa-lib to version 1.0.24 or higher "
-                "to try to fix this issue.");
-        }
-#endif
         msg_Err (aout, "cannot open ALSA device \"%s\": %s", device,
                  snd_strerror (val));
         dialog_Fatal (aout, _("Audio output failed"),
