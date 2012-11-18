@@ -640,7 +640,7 @@ LIBVLC_API libvlc_time_t libvlc_media_player_get_time( libvlc_media_player_t *p_
 LIBVLC_API void libvlc_media_player_set_time( libvlc_media_player_t *p_mi, libvlc_time_t i_time );
 
 /**
- * Get movie position.
+ * Get movie position as percentage between 0.0 and 1.0.
  *
  * \param p_mi the Media Player
  * \return movie position, or -1. in case of error
@@ -648,7 +648,8 @@ LIBVLC_API void libvlc_media_player_set_time( libvlc_media_player_t *p_mi, libvl
 LIBVLC_API float libvlc_media_player_get_position( libvlc_media_player_t *p_mi );
 
 /**
- * Set movie position. This has no effect if playback is not enabled.
+ * Set movie position as percentage between 0.0 and 1.0. 
+ * This has no effect if playback is not enabled.
  * This might not work depending on the underlying input format and protocol.
  *
  * \param p_mi the Media Player
