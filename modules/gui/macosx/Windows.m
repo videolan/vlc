@@ -228,6 +228,13 @@
  *  Common code for main window, detached window and extra video window
  *****************************************************************************/
 
+@interface VLCVideoWindowCommon (Internal)
+- (void)customZoom:(id)sender;
+- (void)hasBecomeFullscreen;
+- (void)leaveFullscreenAndFadeOut:(BOOL)fadeout;
+- (void)hasEndedFullscreen;
+@end
+
 @implementation VLCVideoWindowCommon
 
 @synthesize videoView=o_video_view;

@@ -543,7 +543,13 @@ audio_output_t *getAout(void)
 #pragma mark Private
 
 @interface VLCMain ()
-- (void)_removeOldPreferences;
+- (void)removeOldPreferences;
+@end
+
+@interface VLCMain (Internal)
+- (void)handlePortMessage:(NSPortMessage *)o_msg;
+- (void)resetMediaKeyJump;
+- (void)coreChangedMediaKeySupportSetting: (NSNotification *)o_notification;
 @end
 
 /*****************************************************************************
@@ -723,7 +729,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(coreChangedMediaKeySupportSetting:) name: @"VLCMediaKeySupportSettingChanged" object: nil];
 
-    [self _removeOldPreferences];
+    [self removeOldPreferences];
 
     /* Handle sleep notification */
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(computerWillSleep:)
@@ -1733,7 +1739,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 #pragma mark -
 #pragma mark Remove old prefs
 
-- (void)_removeOldPreferences
+- (void)removeOldPreferences
 {
     static NSString * kVLCPreferencesVersion = @"VLCPreferencesVersion";
     static const int kCurrentPreferencesVersion = 2;

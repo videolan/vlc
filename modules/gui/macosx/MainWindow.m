@@ -45,11 +45,12 @@
 #import "VLCVoutWindowController.h"
 
 
-@interface VLCMainWindow ()
+@interface VLCMainWindow (Internal)
 - (void)resizePlaylistAfterCollapse;
 - (void)makeSplitViewVisible;
 - (void)makeSplitViewHidden;
-
+- (void)showPodcastControls;
+- (void)hidePodcastControls;
 @end
 
 

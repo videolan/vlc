@@ -44,7 +44,7 @@
 #define ASF 12
 /* 13-15 are present, but not set */
 
-@interface VLCConvertAndSave ()
+@interface VLCConvertAndSave (Internal)
 - (void)updateDropView;
 - (void)updateOKButton;
 - (void)resetCustomizationSheetBasedOnProfile:(NSString *)profileString;
@@ -53,6 +53,7 @@
 - (NSString *)composedOptions;
 - (void)updateCurrentProfile;
 - (void)storeProfilesOnDisk;
+- (void)recreateProfilePopup;
 @end
 
 @implementation VLCConvertAndSave

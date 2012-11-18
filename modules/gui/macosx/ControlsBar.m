@@ -368,6 +368,13 @@
  *  Holds all specific outlets, actions and code for the main window controls bar.
  *****************************************************************************/
 
+@interface VLCMainWindowControlsBar (Internal)
+- (void)addJumpButtons:(BOOL)b_fast;
+- (void)removeJumpButtons:(BOOL)b_fast;
+- (void)addPlaymodeButtons:(BOOL)b_fast;
+- (void)removePlaymodeButtons:(BOOL)b_fast;
+@end
+
 @implementation VLCMainWindowControlsBar
 
 - (void)awakeFromNib

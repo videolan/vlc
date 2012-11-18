@@ -30,6 +30,10 @@
 #import "VideoEffects.h"
 #import "SharedDialogs.h"
 
+@interface VLCVideoEffects (Internal)
+- (void)resetProfileSelector;
+@end
+
 #pragma mark -
 #pragma mark Initialization
 

@@ -39,6 +39,10 @@
 #import <vlc_interface.h>
 #import "CompatibilityFixes.h"
 
+@interface VLCBookmarks (Internal)
+- (void)initStrings;
+@end
+
 @implementation VLCBookmarks
 
 static VLCBookmarks *_o_sharedInstance = nil;

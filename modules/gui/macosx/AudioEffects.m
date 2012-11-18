@@ -37,6 +37,12 @@
 
 #import <math.h>
 
+@interface VLCAudioEffects (Internal)
+- (void)resetProfileSelector;
+- (void)updatePresetSelector;
+- (void)setBandSliderValuesForPreset:(NSInteger)presetID;
+@end
+
 #pragma mark -
 #pragma mark Initialization
 

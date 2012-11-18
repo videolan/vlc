@@ -403,6 +403,10 @@
 /*****************************************************************************
  * VLCPlaylist implementation
  *****************************************************************************/
+@interface VLCPlaylist (Internal)
+- (void)saveTableColumns;
+@end
+
 @implementation VLCPlaylist
 
 + (void)initialize{
