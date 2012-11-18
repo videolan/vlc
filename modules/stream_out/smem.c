@@ -341,7 +341,7 @@ static int SendVideo( sout_stream_t *p_stream, sout_stream_id_t *id,
                       block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    int i_line, i_line_size, i_size, i_pixel_pitch;
+    int i_line, i_line_size, i_size, i_pixel_pitch, i_offset = 0;
     uint8_t* p_pixels = NULL;
 
     if( id->format->video.i_bits_per_pixel > 0 )
@@ -368,8 +368,8 @@ static int SendVideo( sout_stream_t *p_stream, sout_stream_id_t *id,
     /* Copying data into user buffer */
     if( id->format->video.i_bits_per_pixel > 0 )
     {
-        for ( int line = 0; line < i_line; line++, p_pixels += i_line_size )
-            memcpy( p_pixels, p_buffer->p_buffer + i_line_size * line , i_line_size );
+        for ( int line = 0; line < i_line; line++, i_offset += i_line_size )
+            memcpy( p_pixels + i_offset, p_buffer->p_buffer + i_offset, i_line_size );
     }
     else
     {
