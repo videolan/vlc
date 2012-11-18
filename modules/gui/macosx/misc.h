@@ -58,9 +58,9 @@
 
 @interface NSScreen (VLCAdditions)
 
-@property (readonly) BOOL mainScreen;
-
 + (NSScreen *)screenWithDisplayID: (CGDirectDisplayID)displayID;
+- (BOOL)hasMenuBar;
+- (BOOL)hasDock;
 - (BOOL)isScreen: (NSScreen*)screen;
 - (CGDirectDisplayID)displayID;
 - (void)blackoutOtherScreens;

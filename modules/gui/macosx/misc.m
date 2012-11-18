@@ -183,9 +183,24 @@ static NSMutableArray *blackoutWindows = NULL;
     return nil;
 }
 
-- (BOOL)mainScreen
+- (BOOL)hasMenuBar
 {
     return ([self displayID] == [[[NSScreen screens] objectAtIndex:0] displayID]);
+}
+
+- (BOOL)hasDock
+{
+    NSRect screen_frame = [self frame];
+    NSRect screen_visible_frame = [self visibleFrame];
+    CGFloat f_menu_bar_thickness = [self hasMenuBar] ? [[NSStatusBar systemStatusBar] thickness] : 0.0;
+
+    BOOL b_found_dock = NO;
+    if (screen_visible_frame.size.width < screen_frame.size.width)
+        b_found_dock = YES;
+    else if (screen_visible_frame.size.height + f_menu_bar_thickness < screen_frame.size.height)
+        b_found_dock = YES;
+
+    return b_found_dock;
 }
 
 - (BOOL)isScreen: (NSScreen*)screen
@@ -231,8 +246,12 @@ static NSMutableArray *blackoutWindows = NULL;
         [blackoutWindows addObject: blackoutWindow];
         [blackoutWindow release];
 
-        if ( [screen mainScreen] )
-            [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
+        NSApplicationPresentationOptions presentationOpts = [NSApp presentationOptions];
+        if ([screen hasMenuBar])
+            presentationOpts |= NSApplicationPresentationAutoHideMenuBar;
+        if ([screen hasMenuBar] || [screen hasDock])
+            presentationOpts |= NSApplicationPresentationAutoHideDock;
+        [NSApp setPresentationOptions:presentationOpts];
     }
 }
 
