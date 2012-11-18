@@ -92,7 +92,7 @@ void WindowClose  (vout_window_t *);
 #define INTERFACE_STYLE_TEXT N_("Run VLC with dark interface style")
 #define INTERFACE_STYLE_LONGTEXT N_("By default, VLC will use the dark interface style.")
 
-#define NATIVE_FULLSCREEN_MODE_ON_LION_TEXT N_("Use the native fullscreen mode on OS X Lion")
+#define NATIVE_FULLSCREEN_MODE_ON_LION_TEXT N_("Use the native fullscreen mode")
 #define NATIVE_FULLSCREEN_MODE_ON_LION_LONGTEXT N_("By default, VLC uses the fullscreen mode known from previous Mac OS X releases. It can also use the native fullscreen mode on Mac OS X 10.7 and later.")
 
 #define KEEPSIZE_TEXT N_("Resize interface to the native video size")
