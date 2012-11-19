@@ -96,6 +96,9 @@
            <property name="text">
             <string>Preferred subtitles language</string>
            </property>
+           <property name="buddy">
+            <cstring>preferredLanguage</cstring>
+           </property>
           </widget>
          </item>
          <item row="1" column="1">
@@ -119,6 +122,9 @@
            <property name="text">
             <string>Default encoding</string>
            </property>
+           <property name="buddy">
+            <cstring>encoding</cstring>
+           </property>
           </widget>
          </item>
         </layout>
@@ -141,6 +147,9 @@
            <property name="text">
             <string>Font</string>
            </property>
+           <property name="buddy">
+            <cstring>font</cstring>
+           </property>
           </widget>
          </item>
          <item row="0" column="1" colspan="3">
@@ -156,6 +165,9 @@
            </property>
            <property name="text">
             <string>Font size</string>
+           </property>
+           <property name="buddy">
+            <cstring>fontSize</cstring>
            </property>
           </widget>
          </item>
@@ -190,6 +202,9 @@
            <property name="text">
             <string>Font color</string>
            </property>
+           <property name="buddy">
+            <cstring>fontColor</cstring>
+           </property>
           </widget>
          </item>
          <item row="1" column="4">
@@ -205,6 +220,9 @@
            </property>
            <property name="text">
             <string>Outline thickness</string>
+           </property>
+           <property name="buddy">
+            <cstring>effect</cstring>
            </property>
           </widget>
          </item>
@@ -222,6 +240,9 @@
           <widget class="QLabel" name="outlineColorLabel">
            <property name="text">
             <string>Outline color</string>
+           </property>
+           <property name="buddy">
+            <cstring>outlineColor</cstring>
            </property>
           </widget>
          </item>
@@ -252,6 +273,9 @@
            </property>
            <property name="text">
             <string>Force subtitle position</string>
+           </property>
+           <property name="buddy">
+            <cstring>subsPosition</cstring>
            </property>
           </widget>
          </item>

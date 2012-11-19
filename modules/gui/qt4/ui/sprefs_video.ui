@@ -76,6 +76,9 @@
            <property name="text">
             <string>Output</string>
            </property>
+           <property name="buddy">
+            <cstring>outputModule</cstring>
+           </property>
           </widget>
          </item>
          <item row="2" column="0" colspan="2">
@@ -115,6 +118,9 @@
            <property name="text">
             <string>Display device</string>
            </property>
+           <property name="buddy">
+            <cstring>dXdisplayDevice</cstring>
+           </property>
           </widget>
          </item>
         </layout>
@@ -136,6 +142,9 @@
           <widget class="QLabel" name="kvaVideoModeLabel">
            <property name="text">
             <string>Video mode</string>
+           </property>
+           <property name="buddy">
+            <cstring>kvaVideoMode</cstring>
            </property>
           </widget>
          </item>
@@ -163,12 +172,18 @@
            <property name="text">
             <string>Deinterlacing</string>
            </property>
+           <property name="buddy">
+            <cstring>deinterlaceBox</cstring>
+           </property>
           </widget>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="arLabel">
            <property name="text">
             <string>Force Aspect Ratio</string>
+           </property>
+           <property name="buddy">
+            <cstring>arLine</cstring>
            </property>
           </widget>
          </item>
@@ -192,6 +207,9 @@
            </property>
            <property name="text">
             <string>Mode</string>
+           </property>
+           <property name="buddy">
+            <cstring>deinterlaceModeBox</cstring>
            </property>
           </widget>
          </item>
@@ -238,12 +256,18 @@
            <property name="text">
             <string>Directory</string>
            </property>
+           <property name="buddy">
+            <cstring>snapshotsDirectory</cstring>
+           </property>
           </widget>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="prefixLabel">
            <property name="text">
             <string>Prefix</string>
+           </property>
+           <property name="buddy">
+            <cstring>snapshotsPrefix</cstring>
            </property>
           </widget>
          </item>
@@ -258,6 +282,9 @@
           <widget class="QLabel" name="formatLabel">
            <property name="text">
             <string>Format</string>
+           </property>
+           <property name="buddy">
+            <cstring>snapshotsFormat</cstring>
            </property>
           </widget>
          </item>

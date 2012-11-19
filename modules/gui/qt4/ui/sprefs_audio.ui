@@ -169,6 +169,9 @@
            <property name="text">
             <string>Output module:</string>
            </property>
+           <property name="buddy">
+            <cstring>outputModule</cstring>
+           </property>
           </widget>
          </item>
          <item row="0" column="1">
@@ -203,6 +206,9 @@
               </property>
               <property name="text">
                <string>Destination file:</string>
+              </property>
+              <property name="buddy">
+               <cstring>fileName</cstring>
               </property>
              </widget>
             </item>
@@ -261,6 +267,9 @@
            <property name="text">
             <string>Visualization:</string>
            </property>
+           <property name="buddy">
+            <cstring>visualisation</cstring>
+           </property>
           </widget>
          </item>
          <item row="8" column="2" colspan="2">
@@ -303,6 +312,9 @@
            <property name="text">
             <string>Dolby Surround:</string>
            </property>
+           <property name="buddy">
+            <cstring>detectionDolby</cstring>
+           </property>
           </widget>
          </item>
          <item row="5" column="0">
@@ -318,6 +330,9 @@
            </property>
            <property name="alignment">
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+           <property name="buddy">
+            <cstring>replayCombo</cstring>
            </property>
           </widget>
          </item>
@@ -435,6 +450,9 @@
            <property name="text">
             <string>Preferred audio language:</string>
            </property>
+           <property name="buddy">
+            <cstring>preferredAudioLanguage</cstring>
+           </property>
           </widget>
          </item>
          <item row="0" column="1">
@@ -486,6 +504,9 @@
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
+              <property name="buddy">
+               <cstring>lastfm_pass_edit</cstring>
+              </property>
              </widget>
             </item>
             <item row="0" column="0">
@@ -501,6 +522,9 @@
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="buddy">
+               <cstring>lastfm_user_edit</cstring>
               </property>
              </widget>
             </item>
