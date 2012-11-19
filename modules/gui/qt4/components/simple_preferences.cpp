@@ -215,6 +215,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
          ******************************/
         START_SPREFS_CAT( Video , qtr("Video Settings") );
             CONFIG_BOOL( "video", enableVideo );
+            ui.videoZone->setEnabled( ui.enableVideo->isChecked() );
+            CONNECT( ui.enableVideo, toggled( bool ),
+                     ui.videoZone, setEnabled( bool ) );
 
             CONFIG_BOOL( "fullscreen", fullscreen );
             CONFIG_BOOL( "overlay", overlay );
@@ -259,9 +262,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         START_SPREFS_CAT( Audio, qtr("Audio Settings") );
 
             CONFIG_BOOL( "audio", enableAudio );
-            ui.SPrefsAudio_zone->setEnabled( ui.enableAudio->isChecked() );
+            ui.audioZone->setEnabled( ui.enableAudio->isChecked() );
             CONNECT( ui.enableAudio, toggled( bool ),
-                     ui.SPrefsAudio_zone, setEnabled( bool ) );
+                     ui.audioZone, setEnabled( bool ) );
 
 #define audioCommon( name ) \
             QWidget * name ## Control = new QWidget( ui.outputAudioBox ); \
@@ -649,6 +652,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                             ui.OSDTitlePosLabel, OSDTitlePos );
 
             CONFIG_BOOL( "spu", spuActiveBox);
+            ui.spuZone->setEnabled( ui.spuActiveBox->isChecked() );
+            CONNECT( ui.spuActiveBox, toggled( bool ),
+                     ui.spuZone, setEnabled( bool ) );
 
             CONFIG_GENERIC( "subsdec-encoding", StringList, ui.encodLabel,
                             encoding );
