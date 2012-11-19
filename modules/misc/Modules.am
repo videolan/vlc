@@ -1,5 +1,11 @@
 SOURCES_vod_rtsp = rtsp.c
 SOURCES_audioscrobbler = audioscrobbler.c
+SOURCES_fingerprinter = fingerprinter.c \
+	fingerprinter.h \
+	webservices/acoustid.c \
+	webservices/json_fixup.h \
+	webservices/json.c \
+	webservices/json.h
 SOURCES_xml = xml/libxml.c
 
 libexport_plugin_la_SOURCES = \
@@ -48,6 +54,7 @@ libstats_plugin_la_LIBADD = $(AM_LIBADD)
 
 libvlc_LTLIBRARIES += \
 	libaudioscrobbler_plugin.la \
+	libfingerprinter_plugin.la \
 	liblogger_plugin.la \
 	libstats_plugin.la
 

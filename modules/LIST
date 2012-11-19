@@ -124,6 +124,7 @@ $Id$
  * fb: video output module for the Linux framebuffer
  * fdkaac: AAC encoder using the fdk-aac library
  * filesystem: Filesystem access module
+ * fingerprinter: AcoustID audio fingerprinter using chromaprint
  * flac: Flac decoder using libflac
  * flacsys: FLAC demuxer
  * float_mixer: Precise float audio mixer
