@@ -79,10 +79,9 @@ vlc_module_end ()
  * Open: open the audio device
  *****************************************************************************/
 
-static int Start( audio_output_t *aout, audio_sample_format_t *restrict fmt )
+static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 {
-    audio_output_t *p_aout = (audio_output_t *)p_this;
-    aout_sys_t *p_sys = aout->sys;
+    aout_sys_t *p_sys = p_aout->sys;
 
     OSStatus status = 0;
 
@@ -110,7 +109,7 @@ static int Start( audio_output_t *aout, audio_sample_format_t *restrict fmt )
     // This will be used for boosting the audio without the need of a mixer (floating-point conversion is expensive on ARM)
     // AudioQueueSetParameter(p_sys->audioQueue, kAudioQueueParam_Volume, 12.0); // Defaults to 1.0
 
-    msg_Dbg(p_aout, "New AudioQueue output created (status = %i)", status);
+    msg_Dbg(p_aout, "New AudioQueue output created (status = %li)", status);
 
     // Allocate buffers for the AudioQueue, and pre-fill them.
     for (int i = 0; i < NUMBER_OF_BUFFERS; ++i) {
@@ -129,7 +128,7 @@ static int Start( audio_output_t *aout, audio_sample_format_t *restrict fmt )
     p_aout->flush = aout_PacketFlush;
     aout_SoftVolumeStart(p_aout);
 
-    msg_Dbg(p_aout, "Starting AudioQueue (status = %i)", status);
+    msg_Dbg(p_aout, "Starting AudioQueue (status = %li)", status);
     status = AudioQueueStart(p_sys->audioQueue, NULL);
 
     return VLC_SUCCESS;
