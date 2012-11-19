@@ -412,7 +412,11 @@ end
 function get_time(var)
     return function(name,client)
         local input = vlc.object.input()
-        client:append(math.floor(vlc.var.get( input, var )))
+	if input then
+	    client:append(math.floor(vlc.var.get( input, var )))
+	else
+	    client:append("")
+	end
     end
 end
 
