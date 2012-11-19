@@ -33,7 +33,6 @@
 #endif
 
 #ifdef __APPLE__
-#define _DARWIN_C_SOURCE
 #include <sys/stat.h>
 #include <sys/param.h>
 #include <sys/ucred.h>
