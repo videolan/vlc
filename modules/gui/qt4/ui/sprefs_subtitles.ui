@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>778</width>
-    <height>614</height>
+    <width>741</width>
+    <height>373</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -58,6 +58,13 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="spuActiveBox">
+     <property name="text">
+      <string>Enable subtitles</string>
+     </property>
     </widget>
    </item>
    <item>

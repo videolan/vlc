@@ -648,6 +648,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "video-title-position", IntegerList,
                             ui.OSDTitlePosLabel, OSDTitlePos );
 
+            CONFIG_BOOL( "spu", spuActiveBox);
+
             CONFIG_GENERIC( "subsdec-encoding", StringList, ui.encodLabel,
                             encoding );
             CONFIG_GENERIC( "sub-language", String, ui.subLangLabel,
