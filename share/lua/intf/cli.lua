@@ -41,7 +41,7 @@ description=
  Note:
     -I cli and -I luacli are aliases for -I luaintf --lua-intf cli
 
- Configuration options setable throught the --lua-config option are:
+ Configuration options settable through the --lua-config option are:
     * hosts: A list of hosts to listen on.
     * host: A host to listen on. (won't be used if `hosts' is set)
     * password: The password used for telnet clients.
@@ -81,9 +81,9 @@ for k,v in pairs(env) do
     if config[k] then
         if type(env[k]) == type(config[k]) then
             env[k] = config[k]
-            vlc.msg.dbg("set environement variable `"..k.."' to "..tostring(env[k]))
+            vlc.msg.dbg("set environment variable `"..k.."' to "..tostring(env[k]))
         else
-            vlc.msg.err("environement variable `"..k.."' should be of type "..type(env[k])..". config value will be discarded.")
+            vlc.msg.err("environment variable `"..k.."' should be of type "..type(env[k])..". config value will be discarded.")
         end
     end
 end
@@ -579,8 +579,8 @@ commands_ordered = {
     { "vratio"; { func = skip(listvalue("vout","aspect-ratio")); args = "[X]"; help = "set/get video aspect ratio" } };
     { "vcrop"; { func = skip(listvalue("vout","crop")); args = "[X]"; help = "set/get video crop"; aliases = { "crop" } } };
     { "vzoom"; { func = skip(listvalue("vout","zoom")); args = "[X]"; help = "set/get video zoom"; aliases = { "zoom" } } };
-    { "vdeinterlace"; { func = skip(listvalue("vout","deinterlace")); args = "[X]"; help = "set/get video deintelace" } };
-    { "vdeinterlace_mode"; { func = skip(listvalue("vout","deinterlace-mode")); args = "[X]"; help = "set/get video deintelace mode" } };
+    { "vdeinterlace"; { func = skip(listvalue("vout","deinterlace")); args = "[X]"; help = "set/get video deinterlace" } };
+    { "vdeinterlace_mode"; { func = skip(listvalue("vout","deinterlace-mode")); args = "[X]"; help = "set/get video deinterlace mode" } };
     { "snapshot"; { func = common.snapshot; help = "take video snapshot" } };
     { "strack"; { func = skip(listvalue("input","spu-es")); args = "[X]"; help = "set/get subtitles track" } };
     { "hotkey"; { func = hotkey; args = "[hotkey name]"; help = "simulate hotkey press"; adv = true; aliases = { "key" } } };
