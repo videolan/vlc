@@ -13,6 +13,7 @@ SOURCES_stream_out_record = record.c
 SOURCES_stream_out_smem = smem.c
 SOURCES_stream_out_setid = setid.c
 SOURCES_stream_out_langfromtelx = langfromtelx.c
+SOURCES_stream_out_chromaprint = chromaprint.c chromaprint_data.h
 
 libstream_out_transcode_plugin_la_SOURCES = \
 	transcode/transcode.c transcode/transcode.h \
@@ -60,3 +61,4 @@ libstream_out_raop_plugin_la_LIBADD = $(AM_LIBADD) $(GCRYPT_LIBS) -lgpg-error $(
 if HAVE_GCRYPT
 libvlc_LTLIBRARIES += libstream_out_raop_plugin.la
 endif
+

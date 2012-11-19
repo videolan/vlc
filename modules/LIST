@@ -312,6 +312,7 @@ $Id$
  * stream_filter_rar: Stream filter to read inside Rar files
  * stream_out_autodel: monitor mux inputs and automatically add/delete streams
  * stream_out_bridge: "exchange" streams between sout instances. To be used with VLM
+ * stream_out_chromaprint: Audio fingerprinter
  * stream_out_delay: introduce delay in an ES when streaming
  * stream_out_description: helper module for RTSP vod
  * stream_out_display: displays a stream output chain
