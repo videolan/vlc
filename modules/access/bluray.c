@@ -47,6 +47,7 @@
 #include <vlc_atomic.h>
 #include <vlc_dialog.h>                     /* BD+/AACS warnings */
 #include <vlc_vout.h>                       /* vout_PutSubpicture / subpicture_t */
+#include <vlc_url.h>			    /* vlc_path2uri */
 
 #include <libbluray/bluray.h>
 #include <libbluray/keys.h>
@@ -1102,8 +1103,20 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
             // if (meta->di_set_number > 0) vlc_meta_SetTrackNum(p_meta, meta->di_set_number);
             // if (meta->di_num_sets > 0) vlc_meta_AddExtra(p_meta, "Discs numbers in Set", meta->di_num_sets);
 
-            if (meta->thumb_count > 0 && meta->thumbnails) {
-                vlc_meta_SetArtURL(p_meta, meta->thumbnails[0].path);
+            if (meta->thumb_count > 0 && meta->thumbnails)
+            {
+                char *psz_thumbpath;
+                if( asprintf( &psz_thumbpath, "%s" DIR_SEP "BDMV" DIR_SEP "META" DIR_SEP "DL" DIR_SEP "%s",
+                              p_sys->psz_bd_path, meta->thumbnails[0].path ) > 0 )
+                {
+                    char *psz_thumburl = vlc_path2uri( psz_thumbpath, "file" );
+                    if( unlikely(psz_thumburl == NULL) )
+                        return VLC_ENOMEM;
+
+                    vlc_meta_SetArtURL( p_meta, psz_thumburl );
+                    free( psz_thumburl );
+                }
+                free( psz_thumbpath );
             }
 
             return VLC_SUCCESS;
