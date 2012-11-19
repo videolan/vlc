@@ -32,6 +32,14 @@
 #include <sys/stat.h>
 #endif
 
+#ifdef __APPLE__
+#define _DARWIN_C_SOURCE
+#include <sys/stat.h>
+#include <sys/param.h>
+#include <sys/ucred.h>
+#include <sys/mount.h>
+#endif
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>                      /* demux_t */
@@ -209,6 +217,25 @@ static int blurayOpen( vlc_object_t *object )
         }
     }
 #endif /* HAVE_MNTENT_H && HAVE_SYS_STAT_H */
+#ifdef __APPLE__
+    /* If we're passed a block device, try to convert it to the mount point. */
+    struct stat st;
+    if ( !stat (p_sys->psz_bd_path, &st)) {
+        if (S_ISBLK (st.st_mode)) {
+            struct statfs mbuf[128];
+            int fs_count;
+
+            if ( (fs_count = getfsstat (NULL, 0, MNT_NOWAIT)) > 0 ) {
+                getfsstat (mbuf, fs_count * sizeof(mbuf[0]), MNT_NOWAIT);
+                for ( int i = 0; i < fs_count; ++i) {
+                    if (!strcmp (mbuf[i].f_mntfromname, p_sys->psz_bd_path)) {
+                        p_sys->psz_bd_path = strndup(mbuf[i].f_mntonname, strlen(mbuf[i].f_mntonname));
+                    }
+                }
+            }
+        }
+    }
+#endif
     p_sys->bluray = bd_open(p_sys->psz_bd_path, NULL);
     if (!p_sys->bluray) {
         free(p_sys);
