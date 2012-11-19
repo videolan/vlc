@@ -631,3 +631,5 @@ xml_ReaderDelete
 xml_ReaderReset
 vlc_keycode2str
 vlc_str2keycode
+fingerprinter_Create
+fingerprinter_Destroy
