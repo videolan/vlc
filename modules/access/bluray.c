@@ -118,6 +118,9 @@ struct  demux_sys_t
     int                 i_audio_stream; /* Selected audio stream. -1 if default */
     int                 i_video_stream;
     stream_t            *p_parser;
+
+    /* Used to store bluray disc path */
+    char                *psz_bd_path;
 };
 
 struct subpicture_updater_sys_t
@@ -155,7 +158,6 @@ static int blurayOpen( vlc_object_t *object )
     demux_t *p_demux = (demux_t*)object;
     demux_sys_t *p_sys;
 
-    char bd_path[PATH_MAX] = { '\0' };
     const char *error_msg = NULL;
 
     if (strcmp(p_demux->psz_access, "bluray")) {
@@ -179,28 +181,26 @@ static int blurayOpen( vlc_object_t *object )
 
     TAB_INIT( p_sys->i_title, p_sys->pp_title );
 
-    /* store current bd_path */
+    /* store current bd path */
     if (p_demux->psz_file) {
-        strncpy(bd_path, p_demux->psz_file, sizeof(bd_path));
-        bd_path[PATH_MAX - 1] = '\0';
+        p_sys->psz_bd_path = strndup(p_demux->psz_file, strlen(p_demux->psz_file));
     }
 
 #if defined (HAVE_MNTENT_H) && defined (HAVE_SYS_STAT_H)
     /* If we're passed a block device, try to convert it to the mount point. */
     struct stat st;
-    if ( !stat (bd_path, &st)) {
+    if ( !stat (p_sys->psz_bd_path, &st)) {
         if (S_ISBLK (st.st_mode)) {
             FILE* mtab = setmntent ("/proc/self/mounts", "r");
             struct mntent* m;
             struct mntent mbuf;
             char buf [8192];
-            /* bd_path may be a symlink (e.g. /dev/dvd -> /dev/sr0), so make
+            /* bd path may be a symlink (e.g. /dev/dvd -> /dev/sr0), so make
              * sure we look up the real device */
-            char* bd_device = realpath(bd_path, NULL);
+            char* bd_device = realpath(p_sys->psz_bd_path, NULL);
             while ((m = getmntent_r (mtab, &mbuf, buf, sizeof(buf))) != NULL) {
-                if (!strcmp (m->mnt_fsname, (bd_device == NULL ? bd_path : bd_device))) {
-                    strncpy (bd_path, m->mnt_dir, sizeof(bd_path));
-                    bd_path[sizeof(bd_path) - 1] = '\0';
+                if (!strcmp (m->mnt_fsname, (bd_device == NULL ? p_sys->psz_bd_path : bd_device))) {
+                    p_sys->psz_bd_path = strndup(m->mnt_dir, strlen(m->mnt_dir));
                     break;
                 }
             }
@@ -209,7 +209,7 @@ static int blurayOpen( vlc_object_t *object )
         }
     }
 #endif /* HAVE_MNTENT_H && HAVE_SYS_STAT_H */
-    p_sys->bluray = bd_open(bd_path, NULL);
+    p_sys->bluray = bd_open(p_sys->psz_bd_path, NULL);
     if (!p_sys->bluray) {
         free(p_sys);
         return VLC_EGENERIC;
@@ -381,6 +381,7 @@ static void blurayClose( vlc_object_t *object )
         vlc_input_title_Delete(p_sys->pp_title[i]);
     TAB_CLEAN( p_sys->i_title, p_sys->pp_title );
 
+    free(p_sys->psz_bd_path);
     free(p_sys);
 }
 
