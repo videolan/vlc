@@ -23,6 +23,7 @@ nodist_SOURCES_qt4 = \
 		extensions_manager.moc.cpp \
 		recents.moc.cpp \
 		adapters/seekpoints.moc.cpp \
+		adapters/chromaprint.moc.cpp \
 		variables.moc.cpp \
 		dialogs/playlist.moc.cpp \
 		dialogs/bookmarks.moc.cpp \
@@ -45,6 +46,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/vlm.moc.cpp \
 		dialogs/firstrun.moc.cpp \
 		dialogs/extensions.moc.cpp \
+		dialogs/fingerprintdialog.moc.cpp \
 		components/extended_panels.moc.cpp \
 		components/info_panels.moc.cpp \
 		components/info_widgets.moc.cpp \
@@ -98,6 +100,7 @@ nodist_SOURCES_qt4 = \
 		ui/messages_panel.h \
 		ui/about.h \
 		ui/update.h \
+		ui/fingerprintdialog.h \
 		styles/seekstyle.moc.cpp \
 		dialogs/ml_configuration.moc.cpp \
 		components/playlist/ml_model.moc.cpp \
@@ -282,6 +285,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		extensions_manager.cpp \
 		recents.cpp \
 		adapters/seekpoints.cpp \
+		adapters/chromaprint.cpp \
 		variables.cpp \
 		dialogs/playlist.cpp \
 		dialogs/bookmarks.cpp \
@@ -305,6 +309,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/firstrun.cpp \
 		dialogs/podcast_configuration.cpp \
 		dialogs/extensions.cpp \
+		dialogs/fingerprintdialog.cpp \
 		components/extended_panels.cpp \
 		components/info_panels.cpp \
 		components/info_widgets.cpp \
@@ -359,6 +364,7 @@ noinst_HEADERS = \
 	extensions_manager.hpp \
 	recents.hpp \
 	adapters/seekpoints.hpp \
+	adapters/chromaprint.hpp \
 	variables.hpp \
 	dialogs/playlist.hpp \
 	dialogs/bookmarks.hpp \
@@ -382,6 +388,7 @@ noinst_HEADERS = \
 	dialogs/firstrun.hpp \
 	dialogs/podcast_configuration.hpp \
 	dialogs/extensions.hpp \
+	dialogs/fingerprintdialog.hpp \
 	components/extended_panels.hpp \
 	components/info_panels.hpp \
 	components/info_widgets.hpp \
@@ -450,4 +457,5 @@ EXTRA_DIST += \
 	ui/update.ui \
 	ui/sout.ui \
 	ui/vlm.ui \
+	ui/fingerprintdialog.ui \
 	$(DEPS_res)

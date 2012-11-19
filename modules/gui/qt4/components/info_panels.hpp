@@ -52,6 +52,7 @@ class CoverArtLabel;
 class QTextEdit;
 class QLabel;
 class VLCStatsView;
+class QPushButton;
 
 class MetaPanel: public QWidget
 {
@@ -88,9 +89,13 @@ private:
     QLabel   *lblURL;
     QString  currentURL;
 
+    QPushButton *fingerprintButton;
+
 public slots:
     void update( input_item_t * );
     void clear();
+    void fingerprint();
+    void fingerprintUpdate( input_item_t * );
 
 private slots:
     void enterEditMode();

@@ -34,6 +34,8 @@
 #include "components/info_panels.hpp"
 #include "components/interface_widgets.hpp"
 #include "info_widgets.hpp"
+#include "dialogs/fingerprintdialog.hpp"
+#include "adapters/chromaprint.hpp"
 
 #include <assert.h>
 #include <vlc_url.h>
@@ -129,7 +131,15 @@ MetaPanel::MetaPanel( QWidget *parent,
 
     /* Language on the same line */
     ADD_META( VLC_META_LANGUAGE, language_text, 7, -1 ); line++;
-    ADD_META( VLC_META_PUBLISHER, publisher_text, 0, 7 ); line++;
+    ADD_META( VLC_META_PUBLISHER, publisher_text, 0, 7 );
+
+    fingerprintButton = new QPushButton( qtr("&Fingerprint") );
+    fingerprintButton->setToolTip( qtr( "Find meta data using audio fingerprinting" ) );
+    fingerprintButton->setVisible( false );
+    metaLayout->addWidget( fingerprintButton, line, 7 , 3, -1 );
+    CONNECT( fingerprintButton, clicked(), this, fingerprint() );
+
+    line++;
 
     lblURL = new QLabel;
     lblURL->setOpenExternalLinks( true );
@@ -212,7 +222,8 @@ void MetaPanel::update( input_item_t *p_item )
     /* URL / URI */
     psz_meta = input_item_GetURI( p_item );
     if( !EMPTY_STR( psz_meta ) )
-         emit uriSet( qfu( psz_meta ) );
+        emit uriSet( qfu( psz_meta ) );
+    fingerprintButton->setVisible( Chromaprint::isSupported( QString( psz_meta ) ) );
     free( psz_meta );
 
     /* Other classic though */
@@ -337,9 +348,24 @@ void MetaPanel::clear()
     publisher_text->clear();
     encodedby_text->clear();
     art_cover->clear();
+    fingerprintButton->setVisible( false );
 
     setEditMode( false );
     emit uriSet( "" );
+}
+
+void MetaPanel::fingerprint()
+{
+    FingerprintDialog *dialog = new FingerprintDialog( this, p_intf, p_input );
+    CONNECT( dialog, metaApplied( input_item_t * ), this, fingerprintUpdate( input_item_t * ) );
+    dialog->setAttribute( Qt::WA_DeleteOnClose, true );
+    dialog->show();
+}
+
+void MetaPanel::fingerprintUpdate( input_item_t *p_item )
+{
+    update( p_item );
+    setEditMode( true );
 }
 
 /**
