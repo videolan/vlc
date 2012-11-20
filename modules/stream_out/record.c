@@ -330,8 +330,8 @@ static int OutputNew( sout_stream_t *p_stream,
     }
     free( psz_tmp );
 
-    if( asprintf( &psz_output, "std{access=file,mux='%s',dst='%s'}",
-                  psz_muxer, psz_file ) < 0 )
+    if( asprintf( &psz_output, "std{access=file,mux='%s',dst='%s',no-append,"
+                  "no-format}", psz_muxer, psz_file ) < 0 )
     {
         psz_output = NULL;
         goto error;
