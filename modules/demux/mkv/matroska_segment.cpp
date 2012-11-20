@@ -1581,6 +1581,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
 
     *pb_key_picture         = true;
     *pb_discardable_picture = false;
+    size_t i_tk;
 
     for( ;; )
     {
@@ -1593,7 +1594,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         if( pp_simpleblock != NULL || ((el = ep->Get()) == NULL && pp_block != NULL) )
         {
             /* Check blocks validity to protect againts broken files */
-            if( BlockFindTrackIndex( NULL, pp_block , pp_simpleblock ) )
+            if( BlockFindTrackIndex( &i_tk, pp_block , pp_simpleblock ) )
             {
                 delete pp_block;
                 pp_simpleblock = NULL;
@@ -1604,6 +1605,29 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             {
                 *pb_key_picture         = pp_simpleblock->IsKeyframe();
                 *pb_discardable_picture = pp_simpleblock->IsDiscardable();
+            }
+            /* We have block group let's check if the picture is a keyframe */
+            else if( *pb_key_picture )
+            {
+                switch(tracks[i_tk]->fmt.i_codec)
+                {
+                    case VLC_CODEC_THEORA:
+                    {
+                        DataBuffer *p_data = &pp_block->GetBuffer(0);
+                        size_t sz = p_data->Size();
+                        const uint8_t * p_buff = p_data->Buffer();
+                        /* if the second bit of a Theora frame is 1 
+                           it's not a keyframe */
+                        if( sz && p_buff )
+                        {
+                            if( p_buff[0] & 0x40 )
+                                *pb_key_picture = false;
+                        }
+                        else
+                            *pb_key_picture = false;
+                        break;
+                    }
+                }
             }
 
             /* update the index */
