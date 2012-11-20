@@ -11,7 +11,13 @@ POSTPROCCONF = \
 DEPS_postproc = ffmpeg
 
 ifdef ENABLE_SMALL
-POSTPROCCONF += --enable-small --optflags=-O2
+POSTPROCCONF += --enable-small
+ifeq ($(ARCH),arm)
+ifdef HAVE_ARMV7A
+# XXX: assumes > ARMv7-A, and thus thumb2-able
+FFMPEGCONF += --enable-thumb
+endif
+endif
 endif
 
 ifdef HAVE_CROSS_COMPILE
@@ -26,7 +32,7 @@ ifeq ($(ARCH),arm)
 POSTPROCCONF += --disable-runtime-cpudetect --arch=arm
 ifdef HAVE_NEON
 POSTPROCCONF += --cpu=cortex-a8 --enable-neon
-POSTPROC_CFLAGS +=-mfloat-abi=softfp -mfpu=neon
+POSTPROC_CFLAGS += -mfloat-abi=softfp -mfpu=neon
 endif
 endif
 
@@ -39,14 +45,13 @@ endif
 ifdef HAVE_DARWIN_OS
 POSTPROCCONF += --arch=$(ARCH) --target-os=darwin
 endif
+ifeq ($(ARCH),x86_64)
+POSTPROCCONF += --cpu=core2
+endif
 ifdef HAVE_IOS
 ifeq ($(ARCH),arm)
 POSTPROCCONF += --as="$(AS)"
-POSTPROCCONF += --cpu=cortex-a8
 endif
-endif
-ifeq ($(ARCH),x86_64)
-POSTPROCCONF += --cpu=core2
 endif
 
 # Linux
