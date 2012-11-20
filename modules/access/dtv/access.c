@@ -674,7 +674,7 @@ static const delsys_t *GuessSystem (const char *scheme, dvb_device_t *dev)
     if (systems & DVB_C)
         return &dvbc;
     if (systems & DVB_S)
-        return &dvbc;
+        return &dvbs;
     if (systems & DVB_T)
         return &dvbt;
     if (systems & ATSC)
