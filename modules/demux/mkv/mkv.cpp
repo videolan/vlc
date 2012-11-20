@@ -722,9 +722,9 @@ static int Demux( demux_t *p_demux)
         }
 
         if( simpleblock != NULL )
-            p_sys->i_pts = p_sys->i_chapter_time + ( simpleblock->GlobalTimecode() / (mtime_t) 1000 );
+            p_sys->i_pts = p_sys->i_chapter_time + ( (mtime_t)simpleblock->GlobalTimecode() / INT64_C(1000) );
         else
-            p_sys->i_pts = p_sys->i_chapter_time + ( block->GlobalTimecode() / (mtime_t) 1000 );
+            p_sys->i_pts = p_sys->i_chapter_time + ( (mtime_t)block->GlobalTimecode() / INT64_C(1000) );
 
         mtime_t i_pcr = VLC_TS_INVALID;
         for( size_t i = 0; i < p_segment->tracks.size(); i++)
