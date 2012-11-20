@@ -68,6 +68,9 @@ static void Close( vlc_object_t * );
 #define APPEND_TEXT N_("Append to file")
 #define APPEND_LONGTEXT N_( "Append to file if it exists instead " \
                             "of replacing it.")
+#define FORMAT_TEXT N_("Format time and date")
+#define FORMAT_LONGTEXT N_("Perform ISO C time and date formatting " \
+    "on the file path")
 #define SYNC_TEXT N_("Synchronous writing")
 #define SYNC_LONGTEXT N_( "Open the file with synchronous writing.")
 
@@ -82,6 +85,8 @@ vlc_module_begin ()
               OVERWRITE_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "append", false, APPEND_TEXT,APPEND_LONGTEXT,
               true )
+    add_bool( SOUT_CFG_PREFIX "format", false, FORMAT_TEXT, FORMAT_LONGTEXT,
+              true )
 #ifdef O_SYNC
     add_bool( SOUT_CFG_PREFIX "sync", false, SYNC_TEXT,SYNC_LONGTEXT,
               false )
@@ -95,6 +100,7 @@ vlc_module_end ()
  *****************************************************************************/
 static const char *const ppsz_sout_options[] = {
     "append",
+    "format",
     "overwrite",
 #ifdef O_SYNC
     "sync",
@@ -160,8 +166,15 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
-        char *path = str_format_time (p_access->psz_path);
-        path_sanitize (path);
+        const char *path = p_access->psz_path;
+        char *buf = NULL;
+
+        if (var_InheritBool (p_access, SOUT_CFG_PREFIX"format"))
+        {
+            buf = str_format_time (path);
+            path_sanitize (buf);
+            path = buf;
+        }
 
         int flags = O_RDWR | O_CREAT | O_LARGEFILE;
         if (!overwrite)
@@ -189,7 +202,7 @@ static int Open( vlc_object_t *p_this )
                                 "overridden and its content will be lost."),
                                 _("Keep existing file"),
                                 _("Overwrite"), NULL) == 2);
-        free (path);
+        free (buf);
         if (fd == -1)
             return VLC_EGENERIC;
     }

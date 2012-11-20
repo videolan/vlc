@@ -159,7 +159,7 @@ static block_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     if( i_bits == 24 )
     {
-        uint8_t *p_out = p_aout_buffer->p_buffer;
+        uint32_t *p_out = p_aout_buffer->p_buffer;
 
         while( p_block->i_buffer / 7 )
         {
@@ -182,7 +182,7 @@ static block_t *Decode( decoder_t *p_dec, block_t **pp_block )
     }
     else if( i_bits == 20 )
     {
-        uint8_t *p_out = p_aout_buffer->p_buffer;
+        uint32_t *p_out = p_aout_buffer->p_buffer;
 
         while( p_block->i_buffer / 6 )
         {
@@ -372,8 +372,8 @@ static block_t *Parse( decoder_t *p_dec, int *pi_frame_length, int *pi_bits,
     }
     else
     {
-        p_dec->fmt_out.i_codec = i_bits == 16 ? VLC_CODEC_S16L : VLC_CODEC_S24L;
-        p_dec->fmt_out.audio.i_bitspersample = i_bits == 16 ? 16 : 24;
+        p_dec->fmt_out.i_codec = i_bits == 16 ? VLC_CODEC_S16N : VLC_CODEC_S32N;
+        p_dec->fmt_out.audio.i_bitspersample = i_bits == 16 ? 16 : 32;
     }
 
     p_dec->fmt_out.audio.i_channels = i_channels;
