@@ -426,6 +426,22 @@ static void sink_input_info_cb(pa_context *ctx, const pa_sink_input_info *i,
 
 /*** VLC audio output callbacks ***/
 
+static int TimeGet(audio_output_t *aout, mtime_t *restrict write_pts)
+{
+    aout_sys_t *sys = aout->sys;
+    pa_stream *s = sys->stream;
+
+    if (pa_stream_is_corked(s) > 0)
+        return -1; /* latency is irrelevant if corked */
+
+    mtime_t delta = vlc_pa_get_latency(aout, sys->context, s);
+    if (delta == VLC_TS_INVALID)
+        return -1;
+
+    *write_pts = mdate() + delta;
+    return 0;
+}
+
 /* Memory free callback. The block_t address is in front of the data. */
 static void data_free(void *data)
 {
@@ -760,8 +776,8 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     /* Stream parameters */
     const pa_stream_flags_t flags = PA_STREAM_START_CORKED
-                                  //| PA_STREAM_INTERPOLATE_TIMING
-                                    | PA_STREAM_NOT_MONOTONIC
+                                  | PA_STREAM_INTERPOLATE_TIMING
+                                  | PA_STREAM_NOT_MONOTONIC
                                   | PA_STREAM_AUTO_TIMING_UPDATE
                                   /*| PA_STREAM_FIX_RATE*/;
 
@@ -936,7 +952,7 @@ static int Open(vlc_object_t *obj)
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
-    aout->time_get = NULL;
+    aout->time_get = TimeGet;
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
