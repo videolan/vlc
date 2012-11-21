@@ -779,7 +779,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
                                   | PA_STREAM_INTERPOLATE_TIMING
                                   | PA_STREAM_NOT_MONOTONIC
                                   | PA_STREAM_AUTO_TIMING_UPDATE
-                                  /*| PA_STREAM_FIX_RATE*/;
+                                  | PA_STREAM_FIX_RATE;
 
     struct pa_buffer_attr attr;
     attr.maxlength = -1;
@@ -867,6 +867,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         goto fail;
     }
 
+    const struct pa_sample_spec *spec = pa_stream_get_sample_spec(s);
 #if PA_CHECK_VERSION(1,0,0)
     if (encoding != PA_ENCODING_INVALID) {
         const pa_format_info *info = pa_stream_get_format_info(s);
@@ -877,10 +878,13 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             fmt->i_format = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_S16N;
         } else {
             msg_Dbg(aout, "digital pass-through enabled");
-            pa_stream_set_latency_update_callback(s, NULL, NULL);
+            spec = NULL;
         }
     }
 #endif
+    if (spec != NULL)
+        fmt->i_rate = spec->rate;
+
     stream_buffer_attr_cb(s, aout);
     var_AddCallback (aout, "audio-device", StreamMove, s);
     stream_moved_cb(s, aout);
