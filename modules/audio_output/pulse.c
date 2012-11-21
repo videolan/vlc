@@ -65,11 +65,7 @@ struct aout_sys_t
     pa_volume_t base_volume; /**< 0dB reference volume */
     pa_cvolume cvolume; /**< actual sink input volume */
     mtime_t first_pts; /**< Play time of buffer start */
-    mtime_t last_pts; /**< Play time of buffer write offset */
     mtime_t paused; /**< Time when (last) paused */
-    mtime_t desync; /**< Measured desynchronization */
-    unsigned nominal_rate; /**< Nominal stream sample rate */
-    unsigned actual_rate; /**< Current stream sample rate */
 };
 
 static void sink_list_cb(pa_context *, const pa_sink_info *, int, void *);
@@ -182,21 +178,6 @@ static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
 
 
 /*** Latency management and lip synchronization ***/
-static void stream_reset_sync(pa_stream *s, audio_output_t *aout)
-{
-    aout_sys_t *sys = aout->sys;
-    const unsigned rate = sys->nominal_rate;
-
-    sys->first_pts = VLC_TS_INVALID;
-    sys->last_pts = VLC_TS_INVALID;
-    sys->desync = 0;
-    pa_operation *op = pa_stream_update_sample_rate(s, rate, NULL, NULL);
-    if (unlikely(op == NULL))
-        return;
-    pa_operation_unref(op);
-    sys->actual_rate = rate;
-}
-
 static void stream_start_now(pa_stream *s, audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
@@ -282,81 +263,13 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
 {
     audio_output_t *aout = userdata;
     aout_sys_t *sys = aout->sys;
-    mtime_t delta, change;
 
     if (sys->paused != VLC_TS_INVALID)
         return; /* nothing to do while paused */
-    if (sys->last_pts == VLC_TS_INVALID) {
-        msg_Dbg(aout, "nothing to play");
-        assert (sys->first_pts == VLC_TS_INVALID);
-        return;
-    }
-    if (pa_stream_is_corked(s) > 0) {
+    if (sys->first_pts == VLC_TS_INVALID)
+        return; /* nothing to do if buffers are (still) empty */
+    if (pa_stream_is_corked(s) > 0)
         stream_start(s, aout);
-        return;
-    }
-
-    /* Compute lip desynchronization */
-    delta = vlc_pa_get_latency(aout, sys->context, s);
-    if (delta == VLC_TS_INVALID)
-        return;
-
-    delta = (sys->last_pts - mdate()) - delta;
-    change = delta - sys->desync;
-    sys->desync = delta;
-    //msg_Dbg(aout, "desync: %+"PRId64" us (variation: %+"PRId64" us)",
-    //        delta, change);
-
-    const unsigned inrate = sys->nominal_rate;
-    unsigned outrate = sys->actual_rate;
-    bool sync = false;
-
-    if (delta < -AOUT_MAX_PTS_DELAY)
-        msg_Warn(aout, "too late by %"PRId64" us", -delta);
-    else if (delta > +AOUT_MAX_PTS_ADVANCE)
-        msg_Warn(aout, "too early by %"PRId64" us", delta);
-    else if (outrate  == inrate)
-        return; /* In sync, do not add unnecessary disturbance! */
-    else
-        sync = true;
-
-    /* Compute playback sample rate */
-    /* This is empirical (especially the shift values).
-     * Feel free to define something smarter. */
-    int adj = sync ? (outrate - inrate)
-                   : outrate * ((delta >> 4) + change) / (CLOCK_FREQ << 2);
-    /* This avoids too quick rate variation. It sounds really bad and
-     * causes unstability (e.g. oscillation around the correct rate). */
-    int limit = inrate >> 10;
-    /* However, to improve stability and try to converge, closing to the
-     * nominal rate is favored over drifting from it. */
-    if ((adj > 0) == (sys->actual_rate > inrate))
-        limit *= 2;
-    if (adj > +limit)
-        adj = +limit;
-    if (adj < -limit)
-        adj = -limit;
-    outrate -= adj;
-
-    /* This keeps the effective rate within specified range
-     * (+/-AOUT_MAX_RESAMPLING% - see <vlc_aout.h>) of the nominal rate. */
-    limit = inrate * AOUT_MAX_RESAMPLING / 100;
-    if (outrate > inrate + limit)
-        outrate = inrate + limit;
-    if (outrate < inrate - limit)
-        outrate = inrate - limit;
-
-    /* Apply adjusted sample rate */
-    if (outrate == sys->actual_rate)
-        return;
-    pa_operation *op = pa_stream_update_sample_rate(s, outrate, NULL, NULL);
-    if (unlikely(op == NULL)) {
-        vlc_pa_error(aout, "cannot change sample rate", sys->context);
-        return;
-    }
-    pa_operation_unref(op);
-    msg_Dbg(aout, "changed sample rate to %u Hz",outrate);
-    sys->actual_rate = outrate;
 }
 
 
@@ -443,13 +356,15 @@ static void stream_moved_cb(pa_stream *s, void *userdata)
 static void stream_overflow_cb(pa_stream *s, void *userdata)
 {
     audio_output_t *aout = userdata;
+    aout_sys_t *sys = aout->sys;
     pa_operation *op;
 
     msg_Err(aout, "overflow, flushing");
     op = pa_stream_flush(s, NULL, NULL);
-    if (likely(op != NULL))
-        pa_operation_unref(op);
-    stream_reset_sync(s, aout);
+    if (unlikely(op == NULL))
+        return;
+    pa_operation_unref(op);
+    sys->first_pts = VLC_TS_INVALID;
 }
 
 static void stream_started_cb(pa_stream *s, void *userdata)
@@ -550,7 +465,6 @@ static void Play(audio_output_t *aout, block_t *block)
         return;
 
     size_t len = block->i_buffer;
-    mtime_t pts = block->i_pts + block->i_length;
 
     /* Note: The core already holds the output FIFO lock at this point.
      * Therefore we must not under any circumstances (try to) acquire the
@@ -561,7 +475,6 @@ static void Play(audio_output_t *aout, block_t *block)
 
     if (sys->first_pts == VLC_TS_INVALID)
         sys->first_pts = block->i_pts;
-    sys->last_pts = pts;
 
     if (pa_stream_is_corked(s) > 0)
         stream_start(s, aout);
@@ -601,9 +514,8 @@ static void Pause(audio_output_t *aout, bool paused, mtime_t date)
         msg_Dbg(aout, "resuming after %"PRId64" us", date);
         sys->paused = VLC_TS_INVALID;
 
-        if (sys->last_pts != VLC_TS_INVALID) {
+        if (sys->first_pts != VLC_TS_INVALID) {
             sys->first_pts += date;
-            sys->last_pts += date;
             stream_start(s, aout);
         }
     }
@@ -851,7 +763,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
                                   //| PA_STREAM_INTERPOLATE_TIMING
                                     | PA_STREAM_NOT_MONOTONIC
                                   | PA_STREAM_AUTO_TIMING_UPDATE
-                                  | PA_STREAM_VARIABLE_RATE;
+                                  /*| PA_STREAM_FIX_RATE*/;
 
     struct pa_buffer_attr attr;
     attr.maxlength = -1;
@@ -869,11 +781,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     sys->stream = NULL;
     sys->trigger = NULL;
     sys->first_pts = VLC_TS_INVALID;
-    sys->last_pts = VLC_TS_INVALID;
     sys->paused = VLC_TS_INVALID;
-    sys->desync = 0;
-    sys->nominal_rate = ss.rate;
-    sys->actual_rate = ss.rate;
 
     /* Channel volume */
     sys->base_volume = PA_VOLUME_NORM;
