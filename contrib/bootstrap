@@ -191,7 +191,7 @@ check_android_sdk()
 	add_make "ANDROID_NDK := ${ANDROID_NDK}"
 	[ -z "${ANDROID_ABI}" ] && echo "You must set ANDROID_ABI environment variable" && exit 1
 	add_make "ANDROID_ABI := ${ANDROID_ABI}"
-	test -z "${NO_NEON}" && add_make_enabled "HAVE_NEON"
+	[ ${ANDROID_ABI} = "armeabi-v7a" ] && add_make_enabled "HAVE_NEON"
 	[ ${ANDROID_ABI} = "armeabi-v7a" ] && add_make_enabled "HAVE_ARMV7A"
 }
 
