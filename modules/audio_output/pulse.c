@@ -472,9 +472,8 @@ static void stream_underflow_cb(pa_stream *s, void *userdata)
 {
     audio_output_t *aout = userdata;
 
-    msg_Warn(aout, "underflow");
-    stream_stop(s, aout);
-    stream_reset_sync(s, aout);
+    msg_Dbg(aout, "underflow");
+    (void) s;
 }
 
 static int stream_wait(pa_stream *stream, pa_threaded_mainloop *mainloop)
