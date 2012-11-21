@@ -498,9 +498,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         } else {
             [o_split_view setHidden: NO];
             [o_playlist_table setHidden: NO];
-            [o_video_view setHidden: !b_activeVideo];
-            if (b_activeVideo && [[o_video_view subviews] count] > 0)
-                [[o_video_view window] makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
+            [o_video_view setHidden: YES];
         }
     }
 }
