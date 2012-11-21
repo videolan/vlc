@@ -102,6 +102,7 @@ Mac OS X Interface:
    date and language
  * add options to the Advanced Open File dialog for start and stop time
  * add an option to play videos as a desktop background
+ * add support for playing video and showing audio visualizations side by side
  * The Streaming/Transcoding wizard and the open dialog's output panel are
    deprecated now
 
