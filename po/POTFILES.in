@@ -295,6 +295,7 @@ modules/audio_filter/converter/a52tofloat32.c
 modules/audio_filter/converter/a52tospdif.c
 modules/audio_filter/converter/dtstofloat32.c
 modules/audio_filter/converter/dtstospdif.c
+modules/audio_filter/converter/endian.c
 modules/audio_filter/converter/format.c
 modules/audio_filter/converter/mpgatofixed32.c
 modules/audio_filter/equalizer.c
