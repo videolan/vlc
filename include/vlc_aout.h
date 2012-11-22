@@ -150,11 +150,10 @@ struct audio_output
     /**< Stops the existing stream (optional, may be NULL).
       * \note A stream must have been started when called.
       */
-    int (*time_get)(audio_output_t *, mtime_t *write_pts);
-    /**< Estimates the date/time of the playback buffer write offset
-      * (optional, may be NULL). The read offset is not returned since it is
-      * always implicitly equal to the current time (mdate()).
-      * \param write_pts timestamp of the write offset [OUT]
+    int (*time_get)(audio_output_t *, mtime_t *delay);
+    /**< Estimates playback buffer latency (optional, may be NULL).
+      * \param delay pointer to the delay until the next sample to be written
+      *              to the playback buffer is rendered [OUT]
       * \return 0 on success, non-zero on failure or lack of data
       * \note A stream must have been started when called.
       */

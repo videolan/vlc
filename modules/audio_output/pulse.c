@@ -426,7 +426,7 @@ static void sink_input_info_cb(pa_context *ctx, const pa_sink_input_info *i,
 
 /*** VLC audio output callbacks ***/
 
-static int TimeGet(audio_output_t *aout, mtime_t *restrict write_pts)
+static int TimeGet(audio_output_t *aout, mtime_t *restrict delay)
 {
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
@@ -438,7 +438,7 @@ static int TimeGet(audio_output_t *aout, mtime_t *restrict write_pts)
     if (delta == VLC_TS_INVALID)
         return -1;
 
-    *write_pts = mdate() + delta;
+    *delay = delta;
     return 0;
 }
 

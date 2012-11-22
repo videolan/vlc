@@ -157,18 +157,20 @@ void aout_PacketDestroy (audio_output_t *aout)
     vlc_mutex_destroy (&p->lock);
 }
 
-int aout_PacketTimeGet (audio_output_t *aout,  mtime_t *restrict pts)
+int aout_PacketTimeGet (audio_output_t *aout, mtime_t *restrict delay)
 {
     aout_packet_t *p = aout_packet (aout);
     mtime_t time_report;
 
+    /* Problem: This measurement is imprecise and prone to jitter.
+     * Solution: Do not use aout_Packet...(). */
     vlc_mutex_lock (&p->lock);
     time_report = date_Get (&p->fifo.end_date);
     vlc_mutex_unlock (&p->lock);
 
     if (time_report == VLC_TS_INVALID)
         return -1;
-    *pts = time_report;
+    *delay = time_report - mdate ();
     return 0;
 }
 

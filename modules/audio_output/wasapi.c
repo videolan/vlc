@@ -135,7 +135,7 @@ struct aout_sys_t
 
 
 /*** VLC audio output callbacks ***/
-static int TimeGet(audio_output_t *aout, mtime_t *restrict pts)
+static int TimeGet(audio_output_t *aout, mtime_t *restrict delay)
 {
     aout_sys_t *sys = aout->sys;
     UINT64 pos, qpcpos;
@@ -159,10 +159,8 @@ static int TimeGet(audio_output_t *aout, mtime_t *restrict pts)
         return -1;
     }
 
-    mtime_t delay =  ((GetQPC() - qpcpos) / (10000000 / CLOCK_FREQ));
+    *delay = ((GetQPC() - qpcpos) / (10000000 / CLOCK_FREQ));
     static_assert((10000000 % CLOCK_FREQ) == 0, "Frequency conversion broken");
-
-    *pts = mdate() + delay;
     return 0;
 }
 

@@ -404,13 +404,13 @@ void aout_OutputDelete (audio_output_t *aout)
         aout->stop (aout);
 }
 
-int aout_OutputTimeGet (audio_output_t *aout, mtime_t *pts)
+int aout_OutputTimeGet (audio_output_t *aout, mtime_t *delay)
 {
     aout_assert_locked (aout);
 
     if (aout->time_get == NULL)
         return -1;
-    return aout->time_get (aout, pts);
+    return aout->time_get (aout, delay);
 }
 
 /**

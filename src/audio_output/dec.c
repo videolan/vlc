@@ -267,7 +267,7 @@ static void aout_DecSynchronize (audio_output_t *aout, mtime_t dec_pts,
                                  int input_rate)
 {
     aout_owner_t *owner = aout_owner (aout);
-    mtime_t aout_pts, drift;
+    mtime_t drift;
 
     /**
      * Depending on the drift between the actual and intended playback times,
@@ -285,9 +285,9 @@ static void aout_DecSynchronize (audio_output_t *aout, mtime_t dec_pts,
      * all samples in the buffer will have been played. Then:
      *    pts = mdate() + delay
      */
-    if (aout_OutputTimeGet (aout, &aout_pts) != 0)
+    if (aout_OutputTimeGet (aout, &drift) != 0)
         return; /* nothing can be done if timing is unknown */
-    drift = aout_pts - dec_pts;
+    drift += mdate () - dec_pts;
 
     /* Late audio output.
      * This can happen due to insufficient caching, scheduling jitter
@@ -311,9 +311,9 @@ static void aout_DecSynchronize (audio_output_t *aout, mtime_t dec_pts,
         owner->sync.discontinuity = true;
 
         /* Now the output might be too early... Recheck. */
-        if (aout_OutputTimeGet (aout, &aout_pts) != 0)
+        if (aout_OutputTimeGet (aout, &drift) != 0)
             return; /* nothing can be done if timing is unknown */
-        drift = aout_pts - dec_pts;
+        drift += mdate () - dec_pts;
     }
 
     /* Early audio output.

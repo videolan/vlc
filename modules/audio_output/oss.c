@@ -324,8 +324,8 @@ static int TimeGet (audio_output_t *aout, mtime_t *restrict pts)
         return -1;
     }
 
-    *pts = mdate () + ((delay * CLOCK_FREQ * sys->format.i_frame_length)
-                      / (sys->format.i_rate * sys->format.i_bytes_per_frame));
+    *pts = (delay * CLOCK_FREQ * sys->format.i_frame_length)
+                        / (sys->format.i_rate * sys->format.i_bytes_per_frame);
     return 0;
 }
 

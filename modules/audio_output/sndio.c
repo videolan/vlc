@@ -197,7 +197,7 @@ static void PositionChanged (void *arg, int delta)
     sys->read_offset += delta;
 }
 
-static int TimeGet (audio_output_t *aout, mtime_t *restrict pts)
+static int TimeGet (audio_output_t *aout, mtime_t *restrict delay)
 {
     aout_sys_t *sys = aout->sys;
     long long frames = sys->write_offset - sys->read_offset;
@@ -205,7 +205,7 @@ static int TimeGet (audio_output_t *aout, mtime_t *restrict pts)
     if (frames == 0)
         return -1;
 
-    *pts = mdate () + (frames * CLOCK_FREQ / sys->rate);
+    *delay = frames * CLOCK_FREQ / sys->rate;
     return 0;
 }
 

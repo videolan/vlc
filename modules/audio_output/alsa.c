@@ -520,7 +520,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static int TimeGet (audio_output_t *aout, mtime_t *restrict pts)
+static int TimeGet (audio_output_t *aout, mtime_t *restrict delay)
 {
     aout_sys_t *sys = aout->sys;
     snd_pcm_sframes_t frames;
@@ -531,7 +531,7 @@ static int TimeGet (audio_output_t *aout, mtime_t *restrict pts)
         msg_Err (aout, "cannot estimate delay: %s", snd_strerror (val));
         return -1;
     }
-    *pts = mdate () + (frames * CLOCK_FREQ / sys->format.i_rate);
+    *delay = frames * CLOCK_FREQ / sys->format.i_rate;
     return 0;
 }
 
