@@ -133,7 +133,7 @@ static void RunIntf( intf_thread_t *p_intf )
         if( i_x < -HIGH_THRESHOLD && i_oldx > -LOW_THRESHOLD )
         {
             b_change = true;
-            psz_type = "270";
+            psz_type = "90";
         }
         else if( ( i_x > -LOW_THRESHOLD && i_oldx < -HIGH_THRESHOLD )
                  || ( i_x < LOW_THRESHOLD && i_oldx > HIGH_THRESHOLD ) )
@@ -144,7 +144,7 @@ static void RunIntf( intf_thread_t *p_intf )
         else if( i_x > HIGH_THRESHOLD && i_oldx < LOW_THRESHOLD )
         {
             b_change = true;
-            psz_type = "90";
+            psz_type = "270";
         }
 
         if( b_change )
