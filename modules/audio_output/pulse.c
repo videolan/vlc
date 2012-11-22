@@ -886,14 +886,15 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         fmt->i_rate = spec->rate;
 
     stream_buffer_attr_cb(s, aout);
-    var_AddCallback (aout, "audio-device", StreamMove, s);
     stream_moved_cb(s, aout);
     pa_threaded_mainloop_unlock(sys->mainloop);
+    var_AddCallback (aout, "audio-device", StreamMove, s);
 
     return VLC_SUCCESS;
 
 fail:
     pa_threaded_mainloop_unlock(sys->mainloop);
+    var_AddCallback (aout, "audio-device", StreamMove, s);
     Stop(aout);
     return VLC_EGENERIC;
 }
