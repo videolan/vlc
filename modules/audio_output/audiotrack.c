@@ -91,6 +91,9 @@ typedef int (*AudioTrack_flush)(void *);
 typedef int (*AudioTrack_pause)(void *);
 
 struct aout_sys_t {
+    float soft_gain;
+    bool soft_mute;
+
     void *libmedia;
     void *AudioTrack;
 
@@ -109,6 +112,9 @@ struct aout_sys_t {
     AudioTrack_flush at_flush;
     AudioTrack_pause at_pause;
 };
+
+/* Soft volume helper */
+#include "volume.h"
 
 static void *InitLibrary(struct aout_sys_t *p_sys);
 
@@ -265,6 +271,8 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         return VLC_EGENERIC;
     }
 
+    aout_SoftVolumeStart(aout);
+
     aout->sys = p_sys;
     aout->time_get = NULL;
     aout->play = Play;
@@ -331,7 +339,7 @@ static int Open(vlc_object_t *obj)
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
-    //aout_SoftVolumeInit(aout);
+    aout_SoftVolumeInit(aout);
     return VLC_SUCCESS;
 }
 
