@@ -2946,13 +2946,18 @@ AS_IF([test "${enable_xcb}" != "no"], [
     AC_MSG_WARN([${XCB_RANDR_PKG_ERRORS}. Panoramix filter will not be supported.])
   ])
 
-  dnl xcb-utils
-  PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms >= 0.3.4], [
-    PKG_CHECK_MODULES(XPROTO, [xproto])
-    VLC_ADD_PLUGIN([globalhotkeys])
-    VLC_ADD_CFLAGS([xcb_window], [-DHAVE_XCB_KEYSYMS])
+  PKG_CHECK_MODULES(XPROTO, [xproto], [
+    VLC_ADD_PLUGIN([xwd])
+
+    dnl xcb-utils
+    PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms >= 0.3.4], [
+      VLC_ADD_PLUGIN([globalhotkeys])
+      VLC_ADD_CFLAGS([xcb_window], [-DHAVE_XCB_KEYSYMS])
+    ], [
+      AC_MSG_WARN([${XCB_KEYSYMS_PKG_ERRORS}. Hotkeys will not work.])
+    ])
   ], [
-    AC_MSG_WARN([${XCB_KEYSYMS_PKG_ERRORS}. Hotkeys will not work.])
+    AC_MSG_WARN([${XPROTO_PKG_ERRORS}. Hotkeys and XWD will not work.])
   ])
 
   AS_IF([test "${enable_glx}" != "no"], [

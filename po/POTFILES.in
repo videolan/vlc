@@ -406,6 +406,7 @@ modules/codec/uleaddvaudio.c
 modules/codec/vorbis.c
 modules/codec/wmafixed/wma.c
 modules/codec/x264.c
+modules/codec/xwd.c
 modules/codec/zvbi.c
 modules/control/dbus/dbus.c
 modules/control/dbus/dbus_common.h

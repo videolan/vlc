@@ -149,6 +149,13 @@ if HAVE_AVCODEC_VDA
 libvlc_LTLIBRARIES += libvda_plugin.la
 endif
 
+### XWD ###
+libxwd_plugin_la_SOURCES = xwd.c
+libxwd_plugin_la_CFLAGS = $(AM_CFLAGS) $(XPROTO_CFLAGS)
+libxwd_plugin_la_LIBADD = $(AM_LIBADD) $(XPROTO_LIBS)
+libvlc_LTLIBRARIES += $(LTLIBxwd)
+EXTRA_LTLIBRARIES += libxwd_plugin.la
+
 ### OpenMAX ###
 noinst_HEADERS += \
 	omxil/OMX_Component.h \
