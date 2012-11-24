@@ -990,7 +990,12 @@ int dvb_set_dvbt2 (dvb_device_t *d, uint32_t freq, const char *modstr,
                           DTV_INNER_FEC, fec, DTV_BANDWIDTH_HZ, bandwidth,
                           DTV_TRANSMISSION_MODE, transmit_mode,
                           DTV_GUARD_INTERVAL, guard,
-                          DTV_DVBT2_PLP_ID, plp);
+# if DVBv5(8)
+                          DTV_STREAM_ID,
+# else
+                          DTV_DVBT2_PLP_ID,
+# endif
+                          plp);
 #else
 # warning DVB-T2 needs Linux DVB version 5.3 or later.
     msg_Err (d->obj, "DVB-T2 support not compiled-in");
@@ -1031,7 +1036,12 @@ int dvb_set_isdbs (dvb_device_t *d, uint64_t freq_Hz, uint16_t ts_id)
         return -1;
     return dvb_set_props (d, 5, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_ISDBS,
                           DTV_FREQUENCY, freq,
-                          DTV_ISDBS_TS_ID, (uint32_t)ts_id);
+#if DVBv5(8)
+                          DTV_STREAM_ID,
+#else
+                          DTV_ISDBS_TS_ID,
+#endif
+                          (uint32_t)ts_id);
 }
 
 
