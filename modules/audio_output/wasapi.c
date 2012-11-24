@@ -127,6 +127,7 @@ struct aout_sys_t
     uint8_t bits; /**< Bits per sample */
     unsigned rate; /**< Sample rate */
     unsigned bytes_per_frame;
+    UINT32 written; /**< Frames written to the buffer */
     UINT32 frames; /**< Total buffer size (frames) */
 
     HANDLE ready; /**< Semaphore from MTA thread */
@@ -155,8 +156,9 @@ static int TimeGet(audio_output_t *aout, mtime_t *restrict delay)
 
     if (pos == 0)
     {
-        msg_Dbg(aout, "cannot compute position: still propagating buffers");
-        return -1;
+        *delay = sys->written * CLOCK_FREQ / sys->rate;
+        msg_Dbg(aout, "extrapolating position: still propagating buffers");
+        return 0;
     }
 
     *delay = ((GetQPC() - qpcpos) / (10000000 / CLOCK_FREQ));
@@ -211,6 +213,7 @@ static void Play(audio_output_t *aout, block_t *block)
         block->p_buffer += copy;
         block->i_buffer -= copy;
         block->i_nb_samples -= frames;
+        sys->written += frames;
         if (block->i_nb_samples == 0)
             break; /* done */
 
@@ -241,6 +244,7 @@ static void Pause(audio_output_t *aout, bool paused, mtime_t date)
         msg_Warn(aout, "cannot %s stream (error 0x%lx)",
                  paused ? "stop" : "start", hr);
     Leave();
+
     (void) date;
 }
 
@@ -255,9 +259,12 @@ static void Flush(audio_output_t *aout, bool wait)
     Enter();
     IAudioClient_Stop(sys->client);
     hr = IAudioClient_Reset(sys->client);
+    Leave();
+
     if (FAILED(hr))
         msg_Warn(aout, "cannot reset stream (error 0x%lx)", hr);
-    Leave();
+    else
+        sys->written = 0;
 }
 
 static int SimpleVolumeSet(audio_output_t *aout, float vol)
@@ -812,6 +819,7 @@ retry:
 
     sys->rate = fmt->i_rate;
     sys->bytes_per_frame = fmt->i_bytes_per_frame;
+    sys->written = 0;
     aout->time_get = TimeGet;
     aout->play = Play;
     aout->pause = Pause;
