@@ -122,11 +122,7 @@ endif
 libshm_plugin_la_SOURCES = shm.c
 libshm_plugin_la_CFLAGS = $(AM_CFLAGS)
 libshm_plugin_la_LIBADD = $(AM_LIBADD)
-if !HAVE_WIN32
-if !HAVE_OS2
 libvlc_LTLIBRARIES += libshm_plugin.la
-endif
-endif
 
 libv4l2_plugin_la_SOURCES = \
 	v4l2/videodev2.h \

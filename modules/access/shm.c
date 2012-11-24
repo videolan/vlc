@@ -30,7 +30,6 @@
 # include <sys/ipc.h>
 # include <sys/shm.h>
 #endif
-#include <sys/mman.h>
 
 #include <vlc_common.h>
 #include <vlc_demux.h>
@@ -107,20 +106,27 @@ vlc_module_begin ()
     add_shortcut ("shm")
 vlc_module_end ()
 
-static void Demux (void *);
 static int Control (demux_t *, int, va_list);
-static void map_detach (demux_sys_t *);
+static void DemuxFile (void *);
+static void CloseFile (demux_sys_t *);
 #ifdef HAVE_SYS_SHM_H
-static void sysv_detach (demux_sys_t *);
+static void DemuxIPC (void *);
+static void CloseIPC (demux_sys_t *);
 #endif
 static void no_detach (demux_sys_t *);
 
 struct demux_sys_t
 {
     /* Everything is read-only when timer is armed. */
-    const void  *addr;
-    size_t       length;
-    size_t       size;
+    union
+    {
+        int fd;
+        struct
+        {
+             const void  *addr;
+             size_t       length;
+        } mem;
+    };
     es_out_id_t *es;
     mtime_t      interval;
     vlc_timer_t  timer;
@@ -130,11 +136,6 @@ struct demux_sys_t
 static int Open (vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
-
-    long pagesize = sysconf (_SC_PAGE_SIZE);
-    if (pagesize == -1)
-        return VLC_EGENERIC;
-    
     demux_sys_t *sys = malloc (sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -165,38 +166,28 @@ static int Open (vlc_object_t *obj)
             goto error;
     }
 
-    sys->length = width * height * (bpp >> 3);
-    if (sys->length == 0)
-        goto error;
-    pagesize--;
-    sys->size = (sys->length + pagesize) & ~pagesize; /* pad */
+    static void (*Demux) (void *);
 
     char *path = var_InheritString (demux, "shm-file");
     if (path != NULL)
     {
-        int fd = vlc_open (path, O_RDONLY);
-        if (fd == -1)
-        {
+        sys->fd = vlc_open (path, O_RDONLY);
+        if (sys->fd == -1)
             msg_Err (demux, "cannot open file %s: %m", path);
-            free (path);
-            goto error;
-        }
-
-        void *mem = mmap (NULL, sys->size, PROT_READ, MAP_SHARED, fd, 0);
-        close (fd);
-        if (mem == MAP_FAILED)
-        {
-            msg_Err (demux, "cannot map file %s: %m", path);
-            free (path);
-            goto error;
-        }
         free (path);
-        sys->addr = mem;
-        sys->detach = map_detach;
+        if (sys->fd == -1)
+            goto error;
+
+        sys->detach = CloseFile;
+        Demux = DemuxFile;
     }
     else
     {
 #ifdef HAVE_SYS_SHM_H
+        sys->mem.length = width * height * (bpp >> 3);
+        if (sys->mem.length == 0)
+            goto error;
+
         int id = var_InheritInteger (demux, "shm-id");
         if (id == IPC_PRIVATE)
             goto error;
@@ -207,8 +198,9 @@ static int Open (vlc_object_t *obj)
             msg_Err (demux, "cannot attach segment %d: %m", id);
             goto error;
         }
-        sys->addr = mem;
-        sys->detach = sysv_detach;
+        sys->mem.addr = mem;
+        sys->detach = CloseIPC;
+        Demux = DemuxIPC;
 #else
         goto error;
 #endif
@@ -264,19 +256,6 @@ static void Close (vlc_object_t *obj)
     sys->detach (sys);
     free (sys);
 }
-
-
-static void map_detach (demux_sys_t *sys)
-{
-    munmap ((void *)sys->addr, sys->size);
-}
-
-#ifdef HAVE_SYS_SHM_H
-static void sysv_detach (demux_sys_t *sys)
-{
-    shmdt (sys->addr);
-}
-#endif
 
 static void no_detach (demux_sys_t *sys)
 {
@@ -342,23 +321,50 @@ static int Control (demux_t *demux, int query, va_list args)
     return VLC_EGENERIC;
 }
 
-
 /**
  * Processing callback
  */
-static void Demux (void *data)
+static void DemuxFile (void *data)
 {
     demux_t *demux = data;
     demux_sys_t *sys = demux->p_sys;
 
     /* Copy frame */
-    block_t *block = block_Alloc (sys->length);
+    block_t *block = block_File (sys->fd);
     if (block == NULL)
         return;
-    memcpy (block->p_buffer, sys->addr, sys->length);
     block->i_pts = block->i_dts = mdate ();
 
     /* Send block */
     es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts);
     es_out_Send (demux->out, sys->es, block);
 }
+
+static void CloseFile (demux_sys_t *sys)
+{
+    close (sys->fd);
+}
+
+#ifdef HAVE_SYS_SHM_H
+static void DemuxIPC (void *data)
+{
+    demux_t *demux = data;
+    demux_sys_t *sys = demux->p_sys;
+
+    /* Copy frame */
+    block_t *block = block_Alloc (sys->mem.length);
+    if (block == NULL)
+        return;
+    memcpy (block->p_buffer, sys->mem.addr, sys->mem.length);
+    block->i_pts = block->i_dts = mdate ();
+
+    /* Send block */
+    es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts);
+    es_out_Send (demux->out, sys->es, block);
+}
+
+static void CloseIPC (demux_sys_t *sys)
+{
+    shmdt (sys->mem.addr);
+}
+#endif
