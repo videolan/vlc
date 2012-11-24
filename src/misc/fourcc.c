@@ -906,6 +906,8 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_PCX, "Personal Computer Exchange Image"),
         A("pcx "),
 
+    B(VLC_CODEC_XWD, "X Window system raster image"),
+
     B(VLC_CODEC_JPEG2000, "JPEG 2000 Image"),
         A("JP2K"),
         A("mjp2"),

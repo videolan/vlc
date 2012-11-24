@@ -238,6 +238,7 @@
 #define VLC_CODEC_SGI             VLC_FOURCC('s','g','i',' ')
 #define VLC_CODEC_PNM             VLC_FOURCC('p','n','m',' ')
 #define VLC_CODEC_PCX             VLC_FOURCC('p','c','x',' ')
+#define VLC_CODEC_XWD             VLC_FOURCC('X','W','D',' ')
 
 
 /* Audio codec */
