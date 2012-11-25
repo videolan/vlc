@@ -282,7 +282,7 @@ static int Control (demux_t *demux, int query, va_list args)
         case DEMUX_CAN_CONTROL_RATE:
         case DEMUX_CAN_SEEK:
         {
-            bool *v = (bool*)va_arg( args, bool * );
+            bool *v = va_arg (args, bool *);
             *v = false;
             return VLC_SUCCESS;
         }
