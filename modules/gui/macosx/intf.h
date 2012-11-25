@@ -209,11 +209,6 @@ struct intf_sys_t
 - (void)mediaKeyTap:(SPMediaKeyTap*)keyTap receivedMediaKeyEvent:(NSEvent*)event;
 @end
 
-@interface VLCMain (Internal)
-- (void)handlePortMessage:(NSPortMessage *)o_msg;
-- (void)resetMediaKeyJump;
-- (void)coreChangedMediaKeySupportSetting: (NSNotification *)o_notification;
-@end
 
 /*****************************************************************************
  * VLCApplication interface
