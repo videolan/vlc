@@ -41,17 +41,17 @@
 #define FPS_LONGTEXT N_( \
     "How many times the screen content should be refreshed per second.")
 
+#define DEPTH_TEXT N_("Frame buffer depth")
+#define DEPTH_LONGTEXT N_( \
+    "Pixel depth of the frame buffer, or zero for XWD file")
+
 #define WIDTH_TEXT N_("Frame buffer width")
 #define WIDTH_LONGTEXT N_( \
-    "Pixel width of the frame buffer")
+    "Pixel width of the frame buffer (ignored for XWD file)")
 
 #define HEIGHT_TEXT N_("Frame buffer height")
 #define HEIGHT_LONGTEXT N_( \
-    "Pixel height of the frame buffer")
-
-#define DEPTH_TEXT N_("Frame buffer depth")
-#define DEPTH_LONGTEXT N_( \
-    "Pixel depth of the frame buffer")
+    "Pixel height of the frame buffer (ignored for XWD file)")
 
 #define ID_TEXT N_("Frame buffer segment ID")
 #define ID_LONGTEXT N_( \
@@ -66,10 +66,11 @@ static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
 static const int depths[] = {
-    8, 15, 16, 24, 32,
+    0, 8, 15, 16, 24, 32,
 };
 
 static const char *const depth_texts[] = {
+    N_("XWD file (autodetect)"),
     N_("8 bits"), N_("15 bits"), N_("16 bits"), N_("24 bits"), N_("32 bits"),
 };
 
@@ -85,14 +86,14 @@ vlc_module_begin ()
     set_callbacks (Open, Close)
 
     add_float ("shm-fps", 10.0, FPS_TEXT, FPS_LONGTEXT, true)
+    add_integer ("shm-depth", 0, DEPTH_TEXT, DEPTH_LONGTEXT, true)
+        change_integer_list (depths, depth_texts)
+        change_safe ()
     add_integer ("shm-width", 800, WIDTH_TEXT, WIDTH_LONGTEXT, false)
         change_integer_range (0, 65535)
         change_safe ()
     add_integer ("shm-height", 480, HEIGHT_TEXT, HEIGHT_LONGTEXT, false)
         change_integer_range (0, 65535)
-        change_safe ()
-    add_integer ("shm-depth", 32, DEPTH_TEXT, DEPTH_LONGTEXT, true)
-        change_integer_list (depths, depth_texts)
         change_safe ()
 
     /* We need to "trust" the memory segment. If it were shrunk while we copy
@@ -141,9 +142,8 @@ static int Open (vlc_object_t *obj)
         return VLC_ENOMEM;
     sys->detach = no_detach;
 
-    uint16_t width = var_InheritInteger (demux, "shm-width");
-    uint16_t height = var_InheritInteger (demux, "shm-height");
     uint32_t chroma;
+    uint16_t width = 0, height = 0;
     uint8_t bpp;
     switch (var_InheritInteger (demux, "shm-depth"))
     {
@@ -162,8 +162,16 @@ static int Open (vlc_object_t *obj)
         case 8:
             chroma = VLC_CODEC_RGB8; bpp = 8;
             break;
+        case 0:
+            chroma = VLC_CODEC_XWD; bpp = 0;
+            break;
         default:
             goto error;
+    }
+    if (bpp != 0)
+    {
+        width = var_InheritInteger (demux, "shm-width");
+        height = var_InheritInteger (demux, "shm-height");
     }
 
     static void (*Demux) (void *);
