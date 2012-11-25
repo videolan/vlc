@@ -130,6 +130,9 @@ struct aout_sys_t
     UINT32 written; /**< Frames written to the buffer */
     UINT32 frames; /**< Total buffer size (frames) */
 
+    float volume_hack; /**< Deferred volume request */
+    int mute_hack; /**< Deferred mute request */
+
     HANDLE ready; /**< Semaphore from MTA thread */
     HANDLE done; /**< Semaphore to MTA thread */
 };
@@ -166,10 +169,28 @@ static int TimeGet(audio_output_t *aout, mtime_t *restrict delay)
     return 0;
 }
 
+static void CheckVolumeHack(audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+
+    if (unlikely(sys->volume_hack >= 0.f))
+    {   /* Apply volume now, if it failed earlier */
+        aout->volume_set(aout, sys->volume_hack);
+        sys->volume_hack = -1.f;
+    }
+    if (unlikely(sys->mute_hack >= 0))
+    {   /* Apply volume now, if it failed earlier */
+        aout->mute_set(aout, sys->mute_hack);
+        sys->mute_hack = -1;
+    }
+}
+
 static void Play(audio_output_t *aout, block_t *block)
 {
     aout_sys_t *sys = aout->sys;
     HRESULT hr = S_OK;
+
+    CheckVolumeHack(aout);
 
     if (sys->chans_to_reorder)
         aout_ChannelReorder(block->p_buffer, block->i_buffer,
@@ -235,6 +256,8 @@ static void Pause(audio_output_t *aout, bool paused, mtime_t date)
     aout_sys_t *sys = aout->sys;
     HRESULT hr;
 
+    CheckVolumeHack(aout);
+
     Enter();
     if (paused)
         hr = IAudioClient_Stop(sys->client);
@@ -253,6 +276,8 @@ static void Flush(audio_output_t *aout, bool wait)
     aout_sys_t *sys = aout->sys;
     HRESULT hr;
 
+    CheckVolumeHack(aout);
+
     if (wait)
         return; /* Drain not implemented */
 
@@ -269,12 +294,13 @@ static void Flush(audio_output_t *aout, bool wait)
 
 static int SimpleVolumeSet(audio_output_t *aout, float vol)
 {
+    aout_sys_t *sys = aout->sys;
     ISimpleAudioVolume *simple;
     HRESULT hr;
 
     if (TryEnter(aout))
         return -1;
-    hr = IAudioClient_GetService(aout->sys->client, &IID_ISimpleAudioVolume,
+    hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume,
                                  (void **)&simple);
     if (SUCCEEDED(hr))
     {
@@ -286,19 +312,22 @@ static int SimpleVolumeSet(audio_output_t *aout, float vol)
     if (FAILED(hr))
     {
         msg_Err(aout, "cannot set volume (error 0x%lx)", hr);
+        sys->volume_hack = vol;
         return -1;
     }
+    sys->volume_hack = -1.f;
     return 0;
 }
 
 static int SimpleMuteSet(audio_output_t *aout, bool mute)
 {
+    aout_sys_t *sys = aout->sys;
     ISimpleAudioVolume *simple;
     HRESULT hr;
 
     if (TryEnter(aout))
         return -1;
-    hr = IAudioClient_GetService(aout->sys->client, &IID_ISimpleAudioVolume,
+    hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume,
                                  (void **)&simple);
     if (SUCCEEDED(hr))
     {
@@ -310,8 +339,10 @@ static int SimpleMuteSet(audio_output_t *aout, bool mute)
     if (FAILED(hr))
     {
         msg_Err(aout, "cannot set mute (error 0x%lx)", hr);
+        sys->mute_hack = mute;
         return -1;
     }
+    sys->mute_hack = -1;
     return 0;
 }
 
@@ -896,6 +927,9 @@ static int Open(vlc_object_t *obj)
     sys->it = pv;
     GetDevices(obj, sys->it);
     Leave();
+
+    sys->volume_hack = -1.f;
+    sys->mute_hack = -1;
 
     aout->sys = sys;
     aout->start = Start;
