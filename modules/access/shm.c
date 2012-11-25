@@ -25,6 +25,7 @@
 #endif
 
 #include <stdarg.h>
+#include <math.h>
 #include <fcntl.h>
 #ifdef HAVE_SYS_SHM_H
 # include <sys/ipc.h>
@@ -128,7 +129,6 @@ struct demux_sys_t
         } mem;
     };
     es_out_id_t *es;
-    mtime_t      interval;
     vlc_timer_t  timer;
     void (*detach) (demux_sys_t *);
 };
@@ -211,8 +211,8 @@ static int Open (vlc_object_t *obj)
     if (rate <= 0.)
         goto error;
 
-    sys->interval = (float)CLOCK_FREQ / rate;
-    if (!sys->interval)
+    mtime_t interval = llroundf((float)CLOCK_FREQ / rate);
+    if (!interval)
         goto error;
 
     es_format_t fmt;
@@ -230,7 +230,7 @@ static int Open (vlc_object_t *obj)
     /* Initializes demux */
     if (vlc_timer_create (&sys->timer, Demux, demux))
         goto error;
-    vlc_timer_schedule (sys->timer, false, 1, sys->interval);
+    vlc_timer_schedule (sys->timer, false, 1, interval);
 
     demux->p_sys = sys;
     demux->pf_demux   = NULL;
@@ -267,8 +267,6 @@ static void no_detach (demux_sys_t *sys)
  */
 static int Control (demux_t *demux, int query, va_list args)
 {
-    demux_sys_t *sys = demux->p_sys;
-
     switch (query)
     {
         case DEMUX_GET_POSITION:
@@ -294,28 +292,17 @@ static int Control (demux_t *demux, int query, va_list args)
         }
 
         case DEMUX_CAN_PAUSE:
-        {
-            bool *v = (bool *)va_arg (args, bool *);
-            *v = true;
-            return VLC_SUCCESS;
-        }
-
-        case DEMUX_SET_PAUSE_STATE:
-        {
-            bool pausing = va_arg (args, int);
-
-            vlc_timer_schedule (sys->timer, false, !pausing, sys->interval);
-            return VLC_SUCCESS;
-        }
-
         case DEMUX_CAN_CONTROL_PACE:
         case DEMUX_CAN_CONTROL_RATE:
         case DEMUX_CAN_SEEK:
         {
-            bool *v = (bool *)va_arg (args, bool *);
+            bool *v = va_arg (args, bool *);
             *v = false;
             return VLC_SUCCESS;
         }
+
+        case DEMUX_SET_PAUSE_STATE:
+            return VLC_SUCCESS; /* should not happen */
     }
 
     return VLC_EGENERIC;

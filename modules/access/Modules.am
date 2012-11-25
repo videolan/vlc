@@ -121,7 +121,7 @@ endif
 
 libshm_plugin_la_SOURCES = shm.c
 libshm_plugin_la_CFLAGS = $(AM_CFLAGS)
-libshm_plugin_la_LIBADD = $(AM_LIBADD)
+libshm_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
 libvlc_LTLIBRARIES += libshm_plugin.la
 
 libv4l2_plugin_la_SOURCES = \
