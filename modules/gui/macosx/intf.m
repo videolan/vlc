@@ -1370,10 +1370,15 @@ static VLCMain *_o_sharedMainInstance = nil;
         int state = var_GetInteger(p_input, "state");
         if (state == PLAYING_S) {
             /* prevent the system from sleeping */
+            if (systemSleepAssertionID > 0) {
+                msg_Dbg(VLCIntf, "releasing old sleep blocker (%i)" , systemSleepAssertionID);
+                IOPMAssertionRelease(systemSleepAssertionID);
+            }
+
             IOReturn success;
             /* work-around a bug in 10.7.4 and 10.7.5, so check for 10.7.x < 10.7.4, 10.8 and 10.6 */
             if ((NSAppKitVersionNumber >= 1115.2 && NSAppKitVersionNumber < 1138.45) || OSX_MOUNTAIN_LION || OSX_SNOW_LEOPARD) {
-                CFStringRef reasonForActivity= CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
+                CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
                 if ([self activeVideoPlayback])
                     success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
                 else
@@ -1401,8 +1406,10 @@ static VLCMain *_o_sharedMainInstance = nil;
             [o_mainwindow setPlay];
 
             /* allow the system to sleep again */
-            msg_Dbg(VLCIntf, "releasing sleep blocker (%i)" , systemSleepAssertionID);
-            IOPMAssertionRelease(systemSleepAssertionID);
+            if (systemSleepAssertionID > 0) {
+                msg_Dbg(VLCIntf, "releasing sleep blocker (%i)" , systemSleepAssertionID);
+                IOPMAssertionRelease(systemSleepAssertionID);
+            }
         }
         vlc_object_release(p_input);
     }
@@ -1463,6 +1470,9 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_mainwindow performSelectorOnMainThread:@selector(setVideoplayEnabled) withObject:nil waitUntilDone:YES];
         [o_mainwindow performSelectorOnMainThread:@selector(togglePlaylist:) withObject:nil waitUntilDone:NO];
     }
+
+    // update sleep blockers
+    [self performSelectorOnMainThread:@selector(playbackStatusUpdated) withObject:nil waitUntilDone:NO];
 }
 
 #pragma mark -
