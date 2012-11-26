@@ -145,7 +145,6 @@ static void DispatchDBusMessages( intf_thread_t *p_intf );
 vlc_module_begin ()
     set_shortname( N_("DBus"))
     set_category( CAT_INTERFACE )
-    set_subcategory( SUBCAT_INTERFACE_CONTROL )
     set_description( N_("D-Bus control interface") )
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )
