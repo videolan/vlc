@@ -56,9 +56,6 @@
  * Input thread configuration
  *****************************************************************************/
 
-#define DEFAULT_INPUT_ACTIVITY 1
-#define TRANSCODE_ACTIVITY 10
-
 /* Used in ErrorThread */
 #define INPUT_IDLE_SLEEP                (CLOCK_FREQ/10)
 
