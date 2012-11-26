@@ -466,7 +466,7 @@ static int LoopInput( playlist_t *p_playlist )
         /* We can unlock as we return VLC_EGENERIC (no event will be lost) */
 
         /* input_resource_t must be manipulated without playlist lock */
-        if( !var_CreateGetBool( p_input, "sout-keep" ) )
+        if( !var_InheritBool( p_input, "sout-keep" ) )
             input_resource_TerminateSout( p_sys->p_input_resource );
 
         /* The DelCallback must be issued without playlist lock */
