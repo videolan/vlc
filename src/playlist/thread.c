@@ -255,14 +255,10 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     /* TODO store art policy in playlist private data */
     if( var_GetInteger( p_playlist, "album-art" ) == ALBUM_ART_WHEN_PLAYED )
     {
-        bool b_has_art;
-
-        char *psz_arturl, *psz_name;
-        psz_arturl = input_item_GetArtURL( p_input );
-        psz_name = input_item_GetName( p_input );
-
+        char *psz_arturl = input_item_GetArtURL( p_input );
+        char *psz_name = input_item_GetName( p_input );
         /* p_input->p_meta should not be null after a successful CreateThread */
-        b_has_art = !EMPTY_STR( psz_arturl );
+        bool b_has_art = !EMPTY_STR( psz_arturl );
 
         if( !b_has_art || strncmp( psz_arturl, "attachment://", 13 ) )
         {
