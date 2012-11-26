@@ -314,6 +314,7 @@ void playlist_Destroy( playlist_t *p_playlist )
 
     msg_Dbg( p_playlist, "destroying" );
 
+    playlist_Deactivate( p_playlist );
     if( p_sys->p_preparser )
         playlist_preparser_Delete( p_sys->p_preparser );
     if( p_sys->p_fetcher )

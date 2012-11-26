@@ -60,18 +60,6 @@ playlist_t *pl_Get (vlc_object_t *obj)
     return pl;
 }
 
-void pl_Deactivate (libvlc_int_t *p_libvlc)
-{
-    bool deactivate;
-
-    vlc_mutex_lock (&global_lock);
-    deactivate = libvlc_priv (p_libvlc)->playlist_active;
-    vlc_mutex_unlock (&global_lock);
-
-    if (deactivate)
-        playlist_Deactivate (libvlc_priv (p_libvlc)->p_playlist);
-}
-
 void playlist_Lock( playlist_t *pl )
 {
     vlc_mutex_lock( &pl_priv(pl)->lock );

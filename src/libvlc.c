@@ -599,10 +599,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     libvlc_priv_t *priv = libvlc_priv (p_libvlc);
     playlist_t    *p_playlist = libvlc_priv (p_libvlc)->p_playlist;
 
-    /* Deactivate the playlist */
-    msg_Dbg( p_libvlc, "deactivating the playlist" );
-    pl_Deactivate( p_libvlc );
-
     /* Remove all services discovery */
     msg_Dbg( p_libvlc, "removing all services discovery tasks" );
     playlist_ServicesDiscoveryKillAll( p_playlist );
