@@ -128,14 +128,6 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-static void UpdateActivity( playlist_t *p_playlist, int i_delta )
-{
-    PL_ASSERT_LOCKED;
-
-    const int i_activity = var_GetInteger( p_playlist, "activity" ) ;
-    var_SetInteger( p_playlist, "activity", i_activity + i_delta );
-}
-
 /**
  * Synchronise the current index of the playlist
  * to match the index of the current item.
@@ -233,7 +225,7 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 
     p_sys->status.i_status = PLAYLIST_RUNNING;
 
-    UpdateActivity( p_playlist, DEFAULT_INPUT_ACTIVITY );
+    var_TriggerCallback( p_playlist, "activity" );
 
     assert( p_sys->p_input == NULL );
 
@@ -485,7 +477,7 @@ static int LoopInput( playlist_t *p_playlist )
         p_sys->p_input = NULL;
         input_Close( p_input );
 
-        UpdateActivity( p_playlist, -DEFAULT_INPUT_ACTIVITY );
+        var_TriggerCallback( p_playlist, "activity" );
 
         return VLC_EGENERIC;
     }
