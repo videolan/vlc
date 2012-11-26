@@ -121,7 +121,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* */
-    var_AddCallback( pl_Get( p_intf ), "item-current", ItemChange, p_intf );
+    var_AddCallback( pl_Get( p_intf ), "activity", ItemChange, p_intf );
 
     return VLC_SUCCESS;
 }
@@ -134,7 +134,7 @@ static void Close( vlc_object_t *p_this )
     intf_thread_t   *p_intf = ( intf_thread_t* ) p_this;
     intf_sys_t      *p_sys  = p_intf->p_sys;
 
-    var_DelCallback( pl_Get( p_this ), "item-current", ItemChange, p_this );
+    var_DelCallback( pl_Get( p_this ), "activity", ItemChange, p_this );
 
     if( p_sys->notification )
     {

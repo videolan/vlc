@@ -157,7 +157,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "volume" )
     ADD_CALLBACK( pIntf->p_libvlc, "intf-toggle-fscontrol" )
 
-    ADD_CALLBACK( pIntf->p_sys->p_playlist, "item-current" )
+    ADD_CALLBACK( pIntf->p_sys->p_playlist, "activity" )
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "random" )
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "loop" )
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "repeat" )
@@ -205,7 +205,7 @@ VlcProc::~VlcProc()
     var_DelCallback( getIntf()->p_libvlc, "intf-toggle-fscontrol",
                      onGenericCallback, this );
 
-    var_DelCallback( getIntf()->p_sys->p_playlist, "item-current",
+    var_DelCallback( getIntf()->p_sys->p_playlist, "activity",
                      onGenericCallback, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "random",
                      onGenericCallback, this );
@@ -367,7 +367,7 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
     } \
     }
 
-    ADD_CALLBACK_ENTRY( "item-current", on_item_current_changed, false )
+    ADD_CALLBACK_ENTRY( "activity", on_item_current_changed, false )
     ADD_CALLBACK_ENTRY( "volume", on_volume_changed, true )
 
     ADD_CALLBACK_ENTRY( "bit-rate", on_bit_rate_changed, false )

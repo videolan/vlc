@@ -107,12 +107,12 @@ int watch_Init( media_library_t *p_ml )
 
     /* Wait on playlist events
      * playlist-item-append -> entry to playlist
-     * item-current -> to ensure that we catch played item only!
+     * activity -> to ensure that we catch played item only!
      * playlist-item-deleted -> exit from playlist
      * item-change -> Currently not required, as we monitor input_item events
      */
     playlist_t *p_pl = pl_Get( p_ml );
-    var_AddCallback( p_pl, "item-current", watch_PlaylistItemCurrent, p_ml );
+    var_AddCallback( p_pl, "activity", watch_PlaylistItemCurrent, p_ml );
     var_AddCallback( p_pl, "playlist-item-append", watch_PlaylistItemAppend, p_ml );
     var_AddCallback( p_pl, "playlist-item-deleted", watch_PlaylistItemDeleted, p_ml );
 
@@ -169,7 +169,7 @@ void watch_Close( media_library_t *p_ml )
     playlist_t *p_pl = pl_Get( p_ml );
     var_DelCallback( p_pl, "playlist-item-deleted", watch_PlaylistItemDeleted, p_ml );
     var_DelCallback( p_pl, "playlist-item-append", watch_PlaylistItemAppend, p_ml );
-    var_DelCallback( p_pl, "item-current", watch_PlaylistItemCurrent, p_ml );
+    var_DelCallback( p_pl, "activity", watch_PlaylistItemCurrent, p_ml );
 
     /* Flush item list */
     il_foreachhashlist( p_ml->p_sys->p_watch->p_hlist, p_elt, ixx )
@@ -385,10 +385,6 @@ static int watch_PlaylistItemCurrent( vlc_object_t *p_this, char const *psz_var,
     (void)newval;
     media_library_t *p_ml = ( media_library_t* ) data;
     input_item_t *p_item = NULL;
-
-    if( strcmp( psz_var, "item-current" ) != 0 )
-        /* This case should not happen... */
-        return VLC_EGENERIC;
 
     /* Get current input */
     input_thread_t *p_input = pl_CurrentInput( p_ml );
