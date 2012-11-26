@@ -265,6 +265,7 @@ VLC_API playlist_t * pl_Get( vlc_object_t * ) VLC_USED;
 VLC_API void playlist_Lock( playlist_t * );
 VLC_API void playlist_Unlock( playlist_t * );
 VLC_API void playlist_AssertLocked( playlist_t * );
+VLC_API void playlist_Deactivate( playlist_t * );
 
 /**
  * Do a playlist action.

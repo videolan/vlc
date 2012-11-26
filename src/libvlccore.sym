@@ -324,6 +324,7 @@ playlist_Clear
 playlist_Control
 playlist_CurrentInput
 playlist_CurrentPlayingItem
+playlist_Deactivate
 playlist_DeleteFromInput
 playlist_Export
 playlist_GetNextLeaf

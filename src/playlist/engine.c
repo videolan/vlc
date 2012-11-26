@@ -313,13 +313,25 @@ void playlist_Destroy( playlist_t *p_playlist )
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
     msg_Dbg( p_playlist, "destroying" );
+
     if( p_sys->p_preparser )
         playlist_preparser_Delete( p_sys->p_preparser );
     if( p_sys->p_fetcher )
         playlist_fetcher_Delete( p_sys->p_fetcher );
 
-    /* Already cleared when deactivating (if activated anyway) */
-    assert( !p_sys->p_input );
+    /* Release input resources */
+    assert( p_sys->p_input == NULL );
+    input_resource_Release( p_sys->p_input_resource );
+
+    if( p_playlist->p_media_library != NULL )
+        playlist_MLDump( p_playlist );
+
+    PL_LOCK;
+    /* Release the current node */
+    set_current_status_node( p_playlist, NULL );
+    /* Release the current item */
+    set_current_status_item( p_playlist, NULL );
+    PL_UNLOCK;
 
     vlc_cond_destroy( &p_sys->signal );
     vlc_mutex_destroy( &p_sys->lock );

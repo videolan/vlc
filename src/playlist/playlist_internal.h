@@ -104,7 +104,6 @@ void playlist_Destroy( playlist_t * );
 
 /* */
 void playlist_Activate( playlist_t * );
-void playlist_Deactivate( playlist_t * );
 void pl_Deactivate (libvlc_int_t *);
 
 /* */

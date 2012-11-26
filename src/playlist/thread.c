@@ -71,38 +71,35 @@ void playlist_Activate( playlist_t *p_playlist )
     msg_Dbg( p_playlist, "playlist threads correctly activated" );
 }
 
+/**
+ * Stops the playlist forever (but do not destroy it yet).
+ * Any input is stopped.
+ * \return Nothing but waits for the playlist to be deactivated.
+ */
 void playlist_Deactivate( playlist_t *p_playlist )
 {
-    /* */
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
-    msg_Dbg( p_playlist, "deactivating the playlist" );
+    if( p_sys->p_input_resource == NULL )
+        return; /* playlist was never activated... */
 
     PL_LOCK;
+    /* WARNING: There is a latent bug. It is assumed that only one thread will
+     * be waiting for playlist deactivation at a time. So far, that works
+     * as playlist_Deactivate() is only ever called while closing an
+     * interface and interfaces are shut down serially by intf_DestroyAll(). */
+    if( p_sys->killed )
+    {
+        PL_UNLOCK;
+        return;
+    }
+
+    msg_Dbg( p_playlist, "deactivating the playlist" );
     p_sys->killed = true;
     vlc_cond_signal( &p_sys->signal );
     PL_UNLOCK;
 
     vlc_join( p_sys->thread, NULL );
-    assert( !p_sys->p_input );
-
-    /* release input resources */
-    input_resource_Release( p_sys->p_input_resource );
-
-    if( var_InheritBool( p_playlist, "media-library" ) )
-        playlist_MLDump( p_playlist );
-
-    PL_LOCK;
-
-    /* Release the current node */
-    set_current_status_node( p_playlist, NULL );
-
-    /* Release the current item */
-    set_current_status_item( p_playlist, NULL );
-
-    PL_UNLOCK;
-
-    msg_Dbg( p_playlist, "playlist correctly deactivated" );
 }
 
 /* */
