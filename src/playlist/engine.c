@@ -304,6 +304,16 @@ static playlist_t *playlist_Create( vlc_object_t *p_parent )
     /* Thread */
     playlist_Activate (p_playlist);
 
+    /* Add service discovery modules */
+    char *mods = var_InheritString( p_playlist, "services-discovery" );
+    if( mods != NULL )
+    {
+        char *p = mods, *m;
+        while( (m = strsep( &p, " :," )) != NULL )
+            playlist_ServicesDiscoveryAdd( p_playlist, m );
+        free( mods );
+    }
+
     return p_playlist;
 }
 
@@ -317,6 +327,9 @@ static playlist_t *playlist_Create( vlc_object_t *p_parent )
 void playlist_Destroy( playlist_t *p_playlist )
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
+
+    /* Remove all services discovery */
+    playlist_ServicesDiscoveryKillAll( p_playlist );
 
     msg_Dbg( p_playlist, "destroying" );
 

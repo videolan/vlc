@@ -452,16 +452,6 @@ dbus_out:
     }
 #endif
 
-    /* Add service discovery modules */
-    psz_modules = var_InheritString( p_libvlc, "services-discovery" );
-    if( psz_modules )
-    {
-        char *p = psz_modules, *m;
-        while( ( m = strsep( &p, " :," ) ) != NULL )
-            playlist_ServicesDiscoveryAdd( pl_Get(p_libvlc), m );
-        free( psz_modules );
-    }
-
 #ifdef ENABLE_VLM
     /* Initialize VLM if vlm-conf is specified */
     psz_parser = var_CreateGetNonEmptyString( p_libvlc, "vlm-conf" );
@@ -587,14 +577,6 @@ dbus_out:
 void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 {
     libvlc_priv_t *priv = libvlc_priv (p_libvlc);
-    playlist_t    *p_playlist = libvlc_priv (p_libvlc)->p_playlist;
-
-    /* Remove all services discovery */
-    if( p_playlist != NULL )
-    {
-        msg_Dbg( p_libvlc, "removing all services discovery tasks" );
-        playlist_ServicesDiscoveryKillAll( p_playlist );
-    }
 
     /* Ask the interfaces to stop and destroy them */
     msg_Dbg( p_libvlc, "removing all interfaces" );
@@ -620,6 +602,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 #endif
 
     /* Free playlist now, all threads are gone */
+    playlist_t *p_playlist = libvlc_priv (p_libvlc)->p_playlist;
     if( p_playlist != NULL )
         playlist_Destroy( p_playlist );
 
