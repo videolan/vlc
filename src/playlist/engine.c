@@ -271,8 +271,6 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
             p_playlist, _( "Media Library" ), p_playlist->p_root,
             PLAYLIST_END, PLAYLIST_RO_FLAG, NULL );
         PL_UNLOCK;
-
-        if(!p_playlist->p_media_library ) return NULL;
     }
     else
     {
