@@ -87,7 +87,6 @@ void playlist_Deactivate( playlist_t *p_playlist )
     assert( !p_sys->p_input );
 
     /* release input resources */
-    input_resource_Terminate( p_sys->p_input_resource );
     input_resource_Release( p_sys->p_input_resource );
 
     if( var_InheritBool( p_playlist, "media-library" ) )
@@ -443,13 +442,12 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
     return p_new;
 }
 
-static int LoopInput( playlist_t *p_playlist )
+static void LoopInput( playlist_t *p_playlist )
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
     input_thread_t *p_input = p_sys->p_input;
 
-    if( !p_input )
-        return VLC_EGENERIC;
+    assert( p_input != NULL );
 
     if( ( p_sys->request.b_request || p_sys->killed ) && vlc_object_alive(p_input) )
     {
@@ -460,26 +458,20 @@ static int LoopInput( playlist_t *p_playlist )
     /* This input is dead. Remove it ! */
     if( p_input->b_dead )
     {
+        p_sys->p_input = NULL;
         PL_DEBUG( "dead input" );
-
         PL_UNLOCK;
-        /* We can unlock as we return VLC_EGENERIC (no event will be lost) */
 
-        /* input_resource_t must be manipulated without playlist lock */
+        /* WARNING: Input resource manipulation and callback deletion are
+         * incompatible with the playlist lock. */
         if( !var_InheritBool( p_input, "sout-keep" ) )
             input_resource_TerminateSout( p_sys->p_input_resource );
-
-        /* The DelCallback must be issued without playlist lock */
         var_DelCallback( p_input, "intf-event", InputEvent, p_playlist );
 
-        PL_LOCK;
-
-        p_sys->p_input = NULL;
         input_Close( p_input );
-
+        PL_LOCK;
         var_TriggerCallback( p_playlist, "activity" );
-
-        return VLC_EGENERIC;
+        return;
     }
     /* This input is dying, let it do */
     else if( !vlc_object_alive(p_input) )
@@ -492,7 +484,8 @@ static int LoopInput( playlist_t *p_playlist )
         PL_DEBUG( "finished input" );
         input_Stop( p_input, false );
     }
-    return VLC_SUCCESS;
+
+    vlc_cond_wait( &p_sys->signal, &p_sys->lock );
 }
 
 static void LoopRequest( playlist_t *p_playlist )
@@ -509,26 +502,10 @@ static void LoopRequest( playlist_t *p_playlist )
     const int i_status = p_sys->request.b_request ?
                          p_sys->request.i_status : p_sys->status.i_status;
 
-    if( i_status == PLAYLIST_STOPPED || p_sys->killed )
+    if( i_status == PLAYLIST_STOPPED )
     {
         p_sys->status.i_status = PLAYLIST_STOPPED;
-
-        if( input_resource_HasVout( p_sys->p_input_resource ) )
-        {
-            /* XXX We can unlock if we don't issue the wait as we will be
-             * call again without anything else done between the calls */
-            PL_UNLOCK;
-
-            /* input_resource_t must be manipulated without playlist lock */
-            input_resource_TerminateVout( p_sys->p_input_resource );
-
-            PL_LOCK;
-        }
-        else
-        {
-            if( !p_sys->killed )
-                vlc_cond_wait( &p_sys->signal, &p_sys->lock );
-        }
+        vlc_cond_wait( &p_sys->signal, &p_sys->lock );
         return;
     }
 
@@ -560,20 +537,29 @@ static void *Thread ( void *data )
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
     playlist_Lock( p_playlist );
-    while( !p_sys->killed || p_sys->p_input )
+    for( ;; )
     {
-        if( p_sys->b_reset_currently_playing )
-            ResetCurrentlyPlaying( p_playlist,
-                                   get_current_status_item( p_playlist ) );
+        while( p_sys->p_input != NULL )
+            LoopInput( p_playlist );
 
-        /* If there is an input, check that it doesn't need to die. */
-        while( !LoopInput( p_playlist ) )
-            vlc_cond_wait( &p_sys->signal, &p_sys->lock );
+        if( p_sys->killed )
+            break; /* THE END */
+
+        /* Destroy any video display if the playlist is stopped */
+        if( p_sys->status.i_status == PLAYLIST_STOPPED
+         && input_resource_HasVout( p_sys->p_input_resource ) )
+        {
+            PL_UNLOCK; /* Mind: NO LOCKS while manipulating input resources! */
+            input_resource_TerminateVout( p_sys->p_input_resource );
+            PL_LOCK;
+            continue; /* lost lock = lost state */
+        }
 
         LoopRequest( p_playlist );
     }
+    p_sys->status.i_status = PLAYLIST_STOPPED;
     playlist_Unlock( p_playlist );
 
+    input_resource_Terminate( p_sys->p_input_resource );
     return NULL;
 }
-
