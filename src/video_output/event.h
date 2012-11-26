@@ -22,7 +22,6 @@
  *****************************************************************************/
 
 #include <vlc_common.h>
-#include <vlc_playlist.h>
 #include <math.h>
 
 #include "vout_control.h"
@@ -40,12 +39,9 @@
 
 static inline void vout_SendEventClose(vout_thread_t *vout)
 {
-    /* Ask to stop
-     * FIXME works only for input handled by the playlist
-     */
-#warning FIXME: remove pl_Get
-    playlist_t *playlist = pl_Get(vout);
-    playlist_Stop(playlist);
+#warning FIXME: implement video close event
+    /* FIXME: this code is disabled as it breaks the non-playlist cases */
+    //playlist_Stop(pl_Get(vout));
 }
 static inline void vout_SendEventKey(vout_thread_t *vout, int key)
 {
