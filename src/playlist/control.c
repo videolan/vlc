@@ -39,27 +39,6 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
  * Playlist control
  *****************************************************************************/
 
-static vlc_mutex_t global_lock = VLC_STATIC_MUTEX;
-
-#undef pl_Get
-playlist_t *pl_Get (vlc_object_t *obj)
-{
-    playlist_t *pl;
-    libvlc_int_t *p_libvlc = obj->p_libvlc;
-
-    vlc_mutex_lock (&global_lock);
-    pl = libvlc_priv (p_libvlc)->p_playlist;
-    assert (pl != NULL);
-
-    if (!libvlc_priv (p_libvlc)->playlist_active)
-    {
-         playlist_Activate (pl);
-         libvlc_priv (p_libvlc)->playlist_active = true;
-    }
-    vlc_mutex_unlock (&global_lock);
-    return pl;
-}
-
 void playlist_Lock( playlist_t *pl )
 {
     vlc_mutex_lock( &pl_priv(pl)->lock );

@@ -357,6 +357,26 @@ void playlist_Destroy( playlist_t *p_playlist )
     vlc_object_release( p_playlist );
 }
 
+#undef pl_Get
+playlist_t *pl_Get (vlc_object_t *obj)
+{
+    static vlc_mutex_t lock = VLC_STATIC_MUTEX;
+    libvlc_int_t *p_libvlc = obj->p_libvlc;
+    playlist_t *pl;
+
+    vlc_mutex_lock (&lock);
+    pl = libvlc_priv (p_libvlc)->p_playlist;
+    assert (pl != NULL);
+
+    if (!libvlc_priv (p_libvlc)->playlist_active)
+    {
+         playlist_Activate (pl);
+         libvlc_priv (p_libvlc)->playlist_active = true;
+    }
+    vlc_mutex_unlock (&lock);
+    return pl;
+}
+
 /** Get current playing input.
  */
 input_thread_t * playlist_CurrentInput( playlist_t * p_playlist )
