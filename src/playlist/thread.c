@@ -479,7 +479,7 @@ static void LoopInput( playlist_t *p_playlist )
     vlc_cond_wait( &p_sys->signal, &p_sys->lock );
 }
 
-static void LoopRequest( playlist_t *p_playlist )
+static void LoopRequest( playlist_t *p_playlist, int i_status )
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
     assert( !p_sys->p_input );
@@ -490,9 +490,6 @@ static void LoopRequest( playlist_t *p_playlist )
      *  - Request, running requested -> start new item
      *  - Request, stopped requested -> collect garbage
     */
-    const int i_status = p_sys->request.b_request ?
-                         p_sys->request.i_status : p_sys->status.i_status;
-
     if( i_status == PLAYLIST_STOPPED )
     {
         p_sys->status.i_status = PLAYLIST_STOPPED;
@@ -536,8 +533,11 @@ static void *Thread ( void *data )
         if( p_sys->killed )
             break; /* THE END */
 
-        /* Destroy any video display if the playlist is stopped */
-        if( p_sys->status.i_status == PLAYLIST_STOPPED
+        const int status = p_sys->request.b_request ?
+                           p_sys->request.i_status : p_sys->status.i_status;
+
+        /* Destroy any video display if the playlist is supposed to stop */
+        if( status == PLAYLIST_STOPPED
          && input_resource_HasVout( p_sys->p_input_resource ) )
         {
             PL_UNLOCK; /* Mind: NO LOCKS while manipulating input resources! */
@@ -546,7 +546,7 @@ static void *Thread ( void *data )
             continue; /* lost lock = lost state */
         }
 
-        LoopRequest( p_playlist );
+        LoopRequest( p_playlist, status );
     }
     p_sys->status.i_status = PLAYLIST_STOPPED;
     playlist_Unlock( p_playlist );
