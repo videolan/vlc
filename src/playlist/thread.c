@@ -224,8 +224,6 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 
     p_sys->status.i_status = PLAYLIST_RUNNING;
 
-    var_TriggerCallback( p_playlist, "activity" );
-
     assert( p_sys->p_input == NULL );
 
     input_thread_t *p_input_thread = input_Create( p_playlist, p_input, NULL, p_sys->p_input_resource );
@@ -243,17 +241,19 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
         }
     }
 
-    char *psz_uri = input_item_GetURI( p_item->p_input );
-    if( psz_uri && ( !strncmp( psz_uri, "directory:", 10 ) ||
-                     !strncmp( psz_uri, "vlc:", 4 ) ) )
+    bool b_find_art = var_GetInteger( p_playlist, "album-art" )
+                                                      == ALBUM_ART_WHEN_PLAYED;
+    if( b_find_art )
     {
+        char *psz_uri = input_item_GetURI( p_item->p_input );
+        if( psz_uri != NULL && (!strncmp( psz_uri, "directory:", 10 ) ||
+                                !strncmp( psz_uri, "vlc:", 4 )) )
+            b_find_art = false;
         free( psz_uri );
-        return VLC_SUCCESS;
     }
-    free( psz_uri );
 
     /* TODO store art policy in playlist private data */
-    if( var_GetInteger( p_playlist, "album-art" ) == ALBUM_ART_WHEN_PLAYED )
+    if( b_find_art )
     {
         char *psz_arturl = input_item_GetArtURL( p_input );
         char *psz_name = input_item_GetName( p_input );
@@ -271,6 +271,7 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     /* FIXME: this is not safe !!*/
     PL_UNLOCK;
     var_SetAddress( p_playlist, "item-current", p_input );
+    var_TriggerCallback( p_playlist, "activity" );
     PL_LOCK;
 
     return VLC_SUCCESS;
@@ -465,8 +466,8 @@ static void LoopInput( playlist_t *p_playlist )
         var_DelCallback( p_input, "intf-event", InputEvent, p_playlist );
 
         input_Close( p_input );
-        PL_LOCK;
         var_TriggerCallback( p_playlist, "activity" );
+        PL_LOCK;
         return;
     }
     /* This input is dying, let it do */
