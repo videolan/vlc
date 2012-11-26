@@ -446,12 +446,13 @@ static void LoopInput( playlist_t *p_playlist )
 
     assert( p_input != NULL );
 
-    if( ( p_sys->request.b_request || p_sys->killed ) && vlc_object_alive(p_input) )
+    if( p_sys->request.b_request || p_sys->killed )
     {
         PL_DEBUG( "incoming request - stopping current input" );
         input_Stop( p_input, true );
     }
 
+#warning Unsynchronized access to *p_input flags...
     /* This input is dead. Remove it ! */
     if( p_input->b_dead )
     {
@@ -469,11 +470,6 @@ static void LoopInput( playlist_t *p_playlist )
         var_TriggerCallback( p_playlist, "activity" );
         PL_LOCK;
         return;
-    }
-    /* This input is dying, let it do */
-    else if( !vlc_object_alive(p_input) )
-    {
-        PL_DEBUG( "dying input" );
     }
     /* This input has finished, ask it to die ! */
     else if( p_input->b_error || p_input->b_eof )
