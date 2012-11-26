@@ -153,6 +153,9 @@ static void Close( vlc_object_t *p_this )
 
     msg_Dbg( p_intf, "closing skins2 module" );
 
+    /* Terminate input to ensure that our window provider is released. */
+    playlist_Deactivate( p_intf->p_sys->p_playlist );
+
     vlc_mutex_lock( &skin_load.mutex );
     skin_load.intf = NULL;
     vlc_mutex_unlock( &skin_load.mutex);
