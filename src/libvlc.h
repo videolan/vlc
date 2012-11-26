@@ -141,8 +141,6 @@ typedef struct libvlc_priv_t
 {
     libvlc_int_t       public_data;
 
-    bool               playlist_active;
-
     /* Messages */
     signed char        i_verbose;   ///< info messages
     bool               b_color;     ///< color messages?

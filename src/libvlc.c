@@ -145,7 +145,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     char *       psz_modules = NULL;
     char *       psz_parser = NULL;
     char *       psz_control = NULL;
-    playlist_t  *p_playlist = NULL;
     char        *psz_val;
 
     /* System specific initialization code */
@@ -433,15 +432,6 @@ dbus_out:
     var_Create( p_libvlc, "user-agent", VLC_VAR_STRING );
     var_SetString( p_libvlc, "user-agent", "(LibVLC "VERSION")" );
 
-    /* Initialize playlist and get commandline files */
-    p_playlist = playlist_Create( VLC_OBJECT(p_libvlc) );
-    if( !p_playlist )
-    {
-        msg_Err( p_libvlc, "playlist initialization failed" );
-        module_EndBank (true);
-        return VLC_EGENERIC;
-    }
-
     /* System specific configuration */
     system_Configure( p_libvlc, i_argc - vlc_optind, ppsz_argv + vlc_optind );
 
@@ -468,7 +458,7 @@ dbus_out:
     {
         char *p = psz_modules, *m;
         while( ( m = strsep( &p, " :," ) ) != NULL )
-            playlist_ServicesDiscoveryAdd( p_playlist, m );
+            playlist_ServicesDiscoveryAdd( pl_Get(p_libvlc), m );
         free( psz_modules );
     }
 
@@ -582,7 +572,7 @@ dbus_out:
     psz_val = var_InheritString( p_libvlc, "open" );
     if ( psz_val != NULL )
     {
-        playlist_AddExt( p_playlist, psz_val, NULL, PLAYLIST_INSERT, 0,
+        playlist_AddExt( pl_Get(p_libvlc), psz_val, NULL, PLAYLIST_INSERT, 0,
                          -1, 0, NULL, 0, true, pl_Unlocked );
         free( psz_val );
     }
@@ -600,8 +590,11 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     playlist_t    *p_playlist = libvlc_priv (p_libvlc)->p_playlist;
 
     /* Remove all services discovery */
-    msg_Dbg( p_libvlc, "removing all services discovery tasks" );
-    playlist_ServicesDiscoveryKillAll( p_playlist );
+    if( p_playlist != NULL )
+    {
+        msg_Dbg( p_libvlc, "removing all services discovery tasks" );
+        playlist_ServicesDiscoveryKillAll( p_playlist );
+    }
 
     /* Ask the interfaces to stop and destroy them */
     msg_Dbg( p_libvlc, "removing all interfaces" );
@@ -627,7 +620,8 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 #endif
 
     /* Free playlist now, all threads are gone */
-    playlist_Destroy( p_playlist );
+    if( p_playlist != NULL )
+        playlist_Destroy( p_playlist );
 
     msg_Dbg( p_libvlc, "removing stats" );
 

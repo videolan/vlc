@@ -195,7 +195,7 @@ static int VideoSplitterCallback( vlc_object_t *p_this, char const *psz_cmd,
  * \param p_parent the vlc object that is to be the parent of this playlist
  * \return a pointer to the created playlist, or NULL on error
  */
-playlist_t * playlist_Create( vlc_object_t *p_parent )
+static playlist_t *playlist_Create( vlc_object_t *p_parent )
 {
     playlist_t *p_playlist;
     playlist_private_t *p;
@@ -208,8 +208,6 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     assert( offsetof( playlist_private_t, public_data ) == 0 );
     p_playlist = &p->public_data;
     TAB_INIT( pl_priv(p_playlist)->i_sds, pl_priv(p_playlist)->pp_sds );
-
-    libvlc_priv(p_parent->p_libvlc)->p_playlist = p_playlist;
 
     VariablesInit( p_playlist );
     vlc_mutex_init( &p->lock );
@@ -298,6 +296,14 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
         pl_priv(p_playlist)->b_auto_preparse = b_auto_preparse;
     }
 
+    /* Input resources */
+    p->p_input_resource = input_resource_New( VLC_OBJECT( p_playlist ) );
+    if( unlikely(p->p_input_resource == NULL) )
+        abort();
+
+    /* Thread */
+    playlist_Activate (p_playlist);
+
     return p_playlist;
 }
 
@@ -366,12 +372,12 @@ playlist_t *pl_Get (vlc_object_t *obj)
 
     vlc_mutex_lock (&lock);
     pl = libvlc_priv (p_libvlc)->p_playlist;
-    assert (pl != NULL);
-
-    if (!libvlc_priv (p_libvlc)->playlist_active)
+    if (unlikely(pl == NULL))
     {
-         playlist_Activate (pl);
-         libvlc_priv (p_libvlc)->playlist_active = true;
+        pl = playlist_Create (VLC_OBJECT(p_libvlc));
+        if (unlikely(pl == NULL))
+            abort();
+        libvlc_priv (p_libvlc)->p_playlist = pl;
     }
     vlc_mutex_unlock (&lock);
     return pl;

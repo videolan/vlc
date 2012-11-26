@@ -99,10 +99,7 @@ typedef struct playlist_private_t
  *****************************************************************************/
 
 /* Creation/Deletion */
-playlist_t *playlist_Create( vlc_object_t * );
 void playlist_Destroy( playlist_t * );
-
-/* */
 void playlist_Activate( playlist_t * );
 
 /* */

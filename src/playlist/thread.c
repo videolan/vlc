@@ -46,29 +46,18 @@ static void *Thread   ( void * );
  *****************************************************************************/
 
 /**
- * Create the main playlist threads.
- * Additionally to the playlist, this thread controls :
- *    - Statistics
- *    - VLM
- * \param p_parent
- * \return an object with a started thread
+ * Creates the main playlist thread.
  */
 void playlist_Activate( playlist_t *p_playlist )
 {
-    /* */
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
-    p_sys->p_input_resource = input_resource_New( VLC_OBJECT( p_playlist ) );
-    if( unlikely(p_sys->p_input_resource == NULL) )
-        abort();
-
-    /* Start the playlist thread */
     if( vlc_clone( &p_sys->thread, Thread, p_playlist,
                    VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_playlist, "cannot spawn playlist thread" );
+        abort();
     }
-    msg_Dbg( p_playlist, "playlist threads correctly activated" );
 }
 
 /**
@@ -79,9 +68,6 @@ void playlist_Activate( playlist_t *p_playlist )
 void playlist_Deactivate( playlist_t *p_playlist )
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
-
-    if( p_sys->p_input_resource == NULL )
-        return; /* playlist was never activated... */
 
     PL_LOCK;
     /* WARNING: There is a latent bug. It is assumed that only one thread will
