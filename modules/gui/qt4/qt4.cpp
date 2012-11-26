@@ -418,8 +418,11 @@ static void Close( vlc_object_t *p_this )
 
     if( !p_sys->b_isDialogProvider )
     {
-        var_Destroy (pl_Get(p_this), "window");
-        var_Destroy (pl_Get(p_this), "qt4-iface");
+        playlist_t *pl = pl_Get(p_this);
+
+        var_Destroy (pl, "window");
+        var_Destroy (pl, "qt4-iface");
+        playlist_Deactivate (pl); /* release window provider if needed */
     }
 
     /* And quit */
