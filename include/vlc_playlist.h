@@ -102,7 +102,6 @@ TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t)
  *
  * - "item-change": It will contain the input_item_t->i_id of a changed input
  * item monitored by the playlist.
- * - "item-current": It will contain a input_item_t->i_id of the current
  * item being played.
  *
  * - "playlist-item-append": It will contain a pointer to a playlist_add_t.

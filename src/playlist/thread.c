@@ -268,9 +268,7 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
         free( psz_arturl );
         free( psz_name );
     }
-    /* FIXME: this is not safe !!*/
     PL_UNLOCK;
-    var_SetAddress( p_playlist, "item-current", p_input );
     var_TriggerCallback( p_playlist, "activity" );
     PL_LOCK;
 

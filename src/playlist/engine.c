@@ -422,7 +422,6 @@ static void VariablesInit( playlist_t *p_playlist )
 
     var_Create( p_playlist, "playlist-item-append", VLC_VAR_ADDRESS );
 
-    var_Create( p_playlist, "item-current", VLC_VAR_ADDRESS );
     var_Create( p_playlist, "input-current", VLC_VAR_ADDRESS );
 
     var_Create( p_playlist, "activity", VLC_VAR_VOID );
