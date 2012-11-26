@@ -562,14 +562,9 @@ static void *Thread ( void *data )
     playlist_Lock( p_playlist );
     while( !p_sys->killed || p_sys->p_input )
     {
-        /* FIXME: what's that ! */
-        if( p_sys->b_reset_currently_playing &&
-            mdate() - p_sys->last_rebuild_date > 30000 ) // 30 ms
-        {
+        if( p_sys->b_reset_currently_playing )
             ResetCurrentlyPlaying( p_playlist,
                                    get_current_status_item( p_playlist ) );
-            p_sys->last_rebuild_date = mdate();
-        }
 
         /* If there is an input, check that it doesn't need to die. */
         while( !LoopInput( p_playlist ) )

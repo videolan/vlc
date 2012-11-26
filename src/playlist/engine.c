@@ -227,7 +227,6 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 
     p_playlist->i_current_index = 0;
     pl_priv(p_playlist)->b_reset_currently_playing = true;
-    pl_priv(p_playlist)->last_rebuild_date = 0;
 
     pl_priv(p_playlist)->b_tree = var_InheritBool( p_parent, "playlist-tree" );
 

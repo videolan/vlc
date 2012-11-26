@@ -90,8 +90,6 @@ typedef struct playlist_private_t
     bool     b_tree; /**< Display as a tree */
     bool     b_doing_ml; /**< Doing media library stuff  get quicker */
     bool     b_auto_preparse;
-    mtime_t  last_rebuild_date;
-
 } playlist_private_t;
 
 #define pl_priv( pl ) ((playlist_private_t *)(pl))
