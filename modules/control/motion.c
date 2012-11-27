@@ -30,6 +30,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <unistd.h>
 
 #include <vlc_common.h>
@@ -46,6 +47,7 @@
 struct intf_sys_t
 {
     motion_sensors_t *p_motion;
+    vlc_thread_t thread;
 };
 
 /*****************************************************************************
@@ -54,7 +56,7 @@ struct intf_sys_t
 static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
-static void RunIntf( intf_thread_t *p_intf );
+static void *RunIntf( void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -79,21 +81,26 @@ vlc_module_end ()
 int Open ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-
-    p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
-    if( p_intf->p_sys == NULL )
-    {
+    intf_sys_t *p_sys = malloc( sizeof( *p_sys ) );
+    if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
-    }
 
-    p_intf->p_sys->p_motion = motion_create( VLC_OBJECT( p_intf ) );
-    if( p_intf->p_sys->p_motion == NULL )
+    p_sys->p_motion = motion_create( VLC_OBJECT( p_intf ) );
+    if( p_sys->p_motion == NULL )
     {
-        free( p_intf->p_sys );
+error:
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
-    p_intf->pf_run = RunIntf;
+    p_intf->pf_run = NULL;
+    p_intf->p_sys = p_sys;
+
+    if( vlc_clone( &p_sys->thread, RunIntf, p_intf, VLC_THREAD_PRIORITY_LOW ) )
+    {
+        motion_destroy( p_sys->p_motion );
+        goto error;
+    }
 
     return VLC_SUCCESS;
 }
@@ -104,9 +111,12 @@ int Open ( vlc_object_t *p_this )
 void Close ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    intf_sys_t *p_sys = p_intf->p_sys;
 
-    motion_destroy( p_intf->p_sys->p_motion );
-    free( p_intf->p_sys );
+    vlc_cancel( p_sys->thread );
+    vlc_join( p_sys->thread, NULL );
+    motion_destroy( p_sys->p_motion );
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -114,8 +124,9 @@ void Close ( vlc_object_t *p_this )
  *****************************************************************************/
 #define LOW_THRESHOLD 800
 #define HIGH_THRESHOLD 1000
-static void RunIntf( intf_thread_t *p_intf )
+static void *RunIntf( void *data )
 {
+    intf_thread_t *p_intf = data;
     int i_oldx = 0;
 
     for( ;; )
@@ -179,7 +190,7 @@ static void RunIntf( intf_thread_t *p_intf )
 
         vlc_restorecancel( canc );
     }
+    assert(0);
 }
 #undef LOW_THRESHOLD
 #undef HIGH_THRESHOLD
-
