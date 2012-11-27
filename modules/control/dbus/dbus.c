@@ -104,7 +104,7 @@ enum
 
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
-static void Run     ( intf_thread_t * );
+static void *Run    ( void * );
 
 static int TrackChange( intf_thread_t * );
 static int AllCallback( vlc_object_t*, const char*, vlc_value_t, vlc_value_t, void* );
@@ -157,6 +157,7 @@ vlc_module_end ()
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t   *p_intf = (intf_thread_t*)p_this;
+#warning Leaks on error paths!
 
     /* initialisation of the connection */
     if( !dbus_threads_init_default() )
@@ -230,7 +231,7 @@ static int Open( vlc_object_t *p_this )
 
     dbus_connection_flush( p_conn );
 
-    p_intf->pf_run = Run;
+    p_intf->pf_run = NULL;
     p_intf->p_sys = p_sys;
     p_sys->p_conn = p_conn;
     p_sys->p_events = vlc_array_new();
@@ -257,28 +258,27 @@ static int Open( vlc_object_t *p_this )
                                                 remove_timeout,
                                                 timeout_toggled,
                                                 p_intf, NULL ) )
-    {
-        dbus_connection_unref( p_conn );
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
+        goto error;
 
     if( !dbus_connection_set_watch_functions( p_conn,
                                               add_watch,
                                               remove_watch,
                                               watch_toggled,
                                               p_intf, NULL ) )
-    {
-        dbus_connection_unref( p_conn );
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
+        goto error;
 
 /*     dbus_connection_set_wakeup_main_function( p_conn,
                                               wakeup_main_loop,
                                               p_intf, NULL); */
 
+    if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
+        goto error;
+
     return VLC_SUCCESS;
+error:
+    dbus_connection_unref( p_conn );
+    free( p_sys );
+    return VLC_ENOMEM;
 }
 
 /*****************************************************************************
@@ -290,6 +290,9 @@ static void Close   ( vlc_object_t *p_this )
     intf_thread_t   *p_intf     = (intf_thread_t*) p_this;
     intf_sys_t      *p_sys      = p_intf->p_sys;
     playlist_t      *p_playlist = p_sys->p_playlist;
+
+    vlc_cancel( p_sys->thread );
+    vlc_join( p_sys->thread, NULL );
 
     var_DelCallback( p_playlist, "activity", AllCallback, p_intf );
     var_DelCallback( p_playlist, "intf-change", AllCallback, p_intf );
@@ -771,8 +774,9 @@ MPRISEntryPoint ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this )
  * Run: main loop
  *****************************************************************************/
 
-static void Run          ( intf_thread_t *p_intf )
+static void *Run( void *data )
 {
+    intf_thread_t *p_intf = data;
     intf_sys_t    *p_sys = p_intf->p_sys;
     mtime_t        i_last_run = mdate();
 
@@ -862,6 +866,7 @@ static void Run          ( intf_thread_t *p_intf )
 
         vlc_restorecancel( canc );
     }
+    assert(0);
 }
 
 static void   wakeup_main_loop( void *p_data )

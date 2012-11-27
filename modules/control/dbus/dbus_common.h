@@ -100,6 +100,7 @@ struct intf_sys_t
     vlc_array_t    *p_watches;
     int             p_pipe_fds[2];
     vlc_mutex_t     lock;
+    vlc_thread_t    thread;
     input_thread_t *p_input;
 
     mtime_t         i_last_input_pos; /* Only access from input thread */
