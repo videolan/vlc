@@ -123,7 +123,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_intf->p_sys = p_sys;
-    p_intf->pf_run = NULL;
 
     p_sys->p_last_vout = NULL;
     p_intf->p_sys->i_mousewheel_mode =

@@ -97,8 +97,6 @@ static int Open( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_intf->pf_run = NULL;
-
     p_sys->i_fd = lirc_init( "vlc", 1 );
     if( p_sys->i_fd == -1 )
     {

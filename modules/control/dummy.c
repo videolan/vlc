@@ -70,7 +70,5 @@ static int Open( vlc_object_t *p_this )
 
     msg_Info( p_intf, "using the dummy interface module..." );
 
-    p_intf->pf_run = NULL;
-
     return VLC_SUCCESS;
 }

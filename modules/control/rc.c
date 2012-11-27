@@ -330,8 +330,6 @@ static int Activate( vlc_object_t *p_this )
     /* Non-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
 
-    p_intf->pf_run = NULL;
-
 #ifdef WIN32
     p_intf->p_sys->b_quiet = var_InheritBool( p_intf, "rc-quiet" );
     if( !p_intf->p_sys->b_quiet )

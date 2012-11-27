@@ -231,7 +231,6 @@ static int Open( vlc_object_t *p_this )
 
     dbus_connection_flush( p_conn );
 
-    p_intf->pf_run = NULL;
     p_intf->p_sys = p_sys;
     p_sys->p_conn = p_conn;
     p_sys->p_events = vlc_array_new();

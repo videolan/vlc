@@ -1827,7 +1827,6 @@ static int Open(vlc_object_t *p_this)
     if (vlc_clone(&sys->thread, Run, intf, VLC_THREAD_PRIORITY_LOW))
         abort(); /* TODO */
 
-    intf->pf_run = NULL;
     return VLC_SUCCESS;
 }
 

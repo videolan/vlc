@@ -93,7 +93,6 @@ error:
         return VLC_EGENERIC;
     }
 
-    p_intf->pf_run = NULL;
     p_intf->p_sys = p_sys;
 
     if( vlc_clone( &p_sys->thread, RunIntf, p_intf, VLC_THREAD_PRIORITY_LOW ) )

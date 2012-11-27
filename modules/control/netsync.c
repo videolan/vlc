@@ -127,7 +127,6 @@ static int Open(vlc_object_t *object)
         return VLC_EGENERIC;
     }
 
-    intf->pf_run = NULL;
     intf->p_sys = sys = malloc(sizeof(*sys));
     if (!sys) {
         net_Close(fd);

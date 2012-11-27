@@ -430,8 +430,6 @@ static int Open(vlc_object_t *p_this)
 
     var_AddCallback(pl_Get(p_intf), "activity", ItemChange, p_intf);
 
-    p_intf->pf_run = NULL;
-
     return VLC_SUCCESS;
 }
 

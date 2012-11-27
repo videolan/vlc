@@ -111,7 +111,6 @@ static int Activate( vlc_object_t *p_this )
     if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 
-    p_intf->pf_run = NULL;
     p_intf->p_sys = p_sys;
 
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )

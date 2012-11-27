@@ -52,15 +52,12 @@ typedef struct intf_thread_t
     VLC_COMMON_MEMBERS
 
     struct intf_thread_t *p_next; /** LibVLC interfaces book keeping */
-    vlc_thread_t thread; /** LibVLC thread */
-    /* Thread properties and locks */
 
     /* Specific interfaces */
     intf_sys_t *        p_sys;                          /** system interface */
 
     /** Interface module */
     module_t *   p_module;
-    void      ( *pf_run )    ( struct intf_thread_t * ); /** Run function */
 
     /** Specific for dialogs providers */
     void ( *pf_show_dialog ) ( struct intf_thread_t *, int, int,
