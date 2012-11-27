@@ -75,6 +75,7 @@ struct intf_sys_t
 
     vlc_mutex_t             lock;               /**< p_sys mutex            */
     vlc_cond_t              wait;               /**< song to submit event   */
+    vlc_thread_t            thread;             /**< thread to submit song  */
 
     /* submission of played songs */
     vlc_url_t               p_submit_url;       /**< where to submit data   */
@@ -104,7 +105,7 @@ struct intf_sys_t
 
 static int  Open            (vlc_object_t *);
 static void Close           (vlc_object_t *);
-static void Run             (intf_thread_t *);
+static void *Run            (void *);
 
 /*****************************************************************************
  * Module descriptor
@@ -419,9 +420,17 @@ static int Open(vlc_object_t *p_this)
     vlc_mutex_init(&p_sys->lock);
     vlc_cond_init(&p_sys->wait);
 
+    if (vlc_clone(&p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW))
+    {
+        vlc_cond_destroy(&p_sys->wait);
+        vlc_mutex_destroy(&p_sys->lock);
+        free(p_sys);
+        return VLC_ENOMEM;
+    }
+
     var_AddCallback(pl_Get(p_intf), "activity", ItemChange, p_intf);
 
-    p_intf->pf_run = Run;
+    p_intf->pf_run = NULL;
 
     return VLC_SUCCESS;
 }
@@ -437,6 +446,9 @@ static void Close(vlc_object_t *p_this)
     intf_sys_t                  *p_sys  = p_intf->p_sys;
 
     var_DelCallback(p_playlist, "activity", ItemChange, p_intf);
+
+    vlc_cancel(p_sys->thread);
+    vlc_join(p_sys->thread, NULL);
 
     p_input = playlist_CurrentInput(p_playlist);
     if (p_input)
@@ -684,8 +696,9 @@ static void HandleInterval(mtime_t *next, unsigned int *i_interval)
 /*****************************************************************************
  * Run : call Handshake() then submit songs
  *****************************************************************************/
-static void Run(intf_thread_t *p_intf)
+static void *Run(void *data)
 {
+    intf_thread_t          *p_intf = data;
     uint8_t                 p_buffer[1024];
     int                     canc = vlc_savecancel();
     bool                    b_handshaked = false;
@@ -718,7 +731,7 @@ static void Run(intf_thread_t *p_intf)
             switch(Handshake(p_intf))
             {
                 case VLC_ENOMEM:
-                    return;
+                    goto out;
 
                 case VLC_ENOVAR:
                     /* username not set */
@@ -726,9 +739,8 @@ static void Run(intf_thread_t *p_intf)
                         _("Last.fm username not set"),
                         "%s", _("Please set a username or disable the "
                         "audioscrobbler plugin, and restart VLC.\n"
-                        "Visit http://www.last.fm/join/ to get an account.")
-                   );
-                    return;
+                        "Visit http://www.last.fm/join/ to get an account."));
+                    goto out;
 
                 case VLC_SUCCESS:
                     msg_Dbg(p_intf, "Handshake successful :)");
@@ -739,7 +751,7 @@ static void Run(intf_thread_t *p_intf)
 
                 case VLC_AUDIOSCROBBLER_EFATAL:
                     msg_Warn(p_intf, "Exiting...");
-                    return;
+                    goto out;
 
                 case VLC_EGENERIC:
                 default:
@@ -755,7 +767,7 @@ static void Run(intf_thread_t *p_intf)
         msg_Dbg(p_intf, "Going to submit some data...");
         char *psz_submit;
         if (asprintf(&psz_submit, "s=%s", p_sys->psz_auth_token) == -1)
-            return;
+            break;
 
         /* forge the HTTP POST request */
         vlc_mutex_lock(&p_sys->lock);
@@ -786,7 +798,7 @@ static void Run(intf_thread_t *p_intf)
            ) == -1)
             {   /* Out of memory */
                 vlc_mutex_unlock(&p_sys->lock);
-                return;
+                goto out;
             }
             psz_submit_tmp = psz_submit;
             if (asprintf(&psz_submit, "%s%s",
@@ -795,7 +807,7 @@ static void Run(intf_thread_t *p_intf)
                 free(psz_submit_tmp);
                 free(psz_submit_song);
                 vlc_mutex_unlock(&p_sys->lock);
-                return;
+                goto out;
             }
             free(psz_submit_song);
             free(psz_submit_tmp);
@@ -883,5 +895,7 @@ static void Run(intf_thread_t *p_intf)
             HandleInterval(&next_exchange, &i_interval);
         }
     }
+out:
     vlc_restorecancel(canc);
+    return NULL;
 }
