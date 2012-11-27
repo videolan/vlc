@@ -178,6 +178,7 @@ struct pl_item_t
 
 struct intf_sys_t
 {
+    vlc_thread_t    thread;
     input_thread_t *p_input;
 
     bool            color;
@@ -1753,12 +1754,11 @@ static inline void UpdateInput(intf_sys_t *sys, playlist_t *p_playlist)
 /*****************************************************************************
  * Run: ncurses thread
  *****************************************************************************/
-static void Run(intf_thread_t *intf)
+static void *Run(void *data)
 {
+    intf_thread_t *intf = data;
     intf_sys_t    *sys = intf->p_sys;
     playlist_t    *p_playlist = pl_Get(intf);
-
-    int canc = vlc_savecancel();
 
     var_AddCallback(p_playlist, "intf-change", PlaylistChanged, intf);
     var_AddCallback(p_playlist, "item-change", ItemChanged, intf);
@@ -1773,7 +1773,7 @@ static void Run(intf_thread_t *intf)
     var_DelCallback(p_playlist, "intf-change", PlaylistChanged, intf);
     var_DelCallback(p_playlist, "item-change", ItemChanged, intf);
     var_DelCallback(p_playlist, "playlist-item-append", PlaylistChanged, intf);
-    vlc_restorecancel(canc);
+    return NULL;
 }
 
 /*****************************************************************************
@@ -1824,7 +1824,10 @@ static int Open(vlc_object_t *p_this)
     PlaylistRebuild(intf),
     PL_UNLOCK;
 
-    intf->pf_run = Run;
+    if (vlc_clone(&sys->thread, Run, intf, VLC_THREAD_PRIORITY_LOW))
+        abort(); /* TODO */
+
+    intf->pf_run = NULL;
     return VLC_SUCCESS;
 }
 
@@ -1834,6 +1837,8 @@ static int Open(vlc_object_t *p_this)
 static void Close(vlc_object_t *p_this)
 {
     intf_sys_t *sys = ((intf_thread_t*)p_this)->p_sys;
+
+    vlc_join(sys->thread, NULL);
 
     PlaylistDestroy(sys);
     DirsDestroy(sys);
