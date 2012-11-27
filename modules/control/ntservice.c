@@ -86,12 +86,13 @@ struct intf_sys_t
     SERVICE_STATUS_HANDLE hStatus;
     SERVICE_STATUS status;
     char *psz_service;
+    vlc_thread_t thread;
 };
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void Run( intf_thread_t *p_intf );
+static void *Run( void * );
 static int NTServiceInstall( intf_thread_t *p_intf );
 static int NTServiceUninstall( intf_thread_t *p_intf );
 static void WINAPI ServiceDispatch( DWORD numArgs, char **args );
@@ -106,8 +107,16 @@ static intf_thread_t *p_global_intf;
 static int Activate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    intf_sys_t *p_sys = malloc( sizeof( *p_sys ) );
+    if( unlikely(p_sys == NULL) )
+        return VLC_ENOMEM;
 
-    p_intf->pf_run = Run;
+    p_intf->pf_run = NULL;
+    p_intf->p_sys = p_sys;
+
+    if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
+        return VLC_ENOMEM;
+
     return VLC_SUCCESS;
 }
 
@@ -116,24 +125,26 @@ static int Activate( vlc_object_t *p_this )
  *****************************************************************************/
 void Close( vlc_object_t *p_this )
 {
-    (void)p_this;
+    intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    intf_sys_t *p_sys = p_intf->p_sys;
+
+    vlc_join( p_sys->thread, NULL );
+    free( p_sys );
 }
 
 /*****************************************************************************
  * Run: interface thread
  *****************************************************************************/
-static void Run( intf_thread_t *p_intf )
+static void *Run( void *data )
 {
-    intf_sys_t sys;
+    intf_thread_t *p_intf = data;
     SERVICE_TABLE_ENTRY dispatchTable[] =
     {
         { (LPTSTR)VLCSERVICENAME, &ServiceDispatch },
         { NULL, NULL }
     };
 
-    int canc = vlc_savecancel();
     p_global_intf = p_intf;
-    p_intf->p_sys = &sys;
     p_intf->p_sys->psz_service = var_InheritString( p_intf, "ntservice-name" );
     p_intf->p_sys->psz_service = p_intf->p_sys->psz_service ?
         p_intf->p_sys->psz_service : strdup(VLCSERVICENAME);
@@ -141,13 +152,13 @@ static void Run( intf_thread_t *p_intf )
     if( var_InheritBool( p_intf, "ntservice-install" ) )
     {
         NTServiceInstall( p_intf );
-        return;
+        return NULL;
     }
 
     if( var_InheritBool( p_intf, "ntservice-uninstall" ) )
     {
         NTServiceUninstall( p_intf );
-        return;
+        return NULL;
     }
 
     if( StartServiceCtrlDispatcher( dispatchTable ) == 0 )
@@ -159,7 +170,7 @@ static void Run( intf_thread_t *p_intf )
 
     /* Make sure we exit (In case other interfaces have been spawned) */
     libvlc_Quit( p_intf->p_libvlc );
-    vlc_restorecancel( canc );
+    return NULL;
 }
 
 /*****************************************************************************
