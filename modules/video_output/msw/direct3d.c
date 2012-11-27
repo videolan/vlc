@@ -39,7 +39,6 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_playlist.h>
 #include <vlc_vout_display.h>
 
 #include <windows.h>
@@ -1450,11 +1449,10 @@ static int DesktopCallback(vlc_object_t *object, char const *psz_cmd,
 
     /* FIXME we should have a way to export variable to be saved */
     if (ch_desktop) {
-        playlist_t *p_playlist = pl_Get(vd);
         /* Modify playlist as well because the vout might have to be
          * restarted */
-        var_Create(p_playlist, "video-wallpaper", VLC_VAR_BOOL);
-        var_SetBool(p_playlist, "video-wallpaper", newval.b_bool);
+        var_Create(object->p_parent, "video-wallpaper", VLC_VAR_BOOL);
+        var_SetBool(object->p_parent, "video-wallpaper", newval.b_bool);
     }
     return VLC_SUCCESS;
 }
