@@ -73,14 +73,14 @@ vlc_module_end ()
 struct intf_sys_t
 {
     struct lirc_config *config;
-
+    vlc_thread_t thread;
     int i_fd;
 };
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void Run( intf_thread_t * );
+static void *Run( void * );
 
 static void Process( intf_thread_t * );
 
@@ -91,40 +91,45 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys;
-    char *psz_file;
 
     /* Allocate instance and initialize some members */
     p_intf->p_sys = p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_intf->pf_run = Run;
+    p_intf->pf_run = NULL;
 
     p_sys->i_fd = lirc_init( "vlc", 1 );
     if( p_sys->i_fd == -1 )
     {
         msg_Err( p_intf, "lirc initialisation failed" );
-        goto exit;
+        goto error;
     }
 
     /* We want polling */
     fcntl( p_sys->i_fd, F_SETFL, fcntl( p_sys->i_fd, F_GETFL ) | O_NONBLOCK );
 
     /* Read the configuration file */
-    psz_file = var_CreateGetNonEmptyString( p_intf, "lirc-file" );
-    if( lirc_readconfig( psz_file, &p_sys->config, NULL ) != 0 )
+    char *psz_file = var_InheritString( p_intf, "lirc-file" );
+    int val = lirc_readconfig( psz_file, &p_sys->config, NULL );
+    free( psz_file );
+    if( val != 0 )
     {
         msg_Err( p_intf, "failure while reading lirc config" );
-        free( psz_file );
-        goto exit;
+        lirc_deinit();
+        goto error;
     }
-    free( psz_file );
+
+    if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
+    {
+        lirc_freeconfig( p_sys->config );
+        lirc_deinit();
+        goto error;
+    }
 
     return VLC_SUCCESS;
 
-exit:
-    if( p_sys->i_fd != -1 )
-        lirc_deinit();
+error:
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -137,6 +142,9 @@ static void Close( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys = p_intf->p_sys;
 
+    vlc_cancel( p_sys->thread );
+    vlc_join( p_sys->thread, NULL );
+
     /* Destroy structure */
     lirc_freeconfig( p_sys->config );
     lirc_deinit();
@@ -146,8 +154,9 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Run: main loop
  *****************************************************************************/
-static void Run( intf_thread_t *p_intf )
+static void *Run( void *data )
 {
+    intf_thread_t *p_intf = data;
     intf_sys_t *p_sys = p_intf->p_sys;
 
     for( ;; )
@@ -167,6 +176,7 @@ static void Run( intf_thread_t *p_intf )
         Process( p_intf );
         vlc_restorecancel(canc);
     }
+    return NULL;
 }
 
 static void Process( intf_thread_t *p_intf )
