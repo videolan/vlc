@@ -80,7 +80,7 @@ static const char *ppsz_input_state[] = {
  *****************************************************************************/
 static int  Activate     ( vlc_object_t * );
 static void Deactivate   ( vlc_object_t * );
-static void Run          ( intf_thread_t * );
+static void *Run         ( void * );
 
 static void Help         ( intf_thread_t *, bool );
 static void RegisterCallbacks( intf_thread_t * );
@@ -123,6 +123,7 @@ struct intf_sys_t
     int *pi_socket_listen;
     int i_socket;
     char *psz_unix_path;
+    vlc_thread_t thread;
 
     /* status changes */
     vlc_mutex_t       status_lock;
@@ -210,6 +211,7 @@ vlc_module_end ()
  *****************************************************************************/
 static int Activate( vlc_object_t *p_this )
 {
+    /* FIXME: This function is full of memory leaks and bugs in error paths. */
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     char *psz_host, *psz_unix_path = NULL;
     int  *pi_socket = NULL;
@@ -328,7 +330,7 @@ static int Activate( vlc_object_t *p_this )
     /* Non-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
 
-    p_intf->pf_run = Run;
+    p_intf->pf_run = NULL;
 
 #ifdef WIN32
     p_intf->p_sys->b_quiet = var_InheritBool( p_intf, "rc-quiet" );
@@ -337,6 +339,10 @@ static int Activate( vlc_object_t *p_this )
     {
         CONSOLE_INTRO_MSG;
     }
+
+    if( vlc_clone( &p_intf->p_sys->thread, Run, p_intf,
+                   VLC_THREAD_PRIORITY_LOW ) )
+        abort();
 
     msg_rc( "%s", _("Remote control interface initialized. Type `help' for help.") );
     return VLC_SUCCESS;
@@ -348,6 +354,8 @@ static int Activate( vlc_object_t *p_this )
 static void Deactivate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
+
+    vlc_join( p_intf->p_sys->thread, NULL );
 
     net_ListenClose( p_intf->p_sys->pi_socket_listen );
     if( p_intf->p_sys->i_socket != -1 )
@@ -439,8 +447,9 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
  * This part of the interface is in a separate thread so that we can call
  * exec() from within it without annoying the rest of the program.
  *****************************************************************************/
-static void Run( intf_thread_t *p_intf )
+static void *Run( void *data )
 {
+    intf_thread_t *p_intf = data;
     input_thread_t * p_input = NULL;
     playlist_t *     p_playlist = pl_Get( p_intf );
 
@@ -451,7 +460,6 @@ static void Run( intf_thread_t *p_intf )
     int  i_size = 0;
     int  i_oldpos = 0;
     int  i_newpos;
-    int  canc = vlc_savecancel();
 
     p_buffer[0] = 0;
 
@@ -790,7 +798,7 @@ static void Run( intf_thread_t *p_intf )
     }
 
     var_DelCallback( p_playlist, "volume", VolumeChanged, p_intf );
-    vlc_restorecancel( canc );
+    return NULL;
 }
 
 static void Help( intf_thread_t *p_intf, bool b_longhelp)
