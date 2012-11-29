@@ -387,6 +387,11 @@ audio_output_t *input_resource_HoldAout( input_resource_t *p_resource )
 
     vlc_mutex_lock( &p_resource->lock_hold );
     p_aout = p_resource->p_aout;
+    if( p_aout == NULL )
+    {   /* No audio outputs exist yet. Create an idle one. */
+        p_aout = aout_New( p_resource->p_parent );
+        p_resource->p_aout = p_aout;
+    }
     if( p_aout )
         vlc_object_hold( p_aout );
     vlc_mutex_unlock( &p_resource->lock_hold );
