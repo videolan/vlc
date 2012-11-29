@@ -44,9 +44,10 @@ struct aout_sys_t
 {
     snd_pcm_t *pcm;
     void (*reorder) (void *, size_t, unsigned);
-    float soft_gain;
+    unsigned rate; /**< Sample rate */
+    uint8_t bits; /**< Bits per sample per channel */
     bool soft_mute;
-    audio_sample_format_t format;
+    float soft_gain;
 };
 
 #include "volume.h"
@@ -468,6 +469,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     /* Setup audio_output_t */
     fmt->i_format = fourcc;
     fmt->i_rate = rate;
+    sys->rate = rate;
     sys->reorder = NULL;
     if (spdif)
     {
@@ -484,8 +486,9 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
                 sys->reorder = Reorder71;
                 break;
         }
+        aout_FormatPrepare (fmt);
+        sys->bits = fmt->i_bitspersample;
     }
-    sys->format = *fmt;
 
     aout->time_get = TimeGet;
     aout->play = Play;
@@ -531,7 +534,7 @@ static int TimeGet (audio_output_t *aout, mtime_t *restrict delay)
         msg_Err (aout, "cannot estimate delay: %s", snd_strerror (val));
         return -1;
     }
-    *delay = frames * CLOCK_FREQ / sys->format.i_rate;
+    *delay = frames * CLOCK_FREQ / sys->rate;
     return 0;
 }
 
@@ -543,8 +546,7 @@ static void Play (audio_output_t *aout, block_t *block)
     aout_sys_t *sys = aout->sys;
 
     if (sys->reorder != NULL)
-        sys->reorder (block->p_buffer, block->i_nb_samples,
-                      sys->format.i_bitspersample / 8);
+        sys->reorder (block->p_buffer, block->i_nb_samples, sys->bits);
 
     snd_pcm_t *pcm = sys->pcm;
 
@@ -638,18 +640,18 @@ static void Stop (audio_output_t *aout)
  * Converts from VLC to ALSA order for 7.1.
  * VLC has middle channels in position 2 and 3, ALSA in position 6 and 7.
  */
-static void Reorder71 (void *p, size_t n, unsigned size)
+static void Reorder71 (void *p, size_t n, unsigned bits)
 {
-    switch (size)
+    switch (bits)
     {
-        case 4:
+        case 32:
             for (uint64_t *ptr = p; n > 0; ptr += 4, n--)
             {
                 uint64_t middle = ptr[1], c_lfe = ptr[2], rear = ptr[3];
                 ptr[1] = c_lfe; ptr[2] = rear; ptr[3] = middle;
             }
             break;
-        case 2:
+        case 16:
             for (uint32_t *ptr = p; n > 0; ptr += 4, n--)
             {
                 uint32_t middle = ptr[1], c_lfe = ptr[2], rear = ptr[3];
@@ -660,15 +662,15 @@ static void Reorder71 (void *p, size_t n, unsigned size)
         default:
             for (uint16_t *ptr = p; n > 0; n--)
             {
-                uint16_t middle[size];
-                memcpy (middle, ptr + size, size * 2);
-                ptr += size;
-                memcpy (ptr, ptr + size, size * 2);
-                ptr += size;
-                memcpy (ptr, ptr + size, size * 2);
-                ptr += size;
-                memcpy (ptr, middle, size * 2);
-                ptr += size;
+                uint16_t middle[bits / 8];
+                memcpy (middle, ptr + (bits / 8), bits / 4);
+                ptr += bits / 4;
+                memcpy (ptr, ptr + (bits / 8), bits / 4);
+                ptr += bits / 4;
+                memcpy (ptr, ptr + (bits / 8), bits / 4);
+                ptr += bits / 4;
+                memcpy (ptr, middle, bits / 4);
+                ptr += bits / 4;
             }
             break;
     }
