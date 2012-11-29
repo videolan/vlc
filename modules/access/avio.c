@@ -204,9 +204,18 @@ error:
 }
 
 /* */
+
+static const char *const ppsz_sout_options[] = {
+    "options",
+    NULL,
+};
+
 int OutOpenAvio(vlc_object_t *object)
 {
     sout_access_out_t *access = (sout_access_out_t*)object;
+
+    config_ChainParse( access, "sout-avio-", ppsz_sout_options, access->p_cfg );
+
     sout_access_out_sys_t *sys = malloc(sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
@@ -227,7 +236,7 @@ int OutOpenAvio(vlc_object_t *object)
         .opaque = access,
     };
     AVDictionary *options = NULL;
-    char *psz_opts = var_InheritString(access, "avio-options");
+    char *psz_opts = var_InheritString(access, "sout-avio-options");
     if (psz_opts && *psz_opts) {
         options = vlc_av_get_options(psz_opts);
         free(psz_opts);
