@@ -274,11 +274,12 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
     {
         ssize_t val = write ((intptr_t)p_access->p_sys,
                              p_buffer->p_buffer, p_buffer->i_buffer);
-        if (val == -1)
+        if (val <= 0)
         {
             if (errno == EINTR)
                 continue;
             block_ChainRelease (p_buffer);
+            msg_Err( p_access, "cannot write: %m" );
             return -1;
         }
 
