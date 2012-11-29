@@ -27,8 +27,9 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
-#include <vlc_fs.h>
+#include <vlc_sout.h>
 
+#define ACCESS_TEXT N_("Dump module")
 #define FILE_TEXT N_("Dump filename")
 #define FILE_LONGTEXT N_( \
     "Name of the file to which the raw stream will be dumped." )
@@ -45,6 +46,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_description( N_("File dumper") )
     set_capability( "demux", 0 )
+    add_module( "demuxdump-access", "sout access", "file", ACCESS_TEXT,
+                ACCESS_TEXT, true )
     add_savefile( "demuxdump-file", "stream-demux.dump", FILE_TEXT,
                   FILE_LONGTEXT, false )
     add_bool( "demuxdump-append", false, APPEND_TEXT, APPEND_LONGTEXT,
@@ -69,34 +72,35 @@ static int Open( vlc_object_t * p_this )
     if( !p_demux->b_force )
         return VLC_EGENERIC;
 
-    const char *mode = "wb";
+    char *access = var_InheritString( p_demux, "demuxdump-access" );
+    if( access == NULL )
+        return VLC_EGENERIC;
+
+    /* --sout-file-append (defaults to false) */
+    var_Create( p_demux, "sout-file-append", VLC_VAR_BOOL );
     if( var_InheritBool( p_demux, "demuxdump-append" ) )
-        mode = "ab";
+        var_SetBool( p_demux, "sout-file-append", true );
+    /* --sout-file-format (always false) */
+    var_Create( p_demux, "sout-file-format", VLC_VAR_BOOL );
 
     char *path = var_InheritString( p_demux, "demuxdump-file" );
     if( path == NULL )
-        return VLC_ENOMEM;
-
-    FILE *stream;
-    if( !strcmp( path, "-" ) )
     {
-        msg_Info( p_demux, "dumping raw stream to standard output" );
-        stream = stdout;
-    }
-    else
-    {
-        stream = vlc_fopen( path, mode );
-        if( stream == NULL )
-            msg_Err( p_demux, "cannot write `%s': %m", path );
-        else
-            msg_Info( p_demux, "writing raw stream to file `%s'", path );
-        free( path );
-
-        if( stream == NULL )
-            return VLC_EGENERIC;
+        free( access );
+        msg_Err( p_demux, "no dump file name given" );
+        return VLC_EGENERIC;
     }
 
-    p_demux->p_sys = (void *)stream;
+    sout_access_out_t *out = sout_AccessOutNew( p_demux, access, path );
+    free( path );
+    free( access );
+    if( out == NULL )
+    {
+        msg_Err( p_demux, "cannot create output" );
+        return VLC_EGENERIC;
+    }
+
+    p_demux->p_sys = (void *)out;
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
     return VLC_SUCCESS;
@@ -108,10 +112,9 @@ static int Open( vlc_object_t * p_this )
 static void Close( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t*)p_this;
-    FILE *stream = (void *)p_demux->p_sys;
+    sout_access_out_t *out = (void *)p_demux->p_sys;
 
-    if( stream != stdout )
-        fclose( stream );
+    sout_AccessOutDelete( out );
 }
 
 /**
@@ -119,17 +122,24 @@ static void Close( vlc_object_t *p_this )
  */
 static int Demux( demux_t *p_demux )
 {
-    FILE *stream = (void *)p_demux->p_sys;
-    char buf[DUMP_BLOCKSIZE];
+    sout_access_out_t *out = (void *)p_demux->p_sys;
 
-    int rd = stream_Read( p_demux->s, buf, sizeof (buf) );
+    block_t *block = block_Alloc( DUMP_BLOCKSIZE );
+    if( unlikely(block == NULL) )
+        return -1;
+
+    int rd = stream_Read( p_demux->s, block->p_buffer, DUMP_BLOCKSIZE );
     if ( rd <= 0 )
+    {
+        block_Release( block );
         return rd;
+    }
+    block->i_buffer = rd;
 
-    size_t wr = fwrite( buf, 1, rd, stream );
+    size_t wr = sout_AccessOutWrite( out, block );
     if( wr != (size_t)rd )
     {
-        msg_Err( p_demux, "cannot write data: %m" );
+        msg_Err( p_demux, "cannot write data" );
         return -1;
     }
     return 1;
