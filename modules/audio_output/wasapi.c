@@ -635,12 +635,12 @@ static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
                         audio_sample_format_t *restrict audio)
 {
     audio->i_rate = wf->nSamplesPerSec;
+    audio->i_physical_channels = 0;
 
     if (wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
     {
         const WAVEFORMATEXTENSIBLE *wfe = (void *)wf;
 
-        audio->i_physical_channels = 0;
         for (unsigned i = 0; chans_in[i]; i++)
             if (wfe->dwChannelMask & chans_in[i])
                 audio->i_physical_channels |= pi_vlc_chan_order_wg4[i];
@@ -652,6 +652,20 @@ static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
     if (wf->nChannels != audio->i_channels)
         return -1;
     return 0;
+}
+
+static unsigned vlc_CheckWaveOrder (const WAVEFORMATEX *restrict wf,
+                                    uint8_t *restrict table)
+{
+    uint32_t mask = 0;
+
+    if (wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
+    {
+        const WAVEFORMATEXTENSIBLE *wfe = (void *)wf;
+
+        mask = wfe->dwChannelMask;
+    }
+    return aout_CheckChannelReorder(chans_in, chans_out, mask, table);
 }
 
 static wchar_t *var_InheritWide(vlc_object_t *obj, const char *name)
@@ -811,9 +825,8 @@ retry:
     else
         assert(pwf == NULL);
 
-    sys->chans_to_reorder = aout_CheckChannelReorder(chans_in, chans_out,
-                                                     fmt->i_physical_channels,
-                                                     sys->chans_table);
+    sys->chans_to_reorder = vlc_CheckWaveOrder((hr == S_OK) ? &wf.Format : pwf,
+                                               sys->chans_table);
     sys->bits = fmt->i_bitspersample;
 
     hr = IAudioClient_Initialize(sys->client, AUDCLNT_SHAREMODE_SHARED, 0,
