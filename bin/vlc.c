@@ -246,7 +246,6 @@ int main( int i_argc, const char *ppsz_argv[] )
 #endif
 #ifdef HAVE_DBUS
     libvlc_add_intf (vlc, "dbus,none");
-    libvlc_add_intf (vlc, "inhibit,none");
 #endif
     if (libvlc_add_intf (vlc, NULL))
         goto out;

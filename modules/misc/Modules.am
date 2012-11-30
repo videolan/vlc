@@ -21,13 +21,6 @@ endif
 EXTRA_LTLIBRARIES += libgnutls_plugin.la
 libvlc_LTLIBRARIES += $(LTLIBgnutls)
 
-libinhibit_plugin_la_SOURCES = inhibit.c
-libinhibit_plugin_la_CFLAGS = $(AM_CFLAGS) $(DBUS_CFLAGS)
-libinhibit_plugin_la_LIBADD = $(AM_LIBADD) $(DBUS_LIBS)
-if HAVE_DBUS
-libvlc_LTLIBRARIES += libinhibit_plugin.la
-endif
-
 libosd_parser_plugin_la_SOURCES = \
 	osd/parser.c osd/osd_menu.c osd/osd_menu.h osd/simple.c osd/xml.c
 libosd_parser_plugin_la_CFLAGS = $(AM_CFLAGS)
@@ -46,6 +39,13 @@ if HAVE_XCB
 libvlc_LTLIBRARIES += \
 	libxdg_screensaver_plugin.la \
 	libxscreensaver_plugin.la
+endif
+
+libpower_plugin_la_SOURCES = inhibit/power.c
+libpower_plugin_la_CFLAGS = $(AM_CFLAGS) $(DBUS_CFLAGS)
+libpower_plugin_la_LIBADD = $(AM_LIBADD) $(DBUS_LIBS)
+if HAVE_DBUS
+libvlc_LTLIBRARIES += libpower_plugin.la
 endif
 
 libmce_plugin_la_SOURCES = inhibit/mce.c
