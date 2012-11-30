@@ -34,14 +34,13 @@ typedef struct
     module_t *module;
 } inhibit_t;
 
-vlc_inhibit_t *vlc_inhibit_Create (vlc_object_t *parent, int_fast32_t wid)
+vlc_inhibit_t *vlc_inhibit_Create (vlc_object_t *parent)
 {
     inhibit_t *priv = vlc_custom_create (parent, sizeof (*priv), "inhibit" );
     if (priv == NULL)
         return NULL;
 
     vlc_inhibit_t *ih = &priv->ih;
-    ih->window_id = wid;
     ih->p_sys = NULL;
     ih->inhibit = NULL;
 

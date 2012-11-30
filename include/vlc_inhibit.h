@@ -33,7 +33,6 @@ struct vlc_inhibit
 {
     VLC_COMMON_MEMBERS
 
-    uint32_t           window_id;
     vlc_inhibit_sys_t *p_sys;
     void             (*inhibit) (vlc_inhibit_t *, bool);
 };
