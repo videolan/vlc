@@ -48,7 +48,7 @@ static int  Activate     ( vlc_object_t * );
 static void  Deactivate   ( vlc_object_t * );
 
 static void Timer( void * );
-static void Inhibit( vlc_inhibit_t *, bool );
+static void Inhibit( vlc_inhibit_t *, unsigned );
 
 struct vlc_inhibit_sys
 {
@@ -122,8 +122,9 @@ static void Deactivate( vlc_object_t *p_this )
     free( p_sys );
 }
 
-static void Inhibit( vlc_inhibit_t *p_ih, bool suspend )
+static void Inhibit( vlc_inhibit_t *p_ih, unsigned mask )
 {
+    bool suspend = (mask & VLC_INHIBIT_DISPLAY) != 0;
     mtime_t d = suspend ? 30*CLOCK_FREQ : 0;
     vlc_timer_schedule( p_ih->p_sys->timer, false, d, d );
 }

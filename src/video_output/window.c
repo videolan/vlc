@@ -97,7 +97,7 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
         cfg->type == VOUT_WINDOW_TYPE_XID) {
         w->inhibit = vlc_inhibit_Create(VLC_OBJECT (window));
         if (w->inhibit != NULL)
-            vlc_inhibit_Set(w->inhibit, true);
+            vlc_inhibit_Set(w->inhibit, VLC_INHIBIT_VIDEO);
             /* FIXME: ^ wait for vout activation, pause */
     }
     else
@@ -121,7 +121,7 @@ void vout_window_Delete(vout_window_t *window)
     window_t *w = (window_t *)window;
     if (w->inhibit)
     {
-        vlc_inhibit_Set (w->inhibit, false);
+        vlc_inhibit_Set (w->inhibit, VLC_INHIBIT_NONE);
         vlc_inhibit_Destroy (w->inhibit);
     }
 

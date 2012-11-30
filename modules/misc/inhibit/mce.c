@@ -44,7 +44,7 @@ vlc_module_begin ()
     set_callbacks (Open, Close)
 vlc_module_end ()
 
-static void Inhibit (vlc_inhibit_t *, bool);
+static void Inhibit (vlc_inhibit_t *, unsigned);
 static void Timer (void *data);
 
 struct vlc_inhibit_sys
@@ -97,9 +97,10 @@ static void Close (vlc_object_t *obj)
     free (sys);
 }
 
-static void Inhibit (vlc_inhibit_t *ih, bool unblank)
+static void Inhibit (vlc_inhibit_t *ih, unsigned flags)
 {
     vlc_inhibit_sys_t *sys = ih->p_sys;
+    bool unblank = (flags & VLC_INHIBIT_DISPLAY) != 0;
 
     /* The shortest blanking interval is 10s on N900, 15s on N9 */
     const mtime_t interval = 9 * CLOCK_FREQ;
