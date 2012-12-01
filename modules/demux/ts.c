@@ -245,7 +245,6 @@ typedef struct
     block_t     **pp_last;
 
     es_mpeg4_descriptor_t *p_mpeg4desc;
-    int         b_gather;
 
 } ts_es_t;
 
@@ -2161,7 +2160,6 @@ static void PIDFillFormat( ts_es_t *es, int i_stream_type )
         break;
     case 0x10:  /* MPEG4 (video) */
         es_format_Init( fmt, VIDEO_ES, VLC_CODEC_MP4V );
-        es->b_gather = true;
         break;
     case 0x1B:  /* H264 <- check transport syntax/needed descriptor */
         es_format_Init( fmt, VIDEO_ES, VLC_CODEC_H264 );
@@ -2202,7 +2200,6 @@ static void PIDFillFormat( ts_es_t *es, int i_stream_type )
 
     case 0xa0:  /* MSCODEC vlc (video) (fixed later) */
         es_format_Init( fmt, UNKNOWN_ES, 0 );
-        es->b_gather = true;
         break;
 
     case 0x06:  /* PES_PRIVATE  (fixed later) */
@@ -3182,7 +3179,6 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
                 p_es->i_data_gathered = 0;
                 p_es->pp_last = &p_es->p_data;
                 p_es->p_mpeg4desc = NULL;
-                p_es->b_gather = false;
 
                 TAB_APPEND( pid->i_extra_es, pid->extra_es, p_es );
             }
@@ -3266,7 +3262,6 @@ static void PMTSetupEsDvbSubtitle( demux_t *p_demux, ts_pid_t *pid,
                 p_es->i_data_gathered = 0;
                 p_es->pp_last = &p_es->p_data;
                 p_es->p_mpeg4desc = NULL;
-                p_es->b_gather = false;
 
                 TAB_APPEND( pid->i_extra_es, pid->extra_es, p_es );
             }
