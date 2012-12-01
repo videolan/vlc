@@ -239,9 +239,9 @@ typedef struct
 {
     es_format_t  fmt;
     es_out_id_t *id;
-    int         i_pes_size;
-    int         i_pes_gathered;
-    block_t     *p_pes;
+    int         i_data_size;
+    int         i_data_gathered;
+    block_t     *p_data;
     block_t     **pp_last;
 
     es_mpeg4_descriptor_t *p_mpeg4desc;
@@ -1328,7 +1328,7 @@ static void PIDInit( ts_pid_t *pid, bool b_psi, ts_psi_t *p_owner )
             return;
 
         es_format_Init( &pid->es->fmt, UNKNOWN_ES, 0 );
-        pid->es->pp_last = &pid->es->p_pes;
+        pid->es->pp_last = &pid->es->p_data;
     }
 }
 
@@ -1360,8 +1360,8 @@ static void PIDClean( demux_t *p_demux, ts_pid_t *pid )
             p_sys->i_pmt_es--;
         }
 
-        if( pid->es->p_pes )
-            block_ChainRelease( pid->es->p_pes );
+        if( pid->es->p_data )
+            block_ChainRelease( pid->es->p_data );
 
         es_format_Clean( &pid->es->fmt );
 
@@ -1375,8 +1375,8 @@ static void PIDClean( demux_t *p_demux, ts_pid_t *pid )
                 p_sys->i_pmt_es--;
             }
 
-            if( pid->extra_es[i]->p_pes )
-                block_ChainRelease( pid->extra_es[i]->p_pes );
+            if( pid->extra_es[i]->p_data )
+                block_ChainRelease( pid->extra_es[i]->p_data );
 
             es_format_Clean( &pid->extra_es[i]->fmt );
 
@@ -1394,7 +1394,7 @@ static void PIDClean( demux_t *p_demux, ts_pid_t *pid )
  ****************************************************************************/
 static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
 {
-    block_t *p_pes = pid->es->p_pes;
+    block_t *p_pes = pid->es->p_data;
     uint8_t header[34];
     unsigned i_pes_size = 0;
     unsigned i_skip = 0;
@@ -1403,10 +1403,10 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
     mtime_t i_length = 0;
 
     /* remove the pes from pid */
-    pid->es->p_pes = NULL;
-    pid->es->i_pes_size= 0;
-    pid->es->i_pes_gathered= 0;
-    pid->es->pp_last = &pid->es->p_pes;
+    pid->es->p_data = NULL;
+    pid->es->i_data_size= 0;
+    pid->es->i_data_gathered= 0;
+    pid->es->pp_last = &pid->es->p_data;
 
     /* FIXME find real max size */
     /* const int i_max = */ block_ChainExtract( p_pes, header, 34 );
@@ -1990,8 +1990,8 @@ static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     {
         msg_Dbg( p_demux, "transport_error_indicator set (pid=%d)",
                  pid->i_pid );
-        if( pid->es->p_pes ) //&& pid->es->fmt.i_cat == VIDEO_ES )
-            pid->es->p_pes->i_flags |= BLOCK_FLAG_CORRUPTED;
+        if( pid->es->p_data ) //&& pid->es->fmt.i_cat == VIDEO_ES )
+            pid->es->p_data->i_flags |= BLOCK_FLAG_CORRUPTED;
     }
 
     if( p_demux->p_sys->csa )
@@ -2015,11 +2015,11 @@ static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
         {
             /* discontinuity indicator found in stream */
             b_discontinuity = (p[5]&0x80) ? true : false;
-            if( b_discontinuity && pid->es->p_pes )
+            if( b_discontinuity && pid->es->p_data )
             {
                 msg_Warn( p_demux, "discontinuity indicator (pid=%d) ",
                             pid->i_pid );
-                /* pid->es->p_pes->i_flags |= BLOCK_FLAG_DISCONTINUITY; */
+                /* pid->es->p_data->i_flags |= BLOCK_FLAG_DISCONTINUITY; */
             }
 #if 0
             if( p[5]&0x40 )
@@ -2054,11 +2054,11 @@ static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
                       i_cc, ( pid->i_cc + 1 )&0x0f, pid->i_pid );
 
             pid->i_cc = i_cc;
-            if( pid->es->p_pes && pid->es->fmt.i_cat != VIDEO_ES )
+            if( pid->es->p_data && pid->es->fmt.i_cat != VIDEO_ES )
             {
                 /* Small video artifacts are usually better than
                  * dropping full frames */
-                pid->es->p_pes->i_flags |= BLOCK_FLAG_CORRUPTED;
+                pid->es->p_data->i_flags |= BLOCK_FLAG_CORRUPTED;
             }
         }
     }
@@ -2094,7 +2094,7 @@ static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 
     if( b_unit_start )
     {
-        if( pid->es->p_pes )
+        if( pid->es->p_data )
         {
             ParsePES( p_demux, pid );
             i_ret = true;
@@ -2103,15 +2103,15 @@ static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
         block_ChainLastAppend( &pid->es->pp_last, p_bk );
         if( p_bk->i_buffer > 6 )
         {
-            pid->es->i_pes_size = GetWBE( &p_bk->p_buffer[4] );
-            if( pid->es->i_pes_size > 0 )
+            pid->es->i_data_size = GetWBE( &p_bk->p_buffer[4] );
+            if( pid->es->i_data_size > 0 )
             {
-                pid->es->i_pes_size += 6;
+                pid->es->i_data_size += 6;
             }
         }
-        pid->es->i_pes_gathered += p_bk->i_buffer;
-        if( pid->es->i_pes_size > 0 &&
-            pid->es->i_pes_gathered >= pid->es->i_pes_size )
+        pid->es->i_data_gathered += p_bk->i_buffer;
+        if( pid->es->i_data_size > 0 &&
+            pid->es->i_data_gathered >= pid->es->i_data_size )
         {
             ParsePES( p_demux, pid );
             i_ret = true;
@@ -2119,7 +2119,7 @@ static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     }
     else
     {
-        if( pid->es->p_pes == NULL )
+        if( pid->es->p_data == NULL )
         {
             /* msg_Dbg( p_demux, "broken packet" ); */
             block_Release( p_bk );
@@ -2127,9 +2127,9 @@ static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
         else
         {
             block_ChainLastAppend( &pid->es->pp_last, p_bk );
-            pid->es->i_pes_gathered += p_bk->i_buffer;
-            if( pid->es->i_pes_size > 0 &&
-                pid->es->i_pes_gathered >= pid->es->i_pes_size )
+            pid->es->i_data_gathered += p_bk->i_buffer;
+            if( pid->es->i_data_size > 0 &&
+                pid->es->i_data_gathered >= pid->es->i_data_size )
             {
                 ParsePES( p_demux, pid );
                 i_ret = true;
@@ -3177,10 +3177,10 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
                 p_es->fmt.psz_description = NULL;
 
                 p_es->id      = NULL;
-                p_es->p_pes   = NULL;
-                p_es->i_pes_size = 0;
-                p_es->i_pes_gathered = 0;
-                p_es->pp_last = &p_es->p_pes;
+                p_es->p_data  = NULL;
+                p_es->i_data_size = 0;
+                p_es->i_data_gathered = 0;
+                p_es->pp_last = &p_es->p_data;
                 p_es->p_mpeg4desc = NULL;
                 p_es->b_gather = false;
 
@@ -3261,10 +3261,10 @@ static void PMTSetupEsDvbSubtitle( demux_t *p_demux, ts_pid_t *pid,
                 p_es->fmt.psz_description = NULL;
 
                 p_es->id      = NULL;
-                p_es->p_pes   = NULL;
-                p_es->i_pes_size = 0;
-                p_es->i_pes_gathered = 0;
-                p_es->pp_last = &p_es->p_pes;
+                p_es->p_data   = NULL;
+                p_es->i_data_size = 0;
+                p_es->i_data_gathered = 0;
+                p_es->pp_last = &p_es->p_data;
                 p_es->p_mpeg4desc = NULL;
                 p_es->b_gather = false;
 
