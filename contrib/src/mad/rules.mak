@@ -26,6 +26,7 @@ ifdef HAVE_IOS
 endif
 	$(APPLY) $(SRC)/mad/mad-noopt.patch
 	$(APPLY) $(SRC)/mad/Provide-Thumb-2-alternative-code-for-MAD_F_MLN.diff
+	$(APPLY) $(SRC)/mad/mad-mips-h-constraint-removal.patch
 	$(MOVE)
 
 .mad: libmad
