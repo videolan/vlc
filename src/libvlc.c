@@ -231,7 +231,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     {
         msg_Err( p_libvlc, "No plugins found! Check your VLC installation.");
         module_EndBank (true);
-        return VLC_ENOITEM;
+        return VLC_ENOMOD;
     }
 
 #ifdef HAVE_DAEMON
