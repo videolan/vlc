@@ -54,11 +54,11 @@ libjack_plugin_la_LIBADD = $(AM_LIBADD) $(JACK_LIBS) $(LIBM)
 EXTRA_LTLIBRARIES += libjack_plugin.la
 libvlc_LTLIBRARIES += $(LTLIBjack)
 
-libwasapi_plugin_la_SOURCES = wasapi.c
-libwasapi_plugin_la_CFLAGS = $(AM_CFLAGS)
-libwasapi_plugin_la_LIBADD = $(AM_LIBADD) -lole32 -lksuser
+libmmdevice_plugin_la_SOURCES = mmdevice.c mmdevice.h wasapi.c
+libmmdevice_plugin_la_CFLAGS = $(AM_CFLAGS)
+libmmdevice_plugin_la_LIBADD = $(AM_LIBADD) -lole32 -lksuser
 if HAVE_WASAPI
-libvlc_LTLIBRARIES += libwasapi_plugin.la
+libvlc_LTLIBRARIES += libmmdevice_plugin.la
 endif
 
 libdirectsound_plugin_la_SOURCES = directx.c windows_audio_common.h packet.c
