@@ -244,7 +244,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         {
             msg_Err( p_libvlc, "Unable to fork vlc to daemon mode" );
             module_EndBank (true);
-            return VLC_EEXIT;
+            return VLC_ENOMEM;
         }
         b_daemon = true;
 
