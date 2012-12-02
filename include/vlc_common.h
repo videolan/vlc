@@ -406,8 +406,6 @@ struct vlc_list_t
 
 #define VLC_ENOITEM        -40                           /**< Item not found */
 
-#define VLC_EEXIT         -255                             /* Program exited */
-#define VLC_EEXITSUCCESS  -999                /* Program exited successfully */
 #define VLC_EGENERIC      -666                              /* Generic error */
 
 /*****************************************************************************

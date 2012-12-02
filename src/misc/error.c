@@ -59,8 +59,6 @@ char const * vlc_error ( int i_err )
         case VLC_EBADVAR:
             return "bad variable value";
 
-        case VLC_EEXIT:
-            return "program exited";
         case VLC_EGENERIC:
             return "generic error";
         default:
