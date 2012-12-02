@@ -224,7 +224,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if (config_PrintHelp (VLC_OBJECT(p_libvlc)))
     {
         module_EndBank (true);
-        return VLC_EEXITSUCCESS;
+        exit(0);
     }
 
     if( module_count <= 1 )
