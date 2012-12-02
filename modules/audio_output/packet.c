@@ -141,6 +141,7 @@ void aout_PacketInit (audio_output_t *aout, aout_packet_t *p, unsigned samples,
 
     vlc_mutex_init (&p->lock);
     p->format = *fmt;
+    aout_FormatPrepare (&p->format);
     aout_FifoInit (&p->partial, p->format.i_rate);
     aout_FifoInit (&p->fifo, p->format.i_rate);
     p->pause_date = VLC_TS_INVALID;
