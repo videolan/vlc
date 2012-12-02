@@ -59,6 +59,11 @@ FFMPEG_CFLAGS += -mfpu=neon
 endif
 endif
 
+# MIPS stuff
+ifeq ($(ARCH),mipsel)
+FFMPEGCONF += --arch=mips
+endif
+
 # x86 stuff
 ifeq ($(ARCH),i386)
 ifndef HAVE_DARWIN_OS
