@@ -361,6 +361,7 @@
 #define VLC_CODEC_BD_PG     VLC_FOURCC('b','d','p','g')
 /* EBU STL (TECH. 3264-E) */
 #define VLC_CODEC_EBU_STL   VLC_FOURCC('S','T','L',' ')
+#define VLC_CODEC_SCTE_27   VLC_FOURCC('S','C','2','7')
 
 
 /* Special endian dependant values

@@ -1391,6 +1391,9 @@ static const staticentry_t p_list_spu[] = {
     B(VLC_CODEC_EBU_STL, "EBU STL subtitles"),
         A("STL "),
 
+    B(VLC_CODEC_SCTE_27, "SCTE-27 subtitles"),
+        A("SC27"),
+
     B(0, "")
 };
 
