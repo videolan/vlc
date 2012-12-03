@@ -85,8 +85,8 @@ struct aout_sys_t
     CONDITION_VARIABLE request_wait;
     CONDITION_VARIABLE reply_wait;
 
-    bool active; /**< Flag to request thread to keep running */
-    bool running; /**< Whether the thread is still running */
+    bool killed; /**< Flag to terminate the thread */
+    bool running; /**< Whether the thread is running */
     int8_t mute; /**< Requested mute state or negative value */
     float volume; /**< Requested volume or negative value */
 };
@@ -439,7 +439,10 @@ static void MMThread(void *data)
         msg_Err(aout, "cannot get simple volume (error 0x%lx)", hr);
 
     EnterCriticalSection(&sys->lock);
-    while (sys->active)
+    sys->running = true;
+    WakeConditionVariable(&sys->reply_wait);
+
+    while (!sys->killed)
     {
         /* Update volume */
         if (sys->volume >= 0.f)
@@ -471,6 +474,7 @@ static void MMThread(void *data)
                                                          &sys->session_events);
         IAudioSessionControl_Release(control);
     }
+    Leave();
 
     EnterCriticalSection(&sys->lock);
     sys->running = false;
@@ -526,8 +530,8 @@ static int Open(vlc_object_t *obj)
     InitializeCriticalSection(&sys->lock);
     InitializeConditionVariable(&sys->request_wait);
     InitializeConditionVariable(&sys->reply_wait);
-    sys->active = true;
-    sys->running = true;
+    sys->killed = false;
+    sys->running = false;
     sys->volume = -1.f;
     sys->mute = -1;
 
@@ -575,6 +579,11 @@ static int Open(vlc_object_t *obj)
     /* Note: thread handle released by CRT, ignore it. */
     if (_beginthread(MMThread, 0, aout) == (uintptr_t)-1)
         goto error;
+
+    EnterCriticalSection(&sys->lock);
+    while (!sys->running)
+        SleepConditionVariableCS(&sys->reply_wait, &sys->lock, INFINITE);
+    LeaveCriticalSection(&sys->lock);
     Leave();
 
     aout->sys = sys;
@@ -606,7 +615,7 @@ static void Close(vlc_object_t *obj)
     aout_sys_t *sys = aout->sys;
 
     EnterCriticalSection(&sys->lock);
-    sys->active = false;
+    sys->killed = true;
     WakeConditionVariable(&sys->request_wait);
     while (sys->running)
         SleepConditionVariableCS(&sys->reply_wait, &sys->lock, INFINITE);
