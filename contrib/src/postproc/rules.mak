@@ -36,6 +36,11 @@ POSTPROC_CFLAGS += -mfloat-abi=softfp -mfpu=neon
 endif
 endif
 
+# MIPS stuff
+ifeq ($(ARCH),mipsel)
+POSTPROCCONF += --arch=mips
+endif
+
 # x86 stuff
 ifeq ($(ARCH),i386)
 POSTPROCCONF += --arch=x86
