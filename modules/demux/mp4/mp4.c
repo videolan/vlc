@@ -216,10 +216,15 @@ static int LoadInitFrag( demux_t *p_demux, const bool b_smooth )
                 if( p_stra && p_stra->data.p_stra->i_track_ID )
                     p_sys->i_tracks++;
                 /* Get timescale and duration of the video track; */
-                if( !p_sys->i_timescale )
+                if( p_sys->i_timescale == 0 )
                 {
                     p_sys->i_timescale = p_stra->data.p_stra->i_timescale;
                     p_sys->i_duration = p_stra->data.p_stra->i_duration;
+                    if( p_sys->i_timescale == 0 )
+                    {
+                        msg_Err( p_demux, "bad timescale" );
+                        goto LoadInitFragError;
+                    }
                 }
             }
         }
@@ -1883,7 +1888,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                           "(%u), making both equal (report any problem).",
                           p_track->i_timescale, p_soun->i_sampleratehi );
 
-                if( p_soun->i_sampleratehi )
+                if( p_soun->i_sampleratehi != 0 )
                     p_track->i_timescale = p_soun->i_sampleratehi;
                 else
                     p_soun->i_sampleratehi = p_track->i_timescale;
@@ -2497,7 +2502,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     }
 
     p_track->i_timescale = p_mdhd->data.p_mdhd->i_timescale;
-    if( !p_track->i_timescale )
+    if( p_track->i_timescale == 0 )
         return;
 
     if( p_mdhd->data.p_mdhd->i_language_code < 0x800 )
@@ -3440,10 +3445,14 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
         {
             MP4_Box_data_sidx_t *p_sidx_data = p_sidx->data.p_sidx;
             assert( p_sidx_data->i_reference_count == 1 );
+
+            if( p_sidx_data->i_timescale == 0 )
+                return VLC_EGENERIC;
+
             unsigned i_chunk_duration = p_sidx_data->p_items[0].i_subsegment_duration /
-                                                       p_sidx_data->i_timescale;
-            default_duration = i_chunk_duration *
-                p_track->i_timescale / ret->i_sample_count;
+                                        p_sidx_data->i_timescale;
+            default_duration = i_chunk_duration * p_track->i_timescale / ret->i_sample_count;
+
         }
     }
 
