@@ -114,7 +114,7 @@ static int Open(vlc_object_t *object)
 
     for (size_t i = 0; i < sizeof (list) / sizeof (list[0]); i++) {
         if (src->i_format == list[i][0]) {
-            if (dst->i_format != list[i][1])
+            if (dst->i_format == list[i][1])
                 goto ok;
             break;
         }
