@@ -100,7 +100,6 @@ static HRESULT TimeGet(aout_api_t *api, mtime_t *restrict delay)
     UINT64 pos, qpcpos;
     HRESULT hr;
 
-    Enter();
     hr = IAudioClient_GetService(sys->client, &IID_IAudioClock, &pv);
     if (SUCCEEDED(hr))
     {
@@ -113,7 +112,6 @@ static HRESULT TimeGet(aout_api_t *api, mtime_t *restrict delay)
     }
     else
         msg_Err(api, "cannot get clock (error 0x%lx)", hr);
-    Leave();
 
     if (SUCCEEDED(hr))
     {
@@ -142,7 +140,6 @@ static HRESULT Play(aout_api_t *api, block_t *block)
         aout_ChannelReorder(block->p_buffer, block->i_buffer,
                           sys->chans_to_reorder, sys->chans_table, sys->bits);
 
-    Enter();
     hr = IAudioClient_GetService(sys->client, &IID_IAudioRenderClient, &pv);
     if (FAILED(hr))
     {
@@ -198,7 +195,6 @@ static HRESULT Play(aout_api_t *api, block_t *block)
     }
     IAudioRenderClient_Release(render);
 out:
-    Leave();
     block_Release(block);
 
     return hr;
@@ -209,7 +205,6 @@ static HRESULT Pause(aout_api_t *api, bool paused)
     aout_api_sys_t *sys = api->sys;
     HRESULT hr;
 
-    Enter();
     if (paused)
         hr = IAudioClient_Stop(sys->client);
     else
@@ -217,7 +212,6 @@ static HRESULT Pause(aout_api_t *api, bool paused)
     if (FAILED(hr))
         msg_Warn(api, "cannot %s stream (error 0x%lx)",
                  paused ? "stop" : "start", hr);
-    Leave();
     return hr;
 }
 
@@ -226,11 +220,9 @@ static HRESULT Flush(aout_api_t *api)
     aout_api_sys_t *sys = api->sys;
     HRESULT hr;
 
-    Enter();
     IAudioClient_Stop(sys->client);
-    hr = IAudioClient_Reset(sys->client);
-    Leave();
 
+    hr = IAudioClient_Reset(sys->client);
     if (FAILED(hr))
         msg_Warn(api, "cannot reset stream (error 0x%lx)", hr);
     else
@@ -339,11 +331,12 @@ static HRESULT Start(aout_api_t *api, audio_sample_format_t *restrict fmt,
         return E_OUTOFMEMORY;
     sys->client = NULL;
 
+    void *pv;
     HRESULT hr;
 
     Enter();
-    void *pv;
     hr = IMMDevice_Activate(dev, &IID_IAudioClient, CLSCTX_ALL, NULL, &pv);
+    Leave();
     if (FAILED(hr))
     {
         msg_Err(api, "cannot activate client (error 0x%lx)", hr);
@@ -400,8 +393,6 @@ static HRESULT Start(aout_api_t *api, audio_sample_format_t *restrict fmt,
         goto error;
     }
 
-    Leave();
-
     sys->rate = fmt->i_rate;
     sys->bytes_per_frame = fmt->i_bytes_per_frame;
     sys->written = 0;
@@ -410,11 +401,11 @@ static HRESULT Start(aout_api_t *api, audio_sample_format_t *restrict fmt,
     api->play = Play;
     api->pause = Pause;
     api->flush = Flush;
-    return VLC_SUCCESS;
+    return S_OK;
 error:
     if (sys->client != NULL)
         IAudioClient_Release(sys->client);
-    Leave();
+    free(sys);
     return hr;
 }
 
@@ -422,10 +413,8 @@ static void Stop(aout_api_t *api)
 {
     aout_api_sys_t *sys = api->sys;
 
-    Enter();
     IAudioClient_Stop(sys->client); /* should not be needed */
     IAudioClient_Release(sys->client);
-    Leave();
 }
 
 #undef aout_api_Start
@@ -442,7 +431,7 @@ aout_api_t *aout_api_Start(vlc_object_t *parent, audio_sample_format_t *fmt,
         vlc_object_release(api);
         api = NULL;
     }
-    return NULL;
+    return api;
 }
 
 void aout_api_Stop(aout_api_t *api)
