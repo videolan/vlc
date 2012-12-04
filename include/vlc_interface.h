@@ -264,7 +264,7 @@ typedef enum vlc_dialog {
                             "*.jss;*.psb;" \
                             "*.rt;*.smi;*.txt;" \
                             "*.smil;*.stl;*.usf;" \
-                            "*.dks;*.pjs;*.mpl2"
+                            "*.dks;*.pjs;*.mpl2;*.mks"
 
 /** \defgroup vlc_interaction Interaction
  * \ingroup vlc_interface
