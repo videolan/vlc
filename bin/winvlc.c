@@ -170,8 +170,8 @@ static void check_crashdump(void)
         return;
     fclose( fd );
 
-    int answer = MessageBox( NULL, L"VLC media player just crashed." \
-    " Do you want to send a bug report to the developers team?",
+    int answer = MessageBox( NULL, L"Ooops: VLC media player just crashed.\n" \
+    "Would you like to send a bug report to the developers team?",
     L"VLC crash reporting", MB_YESNO);
 
     if(answer == IDYES)
@@ -195,20 +195,20 @@ static void check_crashdump(void)
 
                 if( FtpPutFile( ftp, crashdump_path, remote_file,
                             FTP_TRANSFER_TYPE_BINARY, 0) )
-                    MessageBox( NULL, L"Report sent correctly. Thanks a lot \
-                            for the help.", L"Report sent", MB_OK);
+                    MessageBox( NULL, L"Report sent correctly. Thanks a lot " \
+                                "for the help.", L"Report sent", MB_OK);
                 else
-                    MessageBox( NULL, L"There was an error while \
-                            transferring to the FTP server. "\
-                                "Thanks a lot for the help anyway.",
+                    MessageBox( NULL, L"There was an error while "\
+                                "transferring the data to the FTP server.\n"\
+                                "Thanks a lot for the help.",
                                 L"Report sending failed", MB_OK);
                 InternetCloseHandle(ftp);
             }
             else
             {
-                MessageBox( NULL, L"There was an error while connecting to \
-                        the FTP server. "\
-                                "Thanks a lot for the help anyway.",
+                MessageBox( NULL, L"There was an error while connecting to " \
+                                "the FTP server. "\
+                                "Thanks a lot for the help.",
                                 L"Report sending failed", MB_OK);
                 fprintf(stderr,"Can't connect to FTP server 0x%08lu\n",
                         (unsigned long)GetLastError());
@@ -217,8 +217,7 @@ static void check_crashdump(void)
         }
         else
         {
-              MessageBox( NULL, L"There was an error while connecting to the \
-                      Internet. "\
+              MessageBox( NULL, L"There was an error while connecting to the Internet.\n"\
                                 "Thanks a lot for the help anyway.",
                                 L"Report sending failed", MB_OK);
         }
