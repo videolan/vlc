@@ -367,7 +367,7 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
     } \
     }
 
-    ADD_CALLBACK_ENTRY( "activity", on_item_current_changed, false )
+    ADD_CALLBACK_ENTRY( "activity", on_activity_changed, false )
     ADD_CALLBACK_ENTRY( "volume", on_volume_changed, true )
 
     ADD_CALLBACK_ENTRY( "bit-rate", on_bit_rate_changed, false )
@@ -444,10 +444,17 @@ int VlcProc::onGenericCallback2( vlc_object_t *pObj, const char *pVariable,
 }
 
 
-void VlcProc::on_item_current_changed( vlc_object_t* p_obj, vlc_value_t newVal )
+void VlcProc::on_activity_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 {
-    (void)p_obj;
-    input_item_t *p_item = static_cast<input_item_t*>(newVal.p_address);
+    (void)p_obj; (void)newVal;
+
+    input_thread_t *p_input = getIntf()->p_sys->p_input;
+    if( !p_input )
+        return;
+
+    input_item_t *p_item = input_GetItem( p_input );
+    if( !p_item )
+        return;
 
     // Update short name
     char *psz_name = input_item_GetName( p_item );
