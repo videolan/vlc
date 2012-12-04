@@ -87,8 +87,6 @@ struct aout_sys_t
 
     bool killed; /**< Flag to terminate the thread */
     bool running; /**< Whether the thread is running */
-    int8_t mute; /**< Requested mute state or negative value */
-    float volume; /**< Requested volume or negative value */
 };
 
 static int vlc_FromHR(audio_output_t *aout, HRESULT hr)
@@ -138,24 +136,50 @@ static void Flush(audio_output_t *aout, bool wait)
 static int VolumeSet(audio_output_t *aout, float vol)
 {
     aout_sys_t *sys = aout->sys;
+    ISimpleAudioVolume *volume;
+    HRESULT hr;
 
-    EnterCriticalSection(&sys->lock);
-    sys->volume = vol;
-    LeaveCriticalSection(&sys->lock);
+    hr = IAudioSessionManager_GetSimpleAudioVolume(sys->manager,
+                                                   &GUID_VLC_AUD_OUT,
+                                                   FALSE, &volume);
+    if (FAILED(hr))
+    {
+        msg_Err(aout, "cannot get simple volume (error 0x%lx)", hr);
+        return -1;
+    }
 
-    WakeConditionVariable(&sys->request_wait);
+    hr = ISimpleAudioVolume_SetMasterVolume(volume, vol, NULL);
+    ISimpleAudioVolume_Release(volume);
+    if (FAILED(hr))
+    {
+        msg_Err(aout, "cannot set volume (error 0x%lx)", hr);
+        return -1;
+    }
     return 0;
 }
 
 static int MuteSet(audio_output_t *aout, bool mute)
 {
     aout_sys_t *sys = aout->sys;
+    ISimpleAudioVolume *volume;
+    HRESULT hr;
 
-    EnterCriticalSection(&sys->lock);
-    sys->mute = mute;
-    LeaveCriticalSection(&sys->lock);
+    hr = IAudioSessionManager_GetSimpleAudioVolume(sys->manager,
+                                                   &GUID_VLC_AUD_OUT,
+                                                   FALSE, &volume);
+    if (FAILED(hr))
+    {
+        msg_Err(aout, "cannot get simple volume (error 0x%lx)", hr);
+        return -1;
+    }
 
-    WakeConditionVariable(&sys->request_wait);
+    hr = ISimpleAudioVolume_SetMute(volume, mute ? TRUE : FALSE, NULL);
+    ISimpleAudioVolume_Release(volume);
+    if (FAILED(hr))
+    {
+        msg_Err(aout, "cannot set mute (error 0x%lx)", hr);
+        return -1;
+    }
     return 0;
 }
 
@@ -411,7 +435,6 @@ static void MMThread(void *data)
     audio_output_t *aout = data;
     aout_sys_t *sys = aout->sys;
     IAudioSessionControl *control;
-    ISimpleAudioVolume *volume;
     HRESULT hr;
 
     Enter();
@@ -432,42 +455,14 @@ static void MMThread(void *data)
                                                          &sys->session_events);
     }
 
-    hr = IAudioSessionManager_GetSimpleAudioVolume(sys->manager,
-                                                   &GUID_VLC_AUD_OUT, FALSE,
-                                                   &volume);
-    if (FAILED(hr))
-        msg_Err(aout, "cannot get simple volume (error 0x%lx)", hr);
-
     EnterCriticalSection(&sys->lock);
     sys->running = true;
     WakeConditionVariable(&sys->reply_wait);
 
     while (!sys->killed)
-    {
-        /* Update volume */
-        if (sys->volume >= 0.f)
-        {
-            hr = ISimpleAudioVolume_SetMasterVolume(volume, sys->volume, NULL);
-            if (FAILED(hr))
-                msg_Err(aout, "cannot set volume (error 0x%lx)", hr);
-            sys->volume = -1.f;
-        }
-
-        /* Update mute state */
-        if (sys->mute >= 0)
-        {
-            hr = ISimpleAudioVolume_SetMute(volume, sys->mute, NULL);
-            if (FAILED(hr))
-                msg_Err(aout, "cannot set mute (error 0x%lx)", hr);
-            sys->mute = -1;
-        }
-
         SleepConditionVariableCS(&sys->request_wait, &sys->lock, INFINITE);
-    }
     LeaveCriticalSection(&sys->lock);
 
-    if (volume != NULL)
-        ISimpleAudioVolume_Release(volume);
     if (control != NULL)
     {
         IAudioSessionControl_UnregisterAudioSessionNotification(control,
@@ -532,8 +527,6 @@ static int Open(vlc_object_t *obj)
     InitializeConditionVariable(&sys->reply_wait);
     sys->killed = false;
     sys->running = false;
-    sys->volume = -1.f;
-    sys->mute = -1;
 
     hr = CoCreateInstance(&CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL,
                           &IID_IMMDeviceEnumerator, &pv);
