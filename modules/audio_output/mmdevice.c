@@ -151,15 +151,24 @@ static void Pause(audio_output_t *aout, bool paused, mtime_t date)
 static void Flush(audio_output_t *aout, bool wait)
 {
     aout_sys_t *sys = aout->sys;
-
-    if (wait)
-        return; /* Drain not implemented */
+    mtime_t delay = VLC_TS_INVALID;
 
     EnterMTA();
     EnterCriticalSection(&sys->lock);
-    aout_api_Flush(sys->api);
+
+    if (wait)
+    {   /* Loosy drain emulation */
+        if (FAILED(aout_api_TimeGet(sys->api, &delay)))
+            delay = VLC_TS_INVALID;
+    }
+    else
+        aout_api_Flush(sys->api);
+
     LeaveCriticalSection(&sys->lock);
     LeaveMTA();
+
+    if (delay != VLC_TS_INVALID)
+        Sleep((delay / (CLOCK_FREQ / 1000)) + 1);
 }
 
 static ISimpleAudioVolume *GetSimpleVolume(audio_output_t *aout)
