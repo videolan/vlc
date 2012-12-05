@@ -45,7 +45,7 @@ DEFINE_PROPERTYKEY(PKEY_Device_FriendlyName, 0xa45c254e, 0xdf1c, 0x4efd,
 DEFINE_GUID (GUID_VLC_AUD_OUT, 0x4533f59d, 0x59ee, 0x00c6,
    0xad, 0xb2, 0xc6, 0x8b, 0x50, 0x1a, 0x66, 0x55);
 
-static int TryEnter(vlc_object_t *obj)
+static int TryEnterMTA(vlc_object_t *obj)
 {
     HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
     if (unlikely(FAILED(hr)))
@@ -55,16 +55,16 @@ static int TryEnter(vlc_object_t *obj)
     }
     return 0;
 }
-#define TryEnter(o) TryEnter(VLC_OBJECT(o))
+#define TryEnterMTA(o) TryEnterMTA(VLC_OBJECT(o))
 
-static void Enter(void)
+static void EnterMTA(void)
 {
     HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
     if (unlikely(FAILED(hr)))
         abort();
 }
 
-static void Leave(void)
+static void LeaveMTA(void)
 {
     CoUninitialize();
 }
@@ -82,9 +82,19 @@ struct aout_sys_t
     struct IAudioSessionEvents session_events;
 
     LONG refs;
-    HANDLE device_changed;
+    CRITICAL_SECTION lock; /**< Lock to protect Core Audio API state */
+    HANDLE device_changed; /**< Event to reset thread */
     vlc_thread_t thread; /**< Thread for audio session control */
 };
+
+/* NOTE: The Core Audio API documentation totally fails to specify the thread
+ * safety (or lack thereof) of the interfaces. This code is most pessimistic
+ * and assumes that the API is not thread-safe at all.
+ *
+ * The audio output owner (i.e. the audio output core) is responsible for
+ * serializing callbacks. This code only needs to be concerned with
+ * synchronization between the set of audio output callbacks, the thread
+ * and (trivially) the device and session notifications. */
 
 static int vlc_FromHR(audio_output_t *aout, HRESULT hr)
 {
@@ -98,7 +108,13 @@ static int vlc_FromHR(audio_output_t *aout, HRESULT hr)
 static int TimeGet(audio_output_t *aout, mtime_t *restrict delay)
 {
     aout_sys_t *sys = aout->sys;
-    HRESULT hr = aout_api_TimeGet(sys->api, delay);
+    HRESULT hr;
+
+    EnterMTA();
+    EnterCriticalSection(&sys->lock);
+    hr = aout_api_TimeGet(sys->api, delay);
+    LeaveCriticalSection(&sys->lock);
+    LeaveMTA();
 
     return SUCCEEDED(hr) ? 0 : -1;
 }
@@ -106,7 +122,13 @@ static int TimeGet(audio_output_t *aout, mtime_t *restrict delay)
 static void Play(audio_output_t *aout, block_t *block)
 {
     aout_sys_t *sys = aout->sys;
-    HRESULT hr = aout_api_Play(sys->api, block);
+    HRESULT hr;
+
+    EnterMTA();
+    EnterCriticalSection(&sys->lock);
+    hr = aout_api_Play(sys->api, block);
+    LeaveCriticalSection(&sys->lock);
+    LeaveMTA();
 
     vlc_FromHR(aout, hr);
 }
@@ -114,7 +136,13 @@ static void Play(audio_output_t *aout, block_t *block)
 static void Pause(audio_output_t *aout, bool paused, mtime_t date)
 {
     aout_sys_t *sys = aout->sys;
-    HRESULT hr = aout_api_Pause(sys->api, paused);
+    HRESULT hr;
+
+    EnterMTA();
+    EnterCriticalSection(&sys->lock);
+    hr = aout_api_Pause(sys->api, paused);
+    LeaveCriticalSection(&sys->lock);
+    LeaveMTA();
 
     vlc_FromHR(aout, hr);
     (void) date;
@@ -127,63 +155,73 @@ static void Flush(audio_output_t *aout, bool wait)
     if (wait)
         return; /* Drain not implemented */
 
+    EnterMTA();
+    EnterCriticalSection(&sys->lock);
     aout_api_Flush(sys->api);
+    LeaveCriticalSection(&sys->lock);
+    LeaveMTA();
+}
+
+static ISimpleAudioVolume *GetSimpleVolume(audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+    ISimpleAudioVolume *volume;
+    HRESULT hr;
+
+    if (sys->manager == NULL)
+        return NULL;
+
+    if (TryEnterMTA(aout))
+        return NULL;
+    EnterCriticalSection(&sys->lock);
+    hr = IAudioSessionManager_GetSimpleAudioVolume(sys->manager,
+                                                   &GUID_VLC_AUD_OUT,
+                                                   FALSE, &volume);
+    if (FAILED(hr))
+    {
+        LeaveCriticalSection(&sys->lock);
+        LeaveMTA();
+        msg_Err(aout, "cannot get simple volume (error 0x%lx)", hr);
+        return NULL;
+    }
+    return volume;
+}
+
+static void PutSimpleVolume(audio_output_t *aout, ISimpleAudioVolume *volume)
+{
+    aout_sys_t *sys = aout->sys;
+
+    ISimpleAudioVolume_Release(volume);
+    LeaveCriticalSection(&sys->lock);
+    LeaveMTA();
 }
 
 static int VolumeSet(audio_output_t *aout, float vol)
 {
-    aout_sys_t *sys = aout->sys;
-    ISimpleAudioVolume *volume;
-    HRESULT hr;
-
-    if (sys->manager == NULL)
+    ISimpleAudioVolume *volume = GetSimpleVolume(aout);
+    if (volume == NULL)
         return -1;
 
-    hr = IAudioSessionManager_GetSimpleAudioVolume(sys->manager,
-                                                   &GUID_VLC_AUD_OUT,
-                                                   FALSE, &volume);
+    HRESULT hr = ISimpleAudioVolume_SetMasterVolume(volume, vol, NULL);
     if (FAILED(hr))
-    {
-        msg_Err(aout, "cannot get simple volume (error 0x%lx)", hr);
-        return -1;
-    }
-
-    hr = ISimpleAudioVolume_SetMasterVolume(volume, vol, NULL);
-    ISimpleAudioVolume_Release(volume);
-    if (FAILED(hr))
-    {
         msg_Err(aout, "cannot set volume (error 0x%lx)", hr);
-        return -1;
-    }
-    return 0;
+    PutSimpleVolume(aout, volume);
+
+    return FAILED(hr) ? -1 : 0;
 }
 
 static int MuteSet(audio_output_t *aout, bool mute)
 {
-    aout_sys_t *sys = aout->sys;
-    ISimpleAudioVolume *volume;
-    HRESULT hr;
-
-    if (sys->manager == NULL)
+    ISimpleAudioVolume *volume = GetSimpleVolume(aout);
+    if (volume == NULL)
         return -1;
 
-    hr = IAudioSessionManager_GetSimpleAudioVolume(sys->manager,
-                                                   &GUID_VLC_AUD_OUT,
-                                                   FALSE, &volume);
+    HRESULT hr = ISimpleAudioVolume_SetMute(volume, mute ? TRUE : FALSE, NULL);
     if (FAILED(hr))
-    {
-        msg_Err(aout, "cannot get simple volume (error 0x%lx)", hr);
-        return -1;
-    }
+        msg_Err(aout, "cannot set volume (error 0x%lx)", hr);
+    PutSimpleVolume(aout, volume);
 
-    hr = ISimpleAudioVolume_SetMute(volume, mute ? TRUE : FALSE, NULL);
-    ISimpleAudioVolume_Release(volume);
-    if (FAILED(hr))
-    {
-        msg_Err(aout, "cannot set mute (error 0x%lx)", hr);
-        return -1;
-    }
-    return 0;
+    return FAILED(hr) ? -1 : 0;
 }
 
 /*** Audio devices ***/
@@ -430,44 +468,68 @@ static wchar_t *var_InheritWide(vlc_object_t *obj, const char *name)
 }
 #define var_InheritWide(o,n) var_InheritWide(VLC_OBJECT(o),n)
 
+static void MMSession(audio_output_t *aout, aout_sys_t *sys)
+{
+    IAudioSessionControl *control;
+    HRESULT hr;
+
+    /* Register session control */
+    msg_Err(aout, "HERE: %p", sys->manager);
+    if (sys->manager != NULL)
+    {
+        hr = IAudioSessionManager_GetAudioSessionControl(sys->manager,
+                                                         &GUID_VLC_AUD_OUT, 0,
+                                                         &control);
+        if (FAILED(hr))
+            msg_Err(aout, "cannot get session control (error 0x%lx)", hr);
+    }
+    else
+        control = NULL;
+
+    msg_Err(aout, "THERE");
+    if (control != NULL)
+    {
+        wchar_t *ua = var_InheritWide(aout, "user-agent");
+        IAudioSessionControl_SetDisplayName(control, ua, NULL);
+        free(ua);
+
+        IAudioSessionControl_RegisterAudioSessionNotification(control,
+                                                         &sys->session_events);
+    }
+
+    LeaveCriticalSection(&sys->lock);
+    WaitForSingleObject(sys->device_changed, INFINITE);
+    EnterCriticalSection(&sys->lock);
+
+    /* Deregister session control */
+    if (control != NULL)
+    {
+        IAudioSessionControl_UnregisterAudioSessionNotification(control,
+                                                         &sys->session_events);
+        IAudioSessionControl_Release(control);
+    }
+}
+
 /** MMDevice audio output thread.
  * This thread takes cares of the audio session control. Inconveniently enough,
  * the audio session control interface must:
  *  - be created and destroyed from the same thread, and
  *  - survive across VLC audio output calls.
  * The only way to reconcile both requirements is a custom thread.
+ * The thread also ensure that the COM Multi-Thread Apartment is continuously
+ * referenced so that MMDevice objects are not destroyed early.
  */
 static void *MMThread(void *data)
 {
     audio_output_t *aout = data;
     aout_sys_t *sys = aout->sys;
-    IAudioSessionControl *control;
-    HRESULT hr;
 
-    /* Register session control */
-    hr = IAudioSessionManager_GetAudioSessionControl(sys->manager,
-                                                     &GUID_VLC_AUD_OUT, 0,
-                                                     &control);
-    if (FAILED(hr))
-    {
-        msg_Err(aout, "cannot get session control (error 0x%lx)", hr);
-        return NULL;
-    }
-
-    wchar_t *ua = var_InheritWide(aout, "user-agent");
-    IAudioSessionControl_SetDisplayName(control, ua, NULL);
-    free(ua);
-
-    sys->session_events.lpVtbl = &vlc_AudioSessionEvents;
-    IAudioSessionControl_RegisterAudioSessionNotification(control,
-                                                         &sys->session_events);
-
-    WaitForSingleObject(sys->device_changed, INFINITE);
-
-    /* Deregister session control */
-    IAudioSessionControl_UnregisterAudioSessionNotification(control,
-                                                         &sys->session_events);
-    IAudioSessionControl_Release(control);
+    EnterMTA();
+    EnterCriticalSection(&sys->lock);
+    while (sys->it != NULL)
+        MMSession(aout, sys);
+    LeaveCriticalSection(&sys->lock);
+    LeaveMTA();
     return NULL;
 }
 
@@ -479,6 +541,7 @@ static HRESULT OpenDevice(audio_output_t *aout, const char *devid)
     aout_sys_t *sys = aout->sys;
     HRESULT hr;
 
+    EnterCriticalSection(&sys->lock);
     if (devid != NULL) /* Device selected explicitly */
     {
         msg_Dbg(aout, "using selected device %s", devid);
@@ -495,41 +558,26 @@ static HRESULT OpenDevice(audio_output_t *aout, const char *devid)
     else /* Default device selected by policy */
     {
         msg_Dbg(aout, "using default device");
-        msg_Err(aout, "DOING...");
         hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(sys->it, eRender,
                                                          eConsole, &sys->dev);
-        msg_Err(aout, "DONE!");
-    }
-    if (FAILED(hr))
-    {
-        msg_Err(aout, "cannot get device (error 0x%lx)", hr);
-        goto error;
     }
 
     /* Create session manager (for controls even w/o active audio client) */
-    void *pv;
-    hr = IMMDevice_Activate(sys->dev, &IID_IAudioSessionManager,
-                            CLSCTX_ALL, NULL, &pv);
-    if (SUCCEEDED(hr))
-    {
-        sys->manager = pv;
-        if (vlc_clone(&sys->thread, MMThread, aout, VLC_THREAD_PRIORITY_LOW))
-        {
-            IAudioSessionManager_Release(sys->manager);
-            sys->manager = NULL;
-        }
-    }
+    if (FAILED(hr))
+        msg_Err(aout, "cannot get device (error 0x%lx)", hr);
     else
-        msg_Err(aout, "cannot activate session manager (error 0x%lx)", hr);
-
-    return S_OK;
-
-error:
-    if (sys->dev != NULL)
     {
-        IMMDevice_Release(sys->dev);
-        sys->dev = NULL;
+        void *pv;
+        hr = IMMDevice_Activate(sys->dev, &IID_IAudioSessionManager,
+                                CLSCTX_ALL, NULL, &pv);
+        if (FAILED(hr))
+            msg_Err(aout, "cannot activate session manager (error 0x%lx)", hr);
+        else
+            sys->manager = pv;
     }
+    LeaveCriticalSection(&sys->lock);
+
+    SetEvent(sys->device_changed);
     return hr;
 }
 
@@ -540,16 +588,18 @@ static void CloseDevice(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
 
+    assert(sys->dev != NULL);
+
+    EnterCriticalSection(&sys->lock);
     if (sys->manager != NULL)
     {
-        SetEvent(sys->device_changed);
-        vlc_join(sys->thread, NULL);
-
         IAudioSessionManager_Release(sys->manager);
         sys->manager = NULL;
     }
+
     IMMDevice_Release(sys->dev);
     sys->dev = NULL;
+    LeaveCriticalSection(&sys->lock);
 }
 
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
@@ -560,7 +610,12 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     if (sys->dev == NULL)
         return -1;
 
+    EnterMTA();
+    EnterCriticalSection(&sys->lock);
     sys->api = aout_api_Start(aout, fmt, sys->dev, &GUID_VLC_AUD_OUT);
+    LeaveCriticalSection(&sys->lock);
+    LeaveMTA();
+
     return (sys->api != NULL) ? 0 : -1;
 }
 
@@ -569,7 +624,13 @@ static void Stop(audio_output_t *aout)
     aout_sys_t *sys = aout->sys;
 
     assert (sys->api != NULL);
+
+    EnterMTA();
+    EnterCriticalSection(&sys->lock);
     aout_api_Stop(sys->api);
+    LeaveCriticalSection(&sys->lock);
+    LeaveMTA();
+
     sys->api = NULL;
 }
 
@@ -587,35 +648,41 @@ static int Open(vlc_object_t *obj)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
+    aout->sys = sys;
     sys->aout = aout;
     sys->api = NULL;
     sys->it = NULL;
+    sys->session_events.lpVtbl = &vlc_AudioSessionEvents;
     sys->refs = 1;
+
+    InitializeCriticalSection(&sys->lock);
     sys->device_changed = CreateEvent(NULL, FALSE, FALSE, NULL);
     if (unlikely(sys->device_changed == NULL))
-        abort();
+        goto error;
 
     /* Initialize MMDevice API */
-    if (TryEnter(aout))
+    if (TryEnterMTA(aout))
         goto error;
 
     hr = CoCreateInstance(&CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL,
                           &IID_IMMDeviceEnumerator, &pv);
-    Leave();
     if (FAILED(hr))
     {
+        LeaveMTA();
         msg_Dbg(aout, "cannot create device enumerator (error 0x%lx)", hr);
         goto error;
     }
     sys->it = pv;
-
     GetDevices(obj, sys->it);
 
+    if (vlc_clone(&sys->thread, MMThread, aout, VLC_THREAD_PRIORITY_LOW))
+        goto error;
+
     /* Get a device to start with */
-    aout->sys = sys;
     do
         hr = OpenDevice(aout, NULL);
     while (hr == AUDCLNT_E_DEVICE_INVALIDATED);
+    LeaveMTA(); /* leave MTA after thread has entered MTA */
 
     aout->start = Start;
     aout->stop = Stop;
@@ -629,6 +696,14 @@ static int Open(vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
+    if (sys->it != NULL)
+    {
+        IMMDeviceEnumerator_Release(sys->it);
+        LeaveMTA();
+    }
+    if (sys->device_changed != NULL)
+        CloseHandle(sys->device_changed);
+    DeleteCriticalSection(&sys->lock);
     free(sys);
     return VLC_EGENERIC;
 }
@@ -641,11 +716,21 @@ static void Close(vlc_object_t *obj)
     var_DelCallback (aout, "audio-device", DeviceChanged, NULL);
     var_Destroy (aout, "audio-device");
 
+    EnterMTA(); /* enter MTA before thread leaves MTA */
+    EnterCriticalSection(&sys->lock);
     if (sys->dev != NULL)
         CloseDevice(aout);
 
     IMMDeviceEnumerator_Release(sys->it);
+    sys->it = NULL;
+    LeaveCriticalSection(&sys->lock);
+
+    SetEvent(sys->device_changed);
+    vlc_join(sys->thread, NULL);
+    LeaveMTA();
+
     CloseHandle(sys->device_changed);
+    DeleteCriticalSection(&sys->lock);
     free(sys);
 }
 
