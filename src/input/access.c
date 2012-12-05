@@ -31,7 +31,7 @@
 #include <vlc_modules.h>
 
 /* Decode URL (which has had its scheme stripped earlier) to a file path. */
-static char *get_path(const char *location)
+char *get_path(const char *location)
 {
     char *url, *path;
 
