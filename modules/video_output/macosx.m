@@ -265,10 +265,10 @@ void Close (vlc_object_t *this)
     [(id)sys->container performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
     [sys->glView performSelectorOnMainThread:@selector(removeFromSuperview) withObject:nil waitUntilDone:NO];
 
-    [sys->glView release];
-
     if (sys->gl.sys != NULL)
         vout_display_opengl_Delete (sys->vgl);
+
+    [sys->glView release];
 
     if (sys->embed)
         vout_display_DeleteWindow (vd, sys->embed);
