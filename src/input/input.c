@@ -2930,14 +2930,18 @@ static void InputGetExtraFilesPattern( input_thread_t *p_input,
         if( asprintf( &psz_file, psz_format, psz_base, i ) < 0 )
             break;
 
-        if( vlc_stat( psz_file, &st ) || !S_ISREG( st.st_mode ) || !st.st_size )
+        char *psz_tmp_path = get_path( psz_file );
+
+        if( vlc_stat( psz_tmp_path, &st ) || !S_ISREG( st.st_mode ) || !st.st_size )
         {
             free( psz_file );
+            free( psz_tmp_path );
             break;
         }
 
         msg_Dbg( p_input, "Detected extra file `%s'", psz_file );
         TAB_APPEND( i_list, ppsz_list, psz_file );
+        free( psz_tmp_path );
     }
     free( psz_base );
 exit:
