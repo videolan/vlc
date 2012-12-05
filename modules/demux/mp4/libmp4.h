@@ -263,8 +263,9 @@
 #define ATOM_chap VLC_FOURCC( 'c', 'h', 'a', 'p' )
 
 /* Do you want some debug information on all read boxes ? */
-//#define MP4_VERBOSE  1
-
+#ifndef NDEBUG
+# define MP4_VERBOSE  1
+#endif
 
 struct MP4_Box_s;
 
