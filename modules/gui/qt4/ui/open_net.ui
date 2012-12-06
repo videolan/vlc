@@ -35,20 +35,16 @@
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="examples">
+        <property name="styleSheet">
+         <string notr="true">color: #838383; </string>
+        </property>
         <property name="text">
-         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-p { margin: 0; -qt-block-indent: 0; text-indent: 0;}
-body { font-family: 'sans'; font-size: 8pt; font-weight: 400; }
-p &gt; span { color: #838383; }
-&lt;/style&gt;&lt;/head&gt;&lt;body&gt;
-&lt;p&gt;&lt;span&gt;http://www.example.com/stream.avi&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;&lt;span&gt;rtp://@:1234&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;&lt;span&gt;mms://mms.examples.com/stream.asx&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;&lt;span&gt;rtsp://server.example.org:8080/test.sdp&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;&lt;span&gt;http://www.yourtube.com/watch?v=gg64x&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string notr="true">http://www.example.com/stream.avi
+rtp://@:1234
+mms://mms.examples.com/stream.asx
+rtsp://server.example.org:8080/test.sdp
+http://www.yourtube.com/watch?v=gg64x</string>
         </property>
         <property name="margin">
          <number>5</number>
