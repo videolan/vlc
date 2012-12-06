@@ -874,31 +874,36 @@ bool MediaServer::_fetchContents( Container* p_parent, int i_offset )
             if ( !title )
                 continue;
 
-            const char* resource =
-                        xml_getChildElementValue( itemElement, "res" );
-
-            if ( !resource )
-                continue;
-
-            const char* psz_duration = xml_getChildElementAttributeValue( itemElement,
-                                                                    "res",
-                                                                    "duration" );
-
-            mtime_t i_duration = -1;
-            int i_hours, i_minutes, i_seconds, i_decis;
-
-            if ( psz_duration )
+            /* Try to extract all resources in DIDL */
+            IXML_NodeList* p_resource_list = ixmlDocument_getElementsByTagName( (IXML_Document*) itemElement, "res" );
+            if ( p_resource_list )
             {
-                if( sscanf( psz_duration, "%02d:%02d:%02d.%d",
-                        &i_hours, &i_minutes, &i_seconds, &i_decis ))
-                    i_duration = INT64_C(1000000) * ( i_hours*3600 +
-                                                      i_minutes*60 +
-                                                      i_seconds ) +
-                                 INT64_C(100000) * i_decis;
-            }
+                int i_length = ixmlNodeList_length( p_resource_list );
+                for ( int i = 0; i < i_length; i++ )
+                {
+                    mtime_t i_duration = -1;
+                    int i_hours, i_minutes, i_seconds, i_decis;
+                    IXML_Element* p_resource = ( IXML_Element* ) ixmlNodeList_item( p_resource_list, i );
+                    const char* psz_resource_url = xml_getChildElementValue( p_resource, "res" );
+                    if( !psz_resource_url )
+                        continue;
+                    const char* psz_duration = ixmlElement_getAttribute( p_resource, "duration" );
 
-            Item* item = new Item( p_parent, objectID, title, resource, i_duration );
-            p_parent->addItem( item );
+                    if ( psz_duration )
+                    {
+                        if( sscanf( psz_duration, "%02d:%02d:%02d.%d",
+                            &i_hours, &i_minutes, &i_seconds, &i_decis ))
+                            i_duration = INT64_C(1000000) * ( i_hours*3600 +
+                                                              i_minutes*60 +
+                                                              i_seconds ) +
+                                         INT64_C(100000) * i_decis;
+                    }
+                    Item* item = new Item( p_parent, objectID, title, psz_resource_url, i_duration );
+                    p_parent->addItem( item );
+                }
+                ixmlNodeList_free( p_resource_list );
+            }
+            else continue;
         }
         ixmlNodeList_free( itemNodeList );
     }
