@@ -29,7 +29,6 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <audioclient.h>
-#include <mmdeviceapi.h>
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
@@ -312,7 +311,7 @@ static unsigned vlc_CheckWaveOrder (const WAVEFORMATEX *restrict wf,
 }
 
 static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
-                     IMMDevice *dev, const GUID *sid)
+                     const GUID *sid)
 {
     aout_stream_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
@@ -320,9 +319,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
     sys->client = NULL;
 
     void *pv;
-    HRESULT hr;
-
-    hr = IMMDevice_Activate(dev, &IID_IAudioClient, CLSCTX_ALL, NULL, &pv);
+    HRESULT hr = aout_stream_Activate(s, &IID_IAudioClient, NULL, &pv);
     if (FAILED(hr))
     {
         msg_Err(s, "cannot activate client (error 0x%lx)", hr);
@@ -404,10 +401,9 @@ static void Stop(aout_stream_t *s)
 }
 
 HRESULT aout_stream_Start(aout_stream_t *s,
-                          audio_sample_format_t *restrict fmt,
-                          IMMDevice *dev, const GUID *sid)
+                          audio_sample_format_t *restrict fmt, const GUID *sid)
 {
-    return Start(s, fmt, dev, sid);
+    return Start(s, fmt, sid);
 }
 
 void aout_stream_Stop(aout_stream_t *s)

@@ -618,6 +618,18 @@ static void CloseDevice(audio_output_t *aout)
     sys->dev = NULL;
 }
 
+/**
+ * Callback for aout_stream_t to create a stream on the device.
+ * This can instantiate an IAudioClient or IDirectSound(8) object.
+ */
+static HRESULT ActivateDevice(void *opaque, REFIID iid, PROPVARIANT *actparms,
+                              void **restrict pv)
+{
+    IMMDevice *dev = opaque;
+
+    return IMMDevice_Activate(dev, iid, CLSCTX_ALL, actparms, pv);
+}
+
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t *sys = aout->sys;
@@ -631,8 +643,11 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     if (unlikely(s == NULL))
         return -1;
 
+    s->owner.device = sys->dev;
+    s->owner.activate = ActivateDevice;
+
     EnterMTA();
-    hr = aout_stream_Start(s, fmt, sys->dev, &GUID_VLC_AUD_OUT);
+    hr = aout_stream_Start(s, fmt, &GUID_VLC_AUD_OUT);
     if (SUCCEEDED(hr))
         sys->stream = s;
     else

@@ -35,17 +35,22 @@ struct aout_stream
     HRESULT (*play)(aout_stream_t *, block_t *);
     HRESULT (*pause)(aout_stream_t *, bool);
     HRESULT (*flush)(aout_stream_t *);
+
+    struct
+    {
+        void *device;
+        HRESULT (*activate)(void *device, REFIID, PROPVARIANT *, void **);
+    } owner;
 };
 
 /**
  * Creates an audio output stream on a given Windows multimedia device.
  * \param s audio output stream object to be initialized
  * \param fmt audio output sample format [IN/OUT]
- * \param dev MMDevice API output device
  * \param sid audio output session GUID [IN]
  */
 HRESULT aout_stream_Start(aout_stream_t *s, audio_sample_format_t *fmt,
-                          IMMDevice *dev, const GUID *sid);
+                          const GUID *sid);
 
 /**
  * Destroys an audio output stream.
@@ -70,5 +75,12 @@ static inline HRESULT aout_stream_Pause(aout_stream_t *s, bool paused)
 static inline HRESULT aout_stream_Flush(aout_stream_t *s)
 {
     return (s->flush)(s);
+}
+
+static inline
+HRESULT aout_stream_Activate(aout_stream_t *s, REFIID iid,
+                             PROPVARIANT *actparms, void **pv)
+{
+    return s->owner.activate(s->owner.device, iid, actparms, pv);
 }
 #endif
