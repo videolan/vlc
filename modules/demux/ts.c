@@ -235,10 +235,17 @@ typedef struct
 
 } ts_psi_t;
 
+typedef enum
+{
+    TS_ES_DATA_PES,
+    TS_ES_DATA_TABLE_SECTION
+} ts_es_data_type_t;
+
 typedef struct
 {
     es_format_t  fmt;
     es_out_id_t *id;
+    ts_es_data_type_t data_type;
     int         i_data_size;
     int         i_data_gathered;
     block_t     *p_data;
@@ -347,7 +354,7 @@ static inline int PIDGet( block_t *p )
     return ( (p->p_buffer[1]&0x1f)<<8 )|p->p_buffer[2];
 }
 
-static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk );
+static bool GatherData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk );
 
 static block_t* ReadTSPacket( demux_t *p_demux );
 static mtime_t GetPCR( block_t *p_pkt );
@@ -865,7 +872,7 @@ static int Demux( demux_t *p_demux )
             }
             else if( !p_sys->b_udp_out )
             {
-                b_frame = GatherPES( p_demux, p_pid, p_pkt );
+                b_frame = GatherData( p_demux, p_pid, p_pkt );
             }
             else
             {
@@ -1327,6 +1334,7 @@ static void PIDInit( ts_pid_t *pid, bool b_psi, ts_psi_t *p_owner )
             return;
 
         es_format_Init( &pid->es->fmt, UNKNOWN_ES, 0 );
+        pid->es->data_type = TS_ES_DATA_PES;
         pid->es->pp_last = &pid->es->p_data;
     }
 }
@@ -1391,21 +1399,14 @@ static void PIDClean( demux_t *p_demux, ts_pid_t *pid )
 /****************************************************************************
  * gathering stuff
  ****************************************************************************/
-static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
+static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
 {
-    block_t *p_pes = pid->es->p_data;
     uint8_t header[34];
     unsigned i_pes_size = 0;
     unsigned i_skip = 0;
     mtime_t i_dts = -1;
     mtime_t i_pts = -1;
     mtime_t i_length = 0;
-
-    /* remove the pes from pid */
-    pid->es->p_data = NULL;
-    pid->es->i_data_size= 0;
-    pid->es->i_data_gathered= 0;
-    pid->es->pp_last = &pid->es->p_data;
 
     /* FIXME find real max size */
     /* const int i_max = */ block_ChainExtract( p_pes, header, 34 );
@@ -1614,6 +1615,78 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
     else
     {
         msg_Warn( p_demux, "empty pes" );
+    }
+}
+
+static void ParseTableSection( demux_t *p_demux, ts_pid_t *pid, block_t *p_data )
+{
+    block_t *p_content = block_ChainGather( p_data );
+    mtime_t i_date = -1;
+    for( int i = 0; pid->p_owner && i < pid->p_owner->i_prg; i++ )
+    {
+        if( pid->i_owner_number == pid->p_owner->prg[i]->i_number )
+        {
+            i_date = pid->p_owner->prg[i]->i_pcr_value;
+            if( i_date >= 0 )
+                break;
+        }
+    }
+    if( i_date >= 0 )
+    {
+        if( pid->es->fmt.i_codec == VLC_CODEC_SCTE_27 )
+        {
+            /* We need to extract the truncated pts stored inside the payload */
+            if( p_content->i_buffer > 9 && p_content->p_buffer[0] == 0xc6 )
+            {
+                int i_index = 0;
+                int i_offset = 4;
+                if( p_content->p_buffer[3] & 0x40 )
+                {
+                    i_index = ((p_content->p_buffer[7] & 0x0f) << 8) |
+                              p_content->p_buffer[8];
+                    i_offset = 9;
+                }
+                if( i_index == 0 && p_content->i_buffer > i_offset + 8 )
+                {
+                    bool is_immediate = p_content->p_buffer[i_offset + 3] & 0x40;
+                    if( !is_immediate )
+                    {
+                        mtime_t i_display_in = GetDWBE( &p_content->p_buffer[i_offset + 4] );
+                        if( i_display_in < i_date )
+                            i_date = i_display_in + (1ll << 32);
+                        else
+                            i_date = i_display_in;
+                    }
+
+                }
+            }
+        }
+        p_content->i_dts =
+        p_content->i_pts = VLC_TS_0 + i_date * 100 / 9;
+    }
+    es_out_Send( p_demux->out, pid->es->id, p_content );
+}
+static void ParseData( demux_t *p_demux, ts_pid_t *pid )
+{
+    block_t *p_data = pid->es->p_data;
+
+    /* remove the pes from pid */
+    pid->es->p_data = NULL;
+    pid->es->i_data_size = 0;
+    pid->es->i_data_gathered = 0;
+    pid->es->pp_last = &pid->es->p_data;
+
+    if( pid->es->data_type == TS_ES_DATA_PES )
+    {
+        ParsePES( p_demux, pid, p_data );
+    }
+    else if( pid->es->data_type == TS_ES_DATA_TABLE_SECTION )
+    {
+        ParseTableSection( p_demux, pid, p_data );
+    }
+    else
+    {
+        block_ChainRelease( p_data );
     }
 }
 
@@ -1961,7 +2034,7 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
             }
 }
 
-static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
+static bool GatherData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 {
     const uint8_t *p = p_bk->p_buffer;
     const bool b_unit_start = p[1]&0x40;
@@ -2093,26 +2166,49 @@ static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 
     if( b_unit_start )
     {
+        if( pid->es->data_type == TS_ES_DATA_TABLE_SECTION && p_bk->i_buffer > 0 )
+        {
+            int i_pointer_field = __MIN( p_bk->p_buffer[0], p_bk->i_buffer - 1 );
+            block_t *p = block_Duplicate( p_bk );
+            if( p )
+            {
+                p->i_buffer = i_pointer_field;
+                p->p_buffer++;
+                block_ChainLastAppend( &pid->es->pp_last, p );
+            }
+            p_bk->i_buffer -= 1 + i_pointer_field;
+            p_bk->p_buffer += 1 + i_pointer_field;
+        }
         if( pid->es->p_data )
         {
-            ParsePES( p_demux, pid );
+            ParseData( p_demux, pid );
             i_ret = true;
         }
 
         block_ChainLastAppend( &pid->es->pp_last, p_bk );
-        if( p_bk->i_buffer > 6 )
+        if( pid->es->data_type == TS_ES_DATA_PES )
         {
-            pid->es->i_data_size = GetWBE( &p_bk->p_buffer[4] );
-            if( pid->es->i_data_size > 0 )
+            if( p_bk->i_buffer > 6 )
             {
-                pid->es->i_data_size += 6;
+                pid->es->i_data_size = GetWBE( &p_bk->p_buffer[4] );
+                if( pid->es->i_data_size > 0 )
+                {
+                    pid->es->i_data_size += 6;
+                }
+            }
+        }
+        else if( pid->es->data_type == TS_ES_DATA_TABLE_SECTION )
+        {
+            if( p_bk->i_buffer > 3 && p_bk->p_buffer[0] != 0xff )
+            {
+                pid->es->i_data_size = 3 + (((p_bk->p_buffer[1] & 0xf) << 8) | p_bk->p_buffer[2]);
             }
         }
         pid->es->i_data_gathered += p_bk->i_buffer;
         if( pid->es->i_data_size > 0 &&
             pid->es->i_data_gathered >= pid->es->i_data_size )
         {
-            ParsePES( p_demux, pid );
+            ParseData( p_demux, pid );
             i_ret = true;
         }
     }
@@ -2127,10 +2223,11 @@ static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
         {
             block_ChainLastAppend( &pid->es->pp_last, p_bk );
             pid->es->i_data_gathered += p_bk->i_buffer;
+
             if( pid->es->i_data_size > 0 &&
                 pid->es->i_data_gathered >= pid->es->i_data_size )
             {
-                ParsePES( p_demux, pid );
+                ParseData( p_demux, pid );
                 i_ret = true;
             }
         }
@@ -2171,8 +2268,9 @@ static void PIDFillFormat( ts_es_t *es, int i_stream_type )
     case 0x81:  /* A52 (audio) */
         es_format_Init( fmt, AUDIO_ES, VLC_CODEC_A52 );
         break;
-    case 0x82:  /* DVD_SPU (sub) */
-        es_format_Init( fmt, SPU_ES, VLC_CODEC_SPU );
+    case 0x82:  /* SCTE-27 (sub) */
+        es_format_Init( fmt, SPU_ES, VLC_CODEC_SCTE_27 );
+        es->data_type = TS_ES_DATA_TABLE_SECTION;
         break;
     case 0x83:  /* LPCM (audio) */
         es_format_Init( fmt, AUDIO_ES, VLC_CODEC_DVD_LPCM );
@@ -3178,6 +3276,7 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
                 p_es->i_data_size = 0;
                 p_es->i_data_gathered = 0;
                 p_es->pp_last = &p_es->p_data;
+                p_es->data_type = TS_ES_DATA_PES;
                 p_es->p_mpeg4desc = NULL;
 
                 TAB_APPEND( pid->i_extra_es, pid->extra_es, p_es );
@@ -3261,6 +3360,7 @@ static void PMTSetupEsDvbSubtitle( demux_t *p_demux, ts_pid_t *pid,
                 p_es->i_data_size = 0;
                 p_es->i_data_gathered = 0;
                 p_es->pp_last = &p_es->p_data;
+                p_es->data_type = TS_ES_DATA_PES;
                 p_es->p_mpeg4desc = NULL;
 
                 TAB_APPEND( pid->i_extra_es, pid->extra_es, p_es );
