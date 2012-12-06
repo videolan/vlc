@@ -512,6 +512,7 @@ private slots:
 
 class KeyInputDialog : public QDialog
 {
+    Q_OBJECT
 public:
     KeyInputDialog( QTreeWidget *, const QString&, QWidget *, bool b_global = false);
     int keyValue;
@@ -520,11 +521,13 @@ public:
 private:
     QTreeWidget *table;
     QLabel *selected, *warning;
-    QDialogButtonBox *buttonBox;
+    QPushButton *ok, *unset;
 
     void checkForConflicts( int i_vlckey );
     void keyPressEvent( QKeyEvent *);
     void wheelEvent( QWheelEvent *);
     bool b_global;
+private slots:
+    void unsetAction();
 };
 #endif

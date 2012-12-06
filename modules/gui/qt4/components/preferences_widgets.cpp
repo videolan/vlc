@@ -1202,8 +1202,8 @@ void KeySelectorControl::finish()
 
             QString keys = qfu( p_config_item->value.psz );
             treeItem->setText( 1, keys );
-            treeItem->setToolTip( 1, qtr("Double click to change") );
-            treeItem->setToolTip( 2, qtr("Double click to change") );
+            treeItem->setToolTip( 1, qtr("Double click to change.\nDelete key to remove.") );
+            treeItem->setToolTip( 2, qtr("Double click to change.\nDelete key to remove.") );
             treeItem->setData( 1, Qt::UserRole, QVariant( keys ) );
             table->addTopLevelItem( treeItem );
             continue;
@@ -1285,9 +1285,8 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
                 if( ( keyItem != it ) &&
                     ( it->data( 1 + b_global, Qt::UserRole ).toString() == newKey ) )
                 {
-                    it->setData( 1 + b_global, Qt::UserRole,
-                                 QVariant( qfu( "Unset" ) ) );
-                    it->setText( 1 + b_global, qtr( "Unset" ) );
+                    it->setText( 1 + b_global, NULL );
+                    it->setData( 1 + b_global, Qt::UserRole, QVariant() );
                 }
             }
         }
@@ -1295,6 +1294,12 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
         keyItem->setText( column, newKey );
         keyItem->setData( column, Qt::UserRole, newKey );
     }
+    else if( d->result() == 2 )
+    {
+        keyItem->setText( 1 + b_global, NULL );
+        keyItem->setData( 1 + b_global, Qt::UserRole, QVariant() );
+    }
+
     delete d;
 }
 
@@ -1376,18 +1381,21 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
     warning->hide();
     vLayout->insertWidget( 1, warning );
 
-    buttonBox = new QDialogButtonBox;
-    QPushButton *ok = new QPushButton( qtr("Assign") );
+    QDialogButtonBox *buttonBox = new QDialogButtonBox;
+    ok = new QPushButton( qtr("Assign") );
     QPushButton *cancel = new QPushButton( qtr("Cancel") );
+    unset = new QPushButton( qtr("Unset") );
     buttonBox->addButton( ok, QDialogButtonBox::AcceptRole );
+    buttonBox->addButton( unset, QDialogButtonBox::ActionRole );
     buttonBox->addButton( cancel, QDialogButtonBox::RejectRole );
     ok->setDefault( true );
 
     vLayout->addWidget( buttonBox );
-    buttonBox->hide();
+    ok->hide();
 
     CONNECT( buttonBox, accepted(), this, accept() );
     CONNECT( buttonBox, rejected(), this, reject() );
+    BUTTONACT( unset, unsetAction() );
 }
 
 void KeyInputDialog::checkForConflicts( int i_vlckey )
@@ -1403,7 +1411,8 @@ void KeyInputDialog::checkForConflicts( int i_vlckey )
         warning->setText( qtr("Warning: this key or combination is already assigned to ") +
                 QString( "\"<b>%1</b>\"" ).arg( conflictList[0]->text( 0 ) ) );
         warning->show();
-        buttonBox->show();
+        ok->show();
+        unset->hide();
 
         conflicts = true;
     }
@@ -1433,3 +1442,5 @@ void KeyInputDialog::wheelEvent( QWheelEvent *e )
     checkForConflicts( i_vlck );
     keyValue = i_vlck;
 }
+
+void KeyInputDialog::unsetAction() { done( 2 ); };
