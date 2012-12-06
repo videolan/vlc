@@ -77,7 +77,7 @@ static void Leave(void)
     CoUninitialize();
 }
 
-typedef struct aout_api_sys
+typedef struct aout_stream_sys
 {
     IAudioClient *client;
 
@@ -89,13 +89,13 @@ typedef struct aout_api_sys
     unsigned bytes_per_frame;
     UINT32 written; /**< Frames written to the buffer */
     UINT32 frames; /**< Total buffer size (frames) */
-} aout_api_sys_t;
+} aout_stream_sys_t;
 
 
 /*** VLC audio output callbacks ***/
-static HRESULT TimeGet(aout_api_t *api, mtime_t *restrict delay)
+static HRESULT TimeGet(aout_stream_t *s, mtime_t *restrict delay)
 {
-    aout_api_sys_t *sys = api->sys;
+    aout_stream_sys_t *sys = s->sys;
     void *pv;
     UINT64 pos, qpcpos;
     HRESULT hr;
@@ -107,11 +107,11 @@ static HRESULT TimeGet(aout_api_t *api, mtime_t *restrict delay)
 
         hr = IAudioClock_GetPosition(clock, &pos, &qpcpos);
         if (FAILED(hr))
-            msg_Err(api, "cannot get position (error 0x%lx)", hr);
+            msg_Err(s, "cannot get position (error 0x%lx)", hr);
         IAudioClock_Release(clock);
     }
     else
-        msg_Err(api, "cannot get clock (error 0x%lx)", hr);
+        msg_Err(s, "cannot get clock (error 0x%lx)", hr);
 
     if (SUCCEEDED(hr))
     {
@@ -124,15 +124,15 @@ static HRESULT TimeGet(aout_api_t *api, mtime_t *restrict delay)
         else
         {
             *delay = sys->written * CLOCK_FREQ / sys->rate;
-            msg_Dbg(api, "extrapolating position: still propagating buffers");
+            msg_Dbg(s, "extrapolating position: still propagating buffers");
         }
     }
     return hr;
 }
 
-static HRESULT Play(aout_api_t *api, block_t *block)
+static HRESULT Play(aout_stream_t *s, block_t *block)
 {
-    aout_api_sys_t *sys = api->sys;
+    aout_stream_sys_t *sys = s->sys;
     void *pv;
     HRESULT hr;
 
@@ -143,7 +143,7 @@ static HRESULT Play(aout_api_t *api, block_t *block)
     hr = IAudioClient_GetService(sys->client, &IID_IAudioRenderClient, &pv);
     if (FAILED(hr))
     {
-        msg_Err(api, "cannot get render client (error 0x%lx)", hr);
+        msg_Err(s, "cannot get render client (error 0x%lx)", hr);
         goto out;
     }
 
@@ -154,7 +154,7 @@ static HRESULT Play(aout_api_t *api, block_t *block)
         hr = IAudioClient_GetCurrentPadding(sys->client, &frames);
         if (FAILED(hr))
         {
-            msg_Err(api, "cannot get current padding (error 0x%lx)", hr);
+            msg_Err(s, "cannot get current padding (error 0x%lx)", hr);
             break;
         }
 
@@ -167,7 +167,7 @@ static HRESULT Play(aout_api_t *api, block_t *block)
         hr = IAudioRenderClient_GetBuffer(render, frames, &dst);
         if (FAILED(hr))
         {
-            msg_Err(api, "cannot get buffer (error 0x%lx)", hr);
+            msg_Err(s, "cannot get buffer (error 0x%lx)", hr);
             break;
         }
 
@@ -177,7 +177,7 @@ static HRESULT Play(aout_api_t *api, block_t *block)
         hr = IAudioRenderClient_ReleaseBuffer(render, frames, 0);
         if (FAILED(hr))
         {
-            msg_Err(api, "cannot release buffer (error 0x%lx)", hr);
+            msg_Err(s, "cannot release buffer (error 0x%lx)", hr);
             break;
         }
         IAudioClient_Start(sys->client);
@@ -200,9 +200,9 @@ out:
     return hr;
 }
 
-static HRESULT Pause(aout_api_t *api, bool paused)
+static HRESULT Pause(aout_stream_t *s, bool paused)
 {
-    aout_api_sys_t *sys = api->sys;
+    aout_stream_sys_t *sys = s->sys;
     HRESULT hr;
 
     if (paused)
@@ -210,21 +210,21 @@ static HRESULT Pause(aout_api_t *api, bool paused)
     else
         hr = IAudioClient_Start(sys->client);
     if (FAILED(hr))
-        msg_Warn(api, "cannot %s stream (error 0x%lx)",
+        msg_Warn(s, "cannot %s stream (error 0x%lx)",
                  paused ? "stop" : "start", hr);
     return hr;
 }
 
-static HRESULT Flush(aout_api_t *api)
+static HRESULT Flush(aout_stream_t *s)
 {
-    aout_api_sys_t *sys = api->sys;
+    aout_stream_sys_t *sys = s->sys;
     HRESULT hr;
 
     IAudioClient_Stop(sys->client);
 
     hr = IAudioClient_Reset(sys->client);
     if (FAILED(hr))
-        msg_Warn(api, "cannot reset stream (error 0x%lx)", hr);
+        msg_Warn(s, "cannot reset stream (error 0x%lx)", hr);
     else
         sys->written = 0;
     return hr;
@@ -323,10 +323,10 @@ static unsigned vlc_CheckWaveOrder (const WAVEFORMATEX *restrict wf,
     return aout_CheckChannelReorder(chans_in, chans_out, mask, table);
 }
 
-static HRESULT Start(aout_api_t *api, audio_sample_format_t *restrict fmt,
+static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
                      IMMDevice *dev, const GUID *sid)
 {
-    aout_api_sys_t *sys = malloc(sizeof (*sys));
+    aout_stream_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return E_OUTOFMEMORY;
     sys->client = NULL;
@@ -339,7 +339,7 @@ static HRESULT Start(aout_api_t *api, audio_sample_format_t *restrict fmt,
     Leave();
     if (FAILED(hr))
     {
-        msg_Err(api, "cannot activate client (error 0x%lx)", hr);
+        msg_Err(s, "cannot activate client (error 0x%lx)", hr);
         goto error;
     }
     sys->client = pv;
@@ -353,7 +353,7 @@ static HRESULT Start(aout_api_t *api, audio_sample_format_t *restrict fmt,
                                         &wf.Format, &pwf);
     if (FAILED(hr))
     {
-        msg_Err(api, "cannot negotiate audio format (error 0x%lx)", hr);
+        msg_Err(s, "cannot negotiate audio format (error 0x%lx)", hr);
         goto error;
     }
 
@@ -363,11 +363,11 @@ static HRESULT Start(aout_api_t *api, audio_sample_format_t *restrict fmt,
         if (vlc_FromWave(pwf, fmt))
         {
             CoTaskMemFree(pwf);
-            msg_Err(api, "unsupported audio format");
+            msg_Err(s, "unsupported audio format");
             hr = E_INVALIDARG;
             goto error;
         }
-        msg_Dbg(api, "modified format");
+        msg_Dbg(s, "modified format");
     }
     else
         assert(pwf == NULL);
@@ -382,25 +382,25 @@ static HRESULT Start(aout_api_t *api, audio_sample_format_t *restrict fmt,
     CoTaskMemFree(pwf);
     if (FAILED(hr))
     {
-        msg_Err(api, "cannot initialize audio client (error 0x%lx)", hr);
+        msg_Err(s, "cannot initialize audio client (error 0x%lx)", hr);
         goto error;
     }
 
     hr = IAudioClient_GetBufferSize(sys->client, &sys->frames);
     if (FAILED(hr))
     {
-        msg_Err(api, "cannot get buffer size (error 0x%lx)", hr);
+        msg_Err(s, "cannot get buffer size (error 0x%lx)", hr);
         goto error;
     }
 
     sys->rate = fmt->i_rate;
     sys->bytes_per_frame = fmt->i_bytes_per_frame;
     sys->written = 0;
-    api->sys = sys;
-    api->time_get = TimeGet;
-    api->play = Play;
-    api->pause = Pause;
-    api->flush = Flush;
+    s->sys = sys;
+    s->time_get = TimeGet;
+    s->play = Play;
+    s->pause = Pause;
+    s->flush = Flush;
     return S_OK;
 error:
     if (sys->client != NULL)
@@ -409,33 +409,34 @@ error:
     return hr;
 }
 
-static void Stop(aout_api_t *api)
+static void Stop(aout_stream_t *s)
 {
-    aout_api_sys_t *sys = api->sys;
+    aout_stream_sys_t *sys = s->sys;
 
     IAudioClient_Stop(sys->client); /* should not be needed */
     IAudioClient_Release(sys->client);
 }
 
-#undef aout_api_Start
-aout_api_t *aout_api_Start(vlc_object_t *parent, audio_sample_format_t *fmt,
-                           IMMDevice *dev, const GUID *sid)
+#undef aout_stream_Start
+aout_stream_t *aout_stream_Start(vlc_object_t *parent,
+                                 audio_sample_format_t *restrict fmt,
+                                 IMMDevice *dev, const GUID *sid)
 {
-    aout_api_t *api = vlc_object_create(parent, sizeof (*api));
-    if (unlikely(api == NULL))
+    aout_stream_t *s = vlc_object_create(parent, sizeof (*s));
+    if (unlikely(s == NULL))
         return NULL;
 
-    HRESULT hr = Start(api, fmt, dev, sid);
+    HRESULT hr = Start(s, fmt, dev, sid);
     if (FAILED(hr))
     {
-        vlc_object_release(api);
-        api = NULL;
+        vlc_object_release(s);
+        s = NULL;
     }
-    return api;
+    return s;
 }
 
-void aout_api_Stop(aout_api_t *api)
+void aout_stream_Stop(aout_stream_t *s)
 {
-    Stop(api);
-    vlc_object_release(api);
+    Stop(s);
+    vlc_object_release(s);
 }

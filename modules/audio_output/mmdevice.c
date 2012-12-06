@@ -72,7 +72,7 @@ static void LeaveMTA(void)
 struct aout_sys_t
 {
     audio_output_t *aout;
-    aout_api_t *api; /**< Audio output back-end API */
+    aout_stream_t *stream; /**< Underlying audio output stream */
 
     IMMDeviceEnumerator *it; /**< Device enumerator, NULL when exiting */
     /*TODO: IMMNotificationClient*/
@@ -112,7 +112,7 @@ static int TimeGet(audio_output_t *aout, mtime_t *restrict delay)
 
     EnterMTA();
     EnterCriticalSection(&sys->lock);
-    hr = aout_api_TimeGet(sys->api, delay);
+    hr = aout_stream_TimeGet(sys->stream, delay);
     LeaveCriticalSection(&sys->lock);
     LeaveMTA();
 
@@ -126,7 +126,7 @@ static void Play(audio_output_t *aout, block_t *block)
 
     EnterMTA();
     EnterCriticalSection(&sys->lock);
-    hr = aout_api_Play(sys->api, block);
+    hr = aout_stream_Play(sys->stream, block);
     LeaveCriticalSection(&sys->lock);
     LeaveMTA();
 
@@ -140,7 +140,7 @@ static void Pause(audio_output_t *aout, bool paused, mtime_t date)
 
     EnterMTA();
     EnterCriticalSection(&sys->lock);
-    hr = aout_api_Pause(sys->api, paused);
+    hr = aout_stream_Pause(sys->stream, paused);
     LeaveCriticalSection(&sys->lock);
     LeaveMTA();
 
@@ -158,11 +158,11 @@ static void Flush(audio_output_t *aout, bool wait)
 
     if (wait)
     {   /* Loosy drain emulation */
-        if (FAILED(aout_api_TimeGet(sys->api, &delay)))
+        if (FAILED(aout_stream_TimeGet(sys->stream, &delay)))
             delay = VLC_TS_INVALID;
     }
     else
-        aout_api_Flush(sys->api);
+        aout_stream_Flush(sys->stream);
 
     LeaveCriticalSection(&sys->lock);
     LeaveMTA();
@@ -237,7 +237,7 @@ static int MuteSet(audio_output_t *aout, bool mute)
 static int DeviceChanged(vlc_object_t *obj, const char *varname,
                          vlc_value_t prev, vlc_value_t cur, void *data)
 {
-    /* FIXME: This does not work. sys->dev, sys->manager and sys->api must be
+    /* FIXME: This does not work. sys->dev, ->manager and ->stream must be
      * recreated. Those pointers are protected by the aout lock, which
      * serializes accesses to the audio_output_t. Unfortunately,
      * aout lock cannot be taken from a variable callback.
@@ -615,32 +615,32 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t *sys = aout->sys;
 
-    assert (sys->api == NULL);
+    assert (sys->stream == NULL);
     if (sys->dev == NULL)
         return -1;
 
     EnterMTA();
     EnterCriticalSection(&sys->lock);
-    sys->api = aout_api_Start(aout, fmt, sys->dev, &GUID_VLC_AUD_OUT);
+    sys->stream = aout_stream_Start(aout, fmt, sys->dev, &GUID_VLC_AUD_OUT);
     LeaveCriticalSection(&sys->lock);
     LeaveMTA();
 
-    return (sys->api != NULL) ? 0 : -1;
+    return (sys->stream != NULL) ? 0 : -1;
 }
 
 static void Stop(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
 
-    assert (sys->api != NULL);
+    assert (sys->stream != NULL);
 
     EnterMTA();
     EnterCriticalSection(&sys->lock);
-    aout_api_Stop(sys->api);
+    aout_stream_Stop(sys->stream);
     LeaveCriticalSection(&sys->lock);
     LeaveMTA();
 
-    sys->api = NULL;
+    sys->stream = NULL;
 }
 
 static int Open(vlc_object_t *obj)
@@ -659,7 +659,7 @@ static int Open(vlc_object_t *obj)
 
     aout->sys = sys;
     sys->aout = aout;
-    sys->api = NULL;
+    sys->stream = NULL;
     sys->it = NULL;
     sys->session_events.lpVtbl = &vlc_AudioSessionEvents;
     sys->refs = 1;

@@ -21,20 +21,20 @@
 #ifndef VLC_AOUT_MMDEVICE_H
 # define VLC_AOUT_MMDEVICE_H 1
 
-typedef struct aout_api aout_api_t;
+typedef struct aout_stream aout_stream_t;
 
 /**
  * Audio output simplified API for Windows
  */
-struct aout_api
+struct aout_stream
 {
     VLC_COMMON_MEMBERS
     void *sys;
 
-    HRESULT (*time_get)(aout_api_t *, mtime_t *);
-    HRESULT (*play)(aout_api_t *, block_t *);
-    HRESULT (*pause)(aout_api_t *, bool);
-    HRESULT (*flush)(aout_api_t *);
+    HRESULT (*time_get)(aout_stream_t *, mtime_t *);
+    HRESULT (*play)(aout_stream_t *, block_t *);
+    HRESULT (*pause)(aout_stream_t *, bool);
+    HRESULT (*flush)(aout_stream_t *);
 };
 
 /**
@@ -44,32 +44,33 @@ struct aout_api
  * \param dev audio output device
  * \param sid audio output session GUID [IN]
  */
-aout_api_t *aout_api_Start(vlc_object_t *parent, audio_sample_format_t *fmt,
-                           IMMDevice *dev, const GUID *sid);
-#define aout_api_Start(o,f,d,s) aout_api_Start(VLC_OBJECT(o),f,d,s)
+aout_stream_t *aout_stream_Start(vlc_object_t *parent,
+                                 audio_sample_format_t *fmt,
+                                 IMMDevice *dev, const GUID *sid);
+#define aout_stream_Start(o,f,d,s) aout_stream_Start(VLC_OBJECT(o),f,d,s)
 
 /**
  * Destroys an audio output stream.
  */
-void aout_api_Stop(aout_api_t *);
+void aout_stream_Stop(aout_stream_t *);
 
-static inline HRESULT aout_api_TimeGet(aout_api_t *api, mtime_t *delay)
+static inline HRESULT aout_stream_TimeGet(aout_stream_t *s, mtime_t *delay)
 {
-    return (api->time_get)(api, delay);
+    return (s->time_get)(s, delay);
 }
 
-static inline HRESULT aout_api_Play(aout_api_t *api, block_t *block)
+static inline HRESULT aout_stream_Play(aout_stream_t *s, block_t *block)
 {
-    return (api->play)(api, block);
+    return (s->play)(s, block);
 }
 
-static inline HRESULT aout_api_Pause(aout_api_t *api, bool paused)
+static inline HRESULT aout_stream_Pause(aout_stream_t *s, bool paused)
 {
-    return (api->pause)(api, paused);
+    return (s->pause)(s, paused);
 }
 
-static inline HRESULT aout_api_Flush(aout_api_t *api)
+static inline HRESULT aout_stream_Flush(aout_stream_t *s)
 {
-    return (api->flush)(api);
+    return (s->flush)(s);
 }
 #endif
