@@ -79,6 +79,7 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta,
     int n;
     int i_comment;
     int i_attach = 0;
+    seekpoint_t *sk = NULL;
 
     if( i_data < 8 )
         return;
@@ -198,6 +199,7 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta,
             {
                 char *p = strchr( psz_comment, '=' );
                 *p++ = '\0';
+                sk->psz_name = strdup( p );
             }
             else if( sscanf( psz_comment, "chapter %i=", &i_chapt ) == 1 )
             {
@@ -207,7 +209,7 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta,
 
                 if( sscanf( p, "%d:%d:%d.%d", &h, &m, &s, &ms ) == 4 )
                 {
-                    seekpoint_t *sk = vlc_seekpoint_New();
+                    sk = vlc_seekpoint_New();
                     sk->i_time_offset = ((h * 3600 + m * 60 + s) *1000 + ms) * 1000;
                     TAB_APPEND_CAST( (seekpoint_t**), *i_seekpoint, *ppp_seekpoint, sk );
                 }

@@ -510,6 +510,41 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *pi64 = p_sys->i_length * 1000000;
             return VLC_SUCCESS;
 
+        case DEMUX_GET_TITLE_INFO:
+        {
+            input_title_t ***ppp_title = (input_title_t***)va_arg( args, input_title_t*** );
+            int *pi_int    = (int*)va_arg( args, int* );
+            int *pi_title_offset = (int*)va_arg( args, int* );
+            int *pi_seekpoint_offset = (int*)va_arg( args, int* );
+
+            if( p_sys->i_seekpoints > 0 )
+            {
+                *pi_int = 1;
+                *ppp_title = malloc( sizeof( input_title_t**) );
+                input_title_t *p_title = (*ppp_title)[0] = vlc_input_title_New();
+                for( int i = 0; i < p_sys->i_seekpoints; i++ )
+                {
+                    TAB_APPEND( p_title->i_seekpoint, p_title->seekpoint, p_sys->pp_seekpoints[i] );
+                }
+                *pi_title_offset = 0;
+                *pi_seekpoint_offset = 0;
+            }
+            return VLC_SUCCESS;
+        }
+        case DEMUX_SET_TITLE:
+        {
+            const int i_title = (int)va_arg( args, int );
+            if( i_title > 1 )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
+        case DEMUX_SET_SEEKPOINT:
+        {
+            const int i_seekpoint = (int)va_arg( args, int );
+            if( i_seekpoint > p_sys->i_seekpoints )
+                return VLC_EGENERIC;
+            return VLC_EGENERIC;// Seek( p_demux, p_sys->pp_seekpoints[i_seekpoint]->i_time_offset );
+        }
 
         default:
             return demux_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
@@ -1788,6 +1823,11 @@ static void Ogg_ExtractXiphMeta( demux_t *p_demux, const void *p_headers, unsign
         vorbis_ParseComment( &p_ogg->p_meta, (uint8_t*)pp_data[1] + i_skip, pi_size[1] - i_skip,
                              &p_ogg->i_attachments, &p_ogg->attachments,
                              &p_ogg->i_seekpoints, &p_ogg->pp_seekpoints );
+
+    if( p_ogg->i_seekpoints > 1 )
+    {
+        p_demux->info.i_update |= INPUT_UPDATE_TITLE_LIST;
+    }
 
     for( unsigned i = 0; i < i_count; i++ )
         free( pp_data[i] );
