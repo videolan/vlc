@@ -65,18 +65,6 @@ static UINT64 GetQPC(void)
     return (d.quot * 10000000) + ((d.rem * 10000000) / freq.QuadPart);
 }
 
-static void Enter(void)
-{
-    HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-    if (unlikely(FAILED(hr)))
-        abort();
-}
-
-static void Leave(void)
-{
-    CoUninitialize();
-}
-
 typedef struct aout_stream_sys
 {
     IAudioClient *client;
@@ -334,9 +322,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
     void *pv;
     HRESULT hr;
 
-    Enter();
     hr = IMMDevice_Activate(dev, &IID_IAudioClient, CLSCTX_ALL, NULL, &pv);
-    Leave();
     if (FAILED(hr))
     {
         msg_Err(s, "cannot activate client (error 0x%lx)", hr);
