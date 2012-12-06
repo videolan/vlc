@@ -39,15 +39,13 @@ struct aout_stream
 
 /**
  * Creates an audio output stream on a given Windows multimedia device.
- * \param parent parent VLC object
+ * \param s audio output stream object to be initialized
  * \param fmt audio output sample format [IN/OUT]
- * \param dev audio output device
+ * \param dev MMDevice API output device
  * \param sid audio output session GUID [IN]
  */
-aout_stream_t *aout_stream_Start(vlc_object_t *parent,
-                                 audio_sample_format_t *fmt,
-                                 IMMDevice *dev, const GUID *sid);
-#define aout_stream_Start(o,f,d,s) aout_stream_Start(VLC_OBJECT(o),f,d,s)
+HRESULT aout_stream_Start(aout_stream_t *s, audio_sample_format_t *fmt,
+                          IMMDevice *dev, const GUID *sid);
 
 /**
  * Destroys an audio output stream.

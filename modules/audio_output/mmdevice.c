@@ -597,16 +597,25 @@ static void CloseDevice(audio_output_t *aout)
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t *sys = aout->sys;
+    HRESULT hr;
 
     assert (sys->stream == NULL);
     if (sys->dev == NULL)
         return -1;
 
+    aout_stream_t *s = vlc_object_create(aout, sizeof (*s));
+    if (unlikely(s == NULL))
+        return -1;
+
     EnterMTA();
-    sys->stream = aout_stream_Start(aout, fmt, sys->dev, &GUID_VLC_AUD_OUT);
+    hr = aout_stream_Start(s, fmt, sys->dev, &GUID_VLC_AUD_OUT);
+    if (SUCCEEDED(hr))
+        sys->stream = s;
+    else
+        vlc_object_release(s);
     LeaveMTA();
 
-    return (sys->stream != NULL) ? 0 : -1;
+    return vlc_FromHR(aout, hr);
 }
 
 static void Stop(audio_output_t *aout)
@@ -619,6 +628,7 @@ static void Stop(audio_output_t *aout)
     aout_stream_Stop(sys->stream);
     LeaveMTA();
 
+    vlc_object_release(sys->stream);
     sys->stream = NULL;
 }
 

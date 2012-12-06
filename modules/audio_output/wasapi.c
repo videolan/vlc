@@ -403,26 +403,14 @@ static void Stop(aout_stream_t *s)
     IAudioClient_Release(sys->client);
 }
 
-#undef aout_stream_Start
-aout_stream_t *aout_stream_Start(vlc_object_t *parent,
-                                 audio_sample_format_t *restrict fmt,
-                                 IMMDevice *dev, const GUID *sid)
+HRESULT aout_stream_Start(aout_stream_t *s,
+                          audio_sample_format_t *restrict fmt,
+                          IMMDevice *dev, const GUID *sid)
 {
-    aout_stream_t *s = vlc_object_create(parent, sizeof (*s));
-    if (unlikely(s == NULL))
-        return NULL;
-
-    HRESULT hr = Start(s, fmt, dev, sid);
-    if (FAILED(hr))
-    {
-        vlc_object_release(s);
-        s = NULL;
-    }
-    return s;
+    return Start(s, fmt, dev, sid);
 }
 
 void aout_stream_Stop(aout_stream_t *s)
 {
     Stop(s);
-    vlc_object_release(s);
 }
