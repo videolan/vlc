@@ -791,7 +791,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
      * TODO? tlength could be adaptively increased to reduce wakeups. */
     attr.tlength = pa_usec_to_bytes(AOUT_MIN_PREPARE_TIME, &ss);
     attr.prebuf = 0; /* trigger manually */
-    attr.minreq = -1;
+    attr.minreq = attr.tlength / 3;
     attr.fragsize = 0; /* not used for output */
 
     sys->stream = NULL;
