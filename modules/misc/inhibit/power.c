@@ -33,107 +33,120 @@
 #include <vlc_inhibit.h>
 #include <dbus/dbus.h>
 
+enum vlc_inhibit_api
+{
+    FREEDESKTOP, /* KDE and GNOME <= 2.26 */
+    GNOME, /**< GNOME 2.26..3.4 */
+};
+
+static const char dbus_service[][32] =
+{
+    [FREEDESKTOP] = "org.freedesktop.PowerManagement",
+    [GNOME]       = "org.gnome.SessionManager",
+};
+
+static const char dbus_path[][33] =
+{
+    [FREEDESKTOP] = "/org/freedesktop/PowerManagement",
+    [GNOME]       = "/org/gnome/SessionManager",
+};
+
+static const char dbus_interface[][40] =
+{
+    [FREEDESKTOP] = "org.freedesktop.PowerManagement.Inhibit",
+    [GNOME]       = "org.gnome.SessionManager",
+};
+
+static const char dbus_method_uninhibit[][10] =
+{
+    [FREEDESKTOP] = "UnInhibit",
+    [GNOME]       = "Uninhibit",
+};
+
 struct vlc_inhibit_sys
 {
     DBusConnection *conn;
     dbus_uint32_t cookie[2];
 };
 
-static void Inhibit (vlc_inhibit_t *ih, unsigned flags)
+static void InhibitAPI(vlc_inhibit_t *ih, unsigned flags,
+                       enum vlc_inhibit_api type)
 {
-    enum {
-        FREEDESKTOP = 0, /* as used by KDE and gnome <= 2.26 */
-        GNOME       = 1, /* as used by gnome > 2.26 */
-    };
-
-    static const char dbus_service[2][32] = {
-        [FREEDESKTOP]   = "org.freedesktop.PowerManagement",
-        [GNOME]         = "org.gnome.SessionManager",
-    };
-
-    static const char dbus_path[2][33] = {
-        [FREEDESKTOP]   = "/org/freedesktop/PowerManagement",
-        [GNOME]         = "/org/gnome/SessionManager",
-    };
-
-    static const char dbus_interface[2][40] = {
-        [FREEDESKTOP]   = "org.freedesktop.PowerManagement.Inhibit",
-        [GNOME]         = "org.gnome.SessionManager",
-    };
-
-    static const char dbus_method[2][2][10] = {
-        {
-            [FREEDESKTOP]   = "UnInhibit",
-            [GNOME]         = "Uninhibit",
-        },
-        {
-            [FREEDESKTOP]   = "Inhibit",
-            [GNOME]         = "Inhibit",
-        },
-    };
-
-    static const char *app = PACKAGE;
-    static const char *reason = N_("Playing some media.");
-
     vlc_inhibit_sys_t *sys = ih->p_sys;
     DBusConnection *conn = sys->conn;
 
-    const bool suspend = !!flags;
-    const dbus_uint32_t xid = 0; // FIXME ?
-    const dbus_uint32_t gnome_flags = ((flags & VLC_INHIBIT_SUSPEND) ? 8 : 0)
-        | ((flags & VLC_INHIBIT_DISPLAY) ? 4 : 0);
-    for (int type = 0; type < 2; type++) {
-        dbus_bool_t ret;
+    const char *method = flags ? "Inhibit" : dbus_method_uninhibit[type];
+    dbus_bool_t ret;
 
-        DBusMessage *msg = dbus_message_new_method_call(dbus_service[type],
-                dbus_path[type], dbus_interface[type], dbus_method[suspend][type]);
-        if (unlikely(msg == NULL))
-            return;
+    DBusMessage *msg = dbus_message_new_method_call(dbus_service[type],
+                                dbus_path[type], dbus_interface[type], method);
+    if (unlikely(msg == NULL))
+        return;
 
-        if (suspend) {
-            if (type == FREEDESKTOP)
-                ret = dbus_message_append_args (msg, DBUS_TYPE_STRING, &app,
-                        DBUS_TYPE_STRING, &reason,
-                        DBUS_TYPE_INVALID);
-            else if (type == GNOME)
-                ret = dbus_message_append_args (msg, DBUS_TYPE_STRING, &app,
-                        DBUS_TYPE_UINT32, &xid,
-                        DBUS_TYPE_STRING, &reason,
-                        DBUS_TYPE_UINT32, &gnome_flags,
-                        DBUS_TYPE_INVALID);
-        } else {
-            ret = false;
-            if (sys->cookie[type])
-                ret = dbus_message_append_args (msg, DBUS_TYPE_UINT32,
-                    &sys->cookie[type], DBUS_TYPE_INVALID);
-        }
+    if (flags) {
+        const char *app = PACKAGE;
+        const char *reason = N_("Playing some media.");
 
-        if (!ret)
-            goto end;
+        switch (type)
+        {
+            case FREEDESKTOP:
+                ret = dbus_message_append_args(msg, DBUS_TYPE_STRING, &app,
+                                                    DBUS_TYPE_STRING, &reason,
+                                                    DBUS_TYPE_INVALID);
+                break;
+            case GNOME:
+            {
+                dbus_uint32_t xid = 0; // FIXME ?
+                dbus_uint32_t gflags =
+                   ((flags & VLC_INHIBIT_SUSPEND) ? 8 : 0) |
+                   ((flags & VLC_INHIBIT_DISPLAY) ? 4 : 0);
 
-        if (suspend) { /* read reply */
-            /* blocks 50ms maximum */
-            DBusMessage *reply = dbus_connection_send_with_reply_and_block(
-                    conn, msg, 50, NULL );
-
-            if (unlikely(reply == NULL))
-                goto end; /* gpm is not active, or too slow. Better luck next time? */
-
-            if (!dbus_message_get_args(reply, NULL,
-                                       DBUS_TYPE_UINT32, &sys->cookie[type],
-                                       DBUS_TYPE_INVALID))
-                sys->cookie[type] = 0;
-
-            dbus_message_unref( reply );
-        } else { /* just send and flush */
-            if (dbus_connection_send (conn, msg, NULL)) {
-                sys->cookie[type] = 0;
-                dbus_connection_flush (conn);
+                ret = dbus_message_append_args(msg, DBUS_TYPE_STRING, &app,
+                                                    DBUS_TYPE_UINT32, &xid,
+                                                    DBUS_TYPE_STRING, &reason,
+                                                    DBUS_TYPE_UINT32, &gflags,
+                                                    DBUS_TYPE_INVALID);
+                break;
             }
         }
-end:
-        dbus_message_unref (msg);
+    } else {
+        if (sys->cookie[type])
+            ret = dbus_message_append_args(msg, DBUS_TYPE_UINT32,
+                                                            &sys->cookie[type],
+                                                DBUS_TYPE_INVALID);
+        else
+            ret = false;
     }
+
+    if (!ret)
+        goto giveup;
+
+    if (flags) { /* read reply */
+        DBusMessage *reply = dbus_connection_send_with_reply_and_block(
+                                                          conn, msg, 50, NULL);
+        if (unlikely(reply == NULL))
+            goto giveup; /* no reponse?! */
+
+        if (!dbus_message_get_args(reply, NULL,
+                                   DBUS_TYPE_UINT32, &sys->cookie[type],
+                                   DBUS_TYPE_INVALID))
+            sys->cookie[type] = 0;
+
+        dbus_message_unref(reply);
+    } else { /* just send and flush */
+        if (dbus_connection_send (conn, msg, NULL)) {
+            sys->cookie[type] = 0;
+            dbus_connection_flush(conn);
+        }
+    }
+giveup:
+    dbus_message_unref(msg);
+}
+
+static void Inhibit (vlc_inhibit_t *ih, unsigned flags)
+{
+    for (int type = 0; type < 2; type++)
+        InhibitAPI (ih, flags, type);
 }
 
 static int Open (vlc_object_t *obj)
