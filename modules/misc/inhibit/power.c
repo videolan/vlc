@@ -85,7 +85,7 @@ static void InhibitAPI(vlc_inhibit_t *ih, unsigned flags,
 
     if (flags) {
         const char *app = PACKAGE;
-        const char *reason = N_("Playing some media.");
+        const char *reason = _("Playing some media.");
 
         switch (type)
         {
