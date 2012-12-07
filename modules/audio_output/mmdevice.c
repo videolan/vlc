@@ -80,6 +80,7 @@ struct aout_sys_t
     IMMDevice *dev; /**< Selected output device, NULL if none */
     IAudioSessionManager *manager; /**< Session for the output device */
     struct IAudioSessionEvents session_events;
+    ISimpleAudioVolume *volume; /**< Volume setter */
 
     LONG refs;
     HANDLE device_changed; /**< Event to reset thread */
@@ -165,59 +166,36 @@ static void Flush(audio_output_t *aout, bool wait)
 
 }
 
-static ISimpleAudioVolume *GetSimpleVolume(audio_output_t *aout)
-{
-    aout_sys_t *sys = aout->sys;
-    ISimpleAudioVolume *volume;
-    HRESULT hr;
-
-    if (sys->manager == NULL)
-        return NULL;
-
-    if (TryEnterMTA(aout))
-        return NULL;
-    hr = IAudioSessionManager_GetSimpleAudioVolume(sys->manager,
-                                                   &GUID_VLC_AUD_OUT,
-                                                   FALSE, &volume);
-    if (FAILED(hr))
-    {
-        LeaveMTA();
-        msg_Err(aout, "cannot get simple volume (error 0x%lx)", hr);
-        assert(volume == NULL);
-    }
-    return volume;
-}
-
-static void PutSimpleVolume(ISimpleAudioVolume *volume)
-{
-    ISimpleAudioVolume_Release(volume);
-    LeaveMTA();
-}
-
 static int VolumeSet(audio_output_t *aout, float vol)
 {
-    ISimpleAudioVolume *volume = GetSimpleVolume(aout);
+    ISimpleAudioVolume *volume = aout->sys->volume;
     if (volume == NULL)
+        return -1;
+
+    if (TryEnterMTA(aout))
         return -1;
 
     HRESULT hr = ISimpleAudioVolume_SetMasterVolume(volume, vol, NULL);
     if (FAILED(hr))
         msg_Err(aout, "cannot set volume (error 0x%lx)", hr);
-    PutSimpleVolume(volume);
+    LeaveMTA();
 
     return FAILED(hr) ? -1 : 0;
 }
 
 static int MuteSet(audio_output_t *aout, bool mute)
 {
-    ISimpleAudioVolume *volume = GetSimpleVolume(aout);
+    ISimpleAudioVolume *volume = aout->sys->volume;
     if (volume == NULL)
+        return -1;
+
+    if (TryEnterMTA(aout))
         return -1;
 
     HRESULT hr = ISimpleAudioVolume_SetMute(volume, mute ? TRUE : FALSE, NULL);
     if (FAILED(hr))
         msg_Err(aout, "cannot set volume (error 0x%lx)", hr);
-    PutSimpleVolume(volume);
+    LeaveMTA();
 
     return FAILED(hr) ? -1 : 0;
 }
@@ -498,6 +476,12 @@ static void MMSession(audio_output_t *aout, aout_sys_t *sys)
     /* Register session control */
     if (sys->manager != NULL)
     {
+        hr = IAudioSessionManager_GetSimpleAudioVolume(sys->manager,
+                                                       &GUID_VLC_AUD_OUT,
+                                                       FALSE, &sys->volume);
+        if (FAILED(hr))
+            msg_Err(aout, "cannot get simple volume (error 0x%lx)", hr);
+
         hr = IAudioSessionManager_GetAudioSessionControl(sys->manager,
                                                          &GUID_VLC_AUD_OUT, 0,
                                                          &control);
@@ -505,7 +489,10 @@ static void MMSession(audio_output_t *aout, aout_sys_t *sys)
             msg_Err(aout, "cannot get session control (error 0x%lx)", hr);
     }
     else
+    {
+        sys->volume = NULL;
         control = NULL;
+    }
 
     if (control != NULL)
     {
@@ -518,6 +505,7 @@ static void MMSession(audio_output_t *aout, aout_sys_t *sys)
     }
 
     SetEvent(sys->device_ready);
+    /* Wait until device change or exit */
     WaitForSingleObject(sys->device_changed, INFINITE);
 
     /* Deregister session control */
@@ -527,6 +515,9 @@ static void MMSession(audio_output_t *aout, aout_sys_t *sys)
                                                          &sys->session_events);
         IAudioSessionControl_Release(control);
     }
+
+    if (sys->volume != NULL)
+        ISimpleAudioVolume_Release(sys->volume);
 }
 
 /** MMDevice audio output thread.
