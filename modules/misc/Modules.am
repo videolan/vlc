@@ -41,11 +41,11 @@ libvlc_LTLIBRARIES += \
 	libxscreensaver_plugin.la
 endif
 
-libpower_plugin_la_SOURCES = inhibit/power.c
-libpower_plugin_la_CFLAGS = $(AM_CFLAGS) $(DBUS_CFLAGS)
-libpower_plugin_la_LIBADD = $(AM_LIBADD) $(DBUS_LIBS)
+libdbus_screensaver_plugin_la_SOURCES = inhibit/dbus.c
+libdbus_screensaver_plugin_la_CFLAGS = $(AM_CFLAGS) $(DBUS_CFLAGS)
+libdbus_screensaver_plugin_la_LIBADD = $(AM_LIBADD) $(DBUS_LIBS)
 if HAVE_DBUS
-libvlc_LTLIBRARIES += libpower_plugin.la
+libvlc_LTLIBRARIES += libdbus_screensaver_plugin.la
 endif
 
 libmce_plugin_la_SOURCES = inhibit/mce.c

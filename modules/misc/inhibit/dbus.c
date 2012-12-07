@@ -1,7 +1,7 @@
 /*****************************************************************************
- * power.c : prevents the computer from suspending when VLC is playing
+ * dbus.c: power management inhibition using D-Bus
  *****************************************************************************
- * Copyright © 2009-2011 Rémi Denis-Courmont
+ * Copyright © 2009-2012 Rémi Denis-Courmont
  * Copyright © 2007-2012 Rafaël Carré
  *
  * This program is free software; you can redistribute it and/or modify it
