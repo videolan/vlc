@@ -121,11 +121,13 @@ signals:
 /* Sound Slider inherited directly from QAbstractSlider */
 class QPaintEvent;
 
+#define SOUNDMAX  125 // % (+6dB)
+
 class SoundSlider : public QAbstractSlider
 {
     Q_OBJECT
 public:
-    SoundSlider( QWidget *_parent, int _i_step, char * );
+    SoundSlider(QWidget *_parent, int _i_step, char *psz_colors, int max = SOUNDMAX );
     void setMuted( bool ); /* Set Mute status */
 
 protected:
