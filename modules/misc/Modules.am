@@ -32,13 +32,9 @@ endif
 libxdg_screensaver_plugin_la_SOURCES = inhibit/xdg.c
 libxdg_screensaver_plugin_la_CFLAGS = $(AM_CFLAGS)
 libxdg_screensaver_plugin_la_LIBADD = $(AM_LIBADD)
-libxscreensaver_plugin_la_SOURCES = inhibit/xscreensaver.c
-libxscreensaver_plugin_la_CFLAGS = $(AM_CFLAGS)
-libxscreensaver_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_XCB
 libvlc_LTLIBRARIES += \
-	libxdg_screensaver_plugin.la \
-	libxscreensaver_plugin.la
+	libxdg_screensaver_plugin.la
 endif
 
 libdbus_screensaver_plugin_la_SOURCES = inhibit/dbus.c

@@ -948,7 +948,6 @@ modules/misc/gnutls.c
 modules/misc/inhibit/dbus.c
 modules/misc/inhibit/mce.c
 modules/misc/inhibit/xdg.c
-modules/misc/inhibit/xscreensaver.c
 modules/misc/logger.c
 modules/misc/osd/osd_menu.c
 modules/misc/osd/osd_menu.h
