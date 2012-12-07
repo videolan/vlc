@@ -28,10 +28,13 @@
 # include <config.h>
 #endif
 
+#include <assert.h>
+
+#include <dbus/dbus.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_inhibit.h>
-#include <dbus/dbus.h>
 
 enum vlc_inhibit_api
 {
@@ -68,6 +71,7 @@ static const char dbus_method_uninhibit[][10] =
 struct vlc_inhibit_sys
 {
     DBusConnection *conn;
+    DBusPendingCall *pending;
     dbus_uint32_t cookie;
     enum vlc_inhibit_api api;
 };
@@ -75,9 +79,39 @@ struct vlc_inhibit_sys
 static void Inhibit(vlc_inhibit_t *ih, unsigned flags)
 {
     vlc_inhibit_sys_t *sys = ih->p_sys;
-    DBusConnection *conn = sys->conn;
     enum vlc_inhibit_api type = sys->api;
 
+    /* Receive reply from previous request, possibly hours later ;-) */
+    if (sys->pending != NULL)
+    {
+        DBusMessage *reply;
+
+        /* NOTE: Unfortunately, the pending reply cannot simply be cancelled.
+         * Otherwise, the cookie would be lost and inhibition would remain on
+         * (until complete disconnection from the bus). */
+        dbus_pending_call_block(sys->pending);
+        reply = dbus_pending_call_steal_reply(sys->pending);
+        dbus_pending_call_unref(sys->pending);
+        sys->pending = NULL;
+
+        if (reply != NULL)
+        {
+            if (!dbus_message_get_args(reply, NULL,
+                                       DBUS_TYPE_UINT32, &sys->cookie,
+                                       DBUS_TYPE_INVALID))
+                sys->cookie = 0;
+            dbus_message_unref(reply);
+        }
+        msg_Dbg(ih, "got cookie %"PRIu32, (uint32_t)sys->cookie);
+    }
+
+    /* FIXME: This check is incorrect if flags change from one non-zero value
+     * to another one. But the D-Bus API cannot currently inhibit suspend
+     * independently from the screensaver. */
+    if (!sys->cookie == !flags)
+        return; /* nothing to do */
+
+    /* Send request */
     const char *method = flags ? "Inhibit" : dbus_method_uninhibit[type];
     dbus_bool_t ret;
 
@@ -86,9 +120,12 @@ static void Inhibit(vlc_inhibit_t *ih, unsigned flags)
     if (unlikely(msg == NULL))
         return;
 
-    if (flags) {
+    if (flags)
+    {
         const char *app = PACKAGE;
         const char *reason = _("Playing some media.");
+
+        assert(sys->cookie == 0);
 
         switch (type)
         {
@@ -100,9 +137,7 @@ static void Inhibit(vlc_inhibit_t *ih, unsigned flags)
             case GNOME:
             {
                 dbus_uint32_t xid = 0; // FIXME ?
-                dbus_uint32_t gflags =
-                   ((flags & VLC_INHIBIT_SUSPEND) ? 8 : 0) |
-                   ((flags & VLC_INHIBIT_DISPLAY) ? 4 : 0);
+                dbus_uint32_t gflags = 0xC;
 
                 ret = dbus_message_append_args(msg, DBUS_TYPE_STRING, &app,
                                                     DBUS_TYPE_UINT32, &xid,
@@ -111,37 +146,23 @@ static void Inhibit(vlc_inhibit_t *ih, unsigned flags)
                                                     DBUS_TYPE_INVALID);
                 break;
             }
+            default:
+                assert(0);
         }
-    } else {
-        if (sys->cookie)
-            ret = dbus_message_append_args(msg, DBUS_TYPE_UINT32, &sys->cookie,
-                                                DBUS_TYPE_INVALID);
-        else
-            ret = false;
+
+        if (!ret
+        || !dbus_connection_send_with_reply(sys->conn, msg, &sys->pending, -1))
+            sys->pending = NULL;
     }
-
-    if (!ret)
-        goto giveup;
-
-    if (flags) { /* read reply */
-        DBusMessage *reply = dbus_connection_send_with_reply_and_block(
-                                                          conn, msg, 50, NULL);
-        if (unlikely(reply == NULL))
-            goto giveup; /* no reponse?! */
-
-        if (!dbus_message_get_args(reply, NULL,
-                                   DBUS_TYPE_UINT32, &sys->cookie,
-                                   DBUS_TYPE_INVALID))
+    else
+    {
+        assert(sys->cookie != 0);
+        if (!dbus_message_append_args(msg, DBUS_TYPE_UINT32, &sys->cookie,
+                                           DBUS_TYPE_INVALID)
+         || !dbus_connection_send (sys->conn, msg, NULL))
             sys->cookie = 0;
-
-        dbus_message_unref(reply);
-    } else { /* just send and flush */
-        if (dbus_connection_send (conn, msg, NULL)) {
-            sys->cookie = 0;
-            dbus_connection_flush(conn);
-        }
     }
-giveup:
+    dbus_connection_flush(sys->conn);
     dbus_message_unref(msg);
 }
 
@@ -166,6 +187,7 @@ static int Open (vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
+    sys->pending = NULL;
     sys->cookie = 0;
 
     for (unsigned i = 0; i < MAX_API; i++)
@@ -193,6 +215,11 @@ static void Close (vlc_object_t *obj)
     vlc_inhibit_t *ih = (vlc_inhibit_t *)obj;
     vlc_inhibit_sys_t *sys = ih->p_sys;
 
+    if (sys->pending != NULL)
+    {
+        dbus_pending_call_cancel(sys->pending);
+        dbus_pending_call_unref(sys->pending);
+    }
     dbus_connection_close (sys->conn);
     dbus_connection_unref (sys->conn);
     free (sys);
