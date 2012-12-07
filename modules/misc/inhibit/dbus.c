@@ -45,10 +45,11 @@ enum vlc_inhibit_api
 
 #define MAX_API (GNOME+1)
 
-static const char dbus_service[][32] =
+/* Currently, all services have identical service and interface names. */
+static const char dbus_service[][40] =
 {
     [FDO_SS] = "org.freedesktop.ScreenSaver",
-    [FDO_PM] = "org.freedesktop.PowerManagement",
+    [FDO_PM] = "org.freedesktop.PowerManagement.Inhibit",
     [GNOME]  = "org.gnome.SessionManager",
 };
 
@@ -57,13 +58,6 @@ static const char dbus_path[][33] =
     [FDO_SS] = "/ScreenSaver",
     [FDO_PM] = "/org/freedesktop/PowerManagement",
     [GNOME]  = "/org/gnome/SessionManager",
-};
-
-static const char dbus_interface[][40] =
-{
-    [FDO_SS] = "org.freedesktop.ScreenSaver",
-    [FDO_PM] = "org.freedesktop.PowerManagement.Inhibit",
-    [GNOME]  = "org.gnome.SessionManager",
 };
 
 static const char dbus_method_uninhibit[][10] =
@@ -121,7 +115,7 @@ static void Inhibit(vlc_inhibit_t *ih, unsigned flags)
     dbus_bool_t ret;
 
     DBusMessage *msg = dbus_message_new_method_call(dbus_service[type],
-                                dbus_path[type], dbus_interface[type], method);
+                                  dbus_path[type], dbus_service[type], method);
     if (unlikely(msg == NULL))
         return;
 
