@@ -54,10 +54,16 @@ SOURCES_access_avio = avio.c avio.h ../codec/avcodec/cpu.c
 SOURCES_access_attachment = attachment.c
 SOURCES_access_vdr = vdr.c
 SOURCES_libbluray = bluray.c
-SOURCES_decklink = decklink.cpp
 
 SOURCES_access_rar = rar/rar.c rar/rar.h rar/access.c
 SOURCES_stream_filter_rar = rar/rar.c rar/rar.h rar/stream.c
+
+if HAVE_DECKLINK
+libdecklink_plugin_la_SOURCES = decklink.cpp
+libdecklink_plugin_la_CXXFLAGS = $(AM_CFLAGS) $(CXXFLAGS_decklink)
+libdecklink_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_decklink) -ldl
+libvlc_LTLIBRARIES += libdecklink_plugin.la
+endif
 
 if HAVE_QTKIT
 libqtcapture_plugin_la_SOURCES = qtcapture.m

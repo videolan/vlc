@@ -1749,17 +1749,19 @@ if test "${enable_decklink}" != "no"
 then
   if test "${with_decklink_sdk}" != "no" -a -n "${with_decklink_sdk}"
   then
-    VLC_ADD_CPPFLAGS([decklink],[-I${with_decklink_sdk}/include])
+    VLC_ADD_CXXFLAGS([decklink],[-I${with_decklink_sdk}/include])
   fi
   VLC_SAVE_FLAGS
-  CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_decklink}"
+  CXXFLAGS="${CXXFLAGS} ${CXXFLAGS_decklink}"
   AC_LANG_PUSH(C++)
-  AC_CHECK_HEADERS(DeckLinkAPIDispatch.cpp, [
-    VLC_ADD_PLUGIN([decklink])
-  ],[AC_MSG_WARN(Blackmagic DeckLink SDI include files not found, decklink disabled)])
+  AC_CHECK_HEADERS(DeckLinkAPIDispatch.cpp, [], [
+      have_decklink=no
+      AC_MSG_WARN(Blackmagic DeckLink SDI include files not found, decklink disabled)
+  ])
   AC_LANG_POP(C++)
   VLC_RESTORE_FLAGS
 fi
+AM_CONDITIONAL(HAVE_DECKLINK, [ test "${have_decklink}" != "no" ])
 
 
 dnl
