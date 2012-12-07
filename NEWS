@@ -23,6 +23,7 @@ Codecs:
  * Support for Indeo Audio Coder, RealAudio Lossless
  * Add Hardware Acceleration support on OS X for H.264 based upon VDADecoder
  * Add Hardware Acceleration support on Android Jelly Bean using MediaCodec
+ * Support for SCTE-27 subtitles
 
 Encoders:
  * high10, high422 and high444 encoding support in h264
