@@ -504,6 +504,24 @@ static void MMSession(audio_output_t *aout, aout_sys_t *sys)
                                                          &sys->session_events);
     }
 
+    if (sys->volume != NULL)
+    {   /* Get current values (_after_ changes notification registration) */
+        BOOL mute;
+        float level;
+
+        hr = ISimpleAudioVolume_GetMute(sys->volume, &mute);
+        if (FAILED(hr))
+            msg_Err(aout, "cannot get mute (error 0x%lx)", hr);
+        else
+            aout_MuteReport(aout, mute != FALSE);
+
+        hr = ISimpleAudioVolume_GetMasterVolume(sys->volume, &level);
+        if (FAILED(hr))
+            msg_Err(aout, "cannot get mute (error 0x%lx)", hr);
+        else
+            aout_VolumeReport(aout, level);
+    }
+
     SetEvent(sys->device_ready);
     /* Wait until device change or exit */
     WaitForSingleObject(sys->device_changed, INFINITE);
