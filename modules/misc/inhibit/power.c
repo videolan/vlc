@@ -39,6 +39,8 @@ enum vlc_inhibit_api
     GNOME, /**< GNOME 2.26..3.4 */
 };
 
+#define MAX_API (GNOME+1)
+
 static const char dbus_service[][32] =
 {
     [FREEDESKTOP] = "org.freedesktop.PowerManagement",
@@ -66,14 +68,15 @@ static const char dbus_method_uninhibit[][10] =
 struct vlc_inhibit_sys
 {
     DBusConnection *conn;
-    dbus_uint32_t cookie[2];
+    dbus_uint32_t cookie;
+    enum vlc_inhibit_api api;
 };
 
-static void InhibitAPI(vlc_inhibit_t *ih, unsigned flags,
-                       enum vlc_inhibit_api type)
+static void Inhibit(vlc_inhibit_t *ih, unsigned flags)
 {
     vlc_inhibit_sys_t *sys = ih->p_sys;
     DBusConnection *conn = sys->conn;
+    enum vlc_inhibit_api type = sys->api;
 
     const char *method = flags ? "Inhibit" : dbus_method_uninhibit[type];
     dbus_bool_t ret;
@@ -110,9 +113,8 @@ static void InhibitAPI(vlc_inhibit_t *ih, unsigned flags,
             }
         }
     } else {
-        if (sys->cookie[type])
-            ret = dbus_message_append_args(msg, DBUS_TYPE_UINT32,
-                                                            &sys->cookie[type],
+        if (sys->cookie)
+            ret = dbus_message_append_args(msg, DBUS_TYPE_UINT32, &sys->cookie,
                                                 DBUS_TYPE_INVALID);
         else
             ret = false;
@@ -128,14 +130,14 @@ static void InhibitAPI(vlc_inhibit_t *ih, unsigned flags,
             goto giveup; /* no reponse?! */
 
         if (!dbus_message_get_args(reply, NULL,
-                                   DBUS_TYPE_UINT32, &sys->cookie[type],
+                                   DBUS_TYPE_UINT32, &sys->cookie,
                                    DBUS_TYPE_INVALID))
-            sys->cookie[type] = 0;
+            sys->cookie = 0;
 
         dbus_message_unref(reply);
     } else { /* just send and flush */
         if (dbus_connection_send (conn, msg, NULL)) {
-            sys->cookie[type] = 0;
+            sys->cookie = 0;
             dbus_connection_flush(conn);
         }
     }
@@ -143,11 +145,7 @@ giveup:
     dbus_message_unref(msg);
 }
 
-static void Inhibit (vlc_inhibit_t *ih, unsigned flags)
-{
-    for (int type = 0; type < 2; type++)
-        InhibitAPI (ih, flags, type);
-}
+static void Close(vlc_object_t *obj);
 
 static int Open (vlc_object_t *obj)
 {
@@ -157,22 +155,37 @@ static int Open (vlc_object_t *obj)
         return VLC_ENOMEM;
 
     DBusError err;
+    dbus_error_init(&err);
 
-    dbus_error_init (&err);
     sys->conn = dbus_bus_get_private (DBUS_BUS_SESSION, &err);
     if (sys->conn == NULL)
     {
-        msg_Err (obj, "cannot connect to session bus: %s", err.message);
-        dbus_error_free (&err);
-        free (sys);
+        msg_Err(ih, "cannot connect to session bus: %s", err.message);
+        dbus_error_free(&err);
+        free(sys);
         return VLC_EGENERIC;
     }
-    sys->cookie[0] = 0;
-    sys->cookie[1] = 0;
 
-    ih->p_sys = sys;
-    ih->inhibit = Inhibit;
-    return VLC_SUCCESS;
+    sys->cookie = 0;
+
+    for (unsigned i = 0; i < MAX_API; i++)
+    {
+        if (dbus_bus_name_has_owner(sys->conn, dbus_service[i], &err))
+        {
+            msg_Dbg(ih, "found service %s", dbus_service[i]);
+            sys->api = i;
+            ih->p_sys = sys;
+            ih->inhibit = Inhibit;
+            return VLC_SUCCESS;
+        }
+
+        msg_Dbg(ih, "cannot find service %s: %s", dbus_service[i],
+                err.message);
+        dbus_error_free(&err);
+    }
+
+    Close(obj);
+    return VLC_EGENERIC;
 }
 
 static void Close (vlc_object_t *obj)
