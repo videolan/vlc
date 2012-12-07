@@ -565,6 +565,7 @@ static int Open (vlc_object_t *obj)
                 xcb_intern_atom (conn, 1, 21, "XV_AUTOPAINT_COLORKEY"), NULL);
         if (r != NULL && r->atom != 0)
             xcb_xv_set_port_attribute(conn, p_sys->port, r->atom, 1);
+        free(r);
     }
 
     /* Create cursor */
