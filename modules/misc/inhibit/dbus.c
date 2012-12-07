@@ -38,7 +38,8 @@
 
 enum vlc_inhibit_api
 {
-    FREEDESKTOP, /* KDE and GNOME <= 2.26 */
+    FDO_SS, /**< KDE >= 4 and GNOME >= 3.6 */
+    FDO_PM, /**< KDE and GNOME <= 2.26 */
     GNOME, /**< GNOME 2.26..3.4 */
 };
 
@@ -46,26 +47,30 @@ enum vlc_inhibit_api
 
 static const char dbus_service[][32] =
 {
-    [FREEDESKTOP] = "org.freedesktop.PowerManagement",
-    [GNOME]       = "org.gnome.SessionManager",
+    [FDO_SS] = "org.freedesktop.ScreenSaver",
+    [FDO_PM] = "org.freedesktop.PowerManagement",
+    [GNOME]  = "org.gnome.SessionManager",
 };
 
 static const char dbus_path[][33] =
 {
-    [FREEDESKTOP] = "/org/freedesktop/PowerManagement",
-    [GNOME]       = "/org/gnome/SessionManager",
+    [FDO_SS] = "/ScreenSaver",
+    [FDO_PM] = "/org/freedesktop/PowerManagement",
+    [GNOME]  = "/org/gnome/SessionManager",
 };
 
 static const char dbus_interface[][40] =
 {
-    [FREEDESKTOP] = "org.freedesktop.PowerManagement.Inhibit",
-    [GNOME]       = "org.gnome.SessionManager",
+    [FDO_SS] = "org.freedesktop.ScreenSaver",
+    [FDO_PM] = "org.freedesktop.PowerManagement.Inhibit",
+    [GNOME]  = "org.gnome.SessionManager",
 };
 
 static const char dbus_method_uninhibit[][10] =
 {
-    [FREEDESKTOP] = "UnInhibit",
-    [GNOME]       = "Uninhibit",
+    [FDO_SS] = "UnInhibit",
+    [FDO_PM] = "UnInhibit",
+    [GNOME]  = "Uninhibit",
 };
 
 struct vlc_inhibit_sys
@@ -129,11 +134,6 @@ static void Inhibit(vlc_inhibit_t *ih, unsigned flags)
 
         switch (type)
         {
-            case FREEDESKTOP:
-                ret = dbus_message_append_args(msg, DBUS_TYPE_STRING, &app,
-                                                    DBUS_TYPE_STRING, &reason,
-                                                    DBUS_TYPE_INVALID);
-                break;
             case GNOME:
             {
                 dbus_uint32_t xid = 0; // FIXME ?
@@ -147,7 +147,10 @@ static void Inhibit(vlc_inhibit_t *ih, unsigned flags)
                 break;
             }
             default:
-                assert(0);
+                ret = dbus_message_append_args(msg, DBUS_TYPE_STRING, &app,
+                                                    DBUS_TYPE_STRING, &reason,
+                                                    DBUS_TYPE_INVALID);
+                break;
         }
 
         if (!ret
