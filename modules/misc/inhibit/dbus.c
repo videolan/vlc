@@ -192,7 +192,7 @@ static int Open (vlc_object_t *obj)
 
     for (unsigned i = 0; i < MAX_API; i++)
     {
-        if (dbus_bus_name_has_owner(sys->conn, dbus_service[i], &err))
+        if (dbus_bus_name_has_owner(sys->conn, dbus_service[i], NULL))
         {
             msg_Dbg(ih, "found service %s", dbus_service[i]);
             sys->api = i;
@@ -201,9 +201,7 @@ static int Open (vlc_object_t *obj)
             return VLC_SUCCESS;
         }
 
-        msg_Dbg(ih, "cannot find service %s: %s", dbus_service[i],
-                err.message);
-        dbus_error_free(&err);
+        msg_Dbg(ih, "cannot find service %s", dbus_service[i]);
     }
 
     Close(obj);
