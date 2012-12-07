@@ -82,6 +82,7 @@ $Id$
  * cvdsub: CVD subtitles decoder
  * dash: MPEG DASH playback
  * dbus: D-Bus control interface
+ * dbus_screensaver: preventing the computer from suspending
  * dc1394: IIDC (DCAM) FireWire input module
  * ddummy: dummy decoder
  * decklink: input module to read from a Blackmagic SDI card
@@ -161,7 +162,6 @@ $Id$
  * i422_yuy2_sse2: sse2 accelerated version of i422_yuy2
  * idummy: dummy input
  * image: Image file video output
- * inhibit: preventing the computer from suspending
  * integer_mixer: Integer audio mixer
  * invert: inverse video filter
  * iomx: IPC/OpenMaxIL for Android
