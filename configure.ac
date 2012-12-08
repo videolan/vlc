@@ -1745,6 +1745,7 @@ AC_ARG_ENABLE(decklink,
 AC_ARG_WITH(decklink_sdk,
   [AS_HELP_STRING[--with-decklink-sdk=DIR],
     [                        location of Blackmagic DeckLink SDI SDK])])
+have_decklink=no
 if test "${enable_decklink}" != "no"
 then
   if test "${with_decklink_sdk}" != "no" -a -n "${with_decklink_sdk}"
@@ -1754,8 +1755,9 @@ then
   VLC_SAVE_FLAGS
   CXXFLAGS="${CXXFLAGS} ${CXXFLAGS_decklink}"
   AC_LANG_PUSH(C++)
-  AC_CHECK_HEADERS(DeckLinkAPIDispatch.cpp, [], [
-      have_decklink=no
+  AC_CHECK_HEADERS(DeckLinkAPIDispatch.cpp, [
+      have_decklink=yes
+  ], [
       AC_MSG_WARN(Blackmagic DeckLink SDI include files not found, decklink disabled)
   ])
   AC_LANG_POP(C++)
