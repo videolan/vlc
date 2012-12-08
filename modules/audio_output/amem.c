@@ -77,6 +77,7 @@ struct aout_sys_t
     int (*set_volume) (void *opaque, float vol, bool mute);
     float volume;
     bool mute;
+    bool ready;
 };
 
 static void Play (audio_output_t *aout, block_t *block)
@@ -111,6 +112,8 @@ static int VolumeSet (audio_output_t *aout, float vol)
     aout_sys_t *sys = aout->sys;
 
     sys->volume = vol;
+    if (sys->ready)
+        return 0; /* sys->opaque is not yet defined... */
     return sys->set_volume (sys->opaque, vol, sys->mute) ? -1 : 0;
 }
 
@@ -119,6 +122,8 @@ static int MuteSet (audio_output_t *aout, bool mute)
     aout_sys_t *sys = aout->sys;
 
     sys->mute = mute;
+    if (!sys->ready)
+        return 0; /* sys->opaque is not yet defined... */
     return sys->set_volume (sys->opaque, sys->volume, mute) ? -1 : 0;
 }
 
@@ -162,6 +167,11 @@ static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
         fmt->i_rate = sys->rate;
         channels = sys->channels;
     }
+
+    /* Initialize volume (in case the UI changed volume before setup) */
+    sys->ready = true;
+    if (sys->set_volume != NULL)
+        sys->set_volume(sys->opaque, sys->volume, sys->mute);
 
     if (fmt->i_rate == 0 || fmt->i_rate > 192000
      || channels == 0 || channels > AOUT_CHAN_MAX)
@@ -219,6 +229,7 @@ static void Stop (audio_output_t *aout)
 
     if (sys->cleanup != NULL)
         sys->cleanup (sys->opaque);
+    sys->ready = false;
 }
 
 static int Open (vlc_object_t *obj)
@@ -249,6 +260,7 @@ static int Open (vlc_object_t *obj)
     sys->set_volume = var_InheritAddress (obj, "amem-set-volume");
     sys->volume = 1.;
     sys->mute = false;
+    sys->ready = false;
     if (sys->play == NULL)
     {
         free (sys);
