@@ -58,7 +58,11 @@ struct aout_sys_t
     int (*setup) (void **, char *, unsigned *, unsigned *);
     union
     {
-        void (*cleanup) (void *opaque);
+        struct
+        {
+            void *setup_opaque;
+            void (*cleanup) (void *opaque);
+        };
         struct
         {
              unsigned rate:18;
@@ -149,6 +153,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
     {
         channels = aout_FormatNbChannels(fmt);
 
+        sys->opaque = sys->setup_opaque;
         if (sys->setup (&sys->opaque, format, &fmt->i_rate, &channels))
             return VLC_EGENERIC;
     }
@@ -223,13 +228,16 @@ static int Open (vlc_object_t *obj)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    aout->sys = sys;
-    sys->opaque = var_InheritAddress (obj, "amem-data");
+    void *opaque = var_InheritAddress (obj, "amem-data");
     sys->setup = var_InheritAddress (obj, "amem-setup");
     if (sys->setup != NULL)
+    {
+        sys->setup_opaque = opaque;
         sys->cleanup = var_InheritAddress (obj, "amem-cleanup");
+    }
     else
     {
+        sys->opaque = opaque;
         sys->rate = var_InheritInteger (obj, "amem-rate");
         sys->channels = var_InheritInteger (obj, "amem-channels");
     }
@@ -247,6 +255,7 @@ static int Open (vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
+    aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
     aout->time_get = NULL;
