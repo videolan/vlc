@@ -148,6 +148,15 @@ static int SoftMuteSet (audio_output_t *aout, bool mute)
     return 0;
 }
 
+static void Stop (audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+
+    if (sys->cleanup != NULL)
+        sys->cleanup (sys->opaque);
+    sys->ready = false;
+}
+
 static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
 {
     aout_sys_t *sys = aout->sys;
@@ -173,14 +182,14 @@ static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
     if (sys->set_volume != NULL)
         sys->set_volume(sys->opaque, sys->volume, sys->mute);
 
+    /* Ensure that format is supported */
     if (fmt->i_rate == 0 || fmt->i_rate > 192000
-     || channels == 0 || channels > AOUT_CHAN_MAX)
-        return VLC_EGENERIC;
-
-    /* TODO: amem-format */
-    if (strcmp(format, "S16N"))
+     || channels == 0 || channels > AOUT_CHAN_MAX
+     || strcmp(format, "S16N") /* TODO: amem-format */)
     {
-        msg_Err (aout, "format not supported");
+        msg_Err (aout, "format not supported: %s, %u channel(s), %u Hz",
+                 format, channels, fmt->i_rate);
+        Stop (aout);
         return VLC_EGENERIC;
     }
 
@@ -221,15 +230,6 @@ static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
     fmt->i_format = VLC_CODEC_S16N;
     fmt->i_original_channels = fmt->i_physical_channels;
     return VLC_SUCCESS;
-}
-
-static void Stop (audio_output_t *aout)
-{
-    aout_sys_t *sys = aout->sys;
-
-    if (sys->cleanup != NULL)
-        sys->cleanup (sys->opaque);
-    sys->ready = false;
 }
 
 static int Open (vlc_object_t *obj)
