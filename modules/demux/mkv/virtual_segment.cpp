@@ -122,7 +122,10 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
             if( p_vchap )
                 chapters.push_back( p_vchap );
         }
-        i_duration = chapters[ chapters.size() - 1 ]->i_virtual_stop_time;
+        if( chapters.size() )
+            i_duration = chapters[ chapters.size() - 1 ]->i_virtual_stop_time;
+        else
+            i_duration = 0; /* Empty ordered editions will be ignored */
     }
     else /* Not ordered or no edition at all */
     {
@@ -258,23 +261,28 @@ void virtual_edition_c::retimeChapters()
 virtual_segment_c::virtual_segment_c( std::vector<matroska_segment_c*> * p_opened_segments )
 {
     /* Main segment */
+    size_t i;
     matroska_segment_c *p_segment = (*p_opened_segments)[0];
     i_current_edition = 0;
     i_sys_title = 0;
     p_current_chapter = NULL;
 
-    for( size_t i = 0; i < p_segment->stored_editions.size(); i++ )
+    for( i = 0; i < p_segment->stored_editions.size(); i++ )
     {
-        /* Get the default edition, if non use the first one */
-        if( p_segment->stored_editions[i]->b_default )
-            i_current_edition = i;
-
         /* Create a virtual edition from opened */
         virtual_edition_c * p_vedition = new virtual_edition_c( p_segment->stored_editions[i], p_opened_segments );
 
-        /*FIXME if p_vedition failed...*/
-
-        editions.push_back( p_vedition );
+        /* Ordered empty edition can happen when all chapters are 
+         * on an other segment which couldn't be found... ignore it */
+        if(p_vedition->b_ordered && p_vedition->i_duration == 0)
+        {
+            msg_Warn( &p_segment->sys.demuxer,
+                      "Edition %s (%lu) links to other segments not found and is empty... ignoring it",
+                       p_vedition->GetMainName().c_str(), i );
+            delete p_vedition;
+        }
+        else
+            editions.push_back( p_vedition );
     }
     /*if we don't have edition create a dummy one*/
     if( !p_segment->stored_editions.size() )
@@ -283,6 +291,15 @@ virtual_segment_c::virtual_segment_c( std::vector<matroska_segment_c*> * p_opene
         editions.push_back( p_vedition );
     }
 
+    /* Get the default edition, if there is none, use the first one */
+    for( i = 0; i < editions.size(); i++)
+    {
+        if( editions[i]->p_edition && editions[i]->p_edition->b_default )
+        {
+            i_current_edition = i;
+            break;
+        }
+    } 
     /* Set current chapter */
     p_current_chapter = editions[i_current_edition]->getChapterbyTimecode(0);
 
