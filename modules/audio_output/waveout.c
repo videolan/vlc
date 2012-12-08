@@ -67,9 +67,6 @@ static int PlayWaveOut   ( audio_output_t *, HWAVEOUT, WAVEHDR *,
 static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR );
 static void* WaveOutThread( void * );
 
-static int VolumeSet( audio_output_t *, float );
-static int MuteSet( audio_output_t *, bool );
-
 static int WaveOutClearDoneBuffers(aout_sys_t *p_sys);
 
 static int ReloadWaveoutDevices( vlc_object_t *, const char *,
@@ -110,14 +107,8 @@ struct aout_sys_t
 
     uint8_t *p_silence_buffer;              /* buffer we use to play silence */
 
-    union {
-        float volume;
-        float soft_gain;
-    };
-    union {
-        bool mute;
-        bool soft_mute;
-    };
+    float soft_gain;
+    bool soft_mute;
 
     uint8_t chans_to_reorder;              /* do we need channel reordering */
     uint8_t chan_table[AOUT_CHAN_MAX];
@@ -240,8 +231,6 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     }
     else
     {
-        WAVEOUTCAPS wocaps;
-
         switch( val.i_int )
         {
         case AOUT_VAR_5_1:
@@ -277,8 +266,9 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
         p_aout->sys->i_buffer_size = FRAME_SIZE * fmt->i_bytes_per_frame;
 
         aout_PacketInit( p_aout, &p_aout->sys->packet, FRAME_SIZE, fmt );
-
+#if 0
         /* Check for hardware volume support */
+        WAVEOUTCAPS wocaps;
         if( waveOutGetDevCaps( (UINT_PTR)p_aout->sys->h_waveout,
                                &wocaps, sizeof(wocaps) ) == MMSYSERR_NOERROR
          && (wocaps.dwSupport & WAVECAPS_VOLUME) )
@@ -289,7 +279,8 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
             p_aout->sys->mute = false;
         }
         else
-            aout_SoftVolumeInit( p_aout );
+#endif
+            aout_SoftVolumeStart( p_aout );
     }
 
     waveOutReset( p_aout->sys->h_waveout );
@@ -962,22 +953,30 @@ static void* WaveOutThread( void *data )
     return NULL;
 }
 
+#if 0
 static int VolumeSet( audio_output_t *aout, float volume )
 {
     aout_sys_t *sys = aout->sys;
     const HWAVEOUT hwo = sys->h_waveout;
-    const float full = 0xffff.fp0;
 
-    volume *= full;
-    if( volume >= full )
-        return -1;
+    unsigned vol = lroundf(volume * 0xffff.fp0);
+    if (vol > 0xffff)
+    {
+        volume = 1.f;
+        vol = 0xffff;
+    }
 
+    if (!sys->soft_mute)
+    {
+        MMRESULT r = waveOutSetVolume(hwo, vol | (vol << 16));
+        if (r != MMSYSERR_NOERROR)
+        {
+            msg_Err(aout, "cannot set mute: multimedia error %u", r);
+            return -1;
+        }
+    }
     sys->volume = volume;
-    if( sys->mute )
-        return 0;
-
-    uint16_t vol = lroundf(volume);
-    waveOutSetVolume( hwo, vol | (vol << 16) );
+    aout_VolumeReport(aout, volume);
     return 0;
 }
 
@@ -985,12 +984,19 @@ static int MuteSet( audio_output_t * p_aout, bool mute )
 {
     aout_sys_t *sys = p_aout->sys;
     const HWAVEOUT hwo = sys->h_waveout;
-    uint16_t vol = mute ? 0 : lroundf(sys->volume);
 
-    sys->mute = mute;
-    waveOutSetVolume( hwo, vol | (vol << 16) );
+    uint16_t vol = mute ? 0 : lroundf(sys->volume * 0xffff.fp0);
+    MMRESULT r = waveOutSetVolume(hwo, vol | (vol << 16));
+    if (r != MMSYSERR_NOERROR)
+    {
+        msg_Err(p_aout, "cannot set mute: multimedia error %u", r);
+        return -1;
+    }
+    sys->soft_mute = mute;
+    aout_MuteReport(p_aout, mute);
     return 0;
 }
+#endif
 
 /*
   reload the configuration drop down list, of the Audio Devices
@@ -1074,7 +1080,7 @@ static int Open(vlc_object_t *obj)
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
-    /* FIXME: volume handlers */
+    aout_SoftVolumeInit(aout);
     return VLC_SUCCESS;
 }
 
