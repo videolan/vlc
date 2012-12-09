@@ -186,6 +186,7 @@ static int Open (vlc_object_t *obj)
 
     sys->pending = NULL;
     sys->cookie = 0;
+    ih->p_sys = sys;
 
     for (unsigned i = 0; i < MAX_API; i++)
     {
@@ -193,7 +194,6 @@ static int Open (vlc_object_t *obj)
         {
             msg_Dbg(ih, "found service %s", dbus_service[i]);
             sys->api = i;
-            ih->p_sys = sys;
             ih->inhibit = Inhibit;
             return VLC_SUCCESS;
         }
