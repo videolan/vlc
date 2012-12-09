@@ -57,6 +57,9 @@
            <property name="text">
             <string>Keep audio level between sessions</string>
            </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
          <item row="1" column="0" colspan="2">
@@ -71,7 +74,7 @@
             <string>Always reset audio start level to:</string>
            </property>
            <property name="checked">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
           </widget>
          </item>
