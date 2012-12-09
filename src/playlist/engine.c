@@ -27,13 +27,13 @@
 
 #include <stddef.h>
 #include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_sout.h>
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
 #include "playlist_internal.h"
-#include "stream_output/stream_output.h" /* sout_DeleteInstance */
-#include <math.h> /* for fabs() */
+#include "input/resource.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -300,6 +300,11 @@ static playlist_t *playlist_Create( vlc_object_t *p_parent )
     p->p_input_resource = input_resource_New( VLC_OBJECT( p_playlist ) );
     if( unlikely(p->p_input_resource == NULL) )
         abort();
+
+    /* Audio output (needed for volume and device controls). */
+    audio_output_t *aout = input_resource_GetAout( p->p_input_resource );
+    if( aout != NULL )
+        input_resource_PutAout( p->p_input_resource, aout );
 
     /* Thread */
     playlist_Activate (p_playlist);
