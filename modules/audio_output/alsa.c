@@ -318,10 +318,9 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         return VLC_ENOMEM;
 
     snd_pcm_format_t pcm_format; /* ALSA sample format */
-    vlc_fourcc_t fourcc = fmt->i_format;
     bool spdif = false;
 
-    switch (fourcc)
+    switch (fmt->i_format)
     {
         case VLC_CODEC_F64B:
             pcm_format = SND_PCM_FORMAT_FLOAT64_BE;
@@ -376,18 +375,18 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
                 spdif = var_InheritBool (aout, "spdif");
             if (spdif)
             {
-                fourcc = VLC_CODEC_SPDIFL;
+                fmt->i_format = VLC_CODEC_SPDIFL;
                 pcm_format = SND_PCM_FORMAT_S16;
             }
             else
             if (HAVE_FPU)
             {
-                fourcc = VLC_CODEC_FL32;
+                fmt->i_format = VLC_CODEC_FL32;
                 pcm_format = SND_PCM_FORMAT_FLOAT;
             }
             else
             {
-                fourcc = VLC_CODEC_S16N;
+                fmt->i_format = VLC_CODEC_S16N;
                 pcm_format = SND_PCM_FORMAT_S16;
             }
     }
@@ -473,19 +472,19 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     else
     if (snd_pcm_hw_params_test_format (pcm, hw, SND_PCM_FORMAT_FLOAT) == 0)
     {
-        fourcc = VLC_CODEC_FL32;
+        fmt->i_format = VLC_CODEC_FL32;
         pcm_format = SND_PCM_FORMAT_FLOAT;
     }
     else
     if (snd_pcm_hw_params_test_format (pcm, hw, SND_PCM_FORMAT_S32) == 0)
     {
-        fourcc = VLC_CODEC_S32N;
+        fmt->i_format = VLC_CODEC_S32N;
         pcm_format = SND_PCM_FORMAT_S32;
     }
     else
     if (snd_pcm_hw_params_test_format (pcm, hw, SND_PCM_FORMAT_S16) == 0)
     {
-        fourcc = VLC_CODEC_S16N;
+        fmt->i_format = VLC_CODEC_S16N;
         pcm_format = SND_PCM_FORMAT_S16;
     }
     else
@@ -526,15 +525,13 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
 
     /* Set sample rate */
-    unsigned rate = fmt->i_rate;
-    val = snd_pcm_hw_params_set_rate_near (pcm, hw, &rate, NULL);
+    val = snd_pcm_hw_params_set_rate_near (pcm, hw, &fmt->i_rate, NULL);
     if (val)
     {
         msg_Err (aout, "cannot set sample rate: %s", snd_strerror (val));
         goto error;
     }
-    if (fmt->i_rate != rate)
-        msg_Dbg (aout, "resampling from %d Hz to %d Hz", fmt->i_rate, rate);
+    sys->rate = fmt->i_rate;
 
     /* Set buffer size */
     param = AOUT_MAX_ADVANCE_TIME;
@@ -610,9 +607,6 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
 
     /* Setup audio_output_t */
-    fmt->i_format = fourcc;
-    fmt->i_rate = rate;
-    sys->rate = rate;
     if (spdif)
     {
         fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE;
