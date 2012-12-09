@@ -251,7 +251,7 @@ enum pl_locked_state
 #define PL_UNLOCK playlist_Unlock( p_playlist )
 #define PL_ASSERT_LOCKED playlist_AssertLocked( p_playlist )
 
-VLC_API playlist_t * pl_Get( vlc_object_t * ) VLC_USED;
+VLC_API playlist_t * pl_Get( vlc_object_t * );
 #define pl_Get( a ) pl_Get( VLC_OBJECT(a) )
 
 /* Playlist control */
