@@ -50,3 +50,18 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
         return;
     playlist_Control( pl, PLAYLIST_PLAY, false );
 }
+
+int libvlc_add_intf( libvlc_instance_t *p_instance, const char *name )
+{
+    pl_Get (p_instance->p_libvlc_int);
+
+    if( libvlc_InternalAddIntf( p_instance->p_libvlc_int, name ))
+    {
+        if( name != NULL )
+            libvlc_printerr("interface \"%s\" initialization failed", name );
+        else
+            libvlc_printerr("default interface initialization failed");
+        return -1;
+    }
+    return 0;
+}
