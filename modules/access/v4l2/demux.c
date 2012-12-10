@@ -82,7 +82,9 @@ int DemuxOpen( vlc_object_t *obj )
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
     demux->p_sys = sys;
+#ifdef ZVBI_COMPILED
     sys->vbi_cap = NULL;
+#endif
 
     ParseMRL( obj, demux->psz_location );
 
