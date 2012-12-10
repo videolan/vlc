@@ -4,9 +4,14 @@ Changes between 2.0.x and 2.1.0-git:
 Important changes for packagers:
  * The --with-tuning and --without-tuning options are removed. To tune
    compilation for a specific processor type, set CFLAGS manually.
+ * The licenses of numerous modules have changed from GPLv2+ to LGPLv2.1+
 
 3rd party libraries (contrib):
  * /extras/contrib has been replaced by a better system in /contrib
+
+Core:
+ * Audio core rewrite
+ * Fix support for .001, .00x splitted files on Windows
 
 Codecs:
  * Support for OPUS via libopus.
@@ -29,6 +34,7 @@ Access:
  * Important improvements and rewrite of the v4l2 access module
  * HTTP: support for Internationalized Domain Names
  * Microsoft Smooth Streaming support (H264 and VC1) developped by Viotech.net
+ * NTSC EIA-608 closed caption input support via V4L2 VBI devices
 
 Demuxers:
  * MP4: partial support for fragmented MP4
@@ -40,6 +46,7 @@ Demuxers:
  * Support for Cook and Atrac in MKV
  * AVI: support for files produced by Nikon cameras
  * Support for more MJPEG streams
+ * Add support for liveleak streams
 
 Audio output:
  * Windows Audio Session API audio output support
@@ -66,6 +73,7 @@ Video Filters:
 
 Stream Output:
  * Extended support for recording, notably for MKV and AVI
+ * Options support for AVIO output module
 
 Interfaces:
  * configurable password for the HTTP server.
@@ -73,6 +81,7 @@ Interfaces:
  * fixed Lua command line interface console mode under Windows.
  * Better support for MCE remotes on Windows
  * Hotkey support for TS program selection
+ * Rewrite of D-Bus inhibit interface
 
 Mac OS X Port:
  * Discontinued support for PowerPC-based and 32bit Intel-based Macs
