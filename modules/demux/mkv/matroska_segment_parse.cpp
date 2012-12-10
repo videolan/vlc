@@ -233,6 +233,8 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                 case track_audio:
                     psz_type = "audio";
                     tk->fmt.i_cat = AUDIO_ES;
+                    tk->fmt.audio.i_channels = 1;
+                    tk->fmt.audio.i_rate = 8000;
                     break;
                 case track_video:
                     psz_type = "video";
