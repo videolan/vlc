@@ -43,6 +43,10 @@
 
 #define VIDEO_DEVICE_TEXT N_( "Video capture device" )
 #define VIDEO_DEVICE_LONGTEXT N_("Video capture device node." )
+#define VBI_DEVICE_TEXT N_("VBI capture device")
+#define VBI_DEVICE_LONGTEXT N_( \
+    "The device node where VBI data can be read "   \
+    " (for closed captions) " )
 #define STANDARD_TEXT N_( "Standard" )
 #define STANDARD_LONGTEXT N_( \
     "Video standard (Default, SECAM, PAL, or NTSC)." )
@@ -277,6 +281,10 @@ vlc_module_begin ()
     add_loadfile( CFG_PREFIX "dev", "/dev/video0",
                   VIDEO_DEVICE_TEXT, VIDEO_DEVICE_LONGTEXT, false )
         change_safe()
+#ifdef ZVBI_COMPILED
+    add_loadfile( CFG_PREFIX "vbidev", NULL,
+                  VBI_DEVICE_TEXT, VBI_DEVICE_LONGTEXT, false )
+#endif
     add_string( CFG_PREFIX "standard", "",
                 STANDARD_TEXT, STANDARD_LONGTEXT, false )
         change_string_list( standards_vlc, standards_user )

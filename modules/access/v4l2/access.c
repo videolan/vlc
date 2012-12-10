@@ -103,7 +103,8 @@ int InitVideo (access_t *access, int fd, uint32_t caps)
         return -1;
     }
 
-    if (SetupInput (VLC_OBJECT(access), fd))
+    v4l2_std_id std;
+    if (SetupInput (VLC_OBJECT(access), fd, &std))
         return -1;
 
     /* NOTE: The V4L access_demux expects a VLC FOURCC as "chroma". It is used to set the

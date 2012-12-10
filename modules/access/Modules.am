@@ -134,14 +134,15 @@ libv4l2_plugin_la_SOURCES = \
 	v4l2/videodev2.h \
 	v4l2/v4l2.c \
 	v4l2/video.c \
+	v4l2/vbi.c \
 	v4l2/demux.c \
 	v4l2/access.c \
 	v4l2/radio.c \
 	v4l2/controls.c \
 	v4l2/lib.c \
 	v4l2/v4l2.h
-libv4l2_plugin_la_CFLAGS = $(AM_CFLAGS)
-libv4l2_plugin_la_LIBADD = $(AM_LIBADD) $(LIBDL) $(LIBM)
+libv4l2_plugin_la_CFLAGS = $(AM_CFLAGS) $(ZVBI_CFLAGS)
+libv4l2_plugin_la_LIBADD = $(AM_LIBADD) $(LIBDL) $(LIBM) $(ZVBI_LIBS)
 if HAVE_V4L2
 libvlc_LTLIBRARIES += libv4l2_plugin.la
 endif

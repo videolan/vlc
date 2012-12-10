@@ -20,6 +20,10 @@
 
 #include "videodev2.h"
 
+#ifdef ZVBI_COMPILED
+#   include <libzvbi.h>
+#endif
+
 /* libv4l2 functions */
 extern int v4l2_fd_open (int, int);
 extern int (*v4l2_close) (int);
@@ -44,7 +48,7 @@ int OpenDevice (vlc_object_t *, const char *, uint32_t *);
 v4l2_std_id var_InheritStandard (vlc_object_t *, const char *);
 
 /* video.c */
-int SetupInput (vlc_object_t *, int fd);
+int SetupInput (vlc_object_t *, int fd, v4l2_std_id *std);
 int SetupFormat (vlc_object_t *, int, uint32_t,
                  struct v4l2_format *, struct v4l2_streamparm *);
 #define SetupFormat(o,fd,fcc,fmt,p) \
@@ -56,6 +60,14 @@ struct buffer_t *StartMmap (vlc_object_t *, int, uint32_t *);
 void StopMmap (int, struct buffer_t *, uint32_t);
 
 block_t* GrabVideo (vlc_object_t *, int, const struct buffer_t *);
+
+#ifdef ZVBI_COMPILED
+/* vbi.c */
+vbi_capture* OpenVBIDev( vlc_object_t *, const char *);
+void GrabVBI( demux_t *p_demux, vbi_capture *vbi_cap,
+              es_out_id_t **p_es_subt, int num_streams);
+#define VBI_NUM_CC_STREAMS 4
+#endif
 
 /* demux.c */
 int DemuxOpen(vlc_object_t *);

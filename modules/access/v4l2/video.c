@@ -39,7 +39,8 @@
 #include "v4l2.h"
 
 static int SetupStandard (vlc_object_t *obj, int fd,
-                          const struct v4l2_input *restrict input)
+                          const struct v4l2_input *restrict input,
+                          v4l2_std_id *restrict std)
 {
     if (!(input->capabilities & V4L2_IN_CAP_STD))
     {
@@ -47,18 +48,22 @@ static int SetupStandard (vlc_object_t *obj, int fd,
         return 0;
     }
 
-    v4l2_std_id std = var_InheritStandard (obj, CFG_PREFIX"standard");
-    if (std == V4L2_STD_UNKNOWN)
+    *std = var_InheritStandard (obj, CFG_PREFIX"standard");
+    if (*std == V4L2_STD_UNKNOWN)
     {
         msg_Warn (obj, "video standard not set");
+
+        /* Grab the currently selected standard */
+        if (v4l2_ioctl (fd, VIDIOC_G_STD, std) < 0)
+            msg_Err (obj, "cannot get video standard");
         return 0;
     }
-    if (v4l2_ioctl (fd, VIDIOC_S_STD, &std) < 0)
+    if (v4l2_ioctl (fd, VIDIOC_S_STD, std) < 0)
     {
-        msg_Err (obj, "cannot set video standard 0x%"PRIx64": %m", std);
+        msg_Err (obj, "cannot set video standard 0x%"PRIx64": %m", *std);
         return -1;
     }
-    msg_Dbg (obj, "video standard set to 0x%"PRIx64":", std);
+    msg_Dbg (obj, "video standard set to 0x%"PRIx64":", *std);
     return 0;
 }
 
@@ -230,7 +235,7 @@ static int ResetCrop (vlc_object_t *obj, int fd)
     return 0;
 }
 
-int SetupInput (vlc_object_t *obj, int fd)
+int SetupInput (vlc_object_t *obj, int fd, v4l2_std_id *std)
 {
     struct v4l2_input input;
 
@@ -263,7 +268,7 @@ int SetupInput (vlc_object_t *obj, int fd)
     }
     msg_Dbg (obj, "selected input %"PRIu32, input.index);
 
-    SetupStandard (obj, fd, &input);
+    SetupStandard (obj, fd, &input, std);
 
     switch (input.type)
     {
