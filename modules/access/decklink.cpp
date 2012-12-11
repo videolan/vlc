@@ -182,8 +182,6 @@ private:
 HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame* videoFrame, IDeckLinkAudioInputPacket* audioFrame)
 {
     demux_sys_t *sys = demux_->p_sys;
-    block_t *video_frame = NULL;
-    block_t *audio_frame = NULL;
 
     if (videoFrame)
     {
@@ -198,11 +196,9 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
         const int stride = videoFrame->GetRowBytes();
         const int bpp = 2;
 
-        video_frame = block_New(demux_, width * height * bpp);
+        block_t *video_frame = block_New(demux_, width * height * bpp);
         if (!video_frame)
-        {
-            msg_Err(demux_, "Could not allocate memory for video frame");
-        }
+            return S_OK;
 
         void *frame_bytes;
         videoFrame->GetBytes(&frame_bytes);
@@ -231,14 +227,9 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
     {
         const int bytes = audioFrame->GetSampleFrameCount() * sizeof(int16_t) * sys->channels;
 
-        audio_frame = block_New(demux_, bytes);
+        block_t *audio_frame = block_New(demux_, bytes);
         if (!audio_frame)
-        {
-            msg_Err(demux_, "Could not allocate memory for audio frame");
-            if (video_frame)
-                block_Release(video_frame);
             return S_OK;
-        }
 
         void *frame_bytes;
         audioFrame->GetBytes(&frame_bytes);
