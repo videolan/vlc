@@ -151,7 +151,7 @@ public:
         vlc_atomic_set(&m_ref_, 1);
     }
 
-    virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, LPVOID *ppv) { return E_NOINTERFACE; }
+    virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID, LPVOID *) { return E_NOINTERFACE; }
 
     virtual ULONG STDMETHODCALLTYPE AddRef(void)
     {
@@ -266,7 +266,6 @@ static int Open(vlc_object_t *p_this)
     demux_t     *demux = (demux_t*)p_this;
     demux_sys_t *sys;
     int         ret = VLC_EGENERIC;
-    char        *aspect;
     char        *display_mode = NULL;
     char        *video_connection = NULL;
     char        *audio_connection = NULL;
@@ -427,7 +426,7 @@ static int Open(vlc_object_t *p_this)
      */
     char sz_display_mode_padded[5];
     strcpy(sz_display_mode_padded, "    ");
-    for (int i = 0; i < strlen(display_mode); ++i)
+    for (unsigned i = 0; i < strlen(display_mode); ++i)
         sz_display_mode_padded[i] = display_mode[i];
 
     BMDDisplayMode wanted_mode_id;
@@ -490,7 +489,7 @@ static int Open(vlc_object_t *p_this)
 
         msg_Dbg(demux, "Found mode '%s': %s (%dx%d, %.3f fps%s)",
                  sz_mode_id_text, mode_name,
-                 display_mode->GetWidth(), display_mode->GetHeight(),
+                 (int)display_mode->GetWidth(), (int)display_mode->GetHeight(),
                  double(time_scale) / frame_duration, field_dominance);
 
         if (wanted_mode_id == mode_id)
@@ -651,6 +650,4 @@ static int Control(demux_t *demux, int query, va_list args)
         default:
             return VLC_EGENERIC;
     }
-
-    return VLC_EGENERIC;
 }
