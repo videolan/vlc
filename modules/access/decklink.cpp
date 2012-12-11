@@ -252,14 +252,83 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
     return S_OK;
 }
 
+
+static int GetAudioConn(demux_t *demux)
+{
+    demux_sys_t *sys = demux->p_sys;
+
+    char *opt = var_CreateGetNonEmptyString(demux, "decklink-audio-connection");
+    if (!opt)
+        return VLC_SUCCESS;
+
+    BMDAudioConnection c;
+    if (!strcmp(opt, "embedded"))
+        c = bmdAudioConnectionEmbedded;
+    else if (!strcmp(opt, "aesebu"))
+        c = bmdAudioConnectionAESEBU;
+    else if (!strcmp(opt, "analog"))
+        c = bmdAudioConnectionAnalog;
+    else
+    {
+        msg_Err(demux, "Invalid audio-connection: `%s\' specified", opt);
+        free(opt);
+        return VLC_EGENERIC;
+    }
+
+    if (sys->config->SetInt(bmdDeckLinkConfigAudioInputConnection, c) != S_OK)
+    {
+        msg_Err(demux, "Failed to set audio input connection");
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int GetVideoConn(demux_t *demux)
+{
+    demux_sys_t *sys = demux->p_sys;
+
+    char *opt = var_InheritString(demux, "decklink-video-connection");
+    if (!opt)
+        return VLC_SUCCESS;
+
+    BMDVideoConnection c;
+    if (!strcmp(opt, "sdi"))
+        c = bmdVideoConnectionSDI;
+    else if (!strcmp(opt, "hdmi"))
+        c = bmdVideoConnectionHDMI;
+    else if (!strcmp(opt, "opticalsdi"))
+        c = bmdVideoConnectionOpticalSDI;
+    else if (!strcmp(opt, "component"))
+        c = bmdVideoConnectionComponent;
+    else if (!strcmp(opt, "composite"))
+        c = bmdVideoConnectionComposite;
+    else if (!strcmp(opt, "svideo"))
+        c = bmdVideoConnectionSVideo;
+    else
+    {
+        msg_Err(demux, "Invalid video-connection: `%s\' specified", opt);
+        free(opt);
+        return VLC_EGENERIC;
+    }
+
+    free(opt);
+    if (sys->config->SetInt(bmdDeckLinkConfigVideoInputConnection, c) != S_OK)
+    {
+        msg_Err(demux, "Failed to set video input connection");
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
+
 static int Open(vlc_object_t *p_this)
 {
     demux_t     *demux = (demux_t*)p_this;
     demux_sys_t *sys;
     int         ret = VLC_EGENERIC;
     char        *display_mode = NULL;
-    char        *video_connection = NULL;
-    char        *audio_connection = NULL;
     bool        b_found_mode;
     int         card_index;
     int         width, height, fps_num, fps_den;
@@ -339,63 +408,8 @@ static int Open(vlc_object_t *p_this)
         goto finish;
     }
 
-    video_connection = var_InheritString(demux, "decklink-video-connection");
-    if (video_connection)
-    {
-        BMDVideoConnection conn;
-        if (!strcmp(video_connection, "sdi"))
-            conn = bmdVideoConnectionSDI;
-        else if (!strcmp(video_connection, "hdmi"))
-            conn = bmdVideoConnectionHDMI;
-        else if (!strcmp(video_connection, "opticalsdi"))
-            conn = bmdVideoConnectionOpticalSDI;
-        else if (!strcmp(video_connection, "component"))
-            conn = bmdVideoConnectionComponent;
-        else if (!strcmp(video_connection, "composite"))
-            conn = bmdVideoConnectionComposite;
-        else if (!strcmp(video_connection, "svideo"))
-            conn = bmdVideoConnectionSVideo;
-        else
-        {
-            msg_Err(demux, "Invalid --decklink-video-connection specified; choose one of " \
-                              "sdi, hdmi, opticalsdi, component, composite, or svideo.");
-            goto finish;
-        }
-
-        msg_Dbg(demux, "Setting video input connection to 0x%x", conn);
-        result = sys->config->SetInt(bmdDeckLinkConfigVideoInputConnection, conn);
-        if (result != S_OK)
-        {
-            msg_Err(demux, "Failed to set video input connection");
-            goto finish;
-        }
-    }
-
-    audio_connection = var_CreateGetNonEmptyString(demux, "decklink-audio-connection");
-    if (audio_connection)
-    {
-        BMDAudioConnection conn;
-        if (!strcmp(audio_connection, "embedded"))
-            conn = bmdAudioConnectionEmbedded;
-        else if (!strcmp(audio_connection, "aesebu"))
-            conn = bmdAudioConnectionAESEBU;
-        else if (!strcmp(audio_connection, "analog"))
-            conn = bmdAudioConnectionAnalog;
-        else
-        {
-            msg_Err(demux, "Invalid --decklink-audio-connection specified; choose one of " \
-                              "embedded, aesebu, or analog.");
-            goto finish;
-        }
-
-        msg_Dbg(demux, "Setting audio input format to 0x%x", conn);
-        result = sys->config->SetInt(bmdDeckLinkConfigAudioInputConnection, conn);
-        if (result != S_OK)
-        {
-            msg_Err(demux, "Failed to set audio input connection");
-            goto finish;
-        }
-    }
+    if (GetVideoConn(demux) || GetAudioConn(demux))
+        goto finish;
 
     /* Get the list of display modes. */
     result = sys->input->GetDisplayModeIterator(&display_iterator);
@@ -573,8 +587,6 @@ finish:
     if (decklink_iterator)
         decklink_iterator->Release();
 
-    free(video_connection);
-    free(audio_connection);
     free(display_mode);
 
     if (display_iterator)
