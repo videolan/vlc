@@ -360,8 +360,6 @@ static int Open(vlc_object_t *p_this)
         goto finish;
     }
 
-    HRESULT result;
-
     card_index = var_InheritInteger(demux, "decklink-card-index");
     if (card_index < 0)
     {
@@ -369,25 +367,19 @@ static int Open(vlc_object_t *p_this)
         goto finish;
     }
 
-    for (int i = 0; i <= card_index; ++i)
+    for (int i = 0; i <= card_index; i++)
     {
         if (sys->card)
             sys->card->Release();
-        result = decklink_iterator->Next(&sys->card);
-        if (result != S_OK)
-            break;
-    }
-
-    if (result != S_OK)
-    {
-        msg_Err(demux, "DeckLink PCI card %d not found", card_index);
-        goto finish;
+        if (decklink_iterator->Next(&sys->card) != S_OK)
+        {
+            msg_Err(demux, "DeckLink PCI card %d not found", card_index);
+            goto finish;
+        }
     }
 
     const char *model_name;
-    result = sys->card->GetModelName(&model_name);
-
-    if (result != S_OK)
+    if (sys->card->GetModelName(&model_name) != S_OK)
     {
         msg_Err(demux, "Could not get model name");
         goto finish;
@@ -412,8 +404,7 @@ static int Open(vlc_object_t *p_this)
         goto finish;
 
     /* Get the list of display modes. */
-    result = sys->input->GetDisplayModeIterator(&display_iterator);
-    if (result != S_OK)
+    if (sys->input->GetDisplayModeIterator(&display_iterator) != S_OK)
     {
         msg_Err(demux, "Failed to enumerate display modes");
         goto finish;
@@ -442,8 +433,7 @@ static int Open(vlc_object_t *p_this)
     for (;;)
     {
         IDeckLinkDisplayMode *display_mode;
-        result = display_iterator->Next(&display_mode);
-        if (result != S_OK || !display_mode)
+        if ((display_iterator->Next(&display_mode) != S_OK) || !display_mode)
             break;
 
         char sz_mode_id_text[5] = {0};
@@ -451,8 +441,7 @@ static int Open(vlc_object_t *p_this)
         memcpy(sz_mode_id_text, &mode_id, sizeof(mode_id));
 
         const char *mode_name;
-        result = display_mode->GetName(&mode_name);
-        if (result != S_OK)
+        if (display_mode->GetName(&mode_name) != S_OK)
         {
             msg_Err(demux, "Failed to get display mode name");
             display_mode->Release();
@@ -460,8 +449,7 @@ static int Open(vlc_object_t *p_this)
         }
 
         BMDTimeValue frame_duration, time_scale;
-        result = display_mode->GetFrameRate(&frame_duration, &time_scale);
-        if (result != S_OK)
+        if (display_mode->GetFrameRate(&frame_duration, &time_scale) != S_OK)
         {
             msg_Err(demux, "Failed to get frame rate");
             display_mode->Release();
@@ -517,8 +505,7 @@ static int Open(vlc_object_t *p_this)
         goto finish;
     }
 
-    result = sys->input->EnableVideoInput(htonl(wanted_mode_id), bmdFormat8BitYUV, 0);
-    if (result != S_OK)
+    if (sys->input->EnableVideoInput(htonl(wanted_mode_id), bmdFormat8BitYUV, 0) != S_OK)
     {
         msg_Err(demux, "Failed to enable video input");
         goto finish;
@@ -529,8 +516,7 @@ static int Open(vlc_object_t *p_this)
     rate = var_InheritInteger(demux, "decklink-audio-rate");
     if (rate > 0 && sys->channels > 0)
     {
-        result = sys->input->EnableAudioInput(rate, bmdAudioSampleType16bitInteger, sys->channels);
-        if (result != S_OK)
+        if (sys->input->EnableAudioInput(rate, bmdAudioSampleType16bitInteger, sys->channels) != S_OK)
         {
             msg_Err(demux, "Failed to enable audio input");
             goto finish;
@@ -540,8 +526,7 @@ static int Open(vlc_object_t *p_this)
     sys->delegate = new DeckLinkCaptureDelegate(demux);
     sys->input->SetCallback(sys->delegate);
 
-    result = sys->input->StartStreams();
-    if (result != S_OK)
+    if (sys->input->StartStreams() != S_OK)
     {
         msg_Err(demux, "Could not start streaming from SDI card. This could be caused "
                           "by invalid video mode or flags, access denied, or card already in use.");
