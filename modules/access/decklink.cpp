@@ -314,16 +314,33 @@ static int GetVideoConn(demux_t *demux)
     return VLC_SUCCESS;
 }
 
+static const char *GetFieldDominance(BMDFieldDominance dom, uint32_t *flags)
+{
+    switch(dom)
+    {
+        case bmdProgressiveFrame:
+            return "";
+        case bmdProgressiveSegmentedFrame:
+            return ", segmented";
+        case bmdLowerFieldFirst:
+            *flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+            return ", interlaced [BFF]";
+        case bmdUpperFieldFirst:
+            *flags = BLOCK_FLAG_TOP_FIELD_FIRST;
+            return ", interlaced [TFF]";
+        case bmdUnknownFieldDominance:
+        default:
+            return ", unknown field dominance";
+    }
+}
 
 static int Open(vlc_object_t *p_this)
 {
     demux_t     *demux = (demux_t*)p_this;
     demux_sys_t *sys;
     int         ret = VLC_EGENERIC;
-    char        *display_mode = NULL;
-    bool        b_found_mode;
     int         card_index;
-    int         width, height, fps_num, fps_den;
+    int         width = 0, height, fps_num, fps_den;
     int         rate;
     unsigned    aspect_num, aspect_den;
 
@@ -342,8 +359,6 @@ static int Open(vlc_object_t *p_this)
         return VLC_ENOMEM;
 
     vlc_mutex_init(&sys->pts_lock);
-
-    IDeckLinkDisplayModeIterator *display_iterator = NULL;
 
     IDeckLinkIterator *decklink_iterator = CreateDeckLinkIteratorInstance();
     if (!decklink_iterator) {
@@ -367,10 +382,8 @@ static int Open(vlc_object_t *p_this)
     }
 
     const char *model_name;
-    if (sys->card->GetModelName(&model_name) != S_OK) {
-        msg_Err(demux, "Could not get model name");
-        goto finish;
-    }
+    if (sys->card->GetModelName(&model_name) != S_OK)
+        model_name = "unknown";
 
     msg_Dbg(demux, "Opened DeckLink PCI card %d (%s)", card_index, model_name);
 
@@ -388,103 +401,69 @@ static int Open(vlc_object_t *p_this)
     if (GetVideoConn(demux) || GetAudioConn(demux))
         goto finish;
 
+    char *mode;
+    mode = var_CreateGetNonEmptyString(demux, "decklink-mode");
+    if (!mode || strlen(mode) < 3 || strlen(mode) > 4) {
+        msg_Err(demux, "Invalid mode: `%s\'", mode ? mode : "");
+        goto finish;
+    }
+
     /* Get the list of display modes. */
-    if (sys->input->GetDisplayModeIterator(&display_iterator) != S_OK) {
+    IDeckLinkDisplayModeIterator *mode_it;
+    if (sys->input->GetDisplayModeIterator(&mode_it) != S_OK) {
         msg_Err(demux, "Failed to enumerate display modes");
+        free(mode);
         goto finish;
     }
 
-    display_mode = var_CreateGetNonEmptyString(demux, "decklink-mode");
-    if (!display_mode || strlen(display_mode) > 4) {
-        msg_Err(demux, "Missing or invalid --decklink-mode string");
-        goto finish;
-    }
+    union {
+        BMDDisplayMode id;
+        char str[4];
+    } u;
+    memcpy(u.str, mode, 4);
+    if (u.str[3] == '\0')
+        u.str[3] = ' '; /* 'pal'\0 -> 'pal ' */
+    free(mode);
 
-    /*
-     * Pad the --decklink-mode string to four characters, so the user can specify e.g. "pal"
-     * without having to add the trailing space.
-     */
-    char sz_display_mode_padded[5];
-    strcpy(sz_display_mode_padded, "    ");
-    for (unsigned i = 0; i < strlen(display_mode); ++i)
-        sz_display_mode_padded[i] = display_mode[i];
-
-    BMDDisplayMode wanted_mode_id;
-    memcpy(&wanted_mode_id, &sz_display_mode_padded, sizeof(wanted_mode_id));
-
-    b_found_mode = false;
-
-    for (;;) {
-        IDeckLinkDisplayMode *display_mode;
-        if ((display_iterator->Next(&display_mode) != S_OK) || !display_mode)
+    for (IDeckLinkDisplayMode *m;; m->Release()) {
+        if ((mode_it->Next(&m) != S_OK) || !m)
             break;
-
-        char sz_mode_id_text[5] = {0};
-        BMDDisplayMode mode_id = ntohl(display_mode->GetDisplayMode());
-        memcpy(sz_mode_id_text, &mode_id, sizeof(mode_id));
 
         const char *mode_name;
-        if (display_mode->GetName(&mode_name) != S_OK) {
-            msg_Err(demux, "Failed to get display mode name");
-            display_mode->Release();
-            goto finish;
-        }
-
         BMDTimeValue frame_duration, time_scale;
-        if (display_mode->GetFrameRate(&frame_duration, &time_scale) != S_OK) {
-            msg_Err(demux, "Failed to get frame rate");
-            display_mode->Release();
-            goto finish;
+        uint32_t flags = 0;
+        const char *field = GetFieldDominance(m->GetFieldDominance(), &flags);
+        BMDDisplayMode id = ntohl(m->GetDisplayMode());
+
+        if (m->GetName(&mode_name) != S_OK)
+            mode_name = "unknown";
+        if (m->GetFrameRate(&frame_duration, &time_scale) != S_OK) {
+            time_scale = 0;
+            frame_duration = 1;
         }
 
-        const char *field_dominance;
-        uint32_t dominance_flags = 0;
-        switch(display_mode->GetFieldDominance())
-        {
-        case bmdProgressiveFrame:
-            field_dominance = "";
-            break;
-        case bmdProgressiveSegmentedFrame:
-            field_dominance = ", segmented";
-            break;
-        case bmdLowerFieldFirst:
-            field_dominance = ", interlaced [BFF]";
-            dominance_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
-            break;
-        case bmdUpperFieldFirst:
-            field_dominance = ", interlaced [TFF]";
-            dominance_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
-            break;
-        case bmdUnknownFieldDominance:
-        default:
-            field_dominance = ", unknown field dominance";
-            break;
-        }
+        msg_Dbg(demux, "Found mode '%4.4s': %s (%dx%d, %.3f fps%s)",
+                 (char*)&id, mode_name,
+                 (int)m->GetWidth(), (int)m->GetHeight(),
+                 double(time_scale) / frame_duration, field);
 
-        msg_Dbg(demux, "Found mode '%s': %s (%dx%d, %.3f fps%s)",
-                 sz_mode_id_text, mode_name,
-                 (int)display_mode->GetWidth(), (int)display_mode->GetHeight(),
-                 double(time_scale) / frame_duration, field_dominance);
-
-        if (wanted_mode_id == mode_id) {
-            b_found_mode = true;
-            width = display_mode->GetWidth();
-            height = display_mode->GetHeight();
+        if (u.id == id) {
+            width = m->GetWidth();
+            height = m->GetHeight();
             fps_num = time_scale;
             fps_den = frame_duration;
-            sys->dominance_flags = dominance_flags;
+            sys->dominance_flags = flags;
         }
-
-        display_mode->Release();
     }
 
-    if (!b_found_mode) {
-        msg_Err(demux, "Unknown video mode specified. "
-                 "Run VLC with -vv to get a list of supported modes.");
+    mode_it->Release();
+
+    if (width == 0) {
+        msg_Err(demux, "Unknown video mode `%4.4s\' specified.", (char*)&u.id);
         goto finish;
     }
 
-    if (sys->input->EnableVideoInput(htonl(wanted_mode_id), bmdFormat8BitYUV, 0) != S_OK) {
+    if (sys->input->EnableVideoInput(htonl(u.id), bmdFormat8BitYUV, 0) != S_OK) {
         msg_Err(demux, "Failed to enable video input");
         goto finish;
     }
@@ -546,11 +525,6 @@ static int Open(vlc_object_t *p_this)
 finish:
     if (decklink_iterator)
         decklink_iterator->Release();
-
-    free(display_mode);
-
-    if (display_iterator)
-        display_iterator->Release();
 
     if (ret != VLC_SUCCESS)
         Close(p_this);
