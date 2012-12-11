@@ -183,10 +183,8 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
 {
     demux_sys_t *sys = demux_->p_sys;
 
-    if (videoFrame)
-    {
-        if (videoFrame->GetFlags() & bmdFrameHasNoInputSource)
-        {
+    if (videoFrame) {
+        if (videoFrame->GetFlags() & bmdFrameHasNoInputSource) {
             msg_Warn(demux_, "No input signal detected");
             return S_OK;
         }
@@ -202,8 +200,7 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
 
         void *frame_bytes;
         videoFrame->GetBytes(&frame_bytes);
-        for (int y = 0; y < height; ++y)
-        {
+        for (int y = 0; y < height; ++y) {
             const uint8_t *src = (const uint8_t *)frame_bytes + stride * y;
             uint8_t *dst = video_frame->p_buffer + width * bpp * y;
             memcpy(dst, src, width * bpp);
@@ -223,8 +220,7 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
         es_out_Send(demux_->out, sys->video_es, video_frame);
     }
 
-    if (audioFrame)
-    {
+    if (audioFrame) {
         const int bytes = audioFrame->GetSampleFrameCount() * sizeof(int16_t) * sys->channels;
 
         block_t *audio_frame = block_New(demux_, bytes);
@@ -268,15 +264,13 @@ static int GetAudioConn(demux_t *demux)
         c = bmdAudioConnectionAESEBU;
     else if (!strcmp(opt, "analog"))
         c = bmdAudioConnectionAnalog;
-    else
-    {
+    else {
         msg_Err(demux, "Invalid audio-connection: `%s\' specified", opt);
         free(opt);
         return VLC_EGENERIC;
     }
 
-    if (sys->config->SetInt(bmdDeckLinkConfigAudioInputConnection, c) != S_OK)
-    {
+    if (sys->config->SetInt(bmdDeckLinkConfigAudioInputConnection, c) != S_OK) {
         msg_Err(demux, "Failed to set audio input connection");
         return VLC_EGENERIC;
     }
@@ -305,16 +299,14 @@ static int GetVideoConn(demux_t *demux)
         c = bmdVideoConnectionComposite;
     else if (!strcmp(opt, "svideo"))
         c = bmdVideoConnectionSVideo;
-    else
-    {
+    else {
         msg_Err(demux, "Invalid video-connection: `%s\' specified", opt);
         free(opt);
         return VLC_EGENERIC;
     }
 
     free(opt);
-    if (sys->config->SetInt(bmdDeckLinkConfigVideoInputConnection, c) != S_OK)
-    {
+    if (sys->config->SetInt(bmdDeckLinkConfigVideoInputConnection, c) != S_OK) {
         msg_Err(demux, "Failed to set video input connection");
         return VLC_EGENERIC;
     }
@@ -354,48 +346,41 @@ static int Open(vlc_object_t *p_this)
     IDeckLinkDisplayModeIterator *display_iterator = NULL;
 
     IDeckLinkIterator *decklink_iterator = CreateDeckLinkIteratorInstance();
-    if (!decklink_iterator)
-    {
+    if (!decklink_iterator) {
         msg_Err(demux, "DeckLink drivers not found.");
         goto finish;
     }
 
     card_index = var_InheritInteger(demux, "decklink-card-index");
-    if (card_index < 0)
-    {
+    if (card_index < 0) {
         msg_Err(demux, "Invalid card index %d", card_index);
         goto finish;
     }
 
-    for (int i = 0; i <= card_index; i++)
-    {
+    for (int i = 0; i <= card_index; i++) {
         if (sys->card)
             sys->card->Release();
-        if (decklink_iterator->Next(&sys->card) != S_OK)
-        {
+        if (decklink_iterator->Next(&sys->card) != S_OK) {
             msg_Err(demux, "DeckLink PCI card %d not found", card_index);
             goto finish;
         }
     }
 
     const char *model_name;
-    if (sys->card->GetModelName(&model_name) != S_OK)
-    {
+    if (sys->card->GetModelName(&model_name) != S_OK) {
         msg_Err(demux, "Could not get model name");
         goto finish;
     }
 
     msg_Dbg(demux, "Opened DeckLink PCI card %d (%s)", card_index, model_name);
 
-    if (sys->card->QueryInterface(IID_IDeckLinkInput, (void**)&sys->input) != S_OK)
-    {
+    if (sys->card->QueryInterface(IID_IDeckLinkInput, (void**)&sys->input) != S_OK) {
         msg_Err(demux, "Card has no inputs");
         goto finish;
     }
 
     /* Set up the video and audio sources. */
-    if (sys->card->QueryInterface(IID_IDeckLinkConfiguration, (void**)&sys->config) != S_OK)
-    {
+    if (sys->card->QueryInterface(IID_IDeckLinkConfiguration, (void**)&sys->config) != S_OK) {
         msg_Err(demux, "Failed to get configuration interface");
         goto finish;
     }
@@ -404,8 +389,7 @@ static int Open(vlc_object_t *p_this)
         goto finish;
 
     /* Get the list of display modes. */
-    if (sys->input->GetDisplayModeIterator(&display_iterator) != S_OK)
-    {
+    if (sys->input->GetDisplayModeIterator(&display_iterator) != S_OK) {
         msg_Err(demux, "Failed to enumerate display modes");
         goto finish;
     }
@@ -430,8 +414,7 @@ static int Open(vlc_object_t *p_this)
 
     b_found_mode = false;
 
-    for (;;)
-    {
+    for (;;) {
         IDeckLinkDisplayMode *display_mode;
         if ((display_iterator->Next(&display_mode) != S_OK) || !display_mode)
             break;
@@ -441,16 +424,14 @@ static int Open(vlc_object_t *p_this)
         memcpy(sz_mode_id_text, &mode_id, sizeof(mode_id));
 
         const char *mode_name;
-        if (display_mode->GetName(&mode_name) != S_OK)
-        {
+        if (display_mode->GetName(&mode_name) != S_OK) {
             msg_Err(demux, "Failed to get display mode name");
             display_mode->Release();
             goto finish;
         }
 
         BMDTimeValue frame_duration, time_scale;
-        if (display_mode->GetFrameRate(&frame_duration, &time_scale) != S_OK)
-        {
+        if (display_mode->GetFrameRate(&frame_duration, &time_scale) != S_OK) {
             msg_Err(demux, "Failed to get frame rate");
             display_mode->Release();
             goto finish;
@@ -485,8 +466,7 @@ static int Open(vlc_object_t *p_this)
                  (int)display_mode->GetWidth(), (int)display_mode->GetHeight(),
                  double(time_scale) / frame_duration, field_dominance);
 
-        if (wanted_mode_id == mode_id)
-        {
+        if (wanted_mode_id == mode_id) {
             b_found_mode = true;
             width = display_mode->GetWidth();
             height = display_mode->GetHeight();
@@ -498,15 +478,13 @@ static int Open(vlc_object_t *p_this)
         display_mode->Release();
     }
 
-    if (!b_found_mode)
-    {
+    if (!b_found_mode) {
         msg_Err(demux, "Unknown video mode specified. "
                  "Run VLC with -vv to get a list of supported modes.");
         goto finish;
     }
 
-    if (sys->input->EnableVideoInput(htonl(wanted_mode_id), bmdFormat8BitYUV, 0) != S_OK)
-    {
+    if (sys->input->EnableVideoInput(htonl(wanted_mode_id), bmdFormat8BitYUV, 0) != S_OK) {
         msg_Err(demux, "Failed to enable video input");
         goto finish;
     }
@@ -514,10 +492,8 @@ static int Open(vlc_object_t *p_this)
     /* Set up audio. */
     sys->channels = var_InheritInteger(demux, "decklink-audio-channels");
     rate = var_InheritInteger(demux, "decklink-audio-rate");
-    if (rate > 0 && sys->channels > 0)
-    {
-        if (sys->input->EnableAudioInput(rate, bmdAudioSampleType16bitInteger, sys->channels) != S_OK)
-        {
+    if (rate > 0 && sys->channels > 0) {
+        if (sys->input->EnableAudioInput(rate, bmdAudioSampleType16bitInteger, sys->channels) != S_OK) {
             msg_Err(demux, "Failed to enable audio input");
             goto finish;
         }
@@ -526,8 +502,7 @@ static int Open(vlc_object_t *p_this)
     sys->delegate = new DeckLinkCaptureDelegate(demux);
     sys->input->SetCallback(sys->delegate);
 
-    if (sys->input->StartStreams() != S_OK)
-    {
+    if (sys->input->StartStreams() != S_OK) {
         msg_Err(demux, "Could not start streaming from SDI card. This could be caused "
                           "by invalid video mode or flags, access denied, or card already in use.");
         goto finish;
@@ -591,8 +566,7 @@ static void Close(vlc_object_t *p_this)
     if (sys->config)
         sys->config->Release();
 
-    if (sys->input)
-    {
+    if (sys->input) {
         sys->input->StopStreams();
         sys->input->Release();
     }
