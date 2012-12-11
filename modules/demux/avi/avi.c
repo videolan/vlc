@@ -2668,7 +2668,7 @@ static void AVI_ExtractSubtitle( demux_t *p_demux,
     }
 
     /* */
-    if( i_size > 1000000 )
+    if( i_size > 10000000 )
         goto exit;
 
     if( stream_Seek( p_demux->s, i_position ) )
