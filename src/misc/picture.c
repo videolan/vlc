@@ -77,7 +77,7 @@ static int AllocatePicture( picture_t *p_pic,
         p_pic->i_planes = 0;
         return VLC_EGENERIC;
     }
-    p_pic->p_data_orig = p_data; /* TODO: get rid of this */
+    p_pic->gc.p_sys = (void *)p_data;
 
     /* Fill the p_pixels field for each plane */
     p_pic->p[0].p_pixels = p_data;
@@ -96,11 +96,10 @@ static int AllocatePicture( picture_t *p_pic,
 static void PictureDestroy( picture_t *p_picture )
 {
     assert( p_picture &&
-            vlc_atomic_get( &p_picture->gc.refcount ) == 0 &&
-            p_picture->gc.p_sys == NULL );
+            vlc_atomic_get( &p_picture->gc.refcount ) == 0 );
 
     free( p_picture->p_q );
-    vlc_free( p_picture->p_data_orig );
+    vlc_free( p_picture->gc.p_sys );
     free( p_picture->p_sys );
     free( p_picture );
 }
@@ -230,6 +229,7 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
             return NULL;
         }
         p_picture->p_sys = p_resource->p_sys;
+        assert( p_picture->gc.p_sys == NULL );
 
         for( int i = 0; i < p_picture->i_planes; i++ )
         {
@@ -247,13 +247,13 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
             free( p_picture );
             return NULL;
         }
+        assert( p_picture->gc.p_sys != NULL );
     }
     /* */
     p_picture->format = fmt;
 
     vlc_atomic_set( &p_picture->gc.refcount, 1 );
     p_picture->gc.pf_destroy = PictureDestroy;
-    p_picture->gc.p_sys = NULL;
 
     return p_picture;
 }

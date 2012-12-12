@@ -73,7 +73,6 @@ struct picture_t
      */
     video_frame_format_t format;
 
-    void           *p_data_orig;                /**< pointer before memalign */
     plane_t         p[PICTURE_PLANE_MAX];     /**< description of the planes */
     int             i_planes;                /**< number of allocated planes */
 
@@ -117,7 +116,7 @@ struct picture_t
  * This function will create a new picture.
  * The picture created will implement a default release management compatible
  * with picture_Hold and picture_Release. This default management will release
- * p_sys, p_q, p_data_orig fields if non NULL.
+ * p_sys, p_q, gc.p_sys fields if non NULL.
  */
 VLC_API picture_t * picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) VLC_USED;
 
