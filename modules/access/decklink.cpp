@@ -138,6 +138,7 @@ struct demux_sys_t
 
     es_out_id_t *video_es;
     es_out_id_t *audio_es;
+    es_out_id_t *cc_es;
 
     vlc_mutex_t pts_lock;
     int last_pts;  /* protected by <pts_lock> */
@@ -184,7 +185,7 @@ private:
     demux_t *demux_;
 };
 
-static uint32_t av_le2ne32(uint32_t val)
+static inline uint32_t av_le2ne32(uint32_t val)
 {
     union {
         uint32_t v;
@@ -192,6 +193,50 @@ static uint32_t av_le2ne32(uint32_t val)
     } u;
     u.v = val;
     return (u.b[0] << 0) | (u.b[1] << 8) | (u.b[2] << 16) | (u.b[3] << 24);
+}
+
+static void v210_convert(uint16_t *dst, const uint32_t *bytes, const int width, const int height)
+{
+    const int stride = ((width + 47) / 48) * 48 * 8 / 3 / 4;
+    uint16_t *y = &dst[0];
+    uint16_t *u = &dst[width * height * 2 / 2];
+    uint16_t *v = &dst[width * height * 3 / 2];
+
+#define READ_PIXELS(a, b, c)         \
+    do {                             \
+        val  = av_le2ne32(*src++);   \
+        *a++ =  val & 0x3FF;         \
+        *b++ = (val >> 10) & 0x3FF;  \
+        *c++ = (val >> 20) & 0x3FF;  \
+    } while (0)
+
+    for (int h = 0; h < height; h++) {
+        const uint32_t *src = bytes;
+        uint32_t val = 0;
+        int w;
+        for (w = 0; w < width - 5; w += 6) {
+            READ_PIXELS(u, y, v);
+            READ_PIXELS(y, u, y);
+            READ_PIXELS(v, y, u);
+            READ_PIXELS(y, v, y);
+        }
+        if (w < width - 1) {
+            READ_PIXELS(u, y, v);
+
+            val  = av_le2ne32(*src++);
+            *y++ =  val & 0x3FF;
+        }
+        if (w < width - 3) {
+            *u++ = (val >> 10) & 0x3FF;
+            *y++ = (val >> 20) & 0x3FF;
+
+            val  = av_le2ne32(*src++);
+            *v++ =  val & 0x3FF;
+            *y++ = (val >> 10) & 0x3FF;
+        }
+
+        bytes += stride;
+    }
 }
 
 HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame* videoFrame, IDeckLinkAudioInputPacket* audioFrame)
@@ -208,57 +253,131 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
         const int height = videoFrame->GetHeight();
         const int stride = videoFrame->GetRowBytes();
 
-        block_t *video_frame = block_New(demux_, width * height * 4);
+        int bpp = sys->tenbits ? 4 : 2;
+        block_t *video_frame = block_New(demux_, width * height * bpp);
         if (!video_frame)
             return S_OK;
 
-        uint8_t *frame_bytes;
+        const uint32_t *frame_bytes;
         videoFrame->GetBytes((void**)&frame_bytes);
 
+        BMDTimeValue stream_time, frame_duration;
+        videoFrame->GetStreamTime(&stream_time, &frame_duration, CLOCK_FREQ);
+        video_frame->i_flags = BLOCK_FLAG_TYPE_I | sys->dominance_flags;
+        video_frame->i_pts = video_frame->i_dts = VLC_TS_0 + stream_time;
+
         if (sys->tenbits) {
-            /* TODO: VANC */
+            v210_convert((uint16_t*)video_frame->p_buffer, frame_bytes, width, height);
+            IDeckLinkVideoFrameAncillary *vanc;
+            if (videoFrame->GetAncillaryData(&vanc) == S_OK) {
+                for (int i = 1; i < 21; i++) {
+                    uint32_t *buf;
+                    if (vanc->GetBufferForVerticalBlankingLine(i, (void**)&buf) != S_OK)
+                        break;
+                    uint16_t dec[width * 2];
+                    v210_convert(&dec[0], buf, width, 1);
+                    static const uint16_t vanc_header[3] = { 0, 0x3ff, 0x3ff };
+                    if (!memcmp(vanc_header, dec, sizeof(vanc_header))) {
+                        int len = (dec[5] & 0xff) + 6 + 1;
+                        uint16_t vanc_sum = 0;
+                        bool parity_ok = true;
+                        for (int i = 3; i < len - 1; i++) {
+                            uint16_t v = dec[i];
+                            int np = v >> 8;
+                            int p = parity(v & 0xff);
+                            if ((!!p ^ !!(v & 0x100)) || (np != 1 && np != 2)) {
+                                parity_ok = false;
+                                break;
+                            }
+                            vanc_sum += v;
+                            vanc_sum &= 0x1ff;
+                            dec[i] &= 0xff;
+                        }
 
-            //width &= ~1;
-            int stride = ((width + 47) / 48) * 48 * 8 / 3;
+                        if (!parity_ok)
+                            continue;
 
-            uint16_t *y = (uint16_t*)(&video_frame->p_buffer[0]);
-            uint16_t *u = (uint16_t*)(&video_frame->p_buffer[width * height * 2]);
-            uint16_t *v = (uint16_t*)(&video_frame->p_buffer[width * height * 3]);
+                        vanc_sum |= ((~vanc_sum & 0x100) << 1);
+                        if (dec[len - 1] != vanc_sum)
+                            continue;
 
-#define READ_PIXELS(a, b, c)         \
-            do {                             \
-                val  = av_le2ne32(*src++);   \
-                *a++ =  val & 0x3FF;         \
-                *b++ = (val >> 10) & 0x3FF;  \
-                *c++ = (val >> 20) & 0x3FF;  \
-            } while (0)
+                        if (dec[3] != 0x61 /* DID */ ||
+                            dec[4] != 0x01 /* SDID = CEA-708 */)
+                            continue;
 
-            for (int h = 0; h < height; h++) {
-                const uint32_t *src = (const uint32_t*)frame_bytes;
-                uint32_t val = 0;
-                int w;
-                for (w = 0; w < width - 5; w += 6) {
-                    READ_PIXELS(u, y, v);
-                    READ_PIXELS(y, u, y);
-                    READ_PIXELS(v, y, u);
-                    READ_PIXELS(y, v, y);
+                        /* CDP follows */
+                        uint16_t *cdp = &dec[6];
+                        if (cdp[0] != 0x96 || cdp[1] != 0x69)
+                            continue;
+
+                        len -= 7; // remove VANC header and checksum
+
+                        if (cdp[2] != len)
+                            continue;
+
+                        uint8_t cdp_sum = 0;
+                        for (int i = 0; i < len - 1; i++)
+                            cdp_sum += cdp[i];
+                        cdp_sum = cdp_sum ? 256 - cdp_sum : 0;
+                        if (cdp[len - 1] != cdp_sum)
+                            continue;
+
+                        uint8_t rate = cdp[3];
+                        if (!(rate & 0x0f))
+                            continue;
+                        rate >>= 4;
+                        if (rate > 8)
+                            continue;
+
+                        if (!(cdp[4] & 0x43)) /* ccdata_present | caption_service_active | reserved */
+                            continue;
+
+                        uint16_t hdr = (cdp[5] << 8) | cdp[6];
+                        if (cdp[7] != 0x72) /* ccdata_id */
+                            continue;
+
+                        int cc_count = cdp[8];
+                        if (!(cc_count & 0xe0))
+                            continue;
+                        cc_count &= 0x1f;
+                        if ((len - 13) != cc_count * 3)
+                            continue;
+
+                        if (cdp[len - 4] != 0x74) /* footer id */
+                            continue;
+
+                        uint16_t ftr = (cdp[len - 3] << 8) | cdp[len - 2];
+                        if (ftr != hdr)
+                            continue;
+
+                        block_t *cc = block_Alloc(cc_count * 3);
+
+                        for (int i = 0; i < cc_count; i++) {
+                            cc->p_buffer[3*i+0] = cdp[9 + 3*i+0] & 3;
+                            cc->p_buffer[3*i+1] = cdp[9 + 3*i+1];
+                            cc->p_buffer[3*i+2] = cdp[9 + 3*i+2];
+                        }
+
+                        cc->i_pts = cc->i_dts = VLC_TS_0 + stream_time;
+
+                        if (!sys->cc_es) {
+                            es_format_t fmt;
+
+                            es_format_Init( &fmt, SPU_ES, VLC_FOURCC('c', 'c', '1' , ' ') );
+                            fmt.psz_description = strdup("Closed captions 1");
+                            if (fmt.psz_description) {
+                                sys->cc_es = es_out_Add(demux_->out, &fmt);
+                                msg_Dbg(demux_, "Adding Closed captions stream");
+                            }
+                        }
+                        if (sys->cc_es)
+                            es_out_Send(demux_->out, sys->cc_es, cc);
+                        else
+                            block_Release(cc);
+                        break; // we found the line with Closed Caption data
+                    }
                 }
-                if (w < width - 1) {
-                    READ_PIXELS(u, y, v);
-
-                    val  = av_le2ne32(*src++);
-                    *y++ =  val & 0x3FF;
-                }
-                if (w < width - 3) {
-                    *u++ = (val >> 10) & 0x3FF;
-                    *y++ = (val >> 20) & 0x3FF;
-
-                    val  = av_le2ne32(*src++);
-                    *v++ =  val & 0x3FF;
-                    *y++ = (val >> 10) & 0x3FF;
-                }
-
-                frame_bytes += stride;
+                vanc->Release();
             }
         } else {
             for (int y = 0; y < height; ++y) {
@@ -267,11 +386,6 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
                 memcpy(dst, src, width * 2);
             }
         }
-
-        BMDTimeValue stream_time, frame_duration;
-        videoFrame->GetStreamTime(&stream_time, &frame_duration, CLOCK_FREQ);
-        video_frame->i_flags = BLOCK_FLAG_TYPE_I | sys->dominance_flags;
-        video_frame->i_pts = video_frame->i_dts = VLC_TS_0 + stream_time;
 
         vlc_mutex_lock(&sys->pts_lock);
         if (video_frame->i_pts > sys->last_pts)
