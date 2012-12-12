@@ -60,8 +60,7 @@ struct demux_sys_t
     mtime_t start;
 
 #ifdef ZVBI_COMPILED
-    vbi_capture *vbi_cap;
-    es_out_id_t *p_es_subt[VBI_NUM_CC_STREAMS];
+    vlc_v4l2_vbi_t *vbi;
 #endif
 };
 
@@ -70,9 +69,6 @@ static void *MmapThread (void *);
 static void *ReadThread (void *);
 static int DemuxControl( demux_t *, int, va_list );
 static int InitVideo (demux_t *, int fd, uint32_t caps);
-#ifdef ZVBI_COMPILED
-static int InitVBI (demux_t *);
-#endif
 
 int DemuxOpen( vlc_object_t *obj )
 {
@@ -83,7 +79,7 @@ int DemuxOpen( vlc_object_t *obj )
         return VLC_ENOMEM;
     demux->p_sys = sys;
 #ifdef ZVBI_COMPILED
-    sys->vbi_cap = NULL;
+    sys->vbi = NULL;
 #endif
 
     ParseMRL( obj, demux->psz_location );
@@ -452,49 +448,27 @@ static int InitVideo (demux_t *demux, int fd, uint32_t caps)
     }
 
 #ifdef ZVBI_COMPILED
-    char *vbi_path = var_InheritString (demux, CFG_PREFIX"vbidev");
-    if (vbi_path != NULL && (std & V4L2_STD_NTSC_M))
+    if (std & V4L2_STD_NTSC_M)
     {
-        sys->vbi_cap = OpenVBIDev ((vlc_object_t *) demux, vbi_path);
-        if (sys->vbi_cap)
-            InitVBI(demux);
+        char *vbi_path = var_InheritString (demux, CFG_PREFIX"vbidev");
+        if (vbi_path != NULL)
+            sys->vbi = OpenVBI (demux, vbi_path);
+        free(vbi_path);
     }
-    free(vbi_path);
 #endif
 
     if (vlc_clone (&sys->thread, entry, demux, VLC_THREAD_PRIORITY_INPUT))
     {
+#ifdef ZVBI_COMPILED
+        if (sys->vbi != NULL)
+            CloseVBI (sys->vbi);
+#endif
         if (sys->bufv != NULL)
             StopMmap (sys->fd, sys->bufv, sys->bufc);
         return -1;
     }
     return 0;
 }
-
-#ifdef ZVBI_COMPILED
-static int InitVBI (demux_t *demux)
-{
-    demux_sys_t *sys = demux->p_sys;
-
-    for (int i = 0; i < VBI_NUM_CC_STREAMS; i++)
-    {
-        es_format_t fmt;
-
-        es_format_Init( &fmt, SPU_ES, VLC_FOURCC('c', 'c', '1' + i, ' ') );
-        if (asprintf(&fmt.psz_description, "Closed captions %d", i + 1) >= 0)
-        {
-            msg_Dbg( demux, "new spu es %4.4s", (char*)&fmt.i_codec );
-            sys->p_es_subt[i] = es_out_Add( demux->out, &fmt );
-        }
-    }
-
-    /* Do a single read and throw away the results so that ZVBI calls
-       the STREAMON ioctl() */
-    GrabVBI(demux, sys->vbi_cap, sys->p_es_subt, VBI_NUM_CC_STREAMS);
-
-    return 0;
-}
-#endif
 
 void DemuxClose( vlc_object_t *obj )
 {
@@ -509,11 +483,8 @@ void DemuxClose( vlc_object_t *obj )
     v4l2_close (sys->fd);
 
 #ifdef ZVBI_COMPILED
-    if( sys->vbi_cap )
-    {
-        close(vbi_capture_fd(sys->vbi_cap));
-        vbi_capture_delete( sys->vbi_cap );
-    }
+    if (sys->vbi != NULL)
+        CloseVBI (sys->vbi);
 #endif
 
     free( sys );
@@ -567,9 +538,9 @@ static void *UserPtrThread (void *data)
     ufd[0].events = POLLIN;
 
 #ifdef ZVBI_COMPILED
-    if ( sys->vbi_cap )
+    if (sys->vbi != NULL)
     {
-        ufd[1].fd = vbi_capture_fd(sys->vbi_cap);
+        ufd[1].fd = GetFdVBI (sys->vbi);
         ufd[1].events = POLLIN;
         numfds++;
     }
@@ -612,8 +583,8 @@ static void *UserPtrThread (void *data)
             es_out_Send (demux->out, sys->es, block);
         }
 #ifdef ZVBI_COMPILED
-        if( sys->vbi_cap && ufd[1].revents )
-            GrabVBI(demux, sys->vbi_cap, sys->p_es_subt, VBI_NUM_CC_STREAMS);
+        if (sys->vbi != NULL && ufd[1].revents)
+            GrabVBI (demux, sys->vbi);
 #endif
     }
     vlc_restorecancel (canc); /* <- hmm, this is purely cosmetic */
@@ -632,9 +603,9 @@ static void *MmapThread (void *data)
     ufd[0].events = POLLIN;
 
 #ifdef ZVBI_COMPILED
-    if ( sys->vbi_cap )
+    if (sys->vbi != NULL)
     {
-        ufd[1].fd = vbi_capture_fd(sys->vbi_cap);
+        ufd[1].fd = GetFdVBI (sys->vbi);
         ufd[1].events = POLLIN;
         numfds++;
     }
@@ -664,8 +635,8 @@ static void *MmapThread (void *data)
             vlc_restorecancel (canc);
         }
 #ifdef ZVBI_COMPILED
-        if( sys->vbi_cap && ufd[1].revents )
-            GrabVBI(demux, sys->vbi_cap, sys->p_es_subt, VBI_NUM_CC_STREAMS);
+        if (sys->vbi != NULL && ufd[1].revents)
+            GrabVBI (demux, sys->vbi);
 #endif
     }
 
@@ -684,9 +655,9 @@ static void *ReadThread (void *data)
     ufd[0].events = POLLIN;
 
 #ifdef ZVBI_COMPILED
-    if ( sys->vbi_cap )
+    if (sys->vbi != NULL)
     {
-        ufd[1].fd = vbi_capture_fd(sys->vbi_cap);
+        ufd[1].fd = GetFdVBI (sys->vbi);
         ufd[1].events = POLLIN;
         numfds++;
     }
@@ -727,8 +698,8 @@ static void *ReadThread (void *data)
             vlc_restorecancel (canc);
         }
 #ifdef ZVBI_COMPILED
-        if( sys->vbi_cap && ufd[1].revents )
-            GrabVBI(demux, sys->vbi_cap, sys->p_es_subt, VBI_NUM_CC_STREAMS);
+        if (sys->vbi != NULL && ufd[1].revents)
+            GrabVBI (demux, sys->vbi);
 #endif
     }
     assert (0);

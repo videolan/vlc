@@ -35,98 +35,126 @@
 #include "v4l2.h"
 
 #ifdef ZVBI_COMPILED
+# include <libzvbi.h>
+# define VBI_NUM_CC_STREAMS 4
 
-vbi_capture* OpenVBIDev( vlc_object_t *p_obj, const char *psz_device)
+struct vlc_v4l2_vbi
 {
     vbi_capture *cap;
-    char* errstr = NULL;
+    es_out_id_t *es[VBI_NUM_CC_STREAMS];
+};
 
-    //Can put more in here. See osd.c in zvbi package.
-    unsigned int services = VBI_SLICED_CAPTION_525;
+vlc_v4l2_vbi_t *OpenVBI (demux_t *demux, const char *psz_device)
+{
+    vlc_v4l2_vbi_t *vbi = malloc (sizeof (*vbi));
+    if (unlikely(vbi == NULL))
+        return NULL;
 
     int rawfd = vlc_open (psz_device, O_RDWR);
     if (rawfd == -1)
     {
-        msg_Err ( p_obj, "cannot open device '%s': %m", psz_device );
-        return NULL;
+        msg_Err (demux, "cannot open device '%s': %m", psz_device);
+        goto err;
     }
 
-    cap = vbi_capture_v4l2k_new (psz_device,
-                                 rawfd,
-                                 /* buffers */ 5,
-                                 &services,
-                                 /* strict */ 1,
-                                 &errstr,
-                                 /* verbose */ 1);
-    if (cap == NULL)
+    //Can put more in here. See osd.c in zvbi package.
+    unsigned int services = VBI_SLICED_CAPTION_525;
+    char *errstr = NULL;
+
+    vbi->cap = vbi_capture_v4l2k_new (psz_device, rawfd,
+                                      /* buffers */ 5,
+                                      &services,
+                                      /* strict */ 1,
+                                      &errstr,
+                                      /* verbose */ 1);
+    if (vbi->cap == NULL)
     {
-        msg_Err( p_obj, "Cannot capture vbi data with v4l2 interface (%s)",
-                 errstr );
-        free(errstr);
+        msg_Err (demux, "cannot capture VBI data: %s", errstr);
+        free (errstr);
+        goto err;
     }
 
-    return cap;
+    for (unsigned i = 0; i < VBI_NUM_CC_STREAMS; i++)
+    {
+        es_format_t fmt;
+
+        es_format_Init (&fmt, SPU_ES, VLC_FOURCC('c', 'c', '1' + i, ' '));
+        if (asprintf (&fmt.psz_description, "Closed captions %d", i + 1) >= 0)
+        {
+            msg_Dbg (demux, "new spu es %4.4s", (char *)&fmt.i_codec);
+            vbi->es[i] = es_out_Add (demux->out, &fmt);
+        }
+    }
+
+    /* Do a single read and throw away the results so that ZVBI calls
+       the STREAMON ioctl() */
+    GrabVBI(demux, vbi);
+
+    return vbi;
+err:
+    free (vbi);
+    return NULL;
 }
 
-void GrabVBI( demux_t *p_demux, vbi_capture *vbi_cap,
-              es_out_id_t **p_es_subt, int num_streams)
+int GetFdVBI (vlc_v4l2_vbi_t *vbi)
 {
-    block_t     *p_block=NULL;
+    return vbi_capture_fd(vbi->cap);
+}
+
+void GrabVBI (demux_t *p_demux, vlc_v4l2_vbi_t *vbi)
+{
     vbi_capture_buffer *sliced_bytes;
     struct timeval timeout={0,0}; /* poll */
-    int n_lines;
     int canc = vlc_savecancel ();
 
-    int r = vbi_capture_pull_sliced (vbi_cap, &sliced_bytes, &timeout);
+    int r = vbi_capture_pull_sliced (vbi->cap, &sliced_bytes, &timeout);
     switch (r) {
         case -1:
-            msg_Err( p_demux, "Error reading VBI (%m)" );
-            break;
+            msg_Err (p_demux, "error reading VBI: %m");
         case  0: /* nothing avail */
             break;
         case  1: /* got data */
-            n_lines = sliced_bytes->size / sizeof(vbi_sliced);
-            if (n_lines)
-            {
-                int sliced_size = 2; /* Number of bytes per sliced line */
-
-                int size = (sliced_size + 1) * n_lines;
-                if( !( p_block = block_Alloc( size ) ) )
-                {
-                    msg_Err( p_demux, "cannot get block" );
-                }
-                else
-                {
-                    int field;
-                    uint8_t* data = p_block->p_buffer;
-                    vbi_sliced *sliced_array = sliced_bytes->data;
-                    for(field=0; field<n_lines; field++)
-                    {
-                        *data = field;
-                        data++;
-                        memcpy(data, sliced_array[field].data, sliced_size);
-                        data += sliced_size;
-                    }
-                    p_block->i_buffer = size;
-                    p_block->i_pts = mdate();
-                }
-            }
-    }
-
-    if( p_block )
-    {
-        for (int i = 0; i < num_streams; i++)
         {
-            block_t *p_sblock;
-            if (p_es_subt[i] == NULL)
-                continue;
-            p_sblock = block_Duplicate(p_block);
-            if (p_sblock)
-                es_out_Send(p_demux->out, p_es_subt[i], p_sblock);
-        }
-        block_Release(p_block);
-    }
+            int n_lines = sliced_bytes->size / sizeof(vbi_sliced);
+            if (!n_lines)
+                break;
 
+            int sliced_size = 2; /* Number of bytes per sliced line */
+            int size = (sliced_size + 1) * n_lines;
+            block_t *p_block = block_Alloc (size);
+            if (unlikely(p_block == NULL))
+                break;
+
+            uint8_t* data = p_block->p_buffer;
+            vbi_sliced *sliced_array = sliced_bytes->data;
+            for (int field = 0; field < n_lines; field++)
+            {
+                *data = field;
+                data++;
+                memcpy(data, sliced_array[field].data, sliced_size);
+                data += sliced_size;
+            }
+            p_block->i_pts = mdate();
+
+            for (unsigned i = 0; i < VBI_NUM_CC_STREAMS; i++)
+            {
+                if (vbi->es[i] == NULL)
+                    continue;
+
+                block_t *dup = block_Duplicate(p_block);
+                if (likely(dup != NULL))
+                    es_out_Send(p_demux->out, vbi->es[i], dup);
+            }
+            block_Release(p_block);
+        }
+    }
     vlc_restorecancel (canc);
+}
+
+void CloseVBI (vlc_v4l2_vbi_t *vbi)
+{
+    close (vbi_capture_fd (vbi->cap));
+    vbi_capture_delete (vbi->cap);
+    free (vbi);
 }
 #endif

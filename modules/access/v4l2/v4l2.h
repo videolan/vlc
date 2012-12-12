@@ -20,10 +20,6 @@
 
 #include "videodev2.h"
 
-#ifdef ZVBI_COMPILED
-#   include <libzvbi.h>
-#endif
-
 /* libv4l2 functions */
 extern int v4l2_fd_open (int, int);
 extern int (*v4l2_close) (int);
@@ -63,10 +59,12 @@ block_t* GrabVideo (vlc_object_t *, int, const struct buffer_t *);
 
 #ifdef ZVBI_COMPILED
 /* vbi.c */
-vbi_capture* OpenVBIDev( vlc_object_t *, const char *);
-void GrabVBI( demux_t *p_demux, vbi_capture *vbi_cap,
-              es_out_id_t **p_es_subt, int num_streams);
-#define VBI_NUM_CC_STREAMS 4
+typedef struct vlc_v4l2_vbi vlc_v4l2_vbi_t;
+
+vlc_v4l2_vbi_t *OpenVBI (demux_t *, const char *);
+int GetFdVBI (vlc_v4l2_vbi_t *);
+void GrabVBI (demux_t *p_demux, vlc_v4l2_vbi_t *);
+void CloseVBI (vlc_v4l2_vbi_t *);
 #endif
 
 /* demux.c */
