@@ -82,7 +82,7 @@ static scte27_color_t bs_read_color(bs_t *bs)
     return color;
 }
 
-static inline void SetPixel(picture_t *picture, int x, int y, int value)
+static inline void SetYUVPPixel(picture_t *picture, int x, int y, int value)
 {
     picture->p->p_pixels[y * picture->p->i_pitch + x] = value;
 }
@@ -288,14 +288,14 @@ static subpicture_region_t *DecodeSimpleBitmap(decoder_t *dec,
                 for (int dy = 0; dy <= outline_thickness; dy++) {
                     for (int dx = 0; dx <= outline_thickness; dx++) {
                         if (circle[dy][dx]) {
-                            SetPixel(r->p_picture,
-                                     bx + bitmap_oh + dx, by + bitmap_ov + dy, COLOR_OUTLINE);
-                            SetPixel(r->p_picture,
-                                     bx + bitmap_oh - dx, by + bitmap_ov + dy, COLOR_OUTLINE);
-                            SetPixel(r->p_picture,
-                                     bx + bitmap_oh + dx, by + bitmap_ov - dy, COLOR_OUTLINE);
-                            SetPixel(r->p_picture,
-                                     bx + bitmap_oh - dx, by + bitmap_ov - dy, COLOR_OUTLINE);
+                            SetYUVPPixel(r->p_picture,
+                                         bx + bitmap_oh + dx, by + bitmap_ov + dy, COLOR_OUTLINE);
+                            SetYUVPPixel(r->p_picture,
+                                         bx + bitmap_oh - dx, by + bitmap_ov + dy, COLOR_OUTLINE);
+                            SetYUVPPixel(r->p_picture,
+                                         bx + bitmap_oh + dx, by + bitmap_ov - dy, COLOR_OUTLINE);
+                            SetYUVPPixel(r->p_picture,
+                                         bx + bitmap_oh - dx, by + bitmap_ov - dy, COLOR_OUTLINE);
                         }
                     }
                 }
@@ -306,10 +306,10 @@ static subpicture_region_t *DecodeSimpleBitmap(decoder_t *dec,
         for (int by = 0; by < bitmap_v; by++) {
             for (int bx = 0; bx < bitmap_h; bx++) {
                 if (bitmap[by * bitmap_h + bx])
-                    SetPixel(r->p_picture,
-                             bx + bitmap_oh + shadow_right,
-                             by + bitmap_ov + shadow_bottom,
-                             COLOR_SHADOW);
+                    SetYUVPPixel(r->p_picture,
+                                 bx + bitmap_oh + shadow_right,
+                                 by + bitmap_ov + shadow_bottom,
+                                 COLOR_SHADOW);
             }
         }
     }
@@ -318,8 +318,8 @@ static subpicture_region_t *DecodeSimpleBitmap(decoder_t *dec,
     for (int by = 0; by < bitmap_v; by++) {
         for (int bx = 0; bx < bitmap_h; bx++) {
             if (bitmap[by * bitmap_h + bx])
-                SetPixel(r->p_picture,
-                         bx + bitmap_oh, by + bitmap_ov, COLOR_CHARACTER);
+                SetYUVPPixel(r->p_picture,
+                             bx + bitmap_oh, by + bitmap_ov, COLOR_CHARACTER);
         }
     }
     free(bitmap);
