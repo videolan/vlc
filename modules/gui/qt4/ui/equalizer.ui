@@ -79,11 +79,11 @@
      <property name="maximum">
       <number>400</number>
      </property>
+     <property name="value">
+      <number>320</number>
+     </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
-     </property>
-     <property name="invertedAppearance">
-      <bool>false</bool>
      </property>
     </widget>
    </item>

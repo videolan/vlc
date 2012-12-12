@@ -992,24 +992,20 @@ void Equalizer::updateUIFromCore()
     if( p_aout )
     {
         psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
-        psz_pres = var_GetString( p_aout, "equalizer-preset" );
-        if( var_GetBool( p_aout, "equalizer-2pass" ) )
-            ui.eq2PassCheck->setChecked( true );
-        f_preamp = var_GetFloat( p_aout, "equalizer-preamp" );
-        psz_bands = var_GetNonEmptyString( p_aout, "equalizer-bands" );
-        i_preset = presetsComboBox->findData( QVariant( psz_pres ) );
         vlc_object_release( p_aout );
     }
     else
     {
         psz_af = config_GetPsz( p_intf, "audio-filter" );
-        psz_pres = config_GetPsz( p_intf, "equalizer-preset" );
-        if( config_GetInt( p_intf, "equalizer-2pass" ) )
-            ui.eq2PassCheck->setChecked( true );
-        f_preamp = config_GetFloat( p_intf, "equalizer-preamp" );
-        psz_bands = config_GetPsz( p_intf, "equalizer-bands" );
-        i_preset = presetsComboBox->findData( QVariant( psz_pres ) );
     }
+
+    psz_pres = var_InheritString( p_aout, "equalizer-preset" );
+    if( var_InheritBool( p_aout, "equalizer-2pass" ) )
+        ui.eq2PassCheck->setChecked( true );
+    f_preamp = var_InheritFloat( p_aout, "equalizer-preamp" );
+    psz_bands = var_InheritString( p_aout, "equalizer-bands" );
+    i_preset = presetsComboBox->findData( QVariant( psz_pres ) );
+
     if( psz_af && strstr( psz_af, "equalizer" ) != NULL )
         ui.enableCheck->setChecked( true );
     enable( ui.enableCheck->isChecked() );
