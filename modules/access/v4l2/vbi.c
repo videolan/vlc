@@ -75,6 +75,7 @@ void GrabVBI( demux_t *p_demux, vbi_capture *vbi_cap,
     vbi_capture_buffer *sliced_bytes;
     struct timeval timeout={0,0}; /* poll */
     int n_lines;
+    int canc = vlc_savecancel ();
 
     int r = vbi_capture_pull_sliced (vbi_cap, &sliced_bytes, &timeout);
     switch (r) {
@@ -126,6 +127,6 @@ void GrabVBI( demux_t *p_demux, vbi_capture *vbi_cap,
         block_Release(p_block);
     }
 
-    return;
+    vlc_restorecancel (canc);
 }
 #endif
