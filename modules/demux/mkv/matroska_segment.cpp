@@ -833,9 +833,9 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     /* Don't try complex seek if we seek to 0 */
     if( i_date == 0 && i_time_offset == 0 )
     {
+        es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, VLC_TS_0 );
         es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                         INT64_C(0) );
-        es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, VLC_TS_0 );
         es.I_O().setFilePointer( i_start_pos );
 
         delete ep;
@@ -872,8 +872,6 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     cluster = NULL;
 
     sys.i_start_pts = i_date;
-
-    es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
 
     /* now parse until key frame */
     const int es_types[3] = { VIDEO_ES, AUDIO_ES, SPU_ES };
@@ -912,7 +910,11 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     }
     /*Neither video nor audio track... no seek further*/
     if( unlikely( !p_first ) )
+    {
+        es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, i_date );
+        es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
         return;
+    }
 
     for(;;)
     {
@@ -981,6 +983,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
 
     sys.i_pcr = sys.i_pts = p_min->i_date;
     es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, VLC_TS_0 + sys.i_pcr );
+    es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
     cluster = (KaxCluster *) ep->UnGet( p_min->i_seek_pos, p_min->i_cluster_pos );
 
     /* hack use BlockGet to get the cluster then goto the wanted block */
