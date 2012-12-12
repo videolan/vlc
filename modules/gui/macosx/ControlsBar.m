@@ -356,7 +356,8 @@
 
 - (void)setFullscreenState:(BOOL)b_fullscreen
 {
-    [o_fullscreen_btn setState:b_fullscreen];
+    if (!b_nativeFullscreenMode)
+        [o_fullscreen_btn setState:b_fullscreen];
 }
 
 @end
