@@ -2,6 +2,8 @@
  * decklink.cpp: BlackMagic DeckLink SDI input module
  *****************************************************************************
  * Copyright (C) 2010 Steinar H. Gunderson
+ * Copyright (C) 2009 Michael Niedermayer <michaelni@gmx.at>
+ * Copyright (c) 2009 Baptiste Coudurier <baptiste dot coudurier at gmail dot com>
  *
  * Authors: Steinar H. Gunderson <steinar+vlc@gunderson.no>
  *
@@ -113,6 +115,7 @@ vlc_module_begin ()
         change_string_list(ppsz_videoconns, ppsz_videoconns_text)
     add_string("decklink-aspect-ratio", NULL,
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, true)
+    add_bool("decklink-tenbits", true, N_("10 bits"), N_("10 bits"), true)
 
     add_shortcut("decklink")
     set_capability("access_demux", 10)
@@ -141,6 +144,8 @@ struct demux_sys_t
 
     uint32_t dominance_flags;
     int channels;
+
+    bool tenbits;
 };
 
 class DeckLinkCaptureDelegate : public IDeckLinkInputCallback
@@ -179,6 +184,16 @@ private:
     demux_t *demux_;
 };
 
+static uint32_t av_le2ne32(uint32_t val)
+{
+    union {
+        uint32_t v;
+        uint8_t b[4];
+    } u;
+    u.v = val;
+    return (u.b[0] << 0) | (u.b[1] << 8) | (u.b[2] << 16) | (u.b[3] << 24);
+}
+
 HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame* videoFrame, IDeckLinkAudioInputPacket* audioFrame)
 {
     demux_sys_t *sys = demux_->p_sys;
@@ -192,18 +207,65 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
         const int width = videoFrame->GetWidth();
         const int height = videoFrame->GetHeight();
         const int stride = videoFrame->GetRowBytes();
-        const int bpp = 2;
 
-        block_t *video_frame = block_New(demux_, width * height * bpp);
+        block_t *video_frame = block_New(demux_, width * height * 4);
         if (!video_frame)
             return S_OK;
 
-        void *frame_bytes;
-        videoFrame->GetBytes(&frame_bytes);
-        for (int y = 0; y < height; ++y) {
-            const uint8_t *src = (const uint8_t *)frame_bytes + stride * y;
-            uint8_t *dst = video_frame->p_buffer + width * bpp * y;
-            memcpy(dst, src, width * bpp);
+        uint8_t *frame_bytes;
+        videoFrame->GetBytes((void**)&frame_bytes);
+
+        if (sys->tenbits) {
+            /* TODO: VANC */
+
+            //width &= ~1;
+            int stride = ((width + 47) / 48) * 48 * 8 / 3;
+
+            uint16_t *y = (uint16_t*)(&video_frame->p_buffer[0]);
+            uint16_t *u = (uint16_t*)(&video_frame->p_buffer[width * height * 2]);
+            uint16_t *v = (uint16_t*)(&video_frame->p_buffer[width * height * 3]);
+
+#define READ_PIXELS(a, b, c)         \
+            do {                             \
+                val  = av_le2ne32(*src++);   \
+                *a++ =  val & 0x3FF;         \
+                *b++ = (val >> 10) & 0x3FF;  \
+                *c++ = (val >> 20) & 0x3FF;  \
+            } while (0)
+
+            for (int h = 0; h < height; h++) {
+                const uint32_t *src = (const uint32_t*)frame_bytes;
+                uint32_t val = 0;
+                int w;
+                for (w = 0; w < width - 5; w += 6) {
+                    READ_PIXELS(u, y, v);
+                    READ_PIXELS(y, u, y);
+                    READ_PIXELS(v, y, u);
+                    READ_PIXELS(y, v, y);
+                }
+                if (w < width - 1) {
+                    READ_PIXELS(u, y, v);
+
+                    val  = av_le2ne32(*src++);
+                    *y++ =  val & 0x3FF;
+                }
+                if (w < width - 3) {
+                    *u++ = (val >> 10) & 0x3FF;
+                    *y++ = (val >> 20) & 0x3FF;
+
+                    val  = av_le2ne32(*src++);
+                    *v++ =  val & 0x3FF;
+                    *y++ = (val >> 10) & 0x3FF;
+                }
+
+                frame_bytes += stride;
+            }
+        } else {
+            for (int y = 0; y < height; ++y) {
+                const uint8_t *src = (const uint8_t *)frame_bytes + stride * y;
+                uint8_t *dst = video_frame->p_buffer + width * 2 * y;
+                memcpy(dst, src, width * 2);
+            }
         }
 
         BMDTimeValue stream_time, frame_duration;
@@ -360,6 +422,8 @@ static int Open(vlc_object_t *p_this)
 
     vlc_mutex_init(&sys->pts_lock);
 
+    sys->tenbits = var_InheritBool(p_this, "decklink-tenbits");
+
     IDeckLinkIterator *decklink_iterator = CreateDeckLinkIteratorInstance();
     if (!decklink_iterator) {
         msg_Err(demux, "DeckLink drivers not found.");
@@ -463,7 +527,8 @@ static int Open(vlc_object_t *p_this)
         goto finish;
     }
 
-    if (sys->input->EnableVideoInput(htonl(u.id), bmdFormat8BitYUV, 0) != S_OK) {
+    BMDPixelFormat fmt; fmt = sys->tenbits ? bmdFormat10BitYUV : bmdFormat8BitYUV;
+    if (sys->input->EnableVideoInput(htonl(u.id), fmt, 0) != S_OK) {
         msg_Err(demux, "Failed to enable video input");
         goto finish;
     }
@@ -489,7 +554,8 @@ static int Open(vlc_object_t *p_this)
 
     /* Declare elementary streams */
     es_format_t video_fmt;
-    es_format_Init(&video_fmt, VIDEO_ES, VLC_CODEC_UYVY);
+    vlc_fourcc_t chroma; chroma = sys->tenbits ? VLC_CODEC_I422_10L : VLC_CODEC_UYVY;
+    es_format_Init(&video_fmt, VIDEO_ES, chroma);
     video_fmt.video.i_width = width;
     video_fmt.video.i_height = height;
     video_fmt.video.i_sar_num = 1;
