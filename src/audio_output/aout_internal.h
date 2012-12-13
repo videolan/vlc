@@ -75,7 +75,7 @@ typedef struct
     bool recycle_vout;
 
     atomic_uint buffers_lost;
-    vlc_atomic_t restart;
+    atomic_uchar restart;
 } aout_owner_t;
 
 typedef struct

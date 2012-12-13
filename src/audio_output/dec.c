@@ -33,7 +33,6 @@
 #include <vlc_common.h>
 #include <vlc_aout.h>
 #include <vlc_input.h>
-#include <vlc_atomic.h>
 
 #include "aout_internal.h"
 #include "libvlc.h"
@@ -76,7 +75,7 @@ int aout_DecNew( audio_output_t *p_aout,
     /* Create the audio output stream */
     owner->volume = aout_volume_New (p_aout, p_replay_gain);
 
-    vlc_atomic_set (&owner->restart, 0);
+    atomic_store (&owner->restart, 0);
     owner->input_format = *p_format;
     owner->mixer_format = owner->input_format;
 
@@ -129,11 +128,9 @@ static int aout_CheckReady (audio_output_t *aout)
 
     aout_assert_locked (aout);
 
-    int restart = vlc_atomic_swap (&owner->restart, 0);
+    int restart = atomic_exchange (&owner->restart, 0);
     if (unlikely(restart))
     {
-        assert (restart & AOUT_RESTART_INPUT);
-
         const aout_request_vout_t request_vout = owner->request_vout;
 
         aout_FiltersDelete (aout);
@@ -168,8 +165,8 @@ static void aout_RequestRestart (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    /* DO NOT remove AOUT_RESTART_INPUT. You need to change the atomic ops. */
-    vlc_atomic_set (&owner->restart, AOUT_RESTART_OUTPUT|AOUT_RESTART_INPUT);
+    /* NOTE: restarting output requires restarting input. */
+    atomic_fetch_or (&owner->restart, AOUT_RESTART_OUTPUT);
 }
 
 int aout_ChannelsRestart (vlc_object_t *obj, const char *varname,
@@ -196,7 +193,7 @@ void aout_InputRequestRestart (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    vlc_atomic_compare_swap (&owner->restart, 0, AOUT_RESTART_INPUT);
+    atomic_fetch_or (&owner->restart, AOUT_RESTART_INPUT);
 }
 
 
