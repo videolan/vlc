@@ -5,6 +5,7 @@ SOURCES_dts = dts.c dts_header.h dts_header.c
 SOURCES_flac = flac.c
 SOURCES_lpcm = lpcm.c
 SOURCES_araw = araw.c
+SOURCES_g711 = g711.c
 SOURCES_vorbis = vorbis.c
 SOURCES_theora = theora.c
 SOURCES_tremor = vorbis.c
@@ -70,6 +71,7 @@ libvlc_LTLIBRARIES += \
 	libddummy_plugin.la \
 	libdts_plugin.la \
 	libdvbsub_plugin.la \
+	libg711_plugin.la \
 	liblpcm_plugin.la \
 	libmpeg_audio_plugin.la \
 	librawvideo_plugin.la \

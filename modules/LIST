@@ -127,6 +127,7 @@ $Id$
  * fluidsynth: Software MIDI synthetizer using libfluidsynth
  * folder: folder meta data and art finder
  * freetype: Utility to put text on video using freetype2
+ * g711: G.711 audio codec
  * gain: Gain audio filter
  * gaussianblur: gaussian blur video filter
  * gestures: mouse gestures control plugin

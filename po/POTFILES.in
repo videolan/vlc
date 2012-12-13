@@ -372,6 +372,7 @@ modules/codec/faad.c
 modules/codec/fdkaac.c
 modules/codec/flac.c
 modules/codec/fluidsynth.c
+modules/codec/g711.c
 modules/codec/kate.c
 modules/codec/libass.c
 modules/codec/libmpeg2.c
