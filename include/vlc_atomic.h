@@ -362,21 +362,22 @@ static inline uintptr_t vlc_atomic_compare_swap(vlc_atomic_t *atom,
     return u;
 }
 
+typedef atomic_uint_least32_t vlc_atomic_float;
+
 /** Helper to retrieve a single precision from an atom. */
-static inline float vlc_atomic_getf(vlc_atomic_t *atom)
+static inline float vlc_atomic_loadf(vlc_atomic_float *atom)
 {
-    union { float f; uintptr_t i; } u;
-    u.i = vlc_atomic_get(atom);
+    union { float f; uint32_t i; } u;
+    u.i = atomic_load(atom);
     return u.f;
 }
 
 /** Helper to store a single precision into an atom. */
-static inline float vlc_atomic_setf(vlc_atomic_t *atom, float f)
+static inline void vlc_atomic_storef(vlc_atomic_float *atom, float f)
 {
-    union { float f; uintptr_t i; } u;
+    union { float f; uint32_t i; } u;
     u.f = f;
-    vlc_atomic_set(atom, u.i);
-    return f;
+    atomic_store(atom, u.i);
 }
 
 #endif

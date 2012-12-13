@@ -37,7 +37,7 @@ struct aout_volume
 {
     audio_volume_t object;
     audio_replay_gain_t replay_gain;
-    vlc_atomic_t gain_factor;
+    vlc_atomic_float gain_factor;
     float output_factor;
     module_t *module;
 };
@@ -135,7 +135,7 @@ int aout_volume_Amplify(aout_volume_t *vol, block_t *block)
         return -1;
 
     float amp = vol->output_factor
-              * vlc_atomic_getf (&vol->gain_factor);
+              * vlc_atomic_loadf (&vol->gain_factor);
 
     vol->object.amplify(&vol->object, block, amp);
     return 0;
@@ -197,7 +197,7 @@ static int ReplayGainCallback (vlc_object_t *obj, char const *var,
     aout_volume_t *vol = data;
     float multiplier = aout_ReplayGainSelect(obj, val.psz_string,
                                              &vol->replay_gain);
-    vlc_atomic_setf (&vol->gain_factor, multiplier);
+    vlc_atomic_storef (&vol->gain_factor, multiplier);
     VLC_UNUSED(var); VLC_UNUSED(oldval);
     return VLC_SUCCESS;
 }
