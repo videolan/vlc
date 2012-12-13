@@ -150,7 +150,7 @@ VCDReadBlock( access_t * p_access )
                (long unsigned int) p_vcdplayer->i_lsn );
 
     /* Allocate a block for the reading */
-    if( !( p_block = block_New( p_access, i_blocks * M2F2_SECTOR_SIZE ) ) )
+    if( !( p_block = block_Alloc( i_blocks * M2F2_SECTOR_SIZE ) ) )
     {
         msg_Err( p_access, "cannot get a new block of size: %i",
                  i_blocks * M2F2_SECTOR_SIZE );

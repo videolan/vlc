@@ -458,7 +458,7 @@ static int Demux( demux_t *p_demux )
         if( i > SAMPLES_BUFFER )
             i = SAMPLES_BUFFER;
 
-        p_block = block_New( p_demux, i );
+        p_block = block_Alloc( i );
         if( p_block == NULL )
             return VLC_ENOMEM;
 

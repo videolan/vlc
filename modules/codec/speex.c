@@ -508,7 +508,7 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
                 (8 - (i_bits_in_speex_frame % 8)) )
                     / 8;
 
-                p_new_block = block_New( p_dec, i_bytes_in_speex_frame );
+                p_new_block = block_Alloc( i_bytes_in_speex_frame );
             memset( p_new_block->p_buffer, 0xff, i_bytes_in_speex_frame );
 
             /*
@@ -1053,7 +1053,7 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
                                   MAX_FRAME_BYTES );
         speex_bits_reset( &p_sys->bits );
 
-        p_block = block_New( p_enc, i_out );
+        p_block = block_Alloc( i_out );
         memcpy( p_block->p_buffer, p_sys->p_buffer_out, i_out );
 
         p_block->i_length = (mtime_t)1000000 *

@@ -254,7 +254,7 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
         const int stride = videoFrame->GetRowBytes();
 
         int bpp = sys->tenbits ? 4 : 2;
-        block_t *video_frame = block_New(demux_, width * height * bpp);
+        block_t *video_frame = block_Alloc(width * height * bpp);
         if (!video_frame)
             return S_OK;
 
@@ -399,7 +399,7 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
     if (audioFrame) {
         const int bytes = audioFrame->GetSampleFrameCount() * sizeof(int16_t) * sys->channels;
 
-        block_t *audio_frame = block_New(demux_, bytes);
+        block_t *audio_frame = block_Alloc(bytes);
         if (!audio_frame)
             return S_OK;
 

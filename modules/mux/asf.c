@@ -909,13 +909,13 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
 
     if( p_sys->b_asf_http )
     {
-        out = block_New( p_mux, i_size + 50 + 12 );
+        out = block_Alloc( i_size + 50 + 12 );
         bo_init( &bo, out->p_buffer, i_size + 50 + 12 );
         asf_chunk_add( &bo, 0x4824, i_size + 50, 0xc00, p_sys->i_seq++ );
     }
     else
     {
-        out = block_New( p_mux, i_size + 50 );
+        out = block_Alloc( i_size + 50 );
         bo_init( &bo, out->p_buffer, i_size + 50 );
     }
 
@@ -1183,7 +1183,7 @@ static block_t *asf_packet_create( sout_mux_t *p_mux,
 
         if( p_sys->pk == NULL )
         {
-            p_sys->pk = block_New( p_mux, p_sys->i_packet_size + i_preheader );
+            p_sys->pk = block_Alloc( p_sys->i_packet_size + i_preheader );
             /* reserve 14 bytes for the packet header */
             p_sys->i_pk_used = 14 + i_preheader;
             p_sys->i_pk_frame = 0;
@@ -1244,14 +1244,14 @@ static block_t *asf_stream_end_create( sout_mux_t *p_mux )
 
     if( p_sys->b_asf_http )
     {
-        out = block_New( p_mux, 12 );
+        out = block_Alloc( 12 );
         bo_init( &bo, out->p_buffer, 12 );
         asf_chunk_add( &bo, 0x4524, 0, 0x00, p_sys->i_seq++ );
     }
     else
     {
         /* Create index */
-        out = block_New( p_mux, 56 );
+        out = block_Alloc( 56 );
         bo_init( &bo, out->p_buffer, 56 );
         bo_add_guid ( &bo, &asf_object_index_guid );
         bo_addle_u64( &bo, 56 );

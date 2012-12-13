@@ -925,7 +925,7 @@ static block_t *VideoGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
     }
 #endif
 
-    p_out = block_New( p_stream, i_out );
+    p_out = block_Alloc( i_out );
     memcpy( p_out->p_buffer, id->p_buffer_out, i_out );
     p_out->i_length = p_buffer->i_length;
     p_out->i_pts = p_buffer->i_dts;
@@ -968,7 +968,7 @@ static block_t *AudioGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
     if ( i_out <= 0 )
         return NULL;
 
-    p_out = block_New( p_stream, i_out );
+    p_out = block_Alloc( i_out );
     memcpy( p_out->p_buffer, id->p_buffer_out, i_out );
     p_out->i_length = p_buffer->i_length;
     p_out->i_pts = p_buffer->i_dts;

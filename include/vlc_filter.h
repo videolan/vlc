@@ -209,7 +209,7 @@ static inline void filter_DeleteSubpicture( filter_t *p_filter, subpicture_t *p_
     p_filter->pf_sub_buffer_del( p_filter, p_subpicture );
 }
 
-#define filter_NewAudioBuffer block_New
+#define filter_NewAudioBuffer(f,s) ((f), block_Alloc(s))
 
 /**
  * This function gives all input attachments at once.

@@ -351,7 +351,7 @@ static block_t *Block( access_t *p_access )
     }
 
     /* Do the actual reading */
-    if( i_blocks < 0 || !( p_block = block_New( p_access, i_blocks * VCD_DATA_SIZE ) ) )
+    if( i_blocks < 0 || !( p_block = block_Alloc( i_blocks * VCD_DATA_SIZE ) ) )
     {
         msg_Err( p_access, "cannot get a new block of size: %i",
                  i_blocks * VCD_DATA_SIZE );

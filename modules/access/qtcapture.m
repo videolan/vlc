@@ -417,7 +417,7 @@ static int Demux(demux_t *p_demux)
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block;
 
-    p_block = block_New(p_demux, p_sys->width * p_sys->height * 2 /* FIXME */);
+    p_block = block_Alloc(p_sys->width * p_sys->height * 2 /* FIXME */);
     if (!p_block) {
         msg_Err(p_demux, "cannot get block");
         return 0;

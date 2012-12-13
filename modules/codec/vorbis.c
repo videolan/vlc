@@ -880,7 +880,7 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
         while( vorbis_bitrate_flushpacket( &p_sys->vd, &oggpacket ) )
         {
             int i_block_size;
-            p_block = block_New( p_enc, oggpacket.bytes );
+            p_block = block_Alloc( oggpacket.bytes );
             memcpy( p_block->p_buffer, oggpacket.packet, oggpacket.bytes );
 
             i_block_size = vorbis_packet_blocksize( &p_sys->vi, &oggpacket );

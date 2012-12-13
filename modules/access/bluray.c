@@ -1213,7 +1213,7 @@ static int blurayDemux(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    block_t *p_block = block_New(p_demux, NB_TS_PACKETS * (int64_t)BD_TS_PACKET_SIZE);
+    block_t *p_block = block_Alloc(NB_TS_PACKETS * (int64_t)BD_TS_PACKET_SIZE);
     if (!p_block) {
         return -1;
     }

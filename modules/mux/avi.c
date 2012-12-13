@@ -837,7 +837,7 @@ static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
     int                 i_junk;
     buffer_out_t        bo;
 
-    p_hdr = block_New( p_mux, HDR_SIZE );
+    p_hdr = block_Alloc( HDR_SIZE );
     memset( p_hdr->p_buffer, 0, HDR_SIZE );
 
     bo_Init( &bo, HDR_SIZE, p_hdr->p_buffer );
@@ -882,7 +882,7 @@ static block_t * avi_HeaderCreateidx1( sout_mux_t *p_mux )
 
     i_idx1_size = 16 * p_sys->idx1.i_entry_count + 8;
 
-    p_idx1 = block_New( p_mux, i_idx1_size);
+    p_idx1 = block_Alloc( i_idx1_size);
     memset( p_idx1->p_buffer, 0, i_idx1_size);
 
     bo_Init( &bo, i_idx1_size, p_idx1->p_buffer );

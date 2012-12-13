@@ -651,7 +651,7 @@ static bool dirac_UnpackSeqHdr( struct seq_hdr_t *p_sh, block_t *p_block )
 static block_t *dirac_EmitEOS( decoder_t *p_dec, uint32_t i_prev_parse_offset )
 {
     const uint8_t p_eos[] = { 'B','B','C','D',0x10,0,0,0,13,0,0,0,0 };
-    block_t *p_block = block_New( p_dec, 13 );
+    block_t *p_block = block_Alloc( 13 );
     if( !p_block )
         return NULL;
     memcpy( p_block->p_buffer, p_eos, 13 );
@@ -797,7 +797,7 @@ sync_fail:
     p_sys->i_offset = 0;
 
     /* setup the data unit buffer */
-    block_t *p_block = block_New( p_dec, pu.u_next_offset );
+    block_t *p_block = block_Alloc( pu.u_next_offset );
     if( !p_block )
         return NULL;
 
@@ -1383,7 +1383,7 @@ static int Open( vlc_object_t *p_this )
         /* handle hacky systems like ogg that dump some headers
          * in p_extra. and packetizers that expect it to be filled
          * in before real startup */
-        block_t *p_init = block_New( p_dec, p_dec->fmt_in.i_extra );
+        block_t *p_init = block_Alloc( p_dec->fmt_in.i_extra );
         if( !p_init )
         {
             /* memory might be avaliable soon.  it isn't the end of

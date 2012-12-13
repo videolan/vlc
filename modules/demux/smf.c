@@ -525,7 +525,7 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr)
     }
 
     /* FIXME: one message per block is very inefficient */
-    block = block_New (p_demux, 1 + datalen);
+    block = block_Alloc (1 + datalen);
     if (block == NULL)
         goto skip;
 
@@ -603,7 +603,7 @@ static int Demux (demux_t *p_demux)
     /* MIDI Tick emulation (ping the decoder every 10ms) */
     while (cur_tick < last_tick)
     {
-        block_t *tick = block_New (p_demux, 1);
+        block_t *tick = block_Alloc (1);
         if (tick == NULL)
             break;
 

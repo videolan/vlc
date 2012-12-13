@@ -148,7 +148,7 @@ static block_t *GetPCM( encoder_t *p_enc, block_t *p_block )
     while( p_sys->i_buffer + p_block->i_buffer >= pcm_chunk_size )
     {
         unsigned int i_buffer = 0;
-        p_pcm_block = block_New( p_enc, pcm_chunk_size );
+        p_pcm_block = block_Alloc( pcm_chunk_size );
         if( !p_pcm_block )
             break;
 
@@ -224,7 +224,7 @@ static block_t *EncodeFrame( encoder_t *p_enc, block_t *p_block )
         encode_frame( (char*)p_pcm_block->p_buffer, chunk );
         block_Release( p_pcm_block );
 
-        block_t *p_mp3_block = block_New( p_enc, chunk->enc_size );
+        block_t *p_mp3_block = block_Alloc( chunk->enc_size );
         if( !p_mp3_block )
             break;
 

@@ -230,7 +230,7 @@ static int Open( vlc_object_t *p_this )
             goto error;
         }
 
-        p_sys->p_header = block_New( p_access, 4096 );
+        p_sys->p_header = block_Alloc( 4096 );
         p_sys->p_header->i_buffer =
             rmff_dump_header( h, (char *)p_sys->p_header->p_buffer, 1024 );
         rmff_free_header( h );
@@ -283,7 +283,7 @@ static block_t *BlockRead( access_t *p_access )
     i_size = real_get_rdt_chunk_header( p_access->p_sys->p_rtsp, &pheader );
     if( i_size <= 0 ) return NULL;
 
-    p_block = block_New( p_access, i_size );
+    p_block = block_Alloc( i_size );
     p_block->i_buffer = real_get_rdt_chunk( p_access->p_sys->p_rtsp, &pheader,
                                             &p_block->p_buffer );
 

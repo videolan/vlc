@@ -159,7 +159,7 @@ static int Mux( sout_mux_t *p_mux )
             "Content-Length: %zu\r\n"
             "\r\n";
         block_t *p_data = block_FifoGet( p_fifo );
-        block_t *p_header = block_New( p_mux, sizeof( psz_hfmt ) + 20 );
+        block_t *p_header = block_Alloc( sizeof( psz_hfmt ) + 20 );
 
         if( p_header == NULL ) /* uho! */
         {

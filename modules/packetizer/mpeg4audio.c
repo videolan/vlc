@@ -1137,7 +1137,7 @@ static block_t *PacketizeStreamBlock( decoder_t *p_dec, block_t **pp_block )
             /* When we reach this point we already know we have enough
              * data available. */
 
-            p_out_buffer = block_New( p_dec, p_sys->i_frame_size );
+            p_out_buffer = block_Alloc( p_sys->i_frame_size );
             if( !p_out_buffer )
             {
                 //p_dec->b_error = true;

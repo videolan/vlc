@@ -542,7 +542,7 @@ static block_t *EncodeFrames( encoder_t *p_enc, block_t *p_aout_buf )
 
     for ( int i = 0; i < i_num_frames; ++i )
     {
-        block_t *p_block = block_New( p_enc, i_frame_size );
+        block_t *p_block = block_Alloc( i_frame_size );
         if( !p_block )
             return NULL;
 

@@ -452,7 +452,7 @@ static void ProcessHeader( decoder_t *p_dec )
 
     /* Decode STREAMINFO */
     msg_Dbg( p_dec, "decode STREAMINFO" );
-    p_sys->p_block = block_New( p_dec, p_dec->fmt_in.i_extra );
+    p_sys->p_block = block_Alloc( p_dec->fmt_in.i_extra );
     memcpy( p_sys->p_block->p_buffer, p_dec->fmt_in.p_extra,
             p_dec->fmt_in.i_extra );
     FLAC__stream_decoder_process_until_end_of_metadata( p_sys->p_flac );
@@ -641,7 +641,7 @@ EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
         return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
     }
 
-    p_block = block_New( p_enc, bytes );
+    p_block = block_Alloc( bytes );
     memcpy( p_block->p_buffer, buffer, bytes );
 
     p_block->i_dts = p_block->i_pts = p_sys->i_pts;

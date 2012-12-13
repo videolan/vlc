@@ -247,8 +247,7 @@ static int Demux( demux_t *p_demux )
     mpc_frame_info frame;
     mpc_status err;
 #endif
-    p_data = block_New( p_demux,
-                        MPC_DECODER_BUFFER_LENGTH*sizeof(MPC_SAMPLE_FORMAT) );
+    p_data = block_Alloc( MPC_DECODER_BUFFER_LENGTH*sizeof(MPC_SAMPLE_FORMAT) );
     if( !p_data )
         return -1;
 

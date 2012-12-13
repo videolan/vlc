@@ -150,7 +150,7 @@ static block_t *Decode(demux_t *demux,
         size += image->p[i].i_visible_pitch *
                 image->p[i].i_visible_lines;
 
-    data = block_New(demux, size);
+    data = block_Alloc(size);
     if (!data) {
         picture_Release(image);
         return NULL;

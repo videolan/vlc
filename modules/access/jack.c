@@ -463,7 +463,7 @@ static block_t *GrabJack( demux_t *p_demux )
     }
     else
     {
-        p_block = block_New( p_demux, i_read );
+        p_block = block_Alloc( i_read );
     }
     if( !p_block )
     {

@@ -514,7 +514,7 @@ static int ParseImageAttachments( decoder_t *p_dec )
             {
                 block_t   *p_block;
 
-                p_block = block_New( p_image->p_parent, p_attach->i_data );
+                p_block = block_Alloc( p_attach->i_data );
 
                 if( p_block != NULL )
                 {

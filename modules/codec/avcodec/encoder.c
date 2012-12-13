@@ -854,7 +854,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     const int bytesPerPixel = p_enc->fmt_out.video.i_bits_per_pixel ?
                          p_enc->fmt_out.video.i_bits_per_pixel / 8 : 3;
     const int blocksize = __MAX( FF_MIN_BUFFER_SIZE,bytesPerPixel * p_sys->p_context->height * p_sys->p_context->width + 200 );
-    block_t *p_block = block_New( p_enc, blocksize );
+    block_t *p_block = block_Alloc( blocksize );
 
     if( likely(p_pict) ) {
         AVFrame *frame;
@@ -1035,7 +1035,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     {
         msg_Dbg(p_enc,"Flushing..");
         do {
-            p_block = block_New( p_enc, p_sys->i_buffer_out );
+            p_block = block_Alloc( p_sys->i_buffer_out );
             av_init_packet( &packet );
             packet.data = p_block->p_buffer;
             packet.size = p_block->i_buffer;
@@ -1058,7 +1058,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
 
     frame->pts = p_aout_buf->i_pts;
 
-    p_block = block_New( p_enc, p_sys->i_buffer_out );
+    p_block = block_Alloc( p_sys->i_buffer_out );
     av_init_packet( &packet );
     packet.data = p_block->p_buffer;
     packet.size = p_block->i_buffer;

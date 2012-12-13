@@ -66,7 +66,7 @@ static block_t *audio_new_buffer( decoder_t *p_dec, int i_samples )
         i_size = i_samples * 4 * p_dec->fmt_out.audio.i_channels;
     }
 
-    p_block = block_New( p_dec, i_size );
+    p_block = block_Alloc( i_size );
     p_block->i_nb_samples = i_samples;
     return p_block;
 }

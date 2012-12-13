@@ -338,7 +338,7 @@ static block_t *BlockScan( access_t *p_access )
         if ( ufds[0].revents )
         {
             const int i_read_once = 1;
-            block_t *p_block = block_New( p_access, i_read_once * TS_PACKET_SIZE );
+            block_t *p_block = block_Alloc( i_read_once * TS_PACKET_SIZE );
 
             if( ( i_ret = read( p_sys->i_handle, p_block->p_buffer,
                                 i_read_once * TS_PACKET_SIZE ) ) <= 0 )

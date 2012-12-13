@@ -271,7 +271,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         case STATE_SEND_DATA:
             /* When we reach this point we already know we have enough
              * data available. */
-            p_out_buffer = block_New( p_dec, p_sys->i_frame_size );
+            p_out_buffer = block_Alloc( p_sys->i_frame_size );
             if( !p_out_buffer )
                 return NULL;
 

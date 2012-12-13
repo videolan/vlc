@@ -239,7 +239,7 @@ static block_t *GetHeader( sout_mux_t *p_mux )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     block_t *p_block =
-        block_New( p_mux, sizeof( WAVEFORMATEXTENSIBLE ) + 7 * 4 );
+        block_Alloc( sizeof( WAVEFORMATEXTENSIBLE ) + 7 * 4 );
 
     SetDWLE( &p_sys->waveheader[1],
              20 + (p_sys->b_ext ? 40 : 16) + p_sys->i_data ); /* Length */

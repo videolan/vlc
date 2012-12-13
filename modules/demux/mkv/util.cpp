@@ -121,7 +121,7 @@ block_t *block_zlib_decompress( vlc_object_t *p_this, block_t *p_in_block ) {
     d_stream.next_in = (Bytef *)p_in_block->p_buffer;
     d_stream.avail_in = p_in_block->i_buffer;
     n = 0;
-    p_block = block_New( p_this, 0 );
+    p_block = block_Alloc( 0 );
     dst = NULL;
     do
     {
@@ -159,7 +159,7 @@ block_t *MemToBlock( uint8_t *p_mem, size_t i_mem, size_t offset)
     if( unlikely( i_mem > SIZE_MAX - offset ) )
         return NULL;
 
-    block_t *p_block = block_New( p_demux, i_mem + offset );
+    block_t *p_block = block_Alloc( i_mem + offset );
     if( likely(p_block != NULL) )
     {
         memcpy( p_block->p_buffer + offset, p_mem, i_mem );
@@ -198,7 +198,7 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, m
             if( i_index >= p_sys->i_subpackets )
                 return;
 
-            block_t *p_block = block_New( p_demux, p_sys->i_subpacket_size );
+            block_t *p_block = block_Alloc( p_sys->i_subpacket_size );
             if( !p_block )
                 return;
 

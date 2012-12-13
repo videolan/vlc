@@ -290,7 +290,7 @@ static void Close( vlc_object_t * p_this )
         while( i_size > 0 )
         {
             i_chunk = __MIN( 32768, i_size );
-            p_buf = block_New( p_mux, i_chunk );
+            p_buf = block_Alloc( i_chunk );
             sout_AccessOutSeek( p_mux->p_access,
                                 p_sys->i_mdat_pos + i_size - i_chunk );
             if( sout_AccessOutRead( p_mux->p_access, p_buf ) < i_chunk )
@@ -596,7 +596,7 @@ again:
                 p_stream->i_last_dts += i_length;
 
                 /* Write a " " */
-                p_data = block_New( p_mux, 3 );
+                p_data = block_Alloc( 3 );
                 p_data->p_buffer[0] = 0;
                 p_data->p_buffer[1] = 1;
                 p_data->p_buffer[2] = ' ';

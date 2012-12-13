@@ -206,7 +206,7 @@ static int Demux (demux_t *demux)
 {
     demux_sys_t *sys = demux->p_sys;
 
-    block_t *block = block_New( p_demux, sys->block_size);
+    block_t *block = block_Alloc( sys->block_size);
     if (unlikely(block==NULL))
         return 0;
 

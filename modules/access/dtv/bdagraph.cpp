@@ -2822,7 +2822,7 @@ STDMETHODIMP BDAGraph::SampleCB( double /*date*/, IMediaSample *p_sample )
 
     if( i_sample_size > 0 && p_sample_data )
     {
-        block_t *p_block = block_New( p_access, i_sample_size );
+        block_t *p_block = block_Alloc( i_sample_size );
 
         if( p_block )
         {

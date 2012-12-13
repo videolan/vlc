@@ -443,8 +443,7 @@ static block_t *GrabVideo( demux_t *p_demux )
         return NULL;
     }
 
-    p_block = block_New( p_demux, p_sys->frame->size[0] *
-                                  p_sys->frame->size[1] * 2 );
+    p_block = block_Alloc( p_sys->frame->size[0] * p_sys->frame->size[1] * 2 );
     if( !p_block )
     {
         msg_Err( p_demux, "Can not get block" );

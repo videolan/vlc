@@ -294,7 +294,7 @@ static block_t* GrabAudio( demux_t *p_demux )
     block_t *p_block;
 
     if( p_sys->p_block ) p_block = p_sys->p_block;
-    else p_block = block_New( p_demux, p_sys->i_max_frame_size );
+    else p_block = block_Alloc( p_sys->i_max_frame_size );
 
     if( !p_block )
     {

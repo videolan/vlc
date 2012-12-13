@@ -1483,7 +1483,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
 
         /* store dts in a queue, so that they appear in order in
          * coded order */
-        p_block = block_New( p_enc, 1 );
+        p_block = block_Alloc( 1 );
         if( !p_block )
             return NULL;
         p_block->i_dts = p_pic->date - p_sys->i_pts_offset;
@@ -1497,7 +1497,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
             StorePicturePTS( p_enc, p_sys->i_input_picnum, p_pic->date + p_sys->i_field_time );
             p_sys->i_input_picnum++;
 
-            p_block = block_New( p_enc, 1 );
+            p_block = block_Alloc( 1 );
             if( !p_block )
                 return NULL;
             p_block->i_dts = p_pic->date - p_sys->i_pts_offset + p_sys->i_field_time;
@@ -1527,7 +1527,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
             uint32_t u_pic_num;
             int i_presentation_frame;
             p_enc_buf = schro_encoder_pull( p_sys->p_schro, &i_presentation_frame );
-            p_block = block_New( p_enc, p_enc_buf->length );
+            p_block = block_Alloc( p_enc_buf->length );
             if( !p_block )
                 return NULL;
 

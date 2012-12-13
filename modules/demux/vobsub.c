@@ -387,7 +387,7 @@ static int Demux( demux_t *p_demux )
             }
 
             /* allocate a packet */
-            if( ( p_block = block_New( p_demux, i_size ) ) == NULL )
+            if( ( p_block = block_Alloc( i_size ) ) == NULL )
             {
                 tk.i_current_subtitle++;
                 continue;
@@ -674,7 +674,7 @@ static int DemuxVobSub( demux_t *p_demux, block_t *p_bk )
         }
 
         /* Create a block */
-        p_pkt = block_New( p_demux, i_size );
+        p_pkt = block_Alloc( i_size );
         if( unlikely(p_pkt == NULL) )
             break;
         memcpy( p_pkt->p_buffer, p, i_size);

@@ -139,8 +139,6 @@ VLC_API void block_Init( block_t *, void *, size_t );
 VLC_API block_t *block_Alloc( size_t ) VLC_USED VLC_MALLOC;
 VLC_API block_t *block_Realloc( block_t *, ssize_t i_pre, size_t i_body ) VLC_USED;
 
-#define block_New( dummy, size ) block_Alloc(size)
-
 VLC_USED
 static inline block_t *block_Duplicate( block_t *p_block )
 {

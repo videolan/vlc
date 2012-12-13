@@ -703,7 +703,7 @@ static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] )
     if( p_sys->cc.i_data <= 0 )
         return NULL;
 
-    p_cc = block_New( p_dec, p_sys->cc.i_data);
+    p_cc = block_Alloc( p_sys->cc.i_data);
     if( p_cc )
     {
         memcpy( p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data );

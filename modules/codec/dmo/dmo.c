@@ -1542,7 +1542,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
             p_enc->fmt_in.video.i_height *
             p_enc->fmt_in.video.i_bits_per_pixel / 8;
 
-        p_block_in = block_New( p_enc, i_buffer );
+        p_block_in = block_Alloc( i_buffer );
 
         /* Copy picture stride by stride */
         p_dst = p_block_in->p_buffer;
@@ -1566,7 +1566,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
     else
     {
         block_t *p_aout_buffer = (block_t *)p_data;
-        p_block_in = block_New( p_enc, p_aout_buffer->i_buffer );
+        p_block_in = block_Alloc( p_aout_buffer->i_buffer );
         memcpy( p_block_in->p_buffer, p_aout_buffer->p_buffer,
                 p_block_in->i_buffer );
 
@@ -1609,7 +1609,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
         block_t *p_block_out;
         CMediaBuffer *p_out;
 
-        p_block_out = block_New( p_enc, p_sys->i_min_output );
+        p_block_out = block_Alloc( p_sys->i_min_output );
         p_block_out->i_buffer = 0;
         p_out = CMediaBufferCreate(p_block_out, p_sys->i_min_output, false);
         memset( &db, 0, sizeof(db) );

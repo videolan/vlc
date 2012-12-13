@@ -204,7 +204,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         return p_in_buf;
     }
 
-    p_block = block_New( p_sys->p_thread, p_in_buf->i_buffer );
+    p_block = block_Alloc( p_in_buf->i_buffer );
     if( !p_block )
     {
         vlc_mutex_unlock( &p_sys->p_thread->lock );

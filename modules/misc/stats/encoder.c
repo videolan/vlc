@@ -75,7 +75,7 @@ int OpenEncoder ( vlc_object_t *p_this )
 static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 {
     (void)p_pict;
-    block_t * p_block = block_New( p_enc, kBufferSize );
+    block_t * p_block = block_Alloc( kBufferSize );
 
     *(mtime_t*)p_block->p_buffer = mdate();
     p_block->i_buffer = kBufferSize;

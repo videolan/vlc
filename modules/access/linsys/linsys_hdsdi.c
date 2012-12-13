@@ -539,7 +539,7 @@ static int InitAudio( demux_t *p_demux )
 static int HandleVideo( demux_t *p_demux, const uint8_t *p_buffer )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    block_t *p_current_picture = block_New( p_demux, p_sys->i_vblock_size );
+    block_t *p_current_picture = block_Alloc( p_sys->i_vblock_size );
     if( unlikely( !p_current_picture ) )
         return VLC_ENOMEM;
     uint8_t *p_y = p_current_picture->p_buffer;
@@ -609,7 +609,7 @@ static int HandleAudio( demux_t *p_demux, const uint8_t *p_buffer )
         hdsdi_audio_t *p_audio = &p_sys->p_audios[i];
         if ( p_audio->i_channel != -1 && p_audio->p_es != NULL )
         {
-            block_t *p_block = block_New( p_demux, p_sys->i_ablock_size );
+            block_t *p_block = block_Alloc( p_sys->i_ablock_size );
             if( unlikely( !p_block ) )
                 return VLC_ENOMEM;
             SparseCopy( (int16_t *)p_block->p_buffer, (const int16_t *)p_buffer,

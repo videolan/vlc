@@ -266,7 +266,7 @@ static int Demux( demux_t *p_demux )
     const int i_bk = ( p_sys->fmt.audio.i_bitspersample / 8 ) *
                        p_sys->fmt.audio.i_channels;
 
-    p_frame = block_New( p_demux, p_sys->fmt.audio.i_rate / 10 * i_bk );
+    p_frame = block_Alloc( p_sys->fmt.audio.i_rate / 10 * i_bk );
     if( !p_frame )
         return -1;
 

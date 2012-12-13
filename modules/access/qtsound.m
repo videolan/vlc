@@ -502,7 +502,7 @@ static int Demux(demux_t *p_demux)
     block_t *p_blocka;
     NSAutoreleasePool *pool;
 
-    p_blocka = block_New(p_demux, p_sys->i_audio_max_buffer_size);
+    p_blocka = block_Alloc(p_sys->i_audio_max_buffer_size);
 
     if(!p_blocka) {
         msg_Err(p_demux, "cannot get audio block");

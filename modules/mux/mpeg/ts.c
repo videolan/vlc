@@ -1321,7 +1321,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
             if( p_data->i_length > 0 &&
                 ( p_data->i_buffer != 1 || *p_data->p_buffer != ' ' ) )
             {
-                block_t *p_spu = block_New( p_mux, 3 );
+                block_t *p_spu = block_Alloc( 3 );
 
                 p_spu->i_dts = p_data->i_dts + p_data->i_length;
                 p_spu->i_pts = p_spu->i_dts;
@@ -1536,7 +1536,7 @@ static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo )
     }
     else if( i_size > STD_PES_PAYLOAD )
     {
-        block_t *p_new = block_New( p_mux, STD_PES_PAYLOAD );
+        block_t *p_new = block_Alloc( STD_PES_PAYLOAD );
         memcpy( p_new->p_buffer, p_data->p_buffer, STD_PES_PAYLOAD );
         p_new->i_pts = p_data->i_pts;
         p_new->i_dts = p_data->i_dts;
@@ -1767,7 +1767,7 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
         b_adaptation_field = true;
     }
 
-    block_t *p_ts = block_New( p_mux, 188 );
+    block_t *p_ts = block_Alloc( 188 );
 
     if (b_new_pes && !(p_pes->i_flags & BLOCK_FLAG_NO_KEYFRAME) && p_pes->i_flags & BLOCK_FLAG_TYPE_I)
     {

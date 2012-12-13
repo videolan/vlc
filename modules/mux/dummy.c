@@ -153,7 +153,7 @@ static int Mux( sout_mux_t *p_mux )
         {
             /* Write header data */
             block_t *p_data;
-            p_data = block_New( p_mux, p_mux->pp_inputs[i]->p_fmt->i_extra );
+            p_data = block_Alloc( p_mux->pp_inputs[i]->p_fmt->i_extra );
 
             memcpy( p_data->p_buffer, p_mux->pp_inputs[i]->p_fmt->p_extra,
                     p_mux->pp_inputs[i]->p_fmt->i_extra );

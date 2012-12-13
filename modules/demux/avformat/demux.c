@@ -616,7 +616,7 @@ static int Demux( demux_t *p_demux )
     }
     else
     {
-        if( ( p_frame = block_New( p_demux, pkt.size ) ) == NULL )
+        if( ( p_frame = block_Alloc( pkt.size ) ) == NULL )
         {
             av_free_packet( &pkt );
             return 0;

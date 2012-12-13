@@ -325,7 +325,7 @@ block_t *screen_Capture( demux_t *p_demux )
 
     i_size = p_sys->fmt.video.i_height * p_sys->fmt.video.i_width * 4;
 
-    if( !( p_block = block_New( p_demux, i_size ) ) )
+    if( !( p_block = block_Alloc( i_size ) ) )
     {
         msg_Warn( p_demux, "cannot get block" );
         return NULL;

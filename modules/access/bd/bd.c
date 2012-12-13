@@ -409,7 +409,7 @@ static int Demux( demux_t *p_demux )
     /* XXX
      * we ensure that the TS packet start at the begining of the buffer,
      * it ensure proper TS parsing */
-    block_t *p_block = block_New( p_demux, i_packets * BD_TS_PACKET_SIZE + BD_TS_PACKET_HEADER );
+    block_t *p_block = block_Alloc( i_packets * BD_TS_PACKET_SIZE + BD_TS_PACKET_HEADER );
     if( !p_block )
         return -1;
 

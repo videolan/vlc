@@ -850,7 +850,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     th_encode_packetout( p_sys->tcx, 0, &oggpacket );
 
     /* Ogg packet to block */
-    p_block = block_New( p_enc, oggpacket.bytes );
+    p_block = block_Alloc( oggpacket.bytes );
     memcpy( p_block->p_buffer, oggpacket.packet, oggpacket.bytes );
     p_block->i_dts = p_block->i_pts = p_pict->date;
 

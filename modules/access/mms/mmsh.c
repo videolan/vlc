@@ -345,7 +345,7 @@ static block_t *Block( access_t *p_access )
         const size_t i_offset = p_access->info.i_pos - p_sys->i_start;
         const size_t i_copy = p_sys->i_header - i_offset;
 
-        block_t *p_block = block_New( p_access, i_copy );
+        block_t *p_block = block_Alloc( i_copy );
         if( !p_block )
             return NULL;
 
@@ -364,7 +364,7 @@ static block_t *Block( access_t *p_access )
         if( __MAX( p_sys->i_packet_used, p_sys->i_packet_length ) < i_packet_min )
             i_padding = i_packet_min - __MAX( p_sys->i_packet_used, p_sys->i_packet_length );
 
-        block_t *p_block = block_New( p_access, i_copy + i_padding );
+        block_t *p_block = block_Alloc( i_copy + i_padding );
         if( !p_block )
             return NULL;
 

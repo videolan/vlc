@@ -798,7 +798,7 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
         {
             if( p_sys->p_cc[i] )
             {
-                block_t *p_cc = block_New( p_demux, p_sys->cc.i_data );
+                block_t *p_cc = block_Alloc( p_sys->cc.i_data );
                 p_cc->i_flags |= BLOCK_FLAG_TYPE_I;
                 p_cc->i_pts = p_block_in->i_pts;
                 memcpy( p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data );

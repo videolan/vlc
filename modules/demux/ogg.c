@@ -872,7 +872,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         return;
     }
 
-    if( !( p_block = block_New( p_demux, p_oggpacket->bytes ) ) ) return;
+    if( !( p_block = block_Alloc( p_oggpacket->bytes ) ) ) return;
 
 
     /* may need to preroll after a seek */

@@ -855,7 +855,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
 
     /* store dts in a queue, so that they appear in order in
      * coded order */
-    p_block = block_New( p_enc, 1 );
+    p_block = block_Alloc( 1 );
     if( !p_block )
         return NULL;
     p_block->i_dts = p_pic->date - p_sys->i_pts_offset;
@@ -870,7 +870,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
         StorePicturePTS( p_enc, p_sys->i_input_picnum, p_pic->date + p_sys->i_field_time );
         p_sys->i_input_picnum++;
 
-        p_block = block_New( p_enc, 1 );
+        p_block = block_Alloc( 1 );
         if( !p_block )
             return NULL;
         p_block->i_dts = p_pic->date - p_sys->i_pts_offset + p_sys->i_field_time;
@@ -891,7 +891,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
             uint32_t pic_num;
 
             /* extract data from encoder temporary buffer. */
-            p_block = block_New( p_enc, p_sys->p_dirac->enc_buf.size );
+            p_block = block_Alloc( p_sys->p_dirac->enc_buf.size );
             if( !p_block )
                 return NULL;
             memcpy( p_block->p_buffer, p_sys->p_dirac->enc_buf.buffer,

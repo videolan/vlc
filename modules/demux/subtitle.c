@@ -689,7 +689,7 @@ static int Demux( demux_t *p_demux )
             continue;
         }
 
-        if( ( p_block = block_New( p_demux, i_len ) ) == NULL )
+        if( ( p_block = block_Alloc( i_len ) ) == NULL )
         {
             p_sys->i_subtitle++;
             continue;

@@ -410,7 +410,7 @@ static int NewFrame( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    p_sys->p_current_picture = block_New( p_demux, p_sys->i_block_size );
+    p_sys->p_current_picture = block_Alloc( p_sys->i_block_size );
     if( unlikely( !p_sys->p_current_picture ) )
         return VLC_ENOMEM;
     p_sys->p_y = p_sys->p_current_picture->p_buffer;
@@ -801,8 +801,7 @@ static int DecodeTelx( demux_t *p_demux )
         int i_nb_slices_rounded = 3 + (i_nb_slices / 4) * 4;
         int i;
         uint8_t *p;
-        block_t *p_block = block_New( p_demux,
-                                      1 + i_nb_slices_rounded * 46 );
+        block_t *p_block = block_Alloc( 1 + i_nb_slices_rounded * 46 );
         if( unlikely( !p_block ) )
             return VLC_ENOMEM;
         p_block->p_buffer[0] = 0x10; /* FIXME ? data_identifier */
@@ -939,7 +938,7 @@ static int DecodeAudio( demux_t *p_demux, sdi_audio_t *p_audio )
         return VLC_EGENERIC;
     }
 
-    p_block = block_New( p_demux, p_audio->i_nb_samples * sizeof(int16_t) * 2 );
+    p_block = block_Alloc( p_audio->i_nb_samples * sizeof(int16_t) * 2 );
     if( unlikely( !p_block ) )
         return VLC_ENOMEM;
     p_block->i_dts = p_block->i_pts = p_sys->i_next_date

@@ -1718,7 +1718,7 @@ static block_t *StreamParseAsf( demux_t *p_demux, live_track_t *tk,
 
         if( !tk->p_asf_block )
         {
-            tk->p_asf_block = block_New( p_demux, i_packet_size );
+            tk->p_asf_block = block_Alloc( i_packet_size );
             if( !tk->p_asf_block )
                 break;
             tk->p_asf_block->i_buffer = 0;
@@ -1880,7 +1880,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
     {
         AMRAudioSource *amrSource = (AMRAudioSource*)tk->sub->readSource();
 
-        p_block = block_New( p_demux, i_size + 1 );
+        p_block = block_Alloc( i_size + 1 );
         p_block->p_buffer[0] = amrSource->lastFrameHeader();
         memcpy( p_block->p_buffer + 1, tk->p_buffer, i_size );
     }
@@ -1888,7 +1888,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
     {
         H261VideoRTPSource *h261Source = (H261VideoRTPSource*)tk->sub->rtpSource();
         uint32_t header = h261Source->lastSpecialHeader();
-        p_block = block_New( p_demux, i_size + 4 );
+        p_block = block_Alloc( i_size + 4 );
         memcpy( p_block->p_buffer, &header, 4 );
         memcpy( p_block->p_buffer + 4, tk->p_buffer, i_size );
 
@@ -1901,7 +1901,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
             msg_Warn( p_demux, "unsupported NAL type for H264" );
 
         /* Normal NAL type */
-        p_block = block_New( p_demux, i_size + 4 );
+        p_block = block_Alloc( i_size + 4 );
         p_block->p_buffer[0] = 0x00;
         p_block->p_buffer[1] = 0x00;
         p_block->p_buffer[2] = 0x00;
@@ -1916,7 +1916,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
     }
     else
     {
-        p_block = block_New( p_demux, i_size );
+        p_block = block_Alloc( i_size );
         memcpy( p_block->p_buffer, tk->p_buffer, i_size );
     }
 
@@ -2066,7 +2066,7 @@ static int ParseASF( demux_t *p_demux )
     }
 
     /* Always smaller */
-    p_header = block_New( p_demux, psz_end - psz_asf );
+    p_header = block_Alloc( psz_end - psz_asf );
     p_header->i_buffer = vlc_b64_decode_binary_to_buffer( p_header->p_buffer,
                                                p_header->i_buffer, psz_asf );
     //msg_Dbg( p_demux, "Size=%d Hdrb64=%s", p_header->i_buffer, psz_asf );

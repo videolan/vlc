@@ -262,7 +262,7 @@ static block_t *Block( access_t *p_access )
     if( !p_sys->b_header )
     {
         /* Return only the header */
-        p_block = block_New( p_access, sizeof( WAVEHEADER ) );
+        p_block = block_Alloc( sizeof( WAVEHEADER ) );
         memcpy( p_block->p_buffer, &p_sys->waveheader, sizeof(WAVEHEADER) );
         p_sys->b_header = true;
         return p_block;
@@ -279,7 +279,7 @@ static block_t *Block( access_t *p_access )
         i_blocks = p_sys->i_last_sector - p_sys->i_sector;
 
     /* Do the actual reading */
-    if( !( p_block = block_New( p_access, i_blocks * CDDA_DATA_SIZE ) ) )
+    if( !( p_block = block_Alloc( i_blocks * CDDA_DATA_SIZE ) ) )
     {
         msg_Err( p_access, "cannot get a new block of size: %i",
                  i_blocks * CDDA_DATA_SIZE );

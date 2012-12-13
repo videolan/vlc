@@ -1475,7 +1475,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     for( i = 0; i < i_nal; i++ )
         i_out += nal[i].i_payload;
 
-    p_block = block_New( p_enc, i_out + p_sys->i_sei_size );
+    p_block = block_Alloc( i_out + p_sys->i_sei_size );
     if( !p_block ) return NULL;
 
     unsigned int i_offset = 0;

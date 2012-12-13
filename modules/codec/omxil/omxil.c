@@ -1614,7 +1614,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pic )
             {
                 /* We're not in direct rendering mode.
                  * Get a new block and copy the content */
-                p_block = block_New( p_dec, p_header->nFilledLen );
+                p_block = block_Alloc( p_header->nFilledLen );
                 memcpy(p_block->p_buffer, p_header->pBuffer, p_header->nFilledLen );
             }
 

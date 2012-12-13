@@ -1331,7 +1331,7 @@ static int rtp_packetize_g726( sout_stream_id_t *id, block_t *in, int i_pad )
     while( i_data > 0 )
     {
         int           i_payload = __MIN( i_max, i_data );
-        block_t *out = block_New( p_stream, 12 + i_payload );
+        block_t *out = block_Alloc( 12 + i_payload );
 
         /* rtp common header */
         rtp_packetize_common( id, out, 0,

@@ -402,7 +402,7 @@ Raw1394Handler(raw1394handle_t handle, unsigned char *data,
                 block_ChainAppend( &p_sys->p_frame, p_sys->p_ev->p_frame );
             }
             /* reset list */
-            p_sys->p_ev->p_frame = block_New( p_access, 144000 );
+            p_sys->p_ev->p_frame = block_Alloc( 144000 );
             p_sys->p_ev->pp_last = &p_sys->p_frame;
             vlc_mutex_unlock( &p_sys->lock );
         }

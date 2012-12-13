@@ -277,7 +277,7 @@ static block_t* Block( access_t* p_access )
     /* Allocate the buffer we need */
     size_t i_len = __MIN( p_access->p_sys->i_read_size, p_access->info.i_size -
                                               p_access->info.i_pos );
-    block_t* p_block = block_New( p_access, i_len );
+    block_t* p_block = block_Alloc( i_len );
     if( !p_block )
         return NULL;
 

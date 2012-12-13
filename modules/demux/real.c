@@ -547,7 +547,7 @@ static void DemuxVideo( demux_t *p_demux, real_track_t *tk, mtime_t i_dts, unsig
             if( tk->p_frame )
                 block_Release( tk->p_frame );
 
-            tk->p_frame = block_New( p_demux, tk->i_frame_size );
+            tk->p_frame = block_Alloc( tk->i_frame_size );
             if( !tk->p_frame )
             {
                 tk->i_frame_size = 0;
@@ -638,7 +638,7 @@ static void DemuxAudioMethod1( demux_t *p_demux, real_track_t *tk, mtime_t i_pts
             if( i_index >= tk->i_subpackets )
                 return;
 
-            block_t *p_block = block_New( p_demux, tk->i_subpacket_size );
+            block_t *p_block = block_Alloc( tk->i_subpacket_size );
             if( !p_block )
                 return;
             if( &p_buf[tk->i_subpacket_size] > &p_sys->buffer[p_sys->i_buffer] )
@@ -673,7 +673,7 @@ static void DemuxAudioMethod1( demux_t *p_demux, real_track_t *tk, mtime_t i_pts
             if( i_index >= tk->i_subpackets )
                 return;
 
-            block_t *p_block = block_New( p_demux, tk->i_coded_frame_size);
+            block_t *p_block = block_Alloc( tk->i_coded_frame_size);
             if( !p_block )
                 return;
             if( &p_buf[tk->i_coded_frame_size] > &p_sys->buffer[p_sys->i_buffer] )
@@ -745,7 +745,7 @@ static void DemuxAudioMethod2( demux_t *p_demux, real_track_t *tk, mtime_t i_pts
     for( unsigned i = 0; i < i_sub; i++ )
     {
         const int i_sub_size = GetWBE( &p_sys->buffer[2+i*2] );
-        block_t *p_block = block_New( p_demux, i_sub_size );
+        block_t *p_block = block_Alloc( i_sub_size );
         if( !p_block )
             break;
 
@@ -769,7 +769,7 @@ static void DemuxAudioMethod3( demux_t *p_demux, real_track_t *tk, mtime_t i_pts
     if( p_sys->i_buffer <= 0 )
         return;
 
-    block_t *p_block = block_New( p_demux, p_sys->i_buffer );
+    block_t *p_block = block_Alloc( p_sys->i_buffer );
     if( !p_block )
         return;
 
@@ -846,7 +846,7 @@ static void DemuxAudioSipr( demux_t *p_demux, real_track_t *tk, mtime_t i_pts )
 
     if( !p_block )
     {
-        p_block = block_New( p_demux, tk->i_frame_size * tk->i_subpacket_h );
+        p_block = block_Alloc( tk->i_frame_size * tk->i_subpacket_h );
         if( !p_block )
             return;
         tk->p_sipr_packet = p_block;

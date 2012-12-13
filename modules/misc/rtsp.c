@@ -755,7 +755,7 @@ static void CommandPush( vod_t *p_vod, rtsp_cmd_type_t i_type, vod_media_t *p_me
     if( psz_arg )
         cmd.psz_arg = strdup(psz_arg);
 
-    p_cmd = block_New( p_vod, sizeof(rtsp_cmd_t) );
+    p_cmd = block_Alloc( sizeof(rtsp_cmd_t) );
     memcpy( p_cmd->p_buffer, &cmd, sizeof(cmd) );
 
     block_FifoPut( p_vod->p_sys->p_fifo_cmd, p_cmd );

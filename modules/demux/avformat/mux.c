@@ -401,7 +401,7 @@ static int IOWrite( void *opaque, uint8_t *buf, int buf_size )
     msg_Dbg( p_mux, "IOWrite %i bytes", buf_size );
 #endif
 
-    block_t *p_buf = block_New( p_mux->p_sout, buf_size );
+    block_t *p_buf = block_Alloc( buf_size );
     if( buf_size > 0 ) memcpy( p_buf->p_buffer, buf, buf_size );
 
     if( p_mux->p_sys->b_write_header )

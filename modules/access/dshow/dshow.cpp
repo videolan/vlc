@@ -1817,7 +1817,7 @@ static block_t *ReadCompressed( access_t *p_access )
         uint8_t *p_data;
         int i_data_size = sample.p_sample->GetActualDataLength();
 
-        if( !i_data_size || !(p_block = block_New( p_access, i_data_size )) )
+        if( !i_data_size || !(p_block = block_Alloc( i_data_size )) )
         {
             sample.p_sample->Release();
             continue;
@@ -1912,7 +1912,7 @@ static int Demux( demux_t *p_demux )
                      i_stream, i_data_size, i_pts );
 #endif
 
-            p_block = block_New( p_demux, i_data_size );
+            p_block = block_Alloc( i_data_size );
             memcpy( p_block->p_buffer, p_data, i_data_size );
             p_block->i_pts = p_block->i_dts = i_pts;
             sample.p_sample->Release();

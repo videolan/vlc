@@ -348,7 +348,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             }
 
         case STATE_SEND_DATA:
-            p_sout_block = block_New( p_dec, p_sys->i_frame_size );
+            p_sout_block = block_Alloc( p_sys->i_frame_size );
 
             /* Copy the whole frame into the buffer. When we reach this point
              * we already know we have enough data available. */

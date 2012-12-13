@@ -384,7 +384,7 @@ static block_t *Block(access_t *access)
 
     block_t *block = NULL;
     if (buffer_size > 0) {
-        block = block_New(access, buffer_size);
+        block = block_Alloc(buffer_size);
         if (block)
             memcpy(block->p_buffer, buffer, buffer_size);
     }
@@ -584,7 +584,7 @@ static int Demux(demux_t *demux)
             dts = pts;
 
         if (buffer_size > 0) {
-            block_t *block = block_New(demux, buffer_size);
+            block_t *block = block_Alloc(buffer_size);
             if (block) {
                 block->i_dts = dts >= 0 ? (1 + dts) : VLC_TS_INVALID;
                 block->i_pts = pts >= 0 ? (1 + pts) : VLC_TS_INVALID;

@@ -163,7 +163,7 @@ static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_
             /* Get the new fragment and set the pts/dts */
             block_t *p_block_bytestream = p_pack->bytestream.p_block;
 
-            p_pic = block_New( p_dec, p_pack->i_offset + p_pack->i_au_prepend );
+            p_pic = block_Alloc( p_pack->i_offset + p_pack->i_au_prepend );
             p_pic->i_pts = p_block_bytestream->i_pts;
             p_pic->i_dts = p_block_bytestream->i_dts;
 

@@ -434,7 +434,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
             in_buf.bufElSizes = &in_elem_size;
         }
         block_t *p_block;
-        p_block = block_New( p_enc, p_sys->i_maxoutputsize );
+        p_block = block_Alloc( p_sys->i_maxoutputsize );
         p_block->i_buffer = p_sys->i_maxoutputsize;
         out_ptr = p_block->p_buffer;
         out_size = p_block->i_buffer;
