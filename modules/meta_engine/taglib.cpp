@@ -874,11 +874,13 @@ static int WriteMeta( vlc_object_t *p_this )
 #undef SET
 
     psz_meta = input_item_GetDate( p_item );
-    p_tag->setYear( atoi( psz_meta ) );
+    if( !EMPTY_STR(psz_meta) ) p_tag->setYear( atoi( psz_meta ) );
+    else p_tag->setYear( 0 );
     free( psz_meta );
 
     psz_meta = input_item_GetTrackNum( p_item );
-    p_tag->setTrack( atoi( psz_meta ) );
+    if( !EMPTY_STR(psz_meta) ) p_tag->setTrack( atoi( psz_meta ) );
+    else p_tag->setTrack( 0 );
     free( psz_meta );
 
 
