@@ -27,11 +27,11 @@
 #   include "config.h"
 #endif
 
-#include <vlc_common.h>
-
 #include <stdlib.h>
 #include <stdint.h>
 
+#include <vlc_common.h>
+#include <vlc_cpu.h>
 #include "merge.h"
 
 #ifdef CAN_COMPILE_MMXEXT
@@ -69,6 +69,7 @@ void Merge16BitGeneric( void *_p_dest, const void *_p_s1,
 }
 
 #if defined(CAN_COMPILE_MMXEXT)
+VLC_MMX
 void MergeMMXEXT( void *_p_dest, const void *_p_s1, const void *_p_s2,
                   size_t i_bytes )
 {
@@ -82,7 +83,7 @@ void MergeMMXEXT( void *_p_dest, const void *_p_s1, const void *_p_s2,
                                "pavgb %1, %%mm1;"
                                "movq %%mm1, %0" :"=m" (*p_dest):
                                                  "m" (*p_s1),
-                                                 "m" (*p_s2) );
+                                                 "m" (*p_s2) : "mm1" );
         p_dest += 8;
         p_s1 += 8;
         p_s2 += 8;
@@ -94,6 +95,7 @@ void MergeMMXEXT( void *_p_dest, const void *_p_s1, const void *_p_s2,
 #endif
 
 #if defined(CAN_COMPILE_3DNOW)
+VLC_MMX
 void Merge3DNow( void *_p_dest, const void *_p_s1, const void *_p_s2,
                  size_t i_bytes )
 {
@@ -107,7 +109,7 @@ void Merge3DNow( void *_p_dest, const void *_p_s1, const void *_p_s2,
                                "pavgusb %1, %%mm1;"
                                "movq %%mm1, %0" :"=m" (*p_dest):
                                                  "m" (*p_s1),
-                                                 "m" (*p_s2) );
+                                                 "m" (*p_s2) : "mm1" );
         p_dest += 8;
         p_s1 += 8;
         p_s2 += 8;
@@ -119,6 +121,7 @@ void Merge3DNow( void *_p_dest, const void *_p_s1, const void *_p_s2,
 #endif
 
 #if defined(CAN_COMPILE_SSE)
+VLC_SSE
 void Merge8BitSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
                     size_t i_bytes )
 {
@@ -135,7 +138,7 @@ void Merge8BitSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
                                "pavgb %1, %%xmm1;"
                                "movdqu %%xmm1, %0" :"=m" (*p_dest):
                                                  "m" (*p_s1),
-                                                 "m" (*p_s2) );
+                                                 "m" (*p_s2) : "xmm1" );
         p_dest += 16;
         p_s1 += 16;
         p_s2 += 16;
@@ -145,6 +148,7 @@ void Merge8BitSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
         *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
 }
 
+VLC_SSE
 void Merge16BitSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
                      size_t i_bytes )
 {
@@ -162,7 +166,7 @@ void Merge16BitSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
                                "pavgw %1, %%xmm1;"
                                "movdqu %%xmm1, %0" :"=m" (*p_dest):
                                                  "m" (*p_s1),
-                                                 "m" (*p_s2) );
+                                                 "m" (*p_s2) : "xmm1" );
         p_dest += 8;
         p_s1 += 8;
         p_s2 += 8;

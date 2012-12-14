@@ -78,6 +78,7 @@ static inline int XDeint8x8DetectC( uint8_t *src, int i_src )
     return fc < 1 ? false : true;
 }
 #ifdef CAN_COMPILE_MMXEXT
+VLC_MMX
 static inline int XDeint8x8DetectMMXEXT( uint8_t *src, int i_src )
 {
 
@@ -164,6 +165,7 @@ static inline void XDeint8x8MergeC( uint8_t *dst,  int i_dst,
 }
 
 #ifdef CAN_COMPILE_MMXEXT
+VLC_MMX
 static inline void XDeint8x8MergeMMXEXT( uint8_t *dst,  int i_dst,
                                          uint8_t *src1, int i_src1,
                                          uint8_t *src2, int i_src2 )
@@ -237,6 +239,7 @@ static inline void XDeint8x8FieldEC( uint8_t *dst, int i_dst,
 }
 
 #ifdef CAN_COMPILE_MMXEXT
+VLC_MMX
 static inline void XDeint8x8FieldEMMXEXT( uint8_t *dst, int i_dst,
                                           uint8_t *src, int i_src )
 {
@@ -308,6 +311,7 @@ static inline void XDeint8x8FieldC( uint8_t *dst, int i_dst,
 }
 
 #ifdef CAN_COMPILE_MMXEXT
+VLC_MMX
 static inline void XDeint8x8FieldMMXEXT( uint8_t *dst, int i_dst,
                                          uint8_t *src, int i_src )
 {
@@ -495,6 +499,7 @@ static inline void XDeintBand8x8C( uint8_t *dst, int i_dst,
 }
 
 #ifdef CAN_COMPILE_MMXEXT
+VLC_MMX
 static inline void XDeintBand8x8MMXEXT( uint8_t *dst, int i_dst,
                                         uint8_t *src, int i_src,
                                         const int i_mbx, int i_modx )
