@@ -412,7 +412,8 @@ static int Open (vlc_object_t *obj)
     if (adaptors == NULL)
         goto error;
 
-    int forced_adaptor = var_InheritInteger (obj, "xvideo-adaptor");
+    int adaptor_selected = var_InheritInteger (obj, "xvideo-adaptor");
+    int adaptor_current = -1;
 
     /* */
     video_format_t fmt;
@@ -426,12 +427,9 @@ static int Open (vlc_object_t *obj)
         const xcb_xv_adaptor_info_t *a = it.data;
         char *name;
 
-        if (forced_adaptor != -1 && forced_adaptor != 0)
-        {
-            forced_adaptor--;
+        adaptor_current++;
+        if (adaptor_selected != -1 && adaptor_selected != adaptor_current)
             continue;
-        }
-
         if (!(a->type & XCB_XV_TYPE_INPUT_MASK)
          || !(a->type & XCB_XV_TYPE_IMAGE_MASK))
             continue;
