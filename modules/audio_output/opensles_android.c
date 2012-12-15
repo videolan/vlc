@@ -71,9 +71,15 @@ struct aout_sys_t
     SLPlayItf                       playerPlay;
 
     vlc_mutex_t                     lock;
+    mtime_t                         length;
+
+    /* audio buffered through opensles */
     block_t                        *p_chain;
     block_t                       **pp_last;
-    mtime_t                         length;
+
+    /* audio not yet buffered through opensles */
+    block_t                        *p_buffer_chain;
+    block_t                       **pp_buffer_last;
 
     void                           *p_so_handle;
     audio_sample_format_t           format;
@@ -130,10 +136,20 @@ static void Flush(audio_output_t *p_aout, bool drain)
         SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_STOPPED );
         Clear( p_sys->playerBufferQueue );
         SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_PLAYING );
+
+        p_sys->length = 0;
+
+        /* release audio data not yet written to opensles */
+        block_ChainRelease( p_sys->p_buffer_chain );
+        p_sys->p_buffer_chain = NULL;
+        p_sys->pp_buffer_last = &p_sys->p_buffer_chain;
+
+        /* release audio data written to opensles, but not yet
+         * played on hardware */
         block_ChainRelease( p_sys->p_chain );
         p_sys->p_chain = NULL;
         p_sys->pp_last = &p_sys->p_chain;
-        p_sys->length = 0;
+
         vlc_mutex_unlock( &p_sys->lock );
     }
 }
@@ -165,14 +181,58 @@ static int TimeGet(audio_output_t* p_aout, mtime_t* restrict drift)
     return 0;
 }
 
+static int WriteBuffer(audio_output_t *p_aout)
+{
+    aout_sys_t *p_sys = p_aout->sys;
+
+    block_t *b = p_sys->p_buffer_chain;
+    if (!b)
+        return false;
+
+    if (!b->i_length)
+        b->i_length = (mtime_t)(b->i_buffer / 2 / p_sys->format.i_channels) * CLOCK_FREQ / p_sys->format.i_rate;
+
+    /* If something bad happens, we must remove this buffer from the FIFO */
+    block_t **pp_last_saved = p_sys->pp_last;
+    block_t *p_last_saved = *pp_last_saved;
+
+    /* Put this block in the list of audio already written to opensles */
+    block_ChainLastAppend( &p_sys->pp_last, b );
+
+    mtime_t len = b->i_length;
+    p_sys->length += len;
+    block_t *next = b->p_next;
+
+    vlc_mutex_unlock( &p_sys->lock );
+    SLresult r = Enqueue( p_sys->playerBufferQueue, b->p_buffer, b->i_buffer );
+    vlc_mutex_lock( &p_sys->lock );
+
+    if (r == SL_RESULT_SUCCESS) {
+        /* Remove that block from the list of audio not yet written */
+        p_sys->p_buffer_chain = next;
+        if (!p_sys->p_buffer_chain)
+            p_sys->pp_buffer_last = &p_sys->p_buffer_chain;
+    } else {
+        /* Remove that block from the list of audio already written */
+        msg_Err( p_aout, "error %lu%s", r, (r == SL_RESULT_BUFFER_INSUFFICIENT)
+                ? " buffer insufficient"
+                : "");
+
+        p_sys->pp_last = pp_last_saved;
+        *pp_last_saved = p_last_saved;
+        p_sys->length -= len;
+        next = NULL; /* We'll try again next time */
+    }
+
+    return next != NULL;
+}
+
 /*****************************************************************************
  * Play: play a sound
  *****************************************************************************/
 static void Play( audio_output_t *p_aout, block_t *p_buffer )
 {
     aout_sys_t *p_sys = p_aout->sys;
-    int tries = 5;
-    block_t **pp_last, *p_block;
 
     SLAndroidSimpleBufferQueueState st;
     SLresult res = GetState(p_sys->playerBufferQueue, &st);
@@ -181,51 +241,12 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer )
         st.count = 0;
     }
 
-    if (!p_buffer->i_length) {
-        p_buffer->i_length = (mtime_t)(p_buffer->i_buffer / 2 / p_sys->format.i_channels) * CLOCK_FREQ / p_sys->format.i_rate;
-    }
-
-    vlc_mutex_lock( &p_sys->lock );
-
-    p_sys->length += p_buffer->i_length;
-
-    /* If something bad happens, we must remove this buffer from the FIFO */
-    pp_last = p_sys->pp_last;
-    p_block = *pp_last;
-
-    block_ChainLastAppend( &p_sys->pp_last, p_buffer );
+    p_buffer->p_next = NULL; /* Make sur our linked list doesn't use old references */
+    vlc_mutex_lock(&p_sys->lock);
+    block_ChainLastAppend( &p_sys->pp_buffer_last, p_buffer );
+    while (WriteBuffer(p_aout))
+        ;
     vlc_mutex_unlock( &p_sys->lock );
-
-    for (;;)
-    {
-        SLresult result = Enqueue( p_sys->playerBufferQueue, p_buffer->p_buffer,
-                            p_buffer->i_buffer );
-
-        switch (result)
-        {
-        case SL_RESULT_BUFFER_INSUFFICIENT:
-            msg_Err( p_aout, "buffer insufficient");
-
-            if (tries--)
-            {
-                // Wait a bit to retry.
-                // FIXME: buffer in aout_sys_t and retry at next Play() call
-                msleep(CLOCK_FREQ);
-                continue;
-            }
-
-        default:
-            msg_Warn( p_aout, "Error %lu, dropping buffer", result );
-            vlc_mutex_lock( &p_sys->lock );
-            p_sys->pp_last = pp_last;
-            *pp_last = p_block;
-            p_sys->length -= p_buffer->i_length;
-            vlc_mutex_unlock( &p_sys->lock );
-            block_Release( p_buffer );
-        case SL_RESULT_SUCCESS:
-            return;
-        }
-    }
 }
 
 static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext )
@@ -387,6 +408,8 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     vlc_mutex_init( &p_sys->lock );
     p_sys->p_chain = NULL;
     p_sys->pp_last = &p_sys->p_chain;
+    p_sys->p_buffer_chain = NULL;
+    p_sys->pp_buffer_last = &p_sys->p_buffer_chain;
 
     // we want 16bit signed data little endian.
     fmt->i_format              = VLC_CODEC_S16L;
@@ -416,6 +439,7 @@ static void Stop( audio_output_t *p_aout )
     //Flush remaining buffers if any.
     Clear( p_sys->playerBufferQueue );
     block_ChainRelease( p_sys->p_chain );
+    block_ChainRelease( p_sys->p_buffer_chain);
     vlc_mutex_destroy( &p_sys->lock );
     Clean( p_sys );
 }
