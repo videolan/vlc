@@ -1,7 +1,7 @@
 /*****************************************************************************
  * auhal.c: AUHAL and Coreaudio output plugin
  *****************************************************************************
- * Copyright (C) 2005, 2012 VLC authors and VideoLAN
+ * Copyright (C) 2005 - 2012 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
@@ -58,12 +58,6 @@
 #define AOUT_VOLUME_DEFAULT             256
 #define AOUT_VOLUME_MAX                 512
 
-/*
- * TODO:
- * - clean up the debug info
- * - be better at changing stream setup or devices setup changes while playing.
- * - fix 6.1 and 7.1
- */
 
 /*****************************************************************************
  * aout_sys_t: private audio output method descriptor
@@ -81,8 +75,8 @@ struct aout_sys_t
     bool                        b_digital;           /* Are we running in digital mode? */
     mtime_t                     clock_diff;          /* Difference between VLC clock and Device clock */
 
-    uint8_t chans_to_reorder;                        /* do we need channel reordering */
-    uint8_t chan_table[AOUT_CHAN_MAX];
+    uint8_t                     chans_to_reorder;    /* do we need channel reordering */
+    uint8_t                     chan_table[AOUT_CHAN_MAX];
 
     /* AUHAL specific */
     Component                   au_component;        /* The Audiocomponent we use */
@@ -391,7 +385,9 @@ static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
         } else {
             /* We want more than stereo and we can do that */
             for (unsigned int i = 0; i < layout->mNumberChannelDescriptions; i++) {
+#ifndef NDEBUG
                 msg_Dbg(p_aout, "this is channel: %d", (int)layout->mChannelDescriptions[i].mChannelLabel);
+#endif
 
                 switch(layout->mChannelDescriptions[i].mChannelLabel) {
                     case kAudioChannelLabel_Left:
@@ -1114,7 +1110,9 @@ static int AudioStreamSupportsDigital(audio_output_t *p_aout, AudioStreamID i_st
     }
 
     for (int i = 0; i < i_formats; i++) {
+#ifndef NDEBUG
         msg_Dbg(p_aout, STREAM_FORMAT_MSG("supported format: ", p_format_list[i].mFormat));
+#endif
 
         if (p_format_list[i].mFormat.mFormatID == 'IAC3' ||
            p_format_list[i].mFormat.mFormatID == 'iac3' ||
@@ -1242,7 +1240,6 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *_p_aout,
     }
     if (ioData->mNumberBuffers > 1)
         msg_Err(p_aout, "well this is weird. seems like there is more than one buffer...");
-
 
     if (p_sys->i_total_bytes > 0) {
         i_mData_bytes = __MIN(p_sys->i_total_bytes - p_sys->i_read_bytes, ioData->mBuffers[0].mDataByteSize);
@@ -1474,7 +1471,6 @@ static int Open(vlc_object_t *obj)
     aout->mute_set = MuteSet;
 
     /* remember the volume */
-    msg_Warn(aout, "we got %lli, lroundf=%f", var_InheritInteger(aout, "auhal-volume"), (var_InheritInteger(aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT));
     aout_VolumeReport(aout, var_InheritInteger(aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT);
     MuteSet(aout, var_InheritBool(aout, "mute"));
 
