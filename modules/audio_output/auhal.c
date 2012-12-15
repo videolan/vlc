@@ -559,9 +559,6 @@ static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                             kAudioUnitScope_Input,
                             0, &input, sizeof(input)));
 
-    input.inputProc = (AURenderCallback) RenderCallbackAnalog;
-    input.inputProcRefCon = p_aout;
-
     /* Set the new_layout as the layout VLC will use to feed the AU unit */
     verify_noerr(AudioUnitSetProperty(p_sys->au_unit,
                             kAudioUnitProperty_AudioChannelLayout,
