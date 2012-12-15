@@ -115,20 +115,27 @@ static void Clean( aout_sys_t *p_sys )
     free( p_sys );
 }
 
-static void Flush(audio_output_t *p_aout, bool wait)
+static void Flush(audio_output_t *p_aout, bool drain)
 {
-    (void)wait; /* FIXME */
     aout_sys_t *p_sys = p_aout->sys;
 
-    vlc_mutex_lock( &p_sys->lock );
-    SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_STOPPED );
-    Clear( p_sys->playerBufferQueue );
-    SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_PLAYING );
-    block_ChainRelease( p_sys->p_chain );
-    p_sys->p_chain = NULL;
-    p_sys->pp_last = &p_sys->p_chain;
-    p_sys->length = 0;
-    vlc_mutex_unlock( &p_sys->lock );
+    if (drain) {
+        mtime_t delay;
+        vlc_mutex_lock( &p_sys->lock );
+        delay = p_sys->length;
+        vlc_mutex_unlock( &p_sys->lock );
+        msleep(delay);
+    } else {
+        vlc_mutex_lock( &p_sys->lock );
+        SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_STOPPED );
+        Clear( p_sys->playerBufferQueue );
+        SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_PLAYING );
+        block_ChainRelease( p_sys->p_chain );
+        p_sys->p_chain = NULL;
+        p_sys->pp_last = &p_sys->p_chain;
+        p_sys->length = 0;
+        vlc_mutex_unlock( &p_sys->lock );
+    }
 }
 
 static void Pause(audio_output_t *p_aout, bool pause, mtime_t date)
@@ -386,7 +393,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     fmt->i_physical_channels   = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     p_aout->play               = Play;
     p_aout->pause              = Pause;
-    p_aout->flush               = Flush;
+    p_aout->flush              = Flush;
 
     aout_FormatPrepare( fmt );
 
