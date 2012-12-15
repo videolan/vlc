@@ -63,26 +63,6 @@ enum {
     CachingHigher = 1000
 };
 
-enum {
-#ifdef WIN32
-       directxW,
-#elif defined( __OS2__)
-       kaiW,
-#else
-       alsaW,
-       ossW,
-#endif
-       fileW,
-       audioOutCoB,
-       normalizerChB,
-       volLW,
-       headphoneB,
-       spdifChB,
-};
-enum { inputLE, cachingCoB };
-enum { skinRB, qtRB, styleCB };
-enum { shadowCB, backgroundCB };
-
 class ConfigControl;
 class QComboBox;
 class QLineEdit;
@@ -123,7 +103,7 @@ private:
 
     int number;
 
-    QWidgetList optionWidgets;
+    QHash<QString, QWidget*> optionWidgets;
     QStringList qs_filter;
     QButtonGroup *radioGroup;
 

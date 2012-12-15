@@ -296,33 +296,29 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             QGridLayout * outputAudioLayout = qobject_cast<QGridLayout *>(ui.outputAudioBox->layout());
 #ifdef WIN32
             audioControl( DirectX );
-            optionWidgets.append( DirectXControl );
+            optionWidgets["directxW" ] = DirectXControl;
             CONFIG_GENERIC_NO_UI( "directx-audio-device", StringList,
                     DirectXLabel, DirectXDevice );
 #elif defined( __OS2__ )
             audioControl( kai );
-            optionWidgets.append( kaiControl );
+            optionWidgets["kaiW"] = kaiControl;
             CONFIG_GENERIC_NO_UI( "kai-audio-device", StringList, kaiLabel,
                     kaiDevice );
 #else
             if( module_exists( "alsa" ) )
             {
                 audioControl( alsa );
-                optionWidgets.append( alsaControl );
+                optionWidgets["alsaW"] = alsaControl;
                 CONFIG_GENERIC_NO_UI( "alsa-audio-device" , StringList, alsaLabel,
                                 alsaDevice );
             }
-            else
-                optionWidgets.append( NULL );
             if( module_exists( "oss" ) )
             {
                 audioControl2( OSS );
-                optionWidgets.append( OSSControl );
+                optionWidgets["ossW"] = OSSControl;
                 CONFIG_GENERIC_FILE( "oss-audio-device" , File, NULL, OSSDevice,
                                  OSSBrowse );
             }
-            else
-                optionWidgets.append( NULL );
 #endif
 
 #undef audioControl2
@@ -366,14 +362,14 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC_FILE( "audiofile-file", File, ui.fileLabel,
                                  ui.fileName, ui.fileBrowseButton );
 
-            optionWidgets.append( ui.fileControl );
-            optionWidgets.append( ui.outputModule );
-            optionWidgets.append( ui.volNormBox );
+            optionWidgets["fileW"] = ui.fileControl;
+            optionWidgets["audioOutCoB"] = ui.outputModule;
+            optionWidgets["normalizerChB"] = ui.volNormBox;
             /*Little mofification of ui.volumeValue to compile with Qt < 4.3 */
             ui.volumeValue->setButtonSymbols(QAbstractSpinBox::NoButtons);
-            optionWidgets.append( ui.volumeValue );
-            optionWidgets.append( ui.headphoneEffect );
-            optionWidgets.append( ui.spdifBox );
+            optionWidgets["volLW"] = ui.volumeValue;
+            optionWidgets["headphoneB"] = ui.headphoneEffect;
+            optionWidgets["spdifChB"] = ui.spdifBox;
             updateAudioOptions( ui.outputModule->currentIndex() );
 
             /* LastFM */
@@ -481,8 +477,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             else
                 FreeLibrary( hdxva2_dll );
 #endif
-            optionWidgets.append( ui.DVDDeviceComboBox );
-            optionWidgets.append( ui.cachingCombo );
+            optionWidgets["inputLE"] = ui.DVDDeviceComboBox;
+            optionWidgets["cachingCoB"] = ui.cachingCombo;
             CONFIG_GENERIC( "avcodec-skiploopfilter", IntegerList, ui.filterLabel, loopFilterBox );
             CONFIG_GENERIC( "sout-x264-tune", StringList, ui.x264Label, tuneBox );
             CONFIG_GENERIC( "sout-x264-preset", StringList, ui.x264Label, presetBox );
@@ -560,8 +556,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             }
             free( psz_intf );
 
-            optionWidgets.append( ui.skins );
-            optionWidgets.append( ui.qt );
+            optionWidgets["skinRB"] = ui.skins;
+            optionWidgets["qtRB"] = ui.qt;
 #if !defined( WIN32)
             ui.stylesCombo->addItem( qtr("System's default") );
             ui.stylesCombo->addItems( QStyleFactory::keys() );
@@ -572,11 +568,10 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 ui.stylesCombo->setCurrentIndex( 0 ); /* default */
 
             CONNECT( ui.stylesCombo, currentIndexChanged( QString ), this, changeStyle( QString ) );
-            optionWidgets.append( ui.stylesCombo );
+            optionWidgets["styleCB"] = ui.stylesCombo;
 #else
             ui.stylesCombo->hide();
             ui.stylesLabel->hide();
-            optionWidgets.append( NULL );
 #endif
             radioGroup = new QButtonGroup(this);
             radioGroup->addButton( ui.qt, 0 );
@@ -681,8 +676,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             ui.shadowCheck->setChecked( config_GetInt( p_intf, "freetype-shadow-opacity" ) > 0 );
             ui.backgroundCheck->setChecked( config_GetInt( p_intf, "freetype-background-opacity" ) > 0 );
-            optionWidgets.append( ui.shadowCheck );
-            optionWidgets.append( ui.backgroundCheck );
+            optionWidgets["shadowCB"] = ui.shadowCheck;
+            optionWidgets["backgroundCB"] = ui.backgroundCheck;
 
         END_SPREFS_CAT;
 
@@ -757,22 +752,22 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
 void SPrefsPanel::updateAudioOptions( int number)
 {
-    QString value = qobject_cast<QComboBox *>(optionWidgets[audioOutCoB])
+    QString value = qobject_cast<QComboBox *>(optionWidgets["audioOutCoB"])
                                             ->itemData( number ).toString();
 #ifdef WIN32
-    optionWidgets[directxW]->setVisible( ( value == "directsound" ) );
+    optionWidgets["directxW"]->setVisible( ( value == "directsound" ) );
 #elif defined( __OS2__ )
-    optionWidgets[kaiW]->setVisible( ( value == "kai" ) );
+    optionWidgets["kaiW"]->setVisible( ( value == "kai" ) );
 #else
-    /* optionWidgets[ossW] can be NULL */
-    if( optionWidgets[ossW] )
-        optionWidgets[ossW]->setVisible( ( value == "oss" ) );
-    /* optionWidgets[alsaW] can be NULL */
-    if( optionWidgets[alsaW] )
-        optionWidgets[alsaW]->setVisible( ( value == "alsa" ) );
+    /* optionWidgets["ossW] can be NULL */
+    if( optionWidgets["ossW"] )
+        optionWidgets["ossW"]->setVisible( ( value == "oss" ) );
+    /* optionWidgets["alsaW] can be NULL */
+    if( optionWidgets["alsaW"] )
+        optionWidgets["alsaW"]->setVisible( ( value == "alsa" ) );
 #endif
-    optionWidgets[fileW]->setVisible( ( value == "aout_file" ) );
-    optionWidgets[spdifChB]->setVisible( ( value == "alsa" || value == "oss" || value == "auhal" ||
+    optionWidgets["fileW"]->setVisible( ( value == "aout_file" ) );
+    optionWidgets["spdifChB"]->setVisible( ( value == "alsa" || value == "oss" || value == "auhal" ||
                                            value == "directsound" || value == "waveout" ) );
 }
 
@@ -784,7 +779,7 @@ SPrefsPanel::~SPrefsPanel()
 
 void SPrefsPanel::updateAudioVolume( int volume )
 {
-    qobject_cast<QSpinBox *>(optionWidgets[volLW])
+    qobject_cast<QSpinBox *>(optionWidgets["volLW"])
         ->setValue( volume * 100 / AOUT_VOLUME_DEFAULT );
 }
 
@@ -806,7 +801,7 @@ void SPrefsPanel::apply()
     {
         /* Device default selection */
         QByteArray devicepath =
-            qobject_cast<QComboBox *>(optionWidgets[inputLE])->currentText().toUtf8();
+            qobject_cast<QComboBox *>(optionWidgets["inputLE"])->currentText().toUtf8();
         if( devicepath.size() > 0 )
         {
             config_PutPsz( p_intf, "dvd", devicepath );
@@ -816,7 +811,7 @@ void SPrefsPanel::apply()
 
 #define CaC( name, factor ) config_PutInt( p_intf, name, i_comboValue * factor )
         /* Caching */
-        QComboBox *cachingCombo = qobject_cast<QComboBox *>(optionWidgets[cachingCoB]);
+        QComboBox *cachingCombo = qobject_cast<QComboBox *>(optionWidgets["cachingCoB"]);
         int i_comboValue = cachingCombo->itemData( cachingCombo->currentIndex() ).toInt();
         if( i_comboValue )
         {
@@ -832,14 +827,14 @@ void SPrefsPanel::apply()
     /* Interfaces */
     case SPrefsInterface:
     {
-        if( qobject_cast<QRadioButton *>(optionWidgets[skinRB])->isChecked() )
+        if( qobject_cast<QRadioButton *>(optionWidgets["skinRB"])->isChecked() )
             config_PutPsz( p_intf, "intf", "skins2,any" );
         else
         //if( qobject_cast<QRadioButton *>(optionWidgets[qtRB])->isChecked() )
             config_PutPsz( p_intf, "intf", "" );
-        if( qobject_cast<QComboBox *>(optionWidgets[styleCB]) )
+        if( qobject_cast<QComboBox *>(optionWidgets["styleCB"]) )
             getSettings()->setValue( "MainWindow/QtStyle",
-                qobject_cast<QComboBox *>(optionWidgets[styleCB])->currentText() );
+                qobject_cast<QComboBox *>(optionWidgets["styleCB"])->currentText() );
 
         break;
     }
@@ -847,14 +842,14 @@ void SPrefsPanel::apply()
     case SPrefsAudio:
     {
         bool b_checked =
-            qobject_cast<QCheckBox *>(optionWidgets[normalizerChB])->isChecked();
+            qobject_cast<QCheckBox *>(optionWidgets["normalizerChB"])->isChecked();
         if( b_checked && !qs_filter.contains( "normvol" ) )
             qs_filter.append( "normvol" );
         if( !b_checked && qs_filter.contains( "normvol" ) )
             qs_filter.removeAll( "normvol" );
 
         b_checked =
-            qobject_cast<QCheckBox *>(optionWidgets[headphoneB])->isChecked();
+            qobject_cast<QCheckBox *>(optionWidgets["headphoneB"])->isChecked();
 
         if( b_checked && !qs_filter.contains( "headphone" ) )
             qs_filter.append( "headphone" );
@@ -866,7 +861,7 @@ void SPrefsPanel::apply()
     }
     case SPrefsSubtitles:
     {
-        bool b_checked = qobject_cast<QCheckBox *>(optionWidgets[shadowCB])->isChecked();
+        bool b_checked = qobject_cast<QCheckBox *>(optionWidgets["shadowCB"])->isChecked();
         if( b_checked && config_GetInt( p_intf, "freetype-shadow-opacity" ) == 0 ) {
             config_PutInt( p_intf, "freetype-shadow-opacity", 128 );
         }
@@ -874,7 +869,7 @@ void SPrefsPanel::apply()
             config_PutInt( p_intf, "freetype-shadow-opacity", 0 );
         }
 
-        b_checked = qobject_cast<QCheckBox *>(optionWidgets[backgroundCB])->isChecked();
+        b_checked = qobject_cast<QCheckBox *>(optionWidgets["backgroundCB"])->isChecked();
         if( b_checked && config_GetInt( p_intf, "freetype-background-opacity" ) == 0 ) {
             config_PutInt( p_intf, "freetype-background-opacity", 128 );
         }
