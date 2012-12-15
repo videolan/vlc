@@ -52,8 +52,10 @@ Demuxers:
 Audio output:
  * Windows Audio Session API audio output support
  * OpenBSD sndio audio output support
- * Important improvements on the OpenSL ES module
+ * Important improvements on the Android OpenSL ES module
  * Android AudioTrack audio output support
+ * Mac OS X Auhal output supports for 6.1 and 7.1
+ * Rewrite of OSS module to support OSSv4
 
 Audio Filters:
  * new remapping channel filter
