@@ -127,6 +127,7 @@ static void Flush(audio_output_t *p_aout, bool wait)
     block_ChainRelease( p_sys->p_chain );
     p_sys->p_chain = NULL;
     p_sys->pp_last = &p_sys->p_chain;
+    p_sys->length = 0;
     vlc_mutex_unlock( &p_sys->lock );
 }
 
