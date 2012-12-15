@@ -23,6 +23,22 @@ EXTRA_DIST = \
 	extras/package/npapi.am \
 	extras/package/win32/NSIS/vlc.win32.nsi.in \
 	extras/package/win32/NSIS/spad.nsi.in \
+	extras/package/win32/NSIS/UAC/examples \
+	extras/package/win32/NSIS/UAC/examples/UAC_AllowLUA.nsi \
+	extras/package/win32/NSIS/UAC/examples/UAC_AdminOnly.nsi \
+	extras/package/win32/NSIS/UAC/examples/UAC_Uninstaller.nsi \
+	extras/package/win32/NSIS/UAC/examples/UAC.nsh \
+	extras/package/win32/NSIS/UAC/examples/UAC_GetUserShellFolderPath.nsi \
+	extras/package/win32/NSIS/UAC/examples/UAC_RealWorldFullyLoadedDualModeExample.nsi \
+	extras/package/win32/NSIS/UAC/History.txt \
+	extras/package/win32/NSIS/UAC/License.txt \
+	extras/package/win32/NSIS/UAC/nsisutil.h \
+	extras/package/win32/NSIS/UAC/resource.h \
+	extras/package/win32/NSIS/UAC/resource.rc \
+	extras/package/win32/NSIS/UAC/runas.cpp \
+	extras/package/win32/NSIS/UAC/uac.cpp \
+	extras/package/win32/NSIS/UAC/uac.h \
+	extras/package/win32/NSIS/UAC/Readme.html \
 	extras/package/win32/NSIS/UAC.nsh \
 	extras/package/win32/NSIS/languages/declaration.nsh \
 	extras/package/win32/NSIS/languages/bengali.nsh \
