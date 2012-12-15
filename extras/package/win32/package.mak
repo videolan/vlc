@@ -86,7 +86,7 @@ endif
 	$(DLLTOOL) -D libvlccore.dll -l "$(win32_destdir)/sdk/lib/libvlccore.lib" -d "$(top_builddir)/src/.libs/libvlccore.dll.def" "$(prefix)/bin/libvlccore.dll"
 
 	mkdir -p "$(win32_destdir)/sdk/activex/"
-	cd $(top_builddir)/npapi-vlc && cp activex/README.TXT share/test.html $(win32_destdir)/sdk/activex/
+	cd $(top_builddir)/npapi-vlc && cp activex/README.TXT share/test/test.html $(win32_destdir)/sdk/activex/
 
 # Convert to DOS line endings
 	find $(win32_destdir) -type f \( -name "*xml" -or -name "*html" -or -name '*js' -or -name '*css' -or -name '*hosts' -or -iname '*txt' -or -name '*.cfg' -or -name '*.lua' \) -exec $(U2D) {} \;
