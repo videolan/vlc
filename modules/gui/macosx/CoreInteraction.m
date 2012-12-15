@@ -519,7 +519,9 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     if (!p_intf)
         return;
 
-    playlist_VolumeSet(pl_Get(p_intf), i_value / (float)AOUT_VOLUME_DEFAULT);
+    float f_value = i_value / (float)AOUT_VOLUME_DEFAULT;
+
+    playlist_VolumeSet(pl_Get(p_intf), f_value);
 }
 
 #pragma mark -
