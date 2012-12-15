@@ -742,56 +742,11 @@ static void Stop (audio_output_t *aout)
  * Enumerates ALSA output devices.
  */
 static int EnumDevices(vlc_object_t *obj, char const *varname,
-                       char ***restrict vp, char ***restrict tp)
-{
-    unsigned n = 0;
-
-    char **names = xmalloc(sizeof (*names));
-    char **descs = xmalloc(sizeof (*names));
-    names[0] = strdup ("default");
-    descs[0] = strdup (N_("Default"));
-    n++;
-    if (unlikely(names[0] == NULL || descs[0] == NULL))
-        abort();
-
-    void **hints;
-    if (snd_device_name_hint(-1, "pcm", &hints) < 0)
-        return n;
-
-    for (size_t i = 0; hints[i] != NULL; i++)
-    {
-        void *hint = hints[i];
-
-        char *name = snd_device_name_get_hint(hint, "NAME");
-        if (unlikely(name == NULL))
-            continue;
-
-        char *desc = snd_device_name_get_hint(hint, "DESC");
-        if (desc == NULL)
-        {
-            free (name);
-            continue;
-        }
-
-        names = xrealloc (names, (n + 1) * sizeof (*names));
-        descs = xrealloc (descs, (n + 1) * sizeof (*descs));
-        names[n] = name;
-        descs[n] = desc;
-        n++;
-    }
-    snd_device_name_free_hint(hints);
-
-    (void) obj; (void) varname;
-    *vp = names;
-    *tp = descs;
-    return n;
-}
-
-static int DevicesEnum (audio_output_t *aout, char ***idp, char ***namep)
+                       char ***restrict idp, char ***restrict namep)
 {
     void **hints;
 
-    msg_Dbg (aout, "Available ALSA PCM devices:");
+    msg_Dbg (obj, "Available ALSA PCM devices:");
     if (snd_device_name_hint(-1, "pcm", &hints) < 0)
         return -1;
 
@@ -810,7 +765,7 @@ static int DevicesEnum (audio_output_t *aout, char ***idp, char ***namep)
         if (desc != NULL)
             for (char *lf = strchr(desc, '\n'); lf; lf = strchr(lf, '\n'))
                  *lf = ' ';
-        msg_Dbg (aout, "%s (%s)", (desc != NULL) ? desc : name, name);
+        msg_Dbg (obj, "%s (%s)", (desc != NULL) ? desc : name, name);
 
         ids = xrealloc (ids, (n + 1) * sizeof (*ids));
         names = xrealloc (names, (n + 1) * sizeof (*names));
@@ -822,7 +777,13 @@ static int DevicesEnum (audio_output_t *aout, char ***idp, char ***namep)
     snd_device_name_free_hint(hints);
     *idp = ids;
     *namep = names;
+    (void) varname;
     return n;
+}
+
+static int DevicesEnum (audio_output_t *aout, char ***idp, char ***namep)
+{
+    return EnumDevices (VLC_OBJECT(aout), NULL, idp, namep);
 }
 
 static int DeviceSelect (audio_output_t *aout, const char *id)
