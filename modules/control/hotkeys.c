@@ -319,48 +319,28 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             if( p_aout == NULL )
                 break;
 
-            vlc_value_t val, list, list2;
-            int i_count, i;
+            vlc_value_t val, ids, names;
 
-            var_Get( p_aout, "audio-device", &val );
-            var_Change( p_aout, "audio-device", VLC_VAR_GETCHOICES,
-                    &list, &list2 );
-            i_count = list.p_list->i_count;
+            var_Get( p_aout, "device", &val );
+            var_Change( p_aout, "device", VLC_VAR_GETCHOICES, &ids, &names );
 
-            if( i_count > 1 )
+            for( int i = 0; i < ids.p_list->i_count; i++ )
             {
-                for( i = 0; i < i_count; i++ )
+                if( !strcmp(val.psz_string,
+                            ids.p_list->p_values[i].psz_string) )
                 {
-                    if( val.i_int == list.p_list->p_values[i].i_int )
-                    {
-                        break;
-                    }
+                    int j = i + 1;
+                    if( j >= ids.p_list->i_count )
+                        j = 0;
+
+                    DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
+                                    _("Audio Device: %s"),
+                                    names.p_list->p_values[j].psz_string);
+                    var_Set( p_aout, "device", ids.p_list->p_values[j] );
+                    break;
                 }
-                if( i == i_count )
-                {
-                    msg_Warn( p_aout,
-                            "invalid current audio device, selecting 0" );
-                    var_Set( p_aout, "audio-device",
-                            list.p_list->p_values[0] );
-                    i = 0;
-                }
-                else if( i == i_count -1 )
-                {
-                    var_Set( p_aout, "audio-device",
-                            list.p_list->p_values[0] );
-                    i = 0;
-                }
-                else
-                {
-                    var_Set( p_aout, "audio-device",
-                            list.p_list->p_values[i+1] );
-                    i++;
-                }
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                _("Audio Device: %s"),
-                                list2.p_list->p_values[i].psz_string);
             }
-            var_FreeList( &list, &list2 );
+            var_FreeList( &ids, &names );
             vlc_object_release( p_aout );
             break;
         }
