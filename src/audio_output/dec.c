@@ -106,18 +106,19 @@ error:
 /**
  * Stops all plugins involved in the audio output.
  */
-void aout_DecDelete (audio_output_t *p_aout)
+void aout_DecDelete (audio_output_t *aout)
 {
-    aout_owner_t *owner = aout_owner (p_aout);
+    aout_owner_t *owner = aout_owner (aout);
 
-    aout_lock( p_aout );
-    aout_FiltersDelete (p_aout);
-    aout_OutputDelete( p_aout );
+    aout_lock (aout);
+    if (owner->mixer_format.i_format)
+    {
+        aout_FiltersDelete (aout);
+        aout_OutputDelete (aout);
+    }
     aout_volume_Delete (owner->volume);
-
-    var_Destroy( p_aout, "stereo-mode" );
-
-    aout_unlock( p_aout );
+    aout_unlock (aout);
+    var_Destroy (aout, "stereo-mode");
 }
 
 #define AOUT_RESTART_OUTPUT 1
@@ -133,10 +134,13 @@ static int aout_CheckReady (audio_output_t *aout)
     {
         const aout_request_vout_t request_vout = owner->request_vout;
 
-        aout_FiltersDelete (aout);
+        if (owner->mixer_format.i_format)
+            aout_FiltersDelete (aout);
+
         if (restart & AOUT_RESTART_OUTPUT)
         {   /* Reinitializes the output */
-            aout_OutputDelete (aout);
+            if (owner->mixer_format.i_format)
+                aout_OutputDelete (aout);
             owner->mixer_format = owner->input_format;
             if (aout_OutputNew (aout, &owner->mixer_format))
                 owner->mixer_format.i_format = 0;
@@ -453,7 +457,8 @@ void aout_DecChangePause (audio_output_t *aout, bool paused, mtime_t date)
         else
             owner->sync.end += date;
     }
-    aout_OutputPause (aout, paused, date);
+    if (owner->mixer_format.i_format)
+        aout_OutputPause (aout, paused, date);
     aout_unlock (aout);
 }
 
@@ -463,7 +468,8 @@ void aout_DecFlush (audio_output_t *aout)
 
     aout_lock (aout);
     owner->sync.end = VLC_TS_INVALID;
-    aout_OutputFlush (aout, false);
+    if (owner->mixer_format.i_format)
+        aout_OutputFlush (aout, false);
     aout_unlock (aout);
 }
 
@@ -476,7 +482,7 @@ bool aout_DecIsEmpty (audio_output_t *aout)
     aout_lock (aout);
     if (owner->sync.end != VLC_TS_INVALID)
         empty = owner->sync.end <= now;
-    if (empty)
+    if (empty && owner->mixer_format.i_format)
         /* The last PTS has elapsed already. So the underlying audio output
          * buffer should be empty or almost. Thus draining should be fast
          * and will not block the caller too long. */
