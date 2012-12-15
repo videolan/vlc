@@ -267,55 +267,53 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                      ui.audioZone, setEnabled( bool ) );
 
 #define audioCommon( name ) \
-            QWidget * name ## Control = new QWidget( ui.outputAudioBox ); \
-            QHBoxLayout * name ## Layout = new QHBoxLayout( name ## Control); \
-            name ## Layout->setMargin( 0 ); \
-            name ## Layout->setSpacing( 0 ); \
-            QLabel * name ## Label = new QLabel( qtr( "Device:" ), name ## Control ); \
+            QLabel * name ## Label = new QLabel( qtr( "Device:" ) ); \
             name ## Label->setMinimumSize(QSize(250, 0)); \
-            name ## Layout->addWidget( name ## Label ); \
+            outputAudioLayout->addWidget( name ## Label, outputAudioLayout->rowCount(), 0, 1, 1 ); \
 
 #define audioControl( name) \
             audioCommon( name ) \
-            QComboBox * name ## Device = new QComboBox( name ## Control ); \
-            name ## Layout->addWidget( name ## Device ); \
+            QComboBox * name ## Device = new QComboBox; \
             name ## Label->setBuddy( name ## Device ); \
             name ## Device->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred  );\
-            outputAudioLayout->addWidget( name ## Control, outputAudioLayout->rowCount(), 0, 1, -1 );
+            outputAudioLayout->addWidget( name ## Device, outputAudioLayout->rowCount() - 1, 1, 1, -1 );
 
 #define audioControl2( name) \
             audioCommon( name ) \
-            QLineEdit * name ## Device = new QLineEdit( name ## Control ); \
-            name ## Layout->addWidget( name ## Device ); \
+            QLineEdit * name ## Device = new QLineEdit; \
             name ## Label->setBuddy( name ## Device ); \
-            QPushButton * name ## Browse = new QPushButton( qtr( "Browse..." ), name ## Control); \
-            name ## Layout->addWidget( name ## Browse ); \
-            outputAudioLayout->addWidget( name ## Control, outputAudioLayout->rowCount(), 0, 1, -1 );
+            QPushButton * name ## Browse = new QPushButton( qtr( "Browse..." ) ); \
+            outputAudioLayout->addWidget( name ## Device, outputAudioLayout->rowCount() - 1, 0, 1, -1, Qt::AlignLeft );
 
             /* Build if necessary */
             QGridLayout * outputAudioLayout = qobject_cast<QGridLayout *>(ui.outputAudioBox->layout());
 #ifdef WIN32
             audioControl( DirectX );
-            optionWidgets["directxW" ] = DirectXControl;
+            optionWidgets["directxL" ] = DirectXLabel;
+            optionWidgets["directxW" ] = DirectXDevice;
             CONFIG_GENERIC_NO_UI( "directx-audio-device", StringList,
                     DirectXLabel, DirectXDevice );
 #elif defined( __OS2__ )
             audioControl( kai );
-            optionWidgets["kaiW"] = kaiControl;
+            optionWidgets["kaiL"] = kaiLabel;
+            optionWidgets["kaiW"] = kaiDevice;
             CONFIG_GENERIC_NO_UI( "kai-audio-device", StringList, kaiLabel,
                     kaiDevice );
 #else
             if( module_exists( "alsa" ) )
             {
                 audioControl( alsa );
-                optionWidgets["alsaW"] = alsaControl;
+                optionWidgets["alsaL"] = alsaLabel;
+                optionWidgets["alsaW"] = alsaDevice;
                 CONFIG_GENERIC_NO_UI( "alsa-audio-device" , StringList, alsaLabel,
                                 alsaDevice );
             }
             if( module_exists( "oss" ) )
             {
                 audioControl2( OSS );
-                optionWidgets["ossW"] = OSSControl;
+                optionWidgets["ossL"] = OSSLabel;
+                optionWidgets["ossW"] = OSSDevice;
+                optionWidgets["ossB"] = OSSBrowse;
                 CONFIG_GENERIC_FILE( "oss-audio-device" , File, NULL, OSSDevice,
                                  OSSBrowse );
             }
@@ -756,15 +754,22 @@ void SPrefsPanel::updateAudioOptions( int number)
                                             ->itemData( number ).toString();
 #ifdef WIN32
     optionWidgets["directxW"]->setVisible( ( value == "directsound" ) );
+    optionWidgets["directxL"]->setVisible( ( value == "directsound" ) );
 #elif defined( __OS2__ )
+    optionWidgets["kaiL"]->setVisible( ( value == "kai" ) );
     optionWidgets["kaiW"]->setVisible( ( value == "kai" ) );
 #else
     /* optionWidgets["ossW] can be NULL */
-    if( optionWidgets["ossW"] )
+    if( optionWidgets["ossW"] ) {
         optionWidgets["ossW"]->setVisible( ( value == "oss" ) );
+        optionWidgets["ossL"]->setVisible( ( value == "oss" ) );
+        optionWidgets["ossB"]->setVisible( ( value == "oss" ) );
+    }
     /* optionWidgets["alsaW] can be NULL */
-    if( optionWidgets["alsaW"] )
+    if( optionWidgets["alsaW"] ) {
         optionWidgets["alsaW"]->setVisible( ( value == "alsa" ) );
+        optionWidgets["alsaL"]->setVisible( ( value == "alsa" ) );
+    }
 #endif
     optionWidgets["fileW"]->setVisible( ( value == "aout_file" ) );
     optionWidgets["spdifChB"]->setVisible( ( value == "alsa" || value == "oss" || value == "auhal" ||
