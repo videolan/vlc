@@ -44,6 +44,23 @@ static int var_Copy (vlc_object_t *src, const char *name, vlc_value_t prev,
     return var_Set (dst, name, value);
 }
 
+static int aout_DeviceSelect (vlc_object_t *obj, const char *varname,
+                              vlc_value_t prev, vlc_value_t value, void *data)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    int ret = 0; /* FIXME: default value should be -1 */
+
+    msg_Dbg (aout, "changing device: %s -> %s", prev.psz_string,
+             value.psz_string);
+    aout_lock (aout);
+    if (aout->device_select != NULL)
+        ret = aout->device_select (aout, value.psz_string);
+    aout_unlock (aout);
+
+    (void) varname; (void) data;
+    return ret ? VLC_EGENERIC : VLC_SUCCESS;
+}
+
 /**
  * Supply or update the current custom ("hardware") volume.
  * @note This only makes sense after calling aout_VolumeHardInit().
@@ -69,6 +86,23 @@ static void aout_PolicyNotify (audio_output_t *aout, bool cork)
     (cork ? var_IncInteger : var_DecInteger) (aout->p_parent, "corks");
 }
 
+static void aout_DeviceNotify (audio_output_t *aout, const char *id)
+{
+    vlc_value_t val;
+
+    val.psz_string = (char *)id;
+    var_Change (aout, "device", VLC_VAR_SETVALUE, &val, NULL);
+
+    /* FIXME: Remove this hack. Needed if device is not in the list. */
+    char *tmp = var_GetNonEmptyString (aout, "device");
+    if (tmp == NULL || strcmp (tmp, id))
+    {
+        var_Change (aout, "device", VLC_VAR_ADDCHOICE, &val, &val);
+        var_Change (aout, "device", VLC_VAR_SETVALUE, &val, NULL);
+    }
+    free (tmp);
+}
+
 static int aout_GainNotify (audio_output_t *aout, float gain)
 {
     aout_owner_t *owner = aout_owner (aout);
@@ -85,6 +119,8 @@ static int aout_GainNotify (audio_output_t *aout, float gain)
  */
 audio_output_t *aout_New (vlc_object_t *parent)
 {
+    vlc_value_t val, text;
+
     audio_output_t *aout = vlc_custom_create (parent, sizeof (aout_instance_t),
                                               "audio output");
     if (unlikely(aout == NULL))
@@ -100,9 +136,14 @@ audio_output_t *aout_New (vlc_object_t *parent)
     var_AddCallback (aout, "volume", var_Copy, parent);
     var_Create (aout, "mute", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     var_AddCallback (aout, "mute", var_Copy, parent);
+    var_Create (aout, "device", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
+    text.psz_string = _("Audio Device");
+    var_Change (aout, "device", VLC_VAR_SETTEXT, &text, NULL);
+    var_AddCallback (aout, "device", aout_DeviceSelect, NULL);
 
     aout->event.volume_report = aout_VolumeNotify;
     aout->event.mute_report = aout_MuteNotify;
+    aout->event.device_report = aout_DeviceNotify;
     aout->event.policy_report = aout_PolicyNotify;
     aout->event.gain_request = aout_GainNotify;
 
@@ -111,6 +152,8 @@ audio_output_t *aout_New (vlc_object_t *parent)
     aout->stop = NULL;
     aout->volume_set = NULL;
     aout->mute_set = NULL;
+    aout->device_enum = NULL;
+    aout->device_select = NULL;
     owner->module = module_need (aout, "audio output", "$aout", false);
     if (owner->module == NULL)
     {
@@ -119,10 +162,30 @@ audio_output_t *aout_New (vlc_object_t *parent)
         return NULL;
     }
 
+    if (aout->device_enum != NULL)
+    {   /* Backward compatibility with UIs using GETCHOICES/GETLIST */
+        /* Note: this does NOT support hot-plugged devices. */
+        char **ids, **names;
+        int n = aout->device_enum (aout, &ids, &names);
+
+        for (int i = 0; i < n; i++)
+        {
+            val.psz_string = ids[i];
+            text.psz_string = names[i];
+            var_Change (aout, "device", VLC_VAR_ADDCHOICE, &val, &text);
+            free (names[i]);
+            free (ids[i]);
+        }
+        if (n >= 0)
+        {
+            free (names);
+            free (ids);
+        }
+    }
+
     /*
      * Persistent audio output variables
      */
-    vlc_value_t val, text;
     module_config_t *cfg;
     char *str;
 
@@ -230,6 +293,7 @@ void aout_Destroy (audio_output_t *aout)
     aout->mute_set = NULL;
     aout_unlock (aout);
 
+    var_DelCallback (aout, "device", aout_DeviceSelect, NULL);
     var_DelCallback (aout, "mute", var_Copy, aout->p_parent);
     var_SetFloat (aout, "volume", -1.f);
     var_DelCallback (aout, "volume", var_Copy, aout->p_parent);

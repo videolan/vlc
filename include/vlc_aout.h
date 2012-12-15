@@ -184,10 +184,26 @@ struct audio_output
       * \param mute true to mute, false to unmute
       * \warning A stream may or may not have been started when called.
       */
+    int (*device_enum)(audio_output_t *, char ***ids, char ***names);
+    /**< Enumerates available audio output devices (optional, may be NULL).
+      * \param ids pointer to a heap-allocated table of heap-allocated
+      *            nul-terminated device unique identifiers [OUT]
+      * \param names pointer to a heap-allocated table of heap-allocated
+      *              nul-terminated device human-readable names [OUT]
+      * \return The number of entries, or -1 on error.
+      * \warning A stream may or may not have been started when called.
+      */
+    int (*device_select)(audio_output_t *, const char *id);
+    /**< Selects an audio output device (optional, may be NULL).
+      * \param id nul-terminated device unique identifier.
+      * \return 0 on success, non-zero on failure.
+      * \warning A stream may or may not have been started when called.
+      */
     struct {
         void (*volume_report)(audio_output_t *, float);
         void (*mute_report)(audio_output_t *, bool);
         void (*policy_report)(audio_output_t *, bool);
+        void (*device_report)(audio_output_t *, const char *);
         int (*gain_request)(audio_output_t *, float);
     } event;
 };
@@ -285,6 +301,14 @@ static inline void aout_MuteReport(audio_output_t *aout, bool mute)
 static inline void aout_PolicyReport(audio_output_t *aout, bool cork)
 {
     aout->event.policy_report(aout, cork);
+}
+
+/**
+ * Report change of output device.
+ */
+static inline void aout_DeviceReport(audio_output_t *aout, const char *id)
+{
+    aout->event.device_report(aout, id);
 }
 
 /**
