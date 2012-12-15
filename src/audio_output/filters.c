@@ -141,11 +141,7 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
         if (n == max)
             goto overflow;
 
-        filter_t *f = NULL;
-        if (!AOUT_FMT_LINEAR(outfmt))
-           f = TryFormat (obj, outfmt->i_format, &input);
-        if (f == NULL)
-            f = TryFormat (obj, VLC_CODEC_FI32, &input);
+        filter_t *f = TryFormat (obj, VLC_CODEC_FI32, &input);
         if (f == NULL)
             f = TryFormat (obj, VLC_CODEC_FL32, &input);
         if (f == NULL)
@@ -485,7 +481,20 @@ int aout_FiltersNew (audio_output_t *aout,
     var_AddCallback (aout, "equalizer", EqualizerCallback, NULL);
 
     if (!AOUT_FMT_LINEAR(outfmt))
+    {   /* Non-linear output: just convert formats, no filters/visu */
+        if (!AOUT_FMTS_IDENTICAL(infmt, outfmt))
+        {
+            aout_FormatsPrint (aout, "pass-through:", infmt, outfmt);
+            owner->filters[0] = FindConverter(VLC_OBJECT(aout), infmt, outfmt);
+            if (owner->filters[0] == NULL)
+            {
+                msg_Err (aout, "cannot setup pass-through");
+                goto error;
+            }
+            owner->nb_filters++;
+        }
         return 0;
+    }
 
     const char *scaletempo =
         var_InheritBool (aout, "audio-time-stretch") ? "scaletempo" : NULL;
