@@ -217,33 +217,16 @@ void libvlc_audio_output_device_set( libvlc_media_player_t *mp,
     free( psz_config_name );
 }
 
-/*****************************************************************************
- * libvlc_audio_output_get_device_type : Get the current audio device type
- *****************************************************************************/
 int libvlc_audio_output_get_device_type( libvlc_media_player_t *mp )
 {
-    audio_output_t *p_aout = GetAOut( mp );
-    if( p_aout )
-    {
-        int i_device_type = var_GetInteger( p_aout, "audio-device" );
-        vlc_object_release( p_aout );
-        return i_device_type;
-    }
+    (void) mp;
     return libvlc_AudioOutputDevice_Error;
 }
 
-/*****************************************************************************
- * libvlc_audio_output_set_device_type : Set the audio device type
- *****************************************************************************/
 void libvlc_audio_output_set_device_type( libvlc_media_player_t *mp,
                                           int device_type )
 {
-    audio_output_t *p_aout = GetAOut( mp );
-    if( !p_aout )
-        return;
-    if( var_SetInteger( p_aout, "audio-device", device_type ) < 0 )
-        libvlc_printerr( "Error setting audio device" );
-    vlc_object_release( p_aout );
+    (void) mp; (void) device_type;
 }
 
 void libvlc_audio_toggle_mute( libvlc_media_player_t *mp )

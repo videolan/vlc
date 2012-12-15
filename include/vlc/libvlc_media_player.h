@@ -1487,23 +1487,18 @@ LIBVLC_API void libvlc_audio_output_device_set( libvlc_media_player_t *p_mi,
                                                 const char *psz_device_id );
 
 /**
- * Get current audio device type. Device type describes something like
- * character of output sound - stereo sound, 2.1, 5.1 etc
- *
- * \param p_mi media player
- * \return the audio devices type \see libvlc_audio_output_device_types_t
+ * Stub for backward compatibility.
+ * \return always -1.
  */
+LIBVLC_DEPRECATED
 LIBVLC_API int libvlc_audio_output_get_device_type( libvlc_media_player_t *p_mi );
 
 /**
- * Set current audio device type.
- *
- * \param p_mi vlc instance
- * \param device_type the audio device type,
-          according to \see libvlc_audio_output_device_types_t
+ * Stub for backward compatibility.
  */
-LIBVLC_API void libvlc_audio_output_set_device_type( libvlc_media_player_t *p_mi,
-                                                         int device_type );
+LIBVLC_DEPRECATED
+LIBVLC_API void libvlc_audio_output_set_device_type( libvlc_media_player_t *,
+                                                     int );
 
 
 /**
