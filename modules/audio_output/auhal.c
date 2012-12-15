@@ -55,6 +55,9 @@
 #define BUFSIZE (FRAMESIZE * 8) * 8
 #define AOUT_VAR_SPDIF_FLAG 0xf00000
 
+#define AOUT_VOLUME_DEFAULT             256
+#define AOUT_VOLUME_MAX                 512
+
 /*
  * TODO:
  * - clean up the debug info
@@ -131,6 +134,9 @@ static int      MuteSet                 (audio_output_t *, bool);
     "audio device, as listed in your 'Audio Device' menu. This device will " \
     "then be used by default for audio playback.")
 
+#define VOLUME_TEXT N_("Audio volume")
+#define VOLUME_LONGTEXT VOLUME_TEXT
+
 vlc_module_begin ()
     set_shortname("auhal")
     set_description(N_("HAL AudioUnit output"))
@@ -139,6 +145,9 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_AUDIO_AOUT)
     set_callbacks(Open, Close)
     add_integer("macosx-audio-device", 0, ADEV_TEXT, ADEV_LONGTEXT, false)
+    add_integer( "auhal-volume", AOUT_VOLUME_DEFAULT,
+                VOLUME_TEXT, VOLUME_LONGTEXT, true )
+    change_integer_range( 0, AOUT_VOLUME_MAX )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -546,6 +555,15 @@ static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 
     /* Start the AU */
     verify_noerr(AudioOutputUnitStart(p_sys->au_unit));
+
+    /* Set volume for output unit */
+    float volume = var_InheritInteger(p_aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT;
+    verify_noerr(AudioUnitSetParameter(p_sys->au_unit,
+                                    kHALOutputParam_Volume,
+                                    kAudioUnitScope_Global,
+                                    0,
+                                    volume * volume * volume,
+                                    0));
 
     return true;
 }
@@ -1366,15 +1384,16 @@ static int VolumeSet(audio_output_t * p_aout, float volume)
 
     aout_VolumeReport(p_aout, volume);
 
-    volume = volume * volume * volume; // cubic mapping from output.c
-
     /* Set volume for output unit */
     ostatus = AudioUnitSetParameter(p_sys->au_unit,
                                      kHALOutputParam_Volume,
                                      kAudioUnitScope_Global,
                                      0,
-                                     volume,
+                                     volume * volume * volume,
                                      0);
+
+    if (var_InheritBool(p_aout, "volume-save"))
+        config_PutInt(p_aout, "auhal-volume", lroundf(volume * AOUT_VOLUME_DEFAULT));
 
     return ostatus;
 }
@@ -1398,6 +1417,12 @@ static int Open(vlc_object_t *obj)
     aout->stop = Stop;
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
+
+    /* remember the volume */
+    msg_Warn(aout, "we got %lli, lroundf=%f", var_InheritInteger(aout, "auhal-volume"), (var_InheritInteger(aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT));
+    aout_VolumeReport(aout, var_InheritInteger(aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT);
+    MuteSet(aout, var_InheritBool(aout, "mute"));
+
     return VLC_SUCCESS;
 }
 
