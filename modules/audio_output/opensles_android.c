@@ -141,7 +141,11 @@ static void Pause(audio_output_t *p_aout, bool pause, mtime_t date)
 static int TimeGet(audio_output_t* p_aout, mtime_t* restrict drift)
 {
     aout_sys_t *p_sys = p_aout->sys;
+
+    vlc_mutex_lock( &p_sys->lock );
     mtime_t delay = p_sys->length;
+    vlc_mutex_unlock( &p_sys->lock );
+
     SLAndroidSimpleBufferQueueState st;
     SLresult res = GetState(p_sys->playerBufferQueue, &st);
     if (unlikely(res != SL_RESULT_SUCCESS)) {
