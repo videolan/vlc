@@ -104,7 +104,10 @@ static int vlc_FromHR(audio_output_t *aout, HRESULT hr)
 {
     /* Restart on unplug */
     if (unlikely(hr == AUDCLNT_E_DEVICE_INVALIDATED))
-        var_TriggerCallback(aout, "audio-device");
+    {
+        vlc_value_t d;
+        aout_ChannelsRestart(VLC_OBJECT(aout), "audio-device", d, d, NULL);
+    }
     return SUCCEEDED(hr) ? 0 : -1;
 }
 
@@ -198,93 +201,6 @@ static int MuteSet(audio_output_t *aout, bool mute)
     LeaveMTA();
 
     return FAILED(hr) ? -1 : 0;
-}
-
-/*** Audio devices ***/
-static int DeviceChanged(vlc_object_t *obj, const char *varname,
-                         vlc_value_t prev, vlc_value_t cur, void *data)
-{
-    /* FIXME: This does not work. sys->dev, ->manager and ->stream must be
-     * recreated. Those pointers are protected by the aout lock, which
-     * serializes accesses to the audio_output_t. Unfortunately,
-     * aout lock cannot be taken from a variable callback.
-     * Solution: add device_change callback to audio_output_t. */
-    aout_ChannelsRestart(obj, varname, prev, cur, data);
-    return VLC_SUCCESS;
-}
-
-static void GetDevices(vlc_object_t *obj, IMMDeviceEnumerator *it)
-{
-    HRESULT hr;
-    vlc_value_t val, text;
-
-    var_Create (obj, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
-    text.psz_string = _("Audio Device");
-    var_Change (obj, "audio-device", VLC_VAR_SETTEXT, &text, NULL);
-
-    /* TODO: implement IMMNotificationClient for hotplug devices */
-    IMMDeviceCollection *devs;
-    hr = IMMDeviceEnumerator_EnumAudioEndpoints(it, eRender,
-                                                DEVICE_STATE_ACTIVE, &devs);
-    if (FAILED(hr))
-    {
-        msg_Warn (obj, "cannot enumerate audio endpoints (error 0x%lx)", hr);
-        return;
-    }
-
-    UINT n;
-    hr = IMMDeviceCollection_GetCount(devs, &n);
-    if (FAILED(hr))
-    {
-        msg_Warn (obj, "cannot count audio endpoints (error 0x%lx)", hr);
-        n = 0;
-    }
-    else
-        msg_Dbg(obj, "Available Windows Audio devices:");
-
-    while (n > 0)
-    {
-        IMMDevice *dev;
-
-        hr = IMMDeviceCollection_Item(devs, --n, &dev);
-        if (FAILED(hr))
-            continue;
-
-        /* Unique device ID */
-        LPWSTR devid;
-        hr = IMMDevice_GetId(dev, &devid);
-        if (FAILED(hr))
-        {
-            IMMDevice_Release(dev);
-            continue;
-        }
-        val.psz_string = FromWide(devid);
-        CoTaskMemFree(devid);
-        text.psz_string = val.psz_string;
-
-        /* User-readable device name */
-        IPropertyStore *props;
-        hr = IMMDevice_OpenPropertyStore(dev, STGM_READ, &props);
-        if (SUCCEEDED(hr))
-        {
-            PROPVARIANT v;
-
-            PropVariantInit(&v);
-            hr = IPropertyStore_GetValue(props, &PKEY_Device_FriendlyName, &v);
-            if (SUCCEEDED(hr))
-                text.psz_string = FromWide(v.pwszVal);
-            PropVariantClear(&v);
-            IPropertyStore_Release(props);
-        }
-        IMMDevice_Release(dev);
-
-        msg_Dbg(obj, "%s (%s)", val.psz_string, text.psz_string);
-        var_Change(obj, "audio-device", VLC_VAR_ADDCHOICE, &val, &text);
-        if (likely(text.psz_string != val.psz_string))
-            free(text.psz_string);
-        free(val.psz_string);
-    }
-    IMMDeviceCollection_Release(devs);
 }
 
 /*** Audio session events ***/
@@ -435,7 +351,7 @@ vlc_AudioSessionEvents_OnSessionDisconnected(IAudioSessionEvents *this,
             msg_Warn(aout, "session disconnected: unknown reason %d", reason);
             return S_OK;
     }
-    var_TriggerCallback(aout, "audio-device");
+    /* NOTE: audio decoder thread should get invalidated device and restart */
     return S_OK;
 }
 
@@ -559,6 +475,83 @@ static void *MMThread(void *data)
     return NULL;
 }
 
+/*** Audio devices ***/
+static int DevicesEnum(audio_output_t *aout, char ***idp, char ***namep)
+{
+    aout_sys_t *sys = aout->sys;
+    HRESULT hr;
+    IMMDeviceCollection *devs;
+
+    hr = IMMDeviceEnumerator_EnumAudioEndpoints(sys->it, eRender,
+                                                DEVICE_STATE_ACTIVE, &devs);
+    if (FAILED(hr))
+    {
+        msg_Warn(aout, "cannot enumerate audio endpoints (error 0x%lx)", hr);
+        return -1;
+    }
+
+    UINT count;
+    hr = IMMDeviceCollection_GetCount(devs, &count);
+    if (FAILED(hr))
+    {
+        msg_Warn(aout, "cannot count audio endpoints (error 0x%lx)", hr);
+        count = 0;
+    }
+    else
+        msg_Dbg(aout, "Available Windows Audio devices:");
+
+    char **ids = xmalloc (count * sizeof (*ids));
+    char **names = xmalloc (count * sizeof (*names));
+    unsigned n = 0;
+
+    for (UINT i = 0; i < count; i++)
+    {
+        IMMDevice *dev;
+
+        hr = IMMDeviceCollection_Item(devs, i, &dev);
+        if (FAILED(hr))
+            continue;
+
+        /* Unique device ID */
+        LPWSTR devid;
+        hr = IMMDevice_GetId(dev, &devid);
+        if (FAILED(hr))
+        {
+            IMMDevice_Release(dev);
+            continue;
+        }
+        ids[n] = FromWide(devid);
+        names[n] = NULL;
+        CoTaskMemFree(devid);
+
+        /* User-readable device name */
+        IPropertyStore *props;
+        hr = IMMDevice_OpenPropertyStore(dev, STGM_READ, &props);
+        if (SUCCEEDED(hr))
+        {
+            PROPVARIANT v;
+
+            PropVariantInit(&v);
+            hr = IPropertyStore_GetValue(props, &PKEY_Device_FriendlyName, &v);
+            if (SUCCEEDED(hr))
+                names[n] = FromWide(v.pwszVal);
+            PropVariantClear(&v);
+            IPropertyStore_Release(props);
+        }
+        IMMDevice_Release(dev);
+        if (names[n] == NULL)
+            names[n] = xstrdup(ids[n]);
+
+        msg_Dbg(aout, "%s (%s)", ids[n], names[n]);
+        n++;
+    }
+    IMMDeviceCollection_Release(devs);
+
+    *idp = ids;
+    *namep = names;
+    return n;
+}
+
 /**
  * Opens the selected audio output device.
  */
@@ -588,21 +581,36 @@ static HRESULT OpenDevice(audio_output_t *aout, const char *devid)
         hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(sys->it, eRender,
                                                          eConsole, &sys->dev);
     }
-
-    /* Create session manager (for controls even w/o active audio client) */
+    assert(sys->manager == NULL);
     if (FAILED(hr))
-        msg_Err(aout, "cannot get device (error 0x%lx)", hr);
-    else
     {
-        void *pv;
-        hr = IMMDevice_Activate(sys->dev, &IID_IAudioSessionManager,
-                                CLSCTX_ALL, NULL, &pv);
-        if (FAILED(hr))
-            msg_Err(aout, "cannot activate session manager (error 0x%lx)", hr);
-        else
-            sys->manager = pv;
+        msg_Err(aout, "cannot get device (error 0x%lx)", hr);
+        goto out;
     }
 
+    /* Create session manager (for controls even w/o active audio client) */
+    void *pv;
+    hr = IMMDevice_Activate(sys->dev, &IID_IAudioSessionManager,
+                            CLSCTX_ALL, NULL, &pv);
+    if (FAILED(hr))
+        msg_Err(aout, "cannot activate session manager (error 0x%lx)", hr);
+    else
+        sys->manager = pv;
+
+    /* Report actual device */
+    LPWSTR wdevid;
+    hr = IMMDevice_GetId(sys->dev, &wdevid);
+    if (SUCCEEDED(hr))
+    {
+        char *id = FromWide(wdevid);
+        CoTaskMemFree(wdevid);
+        if (likely(id != NULL))
+        {
+            aout_DeviceReport(aout, id);
+            free(id);
+        }
+    }
+out:
     SetEvent(sys->device_changed);
     WaitForSingleObject(sys->device_ready, INFINITE);
     return hr;
@@ -627,6 +635,31 @@ static void CloseDevice(audio_output_t *aout)
     sys->dev = NULL;
 }
 
+static int DeviceSelect(audio_output_t *aout, const char *id)
+{
+    aout_sys_t *sys = aout->sys;
+    HRESULT hr;
+
+    if (TryEnterMTA(aout))
+        return -1;
+
+    if (sys->dev != NULL)
+        CloseDevice(aout);
+
+    hr = OpenDevice(aout, id);
+    while (hr == AUDCLNT_E_DEVICE_INVALIDATED)
+        hr = OpenDevice(aout, NULL); /* Fallback to default device */
+    LeaveMTA();
+
+    if (sys->stream != NULL)
+    {
+        vlc_value_t d;
+        /* Request restart of stream with the new device */
+        aout_ChannelsRestart(VLC_OBJECT(aout), "audio-device", d, d, NULL);
+    }
+    return FAILED(hr) ? -1 : 0;
+}
+
 /**
  * Callback for aout_stream_t to create a stream on the device.
  * This can instantiate an IAudioClient or IDirectSound(8) object.
@@ -645,7 +678,8 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     HRESULT hr;
 
     assert (sys->stream == NULL);
-    if (sys->dev == NULL)
+    /* Open the default device if required (to deal with restarts) */
+    if (sys->dev == NULL && FAILED(DeviceSelect(aout, NULL)))
         return -1;
 
     aout_stream_t *s = vlc_object_create(aout, sizeof (*s));
@@ -721,16 +755,12 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
     sys->it = pv;
-    GetDevices(obj, sys->it);
 
     if (vlc_clone(&sys->thread, MMThread, aout, VLC_THREAD_PRIORITY_LOW))
         goto error;
     WaitForSingleObject(sys->device_ready, INFINITE);
 
-    /* Get a device to start with */
-    do
-        hr = OpenDevice(aout, NULL);
-    while (hr == AUDCLNT_E_DEVICE_INVALIDATED);
+    DeviceSelect(aout, NULL); /* Get a device to start with */
     LeaveMTA(); /* leave MTA after thread has entered MTA */
 
     aout->start = Start;
@@ -741,7 +771,8 @@ static int Open(vlc_object_t *obj)
     aout->flush = Flush;
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
-    var_AddCallback (aout, "audio-device", DeviceChanged, NULL);
+    aout->device_enum = DevicesEnum;
+    aout->device_select = DeviceSelect;
     return VLC_SUCCESS;
 
 error:
@@ -762,9 +793,6 @@ static void Close(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
-
-    var_DelCallback (aout, "audio-device", DeviceChanged, NULL);
-    var_Destroy (aout, "audio-device");
 
     EnterMTA(); /* enter MTA before thread leaves MTA */
     if (sys->dev != NULL)
