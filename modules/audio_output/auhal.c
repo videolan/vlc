@@ -1379,18 +1379,18 @@ static int AudioDeviceCallback(vlc_object_t *p_this, const char *psz_variable,
  *****************************************************************************/
 static int VolumeSet(audio_output_t * p_aout, float volume)
 {
-    struct   aout_sys_t *p_sys = p_aout->sys;
+    struct aout_sys_t *p_sys = p_aout->sys;
     OSStatus ostatus;
 
     aout_VolumeReport(p_aout, volume);
 
     /* Set volume for output unit */
     ostatus = AudioUnitSetParameter(p_sys->au_unit,
-                                     kHALOutputParam_Volume,
-                                     kAudioUnitScope_Global,
-                                     0,
-                                     volume * volume * volume,
-                                     0);
+                                    kHALOutputParam_Volume,
+                                    kAudioUnitScope_Global,
+                                    0,
+                                    volume * volume * volume,
+                                    0);
 
     if (var_InheritBool(p_aout, "volume-save"))
         config_PutInt(p_aout, "auhal-volume", lroundf(volume * AOUT_VOLUME_DEFAULT));
@@ -1400,9 +1400,24 @@ static int VolumeSet(audio_output_t * p_aout, float volume)
 
 static int MuteSet(audio_output_t * p_aout, bool mute)
 {
+    struct   aout_sys_t *p_sys = p_aout->sys;
+    OSStatus ostatus;
+
     aout_MuteReport(p_aout, mute);
 
-    return 0;
+    float volume = .0;
+
+    if (!mute)
+        volume = var_InheritInteger(p_aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT;
+
+    ostatus = AudioUnitSetParameter(p_sys->au_unit,
+                                    kHALOutputParam_Volume,
+                                    kAudioUnitScope_Global,
+                                    0,
+                                    volume * volume * volume,
+                                    0);
+
+    return ostatus;
 }
 
 static int Open(vlc_object_t *obj)
