@@ -127,6 +127,7 @@ libVLC:
  * new libvlc_audio_output_device_list_get and libvlc_audio_output_device_list_release functions
    to replace the deprecated libvlc_audio_output_device_count, libvlc_audio_output_device_longname
    and libvlc_audio_output_device_id
+ * libvlc_audio_output_get_device_type and libvlc_audio_output_set_device_type are now deprecated
  * new libvlc_log_subscribe and libvlc_log_unsubscribe function to register logging callbacks
 
 Removed modules:
@@ -139,6 +140,55 @@ Removed modules:
  * Hildon GUI
  * MSN messenger "now playing" (broken and unmaintained since VLC 1.0.0)
  * Telepathy framework "now playing" (broken and unmaintained since VLC 1.0.0)
+
+
+Changes between 2.0.4 and 2.0.5:
+--------------------------------
+
+Access:
+ * Fix DVB-S delivery system detection
+
+Audio Output:
+ * Fix playback initial synchronization with PulseAudio
+   (however similar bugs in PulseAudio version 2.0 and later still exist)
+ * Fix file output bug affecting floating point on big endian systems
+
+Demuxers:
+ * Fix crash with some embedded subtitle fonts
+ * Fix buffer overflow in HTML subtitles parser
+ * Fix koreus lua parser
+ * Improve reliability for RTSP streams sent by some IP cameras
+ * Fix division by 0 in AIFF demuxer
+ * Fix some MKV crashes when ordered editions have empty or broken links
+ * Fix SWF potential crash on malformed files.
+
+Video filters:
+ * Fix crash in Freetype with embedded fonts
+ * Fix wrong aspect ratio in some cases
+
+Encoders:
+ * Fix Mpeg-2 audio and video encoders initialization
+
+Mac OS X:
+ * Fix Reveal-in-Finder for files with non-Western file names
+ * Fix crash with local statistics disabled
+ * Fix Time counter UI look
+ * Fix system sleep issue on OS X 10.5
+
+Win32:
+ * Fix https streaming
+
+libVLC:
+ * Fix audio and video track selection:
+   The constant track identifier is now always used. Some functions previously
+   incorrectly used the (moving) index of the track in the table of tracks.
+
+Translations:
+ * Update of Asturian, Bengali (India), Bosnian, Croatian, Czech, Danish,
+   Dutch, Estonian, French, Galician, Scottish Gaelic, German, Hebrew,
+   Italian, Japanese, Khmer, Malayalam, Polish, Slovak, Simplified Chinese,
+   Traditional Chinese, Brazilian Portuguese, Turkish, Thai translations
+ * Initial translations for Welsh and Interlingua
 
 
 Changes between 2.0.3 and 2.0.4:
@@ -208,6 +258,7 @@ Translations:
    Chinese, Simplified Chinese, Portuguese, Walloon, Turkish, Thai, Polish,
    Dutch, Khmer, Hindi, Japanese, Galician, Hebrew, German, Breton, Scottish
    Gaelic, Czech, Estonian translations
+ * Initial translations for Bengali, Fula, Gujarati and Bosnian
 
 
 Changes between 2.0.2 and 2.0.3:
