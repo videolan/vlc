@@ -81,6 +81,9 @@ struct aout_sys_t
     bool                        b_digital;           /* Are we running in digital mode? */
     mtime_t                     clock_diff;          /* Difference between VLC clock and Device clock */
 
+    uint8_t chans_to_reorder;                        /* do we need channel reordering */
+    uint8_t chan_table[AOUT_CHAN_MAX];
+
     /* AUHAL specific */
     Component                   au_component;        /* The Audiocomponent we use */
     AudioUnit                   au_unit;             /* The AudioUnit we use */
@@ -441,6 +444,8 @@ static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     msg_Dbg(p_aout, "VLC will output: %s", aout_FormatPrintChannels(fmt));
 
     memset (&new_layout, 0, sizeof(new_layout));
+    uint32_t chans_out[AOUT_CHAN_MAX];
+
     switch(aout_FormatNbChannels(fmt)) {
         case 1:
             new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
@@ -475,12 +480,37 @@ static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_AudioUnit_6_0; // L R Ls Rs C Cs
             break;
         case 7:
-            /* FIXME: This is incorrect. VLC uses the internal ordering: L R Lm Rm Lr Rr C LFE but this is wrong */
-            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_6_1_A; // L R C LFE Ls Rs Cs
+            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_6_1_A;
+
+            chans_out[0] = AOUT_CHAN_LEFT;
+            chans_out[1] = AOUT_CHAN_RIGHT;
+            chans_out[2] = AOUT_CHAN_CENTER;
+            chans_out[3] = AOUT_CHAN_LFE;
+            chans_out[4] = AOUT_CHAN_REARLEFT;
+            chans_out[5] = AOUT_CHAN_REARRIGHT;
+            chans_out[6] = AOUT_CHAN_REARCENTER;
+
+            p_aout->sys->chans_to_reorder = aout_CheckChannelReorder( NULL, chans_out, fmt->i_physical_channels, p_aout->sys->chan_table );
+            if (p_aout->sys->chans_to_reorder)
+                msg_Dbg( p_aout, "channel reordering needed" );
+
             break;
         case 8:
-            /* FIXME: This is incorrect. VLC uses the internal ordering: L R Lm Rm Lr Rr C LFE but this is wrong */
-            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_7_1_A; // L R C LFE Ls Rs Lc Rc
+            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_7_1_A;
+
+            chans_out[0] = AOUT_CHAN_LEFT;
+            chans_out[1] = AOUT_CHAN_RIGHT;
+            chans_out[2] = AOUT_CHAN_CENTER;
+            chans_out[3] = AOUT_CHAN_LFE;
+            chans_out[4] = AOUT_CHAN_MIDDLELEFT;
+            chans_out[5] = AOUT_CHAN_MIDDLERIGHT;
+            chans_out[6] = AOUT_CHAN_REARLEFT;
+            chans_out[7] = AOUT_CHAN_REARRIGHT;
+
+            p_aout->sys->chans_to_reorder = aout_CheckChannelReorder( NULL, chans_out, fmt->i_physical_channels, p_aout->sys->chan_table );
+            if (p_aout->sys->chans_to_reorder)
+                msg_Dbg( p_aout, "channel reordering needed" );
+
             break;
     }
 
@@ -539,7 +569,7 @@ static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     /* Set the new_layout as the layout VLC will use to feed the AU unit */
     verify_noerr(AudioUnitSetProperty(p_sys->au_unit,
                             kAudioUnitProperty_AudioChannelLayout,
-                            kAudioUnitScope_Input,
+                            kAudioUnitScope_Output,
                             0, &new_layout, sizeof(new_layout)));
 
     if (new_layout.mNumberChannelDescriptions > 0)
@@ -1234,6 +1264,16 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *_p_aout,
 
         if (p_buffer != NULL)
         {
+            /* Do the channel reordering */
+            if (p_buffer && p_sys->chans_to_reorder)
+            {
+                aout_ChannelReorder(p_buffer->p_buffer,
+                                    p_buffer->i_buffer,
+                                    p_sys->chans_to_reorder,
+                                    p_sys->chan_table,
+                                    32);
+            }
+
             uint32_t i_second_mData_bytes = __MIN(p_buffer->i_buffer, ioData->mBuffers[0].mDataByteSize - i_mData_bytes);
 
             memcpy((uint8_t *)ioData->mBuffers[0].mData + i_mData_bytes,
