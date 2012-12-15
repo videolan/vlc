@@ -195,6 +195,8 @@ static int WriteBuffer(audio_output_t *p_aout)
     /* If something bad happens, we must remove this buffer from the FIFO */
     block_t **pp_last_saved = p_sys->pp_last;
     block_t *p_last_saved = *pp_last_saved;
+    block_t *next_saved = b->p_next;
+    b->p_next = NULL;
 
     /* Put this block in the list of audio already written to opensles */
     block_ChainLastAppend( &p_sys->pp_last, b );
@@ -214,12 +216,15 @@ static int WriteBuffer(audio_output_t *p_aout)
             p_sys->pp_buffer_last = &p_sys->p_buffer_chain;
     } else {
         /* Remove that block from the list of audio already written */
-        msg_Err( p_aout, "error %lu%s", r, (r == SL_RESULT_BUFFER_INSUFFICIENT)
+        msg_Err( p_aout, "error %lu%s (%d bytes)", r, (r == SL_RESULT_BUFFER_INSUFFICIENT)
                 ? " buffer insufficient"
-                : "");
+                : "", b->i_buffer);
 
         p_sys->pp_last = pp_last_saved;
         *pp_last_saved = p_last_saved;
+
+        b->p_next = next_saved;
+
         p_sys->length -= len;
         next = NULL; /* We'll try again next time */
     }
