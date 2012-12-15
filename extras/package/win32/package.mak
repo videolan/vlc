@@ -64,7 +64,7 @@ endif
 
 	cp "$(top_builddir)/npapi-vlc/activex/axvlc.dll.manifest" "$(win32_destdir)/"
 	cp "$(top_builddir)/npapi-vlc/installed/lib/axvlc.dll" "$(win32_destdir)/"
-	cp "$(top_builddir)/npapi-vlc/npapi/npvlc.dll.manifest" "$(win32_destdir)/"
+	cp "$(top_builddir)/npapi-vlc/npapi/package/npvlc.dll.manifest" "$(win32_destdir)/"
 	cp "$(top_builddir)/npapi-vlc/installed/lib/npvlc.dll" "$(win32_destdir)/"
 
 # Compiler shared DLLs, when using compilers built with --enable-shared
@@ -113,18 +113,18 @@ package-win32-webplugin-common: package-win-strip
 	mkdir -p "$(win32_xpi_destdir)/"
 	cp -r $(win32_destdir)/plugins/ "$(win32_xpi_destdir)/"
 	find $(prefix) -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
-	cp $(top_builddir)/npapi-vlc/npapi/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins/"
+	cp $(top_builddir)/npapi-vlc/npapi/package/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins/"
 	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" "$(win32_xpi_destdir)/plugins/"
 	rm -rf "$(win32_xpi_destdir)/plugins/gui/"
 
 
 package-win32-xpi: package-win32-webplugin-common
-	cp $(top_builddir)/npapi-vlc/npapi/install.rdf "$(win32_xpi_destdir)/"
+	cp $(top_builddir)/npapi-vlc/npapi/package/install.rdf "$(win32_xpi_destdir)/"
 	cd $(win32_xpi_destdir) && zip -r -9 "../vlc-$(VERSION).xpi" install.rdf plugins
 
 
 package-win32-crx: package-win32-webplugin-common
-	cp $(top_builddir)/npapi-vlc/npapi/manifest.json "$(win32_xpi_destdir)/"
+	cp $(top_builddir)/npapi-vlc/npapi/package/manifest.json "$(win32_xpi_destdir)/"
 	crxmake --pack-extension "$(win32_xpi_destdir)" \
 		--extension-output "$(win32_destdir)/vlc-$(VERSION).crx" --ignore-file install.rdf
 
