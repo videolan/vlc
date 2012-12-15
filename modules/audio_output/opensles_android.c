@@ -40,9 +40,6 @@
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
 
-// Maximum number of buffers to enqueue.
-#define BUFF_QUEUE  42
-
 #define Destroy(a) (*a)->Destroy(a);
 #define SetPlayState(a, b) (*a)->SetPlayState(a, b)
 #define RegisterCallback(a, b, c) (*a)->RegisterCallback(a, b, c)
@@ -362,7 +359,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     // configure audio source - this defines the number of samples you can enqueue.
     SLDataLocator_AndroidSimpleBufferQueue loc_bufq = {
         SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,
-        BUFF_QUEUE
+        255 // Maximum number of buffers to enqueue.
     };
 
     SLDataFormat_PCM format_pcm;
