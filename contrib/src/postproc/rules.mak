@@ -61,8 +61,7 @@ endif
 
 # Linux
 ifdef HAVE_LINUX
-POSTPROCCONF += --target-os=linux
-# --enable-pic
+POSTPROCCONF += --target-os=linux --enable-pic
 endif
 
 # Windows
