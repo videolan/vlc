@@ -239,13 +239,6 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
-    SLAndroidSimpleBufferQueueState st;
-    SLresult res = GetState(p_sys->playerBufferQueue, &st);
-    if (unlikely(res != SL_RESULT_SUCCESS)) {
-        msg_Err(p_aout, "Could not query buffer queue state (%lu)", res);
-        st.count = 0;
-    }
-
     p_buffer->p_next = NULL; /* Make sur our linked list doesn't use old references */
     vlc_mutex_lock(&p_sys->lock);
     block_ChainLastAppend( &p_sys->pp_buffer_last, p_buffer );
