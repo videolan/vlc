@@ -4,6 +4,7 @@
  * Copyright (C) 2010 VideoLAN and AUTHORS
  *
  * Authors: Romain Goyet <romain.goyet@likid.org>
+ *          Felix Paul Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +24,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <unistd.h>                                      /* write(), close() */
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -35,7 +34,6 @@
 
 #include <AudioToolBox/AudioToolBox.h>
 
-#define NUMBER_OF_BUFFERS 3
 #define FRAME_SIZE 2048
 
 /*****************************************************************************
@@ -46,10 +44,7 @@
  *****************************************************************************/
 struct aout_sys_t
 {
-    aout_packet_t packet;
     AudioQueueRef audioQueue;
-    float soft_gain;
-    bool soft_mute;
 };
 
 /*****************************************************************************
@@ -57,32 +52,32 @@ struct aout_sys_t
  *****************************************************************************/
 static int  Open               ( vlc_object_t * );
 static void Close              ( vlc_object_t * );
-static void Play               ( audio_output_t *, block_t *, mtime_t * );
+static void Play               ( audio_output_t *, block_t * );
+static void Pause              ( audio_output_t *p_aout, bool pause, mtime_t date );
+static void Flush              ( audio_output_t *p_aout, bool wait );
+static int TimeGet             ( audio_output_t *aout, mtime_t * );
 static void AudioQueueCallback (void *, AudioQueueRef, AudioQueueBufferRef);
-
-#include "volume.h"
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
-    set_shortname( "AudioQueue" )
-    set_description( N_("AudioQueue (iOS / Mac OS) audio output") )
-    set_capability( "audio output", 40 )
-    set_category( CAT_AUDIO )
-    set_subcategory( SUBCAT_AUDIO_AOUT )
-    add_shortcut( "audioqueue" )
-    set_callbacks( Open, Close )
+set_shortname( "AudioQueue" )
+set_description( N_("AudioQueue (iOS / Mac OS) audio output") )
+set_capability( "audio output", 40 )
+set_category( CAT_AUDIO )
+set_subcategory( SUBCAT_AUDIO_AOUT )
+add_shortcut( "audioqueue" )
+set_callbacks( Open, Close )
 vlc_module_end ()
 
 /*****************************************************************************
- * Open: open the audio device
+ * Start: open the audio device
  *****************************************************************************/
 
 static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 {
     aout_sys_t *p_sys = p_aout->sys;
-
     OSStatus status = 0;
 
     // Setup the audio device.
@@ -100,96 +95,113 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     // Create a new output AudioQueue for the device.
     status = AudioQueueNewOutput(&deviceFormat,         // Format
                                  AudioQueueCallback,    // Callback
-                                 p_aout,                // User data, passed to the callback
+                                 NULL,                // User data, passed to the callback
                                  CFRunLoopGetMain(),    // RunLoop
                                  kCFRunLoopDefaultMode, // RunLoop mode
                                  0,                     // Flags ; must be zero (per documentation)...
                                  &(p_sys->audioQueue)); // Output
 
-    // This will be used for boosting the audio without the need of a mixer (floating-point conversion is expensive on ARM)
-    // AudioQueueSetParameter(p_sys->audioQueue, kAudioQueueParam_Volume, 12.0); // Defaults to 1.0
-
-    msg_Dbg(p_aout, "New AudioQueue output created (status = %li)", status);
-
-    // Allocate buffers for the AudioQueue, and pre-fill them.
-    for (int i = 0; i < NUMBER_OF_BUFFERS; ++i) {
-        AudioQueueBufferRef buffer = NULL;
-        status = AudioQueueAllocateBuffer(p_sys->audioQueue, FRAME_SIZE * 4, &buffer);
-        AudioQueueCallback(NULL, p_sys->audioQueue, buffer);
-    }
+    msg_Dbg(p_aout, "New AudioQueue output created (status = %i)", status);
+    if (status != noErr)
+        return VLC_EGENERIC;
 
     fmt->i_format = VLC_CODEC_S16L;
     fmt->i_physical_channels = AOUT_CHANS_STEREO;
     fmt->i_rate = 44100;
-    aout_PacketInit(p_aout, &p_sys->packet, FRAME_SIZE, fmt);
-    p_aout->time_get = aout_PacketTimeGet;
-    p_aout->play = aout_PacketPlay;
-    p_aout->pause = NULL;
-    p_aout->flush = aout_PacketFlush;
-    aout_SoftVolumeStart(p_aout);
+    aout_FormatPrepare(fmt);
 
-    msg_Dbg(p_aout, "Starting AudioQueue (status = %li)", status);
     status = AudioQueueStart(p_sys->audioQueue, NULL);
+    msg_Dbg(p_aout, "Starting AudioQueue (status = %i)", status);
+
+    p_aout->time_get = TimeGet;
+    p_aout->play = Play;
+    p_aout->pause = Pause;
+    p_aout->flush = Flush;
+
+    if (status != noErr)
+        return VLC_EGENERIC;
 
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
-  * aout_FifoPop : get the next buffer out of the FIFO
-  *****************************************************************************/
-static block_t *aout_FifoPop2( aout_fifo_t * p_fifo )
- {
-     block_t *p_buffer = p_fifo->p_first;
-     if( p_buffer != NULL )
-     {
-         p_fifo->p_first = p_buffer->p_next;
-         if( p_fifo->p_first == NULL )
-             p_fifo->pp_last = &p_fifo->p_first;
-     }
-     return p_buffer;
- }
-
-
-/*****************************************************************************
- * Close: close the audio device
+ * Stop: close the audio device
  *****************************************************************************/
+
 static void Stop ( audio_output_t *p_aout )
 {
     struct aout_sys_t * p_sys = p_aout->sys;
 
     msg_Dbg(p_aout, "Stopping AudioQueue");
     AudioQueueStop(p_sys->audioQueue, false);
-    msg_Dbg(p_aout, "Disposing of AudioQueue");
+    msg_Dbg(p_aout, "Disposing AudioQueue");
     AudioQueueDispose(p_sys->audioQueue, false);
-    aout_PacketDestroy(p_aout);
+}
+
+/*****************************************************************************
+ * actual playback
+ *****************************************************************************/
+
+static void Play (audio_output_t *p_aout, block_t *p_block)
+{
+    if ( p_block != NULL ) {
+        AudioQueueBufferRef inBuffer = NULL;
+        OSStatus status;
+
+        status = AudioQueueAllocateBuffer(p_aout->sys->audioQueue, FRAME_SIZE * 2, &inBuffer);
+        if (status != noErr) {
+            msg_Err( p_aout, "buffer alloction failed (%i)", status);
+            return;
+        }
+
+        memcpy( inBuffer->mAudioData, p_block->p_buffer, p_block->i_buffer );
+        inBuffer->mAudioDataByteSize = p_block->i_buffer;
+        block_Release( p_block );
+
+        status = AudioQueueEnqueueBuffer(p_aout->sys->audioQueue, inBuffer, 0, NULL);
+        if (status != noErr)
+            msg_Err( p_aout, "enqueuing buffer failed (%i)", status);
+    }
 }
 
 void AudioQueueCallback(void * inUserData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
-    audio_output_t * p_aout = (audio_output_t *)inUserData;
-    block_t *   p_buffer = NULL;
-
-    if (p_aout) {
-        struct aout_sys_t * p_sys = p_aout->sys;
-        aout_packet_t * packet = &p_sys->packet;
-
-        if (packet)
-        {
-            vlc_mutex_lock( &packet->lock );
-            p_buffer = aout_FifoPop2( &packet->fifo );
-            vlc_mutex_unlock( &packet->lock );
-        }
-    }
-
-    if ( p_buffer != NULL ) {
-        memcpy( inBuffer->mAudioData, p_buffer->p_buffer, p_buffer->i_buffer );
-        inBuffer->mAudioDataByteSize = p_buffer->i_buffer;
-        block_Release( p_buffer );
-    } else {
-        memset( inBuffer->mAudioData, 0, inBuffer->mAudioDataBytesCapacity );
-        inBuffer->mAudioDataByteSize = inBuffer->mAudioDataBytesCapacity;
-    }
-    AudioQueueEnqueueBuffer(inAQ, inBuffer, 0, NULL);
+    /* this function does nothing, but needs to be here to make the AudioQueue API happy.
+     * without a callback, it will refuse to create an AudioQueue instance. */
+    VLC_UNUSED(inUserData);
+    VLC_UNUSED(inAQ);
+    VLC_UNUSED(inBuffer);
 }
+
+static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
+{
+    VLC_UNUSED( date );
+
+    if (pause)
+        AudioQueuePause( p_aout->sys->audioQueue );
+    else
+        AudioQueueStart( p_aout->sys->audioQueue, NULL );
+}
+
+static void Flush (audio_output_t *p_aout, bool wait)
+{
+    VLC_UNUSED( wait );
+
+    AudioQueueFlush( p_aout->sys->audioQueue );
+}
+
+static int TimeGet (audio_output_t *p_aout, mtime_t *restrict delay)
+{
+    // TODO
+
+    VLC_UNUSED( p_aout );
+    VLC_UNUSED( delay );
+
+    return -1;
+}
+
+/*****************************************************************************
+ * Module management
+ *****************************************************************************/
 
 static int Open(vlc_object_t *obj)
 {
@@ -198,10 +210,12 @@ static int Open(vlc_object_t *obj)
 
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
+
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
-    aout_SoftVolumeInit(aout);
+    aout->play = Play;
+
     return VLC_SUCCESS;
 }
 
