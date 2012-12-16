@@ -143,8 +143,12 @@ int aout_DecGetResetLost(audio_output_t *);
 void aout_DecChangePause(audio_output_t *, bool b_paused, mtime_t i_date);
 void aout_DecFlush(audio_output_t *);
 bool aout_DecIsEmpty(audio_output_t *);
+void aout_RequestRestart (audio_output_t *, unsigned);
 
-void aout_InputRequestRestart(audio_output_t *);
+static inline void aout_InputRequestRestart(audio_output_t *aout)
+{
+    aout_RequestRestart(aout, AOUT_RESTART_FILTERS);
+}
 
 /* Audio output locking */
 static inline void aout_lock( audio_output_t *p_aout )

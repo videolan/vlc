@@ -121,8 +121,6 @@ void aout_DecDelete (audio_output_t *aout)
     var_Destroy (aout, "stereo-mode");
 }
 
-#define AOUT_RESTART_OUTPUT 1
-#define AOUT_RESTART_INPUT  2
 static int aout_CheckReady (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
@@ -165,12 +163,10 @@ static int aout_CheckReady (audio_output_t *aout)
  * Marks the audio output for restart, to update any parameter of the output
  * plug-in (e.g. output device or channel mapping).
  */
-static void aout_RequestRestart (audio_output_t *aout)
+void aout_RequestRestart (audio_output_t *aout, unsigned mode)
 {
     aout_owner_t *owner = aout_owner (aout);
-
-    /* NOTE: restarting output requires restarting input. */
-    atomic_fetch_or (&owner->restart, AOUT_RESTART_OUTPUT);
+    atomic_fetch_or (&owner->restart, mode);
 }
 
 int aout_ChannelsRestart (vlc_object_t *obj, const char *varname,
@@ -185,21 +181,9 @@ int aout_ChannelsRestart (vlc_object_t *obj, const char *varname,
          * rebuilding the channel choices. */
         var_Destroy (aout, "stereo-mode");
     }
-    aout_RequestRestart (aout);
+    aout_RequestRestart (aout, AOUT_RESTART_OUTPUT);
     return 0;
 }
-
-/**
- * This function will safely mark aout input to be restarted as soon as
- * possible to take configuration changes into account
- */
-void aout_InputRequestRestart (audio_output_t *aout)
-{
-    aout_owner_t *owner = aout_owner (aout);
-
-    atomic_fetch_or (&owner->restart, AOUT_RESTART_INPUT);
-}
-
 
 /*
  * Buffer management

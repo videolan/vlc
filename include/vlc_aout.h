@@ -205,6 +205,7 @@ struct audio_output
         void (*policy_report)(audio_output_t *, bool);
         void (*device_report)(audio_output_t *, const char *);
         int (*gain_request)(audio_output_t *, float);
+        void (*restart_request)(audio_output_t *, unsigned);
     } event;
 };
 
@@ -218,6 +219,10 @@ static const uint32_t pi_vlc_chan_order_wg4[] =
     AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, AOUT_CHAN_REARCENTER,
     AOUT_CHAN_CENTER, AOUT_CHAN_LFE, 0
 };
+
+#define AOUT_RESTART_FILTERS 1
+#define AOUT_RESTART_OUTPUT  2
+#define AOUT_RESTART_DECODER 4
 
 /*****************************************************************************
  * Prototypes
@@ -322,6 +327,11 @@ static inline void aout_DeviceReport(audio_output_t *aout, const char *id)
 static inline int aout_GainRequest(audio_output_t *aout, float gain)
 {
     return aout->event.gain_request(aout, gain);
+}
+
+static inline void aout_RestartRequest(audio_output_t *aout, unsigned mode)
+{
+    aout->event.restart_request(aout, mode);
 }
 
 VLC_API int aout_ChannelsRestart( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * );

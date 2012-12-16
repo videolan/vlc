@@ -103,6 +103,11 @@ static void aout_DeviceNotify (audio_output_t *aout, const char *id)
     free (tmp);
 }
 
+static void aout_RestartNotify (audio_output_t *aout, unsigned mode)
+{
+    aout_RequestRestart (aout, mode);
+}
+
 static int aout_GainNotify (audio_output_t *aout, float gain)
 {
     aout_owner_t *owner = aout_owner (aout);
@@ -146,6 +151,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
     aout->event.device_report = aout_DeviceNotify;
     aout->event.policy_report = aout_PolicyNotify;
     aout->event.gain_request = aout_GainNotify;
+    aout->event.restart_request = aout_RestartNotify;
 
     /* Audio output module initialization */
     aout->start = NULL;
