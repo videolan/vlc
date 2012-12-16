@@ -108,8 +108,9 @@ static int      OpenSPDIF               (audio_output_t *, audio_sample_format_t
 static void     Close                   (vlc_object_t *);
 
 static void     PlayAnalog              (audio_output_t *, block_t *);
-static void     FlushAnalog             (audio_output_t *aout, bool wait);
-static int      TimeGet                 (audio_output_t *aout, mtime_t *);
+static void     FlushAnalog             (audio_output_t *, bool);
+static void     PauseAnalog             (audio_output_t *, bool, mtime_t);
+static int      TimeGet                 (audio_output_t *, mtime_t *);
 
 static void     Probe                   (audio_output_t *);
 
@@ -291,6 +292,7 @@ static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     AudioChannelLayout          *layout;
     AudioChannelLayout          new_layout;
     AURenderCallbackStruct      input;
+    p_aout->sys->chans_to_reorder = 0;
 
     /* Lets go find our Component */
     desc.componentType = kAudioUnitType_Output;
@@ -594,7 +596,7 @@ static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 
     p_aout->time_get = TimeGet;
     p_aout->play = PlayAnalog;
-    p_aout->pause = NULL;
+    p_aout->pause = PauseAnalog;
     p_aout->flush = FlushAnalog;
 
     return true;
@@ -1216,11 +1218,11 @@ static void PlayAnalog (audio_output_t * p_aout, block_t * p_block)
         /* Do the channel reordering */
         if (p_sys->chans_to_reorder)
         {
-            aout_ChannelReorder(p_block->p_buffer,
-                                p_block->i_buffer,
-                                p_sys->chans_to_reorder,
-                                p_sys->chan_table,
-                                32);
+           aout_ChannelReorder(p_block->p_buffer,
+                               p_block->i_buffer,
+                               p_sys->chans_to_reorder,
+                               p_sys->chan_table,
+                               32);
         }
 
         /* Render audio into buffer */
@@ -1239,10 +1241,20 @@ static void PlayAnalog (audio_output_t * p_aout, block_t * p_block)
     block_Release(p_block);
 }
 
+static void PauseAnalog (audio_output_t *p_aout, bool pause, mtime_t date)
+{
+    VLC_UNUSED(date);
+
+    if (pause)
+        AudioOutputUnitStop(p_aout->sys->au_unit);
+    else
+        AudioOutputUnitStart(p_aout->sys->au_unit);
+}
+
 static void FlushAnalog(audio_output_t *p_aout, bool wait)
 {
-    if (!wait)
-        AudioUnitReset(p_aout->sys->au_unit, kAudioUnitScope_Global, 0);
+    /* we just flush the device, no need to flush the circular buffer, since this will lead to noise only */
+    AudioUnitReset(p_aout->sys->au_unit, kAudioUnitScope_Global, 0);
 }
 
 static int TimeGet(audio_output_t *p_aout, mtime_t *delay)
@@ -1279,6 +1291,11 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
     /* Pull audio from buffer */
     int32_t availableBytes;
     Float32 *buffer = TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
+
+    /* check if we have enough data */
+    if (!availableBytes)
+        return noErr;
+
     memcpy(targetBuffer, buffer, __MIN(bytesToCopy, availableBytes));
     TPCircularBufferConsume(&p_sys->circular_buffer, __MIN(bytesToCopy, availableBytes));
 
