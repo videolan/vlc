@@ -47,6 +47,7 @@ struct aout_sys_t
 {
     AudioQueueRef audioQueue;
     bool          b_stopped;
+    float         f_volume;
 };
 
 /*****************************************************************************
@@ -211,6 +212,24 @@ static int TimeGet (audio_output_t *p_aout, mtime_t *restrict delay)
  * Module management
  *****************************************************************************/
 
+static int VolumeSet(audio_output_t * p_aout, float volume)
+{
+    struct aout_sys_t *p_sys = p_aout->sys;
+    OSStatus ostatus;
+
+    aout_VolumeReport(p_aout, volume);
+    p_sys->f_volume = volume;
+
+    /* Set volume for output unit */
+    ostatus = AudioQueueSetParameter(p_sys->audioQueue, kAudioQueueParam_Volume, volume * volume * volume);
+
+    return ostatus;
+}
+
+/*****************************************************************************
+ * Module management
+ *****************************************************************************/
+
 static int Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
@@ -222,6 +241,10 @@ static int Open(vlc_object_t *obj)
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
+    aout->volume_set = VolumeSet;
+
+    /* reset volume */
+    aout_VolumeReport(aout, 1.0);
 
     return VLC_SUCCESS;
 }
