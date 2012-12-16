@@ -792,9 +792,8 @@ static int DeviceSelect (audio_output_t *aout, const char *id)
         var_Create (aout, "alsa-audio-device", VLC_VAR_STRING);
     var_SetString (aout, "alsa-audio-device", id);
 
-    vlc_value_t dummy;
-    return aout_ChannelsRestart (VLC_OBJECT(aout), "audio-device",
-                                 dummy, dummy, NULL);
+    aout_RestartRequest (aout, AOUT_RESTART_OUTPUT);
+    return 0;
 }
 
 static int Open(vlc_object_t *obj)

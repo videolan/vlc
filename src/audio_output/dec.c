@@ -169,16 +169,6 @@ void aout_RequestRestart (audio_output_t *aout, unsigned mode)
     atomic_fetch_or (&owner->restart, mode);
 }
 
-int aout_ChannelsRestart (vlc_object_t *obj, const char *varname,
-                          vlc_value_t oldval, vlc_value_t newval, void *data)
-{
-    audio_output_t *aout = (audio_output_t *)obj;
-    (void)oldval; (void)newval; (void)data;
-
-    aout_RequestRestart (aout, AOUT_RESTART_OUTPUT);
-    return 0;
-}
-
 /*
  * Buffer management
  */

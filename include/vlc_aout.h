@@ -334,7 +334,16 @@ static inline void aout_RestartRequest(audio_output_t *aout, unsigned mode)
     aout->event.restart_request(aout, mode);
 }
 
-VLC_API int aout_ChannelsRestart( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * );
+static inline int aout_ChannelsRestart (vlc_object_t *obj, const char *varname,
+                            vlc_value_t oldval, vlc_value_t newval, void *data)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    (void)varname; (void)oldval; (void)newval; (void)data;
+
+    aout_RestartRequest (aout, AOUT_RESTART_OUTPUT);
+    return 0;
+}
+
 
 /* */
 VLC_API vout_thread_t * aout_filter_RequestVout( filter_t *, vout_thread_t *p_vout, video_format_t *p_fmt ) VLC_USED;

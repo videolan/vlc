@@ -3,7 +3,6 @@ AddMD5
 aout_BitsPerSample
 aout_ChannelExtract
 aout_ChannelReorder
-aout_ChannelsRestart
 aout_CheckChannelExtraction
 aout_CheckChannelReorder
 aout_filter_RequestVout

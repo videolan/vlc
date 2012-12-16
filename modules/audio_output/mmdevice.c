@@ -104,10 +104,7 @@ static int vlc_FromHR(audio_output_t *aout, HRESULT hr)
 {
     /* Restart on unplug */
     if (unlikely(hr == AUDCLNT_E_DEVICE_INVALIDATED))
-    {
-        vlc_value_t d;
-        aout_ChannelsRestart(VLC_OBJECT(aout), "audio-device", d, d, NULL);
-    }
+        aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
     return SUCCEEDED(hr) ? 0 : -1;
 }
 
@@ -652,11 +649,8 @@ static int DeviceSelect(audio_output_t *aout, const char *id)
     LeaveMTA();
 
     if (sys->stream != NULL)
-    {
-        vlc_value_t d;
         /* Request restart of stream with the new device */
-        aout_ChannelsRestart(VLC_OBJECT(aout), "audio-device", d, d, NULL);
-    }
+        aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
     return FAILED(hr) ? -1 : 0;
 }
 

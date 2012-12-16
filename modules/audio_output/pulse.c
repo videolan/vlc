@@ -315,8 +315,7 @@ static void stream_event_cb(pa_stream *s, const char *name, pa_proplist *pl,
         vlc_value_t dummy = { .i_int = 0 };
 
         msg_Dbg (aout, "format lost");
-        aout_ChannelsRestart (VLC_OBJECT(aout), "audio-device",
-                              dummy, dummy, NULL);
+        aout_RestartRequest (aout, AOUT_RESTART_OUTPUT);
     } else
 #endif
         msg_Warn (aout, "unhandled stream event \"%s\"", name);
