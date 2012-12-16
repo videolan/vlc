@@ -174,7 +174,10 @@ static int TimeGet(audio_output_t* p_aout, mtime_t* restrict drift)
         return -1;
     }
 
-    *drift = (delay && st.count) ? delay : 0;
+    if (delay == 0 || st.count == 0)
+        return -1;
+
+    *drift = delay;
     return 0;
 }
 
