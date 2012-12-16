@@ -1,7 +1,8 @@
 /*****************************************************************************
  * audioqueue.c : AudioQueue audio output plugin for vlc
  *****************************************************************************
- * Copyright (C) 2010 VideoLAN and AUTHORS
+ * Copyright (C) 2010-2012 VLC authors and VideoLAN
+ * $Id$
  *
  * Authors: Romain Goyet <romain.goyet@likid.org>
  *          Felix Paul Kühne <fkuehne@videolan.org>
@@ -50,32 +51,32 @@ struct aout_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Open               ( vlc_object_t * );
-static void Close              ( vlc_object_t * );
-static void Play               ( audio_output_t *, block_t * );
-static void Pause              ( audio_output_t *p_aout, bool pause, mtime_t date );
-static void Flush              ( audio_output_t *p_aout, bool wait );
-static int TimeGet             ( audio_output_t *aout, mtime_t * );
+static int  Open               (vlc_object_t *);
+static void Close              (vlc_object_t *);
+static void Play               (audio_output_t *, block_t *);
+static void Pause              (audio_output_t *p_aout, bool pause, mtime_t date);
+static void Flush              (audio_output_t *p_aout, bool wait);
+static int  TimeGet            (audio_output_t *aout, mtime_t *);
 static void AudioQueueCallback (void *, AudioQueueRef, AudioQueueBufferRef);
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
-set_shortname( "AudioQueue" )
-set_description( N_("AudioQueue (iOS / Mac OS) audio output") )
-set_capability( "audio output", 40 )
-set_category( CAT_AUDIO )
-set_subcategory( SUBCAT_AUDIO_AOUT )
-add_shortcut( "audioqueue" )
-set_callbacks( Open, Close )
+set_shortname("AudioQueue")
+set_description(N_("AudioQueue (iOS / Mac OS) audio output"))
+set_capability("audio output", 40)
+set_category(CAT_AUDIO)
+set_subcategory(SUBCAT_AUDIO_AOUT)
+add_shortcut("audioqueue")
+set_callbacks(Open, Close)
 vlc_module_end ()
 
 /*****************************************************************************
  * Start: open the audio device
  *****************************************************************************/
 
-static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
+static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t *p_sys = p_aout->sys;
     OSStatus status = 0;
@@ -95,7 +96,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     // Create a new output AudioQueue for the device.
     status = AudioQueueNewOutput(&deviceFormat,         // Format
                                  AudioQueueCallback,    // Callback
-                                 NULL,                // User data, passed to the callback
+                                 NULL,                  // User data, passed to the callback
                                  CFRunLoopGetMain(),    // RunLoop
                                  kCFRunLoopDefaultMode, // RunLoop mode
                                  0,                     // Flags ; must be zero (per documentation)...
@@ -128,7 +129,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
  * Stop: close the audio device
  *****************************************************************************/
 
-static void Stop ( audio_output_t *p_aout )
+static void Stop (audio_output_t *p_aout)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
 
@@ -144,23 +145,23 @@ static void Stop ( audio_output_t *p_aout )
 
 static void Play (audio_output_t *p_aout, block_t *p_block)
 {
-    if ( p_block != NULL ) {
+    if (p_block != NULL) {
         AudioQueueBufferRef inBuffer = NULL;
         OSStatus status;
 
         status = AudioQueueAllocateBuffer(p_aout->sys->audioQueue, FRAME_SIZE * 2, &inBuffer);
         if (status != noErr) {
-            msg_Err( p_aout, "buffer alloction failed (%i)", status);
+            msg_Err(p_aout, "buffer alloction failed (%i)", status);
             return;
         }
 
-        memcpy( inBuffer->mAudioData, p_block->p_buffer, p_block->i_buffer );
+        memcpy(inBuffer->mAudioData, p_block->p_buffer, p_block->i_buffer);
         inBuffer->mAudioDataByteSize = p_block->i_buffer;
-        block_Release( p_block );
+        block_Release(p_block);
 
         status = AudioQueueEnqueueBuffer(p_aout->sys->audioQueue, inBuffer, 0, NULL);
         if (status != noErr)
-            msg_Err( p_aout, "enqueuing buffer failed (%i)", status);
+            msg_Err(p_aout, "enqueuing buffer failed (%i)", status);
     }
 }
 
@@ -174,27 +175,27 @@ void AudioQueueCallback(void * inUserData, AudioQueueRef inAQ, AudioQueueBufferR
 
 static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
 {
-    VLC_UNUSED( date );
+    VLC_UNUSED(date);
 
     if (pause)
-        AudioQueuePause( p_aout->sys->audioQueue );
+        AudioQueuePause(p_aout->sys->audioQueue);
     else
-        AudioQueueStart( p_aout->sys->audioQueue, NULL );
+        AudioQueueStart(p_aout->sys->audioQueue, NULL);
 }
 
 static void Flush (audio_output_t *p_aout, bool wait)
 {
-    VLC_UNUSED( wait );
+    VLC_UNUSED(wait);
 
-    AudioQueueFlush( p_aout->sys->audioQueue );
+    AudioQueueFlush(p_aout->sys->audioQueue);
 }
 
 static int TimeGet (audio_output_t *p_aout, mtime_t *restrict delay)
 {
     // TODO
 
-    VLC_UNUSED( p_aout );
-    VLC_UNUSED( delay );
+    VLC_UNUSED(p_aout);
+    VLC_UNUSED(delay);
 
     return -1;
 }
@@ -214,7 +215,6 @@ static int Open(vlc_object_t *obj)
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
-    aout->play = Play;
 
     return VLC_SUCCESS;
 }
