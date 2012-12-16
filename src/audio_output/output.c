@@ -362,6 +362,55 @@ int aout_MuteSet (audio_output_t *aout, bool mute)
 }
 
 /**
+ * Gets the currently selected device.
+ * \return the selected device ID (caller must free() it)
+ *         NULL if no device is selected or in case of error.
+ */
+char *aout_DeviceGet (audio_output_t *aout)
+{
+    return var_GetNonEmptyString (aout, "device");
+}
+
+/**
+ * Selects an audio output device.
+ * \param id device ID to select, or NULL for the default device
+ * \return zero on success, non-zero on error.
+ */
+int aout_DeviceSet (audio_output_t *aout, const char *id)
+{
+    int ret = -1;
+
+    aout_lock (aout);
+    if (aout->device_select != NULL)
+        ret = aout->device_select (aout, id);
+    aout_unlock (aout);
+    return ret;
+}
+
+/**
+ * Enumerates possible audio output devices.
+ *
+ * The function will heap-allocate two tables of heap-allocated strings;
+ * the caller is responsible for freeing all strings and both tables.
+ *
+ * \param ids pointer to a table of device identifiers [OUT]
+ * \param names pointer to a table of device human-readable descriptions [OUT]
+ * \return the number of devices, or negative on error.
+ * \note In case of error, *ids and *names are undefined.
+ */
+int aout_DevicesList (audio_output_t *aout, char ***ids, char ***names)
+{
+    int ret = -1;
+
+    aout_lock (aout);
+    if (aout->device_enum != NULL)
+        ret = aout->device_enum (aout, ids, names);
+    aout_unlock (aout);
+    return ret;
+}
+
+
+/**
  * Starts an audio output stream.
  * \param fmt audio output stream format [IN/OUT]
  * \warning The caller must hold the audio output lock.

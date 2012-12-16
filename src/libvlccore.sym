@@ -14,6 +14,9 @@ aout_VolumeGet
 aout_VolumeSet
 aout_MuteSet
 aout_MuteGet
+aout_DeviceGet
+aout_DeviceSet
+aout_DevicesList
 block_Alloc
 block_FifoCount
 block_FifoEmpty

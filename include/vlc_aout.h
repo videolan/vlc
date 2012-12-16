@@ -277,6 +277,9 @@ VLC_API float aout_VolumeGet (audio_output_t *);
 VLC_API int aout_VolumeSet (audio_output_t *, float);
 VLC_API int aout_MuteGet (audio_output_t *);
 VLC_API int aout_MuteSet (audio_output_t *, bool);
+VLC_API char *aout_DeviceGet (audio_output_t *);
+VLC_API int aout_DeviceSet (audio_output_t *, const char *);
+VLC_API int aout_DevicesList (audio_output_t *, char ***, char ***);
 
 /**
  * Report change of configured audio volume to the core and UI.
