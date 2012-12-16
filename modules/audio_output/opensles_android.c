@@ -51,6 +51,7 @@
 #define Enqueue(a, b, c) (*a)->Enqueue(a, b, c)
 #define Clear(a) (*a)->Clear(a)
 #define GetState(a, b) (*a)->GetState(a, b)
+#define SetPositionUpdatePeriod(a, b) (*a)->SetPositionUpdatePeriod(a, b)
 
 /*****************************************************************************
  * aout_sys_t: audio output method descriptor
@@ -415,6 +416,8 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     p_aout->play               = Play;
     p_aout->pause              = Pause;
     p_aout->flush              = Flush;
+
+    SetPositionUpdatePeriod( p_sys->playerPlay, AOUT_MIN_PREPARE_TIME * 1000 / CLOCK_FREQ);
 
     aout_FormatPrepare( fmt );
 
