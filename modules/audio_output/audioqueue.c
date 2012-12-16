@@ -98,7 +98,7 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
                                  AudioQueueCallback,    // Callback
                                  NULL,                  // User data, passed to the callback
                                  CFRunLoopGetMain(),    // RunLoop
-                                 kCFRunLoopDefaultMode, // RunLoop mode
+                                 kCFRunLoopCommonModes, // RunLoop mode
                                  0,                     // Flags ; must be zero (per documentation)...
                                  &(p_sys->audioQueue)); // Output
 
