@@ -46,6 +46,7 @@
 struct aout_sys_t
 {
     AudioQueueRef audioQueue;
+    bool          b_stopped;
 };
 
 /*****************************************************************************
@@ -111,6 +112,8 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     fmt->i_rate = 44100;
     aout_FormatPrepare(fmt);
 
+    p_aout->sys->b_stopped = false;
+
     status = AudioQueueStart(p_sys->audioQueue, NULL);
     msg_Dbg(p_aout, "Starting AudioQueue (status = %i)", status);
 
@@ -131,12 +134,12 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
 static void Stop (audio_output_t *p_aout)
 {
-    struct aout_sys_t * p_sys = p_aout->sys;
+    p_aout->sys->b_stopped = true;
 
     msg_Dbg(p_aout, "Stopping AudioQueue");
-    AudioQueueStop(p_sys->audioQueue, false);
+    AudioQueueStop(p_aout->sys->audioQueue, true);
     msg_Dbg(p_aout, "Disposing AudioQueue");
-    AudioQueueDispose(p_sys->audioQueue, false);
+    AudioQueueDispose(p_aout->sys->audioQueue, true);
 }
 
 /*****************************************************************************
@@ -185,9 +188,13 @@ static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
 
 static void Flush (audio_output_t *p_aout, bool wait)
 {
-    VLC_UNUSED(wait);
+    if (p_aout->sys->b_stopped || !p_aout->sys->audioQueue)
+        return;
 
-    AudioQueueFlush(p_aout->sys->audioQueue);
+    if (wait)
+        AudioQueueFlush(p_aout->sys->audioQueue);
+    else
+        AudioQueueReset(p_aout->sys->audioQueue);
 }
 
 static int TimeGet (audio_output_t *p_aout, mtime_t *restrict delay)
@@ -222,6 +229,7 @@ static int Open(vlc_object_t *obj)
 static void Close(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
+    msg_Dbg( aout, "audioqueue: Close");
     aout_sys_t *sys = aout->sys;
 
     free(sys);
