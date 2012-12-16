@@ -35,6 +35,7 @@
 #include <vlc_aout.h>
 #include <assert.h>
 #include <dlfcn.h>
+#include <math.h>
 
 // For native audio
 #include <SLES/OpenSLES.h>
@@ -52,6 +53,8 @@
 #define Clear(a) (*a)->Clear(a)
 #define GetState(a, b) (*a)->GetState(a, b)
 #define SetPositionUpdatePeriod(a, b) (*a)->SetPositionUpdatePeriod(a, b)
+#define SetVolumeLevel(a, b) (*a)->SetVolumeLevel(a, b)
+#define SetMute(a, b) (*a)->SetMute(a, b)
 
 /*****************************************************************************
  * aout_sys_t: audio output method descriptor
@@ -65,6 +68,7 @@ struct aout_sys_t
     SLObjectItf                     outputMixObject;
     SLAndroidSimpleBufferQueueItf   playerBufferQueue;
     SLObjectItf                     playerObject;
+    SLVolumeItf                     volumeItf;
 
     SLPlayItf                       playerPlay;
 
@@ -153,6 +157,28 @@ static void Flush(audio_output_t *p_aout, bool drain)
 
         vlc_mutex_unlock( &p_sys->lock );
     }
+}
+
+static int VolumeSet(audio_output_t *aout, float vol)
+{
+    /* Convert UI volume to linear factor (cube) */
+    vol = vol * vol * vol;
+
+    /* millibels from linear amplification */
+    int mb = lroundf(2000.f * log10f(vol));
+    if (mb < SL_MILLIBEL_MIN)
+        mb = SL_MILLIBEL_MIN;
+    else if (mb > 0)
+        mb = 0; /* maximum supported level could be higher: GetMaxVolumeLevel */
+
+    SLresult r = SetVolumeLevel(aout->sys->volumeItf, mb);
+    return (r == SL_RESULT_SUCCESS) ? 0 : -1;
+}
+
+static int MuteSet(audio_output_t *aout, bool mute)
+{
+    SLresult r = SetMute(aout->sys->volumeItf, mute);
+    return (r == SL_RESULT_SUCCESS) ? 0 : -1;
 }
 
 static void Pause(audio_output_t *p_aout, bool pause, mtime_t date)
@@ -388,8 +414,8 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     SLDataSink audioSnk = {&loc_outmix, NULL};
 
     //create audio player
-    const SLInterfaceID ids2[] = { *SL_IID_ANDROIDSIMPLEBUFFERQUEUE };
-    static const SLboolean req2[] = { SL_BOOLEAN_TRUE };
+    const SLInterfaceID ids2[] = { *SL_IID_ANDROIDSIMPLEBUFFERQUEUE, *SL_IID_VOLUME };
+    static const SLboolean req2[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
     result = CreateAudioPlayer( engineEngine, &p_sys->playerObject, &audioSrc,
                                     &audioSnk, sizeof( ids2 ) / sizeof( *ids2 ),
                                     ids2, req2 );
@@ -401,6 +427,9 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     result = GetInterface( p_sys->playerObject, *SL_IID_PLAY, &p_sys->playerPlay );
     CHECK_OPENSL_ERROR( "Failed to get player interface." );
 
+    result = GetInterface( p_sys->playerObject, *SL_IID_VOLUME, &p_sys->volumeItf );
+    CHECK_OPENSL_ERROR( "failed to get volume interface." );
+
     result = GetInterface( p_sys->playerObject, *SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
                                                   &p_sys->playerBufferQueue );
     CHECK_OPENSL_ERROR( "Failed to get buff queue interface" );
@@ -408,7 +437,6 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     result = RegisterCallback( p_sys->playerBufferQueue, PlayedCallback,
                                    (void*)p_aout);
     CHECK_OPENSL_ERROR( "Failed to register buff queue callback." );
-
 
     // set the player's state to playing
     result = SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_PLAYING );
@@ -426,6 +454,8 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     p_aout->play               = Play;
     p_aout->pause              = Pause;
     p_aout->flush              = Flush;
+    p_aout->mute_set           = MuteSet;
+    p_aout->volume_set         = VolumeSet;
 
     SetPositionUpdatePeriod( p_sys->playerPlay, AOUT_MIN_PREPARE_TIME * 1000 / CLOCK_FREQ);
 

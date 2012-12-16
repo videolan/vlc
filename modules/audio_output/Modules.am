@@ -1,13 +1,17 @@
 SOURCES_waveout = waveout.c windows_audio_common.h packet.c
 SOURCES_auhal = TPCircularBuffer.h TPCircularBuffer.c auhal.c packet.c
 SOURCES_audioqueue = audioqueue.c packet.c
-SOURCES_opensles_android = opensles_android.c
+
+libopensles_android_plugin_la_SOURCES = opensles_android.c
+libopensles_android_plugin_la_CFLAGS = $(AM_CFLAGS)
+libopensles_android_plugin_la_LIBADD = $(AM_LIBADD) -ldl -lm
 
 libandroid_audiotrack_plugin_la_SOURCES = audiotrack.c
 libandroid_audiotrack_plugin_la_CFLAGS = $(AM_CFLAGS)
 libandroid_audiotrack_plugin_la_LIBADD = $(AM_LIBADD) -ldl
+
 if HAVE_ANDROID
-libvlc_LTLIBRARIES += libandroid_audiotrack_plugin.la
+libvlc_LTLIBRARIES += libandroid_audiotrack_plugin.la libopensles_android_plugin.la
 endif
 
 libadummy_plugin_la_SOURCES = adummy.c
