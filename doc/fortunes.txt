@@ -983,3 +983,13 @@ reactor leaks ionizing radiations."
 < TypX> finally { featureit(); }
  -- #videolan
 %
+< courmisch> OSS needs an open device to enumerate devices.
+< courmisch> Because whenever something does not make sense, OSS does it.
+< courmisch> For further informations, refer to the chicken-and-egg problem.
+< funman> you never had to do with the french administration did you? :P
+< courmisch> no but the Finnish immigration process:
+< courmisch> work contract needs tax card
+< courmisch> tax card need residence registration
+< courmisch> residence registration needs work contract
+ -- #videolan, or why OSS is worse than Government administrations
+%
