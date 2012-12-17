@@ -47,8 +47,10 @@ struct aout_sys_t
     uint8_t chans_table[AOUT_CHAN_MAX]; /**< Channels order table */
     uint8_t chans_to_reorder; /**< Number of channels to reorder */
     uint8_t bits; /**< Bits per sample per channel */
+
     bool soft_mute;
     float soft_gain;
+    char *device;
 };
 
 #include "volume.h"
@@ -299,12 +301,6 @@ static void Flush (audio_output_t *, bool);
 static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t *sys = aout->sys;
-
-    /* Get device name */
-    char *device = var_InheritString (aout, "alsa-audio-device");
-    if (unlikely(device == NULL))
-        return VLC_ENOMEM;
-
     snd_pcm_format_t pcm_format; /* ALSA sample format */
     bool spdif = false;
 
@@ -379,9 +375,9 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
             }
     }
 
-    /* Choose the IEC device for S/PDIF output:
-       if the device is overridden by the user then it will be the one.
-       Otherwise we compute the default device based on the output format. */
+    const char *device = sys->device;
+    char *devbuf = NULL;
+    /* Choose the IEC device for S/PDIF output */
     if (spdif && !strcmp (device, "default"))
     {
         unsigned aes3;
@@ -400,13 +396,13 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
                 break;
         }
 
-        free (device);
-        if (asprintf (&device,
+        if (asprintf (&devbuf,
                       "iec958:AES0=0x%x,AES1=0x%x,AES2=0x%x,AES3=0x%x",
                       IEC958_AES0_CON_EMPHASIS_NONE | IEC958_AES0_NONAUDIO,
                       IEC958_AES1_CON_ORIGINAL | IEC958_AES1_CON_PCM_CODER,
                       0, aes3) == -1)
             return VLC_ENOMEM;
+        device = devbuf;
     }
 
     /* Open the device */
@@ -415,22 +411,20 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     const int mode = SND_PCM_NO_AUTO_RESAMPLE;
 
     int val = snd_pcm_open (&pcm, device, SND_PCM_STREAM_PLAYBACK, mode);
+    free (devbuf);
     if (val != 0)
     {
-        msg_Err (aout, "cannot open ALSA device \"%s\": %s", device,
+        msg_Err (aout, "cannot open ALSA device \"%s\": %s", sys->device,
                  snd_strerror (val));
         dialog_Fatal (aout, _("Audio output failed"),
                       _("The audio device \"%s\" could not be used:\n%s."),
-                      device, snd_strerror (val));
-        free (device);
+                      sys->device, snd_strerror (val));
         return VLC_EGENERIC;
     }
     sys->pcm = pcm;
 
     /* Print some potentially useful debug */
-    msg_Dbg (aout, "using ALSA device: %s", device);
-    aout_DeviceReport (aout, device);
-    free (device);
+    msg_Dbg (aout, "using ALSA device: %s", sys->device);
     DumpDevice (VLC_OBJECT(aout), pcm);
 
     /* Get Initial hardware parameters */
@@ -623,7 +617,6 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
 error:
     snd_pcm_close (pcm);
-    free (device);
     return VLC_EGENERIC;
 }
 
@@ -788,10 +781,15 @@ static int DevicesEnum (audio_output_t *aout, char ***idp, char ***namep)
 
 static int DeviceSelect (audio_output_t *aout, const char *id)
 {
-    if (!var_Type (aout, "alsa-audio-device"))
-        var_Create (aout, "alsa-audio-device", VLC_VAR_STRING);
-    var_SetString (aout, "alsa-audio-device", id);
+    aout_sys_t *sys = aout->sys;
 
+    char *device = strdup (id ? id : "default");
+    if (unlikely(device == NULL))
+        return -1;
+
+    free (sys->device);
+    sys->device = device;
+    aout_DeviceReport (aout, device);
     aout_RestartRequest (aout, AOUT_RESTART_OUTPUT);
     return 0;
 }
@@ -803,13 +801,21 @@ static int Open(vlc_object_t *obj)
 
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
+    sys->device = var_InheritString (aout, "alsa-audio-device");
+    if (unlikely(sys->device == NULL))
+        goto error;
+
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
     aout_SoftVolumeInit (aout);
     aout->device_enum = DevicesEnum;
     aout->device_select = DeviceSelect;
+    aout_DeviceReport (aout, sys->device);
     return VLC_SUCCESS;
+error:
+    free (sys);
+    return VLC_ENOMEM;
 }
 
 static void Close(vlc_object_t *obj)
@@ -817,5 +823,6 @@ static void Close(vlc_object_t *obj)
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
 
-    free(sys);
+    free (sys->device);
+    free (sys);
 }
