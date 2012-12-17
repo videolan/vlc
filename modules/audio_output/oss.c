@@ -89,7 +89,7 @@ static int DeviceChanged (vlc_object_t *obj, const char *varname,
     if (!var_Type (obj, "oss-audio-device"))
         var_Create (obj, "oss-audio-device", VLC_VAR_STRING);
     var_SetString (obj, "oss-audio-device", cur.psz_string);
-    aout_RestartRequest ((audio_output_t *)aout, AOUT_RESTART_OUTPUT);
+    aout_RestartRequest ((audio_output_t *)obj, AOUT_RESTART_OUTPUT);
     return VLC_SUCCESS;
 }
 
