@@ -53,13 +53,16 @@
 struct aout_sys_t
 {
     int fd;
-    uint8_t level;
-    bool mute;
-    bool starting;
     audio_sample_format_t format;
+    bool starting;
+
+    bool mute;
+    uint8_t level;
+    char *device;
 };
 
 static int Open (vlc_object_t *);
+static void Close (vlc_object_t *);
 
 #define AUDIO_DEV_TEXT N_("Audio output device")
 #define AUDIO_DEV_LONGTEXT N_("OSS device node path.")
@@ -72,7 +75,7 @@ vlc_module_begin ()
     add_string ("oss-audio-device", "",
                 AUDIO_DEV_TEXT, AUDIO_DEV_LONGTEXT, false)
     set_capability( "audio output", 100 )
-    set_callbacks (Open, NULL)
+    set_callbacks (Open, Close)
 vlc_module_end ()
 
 static int TimeGet (audio_output_t *, mtime_t *);
@@ -80,42 +83,26 @@ static void Play (audio_output_t *, block_t *);
 static void Pause (audio_output_t *, bool, mtime_t);
 static void Flush (audio_output_t *, bool);
 static int VolumeSync (audio_output_t *);
-static int VolumeSet (audio_output_t *, float);
-static int MuteSet (audio_output_t *, bool);
-
-static int DeviceChanged (vlc_object_t *obj, const char *varname,
-                          vlc_value_t prev, vlc_value_t cur, void *data)
-{
-    if (!var_Type (obj, "oss-audio-device"))
-        var_Create (obj, "oss-audio-device", VLC_VAR_STRING);
-    var_SetString (obj, "oss-audio-device", cur.psz_string);
-    aout_RestartRequest ((audio_output_t *)obj, AOUT_RESTART_OUTPUT);
-    return VLC_SUCCESS;
-}
 
 static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t* sys = aout->sys;
 
     /* Open the device */
-    const char *device;
-    char *devicebuf = var_InheritString (aout, "oss-audio-device");
-    device = devicebuf;
+    const char *device = sys->device;
     if (device == NULL)
         device = getenv ("OSS_AUDIODEV");
     if (device == NULL)
         device = "/dev/dsp";
 
-    msg_Dbg (aout, "using OSS device: %s", device);
-
     int fd = vlc_open (device, O_WRONLY);
     if (fd == -1)
     {
         msg_Err (aout, "cannot open OSS device %s: %m", device);
-        free (devicebuf);
         return VLC_EGENERIC;
     }
     sys->fd = fd;
+    msg_Dbg (aout, "using OSS device: %s", device);
 
     /* Select audio format */
     int format;
@@ -223,8 +210,6 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
-    aout->volume_set = NULL;
-    aout->mute_set = NULL;
 
     if (spdif)
     {
@@ -236,80 +221,15 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         fmt->i_rate = rate;
         fmt->i_original_channels =
         fmt->i_physical_channels = channels;
-
-        sys->level = 100;
-        sys->mute = false;
-        if (VolumeSync (aout) == 0)
-        {
-            aout->volume_set = VolumeSet;
-            aout->mute_set = MuteSet;
-        }
     }
+
+    VolumeSync (aout):
     sys->starting = true;
-
-    /* Build the devices list */
-    var_Create (aout, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
-    var_SetString (aout, "audio-device", device);
-    var_AddCallback (aout, "audio-device", DeviceChanged, NULL);
-
-    oss_sysinfo si;
-    if (ioctl (fd, SNDCTL_SYSINFO, &si) >= 0)
-    {
-        vlc_value_t val, text;
-
-        text.psz_string = _("Audio Device");
-        var_Change (aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL);
-
-        msg_Dbg (aout, "using %s version %s (0x%06X) under %s", si.product,
-                 si.version, si.versionnum, si.license);
-
-        for (int i = 0; i < si.numaudios; i++)
-        {
-            oss_audioinfo ai = { .dev = i };
-
-            if (ioctl (fd, SNDCTL_AUDIOINFO, &ai) < 0)
-            {
-                msg_Warn (aout, "cannot get device %d infos: %m", i);
-                continue;
-            }
-            if (ai.caps & (PCM_CAP_HIDDEN|PCM_CAP_MODEM))
-                continue;
-            if (!(ai.caps & PCM_CAP_OUTPUT))
-                continue;
-            if (!ai.enabled)
-                continue;
-
-            val.psz_string = ai.devnode;
-            text.psz_string = ai.name;
-            var_Change (aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text);
-        }
-    }
-
     sys->format = *fmt;
-
-    free (devicebuf);
     return VLC_SUCCESS;
 error:
-    free (sys);
     close (fd);
-    free (devicebuf);
     return VLC_EGENERIC;
-}
-
-/**
- * Releases the audio output.
- */
-static void Stop (audio_output_t *aout)
-{
-    aout_sys_t *sys = aout->sys;
-    int fd = sys->fd;
-
-    var_DelCallback (aout, "audio-device", DeviceChanged, NULL);
-    var_Destroy (aout, "audio-device");
-
-    ioctl (fd, SNDCTL_DSP_HALT, NULL);
-    close (fd);
-    free (sys);
 }
 
 static int TimeGet (audio_output_t *aout, mtime_t *restrict pts)
@@ -395,6 +315,19 @@ static int VolumeSync (audio_output_t *aout)
     return 0;
 }
 
+/**
+ * Releases the audio output device.
+ */
+static void Stop (audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+    int fd = sys->fd;
+
+    ioctl (fd, SNDCTL_DSP_HALT, NULL);
+    close (fd);
+    sys->fd = -1;
+}
+
 static int VolumeSet (audio_output_t *aout, float vol)
 {
     aout_sys_t *sys = aout->sys;
@@ -433,6 +366,71 @@ static int MuteSet (audio_output_t *aout, bool mute)
     return 0;
 }
 
+static int DevicesEnum (audio_output_t *aout, char ***idp, char ***namep)
+{
+    aout_sys_t *sys = sys;
+    int fd = sys->fd;
+    oss_sysinfo si;
+
+    if (fd == -1)
+        return -1;
+    if (ioctl (fd, SNDCTL_SYSINFO, &si) < 0)
+    {
+        msg_Err (aout, "cannot get system infos: %m");
+        return -1;
+    }
+
+    msg_Dbg (aout, "using %s version %s (0x%06X) under %s", si.product,
+             si.version, si.versionnum, si.license);
+
+    char **ids = xmalloc (sizeof (*ids) * si.numaudios);
+    char **names = xmalloc (sizeof (*names) * si.numaudios);
+    int n = 0;
+
+    for (int i = 0; i < si.numaudios; i++)
+    {
+        oss_audioinfo ai = { .dev = i };
+
+        if (ioctl (fd, SNDCTL_AUDIOINFO, &ai) < 0)
+        {
+            msg_Warn (aout, "cannot get device %d infos: %m", i);
+            continue;
+        }
+        if (ai.caps & (PCM_CAP_HIDDEN|PCM_CAP_MODEM))
+            continue;
+        if (!(ai.caps & PCM_CAP_OUTPUT))
+            continue;
+        if (!ai.enabled)
+            continue;
+
+        ids[n] = xstrdup (ai.devnode);
+        names[n] = xstrdup (ai.name);
+        n++;
+    }
+    *idp = ids;
+    *namep = names;
+    return n;
+}
+
+static int DeviceSelect (audio_output_t *aout, const char *id)
+{
+    aout_sys_t *sys = aout->sys;
+    char *path = NULL;
+
+    if (id != NULL)
+    {
+        path = strdup (id);
+        if (unlikely(path == NULL))
+            return -1;
+    }
+
+    free (sys->device);
+    sys->device = path;
+    aout_DeviceReport (aout, path);
+    aout_RestartRequest (aout, AOUT_RESTART_OUTPUT);
+    return 0;
+}
+
 static int Open (vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
@@ -441,9 +439,27 @@ static int Open (vlc_object_t *obj)
     if(unlikely( sys == NULL ))
         return VLC_ENOMEM;
 
-    /* FIXME: set volume/mute here */
+    sys->fd = -1;
+
+    sys->level = 100;
+    sys->mute = false;
+    sys->device = var_InheritString (aout, "oss-audio-device");
+
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
+    aout->volume_set = VolumeSet;
+    aout->mute_set = MuteSet;
+    aout->device_enum = DevicesEnum;
+    aout->device_select = DeviceSelect;
     return VLC_SUCCESS;
+}
+
+static void Close (vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = aout->sys;
+
+    free (sys->device);
+    free (sys);
 }
