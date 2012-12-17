@@ -130,6 +130,12 @@ static bool IsRemote (const char *path)
 # define posix_fadvise(fd, off, len, adv)
 #endif
 
+static ssize_t FileRead (access_t *, uint8_t *, size_t);
+static int FileSeek (access_t *, uint64_t);
+static ssize_t StreamRead (access_t *, uint8_t *, size_t);
+static int NoSeek (access_t *, uint64_t);
+static int FileControl (access_t *, int, va_list);
+
 /*****************************************************************************
  * FileOpen: open the file
  *****************************************************************************/
@@ -213,25 +219,19 @@ int FileOpen( vlc_object_t *p_this )
     if (unlikely(p_sys == NULL))
         goto error;
     access_InitFields (p_access);
-    p_access->pf_read = FileRead;
     p_access->pf_block = NULL;
     p_access->pf_control = FileControl;
-    p_access->pf_seek = FileSeek;
     p_access->p_sys = p_sys;
     p_sys->i_nb_reads = 0;
     p_sys->fd = fd;
-    p_sys->b_pace_control = true;
 
-    if (S_ISREG (st.st_mode))
+    if (S_ISREG (st.st_mode) || S_ISBLK (st.st_mode))
+    {
+        p_access->pf_read = FileRead;
+        p_access->pf_seek = FileSeek;
         p_access->info.i_size = st.st_size;
-    else if (!S_ISBLK (st.st_mode))
-    {
-        p_access->pf_seek = NoSeek;
-        p_sys->b_pace_control = strcasecmp (p_access->psz_access, "stream");
-    }
+        p_sys->b_pace_control = true;
 
-    if (p_access->pf_seek != NoSeek)
-    {
         /* Demuxers will need the beginning of the file for probing. */
         posix_fadvise (fd, 0, 4096, POSIX_FADV_WILLNEED);
         /* In most cases, we only read the file once. */
@@ -247,6 +247,13 @@ int FileOpen( vlc_object_t *p_this )
 # endif
 #endif
     }
+    else
+    {
+        p_access->pf_read = StreamRead;
+        p_access->pf_seek = NoSeek;
+        p_sys->b_pace_control = strcasecmp (p_access->psz_access, "stream");
+    }
+
     return VLC_SUCCESS;
 
 error:
@@ -276,46 +283,36 @@ void FileClose (vlc_object_t * p_this)
 
 #include <vlc_network.h>
 
-/*****************************************************************************
- * Read: standard read on a file descriptor.
- *****************************************************************************/
-ssize_t FileRead( access_t *p_access, uint8_t *p_buffer, size_t i_len )
+/**
+ * Reads from a regular file.
+ */
+static ssize_t FileRead (access_t *p_access, uint8_t *p_buffer, size_t i_len)
 {
     access_sys_t *p_sys = p_access->p_sys;
     int fd = p_sys->fd;
-    ssize_t i_ret;
+    ssize_t val = read (fd, p_buffer, i_len);
 
-#if !defined (WIN32) && !defined (__OS2__)
-    if (p_access->pf_seek == NoSeek)
-        i_ret = net_Read (p_access, fd, NULL, p_buffer, i_len, false);
-    else
-#endif
-        i_ret = read (fd, p_buffer, i_len);
-
-    if( i_ret < 0 )
+    if (val < 0)
     {
         switch (errno)
         {
             case EINTR:
             case EAGAIN:
-                break;
-
-            default:
-                msg_Err (p_access, "failed to read (%m)");
-                dialog_Fatal (p_access, _("File reading failed"),
-                              _("VLC could not read the file (%m)."));
-                p_access->info.b_eof = true;
-                return 0;
+                return -1;
         }
+
+        msg_Err (p_access, "read error: %m");
+        dialog_Fatal (p_access, _("File reading failed"),
+                      _("VLC could not read the file (%m)."));
+        val = 0;
     }
-    else if( i_ret > 0 )
-        p_access->info.i_pos += i_ret;
-    else
-        p_access->info.b_eof = true;
+
+    p_access->info.i_pos += val;
+    p_access->info.b_eof = !val;
 
     p_sys->i_nb_reads++;
 
-    if ((p_access->info.i_size && !(p_sys->i_nb_reads % INPUT_FSTAT_NB_READS))
+    if (!(p_sys->i_nb_reads % INPUT_FSTAT_NB_READS)
      || (p_access->info.i_pos > p_access->info.i_size))
     {
         struct stat st;
@@ -327,14 +324,14 @@ ssize_t FileRead( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             p_access->info.i_update |= INPUT_UPDATE_SIZE;
         }
     }
-    return i_ret;
+    return val;
 }
 
 
 /*****************************************************************************
  * Seek: seek to a specific location in a file
  *****************************************************************************/
-int FileSeek (access_t *p_access, uint64_t i_pos)
+static int FileSeek (access_t *p_access, uint64_t i_pos)
 {
     p_access->info.i_pos = i_pos;
     p_access->info.b_eof = false;
@@ -343,7 +340,38 @@ int FileSeek (access_t *p_access, uint64_t i_pos)
     return VLC_SUCCESS;
 }
 
-int NoSeek (access_t *p_access, uint64_t i_pos)
+/**
+ * Reads from a non-seekable file.
+ */
+static ssize_t StreamRead (access_t *p_access, uint8_t *p_buffer, size_t i_len)
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    int fd = p_sys->fd;
+
+#if !defined (WIN32) && !defined (__OS2__)
+    ssize_t val = net_Read (p_access, fd, NULL, p_buffer, i_len, false);
+#else
+    ssize_t val = read (fd, p_buffer, i_len);
+#endif
+
+    if (val < 0)
+    {
+        switch (errno)
+        {
+            case EINTR:
+            case EAGAIN:
+                return -1;
+        }
+        msg_Err (p_access, "read error: %m");
+        val = 0;
+    }
+
+    p_access->info.i_pos += val;
+    p_access->info.b_eof = !val;
+    return val;
+}
+
+static int NoSeek (access_t *p_access, uint64_t i_pos)
 {
     /* assert(0); ?? */
     (void) p_access; (void) i_pos;
@@ -353,7 +381,7 @@ int NoSeek (access_t *p_access, uint64_t i_pos)
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-int FileControl( access_t *p_access, int i_query, va_list args )
+static int FileControl( access_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
     bool    *pb_bool;

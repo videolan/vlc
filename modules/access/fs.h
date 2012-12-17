@@ -22,11 +22,6 @@
 
 int FileOpen (vlc_object_t *);
 void FileClose (vlc_object_t *);
-int NoSeek (access_t *, uint64_t);
-
-ssize_t FileRead (access_t *, uint8_t *, size_t);
-int FileSeek (access_t *, uint64_t);
-int FileControl (access_t *, int, va_list);
 
 int DirOpen (vlc_object_t *);
 int DirInit (access_t *p_access, DIR *handle);
