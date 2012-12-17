@@ -702,13 +702,11 @@ static int ExecuteMediaProperty( vlm_t *p_vlm, int64_t id, bool b_new,
         }
         else if( !strcmp( psz_option, "inputdeln" ) )
         {
-            int i_index;
-
             MISSING( "inputdeln" );
  
-            i_index = atoi( psz_value );
-            if( i_index > 0 && i_index <= p_cfg->i_input )
-                TAB_REMOVE( p_cfg->i_input, p_cfg->ppsz_input, p_cfg->ppsz_input[i_index-1] );
+            int idx = atoi( psz_value );
+            if( idx > 0 && idx <= p_cfg->i_input )
+                TAB_REMOVE( p_cfg->i_input, p_cfg->ppsz_input, p_cfg->ppsz_input[idx-1] );
             i++;
         }
         else if( !strcmp( psz_option, "output" ) )

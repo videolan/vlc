@@ -1439,9 +1439,10 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
             for( int i = 0; i < p_rtsp->i_es; i++ )
             {
-                if( p_rtsp->es[i]->p_media_es == p_es )
+                rtsp_client_es_t *es = p_rtsp->es[i];
+                if( es->p_media_es == p_es )
                 {
-                    TAB_REMOVE( p_rtsp->i_es, p_rtsp->es, p_rtsp->es[i] );
+                    TAB_REMOVE( p_rtsp->i_es, p_rtsp->es, es );
                     break;
                 }
             }
