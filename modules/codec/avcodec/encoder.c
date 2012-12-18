@@ -296,9 +296,6 @@ int OpenEncoder( vlc_object_t *p_this )
     p_enc->p_sys = p_sys;
     p_sys->p_codec = p_codec;
 
-    p_enc->pf_encode_video = EncodeVideo;
-    p_enc->pf_encode_audio = EncodeAudio;
-
     p_sys->p_buffer = NULL;
     p_sys->i_buffer_out = 0;
 
@@ -831,6 +828,9 @@ int OpenEncoder( vlc_object_t *p_this )
     }
 
     msg_Dbg( p_enc, "found encoder %s", psz_namecodec );
+    p_enc->pf_encode_video = EncodeVideo;
+    p_enc->pf_encode_audio = EncodeAudio;
+
 
     return VLC_SUCCESS;
 error:
