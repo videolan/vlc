@@ -97,7 +97,25 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
                  par.bits, par.bps);
         goto error;
     }
-
+    if (par.sig != (par.bits != 8))
+    {
+        msg_Err (obj, "unsupported audio sample format (%ssigned)",
+                 par.sig ? "" : "un");
+        goto error;
+    }
+#ifdef WORDS_BIGENDIAN
+    if (par.le)
+    {
+        msg_Err (obj, "unsupported audio sample format (little endian)");
+        goto error;
+    }
+#else
+    if (!par.le)
+    {
+        msg_Err (obj, "unsupported audio sample format (big endian)");
+        goto error;
+    }
+#endif
     switch (par.bits)
     {
         case 8:
