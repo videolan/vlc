@@ -101,7 +101,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     switch (par.bits)
     {
         case 8:
-            fmt->i_format = par.sig ? VLC_CODEC_S8 : VLC_CODEC_U8;
+            fmt->i_format = VLC_CODEC_U8;
             break;
         case 16:
             fmt->i_format = par.sig

@@ -178,17 +178,6 @@ static block_t *Filter(filter_t *filter, block_t *block)
 }
 
 /* */
-static block_t *S16toS8(filter_t *filter, block_t *b)
-{
-    VLC_UNUSED(filter);
-    int16_t *src = (int16_t *)b->p_buffer;
-    int8_t  *dst = (int8_t *)src;
-    for (int i = b->i_buffer / 2; i--;)
-        *dst++ = (*src++) >> 8;
-
-    b->i_buffer /= 2;
-    return b;
-}
 static block_t *S16toU8(filter_t *filter, block_t *b)
 {
     VLC_UNUSED(filter);
@@ -200,17 +189,7 @@ static block_t *S16toU8(filter_t *filter, block_t *b)
     b->i_buffer /= 2;
     return b;
 }
-static block_t *U16toS8(filter_t *filter, block_t *b)
-{
-    VLC_UNUSED(filter);
-    uint16_t *src = (uint16_t *)b->p_buffer;
-    int8_t   *dst = (int8_t *)src;
-    for (int i = b->i_buffer / 2; i--;)
-        *dst++ = ((int)(*src++) - 32768) >> 8;
 
-    b->i_buffer /= 2;
-    return b;
-}
 static block_t *U16toU8(filter_t *filter, block_t *b)
 {
     VLC_UNUSED(filter);
@@ -245,26 +224,6 @@ static block_t *U16toS16(filter_t *filter, block_t *b)
     return b;
 }
 
-static block_t *S8toU8(filter_t *filter, block_t *b)
-{
-    VLC_UNUSED(filter);
-    int8_t  *src = (int8_t *)b->p_buffer;
-    uint8_t *dst = (uint8_t *)src;
-    for (int i = b->i_buffer; i--;)
-        *dst++ = ((*src++) + 128);
-
-    return b;
-}
-static block_t *U8toS8(filter_t *filter, block_t *b)
-{
-    VLC_UNUSED(filter);
-    uint8_t *src = (uint8_t *)b->p_buffer;
-    int8_t  *dst = (int8_t *)src;
-    for (int i = b->i_buffer; i--;)
-        *dst++ = ((*src++) - 128);
-
-    return b;
-}
 static block_t *S24toS16(filter_t *filter, block_t *b)
 {
     VLC_UNUSED(filter);
@@ -387,13 +346,7 @@ static void X8toX16(block_t *bdst, const block_t *bsrc)
     for (int i = bsrc->i_buffer; i--;)
         *dst++ = (*src++) << 8;
 }
-static void S8toU16(block_t *bdst, const block_t *bsrc)
-{
-    int8_t   *src = (int8_t *)bsrc->p_buffer;
-    uint16_t *dst = (uint16_t *)bdst->p_buffer;
-    for (int i = bsrc->i_buffer; i--;)
-        *dst++ = ((*src++) + 128) << 8;
-}
+
 static void U8toS16(block_t *bdst, const block_t *bsrc)
 {
     uint8_t *src = (uint8_t *)bsrc->p_buffer;
@@ -474,16 +427,12 @@ static const struct {
     { VLC_CODEC_S32N, VLC_CODEC_S32N,   S32toS16 },
     { VLC_CODEC_FL32, VLC_CODEC_S16N,   Fl32toS16 },
 
-    { VLC_CODEC_S16N, VLC_CODEC_S8,     S16toS8 },
     { VLC_CODEC_S16N, VLC_CODEC_U8,     S16toU8 },
     { VLC_CODEC_S16N, VLC_CODEC_U16N,   S16toU16 },
 
-    { VLC_CODEC_U16N, VLC_CODEC_S8,     U16toS8 },
     { VLC_CODEC_U16N, VLC_CODEC_U8,     U16toU8 },
     { VLC_CODEC_U16N, VLC_CODEC_S16N,   U16toS16 },
 
-    { VLC_CODEC_U8,   VLC_CODEC_S8,     U8toS8 },
-    { VLC_CODEC_S8,   VLC_CODEC_U8,     S8toU8 },
     { 0, 0, NULL }
 };
 
@@ -497,9 +446,6 @@ static const struct {
     { VLC_CODEC_S16N, VLC_CODEC_S24N, S16toS24 },
     { VLC_CODEC_S16N, VLC_CODEC_S32N, S16toS32 },
     { VLC_CODEC_S16N, VLC_CODEC_FL32, S16toFl32 },
-
-    { VLC_CODEC_S8,   VLC_CODEC_S16N, X8toX16 },
-    { VLC_CODEC_S8,   VLC_CODEC_U16N, S8toU16 },
 
     { VLC_CODEC_U8,   VLC_CODEC_U16N, X8toX16 },
     { VLC_CODEC_U8,   VLC_CODEC_S16N, U8toS16 },

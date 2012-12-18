@@ -87,11 +87,10 @@ static void    Flush       ( audio_output_t *, bool );
 #define WAV_LONGTEXT N_("Instead of writing a raw file, you can add a WAV " \
                         "header to the file.")
 
-static const char *const format_list[] = { "u8", "s8", "u16", "s16", "u16_le",
+static const char *const format_list[] = { "u8", "u16", "s16", "u16_le",
                                      "s16_le", "u16_be", "s16_be",
                                      "float32", "spdif" };
 static const int format_int[] = { VLC_CODEC_U8,
-                                  VLC_CODEC_S8,
                                   VLC_CODEC_U16N, VLC_CODEC_S16N,
                                   VLC_CODEC_U16L,
                                   VLC_CODEC_S16L,
