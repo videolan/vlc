@@ -250,6 +250,10 @@ int transcode_audio_new( sout_stream_t *p_stream,
     id->p_encoder->fmt_in.audio.i_bitspersample =
         aout_BitsPerSample( id->p_encoder->fmt_in.i_codec );
 
+    id->p_encoder->fmt_out.i_codec =
+        vlc_fourcc_GetCodec( AUDIO_ES, id->p_encoder->fmt_out.i_codec );
+
+
     /* Load user specified audio filters */
     if( p_sys->psz_af )
     {
@@ -284,10 +288,6 @@ int transcode_audio_new( sout_stream_t *p_stream,
         return VLC_EGENERIC;
     }
     fmt_last = id->p_encoder->fmt_in;
-
-    /* */
-    id->p_encoder->fmt_out.i_codec =
-        vlc_fourcc_GetCodec( AUDIO_ES, id->p_encoder->fmt_out.i_codec );
 
     return VLC_SUCCESS;
 }
