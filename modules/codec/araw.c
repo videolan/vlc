@@ -66,9 +66,6 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static block_t *DecodeBlock( decoder_t *, block_t ** );
-#ifdef ENABLE_SOUT
-static block_t *EncoderEncode( encoder_t *, block_t * );
-#endif
 
 struct decoder_sys_t
 {
@@ -85,6 +82,7 @@ static const uint16_t pi_channels_maps[] =
     AOUT_CHANS_7_0,   AOUT_CHANS_7_1, AOUT_CHANS_8_1,
 };
 
+static void S8Decode( void *, const uint8_t *, unsigned );
 static void S20BDecode( void *, const uint8_t *, unsigned );
 static void DAT12Decode( void *, const uint8_t *, unsigned );
 
@@ -150,6 +148,8 @@ static int DecoderOpen( vlc_object_t *p_this )
         bits = 12;
         break;
     case VLC_CODEC_S8:
+        decode = S8Decode;
+        format = VLC_CODEC_U8;
     case VLC_CODEC_U8:
         bits = 8;
         break;
@@ -274,6 +274,14 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     return p_out;
 }
 
+static void S8Decode( void *outp, const uint8_t *in, unsigned samples )
+{
+    uint8_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+        out[i] = in[i] ^ 0x80;
+}
+
 static void S20BDecode( void *outp, const uint8_t *in, unsigned samples )
 {
     int32_t *out = outp;
@@ -332,17 +340,46 @@ static void DecoderClose( vlc_object_t *p_this )
 }
 
 #ifdef ENABLE_SOUT
-/*****************************************************************************
- * EncoderOpen:
- *****************************************************************************/
+static block_t *Encode( encoder_t *enc, block_t *in )
+{
+    if( in == NULL )
+        return NULL;
+
+    block_t *out = block_Alloc( in->i_nb_samples
+                                * enc->fmt_out.audio.i_bytes_per_frame );
+    if( unlikely(out == NULL) )
+        return NULL;
+
+    out->i_flags      = in->i_flags;
+    out->i_nb_samples = in->i_nb_samples;
+    out->i_dts        = in->i_dts;
+    out->i_pts        = in->i_pts;
+    out->i_length     = in->i_length;
+    out->i_nb_samples = in->i_nb_samples;
+
+    void (*encode)(void *, const uint8_t *, unsigned) = (void *)enc->p_sys;
+    if( encode != NULL )
+        encode( out->p_buffer, in->p_buffer, in->i_nb_samples
+                                             * enc->fmt_out.audio.i_channels );
+    else
+        memcpy( out->p_buffer, in->p_buffer, in->i_buffer );
+    return out;
+}
+
+/**
+ * Probes the PCM audio encoder.
+ */
 static int EncoderOpen( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
+    void (*encode)(void *, const uint8_t *, unsigned) = NULL;
 
     switch( p_enc->fmt_out.i_codec )
     {
-    case VLC_CODEC_U8:
     case VLC_CODEC_S8:
+        encode = S8Decode;
+        p_enc->fmt_in.i_codec = VLC_CODEC_U8;
+    case VLC_CODEC_U8:
         p_enc->fmt_out.audio.i_bitspersample = 8;
         break;
     case VLC_CODEC_U16L:
@@ -371,26 +408,20 @@ static int EncoderOpen( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_enc->pf_encode_audio = EncoderEncode;
-    p_enc->fmt_in.i_codec = p_enc->fmt_out.i_codec;
+    p_enc->p_sys = (void *)encode;
+    p_enc->pf_encode_audio = Encode;
+    p_enc->fmt_out.audio.i_bytes_per_frame =
+        (p_enc->fmt_out.audio.i_bitspersample / 8) *
+        p_enc->fmt_in.audio.i_channels;
     p_enc->fmt_out.i_bitrate =
         p_enc->fmt_in.audio.i_channels *
         p_enc->fmt_in.audio.i_rate *
-        p_enc->fmt_in.audio.i_bitspersample;
+        p_enc->fmt_out.audio.i_bitspersample;
 
     msg_Dbg( p_enc, "samplerate:%dHz channels:%d bits/sample:%d",
              p_enc->fmt_out.audio.i_rate, p_enc->fmt_out.audio.i_channels,
              p_enc->fmt_out.audio.i_bitspersample );
 
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * EncoderEncode:
- *****************************************************************************/
-static block_t *EncoderEncode( encoder_t *p_enc, block_t *p_aout_buf )
-{
-    (void) p_enc;
-    return block_Duplicate(p_aout_buf);
 }
 #endif /* ENABLE_SOUT */
