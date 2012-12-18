@@ -51,10 +51,6 @@
 #include "../lib/libvlc_internal.h"
 #endif
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static void* RunInterface( void * );
 static int AddIntfCallback( vlc_object_t *, char const *,
                             vlc_value_t , vlc_value_t , void * );
 
