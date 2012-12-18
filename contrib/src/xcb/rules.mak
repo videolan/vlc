@@ -1,6 +1,6 @@
 # X protocol C language Bindings
 
-XCB_VERSION := 1.7
+XCB_VERSION := 1.9
 XCB_URL := http://xcb.freedesktop.org/dist/libxcb-$(XCB_VERSION).tar.bz2
 
 ifeq ($(call need_pkg,"xcb >= 1.6 xcb-shm xcb-composite xcb-xv >= 1.1.90.1"),)
