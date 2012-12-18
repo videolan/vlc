@@ -85,8 +85,8 @@ static const uint16_t pi_channels_maps[] =
     AOUT_CHANS_7_0,   AOUT_CHANS_7_1, AOUT_CHANS_8_1,
 };
 
-static void DecodeS20B( void *, const uint8_t *, unsigned );
-static void DecodeDAT12( void *, const uint8_t *, unsigned );
+static void S20BDecode( void *, const uint8_t *, unsigned );
+static void DAT12Decode( void *, const uint8_t *, unsigned );
 
 /*****************************************************************************
  * DecoderOpen: probe the decoder and return score
@@ -137,7 +137,7 @@ static int DecoderOpen( vlc_object_t *p_this )
         break;
     case VLC_CODEC_S20B:
         format = VLC_CODEC_S32N;
-        decode = DecodeS20B;
+        decode = S20BDecode;
         bits = 20;
         break;
     case VLC_CODEC_S16L:
@@ -146,7 +146,7 @@ static int DecoderOpen( vlc_object_t *p_this )
         break;
     case VLC_CODEC_DAT12:
         format = VLC_CODEC_S16N;
-        decode = DecodeDAT12;
+        decode = DAT12Decode;
         bits = 12;
         break;
     case VLC_CODEC_S8:
@@ -274,7 +274,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     return p_out;
 }
 
-static void DecodeS20B( void *outp, const uint8_t *in, unsigned samples )
+static void S20BDecode( void *outp, const uint8_t *in, unsigned samples )
 {
     int32_t *out = outp;
 
@@ -305,7 +305,7 @@ static int16_t dat12tos16( uint16_t y )
     return (y - diff[d]) << shift[d];
 }
 
-static void DecodeDAT12( void *outp, const uint8_t *in, unsigned samples )
+static void DAT12Decode( void *outp, const uint8_t *in, unsigned samples )
 {
     int32_t *out = outp;
 
@@ -339,39 +339,35 @@ static int EncoderOpen( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
 
-    if( p_enc->fmt_out.i_codec == VLC_CODEC_U8 ||
-        p_enc->fmt_out.i_codec == VLC_CODEC_S8 )
+    switch( p_enc->fmt_out.i_codec )
     {
+    case VLC_CODEC_U8:
+    case VLC_CODEC_S8:
         p_enc->fmt_out.audio.i_bitspersample = 8;
-    }
-    else if( p_enc->fmt_out.i_codec == VLC_CODEC_U16L ||
-             p_enc->fmt_out.i_codec == VLC_CODEC_U16B ||
-             p_enc->fmt_out.i_codec == VLC_CODEC_S16L ||
-             p_enc->fmt_out.i_codec == VLC_CODEC_S16B )
-    {
+        break;
+    case VLC_CODEC_U16L:
+    case VLC_CODEC_U16B:
+    case VLC_CODEC_S16L:
+    case VLC_CODEC_S16B:
         p_enc->fmt_out.audio.i_bitspersample = 16;
-    }
-    else if( p_enc->fmt_out.i_codec == VLC_CODEC_U24L ||
-             p_enc->fmt_out.i_codec == VLC_CODEC_U24B ||
-             p_enc->fmt_out.i_codec == VLC_CODEC_S24L ||
-             p_enc->fmt_out.i_codec == VLC_CODEC_S24B )
-    {
+        break;
+    case VLC_CODEC_U24L:
+    case VLC_CODEC_U24B:
+    case VLC_CODEC_S24L:
+    case VLC_CODEC_S24B:
         p_enc->fmt_out.audio.i_bitspersample = 24;
-    }
-    else if( p_enc->fmt_out.i_codec == VLC_CODEC_U32L ||
-             p_enc->fmt_out.i_codec == VLC_CODEC_U32B ||
-             p_enc->fmt_out.i_codec == VLC_CODEC_S32L ||
-             p_enc->fmt_out.i_codec == VLC_CODEC_S32B ||
-             p_enc->fmt_out.i_codec == VLC_CODEC_FL32 )
-    {
+        break;
+    case VLC_CODEC_U32L:
+    case VLC_CODEC_U32B:
+    case VLC_CODEC_S32L:
+    case VLC_CODEC_S32B:
+    case VLC_CODEC_FL32:
         p_enc->fmt_out.audio.i_bitspersample = 32;
-    }
-    else if( p_enc->fmt_out.i_codec == VLC_CODEC_FL64 )
-    {
+        break;
+    case VLC_CODEC_FL64:
         p_enc->fmt_out.audio.i_bitspersample = 64;
-    }
-    else
-    {
+        break;
+    default:
         return VLC_EGENERIC;
     }
 
