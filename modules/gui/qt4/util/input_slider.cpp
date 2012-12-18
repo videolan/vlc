@@ -65,7 +65,7 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
 
     // prepare some static colors
     QPalette p = palette();
-    QColor background = p.color( QPalette::Active, QPalette::Background );
+    QColor background = p.color( QPalette::Active, QPalette::Window );
     tickpointForeground = p.color( QPalette::Active, QPalette::WindowText );
     tickpointForeground.setHsv( tickpointForeground.hue(),
             ( background.saturation() + tickpointForeground.saturation() ) / 2,
@@ -469,7 +469,7 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step,
         for( int i = colorList.count(); i < 12; i++)
             colorList.append( "255" );
 
-    background = palette().color( QPalette::Active, QPalette::Background );
+    background = palette().color( QPalette::Active, QPalette::Window );
     foreground = palette().color( QPalette::Active, QPalette::WindowText );
     foreground.setHsv( foreground.hue(),
                     ( background.saturation() + foreground.saturation() ) / 2,

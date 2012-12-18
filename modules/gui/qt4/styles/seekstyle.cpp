@@ -137,7 +137,7 @@ void SeekStyle::drawComplexControl( ComplexControl cc, const QStyleOptionComplex
                     /* draw chapters tickpoints */
                     if ( seekSlider->chapters && seekSlider->inputLength && groove.width() )
                     {
-                        QColor background = p.color( QPalette::Active, QPalette::Background );
+                        QColor background = p.color( QPalette::Active, QPalette::Window );
                         QColor foreground = p.color( QPalette::Active, QPalette::WindowText );
                         foreground.setHsv( foreground.hue(),
                                         ( background.saturation() + foreground.saturation() ) / 2,
