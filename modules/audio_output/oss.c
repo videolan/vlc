@@ -223,7 +223,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         fmt->i_physical_channels = channels;
     }
 
-    VolumeSync (aout):
+    VolumeSync (aout);
     sys->starting = true;
     sys->format = *fmt;
     return VLC_SUCCESS;
@@ -332,6 +332,8 @@ static int VolumeSet (audio_output_t *aout, float vol)
 {
     aout_sys_t *sys = aout->sys;
     int fd = sys->fd;
+    if (fd == -1)
+        return -1;
 
     int level = lroundf (vol * 100.f);
     if (level > 0xFF)
@@ -353,6 +355,8 @@ static int MuteSet (audio_output_t *aout, bool mute)
 {
     aout_sys_t *sys = aout->sys;
     int fd = sys->fd;
+    if (fd == -1)
+        return -1;
 
     int level = mute ? 0 : (sys->level | (sys->level << 8));
     if (ioctl (fd, SNDCTL_DSP_SETPLAYVOL, &level) < 0)
