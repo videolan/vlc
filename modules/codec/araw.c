@@ -83,6 +83,9 @@ static const uint16_t pi_channels_maps[] =
 };
 
 static void S8Decode( void *, const uint8_t *, unsigned );
+static void U16BDecode( void *, const uint8_t *, unsigned );
+static void U16LDecode( void *, const uint8_t *, unsigned );
+static void S16IDecode( void *, const uint8_t *, unsigned );
 static void S20BDecode( void *, const uint8_t *, unsigned );
 static void DAT12Decode( void *, const uint8_t *, unsigned );
 
@@ -138,8 +141,20 @@ static int DecoderOpen( vlc_object_t *p_this )
         decode = S20BDecode;
         bits = 20;
         break;
-    case VLC_CODEC_S16L:
-    case VLC_CODEC_S16B:
+    case VLC_CODEC_U16B:
+        format = VLC_CODEC_S16N;
+        decode = U16BDecode;
+        bits = 16;
+        break;
+    case VLC_CODEC_U16L:
+        format = VLC_CODEC_S16N;
+        decode = U16LDecode;
+        bits = 16;
+        break;
+    case VLC_CODEC_S16I:
+        format = VLC_CODEC_S16N;
+        decode = S16IDecode;
+    case VLC_CODEC_S16N:
         bits = 16;
         break;
     case VLC_CODEC_DAT12:
@@ -282,6 +297,33 @@ static void S8Decode( void *outp, const uint8_t *in, unsigned samples )
         out[i] = in[i] ^ 0x80;
 }
 
+static void U16BDecode( void *outp, const uint8_t *in, unsigned samples )
+{
+    uint16_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+        *(out++) = GetWBE( in ) - 0x8000;
+        in += 2;
+    }
+}
+
+static void U16LDecode( void *outp, const uint8_t *in, unsigned samples )
+{
+    uint16_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+        *(out++) = GetWLE( in ) - 0x8000;
+        in += 2;
+    }
+}
+
+static void S16IDecode( void *out, const uint8_t *in, unsigned samples )
+{
+    swab( in, out, samples * 2 );
+}
+
 static void S20BDecode( void *outp, const uint8_t *in, unsigned samples )
 {
     int32_t *out = outp;
@@ -340,6 +382,24 @@ static void DecoderClose( vlc_object_t *p_this )
 }
 
 #ifdef ENABLE_SOUT
+static void U16IEncode( void *outp, const uint8_t *inp, unsigned samples )
+{
+    const uint16_t *in = (const uint16_t *)inp;
+    uint16_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+        *(out++) =  bswap16( *(in++) + 0x8000 );
+}
+
+static void U16NEncode( void *outp, const uint8_t *inp, unsigned samples )
+{
+    const uint16_t *in = (const uint16_t *)inp;
+    uint16_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+        *(out++) =  *(in++) + 0x8000;
+}
+
 static block_t *Encode( encoder_t *enc, block_t *in )
 {
     if( in == NULL )
@@ -382,10 +442,22 @@ static int EncoderOpen( vlc_object_t *p_this )
     case VLC_CODEC_U8:
         p_enc->fmt_out.audio.i_bitspersample = 8;
         break;
-    case VLC_CODEC_U16L:
-    case VLC_CODEC_U16B:
+    case VLC_CODEC_U16I:
+        encode = U16IEncode;
+        p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
+        p_enc->fmt_out.audio.i_bitspersample = 16;
+        break;
+    case VLC_CODEC_U16N:
+        encode = U16NEncode;
+        p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
+        p_enc->fmt_out.audio.i_bitspersample = 16;
+        break;
+    case VLC_CODEC_S16I:
+        encode = S16IDecode;
+        p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
+        p_enc->fmt_out.audio.i_bitspersample = 16;
+        break;
     case VLC_CODEC_S16L:
-    case VLC_CODEC_S16B:
         p_enc->fmt_out.audio.i_bitspersample = 16;
         break;
     case VLC_CODEC_U24L:
