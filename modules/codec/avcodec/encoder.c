@@ -94,7 +94,7 @@ struct encoder_sys_t
     AVCodecContext  *p_context;
 
     /*
-     * Common properties
+     * Common buffer mainly for audio as frame size in there needs usually be constant
      */
     char *p_buffer;
     size_t i_buffer_out;
@@ -294,6 +294,7 @@ int OpenEncoder( vlc_object_t *p_this )
     if( ( p_sys = calloc( 1, sizeof(encoder_sys_t) ) ) == NULL )
         return VLC_ENOMEM;
     p_enc->p_sys = p_sys;
+    p_sys->i_samples_delay = 0;
     p_sys->p_codec = p_codec;
 
     p_sys->p_buffer = NULL;
@@ -1027,64 +1028,164 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     block_t *p_block, *p_chain = NULL;
-    AVFrame *frame;
-    AVPacket packet;
-    int got_packet,i_out;
+    AVFrame *frame=NULL;
+    int got_packet,i_out,i_samples_left=0,i_data_offset = 0;
 
-    /*FIXME: change to use  avcodec_encode_audio2 to be able to flush*/
+    //i_samples_left is amount of samples we get
+    i_samples_left = p_aout_buf ? p_aout_buf->i_nb_samples : 0;
+
+    if( p_sys->i_samples_delay > 0 )
+    {
+        AVPacket packet;
+        //How much we need to copy from new packet
+        const int leftover = __MAX(0,__MIN(i_samples_left, (p_sys->i_frame_size - p_sys->i_samples_delay)));
+
+        frame = avcodec_alloc_frame();
+        frame->nb_samples = p_sys->i_samples_delay + leftover;
+        frame->format     = p_sys->p_context->sample_fmt;
+
+        //Copy samples from new packet to buffer to get frame size
+        if( likely( leftover ) )
+            memcpy( p_sys->p_buffer+(p_sys->i_samples_delay*p_sys->i_sample_bytes), p_aout_buf->p_buffer, leftover*p_sys->i_sample_bytes*p_enc->fmt_in.audio.i_channels);
+
+        if( avcodec_fill_audio_frame( frame, p_enc->fmt_in.audio.i_channels,
+                              p_sys->p_context->sample_fmt,
+                              p_sys->p_buffer,
+                              (p_sys->i_samples_delay + leftover) * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels,
+                              0) < 0 )
+            msg_Err( p_enc, "Filling on leftovers error i_leftover %d i_samples_left %d samples_delay %d frame size %d", leftover, i_samples_left, p_sys->i_samples_delay, p_sys->i_frame_size );
+
+        if( likely( p_aout_buf ) )
+            frame->pts = p_aout_buf->i_pts -
+                     (mtime_t)1000000 * (mtime_t)p_sys->i_samples_delay /
+                     (mtime_t)p_enc->fmt_in.audio.i_rate;
+
+        p_sys->i_samples_delay = 0;
+        i_data_offset += leftover * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels;
+        i_samples_left -= leftover;
+
+        p_block = block_Alloc( p_sys->i_buffer_out );
+        av_init_packet( &packet );
+        packet.data = p_block->p_buffer;
+        packet.size = p_block->i_buffer;
+
+        i_out = avcodec_encode_audio2( p_sys->p_context, &packet, frame, &got_packet );
+        p_block->i_buffer = packet.size;
+
+
+        /*FIXME: same as avcodec_free_frame, but we don't require so new avcodec that has it*/
+        if( frame->extended_data != frame->data )
+           av_freep( frame->extended_data );
+        av_freep( &frame );
+        if( unlikely( !got_packet || ( i_out < 0 ) ) )
+        {
+            if( i_out < 0 )
+            {
+                msg_Err( p_enc,"Encoding problem...");
+                return p_chain;
+            }
+        } else {
+            p_block->i_buffer = packet.size;
+
+            p_block->i_length = (mtime_t)1000000 *
+             (mtime_t)p_sys->i_frame_size /
+             (mtime_t)p_sys->p_context->sample_rate;
+
+            p_block->i_dts = p_block->i_pts = packet.pts;
+
+            block_ChainAppend( &p_chain, p_block );
+        }
+    }
+
     if( unlikely( !p_aout_buf ) )
     {
         msg_Dbg(p_enc,"Flushing..");
         do {
+            AVPacket packet;
             p_block = block_Alloc( p_sys->i_buffer_out );
             av_init_packet( &packet );
             packet.data = p_block->p_buffer;
             packet.size = p_block->i_buffer;
 
             i_out = avcodec_encode_audio2( p_sys->p_context, &packet, NULL, &got_packet );
+            p_block->i_buffer = packet.size;
+
+            p_block->i_length = (mtime_t)1000000 *
+             (mtime_t)p_sys->i_frame_size /
+             (mtime_t)p_sys->p_context->sample_rate;
+
+            p_block->i_dts = p_block->i_pts = packet.pts;
+
             if( !i_out && got_packet )
                 block_ChainAppend( &p_chain, p_block );
         } while( got_packet && !i_out );
         return p_chain;
     }
 
-    frame = avcodec_alloc_frame();
-
-    frame->nb_samples = p_aout_buf->i_nb_samples;
-    avcodec_fill_audio_frame( frame, p_enc->fmt_in.audio.i_channels,
-                              p_sys->p_context->sample_fmt, 
-                              p_aout_buf->p_buffer, p_aout_buf->i_buffer,
-                              0);
-
-
-    frame->pts = p_aout_buf->i_pts;
-
-    p_block = block_Alloc( p_sys->i_buffer_out );
-    av_init_packet( &packet );
-    packet.data = p_block->p_buffer;
-    packet.size = p_block->i_buffer;
-
-    i_out = avcodec_encode_audio2( p_sys->p_context, &packet, frame, &got_packet );
-    p_block->i_buffer = packet.size;
-    
-    av_freep( &frame );
-    if( unlikely( !got_packet || i_out ) )
+    while( i_samples_left >= p_sys->i_frame_size )
     {
-        if( i_out )
-           msg_Err( p_enc,"Encoding problem..");
-        block_Release( p_block );
-        return NULL;
+        AVPacket packet = {0};
+        frame = avcodec_alloc_frame();
+
+        frame->nb_samples = p_sys->i_frame_size;
+        frame->format     = p_sys->p_context->sample_fmt;
+
+        if( avcodec_fill_audio_frame( frame, p_enc->fmt_in.audio.i_channels,
+                              p_sys->p_context->sample_fmt,
+                              p_aout_buf->p_buffer+i_data_offset,
+                              p_sys->i_frame_size * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels,
+                              0) < 0 )
+                msg_Err( p_enc, "filling error on encode" );
+
+        i_samples_left -= p_sys->i_frame_size;
+        i_data_offset += p_sys->i_frame_size * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels;
+
+        frame->pts = p_aout_buf->i_pts;
+
+        p_block = block_Alloc( p_sys->i_buffer_out );
+        av_init_packet( &packet );
+        packet.data = p_block->p_buffer;
+        packet.size = p_block->i_buffer;
+
+        i_out = avcodec_encode_audio2( p_sys->p_context, &packet, frame, &got_packet );
+        p_block->i_buffer = packet.size;
+
+        if( frame->extended_data != frame->data )
+           av_freep( frame->extended_data );
+        av_freep( &frame );
+        if( unlikely( !got_packet || ( i_out < 0 ) ) )
+        {
+            if( i_out < 0 )
+            {
+                msg_Err( p_enc,"Encoding problem..");
+                return p_chain;
+            }
+            block_Release( p_block );
+            continue;
+        }
+
+        p_block->i_buffer = packet.size;
+
+        p_block->i_length = (mtime_t)1000000 *
+            (mtime_t)p_sys->i_frame_size /
+            (mtime_t)p_sys->p_context->sample_rate;
+
+        p_block->i_dts = p_block->i_pts = packet.pts;
+
+        block_ChainAppend( &p_chain, p_block );
+    }
+    if( i_samples_left < 0 )
+        msg_Err( p_enc, "I_data_left overflow");
+
+    // We have leftover samples that don't fill frame_size, and libavcodec doesn't seem to like
+    // that frame has more data than p_sys->i_frame_size most of the cases currently.
+    if( i_samples_left > 0 )
+    {
+        memcpy( p_sys->p_buffer, p_aout_buf->p_buffer+i_data_offset , i_samples_left*p_sys->i_sample_bytes*p_enc->fmt_in.audio.i_channels);
+        p_sys->i_samples_delay = i_samples_left;
     }
 
-    p_block->i_buffer = packet.size;
-
-    p_block->i_length = (mtime_t)1000000 *
-        (mtime_t)p_sys->i_frame_size /
-        (mtime_t)p_sys->p_context->sample_rate;
-
-    p_block->i_dts = p_block->i_pts = packet.pts;
-
-    return p_block;
+    return p_chain;
 }
 
 /*****************************************************************************
