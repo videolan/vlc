@@ -72,8 +72,7 @@ private:
     QLineEdit *genre_text;
     QLineEdit *copyright_text;
     QLineEdit *collection_text;
-    QLineEdit *seqnum_text;
-    QLineEdit *seqtot_text;
+    QLineEdit *tracknumber_text;
 
     QTextEdit *description_text;
 //    QSpinBox *rating_text;
