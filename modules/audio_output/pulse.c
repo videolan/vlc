@@ -312,8 +312,6 @@ static void stream_event_cb(pa_stream *s, const char *name, pa_proplist *pl,
 #if PA_CHECK_VERSION(1,0,0)
     /* FIXME: expose aout_Restart() directly */
     if (!strcmp(name, PA_STREAM_EVENT_FORMAT_LOST)) {
-        vlc_value_t dummy = { .i_int = 0 };
-
         msg_Dbg (aout, "format lost");
         aout_RestartRequest (aout, AOUT_RESTART_OUTPUT);
     } else
