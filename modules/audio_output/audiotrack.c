@@ -239,10 +239,10 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     stream_type = MUSIC;
 
-    /* We can only accept U8 and S16L */
-    if (fmt->i_format != VLC_CODEC_U8 && fmt->i_format != VLC_CODEC_S16L)
-        fmt->i_format = VLC_CODEC_S16L;
-    format = (fmt->i_format == VLC_CODEC_S16L) ? PCM_16_BIT : PCM_8_BIT;
+    /* We can only accept U8 and S16N */
+    if (fmt->i_format != VLC_CODEC_U8 && fmt->i_format != VLC_CODEC_S16N)
+        fmt->i_format = VLC_CODEC_S16N;
+    format = (fmt->i_format == VLC_CODEC_S16N) ? PCM_16_BIT : PCM_8_BIT;
 
     /* TODO: android supports more channels */
     fmt->i_original_channels = fmt->i_physical_channels;

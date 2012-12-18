@@ -108,7 +108,7 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     if (status != noErr)
         return VLC_EGENERIC;
 
-    fmt->i_format = VLC_CODEC_S16L;
+    fmt->i_format = VLC_CODEC_S16N;
     fmt->i_physical_channels = AOUT_CHANS_STEREO;
     fmt->i_rate = 44100;
     aout_FormatPrepare(fmt);

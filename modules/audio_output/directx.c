@@ -708,7 +708,7 @@ static int CreateDSBuffer( audio_output_t *p_aout, int i_format,
         waveformat.SubFormat = _KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
         break;
 
-    case VLC_CODEC_S16L:
+    case VLC_CODEC_S16N:
         waveformat.Format.wBitsPerSample = 16;
         waveformat.Samples.wValidBitsPerSample =
             waveformat.Format.wBitsPerSample;
@@ -816,7 +816,7 @@ static int CreateDSBufferPCM( audio_output_t *p_aout, vlc_fourcc_t *i_format,
                         (i_rate / 20) * 4 * i_nb_channels, b_probe )
         != VLC_SUCCESS )
     {
-        if ( CreateDSBuffer( p_aout, VLC_CODEC_S16L,
+        if ( CreateDSBuffer( p_aout, VLC_CODEC_S16N,
                              i_channels, i_nb_channels, i_rate,
                              (i_rate / 20) * 2 * i_nb_channels, b_probe )
              != VLC_SUCCESS )
@@ -825,7 +825,7 @@ static int CreateDSBufferPCM( audio_output_t *p_aout, vlc_fourcc_t *i_format,
         }
         else
         {
-            *i_format = VLC_CODEC_S16L;
+            *i_format = VLC_CODEC_S16N;
             return VLC_SUCCESS;
         }
     }

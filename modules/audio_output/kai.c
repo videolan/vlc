@@ -149,8 +149,8 @@ static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     }
 
-    /* Support s16l only */
-    format.i_format = VLC_CODEC_S16L;
+    /* Support S16 only */
+    format.i_format = VLC_CODEC_S16N;
 
     aout_FormatPrepare( &format );
 

@@ -448,8 +448,8 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     p_sys->p_buffer_chain = NULL;
     p_sys->pp_buffer_last = &p_sys->p_buffer_chain;
 
-    // we want 16bit signed data little endian.
-    fmt->i_format              = VLC_CODEC_S16L;
+    // we want 16bit signed data native endian.
+    fmt->i_format              = VLC_CODEC_S16N;
     fmt->i_physical_channels   = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     p_aout->play               = Play;
     p_aout->pause              = Pause;
