@@ -122,19 +122,13 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
             fmt->i_format = VLC_CODEC_U8;
             break;
         case 16:
-            fmt->i_format = par.sig
-                                 ? (par.le ? VLC_CODEC_S16L : VLC_CODEC_S16B)
-                                 : (par.le ? VLC_CODEC_U16L : VLC_CODEC_U16B);
+            fmt->i_format = VLC_CODEC_S16N;
             break;
         case 24:
-            fmt->i_format = par.sig
-                                 ? (par.le ? VLC_CODEC_S24L : VLC_CODEC_S24B)
-                                 : (par.le ? VLC_CODEC_U24L : VLC_CODEC_U24B);
+            fmt->i_format = VLC_CODEC_S24N;
             break;
         case 32:
-            fmt->i_format = par.sig
-                                 ? (par.le ? VLC_CODEC_S32L : VLC_CODEC_S32B)
-                                 : (par.le ? VLC_CODEC_U32L : VLC_CODEC_U32B);
+            fmt->i_format = VLC_CODEC_S32N;
             break;
         default:
             msg_Err (obj, "unsupported audio sample format (%u bits)",

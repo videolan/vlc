@@ -676,11 +676,8 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         case VLC_CODEC_S24L:
             ss.format = PA_SAMPLE_S24LE;
             break;
-        case VLC_CODEC_S16B:
-            ss.format = PA_SAMPLE_S16BE;
-            break;
-        case VLC_CODEC_S16L:
-            ss.format = PA_SAMPLE_S16LE;
+        case VLC_CODEC_S16N:
+            ss.format = PA_SAMPLE_S16NE;
             break;
         case VLC_CODEC_U8:
             ss.format = PA_SAMPLE_U8;

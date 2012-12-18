@@ -44,17 +44,6 @@ vlc_module_begin()
     set_callbacks(Open, NULL)
 vlc_module_end()
 
-static block_t *Filter16(filter_t *filter, block_t *block)
-{
-    uint16_t *data = (uint16_t *)block->p_buffer;
-
-    for (size_t i = 0; i < block->i_buffer / 2; i++)
-        data[i] = bswap16 (data[i]);
-
-    (void) filter;
-    return block;
-}
-
 static block_t *Filter24(filter_t *filter, block_t *block)
 {
     uint8_t *data = (uint8_t *)block->p_buffer;
@@ -94,10 +83,8 @@ static block_t *Filter64(filter_t *filter, block_t *block)
 static const vlc_fourcc_t list[][2] = {
     { VLC_CODEC_F64B, VLC_CODEC_F64L },
     { VLC_CODEC_F32B, VLC_CODEC_F32L },
-    { VLC_CODEC_S16B, VLC_CODEC_S16L },
     { VLC_CODEC_S24B, VLC_CODEC_S24L },
     { VLC_CODEC_S32B, VLC_CODEC_S32L },
-    { VLC_CODEC_S16B, VLC_CODEC_S16L },
     { VLC_CODEC_S24B, VLC_CODEC_S24L },
     { VLC_CODEC_S32B, VLC_CODEC_S32L },
 };
@@ -128,9 +115,6 @@ static int Open(vlc_object_t *object)
 
 ok:
     switch (src->i_bitspersample) {
-        case 16:
-            filter->pf_audio_filter = Filter16;
-            break;
         case 24:
             filter->pf_audio_filter = Filter24;
             break;

@@ -336,17 +336,8 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         case VLC_CODEC_U24L:
             pcm_format = SND_PCM_FORMAT_U24_3LE;
             break;
-        case VLC_CODEC_S16B:
-            pcm_format = SND_PCM_FORMAT_S16_BE;
-            break;
-        case VLC_CODEC_S16L:
-            pcm_format = SND_PCM_FORMAT_S16_LE;
-            break;
-        case VLC_CODEC_U16B:
-            pcm_format = SND_PCM_FORMAT_U16_BE;
-            break;
-        case VLC_CODEC_U16L:
-            pcm_format = SND_PCM_FORMAT_U16_LE;
+        case VLC_CODEC_S16N:
+            pcm_format = SND_PCM_FORMAT_S16;
             break;
         case VLC_CODEC_U8:
             pcm_format = SND_PCM_FORMAT_U8;
