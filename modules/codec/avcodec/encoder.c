@@ -821,7 +821,7 @@ int OpenEncoder( vlc_object_t *p_this )
             goto error;
         }
         p_enc->fmt_out.audio.i_blockalign = p_context->block_align;
-        p_enc->fmt_out.audio.i_bitspersample = aout_BitsPerSample( vlc_fourcc_GetCodec( AUDIO_ES, p_enc->fmt_out.i_codec ) );
+        p_enc->fmt_out.audio.i_bitspersample = aout_BitsPerSample( p_enc->fmt_out.i_codec );
 
         if( p_context->frame_size > 1 )
             p_sys->i_buffer_out = 8 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
