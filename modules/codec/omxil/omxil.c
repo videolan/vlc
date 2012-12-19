@@ -1109,6 +1109,13 @@ loaded:
     p_dec->b_need_packetized = true;
     if (!strcmp(p_sys->psz_component, "OMX.TI.DUCATI1.VIDEO.DECODER"))
         p_sys->b_use_pts = 1;
+
+    if (!strcmp(p_sys->psz_component, "OMX.STM.Video.Decoder"))
+        p_sys->b_use_pts = 1;
+
+    if (p_sys->b_use_pts)
+        msg_Dbg( p_dec, "using pts timestamp mode for %s", p_sys->psz_component);
+
     return VLC_SUCCESS;
 
  error:
