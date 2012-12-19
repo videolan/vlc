@@ -196,19 +196,21 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
         case VOUT_WINDOW_SET_STATE:
         {
             unsigned i_state = va_arg(args, unsigned);
-            // TODO
-//            [o_window performSelectorOnMainThread:@selector(setWindowLevel:) withObject:[NSNumber numberWithUnsignedInt:i_state] waitUntilDone:NO];
+
+            [o_window setLevel: i_state];
+
             return VLC_SUCCESS;
         }
         case VOUT_WINDOW_SET_SIZE:
         {
             NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
 
+            NSRect theFrame = [o_window frame];
             unsigned int i_width  = va_arg(args, unsigned int);
             unsigned int i_height = va_arg(args, unsigned int);
-
-            NSSize newSize = NSMakeSize(i_width, i_height);
-            // TODO
+            theFrame.size.width = i_width;
+            theFrame.size.height = i_height;
+            [o_window setFrame: theFrame display: YES animate: YES];
 
             [o_pool release];
             return VLC_SUCCESS;
