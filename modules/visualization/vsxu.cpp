@@ -113,15 +113,9 @@ static int Open( vlc_object_t * p_this )
     filter_sys_t *p_sys;
 
     /* Test the audio format */
-    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 ||
-        p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
+    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 )
     {
-        msg_Warn( p_filter, "bad input or output format" );
-        return VLC_EGENERIC;
-    }
-    if( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
-    {
-        msg_Warn( p_filter, "input and outut are not similar" );
+        msg_Warn( p_filter, "bad input format" );
         return VLC_EGENERIC;
     }
 
@@ -155,6 +149,7 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
+    p_filter->fmt_out.audio = p_filter->fmt_in.audio;
     p_filter->pf_audio_filter = DoWork;
 
     return VLC_SUCCESS;

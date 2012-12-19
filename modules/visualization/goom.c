@@ -119,20 +119,11 @@ static int Open( vlc_object_t *p_this )
     goom_thread_t  *p_thread;
     video_format_t fmt;
 
-
-    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 ||
-         p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
+    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 )
     {
-        msg_Warn( p_filter, "bad input or output format" );
+        msg_Warn( p_filter, "bad input format" );
         return VLC_EGENERIC;
     }
-    if( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
-    {
-        msg_Warn( p_filter, "input and output formats are not similar" );
-        return VLC_EGENERIC;
-    }
-
-    p_filter->pf_audio_filter = DoWork;
 
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
@@ -167,7 +158,7 @@ static int Open( vlc_object_t *p_this )
     vlc_cond_init( &p_thread->wait );
 
     p_thread->i_blocks = 0;
-    date_Init( &p_thread->date, p_filter->fmt_out.audio.i_rate, 1 );
+    date_Init( &p_thread->date, p_filter->fmt_in.audio.i_rate, 1 );
     date_Set( &p_thread->date, 0 );
     p_thread->i_channels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
 
@@ -183,6 +174,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    p_filter->fmt_out.audio = p_filter->fmt_in.audio;
+    p_filter->pf_audio_filter = DoWork;
     return VLC_SUCCESS;
 }
 
