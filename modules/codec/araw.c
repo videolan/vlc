@@ -89,7 +89,8 @@ static void S16IDecode( void *, const uint8_t *, unsigned );
 static void S20BDecode( void *, const uint8_t *, unsigned );
 static void U32BDecode( void *, const uint8_t *, unsigned );
 static void U32LDecode( void *, const uint8_t *, unsigned );
-static void S32IDecode( void *, const uint8_t *, unsigned );
+static void Swap32Decode( void *, const uint8_t *, unsigned );
+static void Swap64Decode( void *, const uint8_t *, unsigned );
 static void DAT12Decode( void *, const uint8_t *, unsigned );
 
 /*****************************************************************************
@@ -125,12 +126,24 @@ static int DecoderOpen( vlc_object_t *p_this )
 
     switch( format )
     {
+#ifdef WORDS_BIGENDIAN
     case VLC_CODEC_F64L:
+#else
     case VLC_CODEC_F64B:
+#endif
+        format = VLC_CODEC_FL64;
+        decode = Swap64Decode;
+    case VLC_CODEC_FL64:
         bits = 64;
         break;
+#ifdef WORDS_BIGENDIAN
     case VLC_CODEC_F32L:
+#else
     case VLC_CODEC_F32B:
+#endif
+        format = VLC_CODEC_FL32;
+        decode = Swap32Decode;
+    case VLC_CODEC_FL32:
         bits = 32;
         break;
     case VLC_CODEC_U32B:
@@ -145,7 +158,7 @@ static int DecoderOpen( vlc_object_t *p_this )
         break;
     case VLC_CODEC_S32I:
         format = VLC_CODEC_S32N;
-        decode = S32IDecode;
+        decode = Swap32Decode;
      case VLC_CODEC_S32N:
         bits = 32;
         break;
@@ -382,7 +395,7 @@ static void U32LDecode( void *outp, const uint8_t *in, unsigned samples )
     }
 }
 
-static void S32IDecode( void *outp, const uint8_t *in, unsigned samples )
+static void Swap32Decode( void *outp, const uint8_t *in, unsigned samples )
 {
     int32_t *out = outp;
 
@@ -394,6 +407,21 @@ static void S32IDecode( void *outp, const uint8_t *in, unsigned samples )
         *(out++) = GetDWBE( in );
 #endif
         in += 4;
+    }
+}
+
+static void Swap64Decode( void *outp, const uint8_t *in, unsigned samples )
+{
+    int64_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+#ifdef WORDS_BIGENDIAN
+        *(out++) = GetQWLE( in );
+#else
+        *(out++) = GetQWBE( in );
+#endif
+        in += 8;
     }
 }
 
@@ -476,13 +504,22 @@ static void U32NEncode( void *outp, const uint8_t *inp, unsigned samples )
         *(out++) =  *(in++) + 0x80000000;
 }
 
-static void S32IEncode( void *outp, const uint8_t *inp, unsigned samples )
+static void Swap32Encode( void *outp, const uint8_t *inp, unsigned samples )
 {
     const int32_t *in = (const int32_t *)inp;
     int32_t *out = outp;
 
     for( size_t i = 0; i < samples; i++ )
         *(out++) = bswap32( *(in++) );
+}
+
+static void Swap64Encode( void *outp, const uint8_t *inp, unsigned samples )
+{
+    const int64_t *in = (const int64_t *)inp;
+    int64_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+        *(out++) = bswap64( *(in++) );
 }
 
 static block_t *Encode( encoder_t *enc, block_t *in )
@@ -560,15 +597,29 @@ static int EncoderOpen( vlc_object_t *p_this )
         p_enc->fmt_out.audio.i_bitspersample = 32;
         break;
     case VLC_CODEC_S32I:
-        encode = S32IEncode;
+        encode = Swap32Encode;
     case VLC_CODEC_S32N:
         p_enc->fmt_in.i_codec = VLC_CODEC_S32N;
         p_enc->fmt_out.audio.i_bitspersample = 32;
         break;
+#ifdef WORDS_BIGENDIAN
+    case VLC_CODEC_F32L:
+#else
+    case VLC_CODEC_F32B:
+#endif
+        encode = Swap32Encode;
     case VLC_CODEC_FL32:
+        p_enc->fmt_in.i_codec = VLC_CODEC_FL32;
         p_enc->fmt_out.audio.i_bitspersample = 32;
         break;
+#ifdef WORDS_BIGENDIAN
+    case VLC_CODEC_F64L:
+#else
+    case VLC_CODEC_F64B:
+#endif
+        encode = Swap64Encode;
     case VLC_CODEC_FL64:
+        p_enc->fmt_in.i_codec = VLC_CODEC_FL64;
         p_enc->fmt_out.audio.i_bitspersample = 64;
         break;
     default:
