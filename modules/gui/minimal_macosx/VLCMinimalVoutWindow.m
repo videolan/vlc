@@ -26,11 +26,9 @@
  *****************************************************************************/
 #import "intf.h"
 #import "VLCMinimalVoutWindow.h"
+#import "misc.h"
 
 #import <Cocoa/Cocoa.h>
-
-/* SetSystemUIMode, ... */
-#import <Carbon/Carbon.h>
 
 @implementation VLCMinimalVoutWindow
 - (id)initWithContentRect:(NSRect)contentRect
@@ -42,21 +40,28 @@
         [self setHasShadow:YES];
         [self setMovableByWindowBackground: YES];
         [self center];
-        NSLog( @"window created" );
     }
     return self;
 }
 
 - (void)enterFullscreen
 {
+    NSScreen *screen = [self screen];
+
     initialFrame = [self frame];
-    SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
     [self setFrame:[[self screen] frame] display:YES animate:YES];
+
+    NSApplicationPresentationOptions presentationOpts = [NSApp presentationOptions];
+    if ([screen hasMenuBar])
+        presentationOpts |= NSApplicationPresentationAutoHideMenuBar;
+    if ([screen hasMenuBar] || [screen hasDock])
+        presentationOpts |= NSApplicationPresentationAutoHideDock;
+    [NSApp setPresentationOptions:presentationOpts];
 }
 
 - (void)leaveFullscreen
 {
-    SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
+    [NSApp setPresentationOptions: NSApplicationPresentationDefault];
     [self setFrame:initialFrame display:YES animate:YES];
 }
 

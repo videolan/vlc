@@ -3655,7 +3655,7 @@ AC_ARG_ENABLE(minimal-macosx,
   [  --enable-minimal-macosx Minimal Mac OS X support (default disabled)])
 if test "${enable_minimal_macosx}" = "yes" -a "${SYS}" = "darwin"
 then
-  VLC_ADD_LIBS([minimal_macosx], [-Wl,-framework,Cocoa -Wl,-framework,OpenGL -Wl,-framework,Carbon -Wl,-framework,CoreServices -Wl,-framework,AGL])
+  VLC_ADD_LIBS([minimal_macosx], [-Wl,-framework,Cocoa])
   VLC_ADD_OBJCFLAGS([minimal_macosx], [-fobjc-exceptions] )
   VLC_ADD_PLUGIN([minimal_macosx])
 fi
