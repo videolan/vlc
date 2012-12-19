@@ -63,7 +63,7 @@ int OpenIntf ( vlc_object_t *p_this )
 
     memset( p_intf->p_sys, 0, sizeof( *p_intf->p_sys ) );
 
-    p_intf->pf_run = Run;
+    Run(p_intf);
 
     return VLC_SUCCESS;
 }
