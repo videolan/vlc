@@ -23,13 +23,6 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * NOTA BENE: this module requires the linking against a library which is
- * known to require licensing under the GNU General Public License version 2
- * (or later). Therefore, the result of compiling this module will normally
- * be subject to the terms of that later license.
- *****************************************************************************/
-
-/*****************************************************************************
  *
  * information on teletext format can be found here :
  * http://pdc.ro.nu/teletext.html
