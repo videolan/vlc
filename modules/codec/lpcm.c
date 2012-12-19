@@ -256,11 +256,11 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
         {
         case 24:
         case 20:
-            p_dec->fmt_out.i_codec = VLC_CODEC_S24B;
-            p_dec->fmt_out.audio.i_bitspersample = 24;
+            p_dec->fmt_out.i_codec = VLC_CODEC_S32N;
+            p_dec->fmt_out.audio.i_bitspersample = 32;
             break;
         default:
-            p_dec->fmt_out.i_codec = VLC_CODEC_S16B;
+            p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
             p_dec->fmt_out.audio.i_bitspersample = 16;
             break;
         }
@@ -378,13 +378,13 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         /* */
         if( i_bits == 16 )
         {
-            p_dec->fmt_out.i_codec = VLC_CODEC_S16B;
+            p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
             p_dec->fmt_out.audio.i_bitspersample = 16;
         }
         else
         {
-            p_dec->fmt_out.i_codec = VLC_CODEC_S24B;
-            p_dec->fmt_out.audio.i_bitspersample = 24;
+            p_dec->fmt_out.i_codec = VLC_CODEC_S32N;
+            p_dec->fmt_out.audio.i_bitspersample = 32;
         }
 
         /* */
@@ -920,65 +920,69 @@ static int BdHeader( unsigned *pi_rate,
 static void VobExtract( block_t *p_aout_buffer, block_t *p_block,
                         unsigned i_bits )
 {
-    uint8_t *p_out = p_aout_buffer->p_buffer;
-
     /* 20/24 bits LPCM use special packing */
     if( i_bits == 24 )
     {
+        uint32_t *p_out = (uint32_t *)p_aout_buffer->p_buffer;
+
         while( p_block->i_buffer / 12 )
         {
             /* Sample 1 */
-            p_out[0] = p_block->p_buffer[0];
-            p_out[1] = p_block->p_buffer[1];
-            p_out[2] = p_block->p_buffer[8];
+            *(p_out++) = (p_block->p_buffer[ 0] << 24)
+                       | (p_block->p_buffer[ 1] << 16)
+                       | (p_block->p_buffer[ 8] <<  8);
             /* Sample 2 */
-            p_out[3] = p_block->p_buffer[2];
-            p_out[4] = p_block->p_buffer[3];
-            p_out[5] = p_block->p_buffer[9];
+            *(p_out++) = (p_block->p_buffer[ 2] << 24)
+                       | (p_block->p_buffer[ 3] << 16)
+                       | (p_block->p_buffer[ 9] <<  8);
             /* Sample 3 */
-            p_out[6] = p_block->p_buffer[4];
-            p_out[7] = p_block->p_buffer[5];
-            p_out[8] = p_block->p_buffer[10];
+            *(p_out++) = (p_block->p_buffer[ 4] << 24)
+                       | (p_block->p_buffer[ 5] << 16)
+                       | (p_block->p_buffer[10] <<  8);
             /* Sample 4 */
-            p_out[9] = p_block->p_buffer[6];
-            p_out[10] = p_block->p_buffer[7];
-            p_out[11] = p_block->p_buffer[11];
+            *(p_out++) = (p_block->p_buffer[ 6] << 24)
+                       | (p_block->p_buffer[ 7] << 16)
+                       | (p_block->p_buffer[11] <<  8);
 
             p_block->i_buffer -= 12;
             p_block->p_buffer += 12;
-            p_out += 12;
         }
     }
     else if( i_bits == 20 )
     {
+        uint32_t *p_out = (uint32_t *)p_aout_buffer->p_buffer;
+
         while( p_block->i_buffer / 10 )
         {
             /* Sample 1 */
-            p_out[0] = p_block->p_buffer[0];
-            p_out[1] = p_block->p_buffer[1];
-            p_out[2] = p_block->p_buffer[8] & 0xF0;
+            *(p_out++) = ( p_block->p_buffer[0]         << 24)
+                       | ( p_block->p_buffer[1]         << 16)
+                       | ((p_block->p_buffer[8] & 0xF0) <<  8);
             /* Sample 2 */
-            p_out[3] = p_block->p_buffer[2];
-            p_out[4] = p_block->p_buffer[3];
-            p_out[5] = p_block->p_buffer[8] << 4;
+            *(p_out++) = ( p_block->p_buffer[2]         << 24)
+                       | ( p_block->p_buffer[3]         << 16)
+                       | ((p_block->p_buffer[8] & 0x0F) << 12);
             /* Sample 3 */
-            p_out[6] = p_block->p_buffer[4];
-            p_out[7] = p_block->p_buffer[5];
-            p_out[8] = p_block->p_buffer[9] & 0xF0;
+            *(p_out++) = ( p_block->p_buffer[4]         << 24)
+                       | ( p_block->p_buffer[5]         << 16)
+                       | ((p_block->p_buffer[9] & 0xF0) <<  8);
             /* Sample 4 */
-            p_out[9] = p_block->p_buffer[6];
-            p_out[10] = p_block->p_buffer[7];
-            p_out[11] = p_block->p_buffer[9] << 4;
+            *(p_out++) = ( p_block->p_buffer[6]         << 24)
+                       | ( p_block->p_buffer[7]         << 16)
+                       | ((p_block->p_buffer[9] & 0x0F) << 12);
 
             p_block->i_buffer -= 10;
             p_block->p_buffer += 10;
-            p_out += 12;
         }
     }
     else
     {
         assert( i_bits == 16 );
-        memcpy( p_out, p_block->p_buffer, p_block->i_buffer );
+#ifdef WORDS_BIGENDIAN
+        memcpy( p_aout_buffer->p_buffer, p_block->p_buffer, p_block->i_buffer );
+#else
+        swab( p_block->p_buffer, p_aout_buffer->p_buffer, p_block->i_buffer );
+#endif
     }
 }
 static void AobExtract( block_t *p_aout_buffer,
