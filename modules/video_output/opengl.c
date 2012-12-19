@@ -218,10 +218,9 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
     }
 
-    if( vgl->gl->getProcAddress == NULL )
-    {
+    if (vgl->gl->getProcAddress == NULL) {
         fprintf(stderr, "getProcAddress not implemented, bailing out\n");
-        free( vgl );
+        free(vgl);
         return NULL;
     }
 
@@ -232,8 +231,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #else
     bool supports_shaders = false;
 #ifdef __APPLE__
-    if( kCFCoreFoundationVersionNumber >= 786. )
-         supports_shaders = true;
+    if (kCFCoreFoundationVersionNumber >= 786.)
+        supports_shaders = true;
 #endif
 #endif
 
@@ -259,7 +258,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     /* Use YUV if possible and needed */
     bool need_fs_yuv = false;
     float yuv_range_correction = 1.0;
-    if ( max_texture_units >= 3 && supports_shaders &&
+    if (max_texture_units >= 3 && supports_shaders &&
         vlc_fourcc_IsYUV(fmt->i_chroma) && !vlc_fourcc_IsYUV(vgl->fmt.i_chroma)) {
         const vlc_fourcc_t *list = vlc_fourcc_GetYUVFallback(fmt->i_chroma);
         while (*list) {
@@ -325,23 +324,20 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
     vgl->use_multitexture = vgl->chroma->plane_count > 1;
-    vgl->supports_npot = HasExtension( extensions, "GL_ARB_texture_non_power_of_two" ) ||
-                         HasExtension( extensions, "GL_APPLE_texture_2D_limited_npot" );
+    vgl->supports_npot = HasExtension(extensions, "GL_ARB_texture_non_power_of_two") ||
+                         HasExtension(extensions, "GL_APPLE_texture_2D_limited_npot");
 
-    if( !vgl->CreateShader || !vgl->ShaderSource || !vgl->CreateProgram )
-    {
+    if (!vgl->CreateShader || !vgl->ShaderSource || !vgl->CreateProgram) {
         fprintf(stderr, "Looks like you don't have all the opengl we need. Driver is %s, giving up\n", glGetString(GL_VERSION));
-        free( vgl );
+        free(vgl);
         return NULL;
     }
-
 
     /* Texture size */
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
         int w = vgl->fmt.i_width  * vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den;
         int h = vgl->fmt.i_height * vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den;
-        if( vgl->supports_npot )
-        {
+        if (vgl->supports_npot) {
             vgl->tex_width[j]  = w;
             vgl->tex_height[j] = h;
         } else {
@@ -358,148 +354,144 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     if (supports_shaders) {
         char *code = NULL;
 
-            /* [R/G/B][Y U V O] from TV range to full range
-             * XXX we could also do hue/brightness/constrast/gamma
-             * by simply changing the coefficients
-             */
-            const float matrix_bt601_tv2full[12] = {
-                 1.164383561643836,  0.0000,             1.596026785714286, -0.874202217873451 ,
-                 1.164383561643836, -0.391762290094914, -0.812967647237771,  0.531667823499146 ,
-                 1.164383561643836,  2.017232142857142,  0.0000,            -1.085630789302022 ,
-            };
-            const float matrix_bt709_tv2full[12] = {
-                 1.164383561643836,  0.0000,             1.792741071428571, -0.972945075016308 ,
-                 1.164383561643836, -0.21324861427373,  -0.532909328559444,  0.301482665475862 ,
-                 1.164383561643836,  2.112401785714286,  0.0000,            -1.133402217873451 ,
-            };
-            const float (*matrix) = fmt->i_height > 576 ? matrix_bt709_tv2full
-                                                           : matrix_bt601_tv2full;
+        /* [R/G/B][Y U V O] from TV range to full range
+         * XXX we could also do hue/brightness/constrast/gamma
+         * by simply changing the coefficients
+         */
+        const float matrix_bt601_tv2full[12] = {
+            1.164383561643836,  0.0000,             1.596026785714286, -0.874202217873451 ,
+            1.164383561643836, -0.391762290094914, -0.812967647237771,  0.531667823499146 ,
+            1.164383561643836,  2.017232142857142,  0.0000,            -1.085630789302022 ,
+        };
+        const float matrix_bt709_tv2full[12] = {
+            1.164383561643836,  0.0000,             1.792741071428571, -0.972945075016308 ,
+            1.164383561643836, -0.21324861427373,  -0.532909328559444,  0.301482665475862 ,
+            1.164383561643836,  2.112401785714286,  0.0000,            -1.133402217873451 ,
+        };
+        const float (*matrix) = fmt->i_height > 576 ? matrix_bt709_tv2full
+                                                       : matrix_bt601_tv2full;
 
-            /* Basic linear YUV -> RGB conversion using bilinear interpolation */
-            const char *template_glsl_yuv =
-                "#version 120\n"
-                "uniform sampler2D Texture[3];"
-                "uniform vec4      coefficient[4];"
-                "varying vec4      TexCoord0,TexCoord1,TexCoord2;"
-
-                "void main(void) {"
-                " vec4 x,y,z,result;"
-                " x  = texture2D(Texture[0], TexCoord0.st);"
-                " %c = texture2D(Texture[1], TexCoord1.st);"
-                " %c = texture2D(Texture[2], TexCoord2.st);"
-
-                " result = x * coefficient[0] + coefficient[3];"
-                " result = (y * coefficient[1]) + result;"
-                " result = (z * coefficient[2]) + result;"
-                " gl_FragColor = result;"
-                "}";
-            bool swap_uv = vgl->fmt.i_chroma == VLC_CODEC_YV12 ||
-                           vgl->fmt.i_chroma == VLC_CODEC_YV9;
-            if (asprintf(&code, template_glsl_yuv,
-                         swap_uv ? 'z' : 'y',
-                         swap_uv ? 'y' : 'z') < 0)
-                code = NULL;
-
-            for (int i = 0; i < 4; i++) {
-                float correction = i < 3 ? yuv_range_correction : 1.0;
-                /* We place coefficient values for coefficient[4] in one array from matrix values.
-                   Notice that we fill values from top down instead of left to right.*/
-                for( int j = 0; j < 4; j++ )
-                    vgl->local_value[vgl->local_count + i*4+j] = j < 3 ? correction * matrix[j*4+i] : 0.0 ;
-            }
-            vgl->local_count += 4;
-
-            // Basic vertex shader that we use in both cases
-            const char *vertexShader =
-            "#version 120\n"
-            "varying   vec4 TexCoord0,TexCoord1, TexCoord2;"
-            "attribute vec4 MultiTexCoord0,MultiTexCoord1,MultiTexCoord2;"
-            "attribute vec4 vertex_position;"
-            "void main() {"
-            " TexCoord0 = MultiTexCoord0;"
-            " TexCoord1 = MultiTexCoord1;"
-            " TexCoord2 = MultiTexCoord2;"
-            " gl_Position = vertex_position; }";
-
-            // Dummy shader for text overlay
-            const char *helloShader =
+        /* Basic linear YUV -> RGB conversion using bilinear interpolation */
+        const char *template_glsl_yuv =
             "#version 120\n"
             "uniform sampler2D Texture[3];"
-            "uniform vec4 fillColor;"
-            "varying vec4 TexCoord0,TexCoord1,TexCoord2;"
-            "void main()"
-            "{ "
-            "  gl_FragColor = texture2D(Texture[0], TexCoord0.st)*fillColor;}";
+            "uniform vec4      coefficient[4];"
+            "varying vec4      TexCoord0,TexCoord1,TexCoord2;"
 
-            vgl->shader[2] = vgl->CreateShader( GL_VERTEX_SHADER );
-            vgl->ShaderSource( vgl->shader[2], 1, (const GLchar **)&vertexShader, NULL);
-            vgl->CompileShader( vgl->shader[2] );
+            "void main(void) {"
+            " vec4 x,y,z,result;"
+            " x  = texture2D(Texture[0], TexCoord0.st);"
+            " %c = texture2D(Texture[1], TexCoord1.st);"
+            " %c = texture2D(Texture[2], TexCoord2.st);"
 
-            /* Create 'dummy' shader that handles subpicture overlay for now*/
-            vgl->shader[1] = vgl->CreateShader( GL_FRAGMENT_SHADER );
-            vgl->ShaderSource( vgl->shader[1], 1, &helloShader, NULL);
-            vgl->CompileShader( vgl->shader[1] );
-            vgl->program[1] = vgl->CreateProgram();
-            vgl->AttachShader( vgl->program[1], vgl->shader[1]);
-            vgl->AttachShader( vgl->program[1], vgl->shader[2]);
-            vgl->LinkProgram( vgl->program[1] );
+            " result = x * coefficient[0] + coefficient[3];"
+            " result = (y * coefficient[1]) + result;"
+            " result = (z * coefficient[2]) + result;"
+            " gl_FragColor = result;"
+            "}";
+        bool swap_uv = vgl->fmt.i_chroma == VLC_CODEC_YV12 ||
+                       vgl->fmt.i_chroma == VLC_CODEC_YV9;
+        if (asprintf(&code, template_glsl_yuv,
+                     swap_uv ? 'z' : 'y',
+                     swap_uv ? 'y' : 'z') < 0)
+            code = NULL;
 
-            // Create shader from code
-            vgl->shader[0] = vgl->CreateShader( GL_FRAGMENT_SHADER );
-            vgl->program[0] = vgl->CreateProgram();
-            if( need_fs_yuv )
-            {
-                vgl->ShaderSource( vgl->shader[0], 1, (const GLchar **)&code, NULL );
-                vgl->CompileShader( vgl->shader[0]);
-                vgl->AttachShader( vgl->program[0], vgl->shader[0] );
-            } else {
-                /* Use simpler shader if we don't need to to yuv -> rgb,
-                   for example when input is allready rgb (.bmp image).*/
-                vgl->AttachShader( vgl->program[0], vgl->shader[1] );
-            }
-            vgl->AttachShader( vgl->program[0], vgl->shader[2]);
+        for (int i = 0; i < 4; i++) {
+            float correction = i < 3 ? yuv_range_correction : 1.0;
+            /* We place coefficient values for coefficient[4] in one array from matrix values.
+               Notice that we fill values from top down instead of left to right.*/
+            for (int j = 0; j < 4; j++)
+                vgl->local_value[vgl->local_count + i*4+j] = j < 3 ? correction * matrix[j*4+i] : 0.0 ;
+        }
+        vgl->local_count += 4;
 
-            vgl->LinkProgram( vgl->program[0] );
+        // Basic vertex shader that we use in both cases
+        const char *vertexShader =
+        "#version 120\n"
+        "varying   vec4 TexCoord0,TexCoord1, TexCoord2;"
+        "attribute vec4 MultiTexCoord0,MultiTexCoord1,MultiTexCoord2;"
+        "attribute vec4 vertex_position;"
+        "void main() {"
+        " TexCoord0 = MultiTexCoord0;"
+        " TexCoord1 = MultiTexCoord1;"
+        " TexCoord2 = MultiTexCoord2;"
+        " gl_Position = vertex_position;"
+        "}";
 
-            free(code);
-            for( GLuint i = 0; i < 2; i++ )
-            {
-                int infoLength = 0;
-                int charsWritten = 0;
-                char *infolog;
-                vgl->GetProgramiv( vgl->program[i], GL_INFO_LOG_LENGTH, &infoLength );
-                if( infoLength > 1 )
-                {
-                    /* If there is some message, better to check linking is ok */
-                    GLint link_status = GL_TRUE;
-                    vgl->GetProgramiv( vgl->program[i], GL_LINK_STATUS, &link_status );
+        // Dummy shader for text overlay
+        const char *helloShader =
+        "#version 120\n"
+        "uniform sampler2D Texture[3];"
+        "uniform vec4 fillColor;"
+        "varying vec4 TexCoord0,TexCoord1,TexCoord2;"
+        "void main()"
+        "{ "
+        "  gl_FragColor = texture2D(Texture[0], TexCoord0.st)*fillColor;"
+        "}";
 
-                    infolog = (char *)malloc(infoLength);
-                    vgl->GetProgramInfoLog( vgl->program[i], infoLength, &charsWritten, infolog );
-                    fprintf(stderr, "shader program %d:%s %d\n",i,infolog,infoLength);
-                    free(infolog);
+        vgl->shader[2] = vgl->CreateShader(GL_VERTEX_SHADER);
+        vgl->ShaderSource(vgl->shader[2], 1, (const GLchar **)&vertexShader, NULL);
+        vgl->CompileShader(vgl->shader[2]);
 
-                    /* Check shaders messages too */
-                    for( GLuint j = 0; j < 2; j++ )
-                    {
-                        vgl->GetShaderiv( vgl->shader[j], GL_INFO_LOG_LENGTH, &infoLength );
-                        if( infoLength > 1 )
-                        {
-                            infolog = (char *)malloc(infoLength);
-                            vgl->GetShaderInfoLog( vgl->shader[j], infoLength, &charsWritten, infolog );
-                            fprintf(stderr, "shader %d: %s\n",j,infolog );
-                            free( infolog );
-                        }
-                    }
+        /* Create 'dummy' shader that handles subpicture overlay for now*/
+        vgl->shader[1] = vgl->CreateShader(GL_FRAGMENT_SHADER);
+        vgl->ShaderSource(vgl->shader[1], 1, &helloShader, NULL);
+        vgl->CompileShader(vgl->shader[1]);
+        vgl->program[1] = vgl->CreateProgram();
+        vgl->AttachShader(vgl->program[1], vgl->shader[1]);
+        vgl->AttachShader(vgl->program[1], vgl->shader[2]);
+        vgl->LinkProgram(vgl->program[1]);
 
-                    if( link_status == GL_FALSE )
-                    {
-                        fprintf( stderr, "Unable to use program %d\n", i );
-                        free( vgl );
-                        return NULL;
+        // Create shader from code
+        vgl->shader[0] = vgl->CreateShader(GL_FRAGMENT_SHADER);
+        vgl->program[0] = vgl->CreateProgram();
+        if (need_fs_yuv) {
+            vgl->ShaderSource(vgl->shader[0], 1, (const GLchar **)&code, NULL);
+            vgl->CompileShader(vgl->shader[0]);
+            vgl->AttachShader(vgl->program[0], vgl->shader[0]);
+        } else {
+            /* Use simpler shader if we don't need to to yuv -> rgb,
+               for example when input is allready rgb (.bmp image).*/
+            vgl->AttachShader(vgl->program[0], vgl->shader[1]);
+        }
+        vgl->AttachShader(vgl->program[0], vgl->shader[2]);
+
+        vgl->LinkProgram(vgl->program[0]);
+
+        free(code);
+        for (GLuint i = 0; i < 2; i++) {
+            int infoLength = 0;
+            int charsWritten = 0;
+            char *infolog;
+            vgl->GetProgramiv(vgl->program[i], GL_INFO_LOG_LENGTH, &infoLength);
+            if (infoLength > 1) {
+                /* If there is some message, better to check linking is ok */
+                GLint link_status = GL_TRUE;
+                vgl->GetProgramiv(vgl->program[i], GL_LINK_STATUS, &link_status);
+
+                infolog = (char *)malloc(infoLength);
+                vgl->GetProgramInfoLog(vgl->program[i], infoLength, &charsWritten, infolog);
+                fprintf(stderr, "shader program %d:%s %d\n",i,infolog,infoLength);
+                free(infolog);
+
+                /* Check shaders messages too */
+                for (GLuint j = 0; j < 2; j++) {
+                    vgl->GetShaderiv(vgl->shader[j], GL_INFO_LOG_LENGTH, &infoLength);
+                    if (infoLength > 1) {
+                        infolog = (char *)malloc(infoLength);
+                        vgl->GetShaderInfoLog(vgl->shader[j], infoLength, &charsWritten, infolog);
+                        fprintf(stderr, "shader %d: %s\n",j, infolog);
+                        free(infolog);
                     }
                 }
+
+                if (link_status == GL_FALSE) {
+                    fprintf(stderr, "Unable to use program %d\n", i);
+                    free(vgl);
+                    return NULL;
+                }
             }
+        }
     }
 
     /* */
@@ -532,7 +524,6 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
 {
     /* */
     if (!vlc_gl_Lock(vgl->gl)) {
-
         glFinish();
         glFlush();
         for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++)
@@ -543,12 +534,11 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
         }
         free(vgl->region);
 
-        if (vgl->program[0])
-        {
-            for( int i = 0; i < 2; i++ )
-                vgl->DeleteProgram( vgl->program[i] );
-            for( int i = 0; i < 3; i++ )
-                vgl->DeleteShader( vgl->shader[i] );
+        if (vgl->program[0]) {
+            for (int i = 0; i < 2; i++)
+                vgl->DeleteProgram(vgl->program[i]);
+            for (int i = 0; i < 3; i++)
+                vgl->DeleteShader(vgl->shader[i]);
         }
 
         vlc_gl_Unlock(vgl->gl);
@@ -591,8 +581,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
         glGenTextures(vgl->chroma->plane_count, vgl->texture[i]);
         for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-            if (vgl->use_multitexture)
-            {
+            if (vgl->use_multitexture) {
                 glActiveTexture(GL_TEXTURE0 + j);
                 glClientActiveTexture(GL_TEXTURE0 + j);
             }
@@ -650,8 +639,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
 
     /* Update the texture */
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-        if (vgl->use_multitexture)
-        {
+        if (vgl->use_multitexture) {
             glActiveTexture(GL_TEXTURE0 + j);
             glClientActiveTexture(GL_TEXTURE0 + j);
         }
@@ -679,8 +667,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
         vgl->region_count = count;
         vgl->region       = calloc(count, sizeof(*vgl->region));
 
-        if (vgl->use_multitexture)
-        {
+        if (vgl->use_multitexture) {
             glActiveTexture(GL_TEXTURE0 + 0);
             glClientActiveTexture(GL_TEXTURE0 + 0);
         }
@@ -692,10 +679,9 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
             glr->type   = GL_UNSIGNED_BYTE;
             glr->width  = r->fmt.i_visible_width;
             glr->height = r->fmt.i_visible_height;
-            if(!vgl->supports_npot )
-            {
-                glr->width  = GetAlignedSize( glr->width );
-                glr->height = GetAlignedSize( glr->height );
+            if (!vgl->supports_npot) {
+                glr->width  = GetAlignedSize(glr->width);
+                glr->height = GetAlignedSize(glr->height);
             }
             glr->alpha  = (float)subpicture->i_alpha * r->i_alpha / 255 / 255;
             glr->left   =  2.0 * (r->i_x                          ) / subpicture->i_original_picture_width  - 1.0;
@@ -755,7 +741,8 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     return VLC_SUCCESS;
 }
 
-static void draw_without_shaders( vout_display_opengl_t *vgl, float *left, float *top, float *right, float *bottom )
+static void DrawWithoutShaders(vout_display_opengl_t *vgl,
+                               float *left, float *top, float *right, float *bottom)
 {
     static const GLfloat vertexCoord[] = {
         -1.0f, -1.0f,
@@ -772,47 +759,46 @@ static void draw_without_shaders( vout_display_opengl_t *vgl, float *left, float
     };
 
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-       glActiveTexture( GL_TEXTURE0 + j );
-       glClientActiveTexture( GL_TEXTURE0 + j );
+        glActiveTexture(GL_TEXTURE0 + j);
+        glClientActiveTexture(GL_TEXTURE0 + j);
 
-       glEnableClientState(GL_VERTEX_ARRAY);
-       glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-       glEnable(vgl->tex_target);
+        glEnable(vgl->tex_target);
 
-       glBindTexture(vgl->tex_target, vgl->texture[0][j]);
-       glTexCoordPointer(2, GL_FLOAT, 0, textureCoord);
+        glBindTexture(vgl->tex_target, vgl->texture[0][j]);
+        glTexCoordPointer(2, GL_FLOAT, 0, textureCoord);
     }
-    glActiveTexture( GL_TEXTURE0 );
-    glClientActiveTexture( GL_TEXTURE0 );
+    glActiveTexture(GL_TEXTURE0);
+    glClientActiveTexture(GL_TEXTURE0);
 
     glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-       glActiveTexture( GL_TEXTURE0 + j );
-       glClientActiveTexture( GL_TEXTURE0 + j );
-       glDisable(vgl->tex_target);
-       glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-       glDisableClientState(GL_VERTEX_ARRAY);
+        glActiveTexture(GL_TEXTURE0 + j);
+        glClientActiveTexture(GL_TEXTURE0 + j);
+        glDisable(vgl->tex_target);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        glDisableClientState(GL_VERTEX_ARRAY);
     }
-    glActiveTexture( GL_TEXTURE0 );
-    glClientActiveTexture( GL_TEXTURE0 );
+    glActiveTexture(GL_TEXTURE0);
+    glClientActiveTexture(GL_TEXTURE0);
 }
 
-static void draw_with_shaders( vout_display_opengl_t *vgl, float *left, float *top, float *right, float *bottom )
+static void DrawWithShaders(vout_display_opengl_t *vgl,
+                            float *left, float *top, float *right, float *bottom)
 {
-
     const GLfloat vertexCoord[] = {
-        -1.0, 1.0,
+        -1.0,  1.0,
         -1.0, -1.0,
-        1.0, 1.0,
-        1.0, -1.0,
+         1.0,  1.0,
+         1.0, -1.0,
     };
 
-    for( unsigned j = 0; j < vgl->chroma->plane_count; j++)
-    {
+    for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
         char *attribute = NULL;
         const GLfloat texCoord[] = {
             left[j], top[j],
@@ -820,24 +806,24 @@ static void draw_with_shaders( vout_display_opengl_t *vgl, float *left, float *t
             right[j], top[j],
             right[j], bottom[j],
         };
-        glActiveTexture( GL_TEXTURE0+j);
-        glClientActiveTexture( GL_TEXTURE0+j);
+        glActiveTexture(GL_TEXTURE0+j);
+        glClientActiveTexture(GL_TEXTURE0+j);
         glEnable(vgl->tex_target);
         glBindTexture(vgl->tex_target, vgl->texture[0][j]);
-        if(asprintf( &attribute, "MultiTexCoord%1d", j ) == -1 )
+        if (asprintf(&attribute, "MultiTexCoord%1d", j) == -1)
             return;
 
-        vgl->EnableVertexAttribArray( vgl->GetAttribLocation(vgl->program[0], attribute ) );
-        vgl->VertexAttribPointer( vgl->GetAttribLocation( vgl->program[0], attribute ), 2, GL_FLOAT, 0, 0, texCoord);
-        free( attribute );
+        vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[0], attribute));
+        vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[0], attribute), 2, GL_FLOAT, 0, 0, texCoord);
+        free(attribute);
         attribute = NULL;
     }
     glActiveTexture(GL_TEXTURE0 + 0);
     glClientActiveTexture(GL_TEXTURE0 + 0);
-    vgl->EnableVertexAttribArray( vgl->GetAttribLocation( vgl->program[0], "vertex_position"));
-    vgl->VertexAttribPointer( vgl->GetAttribLocation( vgl->program[0], "vertex_position"), 2, GL_FLOAT, 0, 0, vertexCoord);
+    vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[0], "vertex_position"));
+    vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[0], "vertex_position"), 2, GL_FLOAT, 0, 0, vertexCoord);
 
-    glDrawArrays( GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 int vout_display_opengl_Display(vout_display_opengl_t *vgl,
@@ -868,27 +854,24 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         bottom[j] = (source->i_y_offset + source->i_visible_height) * scale_h;
     }
 
-
     /* Why drawing here and not in Render()? Because this way, the
        OpenGL providers can call vout_display_opengl_Display to force redraw.i
        Currently, the OS X provider uses it to get a smooth window resizing */
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-
-    if( vgl->program[0] )
-    {
+    if (vgl->program[0]) {
         vgl->UseProgram(vgl->program[0]);
-        vgl->Uniform4fv( vgl->GetUniformLocation( vgl->program[0], "coefficient" ), 4, vgl->local_value);
-        vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[0], "Texture[0]" ), 0);
-        vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[0], "Texture[1]" ), 1);
-        vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[0], "Texture[2]" ), 2);
-        draw_with_shaders( vgl, left, top ,right, bottom );
+        vgl->Uniform4fv(vgl->GetUniformLocation(vgl->program[0], "coefficient"), 4, vgl->local_value);
+        vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture[0]"), 0);
+        vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture[1]"), 1);
+        vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture[2]"), 2);
+        DrawWithShaders(vgl, left, top ,right, bottom);
         // Change the program for overlays
         vgl->UseProgram(vgl->program[1]);
-        vgl->Uniform1i( vgl->GetUniformLocation( vgl->program[1], "Texture[0]" ), 0);
+        vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[1], "Texture[0]"), 0);
     } else {
-        draw_without_shaders( vgl, left, top, right, bottom );
+        DrawWithoutShaders(vgl, left, top, right, bottom);
     }
 
     glActiveTexture(GL_TEXTURE0 + 0);
@@ -913,18 +896,15 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         };
 
         glBindTexture(GL_TEXTURE_2D, glr->texture);
-        if( vgl->program[0] )
-        {
-            vgl->Uniform4f( vgl->GetUniformLocation( vgl->program[1], "fillColor"), 1.0f, 1.0f, 1.0f, glr->alpha);
-            vgl->EnableVertexAttribArray( vgl->GetAttribLocation( vgl->program[1], "MultiTexCoord0") );
-            vgl->VertexAttribPointer( vgl->GetAttribLocation( vgl->program[1], "MultiTexCoord0"), 2, GL_FLOAT, 0, 0, textureCoord);
-            vgl->EnableVertexAttribArray( vgl->GetAttribLocation( vgl->program[1], "vertex_position"));
-            vgl->VertexAttribPointer( vgl->GetAttribLocation( vgl->program[1], "vertex_position"), 2, GL_FLOAT, 0, 0, vertexCoord);
-        }
-        else
-        {
+        if (vgl->program[0]) {
+            vgl->Uniform4f(vgl->GetUniformLocation(vgl->program[1], "fillColor"), 1.0f, 1.0f, 1.0f, glr->alpha);
+            vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[1], "MultiTexCoord0"));
+            vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "MultiTexCoord0"), 2, GL_FLOAT, 0, 0, textureCoord);
+            vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[1], "vertex_position"));
+            vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "vertex_position"), 2, GL_FLOAT, 0, 0, vertexCoord);
+        } else {
             glEnableClientState(GL_VERTEX_ARRAY);
-            glColor4f( 1.0f, 1.0f, 1.0f, glr->alpha );
+            glColor4f(1.0f, 1.0f, 1.0f, glr->alpha);
             glEnable(GL_TEXTURE_COORD_ARRAY);
             glEnable(GL_VERTEX_ARRAY);
             glTexCoordPointer(2, GL_FLOAT, 0, textureCoord);
@@ -932,10 +912,9 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
             glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
         }
 
-        glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-        if( !vgl->program[0] )
-        {
+        if (!vgl->program[0]) {
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
             glDisableClientState(GL_VERTEX_ARRAY);
         }
