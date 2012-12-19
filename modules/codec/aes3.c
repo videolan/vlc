@@ -157,32 +157,19 @@ static block_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_block->i_buffer -= AES3_HEADER_LEN;
     p_block->p_buffer += AES3_HEADER_LEN;
 
-#ifdef WORDS_BIGENGIAN
-# define LOB 2
-# define HIB 0
-#else
-# define LOB 0
-# define HIB 2
-#endif
-#define  MIB 1
     if( i_bits == 24 )
     {
-        uint8_t *p_out = p_aout_buffer->p_buffer;
+        uint32_t *p_out = (uint32_t *)p_aout_buffer->p_buffer;
 
         while( p_block->i_buffer / 7 )
         {
-            p_out[LOB] = reverse[p_block->p_buffer[0]];
-            p_out[MIB] = reverse[p_block->p_buffer[1]];
-            p_out[HIB] = reverse[p_block->p_buffer[2]];
-            p_out += 3;
-
-            p_out[LOB] =  (reverse[p_block->p_buffer[3]] >> 4)
-                       | ((reverse[p_block->p_buffer[4]] << 4) & 0xf0);
-            p_out[MIB] =  (reverse[p_block->p_buffer[4]] >> 4)
-                       | ((reverse[p_block->p_buffer[5]] << 4) & 0xf0);
-            p_out[HIB] =  (reverse[p_block->p_buffer[5]] >> 4)
-                       | ((reverse[p_block->p_buffer[6]] << 4) & 0xf0);
-            p_out += 3;
+            *(p_out++) =  (reverse[p_block->p_buffer[0]] <<  8)
+                        | (reverse[p_block->p_buffer[1]] << 16)
+                        | (reverse[p_block->p_buffer[2]] << 24);
+            *(p_out++) = ((reverse[p_block->p_buffer[3]] <<  4)
+                        | (reverse[p_block->p_buffer[4]] << 12)
+                        | (reverse[p_block->p_buffer[5]] << 20)
+                        | (reverse[p_block->p_buffer[6]] << 28)) & 0xFFFFFF00;
 
             p_block->i_buffer -= 7;
             p_block->p_buffer += 7;
@@ -191,47 +178,34 @@ static block_t *Decode( decoder_t *p_dec, block_t **pp_block )
     }
     else if( i_bits == 20 )
     {
-        uint8_t *p_out = p_aout_buffer->p_buffer;
+        uint32_t *p_out = (uint32_t *)p_aout_buffer->p_buffer;
 
         while( p_block->i_buffer / 6 )
         {
-            p_out[LOB] = ((reverse[p_block->p_buffer[0]] << 4) & 0xf0);
-            p_out[MIB] =  (reverse[p_block->p_buffer[0]] >> 4)
-                       | ((reverse[p_block->p_buffer[1]] << 4) & 0xf0);
-            p_out[HIB] =  (reverse[p_block->p_buffer[1]] >> 4)
-                       | ((reverse[p_block->p_buffer[2]] << 4) & 0xf0);
-            p_out += 3;
-
-            p_out[LOB] = ((reverse[p_block->p_buffer[3]] << 4) & 0xf0);
-            p_out[MIB] =  (reverse[p_block->p_buffer[3]] >> 4)
-                       | ((reverse[p_block->p_buffer[4]] << 4) & 0xf0);
-            p_out[HIB] =  (reverse[p_block->p_buffer[4]] >> 4)
-                       | ((reverse[p_block->p_buffer[5]] << 4) & 0xf0);
-            p_out += 3;
+            *(p_out++) = (reverse[p_block->p_buffer[0]] << 12)
+                       | (reverse[p_block->p_buffer[1]] << 20)
+                       | (reverse[p_block->p_buffer[2]] << 28);
+            *(p_out++) = (reverse[p_block->p_buffer[3]] << 12)
+                       | (reverse[p_block->p_buffer[4]] << 20)
+                       | (reverse[p_block->p_buffer[5]] << 28);
 
             p_block->i_buffer -= 6;
             p_block->p_buffer += 6;
         }
     }
-#undef  HIB
-#define HIB (!(LOB))
     else
     {
-        uint8_t *p_out = p_aout_buffer->p_buffer;
+        uint16_t *p_out = (uint16_t *)p_aout_buffer->p_buffer;
 
         assert( i_bits == 16 );
 
         while( p_block->i_buffer / 5 )
         {
-            p_out[LOB] = reverse[p_block->p_buffer[0]];
-            p_out[HIB] = reverse[p_block->p_buffer[1]];
-            p_out += 2;
-
-            p_out[LOB] =  (reverse[p_block->p_buffer[2]] >> 4)
-                       | ((reverse[p_block->p_buffer[3]] << 4) & 0xf0);
-            p_out[HIB] =  (reverse[p_block->p_buffer[3]] >> 4)
-                       | ((reverse[p_block->p_buffer[4]] << 4) & 0xf0);
-            p_out += 2;
+            *(p_out++) =  reverse[p_block->p_buffer[0]]
+                        | reverse[p_block->p_buffer[1]];
+            *(p_out++) = (reverse[p_block->p_buffer[2]] >>  4)
+                       | (reverse[p_block->p_buffer[3]] <<  4)
+                       | (reverse[p_block->p_buffer[4]] << 12);
 
             p_block->i_buffer -= 5;
             p_block->p_buffer += 5;
@@ -385,9 +359,8 @@ static block_t *Parse( decoder_t *p_dec, int *pi_frame_length, int *pi_bits,
     }
     else
     {
-        p_dec->fmt_out.i_codec = i_bits == 16 ? VLC_CODEC_S16N
-                                              : VLC_CODEC_S24N;
-        p_dec->fmt_out.audio.i_bitspersample = i_bits == 16 ? 16 : 24;
+        p_dec->fmt_out.i_codec = i_bits == 16 ? VLC_CODEC_S16N : VLC_CODEC_S32N;
+        p_dec->fmt_out.audio.i_bitspersample = i_bits == 16 ? 16 : 32;
     }
 
     p_dec->fmt_out.audio.i_channels = i_channels;
