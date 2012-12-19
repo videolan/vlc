@@ -87,6 +87,9 @@ static void U16BDecode( void *, const uint8_t *, unsigned );
 static void U16LDecode( void *, const uint8_t *, unsigned );
 static void S16IDecode( void *, const uint8_t *, unsigned );
 static void S20BDecode( void *, const uint8_t *, unsigned );
+static void U32BDecode( void *, const uint8_t *, unsigned );
+static void U32LDecode( void *, const uint8_t *, unsigned );
+static void S32IDecode( void *, const uint8_t *, unsigned );
 static void DAT12Decode( void *, const uint8_t *, unsigned );
 
 /*****************************************************************************
@@ -128,8 +131,22 @@ static int DecoderOpen( vlc_object_t *p_this )
         break;
     case VLC_CODEC_F32L:
     case VLC_CODEC_F32B:
-    case VLC_CODEC_S32L:
-    case VLC_CODEC_S32B:
+        bits = 32;
+        break;
+    case VLC_CODEC_U32B:
+        format = VLC_CODEC_S32N;
+        decode = U32BDecode;
+        bits = 32;
+        break;
+    case VLC_CODEC_U32L:
+        format = VLC_CODEC_S32N;
+        decode = U32LDecode;
+        bits = 32;
+        break;
+    case VLC_CODEC_S32I:
+        format = VLC_CODEC_S32N;
+        decode = S32IDecode;
+     case VLC_CODEC_S32N:
         bits = 32;
         break;
     case VLC_CODEC_S24L:
@@ -343,6 +360,43 @@ static void S20BDecode( void *outp, const uint8_t *in, unsigned samples )
         *(out++) = (U16_AT(in) << 16) | ((in[2] & 0xF0) << 8);
 }
 
+static void U32BDecode( void *outp, const uint8_t *in, unsigned samples )
+{
+    uint32_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+        *(out++) = GetDWBE( in ) - 0x80000000;
+        in += 4;
+    }
+}
+
+static void U32LDecode( void *outp, const uint8_t *in, unsigned samples )
+{
+    uint32_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+        *(out++) = GetDWLE( in ) - 0x80000000;
+        in += 4;
+    }
+}
+
+static void S32IDecode( void *outp, const uint8_t *in, unsigned samples )
+{
+    int32_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+#ifdef WORDS_BIGENDIAN
+        *(out++) = GetDWLE( in );
+#else
+        *(out++) = GetDWBE( in );
+#endif
+        in += 4;
+    }
+}
+
 static int16_t dat12tos16( uint16_t y )
 {
     static const uint16_t diff[16] = {
@@ -382,6 +436,10 @@ static void DecoderClose( vlc_object_t *p_this )
 }
 
 #ifdef ENABLE_SOUT
+/* NOTE: Output buffers are always aligned since they are allocated by the araw plugin.
+ * Contrary to the decoder, the encoder can also assume that input buffers are aligned,
+ * since decoded audio blocks must always be aligned. */
+
 static void U16IEncode( void *outp, const uint8_t *inp, unsigned samples )
 {
     const uint16_t *in = (const uint16_t *)inp;
@@ -398,6 +456,33 @@ static void U16NEncode( void *outp, const uint8_t *inp, unsigned samples )
 
     for( size_t i = 0; i < samples; i++ )
         *(out++) =  *(in++) + 0x8000;
+}
+
+static void U32IEncode( void *outp, const uint8_t *inp, unsigned samples )
+{
+    const uint32_t *in = (const uint32_t *)inp;
+    uint32_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+        *(out++) =  bswap32( *(in++) + 0x80000000 );
+}
+
+static void U32NEncode( void *outp, const uint8_t *inp, unsigned samples )
+{
+    const uint32_t *in = (const uint32_t *)inp;
+    uint32_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+        *(out++) =  *(in++) + 0x80000000;
+}
+
+static void S32IEncode( void *outp, const uint8_t *inp, unsigned samples )
+{
+    const int32_t *in = (const int32_t *)inp;
+    int32_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+        *(out++) = bswap32( *(in++) );
 }
 
 static block_t *Encode( encoder_t *enc, block_t *in )
@@ -464,10 +549,22 @@ static int EncoderOpen( vlc_object_t *p_this )
     case VLC_CODEC_S24B:
         p_enc->fmt_out.audio.i_bitspersample = 24;
         break;
-    case VLC_CODEC_U32L:
-    case VLC_CODEC_U32B:
-    case VLC_CODEC_S32L:
-    case VLC_CODEC_S32B:
+    case VLC_CODEC_U32I:
+        encode = U32IEncode;
+        p_enc->fmt_in.i_codec = VLC_CODEC_S32N;
+        p_enc->fmt_out.audio.i_bitspersample = 32;
+        break;
+    case VLC_CODEC_U32N:
+        encode = U32NEncode;
+        p_enc->fmt_in.i_codec = VLC_CODEC_S32N;
+        p_enc->fmt_out.audio.i_bitspersample = 32;
+        break;
+    case VLC_CODEC_S32I:
+        encode = S32IEncode;
+    case VLC_CODEC_S32N:
+        p_enc->fmt_in.i_codec = VLC_CODEC_S32N;
+        p_enc->fmt_out.audio.i_bitspersample = 32;
+        break;
     case VLC_CODEC_FL32:
         p_enc->fmt_out.audio.i_bitspersample = 32;
         break;
