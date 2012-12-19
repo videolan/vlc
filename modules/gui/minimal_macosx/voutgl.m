@@ -33,6 +33,7 @@
 #include "intf.h"
 #include "voutgl.h"
 
+# if 0
 
 static int WindowControl( vout_window_t *, int i_query, va_list );
 
@@ -78,3 +79,5 @@ void WindowClose( vout_window_t *p_wnd )
     /* Clean up */
     free( p_wnd->sys );
 }
+
+#endif

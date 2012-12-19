@@ -41,7 +41,10 @@
 #include <vlc_input.h>
 #import <vlc_interface.h>
 
+#include <vlc_vout_window.h>
+
 #import <intf.h>
+#import "VLCMinimalVoutWindow.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -146,5 +149,97 @@ static void Run( intf_thread_t *p_intf )
     pthread_join( killer_thread, NULL );
 
     [pool release];
+}
+
+/*****************************************************************************
+ * Vout window management
+ *****************************************************************************/
+static int WindowControl(vout_window_t *, int i_query, va_list);
+
+int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
+{
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+
+    NSRect proposedVideoViewPosition = NSMakeRect(cfg->x, cfg->y, cfg->width, cfg->height);
+
+    VLCMinimalVoutWindow *o_window = [[VLCMinimalVoutWindow alloc] initWithContentRect:proposedVideoViewPosition];
+    [o_window makeKeyAndOrderFront:nil];
+
+    if (!o_window) {
+        msg_Err(p_wnd, "window creation failed");
+        [o_pool release];
+        return VLC_EGENERIC;
+    }
+
+    msg_Dbg(p_wnd, "returning video window with proposed position x=%i, y=%i, width=%i, height=%i", cfg->x, cfg->y, cfg->width, cfg->height);
+    p_wnd->handle.nsobject = [o_window contentView];
+
+    // TODO: find a cleaner way for "start in fullscreen"
+    if (var_GetBool(pl_Get(p_wnd), "fullscreen"))
+        [o_window performSelectorOnMainThread:@selector(enterFullscreen) withObject:nil waitUntilDone:NO];
+
+    p_wnd->control = WindowControl;
+
+    [o_pool release];
+    return VLC_SUCCESS;
+}
+
+static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
+{
+    NSWindow * o_window = [(id)p_wnd->handle.nsobject window];
+    if (!o_window) {
+        msg_Err(p_wnd, "failed to recover cocoa window");
+        return VLC_EGENERIC;
+    }
+
+    switch(i_query) {
+        case VOUT_WINDOW_SET_STATE:
+        {
+            unsigned i_state = va_arg(args, unsigned);
+            // TODO
+//            [o_window performSelectorOnMainThread:@selector(setWindowLevel:) withObject:[NSNumber numberWithUnsignedInt:i_state] waitUntilDone:NO];
+            return VLC_SUCCESS;
+        }
+        case VOUT_WINDOW_SET_SIZE:
+        {
+            NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+
+            unsigned int i_width  = va_arg(args, unsigned int);
+            unsigned int i_height = va_arg(args, unsigned int);
+
+            NSSize newSize = NSMakeSize(i_width, i_height);
+            // TODO
+
+            [o_pool release];
+            return VLC_SUCCESS;
+        }
+        case VOUT_WINDOW_SET_FULLSCREEN:
+        {
+            NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+            int i_full = va_arg(args, int);
+
+            if (i_full)
+                [o_window performSelectorOnMainThread:@selector(enterFullscreen) withObject:nil waitUntilDone:NO];
+            else
+                [o_window performSelectorOnMainThread:@selector(leaveFullscreen) withObject:nil waitUntilDone:NO];
+
+            [o_pool release];
+            return VLC_SUCCESS;
+        }
+        default:
+            msg_Warn(p_wnd, "unsupported control query");
+            return VLC_EGENERIC;
+    }
+}
+
+void WindowClose(vout_window_t *p_wnd)
+{
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+
+    NSWindow * o_window = [(id)p_wnd->handle.nsobject window];
+    if (o_window)
+        [o_window release];
+
+    [o_pool release];
 }
 

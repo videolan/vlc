@@ -39,6 +39,7 @@
 #include <OpenGL/OpenGL.h>
 #include <OpenGL/gl.h>
 
+#if 0
 
 /*****************************************************************************
  * cocoaglvoutviewInit
@@ -187,3 +188,4 @@ void cocoaglvoutviewEnd( vout_window_t * p_wnd )
 }
 @end
 
+#endif

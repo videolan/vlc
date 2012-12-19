@@ -45,22 +45,9 @@
         [self setHasShadow:YES];
         [self setMovableByWindowBackground: YES];
         [self center];
+        NSLog( @"window created" );
     }
     return self;
-}
-
-/* @protocol VLCOpenGLVoutEmbedding */
-- (void)addVoutSubview:(NSView *)view
-{
-    [view setAutoresizingMask:NSViewHeightSizable|NSViewWidthSizable];
-    [[self contentView] addSubview:view];
-    [view setFrame:[[self contentView] bounds]];
-}
-
-- (void)removeVoutSubview:(NSView *)view
-{
-    [self close];
-    [self release];
 }
 
 - (void)enterFullscreen

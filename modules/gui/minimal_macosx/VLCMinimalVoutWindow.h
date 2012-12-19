@@ -35,9 +35,6 @@
 
 - (id)initWithContentRect:(NSRect)contentRect;
 
-/* @protocol VLCOpenGLVoutEmbedding */
-- (void)addVoutSubview:(NSView *)view;
-- (void)removeVoutSubview:(NSView *)view;
 - (void)enterFullscreen;
 - (void)leaveFullscreen;
 - (BOOL)stretchesVideo;
