@@ -2,10 +2,6 @@
 
 build-npapi: stamp-npapi-build
 
-stamp-gecko-fetch:
-	svn export http://npapi-sdk.googlecode.com/svn/trunk/headers gecko -r HEAD
-	touch $@
-
 stamp-npapi-fetch:
 	rm -Rf npapi-vlc
 	git clone git://git.videolan.org/npapi-vlc.git npapi-vlc
@@ -17,7 +13,7 @@ stamp-npapi-autogen: stamp-npapi-fetch
 	$(SHELL) ./autogen.sh
 	touch $@
 
-stamp-npapi-configure: stamp-npapi-autogen stamp-gecko-fetch
+stamp-npapi-configure: stamp-npapi-autogen
 	cd npapi-vlc && \
 	$(SHELL) ./configure \
 		--prefix=/ \
@@ -26,7 +22,6 @@ stamp-npapi-configure: stamp-npapi-autogen stamp-gecko-fetch
 		CC="$(CC)" CFLAGS="$(CFLAGS)" \
 		CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" \
 		LD="$(LD)" LDFLAGS="$(LDFLAGS)" \
-		MOZILLA_CFLAGS="-I$(abs_builddir)/gecko" \
 		SHELL="$(SHELL)" \
 		PKG_CONFIG_LIBDIR="../$(srcdir)/extras/contrib/lib/pkgconfig:../lib"
 	touch $@
