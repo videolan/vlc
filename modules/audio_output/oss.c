@@ -111,10 +111,8 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     switch (fmt->i_format)
     {
 #ifdef AFMT_FLOAT
-        case VLC_CODEC_F64B:
-        case VLC_CODEC_F64L:
-        case VLC_CODEC_F32B:
-        case VLC_CODEC_F32L:
+        case VLC_CODEC_FL64:
+        case VLC_CODEC_FL32:
             format = AFMT_FLOAT;
             break;
 #endif

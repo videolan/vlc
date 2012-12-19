@@ -58,31 +58,7 @@ static block_t *Filter24(filter_t *filter, block_t *block)
     return block;
 }
 
-static block_t *Filter32(filter_t *filter, block_t *block)
-{
-    uint32_t *data = (uint32_t *)block->p_buffer;
-
-    for (size_t i = 0; i < block->i_buffer / 4; i++)
-        data[i] = bswap32 (data[i]);
-
-    (void) filter;
-    return block;
-}
-
-static block_t *Filter64(filter_t *filter, block_t *block)
-{
-    uint64_t *data = (uint64_t *)block->p_buffer;
-
-    for (size_t i = 0; i < block->i_buffer / 8; i++)
-        data[i] = bswap64 (data[i]);
-
-    (void) filter;
-    return block;
-}
-
 static const vlc_fourcc_t list[][2] = {
-    { VLC_CODEC_F64B, VLC_CODEC_F64L },
-    { VLC_CODEC_F32B, VLC_CODEC_F32L },
     { VLC_CODEC_S24B, VLC_CODEC_S24L },
     { VLC_CODEC_S24B, VLC_CODEC_S24L },
 };
@@ -115,12 +91,6 @@ ok:
     switch (src->i_bitspersample) {
         case 24:
             filter->pf_audio_filter = Filter24;
-            break;
-        case 32:
-            filter->pf_audio_filter = Filter32;
-            break;
-        case 64:
-            filter->pf_audio_filter = Filter64;
             break;
     }
 

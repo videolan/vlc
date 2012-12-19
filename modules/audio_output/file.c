@@ -87,9 +87,20 @@ static void    Flush       ( audio_output_t *, bool );
 #define WAV_LONGTEXT N_("Instead of writing a raw file, you can add a WAV " \
                         "header to the file.")
 
-static const char *const format_list[] = { "u8", "s16", "float32", "spdif" };
-static const int format_int[] = { VLC_CODEC_U8, VLC_CODEC_S16N,
-                                  VLC_CODEC_F32L, VLC_CODEC_SPDIFL };
+static const char *const format_list[] = {
+    "u8", "s16",
+#ifndef WORDS_BIGENDIAN
+    "float32",
+#endif
+    "spdif",
+};
+static const int format_int[] = {
+    VLC_CODEC_U8, VLC_CODEC_S16N,
+#ifndef WORDS_BIGENDIAN
+    VLC_CODEC_FL32,
+#endif
+    VLC_CODEC_SPDIFL,
+};
 
 #define FILE_TEXT N_("Output file")
 #define FILE_LONGTEXT N_("File to which the audio samples will be written to. (\"-\" for stdout")
@@ -201,10 +212,12 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 
         switch( fmt->i_format )
         {
-        case VLC_CODEC_F32L:
+#ifndef WORDS_BIGENDIAN
+        case VLC_CODEC_FL32:
             wh->Format     = WAVE_FORMAT_IEEE_FLOAT;
             wh->BitsPerSample = sizeof(float) * 8;
             break;
+#endif
         case VLC_CODEC_U8:
             wh->Format     = WAVE_FORMAT_PCM;
             wh->BitsPerSample = 8;
