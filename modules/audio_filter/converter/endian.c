@@ -84,9 +84,7 @@ static const vlc_fourcc_t list[][2] = {
     { VLC_CODEC_F64B, VLC_CODEC_F64L },
     { VLC_CODEC_F32B, VLC_CODEC_F32L },
     { VLC_CODEC_S24B, VLC_CODEC_S24L },
-    { VLC_CODEC_S32B, VLC_CODEC_S32L },
     { VLC_CODEC_S24B, VLC_CODEC_S24L },
-    { VLC_CODEC_S32B, VLC_CODEC_S32L },
 };
 
 static int Open(vlc_object_t *object)
