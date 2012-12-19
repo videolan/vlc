@@ -79,46 +79,6 @@ unsigned int aout_BitsPerSample( vlc_fourcc_t i_format )
     }
 }
 
-vlc_fourcc_t aout_NativeEndian( vlc_fourcc_t i_format )
-{
-    switch( i_format )
-    {
-        case VLC_CODEC_F64B:
-        case VLC_CODEC_F64L:
-            return VLC_CODEC_FL64;
-
-        case VLC_CODEC_F32B:
-        case VLC_CODEC_F32L:
-            return VLC_CODEC_FL32;
-
-        case VLC_CODEC_S32B:
-        case VLC_CODEC_S32L:
-            return VLC_CODEC_S32N;
-
-        case VLC_CODEC_U32B:
-        case VLC_CODEC_U32L:
-            return VLC_CODEC_U32N;
-
-        case VLC_CODEC_S24B:
-        case VLC_CODEC_S24L:
-            return VLC_CODEC_S24N;
-
-        case VLC_CODEC_U24B:
-        case VLC_CODEC_U24L:
-            return VLC_CODEC_U24N;
-
-        case VLC_CODEC_S16B:
-        case VLC_CODEC_S16L:
-            return VLC_CODEC_S16N;
-
-        case VLC_CODEC_U16B:
-        case VLC_CODEC_U16L:
-            return VLC_CODEC_U16N;
-    }
-    return 0;
-}
-
-
 /*****************************************************************************
  * aout_FormatPrepare : compute the number of bytes per frame & frame length
  *****************************************************************************/

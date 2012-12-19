@@ -155,32 +155,9 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
     }
     assert (AOUT_FMT_LINEAR(&input));
 
-    bool same_mix = infmt->i_physical_channels == outfmt->i_physical_channels
-                 && infmt->i_original_channels == outfmt->i_original_channels;
-
-    /* Native endianess */
-    if (input.i_format != outfmt->i_format || !same_mix)
-    {
-        vlc_fourcc_t native = aout_NativeEndian (input.i_format);
-        if (native != 0 && native != input.i_format)
-        {
-            if (n == max)
-                goto overflow;
-
-            filter_t *f = TryFormat (obj, native, &input);
-            if (f == NULL)
-            {
-                msg_Err (obj, "cannot find %s for conversion pipeline",
-                         "native endian converter");
-                goto error;
-            }
-
-            filters[n++] = f;
-        }
-    }
-
     /* Remix channels */
-    if (!same_mix)
+    if (infmt->i_physical_channels != outfmt->i_physical_channels
+     || infmt->i_original_channels != outfmt->i_original_channels)
     {   /* Remixing currently requires FL32... TODO: S16N */
         if (input.i_format != VLC_CODEC_FL32)
         {
@@ -242,38 +219,18 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
     }
 
     /* Format */
-    vlc_fourcc_t native = aout_NativeEndian (outfmt->i_format);
-    if (native == 0)
-        native = outfmt->i_format;
-    if (input.i_format != native)
+    if (input.i_format != outfmt->i_format)
     {
         if (max == 0)
-            goto overflow;
-
-        filter_t *f = TryFormat (obj, native, &input);
-        if (f == NULL)
-        {
-            msg_Err (obj, "cannot find %s for conversion pipeline",
-                     "post-mix converter");
-            goto error;
-        }
-        filters[n++] = f;
-    }
-
-    /* Foreign endianess */
-    if (native != outfmt->i_format)
-    {
-        if (n == max)
             goto overflow;
 
         filter_t *f = TryFormat (obj, outfmt->i_format, &input);
         if (f == NULL)
         {
             msg_Err (obj, "cannot find %s for conversion pipeline",
-                     "foreign endian converter");
+                     "post-mix converter");
             goto error;
         }
-
         filters[n++] = f;
     }
 

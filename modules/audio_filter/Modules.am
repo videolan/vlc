@@ -51,12 +51,10 @@ SOURCES_a52tofloat32 = converter/a52tofloat32.c
 SOURCES_dtstospdif = converter/dtstospdif.c
 SOURCES_dtstofloat32 = converter/dtstofloat32.c
 SOURCES_mpgatofixed32 = converter/mpgatofixed32.c
-SOURCES_audio_endian = converter/endian.c
 SOURCES_audio_format = converter/format.c
 
 libvlc_LTLIBRARIES += \
 	liba52tospdif_plugin.la \
-	libaudio_endian_plugin.la \
 	libaudio_format_plugin.la \
 	libdtstospdif_plugin.la
 

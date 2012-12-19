@@ -29,7 +29,7 @@
 /* Max input rate factor (1/4 -> 4) */
 # define AOUT_MAX_INPUT_RATE (4)
 
-# define AOUT_MAX_FILTERS 12
+# define AOUT_MAX_FILTERS 10
 
 enum {
     AOUT_RESAMPLING_NONE=0,
@@ -123,7 +123,6 @@ void aout_OutputDelete( audio_output_t * p_aout );
 
 
 /* From common.c : */
-vlc_fourcc_t aout_NativeEndian(vlc_fourcc_t);
 void aout_FormatsPrint(vlc_object_t *, const char *,
                        const audio_sample_format_t *,
                        const audio_sample_format_t *);
