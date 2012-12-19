@@ -84,7 +84,9 @@ POSTPROC_CFLAGS += --std=gnu99
 
 # Build
 
+ifdef GPL
 PKGS += postproc
+endif
 ifeq ($(call need_pkg,"libpostproc"),)
 PKGS_FOUND += postproc
 endif

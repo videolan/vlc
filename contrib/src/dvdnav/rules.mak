@@ -6,7 +6,9 @@ DVDNAV_GITURL := git://github.com/microe/libdvdnav
 LIBDVDNAV_VERSION := git
 
 ifdef BUILD_DISCS
+ifdef GPL
 PKGS += dvdnav
+endif
 endif
 ifeq ($(call need_pkg,"dvdnav"),)
 PKGS_FOUND += dvdnav

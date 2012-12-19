@@ -4,7 +4,9 @@ X264_GITURL := git://git.videolan.org/x264.git
 X264_SNAPURL := http://git.videolan.org/?p=x264.git;a=snapshot;h=HEAD;sf=tgz
 
 ifdef BUILD_ENCODERS
+ifdef GPL
 PKGS += x264
+endif
 endif
 
 ifeq ($(call need_pkg,"x264 >= 0.86"),)

@@ -2,7 +2,9 @@
 SAMPLERATE_VERSION := 0.1.8
 SAMPLERATE_URL := http://www.mega-nerd.com/SRC/libsamplerate-$(SAMPLERATE_VERSION).tar.gz
 
+ifdef GPL
 PKGS += samplerate
+endif
 ifeq ($(call need_pkg,"samplerate"),)
 PKGS_FOUND += samplerate
 endif

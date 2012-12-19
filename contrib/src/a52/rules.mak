@@ -3,7 +3,9 @@
 A52DEC_VERSION := 0.7.4
 A52DEC_URL := $(CONTRIB_VIDEOLAN)/a52dec-$(A52DEC_VERSION).tar.gz
 
+ifdef GPL
 PKGS += a52
+endif
 
 $(TARBALLS)/a52dec-$(A52DEC_VERSION).tar.gz:
 	$(call download,$(A52DEC_URL))

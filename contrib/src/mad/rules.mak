@@ -3,7 +3,9 @@
 MAD_VERSION := 0.15.1b
 MAD_URL := $(CONTRIB_VIDEOLAN)/libmad-$(MAD_VERSION).tar.gz
 
+ifdef GPL
 PKGS += mad
+endif
 ifeq ($(call need_pkg,"mad"),)
 PKGS_FOUND += mad
 endif

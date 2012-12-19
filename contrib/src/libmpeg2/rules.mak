@@ -3,7 +3,9 @@
 LIBMPEG2_VERSION = 0.5.1
 LIBMPEG2_URL := http://libmpeg2.sourceforge.net/files/libmpeg2-$(LIBMPEG2_VERSION).tar.gz
 
+ifdef GPL
 PKGS += libmpeg2
+endif
 ifeq ($(call need_pkg,"libmpeg2"),)
 PKGS_FOUND += libmpeg2
 endif

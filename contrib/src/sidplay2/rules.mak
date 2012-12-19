@@ -3,7 +3,9 @@
 SID_VERSION := 2.1.1
 SID_URL := $(SF)/sidplay2/sidplay2/sidplay-libs-$(SID_VERSION)/sidplay-libs-$(SID_VERSION).tar.gz
 
+ifdef GPL
 PKGS += sidplay2
+endif
 
 $(TARBALLS)/sidplay-libs-$(SID_VERSION).tar.gz:
 	$(call download,$(SID_URL))

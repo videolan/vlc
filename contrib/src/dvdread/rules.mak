@@ -4,7 +4,9 @@ LIBDVDREAD_VERSION := 4.2.0
 LIBDVDREAD_URL := http://dvdnav.mplayerhq.hu/releases/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
 
 ifdef BUILD_DISCS
+ifdef GPL
 PKGS += dvdread
+endif
 endif
 ifeq ($(call need_pkg,"dvdread"),)
 PKGS_FOUND += dvdread

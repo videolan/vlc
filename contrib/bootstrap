@@ -29,6 +29,7 @@ usage()
 	echo "  --disable-disc   configure to not build optical discs packages"
 	echo "  --disable-sout   configure to not build stream output packages"
 	echo "  --enable-small   optimize libraries for size with slight speed decrease [DANGEROUS]"
+	echo "  --disable-gpl    configure to not build viral GPL code"
 }
 
 BUILD=
@@ -38,6 +39,7 @@ PKGS_ENABLE=
 PKGS_DISABLE=
 BUILD_ENCODERS="1"
 BUILD_DISCS="1"
+GPL="1"
 
 if test ! -f "../../contrib/src/main.mak"
 then
@@ -69,6 +71,9 @@ do
 			;;
 		--enable-small)
 			ENABLE_SMALL=1
+			;;
+		--disable-gpl)
+			GPL=
 			;;
 		--disable-*)
 			PKGS_DISABLE="${PKGS_DISABLE} ${1#--disable-}"
@@ -199,6 +204,7 @@ test -z "$PREFIX" || add_make "PREFIX := $PREFIX"
 test -z "$BUILD_DISCS" || add_make_enabled "BUILD_DISCS"
 test -z "$BUILD_ENCODERS" || add_make_enabled "BUILD_ENCODERS"
 test -z "$ENABLE_SMALL" || add_make_enabled "ENABLE_SMALL"
+test -z "$GPL" || add_make_enabled "GPL"
 
 #
 # Checks
