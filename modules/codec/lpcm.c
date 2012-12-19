@@ -37,6 +37,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_aout.h>
+#include <unistd.h>
 #include <assert.h>
 
 /*****************************************************************************
@@ -476,7 +477,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->fmt_in.i_codec = p_enc->fmt_out.i_codec;
 
     p_enc->fmt_in.audio.i_bitspersample = 16;
-    p_enc->fmt_in.i_codec = VLC_CODEC_S16B;
+    p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
 
     p_enc->fmt_out.i_bitrate =
         p_enc->fmt_in.audio.i_channels *
@@ -556,8 +557,15 @@ static block_t *EncodeFrames( encoder_t *p_enc, block_t *p_aout_buf )
         const int i_kept_bytes = p_sys->i_buffer_used * p_sys->i_channels * 2;
         const int i_consume_bytes = i_consume_samples * p_sys->i_channels * 2;
 
+#ifdef WORDS_BIGENDIAN
         memcpy( frame + 6, p_sys->p_buffer, i_kept_bytes );
-        memcpy( frame + 6 + i_kept_bytes, p_aout_buf->p_buffer + i_bytes_consumed, i_consume_bytes );
+        memcpy( frame + 6 + i_kept_bytes, p_aout_buf->p_buffer + i_bytes_consumed,
+                i_consume_bytes );
+#else
+        swab( p_sys->p_buffer, frame + 6, i_kept_bytes );
+        swab( p_aout_buf->p_buffer + i_bytes_consumed, frame + 6 + i_kept_bytes,
+              i_consume_bytes );
+#endif
 
         p_sys->i_frame_num++;
         p_sys->i_buffer_used = 0;
