@@ -32,6 +32,7 @@
 #include <vlc_interface.h>
 
 #include <QTreeWidget>
+#include <QSet>
 
 enum
 {
@@ -49,8 +50,7 @@ class PrefsItemData : public QObject
 {
     Q_OBJECT
 public:
-    PrefsItemData()
-    { panel = NULL; i_object_id = 0; i_subcat_id = -1; psz_name = NULL; };
+    PrefsItemData();
     virtual ~PrefsItemData() { free( psz_name ); };
     bool contains( const QString &text, Qt::CaseSensitivity cs );
     AdvPrefsPanel *panel;
@@ -58,6 +58,7 @@ public:
     int i_subcat_id;
     int i_type;
     char *psz_name;
+    bool b_loaded;
     QString name;
     QString help;
 };
@@ -67,18 +68,23 @@ Q_DECLARE_METATYPE( PrefsItemData* );
 class PrefsTree : public QTreeWidget
 {
     Q_OBJECT
+    Q_PROPERTY( bool b_show_only_loaded WRITE setLoadedOnly )
+
 public:
     PrefsTree( intf_thread_t *, QWidget * );
 
     void applyAll();
     void cleanAll();
     void filter( const QString &text );
+    void setLoadedOnly( bool );
 
 private:
     void doAll( bool );
     bool filterItems( QTreeWidgetItem *item, const QString &text, Qt::CaseSensitivity cs );
     bool collapseUnselectedItems( QTreeWidgetItem *item );
+    void updateLoadedStatus( QTreeWidgetItem *item , QSet<QString> *loaded );
     intf_thread_t *p_intf;
+    bool b_show_only_loaded;
 
 private slots:
     void resizeColumns();

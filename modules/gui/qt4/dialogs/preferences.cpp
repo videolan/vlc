@@ -79,6 +79,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     /* Tree and panel initialisations */
     advanced_tree = NULL;
     tree_filter = NULL;
+    current_filter = NULL;
     simple_tree = NULL;
     simple_panels_stack = new QStackedWidget;
     advanced_panels_stack = new QStackedWidget;
@@ -157,6 +158,13 @@ void PrefsDialog::setAdvanced()
                 this, advancedTreeFilterChanged( const QString & ) );
 
         advanced_tree_panel->layout()->addWidget( tree_filter );
+
+        current_filter = new QCheckBox( qtr("Only show current") );
+        current_filter->setToolTip(
+                    qtr("Only show modules related to current playback") );
+        CONNECT( current_filter, stateChanged(int),
+                 this, onlyLoadedToggled() );
+        advanced_tree_panel->layout()->addWidget( current_filter );
     }
 
     /* If don't have already and advanced TREE, then create it */
@@ -327,4 +335,9 @@ void PrefsDialog::reset()
 void PrefsDialog::advancedTreeFilterChanged( const QString & text )
 {
     advanced_tree->filter( text );
+}
+
+void PrefsDialog::onlyLoadedToggled()
+{
+    advanced_tree->setLoadedOnly( current_filter->isChecked() );
 }

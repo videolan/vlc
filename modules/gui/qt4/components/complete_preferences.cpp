@@ -366,6 +366,8 @@ bool PrefsTree::filterItems( QTreeWidgetItem *item, const QString &text,
     PrefsItemData *data = item->data( 0, Qt::UserRole ).value<PrefsItemData *>();
 
     bool filtered = sub_filtered && !data->contains( text, cs );
+    if ( b_show_only_loaded && sub_filtered && !data->b_loaded )
+        filtered = true;
     item->setExpanded( !sub_filtered );
     item->setHidden( filtered );
 
@@ -396,10 +398,59 @@ bool PrefsTree::collapseUnselectedItems( QTreeWidgetItem *item )
     return collapsed;
 }
 
+static void populateLoadedSet( QSet<QString> *loaded, vlc_object_t *p_node )
+{
+    Q_ASSERT( loaded );
+    char *name = vlc_object_get_name( p_node );
+    if ( !EMPTY_STR( name ) ) loaded->insert( QString( name ) );
+    free( name );
+
+    vlc_list_t *l = vlc_list_children( p_node );
+    for( int i=0; i < l->i_count; i++ )
+        populateLoadedSet( loaded, l->p_values[i].p_object );
+    vlc_list_release( l );
+}
+
+/* Updates the PrefsItemData loaded status to reflect currently
+ * running modules */
+void PrefsTree::updateLoadedStatus( QTreeWidgetItem *item = NULL,
+                                    QSet<QString> *loaded = NULL )
+{
+    bool b_release = false;
+
+    if( loaded == NULL )
+    {
+        vlc_object_t *p_root = VLC_OBJECT( p_intf->p_libvlc );
+        loaded = new QSet<QString>();
+        populateLoadedSet( loaded, p_root );
+        b_release = true;
+    }
+
+    if ( item == NULL )
+    {
+        for( int i = 0 ; i < topLevelItemCount(); i++ )
+            updateLoadedStatus( topLevelItem( i ), loaded );
+    }
+    else
+    {
+        PrefsItemData *data = item->data( 0, Qt::UserRole )
+                .value<PrefsItemData *>();
+        data->b_loaded = loaded->contains( QString( data->psz_name ) );
+
+        for( int i = 0; i < item->childCount(); i++ )
+            updateLoadedStatus( item->child( i ), loaded );
+    }
+
+    if ( b_release )
+        delete loaded;
+}
+
 /* apply filter on tree */
 void PrefsTree::filter( const QString &text )
 {
-    bool clear_filter = text.isEmpty();
+    bool clear_filter = text.isEmpty() && ! b_show_only_loaded;
+
+    updateLoadedStatus();
 
     for( int i = 0 ; i < topLevelItemCount(); i++ )
     {
@@ -415,9 +466,24 @@ void PrefsTree::filter( const QString &text )
     }
 }
 
+void PrefsTree::setLoadedOnly( bool b_only )
+{
+    b_show_only_loaded = b_only;
+    filter( "" );
+}
+
 void PrefsTree::resizeColumns()
 {
     resizeColumnToContents( 0 );
+}
+
+PrefsItemData::PrefsItemData()
+{
+    panel = NULL;
+    i_object_id = 0;
+    i_subcat_id = -1;
+    psz_name = NULL;
+    b_loaded = false;
 }
 
 /* go over the module config items and search text in psz_text

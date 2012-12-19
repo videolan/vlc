@@ -70,6 +70,7 @@ private:
     SPrefsCatList *simple_tree;
     PrefsTree *advanced_tree;
     SearchLineEdit *tree_filter;
+    QCheckBox *current_filter;
 
     QGroupBox *types;
     QRadioButton *small,*all;
@@ -83,6 +84,7 @@ private slots:
     void changeAdvPanel( QTreeWidgetItem * );
     void changeSimplePanel( int );
     void advancedTreeFilterChanged( const QString & );
+    void onlyLoadedToggled();
 
     void save();
     void cancel();
