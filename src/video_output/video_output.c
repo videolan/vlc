@@ -1268,8 +1268,6 @@ static void ThreadStep(vout_thread_t *vout, mtime_t *duration)
 
 static void ThreadChangeFullscreen(vout_thread_t *vout, bool fullscreen)
 {
-    /* FIXME not sure setting "fullscreen" is good ... */
-    var_SetBool(vout, "fullscreen", fullscreen);
     vout_SetDisplayFullscreen(vout->p->display.vd, fullscreen);
 }
 
