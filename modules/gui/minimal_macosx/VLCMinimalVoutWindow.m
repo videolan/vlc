@@ -25,8 +25,6 @@
  * Preamble
  *****************************************************************************/
 #include "intf.h"
-#include "voutgl.h"
-#include "VLCOpenGLVoutView.h"
 #include "VLCMinimalVoutWindow.h"
 
 #import <Cocoa/Cocoa.h>
