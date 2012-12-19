@@ -593,10 +593,8 @@ modules/gui/minimal_macosx/intf.m
 modules/gui/minimal_macosx/macosx.c
 modules/gui/minimal_macosx/VLCMinimalVoutWindow.h
 modules/gui/minimal_macosx/VLCMinimalVoutWindow.m
-modules/gui/minimal_macosx/VLCOpenGLVoutView.h
-modules/gui/minimal_macosx/VLCOpenGLVoutView.m
-modules/gui/minimal_macosx/voutgl.h
-modules/gui/minimal_macosx/voutgl.m
+modules/gui/minimal_macosx/misc.h
+modules/gui/minimal_macosx/misc.m
 modules/gui/ncurses.c
 modules/gui/qt4/components/complete_preferences.cpp
 modules/gui/qt4/components/complete_preferences.hpp
