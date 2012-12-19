@@ -125,7 +125,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
             format = AFMT_S32_LE;
             break;
         case VLC_CODEC_S16N:
-            format = AFMT_S16;
+            format = AFMT_S16_NE;
             break;
         case VLC_CODEC_U8:
             format = AFMT_U8;
@@ -152,7 +152,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     switch (format)
     {
         case AFMT_U8:    fmt->i_format = VLC_CODEC_U8;   break;
-        case AFMT_S16:   fmt->i_format = VLC_CODEC_S16N; break;
+        case AFMT_S16_NE:   fmt->i_format = VLC_CODEC_S16N; break;
         //case AFMT_S24_BE:
         //case AFMT_S24_LE:
         case AFMT_S32_BE: fmt->i_format = VLC_CODEC_S32B; break;
