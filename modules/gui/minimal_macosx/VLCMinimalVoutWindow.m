@@ -24,8 +24,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "intf.h"
-#include "VLCMinimalVoutWindow.h"
+#import "intf.h"
+#import "VLCMinimalVoutWindow.h"
 
 #import <Cocoa/Cocoa.h>
 

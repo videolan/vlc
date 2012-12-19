@@ -27,44 +27,36 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <sys/param.h>                                    /* for MAXPATHLEN */
-#include <string.h>
+#import <stdlib.h>                                      /* malloc(), free() */
+#import <sys/param.h>                                    /* for MAXPATHLEN */
+#import <string.h>
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+# import "config.h"
 #endif
 
-#include <vlc_common.h>
+#import <vlc_playlist.h>
+#import <vlc_vout_window.h>
 
-#include <vlc_keys.h>
-
-#include <vlc_input.h>
-#import <vlc_interface.h>
-
-#include <vlc_vout_window.h>
-
-#import <intf.h>
+#import "intf.h"
 #import "VLCMinimalVoutWindow.h"
 
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static void Run ( intf_thread_t *p_intf );
+static void Run (intf_thread_t *p_intf);
 
 /*****************************************************************************
  * OpenIntf: initialize interface
  *****************************************************************************/
-int OpenIntf ( vlc_object_t *p_this )
+int OpenIntf (vlc_object_t *p_this)
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
 	
-    p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
-    if( p_intf->p_sys == NULL )
-    {
+    p_intf->p_sys = malloc(sizeof(intf_sys_t));
+    if (p_intf->p_sys == NULL)
         return VLC_ENOMEM;
-    }
 
-    memset( p_intf->p_sys, 0, sizeof( *p_intf->p_sys ) );
+    memset(p_intf->p_sys, 0, sizeof(*p_intf->p_sys));
 
     Run(p_intf);
 
@@ -74,11 +66,11 @@ int OpenIntf ( vlc_object_t *p_this )
 /*****************************************************************************
  * CloseIntf: destroy interface
  *****************************************************************************/
-void CloseIntf ( vlc_object_t *p_this )
+void CloseIntf (vlc_object_t *p_this)
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
 
-    free( p_intf->p_sys );
+    free(p_intf->p_sys);
 }
 
 /* Dock Connection */
@@ -88,29 +80,29 @@ typedef struct CPSProcessSerNum
         UInt32                hi;
 } CPSProcessSerNum;
 
-extern OSErr    CPSGetCurrentProcess( CPSProcessSerNum *psn);
-extern OSErr    CPSEnableForegroundOperation( CPSProcessSerNum *psn, UInt32 _arg2, UInt32 _arg3, UInt32 _arg4, UInt32 _arg5);
-extern OSErr    CPSSetFrontProcess( CPSProcessSerNum *psn);
+extern OSErr    CPSGetCurrentProcess(CPSProcessSerNum *psn);
+extern OSErr    CPSEnableForegroundOperation(CPSProcessSerNum *psn, UInt32 _arg2, UInt32 _arg3, UInt32 _arg4, UInt32 _arg5);
+extern OSErr    CPSSetFrontProcess(CPSProcessSerNum *psn);
 
 /*****************************************************************************
  * KillerThread: Thread that kill the application
  *****************************************************************************/
-static void * KillerThread( void *user_data )
+static void * KillerThread(void *user_data)
 {
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
 
     intf_thread_t *p_intf = user_data;
 
-    vlc_mutex_init( &p_intf->p_sys->lock );
-    vlc_cond_init( &p_intf->p_sys->wait );
+    vlc_mutex_init(&p_intf->p_sys->lock);
+    vlc_cond_init(&p_intf->p_sys->wait);
 
-    vlc_mutex_lock ( &p_intf->p_sys->lock );
-    while( vlc_object_alive( p_intf ) )
-        vlc_cond_wait( &p_intf->p_sys->wait, &p_intf->p_sys->lock );
-    vlc_mutex_unlock( &p_intf->p_sys->lock );
+    vlc_mutex_lock (&p_intf->p_sys->lock);
+    while(vlc_object_alive(p_intf))
+        vlc_cond_wait(&p_intf->p_sys->wait, &p_intf->p_sys->lock);
+    vlc_mutex_unlock(&p_intf->p_sys->lock);
 
-    vlc_mutex_destroy( &p_intf->p_sys->lock );
-    vlc_cond_destroy( &p_intf->p_sys->wait );
+    vlc_mutex_destroy(&p_intf->p_sys->lock);
+    vlc_cond_destroy(&p_intf->p_sys->wait);
 
     /* We are dead, terminate */
     [NSApp terminate: nil];
@@ -121,7 +113,7 @@ static void * KillerThread( void *user_data )
 /*****************************************************************************
  * Run: main loop
  *****************************************************************************/
-static void Run( intf_thread_t *p_intf )
+static void Run(intf_thread_t *p_intf)
 {
     sigset_t set;
 
@@ -129,13 +121,13 @@ static void Run( intf_thread_t *p_intf )
      * VLC overrides SIGTERM which is sent by the "force quit"
      * menu item to make sure deamon mode quits gracefully, so
      * we un-override SIGTERM here. */
-    sigemptyset( &set );
-    sigaddset( &set, SIGTERM );
-    pthread_sigmask( SIG_UNBLOCK, &set, NULL );
+    sigemptyset(&set);
+    sigaddset(&set, SIGTERM);
+    pthread_sigmask(SIG_UNBLOCK, &set, NULL);
 
     /* Setup a thread that will monitor the module killing */
     pthread_t killer_thread;
-    pthread_create( &killer_thread, NULL, KillerThread, p_intf );
+    pthread_create(&killer_thread, NULL, KillerThread, p_intf);
 
     CPSProcessSerNum PSN;
     NSAutoreleasePool   *pool = [[NSAutoreleasePool alloc] init];
@@ -146,7 +138,7 @@ static void Run( intf_thread_t *p_intf )
                 [NSApplication sharedApplication];
     [NSApp run];
 
-    pthread_join( killer_thread, NULL );
+    pthread_join(killer_thread, NULL);
 
     [pool release];
 }
@@ -192,7 +184,7 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
         return VLC_EGENERIC;
     }
 
-    switch(i_query) {
+    switch (i_query) {
         case VOUT_WINDOW_SET_STATE:
         {
             unsigned i_state = va_arg(args, unsigned);

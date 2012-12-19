@@ -25,17 +25,12 @@
  *****************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-#   include "config.h"
+#   import "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_interface.h>
-#include <vlc_playlist.h>
-#include <vlc_vout.h>
-#include <vlc_aout.h>
-#include <vlc_input.h>
-
-#include <Cocoa/Cocoa.h>
+#import <Cocoa/Cocoa.h>
+#import <vlc_common.h>
+#import <vlc_interface.h>
 
 /*****************************************************************************
  * Local prototypes.
