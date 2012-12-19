@@ -461,30 +461,30 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         free(code);
         for (GLuint i = 0; i < 2; i++) {
             int infoLength = 0;
-            int charsWritten = 0;
-            char *infolog;
             vgl->GetProgramiv(vgl->program[i], GL_INFO_LOG_LENGTH, &infoLength);
             if (infoLength > 1) {
-                /* If there is some message, better to check linking is ok */
-                GLint link_status = GL_TRUE;
-                vgl->GetProgramiv(vgl->program[i], GL_LINK_STATUS, &link_status);
+                int charsWritten;
+                char *infolog;
 
-                infolog = (char *)malloc(infoLength);
+                infolog = malloc(infoLength);
                 vgl->GetProgramInfoLog(vgl->program[i], infoLength, &charsWritten, infolog);
-                fprintf(stderr, "shader program %d:%s %d\n",i,infolog,infoLength);
+                fprintf(stderr, "shader program %d: %s\n", i, infolog);
                 free(infolog);
 
                 /* Check shaders messages too */
                 for (GLuint j = 0; j < 2; j++) {
                     vgl->GetShaderiv(vgl->shader[j], GL_INFO_LOG_LENGTH, &infoLength);
                     if (infoLength > 1) {
-                        infolog = (char *)malloc(infoLength);
+                        infolog = malloc(infoLength);
                         vgl->GetShaderInfoLog(vgl->shader[j], infoLength, &charsWritten, infolog);
-                        fprintf(stderr, "shader %d: %s\n",j, infolog);
+                        fprintf(stderr, "shader %d: %s\n", j, infolog);
                         free(infolog);
                     }
                 }
 
+                /* If there is some message, better to check linking is ok */
+                GLint link_status = GL_TRUE;
+                vgl->GetProgramiv(vgl->program[i], GL_LINK_STATUS, &link_status);
                 if (link_status == GL_FALSE) {
                     fprintf(stderr, "Unable to use program %d\n", i);
                     free(vgl);
@@ -555,7 +555,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
 
     /* Allocate our pictures */
     picture_t *picture[VLCGL_PICTURE_MAX] = {NULL, };
-    unsigned count = 0;
+    unsigned count;
 
     for (count = 0; count < __MIN(VLCGL_PICTURE_MAX, requested_count); count++) {
         picture[count] = picture_NewFromFormat(&vgl->fmt);
@@ -751,7 +751,7 @@ static void DrawWithoutShaders(vout_display_opengl_t *vgl,
          1.0f,  1.0f,
     };
 
-    const GLfloat textureCoord[8] = {
+    const GLfloat textureCoord[] = {
         left[0],  bottom[0],
         right[0], bottom[0],
         left[0],  top[0],
@@ -791,7 +791,7 @@ static void DrawWithoutShaders(vout_display_opengl_t *vgl,
 static void DrawWithShaders(vout_display_opengl_t *vgl,
                             float *left, float *top, float *right, float *bottom)
 {
-    const GLfloat vertexCoord[] = {
+    static const GLfloat vertexCoord[] = {
         -1.0,  1.0,
         -1.0, -1.0,
          1.0,  1.0,
@@ -799,10 +799,9 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     };
 
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-        char *attribute = NULL;
-        const GLfloat texCoord[] = {
-            left[j], top[j],
-            left[j], bottom[j],
+        const GLfloat textureCoord[] = {
+            left[j],  top[j],
+            left[j],  bottom[j],
             right[j], top[j],
             right[j], bottom[j],
         };
@@ -810,13 +809,11 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
         glClientActiveTexture(GL_TEXTURE0+j);
         glEnable(vgl->tex_target);
         glBindTexture(vgl->tex_target, vgl->texture[0][j]);
-        if (asprintf(&attribute, "MultiTexCoord%1d", j) == -1)
-            return;
 
+        char attribute[20];
+        snprintf(attribute, sizeof(attribute), "MultiTexCoord%1d", j);
         vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[0], attribute));
-        vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[0], attribute), 2, GL_FLOAT, 0, 0, texCoord);
-        free(attribute);
-        attribute = NULL;
+        vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[0], attribute), 2, GL_FLOAT, 0, 0, textureCoord);
     }
     glActiveTexture(GL_TEXTURE0 + 0);
     glClientActiveTexture(GL_TEXTURE0 + 0);
@@ -883,10 +880,10 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     for (int i = 0; i < vgl->region_count; i++) {
         gl_region_t *glr = &vgl->region[i];
         const GLfloat vertexCoord[] = {
-            glr->left, glr->top,
-            glr->left, glr->bottom,
+            glr->left,  glr->top,
+            glr->left,  glr->bottom,
             glr->right, glr->top,
-            glr->right,glr->bottom,
+            glr->right, glr->bottom,
         };
         static const GLfloat textureCoord[] = {
             0.0, 0.0,
