@@ -87,6 +87,10 @@ static void U16BDecode( void *, const uint8_t *, unsigned );
 static void U16LDecode( void *, const uint8_t *, unsigned );
 static void S16IDecode( void *, const uint8_t *, unsigned );
 static void S20BDecode( void *, const uint8_t *, unsigned );
+static void U24BDecode( void *, const uint8_t *, unsigned );
+static void U24LDecode( void *, const uint8_t *, unsigned );
+static void S24BDecode( void *, const uint8_t *, unsigned );
+static void S24LDecode( void *, const uint8_t *, unsigned );
 static void U32BDecode( void *, const uint8_t *, unsigned );
 static void U32LDecode( void *, const uint8_t *, unsigned );
 static void Swap32Decode( void *, const uint8_t *, unsigned );
@@ -159,11 +163,27 @@ static int DecoderOpen( vlc_object_t *p_this )
     case VLC_CODEC_S32I:
         format = VLC_CODEC_S32N;
         decode = Swap32Decode;
-     case VLC_CODEC_S32N:
+    case VLC_CODEC_S32N:
         bits = 32;
         break;
-    case VLC_CODEC_S24L:
+    case VLC_CODEC_U24B:
+        format = VLC_CODEC_S32N;
+        decode = U24BDecode;
+        bits = 24;
+        break;
+    case VLC_CODEC_U24L:
+        format = VLC_CODEC_S32N;
+        decode = U24LDecode;
+        bits = 24;
+        break;
     case VLC_CODEC_S24B:
+        format = VLC_CODEC_S32N;
+        decode = S24BDecode;
+        bits = 24;
+        break;
+    case VLC_CODEC_S24L:
+        format = VLC_CODEC_S32N;
+        decode = S24LDecode;
         bits = 24;
         break;
     case VLC_CODEC_S20B:
@@ -373,6 +393,54 @@ static void S20BDecode( void *outp, const uint8_t *in, unsigned samples )
         *(out++) = (U16_AT(in) << 16) | ((in[2] & 0xF0) << 8);
 }
 
+static void U24BDecode( void *outp, const uint8_t *in, unsigned samples )
+{
+    uint32_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+        uint32_t s = ((in[0] << 24) | (in[1] << 16) | (in[2] << 8)) - 0x80000000;
+        *(out++) = s;
+        in += 3;
+    }
+}
+
+static void U24LDecode( void *outp, const uint8_t *in, unsigned samples )
+{
+    uint32_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+        uint32_t s = ((in[2] << 24) | (in[1] << 16) | (in[0] << 8)) - 0x80000000;
+        *(out++) = s;
+        in += 3;
+    }
+}
+
+static void S24BDecode( void *outp, const uint8_t *in, unsigned samples )
+{
+    uint32_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+        uint32_t s = ((in[0] << 24) | (in[1] << 16) | (in[2] << 8));
+        *(out++) = s;
+        in += 3;
+    }
+}
+
+static void S24LDecode( void *outp, const uint8_t *in, unsigned samples )
+{
+    uint32_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+        uint32_t s = ((in[2] << 24) | (in[1] << 16) | (in[0] << 8));
+        *(out++) = s;
+        in += 3;
+    }
+}
+
 static void U32BDecode( void *outp, const uint8_t *in, unsigned samples )
 {
     uint32_t *out = outp;
@@ -486,6 +554,62 @@ static void U16NEncode( void *outp, const uint8_t *inp, unsigned samples )
         *(out++) =  *(in++) + 0x8000;
 }
 
+static void U24BEncode( void *outp, const uint8_t *inp, unsigned samples )
+{
+    const uint32_t *in = (const uint32_t *)inp;
+    uint8_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+        uint32_t s = *(in++);
+        *(out++) = (s >> 24) + 0x80;
+        *(out++) = (s >> 16);
+        *(out++) = (s >>  8);
+    }
+}
+
+static void U24LEncode( void *outp, const uint8_t *inp, unsigned samples )
+{
+    const uint32_t *in = (const uint32_t *)inp;
+    uint8_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+        uint32_t s = *(in++);
+        *(out++) = (s >>  8);
+        *(out++) = (s >> 16);
+        *(out++) = (s >> 24) + 0x80;
+    }
+}
+
+static void S24BEncode( void *outp, const uint8_t *inp, unsigned samples )
+{
+    const uint32_t *in = (const uint32_t *)inp;
+    uint8_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+        uint32_t s = *(in++);
+        *(out++) = (s >> 24);
+        *(out++) = (s >> 16);
+        *(out++) = (s >>  8);
+    }
+}
+
+static void S24LEncode( void *outp, const uint8_t *inp, unsigned samples )
+{
+    const uint32_t *in = (const uint32_t *)inp;
+    uint8_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+        uint32_t s = *(in++);
+        *(out++) = (s >>  8);
+        *(out++) = (s >> 16);
+        *(out++) = (s >> 24);
+    }
+}
+
 static void U32IEncode( void *outp, const uint8_t *inp, unsigned samples )
 {
     const uint32_t *in = (const uint32_t *)inp;
@@ -580,10 +704,24 @@ static int EncoderOpen( vlc_object_t *p_this )
         p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
         p_enc->fmt_out.audio.i_bitspersample = 16;
         break;
-    case VLC_CODEC_U24L:
     case VLC_CODEC_U24B:
-    case VLC_CODEC_S24L:
+        encode = U24BEncode;
+        p_enc->fmt_in.i_codec = VLC_CODEC_S32N;
+        p_enc->fmt_out.audio.i_bitspersample = 24;
+        break;
+    case VLC_CODEC_U24L:
+        encode = U24LEncode;
+        p_enc->fmt_in.i_codec = VLC_CODEC_S32N;
+        p_enc->fmt_out.audio.i_bitspersample = 24;
+        break;
     case VLC_CODEC_S24B:
+        encode = S24BEncode;
+        p_enc->fmt_in.i_codec = VLC_CODEC_S32N;
+        p_enc->fmt_out.audio.i_bitspersample = 24;
+        break;
+    case VLC_CODEC_S24L:
+        encode = S24LEncode;
+        p_enc->fmt_in.i_codec = VLC_CODEC_S32N;
         p_enc->fmt_out.audio.i_bitspersample = 24;
         break;
     case VLC_CODEC_U32I:
