@@ -38,7 +38,6 @@
     if( self = [super initWithContentRect:contentRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO])
     {
         initialFrame = contentRect;
-        fullscreen = NO;
         [self setBackgroundColor:[NSColor blackColor]];
         [self setHasShadow:YES];
         [self setMovableByWindowBackground: YES];
@@ -50,7 +49,6 @@
 
 - (void)enterFullscreen
 {
-    fullscreen = YES;
     initialFrame = [self frame];
     SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
     [self setFrame:[[self screen] frame] display:YES animate:YES];
@@ -58,19 +56,8 @@
 
 - (void)leaveFullscreen
 {
-    fullscreen = NO;
     SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
     [self setFrame:initialFrame display:YES animate:YES];
 }
 
-- (BOOL)stretchesVideo
-{
-    return NO;
-}
-
-- (void)setOnTop: (BOOL)ontop
-{
-
-}
 @end
-

@@ -28,8 +28,6 @@
 @interface VLCMinimalVoutWindow : NSWindow
 {
     NSRect initialFrame;
-    NSPoint initialLocation, initialLocationOnScreen;
-    BOOL fullscreen;
     BOOL mouseDraggedShouldResize;
 }
 
@@ -37,6 +35,4 @@
 
 - (void)enterFullscreen;
 - (void)leaveFullscreen;
-- (BOOL)stretchesVideo;
-- (void)setOnTop: (BOOL)ontop;
 @end
