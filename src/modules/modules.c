@@ -403,7 +403,7 @@ module_t *module_find (const char *name)
 }
 
 /**
- * Tell if a module exists and release it in thic case
+ * Tell if a module exists
  *
  * \param psz_name th name of the module
  * \return TRUE if the module exists
