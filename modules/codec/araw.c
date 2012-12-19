@@ -438,8 +438,8 @@ static int EncoderOpen( vlc_object_t *p_this )
     {
     case VLC_CODEC_S8:
         encode = S8Decode;
-        p_enc->fmt_in.i_codec = VLC_CODEC_U8;
     case VLC_CODEC_U8:
+        p_enc->fmt_in.i_codec = VLC_CODEC_U8;
         p_enc->fmt_out.audio.i_bitspersample = 8;
         break;
     case VLC_CODEC_U16I:
@@ -454,10 +454,8 @@ static int EncoderOpen( vlc_object_t *p_this )
         break;
     case VLC_CODEC_S16I:
         encode = S16IDecode;
+    case VLC_CODEC_S16N:
         p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
-        p_enc->fmt_out.audio.i_bitspersample = 16;
-        break;
-    case VLC_CODEC_S16L:
         p_enc->fmt_out.audio.i_bitspersample = 16;
         break;
     case VLC_CODEC_U24L:
