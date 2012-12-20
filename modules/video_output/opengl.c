@@ -659,22 +659,6 @@ error:
 int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                                 picture_t *picture, subpicture_t *subpicture)
 {
-    /* On Win32/GLX, we do this the usual way:
-       + Fill the buffer with new content,
-       + Reload the texture,
-       + Use the texture.
-
-       On OS X with VRAM or AGP texturing, the order has to be:
-       + Reload the texture,
-       + Fill the buffer with new content,
-       + Use the texture.
-
-       (Thanks to gcc from the Arstechnica forums for the tip)
-
-       Therefore on OSX, we have to use two buffers and textures and use a
-       lock(/unlock) managed picture pool.
-     */
-
     if (vlc_gl_Lock(vgl->gl))
         return VLC_EGENERIC;
 
