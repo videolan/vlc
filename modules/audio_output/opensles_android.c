@@ -41,6 +41,13 @@
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
 
+#define OPENSLES_BUFFERS 255 /* maximum number of buffers */
+#define OPENSLES_BUFLEN  4   /* ms */
+/*
+ * 4ms of precision when mesasuring latency should be plenty enough,
+ * with 255 buffers we can buffer ~1s of audio.
+ */
+
 #define CHECK_OPENSL_ERROR(msg)                \
     if (unlikely(result != SL_RESULT_SUCCESS)) \
     {                                          \
@@ -72,6 +79,7 @@ typedef SLresult (*slCreateEngine_t)(
  *****************************************************************************/
 struct aout_sys_t
 {
+    /* OpenSL objects */
     SLObjectItf                     engineObject;
     SLObjectItf                     outputMixObject;
     SLAndroidSimpleBufferQueueItf   playerBufferQueue;
@@ -80,17 +88,7 @@ struct aout_sys_t
     SLEngineItf                     engineEngine;
     SLPlayItf                       playerPlay;
 
-    vlc_mutex_t                     lock;
-    mtime_t                         length;
-
-    /* audio buffered through opensles */
-    block_t                        *p_chain;
-    block_t                       **pp_last;
-
-    /* audio not yet buffered through opensles */
-    block_t                        *p_buffer_chain;
-    block_t                       **pp_buffer_last;
-
+    /* OpenSL symbols */
     void                           *p_so_handle;
 
     slCreateEngine_t                slCreateEnginePtr;
@@ -99,7 +97,22 @@ struct aout_sys_t
     SLInterfaceID                   SL_IID_VOLUME;
     SLInterfaceID                   SL_IID_PLAY;
 
-    audio_sample_format_t           format;
+    /* */
+
+    vlc_mutex_t                     lock;
+
+    /* audio buffered through opensles */
+    uint8_t                        *buf;
+    size_t                          buf_unit_size;
+    int                             next_buf;
+
+    /* if we can measure latency already */
+    bool                            started;
+
+    /* audio not yet buffered through opensles */
+    block_t                        *p_buffer_chain;
+    block_t                       **pp_buffer_last;
+
 };
 
 /*****************************************************************************
@@ -123,6 +136,32 @@ vlc_module_begin ()
     set_callbacks(Open, Close)
 vlc_module_end ()
 
+/*****************************************************************************
+ *
+ *****************************************************************************/
+
+static int TimeGet(audio_output_t* aout, mtime_t* restrict drift)
+{
+    aout_sys_t *sys = aout->sys;
+
+    SLAndroidSimpleBufferQueueState st;
+    SLresult res = GetState(sys->playerBufferQueue, &st);
+    if (unlikely(res != SL_RESULT_SUCCESS)) {
+        msg_Err(aout, "Could not query buffer queue state in TimeGet (%lu)", res);
+        return -1;
+    }
+
+    vlc_mutex_lock(&sys->lock);
+    bool started = sys->started;
+    vlc_mutex_unlock(&sys->lock);
+
+    if (!started)
+        return -1;
+
+    *drift = CLOCK_FREQ * OPENSLES_BUFLEN * st.count / 1000;
+    //msg_Dbg(aout, "latency %"PRId64"", *drift);
+    return 0;
+}
 
 static void Flush(audio_output_t *aout, bool drain)
 {
@@ -130,28 +169,20 @@ static void Flush(audio_output_t *aout, bool drain)
 
     if (drain) {
         mtime_t delay;
-        vlc_mutex_lock(&sys->lock);
-        delay = sys->length;
-        vlc_mutex_unlock(&sys->lock);
-        msleep(delay);
+        if (!TimeGet(aout, &delay))
+            msleep(delay);
     } else {
         vlc_mutex_lock(&sys->lock);
         SetPlayState(sys->playerPlay, SL_PLAYSTATE_STOPPED);
         Clear(sys->playerBufferQueue);
         SetPlayState(sys->playerPlay, SL_PLAYSTATE_PLAYING);
 
-        sys->length = 0;
-
         /* release audio data not yet written to opensles */
         block_ChainRelease(sys->p_buffer_chain);
         sys->p_buffer_chain = NULL;
         sys->pp_buffer_last = &sys->p_buffer_chain;
 
-        /* release audio data written to opensles, but not yet
-         * played on hardware */
-        block_ChainRelease(sys->p_chain);
-        sys->p_chain = NULL;
-        sys->pp_last = &sys->p_chain;
+        sys->started = false;
 
         vlc_mutex_unlock(&sys->lock);
     }
@@ -187,77 +218,81 @@ static void Pause(audio_output_t *aout, bool pause, mtime_t date)
         pause ? SL_PLAYSTATE_PAUSED : SL_PLAYSTATE_PLAYING);
 }
 
-static int TimeGet(audio_output_t* aout, mtime_t* restrict drift)
-{
-    aout_sys_t *sys = aout->sys;
-
-    vlc_mutex_lock(&sys->lock);
-    mtime_t delay = sys->length;
-    vlc_mutex_unlock(&sys->lock);
-
-    SLAndroidSimpleBufferQueueState st;
-    SLresult res = GetState(sys->playerBufferQueue, &st);
-    if (unlikely(res != SL_RESULT_SUCCESS)) {
-        msg_Err(aout, "Could not query buffer queue state in TimeGet (%lu)", res);
-        return -1;
-    }
-
-    if (delay == 0 || st.count == 0)
-        return -1;
-
-    *drift = delay;
-    return 0;
-}
-
 static int WriteBuffer(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
+    const size_t unit_size = sys->buf_unit_size;
 
     block_t *b = sys->p_buffer_chain;
     if (!b)
         return false;
 
-    if (!b->i_length)
-        b->i_length = (mtime_t)(b->i_buffer / 2 / sys->format.i_channels) * CLOCK_FREQ / sys->format.i_rate;
+    /* Check if we can fill at least one buffer unit by chaining blocks */
+    if (b->i_buffer < unit_size) {
+        if (!b->p_next)
+            return false;
+        ssize_t needed = unit_size - b->i_buffer;
+        for (block_t *next = b->p_next; next; next = next->p_next) {
+            needed -= next->i_buffer;
+            if (needed <= 0)
+                break;
+        }
 
-    /* If something bad happens, we must remove this buffer from the FIFO */
-    block_t **pp_last_saved = sys->pp_last;
-    block_t *p_last_saved = *pp_last_saved;
-    block_t *next_saved = b->p_next;
-    b->p_next = NULL;
+        if (needed > 0)
+            return false;
+    }
 
-    /* Put this block in the list of audio already written to opensles */
-    block_ChainLastAppend(&sys->pp_last, b);
+    SLAndroidSimpleBufferQueueState st;
+    SLresult res = GetState(sys->playerBufferQueue, &st);
+    if (unlikely(res != SL_RESULT_SUCCESS)) {
+        msg_Err(aout, "Could not query buffer queue state in %s (%lu)", __func__, res);
+        return false;
+    }
 
-    mtime_t len = b->i_length;
-    sys->length += len;
-    block_t *next = b->p_next;
+    if (st.count == OPENSLES_BUFFERS)
+        return false;
 
-    vlc_mutex_unlock(&sys->lock);
-    SLresult r = Enqueue(sys->playerBufferQueue, b->p_buffer, b->i_buffer);
-    vlc_mutex_lock(&sys->lock);
+    size_t done = 0;
+    while (done < unit_size) {
+        size_t cur = b->i_buffer;
+        if (cur > unit_size - done)
+            cur = unit_size - done;
+
+        memcpy(&sys->buf[unit_size * sys->next_buf + done], b->p_buffer, cur);
+        b->i_buffer -= cur;
+        b->p_buffer += cur;
+        done += cur;
+
+        block_t *next = b->p_next;
+        if (b->i_buffer == 0) {
+            block_Release(b);
+            b = NULL;
+        }
+
+        if (done == unit_size)
+            break;
+        else
+            b = next;
+    }
+
+    sys->p_buffer_chain = b;
+    if (!b)
+        sys->pp_buffer_last = &sys->p_buffer_chain;
+
+    SLresult r = Enqueue(sys->playerBufferQueue,
+        &sys->buf[unit_size * sys->next_buf], unit_size);
 
     if (r == SL_RESULT_SUCCESS) {
-        /* Remove that block from the list of audio not yet written */
-        sys->p_buffer_chain = next;
-        if (!sys->p_buffer_chain)
-            sys->pp_buffer_last = &sys->p_buffer_chain;
+        if (++sys->next_buf == OPENSLES_BUFFERS)
+            sys->next_buf = 0;
+        return true;
     } else {
-        /* Remove that block from the list of audio already written */
+        /* XXX : if writing fails, we don't retry */
         msg_Err(aout, "error %lu when writing %d bytes %s",
                 r, b->i_buffer,
                 (r == SL_RESULT_BUFFER_INSUFFICIENT) ? " (buffer insufficient)" : "");
-
-        sys->pp_last = pp_last_saved;
-        *pp_last_saved = p_last_saved;
-
-        b->p_next = next_saved;
-
-        sys->length -= len;
-        next = NULL; /* We'll try again next time */
+        return false;
     }
-
-    return next != NULL;
 }
 
 /*****************************************************************************
@@ -269,37 +304,28 @@ static void Play(audio_output_t *aout, block_t *p_buffer)
 
     p_buffer->p_next = NULL; /* Make sur our linked list doesn't use old references */
     vlc_mutex_lock(&sys->lock);
+
+    /* Hold this block until we can write it into the OpenSL buffer */
     block_ChainLastAppend(&sys->pp_buffer_last, p_buffer);
+
+    /* Fill OpenSL buffer */
     while (WriteBuffer(aout))
         ;
+
     vlc_mutex_unlock(&sys->lock);
 }
 
 static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext)
 {
     (void)caller;
-    block_t *p_block;
     audio_output_t *aout = pContext;
     aout_sys_t *sys = aout->sys;
 
     assert (caller == sys->playerBufferQueue);
 
     vlc_mutex_lock(&sys->lock);
-
-    p_block = sys->p_chain;
-    assert(p_block);
-
-    sys->p_chain = sys->p_chain->p_next;
-    /* if we exhausted our fifo, we must reset the pointer to the last
-     * appended block */
-    if (!sys->p_chain)
-        sys->pp_last = &sys->p_chain;
-
-    sys->length -= p_block->i_length;
-
+    sys->started = true;
     vlc_mutex_unlock(&sys->lock);
-
-    block_Release(p_block);
 }
 /*****************************************************************************
  *
@@ -323,7 +349,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     // configure audio source - this defines the number of samples you can enqueue.
     SLDataLocator_AndroidSimpleBufferQueue loc_bufq = {
         SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,
-        255 // Maximum number of buffers to enqueue.
+        OPENSLES_BUFFERS
     };
 
     SLDataFormat_PCM format_pcm;
@@ -373,8 +399,15 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     result = SetPlayState(sys->playerPlay, SL_PLAYSTATE_PLAYING);
     CHECK_OPENSL_ERROR("Failed to switch to playing state");
 
-    sys->p_chain = NULL;
-    sys->pp_last = &sys->p_chain;
+    /* XXX: rounding shouldn't affect us at normal sampling rate */
+    sys->buf_unit_size = OPENSLES_BUFLEN * fmt->i_rate * 2 /* channels */ * 2 /* bps */ / 1000;
+    sys->buf = malloc(OPENSLES_BUFFERS * sys->buf_unit_size);
+    if (!sys->buf)
+        goto error;
+
+    sys->started = false;
+    sys->next_buf = 0;
+
     sys->p_buffer_chain = NULL;
     sys->pp_buffer_last = &sys->p_buffer_chain;
 
@@ -385,8 +418,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     SetPositionUpdatePeriod(sys->playerPlay, AOUT_MIN_PREPARE_TIME * 1000 / CLOCK_FREQ);
 
     aout_FormatPrepare(fmt);
-
-    sys->format = *fmt;
 
     return VLC_SUCCESS;
 
@@ -402,7 +433,8 @@ static void Stop(audio_output_t *aout)
     SetPlayState(sys->playerPlay, SL_PLAYSTATE_STOPPED);
     //Flush remaining buffers if any.
     Clear(sys->playerBufferQueue);
-    block_ChainRelease(sys->p_chain);
+
+    free(sys->buf);
     block_ChainRelease(sys->p_buffer_chain);
 }
 
