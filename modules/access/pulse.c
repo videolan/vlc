@@ -248,8 +248,8 @@ static const vlc_fourcc_t fourccs[] = {
     [PA_SAMPLE_S32BE] =     VLC_CODEC_S32B,
     [PA_SAMPLE_S24LE] =     VLC_CODEC_S24L,
     [PA_SAMPLE_S24BE] =     VLC_CODEC_S24B,
-    [PA_SAMPLE_S24_32LE] =  0,
-    [PA_SAMPLE_S24_32BE] =  0,
+    [PA_SAMPLE_S24_32LE] =  VLC_CODEC_S24L32,
+    [PA_SAMPLE_S24_32BE] =  VLC_CODEC_S24B32,
 };
 
 static int Open(vlc_object_t *obj)
