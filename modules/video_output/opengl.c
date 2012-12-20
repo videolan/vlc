@@ -319,12 +319,12 @@ static void BuildRGBAFragmentShader(vout_display_opengl_t *vgl,
     // Simple shader for RGBA
     const char *code =
         "#version 120\n"
-        "uniform sampler2D Texture[3];"
+        "uniform sampler2D Texture;"
         "uniform vec4 FillColor;"
-        "varying vec4 TexCoord0,TexCoord1,TexCoord2;"
+        "varying vec4 TexCoord0;"
         "void main()"
         "{ "
-        "  gl_FragColor = texture2D(Texture[0], TexCoord0.st)*FillColor;"
+        "  gl_FragColor = texture2D(Texture, TexCoord0.st) * FillColor;"
         "}";
     *shader = vgl->CreateShader(GL_FRAGMENT_SHADER);
     vgl->ShaderSource(*shader, 1, &code, NULL);
@@ -897,7 +897,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         DrawWithShaders(vgl, left, top ,right, bottom);
         // Change the program for overlays
         vgl->UseProgram(vgl->program[1]);
-        vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[1], "Texture[0]"), 0);
+        vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[1], "Texture"), 0);
     } else {
         DrawWithoutShaders(vgl, left, top, right, bottom);
     }
