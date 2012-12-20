@@ -338,22 +338,6 @@ void aout_ChannelReorder( void *ptr, size_t bytes, unsigned channels,
             }
             break;
         }
-
-        case 24:
-        {
-            uint8_t *buf = ptr;
-
-            for( size_t i = 0; i < samples; i++ )
-            {
-                uint8_t tmp[3 * AOUT_CHAN_MAX];
-
-                for( size_t j = 0; j < channels; j++ )
-                    memcpy( tmp + (3 * chans_table[j]), buf + (3 * j), 3 );
-
-                memcpy( buf, tmp, 3 * channels );
-                buf += 3 * channels;
-            }
-        }
     }
 }
 
@@ -386,8 +370,6 @@ void aout_ChannelExtract( void *p_dst, int i_dst_channels,
         ExtractChannel( p_dst, i_dst_channels, p_src, i_src_channels, i_sample_count, pi_selection, 1 );
     else  if( i_bits_per_sample == 16 )
         ExtractChannel( p_dst, i_dst_channels, p_src, i_src_channels, i_sample_count, pi_selection, 2 );
-    else  if( i_bits_per_sample == 24 )
-        ExtractChannel( p_dst, i_dst_channels, p_src, i_src_channels, i_sample_count, pi_selection, 3 );
     else  if( i_bits_per_sample == 32 )
         ExtractChannel( p_dst, i_dst_channels, p_src, i_src_channels, i_sample_count, pi_selection, 4 );
     else  if( i_bits_per_sample == 64 )
