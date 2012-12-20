@@ -52,6 +52,7 @@
 #include <vlc_sout.h>
 #include <vlc_block.h>
 #include <vlc_codec.h>
+#include <vlc_aout.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -268,36 +269,10 @@ static sout_stream_id_t *AddAudio( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     char* psz_tmp;
     sout_stream_id_t* id;
-    int i_bits_per_sample;
+    int i_bits_per_sample = aout_BitsPerSample( p_fmt->i_codec );
 
-    switch( p_fmt->i_codec )
+    if( !i_bits_per_sample )
     {
-    case VLC_CODEC_U8:
-    case VLC_CODEC_S8:
-        i_bits_per_sample = 8;
-        break;
-    case VLC_CODEC_U16L:
-    case VLC_CODEC_S16L:
-    case VLC_CODEC_U16B:
-    case VLC_CODEC_S16B:
-        i_bits_per_sample =  16;
-        break;
-    case VLC_CODEC_U24L:
-    case VLC_CODEC_S24L:
-    case VLC_CODEC_U24B:
-    case VLC_CODEC_S24B:
-        i_bits_per_sample = 24;
-        break;
-    case VLC_CODEC_S32L:
-    case VLC_CODEC_S32B:
-    case VLC_CODEC_FL32:
-    case VLC_CODEC_FI32:
-        i_bits_per_sample = 32;
-        break;
-    case VLC_CODEC_FL64:
-        i_bits_per_sample = 64;
-        break;
-    default:
         msg_Err( p_stream, "Smem does only support raw audio format" );
         return NULL;
     }
