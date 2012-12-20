@@ -71,7 +71,7 @@ typedef struct aout_stream_sys
     uint8_t chans_table[AOUT_CHAN_MAX];
     uint8_t chans_to_reorder;
 
-    uint8_t bits; /**< Bits per sample */
+    vlc_fourcc_t format; /**< Sample format */
     unsigned rate; /**< Sample rate */
     unsigned bytes_per_frame;
     UINT32 written; /**< Frames written to the buffer */
@@ -125,7 +125,7 @@ static HRESULT Play(aout_stream_t *s, block_t *block)
 
     if (sys->chans_to_reorder)
         aout_ChannelReorder(block->p_buffer, block->i_buffer,
-                          sys->chans_to_reorder, sys->chans_table, sys->bits);
+                          sys->chans_to_reorder, sys->chans_table, sys->format);
 
     hr = IAudioClient_GetService(sys->client, &IID_IAudioRenderClient, &pv);
     if (FAILED(hr))
@@ -356,7 +356,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
 
     sys->chans_to_reorder = vlc_CheckWaveOrder((hr == S_OK) ? &wf.Format : pwf,
                                                sys->chans_table);
-    sys->bits = fmt->i_bitspersample;
+    sys->format = fmt->i_format;
 
     hr = IAudioClient_Initialize(sys->client, AUDCLNT_SHAREMODE_SHARED, 0,
                                  AOUT_MAX_PREPARE_TIME * 10, 0,

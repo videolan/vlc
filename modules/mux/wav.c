@@ -293,8 +293,7 @@ static int Mux( sout_mux_t *p_mux )
         if( p_sys->i_chans_to_reorder )
             aout_ChannelReorder( p_block->p_buffer, p_block->i_buffer,
                                  p_sys->i_chans_to_reorder,
-                                 p_sys->pi_chan_table,
-                                 p_input->p_fmt->audio.i_bitspersample );
+                                 p_sys->pi_chan_table, p_input->p_fmt->i_codec );
 
         sout_AccessOutWrite( p_mux->p_access, p_block );
     }

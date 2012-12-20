@@ -1222,7 +1222,7 @@ static void PlayAnalog (audio_output_t * p_aout, block_t * p_block)
                                p_block->i_buffer,
                                p_sys->chans_to_reorder,
                                p_sys->chan_table,
-                               32);
+                               VLC_CODEC_FL32);
         }
 
         /* Render audio into buffer */

@@ -112,6 +112,7 @@ struct aout_sys_t
 
     uint8_t chans_to_reorder;              /* do we need channel reordering */
     uint8_t chan_table[AOUT_CHAN_MAX];
+    vlc_fourcc_t format;
 };
 
 #include "volume.h"
@@ -654,6 +655,7 @@ static int OpenWaveOut( audio_output_t *p_aout, uint32_t i_device_id, int i_form
                                   p_aout->sys->chan_table );
     if( p_aout->sys->chans_to_reorder )
         msg_Dbg( p_aout, "channel reordering needed" );
+    p_aout->sys->format = i_format;
 
     return VLC_SUCCESS;
 
@@ -917,8 +919,7 @@ static void* WaveOutThread( void *data )
                     aout_ChannelReorder( p_buffer->p_buffer,
                         p_buffer->i_buffer,
                         p_sys->waveformat.Format.nChannels,
-                        p_sys->chan_table,
-                        p_sys->waveformat.Format.wBitsPerSample );
+                        p_sys->chan_table, p_sys->format );
                 }
 
                 PlayWaveOut( p_aout, p_sys->h_waveout,

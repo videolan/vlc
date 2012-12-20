@@ -86,8 +86,7 @@ struct aout_sys_t
     uint8_t  chans_to_reorder;              /* do we need channel reordering */
     uint8_t  chan_table[AOUT_CHAN_MAX];
     uint32_t i_channel_mask;
-    uint32_t i_bits_per_sample;
-    uint32_t i_channels;
+    vlc_fourcc_t format;
 };
 
 /*****************************************************************************
@@ -724,8 +723,7 @@ static int CreateDSBuffer( audio_output_t *p_aout, int i_format,
     waveformat.Format.nAvgBytesPerSec =
         waveformat.Format.nSamplesPerSec * waveformat.Format.nBlockAlign;
 
-    p_aout->sys->i_bits_per_sample = waveformat.Format.wBitsPerSample;
-    p_aout->sys->i_channels = i_nb_channels;
+    p_aout->sys->format = i_format;
 
     /* Then fill in the direct sound descriptor */
     memset(&dsbdesc, 0, sizeof(DSBUFFERDESC));
@@ -903,7 +901,7 @@ static int FillBuffer( audio_output_t *p_aout, int i_frame, block_t *p_buffer )
             /* Do the channel reordering here */
             aout_ChannelReorder( p_buffer->p_buffer, p_buffer->i_buffer,
                                  p_sys->chans_to_reorder, p_sys->chan_table,
-                                 p_sys->i_bits_per_sample );
+                                 p_sys->format );
 
         memcpy( p_write_position, p_buffer->p_buffer, l_bytes1 );
         block_Release( p_buffer );

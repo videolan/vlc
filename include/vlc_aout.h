@@ -236,7 +236,7 @@ static const uint32_t pi_vlc_chan_order_wg4[] =
  */
 VLC_API unsigned aout_CheckChannelReorder( const uint32_t *, const uint32_t *,
                                            uint32_t mask, uint8_t *table );
-VLC_API void aout_ChannelReorder( void *, size_t, unsigned, const uint8_t *, unsigned );
+VLC_API void aout_ChannelReorder(void *, size_t, unsigned, const uint8_t *, vlc_fourcc_t);
 
 /**
  * This fonction will compute the extraction parameter into pi_selection to go

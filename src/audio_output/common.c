@@ -276,65 +276,127 @@ unsigned aout_CheckChannelReorder( const uint32_t *chans_in,
     return 0;
 }
 
-/*****************************************************************************
- * aout_ChannelReorder :
- *****************************************************************************/
+/**
+ * Reorders audio samples within a block of linear audio interleaved samples.
+ * \param ptr start address of the block of samples
+ * \param bytes size of the block in bytes (must be a multiple of the product of the
+ *              channels count and the sample size)
+ * \param channels channels count (also length of the chans_table table)
+ * \param chans_table permutation table to reorder the channels
+ *                    (usually computed by aout_CheckChannelReorder())
+ * \param fourcc sample format (must be a linear sample format)
+ * \note The samples must be naturally aligned in memory.
+ */
 void aout_ChannelReorder( void *ptr, size_t bytes, unsigned channels,
-                          const uint8_t *chans_table, unsigned bits_per_sample )
+                          const uint8_t *restrict chans_table, vlc_fourcc_t fourcc )
 {
-    size_t samples = bytes / (channels * (bits_per_sample >> 3));
-
+    assert( channels != 0 );
     assert( channels <= AOUT_CHAN_MAX );
 
-    switch( bits_per_sample )
+    /* The audio formats supported in audio output are inlined. For other formats (used in
+     * demuxers and muxers), memcpy() is used to avoid breaking type punning. */
+    switch( fourcc )
     {
-        case 32:
+        case VLC_CODEC_FL32:
         {
-            uint32_t *buf = ptr;
+            const size_t frames = (bytes / 4) / channels;
+            float *buf = ptr;
 
-            for( size_t i = 0; i < samples; i++ )
+            for( size_t i = 0; i < frames; i++ )
             {
-                uint32_t tmp[AOUT_CHAN_MAX];
+                float tmp[AOUT_CHAN_MAX];
 
                 for( size_t j = 0; j < channels; j++ )
                     tmp[chans_table[j]] = buf[j];
-
                 memcpy( buf, tmp, 4 * channels );
                 buf += channels;
             }
             break;
         }
 
-        case 16:
+        case VLC_CODEC_S16N:
         {
-            uint16_t *buf = ptr;
+            const size_t frames = (bytes / 2) / channels;
+            int16_t *buf = ptr;
 
-            for( size_t i = 0; i < samples; i++ )
+            for( size_t i = 0; i < frames; i++ )
             {
-                uint16_t tmp[AOUT_CHAN_MAX];
+                int16_t tmp[AOUT_CHAN_MAX];
 
                 for( size_t j = 0; j < channels; j++ )
                     tmp[chans_table[j]] = buf[j];
-
                 memcpy( buf, tmp, 2 * channels );
                 buf += channels;
             }
             break;
         }
 
-        case 8:
+        case VLC_CODEC_FL64:
         {
+            const size_t frames = (bytes / 8) / channels;
+            double *buf = ptr;
+
+            for( size_t i = 0; i < frames; i++ )
+            {
+                double tmp[AOUT_CHAN_MAX];
+
+                for( size_t j = 0; j < channels; j++ )
+                    tmp[chans_table[j]] = buf[j];
+                memcpy( buf, tmp, 8 * channels );
+                buf += channels;
+            }
+            break;
+        }
+
+        case VLC_CODEC_S32N:
+        {
+            const size_t frames = (bytes / 4) / channels;
+            int32_t *buf = ptr;
+
+            for( size_t i = 0; i < frames; i++ )
+            {
+                int32_t tmp[AOUT_CHAN_MAX];
+
+                for( size_t j = 0; j < channels; j++ )
+                    tmp[chans_table[j]] = buf[j];
+                memcpy( buf, tmp, 4 * channels );
+                buf += channels;
+            }
+            break;
+        }
+
+        case VLC_CODEC_U8:
+        {
+            const size_t frames = bytes / channels;
             uint8_t *buf = ptr;
 
-            for( size_t i = 0; i < samples; i++ )
+            for( size_t i = 0; i < frames; i++ )
             {
                 uint8_t tmp[AOUT_CHAN_MAX];
 
                 for( size_t j = 0; j < channels; j++ )
                     tmp[chans_table[j]] = buf[j];
-
                 memcpy( buf, tmp, channels );
                 buf += channels;
+            }
+            break;
+        }
+
+        default:
+        {
+            unsigned size = aout_BitsPerSample( fourcc ) / 8;
+            const size_t frames = bytes / size;
+            unsigned char *buf = ptr;
+
+            assert( bytes != 0 );
+            for( size_t i = 0; i < frames; i++ )
+            {
+                unsigned char tmp[AOUT_CHAN_MAX * bytes];
+
+                for( size_t j = 0; j < channels; j++ )
+                    memcpy( tmp + size * chans_table[j], buf + size * j, size );
+                memcpy( buf, tmp, size * channels );
+                buf += size * channels;
             }
             break;
         }

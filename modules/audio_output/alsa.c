@@ -44,9 +44,9 @@ struct aout_sys_t
 {
     snd_pcm_t *pcm;
     unsigned rate; /**< Sample rate */
+    vlc_fourcc_t format; /**< Sample format */
     uint8_t chans_table[AOUT_CHAN_MAX]; /**< Channels order table */
     uint8_t chans_to_reorder; /**< Number of channels to reorder */
-    uint8_t bits; /**< Bits per sample per channel */
 
     bool soft_mute;
     float soft_gain;
@@ -563,11 +563,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE;
         fmt->i_frame_length = A52_FRAME_NB;
     }
-    else
-    {
-        aout_FormatPrepare (fmt);
-        sys->bits = fmt->i_bitspersample;
-    }
+    sys->format = fmt->i_format;
 
     aout->time_get = TimeGet;
     aout->play = Play;
@@ -611,7 +607,7 @@ static void Play (audio_output_t *aout, block_t *block)
 
     if (sys->chans_to_reorder != 0)
         aout_ChannelReorder(block->p_buffer, block->i_buffer,
-                           sys->chans_to_reorder, sys->chans_table, sys->bits);
+                           sys->chans_to_reorder, sys->chans_table, sys->format);
 
     snd_pcm_t *pcm = sys->pcm;
 
