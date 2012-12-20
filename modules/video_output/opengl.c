@@ -756,34 +756,23 @@ static void DrawWithoutShaders(vout_display_opengl_t *vgl,
         right[0], top[0]
     };
 
-    for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-        glActiveTexture(GL_TEXTURE0 + j);
-        glClientActiveTexture(GL_TEXTURE0 + j);
+    glEnable(vgl->tex_target);
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glClientActiveTexture(GL_TEXTURE0 + 0);
 
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glBindTexture(vgl->tex_target, vgl->texture[0][0]);
 
-        glEnable(vgl->tex_target);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-        glBindTexture(vgl->tex_target, vgl->texture[0][j]);
-        glTexCoordPointer(2, GL_FLOAT, 0, textureCoord);
-    }
-    glActiveTexture(GL_TEXTURE0);
-    glClientActiveTexture(GL_TEXTURE0);
-
+    glTexCoordPointer(2, GL_FLOAT, 0, textureCoord);
     glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-    for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-        glActiveTexture(GL_TEXTURE0 + j);
-        glClientActiveTexture(GL_TEXTURE0 + j);
-        glDisable(vgl->tex_target);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
-    }
-    glActiveTexture(GL_TEXTURE0);
-    glClientActiveTexture(GL_TEXTURE0);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisable(vgl->tex_target);
 }
 
 static void DrawWithShaders(vout_display_opengl_t *vgl,
@@ -869,12 +858,12 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         DrawWithoutShaders(vgl, left, top, right, bottom);
     }
 
-    glActiveTexture(GL_TEXTURE0 + 0);
-    glClientActiveTexture(GL_TEXTURE0 + 0);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glClientActiveTexture(GL_TEXTURE0 + 0);
     for (int i = 0; i < vgl->region_count; i++) {
         gl_region_t *glr = &vgl->region[i];
         const GLfloat vertexCoord[] = {
@@ -899,11 +888,9 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
             vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "vertex_position"), 2, GL_FLOAT, 0, 0, vertexCoord);
         } else {
             glEnableClientState(GL_VERTEX_ARRAY);
-            glColor4f(1.0f, 1.0f, 1.0f, glr->alpha);
-            glEnable(GL_TEXTURE_COORD_ARRAY);
-            glEnable(GL_VERTEX_ARRAY);
-            glTexCoordPointer(2, GL_FLOAT, 0, textureCoord);
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+            glColor4f(1.0f, 1.0f, 1.0f, glr->alpha);
+            glTexCoordPointer(2, GL_FLOAT, 0, textureCoord);
             glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
         }
 
