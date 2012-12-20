@@ -133,6 +133,10 @@ private:
             bool drop = false, QTreeWidgetItem* parentItem = 0 );
     PLSelItem * addPodcastItem( playlist_item_t *p_item );
 
+    PLSelItem* playlistItem;
+
+    void updateTotalDuration(PLSelItem*, const char*);
+
     inline PLSelItem * itemWidget( QTreeWidgetItem * );
 
     intf_thread_t    *p_intf;

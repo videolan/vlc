@@ -188,13 +188,42 @@ PLSelItem * putPLData( PLSelItem* item, playlist_item_t* plItem )
     return item;
 }
 
+/*
+ * Reads and updates the playlist's duration as [xx:xx] after the label in the tree
+ * item - the treeview item to get the duration for
+ * prefix - the string to use before the time (should be the category name)
+ */
+void PLSelector::updateTotalDuration( PLSelItem* item, const char* prefix )
+{
+    /* Getting  the playlist */
+    QVariant playlistVariant = item->treeItem()->data( 0, PL_ITEM_ROLE );
+    playlist_item_t* node = playlistVariant.value<playlist_item_t*>();
+
+    /* Formatting time */
+    QString qs_timeLabel( prefix );
+    mtime_t mt_duration = playlist_GetNodeDuration( node );
+    int i_seconds = mt_duration / 1000000;
+    int i_minutes = i_seconds / 60;
+    i_seconds = i_seconds % 60;
+    if( i_minutes >= 60 )
+    {
+        int i_hours = i_minutes / 60;
+        i_minutes = i_minutes % 60;
+        qs_timeLabel += QString(" [%1:%2:%3]").arg( i_hours ).arg( i_minutes, 2, 10, QChar('0') ).arg( i_seconds, 2, 10, QChar('0') );
+    }
+    else
+        qs_timeLabel += QString( " [%1:%2]").arg( i_minutes, 2, 10, QChar('0') ).arg( i_seconds, 2, 10, QChar('0') );
+
+    item->setText( qs_timeLabel );
+}
+
 void PLSelector::createItems()
 {
     /* PL */
-    PLSelItem *pl = putPLData( addItem( PL_ITEM_TYPE, N_("Playlist"), true ),
+    playlistItem = putPLData( addItem( PL_ITEM_TYPE, N_("Playlist"), true ),
                               THEPL->p_playing );
-    pl->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PL ) );
-    setCurrentItem( pl->treeItem() );
+    playlistItem->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PL ) );
+    setCurrentItem( playlistItem->treeItem() );
 
     /* ML */
     PLSelItem *ml = putPLData( addItem( PL_ITEM_TYPE, N_("Media Library"), true ),
@@ -426,6 +455,7 @@ void PLSelector::dragMoveEvent ( QDragMoveEvent * event )
 
 void PLSelector::plItemAdded( int item, int parent )
 {
+    updateTotalDuration(playlistItem, "Playlist");
     if( parent != podcastsParentId || podcastsParent == NULL ) return;
 
     playlist_Lock( THEPL );
@@ -458,6 +488,7 @@ void PLSelector::plItemAdded( int item, int parent )
 
 void PLSelector::plItemRemoved( int id )
 {
+    updateTotalDuration(playlistItem, "Playlist");
     if( !podcastsParent ) return;
 
     int c = podcastsParent->childCount();
@@ -477,6 +508,8 @@ void PLSelector::plItemRemoved( int id )
 
 void PLSelector::inputItemUpdate( input_item_t *arg )
 {
+    updateTotalDuration(playlistItem, "Playlist");
+
     if( podcastsParent == NULL )
         return;
 
