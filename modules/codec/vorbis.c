@@ -253,7 +253,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
 #ifdef MODULE_NAME_IS_tremor
-    p_dec->fmt_out.i_codec = VLC_CODEC_FI32;
+    p_dec->fmt_out.i_codec = VLC_CODEC_S32N;
 #else
     p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
 #endif
@@ -475,11 +475,11 @@ static void Interleave( INTERLEAVE_TYPE *p_out, const INTERLEAVE_TYPE **pp_in,
 {
     for( int j = 0; j < i_samples; j++ )
         for( int i = 0; i < i_nb_channels; i++ )
-            p_out[j * i_nb_channels + pi_chan_table[i]] = pp_in[i][j]
 #ifdef MODULE_NAME_IS_tremor
-                * (FIXED32_ONE >> 24)
+            p_out[j * i_nb_channels + pi_chan_table[i]] = pp_in[i][j] << 8;
+#else
+            p_out[j * i_nb_channels + pi_chan_table[i]] = pp_in[i][j];
 #endif
-            ;
 }
 
 /*****************************************************************************
