@@ -302,11 +302,10 @@ static void BuildRGBFragmentShader(vout_display_opengl_t *vgl,
     const char *code =
         "#version 120\n"
         "uniform sampler2D Texture[3];"
-        "uniform vec4 FillColor;"
         "varying vec4 TexCoord0,TexCoord1,TexCoord2;"
         "void main()"
         "{ "
-        "  gl_FragColor = texture2D(Texture[0], TexCoord0.st)*FillColor;"
+        "  gl_FragColor = texture2D(Texture[0], TexCoord0.st);"
         "}";
     *shader = vgl->CreateShader(GL_FRAGMENT_SHADER);
     vgl->ShaderSource(*shader, 1, &code, NULL);
