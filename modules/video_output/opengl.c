@@ -204,6 +204,133 @@ static bool IsLuminance16Supported(int target)
 }
 #endif
 
+static void BuildVertexShader(vout_display_opengl_t *vgl,
+                              GLint *shader)
+{
+    /* Basic vertex shader */
+    const char *vertexShader =
+        "#version 120\n"
+        "varying   vec4 TexCoord0,TexCoord1, TexCoord2;"
+        "attribute vec4 MultiTexCoord0,MultiTexCoord1,MultiTexCoord2;"
+        "attribute vec4 vertex_position;"
+        "void main() {"
+        " TexCoord0 = MultiTexCoord0;"
+        " TexCoord1 = MultiTexCoord1;"
+        " TexCoord2 = MultiTexCoord2;"
+        " gl_Position = vertex_position;"
+        "}";
+
+    *shader = vgl->CreateShader(GL_VERTEX_SHADER);
+    vgl->ShaderSource(*shader, 1, &vertexShader, NULL);
+    vgl->CompileShader(*shader);
+}
+
+static void BuildYUVFragmentShader(vout_display_opengl_t *vgl,
+                                   GLint *shader,
+                                   int *local_count,
+                                   GLfloat *local_value,
+                                   const video_format_t *fmt,
+                                   float yuv_range_correction)
+
+{
+    /* [R/G/B][Y U V O] from TV range to full range
+     * XXX we could also do hue/brightness/constrast/gamma
+     * by simply changing the coefficients
+     */
+    const float matrix_bt601_tv2full[12] = {
+        1.164383561643836,  0.0000,             1.596026785714286, -0.874202217873451 ,
+        1.164383561643836, -0.391762290094914, -0.812967647237771,  0.531667823499146 ,
+        1.164383561643836,  2.017232142857142,  0.0000,            -1.085630789302022 ,
+    };
+    const float matrix_bt709_tv2full[12] = {
+        1.164383561643836,  0.0000,             1.792741071428571, -0.972945075016308 ,
+        1.164383561643836, -0.21324861427373,  -0.532909328559444,  0.301482665475862 ,
+        1.164383561643836,  2.112401785714286,  0.0000,            -1.133402217873451 ,
+    };
+    const float (*matrix) = fmt->i_height > 576 ? matrix_bt709_tv2full
+                                                : matrix_bt601_tv2full;
+
+    /* Basic linear YUV -> RGB conversion using bilinear interpolation */
+    const char *template_glsl_yuv =
+        "#version 120\n"
+        "uniform sampler2D Texture[3];"
+        "uniform vec4      coefficient[4];"
+        "varying vec4      TexCoord0,TexCoord1,TexCoord2;"
+
+        "void main(void) {"
+        " vec4 x,y,z,result;"
+        " x  = texture2D(Texture[0], TexCoord0.st);"
+        " %c = texture2D(Texture[1], TexCoord1.st);"
+        " %c = texture2D(Texture[2], TexCoord2.st);"
+
+        " result = x * coefficient[0] + coefficient[3];"
+        " result = (y * coefficient[1]) + result;"
+        " result = (z * coefficient[2]) + result;"
+        " gl_FragColor = result;"
+        "}";
+    bool swap_uv = fmt->i_chroma == VLC_CODEC_YV12 ||
+                   fmt->i_chroma == VLC_CODEC_YV9;
+
+    char *code;
+    if (asprintf(&code, template_glsl_yuv,
+                 swap_uv ? 'z' : 'y',
+                 swap_uv ? 'y' : 'z') < 0)
+        code = NULL;
+
+    for (int i = 0; i < 4; i++) {
+        float correction = i < 3 ? yuv_range_correction : 1.0;
+        /* We place coefficient values for coefficient[4] in one array from matrix values.
+           Notice that we fill values from top down instead of left to right.*/
+        for (int j = 0; j < 4; j++)
+            local_value[*local_count + i*4+j] = j < 3 ? correction * matrix[j*4+i]
+                                                      : 0.0 ;
+    }
+    (*local_count) += 4;
+
+
+    *shader = vgl->CreateShader(GL_FRAGMENT_SHADER);
+    vgl->ShaderSource(*shader, 1, (const char **)&code, NULL);
+    vgl->CompileShader(*shader);
+
+    free(code);
+}
+
+static void BuildRGBFragmentShader(vout_display_opengl_t *vgl,
+                                   GLint *shader)
+{
+    // Simple shader for RGB
+    const char *code =
+        "#version 120\n"
+        "uniform sampler2D Texture[3];"
+        "uniform vec4 fillColor;"
+        "varying vec4 TexCoord0,TexCoord1,TexCoord2;"
+        "void main()"
+        "{ "
+        "  gl_FragColor = texture2D(Texture[0], TexCoord0.st)*fillColor;"
+        "}";
+    *shader = vgl->CreateShader(GL_FRAGMENT_SHADER);
+    vgl->ShaderSource(*shader, 1, &code, NULL);
+    vgl->CompileShader(*shader);
+}
+
+static void BuildRGBAFragmentShader(vout_display_opengl_t *vgl,
+                                   GLint *shader)
+{
+    // Simple shader for RGBA
+    const char *code =
+        "#version 120\n"
+        "uniform sampler2D Texture[3];"
+        "uniform vec4 fillColor;"
+        "varying vec4 TexCoord0,TexCoord1,TexCoord2;"
+        "void main()"
+        "{ "
+        "  gl_FragColor = texture2D(Texture[0], TexCoord0.st)*fillColor;"
+        "}";
+    *shader = vgl->CreateShader(GL_FRAGMENT_SHADER);
+    vgl->ShaderSource(*shader, 1, &code, NULL);
+    vgl->CompileShader(*shader);
+}
+
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                                const vlc_fourcc_t **subpicture_chromas,
                                                vlc_gl_t *gl)
@@ -344,150 +471,67 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         }
     }
 
-    /* Build fragment program if needed */
-    vgl->program[0] = 0;
+    /* Build program if needed */
+    vgl->program[0] =
     vgl->program[1] = 0;
+    vgl->shader[0] =
+    vgl->shader[1] =
+    vgl->shader[2] = -1;
     vgl->local_count = 0;
-    vgl->shader[0] = vgl->shader[1] = vgl->shader[2] = -1;
     if (supports_shaders) {
-        char *code = NULL;
+        if (need_fs_yuv)
+            BuildYUVFragmentShader(vgl, &vgl->shader[0],
+                                   &vgl->local_count,
+                                   vgl->local_value,
+                                   fmt, yuv_range_correction);
+        else
+            BuildRGBFragmentShader(vgl, &vgl->shader[0]);
+        BuildRGBAFragmentShader(vgl, &vgl->shader[1]);
+        BuildVertexShader(vgl, &vgl->shader[2]);
 
-        /* [R/G/B][Y U V O] from TV range to full range
-         * XXX we could also do hue/brightness/constrast/gamma
-         * by simply changing the coefficients
-         */
-        const float matrix_bt601_tv2full[12] = {
-            1.164383561643836,  0.0000,             1.596026785714286, -0.874202217873451 ,
-            1.164383561643836, -0.391762290094914, -0.812967647237771,  0.531667823499146 ,
-            1.164383561643836,  2.017232142857142,  0.0000,            -1.085630789302022 ,
-        };
-        const float matrix_bt709_tv2full[12] = {
-            1.164383561643836,  0.0000,             1.792741071428571, -0.972945075016308 ,
-            1.164383561643836, -0.21324861427373,  -0.532909328559444,  0.301482665475862 ,
-            1.164383561643836,  2.112401785714286,  0.0000,            -1.133402217873451 ,
-        };
-        const float (*matrix) = fmt->i_height > 576 ? matrix_bt709_tv2full
-                                                       : matrix_bt601_tv2full;
+        /* Check shaders messages */
+        for (unsigned j = 0; j < 3; j++) {
+            int infoLength;
+            vgl->GetShaderiv(vgl->shader[j], GL_INFO_LOG_LENGTH, &infoLength);
+            if (infoLength <= 1)
+                continue;
 
-        /* Basic linear YUV -> RGB conversion using bilinear interpolation */
-        const char *template_glsl_yuv =
-            "#version 120\n"
-            "uniform sampler2D Texture[3];"
-            "uniform vec4      coefficient[4];"
-            "varying vec4      TexCoord0,TexCoord1,TexCoord2;"
-
-            "void main(void) {"
-            " vec4 x,y,z,result;"
-            " x  = texture2D(Texture[0], TexCoord0.st);"
-            " %c = texture2D(Texture[1], TexCoord1.st);"
-            " %c = texture2D(Texture[2], TexCoord2.st);"
-
-            " result = x * coefficient[0] + coefficient[3];"
-            " result = (y * coefficient[1]) + result;"
-            " result = (z * coefficient[2]) + result;"
-            " gl_FragColor = result;"
-            "}";
-        bool swap_uv = vgl->fmt.i_chroma == VLC_CODEC_YV12 ||
-                       vgl->fmt.i_chroma == VLC_CODEC_YV9;
-        if (asprintf(&code, template_glsl_yuv,
-                     swap_uv ? 'z' : 'y',
-                     swap_uv ? 'y' : 'z') < 0)
-            code = NULL;
-
-        for (int i = 0; i < 4; i++) {
-            float correction = i < 3 ? yuv_range_correction : 1.0;
-            /* We place coefficient values for coefficient[4] in one array from matrix values.
-               Notice that we fill values from top down instead of left to right.*/
-            for (int j = 0; j < 4; j++)
-                vgl->local_value[vgl->local_count + i*4+j] = j < 3 ? correction * matrix[j*4+i] : 0.0 ;
+            char *infolog = malloc(infoLength);
+            int charsWritten;
+            vgl->GetShaderInfoLog(vgl->shader[j], infoLength, &charsWritten, infolog);
+            fprintf(stderr, "shader %d: %s\n", j, infolog);
+            free(infolog);
         }
-        vgl->local_count += 4;
 
-        // Basic vertex shader that we use in both cases
-        const char *vertexShader =
-        "#version 120\n"
-        "varying   vec4 TexCoord0,TexCoord1, TexCoord2;"
-        "attribute vec4 MultiTexCoord0,MultiTexCoord1,MultiTexCoord2;"
-        "attribute vec4 vertex_position;"
-        "void main() {"
-        " TexCoord0 = MultiTexCoord0;"
-        " TexCoord1 = MultiTexCoord1;"
-        " TexCoord2 = MultiTexCoord2;"
-        " gl_Position = vertex_position;"
-        "}";
+        vgl->program[0] = vgl->CreateProgram();
+        vgl->AttachShader(vgl->program[0], vgl->shader[0]);
+        vgl->AttachShader(vgl->program[0], vgl->shader[2]);
+        vgl->LinkProgram(vgl->program[0]);
 
-        // Dummy shader for text overlay
-        const char *helloShader =
-        "#version 120\n"
-        "uniform sampler2D Texture[3];"
-        "uniform vec4 fillColor;"
-        "varying vec4 TexCoord0,TexCoord1,TexCoord2;"
-        "void main()"
-        "{ "
-        "  gl_FragColor = texture2D(Texture[0], TexCoord0.st)*fillColor;"
-        "}";
-
-        vgl->shader[2] = vgl->CreateShader(GL_VERTEX_SHADER);
-        vgl->ShaderSource(vgl->shader[2], 1, (const GLchar **)&vertexShader, NULL);
-        vgl->CompileShader(vgl->shader[2]);
-
-        /* Create 'dummy' shader that handles subpicture overlay for now*/
-        vgl->shader[1] = vgl->CreateShader(GL_FRAGMENT_SHADER);
-        vgl->ShaderSource(vgl->shader[1], 1, &helloShader, NULL);
-        vgl->CompileShader(vgl->shader[1]);
         vgl->program[1] = vgl->CreateProgram();
         vgl->AttachShader(vgl->program[1], vgl->shader[1]);
         vgl->AttachShader(vgl->program[1], vgl->shader[2]);
         vgl->LinkProgram(vgl->program[1]);
 
-        // Create shader from code
-        vgl->shader[0] = vgl->CreateShader(GL_FRAGMENT_SHADER);
-        vgl->program[0] = vgl->CreateProgram();
-        if (need_fs_yuv) {
-            vgl->ShaderSource(vgl->shader[0], 1, (const GLchar **)&code, NULL);
-            vgl->CompileShader(vgl->shader[0]);
-            vgl->AttachShader(vgl->program[0], vgl->shader[0]);
-        } else {
-            /* Use simpler shader if we don't need to to yuv -> rgb,
-               for example when input is allready rgb (.bmp image).*/
-            vgl->AttachShader(vgl->program[0], vgl->shader[1]);
-        }
-        vgl->AttachShader(vgl->program[0], vgl->shader[2]);
-
-        vgl->LinkProgram(vgl->program[0]);
-
-        free(code);
+        /* Check program messages */
         for (GLuint i = 0; i < 2; i++) {
             int infoLength = 0;
             vgl->GetProgramiv(vgl->program[i], GL_INFO_LOG_LENGTH, &infoLength);
-            if (infoLength > 1) {
-                int charsWritten;
-                char *infolog;
+            if (infoLength <= 1)
+                continue;
+            char *infolog = malloc(infoLength);
+            int charsWritten;
+            vgl->GetProgramInfoLog(vgl->program[i], infoLength, &charsWritten, infolog);
+            fprintf(stderr, "shader program %d: %s\n", i, infolog);
+            free(infolog);
 
-                infolog = malloc(infoLength);
-                vgl->GetProgramInfoLog(vgl->program[i], infoLength, &charsWritten, infolog);
-                fprintf(stderr, "shader program %d: %s\n", i, infolog);
-                free(infolog);
-
-                /* Check shaders messages too */
-                for (GLuint j = 0; j < 2; j++) {
-                    vgl->GetShaderiv(vgl->shader[j], GL_INFO_LOG_LENGTH, &infoLength);
-                    if (infoLength > 1) {
-                        infolog = malloc(infoLength);
-                        vgl->GetShaderInfoLog(vgl->shader[j], infoLength, &charsWritten, infolog);
-                        fprintf(stderr, "shader %d: %s\n", j, infolog);
-                        free(infolog);
-                    }
-                }
-
-                /* If there is some message, better to check linking is ok */
-                GLint link_status = GL_TRUE;
-                vgl->GetProgramiv(vgl->program[i], GL_LINK_STATUS, &link_status);
-                if (link_status == GL_FALSE) {
-                    fprintf(stderr, "Unable to use program %d\n", i);
-                    free(vgl);
-                    return NULL;
-                }
+            /* If there is some message, better to check linking is ok */
+            GLint link_status = GL_TRUE;
+            vgl->GetProgramiv(vgl->program[i], GL_LINK_STATUS, &link_status);
+            if (link_status == GL_FALSE) {
+                fprintf(stderr, "Unable to use program %d\n", i);
+                free(vgl);
+                return NULL;
             }
         }
     }
