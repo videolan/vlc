@@ -323,6 +323,8 @@
 #define VLC_CODEC_S24B                       VLC_FOURCC('s','2','4','b')
 #define VLC_CODEC_U24L                       VLC_FOURCC('u','2','4','l')
 #define VLC_CODEC_U24B                       VLC_FOURCC('u','2','4','b')
+#define VLC_CODEC_S24L32                     VLC_FOURCC('s','2','4','4')
+#define VLC_CODEC_S24B32                     VLC_FOURCC('S','2','4','4')
 #define VLC_CODEC_S32L                       VLC_FOURCC('s','3','2','l')
 #define VLC_CODEC_S32B                       VLC_FOURCC('s','3','2','b')
 #define VLC_CODEC_U32L                       VLC_FOURCC('u','3','2','l')

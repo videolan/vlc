@@ -61,6 +61,10 @@ unsigned int aout_BitsPerSample( vlc_fourcc_t i_format )
     case VLC_CODEC_S24B:
         return 24;
 
+    case VLC_CODEC_S24L32:
+    case VLC_CODEC_S24B32:
+    case VLC_CODEC_U32L:
+    case VLC_CODEC_U32B:
     case VLC_CODEC_S32L:
     case VLC_CODEC_S32B:
     case VLC_CODEC_F32L:

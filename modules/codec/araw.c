@@ -91,6 +91,8 @@ static void U24BDecode( void *, const uint8_t *, unsigned );
 static void U24LDecode( void *, const uint8_t *, unsigned );
 static void S24BDecode( void *, const uint8_t *, unsigned );
 static void S24LDecode( void *, const uint8_t *, unsigned );
+static void S24B32Decode( void *, const uint8_t *, unsigned );
+static void S24L32Decode( void *, const uint8_t *, unsigned );
 static void U32BDecode( void *, const uint8_t *, unsigned );
 static void U32LDecode( void *, const uint8_t *, unsigned );
 static void Swap32Decode( void *, const uint8_t *, unsigned );
@@ -164,6 +166,16 @@ static int DecoderOpen( vlc_object_t *p_this )
         format = VLC_CODEC_S32N;
         decode = Swap32Decode;
     case VLC_CODEC_S32N:
+        bits = 32;
+        break;
+    case VLC_CODEC_S24B32:
+        format = VLC_CODEC_S32N;
+        decode = S24B32Decode;
+        bits = 32;
+        break;
+    case VLC_CODEC_S24L32:
+        format = VLC_CODEC_S32N;
+        decode = S24L32Decode;
         bits = 32;
         break;
     case VLC_CODEC_U24B:
@@ -438,6 +450,28 @@ static void S24LDecode( void *outp, const uint8_t *in, unsigned samples )
         uint32_t s = ((in[2] << 24) | (in[1] << 16) | (in[0] << 8));
         *(out++) = s;
         in += 3;
+    }
+}
+
+static void S24B32Decode( void *outp, const uint8_t *in, unsigned samples )
+{
+    uint32_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+        *(out++) = GetDWBE( in ) << 8;
+        in += 4;
+    }
+}
+
+static void S24L32Decode( void *outp, const uint8_t *in, unsigned samples )
+{
+    uint32_t *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+        *(out++) = GetDWLE( in ) << 8;
+        in += 4;
     }
 }
 

@@ -1283,6 +1283,10 @@ static const staticentry_t p_list_audio[] = {
     B(VLC_CODEC_U24B, "PCM U24 BE"),
         A("u24b"),
 
+    B(VLC_CODEC_S24L32, "PCM S24 in 32 LE"),
+
+    B(VLC_CODEC_S24B32, "PCM S24 in 32 BE"),
+
     B(VLC_CODEC_S32L, "PCM S32 LE"),
         A("s32l"),
         A("23ni"),  /* Quicktime */
