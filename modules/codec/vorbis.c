@@ -156,7 +156,7 @@ static block_t *SendPacket( decoder_t *, ogg_packet *, block_t * );
 
 static void ParseVorbisComments( decoder_t * );
 
-static void ConfigureChannelOrder(int *, int, uint32_t, bool );
+static void ConfigureChannelOrder(uint8_t *, int, uint32_t, bool );
 
 #ifdef HAVE_VORBIS_ENCODER
 static int OpenEncoder   ( vlc_object_t * );
@@ -471,7 +471,7 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
  * Interleave: helper function to interleave channels
  *****************************************************************************/
 static void Interleave( INTERLEAVE_TYPE *p_out, const INTERLEAVE_TYPE **pp_in,
-                        int i_nb_channels, int i_samples, int *pi_chan_table)
+                        int i_nb_channels, int i_samples, uint8_t *pi_chan_table)
 {
     for( int j = 0; j < i_samples; j++ )
         for( int i = 0; i < i_nb_channels; i++ )
@@ -513,7 +513,8 @@ static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 
         /* Interleave the samples */
         Interleave( (INTERLEAVE_TYPE*)p_aout_buffer->p_buffer,
-                    (const INTERLEAVE_TYPE**)pp_pcm, p_sys->vi.channels, i_samples, p_sys->pi_chan_table);
+                    (const INTERLEAVE_TYPE**)pp_pcm, p_sys->vi.channels, i_samples,
+                    p_sys->pi_chan_table);
 
         /* Tell libvorbis how many samples we actually consumed */
         vorbis_synthesis_read( &p_sys->vd, i_samples );
@@ -626,7 +627,8 @@ static void ParseVorbisComments( decoder_t *p_dec )
 /*****************************************************************************
  *
  *****************************************************************************/
-static void ConfigureChannelOrder(int *pi_chan_table, int i_channels, uint32_t i_channel_mask, bool b_decode)
+static void ConfigureChannelOrder(uint8_t *pi_chan_table, int i_channels,
+                                  uint32_t i_channel_mask, bool b_decode)
 {
     const uint32_t *pi_channels_in;
     switch( i_channels )
@@ -658,15 +660,12 @@ static void ConfigureChannelOrder(int *pi_chan_table, int i_channels, uint32_t i
             }
     }
 
-    uint8_t tab[AOUT_CHAN_MAX];
     if( b_decode )
         aout_CheckChannelReorder( pi_channels_in, NULL,
-                                  i_channel_mask, tab );
+                                  i_channel_mask, pi_chan_table );
     else
         aout_CheckChannelReorder( NULL, pi_channels_in,
-                                  i_channel_mask, tab );
-    for( int i = 0; i < i_channels; i++)
-         pi_chan_table[i] = tab[i];
+                                  i_channel_mask, pi_chan_table );
 }
 
 /*****************************************************************************
@@ -713,7 +712,7 @@ struct encoder_sys_t
     /*
     ** Channel reordering
     */
-    int pi_chan_table[AOUT_CHAN_MAX];
+    uint8_t pi_chan_table[AOUT_CHAN_MAX];
 
 };
 
