@@ -76,7 +76,6 @@ struct aout_sys_t
     mtime_t                         length;
 
     int                             buffers;
-    mtime_t                         last_callback;
 
     /* audio buffered through opensles */
     block_t                        *p_chain;
@@ -143,7 +142,6 @@ static void Flush(audio_output_t *p_aout, bool drain)
         SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_PLAYING );
 
         p_sys->length = 0;
-        p_sys->last_callback = 0;
         p_sys->buffers = 0;
 
         /* release audio data not yet written to opensles */
@@ -197,11 +195,7 @@ static int TimeGet(audio_output_t* p_aout, mtime_t* restrict drift)
 
     vlc_mutex_lock( &p_sys->lock );
     mtime_t delay = p_sys->length;
-    mtime_t last_callback = p_sys->last_callback;
     vlc_mutex_unlock( &p_sys->lock );
-
-    if (last_callback != 0)
-        delay += last_callback - mdate();
 
     SLAndroidSimpleBufferQueueState st;
     SLresult res = GetState(p_sys->playerBufferQueue, &st);
@@ -295,7 +289,6 @@ static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext
 
     vlc_mutex_lock( &p_sys->lock );
     p_sys->buffers--;
-    p_sys->last_callback = mdate();
 
     p_block = p_sys->p_chain;
     assert( p_block );
