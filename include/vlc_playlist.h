@@ -283,6 +283,10 @@ VLC_API int playlist_Control( playlist_t *p_playlist, int i_query, bool b_locked
  */
 VLC_API input_thread_t * playlist_CurrentInput( playlist_t *p_playlist ) VLC_USED;
 
+/** Get the duration of all items in a node.
+ */
+VLC_API mtime_t playlist_GetNodeDuration( playlist_item_t * );
+
 /** Clear the playlist
  * \param b_locked TRUE if playlist is locked when entering this function
  */

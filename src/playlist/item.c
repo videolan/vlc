@@ -719,6 +719,24 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
     var_SetAddress( p_playlist, "playlist-item-append", &add );
 }
 
+/**
+ * Get the duration of all items in a node.
+ */
+mtime_t playlist_GetNodeDuration( playlist_item_t* node )
+{
+    /* For the assert */
+    playlist_t *p_playlist = node->p_playlist;
+    PL_ASSERT_LOCKED;
+
+    mtime_t mt_duration = 0;
+
+    if( node->i_children != -1 )
+        for( int i = 0; i < node->i_children; i++ )
+            mt_duration += input_item_GetDuration( node->pp_children[i]->p_input );
+
+    return mt_duration;
+}
+
 /***************************************************************************
  * The following functions are local
  ***************************************************************************/
