@@ -26,7 +26,6 @@
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
-#include <vlc_cpu.h>
 #include <vlc_demux.h>
 #include <vlc_plugin.h>
 #include <pulse/pulseaudio.h>
@@ -274,7 +273,7 @@ static int Open(vlc_object_t *obj)
 
     /* Stream parameters */
     struct pa_sample_spec ss;
-    ss.format = HAVE_FPU ? PA_SAMPLE_FLOAT32NE : PA_SAMPLE_S16NE;
+    ss.format = PA_SAMPLE_S16NE;
     ss.rate = 48000;
     ss.channels = 2;
     assert(pa_sample_spec_valid(&ss));
