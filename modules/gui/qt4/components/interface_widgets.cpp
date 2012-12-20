@@ -197,6 +197,7 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
     setPalette( plt );
 
     /* Init the cone art */
+    defaultArt = QString( ":/logo/vlc128.png" );
     updateArt( "" );
 
     /* fade in animator */
@@ -216,16 +217,9 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
 void BackgroundWidget::updateArt( const QString& url )
 {
     if ( !url.isEmpty() )
-    {
         pixmapUrl = url;
-    }
     else
-    {   /* Xmas joke */
-        if( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY && var_InheritBool( p_intf, "qt-icon-change" ) )
-            pixmapUrl = QString( ":/logo/vlc128-xmas.png" );
-        else
-            pixmapUrl = QString( ":/logo/vlc128.png" );
-    }
+        pixmapUrl = defaultArt;
     update();
 }
 
@@ -295,6 +289,121 @@ void BackgroundWidget::contextMenuEvent( QContextMenuEvent *event )
 {
     VLCMenuBar::PopupMenu( p_intf, true );
     event->accept();
+}
+
+EasterEggBackgroundWidget::EasterEggBackgroundWidget( intf_thread_t *p_intf )
+    : BackgroundWidget( p_intf )
+{
+    flakes = new QLinkedList<flake *>();
+    i_rate = 2;
+    i_speed = 1;
+    b_enabled = false;
+    timer = new QTimer( this );
+    timer->setInterval( 100 );
+    CONNECT( timer, timeout(), this, spawnFlakes() );
+    if ( isVisible() && b_enabled ) timer->start();
+    defaultArt = QString( ":/logo/vlc128-xmas.png" );
+    updateArt( "" );
+}
+
+EasterEggBackgroundWidget::~EasterEggBackgroundWidget()
+{
+    timer->stop();
+    delete timer;
+    reset();
+    delete flakes;
+}
+
+void EasterEggBackgroundWidget::showEvent( QShowEvent *e )
+{
+    if ( b_enabled ) timer->start();
+    BackgroundWidget::showEvent( e );
+}
+
+void EasterEggBackgroundWidget::hideEvent( QHideEvent *e )
+{
+    timer->stop();
+    reset();
+    BackgroundWidget::hideEvent( e );
+}
+
+void EasterEggBackgroundWidget::resizeEvent( QResizeEvent *e )
+{
+    reset();
+    BackgroundWidget::resizeEvent( e );
+}
+
+void EasterEggBackgroundWidget::animate()
+{
+    b_enabled = true;
+    if ( isVisible() ) timer->start();
+}
+
+void EasterEggBackgroundWidget::spawnFlakes()
+{
+    if ( ! isVisible() ) return;
+
+    double w = (double) width() / RAND_MAX;
+
+    int i_spawn = ( (double) qrand() / RAND_MAX ) * i_rate;
+
+    QLinkedList<flake *>::iterator it = flakes->begin();
+    while( it != flakes->end() )
+    {
+        flake *current = *it;
+        current->point.setY( current->point.y() + i_speed );
+        if ( current->point.y() + i_speed >= height() )
+        {
+            delete current;
+            it = flakes->erase( it );
+        }
+        else
+            it++;
+    }
+
+    if ( flakes->size() < MAX_FLAKES )
+    for ( int i=0; i<i_spawn; i++ )
+    {
+        flake *f = new flake;
+        f->point.setX( qrand() * w );
+        f->b_fat = ( qrand() < ( RAND_MAX * .33 ) );
+        flakes->append( f );
+    }
+    update();
+}
+
+void EasterEggBackgroundWidget::reset()
+{
+    while ( !flakes->isEmpty() )
+        delete flakes->takeFirst();
+}
+
+void EasterEggBackgroundWidget::paintEvent( QPaintEvent *e )
+{
+    QPainter painter(this);
+
+    painter.setBrush( QBrush( QColor(Qt::white) ) );
+    painter.setPen( QPen(Qt::white) );
+
+    QLinkedList<flake *>::const_iterator it = flakes->constBegin();
+    while( it != flakes->constEnd() )
+    {
+        const flake * const f = *(it++);
+        if ( f->b_fat )
+        {
+            /* Xsnow like :p */
+            painter.drawPoint( f->point.x(), f->point.y() -1 );
+            painter.drawPoint( f->point.x() + 1, f->point.y() );
+            painter.drawPoint( f->point.x(), f->point.y() +1 );
+            painter.drawPoint( f->point.x() - 1, f->point.y() );
+        }
+        else
+        {
+            painter.drawPoint( f->point );
+        }
+    }
+
+    BackgroundWidget::paintEvent( e );
 }
 
 #if 0

@@ -97,7 +97,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     input_name           = "";
     b_interfaceFullScreen= false;
     b_hasPausedWhenMinimized = false;
-
+    i_kc_offset          = false;
 
     /* Ask for Privacy */
     FirstRun::CheckAndRun( this, p_intf );
@@ -381,7 +381,15 @@ void MainInterface::createMainWidget( QSettings *creationSettings )
     stackCentralW = new QVLCStackedWidget( main );
 
     /* Bg Cone */
-    bgWidget = new BackgroundWidget( p_intf );
+    if ( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY
+         && var_InheritBool( p_intf, "qt-icon-change" ) )
+    {
+        bgWidget = new EasterEggBackgroundWidget( p_intf );
+        CONNECT( this, kc_pressed(), bgWidget, animate() );
+    }
+    else
+        bgWidget = new BackgroundWidget( p_intf );
+
     stackCentralW->addWidget( bgWidget );
     if ( !var_InheritBool( p_intf, "qt-bgcone" ) )
         bgWidget->setWithArt( false );
@@ -853,6 +861,14 @@ void MainInterface::togglePlaylist()
     debug();
 }
 
+const Qt::Key MainInterface::kc[10] =
+{
+    Qt::Key_Up, Qt::Key_Up,
+    Qt::Key_Down, Qt::Key_Down,
+    Qt::Key_Left, Qt::Key_Right, Qt::Key_Left, Qt::Key_Right,
+    Qt::Key_B, Qt::Key_A
+};
+
 void MainInterface::dockPlaylist( bool p_docked )
 {
     if( b_plDocked == p_docked ) return;
@@ -1312,6 +1328,18 @@ void MainInterface::dragLeaveEvent(QDragLeaveEvent *event)
 void MainInterface::keyPressEvent( QKeyEvent *e )
 {
     handleKeyPress( e );
+
+    /* easter eggs sequence handling */
+    if ( e->key() == kc[ i_kc_offset ] )
+        i_kc_offset++;
+    else
+        i_kc_offset = 0;
+
+    if ( i_kc_offset == (sizeof( kc ) / sizeof( Qt::Key )) )
+    {
+        i_kc_offset = 0;
+        emit kc_pressed();
+    }
 }
 
 void MainInterface::handleKeyPress( QKeyEvent *e )

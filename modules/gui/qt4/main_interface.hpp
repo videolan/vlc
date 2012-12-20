@@ -181,6 +181,9 @@ private:
     void createTaskBarButtons();
 #endif
 
+    static const Qt::Key kc[10]; /* easter eggs */
+    int i_kc_offset;
+
 public slots:
     void dockPlaylist( bool b_docked = true );
     void toggleMinimalView( bool );
@@ -262,7 +265,7 @@ signals:
     void askToQuit();
     void askBoss();
     void askRaise();
-
+    void kc_pressed(); /* easter eggs */
 };
 
 #endif
