@@ -83,8 +83,6 @@ struct aout_sys_t
     vlc_mutex_t                     lock;
     mtime_t                         length;
 
-    int                             buffers;
-
     /* audio buffered through opensles */
     block_t                        *p_chain;
     block_t                       **pp_last;
@@ -143,7 +141,6 @@ static void Flush(audio_output_t *aout, bool drain)
         SetPlayState(sys->playerPlay, SL_PLAYSTATE_PLAYING);
 
         sys->length = 0;
-        sys->buffers = 0;
 
         /* release audio data not yet written to opensles */
         block_ChainRelease(sys->p_buffer_chain);
@@ -242,14 +239,13 @@ static int WriteBuffer(audio_output_t *aout)
 
     if (r == SL_RESULT_SUCCESS) {
         /* Remove that block from the list of audio not yet written */
-        sys->buffers++;
         sys->p_buffer_chain = next;
         if (!sys->p_buffer_chain)
             sys->pp_buffer_last = &sys->p_buffer_chain;
     } else {
         /* Remove that block from the list of audio already written */
-        msg_Err(aout, "error %lu when writing %d bytes, %d/255 buffers occupied %s",
-                r, b->i_buffer, sys->buffers,
+        msg_Err(aout, "error %lu when writing %d bytes %s",
+                r, b->i_buffer,
                 (r == SL_RESULT_BUFFER_INSUFFICIENT) ? " (buffer insufficient)" : "");
 
         sys->pp_last = pp_last_saved;
@@ -289,7 +285,6 @@ static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext
     assert (caller == sys->playerBufferQueue);
 
     vlc_mutex_lock(&sys->lock);
-    sys->buffers--;
 
     p_block = sys->p_chain;
     assert(p_block);
