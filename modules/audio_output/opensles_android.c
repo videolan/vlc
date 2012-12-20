@@ -41,16 +41,16 @@
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
 
-#define CHECK_OPENSL_ERROR( msg )                   \
-    if( unlikely( result != SL_RESULT_SUCCESS ) )   \
-    {                                               \
-        msg_Err( aout, msg" (%lu)", result );       \
-        goto error;                                 \
+#define CHECK_OPENSL_ERROR(msg)                \
+    if (unlikely(result != SL_RESULT_SUCCESS)) \
+    {                                          \
+        msg_Err(aout, msg" (%lu)", result);    \
+        goto error;                            \
     }
 
 typedef SLresult (*slCreateEngine_t)(
         SLObjectItf*, SLuint32, const SLEngineOption*, SLuint32,
-        const SLInterfaceID*, const SLboolean* );
+        const SLInterfaceID*, const SLboolean*);
 
 #define Destroy(a) (*a)->Destroy(a);
 #define SetPlayState(a, b) (*a)->SetPlayState(a, b)
@@ -68,10 +68,7 @@ typedef SLresult (*slCreateEngine_t)(
 #define SetMute(a, b) (*a)->SetMute(a, b)
 
 /*****************************************************************************
- * aout_sys_t: audio output method descriptor
- *****************************************************************************
- * This structure is part of the audio output thread descriptor.
- * It describes the direct sound specific properties of an audio device.
+ *
  *****************************************************************************/
 struct aout_sys_t
 {
@@ -118,14 +115,14 @@ static void Close (vlc_object_t *);
  *****************************************************************************/
 
 vlc_module_begin ()
-    set_description( N_("OpenSLES audio output") )
-    set_shortname( N_("OpenSLES") )
-    set_category( CAT_AUDIO )
-    set_subcategory( SUBCAT_AUDIO_AOUT )
+    set_description(N_("OpenSLES audio output"))
+    set_shortname(N_("OpenSLES"))
+    set_category(CAT_AUDIO)
+    set_subcategory(SUBCAT_AUDIO_AOUT)
 
-    set_capability( "audio output", 170 )
-    add_shortcut( "opensles", "android" )
-    set_callbacks( Open, Close )
+    set_capability("audio output", 170)
+    add_shortcut("opensles", "android")
+    set_callbacks(Open, Close)
 vlc_module_end ()
 
 
@@ -135,31 +132,31 @@ static void Flush(audio_output_t *aout, bool drain)
 
     if (drain) {
         mtime_t delay;
-        vlc_mutex_lock( &sys->lock );
+        vlc_mutex_lock(&sys->lock);
         delay = sys->length;
-        vlc_mutex_unlock( &sys->lock );
+        vlc_mutex_unlock(&sys->lock);
         msleep(delay);
     } else {
-        vlc_mutex_lock( &sys->lock );
-        SetPlayState( sys->playerPlay, SL_PLAYSTATE_STOPPED );
-        Clear( sys->playerBufferQueue );
-        SetPlayState( sys->playerPlay, SL_PLAYSTATE_PLAYING );
+        vlc_mutex_lock(&sys->lock);
+        SetPlayState(sys->playerPlay, SL_PLAYSTATE_STOPPED);
+        Clear(sys->playerBufferQueue);
+        SetPlayState(sys->playerPlay, SL_PLAYSTATE_PLAYING);
 
         sys->length = 0;
         sys->buffers = 0;
 
         /* release audio data not yet written to opensles */
-        block_ChainRelease( sys->p_buffer_chain );
+        block_ChainRelease(sys->p_buffer_chain);
         sys->p_buffer_chain = NULL;
         sys->pp_buffer_last = &sys->p_buffer_chain;
 
         /* release audio data written to opensles, but not yet
          * played on hardware */
-        block_ChainRelease( sys->p_chain );
+        block_ChainRelease(sys->p_chain);
         sys->p_chain = NULL;
         sys->pp_last = &sys->p_chain;
 
-        vlc_mutex_unlock( &sys->lock );
+        vlc_mutex_unlock(&sys->lock);
     }
 }
 
@@ -189,17 +186,17 @@ static void Pause(audio_output_t *aout, bool pause, mtime_t date)
 {
     (void)date;
     aout_sys_t *sys = aout->sys;
-    SetPlayState( sys->playerPlay,
-        pause ? SL_PLAYSTATE_PAUSED : SL_PLAYSTATE_PLAYING );
+    SetPlayState(sys->playerPlay,
+        pause ? SL_PLAYSTATE_PAUSED : SL_PLAYSTATE_PLAYING);
 }
 
 static int TimeGet(audio_output_t* aout, mtime_t* restrict drift)
 {
     aout_sys_t *sys = aout->sys;
 
-    vlc_mutex_lock( &sys->lock );
+    vlc_mutex_lock(&sys->lock);
     mtime_t delay = sys->length;
-    vlc_mutex_unlock( &sys->lock );
+    vlc_mutex_unlock(&sys->lock);
 
     SLAndroidSimpleBufferQueueState st;
     SLresult res = GetState(sys->playerBufferQueue, &st);
@@ -233,15 +230,15 @@ static int WriteBuffer(audio_output_t *aout)
     b->p_next = NULL;
 
     /* Put this block in the list of audio already written to opensles */
-    block_ChainLastAppend( &sys->pp_last, b );
+    block_ChainLastAppend(&sys->pp_last, b);
 
     mtime_t len = b->i_length;
     sys->length += len;
     block_t *next = b->p_next;
 
-    vlc_mutex_unlock( &sys->lock );
-    SLresult r = Enqueue( sys->playerBufferQueue, b->p_buffer, b->i_buffer );
-    vlc_mutex_lock( &sys->lock );
+    vlc_mutex_unlock(&sys->lock);
+    SLresult r = Enqueue(sys->playerBufferQueue, b->p_buffer, b->i_buffer);
+    vlc_mutex_lock(&sys->lock);
 
     if (r == SL_RESULT_SUCCESS) {
         /* Remove that block from the list of audio not yet written */
@@ -251,7 +248,7 @@ static int WriteBuffer(audio_output_t *aout)
             sys->pp_buffer_last = &sys->p_buffer_chain;
     } else {
         /* Remove that block from the list of audio already written */
-        msg_Err( aout, "error %lu when writing %d bytes, %d/255 buffers occupied %s",
+        msg_Err(aout, "error %lu when writing %d bytes, %d/255 buffers occupied %s",
                 r, b->i_buffer, sys->buffers,
                 (r == SL_RESULT_BUFFER_INSUFFICIENT) ? " (buffer insufficient)" : "");
 
@@ -270,19 +267,19 @@ static int WriteBuffer(audio_output_t *aout)
 /*****************************************************************************
  * Play: play a sound
  *****************************************************************************/
-static void Play( audio_output_t *aout, block_t *p_buffer )
+static void Play(audio_output_t *aout, block_t *p_buffer)
 {
     aout_sys_t *sys = aout->sys;
 
     p_buffer->p_next = NULL; /* Make sur our linked list doesn't use old references */
     vlc_mutex_lock(&sys->lock);
-    block_ChainLastAppend( &sys->pp_buffer_last, p_buffer );
+    block_ChainLastAppend(&sys->pp_buffer_last, p_buffer);
     while (WriteBuffer(aout))
         ;
-    vlc_mutex_unlock( &sys->lock );
+    vlc_mutex_unlock(&sys->lock);
 }
 
-static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext )
+static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext)
 {
     (void)caller;
     block_t *p_block;
@@ -291,11 +288,11 @@ static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext
 
     assert (caller == sys->playerBufferQueue);
 
-    vlc_mutex_lock( &sys->lock );
+    vlc_mutex_lock(&sys->lock);
     sys->buffers--;
 
     p_block = sys->p_chain;
-    assert( p_block );
+    assert(p_block);
 
     sys->p_chain = sys->p_chain->p_next;
     /* if we exhausted our fifo, we must reset the pointer to the last
@@ -305,24 +302,24 @@ static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext
 
     sys->length -= p_block->i_length;
 
-    vlc_mutex_unlock( &sys->lock );
+    vlc_mutex_unlock(&sys->lock);
 
-    block_Release( p_block );
+    block_Release(p_block);
 }
 /*****************************************************************************
  *
  *****************************************************************************/
-static void Clean( aout_sys_t *sys )
+static void Clean(aout_sys_t *sys)
 {
-    if( sys->playerObject )
-        Destroy( sys->playerObject );
-    if( sys->outputMixObject )
-        Destroy( sys->outputMixObject );
-    if( sys->engineObject )
-        Destroy( sys->engineObject );
+    if (sys->playerObject)
+        Destroy(sys->playerObject);
+    if (sys->outputMixObject)
+        Destroy(sys->outputMixObject);
+    if (sys->engineObject)
+        Destroy(sys->engineObject);
 }
 
-static int Start( audio_output_t *aout, audio_sample_format_t *restrict fmt )
+static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     SLresult       result;
 
@@ -355,31 +352,31 @@ static int Start( audio_output_t *aout, audio_sample_format_t *restrict fmt )
     //create audio player
     const SLInterfaceID ids2[] = { sys->SL_IID_ANDROIDSIMPLEBUFFERQUEUE, sys->SL_IID_VOLUME };
     static const SLboolean req2[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
-    result = CreateAudioPlayer( sys->engineEngine, &sys->playerObject, &audioSrc,
-                                    &audioSnk, sizeof( ids2 ) / sizeof( *ids2 ),
-                                    ids2, req2 );
-    CHECK_OPENSL_ERROR( "Failed to create audio player" );
+    result = CreateAudioPlayer(sys->engineEngine, &sys->playerObject, &audioSrc,
+                                    &audioSnk, sizeof(ids2) / sizeof(*ids2),
+                                    ids2, req2);
+    CHECK_OPENSL_ERROR("Failed to create audio player");
 
-    result = Realize( sys->playerObject, SL_BOOLEAN_FALSE );
-    CHECK_OPENSL_ERROR( "Failed to realize player object." );
+    result = Realize(sys->playerObject, SL_BOOLEAN_FALSE);
+    CHECK_OPENSL_ERROR("Failed to realize player object.");
 
-    result = GetInterface( sys->playerObject, sys->SL_IID_PLAY, &sys->playerPlay );
-    CHECK_OPENSL_ERROR( "Failed to get player interface." );
+    result = GetInterface(sys->playerObject, sys->SL_IID_PLAY, &sys->playerPlay);
+    CHECK_OPENSL_ERROR("Failed to get player interface.");
 
-    result = GetInterface( sys->playerObject, sys->SL_IID_VOLUME, &sys->volumeItf );
-    CHECK_OPENSL_ERROR( "failed to get volume interface." );
+    result = GetInterface(sys->playerObject, sys->SL_IID_VOLUME, &sys->volumeItf);
+    CHECK_OPENSL_ERROR("failed to get volume interface.");
 
-    result = GetInterface( sys->playerObject, sys->SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
-                                                  &sys->playerBufferQueue );
-    CHECK_OPENSL_ERROR( "Failed to get buff queue interface" );
+    result = GetInterface(sys->playerObject, sys->SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
+                                                  &sys->playerBufferQueue);
+    CHECK_OPENSL_ERROR("Failed to get buff queue interface");
 
-    result = RegisterCallback( sys->playerBufferQueue, PlayedCallback,
+    result = RegisterCallback(sys->playerBufferQueue, PlayedCallback,
                                    (void*)aout);
-    CHECK_OPENSL_ERROR( "Failed to register buff queue callback." );
+    CHECK_OPENSL_ERROR("Failed to register buff queue callback.");
 
     // set the player's state to playing
-    result = SetPlayState( sys->playerPlay, SL_PLAYSTATE_PLAYING );
-    CHECK_OPENSL_ERROR( "Failed to switch to playing state" );
+    result = SetPlayState(sys->playerPlay, SL_PLAYSTATE_PLAYING);
+    CHECK_OPENSL_ERROR("Failed to switch to playing state");
 
     sys->p_chain = NULL;
     sys->pp_last = &sys->p_chain;
@@ -390,9 +387,9 @@ static int Start( audio_output_t *aout, audio_sample_format_t *restrict fmt )
     fmt->i_format              = VLC_CODEC_S16N;
     fmt->i_physical_channels   = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
 
-    SetPositionUpdatePeriod( sys->playerPlay, AOUT_MIN_PREPARE_TIME * 1000 / CLOCK_FREQ);
+    SetPositionUpdatePeriod(sys->playerPlay, AOUT_MIN_PREPARE_TIME * 1000 / CLOCK_FREQ);
 
-    aout_FormatPrepare( fmt );
+    aout_FormatPrepare(fmt);
 
     sys->format = *fmt;
 
@@ -403,15 +400,15 @@ error:
     return VLC_EGENERIC;
 }
 
-static void Stop( audio_output_t *aout )
+static void Stop(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
 
-    SetPlayState( sys->playerPlay, SL_PLAYSTATE_STOPPED );
+    SetPlayState(sys->playerPlay, SL_PLAYSTATE_STOPPED);
     //Flush remaining buffers if any.
-    Clear( sys->playerBufferQueue );
-    block_ChainRelease( sys->p_chain );
-    block_ChainRelease( sys->p_buffer_chain);
+    Clear(sys->playerBufferQueue);
+    block_ChainRelease(sys->p_chain);
+    block_ChainRelease(sys->p_buffer_chain);
 }
 
 /*****************************************************************************
@@ -463,35 +460,35 @@ static int Open (vlc_object_t *obj)
         sys->dest = *sym;                                           \
     } while(0)
 
-    OPENSL_DLSYM( SL_IID_ANDROIDSIMPLEBUFFERQUEUE, "ANDROIDSIMPLEBUFFERQUEUE" );
-    OPENSL_DLSYM( SL_IID_ENGINE, "ENGINE" );
-    OPENSL_DLSYM( SL_IID_PLAY, "PLAY" );
-    OPENSL_DLSYM( SL_IID_VOLUME, "VOLUME" );
+    OPENSL_DLSYM(SL_IID_ANDROIDSIMPLEBUFFERQUEUE, "ANDROIDSIMPLEBUFFERQUEUE");
+    OPENSL_DLSYM(SL_IID_ENGINE, "ENGINE");
+    OPENSL_DLSYM(SL_IID_PLAY, "PLAY");
+    OPENSL_DLSYM(SL_IID_VOLUME, "VOLUME");
 #undef OPENSL_DLSYM
 
     // create engine
-    result = sys->slCreateEnginePtr( &sys->engineObject, 0, NULL, 0, NULL, NULL );
-    CHECK_OPENSL_ERROR( "Failed to create engine" );
+    result = sys->slCreateEnginePtr(&sys->engineObject, 0, NULL, 0, NULL, NULL);
+    CHECK_OPENSL_ERROR("Failed to create engine");
 
     // realize the engine in synchronous mode
-    result = Realize( sys->engineObject, SL_BOOLEAN_FALSE );
-    CHECK_OPENSL_ERROR( "Failed to realize engine" );
+    result = Realize(sys->engineObject, SL_BOOLEAN_FALSE);
+    CHECK_OPENSL_ERROR("Failed to realize engine");
 
     // get the engine interface, needed to create other objects
-    result = GetInterface( sys->engineObject, sys->SL_IID_ENGINE, &sys->engineEngine );
-    CHECK_OPENSL_ERROR( "Failed to get the engine interface" );
+    result = GetInterface(sys->engineObject, sys->SL_IID_ENGINE, &sys->engineEngine);
+    CHECK_OPENSL_ERROR("Failed to get the engine interface");
 
     // create output mix, with environmental reverb specified as a non-required interface
     const SLInterfaceID ids1[] = { sys->SL_IID_VOLUME };
     const SLboolean req1[] = { SL_BOOLEAN_FALSE };
-    result = CreateOutputMix( sys->engineEngine, &sys->outputMixObject, 1, ids1, req1 );
-    CHECK_OPENSL_ERROR( "Failed to create output mix" );
+    result = CreateOutputMix(sys->engineEngine, &sys->outputMixObject, 1, ids1, req1);
+    CHECK_OPENSL_ERROR("Failed to create output mix");
 
     // realize the output mix in synchronous mode
-    result = Realize( sys->outputMixObject, SL_BOOLEAN_FALSE );
-    CHECK_OPENSL_ERROR( "Failed to realize output mix" );
+    result = Realize(sys->outputMixObject, SL_BOOLEAN_FALSE);
+    CHECK_OPENSL_ERROR("Failed to realize output mix");
 
-    vlc_mutex_init( &sys->lock );
+    vlc_mutex_init(&sys->lock);
 
     aout->start      = Start;
     aout->stop       = Stop;
