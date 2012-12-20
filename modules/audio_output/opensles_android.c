@@ -143,6 +143,8 @@ static void Flush(audio_output_t *p_aout, bool drain)
         SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_PLAYING );
 
         p_sys->length = 0;
+        p_sys->last_callback = 0;
+        p_sys->buffers = 0;
 
         /* release audio data not yet written to opensles */
         block_ChainRelease( p_sys->p_buffer_chain );
