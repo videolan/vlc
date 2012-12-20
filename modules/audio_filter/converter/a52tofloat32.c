@@ -230,17 +230,19 @@ static int Open( vlc_object_t *p_this, filter_sys_t *p_sys,
 /*****************************************************************************
  * Interleave: helper function to interleave channels
  *****************************************************************************/
-static void Interleave( sample_t * p_out, const sample_t * p_in,
-                        int i_nb_channels, uint8_t *pi_chan_table )
+static void Interleave( sample_t *restrict p_out, const sample_t *restrict p_in,
+                        unsigned i_nb_channels, uint8_t *restrict pi_chan_table )
 {
     /* We do not only have to interleave, but also reorder the channels */
-
-    int i, j;
-    for ( j = 0; j < i_nb_channels; j++ )
+    for( unsigned j = 0; j < i_nb_channels; j++ )
     {
-        for ( i = 0; i < 256; i++ )
+        for( unsigned i = 0; i < 256; i++ )
         {
+#ifdef LIBA52_FIXED
+            p_out[i * i_nb_channels + pi_chan_table[j]] = p_in[j * 256 + i] << 4;
+#else
             p_out[i * i_nb_channels + pi_chan_table[j]] = p_in[j * 256 + i];
+#endif
         }
     }
 }
@@ -248,31 +250,37 @@ static void Interleave( sample_t * p_out, const sample_t * p_in,
 /*****************************************************************************
  * Duplicate: helper function to duplicate a unique channel
  *****************************************************************************/
-static void Duplicate( sample_t * p_out, const sample_t * p_in )
+static void Duplicate( sample_t *restrict p_out, const sample_t *restrict p_in )
 {
-    int i;
-
-    for ( i = 256; i--; )
+    for( unsigned i = 256; i--; )
     {
-        *p_out++ = *p_in;
-        *p_out++ = *p_in;
-        p_in++;
+#ifdef LIBA52_FIXED
+        sample_t s = *(p_in++) << 4;
+#else
+        sample_t s = *(p_in++);
+#endif
+        *p_out++ = s;
+        *p_out++ = s;
     }
 }
 
 /*****************************************************************************
  * Exchange: helper function to exchange left & right channels
  *****************************************************************************/
-static void Exchange( sample_t * p_out, const sample_t * p_in )
+static void Exchange( sample_t *restrict p_out, const sample_t *restrict p_in )
 {
-    int i;
-    const sample_t * p_first = p_in + 256;
-    const sample_t * p_second = p_in;
+    const sample_t *p_first = p_in + 256;
+    const sample_t *p_second = p_in;
 
-    for ( i = 0; i < 256; i++ )
+    for( unsigned i = 0; i < 256; i++ )
     {
+#ifdef LIBA52_FIXED
+        *p_out++ = *p_first++ << 4;
+        *p_out++ = *p_second++ << 4;
+#else
         *p_out++ = *p_first++;
         *p_out++ = *p_second++;
+#endif
     }
 }
 
@@ -370,7 +378,7 @@ static int OpenFilter( vlc_object_t *p_this )
     if( p_filter->fmt_in.i_codec != VLC_CODEC_A52 )
         return VLC_EGENERIC;
 #ifdef LIBA52_FIXED
-    if( p_filter->fmt_out.audio.i_format != VLC_CODEC_FI32 )
+    if( p_filter->fmt_out.audio.i_format != VLC_CODEC_S32N )
 #else
     if( p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
 #endif
