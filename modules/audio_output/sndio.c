@@ -124,9 +124,6 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         case 16:
             fmt->i_format = VLC_CODEC_S16N;
             break;
-        case 24:
-            fmt->i_format = VLC_CODEC_S24N;
-            break;
         case 32:
             fmt->i_format = VLC_CODEC_S32N;
             break;

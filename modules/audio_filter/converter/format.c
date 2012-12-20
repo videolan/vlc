@@ -190,26 +190,6 @@ static block_t *S16toU8(filter_t *filter, block_t *b)
     return b;
 }
 
-static block_t *S24toS16(filter_t *filter, block_t *b)
-{
-    VLC_UNUSED(filter);
-    uint8_t *src = (uint8_t *)b->p_buffer;
-    uint8_t *dst = (uint8_t *)src;
-    for (int i = b->i_buffer / 3; i--;) {
-#ifdef WORDS_BIGENDIAN
-        *dst++ = *src++;
-        *dst++ = *src++;
-        src++;
-#else
-        src++;
-        *dst++ = *src++;
-        *dst++ = *src++;
-#endif
-    }
-
-    b->i_buffer = b->i_buffer * 2 / 3;
-    return b;
-}
 static block_t *S32toS16(filter_t *filter, block_t *b)
 {
     VLC_UNUSED(filter);
@@ -313,23 +293,6 @@ static void U8toS16(block_t *bdst, const block_t *bsrc)
         *dst++ = ((*src++) - 128) << 8;
 }
 
-static void S16toS24(block_t *bdst, const block_t *bsrc)
-{
-    uint8_t *src = (uint8_t *)bsrc->p_buffer;
-    uint8_t *dst = (uint8_t *)bdst->p_buffer;
-
-    for (int i = bsrc->i_buffer / 2; i--;) {
-#ifdef WORDS_BIGENDIAN
-        *dst++ = *src++;
-        *dst++ = *src++;
-        *dst++ = 0;
-#else
-        *dst++ = 0;
-        *dst++ = *src++;
-        *dst++ = *src++;
-#endif
-    }
-}
 static void S16toS32(block_t *bdst, const block_t *bsrc)
 {
     int16_t *src = (int16_t *)bsrc->p_buffer;
@@ -355,20 +318,6 @@ static void S16toFl32(block_t *bdst, const block_t *bsrc)
 #endif
     }
 }
-static void S24toFl32(block_t *bdst, const block_t *bsrc)
-{
-    uint8_t *src = bsrc->p_buffer;
-    float   *dst = (float *)bdst->p_buffer;
-    for (int i = bsrc->i_buffer / 3; i--;) {
-#ifdef WORDS_BIGENDIAN
-        int32_t v = (src[0] << 24) | (src[1] << 16) | (src[2] <<  8);
-#else
-        int32_t v = (src[0] <<  8) | (src[1] << 16) | (src[2] << 24);
-#endif
-        src += 3;
-        *dst++ = v / 2147483648.0;
-    }
-}
 
 /* */
 static const struct {
@@ -381,7 +330,6 @@ static const struct {
     { VLC_CODEC_FI32, VLC_CODEC_S16N,   Fi32toS16 },
     { VLC_CODEC_S32N, VLC_CODEC_FL32,   S32toFl32 },
 
-    { VLC_CODEC_S24N, VLC_CODEC_S16N,   S24toS16 },
     { VLC_CODEC_S32N, VLC_CODEC_S16N,   S32toS16 },
     { VLC_CODEC_FL32, VLC_CODEC_S16N,   Fl32toS16 },
 
@@ -395,9 +343,6 @@ static const struct {
     vlc_fourcc_t   dst;
     cvt_indirect_t convert;
 } cvt_indirects[] = {
-    { VLC_CODEC_S24N, VLC_CODEC_FL32, S24toFl32 },
-
-    { VLC_CODEC_S16N, VLC_CODEC_S24N, S16toS24 },
     { VLC_CODEC_S16N, VLC_CODEC_S32N, S16toS32 },
     { VLC_CODEC_S16N, VLC_CODEC_FL32, S16toFl32 },
 
