@@ -41,11 +41,6 @@
 #endif
 
 #ifdef __APPLE__
-#   define PFNGLGENBUFFERSPROC               typeof(glGenBuffers)*
-#   define PFNGLBINDBUFFERPROC               typeof(glBindBuffer)*
-#   define PFNGLDELETEBUFFERSPROC            typeof(glDeleteBuffers)*
-#   define PFNGLBUFFERSUBDATAPROC            typeof(glBufferSubData)*
-#   define PFNGLBUFFERDATAPROC               typeof(glBufferData)*
 #   define PFNGLGETPROGRAMIVPROC             typeof(glGetProgramiv)*
 #   define PFNGLGETPROGRAMINFOLOGPROC        typeof(glGetProgramInfoLog)*
 #   define PFNGLGETSHADERIVPROC              typeof(glGetShaderiv)*
@@ -56,12 +51,10 @@
 #   define PFNGLENABLEVERTEXATTRIBARRAYPROC  typeof(glEnableVertexAttribArray)*
 #   define PFNGLUNIFORM4FVPROC               typeof(glUniform4fv)*
 #   define PFNGLUNIFORM4FPROC                typeof(glUniform4f)*
-#   define PFNGLUNIFORM3IPROC                typeof(glUniform3i)*
 #   define PFNGLUNIFORM1IPROC                typeof(glUniform1i)*
 #   define PFNGLCREATESHADERPROC             typeof(glCreateShader)*
 #   define PFNGLSHADERSOURCEPROC             typeof(glShaderSource)*
 #   define PFNGLCOMPILESHADERPROC            typeof(glCompileShader)*
-#   define PFNGLDETACHSHADERPROC             typeof(glDetachShader)*
 #   define PFNGLDELETESHADERPROC             typeof(glDeleteShader)*
 #   define PFNGLCREATEPROGRAMPROC            typeof(glCreateProgram)*
 #   define PFNGLLINKPROGRAMPROC              typeof(glLinkProgram)*
@@ -131,16 +124,7 @@ struct vout_display_opengl_t {
     int        local_count;
     GLfloat    local_value[16];
 
-    /* Buffer commands */
-    PFNGLGENBUFFERSPROC   GenBuffers;
-    PFNGLBINDBUFFERPROC   BindBuffer;
-    PFNGLDELETEBUFFERSPROC DeleteBuffers;
-    PFNGLBUFFERSUBDATAPROC BufferSubData;
-
-    PFNGLBUFFERDATAPROC   BufferData;
-
     /* Shader variables commands*/
-
     PFNGLGETUNIFORMLOCATIONPROC      GetUniformLocation;
     PFNGLGETATTRIBLOCATIONPROC       GetAttribLocation;
     PFNGLVERTEXATTRIBPOINTERPROC     VertexAttribPointer;
@@ -148,14 +132,12 @@ struct vout_display_opengl_t {
 
     PFNGLUNIFORM4FVPROC   Uniform4fv;
     PFNGLUNIFORM4FPROC    Uniform4f;
-    PFNGLUNIFORM3IPROC    Uniform3i;
     PFNGLUNIFORM1IPROC    Uniform1i;
 
     /* Shader command */
     PFNGLCREATESHADERPROC CreateShader;
     PFNGLSHADERSOURCEPROC ShaderSource;
     PFNGLCOMPILESHADERPROC CompileShader;
-    PFNGLDETACHSHADERPROC   DetachShader;
     PFNGLDELETESHADERPROC   DeleteShader;
 
     PFNGLCREATEPROGRAMPROC CreateProgram;
@@ -362,12 +344,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #endif
 #endif
 
-    vgl->GenBuffers    = (PFNGLGENBUFFERSPROC)vlc_gl_GetProcAddress(vgl->gl, "glGenBuffers");
-    vgl->BindBuffer    = (PFNGLBINDBUFFERPROC)vlc_gl_GetProcAddress(vgl->gl, "glBindBuffer");
-    vgl->BufferData    = (PFNGLBUFFERDATAPROC)vlc_gl_GetProcAddress(vgl->gl, "glBufferData");
-    vgl->BufferSubData = (PFNGLBUFFERSUBDATAPROC)vlc_gl_GetProcAddress(vgl->gl, "glBufferSubData");
-    vgl->DeleteBuffers = (PFNGLDELETEBUFFERSPROC)vlc_gl_GetProcAddress(vgl->gl, "glDeleteBuffers");
-
     vgl->CreateShader  = (PFNGLCREATESHADERPROC)vlc_gl_GetProcAddress(vgl->gl, "glCreateShader");
     vgl->ShaderSource  = (PFNGLSHADERSOURCEPROC)vlc_gl_GetProcAddress(vgl->gl, "glShaderSource");
     vgl->CompileShader = (PFNGLCOMPILESHADERPROC)vlc_gl_GetProcAddress(vgl->gl, "glCompileShader");
@@ -378,7 +354,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->GetProgramInfoLog  = (PFNGLGETPROGRAMINFOLOGPROC)vlc_gl_GetProcAddress(vgl->gl, "glGetProgramInfoLog");
     vgl->GetShaderInfoLog   = (PFNGLGETSHADERINFOLOGPROC)vlc_gl_GetProcAddress(vgl->gl, "glGetShaderInfoLog");
 
-    vgl->DetachShader  = (PFNGLDETACHSHADERPROC)vlc_gl_GetProcAddress(vgl->gl, "glDetachShader");
     vgl->DeleteShader  = (PFNGLDELETESHADERPROC)vlc_gl_GetProcAddress(vgl->gl, "glDeleteShader");
 
     vgl->GetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)vlc_gl_GetProcAddress(vgl->gl, "glGetUniformLocation");
@@ -387,7 +362,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->EnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)vlc_gl_GetProcAddress(vgl->gl, "glEnableVertexAttribArray");
     vgl->Uniform4fv    = (PFNGLUNIFORM4FVPROC)vlc_gl_GetProcAddress(vgl->gl,"glUniform4fv");
     vgl->Uniform4f     = (PFNGLUNIFORM4FPROC)vlc_gl_GetProcAddress(vgl->gl,"glUniform4f");
-    vgl->Uniform3i     = (PFNGLUNIFORM3IPROC)vlc_gl_GetProcAddress(vgl->gl,"glUniform3i");
     vgl->Uniform1i     = (PFNGLUNIFORM1IPROC)vlc_gl_GetProcAddress(vgl->gl,"glUniform1i");
 
     vgl->CreateProgram = (PFNGLCREATEPROGRAMPROC)vlc_gl_GetProcAddress(vgl->gl, "glCreateProgram");
