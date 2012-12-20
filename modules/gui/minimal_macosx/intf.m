@@ -51,7 +51,7 @@ static void Run (intf_thread_t *p_intf);
 int OpenIntf (vlc_object_t *p_this)
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
-	
+
     p_intf->p_sys = malloc(sizeof(intf_sys_t));
     if (p_intf->p_sys == NULL)
         return VLC_ENOMEM;
