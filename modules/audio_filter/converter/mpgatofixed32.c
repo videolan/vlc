@@ -87,7 +87,7 @@ static void DoWork( filter_t * p_filter,
     filter_sys_t *p_sys = p_filter->p_sys;
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_buffer = p_in_buf->i_nb_samples * sizeof(vlc_fixed_t) *
+    p_out_buf->i_buffer = p_in_buf->i_nb_samples * sizeof(float) *
                                aout_FormatNbChannels( &p_filter->fmt_out.audio );
 
     /* Do the actual decoding now. */
@@ -118,7 +118,7 @@ static void DoWork( filter_t * p_filter,
     unsigned int i_samples = p_pcm->length;
     mad_fixed_t const * p_left = p_pcm->samples[0];
     mad_fixed_t const * p_right = p_pcm->samples[1];
-    mad_fixed_t * p_samples = (mad_fixed_t *)p_out_buf->p_buffer;
+    float *p_samples = (float *)p_out_buf->p_buffer;
 
     assert( i_samples == p_out_buf->i_nb_samples );
     /* Interleave and keep buffers in mad_fixed_t format */
@@ -126,14 +126,23 @@ static void DoWork( filter_t * p_filter,
     {
         while ( i_samples-- )
         {
-            *p_samples++ = *p_left++;
-            *p_samples++ = *p_right++;
+            //assert( *p_left < MAD_F_ONE );
+            //assert( *p_left >= -MAD_F_ONE );
+            //assert( *p_right < MAD_F_ONE );
+            //assert( *p_right >= -MAD_F_ONE );
+            *p_samples++ = (float)*p_left++ / (float)MAD_F_ONE;
+            *p_samples++ = (float)*p_right++ / (float)MAD_F_ONE;
         }
     }
     else
     {
         assert( p_pcm->channels == 1 );
-        memcpy( p_samples, p_left, i_samples * sizeof(mad_fixed_t) );
+        while ( i_samples-- )
+        {
+            //assert( *p_left < MAD_F_ONE );
+            //assert( *p_left >= -MAD_F_ONE );
+            *p_samples++ = (float)*p_left++ / (float)MAD_F_ONE;
+        }
     }
 }
 
@@ -149,7 +158,7 @@ static int OpenFilter( vlc_object_t *p_this )
         p_filter->fmt_in.audio.i_format != VLC_FOURCC('m','p','g','3') )
         return VLC_EGENERIC;
 
-    if( p_filter->fmt_out.audio.i_format != VLC_CODEC_FI32 )
+    if( p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
         return VLC_EGENERIC;
 
     if( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
