@@ -407,33 +407,18 @@ void EndAudioDec( decoder_t *p_dec )
  *
  *****************************************************************************/
 
-void GetVlcAudioFormat( vlc_fourcc_t *pi_codec, unsigned *pi_bits, int i_sample_fmt )
+vlc_fourcc_t GetVlcAudioFormat( int fmt )
 {
-    switch( i_sample_fmt )
-    {
-    case AV_SAMPLE_FMT_U8:
-        *pi_codec = VLC_CODEC_U8;
-        *pi_bits = 8;
-        break;
-    case AV_SAMPLE_FMT_S32:
-        *pi_codec = VLC_CODEC_S32N;
-        *pi_bits = 32;
-        break;
-    case AV_SAMPLE_FMT_FLT:
-        *pi_codec = VLC_CODEC_FL32;
-        *pi_bits = 32;
-        break;
-    case AV_SAMPLE_FMT_DBL:
-        *pi_codec = VLC_CODEC_FL64;
-        *pi_bits = 64;
-        break;
-
-    case AV_SAMPLE_FMT_S16:
-    default:
-        *pi_codec = VLC_CODEC_S16N;
-        *pi_bits = 16;
-        break;
-    }
+    static const vlc_fourcc_t fcc[] = {
+        [AV_SAMPLE_FMT_U8]   = VLC_CODEC_U8,
+        [AV_SAMPLE_FMT_S16]  = VLC_CODEC_S16N,
+        [AV_SAMPLE_FMT_S32]  = VLC_CODEC_S32N,
+        [AV_SAMPLE_FMT_FLT]  = VLC_CODEC_FL32,
+        [AV_SAMPLE_FMT_DBL]  = VLC_CODEC_FL64,
+    };
+    if( sizeof(fcc) / sizeof(fcc[0]) < (unsigned)fmt )
+        return fcc[fmt];
+    return VLC_CODEC_S16N;
 }
 
 static const uint64_t pi_channels_map[][2] =
@@ -464,9 +449,8 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    GetVlcAudioFormat( &p_dec->fmt_out.i_codec,
-                       &p_dec->fmt_out.audio.i_bitspersample,
-                       p_sys->p_context->sample_fmt );
+    p_dec->fmt_out.i_codec = GetVlcAudioFormat( p_sys->p_context->sample_fmt );
+    p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
     p_dec->fmt_out.audio.i_rate = p_sys->p_context->sample_rate;
 
     /* */
@@ -518,6 +502,6 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
 
     p_dec->fmt_out.audio.i_physical_channels =
     p_dec->fmt_out.audio.i_original_channels = i_layout_dst;
-    p_dec->fmt_out.audio.i_channels = i_channels_dst;
+    aout_FormatPrepare( &p_dec->fmt_out.audio );
 }
 

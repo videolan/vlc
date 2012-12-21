@@ -807,9 +807,9 @@ int OpenEncoder( vlc_object_t *p_this )
 
     if( p_enc->fmt_in.i_cat == AUDIO_ES )
     {
-        GetVlcAudioFormat( &p_enc->fmt_in.i_codec,
-                           &p_enc->fmt_in.audio.i_bitspersample,
-                           p_sys->p_context->sample_fmt );
+        p_enc->fmt_in.i_codec = GetVlcAudioFormat( p_sys->p_context->sample_fmt );
+        p_enc->fmt_in.audio.i_bitspersample = aout_BitsPerSample( p_enc->fmt_in.i_codec );
+
         p_sys->i_sample_bytes = (p_enc->fmt_in.audio.i_bitspersample / 8) *
                                 p_context->channels;
         p_sys->i_frame_size = p_context->frame_size > 1 ?

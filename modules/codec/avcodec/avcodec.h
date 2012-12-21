@@ -27,7 +27,7 @@ int GetFfmpegCodec( vlc_fourcc_t i_fourcc, int *pi_cat,
                     int *pi_ffmpeg_codec, const char **ppsz_name );
 int GetVlcFourcc( int i_ffmpeg_codec, int *pi_cat,
                   vlc_fourcc_t *pi_fourcc, const char **ppsz_name );
-void GetVlcAudioFormat( vlc_fourcc_t *, unsigned *pi_bits, int i_sample_fmt );
+vlc_fourcc_t GetVlcAudioFormat( int i_sample_fmt );
 
 picture_t * DecodeVideo( decoder_t *, block_t ** );
 block_t * DecodeAudio( decoder_t *, block_t ** );
