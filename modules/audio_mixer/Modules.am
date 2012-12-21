@@ -1,6 +1,11 @@
-SOURCES_float32_mixer = float32.c
-SOURCES_integer_mixer = integer.c
+libfloat_mixer_plugin_la_SOURCES = float.c
+libfloat_mixer_plugin_la_CFLAGS = $(AM_CFLAGS)
+libfloat_mixer_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
+
+libinteger_mixer_plugin_la_SOURCES = integer.c
+libinteger_mixer_plugin_la_CFLAGS = $(AM_CFLAGS)
+libinteger_mixer_plugin_la_LIBADD = $(AM_LIBADD)
 
 libvlc_LTLIBRARIES += \
-	libfloat32_mixer_plugin.la \
+	libfloat_mixer_plugin.la \
 	libinteger_mixer_plugin.la

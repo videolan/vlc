@@ -39,7 +39,6 @@
  * Local prototypes
  *****************************************************************************/
 static int Create( vlc_object_t * );
-static void DoWork( audio_volume_t *, block_t *, float );
 
 /*****************************************************************************
  * Module descriptor
@@ -53,26 +52,12 @@ vlc_module_begin ()
 vlc_module_end ()
 
 /**
- * Initializes the mixer
- */
-static int Create( vlc_object_t *p_this )
-{
-    audio_volume_t *p_volume = (audio_volume_t *)p_this;
-
-    if (p_volume->format != VLC_CODEC_FL32)
-        return -1;
-
-    p_volume->amplify = DoWork;
-    return 0;
-}
-
-/**
  * Mixes a new output buffer
  */
-static void DoWork( audio_volume_t *p_volume, block_t *p_buffer,
-                    float f_multiplier )
+static void FilterFL32( audio_volume_t *p_volume, block_t *p_buffer,
+                        float f_multiplier )
 {
-    if( f_multiplier == 1.0 )
+    if( f_multiplier == 1.f )
         return; /* nothing to do */
 
     float *p = (float *)p_buffer->p_buffer;
@@ -80,4 +65,39 @@ static void DoWork( audio_volume_t *p_volume, block_t *p_buffer,
         *(p++) *= f_multiplier;
 
     (void) p_volume;
+}
+
+static void FilterFL64( audio_volume_t *p_volume, block_t *p_buffer,
+                        float f_multiplier )
+{
+    double *p = (double *)p_buffer->p_buffer;
+    double mult = f_multiplier;
+    if( mult == 1. )
+        return; /* nothing to do */
+
+    for( size_t i = p_buffer->i_buffer / sizeof(float); i > 0; i-- )
+        *(p++) *= mult;
+
+    (void) p_volume;
+}
+
+/**
+ * Initializes the mixer
+ */
+static int Create( vlc_object_t *p_this )
+{
+    audio_volume_t *p_volume = (audio_volume_t *)p_this;
+
+    switch (p_volume->format)
+    {
+        case VLC_CODEC_FL32:
+            p_volume->amplify = FilterFL32;
+            break;
+        case VLC_CODEC_FL64:
+            p_volume->amplify = FilterFL64;
+            break;
+        default:
+            return -1;
+    }
+    return 0;
 }

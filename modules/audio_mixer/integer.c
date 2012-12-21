@@ -22,6 +22,9 @@
 # include "config.h"
 #endif
 
+#include <math.h>
+#include <limits.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
@@ -37,7 +40,74 @@ vlc_module_begin ()
     set_callbacks (Activate, NULL)
 vlc_module_end ()
 
-static void FilterS16N (audio_volume_t *, block_t *, float);
+static void FilterS32N (audio_volume_t *vol, block_t *block, float volume)
+{
+    int32_t *p = (int32_t *)block->p_buffer;
+
+    int32_t mult = lroundf (volume * 0x1.p24f);
+    if (mult == (1 << 24))
+        return;
+
+    for (size_t n = block->i_buffer / sizeof (*p); n > 0; n--)
+    {
+        int64_t s = *p * (int64_t)mult;
+        if (s >= (INT32_MAX << INT64_C(24)))
+            *p = INT32_MAX;
+        else
+        if (s < (INT32_MIN << INT64_C(24)))
+            *p = INT32_MIN;
+        else
+            *p = s >> INT64_C(24);
+        p++;
+    }
+    (void) vol;
+}
+
+static void FilterS16N (audio_volume_t *vol, block_t *block, float volume)
+{
+    int16_t *p = (int16_t *)block->p_buffer;
+
+    int16_t mult = lroundf (volume * 0x1.p8f);
+    if (mult == (1 << 8))
+        return;
+
+    for (size_t n = block->i_buffer / sizeof (*p); n > 0; n--)
+    {
+        int32_t s = *p * (int32_t)mult;
+        if (s >= (INT16_MAX << 8))
+            *p = INT16_MAX;
+        else
+        if (s < (INT_MIN << 8))
+            *p = INT16_MIN;
+        else
+            *p = s >> 8;
+        p++;
+    }
+    (void) vol;
+}
+
+static void FilterU8 (audio_volume_t *vol, block_t *block, float volume)
+{
+    uint8_t *p = (uint8_t *)block->p_buffer;
+
+    int16_t mult = lroundf (volume * 0x1.p8f);
+    if (mult == (1 << 8))
+        return;
+
+    for (size_t n = block->i_buffer / sizeof (*p); n > 0; n--)
+    {
+        int32_t s = (*p - 128) * mult;
+        if (s >= (INT8_MAX << 8))
+            *p = 255;
+        else
+        if (s < (INT8_MIN << 8))
+            *p = 0;
+        else
+            *p = (s >> 8) + 128;
+        p++;
+    }
+    (void) vol;
+}
 
 static int Activate (vlc_object_t *obj)
 {
@@ -45,43 +115,17 @@ static int Activate (vlc_object_t *obj)
 
     switch (vol->format)
     {
+        case VLC_CODEC_S32N:
+            vol->amplify = FilterS32N;
+            break;
         case VLC_CODEC_S16N:
             vol->amplify = FilterS16N;
+            break;
+        case VLC_CODEC_U8:
+            vol->amplify = FilterU8;
             break;
         default:
             return -1;
     }
     return 0;
-}
-
-static void FilterS16N (audio_volume_t *vol, block_t *block, float volume)
-{
-    int32_t mult = volume * 0x1.p16;
-
-    if (mult == 0x10000)
-        return;
-
-    int16_t *p = (int16_t *)block->p_buffer;
-
-    if (mult < 0x10000)
-    {
-        for (size_t n = block->i_buffer / sizeof (*p); n > 0; n--)
-        {
-            *p = (*p * mult) >> 16;
-            p++;
-        }
-    }
-    else
-    {
-        mult >>= 4;
-        for (size_t n = block->i_buffer / sizeof (*p); n > 0; n--)
-        {
-            int32_t v = (*p * mult) >> 12;
-            if (abs (v) > 0x7fff)
-                v = 0x8000;
-            *(p++) = v;
-        }
-    }
-
-    (void) vol;
 }
