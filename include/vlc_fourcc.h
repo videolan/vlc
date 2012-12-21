@@ -338,7 +338,6 @@
 #define VLC_CODEC_MULAW                      VLC_FOURCC('m','l','a','w')
 #define VLC_CODEC_DAT12                      VLC_FOURCC('L','P','1','2')
 #define VLC_CODEC_S24DAUD                    VLC_FOURCC('d','a','u','d')
-#define VLC_CODEC_FI32                       VLC_FOURCC('f','i','3','2')
 #define VLC_CODEC_TWINVQ                     VLC_FOURCC('T','W','I','N')
 #define VLC_CODEC_BMVAUDIO                   VLC_FOURCC('B','M','V','A')
 #define VLC_CODEC_ULEAD_DV_AUDIO_NTSC        VLC_FOURCC('m','s',0x02,0x15)

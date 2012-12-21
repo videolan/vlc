@@ -1313,9 +1313,6 @@ static const staticentry_t p_list_audio[] = {
     B(VLC_CODEC_S24DAUD, "PCM DAUD"),
         A("daud"),
 
-    B(VLC_CODEC_FI32, "32 bits fixed float"),
-        A("fi32"),
-
     B(VLC_CODEC_F32L, "32 bits float LE"),
         A("f32l"),
         A("fl32"),

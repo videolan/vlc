@@ -257,32 +257,6 @@ static block_t *S32toFl32(filter_t *filter, block_t *b)
         *dst++ = (float)(*src++) / 2147483648.0;
     return b;
 }
-static block_t *Fi32toFl32(filter_t *filter, block_t *b)
-{
-    VLC_UNUSED(filter);
-    vlc_fixed_t *src = (vlc_fixed_t *)b->p_buffer;
-    float       *dst = (float *)src;
-    for (int i = b->i_buffer / 4; i--;)
-        *dst++ = *src++ / (float)FIXED32_ONE;
-    return b;
-}
-static block_t *Fi32toS16(filter_t *filter, block_t *b)
-{
-    VLC_UNUSED(filter);
-    vlc_fixed_t *src = (vlc_fixed_t *)b->p_buffer;
-    int16_t     *dst = (int16_t *)src;
-    for (int i = b->i_buffer / 4; i--;) {
-        const vlc_fixed_t v = *src++;
-        if (v >= FIXED32_ONE)
-            *dst++ = INT16_MAX;
-        else if (v <= -FIXED32_ONE)
-            *dst++ = INT16_MIN;
-        else
-            *dst++ = v >> (FIXED32_FRACBITS - 15);
-    }
-    b->i_buffer /= 2;
-    return b;
-}
 
 /* */
 static void U8toS16(block_t *bdst, const block_t *bsrc)
@@ -326,8 +300,6 @@ static const struct {
     cvt_direct_t convert;
 } cvt_directs[] = {
     { VLC_CODEC_FL64, VLC_CODEC_S16N,   Fl64toS16 },
-    { VLC_CODEC_FI32, VLC_CODEC_FL32,   Fi32toFl32 },
-    { VLC_CODEC_FI32, VLC_CODEC_S16N,   Fi32toS16 },
     { VLC_CODEC_S32N, VLC_CODEC_FL32,   S32toFl32 },
 
     { VLC_CODEC_S32N, VLC_CODEC_S16N,   S32toS16 },

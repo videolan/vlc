@@ -76,10 +76,6 @@
        || ((p_format)->i_format == VLC_CODEC_A52)       \
        || ((p_format)->i_format == VLC_CODEC_DTS) )
 
-typedef int32_t vlc_fixed_t;
-#define FIXED32_FRACBITS 28
-#define FIXED32_ONE      (1 << FIXED32_FRACBITS)
-
 /* Values used for the audio-device and audio-channels object variables */
 #define AOUT_VAR_MONO               1
 #define AOUT_VAR_STEREO             2

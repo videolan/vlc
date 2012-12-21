@@ -141,7 +141,7 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
         if (n == max)
             goto overflow;
 
-        filter_t *f = TryFormat (obj, VLC_CODEC_FI32, &input);
+        filter_t *f = TryFormat (obj, VLC_CODEC_S32N, &input);
         if (f == NULL)
             f = TryFormat (obj, VLC_CODEC_FL32, &input);
         if (f == NULL)

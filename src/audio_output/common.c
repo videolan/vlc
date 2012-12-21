@@ -69,7 +69,6 @@ unsigned int aout_BitsPerSample( vlc_fourcc_t i_format )
     case VLC_CODEC_S32B:
     case VLC_CODEC_F32L:
     case VLC_CODEC_F32B:
-    case VLC_CODEC_FI32:
         return 32;
 
     case VLC_CODEC_F64L:

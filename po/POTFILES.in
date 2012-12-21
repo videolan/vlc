@@ -277,7 +277,6 @@ modules/access/vcdx/vcdplayer.c
 modules/access/vcdx/vcdplayer.h
 modules/access/vdr.c
 modules/access/zip/zipstream.c
-modules/arm_neon/audio_format.c
 modules/arm_neon/chroma_yuv.c
 modules/arm_neon/simple_channel_mixer.c
 modules/arm_neon/volume.c

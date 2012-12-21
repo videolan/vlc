@@ -49,7 +49,6 @@ $Id$
  * atmo: Ambilight-like video-output
  * au: AU file demuxer
  * audio_format: helper module for audio transcoding
- * audio_format_neon: helper module for audio transcoding using NEON assembly
  * audiobargraph_a: audiobargraph audio plugin
  * audiobargraph_v: audiobargraph video plugin
  * audioqueue: Audio Output based on AudioQueue API for iOS
