@@ -51,7 +51,9 @@ SOURCES_a52tofloat32 = converter/a52tofloat32.c
 SOURCES_dtstospdif = converter/dtstospdif.c
 SOURCES_dtstofloat32 = converter/dtstofloat32.c
 SOURCES_mpgatofixed32 = converter/mpgatofixed32.c
-SOURCES_audio_format = converter/format.c
+libaudio_format_plugin_la_SOURCES = converter/format.c
+libaudio_format_plugin_la_CFLAGS = $(AM_CFLAGS)
+libaudio_format_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
 
 libvlc_LTLIBRARIES += \
 	liba52tospdif_plugin.la \
