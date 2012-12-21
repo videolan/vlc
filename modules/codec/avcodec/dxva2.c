@@ -154,8 +154,8 @@ static const dxva2_mode_t dxva2_modes[] = {
 
     /* H.264 */
     { "H.264 variable-length decoder, film grain technology",                         &DXVA2_ModeH264_F,                      CODEC_ID_H264 },
-    { "H.264 variable-length decoder, no film grain technology",                      &DXVA2_ModeH264_E,                      CODEC_ID_H264 },
     { "H.264 variable-length decoder, no film grain technology (Intel ClearVideo)",   &DXVADDI_Intel_ModeH264_E,              CODEC_ID_H264 },
+    { "H.264 variable-length decoder, no film grain technology",                      &DXVA2_ModeH264_E,                      CODEC_ID_H264 },
     { "H.264 variable-length decoder, no film grain technology, FMO/ASO",             &DXVA_ModeH264_VLD_WithFMOASO_NoFGT,    CODEC_ID_H264 },
     { "H.264 variable-length decoder, no film grain technology, Flash",               &DXVA_ModeH264_VLD_NoFGT_Flash,         CODEC_ID_H264 },
 
