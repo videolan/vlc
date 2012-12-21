@@ -214,6 +214,7 @@ static void RemapAdd##name( filter_t *p_filter, \
     } \
 }
 
+DEFINE_REMAP( U8,   uint8_t  )
 DEFINE_REMAP( S16N, int16_t  )
 DEFINE_REMAP( S32N, int32_t  )
 DEFINE_REMAP( FL32, float    )
@@ -227,6 +228,8 @@ static inline remap_fun_t GetRemapFun( audio_format_t *p_format, bool b_add )
     {
         switch( p_format->i_format )
         {
+            case VLC_CODEC_U8:
+                return RemapAddU8;
             case VLC_CODEC_S16N:
                 return RemapAddS16N;
             case VLC_CODEC_S32N:
@@ -241,6 +244,8 @@ static inline remap_fun_t GetRemapFun( audio_format_t *p_format, bool b_add )
     {
         switch( p_format->i_format )
         {
+            case VLC_CODEC_U8:
+                return RemapCopyU8;
             case VLC_CODEC_S16N:
                 return RemapCopyS16N;
             case VLC_CODEC_S32N:
