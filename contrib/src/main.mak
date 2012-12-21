@@ -36,16 +36,7 @@ ifneq ($(HOST),$(BUILD))
 HAVE_CROSS_COMPILE = 1
 endif
 ARCH := $(shell $(SRC)/get-arch.sh $(HOST))
-ifneq ($(findstring $(ARCH),i386 sparc sparc64 ppc ppc64 x86_64),)
-# This should be consistent with include/vlc_cpu.h
-HAVE_FPU = 1
-else ifneq ($(findstring $(ARCH),arm),)
-ifneq ($(call cppcheck, __VFP_FP__)),)
-ifeq ($(call cppcheck, __SOFTFP__),)
-HAVE_FPU = 1
-endif
-endif
-endif
+
 ifeq ($(ARCH)-$(HAVE_WIN32),x86_64-1)
 HAVE_WIN64 := 1
 endif
@@ -170,6 +161,18 @@ CXXFLAGS := $(CXXFLAGS) $(EXTRA_CFLAGS) -g
 EXTRA_LDFLAGS += -L$(PREFIX)/lib
 LDFLAGS := $(LDFLAGS) $(EXTRA_LDFLAGS)
 # Do not export those! Use HOSTVARS.
+
+# Do the FPU detection, after we have figured out our compilers and flags.
+ifneq ($(findstring $(ARCH),i386 sparc sparc64 ppc ppc64 x86_64),)
+# This should be consistent with include/vlc_cpu.h
+HAVE_FPU = 1
+else ifneq ($(findstring $(ARCH),arm),)
+ifneq ($(call cppcheck, __VFP_FP__)),)
+ifeq ($(call cppcheck, __SOFTFP__),)
+HAVE_FPU = 1
+endif
+endif
+endif
 
 ACLOCAL_AMFLAGS += -I$(PREFIX)/share/aclocal
 export ACLOCAL_AMFLAGS
