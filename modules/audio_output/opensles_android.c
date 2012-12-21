@@ -401,6 +401,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     /* XXX: rounding shouldn't affect us at normal sampling rate */
     sys->buf_unit_size = OPENSLES_BUFLEN * fmt->i_rate * 2 /* channels */ * 2 /* bps */ / 1000;
+    sys->buf_unit_size = (sys->buf_unit_size + 3) & ~3; // align on sample boundary
     sys->buf = malloc(OPENSLES_BUFFERS * sys->buf_unit_size);
     if (!sys->buf)
         goto error;
