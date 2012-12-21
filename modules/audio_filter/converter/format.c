@@ -278,7 +278,7 @@ static block_t *Fi32toS16(filter_t *filter, block_t *b)
         else if (v <= -FIXED32_ONE)
             *dst++ = INT16_MIN;
         else
-            *dst++ = v >> (32 - FIXED32_FRACBITS);
+            *dst++ = v >> (FIXED32_FRACBITS - 15);
     }
     b->i_buffer /= 2;
     return b;
