@@ -278,8 +278,8 @@ unsigned aout_CheckChannelReorder( const uint32_t *chans_in,
 /**
  * Reorders audio samples within a block of linear audio interleaved samples.
  * \param ptr start address of the block of samples
- * \param bytes size of the block in bytes (must be a multiple of the product of the
- *              channels count and the sample size)
+ * \param bytes size of the block in bytes (must be a multiple of the product
+ *              of the channels count and the sample size)
  * \param channels channels count (also length of the chans_table table)
  * \param chans_table permutation table to reorder the channels
  *                    (usually computed by aout_CheckChannelReorder())
@@ -292,94 +292,32 @@ void aout_ChannelReorder( void *ptr, size_t bytes, unsigned channels,
     assert( channels != 0 );
     assert( channels <= AOUT_CHAN_MAX );
 
-    /* The audio formats supported in audio output are inlined. For other formats (used in
-     * demuxers and muxers), memcpy() is used to avoid breaking type punning. */
+    /* The audio formats supported in audio output are inlined. For other
+     * formats (used in demuxers and muxers), memcpy() is used to avoid
+     * breaking type punning. */
+#define REORDER_TYPE(type) \
+do { \
+    const size_t frames = (bytes / sizeof (type)) / channels; \
+    type *buf = ptr; \
+\
+    for( size_t i = 0; i < frames; i++ ) \
+    { \
+        float tmp[AOUT_CHAN_MAX]; \
+\
+        for( size_t j = 0; j < channels; j++ ) \
+            tmp[chans_table[j]] = buf[j]; \
+        memcpy( buf, tmp, sizeof (type) * channels ); \
+        buf += channels; \
+    } \
+} while(0)
+
     switch( fourcc )
     {
-        case VLC_CODEC_FL32:
-        {
-            const size_t frames = (bytes / 4) / channels;
-            float *buf = ptr;
-
-            for( size_t i = 0; i < frames; i++ )
-            {
-                float tmp[AOUT_CHAN_MAX];
-
-                for( size_t j = 0; j < channels; j++ )
-                    tmp[chans_table[j]] = buf[j];
-                memcpy( buf, tmp, 4 * channels );
-                buf += channels;
-            }
-            break;
-        }
-
-        case VLC_CODEC_S16N:
-        {
-            const size_t frames = (bytes / 2) / channels;
-            int16_t *buf = ptr;
-
-            for( size_t i = 0; i < frames; i++ )
-            {
-                int16_t tmp[AOUT_CHAN_MAX];
-
-                for( size_t j = 0; j < channels; j++ )
-                    tmp[chans_table[j]] = buf[j];
-                memcpy( buf, tmp, 2 * channels );
-                buf += channels;
-            }
-            break;
-        }
-
-        case VLC_CODEC_FL64:
-        {
-            const size_t frames = (bytes / 8) / channels;
-            double *buf = ptr;
-
-            for( size_t i = 0; i < frames; i++ )
-            {
-                double tmp[AOUT_CHAN_MAX];
-
-                for( size_t j = 0; j < channels; j++ )
-                    tmp[chans_table[j]] = buf[j];
-                memcpy( buf, tmp, 8 * channels );
-                buf += channels;
-            }
-            break;
-        }
-
-        case VLC_CODEC_S32N:
-        {
-            const size_t frames = (bytes / 4) / channels;
-            int32_t *buf = ptr;
-
-            for( size_t i = 0; i < frames; i++ )
-            {
-                int32_t tmp[AOUT_CHAN_MAX];
-
-                for( size_t j = 0; j < channels; j++ )
-                    tmp[chans_table[j]] = buf[j];
-                memcpy( buf, tmp, 4 * channels );
-                buf += channels;
-            }
-            break;
-        }
-
-        case VLC_CODEC_U8:
-        {
-            const size_t frames = bytes / channels;
-            uint8_t *buf = ptr;
-
-            for( size_t i = 0; i < frames; i++ )
-            {
-                uint8_t tmp[AOUT_CHAN_MAX];
-
-                for( size_t j = 0; j < channels; j++ )
-                    tmp[chans_table[j]] = buf[j];
-                memcpy( buf, tmp, channels );
-                buf += channels;
-            }
-            break;
-        }
+        case VLC_CODEC_U8:   REORDER_TYPE(uint8_t); break;
+        case VLC_CODEC_S16N: REORDER_TYPE(int16_t); break;
+        case VLC_CODEC_FL32: REORDER_TYPE(float);   break;
+        case VLC_CODEC_S32N: REORDER_TYPE(int32_t); break;
+        case VLC_CODEC_FL64: REORDER_TYPE(double);  break;
 
         default:
         {
