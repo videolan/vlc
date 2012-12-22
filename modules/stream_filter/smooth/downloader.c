@@ -363,13 +363,12 @@ static chunk_t *build_init_chunk( stream_t *s )
     if( !ret->data )
         goto build_init_chunk_error;
 
-    int res = build_smoo_box( s, ret->data );
-    if( res != VLC_SUCCESS )
-        goto build_init_chunk_error;
+    if( build_smoo_box( s, ret->data ) == VLC_SUCCESS)
+        return ret;
 
-    return ret;
-
+    free( ret->data );
 build_init_chunk_error:
+    free( ret );
     msg_Err( s, "build_init_chunk failed" );
     return NULL;
 }
