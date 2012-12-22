@@ -117,7 +117,10 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf)
             + qtr( "You are using the Qt Interface.\n\n" )
             + qtr( "Copyright (C) " ) + COPYRIGHT_YEARS
             + qtr( " by the VideoLAN Team.\n" )
-            + "http://www.videolan.org" );
+            + "<a href=\"http://www.videolan.org\">http://www.videolan.org</a>" );
+
+    /* Be translators friendly: Convert to rich text */
+    ui.infoLabel->setText( ui.infoLabel->text().replace( "\n", "<br/>" ) );
 
     /* GPL License */
     ui.licenseEdit->setText( qfu( psz_license ) );
