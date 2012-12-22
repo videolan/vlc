@@ -199,9 +199,14 @@ void PLSelector::updateTotalDuration( PLSelItem* item, const char* prefix )
     QVariant playlistVariant = item->treeItem()->data( 0, PL_ITEM_ROLE );
     playlist_item_t* node = playlistVariant.value<playlist_item_t*>();
 
+    /* Get the duration of the playlist item */
+    playlist_Lock( THEPL );
+    mtime_t mt_duration = playlist_GetNodeDuration( node );
+    playlist_Unlock( THEPL );
+
     /* Formatting time */
     QString qs_timeLabel( prefix );
-    mtime_t mt_duration = playlist_GetNodeDuration( node );
+
     int i_seconds = mt_duration / 1000000;
     int i_minutes = i_seconds / 60;
     i_seconds = i_seconds % 60;
