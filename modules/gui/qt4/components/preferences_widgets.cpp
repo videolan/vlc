@@ -51,6 +51,8 @@
 #include <QDialogButtonBox>
 #include <QKeyEvent>
 #include <QColorDialog>
+#include <QAction>
+#include <QKeySequence>
 
 #define MINWIDTH_BOX 90
 #define LAST_COLUMN 10
@@ -1144,6 +1146,12 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
 
     table->installEventFilter( this );
 
+    /* Find the top most widget */
+    QWidget *parent, *rootWidget = p;
+    while( parent = rootWidget->parentWidget() )
+        rootWidget = parent;
+    buildAppHotkeysList( rootWidget );
+
     finish();
 
     CONNECT( actionSearch, textChanged( const QString& ),
@@ -1161,6 +1169,17 @@ void KeySelectorControl::fillGrid( QGridLayout *l, int line )
 }
 
 int KeySelectorControl::getType() const { return CONFIG_ITEM_KEY; }
+
+void KeySelectorControl::buildAppHotkeysList( QWidget *rootWidget )
+{
+    QList<QAction *> actionsList = rootWidget->findChildren<QAction *>();
+    foreach( const QAction *action, actionsList )
+    {
+        const QList<QKeySequence> shortcuts = action->shortcuts();
+        foreach( const QKeySequence &keySequence, shortcuts )
+            existingkeys << keySequence.toString();
+    }
+}
 
 void KeySelectorControl::finish()
 {
@@ -1269,6 +1288,7 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
 
     /* Launch a small dialog to ask for a new key */
     KeyInputDialog *d = new KeyInputDialog( table, keyItem->text( 0 ), table, b_global );
+    d->setExistingkeysSet( &existingkeys );
     d->exec();
 
     if( d->result() == QDialog::Accepted )
@@ -1366,6 +1386,7 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
 {
     setModal( true );
     conflicts = false;
+    existingkeys = NULL;
 
     table = _table;
     setWindowTitle( ( b_global ? qtr( "Global" ) + QString(" ") : "" )
@@ -1398,7 +1419,12 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
     BUTTONACT( unset, unsetAction() );
 }
 
-void KeyInputDialog::checkForConflicts( int i_vlckey )
+void KeyInputDialog::setExistingkeysSet( const QSet<QString> *keyset )
+{
+    existingkeys = keyset;
+}
+
+void KeyInputDialog::checkForConflicts( int i_vlckey, const QString &sequence )
 {
     QList<QTreeWidgetItem *> conflictList =
         table->findItems( VLCKeyToString( i_vlckey ), Qt::MatchExactly,
@@ -1410,6 +1436,19 @@ void KeyInputDialog::checkForConflicts( int i_vlckey )
     {
         warning->setText( qtr("Warning: this key or combination is already assigned to ") +
                 QString( "\"<b>%1</b>\"" ).arg( conflictList[0]->text( 0 ) ) );
+        warning->show();
+        ok->show();
+        unset->hide();
+
+        conflicts = true;
+    }
+    else if( existingkeys && !sequence.isEmpty()
+             && existingkeys->contains( sequence ) )
+    {
+        warning->setText(
+            qtr( "Warning: <b>%1</b> is already an application menu shortcut" )
+                    .arg( sequence )
+        );
         warning->show();
         ok->show();
         unset->hide();
@@ -1429,9 +1468,10 @@ void KeyInputDialog::keyPressEvent( QKeyEvent *e )
         e->key() == Qt::Key_AltGr )
         return;
     int i_vlck = qtEventToVLCKey( e );
+    QKeySequence sequence( e->key() | e->modifiers() );
     selected->setText( qtr( "Key or combination: " )
                 + QString("<b>%1</b>").arg( VLCKeyToString( i_vlck ) ) );
-    checkForConflicts( i_vlck );
+    checkForConflicts( i_vlck, sequence.toString() );
     keyValue = i_vlck;
 }
 
@@ -1439,7 +1479,7 @@ void KeyInputDialog::wheelEvent( QWheelEvent *e )
 {
     int i_vlck = qtWheelEventToVLCKey( e );
     selected->setText( qtr( "Key: " ) + VLCKeyToString( i_vlck ) );
-    checkForConflicts( i_vlck );
+    checkForConflicts( i_vlck, QString() );
     keyValue = i_vlck;
 }
 
