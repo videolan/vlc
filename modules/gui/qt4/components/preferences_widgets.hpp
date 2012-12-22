@@ -507,6 +507,8 @@ private:
     QLabel *label;
     QLabel *searchLabel;
     SearchLineEdit *actionSearch;
+    QComboBox *searchOption;
+    QLabel *searchOptionLabel;
     QTreeWidget *table;
     QList<module_config_t *> values;
     QSet<QString> existingkeys;
@@ -514,7 +516,8 @@ private:
     {
         ACTION_COL = 0,
         HOTKEY_COL = 1,
-        GLOBAL_HOTKEY_COL = 2
+        GLOBAL_HOTKEY_COL = 2,
+        ANY_COL = 3 // == count()
     };
 
 private slots:

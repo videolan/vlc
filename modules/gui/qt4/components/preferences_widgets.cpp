@@ -1134,8 +1134,15 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
     searchLabel = new QLabel( qtr( "Search" ), p );
     actionSearch = new SearchLineEdit();
 
+    searchOptionLabel = new QLabel( qtr("in") );
+    searchOption = new QComboBox();
+    searchOption->addItem( qtr("Any field"), ANY_COL );
+    searchOption->addItem( qtr("Actions"), ACTION_COL );
+    searchOption->addItem( qtr("Hotkeys"), HOTKEY_COL );
+    searchOption->addItem( qtr("Global Hotkeys"), GLOBAL_HOTKEY_COL );
+
     table = new QTreeWidget( p );
-    table->setColumnCount(3);
+    table->setColumnCount( ANY_COL );
     table->headerItem()->setText( ACTION_COL, qtr( "Action" ) );
     table->headerItem()->setText( HOTKEY_COL, qtr( "Hotkey" ) );
     table->headerItem()->setToolTip( HOTKEY_COL, qtr( "Application level hotkey" ) );
@@ -1161,10 +1168,12 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
 void KeySelectorControl::fillGrid( QGridLayout *l, int line )
 {
     QGridLayout *gLayout = new QGridLayout();
-    gLayout->addWidget( label, 0, 0, 1, 4 );
+    gLayout->addWidget( label, 0, 0, 1, 5 );
     gLayout->addWidget( searchLabel, 1, 0, 1, 2 );
-    gLayout->addWidget( actionSearch, 1, 2, 1, 2 );
-    gLayout->addWidget( table, 2, 0, 1, 4 );
+    gLayout->addWidget( actionSearch, 1, 2, 1, 1 );
+    gLayout->addWidget( searchOptionLabel, 1, 3, 1, 1 );
+    gLayout->addWidget( searchOption, 1, 4, 1, 1 );
+    gLayout->addWidget( table, 2, 0, 1, 5 );
     l->addLayout( gLayout, line, 0, 1, -1 );
 }
 
@@ -1264,8 +1273,17 @@ void KeySelectorControl::finish()
 
 void KeySelectorControl::filter( const QString &qs_search )
 {
-    QList<QTreeWidgetItem *> resultList =
-            table->findItems( qs_search, Qt::MatchContains, ACTION_COL );
+    int i_column = searchOption->itemData( searchOption->currentIndex() ).toInt();
+    QList<QTreeWidgetItem *> resultList;
+    if ( i_column == ANY_COL )
+    {
+        for( int i = 0; i < ANY_COL; i++ )
+            resultList << table->findItems( qs_search, Qt::MatchContains, i );
+    }
+    else
+    {
+        resultList = table->findItems( qs_search, Qt::MatchContains, i_column );
+    }
     for( int i = 0; i < table->topLevelItemCount(); i++ )
     {
         table->topLevelItem( i )->setHidden(
