@@ -1353,13 +1353,10 @@ void KeySelectorControl::doApply()
             config_PutPsz( p_this,
                            qtu( it->data( ACTION_COL, Qt::UserRole ).toString() ),
                            qtu( it->data( HOTKEY_COL, Qt::UserRole ).toString() ) );
-        if( !it->data( GLOBAL_HOTKEY_COL, Qt::UserRole ).toString().isEmpty() )
-        {
-            config_PutPsz( p_this,
-                           qtu( "global-" + it->data( ACTION_COL, Qt::UserRole ).toString() ),
-                           qtu( it->data( GLOBAL_HOTKEY_COL, Qt::UserRole ).toString() ) );
-        }
 
+        config_PutPsz( p_this,
+                       qtu( "global-" + it->data( ACTION_COL, Qt::UserRole ).toString() ),
+                       qtu( it->data( GLOBAL_HOTKEY_COL, Qt::UserRole ).toString() ) );
     }
 }
 
