@@ -1136,11 +1136,11 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
 
     table = new QTreeWidget( p );
     table->setColumnCount(3);
-    table->headerItem()->setText( 0, qtr( "Action" ) );
-    table->headerItem()->setText( 1, qtr( "Hotkey" ) );
-    table->headerItem()->setToolTip( 1, qtr( "Application level hotkey" ) );
-    table->headerItem()->setText( 2, qtr( "Global" ) );
-    table->headerItem()->setToolTip( 2, qtr( "Desktop level hotkey" ) );
+    table->headerItem()->setText( ACTION_COL, qtr( "Action" ) );
+    table->headerItem()->setText( HOTKEY_COL, qtr( "Hotkey" ) );
+    table->headerItem()->setToolTip( HOTKEY_COL, qtr( "Application level hotkey" ) );
+    table->headerItem()->setText( GLOBAL_HOTKEY_COL, qtr( "Global" ) );
+    table->headerItem()->setToolTip( GLOBAL_HOTKEY_COL, qtr( "Desktop level hotkey" ) );
     table->setAlternatingRowColors( true );
     table->setSelectionBehavior( QAbstractItemView::SelectItems );
 
@@ -1215,15 +1215,15 @@ void KeySelectorControl::finish()
                 - KeyValue in String in column 1
              */
             QTreeWidgetItem *treeItem = new QTreeWidgetItem();
-            treeItem->setText( 0, qtr( p_config_item->psz_text ) );
-            treeItem->setData( 0, Qt::UserRole,
+            treeItem->setText( ACTION_COL, qtr( p_config_item->psz_text ) );
+            treeItem->setData( ACTION_COL, Qt::UserRole,
                                QVariant( qfu( p_config_item->psz_name ) ) );
 
             QString keys = qfu( p_config_item->value.psz );
-            treeItem->setText( 1, keys );
-            treeItem->setToolTip( 1, qtr("Double click to change.\nDelete key to remove.") );
-            treeItem->setToolTip( 2, qtr("Double click to change.\nDelete key to remove.") );
-            treeItem->setData( 1, Qt::UserRole, QVariant( keys ) );
+            treeItem->setText( HOTKEY_COL, keys );
+            treeItem->setToolTip( HOTKEY_COL, qtr("Double click to change.\nDelete key to remove.") );
+            treeItem->setToolTip( GLOBAL_HOTKEY_COL, qtr("Double click to change.\nDelete key to remove.") );
+            treeItem->setData( HOTKEY_COL, Qt::UserRole, QVariant( keys ) );
             table->addTopLevelItem( treeItem );
             continue;
         }
@@ -1240,12 +1240,13 @@ void KeySelectorControl::finish()
     QMap<QString, QString>::const_iterator i = global_keys.constBegin();
     while (i != global_keys.constEnd())
     {
-        QList<QTreeWidgetItem *> list = table->findItems( i.key(), Qt::MatchExactly|Qt::MatchWrap, 0 );
+        QList<QTreeWidgetItem *> list =
+            table->findItems( i.key(), Qt::MatchExactly|Qt::MatchWrap, ACTION_COL );
         if( list.count() >= 1 )
         {
             QString keys = i.value();
-            list[0]->setText( 2, keys );
-            list[0]->setData( 2, Qt::UserRole, keys );
+            list[0]->setText( GLOBAL_HOTKEY_COL, keys );
+            list[0]->setData( GLOBAL_HOTKEY_COL, Qt::UserRole, keys );
         }
         if( list.count() >= 2 )
             msg_Dbg( p_this, "This is probably wrong, %s", qtu(i.key()) );
@@ -1264,7 +1265,7 @@ void KeySelectorControl::finish()
 void KeySelectorControl::filter( const QString &qs_search )
 {
     QList<QTreeWidgetItem *> resultList =
-            table->findItems( qs_search, Qt::MatchContains, 0 );
+            table->findItems( qs_search, Qt::MatchContains, ACTION_COL );
     for( int i = 0; i < table->topLevelItemCount(); i++ )
     {
         table->topLevelItem( i )->setHidden(
@@ -1282,12 +1283,13 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
     if( !keyItem ) return;
 
     /* If clicked on the first column, assuming user wants the normal hotkey */
-    if( column == 0 ) column = 1;
+    if( column == ACTION_COL ) column = HOTKEY_COL;
 
-    bool b_global = ( column == 2 );
+    bool b_global = ( column == GLOBAL_HOTKEY_COL );
 
     /* Launch a small dialog to ask for a new key */
-    KeyInputDialog *d = new KeyInputDialog( table, keyItem->text( 0 ), table, b_global );
+    KeyInputDialog *d = new KeyInputDialog( table, keyItem->text( ACTION_COL ),
+                                            table, b_global );
     d->setExistingkeysSet( &existingkeys );
     d->exec();
 
@@ -1303,10 +1305,10 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
             {
                 it = table->topLevelItem(i);
                 if( ( keyItem != it ) &&
-                    ( it->data( 1 + b_global, Qt::UserRole ).toString() == newKey ) )
+                    ( it->data( column, Qt::UserRole ).toString() == newKey ) )
                 {
-                    it->setText( 1 + b_global, NULL );
-                    it->setData( 1 + b_global, Qt::UserRole, QVariant() );
+                    it->setText( column, NULL );
+                    it->setData( column, Qt::UserRole, QVariant() );
                 }
             }
         }
@@ -1316,8 +1318,8 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
     }
     else if( d->result() == 2 )
     {
-        keyItem->setText( 1 + b_global, NULL );
-        keyItem->setData( 1 + b_global, Qt::UserRole, QVariant() );
+        keyItem->setText( column, NULL );
+        keyItem->setData( column, Qt::UserRole, QVariant() );
     }
 
     delete d;
@@ -1329,15 +1331,15 @@ void KeySelectorControl::doApply()
     for( int i = 0; i < table->topLevelItemCount() ; i++ )
     {
         it = table->topLevelItem(i);
-        if( it->data( 1, Qt::UserRole ).toInt() >= 0 )
+        if( it->data( HOTKEY_COL, Qt::UserRole ).toInt() >= 0 )
             config_PutPsz( p_this,
-                           qtu( it->data( 0, Qt::UserRole ).toString() ),
-                           qtu( it->data( 1, Qt::UserRole ).toString() ) );
-        if( !it->data( 2, Qt::UserRole ).toString().isEmpty() )
+                           qtu( it->data( ACTION_COL, Qt::UserRole ).toString() ),
+                           qtu( it->data( HOTKEY_COL, Qt::UserRole ).toString() ) );
+        if( !it->data( GLOBAL_HOTKEY_COL, Qt::UserRole ).toString().isEmpty() )
         {
             config_PutPsz( p_this,
-                           qtu( "global-" + it->data( 0, Qt::UserRole ).toString() ),
-                           qtu( it->data( 2, Qt::UserRole ).toString() ) );
+                           qtu( "global-" + it->data( ACTION_COL, Qt::UserRole ).toString() ),
+                           qtu( it->data( GLOBAL_HOTKEY_COL, Qt::UserRole ).toString() ) );
         }
 
     }
@@ -1363,7 +1365,7 @@ bool KeySelectorControl::eventFilter( QObject *obj, QEvent *e )
     }
     else if( keyEv->key() == Qt::Key_Delete )
     {
-        if( aTable->currentColumn() != 0 )
+        if( aTable->currentColumn() != ACTION_COL )
         {
             aTable->currentItem()->setText( aTable->currentColumn(), NULL );
             aTable->currentItem()->setData( aTable->currentColumn(), Qt::UserRole, QVariant() );

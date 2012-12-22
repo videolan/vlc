@@ -510,6 +510,12 @@ private:
     QTreeWidget *table;
     QList<module_config_t *> values;
     QSet<QString> existingkeys;
+    enum
+    {
+        ACTION_COL = 0,
+        HOTKEY_COL = 1,
+        GLOBAL_HOTKEY_COL = 2
+    };
 
 private slots:
     void selectKey( QTreeWidgetItem * = NULL, int column = 1 );
