@@ -358,7 +358,7 @@ static int MuteSet (audio_output_t *aout, bool mute)
 
 static int DevicesEnum (audio_output_t *aout, char ***idp, char ***namep)
 {
-    aout_sys_t *sys = sys;
+    aout_sys_t *sys = aout->sys;
     int fd = sys->fd;
     oss_sysinfo si;
 
