@@ -89,6 +89,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--disable-mad --disable-libmpeg2 \
 	--disable-faad --disable-skins2 \
 	--disable-live555 \
+	--disable-lua \
 	--disable-fribidi --disable-glx \
 	--disable-mkv \
 	--with-kde-solid='$${datadir}/kde4/apps'
