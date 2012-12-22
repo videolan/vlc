@@ -685,7 +685,7 @@ NetOpenPanel::~NetOpenPanel()
 
 void NetOpenPanel::clear()
 {
-    ui.urlComboBox->clear();
+    ui.urlComboBox->lineEdit()->clear();
 }
 
 void NetOpenPanel::onAccept()
