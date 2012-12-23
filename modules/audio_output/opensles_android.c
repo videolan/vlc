@@ -103,8 +103,10 @@ struct aout_sys_t
 
     /* audio buffered through opensles */
     uint8_t                        *buf;
-    size_t                          buf_unit_size;
+    size_t                          samples_per_buf;
     int                             next_buf;
+
+    int                             rate;
 
     /* if we can measure latency already */
     bool                            started;
@@ -112,7 +114,7 @@ struct aout_sys_t
     /* audio not yet buffered through opensles */
     block_t                        *p_buffer_chain;
     block_t                       **pp_buffer_last;
-
+    size_t                          samples;
 };
 
 /*****************************************************************************
@@ -140,6 +142,11 @@ vlc_module_end ()
  *
  *****************************************************************************/
 
+static inline int bytesPerSample(void)
+{
+    return 2 /* S16 */ * 2 /* stereo */;
+}
+
 static int TimeGet(audio_output_t* aout, mtime_t* restrict drift)
 {
     aout_sys_t *sys = aout->sys;
@@ -158,8 +165,12 @@ static int TimeGet(audio_output_t* aout, mtime_t* restrict drift)
     if (!started)
         return -1;
 
-    *drift = CLOCK_FREQ * OPENSLES_BUFLEN * st.count / 1000;
-    //msg_Dbg(aout, "latency %"PRId64"", *drift);
+    *drift = (CLOCK_FREQ * OPENSLES_BUFLEN * st.count / 1000)
+        + sys->samples * CLOCK_FREQ / sys->rate;
+
+    /* msg_Dbg(aout, "latency %"PRId64" ms, %d/%d buffers", *drift / 1000,
+        (int)st.count, OPENSLES_BUFFERS); */
+
     return 0;
 }
 
@@ -221,7 +232,7 @@ static void Pause(audio_output_t *aout, bool pause, mtime_t date)
 static int WriteBuffer(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
-    const size_t unit_size = sys->buf_unit_size;
+    const size_t unit_size = sys->samples_per_buf * bytesPerSample();
 
     block_t *b = sys->p_buffer_chain;
     if (!b)
@@ -282,6 +293,8 @@ static int WriteBuffer(audio_output_t *aout)
     SLresult r = Enqueue(sys->playerBufferQueue,
         &sys->buf[unit_size * sys->next_buf], unit_size);
 
+    sys->samples -= sys->samples_per_buf;
+
     if (r == SL_RESULT_SUCCESS) {
         if (++sys->next_buf == OPENSLES_BUFFERS)
             sys->next_buf = 0;
@@ -304,6 +317,8 @@ static void Play(audio_output_t *aout, block_t *p_buffer)
 
     p_buffer->p_next = NULL; /* Make sur our linked list doesn't use old references */
     vlc_mutex_lock(&sys->lock);
+
+    sys->samples += p_buffer->i_buffer / bytesPerSample();
 
     /* Hold this block until we can write it into the OpenSL buffer */
     block_ChainLastAppend(&sys->pp_buffer_last, p_buffer);
@@ -400,9 +415,9 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     CHECK_OPENSL_ERROR("Failed to switch to playing state");
 
     /* XXX: rounding shouldn't affect us at normal sampling rate */
-    sys->buf_unit_size = OPENSLES_BUFLEN * fmt->i_rate * 2 /* channels */ * 2 /* bps */ / 1000;
-    sys->buf_unit_size = (sys->buf_unit_size + 3) & ~3; // align on sample boundary
-    sys->buf = malloc(OPENSLES_BUFFERS * sys->buf_unit_size);
+    sys->rate = fmt->i_rate;
+    sys->samples_per_buf = OPENSLES_BUFLEN * fmt->i_rate / 1000;
+    sys->buf = malloc(OPENSLES_BUFFERS * sys->samples_per_buf * bytesPerSample());
     if (!sys->buf)
         goto error;
 
