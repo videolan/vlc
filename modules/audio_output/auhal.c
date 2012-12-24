@@ -57,7 +57,7 @@
 #define BUFSIZE (FRAMESIZE * 8) * 8
 #define AOUT_VAR_SPDIF_FLAG 0xf00000
 
-#define kBufferLength BUFSIZE
+#define kBufferLength BUFSIZE * 4
 
 #define AOUT_VOLUME_DEFAULT             256
 #define AOUT_VOLUME_MAX                 512
@@ -1253,8 +1253,8 @@ static void PauseAnalog (audio_output_t *p_aout, bool pause, mtime_t date)
 
 static void FlushAnalog(audio_output_t *p_aout, bool wait)
 {
-    /* we just flush the device, no need to flush the circular buffer, since this will lead to noise only */
-    AudioUnitReset(p_aout->sys->au_unit, kAudioUnitScope_Global, 0);
+    /* flush circular buffer */
+    TPCircularBufferClear(&p_aout->sys->circular_buffer);
 }
 
 static int TimeGet(audio_output_t *p_aout, mtime_t *delay)
@@ -1280,7 +1280,6 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
     VLC_UNUSED(ioActionFlags);
     VLC_UNUSED(inTimeStamp);
     VLC_UNUSED(inBusNumber);
-    VLC_UNUSED(inNumberFrames);
 
     audio_output_t * p_aout = (audio_output_t *)p_obj;
     struct aout_sys_t * p_sys = p_aout->sys;
@@ -1293,11 +1292,17 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
     Float32 *buffer = TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
 
     /* check if we have enough data */
-    if (!availableBytes)
-        return noErr;
-
-    memcpy(targetBuffer, buffer, __MIN(bytesToCopy, availableBytes));
-    TPCircularBufferConsume(&p_sys->circular_buffer, __MIN(bytesToCopy, availableBytes));
+    if (!availableBytes) {
+        /* return an empty buffer so silence is played until we have data */
+        for (UInt32 j = 0; j < inNumberFrames; j++)
+            targetBuffer[j] = 0.;
+        msg_Warn(p_aout, "no data, playing silence");
+    } else {
+        msg_Warn(p_aout, "playing %i bytes", availableBytes);
+        memcpy(targetBuffer, buffer, __MIN(bytesToCopy, availableBytes));
+        TPCircularBufferConsume(&p_sys->circular_buffer, __MIN(bytesToCopy, availableBytes));
+        VLC_UNUSED(inNumberFrames);
+    }
 
     return noErr;
 }
