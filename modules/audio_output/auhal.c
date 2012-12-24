@@ -1216,8 +1216,7 @@ static void PlayAnalog (audio_output_t * p_aout, block_t * p_block)
 
     if (p_block->i_nb_samples > 0) {
         /* Do the channel reordering */
-        if (p_sys->chans_to_reorder)
-        {
+        if (p_sys->chans_to_reorder) {
            aout_ChannelReorder(p_block->p_buffer,
                                p_block->i_buffer,
                                p_sys->chans_to_reorder,
@@ -1253,6 +1252,7 @@ static void PauseAnalog (audio_output_t *p_aout, bool pause, mtime_t date)
 
 static void FlushAnalog(audio_output_t *p_aout, bool wait)
 {
+    VLC_UNUSED(wait);
     /* flush circular buffer */
     TPCircularBufferClear(&p_aout->sys->circular_buffer);
 }
@@ -1363,6 +1363,8 @@ static OSStatus HardwareListener(AudioObjectID inObjectID,  UInt32 inNumberAddre
     OSStatus err = noErr;
     audio_output_t     *p_aout = (audio_output_t *)inClientData;
     VLC_UNUSED(inObjectID);
+    VLC_UNUSED(inNumberAddresses);
+    VLC_UNUSED(inAddresses);
 
     if (!p_aout)
         return -1;
