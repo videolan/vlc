@@ -1296,9 +1296,7 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
         /* return an empty buffer so silence is played until we have data */
         for (UInt32 j = 0; j < inNumberFrames; j++)
             targetBuffer[j] = 0.;
-        msg_Warn(p_aout, "no data, playing silence");
     } else {
-        msg_Warn(p_aout, "playing %i bytes", availableBytes);
         memcpy(targetBuffer, buffer, __MIN(bytesToCopy, availableBytes));
         TPCircularBufferConsume(&p_sys->circular_buffer, __MIN(bytesToCopy, availableBytes));
         VLC_UNUSED(inNumberFrames);
