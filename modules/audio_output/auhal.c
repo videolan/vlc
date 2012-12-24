@@ -823,13 +823,13 @@ static void Stop(audio_output_t *p_aout)
     UInt32              i_param_size = 0;
 
     AudioObjectPropertyAddress deviceAliveAddress = { kAudioDevicePropertyDeviceIsAlive, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
-    err = AudioObjectRemovePropertyListener(p_sys->i_selected_dev, &deviceAliveAddress, HardwareListener, NULL);
+    err = AudioObjectRemovePropertyListener(p_sys->i_selected_dev, &deviceAliveAddress, HardwareListener, (void *)p_aout);
     if (err != noErr)
         msg_Err(p_aout, "failed to remove audio device life checker: [%4.4s]", (char *)&err);
 
     if (p_sys->b_digital) {
         AudioObjectPropertyAddress physicalFormatsAddress = { kAudioStreamPropertyAvailablePhysicalFormats, kAudioObjectPropertyScopeGlobal, 0 };
-        err = AudioObjectRemovePropertyListener(p_sys->i_stream_id, &physicalFormatsAddress, HardwareListener, NULL);
+        err = AudioObjectRemovePropertyListener(p_sys->i_stream_id, &physicalFormatsAddress, HardwareListener, (void *)p_aout);
         if (err != noErr)
             msg_Err(p_aout, "failed to remove audio device property streams callback: [%4.4s]", (char *)&err);
     }
@@ -876,7 +876,7 @@ static void Stop(audio_output_t *p_aout)
     }
 
     AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
-    err = AudioObjectRemovePropertyListener(kAudioObjectSystemObject, &audioDevicesAddress, HardwareListener, NULL);
+    err = AudioObjectRemovePropertyListener(kAudioObjectSystemObject, &audioDevicesAddress, HardwareListener, (void *)p_aout);
 
     if (err != noErr)
         msg_Err(p_aout, "AudioHardwareRemovePropertyListener failed: [%4.4s]", (char *)&err);
@@ -1359,23 +1359,33 @@ static OSStatus HardwareListener(AudioObjectID inObjectID,  UInt32 inNumberAddre
     audio_output_t     *p_aout = (audio_output_t *)inClientData;
     VLC_UNUSED(inObjectID);
 
+    if (!p_aout)
+        return -1;
+
+#ifndef NDEBUG
     for (unsigned int i = 0; i < inNumberAddresses; i++) {
-        if (inAddresses[i].mSelector == kAudioHardwarePropertyDevices) {
-            /* something changed in the list of devices */
-            /* We trigger the audio-device's aout_ChannelsRestart callback */
-            msg_Warn(p_aout, "audio device configuration changed, resetting cache");
-            var_TriggerCallback(p_aout, "audio-device");
-            var_Destroy(p_aout, "audio-device");
-        } else if (inAddresses[i].mSelector == kAudioDevicePropertyDeviceIsAlive) {
-            msg_Warn(p_aout, "audio device died, resetting aout");
-            var_TriggerCallback(p_aout, "audio-device");
-            var_Destroy(p_aout, "audio-device");
-        } else if (inAddresses[i].mSelector == kAudioStreamPropertyAvailablePhysicalFormats) {
-            msg_Warn(p_aout, "available physical formats for audio device changed, resetting aout");
-            var_TriggerCallback(p_aout, "audio-device");
-            var_Destroy(p_aout, "audio-device");
+        switch (inAddresses[i].mSelector) {
+            case kAudioHardwarePropertyDevices:
+                msg_Warn(p_aout, "audio device configuration changed, resetting cache");
+                break;
+
+            case kAudioDevicePropertyDeviceIsAlive:
+                msg_Warn(p_aout, "audio device died, resetting aout");
+                break;
+
+            case kAudioStreamPropertyAvailablePhysicalFormats:
+                msg_Warn(p_aout, "available physical formats for audio device changed, resetting aout");
+                break;
+
+            default:
+                msg_Warn(p_aout, "device reset for unknown reason (%i)", inAddresses[i].mSelector);
+                break;
         }
     }
+#endif
+
+    var_TriggerCallback(p_aout, "audio-device");
+    var_Destroy(p_aout, "audio-device");
 
     return err;
 }
