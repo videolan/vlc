@@ -74,6 +74,7 @@ public:
     QStringList qpcodecsList;
 private:
     void registerCodecs();
+    void registerFilters();
     void fillProfile( const QString& qs );
     void fillProfileOldFormat( const QString& qs );
     typedef QSet<QString> resultset;

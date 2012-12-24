@@ -36,6 +36,7 @@
 #include <QButtonGroup>
 #include <QSpinBox>
 #include <QUrl>
+#include <QListWidgetItem>
 
 #include <assert.h>
 #include <vlc_modules.h>
@@ -246,6 +247,13 @@ void VLCProfileSelector::updateOptions( int i )
                 smrl.option( "vb", value.toInt() );
             }
 
+            HASHPICK( "video", "filters" );
+            if ( !value.isEmpty() )
+            {
+                QStringList valuesList = QUrl::fromPercentEncoding( value.toAscii() ).split( ";" );
+                smrl.option( "vfilter", QString("{%1}").arg( valuesList.join( "," ) ) );
+            }
+
             /*if ( codec is h264 )*/
             {
                 /* special handling */
@@ -304,6 +312,14 @@ void VLCProfileSelector::updateOptions( int i )
 
             HASHPICK( "acodec", "samplerate" );
             smrl.option( "samplerate", value.toInt() );
+
+            HASHPICK( "audio", "filters" );
+            if ( !value.isEmpty() )
+            {
+                QStringList valuesList = QUrl::fromPercentEncoding( value.toAscii() ).split( ";" );
+                smrl.option( "afilter", QString("{%1}").arg( valuesList.join( "," ) ) );
+            }
+
         } else {
             HASHPICK( "audio", "copy" );
             if ( ! value.isEmpty() )
@@ -410,6 +426,7 @@ VLCProfileEditor::VLCProfileEditor( const QString& qs_name, const QString& value
     }
     loadCapabilities();
     registerCodecs();
+    registerFilters();
 
     QPushButton *saveButton = new QPushButton(
                 ( qs_name.isEmpty() ) ? qtr( "Create" ) : qtr( "Save" ) );
@@ -452,6 +469,39 @@ void VLCProfileEditor::loadCapabilities()
 //            caps["encoders"].insert( module_get_object( p_module ) );
     }
     module_list_free (p_all);
+}
+
+inline void VLCProfileEditor::registerFilters()
+{
+    size_t count;
+    module_t **p_all = module_list_get (&count);
+
+    for (size_t i = 0; i < count; i++)
+    {
+        module_t *p_module = p_all[i];
+        if ( module_get_score( p_module ) > 0 ) continue;
+
+        QString capability = module_get_capability( p_module );
+        QListWidget *listWidget = NULL;
+        QListWidgetItem *item;
+
+        if ( capability == "video filter2" )
+            listWidget = ui.valueholder_video_filters;
+        else if ( capability == "audio filter" )
+            listWidget = ui.valueholder_audio_filters;
+
+        if ( !listWidget ) continue;
+
+        item = new QListWidgetItem( module_get_name( p_module, true ) );
+        item->setCheckState( Qt::Unchecked );
+        item->setToolTip( QString( module_get_help( p_module ) ) );
+        item->setData( Qt::UserRole, QString( module_get_object( p_module ) ) );
+        listWidget->addItem( item );
+    }
+    module_list_free (p_all);
+
+    ui.valueholder_video_filters->sortItems();
+    ui.valueholder_audio_filters->sortItems();
 }
 
 inline void VLCProfileEditor::registerCodecs()
@@ -631,6 +681,19 @@ void VLCProfileEditor::fillProfile( const QString& qs )
                 QLineEdit *box = qobject_cast<QLineEdit *>( object );
                 box->setText( QUrl::fromPercentEncoding( value.toAscii() ) );
             }
+            else if ( object->inherits( "QListWidget" ) )
+            {
+                QStringList valuesList = QUrl::fromPercentEncoding( value.toAscii() ).split( ";" );
+                const QListWidget *list = qobject_cast<const QListWidget *>( object );
+                for( int i=0; i < list->count(); i++ )
+                {
+                    QListWidgetItem *item = list->item( i );
+                    if ( valuesList.contains( item->data( Qt::UserRole ).toString() ) )
+                        item->setCheckState( Qt::Checked );
+                    else
+                        item->setCheckState( Qt::Unchecked );
+                }
+            }
         }
     }
 }
@@ -751,6 +814,18 @@ QString VLCProfileEditor::transcodeValue()
         {
             const QLineEdit *box = qobject_cast<const QLineEdit *>( object );
             value = QUrl::toPercentEncoding( box->text(), "", "_;" );
+        }
+        else if ( object->inherits( "QListWidget" ) )
+        {
+            const QListWidget *list = qobject_cast<const QListWidget *>( object );
+            QStringList valuesList;
+            for( int i=0; i < list->count(); i++ )
+            {
+                const QListWidgetItem *item = list->item( i );
+                if ( item->checkState() == Qt::Checked )
+                    valuesList.append( item->data( Qt::UserRole ).toString() );
+            }
+            value = QUrl::toPercentEncoding( valuesList.join( ";" ), "", "_;" );
         }
 
         if ( !value.isEmpty() )
