@@ -54,6 +54,8 @@
     if (p_vout)
         vlc_object_release(p_vout);
 
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+
     [self unregisterDraggedTypes];
     [super dealloc];
 }
@@ -66,6 +68,14 @@
 
     i_lastScrollWheelDirection = 0;
     f_cumulated_magnification = 0.0;
+
+#ifdef MAC_OS_X_VERSION_10_7
+    if (!OSX_SNOW_LEOPARD) {
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(osWillChangeFullScreenStatus:) name: NSWindowWillEnterFullScreenNotification object: nil];
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(osWillChangeFullScreenStatus:) name: NSWindowDidEnterFullScreenNotification object: nil];
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(osWillChangeFullScreenStatus:) name: NSWindowWillExitFullScreenNotification object: nil];
+    }
+#endif
 
     return self;
 }
@@ -217,7 +227,7 @@
         i_yvlckey = KEY_MOUSEWHEELDOWN;
     else
         i_yvlckey = KEY_MOUSEWHEELUP;
-    
+
     if (f_deltaX < 0.0f)
         i_xvlckey = KEY_MOUSEWHEELRIGHT;
     else
@@ -285,6 +295,23 @@
 
 #pragma mark -
 #pragma mark Basic view behaviour and touch events handling
+
+- (void)osWillChangeFullScreenStatus:(NSNotification *)notification
+{
+    playlist_t *p_playlist = pl_Get(VLCIntf);
+    if ([notification.name isEqualToString:@"NSWindowWillEnterFullScreenNotification"] || [notification.name isEqualToString:@"NSWindowDidEnterFullScreenNotification"])
+        var_SetBool(p_playlist, "fullscreen", 1);
+    else
+        var_SetBool(p_playlist, "fullscreen", 0);
+
+    NSArray *subviews = [self subviews];
+    NSUInteger count = [subviews count];
+
+    for (NSUInteger x = 0; x < count; x++) {
+        if ([[subviews objectAtIndex:x] respondsToSelector:@selector(reshape)])
+            [[subviews objectAtIndex:x] reshape];
+    }
+}
 
 - (BOOL)mouseDownCanMoveWindow
 {

@@ -200,7 +200,7 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
             unsigned int i_width  = va_arg(args, unsigned int);
             unsigned int i_height = va_arg(args, unsigned int);
 
-            NSSize newSize = NSMakeSize(i_width, i_height);            
+            NSSize newSize = NSMakeSize(i_width, i_height);
             SEL sel = @selector(setNativeVideoSize:forWindow:);
             NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[[[VLCMain sharedInstance] voutController] methodSignatureForSelector:sel]];
             [inv setTarget:[[VLCMain sharedInstance] voutController]];
@@ -1237,9 +1237,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     playlist_t * p_playlist = pl_Get(p_intf);
     BOOL b_fullscreen = i_full;
 
-    if (!var_GetBool(p_playlist, "fullscreen") != !b_fullscreen) {
+    if (!var_GetBool(p_playlist, "fullscreen") != !b_fullscreen)
         var_SetBool(p_playlist, "fullscreen", b_fullscreen);
-    }
 
     if (b_nativeFullscreenMode) {
         // this is called twice in certain situations, so only toogle if we really need to
