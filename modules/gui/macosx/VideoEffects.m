@@ -1050,6 +1050,11 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 {
     BOOL b_state = [o_clone_ckb state];
 
+    if (b_state && [o_wall_ckb state]) {
+        [o_wall_ckb setState: NSOffState];
+        [self enableWall: o_wall_ckb];
+    }
+
     [self setVideoFilter: "clone" on: b_state];
     [o_clone_number_lbl setEnabled: b_state];
     [o_clone_number_fld setEnabled: b_state];
@@ -1064,6 +1069,11 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 - (IBAction)enableWall:(id)sender
 {
     BOOL b_state = [o_wall_ckb state];
+
+    if (b_state && [o_clone_ckb state]) {
+        [o_clone_ckb setState: NSOffState];
+        [self enableClone: o_clone_ckb];
+    }
 
     [self setVideoFilter: "wall" on: b_state];
     [o_wall_numofcols_fld setEnabled: b_state];
