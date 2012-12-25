@@ -246,8 +246,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         [o_transform_ckb setState: (NSInteger)strstr(psz_vfilters, "transform")];
         [o_zoom_ckb setState: (NSInteger)strstr(psz_vfilters, "magnify")];
         [o_puzzle_ckb setState: (NSInteger)strstr(psz_vfilters, "puzzle")];
-        [o_clone_ckb setState: (NSInteger)strstr(psz_vfilters, "clone")];
-        [o_wall_ckb setState: (NSInteger)strstr(psz_vfilters, "wall")];
         [o_threshold_ckb setState: (NSInteger)strstr(psz_vfilters, "colorthres")];
         [o_sepia_ckb setState: (NSInteger)strstr(psz_vfilters, "sepia")];
         [o_noise_ckb setState: (NSInteger)strstr(psz_vfilters, "noise")];
@@ -270,8 +268,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         [o_transform_ckb setState: NSOffState];
         [o_zoom_ckb setState: NSOffState];
         [o_puzzle_ckb setState: NSOffState];
-        [o_clone_ckb setState: NSOffState];
-        [o_wall_ckb setState: NSOffState];
         [o_threshold_ckb setState: NSOffState];
         [o_sepia_ckb setState: NSOffState];
         [o_noise_ckb setState: NSOffState];
@@ -286,6 +282,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         [o_psychedelic_ckb setState: NSOffState];
         [o_anaglyph_ckb setState: NSOffState];
     }
+
     psz_vfilters = config_GetPsz(p_intf, "sub-source");
     if (psz_vfilters) {
         [o_addtext_ckb setState: (NSInteger)strstr(psz_vfilters, "marq")];
@@ -294,6 +291,17 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     } else {
         [o_addtext_ckb setState: NSOffState];
         [o_addlogo_ckb setState: NSOffState];
+    }
+
+    psz_vfilters = config_GetPsz(p_intf, "video-splitter");
+    if (psz_vfilters) {
+        
+        [o_clone_ckb setState: (NSInteger)strstr(psz_vfilters, "clone")];
+        [o_wall_ckb setState: (NSInteger)strstr(psz_vfilters, "wall")];
+        free(psz_vfilters);
+    } else {
+        [o_clone_ckb setState: NSOffState];
+        [o_wall_ckb setState: NSOffState];
     }
 
     /* fetch and show the various values */
@@ -359,9 +367,23 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_puzzle_columns_fld setEnabled: b_state];
     [o_puzzle_columns_lbl setEnabled: b_state];
     [o_puzzle_blackslot_ckb setEnabled: b_state];
+    
     [o_clone_number_fld setIntValue: config_GetInt(p_intf, "clone-count")];
+    b_state = [o_clone_ckb state];
+    [o_clone_number_lbl setEnabled: b_state];
+    [o_clone_number_fld setEnabled: b_state];
+    [o_clone_number_stp setEnabled: b_state];
+
+    b_state = [o_wall_ckb state];
     [o_wall_numofrows_fld setIntValue: config_GetInt(p_intf, "wall-rows")];
+    [o_wall_numofrows_lbl setEnabled: b_state];
+    [o_wall_numofrows_fld setEnabled: b_state];
+    [o_wall_numofrows_stp setEnabled: b_state];
     [o_wall_numofcols_fld setIntValue: config_GetInt(p_intf, "wall-cols")];
+    [o_wall_numofcols_lbl setEnabled: b_state];
+    [o_wall_numofcols_fld setEnabled: b_state];
+    [o_wall_numofcols_stp setEnabled: b_state];
+    
 
     [o_threshold_color_fld setStringValue: [[NSString stringWithFormat:@"%llx", config_GetInt(p_intf, "colorthres-color")] uppercaseString]];
     [o_threshold_saturation_sld setIntValue: config_GetInt(p_intf, "colorthres-saturationthres")];
@@ -1031,6 +1053,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [self setVideoFilter: "clone" on: b_state];
     [o_clone_number_lbl setEnabled: b_state];
     [o_clone_number_fld setEnabled: b_state];
+    [o_clone_number_stp setEnabled: b_state];
 }
 
 - (IBAction)cloneModifierChanged:(id)sender
@@ -1044,8 +1067,11 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
     [self setVideoFilter: "wall" on: b_state];
     [o_wall_numofcols_fld setEnabled: b_state];
+    [o_wall_numofcols_stp setEnabled: b_state];
     [o_wall_numofcols_lbl setEnabled: b_state];
+    
     [o_wall_numofrows_fld setEnabled: b_state];
+    [o_wall_numofrows_stp setEnabled: b_state];
     [o_wall_numofrows_lbl setEnabled: b_state];
 }
 
