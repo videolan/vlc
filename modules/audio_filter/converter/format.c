@@ -90,6 +90,7 @@ static block_t *U8toS16(filter_t *filter, block_t *bsrc)
     if (unlikely(bdst == NULL))
         goto out;
 
+    block_CopyProperties(bdst, bsrc);
     uint8_t *src = (uint8_t *)bsrc->p_buffer;
     int16_t *dst = (int16_t *)bdst->p_buffer;
     for (size_t i = bsrc->i_buffer; i--;)
@@ -106,6 +107,7 @@ static block_t *U8toFl32(filter_t *filter, block_t *bsrc)
     if (unlikely(bdst == NULL))
         goto out;
 
+    block_CopyProperties(bdst, bsrc);
     uint8_t *src = (uint8_t *)bsrc->p_buffer;
     float   *dst = (float *)bdst->p_buffer;
     for (size_t i = bsrc->i_buffer; i--;)
@@ -122,6 +124,7 @@ static block_t *U8toS32(filter_t *filter, block_t *bsrc)
     if (unlikely(bdst == NULL))
         goto out;
 
+    block_CopyProperties(bdst, bsrc);
     uint8_t *src = (uint8_t *)bsrc->p_buffer;
     int32_t *dst = (int32_t *)bdst->p_buffer;
     for (size_t i = bsrc->i_buffer; i--;)
@@ -138,6 +141,7 @@ static block_t *U8toFl64(filter_t *filter, block_t *bsrc)
     if (unlikely(bdst == NULL))
         goto out;
 
+    block_CopyProperties(bdst, bsrc);
     uint8_t *src = (uint8_t *)bsrc->p_buffer;
     double  *dst = (double *)bdst->p_buffer;
     for (size_t i = bsrc->i_buffer; i--;)
@@ -168,6 +172,7 @@ static block_t *S16toFl32(filter_t *filter, block_t *bsrc)
     if (unlikely(bdst == NULL))
         goto out;
 
+    block_CopyProperties(bdst, bsrc);
     int16_t *src = (int16_t *)bsrc->p_buffer;
     float   *dst = (float *)bdst->p_buffer;
     for (size_t i = bsrc->i_buffer / 2; i--;)
@@ -195,6 +200,7 @@ static block_t *S16toS32(filter_t *filter, block_t *bsrc)
     if (unlikely(bdst == NULL))
         goto out;
 
+    block_CopyProperties(bdst, bsrc);
     int16_t *src = (int16_t *)bsrc->p_buffer;
     int32_t *dst = (int32_t *)bdst->p_buffer;
     for (int i = bsrc->i_buffer / 2; i--;)
@@ -211,6 +217,7 @@ static block_t *S16toFl64(filter_t *filter, block_t *bsrc)
     if (unlikely(bdst == NULL))
         goto out;
 
+    block_CopyProperties(bdst, bsrc);
     int16_t *src = (int16_t *)bsrc->p_buffer;
     float   *dst = (float *)bdst->p_buffer;
     for (size_t i = bsrc->i_buffer / 2; i--;)
@@ -296,6 +303,7 @@ static block_t *Fl32toFl64(filter_t *filter, block_t *bsrc)
     if (unlikely(bdst == NULL))
         goto out;
 
+    block_CopyProperties(bdst, bsrc);
     float  *src = (float *)bsrc->p_buffer;
     double *dst = (double *)bdst->p_buffer;
     for (size_t i = bsrc->i_buffer / 4; i--;)
@@ -348,6 +356,7 @@ static block_t *S32toFl64(filter_t *filter, block_t *bsrc)
     if (unlikely(bdst == NULL))
         goto out;
 
+    block_CopyProperties(bdst, bsrc);
     int32_t *src = (int32_t*)bsrc->p_buffer;
     double  *dst = (double *)bdst->p_buffer;
     for (size_t i = bsrc->i_buffer / 4; i--;)
