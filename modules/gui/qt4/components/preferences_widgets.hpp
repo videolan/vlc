@@ -148,6 +148,7 @@ private:
 
 class IntegerRangeConfigControl : public IntegerConfigControl
 {
+    Q_OBJECT
 public:
     IntegerRangeConfigControl( vlc_object_t *, module_config_t *, QWidget * );
     IntegerRangeConfigControl( vlc_object_t *, module_config_t *,
@@ -160,6 +161,7 @@ private:
 
 class IntegerRangeSliderConfigControl : public VIntConfigControl
 {
+    Q_OBJECT
 public:
     IntegerRangeSliderConfigControl( vlc_object_t *, module_config_t *,
                                 QLabel *, QSlider * );
@@ -200,6 +202,7 @@ private:
 
 class BoolConfigControl : public VIntConfigControl
 {
+    Q_OBJECT
 public:
     BoolConfigControl( vlc_object_t *, module_config_t *, QWidget * );
     BoolConfigControl( vlc_object_t *, module_config_t *,
@@ -385,6 +388,7 @@ protected:
 
 class ModuleConfigControl : public VStringConfigControl
 {
+    Q_OBJECT
 public:
     ModuleConfigControl( vlc_object_t *, module_config_t *, QWidget * );
     ModuleConfigControl( vlc_object_t *, module_config_t *, QLabel *,
@@ -467,6 +471,7 @@ struct ModuleCheckBox {
 
 class ModuleListConfigControl : public ConfigControl
 {
+    Q_OBJECT
 public:
     StringConfigControl( vlc_object_t *, module_config_t *, QWidget *, bool
                          bycat );
