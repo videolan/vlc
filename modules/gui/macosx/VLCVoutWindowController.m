@@ -57,6 +57,8 @@
     VLCVoutView *o_vout_view;
     VLCVideoWindowCommon *o_new_video_window;
 
+    if (b_multiple_vout_windows && b_video_wallpaper)
+        b_video_wallpaper = false;
 
     // TODO: make lion fullscreen compatible with video-wallpaper and !embedded-video
     if ((b_video_wallpaper || !b_video_deco) && !b_nativeFullscreenMode) {
