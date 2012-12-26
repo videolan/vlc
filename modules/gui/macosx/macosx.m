@@ -116,6 +116,9 @@ void WindowClose  (vout_window_t *);
 #define PLAYMODEBUTTONS_TEXT N_("Show play mode control buttons")
 #define PLAYMODEBUTTONS_LONGTEXT N_("Shows the shuffle and repeat buttons in the main window")
 
+#define SIDEBAR_TEXT N_("Show sidebar")
+#define SIDEBAR_LONGTEXT N_("Shows a sidebar in the main window listing media sources")
+
 vlc_module_begin ()
     set_description(N_("Mac OS X interface"))
     set_capability("interface", 200)
@@ -141,6 +144,7 @@ vlc_module_begin ()
     add_bool("macosx-icon-change", true, ICONCHANGE_TEXT, ICONCHANGE_LONGTEXT, true)
     add_bool("macosx-show-playback-buttons", false, JUMPBUTTONS_TEXT, JUMPBUTTONS_LONGTEXT, false)
     add_bool("macosx-show-playmode-buttons", true, PLAYMODEBUTTONS_TEXT, PLAYMODEBUTTONS_LONGTEXT, false)
+    add_bool("macosx-show-sidebar", true, SIDEBAR_TEXT, SIDEBAR_LONGTEXT, false)
 
     add_submodule ()
         set_description("Mac OS X Video Output Provider")

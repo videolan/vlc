@@ -370,8 +370,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(someWindowWillClose:) name: NSWindowWillCloseNotification object: nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(someWindowWillMiniaturize:) name: NSWindowWillMiniaturizeNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mainSplitViewWillResizeSubviews:) name:NSSplitViewWillResizeSubviewsNotification object:o_split_view];
 
-    [o_split_view setAutosaveName:@"10thanniversary-splitview"];
     if (b_splitviewShouldBeHidden) {
         [self hideSplitView];
         i_lastSplitViewHeight = 300;
@@ -385,13 +385,19 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self resizeWindow];
     }
 
-    // update fs button to reflect state for next startup
-    if (var_InheritBool(pl_Get(VLCIntf), "fullscreen")) {
+    /* update fs button to reflect state for next startup */
+    if (var_InheritBool(pl_Get(VLCIntf), "fullscreen"))
         [o_controls_bar setFullscreenState:YES];
-    }
+
+    /* restore split view */
+    i_lastLeftSplitViewWidth = 200;
+    /* trick NSSplitView implementation, which pretends to know better than us */
+    if (!config_GetInt(VLCIntf, "macosx-show-sidebar"))
+        [self performSelector:@selector(toggleLeftSubSplitView) withObject:nil afterDelay:0.05];
 }
 
 #pragma mark -
+#pragma mark appearance management
 
 - (VLCMainWindowControlsBar *)controlsBar;
 {
@@ -518,6 +524,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
+    config_PutInt(VLCIntf, "macosx-show-sidebar", ![o_split_view isSubviewCollapsed:o_left_split_view]);
+
     [self saveFrameUsingName: [self frameAutosaveName]];
 }
 
@@ -957,6 +965,22 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if ([subview isEqual:o_left_split_view])
         return NO;
     return YES;
+}
+
+- (void)mainSplitViewWillResizeSubviews:(id)object
+{
+    i_lastLeftSplitViewWidth = [o_left_split_view frame].size.width;
+    config_PutInt(VLCIntf, "macosx-show-sidebar", ![o_split_view isSubviewCollapsed:o_left_split_view]);
+    [[[VLCMain sharedInstance] mainMenu] updateSidebarMenuItem];
+}
+
+- (void)toggleLeftSubSplitView
+{
+    [o_split_view adjustSubviews];
+    if ([o_split_view isSubviewCollapsed:o_left_split_view])
+        [o_split_view setPosition:i_lastLeftSplitViewWidth ofDividerAtIndex:0];
+    else
+        [o_split_view setPosition:[o_split_view minPossiblePositionOfDividerAtIndex:0] ofDividerAtIndex:0];
 }
 
 #pragma mark -

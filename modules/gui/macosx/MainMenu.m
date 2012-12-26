@@ -302,6 +302,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_toggleJumpButtons setState: config_GetInt(VLCIntf, "macosx-show-playback-buttons")];
     [o_mi_togglePlaymodeButtons setTitle: _NS("Show Shuffle & Repeat Buttons")];
     [o_mi_togglePlaymodeButtons setState: config_GetInt(VLCIntf, "macosx-show-playmode-buttons")];
+    [o_mi_toggleSidebar setTitle: _NS("Show Sidebar")];
+    [o_mi_toggleSidebar setState: config_GetInt(VLCIntf, "macosx-show-sidebar")];
     [o_mu_playlistTableColumns setTitle: _NS("Playlist Table Columns")];
 
     [o_mu_controls setTitle: _NS("Playback")];
@@ -645,6 +647,19 @@ static VLCMainMenu *_o_sharedInstance = nil;
     config_PutInt(VLCIntf, "macosx-show-playmode-buttons", b_value);
     [[[[VLCMain sharedInstance] mainWindow] controlsBar] togglePlaymodeButtons];
     [o_mi_togglePlaymodeButtons setState: b_value];
+}
+
+- (IBAction)toggleSidebar:(id)sender
+{
+    BOOL b_value = !config_GetInt(VLCIntf, "macosx-show-sidebar");
+    config_PutInt(VLCIntf, "macosx-show-sidebar", b_value);
+    [[[VLCMain sharedInstance] mainWindow] toggleLeftSubSplitView];
+    [o_mi_toggleSidebar setState: b_value];
+}
+
+- (void)updateSidebarMenuItem
+{
+    [o_mi_toggleSidebar setState: config_GetInt(VLCIntf, "macosx-show-sidebar")];
 }
 
 - (IBAction)togglePlaylistColumnTable:(id)sender

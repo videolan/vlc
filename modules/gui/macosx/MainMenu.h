@@ -80,6 +80,7 @@
     IBOutlet NSMenu * o_mu_view;
     IBOutlet NSMenuItem * o_mi_toggleJumpButtons;
     IBOutlet NSMenuItem * o_mi_togglePlaymodeButtons;
+    IBOutlet NSMenuItem * o_mi_toggleSidebar;
     IBOutlet NSMenu * o_mu_playlistTableColumns;
     NSMenu * o_mu_playlistTableColumnsContextMenu;
 
@@ -215,6 +216,7 @@
 - (void)setSubmenusEnabled:(BOOL)b_enabled;
 - (void)setRateControlsEnabled:(BOOL)b_enabled;
 - (void)setupExtensionsMenu;
+- (void)updateSidebarMenuItem;
 
 - (IBAction)intfOpenFile:(id)sender;
 - (IBAction)intfOpenFileGeneric:(id)sender;
@@ -224,6 +226,7 @@
 
 - (IBAction)toggleJumpButtons:(id)sender;
 - (IBAction)togglePlaymodeButtons:(id)sender;
+- (IBAction)toggleSidebar:(id)sender;
 - (IBAction)togglePlaylistColumnTable:(id)sender;
 - (void)setPlaylistColumnTableState:(NSInteger)i_state forColumn:(NSString *)o_column;
 - (NSMenu *)setupPlaylistTableColumnsMenu;

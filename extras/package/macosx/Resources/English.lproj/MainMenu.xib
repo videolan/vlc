@@ -21,10 +21,11 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="5132"/>
-      <integer value="5260"/>
       <integer value="2730"/>
       <integer value="4850"/>
+      <integer value="5238"/>
+      <integer value="5260"/>
+      <integer value="2"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -57,7 +58,7 @@
         <nil key="NSUserInterfaceItemIdentifier"/>
         <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <object class="NSView" key="NSWindowView" id="429932428">
-          <nil key="NSNextResponder"/>
+          <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -193,6 +194,7 @@
                           </object>
                           <string key="NSFrame">{{1, 1}, {199, 272}}</string>
                           <reference key="NSSuperview" ref="979766179"/>
+                          <reference key="NSNextKeyView" ref="1064884668"/>
                           <reference key="NSDocView" ref="1064884668"/>
                           <reference key="NSBGColor" ref="885475112"/>
                           <int key="NScvFlags">4</int>
@@ -219,6 +221,7 @@
                       </object>
                       <string key="NSFrameSize">{201, 274}</string>
                       <reference key="NSSuperview" ref="824340487"/>
+                      <reference key="NSNextKeyView" ref="18556274"/>
                       <int key="NSsFlags">133650</int>
                       <reference key="NSVScroller" ref="252983915"/>
                       <reference key="NSHScroller" ref="11557666"/>
@@ -441,6 +444,7 @@
                           </object>
                           <string key="NSFrame">{{1, 17}, {402, 236}}</string>
                           <reference key="NSSuperview" ref="915491793"/>
+                          <reference key="NSNextKeyView" ref="23448837"/>
                           <reference key="NSDocView" ref="23448837"/>
                           <reference key="NSBGColor" ref="885475112"/>
                           <int key="NScvFlags">4</int>
@@ -473,6 +477,7 @@
                           </object>
                           <string key="NSFrame">{{1, 0}, {402, 17}}</string>
                           <reference key="NSSuperview" ref="915491793"/>
+                          <reference key="NSNextKeyView" ref="823165105"/>
                           <reference key="NSDocView" ref="823165105"/>
                           <reference key="NSBGColor" ref="885475112"/>
                           <int key="NScvFlags">4</int>
@@ -480,6 +485,7 @@
                       </object>
                       <string key="NSFrameSize">{404, 254}</string>
                       <reference key="NSSuperview" ref="440594360"/>
+                      <reference key="NSNextKeyView" ref="343242432"/>
                       <int key="NSsFlags">133682</int>
                       <reference key="NSVScroller" ref="573737110"/>
                       <reference key="NSHScroller" ref="297523533"/>
@@ -1027,6 +1033,7 @@
             </object>
           </object>
           <string key="NSFrameSize">{604, 310}</string>
+          <reference key="NSSuperview"/>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
@@ -1615,6 +1622,14 @@
                 <object class="NSMenuItem" id="80917102">
                   <reference key="NSMenu" ref="815243229"/>
                   <string key="NSTitle">Show Shuffle &amp; Repeat Buttons</string>
+                  <string key="NSKeyEquiv"/>
+                  <int key="NSMnemonicLoc">2147483647</int>
+                  <reference key="NSOnImage" ref="447396056"/>
+                  <reference key="NSMixedImage" ref="100133332"/>
+                </object>
+                <object class="NSMenuItem" id="35710136">
+                  <reference key="NSMenu" ref="815243229"/>
+                  <string key="NSTitle">Show Sidebar</string>
                   <string key="NSKeyEquiv"/>
                   <int key="NSMnemonicLoc">2147483647</int>
                   <reference key="NSOnImage" ref="447396056"/>
@@ -7938,6 +7953,22 @@ LCAuLi4</string>
           </object>
           <int key="connectionID">5412</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_toggleSidebar</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="35710136"/>
+          </object>
+          <int key="connectionID">5415</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">toggleSidebar:</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="35710136"/>
+          </object>
+          <int key="connectionID">5416</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -10682,6 +10713,7 @@ LCAuLi4</string>
               <reference ref="709859089"/>
               <reference ref="710935977"/>
               <reference ref="338106467"/>
+              <reference ref="35710136"/>
             </object>
             <reference key="parent" ref="939296045"/>
           </object>
@@ -11040,6 +11072,11 @@ LCAuLi4</string>
             <int key="objectID">5409</int>
             <reference key="object" ref="634067619"/>
             <reference key="parent" ref="1056513052"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5413</int>
+            <reference key="object" ref="35710136"/>
+            <reference key="parent" ref="815243229"/>
           </object>
         </object>
       </object>
@@ -11856,6 +11893,7 @@ LCAuLi4</string>
           <string>5335.IBViewBoundsToFrameTransform</string>
           <string>5339.IBPluginDependency</string>
           <string>5409.IBPluginDependency</string>
+          <string>5413.IBPluginDependency</string>
           <string>56.IBPluginDependency</string>
           <string>56.ImportedFromIB2</string>
           <string>57.IBEditorWindowLastContentRect</string>
@@ -12249,7 +12287,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{762, 736}, {518, 20}}</string>
+          <string>{{487, 663}, {518, 20}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12714,7 +12752,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{616, 901}, {260, 73}}</string>
+          <string>{{631, 570}, {260, 93}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12828,6 +12866,7 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>{{329, 186}, {267, 263}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12884,7 +12923,7 @@ LCAuLi4</string>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">5412</int>
+      <int key="maxID">5416</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -15970,6 +16009,7 @@ LCAuLi4</string>
               <string>togglePlaylistColumnTable:</string>
               <string>togglePlaymodeButtons:</string>
               <string>toggleRecord:</string>
+              <string>toggleSidebar:</string>
               <string>toggleVar:</string>
               <string>viewAbout:</string>
               <string>viewErrorsAndWarnings:</string>
@@ -15978,6 +16018,7 @@ LCAuLi4</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -16047,6 +16088,7 @@ LCAuLi4</string>
               <string>togglePlaylistColumnTable:</string>
               <string>togglePlaymodeButtons:</string>
               <string>toggleRecord:</string>
+              <string>toggleSidebar:</string>
               <string>toggleVar:</string>
               <string>viewAbout:</string>
               <string>viewErrorsAndWarnings:</string>
@@ -16169,6 +16211,10 @@ LCAuLi4</string>
               </object>
               <object class="IBActionInfo">
                 <string key="name">toggleRecord:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">toggleSidebar:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
@@ -16299,6 +16345,7 @@ LCAuLi4</string>
               <string>o_mi_title</string>
               <string>o_mi_toggleJumpButtons</string>
               <string>o_mi_togglePlaymodeButtons</string>
+              <string>o_mi_toggleSidebar</string>
               <string>o_mi_trackSynchronization</string>
               <string>o_mi_videoeffects</string>
               <string>o_mi_videotrack</string>
@@ -16429,6 +16476,7 @@ LCAuLi4</string>
               <string>id</string>
               <string>id</string>
               <string>NSView</string>
+              <string>NSMenuItem</string>
               <string>NSMenuItem</string>
               <string>NSMenuItem</string>
               <string>NSMenuItem</string>
@@ -16602,6 +16650,7 @@ LCAuLi4</string>
               <string>o_mi_title</string>
               <string>o_mi_toggleJumpButtons</string>
               <string>o_mi_togglePlaymodeButtons</string>
+              <string>o_mi_toggleSidebar</string>
               <string>o_mi_trackSynchronization</string>
               <string>o_mi_videoeffects</string>
               <string>o_mi_videotrack</string>
@@ -17056,6 +17105,10 @@ LCAuLi4</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_mi_togglePlaymodeButtons</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_toggleSidebar</string>
                 <string key="candidateClassName">NSMenuItem</string>
               </object>
               <object class="IBToOneOutletInfo">

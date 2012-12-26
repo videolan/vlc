@@ -44,7 +44,7 @@
 @interface VLCMainWindow : VLCVideoWindowCommon <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate> {
 
     IBOutlet id o_search_fld;
-    
+
     IBOutlet id o_playlist_table;
     IBOutlet id o_split_view;
     IBOutlet id o_left_split_view;
@@ -82,7 +82,8 @@
     BOOL b_splitview_removed;
     BOOL b_minimized_view;
 
-    int i_lastSplitViewHeight;
+    NSUInteger i_lastSplitViewHeight;
+    NSUInteger i_lastLeftSplitViewWidth;
 
     NSMutableArray *o_sidebaritems;
 
@@ -120,6 +121,7 @@
 
 - (void)windowResizedOrMoved:(NSNotification *)notification;
 
+- (void)toggleLeftSubSplitView;
 - (void)showDropZone;
 - (void)hideDropZone;
 - (void)showSplitView;
