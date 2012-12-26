@@ -154,7 +154,7 @@ private:
     float controlVars[5];
     float oldControlVars[5];
 
-    QCheckBox *enableCheck;
+    QGroupBox *spatializerBox;
 
     void delCallbacks( vlc_object_t * );
     void addCallbacks( vlc_object_t * );
@@ -163,7 +163,6 @@ private:
     void setValues();
 
 private slots:
-    void enable(bool);
     void enable();
     void setInitValues();
 };

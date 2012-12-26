@@ -1396,11 +1396,13 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
     QFont smallFont = QApplication::font();
     smallFont.setPointSize( smallFont.pointSize() - 1 );
 
-    QGridLayout *layout = new QGridLayout( this );
+    QVBoxLayout *layout = new QVBoxLayout( this );
 
-    enableCheck = new QCheckBox( qtr( "Enable spatializer" ) );
-    layout->addWidget( enableCheck, 0, 0, 1, NUM_SP_CTRL );
+    spatializerBox = new QGroupBox( qtr( "Enable spatializer" ) );
+    spatializerBox->setCheckable( true );
+    layout->addWidget( spatializerBox );
 
+    QGridLayout *ctrlLayout = new QGridLayout( spatializerBox );
     for( int i = 0 ; i < NUM_SP_CTRL ; i++ )
     {
         spatCtrl[i] = new QSlider( Qt::Vertical );
@@ -1413,17 +1415,15 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
         ctrl_readout[i] = new QLabel;
         ctrl_readout[i]->setFont( smallFont );
 
-        layout->addWidget( spatCtrl[i],     1, i, Qt::AlignHCenter );
-        layout->addWidget( ctrl_readout[i], 2, i, Qt::AlignHCenter );
-        layout->addWidget( ctrl_texts[i],   3, i, Qt::AlignHCenter );
+        ctrlLayout->addWidget( spatCtrl[i],     0, i, Qt::AlignHCenter );
+        ctrlLayout->addWidget( ctrl_readout[i], 1, i, Qt::AlignHCenter );
+        ctrlLayout->addWidget( ctrl_texts[i],   2, i, Qt::AlignHCenter );
         spatCtrl[i]->setRange( 0, 10 );
     }
     spatCtrl[0]->setRange( 0, 11 );
 
     for( int i = 0; i < NUM_SP_CTRL; i++ )
         CONNECT( spatCtrl[i], valueChanged( int ), this, setInitValues() );
-
-    BUTTONACT( enableCheck, enable() );
 
     /* Write down initial values */
     vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
@@ -1447,28 +1447,19 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
         }
     }
     if( psz_af && strstr( psz_af, "spatializer" ) != NULL )
-        enableCheck->setChecked( true );
+        spatializerBox->setChecked( true );
+    else
+        spatializerBox->setChecked( false );
+
     free( psz_af );
-    enable( enableCheck->isChecked() );
     setValues();
 }
 
 void Spatializer::enable()
 {
-    bool en = enableCheck->isChecked();
-    playlist_EnableAudioFilter( THEPL, "spatializer", en );
-    enable( en );
+    playlist_EnableAudioFilter( THEPL, "spatializer", spatializerBox->isChecked() );
 }
 
-void Spatializer::enable( bool en )
-{
-    for( int i = 0 ; i< NUM_SP_CTRL; i++ )
-    {
-        spatCtrl[i]->setEnabled( en );
-        ctrl_texts[i]->setEnabled( en );
-        ctrl_readout[i]->setEnabled( en );
-    }
-}
 void Spatializer::setInitValues()
 {
     setValues();
