@@ -53,6 +53,7 @@
 PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
                             QTreeWidget( _parent ), p_intf( _p_intf )
 {
+    b_show_only_loaded = false;
     /* General Qt options */
     setAlternatingRowColors( true );
     setHeaderHidden( true );
