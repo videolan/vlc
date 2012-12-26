@@ -419,9 +419,9 @@
     /* time slider */
     s_rc = [self frame];
     s_rc.origin.x = 15;
-    s_rc.origin.y = 55;
+    s_rc.origin.y = 45;
     s_rc.size.width = 518;
-    s_rc.size.height = 9;
+    s_rc.size.height = 13;
     o_fs_timeSlider = [[VLCFSTimeSlider alloc] initWithFrame: s_rc];
     [o_fs_timeSlider setMinValue:0];
     [o_fs_timeSlider setMaxValue:10000];
@@ -603,7 +603,7 @@
     addImage(o_vol_sld_img, 26, 23, NSCompositeSourceOver);
     addImage(o_vol_mute_img, 16, 18, NSCompositeSourceOver);
     addImage(o_vol_max_img, 124, 18, NSCompositeSourceOver);
-    addImage(o_time_sld_img, 15, 53, NSCompositeSourceOver);
+    addImage(o_time_sld_img, 15, 45, NSCompositeSourceOver);
 }
 
 @end
@@ -634,7 +634,7 @@
     [[NSGraphicsContext currentContext] restoreGraphicsState];
 
     NSRect knobRect = [[self cell] knobRectFlipped:NO];
-    knobRect.origin.y+=7.5;
+    knobRect.origin.y+=4;
     [[[NSColor blackColor] colorWithAlphaComponent:0.6] set];
     [self drawKnobInRect: knobRect];
 }
