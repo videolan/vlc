@@ -34,14 +34,6 @@
 #include <QTreeWidget>
 #include <QSet>
 
-enum
-{
-    TYPE_CATEGORY,
-    TYPE_CATSUBCAT,
-    TYPE_SUBCATEGORY,
-    TYPE_MODULE
-};
-
 class AdvPrefsPanel;
 class QLabel;
 class QVBoxLayout;
@@ -56,7 +48,14 @@ public:
     AdvPrefsPanel *panel;
     int i_object_id;
     int i_subcat_id;
-    int i_type;
+    enum prefsType
+    {
+        TYPE_CATEGORY,
+        TYPE_CATSUBCAT,
+        TYPE_SUBCATEGORY,
+        TYPE_MODULE
+    };
+    prefsType i_type;
     char *psz_name;
     bool b_loaded;
     QString name;
