@@ -39,7 +39,7 @@ class EbmlParser
     void Up( void );
     void Down( void );
     void Reset( demux_t *p_demux );
-    EbmlElement *Get( void );
+    EbmlElement *Get( int n_call = 0 );
     void        Keep( void );
     EbmlElement *UnGet( uint64 i_block_pos, uint64 i_cluster_pos );
 
@@ -49,16 +49,17 @@ class EbmlParser
     bool IsTopPresent( EbmlElement * ) const;
 
   private:
+    demux_t     *p_demux;
     EbmlStream  *m_es;
-    int         mi_level;
+    int          mi_level;
     EbmlElement *m_el[10];
     int64_t      mi_remain_size[10];
 
     EbmlElement *m_got;
 
-    int         mi_user_level;
-    bool        mb_keep;
-    bool        mb_dummy;
+    int          mi_user_level;
+    bool         mb_keep;
+    bool         mb_dummy;
 };
 
 /* This class works around a bug in KaxBlockVirtual implementation */
