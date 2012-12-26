@@ -43,7 +43,7 @@ class PrefsItemData : public QObject
     Q_OBJECT
 public:
     PrefsItemData();
-    virtual ~PrefsItemData() { free( psz_name ); };
+    virtual ~PrefsItemData() { free( psz_shortcut ); };
     bool contains( const QString &text, Qt::CaseSensitivity cs );
     AdvPrefsPanel *panel;
     int i_object_id;
@@ -56,7 +56,7 @@ public:
         TYPE_MODULE
     };
     prefsType i_type;
-    char *psz_name;
+    char *psz_shortcut;
     bool b_loaded;
     QString name;
     QString help;

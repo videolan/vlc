@@ -270,7 +270,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
 
         PrefsItemData *module_data = new PrefsItemData();
         module_data->i_type = PrefsItemData::TYPE_MODULE;
-        module_data->psz_name = strdup( module_get_object( p_module ) );
+        module_data->psz_shortcut = strdup( module_get_object( p_module ) );
         module_data->name = qtr( module_get_name( p_module, false ) );
         module_data->help.clear();
         const char *psz_help = module_get_help( p_module );
@@ -436,7 +436,7 @@ void PrefsTree::updateLoadedStatus( QTreeWidgetItem *item = NULL,
     {
         PrefsItemData *data = item->data( 0, Qt::UserRole )
                 .value<PrefsItemData *>();
-        data->b_loaded = loaded->contains( QString( data->psz_name ) );
+        data->b_loaded = loaded->contains( QString( data->psz_shortcut ) );
 
         for( int i = 0; i < item->childCount(); i++ )
             updateLoadedStatus( item->child( i ), loaded );
@@ -483,7 +483,7 @@ PrefsItemData::PrefsItemData()
     panel = NULL;
     i_object_id = 0;
     i_subcat_id = -1;
-    psz_name = NULL;
+    psz_shortcut = NULL;
     b_loaded = false;
 }
 
@@ -496,7 +496,7 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
     if( this->i_type == TYPE_CATEGORY )
         return false;
     else if( this->i_type == TYPE_MODULE )
-        p_module = module_find( this->psz_name );
+        p_module = module_find( this->psz_shortcut );
     else
     {
         p_module = module_get_main();
@@ -584,7 +584,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     if( data->i_type == PrefsItemData::TYPE_CATEGORY )
         return;
     else if( data->i_type == PrefsItemData::TYPE_MODULE )
-        p_module = module_find( data->psz_name );
+        p_module = module_find( data->psz_shortcut );
     else
     {
         p_module = module_get_main();
