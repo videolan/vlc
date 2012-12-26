@@ -158,7 +158,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 #endif
     t_hide_mouse_timer = nil;
     [self useOptimizedDrawing: YES];
-    
+
     [[o_search_fld cell] setPlaceholderString: _NS("Search")];
     [[o_search_fld cell] accessibilitySetOverrideValue:_NS("Enter a term to search the playlist. Results will be selected in the table.") forAttribute:NSAccessibilityDescriptionAttribute];
 
@@ -199,7 +199,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     b_dropzone_active = YES;
     [o_dropzone_view setFrame: [o_playlist_table frame]];
     [o_left_split_view setFrame: [o_sidebar_view frame]];
-    
+
     if (b_nativeFullscreenMode) {
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
     } else {
@@ -360,7 +360,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         o_color_backdrop = [[VLCColorView alloc] initWithFrame: [o_split_view frame]];
         [[self contentView] addSubview: o_color_backdrop positioned: NSWindowBelow relativeTo: o_split_view];
         [o_color_backdrop setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
-        
+
     } else {
         [o_video_view setFrame: [o_split_view frame]];
         [o_playlist_table setBorderType: NSNoBorder];
@@ -525,7 +525,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)someWindowWillClose:(NSNotification *)notification
 {
     id obj = [notification object];
-    
+
     if ([obj class] == [VLCVideoWindowCommon class] || [obj class] == [VLCDetachedVideoWindow class] || ([obj class] == [VLCMainWindow class] && !b_nonembedded)) {
         if ([[VLCMain sharedInstance] activeVideoPlayback])
             [[VLCCoreInteraction sharedInstance] stop];
@@ -878,6 +878,15 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [o_fspanel setVoutWasUpdated: self];
     [o_fspanel setActive: nil];
+
+    NSArray *subviews = [[self videoView] subviews];
+    NSUInteger count = [subviews count];
+
+    for (NSUInteger x = 0; x < count; x++) {
+        if ([[subviews objectAtIndex:x] respondsToSelector:@selector(reshape)])
+            [[subviews objectAtIndex:x] reshape];
+    }
+
 }
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
