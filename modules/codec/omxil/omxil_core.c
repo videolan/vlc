@@ -61,6 +61,7 @@ static const char *ppsz_dll_list[] =
     "libOMX_Core.so", /* TI OMAP IL core */
     "libOmxCore.so", /* Qualcomm IL core */
     "libomxil-bellagio.so",  /* Bellagio IL core */
+    "libnvomx.so", /* Tegra3 IL core */
 #endif
     0
 };
