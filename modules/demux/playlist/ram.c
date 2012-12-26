@@ -343,7 +343,7 @@ static int Demux( demux_t *p_demux )
             if( !EMPTY_STR( psz_copyright ) ) input_item_SetCopyright( p_input, psz_copyright );
             if( !EMPTY_STR( psz_album ) ) input_item_SetAlbum( p_input, psz_album );
             if( !EMPTY_STR( psz_genre ) ) input_item_SetGenre( p_input, psz_genre );
-            if( !EMPTY_STR( psz_year ) ) input_item_SetDate( p_input, psz_copyright );
+            if( !EMPTY_STR( psz_year ) ) input_item_SetDate( p_input, psz_year );
             if( !EMPTY_STR( psz_cdnum ) ) input_item_SetTrackNum( p_input, psz_cdnum );
             if( !EMPTY_STR( psz_comments ) ) input_item_SetDescription( p_input, psz_comments );
 
