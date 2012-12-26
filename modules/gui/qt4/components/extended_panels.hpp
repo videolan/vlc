@@ -135,12 +135,11 @@ private:
     void addCallbacks( vlc_object_t * );
 
     void updateSliders(float *);
-    void setValues();
 
 private slots:
     void enable(bool);
     void enable();
-    void setInitValues();
+    void setValues();
 };
 
 class Spatializer: public QWidget

@@ -1293,7 +1293,7 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent )
     }
 
     for( int i = 0; i < NUM_CP_CTRL; i++ )
-        CONNECT( compCtrl[i], valueChanged( int ), this, setInitValues() );
+        CONNECT( compCtrl[i], valueChanged( int ), this, setValues() );
 
     BUTTONACT( enableCheck, enable() );
 
@@ -1357,11 +1357,6 @@ void Compressor::updateSliders( float * p_controlVars )
                     (int)( p_controlVars[i] / comp_controls[i].f_resolution ) );
         }
     }
-}
-
-void Compressor::setInitValues()
-{
-    setValues();
 }
 
 void Compressor::setValues()
