@@ -160,11 +160,9 @@ private:
     void addCallbacks( vlc_object_t * );
     intf_thread_t *p_intf;
 
-    void setValues();
-
 private slots:
     void enable();
-    void setInitValues();
+    void setValues();
 };
 
 class SyncWidget : public QWidget

@@ -1423,7 +1423,7 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
     spatCtrl[0]->setRange( 0, 11 );
 
     for( int i = 0; i < NUM_SP_CTRL; i++ )
-        CONNECT( spatCtrl[i], valueChanged( int ), this, setInitValues() );
+        CONNECT( spatCtrl[i], valueChanged( int ), this, setValues() );
 
     /* Write down initial values */
     vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
@@ -1458,11 +1458,6 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
 void Spatializer::enable()
 {
     playlist_EnableAudioFilter( THEPL, "spatializer", spatializerBox->isChecked() );
-}
-
-void Spatializer::setInitValues()
-{
-    setValues();
 }
 
 void Spatializer::setValues()
