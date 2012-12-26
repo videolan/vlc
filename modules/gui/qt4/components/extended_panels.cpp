@@ -1258,11 +1258,12 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent )
     QFont smallFont = QApplication::font();
     smallFont.setPointSize( smallFont.pointSize() - 2 );
 
-    QGridLayout *layout = new QGridLayout( this );
+    QVBoxLayout *layout = new QVBoxLayout( this );
+    compressorBox = new QGroupBox( qtr( "Enable dynamic range compressor" ) );
+    compressorBox->setCheckable( true );
+    layout->addWidget( compressorBox );
 
-    enableCheck = new QCheckBox( qtr( "Enable dynamic range compressor" ) );
-    layout->addWidget( enableCheck, 0, 0, 1, NUM_CP_CTRL );
-
+    QGridLayout *ctrlLayout = new QGridLayout( compressorBox );
     for( int i = 0 ; i < NUM_CP_CTRL ; i++ )
     {
         const int i_min = (int)( comp_controls[i].f_min
@@ -1287,15 +1288,13 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent )
         ctrl_readout[i]->setFont( smallFont );
         ctrl_readout[i]->setAlignment( Qt::AlignHCenter );
 
-        layout->addWidget( compCtrl[i],     1, i, Qt::AlignHCenter );
-        layout->addWidget( ctrl_readout[i], 2, i, Qt::AlignHCenter );
-        layout->addWidget( ctrl_texts[i],   3, i, Qt::AlignHCenter );
+        ctrlLayout->addWidget( compCtrl[i],     0, i, Qt::AlignHCenter );
+        ctrlLayout->addWidget( ctrl_readout[i], 1, i, Qt::AlignHCenter );
+        ctrlLayout->addWidget( ctrl_texts[i],   2, i, Qt::AlignHCenter );
     }
 
     for( int i = 0; i < NUM_CP_CTRL; i++ )
         CONNECT( compCtrl[i], valueChanged( int ), this, setValues() );
-
-    BUTTONACT( enableCheck, enable() );
 
     /* Write down initial values */
     vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
@@ -1320,31 +1319,20 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent )
                                               comp_controls[i].psz_name );
         }
     }
+
     if( psz_af && strstr( psz_af, "compressor" ) != NULL )
-    {
-        enableCheck->setChecked( true );
-    }
+        compressorBox->setChecked( true );
+    else
+        compressorBox->setChecked( false );
+
     free( psz_af );
-    enable( enableCheck->isChecked() );
     updateSliders( controlVars );
     setValues();
 }
 
 void Compressor::enable()
 {
-    bool en = enableCheck->isChecked();
-    playlist_EnableAudioFilter( THEPL, "compressor", en );
-    enable( en );
-}
-
-void Compressor::enable( bool en )
-{
-    for( int i = 0 ; i < NUM_CP_CTRL ; i++ )
-    {
-        compCtrl[i]->setEnabled( en );
-        ctrl_texts[i]->setEnabled( en );
-        ctrl_readout[i]->setEnabled( en );
-    }
+    playlist_EnableAudioFilter( THEPL, "compressor", compressorBox->isChecked() );
 }
 
 void Compressor::updateSliders( float * p_controlVars )

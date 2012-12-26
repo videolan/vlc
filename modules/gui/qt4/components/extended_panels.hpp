@@ -127,7 +127,7 @@ private:
     float controlVars[NUM_CP_CTRL];
     float oldControlVars[NUM_CP_CTRL];
 
-    QCheckBox *enableCheck;
+    QGroupBox *compressorBox;
 
     intf_thread_t *p_intf;
 
@@ -137,7 +137,6 @@ private:
     void updateSliders(float *);
 
 private slots:
-    void enable(bool);
     void enable();
     void setValues();
 };
