@@ -891,12 +891,11 @@ bool MediaServer::_fetchContents( Container* p_parent, int i_offset )
 
                     if ( psz_duration )
                     {
-                        if( sscanf( psz_duration, "%02d:%02d:%02d.%d",
+                        if( sscanf( psz_duration, "%d:%02d:%02d",
                             &i_hours, &i_minutes, &i_seconds, &i_decis ))
                             i_duration = INT64_C(1000000) * ( i_hours*3600 +
                                                               i_minutes*60 +
-                                                              i_seconds ) +
-                                         INT64_C(100000) * i_decis;
+                                                              i_seconds );
                     }
                     Item* item = new Item( p_parent, objectID, title, psz_resource_url, i_duration );
                     p_parent->addItem( item );
