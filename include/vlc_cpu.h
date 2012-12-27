@@ -179,6 +179,9 @@ VLC_API unsigned vlc_CPU(void);
 # elif defined (__sparc__)
 #  define HAVE_FPU 1
 
+# elif defined (__mips_hard_float)
+#  define HAVE_FPU 1
+
 # else
 /**
  * Are single precision floating point operations "fast"?

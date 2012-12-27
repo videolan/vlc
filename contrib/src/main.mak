@@ -172,6 +172,8 @@ ifeq ($(call cppcheck, __SOFTFP__),)
 HAVE_FPU = 1
 endif
 endif
+else ifneq ($(call cppcheck, __mips_hard_float),)
+HAVE_FPU = 1
 endif
 
 ACLOCAL_AMFLAGS += -I$(PREFIX)/share/aclocal
