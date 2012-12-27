@@ -40,6 +40,13 @@
 @implementation VLCVideoEffects
 static VLCVideoEffects *_o_sharedInstance = nil;
 
+@synthesize cropLeftValue, cropTopValue, cropRightValue, cropBottomValue;
+@synthesize puzzleRowsValue, puzzleColumnsValue;
+@synthesize wallRowsValue, wallColumnsValue;
+@synthesize cloneValue;
+@synthesize sepiaValue;
+@synthesize posterizeValue;
+
 + (VLCVideoEffects *)sharedInstance
 {
     return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
@@ -328,23 +335,26 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_adjust_hue_lbl setEnabled: b_state];
     [o_adjust_saturation_lbl setEnabled: b_state];
     [o_adjust_reset_btn setEnabled: b_state];
+
     [o_sharpen_sld setFloatValue: config_GetFloat(p_intf, "sharpen-sigma")];
     [o_sharpen_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "sharpen-sigma")]];
     [o_sharpen_sld setEnabled: [o_sharpen_ckb state]];
     [o_sharpen_lbl setEnabled: [o_sharpen_ckb state]];
+
     [o_banding_sld setIntValue: config_GetInt(p_intf, "gradfun-radius")];
     [o_banding_sld setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "gradfun-radius")]];
     [o_banding_sld setEnabled: [o_banding_ckb state]];
     [o_banding_lbl setEnabled: [o_banding_ckb state]];
+
     [o_grain_sld setFloatValue: config_GetFloat(p_intf, "grain-variance")];
     [o_grain_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "grain-variance")]];
     [o_grain_sld setEnabled: [o_grain_ckb state]];
     [o_grain_lbl setEnabled: [o_grain_ckb state]];
 
-    [o_crop_top_fld setIntValue: 0];
-    [o_crop_left_fld setIntValue: 0];
-    [o_crop_right_fld setIntValue: 0];
-    [o_crop_bottom_fld setIntValue: 0];
+    [self setCropLeftValue: 0];
+    [self setCropTopValue: 0];
+    [self setCropRightValue: 0];
+    [self setCropBottomValue: 0];
     [o_crop_sync_top_bottom_ckb setState: NSOffState];
     [o_crop_sync_left_right_ckb setState: NSOffState];
 
@@ -358,38 +368,41 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         [o_transform_pop selectItemWithTag:[tmpString intValue]];
     FREENULL(tmpChar);
     [o_transform_pop setEnabled: [o_transform_ckb state]];
-    [o_puzzle_rows_fld setIntValue: config_GetInt(p_intf, "puzzle-rows")];
-    [o_puzzle_columns_fld setIntValue: config_GetInt(p_intf, "puzzle-cols")];
+
+    [self setPuzzleColumnsValue: config_GetInt(p_intf, "puzzle-cols")];
+    [self setPuzzleRowsValue: config_GetInt(p_intf, "puzzle-rows")];
     [o_puzzle_blackslot_ckb setState: config_GetInt(p_intf, "puzzle-black-slot")];
     b_state = [o_puzzle_ckb state];
     [o_puzzle_rows_fld setEnabled: b_state];
+    [o_puzzle_rows_stp setEnabled: b_state];
     [o_puzzle_rows_lbl setEnabled: b_state];
     [o_puzzle_columns_fld setEnabled: b_state];
+    [o_puzzle_columns_stp setEnabled: b_state];
     [o_puzzle_columns_lbl setEnabled: b_state];
     [o_puzzle_blackslot_ckb setEnabled: b_state];
     
-    [o_clone_number_fld setIntValue: config_GetInt(p_intf, "clone-count")];
+    [self setCloneValue: config_GetInt(p_intf, "clone-count")];
     b_state = [o_clone_ckb state];
     [o_clone_number_lbl setEnabled: b_state];
     [o_clone_number_fld setEnabled: b_state];
     [o_clone_number_stp setEnabled: b_state];
 
     b_state = [o_wall_ckb state];
-    [o_wall_numofrows_fld setIntValue: config_GetInt(p_intf, "wall-rows")];
+    [self setWallRowsValue: config_GetInt(p_intf, "wall-rows")];
     [o_wall_numofrows_lbl setEnabled: b_state];
     [o_wall_numofrows_fld setEnabled: b_state];
     [o_wall_numofrows_stp setEnabled: b_state];
-    [o_wall_numofcols_fld setIntValue: config_GetInt(p_intf, "wall-cols")];
+    [self setWallColumnsValue: config_GetInt(p_intf, "wall-cols")];
     [o_wall_numofcols_lbl setEnabled: b_state];
     [o_wall_numofcols_fld setEnabled: b_state];
     [o_wall_numofcols_stp setEnabled: b_state];
-    
 
     [o_threshold_color_fld setStringValue: [[NSString stringWithFormat:@"%llx", config_GetInt(p_intf, "colorthres-color")] uppercaseString]];
     [o_threshold_saturation_sld setIntValue: config_GetInt(p_intf, "colorthres-saturationthres")];
     [o_threshold_saturation_sld setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "colorthres-saturationthres")]];
     [o_threshold_similarity_sld setIntValue: config_GetInt(p_intf, "colorthres-similaritythres")];
     [o_threshold_similarity_sld setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "colorthres-similaritythres")]];
+    
     b_state = [o_threshold_ckb state];
     [o_threshold_color_fld setEnabled: b_state];
     [o_threshold_color_lbl setEnabled: b_state];
@@ -397,9 +410,13 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_threshold_saturation_lbl setEnabled: b_state];
     [o_threshold_similarity_sld setEnabled: b_state];
     [o_threshold_similarity_lbl setEnabled: b_state];
-    [o_sepia_fld setIntValue: config_GetInt(p_intf, "sepia-intensity")];
-    [o_sepia_fld setEnabled: [o_sepia_ckb state]];
-    [o_sepia_lbl setEnabled: [o_sepia_ckb state]];
+    
+    [self setSepiaValue: config_GetInt(p_intf, "sepia-intensity")];
+    b_state = [o_sepia_ckb state];
+    [o_sepia_fld setEnabled: b_state];
+    [o_sepia_stp setEnabled: b_state];
+    [o_sepia_lbl setEnabled: b_state];
+
     tmpChar = config_GetPsz(p_intf, "gradient-mode");
     tmpString = [NSString stringWithUTF8String: tmpChar];
     if ([tmpString isEqualToString:@"hough"])
@@ -416,12 +433,17 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_gradient_mode_lbl setEnabled: b_state];
     [o_gradient_cartoon_ckb setEnabled: b_state];
     [o_gradient_color_ckb setEnabled: b_state];
+
     [o_extract_fld setStringValue: [[NSString stringWithFormat:@"%llx", config_GetInt(p_intf, "extract-component")] uppercaseString]];
     [o_extract_fld setEnabled: [o_extract_ckb state]];
     [o_extract_lbl setEnabled: [o_extract_ckb state]];
-    [o_posterize_fld setIntValue: config_GetInt(p_intf, "posterize-level")];
-    [o_posterize_fld setEnabled: [o_posterize_ckb state]];
-    [o_posterize_lbl setEnabled: [o_posterize_ckb state]];
+
+    [self setPosterizeValue: config_GetInt(p_intf, "posterize-level")];
+    b_state = [o_posterize_ckb state];
+    [o_posterize_fld setEnabled: b_state];
+    [o_posterize_stp setEnabled: b_state];
+    [o_posterize_lbl setEnabled: b_state];
+    
     [o_blur_sld setIntValue: config_GetInt(p_intf, "blur-factor")];
     [o_blur_sld setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "blur-factor")]];
     [o_blur_sld setEnabled: [o_blur_ckb state]];
@@ -954,38 +976,19 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 #pragma mark -
 #pragma mark crop
 
-#define updateopposite(giver, taker) \
-    if (sender == giver) \
-        [taker setIntValue: [giver intValue]]
-
 - (IBAction)cropObjectChanged:(id)sender
 {
-    updateopposite(o_crop_top_fld, o_crop_top_stp);
-    updateopposite(o_crop_top_stp, o_crop_top_fld);
-    updateopposite(o_crop_left_fld, o_crop_left_stp);
-    updateopposite(o_crop_left_stp, o_crop_left_fld);
-    updateopposite(o_crop_right_fld, o_crop_right_stp);
-    updateopposite(o_crop_right_stp, o_crop_right_fld);
-    updateopposite(o_crop_bottom_fld, o_crop_bottom_stp);
-    updateopposite(o_crop_bottom_stp, o_crop_bottom_fld);
-
     if ([o_crop_sync_top_bottom_ckb state]) {
-        if (sender == o_crop_top_fld || sender == o_crop_top_stp) {
-            [o_crop_bottom_fld setIntValue: [o_crop_top_fld intValue]];
-            [o_crop_bottom_stp setIntValue: [o_crop_top_fld intValue]];
-        } else {
-            [o_crop_top_fld setIntValue: [o_crop_bottom_fld intValue]];
-            [o_crop_top_stp setIntValue: [o_crop_bottom_fld intValue]];
-        }
+        if (sender == o_crop_bottom_fld || sender == o_crop_bottom_stp)
+            [self setCropTopValue: [self cropBottomValue]];
+        else
+            [self setCropBottomValue: [self cropTopValue]];
     }
     if ([o_crop_sync_left_right_ckb state]) {
-        if (sender == o_crop_left_fld || sender == o_crop_left_stp) {
-            [o_crop_right_fld setIntValue: [o_crop_left_fld intValue]];
-            [o_crop_right_stp setIntValue: [o_crop_left_fld intValue]];
-        } else {
-            [o_crop_left_fld setIntValue: [o_crop_right_fld intValue]];
-            [o_crop_left_stp setIntValue: [o_crop_right_fld intValue]];
-        }
+        if (sender == o_crop_right_fld || sender == o_crop_right_stp)
+            [self setCropLeftValue: [self cropRightValue]];
+        else
+            [self setCropRightValue: [self cropLeftValue]];
     }
 
     vout_thread_t *p_vout = getVout();
@@ -997,8 +1000,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         vlc_object_release(p_vout);
     }
 }
-
-#undef updateopposite
 
 #pragma mark -
 #pragma mark geometry
@@ -1031,8 +1032,10 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
     [self setVideoFilter: "puzzle" on: b_state];
     [o_puzzle_columns_fld setEnabled: b_state];
+    [o_puzzle_columns_stp setEnabled: b_state];
     [o_puzzle_columns_lbl setEnabled: b_state];
     [o_puzzle_rows_fld setEnabled: b_state];
+    [o_puzzle_rows_stp setEnabled: b_state];
     [o_puzzle_rows_lbl setEnabled: b_state];
     [o_puzzle_blackslot_ckb setEnabled: b_state];
 }
@@ -1041,10 +1044,10 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 {
     if (sender == o_puzzle_blackslot_ckb)
         [self setVideoFilterProperty: "puzzle-black-slot" forFilter: "puzzle" boolean: [o_puzzle_blackslot_ckb state]];
-    else if (sender == o_puzzle_columns_fld)
-        [self setVideoFilterProperty: "puzzle-cols" forFilter: "puzzle" integer: [o_puzzle_columns_fld intValue]];
+    else if (sender == o_puzzle_columns_fld || sender == o_puzzle_columns_stp)
+        [self setVideoFilterProperty: "puzzle-cols" forFilter: "puzzle" integer: [sender intValue]];
     else
-        [self setVideoFilterProperty: "puzzle-rows" forFilter: "puzzle" integer: [o_puzzle_rows_fld intValue]];
+        [self setVideoFilterProperty: "puzzle-rows" forFilter: "puzzle" integer: [sender intValue]];
 }
 
 - (IBAction)enableClone:(id)sender
@@ -1088,8 +1091,10 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (IBAction)wallModifierChanged:(id)sender
 {
-    [self setVideoFilterProperty: "wall-cols" forFilter: "wall" integer: [o_wall_numofcols_fld intValue]];
-    [self setVideoFilterProperty: "wall-rows" forFilter: "wall" integer: [o_wall_numofrows_fld intValue]];
+    if (sender == o_wall_numofcols_fld || sender == o_wall_numofcols_stp)
+        [self setVideoFilterProperty: "wall-cols" forFilter: "wall" integer: [sender intValue]];
+    else
+        [self setVideoFilterProperty: "wall-rows" forFilter: "wall" integer: [sender intValue]];
 }
 
 #pragma mark -
@@ -1126,6 +1131,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
     [self setVideoFilter: "sepia" on: b_state];
     [o_sepia_fld setEnabled: b_state];
+    [o_sepia_stp setEnabled: b_state];
     [o_sepia_lbl setEnabled: b_state];
 }
 
@@ -1189,6 +1195,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
     [self setVideoFilter: "posterize" on: b_state];
     [o_posterize_fld setEnabled: b_state];
+    [o_posterize_stp setEnabled: b_state];
     [o_posterize_lbl setEnabled: b_state];
 }
 

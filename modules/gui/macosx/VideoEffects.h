@@ -78,8 +78,10 @@
     IBOutlet id o_puzzle_ckb;
     IBOutlet id o_puzzle_rows_lbl;
     IBOutlet id o_puzzle_rows_fld;
+    IBOutlet id o_puzzle_rows_stp;
     IBOutlet id o_puzzle_columns_lbl;
     IBOutlet id o_puzzle_columns_fld;
+    IBOutlet id o_puzzle_columns_stp;
     IBOutlet id o_puzzle_blackslot_ckb;
     IBOutlet id o_clone_ckb;
     IBOutlet id o_clone_number_fld;
@@ -104,6 +106,7 @@
     IBOutlet id o_sepia_ckb;
     IBOutlet id o_sepia_lbl;
     IBOutlet id o_sepia_fld;
+    IBOutlet id o_sepia_stp;
     IBOutlet id o_noise_ckb;
     IBOutlet id o_gradient_ckb;
     IBOutlet id o_gradient_mode_lbl;
@@ -117,6 +120,7 @@
     IBOutlet id o_posterize_ckb;
     IBOutlet id o_posterize_lbl;
     IBOutlet id o_posterize_fld;
+    IBOutlet id o_posterize_stp;
     IBOutlet id o_blur_ckb;
     IBOutlet id o_blur_sld;
     IBOutlet id o_blur_lbl;
@@ -207,4 +211,24 @@
 - (IBAction)enableAddLogo:(id)sender;
 - (IBAction)addLogoModifierChanged:(id)sender;
 - (IBAction)enableAnaglyph:(id)sender;
+
+/* text field / stepper binding values */
+/* use setter to modify gui elements */
+@property (nonatomic) int cropLeftValue;
+@property (nonatomic) int cropTopValue;
+@property (nonatomic) int cropRightValue;
+@property (nonatomic) int cropBottomValue;
+
+@property (nonatomic) int puzzleRowsValue;
+@property (nonatomic) int puzzleColumnsValue;
+
+@property (nonatomic) int wallRowsValue;
+@property (nonatomic) int wallColumnsValue;
+
+@property (nonatomic) int cloneValue;
+
+@property (nonatomic) int sepiaValue;
+
+@property (nonatomic) int posterizeValue;
+
 @end
