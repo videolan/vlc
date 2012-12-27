@@ -1079,9 +1079,6 @@ static char *Eia608Text( eia608_t *h, bool b_html )
         Eia608Strlcat( psz, "<text>", i_size );
     for( int i = 0; i < EIA608_SCREEN_ROWS; i++ )
     {
-        if( !screen->row_used[i] )
-            continue;
-
         if( !b_first )
             Eia608Strlcat( psz, b_html ? "<br />" : "\n", i_size );
         b_first = false;
