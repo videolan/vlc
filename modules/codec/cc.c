@@ -986,9 +986,9 @@ static void Eia608TextLine( struct eia608_screen *screen, char *psz_text, int i_
                     "#ff00ff",  // magenta
                     "#ffffff",  // user defined XXX we use white
                 };
-                CAT( "<font color=" );
+                CAT( "<font color=\"" );
                 CAT( ppsz_color[color] );
-                CAT( ">" );
+                CAT( "\">" );
             }
             if( ( b_close_italics && b_italics ) || ( b_italics && !b_last_italics ) )
                 CAT( "<i>" );
