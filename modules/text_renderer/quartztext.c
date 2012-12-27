@@ -106,6 +106,11 @@ static const int pi_color_values[] = {
   0x00FF0000, 0x00FF00FF, 0x00FFFF00, 0x00808000, 0x00008000, 0x00008080,
   0x0000FF00, 0x00800080, 0x00000080, 0x000000FF, 0x0000FFFF };
 
+static const char *const ppsz_color_names[] = {
+    "black", "gray", "silver", "white", "maroon",
+    "red", "fuchsia", "yellow", "olive", "green",
+    "teal", "lime", "purple", "navy", "blue", "aqua" };
+
 static const char *const ppsz_color_descriptions[] = {
   N_("Black"), N_("Gray"), N_("Silver"), N_("White"), N_("Maroon"),
   N_("Red"), N_("Fuchsia"), N_("Yellow"), N_("Olive"), N_("Green"), N_("Teal"),
@@ -310,6 +315,7 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
     bool          b_bold, b_uline, b_italic;
     vlc_value_t val;
     b_bold = b_uline = b_italic = FALSE;
+    VLC_UNUSED(p_chroma_list);
 
     p_sys->i_font_size    = GetFontSize(p_filter);
 
@@ -492,9 +498,20 @@ static int HandleFontAttributes(xml_reader_t *p_xml_reader,
             }
             else
                 i_font_size = atoi(value);
-        } else if (!strcasecmp("color", attr)  && (value[0] == '#')) {
-            i_font_color = strtol(value + 1, NULL, 16);
-            i_font_color &= 0x00ffffff;
+        } else if (!strcasecmp("color", attr)) {
+            if (value[0] == '#') {
+                i_font_color = strtol(value + 1, NULL, 16);
+                i_font_color &= 0x00ffffff;
+            } else {
+                /* color detection fallback */
+                unsigned int count = sizeof(ppsz_color_names);
+                for (unsigned x = 0; x < count; x++) {
+                    if (!strcmp(value, ppsz_color_names[x])) {
+                        i_font_color = pi_color_values[x];
+                        break;
+                    }
+                }
+            }
         } else if (!strcasecmp("alpha", attr) && (value[0] == '#')) {
             i_font_alpha = strtol(value + 1, NULL, 16);
             i_font_alpha &= 0xff;
@@ -740,6 +757,7 @@ static int RenderHtml(filter_t *p_filter, subpicture_region_t *p_region_out,
     stream_t     *p_sub = NULL;
     xml_t        *p_xml = NULL;
     xml_reader_t *p_xml_reader = NULL;
+    VLC_UNUSED(p_chroma_list);
 
     if (!p_region_in || !p_region_in->psz_html)
         return VLC_EGENERIC;
