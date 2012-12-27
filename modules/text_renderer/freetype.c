@@ -1090,6 +1090,8 @@ static inline int RenderAXYZ( filter_t *p_filter,
                 /* Left offset to take into account alignment */
                 if( (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT )
                     i_align_left += ( i_text_width - p_line->i_width );
+		else if( (p_region->i_align & 0x10) == SUBPICTURE_ALIGN_LEAVETEXT)
+                    i_align_left = i_margin; /* Keep it the way it is */
                 else if( (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT )
                     i_align_left += ( i_text_width - p_line->i_width ) / 2;
             }

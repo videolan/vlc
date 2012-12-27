@@ -327,7 +327,9 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
 
     subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
 
-    p_spu_sys->align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
+    /* The "leavetext" alignment is a special mode where the subpicture
+       region itself gets aligned, but the text inside it does not */
+    p_spu_sys->align = SUBPICTURE_ALIGN_LEAVETEXT;
     p_spu_sys->text  = psz_subtitle;
     p_spu_sys->html  = psz_html;
     p_spu_sys->i_font_height_percent = 5;

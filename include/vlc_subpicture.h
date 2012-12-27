@@ -77,9 +77,10 @@ struct subpicture_region_t
 #define SUBPICTURE_ALIGN_RIGHT 0x2
 #define SUBPICTURE_ALIGN_TOP 0x4
 #define SUBPICTURE_ALIGN_BOTTOM 0x8
+#define SUBPICTURE_ALIGN_LEAVETEXT 0x10 /**< Align the subpicture, but not the text inside */
 #define SUBPICTURE_ALIGN_MASK ( SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_RIGHT| \
-                                SUBPICTURE_ALIGN_TOP |SUBPICTURE_ALIGN_BOTTOM )
-
+                                SUBPICTURE_ALIGN_TOP |SUBPICTURE_ALIGN_BOTTOM| \
+                                SUBPICTURE_ALIGN_LEAVETEXT )
 /**
  * This function will create a new subpicture region.
  *
