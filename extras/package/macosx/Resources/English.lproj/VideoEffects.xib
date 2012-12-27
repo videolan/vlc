@@ -21,7 +21,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="1"/>
+      <integer value="124"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1500,6 +1500,7 @@
                                         <string>allowsFloats</string>
                                         <string>formatterBehavior</string>
                                         <string>locale</string>
+                                        <string>maximum</string>
                                         <string>minimum</string>
                                         <string>negativeFormat</string>
                                         <string>negativeInfinitySymbol</string>
@@ -1514,7 +1515,8 @@
                                         <boolean value="NO"/>
                                         <integer value="1040"/>
                                         <reference ref="1015810800"/>
-                                        <real value="1"/>
+                                        <real value="16"/>
+                                        <real value="2"/>
                                         <string>0</string>
                                         <string>-∞</string>
                                         <string/>
@@ -1536,8 +1538,8 @@
                                       <string key="NSString">NaN</string>
                                       <reference key="NSAttributes" ref="639313226"/>
                                     </object>
-                                    <real value="1" key="NS.min"/>
-                                    <reference key="NS.max" ref="1005529056"/>
+                                    <real value="2" key="NS.min"/>
+                                    <real value="16" key="NS.max"/>
                                     <object class="NSDecimalNumberHandler" key="NS.rounding">
                                       <int key="NS.roundingmode">1</int>
                                       <bool key="NS.raise.overflow">YES</bool>
@@ -1569,8 +1571,8 @@
                                   <reference key="NSSupport" ref="26"/>
                                   <reference key="NSControlView" ref="444599762"/>
                                   <double key="NSValue">4</double>
-                                  <double key="NSMinValue">1</double>
-                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSMinValue">2</double>
+                                  <double key="NSMaxValue">16</double>
                                   <double key="NSIncrement">1</double>
                                   <bool key="NSAutorepeat">YES</bool>
                                 </object>
@@ -1613,6 +1615,7 @@
                                         <string>allowsFloats</string>
                                         <string>formatterBehavior</string>
                                         <string>locale</string>
+                                        <string>maximum</string>
                                         <string>minimum</string>
                                         <string>negativeFormat</string>
                                         <string>negativeInfinitySymbol</string>
@@ -1626,7 +1629,8 @@
                                         <boolean value="NO"/>
                                         <integer value="1040"/>
                                         <reference ref="1015810800"/>
-                                        <real value="1"/>
+                                        <real value="16"/>
+                                        <real value="2"/>
                                         <string>0</string>
                                         <string>-∞</string>
                                         <string/>
@@ -1647,8 +1651,8 @@
                                       <string key="NSString">NaN</string>
                                       <reference key="NSAttributes" ref="639313226"/>
                                     </object>
-                                    <real value="1" key="NS.min"/>
-                                    <reference key="NS.max" ref="1005529056"/>
+                                    <real value="2" key="NS.min"/>
+                                    <real value="16" key="NS.max"/>
                                     <object class="NSDecimalNumberHandler" key="NS.rounding">
                                       <int key="NS.roundingmode">3</int>
                                       <bool key="NS.raise.overflow">YES</bool>
@@ -1680,8 +1684,8 @@
                                   <reference key="NSSupport" ref="26"/>
                                   <reference key="NSControlView" ref="814287388"/>
                                   <double key="NSValue">4</double>
-                                  <double key="NSMinValue">1</double>
-                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSMinValue">2</double>
+                                  <double key="NSMaxValue">16</double>
                                   <double key="NSIncrement">1</double>
                                   <bool key="NSAutorepeat">YES</bool>
                                 </object>
@@ -3823,7 +3827,7 @@
       <object class="NSCustomObject" id="707254443">
         <string key="NSClassName">VLCVideoEffects</string>
       </object>
-      <object class="NSUserDefaultsController" id="165610035">
+      <object class="NSUserDefaultsController" id="749350358">
         <bool key="NSSharedInstance">YES</bool>
       </object>
     </object>
@@ -7729,7 +7733,7 @@
           </object>
           <object class="IBObjectRecord">
             <int key="objectID">800</int>
-            <reference key="object" ref="165610035"/>
+            <reference key="object" ref="749350358"/>
             <reference key="parent" ref="0"/>
           </object>
         </object>
