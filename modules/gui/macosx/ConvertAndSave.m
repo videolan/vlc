@@ -496,8 +496,6 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         [_stream_rtsp_ckb setEnabled:YES];
         [_stream_http_ckb setEnabled:YES];
         [_stream_sdp_ckb setEnabled:YES];
-        [_stream_channel_fld setEnabled:YES];
-        [_stream_sdp_fld setEnabled:[_stream_sdp_ckb state]];
     } else { // UDP
         [_stream_ttl_fld setEnabled:YES];
         [_stream_ttl_stepper setEnabled:YES];
@@ -505,12 +503,13 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         [_stream_rtsp_ckb setEnabled:NO];
         [_stream_http_ckb setEnabled:NO];
         [_stream_sdp_ckb setEnabled:NO];
-        [_stream_channel_fld setEnabled:YES];
     }
+    [self streamAnnouncementToggle:sender];
 }
 
 - (IBAction)streamAnnouncementToggle:(id)sender
 {
+    [_stream_channel_fld setEnabled:([_stream_http_ckb state] || [_stream_rtsp_ckb state] || [_stream_sap_ckb state]) && ([_stream_http_ckb isEnabled] || [_stream_rtsp_ckb isEnabled] || [_stream_sap_ckb isEnabled])];
     [_stream_sdp_fld setEnabled:[_stream_sdp_ckb state]];
 }
 
