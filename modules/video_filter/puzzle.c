@@ -355,9 +355,9 @@ static int PuzzleCallback( vlc_object_t *p_this, char const *psz_var,
     filter_sys_t *p_sys = p_data;
 
     if( !strcmp( psz_var, CFG_PREFIX "rows" ) )
-        atomic_store( &p_sys->change.i_rows, __MAX( 1, newval.i_int ) );
+        atomic_store( &p_sys->change.i_rows, __MAX( 2, newval.i_int ) );
     else if( !strcmp( psz_var, CFG_PREFIX "cols" ) )
-        atomic_store( &p_sys->change.i_cols, __MAX( 1, newval.i_int ) );
+        atomic_store( &p_sys->change.i_cols, __MAX( 2, newval.i_int ) );
     else if( !strcmp( psz_var, CFG_PREFIX "black-slot" ) )
         atomic_store( &p_sys->change.b_blackslot, newval.b_bool );
     atomic_flag_clear( &p_sys->change.b_uptodate );
