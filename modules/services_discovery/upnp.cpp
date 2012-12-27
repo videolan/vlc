@@ -882,7 +882,7 @@ bool MediaServer::_fetchContents( Container* p_parent, int i_offset )
                 for ( int i = 0; i < i_length; i++ )
                 {
                     mtime_t i_duration = -1;
-                    int i_hours, i_minutes, i_seconds, i_decis;
+                    int i_hours, i_minutes, i_seconds;
                     IXML_Element* p_resource = ( IXML_Element* ) ixmlNodeList_item( p_resource_list, i );
                     const char* psz_resource_url = xml_getChildElementValue( p_resource, "res" );
                     if( !psz_resource_url )
