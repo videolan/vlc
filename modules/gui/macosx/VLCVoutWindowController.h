@@ -33,6 +33,8 @@
 @interface VLCVoutWindowController : NSObject
 {
     NSMutableDictionary *o_vout_dict;
+
+    NSPoint top_left_point;
 }
 
 - (VLCVoutView *)setupVoutForWindow:(vout_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition;

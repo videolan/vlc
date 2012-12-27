@@ -37,8 +37,8 @@
       <object class="NSWindowTemplate" id="951447013">
         <int key="NSWindowStyleMask">15</int>
         <int key="NSWindowBacking">2</int>
-        <string key="NSWindowRect">{{131, 97}, {363, 239}}</string>
-        <int key="NSWTFlags">1954022400</int>
+        <string key="NSWindowRect">{{91, 467}, {363, 239}}</string>
+        <int key="NSWTFlags">1948779520</int>
         <string key="NSWindowTitle">VLC media player</string>
         <string key="NSWindowClass">VLCDetachedVideoWindow</string>
         <nil key="NSViewClass"/>
@@ -331,7 +331,7 @@
           <reference key="NSSuperview"/>
           <string key="NSReuseIdentifierKey">_NS:122</string>
         </object>
-        <string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
+        <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <string key="NSFrameAutosaveName">detachedvideowindow</string>
         <bool key="NSWindowIsRestorable">NO</bool>
@@ -1120,9 +1120,9 @@
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">AULCAABBMAAAA</bytes>
           </object>
-          <string>{{558, 677}, {363, 239}}</string>
+          <string>{{558, 517}, {363, 239}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{558, 677}, {363, 239}}</string>
+          <string>{{558, 517}, {363, 239}}</string>
           <boolean value="NO"/>
           <boolean value="NO"/>
           <string>{363, 203}</string>

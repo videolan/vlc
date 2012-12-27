@@ -102,8 +102,13 @@
         if (b_video_wallpaper)
             [o_new_video_window orderBack:nil];
         else {
-            [o_new_video_window center];
-            [o_new_video_window setFrameAutosaveName:@"extra-videowindow"];
+            // no frame autosave for additional vout windows
+            if (!b_multiple_vout_windows) {
+                // initial window position
+                [o_new_video_window center];
+                [o_new_video_window setFrameAutosaveName:@"extra-videowindow"];
+            }
+            
             [o_new_video_window setContentMinSize: NSMakeSize(f_min_video_height, f_min_video_height)];
         }
 
@@ -111,14 +116,20 @@
         b_nonembedded = YES;
     } else {
         if ((var_InheritBool(VLCIntf, "embedded-video") && !b_multiple_vout_windows) || b_nativeFullscreenMode) {
+            // setup embedded video
             o_vout_view = [[[VLCMainWindow sharedInstance] videoView] retain];
             o_new_video_window = [[VLCMainWindow sharedInstance] retain];
             b_nonembedded = NO;
         } else {
+            // setup detached window with controls
             NSWindowController *o_controller = [[NSWindowController alloc] initWithWindowNibName:@"DetachedVideoWindow"];
             [o_controller loadWindow];
             o_new_video_window = [(VLCDetachedVideoWindow *)[o_controller window] retain];
             [o_controller release];
+
+            // no frame autosave for additional vout windows
+            if (b_multiple_vout_windows)
+                [o_new_video_window setFrameAutosaveName:@""];
 
             [o_new_video_window setDelegate: o_new_video_window];
             [o_new_video_window setLevel:NSNormalWindowLevel];
@@ -136,6 +147,20 @@
             NSRect window_rect = [o_new_video_window getWindowRectForProposedVideoViewSize:videoViewSize];
             [o_new_video_window setFrame:window_rect display:YES];
         }
+
+        // cascade windows if we have more than one vout
+        if (b_multiple_vout_windows) {
+            if ([o_vout_dict count] == 1) {
+                NSWindow * o_first_window = [o_vout_dict objectForKey: [[o_vout_dict allKeys] objectAtIndex: 0]];
+
+                NSPoint topleftbase = NSMakePoint(0, [o_first_window frame].size.height);
+                top_left_point = [o_first_window convertBaseToScreen: topleftbase];
+            }
+
+            top_left_point = [o_new_video_window cascadeTopLeftFromPoint: top_left_point];
+            [o_new_video_window setFrameTopLeftPoint: top_left_point];
+        }
+        
         [o_new_video_window setNativeVideoSize:videoViewSize];
 
         [o_new_video_window makeKeyAndOrderFront: self];
