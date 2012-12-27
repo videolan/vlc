@@ -439,39 +439,11 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (IBAction)closeStreamPanel:(id)sender
 {
-    NSMutableString * labelContent = [[NSMutableString alloc] initWithFormat:@"%@ @ %@:%@", [_stream_type_pop titleOfSelectedItem], [_stream_address_fld stringValue], [_stream_port_fld stringValue]];
+    NSMutableString * labelContent = [[NSMutableString alloc] initWithFormat:_NS("%@ stream to %@:%@"), [_stream_type_pop titleOfSelectedItem], [_stream_address_fld stringValue], [_stream_port_fld stringValue]];
 
-    if ([_stream_type_pop indexOfSelectedItem] > 1) {
-        [labelContent appendFormat:@" TTL:%@", [_stream_ttl_fld stringValue]];
-        if ([_stream_sap_ckb state] || [_stream_rtsp_ckb state] || [_stream_http_ckb state] || [_stream_sdp_ckb state])
-            [labelContent appendFormat:@" — %@:\"%@\" (", _NS("Channel"), [_stream_channel_fld stringValue]];
+    if ([_stream_type_pop indexOfSelectedItem] > 1)
+        [labelContent appendFormat:@" (\"%@\")", [_stream_channel_fld stringValue]];
 
-        BOOL b_gotSomething;
-        if (_stream_sap_ckb) {
-            [labelContent appendString:@"SAP"];
-            b_gotSomething = YES;
-        }
-        if (_stream_rtsp_ckb) {
-            if (b_gotSomething)
-                [labelContent appendString:@", "];
-            [labelContent appendString:@"RTSP"];
-            b_gotSomething = YES;
-        }
-        if (_stream_http_ckb) {
-            if (b_gotSomething)
-                [labelContent appendString:@", "];
-            [labelContent appendString:@"HTTP"];
-            b_gotSomething = YES;
-        }
-        if ([_stream_sdp_ckb state]) {
-            if (b_gotSomething)
-                [labelContent appendString:@", "];
-            [labelContent appendString:@"SDP"];
-        }
-
-        if ([_stream_sap_ckb state] || [_stream_rtsp_ckb state] || [_stream_http_ckb state] || [_stream_sdp_ckb state])
-            [labelContent appendString:@")"];
-    }
     [_destination_stream_lbl setStringValue:labelContent];
     [labelContent release];
 
