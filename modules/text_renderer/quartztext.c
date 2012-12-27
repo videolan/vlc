@@ -1,10 +1,12 @@
 /*****************************************************************************
  * quartztext.c : Put text on the video, using Mac OS X Quartz Engine
  *****************************************************************************
- * Copyright (C) 2007, 2009 VLC authors and VideoLAN
+ * Copyright (C) 2007, 2009, 2012 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Bernie Purcell <bitmap@videolan.org>
+ *          Pierre d'Herbemont <pdherbemont # videolan dot>
+ *          Felix Paul Kühne <fkuehne # videolan # org>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
