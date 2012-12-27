@@ -1097,7 +1097,7 @@ static bool Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_t data
 
 static char *Eia608Text( eia608_t *h, bool b_html )
 {
-    const int i_size = EIA608_SCREEN_ROWS * 3 * EIA608_SCREEN_COLUMNS+1;
+    const int i_size = EIA608_SCREEN_ROWS * 10 * EIA608_SCREEN_COLUMNS+1;
     struct eia608_screen *screen = &h->screen[h->i_screen];
     bool b_first = true;
     char *psz;
