@@ -915,6 +915,8 @@ static void Eia608Strlcat( char *d, const char *s, int i_max )
         d[i_max-1] = '\0';
 }
 
+#define CAT(t) Eia608Strlcat( psz_text, t, i_text_max )
+
 static void Eia608TextLine( struct eia608_screen *screen, char *psz_text, int i_text_max, int i_row, bool b_html )
 {
     const uint8_t *p_char = screen->characters[i_row];
@@ -926,11 +928,18 @@ static void Eia608TextLine( struct eia608_screen *screen, char *psz_text, int i_
     eia608_color_t last_color = EIA608_COLOR_DEFAULT;
     bool     b_last_italics = false;
     bool     b_last_underline = false;
+    char utf8[4];
 
     /* Search the start */
     i_start = 0;
-    while( i_start < EIA608_SCREEN_COLUMNS-1 && p_char[i_start] == ' ' )
-        i_start++;
+
+    /* Convert leading spaces to non-breaking so that they don't get
+       stripped by the RenderHtml routine as regular whitespace */
+    while( i_start < EIA608_SCREEN_COLUMNS && p_char[i_start] == ' ' ) {
+	Eia608TextUtf8( utf8, 0x89 );
+	CAT( utf8 );
+	i_start++;
+    }
 
     /* Search the end */
     i_end = EIA608_SCREEN_COLUMNS-1;
@@ -938,13 +947,11 @@ static void Eia608TextLine( struct eia608_screen *screen, char *psz_text, int i_
         i_end--;
 
     /* */
-#define CAT(t) Eia608Strlcat( psz_text, t, i_text_max )
     for( x = i_start; x <= i_end; x++ )
     {
         eia608_color_t color = p_color[x];
         bool b_italics = p_font[x] & EIA608_FONT_ITALICS;
         bool b_underline = p_font[x] & EIA608_FONT_UNDERLINE;
-        char utf8[4];
 
         /* */
         if( b_html )
