@@ -357,7 +357,7 @@ static subpicture_t *Convert( decoder_t *p_dec, block_t *p_block )
     if( b_changed )
     {
         char *psz_subtitle = Eia608Text( &p_sys->eia608, false );
-        char *psz_html     = NULL;//Eia608Text( &p_sys->eia608, true );
+        char *psz_html = Eia608Text( &p_sys->eia608, true );
         return Subtitle( p_dec, psz_subtitle, psz_html, i_pts );
     }
     return NULL;
