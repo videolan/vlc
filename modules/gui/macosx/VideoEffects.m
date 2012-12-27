@@ -536,20 +536,21 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         vlc_object_release(p_vout);
 
     vlc_object_t *p_filter = vlc_object_find_name(pl_Get(p_intf), psz_filter);
-    int i_type;
-    i_type = var_Type(p_filter, psz_name);
-    if (i_type == 0)
-        i_type = config_GetType(p_intf, psz_name);
+    if (p_filter) {
+        int i_type;
+        i_type = var_Type(p_filter, psz_name);
+        if (i_type == 0)
+            i_type = config_GetType(p_intf, psz_name);
 
-    if (!(i_type & VLC_VAR_ISCOMMAND)) {
-        msg_Warn(p_intf, "Brute-restarting filter '%s', because the last changed option isn't a command", psz_name);
-        [self setVideoFilter: psz_filter on: NO];
-        [self setVideoFilter: psz_filter on: YES];
-    } else
-        msg_Dbg(p_intf, "restart not needed");
+        if (!(i_type & VLC_VAR_ISCOMMAND)) {
+            msg_Warn(p_intf, "Brute-restarting filter '%s', because the last changed option isn't a command", psz_name);
+            [self setVideoFilter: psz_filter on: NO];
+            [self setVideoFilter: psz_filter on: YES];
+        } else
+            msg_Dbg(p_intf, "restart not needed");
 
-    if (p_filter)
         vlc_object_release(p_filter);
+    }
 }
 
 - (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter integer: (int)i_value
