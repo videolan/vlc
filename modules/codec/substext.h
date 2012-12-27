@@ -5,6 +5,7 @@ struct subpicture_updater_sys_t {
     int  align;
     int  x;
     int  y;
+    int  i_font_height_percent;
 
     bool is_fixed;
     int  fixed_width;
@@ -79,6 +80,18 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         /* FIXME it doesn't adapt on crop settings changes */
         r->i_x = sys->x * fmt_dst->i_width  / sys->fixed_width;
         r->i_y = sys->y * fmt_dst->i_height / sys->fixed_height;
+    }
+
+    if (sys->i_font_height_percent != 0)
+    {
+        r->p_style = text_style_New();
+        if (r->p_style)
+        {
+	    r->p_style->i_font_size = sys->i_font_height_percent *
+	      subpic->i_original_picture_height / 100;
+            r->p_style->i_font_color = 0xffffff;
+            r->p_style->i_font_alpha = 0xff;
+	}
     }
 }
 static void SubpictureTextDestroy(subpicture_t *subpic)

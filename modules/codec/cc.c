@@ -330,6 +330,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
     p_spu_sys->align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
     p_spu_sys->text  = psz_subtitle;
     p_spu_sys->html  = psz_html;
+    p_spu_sys->i_font_height_percent = 5;
 
     return p_spu;
 }
