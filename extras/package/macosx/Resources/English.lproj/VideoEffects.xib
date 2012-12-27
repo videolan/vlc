@@ -1259,7 +1259,7 @@
                 <object class="NSTabViewItem" id="160045531">
                   <string key="NSIdentifier">geometry</string>
                   <object class="NSView" key="NSView" id="934925915">
-                    <nil key="NSNextResponder"/>
+                    <reference key="NSNextResponder" ref="898819366"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1791,6 +1791,7 @@
                                         <string>allowsFloats</string>
                                         <string>formatterBehavior</string>
                                         <string>locale</string>
+                                        <string>maximum</string>
                                         <string>minimum</string>
                                         <string>negativeFormat</string>
                                         <string>negativeInfinitySymbol</string>
@@ -1805,6 +1806,7 @@
                                         <boolean value="NO"/>
                                         <integer value="1040"/>
                                         <reference ref="1015810800"/>
+                                        <real value="15"/>
                                         <real value="1"/>
                                         <string>0</string>
                                         <string>-∞</string>
@@ -1828,7 +1830,7 @@
                                       <reference key="NSAttributes" ref="639313226"/>
                                     </object>
                                     <real value="1" key="NS.min"/>
-                                    <reference key="NS.max" ref="1005529056"/>
+                                    <real value="15" key="NS.max"/>
                                     <object class="NSDecimalNumberHandler" key="NS.rounding">
                                       <int key="NS.roundingmode">1</int>
                                       <bool key="NS.raise.overflow">YES</bool>
@@ -1861,7 +1863,7 @@
                                   <reference key="NSControlView" ref="979664043"/>
                                   <double key="NSValue">4</double>
                                   <double key="NSMinValue">1</double>
-                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSMaxValue">15</double>
                                   <double key="NSIncrement">1</double>
                                   <bool key="NSAutorepeat">YES</bool>
                                 </object>
@@ -1907,6 +1909,7 @@
                                         <string>allowsFloats</string>
                                         <string>formatterBehavior</string>
                                         <string>locale</string>
+                                        <string>maximum</string>
                                         <string>minimum</string>
                                         <string>negativeFormat</string>
                                         <string>negativeInfinitySymbol</string>
@@ -1920,6 +1923,7 @@
                                         <boolean value="NO"/>
                                         <integer value="1040"/>
                                         <reference ref="1015810800"/>
+                                        <real value="15"/>
                                         <real value="1"/>
                                         <string>0</string>
                                         <string>-∞</string>
@@ -1942,7 +1946,7 @@
                                       <reference key="NSAttributes" ref="639313226"/>
                                     </object>
                                     <real value="1" key="NS.min"/>
-                                    <reference key="NS.max" ref="1005529056"/>
+                                    <real value="15" key="NS.max"/>
                                     <object class="NSDecimalNumberHandler" key="NS.rounding">
                                       <int key="NS.roundingmode">3</int>
                                       <bool key="NS.raise.overflow">YES</bool>
@@ -1975,7 +1979,7 @@
                                   <reference key="NSControlView" ref="228437242"/>
                                   <double key="NSValue">4</double>
                                   <double key="NSMinValue">1</double>
-                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSMaxValue">15</double>
                                   <double key="NSIncrement">1</double>
                                   <bool key="NSAutorepeat">YES</bool>
                                 </object>
@@ -2078,6 +2082,7 @@
                                         <string>allowsFloats</string>
                                         <string>formatterBehavior</string>
                                         <string>locale</string>
+                                        <string>maximum</string>
                                         <string>minimum</string>
                                         <string>negativeFormat</string>
                                         <string>negativeInfinitySymbol</string>
@@ -2092,7 +2097,8 @@
                                         <boolean value="NO"/>
                                         <integer value="1040"/>
                                         <reference ref="1015810800"/>
-                                        <real value="1"/>
+                                        <real value="20"/>
+                                        <real value="2"/>
                                         <string>0</string>
                                         <string>-∞</string>
                                         <string/>
@@ -2114,8 +2120,8 @@
                                       <string key="NSString">NaN</string>
                                       <reference key="NSAttributes" ref="639313226"/>
                                     </object>
-                                    <real value="1" key="NS.min"/>
-                                    <reference key="NS.max" ref="1005529056"/>
+                                    <real value="2" key="NS.min"/>
+                                    <real value="20" key="NS.max"/>
                                     <object class="NSDecimalNumberHandler" key="NS.rounding">
                                       <int key="NS.roundingmode">1</int>
                                       <bool key="NS.raise.overflow">YES</bool>
@@ -2147,8 +2153,8 @@
                                   <reference key="NSSupport" ref="26"/>
                                   <reference key="NSControlView" ref="1003951278"/>
                                   <double key="NSValue">4</double>
-                                  <double key="NSMinValue">1</double>
-                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSMinValue">2</double>
+                                  <double key="NSMaxValue">20</double>
                                   <double key="NSIncrement">1</double>
                                   <bool key="NSAutorepeat">YES</bool>
                                 </object>
@@ -2199,6 +2205,7 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {638, 197}}</string>
+                    <reference key="NSSuperview" ref="898819366"/>
                   </object>
                   <string key="NSLabel">Geometry</string>
                   <reference key="NSColor" ref="279270326"/>
@@ -2207,7 +2214,7 @@
                 <object class="NSTabViewItem" id="133975353">
                   <string key="NSIdentifier">color</string>
                   <object class="NSView" key="NSView" id="10628740">
-                    <reference key="NSNextResponder" ref="898819366"/>
+                    <nil key="NSNextResponder"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -3286,7 +3293,6 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {638, 197}}</string>
-                    <reference key="NSSuperview" ref="898819366"/>
                   </object>
                   <string key="NSLabel">Color</string>
                   <reference key="NSColor" ref="279270326"/>
@@ -3735,7 +3741,7 @@
                   <reference key="NSTabView" ref="898819366"/>
                 </object>
               </object>
-              <reference key="NSSelectedTabViewItem" ref="133975353"/>
+              <reference key="NSSelectedTabViewItem" ref="160045531"/>
               <object class="NSFont" key="NSFont">
                 <string key="NSName">LucidaGrande</string>
                 <double key="NSSize">13</double>
@@ -3747,7 +3753,7 @@
               <nil key="themeKey"/>
               <object class="NSMutableArray" key="NSSubviews">
                 <bool key="EncodedWithXMLCoder">YES</bool>
-                <reference ref="10628740"/>
+                <reference ref="934925915"/>
               </object>
             </object>
             <object class="NSPopUpButton" id="1044210417">
