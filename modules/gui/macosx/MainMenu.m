@@ -434,13 +434,17 @@ static VLCMainMenu *_o_sharedInstance = nil;
         o_mi_tmp = [o_mu_playlistTableColumns addItemWithTitle:o_title
                                                         action:@selector(togglePlaylistColumnTable:)
                                                  keyEquivalent:@""];
-        [o_mi_tmp setTarget:self];
+        /* don't set a valid target for the title column selector, since we want it to be disabled */
+        if (![[o_ptc_menuorder objectAtIndex:i] isEqualToString: TITLE_COLUMN])
+            [o_mi_tmp setTarget:self];
         [o_mi_tmp setTag:i];
 
         o_mi_tmp = [o_context_menu addItemWithTitle:o_title
                                              action:@selector(togglePlaylistColumnTable:)
                                       keyEquivalent:@""];
-        [o_mi_tmp setTarget:self];
+        /* don't set a valid target for the title column selector, since we want it to be disabled */
+        if (![[o_ptc_menuorder objectAtIndex:i] isEqualToString: TITLE_COLUMN])
+            [o_mi_tmp setTarget:self];
         [o_mi_tmp setTag:i];
     }
     if (!o_mu_playlistTableColumnsContextMenu)

@@ -1363,6 +1363,8 @@
     }
     else
         [o_outline_view removeTableColumn: [o_outline_view tableColumnWithIdentifier: o_column]];
+
+    [o_outline_view setOutlineTableColumn: [o_outline_view tableColumnWithIdentifier:TITLE_COLUMN]];
 }
 
 - (void)saveTableColumns
