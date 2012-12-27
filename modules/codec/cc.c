@@ -996,9 +996,34 @@ static void Eia608TextLine( struct eia608_screen *screen, char *psz_text, int i_
                 CAT( "<u>" );
         }
 
-        /* */ 
-        Eia608TextUtf8( utf8, p_char[x] );
-        CAT( utf8 );
+        if( b_html ) {
+            /* Escape XML reserved characters
+               http://www.w3.org/TR/xml/#syntax */
+            switch (p_char[x]) {
+            case '>':
+                CAT( "&gt;" );
+                break;
+            case '<':
+                CAT( "&lt;" );
+                break;
+            case '"':
+                CAT( "&quot;" );
+                break;
+            case '\'':
+                CAT( "&apos;" );
+                break;
+            case '&':
+                CAT( "&amp;" );
+                break;
+            default:
+                Eia608TextUtf8( utf8, p_char[x] );
+                CAT( utf8 );
+                break;
+            }
+        } else {
+            Eia608TextUtf8( utf8, p_char[x] );
+            CAT( utf8 );
+        }
 
         /* */
         b_last_underline = b_underline;
