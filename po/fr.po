@@ -8938,11 +8938,11 @@ msgstr "Réglage des basses de l'entrée audio."
 
 #: modules/access/v4l2/v4l2.c:178
 msgid "Treble level"
-msgstr "Niveau des aigües"
+msgstr "Niveau des aiguës"
 
 #: modules/access/v4l2/v4l2.c:180
 msgid "Treble adjustment of the audio input."
-msgstr "Réglage des aigües de l'entrée audio."
+msgstr "Réglage des aiguës de l'entrée audio."
 
 #: modules/access/v4l2/v4l2.c:183
 msgid "Mute the audio."
@@ -9912,11 +9912,11 @@ msgstr "Graves"
 
 #: modules/audio_filter/equalizer_presets.h:41
 msgid "Full bass and treble"
-msgstr "Graves et aigües"
+msgstr "Graves et aiguës"
 
 #: modules/audio_filter/equalizer_presets.h:41
 msgid "Full treble"
-msgstr "Aigües"
+msgstr "Aiguës"
 
 #: modules/audio_filter/equalizer_presets.h:41
 msgid "Headphones"
