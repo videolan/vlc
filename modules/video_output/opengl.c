@@ -191,7 +191,7 @@ static void BuildVertexShader(vout_display_opengl_t *vgl,
 {
     /* Basic vertex shader */
     const char *vertexShader =
-        "#version 120\n"
+        "#version 100\n"
         "varying   vec4 TexCoord0,TexCoord1, TexCoord2;"
         "attribute vec4 MultiTexCoord0,MultiTexCoord1,MultiTexCoord2;"
         "attribute vec4 VertexPosition;"
@@ -234,16 +234,18 @@ static void BuildYUVFragmentShader(vout_display_opengl_t *vgl,
 
     /* Basic linear YUV -> RGB conversion using bilinear interpolation */
     const char *template_glsl_yuv =
-        "#version 120\n"
-        "uniform sampler2D Texture[3];"
+        "#version 100\n"
+        "uniform sampler2D Texture0;"
+        "uniform sampler2D Texture1;"
+        "uniform sampler2D Texture2;"
         "uniform vec4      Coefficient[4];"
         "varying vec4      TexCoord0,TexCoord1,TexCoord2;"
 
         "void main(void) {"
         " vec4 x,y,z,result;"
-        " x  = texture2D(Texture[0], TexCoord0.st);"
-        " %c = texture2D(Texture[1], TexCoord1.st);"
-        " %c = texture2D(Texture[2], TexCoord2.st);"
+        " x  = texture2D(Texture0, TexCoord0.st);"
+        " %c = texture2D(Texture1, TexCoord1.st);"
+        " %c = texture2D(Texture2, TexCoord2.st);"
 
         " result = x * Coefficient[0] + Coefficient[3];"
         " result = (y * Coefficient[1]) + result;"
@@ -282,7 +284,7 @@ static void BuildRGBFragmentShader(vout_display_opengl_t *vgl,
 {
     // Simple shader for RGB
     const char *code =
-        "#version 120\n"
+        "#version 100\n"
         "uniform sampler2D Texture[3];"
         "varying vec4 TexCoord0,TexCoord1,TexCoord2;"
         "void main()"
@@ -299,7 +301,7 @@ static void BuildRGBAFragmentShader(vout_display_opengl_t *vgl,
 {
     // Simple shader for RGBA
     const char *code =
-        "#version 120\n"
+        "#version 100\n"
         "uniform sampler2D Texture;"
         "uniform vec4 FillColor;"
         "varying vec4 TexCoord0;"
@@ -781,9 +783,9 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
 {
     vgl->UseProgram(vgl->program[0]);
     vgl->Uniform4fv(vgl->GetUniformLocation(vgl->program[0], "Coefficient"), 4, vgl->local_value);
-    vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture[0]"), 0);
-    vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture[1]"), 1);
-    vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture[2]"), 2);
+    vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture0"), 0);
+    vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture1"), 1);
+    vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture2"), 2);
 
     static const GLfloat vertexCoord[] = {
         -1.0,  1.0,
