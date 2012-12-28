@@ -290,36 +290,19 @@ static int  Open ( vlc_object_t *p_this )
 
     p_demux->pf_demux  = Demux;
     p_demux->pf_control= Control;
-    p_demux->p_sys     = p_sys = (demux_sys_t*)malloc( sizeof( demux_sys_t ) );
+    p_demux->p_sys     = p_sys = (demux_sys_t*)calloc( 1, sizeof( demux_sys_t ) );
     if( !p_sys ) return VLC_ENOMEM;
 
     msg_Dbg( p_demux, "version "LIVEMEDIA_LIBRARY_VERSION_STRING );
 
-    p_sys->p_sdp = NULL;
-    p_sys->scheduler = NULL;
-    p_sys->env = NULL;
-    p_sys->ms = NULL;
-    p_sys->rtsp = NULL;
     TAB_INIT( p_sys->i_track, p_sys->track );
-    p_sys->i_pcr = 0;
     p_sys->f_npt = 0.;
     p_sys->f_npt_start = 0.;
     p_sys->f_npt_length = 0.;
-    p_sys->p_out_asf = NULL;
     p_sys->b_no_data = true;
-    p_sys->i_no_data_ti = 0;
-    p_sys->p_timeout = NULL;
-    p_sys->i_timeout = 0;
-    p_sys->b_timeout_call = false;
-    p_sys->b_multicast = false;
-    p_sys->b_real = false;
     p_sys->psz_path = strdup( p_demux->psz_location );
     p_sys->b_force_mcast = var_InheritBool( p_demux, "rtsp-mcast" );
-    p_sys->b_get_param = false;
-    p_sys->b_paused = false;
     p_sys->f_seek_request = -1;
-    p_sys->b_error = false;
-    p_sys->i_live555_ret = 0;
 
     /* parse URL for rtsp://[user:[passwd]@]serverip:port/options */
     vlc_UrlParse( &p_sys->url, p_sys->psz_path, 0 );
