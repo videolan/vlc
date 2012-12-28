@@ -86,6 +86,10 @@ Interfaces:
  * Hotkey support for TS program selection
  * Rewrite of D-Bus inhibit interface
 
+Services discovery:
+ * UPnP A/V subtitles
+ * Support for multiple UPnP resources on a single item
+
 Mac OS X Port:
  * Discontinued support for PowerPC-based and 32bit Intel-based Macs
  * VLC requires Mac OS X 10.6 or later now
