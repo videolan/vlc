@@ -109,6 +109,7 @@
     IBOutlet id _stream_channel_fld;
     IBOutlet id _stream_sdp_matrix;
     IBOutlet id _stream_sdp_fld;
+    IBOutlet id _stream_sdp_browsefile_btn;
 
     NSString * _MRL;
     NSString * _outputDestination;
@@ -145,6 +146,7 @@
 - (IBAction)closeStreamPanel:(id)sender;
 - (IBAction)streamTypeToggle:(id)sender;
 - (IBAction)streamAnnouncementToggle:(id)sender;
+- (IBAction)sdpFileLocationSelector:(id)sender;
 
 - (void)panel:(VLCEnterTextPanel *)panel returnValue:(NSUInteger)value text:(NSString *)text;
 - (void)panel:(VLCSelectItemInPopupPanel *)panel returnValue:(NSUInteger)value item:(NSUInteger)item;

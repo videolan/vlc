@@ -500,6 +500,23 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 {
     [_stream_channel_fld setEnabled:[_stream_sap_ckb state] && [_stream_sap_ckb isEnabled]];
     [_stream_sdp_fld setEnabled:[_stream_sdp_matrix isEnabled] && ([_stream_sdp_matrix selectedCell] != [_stream_sdp_matrix cellWithTag:0])];
+
+    if ([[_stream_sdp_matrix selectedCell] tag] == 3)
+        [_stream_sdp_browsefile_btn setEnabled: YES];
+    else
+        [_stream_sdp_browsefile_btn setEnabled: NO];
+}
+
+- (IBAction)sdpFileLocationSelector:(id)sender
+{
+    NSSavePanel * saveFilePanel = [NSSavePanel savePanel];
+    [saveFilePanel setCanSelectHiddenExtension: YES];
+    [saveFilePanel setCanCreateDirectories: YES];
+    [saveFilePanel setAllowedFileTypes:[NSArray arrayWithObject:@"sdp"]];
+    [saveFilePanel beginSheetModalForWindow:_stream_panel completionHandler:^(NSInteger returnCode) {
+        if (returnCode == NSOKButton)
+            [_stream_sdp_fld setStringValue:[[saveFilePanel URL] path]];
+    }];
 }
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
