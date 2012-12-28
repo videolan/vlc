@@ -65,13 +65,15 @@ static int PlayWaveOut   ( audio_output_t *, HWAVEOUT, WAVEHDR *,
                            block_t *, bool );
 
 static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR );
-static void* WaveOutThread( void * );
 
-static int WaveOutClearDoneBuffers(aout_sys_t *p_sys);
+static void WaveOutClearBuffer( HWAVEOUT, WAVEHDR *);
 
 static int ReloadWaveoutDevices( vlc_object_t *, const char *,
                                  char ***, char *** );
 static uint32_t findDeviceID(char *);
+static int WaveOutTimeGet(audio_output_t * , mtime_t *);
+static void WaveOutFlush( audio_output_t *, bool);
+static void WaveOutPause( audio_output_t *, bool, mtime_t);
 
 static const wchar_t device_name_fmt[] = L"%ls ($%x,$%x)";
 
@@ -83,27 +85,20 @@ static const wchar_t device_name_fmt[] = L"%ls ($%x,$%x)";
  *****************************************************************************/
 struct aout_sys_t
 {
-    aout_packet_t packet;
     uint32_t i_wave_device_id;               /* ID of selected output device */
 
     HWAVEOUT h_waveout;                        /* handle to waveout instance */
 
     WAVEFORMATEXTENSIBLE waveformat;                         /* audio format */
 
-    WAVEHDR waveheader[FRAMES_NUM];
-
-    vlc_thread_t thread;
-    vlc_atomic_t abort;
-    HANDLE event;
-    HANDLE new_buffer_event;
-
-    // rental from alsa.c to synchronize startup of audiothread
-    int b_playing;                                         /* playing status */
-    mtime_t start_date;
+    size_t i_frames;
 
     int i_repeat_counter;
 
     int i_buffer_size;
+
+    int i_rate;
+    bool b_spdif;
 
     uint8_t *p_silence_buffer;              /* buffer we use to play silence */
 
@@ -113,6 +108,11 @@ struct aout_sys_t
     uint8_t chans_to_reorder;              /* do we need channel reordering */
     uint8_t chan_table[AOUT_CHAN_MAX];
     vlc_fourcc_t format;
+
+    mtime_t i_played_length;
+
+    vlc_mutex_t lock;
+    vlc_cond_t cond;
 };
 
 #include "volume.h"
@@ -152,10 +152,10 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 {
     vlc_value_t val;
 
-    p_aout->time_get = aout_PacketTimeGet;
+    p_aout->time_get = WaveOutTimeGet;
     p_aout->play = Play;
-    p_aout->pause = NULL;
-    p_aout->flush = aout_PacketFlush;
+    p_aout->pause = WaveOutPause;
+    p_aout->flush = WaveOutFlush;
 
     /*
       check for configured audio device!
@@ -227,8 +227,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
         fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE;
         fmt->i_frame_length = A52_FRAME_NB;
         p_aout->sys->i_buffer_size = fmt->i_bytes_per_frame;
-
-        aout_PacketInit( p_aout, &p_aout->sys->packet, A52_FRAME_NB, fmt );
+        p_aout->sys->b_spdif = true;
     }
     else
     {
@@ -266,23 +265,12 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
         aout_FormatPrepare( fmt );
         p_aout->sys->i_buffer_size = FRAME_SIZE * fmt->i_bytes_per_frame;
 
-        aout_PacketInit( p_aout, &p_aout->sys->packet, FRAME_SIZE, fmt );
-#if 0
-        /* Check for hardware volume support */
-        WAVEOUTCAPS wocaps;
-        if( waveOutGetDevCaps( (UINT_PTR)p_aout->sys->h_waveout,
-                               &wocaps, sizeof(wocaps) ) == MMSYSERR_NOERROR
-         && (wocaps.dwSupport & WAVECAPS_VOLUME) )
-        {   /* FIXME: this needs to be moved to Open() */
-            p_aout->volume_set = VolumeSet;
-            p_aout->mute_set = MuteSet;
-            p_aout->sys->volume = 0xffff.fp0;
-            p_aout->sys->mute = false;
-        }
-        else
-#endif
-            aout_SoftVolumeStart( p_aout );
+        aout_SoftVolumeStart( p_aout );
+
+        p_aout->sys->b_spdif = false;
     }
+
+    p_aout->sys->i_rate = fmt->i_rate;
 
     waveOutReset( p_aout->sys->h_waveout );
 
@@ -291,7 +279,6 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
         malloc( p_aout->sys->i_buffer_size );
     if( p_aout->sys->p_silence_buffer == NULL )
     {
-        aout_PacketDestroy( p_aout );
         free( p_aout->sys );
         return VLC_ENOMEM;
     }
@@ -303,30 +290,8 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
             p_aout->sys->i_buffer_size );
 
     /* Now we need to setup our waveOut play notification structure */
-    p_aout->sys->event = CreateEvent( NULL, FALSE, FALSE, NULL );
-    p_aout->sys->new_buffer_event = CreateEvent( NULL, FALSE, FALSE, NULL );
-
-    /* define startpoint of playback on first call to play()
-      like alsa does (instead of playing a blank sample) */
-    p_aout->sys->b_playing = 0;
-    p_aout->sys->start_date = 0;
-
-
-    /* Then launch the notification thread */
-    vlc_atomic_set( &p_aout->sys->abort, 0);
-    if( vlc_clone( &p_aout->sys->thread,
-                   WaveOutThread, p_aout, VLC_THREAD_PRIORITY_OUTPUT ) )
-    {
-        msg_Err( p_aout, "cannot create WaveOutThread" );
-    }
-
-    /* We need to kick off the playback in order to have the callback properly
-     * working */
-    for( int i = 0; i < FRAMES_NUM; i++ )
-    {
-        p_aout->sys->waveheader[i].dwFlags = WHDR_DONE;
-        p_aout->sys->waveheader[i].dwUser = 0;
-    }
+    p_aout->sys->i_frames = 0;
+    p_aout->sys->i_played_length = 0;
 
     return VLC_SUCCESS;
 }
@@ -442,24 +407,32 @@ static void Probe( audio_output_t * p_aout, const audio_sample_format_t *fmt )
  * This doesn't actually play the buffer. This just stores the buffer so it
  * can be played by the callback thread.
  *****************************************************************************/
-static void Play( audio_output_t *_p_aout, block_t *block )
+static void Play( audio_output_t *p_aout, block_t *block )
 {
-    if( !_p_aout->sys->b_playing )
+    WAVEHDR * p_waveheader = (WAVEHDR *) malloc(sizeof(WAVEHDR));
+    if(!p_waveheader)
     {
-        _p_aout->sys->b_playing = 1;
+        msg_Err(p_aout, "Couldn't alloc WAVEHDR");
+        return;
+    }
+    if( block && p_aout->sys->chans_to_reorder )
+    {
+        aout_ChannelReorder( block->p_buffer, block->i_buffer,
+                             p_aout->sys->waveformat.Format.nChannels,
+                             p_aout->sys->chan_table, p_aout->sys->format );
+    }
+    while( PlayWaveOut( p_aout, p_aout->sys->h_waveout, p_waveheader, block,       
+                        p_aout->sys->b_spdif ) != VLC_SUCCESS )
 
-        /* get the playing date of the first aout buffer */
-        _p_aout->sys->start_date = block->i_pts;
-
-        msg_Dbg( _p_aout, "Wakeup sleeping output thread.");
-
-        /* wake up the audio output thread */
-        SetEvent( _p_aout->sys->event );
-    } else {
-        SetEvent( _p_aout->sys->new_buffer_event );
+    {
+        msg_Warn( p_aout, "Couln't write frame... sleeping");
+        msleep( block->i_length );
     }
 
-    aout_PacketPlay( _p_aout, block );
+    vlc_mutex_lock( &p_aout->sys->lock );
+    p_aout->sys->i_frames++;
+    p_aout->sys->i_played_length += block->i_length;
+    vlc_mutex_unlock( &p_aout->sys->lock );
 }
 
 /*****************************************************************************
@@ -470,24 +443,6 @@ static void Stop( audio_output_t *p_aout )
     aout_sys_t *p_sys = p_aout->sys;
 
     /* Before calling waveOutClose we must reset the device */
-    vlc_atomic_set( &p_sys->abort, 1);
-
-    /* wake up the audio thread, to recognize that p_aout died */
-    SetEvent( p_sys->event );
-    SetEvent( p_sys->new_buffer_event );
-
-    vlc_join( p_sys->thread, NULL );
-
-    /*
-      kill the real output then - when the feed thread
-      is surely terminated!
-      old code could be too early in case that "feeding"
-      was running on termination
-
-      at this point now its sure, that there will be no new
-      data send to the driver, and we can cancel the last
-      running playbuffers
-    */
     MMRESULT result = waveOutReset( p_sys->h_waveout );
     if(result != MMSYSERR_NOERROR)
     {
@@ -507,17 +462,8 @@ static void Stop( audio_output_t *p_aout )
              of this loop, to avoid deadlock in case of other
              (currently not known bugs, problems, errors cases?)
            */
-           while(
-                 (WaveOutClearDoneBuffers( p_sys ) > 0)
-                 &&
-                 (WaitForSingleObject( p_sys->event, 5000) == WAIT_OBJECT_0)
-                )
-           {
-                 msg_Dbg( p_aout, "Wait for waveout device...");
-           }
+            WaveOutFlush( p_aout, true );
        }
-    } else {
-        WaveOutClearDoneBuffers( p_sys );
     }
 
     /* now we can Close the device */
@@ -526,15 +472,8 @@ static void Stop( audio_output_t *p_aout )
         msg_Err( p_aout, "waveOutClose failed" );
     }
 
-    /*
-      because so long, the waveout device is playing, the callback
-      could occur and need the events
-    */
-    CloseHandle( p_sys->event );
-    CloseHandle( p_sys->new_buffer_event);
-
     free( p_sys->p_silence_buffer );
-    aout_PacketDestroy( p_aout );
+    p_aout->sys->i_played_length = 0;
 }
 
 /*****************************************************************************
@@ -708,6 +647,7 @@ static int PlayWaveOut( audio_output_t *p_aout, HWAVEOUT h_waveout,
     if( p_buffer != NULL )
     {
         p_waveheader->lpData = (LPSTR)p_buffer->p_buffer;
+        p_waveheader->dwBufferLength = p_buffer->i_buffer;
         /*
           copy the buffer to the silence buffer :) so in case we don't
           get the next buffer fast enough (I will repeat this one a time
@@ -733,10 +673,10 @@ static int PlayWaveOut( audio_output_t *p_aout, HWAVEOUT h_waveout,
            }
         }
         p_waveheader->lpData = (LPSTR)p_aout->sys->p_silence_buffer;
+        p_waveheader->dwBufferLength = p_aout->sys->i_buffer_size;
     }
 
     p_waveheader->dwUser = p_buffer ? (DWORD_PTR)p_buffer : (DWORD_PTR)1;
-    p_waveheader->dwBufferLength = p_aout->sys->i_buffer_size;
     p_waveheader->dwFlags = 0;
 
     result = waveOutPrepareHeader( h_waveout, p_waveheader, sizeof(WAVEHDR) );
@@ -764,240 +704,30 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
                                       DWORD_PTR _p_aout,
                                       DWORD_PTR dwParam1, DWORD_PTR dwParam2 )
 {
-    (void)h_waveout;    (void)dwParam1;    (void)dwParam2;
+    (void)dwParam2;
     audio_output_t *p_aout = (audio_output_t *)_p_aout;
-    int i_queued_frames = 0;
+    WAVEHDR * p_waveheader =  (WAVEHDR *) dwParam1;
 
     if( uMsg != WOM_DONE ) return;
 
-    if( vlc_atomic_get(&p_aout->sys->abort) ) return;
+    WaveOutClearBuffer( h_waveout, p_waveheader );
 
-    /* Find out the current latency */
-    for( int i = 0; i < FRAMES_NUM; i++ )
-    {
-        /* Check if frame buf is available */
-        if( !(p_aout->sys->waveheader[i].dwFlags & WHDR_DONE) )
-        {
-            i_queued_frames++;
-        }
-    }
-
-    /* Don't wake up the thread too much */
-    if( i_queued_frames <= FRAMES_NUM/2 )
-        SetEvent( p_aout->sys->event );
+    free(p_waveheader);
+    vlc_mutex_lock( &p_aout->sys->lock );
+    p_aout->sys->i_frames--;
+    vlc_cond_broadcast( &p_aout->sys->cond );
+    vlc_mutex_unlock( &p_aout->sys->lock );
 }
 
+static void WaveOutClearBuffer( HWAVEOUT h_waveout, WAVEHDR *p_waveheader )
+{   
+    block_t *p_buffer = (block_t *)(p_waveheader->dwUser);
+    /* Unprepare and free the buffers which has just been played */
+    waveOutUnprepareHeader( h_waveout, p_waveheader, sizeof(WAVEHDR) );
 
-/****************************************************************************
- * WaveOutClearDoneBuffers: Clear all done marked buffers, and free buffer
- ****************************************************************************
- * return value is the number of still playing buffers in the queue
- ****************************************************************************/
-static int WaveOutClearDoneBuffers(aout_sys_t *p_sys)
-{
-    WAVEHDR *p_waveheader = p_sys->waveheader;
-    int i_queued_frames = 0;
-
-    for( int i = 0; i < FRAMES_NUM; i++ )
-    {
-        if( (p_waveheader[i].dwFlags & WHDR_DONE) &&
-            p_waveheader[i].dwUser )
-        {
-            block_t *p_buffer =
-                    (block_t *)(p_waveheader[i].dwUser);
-            /* Unprepare and free the buffers which has just been played */
-            waveOutUnprepareHeader( p_sys->h_waveout, &p_waveheader[i],
-                                    sizeof(WAVEHDR) );
-
-            if( p_waveheader[i].dwUser != 1 )
-                block_Release( p_buffer );
-
-            p_waveheader[i].dwUser = 0;
-        }
-
-        /* Check if frame buf is available */
-        if( !(p_waveheader[i].dwFlags & WHDR_DONE) )
-        {
-            i_queued_frames++;
-        }
-    }
-    return i_queued_frames;
+    if( p_waveheader->dwUser != 1 )
+        block_Release( p_buffer );
 }
-
-/*****************************************************************************
- * WaveOutThread: this thread will capture play notification events.
- *****************************************************************************
- * We use this thread to feed new audio samples to the sound card because
- * we are not authorized to use waveOutWrite() directly in the waveout
- * callback.
- *****************************************************************************/
-static void* WaveOutThread( void *data )
-{
-    audio_output_t *p_aout = data;
-    aout_sys_t *p_sys = p_aout->sys;
-    block_t *p_buffer = NULL;
-    WAVEHDR *p_waveheader = p_sys->waveheader;
-    int i, i_queued_frames;
-    bool b_sleek;
-    mtime_t next_date;
-    int canc = vlc_savecancel ();
-
-    /* We don't want any resampling when using S/PDIF */
-    b_sleek = p_sys->packet.format.i_format == VLC_CODEC_SPDIFL;
-
-    // wait for first call to "play()"
-    while( !p_sys->start_date && !vlc_atomic_get(&p_aout->sys->abort) )
-           WaitForSingleObject( p_sys->event, INFINITE );
-    if( vlc_atomic_get(&p_aout->sys->abort) )
-        return NULL;
-
-    msg_Dbg( p_aout, "will start to play in %"PRId64" us",
-             (p_sys->start_date - AOUT_MAX_PTS_ADVANCE/4)-mdate());
-
-    // than wait a short time... before grabbing first frames
-    mwait( p_sys->start_date - AOUT_MAX_PTS_ADVANCE/4 );
-
-#define waveout_warn(msg) msg_Warn( p_aout, "aout_PacketNext no buffer "\
-                           "got next_date=%d ms, "\
-                           "%d frames to play, %s",\
-                           (int)(next_date/(mtime_t)1000), \
-                           i_queued_frames, msg);
-    next_date = mdate();
-
-    while( !vlc_atomic_get(&p_aout->sys->abort) )
-    {
-        /* Cleanup and find out the current latency */
-        i_queued_frames = WaveOutClearDoneBuffers( p_sys );
-
-        if( vlc_atomic_get(&p_aout->sys->abort) ) return NULL;
-
-        /* Try to fill in as many frame buffers as possible */
-        for( i = 0; i < FRAMES_NUM; i++ )
-        {
-            /* Check if frame buf is available */
-            if( p_waveheader[i].dwFlags & WHDR_DONE )
-            {
-                // next_date = mdate() + 1000000 * i_queued_frames /
-                //  p_aout->format.i_rate * p_aout->i_nb_samples;
-
-                // the realtime has got our back-site:) to come in sync
-                if(next_date < mdate())
-                   next_date = mdate();
-
-
-                /* Take into account the latency */
-                p_buffer = aout_PacketNext( p_aout, next_date );
-                if(!p_buffer)
-                {
-#if 0
-                    msg_Dbg( p_aout, "aout_PacketNext no buffer got "
-                             "next_date=%"PRId64" ms, %d frames to play",
-                             next_date/1000, i_queued_frames);
-#endif
-                    // means we are too early to request a new buffer?
-                    waveout_warn("waiting...")
-                    mwait( next_date - AOUT_MAX_PTS_ADVANCE/4 );
-                    next_date = mdate();
-                    p_buffer = aout_PacketNext( p_aout, next_date );
-                }
-
-                if( !p_buffer && i_queued_frames )
-                {
-                    /* We aren't late so no need to play a blank sample */
-                    break;
-                }
-
-                if( p_buffer )
-                {
-                    mtime_t buffer_length = p_buffer->i_length;
-                    next_date = next_date + buffer_length;
-                }
-
-                /* Do the channel reordering */
-                if( p_buffer && p_sys->chans_to_reorder )
-                {
-                    aout_ChannelReorder( p_buffer->p_buffer,
-                        p_buffer->i_buffer,
-                        p_sys->waveformat.Format.nChannels,
-                        p_sys->chan_table, p_sys->format );
-                }
-
-                PlayWaveOut( p_aout, p_sys->h_waveout,
-                             &p_waveheader[i], p_buffer, b_sleek );
-
-                i_queued_frames++;
-            }
-        }
-
-        if( vlc_atomic_get(&p_aout->sys->abort) ) return NULL;
-
-        /*
-          deal with the case that the loop didn't fillup the buffer to the
-          max - instead of waiting that half the buffer is played before
-          fillup the waveout buffers, wait only for the next sample buffer
-          to arrive at the play method...
-
-          this will also avoid, that the last buffer is play until the
-          end, and then trying to get more data, so it will also
-          work - if the next buffer will arrive some ms before the
-          last buffer is finished.
-        */
-        if(i_queued_frames < FRAMES_NUM)
-           WaitForSingleObject( p_sys->new_buffer_event, INFINITE );
-        else
-           WaitForSingleObject( p_sys->event, INFINITE );
-
-    }
-
-#undef waveout_warn
-    vlc_restorecancel (canc);
-    return NULL;
-}
-
-#if 0
-static int VolumeSet( audio_output_t *aout, float volume )
-{
-    aout_sys_t *sys = aout->sys;
-    const HWAVEOUT hwo = sys->h_waveout;
-
-    unsigned vol = lroundf(volume * 0xffff.fp0);
-    if (vol > 0xffff)
-    {
-        volume = 1.f;
-        vol = 0xffff;
-    }
-
-    if (!sys->soft_mute)
-    {
-        MMRESULT r = waveOutSetVolume(hwo, vol | (vol << 16));
-        if (r != MMSYSERR_NOERROR)
-        {
-            msg_Err(aout, "cannot set mute: multimedia error %u", r);
-            return -1;
-        }
-    }
-    sys->volume = volume;
-    aout_VolumeReport(aout, volume);
-    return 0;
-}
-
-static int MuteSet( audio_output_t * p_aout, bool mute )
-{
-    aout_sys_t *sys = p_aout->sys;
-    const HWAVEOUT hwo = sys->h_waveout;
-
-    uint16_t vol = mute ? 0 : lroundf(sys->volume * 0xffff.fp0);
-    MMRESULT r = waveOutSetVolume(hwo, vol | (vol << 16));
-    if (r != MMSYSERR_NOERROR)
-    {
-        msg_Err(p_aout, "cannot set mute: multimedia error %u", r);
-        return -1;
-    }
-    sys->soft_mute = mute;
-    aout_MuteReport(p_aout, mute);
-    return 0;
-}
-#endif
 
 /*
   reload the configuration drop down list, of the Audio Devices
@@ -1082,6 +812,9 @@ static int Open(vlc_object_t *obj)
     aout->start = Start;
     aout->stop = Stop;
     aout_SoftVolumeInit(aout);
+
+    vlc_mutex_init( &sys->lock );
+    vlc_cond_init( &sys->cond );
     return VLC_SUCCESS;
 }
 
@@ -1090,5 +823,72 @@ static void Close(vlc_object_t *obj)
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
 
+    vlc_cond_destroy( &sys->cond );
+    vlc_mutex_destroy( &sys->lock );
+
     free(sys);
+}
+
+static int WaveOutTimeGet(audio_output_t * p_aout, mtime_t *delay)
+{
+    MMTIME mmtime;
+    mmtime.wType = TIME_SAMPLES;
+
+    if( !p_aout->sys->i_frames )
+        return -1;
+
+    if( waveOutGetPosition( p_aout->sys->h_waveout, &mmtime, sizeof(MMTIME) ) 
+            != MMSYSERR_NOERROR )
+    {
+        msg_Err( p_aout, "waveOutGetPosition failed");
+        return -1;
+    }
+
+    mtime_t i_pos = (mtime_t) mmtime.u.sample * CLOCK_FREQ / p_aout->sys->i_rate;
+    *delay = p_aout->sys->i_played_length - i_pos;
+    return 0;
+}
+
+static void WaveOutFlush( audio_output_t *p_aout, bool wait)
+{
+    MMRESULT res;
+    if( !wait )
+    {
+        res  = waveOutReset( p_aout->sys->h_waveout );
+        p_aout->sys->i_played_length = 0;
+        if( res != MMSYSERR_NOERROR )
+            msg_Err( p_aout, "waveOutReset failed");
+    }
+    else
+    {
+        vlc_mutex_lock( &p_aout->sys->lock );
+        while( p_aout->sys->i_frames )
+        {
+            vlc_cond_wait( &p_aout->sys->cond, &p_aout->sys-> lock );
+        }
+        vlc_mutex_unlock( &p_aout->sys->lock );
+    }
+}
+
+static void WaveOutPause( audio_output_t * p_aout, bool pause, mtime_t date)
+{
+    MMRESULT res;
+    if(pause)
+    {
+        res = waveOutPause( p_aout->sys->h_waveout );
+        if( res != MMSYSERR_NOERROR )
+        {
+            msg_Err( p_aout, "waveOutPause failed (0x%x)", res);
+            return;
+        }
+    }
+    else
+    {
+        res = waveOutRestart( p_aout->sys->h_waveout );
+        if( res != MMSYSERR_NOERROR )
+        {
+            msg_Err( p_aout, "waveOutRestart failed (0x%x)", res);
+            return;
+        }
+    }
 }
