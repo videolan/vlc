@@ -861,7 +861,6 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
             [composedOptions appendFormat:@",soverlay"];
     }
 
-
     if (!b_streaming) {
         /* file transcoding */
         // add muxer
@@ -882,8 +881,21 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
         if ([_stream_sap_ckb state])
             [composedOptions appendFormat:@",sap,name=\"%@\"", [_stream_channel_fld stringValue]];
-        if ([_stream_sdp_matrix selectedCell] != [_stream_sdp_matrix cellWithTag:0]) //FIXME
-            [composedOptions appendFormat:@",sdp=%@", [_stream_sdp_fld stringValue]];
+        if ([_stream_sdp_matrix selectedCell] != [_stream_sdp_matrix cellWithTag:0]) {
+            NSInteger tag = [[_stream_sdp_matrix selectedCell] tag];
+            switch (tag) {
+                case 1:
+                    [composedOptions appendFormat:@",sdp=\"http://%@\"", [_stream_sdp_fld stringValue]];
+                    break;
+                case 2:
+                    [composedOptions appendFormat:@",sdp=\"rtsp://%@\"", [_stream_sdp_fld stringValue]];
+                    break;
+                case 3:
+                    [composedOptions appendFormat:@",sdp=\"file://%s\"", vlc_path2uri([[_stream_sdp_fld stringValue] UTF8String], NULL)];
+                default:
+                    break;
+            }
+        }
 
         [composedOptions appendString:@"} :sout-keep"];
     }
