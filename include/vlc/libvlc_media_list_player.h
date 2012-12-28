@@ -128,7 +128,7 @@ LIBVLC_API
 void libvlc_media_list_player_play(libvlc_media_list_player_t * p_mlp);
 
 /**
- * Pause media list
+ * Toggle pause (or resume) media list
  *
  * \param p_mlp media list player instance
  */
