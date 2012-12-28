@@ -274,6 +274,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (IBAction)finalizePanel:(id)sender
 {
+    // HTTP, TODO: mux checking, since only MPEG PS, MPEG TS, MPEG 1, OGG, RAW and ASF are allowed
+
     playlist_t * p_playlist = pl_Get(VLCIntf);
 
     input_item_t *p_input = input_item_New([_MRL UTF8String], [[_dropin_media_lbl stringValue] UTF8String]);
@@ -281,6 +283,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         return;
 
     input_item_AddOption(p_input, [[self composedOptions] UTF8String], VLC_INPUT_OPTION_TRUSTED);
+    if (b_streaming)
+        input_item_AddOption(p_input, [[NSString stringWithFormat:@"ttl=%@", [_stream_ttl_fld stringValue]] UTF8String], VLC_INPUT_OPTION_TRUSTED);
 
     int returnValue;
     returnValue = playlist_AddInput(p_playlist, p_input, PLAYLIST_STOP, PLAYLIST_END, true, pl_Unlocked);
@@ -460,14 +464,6 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         NSBeginInformationalAlertSheet(_NS("No SDP URL given"),
                                        _NS("OK"), @"", @"", _stream_panel, nil, nil, nil, nil,
                                        @"%@", _NS("A SDP export is requested, but no URL is provided."));
-        return;
-    }
-
-    NSString *tmpString = [_stream_address_fld stringValue];
-    if ([[tmpString componentsSeparatedByString:@":"] count] != 5 || [[tmpString componentsSeparatedByString:@"."] count] != 3 || ![tmpString isEqualToString:@"localhost"]) {
-        NSBeginInformationalAlertSheet(_NS("Invalid Output Destination"),
-                                       _NS("OK"), @"", @"", _stream_panel, nil, nil, nil, nil,
-                                       @"%@", _NS("The entered output destination IP does not appear to be legit."));
         return;
     }
 
@@ -872,11 +868,32 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
             [composedOptions appendFormat:@",soverlay"];
     }
 
-    // add muxer
-    [composedOptions appendFormat:@"}:standard{mux=%@", [self.currentProfile objectAtIndex:0]];
 
-    // add output destination (file only at this point)
-    [composedOptions appendFormat:@",dst=%@,access=file}", _outputDestination];
+    if (!b_streaming) {
+        /* file transcoding */
+        // add muxer
+        [composedOptions appendFormat:@"}:standard{mux=%@", [self.currentProfile objectAtIndex:0]];
+
+        // add output destination
+        [composedOptions appendFormat:@",dst=%@,access=file}", _outputDestination];
+    } else {
+        /* streaming */
+        if ([[[_stream_type_pop selectedItem] title] isEqualToString:@"RTP"])
+            [composedOptions appendFormat:@":rtp{mux=ts,dst=%@,port=%@", _outputDestination, [_stream_port_fld stringValue]];
+        else if ([[[_stream_type_pop selectedItem] title] isEqualToString:@"UDP"])
+            [composedOptions appendFormat:@":standard{mux=ts,dst=%@,port=%@,access=udp", _outputDestination, [_stream_port_fld stringValue]];
+        else if ([[[_stream_type_pop selectedItem] title] isEqualToString:@"MMSH"])
+            [composedOptions appendFormat:@":standard{mux=asfh,dst=%@,port=%@,access=mmsh", _outputDestination, [_stream_port_fld stringValue]];
+        else
+            [composedOptions appendFormat:@":standard{mux=%@,dst=%@,port=%@,access=http", [self.currentProfile objectAtIndex:0], [_stream_port_fld stringValue], _outputDestination];
+
+        if ([_stream_sap_ckb state])
+            [composedOptions appendFormat:@",sap,name=\"%@\"", [_stream_channel_fld stringValue]];
+        if ([_stream_sdp_ckb state])
+            [composedOptions appendFormat:@",sdp=%@", [_stream_sdp_fld stringValue]];
+
+        [composedOptions appendString:@"} :sout-keep"];
+    }
 
     NSString * returnString = [NSString stringWithString:composedOptions];
     [composedOptions release];
