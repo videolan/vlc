@@ -161,6 +161,7 @@ private:
     void ParseCluster( bool b_update_start_time = true );
     SimpleTag * ParseSimpleTags( KaxTagSimple *tag, int level = 50 );
     void IndexAppendCluster( KaxCluster *cluster );
+    int32_t TrackInit( mkv_track_t * p_tk );
 };
 
 
