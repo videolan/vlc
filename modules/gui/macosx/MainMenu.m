@@ -288,7 +288,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_open_capture setTitle: _NS("Open Capture Device...")];
     [o_mi_open_recent setTitle: _NS("Open Recent")];
     [o_mi_open_wizard setTitle: _NS("Streaming/Exporting Wizard...")];
-    [o_mi_convertandsave setTitle: _NS("Convert / Save...")];
+    [o_mi_convertandsave setTitle: _NS("Convert / Stream...")];
 
     [o_mu_edit setTitle: _NS("Edit")];
     [o_mi_cut setTitle: _NS("Cut")];

@@ -146,8 +146,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
-    [_window setTitle: _NS("Convert & Save")];
-    [_ok_btn setTitle: _NS("Save")];
+    [_window setTitle: _NS("Convert & Stream")];
+    [_ok_btn setTitle: _NS("Go!")];
     [_drop_lbl setStringValue: _NS("Drop media here")];
     [_drop_btn setTitle: _NS("Open media...")];
     [_profile_lbl setStringValue: _NS("Choose Profile")];
