@@ -273,7 +273,18 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (IBAction)finalizePanel:(id)sender
 {
-    // HTTP, TODO: mux checking, since only MPEG PS, MPEG TS, MPEG 1, OGG, RAW and ASF are allowed
+    if (b_streaming) {
+        if ([[[_stream_type_pop selectedItem] title] isEqualToString:@"HTTP"]) {
+            NSString *muxformat = [self.currentProfile objectAtIndex:0];
+            if ([muxformat isEqualToString:@"wav"] || [muxformat isEqualToString:@"mov"] || [muxformat isEqualToString:@"mp4"]) {
+                NSBeginInformationalAlertSheet(_NS("Invalid container format for HTTP streaming"), _NS("OK"), @"", @"", _window,
+                                               nil, nil, nil, nil, @"%@",
+                                               _NS("Media encapsulated as %@ cannot be streamed through the HTTP protocol for technical reasons."),
+                                               [[self currentEncapsulationFormatAsFileExtension:YES] uppercaseString]);
+                return;
+            }
+        }
+    }
 
     playlist_t * p_playlist = pl_Get(VLCIntf);
 
@@ -452,6 +463,13 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [labelContent release];
 
     /* catch obvious errors */
+    if (![[_stream_address_fld stringValue] length] > 0) {
+        NSBeginInformationalAlertSheet(_NS("No Address given"),
+                                       _NS("OK"), @"", @"", _stream_panel, nil, nil, nil, nil,
+                                       @"%@", _NS("In order to stream, a valid destination address is required."));
+        return;
+    }
+
     if ([_stream_sap_ckb state] && ![[_stream_channel_fld stringValue] length] > 0) {
         NSBeginInformationalAlertSheet(_NS("No Channel Name given"),
                                        _NS("OK"), @"", @"", _stream_panel, nil, nil, nil, nil,
