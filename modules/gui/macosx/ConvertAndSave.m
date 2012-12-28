@@ -439,6 +439,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (IBAction)closeStreamPanel:(id)sender
 {
+    /* provide a summary of the user selections */
     NSMutableString * labelContent = [[NSMutableString alloc] initWithFormat:_NS("%@ stream to %@:%@"), [_stream_type_pop titleOfSelectedItem], [_stream_address_fld stringValue], [_stream_port_fld stringValue]];
 
     if ([_stream_type_pop indexOfSelectedItem] > 1)
@@ -446,6 +447,33 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
     [_destination_stream_lbl setStringValue:labelContent];
     [labelContent release];
+
+    /* catch obvious errors */
+    if (([_stream_http_ckb state] || [_stream_rtsp_ckb state] || [_stream_sap_ckb state]) && ![[_stream_channel_fld stringValue] length] > 0) {
+        NSBeginInformationalAlertSheet(_NS("No Channel Name given"),
+                                       _NS("OK"), @"", @"", _stream_panel, nil, nil, nil, nil,
+                                       @"%@", _NS("A stream announcement option is enabled. However, no channel name is provided."));
+        return;
+    }
+
+    if ([_stream_sdp_ckb state] && ![[_stream_sdp_fld stringValue] length] > 0) {
+        NSBeginInformationalAlertSheet(_NS("No SDP URL given"),
+                                       _NS("OK"), @"", @"", _stream_panel, nil, nil, nil, nil,
+                                       @"%@", _NS("A SDP export is requested, but no URL is provided."));
+        return;
+    }
+
+    NSString *tmpString = [_stream_address_fld stringValue];
+    if ([[tmpString componentsSeparatedByString:@":"] count] != 5 || [[tmpString componentsSeparatedByString:@"."] count] != 3 || ![tmpString isEqualToString:@"localhost"]) {
+        NSBeginInformationalAlertSheet(_NS("Invalid Output Destination"),
+                                       _NS("OK"), @"", @"", _stream_panel, nil, nil, nil, nil,
+                                       @"%@", _NS("The entered output destination IP does not appear to be legit."));
+        return;
+    }
+
+    /* store destination for further reference and update UI */
+    [self setOutputDestination: [_stream_address_fld stringValue]];
+    [self updateOKButton];
 
     [_stream_panel orderOut:sender];
     [NSApp endSheet: _stream_panel];
