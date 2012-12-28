@@ -197,13 +197,12 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_stream_ttl_stepper setEnabled:NO];
     [_stream_port_lbl setStringValue:_NS("Port")];
     [_stream_sap_ckb setStringValue:_NS("SAP Announcement")];
-    [_stream_http_ckb setStringValue:_NS("HTTP Announcement")];
-    [_stream_rtsp_ckb setStringValue:_NS("RTSP Announcement")];
-    [_stream_sdp_ckb setStringValue:_NS("Export SDP as file")];
+    [[_stream_sdp_matrix cellWithTag:0] setTitle:_NS("None")];
+    [[_stream_sdp_matrix cellWithTag:1] setTitle:_NS("HTTP Announcement")];
+    [[_stream_sdp_matrix cellWithTag:2] setTitle:_NS("RTSP Announcement")];
+    [[_stream_sdp_matrix cellWithTag:3] setTitle:_NS("Export SDP as file")];
     [_stream_sap_ckb setState:NSOffState];
-    [_stream_http_ckb setState:NSOffState];
-    [_stream_rtsp_ckb setState:NSOffState];
-    [_stream_sdp_ckb setState:NSOffState];
+    [_stream_sdp_matrix setEnabled:NO];
 
     /* there is no way to hide single cells, so replace the existing ones with empty cells.. */
     id blankCell = [[[NSCell alloc] init] autorelease];
@@ -453,14 +452,14 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [labelContent release];
 
     /* catch obvious errors */
-    if (([_stream_http_ckb state] || [_stream_rtsp_ckb state] || [_stream_sap_ckb state]) && ![[_stream_channel_fld stringValue] length] > 0) {
+    if ([_stream_sap_ckb state] && ![[_stream_channel_fld stringValue] length] > 0) {
         NSBeginInformationalAlertSheet(_NS("No Channel Name given"),
                                        _NS("OK"), @"", @"", _stream_panel, nil, nil, nil, nil,
-                                       @"%@", _NS("A stream announcement option is enabled. However, no channel name is provided."));
+                                       @"%@", _NS("SAP stream announcement is enabled. However, no channel name is provided."));
         return;
     }
 
-    if ([_stream_sdp_ckb state] && ![[_stream_sdp_fld stringValue] length] > 0) {
+    if ([_stream_sdp_matrix isEnabled] && [_stream_sdp_matrix selectedCell] != [_stream_sdp_matrix cellWithTag:0] && ![[_stream_sdp_fld stringValue] length] > 0) {
         NSBeginInformationalAlertSheet(_NS("No SDP URL given"),
                                        _NS("OK"), @"", @"", _stream_panel, nil, nil, nil, nil,
                                        @"%@", _NS("A SDP export is requested, but no URL is provided."));
@@ -482,31 +481,25 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         [_stream_ttl_fld setEnabled:NO];
         [_stream_ttl_stepper setEnabled:NO];
         [_stream_sap_ckb setEnabled:NO];
-        [_stream_rtsp_ckb setEnabled:NO];
-        [_stream_http_ckb setEnabled:NO];
-        [_stream_sdp_ckb setEnabled:NO];
+        [_stream_sdp_matrix setEnabled:NO];
     } else if (index == 2) { // RTP
         [_stream_ttl_fld setEnabled:YES];
         [_stream_ttl_stepper setEnabled:YES];
         [_stream_sap_ckb setEnabled:YES];
-        [_stream_rtsp_ckb setEnabled:YES];
-        [_stream_http_ckb setEnabled:YES];
-        [_stream_sdp_ckb setEnabled:YES];
+        [_stream_sdp_matrix setEnabled:YES];
     } else { // UDP
         [_stream_ttl_fld setEnabled:YES];
         [_stream_ttl_stepper setEnabled:YES];
         [_stream_sap_ckb setEnabled:YES];
-        [_stream_rtsp_ckb setEnabled:NO];
-        [_stream_http_ckb setEnabled:NO];
-        [_stream_sdp_ckb setEnabled:NO];
+        [_stream_sdp_matrix setEnabled:NO];
     }
     [self streamAnnouncementToggle:sender];
 }
 
 - (IBAction)streamAnnouncementToggle:(id)sender
 {
-    [_stream_channel_fld setEnabled:([_stream_http_ckb state] || [_stream_rtsp_ckb state] || [_stream_sap_ckb state]) && ([_stream_http_ckb isEnabled] || [_stream_rtsp_ckb isEnabled] || [_stream_sap_ckb isEnabled])];
-    [_stream_sdp_fld setEnabled:[_stream_sdp_ckb state]];
+    [_stream_channel_fld setEnabled:[_stream_sap_ckb state] && [_stream_sap_ckb isEnabled]];
+    [_stream_sdp_fld setEnabled:[_stream_sdp_matrix isEnabled] && ([_stream_sdp_matrix selectedCell] != [_stream_sdp_matrix cellWithTag:0])];
 }
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
@@ -889,7 +882,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
         if ([_stream_sap_ckb state])
             [composedOptions appendFormat:@",sap,name=\"%@\"", [_stream_channel_fld stringValue]];
-        if ([_stream_sdp_ckb state])
+        if ([_stream_sdp_matrix selectedCell] != [_stream_sdp_matrix cellWithTag:0]) //FIXME
             [composedOptions appendFormat:@",sdp=%@", [_stream_sdp_fld stringValue]];
 
         [composedOptions appendString:@"} :sout-keep"];

@@ -106,10 +106,8 @@
     IBOutlet id _stream_port_lbl;
     IBOutlet id _stream_port_fld;
     IBOutlet id _stream_sap_ckb;
-    IBOutlet id _stream_http_ckb;
-    IBOutlet id _stream_rtsp_ckb;
-    IBOutlet id _stream_sdp_ckb;
     IBOutlet id _stream_channel_fld;
+    IBOutlet id _stream_sdp_matrix;
     IBOutlet id _stream_sdp_fld;
 
     NSString * _MRL;
