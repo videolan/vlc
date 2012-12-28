@@ -864,7 +864,7 @@ static int DrawHelp(intf_thread_t *intf)
     if (sys->color) color_set(C_DEFAULT, NULL);
     H(_(" h,H                    Show/Hide help box"));
     H(_(" i                      Show/Hide info box"));
-    H(_(" m                      Show/Hide metadata box"));
+    H(_(" M                      Show/Hide metadata box"));
     H(_(" L                      Show/Hide messages box"));
     H(_(" P                      Show/Hide playlist box"));
     H(_(" B                      Show/Hide filebrowser"));
@@ -887,6 +887,7 @@ static int DrawHelp(intf_thread_t *intf)
     /* xgettext: You can use ← and → characters */
     H(_(" <left>,<right>         Seek -/+ 1%%"));
     H(_(" a, z                   Volume Up/Down"));
+    H(_(" m                      Mute"));
     /* xgettext: You can use ↑ and ↓ characters */
     H(_(" <up>,<down>            Navigate through the box line by line"));
     /* xgettext: You can use ⇞ and ⇟ characters */
@@ -1090,13 +1091,12 @@ static int DrawStatus(intf_thread_t *intf)
 
             mvnprintw(y++, 0, COLS, _(" Position : %s/%s"), buf1, buf2);
 
-            volume =playlist_VolumeGet(p_playlist);
-            if (volume >= 0.f)
-                mvnprintw(y++, 0, COLS, _(" Volume   : %3ld%%"),
-                          lroundf(volume * 100.f));
-            else
-                mvnprintw(y++, 0, COLS, _(" Volume   : ----"),
-                          lroundf(volume * 100.f));
+            volume = playlist_VolumeGet(p_playlist);
+            int mute = playlist_MuteGet(p_playlist);
+            mvnprintw(y++, 0, COLS,
+                      mute ? _(" Volume   : Mute") :
+                      volume >= 0.f ? _(" Volume   : %3ld%%") : _(" Volume   : ----"),
+                      lroundf(volume * 100.f));
 
             if (!var_Get(p_input, "title", &val)) {
                 int i_title_count = var_CountChoices(p_input, "title");
@@ -1564,7 +1564,7 @@ static void HandleCommonKey(intf_thread_t *intf, int key)
     case 'h':
     case 'H': BoxSwitch(sys, BOX_HELP);       return;
     case 'i': BoxSwitch(sys, BOX_INFO);       return;
-    case 'm': BoxSwitch(sys, BOX_META);       return;
+    case 'M': BoxSwitch(sys, BOX_META);       return;
     case 'L': BoxSwitch(sys, BOX_LOG);        return;
     case 'P': BoxSwitch(sys, BOX_PLAYLIST);   return;
     case 'B': BoxSwitch(sys, BOX_BROWSE);     return;
@@ -1610,6 +1610,7 @@ static void HandleCommonKey(intf_thread_t *intf, int key)
     case 'n': playlist_Next(p_playlist);            break;
     case 'a': playlist_VolumeUp(p_playlist, 1, NULL);   break;
     case 'z': playlist_VolumeDown(p_playlist, 1, NULL); break;
+    case 'm': playlist_MuteToggle(p_playlist); break;
 
     case 0x0c:  /* ^l */
     case KEY_CLEAR:
