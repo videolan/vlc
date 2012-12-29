@@ -1046,7 +1046,16 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
 
         //Copy samples from new packet to buffer to get frame size
         if( likely( leftover ) )
-            memcpy( p_sys->p_buffer+(p_sys->i_samples_delay*p_sys->i_sample_bytes), p_aout_buf->p_buffer, leftover*p_sys->i_sample_bytes*p_enc->fmt_in.audio.i_channels);
+        {
+            if( av_sample_fmt_is_planar( p_sys->p_context->sample_fmt ) )
+                aout_Deinterleave( p_sys->p_buffer+(p_sys->i_samples_delay*p_sys->i_sample_bytes*p_enc->fmt_in.audio.i_channels ),
+                                  p_aout_buf->p_buffer, leftover, p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.i_codec );
+            else
+                memcpy( p_sys->p_buffer+(p_sys->i_samples_delay*p_sys->i_sample_bytes),
+                        p_aout_buf->p_buffer,
+                        leftover * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels
+                       );
+        }
 
         if( avcodec_fill_audio_frame( frame, p_enc->fmt_in.audio.i_channels,
                               p_sys->p_context->sample_fmt,
@@ -1130,12 +1139,24 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         frame->nb_samples = p_sys->i_frame_size;
         frame->format     = p_sys->p_context->sample_fmt;
 
-        if( avcodec_fill_audio_frame( frame, p_enc->fmt_in.audio.i_channels,
-                              p_sys->p_context->sample_fmt,
-                              p_aout_buf->p_buffer+i_data_offset,
-                              p_sys->i_frame_size * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels,
-                              0) < 0 )
-                msg_Err( p_enc, "filling error on encode" );
+        if( av_sample_fmt_is_planar( p_sys->p_context->sample_fmt ) )
+        {
+            aout_Deinterleave( p_sys->p_buffer, p_aout_buf->p_buffer+i_data_offset,
+                              p_sys->i_frame_size, p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.i_codec );
+            if( avcodec_fill_audio_frame( frame, p_enc->fmt_in.audio.i_channels,
+                                    p_sys->p_context->sample_fmt,
+                                    p_sys->p_buffer,
+                                    p_sys->i_frame_size * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels,
+                                    0) < 0 )
+                 msg_Err( p_enc, "filling error on encode" );
+        } else {
+            if( avcodec_fill_audio_frame( frame, p_enc->fmt_in.audio.i_channels,
+                                    p_sys->p_context->sample_fmt,
+                                    p_aout_buf->p_buffer+i_data_offset,
+                                    p_sys->i_frame_size * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels,
+                                    0) < 0 )
+                 msg_Err( p_enc, "filling error on encode" );
+        }
 
         i_samples_left -= p_sys->i_frame_size;
         i_data_offset += p_sys->i_frame_size * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels;
@@ -1181,7 +1202,10 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     // that frame has more data than p_sys->i_frame_size most of the cases currently.
     if( i_samples_left > 0 )
     {
-        memcpy( p_sys->p_buffer, p_aout_buf->p_buffer+i_data_offset , i_samples_left*p_sys->i_sample_bytes*p_enc->fmt_in.audio.i_channels);
+        if( av_sample_fmt_is_planar( p_sys->p_context->sample_fmt ) )
+            aout_Deinterleave( p_sys->p_buffer, p_aout_buf->p_buffer+i_data_offset, i_samples_left, p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.i_codec );
+        else
+            memcpy( p_sys->p_buffer, p_aout_buf->p_buffer+i_data_offset , i_samples_left*p_sys->i_sample_bytes*p_enc->fmt_in.audio.i_channels);
         p_sys->i_samples_delay = i_samples_left;
     }
 
