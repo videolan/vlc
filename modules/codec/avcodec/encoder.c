@@ -595,7 +595,8 @@ int OpenEncoder( vlc_object_t *p_this )
         p_context->sample_fmt  = p_codec->sample_fmts ?
                                     p_codec->sample_fmts[0] :
                                     AV_SAMPLE_FMT_S16;
-        p_enc->fmt_in.i_codec  = VLC_CODEC_S16N;
+        p_enc->fmt_in.i_codec  = GetVlcAudioFormat( p_context->sample_fmt );
+
         p_context->sample_rate = p_enc->fmt_out.audio.i_rate;
         p_context->time_base.num = 1;
         p_context->time_base.den = p_context->sample_rate;
