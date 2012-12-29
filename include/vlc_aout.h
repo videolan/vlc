@@ -214,6 +214,8 @@ VLC_API void aout_ChannelReorder(void *, size_t, unsigned, const uint8_t *, vlc_
 
 VLC_API void aout_Interleave(void *dst, const void *src, unsigned samples,
                              unsigned channels, vlc_fourcc_t fourcc);
+VLC_API void aout_Deinterleave(void *dst, const void *src, unsigned samples,
+                             unsigned channels, vlc_fourcc_t fourcc);
 
 /**
  * This fonction will compute the extraction parameter into pi_selection to go

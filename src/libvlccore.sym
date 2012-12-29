@@ -6,6 +6,7 @@ aout_ChannelReorder
 aout_CheckChannelExtraction
 aout_CheckChannelReorder
 aout_Interleave
+aout_Deinterleave
 aout_filter_RequestVout
 aout_FormatPrepare
 aout_FormatPrint
