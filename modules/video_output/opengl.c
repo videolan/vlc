@@ -68,9 +68,11 @@
 #endif
 
 #if USE_OPENGL_ES
+#   define GLSL_VERSION "100"
 #   define VLCGL_TEXTURE_COUNT 1
 #   define VLCGL_PICTURE_MAX 1
 #else
+#   define GLSL_VERSION "120"
 #   define VLCGL_TEXTURE_COUNT 1
 #   define VLCGL_PICTURE_MAX 128
 #endif
@@ -191,11 +193,7 @@ static void BuildVertexShader(vout_display_opengl_t *vgl,
 {
     /* Basic vertex shader */
     const char *vertexShader =
-#if USE_OPENGL_ES == 2
-        "#version 100\n"
-#else
-        "#version 120\n"
-#endif
+        "#version " GLSL_VERSION "\n"
         "varying   vec4 TexCoord0,TexCoord1, TexCoord2;"
         "attribute vec4 MultiTexCoord0,MultiTexCoord1,MultiTexCoord2;"
         "attribute vec4 VertexPosition;"
@@ -238,11 +236,7 @@ static void BuildYUVFragmentShader(vout_display_opengl_t *vgl,
 
     /* Basic linear YUV -> RGB conversion using bilinear interpolation */
     const char *template_glsl_yuv =
-#if USE_OPENGL_ES == 2
-        "#version 100\n"
-#else
-        "#version 120\n"
-#endif
+        "#version " GLSL_VERSION "\n"
         "uniform sampler2D Texture0;"
         "uniform sampler2D Texture1;"
         "uniform sampler2D Texture2;"
@@ -292,11 +286,7 @@ static void BuildRGBFragmentShader(vout_display_opengl_t *vgl,
 {
     // Simple shader for RGB
     const char *code =
-#if USE_OPENGL_ES == 2
-        "#version 100\n"
-#else
-        "#version 120\n"
-#endif
+        "#version " GLSL_VERSION "\n"
         "uniform sampler2D Texture[3];"
         "varying vec4 TexCoord0,TexCoord1,TexCoord2;"
         "void main()"
@@ -313,11 +303,7 @@ static void BuildRGBAFragmentShader(vout_display_opengl_t *vgl,
 {
     // Simple shader for RGBA
     const char *code =
-#if USE_OPENGL_ES == 2
-        "#version 100\n"
-#else
-        "#version 120\n"
-#endif
+        "#version " GLSL_VERSION "\n"
         "uniform sampler2D Texture;"
         "uniform vec4 FillColor;"
         "varying vec4 TexCoord0;"
