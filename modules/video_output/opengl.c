@@ -191,7 +191,7 @@ static void BuildVertexShader(vout_display_opengl_t *vgl,
 {
     /* Basic vertex shader */
     const char *vertexShader =
-#ifdef USE_OPENGL_ES
+#if USE_OPENGL_ES == 2
         "#version 100\n"
 #else
         "#version 120\n"
@@ -238,7 +238,7 @@ static void BuildYUVFragmentShader(vout_display_opengl_t *vgl,
 
     /* Basic linear YUV -> RGB conversion using bilinear interpolation */
     const char *template_glsl_yuv =
-#ifdef USE_OPENGL_ES
+#if USE_OPENGL_ES == 2
         "#version 100\n"
 #else
         "#version 120\n"
@@ -292,7 +292,7 @@ static void BuildRGBFragmentShader(vout_display_opengl_t *vgl,
 {
     // Simple shader for RGB
     const char *code =
-#ifdef USE_OPENGL_ES
+#if USE_OPENGL_ES == 2
         "#version 100\n"
 #else
         "#version 120\n"
@@ -313,7 +313,7 @@ static void BuildRGBAFragmentShader(vout_display_opengl_t *vgl,
 {
     // Simple shader for RGBA
     const char *code =
-#ifdef USE_OPENGL_ES
+#if USE_OPENGL_ES == 2
         "#version 100\n"
 #else
         "#version 120\n"
