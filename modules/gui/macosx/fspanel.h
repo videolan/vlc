@@ -76,12 +76,15 @@
 - (void)setVoutWasUpdated: (VLCWindow *)o_window;
 @end
 
+@class VLCProgressView;
+
 @interface VLCFSPanelView : NSView
 {
     NSColor *fillColor;
     NSButton *o_prev, *o_next, *o_bwd, *o_fwd, *o_play, *o_fullscreen;
     NSTextField *o_streamTitle_txt, *o_streamPosition_txt;
     NSSlider *o_fs_timeSlider, *o_fs_volumeSlider;
+    VLCProgressView *o_progress_view;
     NSImage *o_background_img, *o_vol_sld_img, *o_vol_mute_img, *o_vol_max_img, *o_time_sld_img;
     NSTimeInterval last_fwd_event;
     NSTimeInterval last_bwd_event;

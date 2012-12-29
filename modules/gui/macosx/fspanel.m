@@ -417,11 +417,14 @@
     [o_bwd setContinuous:YES];
 
     /* time slider */
-    s_rc = [self frame];
+    // (surrounding progress view for swipe behaviour)
     s_rc.origin.x = 15;
     s_rc.origin.y = 45;
     s_rc.size.width = 518;
     s_rc.size.height = 13;
+    o_progress_view = [[VLCProgressView alloc] initWithFrame: s_rc];
+    s_rc.origin.x = 0;
+    s_rc.origin.y = 0;
     o_fs_timeSlider = [[VLCFSTimeSlider alloc] initWithFrame: s_rc];
     [o_fs_timeSlider setMinValue:0];
     [o_fs_timeSlider setMaxValue:10000];
@@ -431,7 +434,8 @@
     [o_fs_timeSlider setAction: @selector(fsTimeSliderUpdate:)];
     [[o_fs_volumeSlider cell] accessibilitySetOverrideValue:_NS("Position") forAttribute:NSAccessibilityTitleAttribute];
     [[o_fs_timeSlider cell] accessibilitySetOverrideValue:_NS("Click and move the mouse while keeping the button pressed to use this slider to change current playback position.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [self addSubview: o_fs_timeSlider];
+    [self addSubview: o_progress_view];
+    [o_progress_view addSubview: o_fs_timeSlider];
 
     /* volume slider */
     s_rc = [self frame];
