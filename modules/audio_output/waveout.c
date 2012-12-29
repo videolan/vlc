@@ -55,16 +55,24 @@ static void Play         ( audio_output_t *, block_t * );
 /*****************************************************************************
  * notification_thread_t: waveOut event thread
  *****************************************************************************/
+struct lkwavehdr
+{
+    WAVEHDR hdr;
+    struct lkwavehdr * p_next;
+};
+
 /* local functions */
 static void Probe        ( audio_output_t *, const audio_sample_format_t * );
 static int OpenWaveOut   ( audio_output_t *, uint32_t,
                            int, int, int, int, bool );
 static int OpenWaveOutPCM( audio_output_t *, uint32_t,
                            vlc_fourcc_t*, int, int, int, bool );
-static int PlayWaveOut   ( audio_output_t *, HWAVEOUT, WAVEHDR *,
+static int PlayWaveOut   ( audio_output_t *, HWAVEOUT, struct lkwavehdr *,
                            block_t *, bool );
 
 static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR );
+
+static void WaveOutClean( aout_sys_t * p_sys );
 
 static void WaveOutClearBuffer( HWAVEOUT, WAVEHDR *);
 
@@ -83,6 +91,7 @@ static const wchar_t device_name_fmt[] = L"%ls ($%x,$%x)";
  * This structure is part of the audio output thread descriptor.
  * It describes the waveOut specific properties of an audio device.
  *****************************************************************************/
+
 struct aout_sys_t
 {
     uint32_t i_wave_device_id;               /* ID of selected output device */
@@ -110,6 +119,8 @@ struct aout_sys_t
     vlc_fourcc_t format;
 
     mtime_t i_played_length;
+
+    struct lkwavehdr * p_free_list;
 
     vlc_mutex_t lock;
     vlc_cond_t cond;
@@ -203,7 +214,6 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     {
         /* Probe() has failed. */
         var_Destroy( p_aout, "waveout-audio-device");
-        free( p_aout->sys );
         return VLC_EGENERIC;
     }
 
@@ -219,7 +229,6 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
             != VLC_SUCCESS )
         {
             msg_Err( p_aout, "cannot open waveout audio device" );
-            free( p_aout->sys );
             return VLC_EGENERIC;
         }
 
@@ -257,7 +266,6 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
             != VLC_SUCCESS )
         {
             msg_Err( p_aout, "cannot open waveout audio device" );
-            free( p_aout->sys );
             return VLC_EGENERIC;
         }
 
@@ -279,7 +287,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
         malloc( p_aout->sys->i_buffer_size );
     if( p_aout->sys->p_silence_buffer == NULL )
     {
-        free( p_aout->sys );
+        msg_Err( p_aout, "Couldn't alloc silence buffer... aborting");
         return VLC_ENOMEM;
     }
     p_aout->sys->i_repeat_counter = 0;
@@ -292,6 +300,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     /* Now we need to setup our waveOut play notification structure */
     p_aout->sys->i_frames = 0;
     p_aout->sys->i_played_length = 0;
+    p_aout->sys->p_free_list = NULL;
 
     return VLC_SUCCESS;
 }
@@ -409,12 +418,18 @@ static void Probe( audio_output_t * p_aout, const audio_sample_format_t *fmt )
  *****************************************************************************/
 static void Play( audio_output_t *p_aout, block_t *block )
 {
-    WAVEHDR * p_waveheader = (WAVEHDR *) malloc(sizeof(WAVEHDR));
+    struct lkwavehdr * p_waveheader = 
+        (struct lkwavehdr *) malloc(sizeof(struct lkwavehdr));
     if(!p_waveheader)
     {
         msg_Err(p_aout, "Couldn't alloc WAVEHDR");
+        if( block )
+            block_Release( block );
         return;
     }
+
+    p_waveheader->p_next = NULL;
+
     if( block && p_aout->sys->chans_to_reorder )
     {
         aout_ChannelReorder( block->p_buffer, block->i_buffer,
@@ -428,6 +443,8 @@ static void Play( audio_output_t *p_aout, block_t *block )
         msg_Warn( p_aout, "Couln't write frame... sleeping");
         msleep( block->i_length );
     }
+
+    WaveOutClean( p_aout->sys );
 
     vlc_mutex_lock( &p_aout->sys->lock );
     p_aout->sys->i_frames++;
@@ -465,6 +482,10 @@ static void Stop( audio_output_t *p_aout )
             WaveOutFlush( p_aout, true );
        }
     }
+
+    /* wait for the frames to be queued in cleaning list */
+    WaveOutFlush( p_aout, true );
+    WaveOutClean( p_aout->sys );
 
     /* now we can Close the device */
     if( waveOutClose( p_sys->h_waveout ) != MMSYSERR_NOERROR )
@@ -639,15 +660,15 @@ static int OpenWaveOutPCM( audio_output_t *p_aout, uint32_t i_device_id,
  * PlayWaveOut: play a buffer through the WaveOut device
  *****************************************************************************/
 static int PlayWaveOut( audio_output_t *p_aout, HWAVEOUT h_waveout,
-                        WAVEHDR *p_waveheader, block_t *p_buffer, bool b_spdif)
+                        struct lkwavehdr *p_waveheader, block_t *p_buffer, bool b_spdif)
 {
     MMRESULT result;
 
     /* Prepare the buffer */
     if( p_buffer != NULL )
     {
-        p_waveheader->lpData = (LPSTR)p_buffer->p_buffer;
-        p_waveheader->dwBufferLength = p_buffer->i_buffer;
+        p_waveheader->hdr.lpData = (LPSTR)p_buffer->p_buffer;
+        p_waveheader->hdr.dwBufferLength = p_buffer->i_buffer;
         /*
           copy the buffer to the silence buffer :) so in case we don't
           get the next buffer fast enough (I will repeat this one a time
@@ -672,14 +693,14 @@ static int PlayWaveOut( audio_output_t *p_aout, HWAVEOUT h_waveout,
                            0x00, p_aout->sys->i_buffer_size );
            }
         }
-        p_waveheader->lpData = (LPSTR)p_aout->sys->p_silence_buffer;
-        p_waveheader->dwBufferLength = p_aout->sys->i_buffer_size;
+        p_waveheader->hdr.lpData = (LPSTR)p_aout->sys->p_silence_buffer;
+        p_waveheader->hdr.dwBufferLength = p_aout->sys->i_buffer_size;
     }
 
-    p_waveheader->dwUser = p_buffer ? (DWORD_PTR)p_buffer : (DWORD_PTR)1;
-    p_waveheader->dwFlags = 0;
+    p_waveheader->hdr.dwUser = p_buffer ? (DWORD_PTR)p_buffer : (DWORD_PTR)1;
+    p_waveheader->hdr.dwFlags = 0;
 
-    result = waveOutPrepareHeader( h_waveout, p_waveheader, sizeof(WAVEHDR) );
+    result = waveOutPrepareHeader( h_waveout, &p_waveheader->hdr, sizeof(WAVEHDR) );
     if( result != MMSYSERR_NOERROR )
     {
         msg_Err( p_aout, "waveOutPrepareHeader failed" );
@@ -687,7 +708,7 @@ static int PlayWaveOut( audio_output_t *p_aout, HWAVEOUT h_waveout,
     }
 
     /* Send the buffer to the waveOut queue */
-    result = waveOutWrite( h_waveout, p_waveheader, sizeof(WAVEHDR) );
+    result = waveOutWrite( h_waveout, &p_waveheader->hdr, sizeof(WAVEHDR) );
     if( result != MMSYSERR_NOERROR )
     {
         msg_Err( p_aout, "waveOutWrite failed" );
@@ -704,19 +725,37 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
                                       DWORD_PTR _p_aout,
                                       DWORD_PTR dwParam1, DWORD_PTR dwParam2 )
 {
-    (void)dwParam2;
+    (void) h_waveout;
+    (void) dwParam2;
     audio_output_t *p_aout = (audio_output_t *)_p_aout;
-    WAVEHDR * p_waveheader =  (WAVEHDR *) dwParam1;
+    struct lkwavehdr * p_waveheader =  (struct lkwavehdr *) dwParam1;
 
     if( uMsg != WOM_DONE ) return;
 
-    WaveOutClearBuffer( h_waveout, p_waveheader );
-
-    free(p_waveheader);
     vlc_mutex_lock( &p_aout->sys->lock );
+    p_waveheader->p_next = p_aout->sys->p_free_list;
+    p_aout->sys->p_free_list = p_waveheader;
     p_aout->sys->i_frames--;
     vlc_cond_broadcast( &p_aout->sys->cond );
     vlc_mutex_unlock( &p_aout->sys->lock );
+}
+
+static void WaveOutClean( aout_sys_t * p_sys )
+{
+    struct lkwavehdr *p_whdr, *p_list;
+
+    vlc_mutex_lock(&p_sys->lock);
+    p_list =  p_sys->p_free_list;
+    p_sys->p_free_list = NULL;
+    vlc_mutex_unlock(&p_sys->lock);
+
+    while( p_list )
+    {
+        p_whdr = p_list;
+        p_list = p_list->p_next;
+        WaveOutClearBuffer( p_sys->h_waveout, &p_whdr->hdr );
+        free(p_whdr);
+    }
 }
 
 static void WaveOutClearBuffer( HWAVEOUT h_waveout, WAVEHDR *p_waveheader )
@@ -873,6 +912,7 @@ static void WaveOutFlush( audio_output_t *p_aout, bool wait)
 static void WaveOutPause( audio_output_t * p_aout, bool pause, mtime_t date)
 {
     MMRESULT res;
+    (void) date;
     if(pause)
     {
         res = waveOutPause( p_aout->sys->h_waveout );
