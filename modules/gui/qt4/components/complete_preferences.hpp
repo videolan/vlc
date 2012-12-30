@@ -67,7 +67,6 @@ Q_DECLARE_METATYPE( PrefsItemData* );
 class PrefsTree : public QTreeWidget
 {
     Q_OBJECT
-    Q_PROPERTY( bool b_show_only_loaded WRITE setLoadedOnly )
 
 public:
     PrefsTree( intf_thread_t *, QWidget * );
