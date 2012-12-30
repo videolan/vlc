@@ -56,12 +56,6 @@ class QMenu;
 class QSize;
 class StandardPLPanel;
 
-enum {
-    CONTROLS_VISIBLE  = 0x1,
-    CONTROLS_HIDDEN   = 0x2,
-    CONTROLS_ADVANCED = 0x4,
-};
-
 class MainInterface : public QVLCMW
 {
     Q_OBJECT
@@ -85,6 +79,12 @@ public:
     QSystemTrayIcon *getSysTray() { return sysTray; }
     QMenu *getSysTrayMenu() { return systrayMenu; }
     FullscreenControllerWidget* getFullscreenControllerWidget() { return fullscreenControls; }
+    enum
+    {
+        CONTROLS_VISIBLE  = 0x1,
+        CONTROLS_HIDDEN   = 0x2,
+        CONTROLS_ADVANCED = 0x4,
+    };
     int getControlsVisibilityStatus();
     bool isPlDocked() { return ( b_plDocked != false ); }
     bool isInterfaceFullScreen() { return b_interfaceFullScreen; }

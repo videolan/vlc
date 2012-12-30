@@ -483,7 +483,8 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
     action = menu->addAction( qtr( "Mi&nimal Interface" ) );
     action->setShortcut( qtr( "Ctrl+H" ) );
     action->setCheckable( true );
-    action->setChecked( (mi->getControlsVisibilityStatus() & CONTROLS_HIDDEN ) );
+    action->setChecked( (mi->getControlsVisibilityStatus()
+                         & MainInterface::CONTROLS_HIDDEN ) );
 
     CONNECT( action, triggered( bool ), mi, toggleMinimalView( bool ) );
     CONNECT( mi, minimalViewToggled( bool ), action, setChecked( bool ) );
@@ -500,7 +501,7 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
     action = menu->addAction( qtr( "&Advanced Controls" ), mi,
             SLOT( toggleAdvancedButtons() ) );
     action->setCheckable( true );
-    if( mi->getControlsVisibilityStatus() & CONTROLS_ADVANCED )
+    if( mi->getControlsVisibilityStatus() & MainInterface::CONTROLS_ADVANCED )
         action->setChecked( true );
 
     /* Docked Playlist */
