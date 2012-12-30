@@ -2048,6 +2048,28 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
                                           arrayWithObjects: o_modulename, o_modulelongname,
                                           o_moduleenabled, nil]];
             }
+
+            /* Parental Advisory HACK:
+             * Selecting HTTP, RC and Telnet interfaces is difficult now
+             * since they are just the lua interface module */
+            if (p_config->i_type == CONFIG_SUBCATEGORY &&
+               !strcmp(module_get_object(p_parser), "lua") &&
+               !strcmp(_p_item->psz_name, "extraintf") &&
+               p_config->value.i == _p_item->min.i) {
+
+#define addLuaIntf(shortname, longname) \
+                if (_p_item->value.psz && strstr(_p_item->value.psz, shortname))\
+                    o_moduleenabled = [NSNumber numberWithBool:YES];\
+                else\
+                    o_moduleenabled = [NSNumber numberWithBool:NO];\
+                [o_modulearray addObject:[NSMutableArray arrayWithObjects: @shortname, _NS(longname), o_moduleenabled, nil]]
+
+                addLuaIntf("http", "Web");
+                addLuaIntf("telnet", "Telnet");
+                addLuaIntf("cli", "Console");
+
+#undef addLuaIntf
+            }
         }
         module_config_free(p_configlist);
     }
