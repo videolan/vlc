@@ -493,7 +493,7 @@ class KeySelectorControl : public ConfigControl
     Q_OBJECT
 
 public:
-    explicit KeySelectorControl( vlc_object_t *, module_config_t *, QWidget * );
+    KeySelectorControl( vlc_object_t *, module_config_t *, QWidget * );
     virtual int getType() const;
     virtual void doApply();
 
@@ -535,7 +535,7 @@ class KeyInputDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit KeyInputDialog( QTreeWidget *, const QString&, QWidget *, bool b_global = false );
+    KeyInputDialog( QTreeWidget *, const QString&, QWidget *, bool b_global = false );
     int keyValue;
     bool conflicts;
     void setExistingkeysSet( const QSet<QString> *keyset = NULL );
