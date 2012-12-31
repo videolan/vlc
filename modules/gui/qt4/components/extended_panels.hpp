@@ -117,10 +117,22 @@ private slots:
 class Compressor: public QWidget
 {
     Q_OBJECT
+
 public:
     Compressor( intf_thread_t *, QWidget * );
 
 private:
+    typedef struct
+    {
+        const char *psz_name;
+        const char *psz_descs;
+        const char *psz_units;
+        const float f_min;      // min
+        const float f_max;      // max
+        const float f_value;    // value
+        const float f_resolution; // resolution
+    } comp_controls_t;
+    static const comp_controls_t comp_controls[NUM_CP_CTRL];
     QSlider *compCtrl[NUM_CP_CTRL];
     QLabel *ctrl_texts[NUM_CP_CTRL];
     QLabel *ctrl_readout[NUM_CP_CTRL];

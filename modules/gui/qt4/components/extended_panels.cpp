@@ -1230,18 +1230,7 @@ void Equalizer::addCallbacks( vlc_object_t *p_aout )
  * Dynamic range compressor
  **********************************************************************/
 
-typedef struct
-{
-    const char *psz_name;
-    const char *psz_descs;
-    const char *psz_units;
-    const float f_min;      // min
-    const float f_max;      // max
-    const float f_value;    // value
-    const float f_resolution; // resolution
-} comp_controls_t;
-
-static const comp_controls_t comp_controls[] =
+const Compressor::comp_controls_t Compressor::comp_controls[] =
 {
     { "compressor-rms-peak",    _("RMS/peak"),       "",       0.0f,   1.0f,   0.00f, 0.001f },
     { "compressor-attack",      _("Attack"),       _(" ms"),   1.5f, 400.0f,  25.00f, 0.100f },
