@@ -163,8 +163,8 @@ loop_col:
 	vzip.u8	green1, green2
 	vzip.u8	blue1, blue2
 
-	vst4.u8		{red1,green1,blue1,alpha1}, [O1,:128]!
-	vst4.u8		{red2,green2,blue2,alpha2}, [O1,:128]!
+	vst4.u8		{red1,green1,blue1,alpha1}, [O1,:64]!
+	vst4.u8		{red2,green2,blue2,alpha2}, [O1,:64]!
 
 	/* Y Bottom Row */
 	vld2.u8	{y1,y2}, [Y2,:128]!
@@ -194,8 +194,8 @@ loop_col:
 	vzip.u8	green1, green2
 	vzip.u8	blue1, blue2
 
-	vst4.u8		{red1,green1,blue1,alpha1}, [O2,:128]!
-	vst4.u8		{red2,green2,blue2,alpha2}, [O2,:128]!
+	vst4.u8		{red1,green1,blue1,alpha1}, [O2,:64]!
+	vst4.u8		{red2,green2,blue2,alpha2}, [O2,:64]!
 
 	/* next columns (x16) */
 	subs	COUNT,	COUNT,	#16
