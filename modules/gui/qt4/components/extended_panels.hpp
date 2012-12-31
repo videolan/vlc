@@ -143,9 +143,6 @@ private:
 
     intf_thread_t *p_intf;
 
-    void delCallbacks( vlc_object_t * );
-    void addCallbacks( vlc_object_t * );
-
     void updateSliders(float *);
 
 private slots:
