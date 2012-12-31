@@ -735,7 +735,7 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
             {
                 bool   b_match     = false;
                 bool   b_ignore    = false;
-                int    i_len       = strlen( psz_tag ) - 1;
+                int    i_len       = (psz_tag ? strlen(psz_tag) : 0) - 1;
                 char  *psz_lastTag = NULL;
 
                 if( i_len >= 0 )
@@ -954,7 +954,7 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
         }
     }
 
-    while( *psz_tag )
+    while( psz_tag && *psz_tag )
     {
         /* */
         char *psz_last = &psz_tag[strlen(psz_tag)-1];
