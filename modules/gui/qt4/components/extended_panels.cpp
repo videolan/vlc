@@ -1315,7 +1315,7 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent )
         compressorBox->setChecked( false );
 
     free( psz_af );
-    updateSliders( controlVars );
+    updateSliders();
     setValues();
 }
 
@@ -1324,14 +1324,14 @@ void Compressor::enable()
     playlist_EnableAudioFilter( THEPL, "compressor", compressorBox->isChecked() );
 }
 
-void Compressor::updateSliders( float * p_controlVars )
+void Compressor::updateSliders()
 {
     for( int i = 0 ; i < NUM_CP_CTRL ; i++ )
     {
-        if( oldControlVars[i] != p_controlVars[i] )
+        if( oldControlVars[i] != controlVars[i] )
         {
             compCtrl[i]->setValue(
-                    (int)( p_controlVars[i] / comp_controls[i].f_resolution ) );
+                    (int)( controlVars[i] / comp_controls[i].f_resolution ) );
         }
     }
 }

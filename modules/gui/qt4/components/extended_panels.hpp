@@ -143,7 +143,7 @@ private:
 
     intf_thread_t *p_intf;
 
-    void updateSliders(float *);
+    void updateSliders();
 
 private slots:
     void enable();
