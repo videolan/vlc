@@ -156,15 +156,22 @@ private slots:
 class Spatializer: public QWidget
 {
     Q_OBJECT
+
 public:
     Spatializer( intf_thread_t *, QWidget * );
 
 private:
+    typedef struct
+    {
+        const char *psz_name;
+        const char *psz_desc;
+    } spat_controls_t;
+    static const spat_controls_t spat_controls[NUM_SP_CTRL];
     QSlider *spatCtrl[NUM_SP_CTRL];
     QLabel *ctrl_texts[NUM_SP_CTRL];
     QLabel *ctrl_readout[NUM_SP_CTRL];
-    float controlVars[5];
-    float oldControlVars[5];
+    float controlVars[NUM_SP_CTRL];
+    float oldControlVars[NUM_SP_CTRL];
 
     QGroupBox *spatializerBox;
 

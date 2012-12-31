@@ -1364,13 +1364,7 @@ void Compressor::setValues()
 /**********************************************************************
  * Spatializer
  **********************************************************************/
-typedef struct
-{
-    const char *psz_name;
-    const char *psz_desc;
-} spat_controls_t;
-
-static const spat_controls_t spat_controls[] =
+const Spatializer::spat_controls_t Spatializer::spat_controls[] =
 {
     { "spatializer-roomsize", _("Size") },
     { "spatializer-width",    _("Width") },
