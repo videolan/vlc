@@ -939,9 +939,9 @@ static void Eia608TextLine( struct eia608_screen *screen, char *psz_text, int i_
     /* Convert leading spaces to non-breaking so that they don't get
        stripped by the RenderHtml routine as regular whitespace */
     while( i_start < EIA608_SCREEN_COLUMNS && p_char[i_start] == ' ' ) {
-	Eia608TextUtf8( utf8, 0x89 );
-	CAT( utf8 );
-	i_start++;
+        Eia608TextUtf8( utf8, 0x89 );
+        CAT( utf8 );
+        i_start++;
     }
 
     /* Search the end */
