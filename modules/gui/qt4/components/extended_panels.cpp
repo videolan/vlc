@@ -1248,7 +1248,7 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent )
     smallFont.setPointSize( smallFont.pointSize() - 2 );
 
     QVBoxLayout *layout = new QVBoxLayout( this );
-    compressorBox = new QGroupBox( qtr( "Enable dynamic range compressor" ) );
+    compressorBox = new QGroupBox( qtr( "Enable" ) );
     compressorBox->setCheckable( true );
     layout->addWidget( compressorBox );
 
@@ -1382,7 +1382,7 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
 
     QVBoxLayout *layout = new QVBoxLayout( this );
 
-    spatializerBox = new QGroupBox( qtr( "Enable spatializer" ) );
+    spatializerBox = new QGroupBox( qtr( "Enable" ) );
     spatializerBox->setCheckable( true );
     layout->addWidget( spatializerBox );
 
