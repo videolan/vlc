@@ -83,6 +83,43 @@ private slots:
     void ValueChange( bool value );
 };
 
+class FilterSliderData : public QObject
+{
+    Q_OBJECT
+
+public:
+    typedef struct
+    {
+        const char *psz_name;
+        const char *psz_descs;
+        const char *psz_units;
+        const float f_min;      // min
+        const float f_max;      // max
+        const float f_value;    // value
+        const float f_resolution; // resolution
+    } slider_data_t;
+    FilterSliderData( QObject *parent, intf_thread_t *p_intf,
+                      QSlider *slider,
+                      QLabel *valueLabel, QLabel *nameLabel,
+                      const slider_data_t *p_data );
+    void setValue( float f );
+
+protected:
+    float initialValue();
+
+public slots:
+    void onValueChanged( int i );
+    void updateText( int i );
+    void writeToConfig();
+
+private:
+    intf_thread_t *p_intf;
+    QSlider *slider;
+    QLabel *valueLabel;
+    QLabel *nameLabel;
+    const slider_data_t *p_data;
+};
+
 class Equalizer: public QWidget
 {
     Q_OBJECT
@@ -122,32 +159,12 @@ public:
     Compressor( intf_thread_t *, QWidget * );
 
 private:
-    typedef struct
-    {
-        const char *psz_name;
-        const char *psz_descs;
-        const char *psz_units;
-        const float f_min;      // min
-        const float f_max;      // max
-        const float f_value;    // value
-        const float f_resolution; // resolution
-    } comp_controls_t;
-    static const comp_controls_t comp_controls[NUM_CP_CTRL];
-    QSlider *compCtrl[NUM_CP_CTRL];
-    QLabel *ctrl_texts[NUM_CP_CTRL];
-    QLabel *ctrl_readout[NUM_CP_CTRL];
-    float controlVars[NUM_CP_CTRL];
-    float oldControlVars[NUM_CP_CTRL];
-
+    static const FilterSliderData::slider_data_t comp_controls[NUM_CP_CTRL];
     QGroupBox *compressorBox;
-
     intf_thread_t *p_intf;
-
-    void updateSliders();
 
 private slots:
     void enable();
-    void setValues();
 };
 
 class Spatializer: public QWidget
