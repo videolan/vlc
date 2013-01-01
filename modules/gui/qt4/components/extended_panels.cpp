@@ -1313,6 +1313,7 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent )
         compressorBox->setChecked( true );
     else
         compressorBox->setChecked( false );
+    CONNECT( compressorBox, toggled(bool), this, enable() );
 
     free( psz_af );
     updateSliders();
@@ -1433,6 +1434,7 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
         spatializerBox->setChecked( true );
     else
         spatializerBox->setChecked( false );
+    CONNECT( spatializerBox, toggled(bool), this, enable() );
 
     free( psz_af );
     setValues();
