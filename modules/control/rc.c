@@ -2069,7 +2069,7 @@ static input_item_t *parse_MRL( const char *mrl )
 
         if( !psz_item_mrl )
         {
-            if( strstr( psz_item_mrl, "://" ) != NULL )
+            if( strstr( psz_item, "://" ) != NULL )
                 psz_item_mrl = strdup( psz_item );
             else
                 psz_item_mrl = vlc_path2uri( psz_item, NULL );
