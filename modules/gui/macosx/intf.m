@@ -1160,8 +1160,6 @@ static VLCMain *_o_sharedMainInstance = nil;
                 case NSBackspaceCharacter:
                 case NSUpArrowFunctionKey:
                 case NSDownArrowFunctionKey:
-                case NSRightArrowFunctionKey:
-                case NSLeftArrowFunctionKey:
                 case NSEnterCharacter:
                 case NSCarriageReturnCharacter:
                     return NO;
