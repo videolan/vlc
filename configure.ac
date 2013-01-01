@@ -25,7 +25,7 @@ AC_CANONICAL_HOST
 AC_PRESERVE_HELP_ORDER
 
 AM_INIT_AUTOMAKE(tar-ustar color-tests foreign)
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADER(config.h)
 
 # Disable with "./configure --disable-silent-rules" or "make V=1"
 AM_SILENT_RULES([yes])
