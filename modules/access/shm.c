@@ -27,6 +27,7 @@
 #include <stdarg.h>
 #include <math.h>
 #include <fcntl.h>
+#include <unistd.h>
 #ifdef HAVE_SYS_SHM_H
 # include <sys/ipc.h>
 # include <sys/shm.h>
