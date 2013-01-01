@@ -49,21 +49,32 @@
 #ifdef __APPLE__
 # define DEFAULT_FONT_FILE "/Library/Fonts/Arial Unicode.ttf"
 # define DEFAULT_FAMILY "Arial Unicode MS"
+# define DEFAULT_MONOSPACE_FONT_FILE "/System/Library/Fonts/Monaco.dfont"
+# define DEFAULT_MONOSPACE_FAMILY "Monaco"
 #elif defined( WIN32 )
 # define DEFAULT_FONT_FILE "arial.ttf" /* Default path font found at run-time */
 # define DEFAULT_FAMILY "Arial"
+# define DEFAULT_MONOSPACE_FONT_FILE "cour.ttf"
+# define DEFAULT_MONOSPACE_FAMILY "Courier New"
 #elif defined( __OS2__ )
 # define DEFAULT_FONT_FILE "/psfonts/tnrwt_k.ttf"
 # define DEFAULT_FAMILY "Times New Roman WT K"
+# define DEFAULT_MONOSPACE_FONT_FILE "/psfonts/mtsansdk.ttf"
+# define DEFAULT_MONOSPACE_FAMILY "Monotype Sans Duospace WT K"
 #elif defined( HAVE_MAEMO )
 # define DEFAULT_FONT_FILE "/usr/share/fonts/nokia/nosnb.ttf"
 # define DEFAULT_FAMILY "Nokia Sans Bold"
+# error Missing monospaced fonts
 #elif defined( __ANDROID__ )
 # define DEFAULT_FONT_FILE "/system/fonts/DroidSans-Bold.ttf"
 # define DEFAULT_FAMILY "Droid Sans Bold"
+# define DEFAULT_MONOSPACE_FONT_FILE "/system/fonts/DroidSansMono.ttf"
+# define DEFAULT_MONOSPACE_FAMILY "Droid Sans Mono"
 #else
 # define DEFAULT_FONT_FILE "/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf"
 # define DEFAULT_FAMILY "Serif Bold"
+# define DEFAULT_MONOSPACE_FONT_FILE "/usr/share/fonts/truetype/freefont/FreeMono.ttf"
+# define DEFAULT_MONOSPACE_FAMILY "Monospace"
 #endif
 
 /* Freetype */
@@ -126,6 +137,7 @@ static int  Create ( vlc_object_t * );
 static void Destroy( vlc_object_t * );
 
 #define FONT_TEXT N_("Font")
+#define MONOSPACE_FONT_TEXT N_("Monospace Font")
 
 #define FAMILY_LONGTEXT N_("Font family for the font you want to use")
 #define FONT_LONGTEXT N_("Font file for the font you want to use")
@@ -195,8 +207,10 @@ vlc_module_begin ()
 
 #ifdef HAVE_STYLES
     add_font( "freetype-font", DEFAULT_FAMILY, FONT_TEXT, FAMILY_LONGTEXT, false )
+    add_font( "freetype-monofont", DEFAULT_MONOSPACE_FAMILY, MONOSPACE_FONT_TEXT, FAMILY_LONGTEXT, false )
 #else
     add_loadfile( "freetype-font", DEFAULT_FONT_FILE, FONT_TEXT, FONT_LONGTEXT, false )
+    add_loadfile( "freetype-monofont", DEFAULT_MONOSPACE_FONT_FILE, MONOSPACE_FONT_TEXT, FONT_LONGTEXT, false )
 #endif
 
     add_integer( "freetype-fontsize", 0, FONTSIZE_TEXT,
@@ -334,6 +348,7 @@ struct filter_sys_t
     int            i_default_font_size;
     int            i_display_height;
     char*          psz_fontfamily;
+    char*          psz_monofontfamily;
     xml_reader_t  *p_xml;
 #ifdef WIN32
     char*          psz_win_fonts_path;
@@ -1513,6 +1528,30 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
     return rv;
 }
 
+static int HandleTT(font_stack_t **p_fonts, const char *p_fontfamily )
+{
+    char      *psz_unused_fontname = NULL;
+    uint32_t   i_font_color = 0xffffff;
+    uint32_t   i_karaoke_bg_color = 0x00ffffff;
+    int        i_font_size  = 24;
+
+    /* Default all attributes to the top font in the stack -- in case not
+     * all attributes are specified in the sub-font
+     */
+    PeekFont( p_fonts,
+             &psz_unused_fontname,
+             &i_font_size,
+             &i_font_color,
+             &i_karaoke_bg_color );
+
+    /* Keep all the parent's font attributes, but change to a monospace font */
+    return PushFont( p_fonts,
+                   p_fontfamily,
+                   i_font_size,
+                   i_font_color,
+                   i_karaoke_bg_color );
+}
+
 /* Turn any multiple-whitespaces into single spaces */
 static void HandleWhiteSpace( char *psz_node )
 {
@@ -1653,6 +1692,8 @@ static int ProcessNodes( filter_t *p_filter,
             case XML_READER_ENDELEM:
                 if( !strcasecmp( "font", node ) )
                     PopFont( &p_fonts );
+                else if( !strcasecmp( "tt", node ) )
+                    PopFont( &p_fonts );
                 else if( !strcasecmp( "b", node ) )
                     i_style_flags &= ~STYLE_BOLD;
                else if( !strcasecmp( "i", node ) )
@@ -1666,6 +1707,8 @@ static int ProcessNodes( filter_t *p_filter,
             case XML_READER_STARTELEM:
                 if( !strcasecmp( "font", node ) )
                     HandleFontAttributes( p_xml_reader, &p_fonts );
+                else if( !strcasecmp( "tt", node ) )
+                    HandleTT( &p_fonts, p_sys->psz_monofontfamily );
                 else if( !strcasecmp( "b", node ) )
                     i_style_flags |= STYLE_BOLD;
                 else if( !strcasecmp( "i", node ) )
@@ -2628,7 +2671,9 @@ static int Create( vlc_object_t *p_this )
     filter_sys_t  *p_sys;
     char          *psz_fontfile   = NULL;
     char          *psz_fontfamily = NULL;
-    int            i_error = 0, fontindex = 0;
+    char          *psz_monofontfile   = NULL;
+    char          *psz_monofontfamily = NULL;
+    int            i_error = 0, fontindex = 0, monofontindex = 0;
 
     /* Allocate structure */
     p_filter->p_sys = p_sys = malloc( sizeof(*p_sys) );
@@ -2646,6 +2691,7 @@ static int Create( vlc_object_t *p_this )
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     psz_fontfamily = var_InheritString( p_filter, "freetype-font" );
+    psz_monofontfamily = var_InheritString( p_filter, "freetype-monofont" );
     p_sys->i_default_font_size = var_InheritInteger( p_filter, "freetype-fontsize" );
     p_sys->i_font_opacity = var_InheritInteger( p_filter,"freetype-opacity" );
     p_sys->i_font_opacity = VLC_CLIP( p_sys->i_font_opacity, 0, 255 );
@@ -2712,6 +2758,9 @@ static int Create( vlc_object_t *p_this )
     /* */
     psz_fontfile = FontConfig_Select( NULL, psz_fontfamily, false, false,
                                       p_sys->i_default_font_size, &fontindex );
+    psz_monofontfile = FontConfig_Select( NULL, psz_monofontfamily, false,
+                                          false, p_sys->i_default_font_size,
+                                          &monofontindex );
 #elif defined(__APPLE__)
     psz_fontfile = MacLegacy_Select( p_filter, psz_fontfamily, false, false, 0, &fontindex );
 #elif defined(WIN32)
@@ -2724,11 +2773,15 @@ static int Create( vlc_object_t *p_this )
     /* If nothing is found, use the default family */
     if( !psz_fontfile )
         psz_fontfile = strdup( psz_fontfamily );
+    if( !psz_monofontfile )
+        psz_monofontfile = strdup( psz_monofontfamily );
 
 #else /* !HAVE_STYLES */
     /* Use the default file */
     psz_fontfile = psz_fontfamily;
+    psz_monofontfile = psz_monofontfamily;
 #endif
+    p_sys->psz_monofontfamily = psz_monofontfamily;
 
     /* */
     i_error = FT_Init_FreeType( &p_sys->p_library );
@@ -2781,6 +2834,7 @@ static int Create( vlc_object_t *p_this )
 
 #ifdef HAVE_STYLES
     free( psz_fontfile );
+    free( psz_monofontfile );
 #endif
 
     return VLC_SUCCESS;
@@ -2790,8 +2844,10 @@ error:
     if( p_sys->p_library ) FT_Done_FreeType( p_sys->p_library );
 #ifdef HAVE_STYLES
     free( psz_fontfile );
+    free( psz_monofontfile );
 #endif
     free( psz_fontfamily );
+    free( psz_monofontfamily );
     free( p_sys );
     return VLC_EGENERIC;
 }

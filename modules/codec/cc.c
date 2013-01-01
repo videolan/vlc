@@ -936,6 +936,10 @@ static void Eia608TextLine( struct eia608_screen *screen, char *psz_text, int i_
     /* Search the start */
     i_start = 0;
 
+    /* Ensure we get a monospaced font (required for accurate positioning */
+    if( b_html )
+        CAT( "<tt>" );
+
     /* Convert leading spaces to non-breaking so that they don't get
        stripped by the RenderHtml routine as regular whitespace */
     while( i_start < EIA608_SCREEN_COLUMNS && p_char[i_start] == ' ' ) {
@@ -1041,6 +1045,7 @@ static void Eia608TextLine( struct eia608_screen *screen, char *psz_text, int i_
             CAT( "</i>" );
         if( last_color != EIA608_COLOR_DEFAULT )
             CAT( "</font>" );
+        CAT( "</tt>" );
     }
 #undef CAT
 }
