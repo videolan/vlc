@@ -194,6 +194,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
     memset( tk, 0, sizeof( mkv_track_t ) );
 
     es_format_Init( &tk->fmt, UNKNOWN_ES, 0 );
+    tk->p_es = NULL;
     tk->fmt.psz_language       = strdup("English");
     tk->fmt.psz_description    = NULL;
 

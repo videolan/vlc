@@ -476,10 +476,7 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_
         }
 
         if( p_current_chapter->p_segment != p_chapter->p_segment )
-        {
-            p_chapter->p_segment->Select( i_date );
-            p_current_chapter->p_segment->UnSelect();
-        }
+            ChangeSegment( p_current_chapter->p_segment, p_chapter->p_segment, i_date );
         p_current_chapter = p_chapter;
 
         p_chapter->p_segment->Seek( i_date, i_time_offset, i_global_position );
@@ -613,3 +610,49 @@ void virtual_chapter_c::print()
         sub_chapters[i]->print();
 }
 #endif
+
+void virtual_segment_c::ChangeSegment( matroska_segment_c * p_old, matroska_segment_c * p_new, mtime_t i_start_time )
+{
+    size_t i, j;
+    for( i = 0; i < p_new->tracks.size(); i++)
+    {
+        mkv_track_t *p_tk = p_new->tracks[i];
+        es_format_t *p_nfmt = &p_tk->fmt;
+
+        /* Let's only do that for audio and video for now */
+        if( p_nfmt->i_cat == AUDIO_ES || p_nfmt->i_cat == VIDEO_ES )
+        {
+            
+            /* check for a similar elementary stream */
+            for( j = 0; j < p_old->tracks.size(); j++)
+            {
+                es_format_t * p_ofmt = &p_old->tracks[j]->fmt;
+
+                if( !p_old->tracks[j]->p_es )
+                    continue;
+
+                if( ( p_nfmt->i_cat == p_ofmt->i_cat ) &&
+                    ( p_nfmt->i_codec == p_ofmt->i_codec ) &&
+                    ( p_nfmt->i_priority == p_ofmt->i_priority ) &&
+                    ( p_nfmt->i_bitrate == p_ofmt->i_bitrate ) &&
+                    ( p_nfmt->i_extra == p_ofmt->i_extra ) &&
+                    ( (!p_nfmt->p_extra && !p_ofmt->p_extra) || 
+                      !memcmp( p_nfmt->p_extra, p_ofmt->p_extra, p_nfmt->i_extra ) ) &&
+                    !strcasecmp( p_nfmt->psz_language, p_ofmt->psz_language ) &&
+                    ( ( p_nfmt->i_cat == AUDIO_ES && 
+                        !memcmp( &p_nfmt->audio, &p_ofmt->audio, sizeof(audio_format_t) ) ) ||
+                      ( p_nfmt->i_cat == VIDEO_ES && 
+                        !memcmp( &p_nfmt->video, &p_ofmt->video, sizeof(video_format_t) ) ) ) )
+                {
+                    /* FIXME handle video palettes... */
+                    msg_Warn( &p_old->sys.demuxer, "Reusing decoder of old track %u for track %u", j, i);
+                    p_tk->p_es = p_old->tracks[j]->p_es;
+                    p_old->tracks[j]->p_es = NULL;
+                    break;
+                }
+            }
+        }
+    }
+    p_new->Select( i_start_time );
+    p_old->UnSelect();
+}

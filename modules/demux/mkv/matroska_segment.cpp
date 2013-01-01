@@ -662,6 +662,8 @@ bool matroska_segment_c::Preload( )
             msg_Dbg( &sys.demuxer, "|   + Preload Unknown (%s)", typeid(*el).name() );
     }
 
+    ComputeTrackPriority();
+
     b_preloaded = true;
 
     return true;
@@ -1014,11 +1016,8 @@ int matroska_segment_c::BlockFindTrackIndex( size_t *pi_track,
     return VLC_SUCCESS;
 }
 
-bool matroska_segment_c::Select( mtime_t i_start_time )
+void matroska_segment_c::ComputeTrackPriority()
 {
-    /* add all es */
-    msg_Dbg( &sys.demuxer, "found %d es", (int)tracks.size() );
-
     bool b_has_default_video = false;
     bool b_has_default_audio = false;
     /* check for default */
@@ -1067,8 +1066,28 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         /* Avoid multivideo tracks when unnecessary */
         if( p_tk->fmt.i_cat == VIDEO_ES )
             p_tk->fmt.i_priority--;
+    } 
+}
 
-        p_tk->p_es = es_out_Add( sys.demuxer.out, &p_tk->fmt );
+bool matroska_segment_c::Select( mtime_t i_start_time )
+{
+    /* add all es */
+    msg_Dbg( &sys.demuxer, "found %d es", (int)tracks.size() );
+
+    for( size_t i_track = 0; i_track < tracks.size(); i_track++ )
+    {
+        mkv_track_t *p_tk = tracks[i_track];
+        es_format_t *p_fmt = &p_tk->fmt;
+
+        if( unlikely( p_fmt->i_cat == UNKNOWN_ES || !p_tk->psz_codec ) )
+        {
+            msg_Warn( &sys.demuxer, "invalid track[%d, n=%d]", (int)i_track, p_tk->i_number );
+            p_tk->p_es = NULL;
+            continue;
+        }
+
+        if( !p_tk->p_es )
+            p_tk->p_es = es_out_Add( sys.demuxer.out, &p_tk->fmt );
 
         /* Turn on a subtitles track if it has been flagged as default -
          * but only do this if no subtitles track has already been engaged,

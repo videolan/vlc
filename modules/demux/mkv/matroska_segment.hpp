@@ -162,6 +162,7 @@ private:
     SimpleTag * ParseSimpleTags( KaxTagSimple *tag, int level = 50 );
     void IndexAppendCluster( KaxCluster *cluster );
     int32_t TrackInit( mkv_track_t * p_tk );
+    void ComputeTrackPriority();
 };
 
 
