@@ -86,6 +86,7 @@ struct vlc_va_sys_t
     VAImage      image;
     copy_cache_t image_cache;
 
+    bool b_supports_derive;
 };
 
 /* */
@@ -199,6 +200,8 @@ static int Open( vlc_va_t *p_external, int i_codec_id )
 
     p_va->i_surface_count = i_surface_count;
 
+    p_va->b_supports_derive = false;
+
     if( asprintf( &p_external->description, "VA API version %d.%d",
                   p_va->i_version_major, p_va->i_version_minor ) < 0 )
         p_external->description = NULL;
@@ -216,6 +219,10 @@ static void DestroySurfaces( vlc_va_sys_t *p_va )
     {
         CopyCleanCache( &p_va->image_cache );
         vaDestroyImage( p_va->p_display, p_va->image.image_id );
+    }
+    else if(p_va->b_supports_derive)
+    {
+        CopyCleanCache( &p_va->image_cache );
     }
 
     if( p_va->i_context_id != VA_INVALID_ID )
@@ -289,6 +296,13 @@ static int CreateSurfaces( vlc_va_sys_t *p_va, void **pp_hw_ctx, vlc_fourcc_t *p
         goto error;
     }
 
+    VAImage test_image;
+    if(vaDeriveImage(p_va->p_display, pi_surface_id[0], &test_image) == VA_STATUS_SUCCESS)
+    {
+        p_va->b_supports_derive = true;
+        vaDestroyImage(p_va->p_display, test_image.image_id);
+    }
+
     vlc_fourcc_t  i_chroma = 0;
     VAImageFormat fmt;
     for( int i = 0; i < i_fmt_count; i++ )
@@ -321,6 +335,12 @@ static int CreateSurfaces( vlc_va_sys_t *p_va, void **pp_hw_ctx, vlc_fourcc_t *p
     if( !i_chroma )
         goto error;
     *pi_chroma = i_chroma;
+
+    if(p_va->b_supports_derive)
+    {
+        vaDestroyImage( p_va->p_display, p_va->image.image_id );
+        p_va->image.image_id = VA_INVALID_ID;
+    }
 
     if( unlikely(CopyInitCache( &p_va->image_cache, i_width )) )
         goto error;
@@ -380,14 +400,18 @@ static int Extract( vlc_va_t *p_external, picture_t *p_picture, AVFrame *p_ff )
 #endif
         return VLC_EGENERIC;
 
-    /* XXX vaDeriveImage may be better but it is not supported by
-     * my setup.
-     */
-
-    if( vaGetImage( p_va->p_display, i_surface_id,
-                    0, 0, p_va->i_surface_width, p_va->i_surface_height,
-                    p_va->image.image_id) )
-        return VLC_EGENERIC;
+    if(p_va->b_supports_derive)
+    {
+        if(vaDeriveImage(p_va->p_display, i_surface_id, &(p_va->image)) != VA_STATUS_SUCCESS)
+            return VLC_EGENERIC;
+    }
+    else
+    {
+        if( vaGetImage( p_va->p_display, i_surface_id,
+                        0, 0, p_va->i_surface_width, p_va->i_surface_height,
+                        p_va->image.image_id) )
+            return VLC_EGENERIC;
+    }
 
     void *p_base;
     if( vaMapBuffer( p_va->p_display, p_va->image.buf, &p_base ) )
@@ -431,6 +455,12 @@ static int Extract( vlc_va_t *p_external, picture_t *p_picture, AVFrame *p_ff )
 
     if( vaUnmapBuffer( p_va->p_display, p_va->image.buf ) )
         return VLC_EGENERIC;
+
+    if(p_va->b_supports_derive)
+    {
+        vaDestroyImage( p_va->p_display, p_va->image.image_id );
+        p_va->image.image_id = VA_INVALID_ID;
+    }
 
     return VLC_SUCCESS;
 }
