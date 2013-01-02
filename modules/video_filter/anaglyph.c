@@ -91,7 +91,6 @@ struct filter_sys_t
 
 static int Create(vlc_object_t *p_this)
 {
-    printf("pouet\n");
     filter_t *p_filter = (filter_t *)p_this;
 
     switch (p_filter->fmt_in.video.i_chroma)
