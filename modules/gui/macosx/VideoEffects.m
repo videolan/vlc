@@ -54,7 +54,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 + (void)initialize
 {
-    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:@";;0;1.000000;1.000000;1.000000;1.000000;0.050000;16;2.000000;OTA=;4;4;0;16711680;20;15;120;Z3JhZGllbnQ=;1;0;16711680;6;80;VkxD;-1;;-1;255;2;3;3"], @"VideoEffectProfiles", [NSArray arrayWithObject:_NS("Default")], @"VideoEffectProfileNames", nil];
+    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:@";;;0;1.000000;1.000000;1.000000;1.000000;0.050000;16;2.000000;OTA=;4;4;0;16711680;20;15;120;Z3JhZGllbnQ=;1;0;16711680;6;80;VkxD;-1;;-1;255;2;3;3"], @"VideoEffectProfiles", [NSArray arrayWithObject:_NS("Default")], @"VideoEffectProfileNames", nil];
     [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
 }
 
@@ -666,9 +666,10 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (NSString *)generateProfileString
 {
-    return [NSString stringWithFormat:@"%s;%s;%lli;%f;%f;%f;%f;%f;%lli;%f;%s;%lli;%lli;%lli;%lli;%lli;%lli;%lli;%s;%lli;%lli;%lli;%lli;%lli;%s;%lli;%s;%lli;%lli;%lli;%lli;%lli",
+    return [NSString stringWithFormat:@"%s;%s;%s;%lli;%f;%f;%f;%f;%f;%lli;%f;%s;%lli;%lli;%lli;%lli;%lli;%lli;%lli;%s;%lli;%lli;%lli;%lli;%lli;%s;%lli;%s;%lli;%lli;%lli;%lli;%lli",
             vlc_b64_encode(config_GetPsz(p_intf, "video-filter")),
             vlc_b64_encode(config_GetPsz(p_intf, "sub-source")),
+            vlc_b64_encode(config_GetPsz(p_intf, "video-splitter")),
             config_GetInt(p_intf, "hue"),
             config_GetFloat(p_intf, "contrast"),
             config_GetFloat(p_intf, "brightness"),
@@ -722,6 +723,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     if (p_vout) {
         var_SetString(p_vout, "video-filter", "");
         var_SetString(p_vout, "sub-source", "");
+        var_SetString(p_vout, "video-splitter", "");
         vlc_object_release(p_vout);
     }
 
@@ -740,6 +742,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
             [self setVideoFilter:(char *)[[tempArray objectAtIndex:x] UTF8String] on:YES];
     }
     config_PutPsz(p_intf, "video-filter", [tempString UTF8String]);
+
     tempString = [NSString stringWithFormat:@"%s", vlc_b64_decode([[items objectAtIndex:1] UTF8String])];
     /* enable another round of new filters */
     if ([tempString length] > 0) {
@@ -748,39 +751,49 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         for (NSUInteger x = 0; x < count; x++)
             [self setVideoFilter:(char *)[[tempArray objectAtIndex:x] UTF8String] on:YES];
     }
-    config_PutPsz(p_intf,"sub-source",[tempString UTF8String]);
+    config_PutPsz(p_intf,"sub-source", [tempString UTF8String]);
+
+    tempString = [NSString stringWithFormat:@"%s", vlc_b64_decode([[items objectAtIndex:2] UTF8String])];
+    /* enable another round of new filters */
+    if ([tempString length] > 0) {
+        tempArray = [tempString componentsSeparatedByString:@":"];
+        count = [tempArray count];
+        for (NSUInteger x = 0; x < count; x++)
+            [self setVideoFilter:(char *)[[tempArray objectAtIndex:x] UTF8String] on:YES];
+    }
+    config_PutPsz(p_intf,"video-splitter", [tempString UTF8String]);
 
     /* try to set filter values on-the-fly and store them appropriately */
-    [self setVideoFilterProperty:"hue" forFilter:"adjust" integer:[[items objectAtIndex:2] intValue]];
-    [self setVideoFilterProperty:"contrast" forFilter:"adjust" float:[[items objectAtIndex:3] floatValue]];
-    [self setVideoFilterProperty:"brightness" forFilter:"adjust" float:[[items objectAtIndex:4] floatValue]];
-    [self setVideoFilterProperty:"saturation" forFilter:"adjust" float:[[items objectAtIndex:5] floatValue]];
-    [self setVideoFilterProperty:"gamma" forFilter:"adjust" float:[[items objectAtIndex:6] floatValue]];
-    [self setVideoFilterProperty:"sharpen-sigma" forFilter:"sharpen" float:[[items objectAtIndex:7] floatValue]];
-    [self setVideoFilterProperty:"gradfun-radius" forFilter:"gradfun" integer:[[items objectAtIndex:8] intValue]];
-    [self setVideoFilterProperty:"grain-variance" forFilter:"grain" float:[[items objectAtIndex:9] floatValue]];
-    [self setVideoFilterProperty:"transform-type" forFilter:"transform" string:vlc_b64_decode([[items objectAtIndex:10] UTF8String])];
-    [self setVideoFilterProperty:"puzzle-rows" forFilter:"puzzle" integer:[[items objectAtIndex:11] intValue]];
-    [self setVideoFilterProperty:"puzzle-cols" forFilter:"puzzle" integer:[[items objectAtIndex:12] intValue]];
-    [self setVideoFilterProperty:"puzzle-black-slot" forFilter:"puzzle" boolean:[[items objectAtIndex:13] intValue]];
-    [self setVideoFilterProperty:"colorthres-color" forFilter:"colorthres" integer:[[items objectAtIndex:14] intValue]];
-    [self setVideoFilterProperty:"colorthres-saturationthres" forFilter:"colorthres" integer:[[items objectAtIndex:15] intValue]];
-    [self setVideoFilterProperty:"colorthres-similaritythres" forFilter:"colorthres" integer:[[items objectAtIndex:16] intValue]];
-    [self setVideoFilterProperty:"sepia-intensity" forFilter:"sepia" integer:[[items objectAtIndex:17] intValue]];
-    [self setVideoFilterProperty:"gradient-mode" forFilter:"gradient" string:vlc_b64_decode([[items objectAtIndex:18] UTF8String])];
-    [self setVideoFilterProperty:"gradient-cartoon" forFilter:"gradient" integer:[[items objectAtIndex:19] intValue]];
-    [self setVideoFilterProperty:"gradient-type" forFilter:"gradient" integer:[[items objectAtIndex:20] intValue]];
-    [self setVideoFilterProperty:"extract-component" forFilter:"extract" integer:[[items objectAtIndex:21] intValue]];
-    [self setVideoFilterProperty:"posterize-level" forFilter:"posterize" integer:[[items objectAtIndex:22] intValue]];
-    [self setVideoFilterProperty:"blur-factor" forFilter:"motionblur" integer:[[items objectAtIndex:23] intValue]];
-    [self setVideoFilterProperty:"marq-marquee" forFilter:"marq" string:vlc_b64_decode([[items objectAtIndex:24] UTF8String])];
-    [self setVideoFilterProperty:"marq-position" forFilter:"marq" integer:[[items objectAtIndex:25] intValue]];
-    [self setVideoFilterProperty:"logo-file" forFilter:"logo" string:vlc_b64_decode([[items objectAtIndex:26] UTF8String])];
-    [self setVideoFilterProperty:"logo-position" forFilter:"logo" integer:[[items objectAtIndex:27] intValue]];
-    [self setVideoFilterProperty:"logo-opacity" forFilter:"logo" integer:[[items objectAtIndex:28] intValue]];
-    [self setVideoFilterProperty:"clone-count" forFilter:"clone" integer:[[items objectAtIndex:29] intValue]];
-    [self setVideoFilterProperty:"wall-rows" forFilter:"wall" integer:[[items objectAtIndex:30] intValue]];
-    [self setVideoFilterProperty:"wall-cols" forFilter:"wall" integer:[[items objectAtIndex:31] intValue]];
+    [self setVideoFilterProperty:"hue" forFilter:"adjust" integer:[[items objectAtIndex:3] intValue]];
+    [self setVideoFilterProperty:"contrast" forFilter:"adjust" float:[[items objectAtIndex:4] floatValue]];
+    [self setVideoFilterProperty:"brightness" forFilter:"adjust" float:[[items objectAtIndex:5] floatValue]];
+    [self setVideoFilterProperty:"saturation" forFilter:"adjust" float:[[items objectAtIndex:6] floatValue]];
+    [self setVideoFilterProperty:"gamma" forFilter:"adjust" float:[[items objectAtIndex:7] floatValue]];
+    [self setVideoFilterProperty:"sharpen-sigma" forFilter:"sharpen" float:[[items objectAtIndex:8] floatValue]];
+    [self setVideoFilterProperty:"gradfun-radius" forFilter:"gradfun" integer:[[items objectAtIndex:9] intValue]];
+    [self setVideoFilterProperty:"grain-variance" forFilter:"grain" float:[[items objectAtIndex:10] floatValue]];
+    [self setVideoFilterProperty:"transform-type" forFilter:"transform" string:vlc_b64_decode([[items objectAtIndex:11] UTF8String])];
+    [self setVideoFilterProperty:"puzzle-rows" forFilter:"puzzle" integer:[[items objectAtIndex:12] intValue]];
+    [self setVideoFilterProperty:"puzzle-cols" forFilter:"puzzle" integer:[[items objectAtIndex:13] intValue]];
+    [self setVideoFilterProperty:"puzzle-black-slot" forFilter:"puzzle" boolean:[[items objectAtIndex:14] intValue]];
+    [self setVideoFilterProperty:"colorthres-color" forFilter:"colorthres" integer:[[items objectAtIndex:15] intValue]];
+    [self setVideoFilterProperty:"colorthres-saturationthres" forFilter:"colorthres" integer:[[items objectAtIndex:16] intValue]];
+    [self setVideoFilterProperty:"colorthres-similaritythres" forFilter:"colorthres" integer:[[items objectAtIndex:17] intValue]];
+    [self setVideoFilterProperty:"sepia-intensity" forFilter:"sepia" integer:[[items objectAtIndex:18] intValue]];
+    [self setVideoFilterProperty:"gradient-mode" forFilter:"gradient" string:vlc_b64_decode([[items objectAtIndex:19] UTF8String])];
+    [self setVideoFilterProperty:"gradient-cartoon" forFilter:"gradient" integer:[[items objectAtIndex:20] intValue]];
+    [self setVideoFilterProperty:"gradient-type" forFilter:"gradient" integer:[[items objectAtIndex:21] intValue]];
+    [self setVideoFilterProperty:"extract-component" forFilter:"extract" integer:[[items objectAtIndex:22] intValue]];
+    [self setVideoFilterProperty:"posterize-level" forFilter:"posterize" integer:[[items objectAtIndex:23] intValue]];
+    [self setVideoFilterProperty:"blur-factor" forFilter:"motionblur" integer:[[items objectAtIndex:24] intValue]];
+    [self setVideoFilterProperty:"marq-marquee" forFilter:"marq" string:vlc_b64_decode([[items objectAtIndex:25] UTF8String])];
+    [self setVideoFilterProperty:"marq-position" forFilter:"marq" integer:[[items objectAtIndex:26] intValue]];
+    [self setVideoFilterProperty:"logo-file" forFilter:"logo" string:vlc_b64_decode([[items objectAtIndex:27] UTF8String])];
+    [self setVideoFilterProperty:"logo-position" forFilter:"logo" integer:[[items objectAtIndex:28] intValue]];
+    [self setVideoFilterProperty:"logo-opacity" forFilter:"logo" integer:[[items objectAtIndex:29] intValue]];
+    [self setVideoFilterProperty:"clone-count" forFilter:"clone" integer:[[items objectAtIndex:30] intValue]];
+    [self setVideoFilterProperty:"wall-rows" forFilter:"wall" integer:[[items objectAtIndex:31] intValue]];
+    [self setVideoFilterProperty:"wall-cols" forFilter:"wall" integer:[[items objectAtIndex:32] intValue]];
 
     [defaults setInteger:selectedProfile forKey:@"VideoEffectSelectedProfile"];
     [defaults synchronize];
