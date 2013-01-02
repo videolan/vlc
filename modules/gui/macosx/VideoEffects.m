@@ -661,6 +661,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         }
         var_SetBool(p_filter, psz_name, b_value);
         vlc_object_release(p_vout);
+        vlc_object_release(p_filter);
     }
 }
 
