@@ -10,6 +10,7 @@ struct subpicture_updater_sys_t {
     bool is_fixed;
     int  fixed_width;
     int  fixed_height;
+    bool renderbg;
 };
 
 static int SubpictureTextValidate(subpicture_t *subpic,
@@ -60,6 +61,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     r->psz_text = sys->text ? strdup(sys->text) : NULL;
     r->psz_html = sys->html ? strdup(sys->html) : NULL;
     r->i_align  = sys->align;
+    r->b_renderbg = sys->renderbg;
     if (!sys->is_fixed) {
         const float margin_ratio = 0.04;
         const int   margin_h     = margin_ratio * fmt_dst->i_visible_width;

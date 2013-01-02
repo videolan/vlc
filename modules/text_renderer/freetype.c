@@ -301,6 +301,7 @@ struct line_desc_t
     line_desc_t      *p_next;
 
     int              i_width;
+    int              i_height;
     int              i_base_line;
     int              i_character_count;
     line_character_t *p_character;
@@ -1059,6 +1060,93 @@ static inline void BlendAXYZLine( picture_t *p_picture,
     }
 }
 
+static inline void RenderBackground( subpicture_region_t *p_region,
+                                     line_desc_t *p_line_head,
+                                     FT_BBox *p_bbox,
+                                     int i_margin,
+                                     picture_t *p_picture,
+                                     int i_text_width,
+                                     void (*ExtractComponents)( uint32_t, uint8_t *, uint8_t *, uint8_t * ),
+                                     void (*BlendPixel)(picture_t *, int, int, int, int, int, int, int) )
+{
+    for( line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
+    {
+        int i_align_left = i_margin;
+        int i_align_top = i_margin;
+        int line_start = 0;
+        int line_end = 0;
+        unsigned line_top = 0;
+        int line_bottom = 0;
+        int max_height = 0;
+
+        if( p_line->i_width < i_text_width )
+        {
+            /* Left offset to take into account alignment */
+            if( (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT )
+                i_align_left += ( i_text_width - p_line->i_width );
+            else if( (p_region->i_align & 0x10) == SUBPICTURE_ALIGN_LEAVETEXT)
+                i_align_left = i_margin; /* Keep it the way it is */
+            else if( (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT )
+                i_align_left += ( i_text_width - p_line->i_width ) / 2;
+        }
+
+        /* Find the tallest character in the line */
+        for( int i = 0; i < p_line->i_character_count; i++ ) {
+            const line_character_t *ch = &p_line->p_character[i];
+            FT_BitmapGlyph p_glyph = ch->p_outline ? ch->p_outline : ch->p_glyph;
+            if (p_glyph->top > max_height)
+                max_height = p_glyph->top;
+        }
+
+        /* Compute the background for the line (identify leading/trailing space) */
+        for( int i = 0; i < p_line->i_character_count; i++ ) {
+            const line_character_t *ch = &p_line->p_character[i];
+            FT_BitmapGlyph p_glyph = ch->p_outline ? ch->p_outline : ch->p_glyph;
+            if (p_glyph && p_glyph->bitmap.rows > 0) {
+                // Found a non-whitespace character
+                line_start = i_align_left + p_glyph->left - p_bbox->xMin;
+                break;
+            }
+        }
+
+        /* Fudge factor to make sure caption background edges are left aligned
+           despite variable font width */
+        if (line_start < 12)
+            line_start = 0;
+
+        /* Find right boundary for bounding box for background */
+        for( int i = p_line->i_character_count; i > 0; i-- ) {
+            const line_character_t *ch = &p_line->p_character[i - 1];
+            FT_BitmapGlyph p_glyph = ch->p_shadow ? ch->p_shadow : ch->p_glyph;
+            if (p_glyph && p_glyph->bitmap.rows > 0) {
+                // Found a non-whitespace character
+                line_end = i_align_left + p_glyph->left - p_bbox->xMin + p_glyph->bitmap.width;
+                break;
+            }
+        }
+
+        /* Setup color for the background */
+        uint8_t i_x, i_y, i_z;
+        ExtractComponents( 0x000000, &i_x, &i_y, &i_z );
+
+        /* Compute the upper boundary for the background */
+        if ((i_align_top + p_line->i_base_line - max_height) < 0)
+            line_top = i_align_top + p_line->i_base_line;
+        else
+            line_top = i_align_top + p_line->i_base_line - max_height;
+
+        /* Compute lower boundary for the background */
+        line_bottom =  __MIN(line_top + p_line->i_height, p_region->fmt.i_visible_height);
+
+        /* Render the actual background */
+        for( int dy = line_top; dy < line_bottom; dy++ )
+        {
+            for( int dx = line_start; dx < line_end; dx++ )
+                BlendPixel( p_picture, dx, dy, 0xff, i_x, i_y, i_z, 0xff );
+        }
+    }
+}
+
 static inline int RenderAXYZ( filter_t *p_filter,
                               subpicture_region_t *p_region,
                               line_desc_t *p_line_head,
@@ -1093,6 +1181,11 @@ static inline int RenderAXYZ( filter_t *p_filter,
 
     FillPicture( p_picture, i_a, i_x, i_y, i_z );
 
+    if (p_region->b_renderbg) {
+        RenderBackground(p_region, p_line_head, p_bbox, i_margin, p_picture, i_text_width,
+                         ExtractComponents, BlendPixel);
+    }
+
     /* Render shadow then outline and then normal glyphs */
     for( int g = 0; g < 3; g++ )
     {
@@ -1105,7 +1198,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
                 /* Left offset to take into account alignment */
                 if( (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT )
                     i_align_left += ( i_text_width - p_line->i_width );
-		else if( (p_region->i_align & 0x10) == SUBPICTURE_ALIGN_LEAVETEXT)
+                else if( (p_region->i_align & 0x10) == SUBPICTURE_ALIGN_LEAVETEXT)
                     i_align_left = i_margin; /* Keep it the way it is */
                 else if( (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT )
                     i_align_left += ( i_text_width - p_line->i_width ) / 2;
@@ -2411,6 +2504,7 @@ static int ProcessLines( filter_t *p_filter,
         {
             p_line->i_width  = __MAX(line_bbox.xMax - line_bbox.xMin, 0);
             p_line->i_base_line = i_base_line;
+            p_line->i_height = __MAX(i_face_height, i_face_height_previous);
             if( i_ul_thickness > 0 )
             {
                 for( int i = 0; i < p_line->i_character_count; i++ )

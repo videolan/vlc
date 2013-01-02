@@ -67,6 +67,7 @@ struct subpicture_region_t
     char            *psz_text;       /**< text string comprising this region */
     char            *psz_html;       /**< HTML version of subtitle (NULL = use psz_text) */
     text_style_t    *p_style;        /**< a description of the text style formatting */
+    bool            b_renderbg;      /**< render black background under text */
 
     subpicture_region_t *p_next;                /**< next region in the list */
     subpicture_region_private_t *p_private;  /**< Private data for spu_t *only* */
