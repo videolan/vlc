@@ -1610,6 +1610,10 @@ static int ProcessNodes( filter_t *p_filter,
 
     if( p_font_style )
     {
+        /* If the font is not specified in the style, assume the system font */
+        if(!p_font_style->psz_fontname)
+             p_font_style->psz_fontname = strdup(p_sys->psz_fontfamily);
+
         rv = PushFont( &p_fonts,
                p_font_style->psz_fontname,
                p_font_style->i_font_size > 0 ? p_font_style->i_font_size
