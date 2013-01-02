@@ -302,7 +302,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
     psz_vfilters = config_GetPsz(p_intf, "video-splitter");
     if (psz_vfilters) {
-        
         [o_clone_ckb setState: (NSInteger)strstr(psz_vfilters, "clone")];
         [o_wall_ckb setState: (NSInteger)strstr(psz_vfilters, "wall")];
         free(psz_vfilters);
@@ -508,9 +507,9 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     psz_string = config_GetPsz(p_intf, psz_filter_type);
 
     if (b_on) {
-        if (! psz_string)
+        if (!psz_string)
             psz_string = psz_name;
-        else if ((NSInteger)strstr(psz_string, psz_name) == NO)
+        else if (strstr(psz_string, psz_name) == NULL)
             psz_string = (char *)[[NSString stringWithFormat: @"%s:%s", psz_string, psz_name] UTF8String];
     } else {
         if (!psz_string)
@@ -580,12 +579,12 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     vout_thread_t *p_vout = getVout();
     vlc_object_t *p_filter;
 
-    config_PutInt(p_intf , psz_name , i_value);
+    config_PutInt(p_intf, psz_name, i_value);
 
     if (p_vout) {
         p_filter = vlc_object_find_name(pl_Get(p_intf), psz_filter);
 
-        if (! p_filter) {
+        if (!p_filter) {
             msg_Warn(p_intf, "filter '%s' isn't enabled", psz_filter);
             vlc_object_release(p_vout);
             return;
@@ -594,7 +593,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         vlc_object_release(p_vout);
         vlc_object_release(p_filter);
 
-        [self restartFilterIfNeeded:psz_filter option: psz_name];
+        [self restartFilterIfNeeded: psz_filter option: psz_name];
     }
 }
 
@@ -603,12 +602,12 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     vout_thread_t *p_vout = getVout();
     vlc_object_t *p_filter;
 
-    config_PutFloat(p_intf , psz_name , f_value);
+    config_PutFloat(p_intf, psz_name, f_value);
 
     if (p_vout) {
         p_filter = vlc_object_find_name(pl_Get(p_intf), psz_filter);
 
-        if (! p_filter) {
+        if (!p_filter) {
             msg_Warn(p_intf, "filter '%s' isn't enabled", psz_filter);
             vlc_object_release(p_vout);
             return;
@@ -617,7 +616,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         vlc_object_release(p_vout);
         vlc_object_release(p_filter);
 
-        [self restartFilterIfNeeded:psz_filter option: psz_name];
+        [self restartFilterIfNeeded: psz_filter option: psz_name];
     }
 }
 
@@ -631,7 +630,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     if (p_vout) {
         p_filter = vlc_object_find_name(pl_Get(p_intf), psz_filter);
 
-        if (! p_filter) {
+        if (!p_filter) {
             msg_Warn(p_intf, "filter '%s' isn't enabled", psz_filter);
             vlc_object_release(p_vout);
             return;
@@ -640,7 +639,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         vlc_object_release(p_vout);
         vlc_object_release(p_filter);
 
-        [self restartFilterIfNeeded:psz_filter option: psz_name];
+        [self restartFilterIfNeeded: psz_filter option: psz_name];
     }
 }
 
@@ -654,7 +653,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     if (p_vout) {
         p_filter = vlc_object_find_name(pl_Get(p_intf), psz_filter);
 
-        if (! p_filter) {
+        if (!p_filter) {
             msg_Warn(p_intf, "filter '%s' isn't enabled", psz_filter);
             vlc_object_release(p_vout);
             return;
@@ -740,7 +739,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         for (NSUInteger x = 0; x < count; x++)
             [self setVideoFilter:(char *)[[tempArray objectAtIndex:x] UTF8String] on:YES];
     }
-    config_PutPsz(p_intf,"video-filter",[tempString UTF8String]);
+    config_PutPsz(p_intf, "video-filter", [tempString UTF8String]);
     tempString = [NSString stringWithFormat:@"%s", vlc_b64_decode([[items objectAtIndex:1] UTF8String])];
     /* enable another round of new filters */
     if ([tempString length] > 0) {
@@ -1013,7 +1012,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 - (IBAction)transformModifierChanged:(id)sender
 {
     NSInteger tag = [[o_transform_pop selectedItem] tag];
-    char * psz_string = (char *)[[NSString stringWithFormat:@"%li", tag] UTF8String];
+    char *psz_string = (char *)[[NSString stringWithFormat:@"%li", tag] UTF8String];
     if (tag == 1)
         psz_string = (char *)"hflip";
     else if (tag == 2)
