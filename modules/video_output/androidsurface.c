@@ -46,6 +46,11 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define CHROMA_TEXT N_("Chroma used")
+#define CHROMA_LONGTEXT N_(\
+    "Force use of a specific chroma for output. Default is RGB32.")
+
+#define CFG_PREFIX "androidsurface-"
 
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
@@ -57,6 +62,7 @@ vlc_module_begin()
     set_description(N_("Android Surface video output"))
     set_capability("vout display", 155)
     add_shortcut("androidsurface", "android")
+    add_string(CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true)
     set_callbacks(Open, Close)
 vlc_module_end()
 
@@ -84,21 +90,6 @@ static void             Display(vout_display_t *, picture_t *, subpicture_t *);
 static int              Control(vout_display_t *, int, va_list);
 
 /* */
-struct vout_display_sys_t {
-    picture_pool_t *pool;
-    void *p_library;
-    Surface_lock s_lock;
-    Surface_lock2 s_lock2;
-    Surface_unlockAndPost s_unlockAndPost;
-
-    picture_resource_t resource;
-
-    /* density */
-    int i_sar_num;
-    int i_sar_den;
-};
-
-/* */
 typedef struct _SurfaceInfo {
     uint32_t    w;
     uint32_t    h;
@@ -108,6 +99,23 @@ typedef struct _SurfaceInfo {
     uint32_t*   bits;
     uint32_t    reserved[2];
 } SurfaceInfo;
+
+/* */
+struct vout_display_sys_t {
+    picture_pool_t *pool;
+    void *p_library;
+    Surface_lock s_lock;
+    Surface_lock2 s_lock2;
+    Surface_unlockAndPost s_unlockAndPost;
+
+    picture_resource_t resource;
+
+    int pixel_size;
+
+    /* density */
+    int i_sar_num;
+    int i_sar_den;
+};
 
 struct picture_sys_t
 {
@@ -174,11 +182,45 @@ static int Open(vlc_object_t *p_this) {
 
     /* Setup chroma */
     video_format_t fmt = vd->fmt;
-    fmt.i_chroma = VLC_CODEC_RGB32;
-    fmt.i_rmask  = 0x000000ff;
-    fmt.i_gmask  = 0x0000ff00;
-    fmt.i_bmask  = 0x00ff0000;
+
+    char *psz_fcc = var_InheritString(vd, CFG_PREFIX "chroma");
+    if( psz_fcc ) {
+        fmt.i_chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES, psz_fcc);
+        free(psz_fcc);
+    } else
+        fmt.i_chroma = VLC_CODEC_RGB32;
+
+    switch(fmt.i_chroma) {
+        case VLC_CODEC_YV12:
+            /* avoid swscale usage by asking for I420 instead since the
+             * vout already has code to swap the buffers */
+            fmt.i_chroma = VLC_CODEC_I420;
+        case VLC_CODEC_I420:
+            break;
+
+        case VLC_CODEC_RGB16:
+            fmt.i_bmask = 0x0000001f;
+            fmt.i_gmask = 0x000007e0;
+            fmt.i_rmask = 0x0000f800;
+            break;
+
+        case VLC_CODEC_RGB32:
+            fmt.i_rmask  = 0x000000ff;
+            fmt.i_gmask  = 0x0000ff00;
+            fmt.i_bmask  = 0x00ff0000;
+            break;
+
+        default:
+            return VLC_EGENERIC;
+    }
     video_format_FixRgb(&fmt);
+
+    const vlc_chroma_description_t *desc = vlc_fourcc_GetChromaDescription(fmt.i_chroma);
+    if (unlikely(!desc))
+        return VLC_EGENERIC;
+    sys->pixel_size = desc->pixel_size;
+
+    msg_Dbg(vd, "Pixel format %4.4s (%d bpp)", (char*)&fmt.i_chroma, sys->pixel_size);
 
     /* Create the associated picture */
     picture_resource_t *rsc = &sys->resource;
@@ -251,6 +293,34 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count) {
     return sys->pool;
 }
 
+#define ALIGN_16_PIXELS( x ) ( ( ( x ) + 15 ) / 16 * 16 )
+static void SetupPictureYV12( SurfaceInfo* p_surfaceInfo, picture_t *p_picture )
+{
+    /* according to document of android.graphics.ImageFormat.YV12 */
+    int i_stride = ALIGN_16_PIXELS( p_surfaceInfo->s );
+    int i_c_stride = ALIGN_16_PIXELS( i_stride / 2 );
+
+    p_picture->p->i_pitch = i_stride;
+
+    /* Fill chroma planes for planar YUV */
+    for( int n = 1; n < p_picture->i_planes; n++ )
+    {
+        const plane_t *o = &p_picture->p[n-1];
+        plane_t *p = &p_picture->p[n];
+
+        p->p_pixels = o->p_pixels + o->i_lines * o->i_pitch;
+        p->i_pitch  = i_c_stride;
+        p->i_lines  = p_picture->format.i_height / 2;
+    }
+
+    if( vlc_fourcc_AreUVPlanesSwapped( p_picture->format.i_chroma,
+                                       VLC_CODEC_YV12 ) ) {
+        uint8_t *p_tmp = p_picture->p[1].p_pixels;
+        p_picture->p[1].p_pixels = p_picture->p[2].p_pixels;
+        p_picture->p[2].p_pixels = p_tmp;
+    }
+}
+
 static int  AndroidLockSurface(picture_t *picture) {
     picture_sys_t *picsys = picture->p_sys;
     vout_display_sys_t *sys = picsys->sys;
@@ -284,8 +354,11 @@ static int  AndroidLockSurface(picture_t *picture) {
     }
 
     picture->p->p_pixels = (uint8_t*)info->bits;
-    picture->p->i_pitch = 4 * info->s;
     picture->p->i_lines = info->h;
+    picture->p->i_pitch = sys->pixel_size * info->s;
+
+    if (info->format == 0x32315659 /*ANDROID_IMAGE_FORMAT_YV12*/)
+        SetupPictureYV12(info, picture);
 
     return VLC_SUCCESS;
 }
