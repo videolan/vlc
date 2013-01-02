@@ -143,6 +143,8 @@
     IBOutlet id o_addlogo_transparency_lbl;
     IBOutlet id o_addlogo_transparency_sld;
     IBOutlet id o_anaglyph_ckb;
+
+    NSInteger i_old_profile_index;
 }
 
 /* generic */
@@ -153,6 +155,8 @@
 - (void)setVideoFilterProperty: (char *)psz_name forFilter: (char*)psz_filter float: (float)f_value;
 - (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter string: (char *)psz_value;
 - (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter boolean: (BOOL)b_value;
+
+- (void)saveCurrentProfile;
 
 - (IBAction)toggleWindow:(id)sender;
 - (IBAction)profileSelectorAction:(id)sender;
