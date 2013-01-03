@@ -337,9 +337,12 @@ static int  AndroidLockSurface(picture_t *picture) {
     else
         sys->s_lock2(surf, info, NULL);
 
-    // input size doesn't match the surface size,
-    // request a resize
-    if (info->w != sw || info->h != sh) {
+    // For RGB (32 or 16) we need to align on 8 or 4 pixels, 16 pixels for YUV
+    int align_pixels = (16 / picture->p[0].i_pixel_pitch) - 1;
+    uint32_t aligned_width = (sw + align_pixels) & ~align_pixels;
+
+    if (info->w != aligned_width || info->h != sh) {
+        // input size doesn't match the surface size -> request a resize
         jni_SetAndroidSurfaceSize(sw, sh, sys->i_sar_num, sys->i_sar_den);
         sys->s_unlockAndPost(surf);
         jni_UnlockAndroidSurface();
