@@ -130,10 +130,10 @@ CLEAN_FILE += .xz
 
 # autoconf
 
-autoconf-$(AUTOCONF_VERSION).tar.bz2:
+autoconf-$(AUTOCONF_VERSION).tar.gz:
 	$(call download,$(AUTOCONF_URL))
 
-autoconf: autoconf-$(AUTOCONF_VERSION).tar.bz2
+autoconf: autoconf-$(AUTOCONF_VERSION).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
