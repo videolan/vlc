@@ -3,7 +3,7 @@ $Id$
 
 See lua/README.txt for generic documentation about Lua usage in VLC.
 
-Examples: See fmc.lua, freebox.lua, frenchtv.lua
+Examples: See fmc.lua, frenchtv.lua
 
 VLC Lua SD modules should define two functions:
  * descriptor(): returns a table with information about the module.
