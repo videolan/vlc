@@ -110,8 +110,6 @@ struct vout_display_sys_t {
 
     picture_resource_t resource;
 
-    int pixel_size;
-
     /* density */
     int i_sar_num;
     int i_sar_den;
@@ -215,12 +213,7 @@ static int Open(vlc_object_t *p_this) {
     }
     video_format_FixRgb(&fmt);
 
-    const vlc_chroma_description_t *desc = vlc_fourcc_GetChromaDescription(fmt.i_chroma);
-    if (unlikely(!desc))
-        return VLC_EGENERIC;
-    sys->pixel_size = desc->pixel_size;
-
-    msg_Dbg(vd, "Pixel format %4.4s (%d bpp)", (char*)&fmt.i_chroma, sys->pixel_size);
+    msg_Dbg(vd, "Pixel format %4.4s", (char*)&fmt.i_chroma);
 
     /* Create the associated picture */
     picture_resource_t *rsc = &sys->resource;
@@ -355,7 +348,7 @@ static int  AndroidLockSurface(picture_t *picture) {
 
     picture->p->p_pixels = (uint8_t*)info->bits;
     picture->p->i_lines = info->h;
-    picture->p->i_pitch = sys->pixel_size * info->s;
+    picture->p->i_pitch = picture->p->i_pixel_pitch * info->s;
 
     if (info->format == 0x32315659 /*ANDROID_IMAGE_FORMAT_YV12*/)
         SetupPictureYV12(info, picture);
