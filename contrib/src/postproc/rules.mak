@@ -29,7 +29,6 @@ ifeq ($(ARCH),arm)
 POSTPROCCONF += --disable-runtime-cpudetect --arch=arm
 ifdef HAVE_NEON
 POSTPROCCONF += --cpu=cortex-a8 --enable-neon
-POSTPROC_CFLAGS += -mfloat-abi=softfp -mfpu=neon
 endif
 endif
 
