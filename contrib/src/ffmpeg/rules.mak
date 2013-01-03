@@ -53,9 +53,12 @@ endif
 # ARM stuff
 ifeq ($(ARCH),arm)
 FFMPEGCONF += --arch=arm
-ifdef HAVE_NEON
+ifdef HAVE_ARMV7A
 FFMPEGCONF += --cpu=cortex-a8 --enable-neon
+FFMPEG_CFLAGS += -mfpu=vfpv3-d16
+ifndef HAVE_ANDROID # We want NEON autodetect on Android
 FFMPEG_CFLAGS += -mfpu=neon
+endif
 endif
 endif
 
