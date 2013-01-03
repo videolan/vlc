@@ -76,8 +76,6 @@ ifdef HAVE_WINCE
 POSTPROCCONF += --target-os=mingw32ce --arch=armv4l --cpu=armv4t
 endif
 
-POSTPROC_CFLAGS += --std=gnu99
-
 # Build
 
 ifdef GPL
@@ -107,7 +105,7 @@ endif
 
 .postproc: postproc
 	cd $< && $(HOSTVARS) ./configure \
-		--extra-cflags="$(POSTPROC_CFLAGS) -DHAVE_STDINT_H"  \
+		--extra-cflags="--std=gnu99 $(EXTRA_CFLAGS) -DHAVE_STDINT_H"  \
 		--extra-ldflags="$(LDFLAGS)" $(POSTPROCCONF) \
 		--prefix="$(PREFIX)" --enable-static --disable-shared
 	cd $< && $(MAKE) install-libs install-headers
