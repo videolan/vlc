@@ -95,6 +95,7 @@ public:
         float f_max;      // max
         float f_value;    // value
         float f_resolution; // resolution
+        float f_visual_multiplier; // only for display (f_value *)
     } slider_data_t;
     FilterSliderData( QObject *parent, intf_thread_t *p_intf,
                       QSlider *slider,

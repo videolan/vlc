@@ -945,7 +945,7 @@ void FilterSliderData::setValue( float f )
 
 void FilterSliderData::updateText( int i )
 {
-    float f = ((float) i) * p_data->f_resolution;
+    float f = ((float) i) * p_data->f_resolution * p_data->f_visual_multiplier;
     valueLabel->setText( QString( p_data->units )
                     .prepend( "%1" )
                     .arg( QString::number( f, 'f', 1 ) ) );
@@ -1382,13 +1382,13 @@ Compressor::Compressor( intf_thread_t *p_intf, QWidget *parent )
     i_smallfont = -2;
     const FilterSliderData::slider_data_t a[7] =
     {
-        { "compressor-rms-peak",    qtr("RMS/peak"),         "",       0.0f,   1.0f,   0.00f, 0.001f },
-        { "compressor-attack",      qtr("Attack"),       qtr(" ms"),   1.5f, 400.0f,  25.00f, 0.100f },
-        { "compressor-release",     qtr("Release"),      qtr(" ms"),   2.0f, 800.0f, 100.00f, 0.100f },
-        { "compressor-threshold",   qtr("Threshold"),    qtr(" dB"), -30.0f,   0.0f, -11.00f, 0.010f },
-        { "compressor-ratio",       qtr("Ratio"),            ":1",     1.0f,  20.0f,   8.00f, 0.010f },
-        { "compressor-knee",        qtr("Knee\nradius"), qtr(" dB"),   1.0f,  10.0f,   2.50f, 0.010f },
-        { "compressor-makeup-gain", qtr("Makeup\ngain"), qtr(" dB"),   0.0f,  24.0f,   7.00f, 0.010f },
+        { "compressor-rms-peak",    qtr("RMS/peak"),         "",       0.0f,   1.0f,   0.00f, 0.001f, 1.0 },
+        { "compressor-attack",      qtr("Attack"),       qtr(" ms"),   1.5f, 400.0f,  25.00f, 0.100f, 1.0 },
+        { "compressor-release",     qtr("Release"),      qtr(" ms"),   2.0f, 800.0f, 100.00f, 0.100f, 1.0 },
+        { "compressor-threshold",   qtr("Threshold"),    qtr(" dB"), -30.0f,   0.0f, -11.00f, 0.010f, 1.0 },
+        { "compressor-ratio",       qtr("Ratio"),            ":1",     1.0f,  20.0f,   8.00f, 0.010f, 1.0 },
+        { "compressor-knee",        qtr("Knee\nradius"), qtr(" dB"),   1.0f,  10.0f,   2.50f, 0.010f, 1.0 },
+        { "compressor-makeup-gain", qtr("Makeup\ngain"), qtr(" dB"),   0.0f,  24.0f,   7.00f, 0.010f, 1.0 },
     };
     for( int i=0; i<7 ;i++ ) controls.append( a[i] );
     build();
@@ -1404,11 +1404,11 @@ Spatializer::Spatializer( intf_thread_t *p_intf, QWidget *parent )
     i_smallfont = -1;
     const FilterSliderData::slider_data_t a[5] =
     {
-        { "spatializer-roomsize",   qtr("Size"),    "", 0.0f, 1.1f, 0.85f, 0.1f },
-        { "spatializer-width",      qtr("Width"),   "", 0.0f, 1.0f, 1.0f, 0.1f },
-        { "spatializer-wet",        qtr("Wet"),     "", 0.0f, 1.0f, 0.4f, 0.1f },
-        { "spatializer-dry",        qtr("Dry"),     "", 0.0f, 1.0f, 0.5f, 0.1f },
-        { "spatializer-damp",       qtr("Damp"),    "", 0.0f, 1.0f, 0.5f, 0.1f },
+        { "spatializer-roomsize",   qtr("Size"),    "", 0.0f, 1.1f, 0.85f, 0.1f, 10.0 },
+        { "spatializer-width",      qtr("Width"),   "", 0.0f, 1.0f, 1.0f, 0.1f, 10.0 },
+        { "spatializer-wet",        qtr("Wet"),     "", 0.0f, 1.0f, 0.4f, 0.1f, 10.0 },
+        { "spatializer-dry",        qtr("Dry"),     "", 0.0f, 1.0f, 0.5f, 0.1f, 10.0 },
+        { "spatializer-damp",       qtr("Damp"),    "", 0.0f, 1.0f, 0.5f, 0.1f, 10.0 },
     };
     for( int i=0; i<5 ;i++ ) controls.append( a[i] );
     build();
