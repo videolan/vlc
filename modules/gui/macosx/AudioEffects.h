@@ -99,6 +99,8 @@
     IBOutlet id o_filter_normLevel_sld;
     IBOutlet id o_filter_normLevel_lbl;
     IBOutlet id o_filter_karaoke_ckb;
+
+    NSInteger i_old_profile_index;
 }
 
 /* generic */
@@ -108,6 +110,8 @@
 - (IBAction)profileSelectorAction:(id)sender;
 - (IBAction)addAudioEffectsProfile:(id)sender;
 - (IBAction)removeAudioEffectsProfile:(id)sender;
+
+- (void)saveCurrentProfile;
 
 /* Equalizer */
 - (void)setupEqualizer;

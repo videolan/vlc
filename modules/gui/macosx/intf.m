@@ -62,7 +62,9 @@
 #import "CoreInteraction.h"
 #import "TrackSynchronization.h"
 #import "VLCVoutWindowController.h"
+
 #import "VideoEffects.h"
+#import "AudioEffects.h"
 
 #import <AddressBook/AddressBook.h>         /* for crashlog send mechanism */
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */
@@ -797,8 +799,9 @@ static VLCMain *_o_sharedMainInstance = nil;
         [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
     }
 
-    /* save current video profile */
+    /* save current video and audio profiles */
     [[VLCVideoEffects sharedInstance] saveCurrentProfile];
+    [[VLCAudioEffects sharedInstance] saveCurrentProfile];
 
     /* Save some interface state in configuration, at module quit */
     config_PutInt(p_intf, "random", var_GetBool(p_playlist, "random"));
