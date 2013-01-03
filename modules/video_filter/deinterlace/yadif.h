@@ -39,7 +39,7 @@ DECLARE_ASM_CONST(16, const xmm_reg, pw_1) = {0x0001000100010001ULL, 0x000100010
 
 
 #ifdef CAN_COMPILE_SSSE3
-#if defined(__SSE__) || VLC_GCC_VERSION(4, 4)
+#if defined(__SSE__) || VLC_GCC_VERSION(4, 4) || defined(__clang__)
 // ================ SSSE3 =================
 #define HAVE_YADIF_SSSE3
 #define COMPILE_TEMPLATE_SSE 1
@@ -55,7 +55,7 @@ DECLARE_ASM_CONST(16, const xmm_reg, pw_1) = {0x0001000100010001ULL, 0x000100010
 #endif
 
 #ifdef CAN_COMPILE_SSE2
-#if defined(__SSE__) || VLC_GCC_VERSION(4, 4)
+#if defined(__SSE__) || VLC_GCC_VERSION(4, 4) || defined(__clang__)
 // ================= SSE2 =================
 #define HAVE_YADIF_SSE2
 #define COMPILE_TEMPLATE_SSE 1
@@ -69,7 +69,7 @@ DECLARE_ASM_CONST(16, const xmm_reg, pw_1) = {0x0001000100010001ULL, 0x000100010
 #endif
 
 #ifdef CAN_COMPILE_MMX
-#if defined(__MMX__) || VLC_GCC_VERSION(4, 4)
+#if defined(__MMX__) || VLC_GCC_VERSION(4, 4) || defined(__clang__)
 // ================ MMX =================
 #define HAVE_YADIF_MMX
 #define VLC_TARGET VLC_MMX
