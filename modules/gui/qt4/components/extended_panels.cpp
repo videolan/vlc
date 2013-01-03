@@ -1404,11 +1404,11 @@ Spatializer::Spatializer( intf_thread_t *p_intf, QWidget *parent )
     i_smallfont = -1;
     const FilterSliderData::slider_data_t a[5] =
     {
-        { "spatializer-roomsize",   qtr("Size"),    "", 0.0f, 11.0f, 0.0f, 1.0f },
-        { "spatializer-width",      qtr("Width"),   "", 0.0f, 10.0f, 0.0f, 1.0f },
-        { "spatializer-wet",        qtr("Wet"),     "", 0.0f, 10.0f, 0.0f, 1.0f },
-        { "spatializer-dry",        qtr("Dry"),     "", 0.0f, 10.0f, 0.0f, 1.0f },
-        { "spatializer-damp",       qtr("Damp"),    "", 0.0f, 10.0f, 0.0f, 1.0f },
+        { "spatializer-roomsize",   qtr("Size"),    "", 0.0f, 1.1f, 0.85f, 0.1f },
+        { "spatializer-width",      qtr("Width"),   "", 0.0f, 1.0f, 1.0f, 0.1f },
+        { "spatializer-wet",        qtr("Wet"),     "", 0.0f, 1.0f, 0.4f, 0.1f },
+        { "spatializer-dry",        qtr("Dry"),     "", 0.0f, 1.0f, 0.5f, 0.1f },
+        { "spatializer-damp",       qtr("Damp"),    "", 0.0f, 1.0f, 0.5f, 0.1f },
     };
     for( int i=0; i<5 ;i++ ) controls.append( a[i] );
     build();
