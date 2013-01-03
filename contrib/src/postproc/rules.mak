@@ -98,14 +98,11 @@ postproc: postproc-$(POSTPROC_VERSION).tar.gz .sum-postproc
 	rm -Rf $@ $@-git
 	mkdir -p $@-git
 	$(ZCAT) "$<" | (cd $@-git && tar xv --strip-components=1)
-ifdef HAVE_WIN32
-	sed -i "s/std=c99/std=gnu99/" $@-$(POSTPROC_VERSION)/configure
-endif
 	$(MOVE)
 
 .postproc: postproc
 	cd $< && $(HOSTVARS) ./configure \
-		--extra-cflags="--std=gnu99 $(EXTRA_CFLAGS) -DHAVE_STDINT_H"  \
+		--extra-cflags="$(EXTRA_CFLAGS)"  \
 		--extra-ldflags="$(LDFLAGS)" $(POSTPROCCONF) \
 		--prefix="$(PREFIX)" --enable-static --disable-shared
 	cd $< && $(MAKE) install-libs install-headers
