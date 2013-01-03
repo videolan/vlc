@@ -37,7 +37,6 @@
 #include <QTabWidget>
 
 #define BANDS 10
-#define NUM_SP_CTRL 5
 
 class QSignalMapper;
 
@@ -133,6 +132,7 @@ protected:
     QGroupBox *slidersBox;
     intf_thread_t *p_intf;
     QString name; // filter's module name
+    int i_smallfont;
 
 protected slots:
     void enable();
@@ -177,35 +177,12 @@ public:
     Compressor( intf_thread_t *, QWidget * );
 };
 
-class Spatializer: public QWidget
+class Spatializer: public AudioFilterControlWidget
 {
     Q_OBJECT
 
 public:
     Spatializer( intf_thread_t *, QWidget * );
-
-private:
-    typedef struct
-    {
-        const char *psz_name;
-        const char *psz_desc;
-    } spat_controls_t;
-    static const spat_controls_t spat_controls[NUM_SP_CTRL];
-    QSlider *spatCtrl[NUM_SP_CTRL];
-    QLabel *ctrl_texts[NUM_SP_CTRL];
-    QLabel *ctrl_readout[NUM_SP_CTRL];
-    float controlVars[NUM_SP_CTRL];
-    float oldControlVars[NUM_SP_CTRL];
-
-    QGroupBox *spatializerBox;
-
-    void delCallbacks( vlc_object_t * );
-    void addCallbacks( vlc_object_t * );
-    intf_thread_t *p_intf;
-
-private slots:
-    void enable();
-    void setValues();
 };
 
 class SyncWidget : public QWidget

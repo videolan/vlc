@@ -997,13 +997,13 @@ void FilterSliderData::writeToConfig()
 
 AudioFilterControlWidget::AudioFilterControlWidget
 ( intf_thread_t *_p_intf, QWidget *parent, const char *_name ) :
-    QWidget( parent ), p_intf( _p_intf ), name( _name )
+    QWidget( parent ), p_intf( _p_intf ), name( _name ), i_smallfont(0)
 {}
 
 void AudioFilterControlWidget::build()
 {
     QFont smallFont = QApplication::font();
-    smallFont.setPointSize( smallFont.pointSize() - 2 );
+    smallFont.setPointSize( smallFont.pointSize() + i_smallfont );
 
     QVBoxLayout *layout = new QVBoxLayout( this );
     slidersBox = new QGroupBox( qtr( "Enable" ) );
@@ -1379,6 +1379,7 @@ void Equalizer::addCallbacks( vlc_object_t *p_aout )
 Compressor::Compressor( intf_thread_t *p_intf, QWidget *parent )
     : AudioFilterControlWidget( p_intf, parent, "compressor" )
 {
+    i_smallfont = -2;
     const FilterSliderData::slider_data_t a[7] =
     {
         { "compressor-rms-peak",    qtr("RMS/peak"),         "",       0.0f,   1.0f,   0.00f, 0.001f },
@@ -1396,124 +1397,21 @@ Compressor::Compressor( intf_thread_t *p_intf, QWidget *parent )
 /**********************************************************************
  * Spatializer
  **********************************************************************/
-const Spatializer::spat_controls_t Spatializer::spat_controls[] =
+
+Spatializer::Spatializer( intf_thread_t *p_intf, QWidget *parent )
+    : AudioFilterControlWidget( p_intf, parent, "spatializer" )
 {
-    { "spatializer-roomsize", _("Size") },
-    { "spatializer-width",    _("Width") },
-    { "spatializer-wet",      _("Wet") },
-    { "spatializer-dry",      _("Dry") },
-    { "spatializer-damp",     _("Damp") },
-};
-
-Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
-            : QWidget( _parent ) , p_intf( _p_intf )
-{
-    QFont smallFont = QApplication::font();
-    smallFont.setPointSize( smallFont.pointSize() - 1 );
-
-    QVBoxLayout *layout = new QVBoxLayout( this );
-
-    spatializerBox = new QGroupBox( qtr( "Enable" ) );
-    spatializerBox->setCheckable( true );
-    layout->addWidget( spatializerBox );
-
-    QGridLayout *ctrlLayout = new QGridLayout( spatializerBox );
-    for( int i = 0 ; i < NUM_SP_CTRL ; i++ )
+    i_smallfont = -1;
+    const FilterSliderData::slider_data_t a[5] =
     {
-        spatCtrl[i] = new QSlider( Qt::Vertical );
-        spatCtrl[i]->setValue( (int)var_InheritFloat( p_intf, spat_controls[i].psz_name ) * 10. );
-        oldControlVars[i] = spatCtrl[i]->value();
-
-        ctrl_texts[i] = new QLabel( qtr( spat_controls[i].psz_desc ) + "\n" );
-        ctrl_texts[i]->setFont( smallFont );
-
-        ctrl_readout[i] = new QLabel;
-        ctrl_readout[i]->setFont( smallFont );
-
-        ctrlLayout->addWidget( spatCtrl[i],     0, i, Qt::AlignHCenter );
-        ctrlLayout->addWidget( ctrl_readout[i], 1, i, Qt::AlignHCenter );
-        ctrlLayout->addWidget( ctrl_texts[i],   2, i, Qt::AlignHCenter );
-        spatCtrl[i]->setRange( 0, 10 );
-    }
-    spatCtrl[0]->setRange( 0, 11 );
-
-    for( int i = 0; i < NUM_SP_CTRL; i++ )
-        CONNECT( spatCtrl[i], valueChanged( int ), this, setValues() );
-
-    /* Write down initial values */
-    vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
-    char *psz_af;
-
-    if( p_aout )
-    {
-        psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
-        for( int i = 0; i < NUM_SP_CTRL ; i++ )
-        {
-            controlVars[i] = var_GetFloat( p_aout, spat_controls[i].psz_name );
-        }
-        vlc_object_release( p_aout );
-    }
-    else
-    {
-        psz_af = config_GetPsz( p_intf, "audio-filter" );
-        for( int i = 0; i < NUM_SP_CTRL ; i++ )
-        {
-            controlVars[i] = config_GetFloat( p_intf, spat_controls[i].psz_name );
-        }
-    }
-    if( psz_af && strstr( psz_af, "spatializer" ) != NULL )
-        spatializerBox->setChecked( true );
-    else
-        spatializerBox->setChecked( false );
-    CONNECT( spatializerBox, toggled(bool), this, enable() );
-
-    free( psz_af );
-    setValues();
-}
-
-void Spatializer::enable()
-{
-    playlist_EnableAudioFilter( THEPL, "spatializer", spatializerBox->isChecked() );
-}
-
-void Spatializer::setValues()
-{
-    vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
-
-    for( int i = 0 ; i < NUM_SP_CTRL ; i++ )
-    {
-        float f = (float)( spatCtrl[i]->value() ) / 10;
-        ctrl_readout[i]->setText( QString::number( f, 'f',  1 ) );
-    }
-
-    if( p_aout )
-    {
-        for( int i = 0 ; i < NUM_SP_CTRL ; i++ )
-        {
-            float f = (float)( spatCtrl[i]->value() ) / 10 ;
-            if( oldControlVars[i] != spatCtrl[i]->value() )
-            {
-                var_SetFloat( p_aout, spat_controls[i].psz_name, f );
-                config_PutFloat( p_intf, spat_controls[i].psz_name, f );
-                oldControlVars[i] = spatCtrl[i]->value();
-            }
-        }
-        vlc_object_release( p_aout );
-    }
-
-}
-void Spatializer::delCallbacks( vlc_object_t *p_aout )
-{
-    VLC_UNUSED( p_aout );
-    //    var_DelCallback( p_aout, "Spatializer-bands", EqzCallback, this );
-    //    var_DelCallback( p_aout, "Spatializer-preamp", EqzCallback, this );
-}
-
-void Spatializer::addCallbacks( vlc_object_t *p_aout )
-{
-    VLC_UNUSED( p_aout );
-    //    var_AddCallback( p_aout, "Spatializer-bands", EqzCallback, this );
-    //    var_AddCallback( p_aout, "Spatializer-preamp", EqzCallback, this );
+        { "spatializer-roomsize",   qtr("Size"),    "", 0.0f, 11.0f, 0.0f, 1.0f },
+        { "spatializer-width",      qtr("Width"),   "", 0.0f, 10.0f, 0.0f, 1.0f },
+        { "spatializer-wet",        qtr("Wet"),     "", 0.0f, 10.0f, 0.0f, 1.0f },
+        { "spatializer-dry",        qtr("Dry"),     "", 0.0f, 10.0f, 0.0f, 1.0f },
+        { "spatializer-damp",       qtr("Damp"),    "", 0.0f, 10.0f, 0.0f, 1.0f },
+    };
+    for( int i=0; i<5 ;i++ ) controls.append( a[i] );
+    build();
 }
 
 #include <QToolButton>
