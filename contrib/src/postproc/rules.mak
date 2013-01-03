@@ -27,8 +27,11 @@ endif
 # ARM stuff
 ifeq ($(ARCH),arm)
 POSTPROCCONF += --disable-runtime-cpudetect --arch=arm
+ifdef HAVE_ARMV7A
+POSTPROCCONF += --cpu=cortex-a8
+endif
 ifdef HAVE_NEON
-POSTPROCCONF += --cpu=cortex-a8 --enable-neon
+POSTPROCCONF += --enable-neon
 endif
 endif
 

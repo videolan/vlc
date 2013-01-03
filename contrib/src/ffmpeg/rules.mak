@@ -52,8 +52,11 @@ endif
 # ARM stuff
 ifeq ($(ARCH),arm)
 FFMPEGCONF += --arch=arm
+ifdef HAVE_NEON
+FFMPEGCONF += --enable-neon
+endif
 ifdef HAVE_ARMV7A
-FFMPEGCONF += --cpu=cortex-a8 --enable-neon
+FFMPEGCONF += --cpu=cortex-a8
 endif
 endif
 
