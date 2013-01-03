@@ -346,9 +346,9 @@ static int  AndroidLockSurface(picture_t *picture) {
         return VLC_EGENERIC;
     }
 
-    picture->p->p_pixels = (uint8_t*)info->bits;
-    picture->p->i_lines = info->h;
-    picture->p->i_pitch = picture->p->i_pixel_pitch * info->s;
+    picture->p[0].p_pixels = (uint8_t*)info->bits;
+    picture->p[0].i_lines = info->h;
+    picture->p[0].i_pitch = picture->p[0].i_pixel_pitch * info->s;
 
     if (info->format == 0x32315659 /*ANDROID_IMAGE_FORMAT_YV12*/)
         SetupPictureYV12(info, picture);
