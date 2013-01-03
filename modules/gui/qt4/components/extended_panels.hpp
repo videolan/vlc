@@ -37,7 +37,6 @@
 #include <QTabWidget>
 
 #define BANDS 10
-#define NUM_CP_CTRL 7
 #define NUM_SP_CTRL 5
 
 class QSignalMapper;
@@ -90,13 +89,13 @@ class FilterSliderData : public QObject
 public:
     typedef struct
     {
-        const char *psz_name;
-        const char *psz_descs;
-        const char *psz_units;
-        const float f_min;      // min
-        const float f_max;      // max
-        const float f_value;    // value
-        const float f_resolution; // resolution
+        QString name;
+        QString descs;
+        QString units;
+        float f_min;      // min
+        float f_max;      // max
+        float f_value;    // value
+        float f_resolution; // resolution
     } slider_data_t;
     FilterSliderData( QObject *parent, intf_thread_t *p_intf,
                       QSlider *slider,
@@ -118,6 +117,25 @@ private:
     QLabel *valueLabel;
     QLabel *nameLabel;
     const slider_data_t *p_data;
+};
+
+class AudioFilterControlWidget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    AudioFilterControlWidget( intf_thread_t *, QWidget *, const char *name );
+    virtual ~AudioFilterControlWidget();
+
+protected:
+    virtual void build();
+    QVector<FilterSliderData::slider_data_t> controls;
+    QGroupBox *slidersBox;
+    intf_thread_t *p_intf;
+    QString name; // filter's module name
+
+protected slots:
+    void enable();
 };
 
 class Equalizer: public QWidget
@@ -151,20 +169,12 @@ private slots:
     void setCorePreset(int);
 };
 
-class Compressor: public QWidget
+class Compressor: public AudioFilterControlWidget
 {
     Q_OBJECT
 
 public:
     Compressor( intf_thread_t *, QWidget * );
-
-private:
-    static const FilterSliderData::slider_data_t comp_controls[NUM_CP_CTRL];
-    QGroupBox *compressorBox;
-    intf_thread_t *p_intf;
-
-private slots:
-    void enable();
 };
 
 class Spatializer: public QWidget

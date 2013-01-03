@@ -928,7 +928,7 @@ FilterSliderData::FilterSliderData( QObject *parent,
 {
     slider->setMinimum( p_data->f_min / p_data->f_resolution );
     slider->setMaximum( p_data->f_max / p_data->f_resolution );
-    nameLabel->setText( qfu( p_data->psz_descs ) );
+    nameLabel->setText( p_data->descs );
     CONNECT( slider, valueChanged( int ), this, updateText( int ) );
     setValue( initialValue() );
     /* In case current == min|max text would not be first updated */
@@ -946,7 +946,7 @@ void FilterSliderData::setValue( float f )
 void FilterSliderData::updateText( int i )
 {
     float f = ((float) i) * p_data->f_resolution;
-    valueLabel->setText( qfu( p_data->psz_units )
+    valueLabel->setText( QString( p_data->units )
                     .prepend( "%1" )
                     .arg( QString::number( f, 'f', 1 ) ) );
 }
@@ -957,23 +957,23 @@ float FilterSliderData::initialValue()
     float f = p_data->f_value;
     if( p_aout )
     {
-        if ( var_Type( p_aout, p_data->psz_name ) == 0 )
+        if ( var_Type( p_aout, qtu(p_data->name) ) == 0 )
         {
             vlc_object_release( p_aout );
             /* Not found, will try in config */
         }
         else
         {
-            f = var_GetFloat( p_aout, p_data->psz_name );
+            f = var_GetFloat( p_aout, qtu(p_data->name) );
             vlc_object_release( p_aout );
             return f;
         }
     }
 
-    if ( ! config_FindConfig( VLC_OBJECT(p_intf), p_data->psz_name ) )
+    if ( ! config_FindConfig( VLC_OBJECT(p_intf), qtu(p_data->name) ) )
         return f;
 
-    f = config_GetFloat( p_intf, p_data->psz_name );
+    f = config_GetFloat( p_intf, qtu(p_data->name) );
     return f;
 }
 
@@ -983,7 +983,7 @@ void FilterSliderData::onValueChanged( int i )
     vlc_object_t *p_aout = (vlc_object_t *) THEMIM->getAout();
     if ( p_aout )
     {
-        var_SetFloat( p_aout, p_data->psz_name, f );
+        var_SetFloat( p_aout, qtu(p_data->name), f );
         vlc_object_release( p_aout );
     }
     writeToConfig();
@@ -992,7 +992,72 @@ void FilterSliderData::onValueChanged( int i )
 void FilterSliderData::writeToConfig()
 {
     float f = ((float) slider->value()) * p_data->f_resolution;
-    config_PutFloat( p_intf, p_data->psz_name, f );
+    config_PutFloat( p_intf, qtu(p_data->name), f );
+}
+
+AudioFilterControlWidget::AudioFilterControlWidget
+( intf_thread_t *_p_intf, QWidget *parent, const char *_name ) :
+    QWidget( parent ), p_intf( _p_intf ), name( _name )
+{}
+
+void AudioFilterControlWidget::build()
+{
+    QFont smallFont = QApplication::font();
+    smallFont.setPointSize( smallFont.pointSize() - 2 );
+
+    QVBoxLayout *layout = new QVBoxLayout( this );
+    slidersBox = new QGroupBox( qtr( "Enable" ) );
+    slidersBox->setCheckable( true );
+    layout->addWidget( slidersBox );
+
+    QGridLayout *ctrlLayout = new QGridLayout( slidersBox );
+
+    int i = 0;
+    foreach( const FilterSliderData::slider_data_t &data, controls )
+    {
+        QSlider *slider = new QSlider( Qt::Vertical );
+        QLabel *valueLabel = new QLabel();
+        valueLabel->setFont( smallFont );
+        valueLabel->setAlignment( Qt::AlignHCenter );
+        QLabel *nameLabel = new QLabel();
+        nameLabel->setFont( smallFont );
+        nameLabel->setAlignment( Qt::AlignHCenter );
+        FilterSliderData *filter =
+            new FilterSliderData( this, p_intf,
+                                  slider, valueLabel, nameLabel, & data );
+        ctrlLayout->addWidget( slider, 0, i, Qt::AlignHCenter );
+        ctrlLayout->addWidget( valueLabel, 1, i, Qt::AlignHCenter );
+        ctrlLayout->addWidget( nameLabel, 2, i, Qt::AlignHCenter );
+        i++;
+    }
+
+    vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
+    char *psz_af;
+    if( p_aout )
+    {
+        psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
+        vlc_object_release( p_aout );
+    }
+    else
+        psz_af = config_GetPsz( p_intf, "audio-filter" );
+
+    if( psz_af && strstr( psz_af, qtu(name) ) != NULL )
+        slidersBox->setChecked( true );
+    else
+        slidersBox->setChecked( false );
+    CONNECT( slidersBox, toggled(bool), this, enable() );
+
+    free( psz_af );
+}
+
+AudioFilterControlWidget::~AudioFilterControlWidget()
+{
+
+}
+
+void AudioFilterControlWidget::enable()
+{
+    playlist_EnableAudioFilter( THEPL, qtu(name), slidersBox->isChecked() );
 }
 
 /**********************************************************************
@@ -1311,71 +1376,22 @@ void Equalizer::addCallbacks( vlc_object_t *p_aout )
  * Dynamic range compressor
  **********************************************************************/
 
-const FilterSliderData::slider_data_t Compressor::comp_controls[] =
+Compressor::Compressor( intf_thread_t *p_intf, QWidget *parent )
+    : AudioFilterControlWidget( p_intf, parent, "compressor" )
 {
-    { "compressor-rms-peak",    _("RMS/peak"),       "",       0.0f,   1.0f,   0.00f, 0.001f },
-    { "compressor-attack",      _("Attack"),       _(" ms"),   1.5f, 400.0f,  25.00f, 0.100f },
-    { "compressor-release",     _("Release"),      _(" ms"),   2.0f, 800.0f, 100.00f, 0.100f },
-    { "compressor-threshold",   _("Threshold"),    _(" dB"), -30.0f,   0.0f, -11.00f, 0.010f },
-    { "compressor-ratio",       _("Ratio"),          ":1",     1.0f,  20.0f,   8.00f, 0.010f },
-    { "compressor-knee",        _("Knee\nradius"), _(" dB"),   1.0f,  10.0f,   2.50f, 0.010f },
-    { "compressor-makeup-gain", _("Makeup\ngain"), _(" dB"),   0.0f,  24.0f,   7.00f, 0.010f },
-};
-
-Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent )
-           : QWidget( _parent ) , p_intf( _p_intf )
-{
-    QFont smallFont = QApplication::font();
-    smallFont.setPointSize( smallFont.pointSize() - 2 );
-
-    QVBoxLayout *layout = new QVBoxLayout( this );
-    compressorBox = new QGroupBox( qtr( "Enable" ) );
-    compressorBox->setCheckable( true );
-    layout->addWidget( compressorBox );
-
-    QGridLayout *ctrlLayout = new QGridLayout( compressorBox );
-
-    for( int i = 0 ; i < NUM_CP_CTRL ; i++ )
+    const FilterSliderData::slider_data_t a[7] =
     {
-        QSlider *slider = new QSlider( Qt::Vertical );
-        QLabel *valueLabel = new QLabel();
-        valueLabel->setFont( smallFont );
-        valueLabel->setAlignment( Qt::AlignHCenter );
-        QLabel *nameLabel = new QLabel();
-        nameLabel->setFont( smallFont );
-        nameLabel->setAlignment( Qt::AlignHCenter );
-        FilterSliderData *filter =
-            new FilterSliderData( this, p_intf,
-                slider, valueLabel, nameLabel, & comp_controls[i] );
-        ctrlLayout->addWidget( slider, 0, i, Qt::AlignHCenter );
-        ctrlLayout->addWidget( valueLabel, 1, i, Qt::AlignHCenter );
-        ctrlLayout->addWidget( nameLabel, 2, i, Qt::AlignHCenter );
-    }
-
-    vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
-    char *psz_af;
-    if( p_aout )
-    {
-        psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
-        vlc_object_release( p_aout );
-    }
-    else
-        psz_af = config_GetPsz( p_intf, "audio-filter" );
-
-    if( psz_af && strstr( psz_af, "compressor" ) != NULL )
-        compressorBox->setChecked( true );
-    else
-        compressorBox->setChecked( false );
-    CONNECT( compressorBox, toggled(bool), this, enable() );
-
-    free( psz_af );
+        { "compressor-rms-peak",    qtr("RMS/peak"),         "",       0.0f,   1.0f,   0.00f, 0.001f },
+        { "compressor-attack",      qtr("Attack"),       qtr(" ms"),   1.5f, 400.0f,  25.00f, 0.100f },
+        { "compressor-release",     qtr("Release"),      qtr(" ms"),   2.0f, 800.0f, 100.00f, 0.100f },
+        { "compressor-threshold",   qtr("Threshold"),    qtr(" dB"), -30.0f,   0.0f, -11.00f, 0.010f },
+        { "compressor-ratio",       qtr("Ratio"),            ":1",     1.0f,  20.0f,   8.00f, 0.010f },
+        { "compressor-knee",        qtr("Knee\nradius"), qtr(" dB"),   1.0f,  10.0f,   2.50f, 0.010f },
+        { "compressor-makeup-gain", qtr("Makeup\ngain"), qtr(" dB"),   0.0f,  24.0f,   7.00f, 0.010f },
+    };
+    for( int i=0; i<7 ;i++ ) controls.append( a[i] );
+    build();
 }
-
-void Compressor::enable()
-{
-    playlist_EnableAudioFilter( THEPL, "compressor", compressorBox->isChecked() );
-}
-
 
 /**********************************************************************
  * Spatializer
