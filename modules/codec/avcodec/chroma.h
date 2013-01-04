@@ -26,8 +26,8 @@
 #ifndef _VLC_AVUTIL_CHROMA_H
 #define _VLC_AVUTIL_CHROMA_H 1
 
-int TestFfmpegChroma( const int i_ffmpeg_id, const vlc_fourcc_t i_vlc_fourcc );
-int GetFfmpegChroma( int *i_ffmpeg_chroma, const video_format_t fmt );
-int GetVlcChroma( video_format_t *fmt, const int i_ffmpeg_chroma );
+int TestFfmpegChroma( int i_ffmpeg_id, vlc_fourcc_t i_vlc_fourcc );
+int GetFfmpegChroma( int *i_ffmpeg_chroma, const video_format_t *fmt );
+int GetVlcChroma( video_format_t *fmt, int i_ffmpeg_chroma );
 
 #endif

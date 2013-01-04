@@ -464,7 +464,7 @@ int OpenEncoder( vlc_object_t *p_this )
 
         p_enc->fmt_in.i_codec = VLC_CODEC_I420;
         p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec;
-        GetFfmpegChroma( &p_context->pix_fmt, p_enc->fmt_in.video );
+        GetFfmpegChroma( &p_context->pix_fmt, &p_enc->fmt_in.video );
 
         if( p_codec->pix_fmts )
         {
@@ -682,7 +682,7 @@ int OpenEncoder( vlc_object_t *p_this )
     {
         /* XXX: hack: Force same codec (will be handled by transcode) */
         p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec = p_enc->fmt_out.i_codec;
-        GetFfmpegChroma( &p_context->pix_fmt, p_enc->fmt_in.video );
+        GetFfmpegChroma( &p_context->pix_fmt, &p_enc->fmt_in.video );
     }
 
     /* Make sure we get extradata filled by the encoder */

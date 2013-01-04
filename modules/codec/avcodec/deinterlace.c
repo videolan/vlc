@@ -85,7 +85,7 @@ int OpenDeinterlace( vlc_object_t *p_this )
 
     /* Misc init */
     p_filter->fmt_in.video.i_chroma = p_filter->fmt_in.i_codec;
-    if( GetFfmpegChroma( &p_sys->i_src_ffmpeg_chroma, p_filter->fmt_in.video ) != VLC_SUCCESS )
+    if( GetFfmpegChroma( &p_sys->i_src_ffmpeg_chroma, &p_filter->fmt_in.video ) != VLC_SUCCESS )
     {
         msg_Err( p_filter, "Failed to match chroma type" );
         return VLC_EGENERIC;
