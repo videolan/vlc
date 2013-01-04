@@ -473,7 +473,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
         [o_audio_vol_sld setEnabled: YES];
 
         i = var_InheritInteger(p_intf, "auhal-volume");
-        i = i * 100. / AOUT_VOLUME_MAX;
+        i = i * 200. / AOUT_VOLUME_MAX;
         [o_audio_vol_sld setIntValue: i];
         [o_audio_vol_fld setIntValue: i];
     }
@@ -824,7 +824,7 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
         var_SetBool(p_intf, "volume-save", [o_audio_autosavevol_yes_bcell state]);
         config_PutInt(p_intf, "spdif", [o_audio_spdif_ckb state]);
         if ([o_audio_vol_fld isEnabled])
-            config_PutInt(p_intf, "auhal-volume", ([o_audio_vol_fld intValue] * 512) / 100);
+            config_PutInt(p_intf, "auhal-volume", ([o_audio_vol_fld intValue] * AOUT_VOLUME_MAX) / 200);
 
         SaveIntList(o_audio_dolby_pop, "force-dolby-surround");
 
