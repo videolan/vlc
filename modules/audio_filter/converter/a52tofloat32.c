@@ -45,9 +45,6 @@
 
 #include <stdint.h>                                         /* int16_t .. */
 
-#if !HAVE_FPU
-# define LIBA52_FIXED
-#endif
 #ifdef USE_A52DEC_TREE                                 /* liba52 header file */
 #   include "include/a52.h"
 #else
