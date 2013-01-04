@@ -927,8 +927,9 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
     }
     else
     {
-        msg_Err( p_dec, "don't know how to convert chroma %i",
-                 p_sys->p_context->pix_fmt );
+        const char *name = av_get_pix_fmt_name( p_sys->p_context->pix_fmt );
+        msg_Err( p_dec, "Unsupported decoded output format %d (%s)",
+                 p_sys->p_context->pix_fmt, name ? name : "unknown" );
         p_dec->b_error = 1;
     }
 }
