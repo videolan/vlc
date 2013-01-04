@@ -587,7 +587,7 @@ void DialogsProvider::saveAPlaylist()
 
     for( size_t i = 0; i < sizeof (types) / sizeof (types[0]); i++ )
     {
-        QString tmp = qfu( vlc_gettext( types[i].filter_name ) ) + " (*." + types[i].filter_patterns + ")";
+        QString tmp = qtr( types[i].filter_name ) + " (*." + types[i].filter_patterns + ")";
         if( ext == qfu( types[i].filter_patterns ) )
             filters.insert( 0, tmp );
         else
@@ -621,7 +621,7 @@ void DialogsProvider::saveAPlaylist()
     {
         for( size_t i = 0; i < sizeof (types) / sizeof (types[0]); i++)
         {
-            if ( selected.startsWith( vlc_gettext( types[i].filter_name ) ) )
+            if ( selected.startsWith( qtr( types[i].filter_name ) ) )
             {
                 psz_selected_module = types[i].module;
                 psz_last_playlist_ext = types[i].filter_patterns;
