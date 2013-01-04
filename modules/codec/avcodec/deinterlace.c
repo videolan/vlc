@@ -69,29 +69,25 @@ int OpenDeinterlace( vlc_object_t *p_this )
     /* libavcodec needs to be initialized for some chroma conversions */
     vlc_init_avcodec();
 
-    /* Check if we can handle that formats */
-    if( TestFfmpegChroma( -1, p_filter->fmt_in.i_codec  ) != VLC_SUCCESS )
+    /* Check if the input format */
+    int pix_fmt;
+    p_filter->fmt_in.video.i_chroma = p_filter->fmt_in.i_codec; /* XXX ahem */
+    if( GetFfmpegChroma( &pix_fmt, &p_filter->fmt_in.video ) != VLC_SUCCESS )
     {
-        msg_Err( p_filter, "Failed to match chroma type" );
+        msg_Err( p_filter, "Unsupported chroma type %4.4s",
+                 (char *)&p_filter->fmt_in.video.i_chroma );
         return VLC_EGENERIC;
     }
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_filter->p_sys = p_sys =
-          (filter_sys_t *)malloc(sizeof(filter_sys_t)) ) == NULL )
-    {
-        return VLC_EGENERIC;
-    }
+    p_sys = malloc( sizeof(*p_sys) );
+    if( unlikely(p_sys == NULL) )
+        return VLC_ENOMEM;
 
     /* Misc init */
-    p_filter->fmt_in.video.i_chroma = p_filter->fmt_in.i_codec;
-    if( GetFfmpegChroma( &p_sys->i_src_ffmpeg_chroma, &p_filter->fmt_in.video ) != VLC_SUCCESS )
-    {
-        msg_Err( p_filter, "Failed to match chroma type" );
-        return VLC_EGENERIC;
-    }
+    p_sys->i_src_ffmpeg_chroma = pix_fmt;
+    p_filter->p_sys = p_sys;
     p_filter->pf_video_filter = Deinterlace;
-
     msg_Dbg( p_filter, "deinterlacing" );
 
     return VLC_SUCCESS;
