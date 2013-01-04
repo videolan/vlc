@@ -9,13 +9,15 @@ diff -ruN a52dec.orig/include/a52.h a52dec/include/a52.h
   * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
   *
   * This file is part of a52dec, a free ATSC A-52 stream decoder.
-@@ -24,10 +24,15 @@
+@@ -24,10 +24,17 @@
  #ifndef A52_H
  #define A52_H
  
 -#ifndef LIBA52_DOUBLE
 -typedef float sample_t;
 -#else
++#define LIBA52_FIXED
++
 +#if defined(LIBA52_FIXED)
 +typedef int32_t sample_t;
 +typedef int32_t level_t;
@@ -28,7 +30,7 @@ diff -ruN a52dec.orig/include/a52.h a52dec/include/a52.h
  #endif
  
  typedef struct a52_state_s a52_state_t;
-@@ -53,9 +58,9 @@
+@@ -53,9 +60,9 @@
  int a52_syncinfo (uint8_t * buf, int * flags,
  		  int * sample_rate, int * bit_rate);
  int a52_frame (a52_state_t * state, uint8_t * buf, int * flags,
