@@ -595,19 +595,12 @@ void DialogsProvider::saveAPlaylist()
     }
 
     QString selected;
-
-    QFileDialog *dialog = new QFileDialog( NULL,
-                                           qtr( "Save playlist as..." ),
-                                           QString( p_intf->p_sys->filepath ),
-                                           filters.join( ";;" ) );
-    dialog->setDefaultSuffix( qfu( types[0].filter_patterns ) );
-    dialog->setAcceptMode( QFileDialog::AcceptSave );
-    dialog->exec();
-    QString file = dialog->selectedFiles().first();
-    QString nameFilter = dialog->selectedNameFilter();
+    QString file = QFileDialog::getSaveFileName( NULL,
+                                                 qtr( "Save playlist as..." ),
+                                                 p_intf->p_sys->filepath, filters.join( ";;" ),
+                                                 &selected );
     const char *psz_selected_module = NULL;
     const char *psz_last_playlist_ext = NULL;
-    delete dialog;
 
     if( file.isEmpty() )
         return;
@@ -628,7 +621,7 @@ void DialogsProvider::saveAPlaylist()
     {
         for( size_t i = 0; i < sizeof (types) / sizeof (types[0]); i++)
         {
-            if ( nameFilter.startsWith( vlc_gettext( types[i].filter_name ) ) )
+            if ( selected.startsWith( vlc_gettext( types[i].filter_name ) ) )
             {
                 psz_selected_module = types[i].module;
                 psz_last_playlist_ext = types[i].filter_patterns;
