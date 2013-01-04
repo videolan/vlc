@@ -220,11 +220,9 @@ int OpenEncoder( vlc_object_t *p_this )
     else if( !GetFfmpegCodec( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
                              &psz_namecodec ) )
     {
-        if( TestFfmpegChroma( -1, p_enc->fmt_out.i_codec ) != VLC_SUCCESS )
-        {
-            /* handed chroma output */
-            return VLC_EGENERIC;
-        }
+        if( FindFfmpegChroma( p_enc->fmt_out.i_codec ) == PIX_FMT_NONE )
+            return VLC_EGENERIC; /* handed chroma output */
+
         i_cat      = VIDEO_ES;
         i_codec_id = CODEC_ID_RAWVIDEO;
         psz_namecodec = "Raw video";

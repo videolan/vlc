@@ -122,16 +122,6 @@ static const struct
     { 0, 0, 0, 0, 0 }
 };
 
-int TestFfmpegChroma( int i_ffmpeg_id, vlc_fourcc_t i_vlc_fourcc )
-{
-    for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
-    {
-        if( chroma_table[i].i_chroma == i_vlc_fourcc || chroma_table[i].i_chroma_id == i_ffmpeg_id )
-            return VLC_SUCCESS;
-    }
-    return VLC_EGENERIC;
-}
-
 /* FIXME special case the RGB formats */
 int GetFfmpegChroma( int *restrict i_ffmpeg_chroma, const video_format_t *fmt )
 {
@@ -154,6 +144,14 @@ int GetFfmpegChroma( int *restrict i_ffmpeg_chroma, const video_format_t *fmt )
     return VLC_EGENERIC;
 }
 
+vlc_fourcc_t FindVlcChroma( int i_ffmpeg_id )
+{
+    for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
+        if( chroma_table[i].i_chroma_id == i_ffmpeg_id )
+            return chroma_table[i].i_chroma;
+    return 0;
+}
+
 int GetVlcChroma( video_format_t *fmt, int i_ffmpeg_chroma )
 {
     /* TODO FIXME for rgb format we HAVE to set rgb mask/shift */
@@ -169,4 +167,12 @@ int GetVlcChroma( video_format_t *fmt, int i_ffmpeg_chroma )
         }
     }
     return VLC_EGENERIC;
+}
+
+int FindFfmpegChroma( vlc_fourcc_t fourcc )
+{
+    for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
+        if( chroma_table[i].i_chroma == fourcc )
+            return chroma_table[i].i_chroma_id;
+    return PIX_FMT_NONE;
 }

@@ -902,7 +902,7 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
     {
         vlc_va_Extract( p_sys->p_va, p_pic, p_ff_pic );
     }
-    else if( TestFfmpegChroma( p_sys->p_context->pix_fmt, -1 ) == VLC_SUCCESS )
+    else if( FindVlcChroma( p_sys->p_context->pix_fmt ) )
     {
         int i_plane, i_size, i_line;
         uint8_t *p_dst, *p_src;
