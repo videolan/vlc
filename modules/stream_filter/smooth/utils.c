@@ -178,7 +178,7 @@ void sms_queue_free( sms_queue_t* queue )
 int sms_queue_put( sms_queue_t *queue, const uint64_t value )
 {
     /* Remove the last (and oldest) item */
-    item_t *item, *prev;
+    item_t *item, *prev = NULL;
     int count = 0;
     for( item = queue->first; item != NULL; item = item->next )
     {
