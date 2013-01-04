@@ -476,35 +476,42 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (void)updatePresetSelector
 {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSArray *presets = [defaults objectForKey:@"EQNames"];
+
     [o_eq_presets_popup removeAllItems];
     [o_eq_presets_popup addItemsWithTitles:[[NSUserDefaults standardUserDefaults] objectForKey:@"EQTitles"]];
     [[o_eq_presets_popup menu] addItem:[NSMenuItem separatorItem]];
     [o_eq_presets_popup addItemWithTitle:_NS("Add new Preset...")];
     [[o_eq_presets_popup lastItem] setTarget: self];
     [[o_eq_presets_popup lastItem] setAction: @selector(addPresetAction:)];
-    [o_eq_presets_popup addItemWithTitle:_NS("Organize Presets...")];
-    [[o_eq_presets_popup lastItem] setTarget: self];
-    [[o_eq_presets_popup lastItem] setAction: @selector(deletePresetAction:)];
+
+    if ([presets count] > 1) {
+        [o_eq_presets_popup addItemWithTitle:_NS("Organize Presets...")];
+        [[o_eq_presets_popup lastItem] setTarget: self];
+        [[o_eq_presets_popup lastItem] setAction: @selector(deletePresetAction:)];
+    }
 
     vlc_object_t *p_object = VLC_OBJECT(getAout());
     if (p_object == NULL)
         p_object = vlc_object_hold(pl_Get(p_intf));
 
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSArray *presets = [defaults objectForKey:@"EQNames"];
     NSString *currentPreset = [NSString stringWithFormat:@"%s",var_GetNonEmptyString(p_object, "equalizer-preset")];
-    NSInteger currentPresetIndex = 0;
+    vlc_object_release(p_object);
+
+    NSUInteger currentPresetIndex = 0;
     if ([currentPreset length] > 0) {
         currentPresetIndex = [presets indexOfObjectPassingTest:^(id obj, NSUInteger idx, BOOL *stop) {
             return [obj isEqualToString:currentPreset];
         }];
-    }
+
+        if (currentPresetIndex == NSNotFound)
+            currentPresetIndex = [presets count] - 1;
+    }    
 
     [o_eq_presets_popup selectItemAtIndex:currentPresetIndex];
     [o_eq_preamp_sld setFloatValue:[[[defaults objectForKey:@"EQPreampValues"] objectAtIndex:currentPresetIndex] floatValue]];
     [self setBandSliderValuesForPreset:currentPresetIndex];
-
-    vlc_object_release(p_object);
 }
 
 - (void)equalizerUpdated
