@@ -1092,7 +1092,7 @@ Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
     b_vlcBands = var_InheritBool( p_intf, "equalizer-vlcfreqs" );
 
     /* Add the sliders for the Bands */
-    QGridLayout *grid = new QGridLayout( ui.frame );
+    QGridLayout *grid = new QGridLayout( ui.slidersPlaceholder );
     grid->setMargin( 0 );
     for( int i = 0 ; i < BANDS ; i++ )
     {
