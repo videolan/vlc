@@ -571,13 +571,13 @@ static bool dirac_UnpackSeqHdr( struct seq_hdr_t *p_sh, block_t *p_block )
     if( dirac_bool( &bs ) )
     {
         uint32_t frame_rate_index = dirac_uint( &bs );
-        p_sh->u_fps_num = dirac_frate_tbl[frame_rate_index].u_n;
-        p_sh->u_fps_den = dirac_frate_tbl[frame_rate_index].u_d;
         if( frame_rate_index >= dirac_frate_tbl_size )
         {
             /* invalid header */
             return false;
         }
+        p_sh->u_fps_num = dirac_frate_tbl[frame_rate_index].u_n;
+        p_sh->u_fps_den = dirac_frate_tbl[frame_rate_index].u_d;
         if( frame_rate_index == 0 )
         {
             p_sh->u_fps_num = dirac_uint( &bs ); /* frame_rate_numerator */
