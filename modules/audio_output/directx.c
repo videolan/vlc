@@ -537,7 +537,7 @@ static int VolumeSet( audio_output_t *p_aout, float vol )
 
     /* Clamp to allowed DirectSound range */
     static_assert( DSBVOLUME_MIN < DSBVOLUME_MAX, "DSBVOLUME_* confused" );
-    if( mb >= DSBVOLUME_MAX )
+    if( mb > DSBVOLUME_MAX )
     {
         mb = DSBVOLUME_MAX;
         ret = -1;
