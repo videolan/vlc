@@ -62,6 +62,7 @@
 #import "CoreInteraction.h"
 #import "TrackSynchronization.h"
 #import "VLCVoutWindowController.h"
+#import "ExtensionsManager.h"
 
 #import "VideoEffects.h"
 #import "AudioEffects.h"
@@ -252,6 +253,7 @@ void WindowClose(vout_window_t *p_wnd)
  * Run: main loop
  *****************************************************************************/
 static NSLock * o_appLock = nil;    // controls access to f_appExit
+static NSLock * o_plItemChangedLock = nil;
 
 static void Run(intf_thread_t *p_intf)
 {
@@ -259,12 +261,14 @@ static void Run(intf_thread_t *p_intf)
     [VLCApplication sharedApplication];
 
     o_appLock = [[NSLock alloc] init];
+    o_plItemChangedLock = [[NSLock alloc] init];
 
     [[VLCMain sharedInstance] setIntf: p_intf];
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
 
     [NSApp run];
     [[VLCMain sharedInstance] applicationWillTerminate:nil];
+    [o_plItemChangedLock release];
     [o_appLock release];
     [o_pool release];
 
@@ -381,7 +385,14 @@ static int PLItemChanged(vlc_object_t *p_this, const char *psz_var,
                          vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(PlaylistItemChanged) withObject:nil waitUntilDone:NO];
+
+    /* Due to constraints within NSAttributedString's main loop runtime handling
+     * and other issues, we need to wait for -PlaylistItemChanged to finish and
+     * then -informInputChanged on this non-main thread. */
+    [o_plItemChangedLock lock];
+    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(PlaylistItemChanged) withObject:nil waitUntilDone:YES];
+    [[VLCMain sharedInstance] informInputChanged];
+    [o_plItemChangedLock unlock];
 
     [o_pool release];
     return VLC_SUCCESS;
@@ -582,7 +593,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         _o_sharedMainInstance = [super init];
 
     p_intf = NULL;
-    p_current_input = NULL;
+    p_current_input = p_input_changed = NULL;
 
     o_msg_lock = [[NSLock alloc] init];
     o_msg_arr = [[NSMutableArray arrayWithCapacity: 600] retain];
@@ -1279,7 +1290,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     if (p_current_input && (p_current_input->b_dead || !vlc_object_alive(p_current_input))) {
         var_DelCallback(p_current_input, "intf-event", InputEvent, [VLCMain sharedInstance]);
-        vlc_object_release(p_current_input);
+        p_input_changed = p_current_input;
         p_current_input = NULL;
 
         [o_mainmenu setRateControlsEnabled: NO];
@@ -1293,6 +1304,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             [o_mainmenu setRateControlsEnabled: YES];
             if ([self activeVideoPlayback] && [[o_mainwindow videoView] isHidden])
                 [o_mainwindow performSelectorOnMainThread:@selector(togglePlaylist:) withObject: nil waitUntilDone:NO];
+            p_input_changed = vlc_object_hold(p_current_input);
         }
     }
 
@@ -1300,6 +1312,15 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mainwindow updateWindow];
     [self updateDelays];
     [self updateMainMenu];
+}
+
+- (void)informInputChanged
+{
+    if (p_input_changed) {
+        [[ExtensionsManager getInstance:p_intf] inputChanged:p_input_changed];
+        vlc_object_release(p_input_changed);
+        p_input_changed = NULL;
+    }
 }
 
 - (void)updateMainMenu
