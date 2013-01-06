@@ -539,10 +539,8 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
         [dialogWindow setHas_lock:NO];
 
         BOOL visible = !p_dialog->b_hide;
-        if (visible) {
-            [dialogWindow center];
+        if (visible)
             [dialogWindow makeKeyAndOrderFront:self];
-        }
         else
             [dialogWindow orderOut:nil];
     }
