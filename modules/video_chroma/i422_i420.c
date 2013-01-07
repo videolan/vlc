@@ -92,7 +92,7 @@ static int Activate( vlc_object_t *p_this )
                     p_filter->pf_video_filter = I422_YV12_Filter;
                     break;
 
-                case VLC_CODEC_YUVA:
+                case VLC_CODEC_YUV420A:
                     p_filter->pf_video_filter = I422_YUVA_Filter;
                     break;
 
