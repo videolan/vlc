@@ -147,6 +147,12 @@ void video_format_Setup( video_format_t *p_fmt, vlc_fourcc_t i_chroma,
     case VLC_CODEC_YUVA:
         p_fmt->i_bits_per_pixel = 32;
         break;
+    case VLC_CODEC_YUV420A:
+        p_fmt->i_bits_per_pixel = 20;
+        break;
+    case VLC_CODEC_YUV422A:
+        p_fmt->i_bits_per_pixel = 24;
+        break;
     case VLC_CODEC_I444:
     case VLC_CODEC_J444:
         p_fmt->i_bits_per_pixel = 24;

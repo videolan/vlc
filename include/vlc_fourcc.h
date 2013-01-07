@@ -178,6 +178,10 @@
 #define VLC_CODEC_YUVP            VLC_FOURCC('Y','U','V','P')
 /* Planar YUV 4:4:4 Y:U:V:A */
 #define VLC_CODEC_YUVA            VLC_FOURCC('Y','U','V','A')
+/* Planar YUV 4:2:2 Y:U:V:A */
+#define VLC_CODEC_YUV422A         VLC_FOURCC('I','4','2','A')
+/* Planar YUV 4:2:0 Y:U:V:A */
+#define VLC_CODEC_YUV420A         VLC_FOURCC('I','4','0','A')
 /* Palettized RGB with palette element R:G:B */
 #define VLC_CODEC_RGBP            VLC_FOURCC('R','G','B','P')
 /* 8 bits RGB */
