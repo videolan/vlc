@@ -318,6 +318,9 @@ static int Open( vlc_object_t * p_this )
             goto error;
         break;
     case VLC_CODEC_ADPCM_MS:
+    /* FIXME not sure at all FIXME */
+    case VLC_FOURCC( 'm', 's', 0x00, 0x61 ):
+    case VLC_FOURCC( 'm', 's', 0x00, 0x62 ):
         if( FrameInfo_MS_ADPCM( &p_sys->i_frame_size, &p_sys->i_frame_samples,
                                 &p_sys->fmt ) )
             goto error;
@@ -325,13 +328,6 @@ static int Open( vlc_object_t * p_this )
     case VLC_CODEC_ADPCM_IMA_WAV:
         if( FrameInfo_IMA_ADPCM( &p_sys->i_frame_size, &p_sys->i_frame_samples,
                                  &p_sys->fmt ) )
-            goto error;
-        break;
-    case VLC_FOURCC( 'm', 's', 0x00, 0x61 ):
-    case VLC_FOURCC( 'm', 's', 0x00, 0x62 ):
-        /* FIXME not sure at all FIXME */
-        if( FrameInfo_MS_ADPCM( &p_sys->i_frame_size, &p_sys->i_frame_samples,
-                                &p_sys->fmt ) )
             goto error;
         break;
     case VLC_CODEC_MPGA:
