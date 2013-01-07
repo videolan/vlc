@@ -21,3 +21,14 @@
  int main () {
    const char *src = "Hello";
    char dest[10];
+--- gettext/gettext-tools/gnulib-lib/stpncpy.c.orig	2013-01-07 23:17:13.000000000 +0100
++++ gettext/gettext-tools/gnulib-lib/stpncpy.c	2013-01-07 23:17:25.000000000 +0100
+@@ -24,6 +24,8 @@
+ /* Specification.  */
+ #include <string.h>
+ 
++#undef stpncpy
++
+ #ifndef weak_alias
+ # define __stpncpy stpncpy
+ #endif
