@@ -621,7 +621,7 @@ void DialogsProvider::saveAPlaylist()
     {
         for( size_t i = 0; i < sizeof (types) / sizeof (types[0]); i++)
         {
-            if ( selected.startsWith( vlc_gettext( types[i].filter_name ) ) )
+            if ( selected.startsWith( qfu( vlc_gettext( types[i].filter_name ) ) ) )
             {
                 psz_selected_module = types[i].module;
                 psz_last_playlist_ext = types[i].filter_patterns;
