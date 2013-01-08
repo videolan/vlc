@@ -52,6 +52,9 @@
 # include <stdbool.h>
 #endif
 
+/*****************************************************************************
+ * Compilers definitions
+ *****************************************************************************/
 /* Helper for GCC version checks */
 #ifdef __GNUC__
 # define VLC_GCC_VERSION(maj,min) \
@@ -136,17 +139,6 @@
 /*****************************************************************************
  * Basic types definitions
  *****************************************************************************/
-#if defined( WIN32 )
-#   include <malloc.h>
-#   ifndef PATH_MAX
-#       define PATH_MAX MAX_PATH
-#   endif
-#endif
-
-#ifdef __SYMBIAN32__
- #include <sys/syslimits.h>
-#endif
-
 /**
  * High precision date or time interval
  *
@@ -416,7 +408,15 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
  * OS-specific headers and thread types
  *****************************************************************************/
 #if defined( WIN32 )
-# include <windows.h>
+#   include <malloc.h>
+#   ifndef PATH_MAX
+#       define PATH_MAX MAX_PATH
+#   endif
+#   include <windows.h>
+#endif
+
+#ifdef __SYMBIAN32__
+ #include <sys/syslimits.h>
 #endif
 
 #ifdef __OS2__
@@ -772,7 +772,6 @@ static inline void SetQWLE (void *p, uint64_t qw)
 /* Stuff defined in src/extras/libc.c */
 
 #if defined(WIN32)
-
 /* several type definitions */
 #   if defined( __MINGW32__ )
 #       if !defined( _OFF_T_ )
@@ -792,7 +791,7 @@ static inline void SetQWLE (void *p, uint64_t qw)
 #   endif
 
 #   include <tchar.h>
-#endif
+#endif /* WIN32 */
 
 VLC_API bool vlc_ureduce( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t );
 
@@ -802,7 +801,6 @@ VLC_API bool vlc_ureduce( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t )
 #endif
 
 #ifdef WIN32
-# include <malloc.h>
 # define vlc_memalign(align, size) (__mingw_aligned_malloc(size, align))
 # define vlc_free(base)            (__mingw_aligned_free(base))
 #elif defined(__APPLE__) && !defined(MAC_OS_X_VERSION_10_6)
