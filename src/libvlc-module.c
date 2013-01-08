@@ -998,11 +998,6 @@ static const char *const ppsz_prefres[] = {
     "These options allow you to select default modules. Leave these " \
     "alone unless you really know what you are doing." )
 
-#define MEMCPY_TEXT N_("Memory copy module")
-#define MEMCPY_LONGTEXT N_( \
-    "You can select which memory copy module you want to use. By default " \
-    "VLC will select the fastest one supported by your hardware.")
-
 #define ACCESS_TEXT N_("Access module")
 #define ACCESS_LONGTEXT N_( \
     "This allows you to force an access module. You can use it if " \
@@ -1986,7 +1981,6 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_ADVANCED_MISC )
     set_section( N_("Special modules"), NULL )
     add_category_hint( N_("Miscellaneous"), MISC_CAT_LONGTEXT, true )
-    add_module( "memcpy", "memcpy", NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT, true )
     add_module( "vod-server", "vod server", NULL, VOD_SERVER_TEXT,
                 VOD_SERVER_LONGTEXT, true )
 
