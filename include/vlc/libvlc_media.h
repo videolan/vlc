@@ -394,6 +394,10 @@ LIBVLC_API libvlc_state_t libvlc_media_get_state(
 LIBVLC_API int libvlc_media_get_stats( libvlc_media_t *p_md,
                                            libvlc_media_stats_t *p_stats );
 
+/* The following method uses libvlc_media_list_t, however, media_list usage is optionnal
+ * and this is here for convenience */
+#define VLC_FORWARD_DECLARE_OBJECT(a) struct a
+
 /**
  * Get subitems of media descriptor object. This will increment
  * the reference count of supplied media descriptor object. Use
@@ -402,11 +406,6 @@ LIBVLC_API int libvlc_media_get_stats( libvlc_media_t *p_md,
  * \param p_md media descriptor object
  * \return list of media descriptor subitems or NULL
  */
-
-/* This method uses libvlc_media_list_t, however, media_list usage is optionnal
- * and this is here for convenience */
-#define VLC_FORWARD_DECLARE_OBJECT(a) struct a
-
 LIBVLC_API VLC_FORWARD_DECLARE_OBJECT(libvlc_media_list_t *)
 libvlc_media_subitems( libvlc_media_t *p_md );
 
