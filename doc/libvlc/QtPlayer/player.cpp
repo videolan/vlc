@@ -43,6 +43,7 @@ void Mwindow::initUI() {
     QAction *Open    = new QAction("&Open", this);
     QAction *Quit    = new QAction("&Quit", this);
     QAction *playAc  = new QAction("&Play/Pause", this);
+    QAction *fsAc  = new QAction("&Fullscreen", this);
     QAction *aboutAc = new QAction("&About", this);
 
     Open->setShortcut(QKeySequence("Ctrl+O"));
@@ -52,10 +53,12 @@ void Mwindow::initUI() {
     fileMenu->addAction(aboutAc);
     fileMenu->addAction(Quit);
     editMenu->addAction(playAc);
+    editMenu->addAction(fsAc);
 
     connect(Open,    SIGNAL(triggered()), this, SLOT(openFile()));
     connect(playAc,  SIGNAL(triggered()), this, SLOT(play()));
     connect(aboutAc, SIGNAL(triggered()), this, SLOT(about()));
+    connect(fsAc,    SIGNAL(triggered()), this, SLOT(fullscreen()));
     connect(Quit,    SIGNAL(triggered()), qApp, SLOT(quit()));
 
     /* Buttons for the UI */
@@ -67,6 +70,9 @@ void Mwindow::initUI() {
 
     QPushButton *muteBut = new QPushButton("Mute");
     QObject::connect(muteBut, SIGNAL(clicked()), this, SLOT(mute()));
+
+    QPushButton *fsBut = new QPushButton("Fullscreen");
+    QObject::connect(fsBut, SIGNAL(clicked()), this, SLOT(fullscreen()));
 
     volumeSlider = new QSlider(Qt::Horizontal);
     QObject::connect(volumeSlider, SIGNAL(sliderMoved(int)), this, SLOT(changeVolume(int)));
@@ -92,12 +98,15 @@ void Mwindow::initUI() {
 
     /* Put all in layouts */
     QHBoxLayout *layout = new QHBoxLayout;
+    layout->setMargin(0);
     layout->addWidget(playBut);
     layout->addWidget(stopBut);
     layout->addWidget(muteBut);
+    layout->addWidget(fsBut);
     layout->addWidget(volumeSlider);
 
     QVBoxLayout *layout2 = new QVBoxLayout;
+    layout2->setMargin(0);
     layout2->addWidget(videoWidget);
     layout2->addWidget(slider);
     layout2->addLayout(layout);
@@ -223,6 +232,18 @@ void Mwindow::mute() {
 void Mwindow::about()
 {
     QMessageBox::about(this, "Qt libVLC player demo", QString::fromUtf8(libvlc_get_version()) );
+}
+
+void Mwindow::fullscreen()
+{
+   if (isFullScreen()) {
+       showNormal();
+       menuWidget()->show();
+   }
+   else {
+       showFullScreen();
+       menuWidget()->hide();
+   }
 }
 
 void Mwindow::closeEvent(QCloseEvent *event) {

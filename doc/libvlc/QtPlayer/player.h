@@ -25,6 +25,7 @@ class Mwindow : public QMainWindow {
                void stop();
                void mute();
                void about();
+               void fullscreen();
 
                int changeVolume(int);
                void changePosition(int);
