@@ -303,7 +303,7 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     }
 
     /* We've just started the stream, wait for the first PTS. */
-    if( !date_Get( &p_sys->end_date ) && !p_block->i_pts )
+    if( !date_Get( &p_sys->end_date ) && p_block->i_pts <= VLC_TS_INVALID )
         goto end;
 
     if( p_block->i_buffer <= 0 )
@@ -371,7 +371,7 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     /* **** Set audio output parameters **** */
     SetupOutputFormat( p_dec, true );
 
-    if( p_block->i_pts != 0 &&
+    if( p_block->i_pts > VLC_TS_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )
     {
         date_Set( &p_sys->end_date, p_block->i_pts );
