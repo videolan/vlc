@@ -58,12 +58,6 @@ struct decoder_sys_t
     audio_sample_format_t aout_format;
     date_t                end_date;
 
-    /*
-     *
-     */
-    uint8_t *p_samples;
-    int     i_samples;
-
     /* */
     int     i_reject_count;
 
@@ -192,8 +186,6 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     msg_Dbg( p_dec, "Using %d bytes output buffer", p_sys->i_output_max );
     p_sys->p_output = av_malloc( p_sys->i_output_max );
 
-    p_sys->p_samples = NULL;
-    p_sys->i_samples = 0;
     p_sys->i_reject_count = 0;
     p_sys->b_extract = false;
     p_sys->i_previous_channels = 0;
@@ -214,62 +206,19 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
 }
 
 /*****************************************************************************
- * SplitBuffer: Needed because aout really doesn't like big audio chunk and
- * wma produces easily > 30000 samples...
- *****************************************************************************/
-static block_t *SplitBuffer( decoder_t *p_dec )
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    int i_samples = __MIN( p_sys->i_samples, 4096 );
-    int sample_planar=0;
-    block_t *p_buffer;
-
-    if( i_samples == 0 ) return NULL;
-
-    if( ( p_buffer = decoder_NewAudioBuffer( p_dec, i_samples ) ) == NULL )
-        return NULL;
-
-    p_buffer->i_pts = date_Get( &p_sys->end_date );
-    p_buffer->i_length = date_Increment( &p_sys->end_date, i_samples )
-                         - p_buffer->i_pts;
-
-    sample_planar = av_sample_fmt_is_planar( p_sys->p_context->sample_fmt );
-    if( sample_planar )
-        aout_Interleave( p_buffer->p_buffer, p_sys->p_samples, i_samples, p_sys->p_context->channels, p_dec->fmt_out.audio.i_format );
-
-    if( p_sys->b_extract )
-    {
-        if( sample_planar )
-            memcpy( p_sys->p_samples, p_buffer->p_buffer, p_buffer->i_buffer );
-
-        aout_ChannelExtract( p_buffer->p_buffer, p_dec->fmt_out.audio.i_channels,
-                             p_sys->p_samples, p_sys->p_context->channels, i_samples,
-                             p_sys->pi_extraction, p_dec->fmt_out.audio.i_bitspersample );
-    }
-    else if (!sample_planar)
-        memcpy( p_buffer->p_buffer, p_sys->p_samples, p_buffer->i_buffer );
-
-    p_sys->p_samples += i_samples * p_sys->p_context->channels * ( p_dec->fmt_out.audio.i_bitspersample / 8 );
-    p_sys->i_samples -= i_samples;
-
-
-    return p_buffer;
-}
-
-/*****************************************************************************
  * DecodeAudio: Called to decode one frame
  *****************************************************************************/
 block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_used, i_output;
-    block_t *p_buffer;
-    block_t *p_block;
     AVPacket pkt;
 
-    if( !pp_block || !*pp_block ) return NULL;
+    if( !pp_block || !*pp_block )
+        return NULL;
 
-    p_block = *pp_block;
+    block_t *p_block = *pp_block;
+    *pp_block = NULL;
 
     if( !p_sys->p_context->extradata_size && p_dec->fmt_in.i_extra &&
         p_sys->b_delayed_open)
@@ -285,21 +234,12 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
         avcodec_flush_buffers( p_sys->p_context );
-        p_sys->i_samples = 0;
         date_Set( &p_sys->end_date, 0 );
 
         if( p_sys->i_codec_id == CODEC_ID_MP2 || p_sys->i_codec_id == CODEC_ID_MP3 )
             p_sys->i_reject_count = 3;
 
         goto end;
-    }
-
-    if( p_sys->i_samples > 0 )
-    {
-        /* More data */
-        p_buffer = SplitBuffer( p_dec );
-        if( !p_buffer ) block_Release( p_block );
-        return p_buffer;
     }
 
     /* We've just started the stream, wait for the first PTS. */
@@ -311,7 +251,7 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
 
     if( (p_block->i_flags & BLOCK_FLAG_PRIVATE_REALLOCATED) == 0 )
     {
-        *pp_block = p_block = block_Realloc( p_block, 0, p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
+        p_block = block_Realloc( p_block, 0, p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
         if( !p_block )
             return NULL;
         p_block->i_buffer -= FF_INPUT_BUFFER_PADDING_SIZE;
@@ -363,24 +303,17 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     }
 
     if( p_dec->fmt_out.audio.i_rate != (unsigned int)p_sys->p_context->sample_rate )
-    {
         date_Init( &p_sys->end_date, p_sys->p_context->sample_rate, 1 );
-        date_Set( &p_sys->end_date, p_block->i_pts );
-    }
-
-    /* **** Set audio output parameters **** */
-    SetupOutputFormat( p_dec, true );
 
     if( p_block->i_pts > VLC_TS_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )
     {
         date_Set( &p_sys->end_date, p_block->i_pts );
     }
-    p_block->i_pts = 0;
 
-    /* **** Now we can output these samples **** */
-    p_sys->i_samples = i_output / (p_dec->fmt_out.audio.i_bitspersample / 8) / p_sys->p_context->channels;
-    p_sys->p_samples = p_sys->p_output;
+    block_Release( p_block );
+
+    SetupOutputFormat( p_dec, true );
 
     /* Silent unwanted samples */
     if( p_sys->i_reject_count > 0 )
@@ -389,8 +322,29 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         p_sys->i_reject_count--;
     }
 
-    p_buffer = SplitBuffer( p_dec );
-    if( !p_buffer ) block_Release( p_block );
+    int i_samples = i_output / (p_dec->fmt_out.audio.i_bitspersample / 8) / p_sys->p_context->channels;
+    if (i_samples == 0)
+        return NULL;
+
+    block_t *p_buffer = decoder_NewAudioBuffer( p_dec, i_samples );
+    if (!p_buffer)
+        return NULL;
+
+    p_buffer->i_pts = date_Get( &p_sys->end_date );
+    p_buffer->i_length = date_Increment( &p_sys->end_date, i_samples ) - p_buffer->i_pts;
+
+    int sample_planar = av_sample_fmt_is_planar( p_sys->p_context->sample_fmt );
+    if( sample_planar )
+        aout_Interleave( p_buffer->p_buffer, p_sys->p_output, i_samples, p_sys->p_context->channels, p_dec->fmt_out.audio.i_format );
+
+    if( p_sys->b_extract == !!sample_planar )
+        memcpy( p_sys->p_output, p_buffer->p_buffer, p_buffer->i_buffer );
+
+    if (p_sys->b_extract)
+        aout_ChannelExtract( p_buffer->p_buffer, p_dec->fmt_out.audio.i_channels,
+                             p_sys->p_output, p_sys->p_context->channels, i_samples,
+                             p_sys->pi_extraction, p_dec->fmt_out.audio.i_bitspersample );
+
     return p_buffer;
 
 end:
