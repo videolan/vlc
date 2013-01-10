@@ -145,6 +145,7 @@ struct intf_sys_t
 
     /* sleep management */
     IOPMAssertionID systemSleepAssertionID;
+    IOPMAssertionID userActivityAssertionID;
 
     VLCVoutWindowController *o_vout_controller;
 }

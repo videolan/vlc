@@ -1407,6 +1407,20 @@ static VLCMain *_o_sharedMainInstance = nil;
     if (p_input) {
         int state = var_GetInteger(p_input, "state");
         if (state == PLAYING_S) {
+            /* Declare user activity.
+             This wakes the display if it is off, and postpones display sleep according to the users system preferences
+             Available from 10.7.3
+             */
+            if ([self activeVideoPlayback] && IOPMAssertionDeclareUserActivity)
+            {
+                CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
+                IOPMAssertionDeclareUserActivity(reasonForActivity,
+                                                 kIOPMUserActiveLocal,
+                                                 &userActivityAssertionID);
+                CFRelease(reasonForActivity);
+            }
+
+
             /* prevent the system from sleeping */
             if (systemSleepAssertionID > 0) {
                 msg_Dbg(VLCIntf, "releasing old sleep blocker (%i)" , systemSleepAssertionID);
