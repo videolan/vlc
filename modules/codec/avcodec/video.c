@@ -716,7 +716,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         if( !b_drawpicture || ( !p_sys->p_va && !p_sys->p_ff_pic->linesize[0] ) )
             continue;
 
-        if( !p_sys->p_ff_pic->opaque )
+        if( p_sys->p_va != NULL || p_sys->p_ff_pic->opaque == NULL )
         {
             /* Get a new picture */
             p_pic = ffmpeg_NewPictBuf( p_dec, p_context );
