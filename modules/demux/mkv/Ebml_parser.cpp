@@ -166,9 +166,11 @@ EbmlElement *EbmlParser::Get( int n_call )
     }
     vlc_stream_io_callback & io_stream = (vlc_stream_io_callback &) m_es->I_O();
     uint64 i_size = io_stream.toRead();
+
+    /* Ignore unknown level 0 or 1 elements */
     m_el[mi_level] = m_es->FindNextElement( EBML_CONTEXT(m_el[mi_level - 1]),
-                                            i_ulev, i_size, true, 1 );
-//    mi_remain_size[mi_level] = m_el[mi_level]->GetSize();
+                                            i_ulev, i_size,
+                                            (  mb_dummy | (mi_level > 1) ), 1 );
     if( i_ulev > 0 )
     {
         if( p_prev )
@@ -214,7 +216,8 @@ EbmlElement *EbmlParser::Get( int n_call )
         }
 
         if( p_prev && p_prev->IsFiniteSize() &&
-            p_prev->GetEndPosition() != m_el[mi_level]->GetElementPosition())
+            p_prev->GetEndPosition() != m_el[mi_level]->GetElementPosition() &&
+            mi_level > 1 )
         {
             msg_Err( p_demux, "Dummy Element at unexpected position... corrupted file?" );
             b_bad_position = true;
@@ -225,13 +228,29 @@ EbmlElement *EbmlParser::Get( int n_call )
               m_el[mi_level]->GetEndPosition() <= m_el[mi_level-1]->GetEndPosition() ) )
         {
             /* The element fits inside its upper element */
-            msg_Warn( p_demux, "Dummy element found... skipping it" );
+            msg_Warn( p_demux, "Dummy element found %"PRIu64"... skipping it",
+                      m_el[mi_level]->GetElementPosition() );
             return Get( ++n_call );
         }
         else
         {
             /* Too large, misplaced or 10 successive dummy elements */
-            msg_Err( p_demux, "Dummy element too large or misplaced... skipping to next upper element" );
+            msg_Err( p_demux,
+                     "Dummy element too large or misplaced at %"PRIu64"... skipping to next upper element",
+                     m_el[mi_level]->GetElementPosition() );
+
+            if( mi_level >= 1 &&
+                m_el[mi_level]->GetElementPosition() >= m_el[mi_level-1]->GetEndPosition() )
+            {
+                msg_Err(p_demux, "This element is outside its known parent... upping level");
+                delete m_el[mi_level - 1];
+                m_got = m_el[mi_level -1] = m_el[mi_level];
+                m_el[mi_level] = NULL;
+
+                mi_level--;
+                return NULL;
+            }
+
             delete m_el[mi_level];
             m_el[mi_level] = NULL;
             m_el[mi_level - 1]->SkipData( *m_es, EBML_CONTEXT(m_el[mi_level - 1]) );
