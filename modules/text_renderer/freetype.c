@@ -1177,13 +1177,15 @@ static inline int RenderAXYZ( filter_t *p_filter,
     /* Initialize the picture background */
     uint8_t i_a = p_sys->i_background_opacity;
     uint8_t i_x, i_y, i_z;
-    ExtractComponents( p_sys->i_background_color, &i_x, &i_y, &i_z );
-
-    FillPicture( p_picture, i_a, i_x, i_y, i_z );
 
     if (p_region->b_renderbg) {
+        /* Render the background just under the text */
         RenderBackground(p_region, p_line_head, p_bbox, i_margin, p_picture, i_text_width,
                          ExtractComponents, BlendPixel);
+    } else {
+        /* Render background under entire subpicture block */
+        ExtractComponents( p_sys->i_background_color, &i_x, &i_y, &i_z );
+        FillPicture( p_picture, i_a, i_x, i_y, i_z );
     }
 
     /* Render shadow then outline and then normal glyphs */
