@@ -160,9 +160,9 @@ endif
 
 libxcb_screen_plugin_la_SOURCES = screen/xcb.c
 libxcb_screen_plugin_la_CFLAGS = $(AM_CFLAGS) \
-	$(XCB_CFLAGS) $(XCB_COMPOSITE_CFLAGS)
+	$(XCB_CFLAGS) $(XCB_COMPOSITE_CFLAGS) $(XCB_SHM_CFLAGS)
 libxcb_screen_plugin_la_LIBADD = $(AM_LIBADD) \
-	$(XCB_LIBS) $(XCB_COMPOSITE_LIBS)
+	$(XCB_LIBS) $(XCB_COMPOSITE_LIBS) $(XCB_SHM_LIBS)
 if HAVE_XCB
 libvlc_LTLIBRARIES += libxcb_screen_plugin.la
 endif

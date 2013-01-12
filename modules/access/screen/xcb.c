@@ -27,6 +27,10 @@
 #include <assert.h>
 #include <xcb/xcb.h>
 #include <xcb/composite.h>
+#ifdef HAVE_SYS_SHM_H
+# include <sys/shm.h>
+# include <xcb/shm.h>
+#endif
 #include <vlc_common.h>
 #include <vlc_demux.h>
 #include <vlc_plugin.h>
@@ -94,23 +98,42 @@ vlc_module_end ()
 static void Demux (void *);
 static int Control (demux_t *, int, va_list);
 static es_out_id_t *InitES (demux_t *, uint_fast16_t, uint_fast16_t,
-                            uint_fast8_t);
+                            uint_fast8_t, uint8_t *);
 
 struct demux_sys_t
 {
     /* All owned by timer thread while timer is armed: */
-    xcb_connection_t *conn;
-    es_out_id_t      *es;
-    float             rate;
-    xcb_window_t      window;
-    xcb_pixmap_t      pixmap;
-    int16_t           x, y;
-    uint16_t          w, h;
-    uint16_t          cur_w, cur_h;
+    xcb_connection_t *conn; /**< XCB connection */
+    es_out_id_t      *es; /**< Window capture stream */
+    float             rate; /**< Frame rate */
+    xcb_window_t      window; /**< Captured window XID  */
+    xcb_pixmap_t      pixmap; /**< Pixmap for composited capture */
+    xcb_shm_seg_t     segment; /**< SHM segment XID */
+    int16_t           x, y; /**< Requested capture top-left coordinates */
+    uint16_t          w, h; /**< Requested capture pixel dimensions */
+    uint8_t           bpp; /**< Actual bytes per pixel *es */
+    bool              shm; /**< Whether to use MIT-SHM */
     bool              follow_mouse;
+    uint16_t          cur_w, cur_h; /**< Actual capture pixel dimensions */
     /* Timer does not use this, only input thread: */
     vlc_timer_t       timer;
 };
+
+/** Checks MIT-SHM shared memory support */
+static bool CheckSHM (xcb_connection_t *conn)
+{
+#ifdef HAVE_SYS_SHM_H
+    xcb_shm_query_version_cookie_t ck = xcb_shm_query_version (conn);
+    xcb_shm_query_version_reply_t *r;
+
+    r = xcb_shm_query_version_reply (conn, ck, NULL);
+    free (r);
+    return r != NULL;
+#else
+    (void) conn;
+    return false;
+#endif
+}
 
 /**
  * Probes and initializes.
@@ -192,6 +215,8 @@ static int Open (vlc_object_t *obj)
 
     /* Window properties */
     p_sys->pixmap = xcb_generate_id (conn);
+    p_sys->segment = xcb_generate_id (conn);
+    p_sys->shm = CheckSHM (conn);
     p_sys->w = var_InheritInteger (obj, "screen-width");
     p_sys->h = var_InheritInteger (obj, "screen-height");
     if (p_sys->w != 0 || p_sys->h != 0)
@@ -215,6 +240,7 @@ static int Open (vlc_object_t *obj)
 
     p_sys->cur_w = 0;
     p_sys->cur_h = 0;
+    p_sys->bpp = 0;
     p_sys->es = NULL;
     if (vlc_timer_create (&p_sys->timer, Demux, demux))
         goto error;
@@ -390,11 +416,12 @@ discard:
                                geo->root, geo->width, geo->height);
         }
 
-        sys->es = InitES (demux, w, h, geo->depth);
+        sys->es = InitES (demux, w, h, geo->depth, &sys->bpp);
         if (sys->es != NULL)
         {
             sys->cur_w = w;
             sys->cur_h = h;
+            sys->bpp /= 8; /* bits -> bytes */
         }
     }
 
@@ -403,20 +430,69 @@ discard:
         (sys->window != geo->root) ? sys->pixmap : sys->window;
     free (geo);
 
-    xcb_get_image_reply_t *img;
-    img = xcb_get_image_reply (conn,
-        xcb_get_image (conn, XCB_IMAGE_FORMAT_Z_PIXMAP, drawable,
-                       x, y, w, h, ~0), NULL);
-    if (img == NULL)
-        return;
+    block_t *block = NULL;
+#if HAVE_SYS_SHM_H
+    if (sys->shm)
+    {   /* Capture screen through shared memory */
+        size_t size = w * h * sys->bpp;
+        int id = shmget (IPC_PRIVATE, size, IPC_CREAT | 0777);
+        if (id == -1) /* XXX: fallback */
+        {
+            msg_Err (demux, "shared memory allocation error: %m");
+            goto noshm;
+        }
 
-    uint8_t *data = xcb_get_image_data (img);
-    size_t datalen = xcb_get_image_data_length (img);
-    block_t *block = block_heap_Alloc (img, data + datalen - (uint8_t *)img);
+        /* Attach the segment to X and capture */
+        xcb_shm_get_image_reply_t *img;
+        xcb_shm_get_image_cookie_t ck;
+
+        xcb_shm_attach (conn, sys->segment, id, 0 /* read/write */);
+        ck = xcb_shm_get_image (conn, drawable, x, y, w, h, ~0,
+                                XCB_IMAGE_FORMAT_Z_PIXMAP, sys->segment, 0);
+        xcb_shm_detach (conn, sys->segment);
+        img = xcb_shm_get_image_reply (conn, ck, NULL);
+        xcb_flush (conn); /* ensure eventual detach */
+
+        if (img == NULL)
+        {
+            shmctl (id, IPC_RMID, 0);
+            goto noshm;
+        }
+        free (img);
+
+        /* Attach the segment to VLC */
+        void *shm = shmat (id, NULL, 0 /* read/write */);
+        shmctl (id, IPC_RMID, 0);
+        if (-1 == (intptr_t)shm)
+        {
+            msg_Err (demux, "shared memory attachment error: %m");
+            return;
+        }
+
+        block = block_shm_Alloc (shm, size);
+        if (unlikely(block == NULL))
+            shmdt (shm);
+    }
+noshm:
+#endif
     if (block == NULL)
-        return;
-    block->p_buffer = data;
-    block->i_buffer = datalen;
+    {   /* Capture screen through socket (fallback) */
+        xcb_get_image_reply_t *img;
+
+        img = xcb_get_image_reply (conn,
+            xcb_get_image (conn, XCB_IMAGE_FORMAT_Z_PIXMAP, drawable,
+                           x, y, w, h, ~0), NULL);
+        if (img == NULL)
+            return;
+
+        uint8_t *data = xcb_get_image_data (img);
+        size_t datalen = xcb_get_image_data_length (img);
+        block = block_heap_Alloc (img, data + datalen - (uint8_t *)img);
+        if (block == NULL)
+            return;
+        block->p_buffer = data;
+        block->i_buffer = datalen;
+    }
 
     /* Send block - zero copy */
     if (sys->es != NULL)
@@ -429,12 +505,12 @@ discard:
 }
 
 static es_out_id_t *InitES (demux_t *demux, uint_fast16_t width,
-                            uint_fast16_t height, uint_fast8_t depth)
+                            uint_fast16_t height, uint_fast8_t depth,
+                            uint8_t *bpp)
 {
     demux_sys_t *p_sys = demux->p_sys;
     const xcb_setup_t *setup = xcb_get_setup (p_sys->conn);
     uint32_t chroma = 0;
-    uint8_t bpp;
 
     for (const xcb_format_t *fmt = xcb_setup_pixmap_formats (setup),
              *end = fmt + xcb_setup_pixmap_formats_length (setup);
@@ -442,7 +518,6 @@ static es_out_id_t *InitES (demux_t *demux, uint_fast16_t width,
     {
         if (fmt->depth != depth)
             continue;
-        bpp = fmt->depth;
         switch (fmt->depth)
         {
             case 32:
@@ -451,10 +526,7 @@ static es_out_id_t *InitES (demux_t *demux, uint_fast16_t width,
                 break;
             case 24:
                 if (fmt->bits_per_pixel == 32)
-                {
                     chroma = VLC_CODEC_RGB32;
-                    bpp = 32;
-                }
                 else if (fmt->bits_per_pixel == 24)
                     chroma = VLC_CODEC_RGB24;
                 break;
@@ -472,7 +544,10 @@ static es_out_id_t *InitES (demux_t *demux, uint_fast16_t width,
                 break;
         }
         if (chroma != 0)
+        {
+            *bpp = fmt->bits_per_pixel;
             break;
+        }
     }
 
     if (!chroma)
@@ -485,7 +560,7 @@ static es_out_id_t *InitES (demux_t *demux, uint_fast16_t width,
 
     es_format_Init (&fmt, VIDEO_ES, chroma);
     fmt.video.i_chroma = chroma;
-    fmt.video.i_bits_per_pixel = bpp;
+    fmt.video.i_bits_per_pixel = *bpp;
     fmt.video.i_sar_num = fmt.video.i_sar_den = 1;
     fmt.video.i_frame_rate = 1000 * p_sys->rate;
     fmt.video.i_frame_rate_base = 1000;
