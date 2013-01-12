@@ -742,9 +742,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         }
 
         [self makeFirstResponder: nil];
-
-        if ([self level] != NSNormalWindowLevel)
-            [self setLevel: NSNormalWindowLevel];
+        [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
 
         // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
         [self setAlphaValue:1.0];
@@ -856,6 +854,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [self recreateHideMouseTimer];
     i_originalLevel = [self level];
+    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
     [self setLevel:NSNormalWindowLevel];
 
     if (b_dark_interface) {
@@ -899,7 +898,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
 {
-
     var_SetBool(pl_Get(VLCIntf), "fullscreen", false);
 
     vout_thread_t *p_vout = getVout();
@@ -911,7 +909,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_video_view setFrame: [o_split_view frame]];
     [NSCursor setHiddenUntilMouseMoves: NO];
     [o_fspanel setNonActive: nil];
+    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: i_originalLevel];
     [self setLevel:i_originalLevel];
+
     b_fullscreen = NO;
 
     if (b_dark_interface) {

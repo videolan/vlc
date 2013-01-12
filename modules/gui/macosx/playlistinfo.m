@@ -135,6 +135,12 @@ static VLCInfo *_o_sharedInstance = nil;
     [super dealloc];
 }
 
+- (void)updateCocoaWindowLevel:(NSInteger)i_level
+{
+    if (o_info_window && [o_info_window isVisible] && [o_info_window level] != i_level)
+        [o_info_window setLevel: i_level];
+}
+
 - (void)initPanel
 {
     b_stats = config_GetInt(VLCIntf, "stats");
@@ -145,6 +151,8 @@ static VLCInfo *_o_sharedInstance = nil;
     else
         [self initMediaPanelStats];
 
+    NSInteger i_level = [[[VLCMain sharedInstance] voutController] currentWindowLevel];
+    [o_info_window setLevel: i_level];
     [o_info_window makeKeyAndOrderFront: self];
 }
 

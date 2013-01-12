@@ -8,6 +8,7 @@
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan dot org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
+ *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,6 +42,7 @@
 #import "SPMediaKeyTap.h"                   /* for the media key support */
 #import "misc.h"
 #import "MainWindow.h"
+#import "VLCVoutWindowController.h"
 #import "StringUtility.h"
 
 #import <IOKit/pwr_mgt/IOPMLib.h>           /* for sleep prevention */
@@ -78,7 +80,6 @@ struct intf_sys_t
 @class VLCEmbeddedWindow;
 @class VLCControls;
 @class VLCPlaylist;
-@class VLCVoutWindowController;
 
 @interface VLCMain : NSObject <NSWindowDelegate, NSApplicationDelegate>
 {

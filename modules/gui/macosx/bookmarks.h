@@ -51,6 +51,8 @@
 }
 + (VLCBookmarks *)sharedInstance;
 
+- (void)updateCocoaWindowLevel:(NSInteger)i_level;
+
 - (IBAction)add:(id)sender;
 - (IBAction)clear:(id)sender;
 - (IBAction)edit:(id)sender;

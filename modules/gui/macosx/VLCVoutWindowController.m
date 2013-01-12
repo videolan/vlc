@@ -27,12 +27,19 @@
 #import "MainWindow.h"
 #import "VideoView.h"
 
+#import "VideoEffects.h"
+#import "AudioEffects.h"
+#import "playlistinfo.h"
+#import "bookmarks.h"
+#import "TrackSynchronization.h"
+
 @implementation VLCVoutWindowController
 
 - (id)init
 {
     self = [super init];
     o_vout_dict = [[NSMutableDictionary alloc] init];
+    i_currentWindowLevel = NSNormalWindowLevel;
     return self;
 }
 
@@ -164,15 +171,6 @@
         [o_new_video_window setNativeVideoSize:videoViewSize];
 
         [o_new_video_window makeKeyAndOrderFront: self];
-
-        vout_thread_t *p_vout = getVout();
-        if (p_vout) {
-            if (var_GetBool(p_vout, "video-on-top"))
-                [o_new_video_window setLevel: NSStatusWindowLevel];
-            else
-                [o_new_video_window setLevel: NSNormalWindowLevel];
-            vlc_object_release(p_vout);
-        }
     }
 
     [o_new_video_window setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
@@ -253,5 +251,45 @@
 
     [o_window setNativeVideoSize:size];
 }
+
+- (void)setWindowLevel:(NSInteger)i_level forWindow:(vout_window_t *)p_wnd
+{
+    // only set level for helper windows to normal if no status vout window exist anymore
+    if(i_level == NSStatusWindowLevel) {
+        i_statusLevelWindowCounter++;
+        [self updateWindowLevelForHelperWindows:i_level];
+    } else {
+        i_statusLevelWindowCounter--;
+        if (i_statusLevelWindowCounter == 0) {
+            [self updateWindowLevelForHelperWindows:i_level];
+        }
+    }
+
+    VLCVideoWindowCommon *o_window = [o_vout_dict objectForKey:[NSValue valueWithPointer:p_wnd]];
+    if (!o_window) {
+        msg_Err(VLCIntf, "Cannot set size for nonexisting window");
+        return;
+    }
+
+    [o_window setWindowLevel:i_level];
+}
+
+- (void)updateWindowLevelForHelperWindows:(NSInteger)i_level
+{
+    if (var_InheritBool(VLCIntf, "video-wallpaper"))
+        return;
+
+    i_currentWindowLevel = i_level;
+
+    [[VLCMainWindow sharedInstance] setWindowLevel:i_level];
+    [[VLCVideoEffects sharedInstance] updateCocoaWindowLevel:i_level];
+    [[VLCAudioEffects sharedInstance] updateCocoaWindowLevel:i_level];
+    [[[VLCMain sharedInstance] info] updateCocoaWindowLevel:i_level];
+    [[VLCBookmarks sharedInstance] updateCocoaWindowLevel:i_level];
+    [[VLCTrackSynchronization sharedInstance] updateCocoaWindowLevel:i_level];
+}
+
+@synthesize currentWindowLevel=i_currentWindowLevel;
+
 
 @end

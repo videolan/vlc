@@ -8,6 +8,7 @@
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan.org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
+ *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -140,7 +141,6 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
         msg_Err(p_wnd, "Mac OS X interface not found");
         return VLC_EGENERIC;
     }
-
     NSRect proposedVideoViewPosition = NSMakeRect(cfg->x, cfg->y, cfg->width, cfg->height);
 
     VLCVoutWindowController *o_vout_controller = [[VLCMain sharedInstance] voutController];
@@ -194,7 +194,20 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
         case VOUT_WINDOW_SET_STATE:
         {
             unsigned i_state = va_arg(args, unsigned);
-            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(setWindowLevel:) withObject:[NSNumber numberWithUnsignedInt:i_state] waitUntilDone:NO];
+
+            NSInteger i_cooca_level = NSNormalWindowLevel;
+            if (i_state & VOUT_WINDOW_STATE_ABOVE)
+                i_cooca_level = NSStatusWindowLevel;
+
+            SEL sel = @selector(setWindowLevel:forWindow:);
+            NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[[[VLCMain sharedInstance] voutController] methodSignatureForSelector:sel]];
+            [inv setTarget:[[VLCMain sharedInstance] voutController]];
+            [inv setSelector:sel];
+            [inv setArgument:&i_cooca_level atIndex:2]; // starting at 2!
+            [inv setArgument:&p_wnd atIndex:3];
+            [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
+                               waitUntilDone:NO];
+
             return VLC_SUCCESS;
         }
         case VOUT_WINDOW_SET_SIZE:
@@ -850,6 +863,10 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* remove global observer watching for vout device changes correctly */
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
+    // release before o_info!
+    [o_vout_controller release];
+    o_vout_controller = nil;
+
     /* release some other objects here, because it isn't sure whether dealloc
      * will be called later on */
     if (o_sprefs)
@@ -886,10 +903,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* write cached user defaults to disk */
     [[NSUserDefaults standardUserDefaults] synchronize];
 
-    [o_mainmenu release];
 
-    [o_vout_controller release];
-    o_vout_controller = nil;
+    [o_mainmenu release];
 
     libvlc_Quit(p_intf->p_libvlc);
 
@@ -1475,16 +1490,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 #pragma mark -
 #pragma mark Window updater
 
-- (void)setWindowLevel:(NSNumber*)state
-{
-    if (var_InheritBool(p_intf, "video-wallpaper") || [[[[VLCMainWindow sharedInstance] videoView] window] level] < NSNormalWindowLevel)
-        return;
 
-    if ([state unsignedIntValue] & VOUT_WINDOW_STATE_ABOVE)
-        [[[[VLCMainWindow sharedInstance] videoView] window] setLevel: NSStatusWindowLevel];
-    else
-        [[[[VLCMainWindow sharedInstance] videoView] window] setLevel: NSNormalWindowLevel];
-}
 
 - (void)setActiveVideoPlayback:(BOOL)b_value
 {

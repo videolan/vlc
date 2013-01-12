@@ -52,6 +52,8 @@
 
 /* generic */
 + (VLCTrackSynchronization *)sharedInstance;
+
+- (void)updateCocoaWindowLevel:(NSInteger)i_level;
 - (IBAction)toggleWindow:(id)sender;
 - (IBAction)resetValues:(id)sender;
 - (void)updateValues;

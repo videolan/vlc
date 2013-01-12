@@ -104,6 +104,7 @@
 }
 @property (readonly) input_item_t * item;
 
+- (void)updateCocoaWindowLevel:(NSInteger)i_level;
 - (void)initPanel;
 
 - (IBAction)metaFieldChanged:(id)sender;

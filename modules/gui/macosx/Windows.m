@@ -432,6 +432,15 @@
 #pragma mark -
 #pragma mark Video window resizing logic
 
+- (void)setWindowLevel:(NSInteger)i_state
+{
+    if (var_InheritBool(VLCIntf, "video-wallpaper") || [self level] < NSNormalWindowLevel)
+        return;
+
+    [self setLevel: i_state];
+
+}
+
 - (NSRect)getWindowRectForProposedVideoViewSize:(NSSize)size
 {
     NSSize windowMinSize = [self minSize];
@@ -561,7 +570,9 @@
 
     /* Make sure we don't see the window flashes in float-on-top mode */
     i_originalLevel = [self level];
+    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
     [self setLevel:NSNormalWindowLevel];
+
 
     /* Only create the o_fullscreen_window if we are not in the middle of the zooming animation */
     if (!o_fullscreen_window) {
@@ -720,14 +731,6 @@
     /* We always try to do so */
     [NSScreen unblackoutScreens];
 
-    vout_thread_t *p_vout = getVoutForActiveWindow();
-    if (p_vout) {
-        if (var_GetBool(p_vout, "video-on-top"))
-            [[o_video_view window] setLevel: NSStatusWindowLevel];
-        else
-            [[o_video_view window] setLevel: NSNormalWindowLevel];
-        vlc_object_release(p_vout);
-    }
     [[o_video_view window] makeKeyAndOrderFront: nil];
 
     /* Don't do anything if o_fullscreen_window is already closed */
@@ -840,6 +843,8 @@
 
     [o_fullscreen_window release];
     o_fullscreen_window = nil;
+    
+    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: i_originalLevel];
     [self setLevel:i_originalLevel];
     [self setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
 

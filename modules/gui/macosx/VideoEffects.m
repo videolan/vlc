@@ -212,6 +212,12 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [self resetValues];
 }
 
+- (void)updateCocoaWindowLevel:(NSInteger)i_level
+{
+    if (o_window && [o_window isVisible] && [o_window level] != i_level)
+        [o_window setLevel: i_level];
+}
+
 #pragma mark -
 #pragma mark internal functions
 - (void)resetProfileSelector
@@ -730,8 +736,10 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 {
     if ([o_window isVisible])
         [o_window orderOut:sender];
-    else
+    else {
+        [o_window setLevel: [[[VLCMain sharedInstance] voutController] currentWindowLevel]];
         [o_window makeKeyAndOrderFront:sender];
+    }
 }
 
 - (IBAction)profileSelectorAction:(id)sender

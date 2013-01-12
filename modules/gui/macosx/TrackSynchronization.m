@@ -98,12 +98,20 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
     [self resetValues:self];
 }
 
+- (void)updateCocoaWindowLevel:(NSInteger)i_level
+{
+    if (o_window && [o_window isVisible] && [o_window level] != i_level)
+        [o_window setLevel: i_level];
+}
+
 - (IBAction)toggleWindow:(id)sender
 {
     if ([o_window isVisible])
         [o_window orderOut:sender];
-    else
+    else {
+        [o_window setLevel: [[[VLCMain sharedInstance] voutController] currentWindowLevel]];
         [o_window makeKeyAndOrderFront:sender];
+    }
 }
 
 - (IBAction)resetValues:(id)sender

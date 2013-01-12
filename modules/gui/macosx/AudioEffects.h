@@ -105,6 +105,8 @@
 
 /* generic */
 + (VLCAudioEffects *)sharedInstance;
+
+- (void)updateCocoaWindowLevel:(NSInteger)i_level;
 - (IBAction)toggleWindow:(id)sender;
 - (void)setAudioFilter: (char *)psz_name on:(BOOL)b_on;
 - (IBAction)profileSelectorAction:(id)sender;

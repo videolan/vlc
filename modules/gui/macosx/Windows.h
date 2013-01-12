@@ -101,6 +101,8 @@ static const float f_min_video_height = 70.0;
 @property (nonatomic, assign) VLCVoutView* videoView;
 @property (readonly) VLCControlsBarCommon* controlsBar;
 
+- (void)setWindowLevel:(NSInteger)i_state;
+
 - (void)resizeWindow;
 - (void)setNativeVideoSize:(NSSize)size;
 - (NSRect)getWindowRectForProposedVideoViewSize:(NSSize)size;

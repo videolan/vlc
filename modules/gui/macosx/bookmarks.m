@@ -108,10 +108,17 @@ static VLCBookmarks *_o_sharedInstance = nil;
     [o_edit_lbl_bytes setStringValue: _NS("Position")];
 }
 
+- (void)updateCocoaWindowLevel:(NSInteger)i_level
+{
+    if (o_bookmarks_window && [o_bookmarks_window isVisible] && [o_bookmarks_window level] != i_level)
+        [o_bookmarks_window setLevel: i_level];
+}
+
 - (void)showBookmarks
 {
     /* show the window, called from intf.m */
     [o_bookmarks_window displayIfNeeded];
+    [o_bookmarks_window setLevel: [[[VLCMain sharedInstance] voutController] currentWindowLevel]];
     [o_bookmarks_window makeKeyAndOrderFront:nil];
 }
 
