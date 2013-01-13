@@ -2981,14 +2981,14 @@ have_vdpau="no"
 AS_IF([test "${enable_vdpau}" != "no"], [
   PKG_CHECK_MODULES([VDPAU], [vdpau], [
     have_vdpau="yes"
+    AS_IF([test "${no_x}" = "yes"], [
+      AC_MSG_ERROR([VDPAU requires Xlib (X11).])
+    ])
     AC_MSG_NOTICE([VDPAU acceleration activated])
   ], [
     AS_IF([test -n "${enable_vdpau}"], [
       AC_MSG_ERROR([${VDPAU_PKG_ERRORS}.])
     ])
-  ])
-  AS_IF([test "${no_x}" = "yes"], [
-    AC_MSG_ERROR([VDPAU requires Xlib (X11).])
   ])
 ])
 dnl AM_CONDITIONAL([HAVE_VDPAU], [test "${have_vdpau}" = "yes"])
