@@ -91,7 +91,7 @@ static int Lock (vlc_va_t *va, AVFrame *ff)
         return VLC_EGENERIC;
     }
 
-    unsigned idx = __builtin_ctz (sys->available);
+    unsigned idx = ctz (sys->available);
     sys->available &= ~(1 << idx);
 
     VdpVideoSurface *surface = sys->surfaces + idx;
