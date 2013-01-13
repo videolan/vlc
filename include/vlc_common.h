@@ -524,7 +524,7 @@ static inline unsigned clz (unsigned x)
 
     while (x)
     {
-        x = x >> 1;
+        x >>= 1;
         i--;
     }
     return i;
@@ -535,6 +535,24 @@ static inline unsigned clz (unsigned x)
 #define clz16( x ) (clz(x) - ((sizeof(unsigned) - sizeof (uint16_t)) * 8))
 /* XXX: this assumes that int is 32-bits or more */
 #define clz32( x ) (clz(x) - ((sizeof(unsigned) - sizeof (uint32_t)) * 8))
+
+/** Count trailing zeroes */
+VLC_USED
+static inline unsigned ctz (unsigned x)
+{
+#if VLC_GCC_VERSION(3,4)
+    return __builtin_ctz (x);
+#else
+    unsigned i = sizeof (x) * 8;
+
+    while (x)
+    {
+        x <<= 1;
+        i--;
+    }
+    return i;
+#endif
+}
 
 /** Bit weight */
 VLC_USED
