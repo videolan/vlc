@@ -1180,6 +1180,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
 
     if (p_region->b_renderbg) {
         /* Render the background just under the text */
+        FillPicture( p_picture, 0x00, 0x00, 0x00, 0x00 );
         RenderBackground(p_region, p_line_head, p_bbox, i_margin, p_picture, i_text_width,
                          ExtractComponents, BlendPixel);
     } else {
