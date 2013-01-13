@@ -13,7 +13,7 @@ Core:
  * Audio core rewrite
  * Fix support for .001, .00x splitted files on Windows
 
-Codecs:
+Decoders:
  * Support for OPUS via libopus.
  * Support for CDXL, Ut Video, VBLE, Dxtory codecs via libavcodec.
  * Numerous improvements in OpenMAX IL codec
@@ -24,6 +24,7 @@ Codecs:
  * Add Hardware Acceleration support on OS X for H.264 based upon VDADecoder
  * Add Hardware Acceleration support on Android Jelly Bean using MediaCodec
  * Support for SCTE-27 subtitles
+ * Support for VDPAU hardware video decoding acceleration on Linux
 
 Encoders:
  * high10, high422 and high444 encoding support in h264
