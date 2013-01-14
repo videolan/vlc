@@ -113,8 +113,6 @@ audio_output_t *aout_New (vlc_object_t *parent)
     var_Create (aout, "mute", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     var_AddCallback (aout, "mute", var_Copy, parent);
     var_Create (aout, "device", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
-    text.psz_string = _("Audio Device");
-    var_Change (aout, "device", VLC_VAR_SETTEXT, &text, NULL);
 
     aout->event.volume_report = aout_VolumeNotify;
     aout->event.mute_report = aout_MuteNotify;
@@ -136,27 +134,6 @@ audio_output_t *aout_New (vlc_object_t *parent)
         msg_Err (aout, "no suitable audio output module");
         vlc_object_release (aout);
         return NULL;
-    }
-
-    if (aout->device_enum != NULL)
-    {   /* Backward compatibility with UIs using GETCHOICES/GETLIST */
-        /* Note: this does NOT support hot-plugged devices. */
-        char **ids, **names;
-        int n = aout->device_enum (aout, &ids, &names);
-
-        for (int i = 0; i < n; i++)
-        {
-            val.psz_string = ids[i];
-            text.psz_string = names[i];
-            var_Change (aout, "device", VLC_VAR_ADDCHOICE, &val, &text);
-            free (names[i]);
-            free (ids[i]);
-        }
-        if (n >= 0)
-        {
-            free (names);
-            free (ids);
-        }
     }
 
     /*
