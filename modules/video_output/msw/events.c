@@ -499,7 +499,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
     HMENU      hMenu;
     RECT       rect_window;
     WNDCLASS   wc;                            /* window class components */
-    char       vlc_path[MAX_PATH+1];
+    TCHAR      vlc_path[MAX_PATH+1];
     int        i_style, i_stylex;
 
     msg_Dbg( vd, "DirectXCreateWindow" );
@@ -1043,9 +1043,9 @@ event_thread_t *EventThreadCreate( vout_display_t *vd)
     p_event->source = vd->source;
     vout_display_PlacePicture(&p_event->place, &vd->source, vd->cfg, false);
 
-    _snprintf( p_event->class_main, sizeof(p_event->class_main)/sizeof(*p_event->class_main),
+    _sntprintf( p_event->class_main, sizeof(p_event->class_main)/sizeof(*p_event->class_main),
                _T("VLC MSW %p"), p_event );
-    _snprintf( p_event->class_video, sizeof(p_event->class_video)/sizeof(*p_event->class_video),
+    _sntprintf( p_event->class_video, sizeof(p_event->class_video)/sizeof(*p_event->class_video),
                _T("VLC MSW video %p"), p_event );
     return p_event;
 }

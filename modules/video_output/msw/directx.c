@@ -52,7 +52,7 @@
 #include "common.h"
 
 #ifdef UNICODE
-#   error "Unicode mode not supported"
+# warning "Unicode mode not tested"
 #endif
 
 /*****************************************************************************
@@ -446,12 +446,14 @@ static BOOL WINAPI DirectXOpenDDrawCallback(GUID *guid, LPTSTR desc,
     if (!hmon)
         return TRUE;
 
-    msg_Dbg(vd, "DirectXEnumCallback: %s, %s", desc, drivername);
+    char *psz_drivername = FromT(drivername);
+
+    msg_Dbg(vd, "DirectXEnumCallback: %s, %s", FromT(desc), psz_drivername);
 
     char *device = var_GetString(vd, "directx-device");
 
     /* Check for forced device */
-    if (device && *device && !strcmp(drivername, device)) {
+    if (device && *device && !strcmp(psz_drivername, device)) {
         MONITORINFO monitor_info;
         monitor_info.cbSize = sizeof(MONITORINFO);
 
@@ -475,7 +477,7 @@ static BOOL WINAPI DirectXOpenDDrawCallback(GUID *guid, LPTSTR desc,
     free(device);
 
     if (hmon == sys->hmonitor) {
-        msg_Dbg(vd, "selecting %s, %s", desc, drivername);
+        msg_Dbg(vd, "selecting %s, %s", FromT(desc), psz_drivername);
 
         free(sys->display_driver);
         sys->display_driver = malloc(sizeof(*guid));
@@ -564,16 +566,16 @@ static int DirectXOpenDDraw(vout_display_t *vd)
     /* */
     HRESULT (WINAPI *OurDirectDrawCreate)(GUID *,LPDIRECTDRAW *,IUnknown *);
     OurDirectDrawCreate =
-        (void *)GetProcAddress(sys->hddraw_dll, _T("DirectDrawCreate"));
+        (void *)GetProcAddress(sys->hddraw_dll, "DirectDrawCreate");
     if (!OurDirectDrawCreate) {
         msg_Err(vd, "DirectXInitDDraw failed GetProcAddress");
         return VLC_EGENERIC;
     }
 
     /* */
-    HRESULT (WINAPI *OurDirectDrawEnumerateEx)(LPDDENUMCALLBACKEXA, LPVOID, DWORD);
+    HRESULT (WINAPI *OurDirectDrawEnumerateEx)(LPDDENUMCALLBACKEX, LPVOID, DWORD);
     OurDirectDrawEnumerateEx =
-      (void *)GetProcAddress(sys->hddraw_dll, _T("DirectDrawEnumerateExA"));
+      (void *)GetProcAddress(sys->hddraw_dll, "DirectDrawEnumerateEx");
 
     if (OurDirectDrawEnumerateEx) {
         char *device = var_GetString(vd, "directx-device");
@@ -1425,8 +1427,8 @@ static BOOL WINAPI DirectXEnumCallback2(GUID *guid, LPTSTR desc,
     ctx->descs = xrealloc(ctx->descs, (ctx->count + 1) * sizeof(char *));
 
     /* TODO? Unicode APIs */
-    ctx->values[ctx->count] = FromANSI(drivername);
-    ctx->descs[ctx->count] = FromANSI(drivername);
+    ctx->values[ctx->count] = FromT(drivername);
+    ctx->descs[ctx->count] = FromT(drivername);
     ctx->count++;
 
     return TRUE; /* Keep enumerating */
@@ -1448,9 +1450,9 @@ static int FindDevicesCallback(vlc_object_t *object, const char *name,
     if (hddraw_dll != NULL)
     {
         /* Enumerate displays */
-        HRESULT (WINAPI *OurDirectDrawEnumerateEx)(LPDDENUMCALLBACKEXA,
+        HRESULT (WINAPI *OurDirectDrawEnumerateEx)(LPDDENUMCALLBACKEX,
                                                    LPVOID, DWORD) =
-              (void *)GetProcAddress(hddraw_dll, _T("DirectDrawEnumerateExA"));
+              (void *)GetProcAddress(hddraw_dll, "DirectDrawEnumerateEx");
         if (OurDirectDrawEnumerateEx != NULL)
             OurDirectDrawEnumerateEx(DirectXEnumCallback2, &ctx,
                                      DDENUM_ATTACHEDSECONDARYDEVICES);
