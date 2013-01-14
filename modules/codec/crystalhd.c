@@ -200,7 +200,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     };
     for( int i = 0; i < PATHS_NB; i++ )
     {
-        HINSTANCE p_bcm_dll = LoadLibrary( psz_paths[i] );
+        HINSTANCE p_bcm_dll = LoadLibraryA( psz_paths[i] );
         if( p_bcm_dll )
         {
             p_sys->p_bcm_dll = p_bcm_dll;
@@ -214,7 +214,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
 #define LOAD_SYM( a ) \
-    BC_FUNC( a )  = (void *)GetProcAddress( p_sys->p_bcm_dll, TEXT( #a ) ); \
+    BC_FUNC( a )  = (void *)GetProcAddress( p_sys->p_bcm_dll, ( #a ) ); \
     if( !BC_FUNC( a ) ) { \
         msg_Err( p_dec, "missing symbol " # a ); return VLC_EGENERIC; }
 
