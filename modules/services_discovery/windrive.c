@@ -58,7 +58,7 @@ static int Open (vlc_object_t *obj)
 
     LONG drives = GetLogicalDrives ();
     char mrl[12] = "file:///A:/", name[3] = "A:";
-    TCHAR path[4] = "A:\\";
+    TCHAR path[4] = TEXT("A:\\");
 
     for (char d = 0; d < 26; d++)
     {
