@@ -301,6 +301,8 @@ static void PrintMsg (void *d, int type, const msg_item_t *p_item,
 static void Win32DebugOutputMsg (void* d, int type, const msg_item_t *p_item,
                                  const char *format, va_list dol)
 {
+    VLC_UNUSED(p_item);
+
     const signed char *pverbose = d;
     if (pverbose && (*pverbose < 0 || *pverbose < (type - VLC_MSG_ERR)))
         return;
@@ -323,7 +325,7 @@ static void Win32DebugOutputMsg (void* d, int type, const msg_item_t *p_item,
             msg[msg_len] = '\n';
             msg[msg_len + 1] = '\0';
         }
-        OutputDebugString(msg);
+        OutputDebugStringA(msg);
     }
     free(msg);
 }
