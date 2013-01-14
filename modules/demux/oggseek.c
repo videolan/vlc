@@ -58,22 +58,6 @@ void oggseek_index_entries_free ( demux_index_entry_t *idx )
 }
 
 
-/* unlink and free idx. If idx is head of list, return new head */
-
-static demux_index_entry_t *index_entry_delete( demux_index_entry_t *idx )
-{
-    demux_index_entry_t *xidx = idx;
-
-    if ( idx->p_prev != NULL ) idx->p_prev->p_next = idx->p_next;
-    else xidx = idx->p_next;
-
-    if ( idx->p_next != NULL ) idx->p_next->p_prev = idx->p_prev;
-    free( idx );
-
-    return xidx;
-}
-
-
 /* internal function to create a new list member */
 
 static demux_index_entry_t *index_entry_new( void )
@@ -391,13 +375,11 @@ static int64_t find_last_frame (demux_t *p_demux, logical_stream_t *p_stream)
     int64_t i_kframe = 0;
     int64_t i_pos1;
     int64_t i_pos2;
-    int64_t i_serialno;
 
     demux_sys_t *p_sys  = p_demux->p_sys;
 
     i_pos1 = p_stream->i_data_start;
     i_pos2 = p_sys->i_total_length;
-    i_serialno = p_stream->os.serialno;
 
     i_start_pos = i_pos2 - OGGSEEK_BYTES_TO_READ;
 
