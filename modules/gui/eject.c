@@ -34,6 +34,7 @@
 
 #include <vlc_common.h>
 #include <vlc_fs.h>
+#include <vlc_charset.h>
 
 #if defined( WIN32 )
 #   include <mmsystem.h>
@@ -132,7 +133,7 @@ static int intf_Eject( vlc_object_t *p_this, const char *psz_device )
 
     strcpy( psz_drive, "X:" );
     psz_drive[0] = psz_device[0];
-    op.lpstrElementName = psz_drive;
+    op.lpstrElementName = ToT(psz_drive);
 
     /* Set the flags for the device type */
     i_flags = MCI_OPEN_TYPE | MCI_OPEN_TYPE_ID |
