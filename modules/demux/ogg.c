@@ -2173,6 +2173,11 @@ static void Ogg_ReadAnnodexHeader( demux_t *p_demux,
         minor_version = oggpack_read( &opb, 2*8 ); /* minor version */
         timebase_numerator = GetQWLE( &p_oggpacket->packet[16] );
         timebase_denominator = GetQWLE( &p_oggpacket->packet[24] );
+
+        msg_Dbg( p_demux, "Annodex info: version %"PRIu16".%"PRIu16" "
+                          "Timebase  %"PRId64" / %"PRId64,
+                          major_version, minor_version,
+                          timebase_numerator, timebase_denominator );
     }
     else if( p_oggpacket->bytes >= 42 &&
              !memcmp( p_oggpacket->packet, "AnxData", 7 ) )
