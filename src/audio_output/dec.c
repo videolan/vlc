@@ -137,6 +137,7 @@ static int aout_CheckReady (audio_output_t *aout)
 
         if (restart & AOUT_RESTART_OUTPUT)
         {   /* Reinitializes the output */
+            msg_Dbg (aout, "restarting output...");
             if (owner->mixer_format.i_format)
                 aout_OutputDelete (aout);
             owner->mixer_format = owner->input_format;
@@ -146,6 +147,7 @@ static int aout_CheckReady (audio_output_t *aout)
                                    owner->mixer_format.i_format);
         }
 
+        msg_Dbg (aout, "restarting filters...");
         owner->sync.end = VLC_TS_INVALID;
         owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
 
@@ -168,6 +170,7 @@ void aout_RequestRestart (audio_output_t *aout, unsigned mode)
 {
     aout_owner_t *owner = aout_owner (aout);
     atomic_fetch_or (&owner->restart, mode);
+    msg_Dbg (aout, "restart requested (%u)", mode);
 }
 
 /*
