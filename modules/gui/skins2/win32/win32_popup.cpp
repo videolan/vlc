@@ -74,7 +74,7 @@ void Win32Popup::addItem( const string &rLabel, int pos )
 //     menuItem.fType = MFT_STRING;
     menuItem.fMask = MIIM_ID | MIIM_STRING;
     menuItem.wID = pos;
-    menuItem.dwTypeData = (char*)rLabel.c_str();
+    menuItem.dwTypeData = ToT(rLabel.c_str());
     menuItem.cch = rLabel.size();
 
     InsertMenuItem( m_hMenu, findInsertionPoint( pos ), TRUE, &menuItem );

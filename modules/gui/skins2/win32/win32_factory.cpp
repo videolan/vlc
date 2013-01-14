@@ -31,6 +31,7 @@
 #include <windows.h>
 #include <winuser.h>
 #include <wingdi.h>
+#include <tchar.h>
 
 #include "win32_factory.hpp"
 #include "win32_graphics.hpp"
@@ -147,9 +148,9 @@ Win32Factory::Win32Factory( intf_thread_t *pIntf ):
 
 bool Win32Factory::init()
 {
-    const char* vlc_name = "VLC Media Player";
-    const char* vlc_icon = "VLC_ICON";
-    const char* vlc_class = "SkinWindowClass";
+    LPCTSTR vlc_name = TEXT("VLC Media Player");
+    LPCTSTR vlc_icon = TEXT("VLC_ICON");
+    LPCTSTR vlc_class = TEXT("SkinWindowClass");
 
     // Get instance handle
     m_hInst = GetModuleHandle( NULL );
@@ -162,13 +163,13 @@ bool Win32Factory::init()
     WNDCLASS skinWindowClass;
     skinWindowClass.style = CS_DBLCLKS;
     skinWindowClass.lpfnWndProc = (WNDPROC)Win32Factory::Win32Proc;
-    skinWindowClass.lpszClassName = _T(vlc_class);
+    skinWindowClass.lpszClassName = vlc_class;
     skinWindowClass.lpszMenuName = NULL;
     skinWindowClass.cbClsExtra = 0;
     skinWindowClass.cbWndExtra = 0;
     skinWindowClass.hbrBackground = NULL;
     skinWindowClass.hCursor = LoadCursor( NULL, IDC_ARROW );
-    skinWindowClass.hIcon = LoadIcon( m_hInst, _T(vlc_icon) );
+    skinWindowClass.hIcon = LoadIcon( m_hInst, vlc_icon );
     skinWindowClass.hInstance = m_hInst;
 
     // Register class and check it
@@ -178,7 +179,7 @@ bool Win32Factory::init()
 
         // Check why it failed. If it's because the class already exists
         // then fine, otherwise return with an error.
-        if( !GetClassInfo( m_hInst, _T(vlc_class), &wndclass ) )
+        if( !GetClassInfo( m_hInst, vlc_class, &wndclass ) )
         {
             msg_Err( getIntf(), "cannot register window class" );
             return false;
@@ -186,8 +187,8 @@ bool Win32Factory::init()
     }
 
     // Create Window
-    m_hParentWindow = CreateWindowEx( WS_EX_TOOLWINDOW, _T(vlc_class),
-        _T(vlc_name), WS_POPUP | WS_SYSMENU | WS_MINIMIZEBOX,
+    m_hParentWindow = CreateWindowEx( WS_EX_TOOLWINDOW, vlc_class,
+        vlc_name, WS_POPUP | WS_SYSMENU | WS_MINIMIZEBOX,
         -200, -200, 0, 0, 0, 0, m_hInst, 0 );
     if( m_hParentWindow == NULL )
     {
@@ -212,8 +213,8 @@ bool Win32Factory::init()
     m_trayIcon.uID = 42;
     m_trayIcon.uFlags = NIF_ICON|NIF_TIP|NIF_MESSAGE;
     m_trayIcon.uCallbackMessage = MY_WM_TRAYACTION;
-    m_trayIcon.hIcon = LoadIcon( m_hInst, _T(vlc_icon) );
-    strcpy( m_trayIcon.szTip, vlc_name );
+    m_trayIcon.hIcon = LoadIcon( m_hInst, vlc_icon );
+    _tcscpy( m_trayIcon.szTip, vlc_name );
 
     // Show the systray icon if needed
     if( var_InheritBool( getIntf(), "skins2-systray" ) )
@@ -477,10 +478,10 @@ void Win32Factory::changeCursor( CursorType_t type ) const
 
 void Win32Factory::rmDir( const string &rPath )
 {
-    WIN32_FIND_DATA find;
+    WIN32_FIND_DATAA find;
     string file;
     string findFiles = rPath + "\\*";
-    HANDLE handle    = FindFirstFile( findFiles.c_str(), &find );
+    HANDLE handle    = FindFirstFileA( findFiles.c_str(), &find );
 
     while( handle != INVALID_HANDLE_VALUE )
     {
@@ -498,18 +499,18 @@ void Win32Factory::rmDir( const string &rPath )
             // Else, it is a file so simply delete it
             else
             {
-                DeleteFile( file.c_str() );
+                DeleteFileA( file.c_str() );
             }
         }
 
         // If no more file in directory, exit while
-        if( !FindNextFile( handle, &find ) )
+        if( !FindNextFileA( handle, &find ) )
             break;
     }
 
     // Now directory is empty so can be removed
     FindClose( handle );
-    RemoveDirectory( rPath.c_str() );
+    RemoveDirectoryA( rPath.c_str() );
 }
 
 #endif

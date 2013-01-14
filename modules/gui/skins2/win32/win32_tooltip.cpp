@@ -34,7 +34,7 @@ Win32Tooltip::Win32Tooltip( intf_thread_t *pIntf, HINSTANCE hInst,
 {
     // Create the window
     m_hWnd = CreateWindowEx( WS_EX_TOOLWINDOW,
-        "SkinWindowClass", "tooltip", WS_POPUP | WS_DISABLED,
+        TEXT("SkinWindowClass"), TEXT("tooltip"), WS_POPUP | WS_DISABLED,
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
         hParentWindow, 0, hInst, NULL );
 

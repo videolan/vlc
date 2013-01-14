@@ -55,8 +55,8 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     (void)hParentWindow;
     Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( getIntf() );
 
-    const char* vlc_name =  "VlC Media Player";
-    const char* vlc_class =  "SkinWindowClass";
+    LPCTSTR vlc_name =  TEXT("VlC Media Player");
+    LPCTSTR vlc_class = TEXT("SkinWindowClass");
 
     // Create the window
     if( type == GenericWindow::VoutWindow )
