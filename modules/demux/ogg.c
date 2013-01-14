@@ -421,6 +421,22 @@ static int Demux( demux_t * p_demux )
     return 1;
 }
 
+static void Ogg_ResetStreamHelper( demux_sys_t *p_sys )
+{
+    for( int i = 0; i < p_sys->i_streams; i++ )
+    {
+        logical_stream_t *p_stream = p_sys->pp_stream[i];
+
+        /* we'll trash all the data until we find the next pcr */
+        p_stream->b_reinit = true;
+        p_stream->i_pcr = -1;
+        p_stream->i_interpolated_pcr = -1;
+        p_stream->i_previous_granulepos = -1;
+        ogg_stream_reset( &p_stream->os );
+    }
+    ogg_sync_reset( &p_sys->oy );
+}
+
 /*****************************************************************************
  * Control:
  *****************************************************************************/
@@ -430,7 +446,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     vlc_meta_t *p_meta;
     int64_t *pi64;
     bool *pb_bool;
-    int i;
 
     switch( i_query )
     {
@@ -478,18 +493,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_EGENERIC;
             }
 
-            for( i = 0; i < p_sys->i_streams; i++ )
-            {
-                logical_stream_t *p_stream = p_sys->pp_stream[i];
-
-                /* we'll trash all the data until we find the next pcr */
-                p_stream->b_reinit = true;
-                p_stream->i_pcr = -1;
-                p_stream->i_interpolated_pcr = -1;
-                p_stream->i_previous_granulepos = -1;
-                ogg_stream_reset( &p_stream->os );
-            }
-            ogg_sync_reset( &p_sys->oy );
+            Ogg_ResetStreamHelper( p_sys );
             return demux_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
                                           1, i_query, args );
         case DEMUX_GET_LENGTH:
@@ -538,18 +542,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_EGENERIC;
             }
 
-            for( i = 0; i < p_sys->i_streams; i++ )
-            {
-                logical_stream_t *p_stream = p_sys->pp_stream[i];
-
-                /* we'll trash all the data until we find the next pcr */
-                p_stream->b_reinit = true;
-                p_stream->i_pcr = -1;
-                p_stream->i_interpolated_pcr = -1;
-                p_stream->i_previous_granulepos = -1;
-                ogg_stream_reset( &p_stream->os );
-            }
-            ogg_sync_reset( &p_sys->oy );
+            Ogg_ResetStreamHelper( p_sys );
             int64_t i_block = p_sys->pp_seekpoints[i_seekpoint]->i_time_offset * p_sys->i_bitrate / INT64_C(8000000);
             if( stream_Seek( p_demux->s, i_block ) )
                 return VLC_EGENERIC;
