@@ -149,7 +149,8 @@ static int aout_CheckReady (audio_output_t *aout)
         owner->sync.end = VLC_TS_INVALID;
         owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
 
-        if (aout_FiltersNew (aout, &owner->input_format, &owner->mixer_format,
+        if (owner->mixer_format.i_format
+         && aout_FiltersNew (aout, &owner->input_format, &owner->mixer_format,
                              &request_vout))
         {
             aout_OutputDelete (aout);
