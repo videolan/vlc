@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_input.h>
+#include <vlc_aout.h>
 #include <vlc_vout.h>
 #include <vlc_osd.h>
 #include <vlc_playlist.h>
@@ -314,32 +315,29 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
 
         case ACTIONID_AUDIODEVICE_CYCLE:
         {
-            vlc_object_t *p_aout =
-                                (vlc_object_t *)playlist_GetAout( p_playlist );
+            audio_output_t *p_aout = playlist_GetAout( p_playlist );
             if( p_aout == NULL )
                 break;
 
-            vlc_value_t val, ids, names;
+            char *dev = var_GetNonEmptyString( p_aout, "device" );
+            const char *devstr = (dev != NULL) ? dev : "";
 
-            var_Get( p_aout, "device", &val );
+            vlc_value_t ids, names;
             var_Change( p_aout, "device", VLC_VAR_GETCHOICES, &ids, &names );
 
-            for( int i = 0; i < ids.p_list->i_count; i++ )
-            {
-                if( !strcmp(val.psz_string,
-                            ids.p_list->p_values[i].psz_string) )
-                {
-                    int j = i + 1;
-                    if( j >= ids.p_list->i_count )
-                        j = 0;
-
-                    DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                    _("Audio Device: %s"),
-                                    names.p_list->p_values[j].psz_string);
-                    var_Set( p_aout, "device", ids.p_list->p_values[j] );
+            int i = 0;
+            for( i = 0; i < ids.p_list->i_count; i++ )
+                if( !strcmp(devstr, ids.p_list->p_values[i].psz_string) )
                     break;
-                }
-            }
+            free( dev );
+
+            i++;
+            if( i >= ids.p_list->i_count )
+                i = 0;
+            if( !aout_DeviceSet( p_aout, ids.p_list->p_values[i].psz_string ) )
+                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
+                                _("Audio Device: %s"),
+                                names.p_list->p_values[i].psz_string);
             var_FreeList( &ids, &names );
             vlc_object_release( p_aout );
             break;
