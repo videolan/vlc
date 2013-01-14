@@ -714,7 +714,7 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
 
 #ifndef LOADER
     /* Load msdmo DLL */
-    *p_hmsdmo_dll = LoadLibrary( "msdmo.dll" );
+    *p_hmsdmo_dll = LoadLibraryA( "msdmo.dll" );
     if( *p_hmsdmo_dll == NULL )
     {
         msg_Dbg( p_this, "failed loading msdmo.dll" );
@@ -793,7 +793,7 @@ loader:
     if( codecs_table[i_codec].i_fourcc == 0 )
         return VLC_EGENERIC;    /* Can't happen */
 
-    *p_hmsdmo_dll = LoadLibrary( codecs_table[i_codec].psz_dll );
+    *p_hmsdmo_dll = LoadLibraryA( codecs_table[i_codec].psz_dll );
     if( *p_hmsdmo_dll == NULL )
     {
         msg_Dbg( p_this, "failed loading '%s'",
