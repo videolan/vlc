@@ -156,7 +156,6 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t    *p_sys;
     const uint8_t  *p_peek;
 
-
     /* Check if we are dealing with an ogg stream */
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
     if( !p_demux->b_force && memcmp( p_peek, "OggS", 4 ) )
@@ -164,30 +163,21 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    /* Set exported functions */
-    p_demux->pf_demux = Demux;
-    p_demux->pf_control = Control;
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    /* */
+    p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
 
-    memset( p_sys, 0, sizeof( demux_sys_t ) );
-    p_sys->i_bitrate = 0;
-    p_sys->pp_stream = NULL;
-    p_sys->p_old_stream = NULL;
-
-    /* Begnning of stream, tell the demux to look for elementary streams. */
-    p_sys->i_bos = 0;
-    p_sys->i_eos = 0;
-
     p_sys->i_length = -1;
+
+    /* Set exported functions */
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
 
     /* Initialize the Ogg physical bitstream parser */
     ogg_sync_init( &p_sys->oy );
-    p_sys->b_page_waiting = false;
 
     /* */
-    p_sys->p_meta = NULL;
     TAB_INIT( p_sys->i_seekpoints, p_sys->pp_seekpoints );
 
     return VLC_SUCCESS;

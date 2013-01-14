@@ -110,7 +110,7 @@ struct demux_sys_t
     mtime_t i_pcr;
 
     /* stream state */
-    int     i_bos;
+    int     i_bos; /* Begnning of stream, tell the demux to look for elementary streams. */
     int     i_eos;
 
     /* bitrate */
