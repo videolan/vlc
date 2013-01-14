@@ -110,7 +110,7 @@ static int Open(vlc_object_t *object)
                                         void **);
 
     D2D1CreateFactory = (void *)GetProcAddress(sys->d2_dll,
-                                               TEXT("D2D1CreateFactory"));
+                                               "D2D1CreateFactory");
     if (!D2D1CreateFactory) {
         msg_Err(vd,
                 "Cannot locate reference to a D2D1CreateFactory ABI in D2D1.DLL");
