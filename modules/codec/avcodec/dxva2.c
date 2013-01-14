@@ -572,7 +572,7 @@ static int D3dCreateDevice(vlc_va_dxva2_t *va)
     /* */
     LPDIRECT3D9 (WINAPI *Create9)(UINT SDKVersion);
     Create9 = (void *)GetProcAddress(va->hd3d9_dll,
-                                     TEXT("Direct3DCreate9"));
+                                     "Direct3DCreate9");
     if (!Create9) {
         msg_Err(va->log, "Cannot locate reference to Direct3DCreate9 ABI in DLL");
         return VLC_EGENERIC;
@@ -679,7 +679,7 @@ static int D3dCreateDeviceManager(vlc_va_dxva2_t *va)
                                            IDirect3DDeviceManager9 **);
     CreateDeviceManager9 =
       (void *)GetProcAddress(va->hdxva2_dll,
-                             TEXT("DXVA2CreateDirect3DDeviceManager9"));
+                             "DXVA2CreateDirect3DDeviceManager9");
 
     if (!CreateDeviceManager9) {
         msg_Err(va->log, "cannot load function");
@@ -723,7 +723,7 @@ static int DxCreateVideoService(vlc_va_dxva2_t *va)
                                          void **ppService);
     CreateVideoService =
       (void *)GetProcAddress(va->hdxva2_dll,
-                             TEXT("DXVA2CreateVideoService"));
+                             "DXVA2CreateVideoService");
 
     if (!CreateVideoService) {
         msg_Err(va->log, "cannot load function");
