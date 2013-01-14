@@ -1070,7 +1070,7 @@ static int ReloadDirectXDevices( vlc_object_t *p_this, char const *psz_name,
 
     /* Get DirectSoundEnumerate */
     HRESULT (WINAPI *OurDirectSoundEnumerate)(LPDSENUMCALLBACKW, LPVOID) =
-            (void *)GetProcAddress( hdsound_dll, _T("DirectSoundEnumerateW") );
+            (void *)GetProcAddress( hdsound_dll, "DirectSoundEnumerateW" );
     if( OurDirectSoundEnumerate != NULL )
     {
         OurDirectSoundEnumerate( DeviceEnumCallback, &list );
