@@ -56,7 +56,7 @@ int screen_InitCapture( demux_t *p_demux )
         return VLC_ENOMEM;
 
     /* Get the device context for the whole screen */
-    p_data->hdc_src = CreateDC( "DISPLAY", NULL, NULL, NULL );
+    p_data->hdc_src = CreateDC( TEXT("DISPLAY"), NULL, NULL, NULL );
     if( !p_data->hdc_src )
     {
         msg_Err( p_demux, "cannot get device context" );
