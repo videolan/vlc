@@ -23,19 +23,10 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Preamble
+ * Definitions of structures and functions used by this plugin
  *****************************************************************************/
-
-
-
-
-/*****************************************************************************
- * Definitions of structures and functions used by this plugins
- *****************************************************************************/
-
 
 typedef struct oggseek_index_entry demux_index_entry_t;
-
 
 typedef struct logical_stream_s
 {
@@ -66,6 +57,7 @@ typedef struct logical_stream_s
     /* Misc */
     bool b_reinit;
     int i_granule_shift;
+
     /* Opus has a starting offset in the headers. */
     int i_pre_skip;
     /* Vorbis and Opus can trim the end of a stream using granule positions. */
@@ -90,11 +82,6 @@ typedef struct logical_stream_s
     int i_secondary_header_packets;
 
 } logical_stream_t;
-
-
-
-
-
 
 struct demux_sys_t
 {
@@ -131,16 +118,14 @@ struct demux_sys_t
     /* current page being parsed */
     ogg_page current_page;
 
-    mtime_t i_st_pts;
-
     /* */
-    vlc_meta_t *p_meta;
+    vlc_meta_t          *p_meta;
     int                 i_seekpoints;
     seekpoint_t         **pp_seekpoints;
 
     /* */
-    int                i_attachments;
-    input_attachment_t **attachments;
+    int                 i_attachments;
+    input_attachment_t  **attachments;
 
     /* Length, if available. */
     int64_t i_length;
