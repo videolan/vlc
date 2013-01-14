@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
+#include <vlc_charset.h>
 
 #define VLCSERVICENAME "VLC media player"
 
@@ -139,7 +140,7 @@ static void *Run( void *data )
     intf_thread_t *p_intf = data;
     SERVICE_TABLE_ENTRY dispatchTable[] =
     {
-        { (LPTSTR)VLCSERVICENAME, &ServiceDispatch },
+        { TEXT(VLCSERVICENAME), &ServiceDispatch },
         { NULL, NULL }
     };
 
@@ -178,7 +179,9 @@ static void *Run( void *data )
 static int NTServiceInstall( intf_thread_t *p_intf )
 {
     intf_sys_t *p_sys  = p_intf->p_sys;
-    char psz_path[10*MAX_PATH], psz_pathtmp[MAX_PATH], *psz_extra;
+    char psz_path[10*MAX_PATH], *psz_extra;
+    TCHAR psz_pathtmp[MAX_PATH];
+
     SC_HANDLE handle = OpenSCManager( NULL, NULL, SC_MANAGER_ALL_ACCESS );
     if( handle == NULL )
     {
@@ -190,7 +193,7 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     /* Find out the filename of ourselves so we can install it to the
      * service control manager */
     GetModuleFileName( NULL, psz_pathtmp, MAX_PATH );
-    sprintf( psz_path, "\"%s\" -I "MODULE_STRING, psz_pathtmp );
+    sprintf( psz_path, "\"%s\" -I "MODULE_STRING, FromT(psz_pathtmp) );
 
     psz_extra = var_InheritString( p_intf, "ntservice-extraintf" );
     if( psz_extra )
@@ -209,7 +212,7 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     }
 
     SC_HANDLE service =
-        CreateService( handle, p_sys->psz_service, p_sys->psz_service,
+        CreateServiceA( handle, p_sys->psz_service, p_sys->psz_service,
                        GENERIC_READ | GENERIC_EXECUTE,
                        SERVICE_WIN32_OWN_PROCESS,
                        SERVICE_AUTO_START, SERVICE_ERROR_IGNORE,
@@ -253,7 +256,7 @@ static int NTServiceUninstall( intf_thread_t *p_intf )
     }
 
     /* First, open a handle to the service */
-    SC_HANDLE service = OpenService( handle, p_sys->psz_service, DELETE );
+    SC_HANDLE service = OpenServiceA( handle, p_sys->psz_service, DELETE );
     if( service == NULL )
     {
         msg_Err( p_intf, "could not open service" );
@@ -293,7 +296,7 @@ static void WINAPI ServiceDispatch( DWORD numArgs, char **args )
     p_sys->status.dwControlsAccepted = SERVICE_ACCEPT_STOP;
 
     p_sys->hStatus =
-        RegisterServiceCtrlHandler( p_sys->psz_service, &ServiceCtrlHandler );
+        RegisterServiceCtrlHandlerA( p_sys->psz_service, &ServiceCtrlHandler );
     if( p_sys->hStatus == (SERVICE_STATUS_HANDLE)0 )
     {
         msg_Err( p_intf, "failed to register service control handler" );
