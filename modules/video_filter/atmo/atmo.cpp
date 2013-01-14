@@ -44,6 +44,7 @@
 #include <vlc_playlist.h>
 #include <vlc_filter.h>
 #include <vlc_atomic.h>
+#include <vlc_charset.h>
 
 #include "filter_picture.h"
 
@@ -1847,8 +1848,8 @@ static void Atmo_SetupParameters(filter_t *p_filter)
           COM Server for AtmoLight not running ?
           if the exe path is configured try to start the "userspace" driver
         */
-        char *psz_path = var_CreateGetStringCommand( p_filter,
-                                               CFG_PREFIX "atmowinexe" );
+        LPTSTR psz_path = ToT(var_CreateGetStringCommand( p_filter,
+                                               CFG_PREFIX "atmowinexe" ));
         if(psz_path != NULL)
         {
             STARTUPINFO startupinfo;
@@ -1858,7 +1859,7 @@ static void Atmo_SetupParameters(filter_t *p_filter)
             if(CreateProcess(psz_path, NULL, NULL, NULL,
                 FALSE, 0, NULL, NULL, &startupinfo, &pinfo) == TRUE)
             {
-                msg_Dbg(p_filter,"launched AtmoWin from %s",psz_path);
+                msg_Dbg(p_filter,"launched AtmoWin from %s", FromT(psz_path));
                 WaitForInputIdle(pinfo.hProcess, 5000);
                 /*
                   retry to initialize the library COM ... functionality
@@ -1866,7 +1867,7 @@ static void Atmo_SetupParameters(filter_t *p_filter)
                 */
                 i = AtmoInitialize(p_filter, false);
             } else {
-                msg_Err(p_filter,"failed to launch AtmoWin from %s", psz_path);
+                msg_Err(p_filter,"failed to launch AtmoWin from %s", FromT(psz_path));
             }
             free(psz_path);
         }

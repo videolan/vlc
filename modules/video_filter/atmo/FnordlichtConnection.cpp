@@ -73,7 +73,7 @@ ATMO_BOOL CFnordlichtConnection::OpenConnection()
 
 #if defined(WIN32)
 
-    m_hComport = CreateFile(serdevice,
+    m_hComport = CreateFileA(serdevice,
                     GENERIC_WRITE, 0, NULL,
                     OPEN_EXISTING, 0, NULL);
     if ( m_hComport == INVALID_HANDLE_VALUE )

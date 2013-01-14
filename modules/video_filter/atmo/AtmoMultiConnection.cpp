@@ -50,7 +50,7 @@ HANDLE CAtmoMultiConnection::OpenDevice(char *devName)
 #endif
 
 #if defined(WIN32)
-     hComport = CreateFile(devName, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+     hComport = CreateFileA(devName, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
      if(hComport == INVALID_HANDLE_VALUE) {
 #if !defined(_ATMO_VLC_PLUGIN_)
 	    m_dwLastWin32Error = GetLastError();

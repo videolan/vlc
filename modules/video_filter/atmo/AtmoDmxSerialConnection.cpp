@@ -69,7 +69,7 @@ ATMO_BOOL CAtmoDmxSerialConnection::OpenConnection() {
 
 #if defined(WIN32)
 
-     m_hComport = CreateFile(serdevice, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+     m_hComport = CreateFileA(serdevice, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
      if(m_hComport == INVALID_HANDLE_VALUE) {
 //      we have a problem here can't open com port... somebody else may use it?
 //	    m_dwLastWin32Error = GetLastError();
