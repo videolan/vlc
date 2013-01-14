@@ -597,7 +597,7 @@ static int GetFileFontByName( const char *font_name, char **psz_filename )
     wchar_t vbuffer[MAX_PATH];
     wchar_t dbuffer[256];
 
-    if( RegOpenKeyEx(HKEY_LOCAL_MACHINE, FONT_DIR_NT, 0, KEY_READ, &hKey)
+    if( RegOpenKeyExA(HKEY_LOCAL_MACHINE, FONT_DIR_NT, 0, KEY_READ, &hKey)
             != ERROR_SUCCESS )
         return 1;
 
