@@ -42,7 +42,7 @@ typedef struct logical_stream_s
     /* the header of some logical streams (eg vorbis) contain essential
      * data for the decoder. We back them up here in case we need to re-feed
      * them to the decoder. */
-    int              b_force_backup;
+    bool             b_force_backup;
     int              i_packets_backup;
     void             *p_headers;
     int              i_headers;

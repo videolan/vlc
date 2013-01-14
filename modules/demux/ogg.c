@@ -702,12 +702,14 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         case VLC_CODEC_VORBIS:
         case VLC_CODEC_SPEEX:
         case VLC_CODEC_THEORA:
-            if( p_stream->i_packets_backup == 3 ) p_stream->b_force_backup = 0;
+            if( p_stream->i_packets_backup == 3 )
+                p_stream->b_force_backup = false;
             b_xiph = true;
             break;
 
         case VLC_CODEC_OPUS:
-            if( p_stream->i_packets_backup == 2 ) p_stream->b_force_backup = 0;
+            if( p_stream->i_packets_backup == 2 )
+                p_stream->b_force_backup = false;
             b_xiph = true;
             break;
 
@@ -715,11 +717,11 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             if( !p_stream->fmt.audio.i_rate && p_stream->i_packets_backup == 2 )
             {
                 Ogg_ReadFlacHeader( p_demux, p_stream, p_oggpacket );
-                p_stream->b_force_backup = 0;
+                p_stream->b_force_backup = false;
             }
             else if( p_stream->fmt.audio.i_rate )
             {
-                p_stream->b_force_backup = 0;
+                p_stream->b_force_backup = false;
                 if( p_oggpacket->bytes >= 9 )
                 {
                     p_oggpacket->packet += 9;
@@ -730,12 +732,13 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             break;
 
         case VLC_CODEC_KATE:
-            if( p_stream->i_packets_backup == p_stream->i_kate_num_headers ) p_stream->b_force_backup = 0;
+            if( p_stream->i_packets_backup == p_stream->i_kate_num_headers )
+                p_stream->b_force_backup = false;
             b_xiph = true;
             break;
 
         default:
-            p_stream->b_force_backup = 0;
+            p_stream->b_force_backup = false;
             b_xiph = false;
             break;
         }
@@ -1158,7 +1161,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     /* Grrrr!!!! Did they really have to put all the
                      * important info in the second header packet!!!
                      * (STREAMINFO metadata is in the following packet) */
-                    p_stream->b_force_backup = 1;
+                    p_stream->b_force_backup = true;
 
                     p_stream->fmt.i_cat = AUDIO_ES;
                     p_stream->fmt.i_codec = VLC_CODEC_FLAC;
@@ -1175,7 +1178,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                              oggpacket.packet[5], oggpacket.packet[6],
                              i_packets );
 
-                    p_stream->b_force_backup = 1;
+                    p_stream->b_force_backup = true;
 
                     p_stream->fmt.i_cat = AUDIO_ES;
                     p_stream->fmt.i_codec = VLC_CODEC_FLAC;
@@ -1892,7 +1895,7 @@ static void Ogg_ReadTheoraHeader( demux_t *p_demux, logical_stream_t *p_stream,
     /* Signal that we want to keep a backup of the theora
      * stream headers. They will be used when switching between
      * audio streams. */
-    p_stream->b_force_backup = 1;
+    p_stream->b_force_backup = true;
 
     /* Cheat and get additionnal info ;) */
     bs_init( &bitstream, p_oggpacket->packet, p_oggpacket->bytes );
@@ -1960,7 +1963,7 @@ static void Ogg_ReadVorbisHeader( demux_t *p_demux, logical_stream_t *p_stream,
     /* Signal that we want to keep a backup of the vorbis
      * stream headers. They will be used when switching between
      * audio streams. */
-    p_stream->b_force_backup = 1;
+    p_stream->b_force_backup = true;
 
     /* Cheat and get additionnal info ;) */
     oggpack_readinit( &opb, p_oggpacket->packet, p_oggpacket->bytes);
@@ -1990,7 +1993,7 @@ static void Ogg_ReadSpeexHeader( logical_stream_t *p_stream,
     /* Signal that we want to keep a backup of the speex
      * stream headers. They will be used when switching between
      * audio streams. */
-    p_stream->b_force_backup = 1;
+    p_stream->b_force_backup = true;
 
     /* Cheat and get additionnal info ;) */
     oggpack_readinit( &opb, p_oggpacket->packet, p_oggpacket->bytes);
@@ -2016,7 +2019,7 @@ static void Ogg_ReadOpusHeader( demux_t *p_demux,
     /* Signal that we want to keep a backup of the opus
      * stream headers. They will be used when switching between
      * audio streams. */
-    p_stream->b_force_backup = 1;
+    p_stream->b_force_backup = true;
 
     /* All OggOpus streams are timestamped at 48kHz and
      * can be played at 48kHz. */
@@ -2088,7 +2091,7 @@ static void Ogg_ReadKateHeader( logical_stream_t *p_stream,
     /* Signal that we want to keep a backup of the kate
      * stream headers. They will be used when switching between
      * kate streams. */
-    p_stream->b_force_backup = 1;
+    p_stream->b_force_backup = true;
 
     /* Cheat and get additionnal info ;) */
     oggpack_readinit( &opb, p_oggpacket->packet, p_oggpacket->bytes);
@@ -2204,28 +2207,28 @@ static void Ogg_ReadAnnodexHeader( demux_t *p_demux,
             p_stream->fmt.i_cat = AUDIO_ES;
             p_stream->fmt.i_codec = VLC_CODEC_VORBIS;
 
-            p_stream->b_force_backup = 1;
+            p_stream->b_force_backup = true;
         }
         else if( !strncmp(content_type_string, "audio/x-speex", 13) )
         {
             p_stream->fmt.i_cat = AUDIO_ES;
             p_stream->fmt.i_codec = VLC_CODEC_SPEEX;
 
-            p_stream->b_force_backup = 1;
+            p_stream->b_force_backup = true;
         }
         else if( !strncmp(content_type_string, "video/x-theora", 14) )
         {
             p_stream->fmt.i_cat = VIDEO_ES;
             p_stream->fmt.i_codec = VLC_CODEC_THEORA;
 
-            p_stream->b_force_backup = 1;
+            p_stream->b_force_backup = true;
         }
         else if( !strncmp(content_type_string, "video/x-xvid", 12) )
         {
             p_stream->fmt.i_cat = VIDEO_ES;
             p_stream->fmt.i_codec = VLC_FOURCC( 'x','v','i','d' );
 
-            p_stream->b_force_backup = 1;
+            p_stream->b_force_backup = true;
         }
         else if( !strncmp(content_type_string, "video/mpeg", 10) )
         {
@@ -2284,7 +2287,7 @@ static bool Ogg_ReadDiracHeader( logical_stream_t *p_stream,
 
     /* Backing up stream headers is not required -- seqhdrs are repeated
      * thoughout the stream at suitable decoding start points */
-    p_stream->b_force_backup = 0;
+    p_stream->b_force_backup = false;
 
     /* read in useful bits from sequence header */
     bs_init( &bs, p_oggpacket->packet, p_oggpacket->bytes );
