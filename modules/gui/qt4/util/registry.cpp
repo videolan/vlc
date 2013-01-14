@@ -42,7 +42,7 @@ QVLCRegistry::~QVLCRegistry( void )
 bool QVLCRegistry::RegistryKeyExists( const char *path )
 {
     HKEY keyHandle;
-    if( RegOpenKeyEx( m_RootKey, path, 0, KEY_READ, &keyHandle ) == ERROR_SUCCESS )
+    if( RegOpenKeyExA( m_RootKey, path, 0, KEY_READ, &keyHandle ) == ERROR_SUCCESS )
     {
         RegCloseKey( keyHandle );
         return true;
@@ -57,9 +57,9 @@ bool QVLCRegistry::RegistryValueExists( const char *path, const char *valueName 
     DWORD size1;
     DWORD valueType;
 
-    if( RegOpenKeyEx( m_RootKey, path, 0, KEY_READ, &keyHandle ) == ERROR_SUCCESS )
+    if( RegOpenKeyExA( m_RootKey, path, 0, KEY_READ, &keyHandle ) == ERROR_SUCCESS )
     {
-        if( RegQueryValueEx( keyHandle, valueName, NULL,
+        if( RegQueryValueExA( keyHandle, valueName, NULL,
                              &valueType, NULL, &size1 ) == ERROR_SUCCESS )
         {
            temp = true;
@@ -73,10 +73,10 @@ void QVLCRegistry::WriteRegistryInt( const char *path, const char *valueName, in
 {
     HKEY keyHandle;
 
-    if( RegCreateKeyEx( m_RootKey, path, 0, NULL, REG_OPTION_NON_VOLATILE,
+    if( RegCreateKeyExA( m_RootKey, path, 0, NULL, REG_OPTION_NON_VOLATILE,
                          KEY_WRITE, NULL, &keyHandle, NULL )  == ERROR_SUCCESS )
     {
-        RegSetValueEx( keyHandle, valueName, 0, REG_DWORD,
+        RegSetValueExA( keyHandle, valueName, 0, REG_DWORD,
                 (LPBYTE)&value, sizeof( int ) );
         RegCloseKey( keyHandle );
     }
@@ -86,10 +86,10 @@ void QVLCRegistry::WriteRegistryString( const char *path, const char *valueName,
 {
     HKEY keyHandle;
 
-    if( RegCreateKeyEx( m_RootKey, path, 0, NULL, REG_OPTION_NON_VOLATILE,
+    if( RegCreateKeyExA( m_RootKey, path, 0, NULL, REG_OPTION_NON_VOLATILE,
                          KEY_WRITE, NULL, &keyHandle, NULL )  == ERROR_SUCCESS )
     {
-        RegSetValueEx( keyHandle, valueName, 0, REG_SZ, (LPBYTE)value,
+        RegSetValueExA( keyHandle, valueName, 0, REG_SZ, (LPBYTE)value,
                 (DWORD)( strlen( value ) + 1 ) );
         RegCloseKey( keyHandle );
     }
@@ -98,10 +98,10 @@ void QVLCRegistry::WriteRegistryString( const char *path, const char *valueName,
 void QVLCRegistry::WriteRegistryDouble( const char *path, const char *valueName, double value )
 {
     HKEY keyHandle;
-    if( RegCreateKeyEx( m_RootKey, path, 0, NULL, REG_OPTION_NON_VOLATILE,
+    if( RegCreateKeyExA( m_RootKey, path, 0, NULL, REG_OPTION_NON_VOLATILE,
                        KEY_WRITE, NULL, &keyHandle, NULL ) == ERROR_SUCCESS )
     {
-        RegSetValueEx( keyHandle, valueName, 0, REG_BINARY, (LPBYTE)&value, sizeof( double ) );
+        RegSetValueExA( keyHandle, valueName, 0, REG_BINARY, (LPBYTE)&value, sizeof( double ) );
         RegCloseKey( keyHandle );
     }
 }
@@ -112,13 +112,13 @@ int QVLCRegistry::ReadRegistryInt( const char *path, const char *valueName, int 
     DWORD size1;
     DWORD valueType;
 
-    if( RegOpenKeyEx( m_RootKey, path, 0, KEY_READ, &keyHandle ) == ERROR_SUCCESS )
+    if( RegOpenKeyExA( m_RootKey, path, 0, KEY_READ, &keyHandle ) == ERROR_SUCCESS )
     {
-        if( RegQueryValueEx(  keyHandle, valueName, NULL, &valueType, NULL, &size1 ) == ERROR_SUCCESS )
+        if( RegQueryValueExA(  keyHandle, valueName, NULL, &valueType, NULL, &size1 ) == ERROR_SUCCESS )
         {
            if( valueType == REG_DWORD )
            {
-               if( RegQueryValueEx(  keyHandle, valueName, NULL, &valueType, (LPBYTE)&tempValue, &size1 ) == ERROR_SUCCESS )
+               if( RegQueryValueExA(  keyHandle, valueName, NULL, &valueType, (LPBYTE)&tempValue, &size1 ) == ERROR_SUCCESS )
                {
                   default_value = tempValue;
                };
@@ -138,15 +138,15 @@ char * QVLCRegistry::ReadRegistryString( const char *path, const char *valueName
     DWORD size1;
     DWORD valueType;
 
-    if( RegOpenKeyEx( m_RootKey, path, 0, KEY_READ, &keyHandle ) == ERROR_SUCCESS )
+    if( RegOpenKeyExA( m_RootKey, path, 0, KEY_READ, &keyHandle ) == ERROR_SUCCESS )
     {
-        if( RegQueryValueEx(  keyHandle, valueName, NULL, &valueType, NULL, &size1 ) == ERROR_SUCCESS )
+        if( RegQueryValueExA(  keyHandle, valueName, NULL, &valueType, NULL, &size1 ) == ERROR_SUCCESS )
         {
            if( valueType == REG_SZ )
            {
                // free
                tempValue = ( char * )malloc( size1+1 ); // +1 für NullByte`?
-               if( RegQueryValueEx(  keyHandle, valueName, NULL, &valueType, (LPBYTE)tempValue, &size1 ) == ERROR_SUCCESS )
+               if( RegQueryValueExA(  keyHandle, valueName, NULL, &valueType, (LPBYTE)tempValue, &size1 ) == ERROR_SUCCESS )
                {
                   tempValue2 = tempValue;
                };
@@ -165,14 +165,14 @@ double QVLCRegistry::ReadRegistryDouble( const char *path, const char *valueName
     DWORD size1;
     DWORD valueType;
 
-    if( RegOpenKeyEx( m_RootKey, path, 0, KEY_READ, &keyHandle ) == ERROR_SUCCESS )
+    if( RegOpenKeyExA( m_RootKey, path, 0, KEY_READ, &keyHandle ) == ERROR_SUCCESS )
     {
-        if( RegQueryValueEx( keyHandle, valueName, NULL, &valueType,
+        if( RegQueryValueExA( keyHandle, valueName, NULL, &valueType,
                              NULL, &size1 ) == ERROR_SUCCESS )
         {
            if( ( valueType == REG_BINARY ) && ( size1 == sizeof( double ) ) )
            {
-               if( RegQueryValueEx(  keyHandle, valueName, NULL, &valueType,
+               if( RegQueryValueExA( keyHandle, valueName, NULL, &valueType,
                            (LPBYTE)&tempValue, &size1 ) == ERROR_SUCCESS )
                {
                   default_value = tempValue;
@@ -188,9 +188,9 @@ int QVLCRegistry::DeleteValue( const char *path, const char *valueName )
 {
     HKEY keyHandle;
     long result;
-    if( (result = RegOpenKeyEx(m_RootKey, path, 0, KEY_WRITE, &keyHandle)) == ERROR_SUCCESS)
+    if( (result = RegOpenKeyExA(m_RootKey, path, 0, KEY_WRITE, &keyHandle)) == ERROR_SUCCESS)
     {
-        result = RegDeleteValue(keyHandle, valueName);
+        result = RegDeleteValueA(keyHandle, valueName);
         RegCloseKey(keyHandle);
     }
     //ERROR_SUCCESS = ok everything else you have a problem*g*,
@@ -201,12 +201,12 @@ long QVLCRegistry::DeleteKey( const char *path, const char *keyName )
 {
     HKEY keyHandle;
     long result;
-    if( (result = RegOpenKeyEx(m_RootKey, path, 0, KEY_WRITE, &keyHandle)) == ERROR_SUCCESS)
+    if( (result = RegOpenKeyExA(m_RootKey, path, 0, KEY_WRITE, &keyHandle)) == ERROR_SUCCESS)
     {
          // be warned the key "keyName" will not be deleted if there are subkeys below him, values
         // I think are ok and will be recusively deleted, but not keys...
         // for this case we have to do a little bit more work!
-        result = RegDeleteKey(keyHandle, keyName);
+        result = RegDeleteKeyA(keyHandle, keyName);
         RegCloseKey(keyHandle);
     }
     //ERROR_SUCCESS = ok everything else you have a problem*g*,
