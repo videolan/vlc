@@ -735,7 +735,7 @@ static void SelectClockSource (vlc_object_t *obj)
         if (unlikely(h == NULL))
             abort ();
         clk.interrupt.query = (void *)GetProcAddress (h,
-                                                      _T("QueryUnbiasedInterruptTime"));
+                                                      "QueryUnbiasedInterruptTime");
         if (unlikely(clk.interrupt.query == NULL))
             abort ();
 #endif
@@ -749,7 +749,7 @@ static void SelectClockSource (vlc_object_t *obj)
         HANDLE h = GetModuleHandle (_T("kernel32.dll"));
         if (unlikely(h == NULL))
             abort ();
-        clk.tick.get = (void *)GetProcAddress (h, _T("GetTickCount64"));
+        clk.tick.get = (void *)GetProcAddress (h, "GetTickCount64");
         if (unlikely(clk.tick.get == NULL))
             abort ();
 #endif
