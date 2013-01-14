@@ -319,27 +319,34 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             if( p_aout == NULL )
                 break;
 
-            char *dev = var_GetNonEmptyString( p_aout, "device" );
+            char **ids, **names;
+            int n = aout_DevicesList( p_aout, &ids, &names );
+            if( n == -1 )
+                break;
+
+            char *dev = aout_DeviceGet( p_aout );
             const char *devstr = (dev != NULL) ? dev : "";
 
-            vlc_value_t ids, names;
-            var_Change( p_aout, "device", VLC_VAR_GETCHOICES, &ids, &names );
-
-            int i = 0;
-            for( i = 0; i < ids.p_list->i_count; i++ )
-                if( !strcmp(devstr, ids.p_list->p_values[i].psz_string) )
-                    break;
+            int idx = 0;
+            for( int i = 0; i < n; i++ )
+            {
+                if( !strcmp(devstr, ids[i]) )
+                    idx = (i + 1) % n;
+            }
             free( dev );
 
-            i++;
-            if( i >= ids.p_list->i_count )
-                i = 0;
-            if( !aout_DeviceSet( p_aout, ids.p_list->p_values[i].psz_string ) )
+            if( !aout_DeviceSet( p_aout, ids[idx] ) )
                 DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                _("Audio Device: %s"),
-                                names.p_list->p_values[i].psz_string);
-            var_FreeList( &ids, &names );
+                                _("Audio Device: %s"), names[idx] );
             vlc_object_release( p_aout );
+
+            for( int i = 0; i < n; i++ )
+            {
+                free( ids[i] );
+                free( names[i] );
+            }
+            free( ids );
+            free( names );
             break;
         }
 
