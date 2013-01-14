@@ -44,23 +44,6 @@ static int var_Copy (vlc_object_t *src, const char *name, vlc_value_t prev,
     return var_Set (dst, name, value);
 }
 
-static int aout_DeviceSelect (vlc_object_t *obj, const char *varname,
-                              vlc_value_t prev, vlc_value_t value, void *data)
-{
-    audio_output_t *aout = (audio_output_t *)obj;
-    int ret = 0; /* FIXME: default value should be -1 */
-
-    msg_Dbg (aout, "changing device: %s -> %s", prev.psz_string,
-             value.psz_string);
-    aout_lock (aout);
-    if (aout->device_select != NULL)
-        ret = aout->device_select (aout, value.psz_string);
-    aout_unlock (aout);
-
-    (void) varname; (void) data;
-    return ret ? VLC_EGENERIC : VLC_SUCCESS;
-}
-
 /**
  * Supply or update the current custom ("hardware") volume.
  * @note This only makes sense after calling aout_VolumeHardInit().
@@ -88,19 +71,7 @@ static void aout_PolicyNotify (audio_output_t *aout, bool cork)
 
 static void aout_DeviceNotify (audio_output_t *aout, const char *id)
 {
-    vlc_value_t val;
-
-    val.psz_string = (char *)id;
-    var_Change (aout, "device", VLC_VAR_SETVALUE, &val, NULL);
-
-    /* FIXME: Remove this hack. Needed if device is not in the list. */
-    char *tmp = var_GetNonEmptyString (aout, "device");
-    if (tmp == NULL || strcmp (tmp, id))
-    {
-        var_Change (aout, "device", VLC_VAR_ADDCHOICE, &val, &val);
-        var_Change (aout, "device", VLC_VAR_SETVALUE, &val, NULL);
-    }
-    free (tmp);
+    var_SetString (aout, "device", (id != NULL) ? id : "");
 }
 
 static void aout_RestartNotify (audio_output_t *aout, unsigned mode)
@@ -144,7 +115,6 @@ audio_output_t *aout_New (vlc_object_t *parent)
     var_Create (aout, "device", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
     text.psz_string = _("Audio Device");
     var_Change (aout, "device", VLC_VAR_SETTEXT, &text, NULL);
-    var_AddCallback (aout, "device", aout_DeviceSelect, NULL);
 
     aout->event.volume_report = aout_VolumeNotify;
     aout->event.mute_report = aout_MuteNotify;
@@ -299,7 +269,6 @@ void aout_Destroy (audio_output_t *aout)
     aout->mute_set = NULL;
     aout_unlock (aout);
 
-    var_DelCallback (aout, "device", aout_DeviceSelect, NULL);
     var_DelCallback (aout, "mute", var_Copy, aout->p_parent);
     var_SetFloat (aout, "volume", -1.f);
     var_DelCallback (aout, "volume", var_Copy, aout->p_parent);
