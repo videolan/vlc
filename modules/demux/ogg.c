@@ -533,7 +533,27 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             const int i_seekpoint = (int)va_arg( args, int );
             if( i_seekpoint > p_sys->i_seekpoints )
                 return VLC_EGENERIC;
-            return VLC_EGENERIC;// Seek( p_demux, p_sys->pp_seekpoints[i_seekpoint]->i_time_offset );
+            if( p_sys->i_bos > 0 )
+            {
+                return VLC_EGENERIC;
+            }
+
+            for( i = 0; i < p_sys->i_streams; i++ )
+            {
+                logical_stream_t *p_stream = p_sys->pp_stream[i];
+
+                /* we'll trash all the data until we find the next pcr */
+                p_stream->b_reinit = true;
+                p_stream->i_pcr = -1;
+                p_stream->i_interpolated_pcr = -1;
+                p_stream->i_previous_granulepos = -1;
+                ogg_stream_reset( &p_stream->os );
+            }
+            ogg_sync_reset( &p_sys->oy );
+            int64_t i_block = p_sys->pp_seekpoints[i_seekpoint]->i_time_offset * p_sys->i_bitrate / INT64_C(8000000);
+            if( stream_Seek( p_demux->s, i_block ) )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
         }
 
         default:
