@@ -325,29 +325,16 @@ static void stream_moved_cb(pa_stream *s, void *userdata)
 {
     audio_output_t *aout = userdata;
     aout_sys_t *sys = aout->sys;
+    const char *name = pa_stream_get_device_name(s);
     pa_operation *op;
-    uint32_t idx = pa_stream_get_device_index(s);
 
-    msg_Dbg(aout, "connected to sink %"PRIu32": %s", idx,
-                  pa_stream_get_device_name(s));
-    op = pa_context_get_sink_info_by_index(sys->context, idx,
-                                           sink_info_cb, aout);
+    msg_Dbg(aout, "connected to sink %s", name);
+    aout_DeviceReport(aout, name);
+
+    op = pa_context_get_sink_info_by_name(sys->context, name, sink_info_cb,
+                                          aout);
     if (likely(op != NULL))
         pa_operation_unref(op);
-
-    /* Update the variable if someone else moved our stream */
-    var_Change(aout, "audio-device", VLC_VAR_SETVALUE,
-               &(vlc_value_t){ .i_int = idx }, NULL);
-
-    /* Sink unknown as yet, create stub choice for it */
-    if (var_GetInteger(aout, "audio-device") != idx)
-    {
-        var_Change(aout, "audio-device", VLC_VAR_ADDCHOICE,
-                   &(vlc_value_t){ .i_int = idx },
-                   &(vlc_value_t){ .psz_string = (char *)"?" });
-        var_Change(aout, "audio-device", VLC_VAR_SETVALUE,
-                   &(vlc_value_t){ .i_int = idx }, NULL);
-    }
 }
 
 static void stream_overflow_cb(pa_stream *s, void *userdata)
