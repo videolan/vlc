@@ -82,6 +82,10 @@ static uint32_t findDeviceID(char *);
 static int WaveOutTimeGet(audio_output_t * , mtime_t *);
 static void WaveOutFlush( audio_output_t *, bool);
 static void WaveOutPause( audio_output_t *, bool, mtime_t);
+static int WaveoutVolumeSet(audio_output_t * p_aout, float volume);
+static int WaveoutMuteSet(audio_output_t * p_aout, bool mute);
+
+static void WaveoutPollVolume( void * );
 
 static const wchar_t device_name_fmt[] = L"%ls ($%x,$%x)";
 
@@ -107,14 +111,16 @@ struct aout_sys_t
     int i_buffer_size;
 
     int i_rate;
-    bool b_spdif;
 
     uint8_t *p_silence_buffer;              /* buffer we use to play silence */
+    
+    float f_volume;
 
-    float soft_gain;
-    bool soft_mute;
-
+    bool b_spdif;
+    bool b_mute;
+    bool b_soft;                            /* Use software gain */
     uint8_t chans_to_reorder;              /* do we need channel reordering */
+
     uint8_t chan_table[AOUT_CHAN_MAX];
     vlc_fourcc_t format;
 
@@ -124,9 +130,8 @@ struct aout_sys_t
 
     vlc_mutex_t lock;
     vlc_cond_t cond;
+    vlc_timer_t volume_poll_timer;
 };
-
-#include "volume.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -136,6 +141,8 @@ struct aout_sys_t
                        "decide (default), change needs VLC restart "\
                        "to apply.")
 #define DEFAULT_AUDIO_DEVICE N_("Default Audio Device")
+
+#define VOLUME_TEXT N_("Audio volume")
 
 vlc_module_begin ()
     set_shortname( "WaveOut" )
@@ -147,7 +154,9 @@ vlc_module_begin ()
     add_string( "waveout-audio-device", "wavemapper",
                  DEVICE_TEXT, DEVICE_LONG, false )
        change_string_cb( ReloadWaveoutDevices )
-    add_sw_gain( )
+
+    add_float( "waveout-volume", 1.0f, VOLUME_TEXT, NULL, true )
+         change_float_range(0.0f, 2.0f)
 
     add_bool( "waveout-float32", true, FLOAT_TEXT, FLOAT_LONGTEXT, true )
 
@@ -167,6 +176,9 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     p_aout->play = Play;
     p_aout->pause = WaveOutPause;
     p_aout->flush = WaveOutFlush;
+
+    /* Default behaviour is to use software gain */
+    p_aout->sys->b_soft = true;
 
     /*
       check for configured audio device!
@@ -273,7 +285,13 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
         aout_FormatPrepare( fmt );
         p_aout->sys->i_buffer_size = FRAME_SIZE * fmt->i_bytes_per_frame;
 
-        aout_SoftVolumeStart( p_aout );
+        if( waveoutcaps.dwSupport & WAVECAPS_VOLUME )
+        {
+            aout_GainRequest( p_aout, 1.0f );
+            p_aout->sys->b_soft = false;
+        }
+
+        WaveoutMuteSet( p_aout, p_aout->sys->b_mute );
 
         p_aout->sys->b_spdif = false;
     }
@@ -445,6 +463,7 @@ static void Play( audio_output_t *p_aout, block_t *block )
     }
 
     WaveOutClean( p_aout->sys );
+    WaveoutPollVolume( p_aout );
 
     vlc_mutex_lock( &p_aout->sys->lock );
     p_aout->sys->i_frames++;
@@ -495,6 +514,7 @@ static void Stop( audio_output_t *p_aout )
 
     free( p_sys->p_silence_buffer );
     p_aout->sys->i_played_length = 0;
+    p_sys->b_soft = true;
 }
 
 /*****************************************************************************
@@ -850,10 +870,26 @@ static int Open(vlc_object_t *obj)
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
-    aout_SoftVolumeInit(aout);
+    aout->volume_set = WaveoutVolumeSet;
+    aout->mute_set = WaveoutMuteSet;
+
+    sys->f_volume = var_InheritFloat(aout, "waveout-volume");
+    sys->b_mute = var_InheritBool(aout, "mute");
+
+    aout_MuteReport(aout, sys->b_mute);
+    aout_VolumeReport(aout, sys->f_volume );
+
+    if( vlc_timer_create( &sys->volume_poll_timer, 
+                          WaveoutPollVolume, aout ) )
+    {
+        msg_Err( aout, "Couldn't create volume polling timer" );
+        free( sys );
+        return VLC_ENOMEM;
+    }
 
     vlc_mutex_init( &sys->lock );
     vlc_cond_init( &sys->cond );
+
     return VLC_SUCCESS;
 }
 
@@ -861,6 +897,8 @@ static void Close(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
+   
+    vlc_timer_destroy( sys->volume_poll_timer );
 
     vlc_cond_destroy( &sys->cond );
     vlc_mutex_destroy( &sys->lock );
@@ -915,6 +953,7 @@ static void WaveOutPause( audio_output_t * p_aout, bool pause, mtime_t date)
     (void) date;
     if(pause)
     {
+        vlc_timer_schedule( p_aout->sys->volume_poll_timer, false, 1, 200000 );
         res = waveOutPause( p_aout->sys->h_waveout );
         if( res != MMSYSERR_NOERROR )
         {
@@ -924,6 +963,7 @@ static void WaveOutPause( audio_output_t * p_aout, bool pause, mtime_t date)
     }
     else
     {
+        vlc_timer_schedule( p_aout->sys->volume_poll_timer, false, 0, 0 );
         res = waveOutRestart( p_aout->sys->h_waveout );
         if( res != MMSYSERR_NOERROR )
         {
@@ -931,4 +971,115 @@ static void WaveOutPause( audio_output_t * p_aout, bool pause, mtime_t date)
             return;
         }
     }
+}
+
+static int WaveoutVolumeSet( audio_output_t *p_aout, float volume )
+{
+    aout_sys_t *sys = p_aout->sys;
+
+    if( sys->b_soft )
+    {
+        float gain = volume * volume * volume;
+        if ( !sys->b_mute && aout_GainRequest( p_aout, gain ) )
+            return -1;
+    }
+    else
+    {
+        const HWAVEOUT hwo = sys->h_waveout;
+
+        uint32_t vol = lroundf( volume * 0x7fff.fp0 );
+
+        if( !sys->b_mute )
+        {
+            if( vol > 0xffff )
+            {
+                vol = 0xffff;
+                volume = 2.0f;
+            }
+
+            MMRESULT r = waveOutSetVolume( hwo, vol | ( vol << 16 ) );
+            if( r != MMSYSERR_NOERROR )
+            {
+                msg_Err( p_aout, "waveOutSetVolume failed (%u)", r );
+                return -1;
+            }
+        }
+    }
+
+    vlc_mutex_lock(&p_aout->sys->lock);
+    sys->f_volume = volume;
+
+    if( var_InheritBool( p_aout, "volume-save" ) )
+        config_PutFloat( p_aout, "waveout-volume", volume );
+
+    aout_VolumeReport( p_aout, volume );
+    vlc_mutex_unlock(&p_aout->sys->lock);
+
+    return 0;
+}
+
+static int WaveoutMuteSet( audio_output_t * p_aout, bool mute )
+{
+    aout_sys_t *sys = p_aout->sys;
+    
+    if( sys->b_soft )
+    {
+        float gain = sys->f_volume * sys->f_volume * sys->f_volume; 
+        if ( aout_GainRequest( p_aout, mute ? 0.f : gain ) )
+            return -1;
+    }
+    else
+    {
+
+        const HWAVEOUT hwo = sys->h_waveout;
+        uint32_t vol = mute ? 0 : lroundf( sys->f_volume * 0x7fff.fp0 );
+
+        if( vol > 0xffff )
+            vol = 0xffff;
+
+        MMRESULT r = waveOutSetVolume( hwo, vol | ( vol << 16 ) );
+        if( r != MMSYSERR_NOERROR )
+        {
+            msg_Err( p_aout, "waveOutSetVolume failed (%u)", r );
+            return -1;
+        }
+    }
+
+    vlc_mutex_lock(&p_aout->sys->lock);
+    sys->b_mute = mute;
+    aout_MuteReport( p_aout, mute );
+    vlc_mutex_unlock(&p_aout->sys->lock);
+
+    return 0;
+}
+
+static void WaveoutPollVolume( void * aout )
+{
+    audio_output_t * p_aout = (audio_output_t *) aout;
+    uint32_t vol;
+
+    MMRESULT r = waveOutGetVolume( p_aout->sys->h_waveout, (LPDWORD) &vol );
+
+    if( r != MMSYSERR_NOERROR )
+    {
+        msg_Err( p_aout, "waveOutGetVolume failed (%u)", r );
+        return;
+    }
+
+    float volume = (float) ( vol & UINT32_C( 0xffff ) );
+    volume /= 0x7fff.fp0;
+
+    vlc_mutex_lock(&p_aout->sys->lock);
+    if( !p_aout->sys->b_mute && volume != p_aout->sys->f_volume )
+    {
+        p_aout->sys->f_volume = volume;
+
+        if( var_InheritBool( p_aout, "volume-save" ) )
+            config_PutFloat( p_aout, "waveout-volume", volume );
+
+        aout_VolumeReport( p_aout, volume );
+    }
+    vlc_mutex_unlock(&p_aout->sys->lock);
+
+    return;
 }
