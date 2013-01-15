@@ -108,6 +108,7 @@ static int  ffmpeg_ReGetFrameBuf( struct AVCodecContext *, AVFrame * );
 static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVFrame * );
 static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *,
                                           const enum PixelFormat * );
+static void vlc_va_Delete( vlc_va_t * );
 
 static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
 {
