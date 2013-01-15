@@ -1599,7 +1599,7 @@ static void Atmo_SetupParameters(filter_t *p_filter)
         if(p_sys->h_AtmoCtrl == NULL)
         {
             /*
-              be clever if the location of atmowina.exe is set
+              be clever if the location of atmowin.exe is set
               try to load the dll from the same folder :-)
             */
             char *psz_path = var_CreateGetStringCommand( p_filter,
@@ -1618,7 +1618,9 @@ static void Atmo_SetupParameters(filter_t *p_filter)
                     if( psz_dllname )
                     {
                         msg_Dbg( p_filter, "Try Loading '%s'", psz_dllname );
-                        p_sys->h_AtmoCtrl = LoadLibraryA( psz_dllname );
+                        TCHAR* ptsz_dllname = ToT(psz_dllname);
+                        p_sys->h_AtmoCtrl = LoadLibrary( ptsz_dllname );
+                        free(ptsz_dllname);
                     }
                     free( psz_dllname );
                 }
