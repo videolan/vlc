@@ -112,7 +112,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
     var_AddCallback (aout, "volume", var_Copy, parent);
     var_Create (aout, "mute", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     var_AddCallback (aout, "mute", var_Copy, parent);
-    var_Create (aout, "device", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
+    var_Create (aout, "device", VLC_VAR_STRING);
 
     aout->event.volume_report = aout_VolumeNotify;
     aout->event.mute_report = aout_MuteNotify;
