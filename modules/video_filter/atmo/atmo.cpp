@@ -1848,18 +1848,19 @@ static void Atmo_SetupParameters(filter_t *p_filter)
           COM Server for AtmoLight not running ?
           if the exe path is configured try to start the "userspace" driver
         */
-        LPTSTR psz_path = ToT(var_CreateGetStringCommand( p_filter,
-                                               CFG_PREFIX "atmowinexe" ));
+        char *psz_path = var_CreateGetStringCommand( p_filter,
+                                               CFG_PREFIX "atmowinexe" );
+        LPTSTR ptsz_path = ToT(psz_path);
         if(psz_path != NULL)
         {
             STARTUPINFO startupinfo;
             PROCESS_INFORMATION pinfo;
             memset(&startupinfo, 0, sizeof(STARTUPINFO));
             startupinfo.cb = sizeof(STARTUPINFO);
-            if(CreateProcess(psz_path, NULL, NULL, NULL,
+            if(CreateProcess(ptsz_path, NULL, NULL, NULL,
                 FALSE, 0, NULL, NULL, &startupinfo, &pinfo) == TRUE)
             {
-                msg_Dbg(p_filter,"launched AtmoWin from %s", FromT(psz_path));
+                msg_Dbg(p_filter,"launched AtmoWin from %s", psz_path);
                 WaitForInputIdle(pinfo.hProcess, 5000);
                 /*
                   retry to initialize the library COM ... functionality
@@ -1867,9 +1868,10 @@ static void Atmo_SetupParameters(filter_t *p_filter)
                 */
                 i = AtmoInitialize(p_filter, false);
             } else {
-                msg_Err(p_filter,"failed to launch AtmoWin from %s", FromT(psz_path));
+                msg_Err(p_filter,"failed to launch AtmoWin from %s", psz_path);
             }
             free(psz_path);
+            free(ptsz_path);
         }
     }
 #endif
