@@ -226,6 +226,11 @@ VLC_API ssize_t net_vaPrintf( vlc_object_t *p_this, int fd, const v_socket_t *, 
 # define AI_IDN 0 /* GNU/libc extension */
 #endif
 
+#ifdef WIN32
+# undef gai_strerror
+# define gai_strerror gai_strerrorA
+#endif
+
 #ifdef __OS2__
 # ifndef NI_NUMERICHOST
 #  define NI_NUMERICHOST 0x01
