@@ -68,62 +68,6 @@ struct aout_sys_t
     mtime_t paused; /**< Time when (last) paused */
 };
 
-static void sink_list_cb(pa_context *, const pa_sink_info *, int, void *);
-static void sink_input_info_cb(pa_context *, const pa_sink_input_info *,
-                               int, void *);
-
-/*** Context ***/
-static void context_cb(pa_context *ctx, pa_subscription_event_type_t type,
-                       uint32_t idx, void *userdata)
-{
-    audio_output_t *aout = userdata;
-    aout_sys_t *sys = aout->sys;
-    pa_operation *op;
-
-    switch (type & PA_SUBSCRIPTION_EVENT_FACILITY_MASK)
-    {
-      case PA_SUBSCRIPTION_EVENT_SINK:
-        switch (type & PA_SUBSCRIPTION_EVENT_TYPE_MASK)
-        {
-          case PA_SUBSCRIPTION_EVENT_NEW:
-          case PA_SUBSCRIPTION_EVENT_CHANGE:
-            op = pa_context_get_sink_info_by_index(ctx, idx, sink_list_cb, aout);
-            if (likely(op != NULL))
-                pa_operation_unref(op);
-            break;
-
-          case PA_SUBSCRIPTION_EVENT_REMOVE:
-            var_Change(aout, "audio-device", VLC_VAR_DELCHOICE,
-                       &(vlc_value_t){ .i_int = idx }, NULL);
-            break;
-        }
-        break;
-
-      case PA_SUBSCRIPTION_EVENT_SINK_INPUT:
-        if (sys->stream == NULL || idx != pa_stream_get_index(sys->stream))
-            break; /* only interested in our sink input */
-
-        /* Gee... PA will not provide the infos directly in the event. */
-        switch (type & PA_SUBSCRIPTION_EVENT_TYPE_MASK)
-        {
-          case PA_SUBSCRIPTION_EVENT_REMOVE:
-            msg_Err(aout, "sink input killed!");
-            break;
-
-          default:
-            op = pa_context_get_sink_input_info(ctx, idx, sink_input_info_cb,
-                                                aout);
-            if (likely(op != NULL))
-                pa_operation_unref(op);
-            break;
-        }
-        break;
-
-      default: /* unsubscribed facility?! */
-        assert(0);
-    }
-}
-
 
 /*** Sink ***/
 static void sink_list_cb(pa_context *c, const pa_sink_info *i, int eol,
@@ -151,6 +95,28 @@ static void sink_list_cb(pa_context *c, const pa_sink_info *i, int eol,
     {
         val.i_int = pa_stream_get_device_index(sys->stream);
         var_Change(aout, "audio-device", VLC_VAR_SETVALUE, &val, NULL);
+    }
+}
+
+static void sink_event(pa_context *ctx, unsigned type, uint32_t idx,
+                       audio_output_t *aout)
+{
+    pa_operation *op;
+
+    switch (type)
+    {
+        case PA_SUBSCRIPTION_EVENT_NEW:
+        case PA_SUBSCRIPTION_EVENT_CHANGE:
+            op = pa_context_get_sink_info_by_index(ctx, idx, sink_list_cb,
+                                                   aout);
+            if (likely(op != NULL))
+                pa_operation_unref(op);
+            break;
+
+        case PA_SUBSCRIPTION_EVENT_REMOVE:
+            var_Change(aout, "audio-device", VLC_VAR_DELCHOICE,
+                       &(vlc_value_t){ .i_int = idx }, NULL);
+            break;
     }
 }
 
@@ -405,6 +371,55 @@ static void sink_input_info_cb(pa_context *ctx, const pa_sink_input_info *i,
     volume = pa_sw_volume_divide(volume, sys->base_volume);
     aout_VolumeReport(aout, (float)volume / PA_VOLUME_NORM);
     aout_MuteReport(aout, i->mute);
+}
+
+static void sink_input_event(pa_context *ctx,
+                             pa_subscription_event_type_t type,
+                             uint32_t idx, audio_output_t *aout)
+{
+    pa_operation *op;
+
+    /* Gee... PA will not provide the infos directly in the event. */
+    switch (type)
+    {
+        case PA_SUBSCRIPTION_EVENT_REMOVE:
+            msg_Err(aout, "sink input killed!");
+            break;
+
+        default:
+            op = pa_context_get_sink_input_info(ctx, idx, sink_input_info_cb,
+                                                aout);
+            if (likely(op != NULL))
+                pa_operation_unref(op);
+            break;
+    }
+}
+
+
+/*** Context ***/
+static void context_cb(pa_context *ctx, pa_subscription_event_type_t type,
+                       uint32_t idx, void *userdata)
+{
+    audio_output_t *aout = userdata;
+    aout_sys_t *sys = aout->sys;
+    unsigned facility = type & PA_SUBSCRIPTION_EVENT_FACILITY_MASK;
+
+    type &= PA_SUBSCRIPTION_EVENT_TYPE_MASK;
+    switch (facility)
+    {
+        case PA_SUBSCRIPTION_EVENT_SINK:
+            sink_event(ctx, type, idx, userdata);
+            break;
+
+        case PA_SUBSCRIPTION_EVENT_SINK_INPUT:
+            /* only interested in our sink input */
+            if (sys->stream != NULL && idx == pa_stream_get_index(sys->stream))
+                sink_input_event(ctx, type, idx, userdata);
+            break;
+
+        default: /* unsubscribed facility?! */
+            assert(0);
+    }
 }
 
 
