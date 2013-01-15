@@ -484,7 +484,7 @@ static int Direct3DCreate(vout_display_t *vd)
 
     LPDIRECT3D9 (WINAPI *OurDirect3DCreate9)(UINT SDKVersion);
     OurDirect3DCreate9 =
-        (void *)GetProcAddress(sys->hd3d9_dll, TEXT("Direct3DCreate9"));
+        (void *)GetProcAddress(sys->hd3d9_dll, "Direct3DCreate9");
     if (!OurDirect3DCreate9) {
         msg_Err(vd, "Cannot locate reference to Direct3DCreate9 ABI in DLL");
         return VLC_EGENERIC;
@@ -609,9 +609,8 @@ static int Direct3DOpen(vout_display_t *vd, video_format_t *fmt)
     // If it is present, override default settings
     for (UINT Adapter=0; Adapter< IDirect3D9_GetAdapterCount(d3dobj); ++Adapter) {
         D3DADAPTER_IDENTIFIER9 Identifier;
-        HRESULT Res;
-        Res = IDirect3D9_GetAdapterIdentifier(d3dobj,Adapter,0,&Identifier);
-        if (strstr(Identifier.Description,"PerfHUD") != 0) {
+        HRESULT Res = IDirect3D9_GetAdapterIdentifier(d3dobj,Adapter,0,&Identifier);
+        if (SUCCEEDED(Res) && strstr(Identifier.Description,"PerfHUD") != 0) {
             AdapterToUse = Adapter;
             DeviceType = D3DDEVTYPE_REF;
             break;
