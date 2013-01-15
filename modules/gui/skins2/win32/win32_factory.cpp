@@ -490,7 +490,7 @@ void Win32Factory::rmDir( const string &rPath )
         FOF_SILENT,
         false,
         NULL,
-        TEXT("") };
+        L"" };
 
      SHFileOperationW(&file_op);
 }
