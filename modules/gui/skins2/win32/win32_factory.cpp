@@ -32,6 +32,7 @@
 #include <winuser.h>
 #include <wingdi.h>
 #include <tchar.h>
+#include <shellapi.h>
 
 #include "win32_factory.hpp"
 #include "win32_graphics.hpp"
@@ -478,39 +479,20 @@ void Win32Factory::changeCursor( CursorType_t type ) const
 
 void Win32Factory::rmDir( const string &rPath )
 {
-    WIN32_FIND_DATAA find;
-    string file;
-    string findFiles = rPath + "\\*";
-    HANDLE handle    = FindFirstFileA( findFiles.c_str(), &find );
+    LPWSTR dir = ToWide( rPath.c_str() );
+    SHFILEOPSTRUCTW file_op = {
+        NULL,
+        FO_DELETE,
+        dir,
+        NULL,
+        FOF_NOCONFIRMATION |
+        FOF_NOERRORUI |
+        FOF_SILENT,
+        false,
+        NULL,
+        TEXT("") };
 
-    while( handle != INVALID_HANDLE_VALUE )
-    {
-        // If file is neither "." nor ".."
-        if( strcmp( find.cFileName, "." ) && strcmp( find.cFileName, ".." ) )
-        {
-            // Set file name
-            file = rPath + "\\" + (string)find.cFileName;
-
-            // If file is a directory, delete it recursively
-            if( find.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
-            {
-                rmDir( file );
-            }
-            // Else, it is a file so simply delete it
-            else
-            {
-                DeleteFileA( file.c_str() );
-            }
-        }
-
-        // If no more file in directory, exit while
-        if( !FindNextFileA( handle, &find ) )
-            break;
-    }
-
-    // Now directory is empty so can be removed
-    FindClose( handle );
-    RemoveDirectoryA( rPath.c_str() );
+     SHFileOperationW(&file_op);
 }
 
 #endif
