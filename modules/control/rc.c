@@ -39,6 +39,7 @@
 #include <math.h>
 
 #include <vlc_interface.h>
+#include <vlc_aout.h>
 #include <vlc_vout.h>
 #include <vlc_osd.h>
 #include <vlc_playlist.h>
@@ -103,7 +104,9 @@ static int  VolumeMove   ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int  VideoConfig  ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
-static int  AudioConfig  ( vlc_object_t *, char const *,
+static int  AudioDevice  ( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
+static int  AudioChannel ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int  Menu         ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
@@ -430,8 +433,8 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
     ADD( "volume", STRING, Volume )
     ADD( "volup", STRING, VolumeMove )
     ADD( "voldown", STRING, VolumeMove )
-    ADD( "adev", STRING, AudioConfig )
-    ADD( "achan", STRING, AudioConfig )
+    ADD( "adev", STRING, AudioDevice )
+    ADD( "achan", STRING, AudioChannel )
 
     /* misc menu commands */
     ADD( "stats", BOOL, Statistics )
@@ -842,7 +845,7 @@ static void Help( intf_thread_t *p_intf, bool b_longhelp)
     msg_rc("%s", _("| volume [X] . . . . . . . . . .  set/get audio volume"));
     msg_rc("%s", _("| volup [X]  . . . . . . .  raise audio volume X steps"));
     msg_rc("%s", _("| voldown [X]  . . . . . .  lower audio volume X steps"));
-    msg_rc("%s", _("| adev [X] . . . . . . . . . . .  set/get audio device"));
+    msg_rc("%s", _("| adev [device]  . . . . . . . .  set/get audio device"));
     msg_rc("%s", _("| achan [X]. . . . . . . . . .  set/get audio channels"));
     msg_rc("%s", _("| atrack [X] . . . . . . . . . . . set/get audio track"));
     msg_rc("%s", _("| vtrack [X] . . . . . . . . . . . set/get video track"));
@@ -1688,53 +1691,74 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
     return i_error;
 }
 
-static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
-                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int AudioDevice( vlc_object_t *obj, char const *cmd,
+                        vlc_value_t old, vlc_value_t cur, void *dummy )
 {
-    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
-    intf_thread_t *p_intf = (intf_thread_t*)p_this;
-    const char * psz_variable;
-    vlc_value_t val_name;
-    int i_error;
+    intf_thread_t *p_intf = (intf_thread_t *)obj;
+    audio_output_t *p_aout = playlist_GetAout( pl_Get(p_intf) );
+    if( p_aout == NULL )
+        return VLC_ENOOBJ;
 
-    vlc_object_t *p_aout = (vlc_object_t *)playlist_GetAout( pl_Get(p_this) );
+    if( !*cur.psz_string )
+    {
+        char **ids, **names;
+        int n = aout_DevicesList( p_aout, &ids, &names );
+        if( n < 0 )
+            goto out;
+
+        char *dev = aout_DeviceGet( p_aout );
+        const char *devstr = (dev != NULL) ? dev : "";
+
+        msg_rc( "+----[ %s ]", cmd );
+        for ( int i = 0; i < n; i++ )
+        {
+            const char *fmt = "| %s - %s";
+
+            if( !strcmp(devstr, ids[i]) )
+                fmt = "| %s - %s *";
+            msg_rc( fmt, ids[i], names[i] );
+            free( names[i] );
+            free( ids[i] );
+        }
+        msg_rc( "+----[ end of %s ]", cmd );
+
+        free( dev );
+        free( names );
+        free( ids );
+    }
+    else
+        aout_DeviceSet( p_aout, cur.psz_string );
+out:
+    vlc_object_release( p_aout );
+    (void) old; (void) dummy;
+    return VLC_SUCCESS;
+}
+
+static int AudioChannel( vlc_object_t *obj, char const *cmd,
+                         vlc_value_t old, vlc_value_t cur, void *dummy )
+{
+    intf_thread_t *p_intf = (intf_thread_t*)obj;
+    vlc_object_t *p_aout = (vlc_object_t *)playlist_GetAout( pl_Get(p_intf) );
     if ( p_aout == NULL )
          return VLC_ENOOBJ;
 
-    if ( !strcmp( psz_cmd, "adev" ) )
-        psz_variable = "audio-device";
-    else
-        psz_variable = "stereo-mode";
+    int ret = VLC_SUCCESS;
 
-    /* Get the descriptive name of the variable */
-    var_Change( p_aout, psz_variable, VLC_VAR_GETTEXT,
-                &val_name, NULL );
-    if( !val_name.psz_string ) val_name.psz_string = strdup(psz_variable);
-
-    if ( !*newval.psz_string )
+    if ( !*cur.psz_string )
     {
         /* Retrieve all registered ***. */
         vlc_value_t val, text;
-        int i, i_value;
-
-        if ( var_Get( p_aout, psz_variable, &val ) < 0 )
-        {
-            vlc_object_release( p_aout );
-            free( val_name.psz_string );
-            return VLC_EGENERIC;
-        }
-        i_value = val.i_int;
-
-        if ( var_Change( p_aout, psz_variable,
+        if ( var_Change( p_aout, "stereo-mode",
                          VLC_VAR_GETLIST, &val, &text ) < 0 )
         {
-            vlc_object_release( p_aout );
-            free( val_name.psz_string );
-            return VLC_EGENERIC;
+            ret = VLC_ENOVAR;
+            goto out;
         }
 
-        msg_rc( "+----[ %s ]", val_name.psz_string );
-        for ( i = 0; i < val.p_list->i_count; i++ )
+        int i_value = var_GetInteger( p_aout, "stereo-mode" );
+
+        msg_rc( "+----[ %s ]", cmd );
+        for ( int i = 0; i < val.p_list->i_count; i++ )
         {
             if ( i_value == val.p_list->p_values[i].i_int )
                 msg_rc( "| %"PRId64" - %s *", val.p_list->p_values[i].i_int,
@@ -1744,21 +1768,14 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
                         text.p_list->p_values[i].psz_string );
         }
         var_FreeList( &val, &text );
-        msg_rc( "+----[ end of %s ]", val_name.psz_string );
-
-        i_error = VLC_SUCCESS;
+        msg_rc( "+----[ end of %s ]", cmd );
     }
     else
-    {
-        vlc_value_t val;
-        val.i_int = atoi( newval.psz_string );
-
-        i_error = var_Set( p_aout, psz_variable, val );
-    }
-    free( val_name.psz_string );
+        ret = var_SetInteger( p_aout, "stereo-mode", atoi( cur.psz_string ) );
+out:
     vlc_object_release( p_aout );
-
-    return i_error;
+    (void) old; (void) dummy;
+    return ret;
 }
 
 /* OSD menu commands */
