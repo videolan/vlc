@@ -132,7 +132,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         if( S_OK != SHGetFolderPathW( NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE,
                     NULL, SHGFP_TYPE_CURRENT, path ) )
             fprintf( stderr, "Can't open the vlc conf PATH\n" );
-        swprintf( path+wcslen( path ), L"%s", L"\\vlc\\crashdump" );
+        _snwprintf( path+wcslen( path ), MAX_PATH,  L"%s", L"\\vlc\\crashdump" );
         crashdump_path = &path[0];
 
         check_crashdump();
@@ -188,7 +188,7 @@ static void check_crashdump(void)
                 SYSTEMTIME now;
                 GetSystemTime(&now);
                 wchar_t remote_file[MAX_PATH];
-                swprintf(remote_file,
+                _snwprintf(remote_file, MAX_PATH,
                         L"/crashes-win32/%04d%02d%02d%02d%02d%02d",
                         now.wYear, now.wMonth, now.wDay, now.wHour,
                         now.wMinute, now.wSecond );
