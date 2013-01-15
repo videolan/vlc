@@ -454,8 +454,9 @@ static BOOL WINAPI DirectXOpenDDrawCallback(GUID *guid, LPTSTR desc,
         return TRUE;
 
     char *psz_drivername = FromT(drivername);
+    char *psz_desc = FromT(desc);
 
-    msg_Dbg(vd, "DirectXEnumCallback: %s, %s", FromT(desc), psz_drivername);
+    msg_Dbg(vd, "DirectXEnumCallback: %s, %s", psz_desc, psz_drivername);
 
     char *device = var_GetString(vd, "directx-device");
 
@@ -484,7 +485,7 @@ static BOOL WINAPI DirectXOpenDDrawCallback(GUID *guid, LPTSTR desc,
     free(device);
 
     if (hmon == sys->hmonitor) {
-        msg_Dbg(vd, "selecting %s, %s", FromT(desc), psz_drivername);
+        msg_Dbg(vd, "selecting %s, %s", psz_desc, psz_drivername);
 
         free(sys->display_driver);
         sys->display_driver = malloc(sizeof(*guid));
@@ -492,6 +493,8 @@ static BOOL WINAPI DirectXOpenDDrawCallback(GUID *guid, LPTSTR desc,
             *sys->display_driver = *guid;
     }
 
+    free(psz_drivername);
+    free(psz_desc);
     return TRUE;
 }
 /**
@@ -1430,14 +1433,15 @@ static BOOL WINAPI DirectXEnumCallback2(GUID *guid, LPTSTR desc,
 
     VLC_UNUSED(guid); VLC_UNUSED(desc); VLC_UNUSED(hmon);
 
+    char *psz_drivername = FromT(drivername);
     ctx->values = xrealloc(ctx->values, (ctx->count + 1) * sizeof(char *));
     ctx->descs = xrealloc(ctx->descs, (ctx->count + 1) * sizeof(char *));
 
-    /* TODO? Unicode APIs */
-    ctx->values[ctx->count] = FromT(drivername);
-    ctx->descs[ctx->count] = FromT(drivername);
+    ctx->values[ctx->count] = psz_drivername;
+    ctx->descs[ctx->count] = psz_drivername;
     ctx->count++;
 
+    free(psz_drivername);
     return TRUE; /* Keep enumerating */
 }
 
