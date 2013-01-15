@@ -29,7 +29,6 @@
 @interface VLCMinimalVoutWindow : NSWindow
 {
     NSRect initialFrame;
-    BOOL mouseDraggedShouldResize;
 }
 
 - (id)initWithContentRect:(NSRect)contentRect;
