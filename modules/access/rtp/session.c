@@ -149,7 +149,7 @@ struct rtp_source_t
 
     uint16_t last_seq; /* sequence of the next dequeued packet */
     block_t *blocks; /* re-ordered blocks queue */
-    void    *opaque[0]; /* Per-source private payload data */
+    void    *opaque[1]; /* Per-source private payload data */
 };
 
 /**

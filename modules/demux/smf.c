@@ -68,7 +68,7 @@ struct demux_sys_t
     /* by the way, "quarter note" is "noire" in French */
 
     unsigned     trackc; /* Number of tracks */
-    mtrk_t       trackv[0]; /* Track states */
+    mtrk_t       trackv[1]; /* Track states */
 };
 
 /*****************************************************************************
