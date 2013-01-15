@@ -55,6 +55,13 @@
 # warning "Unicode mode not tested"
 #endif
 
+#ifdef UNICODE
+# define DIRECTDRAWENUMERATEEX_NAME "DirectDrawEnumerateExW"
+#else
+# define DIRECTDRAWENUMERATEEX_NAME "DirectDrawEnumerateExA"
+#endif
+
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -575,7 +582,7 @@ static int DirectXOpenDDraw(vout_display_t *vd)
     /* */
     HRESULT (WINAPI *OurDirectDrawEnumerateEx)(LPDDENUMCALLBACKEX, LPVOID, DWORD);
     OurDirectDrawEnumerateEx =
-      (void *)GetProcAddress(sys->hddraw_dll, "DirectDrawEnumerateEx");
+      (void *)GetProcAddress(sys->hddraw_dll, DIRECTDRAWENUMERATEEX_NAME);
 
     if (OurDirectDrawEnumerateEx) {
         char *device = var_GetString(vd, "directx-device");
@@ -1452,7 +1459,7 @@ static int FindDevicesCallback(vlc_object_t *object, const char *name,
         /* Enumerate displays */
         HRESULT (WINAPI *OurDirectDrawEnumerateEx)(LPDDENUMCALLBACKEX,
                                                    LPVOID, DWORD) =
-              (void *)GetProcAddress(hddraw_dll, "DirectDrawEnumerateEx");
+              (void *)GetProcAddress(hddraw_dll, DIRECTDRAWENUMERATEEX_NAME);
         if (OurDirectDrawEnumerateEx != NULL)
             OurDirectDrawEnumerateEx(DirectXEnumCallback2, &ctx,
                                      DDENUM_ATTACHEDSECONDARYDEVICES);
