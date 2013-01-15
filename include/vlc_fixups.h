@@ -118,10 +118,6 @@ char *strcasestr (const char *, const char *);
 char *strdup (const char *);
 #endif
 
-#ifndef HAVE_STRNCASECMP
-int strncasecmp (const char *, const char *, size_t);
-#endif
-
 #ifndef HAVE_STRVERSCMP
 int strverscmp (const char *, const char *);
 #endif

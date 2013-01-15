@@ -242,7 +242,6 @@
 #cmakedefine HAVE_STRING_H
 #cmakedefine HAVE_STRISTR
 #cmakedefine HAVE_STRLCPY
-#cmakedefine HAVE_STRNCASECMP
 #cmakedefine HAVE_STRNDUP
 #cmakedefine HAVE_STRNICMP
 #cmakedefine HAVE_STRNLEN
