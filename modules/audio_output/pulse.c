@@ -56,6 +56,14 @@ vlc_module_end ()
  * In particular, a VLC variable callback cannot be triggered nor deleted with
  * the PulseAudio mainloop lock held, if the callback acquires the lock. */
 
+struct sink
+{
+    struct sink *next;
+    char *description;
+    uint32_t index;
+    char name[1];
+};
+
 struct aout_sys_t
 {
     pa_stream *stream; /**< PulseAudio playback stream object */
@@ -66,58 +74,92 @@ struct aout_sys_t
     pa_cvolume cvolume; /**< actual sink input volume */
     mtime_t first_pts; /**< Play time of buffer start */
     mtime_t paused; /**< Time when (last) paused */
+
+    struct sink *sinks; /**< Locally-cached list of sinks */
 };
 
 
 /*** Sink ***/
-static void sink_list_cb(pa_context *c, const pa_sink_info *i, int eol,
-                         void *userdata)
+static void sink_add_cb(pa_context *ctx, const pa_sink_info *i, int eol,
+                        void *userdata)
 {
     audio_output_t *aout = userdata;
     aout_sys_t *sys = aout->sys;
-    vlc_value_t val, text;
 
     if (eol)
         return;
-    (void) c;
+    (void) ctx;
 
     msg_Dbg(aout, "listing sink %s (%"PRIu32"): %s", i->name, i->index,
             i->description);
-    val.i_int = i->index;
-    text.psz_string = (char *)i->description;
-    /* FIXME: There is no way to replace a choice explicitly. */
-    var_Change(aout, "audio-device", VLC_VAR_DELCHOICE, &val, NULL);
-    var_Change(aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text);
-    /* FIXME: var_Change() can change the variable value if we remove the
-     * current value from the choice list, or if we add a choice while there
-     * was none. So force the correct value back. */
-    if (sys->stream != NULL)
-    {
-        val.i_int = pa_stream_get_device_index(sys->stream);
-        var_Change(aout, "audio-device", VLC_VAR_SETVALUE, &val, NULL);
-    }
+
+    size_t namelen = strlen(i->name);
+    struct sink *sink = malloc(sizeof (*sink) + namelen);
+    if (unlikely(sink == NULL))
+        return;
+
+    sink->next = sys->sinks;
+    sink->index = i->index;
+    sink->description = strdup(i->description);
+    memcpy(sink->name, i->name, namelen + 1);
+    sys->sinks = sink;
+}
+
+static void sink_mod_cb(pa_context *ctx, const pa_sink_info *i, int eol,
+                        void *userdata)
+{
+    audio_output_t *aout = userdata;
+    aout_sys_t *sys = aout->sys;
+
+    if (eol)
+        return;
+    (void) ctx;
+
+    for (struct sink *sink = sys->sinks; sink != NULL; sink = sink->next)
+        if (sink->index == i->index)
+        {
+            free(sink->description);
+            sink->description = strdup(i->description);
+        }
+}
+
+static void sink_del(uint32_t index, audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+    struct sink **pp = &sys->sinks, *sink;
+
+    while ((sink = *pp) != NULL)
+        if (sink->index == index)
+        {
+            *pp = sink->next;
+            free(sink->description);
+            free(sink);
+        }
+        else
+            pp = &sink->next;
 }
 
 static void sink_event(pa_context *ctx, unsigned type, uint32_t idx,
                        audio_output_t *aout)
 {
-    pa_operation *op;
+    pa_operation *op = NULL;
 
     switch (type)
     {
         case PA_SUBSCRIPTION_EVENT_NEW:
-        case PA_SUBSCRIPTION_EVENT_CHANGE:
-            op = pa_context_get_sink_info_by_index(ctx, idx, sink_list_cb,
+            op = pa_context_get_sink_info_by_index(ctx, idx, sink_add_cb,
                                                    aout);
-            if (likely(op != NULL))
-                pa_operation_unref(op);
             break;
-
+        case PA_SUBSCRIPTION_EVENT_CHANGE:
+            op = pa_context_get_sink_info_by_index(ctx, idx, sink_mod_cb,
+                                                   aout);
+            break;
         case PA_SUBSCRIPTION_EVENT_REMOVE:
-            var_Change(aout, "audio-device", VLC_VAR_DELCHOICE,
-                       &(vlc_value_t){ .i_int = idx }, NULL);
+            sink_del(idx, aout);
             break;
     }
+    if (op != NULL)
+        pa_operation_unref(op);
 }
 
 static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
@@ -614,6 +656,28 @@ static int MuteSet(audio_output_t *aout, bool mute)
     return 0;
 }
 
+static int SinksList(audio_output_t *aout, char ***namesp, char ***descsp)
+{
+    aout_sys_t *sys = aout->sys;
+    char **names, **descs;
+    unsigned n = 0;
+
+    pa_threaded_mainloop_lock(sys->mainloop);
+    for (struct sink *sink = sys->sinks; sink != NULL; sink = sink->next)
+        n++;
+
+    *namesp = names = xmalloc(sizeof(*names) * n);
+    *descsp = descs = xmalloc(sizeof(*descs) * n);
+
+    for (struct sink *sink = sys->sinks; sink != NULL; sink = sink->next)
+    {
+        *(names++) = strdup(sink->name);
+        *(descs++) = strdup(sink->description);
+    }
+    pa_threaded_mainloop_unlock(sys->mainloop);
+    return n;
+}
+
 static int StreamMove(audio_output_t *aout, const char *name)
 {
     aout_sys_t *sys = aout->sys;
@@ -919,6 +983,7 @@ static int Open(vlc_object_t *obj)
     }
     sys->stream = NULL;
     sys->context = ctx;
+    sys->sinks = NULL;
 
     aout->sys = sys;
     aout->start = Start;
@@ -929,16 +994,12 @@ static int Open(vlc_object_t *obj)
     aout->flush = Flush;
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
+    aout->device_enum = SinksList;
     aout->device_select = StreamMove;
 
-    /* Devices (sinks) */
-    var_Create(aout, "audio-device", VLC_VAR_INTEGER|VLC_VAR_HASCHOICE);
-    var_Change(aout, "audio-device", VLC_VAR_SETTEXT,
-               &(vlc_value_t){ .psz_string = (char *)_("Audio device") },
-               NULL);
-
     pa_threaded_mainloop_lock(sys->mainloop);
-    op = pa_context_get_sink_info_list(sys->context, sink_list_cb, aout);
+    /* Sinks (output devices) list */
+    op = pa_context_get_sink_info_list(sys->context, sink_add_cb, aout);
     if (op != NULL)
         pa_operation_unref(op);
 
@@ -965,6 +1026,11 @@ static void Close(vlc_object_t *obj)
     pa_threaded_mainloop_unlock(sys->mainloop);
     vlc_pa_disconnect(obj, ctx, sys->mainloop);
 
-    var_Destroy (aout, "audio-device");
+    for (struct sink *sink = sys->sinks, *next; sink != NULL; sink = next)
+    {
+        next = sink->next;
+        free(sink->description);
+        free(sink);
+    }
     free(sys);
 }
