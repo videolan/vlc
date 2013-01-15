@@ -612,26 +612,20 @@ static int MuteSet(audio_output_t *aout, bool mute)
     return 0;
 }
 
-static int StreamMove(vlc_object_t *obj, const char *varname, vlc_value_t old,
-                      vlc_value_t val, void *userdata)
+static int StreamMove(audio_output_t *aout, const char *name)
 {
-    audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
-    pa_stream *s = userdata;
     pa_operation *op;
-    uint32_t idx = pa_stream_get_index(s);
-    uint32_t sink_idx = val.i_int;
-
-    (void) varname; (void) old;
+    uint32_t idx = pa_stream_get_index(sys->stream);
 
     pa_threaded_mainloop_lock(sys->mainloop);
-    op = pa_context_move_sink_input_by_index(sys->context, idx, sink_idx,
-                                             NULL, NULL);
+    op = pa_context_move_sink_input_by_name(sys->context, idx, name,
+                                            NULL, NULL);
     if (likely(op != NULL)) {
         pa_operation_unref(op);
-        msg_Dbg(aout, "moving to sink %"PRIu32, sink_idx);
+        msg_Dbg(aout, "moving to sink %s", name);
     } else
-        vlc_pa_error(obj, "cannot move sink", sys->context);
+        vlc_pa_error(aout, "cannot move sink input", sys->context);
     pa_threaded_mainloop_unlock(sys->mainloop);
 
     return (op != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
@@ -863,13 +857,11 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     stream_buffer_attr_cb(s, aout);
     stream_moved_cb(s, aout);
     pa_threaded_mainloop_unlock(sys->mainloop);
-    var_AddCallback (aout, "audio-device", StreamMove, s);
 
     return VLC_SUCCESS;
 
 fail:
     pa_threaded_mainloop_unlock(sys->mainloop);
-    var_AddCallback (aout, "audio-device", StreamMove, s);
     Stop(aout);
     return VLC_EGENERIC;
 }
@@ -881,9 +873,6 @@ static void Stop(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
-
-    /* The callback takes mainloop lock, so it CANNOT be held here! */
-    var_DelCallback (aout, "audio-device", StreamMove, s);
 
     pa_threaded_mainloop_lock(sys->mainloop);
     if (unlikely(sys->trigger != NULL))
@@ -938,6 +927,7 @@ static int Open(vlc_object_t *obj)
     aout->flush = Flush;
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
+    aout->device_select = StreamMove;
 
     /* Devices (sinks) */
     var_Create(aout, "audio-device", VLC_VAR_INTEGER|VLC_VAR_HASCHOICE);
