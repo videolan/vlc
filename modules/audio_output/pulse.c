@@ -75,7 +75,9 @@ struct aout_sys_t
     mtime_t first_pts; /**< Play time of buffer start */
     mtime_t paused; /**< Time when (last) paused */
 
+    pa_stream_flags_t flags_force; /**< Forced flags (stream must be NULL) */
     char *sink_force; /**< Forced sink name (stream must be NULL) */
+
     struct sink *sinks; /**< Locally-cached list of sinks */
 };
 
@@ -640,10 +642,13 @@ static int VolumeSet(audio_output_t *aout, float vol)
 static int MuteSet(audio_output_t *aout, bool mute)
 {
     aout_sys_t *sys = aout->sys;
+
     if (sys->stream == NULL)
     {
-        msg_Err (aout, "cannot change volume while not playing");
-        return -1;
+        sys->flags_force &= ~(PA_STREAM_START_MUTED|PA_STREAM_START_UNMUTED);
+        sys->flags_force |=
+            mute ? PA_STREAM_START_MUTED : PA_STREAM_START_UNMUTED;
+        return 0;
     }
 
     pa_operation *op;
@@ -823,7 +828,8 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
 
     /* Stream parameters */
-    const pa_stream_flags_t flags = PA_STREAM_START_CORKED
+    const pa_stream_flags_t flags = sys->flags_force
+                                  | PA_STREAM_START_CORKED
                                   | PA_STREAM_INTERPOLATE_TIMING
                                   | PA_STREAM_NOT_MONOTONIC
                                   | PA_STREAM_AUTO_TIMING_UPDATE
@@ -912,6 +918,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         vlc_pa_error(aout, "stream connection failure", sys->context);
         goto fail;
     }
+    sys->flags_force = PA_STREAM_NOFLAGS;
     free(sys->sink_force);
     sys->sink_force = NULL;
 
@@ -996,6 +1003,7 @@ static int Open(vlc_object_t *obj)
     }
     sys->stream = NULL;
     sys->context = ctx;
+    sys->flags_force = PA_STREAM_NOFLAGS;
     sys->sink_force = NULL;
     sys->sinks = NULL;
 
