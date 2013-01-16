@@ -75,6 +75,7 @@ struct aout_sys_t
     mtime_t first_pts; /**< Play time of buffer start */
     mtime_t paused; /**< Time when (last) paused */
 
+    char *sink_force; /**< Forced sink name (stream must be NULL) */
     struct sink *sinks; /**< Locally-cached list of sinks */
 };
 
@@ -681,6 +682,15 @@ static int SinksList(audio_output_t *aout, char ***namesp, char ***descsp)
 static int StreamMove(audio_output_t *aout, const char *name)
 {
     aout_sys_t *sys = aout->sys;
+
+    if (sys->stream == NULL)
+    {
+        msg_Dbg(aout, "will connect to sink %s", name);
+        free(sys->sink_force);
+        sys->sink_force = strdup(name);
+        return 0;
+    }
+
     pa_operation *op;
     uint32_t idx = pa_stream_get_index(sys->stream);
 
@@ -694,7 +704,7 @@ static int StreamMove(audio_output_t *aout, const char *name)
         vlc_pa_error(aout, "cannot move sink input", sys->context);
     pa_threaded_mainloop_unlock(sys->mainloop);
 
-    return (op != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
+    return (op != NULL) ? 0 : -1;
 }
 
 static void Stop(audio_output_t *);
@@ -896,11 +906,14 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     pa_stream_set_suspended_callback(s, stream_suspended_cb, aout);
     pa_stream_set_underflow_callback(s, stream_underflow_cb, aout);
 
-    if (pa_stream_connect_playback(s, NULL, &attr, flags, NULL, NULL) < 0
+    if (pa_stream_connect_playback(s, sys->sink_force, &attr, flags, NULL,
+                                   NULL) < 0
      || stream_wait(s, sys->mainloop)) {
         vlc_pa_error(aout, "stream connection failure", sys->context);
         goto fail;
     }
+    free(sys->sink_force);
+    sys->sink_force = NULL;
 
     const struct pa_sample_spec *spec = pa_stream_get_sample_spec(s);
 #if PA_CHECK_VERSION(1,0,0)
@@ -983,6 +996,7 @@ static int Open(vlc_object_t *obj)
     }
     sys->stream = NULL;
     sys->context = ctx;
+    sys->sink_force = NULL;
     sys->sinks = NULL;
 
     aout->sys = sys;
@@ -1032,5 +1046,6 @@ static void Close(vlc_object_t *obj)
         free(sink->description);
         free(sink);
     }
+    free(sys->sink_force);
     free(sys);
 }
