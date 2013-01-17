@@ -408,22 +408,184 @@ static inline int GetValue2b(int *var, const uint8_t *p, int *skip, int left, in
     }
 }
 
+struct asf_packet_t
+{
+    int property;
+    int length;
+    int padding_length;
+    uint32_t send_time;
+    bool multiple;
+    int length_type;
+
+    /* buffer handling for this ASF packet */
+    int i_skip;
+    const uint8_t *p_peek;
+    int left;
+};
+
+static void SendPacket(demux_t *p_demux, asf_track_t *tk)
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    block_t *p_gather = block_ChainGather( tk->p_frame );
+
+    if( p_gather->i_dts > VLC_TS_INVALID )
+        tk->i_time = p_gather->i_dts - VLC_TS_0;
+
+    if( p_sys->i_time < 0 )
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_gather->i_dts );
+
+    es_out_Send( p_demux->out, tk->p_es, p_gather );
+
+    tk->p_frame = NULL;
+}
+
+static int DemuxSubPayload(demux_t *p_demux, asf_track_t *tk,
+        int i_sub_payload_data_length, mtime_t i_pts, int i_media_object_offset)
+{
+    /* FIXME I don't use i_media_object_number, sould I ? */
+    if( tk->p_frame && i_media_object_offset == 0 )
+        SendPacket(p_demux, tk);
+
+    block_t *p_frag = stream_Block( p_demux->s, i_sub_payload_data_length );
+    if( p_frag == NULL ) {
+        msg_Warn( p_demux, "cannot read data" );
+        return -1;
+    }
+
+    if( tk->p_frame == NULL ) {
+        p_frag->i_pts = VLC_TS_0 + i_pts;
+        p_frag->i_dts = VLC_TS_0 + p_frag->i_pts; //FIXME: VLC_TS_0 * 2 ?
+        if( tk->i_cat == VIDEO_ES )
+            p_frag->i_pts = VLC_TS_INVALID;
+    }
+
+    block_ChainAppend( &tk->p_frame, p_frag );
+
+    return 0;
+}
+
+static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payload)
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    if( pkt->i_skip >= pkt->left )
+        return -1;
+
+    int i_packet_keyframe = pkt->p_peek[pkt->i_skip] >> 7;
+    unsigned int i_stream_number = pkt->p_peek[pkt->i_skip++] & 0x7f;
+
+    int i_media_object_number = 0;
+    if (GetValue2b(&i_media_object_number, pkt->p_peek, &pkt->i_skip, pkt->left - pkt->i_skip, pkt->property >> 4) < 0)
+        return -1;
+    int i_media_object_offset = 0;
+    if (GetValue2b(&i_media_object_offset, pkt->p_peek, &pkt->i_skip, pkt->left - pkt->i_skip, pkt->property >> 2) < 0)
+        return -1;
+    int i_replicated_data_length = 0;
+    if (GetValue2b(&i_replicated_data_length, pkt->p_peek, &pkt->i_skip, pkt->left - pkt->i_skip, pkt->property) < 0)
+        return -1;
+
+    mtime_t i_pts;
+    if( i_replicated_data_length > 1 ) // should be at least 8 bytes
+    {
+        i_pts = (mtime_t)GetDWLE( pkt->p_peek + pkt->i_skip + 4 );
+        pkt->i_skip += i_replicated_data_length;
+
+        if( pkt->i_skip >= pkt->left )
+            return -1;
+    }
+    else if( i_replicated_data_length == 1 )
+    {
+        i_pts = (mtime_t)i_media_object_offset + (mtime_t)pkt->p_peek[pkt->i_skip] * i_payload;
+        pkt->i_skip++;
+        i_media_object_offset = 0;
+    }
+    else
+    {
+        i_pts = (mtime_t)pkt->send_time * 1000;
+    }
+
+    i_pts -= p_sys->p_fp->i_preroll;
+    if (i_pts < 0) i_pts = 0; // FIXME?
+    i_pts *= 1000; // FIXME ?
+
+    int i_payload_data_length = 0;
+    if( pkt->multiple ) {
+        if (GetValue2b(&i_payload_data_length, pkt->p_peek, &pkt->i_skip, pkt->left - pkt->i_skip, pkt->length_type) < 0)
+            return -1;
+    } else
+        i_payload_data_length = pkt->length - pkt->padding_length - pkt->i_skip;
+
+    if( i_payload_data_length < 0 || i_payload_data_length > pkt->left )
+        return -1;
+
+#ifdef ASF_DEBUG
+     msg_Dbg( p_demux,
+              "payload(%d) stream_number:%d media_object_number:%d media_object_offset:%d replicated_data_length:%d payload_data_length %d",
+              i_payload + 1, i_stream_number, i_media_object_number,
+              i_media_object_offset, i_replicated_data_length, i_payload_data_length );
+#endif
+
+    asf_track_t *tk = p_sys->track[i_stream_number];
+    if( tk == NULL )
+    {
+        msg_Warn( p_demux, "undeclared stream[Id 0x%x]", i_stream_number );
+        goto skip;
+    }
+
+    if( p_sys->i_wait_keyframe && !i_media_object_offset &&
+        (i_stream_number != p_sys->i_seek_track || !i_packet_keyframe) )
+    {
+        p_sys->i_wait_keyframe--;
+        goto skip;
+    }
+    p_sys->i_wait_keyframe = 0;
+
+    if( !tk->p_es )
+        goto skip;
+
+    while (i_payload_data_length)
+    {
+        int i_sub_payload_data_length = i_payload_data_length;
+        if( i_replicated_data_length == 1 )
+            i_sub_payload_data_length = pkt->p_peek[pkt->i_skip++];
+
+        stream_Read(p_demux->s, NULL, pkt->i_skip);
+
+        if (DemuxSubPayload(p_demux, tk, i_sub_payload_data_length, i_pts,
+                            i_media_object_offset) < 0)
+            return -1;
+
+        pkt->left -= pkt->i_skip + i_sub_payload_data_length;
+        pkt->i_skip = 0;
+        if( pkt->left > 0 && stream_Peek( p_demux->s, &pkt->p_peek, pkt->left ) < pkt->left ) {
+            msg_Warn( p_demux, "cannot peek, EOF ?" );
+            return -1;
+        }
+
+        i_payload_data_length -= i_sub_payload_data_length;
+    }
+
+    return 0;
+
+skip:
+    pkt->i_skip += i_payload_data_length;
+    return 0;
+}
+
 static int DemuxPacket( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    int         i_data_packet_min = p_sys->p_fp->i_min_data_packet_size;
-    const uint8_t *p_peek;
-    int         i_skip;
-    int         peek_size;
+    int i_data_packet_min = p_sys->p_fp->i_min_data_packet_size;
 
+    const uint8_t *p_peek;
     if( stream_Peek( p_demux->s, &p_peek,i_data_packet_min)<i_data_packet_min )
     {
         msg_Warn( p_demux, "cannot peek while getting new packet, EOF ?" );
         return 0;
     }
-    peek_size = i_data_packet_min;
-    i_skip = 0;
+    int i_skip = 0;
 
     /* *** parse error correction if present *** */
     if( p_peek[0]&0x80 )
@@ -443,254 +605,82 @@ static int DemuxPacket( demux_t *p_demux )
         i_skip += i_error_correction_data_length;
     }
     else
-    {
-        msg_Warn( p_demux, "p_peek[0]&0x80 != 0x80" );
-    }
+        msg_Warn( p_demux, "no error correction" );
 
     /* sanity check */
     if( i_skip + 2 >= i_data_packet_min )
-    {
         goto loop_error_recovery;
-    }
 
+    struct asf_packet_t pkt;
     int i_packet_flags = p_peek[i_skip]; i_skip++;
-    int i_packet_property = p_peek[i_skip]; i_skip++;
-    int b_packet_multiple_payload = i_packet_flags&0x01;
+    pkt.property = p_peek[i_skip]; i_skip++;
+    pkt.multiple = !!(i_packet_flags&0x01);
 
-    int i_packet_length = i_data_packet_min;
-    int i_packet_sequence = 0;
-    int i_packet_padding_length = 0;
+    pkt.length = i_data_packet_min;
+    pkt.padding_length = 0;
 
-    if (GetValue2b(&i_packet_length, p_peek, &i_skip, peek_size - i_skip, i_packet_flags >> 5) < 0)
+    if (GetValue2b(&pkt.length, p_peek, &i_skip, i_data_packet_min - i_skip, i_packet_flags >> 5) < 0)
         goto loop_error_recovery;
-    if (GetValue2b(&i_packet_sequence, p_peek, &i_skip, peek_size - i_skip, i_packet_flags >> 1) < 0)
+    int i_packet_sequence;
+    if (GetValue2b(&i_packet_sequence, p_peek, &i_skip, i_data_packet_min - i_skip, i_packet_flags >> 1) < 0)
         goto loop_error_recovery;
-    if (GetValue2b(&i_packet_padding_length, p_peek, &i_skip, peek_size - i_skip, i_packet_flags >> 3) < 0)
+    if (GetValue2b(&pkt.padding_length, p_peek, &i_skip, i_data_packet_min - i_skip, i_packet_flags >> 3) < 0)
         goto loop_error_recovery;
 
-    if( i_packet_padding_length > i_packet_length )
+    if( pkt.padding_length > pkt.length )
     {
-        msg_Warn( p_demux, "Too large padding: %d", i_packet_padding_length );
+        msg_Warn( p_demux, "Too large padding: %d", pkt.padding_length );
         goto loop_error_recovery;
     }
 
-    if( i_packet_length < i_data_packet_min )
+    if( pkt.length < i_data_packet_min )
     {
         /* if packet length too short, there is extra padding */
-        i_packet_padding_length += i_data_packet_min - i_packet_length;
-        i_packet_length = i_data_packet_min;
+        pkt.padding_length += i_data_packet_min - pkt.length;
+        pkt.length = i_data_packet_min;
     }
 
-    uint32_t i_packet_send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
+    pkt.send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
     /* uint16_t i_packet_duration = GetWLE( p_peek + i_skip ); */ i_skip += 2;
 
-    int i_packet_size_left = i_packet_length;
+    if( pkt.length <= 0 || stream_Peek( p_demux->s, &p_peek, pkt.length ) < pkt.length)
+    {
+        msg_Warn( p_demux, "cannot peek, EOF ?" );
+        return 0;
+    }
 
     int i_payload_count = 1;
-    int i_payload_length_type = 0x02; //unused
-    if( b_packet_multiple_payload )
+    pkt.length_type = 0x02; //unused
+    if( pkt.multiple )
     {
         i_payload_count = p_peek[i_skip] & 0x3f;
-        i_payload_length_type = ( p_peek[i_skip] >> 6 )&0x03;
+        pkt.length_type = ( p_peek[i_skip] >> 6 )&0x03;
         i_skip++;
     }
 
+#ifdef ASF_DEBUG
+    msg_Dbg(p_demux, "%d payloads", i_payload_count);
+#endif
+
+    pkt.i_skip = i_skip;
+    pkt.p_peek = p_peek;
+    pkt.left = pkt.length;
+
     for( int i_payload = 0; i_payload < i_payload_count ; i_payload++ )
-    {
-        int i_media_object_number = 0;
-        int i_media_object_offset;
-        int i_replicated_data_length = 0;
-        int i_payload_data_length = 0;
-        int i_sub_payload_data_length;
-        int i_tmp = 0;
+        if (DemuxPayload(p_demux, &pkt, i_payload) < 0)
+            return 0;
 
-        mtime_t i_pts;
-        mtime_t i_pts_delta;
-
-        if( i_skip >= i_packet_size_left )
-        {
-            /* prevent some segfault with invalid file */
-            break;
-        }
-
-        int i_packet_keyframe = p_peek[i_skip] >> 7;
-        unsigned int i_stream_number = p_peek[i_skip++] & 0x7f;
-
-        if (GetValue2b(&i_media_object_number, p_peek, &i_skip, peek_size - i_skip, i_packet_property >> 4) < 0)
-            break;
-        if (GetValue2b(&i_tmp, p_peek, &i_skip, peek_size - i_skip, i_packet_property >> 2) < 0)
-            break;
-        if (GetValue2b(&i_replicated_data_length, p_peek, &i_skip, peek_size - i_skip, i_packet_property) < 0)
-            break;
-
-        if( i_replicated_data_length > 1 ) // should be at least 8 bytes
-        {
-            i_pts = (mtime_t)GetDWLE( p_peek + i_skip + 4 ) * 1000;
-            i_skip += i_replicated_data_length;
-            i_pts_delta = 0;
-
-            i_media_object_offset = i_tmp;
-
-            if( i_skip >= i_packet_size_left )
-            {
-                break;
-            }
-        }
-        else if( i_replicated_data_length == 1 )
-        {
-            /* msg_Dbg( p_demux, "found compressed payload" ); */
-
-            i_pts = (mtime_t)i_tmp * 1000;
-            i_pts_delta = (mtime_t)p_peek[i_skip] * 1000; i_skip++;
-
-            i_media_object_offset = 0;
-        }
-        else
-        {
-            i_pts = (mtime_t)i_packet_send_time * 1000;
-            i_pts_delta = 0;
-
-            i_media_object_offset = i_tmp;
-        }
-
-        i_pts = __MAX( i_pts - p_sys->p_fp->i_preroll * 1000, 0 );
-        if( b_packet_multiple_payload )
-        {
-            i_payload_data_length = 0;
-            if (GetValue2b(&i_payload_data_length, p_peek, &i_skip, peek_size - i_skip, i_payload_length_type) < 0)
-                break;
-        }
-        else
-        {
-            i_payload_data_length = i_packet_length -
-                                    i_packet_padding_length - i_skip;
-        }
-
-        if( i_payload_data_length < 0 || i_payload_data_length > i_packet_size_left )
-        {
-            break;
-        }
-#ifdef ASF_DEBUG
-         msg_Dbg( p_demux,
-                  "payload(%d/%d) stream_number:%d media_object_number:%d media_object_offset:%d replicated_data_length:%d payload_data_length %d",
-                  i_payload + 1, i_payload_count, i_stream_number, i_media_object_number,
-                  i_media_object_offset, i_replicated_data_length, i_payload_data_length );
-#endif
-
-        asf_track_t *tk = p_sys->track[i_stream_number];
-        if( tk == NULL )
-        {
-            msg_Warn( p_demux,
-                      "undeclared stream[Id 0x%x]", i_stream_number );
-            i_skip += i_payload_data_length;
-            continue;   // over payload
-        }
-
-        if( p_sys->i_wait_keyframe &&
-            !(i_stream_number == p_sys->i_seek_track && i_packet_keyframe &&
-              !i_media_object_offset) )
-        {
-            i_skip += i_payload_data_length;
-            p_sys->i_wait_keyframe--;
-            continue;   // over payload
-        }
-        p_sys->i_wait_keyframe = 0;
-
-        if( !tk->p_es )
-        {
-            i_skip += i_payload_data_length;
-            continue;
-        }
-
-
-        for( int i_payload_data_pos = 0;
-             i_payload_data_pos < i_payload_data_length &&
-                    i_packet_size_left > 0;
-             i_payload_data_pos += i_sub_payload_data_length )
-        {
-            block_t *p_frag;
-            int i_read;
-
-            // read sub payload length
-            if( i_replicated_data_length == 1 )
-            {
-                i_sub_payload_data_length = p_peek[i_skip]; i_skip++;
-                i_payload_data_pos++;
-            }
-            else
-            {
-                i_sub_payload_data_length = i_payload_data_length;
-            }
-
-            /* FIXME I don't use i_media_object_number, sould I ? */
-            if( tk->p_frame && i_media_object_offset == 0 )
-            {
-                /* send complete packet to decoder */
-                block_t *p_gather = block_ChainGather( tk->p_frame );
-
-                if( p_gather->i_dts > VLC_TS_INVALID )
-                    tk->i_time = p_gather->i_dts - VLC_TS_0;
-
-                if( p_sys->i_time < 0 )
-                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + tk->i_time );
-
-                es_out_Send( p_demux->out, tk->p_es, p_gather );
-
-                tk->p_frame = NULL;
-            }
-
-            i_read = i_sub_payload_data_length + i_skip;
-            if( ( p_frag = stream_Block( p_demux->s, i_read ) ) == NULL )
-            {
-                msg_Warn( p_demux, "cannot read data" );
-                return 0;
-            }
-            i_packet_size_left -= i_read;
-            peek_size = 0;
-
-            p_frag->p_buffer += i_skip;
-            p_frag->i_buffer -= i_skip;
-
-            if( tk->p_frame == NULL )
-            {
-                p_frag->i_pts = VLC_TS_0 + i_pts + i_payload * (mtime_t)i_pts_delta;
-                if( tk->i_cat != VIDEO_ES )
-                    p_frag->i_dts = VLC_TS_0 + p_frag->i_pts;
-                else
-                {
-                    p_frag->i_dts = VLC_TS_0 + p_frag->i_pts;
-                    p_frag->i_pts = VLC_TS_INVALID;
-                }
-            }
-
-            block_ChainAppend( &tk->p_frame, p_frag );
-
-            i_skip = 0;
-            if( i_packet_size_left > 0 )
-            {
-                if( stream_Peek( p_demux->s, &p_peek, i_packet_size_left )
-                                                         < i_packet_size_left )
-                {
-                    msg_Warn( p_demux, "cannot peek, EOF ?" );
-                    return 0;
-                }
-                peek_size = i_packet_size_left;
-            }
-        }
-    }
-
-    if( i_packet_size_left > 0 )
+    if( pkt.left > 0 )
     {
 #ifdef ASF_DEBUG
-        if( i_packet_size_left > i_packet_padding_length )
+        if( pkt.left > pkt.padding_length )
             msg_Warn( p_demux, "Didn't read %d bytes in the packet",
-                            i_packet_size_left - i_packet_padding_length );
-        else if( i_packet_size_left < i_packet_padding_length )
+                            pkt.left - pkt.padding_length );
+        else if( pkt.left < pkt.padding_length )
             msg_Warn( p_demux, "Read %d too much bytes in the packet",
-                            i_packet_padding_length - i_packet_size_left );
+                            pkt.padding_length - pkt.left );
 #endif
-        if( stream_Read( p_demux->s, NULL, i_packet_size_left )
-                                                         < i_packet_size_left )
+        if( stream_Read( p_demux->s, NULL, pkt.left ) < pkt.left )
         {
             msg_Err( p_demux, "cannot skip data, EOF ?" );
             return 0;
