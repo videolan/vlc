@@ -383,15 +383,30 @@ static mtime_t GetMoviePTS( demux_sys_t *p_sys )
     return i_time;
 }
 
-#define GETVALUE2b( bits, var, def ) \
-    switch( (bits)&0x03 ) \
-    { \
-        case 1: var = p_peek[i_skip]; i_skip++; break; \
-        case 2: var = GetWLE( p_peek + i_skip );  i_skip+= 2; break; \
-        case 3: var = GetDWLE( p_peek + i_skip ); i_skip+= 4; break; \
-        case 0: \
-        default: var = def; break;\
+static inline int GetValue2b(int *var, const uint8_t *p, int *skip, int left, int bits)
+{
+    switch(bits&0x03)
+    {
+    case 1:
+        if (left < 1)
+            return -1;
+        *var = p[*skip]; *skip += 1;
+        return 0;
+    case 2:
+        if (left < 2)
+            return -1;
+        *var = GetWLE(&p[*skip]); *skip += 2;
+        return 0;
+    case 3:
+        if (left < 4)
+            return -1;
+        *var = GetDWLE(&p[*skip]); *skip += 4;
+        return 0;
+    case 0:
+    default:
+        return 0;
     }
+}
 
 static int DemuxPacket( demux_t *p_demux )
 {
@@ -405,15 +420,15 @@ static int DemuxPacket( demux_t *p_demux )
     int         i_packet_property;
 
     int         b_packet_multiple_payload;
-    int         i_packet_length;
-    int         i_packet_sequence;
-    int         i_packet_padding_length;
+    int         i_packet_length = i_data_packet_min;
+    int         i_packet_sequence = 0;
+    int         i_packet_padding_length = 0;
 
     uint32_t    i_packet_send_time;
-    uint16_t    i_packet_duration;
     int         i_payload;
     int         i_payload_count;
     int         i_payload_length_type;
+    int         peek_size;
 
 
     if( stream_Peek( p_demux->s, &p_peek,i_data_packet_min)<i_data_packet_min )
@@ -421,6 +436,7 @@ static int DemuxPacket( demux_t *p_demux )
         msg_Warn( p_demux, "cannot peek while getting new packet, EOF ?" );
         return 0;
     }
+    peek_size = i_data_packet_min;
     i_skip = 0;
 
     /* *** parse error correction if present *** */
@@ -461,9 +477,12 @@ static int DemuxPacket( demux_t *p_demux )
     b_packet_multiple_payload = i_packet_flags&0x01;
 
     /* read some value */
-    GETVALUE2b( i_packet_flags >> 5, i_packet_length, i_data_packet_min );
-    GETVALUE2b( i_packet_flags >> 1, i_packet_sequence, 0 );
-    GETVALUE2b( i_packet_flags >> 3, i_packet_padding_length, 0 );
+    if (GetValue2b(&i_packet_length, p_peek, &i_skip, peek_size - i_skip, i_packet_flags >> 5) < 0)
+        goto loop_error_recovery;
+    if (GetValue2b(&i_packet_sequence, p_peek, &i_skip, peek_size - i_skip, i_packet_flags >> 1) < 0)
+        goto loop_error_recovery;
+    if (GetValue2b(&i_packet_padding_length, p_peek, &i_skip, peek_size - i_skip, i_packet_flags >> 3) < 0)
+        goto loop_error_recovery;
 
     if( i_packet_padding_length > i_packet_length )
     {
@@ -479,7 +498,7 @@ static int DemuxPacket( demux_t *p_demux )
     }
 
     i_packet_send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
-    i_packet_duration  = GetWLE( p_peek + i_skip ); i_skip += 2;
+    /* uint16_t i_packet_duration = GetWLE( p_peek + i_skip ); */ i_skip += 2;
 
     i_packet_size_left = i_packet_length;
 
@@ -501,13 +520,13 @@ static int DemuxPacket( demux_t *p_demux )
 
         int i_packet_keyframe;
         unsigned int i_stream_number;
-        int i_media_object_number;
+        int i_media_object_number = 0;
         int i_media_object_offset;
-        int i_replicated_data_length;
-        int i_payload_data_length;
+        int i_replicated_data_length = 0;
+        int i_payload_data_length = 0;
         int i_payload_data_pos;
         int i_sub_payload_data_length;
-        int i_tmp;
+        int i_tmp = 0;
 
         mtime_t i_pts;
         mtime_t i_pts_delta;
@@ -521,9 +540,12 @@ static int DemuxPacket( demux_t *p_demux )
         i_packet_keyframe = p_peek[i_skip] >> 7;
         i_stream_number = p_peek[i_skip++] & 0x7f;
 
-        GETVALUE2b( i_packet_property >> 4, i_media_object_number, 0 );
-        GETVALUE2b( i_packet_property >> 2, i_tmp, 0 );
-        GETVALUE2b( i_packet_property, i_replicated_data_length, 0 );
+        if (GetValue2b(&i_media_object_number, p_peek, &i_skip, peek_size - i_skip, i_packet_property >> 4) < 0)
+            break;
+        if (GetValue2b(&i_tmp, p_peek, &i_skip, peek_size - i_skip, i_packet_property >> 2) < 0)
+            break;
+        if (GetValue2b(&i_replicated_data_length, p_peek, &i_skip, peek_size - i_skip, i_packet_property) < 0)
+            break;
 
         if( i_replicated_data_length > 1 ) // should be at least 8 bytes
         {
@@ -558,7 +580,9 @@ static int DemuxPacket( demux_t *p_demux )
         i_pts = __MAX( i_pts - p_sys->p_fp->i_preroll * 1000, 0 );
         if( b_packet_multiple_payload )
         {
-            GETVALUE2b( i_payload_length_type, i_payload_data_length, 0 );
+            i_payload_data_length = 0;
+            if (GetValue2b(&i_payload_data_length, p_peek, &i_skip, peek_size - i_skip, i_payload_length_type) < 0)
+                break;
         }
         else
         {
@@ -645,6 +669,7 @@ static int DemuxPacket( demux_t *p_demux )
                 return 0;
             }
             i_packet_size_left -= i_read;
+            peek_size = 0;
 
             p_frag->p_buffer += i_skip;
             p_frag->i_buffer -= i_skip;
@@ -672,6 +697,7 @@ static int DemuxPacket( demux_t *p_demux )
                     msg_Warn( p_demux, "cannot peek, EOF ?" );
                     return 0;
                 }
+                peek_size = i_packet_size_left;
             }
         }
     }
