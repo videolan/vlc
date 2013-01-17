@@ -143,6 +143,8 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
 
     createItems();
 
+    setRootIsDecorated( false );
+    setIndentation( 5 );
     /* Expand at least to show level 2 */
     for ( int i = 0; i < topLevelItemCount(); i++ )
         expandItem( topLevelItem( i ) );
