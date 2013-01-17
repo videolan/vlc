@@ -411,25 +411,11 @@ static inline int GetValue2b(int *var, const uint8_t *p, int *skip, int left, in
 static int DemuxPacket( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+
     int         i_data_packet_min = p_sys->p_fp->i_min_data_packet_size;
     const uint8_t *p_peek;
     int         i_skip;
-
-    int         i_packet_size_left;
-    int         i_packet_flags;
-    int         i_packet_property;
-
-    int         b_packet_multiple_payload;
-    int         i_packet_length = i_data_packet_min;
-    int         i_packet_sequence = 0;
-    int         i_packet_padding_length = 0;
-
-    uint32_t    i_packet_send_time;
-    int         i_payload;
-    int         i_payload_count;
-    int         i_payload_length_type;
     int         peek_size;
-
 
     if( stream_Peek( p_demux->s, &p_peek,i_data_packet_min)<i_data_packet_min )
     {
@@ -442,13 +428,9 @@ static int DemuxPacket( demux_t *p_demux )
     /* *** parse error correction if present *** */
     if( p_peek[0]&0x80 )
     {
-        unsigned int i_error_correction_length_type;
-        unsigned int i_error_correction_data_length;
-        unsigned int i_opaque_data_present;
-
-        i_error_correction_data_length = p_peek[0] & 0x0f;  // 4bits
-        i_opaque_data_present = ( p_peek[0] >> 4 )& 0x01;    // 1bit
-        i_error_correction_length_type = ( p_peek[0] >> 5 ) & 0x03; // 2bits
+        unsigned int i_error_correction_data_length = p_peek[0] & 0x0f;
+        unsigned int i_opaque_data_present = ( p_peek[0] >> 4 )& 0x01;
+        unsigned int i_error_correction_length_type = ( p_peek[0] >> 5 ) & 0x03;
         i_skip += 1; // skip error correction flags
 
         if( i_error_correction_length_type != 0x00 ||
@@ -471,12 +453,14 @@ static int DemuxPacket( demux_t *p_demux )
         goto loop_error_recovery;
     }
 
-    i_packet_flags = p_peek[i_skip]; i_skip++;
-    i_packet_property = p_peek[i_skip]; i_skip++;
+    int i_packet_flags = p_peek[i_skip]; i_skip++;
+    int i_packet_property = p_peek[i_skip]; i_skip++;
+    int b_packet_multiple_payload = i_packet_flags&0x01;
 
-    b_packet_multiple_payload = i_packet_flags&0x01;
+    int i_packet_length = i_data_packet_min;
+    int i_packet_sequence = 0;
+    int i_packet_padding_length = 0;
 
-    /* read some value */
     if (GetValue2b(&i_packet_length, p_peek, &i_skip, peek_size - i_skip, i_packet_flags >> 5) < 0)
         goto loop_error_recovery;
     if (GetValue2b(&i_packet_sequence, p_peek, &i_skip, peek_size - i_skip, i_packet_flags >> 1) < 0)
@@ -497,34 +481,26 @@ static int DemuxPacket( demux_t *p_demux )
         i_packet_length = i_data_packet_min;
     }
 
-    i_packet_send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
+    uint32_t i_packet_send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
     /* uint16_t i_packet_duration = GetWLE( p_peek + i_skip ); */ i_skip += 2;
 
-    i_packet_size_left = i_packet_length;
+    int i_packet_size_left = i_packet_length;
 
+    int i_payload_count = 1;
+    int i_payload_length_type = 0x02; //unused
     if( b_packet_multiple_payload )
     {
         i_payload_count = p_peek[i_skip] & 0x3f;
         i_payload_length_type = ( p_peek[i_skip] >> 6 )&0x03;
         i_skip++;
     }
-    else
-    {
-        i_payload_count = 1;
-        i_payload_length_type = 0x02; // unused
-    }
 
-    for( i_payload = 0; i_payload < i_payload_count ; i_payload++ )
+    for( int i_payload = 0; i_payload < i_payload_count ; i_payload++ )
     {
-        asf_track_t   *tk;
-
-        int i_packet_keyframe;
-        unsigned int i_stream_number;
         int i_media_object_number = 0;
         int i_media_object_offset;
         int i_replicated_data_length = 0;
         int i_payload_data_length = 0;
-        int i_payload_data_pos;
         int i_sub_payload_data_length;
         int i_tmp = 0;
 
@@ -537,8 +513,8 @@ static int DemuxPacket( demux_t *p_demux )
             break;
         }
 
-        i_packet_keyframe = p_peek[i_skip] >> 7;
-        i_stream_number = p_peek[i_skip++] & 0x7f;
+        int i_packet_keyframe = p_peek[i_skip] >> 7;
+        unsigned int i_stream_number = p_peek[i_skip++] & 0x7f;
 
         if (GetValue2b(&i_media_object_number, p_peek, &i_skip, peek_size - i_skip, i_packet_property >> 4) < 0)
             break;
@@ -601,7 +577,8 @@ static int DemuxPacket( demux_t *p_demux )
                   i_media_object_offset, i_replicated_data_length, i_payload_data_length );
 #endif
 
-        if( ( tk = p_sys->track[i_stream_number] ) == NULL )
+        asf_track_t *tk = p_sys->track[i_stream_number];
+        if( tk == NULL )
         {
             msg_Warn( p_demux,
                       "undeclared stream[Id 0x%x]", i_stream_number );
@@ -626,7 +603,7 @@ static int DemuxPacket( demux_t *p_demux )
         }
 
 
-        for( i_payload_data_pos = 0;
+        for( int i_payload_data_pos = 0;
              i_payload_data_pos < i_payload_data_length &&
                     i_packet_size_left > 0;
              i_payload_data_pos += i_sub_payload_data_length )
