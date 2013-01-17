@@ -41,6 +41,7 @@
 #include <QPainter>
 #include <QPalette>
 #include <QScrollBar>
+#include <QResource>
 #include <assert.h>
 
 #include <vlc_playlist.h>
@@ -224,29 +225,42 @@ void PLSelector::updateTotalDuration( PLSelItem* item, const char* prefix )
     item->setText( qs_timeLabel );
 }
 
+/* Helper until we get proper icons */
+static QIcon orangify( QString resource )
+{
+    QPixmap pix( resource );
+    QPainter painter( &pix );
+    painter.setCompositionMode( QPainter::CompositionMode_SourceAtop );
+    painter.fillRect( pix.rect(), QColor( 255, 157, 62, 128 ) );
+    return QIcon( pix );
+}
+
 void PLSelector::createItems()
 {
     /* PL */
     playlistItem = putPLData( addItem( PL_ITEM_TYPE, N_("Playlist"), true ),
                               THEPL->p_playing );
     playlistItem->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PL ) );
+    playlistItem->treeItem()->setData( 0, Qt::DecorationRole, orangify( ":/type/playlist" ) );
     setCurrentItem( playlistItem->treeItem() );
 
     /* ML */
     PLSelItem *ml = putPLData( addItem( PL_ITEM_TYPE, N_("Media Library"), true ),
                               THEPL->p_media_library );
     ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
+    ml->treeItem()->setData( 0, Qt::DecorationRole, orangify( ":/type/playlist" ) );
 
 #ifdef MEDIA_LIBRARY
     /* SQL ML */
-    addItem( SQL_ML_TYPE, "SQL Media Library" )->treeItem();
+    ml = addItem( SQL_ML_TYPE, "SQL Media Library" )->treeItem();
+    ml->treeItem()->setData( 0, Qt::DecorationRole, orangify( ":/type/playlist" ) );
 #endif
 
     /* SD nodes */
-    QTreeWidgetItem *mycomp = addItem( CATEGORY_TYPE, N_("My Computer") )->treeItem();
-    QTreeWidgetItem *devices = addItem( CATEGORY_TYPE, N_("Devices") )->treeItem();
-    QTreeWidgetItem *lan = addItem( CATEGORY_TYPE, N_("Local Network") )->treeItem();
-    QTreeWidgetItem *internet = addItem( CATEGORY_TYPE, N_("Internet") )->treeItem();
+    QTreeWidgetItem *mycomp = addItem( CATEGORY_TYPE, N_("My Computer"), false, true )->treeItem();
+    QTreeWidgetItem *devices = addItem( CATEGORY_TYPE, N_("Devices"), false, true )->treeItem();
+    QTreeWidgetItem *lan = addItem( CATEGORY_TYPE, N_("Local Network"), false, true )->treeItem();
+    QTreeWidgetItem *internet = addItem( CATEGORY_TYPE, N_("Internet"), false, true )->treeItem();
 
 #define NOT_SELECTABLE(w) w->setFlags( w->flags() ^ Qt::ItemIsSelectable );
     NOT_SELECTABLE( mycomp );
@@ -269,34 +283,69 @@ void PLSelector::createItems()
         //msg_Dbg( p_intf, "Adding a SD item: %s", *ppsz_longname );
 
         PLSelItem *selItem;
+        QIcon icon;
+        QString name( *ppsz_name );
         switch( *p_category )
         {
         case SD_CAT_INTERNET:
             {
-            selItem = addItem( SD_TYPE, *ppsz_longname, false, internet );
-            if( !strncmp( *ppsz_name, "podcast", 7 ) )
+            selItem = addItem( SD_TYPE, *ppsz_longname, false, false, internet );
+            if( name.startsWith( "podcast" ) )
             {
                 selItem->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PODCAST ) );
                 selItem->addAction( ADD_ACTION, qtr( "Subscribe to a podcast" ) );
                 CONNECT( selItem, action( PLSelItem* ), this, podcastAdd( PLSelItem* ) );
                 podcastsParent = selItem->treeItem();
+                icon = QIcon( ":/sidebar/podcast" );
+            }
+            else if ( name.startsWith( "lua{" ) )
+            {
+                int i_head = name.indexOf( "sd='" ) + 4;
+                int i_tail = name.indexOf( '\'', i_head );
+                name.mid( i_head, i_tail - i_head );
+                QString iconname = QString( ":/sidebar/sd/%1" ).arg( name.mid( i_head, i_tail - i_head + 1 ) );
+                QResource resource( iconname );
+                if ( !resource.isValid() )
+                    icon = orangify( ":/type/net" );
+                else
+                    icon = QIcon( iconname );
             }
             }
             break;
         case SD_CAT_DEVICES:
-            selItem = addItem( SD_TYPE, *ppsz_longname, false, devices );
+            name = name.mid( 0, name.indexOf( '{' ) );
+            selItem = addItem( SD_TYPE, *ppsz_longname, false, false, devices );
+            if ( name == "xcb_app" )
+                icon = QIcon( ":/sidebar/pictures" );
+            else if ( name == "disc" )
+                icon = orangify( ":/type/disc" );
+            else
+                icon = orangify( ":/type/capture-card" );
             break;
         case SD_CAT_LAN:
-            selItem = addItem( SD_TYPE, *ppsz_longname, false, lan );
+            selItem = addItem( SD_TYPE, *ppsz_longname, false, false, lan );
+            icon = orangify( ":/type/network" );
             break;
         case SD_CAT_MYCOMPUTER:
-            selItem = addItem( SD_TYPE, *ppsz_longname, false, mycomp );
+            name = name.mid( 0, name.indexOf( '{' ) );
+            selItem = addItem( SD_TYPE, *ppsz_longname, false, false, mycomp );
+            if ( name == "video_dir" )
+                icon = QIcon( ":/sidebar/movie" );
+            else if ( name == "audio_dir" )
+                icon = QIcon( ":/sidebar/music" );
+            else if ( name == "picture_dir" )
+                icon = QIcon( ":/sidebar/pictures" );
+            else
+                icon = orangify( ":/type/folder-grey" );
             break;
         default:
             selItem = addItem( SD_TYPE, *ppsz_longname );
         }
 
         putSDData( selItem, *ppsz_name, *ppsz_longname );
+        if ( ! icon.isNull() )
+            selItem->treeItem()->setData( 0, Qt::DecorationRole, icon );
+
         free( *ppsz_name );
         free( *ppsz_longname );
     }
@@ -382,13 +431,14 @@ void PLSelector::setSource( QTreeWidgetItem *item )
 }
 
 PLSelItem * PLSelector::addItem (
-    SelectorItemType type, const char* str, bool drop,
+    SelectorItemType type, const char* str, bool drop, bool bold,
     QTreeWidgetItem* parentItem )
 {
   QTreeWidgetItem *item = parentItem ?
       new QTreeWidgetItem( parentItem ) : new QTreeWidgetItem( this );
 
   PLSelItem *selItem = new PLSelItem( item, qtr( str ) );
+  if ( bold ) selItem->setStyleSheet( "font-weight: bold;" );
   setItemWidget( item, 0, selItem );
   item->setData( 0, TYPE_ROLE, (int)type );
   if( !drop ) item->setFlags( item->flags() & ~Qt::ItemIsDropEnabled );
@@ -401,7 +451,7 @@ PLSelItem *PLSelector::addPodcastItem( playlist_item_t *p_item )
     vlc_gc_incref( p_item->p_input );
 
     char *psz_name = input_item_GetName( p_item->p_input );
-    PLSelItem *item = addItem( PL_ITEM_TYPE,  psz_name, false, podcastsParent );
+    PLSelItem *item = addItem( PL_ITEM_TYPE,  psz_name, false, false, podcastsParent );
     free( psz_name );
 
     item->addAction( RM_ACTION, qtr( "Remove this podcast subscription" ) );

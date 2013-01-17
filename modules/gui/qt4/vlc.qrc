@@ -127,4 +127,11 @@
         <file alias="play">pixmaps/win7/win7thumbnail_play.png</file>
         <file alias="next">pixmaps/win7/win7thumbnail_next.png</file>
     </qresource>
+    <qresource prefix="/sidebar">
+        <file alias="podcast">pixmaps/playlist/sidebar-icons/sidebar-podcast.png</file>
+        <file alias="movie">pixmaps/playlist/sidebar-icons/sidebar-movie.png</file>
+        <file alias="music">pixmaps/playlist/sidebar-icons/sidebar-music.png</file>
+        <file alias="pictures">pixmaps/playlist/sidebar-icons/sidebar-pictures.png</file>
+    </qresource>
+    <qresource prefix="/sidebar/sd"/>
 </RCC>

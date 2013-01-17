@@ -134,6 +134,10 @@ DEPS_res = \
 	pixmaps/playlist/shuffle_off.png \
 	pixmaps/playlist/shuffle_on.png \
 	pixmaps/playlist/dropzone.png \
+	pixmaps/playlist/sidebar-icons/sidebar-movie.png \
+	pixmaps/playlist/sidebar-icons/sidebar-pictures.png \
+	pixmaps/playlist/sidebar-icons/sidebar-music.png \
+	pixmaps/playlist/sidebar-icons/sidebar-podcast.png \
 	pixmaps/prefs/advprefs_audio.png \
 	pixmaps/prefs/advprefs_codec.png \
 	pixmaps/prefs/advprefs_extended.png \
