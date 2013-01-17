@@ -351,7 +351,7 @@ static int OpenDemux( vlc_object_t *p_this )
     for( i_len = 0, psz_sdp = NULL; i_len < 65536; )
     {
         const int i_read_max = 1024;
-        char *psz_sdp_new = realloc( psz_sdp, i_len + i_read_max );
+        char *psz_sdp_new = realloc( psz_sdp, i_len + i_read_max + 1 );
         size_t i_read;
         if( psz_sdp_new == NULL )
         {
