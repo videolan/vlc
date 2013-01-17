@@ -419,6 +419,15 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, int loo
                                ptr, chroma_div);
             }
             (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, index, false);
+            jthrowable exception = (*env)->ExceptionOccurred(env);
+            if(exception != NULL) {
+                jclass illegalStateException = (*env)->FindClass(env, "java/lang/IllegalStateException");
+                if((*env)->IsInstanceOf(env, exception, illegalStateException)) {
+                    msg_Err(p_dec, "Codec error (IllegalStateException) in MediaCodec.releaseOutputBuffer");
+                    (*env)->ExceptionClear(env);
+                    (*env)->DeleteLocalRef(env, illegalStateException);
+                }
+            }
             (*env)->DeleteLocalRef(env, buf);
         } else if (index == INFO_OUTPUT_BUFFERS_CHANGED) {
             msg_Dbg(p_dec, "output buffers changed");
