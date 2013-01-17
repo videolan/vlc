@@ -30,7 +30,9 @@
 
 #include "libasf.h"
 
-#define ASF_DEBUG 1
+#ifndef NDEBUG
+# define ASF_DEBUG 1
+#endif
 
 /* Helpers:
  * They ensure that invalid reads will not create problems.
