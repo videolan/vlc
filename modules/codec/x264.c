@@ -122,6 +122,10 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
     " - normal: Non-strict (not Blu-ray compatible)\n"\
     )
 
+#define FULLRANGE_TEXT N_("Use fullrange instead of TV colorrange")
+#define FULLRANGE_LONGTEXT N_("TV-range is usually used colorrange, defining this to true " \
+                              "will enable libx264 to use full colorrange on encoding")
+
 #define CABAC_TEXT N_("CABAC")
 #define CABAC_LONGTEXT N_( "CABAC (Context-Adaptive Binary Arithmetic "\
     "Coding). Slightly slows down encoding and decoding, but should save " \
@@ -497,6 +501,9 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "cabac", true, CABAC_TEXT, CABAC_LONGTEXT,
               true )
 
+    add_bool( SOUT_CFG_PREFIX "fullrange", false, FULLRANGE_TEXT, FULLRANGE_LONGTEXT,
+              true )
+
     add_integer( SOUT_CFG_PREFIX "ref", 3, REF_TEXT,
                  REF_LONGTEXT, true )
         change_integer_range( 1, 16 )
@@ -756,6 +763,7 @@ static const char *const ppsz_sout_options[] = {
     "aq-mode", "aq-strength", "psy-rd", "psy", "profile", "lookahead", "slices",
     "slice-max-size", "slice-max-mbs", "intra-refresh", "mbtree", "hrd",
     "tune","preset", "opengop", "bluray-compat", "frame-packing", "options",
+    "fullrange",
     NULL
 };
 
@@ -791,6 +799,7 @@ static int  Open ( vlc_object_t *p_this )
     int i_qmin = 0, i_qmax = 0;
     x264_nal_t    *nal;
     int i, i_nal;
+    bool fullrange = false;
 
     if( p_enc->fmt_out.i_codec != VLC_CODEC_H264 &&
         !p_enc->b_force )
@@ -808,7 +817,8 @@ static int  Open ( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_enc->fmt_in.i_codec = VLC_CODEC_I420;
+    fullrange = var_GetBool( p_enc, SOUT_CFG_PREFIX "fullrange" );
+    p_enc->fmt_in.i_codec = fullrange ? VLC_CODEC_J420 : VLC_CODEC_I420;
     p_sys->i_colorspace = X264_CSP_I420;
 #if X264_BUILD >= 118
     char *psz_profile = var_GetString( p_enc, SOUT_CFG_PREFIX "profile" );
@@ -826,17 +836,17 @@ static int  Open ( vlc_object_t *p_this )
 
         if( !strcmp( psz_profile, "high10" ) )
         {
-            p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I420_10L : VLC_CODEC_I420;
+            p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I420_10L : fullrange ? VLC_CODEC_J420 : VLC_CODEC_I420;
             p_sys->i_colorspace = X264_CSP_I420 | mask;
         }
         else if( !strcmp( psz_profile, "high422" ) )
         {
-            p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I422_10L : VLC_CODEC_I422;
+            p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I422_10L : fullrange ? VLC_CODEC_J422 : VLC_CODEC_I422;
             p_sys->i_colorspace = X264_CSP_I422 | mask;
         }
         else if( !strcmp( psz_profile, "high444" ) )
         {
-            p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I444_10L : VLC_CODEC_I444;
+            p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I444_10L : fullrange ? VLC_CODEC_J444 : VLC_CODEC_I444;
             p_sys->i_colorspace = X264_CSP_I444 | mask;
         }
 #ifdef MODULE_NAME_IS_x26410b
@@ -879,6 +889,7 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->param.i_csp = p_sys->i_colorspace;
     p_sys->param.i_width  = p_enc->fmt_in.video.i_width;
     p_sys->param.i_height = p_enc->fmt_in.video.i_height;
+    p_sys->param.vui.b_fullrange = fullrange;
 
     if( fabs(var_GetFloat( p_enc, SOUT_CFG_PREFIX "qcomp" ) - 0.60) > 0.005 )
        p_sys->param.rc.f_qcompress = var_GetFloat( p_enc, SOUT_CFG_PREFIX "qcomp" );
