@@ -96,7 +96,7 @@ error:
 
     if (size > 0)
     {
-        psz = malloc (size);
+        psz = malloc (size+1);
         if (unlikely(psz == NULL))
             goto error;
         if (fread (psz, 1, size, file) != size)
@@ -104,7 +104,7 @@ error:
             free (psz);
             goto error;
         }
-        psz[size - 1] = '\0';
+        psz[size] = '\0';
     }
     *p = psz;
     return 0;
