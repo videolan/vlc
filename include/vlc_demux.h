@@ -121,7 +121,7 @@ enum demux_query_e
      * XXX: not mandatory (except for subtitle demux) but will help a lot
      * for multi-input
      */
-    DEMUX_SET_NEXT_DEMUX_TIME,  /* arg1= int64_t *      can fail */
+    DEMUX_SET_NEXT_DEMUX_TIME,  /* arg1= int64_t        can fail */
     /* FPS for correct subtitles handling */
     DEMUX_GET_FPS,              /* arg1= double *       res=can fail    */
 
