@@ -104,7 +104,7 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
                                  0,                     // Flags ; must be zero (per documentation)...
                                  &(p_sys->audioQueue)); // Output
 
-    msg_Dbg(p_aout, "New AudioQueue output created (status = %i)", status);
+    msg_Dbg(p_aout, "New AudioQueue output created (status = %li)", status);
     if (status != noErr)
         return VLC_EGENERIC;
 
@@ -116,7 +116,7 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     p_aout->sys->b_stopped = false;
 
     status = AudioQueueStart(p_sys->audioQueue, NULL);
-    msg_Dbg(p_aout, "Starting AudioQueue (status = %i)", status);
+    msg_Dbg(p_aout, "Starting AudioQueue (status = %li)", status);
 
     p_aout->time_get = TimeGet;
     p_aout->play = Play;
@@ -155,7 +155,7 @@ static void Play (audio_output_t *p_aout, block_t *p_block)
 
         status = AudioQueueAllocateBuffer(p_aout->sys->audioQueue, FRAME_SIZE * 2, &inBuffer);
         if (status != noErr) {
-            msg_Err(p_aout, "buffer alloction failed (%i)", status);
+            msg_Err(p_aout, "buffer alloction failed (%li)", status);
             return;
         }
 
@@ -165,7 +165,7 @@ static void Play (audio_output_t *p_aout, block_t *p_block)
 
         status = AudioQueueEnqueueBuffer(p_aout->sys->audioQueue, inBuffer, 0, NULL);
         if (status != noErr)
-            msg_Err(p_aout, "enqueuing buffer failed (%i)", status);
+            msg_Err(p_aout, "enqueuing buffer failed (%li)", status);
     }
 }
 
