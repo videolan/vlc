@@ -1,7 +1,7 @@
 /*****************************************************************************
  * audioqueue.c : AudioQueue audio output plugin for vlc
  *****************************************************************************
- * Copyright (C) 2010-2012 VLC authors and VideoLAN
+ * Copyright (C) 2010-2013 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Romain Goyet <romain.goyet@likid.org>
@@ -83,15 +83,14 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     // Setup the audio device.
     AudioStreamBasicDescription deviceFormat;
-    deviceFormat.mSampleRate = 44100;
+    deviceFormat.mSampleRate = fmt->i_rate;
     deviceFormat.mFormatID = kAudioFormatLinearPCM;
-    deviceFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger; // Signed integer, little endian
-    deviceFormat.mBytesPerPacket = 4;
+    deviceFormat.mFormatFlags = kAudioFormatFlagsNativeFloatPacked; // FL32
     deviceFormat.mFramesPerPacket = 1;
-    deviceFormat.mBytesPerFrame = 4;
     deviceFormat.mChannelsPerFrame = 2;
-    deviceFormat.mBitsPerChannel = 16;
-    deviceFormat.mReserved = 0;
+    deviceFormat.mBitsPerChannel = 32;
+    deviceFormat.mBytesPerFrame = deviceFormat.mBitsPerChannel * deviceFormat.mChannelsPerFrame / 8;
+    deviceFormat.mBytesPerPacket = deviceFormat.mBytesPerFrame * deviceFormat.mFramesPerPacket;
 
     // Create a new output AudioQueue for the device.
     status = AudioQueueNewOutput(&deviceFormat,         // Format
@@ -106,9 +105,8 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     if (status != noErr)
         return VLC_EGENERIC;
 
-    fmt->i_format = VLC_CODEC_S16N;
+    fmt->i_format = VLC_CODEC_FL32;
     fmt->i_physical_channels = AOUT_CHANS_STEREO;
-    fmt->i_rate = 44100;
     aout_FormatPrepare(fmt);
 
     p_aout->sys->b_stopped = false;
