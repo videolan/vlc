@@ -36,7 +36,8 @@
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
-static const char *const fps_values[] = { "24/1", "25/1", "30/1001", "30/1" };
+static const char *const fps_values[] = { "24/1", "25/1", "30000/1001", "30/1" };
+static const char *const fps_texts[] = { "24", "25", "29.97", "30" };
 
 vlc_module_begin ()
     set_shortname (N_("Time code"))
@@ -47,7 +48,7 @@ vlc_module_begin ()
     set_callbacks (Open, Close)
 
     add_string ("timecode-fps", "25/1", FPS_TEXT, FPS_TEXT, false)
-        change_string_list (fps_values, fps_values)
+        change_string_list (fps_values, fps_texts)
         change_safe ()
 vlc_module_end ()
 
