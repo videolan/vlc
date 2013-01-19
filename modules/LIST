@@ -335,7 +335,8 @@ $Id$
  * taglib: Taglib tags parser and writer
  * tdummy: dummy text renderer
  * telx: teletext subtitles decoder
- * theora: a theora video decoder/packetizer/encoder using the libtheora library
+ * theora: a theora video decoder/packetizer/encoder using the libtheora
+ * timecode: clock/timecode as a subtitle input
  * transform: filter for horizontal and vertical image flips and 90° rotations
  * tremor: a vorbis audio decoder using the libvorbisidec (aka tremor) library
  * trivial_channel_mixer: Simple channel mixer plugin

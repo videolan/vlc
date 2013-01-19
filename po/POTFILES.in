@@ -261,6 +261,7 @@ modules/access/sftp.c
 modules/access/shm.c
 modules/access/smb.c
 modules/access/tcp.c
+modules/access/timecode.c
 modules/access/udp.c
 modules/access/v4l2/controls.c
 modules/access/v4l2/v4l2.c

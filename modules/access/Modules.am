@@ -20,6 +20,10 @@ libsdp_plugin_la_SOURCES = sdp.c
 libsdp_plugin_la_CFLAGS = $(AM_CFLAGS)
 libsdp_plugin_la_LIBADD = $(AM_LIBADD)
 
+libtimecode_plugin_la_SOURCES = timecode.c
+libtimecode_plugin_la_CFLAGS = $(AM_CFLAGS)
+libtimecode_plugin_la_LIBADD = $(AM_LIBADD)
+
 libzip_plugin_la_SOURCES = zip/zip.h zip/zipstream.c zip/zipaccess.c
 libzip_plugin_la_CFLAGS = $(AM_CFLAGS) $(MINIZIP_CFLAGS)
 libzip_plugin_la_LIBADD = $(AM_LIBADD) $(MINIZIP_LIBS)
@@ -90,6 +94,7 @@ libvlc_LTLIBRARIES += \
 	libaccess_imem_plugin.la \
 	libaccess_attachment_plugin.la \
         libsdp_plugin.la \
+	libtimecode_plugin.la \
 	libaccess_rar_plugin.la \
 	libstream_filter_rar_plugin.la \
 	libaccess_vdr_plugin.la \
