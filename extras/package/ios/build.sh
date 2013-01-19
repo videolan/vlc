@@ -74,10 +74,10 @@ info "Building libvlc for iOS"
 if [ "$PLATFORM" = "Simulator" ]; then
     TARGET="i686-apple-darwin11"
     ARCH="i386"
-    OPTIM="-O3"
+    OPTIM="-O3 -g"
 else
     TARGET="arm-apple-darwin11"
-    ARCH="armv7"
+    ARCH="armv7 -g"
 fi
 
 info "Using ${ARCH} with SDK version ${SDK_VERSION}"
@@ -238,7 +238,7 @@ CONTRIB_DIR=${VLCROOT}/contrib-ios-${TARGET} \
 ${VLCROOT}/configure \
     --prefix="${PREFIX}" \
     --host="${TARGET}" \
-    --enable-debug \
+    --disable-debug \
     --enable-static \
     --disable-macosx \
     --disable-macosx-vout \
