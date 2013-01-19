@@ -193,6 +193,7 @@ static void Flush(audio_output_t *aout, bool drain)
         sys->p_buffer_chain = NULL;
         sys->pp_buffer_last = &sys->p_buffer_chain;
 
+        sys->samples = 0;
         sys->started = false;
 
         vlc_mutex_unlock(&sys->lock);
@@ -426,6 +427,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     sys->p_buffer_chain = NULL;
     sys->pp_buffer_last = &sys->p_buffer_chain;
+    sys->samples = 0;
 
     // we want 16bit signed data native endian.
     fmt->i_format              = VLC_CODEC_S16N;
