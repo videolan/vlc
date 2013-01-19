@@ -35,8 +35,6 @@
 
 #include <AudioToolBox/AudioToolBox.h>
 
-#define FRAME_SIZE 2048
-
 /*****************************************************************************
  * aout_sys_t: AudioQueue audio output method descriptor
  *****************************************************************************
@@ -153,7 +151,7 @@ static void Play (audio_output_t *p_aout, block_t *p_block)
         AudioQueueBufferRef inBuffer = NULL;
         OSStatus status;
 
-        status = AudioQueueAllocateBuffer(p_aout->sys->audioQueue, FRAME_SIZE * 2, &inBuffer);
+        status = AudioQueueAllocateBuffer(p_aout->sys->audioQueue, p_block->i_buffer, &inBuffer);
         if (status != noErr) {
             msg_Err(p_aout, "buffer alloction failed (%li)", status);
             return;
