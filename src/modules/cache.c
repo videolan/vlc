@@ -135,7 +135,12 @@ static int CacheLoadConfig (module_config_t *cfg, FILE *file)
         else /* TODO: fix config_GetPszChoices() instead of this hack: */
             LOAD_IMMEDIATE(cfg->list.psz_cb);
         for (unsigned i = 0; i < cfg->list_count; i++)
+        {
             LOAD_STRING (cfg->list.psz[i]);
+            if (cfg->list.psz[i] == NULL /* NULL -> empty string */
+             && (cfg->list.psz[i] = calloc (1, 1)) == NULL)
+                goto error;
+        }
     }
     else
     {
@@ -153,7 +158,12 @@ static int CacheLoadConfig (module_config_t *cfg, FILE *file)
     }
     cfg->list_text = xmalloc (cfg->list_count * sizeof (char *));
     for (unsigned i = 0; i < cfg->list_count; i++)
+    {
         LOAD_STRING (cfg->list_text[i]);
+        if (cfg->list_text[i] == NULL /* NULL -> empty string */
+         && (cfg->list_text[i] = calloc (1, 1)) == NULL)
+            goto error;
+    }
 
     return 0;
 error:
