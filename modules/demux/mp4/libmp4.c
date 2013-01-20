@@ -3609,6 +3609,7 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *s )
 
 error:
     free( p_root );
+    stream_Seek( p_stream, 0 );
     return NULL;
 }
 
