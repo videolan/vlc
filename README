@@ -43,7 +43,6 @@ contrib/           - external libraries retrieving facilities for systems that
 doc/               - Miscellaneous documentation.
 extras/analyser    - Code analyser and editor specific files.
 extras/buildsystem - different buildsystems specific files.
-extras/contrib/    - old contrib/.
 extras/misc        - Files that don't fit in the other extras/ categories.
 extras/package     - VLC packaging specific files such as spec files.
 include/           - Header files.
