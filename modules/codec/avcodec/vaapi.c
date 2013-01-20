@@ -41,6 +41,11 @@
 #include "va.h"
 #include "copy.h"
 
+#ifndef VA_SURFACE_ATTRIB_SETTABLE
+#define vaCreateSurfaces(d, f, w, h, s, ns, a, na) \
+    vaCreateSurfaces(d, w, h, f, ns, s)
+#endif
+
 static int Create( vlc_va_t *, int, const es_format_t * );
 static void Delete( vlc_va_t * );
 
@@ -258,8 +263,8 @@ static int CreateSurfaces( vlc_va_sys_t *p_va, void **pp_hw_ctx, vlc_fourcc_t *p
 
     /* Create surfaces */
     VASurfaceID pi_surface_id[p_va->i_surface_count];
-    if( vaCreateSurfaces( p_va->p_display, i_width, i_height, VA_RT_FORMAT_YUV420,
-                          p_va->i_surface_count, pi_surface_id ) )
+    if( vaCreateSurfaces( p_va->p_display, VA_RT_FORMAT_YUV420, i_width, i_height,
+                          pi_surface_id, p_va->i_surface_count, NULL, 0 ) )
     {
         for( int i = 0; i < p_va->i_surface_count; i++ )
             p_va->p_surface[i].i_id = VA_INVALID_SURFACE;
