@@ -1,6 +1,6 @@
 SOURCES_waveout = waveout.c windows_audio_common.h packet.c
 SOURCES_auhal = TPCircularBuffer.h TPCircularBuffer.c auhal.c packet.c
-SOURCES_audioqueue = audioqueue.c packet.c
+SOURCES_audioqueue = audioqueue.c
 
 libopensles_android_plugin_la_SOURCES = opensles_android.c
 libopensles_android_plugin_la_CFLAGS = $(AM_CFLAGS)
