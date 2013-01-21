@@ -1408,9 +1408,9 @@ static VLCMain *_o_sharedMainInstance = nil;
         int state = var_GetInteger(p_input, "state");
         if (state == PLAYING_S) {
             /* Declare user activity.
-             This wakes the display if it is off, and postpones display sleep according to the users system preferences
-             Available from 10.7.3
-             */
+               This wakes the display if it is off, and postpones display sleep according to the users system preferences
+               Available from 10.7.3 */
+#ifdef MAC_OS_X_VERSION_10_7
             if ([self activeVideoPlayback] && IOPMAssertionDeclareUserActivity)
             {
                 CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
@@ -1419,7 +1419,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                                                  &userActivityAssertionID);
                 CFRelease(reasonForActivity);
             }
-
+#endif
 
             /* prevent the system from sleeping */
             if (systemSleepAssertionID > 0) {
