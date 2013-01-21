@@ -461,6 +461,16 @@ dnl Check for fnative-struct or mms-bitfields support for mingw32
     fi
 ])
 
+AC_ARG_ENABLE(winstore_app,
+     AS_HELP_STRING([--enable-winstore-app],
+                    [Build targetted for Windows Store apps (default disabled)]))
+
+AS_IF([test "${SYS}" = "mingw32"], [
+    AS_IF([test "${enable_winstore_app}" == "yes"], [
+       AC_DEFINE(WINAPI_FAMILY_APP, 1, [Define if you want to build for Windows Store apps])])
+    ])
+
+
 dnl
 dnl Buggy glibc prevention. Purposedly not cached.
 dnl See sourceware.org bugs 5058 and 5443.
