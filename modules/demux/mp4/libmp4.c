@@ -3571,7 +3571,7 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *s )
         return p_root;
 
     p_root->i_size = stream_Size( s );
-    if( stream_Tell( s ) < stream_Size( s ) )
+    if( stream_Tell( s ) + 8 < stream_Size( s ) )
     {
         /* Get the rest of the file */
         i_result = MP4_ReadBoxContainerRaw( p_stream, p_root );
