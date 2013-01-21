@@ -10,33 +10,33 @@
  */
 
 /*
- * VideoLAN Release Signing Key (2012)
- * expirates on 2013-01-31
+ * VideoLAN Release Signing Key (2013)
+ * expirates on 2014-03-03
  */
 
 static const uint8_t videolan_public_key_longid[8] = {
-  0xA7, 0x41, 0x54, 0x9F, 0x59, 0xED, 0x29, 0x87
+  0x71, 0x80, 0x71, 0x3B, 0xE5, 0x8D, 0x1A, 0xDC
 };
 
 /* gpg --export --armor "<id>"|sed -e s/^/\"/ -e s/\$/\\\\n\"/ */
 static const uint8_t videolan_public_key[] = {
-    "-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
-    "Version: GnuPG v1.4.11 (GNU/Linux)\n"
-    "\n"
-    "mQGiBE8KGesRBACEWZkBTfHcFtG1PdGxm0FJXnrCjZPesGZwc6lkx27r6rOKmwNi\n"
-    "gQLUYwSli56ut667zVswI212djfY94hKu9ZbrzoWgr+HQ8lJz0cAJgAdPBM6Zr5E\n"
-    "ChIEo4MQc6aRI6SNAId72+w9GqSku9KN8iScB/Tz9UE58sHKTFdnc7gBFwCgkTlP\n"
-    "4biiX1rnDXUXt/4/edfbpi8D/3bk4QN6EIqoFXQcpryX3BdLsrXAH2azpwstRiOs\n"
-    "bDtK42oEE628zivZO+clQdb81+PkL7MX0vgz9EslOrmPQYOP8snhF8UoSMIQnpqx\n"
-    "GafvggPXGNb6g2eGkH5SwA7MFChKO+UcrOeTrdx5PPdzMm3keWWhhd6gTO0czTMQ\n"
-    "QU0MA/42NDxQM0BbloBOL1/Wj34vjWFImrruMAJBJjOseoraLORAXt9gKJJdVnBu\n"
-    "GpEr4zJ98I9IS52J5EpfD6eqdYQTz8hoOUl21EOueNmdItZpR2emry6flh/9EzAR\n"
-    "xeNDPfEec82WlxyDPYjfwqyhdVKtrDGz19LvkA7EX5CnoxUro7QjVmlkZW9MQU4g\n"
-    "UmVsZWFzZSBTaWduaW5nIEtleSAoMjAxMimIaAQTEQIAKAIbAwYLCQgHAwIGFQgC\n"
-    "CQoLBBYCAwECHgECF4AFAk8KHHoFCQIA2ecACgkQp0FUn1ntKYdgxwCeJYguCuOn\n"
-    "z1HXiaCDJZHpUEs+JzYAn1hKu2OLisAar7ys0Yw5mNq5e3ERiEYEEBECAAYFAk8L\n"
-    "bwAACgkQYrl/VEXBHKcZ2ACeJ41Za2kfwiAwB4y3AmqNqWZpXhQAnjUyejZlVSbE\n"
-    "GLQkOVG8RXz7GLY9\n"
-    "=+5Kj\n"
-    "-----END PGP PUBLIC KEY BLOCK-----\n"
+  "-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
+  "Version: GnuPG v2.0.19 (GNU/Linux)\n"
+  "\n"
+  "mQGiBFD9w2QRBACoEzH9KKirWE4wgiuPPynNnxks+p+t5i1z3CG+1XhagmTHoOf3\n"
+  "v8i19kKHV6WnVMn2CKJFgwTTLYXOJTrBM/4ABVtu11cHeeueeo+pCSkdoLzYJ5QF\n"
+  "HbByB6j33QUbwKF0frEs+ge4LxzvYyCDAmNAW560QtOAR9Lk1Fo5B1GXzwCg1kDk\n"
+  "RkSe7EOZNm1U2rYAQ2VPrfsEAIHr4ooOyUByPR7XpoDOKoaXEG0hjpgh46lbgse+\n"
+  "dQx8YrxS9vXQLwYokfWLrs55avx9Ys0iVv2TMv7X4Tn5sTVaK5K+NbKhxhLORxGI\n"
+  "sgKqRn7W5SG5xoO0w/dmQj756ppjITGbxjFuhYE0X5S6NeMhUuFci7sJ42R7F1Ko\n"
+  "6sYuA/wOMUxCk4XOXeQF16ApyyenjE/UWbBNEhBmjEsZkYAFNc89pAEnEFSnIxK8\n"
+  "fcuCQioM6ojjaW+aEs/q3/klI0nat9LMLhNSCebjriMHwJDU70NeCn4nPWsfItT1\n"
+  "eKvbHNcX+3bq3D/i2Wa3PZ5YFFF01C61dHmVC9YGh4sAOXO09LQjVmlkZW9MQU4g\n"
+  "UmVsZWFzZSBTaWduaW5nIEtleSAoMjAxMymIaAQTEQIAKAUCUP3DZAIbAwUJAfJX\n"
+  "AAYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQcYBxO+WNGtwQQwCg1JX6dDn5\n"
+  "gMpV4oczkpwlj5noOQwAn0HdTOxfmefXNQF1x+Gt9BXBYXrNiEYEEBECAAYFAlD9\n"
+  "xH4ACgkQp0FUn1ntKYdB+gCfS641cDBN2rOKf/+Fra/p3bXgAeAAn2sJtSdN07Dv\n"
+  "rZeDWEbkhT620YOS\n"
+  "=Npzf\n"
+  "-----END PGP PUBLIC KEY BLOCK-----\n"
 };
