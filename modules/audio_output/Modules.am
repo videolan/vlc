@@ -1,4 +1,4 @@
-SOURCES_waveout = waveout.c windows_audio_common.h packet.c
+SOURCES_waveout = waveout.c windows_audio_common.h
 SOURCES_auhal = TPCircularBuffer.h TPCircularBuffer.c auhal.c packet.c
 SOURCES_audioqueue = audioqueue.c
 
