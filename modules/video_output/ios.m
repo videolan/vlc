@@ -1,10 +1,11 @@
 /*****************************************************************************
  * ios.m: iOS X OpenGLES provider
  *****************************************************************************
- * Copyright (C) 2001-2012 VLC Authors and VideoLAN
+ * Copyright (C) 2010-2013 VLC Authors and VideoLAN
  * $Id$
  *
  * Authors: Romain Goyet <romain.goyet at likid dot org>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -250,12 +251,16 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
     switch (query)
     {
+        case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+        {
+            [sys->glView performSelectorOnMainThread:@selector(layoutSubviews) withObject:nil waitUntilDone:NO];
+            return VLC_SUCCESS;
+        }
         case VOUT_DISPLAY_CHANGE_FULLSCREEN:
         case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         case VOUT_DISPLAY_CHANGE_ZOOM:
-        case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         {
             return VLC_SUCCESS;
