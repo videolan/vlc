@@ -701,9 +701,13 @@ static void OpenglSwap (vlc_gl_t *gl)
 
 - (void)mouseDown:(NSEvent *)o_event
 {
-    if ([o_event type] == NSLeftMouseDown && !([o_event modifierFlags] &  NSControlKeyMask)) {
-        if ([o_event clickCount] <= 1)
-            vout_display_SendEventMousePressed (vd, MOUSE_BUTTON_LEFT);
+    @synchronized (self) {
+        if (vd) {
+            if ([o_event type] == NSLeftMouseDown && !([o_event modifierFlags] &  NSControlKeyMask)) {
+                if ([o_event clickCount] <= 1)
+                    vout_display_SendEventMousePressed (vd, MOUSE_BUTTON_LEFT);
+            }
+        }
     }
 
     [super mouseDown:o_event];
@@ -711,22 +715,32 @@ static void OpenglSwap (vlc_gl_t *gl)
 
 - (void)otherMouseDown:(NSEvent *)o_event
 {
-    vout_display_SendEventMousePressed (vd, MOUSE_BUTTON_CENTER);
+    @synchronized (self) {
+        if (vd)
+            vout_display_SendEventMousePressed (vd, MOUSE_BUTTON_CENTER);
+    }
 
     [super otherMouseDown: o_event];
 }
 
 - (void)mouseUp:(NSEvent *)o_event
 {
-    if ([o_event type] == NSLeftMouseUp)
-        vout_display_SendEventMouseReleased (vd, MOUSE_BUTTON_LEFT);
+    @synchronized (self) {
+        if (vd) {
+            if ([o_event type] == NSLeftMouseUp)
+                vout_display_SendEventMouseReleased (vd, MOUSE_BUTTON_LEFT);
+        }
+    }
 
     [super mouseUp: o_event];
 }
 
 - (void)otherMouseUp:(NSEvent *)o_event
 {
-    vout_display_SendEventMouseReleased (vd, MOUSE_BUTTON_CENTER);
+    @synchronized (self) {
+        if (vd)
+            vout_display_SendEventMouseReleased (vd, MOUSE_BUTTON_CENTER);
+    }
 
     [super otherMouseUp: o_event];
 }
