@@ -11,7 +11,7 @@
 
 /*
  * VideoLAN Release Signing Key (2013)
- * expirates on 2014-03-03
+ * expires on 2014-02-03
  */
 
 static const uint8_t videolan_public_key_longid[8] = {
