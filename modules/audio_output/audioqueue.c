@@ -43,9 +43,13 @@
  *****************************************************************************/
 struct aout_sys_t
 {
-    AudioQueueRef audioQueue;
-    bool          b_stopped;
-    float         f_volume;
+    AudioQueueRef           audioQueue;
+    AudioQueueTimelineRef   outTimeline;
+
+    int                     i_rate;
+    mtime_t                 i_played_length;
+    bool                    b_stopped;
+    float                   f_volume;
 };
 
 /*****************************************************************************
@@ -110,9 +114,13 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     aout_FormatPrepare(fmt);
 
     p_aout->sys->b_stopped = false;
+    p_aout->sys->i_rate = fmt->i_rate;
 
     status = AudioQueueStart(p_sys->audioQueue, NULL);
     msg_Dbg(p_aout, "Starting AudioQueue (status = %li)", status);
+
+    status = AudioQueueCreateTimeline(p_sys->audioQueue, &p_sys->outTimeline);
+    msg_Dbg(p_aout, "AudioQueue Timeline started (status = %li)", status);
 
     p_aout->time_get = TimeGet;
     p_aout->play = Play;
@@ -132,7 +140,10 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 static void Stop (audio_output_t *p_aout)
 {
     p_aout->sys->b_stopped = true;
+    p_aout->sys->i_played_length = 0;
 
+    msg_Dbg(p_aout, "Stopping AudioQueue timeline");
+    AudioQueueDisposeTimeline(p_aout->sys->audioQueue, p_aout->sys->outTimeline);
     msg_Dbg(p_aout, "Stopping AudioQueue");
     AudioQueueStop(p_aout->sys->audioQueue, true);
     msg_Dbg(p_aout, "Disposing AudioQueue");
@@ -157,6 +168,7 @@ static void Play (audio_output_t *p_aout, block_t *p_block)
 
         memcpy(inBuffer->mAudioData, p_block->p_buffer, p_block->i_buffer);
         inBuffer->mAudioDataByteSize = p_block->i_buffer;
+        p_aout->sys->i_played_length += p_block->i_length;
         block_Release(p_block);
 
         status = AudioQueueEnqueueBuffer(p_aout->sys->audioQueue, inBuffer, 0, NULL);
@@ -190,18 +202,31 @@ static void Flush (audio_output_t *p_aout, bool wait)
 
     if (wait)
         AudioQueueFlush(p_aout->sys->audioQueue);
-    else
-        AudioQueueReset(p_aout->sys->audioQueue);
+    else {
+        p_aout->sys->i_played_length = 0;
+        AudioQueueStop(p_aout->sys->audioQueue, true);
+        AudioQueueStart(p_aout->sys->audioQueue, NULL);
+    }
 }
 
 static int TimeGet (audio_output_t *p_aout, mtime_t *restrict delay)
 {
-    // TODO
+    AudioTimeStamp outTimeStamp;
+    Boolean b_discontinuity;
+    OSStatus status = AudioQueueGetCurrentTime(p_aout->sys->audioQueue, p_aout->sys->outTimeline, &outTimeStamp, &b_discontinuity);
 
-    VLC_UNUSED(p_aout);
-    VLC_UNUSED(delay);
+    if (status != noErr) {
+        msg_Warn(p_aout, "AudioQueueGetCurrentTime failed (%li)", status);
+        return -1;
+    }
 
-    return -1;
+    if (b_discontinuity)
+        msg_Dbg(p_aout, "detected output discontinuity");
+
+    mtime_t i_pos = (mtime_t) outTimeStamp.mSampleTime * CLOCK_FREQ / p_aout->sys->i_rate;
+    *delay = p_aout->sys->i_played_length - i_pos;
+
+    return 0;
 }
 
 /*****************************************************************************
