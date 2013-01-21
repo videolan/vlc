@@ -200,13 +200,16 @@ static void Flush (audio_output_t *p_aout, bool wait)
     if (p_aout->sys->b_stopped || !p_aout->sys->audioQueue)
         return;
 
+    AudioQueueDisposeTimeline(p_aout->sys->audioQueue, p_aout->sys->outTimeline);
+
     if (wait)
-        AudioQueueFlush(p_aout->sys->audioQueue);
-    else {
-        p_aout->sys->i_played_length = 0;
+        AudioQueueStop(p_aout->sys->audioQueue, false);
+    else
         AudioQueueStop(p_aout->sys->audioQueue, true);
-        AudioQueueStart(p_aout->sys->audioQueue, NULL);
-    }
+
+    p_aout->sys->i_played_length = 0;
+    AudioQueueStart(p_aout->sys->audioQueue, NULL);
+    AudioQueueCreateTimeline(p_aout->sys->audioQueue, &p_aout->sys->outTimeline);
 }
 
 static int TimeGet (audio_output_t *p_aout, mtime_t *restrict delay)
@@ -215,10 +218,8 @@ static int TimeGet (audio_output_t *p_aout, mtime_t *restrict delay)
     Boolean b_discontinuity;
     OSStatus status = AudioQueueGetCurrentTime(p_aout->sys->audioQueue, p_aout->sys->outTimeline, &outTimeStamp, &b_discontinuity);
 
-    if (status != noErr) {
-        msg_Warn(p_aout, "AudioQueueGetCurrentTime failed (%li)", status);
+    if (status != noErr)
         return -1;
-    }
 
     if (b_discontinuity)
         msg_Dbg(p_aout, "detected output discontinuity");
