@@ -578,26 +578,26 @@ frame.origin.x = f_width + frame.origin.x; \
 
     NSRect frame;
     frame = [o_bwd_btn frame];
-    frame.size.width++;
+    frame.size.width--;
     [o_bwd_btn setFrame:frame];
     frame = [o_fwd_btn frame];
-    frame.size.width++;
+    frame.size.width--;
     [o_fwd_btn setFrame:frame];
 
-    float f_space = 29.;
 #define moveItem(item) \
 frame = [item frame]; \
 frame.origin.x = frame.origin.x + f_space; \
 if (b_fast) \
-[item setFrame: frame]; \
+    [item setFrame: frame]; \
 else \
-[[item animator] setFrame: frame]
-
+    [[item animator] setFrame: frame]
+    
+    float f_space = 29.;
     moveItem(o_bwd_btn);
-    moveItem(o_play_btn);
     f_space = 28.;
+    moveItem(o_play_btn);
     moveItem(o_fwd_btn);
-    f_space = 57.;
+    f_space = 28. * 2;
     moveItem(o_stop_btn);
     moveItem(o_playlist_btn);
     moveItem(o_repeat_btn);
@@ -624,7 +624,7 @@ else \
         [[o_bwd_btn animator] setAlternateImage:[NSImage imageNamed:@"backward-6btns-pressed"]];
     }
 
-    preliminaryFrame.origin.x = [o_next_btn frame].origin.x + 82. + [o_fwd_btn frame].size.width;
+    preliminaryFrame.origin.x = [o_prev_btn frame].origin.x + [o_prev_btn frame].size.width + [o_bwd_btn frame].size.width + [o_play_btn frame].size.width + [o_fwd_btn frame].size.width;
     [o_next_btn setFrame: preliminaryFrame];
 
     // wait until the animation is done, if displayed
@@ -655,7 +655,9 @@ else \
     [o_prev_btn removeFromSuperviewWithoutNeedingDisplay];
     [o_next_btn removeFromSuperviewWithoutNeedingDisplay];
     [o_prev_btn release];
+    o_prev_btn = NULL;
     [o_next_btn release];
+    o_next_btn = NULL;
 
     /* change the accessibility help for the backward/forward buttons accordingly */
     [[o_bwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item. Hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
@@ -663,26 +665,26 @@ else \
 
     NSRect frame;
     frame = [o_bwd_btn frame];
-    frame.size.width--;
+    frame.size.width++;
     [o_bwd_btn setFrame:frame];
     frame = [o_fwd_btn frame];
-    frame.size.width--;
+    frame.size.width++;
     [o_fwd_btn setFrame:frame];
 
-    float f_space = 29.;
 #define moveItem(item) \
 frame = [item frame]; \
 frame.origin.x = frame.origin.x - f_space; \
 if (b_fast) \
-[item setFrame: frame]; \
+    [item setFrame: frame]; \
 else \
-[[item animator] setFrame: frame]
+    [[item animator] setFrame: frame]
 
+    float f_space = 29.;
     moveItem(o_bwd_btn);
-    moveItem(o_play_btn);
     f_space = 28.;
+    moveItem(o_play_btn);
     moveItem(o_fwd_btn);
-    f_space = 57.;
+    f_space = 28. * 2;
     moveItem(o_stop_btn);
     moveItem(o_playlist_btn);
     moveItem(o_repeat_btn);
@@ -804,6 +806,16 @@ else \
     [[VLCCoreInteraction sharedInstance] next];
 }
 
+// alternative actions for forward / backward buttons when next / prev are activated
+- (IBAction)forward:(id)sender
+{
+    [[VLCCoreInteraction sharedInstance] forwardExtraShort];
+}
+
+- (IBAction)backward:(id)sender
+{
+    [[VLCCoreInteraction sharedInstance] backwardExtraShort];
+}
 
 - (void)setRepeatOne
 {
