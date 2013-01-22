@@ -723,7 +723,7 @@ static void SelectClockSource (vlc_object_t *obj)
         return;
     }
 
-    const char *name = "perf";
+    const char *name = "multimedia";
     char *str = var_InheritString (obj, "clock-source");
     if (str != NULL)
         name = str;
