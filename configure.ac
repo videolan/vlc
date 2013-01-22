@@ -3673,7 +3673,7 @@ AC_ARG_ENABLE(macosx,
   [  --enable-macosx         Mac OS X gui support (default enabled on Mac OS X)])
 if test "x${enable_macosx}" != "xno" -a "${SYS}" = "darwin"
 then
-  VLC_ADD_LIBS([macosx], [-Wl,-framework,Cocoa -Wl,-framework,OpenGL -Wl,-framework,Carbon -Wl,-framework,CoreServices -Wl,-framework,AGL])
+  VLC_ADD_LIBS([macosx], [-Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,CoreServices])
   VLC_ADD_OBJCFLAGS([macosx], [-fobjc-exceptions] )
   VLC_ADD_PLUGIN([macosx])
 
