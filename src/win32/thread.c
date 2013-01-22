@@ -909,12 +909,11 @@ unsigned vlc_timer_getoverrun (vlc_timer_t timer)
 /*** CPU ***/
 unsigned vlc_GetCPUCount (void)
 {
-    DWORD_PTR process;
-    DWORD_PTR system;
+    SYSTEM_INFO systemInfo;
 
-    if (GetProcessAffinityMask (GetCurrentProcess(), &process, &system))
-        return popcount (system);
-     return 1;
+    GetNativeSystemInfo(&systemInfo);
+
+    return systemInfo.dwNumberOfProcessors;
 }
 
 
