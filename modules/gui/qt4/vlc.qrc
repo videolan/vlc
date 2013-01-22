@@ -128,10 +128,21 @@
         <file alias="next">pixmaps/win7/win7thumbnail_next.png</file>
     </qresource>
     <qresource prefix="/sidebar">
-        <file alias="podcast">pixmaps/playlist/sidebar-icons/sidebar-podcast.png</file>
-        <file alias="movie">pixmaps/playlist/sidebar-icons/sidebar-movie.png</file>
-        <file alias="music">pixmaps/playlist/sidebar-icons/sidebar-music.png</file>
-        <file alias="pictures">pixmaps/playlist/sidebar-icons/sidebar-pictures.png</file>
+        <file alias="disc">pixmaps/playlist/sidebar-icons/disc.png</file>
+        <file alias="playlist">pixmaps/playlist/sidebar-icons/playlist.png</file>
+        <file alias="mtp">pixmaps/playlist/sidebar-icons/mtp.png</file>
+        <file alias="network">pixmaps/playlist/sidebar-icons/network.png</file>
+        <file alias="movie">pixmaps/playlist/sidebar-icons/movie.png</file>
+        <file alias="podcast">pixmaps/playlist/sidebar-icons/podcast.png</file>
+        <file alias="music">pixmaps/playlist/sidebar-icons/music.png</file>
+        <file alias="pictures">pixmaps/playlist/sidebar-icons/pictures.png</file>
+        <file alias="screen">pixmaps/playlist/sidebar-icons/screen.png</file>
+        <file alias="library">pixmaps/playlist/sidebar-icons/library.png</file>
+        <file alias="capture">pixmaps/playlist/sidebar-icons/capture.png</file>
+        <file alias="lan">pixmaps/playlist/sidebar-icons/lan.png</file>
     </qresource>
-    <qresource prefix="/sidebar/sd"/>
+    <qresource prefix="/sidebar/sd">
+        <file alias="icecast">pixmaps/playlist/sidebar-icons/sd/icecast.png</file>
+        <file alias="appletrailers">pixmaps/playlist/sidebar-icons/sd/appletrailers.png</file>
+    </qresource>
 </RCC>

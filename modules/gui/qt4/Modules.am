@@ -134,10 +134,20 @@ DEPS_res = \
 	pixmaps/playlist/shuffle_off.png \
 	pixmaps/playlist/shuffle_on.png \
 	pixmaps/playlist/dropzone.png \
-	pixmaps/playlist/sidebar-icons/sidebar-movie.png \
-	pixmaps/playlist/sidebar-icons/sidebar-pictures.png \
-	pixmaps/playlist/sidebar-icons/sidebar-music.png \
-	pixmaps/playlist/sidebar-icons/sidebar-podcast.png \
+	pixmaps/playlist/sidebar-icons/capture.png \
+	pixmaps/playlist/sidebar-icons/pictures.png \
+	pixmaps/playlist/sidebar-icons/disc.png \
+	pixmaps/playlist/sidebar-icons/playlist.png \
+	pixmaps/playlist/sidebar-icons/lan.png \
+	pixmaps/playlist/sidebar-icons/podcast.png \
+	pixmaps/playlist/sidebar-icons/library.png \
+	pixmaps/playlist/sidebar-icons/screen.png \
+	pixmaps/playlist/sidebar-icons/movie.png \
+	pixmaps/playlist/sidebar-icons/mtp.png \
+	pixmaps/playlist/sidebar-icons/music.png \
+	pixmaps/playlist/sidebar-icons/network.png \
+	pixmaps/playlist/sidebar-icons/sd/appletrailers.png \
+	pixmaps/playlist/sidebar-icons/sd/icecast.png \
 	pixmaps/prefs/advprefs_audio.png \
 	pixmaps/prefs/advprefs_codec.png \
 	pixmaps/prefs/advprefs_extended.png \

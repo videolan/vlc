@@ -225,35 +225,25 @@ void PLSelector::updateTotalDuration( PLSelItem* item, const char* prefix )
     item->setText( qs_timeLabel );
 }
 
-/* Helper until we get proper icons */
-static QIcon orangify( QString resource )
-{
-    QPixmap pix( resource );
-    QPainter painter( &pix );
-    painter.setCompositionMode( QPainter::CompositionMode_SourceAtop );
-    painter.fillRect( pix.rect(), QColor( 255, 157, 62, 128 ) );
-    return QIcon( pix );
-}
-
 void PLSelector::createItems()
 {
     /* PL */
     playlistItem = putPLData( addItem( PL_ITEM_TYPE, N_("Playlist"), true ),
                               THEPL->p_playing );
     playlistItem->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PL ) );
-    playlistItem->treeItem()->setData( 0, Qt::DecorationRole, orangify( ":/type/playlist" ) );
+    playlistItem->treeItem()->setData( 0, Qt::DecorationRole, QIcon( ":/sidebar/playlist" ) );
     setCurrentItem( playlistItem->treeItem() );
 
     /* ML */
     PLSelItem *ml = putPLData( addItem( PL_ITEM_TYPE, N_("Media Library"), true ),
                               THEPL->p_media_library );
     ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
-    ml->treeItem()->setData( 0, Qt::DecorationRole, orangify( ":/type/playlist" ) );
+    ml->treeItem()->setData( 0, Qt::DecorationRole, QIcon( ":/sidebar/library" ) );
 
 #ifdef MEDIA_LIBRARY
     /* SQL ML */
     ml = addItem( SQL_ML_TYPE, "SQL Media Library" )->treeItem();
-    ml->treeItem()->setData( 0, Qt::DecorationRole, orangify( ":/type/playlist" ) );
+    ml->treeItem()->setData( 0, Qt::DecorationRole, QIcon( ":/sidebar/library" ) );
 #endif
 
     /* SD nodes */
@@ -303,10 +293,10 @@ void PLSelector::createItems()
                 int i_head = name.indexOf( "sd='" ) + 4;
                 int i_tail = name.indexOf( '\'', i_head );
                 name.mid( i_head, i_tail - i_head );
-                QString iconname = QString( ":/sidebar/sd/%1" ).arg( name.mid( i_head, i_tail - i_head + 1 ) );
+                QString iconname = QString( ":/sidebar/sd/%1" ).arg( name.mid( i_head, i_tail - i_head ) );
                 QResource resource( iconname );
                 if ( !resource.isValid() )
-                    icon = orangify( ":/type/net" );
+                    icon = QIcon( ":/sidebar/network" );
                 else
                     icon = QIcon( iconname );
             }
@@ -315,16 +305,18 @@ void PLSelector::createItems()
         case SD_CAT_DEVICES:
             name = name.mid( 0, name.indexOf( '{' ) );
             selItem = addItem( SD_TYPE, *ppsz_longname, false, false, devices );
-            if ( name == "xcb_app" )
-                icon = QIcon( ":/sidebar/pictures" );
+            if ( name == "xcb_apps" )
+                icon = QIcon( ":/sidebar/screen" );
+            else if ( name == "mtp" )
+                icon = QIcon( ":/sidebar/mtp" );
             else if ( name == "disc" )
-                icon = orangify( ":/type/disc" );
+                icon = QIcon( ":/sidebar/disc" );
             else
-                icon = orangify( ":/type/capture-card" );
+                icon = QIcon( ":/sidebar/capture" );
             break;
         case SD_CAT_LAN:
             selItem = addItem( SD_TYPE, *ppsz_longname, false, false, lan );
-            icon = orangify( ":/type/network" );
+            icon = QIcon( ":/sidebar/lan" );
             break;
         case SD_CAT_MYCOMPUTER:
             name = name.mid( 0, name.indexOf( '{' ) );
@@ -336,7 +328,7 @@ void PLSelector::createItems()
             else if ( name == "picture_dir" )
                 icon = QIcon( ":/sidebar/pictures" );
             else
-                icon = orangify( ":/type/folder-grey" );
+                icon = QIcon( ":/sidebar/movie" );
             break;
         default:
             selItem = addItem( SD_TYPE, *ppsz_longname );
