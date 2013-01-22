@@ -1,7 +1,7 @@
 /*****************************************************************************
  * auhal.c: AUHAL and Coreaudio output plugin
  *****************************************************************************
- * Copyright (C) 2005 - 2012 VLC authors and VideoLAN
+ * Copyright (C) 2005 - 2013 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
@@ -32,12 +32,12 @@
 
 #import <vlc_common.h>
 #import <vlc_plugin.h>
-#import <vlc_dialog.h>                   // dialog_Fatal
-#import <vlc_aout.h>                     // aout_*
+#import <vlc_dialog.h>                      // dialog_Fatal
+#import <vlc_aout.h>                        // aout_*
 
-#import <AudioUnit/AudioUnit.h>          // AudioUnit
-#import <CoreAudio/CoreAudio.h>      // AudioDeviceID
-#import <AudioToolbox/AudioFormat.h>     // AudioFormatGetProperty
+#import <AudioUnit/AudioUnit.h>             // AudioUnit
+#import <CoreAudio/CoreAudio.h>             // AudioDeviceID
+#import <AudioToolbox/AudioFormat.h>        // AudioFormatGetProperty
 #import <CoreServices/CoreServices.h>
 
 #import "TPCircularBuffer.h"
@@ -95,8 +95,9 @@ struct aout_sys_t
     int                         i_stream_index;     /* The index of i_stream_id in an AudioBufferList */
     AudioStreamBasicDescription stream_format;      /* The format we changed the stream to */
     AudioStreamBasicDescription sfmt_revert;        /* The original format of the stream */
-    bool                        b_revert;           /* Wether we need to revert the stream format */
-    bool                        b_changed_mixing;   /* Wether we need to set the mixing mode back */
+    bool                        b_revert;           /* Whether we need to revert the stream format */
+    bool                        b_changed_mixing;   /* Whether we need to set the mixing mode back */
+    bool                        b_got_first_sample; /* did the aout core provide something to render? */
 };
 
 /*****************************************************************************
@@ -582,8 +583,7 @@ static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
         AudioConvertHostTimeToNanos(AudioGetCurrentHostTime()) / 1000;
     p_sys->clock_diff += mdate();
 
-    /* Start the AU */
-    verify_noerr(AudioOutputUnitStart(p_sys->au_unit));
+    p_sys->b_got_first_sample = false;
 
     /* Set volume for output unit */
     float volume = var_InheritInteger(p_aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT;
@@ -1215,6 +1215,12 @@ static void PlayAnalog (audio_output_t * p_aout, block_t * p_block)
     struct aout_sys_t *p_sys = p_aout->sys;
 
     if (p_block->i_nb_samples > 0) {
+        if (!p_sys->b_got_first_sample) {
+            /* Start the AU */
+            verify_noerr(AudioOutputUnitStart(p_sys->au_unit));
+            p_sys->b_got_first_sample = true;
+        }
+
         /* Do the channel reordering */
         if (p_sys->chans_to_reorder) {
            aout_ChannelReorder(p_block->p_buffer,
@@ -1254,7 +1260,9 @@ static void FlushAnalog(audio_output_t *p_aout, bool wait)
 {
     VLC_UNUSED(wait);
     /* flush circular buffer */
+    AudioOutputUnitStop(p_aout->sys->au_unit);
     TPCircularBufferClear(&p_aout->sys->circular_buffer);
+    p_aout->sys->b_got_first_sample = false;
 }
 
 static int TimeGet(audio_output_t *p_aout, mtime_t *delay)
