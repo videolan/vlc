@@ -97,6 +97,7 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
         }
     }
 
+#if !defined(WINAPI_FAMILY_APP)
     if( var_InheritBool( p_this, "one-instance" )
      || ( var_InheritBool( p_this, "one-instance-when-started-from-file" )
        && var_InheritBool( p_this, "started-from-file" ) ) )
@@ -206,8 +207,10 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
             exit( 0 );
         }
     }
+#endif
 }
 
+#if !defined(WINAPI_FAMILY_APP)
 static unsigned __stdcall IPCHelperThread( void *data )
 {
     vlc_object_t *p_this = data;
@@ -313,12 +316,14 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
 
     return DefWindowProc( hwnd, uMsg, wParam, lParam );
 }
+#endif
 
 /**
  * Cleans up after system_Init() and system_Configure().
  */
 void system_End(void)
 {
+#if !defined(WINAPI_FAMILY_APP)
     HWND ipcwindow;
 
     /* FIXME: thread-safety... */
@@ -331,6 +336,7 @@ void system_End(void)
         vlc_object_release (p_helper);
         p_helper = NULL;
     }
+#endif
 
     timeEndPeriod(5);
 
