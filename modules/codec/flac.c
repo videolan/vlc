@@ -80,8 +80,8 @@ static const int pi_channels_maps[9] =
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT
-     | AOUT_CHAN_MIDDLERIGHT,
+     | AOUT_CHAN_REARCENTER | AOUT_CHAN_MIDDLELEFT| AOUT_CHAN_MIDDLERIGHT
+     | AOUT_CHAN_LFE,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT
      | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT
      | AOUT_CHAN_LFE
@@ -147,16 +147,15 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
 {
     /* XXX it supposes our internal format is WG4 */
     static const unsigned char ppi_reorder[1+8][8] = {
-        {-1},
+        { },
         { 0, },
         { 0, 1 },
         { 0, 1, 2 },
         { 0, 1, 2, 3 },
         { 0, 1, 3, 4, 2 },
         { 0, 1, 4, 5, 2, 3 },
-
-        { 0, 1, 6, 4, 5, 2, 3 },    /* 7.0 Unspecified by flac, but following SMPTE */
-        { 0, 1, 6, 7, 4, 5, 2, 3 }, /* 7.1 Unspecified by flac, but following SMPTE */
+        { 0, 1, 5, 6, 4, 2, 3 },
+        { 0, 1, 6, 7, 4, 5, 2, 3 },
     };
 
     VLC_UNUSED(decoder);
