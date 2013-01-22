@@ -423,7 +423,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 
     while( p_buffer )
     {
-        if ( p_sys->i_handle >= 0 && ( p_sys->b_splitanywhere || ( p_buffer->i_flags & BLOCK_FLAG_TYPE_I ) ) && ( p_buffer->i_dts-p_sys->i_opendts ) > p_sys->i_seglenm )
+        if ( p_sys->i_handle >= 0 && ( p_sys->b_splitanywhere || ( p_buffer->i_flags & BLOCK_FLAG_HEADER ) ) && ( p_buffer->i_dts-p_sys->i_opendts ) > p_sys->i_seglenm )
         {
             closeCurrentSegment( p_access, p_sys, false );
         }
