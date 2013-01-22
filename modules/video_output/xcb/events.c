@@ -85,8 +85,8 @@ static xcb_connection_t *Connect (vlc_object_t *obj, const char *display)
 /**
  * (Try to) register to mouse events on a window if needed.
  */
-void RegisterMouseEvents (vlc_object_t *obj, xcb_connection_t *conn,
-                          xcb_window_t wnd)
+static void RegisterEvents (vlc_object_t *obj, xcb_connection_t *conn,
+                            xcb_window_t wnd)
 {
     /* Subscribe to parent window resize events */
     uint32_t value = XCB_EVENT_MASK_POINTER_MOTION
@@ -158,7 +158,7 @@ vout_window_t *GetWindow (vout_display_t *vd,
 
     /* Events must be registered before the window geometry is queried, so as
      * to avoid missing impeding resize events. */
-    RegisterMouseEvents (VLC_OBJECT(vd), conn, wnd->handle.xid);
+    RegisterEvents (VLC_OBJECT(vd), conn, wnd->handle.xid);
 
     xcb_get_geometry_reply_t *geo =
         xcb_get_geometry_reply (conn, xcb_get_geometry (conn, wnd->handle.xid),

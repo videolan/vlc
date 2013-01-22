@@ -84,70 +84,19 @@ static void Manage (vout_display_t *);
 static void SwapBuffers (vlc_gl_t *gl);
 static void *GetProcAddress (vlc_gl_t *gl, const char *);
 
-static vout_window_t *MakeWindow (vout_display_t *vd)
+static unsigned GetScreenNumber (xcb_connection_t *conn,
+                                 const xcb_screen_t *screen)
 {
-    vout_window_cfg_t wnd_cfg;
-
-    memset (&wnd_cfg, 0, sizeof (wnd_cfg));
-    wnd_cfg.type = VOUT_WINDOW_TYPE_XID;
-    wnd_cfg.x = var_InheritInteger (vd, "video-x");
-    wnd_cfg.y = var_InheritInteger (vd, "video-y");
-    wnd_cfg.width  = vd->cfg->display.width;
-    wnd_cfg.height = vd->cfg->display.height;
-
-    vout_window_t *wnd = vout_display_NewWindow (vd, &wnd_cfg);
-    if (wnd == NULL)
-        msg_Err (vd, "parent window not available");
-    return wnd;
-}
-
-static const xcb_screen_t *
-FindWindow (vout_display_t *vd, xcb_connection_t *conn,
-            unsigned *restrict pnum, uint8_t *restrict pdepth,
-            uint16_t *restrict pwidth, uint16_t *restrict pheight)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    xcb_get_geometry_reply_t *geo =
-        xcb_get_geometry_reply (conn,
-            xcb_get_geometry (conn, sys->embed->handle.xid), NULL);
-    if (geo == NULL)
-    {
-        msg_Err (vd, "parent window not valid");
-        return NULL;
-    }
-
-    xcb_window_t root = geo->root;
-    *pdepth = geo->depth;
-    *pwidth = geo->width;
-    *pheight = geo->height;
-    free (geo);
-
-    /* Find the selected screen */
     const xcb_setup_t *setup = xcb_get_setup (conn);
-    const xcb_screen_t *screen = NULL;
     unsigned num = 0;
 
-    for (xcb_screen_iterator_t i = xcb_setup_roots_iterator (setup);
-         i.rem > 0;
+    for (xcb_screen_iterator_t i = xcb_setup_roots_iterator (setup);;
          xcb_screen_next (&i))
     {
-        if (i.data->root == root)
-        {
-            screen = i.data;
-            break;
-        }
+        if (i.data->root == screen->root)
+            return num;
         num++;
     }
-
-    if (screen == NULL)
-    {
-        msg_Err (vd, "parent window screen not found");
-        return NULL;
-    }
-    msg_Dbg (vd, "using screen 0x%"PRIx32 " (number: %u)", root, num);
-    *pnum = num;
-    return screen;
 }
 
 static bool CheckGLX (vout_display_t *vd, Display *dpy)
@@ -215,22 +164,20 @@ static int Open (vlc_object_t *obj)
     sys->pool = NULL;
     sys->gl.sys = NULL;
 
-    /* Get window */
-    sys->embed = MakeWindow (vd);
+    /* Get window, connect to X server (via XCB) */
+    xcb_connection_t *conn;
+    const xcb_screen_t *scr;
+    uint16_t width, height;
+    uint8_t depth;
+    sys->embed = GetWindow (vd, &conn, &scr, &depth, &width, &height);
     if (sys->embed == NULL)
     {
         free (sys);
         return VLC_EGENERIC;
     }
+    const unsigned snum = GetScreenNumber (conn, scr);
 
-    /* Connect to X server */
-    xcb_connection_t *conn = xcb_connect (sys->embed->display.x11, NULL);
-    if (unlikely(xcb_connection_has_error (conn)))
-    {
-        vout_display_DeleteWindow (vd, sys->embed);
-        free (sys);
-        return VLC_EGENERIC;
-    }
+    sys->conn = conn;
 
     Display *dpy = XOpenDisplay (sys->embed->display.x11);
     if (dpy == NULL)
@@ -241,21 +188,9 @@ static int Open (vlc_object_t *obj)
         return VLC_EGENERIC;
     }
     sys->display = dpy;
-    sys->conn = conn;
     sys->ctx = NULL;
 
     if (!CheckGLX (vd, dpy))
-        goto error;
-
-    RegisterMouseEvents (obj, conn, sys->embed->handle.xid);
-
-    /* Find window parameters */
-    unsigned snum;
-    uint8_t depth;
-    uint16_t width, height;
-    const xcb_screen_t *scr = FindWindow (vd, conn, &snum, &depth,
-                                          &width, &height);
-    if (scr == NULL)
         goto error;
 
     sys->window = xcb_generate_id (conn);

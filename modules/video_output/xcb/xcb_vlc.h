@@ -47,7 +47,6 @@ struct vout_window_t *GetWindow (vout_display_t *obj, xcb_connection_t **,
                                  uint16_t *width, uint16_t *height);
 bool CheckSHM (vlc_object_t *obj, xcb_connection_t *conn);
 xcb_cursor_t CreateBlankCursor (xcb_connection_t *, const xcb_screen_t *);
-void RegisterMouseEvents (vlc_object_t *, xcb_connection_t *, xcb_window_t);
 
 int CheckError (vout_display_t *, xcb_connection_t *conn,
                 const char *str, xcb_void_cookie_t);
