@@ -594,11 +594,12 @@ static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 
     /* Set volume for output unit */
     float volume = var_InheritInteger(p_aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT;
+    volume = volume * volume * volume;
     verify_noerr(AudioUnitSetParameter(p_sys->au_unit,
                                     kHALOutputParam_Volume,
                                     kAudioUnitScope_Global,
                                     0,
-                                    volume * volume * volume,
+                                    volume,
                                     0));
 
     p_aout->time_get = TimeGetAnalog;
@@ -1048,11 +1049,13 @@ error:
  *****************************************************************************/
 static int AudioDeviceHasOutput(AudioDeviceID i_dev_id)
 {
-    UInt32            dataSize;
+    UInt32 dataSize = 0;
+    OSStatus status;
 
     AudioObjectPropertyAddress streamsAddress = { kAudioDevicePropertyStreams, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
-    verify_noerr(AudioObjectGetPropertyDataSize(i_dev_id, &streamsAddress, 0, NULL, &dataSize));
-    if (dataSize == 0)
+    status = AudioObjectGetPropertyDataSize(i_dev_id, &streamsAddress, 0, NULL, &dataSize);
+
+    if (dataSize == 0 || status != noErr)
         return FALSE;
 
     return TRUE;
