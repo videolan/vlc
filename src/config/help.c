@@ -34,7 +34,7 @@
 #include "config/configuration.h"
 #include "libvlc.h"
 
-#if defined( WIN32 )
+#if defined( WIN32 ) && !defined(WINAPI_FAMILY_APP)
 static void ShowConsole (void);
 static void PauseConsole (void);
 #else
@@ -796,7 +796,7 @@ static void Version( void )
     PauseConsole();
 }
 
-#if defined (WIN32)
+#if defined( WIN32 ) && !defined(WINAPI_FAMILY_APP)
 /*****************************************************************************
  * ShowConsole: On Win32, create an output console for debug messages
  *****************************************************************************
@@ -861,7 +861,7 @@ static int ConsoleWidth( void )
             i_width = 80;
         pclose( file );
     }
-#else
+#elif !defined(WINAPI_FAMILY_APP)
     CONSOLE_SCREEN_BUFFER_INFO buf;
 
     if (GetConsoleScreenBufferInfo (GetStdHandle (STD_OUTPUT_HANDLE), &buf))
