@@ -56,39 +56,30 @@ int CheckError (vout_display_t *vd, xcb_connection_t *conn,
 }
 
 /**
- * Gets the size of an X window.
+ * Connect to the X server.
  */
-int GetWindowSize (struct vout_window_t *wnd, xcb_connection_t *conn,
-                   unsigned *restrict width, unsigned *restrict height)
+static xcb_connection_t *Connect (vlc_object_t *obj, const char *display)
 {
-    xcb_get_geometry_cookie_t ck = xcb_get_geometry (conn, wnd->handle.xid);
-    xcb_get_geometry_reply_t *geo = xcb_get_geometry_reply (conn, ck, NULL);
+    xcb_connection_t *conn = xcb_connect (display, NULL);
+    if (xcb_connection_has_error (conn) /*== NULL*/)
+    {
+        msg_Err (obj, "cannot connect to X server (%s)",
+                 (display != NULL) ? display : "default");
+        xcb_disconnect (conn);
+        return NULL;
+    }
 
-    if (!geo)
-        return -1;
-
-    *width = geo->width;
-    *height = geo->height;
-    free (geo);
-    return 0;
-}
-
-/**
- * Create a blank cursor.
- * Note that the pixmaps are leaked (until the X disconnection). Hence, this
- * function should be called no more than once per X connection.
- * @param conn XCB connection
- * @param scr target XCB screen
- */
-xcb_cursor_t CreateBlankCursor (xcb_connection_t *conn,
-                                const xcb_screen_t *scr)
-{
-    xcb_cursor_t cur = xcb_generate_id (conn);
-    xcb_pixmap_t pix = xcb_generate_id (conn);
-
-    xcb_create_pixmap (conn, 1, pix, scr->root, 1, 1);
-    xcb_create_cursor (conn, cur, pix, pix, 0, 0, 0, 0, 0, 0, 1, 1);
-    return cur;
+    const xcb_setup_t *setup = xcb_get_setup (conn);
+    msg_Dbg (obj, "connected to X%"PRIu16".%"PRIu16" server",
+             setup->protocol_major_version, setup->protocol_minor_version);
+    char *vendor = strndup (xcb_setup_vendor (setup), setup->vendor_len);
+    if (vendor)
+    {
+        msg_Dbg (obj, " vendor : %s", vendor);
+        free (vendor);
+    }
+    msg_Dbg (obj, " version: %"PRIu32, setup->release_number);
+    return conn;
 }
 
 /**
@@ -110,6 +101,107 @@ void RegisterMouseEvents (vlc_object_t *obj, xcb_connection_t *conn,
         xcb_change_window_attributes (conn, wnd,
                                       XCB_CW_EVENT_MASK, &value);
     }
+}
+
+/**
+ * Find screen matching a given root window.
+ */
+static const xcb_screen_t *FindScreen (vlc_object_t *obj,
+                                       xcb_connection_t *conn,
+                                       xcb_window_t root)
+{
+    /* Find the selected screen */
+    const xcb_setup_t *setup = xcb_get_setup (conn);
+    for (xcb_screen_iterator_t i = xcb_setup_roots_iterator (setup);
+         i.rem > 0; xcb_screen_next (&i))
+    {
+        if (i.data->root == root)
+        {
+            msg_Dbg (obj, "using screen 0x%"PRIx32, root);
+            return i.data;
+        }
+    }
+    msg_Err (obj, "window screen not found");
+    return NULL;
+}
+
+/**
+ * Create a VLC video X window object, connect to the corresponding X server,
+ * find the corresponding X server screen.
+ */
+vout_window_t *GetWindow (vout_display_t *vd,
+                          xcb_connection_t **restrict pconn,
+                          const xcb_screen_t **restrict pscreen,
+                          uint8_t *restrict pdepth,
+                          uint16_t *restrict pwidth,
+                          uint16_t *restrict pheight)
+{
+    vout_window_cfg_t cfg = {
+        .type = VOUT_WINDOW_TYPE_XID,
+        .x = var_InheritInteger (vd, "video-x"),
+        .y = var_InheritInteger (vd, "video-y"),
+        .width  = vd->cfg->display.width,
+        .height = vd->cfg->display.height,
+    };
+
+    vout_window_t *wnd = vout_display_NewWindow (vd, &cfg);
+    if (wnd == NULL)
+    {
+        msg_Err (vd, "window not available");
+        return NULL;
+    }
+
+    xcb_connection_t *conn = Connect (VLC_OBJECT(vd), wnd->display.x11);
+    if (conn == NULL)
+        goto error;
+    *pconn = conn;
+
+    /* Events must be registered before the window geometry is queried, so as
+     * to avoid missing impeding resize events. */
+    RegisterMouseEvents (VLC_OBJECT(vd), conn, wnd->handle.xid);
+
+    xcb_get_geometry_reply_t *geo =
+        xcb_get_geometry_reply (conn, xcb_get_geometry (conn, wnd->handle.xid),
+                                NULL);
+    if (geo == NULL)
+    {
+        msg_Err (vd, "window not valid");
+        goto error;
+    }
+    *pdepth = geo->depth;
+    *pwidth = geo->width;
+    *pheight = geo->height;
+
+    const xcb_screen_t *screen = FindScreen (VLC_OBJECT(vd), conn, geo->root);
+    free (geo);
+    if (screen == NULL)
+        goto error;
+    *pscreen = screen;
+    return wnd;
+
+error:
+    if (conn != NULL)
+        xcb_disconnect (conn);
+    vout_display_DeleteWindow (vd, wnd);
+    return NULL;
+}
+
+/**
+ * Create a blank cursor.
+ * Note that the pixmaps are leaked (until the X disconnection). Hence, this
+ * function should be called no more than once per X connection.
+ * @param conn XCB connection
+ * @param scr target XCB screen
+ */
+xcb_cursor_t CreateBlankCursor (xcb_connection_t *conn,
+                                const xcb_screen_t *scr)
+{
+    xcb_cursor_t cur = xcb_generate_id (conn);
+    xcb_pixmap_t pix = xcb_generate_id (conn);
+
+    xcb_create_pixmap (conn, 1, pix, scr->root, 1, 1);
+    xcb_create_cursor (conn, cur, pix, pix, 0, 0, 0, 0, 0, 0, 1, 1);
+    return cur;
 }
 
 /* NOTE: we assume no other thread will be _setting_ our video output events

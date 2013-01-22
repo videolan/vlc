@@ -115,7 +115,8 @@ static int Open (vlc_object_t *obj)
     /* Get window, connect to X server */
     xcb_connection_t *conn;
     const xcb_screen_t *scr;
-    sys->embed = GetWindow (vd, &conn, &scr, &(uint8_t){ 0 });
+    uint16_t width, height;
+    sys->embed = GetWindow (vd, &conn, &scr, &(uint8_t){ 0 }, &width, &height);
     if (sys->embed == NULL)
     {
         free (sys);
@@ -249,10 +250,6 @@ found_format:;
         cmap = scr->default_colormap;
 
     /* Create window */
-    unsigned width, height;
-    if (GetWindowSize (sys->embed, conn, &width, &height))
-        goto error;
-
     sys->window = xcb_generate_id (conn);
     sys->gc = xcb_generate_id (conn);
     xcb_pixmap_t pixmap = xcb_generate_id (conn);
