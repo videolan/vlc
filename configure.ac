@@ -205,8 +205,9 @@ case "${host_os}" in
   *mingw32* | *cygwin* | *wince* | *mingwce*)
     AC_CHECK_TOOL(WINDRES, windres, :)
     AC_CHECK_TOOL(OBJCOPY, objcopy, :)
-    test -z "$_WIN32_WINNT" && _WIN32_WINNT=0x0502
-    AC_DEFINE_UNQUOTED([_WIN32_WINNT], ${_WIN32_WINNT}, [Windows API level])
+    AH_TOP([#if defined(WIN32) && !defined(_WIN32_WINNT)])
+    AH_TOP([# define _WIN32_WINNT 0x0502 /* Windows XP SP2 */])
+    AH_TOP([#endif])
     AC_DEFINE([_WIN32_IE], 0x0600, [Define to '0x0600' for IE 6.0 (and shell) APIs.])
     AC_DEFINE([_UNICODE], [1], [Define to 1 for Unicode (Wide Chars) APIs.])
     AC_DEFINE([UNICODE], [1], [Define to 1 for Unicode (Wide Chars) APIs.])
