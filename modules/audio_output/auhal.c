@@ -38,7 +38,6 @@
 #import <AudioUnit/AudioUnit.h>             // AudioUnit
 #import <CoreAudio/CoreAudio.h>             // AudioDeviceID
 #import <AudioToolbox/AudioFormat.h>        // AudioFormatGetProperty
-#import <CoreServices/CoreServices.h>
 
 #import "TPCircularBuffer.h"
 
