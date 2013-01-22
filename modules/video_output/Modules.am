@@ -10,6 +10,13 @@ SOURCES_vout_macosx = macosx.m opengl.h opengl.c
 SOURCES_vout_ios = ios.m opengl.h opengl.c
 SOURCES_android_surface = androidsurface.c
 
+if HAVE_DECKLINK
+libdecklinkoutput_plugin_la_SOURCES = decklink.cpp
+libdecklinkoutput_plugin_la_CXXFLAGS = $(AM_CFLAGS) $(CXXFLAGS_decklinkoutput)
+libdecklinkoutput_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_decklink) $(LIBDL)
+libvlc_LTLIBRARIES += libdecklinkoutput_plugin.la
+endif
+
 ### OpenGL ###
 # TODO: merge all three source files (?)
 libgles2_plugin_la_SOURCES = opengl.c opengl.h gl.c

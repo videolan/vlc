@@ -85,6 +85,7 @@ $Id$
  * dc1394: IIDC (DCAM) FireWire input module
  * ddummy: dummy decoder
  * decklink: input module to read from a Blackmagic SDI card
+ * decklinkoutput: output module to write to Blackmagic SDI card
  * decomp: Decompression module
  * deinterlace: naive deinterlacing filter
  * demux_cdg: Demuxer for CD-G files (Karaoke)

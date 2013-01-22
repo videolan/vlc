@@ -1141,6 +1141,7 @@ modules/video_filter/yuvp.c
 modules/video_output/aa.c
 modules/video_output/androidsurface.c
 modules/video_output/caca.c
+modules/video_output/decklink.cpp
 modules/video_output/directfb.c
 modules/video_output/drawable.c
 modules/video_output/egl.c

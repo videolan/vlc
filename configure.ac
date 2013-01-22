@@ -1764,7 +1764,7 @@ if test "${enable_decklink}" != "no"
 then
   if test "${with_decklink_sdk}" != "no" -a -n "${with_decklink_sdk}"
   then
-    VLC_ADD_CXXFLAGS([decklink],[-I${with_decklink_sdk}/include])
+    VLC_ADD_CXXFLAGS([decklink decklinkoutput],[-I${with_decklink_sdk}/include])
   fi
   VLC_SAVE_FLAGS
   CXXFLAGS="${CXXFLAGS} ${CXXFLAGS_decklink}"

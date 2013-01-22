@@ -64,6 +64,7 @@ Audio Filters:
  * new VSXu visualization plugin
 
 Video Outputs:
+ * DecklinkOutput: New module using Blackmagic cards
  * OpenGL: use glsl instead of ARB to do the YUV->RGB conversions
  * Fix the power management issue on Windows for standby management
 
