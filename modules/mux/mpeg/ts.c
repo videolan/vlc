@@ -1173,6 +1173,18 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     return VLC_SUCCESS;
 }
 
+static void SetHeader( sout_buffer_chain_t *c,
+                        int depth )
+{
+    block_t *p_ts = BufferChainPeek( c );
+    while( depth > 0 )
+    {
+        p_ts = p_ts->p_next;
+        depth--;
+    }
+    p_ts->i_flags |= BLOCK_FLAG_HEADER;
+}
+
 /* returns true if needs more data */
 static bool MuxStreams(sout_mux_t *p_mux )
 {
@@ -1430,6 +1442,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
     /* 3: mux PES into TS */
     BufferChainInit( &chain_ts );
     /* append PAT/PMT  -> FIXME with big pcr delay it won't have enough pat/pmt */
+    bool pat_was_previous = true; //This is to prevent unnecessary double PAT/PMT insertions
     GetPAT( p_mux, &chain_ts );
     GetPMT( p_mux, &chain_ts );
     int i_packet_pos = 0;
@@ -1486,6 +1499,24 @@ static bool MuxStreams(sout_mux_t *p_mux )
             p_ts->i_flags |= BLOCK_FLAG_SCRAMBLED;
         }
         i_packet_pos++;
+
+        /* Write PAT/PMT before every keyframe if use-key-frames is enabled,
+         * this helps to do segmenting with livehttp-output so it can cut segment
+         * and start new one with pat,pmt,keyframe*/
+        if( ( p_sys->b_use_key_frames ) && ( p_ts->i_flags & BLOCK_FLAG_TYPE_I ) )
+        {
+            if( likely( !pat_was_previous ) )
+            {
+                int startcount = chain_ts.i_depth;
+                GetPAT( p_mux, &chain_ts );
+                GetPMT( p_mux, &chain_ts );
+                SetHeader( &chain_ts, startcount );
+                i_packet_count += (chain_ts.i_depth - startcount );
+            } else {
+                SetHeader( &chain_ts, 0); //We just inserted pat/pmt,so just flag it instead of adding new one
+            }
+        }
+        pat_was_previous = false;
 
         /* */
         BufferChainAppend( &chain_ts, p_ts );
