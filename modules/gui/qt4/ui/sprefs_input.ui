@@ -76,7 +76,7 @@
       <item row="4" column="0">
        <widget class="QLabel" name="hwAccelLabel">
         <property name="text">
-         <string>Hardware decoding acceleration</string>
+         <string>Hardware-accelerated decoding</string>
         </property>
         <property name="buddy">
          <cstring>hwAccelModule</cstring>
