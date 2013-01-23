@@ -46,6 +46,7 @@ endif
 DEPS_theora = ogg $(DEPS_ogg)
 
 .theora: libtheora
+	cd $< && autoreconf -ivf -I m4
 	cd $< && $(HOSTVARS) ./configure $(THEORACONF)
 	cd $< && $(MAKE) install
 	touch $@
