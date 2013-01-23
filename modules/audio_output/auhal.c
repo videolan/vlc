@@ -38,6 +38,7 @@
 #import <AudioUnit/AudioUnit.h>             // AudioUnit
 #import <CoreAudio/CoreAudio.h>             // AudioDeviceID
 #import <AudioToolbox/AudioFormat.h>        // AudioFormatGetProperty
+#import <CoreServices/CoreServices.h>
 
 #import "TPCircularBuffer.h"
 
@@ -69,10 +70,10 @@
 struct aout_sys_t
 {
     aout_packet_t               packet;
-    AudioDeviceID               i_default_dev;      /* DeviceID of defaultOutputDevice */
-    AudioDeviceID               i_selected_dev;     /* DeviceID of the selected device */
+    AudioObjectID               i_default_dev;      /* DeviceID of defaultOutputDevice */
+    AudioObjectID               i_selected_dev;     /* DeviceID of the selected device */
+    bool                        b_selected_dev_is_digital;
     AudioDeviceIOProcID         i_procID;           /* DeviceID of current device */
-    UInt32                      i_devices;          /* Number of CoreAudio Devices */
     bool                        b_digital;          /* Are we running in digital mode? */
     mtime_t                     clock_diff;         /* Difference between VLC clock and Device clock */
 
@@ -100,7 +101,17 @@ struct aout_sys_t
     mtime_t                     i_played_length;    /* how much did we play already */
     mtime_t                     i_last_sample_time; /* last sample time played by the AudioUnit */
 
+    struct audio_device_t       *devices;
+
     vlc_mutex_t                 lock;
+};
+
+struct audio_device_t
+{
+    struct audio_device_t *next;
+    UInt32 deviceid;
+    char *name;
+    bool digital;
 };
 
 /*****************************************************************************
@@ -116,7 +127,9 @@ static void     FlushAnalog             (audio_output_t *, bool);
 static void     PauseAnalog             (audio_output_t *, bool, mtime_t);
 static int      TimeGetAnalog           (audio_output_t *, mtime_t *);
 
-static void     Probe                   (audio_output_t *);
+static int      DeviceList              (audio_output_t *p_aout, char ***namesp, char ***descsp);
+static void     RebuildDeviceList       (audio_output_t *);
+static int      SwitchAudioDevice       (audio_output_t *p_aout, const char *name);
 
 static int      AudioDeviceHasOutput    (AudioDeviceID);
 static int      AudioDeviceSupportsDigital(audio_output_t *, AudioDeviceID);
@@ -129,8 +142,6 @@ static OSStatus RenderCallbackSPDIF     (AudioDeviceID, const AudioTimeStamp *, 
                                           AudioBufferList *, const AudioTimeStamp *, void *);
 static OSStatus HardwareListener        (AudioObjectID, UInt32, const AudioObjectPropertyAddress *, void *);
 static OSStatus StreamListener          (AudioObjectID, UInt32, const AudioObjectPropertyAddress *, void *);
-static int      AudioDeviceCallback     (vlc_object_t *, const char *,
-                                          vlc_value_t, vlc_value_t, void *);
 
 static int      VolumeSet               (audio_output_t *, float);
 static int      MuteSet                 (audio_output_t *, bool);
@@ -139,11 +150,6 @@ static int      MuteSet                 (audio_output_t *, bool);
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ADEV_TEXT N_("Audio Device")
-#define ADEV_LONGTEXT N_("Choose a number corresponding to the number of an " \
-    "audio device, as listed in your 'Audio Device' menu. This device will " \
-    "then be used by default for audio playback.")
-
 #define VOLUME_TEXT N_("Audio volume")
 #define VOLUME_LONGTEXT VOLUME_TEXT
 
@@ -154,10 +160,10 @@ vlc_module_begin ()
     set_category(CAT_AUDIO)
     set_subcategory(SUBCAT_AUDIO_AOUT)
     set_callbacks(Open, Close)
-    add_integer("macosx-audio-device", 0, ADEV_TEXT, ADEV_LONGTEXT, false)
     add_integer("auhal-volume", AOUT_VOLUME_DEFAULT,
                 VOLUME_TEXT, VOLUME_LONGTEXT, true)
     change_integer_range(0, AOUT_VOLUME_MAX)
+    add_obsolete_integer("macosx-audio-device") /* since 2.1.0 */
 vlc_module_end ()
 
 /*****************************************************************************
@@ -168,16 +174,12 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     OSStatus                err = noErr;
     UInt32                  i_param_size = 0;
     struct aout_sys_t       *p_sys = NULL;
-    vlc_value_t             val;
 
     /* Use int here, to match kAudioDevicePropertyDeviceIsAlive
      * property size */
     int                     b_alive = false;
 
     p_sys = p_aout->sys;
-    p_sys->i_default_dev = 0;
-    p_sys->i_selected_dev = 0;
-    p_sys->i_devices = 0;
     p_sys->b_digital = false;
     p_sys->au_component = NULL;
     p_sys->au_unit = NULL;
@@ -190,24 +192,10 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     aout_FormatPrint(p_aout, "VLC is looking for:", fmt);
 
-    /* Persistent device variable */
-    if (var_Type(p_aout->p_libvlc, "macosx-audio-device") == 0)
-        var_Create(p_aout->p_libvlc, "macosx-audio-device", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-
-    /* Build a list of devices */
-    if (var_Type(p_aout, "audio-device") == 0)
-        Probe(p_aout);
-
-    /* What device do we want? */
-    if (var_Get(p_aout, "audio-device", &val) < 0) {
-        msg_Err(p_aout, "audio-device var does not exist. device probe failed.");
-        goto error;
-    }
-
-    p_sys->i_selected_dev = val.i_int & ~AOUT_VAR_SPDIF_FLAG; /* remove SPDIF flag to get the true DeviceID */
-    bool b_supports_digital = (val.i_int & AOUT_VAR_SPDIF_FLAG);
-    if (b_supports_digital)
+    if (p_sys->b_selected_dev_is_digital)
         msg_Dbg(p_aout, "audio device supports digital output");
+
+    msg_Dbg(p_aout, "attempting to use device %i", p_sys->i_selected_dev);
 
     /* Check if the desired device is alive and usable */
     i_param_size = sizeof(b_alive);
@@ -256,11 +244,8 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         goto error;
     }
 
-    /* If we change the device we want to use, we should renegotiate the audio chain */
-    var_AddCallback(p_aout, "audio-device", AudioDeviceCallback, NULL);
-
     /* Check for Digital mode or Analog output mode */
-    if (AOUT_FMT_SPDIF (fmt) && b_supports_digital) {
+    if (AOUT_FMT_SPDIF (fmt) && p_sys->b_selected_dev_is_digital) {
         if (OpenSPDIF (p_aout, fmt)) {
             msg_Dbg(p_aout, "digital output successfully opened");
             return VLC_SUCCESS;
@@ -275,7 +260,6 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 error:
     /* If we reach this, this aout has failed */
     msg_Err(p_aout, "opening the auhal output failed");
-    var_Destroy(p_aout, "audio-device");
     return VLC_EGENERIC;
 }
 
@@ -320,7 +304,7 @@ static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                          kAudioUnitScope_Global,
                          0,
                          &p_sys->i_selected_dev,
-                         sizeof(AudioDeviceID));
+                         sizeof(AudioObjectID));
 
     if (err != noErr) {
         msg_Warn(p_aout, "we cannot select the audio device");
@@ -332,7 +316,7 @@ static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 
     err = AudioUnitGetProperty(p_sys->au_unit,
                                    kAudioUnitProperty_StreamFormat,
-                                   kAudioUnitScope_Input,
+                                   kAudioUnitScope_Output,
                                    0,
                                    &DeviceFormat,
                                    &i_param_size);
@@ -376,7 +360,12 @@ static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                                     layout));
         }
 
-        msg_Dbg(p_aout, "layout of AUHAL has %d channels" , (int)layout->mNumberChannelDescriptions);
+        msg_Dbg(p_aout, "layout of AUHAL has %i channels" , layout->mNumberChannelDescriptions);
+
+        if (layout->mNumberChannelDescriptions == 0) {
+            msg_Err(p_aout, "insufficient number of output channels");
+            return false;
+        }
 
         /* Initialize the VLC core channel count */
         fmt->i_physical_channels = 0;
@@ -584,7 +573,6 @@ static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     p_sys->clock_diff += mdate();
 
     /* setup circular buffer */
-    msg_Dbg( p_aout, "suggested buffer size: %i, default %i", DeviceFormat.mBytesPerPacket * 4, kBufferLength);
     TPCircularBufferInit(&p_sys->circular_buffer, kBufferLength);
 
     p_sys->b_got_first_sample = false;
@@ -899,8 +887,6 @@ static void Stop(audio_output_t *p_aout)
             msg_Err(p_aout, "Could not release hogmode: [%4.4s]", (char *)&err);
     }
 
-    var_DelCallback(p_aout, "audio-device", AudioDeviceCallback, NULL);
-
     p_sys->i_played_length = 0;
     p_sys->i_last_sample_time = 0;
 
@@ -911,136 +897,150 @@ static void Stop(audio_output_t *p_aout)
         aout_PacketDestroy(p_aout);
 }
 
-/*****************************************************************************
- * Probe: Check which devices the OS has, and add them to our audio-device menu
- *****************************************************************************/
-static void Probe(audio_output_t * p_aout)
+static int DeviceList(audio_output_t *p_aout, char ***namesp, char ***descsp)
+{
+    struct aout_sys_t   *p_sys = p_aout->sys;
+    char **names, **descs;
+    unsigned n = 0;
+
+    for (struct audio_device_t *device = p_sys->devices; device != NULL; device = device->next)
+        n++;
+
+    *namesp = names = xmalloc(sizeof(*names) * n);
+    *descsp = descs = xmalloc(sizeof(*descs) * n);
+
+    for (struct audio_device_t *device = p_sys->devices; device != NULL; device = device->next) {
+        *(names++) = strdup(device->name);
+        sprintf(*(descs++), "%d", device->deviceid);
+    }
+
+    msg_Dbg(p_aout, "returning a list of %i devices", n);
+
+    return n;
+}
+
+static void add_device_to_list(audio_output_t * p_aout, UInt32 i_id, char *name, bool b_digital)
+{
+    struct aout_sys_t *p_sys = p_aout->sys;
+
+    msg_Dbg(p_aout, "adding device %i (%s) to list", i_id, name);
+
+    struct audio_device_t *device = malloc(sizeof(*device));
+    if (unlikely(device == NULL))
+        return;
+
+    device->next = p_sys->devices;
+    device->deviceid = i_id;
+    device->name = strdup(name);
+    device->digital = b_digital;
+
+    p_sys->devices = device;
+}
+
+static void RebuildDeviceList(audio_output_t * p_aout)
 {
     OSStatus            err = noErr;
-    UInt32              i_param_size = 0;
-    AudioDeviceID       devid_def = 0;
-    AudioDeviceID       *p_devices = NULL;
-    vlc_value_t         val, text;
+    UInt32              propertySize = 0;
+    AudioObjectID       defaultDeviceID = 0;
+    AudioObjectID       *deviceIDs;
+    UInt32              numberOfDevices;
 
     struct aout_sys_t   *p_sys = p_aout->sys;
 
+    if (p_sys->devices)
+        free(p_sys->devices);
+
     /* Get number of devices */
     AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
-    err = AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &audioDevicesAddress, 0, NULL, &i_param_size);
+    err = AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &audioDevicesAddress, 0, NULL, &propertySize);
     if (err != noErr) {
         msg_Err(p_aout, "Could not get number of devices: [%s]", (char *)&err);
-        goto error;
+        return;
     }
 
-    p_sys->i_devices = i_param_size / sizeof(AudioDeviceID);
+    numberOfDevices = propertySize / sizeof(AudioDeviceID);
 
-    if (p_sys->i_devices < 1) {
+    if (numberOfDevices < 1) {
         msg_Err(p_aout, "No audio output devices were found.");
-        goto error;
+        return;
     }
-    msg_Dbg(p_aout, "found %u audio device(s)", (unsigned)p_sys->i_devices);
+    msg_Dbg(p_aout, "found %i audio device(s)", numberOfDevices);
 
     /* Allocate DeviceID array */
-    p_devices = (AudioDeviceID*)malloc(sizeof(AudioDeviceID) * p_sys->i_devices);
-    if (p_devices == NULL)
-        goto error;
+    deviceIDs = (AudioDeviceID *)calloc(numberOfDevices, sizeof(AudioDeviceID));
+    if (deviceIDs == NULL)
+        return;
 
     /* Populate DeviceID array */
-    err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &audioDevicesAddress, 0, NULL, &i_param_size, p_devices);
+    err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &audioDevicesAddress, 0, NULL, &propertySize, deviceIDs);
     if (err != noErr) {
         msg_Err(p_aout, "could not get the device IDs: [%s]", (char *)&err);
-        goto error;
+        return;
     }
 
     /* Find the ID of the default Device */
     AudioObjectPropertyAddress defaultDeviceAddress = { kAudioHardwarePropertyDefaultOutputDevice, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
-    i_param_size = sizeof(AudioDeviceID);
-    err= AudioObjectGetPropertyData(kAudioObjectSystemObject, &defaultDeviceAddress, 0, NULL, &i_param_size, &devid_def);
+    propertySize = sizeof(AudioObjectID);
+    err= AudioObjectGetPropertyData(kAudioObjectSystemObject, &defaultDeviceAddress, 0, NULL, &propertySize, &defaultDeviceID);
     if (err != noErr) {
         msg_Err(p_aout, "could not get default audio device: [%s]", (char *)&err);
-        goto error;
+        return;
     }
-    p_sys->i_default_dev = devid_def;
+    p_sys->i_default_dev = defaultDeviceID;
 
-    var_Create(p_aout, "audio-device", VLC_VAR_INTEGER|VLC_VAR_HASCHOICE);
-    text.psz_string = (char*)_("Audio Device");
-    var_Change(p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL);
+    AudioObjectPropertyAddress deviceNameAddress = { kAudioDevicePropertyDeviceName, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
 
-    AudioObjectPropertyAddress deviceNameAddress = { kAudioDevicePropertyDeviceName, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
-
-    for (unsigned int i = 0; i < p_sys->i_devices; i++) {
+    for (unsigned int i = 0; i < numberOfDevices; i++) {
         char *psz_name;
-        i_param_size = 0;
+        bool b_digital = false;
+        UInt32 i_id = deviceIDs[i];
 
         /* Retrieve the length of the device name */
-        err = AudioObjectGetPropertyDataSize(p_devices[i], &deviceNameAddress, 0, NULL, &i_param_size);
-        if (err != noErr)
-            goto error;
+        err = AudioObjectGetPropertyDataSize(deviceIDs[i], &deviceNameAddress, 0, NULL, &propertySize);
+        if (err != noErr) {
+            msg_Dbg(p_aout, "failed to get name size for device %i", deviceIDs[i]);
+            continue;
+        }
 
         /* Retrieve the name of the device */
-        psz_name = (char *)malloc(i_param_size);
-        err = AudioObjectGetPropertyData(p_devices[i], &deviceNameAddress, 0, NULL, &i_param_size, psz_name);
-        if (err != noErr)
-            goto error;
+        psz_name = (char *)malloc(propertySize);
+        err = AudioObjectGetPropertyData(deviceIDs[i], &deviceNameAddress, 0, NULL, &propertySize, psz_name);
+        if (err != noErr) {
+            msg_Dbg(p_aout, "failed to get name for device %i", deviceIDs[i]);
+            continue;
+        }
 
-        msg_Dbg(p_aout, "DevID: %u DevName: %s", (unsigned)p_devices[i], psz_name);
+        msg_Dbg(p_aout, "DevID: %i DevName: %s", deviceIDs[i], psz_name);
 
-        if (!AudioDeviceHasOutput(p_devices[i])) {
+        if (!AudioDeviceHasOutput(deviceIDs[i])) {
             msg_Dbg(p_aout, "this device is INPUT only. skipping...");
             free(psz_name);
             continue;
         }
 
-        /* Add the menu entries */
-        val.i_int = (int)p_devices[i];
-        text.psz_string = psz_name;
-        var_Change(p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text);
-        text.psz_string = NULL;
-        if (p_sys->i_default_dev == p_devices[i]) {
-            /* The default device is the selected device normally */
-            var_Change(p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL);
-            var_Set(p_aout, "audio-device", val);
+        if (AudioDeviceSupportsDigital(p_aout, deviceIDs[i])) {
+            b_digital = true;
+            msg_Dbg(p_aout, "this device supports digital");
+            asprintf(&psz_name, _("%s (Encoded Output)"), psz_name);
         }
 
-        if (AudioDeviceSupportsDigital(p_aout, p_devices[i])) {
-            val.i_int = (int)p_devices[i] | AOUT_VAR_SPDIF_FLAG;
-            if (asprintf(&text.psz_string, _("%s (Encoded Output)"), psz_name) != -1) {
-                var_Change(p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text);
-                free(text.psz_string);
-                if (p_sys->i_default_dev == p_devices[i] && var_InheritBool(p_aout, "spdif")) {
-                    /* We selected to prefer SPDIF output if available
-                     * then this "dummy" entry should be selected */
-                    var_Change(p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL);
-                    var_Set(p_aout, "audio-device", val);
-                }
-            }
-        }
-
+        add_device_to_list(p_aout, i_id, psz_name, b_digital);
         free(psz_name);
-    }
-
-    /* If a device is already "preselected", then use this device */
-    var_Get(p_aout->p_libvlc, "macosx-audio-device", &val);
-    if (val.i_int > 0) {
-        msg_Dbg(p_aout, "using preselected output device %#"PRIx64, val.i_int);
-        var_Change(p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL);
-        var_Set(p_aout, "audio-device", val);
     }
 
     /* Attach a Listener so that we are notified of a change in the Device setup */
     err = AudioObjectAddPropertyListener(kAudioObjectSystemObject, &audioDevicesAddress, HardwareListener, (void *)p_aout);
-    if (err != noErr) {
+    if (err != noErr)
         msg_Warn(p_aout, "failed to add listener for audio device configuration (%i)", err);
-        goto error;
-    }
 
-    free(p_devices);
-    return;
+    free(deviceIDs);
+}
 
-error:
-    msg_Warn(p_aout, "audio device already in use");
-    free(p_devices);
-    return;
+static int SwitchAudioDevice(audio_output_t *p_aout, const char *name)
+{
+    msg_Warn(p_aout, "we should switch to device '%s'", name);
+
+    return 0;
 }
 
 /*****************************************************************************
@@ -1069,7 +1069,7 @@ static int AudioDeviceSupportsDigital(audio_output_t *p_aout, AudioDeviceID i_de
     UInt32                      i_param_size = 0;
     AudioStreamID               *p_streams = NULL;
     int                         i_streams = 0;
-    bool                  b_return = false;
+    bool                        b_return = false;
 
     /* Retrieve all the output streams */
     AudioObjectPropertyAddress streamsAddress = { kAudioDevicePropertyStreams, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
@@ -1429,8 +1429,7 @@ static OSStatus HardwareListener(AudioObjectID inObjectID,  UInt32 inNumberAddre
     }
 #endif
 
-    var_TriggerCallback(p_aout, "audio-device");
-    var_Destroy(p_aout, "audio-device");
+    RebuildDeviceList(p_aout);
 
     return err;
 }
@@ -1455,19 +1454,6 @@ static OSStatus StreamListener(AudioObjectID inObjectID,  UInt32 inNumberAddress
     }
     return err;
 }
-
-/*****************************************************************************
- * AudioDeviceCallback: Callback triggered when the audio-device variable is changed
- *****************************************************************************/
-static int AudioDeviceCallback(vlc_object_t *p_this, const char *psz_variable,
-                     vlc_value_t old_val, vlc_value_t new_val, void *param)
-{
-    audio_output_t *p_aout = (audio_output_t *)p_this;
-    var_Set(p_aout->p_libvlc, "macosx-audio-device", new_val);
-    msg_Dbg(p_aout, "Set Device: %#"PRIx64, new_val.i_int);
-    return aout_ChannelsRestart(p_this, psz_variable, old_val, new_val, param);
-}
-
 
 /*****************************************************************************
  * VolumeSet: Implements volume_set(). Update the CoreAudio AU volume immediately.
@@ -1530,6 +1516,11 @@ static int Open(vlc_object_t *obj)
     aout->stop = Stop;
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
+    aout->device_enum = DeviceList;
+    aout->sys->devices = NULL;
+    aout->device_select = SwitchAudioDevice;
+
+    RebuildDeviceList(aout);
 
     /* remember the volume */
     aout_VolumeReport(aout, var_InheritInteger(aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT);
