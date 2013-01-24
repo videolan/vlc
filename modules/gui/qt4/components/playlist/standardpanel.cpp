@@ -33,7 +33,6 @@
 #include "components/playlist/ml_model.hpp"       /* MLModel */
 #include "components/playlist/views.hpp"          /* 3 views */
 #include "components/playlist/selector.hpp"       /* PLSelector */
-#include "util/customwidgets.hpp"                 /* PixmapAnimator */
 #include "menus.hpp"                              /* Popup */
 #include "input_manager.hpp"                      /* THEMIM */
 #include "dialogs_provider.hpp"                   /* THEDP */
@@ -87,14 +86,6 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     currentRootIndexId  = -1;
     lastActivatedId     = -1;
-
-    QList<QString> frames;
-    frames << ":/util/wait1";
-    frames << ":/util/wait2";
-    frames << ":/util/wait3";
-    frames << ":/util/wait4";
-    spinnerAnimation = new PixmapAnimator( this, frames );
-    CONNECT( spinnerAnimation, pixmapReady( const QPixmap & ), this, updateViewport() );
 
     /* Saved Settings */
     int i_savedViewMode = getSettings()->value( "Playlist/view-mode", TREE_VIEW ).toInt();
@@ -512,20 +503,6 @@ bool StandardPLPanel::eventFilter ( QObject *obj, QEvent * event )
                                       "media source from the left."),
                                   QPalette::Text );
         }
-        else if ( spinnerAnimation->state() == PixmapAnimator::Running )
-        {
-            if ( currentView->model()->rowCount() )
-                spinnerAnimation->stop(); /* Trick until SD emits events */
-            else
-            {
-                QWidget *viewport = qobject_cast<QWidget *>( obj );
-                QStylePainter painter( viewport );
-                QPixmap *spinner = spinnerAnimation->getPixmap();
-                QPoint point = viewport->geometry().center();
-                point -= QPoint( spinner->size().width() / 2, spinner->size().height() / 2 );
-                painter.drawPixmap( point, *spinner );
-            }
-        }
     }
     return false;
 }
@@ -703,23 +680,6 @@ void StandardPLPanel::showView( int i_view )
     viewStack->setCurrentWidget( currentView );
     browseInto();
     gotoPlayingItem();
-}
-
-void StandardPLPanel::setWaiting( bool b )
-{
-    if ( b )
-    {
-        spinnerAnimation->setLoopCount( 20 ); /* Trick until SD emits an event */
-        spinnerAnimation->start();
-    }
-    else
-        spinnerAnimation->stop();
-}
-
-void StandardPLPanel::updateViewport()
-{
-    /* A single update on parent widget won't work */
-    currentView->viewport()->repaint();
 }
 
 int StandardPLPanel::currentViewIndex() const

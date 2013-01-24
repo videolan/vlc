@@ -141,7 +141,6 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     DCONNECT( selector, categoryActivated( playlist_item_t *, bool ),
               mainView, setRootItem( playlist_item_t *, bool ) );
     mainView->setRootItem( p_root, false );
-    CONNECT( selector, SDCategorySelected(bool), mainView, setWaiting(bool) );
 
     /* */
     split = new PlaylistSplitter( this );

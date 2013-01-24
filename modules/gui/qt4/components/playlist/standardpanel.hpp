@@ -53,7 +53,6 @@ class PicFlowView;
 class LocationBar;
 class PLSelector;
 class PlaylistWidget;
-class PixmapAnimator;
 
 class StandardPLPanel: public QWidget
 {
@@ -111,14 +110,10 @@ private:
     /* for popup */
     QModelIndex popupIndex;  /* FIXME: don't store here, pass as Action param */
 
-    /* Wait spinner */
-    PixmapAnimator *spinnerAnimation;
-
 public slots:
     void setRootItem( playlist_item_t *, bool );
     void browseInto( const QModelIndex& );
     void showView( int );
-    void setWaiting( bool ); /* spinner */
 
 private slots:
     void deleteSelection();
@@ -145,7 +140,6 @@ private slots:
     void toggleColumnShown( int );
 
     void cycleViews();
-    void updateViewport(); /* spinner */
 
 signals:
     void viewChanged( const QModelIndex& );

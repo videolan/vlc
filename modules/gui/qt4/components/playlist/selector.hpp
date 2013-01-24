@@ -62,7 +62,6 @@ enum {
     IN_ITEM_ROLE,        //input_item_t->i_id
     SPECIAL_ROLE,        //SpecialData
     CAP_SEARCH_ROLE,
-    SD_CATEGORY_ROLE,
 };
 
 enum ItemAction {
@@ -155,7 +154,6 @@ private slots:
 
 signals:
     void categoryActivated( playlist_item_t *, bool );
-    void SDCategorySelected( bool );
 };
 
 #endif
