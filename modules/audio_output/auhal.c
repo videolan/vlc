@@ -1041,9 +1041,13 @@ static void RebuildDeviceList(audio_output_t * p_aout)
 
 static int SwitchAudioDevice(audio_output_t *p_aout, const char *name)
 {
-    msg_Warn(p_aout, "we should switch to device '%s'", name);
+    if (name)
+        p_aout->sys->i_selected_dev = atoi(name);
+    else
+        p_aout->sys->i_selected_dev = 0;
 
     aout_DeviceReport(p_aout, name);
+    aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
 
     return 0;
 }
