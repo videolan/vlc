@@ -47,7 +47,7 @@ static int Control (access_t *, int, va_list);
 struct access_sys_t
 {
     size_t length;
-    char   data[1];
+    char   data[];
 };
 
 static int Open (vlc_object_t *obj)
