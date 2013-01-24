@@ -132,6 +132,7 @@ struct sout_access_out_sys_t
     mtime_t  i_seglenm;
     uint32_t i_segment;
     size_t  i_seglen;
+    block_t *block_buffer;
     int i_handle;
     unsigned i_numsegs;
     bool b_delsegs;
@@ -160,8 +161,9 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->i_seglen = var_GetInteger( p_access, SOUT_CFG_PREFIX "seglen" );
-    /* Try to get within +-10% of asked segment length, so lower limit is 90% of segment length*/
-    p_sys->i_seglenm = CLOCK_FREQ * p_sys->i_seglen * 0.9;
+    /* Try to get within +-10% of asked segment length, so limit is +10% of segment length*/
+    p_sys->i_seglenm = CLOCK_FREQ * p_sys->i_seglen * 1.10;
+    p_sys->block_buffer = NULL;
 
     p_sys->i_numsegs = var_GetInteger( p_access, SOUT_CFG_PREFIX "numsegs" );
     p_sys->b_splitanywhere = var_GetBool( p_access, SOUT_CFG_PREFIX "splitanywhere" );
@@ -353,6 +355,30 @@ static void Close( vlc_object_t * p_this )
     sout_access_out_t *p_access = (sout_access_out_t*)p_this;
     sout_access_out_sys_t *p_sys = p_access->p_sys;
 
+    msg_Dbg( p_access, "Flushing buffer to last file");
+    while( p_sys->block_buffer )
+    {
+        ssize_t val = write( p_sys->i_handle, p_sys->block_buffer->p_buffer, p_sys->block_buffer->i_buffer );
+        if ( val == -1 )
+        {
+           if ( errno == EINTR )
+              continue;
+           block_ChainRelease ( p_sys->block_buffer);
+           break;
+        }
+
+        if ( (size_t)val >= p_sys->block_buffer->i_buffer )
+        {
+           block_t *p_next = p_sys->block_buffer->p_next;
+           block_Release (p_sys->block_buffer);
+           p_sys->block_buffer = p_next;
+        }
+        else
+        {
+           p_sys->block_buffer->p_buffer += val;
+           p_sys->block_buffer->i_buffer -= val;
+        }
+    }
 
     closeCurrentSegment( p_access, p_sys, true );
     free( p_sys->psz_indexUrl );
@@ -420,42 +446,58 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     size_t i_write = 0;
     sout_access_out_sys_t *p_sys = p_access->p_sys;
+    block_t *p_temp;
 
     while( p_buffer )
     {
-        if ( p_sys->i_handle >= 0 && ( p_sys->b_splitanywhere || ( p_buffer->i_flags & BLOCK_FLAG_HEADER ) ) && ( p_buffer->i_dts-p_sys->i_opendts ) > p_sys->i_seglenm )
+        if ( ( p_sys->b_splitanywhere || ( p_buffer->i_flags & BLOCK_FLAG_HEADER ) ) )
         {
-            closeCurrentSegment( p_access, p_sys, false );
-        }
-        if ( p_buffer->i_buffer > 0 && p_sys->i_handle < 0 )
-        {
-            p_sys->i_opendts = p_buffer->i_dts;
-            if ( openNextFile( p_access, p_sys ) < 0 )
-                return -1;
-        }
-        ssize_t val = write ( p_sys->i_handle,
-                             p_buffer->p_buffer, p_buffer->i_buffer );
-        if ( val == -1 )
-        {
-            if ( errno == EINTR )
-                continue;
-            block_ChainRelease ( p_buffer );
-            return -1;
+            block_t *output = p_sys->block_buffer;
+            p_sys->block_buffer = NULL;
+
+
+            if( p_sys->i_handle > 0 && ( p_buffer->i_dts - p_sys->i_opendts ) >= p_sys->i_seglenm )
+                closeCurrentSegment( p_access, p_sys, false );
+
+            if ( p_sys->i_handle < 0 )
+            {
+                p_sys->i_opendts = output ? output->i_dts : p_buffer->i_dts;
+                if ( openNextFile( p_access, p_sys ) < 0 )
+                   return -1;
+            }
+
+            while( output )
+            {
+                ssize_t val = write( p_sys->i_handle, output->p_buffer, output->i_buffer );
+                if ( val == -1 )
+                {
+                   if ( errno == EINTR )
+                      continue;
+                   block_ChainRelease ( p_buffer );
+                   return -1;
+                }
+
+                if ( (size_t)val >= output->i_buffer )
+                {
+                   block_t *p_next = output->p_next;
+                   block_Release (output);
+                   output = p_next;
+                }
+                else
+                {
+                   output->p_buffer += val;
+                   output->i_buffer -= val;
+                }
+                i_write += val;
+            }
         }
 
-        if ( (size_t)val >= p_buffer->i_buffer )
-        {
-            block_t *p_next = p_buffer->p_next;
-            block_Release (p_buffer);
-            p_buffer = p_next;
-        }
-        else
-        {
-            p_buffer->p_buffer += val;
-            p_buffer->i_buffer -= val;
-        }
-        i_write += val;
+        p_temp = p_buffer->p_next;
+        p_buffer->p_next = NULL;
+        block_ChainAppend( &p_sys->block_buffer, p_buffer );
+        p_buffer = p_temp;
     }
+
     return i_write;
 }
 
