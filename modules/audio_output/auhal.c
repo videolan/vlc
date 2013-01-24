@@ -1277,12 +1277,20 @@ static void Play (audio_output_t * p_aout, block_t * p_block)
 
 static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
 {
+    struct aout_sys_t * p_sys = p_aout->sys;
     VLC_UNUSED(date);
 
-    if (pause)
-        AudioOutputUnitStop(p_aout->sys->au_unit);
-    else
-        AudioOutputUnitStart(p_aout->sys->au_unit);
+    if (p_aout->sys->b_digital) {
+        if (pause)
+            AudioDeviceStop(p_sys->i_selected_dev, p_sys->i_procID);
+        else
+            AudioDeviceStart(p_sys->i_selected_dev, p_sys->i_procID);
+    } else {
+        if (pause)
+            AudioOutputUnitStop(p_sys->au_unit);
+        else
+            AudioOutputUnitStart(p_sys->au_unit);
+    }
 }
 
 static void Flush(audio_output_t *p_aout, bool wait)
