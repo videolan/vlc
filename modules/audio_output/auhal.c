@@ -111,7 +111,6 @@ struct audio_device_t
     struct audio_device_t *next;
     UInt32 deviceid;
     char *name;
-    bool digital;
 };
 
 /*****************************************************************************
@@ -913,20 +912,15 @@ static int DeviceList(audio_output_t *p_aout, char ***namesp, char ***descsp)
     for (struct audio_device_t *device = p_sys->devices; device != NULL; device = device->next) {
         sprintf(deviceid, "%i", device->deviceid);
         *(names++) = strdup(deviceid);
-        msg_Dbg(p_aout, "using device id %s", deviceid);
         *(descs++) = strdup(device->name);
     }
-
-    msg_Dbg(p_aout, "returning a list of %i devices", n);
 
     return n;
 }
 
-static void add_device_to_list(audio_output_t * p_aout, UInt32 i_id, char *name, bool b_digital)
+static void add_device_to_list(audio_output_t * p_aout, UInt32 i_id, char *name)
 {
     struct aout_sys_t *p_sys = p_aout->sys;
-
-    msg_Dbg(p_aout, "adding device %i (%s) to list", i_id, name);
 
     struct audio_device_t *device = malloc(sizeof(*device));
     if (unlikely(device == NULL))
@@ -935,7 +929,6 @@ static void add_device_to_list(audio_output_t * p_aout, UInt32 i_id, char *name,
     device->next = p_sys->devices;
     device->deviceid = i_id;
     device->name = strdup(name);
-    device->digital = b_digital;
 
     p_sys->devices = device;
 }
@@ -1016,18 +1009,21 @@ static void RebuildDeviceList(audio_output_t * p_aout)
         msg_Dbg(p_aout, "DevID: %i DevName: %s", deviceIDs[i], psz_name);
 
         if (!AudioDeviceHasOutput(deviceIDs[i])) {
-            msg_Dbg(p_aout, "this device is INPUT only. skipping...");
+            msg_Dbg(p_aout, "this '%s' is INPUT only. skipping...", psz_name);
             free(psz_name);
             continue;
         }
 
+        add_device_to_list(p_aout, i_id, psz_name);
+
         if (AudioDeviceSupportsDigital(p_aout, deviceIDs[i])) {
             b_digital = true;
-            msg_Dbg(p_aout, "this device supports digital");
+            msg_Dbg(p_aout, "'%s' supports digital output", psz_name);
             asprintf(&psz_name, _("%s (Encoded Output)"), psz_name);
+            i_id = i_id | AOUT_VAR_SPDIF_FLAG;
+            add_device_to_list(p_aout, i_id, psz_name);
         }
 
-        add_device_to_list(p_aout, i_id, psz_name, b_digital);
         free(psz_name);
     }
 
@@ -1041,10 +1037,18 @@ static void RebuildDeviceList(audio_output_t * p_aout)
 
 static int SwitchAudioDevice(audio_output_t *p_aout, const char *name)
 {
+    struct aout_sys_t *p_sys = p_aout->sys;
+
     if (name)
-        p_aout->sys->i_selected_dev = atoi(name);
+        p_sys->i_selected_dev = atoi(name);
     else
-        p_aout->sys->i_selected_dev = 0;
+        p_sys->i_selected_dev = 0;
+
+    bool b_supports_digital = (p_sys->i_selected_dev & AOUT_VAR_SPDIF_FLAG);
+    if (b_supports_digital)
+        p_sys->b_selected_dev_is_digital = true;
+
+    p_sys->i_selected_dev = p_sys->i_selected_dev & ~AOUT_VAR_SPDIF_FLAG;
 
     aout_DeviceReport(p_aout, name);
     aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
@@ -1148,9 +1152,9 @@ static int AudioStreamSupportsDigital(audio_output_t *p_aout, AudioStreamID i_st
 #endif
 
         if (p_format_list[i].mFormat.mFormatID == 'IAC3' ||
-           p_format_list[i].mFormat.mFormatID == 'iac3' ||
-           p_format_list[i].mFormat.mFormatID == kAudioFormat60958AC3 ||
-           p_format_list[i].mFormat.mFormatID == kAudioFormatAC3)
+            p_format_list[i].mFormat.mFormatID == 'iac3' ||
+            p_format_list[i].mFormat.mFormatID == kAudioFormat60958AC3 ||
+            p_format_list[i].mFormat.mFormatID == kAudioFormatAC3)
             b_return = true;
     }
 
