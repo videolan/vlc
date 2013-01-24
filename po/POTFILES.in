@@ -211,6 +211,7 @@ modules/access/imem.c
 modules/access/jack.c
 modules/access/linsys/linsys_hdsdi.c
 modules/access/linsys/linsys_sdi.c
+modules/access/live555.cpp
 modules/access/mms/asf.c
 modules/access/mms/asf.h
 modules/access/mms/buffer.c
@@ -448,7 +449,6 @@ modules/demux/flac.c
 modules/demux/gme.c
 modules/demux/image.c
 modules/demux/kate_categories.c
-modules/demux/live555.cpp
 modules/demux/mjpeg.c
 modules/demux/mkv/chapter_command.cpp
 modules/demux/mkv/chapter_command.hpp

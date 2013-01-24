@@ -7,7 +7,6 @@ SOURCES_rawvid = rawvid.c
 SOURCES_au = au.c
 SOURCES_rawaud = rawaud.c
 SOURCES_wav = wav.c
-SOURCES_live555 = live555.cpp ../access/mms/asf.c ../access/mms/buffer.c
 SOURCES_nsv = nsv.c
 SOURCES_real = real.c
 SOURCES_ps = ps.c ps.h

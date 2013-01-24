@@ -280,6 +280,7 @@ SOURCES_access_http = http.c
 SOURCES_htcpcp = htcpcp.c
 SOURCES_access_ftp = ftp.c
 SOURCES_access_sftp = sftp.c
+SOURCES_live555 = live555.cpp mms/asf.c mms/buffer.c
 
 libaccess_mms_plugin_la_SOURCES = \
 	mms/mms.c mms/mms.h \
