@@ -121,10 +121,10 @@ static int      OpenAnalog              (audio_output_t *, audio_sample_format_t
 static int      OpenSPDIF               (audio_output_t *, audio_sample_format_t *);
 static void     Close                   (vlc_object_t *);
 
-static void     PlayAnalog              (audio_output_t *, block_t *);
-static void     FlushAnalog             (audio_output_t *, bool);
-static void     PauseAnalog             (audio_output_t *, bool, mtime_t);
-static int      TimeGetAnalog           (audio_output_t *, mtime_t *);
+static void     Play                    (audio_output_t *, block_t *);
+static void     Flush                   (audio_output_t *, bool);
+static void     Pause                   (audio_output_t *, bool, mtime_t);
+static int      TimeGet                 (audio_output_t *, mtime_t *);
 
 static int      DeviceList              (audio_output_t *p_aout, char ***namesp, char ***descsp);
 static void     RebuildDeviceList       (audio_output_t *);
@@ -243,17 +243,27 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         goto error;
     }
 
+    bool b_success = false;
+
     /* Check for Digital mode or Analog output mode */
     if (AOUT_FMT_SPDIF (fmt) && p_sys->b_selected_dev_is_digital) {
         if (OpenSPDIF (p_aout, fmt)) {
             msg_Dbg(p_aout, "digital output successfully opened");
-            return VLC_SUCCESS;
+            b_success = true;
         }
     } else {
         if (OpenAnalog(p_aout, fmt)) {
             msg_Dbg(p_aout, "analog output successfully opened");
-            return VLC_SUCCESS;
+            b_success = true;
         }
+    }
+
+    if (b_success) {
+        p_aout->play = Play;
+        p_aout->flush = Flush;
+        p_aout->time_get = TimeGet;
+        p_aout->pause = Pause;
+        return VLC_SUCCESS;
     }
 
 error:
@@ -588,11 +598,6 @@ static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                                     volume,
                                     0));
 
-    p_aout->time_get = TimeGetAnalog;
-    p_aout->play = PlayAnalog;
-    p_aout->pause = PauseAnalog;
-    p_aout->flush = FlushAnalog;
-
     return true;
 }
 
@@ -771,8 +776,8 @@ static int OpenSPDIF (audio_output_t * p_aout, audio_sample_format_t *fmt)
     fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE;
     fmt->i_frame_length = A52_FRAME_NB;
     fmt->i_rate = (unsigned int)p_sys->stream_format.mSampleRate;
+    p_sys->i_rate = fmt->i_rate;
     aout_FormatPrepare(fmt);
-    aout_PacketInit(p_aout, &p_sys->packet, A52_FRAME_NB, fmt);
 
     /* Add IOProc callback */
     err = AudioDeviceCreateIOProcID(p_sys->i_selected_dev,
@@ -781,7 +786,6 @@ static int OpenSPDIF (audio_output_t * p_aout, audio_sample_format_t *fmt)
                                    &p_sys->i_procID);
     if (err != noErr) {
         msg_Err(p_aout, "AudioDeviceCreateIOProcID failed: [%4.4s]", (char *)&err);
-        aout_PacketDestroy (p_aout);
         return false;
     }
 
@@ -799,7 +803,6 @@ static int OpenSPDIF (audio_output_t * p_aout, audio_sample_format_t *fmt)
         if (err != noErr)
             msg_Err(p_aout, "AudioDeviceDestroyIOProcID failed: [%4.4s]", (char *)&err);
 
-        aout_PacketDestroy (p_aout);
         return false;
     }
 
@@ -891,9 +894,6 @@ static void Stop(audio_output_t *p_aout)
 
     /* clean-up circular buffer */
     TPCircularBufferCleanup(&p_sys->circular_buffer);
-
-    if (p_sys->b_digital)
-        aout_PacketDestroy(p_aout);
 }
 
 static int DeviceList(audio_output_t *p_aout, char ***namesp, char ***descsp)
@@ -1047,6 +1047,8 @@ static int SwitchAudioDevice(audio_output_t *p_aout, const char *name)
     bool b_supports_digital = (p_sys->i_selected_dev & AOUT_VAR_SPDIF_FLAG);
     if (b_supports_digital)
         p_sys->b_selected_dev_is_digital = true;
+    else
+        p_sys->b_selected_dev_is_digital = false;
 
     p_sys->i_selected_dev = p_sys->i_selected_dev & ~AOUT_VAR_SPDIF_FLAG;
 
@@ -1235,7 +1237,7 @@ static int AudioStreamChangeFormat(audio_output_t *p_aout, AudioStreamID i_strea
     return true;
 }
 
-static void PlayAnalog (audio_output_t * p_aout, block_t * p_block)
+static void Play (audio_output_t * p_aout, block_t * p_block)
 {
     struct aout_sys_t *p_sys = p_aout->sys;
 
@@ -1247,7 +1249,7 @@ static void PlayAnalog (audio_output_t * p_aout, block_t * p_block)
         }
 
         /* Do the channel reordering */
-        if (p_sys->chans_to_reorder) {
+        if (p_sys->chans_to_reorder && !p_sys->b_digital) {
            aout_ChannelReorder(p_block->p_buffer,
                                p_block->i_buffer,
                                p_sys->chans_to_reorder,
@@ -1274,7 +1276,7 @@ static void PlayAnalog (audio_output_t * p_aout, block_t * p_block)
     block_Release(p_block);
 }
 
-static void PauseAnalog (audio_output_t *p_aout, bool pause, mtime_t date)
+static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
 {
     VLC_UNUSED(date);
 
@@ -1284,7 +1286,7 @@ static void PauseAnalog (audio_output_t *p_aout, bool pause, mtime_t date)
         AudioOutputUnitStart(p_aout->sys->au_unit);
 }
 
-static void FlushAnalog(audio_output_t *p_aout, bool wait)
+static void Flush(audio_output_t *p_aout, bool wait)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
     VLC_UNUSED(wait);
@@ -1299,7 +1301,7 @@ static void FlushAnalog(audio_output_t *p_aout, bool wait)
     p_sys->i_last_sample_time = 0;
 }
 
-static int TimeGetAnalog(audio_output_t *p_aout, mtime_t *delay)
+static int TimeGet(audio_output_t *p_aout, mtime_t *delay)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
 
@@ -1369,39 +1371,32 @@ static OSStatus RenderCallbackSPDIF (AudioDeviceID inDevice,
                                     const AudioTimeStamp * inOutputTime,
                                     void * threadGlobals)
 {
-    block_t * p_buffer;
-    mtime_t         current_date;
-
-    audio_output_t * p_aout = (audio_output_t *)threadGlobals;
-    struct aout_sys_t * p_sys = p_aout->sys;
-
+    VLC_UNUSED(inNow);
     VLC_UNUSED(inDevice);
     VLC_UNUSED(inInputData);
     VLC_UNUSED(inInputTime);
 
-    /* Check for the difference between the Device clock and mdate */
-    p_sys->clock_diff = - (mtime_t)
-        AudioConvertHostTimeToNanos(inNow->mHostTime) / 1000;
-    p_sys->clock_diff += mdate();
+    audio_output_t * p_aout = (audio_output_t *)threadGlobals;
+    struct aout_sys_t * p_sys = p_aout->sys;
 
-    current_date = p_sys->clock_diff +
-                   AudioConvertHostTimeToNanos(inOutputTime->mHostTime) / 1000;
-                   //- ((mtime_t) 1000000 / p_aout->format.i_rate * 31); // 31 = Latency in Frames. retrieve somewhere
+    int bytesToCopy = outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize;
+    Float32 *targetBuffer = (Float32*)outOutputData->mBuffers[p_sys->i_stream_index].mData;
 
-    p_buffer = aout_PacketNext(p_aout, current_date);
+    /* Pull audio from buffer */
+    int32_t availableBytes;
+    Float32 *buffer = TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
 
-#define BUFFER outOutputData->mBuffers[p_sys->i_stream_index]
-    if (p_buffer != NULL) {
-        if ((int)BUFFER.mDataByteSize != (int)p_buffer->i_buffer)
-            msg_Warn(p_aout, "bytesize: %d nb_bytes: %d", (int)BUFFER.mDataByteSize, (int)p_buffer->i_buffer);
-
-        /* move data into output data buffer */
-        memcpy(BUFFER.mData, p_buffer->p_buffer, p_buffer->i_buffer);
-        block_Release(p_buffer);
+    /* check if we have enough data */
+    if (!availableBytes) {
+        /* return an empty buffer so silence is played until we have data */
+        memset(targetBuffer, 0, outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize);
+    } else {
+        memcpy(targetBuffer, buffer, __MIN(bytesToCopy, availableBytes));
+        TPCircularBufferConsume(&p_sys->circular_buffer, __MIN(bytesToCopy, availableBytes));
+        vlc_mutex_lock(&p_sys->lock);
+        p_sys->i_last_sample_time = inOutputTime->mSampleTime;
+        vlc_mutex_unlock(&p_sys->lock);
     }
-    else
-        memset(BUFFER.mData, 0, BUFFER.mDataByteSize);
-#undef BUFFER
 
     return noErr;
 }
