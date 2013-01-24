@@ -69,7 +69,6 @@
  *****************************************************************************/
 struct aout_sys_t
 {
-    aout_packet_t               packet;
     AudioObjectID               i_default_dev;      /* DeviceID of defaultOutputDevice */
     AudioObjectID               i_selected_dev;     /* DeviceID of the selected device */
     bool                        b_selected_dev_is_digital;
