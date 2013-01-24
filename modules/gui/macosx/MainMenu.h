@@ -1,7 +1,7 @@
 /*****************************************************************************
  * MainMenu.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011-2012 Felix Paul Kühne
+ * Copyright (C) 2011-2013 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -236,6 +236,8 @@
 - (IBAction)setPlaybackRate:(id)sender;
 - (void)updatePlaybackRate;
 - (IBAction)toggleAtoBloop:(id)sender;
+
+- (IBAction)toggleAudioDevice:(id)sender;
 
 - (IBAction)toggleFullscreen:(id)sender;
 - (IBAction)resizeVideoWindow:(id)sender;

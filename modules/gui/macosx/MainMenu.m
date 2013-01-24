@@ -1,7 +1,7 @@
 /*****************************************************************************
  * MainMenu.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011-2012 Felix Paul Kühne
+ * Copyright (C) 2011-2013 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -261,6 +261,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
                              var: "intf-add" selector: @selector(toggleVar:)];
 
     [self setupExtensionsMenu];
+
+    [self refreshAudioDeviceList];
 }
 
 - (void)initStrings
@@ -507,9 +509,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
             [self setupVarMenuItem: o_mi_channels target: (vlc_object_t *)p_aout
                                      var: "stereo-mode" selector: @selector(toggleVar:)];
 
-            [self setupVarMenuItem: o_mi_device target: (vlc_object_t *)p_aout
-                                     var: "audio-device" selector: @selector(toggleVar:)];
-
             [self setupVarMenuItem: o_mi_visual target: (vlc_object_t *)p_aout
                                      var: "visual" selector: @selector(toggleVar:)];
             vlc_object_release(p_aout);
@@ -587,7 +586,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_deinterlace setEnabled: b_enabled];
     [o_mi_deinterlace_mode setEnabled: b_enabled];
     [o_mi_ffmpeg_pp setEnabled: b_enabled];
-    [o_mi_device setEnabled: b_enabled];
     [o_mi_screen setEnabled: b_enabled];
     [o_mi_aspect_ratio setEnabled: b_enabled];
     [o_mi_crop setEnabled: b_enabled];
@@ -716,6 +714,70 @@ static VLCMainMenu *_o_sharedInstance = nil;
 - (IBAction)toggleAtoBloop:(id)sender
 {
     [[VLCCoreInteraction sharedInstance] setAtoB];
+}
+
+#pragma mark -
+#pragma mark audio menu
+- (void)refreshAudioDeviceList
+{
+    char **ids, **names;
+    char *currentDevice;
+
+    [o_mu_device removeAllItems];
+
+    audio_output_t * p_aout = getAout();
+    if (!p_aout)
+        return;
+
+    int n = aout_DevicesList(p_aout, &ids, &names);
+    if (n == -1)
+        return;
+
+    currentDevice = aout_DeviceGet(p_aout);
+
+    NSMenuItem * o_mi_tmp;
+    o_mi_tmp = [o_mu_device addItemWithTitle:_NS("Default") action:@selector(toggleAudioDevice:) keyEquivalent:@""];
+    [o_mi_tmp setTarget:self];
+    if (!currentDevice)
+        [o_mi_tmp setState:NSOnState];
+
+    for (NSUInteger x = 0; x < n; x++) {
+        o_mi_tmp = [o_mu_device addItemWithTitle:[NSString stringWithFormat:@"%s", names[x]] action:@selector(toggleAudioDevice:) keyEquivalent:@""];
+        [o_mi_tmp setTarget:self];
+        [o_mi_tmp setTag:[[NSString stringWithFormat:@"%s", ids[x]] intValue]];
+        if (currentDevice) {
+            if (!strcmp(ids[x], currentDevice))
+                [o_mi_tmp setState: NSOnState];
+        }
+    }
+    vlc_object_release(p_aout);
+
+    for (NSUInteger x = 0; x < n; x++) {
+        free(ids[x]);
+        free(names[x]);
+    }
+    free(ids);
+    free(names);
+
+    [o_mu_device setAutoenablesItems:YES];
+    [o_mi_device setEnabled:YES];
+}
+
+- (IBAction)toggleAudioDevice:(id)sender
+{
+    audio_output_t * p_aout = getAout();
+
+    int returnValue = 0;
+
+    if ([sender tag] > 0)
+        aout_DeviceSet(p_aout, [[NSString stringWithFormat:@"%li", [sender tag]] UTF8String]);
+    else
+        aout_DeviceSet(p_aout, NULL);
+
+    if (returnValue != 0)
+        msg_Warn(VLCIntf, "failed to set audio device %li", [sender tag]);
+
+    [self refreshAudioDeviceList];
 }
 
 #pragma mark -
@@ -1213,10 +1275,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
     /* Preserve settings across vouts via the playlist object: */
     if (!strcmp([menuContent name], "fullscreen") || !strcmp([menuContent name], "video-on-top"))
         var_Set(pl_Get(VLCIntf), [menuContent name] , [menuContent value]);
-
-    /* save our audio device across multiple sessions */
-    if (!strcmp([menuContent name], "audio-device"))
-        config_PutInt(VLCIntf, "macosx-audio-device", [menuContent value].i_int);
 
     p_object = [menuContent vlcObject];
 

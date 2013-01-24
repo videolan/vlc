@@ -1,7 +1,7 @@
 /*****************************************************************************
  * intf.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2012 VLC authors and VideoLAN
+ * Copyright (C) 2002-2013 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -711,12 +711,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     if (!OSX_SNOW_LEOPARD)
         b_nativeFullscreenMode = var_InheritBool(p_intf, "macosx-nativefullscreenmode");
 #endif
-
-    /* recover stored audio device, if set
-     * in case it was unplugged in the meantime, auhal will fall back on the default */
-    int i_value = config_GetInt(p_intf, "macosx-audio-device");
-    if (i_value > 0)
-        var_SetInteger(pl_Get(VLCIntf), "audio-device", i_value);
 
     if (config_GetInt(VLCIntf, "macosx-icon-change")) {
         /* After day 354 of the year, the usual VLC cone is replaced by another cone
