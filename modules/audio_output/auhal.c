@@ -909,9 +909,12 @@ static int DeviceList(audio_output_t *p_aout, char ***namesp, char ***descsp)
     *namesp = names = xmalloc(sizeof(*names) * n);
     *descsp = descs = xmalloc(sizeof(*descs) * n);
 
+    char deviceid[100];
     for (struct audio_device_t *device = p_sys->devices; device != NULL; device = device->next) {
-        *(names++) = strdup(device->name);
-        sprintf(*(descs++), "%d", device->deviceid);
+        sprintf(deviceid, "%i", device->deviceid);
+        *(names++) = strdup(deviceid);
+        msg_Dbg(p_aout, "using device id %s", deviceid);
+        *(descs++) = strdup(device->name);
     }
 
     msg_Dbg(p_aout, "returning a list of %i devices", n);
@@ -1039,6 +1042,8 @@ static void RebuildDeviceList(audio_output_t * p_aout)
 static int SwitchAudioDevice(audio_output_t *p_aout, const char *name)
 {
     msg_Warn(p_aout, "we should switch to device '%s'", name);
+
+    aout_DeviceReport(p_aout, name);
 
     return 0;
 }
