@@ -325,7 +325,9 @@ static void Win32DebugOutputMsg (void* d, int type, const msg_item_t *p_item,
             msg[msg_len] = '\n';
             msg[msg_len + 1] = '\0';
         }
-        OutputDebugStringW(ToWide(msg));
+        wchar_t *wmsg = ToWide(msg);
+        OutputDebugStringW(wmsg);
+        free(wmsg);
     }
     free(msg);
 }
