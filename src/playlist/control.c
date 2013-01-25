@@ -108,6 +108,7 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
     case PLAYLIST_PLAY:
         if( pl_priv(p_playlist)->p_input )
         {
+            pl_priv(p_playlist)->status.i_status = PLAYLIST_RUNNING;
             var_SetInteger( pl_priv(p_playlist)->p_input, "state", PLAYING_S );
             break;
         }
