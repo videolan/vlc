@@ -289,6 +289,7 @@ public slots:
     void showArtUpdate( input_item_t * );
     void askForUpdate();
     void setArtFromFile();
+    void clear();
 };
 
 #endif

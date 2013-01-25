@@ -722,6 +722,11 @@ void CoverArtLabel::setArtFromFile()
     THEMIM->getIM()->setArt( p_item, fileUrl );
 }
 
+void CoverArtLabel::clear()
+{
+    showArtUpdate( "" );
+}
+
 TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
     : ClickableQLabel(), p_intf( _p_intf ), bufTimer( new QTimer(this) ),
       buffering( false ), showBuffering(false), bufVal( -1 ), displayType( _displayType )

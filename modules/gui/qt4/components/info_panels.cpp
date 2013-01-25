@@ -335,6 +335,7 @@ void MetaPanel::clear()
     nowplaying_text->clear();
     publisher_text->clear();
     encodedby_text->clear();
+    art_cover->clear();
 
     setEditMode( false );
     emit uriSet( "" );
