@@ -127,11 +127,7 @@ char *vlc_getcwd (void)
 typedef struct vlc_DIR
 {
     _WDIR *wdir; /* MUST be first, see <vlc_fs.h> */
-    union
-    {
-        DWORD drives;
-        bool insert_dot_dot;
-    } u;
+    bool insert_dot_dot;
 } vlc_DIR;
 
 
@@ -148,17 +144,8 @@ DIR *vlc_opendir (const char *dirname)
         return NULL;
     }
 
-    if (wpath[0] == L'\0' || (wcscmp (wpath, L"\\") == 0))
-    {
-        free (wpath);
-        /* Special mode to list drive letters */
-        p_dir->wdir = NULL;
-        p_dir->u.drives = GetLogicalDrives ();
-        return (void *)p_dir;
-    }
-
     assert (wpath[0]); // wpath[1] is defined
-    p_dir->u.insert_dot_dot = !wcscmp (wpath + 1, L":\\");
+    p_dir->insert_dot_dot = !wcscmp (wpath + 1, L":\\");
 
     _WDIR *wdir = _wopendir (wpath);
     free (wpath);
@@ -175,29 +162,10 @@ char *vlc_readdir (DIR *dir)
 {
     vlc_DIR *p_dir = (vlc_DIR *)dir;
 
-    if (p_dir->wdir == NULL)
-    {
-        /* Drive letters mode */
-        DWORD drives = p_dir->u.drives;
-        if (drives == 0)
-            return NULL; /* end */
-
-        unsigned int i;
-        for (i = 0; !(drives & 1); i++)
-            drives >>= 1;
-        p_dir->u.drives &= ~(1UL << i);
-        assert (i < 26);
-
-        char *ret;
-        if (asprintf (&ret, "%c:\\", 'A' + i) == -1)
-            return NULL;
-        return ret;
-    }
-
-    if (p_dir->u.insert_dot_dot)
+    if (p_dir->insert_dot_dot)
     {
         /* Adds "..", gruik! */
-        p_dir->u.insert_dot_dot = false;
+        p_dir->insert_dot_dot = false;
         return strdup ("..");
     }
 
