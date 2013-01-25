@@ -481,7 +481,7 @@ void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
         for( ssize_t i = 0; i < count; i++ )
         {
             combo->addItem( qtr(texts[i]), QVariant(qfu(values[i])) );
-            if( !strcmp(p_config->value.psz, values[i]) )
+            if( p_config->value.psz && !strcmp(p_config->value.psz, values[i]) )
                 combo->setCurrentIndex( i );
             free( texts[i] );
             free( values[i] );
