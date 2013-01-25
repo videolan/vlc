@@ -227,6 +227,7 @@ public slots:
     void initialize();
 private slots:
     void updateButtons();
+    void enableAdvancedDialog( int );
     void advancedDialog();
 };
 

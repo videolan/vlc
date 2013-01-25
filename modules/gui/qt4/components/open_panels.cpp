@@ -746,6 +746,7 @@ void CaptureOpenPanel::initialize()
     ui.setupUi( this );
 
     BUTTONACT( ui.advancedButton, advancedDialog() );
+    CONNECT( ui.deviceCombo, currentIndexChanged(int), this, enableAdvancedDialog(int) );
 
     /* Create two stacked layouts in the main comboBoxes */
     QStackedLayout *stackedDevLayout = new QStackedLayout;
@@ -1290,6 +1291,14 @@ void CaptureOpenPanel::updateButtons()
     }
 
     advMRL.clear();
+}
+
+void CaptureOpenPanel::enableAdvancedDialog( int i_index )
+{
+    int i_devicetype = ui.deviceCombo->itemData( i_index ).toInt();
+    module_t *p_module =
+        module_find( psz_devModule[i_devicetype] );
+    ui.advancedButton->setEnabled( NULL != p_module );
 }
 
 void CaptureOpenPanel::advancedDialog()
