@@ -48,7 +48,7 @@ static inline void vlc_init_avformat(void)
 {
     vlc_avcodec_lock();
 
-#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( 51, 42, 0 )
+#if LIBAVUTIL_VERSION_CHECK(51, 25, 0, 42, 100)
     av_set_cpu_flags_mask( INT_MAX & ~GetVlcDspMask() );
 #endif
 
