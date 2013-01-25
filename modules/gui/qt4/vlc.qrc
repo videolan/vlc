@@ -144,5 +144,11 @@
     <qresource prefix="/sidebar/sd">
         <file alias="icecast">pixmaps/playlist/sidebar-icons/sd/icecast.png</file>
         <file alias="appletrailers">pixmaps/playlist/sidebar-icons/sd/appletrailers.png</file>
+        <file alias="assembleenationale">pixmaps/playlist/sidebar-icons/sd/assembleenationale.png</file>
+        <file alias="fmc">pixmaps/playlist/sidebar-icons/sd/fmc.png</file>
+        <file alias="frenchtv">pixmaps/playlist/sidebar-icons/sd/frenchtv.png</file>
+        <file alias="jamendo">pixmaps/playlist/sidebar-icons/sd/jamendo.png</file>
+        <file alias="katsomo">pixmaps/playlist/sidebar-icons/sd/katsomo.png</file>
+        <file alias="metachannels">pixmaps/playlist/sidebar-icons/sd/metachannels.png</file>
     </qresource>
 </RCC>
