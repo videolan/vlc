@@ -53,16 +53,175 @@ vlc_module_end ()
  *****************************************************************************/
 static bool IsSupported( const audio_format_t *p_input, const audio_format_t *p_output );
 
+struct filter_sys_t
+{
+    void (*pf_dowork)(filter_t *, block_t *, block_t * );
+};
+
 static block_t *Filter( filter_t *, block_t * );
 
-/*****************************************************************************
- * DoWork: convert a buffer
- *****************************************************************************/
-static void DoWork( filter_t * p_filter,
-                    block_t * p_in_buf, block_t * p_out_buf )
-{
-    const unsigned i_input_physical = p_filter->fmt_in.audio.i_physical_channels;
+static void DoWork_7_x_to_2_0( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
+    float *p_dest = (float *)p_out_buf->p_buffer;
+    const float *p_src = (const float *)p_in_buf->p_buffer;
+    for( int i = p_in_buf->i_nb_samples; i--; )
+    {
+        *p_dest++ = p_src[6] + 0.5 * p_src[0] + p_src[2] / 4 + p_src[4] / 4;
+        *p_dest++ = p_src[6] + 0.5 * p_src[1] + p_src[3] / 4 + p_src[5] / 4;
 
+        p_src += 7;
+
+        if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
+    }
+}
+
+static void DoWork_5_x_to_2_0( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
+    float *p_dest = (float *)p_out_buf->p_buffer;
+    const float *p_src = (const float *)p_in_buf->p_buffer;
+    for( int i = p_in_buf->i_nb_samples; i--; )
+    {
+        *p_dest++ = p_src[4] + 0.5 * p_src[0] + 0.33 * p_src[2];
+        *p_dest++ = p_src[4] + 0.5 * p_src[1] + 0.33 * p_src[3];
+
+        p_src += 5;
+
+        if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
+    }
+}
+
+static void DoWork_4_0_to_2_0( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
+    VLC_UNUSED(p_filter);
+    float *p_dest = (float *)p_out_buf->p_buffer;
+    const float *p_src = (const float *)p_in_buf->p_buffer;
+    for( int i = p_in_buf->i_nb_samples; i--; )
+    {
+        *p_dest++ = p_src[2] + p_src[3] + 0.5 * p_src[0];
+        *p_dest++ = p_src[2] + p_src[3] + 0.5 * p_src[1];
+        p_src += 4;
+    }
+}
+
+static void DoWork_3_x_to_2_0( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
+    float *p_dest = (float *)p_out_buf->p_buffer;
+    const float *p_src = (const float *)p_in_buf->p_buffer;
+    for( int i = p_in_buf->i_nb_samples; i--; )
+    {
+        *p_dest++ = p_src[2] + 0.5 * p_src[0];
+        *p_dest++ = p_src[2] + 0.5 * p_src[1];
+
+        p_src += 3;
+
+        if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
+    }
+}
+
+static void DoWork_7_x_to_1_0( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
+    float *p_dest = (float *)p_out_buf->p_buffer;
+    const float *p_src = (const float *)p_in_buf->p_buffer;
+    for( int i = p_in_buf->i_nb_samples; i--; )
+    {
+        *p_dest++ = p_src[6] + p_src[0] / 4 + p_src[1] / 4 + p_src[2] / 8 + p_src[3] / 8 + p_src[4] / 8 + p_src[5] / 8;
+
+        p_src += 7;
+
+        if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
+    }
+}
+
+static void DoWork_5_x_to_1_0( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
+    float *p_dest = (float *)p_out_buf->p_buffer;
+    const float *p_src = (const float *)p_in_buf->p_buffer;
+    for( int i = p_in_buf->i_nb_samples; i--; )
+    {
+        *p_dest++ = p_src[4] + p_src[0] / 4 + p_src[1] / 4 + p_src[2] / 6 + p_src[3] / 6;
+
+        p_src += 5;
+
+        if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
+    }
+}
+
+static void DoWork_3_x_to_1_0( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
+    float *p_dest = (float *)p_out_buf->p_buffer;
+    const float *p_src = (const float *)p_in_buf->p_buffer;
+    for( int i = p_in_buf->i_nb_samples; i--; )
+    {
+        *p_dest++ = p_src[2] + p_src[0] / 4 + p_src[1] / 4;
+
+        p_src += 3;
+
+        if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
+    }
+}
+
+static void DoWork_2_x_to_1_0( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
+    VLC_UNUSED(p_filter);
+    float *p_dest = (float *)p_out_buf->p_buffer;
+    const float *p_src = (const float *)p_in_buf->p_buffer;
+    for( int i = p_in_buf->i_nb_samples; i--; )
+    {
+        *p_dest++ = p_src[0] / 2 + p_src[1] / 2;
+
+        p_src += 2;
+    }
+}
+
+static void DoWork_7_x_to_4_0( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
+    float *p_dest = (float *)p_out_buf->p_buffer;
+    const float *p_src = (const float *)p_in_buf->p_buffer;
+    for( int i = p_in_buf->i_nb_samples; i--; )
+    {
+        *p_dest++ = p_src[6] + 0.5 * p_src[0] + p_src[2] / 6;
+        *p_dest++ = p_src[6] + 0.5 * p_src[1] + p_src[3] / 6;
+        *p_dest++ = p_src[2] / 6 +  p_src[4];
+        *p_dest++ = p_src[3] / 6 +  p_src[5];
+
+        p_src += 7;
+
+        if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
+    }
+}
+
+static void DoWork_5_x_to_4_0( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
+    float *p_dest = (float *)p_out_buf->p_buffer;
+    const float *p_src = (const float *)p_in_buf->p_buffer;
+    for( int i = p_in_buf->i_nb_samples; i--; )
+    {
+        *p_dest++ = p_src[4] + 0.5 * p_src[0];
+        *p_dest++ = p_src[4] + 0.5 * p_src[1];
+        *p_dest++ = p_src[2];
+        *p_dest++ = p_src[3];
+
+        p_src += 5;
+
+        if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
+    }
+}
+
+
+/*****************************************************************************
+ * OpenFilter:
+ *****************************************************************************/
+static int OpenFilter( vlc_object_t *p_this )
+{
+    filter_t *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys;
+
+    audio_format_t fmt_in  = p_filter->fmt_in.audio;
+    audio_format_t fmt_out = p_filter->fmt_out.audio;
+
+    fmt_in.i_format = p_filter->fmt_in.i_codec;
+    fmt_out.i_format = p_filter->fmt_out.i_codec;
+
+    if( !IsSupported( &fmt_in, &fmt_out ) )
+        return VLC_EGENERIC;
+
+    p_filter->p_sys = malloc( sizeof(*p_sys) );
+    if( unlikely(p_filter->p_sys) )
+        return VLC_ENOMEM;
+
+    p_filter->pf_audio_filter = Filter;
+
+    const unsigned i_input_physical = p_filter->fmt_in.audio.i_physical_channels;
     const bool b_input_7_0 = (i_input_physical & ~AOUT_CHAN_LFE) == AOUT_CHANS_7_0;
     const bool b_input_5_0 = !b_input_7_0 &&
                              ( (i_input_physical & AOUT_CHANS_5_0) == AOUT_CHANS_5_0 ||
@@ -72,103 +231,27 @@ static void DoWork( filter_t * p_filter,
     const bool b_input_3_0 = !b_input_7_0 && !b_input_5_0 && !b_input_4_center_rear &&
                              (i_input_physical & ~AOUT_CHAN_LFE) == AOUT_CHANS_3_0;
 
-    int i_input_nb = aout_FormatNbChannels( &p_filter->fmt_in.audio );
-    int i_output_nb = aout_FormatNbChannels( &p_filter->fmt_out.audio );
-    float *p_dest = (float *)p_out_buf->p_buffer;
-    const float *p_src = (const float *)p_in_buf->p_buffer;
-    int i;
-
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_buffer = p_in_buf->i_buffer * i_output_nb / i_input_nb;
-
     if( p_filter->fmt_out.audio.i_physical_channels == AOUT_CHANS_2_0 )
     {
         if( b_input_7_0 )
-        for( i = p_in_buf->i_nb_samples; i--; )
-        {
-            *p_dest = p_src[6] + 0.5 * p_src[0] + p_src[2] / 4 + p_src[4] / 4;
-            p_dest++;
-            *p_dest = p_src[6] + 0.5 * p_src[1] + p_src[3] / 4 + p_src[5] / 4;
-            p_dest++;
-
-            p_src += 7;
-
-            if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
-        }
+            p_filter->p_sys->pf_dowork = DoWork_7_x_to_2_0;
         else if( b_input_5_0 )
-        for( i = p_in_buf->i_nb_samples; i--; )
-        {
-            *p_dest = p_src[4] + 0.5 * p_src[0] + 0.33 * p_src[2];
-            p_dest++;
-            *p_dest = p_src[4] + 0.5 * p_src[1] + 0.33 * p_src[3];
-            p_dest++;
-
-            p_src += 5;
-
-            if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
-        }
+            p_filter->p_sys->pf_dowork = DoWork_5_x_to_2_0;
+        else if( b_input_4_center_rear )
+            p_filter->p_sys->pf_dowork = DoWork_4_0_to_2_0;
         else if( b_input_3_0 )
-        for( i = p_in_buf->i_nb_samples; i--; )
-        {
-            *p_dest = p_src[2] + 0.5 * p_src[0];
-            p_dest++;
-            *p_dest = p_src[2] + 0.5 * p_src[1];
-            p_dest++;
-
-            p_src += 3;
-
-            if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
-        }
-        else if (b_input_4_center_rear)
-        for( i = p_in_buf->i_nb_samples; i--; )
-        {
-          *p_dest = p_src[2] + p_src[3] + 0.5 * p_src[0];
-          p_dest++;
-          *p_dest = p_src[2] + p_src[3] + 0.5 * p_src[1];
-          p_dest++;
-          p_src += 4;
-        }
+            p_filter->p_sys->pf_dowork = DoWork_3_x_to_2_0;
     }
     else if( p_filter->fmt_out.audio.i_physical_channels == AOUT_CHAN_CENTER )
     {
         if( b_input_7_0 )
-        for( i = p_in_buf->i_nb_samples; i--; )
-        {
-            *p_dest = p_src[6] + p_src[0] / 4 + p_src[1] / 4 + p_src[2] / 8 + p_src[3] / 8 + p_src[4] / 8 + p_src[5] / 8;
-            p_dest++;
-
-            p_src += 7;
-
-            if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
-        }
+            p_filter->p_sys->pf_dowork = DoWork_7_x_to_1_0;
         else if( b_input_5_0 )
-        for( i = p_in_buf->i_nb_samples; i--; )
-        {
-            *p_dest = p_src[4] + p_src[0] / 4 + p_src[1] / 4 + p_src[2] / 6 + p_src[3] / 6;
-            p_dest++;
-
-            p_src += 5;
-
-            if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
-        }
+            p_filter->p_sys->pf_dowork = DoWork_5_x_to_1_0;
         else if( b_input_3_0 )
-        for( i = p_in_buf->i_nb_samples; i--; )
-        {
-            *p_dest = p_src[2] + p_src[0] / 4 + p_src[1] / 4;
-            p_dest++;
-
-            p_src += 3;
-
-            if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
-        }
+            p_filter->p_sys->pf_dowork = DoWork_3_x_to_1_0;
         else
-        for( i = p_in_buf->i_nb_samples; i--; )
-        {
-            *p_dest = p_src[0] / 2 + p_src[1] / 2;
-            p_dest++;
-
-            p_src += 2;
-        }
+            p_filter->p_sys->pf_dowork = DoWork_2_x_to_1_0;
     }
     else
     {
@@ -176,59 +259,12 @@ static void DoWork( filter_t * p_filter,
         assert( b_input_7_0 || b_input_5_0 );
 
         if( b_input_7_0 )
-        for( i = p_in_buf->i_nb_samples; i--; )
-        {
-            *p_dest = p_src[6] + 0.5 * p_src[0] + p_src[2] / 6;
-            p_dest++;
-            *p_dest = p_src[6] + 0.5 * p_src[1] + p_src[3] / 6;
-            p_dest++;
-            *p_dest = p_src[2] / 6 +  p_src[4];
-            p_dest++;
-            *p_dest = p_src[3] / 6 +  p_src[5];
-            p_dest++;
-
-            p_src += 7;
-
-            if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
-        }
+            p_filter->p_sys->pf_dowork = DoWork_7_x_to_4_0;
         else
-        for( i = p_in_buf->i_nb_samples; i--; )
-        {
-            *p_dest = p_src[4] + 0.5 * p_src[0];
-            p_dest++;
-            *p_dest = p_src[4] + 0.5 * p_src[1];
-            p_dest++;
-            *p_dest = p_src[2];
-            p_dest++;
-            *p_dest = p_src[3];
-            p_dest++;
-
-            p_src += 5;
-
-            if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
-        }
+            p_filter->p_sys->pf_dowork = DoWork_5_x_to_4_0;
     }
-}
 
-/*****************************************************************************
- * OpenFilter:
- *****************************************************************************/
-static int OpenFilter( vlc_object_t *p_this )
-{
-    filter_t *p_filter = (filter_t *)p_this;
-
-    audio_format_t fmt_in  = p_filter->fmt_in.audio;
-    audio_format_t fmt_out = p_filter->fmt_out.audio;
-
-    fmt_in.i_format = p_filter->fmt_in.i_codec;
-    fmt_out.i_format = p_filter->fmt_out.i_codec;
-
-    if( !IsSupported( &fmt_in, &fmt_out ) )
-        return -1;
-
-    p_filter->pf_audio_filter = Filter;
-
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -236,6 +272,7 @@ static int OpenFilter( vlc_object_t *p_this )
  *****************************************************************************/
 static block_t *Filter( filter_t *p_filter, block_t *p_block )
 {
+    filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
     if( !p_block || !p_block->i_nb_samples )
     {
         if( p_block )
@@ -260,7 +297,12 @@ static block_t *Filter( filter_t *p_filter, block_t *p_block )
     p_out->i_pts = p_block->i_pts;
     p_out->i_length = p_block->i_length;
 
-    DoWork( p_filter, p_block, p_out );
+    int i_input_nb = aout_FormatNbChannels( &p_filter->fmt_in.audio );
+    int i_output_nb = aout_FormatNbChannels( &p_filter->fmt_out.audio );
+    p_out->i_nb_samples = p_block->i_nb_samples;
+    p_out->i_buffer = p_block->i_buffer * i_output_nb / i_input_nb;
+
+    p_sys->pf_dowork( p_filter, p_block, p_out );
 
     block_Release( p_block );
 
