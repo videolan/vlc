@@ -1512,13 +1512,15 @@ void VLCMenuBar::DoAction( QObject *data )
     MenuItemData *itemData = qobject_cast<MenuItemData *>( data );
     vlc_object_t *p_object = itemData->p_obj;
     if( p_object == NULL ) return;
+    const char *var = itemData->psz_var;
+    vlc_value_t val = itemData->val;
 
     /* Preserve settings across vouts via the playlist object: */
-    if( !strcmp( itemData->psz_var, "fullscreen" )
-     || !strcmp( itemData->psz_var, "video-on-top" ) )
-        var_Set( pl_Get( p_object ), itemData->psz_var, itemData->val );
+    if( !strcmp( var, "fullscreen" )
+     || !strcmp( var, "video-on-top" ) )
+        var_Set( pl_Get( p_object ), var, val );
 
-    var_Set( p_object, itemData->psz_var, itemData->val );
+    var_Set( p_object, var, val );
 }
 
 void VLCMenuBar::updateRecents( intf_thread_t *p_intf )
