@@ -164,7 +164,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     CONNECT( tracknumber_text, textEdited( QString ), this, enterEditMode() );
 
     CONNECT( date_text, textEdited( QString ), this, enterEditMode() );
-    CONNECT( THEMIM->getIM(), artChanged( QString ), this, enterEditMode() );
+//    CONNECT( THEMIM->getIM(), artChanged( QString ), this, enterEditMode() );
 /*    CONNECT( rating_text, valueChanged( QString ), this, enterEditMode( QString ) );*/
 
     /* We are not yet in Edit Mode */
@@ -184,7 +184,7 @@ void MetaPanel::update( input_item_t *p_item )
 
     /* Don't update if you are in edit mode */
     if( b_inEditMode ) return;
-    else p_input = p_item;
+    p_input = p_item;
 
     char *psz_meta;
 #define UPDATE_META( meta, widget ) {                                   \
