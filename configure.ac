@@ -2223,23 +2223,25 @@ dnl
 AC_ARG_ENABLE(avcodec,
 [  --enable-avcodec        libavcodec codec (default enabled)])
 AS_IF([test "${enable_avcodec}" != "no"], [
-  PKG_CHECK_MODULES(AVCODEC,[libavcodec >= 53.34.0 libavutil >= 51.22.0],
-    [
-      VLC_SAVE_FLAGS
-      CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
-      CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
-      AC_CHECK_HEADERS(libavcodec/avcodec.h)
-      AC_CHECK_HEADERS(libavutil/avutil.h)
-      VLC_ADD_PLUGIN([avcodec])
-      VLC_ADD_LIBS([avcodec],[$AVCODEC_LIBS])
-      AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
-        VLC_ADD_LIBS([avcodec],[-Wl,-Bsymbolic])
-      ])
-      VLC_ADD_CFLAGS([avcodec],[$AVCODEC_CFLAGS])
-      VLC_RESTORE_FLAGS
-      have_avcodec="yes"
-    ],[
-      AC_MSG_ERROR([${AVCODEC_PKG_ERRORS}. Pass --disable-avcodec to ignore this error.])
+  PKG_CHECK_MODULES(AVCODEC,[libavcodec >= 53.34.0 libavutil >= 51.22.0], [
+    PKG_CHECK_EXISTS([libavcodec < 55],, [
+      AC_MSG_ERROR([libavcodec versions 55 and later are not supported yet.])
+    ])
+    VLC_SAVE_FLAGS
+    CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
+    CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
+    AC_CHECK_HEADERS(libavcodec/avcodec.h)
+    AC_CHECK_HEADERS(libavutil/avutil.h)
+    VLC_ADD_PLUGIN([avcodec])
+    VLC_ADD_LIBS([avcodec],[$AVCODEC_LIBS])
+    AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
+      VLC_ADD_LIBS([avcodec],[-Wl,-Bsymbolic])
+    ])
+    VLC_ADD_CFLAGS([avcodec],[$AVCODEC_CFLAGS])
+    VLC_RESTORE_FLAGS
+    have_avcodec="yes"
+  ],[
+    AC_MSG_ERROR([${AVCODEC_PKG_ERRORS}. Pass --disable-avcodec to ignore this error.])
   ])
 ], [
   have_avcodec="no"
