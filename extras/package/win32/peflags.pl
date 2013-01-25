@@ -42,7 +42,7 @@ seek F, -2, 1;
 $flags |= 0x40;   # Dynamic Base
 $flags |= 0x100;  # NX Compat
 $flags |= 0x400;  # NO SEH
-$flags |= 0x1000; # App Container
+#$flags |= 0x1000; # App Container
 
 printf F "%c%c", $flags & 0xff,($flags >> 8) & 0xff;
 
