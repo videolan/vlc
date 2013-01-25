@@ -624,9 +624,12 @@ static void *Run( void *data )
         {
             vlc_value_t val;
             int i_ret;
-
             val.psz_string = psz_arg;
-            i_ret = var_Set( p_intf, psz_cmd, val );
+
+            if ((var_Type( p_intf, psz_cmd) & VLC_VAR_CLASS) == VLC_VAR_VOID)
+                i_ret = var_TriggerCallback( p_intf, psz_cmd );
+            else
+                i_ret = var_Set( p_intf, psz_cmd, val );
             msg_rc( "%s: returned %i (%s)",
                     psz_cmd, i_ret, vlc_error( i_ret ) );
         }
@@ -639,7 +642,10 @@ static void *Run( void *data )
             val.psz_string = psz_arg;
             /* FIXME: it's a global command, but we should pass the
              * local object as an argument, not p_intf->p_libvlc. */
-            i_ret = var_Set( p_intf->p_libvlc, psz_cmd, val );
+            if ((var_Type( p_intf->p_libvlc, psz_cmd) & VLC_VAR_CLASS) == VLC_VAR_VOID)
+                i_ret = var_TriggerCallback( p_intf, psz_cmd );
+            else
+                i_ret = var_Set( p_intf->p_libvlc, psz_cmd, val );
             if( i_ret != 0 )
             {
                 msg_rc( "%s: returned %i (%s)",
