@@ -1520,7 +1520,10 @@ void VLCMenuBar::DoAction( QObject *data )
      || !strcmp( var, "video-on-top" ) )
         var_Set( pl_Get( p_object ), var, val );
 
-    var_Set( p_object, var, val );
+    if ((var_Type( p_object, var) & VLC_VAR_CLASS) == VLC_VAR_VOID)
+        var_TriggerCallback( p_object, var );
+    else
+        var_Set( p_object, var, val );
 }
 
 void VLCMenuBar::updateRecents( intf_thread_t *p_intf )
