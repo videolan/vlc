@@ -589,20 +589,19 @@ static char* FontConfig_Select( FcConfig* config, const char* family,
 #endif
 
 #ifdef WIN32
-#define FONT_DIR_NT "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts"
+#define FONT_DIR_NT _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts")
 
-static int GetFileFontByName( const char *font_name, char **psz_filename )
+static int GetFileFontByName( LPCTSTR font_name, char **psz_filename )
 {
     HKEY hKey;
-    wchar_t vbuffer[MAX_PATH];
-    wchar_t dbuffer[256];
+    TCHAR vbuffer[MAX_PATH];
+    TCHAR dbuffer[256];
 
-    if( RegOpenKeyExA(HKEY_LOCAL_MACHINE, FONT_DIR_NT, 0, KEY_READ, &hKey)
+    if( RegOpenKeyEx(HKEY_LOCAL_MACHINE, FONT_DIR_NT, 0, KEY_READ, &hKey)
             != ERROR_SUCCESS )
         return 1;
 
-    MultiByteToWideChar( CP_ACP, 0, font_name, -1, dbuffer, 256 );
-    char *font_name_temp = FromWide( dbuffer );
+    char *font_name_temp = FromT( font_name );
     size_t fontname_len = strlen( font_name_temp );
 
     for( int index = 0;; index++ )
@@ -610,15 +609,15 @@ static int GetFileFontByName( const char *font_name, char **psz_filename )
         DWORD vbuflen = MAX_PATH - 1;
         DWORD dbuflen = 255;
 
-        LONG i_result = RegEnumValueW( hKey, index, vbuffer, &vbuflen,
-                                       NULL, NULL, (LPBYTE)dbuffer, &dbuflen);
+        LONG i_result = RegEnumValue( hKey, index, vbuffer, &vbuflen,
+                                      NULL, NULL, (LPBYTE)dbuffer, &dbuflen);
         if( i_result != ERROR_SUCCESS )
         {
             RegCloseKey( hKey );
             return i_result;
         }
 
-        char *psz_value = FromWide( vbuffer );
+        char *psz_value = FromT( vbuffer );
 
         char *s = strchr( psz_value,'(' );
         if( s != NULL && s != psz_value ) s[-1] = '\0';
@@ -642,7 +641,7 @@ static int GetFileFontByName( const char *font_name, char **psz_filename )
         free( psz_value );
     }
 
-    *psz_filename = FromWide( dbuffer );
+    *psz_filename = FromT( dbuffer );
     free( font_name_temp );
     RegCloseKey( hKey );
     return 0;
@@ -656,7 +655,7 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
     if( (type & RASTER_FONTTYPE) ) return 1;
     // if( lpelfe->elfScript ) FIXME
 
-    return GetFileFontByName( (const char *)lpelfe->elfFullName, (char **)lParam );
+    return GetFileFontByName( (LPCTSTR)lpelfe->elfFullName, (char **)lParam );
 }
 
 static char* Win32_Select( filter_t *p_filter, const char* family,
@@ -675,10 +674,8 @@ static char* Win32_Select( filter_t *p_filter, const char* family,
     if( b_bold )
         lf.lfWeight = FW_BOLD;
 
-    char facename[32];
-    wchar_t* psz_fbuffer = ToWide( family );
-    WideCharToMultiByte( CP_ACP, 0, psz_fbuffer, -1, facename, 32, " ", 0 );
-    strncpy( (LPSTR)&lf.lfFaceName, facename, 32 );
+    LPTSTR psz_fbuffer = ToT( family );
+    _tcsncpy( (LPTSTR)&lf.lfFaceName, psz_fbuffer, LF_FACESIZE );
     free( psz_fbuffer );
 
     /* */
