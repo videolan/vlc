@@ -433,8 +433,8 @@ Function .onInit
 @HAVE_WIN64_TRUE@ ${Endif}
 
 @HAVE_WIN64_TRUE@ SetRegView 64
-ReadRegStr $INSTDIR HKLM "${PRODUCT_DIR_REGKEY}" ""
-StrCmp $INSTDIR "" 0 +1
+ReadRegStr $INSTDIR HKLM "${PRODUCT_DIR_REGKEY}" "InstallDir"
+StrCmp $INSTDIR "" 0 UAC_Elevate
 StrCpy $INSTDIR "$@PROGRAMFILES@\VideoLAN\VLC"
 
 UAC_Elevate:
