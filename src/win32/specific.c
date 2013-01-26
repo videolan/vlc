@@ -294,7 +294,7 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
                 /* FIXME: This breaks relative paths if calling vlc.exe is
                  * started from a different working directory. */
                 char *psz_URI = NULL;
-                if( strstr( psz_URI, "://" ) == NULL )
+                if( strstr( ppsz_argv[i_opt], "://" ) == NULL )
                     psz_URI = vlc_path2uri( ppsz_argv[i_opt], NULL );
                 playlist_AddExt( p_playlist,
                         (psz_URI != NULL) ? psz_URI : ppsz_argv[i_opt],
