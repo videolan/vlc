@@ -41,18 +41,31 @@ CtrlImage::CtrlImage( intf_thread_t *pIntf, GenericBitmap &rBitmap,
     m_rCommand( rCommand ), m_resizeMethod( resizeMethod ), m_art( art ),
     m_x( 0 ), m_y( 0 )
 {
-    // Create an initial unscaled image in the buffer
-    m_pImage = OSFactory::instance( pIntf )->createOSGraphics(
-                                    rBitmap.getWidth(), rBitmap.getHeight() );
-    m_pImage->drawBitmap( *m_pBitmap );
-
-    // Observe the variable
     if( m_art )
     {
+        // art file if any will overwrite the original image
         VlcProc *pVlcProc = VlcProc::instance( getIntf() );
+        ArtManager* pArtManager = ArtManager::instance( getIntf() );
+
+        // add observer
         pVlcProc->getStreamArtVar().addObserver( this );
+
+        // retrieve initial state of art file
+        string str = pVlcProc->getStreamArtVar().get();
+        GenericBitmap* pArt = (GenericBitmap*) pArtManager->getArtBitmap( str );
+        if( pArt )
+        {
+            m_pBitmap = pArt;
+            msg_Dbg( getIntf(), "art file %s to be displayed (wxh = %ix%i)",
+                str.c_str(), m_pBitmap->getWidth(), m_pBitmap->getHeight() );
+        }
     }
 
+    // Create the initial image
+    m_pImage = OSFactory::instance( getIntf() )->createOSGraphics(
+                                    m_pBitmap->getWidth(),
+                                    m_pBitmap->getHeight() );
+    m_pImage->drawBitmap( *m_pBitmap );
 }
 
 
@@ -250,7 +263,6 @@ void CtrlImage::onUpdate( Subject<VarString> &rVariable, void* arg )
         GenericBitmap* pArt = (GenericBitmap*) pArtManager->getArtBitmap( str );
 
         m_pBitmap = pArt ? pArt : m_pOriginalBitmap;
-
         msg_Dbg( getIntf(), "art file %s to be displayed (wxh = %ix%i)",
                             str.c_str(),
                             m_pBitmap->getWidth(),
