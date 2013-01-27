@@ -215,7 +215,10 @@ static int MP4_ReadBoxContainerChildren( stream_t *p_stream,
         p_container->p_last = p_box;
 
         if( p_box->i_type == i_last_child )
+        {
+            MP4_NextBox( p_stream, p_box );
             break;
+        }
 
     } while( MP4_NextBox( p_stream, p_box ) == 1 );
 
