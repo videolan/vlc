@@ -479,7 +479,13 @@ void Win32Factory::changeCursor( CursorType_t type ) const
 
 void Win32Factory::rmDir( const string &rPath )
 {
-    LPWSTR dir = ToWide( rPath.c_str() );
+    LPWSTR dir_temp = ToWide( rPath.c_str() );
+    size_t len = wcslen( dir_temp );
+
+    LPWSTR dir = (wchar_t *)malloc( (len + 1) * sizeof (wchar_t) );
+    wcsncpy( dir, dir_temp, len );
+    dir[len] = '\0';
+
     SHFILEOPSTRUCTW file_op = {
         NULL,
         FO_DELETE,
@@ -493,6 +499,9 @@ void Win32Factory::rmDir( const string &rPath )
         L"" };
 
      SHFileOperationW(&file_op);
+
+     free(dir_temp);
+     free(dir);
 }
 
 #endif
