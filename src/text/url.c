@@ -69,7 +69,7 @@ char *decode_URI (char *str)
     if (in == NULL)
         return NULL;
 
-    signed char c;
+    char c;
     while ((c = *(in++)) != '\0')
     {
         if (c == '%')
@@ -82,12 +82,7 @@ char *decode_URI (char *str)
             *(out++) = strtoul (hex, NULL, 0x10);
         }
         else
-        if (c >= 32)
             *(out++) = c;
-        else
-            /* Inserting non-ASCII or non-printable characters is unsafe,
-             * and no sane browser will send these unencoded */
-            *(out++) = '?';
     }
     *out = '\0';
     return str;
