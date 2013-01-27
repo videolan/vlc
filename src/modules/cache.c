@@ -57,7 +57,7 @@
 #ifdef HAVE_DYNAMIC_PLUGINS
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 21
+#define CACHE_SUBVERSION_NUM 22
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -80,7 +80,15 @@ void CacheDelete( vlc_object_t *obj, const char *dir )
 
 #define LOAD_IMMEDIATE(a) \
     if (fread (&(a), sizeof (char), sizeof (a), file) != sizeof (a)) \
-       goto error
+        goto error
+#define LOAD_FLAG(a) \
+    do { \
+        unsigned char b; \
+        LOAD_IMMEDIATE(b); \
+        if (b > 1) \
+            goto error; \
+        (a) = b; \
+    } while (0)
 
 static int CacheLoadString (char **p, FILE *file)
 {
@@ -115,7 +123,13 @@ error:
 
 static int CacheLoadConfig (module_config_t *cfg, FILE *file)
 {
-    LOAD_IMMEDIATE (cfg->flags);
+    LOAD_IMMEDIATE (cfg->i_type);
+    LOAD_IMMEDIATE (cfg->i_short);
+    LOAD_FLAG (cfg->b_advanced);
+    LOAD_FLAG (cfg->b_internal);
+    LOAD_FLAG (cfg->b_unsaveable);
+    LOAD_FLAG (cfg->b_safe);
+    LOAD_FLAG (cfg->b_removed);
     LOAD_STRING (cfg->psz_type);
     LOAD_STRING (cfg->psz_name);
     LOAD_STRING (cfg->psz_text);
@@ -383,6 +397,11 @@ error:
 #define SAVE_IMMEDIATE( a ) \
     if (fwrite (&(a), sizeof(a), 1, file) != 1) \
         goto error
+#define SAVE_FLAG(a) \
+    do { \
+        char b = (a); \
+        LOAD_IMMEDIATE(b); \
+    } while (0)
 
 static int CacheSaveString (FILE *file, const char *str)
 {
@@ -403,7 +422,13 @@ error:
 
 static int CacheSaveConfig (FILE *file, const module_config_t *cfg)
 {
-    SAVE_IMMEDIATE (cfg->flags);
+    SAVE_IMMEDIATE (cfg->i_type);
+    SAVE_IMMEDIATE (cfg->i_short);
+    SAVE_FLAG (cfg->b_advanced);
+    SAVE_FLAG (cfg->b_internal);
+    SAVE_FLAG (cfg->b_unsaveable);
+    SAVE_FLAG (cfg->b_safe);
+    SAVE_FLAG (cfg->b_removed);
     SAVE_STRING (cfg->psz_type);
     SAVE_STRING (cfg->psz_name);
     SAVE_STRING (cfg->psz_text);

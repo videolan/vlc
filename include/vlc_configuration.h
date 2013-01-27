@@ -59,20 +59,14 @@ typedef int (*vlc_integer_list_cb)(vlc_object_t *, const char *,
 
 struct module_config_t
 {
-    union
-    {
-        struct
-        {
-            uint8_t     i_type;                        /* Configuration type */
-            char        i_short;               /* Optional short option name */
-            unsigned    b_advanced:1;                     /* Advanced option */
-            unsigned    b_internal:1;          /* Hidden from prefs and help */
-            unsigned    b_unsaveable:1;       /* Not stored in configuration */
-            unsigned    b_safe:1;       /* Safe in web plugins and playlists */
-            unsigned    b_removed:1;                           /* Deprecated */
-        };
-        uint32_t flags;
-    };
+    uint8_t     i_type;                        /* Configuration type */
+    char        i_short;               /* Optional short option name */
+    unsigned    b_advanced:1;                     /* Advanced option */
+    unsigned    b_internal:1;          /* Hidden from prefs and help */
+    unsigned    b_unsaveable:1;       /* Not stored in configuration */
+    unsigned    b_safe:1;       /* Safe in web plugins and playlists */
+    unsigned    b_removed:1;                           /* Deprecated */
+
     char *psz_type;                                 /* Configuration subtype */
     char *psz_name;                                           /* Option name */
     char *psz_text;             /* Short comment on the configuration option */
