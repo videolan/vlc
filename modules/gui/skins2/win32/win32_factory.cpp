@@ -482,9 +482,8 @@ void Win32Factory::rmDir( const string &rPath )
     LPWSTR dir_temp = ToWide( rPath.c_str() );
     size_t len = wcslen( dir_temp );
 
-    LPWSTR dir = (wchar_t *)malloc( (len + 1) * sizeof (wchar_t) );
-    wcsncpy( dir, dir_temp, len );
-    dir[len] = '\0';
+    LPWSTR dir = (wchar_t *)malloc( (len + 2) * sizeof (wchar_t) );
+    wcsncpy( dir, dir_temp, len + 2);
 
     SHFILEOPSTRUCTW file_op = {
         NULL,
