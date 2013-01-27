@@ -258,6 +258,14 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_SVQ3, "SVQ-3 (Sorenson Video v3)"),
         A("SVQ3"),
 
+    /* HEVC / H.265 */
+    B(VLC_CODEC_HEVC, "MPEG-H Part2/HEVC (H.265)"),
+        A("hevc"),
+        A("HEVC"),
+        A("h265"),
+        A("H265"),
+        A("x265"),
+
     /* h264 */
     B(VLC_CODEC_H264, "H264 - MPEG-4 AVC (part 10)"),
         A("H264"),
