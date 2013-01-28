@@ -18,12 +18,18 @@
 
 use warnings;
 
-if ($#ARGV != 0) {
-    die "Need exactly one argument";
+if ($#ARGV < 0 || $#ARGV > 1 || ($#ARGV == 1 && $ARGV[0] ne "-AppContainer")) {
+    die "Usage: peflags.pl [-AppContainer] file";
+}
+my $appContainer = 0;
+my $file = $ARGV[0];
+if ($#ARGV == 1 && ($ARGV[0] eq "-AppContainer")) {
+    $appContainer = 1;
+    $file = $ARGV[1];
 }
 
-open F, "+<$ARGV[0]"
-    or die "Can't open `$ARGV[0]'";
+open F, "+<$file"
+    or die "Can't open `$file'";
 binmode F;
 
 seek F, 0x3c, 0;
@@ -42,7 +48,9 @@ seek F, -2, 1;
 $flags |= 0x40;   # Dynamic Base
 $flags |= 0x100;  # NX Compat
 $flags |= 0x400;  # NO SEH
-#$flags |= 0x1000; # App Container
+if ($appContainer) {
+    $flags |= 0x1000; # App Container
+}
 
 printf F "%c%c", $flags & 0xff,($flags >> 8) & 0xff;
 
