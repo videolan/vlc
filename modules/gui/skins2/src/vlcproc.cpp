@@ -453,27 +453,7 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
         getIntf()->p_sys->p_input = pInput;
         vlc_object_hold( pInput );
 
-        input_item_t *p_item = input_GetItem( pInput );
-        if( p_item )
-        {
-            // Update short name
-            char *psz_name = input_item_GetName( p_item );
-            SET_TEXT( m_cVarStreamName, UString( getIntf(), psz_name ) );
-            free( psz_name );
-
-            // Update local path (if possible) or full uri
-            char *psz_uri = input_item_GetURI( p_item );
-            char *psz_path = make_path( psz_uri );
-            char *psz_save = psz_path ? psz_path : psz_uri;
-            SET_TEXT( m_cVarStreamURI, UString( getIntf(), psz_save ) );
-            free( psz_path );
-            free( psz_uri );
-
-            // Update art uri
-            char *psz_art = input_item_GetArtURL( p_item );
-            SET_STRING( m_cVarStreamArt, string( psz_art ? psz_art : "" ) );
-            free( psz_art );
-        }
+        update_current_input();
     }
 
     switch( newVal.i_int )
@@ -792,6 +772,36 @@ void VlcProc::init_variables()
     SET_BOOL( m_cVarMute, b_is_muted );
 
     update_equalizer();
+}
+
+
+void VlcProc::update_current_input()
+{
+    input_thread_t* pInput = getIntf()->p_sys->p_input;
+    if( !pInput )
+        return;
+
+    input_item_t *p_item = input_GetItem( pInput );
+    if( p_item )
+    {
+        // Update short name
+        char *psz_name = input_item_GetName( p_item );
+        SET_TEXT( m_cVarStreamName, UString( getIntf(), psz_name ) );
+        free( psz_name );
+
+        // Update local path (if possible) or full uri
+        char *psz_uri = input_item_GetURI( p_item );
+        char *psz_path = make_path( psz_uri );
+        char *psz_save = psz_path ? psz_path : psz_uri;
+        SET_TEXT( m_cVarStreamURI, UString( getIntf(), psz_save ) );
+        free( psz_path );
+        free( psz_uri );
+
+        // Update art uri
+        char *psz_art = input_item_GetArtURL( p_item );
+        SET_STRING( m_cVarStreamArt, string( psz_art ? psz_art : "" ) );
+        free( psz_art );
+    }
 }
 
 void VlcProc::update_equalizer()

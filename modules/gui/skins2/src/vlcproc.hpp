@@ -98,6 +98,9 @@ public:
     /// update equalizer
     void update_equalizer( );
 
+    /// update global variables for the current input
+    void update_current_input( );
+
     void on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal );
     void on_bit_rate_changed( vlc_object_t* p_obj, vlc_value_t newVal );
     void on_sample_rate_changed( vlc_object_t* p_obj, vlc_value_t newVal );
