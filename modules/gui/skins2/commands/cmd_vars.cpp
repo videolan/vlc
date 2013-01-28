@@ -28,7 +28,7 @@
 #include "../vars/playtree.hpp"
 
 
-void CmdPlaytreeUpdate::execute()
+void CmdItemUpdate::execute()
 {
     if( !m_pItem )
         return;
@@ -43,10 +43,10 @@ void CmdPlaytreeUpdate::execute()
         VlcProc::instance( getIntf() )->getPlaytreeVar().onUpdateItem( id );
 }
 
-bool CmdPlaytreeUpdate::checkRemove( CmdGeneric *pQueuedCommand ) const
+bool CmdItemUpdate::checkRemove( CmdGeneric *pQueuedCommand ) const
 {
     // We don't use RTTI - Use C-style cast
-    CmdPlaytreeUpdate *pUpdateCommand = (CmdPlaytreeUpdate *)(pQueuedCommand);
+    CmdItemUpdate *pUpdateCommand = (CmdItemUpdate *)(pQueuedCommand);
     return m_pItem == pUpdateCommand->m_pItem;
 }
 

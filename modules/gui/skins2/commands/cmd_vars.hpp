@@ -39,16 +39,16 @@ class EqualizerPreamp;
 class VarText;
 
 /// Command to notify the playtree of an item update
-class CmdPlaytreeUpdate: public CmdGeneric
+class CmdItemUpdate: public CmdGeneric
 {
 public:
-    CmdPlaytreeUpdate( intf_thread_t *pIntf, input_item_t* pItem ):
+    CmdItemUpdate( intf_thread_t *pIntf, input_item_t* pItem ):
         CmdGeneric( pIntf ), m_pItem( pItem )
     {
         if( pItem )
             vlc_gc_incref( pItem );
     }
-    virtual ~CmdPlaytreeUpdate()
+    virtual ~CmdItemUpdate()
     {
         if( m_pItem )
             vlc_gc_decref( m_pItem );

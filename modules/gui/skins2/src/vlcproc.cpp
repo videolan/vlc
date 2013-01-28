@@ -247,7 +247,7 @@ int VlcProc::onItemChange( vlc_object_t *pObj, const char *pVariable,
     input_item_t *p_item = static_cast<input_item_t*>(newval.p_address);
 
     // Create a playtree notify command
-    CmdPlaytreeUpdate *pCmdTree = new CmdPlaytreeUpdate( pThis->getIntf(),
+    CmdItemUpdate *pCmdTree = new CmdItemUpdate( pThis->getIntf(),
                                                          p_item );
 
     // Push the command in the asynchronous command queue
