@@ -157,7 +157,6 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "volume" )
     ADD_CALLBACK( pIntf->p_libvlc, "intf-toggle-fscontrol" )
 
-    ADD_CALLBACK( pIntf->p_sys->p_playlist, "activity" )
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "random" )
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "loop" )
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "repeat" )
@@ -205,8 +204,6 @@ VlcProc::~VlcProc()
     var_DelCallback( getIntf()->p_libvlc, "intf-toggle-fscontrol",
                      onGenericCallback, this );
 
-    var_DelCallback( getIntf()->p_sys->p_playlist, "activity",
-                     onGenericCallback, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "random",
                      onGenericCallback, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "loop",
@@ -367,7 +364,6 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
     } \
     }
 
-    ADD_CALLBACK_ENTRY( "activity", on_activity_changed, false )
     ADD_CALLBACK_ENTRY( "volume", on_volume_changed, true )
 
     ADD_CALLBACK_ENTRY( "bit-rate", on_bit_rate_changed, false )
@@ -443,40 +439,6 @@ int VlcProc::onGenericCallback2( vlc_object_t *pObj, const char *pVariable,
     return VLC_EGENERIC;
 }
 
-
-void VlcProc::on_activity_changed( vlc_object_t* p_obj, vlc_value_t newVal )
-{
-    (void)p_obj; (void)newVal;
-
-    input_thread_t *p_input = getIntf()->p_sys->p_input;
-    if( !p_input )
-        return;
-
-    input_item_t *p_item = input_GetItem( p_input );
-    if( !p_item )
-        return;
-
-    // Update short name
-    char *psz_name = input_item_GetName( p_item );
-    SET_TEXT( m_cVarStreamName, UString( getIntf(), psz_name ) );
-    free( psz_name );
-
-    // Update local path (if possible) or full uri
-    char *psz_uri = input_item_GetURI( p_item );
-    char *psz_path = make_path( psz_uri );
-    char *psz_save = psz_path ? psz_path : psz_uri;
-    SET_TEXT( m_cVarStreamURI, UString( getIntf(), psz_save ) );
-    free( psz_path );
-    free( psz_uri );
-
-    // Update art uri
-    char *psz_art = input_item_GetArtURL( p_item );
-    SET_STRING( m_cVarStreamArt, string( psz_art ? psz_art : "" ) );
-    free( psz_art );
-
-    // Update playtree
-    getPlaytreeVar().onUpdateCurrent( true );
-}
 
 void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 {
