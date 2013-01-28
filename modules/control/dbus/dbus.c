@@ -4,10 +4,12 @@
  * Copyright © 2006-2008 Rafaël Carré
  * Copyright © 2007-2012 Mirsal Ennaime
  * Copyright © 2009-2012 The VideoLAN team
+ * Copyright © 2013      Alex Merry
  * $Id$
  *
  * Authors:    Rafaël Carré <funman at videolanorg>
  *             Mirsal Ennaime <mirsal at mirsal fr>
+ *             Alex Merry <dev at randomguy3 me uk>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1207,6 +1209,41 @@ int GetInputMeta( input_item_t* p_input,
     vlc_mutex_unlock( &p_input->lock );
 
     dbus_message_iter_close_container( args, &dict );
+    return VLC_SUCCESS;
+}
+
+int AddProperty( intf_thread_t *p_intf,
+                 DBusMessageIter *p_container,
+                 const char* psz_property_name,
+                 const char* psz_signature,
+                 int (*pf_marshaller) (intf_thread_t*, DBusMessageIter*) )
+{
+    DBusMessageIter entry, v;
+
+    if( !dbus_message_iter_open_container( p_container,
+                                           DBUS_TYPE_DICT_ENTRY, NULL,
+                                           &entry ) )
+        return VLC_ENOMEM;
+
+    if( !dbus_message_iter_append_basic( &entry,
+                                         DBUS_TYPE_STRING,
+                                         &psz_property_name ) )
+        return VLC_ENOMEM;
+
+    if( !dbus_message_iter_open_container( &entry,
+                                           DBUS_TYPE_VARIANT, psz_signature,
+                                           &v ) )
+        return VLC_ENOMEM;
+
+    if( VLC_SUCCESS != pf_marshaller( p_intf, &v ) )
+        return VLC_ENOMEM;
+
+    if( !dbus_message_iter_close_container( &entry, &v) )
+        return VLC_ENOMEM;
+
+    if( !dbus_message_iter_close_container( p_container, &entry ) )
+        return VLC_ENOMEM;
+
     return VLC_SUCCESS;
 }
 

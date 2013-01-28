@@ -478,42 +478,6 @@ DBUS_METHOD( SetProperty )
 #undef PROPERTY_GET_FUNC
 #undef PROPERTY_MAPPING_END
 
-static int
-AddProperty( intf_thread_t *p_intf,
-             DBusMessageIter *p_container,
-             const char* psz_property_name,
-             const char* psz_signature,
-             int (*pf_marshaller) (intf_thread_t*, DBusMessageIter*) )
-{
-    DBusMessageIter entry, v;
-
-    if( !dbus_message_iter_open_container( p_container,
-                                           DBUS_TYPE_DICT_ENTRY, NULL,
-                                           &entry ) )
-        return VLC_ENOMEM;
-
-    if( !dbus_message_iter_append_basic( &entry,
-                                         DBUS_TYPE_STRING,
-                                         &psz_property_name ) )
-        return VLC_ENOMEM;
-
-    if( !dbus_message_iter_open_container( &entry,
-                                           DBUS_TYPE_VARIANT, psz_signature,
-                                           &v ) )
-        return VLC_ENOMEM;
-
-    if( VLC_SUCCESS != pf_marshaller( p_intf, &v ) )
-        return VLC_ENOMEM;
-
-    if( !dbus_message_iter_close_container( &entry, &v) )
-        return VLC_ENOMEM;
-
-    if( !dbus_message_iter_close_container( p_container, &entry ) )
-        return VLC_ENOMEM;
-
-    return VLC_SUCCESS;
-}
-
 #define ADD_PROPERTY( prop, signature ) \
     if( VLC_SUCCESS != AddProperty( (intf_thread_t*) p_this, \
                 &dict, #prop, signature, Marshal##prop ) ) \
