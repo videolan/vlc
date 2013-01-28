@@ -4,10 +4,12 @@
  * Copyright © 2006-2008 Rafaël Carré
  * Copyright © 2007-2011 Mirsal Ennaime
  * Copyright © 2009-2011 The VideoLAN team
+ * Copyright © 2013      Alex Merry
  * $Id$
  *
  * Authors:    Mirsal Ennaime <mirsal at mirsal fr>
  *             Rafaël Carré <funman at videolanorg>
+ *             Alex Merry <dev at randomguy3 me uk>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -137,7 +139,7 @@ DBUS_METHOD( CanSetFullscreen )
     REPLY_SEND;
 }
 
-static void
+static int
 MarshalFullscreen( intf_thread_t *p_intf, DBusMessageIter *container )
 {
     dbus_bool_t b_fullscreen;
@@ -149,6 +151,7 @@ MarshalFullscreen( intf_thread_t *p_intf, DBusMessageIter *container )
 
     dbus_message_iter_append_basic( container,
             DBUS_TYPE_BOOLEAN, &b_fullscreen );
+    return VLC_SUCCESS;
 }
 
 DBUS_METHOD( FullscreenGet )
@@ -517,6 +520,7 @@ DBUS_METHOD( GetAllProperties )
     ADD_PROPERTY( HasTrackList,        "b"  );
     ADD_PROPERTY( CanQuit,             "b"  );
     ADD_PROPERTY( CanSetFullscreen,    "b"  );
+    ADD_PROPERTY( Fullscreen,          "b"  );
     ADD_PROPERTY( CanRaise,            "b"  );
 
     dbus_message_iter_close_container( &args, &dict );
