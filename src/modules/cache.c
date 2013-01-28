@@ -400,7 +400,7 @@ error:
 #define SAVE_FLAG(a) \
     do { \
         char b = (a); \
-        LOAD_IMMEDIATE(b); \
+        SAVE_IMMEDIATE(b); \
     } while (0)
 
 static int CacheSaveString (FILE *file, const char *str)
