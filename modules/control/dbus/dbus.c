@@ -1147,10 +1147,32 @@ int DemarshalSetPropertyValue( DBusMessage *p_msg, void *p_arg )
         free( psz ); \
     }
 
+#define ADD_META_SINGLETON_STRING_LIST( entry, item ) \
+    { \
+        char * psz = input_item_Get##item( p_input );\
+        if( psz ) { \
+            dbus_message_iter_open_container( &dict, DBUS_TYPE_DICT_ENTRY, \
+                    NULL, &dict_entry ); \
+            dbus_message_iter_append_basic( &dict_entry, DBUS_TYPE_STRING, \
+                    &ppsz_meta_items[entry] ); \
+            dbus_message_iter_open_container( &dict_entry, DBUS_TYPE_VARIANT, \
+                    "as", &variant ); \
+            dbus_message_iter_open_container( &variant, DBUS_TYPE_ARRAY, "s", \
+                                              &list ); \
+            dbus_message_iter_append_basic( &list, \
+                    DBUS_TYPE_STRING, \
+                    &psz ); \
+            dbus_message_iter_close_container( &variant, &list ); \
+            dbus_message_iter_close_container( &dict_entry, &variant ); \
+            dbus_message_iter_close_container( &dict, &dict_entry ); \
+        } \
+        free( psz ); \
+    }
+
 int GetInputMeta( input_item_t* p_input,
                   DBusMessageIter *args )
 {
-    DBusMessageIter dict, dict_entry, variant;
+    DBusMessageIter dict, dict_entry, variant, list;
     /** The duration of the track can be expressed in second, milli-seconds and
         µ-seconds */
     dbus_int64_t i_mtime = input_item_GetDuration( p_input );
@@ -1177,19 +1199,19 @@ int GetInputMeta( input_item_t* p_input,
     ADD_META( 0, DBUS_TYPE_OBJECT_PATH, psz_trackid );
     ADD_VLC_META_STRING( 1,  URI );
     ADD_VLC_META_STRING( 2,  Title );
-    ADD_VLC_META_STRING( 3,  Artist );
+    ADD_META_SINGLETON_STRING_LIST( 3,  Artist );
     ADD_VLC_META_STRING( 4,  Album );
     ADD_VLC_META_STRING( 5,  TrackNum );
     ADD_META( 6, DBUS_TYPE_UINT32, i_time );
     ADD_META( 7, DBUS_TYPE_INT64,  i_mtime );
-    ADD_VLC_META_STRING( 8,  Genre );
-    ADD_VLC_META_STRING( 9,  Rating );
-    ADD_VLC_META_STRING( 10, Date );
+    ADD_META_SINGLETON_STRING_LIST( 8,  Genre );
+    //ADD_META( 9, DBUS_TYPE_DOUBLE, rating );
+    ADD_VLC_META_STRING( 10, Date ); // this is supposed to be in ISO 8601 extended format
     ADD_VLC_META_STRING( 11, ArtURL );
     ADD_VLC_META_STRING( 12, TrackID );
 
     ADD_VLC_META_STRING( 17, Copyright );
-    ADD_VLC_META_STRING( 18, Description );
+    ADD_META_SINGLETON_STRING_LIST( 18, Description );
     ADD_VLC_META_STRING( 19, EncodedBy );
     ADD_VLC_META_STRING( 20, Language );
     ADD_META( 21, DBUS_TYPE_INT64, i_length );
