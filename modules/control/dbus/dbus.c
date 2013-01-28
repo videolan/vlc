@@ -519,6 +519,11 @@ static void ProcessEvents( intf_thread_t *p_intf,
         {
         case SIGNAL_ITEM_CURRENT:
             TrackChange( p_intf );
+
+            // rate depends on current item
+            if( !vlc_dictionary_has_key( &tracklist_properties, "Rate" ) )
+                vlc_dictionary_insert( &player_properties, "Rate", NULL );
+
             vlc_dictionary_insert( &player_properties, "Metadata", NULL );
             break;
         case SIGNAL_INTF_CHANGE:

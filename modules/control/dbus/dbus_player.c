@@ -520,7 +520,7 @@ MarshalRate( intf_thread_t *p_intf, DBusMessageIter *container )
         vlc_object_release( (vlc_object_t*) p_input );
     }
     else
-        d_rate = 0.;
+        d_rate = 1.0;
 
     dbus_message_iter_append_basic( container, DBUS_TYPE_DOUBLE, &d_rate );
 }
