@@ -453,7 +453,12 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
         getIntf()->p_sys->p_input = pInput;
         vlc_object_hold( pInput );
 
+        // update global variables pertaining to this input
         update_current_input();
+
+        // ensure the playtree is also updated
+        // (highlights the new item to be played back)
+        getPlaytreeVar().onUpdateCurrent( true );
     }
 
     switch( newVal.i_int )
