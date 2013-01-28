@@ -38,12 +38,6 @@ class EqualizerBands;
 class EqualizerPreamp;
 class VarText;
 
-/// Command to notify the playlist of a change
-DEFINE_COMMAND( NotifyPlaylist, "notify playlist" )
-
-/// Command to notify the playlist of a change
-DEFINE_COMMAND( PlaytreeChanged, "playtree changed" )
-
 /// Command to notify the playtree of an item update
 class CmdPlaytreeUpdate: public CmdGeneric
 {

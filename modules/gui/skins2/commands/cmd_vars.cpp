@@ -28,11 +28,6 @@
 #include "../vars/playtree.hpp"
 
 
-void CmdPlaytreeChanged::execute()
-{
-    VlcProc::instance( getIntf() )->getPlaytreeVar().onChange();
-}
-
 void CmdPlaytreeUpdate::execute()
 {
     if( !m_pItem )
