@@ -280,6 +280,34 @@ DBUS_METHOD( OpenUri )
 }
 
 static int
+MarshalCanGoNext( intf_thread_t *p_intf, DBusMessageIter *container )
+{
+    VLC_UNUSED( p_intf );
+
+    dbus_bool_t b_can_go_next = TRUE;
+
+    if( !dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN,
+                                         &b_can_go_next ) )
+        return VLC_ENOMEM;
+
+    return VLC_SUCCESS;
+}
+
+static int
+MarshalCanGoPrevious( intf_thread_t *p_intf, DBusMessageIter *container )
+{
+    VLC_UNUSED( p_intf );
+
+    dbus_bool_t b_can_go_previous = TRUE;
+
+    if( !dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN,
+                                         &b_can_go_previous ) )
+        return VLC_ENOMEM;
+
+    return VLC_SUCCESS;
+}
+
+static int
 MarshalCanPlay( intf_thread_t *p_intf, DBusMessageIter *container )
 {
     playlist_t *p_playlist = p_intf->p_sys->p_playlist;
@@ -646,6 +674,8 @@ DBUS_METHOD( GetProperty )
     PROPERTY_GET_FUNC( MaximumRate,    "d" )
     PROPERTY_GET_FUNC( CanControl,     "b" )
     PROPERTY_GET_FUNC( CanPlay,        "b" )
+    PROPERTY_GET_FUNC( CanGoNext,      "b" )
+    PROPERTY_GET_FUNC( CanGoPrevious,  "b" )
     PROPERTY_GET_FUNC( CanPause,       "b" )
     PROPERTY_GET_FUNC( CanSeek,        "b" )
     PROPERTY_MAPPING_END
@@ -733,6 +763,8 @@ DBUS_METHOD( GetAllProperties )
     ADD_PROPERTY ( MaximumRate,    "d"     );
     ADD_PROPERTY ( CanControl,     "b"     );
     ADD_PROPERTY ( CanPlay,        "b"     );
+    ADD_PROPERTY ( CanGoNext,      "b"     );
+    ADD_PROPERTY ( CanGoPrevious,  "b"     );
     ADD_PROPERTY ( CanPause,       "b"     );
     ADD_PROPERTY ( CanSeek,        "b"     );
 
