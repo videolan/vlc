@@ -4,10 +4,12 @@
  * Copyright © 2006-2011 Rafaël Carré
  * Copyright © 2007-2011 Mirsal Ennaime
  * Copyright © 2009-2011 The VideoLAN team
+ * Copyright © 2013      Alex Merry
  * $Id$
  *
  * Authors:    Mirsal Ennaime <mirsal at mirsal fr>
  *             Rafaël Carré <funman at videolanorg>
+ *             Alex Merry <dev at randomguy3 me uk>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -286,20 +288,16 @@ DBUS_METHOD( RemoveTrack )
     REPLY_SEND;
 }
 
-DBUS_METHOD( Tracks )
-{ /* Tracks property */
-    VLC_UNUSED( p_this );
-
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-
-    DBusMessageIter tracks, v;
-    char *psz_track_id = NULL;
-    playlist_t   *p_playlist   = PL;
+static int
+MarshalTracks( intf_thread_t *p_intf, DBusMessageIter *container )
+{
+    DBusMessageIter tracks;
+    char         *psz_track_id = NULL;
+    playlist_t   *p_playlist   = p_intf->p_sys->p_playlist;
     input_item_t *p_input      = NULL;
 
-    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "ao", &v );
-    dbus_message_iter_open_container( &v,    DBUS_TYPE_ARRAY, "o", &tracks );
+    dbus_message_iter_open_container( container, DBUS_TYPE_ARRAY, "o",
+                                      &tracks );
 
     PL_LOCK;
 
@@ -315,9 +313,8 @@ DBUS_METHOD( Tracks )
                                              &psz_track_id ) )
         {
             PL_UNLOCK;
-            dbus_message_iter_abandon_container( &v, &tracks );
-            dbus_message_iter_abandon_container( &args, &v );
-            return DBUS_HANDLER_RESULT_NEED_MEMORY;
+            dbus_message_iter_abandon_container( container, &tracks );
+            return VLC_ENOMEM;
         }
 
         free( psz_track_id );
@@ -325,26 +322,57 @@ DBUS_METHOD( Tracks )
 
     PL_UNLOCK;
 
-    if( !dbus_message_iter_close_container( &v, &tracks ) ||
-        !dbus_message_iter_close_container( &args, &v ) )
+    if( !dbus_message_iter_close_container( container, &tracks ) )
+        return VLC_ENOMEM;
+
+    return VLC_SUCCESS;
+}
+
+
+DBUS_METHOD( Tracks )
+{ /* Tracks property */
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+
+    DBusMessageIter v;
+
+    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "ao", &v );
+
+    if( MarshalTracks( p_this, &v ) != VLC_SUCCESS )
+    {
+        dbus_message_iter_abandon_container( &args, &v );
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+    }
+
+    if( !dbus_message_iter_close_container( &args, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
     REPLY_SEND;
 }
 
+static int
+MarshalCanEditTracks( intf_thread_t *p_intf, DBusMessageIter *container )
+{
+    VLC_UNUSED( p_intf );
+    const dbus_bool_t b_ret = TRUE;
+
+    if( !dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN, &b_ret ) )
+        return VLC_ENOMEM;
+
+    return VLC_SUCCESS;
+}
+
 DBUS_METHOD( CanEditTracks )
 { /* CanEditTracks property */
-    VLC_UNUSED( p_this );
     REPLY_INIT;
     OUT_ARGUMENTS;
 
     DBusMessageIter v;
-    const dbus_bool_t b_ret = TRUE;
 
     if( !dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "b", &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
-    if( !dbus_message_iter_append_basic( &v, DBUS_TYPE_BOOLEAN, &b_ret ) )
+    if( MarshalCanEditTracks( p_this, &v ) != VLC_SUCCESS )
     {
         dbus_message_iter_abandon_container( &args, &v );
         return DBUS_HANDLER_RESULT_NEED_MEMORY;

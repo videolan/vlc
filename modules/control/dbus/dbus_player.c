@@ -41,17 +41,12 @@
 
 static int MarshalLoopStatus ( intf_thread_t *, DBusMessageIter * );
 
-DBUS_METHOD( Position )
-{ /* returns position in microseconds */
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-    DBusMessageIter v;
+static int
+MarshalPosition( intf_thread_t *p_intf, DBusMessageIter *container )
+{
     dbus_int64_t i_pos;
-
-    if( !dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "x", &v ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    input_thread_t *p_input = playlist_CurrentInput( PL );
+    input_thread_t *p_input;
+    p_input = playlist_CurrentInput( p_intf->p_sys->p_playlist );
 
     if( !p_input )
         i_pos = 0;
@@ -62,8 +57,22 @@ DBUS_METHOD( Position )
         vlc_object_release( p_input );
     }
 
-    if( !dbus_message_iter_append_basic( &v, DBUS_TYPE_INT64, &i_pos ) )
+    if( !dbus_message_iter_append_basic( container, DBUS_TYPE_INT64, &i_pos ) )
+        return VLC_ENOMEM;
+
+    return VLC_SUCCESS;
+}
+
+DBUS_METHOD( Position )
+{ /* returns position in microseconds */
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+    DBusMessageIter v;
+
+    if( !dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "x", &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
+    MarshalPosition( p_this, &v );
 
     if( !dbus_message_iter_close_container( &args, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
@@ -378,23 +387,31 @@ DBUS_METHOD( CanPause )
     REPLY_SEND;
 }
 
+static int
+MarshalCanControl( intf_thread_t *p_intf, DBusMessageIter *container )
+{
+    VLC_UNUSED( p_intf );
+    dbus_bool_t b_can_control = TRUE;
+
+    if( !dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN,
+                                         &b_can_control ) )
+        return VLC_ENOMEM;
+
+    return VLC_SUCCESS;
+}
+
 DBUS_METHOD( CanControl )
 {
-    VLC_UNUSED( p_this );
-
     REPLY_INIT;
     OUT_ARGUMENTS;
 
     DBusMessageIter v;
-    dbus_bool_t b_can_control = TRUE;
 
     if( !dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT,
                                            "b", &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
-    if( !dbus_message_iter_append_basic( &v, DBUS_TYPE_BOOLEAN,
-                                         &b_can_control ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+    MarshalCanControl( p_this, &v );
 
     if( !dbus_message_iter_close_container( &args, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
@@ -594,21 +611,29 @@ DBUS_METHOD( RateSet )
     REPLY_SEND;
 }
 
+static int
+MarshalMinimumRate( intf_thread_t *p_intf, DBusMessageIter *container )
+{
+    VLC_UNUSED( p_intf );
+    double d_min_rate = (double) INPUT_RATE_MIN / INPUT_RATE_DEFAULT;
+
+    if( !dbus_message_iter_append_basic( container, DBUS_TYPE_DOUBLE, &d_min_rate ) )
+        return VLC_ENOMEM;
+
+    return VLC_SUCCESS;
+}
+
 DBUS_METHOD( MinimumRate )
 {
-    VLC_UNUSED( p_this );
-
     REPLY_INIT;
     OUT_ARGUMENTS;
 
     DBusMessageIter v;
-    double d_min_rate = (double) INPUT_RATE_MIN / INPUT_RATE_DEFAULT;
 
     if( !dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "d", &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
-    if( !dbus_message_iter_append_basic( &v, DBUS_TYPE_DOUBLE, &d_min_rate ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+    MarshalMinimumRate( p_this, &v );
 
     if( !dbus_message_iter_close_container( &args, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
@@ -616,21 +641,29 @@ DBUS_METHOD( MinimumRate )
     REPLY_SEND;
 }
 
+static int
+MarshalMaximumRate( intf_thread_t *p_intf, DBusMessageIter *container )
+{
+    VLC_UNUSED( p_intf );
+    double d_max_rate = (double) INPUT_RATE_MAX / INPUT_RATE_DEFAULT;
+
+    if( !dbus_message_iter_append_basic( container, DBUS_TYPE_DOUBLE, &d_max_rate ) )
+        return VLC_ENOMEM;
+
+    return VLC_SUCCESS;
+}
+
 DBUS_METHOD( MaximumRate )
 {
-    VLC_UNUSED( p_this );
-
     REPLY_INIT;
     OUT_ARGUMENTS;
 
     DBusMessageIter v;
-    double d_max_rate = (double) INPUT_RATE_MAX / INPUT_RATE_DEFAULT;
 
     if( !dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "d", &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
-    if( !dbus_message_iter_append_basic( &v, DBUS_TYPE_DOUBLE, &d_max_rate ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+    MarshalMaximumRate( p_this, &v );
 
     if( !dbus_message_iter_close_container( &args, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
