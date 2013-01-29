@@ -1009,6 +1009,9 @@ loaded:
         /* Some nVidia codec with DRM */
         if (!strncmp(p_sys->ppsz_components[i], "OMX.Nvidia.h264.decode.secure", 29))
             continue;
+        /* Use VC1 decoder for WMV3 for now */
+        if (!strcmp(p_sys->ppsz_components[i], "OMX.SEC.WMV.Decoder"))
+            continue;
 #endif
         omx_error = InitialiseComponent(p_dec, p_sys->ppsz_components[i],
                                         &p_sys->omx_handle);
