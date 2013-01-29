@@ -1081,6 +1081,37 @@ loaded:
             p_header->pOutputPortPrivate = p_header->pBuffer;
             p_header->pBuffer = p_dec->fmt_in.p_extra;
         }
+        else if (p_dec->fmt_in.i_codec == VLC_CODEC_WMV3 &&
+                 p_dec->fmt_in.i_extra >= 4 &&
+                 p_header->nAllocLen >= 36)
+        {
+            int profile;
+            // According to OMX IL 1.2.0 spec (4.3.33.2), the codec config
+            // data for VC-1 Main/Simple (aka WMV3) is according to table 265
+            // in the VC-1 spec. Most of the fields are just set with placeholders
+            // (like framerate, hrd_buffer/rate).
+            static const uint8_t wmv3seq[] = {
+                0xff, 0xff, 0xff, 0xc5, // numframes=ffffff, marker byte
+                0x04, 0x00, 0x00, 0x00, // marker byte
+                0x00, 0x00, 0x00, 0x00, // struct C, almost equal to p_extra
+                0x00, 0x00, 0x00, 0x00, // struct A, vert size
+                0x00, 0x00, 0x00, 0x00, // struct A, horiz size
+                0x0c, 0x00, 0x00, 0x00, // marker byte
+                0xff, 0xff, 0x00, 0x80, // struct B, level=4, cbr=0, hrd_buffer=ffff
+                0xff, 0xff, 0x00, 0x00, // struct B, hrd_rate=ffff
+                0xff, 0xff, 0xff, 0xff, // struct B, framerate=ffffffff
+            };
+            p_header->nFilledLen = sizeof(wmv3seq);
+            memcpy(p_header->pBuffer, wmv3seq, p_header->nFilledLen);
+            // Struct C - almost equal to the extradata
+            memcpy(&p_header->pBuffer[8], p_dec->fmt_in.p_extra, 4);
+            // Expand profile from the highest 2 bits to the highest 4 bits
+            profile = p_header->pBuffer[8] >> 6;
+            p_header->pBuffer[8] = (p_header->pBuffer[8] & 0x0f) | (profile << 4);
+            // Fill in the height/width for struct A
+            SetDWLE(&p_header->pBuffer[12], p_dec->fmt_in.video.i_height);
+            SetDWLE(&p_header->pBuffer[16], p_dec->fmt_in.video.i_width);
+        }
         else
         {
             if(p_header->nFilledLen > p_header->nAllocLen)
