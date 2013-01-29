@@ -679,24 +679,33 @@ static int
 MarshalMetadata( intf_thread_t *p_intf, DBusMessageIter *container )
 {
     DBusMessageIter a;
-    input_item_t *p_item = 0;
+    input_thread_t *p_input = NULL;
+    input_item_t   *p_item  = NULL;
 
-    input_thread_t *p_input;
-    if( ( p_input = playlist_CurrentInput( p_intf->p_sys->p_playlist ) ) ) {
+    if( ( p_input = playlist_CurrentInput( p_intf->p_sys->p_playlist ) ) )
+    {
         p_item = input_GetItem( p_input );
-        if( p_item ) {
+
+        if( p_item )
+        {
             int result = GetInputMeta( p_item, container );
+
             if (result != VLC_SUCCESS)
+            {
+                vlc_object_release( (vlc_object_t*) p_input );
                 return result;
+            }
         }
+
         vlc_object_release( (vlc_object_t*) p_input );
     }
-    if (!p_item) {
+
+    if (!p_item)
+    {
         // avoid breaking the type marshalling
         if( !dbus_message_iter_open_container( container, DBUS_TYPE_ARRAY, "{sv}", &a ) ||
-              !dbus_message_iter_close_container( container, &a ) ) {
+              !dbus_message_iter_close_container( container, &a ) )
             return VLC_ENOMEM;
-        }
     }
 
     return VLC_SUCCESS;
