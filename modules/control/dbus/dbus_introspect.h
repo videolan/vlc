@@ -4,10 +4,12 @@
  * Copyright © 2006-2011 Rafaël Carré
  * Copyright © 2007-2011 Mirsal Ennaime
  * Copyright © 2009-2011 The VideoLAN team
+ * Copyright © 2013      Alex Merry
  * $Id$
  *
  * Authors:    Mirsal Ennaime <mirsal at mirsal fr>
  *             Rafaël Carré <funman at videolanorg>
+ *             Alex Merry <dev at randomguy3 me uk>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,6 +51,10 @@ static const char* psz_introspection_xml =
 "      <arg direction=\"in\" type=\"s\"/>\n"
 "      <arg direction=\"in\" type=\"s\"/>\n"
 "      <arg direction=\"in\" type=\"v\"/>\n"
+"    </method>\n"
+"    <method name=\"GetAll\">\n"
+"      <arg direction=\"in\" type=\"s\"/>\n"
+"      <arg direction=\"out\" type=\"a{sv}\"/>\n"
 "    </method>\n"
 "    <signal name=\"PropertiesChanged\">\n"
 "      <arg type=\"s\"/>\n"

@@ -370,8 +370,10 @@ DBUS_METHOD( SetProperty )
 
 #define ADD_PROPERTY( prop, signature ) \
     if( VLC_SUCCESS != AddProperty( (intf_thread_t*) p_this, \
-                &dict, #prop, signature, Marshal##prop ) ) \
-        return VLC_ENOMEM;
+                &dict, #prop, signature, Marshal##prop ) ) { \
+        dbus_message_iter_abandon_container( &args, &dict ); \
+        return VLC_ENOMEM; \
+    }
 
 DBUS_METHOD( GetAllProperties )
 {
@@ -398,7 +400,8 @@ DBUS_METHOD( GetAllProperties )
 
     msg_Dbg( (vlc_object_t*) p_this, "Getting All properties" );
 
-    dbus_message_iter_open_container( &args, DBUS_TYPE_ARRAY, "{sv}", &dict );
+    if( !dbus_message_iter_open_container( &args, DBUS_TYPE_ARRAY, "{sv}", &dict ) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
     ADD_PROPERTY( Identity,            "s"  );
     ADD_PROPERTY( DesktopEntry,        "s"  );
@@ -410,7 +413,9 @@ DBUS_METHOD( GetAllProperties )
     ADD_PROPERTY( Fullscreen,          "b"  );
     ADD_PROPERTY( CanRaise,            "b"  );
 
-    dbus_message_iter_close_container( &args, &dict );
+    if( !dbus_message_iter_close_container( &args, &dict ))
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
     REPLY_SEND;
 }
 
