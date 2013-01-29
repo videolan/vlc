@@ -195,6 +195,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     case VLC_CODEC_H264: mime = "video/avc"; break;
     case VLC_CODEC_H263: mime = "video/3gpp"; break;
     case VLC_CODEC_MP4V: mime = "video/mp4v-es"; break;
+    case VLC_CODEC_VC1:  mime = "video/wvc1"; break;
     default:
         msg_Dbg(p_dec, "codec %d not supported", p_dec->fmt_in.i_codec);
         return VLC_EGENERIC;
