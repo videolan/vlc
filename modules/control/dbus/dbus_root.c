@@ -86,22 +86,6 @@ MarshalIdentity( intf_thread_t *p_intf, DBusMessageIter *container )
     return VLC_SUCCESS;
 }
 
-DBUS_METHOD( Identity )
-{
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-
-    DBusMessageIter v;
-    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "s", &v );
-
-    MarshalIdentity( p_this, &v );
-
-    if( !dbus_message_iter_close_container( &args, &v ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    REPLY_SEND;
-}
-
 static int
 MarshalCanSetFullscreen( intf_thread_t *p_intf, DBusMessageIter *container )
 {
@@ -127,22 +111,6 @@ MarshalCanSetFullscreen( intf_thread_t *p_intf, DBusMessageIter *container )
     return VLC_SUCCESS;
 }
 
-DBUS_METHOD( CanSetFullscreen )
-{
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-
-    DBusMessageIter v;
-    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "b", &v );
-
-    MarshalCanSetFullscreen( p_this, &v );
-
-    if( !dbus_message_iter_close_container( &args, &v ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    REPLY_SEND;
-}
-
 static int
 MarshalFullscreen( intf_thread_t *p_intf, DBusMessageIter *container )
 {
@@ -158,24 +126,6 @@ MarshalFullscreen( intf_thread_t *p_intf, DBusMessageIter *container )
         return VLC_ENOMEM;
 
     return VLC_SUCCESS;
-}
-
-DBUS_METHOD( FullscreenGet )
-{
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-
-    DBusMessageIter v;
-
-    if( !dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "b", &v ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    MarshalFullscreen( p_this, &v );
-
-    if( !dbus_message_iter_close_container( &args, &v ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    REPLY_SEND;
 }
 
 DBUS_METHOD( FullscreenSet )
@@ -214,22 +164,6 @@ MarshalCanQuit( intf_thread_t *p_intf, DBusMessageIter *container )
     return VLC_SUCCESS;
 }
 
-DBUS_METHOD( CanQuit )
-{
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-
-    DBusMessageIter v;
-    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "b", &v );
-
-    MarshalCanQuit( p_this, &v );
-
-    if( !dbus_message_iter_close_container( &args, &v ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    REPLY_SEND;
-}
-
 static int
 MarshalCanRaise( intf_thread_t *p_intf, DBusMessageIter *container )
 {
@@ -240,22 +174,6 @@ MarshalCanRaise( intf_thread_t *p_intf, DBusMessageIter *container )
         return VLC_ENOMEM;
 
     return VLC_SUCCESS;
-}
-
-DBUS_METHOD( CanRaise )
-{
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-
-    DBusMessageIter v;
-    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "b", &v );
-
-    MarshalCanRaise( p_this, &v );
-
-    if( !dbus_message_iter_close_container( &args, &v ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    REPLY_SEND;
 }
 
 static int
@@ -270,22 +188,6 @@ MarshalHasTrackList( intf_thread_t *p_intf, DBusMessageIter *container )
     return VLC_SUCCESS;
 }
 
-DBUS_METHOD( HasTrackList )
-{
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-
-    DBusMessageIter v;
-    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "b", &v );
-
-    MarshalHasTrackList( p_this, &v );
-
-    if( !dbus_message_iter_close_container( &args, &v ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    REPLY_SEND;
-}
-
 static int
 MarshalDesktopEntry( intf_thread_t *p_intf, DBusMessageIter *container )
 {
@@ -296,22 +198,6 @@ MarshalDesktopEntry( intf_thread_t *p_intf, DBusMessageIter *container )
         return VLC_ENOMEM;
 
     return VLC_SUCCESS;
-}
-
-DBUS_METHOD( DesktopEntry )
-{
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-
-    DBusMessageIter v;
-    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "s", &v );
-
-    MarshalDesktopEntry( p_this, &v );
-
-    if( !dbus_message_iter_close_container( &args, &v ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    REPLY_SEND;
 }
 
 static int
@@ -343,23 +229,6 @@ MarshalSupportedMimeTypes( intf_thread_t *p_intf, DBusMessageIter *container )
     return VLC_SUCCESS;
 }
 
-DBUS_METHOD( SupportedMimeTypes )
-{
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-
-    DBusMessageIter v;
-    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "as", &v );
-
-    if( VLC_SUCCESS != MarshalSupportedMimeTypes( p_this, &v ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    if( !dbus_message_iter_close_container( &args, &v ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    REPLY_SEND;
-}
-
 static int
 MarshalSupportedUriSchemes( intf_thread_t *p_intf, DBusMessageIter *container )
 {
@@ -389,24 +258,6 @@ MarshalSupportedUriSchemes( intf_thread_t *p_intf, DBusMessageIter *container )
     return VLC_SUCCESS;
 }
 
-DBUS_METHOD( SupportedUriSchemes )
-{
-    VLC_UNUSED( p_this );
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-
-    DBusMessageIter v;
-    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "as", &v );
-
-    if( VLC_SUCCESS != MarshalSupportedUriSchemes( p_this, &v ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    if( !dbus_message_iter_close_container( &args, &v ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    REPLY_SEND;
-}
-
 DBUS_METHOD( Quit )
 { /* exits vlc */
     REPLY_INIT;
@@ -422,11 +273,22 @@ DBUS_METHOD( Raise )
 }
 
 #define PROPERTY_MAPPING_BEGIN if( 0 ) {}
-#define PROPERTY_FUNC( interface, property, function ) \
-    else if( !strcmp( psz_interface_name, interface ) && \
-             !strcmp( psz_property_name,  property ) ) \
-        return function( p_conn, p_from, p_this );
-#define PROPERTY_MAPPING_END return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+#define PROPERTY_GET_FUNC( prop, signature ) \
+    else if( !strcmp( psz_property_name,  #prop ) ) { \
+        if( !dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, signature, &v ) ) \
+            return DBUS_HANDLER_RESULT_NEED_MEMORY; \
+        if( VLC_SUCCESS != Marshal##prop( p_this, &v ) ) { \
+            dbus_message_iter_abandon_container( &args, &v ); \
+            return DBUS_HANDLER_RESULT_NEED_MEMORY; \
+        } \
+        if( !dbus_message_iter_close_container( &args, &v ) ) \
+            return DBUS_HANDLER_RESULT_NEED_MEMORY; \
+    }
+#define PROPERTY_SET_FUNC( prop ) \
+    else if( !strcmp( psz_property_name,  #prop ) ) { \
+        return prop##Set( p_conn, p_from, p_this ); \
+    }
+#define PROPERTY_MAPPING_END else { return DBUS_HANDLER_RESULT_NOT_YET_HANDLED; }
 
 DBUS_METHOD( GetProperty )
 {
@@ -452,17 +314,27 @@ DBUS_METHOD( GetProperty )
     msg_Dbg( (vlc_object_t*) p_this, "Getting property %s",
                                      psz_property_name );
 
+    if( strcmp( psz_interface_name, DBUS_MPRIS_ROOT_INTERFACE ) ) {
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+    DBusMessageIter v;
+
     PROPERTY_MAPPING_BEGIN
-    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "Identity",            Identity )
-    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "DesktopEntry",        DesktopEntry )
-    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "SupportedMimeTypes",  SupportedMimeTypes )
-    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "SupportedUriSchemes", SupportedUriSchemes )
-    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "HasTrackList",        HasTrackList )
-    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "CanQuit",             CanQuit )
-    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "CanSetFullscreen",    CanSetFullscreen )
-    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "Fullscreen",          FullscreenGet )
-    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "CanRaise",            CanRaise )
+    PROPERTY_GET_FUNC( Identity,            "s" )
+    PROPERTY_GET_FUNC( CanSetFullscreen,    "b" )
+    PROPERTY_GET_FUNC( Fullscreen,          "b" )
+    PROPERTY_GET_FUNC( CanQuit,             "b" )
+    PROPERTY_GET_FUNC( CanRaise,            "b" )
+    PROPERTY_GET_FUNC( HasTrackList,        "b" )
+    PROPERTY_GET_FUNC( DesktopEntry,        "s" )
+    PROPERTY_GET_FUNC( SupportedMimeTypes,  "as" )
+    PROPERTY_GET_FUNC( SupportedUriSchemes, "as" )
     PROPERTY_MAPPING_END
+
+    REPLY_SEND;
 }
 
 DBUS_METHOD( SetProperty )
@@ -487,12 +359,13 @@ DBUS_METHOD( SetProperty )
     }
 
     PROPERTY_MAPPING_BEGIN
-    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "Fullscreen",    FullscreenSet )
+    PROPERTY_SET_FUNC( Fullscreen )
     PROPERTY_MAPPING_END
 }
 
 #undef PROPERTY_MAPPING_BEGIN
 #undef PROPERTY_GET_FUNC
+#undef PROPERTY_SET_FUNC
 #undef PROPERTY_MAPPING_END
 
 #define ADD_PROPERTY( prop, signature ) \
