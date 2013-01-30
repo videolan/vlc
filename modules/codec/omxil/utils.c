@@ -667,7 +667,7 @@ OMX_ERRORTYPE SetAudioParameters(OMX_HANDLETYPE handle,
         param->aac.nAACtools = OMX_AUDIO_AACToolAll;
         param->aac.nAACERtools = OMX_AUDIO_AACERAll;
         param->aac.eAACProfile = OMX_AUDIO_AACObjectLC;
-        param->aac.eAACStreamFormat = OMX_AUDIO_AACStreamFormatRAW;
+        param->aac.eAACStreamFormat = OMX_AUDIO_AACStreamFormatMP4FF;
         param->aac.eChannelMode = i_channels > 1 ?
             OMX_AUDIO_ChannelModeStereo : OMX_AUDIO_ChannelModeMono;
         break;
