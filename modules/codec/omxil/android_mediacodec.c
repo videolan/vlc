@@ -260,7 +260,7 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     int num_codecs = (*env)->CallStaticIntMethod(env, p_sys->media_codec_list_class,
                                                  p_sys->get_codec_count);
-    jobject codec_info = NULL, codec_name = NULL;
+    jobject codec_name = NULL;
 
     for (int i = 0; i < num_codecs; i++) {
         jobject info = (*env)->CallStaticObjectMethod(env, p_sys->media_codec_list_class,
@@ -287,14 +287,13 @@ static int OpenDecoder(vlc_object_t *p_this)
             memcpy(p_sys->name, name_ptr, name_len);
             p_sys->name[name_len] = '\0';
             (*env)->ReleaseStringUTFChars(env, name, name_ptr);
-            codec_info = info;
             codec_name = name;
             break;
         }
         (*env)->DeleteLocalRef(env, info);
     }
 
-    if (!codec_info) {
+    if (!codec_name) {
         msg_Dbg(p_dec, "No suitable codec matching %s was found", mime);
         goto error;
     }
