@@ -72,7 +72,7 @@ static void SetBookmark ( intf_thread_t *, int );
 static void DisplayPosition( intf_thread_t *, vout_thread_t *, input_thread_t * );
 static void DisplayVolume( intf_thread_t *, vout_thread_t *, float );
 static void DisplayRate ( vout_thread_t *, float );
-static float AdjustRateFine( input_thread_t *, const int );
+static float AdjustRateFine( vlc_object_t *, const int );
 static void ClearChannels  ( intf_thread_t *, vout_thread_t * );
 
 #define DisplayMessage(vout, ch, fmt, ...) \
@@ -172,6 +172,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
     /* Quit */
     switch( i_action )
     {
+        /* Libvlc / interface actions */
         case ACTIONID_QUIT:
             libvlc_Quit( p_intf->p_libvlc );
 
@@ -179,95 +180,37 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s", _( "Quit" ) );
             break;
 
-        /* Volume and audio actions */
-        case ACTIONID_VOL_UP:
-        {
-            float vol;
-            if( playlist_VolumeUp( p_playlist, 1, &vol ) == 0 )
-                DisplayVolume( p_intf, p_vout, vol );
-            break;
-        }
-
-        case ACTIONID_VOL_DOWN:
-        {
-            float vol;
-            if( playlist_VolumeDown( p_playlist, 1, &vol ) == 0 )
-                DisplayVolume( p_intf, p_vout, vol );
-            break;
-        }
-
-        case ACTIONID_VOL_MUTE:
-            if( playlist_MuteToggle( p_playlist ) == 0 )
-            {
-                float vol = playlist_VolumeGet( p_playlist );
-                if( playlist_MuteGet( p_playlist ) > 0 || vol == 0.f )
-                {
-                    ClearChannels( p_intf, p_vout );
-                    DisplayIcon( p_vout, OSD_MUTE_ICON );
-                }
-                else
-                    DisplayVolume( p_intf, p_vout, vol );
-            }
-            break;
-
-        /* Interface showing */
         case ACTIONID_INTF_TOGGLE_FSC:
         case ACTIONID_INTF_HIDE:
             var_TriggerCallback( p_intf->p_libvlc, "intf-toggle-fscontrol" );
             break;
-
         case ACTIONID_INTF_BOSS:
             var_TriggerCallback( p_intf->p_libvlc, "intf-boss" );
             break;
 
-        /* Video Output actions */
-        case ACTIONID_SNAPSHOT:
-            if( p_vout )
-                var_TriggerCallback( p_vout, "video-snapshot" );
+        case ACTIONID_MENU_ON:
+            osd_MenuShow( VLC_OBJECT(p_intf) );
+            break;
+        case ACTIONID_MENU_OFF:
+            osd_MenuHide( VLC_OBJECT(p_intf) );
+            break;
+        case ACTIONID_MENU_LEFT:
+            osd_MenuPrev( VLC_OBJECT(p_intf) );
+            break;
+        case ACTIONID_MENU_RIGHT:
+            osd_MenuNext( VLC_OBJECT(p_intf) );
+            break;
+        case ACTIONID_MENU_UP:
+            osd_MenuUp( VLC_OBJECT(p_intf) );
+            break;
+        case ACTIONID_MENU_DOWN:
+            osd_MenuDown( VLC_OBJECT(p_intf) );
+            break;
+        case ACTIONID_MENU_SELECT:
+            osd_MenuActivate( VLC_OBJECT(p_intf) );
             break;
 
-        case ACTIONID_TOGGLE_FULLSCREEN:
-        {
-            bool fs = var_ToggleBool( p_playlist, "fullscreen" );
-            if( p_vout )
-                var_SetBool( p_vout, "fullscreen", fs );
-            break;
-        }
-
-        case ACTIONID_LEAVE_FULLSCREEN:
-            if( p_vout )
-                var_SetBool( p_vout, "fullscreen", false );
-            var_SetBool( p_playlist, "fullscreen", false );
-            break;
-
-        case ACTIONID_ZOOM_QUARTER:
-        case ACTIONID_ZOOM_HALF:
-        case ACTIONID_ZOOM_ORIGINAL:
-        case ACTIONID_ZOOM_DOUBLE:
-            if( p_vout )
-            {
-                float f;
-                switch( i_action )
-                {
-                    case ACTIONID_ZOOM_QUARTER:  f = 0.25; break;
-                    case ACTIONID_ZOOM_HALF:     f = 0.5;  break;
-                    case ACTIONID_ZOOM_ORIGINAL: f = 1.;   break;
-                     /*case ACTIONID_ZOOM_DOUBLE:*/
-                    default:                     f = 2.;   break;
-                }
-                var_SetFloat( p_vout, "zoom", f );
-            }
-            break;
-
-        case ACTIONID_WALLPAPER:
-        {   /* FIXME: this is invalid if not using DirectX output!!! */
-            vlc_object_t *obj = p_vout ? VLC_OBJECT(p_vout)
-                                       : VLC_OBJECT(p_playlist);
-            var_ToggleBool( obj, "video-wallpaper" );
-            break;
-        }
-
-        /* Playlist actions */
+        /* Playlist actions (including audio) */
         case ACTIONID_LOOP:
             /* Toggle Normal -> Loop -> Repeat -> Normal ... */
             if( var_GetBool( p_playlist, "repeat" ) )
@@ -283,33 +226,96 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             break;
 
         case ACTIONID_RANDOM:
-        {
             var_ToggleBool( p_playlist, "random" );
+            break;
+
+        case ACTIONID_NEXT:
+            DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s", _("Next") );
+            playlist_Next( p_playlist );
+            break;
+        case ACTIONID_PREV:
+            DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s", _("Previous") );
+            playlist_Prev( p_playlist );
+            break;
+
+        case ACTIONID_STOP:
+            playlist_Stop( p_playlist );
+            break;
+
+        case ACTIONID_RATE_NORMAL:
+            var_SetFloat( p_playlist, "rate", 1.f );
+            DisplayRate( p_vout, 1.f );
+            break;
+        case ACTIONID_FASTER:
+            var_TriggerCallback( p_playlist, "rate-faster" );
+            DisplayRate( p_vout, var_GetFloat( p_playlist, "rate" ) );
+            break;
+        case ACTIONID_SLOWER:
+            var_TriggerCallback( p_playlist, "rate-slower" );
+            DisplayRate( p_vout, var_GetFloat( p_playlist, "rate" ) );
+            break;
+        case ACTIONID_RATE_FASTER_FINE:
+        case ACTIONID_RATE_SLOWER_FINE:
+        {
+            const int i_dir = i_action == ACTIONID_RATE_FASTER_FINE ? 1 : -1;
+            float rate = AdjustRateFine( VLC_OBJECT(p_playlist), i_dir );
+
+            var_SetFloat( p_playlist, "rate", rate );
+            DisplayRate( p_vout, rate );
             break;
         }
 
-        case ACTIONID_PLAY_PAUSE:
-            if( p_input )
-            {
-                ClearChannels( p_intf, p_vout );
-
-                int state = var_GetInteger( p_input, "state" );
-                DisplayIcon( p_vout, state != PAUSE_S ? OSD_PAUSE_ICON : OSD_PLAY_ICON );
-                playlist_Pause( p_playlist );
-            }
-            else
-                playlist_Play( p_playlist );
+        case ACTIONID_PLAY_BOOKMARK1:
+        case ACTIONID_PLAY_BOOKMARK2:
+        case ACTIONID_PLAY_BOOKMARK3:
+        case ACTIONID_PLAY_BOOKMARK4:
+        case ACTIONID_PLAY_BOOKMARK5:
+        case ACTIONID_PLAY_BOOKMARK6:
+        case ACTIONID_PLAY_BOOKMARK7:
+        case ACTIONID_PLAY_BOOKMARK8:
+        case ACTIONID_PLAY_BOOKMARK9:
+        case ACTIONID_PLAY_BOOKMARK10:
+            PlayBookmark( p_intf, i_action - ACTIONID_PLAY_BOOKMARK1 + 1 );
             break;
 
-        case ACTIONID_PLAY:
-            if( p_input && var_GetFloat( p_input, "rate" ) != 1. )
-                /* Return to normal speed */
-                var_SetFloat( p_input, "rate", 1. );
-            else
+        case ACTIONID_SET_BOOKMARK1:
+        case ACTIONID_SET_BOOKMARK2:
+        case ACTIONID_SET_BOOKMARK3:
+        case ACTIONID_SET_BOOKMARK4:
+        case ACTIONID_SET_BOOKMARK5:
+        case ACTIONID_SET_BOOKMARK6:
+        case ACTIONID_SET_BOOKMARK7:
+        case ACTIONID_SET_BOOKMARK8:
+        case ACTIONID_SET_BOOKMARK9:
+        case ACTIONID_SET_BOOKMARK10:
+            SetBookmark( p_intf, i_action - ACTIONID_SET_BOOKMARK1 + 1 );
+            break;
+
+        case ACTIONID_VOL_UP:
+        {
+            float vol;
+            if( playlist_VolumeUp( p_playlist, 1, &vol ) == 0 )
+                DisplayVolume( p_intf, p_vout, vol );
+            break;
+        }
+        case ACTIONID_VOL_DOWN:
+        {
+            float vol;
+            if( playlist_VolumeDown( p_playlist, 1, &vol ) == 0 )
+                DisplayVolume( p_intf, p_vout, vol );
+            break;
+        }
+        case ACTIONID_VOL_MUTE:
+            if( playlist_MuteToggle( p_playlist ) == 0 )
             {
-                ClearChannels( p_intf, p_vout );
-                DisplayIcon( p_vout, OSD_PLAY_ICON );
-                playlist_Play( p_playlist );
+                float vol = playlist_VolumeGet( p_playlist );
+                if( playlist_MuteGet( p_playlist ) > 0 || vol == 0.f )
+                {
+                    ClearChannels( p_intf, p_vout );
+                    DisplayIcon( p_vout, OSD_MUTE_ICON );
+                }
+                else
+                    DisplayVolume( p_intf, p_vout, vol );
             }
             break;
 
@@ -350,66 +356,104 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             break;
         }
 
-        /* Input options */
-        default:
+        /* Playlist + input actions */
+        case ACTIONID_PLAY_PAUSE:
+            if( p_input )
+            {
+                ClearChannels( p_intf, p_vout );
+
+                int state = var_GetInteger( p_input, "state" );
+                DisplayIcon( p_vout, state != PAUSE_S ? OSD_PAUSE_ICON : OSD_PLAY_ICON );
+                playlist_Pause( p_playlist );
+            }
+            else
+                playlist_Play( p_playlist );
+            break;
+
+        case ACTIONID_PLAY:
+            if( p_input && var_GetFloat( p_input, "rate" ) != 1. )
+                /* Return to normal speed */
+                var_SetFloat( p_input, "rate", 1. );
+            else
+            {
+                ClearChannels( p_intf, p_vout );
+                DisplayIcon( p_vout, OSD_PLAY_ICON );
+                playlist_Play( p_playlist );
+            }
+            break;
+
+        /* Playlist + video output actions */
+        case ACTIONID_WALLPAPER:
+        {   /* FIXME: this is invalid if not using DirectX output!!! */
+            vlc_object_t *obj = p_vout ? VLC_OBJECT(p_vout)
+                                       : VLC_OBJECT(p_playlist);
+            var_ToggleBool( obj, "video-wallpaper" );
+            break;
+        }
+
+        /* Input actions */
+        case ACTIONID_PAUSE:
+            if( p_input && var_GetInteger( p_input, "state" ) != PAUSE_S )
+            {
+                ClearChannels( p_intf, p_vout );
+                DisplayIcon( p_vout, OSD_PAUSE_ICON );
+                var_SetInteger( p_input, "state", PAUSE_S );
+            }
+            break;
+
+        case ACTIONID_RECORD:
+            if( p_input && var_GetBool( p_input, "can-record" ) )
+            {
+                const bool on = var_ToggleBool( p_input, "record" );
+                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s",
+                    vlc_gettext(on ? N_("Recording") : N_("Recording done")) );
+            }
+            break;
+
+        case ACTIONID_FRAME_NEXT:
+            if( p_input )
+            {
+                var_TriggerCallback( p_input, "frame-next" );
+                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
+                                "%s", _("Next frame") );
+            }
+            break;
+
+        case ACTIONID_SUBDELAY_DOWN:
+        case ACTIONID_SUBDELAY_UP:
         {
-            if( !p_input )
-                break;
+            int diff = (i_action == ACTIONID_SUBDELAY_UP) ? 50000 : -50000;
+            if( p_input )
+            {
+                int64_t i_delay = var_GetTime( p_input, "spu-delay" ) + diff;
 
-            bool b_seekable = var_GetBool( p_input, "can-seek" );
-            int i_interval =0;
+                var_SetTime( p_input, "spu-delay", i_delay );
+                ClearChannels( p_intf, p_vout );
+                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
+                                _( "Subtitle delay %i ms" ),
+                                (int)(i_delay/1000) );
+            }
+            break;
+        }
+        case ACTIONID_AUDIODELAY_DOWN:
+        case ACTIONID_AUDIODELAY_UP:
+        {
+            int diff = (i_action == ACTIONID_AUDIODELAY_UP) ? 50000 : -50000;
+            if( p_input )
+            {
+                int64_t i_delay = var_GetTime( p_input, "audio-delay" ) + diff;
 
-            if( i_action == ACTIONID_PAUSE )
-            {
-                if( var_GetInteger( p_input, "state" ) != PAUSE_S )
-                {
-                    ClearChannels( p_intf, p_vout );
-                    DisplayIcon( p_vout, OSD_PAUSE_ICON );
-                    var_SetInteger( p_input, "state", PAUSE_S );
-                }
+                var_SetTime( p_input, "audio-delay", i_delay );
+                ClearChannels( p_intf, p_vout );
+                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
+                                _( "Audio delay %i ms" ),
+                                 (int)(i_delay/1000) );
             }
-            else if( i_action == ACTIONID_JUMP_BACKWARD_EXTRASHORT
-                     && b_seekable )
-            {
-#define SET_TIME( a, b ) \
-    i_interval = var_InheritInteger( p_input, a "-jump-size" ); \
-    if( i_interval > 0 ) { \
-        mtime_t i_time = (mtime_t)(i_interval * b) * 1000000L; \
-        var_SetTime( p_input, "time-offset", i_time ); \
-        DisplayPosition( p_intf, p_vout, p_input ); \
-    }
-                SET_TIME( "extrashort", -1 );
-            }
-            else if( i_action == ACTIONID_JUMP_FORWARD_EXTRASHORT && b_seekable )
-            {
-                SET_TIME( "extrashort", 1 );
-            }
-            else if( i_action == ACTIONID_JUMP_BACKWARD_SHORT && b_seekable )
-            {
-                SET_TIME( "short", -1 );
-            }
-            else if( i_action == ACTIONID_JUMP_FORWARD_SHORT && b_seekable )
-            {
-                SET_TIME( "short", 1 );
-            }
-            else if( i_action == ACTIONID_JUMP_BACKWARD_MEDIUM && b_seekable )
-            {
-                SET_TIME( "medium", -1 );
-            }
-            else if( i_action == ACTIONID_JUMP_FORWARD_MEDIUM && b_seekable )
-            {
-                SET_TIME( "medium", 1 );
-            }
-            else if( i_action == ACTIONID_JUMP_BACKWARD_LONG && b_seekable )
-            {
-                SET_TIME( "long", -1 );
-            }
-            else if( i_action == ACTIONID_JUMP_FORWARD_LONG && b_seekable )
-            {
-                SET_TIME( "long", 1 );
-#undef SET_TIME
-            }
-            else if( i_action == ACTIONID_AUDIO_TRACK )
+            break;
+        }
+
+        case ACTIONID_AUDIO_TRACK:
+            if( p_input )
             {
                 vlc_value_t val, list, list2;
                 int i_count, i;
@@ -444,7 +488,9 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 }
                 var_FreeList( &list, &list2 );
             }
-            else if( i_action == ACTIONID_SUBTITLE_TRACK )
+            break;
+        case ACTIONID_SUBTITLE_TRACK:
+            if( p_input )
             {
                 vlc_value_t val, list, list2;
                 int i_count, i;
@@ -458,7 +504,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                     DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
                                     _("Subtitle track: %s"), _("N/A") );
                     var_FreeList( &list, &list2 );
-                    goto cleanup_and_continue;
+                    break;
                 }
                 for( i = 0; i < i_count; i++ )
                 {
@@ -484,7 +530,9 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                                 list2.p_list->p_values[i].psz_string );
                 var_FreeList( &list, &list2 );
             }
-            else if( i_action == ACTIONID_PROGRAM_SID )
+            break;
+        case ACTIONID_PROGRAM_SID:
+            if( p_input )
             {
                 vlc_value_t val, list, list2;
                 int i_count, i;
@@ -498,7 +546,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                     DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
                                     _("Program Service ID: %s"), _("N/A") );
                     var_FreeList( &list, &list2 );
-                    goto cleanup_and_continue;
+                    break;
                 }
                 for( i = 0; i < i_count; i++ )
                 {
@@ -524,7 +572,98 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                                 list2.p_list->p_values[i].psz_string );
                 var_FreeList( &list, &list2 );
             }
-            else if( i_action == ACTIONID_ASPECT_RATIO && p_vout )
+            break;
+
+        case ACTIONID_JUMP_BACKWARD_EXTRASHORT:
+        case ACTIONID_JUMP_FORWARD_EXTRASHORT:
+        case ACTIONID_JUMP_BACKWARD_SHORT:
+        case ACTIONID_JUMP_FORWARD_SHORT:
+        case ACTIONID_JUMP_BACKWARD_MEDIUM:
+        case ACTIONID_JUMP_FORWARD_MEDIUM:
+        case ACTIONID_JUMP_BACKWARD_LONG:
+        case ACTIONID_JUMP_FORWARD_LONG:
+        {
+            if( p_input == NULL || !var_GetBool( p_input, "can-seek" ) )
+                break;
+
+            const char *varname;
+            int sign = +1;
+            switch( i_action )
+            {
+                case ACTIONID_JUMP_BACKWARD_EXTRASHORT:
+                    sign = -1;
+                case ACTIONID_JUMP_FORWARD_EXTRASHORT:
+                    varname = "extrashort-jump-size";
+                    break;
+                case ACTIONID_JUMP_BACKWARD_SHORT:
+                    sign = -1;
+                case ACTIONID_JUMP_FORWARD_SHORT:
+                    varname = "short-jump-size";
+                    break;
+                case ACTIONID_JUMP_BACKWARD_MEDIUM:
+                    sign = -1;
+                case ACTIONID_JUMP_FORWARD_MEDIUM:
+                    varname = "medium-jump-size";
+                    break;
+                case ACTIONID_JUMP_BACKWARD_LONG:
+                    sign = -1;
+                case ACTIONID_JUMP_FORWARD_LONG:
+                    varname = "long-jump-size";
+                    break;
+            }
+
+            mtime_t it = var_InheritInteger( p_input, varname );
+            if( it < 0 )
+                break;
+            var_SetTime( p_input, "time-offset", it * sign * CLOCK_FREQ );
+            DisplayPosition( p_intf, p_vout, p_input );
+            break;
+        }
+
+        /* Input navigation (DVD & MKV) */
+        case ACTIONID_TITLE_PREV:
+            if( p_input )
+                var_TriggerCallback( p_input, "prev-title" );
+            break;
+        case ACTIONID_TITLE_NEXT:
+            if( p_input )
+                var_TriggerCallback( p_input, "next-title" );
+            break;
+        case ACTIONID_CHAPTER_PREV:
+            if( p_input )
+                var_TriggerCallback( p_input, "prev-chapter" );
+            break;
+        case ACTIONID_CHAPTER_NEXT:
+            if( p_input )
+                var_TriggerCallback( p_input, "next-chapter" );
+            break;
+        case ACTIONID_DISC_MENU:
+            if( p_input )
+                var_SetInteger( p_input, "title  0", 2 );
+            break;
+
+        /* Video Output actions */
+        case ACTIONID_SNAPSHOT:
+            if( p_vout )
+                var_TriggerCallback( p_vout, "video-snapshot" );
+            break;
+
+        case ACTIONID_TOGGLE_FULLSCREEN:
+        {
+            bool fs = var_ToggleBool( p_playlist, "fullscreen" );
+            if( p_vout )
+                var_SetBool( p_vout, "fullscreen", fs );
+            break;
+        }
+
+        case ACTIONID_LEAVE_FULLSCREEN:
+            if( p_vout )
+                var_SetBool( p_vout, "fullscreen", false );
+            var_SetBool( p_playlist, "fullscreen", false );
+            break;
+
+        case ACTIONID_ASPECT_RATIO:
+            if( p_vout )
             {
                 vlc_value_t val={0}, val_list, text_list;
                 var_Get( p_vout, "aspect-ratio", &val );
@@ -552,7 +691,10 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 }
                 free( val.psz_string );
             }
-            else if( i_action == ACTIONID_CROP && p_vout )
+            break;
+
+        case ACTIONID_CROP:
+            if( p_vout )
             {
                 vlc_value_t val={0}, val_list, text_list;
                 var_Get( p_vout, "crop", &val );
@@ -580,12 +722,47 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 }
                 free( val.psz_string );
             }
-            else if( i_action == ACTIONID_TOGGLE_AUTOSCALE && p_vout )
+            break;
+        case ACTIONID_CROP_TOP:
+            if( p_vout )
+                var_IncInteger( p_vout, "crop-top" );
+            break;
+        case ACTIONID_UNCROP_TOP:
+            if( p_vout )
+                var_DecInteger( p_vout, "crop-top" );
+            break;
+        case ACTIONID_CROP_BOTTOM:
+            if( p_vout )
+                var_IncInteger( p_vout, "crop-bottom" );
+            break;
+        case ACTIONID_UNCROP_BOTTOM:
+            if( p_vout )
+                var_DecInteger( p_vout, "crop-bottom" );
+            break;
+        case ACTIONID_CROP_LEFT:
+            if( p_vout )
+                var_IncInteger( p_vout, "crop-left" );
+            break;
+        case ACTIONID_UNCROP_LEFT:
+            if( p_vout )
+                var_DecInteger( p_vout, "crop-left" );
+            break;
+        case ACTIONID_CROP_RIGHT:
+            if( p_vout )
+                var_IncInteger( p_vout, "crop-right" );
+            break;
+        case ACTIONID_UNCROP_RIGHT:
+            if( p_vout )
+                var_DecInteger( p_vout, "crop-right" );
+            break;
+
+         case ACTIONID_TOGGLE_AUTOSCALE:
+            if( p_vout )
             {
                 float f_scalefactor = var_GetFloat( p_vout, "scale" );
-                if ( f_scalefactor != 1.0 )
+                if ( f_scalefactor != 1.f )
                 {
-                    var_SetFloat( p_vout, "scale", 1.0 );
+                    var_SetFloat( p_vout, "scale", 1.f );
                     DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
                                     "%s", _("Zooming reset") );
                 }
@@ -601,25 +778,83 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                                         "%s", _("Original Size") );
                 }
             }
-            else if( i_action == ACTIONID_SCALE_UP && p_vout )
+            break;
+        case ACTIONID_SCALE_UP:
+            if( p_vout )
             {
-               float f_scalefactor;
+               float f_scalefactor = var_GetFloat( p_vout, "scale" );
 
-               f_scalefactor = var_GetFloat( p_vout, "scale" );
-               if( f_scalefactor < 10. )
-                   f_scalefactor += .1;
+               if( f_scalefactor < 10.f )
+                   f_scalefactor += .1f;
                var_SetFloat( p_vout, "scale", f_scalefactor );
             }
-            else if( i_action == ACTIONID_SCALE_DOWN && p_vout )
+            break;
+        case ACTIONID_SCALE_DOWN:
+            if( p_vout )
             {
-               float f_scalefactor;
+               float f_scalefactor = var_GetFloat( p_vout, "scale" );
 
-               f_scalefactor = var_GetFloat( p_vout, "scale" );
-               if( f_scalefactor > .3 )
-                   f_scalefactor -= .1;
+               if( f_scalefactor > .3f )
+                   f_scalefactor -= .1f;
                var_SetFloat( p_vout, "scale", f_scalefactor );
             }
-            else if( i_action == ACTIONID_DEINTERLACE && p_vout )
+            break;
+
+        case ACTIONID_ZOOM_QUARTER:
+        case ACTIONID_ZOOM_HALF:
+        case ACTIONID_ZOOM_ORIGINAL:
+        case ACTIONID_ZOOM_DOUBLE:
+            if( p_vout )
+            {
+                float f;
+                switch( i_action )
+                {
+                    case ACTIONID_ZOOM_QUARTER:  f = 0.25; break;
+                    case ACTIONID_ZOOM_HALF:     f = 0.5;  break;
+                    case ACTIONID_ZOOM_ORIGINAL: f = 1.;   break;
+                     /*case ACTIONID_ZOOM_DOUBLE:*/
+                    default:                     f = 2.;   break;
+                }
+                var_SetFloat( p_vout, "zoom", f );
+            }
+            break;
+        case ACTIONID_ZOOM:
+        case ACTIONID_UNZOOM:
+            if( p_vout )
+            {
+                vlc_value_t val={0}, val_list, text_list;
+                var_Get( p_vout, "zoom", &val );
+                if( var_Change( p_vout, "zoom", VLC_VAR_GETLIST,
+                                &val_list, &text_list ) >= 0 )
+                {
+                    int i;
+                    for( i = 0; i < val_list.p_list->i_count; i++ )
+                    {
+                        if( val_list.p_list->p_values[i].f_float
+                           == val.f_float )
+                        {
+                            if( i_action == ACTIONID_ZOOM )
+                                i++;
+                            else /* ACTIONID_UNZOOM */
+                                i--;
+                            break;
+                        }
+                    }
+                    if( i == val_list.p_list->i_count ) i = 0;
+                    if( i == -1 ) i = val_list.p_list->i_count-1;
+                    var_SetFloat( p_vout, "zoom",
+                                  val_list.p_list->p_values[i].f_float );
+                    DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
+                                    _("Zoom mode: %s"),
+                                    text_list.p_list->p_values[i].psz_string );
+
+                    var_FreeList( &val_list, &text_list );
+                }
+            }
+            break;
+
+        case ACTIONID_DEINTERLACE:
+            if( p_vout )
             {
                 int i_deinterlace = var_GetInteger( p_vout, "deinterlace" );
                 if( i_deinterlace != 0 )
@@ -653,7 +888,9 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                     free( psz_mode );
                 }
             }
-            else if( i_action == ACTIONID_DEINTERLACE_MODE && p_vout )
+            break;
+        case ACTIONID_DEINTERLACE_MODE:
+            if( p_vout )
             {
                 char *psz_mode = var_GetString( p_vout, "deinterlace-mode" );
                 vlc_value_t vlist, tlist;
@@ -689,224 +926,30 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 }
                 free( psz_mode );
             }
-            else if( ( i_action == ACTIONID_ZOOM ||
-                       i_action == ACTIONID_UNZOOM ) && p_vout )
-            {
-                vlc_value_t val={0}, val_list, text_list;
-                var_Get( p_vout, "zoom", &val );
-                if( var_Change( p_vout, "zoom", VLC_VAR_GETLIST,
-                                &val_list, &text_list ) >= 0 )
-                {
-                    int i;
-                    for( i = 0; i < val_list.p_list->i_count; i++ )
-                    {
-                        if( val_list.p_list->p_values[i].f_float
-                           == val.f_float )
-                        {
-                            if( i_action == ACTIONID_ZOOM )
-                                i++;
-                            else /* ACTIONID_UNZOOM */
-                                i--;
-                            break;
-                        }
-                    }
-                    if( i == val_list.p_list->i_count ) i = 0;
-                    if( i == -1 ) i = val_list.p_list->i_count-1;
-                    var_SetFloat( p_vout, "zoom",
-                                  val_list.p_list->p_values[i].f_float );
-                    DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                    _("Zoom mode: %s"),
-                                    text_list.p_list->p_values[i].psz_string );
+            break;
 
-                    var_FreeList( &val_list, &text_list );
-                }
-            }
-            else if( i_action == ACTIONID_CROP_TOP && p_vout )
-                var_IncInteger( p_vout, "crop-top" );
-            else if( i_action == ACTIONID_UNCROP_TOP && p_vout )
-                var_DecInteger( p_vout, "crop-top" );
-            else if( i_action == ACTIONID_CROP_BOTTOM && p_vout )
-                var_IncInteger( p_vout, "crop-bottom" );
-            else if( i_action == ACTIONID_UNCROP_BOTTOM && p_vout )
-                 var_DecInteger( p_vout, "crop-bottom" );
-            else if( i_action == ACTIONID_CROP_LEFT && p_vout )
-                 var_IncInteger( p_vout, "crop-left" );
-            else if( i_action == ACTIONID_UNCROP_LEFT && p_vout )
-                 var_DecInteger( p_vout, "crop-left" );
-            else if( i_action == ACTIONID_CROP_RIGHT && p_vout )
-                 var_IncInteger( p_vout, "crop-right" );
-            else if( i_action == ACTIONID_UNCROP_RIGHT && p_vout )
-                 var_DecInteger( p_vout, "crop-right" );
+        case ACTIONID_SUBPOS_DOWN:
+        case ACTIONID_SUBPOS_UP:
+        {
+            int i_pos;
+            if( i_action == ACTIONID_SUBPOS_DOWN )
+                i_pos = var_DecInteger( p_vout, "sub-margin" );
+            else
+                i_pos = var_IncInteger( p_vout, "sub-margin" );
 
-            else if( i_action == ACTIONID_NEXT )
-            {
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s", _("Next") );
-                playlist_Next( p_playlist );
-            }
-            else if( i_action == ACTIONID_PREV )
-            {
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s",
-                                _("Previous") );
-                playlist_Prev( p_playlist );
-            }
-            else if( i_action == ACTIONID_STOP )
-            {
-                playlist_Stop( p_playlist );
-            }
-            else if( i_action == ACTIONID_FRAME_NEXT )
-            {
-                var_TriggerCallback( p_input, "frame-next" );
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                "%s", _("Next frame") );
-            }
-            else if( i_action == ACTIONID_RATE_NORMAL )
-            {
-                var_SetFloat( p_playlist, "rate", 1. );
-                DisplayRate( p_vout, var_GetFloat( p_input, "rate" ) );
-            }
-            else if( i_action == ACTIONID_FASTER )
-            {
-                var_TriggerCallback( p_playlist, "rate-faster" );
-                DisplayRate( p_vout, var_GetFloat( p_input, "rate" ) );
-            }
-            else if( i_action == ACTIONID_SLOWER )
-            {
-                var_TriggerCallback( p_playlist, "rate-slower" );
-                DisplayRate( p_vout, var_GetFloat( p_input, "rate" ) );
-            }
-            else if( i_action == ACTIONID_RATE_FASTER_FINE ||
-                     i_action == ACTIONID_RATE_SLOWER_FINE )
-            {
-                const int i_dir = i_action == ACTIONID_RATE_FASTER_FINE ? 1 : -1;
-                float f_newrate = AdjustRateFine( p_input, i_dir );
-
-                var_SetFloat( p_playlist, "rate", f_newrate );
-                DisplayRate( p_vout, f_newrate );
-            }
-            else if( i_action == ACTIONID_POSITION )
-            {
-                if( ( !p_vout || vout_OSDEpg( p_vout, input_GetItem( p_input ) ) ) && b_seekable )
-                    DisplayPosition( p_intf, p_vout, p_input );
-            }
-            else if( i_action >= ACTIONID_PLAY_BOOKMARK1 &&
-                     i_action <= ACTIONID_PLAY_BOOKMARK10 )
-            {
-                PlayBookmark( p_intf, i_action - ACTIONID_PLAY_BOOKMARK1 + 1 );
-            }
-            else if( i_action >= ACTIONID_SET_BOOKMARK1 &&
-                     i_action <= ACTIONID_SET_BOOKMARK10 )
-            {
-                SetBookmark( p_intf, i_action - ACTIONID_SET_BOOKMARK1 + 1 );
-            }
-            /* Only makes sense with DVD */
-            else if( i_action == ACTIONID_TITLE_PREV )
-                var_TriggerCallback( p_input, "prev-title" );
-            else if( i_action == ACTIONID_TITLE_NEXT )
-                var_TriggerCallback( p_input, "next-title" );
-            else if( i_action == ACTIONID_CHAPTER_PREV )
-                var_TriggerCallback( p_input, "prev-chapter" );
-            else if( i_action == ACTIONID_CHAPTER_NEXT )
-                var_TriggerCallback( p_input, "next-chapter" );
-            else if( i_action == ACTIONID_DISC_MENU )
-                var_SetInteger( p_input, "title  0", 2 );
-
-            else if( i_action == ACTIONID_SUBDELAY_DOWN )
-            {
-                int64_t i_delay = var_GetTime( p_input, "spu-delay" );
-                i_delay -= 50000;    /* 50 ms */
-                var_SetTime( p_input, "spu-delay", i_delay );
-                ClearChannels( p_intf, p_vout );
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                _( "Subtitle delay %i ms" ),
-                                (int)(i_delay/1000) );
-            }
-            else if( i_action == ACTIONID_SUBDELAY_UP )
-            {
-                int64_t i_delay = var_GetTime( p_input, "spu-delay" );
-                i_delay += 50000;    /* 50 ms */
-                var_SetTime( p_input, "spu-delay", i_delay );
-                ClearChannels( p_intf, p_vout );
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                _( "Subtitle delay %i ms" ),
-                                 (int)(i_delay/1000) );
-            }
-            else if( ( i_action == ACTIONID_SUBPOS_DOWN ||
-                       i_action == ACTIONID_SUBPOS_UP ) && p_vout )
-            {
-                int i_pos;
-                if( i_action == ACTIONID_SUBPOS_DOWN )
-                    i_pos = var_DecInteger( p_vout, "sub-margin" );
-                else
-                    i_pos = var_IncInteger( p_vout, "sub-margin" );
-
-                ClearChannels( p_intf, p_vout );
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                _( "Subtitle position %i px" ),
-                                 (int)(i_pos) );
-            }
-            else if( i_action == ACTIONID_AUDIODELAY_DOWN )
-            {
-                int64_t i_delay = var_GetTime( p_input, "audio-delay" );
-                i_delay -= 50000;    /* 50 ms */
-                var_SetTime( p_input, "audio-delay", i_delay );
-                ClearChannels( p_intf, p_vout );
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                _( "Audio delay %i ms" ),
-                                 (int)(i_delay/1000) );
-            }
-            else if( i_action == ACTIONID_AUDIODELAY_UP )
-            {
-                int64_t i_delay = var_GetTime( p_input, "audio-delay" );
-                i_delay += 50000;    /* 50 ms */
-                var_SetTime( p_input, "audio-delay", i_delay );
-                ClearChannels( p_intf, p_vout );
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                _( "Audio delay %i ms" ),
-                                 (int)(i_delay/1000) );
-            }
-            else if( i_action == ACTIONID_MENU_ON )
-            {
-                osd_MenuShow( VLC_OBJECT(p_intf) );
-            }
-            else if( i_action == ACTIONID_MENU_OFF )
-            {
-                osd_MenuHide( VLC_OBJECT(p_intf) );
-            }
-            else if( i_action == ACTIONID_MENU_LEFT )
-            {
-                osd_MenuPrev( VLC_OBJECT(p_intf) );
-            }
-            else if( i_action == ACTIONID_MENU_RIGHT )
-            {
-                osd_MenuNext( VLC_OBJECT(p_intf) );
-            }
-            else if( i_action == ACTIONID_MENU_UP )
-            {
-                osd_MenuUp( VLC_OBJECT(p_intf) );
-            }
-            else if( i_action == ACTIONID_MENU_DOWN )
-            {
-                osd_MenuDown( VLC_OBJECT(p_intf) );
-            }
-            else if( i_action == ACTIONID_MENU_SELECT )
-            {
-                osd_MenuActivate( VLC_OBJECT(p_intf) );
-            }
-            else if( i_action == ACTIONID_RECORD )
-            {
-                if( var_GetBool( p_input, "can-record" ) )
-                {
-                    const bool b_record = var_ToggleBool( p_input, "record" );
-
-                    if( b_record )
-                        DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s", _("Recording") );
-                    else
-                        DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s", _("Recording done") );
-                }
-            }
+            ClearChannels( p_intf, p_vout );
+            DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
+                            _( "Subtitle position %d px" ), i_pos );
+            break;
         }
+
+        /* Input + video output */
+        case ACTIONID_POSITION:
+            if( p_vout && vout_OSDEpg( p_vout, input_GetItem( p_input ) ) )
+                DisplayPosition( p_intf, p_vout, p_input );
+            break;
     }
-cleanup_and_continue:
+
     if( p_vout )
         vlc_object_release( p_vout );
     if( p_input )
@@ -1086,11 +1129,11 @@ static void DisplayRate( vout_thread_t *p_vout, float f_rate )
     DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL, _("Speed: %.2fx"), f_rate );
 }
 
-static float AdjustRateFine( input_thread_t *p_input, const int i_dir )
+static float AdjustRateFine( vlc_object_t *p_obj, const int i_dir )
 {
     const float f_rate_min = (float)INPUT_RATE_DEFAULT / INPUT_RATE_MAX;
     const float f_rate_max = (float)INPUT_RATE_DEFAULT / INPUT_RATE_MIN;
-    float f_rate = var_GetFloat( p_input, "rate" );
+    float f_rate = var_GetFloat( p_obj, "rate" );
 
     int i_sign = f_rate < 0 ? -1 : 1;
 
