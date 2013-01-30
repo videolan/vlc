@@ -605,7 +605,7 @@ void vlc_testcancel (void)
     /* This check is needed for the case that vlc_cancel() is followed by
      * vlc_testcancel() without any cancellation point */
     if( DosWaitEventSem( th->cancel_event, 0 ) == NO_ERROR )
-        vlc_cancel_self( NULL );
+        vlc_cancel_self( th );
 
     if (th->killable && th->killed)
     {
