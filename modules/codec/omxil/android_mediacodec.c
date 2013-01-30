@@ -300,8 +300,8 @@ static int OpenDecoder(vlc_object_t *p_this)
     }
 
     // This method doesn't handle errors nicely, it crashes if the codec isn't found.
-    // (The same goes for createDecoderByType.) This is fixed in latest AOSP, but not
-    // in current 4.1 devices.
+    // (The same goes for createDecoderByType.) This is fixed in latest AOSP and in 4.2,
+    // but not in 4.1 devices.
     p_sys->codec = (*env)->CallStaticObjectMethod(env, p_sys->media_codec_class,
                                                   p_sys->create_by_codec_name, codec_name);
     p_sys->codec = (*env)->NewGlobalRef(env, p_sys->codec);
