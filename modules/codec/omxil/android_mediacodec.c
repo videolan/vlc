@@ -486,6 +486,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, int loo
             if (!strncmp(p_sys->name, "OMX.SEC.", strlen("OMX.SEC.")) &&
                 !strstr(p_sys->name, ".Decoder")) {
                 p_sys->slice_height = 0;
+                p_sys->stride = p_dec->fmt_out.video.i_width;
             }
 
             continue;

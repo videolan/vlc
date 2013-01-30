@@ -521,8 +521,10 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
          * at least in the pre-4.0 firmwares). Thus, we enable this quirk on
          * any OMX.SEC. decoder that doesn't contain the string ".Decoder". */
         if(!strncmp(p_sys->psz_component, "OMX.SEC.", strlen("OMX.SEC.")) &&
-           !strstr(p_sys->psz_component, ".Decoder"))
+           !strstr(p_sys->psz_component, ".Decoder")) {
             def->format.video.nSliceHeight = 0;
+            def->format.video.nStride = p_fmt->video.i_width;
+        }
 
         if(!GetVlcVideoFormat( def->format.video.eCompressionFormat,
                                &p_fmt->i_codec, 0 ) )
