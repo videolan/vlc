@@ -5,6 +5,7 @@ PLATFORM=OS
 VERBOSE=no
 SDK_VERSION=6.0
 SDK_MIN=5.1
+ARCH=armv7
 
 usage()
 {
@@ -12,8 +13,9 @@ cat << EOF
 usage: $0 [-s] [-k sdk]
 
 OPTIONS
-   -k       Specify which sdk to use ('xcodebuild -showsdks', current: ${SDK})
-   -s       Build for simulator
+   -k <sdk>      Specify which sdk to use ('xcodebuild -showsdks', current: ${SDK})
+   -s            Build for simulator
+   -a <arch>     Specify which arch to use (current: ${ARCH})
 EOF
 }
 
@@ -34,7 +36,7 @@ info()
     echo "[${blue}info${normal}] $1"
 }
 
-while getopts "hvsk:" OPTION
+while getopts "hvsk:a:" OPTION
 do
      case $OPTION in
          h)
@@ -50,6 +52,9 @@ do
              ;;
          k)
              SDK=$OPTARG
+             ;;
+         a)
+             ARCH=$OPTARG
              ;;
          ?)
              usage
@@ -77,7 +82,6 @@ if [ "$PLATFORM" = "Simulator" ]; then
     OPTIM="-O3 -g"
 else
     TARGET="arm-apple-darwin11"
-    ARCH="armv7 -g"
 fi
 
 info "Using ${ARCH} with SDK version ${SDK_VERSION}"
@@ -100,9 +104,9 @@ then
     exit 1
 fi
 
-BUILDDIR="${VLCROOT}/build-ios-${PLATFORM}"
+BUILDDIR="${VLCROOT}/build-ios-${PLATFORM}/${ARCH}"
 
-PREFIX="${VLCROOT}/install-ios-${PLATFORM}"
+PREFIX="${VLCROOT}/install-ios-${PLATFORM}/${ARCH}"
 
 IOS_GAS_PREPROCESSOR="${VLCROOT}/extras/tools/gas/gas-preprocessor.pl"
 
@@ -117,7 +121,7 @@ spushd "${VLCROOT}/extras/tools"
 make && make .gas
 spopd
 
-info "Building contrib for iOS in '${VLCROOT}/contrib/iPhone${PLATFORM}'"
+info "Building contrib for iOS in '${VLCROOT}/contrib/iPhone${PLATFORM}-${ARCH}'"
 
 # The contrib will read the following
 export AR="xcrun ar"
@@ -156,13 +160,21 @@ else
   export LDFLAGS="-syslibroot=${SDKROOT}/ -arch ${ARCH} -miphoneos-version-min=${SDK_MIN}"
 fi
 
+if [ "$PLATFORM" = "OS" ]; then
+    EXTRA_CFLAGS="-arch ${ARCH} -mcpu=cortex-a8"
+    EXTRA_LDFLAGS="-arch ${ARCH}"
+else
+    EXTRA_CFLAGS="-m32"
+    EXTRA_LDFLAGS="-m32"
+fi
+
 info "LD FLAGS SELECTED = '${LDFLAGS}'"
 
 spushd ${VLCROOT}/contrib
 
 echo ${VLCROOT}
-mkdir -p "${VLCROOT}/contrib/iPhone${PLATFORM}"
-cd "${VLCROOT}/contrib/iPhone${PLATFORM}"
+mkdir -p "${VLCROOT}/contrib/iPhone${PLATFORM}-${ARCH}"
+cd "${VLCROOT}/contrib/iPhone${PLATFORM}-${ARCH}"
 
 if [ "$PLATFORM" = "OS" ]; then
       export AS="${IOS_GAS_PREPROCESSOR} ${CC}"
@@ -200,6 +212,9 @@ fi
     --disable-schroedinger \
     --disable-libmpeg2 \
     --enable-mad > ${out}
+
+echo "EXTRA_CFLAGS += ${EXTRA_CFLAGS}" >> config.mak
+echo "EXTRA_LDFLAGS += ${EXTRA_LDFLAGS}" >> config.mak
 make
 spopd
 
@@ -316,7 +331,9 @@ make -j$MAKE_JOBS > ${out}
 
 info "Installing libvlc"
 make install > ${out}
+
 find ${PREFIX}/lib/vlc/plugins -name *.a -type f -exec cp '{}' ${PREFIX}/lib/vlc/plugins \;
+cp -R "${VLCROOT}/contrib/${TARGET}" "${PREFIX}/contribs"
 
 info "Removing unneeded modules"
 blacklist="

@@ -143,7 +143,6 @@ case "${host_os}" in
         ARCH_flag="-arch x86_64"
       ;;
       arm*)
-        ARCH_flag="-arch armv7"
         ac_cv_c_bigendian="no"
         ac_cv_c_attribute_packed="no"
       ;;
