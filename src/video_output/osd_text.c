@@ -31,29 +31,6 @@
 #include <vlc_osd.h>
 
 /**
- * \brief Show text on the video for some time
- * \param p_spu pointer to the subpicture queue the text is to be showed on
- * \param i_channel Subpicture channel
- * \param psz_string The text to be shown
- * \param p_style Pointer to a struct with text style info (it is duplicated)
- * \param i_flags flags for alignment and such
- * \param i_hmargin horizontal margin in pixels
- * \param i_vmargin vertical margin in pixels
- * \param i_duration Amount of time the text is to be shown.
- */
-int osd_ShowTextRelative( spu_t *p_spu, int i_channel,
-                           const char *psz_string, const text_style_t *p_style,
-                           int i_flags, int i_hmargin, int i_vmargin,
-                           mtime_t i_duration )
-{
-    mtime_t i_now = mdate();
-
-    return osd_ShowTextAbsolute( p_spu, i_channel, psz_string,
-                                  p_style, i_flags, i_hmargin, i_vmargin,
-                                  i_now, i_now + i_duration );
-}
-
-/**
  * \brief Show text on the video from a given start date to a given end date
  * \param p_spu pointer to the subpicture queue the text is to be showed on
  * \param i_channel Subpicture channel
@@ -67,6 +44,7 @@ int osd_ShowTextRelative( spu_t *p_spu, int i_channel,
  *               if this is 0 the string will be shown untill the next string
  *               is about to be shown
  */
+static
 int osd_ShowTextAbsolute( spu_t *p_spu_channel, int i_channel,
                            const char *psz_string, const text_style_t *p_style,
                            int i_flags, int i_hmargin, int i_vmargin,
@@ -111,6 +89,29 @@ int osd_ShowTextAbsolute( spu_t *p_spu_channel, int i_channel,
     return VLC_SUCCESS;
 }
 
+/**
+ * \brief Show text on the video for some time
+ * \param p_spu pointer to the subpicture queue the text is to be showed on
+ * \param i_channel Subpicture channel
+ * \param psz_string The text to be shown
+ * \param p_style Pointer to a struct with text style info (it is duplicated)
+ * \param i_flags flags for alignment and such
+ * \param i_hmargin horizontal margin in pixels
+ * \param i_vmargin vertical margin in pixels
+ * \param i_duration Amount of time the text is to be shown.
+ */
+static
+int osd_ShowTextRelative( spu_t *p_spu, int i_channel,
+                           const char *psz_string, const text_style_t *p_style,
+                           int i_flags, int i_hmargin, int i_vmargin,
+                           mtime_t i_duration )
+{
+    mtime_t i_now = mdate();
+
+    return osd_ShowTextAbsolute( p_spu, i_channel, psz_string,
+                                  p_style, i_flags, i_hmargin, i_vmargin,
+                                  i_now, i_now + i_duration );
+}
 
 /**
  * \brief Write an informative message at the default location,

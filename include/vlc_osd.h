@@ -433,8 +433,6 @@ static inline void osd_SetMenuUpdate( osd_menu_t *p_osd, bool b_value )
  * object. The types are declared in the include file include/vlc_osd.h
  * @see vlc_osd.h
  */
-VLC_API int osd_ShowTextRelative( spu_t *, int, const char *, const text_style_t *, int, int, int, mtime_t );
-VLC_API int osd_ShowTextAbsolute( spu_t *, int, const char *, const text_style_t *, int, int, int, mtime_t, mtime_t );
 VLC_API void osd_Message( spu_t *, int, char *, ... ) VLC_FORMAT( 3, 4 );
 
 /** @} */
