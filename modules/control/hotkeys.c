@@ -64,8 +64,6 @@ static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static int  ActionEvent( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
-static int  SpecialKeyEvent( vlc_object_t *, char const *,
-                             vlc_value_t, vlc_value_t, void * );
 static void PlayBookmark( intf_thread_t *, int );
 static void SetBookmark ( intf_thread_t *, int );
 static void DisplayPosition( intf_thread_t *, vout_thread_t *, input_thread_t * );
@@ -108,7 +106,6 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->p_last_vout = NULL;
 
-    var_AddCallback( p_intf->p_libvlc, "key-pressed", SpecialKeyEvent, p_intf );
     var_AddCallback( p_intf->p_libvlc, "key-action", ActionEvent, p_intf );
     return VLC_SUCCESS;
 }
@@ -122,7 +119,6 @@ static void Close( vlc_object_t *p_this )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     var_DelCallback( p_intf->p_libvlc, "key-action", ActionEvent, p_intf );
-    var_DelCallback( p_intf->p_libvlc, "key-pressed", SpecialKeyEvent, p_intf );
 
     /* Destroy structure */
     free( p_sys );
@@ -914,30 +910,6 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         vlc_object_release( p_vout );
     if( p_input )
         vlc_object_release( p_input );
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * SpecialKeyEvent: callback for mouse events
- *****************************************************************************/
-static int SpecialKeyEvent( vlc_object_t *libvlc, char const *psz_var,
-                            vlc_value_t oldval, vlc_value_t newval,
-                            void *p_data )
-{
-    (void)p_data;
-    (void)psz_var;
-    (void)oldval;
-
-    /* Special action for mouse event */
-    /* FIXME: rework hotkeys handling to allow more than 1 event
-     * to trigger one same action */
-    switch (newval.i_int & ~KEY_MODIFIER)
-    {
-        case KEY_MENU:
-            var_SetBool( libvlc, "intf-popupmenu", true );
-            break;
-    }
-
     return VLC_SUCCESS;
 }
 
