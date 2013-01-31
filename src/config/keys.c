@@ -288,6 +288,7 @@ static const struct action actions[] =
     { "frame-next", ACTIONID_FRAME_NEXT, },
     { "incr-scalefactor", ACTIONID_SCALE_UP, },
     { "intf-boss", ACTIONID_INTF_BOSS, },
+    { "intf-popup-menu", ACTIONID_INTF_POPUP_MENU, },
     { "intf-show", ACTIONID_INTF_TOGGLE_FSC, },
     { "jump+extrashort", ACTIONID_JUMP_FORWARD_EXTRASHORT, },
     { "jump+long", ACTIONID_JUMP_FORWARD_LONG, },

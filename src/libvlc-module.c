@@ -1392,6 +1392,8 @@ static const char *const mouse_wheel_texts[] =
 #define INTF_HIDE_KEY_LONGTEXT N_("Lower the interface below all other windows.")
 #define INTF_BOSS_KEY_TEXT N_("Boss key")
 #define INTF_BOSS_KEY_LONGTEXT N_("Hide the interface and pause playback.")
+#define INTF_POPUP_MENU_KEY_TEXT N_("Context menu")
+#define INTF_POPUP_MENU_KEY_LONGTEXT N_("Show the contextual popup menu.")
 #define SNAP_KEY_TEXT N_("Take video snapshot")
 #define SNAP_KEY_LONGTEXT N_("Takes a video snapshot and writes it to disk.")
 
@@ -2205,6 +2207,7 @@ vlc_module_begin ()
 #   define KEY_DEINTERLACE_MODE   "Shift+d"
 #   define KEY_INTF_TOGGLE_FSC    "i"
 #   define KEY_INTF_BOSS          NULL
+#   define KEY_INTF_POPUP_MENU    "Menu"
 #   define KEY_DISC_MENU          "Ctrl+m"
 #   define KEY_TITLE_PREV         "Ctrl+p"
 #   define KEY_TITLE_NEXT         "Ctrl+n"
@@ -2316,6 +2319,7 @@ vlc_module_begin ()
 #   define KEY_DEINTERLACE_MODE   "Shift+d"
 #   define KEY_INTF_TOGGLE_FSC    "i"
 #   define KEY_INTF_BOSS          NULL
+#   define KEY_INTF_POPUP_MENU    "Menu"
 #   define KEY_DISC_MENU          "Shift+m"
 #   define KEY_TITLE_PREV         "Shift+o"
 #   define KEY_TITLE_NEXT         "Shift+b"
@@ -2485,6 +2489,8 @@ vlc_module_begin ()
 
     add_key( "key-intf-boss", KEY_INTF_BOSS,
              INTF_BOSS_KEY_TEXT, INTF_BOSS_KEY_LONGTEXT, true )
+    add_key( "key-intf-popup-menu", KEY_INTF_POPUP_MENU,
+             INTF_POPUP_MENU_KEY_TEXT, INTF_POPUP_MENU_KEY_LONGTEXT, true )
     add_key( "key-snapshot", KEY_SNAPSHOT,
         SNAP_KEY_TEXT, SNAP_KEY_LONGTEXT, true )
     add_key( "key-record", KEY_RECORD,

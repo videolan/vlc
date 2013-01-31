@@ -166,6 +166,9 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         case ACTIONID_INTF_BOSS:
             var_TriggerCallback( p_intf->p_libvlc, "intf-boss" );
             break;
+        case ACTIONID_INTF_POPUP_MENU:
+            var_TriggerCallback( p_intf->p_libvlc, "intf-popupmenu" );
+            break;
 
         /* Playlist actions (including audio) */
         case ACTIONID_LOOP:
