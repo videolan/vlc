@@ -425,16 +425,6 @@ static inline void osd_SetMenuUpdate( osd_menu_t *p_osd, bool b_value )
     var_Set( p_osd, "osd-menu-update", val );
 }
 
-/**
- * Textual feedback
- *
- * Functions that provide the textual feedback on the OSD. They are shown
- * on hotkey commands. The feedback is also part of the osd_button_t
- * object. The types are declared in the include file include/vlc_osd.h
- * @see vlc_osd.h
- */
-VLC_API void osd_Message( spu_t *, int, char *, ... ) VLC_FORMAT( 3, 4 );
-
 /** @} */
 
 # ifdef __cplusplus

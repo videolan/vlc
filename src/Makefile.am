@@ -404,7 +404,6 @@ SOURCES_libvlc_common = \
 	video_output/vout_subpictures.c \
 	video_output/window.c \
 	video_output/opengl.c \
-	video_output/osd_text.c \
 	video_output/vout_intf.c \
 	video_output/vout_internal.h \
 	video_output/vout_control.h \

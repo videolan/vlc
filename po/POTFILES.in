@@ -154,7 +154,6 @@ src/stream_output/stream_output.h
 src/text/iso-639_def.h
 src/version.c
 src/video_output/interlacing.c
-src/video_output/osd_text.c
 src/video_output/postprocessing.c
 src/video_output/video_output.c
 src/video_output/video_text.c
