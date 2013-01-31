@@ -220,13 +220,6 @@ osd.slider( position, type, [id] ): Display slider. Position is an integer
   from 0 to 100. Type can be "horizontal" or "vertical".
 osd.channel_register(): Register a new OSD channel. Returns the channel id.
 osd.channel_clear( id ): Clear OSD channel.
-osd.menu.show(): Show the OSD menu.
-osd.menu.hide(): Hide the OSD menu.
-osd.menu.prev(): Select previous/left item.
-osd.menu.next(): Select next/right item.
-osd.menu.up(): Move selection up.
-osd.menu.down(): Move selection down.
-osd.menu.activate(): Activate/validate current selection.
 
 Playlist
 --------
