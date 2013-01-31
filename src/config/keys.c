@@ -38,6 +38,7 @@
 #ifdef HAVE_SEARCH_H
 # include <search.h>
 #endif
+#include <errno.h>
 
 #include <vlc_common.h>
 #include <vlc_keys.h>
@@ -406,13 +407,35 @@ static int vlc_key_to_action (vlc_object_t *obj, const char *varname,
 }
 
 /**
+ * Adds a mapping from a certain key code to a certain action.
+ */
+static int vlc_AddMapping (void **map, uint32_t keycode, vlc_action_t action)
+{
+    struct mapping *entry = malloc (sizeof (*entry));
+    if (entry == NULL)
+        return ENOMEM;
+    entry->key = keycode;
+    entry->action = action;
+
+    struct mapping **pent = tsearch (entry, map, keycmp);
+    if (unlikely(pent == NULL))
+        return ENOMEM;
+    if (*pent != entry)
+    {
+        free (entry);
+        return EEXIST;
+    }
+    return 0;
+}
+
+/**
  * Sets up all key mappings for a given action.
  * \param map tree (of struct mapping entries) to write mappings to
  * \param confname VLC configuration item to read mappings from
  * \param action action ID
  */
-static void vlc_MapAction (vlc_object_t *obj, void **map,
-                           const char *confname, vlc_action_t action)
+static void vlc_InitAction (vlc_object_t *obj, void **map,
+                            const char *confname, vlc_action_t action)
 {
     char *keys = var_InheritString (obj, confname);
     if (keys == NULL)
@@ -429,24 +452,11 @@ static void vlc_MapAction (vlc_object_t *obj, void **map,
             continue;
         }
 
-        struct mapping *entry = malloc (sizeof (*entry));
-        if (entry == NULL)
-            continue;
-        entry->key = code;
-        entry->action = action;
-
-        struct mapping **pent = tsearch (entry, map, keycmp);
-        if (unlikely(pent == NULL))
-            continue;
-        if (*pent != entry)
-        {
-            free (entry);
+        if (vlc_AddMapping (map, code, action) == EEXIST)
             msg_Warn (obj, "Key \"%s\" bound to multiple actions", key);
-        }
     }
     free (keys);
 }
-
 
 /**
  * Initializes the key map from configuration.
@@ -485,11 +495,29 @@ struct vlc_actions *vlc_InitActions (libvlc_int_t *libvlc)
         char name[12 + MAXACTION];
 
         snprintf (name, sizeof (name), "global-key-%s", actions[i].name);
-        vlc_MapAction (obj, &as->map, name + 7, actions[i].value);
-        vlc_MapAction (obj, &as->global_map, name, actions[i].value);
+        vlc_InitAction (obj, &as->map, name + 7, actions[i].value);
+        vlc_InitAction (obj, &as->global_map, name, actions[i].value);
+    }
+    keys->psz_action = NULL;
+
+    /* Initialize mouse wheel events */
+    int mousemode = var_InheritInteger (obj, "hotkeys-mousewheel-mode");
+    if (mousemode < 2)
+    {
+        vlc_AddMapping (&as->map,
+                        mousemode ? KEY_MOUSEWHEELLEFT : KEY_MOUSEWHEELUP,
+                        ACTIONID_VOL_UP);
+        vlc_AddMapping (&as->map,
+                        mousemode ? KEY_MOUSEWHEELRIGHT : KEY_MOUSEWHEELDOWN,
+                        ACTIONID_VOL_DOWN);
+        vlc_AddMapping (&as->map,
+                        mousemode ? KEY_MOUSEWHEELUP : KEY_MOUSEWHEELLEFT,
+                        ACTIONID_JUMP_FORWARD_EXTRASHORT);
+        vlc_AddMapping (&as->map,
+                        mousemode ? KEY_MOUSEWHEELDOWN : KEY_MOUSEWHEELRIGHT,
+                        ACTIONID_JUMP_BACKWARD_EXTRASHORT);
     }
 
-    keys->psz_action = NULL;
 
     libvlc->p_hotkeys = as->keys;
     var_AddCallback (obj, "key-pressed", vlc_key_to_action, &as->map);

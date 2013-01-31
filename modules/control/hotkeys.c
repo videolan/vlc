@@ -55,7 +55,6 @@ struct intf_sys_t
     vout_thread_t      *p_last_vout;
     int                 p_channels[ CHANNELS_NUMBER ]; /* contains registered
                                                         * channel IDs */
-    int                 i_mousewheel_mode;
 };
 
 /*****************************************************************************
@@ -108,8 +107,6 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys = p_sys;
 
     p_sys->p_last_vout = NULL;
-    p_intf->p_sys->i_mousewheel_mode =
-        var_InheritInteger( p_intf, "hotkeys-mousewheel-mode" );
 
     var_AddCallback( p_intf->p_libvlc, "key-pressed", SpecialKeyEvent, p_intf );
     var_AddCallback( p_intf->p_libvlc, "key-action", ActionEvent, p_intf );
@@ -924,44 +921,20 @@ static int SpecialKeyEvent( vlc_object_t *libvlc, char const *psz_var,
                             vlc_value_t oldval, vlc_value_t newval,
                             void *p_data )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)p_data;
-    int i_action = 0;
-
+    (void)p_data;
     (void)psz_var;
     (void)oldval;
-
-    int i_mode = p_intf->p_sys->i_mousewheel_mode;
 
     /* Special action for mouse event */
     /* FIXME: rework hotkeys handling to allow more than 1 event
      * to trigger one same action */
     switch (newval.i_int & ~KEY_MODIFIER)
     {
-        case KEY_MOUSEWHEELUP:
-            i_action = (i_mode == MOUSEWHEEL_VOLUME ) ? ACTIONID_VOL_UP
-                                 : ACTIONID_JUMP_FORWARD_EXTRASHORT;
-            break;
-        case KEY_MOUSEWHEELDOWN:
-            i_action = (i_mode == MOUSEWHEEL_VOLUME ) ? ACTIONID_VOL_DOWN
-                                : ACTIONID_JUMP_BACKWARD_EXTRASHORT;
-            break;
-        case KEY_MOUSEWHEELLEFT:
-            i_action = (i_mode == MOUSEWHEEL_VOLUME ) ?
-                        ACTIONID_JUMP_BACKWARD_EXTRASHORT : ACTIONID_VOL_DOWN;
-            break;
-        case KEY_MOUSEWHEELRIGHT:
-            i_action = (i_mode == MOUSEWHEEL_VOLUME ) ?
-                        ACTIONID_JUMP_FORWARD_EXTRASHORT : ACTIONID_VOL_UP;
-            break;
         case KEY_MENU:
             var_SetBool( libvlc, "intf-popupmenu", true );
             break;
     }
 
-    if( i_mode == NO_MOUSEWHEEL ) return VLC_SUCCESS;
-
-    if( i_action )
-        return PutAction( p_intf, i_action );
     return VLC_SUCCESS;
 }
 
