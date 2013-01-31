@@ -1202,6 +1202,20 @@ static const char *const ppsz_albumart_descriptions[] =
 #define HOTKEY_CAT_LONGTEXT N_( "These settings are the global VLC key " \
     "bindings, known as \"hotkeys\"." )
 
+enum{
+    MOUSEWHEEL_VOLUME,
+    MOUSEWHEEL_POSITION,
+    NO_MOUSEWHEEL,
+};
+
+static const int mouse_wheel_values[] = { 2, 0, 1 };
+static const char *const mouse_wheel_texts[] =
+    { N_("Ignore"), N_("Volume Control"), N_("Position Control") };
+
+#define MOUSE_WHEEL_MODE_TEXT N_("MouseWheel up-down axis Control")
+#define MOUSE_WHEEL_MODE_LONGTEXT N_( \
+   "The MouseWheel up-down (vertical) axis can control volume, position or " \
+   "mousewheel event can be ignored")
 #define TOGGLE_FULLSCREEN_KEY_TEXT N_("Fullscreen")
 #define TOGGLE_FULLSCREEN_KEY_LONGTEXT N_("Select the hotkey to use to swap fullscreen state.")
 #define LEAVE_FULLSCREEN_KEY_TEXT N_("Exit fullscreen")
@@ -2103,6 +2117,10 @@ vlc_module_begin ()
 /* Hotkey options*/
     set_subcategory( SUBCAT_INTERFACE_HOTKEYS )
     add_category_hint( N_("Hot keys"), HOTKEY_CAT_LONGTEXT , false )
+
+    add_integer( "hotkeys-mousewheel-mode", 0, MOUSE_WHEEL_MODE_TEXT,
+                 MOUSE_WHEEL_MODE_LONGTEXT, false )
+        change_integer_list( mouse_wheel_values, mouse_wheel_texts )
 
 #if defined(__APPLE__)
 /* Don't use the following combo's */

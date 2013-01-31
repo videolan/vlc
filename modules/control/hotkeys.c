@@ -84,18 +84,6 @@ static void ClearChannels  ( intf_thread_t *, vout_thread_t * );
  * Module descriptor
  *****************************************************************************/
 
-enum{
-    MOUSEWHEEL_VOLUME,
-    MOUSEWHEEL_POSITION,
-    NO_MOUSEWHEEL,
-};
-
-static const int i_mode_list[] =
-    { MOUSEWHEEL_VOLUME, MOUSEWHEEL_POSITION, NO_MOUSEWHEEL };
-
-static const char *const psz_mode_list_text[] =
-    { N_("Volume Control"), N_("Position Control"), N_("Ignore") };
-
 vlc_module_begin ()
     set_shortname( N_("Hotkeys") )
     set_description( N_("Hotkeys management interface") )
@@ -103,12 +91,6 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_HOTKEYS )
-
-    add_integer( "hotkeys-mousewheel-mode", MOUSEWHEEL_VOLUME,
-                 N_("MouseWheel up-down axis Control"),
-                 N_("The MouseWheel up-down (vertical) axis can control volume, position or "
-                    "mousewheel event can be ignored"), false )
-            change_integer_list( i_mode_list, psz_mode_list_text )
 
 vlc_module_end ()
 
