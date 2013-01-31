@@ -947,11 +947,6 @@ modules/misc/inhibit/dbus.c
 modules/misc/inhibit/mce.c
 modules/misc/inhibit/xdg.c
 modules/misc/logger.c
-modules/misc/osd/osd_menu.c
-modules/misc/osd/osd_menu.h
-modules/misc/osd/parser.c
-modules/misc/osd/simple.c
-modules/misc/osd/xml.c
 modules/misc/playlist/export.c
 modules/misc/playlist/html.c
 modules/misc/playlist/m3u.c
@@ -1116,7 +1111,6 @@ modules/video_filter/motionblur.c
 modules/video_filter/motiondetect.c
 modules/video_filter/opencv_example.cpp
 modules/video_filter/opencv_wrapper.c
-modules/video_filter/osdmenu.c
 modules/video_filter/panoramix.c
 modules/video_filter/posterize.c
 modules/video_filter/postproc.c

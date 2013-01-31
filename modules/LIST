@@ -232,8 +232,6 @@ $Id$
  * opensles_android: OpenSL ES audio output for Android
  * opus: a opus audio decoder/packetizer using the libopus library
  * os2drive: service discovery for OS/2 drives
- * osd_parser: OSD import module
- * osdmenu: video_filter for displaying and streaming a On Screen Display menu
  * oss: audio output module using the OSS /dev/dsp interface
  * packetizer_copy: Simple copy packetizer
  * packetizer_dirac: Dirac video packetizer

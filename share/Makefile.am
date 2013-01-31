@@ -42,28 +42,16 @@ EXTRA_DIST += \
 	$(DIST_skins2) \
 	$(DIST_icons) \
 	$(DIST_http_lua) \
-	osdmenu/default.cfg.in \
-	$(DIST_osdmenu_default) \
 	$(DIST_solid)
-CLEANFILES += osdmenu/default.cfg
 
 nobase_vlcdata_DATA =
 if BUILD_SKINS
 nobase_vlcdata_DATA += skins2/default.vlt
 nobase_vlcdata_DATA += $(DIST_skins2)
 endif
-if BUILD_OSDMENU
-nobase_vlcdata_DATA += \
-	osdmenu/default.cfg \
-	$(DIST_osdmenu_default)
-endif
 if KDE_SOLID
 soliddata_DATA = $(DIST_solid)
 endif
-
-osdmenu/default.cfg: osdmenu/default.cfg.in $(top_builddir)/config.status
-	$(AM_V_GEN)mkdir -p osdmenu; \
-	  	   sed -e 's,\@vlcdatadir\@,$(vlcdatadir),g' < "$<" > $@
 
 DIST_icons = \
 	vlc512x512.png
@@ -93,35 +81,6 @@ skins2/default.vlt: $(skins2_default_vlt_FILES)
 		LC_ALL=C sort -z | \
 		tar cvv --exclude .svn --no-recursion --null -T -) | \
 	gzip -n > skins2/default.vlt
-DIST_osdmenu_default = \
-	osdmenu/default/unselected.png \
-	osdmenu/default/selection/bw.png \
-	osdmenu/default/selection/esc.png \
-	osdmenu/default/selection/fw.png \
-	osdmenu/default/selection/volume.png \
-	osdmenu/default/selection/next.png \
-	osdmenu/default/selection/play_pause.png \
-	osdmenu/default/selection/previous.png \
-	osdmenu/default/selection/stop.png \
-	osdmenu/default/selected/bw.png \
-	osdmenu/default/selected/next.png \
-	osdmenu/default/selected/play_pause.png \
-	osdmenu/default/selected/fw.png \
-	osdmenu/default/selected/stop.png \
-	osdmenu/default/selected/previous.png \
-	osdmenu/default/selected/esc.png \
-	osdmenu/default/selected/volume.png \
-	osdmenu/default/volume/volume_00.png \
-	osdmenu/default/volume/volume_01.png \
-	osdmenu/default/volume/volume_02.png \
-	osdmenu/default/volume/volume_03.png \
-	osdmenu/default/volume/volume_04.png \
-	osdmenu/default/volume/volume_05.png \
-	osdmenu/default/volume/volume_06.png \
-	osdmenu/default/volume/volume_07.png \
-	osdmenu/default/volume/volume_08.png \
-	osdmenu/default/volume/volume_09.png \
-	osdmenu/default/volume/volume_10.png
 
 #
 # LUA

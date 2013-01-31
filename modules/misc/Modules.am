@@ -21,14 +21,6 @@ endif
 EXTRA_LTLIBRARIES += libgnutls_plugin.la
 libvlc_LTLIBRARIES += $(LTLIBgnutls)
 
-libosd_parser_plugin_la_SOURCES = \
-	osd/parser.c osd/osd_menu.c osd/osd_menu.h osd/simple.c osd/xml.c
-libosd_parser_plugin_la_CFLAGS = $(AM_CFLAGS)
-libosd_parser_plugin_la_LIBADD = $(AM_LIBADD)
-if BUILD_OSDMENU
-libvlc_LTLIBRARIES += libosd_parser_plugin.la
-endif
-
 libxdg_screensaver_plugin_la_SOURCES = inhibit/xdg.c
 libxdg_screensaver_plugin_la_CFLAGS = $(AM_CFLAGS)
 libxdg_screensaver_plugin_la_LIBADD = $(AM_LIBADD)

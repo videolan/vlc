@@ -54,14 +54,6 @@ if BUILD_SKINS
 	cp -r $(prefix)/share/vlc/skins2 $(win32_destdir)/skins
 endif
 
-if BUILD_OSDMENU
-	cp -r $(prefix)/share/vlc/osdmenu "$(win32_destdir)/"
-	for file in $(win32_destdir)/osdmenu/*.cfg; do \
-		sed -e 's%share/osdmenu%osdmenu%g' -e 's%/%\\%g' "$$file" > "$${file}.tmp"; \
-		mv -f "$${file}.tmp" "$${file}"; \
-	done
-endif
-
 	cp "$(top_builddir)/npapi-vlc/activex/axvlc.dll.manifest" "$(win32_destdir)/"
 	cp "$(top_builddir)/npapi-vlc/installed/lib/axvlc.dll" "$(win32_destdir)/"
 	cp "$(top_builddir)/npapi-vlc/npapi/package/npvlc.dll.manifest" "$(win32_destdir)/"

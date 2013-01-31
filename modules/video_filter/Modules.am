@@ -46,13 +46,6 @@ if !HAVE_WIN32
 libvlc_LTLIBRARIES += libdynamicoverlay_plugin.la
 endif
 
-libosdmenu_plugin_la_SOURCES = osdmenu.c
-libosdmenu_plugin_la_CFLAGS = $(AM_CFLAGS) -DPKGDATADIR=\"$(vlcdatadir)\"
-libosdmenu_plugin_la_LIBADD = $(AM_LIBADD)
-if BUILD_OSDMENU
-libvlc_LTLIBRARIES += libosdmenu_plugin.la
-endif
-
 libremoteosd_plugin_la_SOURCES = remoteosd.c remoteosd_rfbproto.h
 libremoteosd_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
 libremoteosd_plugin_la_LIBADD = $(AM_LIBADD) $(GCRYPT_LIBS) $(LIBS_remoteosd)
