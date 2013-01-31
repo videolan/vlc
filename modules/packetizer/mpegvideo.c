@@ -538,7 +538,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
             /* Unofficial 15fps from Xing*/
             { 15, 1001 },
             /* Unofficial economy rates from libmpeg3 */
-            { 5, 1001 }, { 10, 1001 }, { 12, 1001 }, { 15, 1001 },
+            { 5000, 1001 }, { 1000, 1001 }, { 12000, 1001 }, { 15000, 1001 },
             { 1, 1 },  { 1, 1 }  /* invalid */
         };
 
