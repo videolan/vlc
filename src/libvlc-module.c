@@ -1420,26 +1420,6 @@ static const char *const ppsz_albumart_descriptions[] =
 #define WALLPAPER_KEY_LONGTEXT N_( \
     "Toggle wallpaper mode in video output." )
 
-#define MENU_ON_KEY_TEXT N_("Display OSD menu on top of video output")
-#define MENU_ON_KEY_LONGTEXT N_("Display OSD menu on top of video output")
-#define MENU_OFF_KEY_TEXT N_("Do not display OSD menu on video output")
-#define MENU_OFF_KEY_LONGTEXT N_("Do not display OSD menu on top of video output")
-#define MENU_RIGHT_KEY_TEXT N_("Highlight widget on the right")
-#define MENU_RIGHT_KEY_LONGTEXT N_( \
-        "Move OSD menu highlight to the widget on the right")
-#define MENU_LEFT_KEY_TEXT N_("Highlight widget on the left")
-#define MENU_LEFT_KEY_LONGTEXT N_( \
-        "Move OSD menu highlight to the widget on the left")
-#define MENU_UP_KEY_TEXT N_("Highlight widget on top")
-#define MENU_UP_KEY_LONGTEXT N_( \
-        "Move OSD menu highlight to the widget on top")
-#define MENU_DOWN_KEY_TEXT N_("Highlight widget below")
-#define MENU_DOWN_KEY_LONGTEXT N_( \
-        "Move OSD menu highlight to the widget below")
-#define MENU_SELECT_KEY_TEXT N_("Select current widget")
-#define MENU_SELECT_KEY_LONGTEXT N_( \
-        "Selecting current widget performs the associated action.")
-
 #define AUDI_DEVICE_CYCLE_KEY_TEXT N_("Cycle through audio devices")
 #define AUDI_DEVICE_CYCLE_KEY_LONGTEXT N_("Cycle through available audio devices")
 
@@ -2255,14 +2235,6 @@ vlc_module_begin ()
 #   define KEY_PLAY_BOOKMARK10    NULL
 #   define KEY_RECORD             "Command+Shift+r"
 #   define KEY_WALLPAPER          "w"
-
-#   define KEY_MENU_ON            "Alt+m"
-#   define KEY_MENU_OFF           "Alt+Shift+m"
-#   define KEY_MENU_RIGHT         "Alt+Shift+Right"
-#   define KEY_MENU_LEFT          "Alt+Shift+Left"
-#   define KEY_MENU_UP            "Alt+Shift+Up"
-#   define KEY_MENU_DOWN          "Alt+Shift+Down"
-#   define KEY_MENU_SELECT        "Alt+Shift+Enter"
 #   define KEY_AUDIODEVICE_CYCLE  "Shift+a"
 
 #else /* Non Mac OS X */
@@ -2378,15 +2350,6 @@ vlc_module_begin ()
 #   define KEY_PLAY_BOOKMARK8     "F8"
 #   define KEY_PLAY_BOOKMARK9     "F9"
 #   define KEY_PLAY_BOOKMARK10    "F10"
-
-/* OSD menu */
-#   define KEY_MENU_ON            "Alt+Shift+m"
-#   define KEY_MENU_OFF           "Ctrl+Alt+m"
-#   define KEY_MENU_RIGHT         "Alt+Shift+Right"
-#   define KEY_MENU_LEFT          "Alt+Shift+Left"
-#   define KEY_MENU_UP            "Alt+Shift+Up"
-#   define KEY_MENU_DOWN          "Alt+Shift+Down"
-#   define KEY_MENU_SELECT        "Alt+Shift+Enter"
 #endif
 
     add_key( "key-toggle-fullscreen", KEY_TOGGLE_FULLSCREEN, TOGGLE_FULLSCREEN_KEY_TEXT,
@@ -2514,21 +2477,6 @@ vlc_module_begin ()
              UNZOOM_KEY_TEXT, UNZOOM_KEY_LONGTEXT, true )
     add_key( "key-wallpaper", KEY_WALLPAPER, WALLPAPER_KEY_TEXT,
              WALLPAPER_KEY_LONGTEXT, false )
-
-    add_key( "key-menu-on", KEY_MENU_ON,
-             MENU_ON_KEY_TEXT, MENU_ON_KEY_LONGTEXT, true )
-    add_key( "key-menu-off", KEY_MENU_OFF,
-             MENU_OFF_KEY_TEXT, MENU_OFF_KEY_LONGTEXT, true )
-    add_key( "key-menu-right", KEY_MENU_RIGHT,
-             MENU_RIGHT_KEY_TEXT, MENU_RIGHT_KEY_LONGTEXT, true )
-    add_key( "key-menu-left", KEY_MENU_LEFT,
-             MENU_LEFT_KEY_TEXT, MENU_LEFT_KEY_LONGTEXT, true )
-    add_key( "key-menu-up", KEY_MENU_UP,
-             MENU_UP_KEY_TEXT, MENU_UP_KEY_LONGTEXT, true )
-    add_key( "key-menu-down", KEY_MENU_DOWN,
-             MENU_DOWN_KEY_TEXT, MENU_DOWN_KEY_LONGTEXT, true )
-    add_key( "key-menu-select", KEY_MENU_SELECT,
-             MENU_SELECT_KEY_TEXT, MENU_SELECT_KEY_LONGTEXT, true )
 
     add_key( "key-crop-top", KEY_CROP_TOP,
              CROP_TOP_KEY_TEXT, CROP_TOP_KEY_LONGTEXT, true )
