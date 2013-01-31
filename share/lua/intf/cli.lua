@@ -506,15 +506,6 @@ function listvalue(obj,var)
     end
 end
 
-function menu(name,client,value)
-    local map = { on='show', off='hide', up='up', down='down', left='prev', right='next', ['select']='activate' }
-    if map[value] and vlc.osd.menu[map[value]] then
-        vlc.osd.menu[map[value]]()
-    else
-        client:append("Unknown menu command '"..tostring(value).."'")
-    end
-end
-
 function hotkey(name, client, value)
     if not value then
         client:append("Please specify a hotkey (ie key-quit or quit)")
@@ -584,7 +575,6 @@ commands_ordered = {
     { "snapshot"; { func = common.snapshot; help = "take video snapshot" } };
     { "strack"; { func = skip(listvalue("input","spu-es")); args = "[X]"; help = "set/get subtitles track" } };
     { "hotkey"; { func = hotkey; args = "[hotkey name]"; help = "simulate hotkey press"; adv = true; aliases = { "key" } } };
-    { "menu"; { func = menu; args = "[on|off|up|down|left|right|select]"; help = "use menu"; adv = true } };
     { "" };
     { "vlm"; { func = load_vlm; help = "load the VLM" } };
     { "set"; { func = set_env; args = "[var [value]]"; help = "set/get env var"; adv = true } };
