@@ -3816,12 +3816,6 @@ AS_IF([test "${enable_atmo}" != no], [
   ])
 ])
 
-AC_ARG_ENABLE(osdmenu,
-  AS_HELP_STRING([--enable-osdmenu],[OSD menu (default disabled)]),, [
-  enable_osdmenu="no"
-])
-AM_CONDITIONAL(BUILD_OSDMENU, [test "${enable_osdmenu}" != "no"])
-
 
 EXTEND_HELP_STRING([Service Discovery plugins:])
 dnl
