@@ -41,7 +41,6 @@
 #include <vlc_interface.h>
 #include <vlc_aout.h>
 #include <vlc_vout.h>
-#include <vlc_osd.h>
 #include <vlc_playlist.h>
 #include <vlc_keys.h>
 
@@ -107,8 +106,6 @@ static int  VideoConfig  ( vlc_object_t *, char const *,
 static int  AudioDevice  ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int  AudioChannel ( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
-static int  Menu         ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int  Statistics   ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
@@ -398,9 +395,6 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
     ADD( "next", VOID, Playlist )
     ADD( "goto", INTEGER, Playlist )
     ADD( "status", INTEGER, Playlist )
-
-    /* OSD menu commands */
-    ADD(  "menu", STRING, Menu )
 
     /* DVD commands */
     ADD( "pause", VOID, Input )
@@ -1782,67 +1776,6 @@ out:
     vlc_object_release( p_aout );
     (void) old; (void) dummy;
     return ret;
-}
-
-/* OSD menu commands */
-static int Menu( vlc_object_t *p_this, char const *psz_cmd,
-    vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
-    intf_thread_t *p_intf = (intf_thread_t*)p_this;
-    playlist_t    *p_playlist = p_intf->p_sys->p_playlist;
-    int i_error = VLC_SUCCESS;
-    vlc_value_t val;
-
-    if ( !*newval.psz_string )
-    {
-        msg_rc( "%s", _("Please provide one of the following parameters:") );
-        msg_rc( "[on|off|up|down|left|right|select]" );
-        return VLC_EGENERIC;
-    }
-
-    input_thread_t * p_input = playlist_CurrentInput( p_playlist );
-
-    if( p_input )
-    {
-        var_Get( p_input, "state", &val );
-        vlc_object_release( p_input );
-
-        if( ( val.i_int == PAUSE_S ) &&
-            ( strcmp( newval.psz_string, "select" ) != 0 ) )
-        {
-            msg_rc( "%s", _("Type 'menu select' or 'pause' to continue.") );
-            return VLC_EGENERIC;
-        }
-    }
-
-    val.psz_string = strdup( newval.psz_string );
-    if( !val.psz_string )
-        return VLC_ENOMEM;
-    if( !strcmp( val.psz_string, "on" ) || !strcmp( val.psz_string, "show" ))
-        osd_MenuShow( p_this );
-    else if( !strcmp( val.psz_string, "off" )
-          || !strcmp( val.psz_string, "hide" ) )
-        osd_MenuHide( p_this );
-    else if( !strcmp( val.psz_string, "up" ) )
-        osd_MenuUp( p_this );
-    else if( !strcmp( val.psz_string, "down" ) )
-        osd_MenuDown( p_this );
-    else if( !strcmp( val.psz_string, "left" ) )
-        osd_MenuPrev( p_this );
-    else if( !strcmp( val.psz_string, "right" ) )
-        osd_MenuNext( p_this );
-    else if( !strcmp( val.psz_string, "select" ) )
-        osd_MenuActivate( p_this );
-    else
-    {
-        msg_rc( "%s", _("Please provide one of the following parameters:") );
-        msg_rc( "[on|off|up|down|left|right|select]" );
-        i_error = VLC_EGENERIC;
-    }
-
-    free( val.psz_string );
-    return i_error;
 }
 
 static int Statistics ( vlc_object_t *p_this, char const *psz_cmd,
