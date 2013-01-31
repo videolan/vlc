@@ -33,7 +33,7 @@ function VlcSyntax()
   syn keyword cType module_bank_t module_t module_config_t module_symbols_t
   syn keyword cType module_cache_t config_category_t
   " Playlist
-  syn keyword cType playlist_t playlist_item_t playlist_view_t 
+  syn keyword cType playlist_t playlist_item_t
   syn keyword cType services_discovery_t services_discovery_sys_t
   syn keyword cType playlist_add_t playlist_preparse_t
   syn keyword cType item_info_t item_info_category_t 
@@ -53,7 +53,7 @@ function VlcSyntax()
   syn keyword cType es_format_t video_palette_t
   " Aout
   syn keyword cType audio_output_t aout_sys_t
-  syn keyword cType aout_fifo_t aout_input_t audio_sample_format_t
+  syn keyword cType aout_fifo_t audio_sample_format_t
   syn keyword cType aout_mixer_sys_t aout_filter_sys_t audio_volume_t
   syn keyword cType aout_mixer_t aout_output_t audio_date_t 
   syn keyword cType aout_filter_t
@@ -62,12 +62,12 @@ function VlcSyntax()
   syn keyword cType chroma_sys_t picture_t picture_sys_t picture_heap_t
   syn keyword cType video_frame_format_t
   " SPU
-  syn keyword cType spu_t subpicture_t subpicture_sys_t 
+  syn keyword cType spu_t subpicture_t
   syn keyword cType subpicture_region_t text_style_t
   " Images
   syn keyword cType image_handler_t
   " Sout
-  syn keyword cType sout_instance_t sout_instance_sys_t sout_cfg_t
+  syn keyword cType sout_instance_t sout_cfg_t
   syn keyword cType sout_input_t sout_packetizer_input_t
   syn keyword cType sout_access_out_t sout_access_out_sys_t 
   syn keyword cType sout_mux_t sout_mux_sys_t

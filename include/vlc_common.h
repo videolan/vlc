@@ -218,7 +218,6 @@ typedef enum {
 
 typedef struct playlist_t playlist_t;
 typedef struct playlist_item_t playlist_item_t;
-typedef struct playlist_view_t playlist_view_t;
 typedef struct services_discovery_t services_discovery_t;
 typedef struct services_discovery_sys_t services_discovery_sys_t;
 typedef struct playlist_add_t playlist_add_t;
@@ -258,7 +257,6 @@ typedef struct video_palette_t video_palette_t;
 typedef struct audio_output audio_output_t;
 typedef struct aout_sys_t aout_sys_t;
 typedef struct aout_fifo_t aout_fifo_t;
-typedef struct aout_input_t aout_input_t;
 typedef audio_format_t audio_sample_format_t;
 
 /* Video */
@@ -271,14 +269,12 @@ typedef struct picture_sys_t picture_sys_t;
 /* Subpictures */
 typedef struct spu_t spu_t;
 typedef struct subpicture_t subpicture_t;
-typedef struct subpicture_sys_t subpicture_sys_t;
 typedef struct subpicture_region_t subpicture_region_t;
 
 typedef struct image_handler_t image_handler_t;
 
 /* Stream output */
 typedef struct sout_instance_t sout_instance_t;
-typedef struct sout_instance_sys_t sout_instance_sys_t;
 
 typedef struct sout_input_t sout_input_t;
 typedef struct sout_packetizer_input_t sout_packetizer_input_t;
@@ -343,10 +339,6 @@ typedef struct input_stats_t input_stats_t;
 
 /* Update */
 typedef struct update_t update_t;
-typedef struct update_iterator_t update_iterator_t;
-
-/* Meta engine */
-typedef struct meta_engine_t meta_engine_t;
 
 /**
  * VLC value structure
