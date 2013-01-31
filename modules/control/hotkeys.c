@@ -188,28 +188,6 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             var_TriggerCallback( p_intf->p_libvlc, "intf-boss" );
             break;
 
-        case ACTIONID_MENU_ON:
-            osd_MenuShow( VLC_OBJECT(p_intf) );
-            break;
-        case ACTIONID_MENU_OFF:
-            osd_MenuHide( VLC_OBJECT(p_intf) );
-            break;
-        case ACTIONID_MENU_LEFT:
-            osd_MenuPrev( VLC_OBJECT(p_intf) );
-            break;
-        case ACTIONID_MENU_RIGHT:
-            osd_MenuNext( VLC_OBJECT(p_intf) );
-            break;
-        case ACTIONID_MENU_UP:
-            osd_MenuUp( VLC_OBJECT(p_intf) );
-            break;
-        case ACTIONID_MENU_DOWN:
-            osd_MenuDown( VLC_OBJECT(p_intf) );
-            break;
-        case ACTIONID_MENU_SELECT:
-            osd_MenuActivate( VLC_OBJECT(p_intf) );
-            break;
-
         /* Playlist actions (including audio) */
         case ACTIONID_LOOP:
             /* Toggle Normal -> Loop -> Repeat -> Normal ... */
