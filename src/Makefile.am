@@ -107,7 +107,6 @@ noinst_HEADERS = \
 	../include/vlc_intf_strings.h \
 	../include/vlc_iso_lang.h \
 	../include/vlc_memory.h \
-	../include/vlc_osd.h \
 	../include/vlc_pgpkey.h \
 	../include/vlc_update.h \
 	../include/vlc_vod.h \
@@ -244,10 +243,6 @@ libvlccore_la_SOURCES += $(SOURCES_libvlc_sout)
 if ENABLE_VLM
 libvlccore_la_SOURCES += $(SOURCES_libvlc_vlm)
 endif
-endif
-if BUILD_OSDMENU
-libvlccore_la_SOURCES += osd/osd.c
-AM_CPPFLAGS += -DOSDMENU
 endif
 
 SOURCES_libvlc_darwin = \

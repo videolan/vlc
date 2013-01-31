@@ -275,17 +275,6 @@ net_SetCSCov
 net_vaPrintf
 net_Write
 NTPtime64
-osd_ButtonFind
-osd_ButtonSelect
-osd_MenuActivate
-osd_MenuCreate
-osd_MenuDelete
-osd_MenuDown
-osd_MenuHide
-osd_MenuNext
-osd_MenuPrev
-osd_MenuShow
-osd_MenuUp
 path_sanitize
 picture_BlendSubpicture
 picture_CopyPixels

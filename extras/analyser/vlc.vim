@@ -96,9 +96,6 @@ function VlcSyntax()
   syn keyword cType xml_t xml_sys_t xml_reader_t xml_reader_sys_t
   " VoD
   syn keyword cType vod_t vod_sys_t vod_media_t
-  " OSD
-  syn keyword cType osd_menu_t osd_state_t osd_event_t osd_button_t
-  syn keyword cType osd_menu_state_t
   " OpenGL
   syn keyword cType opengl_t opengl_sys_t
   " VLM

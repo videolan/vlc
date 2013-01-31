@@ -42,7 +42,6 @@ include/vlc_modules.h
 include/vlc_mtime.h
 include/vlc_network.h
 include/vlc_objects.h
-include/vlc_osd.h
 include/vlc_pgpkey.h
 include/vlc_playlist.h
 include/vlc_plugin.h
@@ -135,7 +134,6 @@ src/network/rootbind.c
 src/network/tcp.c
 src/network/tls.c
 src/network/udp.c
-src/osd/osd.c
 src/playlist/control.c
 src/playlist/engine.c
 src/playlist/item.c
