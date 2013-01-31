@@ -35,7 +35,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
-#include <vlc_osd.h>
 #include <vlc_keys.h>
 
 #ifdef HAVE_POLL
@@ -201,31 +200,6 @@ static void Process( intf_thread_t *p_intf )
                     var_SetInteger( p_intf->p_libvlc, "key-action", i_key );
                 else
                     msg_Err( p_intf, "Unknown hotkey '%s'", c );
-            }
-            else if( !strncmp( "menu ", c, 5)  )
-            {
-                if( !strncmp( c, "menu on", 7 ) ||
-                    !strncmp( c, "menu show", 9 ))
-                    osd_MenuShow( VLC_OBJECT(p_intf) );
-                else if( !strncmp( c, "menu off", 8 ) ||
-                         !strncmp( c, "menu hide", 9 ) )
-                    osd_MenuHide( VLC_OBJECT(p_intf) );
-                else if( !strncmp( c, "menu up", 7 ) )
-                    osd_MenuUp( VLC_OBJECT(p_intf) );
-                else if( !strncmp( c, "menu down", 9 ) )
-                    osd_MenuDown( VLC_OBJECT(p_intf) );
-                else if( !strncmp( c, "menu left", 9 ) )
-                    osd_MenuPrev( VLC_OBJECT(p_intf) );
-                else if( !strncmp( c, "menu right", 10 ) )
-                    osd_MenuNext( VLC_OBJECT(p_intf) );
-                else if( !strncmp( c, "menu select", 11 ) )
-                    osd_MenuActivate( VLC_OBJECT(p_intf) );
-                else
-                {
-                    msg_Err( p_intf, "Please provide one of the following parameters:" );
-                    msg_Err( p_intf, "[on|off|up|down|left|right|select]" );
-                    break;
-                }
             }
             else
             {
