@@ -26,7 +26,8 @@
 #   include "config.h"
 #endif
 
-#include <vlc_osd.h>
+#include <vlc_vout.h>
+#include <vlc_vout_osd.h>
 #include <vlc_playlist.h>
 
 #include "cmd_quit.hpp"

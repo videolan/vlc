@@ -30,7 +30,6 @@
 #include <vlc_arrays.h>
 #include <vlc_vout.h>
 #include <vlc_filter.h>
-#include <vlc_osd.h>
 
 #include <string.h>
 #include <ctype.h>

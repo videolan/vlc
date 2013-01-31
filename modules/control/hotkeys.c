@@ -36,7 +36,7 @@
 #include <vlc_input.h>
 #include <vlc_aout.h>
 #include <vlc_vout.h>
-#include <vlc_osd.h>
+#include <vlc_vout_osd.h>
 #include <vlc_playlist.h>
 #include <vlc_keys.h>
 #include "math.h"

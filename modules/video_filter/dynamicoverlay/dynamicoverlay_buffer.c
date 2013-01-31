@@ -27,7 +27,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_osd.h>
 #include <vlc_filter.h>
 
 #include <ctype.h>

@@ -29,7 +29,8 @@
 #import <vlc_playlist.h>
 #import <vlc_input.h>
 #import <vlc_keys.h>
-#import <vlc_osd.h>
+#import <vlc_vout.h>
+#import <vlc_vout_osd.h>
 #import <vlc/vlc.h>
 #import <vlc_strings.h>
 #import <vlc_url.h>

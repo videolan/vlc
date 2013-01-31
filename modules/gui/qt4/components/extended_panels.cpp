@@ -49,7 +49,6 @@
 #include "../../audio_filter/equalizer_presets.h"
 #include <vlc_intf_strings.h>
 #include <vlc_vout.h>
-#include <vlc_osd.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
 

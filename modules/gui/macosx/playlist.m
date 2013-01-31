@@ -50,7 +50,6 @@
 #import "MainMenu.h"
 
 #include <vlc_keys.h>
-#import <vlc_osd.h>
 #import <vlc_interface.h>
 
 #include <vlc_url.h>

@@ -33,7 +33,7 @@
 #endif
 
 #include <vlc_vout.h>
-#include <vlc_osd.h>
+#include <vlc_vout_osd.h>
 
 #include "../vlc.h"
 #include "../libs.h"
