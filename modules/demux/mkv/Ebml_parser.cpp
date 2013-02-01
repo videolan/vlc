@@ -164,12 +164,10 @@ EbmlElement *EbmlParser::Get( int n_call )
         m_el[mi_level]->SkipData( *m_es, EBML_CONTEXT(m_el[mi_level]) );
 
     }
-    vlc_stream_io_callback & io_stream = (vlc_stream_io_callback &) m_es->I_O();
-    uint64 i_size = io_stream.toRead();
 
     /* Ignore unknown level 0 or 1 elements */
     m_el[mi_level] = m_es->FindNextElement( EBML_CONTEXT(m_el[mi_level - 1]),
-                                            i_ulev, i_size,
+                                            i_ulev, UINT64_MAX,
                                             (  mb_dummy | (mi_level > 1) ), 1 );
     if( i_ulev > 0 )
     {
