@@ -496,16 +496,28 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
 
     OUT_ARGUMENTS;
     ADD_STRING( &psz_interface_name );
-    dbus_message_iter_open_container( &args, DBUS_TYPE_ARRAY, "{sv}",
-                                      &changed_properties );
 
-    dbus_message_iter_close_container( &args, &changed_properties );
+    if( unlikely(!dbus_message_iter_open_container( &args,
+                                                    DBUS_TYPE_ARRAY, "{sv}",
+                                                    &changed_properties )) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
-    dbus_message_iter_open_container( &args, DBUS_TYPE_ARRAY, "s",
-                                      &invalidated_properties );
+    if( unlikely(!dbus_message_iter_close_container( &args,
+                                                     &changed_properties )) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
+    if( unlikely(!dbus_message_iter_open_container( &args, DBUS_TYPE_ARRAY, "s",
+                                                    &invalidated_properties )) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
     i_properties    = vlc_dictionary_keys_count( p_changed_properties );
     ppsz_properties = vlc_dictionary_all_keys( p_changed_properties );
+
+    if( unlikely(!ppsz_properties) )
+    {
+        dbus_message_iter_abandon_container( &args, &invalidated_properties );
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+    }
 
     for( int i = 0; i < i_properties; i++ )
     {
@@ -517,8 +529,11 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
         free( ppsz_properties[i] );
     }
 
-    dbus_message_iter_close_container( &args, &invalidated_properties );
     free( ppsz_properties );
+
+    if( unlikely(!dbus_message_iter_close_container( &args,
+                    &invalidated_properties )) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
     SIGNAL_SEND;
 }
