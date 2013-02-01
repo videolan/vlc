@@ -787,6 +787,9 @@ static const char *const ppsz_prefres[] = {
 # if defined(__OpenBSD__)
 #  define DVD_DEVICE     "/dev/cd0c"
 #  define CD_DEVICE      "/dev/cd0c"
+# elif defined(__linux__)
+#  define DVD_DEVICE     "/dev/dvd1"
+#  define CD_DEVICE      "/dev/cdrom1"
 # else
 #  define DVD_DEVICE     "/dev/dvd"
 #  define CD_DEVICE      "/dev/cdrom"
