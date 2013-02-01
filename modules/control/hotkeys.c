@@ -41,11 +41,9 @@
 #include <vlc_keys.h>
 #include "math.h"
 
-#define CHANNELS_NUMBER 4
-#define VOLUME_TEXT_CHAN     p_intf->p_sys->p_channels[ 0 ]
-#define VOLUME_WIDGET_CHAN   p_intf->p_sys->p_channels[ 1 ]
-#define POSITION_TEXT_CHAN   p_intf->p_sys->p_channels[ 2 ]
-#define POSITION_WIDGET_CHAN p_intf->p_sys->p_channels[ 3 ]
+#define CHANNELS_NUMBER 2
+#define VOLUME_WIDGET_CHAN   p_intf->p_sys->p_channels[ 0 ]
+#define POSITION_WIDGET_CHAN p_intf->p_sys->p_channels[ 1 ]
 
 /*****************************************************************************
  * intf_sys_t: description and status of FB interface
@@ -72,8 +70,11 @@ static void DisplayRate ( vout_thread_t *, float );
 static float AdjustRateFine( vlc_object_t *, const int );
 static void ClearChannels  ( intf_thread_t *, vout_thread_t * );
 
-#define DisplayMessage(vout, ch, fmt, ...) \
-    do { if(vout) vout_OSDMessage(vout, ch, fmt, __VA_ARGS__); } while(0)
+#define DisplayMessage(vout, ...) \
+    do { \
+        if (vout) \
+            vout_OSDMessage(vout, SPU_DEFAULT_CHANNEL, __VA_ARGS__); \
+    } while(0)
 #define DisplayIcon(vout, icon) \
     do { if(vout) vout_OSDIcon(vout, SPU_DEFAULT_CHANNEL, icon); } while(0)
 
@@ -152,7 +153,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             libvlc_Quit( p_intf->p_libvlc );
 
             ClearChannels( p_intf, p_vout );
-            DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s", _( "Quit" ) );
+            DisplayMessage( p_vout, _( "Quit" ) );
             break;
 
         case ACTIONID_INTF_TOGGLE_FSC:
@@ -186,11 +187,11 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             break;
 
         case ACTIONID_NEXT:
-            DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s", _("Next") );
+            DisplayMessage( p_vout, _("Next") );
             playlist_Next( p_playlist );
             break;
         case ACTIONID_PREV:
-            DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s", _("Previous") );
+            DisplayMessage( p_vout, _("Previous") );
             playlist_Prev( p_playlist );
             break;
 
@@ -298,8 +299,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             free( dev );
 
             if( !aout_DeviceSet( p_aout, ids[idx] ) )
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                _("Audio Device: %s"), names[idx] );
+                DisplayMessage( p_vout, _("Audio Device: %s"), names[idx] );
             vlc_object_release( p_aout );
 
             for( int i = 0; i < n; i++ )
@@ -361,8 +361,8 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             if( p_input && var_GetBool( p_input, "can-record" ) )
             {
                 const bool on = var_ToggleBool( p_input, "record" );
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s",
-                    vlc_gettext(on ? N_("Recording") : N_("Recording done")) );
+                DisplayMessage( p_vout, vlc_gettext(on
+                                   ? N_("Recording") : N_("Recording done")) );
             }
             break;
 
@@ -370,8 +370,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             if( p_input )
             {
                 var_TriggerCallback( p_input, "frame-next" );
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                "%s", _("Next frame") );
+                DisplayMessage( p_vout, _("Next frame") );
             }
             break;
 
@@ -385,8 +384,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
 
                 var_SetTime( p_input, "spu-delay", i_delay );
                 ClearChannels( p_intf, p_vout );
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                _( "Subtitle delay %i ms" ),
+                DisplayMessage( p_vout, _( "Subtitle delay %i ms" ),
                                 (int)(i_delay/1000) );
             }
             break;
@@ -401,8 +399,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
 
                 var_SetTime( p_input, "audio-delay", i_delay );
                 ClearChannels( p_intf, p_vout );
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                _( "Audio delay %i ms" ),
+                DisplayMessage( p_vout, _( "Audio delay %i ms" ),
                                  (int)(i_delay/1000) );
             }
             break;
@@ -438,8 +435,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                     else
                         i++;
                     var_Set( p_input, "audio-es", list.p_list->p_values[i] );
-                    DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                    _("Audio track: %s"),
+                    DisplayMessage( p_vout, _("Audio track: %s"),
                                     list2.p_list->p_values[i].psz_string );
                 }
                 var_FreeList( &list, &list2 );
@@ -457,8 +453,8 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 i_count = list.p_list->i_count;
                 if( i_count <= 1 )
                 {
-                    DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                    _("Subtitle track: %s"), _("N/A") );
+                    DisplayMessage( p_vout, _("Subtitle track: %s"),
+                                    _("N/A") );
                     var_FreeList( &list, &list2 );
                     break;
                 }
@@ -481,8 +477,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 else
                     i++;
                 var_Set( p_input, "spu-es", list.p_list->p_values[i] );
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                _("Subtitle track: %s"),
+                DisplayMessage( p_vout, _("Subtitle track: %s"),
                                 list2.p_list->p_values[i].psz_string );
                 var_FreeList( &list, &list2 );
             }
@@ -499,8 +494,8 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 i_count = list.p_list->i_count;
                 if( i_count <= 1 )
                 {
-                    DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                    _("Program Service ID: %s"), _("N/A") );
+                    DisplayMessage( p_vout, _("Program Service ID: %s"),
+                                    _("N/A") );
                     var_FreeList( &list, &list2 );
                     break;
                 }
@@ -523,8 +518,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 else
                     i++;
                 var_Set( p_input, "program", list.p_list->p_values[i] );
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                _("Program Service ID: %s"),
+                DisplayMessage( p_vout, _("Program Service ID: %s"),
                                 list2.p_list->p_values[i].psz_string );
                 var_FreeList( &list, &list2 );
             }
@@ -648,8 +642,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                     if( i == val_list.p_list->i_count ) i = 0;
                     var_SetString( p_vout, "aspect-ratio",
                                    val_list.p_list->p_values[i].psz_string );
-                    DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                    _("Aspect ratio: %s"),
+                    DisplayMessage( p_vout, _("Aspect ratio: %s"),
                                     text_list.p_list->p_values[i].psz_string );
 
                     var_FreeList( &val_list, &text_list );
@@ -679,8 +672,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                     if( i == val_list.p_list->i_count ) i = 0;
                     var_SetString( p_vout, "crop",
                                    val_list.p_list->p_values[i].psz_string );
-                    DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                    _("Crop: %s"),
+                    DisplayMessage( p_vout, _("Crop: %s"),
                                     text_list.p_list->p_values[i].psz_string );
 
                     var_FreeList( &val_list, &text_list );
@@ -728,19 +720,16 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 if ( f_scalefactor != 1.f )
                 {
                     var_SetFloat( p_vout, "scale", 1.f );
-                    DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                    "%s", _("Zooming reset") );
+                    DisplayMessage( p_vout, _("Zooming reset") );
                 }
                 else
                 {
                     bool b_autoscale = !var_GetBool( p_vout, "autoscale" );
                     var_SetBool( p_vout, "autoscale", b_autoscale );
                     if( b_autoscale )
-                        DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                        "%s", _("Scaled to screen") );
+                        DisplayMessage( p_vout, _("Scaled to screen") );
                     else
-                        DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                        "%s", _("Original Size") );
+                        DisplayMessage( p_vout, _("Original Size") );
                 }
             }
             break;
@@ -809,8 +798,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                     if( i == -1 ) i = val_list.p_list->i_count-1;
                     var_SetFloat( p_vout, "zoom",
                                   val_list.p_list->p_values[i].f_float );
-                    DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                    _("Zoom mode: %s"),
+                    DisplayMessage( p_vout, _("Zoom mode: %s"),
                                     text_list.p_list->p_values[i].psz_string );
 
                     var_FreeList( &val_list, &text_list );
@@ -825,8 +813,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 if( i_deinterlace != 0 )
                 {
                     var_SetInteger( p_vout, "deinterlace", 0 );
-                    DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                    "%s", _("Deinterlace off") );
+                    DisplayMessage( p_vout, _("Deinterlace off") );
                 }
                 else
                 {
@@ -845,8 +832,8 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                                 break;
                             }
                         }
-                        DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                        "%s (%s)", _("Deinterlace on"), psz_text ? psz_text : psz_mode );
+                        DisplayMessage( p_vout, "%s (%s)", _("Deinterlace on"),
+                                        psz_text ? psz_text : psz_mode );
 
                         var_FreeList( &vlist, &tlist );
                     }
@@ -878,13 +865,13 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                     int i_deinterlace = var_GetInteger( p_vout, "deinterlace" );
                     if( i_deinterlace != 0 )
                     {
-                      DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                      "%s (%s)", _("Deinterlace on"), psz_text ? psz_text : psz_mode );
+                      DisplayMessage( p_vout, "%s (%s)", _("Deinterlace on"),
+                                      psz_text ? psz_text : psz_mode );
                     }
                     else
                     {
-                      DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                      "%s (%s)", _("Deinterlace off"), psz_text ? psz_text : psz_mode );
+                      DisplayMessage( p_vout, "%s (%s)", _("Deinterlace off"),
+                                      psz_text ? psz_text : psz_mode );
                     }
 
                     var_FreeList( &vlist, &tlist );
@@ -903,8 +890,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 i_pos = var_IncInteger( p_vout, "sub-margin" );
 
             ClearChannels( p_intf, p_vout );
-            DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                            _( "Subtitle position %d px" ), i_pos );
+            DisplayMessage( p_vout, _( "Subtitle position %d px" ), i_pos );
             break;
         }
 
@@ -1011,12 +997,11 @@ static void DisplayPosition( intf_thread_t *p_intf, vout_thread_t *p_vout,
     if( time.i_time > 0 )
     {
         secstotimestr( psz_duration, time.i_time / 1000000 );
-        DisplayMessage( p_vout, POSITION_TEXT_CHAN, "%s / %s",
-                        psz_time, psz_duration );
+        DisplayMessage( p_vout, "%s / %s", psz_time, psz_duration );
     }
     else if( i_seconds > 0 )
     {
-        DisplayMessage( p_vout, POSITION_TEXT_CHAN, "%s", psz_time );
+        DisplayMessage( p_vout, "%s", psz_time );
     }
 
     if( var_GetBool( p_vout, "fullscreen" ) )
@@ -1035,15 +1020,14 @@ static void DisplayVolume( intf_thread_t *p_intf, vout_thread_t *p_vout,
     ClearChannels( p_intf, p_vout );
 
     if( var_GetBool( p_vout, "fullscreen" ) )
-        vout_OSDSlider( p_vout, VOLUME_WIDGET_CHAN, lround(vol * 100.),
+        vout_OSDSlider( p_vout, VOLUME_WIDGET_CHAN, lroundf(vol * 100.f),
                         OSD_VERT_SLIDER );
-    DisplayMessage( p_vout, VOLUME_TEXT_CHAN, _( "Volume %ld%%" ),
-                    lround(vol * 100.) );
+    DisplayMessage( p_vout, _( "Volume %ld%%" ), lroundf(vol * 100.f) );
 }
 
 static void DisplayRate( vout_thread_t *p_vout, float f_rate )
 {
-    DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL, _("Speed: %.2fx"), f_rate );
+    DisplayMessage( p_vout, _("Speed: %.2fx"), f_rate );
 }
 
 static float AdjustRateFine( vlc_object_t *p_obj, const int i_dir )
