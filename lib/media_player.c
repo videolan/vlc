@@ -39,22 +39,6 @@
 #include "media_internal.h" // libvlc_media_set_state()
 #include "media_player_internal.h"
 
-/*
- * mapping of libvlc_navigate_mode_t to vlc_action_t
- */
-static const vlc_action_t libvlc_navigate_to_action[] =
-{
-    ACTIONID_NAV_ACTIVATE,
-    ACTIONID_NAV_UP,
-    ACTIONID_NAV_DOWN,
-    ACTIONID_NAV_LEFT,
-    ACTIONID_NAV_RIGHT
-};
-
-static const uint32_t libvlc_navigate_to_action_size =                        \
-  sizeof( libvlc_navigate_to_action ) / sizeof( libvlc_navigate_to_action[0] );
-
-
 static int
 input_seekable_changed( vlc_object_t * p_this, char const * psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval,
@@ -1284,19 +1268,21 @@ int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi )
 void libvlc_media_player_navigate( libvlc_media_player_t* p_mi,
                                    unsigned navigate )
 {
-    input_thread_t *p_input_thread;
+    static const vlc_action_t map[] =
+    {
+        INPUT_NAV_ACTIVATE, INPUT_NAV_UP, INPUT_NAV_DOWN,
+        INPUT_NAV_LEFT, INPUT_NAV_RIGHT,
+    };
 
-    if ( navigate >= libvlc_navigate_to_action_size)
+    if( navigate >= sizeof(map) / sizeof(map[0]) )
       return;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi );
-    if ( !p_input_thread )
+    input_thread_t *p_input = libvlc_get_input_thread ( p_mi );
+    if ( p_input == NULL )
       return;
 
-    var_SetInteger( p_mi->p_libvlc_instance->p_libvlc_int,
-                    "key-action", libvlc_navigate_to_action[navigate] );
-
-    vlc_object_release( p_input_thread );
+    input_Control( p_input, map[navigate], NULL );
+    vlc_object_release( p_input );
 }
 
 /* internal function, used by audio, video */
