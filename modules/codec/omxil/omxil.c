@@ -1019,6 +1019,14 @@ loaded:
         /* Use VC1 decoder for WMV3 for now */
         if (!strcmp(p_sys->ppsz_components[i], "OMX.SEC.WMV.Decoder"))
             continue;
+        /* This decoder does work, but has an insane latency (leading to errors
+         * about "main audio output playback way too late" and dropped frames).
+         * At least Samsung Galaxy S III (where this decoder is present) has
+         * got another one, OMX.SEC.mp3.dec, that works well and has a
+         * sensible latency. (Also, even if that one isn't found, in general,
+         * using SW codecs is usually more than fast enough for MP3.) */
+        if (!strcmp(p_sys->ppsz_components[i], "OMX.SEC.MP3.Decoder"))
+            continue;
 #endif
         omx_error = InitialiseComponent(p_dec, p_sys->ppsz_components[i],
                                         &p_sys->omx_handle);
