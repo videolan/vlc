@@ -56,7 +56,6 @@
 #include <vlc_url.h>
 #include <vlc_vout.h>
 #include <vlc_dialog.h>
-#include <vlc_keys.h>
 #include <vlc_iso_lang.h>
 
 /* FIXME we should find a better way than including that */
@@ -172,8 +171,6 @@ static int ControlInternal( demux_t *, int, ... );
 
 static void StillTimer( void * );
 
-static int EventKey( vlc_object_t *, char const *,
-                     vlc_value_t, vlc_value_t, void * );
 static int EventMouse( vlc_object_t *, char const *,
                        vlc_value_t, vlc_value_t, void * );
 static int EventIntf( vlc_object_t *, char const *,
@@ -366,8 +363,6 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_sys->p_input, "menu-palette", VLC_VAR_ADDRESS );
     var_Create( p_sys->p_input, "highlight", VLC_VAR_BOOL );
 
-    /* catch all key event */
-    var_AddCallback( p_demux->p_libvlc, "key-action", EventKey, p_demux );
     /* catch vout creation event */
     var_AddCallback( p_sys->p_input, "intf-event", EventIntf, p_demux );
 
@@ -395,9 +390,6 @@ static void Close( vlc_object_t *p_this )
         var_DelCallback( p_sys->p_vout, "mouse-moved", EventMouse, p_demux );
         var_DelCallback( p_sys->p_vout, "mouse-clicked", EventMouse, p_demux );
     }
-
-    /* Stop key event handler (FIXME: should really be per-vout too) */
-    var_DelCallback( p_demux->p_libvlc, "key-action", EventKey, p_demux );
 
     /* Stop still image handler */
     if( p_sys->still.b_created )
@@ -578,10 +570,53 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
         }
 
+        case DEMUX_NAV_ACTIVATE:
+        {
+            pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
+
+            ButtonUpdate( p_demux, true );
+            dvdnav_button_activate( p_sys->dvdnav, pci );
+            break;
+        }
+
+        case DEMUX_NAV_UP:
+        {
+            pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
+
+            dvdnav_upper_button_select( p_sys->dvdnav, pci );
+            break;
+        }
+
+        case DEMUX_NAV_DOWN:
+        {
+            pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
+
+            dvdnav_lower_button_select( p_sys->dvdnav, pci );
+            break;
+        }
+
+        case DEMUX_NAV_LEFT:
+        {
+            pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
+
+            dvdnav_left_button_select( p_sys->dvdnav, pci );
+            break;
+        }
+
+        case DEMUX_NAV_RIGHT:
+        {
+            pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
+
+            dvdnav_right_button_select( p_sys->dvdnav, pci );
+            break;
+        }
+
         /* TODO implement others */
         default:
             return VLC_EGENERIC;
     }
+
+    return VLC_SUCCESS;
 }
 
 static int ControlInternal( demux_t *p_demux, int i_query, ... )
@@ -1382,39 +1417,6 @@ static int EventMouse( vlc_object_t *p_vout, char const *psz_var,
     }
     (void)p_vout;
     (void)oldval;
-    return VLC_SUCCESS;
-}
-
-static int EventKey( vlc_object_t *p_this, char const *psz_var,
-                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    demux_t *p_demux = p_data;
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    /* FIXME: thread-safe ? */
-    pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
-
-    switch( newval.i_int )
-    {
-    case ACTIONID_NAV_LEFT:
-        dvdnav_left_button_select( p_sys->dvdnav, pci );
-        break;
-    case ACTIONID_NAV_RIGHT:
-        dvdnav_right_button_select( p_sys->dvdnav, pci );
-        break;
-    case ACTIONID_NAV_UP:
-        dvdnav_upper_button_select( p_sys->dvdnav, pci );
-        break;
-    case ACTIONID_NAV_DOWN:
-        dvdnav_lower_button_select( p_sys->dvdnav, pci );
-        break;
-    case ACTIONID_NAV_ACTIVATE:
-        ButtonUpdate( p_demux, true );
-        dvdnav_button_activate( p_sys->dvdnav, pci );
-        break;
-    }
-
-    (void)p_this;    (void)psz_var;    (void)oldval;
     return VLC_SUCCESS;
 }
 
