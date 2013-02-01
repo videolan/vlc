@@ -668,7 +668,7 @@ OMX_ERRORTYPE SetAudioParameters(OMX_HANDLETYPE handle,
         param->aac.nAACERtools = OMX_AUDIO_AACERAll;
         param->aac.eAACProfile = OMX_AUDIO_AACObjectLC;
         param->aac.eAACStreamFormat = OMX_AUDIO_AACStreamFormatRAW;
-        param->aac.eChannelMode = i_channels ?
+        param->aac.eChannelMode = i_channels > 1 ?
             OMX_AUDIO_ChannelModeStereo : OMX_AUDIO_ChannelModeMono;
         break;
     case OMX_AUDIO_CodingMP3:
@@ -676,7 +676,7 @@ OMX_ERRORTYPE SetAudioParameters(OMX_HANDLETYPE handle,
         param->mp3.nChannels = i_channels;
         param->mp3.nSampleRate = i_samplerate;
         param->mp3.nBitRate = i_bitrate;
-        param->mp3.eChannelMode = i_channels ?
+        param->mp3.eChannelMode = i_channels > 1 ?
             OMX_AUDIO_ChannelModeStereo : OMX_AUDIO_ChannelModeMono;
         param->mp3.eFormat = OMX_AUDIO_MP3StreamFormatMP1Layer3;
         break;
