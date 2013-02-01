@@ -1513,12 +1513,13 @@ block_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     /* Take care of decoded frames first */
     while(!p_buffer)
     {
-        unsigned int i_samples;
+        unsigned int i_samples = 0;
 
         OMX_FIFO_PEEK(&p_sys->out.fifo, p_header);
         if(!p_header) break; /* No frame available */
 
-        i_samples = p_header->nFilledLen / p_sys->out.p_fmt->audio.i_channels / 2;
+        if (p_sys->out.p_fmt->audio.i_channels)
+            i_samples = p_header->nFilledLen / p_sys->out.p_fmt->audio.i_channels / 2;
         if(i_samples)
         {
             p_buffer = decoder_NewAudioBuffer( p_dec, i_samples );
