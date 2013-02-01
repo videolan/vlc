@@ -159,7 +159,6 @@ vlc_module_end ()
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t   *p_intf = (intf_thread_t*)p_this;
-#warning Leaks on error paths!
 
     /* initialisation of the connection */
     if( !dbus_threads_init_default() )
@@ -276,8 +275,20 @@ static int Open( vlc_object_t *p_this )
         goto error;
 
     return VLC_SUCCESS;
+
 error:
+    /* The dbus connection is private,
+     * so we are responsible for closing it
+     * XXX: Does this make sense when OOM ? */
+    dbus_connection_close( p_sys->p_conn );
     dbus_connection_unref( p_conn );
+
+    vlc_array_destroy( p_sys->p_events );
+    vlc_array_destroy( p_sys->p_timeouts );
+    vlc_array_destroy( p_sys->p_watches );
+
+    vlc_mutex_destroy( &p_sys->lock );
+
     free( p_sys );
     return VLC_ENOMEM;
 }
