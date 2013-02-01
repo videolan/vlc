@@ -267,10 +267,6 @@ static int Open( vlc_object_t *p_this )
                                               p_intf, NULL ) )
         goto error;
 
-/*     dbus_connection_set_wakeup_main_function( p_conn,
-                                              wakeup_main_loop,
-                                              p_intf, NULL); */
-
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
         goto error;
 
