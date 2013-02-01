@@ -41,18 +41,13 @@
 #include <vlc_keys.h>
 #include "math.h"
 
-#define CHANNELS_NUMBER 2
-#define VOLUME_WIDGET_CHAN   p_intf->p_sys->p_channels[ 0 ]
-#define POSITION_WIDGET_CHAN p_intf->p_sys->p_channels[ 1 ]
-
 /*****************************************************************************
  * intf_sys_t: description and status of FB interface
  *****************************************************************************/
 struct intf_sys_t
 {
     vout_thread_t      *p_last_vout;
-    int                 p_channels[ CHANNELS_NUMBER ]; /* contains registered
-                                                        * channel IDs */
+    int slider_chan;
 };
 
 /*****************************************************************************
@@ -141,8 +136,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
      * address as the old one... We should rather listen to vout events.
      * Alternatively, we should keep a reference to the vout thread. */
     if( p_vout && p_vout != p_sys->p_last_vout )
-        for( unsigned i = 0; i < CHANNELS_NUMBER; i++ )
-            p_intf->p_sys->p_channels[i] = vout_RegisterSubpictureChannel( p_vout );
+        p_sys->slider_chan = vout_RegisterSubpictureChannel( p_vout );
     p_sys->p_last_vout = p_vout;
 
     /* Quit */
@@ -1007,7 +1001,7 @@ static void DisplayPosition( intf_thread_t *p_intf, vout_thread_t *p_vout,
     if( var_GetBool( p_vout, "fullscreen" ) )
     {
         var_Get( p_input, "position", &pos );
-        vout_OSDSlider( p_vout, POSITION_WIDGET_CHAN,
+        vout_OSDSlider( p_vout, p_intf->p_sys->slider_chan,
                         pos.f_float * 100, OSD_HOR_SLIDER );
     }
 }
@@ -1020,8 +1014,8 @@ static void DisplayVolume( intf_thread_t *p_intf, vout_thread_t *p_vout,
     ClearChannels( p_intf, p_vout );
 
     if( var_GetBool( p_vout, "fullscreen" ) )
-        vout_OSDSlider( p_vout, VOLUME_WIDGET_CHAN, lroundf(vol * 100.f),
-                        OSD_VERT_SLIDER );
+        vout_OSDSlider( p_vout, p_intf->p_sys->slider_chan,
+                        lroundf(vol * 100.f), OSD_VERT_SLIDER );
     DisplayMessage( p_vout, _( "Volume %ld%%" ), lroundf(vol * 100.f) );
 }
 
@@ -1054,7 +1048,6 @@ static void ClearChannels( intf_thread_t *p_intf, vout_thread_t *p_vout )
     if( p_vout )
     {
         vout_FlushSubpictureChannel( p_vout, SPU_DEFAULT_CHANNEL );
-        for( int i = 0; i < CHANNELS_NUMBER; i++ )
-            vout_FlushSubpictureChannel( p_vout, p_intf->p_sys->p_channels[i]  );
+        vout_FlushSubpictureChannel( p_vout, p_intf->p_sys->slider_chan );
     }
 }
