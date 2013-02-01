@@ -470,6 +470,13 @@ enum input_query_e
     INPUT_GET_SPU_DELAY,        /* arg1 = int* res=can fail */
     INPUT_SET_SPU_DELAY,        /* arg1 = int  res=can fail */
 
+    /* Menu navigation */
+    INPUT_NAV_ACTIVATE,
+    INPUT_NAV_UP,
+    INPUT_NAV_DOWN,
+    INPUT_NAV_LEFT,
+    INPUT_NAV_RIGHT,
+
     /* Meta datas */
     INPUT_ADD_INFO,   /* arg1= char* arg2= char* arg3=...     res=can fail */
     INPUT_REPLACE_INFOS,/* arg1= info_category_t *            res=cannot fail */

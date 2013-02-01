@@ -136,6 +136,15 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             i_64 = (int64_t)va_arg( args, int64_t );
             return var_SetTime( p_input, "spu-delay", i_64 );
 
+        case INPUT_NAV_ACTIVATE:
+        case INPUT_NAV_UP:
+        case INPUT_NAV_DOWN:
+        case INPUT_NAV_LEFT:
+        case INPUT_NAV_RIGHT:
+            input_ControlPush( p_input, i_query - INPUT_NAV_ACTIVATE
+                               + INPUT_CONTROL_NAV_ACTIVATE, NULL );
+            return VLC_SUCCESS;
+
         case INPUT_ADD_INFO:
         {
             char *psz_cat = (char *)va_arg( args, char * );

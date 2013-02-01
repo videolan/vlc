@@ -161,6 +161,13 @@ enum demux_query_e
     DEMUX_CAN_SEEK,            /* arg1= bool*    can fail (assume false)*/
 
     DEMUX_GET_SIGNAL,          /* arg1= double * arg2= double * can fail */
+
+    /* Navigation */
+    DEMUX_NAV_ACTIVATE,        /* res=can fail */
+    DEMUX_NAV_UP,              /* res=can fail */
+    DEMUX_NAV_DOWN,            /* res=can fail */
+    DEMUX_NAV_LEFT,            /* res=can fail */
+    DEMUX_NAV_RIGHT,           /* res=can fail */
 };
 
 VLC_API int demux_vaControlHelper( stream_t *, int64_t i_start, int64_t i_end, int64_t i_bitrate, int i_align, int i_query, va_list args );
