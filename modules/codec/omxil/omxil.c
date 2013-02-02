@@ -169,7 +169,7 @@ static int CreateComponentsList(decoder_t *p_dec, const char *psz_role)
         for(j = 0; j < roles; j++)
         {
             msg_Dbg(p_dec, "  - role: %s", ppsz_roles[j]);
-            if(!strncmp((char *)ppsz_roles[j], psz_role, len)) b_found = true;
+            if(!strcmp((char *)ppsz_roles[j], psz_role)) b_found = true;
         }
 
         free(ppsz_roles);
