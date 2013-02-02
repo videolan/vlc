@@ -518,16 +518,7 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
                     strlen("OMX.qcom.video.decoder")))
             def->format.video.eColorFormat = OMX_QCOM_COLOR_FormatYVU420SemiPlanar;
 
-        /* Hack: Some Samsung devices (e.g. Galaxy S III) have multiple
-         * H264 decoders with different quirks (OMX.SEC.avc.dec, OMX.SEC.avcdec
-         * and OMX.SEC.AVC.Decoder) - the latter is well-behaved while the
-         * former ones signal padding but in practice doesn't have any padding.
-         * We can't simply ignore the buggy ones, because some devices only
-         * have that one (Galaxy S II has only got one named OMX.SEC.avcdec,
-         * at least in the pre-4.0 firmwares). Thus, we enable this quirk on
-         * any OMX.SEC. decoder that doesn't contain the string ".Decoder". */
-        if(!strncmp(p_sys->psz_component, "OMX.SEC.", strlen("OMX.SEC.")) &&
-           !strstr(p_sys->psz_component, ".Decoder")) {
+        if (IgnoreOmxDecoderPadding(p_sys->psz_component)) {
             def->format.video.nSliceHeight = 0;
             def->format.video.nStride = p_fmt->video.i_width;
         }

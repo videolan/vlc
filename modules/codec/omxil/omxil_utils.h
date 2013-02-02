@@ -137,6 +137,8 @@ void CopyOmxPicture( int i_color_format, picture_t *p_pic,
 
 void CopyVlcPicture( decoder_t *, OMX_BUFFERHEADERTYPE *, picture_t * );
 
+int IgnoreOmxDecoderPadding(const char *psz_name);
+
 /*****************************************************************************
  * Logging utility functions
  *****************************************************************************/

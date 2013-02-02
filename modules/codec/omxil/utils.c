@@ -182,6 +182,35 @@ void CopyVlcPicture( decoder_t *p_dec, OMX_BUFFERHEADERTYPE *p_header,
     }
 }
 
+int IgnoreOmxDecoderPadding(const char *name)
+{
+    // The list of decoders that signal padding properly is not necessary,
+    // since that is the default, but keep it here for reference. (This is
+    // only relevant for manufacturers that are known to have decoders with
+    // this kind of bug.)
+    // Unknown: OMX.SEC.vc1.dec (wmv9/vc1 - lack of samples that have cropping)
+/*
+    static const char *padding_decoders[] = {
+        "OMX.SEC.AVC.Decoder",
+        "OMX.SEC.wmv7.dec",
+        "OMX.SEC.wmv8.dec",
+        NULL
+    };
+*/
+    static const char *nopadding_decoders[] = {
+        "OMX.SEC.avc.dec",
+        "OMX.SEC.avcdec",
+        "OMX.SEC.MPEG4.Decoder",
+        "OMX.SEC.mpeg4.dec",
+        NULL
+    };
+    for (const char **ptr = nopadding_decoders; *ptr; ptr++) {
+        if (!strcmp(*ptr, name))
+            return 1;
+    }
+    return 0;
+}
+
 /*****************************************************************************
  * Logging utility functions
  *****************************************************************************/

@@ -478,13 +478,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, int loo
                 p_sys->crop_top = 0;
                 p_sys->crop_left = 0;
             }
-            /* Workaround for some Samsung decoders, the ones named e.g.
-             * OMX.SEC.avc.dec don't have any padding between planes (while
-             * the slice height signals that they would have). The ones
-             * named OMX.SEC.AVC.Decoder have proper slice height as the
-             * parameter indicates. */
-            if (!strncmp(p_sys->name, "OMX.SEC.", strlen("OMX.SEC.")) &&
-                !strstr(p_sys->name, ".Decoder")) {
+            if (IgnoreOmxDecoderPadding(p_sys->name)) {
                 p_sys->slice_height = 0;
                 p_sys->stride = p_dec->fmt_out.video.i_width;
             }
