@@ -758,7 +758,8 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
         CHECK_ERROR(omx_error, "couldn't find an input and output port");
     }
 
-    if(!strncmp(p_sys->psz_component, "OMX.SEC.", 8))
+    if(!strncmp(p_sys->psz_component, "OMX.SEC.", 8) &&
+       p_dec->fmt_in.i_cat == VIDEO_ES)
     {
         OMX_INDEXTYPE index;
         omx_error = OMX_GetExtensionIndex(omx_handle, (OMX_STRING) "OMX.SEC.index.ThumbnailMode", &index);
