@@ -31,19 +31,20 @@ end
 -- http://www.assemblee-nationale.tv/direct.html?flux=7#
 
 -- advertised command line:
--- vlc --rtsp-tcp rtsp://a625.l31335None.c31335.g.lq.akamaistream.net/7/625/31335/v0001/assembleenat.download.akamai.com/31335/mp4/fluxh264live7-169.sdp
+-- vlc --rtsp-tcp rtsp://wowg.tdf-cdn.com/5638/live
 
 -- references & interesting URLs:
 -- http://www.assemblee-nationale.tv/js/direct.js
--- urlSdp + "fluxh264live"+stream+".sdp";
--- urlIPhone+'live'+stream+'/stream'+stream+'.m3u8
 -- http://www.assemblee-nationale.tv/ahp/scripts/
 -- arturl http://www.assemblee-nationale.tv/live/images/live1.jpg
 -- seems wrong though, actually depends on agenda
--- alive checks:
--- http://www.assemblee-nationale.tv/php/testurl.php?checkUrl=http://www.assemblee-nationale.tv/../../../live/live1/live.txt&rnd=123456
--- http://www.assemblee-nationale.tv/live/live1/live.txt
--- http://www.assemblee-nationale.tv/live/live1/detection.txt
+
+-- 2013-02-02: it seems they changed some urls...
+-- rtsp://wowg.tdf-cdn.com/5638/live
+-- http://chkg.tdf-cdn.com/5707/stream1.m3u8
+-- we should probably probe those but I'm lazy
+-- the live feeds list has changed too:
+-- http://www.assemblee-nationale.tv/live/live.txt?rnd=
 
 function main()
     -- disregard live checks and list all possible feeds
@@ -58,14 +59,22 @@ function main()
     -- number of probed possible streams
     local nb_streams = 0
     -- base URI for each protocol
-    local iphone_base
+    -- XXX: should be probed as in the js code...
+    local iphone_base = "http://chkg.tdf-cdn.com/"
     -- from http://www.assemblee-nationale.tv/json/data.json
     -- XXX: maybe parse this file directly?
     local rtmp_base = "rtmp://172.25.13.10/live/"
-    local rtsp_base
+    local rtsp_base = "rtsp://wowg.tdf-cdn.com/"
     -- RTMP application names, probed from JS file (XXX: use data.json instead?)
+    -- latest js has a list for other protocols as well
     local rtmp_names = {}
+    local app_names = {}
+    local http_names = {}
+    local rtsp_names = {}
+    local hls_names = {}
     local idx
+    -- live status of each stream
+    local live_streams = {}
 
     -- fetch the main JS file
     fd, msg = vlc.stream( "http://www.assemblee-nationale.tv/js/direct.js" )
@@ -94,6 +103,39 @@ function main()
                 str = string.sub(str, len + 2)
                 table.insert( rtmp_names, s )
             until string.len(str) == 0
+            -- vlc.msg.warn(table.concat(rtmp_names,","))
+        elseif( string.find( line, "var appNames = new Array" ) ) then
+            _, _, str = string.find( line, "Array%( (.*)%);" )
+            repeat
+                _, len, s = string.find( str, "\"([^\"]+)\"" )
+                str = string.sub(str, len + 2)
+                table.insert( app_names, s )
+            until string.len(str) == 0
+            -- vlc.msg.warn(table.concat(app_names,","))
+        elseif( string.find( line, "var streamNamesHttp = new Array" ) ) then
+            _, _, str = string.find( line, "Array%( (.*)%);" )
+            repeat
+                _, len, s = string.find( str, "\"([^\"]+)\"" )
+                str = string.sub(str, len + 2)
+                table.insert( http_names, s )
+            until string.len(str) == 0
+            -- vlc.msg.warn(table.concat(http_names,","))
+        elseif( string.find( line, "var streamNamesRtsp = new Array" ) ) then
+            _, _, str = string.find( line, "Array%( (.*)%);" )
+            repeat
+                _, len, s = string.find( str, "\"([^\"]+)\"" )
+                str = string.sub(str, len + 2)
+                table.insert( rtsp_names, s )
+            until string.len(str) == 0
+            -- vlc.msg.warn(table.concat(rtsp_names,","))
+        elseif( string.find( line, "var streamNamesHls = new Array" ) ) then
+            _, _, str = string.find( line, "Array%( (.*)%);" )
+            repeat
+                _, len, s = string.find( str, "\"([^\"]+)\"" )
+                str = string.sub(str, len + 2)
+                table.insert( hls_names, s )
+            until string.len(str) == 0
+            -- vlc.msg.warn(table.concat(hls_names,","))
         end
         line = fd:readline()
     end
@@ -108,42 +150,31 @@ function main()
         vlc.msg.warn("Unable to locate iphone base url")
     end
 
+    -- fetch the current live status
+    -- XXX: disable live checks if show_all?
+    fd, msg = vlc.stream( "http://www.assemblee-nationale.tv/live/live.txt?rnd=" .. os.time() )
+    if not fd then
+        vlc.msg.warn(msg)
+        return nil
+    end
+
+    line = fd:readline()
+    while line ~= nil do
+        local stream = tonumber(line)
+        if stream ~= nil then
+            live_streams[stream] = 1
+            vlc.msg.dbg("live: " .. tostring(stream))
+        end
+        line = fd:readline()
+    end
+
+    -- build playlist
     for idx=1,nb_streams,1 do
         -- we have a live stream
-        local is_live = false
-        -- the stream is 16/9
-        local is_169 = false
+        local is_live = live_streams[idx] ~= nil
         -- default art for this feed; agenda can have an alternate one
         local arturl = "http://www.assemblee-nationale.tv/live/images/live" .. idx .. ".jpg"
         local line
-
-        vlc.msg.dbg("assembleenationale: checking live stream " .. tostring(idx))
-
-        -- XXX: disable live checks if show_all?
-
-        -- check for live stream
-        fd, msg = vlc.stream( "http://www.assemblee-nationale.tv/php/testurl.php?checkUrl=http://www.assemblee-nationale.tv/../../../live/live" .. idx .. "/live169.txt&rnd=" .. os.time() )
-        if not fd then
-            vlc.msg.warn(msg)
-            return nil
-        end
-        line = fd:readline()
-        if line == "true" then
-            --vlc.msg.dbg("LIVE 16/9")
-            is_live = true
-            is_169 = true
-        else
-            fd, msg = vlc.stream( "http://www.assemblee-nationale.tv/php/testurl.php?checkUrl=http://www.assemblee-nationale.tv/../../../live/live" .. idx .. "/live.txt&rnd=" .. os.time() )
-            if not fd then
-                vlc.msg.warn(msg)
-                return nil
-            end
-            line = fd:readline()
-            if line == "true" then
-                --vlc.msg.dbg("LIVE")
-                is_live = true
-            end
-        end
 
         if is_live or show_all then
 
@@ -151,11 +182,7 @@ function main()
             if do_rtsp then
                 local options={"deinterlace=1", "rtsp-tcp=1"}
                 local path
-                if is_169 then
-                    path = rtsp_base .. "fluxh264live" .. tostring(idx) .. "-169.sdp"
-                else
-                    path = rtsp_base .. "fluxh264live" .. tostring(idx) .. ".sdp"
-                end
+                path = rtsp_base .. rtsp_names[idx] .. "/live"
                 vlc.sd.add_item( {path=path,
                 duration=duration,
                 artist=artist,
@@ -179,7 +206,7 @@ function main()
             -- add iphone (m3u8) streams, VLC doesn't like them much yet
             if do_iphone then
                 local options={"deinterlace=1"}
-                local path = iphone_base .. 'live' .. tostring(idx) .. '/stream' .. tostring(idx) .. '.m3u8'
+                local path = iphone_base .. hls_names[idx] .. '/stream1.m3u8'
                 vlc.sd.add_item( {path=path,
                 duration=duration,
                 artist=artist,
