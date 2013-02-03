@@ -404,7 +404,7 @@ static int PLItemChanged(vlc_object_t *p_this, const char *psz_var,
      * then -informInputChanged on this non-main thread. */
     [o_plItemChangedLock lock];
     [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(PlaylistItemChanged) withObject:nil waitUntilDone:YES];
-    [[VLCMain sharedInstance] informInputChanged];
+    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(informInputChanged) withObject:nil waitUntilDone:YES];
     [o_plItemChangedLock unlock];
 
     [o_pool release];
