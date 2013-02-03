@@ -878,7 +878,7 @@ AS_IF([test "${enable_coverage}" != "no"], [
   LDFLAGS="-lgcov ${LDFLAGS}"
 ])
 
-AS_IF([test "${SYS}" != "mingw32" -a test "${SYS}" != "os2"], [
+AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "os2"], [
   VLC_SAVE_FLAGS
   CFLAGS="${CFLAGS} -fvisibility=hidden"
   CXXFLAGS="${CXXFLAGS} -fvisibility=hidden"
