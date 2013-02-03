@@ -57,6 +57,9 @@ Audio output:
  * Android AudioTrack audio output support
  * Mac OS X Auhal output supports for 6.1 and 7.1
  * Rewrite of OSS module to support OSSv4
+ * Mac OS X Auhal output support for multi-buffer output devices
+   This fix was facilitated through a hardware lending by TEAC Europe GmbH
+   distributing such devices under the brand "TASCAM" (US-122, US-144, etc.).
 
 Audio Filters:
  * new remapping channel filter
