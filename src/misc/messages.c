@@ -325,9 +325,14 @@ static void Win32DebugOutputMsg (void* d, int type, const msg_item_t *p_item,
             msg[msg_len] = '\n';
             msg[msg_len + 1] = '\0';
         }
-        wchar_t *wmsg = ToWide(msg);
-        OutputDebugStringW(wmsg);
-        free(wmsg);
+        char* psz_msg = NULL;
+        if(asprintf(&psz_msg, "%s %s%s: %s", p_item->psz_module,
+                    p_item->psz_object_type, msg_type[type], msg) > 0) {
+            wchar_t* wmsg = ToWide(psz_msg);
+            OutputDebugStringW(wmsg);
+            free(wmsg);
+            free(psz_msg);
+        }
     }
     free(msg);
 }
