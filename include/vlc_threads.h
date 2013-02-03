@@ -392,7 +392,7 @@ static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 
     while (timeout > 50)
     {
-        int val = poll (fds, nfds, timeout);
+        int val = poll (fds, nfds, 50);
         if (val != 0)
             return val;
         timeout -= 50;
