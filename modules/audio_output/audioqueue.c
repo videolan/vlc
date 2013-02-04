@@ -156,25 +156,23 @@ static void Stop (audio_output_t *p_aout)
 
 static void Play (audio_output_t *p_aout, block_t *p_block)
 {
-    if (p_block != NULL) {
-        AudioQueueBufferRef inBuffer = NULL;
-        OSStatus status;
+    AudioQueueBufferRef inBuffer = NULL;
+    OSStatus status;
 
-        status = AudioQueueAllocateBuffer(p_aout->sys->audioQueue, p_block->i_buffer, &inBuffer);
-        if (status != noErr) {
-            msg_Err(p_aout, "buffer alloction failed (%li)", status);
-            return;
-        }
-
-        memcpy(inBuffer->mAudioData, p_block->p_buffer, p_block->i_buffer);
-        inBuffer->mAudioDataByteSize = p_block->i_buffer;
-        p_aout->sys->i_played_length += p_block->i_length;
-        block_Release(p_block);
-
-        status = AudioQueueEnqueueBuffer(p_aout->sys->audioQueue, inBuffer, 0, NULL);
-        if (status != noErr)
-            msg_Err(p_aout, "enqueuing buffer failed (%li)", status);
+    status = AudioQueueAllocateBuffer(p_aout->sys->audioQueue, p_block->i_buffer, &inBuffer);
+    if (status != noErr) {
+        msg_Err(p_aout, "buffer alloction failed (%li)", status);
+        return;
     }
+
+    memcpy(inBuffer->mAudioData, p_block->p_buffer, p_block->i_buffer);
+    inBuffer->mAudioDataByteSize = p_block->i_buffer;
+    p_aout->sys->i_played_length += p_block->i_length;
+    block_Release(p_block);
+
+    status = AudioQueueEnqueueBuffer(p_aout->sys->audioQueue, inBuffer, 0, NULL);
+    if (status != noErr)
+        msg_Err(p_aout, "enqueuing buffer failed (%li)", status);
 }
 
 void AudioQueueCallback(void * inUserData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
