@@ -30,12 +30,13 @@ Encoders:
  * high10, high422 and high444 encoding support in h264
 
 Access:
- * Screen: add support for OS X Lion, remove support for previous OS releases
+ * Screen: add support for OS X Lion and later,
+           remove support for previous OS X releases
  * Major improvements in DASH support
  * Improvements in Blu-Ray module, notably for multiple video tracks support
  * Important improvements and rewrite of the v4l2 access module
  * HTTP: support for Internationalized Domain Names
- * Microsoft Smooth Streaming support (H264 and VC1) developped by Viotech.net
+ * Microsoft Smooth Streaming support (H264 and VC1) developed by Viotech.net
  * NTSC EIA-608 closed caption input support via V4L2 VBI devices
 
 Demuxers:
@@ -55,11 +56,12 @@ Audio output:
  * OpenBSD sndio audio output support
  * Important improvements on the Android OpenSL ES module
  * Android AudioTrack audio output support
- * Mac OS X Auhal output supports for 6.1 and 7.1
+ * OS X Auhal output support for 6.1 and 7.1 playback and layouts
  * Rewrite of OSS module to support OSSv4
  * Mac OS X Auhal output support for multi-buffer output devices
    This fix was facilitated through a hardware lending by TEAC Europe GmbH
    distributing such devices under the brand "TASCAM" (US-122, US-144, etc.).
+ * Rewrite of AudioQueue module for iOS (and OS X)
 
 Audio Filters:
  * new remapping channel filter
@@ -125,6 +127,7 @@ Mac OS X Interface:
  * add an option to play videos as a desktop background
  * add support for playing video and showing audio visualizations side by side
  * improve fullscreen controller time slider with larger click target
+ * rewrite of minimal macosx module for use within VLCKit
  * The Streaming/Transcoding wizard and the open dialog's output panel are
    deprecated now
 
