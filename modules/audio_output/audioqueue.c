@@ -31,8 +31,12 @@
 #import <vlc_plugin.h>
 #import <vlc_aout.h>
 #import <AudioToolBox/AudioQueue.h>
-#import <AudioToolBox/AudioSession.h>
 #import <TargetConditionals.h>
+#if TARGET_OS_IPHONE
+#import <AudioToolBox/AudioSession.h>
+#else
+#define AudioSessionSetActive(x)
+#endif
 
 #pragma mark -
 #pragma mark private declarations
@@ -138,7 +142,6 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     msg_Dbg(p_aout, "New AudioQueue instance created (status = %li)", error);
     if (error != noErr)
         return VLC_EGENERIC;
-
     fmt->i_format = VLC_CODEC_FL32;
     fmt->i_physical_channels = AOUT_CHANS_STEREO;
     aout_FormatPrepare(fmt);
@@ -154,7 +157,7 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     if (error != noErr)
         return VLC_EGENERIC;
 
-#ifdef TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE
     // start audio session so playback continues if mute switch is on
     AudioSessionInitialize (NULL,
                             kCFRunLoopCommonModes,
@@ -171,15 +174,12 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     p_aout->play = Play;
     p_aout->pause = Pause;
     p_aout->flush = Flush;
-
     return VLC_SUCCESS;
 }
 
 static void Stop(audio_output_t *p_aout)
 {
-#ifdef TARGET_OS_IPHONE
     AudioSessionSetActive(false);
-#endif
 
     p_aout->sys->i_played_length = 0;
     AudioQueueDisposeTimeline(p_aout->sys->audioQueueRef, p_aout->sys->timelineRef);
@@ -226,14 +226,10 @@ static void Pause(audio_output_t *p_aout, bool pause, mtime_t date)
 
     if (pause) {
         AudioQueuePause(p_aout->sys->audioQueueRef);
-#ifdef TARGET_OS_IPHONE
         AudioSessionSetActive(false);
-#endif
     } else {
         AudioQueueStart(p_aout->sys->audioQueueRef, NULL);
-#ifdef TARGET_OS_IPHONE
         AudioSessionSetActive(true);
-#endif
     }
 }
 
