@@ -388,18 +388,22 @@ struct vlc_cleanup_t
 /* poll() with cancellation */
 static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 {
-    vlc_testcancel ();
+    int val;
 
-    while (timeout > 50)
+    do
     {
-        int val = poll (fds, nfds, 50);
-        if (val != 0)
-            return val;
-        timeout -= 50;
-        vlc_testcancel ();
-    }
+        int ugly_timeout = 50;
+        if (timeout >= 50)
+            timeout -= 50;
+        else if ((unsigned)timeout < 50u)
+            ugly_timeout = timeout;
 
-    return poll (fds, nfds, timeout);
+        vlc_testcancel ();
+        val = poll (fds, nfds, ugly_timeout);
+    }
+    while (val == 0 && timeout != 0);
+
+    return val;
 }
 # define poll(u,n,t) vlc_poll(u, n, t)
 
