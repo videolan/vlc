@@ -1,11 +1,13 @@
 /*****************************************************************************
  * audioqueue.c : AudioQueue audio output plugin for vlc
  *****************************************************************************
- * Copyright (C) 2010-2013 VLC authors and VideoLAN
+ * Copyright (C) 2000-2013 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Romain Goyet <romain.goyet@likid.org>
- *          Felix Paul Kühne <fkuehne@videolan.org>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
+ *          Rémi Denis-Courmont
+ *          Rafaël Carré <funman at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
