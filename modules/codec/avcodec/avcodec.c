@@ -129,6 +129,10 @@ vlc_module_begin ()
                   SKIPLOOPF_LONGTEXT, false)
         change_safe ()
         change_integer_list( nloopf_list, nloopf_list_text )
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 54, 41, 0 )
+    add_bool( "avcodec-ignorecrop", false, IGNORECROP_TEXT, IGNORECROP_LONGTEXT,
+        true )
+#endif
 
     add_obsolete_integer( "ffmpeg-debug" ) /* removed since 2.1.0 */
     add_integer( "avcodec-debug", 0, DEBUG_TEXT, DEBUG_LONGTEXT,
