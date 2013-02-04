@@ -24,9 +24,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
+#pragma mark includes
+
 #ifdef HAVE_CONFIG_H
 # import "config.h"
 #endif
@@ -36,12 +35,9 @@
 #import <vlc_aout.h>
 #import <AudioToolBox/AudioQueue.h>
 
-/*****************************************************************************
- * aout_sys_t: private audio output method descriptor
- *****************************************************************************
- * This structure is part of the audio output thread descriptor.
- * It describes the AudioQueue specific properties of an output thread.
- *****************************************************************************/
+#pragma mark -
+#pragma mark private declarations
+
 struct aout_sys_t
 {
     AudioQueueRef           audioQueue;
@@ -53,9 +49,6 @@ struct aout_sys_t
     float                   f_volume;
 };
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
 static int  Open                     (vlc_object_t *);
 static void Close                    (vlc_object_t *);
 static void Play                     (audio_output_t *, block_t *);
@@ -68,9 +61,6 @@ static int Start(audio_output_t *, audio_sample_format_t *);
 static void Stop(audio_output_t *);
 static int VolumeSet(audio_output_t *, float );
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
 vlc_module_begin ()
 set_shortname("AudioQueue")
 set_description(N_("AudioQueue (iOS / Mac OS) audio output"))
@@ -81,9 +71,8 @@ add_shortcut("audioqueue")
 set_callbacks(Open, Close)
 vlc_module_end ()
 
-/*****************************************************************************
- * Module management
- *****************************************************************************/
+#pragma mark -
+#pragma mark initialization
 
 static int Open(vlc_object_t *obj)
 {
@@ -126,10 +115,6 @@ static int VolumeSet(audio_output_t * p_aout, float volume)
 
     return ostatus;
 }
-
-/*****************************************************************************
- * Start: open the audio device
- *****************************************************************************/
 
 static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 {
@@ -186,10 +171,6 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * Stop: close the audio device
- *****************************************************************************/
-
 static void Stop(audio_output_t *p_aout)
 {
     p_aout->sys->b_stopped = true;
@@ -202,9 +183,8 @@ static void Stop(audio_output_t *p_aout)
     msg_Dbg(p_aout, "audioqueue stopped and disposed");
 }
 
-/*****************************************************************************
- * actual playback
- *****************************************************************************/
+#pragma mark -
+#pragma mark actual playback
 
 static void Play(audio_output_t *p_aout, block_t *p_block)
 {
