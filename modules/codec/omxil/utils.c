@@ -329,12 +329,6 @@ static const struct
     { VLC_CODEC_MP4A,   OMX_AUDIO_CodingAAC, "audio_decoder.aac" },
     { VLC_CODEC_S16N,   OMX_AUDIO_CodingPCM, "audio_decoder.pcm" },
     { VLC_CODEC_MP3,    OMX_AUDIO_CodingMP3, "audio_decoder.mp3" },
-    { VLC_CODEC_MPGA,   OMX_AUDIO_CodingMP3, "audio_decoder.mp3" },
-    { VLC_CODEC_VORBIS, OMX_AUDIO_CodingVORBIS, "audio_decoder.vorbis" },
-    { VLC_CODEC_WMA1,   OMX_AUDIO_CodingWMA, "audio_decoder.wma" },
-    { VLC_CODEC_WMA2,   OMX_AUDIO_CodingWMA, "audio_decoder.wma" },
-    { VLC_CODEC_WMAP,   OMX_AUDIO_CodingWMA, "audio_decoder.wma" },
-    { VLC_CODEC_WMAL,   OMX_AUDIO_CodingWMA, "audio_decoder.wma" },
     { 0, 0, 0 }
 };
 
