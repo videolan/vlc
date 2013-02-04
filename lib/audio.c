@@ -339,7 +339,7 @@ int libvlc_audio_set_track( libvlc_media_player_t *p_mi, int i_track )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
     vlc_value_t val_list;
-    int i_ret;
+    int i_ret = -1;
 
     if( !p_input_thread )
         return -1;
