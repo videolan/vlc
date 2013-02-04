@@ -1,6 +1,4 @@
 /*****************************************************************************
- * audioqueue.c : AudioQueue audio output plugin for vlc
- *****************************************************************************
  * Copyright (C) 2000-2013 VLC authors and VideoLAN
  * $Id$
  *
@@ -29,12 +27,10 @@
 #ifdef HAVE_CONFIG_H
 # import "config.h"
 #endif
-
 #import <vlc_common.h>
 #import <vlc_plugin.h>
 #import <vlc_aout.h>
 #import <AudioToolBox/AudioQueue.h>
-
 #pragma mark -
 #pragma mark private declarations
 
@@ -47,7 +43,6 @@ struct aout_sys_t
     int                     i_rate;
     float                   f_volume;
 };
-
 static int  Open                     (vlc_object_t *);
 static void Close                    (vlc_object_t *);
 static void Play                     (audio_output_t *, block_t *);
@@ -55,11 +50,9 @@ static void Pause                    (audio_output_t *p_aout, bool pause, mtime_
 static void Flush                    (audio_output_t *p_aout, bool wait);
 static int  TimeGet                  (audio_output_t *aout, mtime_t *);
 static void UnusedAudioQueueCallback (void *, AudioQueueRef, AudioQueueBufferRef);
-
 static int Start(audio_output_t *, audio_sample_format_t *);
 static void Stop(audio_output_t *);
 static int VolumeSet(audio_output_t *, float );
-
 vlc_module_begin ()
 set_shortname("AudioQueue")
 set_description(N_("AudioQueue (iOS / Mac OS) audio output"))
@@ -69,7 +62,6 @@ set_subcategory(SUBCAT_AUDIO_AOUT)
 add_shortcut("audioqueue")
 set_callbacks(Open, Close)
 vlc_module_end ()
-
 #pragma mark -
 #pragma mark initialization
 
@@ -138,8 +130,7 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
                                  NULL,                        // RunLoop
                                  kCFRunLoopCommonModes,       // RunLoop mode
                                  0,                           // Flags ; must be zero (per documentation)...
-                                 &(p_sys->audioQueueRef));       // Output
-
+                                 &(p_sys->audioQueueRef));    // Output
     msg_Dbg(p_aout, "New AudioQueue instance created (status = %li)", error);
     if (error != noErr)
         return VLC_EGENERIC;
@@ -147,7 +138,6 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     fmt->i_format = VLC_CODEC_FL32;
     fmt->i_physical_channels = AOUT_CHANS_STEREO;
     aout_FormatPrepare(fmt);
-
     p_aout->sys->i_rate = fmt->i_rate;
 
     // start queue
@@ -157,7 +147,6 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     // start timeline for synchro
     error = AudioQueueCreateTimeline(p_sys->audioQueueRef, &p_sys->timelineRef);
     msg_Dbg(p_aout, "AudioQueue Timeline started (status = %li)", error);
-
     if (error != noErr)
         return VLC_EGENERIC;
 
@@ -172,11 +161,9 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 static void Stop(audio_output_t *p_aout)
 {
     p_aout->sys->i_played_length = 0;
-
     AudioQueueDisposeTimeline(p_aout->sys->audioQueueRef, p_aout->sys->timelineRef);
     AudioQueueStop(p_aout->sys->audioQueueRef, true);
     AudioQueueDispose(p_aout->sys->audioQueueRef, true);
-
     msg_Dbg(p_aout, "audioqueue stopped and disposed");
 }
 
@@ -189,19 +176,17 @@ static void Play(audio_output_t *p_aout, block_t *p_block)
     OSStatus status;
 
     status = AudioQueueAllocateBuffer(p_aout->sys->audioQueueRef, p_block->i_buffer, &inBuffer);
-    if (status != noErr) {
-        msg_Err(p_aout, "buffer alloction failed (%li)", status);
-        return;
-    }
+    if (status == noErr) {
+        memcpy(inBuffer->mAudioData, p_block->p_buffer, p_block->i_buffer);
+        inBuffer->mAudioDataByteSize = p_block->i_buffer;
 
-    memcpy(inBuffer->mAudioData, p_block->p_buffer, p_block->i_buffer);
-    inBuffer->mAudioDataByteSize = p_block->i_buffer;
-
-    status = AudioQueueEnqueueBuffer(p_aout->sys->audioQueueRef, inBuffer, 0, NULL);
-    if (status == noErr)
-        p_aout->sys->i_played_length += p_block->i_length;
-    else
-        msg_Err(p_aout, "enqueuing buffer failed (%li)", status);
+        status = AudioQueueEnqueueBuffer(p_aout->sys->audioQueueRef, inBuffer, 0, NULL);
+        if (status == noErr)
+            p_aout->sys->i_played_length += p_block->i_length;
+        else
+            msg_Err(p_aout, "enqueuing buffer failed (%li)", status);
+    } else
+            msg_Err(p_aout, "buffer alloction failed (%li)", status);
 
     block_Release(p_block);
 }
