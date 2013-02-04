@@ -143,7 +143,6 @@ vlc_module_begin ()
         add_integer( "rtsp-frame-buffer-size", DEFAULT_FRAME_BUFFER_SIZE,
                      FRAME_BUFFER_SIZE_TEXT, FRAME_BUFFER_SIZE_LONGTEXT,
                      true )
-            change_safe()
 vlc_module_end ()
 
 
