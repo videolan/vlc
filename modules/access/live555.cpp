@@ -90,6 +90,11 @@ static void Close( vlc_object_t * );
 #define PASS_TEXT N_("RTSP password")
 #define PASS_LONGTEXT N_("Sets the password for the connection, " \
     "if no username or password are set in the url.")
+#define FRAME_BUFFER_SIZE_TEXT N_("RTSP frame buffer size")
+#define FRAME_BUFFER_SIZE_LONGTEXT N_("RTSP start frame buffer size of the video " \
+    "track, can be increased in case of broken pictures due " \
+    "to too small buffer.")
+#define DEFAULT_FRAME_BUFFER_SIZE 100000
 
 vlc_module_begin ()
     set_description( N_("RTP/RTSP/SDP demuxer (using Live555)" ) )
@@ -135,6 +140,9 @@ vlc_module_begin ()
             change_safe()
         add_password( "rtsp-pwd", NULL, PASS_TEXT,
                       PASS_LONGTEXT, true )
+        add_integer( "rtsp-frame-buffer-size", DEFAULT_FRAME_BUFFER_SIZE,
+                     FRAME_BUFFER_SIZE_TEXT, FRAME_BUFFER_SIZE_LONGTEXT,
+                     true )
             change_safe()
 vlc_module_end ()
 
@@ -668,12 +676,14 @@ static int SessionsSetup( demux_t *p_demux )
     bool           b_rtsp_tcp;
     int            i_client_port;
     int            i_return = VLC_SUCCESS;
-    unsigned int   i_buffer = 0;
+    unsigned int   i_receive_buffer = 0;
+    int            i_frame_buffer = DEFAULT_FRAME_BUFFER_SIZE;
     unsigned const thresh = 200000; /* RTP reorder threshold .2 second (default .1) */
 
     b_rtsp_tcp    = var_CreateGetBool( p_demux, "rtsp-tcp" ) ||
                     var_GetBool( p_demux, "rtsp-http" );
     i_client_port = var_InheritInteger( p_demux, "rtp-client-port" );
+
 
     /* Create the session from the SDP */
     if( !( p_sys->ms = MediaSession::createNew( *p_sys->env, p_sys->p_sdp ) ) )
@@ -698,9 +708,14 @@ static int SessionsSetup( demux_t *p_demux )
 
         /* Value taken from mplayer */
         if( !strcmp( sub->mediumName(), "audio" ) )
-            i_buffer = 100000;
+            i_receive_buffer = 100000;
         else if( !strcmp( sub->mediumName(), "video" ) )
-            i_buffer = 2000000;
+        {
+            int i_var_buf_size = var_InheritInteger( p_demux, "rtsp-frame-buffer-size" );
+            if( i_var_buf_size > 0 )
+                i_frame_buffer = i_var_buf_size;
+            i_receive_buffer = 2000000;
+        }
         else if( !strcmp( sub->mediumName(), "text" ) )
             ;
         else continue;
@@ -736,8 +751,8 @@ static int SessionsSetup( demux_t *p_demux )
                 int fd = sub->rtpSource()->RTPgs()->socketNum();
 
                 /* Increase the buffer size */
-                if( i_buffer > 0 )
-                    increaseReceiveBufferTo( *p_sys->env, fd, i_buffer );
+                if( i_receive_buffer > 0 )
+                    increaseReceiveBufferTo( *p_sys->env, fd, i_receive_buffer );
 
                 /* Increase the RTP reorder timebuffer just a bit */
                 sub->rtpSource()->setPacketReorderingThresholdTime(thresh);
@@ -802,8 +817,9 @@ static int SessionsSetup( demux_t *p_demux )
             tk->i_pts       = VLC_TS_INVALID;
             tk->f_npt       = 0.;
             tk->b_selected  = true;
-            tk->i_buffer    = 65536;
-            tk->p_buffer    = (uint8_t *)malloc( 65536 );
+            tk->i_buffer    = i_frame_buffer;
+            tk->p_buffer    = (uint8_t *)malloc( i_frame_buffer );
+
             if( !tk->p_buffer )
             {
                 free( tk );
