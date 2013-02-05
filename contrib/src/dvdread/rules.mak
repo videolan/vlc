@@ -1,7 +1,9 @@
 # DVDREAD
 
-LIBDVDREAD_VERSION := 4.2.0
-LIBDVDREAD_URL := http://dvdnav.mplayerhq.hu/releases/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
+# LIBDVDREAD_VERSION := 4.2.0
+# LIBDVDREAD_URL := http://dvdnav.mplayerhq.hu/releases/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
+DVDREAD_GITURL := git://git.videolan.org/libdvdread
+LIBDVDREAD_VERSION := git
 
 ifdef BUILD_DISCS
 ifdef GPL
@@ -12,15 +14,18 @@ ifeq ($(call need_pkg,"dvdread"),)
 PKGS_FOUND += dvdread
 endif
 
-$(TARBALLS)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
-	$(call download,$(LIBDVDREAD_URL))
+$(TARBALLS)/libdvdread-git.tar.xz:
+	$(call download_git,$(DVDREAD_GITURL))
 
-.sum-dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
+# $(TARBALLS)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
+# 	$(call download,$(LIBDVDREAD_URL))
 
-dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2 .sum-dvdread
+.sum-dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.xz
+	$(warning $@ not implemented)
+	touch $@
+
+dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.xz .sum-dvdread
 	$(UNPACK)
-	$(APPLY) $(SRC)/dvdread/dvdread-css-static.patch
-	$(APPLY) $(SRC)/dvdread/osx.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/dvdread/dvdread-win32.patch
 endif
