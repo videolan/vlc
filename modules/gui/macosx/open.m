@@ -1097,10 +1097,14 @@ static VLCOpen *_o_sharedMainInstance = nil;
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
 
     [o_open_panel setAllowsMultipleSelection: NO];
-    [o_open_panel setCanChooseFiles: NO];
     [o_open_panel setCanChooseDirectories: YES];
     [o_open_panel setTitle: [sender title]];
     [o_open_panel setPrompt: _NS("Open")];
+
+    /* work-around for Mountain Lion, which treats folders called "BDMV" including an item named "INDEX.BDM"
+     * as a _FILE_. Don't ask, move on. There is nothing to see here */
+    [o_open_panel setCanChooseFiles: YES];
+    [o_open_panel setAllowedFileTypes:[NSArray arrayWithObjects:@"public.directory", nil]];
 
     if ([o_open_panel runModal] == NSOKButton) {
         NSString *o_path = [[[o_open_panel URLs] objectAtIndex: 0] path];
