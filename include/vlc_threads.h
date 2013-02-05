@@ -392,11 +392,9 @@ static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 
     do
     {
-        int ugly_timeout = 50;
-        if (timeout >= 50)
-            timeout -= 50;
-        else if ((unsigned)timeout < 50u)
-            ugly_timeout = timeout;
+        int ugly_timeout = ((unsigned)timeout >= 50) ? 50 : timeout;
+        if (timeout >= 0)
+            timeout -= ugly_timeout;
 
         vlc_testcancel ();
         val = poll (fds, nfds, ugly_timeout);
