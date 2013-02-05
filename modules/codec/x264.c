@@ -442,10 +442,10 @@ static const char *const framepacking_list_text[] =
 
 vlc_module_begin ()
 #ifdef MODULE_NAME_IS_x26410b
-    set_description( N_("H.264/MPEG4 AVC encoder (x264 10-bit)"))
+    set_description( N_("H.264/MPEG-4 Part 10/AVC encoder (x264 10-bit)"))
     set_capability( "encoder", 0 )
 #else
-    set_description( N_("H.264/MPEG4 AVC encoder (x264)"))
+    set_description( N_("H.264/MPEG-4 Part 10/AVC encoder (x264)"))
     set_capability( "encoder", 200 )
 #endif
     set_callbacks( Open, Close )
