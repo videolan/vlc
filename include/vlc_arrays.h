@@ -103,15 +103,13 @@ static inline void *realloc_down( void *ptr, size_t size )
 #define TAB_APPEND( count, tab, p )             \
     TAB_APPEND_CAST( , count, tab, p )
 
-#define TAB_FIND( count, tab, p, index )        \
+#define TAB_FIND( count, tab, p, idx )          \
   do {                                          \
-    (index) = -1;                               \
-    for( int i = 0; i < (count); i++ )          \
-        if( (tab)[i] == (p) )                   \
-        {                                       \
-            (index) = i;                        \
+    for( (idx) = 0; (idx) < (count); (idx)++ )  \
+        if( (tab)[(idx)] == (p) )               \
             break;                              \
-        }                                       \
+    if( (idx) >= (count) )                      \
+        (idx) = -1;                             \
   } while(0)
 
 
