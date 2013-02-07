@@ -484,7 +484,7 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_var,
         {   /* /!\ Beware of lock inversion with var_DelCallback() /!\ */
             var_DelCallback( p_sys->p_vout, "mouse-moved", MovedEvent,
                              p_intf );
-            var_DelCallback( p_sys->p_vout, "mouse-clicked", ButtonEvent,
+            var_DelCallback( p_sys->p_vout, "mouse-button-down", ButtonEvent,
                              p_intf );
             vlc_object_release( p_sys->p_vout );
         }
@@ -494,7 +494,7 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_var,
         {
             var_AddCallback( p_sys->p_vout, "mouse-moved", MovedEvent,
                              p_intf );
-            var_AddCallback( p_sys->p_vout, "mouse-clicked", ButtonEvent,
+            var_AddCallback( p_sys->p_vout, "mouse-button-down", ButtonEvent,
                              p_intf );
         }
         break;
