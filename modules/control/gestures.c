@@ -76,11 +76,7 @@ static void Close  ( vlc_object_t * );
 #define BUTTON_LONGTEXT N_( \
     "Trigger button for mouse gestures." )
 
-#if defined (HAVE_MAEMO)
-# define BUTTON_DEFAULT "left"
-#else
-# define BUTTON_DEFAULT "right"
-#endif
+#define BUTTON_DEFAULT "left"
 
 static const char *const button_list[] = { "left", "middle", "right" };
 static const char *const button_list_text[] =
