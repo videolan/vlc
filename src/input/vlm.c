@@ -900,7 +900,7 @@ static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_t *p_vlm, const char 
     p_instance->b_sout_keep = false;
     p_instance->p_parent = vlc_object_create( p_vlm, sizeof (vlc_object_t) );
     p_instance->p_input = NULL;
-    p_instance->p_input_resource = input_resource_New( VLC_OBJECT(p_vlm) );
+    p_instance->p_input_resource = input_resource_New( p_instance->p_parent );
 
     return p_instance;
 }
