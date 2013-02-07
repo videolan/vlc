@@ -229,9 +229,16 @@ static int gnutls_ContinueHandshake (vlc_tls_t *session, const char *host,
 #ifdef WIN32
     WSASetLastError (0);
 #endif
-    val = gnutls_handshake (sys->session);
-    if ((val == GNUTLS_E_AGAIN) || (val == GNUTLS_E_INTERRUPTED))
-        return 1 + gnutls_record_get_direction (sys->session);
+    do
+    {
+        val = gnutls_handshake (sys->session);
+        msg_Dbg (session, "TLS handshake: %s", gnutls_strerror (val));
+
+        if ((val == GNUTLS_E_AGAIN) || (val == GNUTLS_E_INTERRUPTED))
+            /* I/O event: return to caller's poll() loop */
+            return 1 + gnutls_record_get_direction (sys->session);
+    }
+    while (val < 0 && !gnutls_error_is_fatal (val));
 
     if (val < 0)
     {
