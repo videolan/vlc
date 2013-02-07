@@ -855,6 +855,12 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
     i_properties = vlc_dictionary_keys_count( p_changed_properties );
     ppsz_properties = vlc_dictionary_all_keys( p_changed_properties );
 
+    if( unlikely(!ppsz_properties) )
+    {
+        dbus_message_iter_abandon_container( &args, &invalidated_properties );
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+    }
+
     for( int i = 0; i < i_properties; i++ )
     {
         PROPERTY_MAPPING_BEGIN
