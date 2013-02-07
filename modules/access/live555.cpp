@@ -527,7 +527,7 @@ static void continueAfterOPTIONS( RTSPClient* client, int result_code,
       // If OPTIONS fails, assume GET_PARAMETER is not supported but
       // still continue on with the stream.  Some servers (foscam)
       // return 501/not implemented for OPTIONS.
-      result_code != 0
+      result_code == 0
       && result_string != NULL
       && strstr( result_string, "GET_PARAMETER" ) != NULL;
     client->sendDescribeCommand( continueAfterDESCRIBE );
