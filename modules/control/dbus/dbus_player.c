@@ -857,7 +857,7 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
 
     if( unlikely(!ppsz_properties) )
     {
-        dbus_message_iter_abandon_container( &args, &invalidated_properties );
+        dbus_message_iter_abandon_container( &args, &changed_properties );
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
     }
 
