@@ -1,7 +1,7 @@
 /*****************************************************************************
  * CoreInteraction.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011-2012 Felix Paul Kühne
+ * Copyright (C) 2011-2013 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -34,6 +34,10 @@
 #import <vlc/vlc.h>
 #import <vlc_strings.h>
 #import <vlc_url.h>
+
+@interface VLCMainWindow (Internal)
+- (void)jumpWithValue:(char *)p_value forward:(BOOL)b_value;
+@end
 
 @implementation VLCCoreInteraction
 static VLCCoreInteraction *_o_sharedInstance = nil;
@@ -78,11 +82,12 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 {
     input_thread_t * p_input;
     p_input = pl_CurrentInput(VLCIntf);
+    playlist_t * p_playlist = pl_Get(VLCIntf);
+
     if (p_input) {
-        var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE);
+        playlist_Play(p_playlist);
         vlc_object_release(p_input);
     } else {
-        playlist_t * p_playlist = pl_Get(VLCIntf);
         bool empty;
 
         PL_LOCK;
@@ -98,27 +103,27 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
 - (void)pause
 {
-    var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_PAUSE);
+    playlist_Pause(pl_Get(VLCIntf));
 }
 
 - (void)stop
 {
-    var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_STOP);
+    playlist_Stop(pl_Get(VLCIntf));
 }
 
 - (void)faster
 {
-    var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_FASTER);
+    var_TriggerCallback(pl_Get(VLCIntf), "rate-faster");
 }
 
 - (void)slower
 {
-    var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_SLOWER);
+    var_TriggerCallback(pl_Get(VLCIntf), "rate-slower");
 }
 
 - (void)normalSpeed
 {
-    var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_RATE_NORMAL);
+    var_SetFloat(pl_Get(VLCIntf), "rate", 1.);
 }
 
 - (void)toggleRecord
@@ -180,12 +185,12 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
 - (void)previous
 {
-    var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_PREV);
+    playlist_Prev(pl_Get(VLCIntf));
 }
 
 - (void)next
 {
-    var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_NEXT);
+    playlist_Next(pl_Get(VLCIntf));
 }
 
 - (int)durationOfCurrentPlaylistItem
@@ -288,44 +293,60 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     [self backwardShort];
 }
 
+- (void)jumpWithValue:(char *)p_value forward:(BOOL)b_value
+{
+    input_thread_t *p_input = pl_CurrentInput(VLCIntf);
+    if (!p_input)
+        return;
+
+    int i_interval = var_InheritInteger( p_input, p_value );
+    if (i_interval > 0) {
+        mtime_t val = CLOCK_FREQ * i_interval;
+        if (!b_value)
+            val = val * -1;
+        var_SetTime( p_input, "time-offset", val );
+    }
+    vlc_object_release(p_input);
+}
+
 - (void)forwardExtraShort
 {
-    var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_JUMP_FORWARD_EXTRASHORT);
+    [self jumpWithValue:"extrashort-jump-size" forward:YES];
 }
 
 - (void)backwardExtraShort
 {
-    var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_JUMP_BACKWARD_EXTRASHORT);
+    [self jumpWithValue:"extrashort-jump-size" forward:NO];
 }
 
 - (void)forwardShort
 {
-    var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_JUMP_FORWARD_SHORT);
+    [self jumpWithValue:"short-jump-size" forward:YES];
 }
 
 - (void)backwardShort
 {
-    var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_JUMP_BACKWARD_SHORT);
+    [self jumpWithValue:"short-jump-size" forward:NO];
 }
 
 - (void)forwardMedium
 {
-    var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_JUMP_FORWARD_MEDIUM);
+    [self jumpWithValue:"medium-jump-size" forward:YES];
 }
 
 - (void)backwardMedium
 {
-    var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_JUMP_BACKWARD_MEDIUM);
+    [self jumpWithValue:"medium-jump-size" forward:NO];
 }
 
 - (void)forwardLong
 {
-    var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_JUMP_FORWARD_LONG);
+    [self jumpWithValue:"long-jump-size" forward:YES];
 }
 
 - (void)backwardLong
 {
-    var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_JUMP_BACKWARD_LONG);
+    [self jumpWithValue:"long-jump-size" forward:NO];
 }
 
 - (void)shuffle

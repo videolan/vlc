@@ -1053,12 +1053,10 @@ static VLCMain *_o_sharedMainInstance = nil;
                 [[VLCCoreInteraction sharedInstance] backward];
                 break;
             case kRemoteButtonVolume_Plus_Hold:
-                if (p_intf)
-                    var_SetInteger(p_intf->p_libvlc, "key-action", ACTIONID_VOL_UP);
+                [[VLCCoreInteraction sharedInstance] volumeUp];
                 break;
             case kRemoteButtonVolume_Minus_Hold:
-                if (p_intf)
-                    var_SetInteger(p_intf->p_libvlc, "key-action", ACTIONID_VOL_DOWN);
+                [[VLCCoreInteraction sharedInstance] volumeDown];
                 break;
         }
         if (b_remote_button_hold) {

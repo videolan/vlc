@@ -1,7 +1,7 @@
 /*****************************************************************************
  * misc.m: code not specific to vlc
  *****************************************************************************
- * Copyright (C) 2003-2012 VLC authors and VideoLAN
+ * Copyright (C) 2003-2013 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -397,6 +397,7 @@ void _drawFrameInRect(NSRect frameRect)
 - (void)scrollWheel:(NSEvent *)o_event
 {
     intf_thread_t * p_intf = VLCIntf;
+    BOOL b_forward = NO;
     CGFloat f_deltaY = [o_event deltaY];
     CGFloat f_deltaX = [o_event deltaX];
 
@@ -410,17 +411,19 @@ void _drawFrameInRect(NSRect frameRect)
     CGFloat f_abs;
     int i_vlckey;
 
-    if (f_delta > 0.0f) {
-        i_vlckey = ACTIONID_JUMP_BACKWARD_EXTRASHORT;
+    if (f_delta > 0.0f)
         f_abs = f_delta;
-    }
     else {
-        i_vlckey = ACTIONID_JUMP_FORWARD_EXTRASHORT;
+        b_forward = YES;
         f_abs = -f_delta;
     }
 
-    for (NSUInteger i = 0; i < (int)(f_abs/4.+1.) && f_abs > 0.05 ; i++)
-        var_SetInteger( p_intf->p_libvlc, "key-action", i_vlckey );
+    for (NSUInteger i = 0; i < (int)(f_abs/4.+1.) && f_abs > 0.05 ; i++) {
+        if (b_forward)
+            [[VLCCoreInteraction sharedInstance] forwardExtraShort];
+        else
+            [[VLCCoreInteraction sharedInstance] backwardExtraShort];
+    }
 }
 
 - (BOOL)acceptsFirstResponder
@@ -500,6 +503,7 @@ void _drawFrameInRect(NSRect frameRect)
 - (void)scrollWheel:(NSEvent *)o_event
 {
     intf_thread_t * p_intf = VLCIntf;
+    BOOL b_up = NO;
     CGFloat f_deltaY = [o_event deltaY];
     CGFloat f_deltaX = [o_event deltaX];
 
@@ -513,17 +517,19 @@ void _drawFrameInRect(NSRect frameRect)
     CGFloat f_abs;
     int i_vlckey;
 
-    if (f_delta > 0.0f) {
-        i_vlckey = ACTIONID_VOL_DOWN;
+    if (f_delta > 0.0f)
         f_abs = f_delta;
-    }
     else {
-        i_vlckey = ACTIONID_VOL_UP;
+        b_up = YES;
         f_abs = -f_delta;
     }
 
-    for (NSUInteger i = 0; i < (int)(f_abs/4.+1.) && f_abs > 0.05 ; i++)
-        var_SetInteger(p_intf->p_libvlc, "key-action", i_vlckey);
+    for (NSUInteger i = 0; i < (int)(f_abs/4.+1.) && f_abs > 0.05 ; i++) {
+        if (b_up)
+            [[VLCCoreInteraction sharedInstance] volumeUp];
+        else
+            [[VLCCoreInteraction sharedInstance] volumeDown];
+    }
 }
 
 @end
