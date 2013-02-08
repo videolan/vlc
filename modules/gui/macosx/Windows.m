@@ -239,6 +239,7 @@
 
 @synthesize videoView=o_video_view;
 @synthesize controlsBar=o_controls_bar;
+@synthesize hasActiveVideo=b_has_active_video;
 
 #pragma mark -
 #pragma mark Init
@@ -551,10 +552,12 @@
 
     var_SetBool(pl_Get(VLCIntf), "fullscreen", true);
 
-    vout_thread_t *p_vout = getVoutForActiveWindow();
-    if (p_vout) {
-        var_SetBool(p_vout, "fullscreen", true);
-        vlc_object_release(p_vout);
+    if ([self hasActiveVideo]) {
+        vout_thread_t *p_vout = getVoutForActiveWindow();
+        if (p_vout) {
+            var_SetBool(p_vout, "fullscreen", true);
+            vlc_object_release(p_vout);
+        }
     }
 
     [o_video_view setFrame: [[self contentView] frame]];
@@ -576,7 +579,8 @@
         [self setFrame: winrect display:NO animate:NO];
     }
 
-    if ([[VLCMain sharedInstance] activeVideoPlayback])
+    // TODO fix bottom bar status when vout just not visible, but there
+    if (![o_video_view isHidden])
         [[o_controls_bar bottomBarView] setHidden: YES];
 
     [self setMovableByWindowBackground: NO];
@@ -588,9 +592,10 @@
     // But this creates some problems when leaving fs over remote intfs, so activate app here.
     [NSApp activateIgnoringOtherApps:YES];
 
-    
-    [[[VLCMainWindow sharedInstance] fsPanel] setVoutWasUpdated: self];
-    [[[VLCMainWindow sharedInstance] fsPanel] setActive: nil];
+    if ([self hasActiveVideo]) {
+        [[[VLCMainWindow sharedInstance] fsPanel] setVoutWasUpdated: self];
+        [[[VLCMainWindow sharedInstance] fsPanel] setActive: nil];
+    }
 
     NSArray *subviews = [[self videoView] subviews];
     NSUInteger count = [subviews count];
@@ -606,10 +611,12 @@
 {
     var_SetBool(pl_Get(VLCIntf), "fullscreen", false);
 
-    vout_thread_t *p_vout = getVoutForActiveWindow();
-    if (p_vout) {
-        var_SetBool(p_vout, "fullscreen", false);
-        vlc_object_release(p_vout);
+    if ([self hasActiveVideo]) {
+        vout_thread_t *p_vout = getVoutForActiveWindow();
+        if (p_vout) {
+            var_SetBool(p_vout, "fullscreen", false);
+            vlc_object_release(p_vout);
+        }
     }
 
     [NSCursor setHiddenUntilMouseMoves: NO];

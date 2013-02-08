@@ -179,6 +179,7 @@
         [[VLCMainWindow sharedInstance] setNonembedded:b_nonembedded];
 
     [o_vout_view setVoutThread:(vout_thread_t *)p_wnd->p_parent];
+    [o_new_video_window setHasActiveVideo: YES];
     [o_vout_dict setObject:[o_new_video_window autorelease] forKey:[NSValue valueWithPointer:p_wnd]];
 
     if (b_nonembedded) {
@@ -200,11 +201,16 @@
     if ([[VLCMainWindow sharedInstance] fullscreen] && ![[VLCMainWindow sharedInstance] nativeFullscreenMode])
         [o_window leaveFullscreen];
 
+    if ([[VLCMainWindow sharedInstance] fullscreen] && [[VLCMainWindow sharedInstance] nativeFullscreenMode])
+        [o_window toggleFullScreen: self];
+
+
     if (![NSStringFromClass([o_window class]) isEqualToString:@"VLCMainWindow"]) {
         [o_window orderOut:self];
     }
 
     [[o_window videoView] releaseVoutThread];
+    [o_window setHasActiveVideo: NO];
     [o_vout_dict removeObjectForKey:o_key];
 
     if ([o_vout_dict count] == 0)

@@ -95,11 +95,12 @@ static const float f_min_video_height = 70.0;
     NSRecursiveLock * o_animation_lock;
     NSInteger i_originalLevel;
 
-
+    BOOL              b_has_active_video;
 }
 
 @property (nonatomic, assign) VLCVoutView* videoView;
 @property (readonly) VLCControlsBarCommon* controlsBar;
+@property (nonatomic, readwrite) BOOL hasActiveVideo;
 
 - (void)setWindowLevel:(NSInteger)i_state;
 
