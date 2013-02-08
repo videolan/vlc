@@ -330,8 +330,7 @@ static void OpenglSwap(vlc_gl_t *gl)
 
         eaglLayer.opaque = TRUE;
         eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
-//                                        [NSNumber numberWithBool:FALSE], kEAGLDrawablePropertyRetainedBacking,
-                                        kEAGLColorFormatRGB565, kEAGLDrawablePropertyColorFormat,
+                                        kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat,
                                         nil];
 
         _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
