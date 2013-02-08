@@ -415,7 +415,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     if (max_texture_units >= 3 && supports_shaders &&
         vlc_fourcc_IsYUV(fmt->i_chroma) && !vlc_fourcc_IsYUV(vgl->fmt.i_chroma)) {
-        printf("passed check\n");
         const vlc_fourcc_t *list = vlc_fourcc_GetYUVFallback(fmt->i_chroma);
         while (*list) {
             const vlc_chroma_description_t *dsc = vlc_fourcc_GetChromaDescription(*list);
