@@ -1,0 +1,35 @@
+<?xml version='1.0'?>
+<Include>
+    <?define ShortProductName = "VLC" ?>
+    <?define ProductName = "VLC media player" ?>
+    <?define Manufacturer = "VideoLAN" ?>
+    <?define AboutURL = "http://www.videolan.org/vlc/" ?>
+    <?define SupportURL = "http://www.videolan.org/support/" ?>
+    <?define UpdatesURL = "http://www.videolan.org/vlc/" ?>
+    <?define Platform= "x86" ?>
+
+    <?define VerMajor = "@VERSION_MAJOR@" ?>
+    <?define VerMinor = "@VERSION_MINOR@" ?>
+    <?define VerPatch = "@VERSION_REVISION@" ?>
+    <?define Version = "$(var.VerMajor).$(var.VerMinor).$(var.VerPatch)" ?>
+    <?define VersionLong = "$(var.Version).0" ?>
+
+    <?define SourceDir = "vlc-@VERSION@" ?>
+    <!--<?define PluginsPath = "$(var.BinPath)\plugins" ?>
+    <?define LocalePath = "$(var.BinPath)\locale" ?>
+    <?define SdkPath = "$(var.BinPath)\sdk" ?>-->
+
+
+    <?if $(var.Platform) = x64 ?>
+        <?define Win64 = "yes" ?>
+    <?else ?>
+        <?define Win64 = "no" ?>
+    <?endif ?>
+
+    <?define AppFolder = "VLC" ?>
+
+
+    <?define BaseGuid = "d2e0205b-0d3a-46e2-adf7-0504ff48cf" ?>
+    <?define CompInstallRegDir = "$(var.BaseGuid)10" ?>
+    <?define CompVLCexe = "$(var.BaseGuid)11" ?>
+</Include>

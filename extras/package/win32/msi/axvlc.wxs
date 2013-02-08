@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <ComponentGroup Id="CompAxvlcGroup">
+            <Component Id="cmpD82D0399A759F50AB929377C843D6E61" Directory="TARGETDIR" Guid="{7E750CC3-2C39-4553-A4F5-41D05A07A924}" KeyPath="yes">
+                <RegistryKey Action="create" Key="CLSID" Root="HKCR" />
+            </Component>
+            <Component Id="cmp528D534111A99293086789AA0CA7DC0A" Directory="TARGETDIR" Guid="{7148466C-5812-4393-9EBD-CDB0EEF59F2D}" KeyPath="yes">
+                <RegistryKey Key="CLSID\{9BE31822-FDAD-461B-AD51-BE1D1C159921}" Root="HKCR">
+                    <RegistryValue Value="VLC ActiveX Plugin and IE Web Plugin v2" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmp21092C1093C67990E736FD62CDC93F18" Directory="TARGETDIR" Guid="{DE2D2A44-C815-4687-B128-1473DFFA3AD7}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{9BE31822-FDAD-461B-AD51-BE1D1C159921}\Control" Root="HKCR" />
+            </Component>
+            <Component Id="cmp48D76B975F39BA4F24F888D572E5DA19" Directory="TARGETDIR" Guid="{29F35711-3F63-48CB-AD09-F44436AB79D7}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{9BE31822-FDAD-461B-AD51-BE1D1C159921}\Implemented Categories" Root="HKCR" />
+            </Component>
+            <Component Id="cmp25985B0A2179E4BD58DAC19DC0D805A7" Directory="TARGETDIR" Guid="{EB3CD321-0B47-450F-B7FF-32A7A60E2749}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{9BE31822-FDAD-461B-AD51-BE1D1C159921}\Implemented Categories\{0DE86A57-2BAA-11CF-A229-00AA003D7352}" Root="HKCR" />
+            </Component>
+            <Component Id="cmp92A9EC90469CFA91BABCDF6FCBD05450" Directory="TARGETDIR" Guid="{8CD20D6F-0FBC-458F-9511-73C7946D7074}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{9BE31822-FDAD-461B-AD51-BE1D1C159921}\Implemented Categories\{0DE86A58-2BAA-11CF-A229-00AA003D7352}" Root="HKCR" />
+            </Component>
+            <Component Id="cmp725824C8C65DEAD1FCB655844D7A79D7" Directory="TARGETDIR" Guid="{C029162C-C131-4CFF-A5FE-1AE199B852FB}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{9BE31822-FDAD-461B-AD51-BE1D1C159921}\Implemented Categories\{40FC6ED4-2438-11CF-A3DB-080036F12502}" Root="HKCR" />
+            </Component>
+            <Component Id="cmp3EF452E9614F092FEE24D3F52A471AA3" Directory="TARGETDIR" Guid="{ECDEF940-3147-4BA1-BEDC-5D7060D24701}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{9BE31822-FDAD-461B-AD51-BE1D1C159921}\Implemented Categories\{7DD95801-9882-11CF-9FA9-00AA006C42C4}" Root="HKCR" />
+            </Component>
+            <Component Id="cmp2FACF4D7BAB422F8CD02B5D95E65E628" Directory="TARGETDIR" Guid="{27D7AA55-C7FB-4357-AA0B-975FD6DB1D9F}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{9BE31822-FDAD-461B-AD51-BE1D1C159921}\Implemented Categories\{7DD95802-9882-11CF-9FA9-00AA006C42C4}" Root="HKCR" />
+            </Component>
+            <Component Id="cmp246832BA1D1CF8ED57CF186089742A1B" Directory="TARGETDIR" Guid="{15FDD705-C9F6-4F3A-B4D0-848C51DCE322}" KeyPath="yes">
+                <RegistryKey Key="CLSID\{9BE31822-FDAD-461B-AD51-BE1D1C159921}\InprocServer32" Root="HKCR">
+                    <RegistryValue Value="[APPLICATIONFOLDER]axvlc.dll" Type="string" />
+                    <RegistryValue Name="ThreadingModel" Value="Apartment" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmp9BC3D76E769DE2ED121759E269CE22CF" Directory="TARGETDIR" Guid="{CE86103F-C761-4AA6-8493-1408733DF699}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{9BE31822-FDAD-461B-AD51-BE1D1C159921}\MiscStatus" Root="HKCR" />
+            </Component>
+            <Component Id="cmp4C48685EC1CC2A60FE113CDFA370359A" Directory="TARGETDIR" Guid="{06A48EC8-B272-4D9F-95FF-FC18D816FEBD}" KeyPath="yes">
+                <RegistryKey Key="CLSID\{9BE31822-FDAD-461B-AD51-BE1D1C159921}\MiscStatus\1" Root="HKCR">
+                    <RegistryValue Value="131473" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmp4FB4D315A79CB77A0C22C771D56A4C9C" Directory="TARGETDIR" Guid="{E6C17150-111C-4AF7-B59D-2143AB3194B4}" KeyPath="yes">
+                <RegistryKey Key="CLSID\{9BE31822-FDAD-461B-AD51-BE1D1C159921}\ProgID" Root="HKCR">
+                    <RegistryValue Value="VideoLAN.VLCPlugin.2" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmp8A757C1DC3B846101EDBED37B1135686" Directory="TARGETDIR" Guid="{AAE5277F-F1C4-4302-B7C0-117861C721E5}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{9BE31822-FDAD-461B-AD51-BE1D1C159921}\Programmable" Root="HKCR" />
+            </Component>
+            <Component Id="cmpF8B7347CA2490016E634F63CAA4925DD" Directory="TARGETDIR" Guid="{653E9F23-DFC5-4BC0-BCD3-A052DC9BD54C}" KeyPath="yes">
+                <RegistryKey Key="CLSID\{9BE31822-FDAD-461B-AD51-BE1D1C159921}\ToolboxBitmap32" Root="HKCR">
+                    <RegistryValue Value="[APPLICATIONFOLDER]axvlc.dll,1" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmpB9BFE69BD53EBECC4926A7F5D2426B30" Directory="TARGETDIR" Guid="{5F66227B-AC1D-4FD2-BB9A-1B09F14CC569}" KeyPath="yes">
+                <RegistryKey Key="CLSID\{9BE31822-FDAD-461B-AD51-BE1D1C159921}\TypeLib" Root="HKCR">
+                    <RegistryValue Value="{DF2BBE39-40A8-433B-A279-073F48DA94B6}" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmpCDF44B03F19223EDC7A0D9D9047827AC" Directory="TARGETDIR" Guid="{345409A3-B7F2-4CEE-8FC7-2DCE3B6BD56F}" KeyPath="yes">
+                <RegistryKey Key="CLSID\{9BE31822-FDAD-461B-AD51-BE1D1C159921}\Version" Root="HKCR">
+                    <RegistryValue Value="1.0" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmpCBA2B3F9594C78AE6375D0139DD5481E" Directory="TARGETDIR" Guid="{F92AFBC3-B296-49FE-A886-E3FC8DD1FEB9}" KeyPath="yes">
+                <RegistryKey Key="CLSID\{9BE31822-FDAD-461B-AD51-BE1D1C159921}\VersionIndependentProgID" Root="HKCR">
+                    <RegistryValue Value="VideoLAN.VLCPlugin" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmp4AC904B4BF4270F571AC302E02051F07" Directory="TARGETDIR" Guid="{04BB9A06-6C19-45B2-97FF-962DD3A1E80B}" KeyPath="yes">
+                <RegistryKey Key="CLSID\{E23FE9C6-778E-49D4-B537-38FCDE4887D8}" Root="HKCR">
+                    <RegistryValue Value="VLC ActiveX Plugin and IE Web Plugin v1" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmp6979E4D28EB216A1835F934DA2D8DBC9" Directory="TARGETDIR" Guid="{488FF35B-94BB-4E4E-A39B-C03F56DB5324}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{E23FE9C6-778E-49D4-B537-38FCDE4887D8}\Control" Root="HKCR" />
+            </Component>
+            <Component Id="cmpC7EF32F95C7700EB849D570614F06F6D" Directory="TARGETDIR" Guid="{61F95561-23DF-4789-977C-D503BA1441D2}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{E23FE9C6-778E-49D4-B537-38FCDE4887D8}\Implemented Categories" Root="HKCR" />
+            </Component>
+            <Component Id="cmpB5E741926CD33F2A4222E9FEE719BA30" Directory="TARGETDIR" Guid="{16F853FB-12FB-42DE-9E69-9A99D5A3B374}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{E23FE9C6-778E-49D4-B537-38FCDE4887D8}\Implemented Categories\{0DE86A57-2BAA-11CF-A229-00AA003D7352}" Root="HKCR" />
+            </Component>
+            <Component Id="cmpC6918C88F8DEC1C75755A03AC9B91D75" Directory="TARGETDIR" Guid="{14AEBB8C-D640-4914-99F5-1ED5CFFA7692}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{E23FE9C6-778E-49D4-B537-38FCDE4887D8}\Implemented Categories\{0DE86A58-2BAA-11CF-A229-00AA003D7352}" Root="HKCR" />
+            </Component>
+            <Component Id="cmp4CEC537C38DA88C4D41AC8772A802905" Directory="TARGETDIR" Guid="{6A9C9D16-9219-43E0-AF68-C91D1E536AE8}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{E23FE9C6-778E-49D4-B537-38FCDE4887D8}\Implemented Categories\{40FC6ED4-2438-11CF-A3DB-080036F12502}" Root="HKCR" />
+            </Component>
+            <Component Id="cmp6014020A4A4E0A4A3454FE5816512EA1" Directory="TARGETDIR" Guid="{51E1019A-7EDC-4CE8-979C-89C032CB1792}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{E23FE9C6-778E-49D4-B537-38FCDE4887D8}\Implemented Categories\{7DD95801-9882-11CF-9FA9-00AA006C42C4}" Root="HKCR" />
+            </Component>
+            <Component Id="cmp53B176A4C6CCB3A0FD040C7BC22B6768" Directory="TARGETDIR" Guid="{81AC98F6-2577-4258-9299-216FB6F40868}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{E23FE9C6-778E-49D4-B537-38FCDE4887D8}\Implemented Categories\{7DD95802-9882-11CF-9FA9-00AA006C42C4}" Root="HKCR" />
+            </Component>
+            <Component Id="cmpEFE95E5D70F19F4C3ADAF7CC0E05DC61" Directory="TARGETDIR" Guid="{173FA543-0EC6-4D46-ADEE-DE03E1205FF3}" KeyPath="yes">
+                <RegistryKey Key="CLSID\{E23FE9C6-778E-49D4-B537-38FCDE4887D8}\InprocServer32" Root="HKCR">
+                    <RegistryValue Value="[APPLICATIONFOLDER]axvlc.dll" Type="string" />
+                    <RegistryValue Name="ThreadingModel" Value="Apartment" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmp1F5312C2FC66DE56472DD97E23A31DF6" Directory="TARGETDIR" Guid="{6E7298F2-2CFD-4BCF-A718-AEEE13C989A3}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{E23FE9C6-778E-49D4-B537-38FCDE4887D8}\MiscStatus" Root="HKCR" />
+            </Component>
+            <Component Id="cmp9DC7BC22DF2236B84C834808E8B90934" Directory="TARGETDIR" Guid="{02795AF1-5BA6-484E-B271-143774A5478D}" KeyPath="yes">
+                <RegistryKey Key="CLSID\{E23FE9C6-778E-49D4-B537-38FCDE4887D8}\MiscStatus\1" Root="HKCR">
+                    <RegistryValue Value="131473" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmpC78F5D0BFAC6C4ADE91668BC6E0D78C8" Directory="TARGETDIR" Guid="{70BF2345-4F82-4E96-9BD8-DCA7078241FA}" KeyPath="yes">
+                <RegistryKey Key="CLSID\{E23FE9C6-778E-49D4-B537-38FCDE4887D8}\ProgID" Root="HKCR">
+                    <RegistryValue Value="VideoLAN.VLCPlugin.1" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmp3FEA142B8321DDDE8D3C841745CE5097" Directory="TARGETDIR" Guid="{E428053F-13D5-445C-8EDE-9DEB1372EC75}" KeyPath="yes">
+                <RegistryKey Action="createAndRemoveOnUninstall" Key="CLSID\{E23FE9C6-778E-49D4-B537-38FCDE4887D8}\Programmable" Root="HKCR" />
+            </Component>
+            <Component Id="cmp8BD10D6F634FC35938D79A521A299898" Directory="TARGETDIR" Guid="{AADB4E7B-700D-4EA2-ADDF-5D7BFA6F3B96}" KeyPath="yes">
+                <RegistryKey Key="CLSID\{E23FE9C6-778E-49D4-B537-38FCDE4887D8}\ToolboxBitmap32" Root="HKCR">
+                    <RegistryValue Value="[APPLICATIONFOLDER]axvlc.dll,1" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmpD3EA0ABCB7D6E7A794A7083D139BE82A" Directory="TARGETDIR" Guid="{6DD13C09-BAEA-4F9F-9881-BC50756DB095}" KeyPath="yes">
+                <RegistryKey Key="CLSID\{E23FE9C6-778E-49D4-B537-38FCDE4887D8}\TypeLib" Root="HKCR">
+                    <RegistryValue Value="{DF2BBE39-40A8-433B-A279-073F48DA94B6}" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmpD1DBB9420A515B8D11269763D4665A97" Directory="TARGETDIR" Guid="{D761D2B2-161D-4927-9C44-AEC9E1C6B598}" KeyPath="yes">
+                <RegistryKey Key="CLSID\{E23FE9C6-778E-49D4-B537-38FCDE4887D8}\Version" Root="HKCR">
+                    <RegistryValue Value="1.0" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmp5C3399ED2AA73248D2A54F6A54FEB111" Directory="TARGETDIR" Guid="{A33D8854-4B56-4F18-BB60-AF2D32CB7BD2}" KeyPath="yes">
+                <RegistryKey Key="CLSID\{E23FE9C6-778E-49D4-B537-38FCDE4887D8}\VersionIndependentProgID" Root="HKCR">
+                    <RegistryValue Value="VideoLAN.VLCPlugin" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmpAAFA41E521E77251CF16037F9962754B" Directory="TARGETDIR" Guid="{CE33E744-F3EE-4457-B0C3-52899FD91591}" KeyPath="yes">
+                <RegistryKey Key="VideoLAN.VLCPlugin" Root="HKCR">
+                    <RegistryValue Value="VLC ActiveX Plugin and IE Web Plugin v2" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmp80FA36087F6628E5EA2F299F51E65B4F" Directory="TARGETDIR" Guid="{1A26F0AE-4EA2-4703-A551-8FD0F96F0655}" KeyPath="yes">
+                <RegistryKey Key="VideoLAN.VLCPlugin\CLSID" Root="HKCR">
+                    <RegistryValue Value="{9BE31822-FDAD-461B-AD51-BE1D1C159921}" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmpA638E255AD1A371614A33CBC5CBE5E50" Directory="TARGETDIR" Guid="{7DE6252F-8DB2-43A9-8751-2263F5AF61FA}" KeyPath="yes">
+                <RegistryKey Key="VideoLAN.VLCPlugin\CurVer" Root="HKCR">
+                    <RegistryValue Value="VideoLAN.VLCPlugin.2" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmpFF5CF266665CF9EEC3C5E5A37164EE4D" Directory="TARGETDIR" Guid="{50FE68D4-6254-4002-B7F6-307E24C8F553}" KeyPath="yes">
+                <RegistryKey Key="VideoLAN.VLCPlugin.1" Root="HKCR">
+                    <RegistryValue Value="VLC ActiveX Plugin and IE Web Plugin v1" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmp278AA39C1A3A9F2A9B06329D3B4C2A4A" Directory="TARGETDIR" Guid="{168ECC12-85CC-433F-B014-306C064DDAC3}" KeyPath="yes">
+                <RegistryKey Key="VideoLAN.VLCPlugin.1\CLSID" Root="HKCR">
+                    <RegistryValue Value="{E23FE9C6-778E-49D4-B537-38FCDE4887D8}" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmpC32C1FB491D2EBA9C172B5AF704A9425" Directory="TARGETDIR" Guid="{3443950E-BDA8-4F68-BDB6-EE54E963703A}" KeyPath="yes">
+                <RegistryKey Key="VideoLAN.VLCPlugin.2" Root="HKCR">
+                    <RegistryValue Value="VLC ActiveX Plugin and IE Web Plugin v2" Type="string" />
+                </RegistryKey>
+            </Component>
+            <Component Id="cmp03134DF6513411D9ACC3C654DCFFBD40" Directory="TARGETDIR" Guid="{311E1A21-D8BC-464E-9F5A-7CDA8768A7A5}" KeyPath="yes">
+                <RegistryKey Key="VideoLAN.VLCPlugin.2\CLSID" Root="HKCR">
+                    <RegistryValue Value="{9BE31822-FDAD-461B-AD51-BE1D1C159921}" Type="string" />
+                </RegistryKey>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="TARGETDIR" />
+    </Fragment>
+</Wix>

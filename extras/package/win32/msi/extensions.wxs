@@ -1,0 +1,865 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="APPLICATIONFOLDER">
+            <Component Id='CompFileAssociation' Guid='b531047e-3556-4dff-8f96-6a2b596d5b0a'>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".3g2" Value="VLC.3g2.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".3g2" Value="" Type="string" />
+                <ProgId Id='VLC.3g2.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='3g2'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".3gp" Value="VLC.3gp.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".3gp" Value="" Type="string" />
+                <ProgId Id='VLC.3gp.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='3gp'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".3gp2" Value="VLC.3gp2.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".3gp2" Value="" Type="string" />
+                <ProgId Id='VLC.3gp2.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='3gp2'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".3gpp" Value="VLC.3gpp.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".3gpp" Value="" Type="string" />
+                <ProgId Id='VLC.3gpp.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='3gpp'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".amv" Value="VLC.amv.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".amv" Value="" Type="string" />
+                <ProgId Id='VLC.amv.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='amv'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".asf" Value="VLC.asf.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".asf" Value="" Type="string" />
+                <ProgId Id='VLC.asf.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='asf'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".avi" Value="VLC.avi.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".avi" Value="" Type="string" />
+                <ProgId Id='VLC.avi.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='avi'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".divx" Value="VLC.divx.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".divx" Value="" Type="string" />
+                <ProgId Id='VLC.divx.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='divx'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".drc" Value="VLC.drc.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".drc" Value="" Type="string" />
+                <ProgId Id='VLC.drc.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='drc'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".dv" Value="VLC.dv.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".dv" Value="" Type="string" />
+                <ProgId Id='VLC.dv.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='dv'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".f4v" Value="VLC.f4v.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".f4v" Value="" Type="string" />
+                <ProgId Id='VLC.f4v.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='f4v'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".flv" Value="VLC.flv.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".flv" Value="" Type="string" />
+                <ProgId Id='VLC.flv.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='flv'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".gxf" Value="VLC.gxf.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".gxf" Value="" Type="string" />
+                <ProgId Id='VLC.gxf.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='gxf'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".m1v" Value="VLC.m1v.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".m1v" Value="" Type="string" />
+                <ProgId Id='VLC.m1v.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='m1v'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".m2t" Value="VLC.m2t.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".m2t" Value="" Type="string" />
+                <ProgId Id='VLC.m2t.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='m2t'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".m2v" Value="VLC.m2v.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".m2v" Value="" Type="string" />
+                <ProgId Id='VLC.m2v.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='m2v'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".m2ts" Value="VLC.m2ts.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".m2ts" Value="" Type="string" />
+                <ProgId Id='VLC.m2ts.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='m2ts'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".m4v" Value="VLC.m4v.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".m4v" Value="" Type="string" />
+                <ProgId Id='VLC.m4v.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='m4v'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mkv" Value="VLC.mkv.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mkv" Value="" Type="string" />
+                <ProgId Id='VLC.mkv.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mkv'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mov" Value="VLC.mov.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mov" Value="" Type="string" />
+                <ProgId Id='VLC.mov.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mov'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mp2" Value="VLC.mp2.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mp2" Value="" Type="string" />
+                <ProgId Id='VLC.mp2.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mp2'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mp2v" Value="VLC.mp2v.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mp2v" Value="" Type="string" />
+                <ProgId Id='VLC.mp2v.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mp2v'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mp4" Value="VLC.mp4.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mp4" Value="" Type="string" />
+                <ProgId Id='VLC.mp4.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mp4'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mp4v" Value="VLC.mp4v.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mp4v" Value="" Type="string" />
+                <ProgId Id='VLC.mp4v.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mp4v'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mpa" Value="VLC.mpa.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mpa" Value="" Type="string" />
+                <ProgId Id='VLC.mpa.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mpa'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mpe" Value="VLC.mpe.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mpe" Value="" Type="string" />
+                <ProgId Id='VLC.mpe.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mpe'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mpeg" Value="VLC.mpeg.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mpeg" Value="" Type="string" />
+                <ProgId Id='VLC.mpeg.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mpeg'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mpeg1" Value="VLC.mpeg1.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mpeg1" Value="" Type="string" />
+                <ProgId Id='VLC.mpeg1.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mpeg1'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mpeg2" Value="VLC.mpeg2.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mpeg2" Value="" Type="string" />
+                <ProgId Id='VLC.mpeg2.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mpeg2'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mpeg4" Value="VLC.mpeg4.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mpeg4" Value="" Type="string" />
+                <ProgId Id='VLC.mpeg4.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mpeg4'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mpg" Value="VLC.mpg.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mpg" Value="" Type="string" />
+                <ProgId Id='VLC.mpg.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mpg'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mpv2" Value="VLC.mpv2.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mpv2" Value="" Type="string" />
+                <ProgId Id='VLC.mpv2.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mpv2'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mts" Value="VLC.mts.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mts" Value="" Type="string" />
+                <ProgId Id='VLC.mts.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mts'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mtv" Value="VLC.mtv.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mtv" Value="" Type="string" />
+                <ProgId Id='VLC.mtv.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mtv'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mxf" Value="VLC.mxf.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mxf" Value="" Type="string" />
+                <ProgId Id='VLC.mxf.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mxf'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".nsv" Value="VLC.nsv.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".nsv" Value="" Type="string" />
+                <ProgId Id='VLC.nsv.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='nsv'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".nuv" Value="VLC.nuv.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".nuv" Value="" Type="string" />
+                <ProgId Id='VLC.nuv.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='nuv'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".ogg" Value="VLC.ogg.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".ogg" Value="" Type="string" />
+                <ProgId Id='VLC.ogg.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='ogg'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".ogm" Value="VLC.ogm.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".ogm" Value="" Type="string" />
+                <ProgId Id='VLC.ogm.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='ogm'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".ogx" Value="VLC.ogx.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".ogx" Value="" Type="string" />
+                <ProgId Id='VLC.ogx.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='ogx'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".ogv" Value="VLC.ogv.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".ogv" Value="" Type="string" />
+                <ProgId Id='VLC.ogv.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='ogv'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".rec" Value="VLC.rec.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".rec" Value="" Type="string" />
+                <ProgId Id='VLC.rec.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='rec'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".rm" Value="VLC.rm.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".rm" Value="" Type="string" />
+                <ProgId Id='VLC.rm.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='rm'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".rmvb" Value="VLC.rmvb.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".rmvb" Value="" Type="string" />
+                <ProgId Id='VLC.rmvb.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='rmvb'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".tod" Value="VLC.tod.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".tod" Value="" Type="string" />
+                <ProgId Id='VLC.tod.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='tod'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".ts" Value="VLC.ts.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".ts" Value="" Type="string" />
+                <ProgId Id='VLC.ts.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='ts'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".tts" Value="VLC.tts.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".tts" Value="" Type="string" />
+                <ProgId Id='VLC.tts.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='tts'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".vob" Value="VLC.vob.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".vob" Value="" Type="string" />
+                <ProgId Id='VLC.vob.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='vob'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".vro" Value="VLC.vro.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".vro" Value="" Type="string" />
+                <ProgId Id='VLC.vro.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='vro'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".webm" Value="VLC.webm.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".webm" Value="" Type="string" />
+                <ProgId Id='VLC.webm.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='webm'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".wmv" Value="VLC.wmv.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".wmv" Value="" Type="string" />
+                <ProgId Id='VLC.wmv.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='wmv'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".3ga" Value="VLC.3ga.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".3ga" Value="" Type="string" />
+                <ProgId Id='VLC.3ga.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='3ga'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".669" Value="VLC.669.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".669" Value="" Type="string" />
+                <ProgId Id='VLC.669.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='669'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".a52" Value="VLC.a52.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".a52" Value="" Type="string" />
+                <ProgId Id='VLC.a52.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='a52'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".aac" Value="VLC.aac.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".aac" Value="" Type="string" />
+                <ProgId Id='VLC.aac.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='aac'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".ac3" Value="VLC.ac3.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".ac3" Value="" Type="string" />
+                <ProgId Id='VLC.ac3.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='ac3'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".adt" Value="VLC.adt.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".adt" Value="" Type="string" />
+                <ProgId Id='VLC.adt.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='adt'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".adts" Value="VLC.adts.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".adts" Value="" Type="string" />
+                <ProgId Id='VLC.adts.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='adts'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".aif" Value="VLC.aif.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".aif" Value="" Type="string" />
+                <ProgId Id='VLC.aif.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='aif'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".aifc" Value="VLC.aifc.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".aifc" Value="" Type="string" />
+                <ProgId Id='VLC.aifc.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='aifc'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".aiff" Value="VLC.aiff.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".aiff" Value="" Type="string" />
+                <ProgId Id='VLC.aiff.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='aiff'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".au" Value="VLC.au.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".au" Value="" Type="string" />
+                <ProgId Id='VLC.au.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='au'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".amr" Value="VLC.amr.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".amr" Value="" Type="string" />
+                <ProgId Id='VLC.amr.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='amr'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".aob" Value="VLC.aob.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".aob" Value="" Type="string" />
+                <ProgId Id='VLC.aob.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='aob'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".ape" Value="VLC.ape.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".ape" Value="" Type="string" />
+                <ProgId Id='VLC.ape.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='ape'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".caf" Value="VLC.caf.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".caf" Value="" Type="string" />
+                <ProgId Id='VLC.caf.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='caf'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".cda" Value="VLC.cda.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".cda" Value="" Type="string" />
+                <ProgId Id='VLC.cda.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='cda'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".dts" Value="VLC.dts.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".dts" Value="" Type="string" />
+                <ProgId Id='VLC.dts.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='dts'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".flac" Value="VLC.flac.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".flac" Value="" Type="string" />
+                <ProgId Id='VLC.flac.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='flac'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".it" Value="VLC.it.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".it" Value="" Type="string" />
+                <ProgId Id='VLC.it.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='it'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".m4a" Value="VLC.m4a.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".m4a" Value="" Type="string" />
+                <ProgId Id='VLC.m4a.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='m4a'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".m4p" Value="VLC.m4p.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".m4p" Value="" Type="string" />
+                <ProgId Id='VLC.m4p.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='m4p'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mid" Value="VLC.mid.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mid" Value="" Type="string" />
+                <ProgId Id='VLC.mid.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mid'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mka" Value="VLC.mka.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mka" Value="" Type="string" />
+                <ProgId Id='VLC.mka.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mka'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mlp" Value="VLC.mlp.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mlp" Value="" Type="string" />
+                <ProgId Id='VLC.mlp.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mlp'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mod" Value="VLC.mod.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mod" Value="" Type="string" />
+                <ProgId Id='VLC.mod.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mod'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mp1" Value="VLC.mp1.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mp1" Value="" Type="string" />
+                <ProgId Id='VLC.mp1.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mp1'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mp3" Value="VLC.mp3.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mp3" Value="" Type="string" />
+                <ProgId Id='VLC.mp3.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mp3'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".mpc" Value="VLC.mpc.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".mpc" Value="" Type="string" />
+                <ProgId Id='VLC.mpc.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='mpc'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".oma" Value="VLC.oma.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".oma" Value="" Type="string" />
+                <ProgId Id='VLC.oma.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='oma'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".oga" Value="VLC.oga.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".oga" Value="" Type="string" />
+                <ProgId Id='VLC.oga.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='oga'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".qcp" Value="VLC.qcp.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".qcp" Value="" Type="string" />
+                <ProgId Id='VLC.qcp.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='qcp'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".rmi" Value="VLC.rmi.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".rmi" Value="" Type="string" />
+                <ProgId Id='VLC.rmi.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='rmi'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".snd" Value="VLC.snd.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".snd" Value="" Type="string" />
+                <ProgId Id='VLC.snd.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='snd'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".s3m" Value="VLC.s3m.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".s3m" Value="" Type="string" />
+                <ProgId Id='VLC.s3m.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='s3m'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".spx" Value="VLC.spx.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".spx" Value="" Type="string" />
+                <ProgId Id='VLC.spx.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='spx'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".tta" Value="VLC.tta.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".tta" Value="" Type="string" />
+                <ProgId Id='VLC.tta.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='tta'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".voc" Value="VLC.voc.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".voc" Value="" Type="string" />
+                <ProgId Id='VLC.voc.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='voc'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".vqf" Value="VLC.vqf.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".vqf" Value="" Type="string" />
+                <ProgId Id='VLC.vqf.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='vqf'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".w64" Value="VLC.w64.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".w64" Value="" Type="string" />
+                <ProgId Id='VLC.w64.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='w64'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".wav" Value="VLC.wav.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".wav" Value="" Type="string" />
+                <ProgId Id='VLC.wav.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='wav'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".wma" Value="VLC.wma.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".wma" Value="" Type="string" />
+                <ProgId Id='VLC.wma.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='wma'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".wv" Value="VLC.wv.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".wv" Value="" Type="string" />
+                <ProgId Id='VLC.wv.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='wv'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".xa" Value="VLC.xa.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".xa" Value="" Type="string" />
+                <ProgId Id='VLC.xa.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='xa'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".xm" Value="VLC.xm.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".xm" Value="" Type="string" />
+                <ProgId Id='VLC.xm.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='xm'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".asx" Value="VLC.asx.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".asx" Value="" Type="string" />
+                <ProgId Id='VLC.asx.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='asx'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".b4s" Value="VLC.b4s.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".b4s" Value="" Type="string" />
+                <ProgId Id='VLC.b4s.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='b4s'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".bin" Value="VLC.bin.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".bin" Value="" Type="string" />
+                <ProgId Id='VLC.bin.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='bin'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".cue" Value="VLC.cue.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".cue" Value="" Type="string" />
+                <ProgId Id='VLC.cue.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='cue'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".ifo" Value="VLC.ifo.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".ifo" Value="" Type="string" />
+                <ProgId Id='VLC.ifo.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='ifo'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".m3u" Value="VLC.m3u.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".m3u" Value="" Type="string" />
+                <ProgId Id='VLC.m3u.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='m3u'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".m3u8" Value="VLC.m3u8.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".m3u8" Value="" Type="string" />
+                <ProgId Id='VLC.m3u8.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='m3u8'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".pls" Value="VLC.pls.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".pls" Value="" Type="string" />
+                <ProgId Id='VLC.pls.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='pls'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".ram" Value="VLC.ram.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".ram" Value="" Type="string" />
+                <ProgId Id='VLC.ram.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='ram'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".sdp" Value="VLC.sdp.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".sdp" Value="" Type="string" />
+                <ProgId Id='VLC.sdp.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='sdp'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".vlc" Value="VLC.vlc.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".vlc" Value="" Type="string" />
+                <ProgId Id='VLC.vlc.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='vlc'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".xspf" Value="VLC.xspf.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".xspf" Value="" Type="string" />
+                <ProgId Id='VLC.xspf.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='xspf'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+            </Component>
+        </DirectoryRef>
+    </Fragment>
+</Wix>
