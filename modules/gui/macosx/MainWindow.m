@@ -148,6 +148,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
+    // sets lion fullscreen behaviour
+    [super awakeFromNib];
+
     BOOL b_splitviewShouldBeHidden = NO;
 
     /* setup the styled interface */
@@ -199,12 +202,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     b_dropzone_active = YES;
     [o_dropzone_view setFrame: [o_playlist_table frame]];
     [o_left_split_view setFrame: [o_sidebar_view frame]];
-
-    if (b_nativeFullscreenMode) {
-        [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
-    } else {
-        [o_titlebar_view setFullscreenButtonHidden: YES];
-    }
 
     if (!OSX_SNOW_LEOPARD) {
         /* the default small size of the search field is slightly different on Lion, let's work-around that */
@@ -790,7 +787,23 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [NSCursor setHiddenUntilMouseMoves: YES];
 }
 
+#pragma mark -
+#pragma mark Lion native fullscreen handling
+- (void)windowWillEnterFullScreen:(NSNotification *)notification
+{
+    [super windowWillEnterFullScreen:notification];
 
+    // update split view frame after removing title bar
+    [o_split_view setFrame: [o_video_view frame]];
+}
+
+- (void)windowWillExitFullScreen:(NSNotification *)notification
+{
+    [super windowWillExitFullScreen: notification];
+
+    // update split view frame after readding title bar
+    [o_split_view setFrame: [o_video_view frame]];
+}
 #pragma mark -
 #pragma mark Fullscreen support
 
@@ -832,109 +845,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     b_window_is_invisible = NO;
 
     /* fullscreenAnimation will be unlocked when animation ends */
-}
-
-#pragma mark -
-#pragma mark Lion native fullscreen handling
-- (void)windowWillEnterFullScreen:(NSNotification *)notification
-{
-    // workaround, see #6668
-    [NSApp setPresentationOptions:(NSApplicationPresentationFullScreen | NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
-
-    var_SetBool(pl_Get(VLCIntf), "fullscreen", true);
-
-    vout_thread_t *p_vout = getVout();
-    if (p_vout) {
-        var_SetBool(p_vout, "fullscreen", true);
-        vlc_object_release(p_vout);
-    }
-
-    [o_video_view setFrame: [[self contentView] frame]];
-    b_fullscreen = YES;
-
-    [self recreateHideMouseTimer];
-    i_originalLevel = [self level];
-    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
-    [self setLevel:NSNormalWindowLevel];
-
-    if (b_dark_interface) {
-        [o_titlebar_view removeFromSuperviewWithoutNeedingDisplay];
-
-        NSRect winrect;
-        CGFloat f_titleBarHeight = [o_titlebar_view frame].size.height;
-        winrect = [self frame];
-
-        winrect.size.height = winrect.size.height - f_titleBarHeight;
-        [self setFrame: winrect display:NO animate:NO];
-        winrect = [o_split_view frame];
-        winrect.size.height = winrect.size.height + f_titleBarHeight;
-        [o_split_view setFrame: winrect];
-    }
-
-    if ([[VLCMain sharedInstance] activeVideoPlayback])
-        [[o_controls_bar bottomBarView] setHidden: YES];
-
-    [self setMovableByWindowBackground: NO];
-}
-
-- (void)windowDidEnterFullScreen:(NSNotification *)notification
-{
-    // Indeed, we somehow can have an "inactive" fullscreen (but a visible window!).
-    // But this creates some problems when leaving fs over remote intfs, so activate app here.
-    [NSApp activateIgnoringOtherApps:YES];
-
-    [o_fspanel setVoutWasUpdated: self];
-    [o_fspanel setActive: nil];
-
-    NSArray *subviews = [[self videoView] subviews];
-    NSUInteger count = [subviews count];
-
-    for (NSUInteger x = 0; x < count; x++) {
-        if ([[subviews objectAtIndex:x] respondsToSelector:@selector(reshape)])
-            [[subviews objectAtIndex:x] reshape];
-    }
-
-}
-
-- (void)windowWillExitFullScreen:(NSNotification *)notification
-{
-    var_SetBool(pl_Get(VLCIntf), "fullscreen", false);
-
-    vout_thread_t *p_vout = getVout();
-    if (p_vout) {
-        var_SetBool(p_vout, "fullscreen", false);
-        vlc_object_release(p_vout);
-    }
-
-    [o_video_view setFrame: [o_split_view frame]];
-    [NSCursor setHiddenUntilMouseMoves: NO];
-    [o_fspanel setNonActive: nil];
-    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: i_originalLevel];
-    [self setLevel:i_originalLevel];
-
-    b_fullscreen = NO;
-
-    if (b_dark_interface) {
-        NSRect winrect;
-        CGFloat f_titleBarHeight = [o_titlebar_view frame].size.height;
-        winrect = [self frame];
-
-        [o_titlebar_view setFrame: NSMakeRect(0, winrect.size.height - f_titleBarHeight,
-                                              winrect.size.width, f_titleBarHeight)];
-        [[self contentView] addSubview: o_titlebar_view];
-
-        winrect.size.height = winrect.size.height + f_titleBarHeight;
-        [self setFrame: winrect display:NO animate:NO];
-        winrect = [o_split_view frame];
-        winrect.size.height = winrect.size.height - f_titleBarHeight;
-        [o_split_view setFrame: winrect];
-        [o_video_view setFrame: winrect];
-    }
-
-    if ([[VLCMain sharedInstance] activeVideoPlayback])
-        [[o_controls_bar bottomBarView] setHidden: NO];
-
-    [self setMovableByWindowBackground: YES];
 }
 
 #pragma mark -
@@ -1349,6 +1259,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
+    // sets lion fullscreen behaviour
+    [super awakeFromNib];
     [self setAcceptsMouseMovedEvents: YES];
 
     if (b_dark_interface) {
@@ -1366,8 +1278,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_titlebar_view setFrame: NSMakeRect(0, winrect.size.height - f_titleBarHeight, winrect.size.width, f_titleBarHeight)];
         [[self contentView] addSubview: o_titlebar_view positioned: NSWindowAbove relativeTo: nil];
 
-        // native fs not supported with detached view yet
-        [o_titlebar_view setFullscreenButtonHidden: YES];
     } else {
         [self setBackgroundColor: [NSColor blackColor]];
     }

@@ -174,14 +174,8 @@
     else if (sender == o_green_btn)
         [[self window] performZoom: sender];
     else if (sender == o_fullscreen_btn) {
-        // set fs directly to true, as the vars can be already true in some configs
-        vout_thread_t *p_vout = getVout();
-        if (p_vout) {
-            var_SetBool(p_vout, "fullscreen", true);
-            vlc_object_release(p_vout);
-        } else { // e.g. lion fullscreen toggle
-            [[VLCMain sharedInstance] setFullscreen:true forWindow:nil];
-        }
+        // same action as native fs button
+        [[self window] toggleFullScreen:self];
 
     } else
         msg_Err(VLCIntf, "unknown button action sender");

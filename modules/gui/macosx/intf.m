@@ -1266,8 +1266,13 @@ static VLCMain *_o_sharedMainInstance = nil;
     if (b_nativeFullscreenMode) {
         // this is called twice in certain situations, so only toogle if we really need to
         if ((b_fullscreen && !([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen)) ||
-            (!b_fullscreen &&  ([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen)))
-            [o_mainwindow toggleFullScreen: self];
+            (!b_fullscreen &&  ([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen))) {
+            if(p_wnd) {
+                VLCVideoWindowCommon *window = [o_vout_controller getWindow: p_wnd];
+                [window toggleFullScreen:self];
+            } else
+                [o_mainwindow toggleFullScreen: self]; // TODO
+        }
 
         if (b_fullscreen)
             [NSApp setPresentationOptions:(NSApplicationPresentationFullScreen | NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];

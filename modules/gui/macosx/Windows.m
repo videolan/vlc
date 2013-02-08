@@ -275,6 +275,23 @@
     [super dealloc];
 }
 
+- (void)awakeFromNib
+{
+    BOOL b_nativeFullscreenMode = NO;
+#ifdef MAC_OS_X_VERSION_10_7
+    if (!OSX_SNOW_LEOPARD)
+        b_nativeFullscreenMode = var_InheritBool(VLCIntf, "macosx-nativefullscreenmode");
+#endif
+
+    if (b_nativeFullscreenMode) {
+        [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
+    } else {
+        [o_titlebar_view setFullscreenButtonHidden: YES];
+    }
+
+    [super awakeFromNib];
+}
+
 - (void)setTitle:(NSString *)title
 {
     if (!title || [title length] < 1)
@@ -522,6 +539,109 @@
     }
 
     return proposedFrameSize;
+}
+
+
+#pragma mark -
+#pragma mark Lion native fullscreen handling
+- (void)windowWillEnterFullScreen:(NSNotification *)notification
+{
+    // workaround, see #6668
+    [NSApp setPresentationOptions:(NSApplicationPresentationFullScreen | NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
+
+    var_SetBool(pl_Get(VLCIntf), "fullscreen", true);
+
+    vout_thread_t *p_vout = getVoutForActiveWindow();
+    if (p_vout) {
+        var_SetBool(p_vout, "fullscreen", true);
+        vlc_object_release(p_vout);
+    }
+
+    [o_video_view setFrame: [[self contentView] frame]];
+    [[VLCMainWindow sharedInstance] setFullscreen: YES];
+
+    [[VLCMainWindow sharedInstance] recreateHideMouseTimer];
+    i_originalLevel = [self level];
+    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
+    [self setLevel:NSNormalWindowLevel];
+
+    if (b_dark_interface) {
+        [o_titlebar_view removeFromSuperviewWithoutNeedingDisplay];
+
+        NSRect winrect;
+        CGFloat f_titleBarHeight = [o_titlebar_view frame].size.height;
+        winrect = [self frame];
+
+        winrect.size.height = winrect.size.height - f_titleBarHeight;
+        [self setFrame: winrect display:NO animate:NO];
+    }
+
+    if ([[VLCMain sharedInstance] activeVideoPlayback])
+        [[o_controls_bar bottomBarView] setHidden: YES];
+
+    [self setMovableByWindowBackground: NO];
+}
+
+- (void)windowDidEnterFullScreen:(NSNotification *)notification
+{
+    // Indeed, we somehow can have an "inactive" fullscreen (but a visible window!).
+    // But this creates some problems when leaving fs over remote intfs, so activate app here.
+    [NSApp activateIgnoringOtherApps:YES];
+
+    
+    [[[VLCMainWindow sharedInstance] fsPanel] setVoutWasUpdated: self];
+    [[[VLCMainWindow sharedInstance] fsPanel] setActive: nil];
+
+    NSArray *subviews = [[self videoView] subviews];
+    NSUInteger count = [subviews count];
+
+    for (NSUInteger x = 0; x < count; x++) {
+        if ([[subviews objectAtIndex:x] respondsToSelector:@selector(reshape)])
+            [[subviews objectAtIndex:x] reshape];
+    }
+
+}
+
+- (void)windowWillExitFullScreen:(NSNotification *)notification
+{
+    var_SetBool(pl_Get(VLCIntf), "fullscreen", false);
+
+    vout_thread_t *p_vout = getVoutForActiveWindow();
+    if (p_vout) {
+        var_SetBool(p_vout, "fullscreen", false);
+        vlc_object_release(p_vout);
+    }
+
+    [NSCursor setHiddenUntilMouseMoves: NO];
+    [[[VLCMainWindow sharedInstance] fsPanel] setNonActive: nil];
+    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: i_originalLevel];
+    [self setLevel:i_originalLevel];
+
+    [[VLCMainWindow sharedInstance] setFullscreen: NO];
+
+    if (b_dark_interface) {
+        NSRect winrect;
+        CGFloat f_titleBarHeight = [o_titlebar_view frame].size.height;
+        winrect = [self frame];
+
+        [o_titlebar_view setFrame: NSMakeRect(0, winrect.size.height - f_titleBarHeight,
+                                              winrect.size.width, f_titleBarHeight)];
+        [[self contentView] addSubview: o_titlebar_view];
+
+        winrect.size.height = winrect.size.height + f_titleBarHeight;
+        [self setFrame: winrect display:NO animate:NO];
+        winrect = [o_video_view frame];
+        winrect.size.height -= f_titleBarHeight;
+        [o_video_view setFrame: winrect];
+    }
+
+    NSRect videoViewFrame = [o_video_view frame];
+    videoViewFrame.origin.y = [[o_controls_bar bottomBarView] frame].size.height;
+    videoViewFrame.size.height -= [[o_controls_bar bottomBarView] frame].size.height;
+    [o_video_view setFrame: videoViewFrame];
+    [[o_controls_bar bottomBarView] setHidden: NO];
+    
+    [self setMovableByWindowBackground: YES];
 }
 
 #pragma mark -

@@ -114,4 +114,9 @@ static const float f_min_video_height = 70.0;
 - (void)enterFullscreen;
 - (void)leaveFullscreen;
 
+/* lion fullscreen handling */
+- (void)windowWillEnterFullScreen:(NSNotification *)notification;
+- (void)windowDidEnterFullScreen:(NSNotification *)notification;
+- (void)windowWillExitFullScreen:(NSNotification *)notification;
+
 @end

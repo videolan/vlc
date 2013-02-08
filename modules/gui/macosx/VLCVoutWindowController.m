@@ -122,7 +122,7 @@
         [[VLCMainWindow sharedInstance] setNonembedded:YES];
         b_nonembedded = YES;
     } else {
-        if ((var_InheritBool(VLCIntf, "embedded-video") && !b_multiple_vout_windows) || b_nativeFullscreenMode) {
+        if ((var_InheritBool(VLCIntf, "embedded-video") && !b_multiple_vout_windows)) {
             // setup embedded video
             o_vout_view = [[[VLCMainWindow sharedInstance] videoView] retain];
             o_new_video_window = [[VLCMainWindow sharedInstance] retain];
@@ -231,6 +231,14 @@
     }
 
     [o_window performSelector:aSel];
+}
+
+- (VLCVideoWindowCommon *)getWindow:(vout_window_t *)p_wnd
+{
+    VLCVideoWindowCommon *o_window = [o_vout_dict objectForKey:[NSValue valueWithPointer:p_wnd]];
+    assert(o_window);
+    return o_window;
+
 }
 
 - (void)updateWindowsUsingBlock:(void (^)(VLCVideoWindowCommon *o_window))windowUpdater

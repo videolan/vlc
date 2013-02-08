@@ -47,6 +47,7 @@
 - (void)removeVoutforDisplay:(NSValue *)o_key;
 
 - (void)updateWindowsControlsBarWithSelector:(SEL)aSel;
+- (VLCVideoWindowCommon *)getWindow:(vout_window_t *)p_wnd;
 - (void)updateWindowsUsingBlock:(void (^)(VLCVideoWindowCommon *o_window))windowUpdater;
 
 - (void)updateWindow:(vout_window_t *)p_wnd withSelector:(SEL)aSel;

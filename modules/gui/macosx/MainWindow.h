@@ -140,11 +140,6 @@
 - (void)hideMouseCursor:(NSTimer *)timer;
 - (void)recreateHideMouseTimer;
 
-/* lion's native fullscreen handling */
-- (void)windowWillEnterFullScreen:(NSNotification *)notification;
-- (void)windowDidEnterFullScreen:(NSNotification *)notification;
-- (void)windowWillExitFullScreen:(NSNotification *)notification;
-
 @end
 
 @interface VLCDetachedVideoWindow : VLCVideoWindowCommon

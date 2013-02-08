@@ -132,6 +132,22 @@
     if ([[o_bottombar_view window] styleMask] & NSResizableWindowMask)
         [o_resize_view removeFromSuperviewWithoutNeedingDisplay];
 
+    
+    // remove fullscreen button for lion fullscreen
+    if (b_nativeFullscreenMode) {
+        float f_width = [o_fullscreen_btn frame].size.width;
+
+        NSRect frame = [o_time_fld frame];
+        frame.origin.x += f_width;
+        [o_time_fld setFrame: frame];
+
+        frame = [o_progress_view frame];
+        frame.size.width = f_width + frame.size.width;
+        [o_progress_view setFrame: frame];
+
+        [o_fullscreen_btn removeFromSuperviewWithoutNeedingDisplay];
+    }
+
 }
 
 #pragma mark -
@@ -382,6 +398,7 @@
 {
     [super awakeFromNib];
 
+
     [o_stop_btn setToolTip: _NS("Stop")];
     [[o_stop_btn cell] accessibilitySetOverrideValue:_NS("Click to stop playback.") forAttribute:NSAccessibilityDescriptionAttribute];
     [[o_stop_btn cell] accessibilitySetOverrideValue:[o_stop_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
@@ -484,11 +501,14 @@
     [o_volume_sld setEnabled: b_mute];
     [o_volume_up_btn setEnabled: b_mute];
 
+
     // remove fullscreen button for lion fullscreen
     if (b_nativeFullscreenMode) {
         NSRect frame;
-        float f_width = [o_fullscreen_btn frame].size.width;
 
+        // == [o_fullscreen_btn frame].size.width;
+        // button is already removed!
+        float f_width = 29.;
 #define moveItem(item) \
 frame = [item frame]; \
 frame.origin.x = f_width + frame.origin.x; \
@@ -499,15 +519,11 @@ frame.origin.x = f_width + frame.origin.x; \
         moveItem(o_volume_sld);
         moveItem(o_volume_track_view);
         moveItem(o_volume_down_btn);
-        moveItem(o_time_fld);
 #undef moveItem
 
-        frame = [o_progress_view frame];
-        frame.size.width = f_width + frame.size.width;
-        [o_progress_view setFrame: frame];
-
-        [o_fullscreen_btn removeFromSuperviewWithoutNeedingDisplay];
+        // time field and progress bar are moved in super method!
     }
+    
 
     b_show_jump_buttons = config_GetInt(VLCIntf, "macosx-show-playback-buttons");
     if (b_show_jump_buttons)
@@ -518,6 +534,7 @@ frame.origin.x = f_width + frame.origin.x; \
         [self removePlaymodeButtons:YES];
 
     [[VLCMain sharedInstance] playbackModeUpdated];
+
 }
 
 #pragma mark -
