@@ -71,10 +71,12 @@
 #   define GLSL_VERSION "100"
 #   define VLCGL_TEXTURE_COUNT 1
 #   define VLCGL_PICTURE_MAX 1
+#   define PRECISION "precision highp float;"
 #else
 #   define GLSL_VERSION "120"
 #   define VLCGL_TEXTURE_COUNT 1
 #   define VLCGL_PICTURE_MAX 128
+#   define PRECISION ""
 #endif
 
 static const vlc_fourcc_t gl_subpicture_chromas[] = {
@@ -194,9 +196,7 @@ static void BuildVertexShader(vout_display_opengl_t *vgl,
     /* Basic vertex shader */
     const char *vertexShader =
         "#version " GLSL_VERSION "\n"
-#if USE_OPENGL_ES
-        "precision highp float;"
-#endif
+        PRECISION
         "varying vec4 TexCoord0,TexCoord1, TexCoord2;"
         "attribute vec4 MultiTexCoord0,MultiTexCoord1,MultiTexCoord2;"
         "attribute vec4 VertexPosition;"
@@ -240,9 +240,7 @@ static void BuildYUVFragmentShader(vout_display_opengl_t *vgl,
     /* Basic linear YUV -> RGB conversion using bilinear interpolation */
     const char *template_glsl_yuv =
         "#version " GLSL_VERSION "\n"
-#if USE_OPENGL_ES
-        "precision highp float;"
-#endif
+        PRECISION
         "uniform sampler2D Texture0;"
         "uniform sampler2D Texture1;"
         "uniform sampler2D Texture2;"
@@ -293,9 +291,7 @@ static void BuildRGBFragmentShader(vout_display_opengl_t *vgl,
     // Simple shader for RGB
     const char *code =
         "#version " GLSL_VERSION "\n"
-#if USE_OPENGL_ES
-        "precision highp float;"
-#endif
+        PRECISION
         "uniform sampler2D Texture[3];"
         "varying vec4 TexCoord0,TexCoord1,TexCoord2;"
         "void main()"
@@ -313,9 +309,7 @@ static void BuildRGBAFragmentShader(vout_display_opengl_t *vgl,
     // Simple shader for RGBA
     const char *code =
         "#version " GLSL_VERSION "\n"
-#if USE_OPENGL_ES
-        "precision highp float;"
-#endif
+        PRECISION
         "uniform sampler2D Texture;"
         "uniform vec4 FillColor;"
         "varying vec4 TexCoord0;"
