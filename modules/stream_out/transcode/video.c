@@ -34,8 +34,8 @@
 #include <vlc_spu.h>
 #include <vlc_modules.h>
 
-#define ENC_FRAMERATE (25 * 1000 + .5)
-#define ENC_FRAMERATE_BASE 1000
+#define ENC_FRAMERATE (25 * 1001 + .5)
+#define ENC_FRAMERATE_BASE 1001
 
 struct decoder_owner_sys_t
 {
