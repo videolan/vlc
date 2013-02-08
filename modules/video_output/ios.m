@@ -333,7 +333,7 @@ static void OpenglSwap(vlc_gl_t *gl)
                                         kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat,
                                         nil];
 
-        _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
+        _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
         NSAssert(_context && [EAGLContext setCurrentContext:_context], @"Creating context");
 
         // This shouldn't need to be done on the main thread.
