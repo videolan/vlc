@@ -659,11 +659,34 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
         }
         glBindTexture(vgl->tex_target, vgl->texture[0][j]);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, picture->p[j].i_pitch / picture->p[j].i_pixel_pitch);
-        glTexSubImage2D(vgl->tex_target, 0,
-                        0, 0,
-                        vgl->fmt.i_width  * vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den,
-                        vgl->fmt.i_height * vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den,
-                        vgl->tex_format, vgl->tex_type, picture->p[j].p_pixels);
+
+#if USE_OPENGL_ES
+        if ( (picture->p[j].i_pitch / picture->p[j].i_pixel_pitch) != (vgl->fmt.i_width  * vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den) ) {
+            uint8_t *new_plane = malloc(picture->p[j].i_pitch*picture->p[j].i_pixel_pitch *vgl->fmt.i_height * vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den);
+            uint8_t *destination = new_plane;
+            const uint8_t *source = picture->p[j].p_pixels;
+            for( unsigned height = 0; height < vgl->fmt.i_height * vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den; height++ )
+            {
+                memcpy( destination, source, vgl->fmt.i_width  * vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den );
+                source +=  picture->p[j].i_pitch*picture->p[j].i_pixel_pitch;
+                destination += vgl->fmt.i_width  * vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den;
+            }
+            glTexSubImage2D( vgl->tex_target, 0,
+                             0, 0,
+                             vgl->fmt.i_width  * vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den,
+                             vgl->fmt.i_height * vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den,
+                             vgl->tex_format, vgl->tex_type, new_plane );
+            free( new_plane );
+        } else {
+#endif
+            glTexSubImage2D(vgl->tex_target, 0,
+                            0, 0,
+                            vgl->fmt.i_width  * vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den,
+                            vgl->fmt.i_height * vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den,
+                            vgl->tex_format, vgl->tex_type, picture->p[j].p_pixels);
+#if USE_OPENGL_ES
+        }
+#endif
     }
 
     int         last_count = vgl->region_count;
