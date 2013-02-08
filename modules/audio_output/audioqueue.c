@@ -214,10 +214,9 @@ static void Play(audio_output_t *p_aout, block_t *p_block)
 
 void UnusedAudioQueueCallback(void * inUserData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
     /* this function does nothing, but needs to be here to make the AudioQueue API happy.
-     * without a callback, it will refuse to create an AudioQueue instance. */
+     * additionally, we clean-up after empty buffers */
     VLC_UNUSED(inUserData);
-    VLC_UNUSED(inAQ);
-    VLC_UNUSED(inBuffer);
+    AudioQueueFreeBuffer(inAQ, inBuffer);
 }
 
 static void Pause(audio_output_t *p_aout, bool pause, mtime_t date)
