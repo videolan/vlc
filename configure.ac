@@ -3164,7 +3164,6 @@ AC_ARG_ENABLE(ios-vout,
 if test "${enable_ios_vout}" = "yes"
 then
   VLC_ADD_PLUGIN([vout_ios])
-  VLC_ADD_CFLAGS([vout_ios], [-DUSE_OPENGL_ES=1])
   VLC_ADD_LIBS([vout_ios], [-Wl,-framework,OpenGLES,-framework,QuartzCore,-framework,UIKit,-framework,Foundation])
 fi
 
