@@ -134,7 +134,7 @@ static int      AudioDeviceSupportsDigital(audio_output_t *, AudioDeviceID);
 static int      AudioStreamSupportsDigital(audio_output_t *, AudioStreamID);
 static int      AudioStreamChangeFormat (audio_output_t *, AudioStreamID, AudioStreamBasicDescription);
 
-static OSStatus RenderCallbackAnalog    (vlc_object_t *, AudioUnitRenderActionFlags *, const AudioTimeStamp *, unsigned int, unsigned int, AudioBufferList *);
+static OSStatus RenderCallbackAnalog    (vlc_object_t *, AudioUnitRenderActionFlags *, const AudioTimeStamp *, UInt32 , UInt32, AudioBufferList *);
 
 static OSStatus RenderCallbackSPDIF     (AudioDeviceID, const AudioTimeStamp *, const void *, const AudioTimeStamp *,
                                           AudioBufferList *, const AudioTimeStamp *, void *);
