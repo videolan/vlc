@@ -1305,8 +1305,15 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         else
         {
             WAVEFORMATEX *p_wf = (WAVEFORMATEX*)p_tk->p_extra_data;
-
-            wf_tag_to_fourcc( GetWLE( &p_wf->wFormatTag ), &p_tk->fmt.i_codec, NULL );
+            if( p_wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE && 
+                p_tk->i_extra_data >= sizeof(WAVEFORMATEXTENSIBLE) )
+            {
+                WAVEFORMATEXTENSIBLE * p_wext = (WAVEFORMATEXTENSIBLE*) p_wf;
+                sf_tag_to_fourcc( &p_wext->SubFormat,  &p_tk->fmt.i_codec, NULL);
+                /* FIXME should we use Samples and dwChannelMask?*/
+            }
+            else
+                wf_tag_to_fourcc( GetWLE( &p_wf->wFormatTag ), &p_tk->fmt.i_codec, NULL );
 
             if( p_tk->fmt.i_codec == VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
                 msg_Err( &sys.demuxer, "Unrecognized wf tag: 0x%x", GetWLE( &p_wf->wFormatTag ) );
