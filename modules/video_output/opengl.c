@@ -346,10 +346,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     bool supports_shaders = strverscmp((const char *)ogl_version, "2.0") >= 0;
 #else
     bool supports_shaders = false;
-
-#ifdef __APPLE__
-    supports_shaders = true;
-#endif
 #endif
 
     vgl->CreateShader  = (PFNGLCREATESHADERPROC)vlc_gl_GetProcAddress(vgl->gl, "glCreateShader");
@@ -387,10 +383,12 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
 
 #ifdef __APPLE__
+#if USE_OPENGL_ES
     /* work-around an iOS 6 bug */
     if (kCFCoreFoundationVersionNumber >= 786.)
         max_texture_units = 8;
     supports_shaders = true;
+#endif
 #endif
 
     /* Initialize with default chroma */
