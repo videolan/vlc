@@ -194,7 +194,8 @@ static void BuildVertexShader(vout_display_opengl_t *vgl,
     /* Basic vertex shader */
     const char *vertexShader =
         "#version " GLSL_VERSION "\n"
-        "varying   vec4 TexCoord0,TexCoord1, TexCoord2;"
+        "precision highp float;"
+        "varying vec4 TexCoord0,TexCoord1, TexCoord2;"
         "attribute vec4 MultiTexCoord0,MultiTexCoord1,MultiTexCoord2;"
         "attribute vec4 VertexPosition;"
         "void main() {"
@@ -237,6 +238,7 @@ static void BuildYUVFragmentShader(vout_display_opengl_t *vgl,
     /* Basic linear YUV -> RGB conversion using bilinear interpolation */
     const char *template_glsl_yuv =
         "#version " GLSL_VERSION "\n"
+        "precision highp float;"
         "uniform sampler2D Texture0;"
         "uniform sampler2D Texture1;"
         "uniform sampler2D Texture2;"
@@ -287,6 +289,7 @@ static void BuildRGBFragmentShader(vout_display_opengl_t *vgl,
     // Simple shader for RGB
     const char *code =
         "#version " GLSL_VERSION "\n"
+        "precision highp float;"
         "uniform sampler2D Texture[3];"
         "varying vec4 TexCoord0,TexCoord1,TexCoord2;"
         "void main()"
@@ -304,6 +307,7 @@ static void BuildRGBAFragmentShader(vout_display_opengl_t *vgl,
     // Simple shader for RGBA
     const char *code =
         "#version " GLSL_VERSION "\n"
+        "precision highp float;"
         "uniform sampler2D Texture;"
         "uniform vec4 FillColor;"
         "varying vec4 TexCoord0;"
@@ -342,9 +346,9 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     bool supports_shaders = strverscmp((const char *)ogl_version, "2.0") >= 0;
 #else
     bool supports_shaders = false;
+
 #ifdef __APPLE__
-    if (kCFCoreFoundationVersionNumber >= 786.)
-        supports_shaders = true;
+    supports_shaders = true;
 #endif
 #endif
 
@@ -382,6 +386,13 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GLint max_texture_units = 0;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
 
+#ifdef __APPLE__
+    /* work-around an iOS 6 bug */
+    if (kCFCoreFoundationVersionNumber >= 786.)
+        max_texture_units = 8;
+    supports_shaders = true;
+#endif
+
     /* Initialize with default chroma */
     vgl->fmt = *fmt;
     vgl->fmt.i_chroma = VLC_CODEC_RGB32;
@@ -401,8 +412,10 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     /* Use YUV if possible and needed */
     bool need_fs_yuv = false;
     float yuv_range_correction = 1.0;
+
     if (max_texture_units >= 3 && supports_shaders &&
         vlc_fourcc_IsYUV(fmt->i_chroma) && !vlc_fourcc_IsYUV(vgl->fmt.i_chroma)) {
+        printf("passed check\n");
         const vlc_fourcc_t *list = vlc_fourcc_GetYUVFallback(fmt->i_chroma);
         while (*list) {
             const vlc_chroma_description_t *dsc = vlc_fourcc_GetChromaDescription(*list);
