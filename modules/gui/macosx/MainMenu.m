@@ -1356,15 +1356,14 @@ static VLCMainMenu *_o_sharedInstance = nil;
                 if ([o_title isEqualToString: _NS("Float on Top")])
                     [o_mi setState: var_GetBool(p_vout, "video-on-top")];
 
-                bEnabled = TRUE;
+                if ([o_title isEqualToString: _NS("Fullscreen")])
+                    [o_mi setState: var_GetBool(p_vout, "fullscreen")];
 
+                bEnabled = TRUE;
                 vlc_object_release(p_vout);
             }
         }
-        if ([o_title isEqualToString: _NS("Fullscreen")]) {
-            [o_mi setState: var_GetBool(p_playlist, "fullscreen")];
-            bEnabled = TRUE;
-        }
+        
         [self setupMenus]; /* Make sure video menu is up to date */
     }
 
