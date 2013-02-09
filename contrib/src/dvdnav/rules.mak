@@ -26,12 +26,12 @@ $(TARBALLS)/libdvdnav-git.tar.xz:
 
 dvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.xz .sum-dvdnav
 	$(UNPACK)
+	cd $(UNPACK_DIR) && autoreconf -ivf
 	$(MOVE)
 
 DEPS_dvdnav = dvdcss dvdread
 
 .dvdnav: dvdnav .dvdcss .dvdread
-	cd $< && sh autogen.sh noconfig
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-examples
 	cd $< && $(MAKE) install
 	touch $@

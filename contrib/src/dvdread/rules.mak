@@ -29,12 +29,12 @@ dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.xz .sum-dvdread
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/dvdread/dvdread-win32.patch
 endif
+	cd $(UNPACK_DIR) && autoreconf -ivf
 	$(MOVE)
 
 DEPS_dvdread = dvdcss
 
 .dvdread: dvdread .dvdcss
-	cd $< && sh autogen.sh noconfig
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-libdvdcss
 	cd $< && $(MAKE) install
 	touch $@
