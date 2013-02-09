@@ -987,12 +987,6 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
 
 - (IBAction)interfaceSettingChanged:(id)sender
 {
-    if (sender == o_intf_embedded_ckb && [o_intf_embedded_ckb state] == NSOffState)
-        [o_intf_nativefullscreen_ckb setState: NSOffState];
-
-    if (sender == o_intf_nativefullscreen_ckb && [o_intf_nativefullscreen_ckb state] == NSOnState)
-        [o_intf_embedded_ckb setState: NSOnState];
-
     b_intfSettingChanged = YES;
 }
 
