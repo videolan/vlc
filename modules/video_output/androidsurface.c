@@ -115,8 +115,7 @@ struct vout_display_sys_t {
     int i_sar_den;
 };
 
-struct picture_sys_t
-{
+struct picture_sys_t {
     void *surf;
     SurfaceInfo info;
     vout_display_sys_t *sys;
@@ -127,7 +126,8 @@ static void AndroidUnlockSurface(picture_t *);
 
 static vlc_mutex_t single_instance = VLC_STATIC_MUTEX;
 
-static inline void *LoadSurface(const char *psz_lib, vout_display_sys_t *sys) {
+static inline void *LoadSurface(const char *psz_lib, vout_display_sys_t *sys)
+{
     void *p_library = dlopen(psz_lib, RTLD_NOW);
     if (p_library) {
         sys->s_lock = (Surface_lock)(dlsym(p_library, ANDROID_SYM_S_LOCK));
@@ -142,7 +142,8 @@ static inline void *LoadSurface(const char *psz_lib, vout_display_sys_t *sys) {
     return NULL;
 }
 
-static void *InitLibrary(vout_display_sys_t *sys) {
+static void *InitLibrary(vout_display_sys_t *sys)
+{
     void *p_library;
     if ((p_library = LoadSurface("libsurfaceflinger_client.so", sys)))
         return p_library;
@@ -151,7 +152,8 @@ static void *InitLibrary(vout_display_sys_t *sys) {
     return LoadSurface("libui.so", sys);
 }
 
-static int Open(vlc_object_t *p_this) {
+static int Open(vlc_object_t *p_this)
+{
     vout_display_t *vd = (vout_display_t *)p_this;
     vout_display_sys_t *sys;
     void *p_library;
@@ -270,7 +272,8 @@ enomem:
     return VLC_ENOMEM;
 }
 
-static void Close(vlc_object_t *p_this) {
+static void Close(vlc_object_t *p_this)
+{
     vout_display_t *vd = (vout_display_t *)p_this;
     vout_display_sys_t *sys = vd->sys;
 
@@ -280,7 +283,8 @@ static void Close(vlc_object_t *p_this) {
     vlc_mutex_unlock(&single_instance);
 }
 
-static picture_pool_t *Pool(vout_display_t *vd, unsigned count) {
+static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
+{
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(count);
     return sys->pool;
@@ -314,7 +318,8 @@ static void SetupPictureYV12( SurfaceInfo* p_surfaceInfo, picture_t *p_picture )
     }
 }
 
-static int  AndroidLockSurface(picture_t *picture) {
+static int  AndroidLockSurface(picture_t *picture)
+{
     picture_sys_t *picsys = picture->p_sys;
     vout_display_sys_t *sys = picsys->sys;
     SurfaceInfo *info;
@@ -359,7 +364,8 @@ static int  AndroidLockSurface(picture_t *picture) {
     return VLC_SUCCESS;
 }
 
-static void AndroidUnlockSurface(picture_t *picture) {
+static void AndroidUnlockSurface(picture_t *picture)
+{
     picture_sys_t *picsys = picture->p_sys;
     vout_display_sys_t *sys = picsys->sys;
 
@@ -368,29 +374,32 @@ static void AndroidUnlockSurface(picture_t *picture) {
     jni_UnlockAndroidSurface();
 }
 
-static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture) {
+static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
+{
     VLC_UNUSED(vd);
     VLC_UNUSED(subpicture);
     picture_Release(picture);
 }
 
-static int Control(vout_display_t *vd, int query, va_list args) {
+static int Control(vout_display_t *vd, int query, va_list args)
+{
     VLC_UNUSED(args);
 
     switch (query) {
-        case VOUT_DISPLAY_CHANGE_FULLSCREEN:
-        case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
-        case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-        case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
-        case VOUT_DISPLAY_CHANGE_ZOOM:
-        case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
-        case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        case VOUT_DISPLAY_GET_OPENGL:
-            return VLC_EGENERIC;
-        case VOUT_DISPLAY_HIDE_MOUSE:
-            return VLC_SUCCESS;
-        default:
-            msg_Err(vd, "Unknown request in android vout display");
-            return VLC_EGENERIC;
+    case VOUT_DISPLAY_HIDE_MOUSE:
+        return VLC_SUCCESS;
+
+    default:
+        msg_Err(vd, "Unknown request in android vout display");
+
+    case VOUT_DISPLAY_CHANGE_FULLSCREEN:
+    case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
+    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+    case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
+    case VOUT_DISPLAY_CHANGE_ZOOM:
+    case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+    case VOUT_DISPLAY_GET_OPENGL:
+        return VLC_EGENERIC;
     }
 }
