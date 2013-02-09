@@ -127,6 +127,11 @@ void Playtree::onUpdateItem( int id )
                 tree_update::ItemUpdated, IteratorVisible( it, this ) );
             notify( &descr );
         }
+        else
+        {
+            delete pName;
+        }
+
     }
     else
     {
