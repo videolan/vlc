@@ -116,9 +116,7 @@ void Playtree::onUpdateItem( int id )
             return;
         }
 
-        char *psz_name = input_item_GetTitleFbName( pNode->p_input );
-        UString *pName = new UString( getIntf(), psz_name );
-        free(psz_name);
+        UString *pName = getTitle( pNode->p_input );
         playlist_Unlock( m_pPlaylist );
 
         if( *pName != *(it->getString()) )
@@ -219,10 +217,7 @@ void Playtree::onAppend( playlist_add_t *p_add )
         for( pos = 0; pos < pItem->p_parent->i_children; pos++ )
             if( pItem->p_parent->pp_children[pos] == pItem ) break;
 
-        char *psz_name = input_item_GetTitleFbName( pItem->p_input );
-        UString *pName = new UString( getIntf(), psz_name );
-        free( psz_name );
-
+        UString *pName = getTitle( pItem->p_input );
         playlist_item_t* current = playlist_CurrentPlayingItem( m_pPlaylist );
 
         Iterator it = it_node->add(
@@ -242,7 +237,7 @@ void Playtree::onAppend( playlist_add_t *p_add )
 
 void Playtree::buildNode( playlist_item_t *pNode, VarTree &rTree )
 {
-    UString *pName = new UString( getIntf(), pNode->p_input->psz_name );
+    UString *pName = getTitle( pNode->p_input );
     Iterator it = rTree.add(
         pNode->i_id, UStringPtr( pName ), false,
         playlist_CurrentPlayingItem(m_pPlaylist) == pNode,
@@ -353,6 +348,23 @@ void Playtree::insertItems( VarTree& elem, const list<string>& files, bool start
 fin:
     playlist_Unlock( m_pPlaylist );
 }
+
+
+UString* Playtree::getTitle( input_item_t *pItem )
+{
+    char *psz_name = input_item_GetTitle( pItem );
+    if( EMPTY_STR( psz_name ) )
+    {
+        free( psz_name );
+        psz_name = input_item_GetName( pItem );
+    }
+    if( !psz_name )
+        psz_name = strdup ( "" );
+    UString *pTitle = new UString( getIntf(), psz_name );
+    free( psz_name );
+    return pTitle;
+}
+
 
 VarTree::Iterator Playtree::findById( int id )
 {

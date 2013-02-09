@@ -79,6 +79,9 @@ private:
 
     /// Update Node's children
     void buildNode( playlist_item_t *p_node, VarTree &m_pNode );
+
+    /// title for an item
+    UString* getTitle( input_item_t *pItem );
 };
 
 #endif
