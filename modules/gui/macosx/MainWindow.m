@@ -158,7 +158,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (!OSX_SNOW_LEOPARD)
         b_nativeFullscreenMode = var_InheritBool(VLCIntf, "macosx-nativefullscreenmode");
 #endif
-    t_hide_mouse_timer = nil;
     [self useOptimizedDrawing: YES];
 
     [[o_search_fld cell] setPlaceholderString: _NS("Search")];
@@ -754,36 +753,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         if (!b_videoPlayback)
             [o_fspanel setNonActive: nil];
     }
-}
-
-//  Called automatically if window's acceptsMouseMovedEvents property is true
-- (void)mouseMoved:(NSEvent *)theEvent
-{
-    if (b_fullscreen)
-        [self recreateHideMouseTimer];
-
-    [super mouseMoved: theEvent];
-}
-
-- (void)recreateHideMouseTimer
-{
-    if (t_hide_mouse_timer != nil) {
-        [t_hide_mouse_timer invalidate];
-        [t_hide_mouse_timer release];
-    }
-
-    t_hide_mouse_timer = [NSTimer scheduledTimerWithTimeInterval:2
-                                                          target:self
-                                                        selector:@selector(hideMouseCursor:)
-                                                        userInfo:nil
-                                                         repeats:NO];
-    [t_hide_mouse_timer retain];
-}
-
-//  NSTimer selectors require this function signature as per Apple's docs
-- (void)hideMouseCursor:(NSTimer *)timer
-{
-    [NSCursor setHiddenUntilMouseMoves: YES];
 }
 
 #pragma mark -

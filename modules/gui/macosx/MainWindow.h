@@ -92,8 +92,6 @@
 
     BOOL b_podcastView_displayed;
 
-    NSTimer *t_hide_mouse_timer;
-
     VLCColorView * o_color_backdrop;
 
     NSRect frameBeforePlayback;
@@ -132,9 +130,6 @@
 - (void)showFullscreenController;
 
 - (void)setVideoplayEnabled;
-
-- (void)hideMouseCursor:(NSTimer *)timer;
-- (void)recreateHideMouseTimer;
 
 @end
 

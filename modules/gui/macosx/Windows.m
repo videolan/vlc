@@ -547,6 +547,39 @@
 
 
 #pragma mark -
+#pragma mark Mouse cursor handling
+
+//  NSTimer selectors require this function signature as per Apple's docs
+- (void)hideMouseCursor:(NSTimer *)timer
+{
+    [NSCursor setHiddenUntilMouseMoves: YES];
+}
+
+- (void)recreateHideMouseTimer
+{
+    if (t_hide_mouse_timer != nil) {
+        [t_hide_mouse_timer invalidate];
+        [t_hide_mouse_timer release];
+    }
+
+    t_hide_mouse_timer = [NSTimer scheduledTimerWithTimeInterval:2
+                                                          target:self
+                                                        selector:@selector(hideMouseCursor:)
+                                                        userInfo:nil
+                                                         repeats:NO];
+    [t_hide_mouse_timer retain];
+}
+
+//  Called automatically if window's acceptsMouseMovedEvents property is true
+- (void)mouseMoved:(NSEvent *)theEvent
+{
+    if (b_fullscreen)
+        [self recreateHideMouseTimer];
+
+    [super mouseMoved: theEvent];
+}
+
+#pragma mark -
 #pragma mark Lion native fullscreen handling
 
 - (void)becomeKeyWindow
