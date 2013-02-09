@@ -129,34 +129,40 @@ static vlc_mutex_t single_instance = VLC_STATIC_MUTEX;
 static inline void *LoadSurface(const char *psz_lib, vout_display_sys_t *sys)
 {
     void *p_library = dlopen(psz_lib, RTLD_NOW);
-    if (p_library) {
-        sys->s_lock = (Surface_lock)(dlsym(p_library, ANDROID_SYM_S_LOCK));
-        sys->s_lock2 = (Surface_lock2)(dlsym(p_library, ANDROID_SYM_S_LOCK2));
-        sys->s_unlockAndPost =
-            (Surface_unlockAndPost)(dlsym(p_library, ANDROID_SYM_S_UNLOCK));
-        if ((sys->s_lock || sys->s_lock2) && sys->s_unlockAndPost) {
-            return p_library;
-        }
-        dlclose(p_library);
-    }
+    if (!p_library)
+        return NULL;
+
+    sys->s_lock = (Surface_lock)(dlsym(p_library, ANDROID_SYM_S_LOCK));
+    sys->s_lock2 = (Surface_lock2)(dlsym(p_library, ANDROID_SYM_S_LOCK2));
+    sys->s_unlockAndPost =
+        (Surface_unlockAndPost)(dlsym(p_library, ANDROID_SYM_S_UNLOCK));
+
+    if ((sys->s_lock || sys->s_lock2) && sys->s_unlockAndPost)
+        return p_library;
+
+    dlclose(p_library);
     return NULL;
 }
 
 static void *InitLibrary(vout_display_sys_t *sys)
 {
-    void *p_library;
-    if ((p_library = LoadSurface("libsurfaceflinger_client.so", sys)))
-        return p_library;
-    if ((p_library = LoadSurface("libgui.so", sys)))
-        return p_library;
-    return LoadSurface("libui.so", sys);
+    static const char *libs[] = {
+        "libsurfaceflinger_client.so",
+        "libgui.so",
+        "libui.so"
+    };
+
+    for (size_t i = 0; i < sizeof(libs) / sizeof(*libs); i++) {
+        void *lib = LoadSurface(libs[i], sys);
+        if (lib)
+            return lib;
+    }
+    return NULL;
 }
 
 static int Open(vlc_object_t *p_this)
 {
     vout_display_t *vd = (vout_display_t *)p_this;
-    vout_display_sys_t *sys;
-    void *p_library;
 
     /* */
     if (vlc_mutex_trylock(&single_instance) != 0) {
@@ -165,15 +171,15 @@ static int Open(vlc_object_t *p_this)
     }
 
     /* Allocate structure */
-    sys = (struct vout_display_sys_t*) calloc(1, sizeof(*sys));
+    vout_display_sys_t *sys = (struct vout_display_sys_t*) calloc(1, sizeof(*sys));
     if (!sys) {
         vlc_mutex_unlock(&single_instance);
         return VLC_ENOMEM;
     }
 
     /* */
-    sys->p_library = p_library = InitLibrary(sys);
-    if (!p_library) {
+    sys->p_library = InitLibrary(sys);
+    if (!sys->p_library) {
         free(sys);
         msg_Err(vd, "Could not initialize libui.so/libgui.so/libsurfaceflinger_client.so!");
         vlc_mutex_unlock(&single_instance);
@@ -266,8 +272,8 @@ static int Open(vlc_object_t *p_this)
 
 enomem:
     free(rsc->p_sys);
+    dlclose(sys->p_library);
     free(sys);
-    dlclose(p_library);
     vlc_mutex_unlock(&single_instance);
     return VLC_ENOMEM;
 }
@@ -285,9 +291,9 @@ static void Close(vlc_object_t *p_this)
 
 static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
-    vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(count);
-    return sys->pool;
+
+    return vd->sys->pool;
 }
 
 #define ALIGN_16_PIXELS( x ) ( ( ( x ) + 15 ) / 16 * 16 )
@@ -376,6 +382,8 @@ static void AndroidUnlockSurface(picture_t *picture)
 
 static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
+    /* FIXME ? */
+
     VLC_UNUSED(vd);
     VLC_UNUSED(subpicture);
     picture_Release(picture);
