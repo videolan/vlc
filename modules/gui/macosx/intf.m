@@ -1264,14 +1264,18 @@ static VLCMain *_o_sharedMainInstance = nil;
         var_SetBool(p_playlist, "fullscreen", b_fullscreen);
 
     if (b_nativeFullscreenMode) {
-        // this is called twice in certain situations, so only toogle if we really need to
-        if ((b_fullscreen && !([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen)) ||
-            (!b_fullscreen &&  ([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen))) {
-            if(p_wnd) {
-                VLCVideoWindowCommon *window = [o_vout_controller getWindow: p_wnd];
-                [window toggleFullScreen:self];
-            } else
-                [o_mainwindow toggleFullScreen: self]; // TODO
+        VLCVideoWindowCommon *o_active_window = nil;
+        if(p_wnd)
+            o_active_window = [o_vout_controller getWindow: p_wnd];
+        else
+            o_active_window = o_mainwindow;
+
+        // fullscreen might be triggered twice (vout event)
+        // so ignore duplicate events here
+        if((b_fullscreen && ![o_active_window fullscreen]) ||
+            (!b_fullscreen && [o_active_window fullscreen])) {
+
+            [o_active_window toggleFullScreen:self];
         }
 
         if (b_fullscreen)

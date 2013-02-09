@@ -184,12 +184,7 @@
 {
     b_nonActive = NO;
 
-    id currentWindow = [NSApp keyWindow];
-    if ([currentWindow respondsToSelector:@selector(hasActiveVideo)]) {
-        if ([currentWindow hasActiveVideo]) {
-            [[VLCMain sharedInstance] showFullscreenController];
-        }
-    }
+    [[VLCMain sharedInstance] showFullscreenController];
 }
 
 /* This routine is called repeatedly to fade in the window */

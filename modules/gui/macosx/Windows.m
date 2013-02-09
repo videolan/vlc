@@ -35,6 +35,10 @@
  *****************************************************************************/
 
 @implementation VLCWindow
+
+@synthesize hasActiveVideo=b_has_active_video;
+@synthesize fullscreen=b_fullscreen;
+
 - (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)styleMask
                   backing:(NSBackingStoreType)backingType defer:(BOOL)flag
 {
@@ -239,7 +243,6 @@
 
 @synthesize videoView=o_video_view;
 @synthesize controlsBar=o_controls_bar;
-@synthesize hasActiveVideo=b_has_active_video;
 
 #pragma mark -
 #pragma mark Init
@@ -503,7 +506,7 @@
 
 - (void)resizeWindow
 {
-    if ([[VLCMainWindow sharedInstance] fullscreen])
+    if ([self fullscreen])
         return;
 
     NSRect window_rect = [self getWindowRectForProposedVideoViewSize:nativeVideoSize];
@@ -524,7 +527,7 @@
         return proposedFrameSize;
 
     // needed when entering lion fullscreen mode
-    if ([[VLCMainWindow sharedInstance] fullscreen])
+    if ([self fullscreen])
         return proposedFrameSize;
 
     if ([[VLCCoreInteraction sharedInstance] aspectRatioIsLocked]) {
@@ -545,10 +548,24 @@
 
 #pragma mark -
 #pragma mark Lion native fullscreen handling
+
+- (void)becomeKeyWindow
+{
+    [super becomeKeyWindow];
+
+    // change fspanel state for the case when multiple windows are in fullscreen
+    if ([self hasActiveVideo] && [self fullscreen])
+        [[[VLCMainWindow sharedInstance] fsPanel] setActive:nil];
+    else
+        [[[VLCMainWindow sharedInstance] fsPanel] setNonActive:nil];
+}
+
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
     // workaround, see #6668
     [NSApp setPresentationOptions:(NSApplicationPresentationFullScreen | NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
+
+    [self setFullscreen: YES];
 
     var_SetBool(pl_Get(VLCIntf), "fullscreen", true);
 
@@ -561,7 +578,6 @@
     }
 
     [o_video_view setFrame: [[self contentView] frame]];
-    [[VLCMainWindow sharedInstance] setFullscreen: YES];
 
     [[VLCMainWindow sharedInstance] recreateHideMouseTimer];
     i_originalLevel = [self level];
@@ -609,6 +625,8 @@
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
 {
+    [self setFullscreen: NO];
+
     var_SetBool(pl_Get(VLCIntf), "fullscreen", false);
 
     if ([self hasActiveVideo]) {
@@ -621,10 +639,9 @@
 
     [NSCursor setHiddenUntilMouseMoves: NO];
     [[[VLCMainWindow sharedInstance] fsPanel] setNonActive: nil];
+    
     [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: i_originalLevel];
     [self setLevel:i_originalLevel];
-
-    [[VLCMainWindow sharedInstance] setFullscreen: NO];
 
     if (b_dark_interface) {
         NSRect winrect;
@@ -712,6 +729,8 @@
         [o_fullscreen_window setBackgroundColor: [NSColor blackColor]];
         [o_fullscreen_window setCanBecomeKeyWindow: YES];
         [o_fullscreen_window setCanBecomeMainWindow: YES];
+        [o_fullscreen_window setHasActiveVideo: YES];
+        [o_fullscreen_window setFullscreen: YES];
 
         if (![self isVisible] || [self alphaValue] == 0.0) {
             /* We don't animate if we are not visible, instead we
@@ -761,7 +780,7 @@
     }
 
     /* We are in fullscreen (and no animation is running) */
-    if ([[VLCMainWindow sharedInstance] fullscreen]) {
+    if ([self fullscreen]) {
         /* Make sure we are hidden */
         [self orderOut: self];
 
@@ -834,7 +853,7 @@
     if ([self isVisible])
         [self orderOut: self];
 
-    [[VLCMainWindow sharedInstance] setFullscreen:YES];
+    [self setFullscreen:YES];
     [self unlockFullscreenAnimation];
 }
 
@@ -950,7 +969,7 @@
 
 - (void)hasEndedFullscreen
 {
-    [[VLCMainWindow sharedInstance] setFullscreen:NO];
+    [self setFullscreen:NO];
 
     /* This function is private and should be only triggered at the end of the fullscreen change animation */
     /* Make sure we don't see the o_video_view disappearing of the screen during this operation */

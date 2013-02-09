@@ -92,9 +92,6 @@
 
     BOOL b_podcastView_displayed;
 
-    /* set to yes if we are fullscreen and all animations are over */
-    BOOL b_fullscreen;
-
     NSTimer *t_hide_mouse_timer;
 
     VLCColorView * o_color_backdrop;
@@ -102,7 +99,6 @@
     NSRect frameBeforePlayback;
 }
 + (VLCMainWindow *)sharedInstance;
-@property (readwrite) BOOL fullscreen;
 @property (readonly) BOOL nativeFullscreenMode;
 @property (readwrite) BOOL nonembedded;
 

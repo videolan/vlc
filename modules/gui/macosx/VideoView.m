@@ -319,7 +319,7 @@
     // This is the result of [NSEvent standardMagnificationThreshold].
     // Unfortunately, this is a private API, currently.
     CGFloat f_threshold = 0.3;
-    BOOL b_fullscreen = [[VLCMainWindow sharedInstance] fullscreen];
+    BOOL b_fullscreen = [(VLCVideoWindowCommon *)[self window] fullscreen];
 
     if ((f_cumulated_magnification > f_threshold && !b_fullscreen) || (f_cumulated_magnification < -f_threshold && b_fullscreen)) {
         f_cumulated_magnification = 0.0;

@@ -40,9 +40,21 @@
     BOOL b_canBecomeMainWindow;
     BOOL b_isset_canBecomeMainWindow;
     NSViewAnimation *o_current_animation;
+
+    BOOL              b_has_active_video;
+
+    /* 
+     * normal fullscreen: YES when all animations are over
+     * lion fullscreen:   toggled when fs animation starts
+     * for fullscreen window: always YES
+     */
+    BOOL              b_fullscreen;
 }
 @property (readwrite) BOOL canBecomeKeyWindow;
 @property (readwrite) BOOL canBecomeMainWindow;
+
+@property (nonatomic, readwrite) BOOL hasActiveVideo;
+@property (nonatomic, readwrite) BOOL fullscreen;
 
 /* animate mode is only supported in >=10.4 */
 - (void)orderFront: (id)sender animate: (BOOL)animate;
@@ -95,12 +107,11 @@ static const float f_min_video_height = 70.0;
     NSRecursiveLock * o_animation_lock;
     NSInteger i_originalLevel;
 
-    BOOL              b_has_active_video;
+    NSTimer *t_hide_mouse_timer;
 }
 
 @property (nonatomic, assign) VLCVoutView* videoView;
 @property (readonly) VLCControlsBarCommon* controlsBar;
-@property (nonatomic, readwrite) BOOL hasActiveVideo;
 
 - (void)setWindowLevel:(NSInteger)i_state;
 

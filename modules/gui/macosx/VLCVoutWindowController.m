@@ -198,10 +198,12 @@
         return;
     }
 
-    if ([[VLCMainWindow sharedInstance] fullscreen] && ![[VLCMainWindow sharedInstance] nativeFullscreenMode])
+    if ([o_window fullscreen] && ![[VLCMainWindow sharedInstance] nativeFullscreenMode])
         [o_window leaveFullscreen];
 
-    if ([[VLCMainWindow sharedInstance] fullscreen] && [[VLCMainWindow sharedInstance] nativeFullscreenMode])
+    if (![NSStringFromClass([o_window class]) isEqualToString:@"VLCMainWindow"] &&
+            [o_window fullscreen] &&
+            [[VLCMainWindow sharedInstance] nativeFullscreenMode])
         [o_window toggleFullScreen: self];
 
 

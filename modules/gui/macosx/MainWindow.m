@@ -56,7 +56,6 @@
 
 @implementation VLCMainWindow
 
-@synthesize fullscreen=b_fullscreen;
 @synthesize nativeFullscreenMode=b_nativeFullscreenMode;
 @synthesize nonembedded=b_nonembedded;
 @synthesize fsPanel=o_fspanel;
@@ -809,8 +808,18 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)showFullscreenController
 {
-     if (b_fullscreen && [[VLCMain sharedInstance] activeVideoPlayback])
-        [o_fspanel fadeIn];
+
+    id currentWindow = [NSApp keyWindow];
+    if ([currentWindow respondsToSelector:@selector(hasActiveVideo)] && [currentWindow hasActiveVideo]) {
+        if ([currentWindow respondsToSelector:@selector(fullscreen)] && [currentWindow fullscreen]) {
+
+            if ([[VLCMain sharedInstance] activeVideoPlayback])
+                [o_fspanel fadeIn];
+        }
+
+    }
+    
+    
 }
 
 - (void)makeKeyAndOrderFront: (id)sender
