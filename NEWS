@@ -11,7 +11,7 @@ Important changes for packagers:
 
 Core:
  * Audio core rewrite
- * Fix support for .001, .00x splitted files on Windows
+ * Fix support for .001, .00x split files on Windows
 
 Decoders:
  * Support for OPUS via libopus.
@@ -58,7 +58,7 @@ Audio output:
  * Android AudioTrack audio output support
  * OS X Auhal output support for 6.1 and 7.1 playback and layouts
  * Rewrite of OSS module to support OSSv4
- * Mac OS X Auhal output support for multi-buffer output devices
+ * OS X Auhal output support for multi-buffer output devices
    This fix was facilitated through a hardware lending by TEAC Europe GmbH
    distributing such devices under the brand "TASCAM" (US-122, US-144, etc.).
  * Rewrite of AudioQueue module for iOS (and OS X)
@@ -71,6 +71,7 @@ Audio Filters:
 Video Outputs:
  * DecklinkOutput: New module using Blackmagic cards
  * OpenGL: use glsl instead of ARB to do the YUV->RGB conversions
+ * OpenGLES: add support for color conversation shaders on Android and iOS
  * Fix the power management issue on Windows for standby management
 
 Video Filters:
@@ -88,7 +89,7 @@ Stream Output:
 Interfaces:
  * configurable password for the HTTP server.
  * .hosts removed from the HTTP server.
- * fixed Lua command line interface console mode under Windows.
+ * fix Lua command line interface console mode under Windows.
  * Better support for MCE remotes on Windows
  * Hotkey support for TS program selection
  * Rewrite of D-Bus inhibit interface
@@ -97,11 +98,11 @@ Services discovery:
  * UPnP A/V subtitles
  * Support for multiple UPnP resources on a single item
 
-Mac OS X Port:
+OS X Port:
  * Discontinued support for PowerPC-based and 32bit Intel-based Macs
  * VLC requires Mac OS X 10.6 or later now
 
-Mac OS X Interface:
+OS X Interface:
  * add support for multiple video outputs
  * add accessibility support to playback windows, open panel and fullscreen
    controller
