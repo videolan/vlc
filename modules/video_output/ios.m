@@ -157,11 +157,11 @@ static int Open(vlc_object_t *this)
     sys->gl.lock = OpenglClean; // We don't do locking, but sometimes we need to cleanup the framebuffer
     sys->gl.unlock = NULL;
     sys->gl.swap = OpenglSwap;
-	sys->gl.getProcAddress = OurGetProcAddress;
+    sys->gl.getProcAddress = OurGetProcAddress;
     sys->gl.sys = sys;
 
-	sys->vgl = vout_display_opengl_New(&vd->fmt, NULL, &sys->gl);
-	if (!sys->vgl)
+    sys->vgl = vout_display_opengl_New(&vd->fmt, NULL, &sys->gl);
+    if (!sys->vgl)
     {
         sys->gl.sys = NULL;
         goto error;
@@ -242,7 +242,7 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *sub
     vout_display_opengl_Display(sys->vgl, &vd->fmt );
     picture_Release (pic);
     sys->has_first_frame = true;
-	(void)subpicture;
+    (void)subpicture;
 }
 
 static int Control (vout_display_t *vd, int query, va_list ap)
