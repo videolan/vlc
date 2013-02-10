@@ -243,6 +243,7 @@
 
 @synthesize videoView=o_video_view;
 @synthesize controlsBar=o_controls_bar;
+@synthesize enteringFullscreenTransition=b_entering_fullscreen_transition;
 
 #pragma mark -
 #pragma mark Init
@@ -527,7 +528,7 @@
         return proposedFrameSize;
 
     // needed when entering lion fullscreen mode
-    if ([self fullscreen])
+    if (b_entering_fullscreen_transition || [self fullscreen])
         return proposedFrameSize;
 
     if ([[VLCCoreInteraction sharedInstance] aspectRatioIsLocked]) {
@@ -598,7 +599,7 @@
     // workaround, see #6668
     [NSApp setPresentationOptions:(NSApplicationPresentationFullScreen | NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
 
-    [self setFullscreen: YES];
+    b_entering_fullscreen_transition = YES;
 
     var_SetBool(pl_Get(VLCIntf), "fullscreen", true);
 
@@ -640,6 +641,9 @@
     // Indeed, we somehow can have an "inactive" fullscreen (but a visible window!).
     // But this creates some problems when leaving fs over remote intfs, so activate app here.
     [NSApp activateIgnoringOtherApps:YES];
+
+    [self setFullscreen: YES];
+    b_entering_fullscreen_transition = NO;
 
     if ([self hasActiveVideo]) {
         [[[VLCMainWindow sharedInstance] fsPanel] setVoutWasUpdated: self];

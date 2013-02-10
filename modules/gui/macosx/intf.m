@@ -1272,7 +1272,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
         // fullscreen might be triggered twice (vout event)
         // so ignore duplicate events here
-        if((b_fullscreen && ![o_active_window fullscreen]) ||
+        if((b_fullscreen && !([o_active_window fullscreen] || [o_active_window enteringFullscreenTransition])) ||
             (!b_fullscreen && [o_active_window fullscreen])) {
 
             [o_active_window toggleFullScreen:self];

@@ -44,8 +44,7 @@
     BOOL              b_has_active_video;
 
     /* 
-     * normal fullscreen: YES when all animations are over
-     * lion fullscreen:   toggled when fs animation starts
+     * YES when all animations are over
      * for fullscreen window: always YES
      */
     BOOL              b_fullscreen;
@@ -108,10 +107,14 @@ static const float f_min_video_height = 70.0;
     NSInteger i_originalLevel;
 
     NSTimer *t_hide_mouse_timer;
+
+    // true when the window is in transition for entering lion fullscreen
+    BOOL b_entering_fullscreen_transition;
 }
 
 @property (nonatomic, assign) VLCVoutView* videoView;
 @property (readonly) VLCControlsBarCommon* controlsBar;
+@property (readonly) BOOL enteringFullscreenTransition;
 
 - (void)setWindowLevel:(NSInteger)i_state;
 
