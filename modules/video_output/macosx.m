@@ -1,18 +1,19 @@
 /*****************************************************************************
  * macosx.m: MacOS X OpenGL provider
  *****************************************************************************
- * Copyright (C) 2001-2012 VLC authors and VideoLAN
+ * Copyright (C) 2001-2013 VLC authors and VideoLAN
  * $Id$
  *
- * Authors: Colin Delacroix <colin@zoy.org>
- *          Florian G. Pflug <fgp@phlo.org>
- *          Derk-Jan Hartman <hartman at videolan dot org>
+ * Authors: Derk-Jan Hartman <hartman at videolan dot org>
  *          Eric Petit <titer@m0k.org>
  *          Benjamin Pracht <bigben at videolan dot org>
  *          Damien Fouilleul <damienf at videolan dot org>
  *          Pierre d'Herbemont <pdherbemont at videolan dot org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
  *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
+ *          Rémi Denis-Courmont
+ *          Juho Vähä-Herttua <juhovh at iki dot fi>
+ *          Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
