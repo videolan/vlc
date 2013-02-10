@@ -355,7 +355,7 @@ static bool parse_track_node COMPLEX_INTERFACE
           {"title",        {.smpl = set_item_info}, false },
           {"creator",      {.smpl = set_item_info}, false },
           {"annotation",   {.smpl = set_item_info}, false },
-          {"info",         {NULL}, false },
+          {"info",         {.smpl = set_item_info}, false },
           {"image",        {.smpl = set_item_info}, false },
           {"album",        {.smpl = set_item_info}, false },
           {"trackNum",     {.smpl = set_item_info}, false },
@@ -545,6 +545,8 @@ static bool set_item_info SIMPLE_INTERFACE
     }
     else if (!strcmp(psz_name, "annotation"))
         input_item_SetDescription(p_input, psz_value);
+    else if (!strcmp(psz_name, "info"))
+        input_item_SetURL(p_input, psz_value);
     else if (!strcmp(psz_name, "image"))
         input_item_SetArtURL(p_input, psz_value);
     return true;

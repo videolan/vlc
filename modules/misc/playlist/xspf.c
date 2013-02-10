@@ -127,6 +127,11 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
         fprintf( p_file, "\t\t\t<annotation>%s</annotation>\n", psz );
     free( psz );
 
+    psz = input_xml( p_input, input_item_GetURL );
+    if( psz && *psz )
+        fprintf( p_file, "\t\t\t<info>%s</info>\n", psz );
+    free( psz );
+
     psz = input_xml( p_input, input_item_GetArtURL );
     if( psz && *psz )
         fprintf( p_file, "\t\t\t<image>%s</image>\n", psz );
