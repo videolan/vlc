@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VideoView.h: MacOS X video output module
  *****************************************************************************
- * Copyright (C) 2002-2012 VLC authors and VideoLAN
+ * Copyright (C) 2002-2013 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
@@ -9,6 +9,7 @@
  *          Benjamin Pracht <bigben at videolan dot org>
  *          Pierre d'Herbemont <pdherbemont # videolan org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
+ *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

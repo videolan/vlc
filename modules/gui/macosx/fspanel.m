@@ -1,11 +1,12 @@
 /*****************************************************************************
  * fspanel.m: MacOS X full screen panel
  *****************************************************************************
- * Copyright (C) 2006-2012 VLC authors and VideoLAN
+ * Copyright (C) 2006-2013 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jérôme Decoodt <djc at videolan dot org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
+ *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
