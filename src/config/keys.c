@@ -506,16 +506,16 @@ struct vlc_actions *vlc_InitActions (libvlc_int_t *libvlc)
     if (mousemode < 2)
     {
         vlc_AddMapping (&as->map,
-                        mousemode ? KEY_MOUSEWHEELLEFT : KEY_MOUSEWHEELUP,
+                        mousemode ? KEY_MOUSEWHEELRIGHT : KEY_MOUSEWHEELUP,
                         ACTIONID_VOL_UP);
         vlc_AddMapping (&as->map,
-                        mousemode ? KEY_MOUSEWHEELRIGHT : KEY_MOUSEWHEELDOWN,
+                        mousemode ? KEY_MOUSEWHEELLEFT : KEY_MOUSEWHEELDOWN,
                         ACTIONID_VOL_DOWN);
         vlc_AddMapping (&as->map,
-                        mousemode ? KEY_MOUSEWHEELUP : KEY_MOUSEWHEELLEFT,
+                        mousemode ? KEY_MOUSEWHEELUP : KEY_MOUSEWHEELRIGHT,
                         ACTIONID_JUMP_FORWARD_EXTRASHORT);
         vlc_AddMapping (&as->map,
-                        mousemode ? KEY_MOUSEWHEELDOWN : KEY_MOUSEWHEELRIGHT,
+                        mousemode ? KEY_MOUSEWHEELDOWN : KEY_MOUSEWHEELLEFT,
                         ACTIONID_JUMP_BACKWARD_EXTRASHORT);
     }
 
