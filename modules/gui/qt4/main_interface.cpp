@@ -59,6 +59,7 @@
 #include <QStatusBar>
 #include <QLabel>
 #include <QStackedWidget>
+#include <QFileInfo>
 
 #include <vlc_keys.h>                       /* Wheel event */
 #include <vlc_vout_display.h>               /* vout_thread_t and VOUT_ events */
@@ -1268,7 +1269,7 @@ void MainInterface::dropEvent(QDropEvent *event)
  */
 void MainInterface::dropEventPlay( QDropEvent *event, bool b_play, bool b_playlist )
 {
-    if( event->possibleActions() & ( Qt::CopyAction | Qt::MoveAction ) )
+    if( event->possibleActions() & ( Qt::CopyAction | Qt::MoveAction | Qt::LinkAction ) )
        event->setDropAction( Qt::CopyAction );
     else
         return;
@@ -1293,11 +1294,29 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play, bool b_playli
         if( url.isValid() )
         {
             QString mrl = toURI( url.toEncoded().constData() );
-            playlist_Add( THEPL, qtu(mrl), NULL,
+            QFileInfo info( url.toLocalFile() );
+            if( info.exists() && info.isSymLink() )
+            {
+                QString target = info.symLinkTarget();
+                QUrl url;
+                if( QFile::exists( target ) )
+                {
+                    url = QUrl::fromLocalFile( target );
+                }
+                else
+                {
+                    url.setUrl( target );
+                }
+                mrl = toURI( url.toEncoded().constData() );
+            }
+            if( mrl.length() > 0 )
+            {
+                playlist_Add( THEPL, qtu(mrl), NULL,
                           PLAYLIST_APPEND | (first ? PLAYLIST_GO: PLAYLIST_PREPARSE),
                           PLAYLIST_END, b_playlist, pl_Unlocked );
-            first = false;
-            RecentsMRL::getInstance( p_intf )->addRecent( mrl );
+                first = false;
+                RecentsMRL::getInstance( p_intf )->addRecent( mrl );
+            }
         }
     }
 
