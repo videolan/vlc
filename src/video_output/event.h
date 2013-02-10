@@ -87,8 +87,7 @@ static inline void vout_SendEventMouseReleased(vout_thread_t *vout, int button)
 static inline void vout_SendEventMouseDoubleClick(vout_thread_t *vout)
 {
     //vout_ControlSetFullscreen(vout, !var_GetBool(vout, "fullscreen"));
-    //var_ToggleBool(vout, "fullscreen");
-    var_SetInteger(vout->p_libvlc, "key-action", ACTIONID_TOGGLE_FULLSCREEN);
+    var_ToggleBool(vout, "fullscreen");
 }
 static inline void vout_SendEventMouseVisible(vout_thread_t *vout)
 {
