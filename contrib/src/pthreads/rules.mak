@@ -4,7 +4,7 @@ ifndef HAVE_WIN32
 PKGS_FOUND += pthreads
 endif
 
-PTHREADS_W32_VERSION := 2-8-0
+PTHREADS_W32_VERSION := 2-9-1
 PTHREADS_W32_URL := ftp://sources.redhat.com/pub/pthreads-win32/pthreads-w32-$(PTHREADS_W32_VERSION)-release.tar.gz
 
 $(TARBALLS)/pthreads-w32-$(PTHREADS_W32_VERSION)-release.tar.gz:
@@ -15,8 +15,6 @@ $(TARBALLS)/pthreads-w32-$(PTHREADS_W32_VERSION)-release.tar.gz:
 ifdef HAVE_WIN32
 pthreads: pthreads-w32-$(PTHREADS_W32_VERSION)-release.tar.gz .sum-pthreads
 	$(UNPACK)
-	$(APPLY) $(SRC)/pthreads/pthreads-detach.patch
-	$(APPLY) $(SRC)/pthreads/pthreads-win64.patch
 	sed -e 's/^CROSS.*=/CROSS ?=/' -i.orig $(UNPACK_DIR)/GNUmakefile
 	$(MOVE)
 
