@@ -720,13 +720,6 @@ CtrlTree::Iterator CtrlTree::getFirstFromSlider()
 
     Iterator it_first = m_rTree.getItem( index );
 
-    if( m_lastClicked == m_rTree.end() )
-    {
-        m_lastClicked = it_first;
-        if( m_lastClicked != m_rTree.end() )
-            m_lastClicked->setSelected( true );
-    }
-
     return it_first;
 }
 
