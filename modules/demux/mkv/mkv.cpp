@@ -247,6 +247,8 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
+    p_sys->FreeUnused();
+
     p_sys->InitUi();
 
     return VLC_SUCCESS;

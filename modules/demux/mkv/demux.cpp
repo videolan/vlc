@@ -713,6 +713,38 @@ bool demux_sys_t::PreloadLinked()
     return true;
 }
 
+void demux_sys_t::FreeUnused()
+{
+    size_t i;
+    for( i = 0; i < streams.size(); i++ )
+    {
+        bool used = false;
+        struct matroska_stream_c *p_s = streams[i];
+        for( size_t j = 0; j < p_s->segments.size(); j++ )
+        {
+            if( p_s->segments[j]->b_preloaded )
+            {
+                used = true;
+                break;
+            }
+        }
+        if( !used )
+        {
+            streams[i] = NULL;
+            delete p_s;
+        }
+        
+    }
+    for( i = 0; i < opened_segments.size(); i++)
+    {
+        if( !opened_segments[i]->b_preloaded )
+        {
+            delete opened_segments[i];
+            opened_segments[i] = NULL;
+        }
+    }
+}
+
 virtual_segment_c *demux_sys_t::VirtualFromSegments( std::vector<matroska_segment_c*> *p_segments ) const
 {
     if ( p_segments->empty() )
