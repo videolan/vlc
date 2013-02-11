@@ -46,6 +46,7 @@ class QTimer;
 class SeekPoints;
 class QPropertyAnimation;
 class QStyleOption;
+class QCommonStyle;
 
 /* Input Slider derived from QSlider */
 class SeekSlider : public QSlider
@@ -96,6 +97,8 @@ private:
     QColor tickpointForeground;
     QColor shadowDark;
     QColor shadowLight;
+    QCommonStyle *alternativeStyle;
+
     /* Handle's animation */
     qreal mHandleOpacity;
     QPropertyAnimation *animHandle;

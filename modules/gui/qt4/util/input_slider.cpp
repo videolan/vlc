@@ -62,6 +62,7 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
     chapters = NULL;
     mHandleLength = -1;
     b_seekable = true;
+    alternativeStyle = NULL;
 
     // prepare some static colors
     QPalette p = palette();
@@ -111,7 +112,10 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
 
     /* Use the new/classic style */
     if( !b_classic )
-        setStyle( new SeekStyle );
+    {
+        alternativeStyle = new SeekStyle;
+        setStyle( alternativeStyle );
+    }
 
     /* Init to 0 */
     setPosition( -1.0, 0, 0 );
@@ -135,6 +139,8 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
 SeekSlider::~SeekSlider()
 {
     delete chapters;
+    if ( alternativeStyle )
+        delete alternativeStyle;
 }
 
 /***
