@@ -786,16 +786,23 @@ void VlcProc::update_current_input()
     if( !pInput )
         return;
 
-    input_item_t *p_item = input_GetItem( pInput );
-    if( p_item )
+    input_item_t *pItem = input_GetItem( pInput );
+    if( pItem )
     {
         // Update short name
-        char *psz_name = input_item_GetName( p_item );
+        char *psz_name = input_item_GetTitle( pItem );
+        if( EMPTY_STR( psz_name ) )
+        {
+            free( psz_name );
+            psz_name = input_item_GetName( pItem );
+        }
+        if( !psz_name )
+            psz_name = strdup ( "" );
         SET_TEXT( m_cVarStreamName, UString( getIntf(), psz_name ) );
         free( psz_name );
 
         // Update local path (if possible) or full uri
-        char *psz_uri = input_item_GetURI( p_item );
+        char *psz_uri = input_item_GetURI( pItem );
         char *psz_path = make_path( psz_uri );
         char *psz_save = psz_path ? psz_path : psz_uri;
         SET_TEXT( m_cVarStreamURI, UString( getIntf(), psz_save ) );
@@ -803,7 +810,7 @@ void VlcProc::update_current_input()
         free( psz_uri );
 
         // Update art uri
-        char *psz_art = input_item_GetArtURL( p_item );
+        char *psz_art = input_item_GetArtURL( pItem );
         SET_STRING( m_cVarStreamArt, string( psz_art ? psz_art : "" ) );
         free( psz_art );
     }
