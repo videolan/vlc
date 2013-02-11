@@ -188,7 +188,6 @@ int IgnoreOmxDecoderPadding(const char *name)
     // since that is the default, but keep it here for reference. (This is
     // only relevant for manufacturers that are known to have decoders with
     // this kind of bug.)
-    // Unknown: OMX.SEC.vc1.dec (wmv9/vc1 - lack of samples that have cropping)
 /*
     static const char *padding_decoders[] = {
         "OMX.SEC.AVC.Decoder",
@@ -202,6 +201,7 @@ int IgnoreOmxDecoderPadding(const char *name)
         "OMX.SEC.avcdec",
         "OMX.SEC.MPEG4.Decoder",
         "OMX.SEC.mpeg4.dec",
+        "OMX.SEC.vc1.dec",
         NULL
     };
     for (const char **ptr = nopadding_decoders; *ptr; ptr++) {
