@@ -733,7 +733,6 @@ void demux_sys_t::FreeUnused()
             streams[i] = NULL;
             delete p_s;
         }
-        
     }
     for( i = 0; i < opened_segments.size(); i++)
     {
