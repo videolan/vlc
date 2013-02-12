@@ -62,7 +62,6 @@
 #   define PFNGLDELETEPROGRAMPROC            typeof(glDeleteProgram)*
 #   define PFNGLATTACHSHADERPROC             typeof(glAttachShader)*
 #if USE_OPENGL_ES
-#   define GL_UNPACK_ROW_LENGTH 0
 #   import <CoreFoundation/CoreFoundation.h>
 #endif
 #endif
@@ -659,11 +658,10 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
             glClientActiveTexture(GL_TEXTURE0 + j);
         }
         glBindTexture(vgl->tex_target, vgl->texture[0][j]);
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, picture->p[j].i_pitch / picture->p[j].i_pixel_pitch);
 
-#if USE_OPENGL_ES
         if ( (picture->p[j].i_pitch / picture->p[j].i_pixel_pitch) != (vgl->fmt.i_width  * vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den) ) {
             uint8_t *new_plane = malloc(picture->p[j].i_pitch*picture->p[j].i_pixel_pitch *vgl->fmt.i_height * vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den);
+#ifndef GL_UNPACK_ROW_LENGTH
             uint8_t *destination = new_plane;
             const uint8_t *source = picture->p[j].p_pixels;
             for( unsigned height = 0; height < vgl->fmt.i_height * vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den; height++ )
@@ -679,13 +677,15 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                              vgl->tex_format, vgl->tex_type, new_plane );
             free( new_plane );
         } else {
+#else
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, picture->p[j].i_pitch / picture->p[j].i_pixel_pitch);
 #endif
             glTexSubImage2D(vgl->tex_target, 0,
                             0, 0,
                             vgl->fmt.i_width  * vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den,
                             vgl->fmt.i_height * vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den,
                             vgl->tex_format, vgl->tex_type, picture->p[j].p_pixels);
-#if USE_OPENGL_ES
+#ifndef GL_UNPACK_ROW_LENGTH
         }
 #endif
     }
@@ -745,7 +745,9 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
             if (glr->texture) {
                 glBindTexture(GL_TEXTURE_2D, glr->texture);
                 /* TODO set GL_UNPACK_ALIGNMENT */
+#ifdef GL_UNPACK_ROW_LENGTH
                 glPixelStorei(GL_UNPACK_ROW_LENGTH, r->p_picture->p->i_pitch / r->p_picture->p->i_pixel_pitch);
+#endif
                 glTexSubImage2D(GL_TEXTURE_2D, 0,
                                 0, 0, glr->width, glr->height,
                                 glr->format, glr->type, &r->p_picture->p->p_pixels[pixels_offset]);
@@ -761,7 +763,9 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
                 /* TODO set GL_UNPACK_ALIGNMENT */
+#ifdef GL_UNPACK_ROW_LENGTH
                 glPixelStorei(GL_UNPACK_ROW_LENGTH, r->p_picture->p->i_pitch / r->p_picture->p->i_pixel_pitch);
+#endif
                 glTexImage2D(GL_TEXTURE_2D, 0, glr->format,
                              glr->width, glr->height, 0, glr->format, glr->type,
                              &r->p_picture->p->p_pixels[pixels_offset]);
