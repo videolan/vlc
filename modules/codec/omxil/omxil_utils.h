@@ -72,6 +72,20 @@
          if( !(p_fifo)->p_first ) (p_fifo)->pp_last = &(p_fifo)->p_first; \
          vlc_mutex_unlock( &(p_fifo)->lock ); } while(0)
 
+#define OMX_FIFO_GET_TIMEOUT(p_fifo, p_buffer, timeout) \
+    do { vlc_mutex_lock( &(p_fifo)->lock ); \
+         mtime_t end = mdate() + timeout; \
+         if( !(p_fifo)->p_first ) \
+             vlc_cond_timedwait( &(p_fifo)->wait, &(p_fifo)->lock, end ); \
+         p_buffer = (p_fifo)->p_first; \
+         if( p_buffer ) { \
+             OMX_BUFFERHEADERTYPE **pp_next = (OMX_BUFFERHEADERTYPE **) \
+                 ((void **)p_buffer + (p_fifo)->offset); \
+             (p_fifo)->p_first = *pp_next; *pp_next = 0; \
+             if( !(p_fifo)->p_first ) (p_fifo)->pp_last = &(p_fifo)->p_first; \
+         } \
+         vlc_mutex_unlock( &(p_fifo)->lock ); } while(0)
+
 #define OMX_FIFO_PUT(p_fifo, p_buffer) \
     do { vlc_mutex_lock (&(p_fifo)->lock);              \
          OMX_BUFFERHEADERTYPE **pp_next = (OMX_BUFFERHEADERTYPE **) \

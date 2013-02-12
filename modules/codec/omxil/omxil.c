@@ -1368,7 +1368,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     }
 
     /* Send the input buffer to the component */
-    OMX_FIFO_GET(&p_sys->in.fifo, p_header);
+    OMX_FIFO_GET_TIMEOUT(&p_sys->in.fifo, p_header, 200000);
 
     if (p_header && p_header->nFlags & SENTINEL_FLAG) {
         free(p_header);
@@ -1524,7 +1524,7 @@ block_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
 
 
     /* Send the input buffer to the component */
-    OMX_FIFO_GET(&p_sys->in.fifo, p_header);
+    OMX_FIFO_GET_TIMEOUT(&p_sys->in.fifo, p_header, 200000);
 
     if (p_header && p_header->nFlags & SENTINEL_FLAG) {
         free(p_header);
