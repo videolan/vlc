@@ -734,3 +734,116 @@ libvlc_media_get_tracks_info( libvlc_media_t *p_md, libvlc_media_track_info_t **
     vlc_mutex_unlock( &p_input_item->lock );
     return i_es;
 }
+
+int
+libvlc_media_tracks_get( libvlc_media_t *p_md, libvlc_media_track_t *** pp_es )
+{
+    assert( p_md );
+
+    input_item_t *p_input_item = p_md->p_input_item;
+    vlc_mutex_lock( &p_input_item->lock );
+
+    const int i_es = p_input_item->i_es;
+    *pp_es = (i_es > 0) ? calloc( i_es, sizeof(**pp_es) ) : NULL;
+
+    if( !*pp_es ) /* no ES, or OOM */
+    {
+        vlc_mutex_unlock( &p_input_item->lock );
+        return 0;
+    }
+
+    /* Fill array */
+    for( int i = 0; i < i_es; i++ )
+    {
+        libvlc_media_track_t *p_mes = calloc( 1, sizeof(*p_mes) );
+        if ( p_mes )
+        {
+            p_mes->audio = malloc( __MAX(__MAX(sizeof(*p_mes->audio),
+                                               sizeof(*p_mes->video)),
+                                               sizeof(*p_mes->subtitle)) );
+        }
+        if ( !p_mes || !p_mes->audio )
+        {
+            libvlc_media_tracks_release( *pp_es, i_es );
+            *pp_es = NULL;
+            return 0;
+        }
+        (*pp_es)[i] = p_mes;
+
+        const es_format_t *p_es = p_input_item->es[i];
+
+        p_mes->i_codec = p_es->i_codec;
+        p_mes->i_original_fourcc = p_es->i_original_fourcc;
+        p_mes->i_id = p_es->i_id;
+
+        p_mes->i_profile = p_es->i_profile;
+        p_mes->i_level = p_es->i_level;
+
+        p_mes->i_bitrate = p_es->i_bitrate;
+        p_mes->psz_language = p_es->psz_language != NULL ? strdup(p_es->psz_language) : NULL;
+        p_mes->psz_description = p_es->psz_description != NULL ? strdup(p_es->psz_description) : NULL;
+
+        switch(p_es->i_cat)
+        {
+        case UNKNOWN_ES:
+        default:
+            p_mes->i_type = libvlc_track_unknown;
+            break;
+        case VIDEO_ES:
+            p_mes->i_type = libvlc_track_video;
+            p_mes->video->i_height = p_es->video.i_height;
+            p_mes->video->i_width = p_es->video.i_width;
+            p_mes->video->i_sar_num = p_es->video.i_sar_num;
+            p_mes->video->i_sar_den = p_es->video.i_sar_den;
+            p_mes->video->i_frame_rate_num = p_es->video.i_frame_rate;
+            p_mes->video->i_frame_rate_den = p_es->video.i_frame_rate_base;
+            break;
+        case AUDIO_ES:
+            p_mes->i_type = libvlc_track_audio;
+            p_mes->audio->i_channels = p_es->audio.i_channels;
+            p_mes->audio->i_rate = p_es->audio.i_rate;
+            break;
+        case SPU_ES:
+            p_mes->i_type = libvlc_track_text;
+            p_mes->subtitle->psz_encoding = p_es->subs.psz_encoding != NULL ?
+                                            strdup(p_es->subs.psz_encoding) : NULL;
+            break;
+        }
+    }
+
+    vlc_mutex_unlock( &p_input_item->lock );
+    return i_es;
+}
+
+
+/**************************************************************************
+ * Release media descriptor's elementary streams description array
+ **************************************************************************/
+void libvlc_media_tracks_release( libvlc_media_track_t **p_tracks, int i_count )
+{
+    if( !p_tracks )
+        return;
+    for( int i = 0; i < i_count; ++i )
+    {
+        if ( !p_tracks[i] )
+            continue;
+        free( p_tracks[i]->psz_language );
+        free( p_tracks[i]->psz_description );
+        switch( p_tracks[i]->i_type )
+        {
+        case libvlc_track_audio:
+            break;
+        case libvlc_track_video:
+            break;
+        case libvlc_track_text:
+            free( p_tracks[i]->subtitle->psz_encoding );
+            break;
+        case libvlc_track_unknown:
+        default:
+            break;
+        }
+        free( p_tracks[i]->audio );
+        free( p_tracks[i] );
+    }
+    free( p_tracks );
+}

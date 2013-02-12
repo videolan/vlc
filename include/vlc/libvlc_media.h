@@ -170,6 +170,52 @@ typedef struct libvlc_media_track_info_t
 } libvlc_media_track_info_t;
 
 
+typedef struct libvlc_audio_track_t
+{
+    unsigned    i_channels;
+    unsigned    i_rate;
+} libvlc_audio_track_t;
+
+typedef struct libvlc_video_track_t
+{
+    unsigned    i_height;
+    unsigned    i_width;
+    unsigned    i_sar_num;
+    unsigned    i_sar_den;
+    unsigned    i_frame_rate_num;
+    unsigned    i_frame_rate_den;
+} libvlc_video_track_t;
+
+typedef struct libvlc_subtitle_track_t
+{
+    char *psz_encoding;
+} libvlc_subtitle_track_t;
+
+typedef struct libvlc_media_track_t
+{
+    /* Codec fourcc */
+    uint32_t    i_codec;
+    uint32_t    i_original_fourcc;
+    int         i_id;
+    libvlc_track_type_t i_type;
+
+    /* Codec specific */
+    int         i_profile;
+    int         i_level;
+
+    union {
+        libvlc_audio_track_t *audio;
+        libvlc_video_track_t *video;
+        libvlc_subtitle_track_t *subtitle;
+    };
+
+    unsigned int i_bitrate;
+    char *psz_language;
+    char *psz_description;
+
+} libvlc_media_track_t;
+
+
 /**
  * Create a media with a certain given media resource location,
  * for instance a valid URL.
@@ -503,15 +549,50 @@ LIBVLC_API void *libvlc_media_get_user_data( libvlc_media_t *p_md );
  * before calling this function.
  * Not doing this will result in an empty array.
  *
+ * \deprecated Use libvlc_media_tracks_get instead
+ *
  * \param p_md media descriptor object
  * \param tracks address to store an allocated array of Elementary Streams
  *        descriptions (must be freed by the caller) [OUT]
  *
  * \return the number of Elementary Streams
  */
-LIBVLC_API
+LIBVLC_DEPRECATED LIBVLC_API
 int libvlc_media_get_tracks_info( libvlc_media_t *p_md,
                                   libvlc_media_track_info_t **tracks );
+
+/**
+ * Get media descriptor's elementary streams description
+ *
+ * Note, you need to call libvlc_media_parse() or play the media at least once
+ * before calling this function.
+ * Not doing this will result in an empty array.
+ *
+ * \version LibVLC 2.1.0 and later.
+ *
+ * \param p_md media descriptor object
+ * \param tracks address to store an allocated array of Elementary Streams
+ *        descriptions (must be freed with libvlc_media_tracks_release
+          by the caller) [OUT]
+ *
+ * \return the number of Elementary Streams
+ */
+LIBVLC_API
+int libvlc_media_tracks_get( libvlc_media_t *p_md,
+                             libvlc_media_track_t ***tracks );
+
+
+/**
+ * Release media descriptor's elementary streams description array
+ *
+ * \version LibVLC 2.1.0 and later.
+ *
+ * \param p_tracks tracks info array to release
+ * \param i_count number of elements in the array
+ */
+LIBVLC_API
+void libvlc_media_tracks_release( libvlc_media_track_t **p_tracks,
+                                  int i_count );
 
 /** @}*/
 
