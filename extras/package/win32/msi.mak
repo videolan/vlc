@@ -8,7 +8,7 @@ W_MSIDIR=`winepath -w '$(MSIDIR)'`
 MSIBUILDDIR=$(abs_top_builddir)/extras/package/win32/msi
 W_MSIBUILDDIR=`winepath -w '$(MSIBUILDDIR)'`
 
-package-msi: heat candle light
+package-msi: heat candle light package-win-strip
 
 heat:
 	$(HEAT) dir $(VLCDIR)/plugins -cg CompPluginsGroup -gg -scom -sreg -sfrag -srd -dr PLUGINSDIR -out $(W_MSIBUILDDIR)/Plugins.fragment.wxs
