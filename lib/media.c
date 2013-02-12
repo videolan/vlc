@@ -735,7 +735,7 @@ libvlc_media_get_tracks_info( libvlc_media_t *p_md, libvlc_media_track_info_t **
     return i_es;
 }
 
-int
+unsigned
 libvlc_media_tracks_get( libvlc_media_t *p_md, libvlc_media_track_t *** pp_es )
 {
     assert( p_md );
@@ -819,11 +819,9 @@ libvlc_media_tracks_get( libvlc_media_t *p_md, libvlc_media_track_t *** pp_es )
 /**************************************************************************
  * Release media descriptor's elementary streams description array
  **************************************************************************/
-void libvlc_media_tracks_release( libvlc_media_track_t **p_tracks, int i_count )
+void libvlc_media_tracks_release( libvlc_media_track_t **p_tracks, unsigned i_count )
 {
-    if( !p_tracks )
-        return;
-    for( int i = 0; i < i_count; ++i )
+    for( unsigned i = 0; i < i_count; ++i )
     {
         if ( !p_tracks[i] )
             continue;

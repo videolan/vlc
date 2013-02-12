@@ -575,11 +575,11 @@ int libvlc_media_get_tracks_info( libvlc_media_t *p_md,
  *        descriptions (must be freed with libvlc_media_tracks_release
           by the caller) [OUT]
  *
- * \return the number of Elementary Streams
+ * \return the number of Elementary Streams (zero on error)
  */
 LIBVLC_API
-int libvlc_media_tracks_get( libvlc_media_t *p_md,
-                             libvlc_media_track_t ***tracks );
+unsigned libvlc_media_tracks_get( libvlc_media_t *p_md,
+                                  libvlc_media_track_t ***tracks );
 
 
 /**
@@ -592,7 +592,7 @@ int libvlc_media_tracks_get( libvlc_media_t *p_md,
  */
 LIBVLC_API
 void libvlc_media_tracks_release( libvlc_media_track_t **p_tracks,
-                                  int i_count );
+                                  unsigned i_count );
 
 /** @}*/
 
