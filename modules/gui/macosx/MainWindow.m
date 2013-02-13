@@ -530,7 +530,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     id obj = [notification object];
 
-    if ([obj class] == [VLCVideoWindowCommon class] || [obj class] == [VLCDetachedVideoWindow class] || ([obj class] == [VLCMainWindow class] && !b_nonembedded)) {
+    // hasActiveVideo is defined for VLCVideoWindowCommon and subclasses
+    if ([obj respondsToSelector:@selector(hasActiveVideo)] && [obj hasActiveVideo]) {
         if ([[VLCMain sharedInstance] activeVideoPlayback])
             [[VLCCoreInteraction sharedInstance] stop];
     }

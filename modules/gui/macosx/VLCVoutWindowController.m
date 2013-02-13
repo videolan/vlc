@@ -202,11 +202,13 @@
         [o_window leaveFullscreen];
 
     [[o_window videoView] releaseVoutThread];
-    [o_window setHasActiveVideo: NO];
 
+    // set active video to no BEFORE closing the window to avoid stopping playback
+    // due to NSWindowWillCloseNotification
+    [o_window setHasActiveVideo: NO];
     if (![NSStringFromClass([o_window class]) isEqualToString:@"VLCMainWindow"]) {
         [o_window close];
-        [o_window orderOut:self];
+        [o_window orderOut:self]; // for dark interface
     }
 
     [o_vout_dict removeObjectForKey:o_key];
