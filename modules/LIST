@@ -107,9 +107,11 @@ $Id$
  * dtv: DVB support (superseds bda module for Windows)
  * dummy: dummy interface
  * dv1394: Digital Video (Firewire/IEEE1394/I-Link) access module
+ * dvb: Older DVB support module
  * dvbsub: decoder module for subs in dvb streams
  * dvdnav: access module for DVDs with libdvdnav
  * dvdread: input module for accessing DVDs, uses libdvdread
+ * dxva2: DxVA2 hardware-accelerated decoding
  * dynamicoverlay: subpicture filter using shared memory that can be written to by external applications
  * edummy: dummy encoder
  * egl: EGL video output
@@ -120,10 +122,11 @@ $Id$
  * extract: Extract RGB components video filter
  * faad: AAC decoder using libfaad2
  * fb: video output module for the Linux framebuffer
+ * fdkaac: AAC encoder using the fdk-aac library
  * filesystem: Filesystem access module
  * flac: Flac decoder using libflac
  * flacsys: FLAC demuxer
- * float32_mixer: Precise float32 audio mixer
+ * float_mixer: Precise float audio mixer
  * fluidsynth: Software MIDI synthetizer using libfluidsynth
  * folder: folder meta data and art finder
  * freetype: Utility to put text on video using freetype2
@@ -136,6 +139,7 @@ $Id$
  * gles2: OpenGL ES2 video output using the generic OpenGL provider
  * globalhotkeys: module to catch hotkeys when application doesn't have the focus
  * glwin32: a opengl provider using DirectX OpenGL
+ * glx: GLX extension for OpenGL
  * gme: old console games music playback using Game Music Emu
  * gnutls: GNU TLS encryption/decryption module
  * goom: visualisation plugin based on goom
@@ -195,6 +199,7 @@ $Id$
  * mirror: mirror video filter
  * mjpeg: a demuxer for multipart and concatenated JPEG data
  * mkv: Matroska demuxer
+ * mmdevice: Windows Audio Session API audio output using MMDevice
  * mod: MOD demuxer
  * mono: stereo-to-mono downmix simple channel mixer
  * mosaic: Module used to display a mosaic
@@ -282,6 +287,7 @@ $Id$
  * scene: scene video filter
  * schroedinger: Schroedinger video decoder
  * screen: a input module that takes screenshots of the primary monitor
+ * scte27: SCTE-27/Digicipher subtitles decoder
  * sdl_image: SDL-based image decoder
  * sdp: SDP fake access
  * sepia: Sepia video filter
@@ -348,13 +354,15 @@ $Id$
  * uleaddvaudio: codec for DV Audio from Ulead
  * upnp: libupnp UPNP service discovery
  * v4l2: Video 4 Linux 2 input module
+ * vaapi: VAAPI hardware-accelerated decoding
  * vc1: VC-1 Video demuxer
  * vcd: input module for accessing Video CDs
  * vcdx: input module for accessing Video CDs with navigation & stills
+ * vda: VDADecoder hardware-accelerated decoding
  * vdpau: VDPAU hardware-accelerated decoding
  * vdummy: dummy video display
  * visual: visualisation system
- * vmem: memory video driver
+ * vmem: video memory output
  * vobsub: VobSUB subtitles demuxer
  * voc: VOC demuxer
  * vod_rtsp: RTSP VoD module
@@ -365,7 +373,6 @@ $Id$
  * vout_sdl: video output module using the SDL library
  * vsxu: audio visualization using Vovoid VSXu
  * wall: image wall filter
- * wasapi: Windows Audio Session API audio output
  * wav: Wav demuxer
  * wave: Wave video effect
  * waveout: simple audio output module for Windows
@@ -384,6 +391,7 @@ $Id$
  * xcb_xv: a XVideo video output using XCB
  * xdg_screensaver: xdg-utils screensaver inhibition
  * xml: LibXML xml parser
+ * xwd: X Window system raster image dump pseudo-decoder
  * yuv: yuv video output
  * yuv_rgb_neon: yuv->RGB chroma converter for NEON devices
  * yuvp: YUVP to YUVA/RGBA chroma converter
