@@ -745,7 +745,7 @@ static void SelectClockSource (vlc_object_t *obj)
     if (!strcmp (name, "tick"))
     {
         msg_Dbg (obj, "using Windows time as clock source");
-#if (_WIN32_WINNT < 0x0601)
+#if (_WIN32_WINNT < 0x0600)
         HANDLE h = GetModuleHandle (_T("kernel32.dll"));
         if (unlikely(h == NULL))
             abort ();
