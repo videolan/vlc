@@ -1,3 +1,8 @@
+if HAVE_WIN32
+BUILT_SOURCES_distclean += \
+	extras/package/win32/msi/config.wxi
+endif
+
 WIXPATH=`winepath -u 'C:\\Program Files (x86)\\Windows Installer XML v3.5\\bin'`
 HEAT=wine "$(WIXPATH)/heat.exe"
 CANDLE=wine "$(WIXPATH)/candle.exe"
