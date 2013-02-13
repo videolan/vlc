@@ -145,6 +145,8 @@ libVLC:
    and libvlc_audio_output_device_id
  * libvlc_audio_output_get_device_type and libvlc_audio_output_set_device_type are now deprecated
  * new libvlc_log_subscribe and libvlc_log_unsubscribe function to register logging callbacks
+ * new libvlc_media_tracks_get and libvlc_media_tracks_release methods to get more info about the
+   media tracks. libvlc_media_get_tracks_info is now deprecated.
 
 Removed modules:
  * portaudio audio output: use the native audio output instead
