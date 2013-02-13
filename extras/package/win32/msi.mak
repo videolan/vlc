@@ -7,6 +7,7 @@ MSIDIR=$(abs_srcdir)/extras/package/win32/msi
 W_MSIDIR=`winepath -w '$(MSIDIR)'`
 MSIBUILDDIR=$(abs_top_builddir)/extras/package/win32/msi
 W_MSIBUILDDIR=`winepath -w '$(MSIBUILDDIR)'`
+MSIOUTFILE=vlc-$(VERSION).msi
 
 package-msi: heat candle light package-win-strip
 
@@ -20,7 +21,7 @@ candle:
 	$(am__cd) $(MSIBUILDDIR) && $(CANDLE) -ext WiXUtilExtension $(W_MSIDIR)\\product.wxs $(W_MSIDIR)\\axvlc.wxs $(W_MSIDIR)\\extensions.wxs $(W_MSIBUILDDIR)\\*.fragment.wxs
 
 light:
-	$(LIGHT) -sval -ext WixUIExtension -ext WixUtilExtension -cultures:en-us -b $(W_MSIDIR) -b $(VLCDIR)/plugins -b $(VLCDIR)/locale -b $(VLCDIR)/lua -b $(VLCDIR)/skins $(W_MSIBUILDDIR)\\product.wixobj $(W_MSIBUILDDIR)\\axvlc.wixobj $(W_MSIBUILDDIR)\\extensions.wixobj $(W_MSIBUILDDIR)\\*.fragment.wixobj -o vlc-$(VERSION).msi
+	$(LIGHT) -sval -ext WixUIExtension -ext WixUtilExtension -cultures:en-us -b $(W_MSIDIR) -b $(VLCDIR)/plugins -b $(VLCDIR)/locale -b $(VLCDIR)/lua -b $(VLCDIR)/skins $(W_MSIBUILDDIR)\\product.wixobj $(W_MSIBUILDDIR)\\axvlc.wixobj $(W_MSIBUILDDIR)\\extensions.wixobj $(W_MSIBUILDDIR)\\*.fragment.wixobj -o $(MSIOUTFILE)
 
 cleanmsi:
 	-rm -f $(MSIBUILDDIR)/*.wixobj
@@ -28,4 +29,4 @@ cleanmsi:
 	-rm -f $(MSIBUILDDIR)/*.fragment.wxs
 
 distcleanmsi: cleanmsi
-	-rm -f vlc-installer.msi
+	-rm -f $(MSIOUTFILE)
