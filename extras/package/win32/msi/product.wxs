@@ -36,7 +36,8 @@
             InstallPrivileges='elevated'
             InstallScope='perMachine'
             InstallerVersion='200'
-            Compressed='yes'/>
+            Compressed='yes'
+            Platforms='$(var.Platform)'/>
 
         <MajorUpgrade Schedule="afterInstallInitialize" DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."/>
 
@@ -55,7 +56,7 @@
         <Property Id="ApplicationFolderName" Value="$(var.Manufacturer)\$(var.AppFolder)" />
         <Property Id="WixAppFolder" Value="WixPerMachineFolder" />
         <Property Id="APPLICATIONFOLDER">
-            <RegistrySearch Id="FindInstallRegDir" Type="raw" Root="HKLM" Key="Software\VideoLAN\VLC" Name="InstallDir" />
+            <RegistrySearch Id="FindInstallRegDir" Type="raw" Root="HKLM" Win64="$(var.Win64)" Key="Software\VideoLAN\VLC" Name="InstallDir" />
         </Property>
 
         <WixVariable Id="WixUISupportPerUser" Value="0" />
@@ -65,7 +66,7 @@
         <Media Id='1' Cabinet='product.cab' EmbedCab='yes' CompressionLevel="high" />
 
         <Directory Id='TARGETDIR' Name='SourceDir'>
-            <Directory Id='ProgramFilesFolder' Name='PFiles'>
+            <Directory Id='$(var.PlatformProgramFilesFolder)' Name='PFiles'>
                 <Directory Id='VideoLANFolder' Name='$(var.Manufacturer)'>
                     <Directory Id='APPLICATIONFOLDER' Name='$(var.AppFolder)' FileSource="$(var.SourceDir)">
 
