@@ -236,17 +236,20 @@ case "${host_os}" in
         DESTDIR="`pwd`/_win32/"
 
         dnl
-        dnl NSIS Installer prefix and WIN64
+        dnl NSIS/MSI Installer prefix and WIN64
         dnl
         case "${host}" in
             amd64*|x86_64*)
                 HAVE_WIN64="1"
+                WINDOWS_ARCH="x64"
                 PROGRAMFILES="PROGRAMFILES64"
             ;;
             *)
+                WINDOWS_ARCH="x86"
                 PROGRAMFILES="PROGRAMFILES"
             ;;
         esac
+        AC_SUBST(WINDOWS_ARCH)
         AC_SUBST(PROGRAMFILES)
 
     fi

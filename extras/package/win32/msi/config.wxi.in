@@ -6,7 +6,6 @@
     <?define AboutURL = "http://www.videolan.org/vlc/" ?>
     <?define SupportURL = "http://www.videolan.org/support/" ?>
     <?define UpdatesURL = "http://www.videolan.org/vlc/" ?>
-    <?define Platform= "x86" ?>
 
     <?define VerMajor = "@VERSION_MAJOR@" ?>
     <?define VerMinor = "@VERSION_MINOR@" ?>
@@ -19,8 +18,9 @@
     <?define LocalePath = "$(var.BinPath)\locale" ?>
     <?define SdkPath = "$(var.BinPath)\sdk" ?>-->
 
+    <?define Platform= "@WINDOWS_ARCH@" ?>
 
-    <?if $(var.Platform) = x64 ?>
+    <?if $(var.Platform) = "x64" ?>
         <?define Win64 = "yes" ?>
     <?else ?>
         <?define Win64 = "no" ?>
