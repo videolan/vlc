@@ -25,7 +25,7 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <Product
         Id='*'
-        Name='$(var.ProductName) $(var.Version)'
+        Name='$(var.ProductName) $(var.Version) ($(var.PlatformString))'
         Language='1033'
         Version='$(var.VersionLong)'
         Manufacturer='$(var.Manufacturer)'

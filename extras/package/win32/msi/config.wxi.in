@@ -22,8 +22,10 @@
 
     <?if $(var.Platform) = "x64" ?>
         <?define Win64 = "yes" ?>
+        <?define PlatformString = "64-bit"?>
     <?else ?>
         <?define Win64 = "no" ?>
+        <?define PlatformString = "32-bit"?>
     <?endif ?>
 
     <?define AppFolder = "VLC" ?>
