@@ -1414,7 +1414,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 }
                 p_sys->i_pcr = 0;
 
-                /* Retrieve RTP-Info values */
                 for( i = 0; i < p_sys->i_track; i++ )
                 {
                     p_sys->track[i]->b_rtcp_sync = false;
