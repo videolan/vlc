@@ -1,4 +1,4 @@
-WIXPATH=`winepath -u 'C:\\Program Files\\Windows Installer XML v3.5\\bin'`
+WIXPATH=`winepath -u 'C:\\Program Files (x86)\\Windows Installer XML v3.5\\bin'`
 HEAT=wine "$(WIXPATH)/heat.exe"
 CANDLE=wine "$(WIXPATH)/candle.exe"
 LIGHT=wine "$(WIXPATH)/light.exe"
