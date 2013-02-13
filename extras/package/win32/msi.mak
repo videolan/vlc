@@ -27,6 +27,7 @@ candle:
 
 light:
 	$(LIGHT) -sval -ext WixUIExtension -ext WixUtilExtension -cultures:en-us -b $(W_MSIDIR) -b $(VLCDIR)/plugins -b $(VLCDIR)/locale -b $(VLCDIR)/lua -b $(VLCDIR)/skins $(W_MSIBUILDDIR)\\product.wixobj $(W_MSIBUILDDIR)\\axvlc.wixobj $(W_MSIBUILDDIR)\\extensions.wixobj $(W_MSIBUILDDIR)\\*.fragment.wixobj -o $(MSIOUTFILE)
+	chmod 644 $(MSIOUTFILE)
 
 cleanmsi:
 	-rm -f $(MSIBUILDDIR)/*.wixobj
