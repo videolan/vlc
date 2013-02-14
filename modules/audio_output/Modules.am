@@ -65,7 +65,7 @@ if HAVE_WASAPI
 libvlc_LTLIBRARIES += libmmdevice_plugin.la
 endif
 
-libdirectsound_plugin_la_SOURCES = directx.c windows_audio_common.h packet.c
+libdirectsound_plugin_la_SOURCES = directx.c windows_audio_common.h
 libdirectsound_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdirectsound_plugin_la_LIBADD = $(AM_LIBADD) -lole32
 if HAVE_DIRECTX
