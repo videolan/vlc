@@ -460,7 +460,10 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         channels = popcount (fmt->i_physical_channels);
     }
     else
+    {
+        sys->chans_to_reorder = 0;
         channels = 2;
+    }
     fmt->i_original_channels = fmt->i_physical_channels;
 
     /* By default, ALSA plug will pad missing channels with zeroes, which is
