@@ -76,7 +76,7 @@
                             </RegistryKey>
                         </Component>
 
-                        <Component Id='CompVLC' Guid='$(var.CompVLCexe)'>
+                        <Component Id='CompVLC' Guid='$(var.CompVLCexe)' Win64="$(var.Win64)">
                             <File Id='vlc.exe' Name='vlc.exe' KeyPath='yes' Vital='yes' DiskId='1' />
                             <File Id='vlc.exe.manifest' Name='vlc.exe.manifest' DiskId='1' />
 
@@ -108,7 +108,7 @@
 
                         </Component>
 
-                        <Component Id='CompTXT' Guid='7fbd228c-87d8-4e91-85b3-aa65e03c9f1e'>
+                        <Component Id='CompTXT' Guid='7fbd228c-87d8-4e91-85b3-aa65e03c9f1e' Win64="$(var.Win64)">
                             <File Id='AUTHORS.txt' Name='AUTHORS.txt'  DiskId='1' />
                             <File Id='COPYING.txt' Name='COPYING.txt' DiskId='1' />
                             <File Id='NEWS.txt' Name='NEWS.txt' DiskId='1' />
@@ -116,35 +116,35 @@
                             <File Id='THANKS.txt' Name='THANKS.txt' DiskId='1' />
                         </Component>
 
-                        <Component Id='CompLibvlccore' Guid='efa826fd-0037-4ccd-9573-604fde3b9efa'>
+                        <Component Id='CompLibvlccore' Guid='efa826fd-0037-4ccd-9573-604fde3b9efa' Win64="$(var.Win64)">
                             <File Id='libvlccore.dll' Name='libvlccore.dll' KeyPath='yes' Vital='yes' DiskId='1' />
                         </Component>
 
-                        <Component Id='CompLibvlc' Guid='50d7e1e1-4512-4020-9f7b-5dc8484574f3'>
+                        <Component Id='CompLibvlc' Guid='50d7e1e1-4512-4020-9f7b-5dc8484574f3' Win64="$(var.Win64)">
                             <File Id='libvlc.dll' Name='libvlc.dll' KeyPath='yes' Vital='yes' DiskId='1' />
                             <File Id='libvlc.dll.manifest' Name='libvlc.dll.manifest' DiskId='1' />
                         </Component>
 
-                        <Component Id='CompNpvlc' Guid='e7d6b54c-c4ea-4280-90f5-c6ae80073d25'>
+                        <Component Id='CompNpvlc' Guid='e7d6b54c-c4ea-4280-90f5-c6ae80073d25' Win64="$(var.Win64)">
                             <File Id='npvlc.dll' Name='npvlc.dll' KeyPath='yes' DiskId='1' />
                             <File Id='npvlc.dll.manifest' Name='npvlc.dll.manifest' DiskId='1' />
                         </Component>
 
-                        <Component Id='CompAxvlc' Guid='cabe28b1-5586-4ac3-815b-4f3a834c0d54'>
+                        <Component Id='CompAxvlc' Guid='cabe28b1-5586-4ac3-815b-4f3a834c0d54' Win64="$(var.Win64)">
                             <File Id='axvlc.dll' Name='axvlc.dll' KeyPath='yes' DiskId='1' />
                             <File Id='axvlc.dll.manifest' Name='axvlc.dll.manifest' DiskId='1' />
                         </Component>
 
-                        <Component Id='CompCacheGen' Guid='e1b4a499-e223-4c18-9de0-258f12b8dcfa'>
+                        <Component Id='CompCacheGen' Guid='e1b4a499-e223-4c18-9de0-258f12b8dcfa' Win64="$(var.Win64)">
                             <File Id='vlc_cache_gen.exe' Name='vlc-cache-gen.exe' KeyPath='yes' DiskId='1' />
                         </Component>
 
-                        <Component Id='CompIcon' Guid='8707410c-55fe-4c38-924e-438762b8b82e'>
+                        <Component Id='CompIcon' Guid='8707410c-55fe-4c38-924e-438762b8b82e' Win64="$(var.Win64)">
                             <File Id='vlc.ico' Name='vlc.ico' KeyPath='yes' DiskId='1' />
                         </Component>
 
                         <Directory Id='PLUGINSDIR' Name='plugins'>
-                            <Component Id='CompPluginsCache' Guid='0b72e987-8e3c-4201-aa3e-5b57ca9c040e'>
+                            <Component Id='CompPluginsCache' Guid='0b72e987-8e3c-4201-aa3e-5b57ca9c040e' Win64="$(var.Win64)">
                                 <RemoveFile Id="RemovePluginsCache" Name="plugins.dat" On="uninstall" />
                             </Component>
                         </Directory>
@@ -153,7 +153,7 @@
                         <!-- <Directory Id='OSDMENUDIR' Name='osdmenu' /> -->
                         <Directory Id='SKINSDIR' Name='skins' />
 
-                        <Component Id='CompPlayDiscs' Guid='b0d90296-b20c-4c74-a3b3-a7694e011f25'>
+                        <Component Id='CompPlayDiscs' Guid='b0d90296-b20c-4c74-a3b3-a7694e011f25' Win64="$(var.Win64)">
                             <!-- Audio CD -->
                             <RegistryValue Root="HKCR" Key="AudioCD\shell\PlayWithVLC" Value="Play with VLC media player" Type="string" />
                             <RegistryValue Root="HKCR" Key="AudioCD\shell\PlayWithVLC\command" Value="&quot;[#vlc.exe]&quot; --started-from-file cdda:///%1" Type="string" />
@@ -259,7 +259,7 @@
         </Directory>
 
         <DirectoryRef Id="ProgramMenuProductFolder">
-            <Component Id="CompProgramMenuShortcuts" Guid="*">
+            <Component Id="CompProgramMenuShortcuts" Guid="*" Win64="$(var.Win64)">
                 <!-- create folders -->
                 <CreateFolder Directory="ProgramMenuManufacturerFolder" />
                 <CreateFolder Directory="ProgramMenuProductFolder" />
