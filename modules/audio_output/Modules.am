@@ -72,7 +72,7 @@ if HAVE_DIRECTX
 libvlc_LTLIBRARIES += libdirectsound_plugin.la
 endif
 
-libkai_plugin_la_SOURCES = kai.c packet.c
+libkai_plugin_la_SOURCES = kai.c
 libkai_plugin_la_CFLAGS = $(AM_CFLAGS)
 libkai_plugin_la_LIBADD = $(AM_LIBADD) $(KAI_LIBS)
 if HAVE_KAI
