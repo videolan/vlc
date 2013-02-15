@@ -305,5 +305,4 @@
 
 @synthesize currentWindowLevel=i_currentWindowLevel;
 
-
 @end

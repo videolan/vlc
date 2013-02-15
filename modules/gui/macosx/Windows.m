@@ -786,12 +786,7 @@
                 CGDisplayFade(token, 0.5, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES);
             }
 
-            NSApplicationPresentationOptions presentationOpts = [NSApp presentationOptions];
-            if ([screen hasMenuBar])
-                presentationOpts |= NSApplicationPresentationAutoHideMenuBar;
-            if ([screen hasMenuBar] || [screen hasDock])
-                presentationOpts |= NSApplicationPresentationAutoHideDock;
-            [NSApp setPresentationOptions:presentationOpts];
+            [screen setFullscreenPresentationOptions];
 
             [[o_video_view superview] replaceSubview:o_video_view with:o_temp_view];
             [o_temp_view setFrame:[o_video_view frame]];
@@ -841,12 +836,7 @@
         [o_fullscreen_anim2 release];
     }
 
-    NSApplicationPresentationOptions presentationOpts = [NSApp presentationOptions];
-    if ([screen hasMenuBar])
-        presentationOpts |= NSApplicationPresentationAutoHideMenuBar;
-    if ([screen hasMenuBar] || [screen hasDock])
-        presentationOpts |= NSApplicationPresentationAutoHideDock;
-    [NSApp setPresentationOptions:presentationOpts];
+    [screen setFullscreenPresentationOptions];
 
     dict1 = [[NSMutableDictionary alloc] initWithCapacity:2];
     dict2 = [[NSMutableDictionary alloc] initWithCapacity:3];

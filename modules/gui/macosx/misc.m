@@ -246,12 +246,7 @@ static NSMutableArray *blackoutWindows = NULL;
         [blackoutWindows addObject: blackoutWindow];
         [blackoutWindow release];
 
-        NSApplicationPresentationOptions presentationOpts = [NSApp presentationOptions];
-        if ([screen hasMenuBar])
-            presentationOpts |= NSApplicationPresentationAutoHideMenuBar;
-        if ([screen hasMenuBar] || [screen hasDock])
-            presentationOpts |= NSApplicationPresentationAutoHideDock;
-        [NSApp setPresentationOptions:presentationOpts];
+        [screen setFullscreenPresentationOptions];
     }
 }
 
@@ -265,6 +260,16 @@ static NSMutableArray *blackoutWindows = NULL;
     }
 
     [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
+}
+
+- (void)setFullscreenPresentationOptions
+{
+    NSApplicationPresentationOptions presentationOpts = [NSApp presentationOptions];
+    if ([self hasMenuBar])
+        presentationOpts |= NSApplicationPresentationAutoHideMenuBar;
+    if ([self hasMenuBar] || [self hasDock])
+        presentationOpts |= NSApplicationPresentationAutoHideDock;
+    [NSApp setPresentationOptions:presentationOpts];
 }
 
 @end
