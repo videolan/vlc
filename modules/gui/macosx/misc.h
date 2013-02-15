@@ -65,6 +65,9 @@
 - (CGDirectDisplayID)displayID;
 - (void)blackoutOtherScreens;
 + (void)unblackoutScreens;
+
+- (void)setFullscreenPresentationOptions;
+- (void)setNonFullscreenPresentationOptions;
 @end
 
 

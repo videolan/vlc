@@ -256,10 +256,9 @@ static NSMutableArray *blackoutWindows = NULL;
 
     for (NSUInteger i = 0; i < blackoutWindowCount; i++) {
         VLCWindow *blackoutWindow = [blackoutWindows objectAtIndex: i];
+        [[blackoutWindow screen] setNonFullscreenPresentationOptions];
         [blackoutWindow closeAndAnimate: YES];
     }
-
-    [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
 }
 
 - (void)setFullscreenPresentationOptions
@@ -269,6 +268,16 @@ static NSMutableArray *blackoutWindows = NULL;
         presentationOpts |= NSApplicationPresentationAutoHideMenuBar;
     if ([self hasMenuBar] || [self hasDock])
         presentationOpts |= NSApplicationPresentationAutoHideDock;
+    [NSApp setPresentationOptions:presentationOpts];
+}
+
+- (void)setNonFullscreenPresentationOptions
+{
+    NSApplicationPresentationOptions presentationOpts = [NSApp presentationOptions];
+    if ([self hasMenuBar])
+        presentationOpts &= (~NSApplicationPresentationAutoHideMenuBar);
+    if ([self hasMenuBar] || [self hasDock])
+        presentationOpts &= (~NSApplicationPresentationAutoHideDock);
     [NSApp setPresentationOptions:presentationOpts];
 }
 

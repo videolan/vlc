@@ -930,7 +930,7 @@
         }
 
         [[[VLCMainWindow sharedInstance] fsPanel] setNonActive: nil];
-        [NSApp setPresentationOptions: NSApplicationPresentationDefault];
+        [[o_fullscreen_window screen] setNonFullscreenPresentationOptions];
 
         /* Will release the lock */
         [self hasEndedFullscreen];
@@ -952,7 +952,7 @@
     [[o_video_view window] orderFront: self];
 
     [[[VLCMainWindow sharedInstance] fsPanel] setNonActive: nil];
-    [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
+    [[o_fullscreen_window screen] setNonFullscreenPresentationOptions];
 
     if (o_fullscreen_anim1) {
         [o_fullscreen_anim1 stopAnimation];
