@@ -134,7 +134,7 @@
                 [[VLCCoreInteraction sharedInstance] toggleFullscreen];
             else if (p_vout) {
                 if (key == ' ')
-                    [[VLCCoreInteraction sharedInstance] play];
+                    [[VLCCoreInteraction sharedInstance] playOrPause];
                 else {
                     val.i_int |= (int)CocoaKeyToVLC(key);
                     var_Set(p_vout->p_libvlc, "key-pressed", val);

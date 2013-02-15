@@ -155,7 +155,7 @@
 
 - (IBAction)play:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] play];
+    [[VLCCoreInteraction sharedInstance] playOrPause];
 }
 
 - (void)resetPreviousButton

@@ -78,14 +78,14 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 #pragma mark -
 #pragma mark Playback Controls
 
-- (void)play
+- (void)playOrPause
 {
     input_thread_t * p_input;
     p_input = pl_CurrentInput(VLCIntf);
     playlist_t * p_playlist = pl_Get(VLCIntf);
 
     if (p_input) {
-        playlist_Play(p_playlist);
+        playlist_Pause(p_playlist);
         vlc_object_release(p_input);
     } else {
         bool empty;

@@ -88,7 +88,7 @@
     playlist_t * p_playlist = pl_Get(p_intf);
 
     if ([o_command isEqualToString:@"play"])
-        [[VLCCoreInteraction sharedInstance] play];
+        [[VLCCoreInteraction sharedInstance] playOrPause];
     else if ([o_command isEqualToString:@"stop"])
         [[VLCCoreInteraction sharedInstance] stop];
     else if ([o_command isEqualToString:@"previous"])

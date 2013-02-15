@@ -38,7 +38,7 @@
 @property (readonly) NSString * nameOfCurrentPlaylistItem;
 @property (nonatomic, readwrite) BOOL mute;
 
-- (void)play;
+- (void)playOrPause;
 - (void)pause;
 - (void)stop;
 - (void)faster;

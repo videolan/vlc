@@ -534,7 +534,7 @@
 
 - (IBAction)play:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] play];
+    [[VLCCoreInteraction sharedInstance] playOrPause];
 }
 
 - (IBAction)forward:(id)sender

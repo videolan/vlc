@@ -932,7 +932,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         int keyRepeat = (keyFlags & 0x1);
 
         if (keyCode == NX_KEYTYPE_PLAY && keyState == 0)
-            [[VLCCoreInteraction sharedInstance] play];
+            [[VLCCoreInteraction sharedInstance] playOrPause];
 
         if ((keyCode == NX_KEYTYPE_FAST || keyCode == NX_KEYTYPE_NEXT) && !b_mediakeyJustJumped) {
             if (keyState == 0 && keyRepeat == 0)
@@ -1078,13 +1078,13 @@ static VLCMain *_o_sharedMainInstance = nil;
             [[VLCCoreInteraction sharedInstance] toggleFullscreen];
             break;
         case k2009RemoteButtonPlay:
-            [[VLCCoreInteraction sharedInstance] play];
+            [[VLCCoreInteraction sharedInstance] playOrPause];
             break;
         case kRemoteButtonPlay:
             if (count >= 2)
                 [[VLCCoreInteraction sharedInstance] toggleFullscreen];
             else
-                [[VLCCoreInteraction sharedInstance] play];
+                [[VLCCoreInteraction sharedInstance] playOrPause];
             break;
         case kRemoteButtonVolume_Plus:
             if (config_GetInt(VLCIntf, "macosx-appleremote-sysvol"))
@@ -1192,7 +1192,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         }
 
         if (key == 0x0020) { // space key
-            [[VLCCoreInteraction sharedInstance] play];
+            [[VLCCoreInteraction sharedInstance] playOrPause];
             return YES;
         }
 
