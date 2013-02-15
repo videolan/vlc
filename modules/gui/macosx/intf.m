@@ -172,8 +172,8 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
         int i_full = 1;
 
         SEL sel = @selector(setFullscreen:forWindow:);
-        NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[[VLCMain sharedInstance] methodSignatureForSelector:sel]];
-        [inv setTarget:[VLCMain sharedInstance]];
+        NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[[[VLCMain sharedInstance] voutController] methodSignatureForSelector:sel]];
+        [inv setTarget:[[VLCMain sharedInstance] voutController]];
         [inv setSelector:sel];
         [inv setArgument:&i_full atIndex:2];
         [inv setArgument:&p_wnd atIndex:3];
@@ -236,8 +236,8 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
             int i_full = va_arg(args, int);
 
             SEL sel = @selector(setFullscreen:forWindow:);
-            NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[[VLCMain sharedInstance] methodSignatureForSelector:sel]];
-            [inv setTarget:[VLCMain sharedInstance]];
+            NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[[[VLCMain sharedInstance] voutController] methodSignatureForSelector:sel]];
+            [inv setTarget:[[VLCMain sharedInstance] voutController]];
             [inv setSelector:sel];
             [inv setArgument:&i_full atIndex:2]; // starting at 2!
             [inv setArgument:&p_wnd atIndex:3];
@@ -1253,54 +1253,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 #pragma mark -
 #pragma mark Interface updaters
-- (void)setFullscreen:(int)i_full forWindow:(vout_window_t *)p_wnd
-{
-    if (!p_intf || (!b_nativeFullscreenMode && !p_wnd))
-        return;
-    playlist_t * p_playlist = pl_Get(p_intf);
-    BOOL b_fullscreen = i_full;
-
-    if (!var_GetBool(p_playlist, "fullscreen") != !b_fullscreen)
-        var_SetBool(p_playlist, "fullscreen", b_fullscreen);
-
-    if (b_nativeFullscreenMode) {
-        VLCVideoWindowCommon *o_active_window = nil;
-        if(p_wnd)
-            o_active_window = [o_vout_controller getWindow: p_wnd];
-        else
-            o_active_window = o_mainwindow;
-
-        // fullscreen might be triggered twice (vout event)
-        // so ignore duplicate events here
-        if((b_fullscreen && !([o_active_window fullscreen] || [o_active_window enteringFullscreenTransition])) ||
-            (!b_fullscreen && [o_active_window fullscreen])) {
-
-            [o_active_window toggleFullScreen:self];
-        }
-
-        if (b_fullscreen)
-            [NSApp setPresentationOptions:(NSApplicationPresentationFullScreen | NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
-        else
-            [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
-    } else {
-        assert(p_wnd);
-
-        if (b_fullscreen) {
-            input_thread_t * p_input = pl_CurrentInput(p_intf);
-            if (p_input != NULL && [self activeVideoPlayback]) {
-                // activate app, as method can also be triggered from outside the app (prevents nasty window layout)
-                [NSApp activateIgnoringOtherApps:YES];
-                [o_vout_controller updateWindow:p_wnd withSelector:@selector(enterFullscreen)];
-
-            }
-            if (p_input)
-                vlc_object_release(p_input);
-        } else {
-            // leaving fullscreen is always allowed
-            [o_vout_controller updateWindow:p_wnd withSelector:@selector(leaveFullscreen)];
-        }
-    }
-}
 
 - (void)PlaylistItemChanged
 {

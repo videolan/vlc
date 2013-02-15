@@ -622,7 +622,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
         vlc_object_release(p_vout);
     } else { // e.g. lion fullscreen toggle
         BOOL b_fs = var_ToggleBool(pl_Get(p_intf), "fullscreen");
-        [[VLCMain sharedInstance] setFullscreen:b_fs forWindow:nil];
+        [[[VLCMain sharedInstance] voutController] setFullscreen:b_fs forWindow:nil];
     }
 }
 

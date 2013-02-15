@@ -45,15 +45,12 @@
 
 - (VLCVoutView *)setupVoutForWindow:(vout_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition;
 - (void)removeVoutforDisplay:(NSValue *)o_key;
-
-- (void)updateWindowsControlsBarWithSelector:(SEL)aSel;
-- (VLCVideoWindowCommon *)getWindow:(vout_window_t *)p_wnd;
-- (void)updateWindowsUsingBlock:(void (^)(VLCVideoWindowCommon *o_window))windowUpdater;
-
-- (void)updateWindow:(vout_window_t *)p_wnd withSelector:(SEL)aSel;
-
 - (void)setNativeVideoSize:(NSSize)size forWindow:(vout_window_t *)p_wnd;
 - (void)setWindowLevel:(NSInteger)i_level forWindow:(vout_window_t *)p_wnd;
+- (void)setFullscreen:(int)i_full forWindow:(vout_window_t *)p_wnd;
+
+- (void)updateWindowsControlsBarWithSelector:(SEL)aSel;
+- (void)updateWindowsUsingBlock:(void (^)(VLCVideoWindowCommon *o_window))windowUpdater;
 
 - (void)updateWindowLevelForHelperWindows:(NSInteger)i_level;
 

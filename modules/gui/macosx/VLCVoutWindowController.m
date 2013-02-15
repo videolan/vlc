@@ -53,6 +53,8 @@
     [super dealloc];
 }
 
+#pragma mark -
+#pragma mark Methods for vout provider
 
 - (VLCVoutView *)setupVoutForWindow:(vout_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition
 {
@@ -217,43 +219,6 @@
         [[VLCMain sharedInstance] setActiveVideoPlayback:NO];
 }
 
-- (void)updateWindowsControlsBarWithSelector:(SEL)aSel
-{
-    [o_vout_dict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-        if ([obj respondsToSelector:@selector(controlsBar)]) {
-            id o_controlsBar = [obj controlsBar];
-            if (o_controlsBar)
-                [o_controlsBar performSelector:aSel];
-        }
-    }];
-}
-
-- (void)updateWindow:(vout_window_t *)p_wnd withSelector:(SEL)aSel;
-{
-    VLCVideoWindowCommon *o_window = [o_vout_dict objectForKey:[NSValue valueWithPointer:p_wnd]];
-    if (!o_window) {
-        msg_Err(VLCIntf, "Cannot call selector for nonexisting window");
-        return;
-    }
-
-    [o_window performSelector:aSel];
-}
-
-- (VLCVideoWindowCommon *)getWindow:(vout_window_t *)p_wnd
-{
-    VLCVideoWindowCommon *o_window = [o_vout_dict objectForKey:[NSValue valueWithPointer:p_wnd]];
-    assert(o_window);
-    return o_window;
-
-}
-
-- (void)updateWindowsUsingBlock:(void (^)(VLCVideoWindowCommon *o_window))windowUpdater
-{
-    [o_vout_dict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-        if ([obj isKindOfClass: [NSWindow class]])
-            windowUpdater(obj);
-    }];
-}
 
 - (void)setNativeVideoSize:(NSSize)size forWindow:(vout_window_t *)p_wnd
 {
@@ -286,6 +251,83 @@
     }
 
     [o_window setWindowLevel:i_level];
+}
+
+
+- (void)setFullscreen:(int)i_full forWindow:(vout_window_t *)p_wnd
+{
+    intf_thread_t *p_intf = VLCIntf;
+    BOOL b_nativeFullscreenMode = [[VLCMain sharedInstance] nativeFullscreenMode];
+    
+    if (!p_intf || (!b_nativeFullscreenMode && !p_wnd))
+        return;
+    playlist_t *p_playlist = pl_Get(p_intf);
+    BOOL b_fullscreen = i_full;
+
+    if (!var_GetBool(p_playlist, "fullscreen") != !b_fullscreen)
+        var_SetBool(p_playlist, "fullscreen", b_fullscreen);
+
+    VLCVideoWindowCommon *o_current_window = nil;
+    if(p_wnd)
+        o_current_window = [o_vout_dict objectForKey:[NSValue valueWithPointer:p_wnd]];
+
+    if (b_nativeFullscreenMode) {
+        if(!o_current_window)
+            o_current_window = [VLCMainWindow sharedInstance];        
+        assert(o_current_window);
+
+        // fullscreen might be triggered twice (vout event)
+        // so ignore duplicate events here
+        if((b_fullscreen && !([o_current_window fullscreen] || [o_current_window enteringFullscreenTransition])) ||
+           (!b_fullscreen && [o_current_window fullscreen])) {
+
+            [o_current_window toggleFullScreen:self];
+        }
+
+        if (b_fullscreen)
+            [NSApp setPresentationOptions:(NSApplicationPresentationFullScreen | NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
+        else
+            [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
+    } else {
+        assert(o_current_window);
+
+        if (b_fullscreen) {
+            input_thread_t * p_input = pl_CurrentInput(p_intf);
+            if (p_input != NULL && [[VLCMain sharedInstance] activeVideoPlayback]) {
+                // activate app, as method can also be triggered from outside the app (prevents nasty window layout)
+                [NSApp activateIgnoringOtherApps:YES];
+                [o_current_window enterFullscreen];
+
+            }
+            if (p_input)
+                vlc_object_release(p_input);
+        } else {
+            // leaving fullscreen is always allowed
+            [o_current_window leaveFullscreen];
+        }
+    }
+}
+
+#pragma mark -
+#pragma mark Misc methods
+
+- (void)updateWindowsControlsBarWithSelector:(SEL)aSel
+{
+    [o_vout_dict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        if ([obj respondsToSelector:@selector(controlsBar)]) {
+            id o_controlsBar = [obj controlsBar];
+            if (o_controlsBar)
+                [o_controlsBar performSelector:aSel];
+        }
+    }];
+}
+
+- (void)updateWindowsUsingBlock:(void (^)(VLCVideoWindowCommon *o_window))windowUpdater
+{
+    [o_vout_dict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        if ([obj isKindOfClass: [NSWindow class]])
+            windowUpdater(obj);
+    }];
 }
 
 - (void)updateWindowLevelForHelperWindows:(NSInteger)i_level

@@ -177,8 +177,6 @@ struct intf_sys_t
 - (void)updateCurrentlyUsedHotkeys;
 - (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event force:(BOOL)b_force;
 
-- (void)setFullscreen:(int)i_full forWindow:(vout_window_t *)p_wnd;
-
 - (void)PlaylistItemChanged;
 - (void)playbackStatusUpdated;
 - (void)sendDistributedNotificationWithUpdatedPlaybackStatus;
