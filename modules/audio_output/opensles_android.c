@@ -42,10 +42,10 @@
 #include <SLES/OpenSLES_Android.h>
 
 #define OPENSLES_BUFFERS 255 /* maximum number of buffers */
-#define OPENSLES_BUFLEN  4   /* ms */
+#define OPENSLES_BUFLEN  10   /* ms */
 /*
- * 4ms of precision when mesasuring latency should be plenty enough,
- * with 255 buffers we can buffer ~1s of audio.
+ * 10ms of precision when mesasuring latency should be enough,
+ * with 255 buffers we can buffer 2.55s of audio.
  */
 
 #define CHECK_OPENSL_ERROR(msg)                \
