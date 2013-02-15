@@ -594,6 +594,13 @@
         [[[VLCMainWindow sharedInstance] fsPanel] setNonActive:nil];
 }
 
+- (void)resignKeyWindow
+{
+    [super resignKeyWindow];
+
+    [[[VLCMainWindow sharedInstance] fsPanel] setNonActive:nil];
+}
+
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
     // workaround, see #6668
