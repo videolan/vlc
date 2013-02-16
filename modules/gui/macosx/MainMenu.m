@@ -766,17 +766,20 @@ static VLCMainMenu *_o_sharedInstance = nil;
 - (IBAction)toggleAudioDevice:(id)sender
 {
     audio_output_t * p_aout = getAout();
+    if (!p_aout)
+        return;
 
     int returnValue = 0;
 
     if ([sender tag] > 0)
-        aout_DeviceSet(p_aout, [[NSString stringWithFormat:@"%li", [sender tag]] UTF8String]);
+        returnValue = aout_DeviceSet(p_aout, [[NSString stringWithFormat:@"%li", [sender tag]] UTF8String]);
     else
-        aout_DeviceSet(p_aout, NULL);
+        returnValue = aout_DeviceSet(p_aout, NULL);
 
     if (returnValue != 0)
         msg_Warn(VLCIntf, "failed to set audio device %li", [sender tag]);
 
+    vlc_object_release(p_aout);
     [self refreshAudioDeviceList];
 }
 
