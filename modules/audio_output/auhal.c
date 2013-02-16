@@ -997,6 +997,13 @@ static void RebuildDeviceList(audio_output_t * p_aout)
         bool b_digital = false;
         UInt32 i_id = deviceIDs[i];
 
+        /* Retrieve the length of the device name */
+        err = AudioObjectGetPropertyDataSize(deviceIDs[i], &deviceNameAddress, 0, NULL, &propertySize);
+        if (err != noErr) {
+            msg_Dbg(p_aout, "failed to get name size for device %i", deviceIDs[i]);
+            continue;
+        }
+
         /* Retrieve the name of the device */
         err = AudioObjectGetPropertyData(deviceIDs[i], &deviceNameAddress, 0, NULL, &propertySize, &device_name_ref);
         if (err != noErr) {
