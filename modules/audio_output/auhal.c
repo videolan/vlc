@@ -22,9 +22,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
+#pragma mark includes
 
 #ifdef HAVE_CONFIG_H
 # import "config.h"
@@ -41,6 +39,9 @@
 #import <CoreServices/CoreServices.h>
 
 #import "TPCircularBuffer.h"
+
+#pragma mark -
+#pragma mark private declarations
 
 #ifndef verify_noerr
 # define verify_noerr(a) assert((a) == noErr)
@@ -60,6 +61,8 @@
 #define AOUT_VOLUME_DEFAULT             256
 #define AOUT_VOLUME_MAX                 512
 
+#define VOLUME_TEXT N_("Audio volume")
+#define VOLUME_LONGTEXT VOLUME_TEXT
 
 /*****************************************************************************
  * aout_sys_t: private audio output method descriptor
@@ -112,44 +115,41 @@ struct audio_device_t
     char *name;
 };
 
-/*****************************************************************************
- * Local prototypes.
- *****************************************************************************/
-static int      Open                    (vlc_object_t *);
-static int      OpenAnalog              (audio_output_t *, audio_sample_format_t *);
-static int      OpenSPDIF               (audio_output_t *, audio_sample_format_t *);
-static void     Close                   (vlc_object_t *);
 
-static void     Play                    (audio_output_t *, block_t *);
-static void     Flush                   (audio_output_t *, bool);
-static void     Pause                   (audio_output_t *, bool, mtime_t);
-static int      TimeGet                 (audio_output_t *, mtime_t *);
+#pragma mark -
+#pragma mark local prototypes & module descriptor
+
+static int      Open                    (vlc_object_t *);
+static void     Close                   (vlc_object_t *);
+static int      Start                   (audio_output_t *, audio_sample_format_t *);
+static int      StartAnalog             (audio_output_t *, audio_sample_format_t *);
+static int      StartSPDIF              (audio_output_t *, audio_sample_format_t *);
+static void     Stop                    (audio_output_t *);
 
 static int      DeviceList              (audio_output_t *p_aout, char ***namesp, char ***descsp);
 static void     RebuildDeviceList       (audio_output_t *);
 static int      SwitchAudioDevice       (audio_output_t *p_aout, const char *name);
+static int      VolumeSet               (audio_output_t *, float);
+static int      MuteSet                 (audio_output_t *, bool);
+
+static void     Play                    (audio_output_t *, block_t *);
+static void     Pause                   (audio_output_t *, bool, mtime_t);
+static void     Flush                   (audio_output_t *, bool);
+static int      TimeGet                 (audio_output_t *, mtime_t *);
+static OSStatus RenderCallbackAnalog    (vlc_object_t *, AudioUnitRenderActionFlags *, const AudioTimeStamp *,
+                                         UInt32 , UInt32, AudioBufferList *);
+
+static OSStatus RenderCallbackSPDIF     (AudioDeviceID, const AudioTimeStamp *, const void *, const AudioTimeStamp *,
+                                         AudioBufferList *, const AudioTimeStamp *, void *);
+
+static OSStatus HardwareListener        (AudioObjectID, UInt32, const AudioObjectPropertyAddress *, void *);
+static OSStatus StreamListener          (AudioObjectID, UInt32, const AudioObjectPropertyAddress *, void *);
 
 static int      AudioDeviceHasOutput    (AudioDeviceID);
 static int      AudioDeviceSupportsDigital(audio_output_t *, AudioDeviceID);
 static int      AudioStreamSupportsDigital(audio_output_t *, AudioStreamID);
 static int      AudioStreamChangeFormat (audio_output_t *, AudioStreamID, AudioStreamBasicDescription);
 
-static OSStatus RenderCallbackAnalog    (vlc_object_t *, AudioUnitRenderActionFlags *, const AudioTimeStamp *, UInt32 , UInt32, AudioBufferList *);
-
-static OSStatus RenderCallbackSPDIF     (AudioDeviceID, const AudioTimeStamp *, const void *, const AudioTimeStamp *,
-                                          AudioBufferList *, const AudioTimeStamp *, void *);
-static OSStatus HardwareListener        (AudioObjectID, UInt32, const AudioObjectPropertyAddress *, void *);
-static OSStatus StreamListener          (AudioObjectID, UInt32, const AudioObjectPropertyAddress *, void *);
-
-static int      VolumeSet               (audio_output_t *, float);
-static int      MuteSet                 (audio_output_t *, bool);
-
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-#define VOLUME_TEXT N_("Audio volume")
-#define VOLUME_LONGTEXT VOLUME_TEXT
 
 vlc_module_begin ()
     set_shortname("auhal")
@@ -164,9 +164,53 @@ vlc_module_begin ()
     add_obsolete_integer("macosx-audio-device") /* since 2.1.0 */
 vlc_module_end ()
 
-/*****************************************************************************
- * Open: open macosx audio output
- *****************************************************************************/
+#pragma mark -
+#pragma mark initialization
+
+static int Open(vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = malloc(sizeof (*sys));
+
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+
+    vlc_mutex_init(&sys->lock);
+
+    aout->sys = sys;
+    aout->start = Start;
+    aout->stop = Stop;
+    aout->volume_set = VolumeSet;
+    aout->mute_set = MuteSet;
+    aout->device_enum = DeviceList;
+    aout->sys->devices = NULL;
+    aout->device_select = SwitchAudioDevice;
+
+    RebuildDeviceList(aout);
+
+    /* remember the volume */
+    aout_VolumeReport(aout, var_InheritInteger(aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT);
+    MuteSet(aout, var_InheritBool(aout, "mute"));
+
+    return VLC_SUCCESS;
+}
+
+static void Close(vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = aout->sys;
+
+    for (struct audio_device_t * device = sys->devices, *next; device != NULL; device = next) {
+        next = device->next;
+        free(device->name);
+        free(device);
+    }
+
+    vlc_mutex_destroy(&sys->lock);
+
+    free(sys);
+}
+
 static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 {
     OSStatus                err = noErr;
@@ -246,12 +290,12 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     /* Check for Digital mode or Analog output mode */
     if (AOUT_FMT_SPDIF (fmt) && p_sys->b_selected_dev_is_digital) {
-        if (OpenSPDIF (p_aout, fmt)) {
+        if (StartSPDIF (p_aout, fmt)) {
             msg_Dbg(p_aout, "digital output successfully opened");
             b_success = true;
         }
     } else {
-        if (OpenAnalog(p_aout, fmt)) {
+        if (StartAnalog(p_aout, fmt)) {
             msg_Dbg(p_aout, "analog output successfully opened");
             b_success = true;
         }
@@ -267,14 +311,14 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
 error:
     /* If we reach this, this aout has failed */
-    msg_Err(p_aout, "opening the auhal output failed");
+    msg_Err(p_aout, "opening auhal output failed");
     return VLC_EGENERIC;
 }
 
-/*****************************************************************************
- * Open: open and setup a HAL AudioUnit to do analog (multichannel) audio output
- *****************************************************************************/
-static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
+/*
+ * StartAnalog: open and setup a HAL AudioUnit to do PCM audio output
+ */
+static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 {
     struct aout_sys_t           *p_sys = p_aout->sys;
     OSStatus                    err = noErr;
@@ -600,10 +644,10 @@ static int OpenAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     return true;
 }
 
-/*****************************************************************************
- * Setup a encoded digital stream (SPDIF)
- *****************************************************************************/
-static int OpenSPDIF (audio_output_t * p_aout, audio_sample_format_t *fmt)
+/*
+ * StartSPDIF: Setup an encoded digital stream (SPDIF) output
+ */
+static int StartSPDIF (audio_output_t * p_aout, audio_sample_format_t *fmt)
 {
     struct aout_sys_t       *p_sys = p_aout->sys;
     OSStatus                err = noErr;
@@ -678,7 +722,7 @@ static int OpenSPDIF (audio_output_t * p_aout, audio_sample_format_t *fmt)
         /* Retrieve all the stream formats supported by each output stream */
         err = AudioObjectGetPropertyDataSize(p_streams[i], &physicalFormatsAddress, 0, NULL, &i_param_size);
         if (err != noErr) {
-            msg_Err(p_aout, "OpenSPDIF: could not get number of streamformats: [%s] (%i)", (char *)&err, (int32_t)err);
+            msg_Err(p_aout, "could not get number of streamformats: [%s] (%i)", (char *)&err, (int32_t)err);
             continue;
         }
 
@@ -808,10 +852,6 @@ static int OpenSPDIF (audio_output_t * p_aout, audio_sample_format_t *fmt)
     return true;
 }
 
-
-/*****************************************************************************
- * Close: Close HAL AudioUnit
- *****************************************************************************/
 static void Stop(audio_output_t *p_aout)
 {
     struct aout_sys_t   *p_sys = p_aout->sys;
@@ -894,6 +934,9 @@ static void Stop(audio_output_t *p_aout)
     /* clean-up circular buffer */
     TPCircularBufferCleanup(&p_sys->circular_buffer);
 }
+
+#pragma mark -
+#pragma mark core interaction
 
 static int DeviceList(audio_output_t *p_aout, char ***namesp, char ***descsp)
 {
@@ -1072,184 +1115,51 @@ static int SwitchAudioDevice(audio_output_t *p_aout, const char *name)
     return 0;
 }
 
-/*****************************************************************************
- * AudioDeviceHasOutput: Checks if the Device actually provides any outputs at all
- *****************************************************************************/
-static int AudioDeviceHasOutput(AudioDeviceID i_dev_id)
+static int VolumeSet(audio_output_t * p_aout, float volume)
 {
-    UInt32 dataSize = 0;
-    OSStatus status;
+    struct aout_sys_t *p_sys = p_aout->sys;
+    OSStatus ostatus;
 
-    AudioObjectPropertyAddress streamsAddress = { kAudioDevicePropertyStreams, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
-    status = AudioObjectGetPropertyDataSize(i_dev_id, &streamsAddress, 0, NULL, &dataSize);
+    aout_VolumeReport(p_aout, volume);
 
-    if (dataSize == 0 || status != noErr)
-        return FALSE;
+    /* Set volume for output unit */
+    ostatus = AudioUnitSetParameter(p_sys->au_unit,
+                                    kHALOutputParam_Volume,
+                                    kAudioUnitScope_Global,
+                                    0,
+                                    volume * volume * volume,
+                                    0);
 
-    return TRUE;
+    if (var_InheritBool(p_aout, "volume-save"))
+        config_PutInt(p_aout, "auhal-volume", lroundf(volume * AOUT_VOLUME_DEFAULT));
+
+    return ostatus;
 }
 
-/*****************************************************************************
- * AudioDeviceSupportsDigital: Check i_dev_id for digital stream support.
- *****************************************************************************/
-static int AudioDeviceSupportsDigital(audio_output_t *p_aout, AudioDeviceID i_dev_id)
+static int MuteSet(audio_output_t * p_aout, bool mute)
 {
-    OSStatus                    err = noErr;
-    UInt32                      i_param_size = 0;
-    AudioStreamID               *p_streams = NULL;
-    int                         i_streams = 0;
-    bool                        b_return = false;
+    struct   aout_sys_t *p_sys = p_aout->sys;
+    OSStatus ostatus;
 
-    /* Retrieve all the output streams */
-    AudioObjectPropertyAddress streamsAddress = { kAudioDevicePropertyStreams, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
-    err = AudioObjectGetPropertyDataSize(i_dev_id, &streamsAddress, 0, NULL, &i_param_size);
-    if (err != noErr) {
-        msg_Err(p_aout, "could not get number of streams: [%s] (%i)", (char *)&err, (int32_t)err);
-        return false;
-    }
+    aout_MuteReport(p_aout, mute);
 
-    i_streams = i_param_size / sizeof(AudioStreamID);
-    p_streams = (AudioStreamID *)malloc(i_param_size);
-    if (p_streams == NULL)
-        return VLC_ENOMEM;
+    float volume = .0;
 
-    err = AudioObjectGetPropertyData(i_dev_id, &streamsAddress, 0, NULL, &i_param_size, p_streams);
-    if (err != noErr) {
-        msg_Err(p_aout, "could not get list of streams: [%s]", (char *)&err);
-        return false;
-    }
+    if (!mute)
+        volume = var_InheritInteger(p_aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT;
 
-    for (int i = 0; i < i_streams; i++) {
-        if (AudioStreamSupportsDigital(p_aout, p_streams[i]))
-            b_return = true;
-    }
+    ostatus = AudioUnitSetParameter(p_sys->au_unit,
+                                    kHALOutputParam_Volume,
+                                    kAudioUnitScope_Global,
+                                    0,
+                                    volume * volume * volume,
+                                    0);
 
-    free(p_streams);
-    return b_return;
+    return ostatus;
 }
 
-/*****************************************************************************
- * AudioStreamSupportsDigital: Check i_stream_id for digital stream support.
- *****************************************************************************/
-static int AudioStreamSupportsDigital(audio_output_t *p_aout, AudioStreamID i_stream_id)
-{
-    OSStatus                    err = noErr;
-    UInt32                      i_param_size = 0;
-    AudioStreamRangedDescription *p_format_list = NULL;
-    int                         i_formats = 0;
-    bool                        b_return = false;
-
-    /* Retrieve all the stream formats supported by each output stream */
-    AudioObjectPropertyAddress physicalFormatsAddress = { kAudioStreamPropertyAvailablePhysicalFormats, kAudioObjectPropertyScopeGlobal, 0 };
-    err = AudioObjectGetPropertyDataSize(i_stream_id, &physicalFormatsAddress, 0, NULL, &i_param_size);
-    if (err != noErr) {
-        msg_Err(p_aout, "could not get number of streamformats: [%s] (%i)", (char *)&err, (int32_t)err);
-        return false;
-    }
-
-    i_formats = i_param_size / sizeof(AudioStreamRangedDescription);
-    msg_Dbg(p_aout, "found %i stream formats", i_formats);
-
-    p_format_list = (AudioStreamRangedDescription *)malloc(i_param_size);
-    if (p_format_list == NULL)
-        return false;
-
-    err = AudioObjectGetPropertyData(i_stream_id, &physicalFormatsAddress, 0, NULL, &i_param_size, p_format_list);
-    if (err != noErr) {
-        msg_Err(p_aout, "could not get the list of streamformats: [%4.4s]", (char *)&err);
-        free(p_format_list);
-        p_format_list = NULL;
-        return false;
-    }
-
-    for (int i = 0; i < i_formats; i++) {
-#ifndef NDEBUG
-        msg_Dbg(p_aout, STREAM_FORMAT_MSG("supported format: ", p_format_list[i].mFormat));
-#endif
-
-        if (p_format_list[i].mFormat.mFormatID == 'IAC3' ||
-            p_format_list[i].mFormat.mFormatID == 'iac3' ||
-            p_format_list[i].mFormat.mFormatID == kAudioFormat60958AC3 ||
-            p_format_list[i].mFormat.mFormatID == kAudioFormatAC3)
-            b_return = true;
-    }
-
-    free(p_format_list);
-    return b_return;
-}
-
-/*****************************************************************************
- * AudioStreamChangeFormat: Change i_stream_id to change_format
- *****************************************************************************/
-static int AudioStreamChangeFormat(audio_output_t *p_aout, AudioStreamID i_stream_id, AudioStreamBasicDescription change_format)
-{
-    OSStatus            err = noErr;
-    UInt32              i_param_size = 0;
-
-    AudioObjectPropertyAddress physicalFormatAddress = { kAudioStreamPropertyPhysicalFormat, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
-
-    struct { vlc_mutex_t lock; vlc_cond_t cond; } w;
-
-    msg_Dbg(p_aout, STREAM_FORMAT_MSG("setting stream format: ", change_format));
-
-    /* Condition because SetProperty is asynchronious */
-    vlc_cond_init(&w.cond);
-    vlc_mutex_init(&w.lock);
-    vlc_mutex_lock(&w.lock);
-
-    /* Install the callback */
-    err = AudioObjectAddPropertyListener(i_stream_id, &physicalFormatAddress, StreamListener, (void *)&w);
-    if (err != noErr) {
-        msg_Err(p_aout, "AudioObjectAddPropertyListener for kAudioStreamPropertyPhysicalFormat failed: [%4.4s]", (char *)&err);
-        return false;
-    }
-
-    /* change the format */
-    err = AudioObjectSetPropertyData(i_stream_id, &physicalFormatAddress, 0, NULL, sizeof(AudioStreamBasicDescription),
-                                     &change_format);
-    if (err != noErr) {
-        msg_Err(p_aout, "could not set the stream format: [%4.4s]", (char *)&err);
-        return false;
-    }
-
-    /* The AudioStreamSetProperty is not only asynchronious (requiring the locks)
-     * it is also not atomic in its behaviour.
-     * Therefore we check 5 times before we really give up.
-     * FIXME: failing isn't actually implemented yet. */
-    for (int i = 0; i < 5; i++) {
-        AudioStreamBasicDescription actual_format;
-        mtime_t timeout = mdate() + 500000;
-
-        if (vlc_cond_timedwait(&w.cond, &w.lock, timeout))
-            msg_Dbg(p_aout, "reached timeout");
-
-        i_param_size = sizeof(AudioStreamBasicDescription);
-        err = AudioObjectGetPropertyData(i_stream_id, &physicalFormatAddress, 0, NULL, &i_param_size, &actual_format);
-
-        msg_Dbg(p_aout, STREAM_FORMAT_MSG("actual format in use: ", actual_format));
-        if (actual_format.mSampleRate == change_format.mSampleRate &&
-            actual_format.mFormatID == change_format.mFormatID &&
-            actual_format.mFramesPerPacket == change_format.mFramesPerPacket) {
-            /* The right format is now active */
-            break;
-        }
-        /* We need to check again */
-    }
-
-    /* Removing the property listener */
-    err = AudioObjectRemovePropertyListener(i_stream_id, &physicalFormatAddress, StreamListener, (void *)&w);
-    if (err != noErr) {
-        msg_Err(p_aout, "AudioStreamRemovePropertyListener failed: [%4.4s]", (char *)&err);
-        return false;
-    }
-
-    /* Destroy the lock and condition */
-    vlc_mutex_unlock(&w.lock);
-    vlc_mutex_destroy(&w.lock);
-    vlc_cond_destroy(&w.cond);
-
-    return true;
-}
+#pragma mark -
+#pragma mark actual playback
 
 static void Play (audio_output_t * p_aout, block_t * p_block)
 {
@@ -1382,9 +1292,9 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
     return noErr;
 }
 
-/*****************************************************************************
+/*
  * RenderCallbackSPDIF: callback for SPDIF audio output
- *****************************************************************************/
+ */
 static OSStatus RenderCallbackSPDIF (AudioDeviceID inDevice,
                                     const AudioTimeStamp * inNow,
                                     const void * inInputData,
@@ -1423,9 +1333,12 @@ static OSStatus RenderCallbackSPDIF (AudioDeviceID inDevice,
     return noErr;
 }
 
-/*****************************************************************************
+#pragma mark -
+#pragma mark Stream / Hardware Listeners
+
+/*
  * HardwareListener: Warns us of changes in the list of registered devices
- *****************************************************************************/
+ */
 static OSStatus HardwareListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses, const AudioObjectPropertyAddress inAddresses[], void*inClientData)
 {
     OSStatus err = noErr;
@@ -1464,9 +1377,9 @@ static OSStatus HardwareListener(AudioObjectID inObjectID,  UInt32 inNumberAddre
     return err;
 }
 
-/*****************************************************************************
- * StreamListener
- *****************************************************************************/
+/*
+ * StreamListener: check whether the device's physical format changes on-the-fly (unlikely)
+ */
 static OSStatus StreamListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses, const AudioObjectPropertyAddress inAddresses[], void*inClientData)
 {
     OSStatus err = noErr;
@@ -1485,92 +1398,184 @@ static OSStatus StreamListener(AudioObjectID inObjectID,  UInt32 inNumberAddress
     return err;
 }
 
-/*****************************************************************************
- * VolumeSet: Implements volume_set(). Update the CoreAudio AU volume immediately.
- *****************************************************************************/
-static int VolumeSet(audio_output_t * p_aout, float volume)
+#pragma mark -
+#pragma mark helpers
+
+/*
+ * AudioDeviceHasOutput: Checks if the device is actually an output device
+ */
+static int AudioDeviceHasOutput(AudioDeviceID i_dev_id)
 {
-    struct aout_sys_t *p_sys = p_aout->sys;
-    OSStatus ostatus;
+    UInt32 dataSize = 0;
+    OSStatus status;
 
-    aout_VolumeReport(p_aout, volume);
+    AudioObjectPropertyAddress streamsAddress = { kAudioDevicePropertyStreams, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
+    status = AudioObjectGetPropertyDataSize(i_dev_id, &streamsAddress, 0, NULL, &dataSize);
 
-    /* Set volume for output unit */
-    ostatus = AudioUnitSetParameter(p_sys->au_unit,
-                                    kHALOutputParam_Volume,
-                                    kAudioUnitScope_Global,
-                                    0,
-                                    volume * volume * volume,
-                                    0);
+    if (dataSize == 0 || status != noErr)
+        return FALSE;
 
-    if (var_InheritBool(p_aout, "volume-save"))
-        config_PutInt(p_aout, "auhal-volume", lroundf(volume * AOUT_VOLUME_DEFAULT));
-
-    return ostatus;
+    return TRUE;
 }
 
-static int MuteSet(audio_output_t * p_aout, bool mute)
+/*
+ * AudioDeviceSupportsDigital: Checks if device supports raw bitstreams
+ */
+static int AudioDeviceSupportsDigital(audio_output_t *p_aout, AudioDeviceID i_dev_id)
 {
-    struct   aout_sys_t *p_sys = p_aout->sys;
-    OSStatus ostatus;
+    OSStatus                    err = noErr;
+    UInt32                      i_param_size = 0;
+    AudioStreamID               *p_streams = NULL;
+    int                         i_streams = 0;
+    bool                        b_return = false;
 
-    aout_MuteReport(p_aout, mute);
-
-    float volume = .0;
-
-    if (!mute)
-        volume = var_InheritInteger(p_aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT;
-
-    ostatus = AudioUnitSetParameter(p_sys->au_unit,
-                                    kHALOutputParam_Volume,
-                                    kAudioUnitScope_Global,
-                                    0,
-                                    volume * volume * volume,
-                                    0);
-
-    return ostatus;
-}
-
-static int Open(vlc_object_t *obj)
-{
-    audio_output_t *aout = (audio_output_t *)obj;
-    aout_sys_t *sys = malloc(sizeof (*sys));
-
-    if (unlikely(sys == NULL))
-        return VLC_ENOMEM;
-
-    vlc_mutex_init(&sys->lock);
-
-    aout->sys = sys;
-    aout->start = Start;
-    aout->stop = Stop;
-    aout->volume_set = VolumeSet;
-    aout->mute_set = MuteSet;
-    aout->device_enum = DeviceList;
-    aout->sys->devices = NULL;
-    aout->device_select = SwitchAudioDevice;
-
-    RebuildDeviceList(aout);
-
-    /* remember the volume */
-    aout_VolumeReport(aout, var_InheritInteger(aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT);
-    MuteSet(aout, var_InheritBool(aout, "mute"));
-
-    return VLC_SUCCESS;
-}
-
-static void Close(vlc_object_t *obj)
-{
-    audio_output_t *aout = (audio_output_t *)obj;
-    aout_sys_t *sys = aout->sys;
-
-    for (struct audio_device_t * device = sys->devices, *next; device != NULL; device = next) {
-        next = device->next;
-        free(device->name);
-        free(device);
+    /* Retrieve all the output streams */
+    AudioObjectPropertyAddress streamsAddress = { kAudioDevicePropertyStreams, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
+    err = AudioObjectGetPropertyDataSize(i_dev_id, &streamsAddress, 0, NULL, &i_param_size);
+    if (err != noErr) {
+        msg_Err(p_aout, "could not get number of streams: [%s] (%i)", (char *)&err, (int32_t)err);
+        return false;
     }
 
-    vlc_mutex_destroy(&sys->lock);
+    i_streams = i_param_size / sizeof(AudioStreamID);
+    p_streams = (AudioStreamID *)malloc(i_param_size);
+    if (p_streams == NULL)
+        return VLC_ENOMEM;
 
-    free(sys);
+    err = AudioObjectGetPropertyData(i_dev_id, &streamsAddress, 0, NULL, &i_param_size, p_streams);
+    if (err != noErr) {
+        msg_Err(p_aout, "could not get list of streams: [%s]", (char *)&err);
+        return false;
+    }
+
+    for (int i = 0; i < i_streams; i++) {
+        if (AudioStreamSupportsDigital(p_aout, p_streams[i]))
+            b_return = true;
+    }
+
+    free(p_streams);
+    return b_return;
+}
+
+/*
+ * AudioStreamSupportsDigital: Checks if audio stream is compatible with raw bitstreams
+ */
+static int AudioStreamSupportsDigital(audio_output_t *p_aout, AudioStreamID i_stream_id)
+{
+    OSStatus                    err = noErr;
+    UInt32                      i_param_size = 0;
+    AudioStreamRangedDescription *p_format_list = NULL;
+    int                         i_formats = 0;
+    bool                        b_return = false;
+
+    /* Retrieve all the stream formats supported by each output stream */
+    AudioObjectPropertyAddress physicalFormatsAddress = { kAudioStreamPropertyAvailablePhysicalFormats, kAudioObjectPropertyScopeGlobal, 0 };
+    err = AudioObjectGetPropertyDataSize(i_stream_id, &physicalFormatsAddress, 0, NULL, &i_param_size);
+    if (err != noErr) {
+        msg_Err(p_aout, "could not get number of streamformats: [%s] (%i)", (char *)&err, (int32_t)err);
+        return false;
+    }
+
+    i_formats = i_param_size / sizeof(AudioStreamRangedDescription);
+    msg_Dbg(p_aout, "found %i stream formats", i_formats);
+
+    p_format_list = (AudioStreamRangedDescription *)malloc(i_param_size);
+    if (p_format_list == NULL)
+        return false;
+
+    err = AudioObjectGetPropertyData(i_stream_id, &physicalFormatsAddress, 0, NULL, &i_param_size, p_format_list);
+    if (err != noErr) {
+        msg_Err(p_aout, "could not get the list of streamformats: [%4.4s]", (char *)&err);
+        free(p_format_list);
+        p_format_list = NULL;
+        return false;
+    }
+
+    for (int i = 0; i < i_formats; i++) {
+#ifndef NDEBUG
+        msg_Dbg(p_aout, STREAM_FORMAT_MSG("supported format: ", p_format_list[i].mFormat));
+#endif
+
+        if (p_format_list[i].mFormat.mFormatID == 'IAC3' ||
+            p_format_list[i].mFormat.mFormatID == 'iac3' ||
+            p_format_list[i].mFormat.mFormatID == kAudioFormat60958AC3 ||
+            p_format_list[i].mFormat.mFormatID == kAudioFormatAC3)
+            b_return = true;
+    }
+
+    free(p_format_list);
+    return b_return;
+}
+
+/*
+ * AudioStreamChangeFormat: switch stream format based on the provided description
+ */
+static int AudioStreamChangeFormat(audio_output_t *p_aout, AudioStreamID i_stream_id, AudioStreamBasicDescription change_format)
+{
+    OSStatus            err = noErr;
+    UInt32              i_param_size = 0;
+
+    AudioObjectPropertyAddress physicalFormatAddress = { kAudioStreamPropertyPhysicalFormat, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+
+    struct { vlc_mutex_t lock; vlc_cond_t cond; } w;
+
+    msg_Dbg(p_aout, STREAM_FORMAT_MSG("setting stream format: ", change_format));
+
+    /* Condition because SetProperty is asynchronious */
+    vlc_cond_init(&w.cond);
+    vlc_mutex_init(&w.lock);
+    vlc_mutex_lock(&w.lock);
+
+    /* Install the callback */
+    err = AudioObjectAddPropertyListener(i_stream_id, &physicalFormatAddress, StreamListener, (void *)&w);
+    if (err != noErr) {
+        msg_Err(p_aout, "AudioObjectAddPropertyListener for kAudioStreamPropertyPhysicalFormat failed: [%4.4s]", (char *)&err);
+        return false;
+    }
+
+    /* change the format */
+    err = AudioObjectSetPropertyData(i_stream_id, &physicalFormatAddress, 0, NULL, sizeof(AudioStreamBasicDescription),
+                                     &change_format);
+    if (err != noErr) {
+        msg_Err(p_aout, "could not set the stream format: [%4.4s]", (char *)&err);
+        return false;
+    }
+
+    /* The AudioStreamSetProperty is not only asynchronious (requiring the locks)
+     * it is also not atomic in its behaviour.
+     * Therefore we check 5 times before we really give up.
+     * FIXME: failing isn't actually implemented yet. */
+    for (int i = 0; i < 5; i++) {
+        AudioStreamBasicDescription actual_format;
+        mtime_t timeout = mdate() + 500000;
+
+        if (vlc_cond_timedwait(&w.cond, &w.lock, timeout))
+            msg_Dbg(p_aout, "reached timeout");
+
+        i_param_size = sizeof(AudioStreamBasicDescription);
+        err = AudioObjectGetPropertyData(i_stream_id, &physicalFormatAddress, 0, NULL, &i_param_size, &actual_format);
+
+        msg_Dbg(p_aout, STREAM_FORMAT_MSG("actual format in use: ", actual_format));
+        if (actual_format.mSampleRate == change_format.mSampleRate &&
+            actual_format.mFormatID == change_format.mFormatID &&
+            actual_format.mFramesPerPacket == change_format.mFramesPerPacket) {
+            /* The right format is now active */
+            break;
+        }
+        /* We need to check again */
+    }
+
+    /* Removing the property listener */
+    err = AudioObjectRemovePropertyListener(i_stream_id, &physicalFormatAddress, StreamListener, (void *)&w);
+    if (err != noErr) {
+        msg_Err(p_aout, "AudioStreamRemovePropertyListener failed: [%4.4s]", (char *)&err);
+        return false;
+    }
+
+    /* Destroy the lock and condition */
+    vlc_mutex_unlock(&w.lock);
+    vlc_mutex_destroy(&w.lock);
+    vlc_cond_destroy(&w.cond);
+
+    return true;
 }
