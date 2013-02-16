@@ -730,8 +730,10 @@ static VLCMainMenu *_o_sharedInstance = nil;
         return;
 
     int n = aout_DevicesList(p_aout, &ids, &names);
-    if (n == -1)
+    if (n == -1) {
+        vlc_object_release(p_aout);
         return;
+    }
 
     currentDevice = aout_DeviceGet(p_aout);
     NSMenuItem * o_mi_tmp;
