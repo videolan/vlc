@@ -983,27 +983,25 @@ static void RebuildDeviceList(audio_output_t * p_aout)
     }
     p_sys->i_default_dev = defaultDeviceID;
 
-    AudioObjectPropertyAddress deviceNameAddress = { kAudioDevicePropertyDeviceName, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+    AudioObjectPropertyAddress deviceNameAddress = { kAudioObjectPropertyName, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
 
     for (unsigned int i = 0; i < numberOfDevices; i++) {
+        CFStringRef device_name_ref;
         char *psz_name;
+        CFIndex length;
         bool b_digital = false;
         UInt32 i_id = deviceIDs[i];
 
-        /* Retrieve the length of the device name */
-        err = AudioObjectGetPropertyDataSize(deviceIDs[i], &deviceNameAddress, 0, NULL, &propertySize);
-        if (err != noErr) {
-            msg_Dbg(p_aout, "failed to get name size for device %i", deviceIDs[i]);
-            continue;
-        }
-
         /* Retrieve the name of the device */
-        psz_name = (char *)malloc(propertySize);
-        err = AudioObjectGetPropertyData(deviceIDs[i], &deviceNameAddress, 0, NULL, &propertySize, psz_name);
+        err = AudioObjectGetPropertyData(deviceIDs[i], &deviceNameAddress, 0, NULL, &propertySize, &device_name_ref);
         if (err != noErr) {
             msg_Dbg(p_aout, "failed to get name for device %i", deviceIDs[i]);
             continue;
         }
+        length = CFStringGetLength(device_name_ref);
+        length++;
+        psz_name = (char *)malloc(length);
+        CFStringGetCString(device_name_ref, psz_name, length, kCFStringEncodingUTF8);
 
         msg_Dbg(p_aout, "DevID: %i DevName: %s", deviceIDs[i], psz_name);
 
@@ -1023,6 +1021,7 @@ static void RebuildDeviceList(audio_output_t * p_aout)
             add_device_to_list(p_aout, i_id, psz_name);
         }
 
+        CFRelease(device_name_ref);
         free(psz_name);
     }
 
