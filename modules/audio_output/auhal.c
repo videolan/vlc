@@ -1016,9 +1016,11 @@ static void RebuildDeviceList(audio_output_t * p_aout)
         if (AudioDeviceSupportsDigital(p_aout, deviceIDs[i])) {
             b_digital = true;
             msg_Dbg(p_aout, "'%s' supports digital output", psz_name);
-            asprintf(&psz_name, _("%s (Encoded Output)"), psz_name);
+            char *psz_encoded_name = nil;
+            asprintf(&psz_encoded_name, _("%s (Encoded Output)"), psz_name);
             i_id = i_id | AOUT_VAR_SPDIF_FLAG;
-            add_device_to_list(p_aout, i_id, psz_name);
+            add_device_to_list(p_aout, i_id, psz_encoded_name);
+            free(psz_encoded_name);
         }
 
         CFRelease(device_name_ref);
