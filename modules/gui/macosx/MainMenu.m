@@ -734,23 +734,16 @@ static VLCMainMenu *_o_sharedInstance = nil;
         return;
 
     currentDevice = aout_DeviceGet(p_aout);
-
     NSMenuItem * o_mi_tmp;
-    o_mi_tmp = [o_mu_device addItemWithTitle:_NS("Default") action:@selector(toggleAudioDevice:) keyEquivalent:@""];
-    [o_mi_tmp setTarget:self];
-    if (!currentDevice)
-        [o_mi_tmp setState:NSOnState];
 
     for (NSUInteger x = 0; x < n; x++) {
         o_mi_tmp = [o_mu_device addItemWithTitle:[NSString stringWithFormat:@"%s", names[x]] action:@selector(toggleAudioDevice:) keyEquivalent:@""];
         [o_mi_tmp setTarget:self];
         [o_mi_tmp setTag:[[NSString stringWithFormat:@"%s", ids[x]] intValue]];
-        if (currentDevice) {
-            if (!strcmp(ids[x], currentDevice))
-                [o_mi_tmp setState: NSOnState];
-        }
     }
     vlc_object_release(p_aout);
+
+    [[o_mu_device itemWithTag:[[NSString stringWithFormat:@"%s", currentDevice] intValue]] setState:NSOnState];
 
     for (NSUInteger x = 0; x < n; x++) {
         free(ids[x]);
@@ -1366,7 +1359,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
                 vlc_object_release(p_vout);
             }
         }
-        
+
         [self setupMenus]; /* Make sure video menu is up to date */
     }
 
