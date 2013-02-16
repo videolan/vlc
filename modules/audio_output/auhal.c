@@ -942,8 +942,13 @@ static void RebuildDeviceList(audio_output_t * p_aout)
 
     struct aout_sys_t   *p_sys = p_aout->sys;
 
-    if (p_sys->devices)
-        free(p_sys->devices);
+    if (p_sys->devices) {
+        for (struct audio_device_t * device = p_sys->devices, *next; device != NULL; device = next) {
+            next = device->next;
+            free(device->name);
+            free(device);
+        }
+    }
 
     /* Get number of devices */
     AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
@@ -1549,6 +1554,12 @@ static void Close(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
+
+    for (struct audio_device_t * device = sys->devices, *next; device != NULL; device = next) {
+        next = device->next;
+        free(device->name);
+        free(device);
+    }
 
     vlc_mutex_destroy(&sys->lock);
 
