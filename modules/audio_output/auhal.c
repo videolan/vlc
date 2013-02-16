@@ -990,12 +990,17 @@ static void RebuildDeviceList(audio_output_t * p_aout)
         bool b_digital = false;
         UInt32 i_id = deviceIDs[i];
 
+        propertySize = 0;
         /* Retrieve the length of the device name */
         err = AudioObjectGetPropertyDataSize(deviceIDs[i], &deviceNameAddress, 0, NULL, &propertySize);
         if (err != noErr) {
             msg_Dbg(p_aout, "failed to get name size for device %i", deviceIDs[i]);
             continue;
         }
+
+        // previous function returns to small buffer len, bug in core audio!?
+        if (propertySize < 100)
+            propertySize = 100;
 
         /* Retrieve the name of the device */
         psz_name = (char *)malloc(propertySize);
@@ -1018,9 +1023,11 @@ static void RebuildDeviceList(audio_output_t * p_aout)
         if (AudioDeviceSupportsDigital(p_aout, deviceIDs[i])) {
             b_digital = true;
             msg_Dbg(p_aout, "'%s' supports digital output", psz_name);
-            asprintf(&psz_name, _("%s (Encoded Output)"), psz_name);
+            char *psz_encoded_name = nil;
+            asprintf(&psz_encoded_name, _("%s (Encoded Output)"), psz_name);
             i_id = i_id | AOUT_VAR_SPDIF_FLAG;
-            add_device_to_list(p_aout, i_id, psz_name);
+            add_device_to_list(p_aout, i_id, psz_encoded_name);
+            free(psz_encoded_name);
         }
 
         free(psz_name);
