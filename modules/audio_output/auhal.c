@@ -1039,6 +1039,8 @@ static void RebuildDeviceList(audio_output_t * p_aout)
         free(psz_name);
     }
 
+    add_device_to_list(p_aout, 0, _("System Sound Output Device"));
+
     /* Attach a Listener so that we are notified of a change in the Device setup */
     err = AudioObjectAddPropertyListener(kAudioObjectSystemObject, &audioDevicesAddress, HardwareListener, (void *)p_aout);
     if (err != noErr)
