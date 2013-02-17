@@ -1891,6 +1891,11 @@ if test "${enable_screen}" != "no"; then
 fi
 
 dnl
+dnl  VNC/RFB access module
+dnl
+PKG_ENABLE_MODULES_VLC([LIBVNC], [libvnc], [libvncclient >= 0.9.9], (VNC/rfb client support), [auto])
+
+dnl
 dnl  Real RTSP plugin
 dnl
 AC_ARG_ENABLE(realrtsp,

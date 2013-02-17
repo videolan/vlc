@@ -190,6 +190,8 @@ libscreen_plugin_la_LDFLAGS += "-Wl,-framework,OpenGL,-framework,ApplicationServ
 libvlc_LTLIBRARIES += libscreen_plugin.la
 endif
 
+### VNC ###
+SOURCES_libvnc = vnc.c
 
 ### Optical media ###
 
