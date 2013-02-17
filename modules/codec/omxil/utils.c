@@ -623,8 +623,8 @@ unsigned int GetAudioParamSize(OMX_INDEXTYPE index)
 
 OMX_ERRORTYPE SetAudioParameters(OMX_HANDLETYPE handle,
     OmxFormatParam *param, OMX_U32 i_port, OMX_AUDIO_CODINGTYPE encoding,
-    uint8_t i_channels, unsigned int i_samplerate, unsigned int i_bitrate,
-    unsigned int i_bps, unsigned int i_blocksize)
+    vlc_fourcc_t i_codec, uint8_t i_channels, unsigned int i_samplerate,
+    unsigned int i_bitrate, unsigned int i_bps, unsigned int i_blocksize)
 {
     OMX_INDEXTYPE index;
 
@@ -657,7 +657,10 @@ OMX_ERRORTYPE SetAudioParameters(OMX_HANDLETYPE handle,
         OMX_INIT_STRUCTURE(param->amr);
         param->amr.nChannels = i_channels;
         param->amr.nBitRate = i_bitrate;
-        param->amr.eAMRBandMode = OMX_AUDIO_AMRBandModeUnused;
+        if (i_codec == VLC_CODEC_AMR_WB)
+            param->amr.eAMRBandMode = OMX_AUDIO_AMRBandModeWB0;
+        else
+            param->amr.eAMRBandMode = OMX_AUDIO_AMRBandModeNB0;
         param->amr.eAMRDTXMode = OMX_AUDIO_AMRDTXModeOff;
         param->amr.eAMRFrameFormat = OMX_AUDIO_AMRFrameFormatFSF;
         break;

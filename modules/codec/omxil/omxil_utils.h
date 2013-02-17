@@ -192,8 +192,8 @@ int GetVlcChromaSizes( vlc_fourcc_t i_fourcc,
  *****************************************************************************/
 OMX_ERRORTYPE SetAudioParameters(OMX_HANDLETYPE handle,
     OmxFormatParam *param, OMX_U32 i_port, OMX_AUDIO_CODINGTYPE encoding,
-    uint8_t i_channels, unsigned int i_samplerate, unsigned int i_bitrate,
-    unsigned int i_bps, unsigned int i_blocksize);
+    vlc_fourcc_t i_codec, uint8_t i_channels, unsigned int i_samplerate,
+    unsigned int i_bitrate, unsigned int i_bps, unsigned int i_blocksize);
 OMX_ERRORTYPE GetAudioParameters(OMX_HANDLETYPE handle,
     OmxFormatParam *param, OMX_U32 i_port, OMX_AUDIO_CODINGTYPE encoding,
     uint8_t *pi_channels, unsigned int *pi_samplerate,
