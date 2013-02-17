@@ -421,7 +421,7 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
         if (def->eDir == OMX_DirInput) {
             CHECK_ERROR(omx_error, "SetAudioParameters failed (%x : %s)",
                         omx_error, ErrorToString(omx_error));
-        } else {
+        } else if (omx_error != OMX_ErrorNone) {
             msg_Warn(p_dec, "SetAudioParameters failed (%x : %s) on output port",
                      omx_error, ErrorToString(omx_error));
             omx_error = OMX_ErrorNone;
