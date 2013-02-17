@@ -324,8 +324,8 @@ static const struct
 
 } audio_format_table[] =
 {
-    { VLC_CODEC_AMR_NB, OMX_AUDIO_CodingAMR, "audio_decoder.amr" },
-    { VLC_CODEC_AMR_WB, OMX_AUDIO_CodingAMR, "audio_decoder.amr" },
+    { VLC_CODEC_AMR_NB, OMX_AUDIO_CodingAMR, "audio_decoder.amrnb" },
+    { VLC_CODEC_AMR_WB, OMX_AUDIO_CodingAMR, "audio_decoder.amrwb" },
     { VLC_CODEC_MP4A,   OMX_AUDIO_CodingAAC, "audio_decoder.aac" },
     { VLC_CODEC_S16N,   OMX_AUDIO_CodingPCM, "audio_decoder.pcm" },
     { VLC_CODEC_MP3,    OMX_AUDIO_CodingMP3, "audio_decoder.mp3" },
@@ -363,8 +363,8 @@ static const struct
 
 } audio_enc_format_table[] =
 {
-    { VLC_CODEC_AMR_NB, OMX_AUDIO_CodingAMR, "audio_encoder.amr" },
-    { VLC_CODEC_AMR_WB, OMX_AUDIO_CodingAMR, "audio_encoder.amr" },
+    { VLC_CODEC_AMR_NB, OMX_AUDIO_CodingAMR, "audio_encoder.amrnb" },
+    { VLC_CODEC_AMR_WB, OMX_AUDIO_CodingAMR, "audio_encoder.amrwb" },
     { VLC_CODEC_MP4A,   OMX_AUDIO_CodingAAC, "audio_encoder.aac" },
     { VLC_CODEC_S16N,   OMX_AUDIO_CodingPCM, "audio_encoder.pcm" },
     { 0, 0, 0 }
