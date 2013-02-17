@@ -659,7 +659,7 @@ OMX_ERRORTYPE SetAudioParameters(OMX_HANDLETYPE handle,
         param->amr.nBitRate = i_bitrate;
         param->amr.eAMRBandMode = OMX_AUDIO_AMRBandModeUnused;
         param->amr.eAMRDTXMode = OMX_AUDIO_AMRDTXModeOff;
-        param->amr.eAMRFrameFormat = OMX_AUDIO_AMRFrameFormatConformance;
+        param->amr.eAMRFrameFormat = OMX_AUDIO_AMRFrameFormatFSF;
         break;
     case OMX_AUDIO_CodingG723:
         OMX_INIT_STRUCTURE(param->g723);
