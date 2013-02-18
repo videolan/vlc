@@ -446,7 +446,7 @@ static int gnutls_HandshakeAndValidate (vlc_tls_t *session, const char *host,
         val = gnutls_CertSearch (session, host, service, data);
     }
 error:
-    gnutls_x509_crt_init (&cert);
+    gnutls_x509_crt_deinit (cert);
     return val ? -1 : 0;
 }
 
