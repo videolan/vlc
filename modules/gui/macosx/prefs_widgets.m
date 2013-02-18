@@ -838,6 +838,9 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     case CONFIG_ITEM_MODULE_LIST_CAT:
         p_control = [[ModuleListConfigControl alloc] initWithItem: _p_item withView: o_parent_view];
         break;
+    case CONFIG_SECTION:
+        p_control = [[SectionControl alloc] initWithItem: _p_item withView: o_parent_view];
+        break;
     default:
         break;
     }
@@ -2315,3 +2318,44 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
         withObject: anObject];
 }
 @end
+
+@implementation SectionControl
+
+- (id) initWithItem: (module_config_t *)_p_item
+           withView: (NSView *)o_parent_view
+{
+    NSRect mainFrame = [o_parent_view frame];
+    NSString *o_labelString, *o_tooltip;
+    mainFrame.size.height = 17;
+    mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
+    mainFrame.origin.x = LEFTMARGIN;
+    mainFrame.origin.y = 0;
+
+    if ([super initWithFrame: mainFrame item: _p_item] != nil) {
+        
+        /* add the label */
+        if (p_item->psz_text)
+            o_labelString = _NS((char *)p_item->psz_text);
+        else
+            o_labelString = @"";
+
+        NSDictionary *boldAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                        [NSFont boldSystemFontOfSize:[NSFont systemFontSize]],
+                        NSFontAttributeName,
+                        nil];
+        NSAttributedString *o_bold_string = [[NSAttributedString alloc] initWithString: o_labelString attributes: boldAttributes];
+
+        ADD_LABEL(o_label, mainFrame, 1, 0, @"", @"")
+        [o_label setAttributedStringValue: o_bold_string];
+        [o_label sizeToFit];
+
+        [o_bold_string release];
+        
+        [o_label setAutoresizingMask:NSViewNotSizable];
+        [self addSubview: o_label];
+    }
+    return self;
+}
+
+@end
+

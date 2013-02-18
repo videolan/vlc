@@ -385,13 +385,13 @@ static VLCPrefs *_o_sharedMainInstance = nil;
                 }
             }
 
-            if (module_is_main(p_module) && CONFIG_ITEM(configType)) {
+            if (module_is_main(p_module) && (CONFIG_ITEM(configType) || configType == CONFIG_SECTION)) {
                 if (categoryItem && [self isSubCategoryGeneral:lastsubcat])
                     [[categoryItem options] addObject:[[VLCTreeLeafItem alloc] initWithConfigItem:&p_configs[j]]];
                 else if (subCategoryItem)
                     [[subCategoryItem options] addObject:[[VLCTreeLeafItem alloc] initWithConfigItem:&p_configs[j]]];
             }
-            else if (!module_is_main(p_module) && CONFIG_ITEM(configType)) {
+            else if (!module_is_main(p_module) && (CONFIG_ITEM(configType) || configType == CONFIG_SECTION)) {
                 if (![[subCategoryItem children] containsObject: pluginItem])
                     [[subCategoryItem children] addObject:pluginItem];
 
