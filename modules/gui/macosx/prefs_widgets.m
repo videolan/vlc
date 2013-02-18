@@ -1877,20 +1877,18 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     if ([super initWithFrame: mainFrame item: _p_item] != nil) {
         i_view_type = CONFIG_ITEM_BOOL;
 
-        /* add the checkbox */
-        o_tooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
-        ADD_CHECKBOX(o_checkbox, mainFrame, 0,
-                        0, @"", o_tooltip, p_item->value.i, NSImageLeft)
-        [o_checkbox setAutoresizingMask:NSViewNotSizable ];
-        [self addSubview: o_checkbox];
-        /* add the label */
         if (p_item->psz_text)
             o_labelString = _NS((char *)p_item->psz_text);
         else
             o_labelString = @"";
-        ADD_LABEL(o_label, mainFrame, [o_checkbox frame].size.width, 0, o_labelString, o_tooltip)
-        [o_label setAutoresizingMask:NSViewNotSizable ];
-        [self addSubview: o_label];
+
+        o_tooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+
+        /* add the checkbox */
+        ADD_CHECKBOX(o_checkbox, mainFrame, 0,
+                        0, o_labelString, o_tooltip, p_item->value.i, NSImageLeft)
+        [o_checkbox setAutoresizingMask:NSViewNotSizable ];
+        [self addSubview: o_checkbox];
     }
     return self;
 }
