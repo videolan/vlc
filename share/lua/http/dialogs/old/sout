@@ -172,8 +172,8 @@ Note that the sout chain is used and sent to VLC by the input dialog
               <option value="DIV1">DIV1</option>
               <option value="DIV2">DIV2</option>
               <option value="DIV3">DIV3</option>
-              <option value="H263">h263</option>
-              <option value="H264">h264</option>
+              <option value="h263">h263</option>
+              <option value="h264">h264</option>
               <option value="WMV1">WMV1</option>
               <option value="WMV2">WMV2</option>
               <option value="MJPG">MJPG</option>
