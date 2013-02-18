@@ -50,6 +50,9 @@ void SeekPoints::update()
 
     vlc_object_release( p_input_thread );
 
+    if( !p_title )
+        return;
+
     /* lock here too, as update event is triggered by an external thread */
     if ( !access() ) return;
     pointsList.clear();
