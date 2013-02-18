@@ -1181,20 +1181,11 @@ static void Play (audio_output_t * p_aout, block_t * p_block)
                                VLC_CODEC_FL32);
         }
 
-        /* Render audio into buffer */
-        AudioBufferList bufferList;
-        bufferList.mNumberBuffers = 1;
-        bufferList.mBuffers[0].mNumberChannels = p_sys->i_numberOfChannels;
-        bufferList.mBuffers[0].mData = malloc(p_block->i_nb_samples * sizeof(Float32) * p_sys->i_numberOfChannels);
-        bufferList.mBuffers[0].mDataByteSize = p_block->i_nb_samples * sizeof(Float32) * p_sys->i_numberOfChannels;
-
-        memcpy(bufferList.mBuffers[0].mData, p_block->p_buffer, p_block->i_buffer);
-
         /* keep track of the played data */
         p_aout->sys->i_played_length += p_block->i_length;
 
         /* move data to buffer */
-        TPCircularBufferProduceBytes(&p_sys->circular_buffer, bufferList.mBuffers[0].mData, bufferList.mBuffers[0].mDataByteSize);
+        TPCircularBufferProduceBytes(&p_sys->circular_buffer, p_block->p_buffer, p_block->i_buffer);
     }
 
     block_Release(p_block);
