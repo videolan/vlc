@@ -345,25 +345,17 @@ static int gnutls_CertSearch (vlc_tls_t *obj, const char *host,
 
 static struct
 {
-    int flag;
-    const char msg[43];
-    bool strict;
+    unsigned flag;
+    const char msg[29];
 } cert_errs[] =
 {
-    { GNUTLS_CERT_INVALID,
-        "Certificate could not be verified", false },
-    { GNUTLS_CERT_REVOKED,
-        "Certificate was revoked", true },
-    { GNUTLS_CERT_SIGNER_NOT_FOUND,
-        "Certificate's signer was not found", false },
-    { GNUTLS_CERT_SIGNER_NOT_CA,
-        "Certificate's signer is not a CA", true },
-    { GNUTLS_CERT_INSECURE_ALGORITHM,
-      "Insecure certificate signature algorithm", true },
-    { GNUTLS_CERT_NOT_ACTIVATED,
-        "Certificate is not yet activated", true },
-    { GNUTLS_CERT_EXPIRED,
-        "Certificate has expired", true },
+    { GNUTLS_CERT_INVALID,            "Certificate not verified"     },
+    { GNUTLS_CERT_REVOKED,            "Certificate revoked"          },
+    { GNUTLS_CERT_SIGNER_NOT_FOUND,   "Signer not found"             },
+    { GNUTLS_CERT_SIGNER_NOT_CA,      "Signer not a CA"              },
+    { GNUTLS_CERT_INSECURE_ALGORITHM, "Signature algorithm insecure" },
+    { GNUTLS_CERT_NOT_ACTIVATED,      "Certificate not activated"    },
+    { GNUTLS_CERT_EXPIRED,            "Certificate expired"          },
 };
 
 
@@ -386,25 +378,14 @@ static int gnutls_HandshakeAndValidate (vlc_tls_t *session, const char *host,
                  gnutls_strerror (val));
         return -1;
     }
-
     if (status)
     {
-        msg_Err (session, "Certificate verification failure:");
+        msg_Err (session, "Certificate verification failure (0x%04X)", status);
         for (size_t i = 0; i < sizeof (cert_errs) / sizeof (cert_errs[0]); i++)
             if (status & cert_errs[i].flag)
-            {
                 msg_Err (session, " * %s", cert_errs[i].msg);
-                status &= ~cert_errs[i].flag;
-                if (cert_errs[i].strict)
-                    val = -1;
-            }
-
-        if (status)
-        {
-            msg_Err (session, " * Unknown verification error 0x%04X", status);
-            val = -1;
-        }
-        status = -1;
+        if (status & ~(GNUTLS_CERT_INVALID|GNUTLS_CERT_SIGNER_NOT_FOUND))
+            return -1;
     }
 
     /* certificate (host)name verification */
@@ -447,7 +428,7 @@ static int gnutls_HandshakeAndValidate (vlc_tls_t *session, const char *host,
     }
 error:
     gnutls_x509_crt_deinit (cert);
-    return val ? -1 : 0;
+    return val;
 }
 
 static int
