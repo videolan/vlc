@@ -3211,6 +3211,18 @@ then
 fi
 
 dnl
+dnl  iOS ES2 vout module
+dnl
+AC_ARG_ENABLE(ios-vout2,
+  [  --enable-ios-vout2    iOS video output module (default disabled)])
+if test "${enable_ios_vout2}" = "yes"
+then
+  VLC_ADD_PLUGIN([vout_ios2])
+  VLC_ADD_LIBS([vout_ios2], [-Wl,-framework,OpenGLES,-framework,QuartzCore,-framework,UIKit])
+fi
+
+
+dnl
 dnl  Windows DirectX module
 dnl
 

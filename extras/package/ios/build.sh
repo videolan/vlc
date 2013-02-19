@@ -266,6 +266,7 @@ ${VLCROOT}/configure \
     --disable-macosx-vlc-app \
     --enable-audioqueue \
     --enable-ios-vout \
+    --enable-ios-vout2 \
     --disable-shared \
     --disable-macosx-quartztext \
     --enable-avcodec \

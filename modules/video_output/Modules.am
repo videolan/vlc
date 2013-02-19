@@ -8,6 +8,7 @@ SOURCES_vmem = vmem.c
 SOURCES_yuv = yuv.c
 SOURCES_vout_macosx = macosx.m opengl.h opengl.c
 SOURCES_vout_ios = ios.m opengl.h opengl.c
+SOURCES_vout_ios2 = ios2.m opengl.h opengl.c
 SOURCES_android_surface = androidsurface.c
 
 if HAVE_DECKLINK
