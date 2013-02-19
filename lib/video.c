@@ -314,7 +314,7 @@ libvlc_track_description_t *
     return libvlc_get_track_description( p_mi, "spu-es" );
 }
 
-int libvlc_video_set_spu( libvlc_media_player_t *p_mi, unsigned i_spu )
+int libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
     vlc_value_t list;

@@ -1037,10 +1037,10 @@ LIBVLC_API libvlc_track_description_t *
  * Set new video subtitle.
  *
  * \param p_mi the media player
- * \param i_spu new video subtitle to select
+ * \param i_spu video subtitle track to select (i_id from track description)
  * \return 0 on success, -1 if out of range
  */
-LIBVLC_API int libvlc_video_set_spu( libvlc_media_player_t *p_mi, unsigned i_spu );
+LIBVLC_API int libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu );
 
 /**
  * Set new video subtitle file.
