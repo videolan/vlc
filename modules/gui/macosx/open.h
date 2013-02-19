@@ -243,7 +243,6 @@
     NSString *o_file_slave_path;
     NSString *o_sub_path;
     NSString *o_mrl;
-    intf_thread_t * p_intf;
     NSMutableArray *o_displayInfos;
 }
 

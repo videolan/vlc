@@ -84,10 +84,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     if (_o_sharedMainInstance)
         [self dealloc];
-    else {
+    else
         _o_sharedMainInstance = [super init];
-        p_intf = VLCIntf;
-    }
 
     return _o_sharedMainInstance;
 }
@@ -196,8 +194,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [[o_net_mode cellAtRow:0 column:0] setTitle: _NS("Unicast")];
     [[o_net_mode cellAtRow:1 column:0] setTitle: _NS("Multicast")];
 
-    [o_net_udp_port setIntValue: config_GetInt(p_intf, "server-port")];
-    [o_net_udp_port_stp setIntValue: config_GetInt(p_intf, "server-port")];
+    [o_net_udp_port setIntValue: config_GetInt(VLCIntf, "server-port")];
+    [o_net_udp_port_stp setIntValue: config_GetInt(VLCIntf, "server-port")];
 
     [o_eyetv_chn_bgbar setUsesThreadedAnimation: YES];
 
@@ -348,6 +346,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     int i_index;
     module_config_t * p_item;
+    intf_thread_t * p_intf = VLCIntf;
 
     [o_file_sub_ckbox setTitle: _NS("Load subtitles file:")];
     [o_file_sub_path_lbl setStringValue: _NS("Choose a file")];
@@ -442,7 +441,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
             [o_options addObject: [NSString stringWithFormat:
                     @"subsdec-align=%li", [o_file_sub_align_pop indexOfSelectedItem]]];
 
-            p_item = config_FindConfig(VLC_OBJECT(p_intf),
+            p_item = config_FindConfig(VLC_OBJECT(VLCIntf),
                                             "freetype-rel-fontsize");
 
             if (p_item) {
@@ -1181,7 +1180,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         else if ([[sender selectedCell] tag] == 1)
             [o_panel makeFirstResponder: o_net_udpm_addr];
         else
-            msg_Warn(p_intf, "Unknown sender tried to change UDP/RTP mode");
+            msg_Warn(VLCIntf, "Unknown sender tried to change UDP/RTP mode");
     }
 
     [self openNetInfoChanged: nil];
@@ -1223,7 +1222,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
             else
                 o_mrl_string = @"rtp://";
 
-            if (i_port != config_GetInt(p_intf, "server-port")) {
+            if (i_port != config_GetInt(VLCIntf, "server-port")) {
                 o_mrl_string =
                     [o_mrl_string stringByAppendingFormat: @"@:%i", i_port];
             }
@@ -1237,7 +1236,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
             else
                 o_mrl_string = [NSString stringWithFormat: @"rtp://@%@", o_addr];
 
-            if (i_port != config_GetInt(p_intf, "server-port")) {
+            if (i_port != config_GetInt(VLCIntf, "server-port")) {
                 o_mrl_string =
                     [o_mrl_string stringByAppendingFormat: @":%i", i_port];
             }
@@ -1272,7 +1271,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
             else
                 o_mrl_string = @"rtp://";
 
-            if (i_port != config_GetInt(p_intf, "server-port")) {
+            if (i_port != config_GetInt(VLCIntf, "server-port")) {
                 o_mrl_string =
                 [o_mrl_string stringByAppendingFormat: @"@:%i", i_port];
             }
@@ -1286,7 +1285,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
             else
                 o_mrl_string = [NSString stringWithFormat: @"rtp://@%@", o_addr];
 
-            if (i_port != config_GetInt(p_intf, "server-port")) {
+            if (i_port != config_GetInt(VLCIntf, "server-port")) {
                 o_mrl_string =
                 [o_mrl_string stringByAppendingFormat: @":%i", i_port];
             }
@@ -1319,6 +1318,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (IBAction)openCaptureModeChanged:(id)sender
 {
+    intf_thread_t * p_intf = VLCIntf;
+
     if ([[[o_capture_mode_pop selectedItem] title] isEqualToString: @"EyeTV"]) {
         if ([[[VLCMain sharedInstance] eyeTVController] eyeTVRunning] == YES) {
             if ([[[VLCMain sharedInstance] eyeTVController] deviceConnected] == YES) {
