@@ -29,6 +29,7 @@ dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.xz .sum-dvdread
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/dvdread/dvdread-win32.patch
 endif
+	$(APPLY) $(SRC)/dvdread/osx.patch
 	cd $(UNPACK_DIR) && autoreconf -ivf
 	$(MOVE)
 
