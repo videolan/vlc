@@ -103,9 +103,6 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
 
-    /* Set p_input field */
-    p_demux->pf_demux   = Demux;
-    p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
@@ -210,6 +207,8 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_frame_size = p_sys->i_frame_samples * p_sys->i_seek_step;
     msg_Dbg( p_demux, "frame size is %d bytes ", p_sys->i_frame_size);
 
+    p_demux->pf_demux   = Demux;
+    p_demux->pf_control = Control;
     return VLC_SUCCESS;
 }
 

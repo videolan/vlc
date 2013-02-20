@@ -169,9 +169,6 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 valid:
-    /* Set p_input field */
-    p_demux->pf_demux   = Demux;
-    p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
@@ -388,6 +385,8 @@ valid:
                         * p_sys->fmt_video.video.i_bits_per_pixel / 8;
     p_sys->p_es_video = es_out_Add( p_demux->out, &p_sys->fmt_video );
 
+    p_demux->pf_demux   = Demux;
+    p_demux->pf_control = Control;
     return VLC_SUCCESS;
 
 error:

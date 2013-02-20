@@ -194,9 +194,6 @@ static int Open( vlc_object_t * p_this )
 
     p_peek += 72;                                  /* skip rest of DIF block */
 
-    /* Set p_input field */
-    p_demux->pf_demux   = Demux;
-    p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
@@ -236,6 +233,8 @@ static int Open( vlc_object_t * p_this )
         p_sys->p_es_audio = es_out_Add( p_demux->out, &p_sys->fmt_audio );
     }
 
+    p_demux->pf_demux   = Demux;
+    p_demux->pf_control = Control;
     return VLC_SUCCESS;
 }
 
