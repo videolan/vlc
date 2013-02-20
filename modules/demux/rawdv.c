@@ -216,13 +216,6 @@ static int Open( vlc_object_t * p_this )
     p_sys->fmt_video.video.i_width = 720;
     p_sys->fmt_video.video.i_height= dv_header.dsf ? 576 : 480;;
 
-    /* FIXME FIXME */
-#if 0
-    /* necessary because input_SplitBuffer() will only get
-     * INPUT_DEFAULT_BUFSIZE bytes at a time. */
-    p_input->i_bufsize = p_sys->frame_size;
-#endif
-
     p_sys->p_es_video = es_out_Add( p_demux->out, &p_sys->fmt_video );
 
     /* Audio stuff */
