@@ -193,6 +193,9 @@ endif
 ### VNC ###
 SOURCES_libvnc = vnc.c
 
+### RDP / Remote Desktop ###
+SOURCES_rdp = rdp.c
+
 ### Optical media ###
 
 SOURCES_cdda = \

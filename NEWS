@@ -39,6 +39,7 @@ Access:
  * Microsoft Smooth Streaming support (H264 and VC1) developed by Viotech.net
  * NTSC EIA-608 closed caption input support via V4L2 VBI devices
  * Add support for VNC/rfb in view only mode
+ * Add support for Remote Desktop/RDP in view only mode
 
 Demuxers:
  * MP4: partial support for fragmented MP4

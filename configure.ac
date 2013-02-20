@@ -1905,6 +1905,10 @@ dnl  VNC/RFB access module
 dnl
 PKG_ENABLE_MODULES_VLC([LIBVNC], [libvnc], [libvncclient >= 0.9.9], (VNC/rfb client support), [auto])
 
+dnl  RDP/Remote Desktop access module
+dnl
+PKG_ENABLE_MODULES_VLC([LIBFREERDP], [rdp], [freerdp >= 1.0.1], (RDP/Remote Desktop client support) )
+
 dnl
 dnl  Real RTSP plugin
 dnl
