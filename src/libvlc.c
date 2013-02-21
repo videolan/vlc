@@ -351,7 +351,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
             /* append MRLs */
             if( !dbus_message_append_args( msg, DBUS_TYPE_STRING, &mrl,
-                                                DBUS_TYPE_STRING, &after_track,
+                                                DBUS_TYPE_OBJECT_PATH, &after_track,
                                                 DBUS_TYPE_BOOLEAN, &play,
                                                 DBUS_TYPE_INVALID ) )
             {
