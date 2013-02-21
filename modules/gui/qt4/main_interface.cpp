@@ -327,11 +327,6 @@ void MainInterface::computeMinimumSize()
     setMinimumWidth( minWidth );
 }
 
-inline void MainInterface::moveWindow( int offsetX, int offsetY )
-{
-    move( x() + offsetX, y() + offsetY );
-}
-
 /*****************************
  *   Main UI handling        *
  *****************************/
@@ -1409,36 +1404,6 @@ bool MainInterface::eventFilter( QObject *obj, QEvent *event )
     } else {
         return QObject::eventFilter( obj, event );
     }
-}
-
-void MainInterface::mousePressEvent( QMouseEvent *event )
-{
-    b_customMoving = Qt::LeftButton == event->button();
-    lastCustomMovePos = event->globalPos();
-}
-
-void MainInterface::mouseMoveEvent( QMouseEvent *event )
-{
-    if( b_customMoving )
-    {
-        moveWindow(
-            event->globalX() - lastCustomMovePos.x(),
-            event->globalY() - lastCustomMovePos.y()
-        );
-        lastCustomMovePos = event->globalPos();
-    }
-}
-
-void MainInterface::mouseReleaseEvent( QMouseEvent *event )
-{
-    if( b_customMoving )
-    {
-        moveWindow(
-            event->globalX() - lastCustomMovePos.x(),
-            event->globalY() - lastCustomMovePos.y()
-        );
-    }
-    b_customMoving = false;
 }
 
 void MainInterface::toolBarConfUpdated()

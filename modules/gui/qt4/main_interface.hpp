@@ -105,9 +105,6 @@ protected:
     virtual void keyPressEvent( QKeyEvent *);
     virtual void wheelEvent( QWheelEvent * );
     virtual bool eventFilter(QObject *, QEvent *);
-    virtual void mousePressEvent( QMouseEvent * );
-    virtual void mouseMoveEvent( QMouseEvent * );
-    virtual void mouseReleaseEvent( QMouseEvent * );
 
 private:
     /* Main Widgets Creation */
@@ -129,9 +126,6 @@ private:
     void setMinimalView( bool );
     void setInterfaceFullScreen( bool );
     void computeMinimumSize();
-
-    /* */
-    inline void moveWindow( int offsetX, int offsetY );
 
     /* */
     QSettings           *settings;
@@ -161,8 +155,6 @@ private:
 
     QMap<QWidget *, QSize> stackWidgetsSizes;
 
-    QPoint              lastCustomMovePos;
-
     /* Flags */
     unsigned             i_notificationSetting; /// Systray Notifications
     bool                 b_autoresize;          ///< persistent resizable window
@@ -181,7 +173,6 @@ private:
 
     bool                 b_hasPausedWhenMinimized;
     bool                 b_statusbarVisible;
-    bool                 b_customMoving;        ///< Is the window moving by dragging ?
 
 #ifdef WIN32
     HIMAGELIST himl;
