@@ -241,7 +241,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     libvlc_set_user_agent (vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
 
     libvlc_add_intf (vlc, "hotkeys,none");
-#if !defined (HAVE_MAEMO) && !defined __APPLE__ && !defined (__OS2__)
+#if !defined __APPLE__ && !defined (__OS2__)
     libvlc_add_intf (vlc, "globalhotkeys,none");
 #endif
 #ifdef HAVE_DBUS

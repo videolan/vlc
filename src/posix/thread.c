@@ -828,9 +828,6 @@ int vlc_set_priority (vlc_thread_t th, int priority)
 void vlc_cancel (vlc_thread_t thread_id)
 {
     pthread_cancel (thread_id);
-#ifdef HAVE_MAEMO
-    pthread_kill (thread_id, SIGRTMIN);
-#endif
 }
 
 /**

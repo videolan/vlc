@@ -1527,13 +1527,7 @@ vlc_module_begin ()
         change_safe ()
     add_bool( "grayscale", 0, GRAYSCALE_TEXT,
               GRAYSCALE_LONGTEXT, true )
-#if defined (HAVE_MAEMO)
-# define FULLSCREEN_DEFAULT true
-#else
-# define FULLSCREEN_DEFAULT false
-#endif
-    add_bool( "fullscreen", FULLSCREEN_DEFAULT, FULLSCREEN_TEXT,
-              FULLSCREEN_LONGTEXT, false )
+    add_bool( "fullscreen", false, FULLSCREEN_TEXT, FULLSCREEN_LONGTEXT, false )
         change_short('f')
         change_safe ()
     add_bool( "embedded-video", 1, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,

@@ -61,10 +61,6 @@
 # define DEFAULT_FAMILY "Times New Roman WT K"
 # define DEFAULT_MONOSPACE_FONT_FILE "/psfonts/mtsansdk.ttf"
 # define DEFAULT_MONOSPACE_FAMILY "Monotype Sans Duospace WT K"
-#elif defined( HAVE_MAEMO )
-# define DEFAULT_FONT_FILE "/usr/share/fonts/nokia/nosnb.ttf"
-# define DEFAULT_FAMILY "Nokia Sans Bold"
-# error Missing monospaced fonts
 #elif defined( __ANDROID__ )
 # define DEFAULT_FONT_FILE "/system/fonts/DroidSans-Bold.ttf"
 # define DEFAULT_FAMILY "Droid Sans Bold"
