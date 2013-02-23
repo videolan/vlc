@@ -191,7 +191,6 @@ $Id$
  * magnify: zoom video filter
  * marq: Overlays a marquee on the video
  * mash: OpenMash based decoder
- * mce: Nokia MCE screen unblanking module
  * media_library: a sql based media library
  * mediacodec: Android Jelly Bean MediaCodec decoder module
  * mediadirs: Picture/Music/Video user directories as service discoveries

@@ -3888,12 +3888,6 @@ AS_IF([test "${enable_gnutls}" != "no"], [
 ])
 
 
-dnl
-dnl Nokia MCE plugin (Maemo screen unblanking)
-dnl
-PKG_CHECK_MODULES([MCE], [dbus-1 mce], [VLC_ADD_PLUGIN([mce])], [true])
-
-
 AS_IF([test -f "/etc/maemo_version"], [
   AC_DEFINE([HAVE_MAEMO], 1, [Define to 1 if building for the Maemo platform.])
 ])

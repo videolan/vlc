@@ -158,6 +158,7 @@ Removed modules:
  * Hildon GUI
  * MSN messenger "now playing" (broken and unmaintained since VLC 1.0.0)
  * Telepathy framework "now playing" (broken and unmaintained since VLC 1.0.0)
+ * Nokia/Maemo MCE screen unblanking plugin
 
 
 Changes between 2.0.4 and 2.0.5:

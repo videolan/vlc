@@ -36,12 +36,6 @@ if HAVE_DBUS
 libvlc_LTLIBRARIES += libdbus_screensaver_plugin.la
 endif
 
-libmce_plugin_la_SOURCES = inhibit/mce.c
-libmce_plugin_la_CFLAGS = $(AM_CLFAGS) $(DBUS_CFLAGS) $(MCE_CFLAGS)
-libmce_plugin_la_LIBADD = $(AM_LIBADD) $(DBUS_LIBS) $(MCE_LIBS)
-EXTRA_LTLIBRARIES += libmce_plugin.la
-libvlc_LTLIBRARIES += $(LTLIBmce)
-
 liblogger_plugin_la_SOURCES = logger.c
 liblogger_plugin_la_CFLAGS = $(AM_CFLAGS)
 liblogger_plugin_la_LIBADD = $(AM_LIBADD)

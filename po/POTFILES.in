@@ -942,7 +942,6 @@ modules/misc/audioscrobbler.c
 modules/misc/dhparams.h
 modules/misc/gnutls.c
 modules/misc/inhibit/dbus.c
-modules/misc/inhibit/mce.c
 modules/misc/inhibit/xdg.c
 modules/misc/logger.c
 modules/misc/playlist/export.c
