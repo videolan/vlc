@@ -184,6 +184,7 @@ if HAVE_DARWIN
 libscreen_plugin_la_SOURCES += screen/mac.c
 libscreen_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 libscreen_plugin_la_LDFLAGS += "-Wl,-framework,OpenGL,-framework,ApplicationServices"
+libvlc_LTLIBRARIES += libscreen_plugin.la
 endif
 
 
