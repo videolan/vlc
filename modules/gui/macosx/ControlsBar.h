@@ -146,7 +146,6 @@
 
 - (void)updateVolumeSlider;
 - (void)updateControls;
-- (void)updatePosAndTimeInFSPanel:(VLCFSPanel *)o_fspanel;
 
 @end
 

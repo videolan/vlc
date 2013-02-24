@@ -52,7 +52,7 @@
 - (void)setPlay;
 - (void)setPause;
 - (void)setStreamTitle: (NSString *)o_title;
-- (void)setStreamPos: (float)f_pos andTime: (NSString *)o_time;
+- (void)updatePositionAndTime;
 - (void)setSeekable: (BOOL)b_seekable;
 - (void)setVolumeLevel: (int)i_volumeLevel;
 
@@ -83,7 +83,8 @@
 {
     NSColor *fillColor;
     NSButton *o_prev, *o_next, *o_bwd, *o_fwd, *o_play, *o_fullscreen;
-    NSTextField *o_streamTitle_txt, *o_streamPosition_txt;
+    NSTextField *o_streamTitle_txt;
+    VLCTimeField *o_streamPosition_txt, *o_streamLength_txt;
     NSSlider *o_fs_timeSlider, *o_fs_volumeSlider;
     VLCProgressView *o_progress_view;
     NSImage *o_background_img, *o_vol_sld_img, *o_vol_mute_img, *o_vol_max_img, *o_time_sld_img;
@@ -96,7 +97,7 @@
 - (void)setPlay;
 - (void)setPause;
 - (void)setStreamTitle: (NSString *)o_title;
-- (void)setStreamPos: (float)f_pos andTime: (NSString *)o_time;
+- (void)updatePositionAndTime;
 - (void)setSeekable: (BOOL)b_seekable;
 - (void)setVolumeLevel: (int)i_volumeLevel;
 - (IBAction)play:(id)sender;

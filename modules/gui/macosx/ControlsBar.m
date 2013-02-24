@@ -988,9 +988,4 @@ else \
     [[VLCMainMenu sharedInstance] setRateControlsEnabled: b_control];
 }
 
-- (void)updatePosAndTimeInFSPanel:(VLCFSPanel *)o_fspanel
-{
-    [o_fspanel setStreamPos:[o_time_sld floatValue] andTime: [o_time_fld stringValue]];
-}
-
 @end

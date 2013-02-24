@@ -154,9 +154,9 @@
     [[self contentView] setStreamTitle: o_title];
 }
 
-- (void)setStreamPos:(float) f_pos andTime:(NSString *)o_time
+- (void)updatePositionAndTime
 {
-    [[self contentView] setStreamPos:f_pos andTime: o_time];
+    [[self contentView] updatePositionAndTime];
 }
 
 - (void)setSeekable:(BOOL) b_seekable
@@ -458,15 +458,20 @@
 
     /* time counter and stream title output fields */
     s_rc = [self frame];
-    s_rc.origin.x = 98;
+    // 10 px gap between time fields
+    s_rc.origin.x = 90;
     s_rc.origin.y = 64;
-    s_rc.size.width = 352;
+    s_rc.size.width = 361;
     s_rc.size.height = 14;
     addTextfield(NSTextField, o_streamTitle_txt, NSCenterTextAlignment, systemFontOfSize, whiteColor);
+    s_rc.origin.x = 15;
+    s_rc.origin.y = 64;
+    s_rc.size.width = 65;
+    addTextfield(VLCTimeField, o_streamPosition_txt, NSLeftTextAlignment, systemFontOfSize, whiteColor);
     s_rc.origin.x = 471;
     s_rc.origin.y = 64;
     s_rc.size.width = 65;
-    addTextfield(VLCTimeField, o_streamPosition_txt, NSRightTextAlignment, systemFontOfSize, whiteColor);
+    addTextfield(VLCTimeField, o_streamLength_txt, NSRightTextAlignment, systemFontOfSize, whiteColor);
 
     o_background_img = [[NSImage imageNamed:@"fs_background"] retain];
     o_vol_sld_img = [[NSImage imageNamed:@"fs_volume_slider_bar"] retain];
@@ -514,10 +519,54 @@
     [o_streamTitle_txt setStringValue: o_title];
 }
 
-- (void)setStreamPos:(float) f_pos andTime:(NSString *)o_time
+- (void)updatePositionAndTime
 {
-    [o_streamPosition_txt setStringValue: o_time];
-    [o_fs_timeSlider setFloatValue: f_pos];
+    input_thread_t * p_input;
+    p_input = pl_CurrentInput(VLCIntf);
+    if (p_input) {
+        
+        vlc_value_t pos;
+        float f_updated;
+
+        var_Get(p_input, "position", &pos);
+        f_updated = 10000. * pos.f_float;
+        [o_fs_timeSlider setFloatValue: f_updated];
+
+        vlc_value_t time;
+        char psz_time[MSTRTIME_MAX_SIZE];
+
+        var_Get(p_input, "time", &time);
+        mtime_t dur = input_item_GetDuration(input_GetItem(p_input));
+
+        // update total duration (right field)
+        if(dur <= 0) {
+            [o_streamLength_txt setHidden: YES];
+        } else {
+            [o_streamLength_txt setHidden: NO];
+
+            NSString *o_total_time;
+            if ([o_streamLength_txt timeRemaining]) {
+                mtime_t remaining = 0;
+                if (dur > time.i_time)
+                    remaining = dur - time.i_time;
+                o_total_time = [NSString stringWithFormat: @"-%s", secstotimestr(psz_time, (remaining / 1000000))];
+            } else
+                o_total_time = [NSString stringWithUTF8String: secstotimestr(psz_time, (dur / 1000000))];
+
+            [o_streamLength_txt setStringValue: o_total_time];
+        }
+
+        // update current position (left field)
+        NSString *o_playback_pos = [NSString stringWithUTF8String: secstotimestr(psz_time, (time.i_time / 1000000))];
+               
+        [o_streamPosition_txt setStringValue: o_playback_pos];
+        vlc_object_release(p_input);
+    } else {
+        [o_fs_timeSlider setFloatValue: 0.0];
+        [o_streamPosition_txt setStringValue: @"00:00"];
+        [o_streamLength_txt setHidden: YES];
+    }
+
 }
 
 - (void)setSeekable:(BOOL)b_seekable
