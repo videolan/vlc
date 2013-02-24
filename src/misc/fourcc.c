@@ -1589,6 +1589,9 @@ const char *vlc_fourcc_GetDescription( int i_cat, vlc_fourcc_t i_fourcc )
 #define VLC_CODEC_YUV_PLANAR_420 \
     VLC_CODEC_I420, VLC_CODEC_YV12, VLC_CODEC_J420
 
+#define VLC_CODEC_YUV_SEMIPLANAR_420 \
+    VLC_CODEC_NV12, VLC_CODEC_NV21
+
 #define VLC_CODEC_YUV_PLANAR_420_16 \
     VLC_CODEC_I420_10L, VLC_CODEC_I420_10B, VLC_CODEC_I420_9L, VLC_CODEC_I420_9B
 
@@ -1773,6 +1776,7 @@ static const vlc_fourcc_t *pp_YUV_fallback[] = {
 
 static const vlc_fourcc_t p_list_YUV[] = {
     VLC_CODEC_YUV_PLANAR_420,
+    VLC_CODEC_YUV_SEMIPLANAR_420,
     VLC_CODEC_YUV_PLANAR_422,
     VLC_CODEC_YUV_PLANAR_440,
     VLC_CODEC_YUV_PLANAR_444,
