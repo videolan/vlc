@@ -61,6 +61,7 @@
 #include <GroupsockHelper.hh>
 #include <liveMedia.hh>
 #include <liveMedia_version.hh>
+#include <Base64.hh>
 
 extern "C" {
 #include "../access/mms/asf.h"  /* Who said ugly ? */
@@ -268,6 +269,8 @@ static void* TimeoutPrevention( void * );
 
 static unsigned char* parseH264ConfigStr( char const* configStr,
                                           unsigned int& configSize );
+static unsigned char* parseVorbisConfigStr( char const* configStr,
+                                            unsigned int& configSize );
 
 /*****************************************************************************
  * DemuxOpen:
@@ -959,6 +962,20 @@ static int SessionsSetup( demux_t *p_demux )
                         tk->fmt.audio.i_rate = 8000;
                     }
                 }
+                else if( !strcmp( sub->codecName(), "VORBIS" ) )
+                {
+                    tk->fmt.i_codec = VLC_CODEC_VORBIS;
+                    unsigned int i_extra;
+                    unsigned char *p_extra;
+                    if( ( p_extra=parseVorbisConfigStr( sub->fmtp_config(),
+                                                        i_extra ) ) )
+                    {
+                        tk->fmt.i_extra = i_extra;
+                        tk->fmt.p_extra = p_extra;
+                    }
+                    else
+                        msg_Warn( p_demux,"Missing or unsupported vorbis header." );
+                }
             }
             else if( !strcmp( sub->mediumName(), "video" ) )
             {
@@ -1049,6 +1066,10 @@ static int SessionsSetup( demux_t *p_demux )
                     tk->b_discard_trunc = true;
                     tk->p_out_muxed = stream_DemuxNew( p_demux, "rawdv",
                                                        p_demux->out );
+                }
+                else if( !strcmp( sub->codecName(), "VP8" ) )
+                {
+                    tk->fmt.i_codec = VLC_CODEC_VP8;
                 }
             }
             else if( !strcmp( sub->mediumName(), "text" ) )
@@ -2123,3 +2144,24 @@ static unsigned char* parseH264ConfigStr( char const* configStr,
     free( dup );
     return cfg;
 }
+
+static uint8_t *parseVorbisConfigStr( char const* configStr,
+                                      unsigned int& configSize )
+{
+    configSize = 0;
+    if( configStr == NULL || *configStr == '\0' )
+        return NULL;
+    unsigned char *p_cfg = base64Decode( configStr, configSize );
+    uint8_t *p_extra = NULL;
+    /* skip header count, ident number and length (cf. RFC 5215) */
+    const unsigned int headerSkip = 9;
+    if( configSize > headerSkip && ((uint8_t*)p_cfg)[3] == 1 )
+    {
+        configSize -= headerSkip;
+        p_extra = (uint8_t*)xmalloc( configSize );
+        memcpy( p_extra, p_cfg+headerSkip, configSize );
+    }
+    delete[] p_cfg;
+    return p_extra;
+}
+
