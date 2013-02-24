@@ -65,7 +65,7 @@ int screen_InitCapture(demux_t *p_demux)
     CGLError returnedError;
     int i_bits_per_pixel, i_chroma = 0;
 
-    p_sys->p_data = p_data = calloc(1, sizeof(screen_data_t ) );
+    p_sys->p_data = p_data = calloc(1, sizeof(screen_data_t));
     if (!p_data)
         return VLC_ENOMEM;
 
@@ -76,8 +76,8 @@ int screen_InitCapture(demux_t *p_demux)
     returnedError = CGGetOnlineDisplayList(0, NULL, &displayCount);
     if (!returnedError) {
         CGDirectDisplayID *ids;
-        ids = ( CGDirectDisplayID * )malloc( displayCount * sizeof( CGDirectDisplayID ) );
-        returnedError = CGGetOnlineDisplayList( displayCount, ids, &displayCount );
+        ids = (CGDirectDisplayID *)malloc(displayCount * sizeof(CGDirectDisplayID));
+        returnedError = CGGetOnlineDisplayList(displayCount, ids, &displayCount);
         if (!returnedError) {
             if (p_sys->i_display_id > 0) {
                 for (unsigned int i = 0; i < displayCount; i++) {
@@ -101,7 +101,7 @@ int screen_InitCapture(demux_t *p_demux)
 
     p_data->width = p_sys->i_width;
     p_data->height = p_sys->i_height;
-    if( p_data->width <= 0 || p_data->height <= 0 ) {
+    if (p_data->width <= 0 || p_data->height <= 0) {
         p_data->width = p_data->screen_width;
         p_data->height = p_data->screen_height;
     }
@@ -131,7 +131,7 @@ int screen_InitCapture(demux_t *p_demux)
     free(psz_name);
 
     /* setup format */
-    es_format_Init(&p_sys->fmt, VIDEO_ES, i_chroma );
+    es_format_Init(&p_sys->fmt, VIDEO_ES, i_chroma);
     p_sys->fmt.video.i_visible_width  =
     p_sys->fmt.video.i_width          = rect.size.width;
     p_sys->fmt.video.i_visible_height =
@@ -179,7 +179,7 @@ int screen_CloseCapture(demux_t *p_demux)
 block_t *screen_Capture(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    screen_data_t *p_data = ( screen_data_t * )p_sys->p_data;
+    screen_data_t *p_data = (screen_data_t *)p_sys->p_data;
     block_t *p_block;
     CGRect capture_rect;
     CGImageRef image;
@@ -231,9 +231,6 @@ block_t *screen_Capture(demux_t *p_demux)
         CFRelease(data);
         CFRelease(dataProvider);
         CFRelease(image);
-
-
-        free(p_sys->p_mouse);
 
         return p_block;
     }
