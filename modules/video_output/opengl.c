@@ -412,8 +412,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     bool need_fs_yuv = false;
     float yuv_range_correction = 1.0;
 
-    if (max_texture_units >= 3 && supports_shaders &&
-        vlc_fourcc_IsYUV(fmt->i_chroma) && !vlc_fourcc_IsYUV(vgl->fmt.i_chroma)) {
+    if (max_texture_units >= 3 && supports_shaders && vlc_fourcc_IsYUV(fmt->i_chroma)) {
         const vlc_fourcc_t *list = vlc_fourcc_GetYUVFallback(fmt->i_chroma);
         while (*list) {
             const vlc_chroma_description_t *dsc = vlc_fourcc_GetChromaDescription(*list);
@@ -466,14 +465,11 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->shader[1] =
     vgl->shader[2] = -1;
     vgl->local_count = 0;
-    if (supports_shaders) {
-        if (need_fs_yuv)
-            BuildYUVFragmentShader(vgl, &vgl->shader[0],
+    if (supports_shaders && vlc_fourcc_IsYUV(fmt->i_chroma)) {
+        BuildYUVFragmentShader(vgl, &vgl->shader[0],
                                    &vgl->local_count,
                                    vgl->local_value,
                                    fmt, yuv_range_correction);
-        else
-            BuildRGBFragmentShader(vgl, &vgl->shader[0]);
         BuildRGBAFragmentShader(vgl, &vgl->shader[1]);
         BuildVertexShader(vgl, &vgl->shader[2]);
 
