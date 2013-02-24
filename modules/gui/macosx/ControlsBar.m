@@ -108,8 +108,16 @@
     [o_play_btn setImage: o_play_img];
     [o_play_btn setAlternateImage: o_play_pressed_img];
 
+    NSColor *o_string_color;
+    if (!var_InheritBool(VLCIntf, "macosx-interfacestyle"))
+        o_string_color = [NSColor colorWithCalibratedRed:0.229 green:0.229 blue:0.229 alpha:100.0];
+    else
+        o_string_color = [NSColor colorWithCalibratedRed:0.64 green:0.64 blue:0.64 alpha:100.0];
+    [o_time_fld setTextColor: o_string_color];
+    [o_time_fld setFont:[NSFont titleBarFontOfSize:10.0]];
     [o_time_fld setAlignment: NSCenterTextAlignment];
     [o_time_fld setNeedsDisplay:YES];
+    [o_time_fld setRemainingIdentifier:@"DisplayTimeAsTimeRemaining"];
 
     // prepare time slider fance gradient view
     if (!b_dark_interface) {

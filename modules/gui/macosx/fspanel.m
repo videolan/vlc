@@ -472,6 +472,7 @@
     s_rc.origin.y = 64;
     s_rc.size.width = 65;
     addTextfield(VLCTimeField, o_streamLength_txt, NSRightTextAlignment, systemFontOfSize, whiteColor);
+    [o_streamLength_txt setRemainingIdentifier: @"DisplayFullscreenTimeAsTimeRemaining"];
 
     o_background_img = [[NSImage imageNamed:@"fs_background"] retain];
     o_vol_sld_img = [[NSImage imageNamed:@"fs_volume_slider_bar"] retain];
