@@ -284,6 +284,7 @@ static void BuildYUVFragmentShader(vout_display_opengl_t *vgl,
     free(code);
 }
 
+#if 0
 static void BuildRGBFragmentShader(vout_display_opengl_t *vgl,
                                    GLint *shader)
 {
@@ -301,6 +302,7 @@ static void BuildRGBFragmentShader(vout_display_opengl_t *vgl,
     vgl->ShaderSource(*shader, 1, &code, NULL);
     vgl->CompileShader(*shader);
 }
+#endif
 
 static void BuildRGBAFragmentShader(vout_display_opengl_t *vgl,
                                    GLint *shader)
@@ -465,11 +467,9 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->shader[1] =
     vgl->shader[2] = -1;
     vgl->local_count = 0;
-    if (supports_shaders && vlc_fourcc_IsYUV(fmt->i_chroma)) {
-        BuildYUVFragmentShader(vgl, &vgl->shader[0],
-                                   &vgl->local_count,
-                                   vgl->local_value,
-                                   fmt, yuv_range_correction);
+    if (supports_shaders && need_fs_yuv) {
+        BuildYUVFragmentShader(vgl, &vgl->shader[0], &vgl->local_count,
+                               vgl->local_value, fmt, yuv_range_correction);
         BuildRGBAFragmentShader(vgl, &vgl->shader[1]);
         BuildVertexShader(vgl, &vgl->shader[2]);
 
