@@ -199,6 +199,7 @@ fi
     --disable-caca \
     --disable-gettext \
     --disable-mpcdec \
+    --disable-screen \
     --disable-upnp \
     --disable-gme \
     --disable-tremor \
