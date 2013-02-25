@@ -132,9 +132,11 @@ struct sout_access_out_sys_t
     mtime_t  i_seglenm;
     uint32_t i_segment;
     size_t  i_seglen;
+    float   *p_seglens;
     block_t *block_buffer;
     int i_handle;
     unsigned i_numsegs;
+    unsigned i_seglens;
     bool b_delsegs;
     bool b_ratecontrol;
     bool b_splitanywhere;
@@ -157,7 +159,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( !( p_sys = malloc ( sizeof( *p_sys ) ) ) )
+    if( unlikely( !( p_sys = malloc ( sizeof( *p_sys ) ) ) ) )
         return VLC_ENOMEM;
 
     p_sys->i_seglen = var_GetInteger( p_access, SOUT_CFG_PREFIX "seglen" );
@@ -169,6 +171,20 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_splitanywhere = var_GetBool( p_access, SOUT_CFG_PREFIX "splitanywhere" );
     p_sys->b_delsegs = var_GetBool( p_access, SOUT_CFG_PREFIX "delsegs" );
     p_sys->b_ratecontrol = var_GetBool( p_access, SOUT_CFG_PREFIX "ratecontrol") ;
+
+
+    /* 5 elements is from harrison-stetson algorithm to start from some number
+     * if we don't have numsegs defined
+     */
+    p_sys->i_seglens = 5;
+    if( p_sys->i_numsegs )
+        p_sys->i_seglens = p_sys->i_numsegs+1;
+    p_sys->p_seglens = malloc( sizeof(float) * p_sys->i_seglens  );
+    if( unlikely( !p_sys->p_seglens ) )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
 
     p_sys->psz_indexPath = NULL;
     psz_idx = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "index" );
@@ -242,7 +258,18 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
     uint32_t i_firstseg;
 
     if ( p_sys->i_numsegs == 0 || p_sys->i_segment < p_sys->i_numsegs )
+    {
         i_firstseg = 1;
+
+        if( p_sys->i_segment >= (p_sys->i_seglens-1) )
+        {
+            p_sys->i_seglens <<= 1;
+            msg_Dbg( p_access, "Segment amount %u", p_sys->i_seglens );
+            p_sys->p_seglens = realloc( p_sys->p_seglens, sizeof(float) * p_sys->i_seglens );
+            if( unlikely( !p_sys->p_seglens ) )
+             return -1;
+        }
+    }
     else
         i_firstseg = ( p_sys->i_segment - p_sys->i_numsegs ) + 1;
 
@@ -263,7 +290,7 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
             return -1;
         }
 
-        if ( fprintf( fp, "#EXTM3U\n#EXT-X-TARGETDURATION:%zu\n#EXT-X-MEDIA-SEQUENCE:%"PRIu32"\n", p_sys->i_seglen, i_firstseg ) < 0 )
+        if ( fprintf( fp, "#EXTM3U\n#EXT-X-TARGETDURATION:%zu\n#EXT-X-VERSION:3\n#EXT-X-MEDIA-SEQUENCE:%"PRIu32"\n", p_sys->i_seglen, i_firstseg ) < 0 )
         {
             free( psz_idxTmp );
             fclose( fp );
@@ -274,13 +301,21 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
         for ( uint32_t i = i_firstseg; i <= p_sys->i_segment; i++ )
         {
             char *psz_name;
+            char *psz_duration = NULL;
             if ( ! ( psz_name = formatSegmentPath( psz_idxFormat, i, false ) ) )
             {
                 free( psz_idxTmp );
                 fclose( fp );
                 return -1;
             }
-            val = fprintf( fp, "#EXTINF:%zu,\n%s\n", p_sys->i_seglen, psz_name );
+            if( ! ( us_asprintf( &psz_duration, "%.2f", p_sys->p_seglens[i % p_sys->i_seglens ], psz_name ) ) )
+            {
+                free( psz_idxTmp );
+                fclose( fp );
+                return -1;
+            }
+            val = fprintf( fp, "#EXTINF:%s,\n%s\n", psz_duration, psz_name );
+            free( psz_duration );
             free( psz_name );
             if ( val < 0 )
             {
@@ -366,6 +401,12 @@ static void Close( vlc_object_t * p_this )
            block_ChainRelease ( p_sys->block_buffer);
            break;
         }
+        if( !p_sys->block_buffer->p_next )
+        {
+            p_sys->p_seglens[p_sys->i_segment % p_sys->i_seglens ] =
+                (float)( p_sys->block_buffer->i_length / (1000000)) +
+                (float)(p_sys->block_buffer->i_dts - p_sys->i_opendts) / CLOCK_FREQ;
+        }
 
         if ( (size_t)val >= p_sys->block_buffer->i_buffer )
         {
@@ -383,6 +424,7 @@ static void Close( vlc_object_t * p_this )
     closeCurrentSegment( p_access, p_sys, true );
     free( p_sys->psz_indexUrl );
     free( p_sys->psz_indexPath );
+    free( p_sys->p_seglens );
     free( p_sys );
 
     msg_Dbg( p_access, "livehttp access output closed" );
@@ -479,6 +521,9 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
                    block_ChainRelease ( p_buffer );
                    return -1;
                 }
+                p_sys->p_seglens[p_sys->i_segment % p_sys->i_seglens ] =
+                    (float)output->i_length / INT64_C(1000000) +
+                    (float)(output->i_dts - p_sys->i_opendts) / CLOCK_FREQ;
 
                 if ( (size_t)val >= output->i_buffer )
                 {
