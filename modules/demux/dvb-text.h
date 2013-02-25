@@ -58,6 +58,7 @@ static char *vlc_from_EIT (const void *buf, size_t length)
                return NULL;
            break;
         case 0x11: /* the BMP */
+        case 0x14: /* Big5 subset of the BMP */
             encoding = "UCS-2BE";
             break;
         case 0x12:
@@ -69,9 +70,6 @@ static char *vlc_from_EIT (const void *buf, size_t length)
             break;
         case 0x13: /* GB-2312-1980 */
             encoding = "GB2312";
-            break;
-        case 0x14: /* Big5 subset of the BMP */
-            encoding = "BIG-5";
             break;
         case 0x15:
             encoding = "UTF-8";
