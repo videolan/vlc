@@ -168,8 +168,8 @@ static int TimeGet(audio_output_t* aout, mtime_t* restrict drift)
     *drift = (CLOCK_FREQ * OPENSLES_BUFLEN * st.count / 1000)
         + sys->samples * CLOCK_FREQ / sys->rate;
 
-    /* msg_Dbg(aout, "latency %"PRId64" ms, %d/%d buffers", *drift / 1000,
-        (int)st.count, OPENSLES_BUFFERS); */
+    msg_Dbg(aout, "latency %"PRId64" ms, %d/%d buffers", *drift / 1000,
+        (int)st.count, OPENSLES_BUFFERS);
 
     return 0;
 }
