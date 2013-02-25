@@ -1007,6 +1007,12 @@ loaded:
          * using SW codecs is usually more than fast enough for MP3.) */
         if (!strcmp(p_sys->ppsz_components[i], "OMX.SEC.MP3.Decoder"))
             continue;
+        /* This codec should be able to handle both VC1 and WMV3, but
+         * for VC1 it doesn't output any buffers at all (in the way we use
+         * it) and for WMV3 it outputs plain black buffers. Thus ignore
+         * it until we can make it work properly. */
+        if (!strcmp(p_sys->ppsz_components[i], "OMX.Nvidia.vc1.decode"))
+            continue;
 #endif
         omx_error = InitialiseComponent(p_dec, p_sys->ppsz_components[i],
                                         &p_sys->omx_handle);
