@@ -163,8 +163,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->i_seglen = var_GetInteger( p_access, SOUT_CFG_PREFIX "seglen" );
-    /* Try to get within +-10% of asked segment length, so limit is +10% of segment length*/
-    p_sys->i_seglenm = CLOCK_FREQ * p_sys->i_seglen * 1.10;
+    /* Try to get within asked segment length */
+    p_sys->i_seglenm = CLOCK_FREQ * p_sys->i_seglen;
     p_sys->block_buffer = NULL;
 
     p_sys->i_numsegs = var_GetInteger( p_access, SOUT_CFG_PREFIX "numsegs" );
