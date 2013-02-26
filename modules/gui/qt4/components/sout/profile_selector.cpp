@@ -251,7 +251,7 @@ void VLCProfileSelector::updateOptions( int i )
             if ( !value.isEmpty() )
             {
                 QStringList valuesList = QUrl::fromPercentEncoding( value.toAscii() ).split( ";" );
-                smrl.option( "vfilter", QString("{%1}").arg( valuesList.join( "," ) ) );
+                smrl.option( "vfilter", valuesList.join( ":" ) );
             }
 
             /*if ( codec is h264 )*/
@@ -317,7 +317,7 @@ void VLCProfileSelector::updateOptions( int i )
             if ( !value.isEmpty() )
             {
                 QStringList valuesList = QUrl::fromPercentEncoding( value.toAscii() ).split( ";" );
-                smrl.option( "afilter", QString("{%1}").arg( valuesList.join( "," ) ) );
+                smrl.option( "afilter", valuesList.join( ":" ) );
             }
 
         } else {
