@@ -993,8 +993,9 @@ loaded:
          * has got a working OMX.qcom.video.decoder.avc instead though. */
         if (!strncmp(p_sys->ppsz_components[i], "OMX.ARICENT.", 12))
             continue;
-        /* Some nVidia codec with DRM */
-        if (!strncmp(p_sys->ppsz_components[i], "OMX.Nvidia.h264.decode.secure", 29))
+        /* Codecs with DRM, that don't output plain YUV data but only
+         * support direct rendering where the output can't be intercepted. */
+        if (strstr(p_sys->ppsz_components[i], ".secure"))
             continue;
         /* Use VC1 decoder for WMV3 for now */
         if (!strcmp(p_sys->ppsz_components[i], "OMX.SEC.WMV.Decoder"))
