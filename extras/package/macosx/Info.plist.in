@@ -42,6 +42,20 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>dvdmedia</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>movie.icns</string>
+            <key>CFBundleTypeName</key>
+            <string>DVD Media Document</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSTypeIsPackage</key>
+            <true/>
+        </dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>xspf</string>
