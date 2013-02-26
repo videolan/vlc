@@ -56,6 +56,11 @@ struct screen_data_t
     int screen_height;
 
     CGDirectDisplayID display_id;
+
+    CGContextRef offscreen_context;
+    CGRect offscreen_rect;
+    void *offscreen_bitmap;
+    size_t offscreen_bitmap_size;
 };
 
 int screen_InitCapture(demux_t *p_demux)
@@ -63,7 +68,6 @@ int screen_InitCapture(demux_t *p_demux)
     demux_sys_t *p_sys = p_demux->p_sys;
     screen_data_t *p_data;
     CGLError returnedError;
-    int i_bits_per_pixel, i_chroma = 0;
 
     p_sys->p_data = p_data = calloc(1, sizeof(screen_data_t));
     if (!p_data)
@@ -106,59 +110,17 @@ int screen_InitCapture(demux_t *p_demux)
         p_data->height = p_data->screen_height;
     }
 
-    CFStringRef pixelEncoding = CGDisplayModeCopyPixelEncoding(CGDisplayCopyDisplayMode(p_data->display_id));
-    int length = CFStringGetLength(pixelEncoding);
-    length++;
-    char *psz_name = (char *)malloc(length);
-    CFStringGetCString(pixelEncoding, psz_name, length, kCFStringEncodingUTF8);
-    msg_Dbg(p_demux, "pixel encoding is '%s'", psz_name);
-    CFRelease(pixelEncoding);
-
-    if (!strcmp(psz_name, IO32BitDirectPixels)) {
-        i_chroma = VLC_CODEC_RGB32;
-        i_bits_per_pixel = 32;
-    } else if (!strcmp(psz_name, IO16BitDirectPixels)) {
-        i_chroma = VLC_CODEC_RGB16;
-        i_bits_per_pixel = 16;
-    } else if (!strcmp(psz_name, IO8BitIndexedPixels)) {
-        i_chroma = VLC_CODEC_RGB8;
-        i_bits_per_pixel = 8;
-    } else {
-        msg_Err(p_demux, "unsupported pixel encoding");
-        free(p_data);
-        return VLC_EGENERIC;
-    }
-    free(psz_name);
-
     /* setup format */
-    es_format_Init(&p_sys->fmt, VIDEO_ES, i_chroma);
+    es_format_Init(&p_sys->fmt, VIDEO_ES, VLC_CODEC_RGB32);
     p_sys->fmt.video.i_visible_width  =
     p_sys->fmt.video.i_width          = rect.size.width;
     p_sys->fmt.video.i_visible_height =
     p_sys->fmt.video.i_height         = rect.size.height;
-    p_sys->fmt.video.i_bits_per_pixel = i_bits_per_pixel;
-    p_sys->fmt.video.i_chroma         = i_chroma;
-
-    switch (i_chroma) {
-        case VLC_CODEC_RGB15:
-            p_sys->fmt.video.i_rmask = 0x7c00;
-            p_sys->fmt.video.i_gmask = 0x03e0;
-            p_sys->fmt.video.i_bmask = 0x001f;
-            break;
-        case VLC_CODEC_RGB24:
-            p_sys->fmt.video.i_rmask = 0x00ff0000;
-            p_sys->fmt.video.i_gmask = 0x0000ff00;
-            p_sys->fmt.video.i_bmask = 0x000000ff;
-            break;
-        case VLC_CODEC_RGB32:
-            p_sys->fmt.video.i_rmask = 0x00ff0000;
-            p_sys->fmt.video.i_gmask = 0x0000ff00;
-            p_sys->fmt.video.i_bmask = 0x000000ff;
-            break;
-        default:
-            msg_Warn( p_demux, "Unknown RGB masks" );
-            break;
-    }
+    p_sys->fmt.video.i_bits_per_pixel = 32;
+    p_sys->fmt.video.i_chroma         = VLC_CODEC_RGB32;
+    p_sys->fmt.video.i_rmask          = 0x00ff0000;
+    p_sys->fmt.video.i_gmask          = 0x0000ff00;
+    p_sys->fmt.video.i_bmask          = 0x000000ff;
 
     return VLC_SUCCESS;
 }
@@ -167,6 +129,12 @@ int screen_CloseCapture(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     screen_data_t *p_data = p_sys->p_data;
+
+    if (p_data->offscreen_context)
+        CFRelease(p_data->offscreen_context);
+
+    if (p_data->offscreen_bitmap)
+        free(p_data->offscreen_bitmap);
 
     if (p_data->p_block)
         block_Release(p_data->p_block);
@@ -183,8 +151,6 @@ block_t *screen_Capture(demux_t *p_demux)
     block_t *p_block;
     CGRect capture_rect;
     CGImageRef image;
-    CGDataProviderRef dataProvider;
-    CFDataRef data;
 
     /* forward cursor location */
     CGPoint cursor_pos;
@@ -204,37 +170,67 @@ block_t *screen_Capture(demux_t *p_demux)
     capture_rect.size.width = p_data->width;
     capture_rect.size.height = p_data->height;
 
-#if 0
-    // FIXME: actually plot cursor image into snapshot
+    /* fetch image data */
+    image = CGDisplayCreateImageForRect(p_data->display_id, capture_rect);
+    if (!image) {
+        msg_Warn(p_demux, "no image!");
+        return NULL;
+    }
+
+    /* create offscreen context */
+    if (!p_data->offscreen_context) {
+        CGColorSpaceRef colorspace;
+
+        colorspace = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB);
+
+        p_data->offscreen_bitmap_size = p_sys->fmt.video.i_width * p_sys->fmt.video.i_height * 4;
+        p_data->offscreen_bitmap = calloc(1, p_data->offscreen_bitmap_size);
+        if (p_data->offscreen_bitmap == NULL) {
+            msg_Warn(p_demux, "can't allocate offscreen bitmap");
+            CFRelease(image);
+            return NULL;
+        }
+
+        p_data->offscreen_context = CGBitmapContextCreate(p_data->offscreen_bitmap, p_sys->fmt.video.i_width, p_sys->fmt.video.i_height, 8, p_sys->fmt.video.i_width * 4, colorspace, kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little);
+        if (!p_data->offscreen_context) {
+            msg_Warn(p_demux, "can't create offscreen bitmap context");
+            CFRelease(image);
+            return NULL;
+        }
+
+        CGColorSpaceRelease(colorspace);
+
+        p_data->offscreen_rect = CGRectMake(0, 0, p_sys->fmt.video.i_width, p_sys->fmt.video.i_height);
+    }
+
     /* fetch cursor image */
     CGImageRef cursor_image;
     int cid = CGSMainConnectionID();
     CGPoint outHotSpot;
     cursor_image = CGSCreateRegisteredCursorImage(cid, (char *)"com.apple.coregraphics.GlobalCurrent", &outHotSpot);
-#endif
 
-    /* fetch image data */
-    image = CGDisplayCreateImageForRect(p_data->display_id, capture_rect);
-    if (image) {
-        /* build block */
-        int i_buffer = (p_sys->fmt.video.i_bits_per_pixel + 7) / 8 * p_sys->fmt.video.i_width * p_sys->fmt.video.i_height;
-        p_block = block_Alloc(i_buffer);
-        if (!p_block) {
-            msg_Warn(p_demux, "can't get block");
-            return NULL;
-        }
+    /* draw screen image and cursor image */
+    CGRect cursor_rect;
+    cursor_rect.size.width = CGImageGetWidth(cursor_image);
+    cursor_rect.size.height = CGImageGetHeight(cursor_image);
+    cursor_rect.origin.x = cursor_pos.x - p_sys->i_left - outHotSpot.x;
+    cursor_rect.origin.y = p_data->offscreen_rect.size.height
+        - (cursor_pos.y + cursor_rect.size.height - p_sys->i_top - outHotSpot.y);
 
-        dataProvider = CGImageGetDataProvider(image);
-        data = CGDataProviderCopyData(dataProvider);
-        CFDataGetBytes(data, CFRangeMake(0,CFDataGetLength(data)), p_block->p_buffer);
+    CGContextDrawImage(p_data->offscreen_context, p_data->offscreen_rect, image);
+    CGContextDrawImage(p_data->offscreen_context, cursor_rect, cursor_image);
 
-        CFRelease(data);
-        CFRelease(dataProvider);
+    /* build block */
+    p_block = block_Alloc(p_data->offscreen_bitmap_size);
+    if (!p_block) {
+        msg_Warn(p_demux, "can't get block");
         CFRelease(image);
-
-        return p_block;
+        return NULL;
     }
 
-    msg_Warn(p_demux, "no image!");
-    return NULL;
+    memmove(p_block->p_buffer, p_data->offscreen_bitmap, p_data->offscreen_bitmap_size);
+
+    CFRelease(image);
+
+    return p_block;
 }
