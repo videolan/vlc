@@ -1725,16 +1725,7 @@ PKG_ENABLE_MODULES_VLC([OPENCV], [opencv_example opencv_wrapper], [opencv > 2.0]
 dnl
 dnl  libsmbclient plugin
 dnl
-AC_ARG_ENABLE(smb,
-  [AS_HELP_STRING([--disable-smb], [disable SMB/CIFS support (default auto)])])
-if test "${enable_smb}" != "no"; then
-  AC_CHECK_HEADERS(libsmbclient.h,
-    [ VLC_ADD_PLUGIN([access_smb])
-      VLC_ADD_LIBS([access_smb],[-lsmbclient]) ],
-    [ if test -n "${enable_smb}"; then
-        AC_MSG_ERROR([cannot find libsmbclient headers])
-     fi ])
-fi
+PKG_ENABLE_MODULES_VLC([SMBCLIENT], [access_smb], [smbclient], (SMB/CIFS support), [auto])
 
 
 dnl

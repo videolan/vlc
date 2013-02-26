@@ -267,8 +267,8 @@ endif
 ### Network streams ###
 
 libaccess_smb_plugin_la_SOURCES = smb.c
-libaccess_smb_plugin_la_CFLAGS = $(AM_CFLAGS)
-libaccess_smb_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_access_smb)
+libaccess_smb_plugin_la_CFLAGS = $(AM_CFLAGS) $(SMBCLIENT_CFLAGS)
+libaccess_smb_plugin_la_LIBADD = $(AM_LIBADD) $(SMBCLIENT_LIBS)
 if HAVE_WIN32
 libaccess_smb_plugin_la_LIBADD += -lmpr
 endif
