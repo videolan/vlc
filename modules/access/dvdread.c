@@ -755,6 +755,12 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
         pgn = p_vts->vts_ptt_srpt->title[p_sys->i_ttn - 1].ptt[0].pgn;
         p_pgc = p_vts->vts_pgcit->pgci_srp[pgc_id - 1].pgc;
 
+        if( p_pgc->cell_playback == NULL )
+        {
+            msg_Err( p_demux, "Invalid PGC (cell_playback_offset)" );
+            return VLC_EGENERIC;
+        }
+
         p_sys->i_title_start_cell =
             i_start_cell = p_pgc->program_map[pgn - 1] - 1;
         p_sys->i_title_start_block =
@@ -999,6 +1005,8 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
                   p_sys->i_ttn - 1].ptt[i_chapter].pgn;
 
         p_pgc = p_vts->vts_pgcit->pgci_srp[pgc_id - 1].pgc;
+        if( p_pgc->cell_playback == NULL )
+            return VLC_EGENERIC; /* Couldn't set chapter */
 
         p_sys->i_cur_cell = p_pgc->program_map[pgn - 1] - 1;
         p_sys->i_chapter = i_chapter;
