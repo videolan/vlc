@@ -48,6 +48,8 @@ struct demux_sys_t
     mtime_t i_next_date;
     int i_incr;
 
+    mtime_t i_start;
+
 #ifdef SCREEN_SUBSCREEN
     bool b_follow_mouse;
     unsigned int i_screen_height;

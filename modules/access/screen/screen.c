@@ -235,6 +235,8 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->es = es_out_Add( p_demux->out, &p_sys->fmt );
 
+    p_sys->i_start = mdate();
+
     return VLC_SUCCESS;
 }
 
@@ -293,6 +295,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     bool *pb;
     int64_t *pi64;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
     switch( i_query )
     {
@@ -313,7 +316,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = mdate();
+            *pi64 = mdate() - p_sys->i_start;
             return VLC_SUCCESS;
 
         /* TODO implement others */
