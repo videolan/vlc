@@ -678,6 +678,14 @@ static int64_t get_last_frame ( demux_t *p_demux, logical_stream_t *p_stream )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     int64_t i_frame;
+    ogg_stream_state os;
+
+    /* Backup the stream state. We get called during header processing, and our
+     * caller expects its header packet to remain valid after the call. If we
+     * let find_last_frame() reuse the same stream state, then it will
+     * invalidate the pointers in that packet. */
+    memcpy(&os, &p_stream->os, sizeof(os));
+    ogg_stream_init( &p_stream->os, p_stream->i_serial_no );
 
     i_frame = find_last_frame ( p_demux, p_stream );
 
@@ -690,9 +698,8 @@ static int64_t get_last_frame ( demux_t *p_demux, logical_stream_t *p_stream )
     seek_byte( p_demux, 0 );
     /* Reset stream states */
     p_sys->i_streams = 0;
-    p_stream->i_serial_no = ogg_page_serialno( &p_sys->current_page );
-    ogg_stream_init( &p_stream->os, p_stream->i_serial_no );
-    ogg_stream_pagein( &p_stream->os, &p_sys->current_page );
+    ogg_stream_clear( &p_stream->os );
+    memcpy( &p_stream->os, &os, sizeof(os) );
 
     return i_frame;
 }
