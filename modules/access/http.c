@@ -195,6 +195,9 @@ struct access_sys_t
     vlc_array_t * cookies;
 };
 
+char      *psz_cached_http_user = NULL;
+char      *psz_cached_http_password = NULL;
+
 /* */
 static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
                             unsigned i_redirect, vlc_array_t *cookies );
@@ -538,6 +541,17 @@ connect:
             Disconnect( p_access );
             goto connect;
         }
+        if (psz_cached_http_user && psz_cached_http_password) {
+
+               p_sys->url.psz_username = strdup(psz_cached_http_user);
+               free(psz_cached_http_user);
+               psz_cached_http_user = NULL;
+               p_sys->url.psz_password = strdup(psz_cached_http_password);
+               free(psz_cached_http_password);
+               psz_cached_http_password = NULL;
+               Disconnect(p_access);
+               goto connect;
+        }
         msg_Dbg( p_access, "authentication failed for realm %s",
                  p_sys->auth.psz_realm );
         dialog_Login( p_access, &psz_login, &psz_password,
@@ -558,6 +572,17 @@ connect:
             free( psz_password );
             goto error;
         }
+    }
+
+    /* Succesful authentication => remember user/password if any */
+    if (p_sys->url.psz_username) {
+
+       psz_cached_http_user = strdup(p_sys->url.psz_username);
+    }
+
+    if (p_sys->url.psz_password) {
+
+       psz_cached_http_password = strdup(p_sys->url.psz_password);
     }
 
     if( ( p_sys->i_code == 301 || p_sys->i_code == 302 ||
