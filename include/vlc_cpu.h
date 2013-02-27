@@ -176,6 +176,9 @@ VLC_API unsigned vlc_CPU(void);
 #   define vlc_CPU_ARM_NEON() ((vlc_CPU() & VLC_CPU_ARM_NEON) != 0)
 #  endif
 
+# elif defined (__aarch64__)
+#  define HAVE_FPU 1
+
 # elif defined (__sparc__)
 #  define HAVE_FPU 1
 
