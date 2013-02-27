@@ -271,105 +271,6 @@ static void aout_Destructor (vlc_object_t *obj)
 }
 
 /**
- * Gets the volume of the audio output stream (independent of mute).
- * \return Current audio volume (0. = silent, 1. = nominal),
- * or a strictly negative value if undefined.
- */
-float aout_VolumeGet (audio_output_t *aout)
-{
-    return var_GetFloat (aout, "volume");
-}
-
-/**
- * Sets the volume of the audio output stream.
- * \note The mute status is not changed.
- * \return 0 on success, -1 on failure.
- */
-int aout_VolumeSet (audio_output_t *aout, float vol)
-{
-    int ret = -1;
-
-    aout_OutputLock (aout);
-    if (aout->volume_set != NULL)
-        ret = aout->volume_set (aout, vol);
-    aout_OutputUnlock (aout);
-    return ret;
-}
-
-/**
- * Gets the audio output stream mute flag.
- * \return 0 if not muted, 1 if muted, -1 if undefined.
- */
-int aout_MuteGet (audio_output_t *aout)
-{
-    return var_InheritBool (aout, "mute");
-}
-
-/**
- * Sets the audio output stream mute flag.
- * \return 0 on success, -1 on failure.
- */
-int aout_MuteSet (audio_output_t *aout, bool mute)
-{
-    int ret = -1;
-
-    aout_OutputLock (aout);
-    if (aout->mute_set != NULL)
-        ret = aout->mute_set (aout, mute);
-    aout_OutputUnlock (aout);
-    return ret;
-}
-
-/**
- * Gets the currently selected device.
- * \return the selected device ID (caller must free() it)
- *         NULL if no device is selected or in case of error.
- */
-char *aout_DeviceGet (audio_output_t *aout)
-{
-    return var_GetNonEmptyString (aout, "device");
-}
-
-/**
- * Selects an audio output device.
- * \param id device ID to select, or NULL for the default device
- * \return zero on success, non-zero on error.
- */
-int aout_DeviceSet (audio_output_t *aout, const char *id)
-{
-    int ret = -1;
-
-    aout_OutputLock (aout);
-    if (aout->device_select != NULL)
-        ret = aout->device_select (aout, id);
-    aout_OutputUnlock (aout);
-    return ret;
-}
-
-/**
- * Enumerates possible audio output devices.
- *
- * The function will heap-allocate two tables of heap-allocated strings;
- * the caller is responsible for freeing all strings and both tables.
- *
- * \param ids pointer to a table of device identifiers [OUT]
- * \param names pointer to a table of device human-readable descriptions [OUT]
- * \return the number of devices, or negative on error.
- * \note In case of error, *ids and *names are undefined.
- */
-int aout_DevicesList (audio_output_t *aout, char ***ids, char ***names)
-{
-    int ret = -1;
-
-    aout_OutputLock (aout);
-    if (aout->device_enum != NULL)
-        ret = aout->device_enum (aout, ids, names);
-    aout_OutputUnlock (aout);
-    return ret;
-}
-
-
-/**
  * Starts an audio output stream.
  * \param fmt audio output stream format [IN/OUT]
  * \warning The caller must hold the audio output lock.
@@ -530,6 +431,32 @@ void aout_OutputFlush( audio_output_t *aout, bool wait )
     aout->flush (aout, wait);
 }
 
+static int aout_OutputVolumeSet (audio_output_t *aout, float vol)
+{
+    aout_OutputAssertLocked (aout);
+    return (aout->volume_set != NULL) ? aout->volume_set (aout, vol) : -1;
+}
+
+static int aout_OutputMuteSet (audio_output_t *aout, bool mute)
+{
+    aout_OutputAssertLocked (aout);
+    return (aout->mute_set != NULL) ? aout->mute_set (aout, mute) : -1;
+}
+
+static int aout_OutputDeviceSet (audio_output_t *aout, const char *id)
+{
+    aout_OutputAssertLocked (aout);
+    return (aout->device_select != NULL) ? aout->device_select (aout, id) : -1;
+}
+
+static int aout_OutputDevicesEnum (audio_output_t *aout,
+                                   char ***ids, char ***names)
+{
+    aout_OutputAssertLocked (aout);
+    return (aout->device_enum != NULL) ? aout->device_enum (aout, ids, names)
+                                       : -1;
+}
+
 void aout_OutputLock (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
@@ -542,4 +469,98 @@ void aout_OutputUnlock (audio_output_t *aout)
     aout_owner_t *owner = aout_owner (aout);
 
     vlc_mutex_unlock (&owner->lock);
+}
+
+/**
+ * Gets the volume of the audio output stream (independent of mute).
+ * \return Current audio volume (0. = silent, 1. = nominal),
+ * or a strictly negative value if undefined.
+ */
+float aout_VolumeGet (audio_output_t *aout)
+{
+    return var_GetFloat (aout, "volume");
+}
+
+/**
+ * Sets the volume of the audio output stream.
+ * \note The mute status is not changed.
+ * \return 0 on success, -1 on failure.
+ */
+int aout_VolumeSet (audio_output_t *aout, float vol)
+{
+    int ret;
+
+    aout_OutputLock (aout);
+    ret = aout_OutputVolumeSet (aout, vol);
+    aout_OutputUnlock (aout);
+    return ret;
+}
+
+/**
+ * Gets the audio output stream mute flag.
+ * \return 0 if not muted, 1 if muted, -1 if undefined.
+ */
+int aout_MuteGet (audio_output_t *aout)
+{
+    return var_InheritBool (aout, "mute");
+}
+
+/**
+ * Sets the audio output stream mute flag.
+ * \return 0 on success, -1 on failure.
+ */
+int aout_MuteSet (audio_output_t *aout, bool mute)
+{
+    int ret;
+
+    aout_OutputLock (aout);
+    ret = aout_OutputMuteSet (aout, mute);
+    aout_OutputUnlock (aout);
+    return ret;
+}
+
+/**
+ * Gets the currently selected device.
+ * \return the selected device ID (caller must free() it)
+ *         NULL if no device is selected or in case of error.
+ */
+char *aout_DeviceGet (audio_output_t *aout)
+{
+    return var_GetNonEmptyString (aout, "device");
+}
+
+/**
+ * Selects an audio output device.
+ * \param id device ID to select, or NULL for the default device
+ * \return zero on success, non-zero on error.
+ */
+int aout_DeviceSet (audio_output_t *aout, const char *id)
+{
+    int ret;
+
+    aout_OutputLock (aout);
+    ret = aout_OutputDeviceSet (aout, id);
+    aout_OutputUnlock (aout);
+    return ret;
+}
+
+/**
+ * Enumerates possible audio output devices.
+ *
+ * The function will heap-allocate two tables of heap-allocated strings;
+ * the caller is responsible for freeing all strings and both tables.
+ *
+ * \param ids pointer to a table of device identifiers [OUT]
+ * \param names pointer to a table of device human-readable descriptions [OUT]
+ * \return the number of devices, or negative on error.
+ * \note In case of error, *ids and *names are undefined.
+ */
+int aout_DevicesList (audio_output_t *aout, char ***ids, char ***names)
+{
+    int ret;
+
+    aout_OutputLock (aout);
+    ret = aout_OutputDevicesEnum (aout, ids, names);
+    aout_OutputUnlock (aout);
+    return ret;
 }
