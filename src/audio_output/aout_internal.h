@@ -120,6 +120,8 @@ void aout_OutputPlay(audio_output_t *, block_t *);
 void aout_OutputPause( audio_output_t * p_aout, bool, mtime_t );
 void aout_OutputFlush( audio_output_t * p_aout, bool );
 void aout_OutputDelete( audio_output_t * p_aout );
+void aout_OutputLock(audio_output_t *);
+void aout_OutputUnlock(audio_output_t *);
 
 
 /* From common.c : */
@@ -148,19 +150,5 @@ static inline void aout_InputRequestRestart(audio_output_t *aout)
 {
     aout_RequestRestart(aout, AOUT_RESTART_FILTERS);
 }
-
-/* Audio output locking */
-static inline void aout_lock( audio_output_t *p_aout )
-{
-    vlc_mutex_lock( &aout_owner(p_aout)->lock );
-}
-
-static inline void aout_unlock( audio_output_t *p_aout )
-{
-    vlc_mutex_unlock( &aout_owner(p_aout)->lock );
-}
-
-#define aout_assert_locked( aout ) \
-        vlc_assert_locked( &aout_owner(aout)->lock )
 
 #endif /* !LIBVLC_AOUT_INTERNAL_H */

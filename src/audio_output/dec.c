@@ -68,7 +68,7 @@ int aout_DecNew( audio_output_t *p_aout,
     aout_owner_t *owner = aout_owner(p_aout);
 
     /* TODO: reduce lock scope depending on decoder's real need */
-    aout_lock( p_aout );
+    aout_OutputLock (p_aout);
 
     var_Destroy( p_aout, "stereo-mode" );
 
@@ -90,14 +90,14 @@ int aout_DecNew( audio_output_t *p_aout,
         aout_OutputDelete (p_aout);
 error:
         aout_volume_Delete (owner->volume);
-        aout_unlock (p_aout);
+        aout_OutputUnlock (p_aout);
         return -1;
     }
 
     owner->sync.end = VLC_TS_INVALID;
     owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
     owner->sync.discontinuity = true;
-    aout_unlock( p_aout );
+    aout_OutputUnlock (p_aout);
 
     atomic_init (&owner->buffers_lost, 0);
     return 0;
@@ -110,22 +110,20 @@ void aout_DecDelete (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    aout_lock (aout);
+    aout_OutputLock (aout);
     if (owner->mixer_format.i_format)
     {
         aout_FiltersDelete (aout);
         aout_OutputDelete (aout);
     }
     aout_volume_Delete (owner->volume);
-    aout_unlock (aout);
+    aout_OutputUnlock (aout);
     var_Destroy (aout, "stereo-mode");
 }
 
 static int aout_CheckReady (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
-
-    aout_assert_locked (aout);
 
     int restart = atomic_exchange (&owner->restart, 0);
     if (unlikely(restart))
@@ -365,7 +363,7 @@ int aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
     block->i_length = CLOCK_FREQ * block->i_nb_samples
                                  / owner->input_format.i_rate;
 
-    aout_lock (aout);
+    aout_OutputLock (aout);
     if (unlikely(aout_CheckReady (aout)))
         goto drop; /* Pipeline is unrecoverably broken :-( */
 
@@ -401,7 +399,7 @@ int aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
     owner->sync.discontinuity = false;
     aout_OutputPlay (aout, block);
 out:
-    aout_unlock (aout);
+    aout_OutputUnlock (aout);
     return 0;
 drop:
     owner->sync.discontinuity = true;
@@ -421,7 +419,7 @@ void aout_DecChangePause (audio_output_t *aout, bool paused, mtime_t date)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    aout_lock (aout);
+    aout_OutputLock (aout);
     if (owner->sync.end != VLC_TS_INVALID)
     {
         if (paused)
@@ -431,18 +429,18 @@ void aout_DecChangePause (audio_output_t *aout, bool paused, mtime_t date)
     }
     if (owner->mixer_format.i_format)
         aout_OutputPause (aout, paused, date);
-    aout_unlock (aout);
+    aout_OutputUnlock (aout);
 }
 
 void aout_DecFlush (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    aout_lock (aout);
+    aout_OutputLock (aout);
     owner->sync.end = VLC_TS_INVALID;
     if (owner->mixer_format.i_format)
         aout_OutputFlush (aout, false);
-    aout_unlock (aout);
+    aout_OutputUnlock (aout);
 }
 
 bool aout_DecIsEmpty (audio_output_t *aout)
@@ -451,7 +449,7 @@ bool aout_DecIsEmpty (audio_output_t *aout)
     mtime_t now = mdate ();
     bool empty = true;
 
-    aout_lock (aout);
+    aout_OutputLock (aout);
     if (owner->sync.end != VLC_TS_INVALID)
         empty = owner->sync.end <= now;
     if (empty && owner->mixer_format.i_format)
@@ -459,6 +457,6 @@ bool aout_DecIsEmpty (audio_output_t *aout)
          * buffer should be empty or almost. Thus draining should be fast
          * and will not block the caller too long. */
         aout_OutputFlush (aout, true);
-    aout_unlock (aout);
+    aout_OutputUnlock (aout);
     return empty;
 }

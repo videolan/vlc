@@ -33,6 +33,13 @@
 #include "aout_internal.h"
 
 /* Local functions */
+static void aout_OutputAssertLocked (audio_output_t *aout)
+{
+    aout_owner_t *owner = aout_owner (aout);
+
+    vlc_assert_locked (&owner->lock);
+}
+
 static void aout_Destructor( vlc_object_t * p_this );
 
 static int var_Copy (vlc_object_t *src, const char *name, vlc_value_t prev,
@@ -83,7 +90,7 @@ static int aout_GainNotify (audio_output_t *aout, float gain)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    aout_assert_locked (aout);
+    aout_OutputAssertLocked (aout);
     aout_volume_SetVolume (owner->volume, gain);
     /* XXX: ideally, return -1 if format cannot be amplified */
     return 0;
@@ -239,12 +246,12 @@ void aout_Destroy (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    aout_lock (aout);
+    aout_OutputLock (aout);
     module_unneed (aout, owner->module);
     /* Protect against late call from intf.c */
     aout->volume_set = NULL;
     aout->mute_set = NULL;
-    aout_unlock (aout);
+    aout_OutputUnlock (aout);
 
     var_DelCallback (aout, "mute", var_Copy, aout->p_parent);
     var_SetFloat (aout, "volume", -1.f);
@@ -282,10 +289,10 @@ int aout_VolumeSet (audio_output_t *aout, float vol)
 {
     int ret = -1;
 
-    aout_lock (aout);
+    aout_OutputLock (aout);
     if (aout->volume_set != NULL)
         ret = aout->volume_set (aout, vol);
-    aout_unlock (aout);
+    aout_OutputUnlock (aout);
     return ret;
 }
 
@@ -306,10 +313,10 @@ int aout_MuteSet (audio_output_t *aout, bool mute)
 {
     int ret = -1;
 
-    aout_lock (aout);
+    aout_OutputLock (aout);
     if (aout->mute_set != NULL)
         ret = aout->mute_set (aout, mute);
-    aout_unlock (aout);
+    aout_OutputUnlock (aout);
     return ret;
 }
 
@@ -332,10 +339,10 @@ int aout_DeviceSet (audio_output_t *aout, const char *id)
 {
     int ret = -1;
 
-    aout_lock (aout);
+    aout_OutputLock (aout);
     if (aout->device_select != NULL)
         ret = aout->device_select (aout, id);
-    aout_unlock (aout);
+    aout_OutputUnlock (aout);
     return ret;
 }
 
@@ -354,10 +361,10 @@ int aout_DevicesList (audio_output_t *aout, char ***ids, char ***names)
 {
     int ret = -1;
 
-    aout_lock (aout);
+    aout_OutputLock (aout);
     if (aout->device_enum != NULL)
         ret = aout->device_enum (aout, ids, names);
-    aout_unlock (aout);
+    aout_OutputUnlock (aout);
     return ret;
 }
 
@@ -369,7 +376,7 @@ int aout_DevicesList (audio_output_t *aout, char ***ids, char ***names)
  */
 int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
-    aout_assert_locked (aout);
+    aout_OutputAssertLocked (aout);
 
     /* Ideally, the audio filters would be created before the audio output,
      * and the ideal audio format would be the output of the filters chain.
@@ -462,7 +469,7 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt)
  */
 void aout_OutputDelete (audio_output_t *aout)
 {
-    aout_assert_locked (aout);
+    aout_OutputAssertLocked (aout);
 
     var_DelCallback (aout, "stereo-mode", aout_ChannelsRestart, NULL);
     if (aout->stop != NULL)
@@ -471,7 +478,7 @@ void aout_OutputDelete (audio_output_t *aout)
 
 int aout_OutputTimeGet (audio_output_t *aout, mtime_t *delay)
 {
-    aout_assert_locked (aout);
+    aout_OutputAssertLocked (aout);
 
     if (aout->time_get == NULL)
         return -1;
@@ -485,7 +492,7 @@ int aout_OutputTimeGet (audio_output_t *aout, mtime_t *delay)
  */
 void aout_OutputPlay (audio_output_t *aout, block_t *block)
 {
-    aout_assert_locked (aout);
+    aout_OutputAssertLocked (aout);
     aout->play (aout, block);
 }
 
@@ -505,7 +512,7 @@ static void PauseDefault (audio_output_t *aout, bool pause, mtime_t date)
  */
 void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
 {
-    aout_assert_locked (aout);
+    aout_OutputAssertLocked (aout);
     ((aout->pause != NULL) ? aout->pause : PauseDefault) (aout, pause, date);
 }
 
@@ -519,6 +526,20 @@ void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
  */
 void aout_OutputFlush( audio_output_t *aout, bool wait )
 {
-    aout_assert_locked( aout );
+    aout_OutputAssertLocked( aout );
     aout->flush (aout, wait);
+}
+
+void aout_OutputLock (audio_output_t *aout)
+{
+    aout_owner_t *owner = aout_owner (aout);
+
+    vlc_mutex_lock (&owner->lock);
+}
+
+void aout_OutputUnlock (audio_output_t *aout)
+{
+    aout_owner_t *owner = aout_owner (aout);
+
+    vlc_mutex_unlock (&owner->lock);
 }
