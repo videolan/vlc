@@ -300,13 +300,6 @@ static int OpenFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-#if !defined( SYS_DARWIN )
-    if( !var_InheritBool( p_this, "hq-resampling" ) )
-    {
-        return VLC_EGENERIC;
-    }
-#endif
-
     /* Allocate the memory needed to store the module's structure */
     p_filter->p_sys = p_sys = malloc( sizeof(struct filter_sys_t) );
     if( p_sys == NULL )

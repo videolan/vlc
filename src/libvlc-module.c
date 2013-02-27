@@ -154,14 +154,6 @@ static const char *const ppsz_snap_formats[] =
     "The volume can be recorded and automatically restored next time " \
     "VLC is used." )
 
-#if !defined( __APPLE__ )
-#define AOUT_RESAMP_TEXT N_("High quality audio resampling")
-#define AOUT_RESAMP_LONGTEXT N_( \
-    "This uses a high quality audio resampling algorithm. High quality " \
-    "audio resampling can be processor intensive so you can " \
-    "disable it and a cheaper resampling algorithm will be used instead.")
-#endif
-
 #define DESYNC_TEXT N_("Audio desynchronization compensation")
 #define DESYNC_LONGTEXT N_( \
     "This delays the audio output. The delay must be given in milliseconds. " \
@@ -1476,10 +1468,7 @@ vlc_module_begin ()
         change_integer_range( 1, AOUT_VOLUME_DEFAULT )
     add_bool( "volume-save", true, VOLUME_SAVE_TEXT, VOLUME_SAVE_TEXT, true )
     add_obsolete_integer( "aout-rate" ) /* since 2.0.0 */
-#if HAVE_FPU && !defined( __APPLE__ )
-    add_bool( "hq-resampling", 1, AOUT_RESAMP_TEXT,
-              AOUT_RESAMP_LONGTEXT, true )
-#endif
+    add_obsolete_bool( "hq-resampling" ) /* since 1.1.8 */
     add_bool( "spdif", 0, SPDIF_TEXT, SPDIF_LONGTEXT, false )
     add_integer( "force-dolby-surround", 0, FORCE_DOLBY_TEXT,
                  FORCE_DOLBY_LONGTEXT, false )
