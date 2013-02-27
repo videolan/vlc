@@ -25,12 +25,17 @@
 # include "config.h"
 #endif
 
+#include <stdlib.h>
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_aout.h>
 #include <vlc_modules.h>
 
 #include "libvlc.h"
 #include "aout_internal.h"
+
+static const char unset_str[1] = ""; /* Non-NULL constant string pointer */
 
 /* Local functions */
 static void aout_OutputAssertLocked (audio_output_t *aout)
@@ -112,6 +117,11 @@ audio_output_t *aout_New (vlc_object_t *parent)
     aout_owner_t *owner = aout_owner (aout);
 
     vlc_mutex_init (&owner->lock);
+    vlc_mutex_init (&owner->req.lock);
+    owner->req.device = (char *)unset_str;
+    owner->req.volume = -1.f;
+    owner->req.mute = -1;
+
     vlc_object_set_destructor (aout, aout_Destructor);
 
     /* Audio output module callbacks */
@@ -464,11 +474,46 @@ void aout_OutputLock (audio_output_t *aout)
     vlc_mutex_lock (&owner->lock);
 }
 
+static int aout_OutputTryLock (audio_output_t *aout)
+{
+    aout_owner_t *owner = aout_owner (aout);
+
+    return vlc_mutex_trylock (&owner->lock);
+}
+
 void aout_OutputUnlock (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 
+    vlc_assert_locked (&owner->lock);
+    vlc_mutex_lock (&owner->req.lock);
+
+    if (owner->req.device != unset_str)
+    {
+        aout_OutputDeviceSet (aout, owner->req.device);
+        free (owner->req.device);
+        owner->req.device = (char *)unset_str;
+    }
+
+    if (owner->req.volume >= 0.f)
+    {
+        aout_OutputVolumeSet (aout, owner->req.volume);
+        owner->req.volume = -1.f;
+    }
+
+    if (owner->req.mute >= 0)
+    {
+        aout_OutputMuteSet (aout, owner->req.mute);
+        owner->req.mute = -1;
+    }
+
     vlc_mutex_unlock (&owner->lock);
+    /* If another thread is blocked waiting for owner->req.lock at this point,
+     * this aout_OutputUnlock() call will not see and apply its change request.
+     * The other thread will need to apply the change request itself, which
+     * implies it is able to (try-)lock owner->lock. Therefore this thread must
+     * release owner->lock _before_ owner->req.lock. Do not reorder!!! */
+    vlc_mutex_unlock (&owner->req.lock);
 }
 
 /**
@@ -484,16 +529,20 @@ float aout_VolumeGet (audio_output_t *aout)
 /**
  * Sets the volume of the audio output stream.
  * \note The mute status is not changed.
- * \return 0 on success, -1 on failure.
+ * \return 0 on success, -1 on failure (TODO).
  */
 int aout_VolumeSet (audio_output_t *aout, float vol)
 {
-    int ret;
+    aout_owner_t *owner = aout_owner (aout);
 
-    aout_OutputLock (aout);
-    ret = aout_OutputVolumeSet (aout, vol);
-    aout_OutputUnlock (aout);
-    return ret;
+    assert (vol >= 0.f);
+    vlc_mutex_lock (&owner->req.lock);
+    owner->req.volume = vol;
+    vlc_mutex_unlock (&owner->req.lock);
+
+    if (aout_OutputTryLock (aout) == 0)
+        aout_OutputUnlock (aout);
+    return 0;
 }
 
 /**
@@ -507,16 +556,19 @@ int aout_MuteGet (audio_output_t *aout)
 
 /**
  * Sets the audio output stream mute flag.
- * \return 0 on success, -1 on failure.
+ * \return 0 on success, -1 on failure (TODO).
  */
 int aout_MuteSet (audio_output_t *aout, bool mute)
 {
-    int ret;
+    aout_owner_t *owner = aout_owner (aout);
 
-    aout_OutputLock (aout);
-    ret = aout_OutputMuteSet (aout, mute);
-    aout_OutputUnlock (aout);
-    return ret;
+    vlc_mutex_lock (&owner->req.lock);
+    owner->req.mute = mute;
+    vlc_mutex_unlock (&owner->req.lock);
+
+    if (aout_OutputTryLock (aout) == 0)
+        aout_OutputUnlock (aout);
+    return 0;
 }
 
 /**
@@ -532,16 +584,27 @@ char *aout_DeviceGet (audio_output_t *aout)
 /**
  * Selects an audio output device.
  * \param id device ID to select, or NULL for the default device
- * \return zero on success, non-zero on error.
+ * \return zero on success, non-zero on error (TODO).
  */
 int aout_DeviceSet (audio_output_t *aout, const char *id)
 {
-    int ret;
+    aout_owner_t *owner = aout_owner (aout);
 
-    aout_OutputLock (aout);
-    ret = aout_OutputDeviceSet (aout, id);
-    aout_OutputUnlock (aout);
-    return ret;
+    char *dev = NULL;
+    if (id != NULL)
+    {
+        dev = strdup (id);
+        if (unlikely(dev == NULL))
+            return -1;
+    }
+
+    vlc_mutex_lock (&owner->req.lock);
+    owner->req.device = dev;
+    vlc_mutex_unlock (&owner->req.lock);
+
+    if (aout_OutputTryLock (aout) == 0)
+        aout_OutputUnlock (aout);
+    return 0;
 }
 
 /**

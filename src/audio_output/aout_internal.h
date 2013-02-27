@@ -54,6 +54,14 @@ typedef struct
 
     struct
     {
+        vlc_mutex_t lock;
+        char *device;
+        float volume;
+        char mute;
+    } req;
+
+    struct
+    {
         mtime_t end; /**< Last seen PTS */
         unsigned resamp_start_drift; /**< Resampler drift absolute value */
         int resamp_type; /**< Resampler mode (FIXME: redundant / resampling) */
