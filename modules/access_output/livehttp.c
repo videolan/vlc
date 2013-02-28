@@ -1,10 +1,11 @@
 /*****************************************************************************
  * livehttp.c: Live HTTP Streaming
  *****************************************************************************
- * Copyright © 2001, 2002 VLC authors and VideoLAN
+ * Copyright © 2001, 2002, 2013 VLC authors and VideoLAN
  * Copyright © 2009-2010 by Keary Griffin
  *
  * Authors: Keary Griffin <kearygriffin at gmail.com>
+ *          Ilkka Ollakka <ileoo at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
