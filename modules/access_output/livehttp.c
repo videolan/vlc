@@ -456,7 +456,10 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
             p_sys->block_buffer = NULL;
 
 
-            if( p_sys->i_handle > 0 && ( p_buffer->i_dts - p_sys->i_opendts ) >= p_sys->i_seglenm )
+            if( p_sys->i_handle > 0 &&
+                ( p_buffer->i_dts - p_sys->i_opendts +
+                  p_buffer->i_length * CLOCK_FREQ / INT64_C(1000000)
+                ) >= p_sys->i_seglenm )
                 closeCurrentSegment( p_access, p_sys, false );
 
             if ( p_sys->i_handle < 0 )
