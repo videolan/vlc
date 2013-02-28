@@ -71,6 +71,9 @@ static void Close( vlc_object_t * );
 #define NUMSEGS_TEXT N_("Number of segments")
 #define NUMSEGS_LONGTEXT N_("Number of segments to include in index")
 
+#define NOCACHE_TEXT N_("Allow cache")
+#define NOCACHE_LONGTEXT N_("Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled")
+
 #define INDEX_TEXT N_("Index file")
 #define INDEX_LONGTEXT N_("Path to the index file to create")
 
@@ -98,6 +101,8 @@ vlc_module_begin ()
               DELSEGS_TEXT, DELSEGS_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "ratecontrol", false,
               RATECONTROL_TEXT, RATECONTROL_TEXT, true )
+    add_bool( SOUT_CFG_PREFIX "caching", true,
+              NOCACHE_TEXT, NOCACHE_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "index", NULL,
                 INDEX_TEXT, INDEX_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "index-url", NULL,
@@ -117,6 +122,7 @@ static const char *const ppsz_sout_options[] = {
     "index",
     "index-url",
     "ratecontrol",
+    "caching",
     NULL
 };
 
@@ -141,6 +147,7 @@ struct sout_access_out_sys_t
     bool b_delsegs;
     bool b_ratecontrol;
     bool b_splitanywhere;
+    bool b_caching;
 };
 
 /*****************************************************************************
@@ -172,6 +179,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_splitanywhere = var_GetBool( p_access, SOUT_CFG_PREFIX "splitanywhere" );
     p_sys->b_delsegs = var_GetBool( p_access, SOUT_CFG_PREFIX "delsegs" );
     p_sys->b_ratecontrol = var_GetBool( p_access, SOUT_CFG_PREFIX "ratecontrol") ;
+    p_sys->b_caching = var_GetBool( p_access, SOUT_CFG_PREFIX "caching") ;
 
 
     /* 5 elements is from harrison-stetson algorithm to start from some number
@@ -291,7 +299,7 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
             return -1;
         }
 
-        if ( fprintf( fp, "#EXTM3U\n#EXT-X-TARGETDURATION:%zu\n#EXT-X-VERSION:3\n#EXT-X-MEDIA-SEQUENCE:%"PRIu32"\n", p_sys->i_seglen, i_firstseg ) < 0 )
+        if ( fprintf( fp, "#EXTM3U\n#EXT-X-TARGETDURATION:%zu\n#EXT-X-VERSION:3\n#EXT-X-ALLOW-CACHE:%s\n#EXT-X-MEDIA-SEQUENCE:%"PRIu32"\n", p_sys->i_seglen, p_sys->b_caching ? "YES" : "NO",i_firstseg ) < 0 )
         {
             free( psz_idxTmp );
             fclose( fp );
