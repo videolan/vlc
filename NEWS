@@ -85,6 +85,8 @@ Video Filters:
 Stream Output:
  * Extended support for recording, notably for MKV and AVI
  * Options support for AVIO output module
+ * Livehttp places more accurate segments durations in playlist
+ * Livehttp allows setting cachin-variable in playlist
 
 Interfaces:
  * configurable password for the HTTP server.
