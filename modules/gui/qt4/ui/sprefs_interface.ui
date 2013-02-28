@@ -30,12 +30,15 @@
    <property name="bottomMargin">
     <number>0</number>
    </property>
-   <item row="2" column="0" colspan="2">
+   <item row="1" column="0" colspan="2">
     <widget class="QGroupBox" name="OneInterfaceBox">
      <property name="title">
       <string>Instances</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
+      <property name="verticalSpacing">
+       <number>0</number>
+      </property>
       <property name="leftMargin">
        <number>9</number>
       </property>
@@ -44,9 +47,6 @@
       </property>
       <property name="bottomMargin">
        <number>9</number>
-      </property>
-      <property name="verticalSpacing">
-       <number>0</number>
       </property>
       <item row="0" column="0">
        <widget class="QCheckBox" name="OneInterfaceMode">
@@ -65,7 +65,7 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2">
+   <item row="2" column="0" colspan="2">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
       <string>Privacy / Network Interaction</string>
@@ -183,41 +183,7 @@
      </layout>
     </widget>
    </item>
-   <item row="0" column="0" colspan="2">
-    <widget class="QGroupBox" name="languageBox">
-     <property name="title">
-      <string>Language</string>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QLabel" name="languageLabel">
-        <property name="maximumSize">
-         <size>
-          <width>220</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Menus language:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="buddy">
-         <cstring>language</cstring>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="language"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="2">
+   <item row="3" column="0" colspan="2">
     <widget class="QGroupBox" name="playlistGroupBox">
      <property name="title">
       <string>Playlist</string>
@@ -308,7 +274,7 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
+   <item row="0" column="0" colspan="2">
     <widget class="QGroupBox" name="LooknfeelBox">
      <property name="title">
       <string>Look and feel</string>
@@ -673,7 +639,6 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>language</tabstop>
   <tabstop>qt</tabstop>
   <tabstop>skins</tabstop>
   <tabstop>fsController</tabstop>

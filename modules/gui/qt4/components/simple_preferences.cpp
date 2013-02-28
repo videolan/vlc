@@ -523,13 +523,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                     + qtr( "VLC skins website" )+ QString( "</a>." ) );
             ui.skinsLabel->setFont( italicFont );
 
-            if( config_GetType( p_intf, "language" ) )
-            {
-                CONFIG_GENERIC( "language", StringList, ui.languageLabel,
-                                language );
-            }
-            else
-                ui.languageBox->hide();
 #ifdef WIN32
             BUTTONACT( ui.assoButton, assoDialog() );
 #else
