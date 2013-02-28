@@ -206,6 +206,10 @@ void video_format_Setup( video_format_t *p_fmt, vlc_fourcc_t i_chroma,
         p_fmt->i_bits_per_pixel = 8;
         break;
 
+    case VLC_CODEC_XYZ12:
+        p_fmt->i_bits_per_pixel = 48;
+        break;
+
     default:
         p_fmt->i_bits_per_pixel = 0;
         break;

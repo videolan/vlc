@@ -370,6 +370,9 @@
 #define VLC_CODEC_EBU_STL   VLC_FOURCC('S','T','L',' ')
 #define VLC_CODEC_SCTE_27   VLC_FOURCC('S','C','2','7')
 
+/* XYZ colorspace 12 bits packed in 16 bits, organisation |XXX0|YYY0|ZZZ0| */
+#define VLC_CODEC_XYZ12     VLC_FOURCC('X','Y','1','2')
+
 
 /* Special endian dependant values
  * The suffic N means Native

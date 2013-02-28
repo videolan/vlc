@@ -843,6 +843,10 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_I444_10B, "Planar 4:4:4 YUV 10-bit BE"),
         A("I4AB"),
 
+    /* XYZ color space */
+    B(VLC_CODEC_XYZ12, "Packed XYZ 12-bit BE"),
+        A("XY12"),
+
     /* Videogames Codecs */
 
     /* Interplay MVE */
@@ -1958,6 +1962,7 @@ static const struct
     { { VLC_CODEC_RGBA,  0 },                  PACKED_FMT(4, 32) },
 
     { { VLC_CODEC_Y211, 0 },                   { 1, { {{1,4}, {1,1}} }, 4, 32 } },
+    { { VLC_CODEC_XYZ12,  0 },                 PACKED_FMT(6, 48) },
 
     { {0}, { 0, {}, 0, 0 } }
 };
