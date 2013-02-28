@@ -530,6 +530,9 @@ local aout = vlc.object.aout()
         s.stats[tag]=v
       end
 
+      	s.information.chapter=vlc.var.get(input, "chapter")
+      	s.information.title=vlc.var.get(input, "title")
+
       	s.information.chapters=vlc.var.get_list(input, "chapter")
       	s.information.titles=vlc.var.get_list(input, "title")
 
