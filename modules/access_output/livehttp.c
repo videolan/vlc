@@ -90,8 +90,8 @@ vlc_module_begin ()
     set_capability( "sout access", 0 )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_ACO )
-    add_integer( SOUT_CFG_PREFIX "seglen", 10, SEGLEN_TEXT, SEGLEN_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "numsegs", 0, NUMSEGS_TEXT, NUMSEGS_LONGTEXT, true )
+    add_integer( SOUT_CFG_PREFIX "seglen", 10, SEGLEN_TEXT, SEGLEN_LONGTEXT, false )
+    add_integer( SOUT_CFG_PREFIX "numsegs", 0, NUMSEGS_TEXT, NUMSEGS_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX "splitanywhere", false,
               SPLITANYWHERE_TEXT, SPLITANYWHERE_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "delsegs", true,
@@ -99,9 +99,9 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "ratecontrol", false,
               RATECONTROL_TEXT, RATECONTROL_TEXT, true )
     add_string( SOUT_CFG_PREFIX "index", NULL,
-                INDEX_TEXT, INDEX_LONGTEXT, true )
+                INDEX_TEXT, INDEX_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "index-url", NULL,
-                INDEXURL_TEXT, INDEXURL_LONGTEXT, true )
+                INDEXURL_TEXT, INDEXURL_LONGTEXT, false )
     set_callbacks( Open, Close )
 vlc_module_end ()
 
