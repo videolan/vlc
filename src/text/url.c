@@ -525,8 +525,6 @@ static char *vlc_idna_to_ascii (const char *idn)
         free (buf);
         goto error;
     }
-    free (wide);
-
     ret = FromWide (buf);
     free (buf);
 error:
