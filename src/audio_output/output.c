@@ -599,6 +599,8 @@ int aout_DeviceSet (audio_output_t *aout, const char *id)
     }
 
     vlc_mutex_lock (&owner->req.lock);
+    if (owner->req.device != unset_str)
+        free (owner->req.device);
     owner->req.device = dev;
     vlc_mutex_unlock (&owner->req.lock);
 
