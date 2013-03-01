@@ -468,7 +468,7 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
     }
 
     size_t i_outsize = calculate_output_buffer_size ( p_filter, p_in_buf->i_buffer );
-    block_t *p_out_buf = filter_NewAudioBuffer( p_filter, i_outsize );
+    block_t *p_out_buf = block_Alloc( i_outsize );
     if( p_out_buf == NULL )
         return NULL;
 

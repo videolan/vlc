@@ -86,7 +86,7 @@ static block_t *DoWork( filter_t * p_filter, block_t *p_in_buf )
     uint16_t i_frame_size = p_in_buf->i_buffer / 2;
     uint8_t * p_in = p_in_buf->p_buffer;
 
-    block_t *p_out_buf = filter_NewAudioBuffer( p_filter, AOUT_SPDIF_SIZE );
+    block_t *p_out_buf = block_Alloc( AOUT_SPDIF_SIZE );
     if( !p_out_buf )
         goto out;
     uint8_t * p_out = p_out_buf->p_buffer;

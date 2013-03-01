@@ -164,7 +164,7 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
     size_t i_nb_channels = aout_FormatNbChannels( &p_filter->fmt_out.audio );
     size_t i_nb_rear = 0;
     size_t i;
-    block_t *p_out_buf = filter_NewAudioBuffer( p_filter,
+    block_t *p_out_buf = block_Alloc(
                                 sizeof(float) * i_nb_samples * i_nb_channels );
     if( !p_out_buf )
         goto out;

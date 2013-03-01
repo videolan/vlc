@@ -156,8 +156,7 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
     }
 
     p_filter->p_sys->i_frames = 0;
-    block_t *p_out_buf = filter_NewAudioBuffer( p_filter,
-                                                12 * p_in_buf->i_nb_samples );
+    block_t *p_out_buf = block_Alloc( 12 * p_in_buf->i_nb_samples );
     if( !p_out_buf )
         goto out;
 

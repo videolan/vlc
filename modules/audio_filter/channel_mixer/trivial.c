@@ -109,7 +109,7 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
     }
     else
     {
-        p_out_buf = filter_NewAudioBuffer( p_filter,
+        p_out_buf = block_Alloc(
                               p_in_buf->i_buffer / i_input_nb * i_output_nb );
         if( !p_out_buf )
             goto out;

@@ -247,7 +247,7 @@ static block_t *Filter( filter_t *p_filter, block_t *p_block )
       p_filter->fmt_out.audio.i_bitspersample *
         p_filter->fmt_out.audio.i_channels / 8;
 
-    block_t *p_out = filter_NewAudioBuffer( p_filter, i_out_size );
+    block_t *p_out = block_Alloc( i_out_size );
     if( !p_out )
     {
         msg_Warn( p_filter, "can't get output buffer" );

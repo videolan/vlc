@@ -145,7 +145,7 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
     size_t i_out_size = i_bytes_per_frame * ( 1 + ( p_in_buf->i_nb_samples *
               p_filter->fmt_out.audio.i_rate / p_filter->fmt_in.audio.i_rate) )
             + p_filter->p_sys->i_buf_size;
-    block_t *p_out_buf = filter_NewAudioBuffer( p_filter, i_out_size );
+    block_t *p_out_buf = block_Alloc( i_out_size );
     if( !p_out_buf )
     {
         block_Release( p_in_buf );

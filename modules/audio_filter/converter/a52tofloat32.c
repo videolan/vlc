@@ -296,7 +296,7 @@ static block_t *Convert( filter_t *p_filter, block_t *p_in_buf )
     int i_flags = p_sys->i_flags;
     size_t i_bytes_per_block = 256 * p_sys->i_nb_channels * sizeof(sample_t);
 
-    block_t *p_out_buf = filter_NewAudioBuffer( p_filter, 6 * i_bytes_per_block );
+    block_t *p_out_buf = block_Alloc( 6 * i_bytes_per_block );
     if( unlikely(p_out_buf == NULL) )
         goto out;
 

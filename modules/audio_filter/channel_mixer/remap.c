@@ -376,7 +376,7 @@ static block_t *Remap( filter_t *p_filter, block_t *p_block )
     size_t i_out_size = p_block->i_nb_samples *
         p_filter->fmt_out.audio.i_bytes_per_frame;
 
-    block_t *p_out = filter_NewAudioBuffer( p_filter, i_out_size );
+    block_t *p_out = block_Alloc( i_out_size );
     if( !p_out )
     {
         msg_Warn( p_filter, "can't get output buffer" );
