@@ -1354,69 +1354,66 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)playbackStatusUpdated
 {
-    input_thread_t * p_input;
-
-    p_input = pl_CurrentInput(p_intf);
-    if (p_input) {
-        int state = var_GetInteger(p_input, "state");
-        if (state == PLAYING_S) {
-            /* Declare user activity.
-               This wakes the display if it is off, and postpones display sleep according to the users system preferences
-               Available from 10.7.3 */
+    int state = -1;
+    if (p_current_input) {
+        state = var_GetInteger(p_current_input, "state");
+    }
+    
+    if (state == PLAYING_S) {
+        /* Declare user activity.
+         This wakes the display if it is off, and postpones display sleep according to the users system preferences
+         Available from 10.7.3 */
 #ifdef MAC_OS_X_VERSION_10_7
-            if ([self activeVideoPlayback] && IOPMAssertionDeclareUserActivity)
-            {
-                CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
-                IOPMAssertionDeclareUserActivity(reasonForActivity,
-                                                 kIOPMUserActiveLocal,
-                                                 &userActivityAssertionID);
-                CFRelease(reasonForActivity);
-            }
+        if ([self activeVideoPlayback] && IOPMAssertionDeclareUserActivity)
+        {
+            CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
+            IOPMAssertionDeclareUserActivity(reasonForActivity,
+                                             kIOPMUserActiveLocal,
+                                             &userActivityAssertionID);
+            CFRelease(reasonForActivity);
+        }
 #endif
 
-            /* prevent the system from sleeping */
-            if (systemSleepAssertionID > 0) {
-                msg_Dbg(VLCIntf, "releasing old sleep blocker (%i)" , systemSleepAssertionID);
-                IOPMAssertionRelease(systemSleepAssertionID);
-            }
-
-            IOReturn success;
-            /* work-around a bug in 10.7.4 and 10.7.5, so check for 10.7.x < 10.7.4, 10.8 and 10.6 */
-            if ((NSAppKitVersionNumber >= 1115.2 && NSAppKitVersionNumber < 1138.45) || OSX_MOUNTAIN_LION || OSX_SNOW_LEOPARD) {
-                CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
-                if ([self activeVideoPlayback])
-                    success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
-                else
-                    success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
-                CFRelease(reasonForActivity);
-            } else {
-                /* fall-back on the 10.5 mode, which also works on 10.7.4 and 10.7.5 */
-                if ([self activeVideoPlayback])
-                    success = IOPMAssertionCreate(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, &systemSleepAssertionID);
-                else
-                    success = IOPMAssertionCreate(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, &systemSleepAssertionID);
-            }
-
-            if (success == kIOReturnSuccess)
-                msg_Dbg(VLCIntf, "prevented sleep through IOKit (%i)", systemSleepAssertionID);
-            else
-                msg_Warn(VLCIntf, "failed to prevent system sleep through IOKit");
-
-            [[self mainMenu] setPause];
-            [o_mainwindow setPause];
-        } else {
-            if (state == END_S)
-                [o_mainmenu setSubmenusEnabled: FALSE];
-            [[self mainMenu] setPlay];
-            [o_mainwindow setPlay];
-
-            /* allow the system to sleep again */
-            if (systemSleepAssertionID > 0) {
-                msg_Dbg(VLCIntf, "releasing sleep blocker (%i)" , systemSleepAssertionID);
-                IOPMAssertionRelease(systemSleepAssertionID);
-            }
+        /* prevent the system from sleeping */
+        if (systemSleepAssertionID > 0) {
+            msg_Dbg(VLCIntf, "releasing old sleep blocker (%i)" , systemSleepAssertionID);
+            IOPMAssertionRelease(systemSleepAssertionID);
         }
-        vlc_object_release(p_input);
+
+        IOReturn success;
+        /* work-around a bug in 10.7.4 and 10.7.5, so check for 10.7.x < 10.7.4, 10.8 and 10.6 */
+        if ((NSAppKitVersionNumber >= 1115.2 && NSAppKitVersionNumber < 1138.45) || OSX_MOUNTAIN_LION || OSX_SNOW_LEOPARD) {
+            CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
+            if ([self activeVideoPlayback])
+                success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
+            else
+                success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
+            CFRelease(reasonForActivity);
+        } else {
+            /* fall-back on the 10.5 mode, which also works on 10.7.4 and 10.7.5 */
+            if ([self activeVideoPlayback])
+                success = IOPMAssertionCreate(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, &systemSleepAssertionID);
+            else
+                success = IOPMAssertionCreate(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, &systemSleepAssertionID);
+        }
+
+        if (success == kIOReturnSuccess)
+            msg_Dbg(VLCIntf, "prevented sleep through IOKit (%i)", systemSleepAssertionID);
+        else
+            msg_Warn(VLCIntf, "failed to prevent system sleep through IOKit");
+
+        [[self mainMenu] setPause];
+        [o_mainwindow setPause];
+    } else {
+        [o_mainmenu setSubmenusEnabled: FALSE];
+        [[self mainMenu] setPlay];
+        [o_mainwindow setPlay];
+
+        /* allow the system to sleep again */
+        if (systemSleepAssertionID > 0) {
+            msg_Dbg(VLCIntf, "releasing sleep blocker (%i)" , systemSleepAssertionID);
+            IOPMAssertionRelease(systemSleepAssertionID);
+        }
     }
 
     [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateMainWindow) withObject: nil waitUntilDone: NO];
