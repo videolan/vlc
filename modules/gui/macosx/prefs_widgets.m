@@ -1025,17 +1025,28 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
         [self addSubview: o_label];
 
         /* build the textfield */
-        ADD_COMBO(o_combo, mainFrame, [o_label frame].size.width,
+        ADD_POPUP(o_popup, mainFrame, [o_label frame].size.width,
             -2, 0, o_textfieldTooltip)
-        [o_combo setAutoresizingMask:NSViewWidthSizable ];
+        [o_popup setAutoresizingMask:NSViewWidthSizable];
+
+        /* add items */
         for (int i_index = 0; i_index < p_item->list_count; i_index++) {
+            NSString *o_text;
+            if (p_item->list_text && p_item->list_text[i_index])
+                o_text = _NS((char *)p_item->list_text[i_index]);
+            else
+                o_text = _NS((char *)p_item->list.psz[i_index]);
+            [o_popup addItemWithTitle: o_text];
+
+            /* select default item */
             if (!p_item->value.psz && !p_item->list.psz[i_index])
-                [o_combo selectItemAtIndex: i_index];
+                [o_popup selectItemAtIndex: i_index];
             else if (p_item->value.psz && p_item->list.psz[i_index] &&
-                !strcmp(p_item->value.psz, p_item->list.psz[i_index]))
-                [o_combo selectItemAtIndex: i_index];
-       }
-        [self addSubview: o_combo];
+                     !strcmp(p_item->value.psz, p_item->list.psz[i_index]))
+                [o_popup selectItemAtIndex: i_index];
+        }
+
+        [self addSubview: o_popup];
     }
     return self;
 }
@@ -1048,60 +1059,44 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     frame.origin.x = i_xPos - frame.size.width - 3;
     [o_label setFrame:frame];
 
-    frame = [o_combo frame];
+    frame = [o_popup frame];
     frame.origin.x = i_xPos + 2;
     frame.size.width = superFrame.size.width - frame.origin.x + 2;
-    [o_combo setFrame:frame];
+    [o_popup setFrame:frame];
 }
 
 - (void)dealloc
 {
-    [o_combo release];
+    [o_popup release];
     [super dealloc];
 }
 
 - (char *)stringValue
 {
-    if ([o_combo indexOfSelectedItem] >= 0) {
-        if (p_item->list.psz[[o_combo indexOfSelectedItem]] != NULL)
-            return strdup(p_item->list.psz[[o_combo indexOfSelectedItem]]);
+    if ([o_popup indexOfSelectedItem] >= 0) {
+        if (p_item->list.psz[[o_popup indexOfSelectedItem]] != NULL)
+            return strdup(p_item->list.psz[[o_popup indexOfSelectedItem]]);
     } else {
-        if ([[VLCStringUtility sharedInstance] delocalizeString: [o_combo stringValue]] != NULL)
-            return strdup([[VLCStringUtility sharedInstance] delocalizeString: [o_combo stringValue]]);
+        if ([[VLCStringUtility sharedInstance] delocalizeString: [o_popup stringValue]] != NULL)
+            return strdup([[VLCStringUtility sharedInstance] delocalizeString: [o_popup stringValue]]);
     }
     return NULL;
 }
 
 - (void)resetValues
 {
-    [o_combo reloadData];
     char *psz_value = config_GetPsz(VLCIntf, p_item->psz_name);
 
     for (int i_index = 0; i_index < p_item->list_count; i_index++) {
         if (!psz_value && !p_item->list.psz[i_index])
-            [o_combo selectItemAtIndex: i_index];
+            [o_popup selectItemAtIndex: i_index];
         else if (psz_value && p_item->list.psz[i_index] &&
             !strcmp(psz_value, p_item->list.psz[i_index]))
-            [o_combo selectItemAtIndex: i_index];
+            [o_popup selectItemAtIndex: i_index];
     }
 
     free(psz_value);
     [super resetValues];
-}
-@end
-
-@implementation StringListConfigControl (NSComboBoxDataSource)
-- (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox
-{
-        return p_item->list_count;
-}
-
-- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)i_index
-{
-    if (p_item->list_text && p_item->list_text[i_index]) {
-        return _NS((char *)p_item->list_text[i_index]);
-    } else
-        return _NS((char *)p_item->list.psz[i_index]);
 }
 @end
 
@@ -1478,14 +1473,24 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
         [self addSubview: o_label];
 
         /* build the textfield */
-        ADD_COMBO(o_combo, mainFrame, [o_label frame].size.width,
+        ADD_POPUP(o_popup, mainFrame, [o_label frame].size.width,
             -2, 0, o_textfieldTooltip)
-        [o_combo setAutoresizingMask:NSViewWidthSizable ];
+        [o_popup setAutoresizingMask:NSViewWidthSizable ];
+
+        /* add items */
         for (int i_index = 0; i_index < p_item->list_count; i_index++) {
+            NSString *o_text;
+            if (p_item->list_text && p_item->list_text[i_index])
+                o_text = _NS((char *)p_item->list_text[i_index]);
+            else
+                o_text = [NSString stringWithFormat: @"%i", p_item->list.i[i_index]];
+            [o_popup addItemWithTitle: o_text];
+
             if (p_item->value.i == p_item->list.i[i_index])
-                [o_combo selectItemAtIndex: i_index];
+                [o_popup selectItemAtIndex: i_index];
         }
-        [self addSubview: o_combo];
+        
+        [self addSubview: o_popup];
     }
     return self;
 }
@@ -1498,49 +1503,33 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     frame.origin.x = i_xPos - frame.size.width - 3;
     [o_label setFrame:frame];
 
-    frame = [o_combo frame];
+    frame = [o_popup frame];
     frame.origin.x = i_xPos + 2;
     frame.size.width = superFrame.size.width - frame.origin.x + 2;
-    [o_combo setFrame:frame];
+    [o_popup setFrame:frame];
 }
 
 - (void)dealloc
 {
-    [o_combo release];
+    [o_popup release];
     [super dealloc];
 }
 
 - (int)intValue
 {
-    if ([o_combo indexOfSelectedItem] >= 0)
-        return p_item->list.i[[o_combo indexOfSelectedItem]];
+    if ([o_popup indexOfSelectedItem] >= 0)
+        return p_item->list.i[[o_popup indexOfSelectedItem]];
     else
-        return [o_combo intValue];
+        return [o_popup intValue];
 }
 
 -(void)resetValues
 {
-    [o_combo reloadData];
     for (int i_index = 0; i_index < p_item->list_count; i_index++) {
         if (config_GetInt(VLCIntf, p_item->psz_name) == p_item->list.i[i_index])
-            [o_combo selectItemAtIndex: i_index];
+            [o_popup selectItemAtIndex: i_index];
     }
 
-}
-@end
-
-@implementation IntegerListConfigControl (NSComboBoxDataSource)
-- (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox
-{
-    return p_item->list_count;
-}
-
-- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)i_index
-{
-    if (p_item->list_text && p_item->list_text[i_index])
-        return _NS((char *)p_item->list_text[i_index]);
-    else
-        return [NSString stringWithFormat: @"%i", p_item->list.i[i_index]];
 }
 @end
 
