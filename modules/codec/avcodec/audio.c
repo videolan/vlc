@@ -181,8 +181,8 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
         p_sys->i_output_max = 0;
         break;
     }
-    if( p_sys->i_output_max < AVCODEC_MAX_AUDIO_FRAME_SIZE )
-        p_sys->i_output_max = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+    if( p_sys->i_output_max < 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE )
+        p_sys->i_output_max = 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
     msg_Dbg( p_dec, "Using %d bytes output buffer", p_sys->i_output_max );
     p_sys->p_output = av_malloc( p_sys->i_output_max );
 
