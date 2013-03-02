@@ -37,7 +37,7 @@
 
 #define FRAME_SIZE 2048
 
-#define AUDIO_BUFFER_SIZE ( 64 * 1024 )
+#define AUDIO_BUFFER_SIZE_IN_SECONDS ( AOUT_MAX_ADVANCE_TIME / CLOCK_FREQ )
 
 struct audio_buffer_t
 {
@@ -225,7 +225,8 @@ static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
 
     aout_SoftVolumeStart( p_aout );
 
-    CreateBuffer( p_aout, AUDIO_BUFFER_SIZE );
+    CreateBuffer( p_aout, AUDIO_BUFFER_SIZE_IN_SECONDS *
+                          format.i_rate * format.i_bytes_per_frame );
 
     if ( var_Type( p_aout, "audio-device" ) == 0 )
     {
@@ -458,6 +459,9 @@ static int WriteBuffer( audio_output_t *aout, uint8_t *data, int size )
 
     vlc_mutex_lock( &buffer->mutex );
 
+    /* FIXME :
+     * If size is larger than buffer->size, this is locked indefinitely.
+     */
     while( buffer->length + size > buffer->size )
         vlc_cond_wait( &buffer->cond, &buffer->mutex );
 
