@@ -195,6 +195,7 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
     switch(i_query) {
         case VOUT_WINDOW_SET_STATE:
         {
+            NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
             unsigned i_state = va_arg(args, unsigned);
 
             NSInteger i_cooca_level = NSNormalWindowLevel;
@@ -210,6 +211,7 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
             [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
                                waitUntilDone:NO];
 
+            [o_pool release];
             return VLC_SUCCESS;
         }
         case VOUT_WINDOW_SET_SIZE:
