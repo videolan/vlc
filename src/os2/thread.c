@@ -39,6 +39,12 @@
 #include <errno.h>
 #include <time.h>
 
+#include <sys/types.h>
+#include <sys/socket.h>
+
+#include <sys/time.h>
+#include <sys/select.h>
+
 static vlc_threadvar_t thread_key;
 
 /**
@@ -49,6 +55,7 @@ struct vlc_thread
     TID            tid;
     HEV            cancel_event;
     HEV            done_event;
+    int            cancel_sock;
 
     bool           detached;
     bool           killable;
@@ -246,6 +253,8 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
 }
 
 /*** Condition variables ***/
+#undef CLOCK_REALTIME
+#undef CLOCK_MONOTONIC
 enum
 {
     CLOCK_REALTIME=0, /* must be zero for VLC_STATIC_COND */
@@ -459,6 +468,9 @@ retry:
     {
         DosCloseEventSem (th->cancel_event);
         DosCloseEventSem (th->done_event );
+
+        soclose (th->cancel_sock);
+
         free (th);
     }
 }
@@ -492,6 +504,10 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
     if( DosCreateEventSem (NULL, &th->done_event, 0, FALSE))
         goto error;
 
+    th->cancel_sock = socket (AF_LOCAL, SOCK_STREAM, 0);
+    if( th->cancel_sock < 0 )
+        goto error;
+
     th->tid = _beginthread (vlc_entry, NULL, 1024 * 1024, th);
     if((int)th->tid == -1)
         goto error;
@@ -508,6 +524,7 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
     return 0;
 
 error:
+    soclose (th->cancel_sock);
     DosCloseEventSem (th->cancel_event);
     DosCloseEventSem (th->done_event);
     free (th);
@@ -536,6 +553,8 @@ void vlc_join (vlc_thread_t th, void **result)
 
     DosCloseEventSem( th->cancel_event );
     DosCloseEventSem( th->done_event );
+
+    soclose( th->cancel_sock );
 
     free( th );
 }
@@ -574,6 +593,7 @@ static void vlc_cancel_self (PVOID self)
 void vlc_cancel (vlc_thread_t thread_id)
 {
     DosPostEventSem( thread_id->cancel_event );
+    so_cancel( thread_id->cancel_sock );
 }
 
 int vlc_savecancel (void)
@@ -654,6 +674,82 @@ void vlc_control_cancel (int cmd, ...)
         }
     }
     va_end (ap);
+}
+
+static int vlc_select( int nfds, fd_set *rdset, fd_set *wrset, fd_set *exset,
+                       struct timeval *timeout )
+{
+    struct vlc_thread *th = vlc_threadvar_get( thread_key );
+
+    int rc;
+
+    if( th )
+    {
+        FD_SET( th->cancel_sock, rdset );
+
+        nfds = MAX( nfds, th->cancel_sock + 1 );
+    }
+
+    rc = select( nfds, rdset, wrset, exset, timeout );
+
+    vlc_testcancel();
+
+    return rc;
+
+}
+
+int vlc_poll( struct pollfd *fds, unsigned nfds, int timeout )
+{
+    fd_set rdset, wrset, exset;
+
+    struct timeval tv = { 0, 0 };
+
+    int val = -1;
+
+    FD_ZERO( &rdset );
+    FD_ZERO( &wrset );
+    FD_ZERO( &exset );
+    for( unsigned i = 0; i < nfds; i++ )
+    {
+        int fd = fds[ i ].fd;
+        if( val < fd )
+            val = fd;
+
+        if(( unsigned )fd >= FD_SETSIZE )
+        {
+            errno = EINVAL;
+            return -1;
+        }
+
+        if( fds[ i ].events & POLLIN )
+            FD_SET( fd, &rdset );
+        if( fds[ i ].events & POLLOUT )
+            FD_SET( fd, &wrset );
+        if( fds[ i ].events & POLLPRI )
+            FD_SET( fd, &exset );
+    }
+
+    if( timeout >= 0 )
+    {
+        div_t d    = div( timeout, 1000 );
+        tv.tv_sec  = d.quot;
+        tv.tv_usec = d.rem * 1000;
+    }
+
+    val = vlc_select( val + 1, &rdset, &wrset, &exset,
+                      ( timeout >= 0 ) ? &tv : NULL );
+    if( val == -1 )
+        return -1;
+
+    for( unsigned i = 0; i < nfds; i++ )
+    {
+        int fd = fds[ i ].fd;
+        fds[ i ].revents = ( FD_ISSET( fd, &rdset ) ? POLLIN  : 0 )
+                         | ( FD_ISSET( fd, &wrset ) ? POLLOUT : 0 )
+                         | ( FD_ISSET( fd, &exset ) ? POLLPRI : 0 );
+    }
+
+    return val;
 }
 
 #define Q2LL( q )   ( *( long long * )&( q ))
