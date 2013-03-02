@@ -498,7 +498,7 @@ int aout_FiltersNew (audio_output_t *aout,
                                          name == visual);
         if (filter == NULL)
         {
-            msg_Err (aout, "cannot add user filter %s (skipped)", name);
+            msg_Dbg (aout, "cannot add user filter %s (skipped)", name);
             continue;
         }
 
