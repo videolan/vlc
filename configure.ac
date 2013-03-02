@@ -3674,7 +3674,7 @@ then
   VLC_ADD_OBJCFLAGS([macosx], [-fobjc-exceptions] )
   VLC_ADD_PLUGIN([macosx])
 
-  VLC_ADD_LIBS([macosx], [-Wl,-framework,QTKit -Wl,-framework,IOKit -Wl,-framework,AddressBook -Wl,-framework,WebKit -Wl,-framework,CoreAudio -Wl,-framework,SystemConfiguration])
+  VLC_ADD_LIBS([macosx], [-Wl,-framework,QTKit -Wl,-framework,IOKit -Wl,-framework,AddressBook -Wl,-framework,WebKit -Wl,-framework,CoreAudio -Wl,-framework,SystemConfiguration -Wl,-framework,ScriptingBridge])
 
   if test ! -d ${CONTRIB_DIR}/Sparkle.framework
   then

@@ -148,6 +148,10 @@ struct intf_sys_t
     IOPMAssertionID userActivityAssertionID;
 
     VLCVoutWindowController *o_vout_controller;
+
+    /* iTunes play/pause support */
+    BOOL b_has_itunes_paused;
+    NSTimer *o_itunes_play_timer;
 }
 
 @property (readonly) VLCVoutWindowController* voutController;

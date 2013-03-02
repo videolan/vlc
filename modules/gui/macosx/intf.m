@@ -71,6 +71,8 @@
 #import <AddressBook/AddressBook.h>         /* for crashlog send mechanism */
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */
 
+#import "iTunes.h"
+
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -805,6 +807,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     if (isTerminating)
         return;
 
+    [self resumeItunesPlayback:nil];
+
     if (notification == nil)
         [[NSNotificationCenter defaultCenter] postNotificationName: NSApplicationWillTerminateNotification object: nil];
 
@@ -1352,14 +1356,53 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_playlist outlineViewSelectionDidChange:nil];
 }
 
+- (void)resumeItunesPlayback:(id)sender
+{
+    if (b_has_itunes_paused && var_InheritInteger(p_intf, "macosx-control-itunes") > 1) {
+        iTunesApplication *iTunesApp = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
+        if (iTunesApp && [iTunesApp isRunning]) {
+            if ([iTunesApp playerState] == iTunesEPlSPaused) {
+                msg_Dbg(p_intf, "Unpause iTunes...");
+                [iTunesApp playpause];
+            }
+        }
+        
+    }
+
+    b_has_itunes_paused = NO;
+    o_itunes_play_timer = nil;
+}
+
 - (void)playbackStatusUpdated
 {
     int state = -1;
     if (p_current_input) {
         state = var_GetInteger(p_current_input, "state");
     }
-    
+
+    int i_control_itunes = var_InheritInteger(p_intf, "macosx-control-itunes");
+    // cancel itunes timer if next item starts playing
+    if (state > -1 && state != END_S && i_control_itunes > 0) {
+        if (o_itunes_play_timer) {
+            [o_itunes_play_timer invalidate];
+            o_itunes_play_timer = nil;
+        }
+    }
+
     if (state == PLAYING_S) {
+        // pause iTunes
+        if (i_control_itunes > 0 && !b_has_itunes_paused) {
+            iTunesApplication *iTunesApp = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
+            if (iTunesApp && [iTunesApp isRunning]) {
+                if ([iTunesApp playerState] == iTunesEPlSPlaying) {
+                    msg_Dbg(p_intf, "Pause iTunes...");
+                    [iTunesApp pause];
+                    b_has_itunes_paused = YES;
+                }
+            }
+        }
+
+        
         /* Declare user activity.
          This wakes the display if it is off, and postpones display sleep according to the users system preferences
          Available from 10.7.3 */
@@ -1413,6 +1456,19 @@ static VLCMain *_o_sharedMainInstance = nil;
         if (systemSleepAssertionID > 0) {
             msg_Dbg(VLCIntf, "releasing sleep blocker (%i)" , systemSleepAssertionID);
             IOPMAssertionRelease(systemSleepAssertionID);
+        }
+
+        if (state == END_S || state == -1) {
+            if (i_control_itunes > 0) {
+                if (o_itunes_play_timer) {
+                    [o_itunes_play_timer invalidate];
+                }
+                o_itunes_play_timer = [NSTimer scheduledTimerWithTimeInterval: 0.5
+                                                                       target: self
+                                                                     selector: @selector(resumeItunesPlayback:)
+                                                                     userInfo: nil
+                                                                      repeats: NO];
+            }
         }
     }
 

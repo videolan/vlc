@@ -1,7 +1,7 @@
 /*****************************************************************************
  * macosx.m: Mac OS X module for vlc
  *****************************************************************************
- * Copyright (C) 2001-2012 VLC authors and VideoLAN
+ * Copyright (C) 2001-2013 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>
@@ -9,6 +9,7 @@
  *          Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
+ *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -119,7 +120,16 @@ void WindowClose  (vout_window_t *);
 #define SIDEBAR_TEXT N_("Show sidebar")
 #define SIDEBAR_LONGTEXT N_("Shows a sidebar in the main window listing media sources")
 
-vlc_module_begin ()
+#define ITUNES_TEXT N_("Pause iTunes during VLC playback")
+#define ITUNES_LONGTEXT N_("Pauses iTunes playback when VLC playback starts. If selected, iTunes playback will be resumed again if VLC playback is finished.")
+
+static const int itunes_list[] =
+    { 0, 1, 2 };
+static const char *const itunes_list_text[] = {
+    N_("Do nothing"), N_("Pause iTunes"), N_("Pause and resume iTunes")
+};
+
+vlc_module_begin()
     set_description(N_("Mac OS X interface"))
     set_capability("interface", 200)
     set_callbacks(OpenIntf, CloseIntf)
@@ -145,8 +155,10 @@ vlc_module_begin ()
     add_bool("macosx-show-playback-buttons", false, JUMPBUTTONS_TEXT, JUMPBUTTONS_LONGTEXT, false)
     add_bool("macosx-show-playmode-buttons", true, PLAYMODEBUTTONS_TEXT, PLAYMODEBUTTONS_LONGTEXT, false)
     add_bool("macosx-show-sidebar", true, SIDEBAR_TEXT, SIDEBAR_LONGTEXT, false)
+    add_integer("macosx-control-itunes", 1, ITUNES_TEXT, ITUNES_LONGTEXT, false)
+    change_integer_list(itunes_list, itunes_list_text)
 
-    add_submodule ()
+    add_submodule()
         set_description("Mac OS X Video Output Provider")
         set_capability("vout window nsobject", 100)
         set_callbacks(WindowOpen, WindowClose)
@@ -154,5 +166,5 @@ vlc_module_begin ()
         add_integer("macosx-vdev", 0, VDEV_TEXT, VDEV_LONGTEXT, false)
         add_float_with_range("macosx-opaqueness", 1, 0, 1, OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, true);
         add_bool("macosx-black", true, BLACK_TEXT, BLACK_LONGTEXT, false)
-vlc_module_end ()
+vlc_module_end()
 
