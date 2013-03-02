@@ -221,7 +221,7 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     [o_intf_style_bright_bcell setTitle: _NS("Bright")];
     [o_intf_art_txt setStringValue: _NS("Album art download policy")];
     [o_intf_embedded_ckb setTitle: _NS("Show video within the main window")];
-    [o_intf_nativefullscreen_ckb setTitle: _NS("Use the native fullscreen mode on OS X Lion")];
+    [o_intf_nativefullscreen_ckb setTitle: _NS("Use the native fullscreen mode")];
     [o_intf_fspanel_ckb setTitle: _NS("Show Fullscreen Controller")];
     [o_intf_network_box setTitle: _NS("Privacy / Network Interaction")];
     [o_intf_appleremote_ckb setTitle: _NS("Control playback with the Apple Remote")];
