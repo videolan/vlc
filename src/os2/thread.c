@@ -381,7 +381,7 @@ int vlc_threadvar_create (vlc_threadvar_t *p_tls, void (*destr) (void *))
     if( rc )
     {
         free (var);
-        return ENOMEM;
+        return EAGAIN;
     }
 
     var->destroy = destr;
