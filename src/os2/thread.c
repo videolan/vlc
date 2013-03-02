@@ -390,6 +390,9 @@ int vlc_threadvar_create (vlc_threadvar_t *p_tls, void (*destr) (void *))
 
     vlc_mutex_lock (&super_mutex);
     var->prev = vlc_threadvar_last;
+    if (var->prev)
+        var->prev->next = var;
+
     vlc_threadvar_last = var;
     vlc_mutex_unlock (&super_mutex);
     return 0;
@@ -402,10 +405,12 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
     vlc_mutex_lock (&super_mutex);
     if (var->prev != NULL)
         var->prev->next = var->next;
-    else
-        vlc_threadvar_last = var->next;
+
     if (var->next != NULL)
         var->next->prev = var->prev;
+    else
+        vlc_threadvar_last = var->prev;
+
     vlc_mutex_unlock (&super_mutex);
 
     DosFreeThreadLocalMemory( var->id );
