@@ -119,8 +119,8 @@ static ULONG vlc_Sleep (ULONG ulTimeout)
     return ( rc != ERROR_TIMEOUT ) ? rc : 0;
 }
 
-vlc_mutex_t super_mutex;
-vlc_cond_t  super_variable;
+static vlc_mutex_t super_mutex;
+static vlc_cond_t  super_variable;
 extern vlc_rwlock_t config_lock, msg_lock;
 
 int _CRT_init(void);
