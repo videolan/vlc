@@ -326,7 +326,7 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
     if (!p_condvar->hev)
     {   /* FIXME FIXME FIXME */
         msleep (50000);
-        return;
+        return 0;
     }
 
     do
