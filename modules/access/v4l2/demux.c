@@ -537,15 +537,6 @@ static void *UserPtrThread (void *data)
     ufd[0].fd = fd;
     ufd[0].events = POLLIN;
 
-#ifdef ZVBI_COMPILED
-    if (sys->vbi != NULL)
-    {
-        ufd[1].fd = GetFdVBI (sys->vbi);
-        ufd[1].events = POLLIN;
-        numfds++;
-    }
-#endif
-
     int canc = vlc_savecancel ();
     for (;;)
     {
@@ -566,26 +557,19 @@ static void *UserPtrThread (void *data)
         vlc_cleanup_pop ();
         canc = vlc_savecancel ();
 
-        if( ufd[0].revents )
+        if (v4l2_ioctl (fd, VIDIOC_DQBUF, &buf) < 0)
         {
-            if (v4l2_ioctl (fd, VIDIOC_DQBUF, &buf) < 0)
-            {
-                msg_Err (demux, "cannot dequeue buffer: %m");
-                block_Release (block);
-                continue;
-            }
-
-            assert (block->p_buffer == (void *)buf.m.userptr);
-            block->i_buffer = buf.length;
-            block->i_pts = block->i_dts = mdate ();
-            block->i_flags |= sys->block_flags;
-            es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts);
-            es_out_Send (demux->out, sys->es, block);
+            msg_Err (demux, "cannot dequeue buffer: %m");
+            block_Release (block);
+            continue;
         }
-#ifdef ZVBI_COMPILED
-        if (sys->vbi != NULL && ufd[1].revents)
-            GrabVBI (demux, sys->vbi);
-#endif
+
+        assert (block->p_buffer == (void *)buf.m.userptr);
+        block->i_buffer = buf.length;
+        block->i_pts = block->i_dts = mdate ();
+        block->i_flags |= sys->block_flags;
+        es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts);
+        es_out_Send (demux->out, sys->es, block);
     }
     vlc_restorecancel (canc); /* <- hmm, this is purely cosmetic */
     return NULL;
