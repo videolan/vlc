@@ -143,7 +143,7 @@ autoconf: autoconf-$(AUTOCONF_VERSION).tar.gz
 
 CLEAN_FILE += .autoconf
 CLEAN_PKG += autoconf
-DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.bz2
+DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.gz
 
 # automake
 
