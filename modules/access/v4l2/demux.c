@@ -410,7 +410,7 @@ static int InitVideo (demux_t *demux, int fd, uint32_t caps)
     void *(*entry) (void *);
     if (caps & V4L2_CAP_STREAMING)
     {
-        if (StartUserPtr (VLC_OBJECT(demux), fd) == 0)
+        if (0 /* BROKEN */ && StartUserPtr (VLC_OBJECT(demux), fd) == 0)
         {
             /* In principles, mmap() will pad the length to a multiple of the
              * page size, so there is no need to care. Nevertheless with the
