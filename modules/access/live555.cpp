@@ -2151,7 +2151,13 @@ static uint8_t *parseVorbisConfigStr( char const* configStr,
     configSize = 0;
     if( configStr == NULL || *configStr == '\0' )
         return NULL;
+#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1332115200 // 2012.03.20
     unsigned char *p_cfg = base64Decode( configStr, configSize );
+#else
+    char* configStr_dup = strdup( configStr );
+    unsigned char *p_cfg = base64Decode( configStr_dup, configSize );
+    free( configStr_dup );
+#endif
     uint8_t *p_extra = NULL;
     /* skip header count, ident number and length (cf. RFC 5215) */
     const unsigned int headerSkip = 9;
