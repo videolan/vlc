@@ -45,6 +45,8 @@ struct aout_sys_t
     AudioQueueRef           audioQueueRef;
     AudioQueueTimelineRef   timelineRef;
 
+    bool                    b_started;
+
     mtime_t                 i_played_length;
     int                     i_rate;
     float                   f_volume;
@@ -169,6 +171,8 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 	AudioSessionSetActive(true);
 #endif
 
+    p_aout->sys->b_started = true;
+
     p_aout->time_get = TimeGet;
     p_aout->play = Play;
     p_aout->pause = Pause;
@@ -243,9 +247,11 @@ static void Flush(audio_output_t *p_aout, bool wait)
     else
         AudioQueueStop(p_aout->sys->audioQueueRef, true);
 
+    p_aout->sys->b_started = false;
     p_aout->sys->i_played_length = 0;
     AudioQueueStart(p_aout->sys->audioQueueRef, NULL);
     AudioQueueCreateTimeline(p_aout->sys->audioQueueRef, &p_aout->sys->timelineRef);
+    p_aout->sys->b_started = true;
 }
 
 static int TimeGet(audio_output_t *p_aout, mtime_t *restrict delay)
@@ -257,11 +263,20 @@ static int TimeGet(audio_output_t *p_aout, mtime_t *restrict delay)
     if (status != noErr)
         return -1;
 
-    if (b_discontinuity)
+    bool b_started = p_aout->sys->b_started;
+
+    if (!b_started)
+        return -1;
+
+    if (b_discontinuity) {
         msg_Dbg(p_aout, "detected output discontinuity");
+        return -1;
+    }
 
     mtime_t i_pos = (mtime_t) outTimeStamp.mSampleTime * CLOCK_FREQ / p_aout->sys->i_rate;
-    *delay = p_aout->sys->i_played_length - i_pos;
-
-    return 0;
+    if (i_pos > 0) {
+        *delay = p_aout->sys->i_played_length - i_pos;
+        return 0;
+    } else
+        return -1;
 }
