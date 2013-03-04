@@ -57,7 +57,7 @@ typedef struct
         vlc_mutex_t lock;
         char *device;
         float volume;
-        char mute;
+        signed char mute;
     } req;
 
     struct
