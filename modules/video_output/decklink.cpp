@@ -225,6 +225,7 @@ static struct decklink_sys_t *GetDLSys(vlc_object_t *obj)
         sys = (struct decklink_sys_t*)malloc(sizeof(*sys));
         if (sys) {
             sys->p_output = NULL;
+            sys->offset = 0;
             sys->users = 0;
             sys->aconn = 0;
             vlc_mutex_init(&sys->lock);
