@@ -265,6 +265,7 @@ ${VLCROOT}/configure \
     --disable-macosx-eyetv \
     --disable-macosx-vlc-app \
     --enable-audioqueue \
+    --enable-ios-audio \
     --enable-ios-vout \
     --enable-ios-vout2 \
     --disable-shared \

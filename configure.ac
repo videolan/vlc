@@ -3532,6 +3532,19 @@ then
 fi
 
 dnl
+dnl  iOS CoreAudio plugin
+dnl
+AC_ARG_ENABLE(ios-audio,
+  [  --enable-ios-audio       Audio module for iOS (default disabled)])
+if test "${enable_ios_audio}" = "yes"
+then
+  AC_CHECK_HEADERS(AudioUnit/AudioUnit.h,
+    [ VLC_ADD_PLUGIN([audiounit_ios])
+      VLC_ADD_LIBS([audiounit_ios],[-Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,CoreServices])
+    ], [ AC_MSG_ERROR([cannot find AudioUnit headers]) ])
+fi
+
+dnl
 dnl  AudioQueue plugin
 dnl
 AC_ARG_ENABLE(audioqueue,
