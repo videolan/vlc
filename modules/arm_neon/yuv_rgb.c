@@ -95,6 +95,14 @@ static void I420_RGBA (filter_t *filter, picture_t *src, picture_t *dst)
     struct yuv_planes in = { src->Y_PIXELS, src->U_PIXELS, src->V_PIXELS, src->Y_PITCH };
     i420_rgb_neon (&out, &in, filter->fmt_in.video.i_width, filter->fmt_in.video.i_height);
 }
+
+static void I420_RV16 (filter_t *filter, picture_t *src, picture_t *dst)
+{
+    struct yuv_pack out = { dst->p->p_pixels, dst->p->i_pitch };
+    struct yuv_planes in = { src->Y_PIXELS, src->U_PIXELS, src->V_PIXELS, src->Y_PITCH };
+    i420_rv16_neon (&out, &in, filter->fmt_in.video.i_width, filter->fmt_in.video.i_height);
+}
+
 static void YV12_RGBA (filter_t *filter, picture_t *src, picture_t *dst)
 {
     struct yuv_pack out = { dst->p->p_pixels, dst->p->i_pitch };
@@ -117,6 +125,7 @@ static void NV12_RGBA (filter_t *filter, picture_t *src, picture_t *dst)
 }
 
 VIDEO_FILTER_WRAPPER (I420_RGBA)
+VIDEO_FILTER_WRAPPER (I420_RV16)
 VIDEO_FILTER_WRAPPER (YV12_RGBA)
 VIDEO_FILTER_WRAPPER (NV21_RGBA)
 VIDEO_FILTER_WRAPPER (NV12_RGBA)
@@ -135,6 +144,17 @@ static int Open (vlc_object_t *obj)
 
     switch (filter->fmt_out.video.i_chroma)
     {
+        case VLC_CODEC_RGB16:
+            switch (filter->fmt_in.video.i_chroma)
+            {
+                case VLC_CODEC_I420:
+                    filter->pf_video_filter = I420_RV16_Filter;
+                    break;
+                default:
+                    return VLC_EGENERIC;
+            }
+            break;
+
         case VLC_CODEC_RGB32:
             if(        filter->fmt_out.video.i_rmask != 0x000000ff
                     || filter->fmt_out.video.i_gmask != 0x0000ff00

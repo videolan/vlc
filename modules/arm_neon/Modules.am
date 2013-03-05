@@ -21,6 +21,7 @@ libvolume_neon_plugin_la_LIBADD = $(AM_LIBADD)
 
 libyuv_rgb_neon_plugin_la_SOURCES = \
 	i420_rgb.S \
+	i420_rv16.S \
 	nv21_rgb.S \
 	nv12_rgb.S \
 	yuv_rgb.c

@@ -72,6 +72,11 @@ void i420_rgb_neon (struct yuv_pack *const out,
                     const struct yuv_planes *const in,
                     int width, int height) asm("i420_rgb_neon");
 
+/* I420 to RV16 conversion. */
+void i420_rv16_neon (struct yuv_pack *const out,
+                     const struct yuv_planes *const in,
+                     int width, int height) asm("i420_rv16_neon");
+
 /* NV21 to RGBA conversion. */
 void nv21_rgb_neon (struct yuv_pack *const out,
                     const struct yuv_planes *const in,
