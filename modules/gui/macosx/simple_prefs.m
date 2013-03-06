@@ -545,7 +545,10 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     [self setupField: o_input_httpproxypwd_sfld forOption:"http-proxy-pwd"];
     [o_input_postproc_fld setIntValue: config_GetInt(p_intf, "postproc-q")];
     [o_input_postproc_fld setToolTip: _NS(config_GetLabel(p_intf, "postproc-q"))];
-    [o_input_avcodec_hw_ckb setState: !strcmp(config_GetPsz(p_intf,"avcodec-hw"), "vdadecoder")];
+    if (config_GetPsz(p_intf,"avcodec-hw"))
+        [o_input_avcodec_hw_ckb setState: !strcmp(config_GetPsz(p_intf,"avcodec-hw"), "vdadecoder")];
+    else
+        [o_input_avcodec_hw_ckb setState: NSOffState];
     [o_input_avcodec_hw_ckb setToolTip: _NS(config_GetLabel(p_intf,"avcodec-hw") ?: "")];
 
     [self setupButton: o_input_avi_pop forIntList: "avi-index"];
