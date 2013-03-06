@@ -42,6 +42,13 @@ end
 
 -- Parse function.
 function parse()
+    agent = vlc.var.inherit(nil,"http-user-agent")
+
+    if string.match( string.lower(agent), ".*vlc.*" ) then
+        vlc.msg.dbg("Wrong agent, adapting...")
+        return { { path = vlc.access .. "://" .. vlc.path; options = {":http-user-agent=Mozilla/5.0" } } }
+    end
+
     _,_,id = string.find( vlc.path, "vimeo.com/([0-9]*)")
     prefres = get_prefres()
     ishd = false
