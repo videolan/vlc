@@ -1185,7 +1185,10 @@ static void Play (audio_output_t * p_aout, block_t * p_block)
         p_aout->sys->i_played_length += p_block->i_length;
 
         /* move data to buffer */
-        TPCircularBufferProduceBytes(&p_sys->circular_buffer, p_block->p_buffer, p_block->i_buffer);
+        if (unlikely(TPCircularBufferProduceBytes(&p_sys->circular_buffer, p_block->p_buffer, p_block->i_buffer) == 0)) {
+            msg_Warn(p_aout, "Audio buffer was dropped");
+        }
+
     }
 
     block_Release(p_block);
