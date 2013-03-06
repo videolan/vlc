@@ -46,7 +46,7 @@ endif
 
 ifdef HAVE_CROSS_COMPILE
 FFMPEGCONF += --enable-cross-compile
-ifndef HAVE_IOS
+ifndef HAVE_DARWIN_OS
 FFMPEGCONF += --cross-prefix=$(HOST)-
 endif
 endif
@@ -88,6 +88,9 @@ ifdef HAVE_IOS
 ifeq ($(ARCH),arm)
 FFMPEGCONF += --enable-pic --as="$(AS)"
 endif
+endif
+ifdef HAVE_MACOSX
+FFMPEGCONF += --enable-vda
 endif
 
 # Linux
