@@ -225,9 +225,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     i_val = var_CreateGetInteger( p_dec, "avcodec-vismv" );
     if( i_val ) p_sys->p_context->debug_mv = i_val;
 
-    i_val = var_CreateGetInteger( p_dec, "avcodec-lowres" );
-    if( i_val > 0 && i_val <= 2 ) p_sys->p_context->lowres = i_val;
-
     i_val = var_CreateGetInteger( p_dec, "avcodec-skiploopfilter" );
     if( i_val >= 4 ) p_sys->p_context->skip_loop_filter = AVDISCARD_ALL;
     else if( i_val == 3 ) p_sys->p_context->skip_loop_filter = AVDISCARD_NONKEY;
