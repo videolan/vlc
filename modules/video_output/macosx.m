@@ -503,8 +503,23 @@ static void OpenglSwap (vlc_gl_t *gl)
     GLint params[] = { 1 };
     CGLSetParameter ([[self openGLContext] CGLContextObj], kCGLCPSwapInterval, params);
 
+    [[NSNotificationCenter defaultCenter] addObserverForName:NSApplicationDidChangeScreenParametersNotification
+                                                      object:[NSApplication sharedApplication]
+                                                       queue:nil
+                                                  usingBlock:^(NSNotification *notification) {
+                                                      [self performSelectorOnMainThread:@selector(reshape)
+                                                                             withObject:nil
+                                                                          waitUntilDone:NO];
+                                                  }];
+
     [self setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
     return self;
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [super dealloc];
 }
 
 /**
