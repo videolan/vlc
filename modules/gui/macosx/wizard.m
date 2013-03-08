@@ -1,7 +1,7 @@
 /*****************************************************************************
  * wizard.m: MacOS X Streaming Wizard
  *****************************************************************************
- * Copyright (C) 2005-2012 VLC authors and VideoLAN
+ * Copyright (C) 2005-2013 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne at videolan dot org>,
@@ -1460,7 +1460,7 @@ static VLCWizard *_o_sharedInstance = nil;
         {
             /* we are just transcoding and dumping the stuff to a file */
             [o_opts_string appendFormat:
-                @":sout=#%@%@standard{mux=%@,dst=%@,access=file}",
+                @":sout=#%@%@standard{mux=%@,access=file{no-overwrite},dst=%@}",
                 o_duplicateCmd,
                 o_trnscdCmd,
                 [[o_encapFormats objectAtIndex: [[o_userSelections objectForKey:@"encapFormat"] intValue]] objectAtIndex:0],

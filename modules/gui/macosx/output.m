@@ -1,13 +1,14 @@
 /*****************************************************************************
  * output.m: MacOS X Output Dialog
  *****************************************************************************
- * Copyright (C) 2002-2007 VLC authors and VideoLAN
+ * Copyright (C) 2002-2013 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
  *          Benjamin Pracht <bigben AT videolan DOT org>
+ *          Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -349,7 +350,7 @@
             [self setSoutMRL:o_sout_options];
             return;
         } else
-                [o_mrl_string appendFormat: @"std{access=file,mux=%@,dst=\"%@\"}", o_mux_string, [o_file_field stringValue]];
+                [o_mrl_string appendFormat: @"std{access=file{no-overwrite},mux=%@,dst=\"%@\"}", o_mux_string, [o_file_field stringValue]];
     }
     else if ([o_mode isEqualToString: _NS("Stream")]) {
         o_mode = [o_stream_type titleOfSelectedItem];

@@ -902,7 +902,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         [composedOptions appendFormat:@"}:standard{mux=%@", [self.currentProfile objectAtIndex:0]];
 
         // add output destination
-        [composedOptions appendFormat:@",dst=%@,access=file}", _outputDestination];
+        [composedOptions appendFormat:@",access=file{no-overwrite},dst=%@}", _outputDestination];
     } else {
         /* streaming */
         if ([[[_stream_type_pop selectedItem] title] isEqualToString:@"RTP"])
