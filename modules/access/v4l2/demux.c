@@ -566,7 +566,7 @@ static void *UserPtrThread (void *data)
 
         assert (block->p_buffer == (void *)buf.m.userptr);
         block->i_buffer = buf.length;
-        block->i_pts = block->i_dts = mdate ();
+        block->i_pts = block->i_dts = GetBufferPTS (&buf);
         block->i_flags |= sys->block_flags;
         es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts);
         es_out_Send (demux->out, sys->es, block);
@@ -611,7 +611,6 @@ static void *MmapThread (void *data)
             block_t *block = GrabVideo (VLC_OBJECT(demux), fd, sys->bufv);
             if (block != NULL)
             {
-                block->i_pts = block->i_dts = mdate ();
                 block->i_flags |= sys->block_flags;
                 es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts);
                 es_out_Send (demux->out, sys->es, block);
