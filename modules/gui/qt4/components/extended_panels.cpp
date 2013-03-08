@@ -1071,8 +1071,8 @@ static const QString vlc_band_frequencies[] =
 
 static const QString iso_band_frequencies[] =
 {
-    " 31.25 Hz ", " 62.5 Hz ", " 125 Hz ", " 250 Hz ", " 500 Hz ",
-    "    1 kHz ", "   2 kHz ", "  4 kHz ", "  8 kHz ", " 16 kHz "
+    "  31 Hz ", "  63 Hz ", " 125 Hz ", " 250 Hz ", " 500 Hz ",
+    "  1 kHz ", "  2 kHz ", "  4 kHz ", "  8 kHz ", " 16 kHz "
 };
 
 Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
