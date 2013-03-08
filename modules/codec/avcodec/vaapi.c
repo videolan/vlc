@@ -104,24 +104,24 @@ static int Open( vlc_va_t *p_external, int i_codec_id )
     /* */
     switch( i_codec_id )
     {
-    case CODEC_ID_MPEG1VIDEO:
-    case CODEC_ID_MPEG2VIDEO:
+    case AV_CODEC_ID_MPEG1VIDEO:
+    case AV_CODEC_ID_MPEG2VIDEO:
         i_profile = VAProfileMPEG2Main;
         i_surface_count = 2+1;
         break;
-    case CODEC_ID_MPEG4:
+    case AV_CODEC_ID_MPEG4:
         i_profile = VAProfileMPEG4AdvancedSimple;
         i_surface_count = 2+1;
         break;
-    case CODEC_ID_WMV3:
+    case AV_CODEC_ID_WMV3:
         i_profile = VAProfileVC1Main;
         i_surface_count = 2+1;
         break;
-    case CODEC_ID_VC1:
+    case AV_CODEC_ID_VC1:
         i_profile = VAProfileVC1Advanced;
         i_surface_count = 2+1;
         break;
-    case CODEC_ID_H264:
+    case AV_CODEC_ID_H264:
         i_profile = VAProfileH264High;
         i_surface_count = 16+1;
         break;

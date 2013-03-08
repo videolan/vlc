@@ -308,7 +308,7 @@ int OpenDemux( vlc_object_t *p_this )
             es_format_Init( &fmt, VIDEO_ES, fcc );
 
             /* Special case for raw video data */
-            if( cc->codec_id == CODEC_ID_RAWVIDEO )
+            if( cc->codec_id == AV_CODEC_ID_RAWVIDEO )
             {
                 msg_Dbg( p_demux, "raw video, pixel format: %i", cc->pix_fmt );
                 if( GetVlcChroma( &fmt.video, cc->pix_fmt ) != VLC_SUCCESS)
@@ -319,7 +319,7 @@ int OpenDemux( vlc_object_t *p_this )
                     fmt.i_codec = fmt.video.i_chroma;
             }
             /* We need this for the h264 packetizer */
-            else if( cc->codec_id == CODEC_ID_H264 && ( p_sys->fmt == av_find_input_format("flv") ||
+            else if( cc->codec_id == AV_CODEC_ID_H264 && ( p_sys->fmt == av_find_input_format("flv") ||
                 p_sys->fmt == av_find_input_format("matroska") || p_sys->fmt == av_find_input_format("mp4") ) )
                 fmt.i_original_fourcc = VLC_FOURCC( 'a', 'v', 'c', '1' );
 
@@ -334,7 +334,7 @@ int OpenDemux( vlc_object_t *p_this )
         case AVMEDIA_TYPE_SUBTITLE:
             es_format_Init( &fmt, SPU_ES, fcc );
             if( strncmp( p_sys->ic->iformat->name, "matroska", 8 ) == 0 &&
-                cc->codec_id == CODEC_ID_DVD_SUBTITLE &&
+                cc->codec_id == AV_CODEC_ID_DVD_SUBTITLE &&
                 cc->extradata != NULL &&
                 cc->extradata_size > 0 )
             {
@@ -386,7 +386,7 @@ int OpenDemux( vlc_object_t *p_this )
                 input_attachment_t *p_attachment;
 
                 psz_type = "attachment";
-                if( cc->codec_id == CODEC_ID_TTF )
+                if( cc->codec_id == AV_CODEC_ID_TTF )
                 {
                     AVDictionaryEntry *filename = av_dict_get( s->metadata, "filename", NULL, 0 );
                     if( filename && filename->value )
@@ -427,7 +427,7 @@ int OpenDemux( vlc_object_t *p_this )
             const uint8_t *p_extra = cc->extradata;
             unsigned      i_extra  = cc->extradata_size;
 
-            if( cc->codec_id == CODEC_ID_THEORA && b_ogg )
+            if( cc->codec_id == AV_CODEC_ID_THEORA && b_ogg )
             {
                 unsigned pi_size[3];
                 const void *pp_data[3];
@@ -451,7 +451,7 @@ int OpenDemux( vlc_object_t *p_this )
                     fmt.p_extra = NULL;
                 }
             }
-            else if( cc->codec_id == CODEC_ID_SPEEX && b_ogg )
+            else if( cc->codec_id == AV_CODEC_ID_SPEEX && b_ogg )
             {
                 const uint8_t p_dummy_comment[] = {
                     0, 0, 0, 0,
@@ -597,7 +597,7 @@ static int Demux( demux_t *p_demux )
         av_free_packet( &pkt );
         return 1;
     }
-    if( p_stream->codec->codec_id == CODEC_ID_SSA )
+    if( p_stream->codec->codec_id == AV_CODEC_ID_SSA )
     {
         p_frame = BuildSsaFrame( &pkt, p_sys->i_ssa_order++ );
         if( !p_frame )

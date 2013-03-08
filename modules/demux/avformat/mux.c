@@ -230,9 +230,9 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     codec->bit_rate = p_input->p_fmt->i_bitrate;
     codec->codec_tag = av_codec_get_tag( p_sys->oc->oformat->codec_tag, i_codec_id );
-    if( !codec->codec_tag && i_codec_id == CODEC_ID_MP2 )
+    if( !codec->codec_tag && i_codec_id == AV_CODEC_ID_MP2 )
     {
-        i_codec_id = CODEC_ID_MP3;
+        i_codec_id = AV_CODEC_ID_MP3;
         codec->codec_tag = av_codec_get_tag( p_sys->oc->oformat->codec_tag, i_codec_id );
     }
     codec->codec_id = i_codec_id;

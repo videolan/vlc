@@ -339,7 +339,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
               p_fmt->i_codec == VLC_CODEC_MPGA &&
               p_sys->b_audio )
     {
-        int i_ff_codec = CODEC_ID_MP2;
+        int i_ff_codec = AV_CODEC_ID_MP2;
         int i;
 
         id->b_switcher_audio = true;
@@ -725,7 +725,7 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
     if ( p_sys->i_cmd > 0 )
     {
         /* Create a new encoder. */
-        int i_ff_codec = CODEC_ID_MPEG2VIDEO;
+        int i_ff_codec = AV_CODEC_ID_MPEG2VIDEO;
         int i_aspect_num, i_aspect_den;
 
         if( i_ff_codec == 0 )

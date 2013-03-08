@@ -204,19 +204,19 @@ int OpenEncoder( vlc_object_t *p_this )
     if( p_enc->fmt_out.i_codec == VLC_CODEC_MP3 )
     {
         i_cat = AUDIO_ES;
-        i_codec_id = CODEC_ID_MP3;
+        i_codec_id = AV_CODEC_ID_MP3;
         psz_namecodec = "MPEG I/II Layer 3";
     }
     else if( p_enc->fmt_out.i_codec == VLC_CODEC_MP2 )
     {
         i_cat = AUDIO_ES;
-        i_codec_id = CODEC_ID_MP2;
+        i_codec_id = AV_CODEC_ID_MP2;
         psz_namecodec = "MPEG I/II Layer 2";
     }
     else if( p_enc->fmt_out.i_codec == VLC_CODEC_MP1V )
     {
         i_cat = VIDEO_ES;
-        i_codec_id = CODEC_ID_MPEG1VIDEO;
+        i_codec_id = AV_CODEC_ID_MPEG1VIDEO;
         psz_namecodec = "MPEG-1 video";
     }
     else if( !GetFfmpegCodec( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
@@ -226,7 +226,7 @@ int OpenEncoder( vlc_object_t *p_this )
             return VLC_EGENERIC; /* handed chroma output */
 
         i_cat      = VIDEO_ES;
-        i_codec_id = CODEC_ID_RAWVIDEO;
+        i_codec_id = AV_CODEC_ID_RAWVIDEO;
         psz_namecodec = "Raw video";
     }
 
@@ -515,20 +515,20 @@ int OpenEncoder( vlc_object_t *p_this )
            See libavcodec/mpegvideo_enc.c:MPV_encode_init and
            libavcodec/svq3.c , WMV2 calls MPV_encode_init also.
          */
-        if ( i_codec_id == CODEC_ID_FLV1 ||
-             i_codec_id == CODEC_ID_H261 ||
-             i_codec_id == CODEC_ID_LJPEG ||
-             i_codec_id == CODEC_ID_MJPEG ||
-             i_codec_id == CODEC_ID_H263 ||
-             i_codec_id == CODEC_ID_H263P ||
-             i_codec_id == CODEC_ID_MSMPEG4V1 ||
-             i_codec_id == CODEC_ID_MSMPEG4V2 ||
-             i_codec_id == CODEC_ID_MSMPEG4V3 ||
-             i_codec_id == CODEC_ID_WMV1 ||
-             i_codec_id == CODEC_ID_WMV2 ||
-             i_codec_id == CODEC_ID_RV10 ||
-             i_codec_id == CODEC_ID_RV20 ||
-             i_codec_id == CODEC_ID_SVQ3 )
+        if ( i_codec_id == AV_CODEC_ID_FLV1 ||
+             i_codec_id == AV_CODEC_ID_H261 ||
+             i_codec_id == AV_CODEC_ID_LJPEG ||
+             i_codec_id == AV_CODEC_ID_MJPEG ||
+             i_codec_id == AV_CODEC_ID_H263 ||
+             i_codec_id == AV_CODEC_ID_H263P ||
+             i_codec_id == AV_CODEC_ID_MSMPEG4V1 ||
+             i_codec_id == AV_CODEC_ID_MSMPEG4V2 ||
+             i_codec_id == AV_CODEC_ID_MSMPEG4V3 ||
+             i_codec_id == AV_CODEC_ID_WMV1 ||
+             i_codec_id == AV_CODEC_ID_WMV2 ||
+             i_codec_id == AV_CODEC_ID_RV10 ||
+             i_codec_id == AV_CODEC_ID_RV20 ||
+             i_codec_id == AV_CODEC_ID_SVQ3 )
             p_enc->i_threads = 1;
 
         if( p_sys->i_vtolerance > 0 )
@@ -580,7 +580,7 @@ int OpenEncoder( vlc_object_t *p_this )
     else if( p_enc->fmt_in.i_cat == AUDIO_ES )
     {
         /* work around bug in libmp3lame encoding */
-        if( i_codec_id == CODEC_ID_MP3 && p_enc->fmt_in.audio.i_channels > 2 )
+        if( i_codec_id == AV_CODEC_ID_MP3 && p_enc->fmt_in.audio.i_channels > 2 )
             p_enc->fmt_in.audio.i_channels = 2;
 
         p_context->codec_type  = AVMEDIA_TYPE_AUDIO;
@@ -626,7 +626,7 @@ int OpenEncoder( vlc_object_t *p_this )
 
     /* Set reasonable defaults to VP8, based on
        libvpx-720p preset from libvpx ffmpeg-patch */
-    if( i_codec_id == CODEC_ID_VP8 )
+    if( i_codec_id == AV_CODEC_ID_VP8 )
     {
         /* Lets give bitrate tolerance */
         p_context->bit_rate_tolerance = __MAX(2 * (int)p_enc->fmt_out.i_bitrate, p_sys->i_vtolerance );
@@ -672,7 +672,7 @@ int OpenEncoder( vlc_object_t *p_this )
 #endif
     }
 
-    if( i_codec_id == CODEC_ID_RAWVIDEO )
+    if( i_codec_id == AV_CODEC_ID_RAWVIDEO )
     {
         /* XXX: hack: Force same codec (will be handled by transcode) */
         p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec = p_enc->fmt_out.i_codec;
@@ -696,8 +696,8 @@ int OpenEncoder( vlc_object_t *p_this )
     if( ret )
     {
         if( p_enc->fmt_in.i_cat == AUDIO_ES &&
-             (p_context->channels > 2 || i_codec_id == CODEC_ID_MP2
-               || i_codec_id == CODEC_ID_MP3) )
+             (p_context->channels > 2 || i_codec_id == AV_CODEC_ID_MP2
+               || i_codec_id == AV_CODEC_ID_MP3) )
         {
             if( p_context->channels > 2 )
             {
@@ -706,7 +706,7 @@ int OpenEncoder( vlc_object_t *p_this )
                 msg_Warn( p_enc, "stereo mode selected (codec limitation)" );
             }
 
-            if( i_codec_id == CODEC_ID_MP2 || i_codec_id == CODEC_ID_MP3 )
+            if( i_codec_id == AV_CODEC_ID_MP2 || i_codec_id == AV_CODEC_ID_MP3 )
             {
                 int i_frequency, i;
 
@@ -767,7 +767,7 @@ int OpenEncoder( vlc_object_t *p_this )
         }
     }
 
-    if( i_codec_id == CODEC_ID_FLAC )
+    if( i_codec_id == AV_CODEC_ID_FLAC )
     {
         p_enc->fmt_out.i_extra = 4 + 1 + 3 + p_context->extradata_size;
         p_enc->fmt_out.p_extra = malloc( p_enc->fmt_out.i_extra );

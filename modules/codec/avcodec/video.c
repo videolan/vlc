@@ -287,8 +287,8 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( var_CreateGetBool( p_dec, "avcodec-dr" ) &&
        (p_sys->p_codec->capabilities & CODEC_CAP_DR1) &&
         /* No idea why ... but this fixes flickering on some TSCC streams */
-        p_sys->i_codec_id != CODEC_ID_TSCC && p_sys->i_codec_id != CODEC_ID_CSCD &&
-        p_sys->i_codec_id != CODEC_ID_CINEPAK &&
+        p_sys->i_codec_id != AV_CODEC_ID_TSCC && p_sys->i_codec_id != AV_CODEC_ID_CSCD &&
+        p_sys->i_codec_id != AV_CODEC_ID_CINEPAK &&
         !p_sys->p_context->debug_mv )
     {
         /* Some codecs set pix_fmt only after the 1st frame has been decoded,
@@ -333,10 +333,10 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     char *hw = var_CreateGetString( p_dec, "avcodec-hw" ); /* FIXME */
     if( (hw == NULL || strcasecmp( hw, "none" )) &&
-        (i_codec_id == CODEC_ID_MPEG1VIDEO || i_codec_id == CODEC_ID_MPEG2VIDEO ||
-         i_codec_id == CODEC_ID_MPEG4 ||
-         i_codec_id == CODEC_ID_H264 ||
-         i_codec_id == CODEC_ID_VC1 || i_codec_id == CODEC_ID_WMV3) )
+        (i_codec_id == AV_CODEC_ID_MPEG1VIDEO || i_codec_id == AV_CODEC_ID_MPEG2VIDEO ||
+         i_codec_id == AV_CODEC_ID_MPEG4 ||
+         i_codec_id == AV_CODEC_ID_H264 ||
+         i_codec_id == AV_CODEC_ID_VC1 || i_codec_id == AV_CODEC_ID_WMV3) )
     {
 #ifdef HAVE_AVCODEC_MT
         if( p_sys->p_context->thread_type & FF_THREAD_FRAME )
@@ -345,7 +345,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
             p_sys->p_context->thread_type &= ~FF_THREAD_FRAME;
         }
         if( ( p_sys->p_context->thread_type & FF_THREAD_SLICE ) &&
-            ( i_codec_id == CODEC_ID_MPEG1VIDEO || i_codec_id == CODEC_ID_MPEG2VIDEO ) )
+            ( i_codec_id == AV_CODEC_ID_MPEG1VIDEO || i_codec_id == AV_CODEC_ID_MPEG2VIDEO ) )
         {
             msg_Warn( p_dec, "threaded slice decoding is not compatible with libavcodec-hw, disabled" );
             p_sys->p_context->thread_type &= ~FF_THREAD_SLICE;
@@ -377,7 +377,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
     /* Setup palette */
-# warning FIXME
+# warning FIXME: palette
 
     /* ***** init this codec with special data ***** */
     ffmpeg_InitCodec( p_dec );
@@ -800,7 +800,7 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
 
     if( !i_size ) return;
 
-    if( p_sys->i_codec_id == CODEC_ID_SVQ3 )
+    if( p_sys->i_codec_id == AV_CODEC_ID_SVQ3 )
     {
         uint8_t *p;
 
@@ -970,11 +970,11 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
         unsigned i_align;
         switch( p_sys->i_codec_id )
         {
-        case CODEC_ID_SVQ1:
-        case CODEC_ID_VP5:
-        case CODEC_ID_VP6:
-        case CODEC_ID_VP6F:
-        case CODEC_ID_VP6A:
+        case AV_CODEC_ID_SVQ1:
+        case AV_CODEC_ID_VP5:
+        case AV_CODEC_ID_VP6:
+        case AV_CODEC_ID_VP6F:
+        case AV_CODEC_ID_VP6A:
             i_align = 16;
             break;
         default:

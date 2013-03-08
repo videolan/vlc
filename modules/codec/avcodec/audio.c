@@ -255,7 +255,7 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         avcodec_flush_buffers( ctx );
         date_Set( &p_sys->end_date, 0 );
 
-        if( p_sys->i_codec_id == CODEC_ID_MP2 || p_sys->i_codec_id == CODEC_ID_MP3 )
+        if( p_sys->i_codec_id == AV_CODEC_ID_MP2 || p_sys->i_codec_id == AV_CODEC_ID_MP3 )
             p_sys->i_reject_count = 3;
 
         goto end;

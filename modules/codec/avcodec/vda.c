@@ -264,7 +264,7 @@ static void Close( vlc_va_t *p_external )
 
 static int Open( vlc_va_t *external, int i_codec_id, const es_format_t *fmt )
 {
-    if( i_codec_id != CODEC_ID_H264 )
+    if( i_codec_id != AV_CODEC_ID_H264 )
         return NULL;
 
     if( fmt->p_extra == NULL || fmt->i_extra < 7 )

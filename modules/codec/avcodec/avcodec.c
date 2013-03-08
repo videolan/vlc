@@ -392,10 +392,10 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
 
     if( p_sys->p_context->extradata_size <= 0 )
     {
-        if( p_sys->i_codec_id == CODEC_ID_VC1 ||
-            p_sys->i_codec_id == CODEC_ID_VORBIS ||
-            p_sys->i_codec_id == CODEC_ID_THEORA ||
-            ( p_sys->i_codec_id == CODEC_ID_AAC &&
+        if( p_sys->i_codec_id == AV_CODEC_ID_VC1 ||
+            p_sys->i_codec_id == AV_CODEC_ID_VORBIS ||
+            p_sys->i_codec_id == AV_CODEC_ID_THEORA ||
+            ( p_sys->i_codec_id == AV_CODEC_ID_AAC &&
               !p_dec->fmt_in.b_packetized ) )
         {
             msg_Warn( p_dec, "waiting for extra data for codec %s",
@@ -417,7 +417,7 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
         p_sys->p_context->block_align = p_dec->fmt_in.audio.i_blockalign;
         p_sys->p_context->bit_rate = p_dec->fmt_in.i_bitrate;
         p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.audio.i_bitspersample;
-        if( p_sys->i_codec_id == CODEC_ID_ADPCM_G726 &&
+        if( p_sys->i_codec_id == AV_CODEC_ID_ADPCM_G726 &&
             p_sys->p_context->bit_rate > 0 &&
             p_sys->p_context->sample_rate >  0)
             p_sys->p_context->bits_per_coded_sample = p_sys->p_context->bit_rate /
