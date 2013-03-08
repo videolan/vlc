@@ -618,11 +618,6 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_TRUEMOTION2, "Duck TrueMotion v2.0 Video"),
         A("TM20"),
 
-    /* FFMPEG's SNOW wavelet codec */
-    B(VLC_CODEC_SNOW, "FFMpeg SNOW wavelet Video"),
-        A("SNOW"),
-        A("snow"),
-
     B(VLC_CODEC_QTRLE, "Apple QuickTime RLE Video"),
         A("rle "),
 

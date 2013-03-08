@@ -52,7 +52,6 @@
 #define VLC_CODEC_VC1             VLC_FOURCC('V','C','-','1')
 #define VLC_CODEC_THEORA          VLC_FOURCC('t','h','e','o')
 #define VLC_CODEC_TARKIN          VLC_FOURCC('t','a','r','k')
-#define VLC_CODEC_SNOW            VLC_FOURCC('S','N','O','W')
 #define VLC_CODEC_DIRAC           VLC_FOURCC('d','r','a','c')
 #define VLC_CODEC_CAVS            VLC_FOURCC('C','A','V','S')
 #define VLC_CODEC_NUV             VLC_FOURCC('N','J','P','G')

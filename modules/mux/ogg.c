@@ -309,7 +309,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         case VLC_CODEC_WMV1:
         case VLC_CODEC_WMV2:
         case VLC_CODEC_WMV3:
-        case VLC_CODEC_SNOW:
             p_stream->p_oggds_header = calloc( 1, sizeof(oggds_header_t) );
             if( !p_stream->p_oggds_header )
             {
