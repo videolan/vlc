@@ -277,7 +277,7 @@ virtual_segment_c::virtual_segment_c( std::vector<matroska_segment_c*> * p_opene
         if(p_vedition->b_ordered && p_vedition->i_duration == 0)
         {
             msg_Warn( &p_segment->sys.demuxer,
-                      "Edition %s (%lu) links to other segments not found and is empty... ignoring it",
+                      "Edition %s (%zu) links to other segments not found and is empty... ignoring it",
                        p_vedition->GetMainName().c_str(), i );
             delete p_vedition;
         }
