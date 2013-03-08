@@ -221,6 +221,11 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta,
              * undocumented tags and replay gain ) */
             char *p = strchr( psz_comment, '=' );
             *p++ = '\0';
+
+            for( int i = 0; psz_comment[i]; i++ )
+                if( psz_comment[i] >= 'a' && psz_comment[i] <= 'z' )
+                    psz_comment[i] -= 'a' - 'A';
+
             vlc_meta_AddExtra( p_meta, psz_comment, p );
         }
 #undef IF_EXTRACT
