@@ -18,7 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "videodev2.h"
+#include <linux/videodev2.h>
 
 /* libv4l2 functions */
 extern int v4l2_fd_open (int, int);
