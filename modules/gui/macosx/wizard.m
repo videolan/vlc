@@ -4,7 +4,7 @@
  * Copyright (C) 2005-2013 VLC authors and VideoLAN
  * $Id$
  *
- * Authors: Felix Paul K�hne <fkuehne at videolan dot org>,
+ * Authors: Felix Paul Kühne <fkuehne at videolan dot org>,
  *          Brendon Justin <brendonjustin at gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,7 @@
 
 /*****************************************************************************
  * Note: this code is partially based upon ../wxwidgets/wizard.cpp and
- *         ../wxwidgets/streamdata.h; both written by Clément Stenac.
+ *         ../wxwidgets/streamdata.h; both written by ClÃ©ment Stenac.
  *****************************************************************************/
 
 
