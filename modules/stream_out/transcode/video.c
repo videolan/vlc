@@ -66,6 +66,12 @@ static picture_t *video_new_buffer_decoder( decoder_t *p_dec )
     return picture_NewFromFormat( &p_dec->fmt_out.video );
 }
 
+static picture_t *video_new_buffer_encoder( encoder_t *p_enc )
+{
+    p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec;
+    return picture_NewFromFormat( &p_enc->fmt_in.video );
+}
+
 static picture_t *transcode_video_filter_buffer_new( filter_t *p_filter )
 {
     p_filter->fmt_out.video.i_chroma = p_filter->fmt_out.i_codec;
@@ -719,8 +725,9 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
             {
                 if( picture_IsReferenced( p_pic ) && !filter_chain_GetLength( id->p_f_chain ) )
                 {
-                    /* We can't modify the picture, we need to duplicate it */
-                    picture_t *p_tmp = video_new_buffer_decoder( id->p_decoder );
+                    /* We can't modify the picture, we need to duplicate it,
+                     * in this point the picture is already p_encoder->fmt.in format*/
+                    picture_t *p_tmp = video_new_buffer_encoder( id->p_encoder );
                     if( likely( p_tmp ) )
                     {
                         picture_Copy( p_tmp, p_pic );
@@ -765,7 +772,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                if( p_sys->i_threads >= 1 )
                {
                    /* We can't modify the picture, we need to duplicate it */
-                   p_pic2 = video_new_buffer_decoder( id->p_decoder );
+                   p_pic2 = video_new_buffer_encoder( id->p_encoder );
                    if( likely( p_pic2 != NULL ) )
                    {
                        picture_Copy( p_pic2, p_pic );
