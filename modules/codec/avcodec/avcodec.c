@@ -361,9 +361,6 @@ static void CloseDecoder( vlc_object_t *p_this )
 
     switch( p_sys->i_cat )
     {
-    case AUDIO_ES:
-         EndAudioDec ( p_dec );
-        break;
     case VIDEO_ES:
          EndVideoDec ( p_dec );
         break;
