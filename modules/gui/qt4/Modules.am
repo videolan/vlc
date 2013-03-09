@@ -260,6 +260,9 @@ else
 endif
 endif
 
+# These MOC files depend on the configure settings:
+dialogs_provider.moc.cpp dialogs/vlm.moc.cpp: $(top_builddir)/config.h
+
 .ui.h:
 	$(AM_V_at)mkdir -p -- ui
 	$(AM_V_at)rm -f $@ $@.tmp
@@ -442,4 +445,3 @@ EXTRA_DIST += \
 	ui/sout.ui \
 	ui/vlm.ui \
 	$(DEPS_res)
-
