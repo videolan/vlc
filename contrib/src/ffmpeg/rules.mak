@@ -120,7 +120,7 @@ endif
 
 # Build
 PKGS += ffmpeg
-ifeq ($(call need_pkg,"libavcodec >= 52.25.0 libavformat >= 52.30.0 libswscale"),)
+ifeq ($(call need_pkg,"libavcodec >= 54.25.0 libavformat >= 53.21.0 libswscale"),)
 PKGS_FOUND += ffmpeg
 endif
 
