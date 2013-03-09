@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">12D78</string>
+    <string key="IBDocument.SystemVersion">12C60</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1187.37</string>
-    <string key="IBDocument.HIToolboxVersion">626.00</string>
+    <string key="IBDocument.AppKitVersion">1187.34</string>
+    <string key="IBDocument.HIToolboxVersion">625.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <object class="NSArray" key="dict.sortedKeys">
@@ -21,11 +21,11 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="5238"/>
-      <integer value="2730"/>
       <integer value="2"/>
-      <integer value="4850"/>
+      <integer value="2730"/>
+      <integer value="29"/>
       <integer value="5260"/>
+      <integer value="4850"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -2544,7 +2544,7 @@
                   <reference key="NSMenu" ref="1016637396"/>
                   <string key="NSTitle">Errors and Warnings...</string>
                   <string key="NSKeyEquiv">m</string>
-                  <int key="NSKeyEquivModMask">1310720</int>
+                  <int key="NSKeyEquivModMask">1572864</int>
                   <int key="NSMnemonicLoc">2147483647</int>
                   <reference key="NSOnImage" ref="447396056"/>
                   <reference key="NSMixedImage" ref="100133332"/>
@@ -12064,7 +12064,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{743, 801}, {197, 173}}</string>
+          <string>{{758, 490}, {197, 173}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12198,7 +12198,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{572, 871}, {137, 103}}</string>
+          <string>{{587, 560}, {137, 103}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>{{343, 329}, {604, 310}}</string>
@@ -12254,7 +12254,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{858, 691}, {243, 283}}</string>
+          <string>{{873, 380}, {243, 283}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12403,7 +12403,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{801, 611}, {208, 363}}</string>
+          <string>{{816, 300}, {208, 363}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12806,7 +12806,7 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{956, 353}, {222, 383}}</string>
+          <string>{{681, 280}, {222, 383}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12988,7 +12988,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{530, 731}, {297, 243}}</string>
+          <string>{{545, 420}, {297, 243}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
