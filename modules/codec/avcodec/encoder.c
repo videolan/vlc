@@ -133,7 +133,9 @@ struct encoder_sys_t
     bool       b_trellis;
     int        i_quality; /* for VBR */
     float      f_lumi_masking, f_dark_masking, f_p_masking, f_border_masking;
+#if (LIBAVCODEC_VERSION_MAJOR < 55)
     int        i_luma_elim, i_chroma_elim;
+#endif
     int        i_aac_profile; /* AAC profile to use.*/
 
     AVFrame    *frame;
@@ -144,10 +146,12 @@ static const char *const ppsz_enc_options[] = {
     "rc-buffer-size", "rc-buffer-aggressivity", "pre-me", "hurry-up",
     "interlace", "interlace-me", "i-quant-factor", "noise-reduction", "mpeg4-matrix",
     "trellis", "qscale", "strict", "lumi-masking", "dark-masking",
-    "p-masking", "border-masking", "luma-elim-threshold",
-    "chroma-elim-threshold",
-     "aac-profile",
-     NULL
+    "p-masking", "border-masking",
+#if (LIBAVCODEC_VERSION_MAJOR < 55)
+    "luma-elim-threshold", "chroma-elim-threshold",
+#endif
+    "aac-profile",
+    NULL
 };
 
 static const uint16_t mpa_bitrate_tab[2][15] =
@@ -364,8 +368,10 @@ int OpenEncoder( vlc_object_t *p_this )
     p_sys->f_dark_masking = var_GetFloat( p_enc, ENC_CFG_PREFIX "dark-masking" );
     p_sys->f_p_masking = var_GetFloat( p_enc, ENC_CFG_PREFIX "p-masking" );
     p_sys->f_border_masking = var_GetFloat( p_enc, ENC_CFG_PREFIX "border-masking" );
+#if (LIBAVCODEC_VERSION_MAJOR < 55)
     p_sys->i_luma_elim = var_GetInteger( p_enc, ENC_CFG_PREFIX "luma-elim-threshold" );
     p_sys->i_chroma_elim = var_GetInteger( p_enc, ENC_CFG_PREFIX "chroma-elim-threshold" );
+#endif
 
     psz_val = var_GetString( p_enc, ENC_CFG_PREFIX "aac-profile" );
     /* libavcodec uses faac encoder atm, and it has issues with
@@ -437,8 +443,10 @@ int OpenEncoder( vlc_object_t *p_this )
         p_context->dark_masking = p_sys->f_dark_masking;
         p_context->p_masking = p_sys->f_p_masking;
         p_context->border_masking = p_sys->f_border_masking;
+#if (LIBAVCODEC_VERSION_MAJOR < 55)
         p_context->luma_elim_threshold = p_sys->i_luma_elim;
         p_context->chroma_elim_threshold = p_sys->i_chroma_elim;
+#endif
 
         if( p_sys->i_key_int > 0 )
             p_context->gop_size = p_sys->i_key_int;
