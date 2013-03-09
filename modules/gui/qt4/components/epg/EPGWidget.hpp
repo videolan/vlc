@@ -43,6 +43,11 @@ class EPGWidget : public QWidget
 public:
     explicit EPGWidget( QWidget* parent = 0 );
     void reset();
+    enum
+    {
+        EPGVIEW_WIDGET = 0,
+        NOEPG_WIDGET = 1
+    };
 
 public slots:
     void setZoom( int level );

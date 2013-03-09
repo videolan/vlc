@@ -37,12 +37,6 @@
 #include <vlc_common.h>
 #include <vlc_epg.h>
 
-enum
-{
-    EPGVIEW_WIDGET = 0,
-    NOEPG_WIDGET = 1
-};
-
 EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
 {
     b_input_type_known = false;
