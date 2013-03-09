@@ -23,10 +23,8 @@
 
 #include "EPGRuler.hpp"
 
+class QPaintEvent;
 #include <QPainter>
-#include <QFont>
-#include <QPaintEvent>
-#include <QtDebug>
 #include <QDateTime>
 #include <QPoint>
 #include <QRect>
