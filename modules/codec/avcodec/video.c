@@ -737,18 +737,6 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_pic->p_q = malloc( p_pic->i_qstride * i_mb_h );
             memcpy( p_pic->p_q, p_sys->p_ff_pic->qscale_table,
                     p_pic->i_qstride * i_mb_h );
-            switch( p_sys->p_ff_pic->qscale_type )
-            {
-                case FF_QSCALE_TYPE_MPEG1:
-                    p_pic->i_qtype = QTYPE_MPEG1;
-                    break;
-                case FF_QSCALE_TYPE_MPEG2:
-                    p_pic->i_qtype = QTYPE_MPEG2;
-                    break;
-                case FF_QSCALE_TYPE_H264:
-                    p_pic->i_qtype = QTYPE_H264;
-                    break;
-            }
 
             return p_pic;
         }
