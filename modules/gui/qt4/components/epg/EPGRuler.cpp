@@ -28,6 +28,9 @@
 #include <QPaintEvent>
 #include <QtDebug>
 #include <QDateTime>
+#include <QPoint>
+#include <QRect>
+#include <QSize>
 
 EPGRuler::EPGRuler( QWidget* parent )
     : QWidget( parent )
@@ -66,41 +69,40 @@ void EPGRuler::paintEvent( QPaintEvent *event )
 {
     Q_UNUSED( event );
 
+    const QSize margin( 0, 15 );
+    const QSize header( 0, 15 );
+    const int spacing = m_scale * 3600;
     QPainter p( this );
 
-    int secondsOffset = m_offset / m_scale;
-
     QDateTime localStartTime;
-    localStartTime = m_startTime.addSecs( secondsOffset );
+    localStartTime = m_startTime.addSecs( m_offset / m_scale );
 
     QDateTime diff( localStartTime );
     diff.setTime( QTime( localStartTime.time().hour(), 0, 0, 0 ) );
 
     int secondsToHour = localStartTime.secsTo( diff );
 
+    /* draw hour blocks, with right bound being hourmark */
+    QPoint here( secondsToHour * m_scale, margin.height() );
+    QPoint previous( -1, 0 );
     QDateTime current( localStartTime.addSecs( secondsToHour ) );
-
-    int spacing = ( m_scale * 60 ) * 60;
-    int posx = secondsToHour * m_scale;
-
-    // Count the number of items to draw
-    int itemsToDraw = ( width() / spacing ) + 1;
-
-    for ( ; itemsToDraw >= 0; --itemsToDraw )
+    current = current.addSecs( -3600 );
+    while ( here.rx() < width() + spacing )
     {
-        p.drawLine( posx, 15, posx, 30 );
-        p.drawText( posx + 1, 12, 50, 15, Qt::AlignLeft, current.toString( "hh'h'" ) );
-        posx += spacing;
-        current = current.addSecs( 60 * 60 );
+        QRect area( QPoint( previous.x() + 1, margin.height() ), here );
+        area.adjust( 0, 0, 0, header.height() );
+        p.drawLine( area.topRight(), area.bottomRight() );
+        p.drawText( area, Qt::AlignLeft, current.toString( "hh'h'" ) );
+        previous = here;
+        here.rx() += spacing;
+        current = current.addSecs( 3600 );
     }
 
     /* draw current time line */
-    posx = localStartTime.secsTo( QDateTime::currentDateTime() ) * m_scale;
-    if ( posx <= width() && posx >= 0 )
+    here.rx() = localStartTime.secsTo( QDateTime::currentDateTime() ) * m_scale;
+    if ( here.x() <= width() && here.x() >= 0 )
     {
-        QPen pen( QPen( QColor( 255, 0 , 0, 128 ) ) );
-        pen.setWidth( 3 );
-        p.setPen( pen );
-        p.drawLine( posx - 1, 15, posx - 1, 30 );
+        p.setPen( QPen( QColor( 255, 0 , 0, 128 ) ) );
+        p.drawLine( here, QPoint( here.x(), here.y() + header.height() ) );
     }
 }
