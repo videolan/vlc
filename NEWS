@@ -122,6 +122,7 @@ OS X Interface:
    selection and to manage the list of presets
  * add custom profiles for video and audio effects, which let the user keep
    multiple configuration sets of all the individual filters
+ * Support for pausing iTunes during media playback with VLC
  * add support for video filters to clone the video output or split it in parts
  * add A->B loop feature known from the Qt interface
  * add an option to disable skipping to next/previous file with the Apple Remote
