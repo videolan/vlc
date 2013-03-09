@@ -21,9 +21,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -33,45 +30,6 @@
 
 #include "stats.h"
 
-/*****************************************************************************
- * encoder_sys_t
- *****************************************************************************/
-struct encoder_sys_t
-{
-    int i;
-};
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict );
-static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_abuff );
-
-/*****************************************************************************
- * OpenDecoder: open the dummy encoder.
- *****************************************************************************/
-int OpenEncoder ( vlc_object_t *p_this )
-{
-    encoder_t *p_enc = (encoder_t *)p_this;
-
-    p_enc->p_sys = malloc(sizeof(encoder_sys_t));
-
-    if( !p_enc->p_sys ) return VLC_ENOMEM;
-
-    p_enc->p_sys->i = 0;
-
-    msg_Dbg( p_this, "opening stats encoder" );
-
-    p_enc->pf_encode_video = EncodeVideo;
-    p_enc->pf_encode_audio = EncodeAudio;
-
-
-    return VLC_SUCCESS;
-}
-
-/****************************************************************************
- * EncodeVideo: the whole thing
- ****************************************************************************/
 static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 {
     (void)p_pict;
@@ -87,9 +45,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     return p_block;
 }
 
-/****************************************************************************
- * EncodeVideo: the whole thing
- ****************************************************************************/
 static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_abuff )
 {
     (void)p_abuff;
@@ -97,14 +52,14 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_abuff )
     return NULL;
 }
 
-
-/*****************************************************************************
- * CloseDecoder: decoder destruction
- *****************************************************************************/
-void CloseEncoder ( vlc_object_t *p_this )
+int OpenEncoder ( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
 
-    msg_Dbg( p_this, "closing stats encoder" );
-    free( p_enc->p_sys );
+    msg_Dbg( p_this, "opening stats encoder" );
+
+    p_enc->pf_encode_video = EncodeVideo;
+    p_enc->pf_encode_audio = EncodeAudio;
+
+    return VLC_SUCCESS;
 }

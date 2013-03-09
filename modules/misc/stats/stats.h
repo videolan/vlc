@@ -28,7 +28,6 @@
 int  OpenDecoder  ( vlc_object_t * );
 
 int  OpenEncoder  ( vlc_object_t * );
-void CloseEncoder ( vlc_object_t * );
 
 int  OpenDemux    ( vlc_object_t * );
 void CloseDemux   ( vlc_object_t * );
