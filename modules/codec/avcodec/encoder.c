@@ -96,7 +96,7 @@ struct encoder_sys_t
     /*
      * Common buffer mainly for audio as frame size in there needs usually be constant
      */
-    char *p_buffer;
+    uint8_t *p_buffer;
     size_t i_buffer_out;
 
     /*
