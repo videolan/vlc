@@ -1377,6 +1377,7 @@ static OSStatus HardwareListener(AudioObjectID inObjectID,  UInt32 inNumberAddre
 #endif
 
     RebuildDeviceList(p_aout);
+    aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
 
     return err;
 }
