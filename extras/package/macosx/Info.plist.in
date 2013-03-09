@@ -1380,6 +1380,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>mms</string>
+				<string>mmsh</string>
 			</array>
 		</dict>
 		<dict>
@@ -1400,6 +1401,49 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>udp</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLIconFile</key>
+			<string>generic</string>
+			<key>CFBundleURLName</key>
+			<string>rtp url</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>rtp</string>
+			</array>
+		</dict>
+        <dict>
+			<key>CFBundleURLIconFile</key>
+			<string>generic</string>
+			<key>CFBundleURLName</key>
+			<string>rtmp url</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>rtmp</string>
+				<string>rtmps</string>
+				<string>rtmpe</string>
+				<string>rtmpt</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLIconFile</key>
+			<string>generic</string>
+			<key>CFBundleURLName</key>
+			<string>sftp url</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>sftp</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLIconFile</key>
+			<string>generic</string>
+			<key>CFBundleURLName</key>
+			<string>smb url</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>smb</string>
 			</array>
 		</dict>
 	</array>
