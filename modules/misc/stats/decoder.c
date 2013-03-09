@@ -21,9 +21,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -33,38 +30,6 @@
 
 #include "stats.h"
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block );
-
-/*****************************************************************************
- * OpenDecoder: Open the decoder
- *****************************************************************************/
-int OpenDecoder ( vlc_object_t *p_this )
-{
-    decoder_t *p_dec = (decoder_t*)p_this;
-
-    msg_Dbg( p_this, "opening stats decoder" );
-
-    /* Set callbacks */
-    p_dec->pf_decode_video = DecodeBlock;
-    p_dec->pf_decode_audio = NULL;
-    p_dec->pf_decode_sub = NULL;
-
-    /* */
-    es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_CODEC_I420 );
-    p_dec->fmt_out.video.i_width = 100;
-    p_dec->fmt_out.video.i_height = 100;
-    p_dec->fmt_out.video.i_sar_num = 1;
-    p_dec->fmt_out.video.i_sar_den = 1;
-
-    return VLC_SUCCESS;
-}
-
-/****************************************************************************
- * RunDecoder: the whole thing
- ****************************************************************************/
 static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     block_t *p_block;
@@ -98,10 +63,23 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     return p_pic;
 }
 
-/*****************************************************************************
- * CloseDecoder: decoder destruction
- *****************************************************************************/
-void CloseDecoder ( vlc_object_t *p_this )
+int OpenDecoder ( vlc_object_t *p_this )
 {
-    msg_Dbg( p_this, "closing stats decoder" );
+    decoder_t *p_dec = (decoder_t*)p_this;
+
+    msg_Dbg( p_this, "opening stats decoder" );
+
+    /* Set callbacks */
+    p_dec->pf_decode_video = DecodeBlock;
+    p_dec->pf_decode_audio = NULL;
+    p_dec->pf_decode_sub = NULL;
+
+    /* */
+    es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_CODEC_I420 );
+    p_dec->fmt_out.video.i_width = 100;
+    p_dec->fmt_out.video.i_height = 100;
+    p_dec->fmt_out.video.i_sar_num = 1;
+    p_dec->fmt_out.video.i_sar_den = 1;
+
+    return VLC_SUCCESS;
 }
