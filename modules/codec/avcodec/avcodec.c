@@ -239,13 +239,6 @@ vlc_module_begin ()
                 ENC_PROFILE_TEXT, ENC_PROFILE_LONGTEXT, true )
 #endif /* ENABLE_SOUT */
 
-    /* video filter submodule */
-    add_submodule ()
-    set_capability( "video filter2", 0 )
-    set_callbacks( OpenDeinterlace, CloseDeinterlace )
-    set_description( N_("FFmpeg deinterlace video filter") )
-    add_shortcut( "ffmpeg-deinterlace" )
-
 #ifdef MERGE_FFMPEG
     add_submodule ()
 #   include "../../demux/avformat/avformat.c"

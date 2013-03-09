@@ -96,7 +96,6 @@ libavcodec_plugin_la_SOURCES = \
 	avcodec/subtitle.c \
 	avcodec/audio.c \
 	avcodec/cpu.c \
-	avcodec/deinterlace.c \
 	avcodec/fourcc.c \
 	avcodec/chroma.c avcodec/chroma.h \
 	avcodec/va.h \
