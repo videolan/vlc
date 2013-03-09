@@ -2222,11 +2222,6 @@ AC_ARG_ENABLE(avcodec,
 [  --enable-avcodec        libavcodec codec (default enabled)])
 AS_IF([test "${enable_avcodec}" != "no"], [
   PKG_CHECK_MODULES(AVCODEC,[libavcodec >= 53.34.0 libavutil >= 51.22.0], [
-    AS_IF([test "${enable_sout}" != "no"], [
-      PKG_CHECK_EXISTS([libavcodec < 55],, [
-        AC_MSG_ERROR([libavcodec version 55 requires --disable-sout.])
-      ])
-    ])
     PKG_CHECK_EXISTS([libavcodec < 56],, [
       AC_MSG_ERROR([libavcodec versions 56 and later are not supported yet.])
     ])
