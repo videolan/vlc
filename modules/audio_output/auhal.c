@@ -64,6 +64,9 @@
 #define VOLUME_TEXT N_("Audio volume")
 #define VOLUME_LONGTEXT VOLUME_TEXT
 
+#define DEVICE_TEXT N_("Last audio device")
+#define DEVICE_LONGTEXT DEVICE_TEXT
+
 /*****************************************************************************
  * aout_sys_t: private audio output method descriptor
  *****************************************************************************
@@ -161,6 +164,7 @@ vlc_module_begin ()
     add_integer("auhal-volume", AOUT_VOLUME_DEFAULT,
                 VOLUME_TEXT, VOLUME_LONGTEXT, true)
     change_integer_range(0, AOUT_VOLUME_MAX)
+    add_string("auhal-audio-device", "", DEVICE_TEXT, DEVICE_LONGTEXT, true)
     add_obsolete_integer("macosx-audio-device") /* since 2.1.0 */
 vlc_module_end ()
 
@@ -192,6 +196,8 @@ static int Open(vlc_object_t *obj)
     aout_VolumeReport(aout, var_InheritInteger(aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT);
     MuteSet(aout, var_InheritBool(aout, "mute"));
 
+    SwitchAudioDevice(aout, config_GetPsz(aout, "auhal-audio-device"));
+
     return VLC_SUCCESS;
 }
 
@@ -199,6 +205,8 @@ static void Close(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
+
+    config_PutPsz(aout, "auhal-audio-device", aout_DeviceGet(aout));
 
     for (struct audio_device_t * device = sys->devices, *next; device != NULL; device = next) {
         next = device->next;
