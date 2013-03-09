@@ -94,6 +94,7 @@ static int OpenDecoder ( vlc_object_t *p_this )
 }
 
 /*** Encoder ***/
+#ifdef ENABLE_SOUT
 static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 {
     (void)p_pict;
@@ -127,7 +128,9 @@ static int OpenEncoder ( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
 }
+#endif
 
+/*** Demuxer ***/
 struct demux_sys_t
 {
     es_format_t     fmt;
@@ -206,11 +209,13 @@ static void CloseDemux ( vlc_object_t *p_this )
 
 vlc_module_begin ()
     set_shortname( N_("Stats"))
+#ifdef ENABLE_SOUT
     set_description( N_("Stats encoder function") )
     set_capability( "encoder", 0 )
     add_shortcut( "stats" )
     set_callbacks( OpenEncoder, NULL )
     add_submodule ()
+#endif
         set_section( N_( "Stats decoder" ), NULL )
         set_description( N_("Stats decoder function") )
         set_capability( "decoder", 0 )
