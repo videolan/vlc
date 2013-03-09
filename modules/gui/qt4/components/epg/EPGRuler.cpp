@@ -29,6 +29,8 @@ class QPaintEvent;
 #include <QPoint>
 #include <QRect>
 #include <QSize>
+#include <QPalette>
+#include <QColor>
 
 EPGRuler::EPGRuler( QWidget* parent )
     : QWidget( parent )
@@ -73,6 +75,7 @@ void EPGRuler::paintEvent( QPaintEvent *event )
 
     QDateTime localStartTime;
     localStartTime = m_startTime.addSecs( m_offset / m_scale );
+    const QString currentDate = localStartTime.date().toString();
 
     QDateTime diff( localStartTime );
     diff.setTime( QTime( localStartTime.time().hour(), 0, 0, 0 ) );
@@ -84,12 +87,35 @@ void EPGRuler::paintEvent( QPaintEvent *event )
     QPoint previous( -1, 0 );
     QDateTime current( localStartTime.addSecs( secondsToHour ) );
     current = current.addSecs( -3600 );
+
+    QPalette::ColorRole fillColorRole;
+    if ( localStartTime.date().daysTo( current.date() ) % 2 == 0 )
+        fillColorRole = QPalette::Window;
+    else
+        fillColorRole = QPalette::Dark;
+    QColor fillColor = palette().color( fillColorRole );
+
     while ( here.rx() < width() + spacing )
     {
         QRect area( QPoint( previous.x() + 1, margin.height() ), here );
         area.adjust( 0, 0, 0, header.height() );
+        QString timeString = current.toString( "hh'h'" );
+        localStartTime.date().daysTo( current.date() );
+        if ( current.time().hour() == 0 &&
+             current.date().toString() != currentDate )
+        {
+            /* Show Day */
+            timeString += current.date().toString( " ddd dd" );
+            /* And switch colors */
+            if ( fillColorRole == QPalette::Dark )
+                fillColorRole = QPalette::Window;
+            else
+                fillColorRole = QPalette::Dark;
+            fillColor = palette().color( fillColorRole );
+        }
+        p.fillRect( area, fillColor );
         p.drawLine( area.topRight(), area.bottomRight() );
-        p.drawText( area, Qt::AlignLeft, current.toString( "hh'h'" ) );
+        p.drawText( area, Qt::AlignLeft, timeString );
         previous = here;
         here.rx() += spacing;
         current = current.addSecs( 3600 );
