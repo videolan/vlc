@@ -119,7 +119,6 @@ void picture_Reset( picture_t *p_picture )
     free( p_picture->p_q );
     p_picture->p_q = NULL;
     p_picture->i_qstride = 0;
-    p_picture->i_qtype = 0;
 }
 
 /*****************************************************************************
@@ -148,7 +147,6 @@ int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma,
 
     p_picture->i_nb_fields = 2;
 
-    p_picture->i_qtype = QTYPE_NONE;
     p_picture->i_qstride = 0;
     p_picture->p_q = NULL;
 

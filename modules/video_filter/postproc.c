@@ -336,8 +336,7 @@ static picture_t *PostprocPict( filter_t *p_filter, picture_t *p_pic )
                     p_filter->fmt_in.video.i_width,
                     p_filter->fmt_in.video.i_height,
                     p_pic->p_q, p_pic->i_qstride,
-                    p_sys->pp_mode, p_sys->pp_context,
-                    p_pic->i_qtype == QTYPE_MPEG2 ? PP_PICT_TYPE_QP2 : 0 );
+                    p_sys->pp_mode, p_sys->pp_context, 0 );
     vlc_mutex_unlock( &p_sys->lock );
 
     return CopyInfoAndRelease( p_outpic, p_pic );

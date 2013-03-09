@@ -93,7 +93,6 @@ struct picture_t
     unsigned int    i_nb_fields;                  /**< # of displayed fields */
     int8_t         *p_q;                           /**< quantification table */
     int             i_qstride;                    /**< quantification stride */
-    int             i_qtype;                       /**< quantification style */
     /**@}*/
 
     /** Private data - the video output plugin might want to put stuff here to
@@ -249,20 +248,6 @@ VLC_API int picture_Setup( picture_t *, vlc_fourcc_t i_chroma, int i_width, int 
  */
 VLC_API void picture_BlendSubpicture( picture_t *, filter_t *p_blend, subpicture_t * );
 
-
-/*****************************************************************************
- * Flags used to describe the status of a picture
- *****************************************************************************/
-
-/* Quantification type */
-enum
-{
-    QTYPE_NONE,
-
-    QTYPE_MPEG1,
-    QTYPE_MPEG2,
-    QTYPE_H264,
-};
 
 /*****************************************************************************
  * Shortcuts to access image components

@@ -91,7 +91,6 @@ struct vout_thread_sys_t
     struct {
         mtime_t     date;
         mtime_t     timestamp;
-        int         qtype;
         bool        is_interlaced;
         picture_t   *decoded;
         picture_t   *current;

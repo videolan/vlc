@@ -49,7 +49,6 @@
 #include <libvlc.h>
 #include "vout_internal.h"
 #include "interlacing.h"
-#include "postprocessing.h"
 #include "display.h"
 
 /*****************************************************************************
@@ -855,7 +854,6 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool is_
         vout->p->displayed.decoded       = picture_Hold(decoded);
         vout->p->displayed.timestamp     = decoded->date;
         vout->p->displayed.is_interlaced = !decoded->b_progressive;
-        vout->p->displayed.qtype         = decoded->i_qtype;
 
         picture = filter_chain_VideoFilter(vout->p->filter.chain_static, decoded);
     }
@@ -1128,8 +1126,7 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
 
 static void ThreadManage(vout_thread_t *vout,
                          mtime_t *deadline,
-                         vout_interlacing_support_t *interlacing,
-                         vout_postprocessing_support_t *postprocessing)
+                         vout_interlacing_support_t *interlacing)
 {
     vlc_mutex_lock(&vout->p->picture_lock);
 
@@ -1139,13 +1136,9 @@ static void ThreadManage(vout_thread_t *vout,
             break;
     }
 
-    const int  picture_qtype      = vout->p->displayed.qtype;
     const bool picture_interlaced = vout->p->displayed.is_interlaced;
 
     vlc_mutex_unlock(&vout->p->picture_lock);
-
-    /* Post processing */
-    vout_SetPostProcessingState(vout, postprocessing, picture_qtype);
 
     /* Deinterlacing */
     vout_SetInterlacingState(vout, interlacing, picture_interlaced);
@@ -1364,7 +1357,6 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
     vout->p->displayed.decoded       = NULL;
     vout->p->displayed.date          = VLC_TS_INVALID;
     vout->p->displayed.timestamp     = VLC_TS_INVALID;
-    vout->p->displayed.qtype         = QTYPE_NONE;
     vout->p->displayed.is_interlaced = false;
 
     vout->p->step.last               = VLC_TS_INVALID;
@@ -1480,9 +1472,6 @@ static void *Thread(void *object)
         .is_interlaced = false,
         .date = mdate(),
     };
-    vout_postprocessing_support_t postprocessing = {
-        .qtype = QTYPE_NONE,
-    };
 
     mtime_t deadline = VLC_TS_INVALID;
     for (;;) {
@@ -1576,7 +1565,7 @@ static void *Thread(void *object)
             vout_control_cmd_Clean(&cmd);
         }
 
-        ThreadManage(vout, &deadline, &interlacing, &postprocessing);
+        ThreadManage(vout, &deadline, &interlacing);
     }
 }
 
