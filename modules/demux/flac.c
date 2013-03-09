@@ -72,7 +72,6 @@ struct demux_sys_t
     decoder_t *p_packetizer;
 
     vlc_meta_t *p_meta;
-    audio_replay_gain_t replay_gain;
 
     int64_t i_time_offset;
     int64_t i_pts;
@@ -128,7 +127,6 @@ static int Open( vlc_object_t * p_this )
     p_demux->p_sys      = p_sys;
     p_sys->b_start = true;
     p_sys->p_meta = NULL;
-    memset( &p_sys->replay_gain, 0, sizeof(p_sys->replay_gain) );
     p_sys->i_length = 0;
     p_sys->i_time_offset = 0;
     p_sys->i_pts = 0;
@@ -169,7 +167,6 @@ static int Open( vlc_object_t * p_this )
                   p_sys->attachments[p_sys->i_cover_idx]->psz_name );
         vlc_meta_Set( p_sys->p_meta, vlc_meta_ArtworkURL, psz_url );
     }
-    vlc_audio_replay_gain_MergeFromMeta( &p_sys->replay_gain, p_sys->p_meta );
     return VLC_SUCCESS;
 }
 
@@ -224,7 +221,6 @@ static int Demux( demux_t *p_demux )
             if( p_sys->p_es == NULL )
             {
                 p_sys->p_packetizer->fmt_out.b_packetized = true;
-                p_sys->p_packetizer->fmt_out.audio_replay_gain = p_sys->replay_gain;
                 p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_out);
             }
 

@@ -253,4 +253,8 @@ int subtitles_Filter( const char *);
 void input_SplitMRL( const char **, const char **, const char **,
                      const char **, char * );
 
+/* meta.c */
+void vlc_audio_replay_gain_MergeFromMeta( audio_replay_gain_t *p_dst,
+                                          const vlc_meta_t *p_meta );
+
 #endif
