@@ -303,7 +303,6 @@
 #define VLC_CODEC_GSM_MS                     VLC_FOURCC('a','g','s','m')
 #define VLC_CODEC_ATRAC1                     VLC_FOURCC('a','t','r','1')
 #define VLC_CODEC_ATRAC3                     VLC_FOURCC('a','t','r','c')
-#define VLC_CODEC_SONIC                      VLC_FOURCC('S','O','N','C')
 #define VLC_CODEC_IMC                        VLC_FOURCC(0x1,0x4,0x0,0x0)
 #define VLC_CODEC_TRUESPEECH                 VLC_FOURCC(0x22,0x0,0x0,0x0)
 #define VLC_CODEC_NELLYMOSER                 VLC_FOURCC('N','E','L','L')
