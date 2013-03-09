@@ -240,10 +240,9 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
 
     block_t *p_block = *pp_block;
 
-    if( !p_sys->p_context->extradata_size && p_dec->fmt_in.i_extra &&
-        p_sys->b_delayed_open)
+    if( !ctx->extradata_size && p_dec->fmt_in.i_extra && p_sys->b_delayed_open)
     {
-        InitDecoderConfig( p_dec, p_sys->p_context);
+        InitDecoderConfig( p_dec, ctx );
         if( ffmpeg_OpenCodec( p_dec ) )
             msg_Err( p_dec, "Cannot open decoder %s", p_sys->psz_namecodec );
     }
@@ -253,7 +252,7 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
 
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
-        avcodec_flush_buffers( p_sys->p_context );
+        avcodec_flush_buffers( ctx );
         date_Set( &p_sys->end_date, 0 );
 
         if( p_sys->i_codec_id == CODEC_ID_MP2 || p_sys->i_codec_id == CODEC_ID_MP3 )
@@ -306,16 +305,15 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         p_block->i_buffer -= used;
     }
 
-    if( p_sys->p_context->channels <= 0 || p_sys->p_context->channels > 8 ||
-        p_sys->p_context->sample_rate <= 0 )
+    if( ctx->channels <= 0 || ctx->channels > 8 || ctx->sample_rate <= 0 )
     {
         msg_Warn( p_dec, "invalid audio properties channels count %d, sample rate %d",
-                  p_sys->p_context->channels, p_sys->p_context->sample_rate );
+                  ctx->channels, ctx->sample_rate );
         goto end;
     }
 
-    if( p_dec->fmt_out.audio.i_rate != (unsigned int)p_sys->p_context->sample_rate )
-        date_Init( &p_sys->end_date, p_sys->p_context->sample_rate, 1 );
+    if( p_dec->fmt_out.audio.i_rate != (unsigned int)ctx->sample_rate )
+        date_Init( &p_sys->end_date, ctx->sample_rate, 1 );
 
     if( p_block->i_pts > VLC_TS_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )
