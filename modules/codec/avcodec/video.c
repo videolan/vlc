@@ -732,12 +732,6 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_pic->b_progressive = !p_sys->p_ff_pic->interlaced_frame;
             p_pic->b_top_field_first = p_sys->p_ff_pic->top_field_first;
 
-            p_pic->i_qstride = p_sys->p_ff_pic->qstride;
-            int i_mb_h = ( p_pic->format.i_height + 15 ) / 16;
-            p_pic->p_q = malloc( p_pic->i_qstride * i_mb_h );
-            memcpy( p_pic->p_q, p_sys->p_ff_pic->qscale_table,
-                    p_pic->i_qstride * i_mb_h );
-
             return p_pic;
         }
         else
