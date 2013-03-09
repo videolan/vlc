@@ -43,11 +43,7 @@ if HAVE_ANDROID
 liblogger_plugin_la_LIBADD += -llog
 endif
 
-libstats_plugin_la_SOURCES = \
-	stats/demux.c \
-	stats/decoder.c \
-	stats/encoder.c \
-	stats/stats.c stats/stats.h
+libstats_plugin_la_SOURCES = stats.c
 libstats_plugin_la_CFLAGS = $(AM_CFLAGS)
 libstats_plugin_la_LIBADD = $(AM_LIBADD)
 
