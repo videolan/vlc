@@ -113,10 +113,6 @@ struct filter_sys_t
     /* Set to NULL if post processing is disabled */
     pp_mode *pp_mode;
 
-    /* Set to true if previous pic had a quant matrix
-       (used to prevent spamming warning messages) */
-    bool b_had_matrix;
-
     /* Lock when using or changing pp_mode */
     vlc_mutex_t lock;
 };
@@ -258,8 +254,9 @@ static int OpenPostproc( vlc_object_t *p_this )
     var_AddCallback( p_filter, FILTER_PREFIX "name", PPNameCallback, NULL );
 
     p_filter->pf_video_filter = PostprocPict;
-    p_sys->b_had_matrix = true;
 
+    msg_Warn( p_filter, "Quantification table was not set by video decoder. "
+                        "Postprocessing won't look good." );
     return VLC_SUCCESS;
 }
 
@@ -322,20 +319,9 @@ static picture_t *PostprocPict( filter_t *p_filter, picture_t *p_pic )
         i_dst_stride[i_plane] = p_outpic->p[i_plane].i_pitch;
     }
 
-    if( !p_pic->p_q && p_sys->b_had_matrix )
-    {
-        msg_Warn( p_filter, "Quantification table was not set by video decoder. Postprocessing won't look good." );
-        p_sys->b_had_matrix = false;
-    }
-    else if( p_pic->p_q )
-    {
-        p_sys->b_had_matrix = true;
-    }
-
     pp_postprocess( src, i_src_stride, dst, i_dst_stride,
                     p_filter->fmt_in.video.i_width,
-                    p_filter->fmt_in.video.i_height,
-                    p_pic->p_q, p_pic->i_qstride,
+                    p_filter->fmt_in.video.i_height, NULL, 0,
                     p_sys->pp_mode, p_sys->pp_context, 0 );
     vlc_mutex_unlock( &p_sys->lock );
 

@@ -91,8 +91,6 @@ struct picture_t
     bool            b_progressive;          /**< is it a progressive frame ? */
     bool            b_top_field_first;             /**< which field is first */
     unsigned int    i_nb_fields;                  /**< # of displayed fields */
-    int8_t         *p_q;                           /**< quantification table */
-    int             i_qstride;                    /**< quantification stride */
     /**@}*/
 
     /** Private data - the video output plugin might want to put stuff here to
@@ -115,7 +113,7 @@ struct picture_t
  * This function will create a new picture.
  * The picture created will implement a default release management compatible
  * with picture_Hold and picture_Release. This default management will release
- * p_sys, p_q, gc.p_sys fields if non NULL.
+ * p_sys, gc.p_sys fields if non NULL.
  */
 VLC_API picture_t * picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) VLC_USED;
 

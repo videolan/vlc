@@ -98,7 +98,6 @@ static void PictureDestroy( picture_t *p_picture )
     assert( p_picture &&
             vlc_atomic_get( &p_picture->gc.refcount ) == 0 );
 
-    free( p_picture->p_q );
     vlc_free( p_picture->gc.p_sys );
     free( p_picture->p_sys );
     free( p_picture );
@@ -115,10 +114,6 @@ void picture_Reset( picture_t *p_picture )
     p_picture->b_progressive = false;
     p_picture->i_nb_fields = 2;
     p_picture->b_top_field_first = false;
-
-    free( p_picture->p_q );
-    p_picture->p_q = NULL;
-    p_picture->i_qstride = 0;
 }
 
 /*****************************************************************************
@@ -146,9 +141,6 @@ int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma,
     p_picture->gc.p_sys = NULL;
 
     p_picture->i_nb_fields = 2;
-
-    p_picture->i_qstride = 0;
-    p_picture->p_q = NULL;
 
     video_format_Setup( &p_picture->format, i_chroma, i_width, i_height,
                         i_sar_num, i_sar_den );
@@ -340,8 +332,6 @@ void picture_CopyProperties( picture_t *p_dst, const picture_t *p_src )
     p_dst->b_progressive = p_src->b_progressive;
     p_dst->i_nb_fields = p_src->i_nb_fields;
     p_dst->b_top_field_first = p_src->b_top_field_first;
-
-    /* FIXME: copy ->p_q and ->p_qstride */
 }
 
 void picture_CopyPixels( picture_t *p_dst, const picture_t *p_src )
