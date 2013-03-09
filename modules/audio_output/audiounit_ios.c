@@ -258,6 +258,17 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
         return false;
     }
 
+    /* start audio session so playback continues if mute switch is on */
+    AudioSessionInitialize (NULL,
+                            kCFRunLoopCommonModes,
+                            NULL,
+                            NULL);
+
+	/* Set audio session to mediaplayback */
+	UInt32 sessionCategory = kAudioSessionCategory_MediaPlayback;
+	AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(sessionCategory),&sessionCategory);
+	AudioSessionSetActive(true);
+
     /* setup circular buffer */
     TPCircularBufferInit(&p_sys->circular_buffer, kBufferLength);
 
@@ -273,6 +284,8 @@ static void Stop(audio_output_t *p_aout)
 {
     struct aout_sys_t   *p_sys = p_aout->sys;
     OSStatus status;
+
+    AudioSessionSetActive(false);
 
     if (p_sys->au_unit) {
         status = AudioOutputUnitStop(p_sys->au_unit);
@@ -331,10 +344,13 @@ static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
     struct aout_sys_t * p_sys = p_aout->sys;
     VLC_UNUSED(date);
 
-    if (pause)
+    if (pause) {
         AudioOutputUnitStop(p_sys->au_unit);
-    else
+        AudioSessionSetActive(false);
+    } else {
         AudioOutputUnitStart(p_sys->au_unit);
+        AudioSessionSetActive(true);
+    }
 }
 
 static void Flush(audio_output_t *p_aout, bool wait)
