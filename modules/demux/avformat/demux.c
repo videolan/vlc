@@ -325,15 +325,7 @@ int OpenDemux( vlc_object_t *p_this )
 
             fmt.video.i_width = cc->width;
             fmt.video.i_height = cc->height;
-#if LIBAVCODEC_VERSION_MAJOR < 54
-            if( cc->palctrl )
-            {
-                fmt.video.p_palette = malloc( sizeof(video_palette_t) );
-                *fmt.video.p_palette = *(video_palette_t *)cc->palctrl;
-            }
-#else
 # warning FIXME: implement palette transmission
-#endif
             psz_type = "video";
             fmt.video.i_frame_rate = cc->time_base.den;
             fmt.video.i_frame_rate_base = cc->time_base.num * __MAX( cc->ticks_per_frame, 1 );

@@ -42,8 +42,8 @@
 #include "chroma.h"
 #include "avcommon.h"
 
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 53, 34, 0 )
-#   error You must update libavcodec to a version >= 53.34.0
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 54, 25, 0 )
+#   error You must update libavcodec to a version >= 54.25.0
 #endif
 
 /*****************************************************************************
@@ -300,11 +300,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* *** get a p_context *** */
-#if LIBAVCODEC_VERSION_MAJOR >= 54
     p_context = avcodec_alloc_context3(p_codec);
-#else
-    p_context = avcodec_alloc_context();
-#endif
     if( !p_context )
         return VLC_ENOMEM;
     p_context->debug = var_InheritInteger( p_dec, "avcodec-debug" );
@@ -429,11 +425,7 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
     }
     int ret;
     vlc_avcodec_lock();
-#if LIBAVCODEC_VERSION_MAJOR >= 54
     ret = avcodec_open2( p_sys->p_context, p_sys->p_codec, NULL /* options */ );
-#else
-    ret = avcodec_open( p_sys->p_context, p_sys->p_codec );
-#endif
     vlc_avcodec_unlock();
     if( ret < 0 )
         return VLC_EGENERIC;

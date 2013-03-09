@@ -300,11 +300,7 @@ int OpenEncoder( vlc_object_t *p_this )
     p_sys->p_buffer = NULL;
     p_sys->i_buffer_out = 0;
 
-#if LIBAVCODEC_VERSION_MAJOR < 54
-    p_context = avcodec_alloc_context();
-#else
     p_context = avcodec_alloc_context3(p_codec);
-#endif
     p_sys->p_context = p_context;
     p_sys->p_context->codec_id = p_sys->p_codec->id;
     p_context->debug = var_InheritInteger( p_enc, "avcodec-debug" );
@@ -387,13 +383,11 @@ int OpenEncoder( vlc_object_t *p_this )
 #endif
         else if( !strncmp( psz_val, "ltp", 3 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_LTP;
-#if LIBAVCODEC_VERSION_CHECK( 54, 19, 0, 35, 100 )
 /* These require libavcodec with libfdk-aac */
         else if( !strncmp( psz_val, "hev2", 4 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_HE_V2;
         else if( !strncmp( psz_val, "hev1", 4 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_HE;
-#endif
         else
         {
             msg_Warn( p_enc, "unknown AAC profile requested, setting it to low" );
@@ -697,11 +691,7 @@ int OpenEncoder( vlc_object_t *p_this )
 
     int ret;
     vlc_avcodec_lock();
-#if LIBAVCODEC_VERSION_MAJOR < 54
-    ret = avcodec_open( p_context, p_codec );
-#else
     ret = avcodec_open2( p_context, p_codec, NULL /* options */ );
-#endif
     vlc_avcodec_unlock();
     if( ret )
     {
@@ -755,11 +745,7 @@ int OpenEncoder( vlc_object_t *p_this )
 
             p_context->codec = NULL;
             vlc_avcodec_lock();
-#if LIBAVCODEC_VERSION_MAJOR < 54
-            ret = avcodec_open( p_context, p_codec );
-#else
             ret = avcodec_open2( p_context, p_codec, NULL /* options */ );
-#endif
             vlc_avcodec_unlock();
             if( ret )
             {
