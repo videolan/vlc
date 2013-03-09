@@ -285,26 +285,6 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
     (LIBAVCODEC_VERSION_MICRO >= 100 && LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( a, d, e ) )
 
 
-/* Ugly ifdefinitions to provide backwards compatibility with older ffmpeg/libav
- * versions */
-#ifndef AV_CPU_FLAG_FORCE
-#   define AV_CPU_FLAG_FORCE       FF_MM_FORCE
-#   define AV_CPU_FLAG_MMX         FF_MM_MMX
-#   define AV_CPU_FLAG_3DNOW       FF_MM_3DNOW
-#   define AV_CPU_FLAG_MMX2        FF_MM_MMX2
-#   define AV_CPU_FLAG_SSE         FF_MM_SSE
-#   define AV_CPU_FLAG_SSE2        FF_MM_SSE2
-#   define AV_CPU_FLAG_SSE2SLOW    FF_MM_SSE2SLOW
-#   define AV_CPU_FLAG_3DNOWEXT    FF_MM_3DNOWEXT
-#   define AV_CPU_FLAG_SSE3        FF_MM_SSE3
-#   define AV_CPU_FLAG_SSE3SLOW    FF_MM_SSE3SLOW
-#   define AV_CPU_FLAG_SSSE3       FF_MM_SSSE3
-#   define AV_CPU_FLAG_SSE4        FF_MM_SSE4
-#   define AV_CPU_FLAG_SSE42       FF_MM_SSE42
-#   define AV_CPU_FLAG_IWMMXT      FF_MM_IWMMXT
-#   define AV_CPU_FLAG_ALTIVEC     FF_MM_ALTIVEC
-#endif
-
 #if LIBAVCODEC_VERSION_MAJOR < 54
 #   define AV_PICTURE_TYPE_B        FF_B_TYPE
 #   define AV_PICTURE_TYPE_I        FF_I_TYPE
@@ -378,9 +358,4 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 #   define AV_CH_STEREO_RIGHT       CH_STEREO_RIGHT
 #endif
 
-
-#endif
-
-#ifndef AV_PKT_FLAG_KEY
-#   define AV_PKT_FLAG_KEY         PKT_FLAG_KEY
-#endif
+#endif /* LIBAVCODEC_VERSION_MAJOR < 54 */
