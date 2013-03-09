@@ -1,7 +1,7 @@
 /*****************************************************************************
  * applescript.m: MacOS X AppleScript support
  *****************************************************************************
- * Copyright (C) 2002-2012 VLC authors and VideoLAN
+ * Copyright (C) 2002-2013 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -25,9 +25,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "intf.h"
-#include "applescript.h"
-#include "CoreInteraction.h"
+#import "intf.h"
+#import "applescript.h"
+#import "CoreInteraction.h"
+#import "playlist.h"
 
 /*****************************************************************************
  * VLGetURLScriptCommand implementation
@@ -39,30 +40,18 @@
     NSString *o_urlString = [self directParameter];
 
     if ([o_command isEqualToString:@"GetURL"] || [o_command isEqualToString:@"OpenURL"]) {
-        intf_thread_t * p_intf = VLCIntf;
-        playlist_t * p_playlist = pl_Get(p_intf);
-
         if (o_urlString) {
-            NSURL * o_url;
-            input_item_t *p_input;
-            int returnValue;
-
-            p_input = input_item_New([o_urlString fileSystemRepresentation],
-                                    [[[NSFileManager defaultManager]
-                                    displayNameAtPath: o_urlString] UTF8String]);
-            if (!p_input)
-                return nil;
-
-            returnValue = playlist_AddInput(p_playlist, p_input, PLAYLIST_INSERT,
-                               PLAYLIST_END, true, pl_Unlocked);
-            vlc_gc_decref(p_input);
-
-            if (returnValue != VLC_SUCCESS)
-                return nil;
-
-            o_url = [NSURL fileURLWithPath: o_urlString];
+            BOOL b_autoplay = config_GetInt(VLCIntf, "macosx-autoplay");
+            NSURL * o_url = [NSURL fileURLWithPath: o_urlString];
             if (o_url != nil)
                 [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: o_url];
+
+            NSMutableArray *o_result = [NSMutableArray arrayWithObject:[NSDictionary dictionaryWithObject:o_urlString forKey:@"ITEM_URL"]];
+
+            if (b_autoplay)
+                [[[VLCMain sharedInstance] playlist] appendArray: o_result atPos: -1 enqueue: NO];
+            else
+                [[[VLCMain sharedInstance] playlist] appendArray: o_result atPos: -1 enqueue: YES];
         }
     }
     return nil;

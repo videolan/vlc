@@ -131,6 +131,8 @@ OS X Interface:
  * add support for playing video and showing audio visualizations side by side
  * improve fullscreen controller time slider with larger click target
  * rewrite of minimal macosx module for use within VLCKit
+ * add support for 'macosx-autoplay' to the Apple Event / Apple Script bindings
+   when adding new inputs
  * The Streaming/Transcoding wizard and the open dialog's output panel are
    deprecated now
 
