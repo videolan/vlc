@@ -36,8 +36,8 @@ EPGRuler::EPGRuler( QWidget* parent )
     : QWidget( parent )
 {
     setContentsMargins( 0, 0, 0, 0 );
-    setMinimumHeight( 30 );
-    setMaximumHeight( 30 );
+    setMinimumHeight( 15 );
+    setMaximumHeight( 15 );
     m_offset = 0;
 }
 
@@ -68,9 +68,8 @@ void EPGRuler::setOffset( int offset )
 void EPGRuler::paintEvent( QPaintEvent *event )
 {
     Q_UNUSED( event );
-
-    const QSize margin( 0, 15 );
-    const QSize header( 0, 15 );
+    const QSize margin( 0, contentsMargins().top() );
+    const QSize header( 0, maximumHeight() - contentsMargins().top() );
     const int spacing = m_scale * 3600;
     QPainter p( this );
 
