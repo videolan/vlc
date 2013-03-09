@@ -278,7 +278,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
             NSString *muxformat = [self.currentProfile objectAtIndex:0];
             if ([muxformat isEqualToString:@"wav"] || [muxformat isEqualToString:@"mov"] || [muxformat isEqualToString:@"mp4"] || [muxformat isEqualToString:@"mkv"]) {
                 NSBeginInformationalAlertSheet(_NS("Invalid container format for HTTP streaming"), _NS("OK"), @"", @"", _window,
-                                               nil, nil, nil, nil, @"%@",
+                                               nil, nil, nil, nil,
                                                _NS("Media encapsulated as %@ cannot be streamed through the HTTP protocol for technical reasons."),
                                                [[self currentEncapsulationFormatAsFileExtension:YES] uppercaseString]);
                 return;
