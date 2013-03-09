@@ -27,9 +27,6 @@
 #include <QDateTime>
 #include <QMatrix>
 #include <QPaintEvent>
-#include <QScrollBar>
-#include <QtDebug>
-#include <QGraphicsTextItem>
 
 EPGGraphicsScene::EPGGraphicsScene( QObject *parent ) : QGraphicsScene( parent )
 {}
