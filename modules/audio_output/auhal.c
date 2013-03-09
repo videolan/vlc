@@ -313,11 +313,6 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         p_aout->play = Play;
         p_aout->flush = Flush;
         p_aout->time_get = TimeGet;
-
-        // TODO fix TimeGet for S/PDIF
-        if (AOUT_FMT_SPDIF (fmt) && p_sys->b_selected_dev_is_digital)
-            p_aout->time_get = NULL;
-
         p_aout->pause = Pause;
         return VLC_SUCCESS;
     }
