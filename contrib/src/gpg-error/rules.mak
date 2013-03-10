@@ -1,5 +1,5 @@
 # GPGERROR
-GPGERROR_VERSION := 1.10
+GPGERROR_VERSION := 1.11
 GPGERROR_URL := ftp://ftp.gnupg.org/gcrypt/libgpg-error/libgpg-error-$(GPGERROR_VERSION).tar.bz2
 
 $(TARBALLS)/libgpg-error-$(GPGERROR_VERSION).tar.bz2:
@@ -12,7 +12,6 @@ libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.bz2 .sum-gpg-error
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/gpg-error/windres-make.patch
 endif
-	$(APPLY) $(SRC)/gpg-error/cppflags.patch
 	$(MOVE)
 
 .gpg-error: libgpg-error
