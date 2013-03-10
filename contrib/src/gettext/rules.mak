@@ -1,5 +1,5 @@
 # gettext
-GETTEXT_VERSION=0.18.1.1
+GETTEXT_VERSION=0.18.2.1
 GETTEXT_URL=$(GNU)/gettext/gettext-$(GETTEXT_VERSION).tar.gz
 
 PKGS += gettext
@@ -15,10 +15,6 @@ $(TARBALLS)/gettext-$(GETTEXT_VERSION).tar.gz:
 
 gettext: gettext-$(GETTEXT_VERSION).tar.gz .sum-gettext
 	$(UNPACK)
-	$(APPLY) $(SRC)/gettext/alloca.patch
-ifdef HAVE_MACOSX
-	$(APPLY) $(SRC)/gettext/gettext-macosx.patch
-endif
 	$(MOVE)
 
 DEPS_gettext = iconv $(DEPS_iconv)
