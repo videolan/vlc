@@ -1,7 +1,7 @@
 /*****************************************************************************
 * simple_prefs.m: Simple Preferences for Mac OS X
 *****************************************************************************
-* Copyright (C) 2008-2012 VLC authors and VideoLAN
+* Copyright (C) 2008-2013 VLC authors and VideoLAN
 * $Id$
 *
 * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
@@ -214,6 +214,13 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     [o_input_rtsp_ckb setTitle: _NS("Use RTP over RTSP (TCP)")];
     [o_input_skipLoop_txt setStringValue: _NS("Skip the loop filter for H.264 decoding")];
     [o_input_mkv_preload_dir_ckb setTitle: _NS("Preload MKV files in the same directory")];
+    [o_input_urlhandler_btn setTitle: _NS("Edit default application settings for network protocols")];
+
+    /* url handler */
+    [o_urlhandler_title_txt setStringValue: _NS("Open network streams using the following protocols")];
+    [o_urlhandler_subtitle_txt setStringValue: _NS("Note that these are system-wide settings.")];
+    [o_urlhandler_save_btn setTitle: _NS("Save")];
+    [o_urlhandler_cancel_btn setTitle: _NS("Cancel")];
 
     /* interface */
     [o_intf_style_txt setStringValue: _NS("Interface style")];
@@ -1150,6 +1157,87 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
 - (void)showInputSettings
 {
     [self showSettingsForCategory: o_input_view];
+}
+
+- (NSString *)bundleIdentifierForApplicationName:(NSString *)appName
+{
+    NSWorkspace * workspace = [NSWorkspace sharedWorkspace];
+    NSString * appPath = [workspace fullPathForApplication:appName];
+    if (appPath) {
+        NSBundle * appBundle = [NSBundle bundleWithPath:appPath];
+        return [appBundle bundleIdentifier];
+    }
+    return nil;
+}
+
+- (NSString *)applicationNameForBundleIdentifier:(NSString *)bundleIdentifier
+{
+    return [[[NSFileManager defaultManager] displayNameAtPath:[[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:bundleIdentifier]] stringByDeletingPathExtension];
+}
+
+- (NSImage *)iconForBundleIdentifier:(NSString *)bundleIdentifier
+{
+    NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+    NSSize iconSize = NSMakeSize(16., 16.);
+    NSImage *icon = [workspace iconForFile:[workspace absolutePathForAppBundleWithIdentifier:bundleIdentifier]];
+    [icon setSize:iconSize];
+    return icon;
+}
+
+- (IBAction)urlHandlerAction:(id)sender
+{
+    NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+
+    if (sender == o_input_urlhandler_btn) {
+        NSArray *handlers;
+        NSString *handler;
+        NSString *rawhandler;
+        NSMutableArray *rawHandlers;
+
+#define fillUrlHandlerPopup( protocol, object ) \
+        handlers = (NSArray *)LSCopyAllHandlersForURLScheme(CFSTR( protocol )); \
+        rawHandlers = [[NSMutableArray alloc] init]; \
+        [object removeAllItems]; \
+        for (NSUInteger x = 0; x < [handlers count]; x++) { \
+            rawhandler = [handlers objectAtIndex:x]; \
+            handler = [self applicationNameForBundleIdentifier:rawhandler]; \
+            if (handler && ![handler isEqualToString:@""]) { \
+                [object addItemWithTitle:handler]; \
+                [[object lastItem] setImage: [self iconForBundleIdentifier:[handlers objectAtIndex:x]]]; \
+                [rawHandlers addObject: rawhandler]; \
+            } \
+        } \
+        [object selectItemAtIndex: [rawHandlers indexOfObject:(id)LSCopyDefaultHandlerForURLScheme(CFSTR( protocol ))]]; \
+        [rawHandlers release]
+
+        fillUrlHandlerPopup( "ftp", o_urlhandler_ftp_pop);
+        fillUrlHandlerPopup( "mms", o_urlhandler_mms_pop);
+        fillUrlHandlerPopup( "rtmp", o_urlhandler_rtmp_pop);
+        fillUrlHandlerPopup( "rtp", o_urlhandler_rtp_pop);
+        fillUrlHandlerPopup( "rtsp", o_urlhandler_rtsp_pop);
+        fillUrlHandlerPopup( "sftp", o_urlhandler_sftp_pop);
+        fillUrlHandlerPopup( "smb", o_urlhandler_smb_pop);
+        fillUrlHandlerPopup( "udp", o_urlhandler_udp_pop);
+
+#undef fillUrlHandlerPopup
+
+        [NSApp beginSheet:o_urlhandler_win modalForWindow:o_sprefs_win modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    } else {
+        [o_urlhandler_win orderOut:sender];
+        [NSApp endSheet: o_urlhandler_win];
+
+        if (sender == o_urlhandler_save_btn) {
+            LSSetDefaultHandlerForURLScheme(CFSTR("ftp"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_ftp_pop selectedItem] title]]);
+            LSSetDefaultHandlerForURLScheme(CFSTR("mms"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_mms_pop selectedItem] title]]);
+            LSSetDefaultHandlerForURLScheme(CFSTR("mmsh"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_mms_pop selectedItem] title]]);
+            LSSetDefaultHandlerForURLScheme(CFSTR("rtmp"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_rtmp_pop selectedItem] title]]);
+            LSSetDefaultHandlerForURLScheme(CFSTR("rtp"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_rtp_pop selectedItem] title]]);
+            LSSetDefaultHandlerForURLScheme(CFSTR("rtsp"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_rtsp_pop selectedItem] title]]);
+            LSSetDefaultHandlerForURLScheme(CFSTR("sftp"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_sftp_pop selectedItem] title]]);
+            LSSetDefaultHandlerForURLScheme(CFSTR("smb"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_smb_pop selectedItem] title]]);
+            LSSetDefaultHandlerForURLScheme(CFSTR("udp"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_udp_pop selectedItem] title]]);
+        }
+    }
 }
 
 #pragma mark -

@@ -1,7 +1,7 @@
 /*****************************************************************************
 * simple_prefs.h: Simple Preferences for Mac OS X
 *****************************************************************************
-* Copyright (C) 2008-2012 VLC authors and VideoLAN
+* Copyright (C) 2008-2013 VLC authors and VideoLAN
 * $Id$
 *
 * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
@@ -84,6 +84,7 @@
     IBOutlet id o_input_skipLoop_txt;
     IBOutlet id o_input_skipLoop_pop;
     IBOutlet id o_input_mkv_preload_dir_ckb;
+    IBOutlet id o_input_urlhandler_btn;
     IBOutlet id o_input_view;
 
     IBOutlet id o_intf_style_txt;
@@ -164,6 +165,20 @@
     IBOutlet id o_video_video_box;
     IBOutlet id o_video_view;
 
+    IBOutlet id o_urlhandler_title_txt;
+    IBOutlet id o_urlhandler_subtitle_txt;
+    IBOutlet id o_urlhandler_save_btn;
+    IBOutlet id o_urlhandler_cancel_btn;
+    IBOutlet id o_urlhandler_ftp_pop;
+    IBOutlet id o_urlhandler_mms_pop;
+    IBOutlet id o_urlhandler_rtmp_pop;
+    IBOutlet id o_urlhandler_rtp_pop;
+    IBOutlet id o_urlhandler_rtsp_pop;
+    IBOutlet id o_urlhandler_sftp_pop;
+    IBOutlet id o_urlhandler_smb_pop;
+    IBOutlet id o_urlhandler_udp_pop;
+    IBOutlet id o_urlhandler_win;
+
     BOOL b_audioSettingChanged;
     BOOL b_intfSettingChanged;
     BOOL b_videoSettingChanged;
@@ -223,6 +238,7 @@
 /* input & codecs */
 - (IBAction)inputSettingChanged:(id)sender;
 - (void)showInputSettings;
+- (IBAction)urlHandlerAction:(id)sender;
 
 /* hotkeys */
 - (IBAction)hotkeySettingChanged:(id)sender;
