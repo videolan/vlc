@@ -1,6 +1,6 @@
 # libvpx
 
-VPX_VERSION := v1.0.0
+VPX_VERSION := v1.1.0
 VPX_URL := http://webm.googlecode.com/files/libvpx-$(VPX_VERSION).tar.bz2
 
 $(TARBALLS)/libvpx-$(VPX_VERSION).tar.bz2:
