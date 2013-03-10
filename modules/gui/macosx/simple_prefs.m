@@ -209,7 +209,7 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     [o_input_httpproxypwd_txt setStringValue: _NS("Password for HTTP Proxy")];
     [o_input_mux_box setTitle: _NS("Codecs / Muxers")];
     [o_input_net_box setTitle: _NS("Network")];
-    [o_input_avcodec_hw_ckb setTitle: _NS("Hardware Acceleration")];
+    [o_input_avcodec_hw_txt setStringValue: _NS("Hardware Acceleration")];
     [o_input_postproc_txt setStringValue: _NS("Post-Processing Quality")];
     [o_input_rtsp_ckb setTitle: _NS("Use RTP over RTSP (TCP)")];
     [o_input_skipLoop_txt setStringValue: _NS("Skip the loop filter for H.264 decoding")];
@@ -552,11 +552,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     [self setupField: o_input_httpproxypwd_sfld forOption:"http-proxy-pwd"];
     [o_input_postproc_fld setIntValue: config_GetInt(p_intf, "postproc-q")];
     [o_input_postproc_fld setToolTip: _NS(config_GetLabel(p_intf, "postproc-q"))];
-    if (config_GetPsz(p_intf,"avcodec-hw"))
-        [o_input_avcodec_hw_ckb setState: !strcmp(config_GetPsz(p_intf,"avcodec-hw"), "vdadecoder")];
-    else
-        [o_input_avcodec_hw_ckb setState: NSOffState];
-    [o_input_avcodec_hw_ckb setToolTip: _NS(config_GetLabel(p_intf,"avcodec-hw") ?: "")];
+    [self setupButton: o_input_avcodec_hw_pop forModuleList: "avcodec-hw"];
 
     [self setupButton: o_input_avi_pop forIntList: "avi-index"];
 
@@ -893,10 +889,7 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
         SaveIntList(o_input_avi_pop, "avi-index");
 
         config_PutInt(p_intf, "rtsp-tcp", [o_input_rtsp_ckb state]);
-        if ([o_input_avcodec_hw_ckb state])
-            config_PutPsz(p_intf, "avcodec-hw", "vdadecoder");
-        else
-            config_PutPsz(p_intf, "avcodec-hw", "");
+        SaveModuleList(o_input_avcodec_hw_pop, "avcodec-hw");
         SaveIntList(o_input_skipLoop_pop, "avcodec-skiploopfilter");
 
         config_PutInt(p_intf, "mkv-preload-local-dir", [o_input_mkv_preload_dir_ckb state]);
