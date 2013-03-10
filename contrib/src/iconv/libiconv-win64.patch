@@ -1281,3 +1281,13 @@ diff -ruN libiconv/lib/iconv.c libiconv.new/lib/iconv.c
            void **chain = &mmalloca_results[slot];
            for (; *chain != NULL;)
              {
+--- iconv.new/srclib/malloca.h	2011-08-07 15:42:06.000000000 +0200
++++ iconv/srclib/malloca.h	2013-03-10 12:50:30.804222836 +0100
+@@ -22,6 +22,7 @@
+ #include <alloca.h>
+ #include <stddef.h>
+ #include <stdlib.h>
++#include <stdint.h>
+ 
+ 
+ #ifdef __cplusplus
