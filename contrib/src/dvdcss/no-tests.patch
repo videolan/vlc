@@ -1,8 +1,0 @@
---- dvdcss/Makefile.am.orig	2011-11-22 22:10:24.956672889 -0500
-+++ dvdcss/Makefile.am	2011-11-22 22:10:29.856697179 -0500
-@@ -1,4 +1,4 @@
--SUBDIRS = src test doc
-+SUBDIRS = src
- DIST_SUBDIRS = $(SUBDIRS)
- 
- EXTRA_DIST = libdvdcss.spec bootstrap
