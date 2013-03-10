@@ -1,7 +1,7 @@
 # GnuTLS
 
-GNUTLS_VERSION := 2.12.20
-GNUTLS_URL := http://ftp.gnu.org/pub/gnu/gnutls/gnutls-$(GNUTLS_VERSION).tar.bz2
+GNUTLS_VERSION := 2.12.23
+GNUTLS_URL := ftp://ftp.gnutls.org/gcrypt/gnutls/v2.12/gnutls-$(GNUTLS_VERSION).tar.bz2
 
 PKGS += gnutls
 ifeq ($(call need_pkg,"gnutls >= 2.0.0"),)
