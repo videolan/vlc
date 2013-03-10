@@ -350,7 +350,7 @@
             [self setSoutMRL:o_sout_options];
             return;
         } else
-                [o_mrl_string appendFormat: @"std{access=file{no-overwrite},mux=%@,dst=\"%@\"}", o_mux_string, [o_file_field stringValue]];
+                [o_mrl_string appendFormat: @"standard{mux=%@,access=file{no-overwrite},dst=\"%@\"}", o_mux_string, [o_file_field stringValue]];
     }
     else if ([o_mode isEqualToString: _NS("Stream")]) {
         o_mode = [o_stream_type titleOfSelectedItem];
@@ -389,7 +389,7 @@
             }
 
             [o_mrl_string appendFormat:
-                        @"std{access=%@,mux=%@,dst=%@%@}",
+                        @"standard{mux=%@,access=%@,dst=%@%@}",
                         o_mode, o_mux_string, o_finalStreamAddress, o_announce];
         } else {
             NSString * o_stream_name;
@@ -412,7 +412,7 @@
                 [o_announce appendFormat:@",sdp=\"file://%@\"",[o_sdp_url stringValue]];
 
             [o_mrl_string appendFormat:
-                        @"rtp{dst=\"%@\",port=%@%@%@}",[o_stream_address stringValue],
+                        @"rtp{mux=ts,dst=\"%@\",port=%@%@%@}",[o_stream_address stringValue],
                         [o_stream_port stringValue], o_stream_name, o_announce];
         }
 
@@ -461,8 +461,7 @@
     [o_save_panel setNameFieldStringValue: o_name];
 
     if ([o_save_panel runModal] == NSFileHandlingPanelOKButton) {
-        NSString *o_filename = [[o_save_panel URL] path];
-        [o_file_field setStringValue: o_filename];
+        [o_file_field setStringValue: [[o_save_panel URL] path]];
         [self outputInfoChanged: nil];
     }
 }
