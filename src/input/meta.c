@@ -40,9 +40,9 @@
 struct vlc_meta_t
 {
     char * ppsz_meta[VLC_META_TYPE_COUNT];
-    
+
     vlc_dictionary_t extra_tags;
-    
+
     int i_status;
 };
 
@@ -78,7 +78,7 @@ const char * vlc_meta_TypeToLocalizedString( vlc_meta_type_t meta_type )
 /**
  * vlc_meta contructor.
  * vlc_meta_Delete() will free the returned pointer.
- */ 
+ */
 vlc_meta_t *vlc_meta_New( void )
 {
     vlc_meta_t *m = (vlc_meta_t*)malloc( sizeof(*m) );
@@ -110,7 +110,7 @@ void vlc_meta_Delete( vlc_meta_t *m )
  * vlc_meta has two kinds of meta, the one in a table, and the one in a
  * dictionary.
  * FIXME - Why don't we merge those two?
- */ 
+ */
 
 void vlc_meta_Set( vlc_meta_t *p_meta, vlc_meta_type_t meta_type, const char *psz_val )
 {
@@ -168,10 +168,10 @@ void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
 {
     char **ppsz_all_keys;
     int i;
-    
+
     if( !dst || !src )
         return;
-    
+
     for( i = 0; i < VLC_META_TYPE_COUNT; i++ )
     {
         if( src->ppsz_meta[i] )
@@ -180,14 +180,14 @@ void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
             dst->ppsz_meta[i] = strdup( src->ppsz_meta[i] );
         }
     }
-    
+
     /* XXX: If speed up are needed, it is possible */
     ppsz_all_keys = vlc_dictionary_all_keys( &src->extra_tags );
     for( i = 0; ppsz_all_keys && ppsz_all_keys[i]; i++ )
     {
         /* Always try to remove the previous value */
         vlc_dictionary_remove_value_for_key( &dst->extra_tags, ppsz_all_keys[i], vlc_meta_FreeExtraKey, NULL );
-        
+
         void *p_value = vlc_dictionary_value_for_key( &src->extra_tags, ppsz_all_keys[i] );
         vlc_dictionary_insert( &dst->extra_tags, ppsz_all_keys[i], strdup( (const char*)p_value ) );
         free( ppsz_all_keys[i] );
