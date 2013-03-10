@@ -1193,12 +1193,14 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
         NSString *handler;
         NSString *rawhandler;
         NSMutableArray *rawHandlers;
+        NSUInteger count;
 
 #define fillUrlHandlerPopup( protocol, object ) \
         handlers = (NSArray *)LSCopyAllHandlersForURLScheme(CFSTR( protocol )); \
         rawHandlers = [[NSMutableArray alloc] init]; \
         [object removeAllItems]; \
-        for (NSUInteger x = 0; x < [handlers count]; x++) { \
+        count = [handlers count]; \
+        for (NSUInteger x = 0; x < count; x++) { \
             rawhandler = [handlers objectAtIndex:x]; \
             handler = [self applicationNameForBundleIdentifier:rawhandler]; \
             if (handler && ![handler isEqualToString:@""]) { \
