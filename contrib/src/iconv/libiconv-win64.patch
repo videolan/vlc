@@ -1,7 +1,26 @@
-diff -ruN libiconv/lib/aliases.h libiconv.new/lib/aliases.h
---- libiconv/lib/aliases.h	2009-06-30 22:51:58.000000000 +0200
-+++ libiconv.new/lib/aliases.h	2009-09-02 23:20:33.000000000 +0200
-@@ -808,852 +808,852 @@
+diff -ruN libiconv/lib/iconv.c libiconv.new/lib/iconv.c
+--- libiconv/lib/iconv.c	2009-06-21 13:17:33.000000000 +0200
++++ libiconv.new/lib/iconv.c	2009-09-02 23:24:06.000000000 +0200
+@@ -21,6 +21,7 @@
+ #include <iconv.h>
+ 
+ #include <stdlib.h>
++#include <stdint.h>
+ #include <string.h>
+ #include "config.h"
+ #include "localcharset.h"
+@@ -168,7 +169,7 @@
+ };
+ #define stringpool2 ((const char *) &stringpool2_contents)
+ static const struct alias sysdep_aliases[] = {
+-#define S(tag,name,encoding_index) { (int)(long)&((struct stringpool2_t *)0)->stringpool_##tag, encoding_index },
++#define S(tag,name,encoding_index) { (int)(intptr_t)&((struct stringpool2_t *)0)->stringpool_##tag, encoding_index },
+ #include "aliases2.h"
+ #undef S
+ };
+--- iconv/lib/aliases.h.orig	2013-03-10 12:13:55.861853467 +0100
++++ iconv.new/lib/aliases.h	2013-03-10 12:12:46.810972684 +0100
+@@ -810,852 +810,852 @@
    {
      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
  #line 308 "lib/aliases.gperf"
@@ -15,7 +34,7 @@ diff -ruN libiconv/lib/aliases.h libiconv.new/lib/aliases.h
  #line 209 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str11, ei_cp1131},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str11, ei_cp1131},
- #line 353 "lib/aliases.gperf"
+ #line 354 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str12, ei_johab},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str12, ei_johab},
  #line 207 "lib/aliases.gperf"
@@ -177,7 +196,7 @@ diff -ruN libiconv/lib/aliases.h libiconv.new/lib/aliases.h
  #line 114 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str90, ei_iso8859_8},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str90, ei_iso8859_8},
- #line 350 "lib/aliases.gperf"
+ #line 351 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str91, ei_cp949},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str91, ei_cp949},
  #line 54 "lib/aliases.gperf"
@@ -335,7 +354,7 @@ diff -ruN libiconv/lib/aliases.h libiconv.new/lib/aliases.h
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str154, ei_iso8859_14},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str154, ei_iso8859_14},
      {-1},
- #line 351 "lib/aliases.gperf"
+ #line 352 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str156, ei_cp949},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str156, ei_cp949},
  #line 199 "lib/aliases.gperf"
@@ -571,11 +590,11 @@ diff -ruN libiconv/lib/aliases.h libiconv.new/lib/aliases.h
  #line 298 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str270, ei_ksc5601},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str270, ei_ksc5601},
- #line 356 "lib/aliases.gperf"
+ #line 357 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str271, ei_local_char},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str271, ei_local_char},
      {-1},
- #line 348 "lib/aliases.gperf"
+ #line 349 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str273, ei_euc_kr},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str273, ei_euc_kr},
      {-1}, {-1}, {-1},
@@ -603,7 +622,7 @@ diff -ruN libiconv/lib/aliases.h libiconv.new/lib/aliases.h
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str287, ei_ascii},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str287, ei_ascii},
      {-1}, {-1},
- #line 347 "lib/aliases.gperf"
+ #line 348 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str290, ei_euc_kr},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str290, ei_euc_kr},
      {-1}, {-1},
@@ -671,7 +690,7 @@ diff -ruN libiconv/lib/aliases.h libiconv.new/lib/aliases.h
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str330, ei_iso646_jp},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str330, ei_iso646_jp},
      {-1}, {-1}, {-1},
- #line 355 "lib/aliases.gperf"
+ #line 356 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str334, ei_iso2022_kr},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str334, ei_iso2022_kr},
      {-1},
@@ -718,7 +737,7 @@ diff -ruN libiconv/lib/aliases.h libiconv.new/lib/aliases.h
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str359, ei_iso8859_6},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str359, ei_iso8859_6},
      {-1}, {-1},
- #line 354 "lib/aliases.gperf"
+ #line 355 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str362, ei_iso2022_kr},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str362, ei_iso2022_kr},
  #line 34 "lib/aliases.gperf"
@@ -844,7 +863,7 @@ diff -ruN libiconv/lib/aliases.h libiconv.new/lib/aliases.h
  #line 196 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str424, ei_cp1258},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str424, ei_cp1258},
- #line 349 "lib/aliases.gperf"
+ #line 350 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str425, ei_euc_kr},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str425, ei_euc_kr},
  #line 297 "lib/aliases.gperf"
@@ -978,9 +997,9 @@ diff -ruN libiconv/lib/aliases.h libiconv.new/lib/aliases.h
  #line 81 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str509, ei_iso8859_4},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str509, ei_iso8859_4},
- #line 345 "lib/aliases.gperf"
--    {(int)(long)&((struct stringpool_t *)0)->stringpool_str510, ei_big5hkscs2004},
-+    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str510, ei_big5hkscs2004},
+ #line 346 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str510, ei_big5hkscs2008},
++    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str510, ei_big5hkscs2008},
      {-1}, {-1}, {-1}, {-1},
  #line 99 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str515, ei_iso8859_6},
@@ -994,9 +1013,9 @@ diff -ruN libiconv/lib/aliases.h libiconv.new/lib/aliases.h
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str525, ei_ces_big5},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str525, ei_ces_big5},
      {-1},
- #line 344 "lib/aliases.gperf"
--    {(int)(long)&((struct stringpool_t *)0)->stringpool_str527, ei_big5hkscs2004},
-+    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str527, ei_big5hkscs2004},
+ #line 345 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str527, ei_big5hkscs2008},
++    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str527, ei_big5hkscs2008},
      {-1}, {-1}, {-1},
  #line 214 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str531, ei_mac_centraleurope},
@@ -1137,7 +1156,7 @@ diff -ruN libiconv/lib/aliases.h libiconv.new/lib/aliases.h
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str657, ei_jisx0208},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str657, ei_jisx0208},
      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
- #line 357 "lib/aliases.gperf"
+ #line 358 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str664, ei_local_wchar_t},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str664, ei_local_wchar_t},
      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
@@ -1179,7 +1198,7 @@ diff -ruN libiconv/lib/aliases.h libiconv.new/lib/aliases.h
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str765, ei_ucs4swapped},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str765, ei_ucs4swapped},
      {-1}, {-1},
- #line 352 "lib/aliases.gperf"
+ #line 353 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str768, ei_johab},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str768, ei_johab},
      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
@@ -1194,7 +1213,7 @@ diff -ruN libiconv/lib/aliases.h libiconv.new/lib/aliases.h
      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
-@@ -1661,28 +1661,28 @@
+@@ -1663,31 +1663,31 @@
      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
  #line 194 "lib/aliases.gperf"
@@ -1208,7 +1227,11 @@ diff -ruN libiconv/lib/aliases.h libiconv.new/lib/aliases.h
  #line 343 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str888, ei_big5hkscs2001},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str888, ei_big5hkscs2001},
-     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+ #line 347 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str896, ei_big5hkscs2008},
++    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str896, ei_big5hkscs2008},
+     {-1},
  #line 270 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str898, ei_jisx0201},
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str898, ei_jisx0201},
@@ -1223,58 +1246,38 @@ diff -ruN libiconv/lib/aliases.h libiconv.new/lib/aliases.h
      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
- #line 346 "lib/aliases.gperf"
+ #line 344 "lib/aliases.gperf"
 -    {(int)(long)&((struct stringpool_t *)0)->stringpool_str935, ei_big5hkscs2004}
 +    {(int)(intptr_t)&((struct stringpool_t *)0)->stringpool_str935, ei_big5hkscs2004}
    };
  
  #ifdef __GNUC__
-diff -ruN libiconv/lib/iconv.c libiconv.new/lib/iconv.c
---- libiconv/lib/iconv.c	2009-06-21 13:17:33.000000000 +0200
-+++ libiconv.new/lib/iconv.c	2009-09-02 23:24:06.000000000 +0200
-@@ -21,6 +21,7 @@
- #include <iconv.h>
- 
- #include <stdlib.h>
-+#include <stdint.h>
- #include <string.h>
- #include "config.h"
- #include "localcharset.h"
-@@ -168,7 +169,7 @@
- };
- #define stringpool2 ((const char *) &stringpool2_contents)
- static const struct alias sysdep_aliases[] = {
--#define S(tag,name,encoding_index) { (int)(long)&((struct stringpool2_t *)0)->stringpool_##tag, encoding_index },
-+#define S(tag,name,encoding_index) { (int)(intptr_t)&((struct stringpool2_t *)0)->stringpool_##tag, encoding_index },
- #include "aliases2.h"
- #undef S
- };
---- libiconv/srclib/malloca.c	2009-06-21 13:31:08.000000000 +0200
-+++ libiconv.new/srclib/malloca.c	2009-09-03 00:02:20.000000000 +0200
-@@ -75,7 +75,7 @@
+--- iconv/srclib/malloca.c.orig	2013-03-10 12:16:34.030538010 +0100
++++ iconv/srclib/malloca.c	2013-03-10 12:16:32.980524613 +0100
+@@ -77,7 +77,7 @@
  
        if (p != NULL)
- 	{
--	  size_t slot;
-+	  uintptr_t slot;
+         {
+-          size_t slot;
++          uintptr_t slot;
  
- 	  p += HEADER_SIZE;
+           p += HEADER_SIZE;
  
-@@ -83,7 +83,7 @@
- 	  ((int *) p)[-1] = MAGIC_NUMBER;
+@@ -85,7 +85,7 @@
+           ((int *) p)[-1] = MAGIC_NUMBER;
  
- 	  /* Enter p into the hash table.  */
--	  slot = (unsigned long) p % HASH_TABLE_SIZE;
-+	  slot = (uintptr_t) p % HASH_TABLE_SIZE;
- 	  ((struct header *) (p - HEADER_SIZE))->next = mmalloca_results[slot];
- 	  mmalloca_results[slot] = p;
+           /* Enter p into the hash table.  */
+-          slot = (unsigned long) p % HASH_TABLE_SIZE;
++          slot = (uintptr_t) p % HASH_TABLE_SIZE;
+           ((struct header *) (p - HEADER_SIZE))->next = mmalloca_results[slot];
+           mmalloca_results[slot] = p;
  
-@@ -116,7 +116,7 @@
- 	{
- 	  /* Looks like a mmalloca() result.  To see whether it really is one,
- 	     perform a lookup in the hash table.  */
--	  size_t slot = (unsigned long) p % HASH_TABLE_SIZE;
-+	  uintptr_t slot = (uintptr_t) p % HASH_TABLE_SIZE;
- 	  void **chain = &mmalloca_results[slot];
- 	  for (; *chain != NULL;)
- 	    {
+@@ -118,7 +118,7 @@
+         {
+           /* Looks like a mmalloca() result.  To see whether it really is one,
+              perform a lookup in the hash table.  */
+-          size_t slot = (unsigned long) p % HASH_TABLE_SIZE;
++          uintptr_t slot = (uintptr_t) p % HASH_TABLE_SIZE;
+           void **chain = &mmalloca_results[slot];
+           for (; *chain != NULL;)
+             {

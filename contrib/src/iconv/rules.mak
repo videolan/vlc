@@ -1,5 +1,5 @@
 # libiconv
-LIBICONV_VERSION=1.13.1
+LIBICONV_VERSION=1.14
 LIBICONV_URL=$(GNU)/libiconv/libiconv-$(LIBICONV_VERSION).tar.gz
 
 PKGS += iconv
