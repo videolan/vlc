@@ -59,6 +59,7 @@ int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
     if (unlikely(res == -1))
         return -1;
 
+#if !defined(WINAPI_FAMILY_APP)
     /* Writing to the console is a lot of fun on Microsoft Windows.
      * If you use the standard I/O functions, you must use the OEM code page,
      * which is different from the usual ANSI code page. Or maybe not, if the
@@ -79,6 +80,7 @@ int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
                 goto out;
         }
     }
+#endif
 
     char *ansi = ToANSI (str);
     if (ansi != NULL)
