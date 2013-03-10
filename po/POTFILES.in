@@ -152,7 +152,6 @@ src/stream_output/stream_output.h
 src/text/iso-639_def.h
 src/version.c
 src/video_output/interlacing.c
-src/video_output/postprocessing.c
 src/video_output/video_output.c
 src/video_output/video_text.c
 src/video_output/video_widgets.c
@@ -345,7 +344,6 @@ modules/codec/avcodec/audio.c
 modules/codec/avcodec/avcodec.c
 modules/codec/avcodec/avcodec.h
 modules/codec/avcodec/chroma.c
-modules/codec/avcodec/deinterlace.c
 modules/codec/avcodec/dxva2.c
 modules/codec/avcodec/encoder.c
 modules/codec/avcodec/fourcc.c
@@ -950,11 +948,7 @@ modules/misc/playlist/m3u.c
 modules/misc/playlist/xspf.c
 modules/misc/rtsp.c
 modules/misc/sqlite.c
-modules/misc/stats/decoder.c
-modules/misc/stats/demux.c
-modules/misc/stats/encoder.c
-modules/misc/stats/stats.c
-modules/misc/stats/stats.h
+modules/misc/stats.c
 modules/misc/xml/libxml.c
 modules/mux/asf.c
 modules/mux/avi.c
