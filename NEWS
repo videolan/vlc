@@ -132,7 +132,10 @@ OS X Interface:
  * improve fullscreen controller time slider with larger click target
  * rewrite of minimal macosx module for use within VLCKit
  * add support for 'macosx-autoplay' to the Apple Event / Apple Script bindings
-   when adding new inputs
+   when adding new inputs - this also affects network streams opened through
+   3rd party applications
+ * add a UI to the preferences dialog to configure the default application
+   handler for ftp, mms, rtmp, rtp, rtsp, sftp, smb and udp streams
  * The Streaming/Transcoding wizard and the open dialog's output panel are
    deprecated now
 
