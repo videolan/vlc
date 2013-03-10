@@ -1,5 +1,5 @@
 # FRIBIDI
-FRIBIDI_VERSION := 0.19.4
+FRIBIDI_VERSION := 0.19.5
 FRIBIDI_URL := http://fribidi.org/download/fribidi-$(FRIBIDI_VERSION).tar.bz2
 
 PKGS += fribidi
