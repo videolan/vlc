@@ -932,10 +932,10 @@ static int InputCallback( vlc_object_t *p_this, const char *psz_var,
             break;
         case INPUT_EVENT_ITEM_META:
             p_info->signal = SIGNAL_INPUT_METADATA;
-            return VLC_SUCCESS;
+            break;
         case INPUT_EVENT_RATE:
             p_info->signal = SIGNAL_RATE;
-            return VLC_SUCCESS;
+            break;
         case INPUT_EVENT_POSITION:
         {
             mtime_t i_now = mdate(), i_pos, i_projected_pos, i_interval;
