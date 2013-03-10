@@ -680,7 +680,7 @@ static mtime_t mdate_wall (void)
     FILETIME ts;
     ULARGE_INTEGER s;
 
-#if (_WIN32_WINNT >= 0x0602)
+#if (_WIN32_WINNT >= 0x0602) && !defined(WINAPI_FAMILY_APP)
     GetSystemTimePreciseAsFileTime (&ts);
 #else
     GetSystemTimeAsFileTime (&ts);
