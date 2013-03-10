@@ -1005,6 +1005,7 @@ static void RebuildDeviceList(audio_output_t * p_aout)
             free(device);
         }
     }
+    p_sys->devices = NULL;
 
     /* Get number of devices */
     AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
