@@ -1,6 +1,6 @@
 # jpeg
 
-JPEG_VERSION := 8d
+JPEG_VERSION := 9
 JPEG_URL := http://www.ijg.org/files/jpegsrc.v$(JPEG_VERSION).tar.gz
 
 $(TARBALLS)/jpegsrc.v$(JPEG_VERSION).tar.gz:
