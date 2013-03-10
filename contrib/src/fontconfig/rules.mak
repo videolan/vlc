@@ -1,6 +1,6 @@
 # fontconfig
 
-FONTCONFIG_VERSION := 2.8.0
+FONTCONFIG_VERSION := 2.10.2
 FONTCONFIG_URL := http://fontconfig.org/release/fontconfig-$(FONTCONFIG_VERSION).tar.gz
 
 PKGS += fontconfig
@@ -15,7 +15,6 @@ $(TARBALLS)/fontconfig-$(FONTCONFIG_VERSION).tar.gz:
 
 fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz .sum-fontconfig
 	$(UNPACK)
-	$(APPLY) $(SRC)/fontconfig/fontconfig-march.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/fontconfig/fontconfig-win32.patch
 	$(APPLY) $(SRC)/fontconfig/fontconfig-noxml2.patch

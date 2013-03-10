@@ -69,15 +69,15 @@
 diff -ruN fontconfig/src/fcxml.c fontconfig.new/src/fcxml.c
 --- fontconfig/src/fcxml.c	2009-08-13 16:08:49.000000000 +0200
 +++ fontconfig.new/src/fcxml.c	2009-08-19 00:03:35.000000000 +0200
-@@ -2466,13 +2466,18 @@
+@@ -2850,6 +2850,7 @@
  bail0:
      return ret || !complain;
  }
 +#endif
-+
  
- FcBool
- FcConfigParseAndLoad (FcConfig	    *config,
+ #ifdef _WIN32
+ pfnGetSystemWindowsDirectory pGetSystemWindowsDirectory = NULL;
+@@ -2861,7 +2862,10 @@
  		      const FcChar8 *name,
  		      FcBool	    complain)
  {
