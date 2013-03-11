@@ -1565,33 +1565,14 @@ static OMX_ERRORTYPE OmxEventHandler( OMX_HANDLETYPE omx_handle,
     unsigned int i;
     (void)omx_handle;
 
+    PrintOmxEvent((vlc_object_t *) p_dec, event, data_1, data_2, event_data);
     switch (event)
     {
-    case OMX_EventCmdComplete:
-        switch ((OMX_STATETYPE)data_1)
-        {
-        case OMX_CommandStateSet:
-            msg_Dbg( p_dec, "OmxEventHandler (%s, %s, %s)", EventToString(event),
-                     CommandToString(data_1), StateToString(data_2) );
-            break;
-
-        default:
-            msg_Dbg( p_dec, "OmxEventHandler (%s, %s, %u)", EventToString(event),
-                     CommandToString(data_1), (unsigned int)data_2 );
-            break;
-        }
-        break;
-
     case OMX_EventError:
-        msg_Dbg( p_dec, "OmxEventHandler (%s, %s, %u, %s)", EventToString(event),
-                 ErrorToString((OMX_ERRORTYPE)data_1), (unsigned int)data_2,
-                 (const char *)event_data);
         //p_sys->b_error = true;
         break;
 
     case OMX_EventPortSettingsChanged:
-        msg_Dbg( p_dec, "OmxEventHandler (%s, %u, %u)", EventToString(event),
-                 (unsigned int)data_1, (unsigned int)data_2 );
         if( data_2 == 0 || data_2 == OMX_IndexParamPortDefinition )
         {
             OMX_BUFFERHEADERTYPE *sentinel;
@@ -1617,8 +1598,6 @@ static OMX_ERRORTYPE OmxEventHandler( OMX_HANDLETYPE omx_handle,
         break;
 
     default:
-        msg_Dbg( p_dec, "OmxEventHandler (%s, %u, %u)", EventToString(event),
-                 (unsigned int)data_1, (unsigned int)data_2 );
         break;
     }
 

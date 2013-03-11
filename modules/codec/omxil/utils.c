@@ -116,6 +116,39 @@ OMX_ERRORTYPE WaitForSpecificOmxEvent(decoder_t *p_dec,
     return OMX_ErrorNone;
 }
 
+void PrintOmxEvent(vlc_object_t *p_this, OMX_EVENTTYPE event, OMX_U32 data_1,
+    OMX_U32 data_2, OMX_PTR event_data)
+{
+    switch (event)
+    {
+    case OMX_EventCmdComplete:
+        switch ((OMX_STATETYPE)data_1)
+        {
+        case OMX_CommandStateSet:
+            msg_Dbg( p_this, "OmxEventHandler (%s, %s, %s)", EventToString(event),
+                     CommandToString(data_1), StateToString(data_2) );
+            break;
+
+        default:
+            msg_Dbg( p_this, "OmxEventHandler (%s, %s, %u)", EventToString(event),
+                     CommandToString(data_1), (unsigned int)data_2 );
+            break;
+        }
+        break;
+
+    case OMX_EventError:
+        msg_Dbg( p_this, "OmxEventHandler (%s, %s, %u, %s)", EventToString(event),
+                 ErrorToString((OMX_ERRORTYPE)data_1), (unsigned int)data_2,
+                 (const char *)event_data);
+        break;
+
+    default:
+        msg_Dbg( p_this, "OmxEventHandler (%s, %u, %u)", EventToString(event),
+                 (unsigned int)data_1, (unsigned int)data_2 );
+        break;
+    }
+}
+
 /*****************************************************************************
  * Picture utility functions
  *****************************************************************************/

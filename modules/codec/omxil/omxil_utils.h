@@ -158,6 +158,8 @@ OMX_ERRORTYPE WaitForOmxEvent(decoder_t *p_dec, OMX_EVENTTYPE *event,
 OMX_ERRORTYPE WaitForSpecificOmxEvent(decoder_t *p_dec,
     OMX_EVENTTYPE specific_event, OMX_U32 *data_1, OMX_U32 *data_2,
     OMX_PTR *event_data);
+void PrintOmxEvent(vlc_object_t *p_this, OMX_EVENTTYPE event, OMX_U32 data_1,
+    OMX_U32 data_2, OMX_PTR event_data);
 
 /*****************************************************************************
  * Picture utility functions
