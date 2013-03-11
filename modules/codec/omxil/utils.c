@@ -40,10 +40,22 @@
 /*****************************************************************************
  * Events utility functions
  *****************************************************************************/
-OMX_ERRORTYPE PostOmxEvent(decoder_t *p_dec, OMX_EVENTTYPE event,
+void InitOmxEventQueue(OmxEventQueue *queue)
+{
+    queue->pp_last_event = &queue->p_events;
+    vlc_mutex_init(&queue->mutex);
+    vlc_cond_init(&queue->cond);
+}
+
+void DeinitOmxEventQueue(OmxEventQueue *queue)
+{
+    vlc_mutex_destroy(&queue->mutex);
+    vlc_cond_destroy(&queue->cond);
+}
+
+OMX_ERRORTYPE PostOmxEvent(OmxEventQueue *queue, OMX_EVENTTYPE event,
     OMX_U32 data_1, OMX_U32 data_2, OMX_PTR event_data)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
     OmxEvent *p_event;
 
     p_event = malloc(sizeof(OmxEvent));
@@ -55,33 +67,32 @@ OMX_ERRORTYPE PostOmxEvent(decoder_t *p_dec, OMX_EVENTTYPE event,
     p_event->event_data = event_data;
     p_event->next = 0;
 
-    vlc_mutex_lock(&p_sys->mutex);
-    *p_sys->pp_last_event = p_event;
-    p_sys->pp_last_event = &p_event->next;
-    vlc_cond_signal(&p_sys->cond);
-    vlc_mutex_unlock(&p_sys->mutex);
+    vlc_mutex_lock(&queue->mutex);
+    *queue->pp_last_event = p_event;
+    queue->pp_last_event = &p_event->next;
+    vlc_cond_signal(&queue->cond);
+    vlc_mutex_unlock(&queue->mutex);
     return OMX_ErrorNone;
 }
 
-OMX_ERRORTYPE WaitForOmxEvent(decoder_t *p_dec, OMX_EVENTTYPE *event,
+OMX_ERRORTYPE WaitForOmxEvent(OmxEventQueue *queue, OMX_EVENTTYPE *event,
     OMX_U32 *data_1, OMX_U32 *data_2, OMX_PTR *event_data)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
     OmxEvent *p_event;
 
-    vlc_mutex_lock(&p_sys->mutex);
+    vlc_mutex_lock(&queue->mutex);
 
-    if(!p_sys->p_events)
-        vlc_cond_timedwait(&p_sys->cond, &p_sys->mutex, mdate()+CLOCK_FREQ);
+    if(!queue->p_events)
+        vlc_cond_timedwait(&queue->cond, &queue->mutex, mdate()+CLOCK_FREQ);
 
-    p_event = p_sys->p_events;
+    p_event = queue->p_events;
     if(p_event)
     {
-        p_sys->p_events = p_event->next;
-        if(!p_sys->p_events) p_sys->pp_last_event = &p_sys->p_events;
+        queue->p_events = p_event->next;
+        if(!queue->p_events) queue->pp_last_event = &queue->p_events;
     }
 
-    vlc_mutex_unlock(&p_sys->mutex);
+    vlc_mutex_unlock(&queue->mutex);
 
     if(p_event)
     {
@@ -96,7 +107,7 @@ OMX_ERRORTYPE WaitForOmxEvent(decoder_t *p_dec, OMX_EVENTTYPE *event,
     return OMX_ErrorTimeout;
 }
 
-OMX_ERRORTYPE WaitForSpecificOmxEvent(decoder_t *p_dec,
+OMX_ERRORTYPE WaitForSpecificOmxEvent(OmxEventQueue *queue,
     OMX_EVENTTYPE specific_event, OMX_U32 *data_1, OMX_U32 *data_2,
     OMX_PTR *event_data)
 {
@@ -106,7 +117,7 @@ OMX_ERRORTYPE WaitForSpecificOmxEvent(decoder_t *p_dec,
 
     while(1)
     {
-        status = WaitForOmxEvent(p_dec, &event, data_1, data_2, event_data);
+        status = WaitForOmxEvent(queue, &event, data_1, data_2, event_data);
         if(status != OMX_ErrorNone) return status;
 
         if(event == specific_event) break;

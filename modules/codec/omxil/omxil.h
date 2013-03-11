@@ -81,11 +81,7 @@ struct decoder_sys_t
     char ppsz_components[MAX_COMPONENTS_LIST_SIZE][OMX_MAX_STRINGNAME_SIZE];
     unsigned int components;
 
-    struct OmxEvent *p_events;
-    struct OmxEvent **pp_last_event;
-
-    vlc_mutex_t mutex;
-    vlc_cond_t cond;
+    OmxEventQueue event_queue;
 
     OmxPort *p_ports;
     unsigned int ports;

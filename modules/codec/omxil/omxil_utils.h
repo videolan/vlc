@@ -151,11 +151,22 @@ typedef struct OmxEvent
     struct OmxEvent *next;
 } OmxEvent;
 
-OMX_ERRORTYPE PostOmxEvent(decoder_t *p_dec, OMX_EVENTTYPE event,
+typedef struct OmxEventQueue
+{
+    OmxEvent *p_events;
+    OmxEvent **pp_last_event;
+
+    vlc_mutex_t mutex;
+    vlc_cond_t cond;
+} OmxEventQueue;
+
+void InitOmxEventQueue(OmxEventQueue *queue);
+void DeinitOmxEventQueue(OmxEventQueue *queue);
+OMX_ERRORTYPE PostOmxEvent(OmxEventQueue *queue, OMX_EVENTTYPE event,
     OMX_U32 data_1, OMX_U32 data_2, OMX_PTR event_data);
-OMX_ERRORTYPE WaitForOmxEvent(decoder_t *p_dec, OMX_EVENTTYPE *event,
+OMX_ERRORTYPE WaitForOmxEvent(OmxEventQueue *queue, OMX_EVENTTYPE *event,
     OMX_U32 *data_1, OMX_U32 *data_2, OMX_PTR *event_data);
-OMX_ERRORTYPE WaitForSpecificOmxEvent(decoder_t *p_dec,
+OMX_ERRORTYPE WaitForSpecificOmxEvent(OmxEventQueue *queue,
     OMX_EVENTTYPE specific_event, OMX_U32 *data_1, OMX_U32 *data_2,
     OMX_PTR *event_data);
 void PrintOmxEvent(vlc_object_t *p_this, OMX_EVENTTYPE event, OMX_U32 data_1,

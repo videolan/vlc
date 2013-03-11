@@ -501,7 +501,7 @@ static OMX_ERRORTYPE DeinitialiseComponent(decoder_t *p_dec,
         CHECK_ERROR(omx_error, "OMX_CommandStateSet Idle failed (%x)", omx_error );
         while (1) {
             OMX_U32 cmd, state;
-            omx_error = WaitForSpecificOmxEvent(p_dec, OMX_EventCmdComplete, &cmd, &state, 0);
+            omx_error = WaitForSpecificOmxEvent(&p_sys->event_queue, OMX_EventCmdComplete, &cmd, &state, 0);
             CHECK_ERROR(omx_error, "Wait for Idle failed (%x)", omx_error );
             // The event queue can contain other OMX_EventCmdComplete items,
             // such as for OMX_CommandFlush
@@ -552,7 +552,7 @@ static OMX_ERRORTYPE DeinitialiseComponent(decoder_t *p_dec,
             }
         }
 
-        omx_error = WaitForSpecificOmxEvent(p_dec, OMX_EventCmdComplete, 0, 0, 0);
+        omx_error = WaitForSpecificOmxEvent(&p_sys->event_queue, OMX_EventCmdComplete, 0, 0, 0);
         CHECK_ERROR(omx_error, "Wait for Loaded failed (%x)", omx_error );
     }
 
@@ -704,7 +704,7 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
                                          p_port->i_port_index, NULL);
             CHECK_ERROR(omx_error, "OMX_CommandPortEnable on %i failed (%x)",
                         (int)p_port->i_port_index, omx_error );
-            omx_error = WaitForSpecificOmxEvent(p_dec, OMX_EventCmdComplete, 0, 0, 0);
+            omx_error = WaitForSpecificOmxEvent(&p_sys->event_queue, OMX_EventCmdComplete, 0, 0, 0);
             CHECK_ERROR(omx_error, "Wait for PortEnable on %i failed (%x)",
                         (int)p_port->i_port_index, omx_error );
         }
@@ -789,9 +789,7 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
         p_dec->fmt_out.i_codec = 0;
     }
     p_sys->b_enc = b_encode;
-    p_sys->pp_last_event = &p_sys->p_events;
-    vlc_mutex_init (&p_sys->mutex);
-    vlc_cond_init (&p_sys->cond);
+    InitOmxEventQueue(&p_sys->event_queue);
     vlc_mutex_init (&p_sys->in.fifo.lock);
     vlc_cond_init (&p_sys->in.fifo.wait);
     p_sys->in.fifo.offset = offsetof(OMX_BUFFERHEADERTYPE, pOutputPortPrivate) / sizeof(void *);
@@ -908,13 +906,13 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
                     omx_error, (int)p_port->i_port_index, j );
     }
 
-    omx_error = WaitForSpecificOmxEvent(p_dec, OMX_EventCmdComplete, 0, 0, 0);
+    omx_error = WaitForSpecificOmxEvent(&p_sys->event_queue, OMX_EventCmdComplete, 0, 0, 0);
     CHECK_ERROR(omx_error, "Wait for Idle failed (%x)", omx_error );
 
     omx_error = OMX_SendCommand( p_sys->omx_handle, OMX_CommandStateSet,
                                  OMX_StateExecuting, 0);
     CHECK_ERROR(omx_error, "OMX_CommandStateSet Executing failed (%x)", omx_error );
-    omx_error = WaitForSpecificOmxEvent(p_dec, OMX_EventCmdComplete, 0, 0, 0);
+    omx_error = WaitForSpecificOmxEvent(&p_sys->event_queue, OMX_EventCmdComplete, 0, 0, 0);
     CHECK_ERROR(omx_error, "Wait for Executing failed (%x)", omx_error );
 
     /* Send codec configuration data */
@@ -1053,7 +1051,7 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
     CHECK_ERROR(omx_error, "OMX_FreeBuffer failed (%x, %i, %i)",
                 omx_error, (int)p_port->i_port_index, i );
 
-    omx_error = WaitForSpecificOmxEvent(p_dec, OMX_EventCmdComplete, 0, 0, 0);
+    omx_error = WaitForSpecificOmxEvent(&p_sys->event_queue, OMX_EventCmdComplete, 0, 0, 0);
     CHECK_ERROR(omx_error, "Wait for PortDisable failed (%x)", omx_error );
 
     /* Get the new port definition */
@@ -1114,7 +1112,7 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
     CHECK_ERROR(omx_error, "OMX_UseBuffer failed (%x, %i, %i)",
                 omx_error, (int)p_port->i_port_index, i );
 
-    omx_error = WaitForSpecificOmxEvent(p_dec, OMX_EventCmdComplete, 0, 0, 0);
+    omx_error = WaitForSpecificOmxEvent(&p_sys->event_queue, OMX_EventCmdComplete, 0, 0, 0);
     CHECK_ERROR(omx_error, "Wait for PortEnable failed (%x)", omx_error );
 
     PrintOmx(p_dec, p_sys->omx_handle, p_dec->p_sys->in.i_port_index);
@@ -1543,8 +1541,7 @@ static void CloseGeneric( vlc_object_t *p_this )
 
     DeinitOmxCore();
 
-    vlc_mutex_destroy (&p_sys->mutex);
-    vlc_cond_destroy (&p_sys->cond);
+    DeinitOmxEventQueue(&p_sys->event_queue);
     vlc_mutex_destroy (&p_sys->in.fifo.lock);
     vlc_cond_destroy (&p_sys->in.fifo.wait);
     vlc_mutex_destroy (&p_sys->out.fifo.lock);
@@ -1601,7 +1598,7 @@ static OMX_ERRORTYPE OmxEventHandler( OMX_HANDLETYPE omx_handle,
         break;
     }
 
-    PostOmxEvent(p_dec, event, data_1, data_2, event_data);
+    PostOmxEvent(&p_sys->event_queue, event, data_1, data_2, event_data);
     return OMX_ErrorNone;
 }
 
