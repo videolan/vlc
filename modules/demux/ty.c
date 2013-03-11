@@ -1443,7 +1443,7 @@ static void DemuxDecodeXds( demux_t *p_demux, uint8_t d1, uint8_t d2 )
         p_epg = vlc_epg_New( NULL );
         if( m->current.psz_name )
         {
-            vlc_epg_AddEvent( p_epg, 0, 0, m->current.psz_name, NULL, NULL );
+            vlc_epg_AddEvent( p_epg, 0, 0, m->current.psz_name, NULL, NULL, 0 );
             //if( m->current.psz_rating )
             //  TODO but VLC cannot yet handle rating per epg event
             vlc_epg_SetCurrent( p_epg, 0 );

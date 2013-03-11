@@ -2837,6 +2837,7 @@ static void EITCallBack( demux_t *p_demux,
         char                *psz_extra = strdup("");
         int64_t i_start;
         int i_duration;
+        int i_min_age = 0;
 
         i_start = EITConvertStartTime( p_evt->i_start_time );
         i_duration = EITConvertDuration( p_evt->i_duration );
@@ -2915,6 +2916,24 @@ static void EITCallBack( demux_t *p_demux,
                     }
                 }
             }
+            else if( p_dr->i_tag == 0x55 )
+            {
+                dvbpsi_parental_rating_dr_t *pR = dvbpsi_DecodeParentalRatingDr( p_dr );
+                if ( pR )
+                {
+                    for ( int i = 0; i < pR->i_ratings_number; i++ )
+                    {
+                        const dvbpsi_parental_rating_t *p_rating = & pR->p_parental_rating[ i ];
+                        if ( p_rating->i_rating > 0x00 && p_rating->i_rating <= 0x0F )
+                        {
+                            if ( p_rating->i_rating + 3 > i_min_age )
+                                i_min_age = p_rating->i_rating + 3;
+                            msg_Dbg( p_demux, "..* event parental control set to %d years",
+                                     i_min_age );
+                        }
+                    }
+                }
+            }
             else
             {
                 msg_Dbg( p_demux, "    - tag=0x%x(%d)", p_dr->i_tag, p_dr->i_tag );
@@ -2924,7 +2943,7 @@ static void EITCallBack( demux_t *p_demux,
         /* */
         if( i_start > 0 )
             vlc_epg_AddEvent( p_epg, i_start, i_duration, psz_name, psz_text,
-                              *psz_extra ? psz_extra : NULL );
+                              *psz_extra ? psz_extra : NULL, i_min_age );
 
         /* Update "now playing" field */
         if( p_evt->i_running_status == 0x04 && i_start > 0 )
