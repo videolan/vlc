@@ -104,6 +104,19 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
     /* Draw the title. */
     painter->drawText( mapped, Qt::AlignTop | Qt::AlignLeft, fm.elidedText( m_name, Qt::ElideRight, mapped.width() ) );
 
+    if ( m_rating > 0 && mapped.width() > 40 )
+    {
+        QRectF iconsRect = QRectF( mapped.bottomRight(), mapped.bottomRight() );
+        iconsRect.adjust( -20, -20, 0, 0 );
+        painter->save();
+        painter->setBrush( Qt::white );
+        f.setPixelSize( 8 );
+        painter->setFont( f );
+        painter->drawRect( iconsRect );
+        painter->drawText( iconsRect, Qt::AlignCenter, QString("%1+").arg( m_rating ) );
+        painter->restore();
+    }
+
     mapped.adjust( 0, 20, 0, 0 );
 
     QDateTime m_end = m_start.addSecs( m_duration );
@@ -158,6 +171,7 @@ bool EPGItem::setData( vlc_epg_event_t *data )
         m_description = newdesc;
         m_shortDescription = newshortdesc;
         setDuration( data->i_duration );
+        setRating( data->i_rating );
         update();
         return true;
     }
@@ -183,6 +197,11 @@ void EPGItem::setDuration( int duration )
 {
     m_duration = duration;
     m_boundingRect.setWidth( duration );
+}
+
+void EPGItem::setRating( uint8_t i_rating )
+{
+    m_rating = i_rating;
 }
 
 QString EPGItem::description()
