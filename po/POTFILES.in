@@ -381,6 +381,7 @@ modules/codec/omxil/omxil.c
 modules/codec/omxil/omxil.h
 modules/codec/omxil/omxil_utils.h
 modules/codec/omxil/utils.c
+modules/codec/omxil/vout.c
 modules/codec/opus.c
 modules/codec/png.c
 modules/codec/quicktime.c

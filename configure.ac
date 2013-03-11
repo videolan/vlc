@@ -2123,6 +2123,16 @@ then
 fi
 
 dnl
+dnl openmax il vout plugin
+dnl
+AC_ARG_ENABLE(omxil-vout,
+  [  --enable-omxil-vout     openmax il video output module (default disabled)])
+if test "${enable_omxil_vout}" = "yes"
+then
+  VLC_ADD_PLUGIN([omxil_vout])
+fi
+
+dnl
 dnl CrystalHD codec plugin
 dnl
 AC_ARG_ENABLE(crystalhd,

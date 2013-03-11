@@ -232,6 +232,7 @@ $Id$
  * ogg: input module for OGG decapsulation
  * oldrc: old interface module using stdio
  * omxil: OpenMAX IL audio/video decoder
+ * omxil_vout: OpenMAX IL video output
  * opencv_example: OpenCV example (face identification)
  * opencv_wrapper: OpenCV wrapper video filter
  * opensles_android: OpenSL ES audio output for Android
