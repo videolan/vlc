@@ -139,10 +139,9 @@ static int CreateComponentsList(decoder_t *p_dec, const char *psz_role)
     OMX_ERRORTYPE omx_error;
     OMX_U32 roles = 0;
     OMX_U8 **ppsz_roles = 0;
-    unsigned int i, j, len;
+    unsigned int i, j;
 
     if(!psz_role) goto end;
-    len = strlen(psz_role);
 
     for( i = 0; ; i++ )
     {
