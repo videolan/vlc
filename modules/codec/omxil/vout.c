@@ -31,6 +31,10 @@
 
 #include "omxil.h"
 #include "omxil_core.h"
+#include "OMX_Broadcom.h"
+
+// Defined in the broadcom version of OMX_Index.h
+#define OMX_IndexConfigDisplayRegion 0x7f000010
 
 /*****************************************************************************
  * Module descriptor
@@ -232,6 +236,20 @@ static int Open(vlc_object_t *p_this)
     omx_error = WaitForSpecificOmxEvent(&p_sys->event_queue, OMX_EventCmdComplete, 0, 0, 0);
     CHECK_ERROR(omx_error, "Wait for Executing failed (%x: %s)",
                 omx_error, ErrorToString(omx_error));
+
+    if (!strcmp(p_sys->psz_component, "OMX.broadcom.video_render")) {
+        OMX_CONFIG_DISPLAYREGIONTYPE config_display;
+        OMX_INIT_STRUCTURE(config_display);
+        config_display.nPortIndex = p_sys->port.i_port_index;
+
+        config_display.set = OMX_DISPLAY_SET_SRC_RECT;
+        config_display.src_rect.width = vd->cfg->display.width;
+        config_display.src_rect.height = vd->cfg->display.height;
+        OMX_SetConfig(p_sys->omx_handle, OMX_IndexConfigDisplayRegion, &config_display);
+        config_display.set = OMX_DISPLAY_SET_FULLSCREEN;
+        config_display.fullscreen = OMX_TRUE;
+        OMX_SetConfig(p_sys->omx_handle, OMX_IndexConfigDisplayRegion, &config_display);
+    }
 
 
     /* Setup chroma */
