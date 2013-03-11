@@ -941,7 +941,7 @@ loaded:
     vlc_cond_init (&p_sys->out.fifo.wait);
     p_sys->out.fifo.offset = offsetof(OMX_BUFFERHEADERTYPE, pInputPortPrivate) / sizeof(void *);
     p_sys->out.fifo.pp_last = &p_sys->out.fifo.p_first;
-    p_sys->out.b_direct = true;
+    p_sys->out.b_direct = false;
     p_sys->out.b_flushed = true;
     p_sys->out.p_fmt = &p_dec->fmt_out;
     p_sys->ports = 2;
@@ -1039,7 +1039,7 @@ loaded:
             p_port->pp_buffers[i] = (void *)ALIGN((uintptr_t)p_buf, p_port->definition.nBufferAlignment);
 #endif
 
-            if(0 && p_port->b_direct)
+            if(p_port->b_direct)
                 omx_error =
                     OMX_UseBuffer( p_sys->omx_handle, &p_port->pp_buffers[j],
                                    p_port->i_port_index, 0,
@@ -1246,7 +1246,7 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
     p_port->i_buffers = p_port->definition.nBufferCountActual;
     for(i = 0; i < p_port->i_buffers; i++)
     {
-        if(0 && p_port->b_direct)
+        if(p_port->b_direct)
             omx_error =
                 OMX_UseBuffer( p_sys->omx_handle, &p_port->pp_buffers[i],
                                p_port->i_port_index, 0,
@@ -1349,7 +1349,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         }
 
         /* Get a new picture */
-        if(p_sys->in.b_direct && !p_header->pAppPrivate)
+        if(p_sys->out.b_direct && !p_header->pAppPrivate)
         {
             p_next_pic = decoder_NewPicture( p_dec );
             if(!p_next_pic) break;
