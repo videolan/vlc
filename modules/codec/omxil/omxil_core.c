@@ -55,6 +55,8 @@ static const char *ppsz_dll_list[] =
 {
 #if defined(USE_IOMX)
     "libiomx.so", /* Not used when using IOMX, the lib should already be loaded */
+#elif defined(RPI_OMX)
+    "/opt/vc/lib/libopenmaxil.so",  /* Broadcom IL core */
 #else
     "libOMX_Core.so", /* TI OMAP IL core */
     "libOmxCore.so", /* Qualcomm IL core */
@@ -62,6 +64,14 @@ static const char *ppsz_dll_list[] =
 #endif
     0
 };
+
+#ifdef RPI_OMX
+static const char *ppsz_extra_dll_list[] =
+{
+    "/opt/vc/lib/libbcm_host.so",  /* Broadcom host library */
+    0
+};
+#endif
 
 /*****************************************************************************
  * Global OMX Core instance, shared between module instances
@@ -77,6 +87,22 @@ OMX_ERRORTYPE (*pf_free_handle) (OMX_HANDLETYPE);
 OMX_ERRORTYPE (*pf_component_enum)(OMX_STRING, OMX_U32, OMX_U32);
 OMX_ERRORTYPE (*pf_get_roles_of_component)(OMX_STRING, OMX_U32 *, OMX_U8 **);
 
+#ifdef RPI_OMX
+static void *extra_dll_handle;
+static void (*pf_host_init)(void);
+static void (*pf_host_deinit)(void);
+
+static void CloseExtraDll()
+{
+    if (pf_host_deinit)
+        pf_host_deinit();
+    // Intentionally not unloading the host library, since it cannot be
+    // unloaded cleanly after it has been initialized.
+}
+#else
+#define CloseExtraDll()
+#endif
+
 int InitOmxCore(vlc_object_t *p_this)
 {
     int i;
@@ -87,6 +113,23 @@ int InitOmxCore(vlc_object_t *p_this)
         return VLC_SUCCESS;
     }
 
+#ifdef RPI_OMX
+    /* Load an extra library first, if available */
+    extra_dll_handle = NULL;
+    for( i = 0; ppsz_extra_dll_list[i]; i++ )
+    {
+        extra_dll_handle = dll_open( ppsz_extra_dll_list[i] );
+        if( extra_dll_handle ) break;
+    }
+    if( extra_dll_handle )
+    {
+        pf_host_init = dlsym( extra_dll_handle, "bcm_host_init" );
+        pf_host_deinit = dlsym( extra_dll_handle, "bcm_host_deinit" );
+        if (pf_host_init)
+            pf_host_init();
+    }
+#endif
+
     /* Load the OMX core */
     for( i = 0; ppsz_dll_list[i]; i++ )
     {
@@ -95,6 +138,7 @@ int InitOmxCore(vlc_object_t *p_this)
     }
     if( !dll_handle )
     {
+        CloseExtraDll();
         vlc_mutex_unlock( &omx_core_mutex );
         return VLC_EGENERIC;
     }
@@ -111,6 +155,7 @@ int InitOmxCore(vlc_object_t *p_this)
         msg_Warn( p_this, "cannot find OMX_* symbols in `%s' (%s)",
                   ppsz_dll_list[i], dlerror() );
         dll_close(dll_handle);
+        CloseExtraDll();
         vlc_mutex_unlock( &omx_core_mutex );
         return VLC_EGENERIC;
     }
@@ -122,6 +167,7 @@ int InitOmxCore(vlc_object_t *p_this)
         msg_Warn( p_this, "OMX_Init failed (%x: %s)", omx_error,
                   ErrorToString(omx_error) );
         dll_close(dll_handle);
+        CloseExtraDll();
         vlc_mutex_unlock( &omx_core_mutex );
         return VLC_EGENERIC;
     }
@@ -138,6 +184,7 @@ void DeinitOmxCore(void)
     {
         pf_deinit();
         dll_close( dll_handle );
+        CloseExtraDll();
     }
     vlc_mutex_unlock( &omx_core_mutex );
 }
