@@ -212,6 +212,18 @@ int CreateComponentsList(vlc_object_t *p_this, const char *psz_role,
 
         msg_Dbg(p_this, "component %s", psz_name);
 
+#ifdef RPI_OMX
+        if (!strcmp(psz_name, "OMX.broadcom.video_decode")) {
+            if (!strcmp(psz_role, "video_decoder.avc")) {
+                goto found;
+            }
+        } else if (!strcmp(psz_name, "OMX.broadcom.video_render")) {
+            if (!strcmp(psz_role, "iv_renderer")) {
+                goto found;
+            }
+        }
+#endif
+
         omx_error = pf_get_roles_of_component(psz_name, &roles, 0);
         if(omx_error != OMX_ErrorNone || !roles) continue;
 
@@ -235,6 +247,7 @@ int CreateComponentsList(vlc_object_t *p_this, const char *psz_role,
 
         if(!b_found) continue;
 
+found:
         if(components >= MAX_COMPONENTS_LIST_SIZE)
         {
             msg_Dbg(p_this, "too many matching components");
