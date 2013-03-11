@@ -29,6 +29,11 @@
 #define OMX_VERSION_MINOR 0
 #define OMX_VERSION_REV   0
 #define OMX_VERSION_STEP  0
+#elif defined(RPI_OMX)
+#define OMX_VERSION_MAJOR 1
+#define OMX_VERSION_MINOR 1
+#define OMX_VERSION_REV   2
+#define OMX_VERSION_STEP  0
 #else
 #define OMX_VERSION_MAJOR 1
 #define OMX_VERSION_MINOR 1
