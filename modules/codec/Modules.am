@@ -186,7 +186,7 @@ libomxil_plugin_la_SOURCES = \
 	omxil/utils.c omxil/omxil_utils.h \
 	h264_nal.h \
 	omxil/qcom.c omxil/qcom.h \
-	omxil/omxil.c omxil/omxil.h
+	omxil/omxil.c omxil/omxil.h omxil/omxil_core.c omxil/omxil_core.h
 libomxil_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/omxil
 libomxil_plugin_la_LIBADD = $(AM_LIBADD) $(LIBDL)
 

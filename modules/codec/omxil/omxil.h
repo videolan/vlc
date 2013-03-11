@@ -30,11 +30,7 @@
 #include "OMX_Video.h"
 
 #include "omxil_utils.h"
-
-/*****************************************************************************
- * defines
- *****************************************************************************/
-#define MAX_COMPONENTS_LIST_SIZE 32
+#include "omxil_core.h"
 
 /*****************************************************************************
  * decoder_sys_t : omxil decoder descriptor
@@ -80,7 +76,6 @@ struct decoder_sys_t
     OMX_HANDLETYPE omx_handle;
 
     bool b_enc;
-    bool b_init;
 
     char psz_component[OMX_MAX_STRINGNAME_SIZE];
     char ppsz_components[MAX_COMPONENTS_LIST_SIZE][OMX_MAX_STRINGNAME_SIZE];
