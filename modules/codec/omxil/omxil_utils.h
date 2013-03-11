@@ -55,6 +55,23 @@
 #define CHECK_ERROR(a, ...) \
     if(a != OMX_ErrorNone) {msg_Dbg( p_dec, __VA_ARGS__ ); goto error;}
 
+#ifdef OMX_SKIP64BIT
+static inline int64_t FromOmxTicks(OMX_TICKS value)
+{
+    return (((int64_t)value.nHighPart) << 32) | value.nLowPart;
+}
+static inline OMX_TICKS ToOmxTicks(int64_t value)
+{
+    OMX_TICKS s;
+    s.nLowPart = value;
+    s.nHighPart = value >> 32;
+    return s;
+}
+#else
+#define FromOmxTicks(x) (x)
+#define ToOmxTicks(x) (x)
+#endif
+
 /*****************************************************************************
  * OMX buffer FIFO macros
  *****************************************************************************/

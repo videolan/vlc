@@ -1341,7 +1341,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             }
 
             if (p_pic)
-                p_pic->date = p_header->nTimeStamp;
+                p_pic->date = FromOmxTicks(p_header->nTimeStamp);
             p_header->nFilledLen = 0;
             p_header->pAppPrivate = 0;
         }
@@ -1382,9 +1382,9 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         p_header->nOffset = 0;
         p_header->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
         if (p_sys->b_use_pts && p_block->i_pts)
-            p_header->nTimeStamp = p_block->i_pts;
+            p_header->nTimeStamp = ToOmxTicks(p_block->i_pts);
         else
-            p_header->nTimeStamp = p_block->i_dts;
+            p_header->nTimeStamp = ToOmxTicks(p_block->i_dts);
 
         /* In direct mode we pass the input pointer as is.
          * Otherwise we memcopy the data */
@@ -1507,9 +1507,10 @@ block_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
             memcpy( p_buffer->p_buffer, p_header->pBuffer, p_buffer->i_buffer );
             p_header->nFilledLen = 0;
 
-            if( p_header->nTimeStamp != 0 &&
-                p_header->nTimeStamp != date_Get( &p_sys->end_date ) )
-                date_Set( &p_sys->end_date, p_header->nTimeStamp );
+            int64_t timestamp = FromOmxTicks(p_header->nTimeStamp);
+            if( timestamp != 0 &&
+                timestamp != date_Get( &p_sys->end_date ) )
+                date_Set( &p_sys->end_date, timestamp );
 
             p_buffer->i_pts = date_Get( &p_sys->end_date );
             p_buffer->i_length = date_Increment( &p_sys->end_date, i_samples ) -
@@ -1537,7 +1538,7 @@ block_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         p_header->nFilledLen = p_block->i_buffer;
         p_header->nOffset = 0;
         p_header->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
-        p_header->nTimeStamp = p_block->i_dts;
+        p_header->nTimeStamp = ToOmxTicks(p_block->i_dts);
 
         /* In direct mode we pass the input pointer as is.
          * Otherwise we memcopy the data */
@@ -1622,7 +1623,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pic )
         p_header->nFilledLen = p_sys->in.i_frame_size;
         p_header->nOffset = 0;
         p_header->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
-        p_header->nTimeStamp = p_pic->date;
+        p_header->nTimeStamp = ToOmxTicks(p_pic->date);
 #ifdef OMXIL_EXTRA_DEBUG
         msg_Dbg( p_dec, "EmptyThisBuffer %p, %p, %i", p_header, p_header->pBuffer,
                  (int)p_header->nFilledLen );
@@ -1663,7 +1664,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pic )
             }
 
             p_block->i_buffer = p_header->nFilledLen;
-            p_block->i_pts = p_block->i_dts = p_header->nTimeStamp;
+            p_block->i_pts = p_block->i_dts = FromOmxTicks(p_header->nTimeStamp);
             p_header->nFilledLen = 0;
             p_header->pAppPrivate = 0;
         }
