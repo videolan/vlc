@@ -81,7 +81,6 @@ struct decoder_sys_t
 
     bool b_enc;
     bool b_init;
-    vlc_mutex_t lock;
 
     char psz_component[OMX_MAX_STRINGNAME_SIZE];
     char ppsz_components[MAX_COMPONENTS_LIST_SIZE][OMX_MAX_STRINGNAME_SIZE];

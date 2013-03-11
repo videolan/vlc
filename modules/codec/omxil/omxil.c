@@ -928,7 +928,6 @@ loaded:
     p_sys->pp_last_event = &p_sys->p_events;
     vlc_mutex_init (&p_sys->mutex);
     vlc_cond_init (&p_sys->cond);
-    vlc_mutex_init (&p_sys->lock);
     vlc_mutex_init (&p_sys->in.fifo.lock);
     vlc_cond_init (&p_sys->in.fifo.wait);
     p_sys->in.fifo.offset = offsetof(OMX_BUFFERHEADERTYPE, pOutputPortPrivate) / sizeof(void *);
