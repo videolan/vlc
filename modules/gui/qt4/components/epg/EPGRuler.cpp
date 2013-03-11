@@ -75,7 +75,6 @@ void EPGRuler::paintEvent( QPaintEvent *event )
 
     QDateTime localStartTime;
     localStartTime = m_startTime.addSecs( m_offset / m_scale );
-    const QString currentDate = localStartTime.date().toString();
 
     QDateTime diff( localStartTime );
     diff.setTime( QTime( localStartTime.time().hour(), 0, 0, 0 ) );
@@ -88,31 +87,20 @@ void EPGRuler::paintEvent( QPaintEvent *event )
     QDateTime current( localStartTime.addSecs( secondsToHour ) );
     current = current.addSecs( -3600 );
 
-    QPalette::ColorRole fillColorRole;
-    if ( localStartTime.date().daysTo( current.date() ) % 2 == 0 )
-        fillColorRole = QPalette::Window;
-    else
-        fillColorRole = QPalette::Dark;
-    QColor fillColor = palette().color( fillColorRole );
-
+    QColor fillColor;
     while ( here.rx() < width() + spacing )
     {
         QRect area( QPoint( previous.x() + 1, margin.height() ), here );
         area.adjust( 0, 0, 0, header.height() );
         QString timeString = current.toString( "hh'h'" );
-        localStartTime.date().daysTo( current.date() );
-        if ( current.time().hour() == 0 &&
-             current.date().toString() != currentDate )
-        {
-            /* Show Day */
+        /* Show Day */
+        if ( current.time().hour() == 0 )
             timeString += current.date().toString( " ddd dd" );
-            /* And switch colors */
-            if ( fillColorRole == QPalette::Dark )
-                fillColorRole = QPalette::Window;
-            else
-                fillColorRole = QPalette::Dark;
-            fillColor = palette().color( fillColorRole );
-        }
+
+        if ( m_startTime.date().daysTo( current.date() ) % 2 == 0 )
+            fillColor = palette().color( QPalette::Window );
+        else
+            fillColor = palette().color( QPalette::Dark );
         p.fillRect( area, fillColor );
         p.drawLine( area.topRight(), area.bottomRight() );
         p.drawText( area, Qt::AlignLeft, timeString );
