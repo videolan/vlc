@@ -75,8 +75,11 @@ struct decoder_sys_t
 
 
     /* */
-    //AVPaletteControl palette;
-#warning FIXME
+#if LIBAVCODEC_VERSION_MAJOR < 54
+    AVPaletteControl palette;
+#else
+# warning FIXME
+#endif
 
     /* */
     bool b_flush;
@@ -376,8 +379,39 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     }
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
+#if LIBAVCODEC_VERSION_MAJOR < 54
     /* Setup palette */
-# warning FIXME: palette
+    memset( &p_sys->palette, 0, sizeof(p_sys->palette) );
+    if( p_dec->fmt_in.video.p_palette )
+    {
+        p_sys->palette.palette_changed = 1;
+
+        for( int i = 0; i < __MIN( AVPALETTE_COUNT, p_dec->fmt_in.video.p_palette->i_entries ); i++ )
+        {
+            union {
+                uint32_t u;
+                uint8_t a[4];
+            } c;
+            c.a[0] = p_dec->fmt_in.video.p_palette->palette[i][0];
+            c.a[1] = p_dec->fmt_in.video.p_palette->palette[i][1];
+            c.a[2] = p_dec->fmt_in.video.p_palette->palette[i][2];
+            c.a[3] = p_dec->fmt_in.video.p_palette->palette[i][3];
+
+            p_sys->palette.palette[i] = c.u;
+        }
+        p_sys->p_context->palctrl = &p_sys->palette;
+
+        p_dec->fmt_out.video.p_palette = malloc( sizeof(video_palette_t) );
+        if( p_dec->fmt_out.video.p_palette )
+            *p_dec->fmt_out.video.p_palette = *p_dec->fmt_in.video.p_palette;
+    }
+    else if( p_sys->i_codec_id != CODEC_ID_MSVIDEO1 && p_sys->i_codec_id != CODEC_ID_CINEPAK )
+    {
+        p_sys->p_context->palctrl = &p_sys->palette;
+    }
+#else
+# warning FIXME
+#endif
 
     /* ***** init this codec with special data ***** */
     ffmpeg_InitCodec( p_dec );
@@ -912,6 +946,10 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
         /* */
         p_ff_pic->type = FF_BUFFER_TYPE_USER;
 
+#if LIBAVCODEC_VERSION_MAJOR < 54
+        p_ff_pic->age = 256*256*256*64;
+#endif
+
         if( vlc_va_Get( p_sys->p_va, p_ff_pic ) )
         {
             msg_Err( p_dec, "VaGrabSurface failed" );
@@ -999,6 +1037,10 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_ff_pic->linesize[1] = p_pic->p[1].i_pitch;
     p_ff_pic->linesize[2] = p_pic->p[2].i_pitch;
     p_ff_pic->linesize[3] = 0;
+
+#if LIBAVCODEC_VERSION_MAJOR < 54
+    p_ff_pic->age = 256*256*256*64;
+#endif
 
     post_mt( p_sys );
     return 0;

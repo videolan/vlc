@@ -131,8 +131,10 @@ vlc_module_begin ()
                  QSCALE_TEXT, QSCALE_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "mute-audio", true,
               AUDIO_TEXT, AUDIO_LONGTEXT, true )
+#if LIBAVCODEC_VERSION_MAJOR >= 54
     add_string( SOUT_CFG_PREFIX "options", NULL,
                 AV_OPTIONS_TEXT, AV_OPTIONS_LONGTEXT, true )
+#endif
 vlc_module_end ()
 
 static const char *const ppsz_sout_options[] = {
@@ -156,7 +158,9 @@ struct sout_stream_sys_t
     int             i_fd;
     int             i_cmd, i_old_cmd;
 
+#if LIBAVCODEC_VERSION_MAJOR >= 54
     AVDictionary    *options;
+#endif
 };
 
 struct sout_stream_id_t
@@ -293,6 +297,7 @@ static int Open( vlc_object_t *p_this )
     p_stream->pf_send   = Send;
     p_stream->p_sys     = p_sys;
 
+#if LIBAVCODEC_VERSION_MAJOR >= 54
     char *psz_opts = var_InheritString( p_stream, SOUT_CFG_PREFIX "options" );
     if (psz_opts && *psz_opts) {
         p_sys->options = vlc_av_get_options(psz_opts);
@@ -300,6 +305,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->options = NULL;
     }
     free(psz_opts);
+#endif
 
     return VLC_SUCCESS;
 }
@@ -312,7 +318,10 @@ static void Close( vlc_object_t * p_this )
     sout_stream_t       *p_stream = (sout_stream_t *)p_this;
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
 
+#if LIBAVCODEC_VERSION_MAJOR >= 54
     av_dict_free( &p_sys->options );
+#endif
+
     free( p_sys );
 }
 
@@ -371,6 +380,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->ff_enc_c->bit_rate    = p_fmt->i_bitrate;
 
         int ret;
+#if LIBAVCODEC_VERSION_MAJOR >= 54
         AVDictionary *options = NULL;
         if (p_sys->options)
             av_dict_copy(&options, p_sys->options, 0);
@@ -382,6 +392,11 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             msg_Err( p_stream, "Unknown option \"%s\"", t->key );
         }
         av_dict_free(&options);
+#else
+        vlc_avcodec_lock();
+        ret = avcodec_open( id->ff_enc_c, id->ff_enc );
+        vlc_avcodec_unlock();
+#endif
 
         if (ret)
         {
@@ -768,17 +783,21 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
 
         vlc_avcodec_lock();
         int ret;
+#if LIBAVCODEC_VERSION_MAJOR >= 54
         AVDictionary *options = NULL;
         if (p_sys->options)
             av_dict_copy(&options, p_sys->options, 0);
+#endif
         ret = avcodec_open2( id->ff_enc_c, id->ff_enc, options ? &options : NULL );
         vlc_avcodec_unlock();
 
+#if LIBAVCODEC_VERSION_MAJOR >= 54
         AVDictionaryEntry *t = NULL;
         while ((t = av_dict_get(options, "", t, AV_DICT_IGNORE_SUFFIX))) {
             msg_Err( p_stream, "Unknown option \"%s\"", t->key );
         }
         av_dict_free(&options);
+#endif
 
         if (ret)
         {
