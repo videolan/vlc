@@ -91,6 +91,7 @@ endif
 
 ### FFmpeg/libav ###
 libavcodec_plugin_la_SOURCES = \
+	avcodec/avcommon_compat.h \
 	avcodec/avcommon.h \
 	avcodec/video.c \
 	avcodec/subtitle.c \

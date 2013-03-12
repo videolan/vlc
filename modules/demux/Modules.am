@@ -45,6 +45,7 @@ libavformat_plugin_la_SOURCES = avformat/demux.c \
 	../codec/avcodec/chroma.c \
 	../codec/avcodec/cpu.c \
 	../codec/avcodec/avcommon.h \
+	../codec/avcodec/avcommon_compat.h \
 	vobsub.h \
 	avformat/avformat.c avformat/avformat.h
 if ENABLE_SOUT

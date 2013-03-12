@@ -21,6 +21,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef AVCOMMON_H
+#define AVCOMMON_H 1
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -30,6 +33,8 @@
 #include <vlc_variables.h>
 
 #include <limits.h>
+
+#include "avcommon_compat.h"
 
 /* LIBAVUTIL_VERSION_CHECK checks for the right version of libav and FFmpeg
  * a is the major version
@@ -72,10 +77,6 @@ static inline void vlc_init_avcodec(void)
 # include <libavutil/avutil.h>
 # include <libavutil/dict.h>
 
-#if LIBAVUTIL_VERSION_MAJOR < 52 && !defined(AV_CPU_FLAG_MMXEXT)
-#   define AV_CPU_FLAG_MMXEXT       AV_CPU_FLAG_MMX2
-#endif
-
 #define AV_OPTIONS_TEXT     "Advanced options."
 #define AV_OPTIONS_LONGTEXT "Advanced options, in the form {opt=val,opt2=val2} ."
 
@@ -93,4 +94,6 @@ static inline AVDictionary *vlc_av_get_options(const char *psz_opts)
     }
     return options;
 }
+#endif
+
 #endif
