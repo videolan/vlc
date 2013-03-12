@@ -471,6 +471,12 @@ enum {
 
 #endif /* LIBAVCODEC_VERSION < 54.25 */
 
+#if LIBAVCODEC_VERSION_MAJOR < 54
+# define avcodec_alloc_context3(a) avcodec_alloc_context()
+# define avcodec_open2(a, b, c) avcodec_open(a, b)
+# define err_recognition error_recognition
+#endif
+
 #endif /* HAVE_LIBAVCODEC_AVCODEC_H */
 
 #ifdef HAVE_LIBAVUTIL_AVUTIL_H
