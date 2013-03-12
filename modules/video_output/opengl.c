@@ -382,12 +382,10 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->supports_npot = HasExtension(extensions, "GL_ARB_texture_non_power_of_two") ||
                          HasExtension(extensions, "GL_APPLE_texture_2D_limited_npot");
 
-#if USE_OPENGL_ES
+#if USE_OPENGL_ES == 2
     /* OpenGL ES 2 includes support for non-power of 2 textures by specification
      * so checks for extensions are bound to fail. Check for OpenGL ES version instead. */
-    const unsigned char *ogl_version = glGetString(GL_VERSION);
-    if (strverscmp((const char *)ogl_version, "2.0") >= 0)
-        vgl->supports_npot = true;
+    vgl->supports_npot = true;
 #endif
 
     GLint max_texture_units = 0;
