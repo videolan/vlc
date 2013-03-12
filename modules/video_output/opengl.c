@@ -40,7 +40,7 @@
 # define GL_CLAMP_TO_EDGE 0x812F
 #endif
 
-#ifdef __APPLE__
+#if USE_OPENGL_ES == 2 || defined(__APPLE__)
 #   define PFNGLGETPROGRAMIVPROC             typeof(glGetProgramiv)*
 #   define PFNGLGETPROGRAMINFOLOGPROC        typeof(glGetProgramInfoLog)*
 #   define PFNGLGETSHADERIVPROC              typeof(glGetShaderiv)*
@@ -61,7 +61,7 @@
 #   define PFNGLUSEPROGRAMPROC               typeof(glUseProgram)*
 #   define PFNGLDELETEPROGRAMPROC            typeof(glDeleteProgram)*
 #   define PFNGLATTACHSHADERPROC             typeof(glAttachShader)*
-#if USE_OPENGL_ES
+#if defined(__APPLE__) && USE_OPENGL_ES
 #   import <CoreFoundation/CoreFoundation.h>
 #endif
 #endif
@@ -71,11 +71,20 @@
 #   define VLCGL_TEXTURE_COUNT 1
 #   define VLCGL_PICTURE_MAX 1
 #   define PRECISION "precision highp float;"
+#if USE_OPENGL_ES == 2
+#   define SUPPORTS_SHADERS
+#   define glClientActiveTexture(x)
+#else
+#   define SUPPORTS_FIXED_PIPELINE
+#   define GL_MAX_TEXTURE_IMAGE_UNITS GL_MAX_TEXTURE_UNITS
+#endif
 #else
 #   define GLSL_VERSION "120"
 #   define VLCGL_TEXTURE_COUNT 1
 #   define VLCGL_PICTURE_MAX 128
 #   define PRECISION ""
+#   define SUPPORTS_SHADERS
+#   define SUPPORTS_FIXED_PIPELINE
 #endif
 
 static const vlc_fourcc_t gl_subpicture_chromas[] = {
@@ -128,6 +137,7 @@ struct vout_display_opengl_t {
     GLfloat    local_value[16];
 
     /* Shader variables commands*/
+#ifdef SUPPORTS_SHADERS
     PFNGLGETUNIFORMLOCATIONPROC      GetUniformLocation;
     PFNGLGETATTRIBLOCATIONPROC       GetAttribLocation;
     PFNGLVERTEXATTRIBPOINTERPROC     VertexAttribPointer;
@@ -155,6 +165,7 @@ struct vout_display_opengl_t {
     PFNGLGETPROGRAMINFOLOGPROC GetProgramInfoLog;
     PFNGLGETSHADERIVPROC   GetShaderiv;
     PFNGLGETSHADERINFOLOGPROC GetShaderInfoLog;
+#endif
 
 
     /* multitexture */
@@ -189,6 +200,7 @@ static bool IsLuminance16Supported(int target)
 }
 #endif
 
+#ifdef SUPPORTS_SHADERS
 static void BuildVertexShader(vout_display_opengl_t *vgl,
                               GLint *shader)
 {
@@ -322,6 +334,7 @@ static void BuildRGBAFragmentShader(vout_display_opengl_t *vgl,
     vgl->ShaderSource(*shader, 1, &code, NULL);
     vgl->CompileShader(*shader);
 }
+#endif
 
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                                const vlc_fourcc_t **subpicture_chromas,
@@ -351,6 +364,33 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     bool supports_shaders = false;
 #endif
 
+#if USE_OPENGL_ES == 2
+    vgl->CreateShader  = glCreateShader;
+    vgl->ShaderSource  = glShaderSource;
+    vgl->CompileShader = glCompileShader;
+    vgl->AttachShader  = glAttachShader;
+
+    vgl->GetProgramiv  = glGetProgramiv;
+    vgl->GetShaderiv   = glGetShaderiv;
+    vgl->GetProgramInfoLog  = glGetProgramInfoLog;
+    vgl->GetShaderInfoLog   = glGetShaderInfoLog;
+
+    vgl->DeleteShader  = glDeleteShader;
+
+    vgl->GetUniformLocation = glGetUniformLocation;
+    vgl->GetAttribLocation  = glGetAttribLocation;
+    vgl->VertexAttribPointer= glVertexAttribPointer;
+    vgl->EnableVertexAttribArray = glEnableVertexAttribArray;
+    vgl->Uniform4fv    = glUniform4fv;
+    vgl->Uniform4f     = glUniform4f;
+    vgl->Uniform1i     = glUniform1i;
+
+    vgl->CreateProgram = glCreateProgram;
+    vgl->LinkProgram   = glLinkProgram;
+    vgl->UseProgram    = glUseProgram;
+    vgl->DeleteProgram = glDeleteProgram;
+    supports_shaders = true;
+#elif defined(SUPPORTS_SHADERS)
     vgl->CreateShader  = (PFNGLCREATESHADERPROC)vlc_gl_GetProcAddress(vgl->gl, "glCreateShader");
     vgl->ShaderSource  = (PFNGLSHADERSOURCEPROC)vlc_gl_GetProcAddress(vgl->gl, "glShaderSource");
     vgl->CompileShader = (PFNGLCOMPILESHADERPROC)vlc_gl_GetProcAddress(vgl->gl, "glCompileShader");
@@ -378,6 +418,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     if (!vgl->CreateShader || !vgl->ShaderSource || !vgl->CreateProgram)
         supports_shaders = false;
+#endif
 
     vgl->supports_npot = HasExtension(extensions, "GL_ARB_texture_non_power_of_two") ||
                          HasExtension(extensions, "GL_APPLE_texture_2D_limited_npot");
@@ -474,6 +515,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->shader[2] = -1;
     vgl->local_count = 0;
     if (supports_shaders && need_fs_yuv) {
+#ifdef SUPPORTS_SHADERS
         BuildYUVFragmentShader(vgl, &vgl->shader[0], &vgl->local_count,
                                vgl->local_value, fmt, yuv_range_correction);
         BuildRGBAFragmentShader(vgl, &vgl->shader[1]);
@@ -524,6 +566,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                 return NULL;
             }
         }
+#endif
     }
 
     /* */
@@ -566,12 +609,14 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
         }
         free(vgl->region);
 
+#ifdef SUPPORTS_SHADERS
         if (vgl->program[0]) {
             for (int i = 0; i < 2; i++)
                 vgl->DeleteProgram(vgl->program[i]);
             for (int i = 0; i < 3; i++)
                 vgl->DeleteShader(vgl->shader[i]);
         }
+#endif
 
         vlc_gl_Unlock(vgl->gl);
     }
@@ -788,6 +833,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     return VLC_SUCCESS;
 }
 
+#ifdef SUPPORTS_FIXED_PIPELINE
 static void DrawWithoutShaders(vout_display_opengl_t *vgl,
                                float *left, float *top, float *right, float *bottom)
 {
@@ -823,7 +869,9 @@ static void DrawWithoutShaders(vout_display_opengl_t *vgl,
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisable(vgl->tex_target);
 }
+#endif
 
+#ifdef SUPPORTS_SHADERS
 static void DrawWithShaders(vout_display_opengl_t *vgl,
                             float *left, float *top, float *right, float *bottom)
 {
@@ -864,6 +912,7 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
+#endif
 
 int vout_display_opengl_Display(vout_display_opengl_t *vgl,
                                 const video_format_t *source)
@@ -900,16 +949,24 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         bottom[j] = (source->i_y_offset + source->i_visible_height) * scale_h;
     }
 
+#ifdef SUPPORTS_SHADERS
     if (vgl->program[0])
         DrawWithShaders(vgl, left, top ,right, bottom);
     else
+#endif
+    {
+#ifdef SUPPORTS_FIXED_PIPELINE
         DrawWithoutShaders(vgl, left, top, right, bottom);
+#endif
+    }
 
     /* Draw the subpictures */
     if (vgl->program[1]) {
+#ifdef SUPPORTS_SHADERS
         // Change the program for overlays
         vgl->UseProgram(vgl->program[1]);
         vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[1], "Texture"), 0);
+#endif
     }
 
     glEnable(GL_TEXTURE_2D);
@@ -935,24 +992,30 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
         glBindTexture(GL_TEXTURE_2D, glr->texture);
         if (vgl->program[1]) {
+#ifdef SUPPORTS_SHADERS
             vgl->Uniform4f(vgl->GetUniformLocation(vgl->program[1], "FillColor"), 1.0f, 1.0f, 1.0f, glr->alpha);
             vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[1], "MultiTexCoord0"));
             vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "MultiTexCoord0"), 2, GL_FLOAT, 0, 0, textureCoord);
             vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[1], "VertexPosition"));
             vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "VertexPosition"), 2, GL_FLOAT, 0, 0, vertexCoord);
+#endif
         } else {
+#ifdef SUPPORTS_FIXED_PIPELINE
             glEnableClientState(GL_VERTEX_ARRAY);
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glColor4f(1.0f, 1.0f, 1.0f, glr->alpha);
             glTexCoordPointer(2, GL_FLOAT, 0, textureCoord);
             glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
+#endif
         }
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         if (!vgl->program[1]) {
+#ifdef SUPPORTS_FIXED_PIPELINE
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
             glDisableClientState(GL_VERTEX_ARRAY);
+#endif
         }
     }
     glDisable(GL_BLEND);

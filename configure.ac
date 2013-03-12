@@ -2897,10 +2897,10 @@ PKG_CHECK_MODULES([GL], [gl], [
   ])
 ])
 
-dnl OpenGL ES 2: depends on EGL 1.1 and is currently unfinished
-dnl PKG_ENABLE_MODULES_VLC([GLES2], [], [glesv2], [OpenGL ES v2 support], [auto])
-dnl OpenGL ES 1: depends on EGL 1.0 and is currently broken
-dnl PKG_ENABLE_MODULES_VLC([GLES1], [], [glesv1_cm], [OpenGL ES v1 support], [auto])
+dnl OpenGL ES 2: depends on EGL 1.1
+PKG_ENABLE_MODULES_VLC([GLES2], [], [glesv2], [OpenGL ES v2 support], [auto])
+dnl OpenGL ES 1: depends on EGL 1.0
+PKG_ENABLE_MODULES_VLC([GLES1], [], [glesv1_cm], [OpenGL ES v1 support], [auto])
 
 AC_ARG_ENABLE(egl,
   [  --enable-egl            OpenGL support through EGL (default disabled)],, [
