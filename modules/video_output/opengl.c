@@ -710,7 +710,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
         if ( (picture->p[j].i_pitch / picture->p[j].i_pixel_pitch) != (unsigned int)
              ( picture->format.i_visible_width * vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den ) )
         {
-            uint8_t *new_plane = malloc( picture->format.i_visible_width * vgl->fmt.i_visible_height * vgl->chroma->p[j].h.num / (vgl->chroma->p[j].h.den *  vgl->chroma->p[j].w.den ) );
+            uint8_t *new_plane = malloc( picture->format.i_visible_width * vgl->fmt.i_visible_height * vgl->chroma->p[j].w.num * vgl->chroma->p[j].h.num / (vgl->chroma->p[j].h.den * vgl->chroma->p[j].w.den ) );
             uint8_t *destination = new_plane;
             const uint8_t *source = picture->p[j].p_pixels;
 
