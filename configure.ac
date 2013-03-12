@@ -2258,7 +2258,7 @@ AS_IF([test "${enable_libva}" = "yes" -a "${have_avcodec}" != "yes" ], [
   AC_MSG_ERROR([--enable-libva and --disable-avcodec options are mutually exclusive. Use --enable-avcodec.])
 ])
 have_avcodec_vaapi="no"
-AS_IF([test "${enable_libva}" != "no"], [
+AS_IF([test "${enable_libva}" != "no" -a "${have_avcodec}" == "yes"], [
   PKG_CHECK_MODULES(LIBVA, [libva libva-x11], [
     VLC_SAVE_FLAGS
     CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
@@ -2995,7 +2995,7 @@ AC_ARG_ENABLE(vdpau,
   [AS_HELP_STRING([--enable-vdpau],
     [VDPAU hardware decoder support (default auto)])])
 have_vdpau="no"
-AS_IF([test "${enable_vdpau}" != "no"], [
+AS_IF([test "${enable_vdpau}" != "no" -a "${have_avcodec}" == "yes"], [
   PKG_CHECK_MODULES([VDPAU], [vdpau], [
     have_vdpau="yes"
     AS_IF([test "${no_x}" = "yes"], [
