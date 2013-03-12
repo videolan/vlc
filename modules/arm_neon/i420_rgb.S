@@ -50,16 +50,20 @@
 
 #define u	D24
 #define v	D25
-#define y1	D28
-#define y2	D29
+#define y1	D18
+#define y2	D19
 
 #define chro_r	Q6
 #define chro_g	Q7
 #define chro_b	Q8
-#define red		Q9
-#define green	Q10
-#define blue	Q11
-#define lumi	Q15
+#define lumi1	Q15
+#define lumi2	Q10
+#define red16_1		Q9
+#define green16_1	Q10
+#define blue16_1	Q11
+#define red16_2		Q12
+#define green16_2	Q13
+#define blue16_2	Q14
 
 #define red1	D24
 #define green1	D25
@@ -123,69 +127,69 @@ loop_col:
 	vld1.u8	{u}, [U,:64]!
 	vld1.u8	{v}, [V,:64]!
 
-	vmull.u8	chro_r, v, coefRV
-	vmull.u8	chro_g, u, coefGU
-	vmlal.u8	chro_g, v, coefGV
-	vmull.u8	chro_b, u, coefBU
+	/* Y Top Row */
+	vld2.u8	{y1,y2}, [Y1,:128]!
 
-	vadd.s16	chro_r, Rc, chro_r
-	vsub.s16	chro_g, Gc, chro_g
-	vadd.s16	chro_b, Bc, chro_b
+	vmull.u8	Q14, v, coefRV
+	vmull.u8	Q11, u, coefGU
+	vmull.u8	Q13, u, coefBU
+	vmlal.u8	Q11, v, coefGV
+
+	vmull.u8	lumi2, y2, coefY
+	vmull.u8	lumi1, y1, coefY
+	vadd.s16	chro_r, Rc, Q14
+	vadd.s16	chro_b, Bc, Q13
+	vsub.s16	chro_g, Gc, Q11
 
 	pld	[U]
 	pld	[V]
 
-	/* Y Top Row */
-	vld2.u8	{y1,y2}, [Y1,:128]!
+	/* chrominance + luminance */
+	vqadd.s16	red16_2, lumi2, chro_r
+	vqadd.s16	blue16_2, lumi2, chro_b
+	vqadd.s16	green16_2, lumi2, chro_g
+	vqadd.s16	red16_1, lumi1, chro_r
+	vqadd.s16	green16_1, lumi1, chro_g
+	vqadd.s16	blue16_1, lumi1, chro_b
 
-	/* y1 : chrominance + luminance, then clamp (divide by 64) */
-	vmull.u8	lumi, y1, coefY
-	vqadd.s16	red, lumi, chro_r
-	vqadd.s16	green, lumi, chro_g
-	vqadd.s16	blue, lumi, chro_b
-	vqrshrun.s16	red1, red, #6
-	vqrshrun.s16	green1, green, #6
-	vqrshrun.s16	blue1, blue, #6
-
-	/* y2 : chrominance + luminance, then clamp (divide by 64) */
-	vmull.u8	lumi, y2, coefY
-	vqadd.s16	red, lumi, chro_r
-	vqadd.s16	green, lumi, chro_g
-	vqadd.s16	blue, lumi, chro_b
-	vqrshrun.s16	red2, red, #6
-	vqrshrun.s16	green2, green, #6
-	vqrshrun.s16	blue2, blue, #6
+	/* clamp (divide by 64) */
+	vqrshrun.s16	blue2, blue16_2, #6
+	vqrshrun.s16	red2, red16_2, #6
+	vqrshrun.s16	green2, green16_2, #6
+	vqrshrun.s16	red1, red16_1, #6
+	vqrshrun.s16	green1, green16_1, #6
+	vqrshrun.s16	blue1, blue16_1, #6
 
 	pld	[Y1]
-
-	vmov.u8	alpha2, #255
-	vzip.u8	red1, red2
-	vzip.u8	green1, green2
-	vzip.u8	blue1, blue2
-
-	vst4.u8		{red1,green1,blue1,alpha1}, [O1,:128]!
-	vst4.u8		{red2,green2,blue2,alpha2}, [O1,:128]!
 
 	/* Y Bottom Row */
 	vld2.u8	{y1,y2}, [Y2,:128]!
 
-	/* y1 : chrominance + luminance, then clamp (divide by 64) */
-	vmull.u8	lumi, y1, coefY
-	vqadd.s16	red, lumi, chro_r
-	vqadd.s16	green, lumi, chro_g
-	vqadd.s16	blue, lumi, chro_b
-	vqrshrun.s16	red1, red, #6
-	vqrshrun.s16	green1, green, #6
-	vqrshrun.s16	blue1, blue, #6
+	vmov.u8	alpha1, #255
+	vzip.u8	red1, red2
+	vzip.u8	green1, green2
+	vzip.u8	blue1, blue2
 
-	/* y2 : chrominance + luminance, then clamp (divide by 64) */
-	vmull.u8	lumi, y2, coefY
-	vqadd.s16	red, lumi, chro_r
-	vqadd.s16	green, lumi, chro_g
-	vqadd.s16	blue, lumi, chro_b
-	vqrshrun.s16	red2, red, #6
-	vqrshrun.s16	green2, green, #6
-	vqrshrun.s16	blue2, blue, #6
+	vmull.u8	lumi2, y2, coefY
+	vst4.u8		{red1,green1,blue1,alpha1}, [O1,:128]!
+	vst4.u8		{red2,green2,blue2,alpha2}, [O1,:128]!
+
+	/* chrominance + luminance */
+	vmull.u8	lumi1, y1, coefY
+	vqadd.s16	red16_2, lumi2, chro_r
+	vqadd.s16	green16_2, lumi2, chro_g
+	vqadd.s16	blue16_2, lumi2, chro_b
+	vqadd.s16	red16_1, lumi1, chro_r
+	vqadd.s16	green16_1, lumi1, chro_g
+	vqadd.s16	blue16_1, lumi1, chro_b
+
+	/* clamp (divide by 64) */
+	vqrshrun.s16	blue2, blue16_2, #6
+	vqrshrun.s16	red2, red16_2, #6
+	vqrshrun.s16	green2, green16_2, #6
+	vqrshrun.s16	red1, red16_1, #6
+	vqrshrun.s16	green1, green16_1, #6
+	vqrshrun.s16	blue1, blue16_1, #6
 
 	pld	[Y2]
 
