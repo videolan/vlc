@@ -178,7 +178,6 @@ endif
 
 libvlccore_la_SOURCES = $(SOURCES_libvlc)
 libvlccore_la_LDFLAGS = \
-	-no-undefined \
 	$(LDFLAGS_libvlccore) \
 	-no-undefined \
 	-export-symbols $(srcdir)/libvlccore.sym \
