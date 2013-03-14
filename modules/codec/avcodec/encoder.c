@@ -825,19 +825,16 @@ int OpenEncoder( vlc_object_t *p_this )
                                 p_context->channels;
         p_sys->i_frame_size = p_context->frame_size > 1 ?
                                     p_context->frame_size :
-                                    RAW_AUDIO_FRAME_SIZE;
+                                    FF_MIN_BUFFER_SIZE;
         p_sys->p_buffer = malloc( p_sys->i_frame_size * p_sys->i_sample_bytes );
-        if ( p_sys->p_buffer == NULL )
+        if ( unlikely( p_sys->p_buffer == NULL ) )
         {
             goto error;
         }
         p_enc->fmt_out.audio.i_blockalign = p_context->block_align;
         p_enc->fmt_out.audio.i_bitspersample = aout_BitsPerSample( p_enc->fmt_out.i_codec );
 
-        if( p_context->frame_size > 1 )
-            p_sys->i_buffer_out = 8 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
-        else
-            p_sys->i_buffer_out = p_sys->i_frame_size * p_sys->i_sample_bytes;
+        p_sys->i_buffer_out = p_sys->i_frame_size * p_sys->i_sample_bytes;
     }
 
     p_sys->frame = avcodec_alloc_frame();
@@ -865,7 +862,8 @@ error:
 static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
-    int i_out, i_plane;
+    int i_out, i_plane, i_got_packet=1;
+    AVPacket av_pkt;
 
     /* Initialize the video output buffer the first time.
      * This is done here instead of OpenEncoder() because we need the actual
@@ -876,6 +874,12 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     const int blocksize = __MAX( FF_MIN_BUFFER_SIZE,bytesPerPixel * p_sys->p_context->height * p_sys->p_context->width + 200 );
     block_t *p_block = block_Alloc( blocksize );
 
+#if (LIBAVCODEC_VERSION_MAJOR >= 54)
+    /*We don't use av_pkt with major_version < 54, so no point init it*/
+    av_init_packet( &av_pkt );
+    av_pkt.data = p_block->p_buffer;
+    av_pkt.size = p_block->i_buffer;
+#endif
     if( likely(p_pict) ) {
         avcodec_get_frame_defaults( p_sys->frame );
         for( i_plane = 0; i_plane < p_pict->i_planes; i_plane++ )
@@ -954,21 +958,29 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 
         p_sys->frame->quality = p_sys->i_quality;
 
-        i_out = avcodec_encode_video( p_sys->p_context, p_block->p_buffer,
-                                     p_block->i_buffer, p_sys->frame );
+#if (LIBAVCODEC_VERSION_MAJOR < 54)
+        i_out = avcodec_encode_video( p_sys->p_context, p_block->p_buffer, p_block->i_buffer, p_sys->frame );
+#else
+        i_out = avcodec_encode_video2( p_sys->p_context, &av_pkt, p_sys->frame, &i_got_packet );
+#endif
     }
     else
     {
-        i_out = avcodec_encode_video( p_sys->p_context, p_block->p_buffer,
-                                     p_block->i_buffer, NULL);
+#if (LIBAVCODEC_VERSION_MAJOR < 54)
+        i_out = avcodec_encode_video( p_sys->p_context, p_block->p_buffer, p_block->i_buffer, NULL);
+#else
+        i_out = avcodec_encode_video2( p_sys->p_context, &av_pkt, NULL, &i_got_packet );
+#endif
     }
 
-    if( i_out <= 0 )
+    if( unlikely( i_out < 0 || i_got_packet == 0 ) )
     {
         block_Release( p_block );
         return NULL;
     }
 
+
+#if (LIBAVCODEC_VERSION_MAJOR < 54)
     p_block->i_buffer = i_out;
 
     /* FIXME, 3-2 pulldown is not handled correctly */
@@ -1016,6 +1028,14 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
          * correctly */
         p_block->i_dts = p_block->i_pts = p_pict->date;
     }
+#else
+    p_block->i_buffer = av_pkt.size;
+
+    p_block->i_length = av_pkt.duration / p_sys->p_context->time_base.den;
+
+    p_block->i_pts = av_pkt.pts;
+    p_block->i_dts = av_pkt.dts;
+#endif
 
     switch ( p_sys->p_context->coded_frame->pict_type )
     {
