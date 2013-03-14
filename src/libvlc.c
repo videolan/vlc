@@ -201,11 +201,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     int vlc_optind;
     if( config_LoadCmdLine( p_libvlc, i_argc, ppsz_argv, &vlc_optind ) )
     {
-#ifdef WIN32
-        MessageBox (NULL, TEXT("The command line options could not be parsed.\n"
-                    "Make sure they are valid."), TEXT("VLC media player"),
-                    MB_OK|MB_ICONERROR);
-#endif
         module_EndBank (true);
         return VLC_EGENERIC;
     }

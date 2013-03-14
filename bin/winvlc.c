@@ -154,6 +154,12 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         libvlc_wait (vlc);
         libvlc_release (vlc);
     }
+    else
+        MessageBox (NULL, TEXT("VLC media player could not start.\n"
+                    "Either the command line options were invalid or no plugins were found.\n"),
+                    TEXT("VLC media player"),
+                    MB_OK|MB_ICONERROR);
+
 
     for (int i = 0; i < argc; i++)
         free (argv[i]);
