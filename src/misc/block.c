@@ -117,11 +117,15 @@ static void BlockMetaCopy( block_t *restrict out, const block_t *in )
     out->i_length  = in->i_length;
 }
 
-/* Memory alignment (must be a multiple of sizeof(void*) and a power of two) */
-#define BLOCK_ALIGN        16
-/* Initial reserved header and footer size (must be multiple of alignment) */
+/** Initial memory alignment of data block.
+ * @note This must be a multiple of sizeof(void*) and a power of two.
+ * libavcodec AVX optimizations require at least 32-bytes. */
+#define BLOCK_ALIGN        32
+
+/** Initial reserved header and footer size. */
 #define BLOCK_PADDING      32
-/* Maximum size of reserved footer before we release with realloc() */
+
+/* Maximum size of reserved footer before shrinking with realloc(). */
 #define BLOCK_WASTE_SIZE   2048
 
 block_t *block_Alloc (size_t size)
