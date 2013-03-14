@@ -115,8 +115,8 @@
 #define ADEC_TITLE  N_( "Audio codecs" )
 #define ADEC_HELP N_( "Settings for the audio-only decoders and encoders." )
 
-#define SDEC_TITLE N_( "Subtitles codecs")
-#define SDEC_HELP N_( "Settings for subtitles, teletext and CC decoders and encoders." )
+#define SDEC_TITLE N_( "Subtitle codecs")
+#define SDEC_HELP N_( "Settings for subtitle, teletext and CC decoders and encoders." )
 
 #define ADVANCED_TITLE N_("General Input" )
 #define ADVANCED_HELP N_( "General input settings. Use with care..." )
@@ -200,7 +200,7 @@
 
 #define ENCODER_TITLE N_("Encoders settings")
 #define ENCODER_HELP N_( \
-    "These are general settings for video/audio/subtitles encoding modules.")
+    "These are general settings for video/audio/subtitle encoding modules.")
 
 
 #define DIALOGS_TITLE N_("Dialog providers settings")
@@ -210,7 +210,7 @@
 #define SUBTITLE_DEMUX_TITLE N_("Subtitle demuxer settings")
 #define SUBTITLE_DEMUX_HELP N_( \
     "In this section you can force the behavior of the subtitle demuxer, " \
-    "for example by setting the subtitles type or file name.")
+    "for example by setting the subtitle type or file name.")
 
 /*
  *  A little help for modules with unknown capabilities

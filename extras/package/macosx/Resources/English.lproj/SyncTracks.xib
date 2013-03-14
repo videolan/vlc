@@ -390,7 +390,7 @@
                       <object class="NSTextFieldCell" key="NSCell" id="432856306">
                         <int key="NSCellFlags">68288064</int>
                         <int key="NSCellFlags2">272761856</int>
-                        <string key="NSContents">Subtitles speed:</string>
+                        <string key="NSContents">Subtitle speed:</string>
                         <reference key="NSSupport" ref="26"/>
                         <reference key="NSControlView" ref="1031205444"/>
                         <reference key="NSBackgroundColor" ref="592262308"/>
@@ -485,7 +485,7 @@
                       <object class="NSTextFieldCell" key="NSCell" id="888222676">
                         <int key="NSCellFlags">68288064</int>
                         <int key="NSCellFlags2">272761856</int>
-                        <string key="NSContents">Subtitles duration factor:</string>
+                        <string key="NSContents">Subtitle duration factor:</string>
                         <reference key="NSSupport" ref="26"/>
                         <reference key="NSControlView" ref="934030007"/>
                         <reference key="NSBackgroundColor" ref="592262308"/>

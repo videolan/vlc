@@ -621,7 +621,7 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 QMenu *VLCMenuBar::SubtitleMenu( QMenu *current )
 {
     QAction *action;
-    QMenu *submenu = new QMenu( qtr( "&Subtitles Track" ), current );
+    QMenu *submenu = new QMenu( qtr( "&Subtitle Track" ), current );
     action = current->addMenu( submenu );
     action->setData( "spu-es" );
     addDPStaticEntry( submenu, qtr( "Open File..." ), "",

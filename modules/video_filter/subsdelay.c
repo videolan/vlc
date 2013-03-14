@@ -42,7 +42,7 @@
 
 /* descriptions */
 
-#define SUBSDELAY_HELP N_("Change subtitles delay")
+#define SUBSDELAY_HELP N_("Change subtitle delay")
 
 #define MODE_TEXT N_( "Delay calculation mode" )
 #define MODE_LONGTEXT N_( \
@@ -272,7 +272,7 @@ static void SubsdelayEntryNewStopValueUpdated( subsdelay_heap_entry_t *p_entry )
 
 vlc_module_begin()
         set_shortname( _("Subsdelay") )
-        set_description( _("Subtitles delay") )
+        set_description( _("Subtitle delay") )
         set_help( SUBSDELAY_HELP )
         set_capability( "sub filter", 0 )
         set_callbacks( SubsdelayCreate, SubsdelayDestroy )

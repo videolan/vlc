@@ -1487,7 +1487,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         /* We need to get rid of the header packet */
                         ogg_stream_packetout( &p_stream->os, &oggpacket );
 
-                        msg_Dbg( p_demux, "found text subtitles header" );
+                        msg_Dbg( p_demux, "found text subtitle header" );
                         p_stream->fmt.i_cat = SPU_ES;
                         p_stream->fmt.i_codec = VLC_CODEC_SUBT;
                         p_stream->f_rate = 1000; /* granulepos is in millisec */

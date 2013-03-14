@@ -2287,7 +2287,7 @@
                 </object>
                 <object class="NSMenuItem" id="897405414">
                   <reference key="NSMenu" ref="598695780"/>
-                  <string key="NSTitle">Subtitles track</string>
+                  <string key="NSTitle">Subtitle track</string>
                   <string key="NSKeyEquiv"/>
                   <int key="NSKeyEquivModMask">1048576</int>
                   <int key="NSMnemonicLoc">2147483647</int>
@@ -2295,7 +2295,7 @@
                   <reference key="NSMixedImage" ref="100133332"/>
                   <string key="NSAction">submenuAction:</string>
                   <object class="NSMenu" key="NSSubmenu" id="451511994">
-                    <string key="NSTitle">Subtitles track</string>
+                    <string key="NSTitle">Subtitle track</string>
                     <object class="NSMutableArray" key="NSMenuItems">
                       <bool key="EncodedWithXMLCoder">YES</bool>
                       <object class="NSMenuItem" id="582837384">

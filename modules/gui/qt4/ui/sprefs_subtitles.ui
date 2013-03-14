@@ -82,7 +82,7 @@
          </sizepolicy>
         </property>
         <property name="title">
-         <string>Subtitles Language</string>
+         <string>Subtitle Language</string>
         </property>
         <layout class="QGridLayout">
          <item row="0" column="0">
@@ -94,7 +94,7 @@
             </size>
            </property>
            <property name="text">
-            <string>Preferred subtitles language</string>
+            <string>Preferred subtitle language</string>
            </property>
            <property name="buddy">
             <cstring>preferredLanguage</cstring>
@@ -133,7 +133,7 @@
       <item>
        <widget class="QGroupBox" name="groupBox">
         <property name="title">
-         <string>Subtitles effects</string>
+         <string>Subtitle effects</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_2">
          <item row="0" column="0">

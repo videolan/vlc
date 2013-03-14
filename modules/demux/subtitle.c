@@ -67,7 +67,7 @@ static const char *const ppsz_sub_type[] =
 
 vlc_module_begin ()
     set_shortname( N_("Subtitles"))
-    set_description( N_("Text subtitles parser") )
+    set_description( N_("Text subtitle parser") )
     set_capability( "demux", 0 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
@@ -75,12 +75,12 @@ vlc_module_begin ()
                N_("Frames per second"),
                SUB_FPS_LONGTEXT, true )
     add_integer( "sub-delay", 0,
-               N_("Subtitles delay"),
+               N_("Subtitle delay"),
                SUB_DELAY_LONGTEXT, true )
-    add_string( "sub-type", "auto", N_("Subtitles format"),
+    add_string( "sub-type", "auto", N_("Subtitle format"),
                 SUB_TYPE_LONGTEXT, true )
         change_string_list( ppsz_sub_type, ppsz_sub_type )
-    add_string( "sub-description", NULL, N_("Subtitles description"),
+    add_string( "sub-description", NULL, N_("Subtitle description"),
                 SUB_DESCRIPTION_LONGTEXT, true )
     set_callbacks( Open, Close )
 

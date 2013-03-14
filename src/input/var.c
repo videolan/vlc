@@ -207,7 +207,7 @@ void input_ControlVarInit ( input_thread_t *p_input )
 
     /* Spu ES */
     var_Create( p_input, "spu-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-    text.psz_string = _("Subtitles Track");
+    text.psz_string = _("Subtitle Track");
     var_Change( p_input, "spu-es", VLC_VAR_SETTEXT, &text, NULL );
 
     /* Special read only objects variables for intf */

@@ -58,7 +58,7 @@ static void Close(vlc_object_t *);
 
 #define HW_BLENDING_TEXT N_("Use hardware blending support")
 #define HW_BLENDING_LONGTEXT N_(\
-    "Try to use hardware acceleration for subtitles/OSD blending.")
+    "Try to use hardware acceleration for subtitle/OSD blending.")
 
 #define D3D_HELP N_("Recommended video output for Windows Vista and later versions")
 

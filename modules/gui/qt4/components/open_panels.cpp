@@ -249,7 +249,7 @@ void FileOpenPanel::removeFile()
 void FileOpenPanel::browseFileSub()
 {
     // TODO Handle selection of more than one subtitles file
-    QStringList files = THEDP->showSimpleOpen( qtr("Open subtitles file"),
+    QStringList files = THEDP->showSimpleOpen( qtr("Open subtitle file"),
                            EXT_FILTER_SUBTITLE, p_intf->p_sys->filepath );
 
     if( files.isEmpty() ) return;

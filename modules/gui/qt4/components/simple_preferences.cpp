@@ -88,7 +88,7 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent, bool sma
                   cone_audio_64, 1 );
     ADD_CATEGORY( SPrefsVideo, qtr("Video"), qtr("Video Settings"),
                   cone_video_64, 2 );
-    ADD_CATEGORY( SPrefsSubtitles, SUBPIC_TITLE, qtr("Subtitles & On Screen Display Settings"),
+    ADD_CATEGORY( SPrefsSubtitles, SUBPIC_TITLE, qtr("Subtitle & On Screen Display Settings"),
                   cone_subtitles_64, 3 );
     ADD_CATEGORY( SPrefsInputAndCodecs, INPUT_TITLE, qtr("Input & Codecs Settings"),
                   cone_input_64, 4 );
@@ -636,7 +636,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         END_SPREFS_CAT;
 
         START_SPREFS_CAT( Subtitles,
-                            qtr("Subtitles & On Screen Display Settings") );
+                            qtr("Subtitle & On Screen Display Settings") );
             CONFIG_BOOL( "osd", OSDBox);
             CONFIG_BOOL( "video-title-show", OSDTitleBox);
             CONFIG_GENERIC( "video-title-position", IntegerList,

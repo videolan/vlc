@@ -1,5 +1,5 @@
 /*****************************************************************************
- * subsdec.c : text subtitles decoder
+ * subsdec.c : text subtitle decoder
  *****************************************************************************
  * Copyright (C) 2000-2006 VLC authors and VideoLAN
  * $Id$
@@ -163,13 +163,13 @@ static const int  pi_justification[] = { 0, 1, 2 };
 static const char *const ppsz_justification_text[] = {
     N_("Center"),N_("Left"),N_("Right")};
 
-#define ENCODING_TEXT N_("Subtitles text encoding")
+#define ENCODING_TEXT N_("Subtitle text encoding")
 #define ENCODING_LONGTEXT N_("Set the encoding used in text subtitles")
-#define ALIGN_TEXT N_("Subtitles justification")
+#define ALIGN_TEXT N_("Subtitle justification")
 #define ALIGN_LONGTEXT N_("Set the justification of subtitles")
-#define AUTODETECT_UTF8_TEXT N_("UTF-8 subtitles autodetection")
+#define AUTODETECT_UTF8_TEXT N_("UTF-8 subtitle autodetection")
 #define AUTODETECT_UTF8_LONGTEXT N_("This enables automatic detection of " \
-            "UTF-8 encoding within subtitles files.")
+            "UTF-8 encoding within subtitle files.")
 #define FORMAT_TEXT N_("Formatted Subtitles")
 #define FORMAT_LONGTEXT N_("Some subtitle formats allow for text formatting. " \
  "VLC partly implements this, but you can choose to disable all formatting.")
@@ -179,7 +179,7 @@ static void CloseDecoder  ( vlc_object_t * );
 
 vlc_module_begin ()
     set_shortname( N_("Subtitles"))
-    set_description( N_("Text subtitles decoder") )
+    set_description( N_("Text subtitle decoder") )
     set_capability( "decoder", 50 )
     set_callbacks( OpenDecoder, CloseDecoder )
     set_category( CAT_INPUT )

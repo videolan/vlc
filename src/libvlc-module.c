@@ -586,7 +586,7 @@ static const char *const ppsz_clock_descriptions[] =
     "Stream number of the audio track to use " \
     "(from 0 to n).")
 
-#define INPUT_SUBTRACK_TEXT N_("Subtitles track")
+#define INPUT_SUBTRACK_TEXT N_("Subtitle track")
 #define INPUT_SUBTRACK_LONGTEXT N_( \
     "Stream number of the subtitle track to use " \
     "(from 0 to n).")
@@ -606,7 +606,7 @@ static const char *const ppsz_clock_descriptions[] =
 #define INPUT_AUDIOTRACK_ID_LONGTEXT N_( \
     "Stream ID of the audio track to use.")
 
-#define INPUT_SUBTRACK_ID_TEXT N_("Subtitles track ID")
+#define INPUT_SUBTRACK_ID_TEXT N_("Subtitle track ID")
 #define INPUT_SUBTRACK_ID_LONGTEXT N_( \
     "Stream ID of the subtitle track to use.")
 
@@ -723,7 +723,7 @@ static const char *const ppsz_prefres[] = {
 #define SUB_FILTER_TEXT N_("Subpictures filter module")
 #define SUB_FILTER_LONGTEXT N_( \
     "This adds so-called \"subpicture filters\". These filter subpictures " \
-    "created by subtitles decoders or other subpictures sources." )
+    "created by subtitle decoders or other subpictures sources." )
 
 #define SUB_AUTO_TEXT N_("Autodetect subtitle files")
 #define SUB_AUTO_LONGTEXT N_( \

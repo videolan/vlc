@@ -573,7 +573,7 @@ commands_ordered = {
     { "vdeinterlace"; { func = skip(listvalue("vout","deinterlace")); args = "[X]"; help = "set/get video deinterlace" } };
     { "vdeinterlace_mode"; { func = skip(listvalue("vout","deinterlace-mode")); args = "[X]"; help = "set/get video deinterlace mode" } };
     { "snapshot"; { func = common.snapshot; help = "take video snapshot" } };
-    { "strack"; { func = skip(listvalue("input","spu-es")); args = "[X]"; help = "set/get subtitles track" } };
+    { "strack"; { func = skip(listvalue("input","spu-es")); args = "[X]"; help = "set/get subtitle track" } };
     { "hotkey"; { func = hotkey; args = "[hotkey name]"; help = "simulate hotkey press"; adv = true; aliases = { "key" } } };
     { "" };
     { "vlm"; { func = load_vlm; help = "load the VLM" } };

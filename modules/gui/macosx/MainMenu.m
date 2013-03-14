@@ -391,8 +391,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mu_crop setTitle: _NS("Crop")];
     [o_mi_screen setTitle: _NS("Fullscreen Video Device")];
     [o_mu_screen setTitle: _NS("Fullscreen Video Device")];
-    [o_mi_subtitle setTitle: _NS("Subtitles Track")];
-    [o_mu_subtitle setTitle: _NS("Subtitles Track")];
+    [o_mi_subtitle setTitle: _NS("Subtitle Track")];
+    [o_mu_subtitle setTitle: _NS("Subtitle Track")];
     [o_mi_addSub setTitle: _NS("Open File...")];
     [o_mi_deinterlace setTitle: _NS("Deinterlace")];
     [o_mu_deinterlace setTitle: _NS("Deinterlace")];
@@ -1174,7 +1174,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     }
 
     /* special case for the subtitles item */
-    if ([[o_parent title] isEqualToString: _NS("Subtitles Track")] == YES) {
+    if ([[o_parent title] isEqualToString: _NS("Subtitle Track")] == YES) {
         NSMenuItem * o_lmi_tmp;
         o_lmi_tmp = [o_menu addItemWithTitle: _NS("Open File...") action: @selector(addSubtitleFile:) keyEquivalent: @""];
         [o_lmi_tmp setTarget: [[VLCMain sharedInstance] controls]];
@@ -1222,7 +1222,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_parent setEnabled: (val_list.p_list->i_count > 1)];
 
     /* another special case for the subtitles item */
-    if ([[o_parent title] isEqualToString: _NS("Subtitles Track")] == YES)
+    if ([[o_parent title] isEqualToString: _NS("Subtitle Track")] == YES)
         [o_menu addItem: [NSMenuItem separatorItem]];
 
     for (i = 0; i < val_list.p_list->i_count; i++) {
@@ -1268,7 +1268,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
     /* special case for the subtitles sub-menu
      * In case that we don't have any subs, we don't want a separator item at the end */
-    if ([[o_parent title] isEqualToString: _NS("Subtitles Track")] == YES) {
+    if ([[o_parent title] isEqualToString: _NS("Subtitle Track")] == YES) {
         if ([o_menu numberOfItems] == 2)
             [o_menu removeItemAtIndex: 1];
     }

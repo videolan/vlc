@@ -260,7 +260,7 @@ Note that the sout chain is used and sent to VLC by the input dialog
         <tr>
           <td>
             <input type="checkbox" id="sout_sub" onchange="update_sout()"/>
-            <label for="sout_sub">Subtitles Codec</label>
+            <label for="sout_sub">Subtitle Codec</label>
           </td>
           <td>
             <select id="sout_scodec" onchange="update_sout()">
@@ -269,7 +269,7 @@ Note that the sout chain is used and sent to VLC by the input dialog
           </td>
           <td colspan="2">
             <input type="checkbox" id="sout_soverlay" onchange="update_sout()"/>
-            <label for="sout_soverlay">Subtitles overlay</label>
+            <label for="sout_soverlay">Subtitle overlay</label>
           </td>
         </tr>
       </table>

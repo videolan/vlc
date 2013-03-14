@@ -164,7 +164,7 @@ bool transcode_spu_add( sout_stream_t *p_stream, es_format_t *p_fmt,
 
     if( p_sys->i_scodec || p_sys->psz_senc )
     {
-        msg_Dbg( p_stream, "creating subtitles transcoding from fcc=`%4.4s' "
+        msg_Dbg( p_stream, "creating subtitle transcoding from fcc=`%4.4s' "
                  "to fcc=`%4.4s'", (char*)&p_fmt->i_codec,
                  (char*)&p_sys->i_scodec );
 
@@ -174,7 +174,7 @@ bool transcode_spu_add( sout_stream_t *p_stream, es_format_t *p_fmt,
         /* build decoder -> filter -> encoder */
         if( transcode_spu_new( p_stream, id ) )
         {
-            msg_Err( p_stream, "cannot create subtitles chain" );
+            msg_Err( p_stream, "cannot create subtitle chain" );
             return false;
         }
 
@@ -191,7 +191,7 @@ bool transcode_spu_add( sout_stream_t *p_stream, es_format_t *p_fmt,
     else
     {
         assert( p_sys->b_soverlay );
-        msg_Dbg( p_stream, "subtitles (fcc=`%4.4s') overlaying",
+        msg_Dbg( p_stream, "subtitle (fcc=`%4.4s') overlaying",
                  (char*)&p_fmt->i_codec );
 
         id->b_transcode = true;
@@ -199,7 +199,7 @@ bool transcode_spu_add( sout_stream_t *p_stream, es_format_t *p_fmt,
         /* Build decoder -> filter -> overlaying chain */
         if( transcode_spu_new( p_stream, id ) )
         {
-            msg_Err( p_stream, "cannot create subtitles chain" );
+            msg_Err( p_stream, "cannot create subtitle chain" );
             return false;
         }
     }

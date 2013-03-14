@@ -853,7 +853,7 @@ static void Help( intf_thread_t *p_intf, bool b_longhelp)
     msg_rc("%s", _("| vcrop [X]  . . . . . . . . . . .  set/get video crop"));
     msg_rc("%s", _("| vzoom [X]  . . . . . . . . . . .  set/get video zoom"));
     msg_rc("%s", _("| snapshot . . . . . . . . . . . . take video snapshot"));
-    msg_rc("%s", _("| strack [X] . . . . . . . . . set/get subtitles track"));
+    msg_rc("%s", _("| strack [X] . . . . . . . . .  set/get subtitle track"));
     msg_rc("%s", _("| key [hotkey name] . . . . . .  simulate hotkey press"));
     msg_rc("%s", _("| menu . . [on|off|up|down|left|right|select] use menu"));
     msg_rc(  "| ");

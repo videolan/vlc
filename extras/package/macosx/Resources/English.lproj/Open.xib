@@ -214,7 +214,7 @@
                         <object class="NSButtonCell" key="NSCell" id="505386145">
                           <int key="NSCellFlags">67239424</int>
                           <int key="NSCellFlags2">0</int>
-                          <string key="NSContents">Load subtitles file:</string>
+                          <string key="NSContents">Load subtitle file:</string>
                           <reference key="NSSupport" ref="725567486"/>
                           <reference key="NSControlView" ref="895203276"/>
                           <int key="NSButtonFlags">1211912703</int>
@@ -1339,7 +1339,7 @@ c3ViX2FsaWduX2xibDsKCg</string>
                       <object class="NSTextFieldCell" key="NSCell" id="16061800">
                         <int key="NSCellFlags">67239424</int>
                         <int key="NSCellFlags2">4194304</int>
-                        <string key="NSContents">Subtitles justification</string>
+                        <string key="NSContents">Subtitle justification</string>
                         <reference key="NSSupport" ref="725567486"/>
                         <reference key="NSControlView" ref="1062804181"/>
                         <reference key="NSBackgroundColor" ref="227735768"/>

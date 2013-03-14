@@ -323,7 +323,7 @@
       <item row="0" column="3">
        <widget class="QLabel" name="subtitlesLabel">
         <property name="text">
-         <string>Subtitles track</string>
+         <string>Subtitle track</string>
         </property>
         <property name="buddy">
          <cstring>subtitlesSpin</cstring>

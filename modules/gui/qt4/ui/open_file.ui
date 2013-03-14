@@ -102,10 +102,10 @@
       <bool>false</bool>
      </property>
      <property name="toolTip">
-      <string>Add a subtitles file</string>
+      <string>Add a subtitle file</string>
      </property>
      <property name="text">
-      <string>Use a sub&amp;titles file</string>
+      <string>Use a sub&amp;title file</string>
      </property>
     </widget>
    </item>
@@ -136,7 +136,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Select the subtitles file</string>
+            <string>Select the subtitle file</string>
            </property>
            <property name="text">
             <string>Browse...</string>

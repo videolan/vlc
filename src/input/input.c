@@ -3171,7 +3171,7 @@ static void MRLSections( const char *p,
 }
 
 /*****************************************************************************
- * input_AddSubtitles: add a subtitles file and enable it
+ * input_AddSubtitles: add a subtitle file and enable it
  *****************************************************************************/
 static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, unsigned i_flags )
 {
@@ -3194,7 +3194,7 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, unsigned i
 
             if( !vlc_stat( psz_path, &st ) && S_ISREG( st.st_mode ) )
             {
-                msg_Dbg( p_input, "using %s subtitles file instead of %s",
+                msg_Dbg( p_input, "using %s as subtitle file instead of %s",
                          psz_path, psz_subtitle );
                 strcpy( psz_subtitle, psz_path );
             }

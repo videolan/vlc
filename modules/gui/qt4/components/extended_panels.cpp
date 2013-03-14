@@ -1483,7 +1483,7 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     subsLayout->addWidget( subsSpin, 0, 2, 1, 1 );
 
     QLabel *subSpeedLabel = new QLabel;
-    subSpeedLabel->setText( qtr( "Subtitles speed:" ) );
+    subSpeedLabel->setText( qtr( "Subtitle speed:" ) );
     subsLayout->addWidget( subSpeedLabel, 1, 0, 1, 1 );
 
     subSpeedSpin = new QDoubleSpinBox;
@@ -1497,7 +1497,7 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     subsLayout->addWidget( subSpeedSpin, 1, 2, 1, 1 );
 
     QLabel *subDurationLabel = new QLabel;
-    subDurationLabel->setText( qtr( "Subtitles duration factor:" ) );
+    subDurationLabel->setText( qtr( "Subtitle duration factor:" ) );
     subsLayout->addWidget( subDurationLabel, 2, 0, 1, 1 );
 
     subDurationSpin = new QDoubleSpinBox;
@@ -1608,17 +1608,17 @@ void SyncControls::initSubsDuration()
     {
     default:
     case SUBSDELAY_MODE_ABSOLUTE:
-        subDurationSpin->setToolTip( qtr( "Extend subtitles duration by this value.\n"
+        subDurationSpin->setToolTip( qtr( "Extend subtitle duration by this value.\n"
                                           "Set 0 to disable." ) );
         subDurationSpin->setSuffix( " s" );
         break;
     case SUBSDELAY_MODE_RELATIVE_SOURCE_DELAY:
-        subDurationSpin->setToolTip( qtr( "Multiply subtitles duration by this value.\n"
+        subDurationSpin->setToolTip( qtr( "Multiply subtitle duration by this value.\n"
                                           "Set 0 to disable." ) );
         subDurationSpin->setSuffix( "" );
         break;
     case SUBSDELAY_MODE_RELATIVE_SOURCE_CONTENT:
-        subDurationSpin->setToolTip( qtr( "Recalculate subtitles duration according\n"
+        subDurationSpin->setToolTip( qtr( "Recalculate subtitle duration according\n"
                                           "to their content and this value.\n"
                                           "Set 0 to disable." ) );
         subDurationSpin->setSuffix( "" );

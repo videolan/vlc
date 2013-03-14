@@ -80,10 +80,10 @@ This dialog needs the following dialogs to be fully functional: browse
       <input type="checkbox" id="input_sub_options" />
       <label for="input_sub_options">Subtitle options *TODO/FIXME/FIXHTTPD*</label>
       <br/>
-      <label for="input_sub_file">Subtitles file</label>
+      <label for="input_sub_file">Subtitle file</label>
       <input type="text" id="input_sub_file" size="60" />
       <br/>
-      <label for="input_sub_enc">Subtitles encoding</label>
+      <label for="input_sub_enc">Subtitle encoding</label>
       <select id="input_sub_enc">
         <option></option>
       </select>
@@ -142,7 +142,7 @@ This dialog needs the following dialogs to be fully functional: browse
         </tr>
         <tr>
           <td>
-            <label for="input_disc_subtrack">Subtitles track</label>
+            <label for="input_disc_subtrack">Subtitle track</label>
           </td>
           <td>
              <input type="text" id="input_disc_subtrack" onchange="update_input_disc();" />
