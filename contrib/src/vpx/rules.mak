@@ -17,6 +17,9 @@ ifdef HAVE_MACOSX
 	$(APPLY) $(SRC)/vpx/libvpx-mac.patch
 	$(APPLY) $(SRC)/vpx/libvpx-mac-mountain-lion.patch
 endif
+ifdef HAVE_WIN32
+	$(APPLY) $(SRC)/vpx/libvpx-win32.patch
+endif
 ifneq ($(which bash),/bin/bash)
 	sed -i.orig \
 		s,^\#!/bin/bash,\#!`which bash`,g \
