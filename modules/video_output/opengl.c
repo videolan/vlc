@@ -105,6 +105,9 @@ typedef struct {
     float    left;
     float    bottom;
     float    right;
+
+    float    tex_width;
+    float    tex_height;
 } gl_region_t;
 
 struct vout_display_opengl_t {
@@ -811,6 +814,11 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
             if (!vgl->supports_npot) {
                 glr->width  = GetAlignedSize(glr->width);
                 glr->height = GetAlignedSize(glr->height);
+                glr->tex_width  = (float) r->fmt.i_visible_width  / glr->width;
+                glr->tex_height = (float) r->fmt.i_visible_height / glr->height;
+            } else {
+                glr->tex_width  = 1.0;
+                glr->tex_height = 1.0;
             }
             glr->alpha  = (float)subpicture->i_alpha * r->i_alpha / 255 / 255;
             glr->left   =  2.0 * (r->i_x                          ) / subpicture->i_original_picture_width  - 1.0;
@@ -1017,11 +1025,11 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
             glr->right, glr->top,
             glr->right, glr->bottom,
         };
-        static const GLfloat textureCoord[] = {
+        const GLfloat textureCoord[] = {
             0.0, 0.0,
-            0.0, 1.0,
-            1.0, 0.0,
-            1.0, 1.0,
+            0.0, glr->tex_height,
+            glr->tex_width, 0.0,
+            glr->tex_width, glr->tex_height,
         };
 
         glBindTexture(GL_TEXTURE_2D, glr->texture);
