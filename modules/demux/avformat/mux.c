@@ -106,11 +106,6 @@ int OpenMux( vlc_object_t *p_this )
       return VLC_EGENERIC;
     }
 
-    /* Fill p_mux fields */
-    p_mux->pf_control   = Control;
-    p_mux->pf_addstream = AddStream;
-    p_mux->pf_delstream = DelStream;
-    p_mux->pf_mux       = Mux;
     p_mux->p_sys = p_sys = malloc( sizeof( sout_mux_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
@@ -135,6 +130,12 @@ int OpenMux( vlc_object_t *p_this )
     p_sys->b_write_header = true;
     p_sys->b_error = false;
     p_sys->i_initial_dts = 0;
+
+    /* Fill p_mux fields */
+    p_mux->pf_control   = Control;
+    p_mux->pf_addstream = AddStream;
+    p_mux->pf_delstream = DelStream;
+    p_mux->pf_mux       = Mux;
 
     return VLC_SUCCESS;
 }
