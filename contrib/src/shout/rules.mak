@@ -26,7 +26,13 @@ libshout: libshout-$(SHOUT_VERSION).tar.gz .sum-shout
 DEPS_shout = ogg $(DEPS_ogg) theora $(DEPS_theora) speex $(DEPS_speex)
 DEPS_shout += vorbis $(DEPS_vorbis)
 
+SHOUT_CONF :=
+
+ifdef HAVE_WIN32
+SHOUT_CONF += "--disable-thread"
+endif
+
 .shout: libshout
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure $(SHOUT_CONF) $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
