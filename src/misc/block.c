@@ -450,7 +450,7 @@ block_t *block_File (int fd)
     }
 
     /* Prevent an integer overflow in mmap() and malloc() */
-    if (st.st_size >= SIZE_MAX)
+    if ((uintmax_t)st.st_size >= SIZE_MAX)
     {
         errno = ENOMEM;
         return NULL;
