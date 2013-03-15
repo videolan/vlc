@@ -1506,7 +1506,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
         p_block->i_flags |= BLOCK_FLAG_TYPE_I;
     else if( pic.i_type == X264_TYPE_P || pic.i_type == X264_TYPE_I )
         p_block->i_flags |= BLOCK_FLAG_TYPE_P;
-    else if( pic.i_type == X264_TYPE_B )
+    else if( IS_X264_TYPE_B( pic.i_type ) )
         p_block->i_flags |= BLOCK_FLAG_TYPE_B;
     else
         p_block->i_flags |= BLOCK_FLAG_TYPE_PB;
