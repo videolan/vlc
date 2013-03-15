@@ -1035,6 +1035,8 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 
     p_block->i_pts = av_pkt.pts;
     p_block->i_dts = av_pkt.dts;
+    if( unlikely( av_pkt.flags & AV_PKT_FLAG_CORRUPT ) )
+        p_block->i_flags |= BLOCK_FLAG_CORRUPTED;
 #endif
 
     switch ( p_sys->p_context->coded_frame->pict_type )
