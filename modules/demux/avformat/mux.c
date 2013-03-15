@@ -59,8 +59,6 @@ struct sout_mux_sys_t
 
     bool     b_write_header;
     bool     b_error;
-
-    int64_t        i_initial_dts;
 };
 
 /*****************************************************************************
@@ -129,7 +127,6 @@ int OpenMux( vlc_object_t *p_this )
 
     p_sys->b_write_header = true;
     p_sys->b_error = false;
-    p_sys->i_initial_dts = 0;
 
     /* Fill p_mux fields */
     p_mux->pf_control   = Control;
@@ -277,10 +274,6 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
 
     if( p_data->i_flags & BLOCK_FLAG_TYPE_I ) pkt.flags |= AV_PKT_FLAG_KEY;
 
-    /* avformat expects pts/dts which start from 0 */
-    p_data->i_dts -= p_mux->p_sys->i_initial_dts;
-    p_data->i_pts -= p_mux->p_sys->i_initial_dts;
-
     if( p_data->i_pts > 0 )
         pkt.pts = p_data->i_pts * p_stream->time_base.den /
             INT64_C(1000000) / p_stream->time_base.num;
@@ -350,9 +343,6 @@ static int Mux( sout_mux_t *p_mux )
         int i_stream = sout_MuxGetStream( p_mux, 1, &i_dts );
         if( i_stream < 0 )
             return VLC_SUCCESS;
-
-        if( !p_mux->p_sys->i_initial_dts )
-            p_mux->p_sys->i_initial_dts = i_dts;
 
         MuxBlock( p_mux, p_mux->pp_inputs[i_stream] );
     }
