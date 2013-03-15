@@ -122,7 +122,7 @@ int OpenMux( vlc_object_t *p_this )
 
     p_sys->io = avio_alloc_context(
         p_sys->io_buffer, p_sys->io_buffer_size,
-        1, p_mux, NULL, IOWrite, IOSeek );
+        0, p_mux, NULL, IOWrite, IOSeek );
 
     p_sys->oc->pb = p_sys->io;
     p_sys->oc->nb_streams = 0;
