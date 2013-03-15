@@ -1040,15 +1040,19 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     switch ( p_sys->p_context->coded_frame->pict_type )
     {
     case AV_PICTURE_TYPE_I:
+    case AV_PICTURE_TYPE_SI:
         p_block->i_flags |= BLOCK_FLAG_TYPE_I;
         break;
     case AV_PICTURE_TYPE_P:
+    case AV_PICTURE_TYPE_SP:
         p_block->i_flags |= BLOCK_FLAG_TYPE_P;
         break;
     case AV_PICTURE_TYPE_B:
+    case AV_PICTURE_TYPE_BI:
         p_block->i_flags |= BLOCK_FLAG_TYPE_B;
         break;
-
+    default:
+        p_block->i_flags |= BLOCK_FLAG_TYPE_PB;
     }
 
     return p_block;
