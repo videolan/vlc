@@ -2133,6 +2133,17 @@ then
 fi
 
 dnl
+dnl raspberry pi openmax il configuration
+dnl
+AC_ARG_ENABLE(rpi-omxil,
+  [  --enable-rpi-omxil     openmax il configured for raspberry pi (default disabled)])
+if test "${enable_rpi_omxil}" = "yes"
+then
+  VLC_ADD_PLUGIN([omxil omxil_vout])
+  VLC_ADD_CFLAGS([omxil omxil_vout],[-DRPI_OMX])
+fi
+
+dnl
 dnl CrystalHD codec plugin
 dnl
 AC_ARG_ENABLE(crystalhd,

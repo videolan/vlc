@@ -187,11 +187,11 @@ libomxil_plugin_la_SOURCES = \
 	h264_nal.h \
 	omxil/qcom.c omxil/qcom.h \
 	omxil/omxil.c omxil/omxil.h omxil/omxil_core.c omxil/omxil_core.h
-libomxil_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/omxil
+libomxil_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/omxil $(CFLAGS_omxil)
 libomxil_plugin_la_LIBADD = $(AM_LIBADD) $(LIBDL)
 
 libomxil_vout_plugin_la_SOURCES = omxil/vout.c omxil/omxil_core.c omxil/utils.c omxil/qcom.c
-libomxil_vout_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/omxil
+libomxil_vout_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/omxil $(CFLAGS_omxil_vout)
 libomxil_vout_plugin_la_LIBADD = $(AM_LIBADD) $(LIBDL)
 
 libiomx_plugin_la_SOURCES = $(libomxil_plugin_la_SOURCES)
