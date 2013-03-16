@@ -101,7 +101,7 @@ vlc_module_begin ()
               DELSEGS_TEXT, DELSEGS_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "ratecontrol", false,
               RATECONTROL_TEXT, RATECONTROL_TEXT, true )
-    add_bool( SOUT_CFG_PREFIX "caching", true,
+    add_bool( SOUT_CFG_PREFIX "caching", false,
               NOCACHE_TEXT, NOCACHE_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "index", NULL,
                 INDEX_TEXT, INDEX_LONGTEXT, false )
