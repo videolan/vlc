@@ -1,6 +1,5 @@
 SOURCES_access_output_dummy = dummy.c
 SOURCES_access_output_file = file.c
-SOURCES_access_output_livehttp = livehttp.c
 SOURCES_access_output_udp = udp.c
 SOURCES_access_output_http = http.c bonjour.c bonjour.h
 SOURCES_access_output_shout = shout.c
@@ -8,7 +7,13 @@ SOURCES_access_output_shout = shout.c
 libvlc_LTLIBRARIES += \
 	libaccess_output_dummy_plugin.la \
 	libaccess_output_file_plugin.la \
-	libaccess_output_livehttp_plugin.la \
 	libaccess_output_udp_plugin.la \
 	libaccess_output_http_plugin.la \
 	$(NULL)
+
+if HAVE_GCRYPT
+libaccess_output_livehttp_plugin_la_SOURCES = livehttp.c
+libaccess_output_livehttp_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
+libaccess_output_livehttp_plugin_la_LIBADD = $(AM_LIBADD) $(GCRYPT_LIBS) -lgpg-error
+libvlc_LTLIBRARIES += libaccess_output_livehttp_plugin.la
+endif

@@ -46,6 +46,9 @@
 #include <vlc_strings.h>
 #include <vlc_charset.h>
 
+#include <gcrypt.h>
+#include <vlc_gcrypt.h>
+
 #ifndef O_LARGEFILE
 #   define O_LARGEFILE 0
 #endif
@@ -86,6 +89,12 @@ static void Close( vlc_object_t * );
 
 #define RATECONTROL_TEXT N_("Use muxers rate control mechanism")
 
+#define KEYURI_TEXT N_("AES key URI to place in playlist")
+#define KEYURI_LONGTEXT N_("Location from where client will retrieve the stream decryption key")
+
+#define KEYFILE_TEXT N_("AES key file")
+#define KEYFILE_LONGTEXT N_("File containing the 16 bytes encryption key")
+
 vlc_module_begin ()
     set_description( N_("HTTP Live streaming output") )
     set_shortname( N_("LiveHTTP" ))
@@ -107,6 +116,10 @@ vlc_module_begin ()
                 INDEX_TEXT, INDEX_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "index-url", NULL,
                 INDEXURL_TEXT, INDEXURL_LONGTEXT, false )
+    add_string( SOUT_CFG_PREFIX "key-uri", NULL,
+                KEYURI_TEXT, KEYURI_TEXT, true )
+    add_loadfile( SOUT_CFG_PREFIX "key-file", NULL,
+                KEYFILE_TEXT, KEYFILE_LONGTEXT, true )
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -123,6 +136,8 @@ static const char *const ppsz_sout_options[] = {
     "index-url",
     "ratecontrol",
     "caching",
+    "key-uri",
+    "key-file",
     NULL
 };
 
@@ -148,8 +163,12 @@ struct sout_access_out_sys_t
     bool b_ratecontrol;
     bool b_splitanywhere;
     bool b_caching;
+    uint8_t aes_ivs[16];
+    gcry_cipher_hd_t aes_ctx;
+    char *key_uri;
 };
 
+static int CryptSetup( sout_access_out_t *p_access );
 /*****************************************************************************
  * Open: open the file
  *****************************************************************************/
@@ -216,6 +235,17 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_indexUrl = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "index-url" );
 
     p_access->p_sys = p_sys;
+
+    if( CryptSetup( p_access ) < 0 )
+    {
+        free( p_sys->psz_indexUrl );
+        free( p_sys->psz_indexPath );
+        free( p_sys->p_seglens );
+        free( p_sys );
+        msg_Err( p_access, "Encryption init failed" );
+        return VLC_EGENERIC;
+    }
+
     p_sys->i_handle = -1;
     p_sys->i_segment = 0;
     p_sys->psz_cursegPath = NULL;
@@ -226,6 +256,91 @@ static int Open( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
 }
+
+/************************************************************************
+ * CryptSetup: Initialize encryption
+ ************************************************************************/
+static int CryptSetup( sout_access_out_t *p_access )
+{
+    sout_access_out_sys_t *p_sys = p_access->p_sys;
+    uint8_t key[16];
+
+    p_sys->key_uri = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "key-uri" );
+    if( !p_sys->key_uri ) /*No key uri, assume no encryption wanted*/
+    {
+        msg_Dbg( p_access, "No key uri, no encryption");
+        return VLC_SUCCESS;
+    }
+    vlc_gcrypt_init();
+
+    /*Setup encryption cipher*/
+    gcry_error_t err = gcry_cipher_open( &p_sys->aes_ctx, GCRY_CIPHER_AES,
+                                         GCRY_CIPHER_MODE_CBC, 0 );
+    if( err )
+    {
+        msg_Err( p_access, "Openin AES Cipher failed: %s", gpg_strerror(err));
+        return VLC_EGENERIC;
+    }
+
+    char *keyfile = var_InheritString( p_access, SOUT_CFG_PREFIX "key-file" );
+    if( unlikely(keyfile == NULL) )
+    {
+        msg_Err( p_access, "No key-file, no encryption" );
+        return VLC_EGENERIC;
+    }
+
+    int keyfd = vlc_open( keyfile, O_RDONLY | O_NONBLOCK );
+    if( unlikely( keyfd == -1 ) )
+    {
+        msg_Err( p_access, "Unable to open keyfile %s: %m", keyfile );
+        free( keyfile );
+        return VLC_EGENERIC;
+    }
+    free( keyfile );
+
+    ssize_t keylen = read( keyfd, key, 16 );
+
+    close( keyfd );
+    if( keylen < 16 )
+    {
+        msg_Err( p_access, "No key at least 16 octects (you provided %zd), no encryption", keylen );
+        return VLC_EGENERIC;
+    }
+
+    err = gcry_cipher_setkey( p_sys->aes_ctx, key, 16 );
+    if(err)
+    {
+        msg_Err(p_access, "Setting AES key failed: %s", gpg_strerror(err));
+        gcry_cipher_close( p_sys->aes_ctx);
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
+/************************************************************************
+ * CryptKey: Set encryption IV to current segment number
+ ************************************************************************/
+static int CryptKey( sout_access_out_t *p_access, uint32_t i_segment )
+{
+    sout_access_out_sys_t *p_sys = p_access->p_sys;
+    memset( p_sys->aes_ivs, 0, 16 * sizeof(uint8_t));
+    p_sys->aes_ivs[15] = i_segment & 0xff;
+    p_sys->aes_ivs[14] = (i_segment >> 8 ) & 0xff;
+    p_sys->aes_ivs[13] = (i_segment >> 16 ) & 0xff;
+    p_sys->aes_ivs[12] = (i_segment >> 24 ) & 0xff;
+
+    gcry_error_t err = gcry_cipher_setiv( p_sys->aes_ctx,
+                                          p_sys->aes_ivs, 16);
+    if( err )
+    {
+        msg_Err(p_access, "Setting AES IVs failed: %s", gpg_strerror(err) );
+        gcry_cipher_close( p_sys->aes_ctx);
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+
 
 #define SEG_NUMBER_PLACEHOLDER "#"
 /*****************************************************************************
@@ -240,7 +355,8 @@ static char *formatSegmentPath( char *psz_path, uint32_t i_seg, bool b_sanitize 
         return NULL;
 
     psz_firstNumSign = psz_result + strcspn( psz_result, SEG_NUMBER_PLACEHOLDER );
-    if ( *psz_firstNumSign ) {
+    if ( *psz_firstNumSign )
+    {
         char *psz_newResult;
         int i_cnt = strspn( psz_firstNumSign, SEG_NUMBER_PLACEHOLDER );
         int ret;
@@ -305,6 +421,16 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
             free( psz_idxTmp );
             fclose( fp );
             return -1;
+        }
+
+        if( p_sys->key_uri )
+        {
+            if( fprintf( fp, "#EXT-X-KEY:METHOD=AES-128,URI=\"%s\"\n", p_sys->key_uri ) < 0 )
+            {
+                free( psz_idxTmp );
+                fclose( fp );
+                return -1;
+            }
         }
 
         char *psz_idxFormat = p_sys->psz_indexUrl ? p_sys->psz_indexUrl : p_access->psz_path;
@@ -403,6 +529,27 @@ static void Close( vlc_object_t * p_this )
     msg_Dbg( p_access, "Flushing buffer to last file");
     while( p_sys->block_buffer )
     {
+        if( p_sys->key_uri )
+        {
+            size_t original = p_sys->block_buffer->i_buffer;
+            size_t padded = (p_sys->block_buffer->i_buffer + 15 ) & ~15;
+            if( padded == p_sys->block_buffer->i_buffer )
+                padded += 16;
+            p_sys->block_buffer = block_Realloc( p_sys->block_buffer, 0, padded );
+            if( !p_sys->block_buffer )
+                break;
+            int pad = padded - original;
+            memset( &p_sys->block_buffer->p_buffer[original], pad, pad );
+
+            gcry_error_t err = gcry_cipher_encrypt( p_sys->aes_ctx,
+                                p_sys->block_buffer->p_buffer, padded, NULL, 0 );
+            if( err )
+            {
+                msg_Err( p_access, "Encryption failure: %s ", gpg_strerror(err) );
+                break;
+            }
+
+        }
         ssize_t val = write( p_sys->i_handle, p_sys->block_buffer->p_buffer, p_sys->block_buffer->i_buffer );
         if ( val == -1 )
         {
@@ -437,6 +584,11 @@ static void Close( vlc_object_t * p_this )
     free( p_sys->p_seglens );
     free( p_sys );
 
+    if( p_sys->key_uri )
+    {
+        gcry_cipher_close( p_sys->aes_ctx );
+        free( p_sys->key_uri );
+    }
     msg_Dbg( p_access, "livehttp access output closed" );
 }
 
@@ -482,6 +634,7 @@ static ssize_t openNextFile( sout_access_out_t *p_access, sout_access_out_sys_t 
         return -1;
     }
 
+    CryptKey( p_access, i_newseg );
     msg_Dbg( p_access, "Successfully opened livehttp file: %s (%"PRIu32")" , psz_seg, i_newseg );
 
     //free( psz_seg );
@@ -523,6 +676,27 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 
             while( output )
             {
+                if( p_sys->key_uri )
+                {
+                    size_t original = output->i_buffer;
+                    size_t padded = (output->i_buffer + 15 ) & ~15;
+                    if( padded == output->i_buffer )
+                        padded += 16;
+                    output = block_Realloc( output, 0, padded );
+                    if( !output )
+                        return VLC_ENOMEM;
+                    int pad = padded - original;
+                    memset( &output->p_buffer[original], pad, pad );
+
+                    gcry_error_t err = gcry_cipher_encrypt( p_sys->aes_ctx,
+                                        output->p_buffer, padded, NULL, 0 );
+                    if( err )
+                    {
+                        msg_Err( p_access, "Encryption failure: %s ", gpg_strerror(err) );
+                        return -1;
+                    }
+
+                }
                 ssize_t val = write( p_sys->i_handle, output->p_buffer, output->i_buffer );
                 if ( val == -1 )
                 {
