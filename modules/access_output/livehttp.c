@@ -204,6 +204,7 @@ static int Open( vlc_object_t *p_this )
         free( psz_idx );
         if ( !psz_tmp )
         {
+            free( p_sys->p_seglens );
             free( p_sys );
             return VLC_ENOMEM;
         }
