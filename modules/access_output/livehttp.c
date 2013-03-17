@@ -49,6 +49,8 @@
 #include <gcrypt.h>
 #include <vlc_gcrypt.h>
 
+#include <vlc_rand.h>
+
 #ifndef O_LARGEFILE
 #   define O_LARGEFILE 0
 #endif
@@ -95,6 +97,9 @@ static void Close( vlc_object_t * );
 #define KEYFILE_TEXT N_("AES key file")
 #define KEYFILE_LONGTEXT N_("File containing the 16 bytes encryption key")
 
+#define RANDOMIV_TEXT N_("Use randomized IV for encryption")
+#define RANDOMIV_LONGTEXT N_("Generate IV instead using segment-number as IV")
+
 vlc_module_begin ()
     set_description( N_("HTTP Live streaming output") )
     set_shortname( N_("LiveHTTP" ))
@@ -112,6 +117,8 @@ vlc_module_begin ()
               RATECONTROL_TEXT, RATECONTROL_TEXT, true )
     add_bool( SOUT_CFG_PREFIX "caching", false,
               NOCACHE_TEXT, NOCACHE_LONGTEXT, true )
+    add_bool( SOUT_CFG_PREFIX "generate-iv", false,
+              RANDOMIV_TEXT, RANDOMIV_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "index", NULL,
                 INDEX_TEXT, INDEX_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "index-url", NULL,
@@ -138,6 +145,7 @@ static const char *const ppsz_sout_options[] = {
     "caching",
     "key-uri",
     "key-file",
+    "generate-iv",
     NULL
 };
 
@@ -163,6 +171,7 @@ struct sout_access_out_sys_t
     bool b_ratecontrol;
     bool b_splitanywhere;
     bool b_caching;
+    bool b_generate_iv;
     uint8_t aes_ivs[16];
     gcry_cipher_hd_t aes_ctx;
     char *key_uri;
@@ -199,6 +208,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_delsegs = var_GetBool( p_access, SOUT_CFG_PREFIX "delsegs" );
     p_sys->b_ratecontrol = var_GetBool( p_access, SOUT_CFG_PREFIX "ratecontrol") ;
     p_sys->b_caching = var_GetBool( p_access, SOUT_CFG_PREFIX "caching") ;
+    p_sys->b_generate_iv = var_GetBool( p_access, SOUT_CFG_PREFIX "generate-iv") ;
 
 
     /* 5 elements is from harrison-stetson algorithm to start from some number
@@ -315,6 +325,9 @@ static int CryptSetup( sout_access_out_t *p_access )
         return VLC_EGENERIC;
     }
 
+    if( p_sys->b_generate_iv )
+        vlc_rand_bytes( p_sys->aes_ivs, sizeof(uint8_t)*16);
+
     return VLC_SUCCESS;
 }
 
@@ -324,11 +337,16 @@ static int CryptSetup( sout_access_out_t *p_access )
 static int CryptKey( sout_access_out_t *p_access, uint32_t i_segment )
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
-    memset( p_sys->aes_ivs, 0, 16 * sizeof(uint8_t));
-    p_sys->aes_ivs[15] = i_segment & 0xff;
-    p_sys->aes_ivs[14] = (i_segment >> 8 ) & 0xff;
-    p_sys->aes_ivs[13] = (i_segment >> 16 ) & 0xff;
-    p_sys->aes_ivs[12] = (i_segment >> 24 ) & 0xff;
+
+    if( !p_sys->b_generate_iv )
+    {
+        /* Use segment number as IV if randomIV isn't selected*/
+        memset( p_sys->aes_ivs, 0, 16 * sizeof(uint8_t));
+        p_sys->aes_ivs[15] = i_segment & 0xff;
+        p_sys->aes_ivs[14] = (i_segment >> 8 ) & 0xff;
+        p_sys->aes_ivs[13] = (i_segment >> 16 ) & 0xff;
+        p_sys->aes_ivs[12] = (i_segment >> 24 ) & 0xff;
+    }
 
     gcry_error_t err = gcry_cipher_setiv( p_sys->aes_ctx,
                                           p_sys->aes_ivs, 16);
@@ -425,7 +443,24 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
 
         if( p_sys->key_uri )
         {
-            if( fprintf( fp, "#EXT-X-KEY:METHOD=AES-128,URI=\"%s\"\n", p_sys->key_uri ) < 0 )
+            int ret = 0;
+            if( p_sys->b_generate_iv )
+            {
+                unsigned long long iv_hi = 0, iv_lo = 0;
+                for( unsigned short i = 0; i < 8; i++ )
+                {
+                    iv_hi |= p_sys->aes_ivs[i] & 0xff;
+                    iv_hi <<= 8;
+                    iv_lo |= p_sys->aes_ivs[8+i] & 0xff;
+                    iv_lo <<= 8;
+                }
+                ret = fprintf( fp, "#EXT-X-KEY:METHOD=AES-128,URI=\"%s\",IV=0X%16.16llx%16.16llx\n",
+                               p_sys->key_uri, iv_hi, iv_lo );
+
+            } else {
+                ret = fprintf( fp, "#EXT-X-KEY:METHOD=AES-128,URI=\"%s\"\n", p_sys->key_uri );
+            }
+            if( ret < 0 )
             {
                 free( psz_idxTmp );
                 fclose( fp );
