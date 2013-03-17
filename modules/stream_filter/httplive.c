@@ -775,7 +775,13 @@ static int parse_Key(stream_t *s, hls_stream_t *hls, char *p_read)
             if (end != NULL)
                 *end = 0;
         }
-        hls->psz_current_key_path = relative_URI(hls->url, uri);
+        /* For absolute URI, just duplicate it
+         * don't limit to HTTP, maybe some sanity checking
+         * should be done more in here? */
+        if( strstr( uri , "://" ) )
+            hls->psz_current_key_path = strdup( uri );
+        else
+            hls->psz_current_key_path = relative_URI(hls->url, uri);
         free(value);
 
         value = iv = parse_Attributes(p_read, "IV");
