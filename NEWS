@@ -87,6 +87,7 @@ Stream Output:
  * Options support for AVIO output module
  * Livehttp places more accurate segments durations in playlist
  * Livehttp allows setting cachin-variable in playlist
+ * Livehttp stream encryption support
 
 Interfaces:
  * configurable password for the HTTP server.
