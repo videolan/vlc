@@ -434,7 +434,11 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
             return -1;
         }
 
-        if ( fprintf( fp, "#EXTM3U\n#EXT-X-TARGETDURATION:%zu\n#EXT-X-VERSION:3\n#EXT-X-ALLOW-CACHE:%s\n#EXT-X-MEDIA-SEQUENCE:%"PRIu32"\n", p_sys->i_seglen, p_sys->b_caching ? "YES" : "NO",i_firstseg ) < 0 )
+        if ( fprintf( fp, "#EXTM3U\n#EXT-X-TARGETDURATION:%zu\n#EXT-X-VERSION:3\n#EXT-X-ALLOW-CACHE:%s"
+                          "%s\n#EXT-X-MEDIA-SEQUENCE:%"PRIu32"\n", p_sys->i_seglen,
+                          p_sys->b_caching ? "YES" : "NO",
+                          p_sys->i_numsegs > 0 ? "" : b_isend ? "\n#EXT-X-PLAYLIST-TYPE:VOD" : "\n#EXT-X-PLAYLIST-TYPE:EVENT",
+                          i_firstseg ) < 0 )
         {
             free( psz_idxTmp );
             fclose( fp );
