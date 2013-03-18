@@ -408,7 +408,7 @@
     NSRect s_rc = [self frame];
     addButton(o_prev, @"fs_skip_previous" , @"fs_skip_previous_highlight", 174, 15, prev, _NS("Click to go to the previous playlist item."), _NS("Previous"));
     addButton(o_bwd, @"fs_rewind"        , @"fs_rewind_highlight"       , 211, 14, backward, _NS("Click and hold to skip backward through the current media."), _NS("Backward"));
-    addButton(o_play, @"fs_play"          , @"fs_play_highlight"         , 267, 10, play, _NS("Click to play or pause the current media."), _NS("Play/Pause"));
+    addButton(o_play, @"fs_play"          , @"fs_play_highlight"         , 265, 10, play, _NS("Click to play or pause the current media."), _NS("Play/Pause"));
     addButton(o_fwd, @"fs_forward"       , @"fs_forward_highlight"      , 313, 14, forward, _NS("Click and hold to skip forward through the current media."), _NS("Forward"));
     addButton(o_next, @"fs_skip_next"     , @"fs_skip_next_highlight"    , 365, 15, next, _NS("Click to go to the next playlist item."), _NS("Next"));
     addButton(o_fullscreen, @"fs_exit_fullscreen", @"fs_exit_fullscreen_hightlight", 507, 13, toggleFullscreen, _NS("Click to exit fullscreen playback."), _NS("Toggle Fullscreen mode"));
