@@ -1135,6 +1135,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     OMX_BUFFERHEADERTYPE *p_header;
     block_t *p_block;
     int i_input_used = 0;
+    struct H264ConvertState convert_state = { 0, 0 };
 
     if( !pp_block || !*pp_block )
         return NULL;
@@ -1271,7 +1272,7 @@ more_input:
          * i_nal_size_length == 0, which is the case for codecs other
          * than H.264 */
         convert_h264_to_annexb( p_header->pBuffer, p_header->nFilledLen,
-                                p_sys->i_nal_size_length );
+                                p_sys->i_nal_size_length, &convert_state );
 #ifdef OMXIL_EXTRA_DEBUG
         msg_Dbg( p_dec, "EmptyThisBuffer %p, %p, %i", p_header, p_header->pBuffer,
                  (int)p_header->nFilledLen );

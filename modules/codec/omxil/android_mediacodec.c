@@ -495,6 +495,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     decoder_sys_t *p_sys = p_dec->p_sys;
     picture_t *p_pic = NULL;
     JNIEnv *env = NULL;
+    struct H264ConvertState convert_state = { 0, 0 };
 
     if (!pp_block || !*pp_block)
         return NULL;
@@ -527,7 +528,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
             size = p_block->i_buffer;
         memcpy(bufptr, p_block->p_buffer, size);
 
-        convert_h264_to_annexb(bufptr, size, p_sys->nal_size);
+        convert_h264_to_annexb(bufptr, size, p_sys->nal_size, &convert_state);
 
         int64_t ts = p_block->i_pts;
         if (!ts && p_block->i_dts)
