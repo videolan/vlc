@@ -67,9 +67,6 @@ struct intf_sys_t
     bool b_input_update;
     bool b_aout_update;
     bool b_vout_update;
-
-    /* The messages window */
-    msg_subscription_t sub;
 };
 
 /*****************************************************************************

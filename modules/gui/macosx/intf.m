@@ -115,7 +115,7 @@ int OpenIntf (vlc_object_t *p_this)
     memset(p_intf->p_sys, 0, sizeof(*p_intf->p_sys));
 
     /* subscribe to LibVLCCore's messages */
-    vlc_Subscribe(&p_intf->p_sys->sub, MsgCallback, NULL);
+    vlc_LogSet(p_this->p_libvlc, MsgCallback, NULL);
 
     Run(p_intf);
 
@@ -890,7 +890,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_eyetv release];
 
     /* unsubscribe from libvlc's debug messages */
-    vlc_Unsubscribe(&p_intf->p_sys->sub);
+    vlc_LogSet(p_intf->p_libvlc, NULL, NULL);
 
     [o_msg_arr removeAllObjects];
     [o_msg_arr release];
