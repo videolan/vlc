@@ -1134,6 +1134,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
     OMX_BUFFERHEADERTYPE *p_header;
     block_t *p_block;
+    int i_input_used = 0;
 
     if( !pp_block || !*pp_block )
         return NULL;
@@ -1218,6 +1219,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         OMX_FillThisBuffer(p_sys->omx_handle, p_header);
     }
 
+more_input:
     /* Send the input buffer to the component */
     OMX_FIFO_GET_TIMEOUT(&p_sys->in.fifo, p_header, 200000);
 
@@ -1228,7 +1230,8 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
     if(p_header)
     {
-        p_header->nFilledLen = p_block->i_buffer;
+        bool decode_more = false;
+        p_header->nFilledLen = p_block->i_buffer - i_input_used;
         p_header->nOffset = 0;
         p_header->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
         if (p_sys->b_use_pts && p_block->i_pts)
@@ -1243,17 +1246,25 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_header->pOutputPortPrivate = p_header->pBuffer;
             p_header->pBuffer = p_block->p_buffer;
             p_header->pAppPrivate = p_block;
+            i_input_used = p_header->nFilledLen;
         }
         else
         {
             if(p_header->nFilledLen > p_header->nAllocLen)
             {
-                msg_Dbg(p_dec, "buffer too small (%i,%i)",
-                        (int)p_header->nFilledLen, (int)p_header->nAllocLen);
                 p_header->nFilledLen = p_header->nAllocLen;
             }
-            memcpy(p_header->pBuffer, p_block->p_buffer, p_header->nFilledLen );
-            block_Release(p_block);
+            memcpy(p_header->pBuffer, p_block->p_buffer + i_input_used, p_header->nFilledLen);
+            i_input_used += p_header->nFilledLen;
+            if (i_input_used == p_block->i_buffer)
+            {
+                block_Release(p_block);
+            }
+            else
+            {
+                decode_more = true;
+                p_header->nFlags &= ~OMX_BUFFERFLAG_ENDOFFRAME;
+            }
         }
 
         /* Convert H.264 NAL format to annex b. Doesn't do anything if
@@ -1267,7 +1278,10 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 #endif
         OMX_EmptyThisBuffer(p_sys->omx_handle, p_header);
         p_sys->in.b_flushed = false;
-        *pp_block = NULL; /* Avoid being fed the same packet again */
+        if (decode_more)
+            goto more_input;
+        else
+            *pp_block = NULL; /* Avoid being fed the same packet again */
     }
 
 reconfig:
