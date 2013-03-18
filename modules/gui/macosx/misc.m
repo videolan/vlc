@@ -501,8 +501,6 @@ void _drawFrameInRect(NSRect frameRect)
     NSRect knobRect = [[self cell] knobRectFlipped:NO];
     if (b_dark)
         knobRect.origin.y+=2;
-    else
-        knobRect.origin.y+=1;
     [self drawKnobInRect: knobRect];
 }
 
