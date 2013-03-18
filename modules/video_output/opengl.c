@@ -851,6 +851,7 @@ static void DrawWithoutShaders(vout_display_opengl_t *vgl,
         right[0], top[0]
     };
 
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glEnable(vgl->tex_target);
     glActiveTexture(GL_TEXTURE0 + 0);
     glClientActiveTexture(GL_TEXTURE0 + 0);
