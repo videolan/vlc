@@ -74,7 +74,6 @@
  *****************************************************************************/
 struct intf_sys_t
 {
-    msg_subscription_t sub;
     FILE *p_file;
     const char *footer;
 };
@@ -298,7 +297,7 @@ static int Open( vlc_object_t *p_this )
         fputs( header, p_sys->p_file );
     }
 
-    vlc_Subscribe( &p_sys->sub, cb, p_intf );
+    vlc_LogSet( p_intf->p_libvlc, cb, p_intf );
     return VLC_SUCCESS;
 }
 
@@ -311,7 +310,7 @@ static void Close( vlc_object_t *p_this )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     /* Flush the queue and unsubscribe from the message queue */
-    vlc_Unsubscribe( &p_sys->sub );
+    vlc_LogSet( p_intf->p_libvlc, NULL, NULL );
 
     /* Close the log file */
 #ifdef HAVE_SYSLOG_H
