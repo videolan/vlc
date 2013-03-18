@@ -178,6 +178,7 @@ $Id$
  * libass: Subtitle renderers using libass
  * libbluray: Library to access Blu-Ray drives
  * libmpeg2: Mpeg2 video decoder using libmpeg2
+ * libvnc: VNC/rfb view only access module
  * linsys_hdsdi: Linsys HDSDI cards access module
  * linsys_sdi: Linsys SDI cards access module
  * lirc: Linux infrared control module
