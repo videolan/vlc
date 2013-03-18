@@ -271,11 +271,10 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
             assert (0);
     }
 
-    if( i_type & VLC_VAR_DOINHERIT )
+    if( (i_type & VLC_VAR_DOINHERIT)
+     && var_Inherit( p_this, psz_name, i_type, &p_var->val ) == 0 )
     {
-        if( var_Inherit( p_this, psz_name, i_type, &p_var->val ) )
-            msg_Err( p_this, "cannot inherit value for %s", psz_name );
-        else if( i_type & VLC_VAR_HASCHOICE )
+        if( i_type & VLC_VAR_HASCHOICE )
         {
             /* We must add the inherited value to our choice list */
             p_var->i_default = 0;
@@ -1232,14 +1231,11 @@ int var_Inherit( vlc_object_t *p_this, const char *psz_name, int i_type,
         case VLC_VAR_BOOL:
             p_val->b_bool = config_GetInt( p_this, psz_name );
             break;
+        default:
+            assert(0);
         case VLC_VAR_ADDRESS:
             return VLC_ENOOBJ;
-        default:
-            msg_Warn( p_this, "Could not inherit value for var %s "
-                              "from config. Invalid Type", psz_name );
-            return VLC_ENOOBJ;
     }
-    /*msg_Dbg( p_this, "Inherited value for var %s from config", psz_name );*/
     return VLC_SUCCESS;
 }
 
