@@ -81,11 +81,6 @@ static int Open( vlc_object_t *p_this )
     if( p_intf->p_sys == NULL )
         return VLC_ENOMEM;
 
-    // Suscribe to messages bank
-#if 0
-    p_intf->p_sys->p_sub = vlc_Subscribe( p_intf );
-#endif
-
     p_intf->p_sys->p_input = NULL;
     p_intf->p_sys->p_playlist = pl_Get( p_intf );
 
@@ -176,11 +171,6 @@ static void Close( vlc_object_t *p_this )
 
     vlc_mutex_destroy( &p_intf->p_sys->init_lock );
     vlc_cond_destroy( &p_intf->p_sys->init_wait );
-
-    // Unsubscribe from messages bank
-#if 0
-    vlc_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
-#endif
 
     // Destroy structure
     free( p_intf->p_sys );

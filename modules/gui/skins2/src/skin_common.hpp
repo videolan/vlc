@@ -108,9 +108,6 @@ struct intf_sys_t
     /// The playlist thread
     playlist_t *p_playlist;
 
-    /// Message bank subscription
-    msg_subscription_t *p_sub;
-
     // "Singleton" objects: MUST be initialized to NULL !
     /// Logger
     Logger *p_logger;
