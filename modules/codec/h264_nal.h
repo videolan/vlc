@@ -114,7 +114,7 @@ static void convert_h264_to_annexb( uint8_t *p_buf, uint32_t i_len,
             p_buf[i] = 0;
         }
         p_buf[i_nal_size - 1] = 1;
-        if( nal_len > INT_MAX || nal_len > (unsigned int) i_len )
+        if( nal_len > INT_MAX || nal_len + i_nal_size > (unsigned int) i_len )
             break;
         p_buf += nal_len + i_nal_size;
         i_len -= nal_len + i_nal_size;
