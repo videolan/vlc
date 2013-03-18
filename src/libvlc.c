@@ -614,6 +614,8 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     }
 #endif
 
+    vlc_DeinitActions( p_libvlc, priv->actions );
+
     /* Save the configuration */
     if( !var_InheritBool( p_libvlc, "ignore-config" ) )
         config_AutoSaveConfigFile( VLC_OBJECT(p_libvlc) );
@@ -621,7 +623,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     /* Free module bank. It is refcounted, so we call this each time  */
     module_EndBank (true);
 
-    vlc_DeinitActions( p_libvlc, priv->actions );
 #if defined(WIN32) || defined(__OS2__)
     system_End( );
 #endif
