@@ -116,12 +116,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
     priv->p_ml = NULL;
     priv->p_dialog_provider = NULL;
     priv->p_vlm = NULL;
-    priv->i_verbose = 3; /* initial value until config is loaded */
-#if defined( HAVE_ISATTY ) && !defined( WIN32 )
-    priv->b_color = isatty( STDERR_FILENO ); /* 2 is for stderr */
-#else
-    priv->b_color = false;
-#endif
 
     /* Initialize mutexes */
     vlc_mutex_init( &priv->ml_lock );
@@ -162,13 +156,27 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         module_EndBank (false);
         return VLC_EGENERIC;
     }
-    priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
 
-    /* Find verbosity from VLC_VERBOSE environment variable */
+    /*
+     * Message queue options (read-only afterwards)
+     */
+#if defined (HAVE_ISATTY) && !defined (WIN32)
+    if (isatty (STDERR_FILENO))
+        priv->b_color = var_InheritBool (p_libvlc, "color");
+    else
+#endif
+        priv->b_color = false;
+
+    priv->i_verbose = var_InheritInteger (p_libvlc, "verbose");
+    psz_val = getenv ("VLC_VERBOSE");
+    if (psz_val != NULL)
+        priv->i_verbose = atoi (psz_val);
+
+    if (var_InheritBool (p_libvlc, "quiet"))
     {
-        char *env = getenv( "VLC_VERBOSE" );
-        if( env != NULL )
-            priv->i_verbose = atoi( env );
+        var_Create (p_libvlc, "verbose", VLC_VAR_INTEGER);
+        var_SetInteger (p_libvlc, "verbose", -1);
+        priv->i_verbose = -1;
     }
 
     /* Announce who we are (TODO: only first instance?) */
@@ -204,7 +212,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         module_EndBank (true);
         return VLC_EGENERIC;
     }
-    priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
 
     /*
      * Support for gettext
@@ -380,20 +387,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #undef MPRIS_TRACKLIST_INTERFACE
 dbus_out:
 #endif // HAVE_DBUS
-
-    /*
-     * Message queue options
-     */
-    /* Last chance to set the verbosity. Once we start interfaces and other
-     * threads, verbosity becomes read-only. */
-    var_Create( p_libvlc, "verbose", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    if( var_InheritBool( p_libvlc, "quiet" ) )
-    {
-        var_SetInteger( p_libvlc, "verbose", -1 );
-        priv->i_verbose = -1;
-    }
-    if( priv->b_color )
-        priv->b_color = var_InheritBool( p_libvlc, "color" );
 
     vlc_CPU_dump( VLC_OBJECT(p_libvlc) );
     vlc_object_set_name( p_libvlc, "main" );

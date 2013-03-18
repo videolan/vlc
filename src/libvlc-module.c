@@ -2059,9 +2059,11 @@ vlc_module_begin ()
     add_integer( "verbose", 0, VERBOSE_TEXT, VERBOSE_LONGTEXT,
                  false )
         change_short('v')
+        change_volatile ()
     add_obsolete_string( "verbose-objects" ) /* since 2.1.0 */
     add_bool( "quiet", 0, QUIET_TEXT, QUIET_LONGTEXT, false )
         change_short('q')
+        change_volatile ()
 
 #if !defined(WIN32) && !defined(__OS2__)
     add_bool( "daemon", 0, DAEMON_TEXT, DAEMON_LONGTEXT, true )
@@ -2083,6 +2085,7 @@ vlc_module_begin ()
 #endif
 
     add_bool( "color", true, COLOR_TEXT, COLOR_LONGTEXT, true )
+        change_volatile ()
     add_bool( "advanced", false, ADVANCED_TEXT, ADVANCED_LONGTEXT,
                     false )
     add_bool( "interact", true, INTERACTION_TEXT,
