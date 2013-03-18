@@ -1,9 +1,12 @@
-SOURCES_sap = sap.c
 SOURCES_upnp = upnp.cpp upnp.hpp
 SOURCES_bonjour = bonjour.c
 SOURCES_podcast = podcast.c
 SOURCES_mtp = mtp.c
 SOURCES_mediadirs = mediadirs.c
+
+libsap_plugin_la_SOURCES = sap.c
+libsap_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_sap)
+libsap_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_sap) $(SOCKET_LIBS)
 
 libpulselist_plugin_la_SOURCES = \
 	../audio_output/vlcpulse.c ../audio_output/vlcpulse.h \
