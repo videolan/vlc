@@ -84,14 +84,13 @@ struct intf_sys_t
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 
-static void TextPrint(void *, int, const msg_item_t *, const char *, va_list);
-static void HtmlPrint(void *, int, const msg_item_t *, const char *, va_list);
+static void TextPrint(void *, int, const vlc_log_t *, const char *, va_list);
+static void HtmlPrint(void *, int, const vlc_log_t *, const char *, va_list);
 #ifdef HAVE_SYSLOG_H
-static void SyslogPrint(void *, int, const msg_item_t *, const char *,
-                        va_list);
+static void SyslogPrint(void *, int, const vlc_log_t *, const char *, va_list);
 #endif
 #ifdef __ANDROID__
-static void AndroidPrint(void *, int, const msg_item_t *, const char *, va_list);
+static void AndroidPrint(void *, int, const vlc_log_t *, const char *, va_list);
 #endif
 
 /*****************************************************************************
@@ -357,7 +356,7 @@ static const android_LogPriority prioritytype[4] = {
     ANDROID_LOG_DEBUG
 };
 
-static void AndroidPrint( void *opaque, int type, const msg_item_t *item,
+static void AndroidPrint( void *opaque, int type, const vlc_log_t *item,
                        const char *fmt, va_list ap )
 {
     (void)item;
@@ -372,7 +371,7 @@ static void AndroidPrint( void *opaque, int type, const msg_item_t *item,
 }
 #endif
 
-static void TextPrint( void *opaque, int type, const msg_item_t *item,
+static void TextPrint( void *opaque, int type, const vlc_log_t *item,
                        const char *fmt, va_list ap )
 {
     intf_thread_t *p_intf = opaque;
@@ -391,7 +390,7 @@ static void TextPrint( void *opaque, int type, const msg_item_t *item,
 }
 
 #ifdef HAVE_SYSLOG_H
-static void SyslogPrint( void *opaque, int type, const msg_item_t *item,
+static void SyslogPrint( void *opaque, int type, const vlc_log_t *item,
                          const char *fmt, va_list ap )
 {
     static const int i_prio[4] = { LOG_INFO, LOG_ERR, LOG_WARNING, LOG_DEBUG };
@@ -416,7 +415,7 @@ static void SyslogPrint( void *opaque, int type, const msg_item_t *item,
 }
 #endif
 
-static void HtmlPrint( void *opaque, int type, const msg_item_t *item,
+static void HtmlPrint( void *opaque, int type, const vlc_log_t *item,
                        const char *fmt, va_list ap )
 {
     static const unsigned color[4] = {

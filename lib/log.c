@@ -60,7 +60,7 @@ static void libvlc_log (int level, const char *fmt, ...)
     va_end (ap);
 }
 
-static void libvlc_logf (void *dummy, int level, const msg_item_t *item,
+static void libvlc_logf (void *dummy, int level, const vlc_log_t *item,
                          const char *fmt, va_list ap)
 {
     char *msg;

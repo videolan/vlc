@@ -82,7 +82,7 @@ static void updateProgressPanel (void *, const char *, float);
 static bool checkProgressPanel (void *);
 static void destroyProgressPanel (void *);
 
-static void MsgCallback(void *data, int type, const msg_item_t *item, const char *format, va_list ap);
+static void MsgCallback(void *data, int type, const vlc_log_t *item, const char *format, va_list ap);
 
 static int InputEvent(vlc_object_t *, const char *,
                       vlc_value_t, vlc_value_t, void *);
@@ -300,7 +300,7 @@ static void Run(intf_thread_t *p_intf)
  * ready to be displayed. We store everything in a NSArray in our Cocoa part
  * of this file.
  *****************************************************************************/
-static void MsgCallback(void *data, int type, const msg_item_t *item, const char *format, va_list ap)
+static void MsgCallback(void *data, int type, const vlc_log_t *item, const char *format, va_list ap)
 {
     int canc = vlc_savecancel();
     char *str;
@@ -1901,7 +1901,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         return @"";
 }
 
-- (void)processReceivedlibvlcMessage:(const msg_item_t *) item ofType: (int)i_type withStr: (char *)str
+- (void)processReceivedlibvlcMessage:(const vlc_log_t *) item ofType: (int)i_type withStr: (char *)str
 {
     if (o_msg_arr) {
         NSColor *o_white = [NSColor whiteColor];

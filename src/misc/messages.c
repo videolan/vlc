@@ -68,7 +68,7 @@ void vlc_Log (vlc_object_t *obj, int type, const char *module,
 }
 
 #ifdef WIN32
-static void Win32DebugOutputMsg (void *, int , const msg_item_t *,
+static void Win32DebugOutputMsg (void *, int , const vlc_log_t *,
                                  const char *, va_list);
 #endif
 
@@ -143,7 +143,7 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
 #endif
 
     /* Fill message information fields */
-    msg_item_t msg;
+    vlc_log_t msg;
 
     msg.i_object_id = (uintptr_t)obj;
     msg.psz_object_type = (obj != NULL) ? obj->psz_object_type : "generic";
@@ -185,7 +185,7 @@ static const char msg_type[4][9] = { "", " error", " warning", " debug" };
 #define GRAY    "\033[0m"
 static const char msg_color[4][8] = { WHITE, RED, YELLOW, GRAY };
 
-static void PrintColorMsg (void *d, int type, const msg_item_t *p_item,
+static void PrintColorMsg (void *d, int type, const vlc_log_t *p_item,
                            const char *format, va_list ap)
 {
     FILE *stream = stderr;
@@ -211,7 +211,7 @@ static void PrintColorMsg (void *d, int type, const msg_item_t *p_item,
     vlc_restorecancel (canc);
 }
 
-static void PrintMsg (void *d, int type, const msg_item_t *p_item,
+static void PrintMsg (void *d, int type, const vlc_log_t *p_item,
                       const char *format, va_list ap)
 {
     FILE *stream = stderr;
@@ -238,7 +238,7 @@ static void PrintMsg (void *d, int type, const msg_item_t *p_item,
 }
 
 #ifdef WIN32
-static void Win32DebugOutputMsg (void* d, int type, const msg_item_t *p_item,
+static void Win32DebugOutputMsg (void* d, int type, const vlc_log_t *p_item,
                                  const char *format, va_list dol)
 {
     VLC_UNUSED(p_item);

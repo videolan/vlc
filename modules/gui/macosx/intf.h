@@ -201,7 +201,7 @@ struct intf_sys_t
 - (IBAction)showMessagesPanel:(id)sender;
 - (IBAction)updateMessagesPanel:(id)sender;
 
-- (void)processReceivedlibvlcMessage:(const msg_item_t *) item ofType: (int)type withStr: (char *)str;
+- (void)processReceivedlibvlcMessage:(const vlc_log_t *) item ofType: (int)type withStr: (char *)str;
 
 - (void)updateTogglePlaylistState;
 

@@ -150,7 +150,7 @@ typedef struct libvlc_priv_t
     /* Logging */
     struct
     {
-        void (*cb) (void *, int, const msg_item_t *, const char *, va_list);
+        void (*cb) (void *, int, const vlc_log_t *, const char *, va_list);
         void *opaque;
         vlc_rwlock_t lock;
     } log;

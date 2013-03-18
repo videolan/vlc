@@ -194,7 +194,7 @@ struct intf_sys_t
     struct
     {
         int              type;
-        msg_item_t      *item;
+        vlc_log_t       *item;
         char            *msg;
     } msgs[50];      // ring buffer
     int                 i_msgs;
@@ -999,7 +999,7 @@ static int DrawMessages(intf_thread_t *intf)
     vlc_mutex_lock(&sys->msg_lock);
     int i = sys->i_msgs;
     for(;;) {
-        msg_item_t *msg = sys->msgs[i].item;
+        vlc_log_t *msg = sys->msgs[i].item;
         if (msg) {
             if (sys->color)
                 color_set(sys->msgs[i].type + C_INFO, NULL);
@@ -1698,9 +1698,9 @@ static void HandleKey(intf_thread_t *intf)
 /*
  *
  */
-static msg_item_t *msg_Copy (const msg_item_t *msg)
+static vlc_log_t *msg_Copy (const vlc_log_t *msg)
 {
-    msg_item_t *copy = (msg_item_t *)xmalloc (sizeof (*copy));
+    vlc_log_t *copy = (vlc_log_t *)xmalloc (sizeof (*copy));
     copy->i_object_id = msg->i_object_id;
     copy->psz_object_type = msg->psz_object_type;
     copy->psz_module = strdup (msg->psz_module);
@@ -1708,14 +1708,14 @@ static msg_item_t *msg_Copy (const msg_item_t *msg)
     return copy;
 }
 
-static void msg_Free (msg_item_t *msg)
+static void msg_Free (vlc_log_t *msg)
 {
     free ((char *)msg->psz_module);
     free ((char *)msg->psz_header);
     free (msg);
 }
 
-static void MsgCallback(void *data, int type, const msg_item_t *msg,
+static void MsgCallback(void *data, int type, const vlc_log_t *msg,
                         const char *format, va_list ap)
 {
     intf_sys_t *sys = data;

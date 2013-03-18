@@ -43,7 +43,7 @@
  */
 
 /** Message types */
-enum msg_item_type
+enum vlc_log_type
 {
     VLC_MSG_INFO=0, /**< Important information */
     VLC_MSG_ERR,    /**< Error */
@@ -54,13 +54,13 @@ enum msg_item_type
 /**
  * Log message
  */
-typedef struct
+typedef struct vlc_log_t
 {
     uintptr_t   i_object_id; /**< Emitter (temporaly) unique object ID or 0 */
     const char *psz_object_type; /**< Emitter object type name */
     const char *psz_module; /**< Emitter module (source code) */
     const char *psz_header; /**< Additional header (used by VLM media) */
-} msg_item_t;
+} vlc_log_t;
 
 VLC_API void vlc_Log(vlc_object_t *, int,
                      const char *, const char *, ...) VLC_FORMAT( 4, 5 );

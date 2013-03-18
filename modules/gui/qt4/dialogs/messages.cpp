@@ -50,7 +50,7 @@ enum {
 class MsgEvent : public QEvent
 {
 public:
-    MsgEvent( int, const msg_item_t *, const char * );
+    MsgEvent( int, const vlc_log_t *, const char * );
 
     int priority;
     uintptr_t object_id;
@@ -60,7 +60,7 @@ public:
     QString text;
 };
 
-MsgEvent::MsgEvent( int type, const msg_item_t *msg, const char *text )
+MsgEvent::MsgEvent( int type, const vlc_log_t *msg, const char *text )
     : QEvent( (QEvent::Type)MsgEvent_Type ),
       priority( type ),
       object_id( msg->i_object_id ),
@@ -332,7 +332,7 @@ void MessagesDialog::tabChanged( int i )
                                      : qtr("Clear the messages") );
 }
 
-void MessagesDialog::MsgCallback( void *self, int type, const msg_item_t *item,
+void MessagesDialog::MsgCallback( void *self, int type, const vlc_log_t *item,
                                   const char *format, va_list ap )
 {
     MessagesDialog *dialog = (MessagesDialog *)self;

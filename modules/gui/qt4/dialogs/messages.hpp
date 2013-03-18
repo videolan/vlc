@@ -50,13 +50,13 @@ private:
     virtual ~MessagesDialog();
 
     Ui::messagesPanelWidget ui;
-    static void sinkMessage( void *, msg_item_t *, unsigned );
+    static void sinkMessage( void *, vlc_log_t *, unsigned );
     void customEvent( QEvent * );
     void sinkMessage( const MsgEvent * );
     bool matchFilter( const QString& );
 
     vlc_atomic_t verbosity;
-    static void MsgCallback( void *, int, const msg_item_t *, const char *,
+    static void MsgCallback( void *, int, const vlc_log_t *, const char *,
                              va_list );
 
 private slots:

@@ -104,12 +104,12 @@ VLC_API void libvlc_Quit( libvlc_int_t * );
 /**
  * Message logging callback signature.
  * \param data data pointer as provided to vlc_msg_SetCallback().
- * \param type message type (VLC_MSG_* values from enum msg_item_type)
+ * \param type message type (VLC_MSG_* values from enum vlc_log_type)
  * \param item meta informations
  * \param fmt format string
  * \param args format string arguments
  */
-typedef void (*vlc_log_cb) (void *data, int type, const msg_item_t *item,
+typedef void (*vlc_log_cb) (void *data, int type, const vlc_log_t *item,
                             const char *fmt, va_list args);
 
 VLC_API void vlc_LogSet(libvlc_int_t *, vlc_log_cb cb, void *data);
