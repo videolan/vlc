@@ -389,7 +389,6 @@ dbus_out:
 #endif // HAVE_DBUS
 
     vlc_CPU_dump( VLC_OBJECT(p_libvlc) );
-    vlc_object_set_name( p_libvlc, "main" );
 
     priv->b_stats = var_InheritBool( p_libvlc, "stats" );
 
