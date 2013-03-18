@@ -130,7 +130,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     restoreWidgetPosition( "Messages", QSize( 600, 450 ) );
 
     /* Hook up to LibVLC messaging */
-    vlc_Subscribe( &sub, MsgCallback, this );
+    vlc_LogSet( p_intf->p_libvlc, MsgCallback, this );
 
     buildTree( NULL, VLC_OBJECT( p_intf->p_libvlc ) );
 }
@@ -138,7 +138,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
 MessagesDialog::~MessagesDialog()
 {
     saveWidgetPosition( "Messages" );
-    vlc_Unsubscribe( &sub );
+    vlc_LogSet( p_intf->p_libvlc, NULL, NULL );
 };
 
 void MessagesDialog::changeVerbosity( int i_verbosity )
