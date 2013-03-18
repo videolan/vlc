@@ -37,10 +37,7 @@ void libvlc_threads_init (void)
 {
     vlc_mutex_lock (&lock);
     if (refs++ == 0)
-    {
         vlc_threadvar_create (&context, free);
-        libvlc_log_init ();
-    }
     vlc_mutex_unlock (&lock);
 }
 
@@ -49,10 +46,7 @@ void libvlc_threads_deinit (void)
     vlc_mutex_lock (&lock);
     assert (refs > 0);
     if (--refs == 0)
-    {
-        libvlc_log_deinit ();
         vlc_threadvar_delete (&context);
-    }
     vlc_mutex_unlock (&lock);
 }
 

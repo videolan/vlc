@@ -34,15 +34,24 @@
 
 /*** Logging core dispatcher ***/
 
-static vlc_rwlock_t log_lock = VLC_STATIC_RWLOCK;
-static libvlc_log_subscriber_t *log_first = NULL;
-static msg_subscription_t sub;
-
-VLC_FORMAT(2,3)
-static void libvlc_log (int level, const char *fmt, ...)
+VLC_FORMAT(4,5)
+static void libvlc_log (libvlc_instance_t *inst, int level,
+                        const libvlc_log_t *ctx, const char *fmt, ...)
 {
-    libvlc_log_subscriber_t *sub;
     va_list ap;
+
+    va_start (ap, fmt);
+    inst->log.cb (inst->log.data, level, ctx, fmt, ap);
+    va_end (ap);
+}
+
+static void libvlc_logf (void *data, int level, const vlc_log_t *item,
+                         const char *fmt, va_list ap)
+{
+    char *msg;
+
+    if (unlikely(vasprintf (&msg, fmt, ap) == -1))
+        return;
 
     switch (level)
     {
@@ -52,70 +61,33 @@ static void libvlc_log (int level, const char *fmt, ...)
         case VLC_MSG_DBG:  level = LIBVLC_DEBUG;   break;
     }
 
-    va_start (ap, fmt);
-    vlc_rwlock_rdlock (&log_lock);
-    for (sub = log_first; sub != NULL; sub = sub->next)
-        sub->func (sub->opaque, level, fmt, ap);
-    vlc_rwlock_unlock (&log_lock);
-    va_end (ap);
-}
-
-static void libvlc_logf (void *dummy, int level, const vlc_log_t *item,
-                         const char *fmt, va_list ap)
-{
-    char *msg;
-
-    if (unlikely(vasprintf (&msg, fmt, ap) == -1))
-        msg = NULL;
     if (item->psz_header != NULL)
-        libvlc_log (level, "[%p] [%s]: %s %s %s", (void *)item->i_object_id,
-                    item->psz_header, item->psz_module, item->psz_object_type,
-                    msg ? msg : "Not enough memory");
+        libvlc_log (data, level, item, "[%p] [%s]: %s %s %s",
+                    (void *)item->i_object_id, item->psz_header,
+                    item->psz_module, item->psz_object_type, msg);
     else
-        libvlc_log (level, "[%p]: %s %s %s", (void *)item->i_object_id,
-                    item->psz_module, item->psz_object_type,
-                    msg ? msg : "Not enough memory");
+        libvlc_log (data, level, item, "[%p]: %s %s %s",
+                    (void *)item->i_object_id, item->psz_module,
+                    item->psz_object_type, msg);
     free (msg);
-    (void) dummy;
 }
 
-void libvlc_log_init (void)
+void libvlc_log_unset (libvlc_instance_t *inst)
 {
-    vlc_Subscribe (&sub, libvlc_logf, NULL);
+    vlc_LogSet (inst->p_libvlc_int, NULL, NULL);
 }
 
-void libvlc_log_deinit (void)
+void libvlc_log_set (libvlc_instance_t *inst, libvlc_log_cb cb, void *data)
 {
-    vlc_Unsubscribe (&sub);
-}
-
-void libvlc_log_subscribe (libvlc_log_subscriber_t *sub,
-                           libvlc_log_cb cb, void *data)
-{
-    sub->prev = NULL;
-    sub->func = cb;
-    sub->opaque = data;
-    vlc_rwlock_wrlock (&log_lock);
-    sub->next = log_first;
-    log_first = sub;
-    vlc_rwlock_unlock (&log_lock);
-}
-
-void libvlc_log_unsubscribe( libvlc_log_subscriber_t *sub )
-{
-    vlc_rwlock_wrlock (&log_lock);
-    if (sub->next != NULL)
-        sub->next->prev = sub->prev;
-    if (sub->prev != NULL)
-        sub->prev->next = sub->next;
-    else
-        log_first = sub->next;
-    vlc_rwlock_unlock (&log_lock);
+    libvlc_log_unset (inst); /* <- Barrier before modifying the callback */
+    inst->log.cb = cb;
+    inst->log.data = data;
+    vlc_LogSet (inst->p_libvlc_int, libvlc_logf, inst);
 }
 
 /*** Helpers for logging to files ***/
-static void libvlc_log_file (void *data, int level, const char *fmt,
-                             va_list ap)
+static void libvlc_log_file (void *data, int level, const libvlc_log_t *log,
+                             const char *fmt, va_list ap)
 {
     FILE *stream = data;
 
@@ -123,12 +95,12 @@ static void libvlc_log_file (void *data, int level, const char *fmt,
     vfprintf (stream, fmt, ap);
     fputc ('\n', stream);
     funlockfile (stream);
-    (void) level;
+    (void) level; (void) log;
 }
 
-void libvlc_log_subscribe_file (libvlc_log_subscriber_t *sub, FILE *stream)
+void libvlc_log_set_file (libvlc_instance_t *inst, FILE *stream)
 {
-    libvlc_log_subscribe (sub, libvlc_log_file, stream);
+    libvlc_log_set (inst, libvlc_log_file, stream);
 }
 
 /*** Stubs for the old interface ***/

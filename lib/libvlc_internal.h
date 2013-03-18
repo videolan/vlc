@@ -72,6 +72,11 @@ struct libvlc_instance_t
     unsigned      ref_count;
     vlc_mutex_t   instance_lock;
     struct libvlc_callback_entry_list_t *p_callback_list;
+    struct
+    {
+        void (*cb) (void *, int, const libvlc_log_t *, const char *, va_list);
+        void *data;
+    } log;
 };
 
 

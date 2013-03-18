@@ -336,79 +336,56 @@ enum libvlc_log_level
     LIBVLC_ERROR=4    /**< Error message */
 };
 
+typedef struct vlc_log_t libvlc_log_t;
+
 /**
  * Callback prototype for LibVLC log message handler.
- * \param data data pointer as given to libvlc_log_subscribe()
+ * \param data data pointer as given to libvlc_log_set()
  * \param level message level (@ref enum libvlc_log_level)
+ * \param ctx message context (meta-informations about the message)
  * \param fmt printf() format string (as defined by ISO C11)
  * \param args variable argument list for the format
  * \note Log message handlers <b>must</b> be thread-safe.
  */
-typedef void (*libvlc_log_cb)(void *data, int level, const char *fmt,
-                              va_list args);
+typedef void (*libvlc_log_cb)(void *data, int level, const libvlc_log_t *ctx,
+                              const char *fmt, va_list args);
 
 /**
- * Data structure for a LibVLC logging callbacks.
- * \note This structure contains exactly 4 pointers and will never change.
- * Nevertheless, it should not be accessed directly outside of LibVLC.
- * (In fact, doing so would fail the thread memory model.)
- */
-typedef struct libvlc_log_subscriber
-{
-    struct libvlc_log_subscriber *prev, *next;
-    libvlc_log_cb func;
-    void *opaque;
-} libvlc_log_subscriber_t;
-
-/**
- * Registers a logging callback to LibVLC.
- * This function is thread-safe.
+ * Unsets the logging callback for a LibVLC instance. This is rarely needed:
+ * the callback is implicitly unset when the instance is destroyed.
+ * This function will wait for any pending callbacks invocation to complete
+ * (causing a deadlock if called from within the callback).
  *
- * \param sub uninitialized subscriber structure
+ * \version LibVLC 2.1.0 or later
+ */
+LIBVLC_API void libvlc_log_unset( libvlc_instance_t * );
+
+/**
+ * Sets the logging callback for a LibVLC instance.
+ * This function is thread-safe: it will wait for any pending callbacks
+ * invocation to complete.
+ *
  * \param cb callback function pointer
  * \param data opaque data pointer for the callback function
  *
  * \note Some log messages (especially debug) are emitted by LibVLC while
- * initializing, before any LibVLC instance even exists.
- * Thus this function does not require a LibVLC instance parameter.
+ * is being initialized. These messages cannot be captured with this interface.
  *
- * \warning As a consequence of not depending on a LibVLC instance,
- * all logging callbacks are shared by all LibVLC instances within the
- * process / address space. This also enables log messages to be emitted
- * by LibVLC components that are not specific to any given LibVLC instance.
+ * \warning A deadlock may occur if this function is called from the callback.
  *
- * \warning Do not call this function from within a logging callback.
- * It would trigger a dead lock.
  * \version LibVLC 2.1.0 or later
  */
-LIBVLC_API void libvlc_log_subscribe( libvlc_log_subscriber_t *sub,
-                                      libvlc_log_cb cb, void *data );
+LIBVLC_API void libvlc_log_set( libvlc_instance_t *,
+                                libvlc_log_cb cb, void *data );
 
 
 /**
- * Registers a logging callback to a file.
+ * Sets up logging to a file.
  * \param stream FILE pointer opened for writing
- *         (the FILE pointer must remain valid until libvlc_log_unsubscribe())
+ *         (the FILE pointer must remain valid until libvlc_log_unset())
  * \version LibVLC 2.1.0 or later
  */
-LIBVLC_API void libvlc_log_subscribe_file( libvlc_log_subscriber_t *sub,
-                                           FILE *stream );
-
-/**
- * Deregisters a logging callback from LibVLC.
- * This function is thread-safe.
- *
- * \note After (and only after) libvlc_log_unsubscribe() has returned,
- * LibVLC warrants that there are no more pending calls of the subscription
- * callback function.
- *
- * \warning Do not call this function from within a logging callback.
- * It would trigger a dead lock.
- *
- * \param sub initialized subscriber structure
- * \version LibVLC 2.1.0 or later
- */
-LIBVLC_API void libvlc_log_unsubscribe( libvlc_log_subscriber_t *sub );
+LIBVLC_API void libvlc_log_set_file( libvlc_instance_t *, FILE *stream );
 
 /**
  * Always returns minus one.

@@ -52,9 +52,6 @@ typedef int64_t libvlc_time_t;
  * @{
  */
 
-/** This structure is opaque. It represents a libvlc log instance */
-typedef struct libvlc_log_t libvlc_log_t;
-
 /** This structure is opaque. It represents a libvlc log iterator */
 typedef struct libvlc_log_iterator_t libvlc_log_iterator_t;
 
