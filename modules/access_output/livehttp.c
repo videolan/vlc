@@ -673,7 +673,8 @@ static ssize_t openNextFile( sout_access_out_t *p_access, sout_access_out_sys_t 
         return -1;
     }
 
-    CryptKey( p_access, i_newseg );
+    if( p_sys->key_uri )
+        CryptKey( p_access, i_newseg );
     msg_Dbg( p_access, "Successfully opened livehttp file: %s (%"PRIu32")" , psz_seg, i_newseg );
 
     //free( psz_seg );
