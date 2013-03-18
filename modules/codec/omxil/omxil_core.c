@@ -192,6 +192,20 @@ void DeinitOmxCore(void)
 /*****************************************************************************
  * CreateComponentsList: creates a list of components matching the given role
  *****************************************************************************/
+
+static const struct
+{
+    const char *psz_role;
+    const char *psz_name;
+} role_mappings[] =
+{
+#ifdef RPI_OMX
+    { "video_decoder.avc", "OMX.broadcom.video_decode" },
+    { "iv_renderer", "OMX.broadcom.video_render" },
+#endif
+    { 0, 0 }
+};
+
 int CreateComponentsList(vlc_object_t *p_this, const char *psz_role,
                          char ppsz_components[MAX_COMPONENTS_LIST_SIZE][OMX_MAX_STRINGNAME_SIZE])
 {
@@ -212,17 +226,12 @@ int CreateComponentsList(vlc_object_t *p_this, const char *psz_role,
 
         msg_Dbg(p_this, "component %s", psz_name);
 
-#ifdef RPI_OMX
-        if (!strcmp(psz_name, "OMX.broadcom.video_decode")) {
-            if (!strcmp(psz_role, "video_decoder.avc")) {
-                goto found;
-            }
-        } else if (!strcmp(psz_name, "OMX.broadcom.video_render")) {
-            if (!strcmp(psz_role, "iv_renderer")) {
+        for( unsigned int j = 0; role_mappings[j].psz_role; j++ ) {
+            if( !strcmp( psz_role, role_mappings[j].psz_role ) &&
+                !strcmp( psz_name, role_mappings[j].psz_name ) ) {
                 goto found;
             }
         }
-#endif
 
         omx_error = pf_get_roles_of_component(psz_name, &roles, 0);
         if(omx_error != OMX_ErrorNone || !roles) continue;
