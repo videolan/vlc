@@ -923,7 +923,7 @@ void vlc_threads_setup (libvlc_int_t *p_libvlc)
     SelectClockSource (VLC_OBJECT(p_libvlc));
 }
 
-extern vlc_rwlock_t config_lock, msg_lock;
+extern vlc_rwlock_t config_lock;
 BOOL WINAPI DllMain (HINSTANCE, DWORD, LPVOID);
 
 BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
@@ -939,12 +939,10 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             vlc_cond_init (&super_variable);
             vlc_threadvar_create (&thread_key, NULL);
             vlc_rwlock_init (&config_lock);
-            vlc_rwlock_init (&msg_lock);
             vlc_CPU_init ();
             break;
 
         case DLL_PROCESS_DETACH:
-            vlc_rwlock_destroy (&msg_lock);
             vlc_rwlock_destroy (&config_lock);
             vlc_threadvar_delete (&thread_key);
             vlc_cond_destroy (&super_variable);

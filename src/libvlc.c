@@ -179,6 +179,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         priv->i_verbose = -1;
     }
 
+    vlc_LogInit (p_libvlc);
+
     /* Announce who we are (TODO: only first instance?) */
     msg_Dbg( p_libvlc, "VLC media player - %s", VERSION_MESSAGE );
     msg_Dbg( p_libvlc, "%s", COPYRIGHT_MESSAGE );
@@ -210,6 +212,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( config_LoadCmdLine( p_libvlc, i_argc, ppsz_argv, &vlc_optind ) )
     {
         module_EndBank (true);
+        vlc_LogDeinit (p_libvlc);
         return VLC_EGENERIC;
     }
 
@@ -233,6 +236,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     {
         msg_Err( p_libvlc, "No plugins found! Check your VLC installation.");
         module_EndBank (true);
+        vlc_LogDeinit (p_libvlc);
         return VLC_ENOMOD;
     }
 
@@ -246,6 +250,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         {
             msg_Err( p_libvlc, "Unable to fork vlc to daemon mode" );
             module_EndBank (true);
+            vlc_LogDeinit (p_libvlc);
             return VLC_ENOMEM;
         }
         b_daemon = true;
@@ -622,7 +627,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     /* Free module bank. It is refcounted, so we call this each time  */
     module_EndBank (true);
-
+    vlc_LogDeinit (p_libvlc);
 #if defined(WIN32) || defined(__OS2__)
     system_End( );
 #endif

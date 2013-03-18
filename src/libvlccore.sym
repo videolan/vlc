@@ -255,9 +255,8 @@ module_unneed
 vlc_module_load
 vlc_module_unload
 vlc_Log
+vlc_LogSet
 vlc_vaLog
-vlc_Subscribe
-vlc_Unsubscribe
 msleep
 mstrtime
 mwait

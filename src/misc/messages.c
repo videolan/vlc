@@ -50,51 +50,6 @@
 #include "../libvlc.h"
 
 /**
- * Store all data required by messages interfaces.
- */
-vlc_rwlock_t msg_lock = VLC_STATIC_RWLOCK;
-msg_subscription_t *msg_head;
-
-/**
- * Subscribe to the message queue.
- * Whenever a message is emitted, a callback will be called.
- * Callback invocation are serialized within a subscription.
- *
- * @param cb callback function
- * @param opaque data for the callback function
- */
-void vlc_Subscribe (msg_subscription_t *sub, msg_callback_t cb, void *opaque)
-{
-    sub->prev = NULL;
-    sub->func = cb;
-    sub->opaque = opaque;
-
-    vlc_rwlock_wrlock (&msg_lock);
-    sub->next = msg_head;
-    msg_head = sub;
-    vlc_rwlock_unlock (&msg_lock);
-}
-
-/**
- * Unsubscribe from the message queue.
- * This function waits for the message callback to return if needed.
- */
-void vlc_Unsubscribe (msg_subscription_t *sub)
-{
-    vlc_rwlock_wrlock (&msg_lock);
-    if (sub->next != NULL)
-        sub->next->prev = sub->prev;
-    if (sub->prev != NULL)
-        sub->prev->next = sub->next;
-    else
-    {
-        assert (msg_head == sub);
-        msg_head = sub->next;
-    }
-    vlc_rwlock_unlock (&msg_lock);
-}
-
-/**
  * Emit a log message.
  * \param obj VLC object emitting the message or NULL
  * \param type VLC_MSG_* message type (info, error, warning or debug)
@@ -112,9 +67,6 @@ void vlc_Log (vlc_object_t *obj, int type, const char *module,
     va_end (args);
 }
 
-static void PrintColorMsg (void *, int, const msg_item_t *,
-                           const char *, va_list);
-static void PrintMsg (void *, int, const msg_item_t *, const char *, va_list);
 #ifdef WIN32
 static void Win32DebugOutputMsg (void *, int , const msg_item_t *,
                                  const char *, va_list);
@@ -205,32 +157,20 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
             break;
         }
 
-    /* Pass message to subscribers */
+    /* Pass message to the callback */
     libvlc_priv_t *priv = libvlc_priv (obj->p_libvlc);
 
+#ifdef WIN32
     va_list ap;
 
-    va_copy (ap, args);
-    if (priv->b_color)
-        PrintColorMsg (&priv->i_verbose, type, &msg, format, ap);
-    else
-        PrintMsg (&priv->i_verbose, type, &msg, format, ap);
-    va_end (ap);
-
-#ifdef WIN32
     va_copy (ap, args);
     Win32DebugOutputMsg (&priv->i_verbose, type, &msg, format, ap);
     va_end (ap);
 #endif
 
-    vlc_rwlock_rdlock (&msg_lock);
-    for (msg_subscription_t *sub = msg_head; sub != NULL; sub = sub->next)
-    {
-        va_copy (ap, args);
-        sub->func (sub->opaque, type, &msg, format, ap);
-        va_end (ap);
-    }
-    vlc_rwlock_unlock (&msg_lock);
+    vlc_rwlock_rdlock (&priv->log.lock);
+    priv->log.cb (priv->log.opaque, type, &msg, format, args);
+    vlc_rwlock_unlock (&priv->log.lock);
 
     uselocale (locale);
     freelocale (c);
@@ -248,10 +188,10 @@ static const char msg_color[4][8] = { WHITE, RED, YELLOW, GRAY };
 static void PrintColorMsg (void *d, int type, const msg_item_t *p_item,
                            const char *format, va_list ap)
 {
-    const signed char *pverbose = d;
     FILE *stream = stderr;
+    int verbose = (intptr_t)d;
 
-    if (*pverbose < 0 || *pverbose < (type - VLC_MSG_ERR))
+    if (verbose < 0 || verbose < (type - VLC_MSG_ERR))
         return;
 
     int canc = vlc_savecancel ();
@@ -274,10 +214,10 @@ static void PrintColorMsg (void *d, int type, const msg_item_t *p_item,
 static void PrintMsg (void *d, int type, const msg_item_t *p_item,
                       const char *format, va_list ap)
 {
-    const signed char *pverbose = d;
     FILE *stream = stderr;
+    int verbose = (intptr_t)d;
 
-    if (*pverbose < 0 || *pverbose < (type - VLC_MSG_ERR))
+    if (verbose < 0 || verbose < (type - VLC_MSG_ERR))
         return;
 
     int canc = vlc_savecancel ();
@@ -337,3 +277,39 @@ static void Win32DebugOutputMsg (void* d, int type, const msg_item_t *p_item,
     free(msg);
 }
 #endif
+
+/**
+ * Sets the message logging callback.
+ * \param cb message callback, or NULL to reset
+ * \param data data pointer for the message callback
+ */
+void vlc_LogSet (libvlc_int_t *vlc, vlc_log_cb cb, void *opaque)
+{
+    libvlc_priv_t *priv = libvlc_priv (vlc);
+
+    if (cb == NULL)
+    {
+        cb = priv->b_color ? PrintColorMsg : PrintMsg;
+        opaque = (void *)(intptr_t)priv->i_verbose;
+    }
+
+    vlc_rwlock_wrlock (&priv->log.lock);
+    priv->log.cb = cb;
+    priv->log.opaque = opaque;
+    vlc_rwlock_unlock (&priv->log.lock);
+}
+
+void vlc_LogInit (libvlc_int_t *vlc)
+{
+    libvlc_priv_t *priv = libvlc_priv (vlc);
+
+    vlc_rwlock_init (&priv->log.lock);
+    vlc_LogSet (vlc, NULL, NULL);
+}
+
+void vlc_LogDeinit (libvlc_int_t *vlc)
+{
+    libvlc_priv_t *priv = libvlc_priv (vlc);
+
+    vlc_rwlock_destroy (&priv->log.lock);
+}

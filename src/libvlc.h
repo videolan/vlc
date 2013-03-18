@@ -75,6 +75,12 @@ void vlc_assert_locked (vlc_mutex_t *);
 #endif
 
 /*
+ * Logging
+ */
+void vlc_LogInit(libvlc_int_t *);
+void vlc_LogDeinit(libvlc_int_t *);
+
+/*
  * LibVLC exit event handling
  */
 typedef struct vlc_exit
@@ -141,7 +147,13 @@ typedef struct libvlc_priv_t
 {
     libvlc_int_t       public_data;
 
-    /* Messages */
+    /* Logging */
+    struct
+    {
+        void (*cb) (void *, int, const msg_item_t *, const char *, va_list);
+        void *opaque;
+        vlc_rwlock_t lock;
+    } log;
     signed char        i_verbose;   ///< info messages
     bool               b_color;     ///< color messages?
     bool               b_stats;     ///< Whether to collect stats

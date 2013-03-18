@@ -194,7 +194,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->p_file = NULL;
-    msg_callback_t cb = TextPrint;
+    vlc_log_cb cb = TextPrint;
     const char *filename = LOG_FILE_TEXT, *header = TEXT_HEADER;
     p_sys->footer = TEXT_FOOTER;
 
