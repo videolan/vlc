@@ -175,6 +175,8 @@ struct sout_access_out_sys_t
     uint8_t aes_ivs[16];
     gcry_cipher_hd_t aes_ctx;
     char *key_uri;
+    uint8_t stuffing_bytes[16];
+    ssize_t stuffing_size;
 };
 
 static int CryptSetup( sout_access_out_t *p_access );
@@ -210,6 +212,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_caching = var_GetBool( p_access, SOUT_CFG_PREFIX "caching") ;
     p_sys->b_generate_iv = var_GetBool( p_access, SOUT_CFG_PREFIX "generate-iv") ;
 
+    p_sys->stuffing_size = 0;
 
     /* 5 elements is from harrison-stetson algorithm to start from some number
      * if we don't have numsegs defined
@@ -545,6 +548,21 @@ static void closeCurrentSegment( sout_access_out_t *p_access, sout_access_out_sy
 {
     if ( p_sys->i_handle >= 0 )
     {
+    if( p_sys->key_uri )
+    {
+        size_t pad = 16 - p_sys->stuffing_size;
+            memset(&p_sys->stuffing_bytes[p_sys->stuffing_size], pad, pad);
+        gcry_error_t err = gcry_cipher_encrypt( p_sys->aes_ctx, p_sys->stuffing_bytes, 16, NULL, 0 );
+
+            if( err ) {
+        msg_Err( p_access, "Couldn't encrypt 16 bytes: %s", gpg_strerror(err) );
+        } else {
+                int ret = write( p_sys->i_handle, p_sys->stuffing_bytes, 16 );
+        if( ret != 16 )
+                    msg_Err( p_access, "Couldn't write 16 bytes" );
+            }
+            p_sys->stuffing_size = 0;
+    }
         close( p_sys->i_handle );
         p_sys->i_handle = -1;
         if ( p_sys->psz_cursegPath )
@@ -566,28 +584,37 @@ static void Close( vlc_object_t * p_this )
     sout_access_out_sys_t *p_sys = p_access->p_sys;
 
     msg_Dbg( p_access, "Flushing buffer to last file");
+    bool crypted = false;
     while( p_sys->block_buffer )
     {
-        if( p_sys->key_uri )
+        if( p_sys->key_uri && !crypted)
         {
+            if( p_sys->stuffing_size )
+            {
+                p_sys->block_buffer = block_Realloc( p_sys->block_buffer, p_sys->stuffing_size, p_sys->block_buffer->i_buffer );
+                if( unlikely(!p_sys->block_buffer) )
+                    return;
+                memcpy( p_sys->block_buffer->p_buffer, p_sys->stuffing_bytes, p_sys->stuffing_size );
+                p_sys->stuffing_size = 0;
+            }
             size_t original = p_sys->block_buffer->i_buffer;
-            size_t padded = (p_sys->block_buffer->i_buffer + 15 ) & ~15;
-            if( padded == p_sys->block_buffer->i_buffer )
-                padded += 16;
-            p_sys->block_buffer = block_Realloc( p_sys->block_buffer, 0, padded );
-            if( !p_sys->block_buffer )
-                break;
-            int pad = padded - original;
-            memset( &p_sys->block_buffer->p_buffer[original], pad, pad );
+            size_t padded = (original + 15 ) & ~15;
+            size_t pad = padded - original;
+            if( pad )
+            {
+                p_sys->stuffing_size = 16 - pad;
+                p_sys->block_buffer->i_buffer -= p_sys->stuffing_size;
+                memcpy( p_sys->stuffing_bytes, &p_sys->block_buffer->p_buffer[p_sys->block_buffer->i_buffer], p_sys->stuffing_size );
+            }
 
             gcry_error_t err = gcry_cipher_encrypt( p_sys->aes_ctx,
-                                p_sys->block_buffer->p_buffer, padded, NULL, 0 );
+                                p_sys->block_buffer->p_buffer, p_sys->block_buffer->i_buffer, NULL, 0 );
             if( err )
             {
                 msg_Err( p_access, "Encryption failure: %s ", gpg_strerror(err) );
                 break;
             }
-
+            crypted = true;
         }
         ssize_t val = write( p_sys->i_handle, p_sys->block_buffer->p_buffer, p_sys->block_buffer->i_buffer );
         if ( val == -1 )
@@ -609,6 +636,7 @@ static void Close( vlc_object_t * p_this )
            block_t *p_next = p_sys->block_buffer->p_next;
            block_Release (p_sys->block_buffer);
            p_sys->block_buffer = p_next;
+           crypted=false;
         }
         else
         {
@@ -697,6 +725,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
     {
         if ( ( p_sys->b_splitanywhere || ( p_buffer->i_flags & BLOCK_FLAG_HEADER ) ) )
         {
+            bool crypted = false;
             block_t *output = p_sys->block_buffer;
             p_sys->block_buffer = NULL;
 
@@ -716,25 +745,34 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 
             while( output )
             {
-                if( p_sys->key_uri )
+                if( p_sys->key_uri && !crypted )
                 {
+                    if( p_sys->stuffing_size )
+                    {
+                        output = block_Realloc( output, p_sys->stuffing_size, output->i_buffer );
+                        if( unlikely(!output ) )
+                            return VLC_ENOMEM;
+                        memcpy( output->p_buffer, p_sys->stuffing_bytes, p_sys->stuffing_size );
+                        p_sys->stuffing_size = 0;
+                    }
                     size_t original = output->i_buffer;
                     size_t padded = (output->i_buffer + 15 ) & ~15;
-                    if( padded == output->i_buffer )
-                        padded += 16;
-                    output = block_Realloc( output, 0, padded );
-                    if( !output )
-                        return VLC_ENOMEM;
-                    int pad = padded - original;
-                    memset( &output->p_buffer[original], pad, pad );
+                    size_t pad = padded - original;
+                    if( pad )
+                    {
+                        p_sys->stuffing_size = 16-pad;
+                        output->i_buffer -= p_sys->stuffing_size;
+                        memcpy(p_sys->stuffing_bytes, &output->p_buffer[output->i_buffer], p_sys->stuffing_size);
+                    }
 
                     gcry_error_t err = gcry_cipher_encrypt( p_sys->aes_ctx,
-                                        output->p_buffer, padded, NULL, 0 );
+                                        output->p_buffer, output->i_buffer, NULL, 0 );
                     if( err )
                     {
                         msg_Err( p_access, "Encryption failure: %s ", gpg_strerror(err) );
                         return -1;
                     }
+                    crypted=true;
 
                 }
                 ssize_t val = write( p_sys->i_handle, output->p_buffer, output->i_buffer );
@@ -754,6 +792,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
                    block_t *p_next = output->p_next;
                    block_Release (output);
                    output = p_next;
+                   crypted=false;
                 }
                 else
                 {
