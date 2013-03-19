@@ -155,6 +155,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     var_AddCallback( p_object, var, onGenericCallback, this );
 
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "volume" )
+    ADD_CALLBACK( pIntf->p_sys->p_playlist, "mute" )
     ADD_CALLBACK( pIntf->p_libvlc, "intf-toggle-fscontrol" )
 
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "random" )
@@ -200,6 +201,8 @@ VlcProc::~VlcProc()
     }
 
     var_DelCallback( getIntf()->p_sys->p_playlist, "volume",
+                     onGenericCallback, this );
+    var_DelCallback( getIntf()->p_sys->p_playlist, "mute",
                      onGenericCallback, this );
     var_DelCallback( getIntf()->p_libvlc, "intf-toggle-fscontrol",
                      onGenericCallback, this );
@@ -365,6 +368,7 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
     }
 
     ADD_CALLBACK_ENTRY( "volume", on_volume_changed, true )
+    ADD_CALLBACK_ENTRY( "mute", on_mute_changed, true )
 
     ADD_CALLBACK_ENTRY( "bit-rate", on_bit_rate_changed, false )
     ADD_CALLBACK_ENTRY( "sample-rate", on_sample_rate_changed, false )
@@ -669,8 +673,12 @@ void VlcProc::on_volume_changed( vlc_object_t* p_obj, vlc_value_t newVal )
     playlist_t* pPlaylist = getIntf()->p_sys->p_playlist;
 
     SET_VOLUME( m_cVarVolume, var_GetFloat( pPlaylist, "volume" ), false );
-    bool b_is_muted = playlist_MuteGet( pPlaylist ) > 0;
-    SET_BOOL( m_cVarMute, b_is_muted );
+}
+
+void VlcProc::on_mute_changed( vlc_object_t* p_obj, vlc_value_t newVal )
+{
+    (void)p_obj;
+    SET_BOOL( m_cVarMute, newVal.b_bool );
 }
 
 void VlcProc::on_audio_filter_changed( vlc_object_t* p_obj, vlc_value_t newVal )
@@ -773,8 +781,7 @@ void VlcProc::init_variables()
     SET_BOOL( m_cVarRepeat, var_GetBool( pPlaylist, "repeat" ) );
 
     SET_VOLUME( m_cVarVolume, var_GetFloat( pPlaylist, "volume" ), false );
-    bool b_is_muted = playlist_MuteGet( pPlaylist ) > 0;
-    SET_BOOL( m_cVarMute, b_is_muted );
+    SET_BOOL( m_cVarMute, var_GetBool( pPlaylist, "mute" ) );
 
     update_equalizer();
 }

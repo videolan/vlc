@@ -111,6 +111,7 @@ public:
     void on_repeat_changed( vlc_object_t* p_obj, vlc_value_t newVal );
 
     void on_volume_changed( vlc_object_t* p_obj, vlc_value_t newVal );
+    void on_mute_changed( vlc_object_t* p_obj, vlc_value_t newVal );
     void on_audio_filter_changed( vlc_object_t* p_obj, vlc_value_t newVal );
 
     void on_intf_show_changed( vlc_object_t* p_obj, vlc_value_t newVal );
