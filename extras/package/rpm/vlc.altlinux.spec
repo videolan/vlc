@@ -1175,7 +1175,6 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %_vlc_pluginsdir/stream_out/libstream_out_gather_plugin.so*
 %_vlc_pluginsdir/stream_out/libstream_out_mosaic_bridge_plugin.so*
 %_vlc_pluginsdir/stream_out/libstream_out_rtp_plugin.so*
-#%_vlc_pluginsdir/stream_out/libstream_out_switcher_plugin.so*
 %_vlc_pluginsdir/stream_out/libstream_out_transcode_plugin.so*
 %_vlc_pluginsdir/stream_out/libstream_out_autodel_plugin.so*
 
@@ -1374,7 +1373,6 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 
 %files plugin-ffmpeg
 %_vlc_pluginsdir/codec/libffmpeg_plugin.so*
-#%_vlc_pluginsdir/stream_out/libstream_out_switcher_plugin.so*
 
 %files plugin-framebuffer
 %_vlc_pluginsdir/video_output/libfb_plugin.so*

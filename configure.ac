@@ -2391,21 +2391,6 @@ AS_IF([test "${enable_vda}" != "no"], [
 AM_CONDITIONAL([HAVE_AVCODEC_VDA], [test "${have_avcodec_vda}" = "yes"])
 
 dnl
-dnl stream_out switcher needs libavcodec
-dnl
-AC_ARG_ENABLE(switcher,
-  [  --enable-switcher       Stream-out switcher plugin (default disabled)])
-AS_IF([test "${enable_switcher}" = "yes"], [
-  AS_IF([test "x${have_avcodec}" = "xyes"], [
-    VLC_ADD_PLUGIN([stream_out_switcher])
-    VLC_ADD_LIBS([stream_out_switcher],[$AVCODEC_LIBS $AVUTIL_LIBS $LIBM])
-    VLC_ADD_CFLAGS([stream_out_switcher],[$AVCODEC_CFLAGS $AVUTIL_CFLAGS])
-  ],[AC_MSG_ERROR([Stream_out switcher depends on avcodec])
-  ])
-])
-
-
-dnl
 dnl  avformat demuxer/muxer plugin
 dnl
 

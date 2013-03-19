@@ -6,8 +6,6 @@ SOURCES_stream_out_duplicate = duplicate.c
 SOURCES_stream_out_es = es.c
 SOURCES_stream_out_display = display.c
 SOURCES_stream_out_gather = gather.c
-SOURCES_stream_out_switcher = switcher.c ../codec/avcodec/cpu.c \
-	../codec/avcodec/avcommon_compat.h ../codec/avcodec/avcommon.h
 SOURCES_stream_out_bridge = bridge.c
 SOURCES_stream_out_mosaic_bridge = mosaic_bridge.c
 SOURCES_stream_out_autodel = autodel.c

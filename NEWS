@@ -89,6 +89,7 @@ Stream Output:
  * Livehttp places more accurate segments durations in playlist
  * Livehttp allows setting cachin-variable in playlist
  * Livehttp stream encryption support
+ * Unmaintained switcher has been removed
 
 Interfaces:
  * configurable password for the HTTP server.

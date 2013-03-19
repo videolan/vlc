@@ -1014,7 +1014,6 @@ modules/stream_out/rtsp.c
 modules/stream_out/setid.c
 modules/stream_out/smem.c
 modules/stream_out/standard.c
-modules/stream_out/switcher.c
 modules/stream_out/transcode/transcode.c
 modules/text_renderer/freetype.c
 modules/text_renderer/quartztext.c
