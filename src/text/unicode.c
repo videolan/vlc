@@ -81,12 +81,11 @@ int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
         }
     }
 #endif
-
-    char *ansi = ToANSI (str);
-    if (ansi != NULL)
+    wchar_t *wide = ToWide(str);
+    if (likely(wide != NULL))
     {
-        fputs (ansi, stream);
-        free (ansi);
+        res = fputws(wide, stream);
+        free(wide);
     }
     else
         res = -1;
