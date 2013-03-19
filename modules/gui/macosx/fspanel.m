@@ -406,12 +406,12 @@
     id view = [super initWithFrame:frameRect];
     fillColor = [[NSColor clearColor] retain];
     NSRect s_rc = [self frame];
-    addButton(o_prev, @"fs_skip_previous" , @"fs_skip_previous_highlight", 174, 15, prev, _NS("Click to go to the previous playlist item."), _NS("Previous"));
-    addButton(o_bwd, @"fs_rewind"        , @"fs_rewind_highlight"       , 211, 14, backward, _NS("Click and hold to skip backward through the current media."), _NS("Backward"));
-    addButton(o_play, @"fs_play"          , @"fs_play_highlight"         , 265, 10, play, _NS("Click to play or pause the current media."), _NS("Play/Pause"));
-    addButton(o_fwd, @"fs_forward"       , @"fs_forward_highlight"      , 313, 14, forward, _NS("Click and hold to skip forward through the current media."), _NS("Forward"));
-    addButton(o_next, @"fs_skip_next"     , @"fs_skip_next_highlight"    , 365, 15, next, _NS("Click to go to the next playlist item."), _NS("Next"));
-    addButton(o_fullscreen, @"fs_exit_fullscreen", @"fs_exit_fullscreen_hightlight", 507, 13, toggleFullscreen, _NS("Click to exit fullscreen playback."), _NS("Toggle Fullscreen mode"));
+    addButton(o_prev, @"fs_skip_previous_highlight" , @"fs_skip_previous", 174, 15, prev, _NS("Click to go to the previous playlist item."), _NS("Previous"));
+    addButton(o_bwd, @"fs_rewind_highlight"        , @"fs_rewind"       , 211, 14, backward, _NS("Click and hold to skip backward through the current media."), _NS("Backward"));
+    addButton(o_play, @"fs_play_highlight"          , @"fs_play"         , 265, 10, play, _NS("Click to play or pause the current media."), _NS("Play/Pause"));
+    addButton(o_fwd, @"fs_forward_highlight"       , @"fs_forward"      , 313, 14, forward, _NS("Click and hold to skip forward through the current media."), _NS("Forward"));
+    addButton(o_next, @"fs_skip_next_highlight"     , @"fs_skip_next"    , 365, 15, next, _NS("Click to go to the next playlist item."), _NS("Next"));
+    addButton(o_fullscreen, @"fs_exit_fullscreen_highlight", @"fs_exit_fullscreen", 507, 13, toggleFullscreen, _NS("Click to exit fullscreen playback."), _NS("Toggle Fullscreen mode"));
 /*
     addButton(o_button, @"image (off state)", @"image (on state)", 38, 51, something, accessibility help string, usual tool tip);
  */
@@ -476,8 +476,8 @@
 
     o_background_img = [[NSImage imageNamed:@"fs_background"] retain];
     o_vol_sld_img = [[NSImage imageNamed:@"fs_volume_slider_bar"] retain];
-    o_vol_mute_img = [[NSImage imageNamed:@"fs_volume_mute"] retain];
-    o_vol_max_img = [[NSImage imageNamed:@"fs_volume_max"] retain];
+    o_vol_mute_img = [[NSImage imageNamed:@"fs_volume_mute_highlight"] retain];
+    o_vol_max_img = [[NSImage imageNamed:@"fs_volume_max_highlight"] retain];
     o_time_sld_img = [[NSImage imageNamed:@"fs_time_slider"] retain];
 
     return view;
@@ -505,14 +505,14 @@
 
 - (void)setPlay
 {
-    [o_play setImage:[NSImage imageNamed:@"fs_play"]];
-    [o_play setAlternateImage: [NSImage imageNamed:@"fs_play_highlight"]];
+    [o_play setImage:[NSImage imageNamed:@"fs_play_highlight"]];
+    [o_play setAlternateImage: [NSImage imageNamed:@"fs_play"]];
 }
 
 - (void)setPause
 {
-    [o_play setImage: [NSImage imageNamed:@"fs_pause"]];
-    [o_play setAlternateImage: [NSImage imageNamed:@"fs_pause_highlight"]];
+    [o_play setImage: [NSImage imageNamed:@"fs_pause_highlight"]];
+    [o_play setAlternateImage: [NSImage imageNamed:@"fs_pause"]];
 }
 
 - (void)setStreamTitle:(NSString *)o_title
@@ -704,7 +704,7 @@
 - (void)drawKnobInRect:(NSRect) knobRect
 {
     NSRect image_rect;
-    NSImage *img = [NSImage imageNamed:@"fs_volume_slider_knob"];
+    NSImage *img = [NSImage imageNamed:@"fs_volume_slider_knob_highlight"];
     image_rect.size = [img size];
     image_rect.origin.x = 0;
     image_rect.origin.y = 0;
