@@ -80,6 +80,7 @@ typedef struct
 
 void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_argv[] )
 {
+#if !defined(WINAPI_FAMILY_APP)
     /* Raise default priority of the current process */
 #ifndef ABOVE_NORMAL_PRIORITY_CLASS
 #   define ABOVE_NORMAL_PRIORITY_CLASS 0x00008000
@@ -97,7 +98,6 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
         }
     }
 
-#if !defined(WINAPI_FAMILY_APP)
     if( var_InheritBool( p_this, "one-instance" )
      || ( var_InheritBool( p_this, "one-instance-when-started-from-file" )
        && var_InheritBool( p_this, "started-from-file" ) ) )
