@@ -45,6 +45,8 @@ libvlc_get_fullscreen
 libvlc_get_input_thread
 libvlc_get_log_verbosity
 libvlc_get_version
+libvlc_log_get_context
+libvlc_log_get_object
 libvlc_log_set
 libvlc_log_set_file
 libvlc_log_unset

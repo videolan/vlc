@@ -339,6 +339,49 @@ enum libvlc_log_level
 typedef struct vlc_log_t libvlc_log_t;
 
 /**
+ * Gets debugging informations about a log message: the name of the VLC module
+ * emitting the message and the message location within the source code.
+ *
+ * The returned module name and file name will be NULL if unknown.
+ * The returned line number will similarly be zero if unknown.
+ *
+ * \param ctx message context (as passed to the @ref libvlc_log_cb callback)
+ * \param module module name storage (or NULL) [OUT]
+ * \param file source code file name storage (or NULL) [OUT]
+ * \param line source code file line number storage (or NULL) [OUT]
+ * \warning The returned module name and source code file name, if non-NULL,
+ * are only valid until the logging callback returns.
+ *
+ * \version LibVLC 2.1.0 or later
+ */
+void libvlc_log_get_context(const libvlc_log_t *ctx, const char **module,
+                            const char **file, unsigned *restrict line);
+
+/**
+ * Gets VLC object informations about a log message: the type name of the VLC
+ * object emitting the message, the object header if any and a temporaly-unique
+ * object identifier. These informations are mainly meant for <b>manual</b>
+ * troubleshooting.
+ *
+ * The returned type name may be "generic" if unknown, but it cannot be NULL.
+ * The returned header will be NULL if unset; in current versions, the header
+ * is used to distinguish for VLM inputs.
+ * The returned object ID will be zero if the message is not associated with
+ * any VLC object.
+ *
+ * \param ctx message context (as passed to the @ref libvlc_log_cb callback)
+ * \param name object name storage (or NULL) [OUT]
+ * \param header object header (or NULL) [OUT]
+ * \param line source code file line number storage (or NULL) [OUT]
+ * \warning The returned module name and source code file name, if non-NULL,
+ * are only valid until the logging callback returns.
+ *
+ * \version LibVLC 2.1.0 or later
+ */
+void libvlc_log_get_object(const libvlc_log_t *ctx, const char **name,
+                           const char **header, uintptr_t *id);
+
+/**
  * Callback prototype for LibVLC log message handler.
  * \param data data pointer as given to libvlc_log_set()
  * \param level message level (@ref enum libvlc_log_level)
@@ -346,6 +389,8 @@ typedef struct vlc_log_t libvlc_log_t;
  * \param fmt printf() format string (as defined by ISO C11)
  * \param args variable argument list for the format
  * \note Log message handlers <b>must</b> be thread-safe.
+ * \warning The message context pointer, the format string parameters and the
+ *          variable arguments are only valid until the callback returns.
  */
 typedef void (*libvlc_log_cb)(void *data, int level, const libvlc_log_t *ctx,
                               const char *fmt, va_list args);

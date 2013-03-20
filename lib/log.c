@@ -34,6 +34,33 @@
 
 /*** Logging core dispatcher ***/
 
+void libvlc_log_get_context(const libvlc_log_t *ctx,
+                            const char **restrict module,
+                            const char **restrict file,
+                            unsigned *restrict line)
+{
+    if (module != NULL)
+        *module = ctx->psz_module;
+    if (file != NULL)
+        *file = NULL;
+    if (line != NULL)
+        *line = 0;
+}
+
+void libvlc_log_get_object(const libvlc_log_t *ctx,
+                           const char **restrict name,
+                           const char **restrict header,
+                           uintptr_t *restrict id)
+{
+    if (name != NULL)
+        *name = (ctx->psz_object_type != NULL)
+                ? ctx->psz_object_type : "generic";
+    if (header != NULL)
+        *header = ctx->psz_header;
+    if (id != NULL)
+        *id = ctx->i_object_id;
+}
+
 VLC_FORMAT(4,5)
 static void libvlc_log (libvlc_instance_t *inst, int level,
                         const libvlc_log_t *ctx, const char *fmt, ...)
