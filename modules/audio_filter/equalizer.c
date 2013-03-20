@@ -402,8 +402,8 @@ static int EqzInit( filter_t *p_filter, int i_rate )
                         i_rate, p_sys->i_band, p_sys->b_2eqz ? 2 : 1 );
     for( i = 0; i < p_sys->i_band; i++ )
     {
-        msg_Dbg( p_filter, "   %d Hz -> factor:%f alpha:%f beta:%f gamma:%f",
-                 (int)cfg.band[i].f_frequency, p_sys->f_amp[i],
+        msg_Dbg( p_filter, "   %.2f Hz -> factor:%f alpha:%f beta:%f gamma:%f",
+                 cfg.band[i].f_frequency, p_sys->f_amp[i],
                  p_sys->f_alpha[i], p_sys->f_beta[i], p_sys->f_gamma[i]);
     }
     return VLC_SUCCESS;
