@@ -167,10 +167,9 @@ static int OpenFilter( vlc_object_t *p_this )
     /* Allocate the memory needed to store the module's structure */
     p_sys = p_filter->p_sys = malloc( sizeof(filter_sys_t) );
     if( p_sys == NULL )
-        return -1;
+        return VLC_ENOMEM;
     p_sys->i_reject_count = 0;
 
-    p_filter->pf_audio_filter = Convert;
 
     /* Initialize libmad */
     mad_stream_init( &p_sys->mad_stream );
@@ -183,7 +182,9 @@ static int OpenFilter( vlc_object_t *p_this )
              (char *)&p_filter->fmt_out.audio.i_format,
              p_filter->fmt_out.audio.i_bitspersample );
 
-    return 0;
+    p_filter->pf_audio_filter = Convert;
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -214,7 +215,7 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
         p_filter->fmt_out.audio.i_channels / 8;
 
     block_t *p_out = block_Alloc( i_out_size );
-    if( !p_out )
+    if( unlikely( !p_out ) )
     {
         msg_Warn( p_filter, "can't get output buffer" );
         block_Release( p_block );
