@@ -547,10 +547,18 @@ static char *relative_URI(const char *psz_url, const char *psz_path)
     if (strncmp(psz_path, "http", 4) == 0)
         return NULL;
 
-    char    *path_end = strrchr(psz_url, '/');
-    if (path_end == NULL)
+    char *path_separator=NULL;
+    if( psz_path[0] == '/' ) //Relative URL with absolute path
+    {
+        //Try to find separator for name and path, try to skip
+        //access and first ://
+        path_separator = strchr( &psz_url[8], '/');
+    } else {
+        path_separator = strrchr(psz_url, '/');
+    }
+    if ( unlikely( path_separator == NULL ) )
         return NULL;
-    unsigned int    url_length = path_end - psz_url + 1;
+    const size_t url_length = path_separator - psz_url + 1;
     char    *psz_res = malloc(url_length + strlen(psz_path) + 1);
     strncpy(psz_res, psz_url, url_length);
     psz_res[url_length] = 0;
