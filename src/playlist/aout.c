@@ -120,8 +120,6 @@ int playlist_MuteSet (playlist_t *pl, bool mute)
     {
         ret = aout_MuteSet (aout, mute);
         vlc_object_release (aout);
-        if (ret == 0)
-            var_SetBool (pl, "mute", mute);
     }
     return ret;
 }
