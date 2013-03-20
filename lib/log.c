@@ -61,24 +61,10 @@ void libvlc_log_get_object(const libvlc_log_t *ctx,
         *id = ctx->i_object_id;
 }
 
-VLC_FORMAT(4,5)
-static void libvlc_log (libvlc_instance_t *inst, int level,
-                        const libvlc_log_t *ctx, const char *fmt, ...)
-{
-    va_list ap;
-
-    va_start (ap, fmt);
-    inst->log.cb (inst->log.data, level, ctx, fmt, ap);
-    va_end (ap);
-}
-
 static void libvlc_logf (void *data, int level, const vlc_log_t *item,
                          const char *fmt, va_list ap)
 {
-    char *msg;
-
-    if (unlikely(vasprintf (&msg, fmt, ap) == -1))
-        return;
+    libvlc_instance_t *inst = data;
 
     switch (level)
     {
@@ -88,15 +74,7 @@ static void libvlc_logf (void *data, int level, const vlc_log_t *item,
         case VLC_MSG_DBG:  level = LIBVLC_DEBUG;   break;
     }
 
-    if (item->psz_header != NULL)
-        libvlc_log (data, level, item, "[%p] [%s]: %s %s %s",
-                    (void *)item->i_object_id, item->psz_header,
-                    item->psz_module, item->psz_object_type, msg);
-    else
-        libvlc_log (data, level, item, "[%p]: %s %s %s",
-                    (void *)item->i_object_id, item->psz_module,
-                    item->psz_object_type, msg);
-    free (msg);
+    inst->log.cb (inst->log.data, level, item, fmt, ap);
 }
 
 void libvlc_log_unset (libvlc_instance_t *inst)
