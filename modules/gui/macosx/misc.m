@@ -499,8 +499,7 @@ void _drawFrameInRect(NSRect frameRect)
     [[NSGraphicsContext currentContext] restoreGraphicsState];
 
     NSRect knobRect = [[self cell] knobRectFlipped:NO];
-    if (b_dark)
-        knobRect.origin.y+=2;
+    knobRect.origin.y+=1;
     [self drawKnobInRect: knobRect];
 }
 
