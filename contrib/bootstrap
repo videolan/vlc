@@ -118,7 +118,7 @@ fi
 # Prepare files
 #
 echo "Creating configuration file... config.mak"
-exec 3>config.mak
+exec 3>config.mak || exit $?
 cat >&3 << EOF
 # This file was automatically generated.
 # Any change will be overwritten if ../bootstrap is run again.
@@ -254,7 +254,7 @@ esac
 # Results output
 #
 test -e Makefile && unlink Makefile
-ln -sf ../../contrib/src/main.mak Makefile
+ln -sf ../../contrib/src/main.mak Makefile || exit $?
 cat << EOF
 Bootstrap completed.
 
@@ -272,4 +272,4 @@ Other targets:
  * make package      prepare prebuilt packages
 EOF
 
-mkdir -p ../../contrib/tarballs
+mkdir -p ../../contrib/tarballs || exit $?
