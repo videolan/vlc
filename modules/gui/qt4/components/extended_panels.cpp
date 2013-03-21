@@ -39,6 +39,8 @@
 #include <QComboBox>
 #include <QTimer>
 #include <QFileDialog>
+#include <QGraphicsScene>
+#include <QPainter>
 
 #include "components/extended_panels.hpp"
 #include "dialogs/preferences.hpp"
@@ -1244,7 +1246,23 @@ void Equalizer::build()
     ui.presetsCombo->addItem( "", QVariant() ); /* 1st entry = custom/modified */
     for( i = 0 ; i < NB_PRESETS ; i ++ )
     {
-        ui.presetsCombo->addItem( qtr( preset_list_text[i] ),
+        QGraphicsScene scene;
+        QPixmap icon( 40, 40 );
+        icon.fill( Qt::transparent );
+        QPainter painter( &icon );
+        for ( int j = 0; j < eqz_preset_10b[i].i_band; j++ )
+        {
+            float f_value = eqz_preset_10b[i].f_amp[j];
+            if ( f_value > 20.0 ) f_value = 20.0;
+            if ( f_value < -20.0 ) f_value = -20.0;
+            QRectF shape( j, 20.0 - f_value, 1, f_value );
+            scene.addRect( shape, QPen(), palette().brush( QPalette::WindowText ) );
+        }
+        scene.addLine( 0.0, 20.0, eqz_preset_10b[i].i_band, 20.0,
+                       palette().color( QPalette::WindowText ) );
+        scene.setSceneRect( 0.0, 0.0, eqz_preset_10b[i].i_band , 40.0 );
+        scene.render( &painter, icon.rect(), scene.sceneRect(), Qt::IgnoreAspectRatio );
+        ui.presetsCombo->addItem( icon, qtr( preset_list_text[i] ),
                                      QVariant( preset_list[i] ) );
     }
     CONNECT( ui.presetsCombo, activated(int), this, setCorePreset(int) );
