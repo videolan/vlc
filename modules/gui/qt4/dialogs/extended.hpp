@@ -35,6 +35,13 @@ class ExtendedDialog : public QVLCDialog, public Singleton<ExtendedDialog>
 {
     Q_OBJECT
 public:
+    enum
+    {
+        AUDIO_TAB = 0,
+        VIDEO_TAB,
+        SYNCHRO_TAB,
+        V4L2_TAB
+    };
     void showTab( int i );
     int currentTab();
 private:
@@ -45,8 +52,10 @@ private:
     ExtVideo *videoEffect;
     Equalizer *equal;
     QTabWidget *mainTabW;
+    QCheckBox *writeChangesBox;
 private slots:
     void changedItem( int );
+    void currentTabChanged( int );
 
     friend class    Singleton<ExtendedDialog>;
 };

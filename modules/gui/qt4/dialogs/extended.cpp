@@ -70,7 +70,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf )
     audioTab->addTab( spatial, qtr( "Spatializer" ) );
     audioLayout->addWidget( audioTab );
 
-    mainTabW->addTab( audioWidget, qtr( "Audio Effects" ) );
+    mainTabW->insertTab( AUDIO_TAB, audioWidget, qtr( "Audio Effects" ) );
 
     /* Video Effects */
     QWidget *videoWidget = new QWidget;
@@ -81,23 +81,35 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf )
     videoLayout->addWidget( videoTab );
     videoTab->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
 
-    mainTabW->addTab( videoWidget, qtr( "Video Effects" ) );
+    mainTabW->insertTab( VIDEO_TAB, videoWidget, qtr( "Video Effects" ) );
 
     syncW = new SyncControls( p_intf, videoTab );
-    mainTabW->addTab( syncW, qtr( "Synchronization" ) );
+    mainTabW->insertTab( SYNCHRO_TAB, syncW, qtr( "Synchronization" ) );
 
     if( module_exists( "v4l2" ) )
     {
         ExtV4l2 *v4l2 = new ExtV4l2( p_intf, mainTabW );
-        mainTabW->addTab( v4l2, qtr( "v4l2 controls" ) );
+        mainTabW->insertTab( V4L2_TAB, v4l2, qtr( "v4l2 controls" ) );
     }
 
     layout->addWidget( mainTabW );
 
+    /* Bottom buttons / checkbox line */
+    QHBoxLayout *buttonsLayout = new QHBoxLayout();
+    layout->addLayout( buttonsLayout );
+
+    writeChangesBox = new QCheckBox( qtr("&Write changes to config") );
+    buttonsLayout->addWidget( writeChangesBox );
+    CONNECT( writeChangesBox, toggled(bool), compres, setSaveToConfig(bool) );
+    CONNECT( writeChangesBox, toggled(bool), spatial, setSaveToConfig(bool) );
+    CONNECT( writeChangesBox, toggled(bool), equal, setSaveToConfig(bool) );
+    CONNECT( mainTabW, currentChanged(int), this, currentTabChanged(int) );
+
     QDialogButtonBox *closeButtonBox = new QDialogButtonBox( Qt::Horizontal, this );
     closeButtonBox->addButton(
         new QPushButton( qtr("&Close"), this ), QDialogButtonBox::RejectRole );
-    layout->addWidget( closeButtonBox );
+    buttonsLayout->addWidget( closeButtonBox );
+
     CONNECT( closeButtonBox, rejected(), this, close() );
 
     /* Restore geometry or move this dialog on the left pane of the MI */
@@ -136,4 +148,9 @@ void ExtendedDialog::changedItem( int i_status )
     if( i_status != END_S ) return;
     syncW->clean();
     videoEffect->clean();
+}
+
+void ExtendedDialog::currentTabChanged( int i )
+{
+    writeChangesBox->setVisible( i == AUDIO_TAB );
 }

@@ -111,11 +111,13 @@ protected:
     QLabel *nameLabel;
     const slider_data_t *p_data;
     intf_thread_t *p_intf;
+    bool b_save_to_config;
 
 public slots:
     virtual void onValueChanged( int i ) const;
     virtual void updateText( int i );
     virtual void writeToConfig() const;
+    void setSaveToConfig( bool );
 };
 
 class AudioFilterControlWidget : public QWidget
@@ -129,6 +131,7 @@ public:
 protected:
     virtual void build();
     QVector<FilterSliderData::slider_data_t> controls;
+    QVector<FilterSliderData *> sliderDatas;
     QGroupBox *slidersBox;
     intf_thread_t *p_intf;
     QString name; // filter's module name
@@ -136,6 +139,7 @@ protected:
 
 protected slots:
     void enable( bool ) const;
+    virtual void setSaveToConfig( bool );
 };
 
 class EqualizerSliderData : public FilterSliderData
@@ -168,8 +172,10 @@ public:
 protected:
     virtual void build();
 
+protected slots:
+    virtual void setSaveToConfig( bool );
+
 private:
-    QVector<FilterSliderData *> eqSliders;
     FilterSliderData *preamp;
     FilterSliderData::slider_data_t preamp_values;
 

@@ -921,7 +921,9 @@ void ExtV4l2::ValueChange( int value )
 
 FilterSliderData::FilterSliderData( QObject *parent, QSlider *_slider ) :
     QObject( parent ), slider( _slider )
-{}
+{
+    b_save_to_config = false;
+}
 
 FilterSliderData::FilterSliderData( QObject *parent,
                                     intf_thread_t *_p_intf,
@@ -931,6 +933,7 @@ FilterSliderData::FilterSliderData( QObject *parent,
     QObject( parent ), slider( _slider ), valueLabel( _label ),
     nameLabel( _nameLabel ), p_data( _p_data ), p_intf( _p_intf )
 {
+    b_save_to_config = false;
     slider->setMinimum( p_data->f_min / p_data->f_resolution );
     slider->setMaximum( p_data->f_max / p_data->f_resolution );
     nameLabel->setText( p_data->descs );
@@ -996,8 +999,14 @@ void FilterSliderData::onValueChanged( int i ) const
 
 void FilterSliderData::writeToConfig() const
 {
+    if ( !b_save_to_config ) return;
     float f = ((float) slider->value()) * p_data->f_resolution;
     config_PutFloat( p_intf, qtu(p_data->name), f );
+}
+
+void FilterSliderData::setSaveToConfig( bool b )
+{
+    b_save_to_config = b;
 }
 
 AudioFilterControlWidget::AudioFilterControlWidget
@@ -1034,6 +1043,7 @@ void AudioFilterControlWidget::build()
         ctrlLayout->addWidget( valueLabel, 1, i, Qt::AlignHCenter );
         ctrlLayout->addWidget( nameLabel, 2, i, Qt::AlignHCenter );
         i++;
+        sliderDatas << filter;
     }
 
     vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
@@ -1063,6 +1073,12 @@ AudioFilterControlWidget::~AudioFilterControlWidget()
 void AudioFilterControlWidget::enable( bool b_enable ) const
 {
     playlist_EnableAudioFilter( THEPL, qtu(name), b_enable );
+}
+
+void AudioFilterControlWidget::setSaveToConfig( bool b_save )
+{
+    foreach( FilterSliderData *f, sliderDatas )
+        f->setSaveToConfig( b_save );
 }
 
 /**********************************************************************
@@ -1153,6 +1169,7 @@ void EqualizerSliderData::onValueChanged( int i ) const
 
 void EqualizerSliderData::writeToConfig() const
 {
+    if ( !b_save_to_config ) return;
     QStringList bands = getBandsFromAout();
     if ( bands.count() > index )
     {
@@ -1238,7 +1255,7 @@ void Equalizer::build()
         ctrlLayout->addWidget( slider, 0, i, Qt::AlignHCenter );
         ctrlLayout->addWidget( valueLabel, 2, i, Qt::AlignHCenter );
         ctrlLayout->addWidget( nameLabel, 1, i, Qt::AlignHCenter );
-        eqSliders << filter; /* keep track for applying presets */
+        sliderDatas << filter; /* keep track for applying presets */
         i++;
     }
 
@@ -1304,6 +1321,12 @@ void Equalizer::build()
     CONNECT( ui.eq2PassCheck, toggled(bool), this, enable2Pass(bool) );
 }
 
+void Equalizer::setSaveToConfig( bool b_save )
+{
+    AudioFilterControlWidget::setSaveToConfig( b_save );
+    preamp->setSaveToConfig( b_save );
+}
+
 void Equalizer::setCorePreset( int i_preset )
 {
     if( i_preset < 1 )
@@ -1313,8 +1336,8 @@ void Equalizer::setCorePreset( int i_preset )
 
     preamp->setValue( eqz_preset_10b[i_preset].f_preamp );
     for ( int i=0; i< qMin( eqz_preset_10b[i_preset].i_band,
-                            eqSliders.count() ) ; i++ )
-        eqSliders[i]->setValue( eqz_preset_10b[i_preset].f_amp[i] );
+                            sliderDatas.count() ) ; i++ )
+        sliderDatas[i]->setValue( eqz_preset_10b[i_preset].f_amp[i] );
 
     vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
     if( p_aout )
