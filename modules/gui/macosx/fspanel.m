@@ -442,9 +442,9 @@
     /* volume slider */
     s_rc = [self frame];
     s_rc.origin.x = 26;
-    s_rc.origin.y = 21;
+    s_rc.origin.y = 20;
     s_rc.size.width = 95;
-    s_rc.size.height = 10;
+    s_rc.size.height = 12;
     o_fs_volumeSlider = [[VLCFSVolumeSlider alloc] initWithFrame: s_rc];
     [o_fs_volumeSlider setMinValue:0];
     [o_fs_volumeSlider setMaxValue:AOUT_VOLUME_MAX];
