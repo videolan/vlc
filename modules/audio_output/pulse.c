@@ -648,6 +648,7 @@ static int MuteSet(audio_output_t *aout, bool mute)
         sys->flags_force &= ~(PA_STREAM_START_MUTED|PA_STREAM_START_UNMUTED);
         sys->flags_force |=
             mute ? PA_STREAM_START_MUTED : PA_STREAM_START_UNMUTED;
+        aout_MuteReport(aout, mute);
         return 0;
     }
 
