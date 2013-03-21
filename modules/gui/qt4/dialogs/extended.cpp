@@ -136,5 +136,4 @@ void ExtendedDialog::changedItem( int i_status )
     if( i_status != END_S ) return;
     syncW->clean();
     videoEffect->clean();
-    equal->clean();
 }

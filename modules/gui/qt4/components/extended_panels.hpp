@@ -104,19 +104,18 @@ public:
     void setValue( float f );
 
 protected:
-    float initialValue();
-
-public slots:
-    void onValueChanged( int i );
-    void updateText( int i );
-    void writeToConfig();
-
-private:
-    intf_thread_t *p_intf;
+    FilterSliderData( QObject *parent, QSlider *slider );
+    virtual float initialValue();
     QSlider *slider;
     QLabel *valueLabel;
     QLabel *nameLabel;
     const slider_data_t *p_data;
+    intf_thread_t *p_intf;
+
+public slots:
+    virtual void onValueChanged( int i ) const;
+    virtual void updateText( int i );
+    virtual void writeToConfig() const;
 };
 
 class AudioFilterControlWidget : public QWidget
@@ -136,38 +135,47 @@ protected:
     int i_smallfont;
 
 protected slots:
-    void enable();
+    void enable( bool ) const;
 };
 
-class Equalizer: public QWidget
+class EqualizerSliderData : public FilterSliderData
 {
     Q_OBJECT
-    friend class ExtendedDialog;
+
+public:
+    EqualizerSliderData( QObject *parent, intf_thread_t *p_intf,
+                         QSlider *slider,
+                         QLabel *valueLabel, QLabel *nameLabel,
+                         const slider_data_t *p_data, int index );
+
+protected:
+    virtual float initialValue();
+    int index;
+    QStringList getBandsFromAout() const;
+
+public slots:
+    virtual void onValueChanged( int i ) const;
+    virtual void writeToConfig() const;
+};
+
+class Equalizer: public AudioFilterControlWidget
+{
+    Q_OBJECT
+
 public:
     Equalizer( intf_thread_t *, QWidget * );
-    QComboBox *presetsComboBox;
 
-    char * createValuesFromPreset( int i_preset );
-    void updateUIFromCore();
-    void changeFreqLabels( bool );
+protected:
+    virtual void build();
+
 private:
-    Ui::EqualizerWidget ui;
-    QSlider *bands[BANDS];
-    QLabel *band_texts[BANDS];
-    bool b_vlcBands;
+    QVector<FilterSliderData *> eqSliders;
+    FilterSliderData *preamp;
+    FilterSliderData::slider_data_t preamp_values;
 
-    void delCallbacks( vlc_object_t * );
-    void addCallbacks( vlc_object_t * );
-
-    intf_thread_t *p_intf;
-    void clean() { enable(); }
 private slots:
-    void enable(bool);
-    void enable();
-    void set2Pass();
-    void setPreamp();
-    void setCoreBands();
-    void setCorePreset(int);
+    void setCorePreset( int );
+    void enable2Pass( bool ) const;
 };
 
 class Compressor: public AudioFilterControlWidget

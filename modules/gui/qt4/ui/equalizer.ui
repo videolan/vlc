@@ -19,7 +19,16 @@
      <property name="spacing">
       <number>6</number>
      </property>
-     <property name="margin">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
@@ -87,7 +96,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="3" column="0" colspan="2">
     <widget class="QLabel" name="preampLabel">
      <property name="text">
       <string>Preamp</string>
@@ -113,13 +122,20 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="2" rowspan="2">
+   <item row="1" column="2" rowspan="4">
     <widget class="QWidget" name="slidersPlaceholder" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2">
+    <widget class="QLabel" name="preampValue">
+     <property name="text">
+      <string>0.00 dB</string>
      </property>
     </widget>
    </item>
