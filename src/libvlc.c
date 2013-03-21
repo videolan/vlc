@@ -49,10 +49,6 @@
 
 #include "config/vlc_getopt.h"
 
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h> /* isatty() */
-#endif
-
 #ifdef HAVE_DBUS
 /* used for one-instance mode */
 #   include <dbus/dbus.h>
@@ -157,35 +153,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         return VLC_EGENERIC;
     }
 
-    /*
-     * Message queue options (read-only afterwards)
-     */
-#if defined (HAVE_ISATTY) && !defined (WIN32)
-    if (isatty (STDERR_FILENO))
-        priv->b_color = var_InheritBool (p_libvlc, "color");
-    else
-#endif
-        priv->b_color = false;
-
-    priv->i_verbose = var_InheritInteger (p_libvlc, "verbose");
-    psz_val = getenv ("VLC_VERBOSE");
-    if (psz_val != NULL)
-        priv->i_verbose = atoi (psz_val);
-
-    if (var_InheritBool (p_libvlc, "quiet"))
-    {
-        var_Create (p_libvlc, "verbose", VLC_VAR_INTEGER);
-        var_SetInteger (p_libvlc, "verbose", -1);
-        priv->i_verbose = -1;
-    }
-
     vlc_LogInit (p_libvlc);
-
-    /* Announce who we are (TODO: only first instance?) */
-    msg_Dbg( p_libvlc, "VLC media player - %s", VERSION_MESSAGE );
-    msg_Dbg( p_libvlc, "%s", COPYRIGHT_MESSAGE );
-    msg_Dbg( p_libvlc, "revision %s", psz_vlc_changeset );
-    msg_Dbg( p_libvlc, "configured with %s", CONFIGURE_LINE );
     vlc_threads_setup (p_libvlc);
 
     /* Load the builtins and plugins into the module_bank.

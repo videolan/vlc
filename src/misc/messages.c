@@ -32,6 +32,7 @@
 # include "config.h"
 #endif
 
+#include <stdlib.h>
 #include <stdarg.h>                                       /* va_list for BSD */
 #ifdef __APPLE__
 # include <xlocale.h>
@@ -40,6 +41,7 @@
 #endif
 #include <errno.h>                                                  /* errno */
 #include <assert.h>
+#include <unistd.h>
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
@@ -164,7 +166,7 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
     va_list ap;
 
     va_copy (ap, args);
-    Win32DebugOutputMsg (&priv->i_verbose, type, &msg, format, ap);
+    Win32DebugOutputMsg (&priv->log.verbose, type, &msg, format, ap);
     va_end (ap);
 #endif
 
@@ -289,19 +291,39 @@ void vlc_LogSet (libvlc_int_t *vlc, vlc_log_cb cb, void *opaque)
 
     if (cb == NULL)
     {
-        cb = priv->b_color ? PrintColorMsg : PrintMsg;
-        opaque = (void *)(intptr_t)priv->i_verbose;
+#if defined (HAVE_ISATTY) && !defined (WIN32)
+        if (isatty (STDERR_FILENO) && var_InheritBool (vlc, "color"))
+            cb = PrintColorMsg;
+        else
+#endif
+            cb = PrintMsg;
+        opaque = (void *)(intptr_t)priv->log.verbose;
     }
 
     vlc_rwlock_wrlock (&priv->log.lock);
     priv->log.cb = cb;
     priv->log.opaque = opaque;
     vlc_rwlock_unlock (&priv->log.lock);
+
+    /* Announce who we are */
+    msg_Dbg (vlc, "VLC media player - %s", VERSION_MESSAGE);
+    msg_Dbg (vlc, "%s", COPYRIGHT_MESSAGE);
+    msg_Dbg (vlc, "revision %s", psz_vlc_changeset);
+    msg_Dbg (vlc, "configured with %s", CONFIGURE_LINE);
 }
 
 void vlc_LogInit (libvlc_int_t *vlc)
 {
     libvlc_priv_t *priv = libvlc_priv (vlc);
+    const char *str;
+
+    if (var_InheritBool (vlc, "quiet"))
+        priv->log.verbose = -1;
+    else
+    if ((str = getenv ("VLC_VERBOSE")) != NULL)
+        priv->log.verbose = atoi (str);
+    else
+        priv->log.verbose = var_InheritInteger (vlc, "verbose");
 
     vlc_rwlock_init (&priv->log.lock);
     vlc_LogSet (vlc, NULL, NULL);

@@ -152,10 +152,9 @@ typedef struct libvlc_priv_t
     {
         void (*cb) (void *, int, const vlc_log_t *, const char *, va_list);
         void *opaque;
+        signed char verbose;
         vlc_rwlock_t lock;
     } log;
-    signed char        i_verbose;   ///< info messages
-    bool               b_color;     ///< color messages?
     bool               b_stats;     ///< Whether to collect stats
 
     /* Singleton objects */
