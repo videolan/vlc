@@ -132,6 +132,7 @@ static int Open(vlc_object_t *p_this)
     vout_display_t *p_dec = vd;
     char ppsz_components[MAX_COMPONENTS_LIST_SIZE][OMX_MAX_STRINGNAME_SIZE];
     picture_t** pictures = NULL;
+    OMX_PARAM_PORTDEFINITIONTYPE *def;
 
     static OMX_CALLBACKTYPE callbacks =
         { OmxEventHandler, OmxEmptyBufferDone, OmxFillBufferDone };
@@ -179,18 +180,19 @@ static int Open(vlc_object_t *p_this)
     p_sys->port.b_valid = true;
     p_sys->port.omx_handle = p_sys->omx_handle;
 
-    OMX_INIT_STRUCTURE(p_sys->port.definition);
-    p_sys->port.definition.nPortIndex = p_sys->port.i_port_index;
-    omx_error = OMX_GetParameter(p_sys->omx_handle, OMX_IndexParamPortDefinition, &p_sys->port.definition);
+    def = &p_sys->port.definition;
+    OMX_INIT_STRUCTURE(*def);
+    def->nPortIndex = p_sys->port.i_port_index;
+    omx_error = OMX_GetParameter(p_sys->omx_handle, OMX_IndexParamPortDefinition, def);
     CHECK_ERROR(omx_error, "OMX_GetParameter(OMX_IndexParamPortDefinition) failed (%x: %s)",
                 omx_error, ErrorToString(omx_error));
 
 #define ALIGN_16_PIXELS(x) (((x) + 15) / 16 * 16)
 
-    p_sys->port.definition.format.video.nFrameWidth = ALIGN_16_PIXELS(vd->cfg->display.width);
-    p_sys->port.definition.format.video.nFrameHeight = ALIGN_16_PIXELS(vd->cfg->display.height);
-    p_sys->port.definition.format.video.nStride = p_sys->port.definition.format.video.nFrameWidth;
-    p_sys->port.definition.format.video.nSliceHeight = p_sys->port.definition.format.video.nFrameHeight;
+    def->format.video.nFrameWidth = ALIGN_16_PIXELS(vd->cfg->display.width);
+    def->format.video.nFrameHeight = ALIGN_16_PIXELS(vd->cfg->display.height);
+    def->format.video.nStride = def->format.video.nFrameWidth;
+    def->format.video.nSliceHeight = def->format.video.nFrameHeight;
     p_sys->port.definition.format.video.eColorFormat = OMX_COLOR_FormatYUV420PackedPlanar;
 
     omx_error = OMX_SetParameter(p_sys->omx_handle, OMX_IndexParamPortDefinition, &p_sys->port.definition);
