@@ -180,6 +180,15 @@ static OMX_ERRORTYPE ImplementationSpecificWorkarounds(decoder_t *p_dec,
         }
     }
 #endif
+#ifdef RPI_OMX
+    else if (!strcmp(p_sys->psz_component, "OMX.broadcom.video_decode"))
+    {
+        /* Clear these fields before setting parameters, to allow the codec
+         * fill in what it wants (instead of rejecting whatever happened to
+         * be there. */
+        def->format.video.nStride = def->format.video.nSliceHeight = 0;
+    }
+#endif
 
     return OMX_ErrorNone;
 }
