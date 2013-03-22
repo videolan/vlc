@@ -260,6 +260,13 @@ static int Open(vlc_object_t *p_this)
         config_display.set = OMX_DISPLAY_SET_FULLSCREEN;
         config_display.fullscreen = OMX_TRUE;
         OMX_SetConfig(p_sys->omx_handle, OMX_IndexConfigDisplayRegion, &config_display);
+
+        if (vd->fmt.i_width != vd->cfg->display.width || vd->fmt.i_height != vd->cfg->display.height) {
+            config_display.set = OMX_DISPLAY_SET_PIXEL;
+            config_display.pixel_x = vd->cfg->display.width  * vd->fmt.i_height;
+            config_display.pixel_y = vd->cfg->display.height * vd->fmt.i_width;
+            OMX_SetConfig(p_sys->omx_handle, OMX_IndexConfigDisplayRegion, &config_display);
+        }
     }
 
 
