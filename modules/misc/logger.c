@@ -76,6 +76,7 @@ struct intf_sys_t
 {
     FILE *p_file;
     const char *footer;
+    char *ident;
 };
 
 /*****************************************************************************
@@ -117,6 +118,10 @@ static const char *const mode_list_text[] = { N_("Text"), "HTML"
 #define LOGMODE_LONGTEXT N_("Specify the logging format.")
 
 #ifdef HAVE_SYSLOG_H
+#define SYSLOG_IDENT_TEXT N_("Syslog ident")
+#define SYSLOG_IDENT_LONGTEXT N_("Set the ident that VLC would use when " \
+  "logging to syslog.")
+
 #define SYSLOG_FACILITY_TEXT N_("Syslog facility")
 #define SYSLOG_FACILITY_LONGTEXT N_("Select the syslog facility where logs " \
   "will be forwarded.")
@@ -162,6 +167,8 @@ vlc_module_begin ()
                 false )
         change_string_list( mode_list, mode_list_text )
 #ifdef HAVE_SYSLOG_H
+    add_string( "syslog-ident", "vlc", SYSLOG_IDENT_TEXT,
+                SYSLOG_IDENT_LONGTEXT, true )
     add_string( "syslog-facility", fac_name[0], SYSLOG_FACILITY_TEXT,
                 SYSLOG_FACILITY_LONGTEXT, true )
         change_string_list( fac_name, fac_name )
@@ -250,7 +257,16 @@ static int Open( vlc_object_t *p_this )
             i_facility = fac_number[0];
         }
 
-        openlog( "vlc", LOG_PID|LOG_NDELAY, i_facility );
+        char *psz_syslog_ident = var_InheritString( p_intf, "syslog-ident" );
+        if (unlikely(psz_syslog_ident == NULL))
+        {
+            free( p_sys );
+            return VLC_ENOMEM;
+        }
+
+        p_sys->ident = psz_syslog_ident;
+        openlog( p_sys->ident, LOG_PID|LOG_NDELAY, i_facility );
+
         p_sys->p_file = NULL;
     }
     else
@@ -314,7 +330,10 @@ static void Close( vlc_object_t *p_this )
     /* Close the log file */
 #ifdef HAVE_SYSLOG_H
     if( p_sys->p_file == NULL )
+    {
         closelog();
+        free( p_sys->ident );
+    }
     else
 #endif
     if( p_sys->p_file )
