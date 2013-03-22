@@ -189,8 +189,8 @@ static int Open(vlc_object_t *p_this)
 
 #define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
 
-    def->format.video.nFrameWidth = vd->cfg->display.width;
-    def->format.video.nFrameHeight = vd->cfg->display.height;
+    def->format.video.nFrameWidth = vd->fmt.i_width;
+    def->format.video.nFrameHeight = vd->fmt.i_height;
     def->format.video.nStride = 0;
     def->format.video.nSliceHeight = 0;
     p_sys->port.definition.format.video.eColorFormat = OMX_COLOR_FormatYUV420PackedPlanar;
