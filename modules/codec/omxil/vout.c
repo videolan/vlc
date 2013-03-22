@@ -187,18 +187,27 @@ static int Open(vlc_object_t *p_this)
     CHECK_ERROR(omx_error, "OMX_GetParameter(OMX_IndexParamPortDefinition) failed (%x: %s)",
                 omx_error, ErrorToString(omx_error));
 
-#define ALIGN_16_PIXELS(x) (((x) + 15) / 16 * 16)
+#define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
 
-    def->format.video.nFrameWidth = ALIGN_16_PIXELS(vd->cfg->display.width);
-    def->format.video.nFrameHeight = ALIGN_16_PIXELS(vd->cfg->display.height);
-    def->format.video.nStride = def->format.video.nFrameWidth;
-    def->format.video.nSliceHeight = def->format.video.nFrameHeight;
+    def->format.video.nFrameWidth = vd->cfg->display.width;
+    def->format.video.nFrameHeight = vd->cfg->display.height;
+    def->format.video.nStride = 0;
+    def->format.video.nSliceHeight = 0;
     p_sys->port.definition.format.video.eColorFormat = OMX_COLOR_FormatYUV420PackedPlanar;
+
+    if (!strcmp(p_sys->psz_component, "OMX.broadcom.video_render")) {
+        def->format.video.nSliceHeight = ALIGN(def->format.video.nFrameHeight, 16);
+    }
 
     omx_error = OMX_SetParameter(p_sys->omx_handle, OMX_IndexParamPortDefinition, &p_sys->port.definition);
     CHECK_ERROR(omx_error, "OMX_SetParameter(OMX_IndexParamPortDefinition) failed (%x: %s)",
                 omx_error, ErrorToString(omx_error));
     OMX_GetParameter(p_sys->omx_handle, OMX_IndexParamPortDefinition, &p_sys->port.definition);
+
+    if (def->format.video.nStride < (int) def->format.video.nFrameWidth)
+        def->format.video.nStride = def->format.video.nFrameWidth;
+    if (def->format.video.nSliceHeight < def->format.video.nFrameHeight)
+        def->format.video.nSliceHeight = def->format.video.nFrameHeight;
 
     p_sys->port.pp_buffers =
             malloc(p_sys->port.definition.nBufferCountActual *
