@@ -3440,7 +3440,7 @@ dnl
 AC_ARG_ENABLE([sndio],
   [AS_HELP_STRING([--disable-sndio],
     [support the OpenBSD sndio (default auto)])],, [
-  AS_IF([test "$SYS" = "opensd"], [
+  AS_IF([test "$SYS" = "openbsd"], [
     enable_sndio="yes"
   ])
 ])

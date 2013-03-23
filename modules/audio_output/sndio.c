@@ -32,7 +32,7 @@
 #include <sndio.h>
 
 static int Open (vlc_object_t *);
-static void Close (vlc_objec_t *);
+static void Close (vlc_object_t *);
 
 vlc_module_begin ()
     set_shortname ("sndio")
@@ -43,7 +43,7 @@ vlc_module_begin ()
     set_callbacks (Open, Close)
 vlc_module_end ()
 
-static int TimeGet (audio_output, mtime_t *);
+static int TimeGet (audio_output_t *, mtime_t *);
 static void Play (audio_output_t *, block_t *);
 static void Flush (audio_output_t *, bool);
 static int VolumeSet (audio_output_t *, float);
@@ -87,13 +87,13 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     if (!sio_setpar (sys->hdl, &par) || !sio_getpar (sys->hdl, &par))
     {
-        msg_Err (obj, "cannot negotiate audio playback parameters");
+        msg_Err (aout, "cannot negotiate audio playback parameters");
         goto error;
     }
 
     if (par.bps != par.bits >> 3)
     {
-        msg_Err (obj, "unsupported audio sample format (%u bits in %u bytes)",
+        msg_Err (aout, "unsupported audio sample format (%u bits in %u bytes)",
                  par.bits, par.bps);
         goto error;
     }
@@ -128,7 +128,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
             fmt->i_format = VLC_CODEC_S32N;
             break;
         default:
-            msg_Err (obj, "unsupported audio sample format (%u bits)",
+            msg_Err (aout, "unsupported audio sample format (%u bits)",
                      par.bits);
             goto error;
     }
@@ -300,7 +300,7 @@ static int Open (vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
-static int Close (vlc_object_t *obj)
+static void Close (vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
