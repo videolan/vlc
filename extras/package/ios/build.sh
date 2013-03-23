@@ -269,9 +269,6 @@ ${VLCROOT}/configure \
     --enable-avcodec \
     --enable-mkv \
     --enable-opus \
-    --enable-dvbpsi \
-    --enable-swscale \
-    --disable-projectm \
     --disable-sout \
     --disable-faad \
     --disable-lua \
@@ -287,7 +284,6 @@ ${VLCROOT}/configure \
     --disable-httpd \
     --disable-nls \
     --disable-glx \
-    --disable-lua \
     --disable-sse \
     --enable-neon \
     --disable-notify \
@@ -311,9 +307,6 @@ ${VLCROOT}/configure \
     --disable-fluidsynth \
     --disable-jack \
     --disable-pulse \
-    --disable-sout \
-    --disable-faad \
-    --disable-lua \
     --disable-mtp \
     --enable-ogg \
     --enable-speex \
