@@ -232,14 +232,17 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
 static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
-
-    vout_display_opengl_Prepare( sys->vgl, pic, subpicture );
+    if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+        vout_display_opengl_Prepare( sys->vgl, pic, subpicture );
+    }
 }
 
 static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
-    vout_display_opengl_Display(sys->vgl, &vd->fmt );
+    if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+        vout_display_opengl_Display(sys->vgl, &vd->fmt );
+    }
     picture_Release (pic);
     sys->has_first_frame = true;
     (void)subpicture;
@@ -297,7 +300,10 @@ static void OpenglSwap(vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = gl->sys;
     EAGLContext *context = [sys->glView context];
-    [context presentRenderbuffer:GL_RENDERBUFFER];
+
+    if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+        [context presentRenderbuffer:GL_RENDERBUFFER];
+    }
 }
 
 /*****************************************************************************
