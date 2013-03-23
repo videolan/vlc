@@ -6,6 +6,7 @@
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
+ *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -56,7 +57,8 @@
 
 #define AOUT_VAR_SPDIF_FLAG 0xf00000
 
-#define kBufferLength 2048 * 8 * 8 * 4
+#define AUDIO_BUFFER_SIZE_IN_SECONDS (AOUT_MAX_ADVANCE_TIME / CLOCK_FREQ)
+
 
 #define AOUT_VOLUME_DEFAULT             256
 #define AOUT_VOLUME_MAX                 512
@@ -103,8 +105,7 @@ struct aout_sys_t
     bool                        b_got_first_sample; /* did the aout core provide something to render? */
 
     int                         i_rate;             /* media sample rate */
-    mtime_t                     i_played_length;    /* how much did we play already */
-    mtime_t                     i_last_sample_time; /* last sample time played by the AudioUnit */
+    int                         i_bytes_per_sample;
 
     struct audio_device_t       *devices;
 
@@ -239,6 +240,7 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     p_sys->i_stream_index = -1;
     p_sys->b_revert = false;
     p_sys->b_changed_mixing = false;
+    p_sys->i_bytes_per_sample = 0;
 
     aout_FormatPrint(p_aout, "VLC is looking for:", fmt);
 
@@ -633,11 +635,10 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     p_sys->clock_diff += mdate();
 
     /* setup circular buffer */
-    TPCircularBufferInit(&p_sys->circular_buffer, kBufferLength);
+    TPCircularBufferInit(&p_sys->circular_buffer, AUDIO_BUFFER_SIZE_IN_SECONDS *
+                         fmt->i_rate * fmt->i_bytes_per_frame);
 
     p_sys->b_got_first_sample = false;
-    p_sys->i_played_length = 0;
-    p_sys->i_last_sample_time = 0;
 
     /* Set volume for output unit */
     float volume = var_InheritInteger(p_aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT;
@@ -858,9 +859,7 @@ static int StartSPDIF (audio_output_t * p_aout, audio_sample_format_t *fmt)
     }
 
     /* setup circular buffer */
-    TPCircularBufferInit(&p_sys->circular_buffer, kBufferLength);
-    p_sys->i_played_length = 0;
-    p_sys->i_last_sample_time = 0;
+    TPCircularBufferInit(&p_sys->circular_buffer, 200 * AOUT_SPDIF_SIZE);
 
     return true;
 }
@@ -941,8 +940,7 @@ static void Stop(audio_output_t *p_aout)
             msg_Err(p_aout, "Could not release hogmode: [%4.4s]", (char *)&err);
     }
 
-    p_sys->i_played_length = 0;
-    p_sys->i_last_sample_time = 0;
+    p_sys->i_bytes_per_sample = 0;
 
     /* clean-up circular buffer */
     TPCircularBufferCleanup(&p_sys->circular_buffer);
@@ -1195,14 +1193,13 @@ static void Play (audio_output_t * p_aout, block_t * p_block)
                                VLC_CODEC_FL32);
         }
 
-        /* keep track of the played data */
-        p_aout->sys->i_played_length += p_block->i_length;
-
         /* move data to buffer */
         if (unlikely(TPCircularBufferProduceBytes(&p_sys->circular_buffer, p_block->p_buffer, p_block->i_buffer) == 0)) {
             msg_Warn(p_aout, "Audio buffer was dropped");
         }
 
+        if (!p_sys->i_bytes_per_sample)
+            p_sys->i_bytes_per_sample = p_block->i_buffer / p_block->i_nb_samples;
     }
 
     block_Release(p_block);
@@ -1236,25 +1233,21 @@ static void Flush(audio_output_t *p_aout, bool wait)
     /* flush circular buffer */
     AudioOutputUnitStop(p_aout->sys->au_unit);
     TPCircularBufferClear(&p_aout->sys->circular_buffer);
-
-    p_sys->i_played_length = 0;
-    p_sys->i_last_sample_time = 0;
 }
 
 static int TimeGet(audio_output_t *p_aout, mtime_t *delay)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
 
-    vlc_mutex_lock(&p_sys->lock);
-    mtime_t i_pos = p_sys->i_last_sample_time * CLOCK_FREQ / p_sys->i_rate;
-    vlc_mutex_unlock(&p_sys->lock);
-
-    if (i_pos > 0) {
-        *delay = p_aout->sys->i_played_length - i_pos;
-        return 0;
-    }
-    else
+    if (!p_sys->i_bytes_per_sample)
         return -1;
+
+    int32_t availableBytes;
+    TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
+
+    *delay = (availableBytes / p_sys->i_bytes_per_sample) * CLOCK_FREQ / p_sys->i_rate;
+
+    return 0;
 }
 
 /*****************************************************************************
@@ -1292,9 +1285,6 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
         memcpy(targetBuffer, buffer, __MIN(bytesToCopy, availableBytes));
         TPCircularBufferConsume(&p_sys->circular_buffer, __MIN(bytesToCopy, availableBytes));
         VLC_UNUSED(inNumberFrames);
-        vlc_mutex_lock(&p_sys->lock);
-        p_sys->i_last_sample_time = inTimeStamp->mSampleTime;
-        vlc_mutex_unlock(&p_sys->lock);
     }
 
     return noErr;
@@ -1315,6 +1305,7 @@ static OSStatus RenderCallbackSPDIF (AudioDeviceID inDevice,
     VLC_UNUSED(inDevice);
     VLC_UNUSED(inInputData);
     VLC_UNUSED(inInputTime);
+    VLC_UNUSED(inOutputTime);
 
     audio_output_t * p_aout = (audio_output_t *)threadGlobals;
     struct aout_sys_t * p_sys = p_aout->sys;
@@ -1333,9 +1324,6 @@ static OSStatus RenderCallbackSPDIF (AudioDeviceID inDevice,
     } else {
         memcpy(targetBuffer, buffer, __MIN(bytesToCopy, availableBytes));
         TPCircularBufferConsume(&p_sys->circular_buffer, __MIN(bytesToCopy, availableBytes));
-        vlc_mutex_lock(&p_sys->lock);
-        p_sys->i_last_sample_time = inOutputTime->mSampleTime;
-        vlc_mutex_unlock(&p_sys->lock);
     }
 
     return noErr;
