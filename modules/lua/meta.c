@@ -74,7 +74,7 @@ static lua_State * init( vlc_object_t *p_this, input_item_t * p_item, const char
     luaopen_xml( L );
     luaopen_input_item( L, p_item );
 
-    if( vlclua_add_modules_path( p_this, L, psz_filename ) )
+    if( vlclua_add_modules_path( L, psz_filename ) )
     {
         msg_Warn( p_this, "Error while setting the module search path for %s",
                   psz_filename );

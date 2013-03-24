@@ -274,7 +274,7 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
     lua_pop( L, 1 );
 
     /* Setup the module search path */
-    if( vlclua_add_modules_path( p_intf, L, p_sys->psz_filename ) )
+    if( vlclua_add_modules_path( L, p_sys->psz_filename ) )
     {
         msg_Warn( p_intf, "Error while setting the module search path for %s",
                   p_sys->psz_filename );

@@ -161,7 +161,7 @@ static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
     lua_pop( L, 1 );
 
     /* Setup the module search path */
-    if( vlclua_add_modules_path( p_demux, L, psz_filename ) )
+    if( vlclua_add_modules_path( L, psz_filename ) )
     {
         msg_Warn( p_demux, "Error while setting the module search path for %s",
                   psz_filename );

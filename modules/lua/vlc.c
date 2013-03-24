@@ -637,7 +637,7 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
                 goto error;
             }
             luaL_openlibs( L );
-            if( vlclua_add_modules_path( probe, L, psz_filename ) )
+            if( vlclua_add_modules_path( L, psz_filename ) )
             {
                 msg_Err( probe, "Error while setting the module search path for %s",
                           psz_filename );
@@ -736,8 +736,7 @@ static int vlclua_add_modules_path_inner( lua_State *L, const char *psz_path )
     return count;
 }
 
-#undef vlclua_add_modules_path
-int vlclua_add_modules_path( vlc_object_t *obj, lua_State *L, const char *psz_filename )
+int vlclua_add_modules_path( lua_State *L, const char *psz_filename )
 {
     /* Setup the module search path:
      *   * "The script's directory"/modules
