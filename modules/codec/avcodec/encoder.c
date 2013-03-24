@@ -46,6 +46,10 @@
 #include "avcodec.h"
 #include "avcommon.h"
 
+#if LIBAVUTIL_VERSION_CHECK( 52,2,6,0,0 )
+# include <libavutil/channel_layout.h>
+#endif
+
 #define HURRY_UP_GUARD1 (450000)
 #define HURRY_UP_GUARD2 (300000)
 #define HURRY_UP_GUARD3 (100000)
@@ -635,6 +639,9 @@ int OpenEncoder( vlc_object_t *p_this )
         p_context->time_base.num = 1;
         p_context->time_base.den = p_context->sample_rate;
         p_context->channels    = p_enc->fmt_out.audio.i_channels;
+#if LIBAVUTIL_VERSION_CHECK( 52, 2, 6, 0, 0)
+        p_context->channel_layout = av_get_default_channel_layout( p_context->channels );
+#endif
 
         if ( p_enc->fmt_out.i_codec == VLC_CODEC_MP4A )
         {
