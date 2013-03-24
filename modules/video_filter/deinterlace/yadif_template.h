@@ -126,7 +126,7 @@ VLC_TARGET static void RENAME(yadif_filter_line)(uint8_t *dst,
                               int w, int prefs, int mrefs, int parity, int mode)
 {
     uint8_t tmpU[5*16];
-    uint8_t *tmp= (uint8_t*)(((uint64_t)(tmpU+15)) & ~15);
+    uint8_t *tmp= (uint8_t*)(((uintptr_t)(tmpU+15)) & ~15);
     int x;
 
 #define FILTER\
