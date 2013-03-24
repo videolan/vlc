@@ -114,9 +114,6 @@ int OpenIntf (vlc_object_t *p_this)
 
     memset(p_intf->p_sys, 0, sizeof(*p_intf->p_sys));
 
-    /* subscribe to LibVLCCore's messages */
-    vlc_LogSet(p_this->p_libvlc, MsgCallback, NULL);
-
     Run(p_intf);
 
     [o_pool release];
@@ -281,6 +278,10 @@ static void Run(intf_thread_t *p_intf)
     o_plItemChangedLock = [[NSLock alloc] init];
 
     [[VLCMain sharedInstance] setIntf: p_intf];
+
+    /* subscribe to LibVLCCore's messages */
+    vlc_LogSet(p_intf->p_libvlc, MsgCallback, NULL);
+
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
 
     [NSApp run];
