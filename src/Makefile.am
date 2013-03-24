@@ -461,7 +461,6 @@ SOURCES_libvlc_common = \
 	misc/update.c \
 	misc/update_crypto.c \
 	misc/xml.c \
-	misc/media_library.c \
 	extras/libc.c \
 	extras/tdestroy.c \
 	misc/filter.c \

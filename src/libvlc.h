@@ -159,8 +159,6 @@ typedef struct libvlc_priv_t
 
     /* Singleton objects */
     playlist_t        *p_playlist; ///< the playlist singleton
-    struct media_library_t *p_ml;    ///< the ML singleton
-    vlc_mutex_t       ml_lock; ///< Mutex for ML creation
     vlm_t             *p_vlm;  ///< the VLM singleton (or NULL)
     vlc_object_t      *p_dialog_provider; ///< dialog provider
 #ifdef ENABLE_SOUT

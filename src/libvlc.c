@@ -55,7 +55,6 @@
 #endif
 
 
-#include <vlc_media_library.h>
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
 
@@ -109,12 +108,9 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     priv = libvlc_priv (p_libvlc);
     priv->p_playlist = NULL;
-    priv->p_ml = NULL;
     priv->p_dialog_provider = NULL;
     priv->p_vlm = NULL;
 
-    /* Initialize mutexes */
-    vlc_mutex_init( &priv->ml_lock );
     vlc_ExitInit( &priv->exit );
 
     return p_libvlc;
@@ -395,23 +391,6 @@ dbus_out:
     /* System specific configuration */
     system_Configure( p_libvlc, i_argc - vlc_optind, ppsz_argv + vlc_optind );
 
-#if defined(MEDIA_LIBRARY)
-    /* Get the ML */
-    if( var_GetBool( p_libvlc, "load-media-library-on-startup" ) )
-    {
-        priv->p_ml = ml_Create( VLC_OBJECT( p_libvlc ), NULL );
-        if( !priv->p_ml )
-        {
-            msg_Err( p_libvlc, "ML initialization failed" );
-            return VLC_EGENERIC;
-        }
-    }
-    else
-    {
-        priv->p_ml = NULL;
-    }
-#endif
-
 #ifdef ENABLE_VLM
     /* Initialize VLM if vlm-conf is specified */
     psz_parser = var_CreateGetNonEmptyString( p_libvlc, "vlm-conf" );
@@ -551,16 +530,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     }
 #endif
 
-#if defined(MEDIA_LIBRARY)
-    media_library_t* p_ml = priv->p_ml;
-    if( p_ml )
-    {
-        ml_Destroy( VLC_OBJECT( p_ml ) );
-        vlc_object_release( p_ml );
-        libvlc_priv(p_playlist->p_libvlc)->p_ml = NULL;
-    }
-#endif
-
     /* Free playlist now, all threads are gone */
     playlist_t *p_playlist = libvlc_priv (p_libvlc)->p_playlist;
     if( p_playlist != NULL )
@@ -612,9 +581,7 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
 {
     libvlc_priv_t *priv = libvlc_priv( p_libvlc );
 
-    /* Destroy mutexes */
     vlc_ExitDestroy( &priv->exit );
-    vlc_mutex_destroy( &priv->ml_lock );
 
     assert( atomic_load(&(vlc_internals(p_libvlc)->refs)) == 1 );
     vlc_object_release( p_libvlc );

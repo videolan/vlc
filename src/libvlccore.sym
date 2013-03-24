@@ -230,13 +230,7 @@ vlc_UrlClean
 vlc_path2uri
 make_path
 mdate
-ml_Get
 media_New
-ml_OpConnectChilds
-ml_FtreeSpec
-ml_UpdateSimple
-ml_GetPersonsFromMedia
-ml_DeletePersonTypeFromMedia
 module_config_free
 module_config_get
 module_exists

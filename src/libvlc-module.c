@@ -2033,10 +2033,6 @@ vlc_module_begin ()
               PLAYLISTENQUEUE_LONGTEXT, true )
 #endif
     add_bool( "media-library", 0, ML_TEXT, ML_LONGTEXT, false )
-#if defined( MEDIA_LIBRARY )
-    add_bool( "load-media-library-on-startup", 1, LOAD_ML_TEXT,
-            LOAD_ML_LONGTEXT, false )
-#endif
     add_bool( "playlist-tree", 0, PLTREE_TEXT, PLTREE_LONGTEXT, false )
 
     add_string( "open", "", OPEN_TEXT, OPEN_LONGTEXT, false )

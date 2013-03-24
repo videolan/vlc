@@ -3960,17 +3960,6 @@ dnl
 PKG_ENABLE_MODULES_VLC([NOTIFY], [], [libnotify gtk+-2.0], [libnotify notification], [auto])
 
 dnl
-dnl media library
-dnl
-AC_ARG_ENABLE(media-library,
-    [  --enable-media-library  media library (default disabled)])
-AS_IF([test "${enable_media_library}" = "yes"], [
-  AC_DEFINE([MEDIA_LIBRARY], 1, [Define if you want to use the VLC media library])
-  VLC_ADD_CPPFLAGS([qt4],"-DMEDIA_LIBRARY")
-])
-
-
-dnl
 dnl  Endianness check
 dnl
 AC_C_BIGENDIAN
