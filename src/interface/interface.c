@@ -145,28 +145,23 @@ error:
  */
 void intf_DestroyAll( libvlc_int_t *p_libvlc )
 {
-    intf_thread_t *p_first;
+    intf_thread_t *p_intf;
 
     vlc_mutex_lock( &lock );
-    p_first = libvlc_priv( p_libvlc )->p_intf;
+    p_intf = libvlc_priv( p_libvlc )->p_intf;
 #ifndef NDEBUG
     libvlc_priv( p_libvlc )->p_intf = NULL;
 #endif
     vlc_mutex_unlock( &lock );
 
-    /* Tell the interfaces to die */
-    for( intf_thread_t *p_intf = p_first; p_intf; p_intf = p_intf->p_next )
-        vlc_object_kill( p_intf );
-
     /* Cleanup the interfaces */
-    for( intf_thread_t *p_intf = p_first; p_intf != NULL; )
+    while( p_intf != NULL )
     {
         intf_thread_t *p_next = p_intf->p_next;
 
         module_unneed( p_intf, p_intf->p_module );
         config_ChainDestroy( p_intf->p_cfg );
         vlc_object_release( p_intf );
-
         p_intf = p_next;
     }
 }
