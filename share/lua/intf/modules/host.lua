@@ -38,7 +38,7 @@ Example use:
     --or h:listen( { "localhost:4212", "*console" } )
 
     -- The main loop
-    while not vlc.misc.should_die() do
+    while true do
         -- accept new connections and select active clients
         local write, read = h:accept_and_select()
 

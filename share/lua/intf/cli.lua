@@ -788,7 +788,7 @@ h:listen( config.hosts or config.host or "*console" )
 password = config.password or "admin"
 
 --[[ The main loop ]]
-while not vlc.misc.should_die() do
+while true do
     local write, read = h:accept_and_select()
 
     for _, client in pairs(write) do
