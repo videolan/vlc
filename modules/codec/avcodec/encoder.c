@@ -598,14 +598,14 @@ int OpenEncoder( vlc_object_t *p_this )
                                     p_codec->sample_fmts[0] :
                                     AV_SAMPLE_FMT_S16;
 
-        // Try if we can use interleaved format for codec input as VLC doesn't really do planar audio yet
-        // FIXME: Remove when planar/interleaved audio in vlc is equally supported
-        if( av_sample_fmt_is_planar( p_context->sample_fmt ) )
+        /* Try to match avcodec input format to vlc format so we could avoid one
+           format conversion */
+        if( GetVlcAudioFormat( p_context->sample_fmt ) != p_enc->fmt_in.i_codec )
         {
-            msg_Dbg( p_enc, "Trying to find packet sample format instead of %s", av_get_sample_fmt_name( p_context->sample_fmt ) );
+            msg_Dbg( p_enc, "Trying to find more suitable sample format instead of %s", av_get_sample_fmt_name( p_context->sample_fmt ) );
             for( unsigned int i=0; p_codec->sample_fmts[i] != -1; i++ )
             {
-                if( !av_sample_fmt_is_planar( p_codec->sample_fmts[i] ) )
+                if( GetVlcAudioFormat( p_codec->sample_fmts[i] ) == p_enc->fmt_in.i_codec )
                 {
                     p_context->sample_fmt = p_codec->sample_fmts[i];
                     msg_Dbg( p_enc, "Using %s as new sample format", av_get_sample_fmt_name( p_context->sample_fmt ) );
@@ -613,6 +613,22 @@ int OpenEncoder( vlc_object_t *p_this )
                 }
             }
         }
+        // Try if we can use interleaved format for codec input as VLC doesn't really do planar audio yet
+        // FIXME: Remove when planar/interleaved audio in vlc is equally supported
+        if( av_sample_fmt_is_planar( p_context->sample_fmt ) )
+        {
+            msg_Dbg( p_enc, "Trying to find packet sample format instead of planar %s", av_get_sample_fmt_name( p_context->sample_fmt ) );
+            for( unsigned int i=0; p_codec->sample_fmts[i] != -1; i++ )
+            {
+                if( !av_sample_fmt_is_planar( p_codec->sample_fmts[i] ) )
+                {
+                    p_context->sample_fmt = p_codec->sample_fmts[i];
+                    msg_Dbg( p_enc, "Changing to packet format %s as new sample format", av_get_sample_fmt_name( p_context->sample_fmt ) );
+                    break;
+                }
+            }
+        }
+        msg_Dbg( p_enc, "Ended up using %s as sample format", av_get_sample_fmt_name( p_context->sample_fmt ) );
         p_enc->fmt_in.i_codec  = GetVlcAudioFormat( p_context->sample_fmt );
 
         p_context->sample_rate = p_enc->fmt_out.audio.i_rate;
