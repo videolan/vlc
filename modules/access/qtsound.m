@@ -138,7 +138,8 @@ vlc_module_end ()
                 return;
             }
         } else {
-            msg_Err(p_qtsound, "Too many or only one channel found.");
+            msg_Err(p_qtsound, "Too many or only one channel found: %i.",
+                               tempAudioBufferList->mNumberBuffers);
             return;
         }
 
