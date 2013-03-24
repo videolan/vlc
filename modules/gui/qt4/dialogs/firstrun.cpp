@@ -70,13 +70,13 @@ void FirstRun::buildPrivDialog()
     QGridLayout *blablaLayout = new QGridLayout( blabla );
     QLabel *text = new QLabel( qtr(
         "<p>In order to protect your privacy, the <i>VLC media player</i> "
-        "does <b>not</b> collect personal informations or transmit them, "
+        "does <b>not</b> collect personal data or transmit them, "
         "not even in anonymized form, to anyone."
         "</p>\n"
         "<p>Nevertheless, <i>VLC</i> is able to automatically retrieve "
-        "informations about the media in your playlist from third party "
-        "Internet-based services. These informations include covert arts, "
-        "track names, authoring and other meta-data."
+        "information about the media in your playlist from third party "
+        "Internet-based services. That includes covert arts, track names, "
+        "authoring and other meta-data."
         "</p>\n"
         "That may entail identifying some of your media files to third party "
         "entities. Therefore the <i>VLC</i> developers require your express "
