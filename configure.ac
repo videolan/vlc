@@ -3967,7 +3967,6 @@ AC_ARG_ENABLE(media-library,
 AS_IF([test "${enable_media_library}" = "yes"], [
   AC_DEFINE([MEDIA_LIBRARY], 1, [Define if you want to use the VLC media library])
   VLC_ADD_CPPFLAGS([qt4],"-DMEDIA_LIBRARY")
-  VLC_ADD_PLUGIN([media_library])
 
 dnl
 dnl SQLite
@@ -4135,7 +4134,6 @@ AC_CONFIG_FILES([
   modules/lua/Makefile
   modules/meta_engine/Makefile
   modules/misc/Makefile
-  modules/media_library/Makefile
   modules/mux/Makefile
   modules/notify/Makefile
   modules/packetizer/Makefile

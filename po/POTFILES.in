@@ -935,7 +935,6 @@ modules/lua/libs/volume.c
 modules/lua/meta.c
 modules/lua/vlc.c
 modules/lua/vlc.h
-modules/media_library/sql_media_library.c
 modules/meta_engine/folder.c
 modules/meta_engine/taglib.cpp
 modules/misc/audioscrobbler.c

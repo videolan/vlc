@@ -10,7 +10,6 @@ BASE_SUBDIRS = \
 	gui \
 	meta_engine \
 	misc \
-	media_library \
 	notify \
 	packetizer \
 	services_discovery \
