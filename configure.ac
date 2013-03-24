@@ -3967,22 +3967,6 @@ AC_ARG_ENABLE(media-library,
 AS_IF([test "${enable_media_library}" = "yes"], [
   AC_DEFINE([MEDIA_LIBRARY], 1, [Define if you want to use the VLC media library])
   VLC_ADD_CPPFLAGS([qt4],"-DMEDIA_LIBRARY")
-
-dnl
-dnl SQLite
-dnl
-  AS_IF([test "${SYS}" != "darwin"], [
-    PKG_ENABLE_MODULES_VLC([SQLITE], [], [sqlite3 >= 3.6.0], [sqlite3], [auto])
-  ], [
-    AS_IF([test "${enable_sqlite}" != "no"], [
-      AC_CHECK_HEADERS(sqlite3.h, [
-        VLC_ADD_PLUGIN([sqlite])
-        VLC_ADD_LIBS([sqlite], [-lsqlite3])
-      ], [
-        AC_MSG_ERROR([sqlite3 is required for the media library])
-      ])
-    ])
-  ])
 ])
 
 

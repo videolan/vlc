@@ -293,7 +293,6 @@ ${VLCROOT}/configure \
     --enable-swscale \
     --disable-projectm \
     --disable-libass \
-    --disable-sqlite \
     --disable-libxml2 \
     --disable-goom \
     --disable-dvdread \

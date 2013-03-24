@@ -305,7 +305,6 @@ $Id$
  * speex: a speex audio decoder/packetizer using the libspeex library
  * speex_resampler: audio resampler using the libspeexdsp library
  * spudec: RLE DVD subtitles decoder
- * sqlite: manage an SQLite database
  * stats: Stats encoder function
  * stereo_widen: Enhances stereo effect
  * stl: EBU STL decoder

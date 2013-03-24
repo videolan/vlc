@@ -948,7 +948,6 @@ modules/misc/playlist/html.c
 modules/misc/playlist/m3u.c
 modules/misc/playlist/xspf.c
 modules/misc/rtsp.c
-modules/misc/sqlite.c
 modules/misc/stats.c
 modules/misc/xml/libxml.c
 modules/mux/asf.c
