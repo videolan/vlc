@@ -372,11 +372,11 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     int pi_gamma[256];
 
     picture_t *p_outpic;
-    uint8_t *p_in, *p_in_v, *p_in_end, *p_line_end;
-    uint8_t *p_out, *p_out_v;
+    uint8_t *p_in, *p_in_end, *p_line_end;
+    uint8_t *p_out;
     int i_y_offset, i_u_offset, i_v_offset;
 
-    int i_visible_lines, i_pitch, i_visible_pitch;
+    int i_pitch, i_visible_pitch;
 
     bool b_thres;
     double  f_hue;
@@ -389,7 +389,6 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
 
     if( !p_pic ) return NULL;
 
-    i_visible_lines = p_pic->p->i_visible_lines;
     i_pitch = p_pic->p->i_pitch;
     i_visible_pitch = p_pic->p->i_visible_pitch;
 
@@ -501,13 +500,6 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     /*
      * Do the U and V planes
      */
-
-    p_in = p_pic->p->p_pixels + i_u_offset;
-    p_in_v = p_pic->p->p_pixels + i_v_offset;
-    p_in_end = p_in + i_visible_lines * i_pitch - 8 * 4;
-
-    p_out = p_outpic->p->p_pixels + i_u_offset;
-    p_out_v = p_outpic->p->p_pixels + i_v_offset;
 
     i_sin = sin(f_hue) * 256;
     i_cos = cos(f_hue) * 256;
