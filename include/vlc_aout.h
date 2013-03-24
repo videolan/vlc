@@ -325,7 +325,7 @@ static inline int aout_ChannelsRestart (vlc_object_t *obj, const char *varname,
 
 
 /* */
-VLC_API vout_thread_t * aout_filter_RequestVout( filter_t *, vout_thread_t *p_vout, video_format_t *p_fmt ) VLC_USED;
+VLC_API vout_thread_t * aout_filter_RequestVout( filter_t *, vout_thread_t *p_vout, video_format_t *p_fmt );
 
 /** Audio output buffer FIFO */
 struct aout_fifo_t
