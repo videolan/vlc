@@ -33,14 +33,8 @@ class FirstRun : public QWidget
     public:
         static void CheckAndRun( QWidget *_p, intf_thread_t *p_intf )
         {
-            if( getSettings()->value( "IsFirstRun", 1 ).toInt() )
-            {
-                if( var_InheritBool( p_intf, "qt-privacy-ask") )
-                {
-                    new FirstRun( _p, p_intf );
-                }
-                getSettings()->setValue( "IsFirstRun", 0 );
-            }
+            if( var_InheritBool( p_intf, "qt-privacy-ask") )
+                new FirstRun( _p, p_intf );
         }
         FirstRun( QWidget *, intf_thread_t * );
     private:
