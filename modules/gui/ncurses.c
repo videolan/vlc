@@ -1764,7 +1764,7 @@ static void *Run(void *data)
     var_AddCallback(p_playlist, "item-change", ItemChanged, intf);
     var_AddCallback(p_playlist, "playlist-item-append", PlaylistChanged, intf);
 
-    while (vlc_object_alive(intf) && !sys->exit) {
+    while (!sys->exit) {
         UpdateInput(sys, p_playlist);
         Redraw(intf);
         HandleKey(intf);
