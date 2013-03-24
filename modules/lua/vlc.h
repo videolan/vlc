@@ -131,7 +131,7 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this, const char * luadirname,
         void * user_data );
 int vlclua_dir_list( const char *luadirname, char ***pppsz_dir_list );
 void vlclua_dir_list_free( char **ppsz_dir_list );
-char *vlclua_find_file( vlc_object_t *p_this, const char *psz_luadirname, const char *psz_name );
+char *vlclua_find_file( const char *psz_luadirname, const char *psz_name );
 
 /*****************************************************************************
  * Replace Lua file reader by VLC input. Allows loadings scripts in Zip pkg.

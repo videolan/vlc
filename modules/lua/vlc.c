@@ -316,7 +316,7 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
     return i_ret;
 }
 
-char *vlclua_find_file( vlc_object_t *p_this, const char *psz_luadirname, const char *psz_name )
+char *vlclua_find_file( const char *psz_luadirname, const char *psz_name )
 {
     char **ppsz_dir_list = NULL;
     vlclua_dir_list( psz_luadirname, &ppsz_dir_list );

@@ -221,7 +221,7 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
         return VLC_ENOMEM;
     }
     p_sys = p_intf->p_sys;
-    p_sys->psz_filename = vlclua_find_file( p_this, "intf", name );
+    p_sys->psz_filename = vlclua_find_file( "intf", name );
     if( !p_sys->psz_filename )
     {
         msg_Err( p_intf, "Couldn't find lua interface script \"%s\".",
@@ -346,7 +346,7 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
         /* msg_Warn( p_intf, "The `telnet' lua interface script was replaced "
                           "by `cli', please update your configuration!" ); */
 
-        char *wrapped_file = vlclua_find_file( p_this, "intf", "cli" );
+        char *wrapped_file = vlclua_find_file( "intf", "cli" );
         if( !wrapped_file )
         {
             msg_Err( p_intf, "Couldn't find lua interface script \"cli\", "
