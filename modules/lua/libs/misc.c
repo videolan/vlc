@@ -140,13 +140,6 @@ static int vlclua_mwait( lua_State *L )
     return 0;
 }
 
-static int vlclua_intf_should_die( lua_State *L )
-{
-    vlc_object_t *p_this = vlclua_get_this( L );
-    lua_pushboolean( L, !vlc_object_alive( p_this ) );
-    return 1;
-}
-
 static int vlclua_action_id( lua_State *L )
 {
     vlc_action_t i_key = vlc_GetActionId( luaL_checkstring( L, 1 ) );
@@ -169,7 +162,6 @@ static const luaL_Reg vlclua_misc_reg[] = {
     { "mdate", vlclua_mdate },
     { "mwait", vlclua_mwait },
 
-    { "should_die", vlclua_intf_should_die },
     { "quit", vlclua_quit },
 
     { NULL, NULL }
