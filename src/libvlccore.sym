@@ -378,8 +378,6 @@ spu_ChangeFilters
 spu_Render
 spu_RegisterChannel
 spu_ClearChannel
-sql_Create
-sql_Destroy
 stream_Block
 stream_BlockRemaining
 stream_Control

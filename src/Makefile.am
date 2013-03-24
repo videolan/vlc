@@ -76,7 +76,6 @@ pluginsinclude_HEADERS = \
 	../include/vlc_probe.h \
 	../include/vlc_rand.h \
 	../include/vlc_services_discovery.h \
-	../include/vlc_sql.h \
 	../include/vlc_sout.h \
 	../include/vlc_spu.h \
 	../include/vlc_stream.h \
@@ -466,7 +465,6 @@ SOURCES_libvlc_common = \
 	misc/filter.c \
 	misc/filter_chain.c \
 	misc/http_auth.c \
-	misc/sql.c \
 	misc/text_style.c \
 	misc/subpicture.c \
 	misc/subpicture.h \
