@@ -78,11 +78,6 @@ void vlclua_set_intf( lua_State *L, intf_sys_t *p_intf )
     vlclua_set_object( L, vlclua_set_intf, p_intf );
 }
 
-static intf_sys_t * vlclua_get_intf( lua_State *L )
-{
-    return vlclua_get_object( L, vlclua_set_intf );
-}
-
 /*****************************************************************************
  * VLC error code translation
  *****************************************************************************/
