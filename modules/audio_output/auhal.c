@@ -110,6 +110,7 @@ struct aout_sys_t
     struct audio_device_t       *devices;
 
     vlc_mutex_t                 lock;
+    vlc_cond_t                  cond;
 };
 
 struct audio_device_t
@@ -181,6 +182,7 @@ static int Open(vlc_object_t *obj)
         return VLC_ENOMEM;
 
     vlc_mutex_init(&sys->lock);
+    vlc_cond_init(&sys->cond);
 
     aout->sys = sys;
     aout->start = Start;
@@ -216,6 +218,7 @@ static void Close(vlc_object_t *obj)
     }
 
     vlc_mutex_destroy(&sys->lock);
+    vlc_cond_destroy(&sys->cond);
 
     free(sys);
 }
@@ -1225,14 +1228,23 @@ static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
 
 static void Flush(audio_output_t *p_aout, bool wait)
 {
-    struct aout_sys_t * p_sys = p_aout->sys;
-    VLC_UNUSED(wait);
+    struct aout_sys_t *p_sys = p_aout->sys;
 
-    p_sys->b_got_first_sample = false;
+    if (wait) {
+        int32_t availableBytes;
+        vlc_mutex_lock(&p_sys->lock);
+        while (TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes) != NULL) {
+            vlc_cond_wait(&p_sys->cond, &p_sys->lock);
+        }
+        vlc_mutex_unlock(&p_sys->lock);
 
-    /* flush circular buffer */
-    AudioOutputUnitStop(p_aout->sys->au_unit);
-    TPCircularBufferClear(&p_aout->sys->circular_buffer);
+    } else {
+        p_sys->b_got_first_sample = false;
+
+        /* flush circular buffer */
+        AudioOutputUnitStop(p_aout->sys->au_unit);
+        TPCircularBufferClear(&p_aout->sys->circular_buffer);
+    }
 }
 
 static int TimeGet(audio_output_t *p_aout, mtime_t *delay)
@@ -1287,6 +1299,10 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
         VLC_UNUSED(inNumberFrames);
     }
 
+    vlc_mutex_lock(&p_sys->lock);
+    vlc_cond_signal(&p_sys->cond);
+    vlc_mutex_unlock(&p_sys->lock);
+
     return noErr;
 }
 
@@ -1325,6 +1341,10 @@ static OSStatus RenderCallbackSPDIF (AudioDeviceID inDevice,
         memcpy(targetBuffer, buffer, __MIN(bytesToCopy, availableBytes));
         TPCircularBufferConsume(&p_sys->circular_buffer, __MIN(bytesToCopy, availableBytes));
     }
+
+    vlc_mutex_lock(&p_sys->lock);
+    vlc_cond_signal(&p_sys->cond);
+    vlc_mutex_unlock(&p_sys->lock);
 
     return noErr;
 }
