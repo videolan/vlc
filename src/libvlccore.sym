@@ -230,7 +230,6 @@ vlc_UrlClean
 vlc_path2uri
 make_path
 mdate
-media_New
 module_config_free
 module_config_get
 module_exists
