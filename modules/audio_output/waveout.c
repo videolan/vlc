@@ -62,7 +62,6 @@ struct lkwavehdr
 };
 
 /* local functions */
-static void Probe        ( audio_output_t *, const audio_sample_format_t * );
 static int OpenWaveOut   ( audio_output_t *, uint32_t,
                            int, int, int, int, bool );
 static int OpenWaveOutPCM( audio_output_t *, uint32_t,
@@ -113,7 +112,7 @@ struct aout_sys_t
     int i_rate;
 
     uint8_t *p_silence_buffer;              /* buffer we use to play silence */
-    
+
     float f_volume;
 
     bool b_spdif;
@@ -142,6 +141,11 @@ struct aout_sys_t
                        "to apply.")
 #define DEFAULT_AUDIO_DEVICE N_("Default Audio Device")
 
+#define AUDIO_CHAN_TEXT N_("Audio output channels")
+#define AUDIO_CHAN_LONGTEXT N_("Channels available for audio output. " \
+    "If the input has more channels than the output, it will be down-mixed. " \
+    "This parameter is ignored when digital pass-through is active.")
+
 #define VOLUME_TEXT N_("Audio volume")
 
 vlc_module_begin ()
@@ -150,16 +154,15 @@ vlc_module_begin ()
     set_capability( "audio output", 50 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
-
     add_string( "waveout-audio-device", "wavemapper",
                  DEVICE_TEXT, DEVICE_LONG, false )
        change_string_cb( ReloadWaveoutDevices )
-
     add_float( "waveout-volume", 1.0f, VOLUME_TEXT, NULL, true )
          change_float_range(0.0f, 2.0f)
-
     add_bool( "waveout-float32", true, FLOAT_TEXT, FLOAT_LONGTEXT, true )
-
+    add_integer ("waveout-audio-channels", 6, AUDIO_CHAN_TEXT,
+                 AUDIO_CHAN_LONGTEXT, false)
+        change_integer_range(1,6)
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -183,6 +186,9 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     /*
       check for configured audio device!
     */
+    fmt->i_format = var_InheritBool( p_aout, "waveout-float32" )?
+        VLC_CODEC_FL32: VLC_CODEC_S16N;
+
     char *psz_waveout_dev = var_CreateGetString( p_aout, "waveout-audio-device");
 
     p_aout->sys->i_wave_device_id =
@@ -217,67 +223,73 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 
 
 
-    if( var_Type( p_aout, "audio-device" ) == 0 )
-    {
-        Probe( p_aout, fmt );
-    }
-
-    if( var_Get( p_aout, "audio-device", &val ) < 0 )
-    {
-        /* Probe() has failed. */
-        var_Destroy( p_aout, "waveout-audio-device");
-        return VLC_EGENERIC;
-    }
-
-
     /* Open the device */
-    if( val.i_int == AOUT_VAR_SPDIF )
+    if( AOUT_FMT_SPDIF(fmt) && var_InheritBool (p_aout, "spdif") )
     {
-        fmt->i_format = VLC_CODEC_SPDIFL;
 
         if( OpenWaveOut( p_aout, p_aout->sys->i_wave_device_id,
                          VLC_CODEC_SPDIFL, fmt->i_physical_channels,
                          aout_FormatNbChannels( fmt ), fmt->i_rate, false )
-            != VLC_SUCCESS )
+            == VLC_SUCCESS )
         {
-            msg_Err( p_aout, "cannot open waveout audio device" );
-            return VLC_EGENERIC;
-        }
+            fmt->i_format = VLC_CODEC_SPDIFL;
 
-        /* Calculate the frame size in bytes */
-        fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE;
-        fmt->i_frame_length = A52_FRAME_NB;
-        p_aout->sys->i_buffer_size = fmt->i_bytes_per_frame;
-        p_aout->sys->b_spdif = true;
+            /* Calculate the frame size in bytes */
+            fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE;
+            fmt->i_frame_length = A52_FRAME_NB;
+            p_aout->sys->i_buffer_size = fmt->i_bytes_per_frame;
+            p_aout->sys->b_spdif = true;
+
+        }
+        else
+            msg_Err( p_aout,
+                     "cannot open waveout audio device for spdif fallback to PCM" );
     }
-    else
-    {
-        switch( val.i_int )
-        {
-        case AOUT_VAR_5_1:
-            fmt->i_physical_channels
-                    = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-                      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
-                      | AOUT_CHAN_LFE;
-            break;
-        case AOUT_VAR_2F2R:
-            fmt->i_physical_channels
-                    = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-                      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-            break;
-        case AOUT_VAR_MONO:
-            fmt->i_physical_channels = AOUT_CHAN_CENTER;
-            break;
-        default:
-            fmt->i_physical_channels = AOUT_CHANS_STEREO;
-        }
 
-        if( OpenWaveOutPCM( p_aout, p_aout->sys->i_wave_device_id,
-                            &fmt->i_format, fmt->i_physical_channels,
-                            aout_FormatNbChannels( fmt ), fmt->i_rate, false )
-            != VLC_SUCCESS )
+    if( fmt->i_format != VLC_CODEC_SPDIFL )
+    {
+        int max_chan = var_InheritInteger( p_aout, "waveout-audio-channels");
+        int i_channels = aout_FormatNbChannels(fmt);
+        i_channels = ( i_channels < max_chan )? i_channels: max_chan;
+        do
         {
-            msg_Err( p_aout, "cannot open waveout audio device" );
+            switch(i_channels)
+            {
+                case 6:
+                    fmt->i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                        | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT
+                        | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE;
+                    break;
+                case 5:
+                    fmt->i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                        | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+                        | AOUT_CHAN_LFE;
+                    break;
+                case 4:
+                    fmt->i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                        | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+                    break;
+                case 3:
+                    fmt->i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                        | AOUT_CHAN_LFE;
+                    break;
+                case 2:
+                    fmt->i_physical_channels = AOUT_CHANS_STEREO;
+                    break;
+                case 1:
+                default:
+                    fmt->i_physical_channels = AOUT_CHAN_CENTER;
+            }
+            msg_Dbg( p_aout, "Trying %d channels", i_channels );
+        }
+        while( ( OpenWaveOutPCM( p_aout, p_aout->sys->i_wave_device_id,
+                                 &fmt->i_format, fmt->i_physical_channels,
+                                 i_channels, fmt->i_rate, false ) != VLC_SUCCESS ) &&
+               --i_channels );
+
+        if( !i_channels )
+        {
+            msg_Err(p_aout, "Waveout couldn't find appropriate channel mapping");
             return VLC_EGENERIC;
         }
 
@@ -324,111 +336,6 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 }
 
 /*****************************************************************************
- * Probe: probe the audio device for available formats and channels
- *****************************************************************************/
-static void Probe( audio_output_t * p_aout, const audio_sample_format_t *fmt )
-{
-    vlc_value_t val, text;
-    vlc_fourcc_t i_format;
-    unsigned int i_physical_channels;
-
-    var_Create( p_aout, "audio-device", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-    text.psz_string = _("Audio Device");
-    var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
-
-    /* Test for 5.1 support */
-    i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
-                          AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT |
-                          AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE;
-    if( fmt->i_physical_channels == i_physical_channels )
-    {
-        if( OpenWaveOutPCM( p_aout, p_aout->sys->i_wave_device_id,
-                            &i_format, i_physical_channels, 6,
-                            fmt->i_rate, true )
-            == VLC_SUCCESS )
-        {
-            val.i_int = AOUT_VAR_5_1;
-            text.psz_string = (char *)_("5.1");
-            var_Change( p_aout, "audio-device",
-                        VLC_VAR_ADDCHOICE, &val, &text );
-            msg_Dbg( p_aout, "device supports 5.1 channels" );
-        }
-    }
-
-    /* Test for 2 Front 2 Rear support */
-    i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
-                          AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-    if( ( fmt->i_physical_channels & i_physical_channels )
-        == i_physical_channels )
-    {
-        if( OpenWaveOutPCM( p_aout,p_aout->sys->i_wave_device_id,
-                            &i_format, i_physical_channels, 4,
-                            fmt->i_rate, true )
-            == VLC_SUCCESS )
-        {
-            val.i_int = AOUT_VAR_2F2R;
-            text.psz_string = (char *)_("2 Front 2 Rear");
-            var_Change( p_aout, "audio-device",
-                        VLC_VAR_ADDCHOICE, &val, &text );
-            msg_Dbg( p_aout, "device supports 4 channels" );
-        }
-    }
-
-    /* Test for stereo support */
-    i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-    if( OpenWaveOutPCM( p_aout, p_aout->sys->i_wave_device_id,
-                        &i_format,i_physical_channels, 2,
-                        fmt->i_rate, true )
-        == VLC_SUCCESS )
-    {
-        val.i_int = AOUT_VAR_STEREO;
-        text.psz_string = (char *)_("Stereo");
-        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
-        msg_Dbg( p_aout, "device supports 2 channels" );
-    }
-
-    /* Test for mono support */
-    i_physical_channels = AOUT_CHAN_CENTER;
-    if( OpenWaveOutPCM( p_aout, p_aout->sys->i_wave_device_id,
-                        &i_format, i_physical_channels, 1, fmt->i_rate, true )
-        == VLC_SUCCESS )
-    {
-        val.i_int = AOUT_VAR_MONO;
-        text.psz_string = (char *)_("Mono");
-        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
-        msg_Dbg( p_aout, "device supports 1 channel" );
-    }
-
-    /* Test for SPDIF support */
-    if ( AOUT_FMT_SPDIF( fmt ) )
-    {
-        if( OpenWaveOut( p_aout, p_aout->sys->i_wave_device_id,
-                         VLC_CODEC_SPDIFL, fmt->i_physical_channels,
-                         aout_FormatNbChannels( fmt ), fmt->i_rate, true )
-            == VLC_SUCCESS )
-        {
-            msg_Dbg( p_aout, "device supports A/52 over S/PDIF" );
-            val.i_int = AOUT_VAR_SPDIF;
-            text.psz_string = (char *)_("A/52 over S/PDIF");
-            var_Change( p_aout, "audio-device",
-                        VLC_VAR_ADDCHOICE, &val, &text );
-            if( var_InheritBool( p_aout, "spdif" ) )
-                var_Set( p_aout, "audio-device", val );
-        }
-    }
-
-    var_Change( p_aout, "audio-device", VLC_VAR_CHOICESCOUNT, &val, NULL );
-    if( val.i_int <= 0 )
-    {
-        /* Probe() has failed. */
-        var_Destroy( p_aout, "audio-device" );
-        return;
-    }
-
-    var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
-}
-
-/*****************************************************************************
  * Play: play a sound buffer
  *****************************************************************************
  * This doesn't actually play the buffer. This just stores the buffer so it
@@ -436,7 +343,7 @@ static void Probe( audio_output_t * p_aout, const audio_sample_format_t *fmt )
  *****************************************************************************/
 static void Play( audio_output_t *p_aout, block_t *block )
 {
-    struct lkwavehdr * p_waveheader = 
+    struct lkwavehdr * p_waveheader =
         (struct lkwavehdr *) malloc(sizeof(struct lkwavehdr));
     if(!p_waveheader)
     {
@@ -454,7 +361,7 @@ static void Play( audio_output_t *p_aout, block_t *block )
                              p_aout->sys->waveformat.Format.nChannels,
                              p_aout->sys->chan_table, p_aout->sys->format );
     }
-    while( PlayWaveOut( p_aout, p_aout->sys->h_waveout, p_waveheader, block,       
+    while( PlayWaveOut( p_aout, p_aout->sys->h_waveout, p_waveheader, block,
                         p_aout->sys->b_spdif ) != VLC_SUCCESS )
 
     {
@@ -604,7 +511,7 @@ static int OpenWaveOut( audio_output_t *p_aout, uint32_t i_device_id, int i_form
                  waveformat.Samples.wValidBitsPerSample);
         msg_Dbg( p_aout,"waveformat.Samples.wSamplesPerBlock = %d",
                  waveformat.Samples.wSamplesPerBlock);
-        msg_Dbg( p_aout,"waveformat.dwChannelMask          = %lu",
+        msg_Dbg( p_aout,"waveformat.dwChannelMask          = %lx",
                  waveformat.dwChannelMask);
     }
 
@@ -779,7 +686,7 @@ static void WaveOutClean( aout_sys_t * p_sys )
 }
 
 static void WaveOutClearBuffer( HWAVEOUT h_waveout, WAVEHDR *p_waveheader )
-{   
+{
     block_t *p_buffer = (block_t *)(p_waveheader->dwUser);
     /* Unprepare and free the buffers which has just been played */
     waveOutUnprepareHeader( h_waveout, p_waveheader, sizeof(WAVEHDR) );
@@ -879,7 +786,7 @@ static int Open(vlc_object_t *obj)
     aout_MuteReport(aout, sys->b_mute);
     aout_VolumeReport(aout, sys->f_volume );
 
-    if( vlc_timer_create( &sys->volume_poll_timer, 
+    if( vlc_timer_create( &sys->volume_poll_timer,
                           WaveoutPollVolume, aout ) )
     {
         msg_Err( aout, "Couldn't create volume polling timer" );
@@ -897,7 +804,7 @@ static void Close(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
-   
+
     vlc_timer_destroy( sys->volume_poll_timer );
 
     vlc_cond_destroy( &sys->cond );
@@ -914,7 +821,7 @@ static int WaveOutTimeGet(audio_output_t * p_aout, mtime_t *delay)
     if( !p_aout->sys->i_frames )
         return -1;
 
-    if( waveOutGetPosition( p_aout->sys->h_waveout, &mmtime, sizeof(MMTIME) ) 
+    if( waveOutGetPosition( p_aout->sys->h_waveout, &mmtime, sizeof(MMTIME) )
             != MMSYSERR_NOERROR )
     {
         msg_Err( p_aout, "waveOutGetPosition failed");
@@ -1021,10 +928,10 @@ static int WaveoutVolumeSet( audio_output_t *p_aout, float volume )
 static int WaveoutMuteSet( audio_output_t * p_aout, bool mute )
 {
     aout_sys_t *sys = p_aout->sys;
-    
+
     if( sys->b_soft )
     {
-        float gain = sys->f_volume * sys->f_volume * sys->f_volume; 
+        float gain = sys->f_volume * sys->f_volume * sys->f_volume;
         if ( aout_GainRequest( p_aout, mute ? 0.f : gain ) )
             return -1;
     }
