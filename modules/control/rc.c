@@ -498,13 +498,10 @@ static void *Run( void *data )
             /* New input has been registered */
             if( p_input )
             {
-                if( !p_input->b_dead || vlc_object_alive (p_input) )
-                {
-                    char *psz_uri =
-                            input_item_GetURI( input_GetItem( p_input ) );
-                    msg_rc( STATUS_CHANGE "( new input: %s )", psz_uri );
-                    free( psz_uri );
-                }
+                char *psz_uri = input_item_GetURI( input_GetItem( p_input ) );
+                msg_rc( STATUS_CHANGE "( new input: %s )", psz_uri );
+                free( psz_uri );
+
                 var_AddCallback( p_input, "intf-event", InputEvent, p_intf );
             }
         }
@@ -521,8 +518,7 @@ static void *Run( void *data )
             }
         }
 
-        if( (p_input != NULL) && !p_input->b_dead && vlc_object_alive (p_input) &&
-            (p_playlist != NULL) )
+        if( p_input != NULL && p_playlist != NULL )
         {
             PL_LOCK;
             int status = playlist_Status( p_playlist );
