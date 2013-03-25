@@ -41,8 +41,8 @@
  * b and c the minor and micro versions of libav
  * d and e the minor and micro versions of FFmpeg */
 #define LIBAVUTIL_VERSION_CHECK( a, b, c, d, e ) \
-    (LIBAVUTIL_VERSION_MICRO <  100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( a, b, c ) ) || \
-    (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( a, d, e ) )
+    ( (LIBAVUTIL_VERSION_MICRO <  100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( a, b, c ) ) || \
+      (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( a, d, e ) ) )
 
 
 unsigned GetVlcDspMask( void );
