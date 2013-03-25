@@ -160,19 +160,21 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
         }
 
     /* Pass message to the callback */
-    libvlc_priv_t *priv = libvlc_priv (obj->p_libvlc);
+    libvlc_priv_t *priv = obj ? libvlc_priv (obj->p_libvlc) : NULL;
 
 #ifdef WIN32
     va_list ap;
 
     va_copy (ap, args);
-    Win32DebugOutputMsg (&priv->log.verbose, type, &msg, format, ap);
+    Win32DebugOutputMsg (priv ? &priv->log.verbose : NULL, type, &msg, format, ap);
     va_end (ap);
 #endif
 
-    vlc_rwlock_rdlock (&priv->log.lock);
-    priv->log.cb (priv->log.opaque, type, &msg, format, args);
-    vlc_rwlock_unlock (&priv->log.lock);
+    if (priv) {
+        vlc_rwlock_rdlock (&priv->log.lock);
+        priv->log.cb (priv->log.opaque, type, &msg, format, args);
+        vlc_rwlock_unlock (&priv->log.lock);
+    }
 
     uselocale (locale);
     freelocale (c);
