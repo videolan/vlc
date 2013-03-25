@@ -29,6 +29,7 @@
 #include "demux.h"
 #include <libvlc.h>
 #include <vlc_codec.h>
+#include <vlc_atomic.h>
 
 /****************************************************************************
  * stream_Demux*: create a demuxer for an outpout stream (allow demuxer chain)
@@ -45,6 +46,7 @@ struct stream_sys_t
     char        *psz_name;
     es_out_t    *out;
 
+    atomic_bool  active;
     vlc_thread_t thread;
     vlc_mutex_t  lock;
     struct
@@ -103,6 +105,7 @@ stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *ou
         return NULL;
     }
 
+    atomic_init( &p_sys->active, true );
     vlc_mutex_init( &p_sys->lock );
 
     if( vlc_clone( &p_sys->thread, DStreamThread, s, VLC_THREAD_PRIORITY_INPUT ) )
@@ -156,7 +159,7 @@ static void DStreamDelete( stream_t *s )
     stream_sys_t *p_sys = s->p_sys;
     block_t *p_empty;
 
-    vlc_object_kill( s );
+    atomic_store( &p_sys->active, false );
     p_empty = block_Alloc( 0 );
     block_FifoPut( p_sys->p_fifo, p_empty );
     vlc_join( p_sys->thread, NULL );
@@ -180,7 +183,7 @@ static int DStreamRead( stream_t *s, void *p_read, unsigned int i_read )
 
     //msg_Dbg( s, "DStreamRead: wanted %d bytes", i_read );
 
-    while( vlc_object_alive( s ) && !s->b_error && i_read )
+    while( atomic_load( &p_sys->active ) && !s->b_error && i_read )
     {
         block_t *p_block = p_sys->p_block;
         int i_copy;
@@ -223,7 +226,7 @@ static int DStreamPeek( stream_t *s, const uint8_t **pp_peek, unsigned int i_pee
 
     //msg_Dbg( s, "DStreamPeek: wanted %d bytes", i_peek );
 
-    while( vlc_object_alive( s ) && !s->b_error && i_peek )
+    while( atomic_load( &p_sys->active ) && !s->b_error && i_peek )
     {
         int i_copy;
 
@@ -326,7 +329,7 @@ static void* DStreamThread( void *obj )
 
     /* Main loop */
     mtime_t next_update = 0;
-    while( vlc_object_alive( s ) )
+    while( atomic_load( &p_sys->active ) )
     {
         if( p_demux->info.i_update || mdate() >= next_update )
         {
