@@ -222,7 +222,7 @@ void vlm_Delete( vlm_t *p_vlm )
     TAB_CLEAN( p_vlm->i_schedule, p_vlm->schedule );
     vlc_mutex_unlock( &p_vlm->lock );
 
-    vlc_object_kill( p_vlm );
+    vlc_cancel( p_vlm->thread );
 
     if( p_vlm->p_vod )
     {
@@ -233,12 +233,6 @@ void vlm_Delete( vlm_t *p_vlm )
     libvlc_priv(p_vlm->p_libvlc)->p_vlm = NULL;
     vlc_mutex_unlock( &vlm_mutex );
 
-    vlc_mutex_lock( &p_vlm->lock_manage );
-    p_vlm->input_state_changed = true;
-    vlc_cond_signal( &p_vlm->wait_manage );
-    vlc_mutex_unlock( &p_vlm->lock_manage );
-
-    /*vlc_cancel( p_vlm->thread ); */
     vlc_join( p_vlm->thread, NULL );
 
     vlc_cond_destroy( &p_vlm->wait_manage );
@@ -400,16 +394,16 @@ static void* Manage( void* p_object )
     mtime_t i_time;
     mtime_t i_nextschedule = 0;
 
-    int canc = vlc_savecancel ();
     i_lastcheck = vlm_Date();
 
-    while( vlc_object_alive( vlm ) )
+    for( ;; )
     {
         char **ppsz_scheduled_commands = NULL;
         int    i_scheduled_commands = 0;
         bool scheduled_command = false;
 
         vlc_mutex_lock( &vlm->lock_manage );
+        mutex_cleanup_push( &vlm->lock_manage );
         while( !vlm->input_state_changed && !scheduled_command )
         {
             if( i_nextschedule )
@@ -418,7 +412,9 @@ static void* Manage( void* p_object )
                 vlc_cond_wait( &vlm->wait_manage, &vlm->lock_manage );
         }
         vlm->input_state_changed = false;
-        vlc_mutex_unlock( &vlm->lock_manage );
+        vlc_cleanup_run( );
+
+        int canc = vlc_savecancel ();
         /* destroy the inputs that wants to die, and launch the next input */
         vlc_mutex_lock( &vlm->lock );
         for( i = 0; i < vlm->i_media; i++ )
@@ -518,10 +514,9 @@ static void* Manage( void* p_object )
 
         i_lastcheck = i_time;
         vlc_mutex_unlock( &vlm->lock );
-
+        vlc_restorecancel (canc);
     }
 
-    vlc_restorecancel (canc);
     return NULL;
 }
 
