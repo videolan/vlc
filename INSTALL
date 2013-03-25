@@ -62,13 +62,3 @@ To build a Debian package, you need to get the packaging info
    git clone git://git.debian.org/pkg-multimedia/vlc.git debian
 and then
    git-buildpackage
-
-
-To build RPM packages, copy a spec file from extra/package/rpm and:
-
-   rpm -ba vlc.spec
-
-To build an ipkg package (iPAQ familiar Linux), use:
-
-   ipkg-buildpackage
-
