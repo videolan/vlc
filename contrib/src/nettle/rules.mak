@@ -1,6 +1,6 @@
 # Nettle
 
-NETTLE_VERSION := 2.2
+NETTLE_VERSION := 2.6
 NETTLE_URL := ftp://ftp.gnu.org/gnu/nettle/nettle-$(NETTLE_VERSION).tar.gz
 
 # PKGS += nettle
