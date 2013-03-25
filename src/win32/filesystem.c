@@ -240,7 +240,12 @@ int vlc_dup (int oldfd)
 
 int vlc_pipe (int fds[2])
 {
+#ifdef WINAPI_FAMILY_APP
+    _set_errno(EPERM);
+    return -1;
+#else
     return _pipe (fds, 32768, O_NOINHERIT | O_BINARY);
+#endif
 }
 
 #include <vlc_network.h>
