@@ -274,11 +274,15 @@ void InputManager::customEvent( QEvent *event )
 inline void InputManager::addCallbacks()
 {
     var_AddCallback( p_input, "intf-event", InputEvent, this );
+    if( !p_intf->p_sys->b_isDialogProvider )
+        var_AddCallback( p_input, "state", PLItemChanged, THEMIM );
 }
 
 /* Delete the callbacks on Input. Self explanatory */
 inline void InputManager::delCallbacks()
 {
+    if( !p_intf->p_sys->b_isDialogProvider )
+        var_DelCallback( p_input, "state", PLItemChanged, THEMIM );
     var_DelCallback( p_input, "intf-event", InputEvent, this );
 }
 
@@ -995,11 +999,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     /* initialize p_input (an input can already be running) */
     p_input = playlist_CurrentInput( pl_Get(p_intf) );
     if( p_input )
-    {
-        if( !p_intf->p_sys->b_isDialogProvider )
-            var_AddCallback( p_input, "state", PLItemChanged, this );
         emit inputChanged( p_input );
-    }
 }
 
 MainInputManager::~MainInputManager()
@@ -1007,7 +1007,6 @@ MainInputManager::~MainInputManager()
     if( p_input )
     {
        emit inputChanged( NULL );
-       var_DelCallback( p_input, "state", PLItemChanged, this );
        vlc_object_release( p_input );
     }
 
@@ -1058,43 +1057,10 @@ void MainInputManager::customEvent( QEvent *event )
         if( type != IMEvent::ItemChanged ) return;
     }
 
-    /* Should be PLItemChanged Event */
-    if( !p_intf->p_sys->b_isDialogProvider )
-    {
-        if( p_input && ( p_input->b_dead || !vlc_object_alive (p_input) ) )
-        {
-            emit inputChanged( p_input );
-            var_DelCallback( p_input, "state", PLItemChanged, this );
-            vlc_object_release( p_input );
-            p_input = NULL;
-            return;
-        }
-
-        if( !p_input )
-        {
-            p_input = playlist_CurrentInput(THEPL);
-            if( p_input )
-            {
-                var_AddCallback( p_input, "state", PLItemChanged, this );
-                emit inputChanged( p_input );
-            }
-        }
-    }
-    else
-    {
-        /* remove previous stored p_input */
-        if( p_input )
-        {
-            vlc_object_release( p_input );
-            p_input = NULL;
-        }
-        /* we are working as a dialogs provider */
-        p_input = playlist_CurrentInput( pl_Get(p_intf) );
-        if( p_input )
-        {
-            emit inputChanged( p_input );
-        }
-    }
+    if( p_input != NULL )
+        vlc_object_release( p_input );
+    p_input = playlist_CurrentInput( pl_Get(p_intf) );
+    emit inputChanged( p_input );
 }
 
 /* Playlist Control functions */
