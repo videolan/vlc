@@ -102,7 +102,7 @@ void InputManager::setInput( input_thread_t *_p_input )
 {
     delInput();
     p_input = _p_input;
-    if( p_input && !( p_input->b_dead || !vlc_object_alive (p_input) ) )
+    if( p_input != NULL )
     {
         msg_Dbg( p_intf, "IM: Setting an input" );
         vlc_object_hold( p_input );
@@ -119,7 +119,6 @@ void InputManager::setInput( input_thread_t *_p_input )
     }
     else
     {
-        p_input = NULL;
         p_item = NULL;
         assert( !p_input_vbi );
         emit rateChanged( var_InheritFloat( p_intf, "rate" ) );

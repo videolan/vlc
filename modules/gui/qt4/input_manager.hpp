@@ -133,8 +133,7 @@ public:
     {
         return p_input /* We have an input */
             && !p_input->b_dead /* not dead yet, */
-            && !p_input->b_eof  /* not EOF either, */
-            && vlc_object_alive (p_input); /* and the VLC object is alive */
+            && !p_input->b_eof  /* not EOF either */;
     }
 
     int playingStatus();
