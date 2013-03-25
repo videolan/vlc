@@ -50,7 +50,7 @@ static bool ReadWin32( HANDLE *hConsoleIn, char *p_buffer, int *pi_size )
     INPUT_RECORD input_record;
     DWORD i_dw;
 
-    while( /*vlc_object_alive( p_intf ) &&*/ *pi_size < MAX_LINE_LENGTH &&
+    while( *pi_size < MAX_LINE_LENGTH &&
            ReadConsoleInput( hConsoleIn, &input_record, 1, &i_dw ) )
     {
         if( input_record.EventType != KEY_EVENT ||
