@@ -1,5 +1,5 @@
---- gnutls/lib/gl/read-file.c.orig	2012-03-06 20:59:29.600593329 -0500
-+++ gnutls/lib/gl/read-file.c	2012-03-06 20:59:44.568593328 -0500
+--- gnutls/gl/read-file.c.orig	2012-03-06 20:59:29.600593329 -0500
++++ gnutls/gl/read-file.c	2012-03-06 20:59:44.568593328 -0500
 @@ -35,6 +35,9 @@
  /* Get errno. */
  #include <errno.h>

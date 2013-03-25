@@ -1,54 +1,55 @@
-diff -ru gnutls.orig/lib/nettle/Makefile.am gnutls/lib/nettle/Makefile.am
---- gnutls.orig/lib/nettle/Makefile.am	2011-07-19 20:25:09.000000000 +0300
-+++ gnutls/lib/nettle/Makefile.am	2011-07-19 20:25:39.000000000 +0300
-@@ -35,4 +35,4 @@
+diff -ru gnutls.orig/lib/nettle/rnd.c gnutls/lib/nettle/rnd.c
+--- gnutls-3.1.10/lib/nettle/Makefile.am.orig	2013-03-25 14:41:50.265377296 +0100
++++ gnutls-3.1.10/lib/nettle/Makefile.am	2013-03-25 14:50:17.436084975 +0100
+@@ -33,7 +33,7 @@
  
  noinst_LTLIBRARIES = libcrypto.la
  
--libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c egd.c egd.h
-+libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c
---- gnutls/lib/nettle/Makefile.in.orig	2011-11-22 23:27:22.099568057 -0500
-+++ gnutls/lib/nettle/Makefile.in	2011-11-22 23:27:45.711685158 -0500
-@@ -117,8 +117,7 @@
- CONFIG_CLEAN_VPATH_FILES =
+-libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c egd.c egd.h \
++libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c \
+ 	multi.c wmnaf.c ecc_free.c ecc.h ecc_make_key.c ecc_shared_secret.c \
+ 	ecc_map.c ecc_mulmod.c ecc_mulmod_cached.c \
+ 	ecc_points.c ecc_projective_dbl_point_3.c ecc_projective_isneutral.c \
+--- gnutls-3.1.10/lib/nettle/Makefile.in.orig	2013-03-25 14:41:50.268710655 +0100
++++ gnutls-3.1.10/lib/nettle/Makefile.in	2013-03-25 14:51:42.180123726 +0100
+@@ -219,7 +219,7 @@
  LTLIBRARIES = $(noinst_LTLIBRARIES)
  libcrypto_la_LIBADD =
--am_libcrypto_la_OBJECTS = pk.lo mpi.lo mac.lo cipher.lo rnd.lo init.lo \
--	egd.lo
-+am_libcrypto_la_OBJECTS = pk.lo mpi.lo mac.lo cipher.lo rnd.lo init.lo
- libcrypto_la_OBJECTS = $(am_libcrypto_la_OBJECTS)
- AM_V_lt = $(am__v_lt_$(V))
- am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
-@@ -829,7 +828,7 @@
+ am_libcrypto_la_OBJECTS = pk.lo mpi.lo mac.lo cipher.lo rnd.lo init.lo \
+-	egd.lo multi.lo wmnaf.lo ecc_free.lo ecc_make_key.lo \
++	multi.lo wmnaf.lo ecc_free.lo ecc_make_key.lo \
+ 	ecc_shared_secret.lo ecc_map.lo ecc_mulmod.lo \
+ 	ecc_mulmod_cached.lo ecc_points.lo \
+ 	ecc_projective_dbl_point_3.lo ecc_projective_isneutral.lo \
+@@ -1536,7 +1536,7 @@
  	-I$(srcdir)/../includes -I$(builddir)/../includes \
- 	-I$(srcdir)/.. $(am__append_1)
+ 	-I$(builddir)/../../gl -I$(srcdir)/.. $(am__append_1)
  noinst_LTLIBRARIES = libcrypto.la
--libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c egd.c egd.h
-+libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c
- all: all-am
- 
- .SUFFIXES:
-@@ -883,7 +882,6 @@
- 	-rm -f *.tab.c
- 
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cipher.Plo@am__quote@
+-libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c egd.c egd.h \
++libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c \
+ 	multi.c wmnaf.c ecc_free.c ecc.h ecc_make_key.c ecc_shared_secret.c \
+ 	ecc_map.c ecc_mulmod.c ecc_mulmod_cached.c \
+ 	ecc_points.c ecc_projective_dbl_point_3.c ecc_projective_isneutral.c \
+@@ -1610,7 +1610,6 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ecc_shared_secret.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ecc_sign_hash.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ecc_verify_hash.Plo@am__quote@
 -@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/egd.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/init.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mac.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpi.Plo@am__quote@
-diff -ru gnutls.orig/lib/nettle/rnd.c gnutls/lib/nettle/rnd.c
---- gnutls.orig/lib/nettle/rnd.c	2011-07-19 20:25:09.000000000 +0300
-+++ gnutls/lib/nettle/rnd.c	2011-07-19 20:26:47.000000000 +0300
-@@ -159,7 +159,7 @@
- #ifdef HAVE_GETRUSAGE
- #include <sys/resource.h>
- #endif
+--- gnutls-3.1.10/lib/nettle/rnd.c.orig	2013-03-21 21:42:28.000000000 +0100
++++ gnutls-3.1.10/lib/nettle/rnd.c	2013-03-25 14:52:50.004027534 +0100
+@@ -205,7 +205,7 @@
+ #include <sys/time.h>
+ #include <fcntl.h>
+ #include <locks.h>
 -#include "egd.h"
 +//#include "egd.h"
  
  #define DEVICE_READ_SIZE 16
  #define DEVICE_READ_SIZE_MAX 32
-@@ -288,6 +288,7 @@
+@@ -276,6 +276,7 @@
    return 0;
  }
  
@@ -56,7 +57,7 @@ diff -ru gnutls.orig/lib/nettle/rnd.c gnutls/lib/nettle/rnd.c
  static int
  do_device_source_egd (int init)
  {
-@@ -342,6 +343,7 @@
+@@ -329,6 +330,7 @@
      }
    return 0;
  }
@@ -64,7 +65,7 @@ diff -ru gnutls.orig/lib/nettle/rnd.c gnutls/lib/nettle/rnd.c
  
  static int
  do_device_source (int init)
-@@ -359,11 +361,13 @@
+@@ -346,11 +348,13 @@
  
        do_source = do_device_source_urandom;
        ret = do_source (init);

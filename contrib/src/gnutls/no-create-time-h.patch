@@ -1,5 +1,5 @@
---- gnutls/lib/gl/Makefile.am	2011-04-07 17:30:44.000000000 -0700
-+++ gnutls/lib/gl/Makefile.am	2012-03-02 19:51:53.576555217 -0800
+--- gnutls/gl/Makefile.am	2011-04-07 17:30:44.000000000 -0700
++++ gnutls/gl/Makefile.am	2012-03-02 19:51:53.576555217 -0800
 @@ -891,7 +891,7 @@ EXTRA_DIST += sys_stat.in.h
  
  ## begin gnulib module time
