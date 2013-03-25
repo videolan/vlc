@@ -5,7 +5,6 @@ SOURCES_mirror = mirror.c
 SOURCES_adjust = adjust.c adjust_sat_hue.c adjust_sat_hue.h
 SOURCES_wall = wall.c
 SOURCES_clone = clone.c
-SOURCES_crop = crop.c
 SOURCES_motionblur = motionblur.c
 SOURCES_logo = logo.c
 SOURCES_audiobargraph_v = audiobargraph_v.c

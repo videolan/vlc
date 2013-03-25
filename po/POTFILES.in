@@ -1070,7 +1070,6 @@ modules/video_filter/canvas.c
 modules/video_filter/chain.c
 modules/video_filter/clone.c
 modules/video_filter/colorthres.c
-modules/video_filter/crop.c
 modules/video_filter/croppadd.c
 modules/video_filter/deinterlace/algo_phosphor.h
 modules/video_filter/deinterlace/deinterlace.c
