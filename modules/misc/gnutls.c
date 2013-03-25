@@ -38,16 +38,6 @@
 
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
-#if (GNUTLS_VERSION_NUMBER < 0x030014)
-# define gnutls_certificate_set_x509_system_trust(c) \
-    (c, GNUTLS_E_UNIMPLEMENTED_FEATURE)
-#endif
-#if (GNUTLS_VERSION_NUMBER < 0x03000D)
-# define gnutls_verify_stored_pubkey(db,tdb,host,serv,ctype,cert,fl) \
-    (db, host, serv, ctype, cert, fl, GNUTLS_E_NO_CERTIFICATE_FOUND)
-# define gnutls_store_pubkey(db,tdb,host,serv,ctype,cert,e,fl) \
-    (db, host, serv, ctype, cert, fl, GNUTLS_E_UNIMPLEMENTED_FEATURE)
-#endif
 #include "dhparams.h"
 
 /*****************************************************************************
@@ -114,7 +104,7 @@ static int gnutls_Init (vlc_object_t *p_this)
         goto error;
     }
 
-    const char *psz_version = gnutls_check_version ("2.6.6");
+    const char *psz_version = gnutls_check_version ("3.0.20");
     if (psz_version == NULL)
     {
         msg_Err (p_this, "unsupported GnuTLS version");
