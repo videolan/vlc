@@ -110,7 +110,7 @@ static int dvb_parse_modulation (const char *str, int def)
         { "32APSK", APSK_32   },
         { "32QAM",   QAM_32   },
         { "64QAM",   QAM_64   },
-        { "8PSK",    PSK_8    }, 
+        { "8PSK",    PSK_8    },
         { "8VSB",    VSB_8    },
         { "DQPSK", DQPSK      },
         { "QAM",     QAM_AUTO },
@@ -792,7 +792,7 @@ known:
                    | ((voltage == SEC_VOLTAGE_18) << 1) /* polarization */
                    | (tone == SEC_TONE_ON); /* option */
         cmd.msg[4] = cmd.msg[5] = 0; /* unused */
-        cmd.msg_len = 4; /* length*/
+        cmd.msg_len = 4; /* length */
 
         msleep (15000); /* wait 15 ms before DiSEqC command */
         unsigned uncommitted = var_InheritInteger (d->obj, "dvb-uncommitted");
@@ -807,7 +807,7 @@ known:
                        | ((voltage == SEC_VOLTAGE_18) << 1) /* polarization */
                        | (tone == SEC_TONE_ON); /* option */
           uncmd.msg[4] = uncmd.msg[5] = 0; /* unused */
-          uncmd.msg_len = 4; /* length*/
+          uncmd.msg_len = 4; /* length */
           if (ioctl (d->frontend, FE_DISEQC_SEND_MASTER_CMD, &uncmd) < 0)
           {
               msg_Err (d->obj, "cannot send DiSEqC command: %m");
