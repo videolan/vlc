@@ -476,7 +476,7 @@ static void *Run( void *data )
     /* Listen to audio volume updates */
     var_AddCallback( p_playlist, "volume", VolumeChanged, p_intf );
 
-    while( vlc_object_alive( p_intf ) )
+    for( ;; )
     {
         char *psz_cmd, *psz_arg;
         bool b_complete;
@@ -1861,7 +1861,7 @@ static bool ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
     while( WaitForSingleObject( p_intf->p_sys->hConsoleIn,
                                 INTF_IDLE_SLEEP/1000 ) == WAIT_OBJECT_0 )
     {
-        while( vlc_object_alive( p_intf ) && *pi_size < MAX_LINE_LENGTH &&
+        while( *pi_size < MAX_LINE_LENGTH &&
                ReadConsoleInput( p_intf->p_sys->hConsoleIn, &input_record,
                                  1, &i_dw ) )
         {
@@ -1931,7 +1931,7 @@ bool ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
     }
 #endif
 
-    while( vlc_object_alive( p_intf ) && *pi_size < MAX_LINE_LENGTH &&
+    while( *pi_size < MAX_LINE_LENGTH &&
            (i_read = net_Read( p_intf, p_intf->p_sys->i_socket == -1 ?
                        0 /*STDIN_FILENO*/ : p_intf->p_sys->i_socket, NULL,
                   (uint8_t *)p_buffer + *pi_size, 1, false ) ) > 0 )
