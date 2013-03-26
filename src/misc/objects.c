@@ -378,33 +378,35 @@ int vlc_object_waitpipe( vlc_object_t *obj )
     return internals->pipes[0];
 }
 
-#undef vlc_object_kill
 /**
- * Requests termination of an object, cancels the object thread, and make the
- * object wait pipe (if it exists) readable. Not a cancellation point.
+ * Hack for input objects. Should be removed eventually.
  */
-void vlc_object_kill( vlc_object_t *p_this )
+void ObjectKillChildrens( vlc_object_t *p_obj )
 {
-    vlc_object_internals_t *priv = vlc_internals( p_this );
-    int fd = -1;
+    /* FIXME ObjectKillChildrens seems a very bad idea in fact */
+    /*if( p_obj == VLC_OBJECT(p_input->p->p_sout) ) return;*/
 
+    vlc_object_internals_t *priv = vlc_internals (p_obj);
     if (atomic_exchange (&priv->alive, false))
     {
+        int fd;
+
         vlc_mutex_lock (&pipe_lock);
         fd = priv->pipes[1];
         vlc_mutex_unlock (&pipe_lock);
+        if (fd != -1)
+        {
+            write (fd, &(uint64_t){ 1 }, sizeof (uint64_t));
+            msg_Dbg (p_obj, "object waitpipe triggered");
+        }
     }
 
-    if (fd != -1)
-    {
-        int canc = vlc_savecancel ();
-
-        /* write _after_ setting b_die, so vlc_object_alive() returns false */
-        write (fd, &(uint64_t){ 1 }, sizeof (uint64_t));
-        msg_Dbg (p_this, "waitpipe: object killed");
-        vlc_restorecancel (canc);
-    }
+    vlc_list_t *p_list = vlc_list_children( p_obj );
+    for( int i = 0; i < p_list->i_count; i++ )
+        ObjectKillChildrens( p_list->p_values[i].p_object );
+    vlc_list_release( p_list );
 }
+
 
 #undef vlc_object_find_name
 /**

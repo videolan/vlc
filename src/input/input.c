@@ -70,8 +70,6 @@ static  int             Init    ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
 static void             MainLoop( input_thread_t *p_input, bool b_interactive );
 
-static void ObjectKillChildrens( input_thread_t *, vlc_object_t * );
-
 static inline int ControlPop( input_thread_t *, int *, vlc_value_t *, mtime_t i_deadline, bool b_postpone_seek );
 static void       ControlRelease( int i_type, vlc_value_t val );
 static bool       ControlIsSeekRequest( int i_type );
@@ -242,7 +240,7 @@ void input_Stop( input_thread_t *p_input, bool b_abort )
     /* Set die for input and ALL of this childrens (even (grand-)grand-childrens)
      * It is needed here even if it is done in INPUT_CONTROL_SET_DIE handler to
      * unlock the control loop */
-    ObjectKillChildrens( p_input, VLC_OBJECT(p_input) );
+    ObjectKillChildrens( VLC_OBJECT(p_input) );
 
     vlc_mutex_lock( &p_input->p->lock_control );
     p_input->p->b_abort |= b_abort;
@@ -283,25 +281,6 @@ input_item_t *input_GetItem( input_thread_t *p_input )
 {
     assert( p_input && p_input->p );
     return p_input->p->p_item;
-}
-
-/*****************************************************************************
- * ObjectKillChildrens
- *****************************************************************************/
-static void ObjectKillChildrens( input_thread_t *p_input, vlc_object_t *p_obj )
-{
-    vlc_list_t *p_list;
-
-    /* FIXME ObjectKillChildrens seems a very bad idea in fact */
-    if( p_obj == VLC_OBJECT(p_input->p->p_sout) )
-        return;
-
-    vlc_object_kill( p_obj );
-
-    p_list = vlc_list_children( p_obj );
-    for( int i = 0; i < p_list->i_count; i++ )
-        ObjectKillChildrens( p_input, p_list->p_values[i].p_object );
-    vlc_list_release( p_list );
 }
 
 /*****************************************************************************
@@ -1686,7 +1665,7 @@ static bool Control( input_thread_t *p_input,
             msg_Dbg( p_input, "control: stopping input" );
 
             /* Mark all submodules to die */
-            ObjectKillChildrens( p_input, VLC_OBJECT(p_input) );
+            ObjectKillChildrens( VLC_OBJECT(p_input) );
             break;
 
         case INPUT_CONTROL_SET_POSITION:
