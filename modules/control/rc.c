@@ -129,6 +129,7 @@ struct intf_sys_t
     vlc_mutex_t       status_lock;
     int               i_last_state;
     playlist_t        *p_playlist;
+    input_thread_t    *p_input;
     bool              b_input_buffering;
 
 #ifdef WIN32
@@ -213,6 +214,7 @@ static int Activate( vlc_object_t *p_this )
 {
     /* FIXME: This function is full of memory leaks and bugs in error paths. */
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    playlist_t *p_playlist = pl_Get( p_intf );
     char *psz_host, *psz_unix_path = NULL;
     int  *pi_socket = NULL;
 
@@ -316,33 +318,38 @@ static int Activate( vlc_object_t *p_this )
         free( psz_host );
     }
 
-    p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
-    if( !p_intf->p_sys )
+    intf_sys_t *p_sys = malloc( sizeof( *p_sys ) );
+    if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 
-    p_intf->p_sys->pi_socket_listen = pi_socket;
-    p_intf->p_sys->i_socket = -1;
-    p_intf->p_sys->psz_unix_path = psz_unix_path;
-    vlc_mutex_init( &p_intf->p_sys->status_lock );
-    p_intf->p_sys->i_last_state = PLAYLIST_STOPPED;
-    p_intf->p_sys->b_input_buffering = false;
+    p_intf->p_sys = p_sys;
+    p_sys->pi_socket_listen = pi_socket;
+    p_sys->i_socket = -1;
+    p_sys->psz_unix_path = psz_unix_path;
+    vlc_mutex_init( &p_sys->status_lock );
+    p_sys->i_last_state = PLAYLIST_STOPPED;
+    p_sys->b_input_buffering = false;
+    p_sys->p_playlist = p_playlist;
+    p_sys->p_input = NULL;
 
     /* Non-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
 
 #ifdef WIN32
-    p_intf->p_sys->b_quiet = var_InheritBool( p_intf, "rc-quiet" );
-    if( !p_intf->p_sys->b_quiet )
+    p_sys->b_quiet = var_InheritBool( p_intf, "rc-quiet" );
+    if( !p_sys->b_quiet )
 #endif
     {
         CONSOLE_INTRO_MSG;
     }
 
-    if( vlc_clone( &p_intf->p_sys->thread, Run, p_intf,
-                   VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
         abort();
 
     msg_rc( "%s", _("Remote control interface initialized. Type `help' for help.") );
+
+    /* Listen to audio volume updates */
+    var_AddCallback( p_sys->p_playlist, "volume", VolumeChanged, p_intf );
     return VLC_SUCCESS;
 }
 
@@ -352,21 +359,29 @@ static int Activate( vlc_object_t *p_this )
 static void Deactivate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    intf_sys_t *p_sys = p_intf->p_sys;
 
-    vlc_join( p_intf->p_sys->thread, NULL );
+    var_DelCallback( p_sys->p_playlist, "volume", VolumeChanged, p_intf );
+    vlc_join( p_sys->thread, NULL );
 
-    net_ListenClose( p_intf->p_sys->pi_socket_listen );
-    if( p_intf->p_sys->i_socket != -1 )
-        net_Close( p_intf->p_sys->i_socket );
-    if( p_intf->p_sys->psz_unix_path != NULL )
+    if( p_sys->p_input != NULL )
+    {
+        var_DelCallback( p_sys->p_input, "intf-event", InputEvent, p_intf );
+        vlc_object_release( p_sys->p_input );
+    }
+
+    net_ListenClose( p_sys->pi_socket_listen );
+    if( p_sys->i_socket != -1 )
+        net_Close( p_sys->i_socket );
+    if( p_sys->psz_unix_path != NULL )
     {
 #if defined(AF_LOCAL) && !defined(WIN32)
-        unlink( p_intf->p_sys->psz_unix_path );
+        unlink( p_sys->psz_unix_path );
 #endif
-        free( p_intf->p_sys->psz_unix_path );
+        free( p_sys->psz_unix_path );
     }
-    vlc_mutex_destroy( &p_intf->p_sys->status_lock );
-    free( p_intf->p_sys );
+    vlc_mutex_destroy( &p_sys->status_lock );
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -445,8 +460,7 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
 static void *Run( void *data )
 {
     intf_thread_t *p_intf = data;
-    input_thread_t * p_input = NULL;
-    playlist_t *     p_playlist = pl_Get( p_intf );
+    intf_sys_t *p_sys = p_intf->p_sys;
 
     char p_buffer[ MAX_LINE_LENGTH + 1 ];
     bool b_showpos = var_InheritBool( p_intf, "rc-show-pos" );
@@ -469,84 +483,80 @@ static void *Run( void *data )
 #endif
 
     /* Register commands that will be cleaned up upon object destruction */
-    p_intf->p_sys->p_playlist = p_playlist;
     RegisterCallbacks( p_intf );
 
     /* status callbacks */
-    /* Listen to audio volume updates */
-    var_AddCallback( p_playlist, "volume", VolumeChanged, p_intf );
 
     for( ;; )
     {
         char *psz_cmd, *psz_arg;
         bool b_complete;
 
-        if( p_intf->p_sys->pi_socket_listen != NULL &&
-            p_intf->p_sys->i_socket == -1 )
+        if( p_sys->pi_socket_listen != NULL && p_sys->i_socket == -1 )
         {
-            p_intf->p_sys->i_socket =
-                net_Accept( p_intf, p_intf->p_sys->pi_socket_listen );
-            if( p_intf->p_sys->i_socket == -1 ) continue;
+            p_sys->i_socket =
+                net_Accept( p_intf, p_sys->pi_socket_listen );
+            if( p_sys->i_socket == -1 ) continue;
         }
 
         b_complete = ReadCommand( p_intf, p_buffer, &i_size );
 
         /* Manage the input part */
-        if( p_input == NULL )
+        if( p_sys->p_input == NULL )
         {
-            p_input = playlist_CurrentInput( p_playlist );
+            p_sys->p_input = playlist_CurrentInput( p_sys->p_playlist );
             /* New input has been registered */
-            if( p_input )
+            if( p_sys->p_input )
             {
-                char *psz_uri = input_item_GetURI( input_GetItem( p_input ) );
+                char *psz_uri = input_item_GetURI( input_GetItem( p_sys->p_input ) );
                 msg_rc( STATUS_CHANGE "( new input: %s )", psz_uri );
                 free( psz_uri );
 
-                var_AddCallback( p_input, "intf-event", InputEvent, p_intf );
+                var_AddCallback( p_sys->p_input, "intf-event", InputEvent, p_intf );
             }
         }
-        else if( p_input->b_dead )
+#warning This is not reliable...
+        else if( p_sys->p_input->b_dead )
         {
-            var_DelCallback( p_input, "intf-event", InputEvent, p_intf );
-            vlc_object_release( p_input );
-            p_input = NULL;
+            var_DelCallback( p_sys->p_input, "intf-event", InputEvent, p_intf );
+            vlc_object_release( p_sys->p_input );
+            p_sys->p_input = NULL;
 
-            if( p_playlist )
-            {
-                p_intf->p_sys->i_last_state = PLAYLIST_STOPPED;
-                msg_rc( STATUS_CHANGE "( stop state: 0 )" );
-            }
+            p_sys->i_last_state = PLAYLIST_STOPPED;
+            msg_rc( STATUS_CHANGE "( stop state: 0 )" );
         }
 
-        if( p_input != NULL && p_playlist != NULL )
+        if( p_sys->p_input != NULL )
         {
+            playlist_t *p_playlist = p_sys->p_playlist;
+
             PL_LOCK;
             int status = playlist_Status( p_playlist );
             PL_UNLOCK;
 
-            if( p_intf->p_sys->i_last_state != status )
+            if( p_sys->i_last_state != status )
             {
                 if( status == PLAYLIST_STOPPED )
                 {
-                    p_intf->p_sys->i_last_state = PLAYLIST_STOPPED;
+                    p_sys->i_last_state = PLAYLIST_STOPPED;
                     msg_rc( STATUS_CHANGE "( stop state: 5 )" );
                 }
                 else if( status == PLAYLIST_RUNNING )
                 {
-                    p_intf->p_sys->i_last_state = PLAYLIST_RUNNING;
+                    p_sys->i_last_state = PLAYLIST_RUNNING;
                     msg_rc( STATUS_CHANGE "( play state: 3 )" );
                 }
                 else if( status == PLAYLIST_PAUSED )
                 {
-                    p_intf->p_sys->i_last_state = PLAYLIST_PAUSED;
+                    p_sys->i_last_state = PLAYLIST_PAUSED;
                     msg_rc( STATUS_CHANGE "( pause state: 4 )" );
                 }
             }
         }
 
-        if( p_input && b_showpos )
+        if( p_sys->p_input && b_showpos )
         {
-            i_newpos = 100 * var_GetFloat( p_input, "position" );
+            i_newpos = 100 * var_GetFloat( p_sys->p_input, "position" );
             if( i_oldpos != i_newpos )
             {
                 i_oldpos = i_newpos;
@@ -645,21 +655,21 @@ static void *Run( void *data )
         else if( !strcmp( psz_cmd, "logout" ) )
         {
             /* Close connection */
-            if( p_intf->p_sys->i_socket != -1 )
+            if( p_sys->i_socket != -1 )
             {
-                net_Close( p_intf->p_sys->i_socket );
+                net_Close( p_sys->i_socket );
+                p_sys->i_socket = -1;
             }
-            p_intf->p_sys->i_socket = -1;
         }
         else if( !strcmp( psz_cmd, "info" ) )
         {
-            if( p_input )
+            if( p_sys->p_input )
             {
                 int i, j;
-                vlc_mutex_lock( &input_GetItem(p_input)->lock );
-                for ( i = 0; i < input_GetItem(p_input)->i_categories; i++ )
+                vlc_mutex_lock( &input_GetItem(p_sys->p_input)->lock );
+                for ( i = 0; i < input_GetItem(p_sys->p_input)->i_categories; i++ )
                 {
-                    info_category_t *p_category = input_GetItem(p_input)
+                    info_category_t *p_category = input_GetItem(p_sys->p_input)
                                                         ->pp_categories[i];
 
                     msg_rc( "+----[ %s ]", p_category->psz_name );
@@ -673,7 +683,7 @@ static void *Run( void *data )
                     msg_rc( "| " );
                 }
                 msg_rc( "+----[ end of stream info ]" );
-                vlc_mutex_unlock( &input_GetItem(p_input)->lock );
+                vlc_mutex_unlock( &input_GetItem(p_sys->p_input)->lock );
             }
             else
             {
@@ -682,7 +692,7 @@ static void *Run( void *data )
         }
         else if( !strcmp( psz_cmd, "is_playing" ) )
         {
-            if( ! p_input )
+            if( p_sys->p_input == NULL )
             {
                 msg_rc( "0" );
             }
@@ -693,39 +703,39 @@ static void *Run( void *data )
         }
         else if( !strcmp( psz_cmd, "get_time" ) )
         {
-            if( ! p_input )
+            if( p_sys->p_input == NULL )
             {
                 msg_rc("0");
             }
             else
             {
                 vlc_value_t time;
-                var_Get( p_input, "time", &time );
+                var_Get( p_sys->p_input, "time", &time );
                 msg_rc( "%"PRIu64, time.i_time / 1000000);
             }
         }
         else if( !strcmp( psz_cmd, "get_length" ) )
         {
-            if( ! p_input )
+            if( p_sys->p_input == NULL )
             {
                 msg_rc("0");
             }
             else
             {
                 vlc_value_t time;
-                var_Get( p_input, "length", &time );
+                var_Get( p_sys->p_input, "length", &time );
                 msg_rc( "%"PRIu64, time.i_time / 1000000);
             }
         }
         else if( !strcmp( psz_cmd, "get_title" ) )
         {
-            if( ! p_input )
+            if( p_sys->p_input == NULL )
             {
                 msg_rc("%s", "");
             }
             else
             {
-                msg_rc( "%s", input_GetItem(p_input)->psz_name );
+                msg_rc( "%s", input_GetItem(p_sys->p_input)->psz_name );
             }
         }
         else if( !strcmp( psz_cmd, "longhelp" ) || !strncmp( psz_cmd, "h", 1 )
@@ -750,15 +760,15 @@ static void *Run( void *data )
             bool fs;
 
             if( !strncasecmp( psz_arg, "on", 2 ) )
-                var_SetBool( p_playlist, "fullscreen", fs = true );
+                var_SetBool( p_sys->p_playlist, "fullscreen", fs = true );
             else if( !strncasecmp( psz_arg, "off", 3 ) )
-                var_SetBool( p_playlist, "fullscreen", fs = false );
+                var_SetBool( p_sys->p_playlist, "fullscreen", fs = false );
             else
-                fs = var_ToggleBool( p_playlist, "fullscreen" );
+                fs = var_ToggleBool( p_sys->p_playlist, "fullscreen" );
 
-            if( p_input )
+            if( p_sys->p_input == NULL )
             {
-                vout_thread_t *p_vout = input_GetVout( p_input );
+                vout_thread_t *p_vout = input_GetVout( p_sys->p_input );
                 if( p_vout )
                 {
                     var_SetBool( p_vout, "fullscreen", fs );
@@ -788,13 +798,6 @@ static void *Run( void *data )
     msg_rc( STATUS_CHANGE "( stop state: 0 )" );
     msg_rc( STATUS_CHANGE "( quit )" );
 
-    if( p_input )
-    {
-        var_DelCallback( p_input, "intf-event", InputEvent, p_intf );
-        vlc_object_release( p_input );
-    }
-
-    var_DelCallback( p_playlist, "volume", VolumeChanged, p_intf );
     return NULL;
 }
 
