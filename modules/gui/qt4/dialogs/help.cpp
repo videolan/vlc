@@ -184,9 +184,9 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     b_checked = false;
 
     setMinimumSize( 300, 300 );
-    setMaximumSize( 400, 300 );
+    setMaximumSize( 500, 300 );
 
-    restoreWidgetPosition( "Update", QSize( 300, 250 ) );
+    restoreWidgetPosition( "Update", maximumSize() );
 
     /* Check for updates */
     UpdateOrDownload();
