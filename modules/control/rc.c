@@ -361,6 +361,7 @@ static void Deactivate( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     intf_sys_t *p_sys = p_intf->p_sys;
 
+    vlc_cancel( p_sys->thread );
     var_DelCallback( p_sys->p_playlist, "volume", VolumeChanged, p_intf );
     vlc_join( p_sys->thread, NULL );
 
@@ -469,6 +470,7 @@ static void *Run( void *data )
     int  i_size = 0;
     int  i_oldpos = 0;
     int  i_newpos;
+    int  canc = vlc_savecancel( );
 
     p_buffer[0] = 0;
 
@@ -492,6 +494,8 @@ static void *Run( void *data )
         char *psz_cmd, *psz_arg;
         bool b_complete;
 
+        vlc_restorecancel( canc );
+
         if( p_sys->pi_socket_listen != NULL && p_sys->i_socket == -1 )
         {
             p_sys->i_socket =
@@ -500,6 +504,7 @@ static void *Run( void *data )
         }
 
         b_complete = ReadCommand( p_intf, p_buffer, &i_size );
+        canc = vlc_savecancel( );
 
         /* Manage the input part */
         if( p_sys->p_input == NULL )
@@ -797,6 +802,8 @@ static void *Run( void *data )
 
     msg_rc( STATUS_CHANGE "( stop state: 0 )" );
     msg_rc( STATUS_CHANGE "( quit )" );
+
+    vlc_restorecancel( canc );
 
     return NULL;
 }
