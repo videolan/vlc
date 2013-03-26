@@ -1,0 +1,11 @@
+--- gnutls/configure.ac.orig	2013-03-25 22:24:57.224241327 -0400
++++ gnutls/configure.ac	2013-03-25 22:25:10.930919097 -0400
+@@ -26,7 +26,7 @@
+ AC_CONFIG_MACRO_DIR([m4])
+ AC_CANONICAL_HOST
+ 
+-AM_INIT_AUTOMAKE([1.11.3 no-dist-gzip dist-xz dist-lzip -Wall -Wno-override])
++AM_INIT_AUTOMAKE([1.11.1 no-dist-gzip dist-xz -Wall -Wno-override])
+ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+ AC_CONFIG_HEADERS([config.h])
+ 
