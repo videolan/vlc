@@ -1,13 +1,15 @@
 Changes between 2.0.x and 2.1.0-git:
 --------------------------------
 
-Important changes for packagers:
+Important changes:
+ * The licenses of numerous modules have changed from GPLv2+ to LGPLv2.1+
+ * Discontinued support for PowerPC-based and 32bit Intel-based Macs
+   VLC requires Mac OS X 10.6 or later now on 64bit hardware
  * The --with-tuning and --without-tuning options are removed. To tune
    compilation for a specific processor type, set CFLAGS manually.
- * The licenses of numerous modules have changed from GPLv2+ to LGPLv2.1+
 
 3rd party libraries (contrib):
- * /extras/contrib has been replaced by a better system in /contrib
+ * /extras/contrib has been replaced by a cleaner system in /contrib
 
 Core:
  * Audio core rewrite
@@ -16,15 +18,16 @@ Core:
 Decoders:
  * Support for OPUS via libopus.
  * Support for CDXL, Ut Video, VBLE, Dxtory codecs via libavcodec.
- * Numerous improvements in OpenMAX IL codec
+ * Numerous improvements on the OpenMAX IL codec
  * Support for Ulead DV audio
  * Support for TechSmith Screen Codec 2, Microsoft Expression Encoder Screen,
-   Microsoft Application Screen Decoder 1 (MSS1)
+   Microsoft Application Screen Decoder 1 (MSS1) and 2 (MSS2)
  * Support for Indeo Audio Coder, RealAudio Lossless
  * Add Hardware Acceleration support on OS X for H.264 based upon VDADecoder
  * Add Hardware Acceleration support on Android Jelly Bean using MediaCodec
  * Support for SCTE-27 subtitles
  * Support for VDPAU hardware video decoding acceleration on Linux
+ * Split G.711 decoder from Araw decoder
 
 Encoders:
  * high10, high422 and high444 encoding support in h264
@@ -40,6 +43,8 @@ Access:
  * NTSC EIA-608 closed caption input support via V4L2 VBI devices
  * Add support for VNC/rfb in view only mode
  * Add support for Remote Desktop/RDP in view only mode
+ * Timecode: generate a clock/timecode as a subtitle track
+   vlc video.mkv --input-slave timecode:// --timecode-fps 30/1001
 
 Demuxers:
  * MP4: partial support for fragmented MP4
@@ -66,23 +71,28 @@ Audio output:
  * Rewrite of AudioQueue module for iOS (and OS X)
 
 Audio Filters:
- * new remapping channel filter
- * new filter to enhance stereo effect by mono suppression and delay effect
- * new VSXu visualization plugin
+ * New remapping channel filter
+ * New filter to enhance stereo effect by mono suppression and delay effect
+ * New VSXu visualization plugin
+ * ARM NEON acceleration of volume filter
 
 Video Outputs:
- * DecklinkOutput: New module using Blackmagic cards
+ * New module to output using Decklink Blackmagic cards
+ * New module using OpenMAX IL to output video
  * OpenGL: use glsl instead of ARB to do the YUV->RGB conversions
  * OpenGLES: add support for color conversation shaders on Android and iOS
+ * Fix and enable the OpenGL ES1 and ES2 modules
+   Also, subpictures now work in the OpenGL ES2 module
  * Fix the power management issue on Windows for standby management
 
 Video Filters:
- * new anaglyph video filter which transforms side by side 3D video streams in
+ * New anaglyph video filter which transforms side by side 3D video streams in
    anaglyph glasses (aka red/blue) compatible images.
  * Support in deinterlacing filter for most 4:2:0, 4:2:2, 4:4:4 YUV formats
    and for bits depth higher than 8bits (like 10bits)
  * Improvements on the transform filter, to support 10bits and RGB formats
  * Revival of the openCV and openCV example filters
+ * ARM NEON acceleration of chroma filters
 
 Stream Output:
  * Extended support for recording, notably for MKV and AVI
@@ -90,7 +100,6 @@ Stream Output:
  * Livehttp places more accurate segments durations in playlist
  * Livehttp allows setting cachin-variable in playlist
  * Livehttp stream encryption support
- * Unmaintained switcher has been removed
 
 Interfaces:
  * configurable password for the HTTP server.
@@ -103,10 +112,6 @@ Interfaces:
 Services discovery:
  * UPnP A/V subtitles
  * Support for multiple UPnP resources on a single item
-
-OS X Port:
- * Discontinued support for PowerPC-based and 32bit Intel-based Macs
- * VLC requires Mac OS X 10.6 or later now
 
 OS X Interface:
  * add support for multiple video outputs
@@ -171,6 +176,10 @@ Removed modules:
  * MSN messenger "now playing" (broken and unmaintained since VLC 1.0.0)
  * Telepathy framework "now playing" (broken and unmaintained since VLC 1.0.0)
  * Nokia/Maemo MCE screen unblanking plugin
+ * Broken crop video filter
+ * Switcher module
+ * OSD parser and menu
+ * Xscreensaver: use xdg-screensaver
 
 
 Changes between 2.0.4 and 2.0.5:
