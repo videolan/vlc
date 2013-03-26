@@ -14,6 +14,8 @@ Important changes:
 Core:
  * Audio core rewrite
  * Fix support for .001, .00x split files on Windows
+ * Full support for UNICODE Windows mode
+ * Partial support for Windows Store App
 
 Decoders:
  * Support for OPUS via libopus.
@@ -154,6 +156,13 @@ Qt:
  * Menus modifications and improvements
  * Playlist improvements and fixes, including PictureFlow view
  * Streaming output wizard rewrite
+ * Add bitrate graph in information panels
+ * Filters panels improvements, notably Equalizer and Compressor
+ * EPG display fixes and improvements
+ * Add SD pixmap sources
+ * Preferences hotkeys management fixes
+ * Display playlist total duration
+ * Support for a Maximum volume in the UI
  * Numerous fixes
 
 libVLC:
