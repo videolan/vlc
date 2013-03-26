@@ -249,7 +249,16 @@ void UpdateDialog::updateNotify( bool b_result )
                 .arg( p_release->i_extra == 0 ? "" : "." + QString::number( p_release->i_extra ) );
 
             ui.updateNotifyLabel->setText( message );
-            ui.updateNotifyTextEdit->setText( qfu( p_release->psz_desc ) );
+            message = qfu( p_release->psz_desc ).replace( "\n", "<br/>" );
+
+            /* Try to highlight releases featuring security changes */
+            int i_index = message.indexOf( "security", Qt::CaseInsensitive );
+            if ( i_index >= 0 )
+            {
+                message.insert( i_index + 8, "</font>" );
+                message.insert( i_index, "<font style=\"color:red\">" );
+            }
+            ui.updateNotifyTextEdit->setHtml( message );
 
             /* Force the dialog to be shown */
             this->show();
