@@ -96,8 +96,6 @@
 
 #include "ebml/StdIOCallback.h"
 
-#include <vlc_keys.h>
-
 extern "C" {
    #include "../mp4/libmp4.h"
 }
