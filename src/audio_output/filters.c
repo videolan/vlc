@@ -457,6 +457,11 @@ int aout_FiltersNew (audio_output_t *aout,
         var_InheritBool (aout, "audio-time-stretch") ? "scaletempo" : NULL;
     char *filters = var_InheritString (aout, "audio-filter");
     char *visual = var_InheritString (aout, "audio-visual");
+    if (visual != NULL && !strcasecmp (visual, "none"))
+    {
+        free (visual);
+        visual = NULL;
+    }
 
     if (request_vout != NULL)
         owner->request_vout = *request_vout;
@@ -465,7 +470,7 @@ int aout_FiltersNew (audio_output_t *aout,
         owner->request_vout.pf_request_vout = RequestVout;
         owner->request_vout.p_private = aout;
     }
-    owner->recycle_vout = (visual != NULL) && *visual;
+    owner->recycle_vout = visual != NULL;
 
     /* parse user filter lists */
     const char *list[AOUT_MAX_FILTERS];
