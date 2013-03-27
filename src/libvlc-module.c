@@ -147,7 +147,7 @@ static const char *const ppsz_snap_formats[] =
 #define VOLUME_STEP_TEXT N_("Audio output volume step")
 #define VOLUME_STEP_LONGTEXT N_( \
     "The step size of the volume is adjustable using this option.")
-#define AOUT_VOLUME_STEP 32
+#define AOUT_VOLUME_STEP 13
 
 #define VOLUME_SAVE_TEXT N_( "Remember the audio volume" )
 #define VOLUME_SAVE_LONGTEXT N_( \
