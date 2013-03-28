@@ -136,7 +136,7 @@ const QDateTime& EPGItem::start() const
     return m_start;
 }
 
-QDateTime EPGItem::end()
+QDateTime EPGItem::end() const
 {
     return QDateTime( m_start ).addSecs( m_duration );
 }
@@ -204,7 +204,7 @@ void EPGItem::setRating( uint8_t i_rating )
     m_rating = i_rating;
 }
 
-QString EPGItem::description()
+QString EPGItem::description() const
 {
     if( m_description.isEmpty() )
         return m_shortDescription;

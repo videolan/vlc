@@ -44,12 +44,12 @@ public:
     virtual void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0 );
 
     const QDateTime& start() const;
-    QDateTime end();
+    QDateTime end() const;
 
     int duration() const;
-    const QString& name() { return m_name; };
-    QString description();
-    int rating() { return m_rating; }
+    const QString& name() const { return m_name; }
+    QString description() const;
+    int rating() const { return m_rating; }
     bool setData( vlc_epg_event_t * );
     void setRow( unsigned int );
     void setCurrent( bool );
