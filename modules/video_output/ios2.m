@@ -89,9 +89,11 @@ vlc_module_end ()
     GLuint _frameBuffer;
 
     BOOL _bufferNeedReset;
+    BOOL _appActive;
 }
 @property (readwrite) vout_display_t* voutDisplay;
 @property (readonly) EAGLContext* eaglContext;
+@property (readonly) BOOL isAppActive;
 
 - (void)createBuffers;
 - (void)destroyBuffers;
@@ -189,6 +191,8 @@ static int Open(vlc_object_t *this)
     vd->control = Control;
 
     /* */
+    [[NSNotificationCenter defaultCenter] addObserver:sys->glESView selector:@selector(applicationStateChanged:) name:UIApplicationWillResignActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:sys->glESView selector:@selector(applicationStateChanged:) name:UIApplicationDidBecomeActiveNotification object:nil];
     [sys->glESView performSelectorOnMainThread:@selector(reshape) withObject:nil waitUntilDone:YES];
 
     [autoreleasePool release];
@@ -311,7 +315,8 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *sub
 {
     vout_display_sys_t *sys = vd->sys;
     sys->has_first_frame = true;
-    vout_display_opengl_Display(sys->vgl, &vd->source);
+    if ([sys->glESView isAppActive])
+        vout_display_opengl_Display(sys->vgl, &vd->source);
 
     picture_Release(pic);
 
@@ -324,7 +329,8 @@ static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subp
 
     vout_display_sys_t *sys = vd->sys;
 
-    vout_display_opengl_Prepare(sys->vgl, pic, subpicture);
+    if ([sys->glESView isAppActive])
+        vout_display_opengl_Prepare(sys->vgl, pic, subpicture);
 }
 
 static picture_pool_t *PicturePool(vout_display_t *vd, unsigned requested_count)
@@ -350,14 +356,15 @@ static int OpenglESClean(vlc_gl_t *gl)
 static void OpenglESSwap(vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
-    [[sys->glESView eaglContext] presentRenderbuffer:GL_RENDERBUFFER];
+    if ([sys->glESView isAppActive])
+        [[sys->glESView eaglContext] presentRenderbuffer:GL_RENDERBUFFER];
 }
 
 /*****************************************************************************
  * Our UIView object
  *****************************************************************************/
 @implementation VLCOpenGLES2VideoView
-@synthesize voutDisplay = _voutDisplay, eaglContext = _eaglContext;
+@synthesize voutDisplay = _voutDisplay, eaglContext = _eaglContext, isAppActive = _appActive;
 
 + (Class)layerClass
 {
@@ -383,6 +390,8 @@ static void OpenglESSwap(vlc_gl_t *gl)
     [self performSelectorOnMainThread:@selector(createBuffers) withObject:nil waitUntilDone:YES];
     [self performSelectorOnMainThread:@selector(reshape) withObject:nil waitUntilDone:NO];
     [self setAutoresizingMask: UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
+
+    _appActive = ([UIApplication sharedApplication].applicationState == UIApplicationStateActive);
 
     return self;
 }
@@ -482,6 +491,14 @@ static void OpenglESSwap(vlc_gl_t *gl)
 
     // x / y are top left corner, but we need the lower left one
     glViewport(place.x, place.y, place.width, place.height);
+}
+
+- (void)applicationStateChanged:(NSNotification *)notification
+{
+    if ([[notification name] isEqualToString: UIApplicationWillResignActiveNotification])
+        _appActive = NO;
+    else
+        _appActive = YES;
 }
 
 - (void)updateConstraints
