@@ -185,7 +185,8 @@ else
   export ASCPP="xcrun as"
 fi
 
-../bootstrap --host=${TARGET} --build="i686-apple-darwin10" --disable-disc --disable-sout \
+../bootstrap --host=${TARGET} --build="i686-apple-darwin10" --disable-gpl \
+    --disable-disc --disable-sout \
     --enable-small \
     --disable-sdl \
     --disable-SDL_image \
