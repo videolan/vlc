@@ -112,12 +112,12 @@ void EPGView::updateChannels()
     mutex.unlock();
 }
 
-const QDateTime& EPGView::startTime()
+const QDateTime& EPGView::startTime() const
 {
     return m_startTime;
 }
 
-const QDateTime& EPGView::baseTime()
+const QDateTime& EPGView::baseTime() const
 {
     return m_baseTime;
 }

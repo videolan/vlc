@@ -58,8 +58,8 @@ public:
     void            setScale( double scaleFactor );
 
     void            updateStartTime();
-    const QDateTime& startTime();
-    const QDateTime& baseTime();
+    const QDateTime& startTime() const;
+    const QDateTime& baseTime() const;
 
     bool            addEPGEvent( vlc_epg_event_t*, QString, bool );
     void            removeEPGEvent( vlc_epg_event_t*, QString );
