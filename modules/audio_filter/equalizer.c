@@ -254,20 +254,15 @@ static void EqzCoeffs( int i_rate, float f_octave_percent,
         {
             float f_theta_1 = ( 2.0 * M_PI * f_freq ) / f_rate;
             float f_theta_2 = f_theta_1 / f_octave_factor;
-            float f_sin     = sin( f_theta_2 ) * 0.5;
+            float f_sin     = sin( f_theta_2 );
             float f_sin_prd = sin( f_theta_2 * f_octave_factor_1 )
                             * sin( f_theta_2 * f_octave_factor_2 );
-            /* The equation from equ-xmms simplifies to something similar to
-             * this when you restrict the domain to all valid frequencies at or
-             * below the Nyquist frequency (the interval 0 <= f_theta_1 <= Pi).
-             * (This result for the root is twice that returned by equ-xmms,
-             * but the more efficient calculations for alpha, beta, and gamma
-             * below compensate for this.) */
-            float f_root    = ( f_sin - f_sin_prd ) / ( f_sin + f_sin_prd );
+            float f_sin_hlf = f_sin * 0.5;
+            float f_den     = f_sin_hlf + f_sin_prd;
 
-            p_eqz_config->band[i].f_alpha = ( 1.0 - f_root ) * 0.5;
-            p_eqz_config->band[i].f_beta  = f_root;
-            p_eqz_config->band[i].f_gamma = ( 1.0 + f_root ) * cos( f_theta_1 );
+            p_eqz_config->band[i].f_alpha = f_sin_prd / f_den;
+            p_eqz_config->band[i].f_beta  = ( f_sin_hlf - f_sin_prd ) / f_den;
+            p_eqz_config->band[i].f_gamma = f_sin * cos( f_theta_1 ) / f_den;
         }
         else
         {
