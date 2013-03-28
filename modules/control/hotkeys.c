@@ -476,7 +476,8 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 var_FreeList( &list, &list2 );
             }
             break;
-        case ACTIONID_PROGRAM_SID:
+        case ACTIONID_PROGRAM_SID_NEXT:
+        case ACTIONID_PROGRAM_SID_PREV:
             if( p_input )
             {
                 vlc_value_t val, list, list2;
@@ -500,17 +501,25 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                         break;
                     }
                 }
-                /* value of program was not in choices list */
+                /* value of program sid was not in choices list */
                 if( i == i_count )
                 {
                     msg_Warn( p_input,
                               "invalid current program SID, selecting 0" );
                     i = 0;
                 }
-                else if( i == i_count - 1 )
-                    i = 0;
-                else
-                    i++;
+                else if( i_action == ACTIONID_PROGRAM_SID_NEXT ) {
+                    if( i == i_count - 1 )
+                        i = 0;
+                    else
+                        i++;
+                    }
+                else { /* ACTIONID_PROGRAM_SID_PREV */
+                    if( i == 0 )
+                        i = i_count - 1;
+                    else
+                        i--;
+                    }
                 var_Set( p_input, "program", list.p_list->p_values[i] );
                 DisplayMessage( p_vout, _("Program Service ID: %s"),
                                 list2.p_list->p_values[i].psz_string );

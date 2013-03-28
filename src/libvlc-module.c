@@ -1364,8 +1364,10 @@ static const char *const mouse_wheel_texts[] =
 #define AUDIO_TRACK_KEY_LONGTEXT N_("Cycle through the available audio tracks(languages).")
 #define SUBTITLE_TRACK_KEY_TEXT N_("Cycle subtitle track")
 #define SUBTITLE_TRACK_KEY_LONGTEXT N_("Cycle through the available subtitle tracks.")
-#define PROGRAM_SID_KEY_TEXT N_("Cycle program Service ID")
-#define PROGRAM_SID_KEY_LONGTEXT N_("Cycle through the available program Service IDs (SIDs).")
+#define PROGRAM_SID_NEXT_KEY_TEXT N_("Cycle next program Service ID")
+#define PROGRAM_SID_NEXT_KEY_LONGTEXT N_("Cycle through the available next program Service IDs (SIDs).")
+#define PROGRAM_SID_PREV_KEY_TEXT N_("Cycle previous program Service ID")
+#define PROGRAM_SID_PREV_KEY_LONGTEXT N_("Cycle through the available previous program Service IDs (SIDs).")
 #define ASPECT_RATIO_KEY_TEXT N_("Cycle source aspect ratio")
 #define ASPECT_RATIO_KEY_LONGTEXT N_("Cycle through a predefined list of source aspect ratios.")
 #define CROP_KEY_TEXT N_("Cycle video crop")
@@ -2182,7 +2184,8 @@ vlc_module_begin ()
 #   define KEY_AUDIODELAY_DOWN    "f"
 #   define KEY_AUDIO_TRACK        "l"
 #   define KEY_SUBTITLE_TRACK     "s"
-#   define KEY_PROGRAM_SID        "x"
+#   define KEY_PROGRAM_SID_NEXT   "x"
+#   define KEY_PROGRAM_SID_PREV   "Shift+x"
 #   define KEY_ASPECT_RATIO       "a"
 #   define KEY_CROP               "c"
 #   define KEY_TOGGLE_AUTOSCALE   "o"
@@ -2294,7 +2297,8 @@ vlc_module_begin ()
 
 #   define KEY_AUDIO_TRACK        "b"
 #   define KEY_SUBTITLE_TRACK     "v"
-#   define KEY_PROGRAM_SID        "x"
+#   define KEY_PROGRAM_SID_NEXT   "x"
+#   define KEY_PROGRAM_SID_PREV   "Shift+x"
 #   define KEY_ASPECT_RATIO       "a"
 #   define KEY_CROP               "c"
 #   define KEY_TOGGLE_AUTOSCALE   "o"
@@ -2452,8 +2456,10 @@ vlc_module_begin ()
              AUDI_DEVICE_CYCLE_KEY_LONGTEXT, false )
     add_key( "key-subtitle-track", KEY_SUBTITLE_TRACK,
              SUBTITLE_TRACK_KEY_TEXT, SUBTITLE_TRACK_KEY_LONGTEXT, false )
-    add_key( "key-program-sid", KEY_PROGRAM_SID,
-             PROGRAM_SID_KEY_TEXT, PROGRAM_SID_KEY_LONGTEXT, false )
+    add_key( "key-program-sid-next", KEY_PROGRAM_SID_NEXT,
+             PROGRAM_SID_NEXT_KEY_TEXT, PROGRAM_SID_NEXT_KEY_LONGTEXT, false )
+    add_key( "key-program-sid-prev", KEY_PROGRAM_SID_PREV,
+             PROGRAM_SID_PREV_KEY_TEXT, PROGRAM_SID_PREV_KEY_LONGTEXT, false )
     add_key( "key-aspect-ratio", KEY_ASPECT_RATIO,
              ASPECT_RATIO_KEY_TEXT, ASPECT_RATIO_KEY_LONGTEXT, false )
     add_key( "key-crop", KEY_CROP,
