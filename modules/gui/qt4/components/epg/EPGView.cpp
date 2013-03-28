@@ -196,6 +196,11 @@ bool EPGView::addEPGEvent( vlc_epg_event_t *eventdata, QString channelName, bool
         scene()->addItem( epgItem );
         /* update only our row (without calling the updatechannels()) */
         epgItem->setRow( epgitemsByChannel.keys().indexOf( channelName ) );
+
+        /* First Insert, needs to focus by default then */
+        if ( epgitemsByChannel.keys().count() == 1 &&
+             epgItemByTime->count() == 1 )
+            focusItem( epgItem );
     }
     mutex.unlock();
 
