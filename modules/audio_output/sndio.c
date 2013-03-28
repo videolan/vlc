@@ -54,8 +54,8 @@ static void PositionChanged (void *, int);
 struct aout_sys_t
 {
     struct sio_hdl *hdl;
-    unsigned long long read_offset;
-    unsigned long long write_offset;
+    int started;
+    int delay;
     unsigned rate;
     unsigned volume;
     bool mute;
@@ -69,21 +69,39 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     sys->hdl = sio_open (NULL, SIO_PLAY, 0 /* blocking */);
     if (sys->hdl == NULL)
     {
-        msg_Err (obj, "cannot create audio playback stream");
-        free (sys);
+        msg_Err (aout, "cannot create audio playback stream");
         return VLC_EGENERIC;
     }
-    aout->sys = sys;
 
     struct sio_par par;
     sio_initpar (&par);
-    par.bits = 16;
-    par.bps = par.bits >> 3;
-    par.sig = 1;
-    par.le = SIO_LE_NATIVE;
+    switch (fmt->i_format) {
+    case VLC_CODEC_S8:
+	par.bits = 8;
+	par.sig = 0;
+	break;
+    case VLC_CODEC_S16N:
+	par.bits = 16;
+	par.sig = 1;
+	par.le = SIO_LE_NATIVE;
+	break;
+    case VLC_CODEC_S32N:
+    case VLC_CODEC_FL32:
+    case VLC_CODEC_FL64:
+	par.bits = 32;
+	par.sig = 1;
+	par.le = SIO_LE_NATIVE;
+	break;
+    default:
+	/* use a common audio format */
+	par.bits = 16;
+	par.sig = 1;
+	par.le = SIO_LE_NATIVE;
+    }
     par.pchan = aout_FormatNbChannels (fmt);
     par.rate = fmt->i_rate;
-    par.xrun = SIO_SYNC;
+    par.round = par.rate / 50;
+    par.appbufsz = par.rate / 4;
 
     if (!sio_setpar (sys->hdl, &par) || !sio_getpar (sys->hdl, &par))
     {
@@ -91,7 +109,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         goto error;
     }
 
-    if (par.bps != par.bits >> 3)
+    if (par.bps != par.bits >> 3 && !par.msb)
     {
         msg_Err (aout, "unsupported audio sample format (%u bits in %u bytes)",
                  par.bits, par.bps);
@@ -99,23 +117,16 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
     if (par.sig != (par.bits != 8))
     {
-        msg_Err (obj, "unsupported audio sample format (%ssigned)",
+        msg_Err (aout, "unsupported audio sample format (%ssigned)",
                  par.sig ? "" : "un");
         goto error;
     }
-#ifdef WORDS_BIGENDIAN
-    if (par.le)
+    if (par.bps > 1 && par.le != SIO_LE_NATIVE)
     {
-        msg_Err (obj, "unsupported audio sample format (little endian)");
+        msg_Err (aout, "unsupported audio sample format (%s endian)",
+		 par.le ? "little" : "big");
         goto error;
     }
-#else
-    if (!par.le)
-    {
-        msg_Err (obj, "unsupported audio sample format (big endian)");
-        goto error;
-    }
-#endif
     switch (par.bits)
     {
         case 8:
@@ -163,7 +174,6 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     fmt->i_original_channels = fmt->i_physical_channels = chans;
     aout_FormatPrepare (fmt);
 
-    aout->sys = sys;
     aout->time_get = TimeGet;
     aout->play = Play;
     aout->pause = NULL;
@@ -179,8 +189,8 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         aout->mute_set = NULL;
     }
 
-    sys->read_offset = 0;
-    sys->write_offset = 0;
+    sys->started = 0;
+    sys->delay = 0;
     sio_onmove (sys->hdl, PositionChanged, aout);
     sio_start (sys->hdl);
     return VLC_SUCCESS;
@@ -190,9 +200,8 @@ error:
     return VLC_EGENERIC;
 }
 
-static void Close (vlc_object_t *obj)
+static void Stop (audio_output_t *aout)
 {
-    audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
 
     sio_close (sys->hdl);
@@ -203,18 +212,17 @@ static void PositionChanged (void *arg, int delta)
     audio_output_t *aout = arg;
     aout_sys_t *sys = aout->sys;
 
-    sys->read_offset += delta;
+    sys->delay -= delta;
+    sys->started = 1;
 }
 
 static int TimeGet (audio_output_t *aout, mtime_t *restrict delay)
 {
     aout_sys_t *sys = aout->sys;
-    long long frames = sys->write_offset - sys->read_offset;
 
-    if (frames == 0)
-        return -1;
-
-    *delay = frames * CLOCK_FREQ / sys->rate;
+    if (!sys->started)
+	return -1;
+    *delay = (mtime_t)sys->delay * CLOCK_FREQ / sys->rate;
     return 0;
 }
 
@@ -222,35 +230,20 @@ static void Play (audio_output_t *aout, block_t *block)
 {
     aout_sys_t *sys = aout->sys;
 
-    sys->write_offset += block->i_nb_samples;
-
-    while (block->i_buffer > 0 && !sio_eof (sys->hdl))
-    {
-        size_t bytes = sio_write (sys->hdl, block->p_buffer, block->i_buffer);
-
-        block->p_buffer += bytes;
-        block->i_buffer -= bytes;
-        /* Note that i_nb_samples and i_pts are not updated here. */
-    }
+    sio_write (sys->hdl, block->p_buffer, block->i_buffer);
+    sys->delay += block->i_nb_samples;
     block_Release (block);
 }
 
 static void Flush (audio_output_t *aout, bool wait)
 {
-    if (wait)
-    {
-        long long frames = sys->write_offset - sys->read_offset;
+    aout_sys_t *sys = aout->sys;
 
-        if (frames > 0)
-            msleep (frames * CLOCK_FREQ / sys->rate);
-    }
-    else
-    {
-        sio_stop (sys->hdl);
-        sys->read_offset = 0;
-        sys->write_offset = 0;
-        sio_start (sys->hdl);
-    }
+    sio_stop (sys->hdl);
+    sys->started = 0;
+    sys->delay = 0;
+    sio_start (sys->hdl);
+    (void)wait;
 }
 
 static void VolumeChanged (void *arg, unsigned volume)
@@ -267,8 +260,13 @@ static void VolumeChanged (void *arg, unsigned volume)
 static int VolumeSet (audio_output_t *aout, float fvol)
 {
     aout_sys_t *sys = aout->sys;
-    unsigned volume = lroundf (fvol * SIO_MAXVOL);
+    unsigned volume;
 
+    if (fvol < 0)
+	fvol = 0;
+    if (fvol > 1)
+	fvol = 1;
+    volume = lroundf (fvol * SIO_MAXVOL);
     if (!sys->mute && !sio_setvol (sys->hdl, volume))
         return -1;
     sys->volume = volume;
