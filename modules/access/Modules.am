@@ -183,7 +183,7 @@ libscreen_plugin_la_SOURCES += screen/win32.c
 libscreen_plugin_la_LIBADD += -lgdi32
 libvlc_LTLIBRARIES += libscreen_plugin.la
 endif
-if HAVE_DARWIN
+if HAVE_MAC_SCREEN
 libscreen_plugin_la_SOURCES += screen/mac.c
 libscreen_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 libscreen_plugin_la_LDFLAGS += "-Wl,-framework,OpenGL,-framework,ApplicationServices"

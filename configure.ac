@@ -1892,13 +1892,12 @@ AC_ARG_ENABLE(screen,
     [disable screen capture (default enabled)])])
 if test "${enable_screen}" != "no"; then
   if test "${SYS}" = "darwin"; then
-    AC_CHECK_HEADERS(OpenGL/gl.h, [
-      AC_CHECK_HEADERS(ApplicationServices/ApplicationServices.h, [
-        VLC_ADD_PLUGIN([screen])
-      ])
+    AC_CHECK_HEADERS(ApplicationServices/ApplicationServices.h, [
+      VLC_ADD_PLUGIN([screen])
     ])
   fi
 fi
+AM_CONDITIONAL(HAVE_MAC_SCREEN, [test "${SYS}" = "darwin" -a "x${enable_screen}" != "xno"])
 
 dnl
 dnl  VNC/RFB access module

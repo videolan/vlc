@@ -199,7 +199,6 @@ fi
     --disable-caca \
     --disable-gettext \
     --disable-mpcdec \
-    --disable-screen \
     --disable-upnp \
     --disable-gme \
     --disable-tremor \
@@ -311,6 +310,7 @@ ${VLCROOT}/configure \
     --enable-speex \
     --enable-theora \
     --enable-flac \
+    --disable-screen \
     --disable-freetype \
     --disable-taglib \
     --disable-mmx > ${out} # MMX and SSE support requires llvm which is broken on Simulator
