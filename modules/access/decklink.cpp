@@ -340,7 +340,9 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
                         if (!(cc_count & 0xe0))
                             continue;
                         cc_count &= 0x1f;
-                        if ((len - 13) != cc_count * 3)
+
+                        /* FIXME: parse additional data (CC language?) */
+                        if ((len - 13) < cc_count * 3)
                             continue;
 
                         if (cdp[len - 4] != 0x74) /* footer id */
