@@ -415,7 +415,6 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
         if (audio_frame->i_pts > sys->last_pts)
             sys->last_pts = audio_frame->i_pts;
         vlc_mutex_unlock(&sys->pts_lock);
-        if (audio_frame->i_pts > sys->last_pts)
 
         es_out_Control(demux_->out, ES_OUT_SET_PCR, audio_frame->i_pts);
         es_out_Send(demux_->out, sys->audio_es, audio_frame);
