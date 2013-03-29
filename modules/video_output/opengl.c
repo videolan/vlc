@@ -714,10 +714,10 @@ static void Upload(vout_display_opengl_t *vgl, int in_width, int in_height,
     // This unpack alignment is the default, but setting it just in case.
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 #ifndef GL_UNPACK_ROW_LENGTH
-    if ( pitch != ALIGN(full_width * pixel_pitch, 4) )
+    int dst_width = full_upload ? full_width : width;
+    int dst_pitch = ALIGN(dst_width * pixel_pitch, 4);
+    if ( pitch != dst_pitch )
     {
-        int dst_width = full_upload ? full_width : width;
-        int dst_pitch = ALIGN(dst_width * pixel_pitch, 4);
         int buf_size = dst_pitch * full_height * pixel_pitch;
         const uint8_t *source = pixels;
         uint8_t *destination;
@@ -759,7 +759,7 @@ static void Upload(vout_display_opengl_t *vgl, int in_width, int in_height,
         else
             glTexSubImage2D(tex_target, 0,
                             0, 0,
-                            full_width, full_height,
+                            width, height,
                             tex_format, tex_type, pixels);
     }
 }
