@@ -33,6 +33,8 @@
 #include "../vlc.h"
 #include "../libs.h"
 
+#ifndef WINAPI_FAMILY_APP
+
 /* Based on modules/control/rc.c and include/vlc_interface.h */
 static HANDLE GetConsole( lua_State *L )
 {
@@ -156,4 +158,4 @@ void luaopen_win( lua_State *L )
     lua_setfield( L, -2, "win" );
 }
 
-
+#endif /* WINAPI_FAMILY_APP */
