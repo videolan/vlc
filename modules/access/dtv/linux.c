@@ -810,21 +810,22 @@ known:
           uncmd.msg_len = 4; /* length */
           if (ioctl (d->frontend, FE_DISEQC_SEND_MASTER_CMD, &uncmd) < 0)
           {
-              msg_Err (d->obj, "cannot send DiSEqC command: %m");
+              msg_Err (d->obj, "cannot send uncommitted DiSEqC command: %m");
               return -1;
           }
           /* Repeat uncommitted command */
           uncmd.msg[0] = 0xE1; /* framing: master, no reply, repeated TX */
           if (ioctl (d->frontend, FE_DISEQC_SEND_MASTER_CMD, &uncmd) < 0)
           {
-              msg_Err (d->obj, "cannot send DiSEqC command: %m");
+              msg_Err (d->obj,
+                       "cannot send repeated uncommitted DiSEqC command: %m");
               return -1;
           }
           msleep(125000); /* wait 125 ms before committed DiSEqC command */
         }
         if (ioctl (d->frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd) < 0)
         {
-            msg_Err (d->obj, "cannot send DiSEqC command: %m");
+            msg_Err (d->obj, "cannot send committed DiSEqC command: %m");
             return -1;
         }
         msleep (54000 + 15000);
