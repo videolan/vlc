@@ -357,14 +357,7 @@ fin:
 
 UString* Playtree::getTitle( input_item_t *pItem )
 {
-    char *psz_name = input_item_GetTitle( pItem );
-    if( EMPTY_STR( psz_name ) )
-    {
-        free( psz_name );
-        psz_name = input_item_GetName( pItem );
-    }
-    if( !psz_name )
-        psz_name = strdup ( "" );
+    char *psz_name = input_item_GetTitleFbName( pItem );
     UString *pTitle = new UString( getIntf(), psz_name );
     free( psz_name );
     return pTitle;
