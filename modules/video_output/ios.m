@@ -27,8 +27,6 @@
  *****************************************************************************/
 
 #import <UIKit/UIKit.h>
-#import <OpenGLES/ES1/gl.h>
-#import <OpenGLES/ES1/glext.h>
 #import <QuartzCore/QuartzCore.h>
 #import <dlfcn.h>
 
