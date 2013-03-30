@@ -207,7 +207,7 @@ bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, con
     {
         if( !model->isCurrentItem( model->rootIndex(), PLModel::IN_PLAYLIST ) )
         {
-            ADD_MENU_ENTRY( QIcon(), qtr("Add to playlist"),
+            ADD_MENU_ENTRY( QIcon(), qtr(I_PL_ADDPL),
                             container.ACTION_ADDTOPLAYLIST, selectionlist );
         }
     }

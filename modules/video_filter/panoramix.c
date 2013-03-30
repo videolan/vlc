@@ -66,7 +66,7 @@
     "which to split the video")
 
 #define ACTIVE_TEXT N_("Active windows")
-#define ACTIVE_LONGTEXT N_("Comma separated list of active windows, " \
+#define ACTIVE_LONGTEXT N_("Comma-separated list of active windows, " \
     "defaults to all")
 
 #define CFG_PREFIX "panoramix-"

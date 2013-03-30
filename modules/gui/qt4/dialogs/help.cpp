@@ -110,7 +110,7 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf)
                 "CDs, DVDs, network streams, capture cards and even more!\n"
                 "VLC uses its internal codecs and works on essentially every "
                 "popular platform.\n\n" )
-            + qtr( "This version of VLC was compiled by:\n " )
+            + qtr( "This version of VLC was compiled by:\n" )
             + qfu( VLC_CompileBy() )+ " on " + qfu( VLC_CompileHost() ) +
             + " ("__DATE__" "__TIME__").\n"
             + qtr( "Compiler: " ) + qfu( VLC_Compiler() ) + ".\n"
