@@ -32,6 +32,7 @@
 #include <vlc_vout.h>
 #include <vlc_playlist.h>
 #include <vlc_url.h>
+#include <vlc_strings.h>
 
 #include "vlcproc.hpp"
 #include "os_factory.hpp"
@@ -789,6 +790,7 @@ void VlcProc::init_variables()
 
 void VlcProc::update_current_input()
 {
+    playlist_t* pPlaylist = getIntf()->p_sys->p_playlist;
     input_thread_t* pInput = getIntf()->p_sys->p_input;
     if( !pInput )
         return;
@@ -796,16 +798,11 @@ void VlcProc::update_current_input()
     input_item_t *pItem = input_GetItem( pInput );
     if( pItem )
     {
-        // Update short name
-        char *psz_name = input_item_GetTitle( pItem );
-        if( EMPTY_STR( psz_name ) )
-        {
-            free( psz_name );
-            psz_name = input_item_GetName( pItem );
-        }
-        if( !psz_name )
-            psz_name = strdup ( "" );
+        // Update short name (as defined by --input-title-format)
+        char *psz_fmt = var_InheritString( getIntf(), "input-title-format" );
+        char *psz_name = str_format_meta( pPlaylist, psz_fmt );
         SET_TEXT( m_cVarStreamName, UString( getIntf(), psz_name ) );
+        free( psz_fmt );
         free( psz_name );
 
         // Update local path (if possible) or full uri
