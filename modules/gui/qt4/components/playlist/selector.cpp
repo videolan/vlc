@@ -292,7 +292,6 @@ void PLSelector::createItems()
             {
                 int i_head = name.indexOf( "sd='" ) + 4;
                 int i_tail = name.indexOf( '\'', i_head );
-                name.mid( i_head, i_tail - i_head );
                 QString iconname = QString( ":/sidebar/sd/%1" ).arg( name.mid( i_head, i_tail - i_head ) );
                 QResource resource( iconname );
                 if ( !resource.isValid() )
