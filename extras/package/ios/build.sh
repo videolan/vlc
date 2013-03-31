@@ -82,6 +82,7 @@ if [ "$PLATFORM" = "Simulator" ]; then
     OPTIM="-O3 -g"
 else
     TARGET="arm-apple-darwin11"
+    OPTIM="-O3 -g"
 fi
 
 info "Using ${ARCH} with SDK version ${SDK_VERSION}"
@@ -212,7 +213,7 @@ fi
     --disable-orc \
     --disable-schroedinger \
     --disable-libmpeg2 \
-    --enable-mad > ${out}
+    --disable-mad > ${out}
 
 echo "EXTRA_CFLAGS += ${EXTRA_CFLAGS}" >> config.mak
 echo "EXTRA_LDFLAGS += ${EXTRA_LDFLAGS}" >> config.mak
@@ -272,7 +273,6 @@ ${VLCROOT}/configure \
     --disable-sout \
     --disable-faad \
     --disable-lua \
-    --enable-mad \
     --disable-a52 \
     --disable-fribidi \
     --disable-macosx-audio \
@@ -314,7 +314,8 @@ ${VLCROOT}/configure \
     --disable-screen \
     --disable-freetype \
     --disable-taglib \
-    --disable-mmx > ${out} # MMX and SSE support requires llvm which is broken on Simulator
+    --disable-mmx \
+    --disable-mad > ${out} # MMX and SSE support requires llvm which is broken on Simulator
 fi
 
 CORE_COUNT=`sysctl -n machdep.cpu.core_count`
@@ -383,7 +384,6 @@ logger
 visual
 fb
 aout_file
-yuv
 dummy
 invert
 sepia
@@ -396,7 +396,6 @@ extract
 colorthres
 antiflicker
 anaglyph
-adjust
 remap
 "
 
