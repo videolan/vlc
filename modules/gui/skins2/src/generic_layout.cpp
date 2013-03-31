@@ -37,7 +37,9 @@
 GenericLayout::GenericLayout( intf_thread_t *pIntf, int width, int height,
                               int minWidth, int maxWidth, int minHeight,
                               int maxHeight ):
-    SkinObject( pIntf ), m_pWindow( NULL ), m_rect( 0, 0, width, height ),
+    SkinObject( pIntf ), m_pWindow( NULL ),
+    m_original_width( width ), m_original_height( height ),
+    m_rect( 0, 0, width, height ),
     m_minWidth( minWidth ), m_maxWidth( maxWidth ),
     m_minHeight( minHeight ), m_maxHeight( maxHeight ), m_pVideoCtrlSet(),
     m_visible( false ), m_pVarActive( NULL )
