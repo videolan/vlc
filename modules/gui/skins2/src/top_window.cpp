@@ -351,7 +351,13 @@ void TopWindow::setActiveLayout( GenericLayout *pLayout )
         }
         // The current layout becomes inactive
         m_pActiveLayout->getActiveVar().set( false );
-        pLayout->resize( m_pActiveLayout->getWidth(), m_pActiveLayout->getHeight() );
+
+        // if both layouts have the same original size, infer a
+        // subsequent resize of the active layout has to be applied
+        // to the new layout about to become active
+        if( pLayout->isTightlyCoupledWith( *m_pActiveLayout ) )
+            pLayout->resize( m_pActiveLayout->getWidth(),
+                             m_pActiveLayout->getHeight() );
     }
 
     pLayout->setWindow( this );
