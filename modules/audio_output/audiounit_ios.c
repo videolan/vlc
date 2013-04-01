@@ -392,9 +392,8 @@ static OSStatus RenderCallback(vlc_object_t *p_obj,
 
     /* check if we have enough data */
     if (!availableBytes) {
-        /* return an empty buffer so silence is played until we have data */
-        for (UInt32 j = 0; j < inNumberFrames; j++)
-            targetBuffer[j] = 0.;
+        /* bail out and restart unit the next time we receive some data */
+        Flush(p_aout, false);
     } else {
         memcpy(targetBuffer, buffer, __MIN(bytesToCopy, availableBytes));
         TPCircularBufferConsume(&p_sys->circular_buffer, __MIN(bytesToCopy, availableBytes));
