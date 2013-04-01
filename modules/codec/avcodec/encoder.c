@@ -118,6 +118,7 @@ struct encoder_sys_t
     size_t i_frame_size;
     size_t i_samples_delay; //How much samples in delay buffer
     bool b_planar;
+    bool b_variable;    //Encoder can be fed with any size frames not just frame_size
     mtime_t i_pts;
     date_t  buffer_date;
 
@@ -862,6 +863,8 @@ int OpenEncoder( vlc_object_t *p_this )
         }
         p_enc->fmt_out.audio.i_blockalign = p_context->block_align;
         p_enc->fmt_out.audio.i_bitspersample = aout_BitsPerSample( p_enc->fmt_out.i_codec );
+        //b_variable tells if we can feed any size frames to encoder
+        p_sys->b_variable = p_context->frame_size ? false : true;
 
         p_sys->i_buffer_out = p_sys->i_frame_size * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels;
     }
@@ -1205,7 +1208,9 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         return p_chain;
     }
 
-    while( i_samples_left >= p_sys->i_frame_size )
+
+    while( ( p_aout_buf->i_nb_samples >= p_sys->i_frame_size ) ||
+           ( p_sys->b_variable && p_aout_buf->i_nb_samples ) )
     {
         AVPacket packet = {0};
 
@@ -1214,7 +1219,10 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
             date_Set( &p_sys->buffer_date, p_aout_buf->i_pts );
 
         avcodec_get_frame_defaults( p_sys->frame );
-        p_sys->frame->nb_samples = p_sys->i_frame_size;
+        if( p_sys->b_variable )
+            p_sys->frame->nb_samples = p_aout_buf->i_nb_samples;
+        else
+            p_sys->frame->nb_samples = p_sys->i_frame_size;
         p_sys->frame->format     = p_sys->p_context->sample_fmt;
         p_sys->frame->pts        = date_Get( &p_sys->buffer_date );
 
