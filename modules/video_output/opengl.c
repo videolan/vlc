@@ -465,6 +465,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->tex_type     = GL_UNSIGNED_BYTE;
     /* Use YUV if possible and needed */
     bool need_fs_yuv = false;
+    bool need_fs_rgba = USE_OPENGL_ES == 2;
     float yuv_range_correction = 1.0;
 
     if (max_texture_units >= 3 && supports_shaders && vlc_fourcc_IsYUV(fmt->i_chroma)) {
@@ -520,7 +521,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->shader[1] =
     vgl->shader[2] = -1;
     vgl->local_count = 0;
-    if (supports_shaders && need_fs_yuv) {
+    if (supports_shaders && (need_fs_yuv || need_fs_rgba)) {
 #ifdef SUPPORTS_SHADERS
         BuildYUVFragmentShader(vgl, &vgl->shader[0], &vgl->local_count,
                                vgl->local_value, fmt, yuv_range_correction);
@@ -915,13 +916,19 @@ static void DrawWithoutShaders(vout_display_opengl_t *vgl,
 
 #ifdef SUPPORTS_SHADERS
 static void DrawWithShaders(vout_display_opengl_t *vgl,
-                            float *left, float *top, float *right, float *bottom)
+                            float *left, float *top, float *right, float *bottom,
+                            int program)
 {
-    vgl->UseProgram(vgl->program[0]);
-    vgl->Uniform4fv(vgl->GetUniformLocation(vgl->program[0], "Coefficient"), 4, vgl->local_value);
-    vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture0"), 0);
-    vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture1"), 1);
-    vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture2"), 2);
+    vgl->UseProgram(vgl->program[program]);
+    if (program == 0) {
+        vgl->Uniform4fv(vgl->GetUniformLocation(vgl->program[0], "Coefficient"), 4, vgl->local_value);
+        vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture0"), 0);
+        vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture1"), 1);
+        vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture2"), 2);
+    } else {
+        vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[1], "Texture0"), 0);
+        vgl->Uniform4f(vgl->GetUniformLocation(vgl->program[1], "FillColor"), 1.0f, 1.0f, 1.0f, 1.0f);
+    }
 
     static const GLfloat vertexCoord[] = {
         -1.0,  1.0,
@@ -944,13 +951,13 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
 
         char attribute[20];
         snprintf(attribute, sizeof(attribute), "MultiTexCoord%1d", j);
-        vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[0], attribute));
-        vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[0], attribute), 2, GL_FLOAT, 0, 0, textureCoord);
+        vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[program], attribute));
+        vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[program], attribute), 2, GL_FLOAT, 0, 0, textureCoord);
     }
     glActiveTexture(GL_TEXTURE0 + 0);
     glClientActiveTexture(GL_TEXTURE0 + 0);
-    vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[0], "VertexPosition"));
-    vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[0], "VertexPosition"), 2, GL_FLOAT, 0, 0, vertexCoord);
+    vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[program], "VertexPosition"));
+    vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[program], "VertexPosition"), 2, GL_FLOAT, 0, 0, vertexCoord);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
@@ -992,8 +999,10 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     }
 
 #ifdef SUPPORTS_SHADERS
-    if (vgl->program[0])
-        DrawWithShaders(vgl, left, top ,right, bottom);
+    if (vgl->program[0] && vgl->chroma->plane_count == 3)
+        DrawWithShaders(vgl, left, top, right, bottom, 0);
+    else if (vgl->program[1] && vgl->chroma->plane_count == 1)
+        DrawWithShaders(vgl, left, top, right, bottom, 1);
     else
 #endif
     {
