@@ -199,9 +199,10 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     AudioStreamBasicDescription streamDescription;
     streamDescription.mSampleRate = fmt->i_rate;
     fmt->i_format = VLC_CODEC_FL32;
+    fmt->i_physical_channels = AOUT_CHANS_STEREO;
     streamDescription.mFormatID = kAudioFormatLinearPCM;
     streamDescription.mFormatFlags = kAudioFormatFlagsNativeFloatPacked; // FL32
-    streamDescription.mChannelsPerFrame = 2;
+    streamDescription.mChannelsPerFrame = aout_FormatNbChannels(fmt);
     streamDescription.mFramesPerPacket = 1;
     streamDescription.mBitsPerChannel = 32;
     streamDescription.mBytesPerFrame = streamDescription.mBitsPerChannel * streamDescription.mChannelsPerFrame / 8;
@@ -323,7 +324,7 @@ static void Play (audio_output_t * p_aout, block_t * p_block)
         }
 
         /* move data to buffer */
-        if (unlikely(TPCircularBufferProduceBytes(&p_sys->circular_buffer, p_block->p_buffer, p_block->i_buffer)))
+        if (unlikely(!TPCircularBufferProduceBytes(&p_sys->circular_buffer, p_block->p_buffer, p_block->i_buffer)))
             msg_Warn(p_aout, "Audio buffer was dropped");
 
         if (!p_sys->i_bytes_per_sample)
