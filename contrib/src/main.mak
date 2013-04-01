@@ -392,6 +392,9 @@ ifdef HAVE_DARWIN_OS
 	echo "set(CMAKE_CXX_FLAGS $(CFLAGS))" >> $@
 	echo "set(CMAKE_LD_FLAGS $(LDFLAGS))" >> $@
 endif
+ifdef HAVE_CROSS_COMPILE
+	echo "set(_CMAKE_TOOLCHAIN_PREFIX $(HOST)-)" >> $@
+endif
 	echo "set(CMAKE_C_COMPILER $(CC))" >> $@
 	echo "set(CMAKE_CXX_COMPILER $(CXX))" >> $@
 	echo "set(CMAKE_FIND_ROOT_PATH $(PREFIX))" >> $@
