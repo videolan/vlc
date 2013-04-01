@@ -58,9 +58,6 @@
  *****************************************************************************/
 struct aout_sys_t
 {
-    uint8_t                     chan_table[AOUT_CHAN_MAX];
-
-    UInt32                      i_numberOfChannels;
     TPCircularBuffer            circular_buffer;    /* circular buffer to swap the audio data */
 
     /* AUHAL specific */
@@ -70,8 +67,6 @@ struct aout_sys_t
     int                         i_rate;             /* media sample rate */
     int                         i_bytes_per_sample;
     bool                        b_got_first_sample;
-
-    vlc_mutex_t                 lock;
 };
 
 #pragma mark -
@@ -109,8 +104,6 @@ static int Open(vlc_object_t *obj)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    vlc_mutex_init(&sys->lock);
-
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
@@ -122,8 +115,6 @@ static void Close(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
-
-    vlc_mutex_destroy(&sys->lock);
 
     free(sys);
 }
