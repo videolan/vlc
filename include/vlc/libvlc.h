@@ -401,6 +401,7 @@ typedef void (*libvlc_log_cb)(void *data, int level, const libvlc_log_t *ctx,
  * This function will wait for any pending callbacks invocation to complete
  * (causing a deadlock if called from within the callback).
  *
+ * \param p_instance libvlc instance
  * \version LibVLC 2.1.0 or later
  */
 LIBVLC_API void libvlc_log_unset( libvlc_instance_t * );
@@ -418,6 +419,7 @@ LIBVLC_API void libvlc_log_unset( libvlc_instance_t * );
  *
  * \warning A deadlock may occur if this function is called from the callback.
  *
+ * \param p_instance libvlc instance
  * \version LibVLC 2.1.0 or later
  */
 LIBVLC_API void libvlc_log_set( libvlc_instance_t *,
@@ -426,6 +428,7 @@ LIBVLC_API void libvlc_log_set( libvlc_instance_t *,
 
 /**
  * Sets up logging to a file.
+ * \param p_instance libvlc instance
  * \param stream FILE pointer opened for writing
  *         (the FILE pointer must remain valid until libvlc_log_unset())
  * \version LibVLC 2.1.0 or later
