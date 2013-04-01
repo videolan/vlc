@@ -171,12 +171,21 @@ void VoutManager::requestVout( CtrlVideo* pCtrlVideo )
 
 CtrlVideo* VoutManager::getBestCtrlVideo( )
 {
-    // try to find an unused useable VideoControl
-
     vector<CtrlVideo*>::const_iterator it;
+
+    // first, look up a video control that is visible and unused
     for( it = m_pCtrlVideoVec.begin(); it != m_pCtrlVideoVec.end(); ++it )
     {
         if( (*it)->isUseable() && !(*it)->isUsed() )
+        {
+            return (*it);
+        }
+    }
+
+    // as a fallback, look up any video control that is unused
+    for( it = m_pCtrlVideoVec.begin(); it != m_pCtrlVideoVec.end(); ++it )
+    {
+        if( !(*it)->isUsed() )
         {
             return (*it);
         }

@@ -115,6 +115,9 @@ public:
                m_original_height == otherLayout.m_original_height;
     }
 
+    // getter for layout visibility
+    virtual bool isVisible( ) const { return m_visible; }
+
     /**
      * Add a control in the layout at the given position, and
      * the optional given layer
