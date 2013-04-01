@@ -114,10 +114,12 @@ struct encoder_sys_t
     /*
      * Audio properties
      */
-    int i_sample_bytes;
-    int i_frame_size;
-    int i_samples_delay;
+    size_t i_sample_bytes;
+    size_t i_frame_size;
+    size_t i_samples_delay; //How much samples in delay buffer
+    bool b_planar;
     mtime_t i_pts;
+    date_t  buffer_date;
 
     /* Encoding settings */
     int        i_key_int;
@@ -304,6 +306,7 @@ int OpenEncoder( vlc_object_t *p_this )
     p_enc->p_sys = p_sys;
     p_sys->i_samples_delay = 0;
     p_sys->p_codec = p_codec;
+    p_sys->b_planar = false;
 
     p_sys->p_buffer = NULL;
     p_sys->i_buffer_out = 0;
@@ -617,9 +620,10 @@ int OpenEncoder( vlc_object_t *p_this )
                 }
             }
         }
+        p_sys->b_planar = av_sample_fmt_is_planar( p_context->sample_fmt );
         // Try if we can use interleaved format for codec input as VLC doesn't really do planar audio yet
         // FIXME: Remove when planar/interleaved audio in vlc is equally supported
-        if( av_sample_fmt_is_planar( p_context->sample_fmt ) )
+        if( p_sys->b_planar )
         {
             msg_Dbg( p_enc, "Trying to find packet sample format instead of planar %s", av_get_sample_fmt_name( p_context->sample_fmt ) );
             for( unsigned int i=0; p_codec->sample_fmts[i] != -1; i++ )
@@ -634,8 +638,11 @@ int OpenEncoder( vlc_object_t *p_this )
         }
         msg_Dbg( p_enc, "Ended up using %s as sample format", av_get_sample_fmt_name( p_context->sample_fmt ) );
         p_enc->fmt_in.i_codec  = GetVlcAudioFormat( p_context->sample_fmt );
+        p_sys->b_planar = av_sample_fmt_is_planar( p_context->sample_fmt );
 
         p_context->sample_rate = p_enc->fmt_out.audio.i_rate;
+        date_Init( &p_sys->buffer_date, p_enc->fmt_out.audio.i_rate, 1 );
+        date_Set( &p_sys->buffer_date, 0 );
         p_context->time_base.num = 1;
         p_context->time_base.den = p_context->sample_rate;
         p_context->channels    = p_enc->fmt_out.audio.i_channels;
@@ -844,12 +851,11 @@ int OpenEncoder( vlc_object_t *p_this )
         p_enc->fmt_in.i_codec = GetVlcAudioFormat( p_sys->p_context->sample_fmt );
         p_enc->fmt_in.audio.i_bitspersample = aout_BitsPerSample( p_enc->fmt_in.i_codec );
 
-        p_sys->i_sample_bytes = (p_enc->fmt_in.audio.i_bitspersample / 8) *
-                                p_context->channels;
+        p_sys->i_sample_bytes = (p_enc->fmt_in.audio.i_bitspersample / 8);
         p_sys->i_frame_size = p_context->frame_size > 1 ?
                                     p_context->frame_size :
                                     FF_MIN_BUFFER_SIZE;
-        p_sys->p_buffer = malloc( p_sys->i_frame_size * p_sys->i_sample_bytes );
+        p_sys->p_buffer = malloc( p_sys->i_frame_size * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels);
         if ( unlikely( p_sys->p_buffer == NULL ) )
         {
             goto error;
@@ -857,7 +863,7 @@ int OpenEncoder( vlc_object_t *p_this )
         p_enc->fmt_out.audio.i_blockalign = p_context->block_align;
         p_enc->fmt_out.audio.i_bitspersample = aout_BitsPerSample( p_enc->fmt_out.i_codec );
 
-        p_sys->i_buffer_out = p_sys->i_frame_size * p_sys->i_sample_bytes;
+        p_sys->i_buffer_out = p_sys->i_frame_size * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels;
     }
 
     p_sys->frame = avcodec_alloc_frame();
@@ -1091,49 +1097,60 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     block_t *p_block, *p_chain = NULL;
-    int got_packet,i_out,i_samples_left=0,i_data_offset = 0;
+    int got_packet,i_out;
+    size_t buffer_delay = 0, i_samples_left = 0;
 
-    //i_samples_left is amount of samples we get
+    //i_bytes_left is amount of bytes we get
     i_samples_left = p_aout_buf ? p_aout_buf->i_nb_samples : 0;
+    buffer_delay = p_sys->i_samples_delay * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels;
 
-    if( p_sys->i_samples_delay > 0 )
+    //p_sys->i_buffer_out = p_sys->i_frame_size * chan * p_sys->i_sample_bytes
+    //Calculate how many bytes we would need from current buffer to fill frame
+    size_t leftover_samples = __MAX(0,__MIN((ssize_t)i_samples_left, (ssize_t)(p_sys->i_frame_size - p_sys->i_samples_delay)));
+
+    // Check if we have enough samples in delay_buffer and current p_aout_buf to fill frame
+    // Or if we are cleaning up
+    if( ( buffer_delay > 0 ) &&
+            ( ( p_aout_buf && ( leftover_samples <= p_aout_buf->i_nb_samples ) &&
+               ( (leftover_samples + p_sys->i_samples_delay ) >= p_sys->i_frame_size )
+              ) ||
+             ( !p_aout_buf ) 
+            )
+         )
     {
-        AVPacket packet;
         //How much we need to copy from new packet
-        const int leftover = __MAX(0,__MIN(i_samples_left, (p_sys->i_frame_size - p_sys->i_samples_delay)));
+        const int leftover = leftover_samples * p_enc->fmt_in.audio.i_channels * p_sys->i_sample_bytes;
 
+        AVPacket packet = {0};
         avcodec_get_frame_defaults( p_sys->frame );
-        p_sys->frame->nb_samples = p_sys->i_samples_delay + leftover;
         p_sys->frame->format     = p_sys->p_context->sample_fmt;
-
-        //Copy samples from new packet to buffer to get frame size
-        if( likely( leftover ) )
-        {
-            if( av_sample_fmt_is_planar( p_sys->p_context->sample_fmt ) )
-                aout_Deinterleave( p_sys->p_buffer+(p_sys->i_samples_delay*p_sys->i_sample_bytes*p_enc->fmt_in.audio.i_channels ),
-                                  p_aout_buf->p_buffer, leftover, p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.i_codec );
-            else
-                memcpy( p_sys->p_buffer+(p_sys->i_samples_delay*p_sys->i_sample_bytes),
-                        p_aout_buf->p_buffer,
-                        leftover * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels
-                       );
-        }
-
-        if( avcodec_fill_audio_frame( p_sys->frame, p_enc->fmt_in.audio.i_channels,
-                              p_sys->p_context->sample_fmt,
-                              p_sys->p_buffer,
-                              (p_sys->i_samples_delay + leftover) * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels,
-                              0) < 0 )
-            msg_Err( p_enc, "Filling on leftovers error i_leftover %d i_samples_left %d samples_delay %d frame size %d", leftover, i_samples_left, p_sys->i_samples_delay, p_sys->i_frame_size );
+        p_sys->frame->pts        = date_Get( &p_sys->buffer_date );
+        p_sys->frame->nb_samples = leftover_samples + p_sys->i_samples_delay;
+        date_Increment( &p_sys->buffer_date, p_sys->i_frame_size );
 
         if( likely( p_aout_buf ) )
-            p_sys->frame->pts = p_aout_buf->i_pts -
-                     (mtime_t)1000000 * (mtime_t)p_sys->i_samples_delay /
-                     (mtime_t)p_enc->fmt_in.audio.i_rate;
+        {
+            p_aout_buf->i_nb_samples -= leftover_samples;
 
+            // We need to deinterleave from p_aout_buf to p_buffer the leftover bytes
+            if( p_sys->b_planar )
+                aout_Deinterleave( p_sys->p_buffer+buffer_delay, p_aout_buf->p_buffer,
+                    leftover_samples, p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.i_codec );
+            else
+                memcpy( p_sys->p_buffer + buffer_delay, p_aout_buf->p_buffer, leftover);
+
+            p_aout_buf->p_buffer     += leftover;
+            p_aout_buf->i_buffer     -= leftover;
+            p_aout_buf->i_pts         = date_Get( &p_sys->buffer_date );
+        }
+        if( avcodec_fill_audio_frame( p_sys->frame, p_enc->fmt_in.audio.i_channels,
+                p_sys->p_context->sample_fmt, p_sys->p_buffer,
+                leftover + buffer_delay,
+                0) < 0 )
+            msg_Err( p_enc, "filling error on fillup" );
+
+        buffer_delay = 0;
         p_sys->i_samples_delay = 0;
-        i_data_offset += leftover * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels;
-        i_samples_left -= leftover;
 
         p_block = block_Alloc( p_sys->i_buffer_out );
         av_init_packet( &packet );
@@ -1141,34 +1158,33 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         packet.size = p_block->i_buffer;
 
         i_out = avcodec_encode_audio2( p_sys->p_context, &packet, p_sys->frame, &got_packet );
-        p_block->i_buffer = packet.size;
 
-
-        if( unlikely( !got_packet || ( i_out < 0 ) ) )
+        if( unlikely( !got_packet || ( i_out < 0 ) || !packet.size ) )
         {
             if( i_out < 0 )
             {
-                msg_Err( p_enc,"Encoding problem...");
+                msg_Err( p_enc,"Encoding problem..");
                 return p_chain;
             }
-        } else {
-            p_block->i_buffer = packet.size;
-
-            p_block->i_length = (mtime_t)1000000 *
-             (mtime_t)p_sys->i_frame_size /
-             (mtime_t)p_sys->p_context->sample_rate;
-
-            p_block->i_dts = p_block->i_pts = packet.pts;
-
-            block_ChainAppend( &p_chain, p_block );
+            block_Release( p_block );
+            return NULL;
         }
+
+        p_block->i_buffer = packet.size;
+        p_block->i_length = (mtime_t)1000000 *
+            (mtime_t)p_sys->frame->nb_samples /
+            (mtime_t)p_sys->p_context->sample_rate;
+
+        p_block->i_dts = p_block->i_pts = packet.pts;
+
+        block_ChainAppend( &p_chain, p_block );
     }
 
     if( unlikely( !p_aout_buf ) )
     {
         msg_Dbg(p_enc,"Flushing..");
         do {
-            AVPacket packet;
+            AVPacket packet = {0};
             p_block = block_Alloc( p_sys->i_buffer_out );
             av_init_packet( &packet );
             packet.data = p_block->p_buffer;
@@ -1183,9 +1199,9 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
 
             p_block->i_dts = p_block->i_pts = packet.pts;
 
-            if( !i_out && got_packet )
+            if( i_out >= 0 && got_packet )
                 block_ChainAppend( &p_chain, p_block );
-        } while( got_packet && !i_out );
+        } while( got_packet && (i_out>=0) );
         return p_chain;
     }
 
@@ -1193,32 +1209,34 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     {
         AVPacket packet = {0};
 
+        if( unlikely( p_aout_buf->i_pts > VLC_TS_INVALID &&
+                      p_aout_buf->i_pts != date_Get( &p_sys->buffer_date ) ) )
+            date_Set( &p_sys->buffer_date, p_aout_buf->i_pts );
+
+        avcodec_get_frame_defaults( p_sys->frame );
         p_sys->frame->nb_samples = p_sys->i_frame_size;
         p_sys->frame->format     = p_sys->p_context->sample_fmt;
+        p_sys->frame->pts        = date_Get( &p_sys->buffer_date );
 
-        if( av_sample_fmt_is_planar( p_sys->p_context->sample_fmt ) )
+        if( p_sys->b_planar )
         {
-            aout_Deinterleave( p_sys->p_buffer, p_aout_buf->p_buffer+i_data_offset,
-                              p_sys->i_frame_size, p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.i_codec );
-            if( avcodec_fill_audio_frame( p_sys->frame, p_enc->fmt_in.audio.i_channels,
-                                    p_sys->p_context->sample_fmt,
-                                    p_sys->p_buffer,
-                                    p_sys->i_frame_size * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels,
-                                    0) < 0 )
-                 msg_Err( p_enc, "filling error on encode" );
-        } else {
-            if( avcodec_fill_audio_frame( p_sys->frame, p_enc->fmt_in.audio.i_channels,
-                                    p_sys->p_context->sample_fmt,
-                                    p_aout_buf->p_buffer+i_data_offset,
-                                    p_sys->i_frame_size * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels,
-                                    0) < 0 )
-                 msg_Err( p_enc, "filling error on encode" );
+            aout_Deinterleave( p_sys->p_buffer, p_aout_buf->p_buffer,
+                               p_sys->frame->nb_samples, p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.i_codec );
+
         }
 
-        i_samples_left -= p_sys->i_frame_size;
-        i_data_offset += p_sys->i_frame_size * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels;
+        if( avcodec_fill_audio_frame( p_sys->frame, p_enc->fmt_in.audio.i_channels,
+                                    p_sys->p_context->sample_fmt,
+                                    p_sys->b_planar ? p_sys->p_buffer : p_aout_buf->p_buffer,
+                                    __MIN(p_sys->i_buffer_out, p_aout_buf->i_buffer),
+                                    0) < 0 )
+                 msg_Err( p_enc, "filling error on encode" );
 
-        p_sys->frame->pts = p_aout_buf->i_pts;
+        p_aout_buf->p_buffer     += (p_sys->frame->nb_samples * p_enc->fmt_in.audio.i_channels * p_sys->i_sample_bytes);
+        p_aout_buf->i_buffer     -= (p_sys->frame->nb_samples * p_enc->fmt_in.audio.i_channels * p_sys->i_sample_bytes);
+        p_aout_buf->i_nb_samples -= p_sys->frame->nb_samples;
+        date_Increment( &p_sys->buffer_date, p_sys->frame->nb_samples );
+
 
         p_block = block_Alloc( p_sys->i_buffer_out );
         av_init_packet( &packet );
@@ -1242,25 +1260,25 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         p_block->i_buffer = packet.size;
 
         p_block->i_length = (mtime_t)1000000 *
-            (mtime_t)p_sys->i_frame_size /
+            (mtime_t)p_sys->frame->nb_samples /
             (mtime_t)p_sys->p_context->sample_rate;
 
         p_block->i_dts = p_block->i_pts = packet.pts;
 
         block_ChainAppend( &p_chain, p_block );
     }
-    if( i_samples_left < 0 )
-        msg_Err( p_enc, "I_data_left overflow");
 
     // We have leftover samples that don't fill frame_size, and libavcodec doesn't seem to like
     // that frame has more data than p_sys->i_frame_size most of the cases currently.
-    if( i_samples_left > 0 )
+    if( p_aout_buf->i_nb_samples > 0 )
     {
-        if( av_sample_fmt_is_planar( p_sys->p_context->sample_fmt ) )
-            aout_Deinterleave( p_sys->p_buffer, p_aout_buf->p_buffer+i_data_offset, i_samples_left, p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.i_codec );
-        else
-            memcpy( p_sys->p_buffer, p_aout_buf->p_buffer+i_data_offset , i_samples_left*p_sys->i_sample_bytes*p_enc->fmt_in.audio.i_channels);
-        p_sys->i_samples_delay = i_samples_left;
+       if( p_sys->b_planar )
+          aout_Deinterleave( p_sys->p_buffer+buffer_delay, p_aout_buf->p_buffer,
+              p_aout_buf->i_nb_samples, p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.i_codec );
+       else
+           memcpy( p_sys->p_buffer + buffer_delay, p_aout_buf->p_buffer,
+                   p_aout_buf->i_nb_samples * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels);
+        p_sys->i_samples_delay += p_aout_buf->i_nb_samples;
     }
 
     return p_chain;
