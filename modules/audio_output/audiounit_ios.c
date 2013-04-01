@@ -58,7 +58,6 @@
  *****************************************************************************/
 struct aout_sys_t
 {
-    uint8_t                     chans_to_reorder;   /* do we need channel reordering */
     uint8_t                     chan_table[AOUT_CHAN_MAX];
 
     UInt32                      i_numberOfChannels;
@@ -163,7 +162,6 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     UInt32                      i_param_size = 0;
     AudioComponentDescription   desc;
     AURenderCallbackStruct      callback;
-    p_aout->sys->chans_to_reorder = 0;
     OSStatus status;
 
     /* Lets go find our Component */
@@ -312,15 +310,6 @@ static void Play (audio_output_t * p_aout, block_t * p_block)
             OSStatus status = AudioOutputUnitStart(p_sys->au_unit);
             msg_Dbg(p_aout, "audio output unit started: %li", status);
             p_sys->b_got_first_sample = true;
-        }
-
-        /* Do the channel reordering */
-        if (p_sys->chans_to_reorder) {
-           aout_ChannelReorder(p_block->p_buffer,
-                               p_block->i_buffer,
-                               p_sys->chans_to_reorder,
-                               p_sys->chan_table,
-                               VLC_CODEC_FL32);
         }
 
         /* move data to buffer */
