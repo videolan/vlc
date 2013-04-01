@@ -84,6 +84,16 @@ static void Close        ( vlc_object_t * );
 # define PRESET_PATH    "/usr/share/projectM/presets"
 #endif
 
+#ifdef DEFAULT_FONT_FILE
+#undef FONT_PATH
+#define FONT_PATH DEFAULT_FONT_FILE
+#endif
+
+#ifdef DEFAULT_MONOSPACE_FONT_FILE
+#undef FONT_PATH_MENU
+#define FONT_PATH_MENU DEFAULT_MONOSPACE_FONT_FILE
+#endif
+
 vlc_module_begin ()
     set_shortname( N_("projectM"))
     set_description( N_("libprojectM effect") )

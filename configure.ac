@@ -3109,6 +3109,28 @@ AC_ARG_ENABLE(fribidi,
 AC_ARG_ENABLE(fontconfig,
   [  --enable-fontconfig     fontconfig support (default auto)])
 
+AC_ARG_WITH([default-font],
+    AS_HELP_STRING([--with-default-font=PATH],
+        [Path to the default font]),
+        [AC_DEFINE_UNQUOTED([DEFAULT_FONT_FILE],
+            "$withval", [Default font])])
+AC_ARG_WITH([default-monospace-font],
+    AS_HELP_STRING([--with-default-monospace-font=PATH],
+        [Path to the default font]),
+        [AC_DEFINE_UNQUOTED([DEFAULT_MONOSPACE_FONT_FILE],
+            "$withval", [Default monospace font])])
+
+AC_ARG_WITH([default-font-family],
+    AS_HELP_STRING([--with-default-font-family=NAME],
+        [Path to the default font family]),
+        [AC_DEFINE_UNQUOTED([DEFAULT_FAMILY],
+            "$withval", [Default font family])])
+AC_ARG_WITH([default-monospace-font-family],
+    AS_HELP_STRING([--with-default-monospace-font-family=NAME],
+        [Path to the default font family]),
+        [AC_DEFINE_UNQUOTED([DEFAULT_MONOSPACE_FAMILY],
+            "$withval", [Default monospace font family])])
+
 if test "${enable_freetype}" != "no"; then
    PKG_CHECK_MODULES(FREETYPE, freetype2, [
       have_freetype=yes
