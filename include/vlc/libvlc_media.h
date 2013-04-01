@@ -306,11 +306,11 @@ LIBVLC_API libvlc_media_t *libvlc_media_new_as_node(
  * These options must be set through libvlc_new() instead.
  *
  * \param p_md the media descriptor
- * \param ppsz_options the options (as a string)
+ * \param psz_options the options (as a string)
  */
 LIBVLC_API void libvlc_media_add_option(
                                    libvlc_media_t *p_md,
-                                   const char * ppsz_options );
+                                   const char * psz_options );
 
 /**
  * Add an option to the media with configurable flags.
@@ -326,12 +326,12 @@ LIBVLC_API void libvlc_media_add_option(
  * must be set on the whole libvlc instance instead.
  *
  * \param p_md the media descriptor
- * \param ppsz_options the options (as a string)
+ * \param psz_options the options (as a string)
  * \param i_flags the flags for this option
  */
 LIBVLC_API void libvlc_media_add_option_flag(
                                    libvlc_media_t *p_md,
-                                   const char * ppsz_options,
+                                   const char * psz_options,
                                    unsigned i_flags );
 
 
