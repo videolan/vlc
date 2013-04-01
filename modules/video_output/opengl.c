@@ -573,6 +573,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                 return NULL;
             }
         }
+#else
+        (void)yuv_range_correction;
 #endif
     }
 
