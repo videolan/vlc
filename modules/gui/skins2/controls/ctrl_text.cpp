@@ -6,6 +6,7 @@
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
+ *          Erwan Tulou      <erwan10 At videolan Dot org<
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,8 +97,8 @@ CtrlText::CtrlText( intf_thread_t *pIntf, VarText &rVariable,
     // Observe the variable
     m_rVariable.addObserver( this );
 
-    // Set the text
-    displayText( m_rVariable.get() );
+    // initialize pictures
+    setPictures( m_rVariable.get() );
 }
 
 
@@ -218,7 +219,8 @@ void CtrlText::onUpdate( Subject<VarText> &rVariable, void* arg )
     (void)rVariable; (void)arg;
     if( isVisible() )
     {
-        displayText( m_rVariable.get() );
+        setPictures( m_rVariable.get() );
+        updateContext();
         notifyLayout( getPosition()->getWidth(), getPosition()->getHeight() );
     }
 }
@@ -232,41 +234,71 @@ void CtrlText::onUpdate( Subject<VarBool> &rVariable, void *arg  )
     {
         if( isVisible() )
         {
-            displayText( m_rVariable.get() );
+            setPictures( m_rVariable.get() );
+            updateContext();
             notifyLayout( getPosition()->getWidth(), getPosition()->getHeight() );
-        }
-        else
-        {
-            notifyLayout();
         }
     }
 }
 
 
-void CtrlText::displayText( const UString &rText )
+void CtrlText::setPictures( const UString &rText )
 {
-    // Create the images ('normal' and 'double') from the text
+    // reset the images ('normal' and 'double') from the text
     // 'Normal' image
     delete m_pImg;
     m_pImg = m_rFont.drawString( rText, m_color );
     if( !m_pImg )
-    {
         return;
-    }
+
     // 'Double' image
     const UString doubleStringWithSep = rText + SEPARATOR_STRING + rText;
     delete m_pImgDouble;
     m_pImgDouble = m_rFont.drawString( doubleStringWithSep, m_color );
+}
 
-    // Update the current image used, as if the control size had changed
-    onPositionChange();
 
-    if( m_alignment == kRight && getPosition() &&
+void CtrlText::updateContext()
+{
+    if( !m_pImg || !getPosition() )
+        return;
+
+    if( m_pImg->getWidth() < getPosition()->getWidth() )
+    {
+        m_pCurrImg = m_pImg;
+
+        // When the control becomes wide enough for the text to display,
+        // make sure to stop any scrolling effect
+        m_pTimer->stop();
+        m_xPos = 0;
+    }
+    else
+    {
+        m_pCurrImg = m_pImgDouble;
+    }
+
+    // If the control is in the moving state,
+    // automatically start or stop the timer accordingly
+    const string &rState = m_fsm.getState();
+    if( rState == "moving" || rState == "outMoving" )
+    {
+        if( m_pCurrImg == m_pImgDouble )
+        {
+            m_pTimer->start( MOVING_TEXT_DELAY, false );
+        }
+        else
+        {
+            m_pTimer->stop();
+        }
+    }
+
+    // compute alignment
+    if( m_alignment == kRight &&
         getPosition()->getWidth() < m_pImg->getWidth() )
     {
         m_xPos = getPosition()->getWidth() - m_pImg->getWidth();
     }
-    else if( m_alignment == kCenter && getPosition() &&
+    else if( m_alignment == kCenter &&
              getPosition()->getWidth() < m_pImg->getWidth() )
     {
         m_xPos = (getPosition()->getWidth() - m_pImg->getWidth()) / 2;
@@ -275,58 +307,18 @@ void CtrlText::displayText( const UString &rText )
     {
         m_xPos = 0;
     }
-
-    if( getPosition() )
-    {
-        // If the control was in the moving state, check if the scrolling is
-        // still necessary
-        const string &rState = m_fsm.getState();
-        if( rState == "moving" || rState == "outMoving" )
-        {
-            if( m_pImg && m_pImg->getWidth() >= getPosition()->getWidth() )
-            {
-                m_pCurrImg = m_pImgDouble;
-                m_pTimer->start( MOVING_TEXT_DELAY, false );
-            }
-            else
-            {
-                m_pTimer->stop();
-            }
-        }
-    }
 }
 
 
 void CtrlText::onPositionChange()
 {
-    if( m_pImg && getPosition() )
-    {
-        if( m_pImg->getWidth() < getPosition()->getWidth() )
-        {
-            m_pCurrImg = m_pImg;
-
-            // When the control becomes wide enough for the text to display,
-            // make sure to stop any scrolling effect
-            m_pTimer->stop();
-            m_xPos = 0;
-        }
-        else
-        {
-            m_pCurrImg = m_pImgDouble;
-        }
-    }
-    else
-    {
-        // m_pImg is a better default value than m_pImgDouble, but anyway we
-        // don't care because the control is never drawn without position :)
-        m_pCurrImg = m_pImg;
-    }
+    updateContext();
 }
 
 
 void CtrlText::onResize()
 {
-    onPositionChange();
+    updateContext();
 }
 
 
@@ -349,13 +341,9 @@ void CtrlText::CmdManualMoving::execute()
     // Start the automatic movement, but only if the text is wider than the
     // control and if the control can scroll (either in manual or automatic
     // mode)
-    if( m_pParent->m_pImg &&
-        m_pParent->m_pImg->getWidth() >= m_pParent->getPosition()->getWidth() )
+    if( m_pParent->m_pCurrImg &&
+        m_pParent->m_pCurrImg == m_pParent->m_pImgDouble )
     {
-        // The current image may have been set incorrectly in displayText(), so
-        // set the correct value
-        m_pParent->m_pCurrImg = m_pParent->m_pImgDouble;
-
         m_pParent->m_pTimer->start( MOVING_TEXT_DELAY, false );
     }
 }
@@ -371,14 +359,10 @@ void CtrlText::CmdMove::execute()
 {
     EvtMouse *pEvtMouse = (EvtMouse*)m_pParent->m_pEvt;
 
-    // Do nothing if the text fits in the control
-    if( m_pParent->m_pImg &&
-        m_pParent->m_pImg->getWidth() >= m_pParent->getPosition()->getWidth() )
+    // Move text only when it is larger than the control
+    if( m_pParent->m_pCurrImg &&
+        m_pParent->m_pCurrImg == m_pParent->m_pImgDouble )
     {
-        // The current image may have been set incorrectly in displayText(), so
-        // we set the correct value
-        m_pParent->m_pCurrImg = m_pParent->m_pImgDouble;
-
         // Compute the new position of the left side, and make sure it is
         // in the correct range
         m_pParent->m_xPos = (pEvtMouse->getXPos() - m_pParent->m_xOffset);
@@ -402,13 +386,12 @@ void CtrlText::CmdUpdateText::execute()
 
 void CtrlText::adjust( int &position )
 {
+    if( !m_pImg || !m_pImgDouble )
+        return;
+
     // {m_pImgDouble->getWidth() - m_pImg->getWidth()} is the period of the
     // bitmap; remember that the string used to generate m_pImgDouble is of the
     // form: "foo  foo", the number of spaces being a parameter
-    if( !m_pImg )
-    {
-        return;
-    }
     position %= m_pImgDouble->getWidth() - m_pImg->getWidth();
     if( position > 0 )
     {

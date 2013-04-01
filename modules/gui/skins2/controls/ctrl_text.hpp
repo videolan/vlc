@@ -129,8 +129,11 @@ private:
     /// Method called when visibility is updated
     virtual void onUpdate( Subject<VarBool> &rVariable , void* );
 
-    /// Display the text on the control
-    void displayText( const UString &rText );
+    /// Intialize the set of pictures
+    void setPictures( const UString &rText );
+
+    /// Update object according to current context
+    void updateContext();
 
     /// Helper function to set the position in the correct interval
     void adjust( int &position );
