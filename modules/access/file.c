@@ -176,7 +176,7 @@ int FileOpen( vlc_object_t *p_this )
         {
             msg_Err (p_access, "cannot open file %s (%m)", path);
             dialog_Fatal (p_access, _("File reading failed"),
-                          _("VLC could not open the file \"%s\". (%m)"), path);
+                          _("VLC could not open the file \"%s\" (%m)."), path);
         }
     }
     if (fd == -1)
