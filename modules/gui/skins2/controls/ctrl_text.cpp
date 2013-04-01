@@ -91,7 +91,7 @@ CtrlText::CtrlText( intf_thread_t *pIntf, VarText &rVariable,
     }
 
     // Initial state
-    m_fsm.setState( "outStill" );
+    m_fsm.setState( (m_scrollMode != kAutomatic) ? "outStill" : "outMoving" );
 
     // Observe the variable
     m_rVariable.addObserver( this );
