@@ -34,18 +34,9 @@
 #include <vlc_codec.h>
 #include <vlc_codecs.h>
 
-#ifndef WIN32
-#    define LOADER
-#else
+#ifdef WIN32
 #   include <objbase.h>
 #   include <vlc_charset.h>
-#endif
-
-#ifdef LOADER
-/* Need the w32dll loader from mplayer */
-#   include <wine/winerror.h>
-#   include <ldt_keeper.h>
-#   include <wine/windef.h>
 #endif
 
 #include <vlc_codecs.h>
@@ -54,18 +45,6 @@
 #ifndef NDEBUG
 # define DMO_DEBUG 1
 #endif
-
-#ifdef LOADER
-/* Not Needed */
-long CoInitialize( void *pvReserved ) { VLC_UNUSED(pvReserved); return -1; }
-void CoUninitialize( void ) { }
-
-/* A few prototypes */
-HMODULE WINAPI LoadLibraryA(LPCSTR);
-#define LoadLibrary LoadLibraryA
-FARPROC WINAPI GetProcAddress(HMODULE,LPCSTR);
-int     WINAPI FreeLibrary(HMODULE);
-#endif /* LOADER */
 
 typedef long (STDCALL *GETCLASS) ( const GUID*, const GUID*, void** );
 
@@ -133,10 +112,6 @@ struct decoder_sys_t
     uint8_t *p_buffer;
 
     date_t end_date;
-
-#ifdef LOADER
-    ldt_fs_t    *ldt_fs;
-#endif
 
     vlc_thread_t thread;
     vlc_mutex_t  lock;
@@ -375,12 +350,8 @@ static int DecOpen( decoder_t *p_dec )
     VIDEOINFOHEADER *p_vih = NULL;
     WAVEFORMATEX *p_wf = NULL;
 
-#ifdef LOADER
-    ldt_fs_t *ldt_fs = Setup_LDT_Keeper();
-#else
     /* Initialize OLE/COM */
     CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
-#endif /* LOADER */
 
     if( LoadDMO( VLC_OBJECT(p_dec), &hmsdmo_dll, &p_dmo, &p_dec->fmt_in, false )
         != VLC_SUCCESS )
@@ -603,9 +574,6 @@ static int DecOpen( decoder_t *p_dec )
     /* Allocate the memory needed to store the decoder's structure */
     p_sys->hmsdmo_dll = hmsdmo_dll;
     p_sys->p_dmo = p_dmo;
-#ifdef LOADER
-    p_sys->ldt_fs = ldt_fs;
-#endif
 
     /* Find out some properties of the output */
     {
@@ -650,12 +618,8 @@ static int DecOpen( decoder_t *p_dec )
     if( p_dmo ) p_dmo->vt->Release( (IUnknown *)p_dmo );
     if( hmsdmo_dll ) FreeLibrary( hmsdmo_dll );
 
-#ifdef LOADER
-    Restore_LDT_Keeper( ldt_fs );
-#else
     /* Uninitialize OLE/COM */
     CoUninitialize();
-#endif /* LOADER */
 
     free( p_vih );
     free( p_wf );
@@ -677,7 +641,6 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
     DMO_PARTIAL_MEDIATYPE dmo_partial_type;
     int i_err;
 
-#ifndef LOADER
     long (STDCALL *OurDMOEnum)( const GUID *, uint32_t, uint32_t,
                                const DMO_PARTIAL_MEDIATYPE *,
                                uint32_t, const DMO_PARTIAL_MEDIATYPE *,
@@ -687,7 +650,6 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
     WCHAR *psz_dmo_name;
     GUID clsid_dmo;
     uint32_t i_dummy;
-#endif
 
     GETCLASS GetClass;
     IClassFactory *cFactory = NULL;
@@ -712,7 +674,6 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
         dmo_partial_type.subtype.Data1 = p_fmt->i_original_fourcc ?: p_fmt->i_codec;
     }
 
-#ifndef LOADER
     /* Load msdmo DLL */
     *p_hmsdmo_dll = LoadLibraryA( "msdmo.dll" );
     if( *p_hmsdmo_dll == NULL )
@@ -783,7 +744,6 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
     return VLC_SUCCESS;
 
 loader:
-#endif   /* LOADER */
 
     for( i_codec = 0; codecs_table[i_codec].i_fourcc != 0; i_codec++ )
     {
@@ -848,14 +808,7 @@ static void DecClose( decoder_t *p_dec )
     if( p_sys->p_dmo ) p_sys->p_dmo->vt->Release( (IUnknown *)p_sys->p_dmo );
     FreeLibrary( p_sys->hmsdmo_dll );
 
-#ifdef LOADER
-#if 0
-    Restore_LDT_Keeper( p_sys->ldt_fs );
-#endif
-#else
-    /* Uninitialize OLE/COM */
     CoUninitialize();
-#endif
 
     free( p_sys->p_buffer );
 }
@@ -1098,9 +1051,6 @@ struct encoder_sys_t
 
     date_t end_date;
 
-#ifdef LOADER
-    ldt_fs_t    *ldt_fs;
-#endif
 };
 
 /*****************************************************************************
@@ -1425,12 +1375,8 @@ static int EncOpen( vlc_object_t *p_this )
     IMediaObject *p_dmo = NULL;
     HINSTANCE hmsdmo_dll = NULL;
 
-#ifdef LOADER
-    ldt_fs_t *ldt_fs = Setup_LDT_Keeper();
-#else
     /* Initialize OLE/COM */
     CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
-#endif /* LOADER */
 
     if( LoadDMO( p_this, &hmsdmo_dll, &p_dmo, &p_enc->fmt_out, true )
         != VLC_SUCCESS )
@@ -1457,9 +1403,6 @@ static int EncOpen( vlc_object_t *p_this )
 
     p_sys->hmsdmo_dll = hmsdmo_dll;
     p_sys->p_dmo = p_dmo;
-#ifdef LOADER
-    p_sys->ldt_fs = ldt_fs;
-#endif
 
     /* Find out some properties of the inputput */
     {
@@ -1504,12 +1447,8 @@ static int EncOpen( vlc_object_t *p_this )
     if( p_dmo ) p_dmo->vt->Release( (IUnknown *)p_dmo );
     if( hmsdmo_dll ) FreeLibrary( hmsdmo_dll );
 
-#ifdef LOADER
-    Restore_LDT_Keeper( ldt_fs );
-#else
     /* Uninitialize OLE/COM */
     CoUninitialize();
-#endif /* LOADER */
 
     free( p_sys );
 
@@ -1686,14 +1625,8 @@ void EncoderClose( vlc_object_t *p_this )
     if( p_sys->p_dmo ) p_sys->p_dmo->vt->Release( (IUnknown *)p_sys->p_dmo );
     FreeLibrary( p_sys->hmsdmo_dll );
 
-#ifdef LOADER
-#if 0
-    Restore_LDT_Keeper( p_sys->ldt_fs );
-#endif
-#else
     /* Uninitialize OLE/COM */
     CoUninitialize();
-#endif
 
     free( p_sys );
 }
