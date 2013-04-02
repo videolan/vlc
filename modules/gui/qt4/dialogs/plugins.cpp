@@ -183,8 +183,15 @@ void PluginTab::keyPressEvent( QKeyEvent *keyEvent )
 bool PluginTreeItem::operator< ( const QTreeWidgetItem & other ) const
 {
     int col = treeWidget()->sortColumn();
-    if( col == 2 )
+    if( col == PluginTab::SCORE )
         return text( col ).toInt() < other.text( col ).toInt();
+    else if ( col == PluginTab::CAPABILITY )
+    {
+        if ( text( PluginTab::CAPABILITY ) == other.text( PluginTab::CAPABILITY ) )
+            return text( PluginTab::NAME ) < other.text( PluginTab::NAME );
+        else
+            return text( PluginTab::CAPABILITY ) < other.text( PluginTab::CAPABILITY );
+    }
     return text( col ) < other.text( col );
 }
 

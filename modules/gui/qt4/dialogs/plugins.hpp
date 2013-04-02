@@ -69,6 +69,13 @@ private:
 class PluginTab : public QVLCFrame
 {
     Q_OBJECT
+public:
+    enum
+    {
+        NAME = 0,
+        CAPABILITY,
+        SCORE
+    };
 
 protected:
     virtual void keyPressEvent( QKeyEvent *keyEvent );
