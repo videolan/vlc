@@ -1,0 +1,32 @@
+--- gmp-4.2.1/configure.in.orig	2013-04-02 16:26:56.000000000 +0300
++++ gmp-4.2.1/configure.in	2013-04-02 16:27:25.000000000 +0300
+@@ -67,7 +67,7 @@
+ dnl  Note that there's a copy of these options in the top-level Makefile.am,
+ dnl  so update there too if changing anything.
+ dnl
+-AM_INIT_AUTOMAKE([1.8 gnu no-dependencies $(top_builddir)/ansi2knr])
++AM_INIT_AUTOMAKE([1.8 gnu no-dependencies])
+ AM_CONFIG_HEADER(config.h:config.in)
+ AM_MAINTAINER_MODE
+ 
+@@ -2024,9 +2024,6 @@
+ echo "      MPN_PATH=\"$path\""
+ 
+ 
+-# Automake ansi2knr support.
+-AM_C_PROTOTYPES
+-
+ GMP_PROG_AR
+ GMP_PROG_NM
+ 
+--- gmp-4.2.1/Makefile.am.orig	2013-04-02 16:27:07.000000000 +0300
++++ gmp-4.2.1/Makefile.am	2013-04-02 16:27:13.000000000 +0300
+@@ -27,7 +27,7 @@
+ # Makefiles in subdirectories, but here we must omit it so automake gives
+ # the actual ansi2knr build rule, not "cd $(top_builddir) && make ansi2knr".
+ #
+-AUTOMAKE_OPTIONS = 1.8 gnu no-dependencies ansi2knr
++AUTOMAKE_OPTIONS = 1.8 gnu no-dependencies
+ 
+ 
+ # Libtool -version-info for libgmp.la and libmp.la.  See "Versioning" in the
