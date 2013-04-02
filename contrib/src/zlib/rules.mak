@@ -7,6 +7,12 @@ ifeq ($(call need_pkg,"zlib"),)
 PKGS_FOUND += zlib
 endif
 
+ifeq ($(shell uname),Darwin) # zlib tries to use libtool on Darwin
+ifdef HAVE_CROSS_COMPILE
+ZLIB_CONFIG_VARS=CHOST=$(HOST)
+endif
+endif
+
 $(TARBALLS)/zlib-$(ZLIB_VERSION).tar.gz:
 	$(call download,$(ZLIB_URL))
 
@@ -18,6 +24,6 @@ zlib: zlib-$(ZLIB_VERSION).tar.gz .sum-zlib
 	$(MOVE)
 
 .zlib: zlib
-	cd $< && $(HOSTVARS) ./configure --prefix=$(PREFIX) --static
+	cd $< && $(HOSTVARS) $(ZLIB_CONFIG_VARS) ./configure --prefix=$(PREFIX) --static
 	cd $< && $(MAKE) install
 	touch $@
