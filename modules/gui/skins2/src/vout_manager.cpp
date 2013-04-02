@@ -95,15 +95,15 @@ void VoutManager::saveVoutConfig( )
     vector<SavedWnd>::iterator it;
     for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
     {
-        if( (*it).pCtrlVideo )
+        if( it->pCtrlVideo )
         {
             // detach vout thread from VideoControl
-            (*it).pCtrlVideo->detachVoutWindow( );
+            it->pCtrlVideo->detachVoutWindow( );
 
             // memorize width/height before VideoControl is destroyed
-            (*it).width = (*it).pCtrlVideo->getPosition()->getWidth();
-            (*it).height = (*it).pCtrlVideo->getPosition()->getHeight();
-            (*it).pCtrlVideo = NULL;
+            it->width = it->pCtrlVideo->getPosition()->getWidth();
+            it->height = it->pCtrlVideo->getPosition()->getHeight();
+            it->pCtrlVideo = NULL;
        }
     }
 
@@ -128,8 +128,8 @@ void VoutManager::restoreVoutConfig( bool b_success )
         CtrlVideo* pCtrlVideo = getBestCtrlVideo();
         if( pCtrlVideo )
         {
-            pCtrlVideo->attachVoutWindow( (*it).pVoutWindow );
-           (*it).pCtrlVideo = pCtrlVideo;
+            pCtrlVideo->attachVoutWindow( it->pVoutWindow );
+            it->pCtrlVideo = pCtrlVideo;
         }
     }
 }
@@ -140,13 +140,13 @@ void VoutManager::discardVout( CtrlVideo* pCtrlVideo )
     vector<SavedWnd>::iterator it;
     for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
     {
-        if( (*it).pCtrlVideo == pCtrlVideo )
+        if( it->pCtrlVideo == pCtrlVideo )
         {
             // detach vout thread from VideoControl
-            (*it).pCtrlVideo->detachVoutWindow( );
-            (*it).width = (*it).pCtrlVideo->getPosition()->getWidth();
-            (*it).height = (*it).pCtrlVideo->getPosition()->getHeight();
-            (*it).pCtrlVideo = NULL;
+            it->pCtrlVideo->detachVoutWindow( );
+            it->width = it->pCtrlVideo->getPosition()->getWidth();
+            it->height = it->pCtrlVideo->getPosition()->getHeight();
+            it->pCtrlVideo = NULL;
             break;
         }
     }
@@ -158,11 +158,11 @@ void VoutManager::requestVout( CtrlVideo* pCtrlVideo )
     vector<SavedWnd>::iterator it;
     for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
     {
-        if( (*it).pCtrlVideo == NULL )
+        if( it->pCtrlVideo == NULL )
         {
-            pCtrlVideo->attachVoutWindow( (*it).pVoutWindow,
-                                          (*it).width, (*it).height );
-            (*it).pCtrlVideo = pCtrlVideo;
+            pCtrlVideo->attachVoutWindow( it->pVoutWindow,
+                                          it->width, it->height );
+            it->pCtrlVideo = pCtrlVideo;
             break;
         }
     }
@@ -221,7 +221,7 @@ void VoutManager::acceptWnd( vout_window_t* pWnd, int width, int height )
     // save vout characteristics
     m_SavedWndVec.push_back( SavedWnd( pWnd, pVoutWindow, pCtrlVideo ) );
 
-    msg_Dbg( pWnd, "New vout : Ctrl = %p, w x h = %dx%d",
+    msg_Dbg( pWnd, "New vout : Ctrl = %p, w x h = %ix%i",
                     pCtrlVideo, width, height );
 }
 
@@ -232,19 +232,19 @@ void VoutManager::releaseWnd( vout_window_t* pWnd )
     vector<SavedWnd>::iterator it;
     for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
     {
-        if( (*it).pWnd == pWnd )
+        if( it->pWnd == pWnd )
         {
             msg_Dbg( getIntf(), "vout released vout=%p, VideoCtrl=%p",
-                             pWnd, (*it).pCtrlVideo );
+                             pWnd, it->pCtrlVideo );
 
             // if a video control was being used, detach from it
-            if( (*it).pCtrlVideo )
+            if( it->pCtrlVideo )
             {
-                (*it).pCtrlVideo->detachVoutWindow( );
+                it->pCtrlVideo->detachVoutWindow( );
             }
 
             // remove resources
-            delete (*it).pVoutWindow;
+            delete it->pVoutWindow;
             m_SavedWndVec.erase( it );
             break;
         }
@@ -257,15 +257,15 @@ void VoutManager::releaseWnd( vout_window_t* pWnd )
 
 void VoutManager::setSizeWnd( vout_window_t *pWnd, int width, int height )
 {
-   msg_Dbg( pWnd, "setSize (%dx%d) received from vout thread",
+   msg_Dbg( pWnd, "setSize (%ix%i) received from vout thread",
                   width, height );
 
    vector<SavedWnd>::iterator it;
    for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
    {
-       if( (*it).pWnd == pWnd )
+       if( it->pWnd == pWnd )
        {
-           VoutWindow* pVoutWindow = (*it).pVoutWindow;
+           VoutWindow* pVoutWindow = it->pVoutWindow;
 
            pVoutWindow->setOriginalWidth( width );
            pVoutWindow->setOriginalHeight( height );
@@ -292,7 +292,7 @@ void VoutManager::setFullscreenWnd( vout_window_t *pWnd, bool b_fullscreen )
         vector<SavedWnd>::iterator it;
         for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
         {
-            if( (*it).pWnd == pWnd )
+            if( it->pWnd == pWnd )
             {
                 VoutWindow* pVoutWindow = it->pVoutWindow;
                 configureFullscreen( *pVoutWindow );
