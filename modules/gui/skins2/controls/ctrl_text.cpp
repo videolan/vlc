@@ -236,8 +236,10 @@ void CtrlText::onUpdate( Subject<VarBool> &rVariable, void *arg  )
         {
             setPictures( m_rVariable.get() );
             updateContext();
-            notifyLayout( getPosition()->getWidth(), getPosition()->getHeight() );
         }
+
+        // notify in any case
+        notifyLayout( getPosition()->getWidth(), getPosition()->getHeight() );
     }
 }
 
