@@ -595,6 +595,7 @@ AC_LINK_IFELSE([
     AC_LANG_PROGRAM([#ifdef WIN32
         #include <ws2tcpip.h>
         #else
+        #include <sys/socket.h>
         #include <arpa/inet.h>
         #endif], [
         char dst[[sizeof(struct in_addr)]];
