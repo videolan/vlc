@@ -4004,20 +4004,7 @@ AC_SUBST(soliddatadir)
 AM_CONDITIONAL(KDE_SOLID, [test "x${soliddatadir}" != "x"])
 
 dnl
-dnl  DLL loader copied from MPlayer copied from somewhere else (WINE ?)
-dnl
-loader=false
-AC_ARG_ENABLE(loader,
-  AS_HELP_STRING([--enable-loader],[build DLL loader for ELF i386 platforms
-          (default disabled)]))
-AM_CONDITIONAL(LOADER, [test "${enable_loader}" = "yes"])
-AS_IF([test "${enable_loader}" = "yes"],
-  [ VLC_ADD_PLUGIN([dmo])
-    VLC_ADD_CPPFLAGS([dmo quicktime ],[-I\\\$(srcdir)/loader])
-    VLC_ADD_LIBS([dmo quicktime ],[libloader.la])
-    VLC_ADD_LIBS([dmo quicktime], [-lpthread])
-  ])
-
+dnl  DMO codec
 AS_IF([test "${SYS}" = "mingw32"], [VLC_ADD_PLUGIN([dmo]) VLC_ADD_LIBS([dmo],[-lole32 -luuid]) ])
 
 EXTEND_HELP_STRING([Components:])

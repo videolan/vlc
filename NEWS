@@ -189,6 +189,7 @@ Removed modules:
  * Switcher module
  * OSD parser and menu
  * Xscreensaver: use xdg-screensaver
+ * Removed DLL loader for non-Windows Operating Systems
 
 
 Changes between 2.0.4 and 2.0.5:

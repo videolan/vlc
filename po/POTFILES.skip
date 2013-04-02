@@ -1,5 +1,3 @@
 extras/misc/mpris.xml
-modules/codec/loader/driver.c
-modules/codec/loader/ldt_keeper.c
 modules/codec/wmafixed/bswap.h
 modules/access/dvb/scan.c
