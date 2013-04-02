@@ -784,6 +784,8 @@ void VlcProc::init_variables()
     SET_VOLUME( m_cVarVolume, var_GetFloat( pPlaylist, "volume" ), false );
     SET_BOOL( m_cVarMute, var_GetBool( pPlaylist, "mute" ) );
 
+    SET_BOOL( m_cVarStopped, true );
+
     update_equalizer();
 }
 
