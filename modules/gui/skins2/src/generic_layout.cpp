@@ -174,6 +174,10 @@ void GenericLayout::onControlUpdate( const CtrlGeneric &rCtrl,
 
 void GenericLayout::resize( int width, int height )
 {
+    // check real resize
+    if( width == m_rect.getWidth() && height == m_rect.getHeight() )
+        return;
+
     // Update the window size
     m_rect = SkinsRect( 0, 0 , width, height );
 
@@ -190,16 +194,6 @@ void GenericLayout::resize( int width, int height )
     for( iter = m_controlList.begin(); iter != m_controlList.end(); ++iter )
     {
         iter->m_pControl->onResize();
-    }
-
-    // Resize and refresh the associated window
-    TopWindow *pWindow = getWindow();
-    if( pWindow )
-    {
-        // Resize the window
-        pWindow->resize( width, height );
-        // Change the shape of the window and redraw it
-        refreshAll();
     }
 }
 
@@ -236,7 +230,6 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
     {
         // first apply new shape to the window
         pWindow->updateShape();
-
         pWindow->invalidateRect( x, y, width, height );
     }
 }

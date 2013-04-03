@@ -278,6 +278,13 @@ void WindowManager::resize( GenericLayout &rLayout,
     // Do the actual resizing
     rLayout.resize( newWidth, newHeight );
 
+    // Resize the window
+    TopWindow *pWindow = rLayout.getWindow();
+    pWindow->resize( newWidth, newHeight );
+
+    // refresh content
+    rLayout.refreshAll();
+
     // Move all the anchored windows
     WinSet_t::const_iterator it;
     if( m_direction == kResizeE ||
