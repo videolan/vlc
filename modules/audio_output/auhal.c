@@ -1012,7 +1012,7 @@ static void RebuildDeviceList(audio_output_t * p_aout)
     AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
     err = AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &audioDevicesAddress, 0, NULL, &propertySize);
     if (err != noErr) {
-        msg_Err(p_aout, "Could not get number of devices: [%s]", (char *)&err);
+        msg_Err(p_aout, "Could not get number of devices: [%4.4s]", (char *)&err);
         return;
     }
 
@@ -1032,7 +1032,7 @@ static void RebuildDeviceList(audio_output_t * p_aout)
     /* Populate DeviceID array */
     err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &audioDevicesAddress, 0, NULL, &propertySize, deviceIDs);
     if (err != noErr) {
-        msg_Err(p_aout, "could not get the device IDs: [%s]", (char *)&err);
+        msg_Err(p_aout, "could not get the device IDs: [%4.4s]", (char *)&err);
         return;
     }
 
@@ -1041,7 +1041,7 @@ static void RebuildDeviceList(audio_output_t * p_aout)
     propertySize = sizeof(AudioObjectID);
     err= AudioObjectGetPropertyData(kAudioObjectSystemObject, &defaultDeviceAddress, 0, NULL, &propertySize, &defaultDeviceID);
     if (err != noErr) {
-        msg_Err(p_aout, "could not get default audio device: [%s]", (char *)&err);
+        msg_Err(p_aout, "could not get default audio device: [%4.4s]", (char *)&err);
         return;
     }
     p_sys->i_default_dev = defaultDeviceID;
@@ -1275,6 +1275,7 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
     VLC_UNUSED(ioActionFlags);
     VLC_UNUSED(inTimeStamp);
     VLC_UNUSED(inBusNumber);
+    VLC_UNUSED(inNumberFrames);
 
     audio_output_t * p_aout = (audio_output_t *)p_obj;
     struct aout_sys_t * p_sys = p_aout->sys;
@@ -1294,7 +1295,6 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
     } else {
         memcpy(targetBuffer, buffer, __MIN(bytesToCopy, availableBytes));
         TPCircularBufferConsume(&p_sys->circular_buffer, __MIN(bytesToCopy, availableBytes));
-        VLC_UNUSED(inNumberFrames);
     }
 
     vlc_mutex_lock(&p_sys->lock);
@@ -1325,11 +1325,11 @@ static OSStatus RenderCallbackSPDIF (AudioDeviceID inDevice,
     struct aout_sys_t * p_sys = p_aout->sys;
 
     int bytesToCopy = outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize;
-    Float32 *targetBuffer = (Float32*)outOutputData->mBuffers[p_sys->i_stream_index].mData;
+    char *targetBuffer = outOutputData->mBuffers[p_sys->i_stream_index].mData;
 
     /* Pull audio from buffer */
     int32_t availableBytes;
-    Float32 *buffer = TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
+    char *buffer = TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
 
     /* check if we have enough data */
     if (!availableBytes) {
