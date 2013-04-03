@@ -746,14 +746,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     if (b_nativeFullscreenMode) {
-        if ([NSApp presentationOptions] & NSApplicationPresentationFullScreen)
+        if ([self hasActiveVideo] && [self fullscreen]) {
             [[o_controls_bar bottomBarView] setHidden: b_videoPlayback];
-        else
-            [[o_controls_bar bottomBarView] setHidden: NO];
-        if (b_videoPlayback && b_fullscreen)
             [o_fspanel setActive: nil];
-        if (!b_videoPlayback)
+        } else {
+            [[o_controls_bar bottomBarView] setHidden: NO];
             [o_fspanel setNonActive: nil];
+        }
     }
 }
 
