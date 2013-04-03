@@ -506,8 +506,13 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
 
     if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
         block_Release(p_block);
-        if (p_sys->decoded)
+        if (p_sys->decoded) {
             (*env)->CallVoidMethod(env, p_sys->codec, p_sys->flush);
+            if ((*env)->ExceptionOccurred(env)) {
+                msg_Warn(p_dec, "Exception occurred in MediaCodec.flush");
+                (*env)->ExceptionClear(env);
+            }
+        }
         p_sys->decoded = 0;
         (*myVm)->DetachCurrentThread(myVm);
         return NULL;
