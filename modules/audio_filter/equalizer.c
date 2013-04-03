@@ -352,6 +352,8 @@ static int EqzInit( filter_t *p_filter, int i_rate )
         }
     }
 
+    p_sys->psz_newbands = NULL;
+
     var_Create( p_aout, "equalizer-bands", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_aout, "equalizer-preset", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
@@ -372,10 +374,8 @@ static int EqzInit( filter_t *p_filter, int i_rate )
 
     free( val1.psz_string );
 
-    /* Register preset bands (for intf) if : */
-    /* We have no bands info --> the preset info must be given to the intf */
-    /* or The bands info matches the preset */
-    if (p_sys->psz_newbands == NULL)
+    /* Exit if we have no preset and no bands value */
+    if (p_sys->psz_newbands == NULL && (!val2.psz_string || !*val2.psz_string))
     {
         msg_Err(p_filter, "No preset selected");
         free( val2.psz_string );
@@ -383,8 +383,11 @@ static int EqzInit( filter_t *p_filter, int i_rate )
         i_ret = VLC_EGENERIC;
         goto error;
     }
-    if( ( *(val2.psz_string) &&
-        strstr( p_sys->psz_newbands, val2.psz_string ) ) || !*val2.psz_string )
+    /* Register preset bands (for intf) if : */
+    /* We have no bands info --> the preset info must be given to the intf */
+    /* or The bands info matches the preset */
+    if( ( p_sys->psz_newbands && *(val2.psz_string) &&
+         strstr( p_sys->psz_newbands, val2.psz_string ) ) || !*val2.psz_string )
     {
         var_SetString( p_aout, "equalizer-bands", p_sys->psz_newbands );
         if( p_sys->f_newpreamp == p_sys->f_gamp )
