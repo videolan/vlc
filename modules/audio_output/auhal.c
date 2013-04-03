@@ -1231,8 +1231,10 @@ static void Flush(audio_output_t *p_aout, bool wait)
     if (wait) {
         int32_t availableBytes;
         vlc_mutex_lock(&p_sys->lock);
-        while (TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes) != NULL) {
+        TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
+        while (availableBytes > 0) {
             vlc_cond_wait(&p_sys->cond, &p_sys->lock);
+            TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
         }
         vlc_mutex_unlock(&p_sys->lock);
 
@@ -1283,6 +1285,7 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
     int bytesToCopy = ioData->mBuffers[0].mDataByteSize;
     Float32 *targetBuffer = (Float32*)ioData->mBuffers[0].mData;
 
+    vlc_mutex_lock(&p_sys->lock);
     /* Pull audio from buffer */
     int32_t availableBytes;
     Float32 *buffer = TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
@@ -1297,7 +1300,6 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
         TPCircularBufferConsume(&p_sys->circular_buffer, __MIN(bytesToCopy, availableBytes));
     }
 
-    vlc_mutex_lock(&p_sys->lock);
     vlc_cond_signal(&p_sys->cond);
     vlc_mutex_unlock(&p_sys->lock);
 
@@ -1327,6 +1329,7 @@ static OSStatus RenderCallbackSPDIF (AudioDeviceID inDevice,
     int bytesToCopy = outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize;
     char *targetBuffer = outOutputData->mBuffers[p_sys->i_stream_index].mData;
 
+    vlc_mutex_lock(&p_sys->lock);
     /* Pull audio from buffer */
     int32_t availableBytes;
     char *buffer = TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
@@ -1340,7 +1343,6 @@ static OSStatus RenderCallbackSPDIF (AudioDeviceID inDevice,
         TPCircularBufferConsume(&p_sys->circular_buffer, __MIN(bytesToCopy, availableBytes));
     }
 
-    vlc_mutex_lock(&p_sys->lock);
     vlc_cond_signal(&p_sys->cond);
     vlc_mutex_unlock(&p_sys->lock);
 
