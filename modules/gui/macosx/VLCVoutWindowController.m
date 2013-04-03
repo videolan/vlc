@@ -117,7 +117,7 @@
                 [o_new_video_window center];
                 [o_new_video_window setFrameAutosaveName:@"extra-videowindow"];
             }
-            
+
             [o_new_video_window setContentMinSize: NSMakeSize(f_min_video_height, f_min_video_height)];
         }
 
@@ -169,7 +169,7 @@
             top_left_point = [o_new_video_window cascadeTopLeftFromPoint: top_left_point];
             [o_new_video_window setFrameTopLeftPoint: top_left_point];
         }
-        
+
         [o_new_video_window setNativeVideoSize:videoViewSize];
 
         [o_new_video_window makeKeyAndOrderFront: self];
@@ -258,7 +258,7 @@
 {
     intf_thread_t *p_intf = VLCIntf;
     BOOL b_nativeFullscreenMode = [[VLCMain sharedInstance] nativeFullscreenMode];
-    
+
     if (!p_intf || (!b_nativeFullscreenMode && !p_wnd))
         return;
     playlist_t *p_playlist = pl_Get(p_intf);
@@ -273,7 +273,7 @@
 
     if (b_nativeFullscreenMode) {
         if(!o_current_window)
-            o_current_window = [VLCMainWindow sharedInstance];        
+            o_current_window = [VLCMainWindow sharedInstance];
         assert(o_current_window);
 
         // fullscreen might be triggered twice (vout event)
