@@ -267,3 +267,13 @@ void GenericLayout::onHide()
     m_visible = false;
 }
 
+
+bool GenericLayout::isTightlyCoupledWith( const GenericLayout& otherLayout ) const
+{
+    return m_original_width == otherLayout.m_original_width &&
+           m_original_height == otherLayout.m_original_height &&
+           m_minWidth == otherLayout.m_minWidth &&
+           m_maxWidth == otherLayout.m_maxWidth &&
+           m_minHeight == otherLayout.m_minHeight &&
+           m_maxHeight == otherLayout.m_maxHeight;
+}

@@ -108,12 +108,7 @@ public:
     virtual void resize( int width, int height );
 
     /// determine whether layouts should be kept the same size
-    virtual bool isTightlyCoupledWith( const GenericLayout& otherLayout ) const
-    {
-        return m_original_width == otherLayout.m_original_width
-               &&
-               m_original_height == otherLayout.m_original_height;
-    }
+    virtual bool isTightlyCoupledWith( const GenericLayout& otherLayout ) const;
 
     // getter for layout visibility
     virtual bool isVisible( ) const { return m_visible; }
@@ -163,8 +158,8 @@ private:
     const int m_original_height;
     /// Layout size
     SkinsRect m_rect;
-    int m_minWidth, m_maxWidth;
-    int m_minHeight, m_maxHeight;
+    const int m_minWidth, m_maxWidth;
+    const int m_minHeight, m_maxHeight;
     /// Image of the layout
     OSGraphics *m_pImage;
     /// List of the controls in the layout
