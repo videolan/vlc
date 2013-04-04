@@ -1037,6 +1037,13 @@ void Builder::addVideo( const BuilderData::Video &rData )
             Data.m_autoResize = false;
         }
     }
+    if( !(Data.m_width > 0 && Data.m_height > 0) )
+    {
+        msg_Err( getIntf(),
+            "pls, provide a valid size for the video control id: %s "
+             "(dropping the video control)", Data.m_id.c_str() );
+        return;
+    }
 
     // Get the visibility variable
     // XXX check when it is null
