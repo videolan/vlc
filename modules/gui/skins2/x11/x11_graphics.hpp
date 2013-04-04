@@ -102,6 +102,10 @@ private:
     void addHSegmentInRegion( Region &rMask, int xStart, int xEnd, int y );
     /// Add a vertical segment in a region
     void addVSegmentInRegion( Region &rMask, int yStart, int yEnd, int x );
+    /// check boundaries for graphics and bitmaps
+    bool checkBoundaries( int x_src, int y_src, int w_src, int h_src,
+                          int& x_target, int& y_target,
+                          int& w_target, int& h_target );
 };
 
 
