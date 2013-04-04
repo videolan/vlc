@@ -1197,7 +1197,8 @@ static void Play (audio_output_t * p_aout, block_t * p_block)
         }
 
         /* move data to buffer */
-        TPCircularBufferProduceBytes(&p_sys->circular_buffer, p_block->p_buffer, p_block->i_buffer);
+        if (unlikely(!TPCircularBufferProduceBytes(&p_sys->circular_buffer, p_block->p_buffer, p_block->i_buffer)))
+            msg_Warn(p_aout, "dropped buffer");
 
         if (!p_sys->i_bytes_per_sample)
             p_sys->i_bytes_per_sample = p_block->i_buffer / p_block->i_nb_samples;
