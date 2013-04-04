@@ -24,6 +24,7 @@
 
 #include <libkern/OSAtomic.h>
 #include <string.h>
+#include <assert.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -95,14 +96,16 @@ static __inline__ __attribute__((always_inline)) void* TPCircularBufferTail(TPCi
 static __inline__ __attribute__((always_inline)) void TPCircularBufferConsume(TPCircularBuffer *buffer, int32_t amount) {
     buffer->tail = (buffer->tail + amount) % buffer->length;
     OSAtomicAdd32Barrier(-amount, &buffer->fillCount);
+    assert(buffer->fillCount >= 0);
 }
 
 /*!
  * Version of TPCircularBufferConsume without the memory barrier, for more optimal use in single-threaded contexts
  */
- static __inline__ __attribute__((always_inline)) void TPCircularBufferConsumeNoBarrier(TPCircularBuffer *buffer, int32_t amount) {
+static __inline__ __attribute__((always_inline)) void TPCircularBufferConsumeNoBarrier(TPCircularBuffer *buffer, int32_t amount) {
     buffer->tail = (buffer->tail + amount) % buffer->length;
     buffer->fillCount -= amount;
+    assert(buffer->fillCount >= 0);
 }
 
 /*!
@@ -134,6 +137,7 @@ static __inline__ __attribute__((always_inline)) void* TPCircularBufferHead(TPCi
 static __inline__ __attribute__((always_inline)) void TPCircularBufferProduce(TPCircularBuffer *buffer, int amount) {
     buffer->head = (buffer->head + amount) % buffer->length;
     OSAtomicAdd32Barrier(amount, &buffer->fillCount);
+    assert(buffer->fillCount <= buffer->length);
 }
 
 /*!
@@ -142,6 +146,7 @@ static __inline__ __attribute__((always_inline)) void TPCircularBufferProduce(TP
 static __inline__ __attribute__((always_inline)) void TPCircularBufferProduceNoBarrier(TPCircularBuffer *buffer, int amount) {
     buffer->head = (buffer->head + amount) % buffer->length;
     buffer->fillCount += amount;
+    assert(buffer->fillCount <= buffer->length);
 }
 
 /*!
