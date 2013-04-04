@@ -29,6 +29,7 @@
 #include "../utils/bezier.hpp"
 #include "../utils/fsm.hpp"
 #include "../utils/observer.hpp"
+#include "../utils/position.hpp"
 
 
 class GenericBitmap;

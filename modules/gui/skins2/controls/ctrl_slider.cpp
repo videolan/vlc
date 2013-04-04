@@ -31,7 +31,6 @@
 #include "../src/top_window.hpp"
 #include "../src/os_factory.hpp"
 #include "../src/os_graphics.hpp"
-#include "../utils/position.hpp"
 #include "../utils/var_percent.hpp"
 
 
