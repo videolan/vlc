@@ -74,10 +74,8 @@ endif
 	cp -r $(prefix)/include "$(win32_destdir)/sdk"
 	cp -r $(prefix)/lib/pkgconfig "$(win32_destdir)/sdk/lib"
 	cd $(prefix)/lib && cp -rv libvlc.dll.a libvlc.la libvlccore.dll.a libvlccore.la "$(win32_destdir)/sdk/lib/"
-	cd "$(prefix)/bin" && $(GENDEF) "libvlc.dll"
-	$(DLLTOOL) -D libvlc.dll -l "$(win32_destdir)/sdk/lib/libvlc.lib" -d "$(prefix)/bin/libvlc.def" "$(prefix)/bin/libvlc.dll"
-	cd "$(prefix)/bin" && $(GENDEF) "libvlccore.dll"
-	$(DLLTOOL) -D libvlccore.dll -l "$(win32_destdir)/sdk/lib/libvlccore.lib" -d "$(prefix)/bin/libvlccore.def" "$(prefix)/bin/libvlccore.dll"
+	$(DLLTOOL) -D libvlc.dll -l "$(win32_destdir)/sdk/lib/libvlc.lib" -d "$(top_builddir)/lib/.libs/libvlc.dll.def" "$(prefix)/bin/libvlc.dll"
+	$(DLLTOOL) -D libvlccore.dll -l "$(win32_destdir)/sdk/lib/libvlccore.lib" -d "$(top_builddir)/src/.libs/libvlccore.dll.def" "$(prefix)/bin/libvlccore.dll"
 
 	mkdir -p "$(win32_destdir)/sdk/activex/"
 	cd $(top_builddir)/npapi-vlc && cp activex/README.TXT share/test/test.html $(win32_destdir)/sdk/activex/

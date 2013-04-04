@@ -204,10 +204,6 @@ case "${host_os}" in
   *mingw32* | *cygwin* | *wince* | *mingwce*)
     AC_CHECK_TOOL(WINDRES, windres, :)
     AC_CHECK_TOOL(OBJCOPY, objcopy, :)
-    AC_PATH_PROGS(GENDEF,[${GENDEF} gendef], [false])
-    AS_IF([test "${GENDEF}" = "false"], [
-        AC_MSG_ERROR([Could not find gendef.])
-    ])
     AH_TOP([#if defined(WIN32) && !defined(_WIN32_WINNT)])
     AH_TOP([# define _WIN32_WINNT 0x0502 /* Windows XP SP2 */])
     AH_TOP([#endif])
