@@ -82,19 +82,20 @@ void Win32Graphics::drawBitmap( const GenericBitmap &rBitmap,
                                 int width, int height, bool blend )
 {
     (void)blend;
-    // Get the bitmap size if necessary
-    if( width == -1 )
+
+    // check and adapt to source if needed
+    if( !checkBoundaries( 0, 0, rBitmap.getWidth(), rBitmap.getHeight(),
+                          xSrc, ySrc, width, height ) )
     {
-        width = rBitmap.getWidth();
-    }
-    if( height == -1 )
-    {
-        height = rBitmap.getHeight();
+        msg_Err( getIntf(), "empty source! pls, debug your skin" );
+        return;
     }
 
-    if( xDest + width > m_width || yDest + height > m_height )
+    // check destination
+    if( !checkBoundaries( 0, 0, m_width, m_height,
+                          xDest, yDest, width, height ) )
     {
-        msg_Err( getIntf(), "Bitmap too large !" );
+        msg_Err( getIntf(), "out of reach destination! pls, debug your skin" );
         return;
     }
 
@@ -212,13 +213,20 @@ void Win32Graphics::drawGraphics( const OSGraphics &rGraphics, int xSrc,
                                   int ySrc, int xDest, int yDest, int width,
                                   int height )
 {
-    if( width == -1 )
+    // check and adapt to source if needed
+    if( !checkBoundaries( 0, 0, rGraphics.getWidth(), rGraphics.getHeight(),
+                          xSrc, ySrc, width, height ) )
     {
-        width = rGraphics.getWidth();
+        msg_Err( getIntf(), "nothing to draw from graphics source" );
+        return;
     }
-    if( height == -1 )
+
+    // check destination
+    if( !checkBoundaries( 0, 0, m_width, m_height,
+                          xDest, yDest, width, height ) )
     {
-        height = rGraphics.getHeight();
+        msg_Err( getIntf(), "out of reach destination! pls, debug your skin" );
+        return;
     }
 
     // Create the mask for transparency
@@ -344,6 +352,31 @@ void Win32Graphics::addSegmentInRegion( HRGN &rMask, int start,
     HRGN buffer = CreateRectRgn( start, line, end, line + 1 );
     CombineRgn( rMask, buffer, rMask, RGN_OR );
     DeleteObject( buffer );
+}
+
+
+bool Win32Graphics::checkBoundaries( int x_src, int y_src,
+                                     int w_src, int h_src,
+                                     int& x_target, int& y_target,
+                                     int& w_target, int& h_target )
+{
+    // set valid width and height
+    w_target = (w_target > 0) ? w_target : w_src;
+    h_target = (h_target > 0) ? h_target : h_src;
+
+    // clip source if needed
+    rect srcRegion( x_src, y_src, w_src, h_src );
+    rect targetRegion( x_target, y_target, w_target, h_target );
+    rect inter;
+    if( rect::intersect( srcRegion, targetRegion, &inter ) )
+    {
+        x_target = inter.x;
+        y_target = inter.y;
+        w_target = inter.width;
+        h_target = inter.height;
+        return true;
+    }
+    return false;
 }
 
 #endif

@@ -95,6 +95,11 @@ private:
 
     /// Add a segment in a region
     void addSegmentInRegion( HRGN &rMask, int start, int end, int line );
+
+    /// check boundaries for graphics and bitmaps
+    bool checkBoundaries( int x_src, int y_src, int w_src, int h_src,
+                          int& x_target, int& y_target,
+                          int& w_target, int& h_target );
 };
 
 
