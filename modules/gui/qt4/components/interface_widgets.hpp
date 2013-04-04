@@ -61,7 +61,6 @@ public:
 
     WId request( int *, int *, unsigned int *, unsigned int *, bool );
     void  release( void );
-    int   control( void *, int, va_list );
     void  sync( void );
 
 protected:
