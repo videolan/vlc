@@ -325,6 +325,7 @@ modules/audio_output/alsa.c
 modules/audio_output/amem.c
 modules/audio_output/audioqueue.c
 modules/audio_output/audiotrack.c
+modules/audio_output/audiounit_ios.c
 modules/audio_output/auhal.c
 modules/audio_output/directx.c
 modules/audio_output/file.c
@@ -1134,6 +1135,7 @@ modules/video_output/fb.c
 modules/video_output/gl.c
 modules/video_output/glx.c
 modules/video_output/ios.m
+modules/video_output/ios2.m
 modules/video_output/kva.c
 modules/video_output/macosx.m
 modules/video_output/msw/direct2d.c

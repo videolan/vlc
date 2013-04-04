@@ -53,7 +53,8 @@ $Id$
  * audiobargraph_v: audiobargraph video plugin
  * audioqueue: Audio Output based on AudioQueue API for iOS
  * audioscrobbler: AudioScrobbler/Last.fm submission plugin
- * auhal: Audio output for MacOS X based on the AUHAL API
+ * audiounit_ios: AudioUnit output plugin for iOS
+ * auhal: Audio output for Mac OS X based on the AUHAL API
  * avcodec: libavcodec audio/video decoder
  * avformat: libavformat demuxer
  * avi: AVI file stream demuxer
@@ -366,8 +367,9 @@ $Id$
  * vod_rtsp: RTSP VoD module
  * volume_neon: audio volume optimized for ARM NEON
  * vorbis: a vorbis audio decoder/packetizer using the libvorbis library
+ * vout_ios2: iOS video provider using OpenGL ES 2
  * vout_ios: iOS video output
- * vout_macosx: MacOS X OpenGL provider
+ * vout_macosx: Mac OS X OpenGL provider
  * vout_sdl: video output module using the SDL library
  * vsxu: audio visualization using Vovoid VSXu
  * wall: image wall filter

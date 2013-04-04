@@ -71,6 +71,7 @@ Audio output:
    This fix was facilitated through a hardware lending by TEAC Europe GmbH
    distributing such devices under the brand "TASCAM" (US-122, US-144, etc.).
  * Rewrite of AudioQueue module for iOS (and OS X)
+ * New, simplified AudioUnit output module for iOS
 
 Audio Filters:
  * New remapping channel filter
@@ -86,6 +87,7 @@ Video Outputs:
  * Fix and enable the OpenGL ES1 and ES2 modules
    Also, subpictures now work in the OpenGL ES2 module
  * Fix the power management issue on Windows for standby management
+ * New output module for iOS using OpenGL ES2
 
 Video Filters:
  * New anaglyph video filter which transforms side by side 3D video streams in
