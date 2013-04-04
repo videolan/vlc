@@ -213,7 +213,8 @@ fi
     --disable-orc \
     --disable-schroedinger \
     --disable-libmpeg2 \
-    --disable-mad > ${out}
+    --disable-mad \
+    --disable-taglib > ${out}
 
 echo "EXTRA_CFLAGS += ${EXTRA_CFLAGS}" >> config.mak
 echo "EXTRA_LDFLAGS += ${EXTRA_LDFLAGS}" >> config.mak
