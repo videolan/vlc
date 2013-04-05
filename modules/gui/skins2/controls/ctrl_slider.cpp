@@ -34,8 +34,6 @@
 #include "../utils/var_percent.hpp"
 
 
-#define RANGE 40
-
 static inline float scroll( bool up, float pct, float step )
 {
     return pct + ( up ? step : -step );
@@ -57,8 +55,7 @@ CtrlSliderCursor::CtrlSliderCursor( intf_thread_t *pIntf,
     m_cmdOverDown( this ), m_cmdDownOver( this ),
     m_cmdOverUp( this ), m_cmdUpOver( this ),
     m_cmdMove( this ), m_cmdScroll( this ),
-    m_lastPercentage( 0 ), m_lastCursorRect(),
-    m_xOffset( 0 ), m_yOffset( 0 ),
+    m_lastCursorRect(), m_xOffset( 0 ), m_yOffset( 0 ),
     m_pEvt( NULL ), m_rCurve( rCurve )
 {
     // Build the images of the cursor
@@ -94,9 +91,6 @@ CtrlSliderCursor::CtrlSliderCursor( intf_thread_t *pIntf,
 
     // Observe the position variable
     m_rVariable.addObserver( this );
-
-    // Initial position of the cursor
-    m_lastPercentage = m_rVariable.get();
 }
 
 
@@ -204,9 +198,6 @@ void CtrlSliderCursor::CmdOverDown::execute()
 
 void CtrlSliderCursor::CmdDownOver::execute()
 {
-    // Save the position
-    m_pParent->m_lastPercentage = m_pParent->m_rVariable.get();
-
     m_pParent->releaseMouse();
     m_pParent->m_pImg = m_pParent->m_pImgUp;
     m_pParent->refreshLayout();
@@ -245,17 +236,9 @@ void CtrlSliderCursor::CmdMove::execute()
     int relXPond = (int)(relX / factorX);
     int relYPond = (int)(relY / factorY);
 
-    // Update the position
-    if( m_pParent->m_rCurve.getMinDist( relXPond, relYPond ) < RANGE )
-    {
-        float percentage = m_pParent->m_rCurve.getNearestPercent( relXPond,
-                                                              relYPond );
-        m_pParent->m_rVariable.set( percentage );
-    }
-    else
-    {
-        m_pParent->m_rVariable.set( m_pParent->m_lastPercentage );
-    }
+    float percentage =
+        m_pParent->m_rCurve.getNearestPercent( relXPond, relYPond );
+    m_pParent->m_rVariable.set( percentage );
 }
 
 void CtrlSliderCursor::CmdScroll::execute()
