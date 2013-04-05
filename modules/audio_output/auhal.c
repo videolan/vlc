@@ -233,6 +233,8 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
      * property size */
     int                     b_alive = false;
 
+    bool                    b_start_digital = false;
+
     p_sys = p_aout->sys;
     p_sys->b_digital = false;
     p_sys->au_component = NULL;
@@ -246,9 +248,6 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     p_sys->i_bytes_per_sample = 0;
 
     aout_FormatPrint(p_aout, "VLC is looking for:", fmt);
-
-    if (p_sys->b_selected_dev_is_digital)
-        msg_Dbg(p_aout, "audio device supports digital output");
 
     msg_Dbg(p_aout, "attempting to use device %i", p_sys->i_selected_dev);
 
@@ -267,9 +266,18 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     }
 
     if (!b_alive) {
-        msg_Warn(p_aout, "selected audio device is not alive, switching to default device");
+        msg_Warn(p_aout, "selected audio device is not alive, switching to default device with id %i", p_sys->i_default_dev);
         p_sys->i_selected_dev = p_sys->i_default_dev;
+        p_sys->b_selected_dev_is_digital = false;
     }
+
+    // recheck if device still supports digital
+    b_start_digital = p_sys->b_selected_dev_is_digital;
+    if(!AudioDeviceSupportsDigital(p_aout, p_sys->i_selected_dev))
+        b_start_digital = false;
+
+    if (b_start_digital)
+        msg_Dbg(p_aout, "Use audio device for digital output");
 
     /* add a callback to see if the device dies later on */
     err = AudioObjectAddPropertyListener(p_sys->i_selected_dev, &audioDeviceAliveAddress, HardwareListener, (void *)p_aout);
@@ -302,7 +310,7 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     bool b_success = false;
 
     /* Check for Digital mode or Analog output mode */
-    if (AOUT_FMT_SPDIF (fmt) && p_sys->b_selected_dev_is_digital) {
+    if (AOUT_FMT_SPDIF (fmt) && b_start_digital) {
         if (StartSPDIF (p_aout, fmt)) {
             msg_Dbg(p_aout, "digital output successfully opened");
             b_success = true;
