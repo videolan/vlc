@@ -194,6 +194,7 @@ void PrefsDialog::setAdvanced()
 
     all->setChecked( true );
     stack->setCurrentIndex( ADVANCED );
+    setWindowTitle( qtr( "Advanced Preferences" ) );
 }
 
 void PrefsDialog::setSmall()
@@ -214,6 +215,7 @@ void PrefsDialog::setSmall()
 
     small->setChecked( true );
     stack->setCurrentIndex( SIMPLE );
+    setWindowTitle( qtr( "Simple Preferences" ) );
 }
 
 /* Switching from on simple panel to another */
