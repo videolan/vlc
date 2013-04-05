@@ -39,6 +39,7 @@
 #include <vlc_aout.h>
 
 #include <jack/jack.h>
+#include <jack/ringbuffer.h>
 
 typedef jack_default_audio_sample_t jack_sample_t;
 
@@ -50,14 +51,16 @@ typedef jack_default_audio_sample_t jack_sample_t;
  *****************************************************************************/
 struct aout_sys_t
 {
-    aout_packet_t   packet;
+    jack_ringbuffer_t *p_jack_ringbuffer;
     jack_client_t  *p_jack_client;
     jack_port_t   **p_jack_ports;
     jack_sample_t **p_jack_buffers;
     unsigned int    i_channels;
+    unsigned int    i_rate;
     jack_nframes_t latency;
     float soft_gain;
     bool soft_mute;
+    mtime_t paused; /**< Time when (last) paused */
 };
 
 /*****************************************************************************
@@ -65,6 +68,10 @@ struct aout_sys_t
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
+static void Play         ( audio_output_t * p_aout, block_t * p_block );
+static void Pause        ( audio_output_t *aout, bool paused, mtime_t date );
+static void Flush        ( audio_output_t *p_aout, bool wait );
+static int  TimeGet      ( audio_output_t *, mtime_t * );
 static int  Process      ( jack_nframes_t i_frames, void *p_arg );
 static int  GraphChange  ( void *p_arg );
 
@@ -109,6 +116,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     int i_error;
 
     p_sys->latency = 0;
+    p_sys->paused = VLC_TS_INVALID;
 
     /* Connect to the JACK server */
     snprintf( psz_name, sizeof(psz_name), "vlc_%d", getpid());
@@ -130,17 +138,16 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     /* JACK only supports fl32 format */
     fmt->i_format = VLC_CODEC_FL32;
     // TODO add buffer size callback
-    fmt->i_rate = jack_get_sample_rate( p_sys->p_jack_client );
+    p_sys->i_rate = fmt->i_rate = jack_get_sample_rate( p_sys->p_jack_client );
 
-    p_aout->time_get = aout_PacketTimeGet;
-    p_aout->play = aout_PacketPlay;
-    p_aout->pause = NULL;
-    p_aout->flush = aout_PacketFlush;
-    aout_PacketInit( p_aout, &p_sys->packet,
-                     jack_get_buffer_size( p_sys->p_jack_client ), fmt );
+    p_aout->play = Play;
+    p_aout->pause = Pause;
+    p_aout->flush = Flush;
+    p_aout->time_get = TimeGet;
     aout_SoftVolumeStart( p_aout );
 
     p_sys->i_channels = aout_FormatNbChannels( fmt );
+    aout_FormatPrepare(fmt);
 
     p_sys->p_jack_ports = malloc( p_sys->i_channels *
                                   sizeof(jack_port_t *) );
@@ -153,6 +160,16 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     p_sys->p_jack_buffers = malloc( p_sys->i_channels *
                                     sizeof(jack_sample_t *) );
     if( p_sys->p_jack_buffers == NULL )
+    {
+        status = VLC_ENOMEM;
+        goto error_out;
+    }
+
+    const size_t buf_sz = AOUT_MAX_ADVANCE_TIME * fmt->i_rate *
+        fmt->i_bytes_per_frame / CLOCK_FREQ;
+    p_sys->p_jack_ringbuffer = jack_ringbuffer_create( buf_sz );
+
+    if( p_sys->p_jack_ringbuffer == NULL )
     {
         status = VLC_ENOMEM;
         goto error_out;
@@ -225,45 +242,166 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 
 error_out:
     /* Clean up, if an error occurred */
-    if( status != VLC_SUCCESS && p_sys != NULL)
+    if( status != VLC_SUCCESS && p_sys != NULL )
     {
         if( p_sys->p_jack_client )
         {
             jack_deactivate( p_sys->p_jack_client );
             jack_client_close( p_sys->p_jack_client );
-            aout_PacketDestroy( p_aout );
         }
+        if( p_sys->p_jack_ringbuffer )
+            jack_ringbuffer_free( p_sys->p_jack_ringbuffer );
+
         free( p_sys->p_jack_ports );
         free( p_sys->p_jack_buffers );
     }
     return status;
 }
 
+static void Play (audio_output_t * p_aout, block_t * p_block)
+{
+    struct aout_sys_t *p_sys = p_aout->sys;
+    jack_ringbuffer_t *rb = p_sys->p_jack_ringbuffer;
+    const size_t bytes_per_frame = p_sys->i_channels * sizeof(jack_sample_t);
+
+    while (p_block->i_buffer > 0) {
+
+        /* move data to buffer */
+        const size_t write_space = jack_ringbuffer_write_space(rb);
+        const size_t bytes = p_block->i_buffer < write_space ?
+            p_block->i_buffer : write_space;
+
+        /* If our audio thread is not reading fast enough */
+        if( unlikely( bytes == 0 ) ) {
+            msg_Warn( p_aout, "%"PRIuPTR " frames of audio dropped",
+                    p_block->i_buffer /  bytes_per_frame );
+            break;
+        }
+
+        jack_ringbuffer_write( rb, (const char *) p_block->p_buffer, bytes );
+
+        p_block->p_buffer += bytes;
+        p_block->i_buffer -= bytes;
+    }
+
+    block_Release(p_block);
+}
+
+/**
+ * Pause or unpause playback
+ */
+static void Pause(audio_output_t *aout, bool paused, mtime_t date)
+{
+    aout_sys_t *sys = aout->sys;
+
+    if( paused ) {
+        sys->paused = date;
+    } else {
+        date -= sys->paused;
+        msg_Dbg(aout, "resuming after %"PRId64" us", date);
+        sys->paused = VLC_TS_INVALID;
+    }
+}
+
+static void Flush(audio_output_t *p_aout, bool wait)
+{
+    struct aout_sys_t * p_sys = p_aout->sys;
+    jack_ringbuffer_t *rb = p_sys->p_jack_ringbuffer;
+    jack_client_t *client = p_sys->p_jack_client;
+    int i_error;
+
+    /* Sleep if wait was requested */
+    if( wait )
+    {
+        mtime_t delay;
+        if (!TimeGet(p_aout, &delay))
+            msleep(delay);
+    }
+
+    /* FIXME: maybe the ringbuffer_reset should just be protected by signalling
+     * with atomic variables?
+     * Here we save and restore connections, otherwise we'd lose the connections
+     * every seek because of the deactivate/activate */
+
+    /* Save connections */
+    const char **connections_list[p_sys->i_channels];
+
+    for( size_t i = 0; i < p_sys->i_channels; i++ )
+    {
+        const char **port_connections = jack_port_get_all_connections( client,
+                p_sys->p_jack_ports[i] );
+        connections_list[i] = port_connections;
+    }
+
+    /* Suspend audio processing */
+    i_error = jack_deactivate( p_sys->p_jack_client );
+    if( i_error )
+    {
+        msg_Err( p_aout, "failed to deactivate JACK client (error %d)",
+                i_error );
+        return;
+    }
+
+    /* reset ringbuffer read and write pointers */
+    jack_ringbuffer_reset(rb);
+
+    /* Resume audio processing */
+    i_error = jack_activate( p_sys->p_jack_client );
+    if( i_error )
+    {
+        msg_Err( p_aout, "failed to activate JACK client (error %d)", i_error );
+        return;
+    }
+
+    /* Restore connections */
+    for( size_t i = 0; i < p_sys->i_channels; i++ )
+    {
+        const char **port_connections = connections_list[i];
+        const char *psz_out = jack_port_name( p_sys->p_jack_ports[i] );
+        for (const char **psz_in = port_connections; psz_in && *psz_in;
+                psz_in++)
+        {
+            i_error = jack_connect( client, psz_out, *psz_in );
+            if( i_error )
+            {
+                msg_Err( p_aout, "failed to connect ports %s and %s (error %d)",
+                        psz_out, *psz_in, i_error );
+            }
+        }
+
+        if( port_connections )
+            jack_free(port_connections);
+    }
+}
+
+static int TimeGet(audio_output_t *p_aout, mtime_t *delay)
+{
+    struct aout_sys_t * p_sys = p_aout->sys;
+    jack_ringbuffer_t *rb = p_sys->p_jack_ringbuffer;
+    const size_t bytes_per_frame = p_sys->i_channels * sizeof(jack_sample_t);
+
+    *delay = (p_sys->latency +
+            (jack_ringbuffer_read_space(rb) / bytes_per_frame)) *
+        CLOCK_FREQ / p_sys->i_rate;
+
+    return 0;
+}
 
 /*****************************************************************************
  * Process: callback for JACK
  *****************************************************************************/
 int Process( jack_nframes_t i_frames, void *p_arg )
 {
-    unsigned int i, j, i_nb_samples = 0;
+    unsigned int i, j, frames_from_rb = 0;
+    size_t bytes_read = 0;
+    size_t frames_read;
     audio_output_t *p_aout = (audio_output_t*) p_arg;
     struct aout_sys_t *p_sys = p_aout->sys;
-    jack_sample_t *p_src = NULL;
 
-    jack_nframes_t dframes = p_sys->latency
-                             - jack_frames_since_cycle_start( p_sys->p_jack_client );
+    /* Get the next audio data buffer unless paused */
 
-    jack_time_t dtime = dframes * 1000 * 1000 / jack_get_sample_rate( p_sys->p_jack_client );
-    mtime_t play_date = mdate() + (mtime_t) ( dtime );
-
-    /* Get the next audio data buffer */
-    block_t *p_buffer = aout_PacketNext( p_aout, play_date );
-
-    if( p_buffer != NULL )
-    {
-        p_src = (jack_sample_t *)p_buffer->p_buffer;
-        i_nb_samples = p_buffer->i_nb_samples;
-    }
+    if( p_sys->paused == VLC_TS_INVALID )
+        frames_from_rb = i_frames;
 
     /* Get the JACK buffers to write to */
     for( i = 0; i < p_sys->i_channels; i++ )
@@ -273,28 +411,27 @@ int Process( jack_nframes_t i_frames, void *p_arg )
     }
 
     /* Copy in the audio data */
-    for( j = 0; j < i_nb_samples; j++ )
+    for( j = 0; j < frames_from_rb; j++ )
     {
         for( i = 0; i < p_sys->i_channels; i++ )
         {
-            jack_sample_t *p_dst = p_sys->p_jack_buffers[i];
-            p_dst[j] = *p_src;
-            p_src++;
+            jack_sample_t *p_dst = p_sys->p_jack_buffers[i] + j;
+            bytes_read += jack_ringbuffer_read( p_sys->p_jack_ringbuffer,
+                    (char *) p_dst, sizeof(jack_sample_t) );
         }
     }
 
     /* Fill any remaining buffer with silence */
-    if( i_nb_samples < i_frames )
+    frames_read = (bytes_read / sizeof(jack_sample_t)) / p_sys->i_channels;
+    if( frames_read < i_frames )
     {
         for( i = 0; i < p_sys->i_channels; i++ )
         {
-            memset( p_sys->p_jack_buffers[i] + i_nb_samples, 0,
-                    sizeof( jack_sample_t ) * (i_frames - i_nb_samples) );
+            memset( p_sys->p_jack_buffers[i] + frames_read, 0,
+                    sizeof( jack_sample_t ) * (i_frames - frames_read) );
         }
     }
 
-    if( p_buffer )
-        block_Release( p_buffer );
     return 0;
 }
 
@@ -308,18 +445,19 @@ static int GraphChange( void *p_arg )
   audio_output_t *p_aout = (audio_output_t*) p_arg;
   struct aout_sys_t *p_sys = p_aout->sys;
   unsigned int i;
-  jack_nframes_t port_latency;
+  jack_latency_range_t port_latency;
 
   p_sys->latency = 0;
 
   for( i = 0; i < p_sys->i_channels; ++i )
   {
-    port_latency = jack_port_get_total_latency( p_sys->p_jack_client,
-                                                  p_sys->p_jack_ports[i] );
-    p_sys->latency = __MAX( p_sys->latency, port_latency );
+    jack_port_get_latency_range( p_sys->p_jack_ports[i], JackPlaybackLatency,
+                                 &port_latency );
+    p_sys->latency = __MAX( p_sys->latency, port_latency.max );
   }
 
-  msg_Dbg(p_aout, "JACK graph reordered. Our maximum latency=%d.", p_sys->latency);
+  msg_Dbg(p_aout, "JACK graph reordered. Our maximum latency=%d.",
+          p_sys->latency);
 
   return 0;
 }
@@ -345,7 +483,7 @@ static void Stop( audio_output_t *p_aout )
     }
     free( p_sys->p_jack_ports );
     free( p_sys->p_jack_buffers );
-    aout_PacketDestroy( p_aout );
+    jack_ringbuffer_free( p_sys->p_jack_ringbuffer );
 }
 
 static int Open(vlc_object_t *obj)
@@ -353,7 +491,7 @@ static int Open(vlc_object_t *obj)
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = calloc(1, sizeof (*sys));
 
-    if (unlikely(sys == NULL))
+    if( unlikely( sys == NULL ) )
         return VLC_ENOMEM;
     aout->sys = sys;
     aout->start = Start;
