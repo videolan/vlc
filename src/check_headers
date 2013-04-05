@@ -6,7 +6,7 @@ cd "$(dirname "$0")" || exit $?
 # Look for configure #defines in public headers.
 # There are incorrect, as external users don't have our <config.h>.
 regexp="$(cat ../config.h.in | \
-	sed -n -e 's/^#undef \([A-Z0-9_]*\)$/\1/p' | \
+	sed -n -e 's/^#undef \([[:upper:][:digit:]_]*\)$/\1/p' | \
 	grep -v 'WORDS_BIGENDIAN' | \
 	grep -v 'UNICODE' | \
 	grep -v '__LIBVLC__' | \
