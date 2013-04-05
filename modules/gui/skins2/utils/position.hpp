@@ -263,6 +263,13 @@ public:
     static int min( int x, int y ) { return x < y ? x : y; }
     static int max( int x, int y ) { return x < y ? y : x; }
 
+    bool operator==( const rect& other ) const
+    {
+        return x == other.x &&
+               y == other.y &&
+               width == other.width &&
+               height == other.height;
+    }
 };
 
 #endif
