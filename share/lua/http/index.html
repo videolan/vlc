@@ -189,7 +189,7 @@
 				$('#viewContainer').animate({height: 'toggle'});
 			});
 			/* delay script loading so we won't block if we have no net access */
-			$.getScript('http://static.flowplayer.org/js/flowplayer-3.2.6.min.js', function(data, textStatus){
+			$.getScript('http://releases.flowplayer.org/js/flowplayer-3.2.6.min.js', function(data, textStatus){
 				$('#player').empty();
 				flowplayer("player", "http://releases.flowplayer.org/swf/flowplayer-3.2.7.swf");
 				/* .getScript only handles success() */
