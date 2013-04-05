@@ -38,7 +38,7 @@
 
 static inline float scroll( bool up, float pct, float step )
 {
-    return pct + (up? step : -step);
+    return pct + ( up ? step : -step );
 }
 
 
@@ -57,7 +57,8 @@ CtrlSliderCursor::CtrlSliderCursor( intf_thread_t *pIntf,
     m_cmdOverDown( this ), m_cmdDownOver( this ),
     m_cmdOverUp( this ), m_cmdUpOver( this ),
     m_cmdMove( this ), m_cmdScroll( this ),
-    m_lastPercentage( 0 ), m_xOffset( 0 ), m_yOffset( 0 ),
+    m_lastPercentage( 0 ), m_lastCursorRect(),
+    m_xOffset( 0 ), m_yOffset( 0 ),
     m_pEvt( NULL ), m_rCurve( rCurve )
 {
     // Build the images of the cursor
@@ -134,10 +135,8 @@ bool CtrlSliderCursor::mouseOver( int x, int y ) const
         return m_pImg->hit( x - xPos + m_pImg->getWidth() / 2,
                             y - yPos + m_pImg->getHeight() / 2 );
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 
@@ -149,10 +148,10 @@ void CtrlSliderCursor::draw( OSGraphics &rImage, int xDest, int yDest, int w, in
         rect inter;
         rect clip( xDest, yDest, w, h);
 
-        if( rect::intersect( m_currentCursorRect, clip, &inter ) )
+        if( rect::intersect( m_lastCursorRect, clip, &inter ) )
             rImage.drawGraphics( *m_pImg,
-                             inter.x - m_currentCursorRect.x,
-                             inter.y - m_currentCursorRect.y,
+                             inter.x - m_lastCursorRect.x,
+                             inter.y - m_lastCursorRect.y,
                              inter.x, inter.y, inter.width, inter.height );
     }
 }
@@ -160,22 +159,7 @@ void CtrlSliderCursor::draw( OSGraphics &rImage, int xDest, int yDest, int w, in
 
 void CtrlSliderCursor::onPositionChange()
 {
-    // Compute the position of the cursor
-    int xPos, yPos;
-    m_rCurve.getPoint( m_rVariable.get(), xPos, yPos );
-
-    // Compute the resize factors
-    float factorX, factorY;
-    getResizeFactors( factorX, factorY );
-    xPos = (int)(xPos * factorX);
-    yPos = (int)(yPos * factorY);
-
-    const Position *pPos = getPosition();
-
-    int x = pPos->getLeft() + xPos - m_pImg->getWidth() / 2;
-    int y = pPos->getTop() + yPos - m_pImg->getHeight() / 2;
-
-    m_currentCursorRect = rect( x, y, m_pImg->getWidth(), m_pImg->getHeight() );
+    m_lastCursorRect = getCurrentCursorRect();
 }
 
 
@@ -302,6 +286,27 @@ void CtrlSliderCursor::getResizeFactors( float &rFactorX,
 
 void CtrlSliderCursor::refreshLayout( bool force )
 {
+    rect currRect = getCurrentCursorRect();
+    if( !force && currRect == m_lastCursorRect )
+        return;
+
+    rect join;
+    if( rect::join( m_lastCursorRect, currRect, &join ) )
+    {
+        m_lastCursorRect = currRect;
+
+        const Position *pPos = getPosition();
+        notifyLayout( join.width, join.height,
+                      join.x - pPos->getLeft(),
+                      join.y - pPos->getTop() );
+    }
+}
+
+
+rect CtrlSliderCursor::getCurrentCursorRect()
+{
+    const Position *pPos = getPosition();
+
     // Compute the position of the cursor
     int xPos, yPos;
     m_rCurve.getPoint( m_rVariable.get(), xPos, yPos );
@@ -312,31 +317,10 @@ void CtrlSliderCursor::refreshLayout( bool force )
     xPos = (int)(xPos * factorX);
     yPos = (int)(yPos * factorY);
 
-    const Position *pPos = getPosition();
-
     int x = pPos->getLeft() + xPos - m_pImg->getWidth() / 2;
     int y = pPos->getTop() + yPos - m_pImg->getHeight() / 2;
 
-    rect region( x, y, m_pImg->getWidth(), m_pImg->getHeight() );
-
-
-    if( !force &&
-        region.x == m_currentCursorRect.x &&
-        region.y == m_currentCursorRect.y &&
-        region.width == m_currentCursorRect.width &&
-        region.height == m_currentCursorRect.height )
-    {
-        return;
-    }
-
-    rect join;
-    if( rect::join( m_currentCursorRect, region, &join ) )
-    {
-        m_currentCursorRect = region;
-        notifyLayout( join.width, join.height,
-                      join.x - pPos->getLeft(),
-                      join.y - pPos->getTop() );
-    }
+    return rect( x, y, m_pImg->getWidth(), m_pImg->getHeight() );
 }
 
 

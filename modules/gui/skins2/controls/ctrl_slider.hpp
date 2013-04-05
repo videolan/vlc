@@ -88,7 +88,6 @@ private:
     int m_width, m_height;
     /// Position of the cursor
     int m_xPosition, m_yPosition;
-    rect m_currentCursorRect;
     /// Callback objects
     DEFINE_CALLBACK( CtrlSliderCursor, OverDown )
     DEFINE_CALLBACK( CtrlSliderCursor, DownOver )
@@ -98,6 +97,8 @@ private:
     DEFINE_CALLBACK( CtrlSliderCursor, Scroll )
     /// Last saved position of the cursor (stored as a percentage)
     float m_lastPercentage;
+    /// Last saved cursor placement
+    rect m_lastCursorRect;
     /// Offset between the mouse pointer and the center of the cursor
     int m_xOffset, m_yOffset;
     /// The last received event
@@ -117,6 +118,9 @@ private:
 
     /// Call notifyLayout
     void refreshLayout( bool force = true );
+
+    /// getter for the current slider rectangle
+    rect getCurrentCursorRect();
 };
 
 
