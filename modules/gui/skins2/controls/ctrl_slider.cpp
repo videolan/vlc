@@ -327,8 +327,8 @@ CtrlSliderBg::CtrlSliderBg( intf_thread_t *pIntf,
         // TODO: we should probably change this assumption, as it would make
         // the code a bit simpler and it would be more natural for the skins
         // designers
-        m_bgWidth = (pBackground->getWidth() + m_padHoriz) / nbHoriz;
-        m_bgHeight = (pBackground->getHeight() + m_padVert) / nbVert;
+        m_bgWidth = (pBackground->getWidth() + m_padHoriz) / m_nbHoriz;
+        m_bgHeight = (pBackground->getHeight() + m_padVert) / m_nbVert;
 
         // Observe the position variable
         m_rVariable.addObserver( this );
@@ -361,7 +361,7 @@ bool CtrlSliderBg::mouseOver( int x, int y ) const
 
 void CtrlSliderBg::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h )
 {
-    if( !m_pImgSeq || m_bgWidth <=0 || m_bgHeight <= 0 )
+    if( !m_pImgSeq || m_bgWidth <= 0 || m_bgHeight <= 0 )
         return;
 
     // Compute the resize factors
