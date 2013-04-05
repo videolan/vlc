@@ -185,25 +185,6 @@ void CtrlSliderCursor::onResize()
 }
 
 
-void CtrlSliderCursor::notifyLayout( int width, int height, int xOffSet, int yOffSet )
-{
-    if( width > 0 && height > 0 )
-    {
-        CtrlGeneric::notifyLayout( width, height, xOffSet, yOffSet );
-    }
-    else
-    {
-        onPositionChange();
-
-        const Position *pPos = getPosition();
-        CtrlGeneric::notifyLayout( m_currentCursorRect.width,
-                                   m_currentCursorRect.height,
-                                   m_currentCursorRect.x - pPos->getLeft(),
-                                   m_currentCursorRect.y - pPos->getTop() );
-    }
-}
-
-
 void CtrlSliderCursor::onUpdate( Subject<VarPercent> &rVariable, void *arg  )
 {
     (void)rVariable; (void)arg;
