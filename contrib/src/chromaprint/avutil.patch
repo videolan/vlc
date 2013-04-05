@@ -1,0 +1,10 @@
+--- chromaprint/src/fft_lib_avfft.h	2012-09-05 20:05:36.000000000 +0200
++++ chromaprint.new/src/fft_lib_avfft.h	2013-04-05 17:21:56.830255210 +0200
+@@ -23,6 +23,7 @@
+ 
+ #include <math.h>
+ extern "C" {
++#include <libavutil/mem.h>
+ #include <libavcodec/avcodec.h>
+ #include <libavcodec/avfft.h>
+ }
