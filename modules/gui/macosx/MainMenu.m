@@ -24,7 +24,6 @@
 #import "MainMenu.h"
 #import <vlc_common.h>
 #import <vlc_playlist.h>
-#import <CoreAudio/CoreAudio.h>
 
 #import "intf.h"
 #import "open.h"
@@ -45,19 +44,6 @@
 #import "ControlsBar.h"
 #import "ExtensionsManager.h"
 #import "ConvertAndSave.h"
-
-static OSStatus HardwareListener        (AudioObjectID, UInt32, const AudioObjectPropertyAddress *, void *);
-
-static OSStatus HardwareListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses, const AudioObjectPropertyAddress inAddresses[], void*inClientData)
-{
-    VLC_UNUSED(inObjectID);
-    VLC_UNUSED(inNumberAddresses);
-    VLC_UNUSED(inAddresses);
-    // give the core some time update its internal structure for the new device setup
-    [[VLCMainMenu sharedInstance] performSelector:@selector(refreshAudioDeviceList) withObject:nil afterDelay:.5];
-
-    return noErr;
-}
 
 @implementation VLCMainMenu
 static VLCMainMenu *_o_sharedInstance = nil;
@@ -100,11 +86,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (void)dealloc
 {
-    AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
-    OSStatus err = AudioObjectRemovePropertyListener(kAudioObjectSystemObject, &audioDevicesAddress, HardwareListener, nil);
-    if (err != noErr)
-        msg_Err(p_intf, "failed to add audio hardware listener (%i)", err);
-
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
     if (b_nib_about_loaded)
@@ -282,13 +263,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [self setupExtensionsMenu];
 
     [self refreshAudioDeviceList];
-
-    AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices,
-                                                       kAudioObjectPropertyScopeGlobal,
-                                                       kAudioObjectPropertyElementMaster };
-    OSStatus err = AudioObjectAddPropertyListener(kAudioObjectSystemObject, &audioDevicesAddress, HardwareListener, nil);
-    if (err != noErr)
-        msg_Err(p_intf, "failed to add audio hardware listener (%i)", err);
 }
 
 - (void)initStrings
@@ -1365,6 +1339,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     } else if ([o_title isEqualToString: _NS("Mute")]) {
         [o_mi setState: [[VLCCoreInteraction sharedInstance] mute] ? NSOnState : NSOffState];
         [self setupMenus]; /* Make sure audio menu is up to date */
+        [self refreshAudioDeviceList];
     } else if ([o_title isEqualToString: _NS("Half Size")] ||
                [o_title isEqualToString: _NS("Normal Size")] ||
                [o_title isEqualToString: _NS("Double Size")] ||
