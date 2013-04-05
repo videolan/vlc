@@ -135,13 +135,13 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
      || var_InheritBool( p_intf, "advanced" ) )
         setAdvanced();
     else
-        setSmall();
+        setSimple();
 
     BUTTONACT( save, save() );
     BUTTONACT( cancel, cancel() );
     BUTTONACT( reset, reset() );
 
-    BUTTONACT( simple, setSmall() );
+    BUTTONACT( simple, setSimple() );
     BUTTONACT( all, setAdvanced() );
 
     resize( 780, sizeHint().height() );
@@ -197,7 +197,7 @@ void PrefsDialog::setAdvanced()
     setWindowTitle( qtr( "Advanced Preferences" ) );
 }
 
-void PrefsDialog::setSmall()
+void PrefsDialog::setSimple()
 {
     /* If no simple_tree, create one, connect it */
     if( !simple_tree )
