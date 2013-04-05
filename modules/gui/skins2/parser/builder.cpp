@@ -863,10 +863,7 @@ void Builder::addSlider( const BuilderData::Slider &rData )
 
     // Get the bitmaps of the background
     GenericBitmap *pBgImage = NULL;
-    if( rData.m_imageId != "none" )
-    {
-        GET_BMP( pBgImage, rData.m_imageId );
-    }
+    GET_BMP( pBgImage, rData.m_imageId );
 
     GenericLayout *pLayout = m_pTheme->getLayoutById( rData.m_layoutId );
     if( pLayout == NULL )
