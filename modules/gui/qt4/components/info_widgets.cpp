@@ -30,7 +30,7 @@
 #include <QGraphicsLineItem>
 #include <QVectorIterator>
 
-#define STATS_LENGTH 10
+#define STATS_LENGTH 60
 #define ADD_LABEL(row, color, text) \
 label = new QLabel( QString( "<font color=\"%1\">%2</font>" ) \
                     .arg( color.name() ) \
