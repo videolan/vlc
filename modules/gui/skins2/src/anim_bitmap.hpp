@@ -62,7 +62,7 @@ private:
     /// Bitmap stored
     const GenericBitmap &m_rBitmap;
     /// Graphics to store the bitmap
-    OSGraphics *m_pImage;
+    const OSGraphics * const m_pImage;
     /// Number of frames
     int m_nbFrames;
     /// Frame rate

@@ -29,18 +29,13 @@
 
 
 AnimBitmap::AnimBitmap( intf_thread_t *pIntf, const GenericBitmap &rBitmap ):
-    SkinObject( pIntf ), m_rBitmap( rBitmap ), m_pImage( NULL ),
-    m_curFrame( 0 ), m_curLoop( 0 ), m_pTimer( NULL ), m_cmdNextFrame( this )
+    SkinObject( pIntf ),
+    m_rBitmap( rBitmap ), m_pImage( rBitmap.getGraphics() ),
+    m_nbFrames( rBitmap.getNbFrames() ), m_frameRate( rBitmap.getFrameRate() ),
+    m_nbLoops( rBitmap.getNbLoops() ), m_curFrame( 0 ), m_curLoop( 0 ),
+    m_pTimer( NULL ), m_cmdNextFrame( this )
 {
-    // Build the graphics
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
-    m_pImage = pOsFactory->createOSGraphics( rBitmap.getWidth(),
-                                             rBitmap.getHeight() );
-    m_pImage->drawBitmap( rBitmap, 0, 0 );
-
-    m_nbFrames = rBitmap.getNbFrames();
-    m_frameRate = rBitmap.getFrameRate();
-    m_nbLoops = rBitmap.getNbLoops();
 
     // Create the timer
     m_pTimer = pOsFactory->createOSTimer( m_cmdNextFrame );
@@ -49,7 +44,6 @@ AnimBitmap::AnimBitmap( intf_thread_t *pIntf, const GenericBitmap &rBitmap ):
 
 AnimBitmap::~AnimBitmap()
 {
-    delete m_pImage;
     delete m_pTimer;
 }
 
