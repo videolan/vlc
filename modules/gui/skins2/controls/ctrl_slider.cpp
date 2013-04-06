@@ -52,24 +52,17 @@ CtrlSliderCursor::CtrlSliderCursor( intf_thread_t *pIntf,
     CtrlGeneric( pIntf, rHelp, pVisible ), m_fsm( pIntf ),
     m_rVariable( rVariable ), m_tooltip( rTooltip ),
     m_width( rCurve.getWidth() ), m_height( rCurve.getHeight() ),
+    m_xPosition( 0 ), m_yPosition( 0 ),
     m_cmdOverDown( this ), m_cmdDownOver( this ),
     m_cmdOverUp( this ), m_cmdUpOver( this ),
     m_cmdMove( this ), m_cmdScroll( this ),
     m_lastCursorRect(), m_xOffset( 0 ), m_yOffset( 0 ),
-    m_pEvt( NULL ), m_rCurve( rCurve )
+    m_pEvt( NULL ), m_rCurve( rCurve ),
+    m_pImgUp( rBmpUp.getGraphics() ),
+    m_pImgOver( rBmpOver.getGraphics() ),
+    m_pImgDown( rBmpDown.getGraphics() ),
+    m_pImg( m_pImgUp )
 {
-    // Build the images of the cursor
-    OSFactory *pOsFactory = OSFactory::instance( getIntf() );
-    m_pImgUp = pOsFactory->createOSGraphics( rBmpUp.getWidth(),
-                                             rBmpUp.getHeight() );
-    m_pImgUp->drawBitmap( rBmpUp, 0, 0 );
-    m_pImgDown = pOsFactory->createOSGraphics( rBmpDown.getWidth(),
-                                               rBmpDown.getHeight() );
-    m_pImgDown->drawBitmap( rBmpDown, 0, 0 );
-    m_pImgOver = pOsFactory->createOSGraphics( rBmpOver.getWidth(),
-                                               rBmpOver.getHeight() );
-    m_pImgOver->drawBitmap( rBmpOver, 0, 0 );
-
     // States
     m_fsm.addState( "up" );
     m_fsm.addState( "over" );
@@ -87,7 +80,6 @@ CtrlSliderCursor::CtrlSliderCursor( intf_thread_t *pIntf,
 
     // Initial state
     m_fsm.setState( "up" );
-    m_pImg = m_pImgUp;
 
     // Observe the position variable
     m_rVariable.addObserver( this );
@@ -97,9 +89,6 @@ CtrlSliderCursor::CtrlSliderCursor( intf_thread_t *pIntf,
 CtrlSliderCursor::~CtrlSliderCursor()
 {
     m_rVariable.delObserver( this );
-    delete m_pImgUp;
-    delete m_pImgDown;
-    delete m_pImgOver;
 }
 
 
@@ -191,6 +180,9 @@ void CtrlSliderCursor::CmdOverDown::execute()
                        - (int)(tempY * factorY);
 
     m_pParent->captureMouse();
+
+    if( m_pParent->m_pImg == m_pParent->m_pImgDown )
+        return;
     m_pParent->m_pImg = m_pParent->m_pImgDown;
     m_pParent->refreshLayout();
 }
@@ -199,6 +191,9 @@ void CtrlSliderCursor::CmdOverDown::execute()
 void CtrlSliderCursor::CmdDownOver::execute()
 {
     m_pParent->releaseMouse();
+
+    if( m_pParent->m_pImg == m_pParent->m_pImgUp )
+        return;
     m_pParent->m_pImg = m_pParent->m_pImgUp;
     m_pParent->refreshLayout();
 }
@@ -206,6 +201,8 @@ void CtrlSliderCursor::CmdDownOver::execute()
 
 void CtrlSliderCursor::CmdUpOver::execute()
 {
+    if( m_pParent->m_pImg == m_pParent->m_pImgOver )
+        return;
     m_pParent->m_pImg = m_pParent->m_pImgOver;
     m_pParent->refreshLayout();
 }
@@ -213,6 +210,8 @@ void CtrlSliderCursor::CmdUpOver::execute()
 
 void CtrlSliderCursor::CmdOverUp::execute()
 {
+    if( m_pParent->m_pImg == m_pParent->m_pImgUp )
+        return;
     m_pParent->m_pImg = m_pParent->m_pImgUp;
     m_pParent->refreshLayout();
 }

@@ -101,12 +101,14 @@ private:
     int m_xOffset, m_yOffset;
     /// The last received event
     EvtGeneric *m_pEvt;
-    /// Images of the cursor in the differents states
-    OSGraphics *m_pImgUp, *m_pImgOver, *m_pImgDown;
-    /// Current image
-    OSGraphics *m_pImg;
     /// Bezier curve of the slider
     const Bezier &m_rCurve;
+    /// Images of the cursor in the different states
+    const OSGraphics * const m_pImgUp;
+    const OSGraphics * const m_pImgOver;
+    const OSGraphics * const m_pImgDown;
+    /// Current image
+    const OSGraphics *m_pImg;
 
     /// Method called when the position variable is modified
     virtual void onUpdate( Subject<VarPercent> &rVariable, void * );
