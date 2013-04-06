@@ -26,6 +26,7 @@
 #define GENERIC_BITMAP_HPP
 
 #include "skin_common.hpp"
+#include "../src/os_graphics.hpp"
 #include "../utils/pointer.hpp"
 #include "../utils/position.hpp"
 
@@ -34,11 +35,14 @@
 class GenericBitmap: public SkinObject, public Box
 {
 public:
-    virtual ~GenericBitmap() { }
+    virtual ~GenericBitmap() { delete m_pGraphics; }
 
     /// Get a linear buffer containing the image data.
     /// Each pixel is stored in 4 bytes in the order B,G,R,A
     virtual uint8_t *getData() const = 0;
+
+    /// Get the bitmap as a graphics
+    virtual const OSGraphics *getGraphics() const;
 
     /// Get the number of frames in the bitmap
     int getNbFrames() const { return m_nbFrames; }
@@ -59,6 +63,9 @@ private:
     int m_frameRate;
     /// Number of Loops
     int m_nbLoops;
+
+    /// graphics copy of the bitmap
+    mutable OSGraphics* m_pGraphics;
 };
 
 
