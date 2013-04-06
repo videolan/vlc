@@ -654,7 +654,10 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, intf_thread_t *_p_i )
 
     p_item = THEMIM->currentInputItem();
     if( p_item )
+    {
+        vlc_gc_incref( p_item );
         showArtUpdate( p_item );
+    }
     else
         showArtUpdate( "" );
 }
