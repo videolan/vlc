@@ -254,7 +254,7 @@ static void EqzCoeffs( int i_rate, float f_octave_percent,
 
         if( f_freq <= f_nyquist_freq )
         {
-            float f_theta_1 = ( 2.0f * M_PI * f_freq ) / f_rate;
+            float f_theta_1 = ( 2.0f * (float) M_PI * f_freq ) / f_rate;
             float f_theta_2 = f_theta_1 / f_octave_factor;
             float f_sin     = sinf( f_theta_2 );
             float f_sin_prd = sinf( f_theta_2 * f_octave_factor_1 )
