@@ -600,6 +600,11 @@ InputStatsPanel::InputStatsPanel( QWidget *parent ): QWidget( parent )
     statsView->setFrameStyle( QFrame::NoFrame );
     statsView->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
     input_bitrate_graph->setSizeHint( 1, QSize(0, 100) );
+    QString graphlabel =
+            QString( "<font style=\"color:#ff8c00\">%1</font><br/>%2" )
+            .arg( qtr("Last 60 seconds") )
+            .arg( qtr("Overall") );
+    StatsTree->setItemWidget( input_bitrate_graph, 0, new QLabel( graphlabel ) );
     StatsTree->setItemWidget( input_bitrate_graph, 1, statsView );
 }
 
