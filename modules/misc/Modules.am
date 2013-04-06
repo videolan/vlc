@@ -1,7 +1,6 @@
 SOURCES_vod_rtsp = rtsp.c
 SOURCES_audioscrobbler = audioscrobbler.c
 SOURCES_fingerprinter = fingerprinter.c \
-	fingerprinter.h \
 	webservices/acoustid.c \
 	webservices/json_fixup.h \
 	webservices/json.c \
