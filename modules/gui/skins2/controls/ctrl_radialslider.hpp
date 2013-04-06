@@ -76,9 +76,7 @@ private:
     /// The last received event
     EvtGeneric *m_pEvt;
     /// Sequence of images
-    OSGraphics *m_pImgSeq;
-    /// Last saved position
-    int m_lastPos;
+    const OSGraphics * const m_pImgSeq;
 
     /// Callback objects
     DEFINE_CALLBACK( CtrlRadialSlider, UpDown )

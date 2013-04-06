@@ -40,17 +40,11 @@ CtrlRadialSlider::CtrlRadialSlider( intf_thread_t *pIntf,
                                     VarBool *pVisible ):
     CtrlGeneric( pIntf, rHelp, pVisible ), m_fsm( pIntf ), m_numImg( numImg ),
     m_rVariable( rVariable ), m_minAngle( minAngle ), m_maxAngle( maxAngle ),
-    m_position( 0 ), m_cmdUpDown( this ), m_cmdDownUp( this ),
-    m_cmdMove( this )
+    m_position( 0 ),
+    m_width( rBmpSeq.getWidth() ), m_height( rBmpSeq.getHeight() / numImg ),
+    m_pImgSeq( rBmpSeq.getGraphics() ),
+    m_cmdUpDown( this ), m_cmdDownUp( this ), m_cmdMove( this )
 {
-    // Build the images of the sequence
-    m_pImgSeq = OSFactory::instance( getIntf() )->createOSGraphics(
-                                     rBmpSeq.getWidth(), rBmpSeq.getHeight() );
-    m_pImgSeq->drawBitmap( rBmpSeq, 0, 0 );
-
-    m_width = rBmpSeq.getWidth();
-    m_height = rBmpSeq.getHeight() / numImg;
-
     // States
     m_fsm.addState( "up" );
     m_fsm.addState( "down" );
@@ -71,7 +65,6 @@ CtrlRadialSlider::CtrlRadialSlider( intf_thread_t *pIntf,
 CtrlRadialSlider::~CtrlRadialSlider()
 {
     m_rVariable.delObserver( this );
-    delete m_pImgSeq;
 }
 
 
