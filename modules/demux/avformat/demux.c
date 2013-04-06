@@ -868,24 +868,38 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_META:
         {
-            vlc_meta_t *p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
+            static const char names[][10] = {
+                [vlc_meta_Title] = "title",
+                [vlc_meta_Artist] = "artist",
+                [vlc_meta_Genre] = "genre",
+                [vlc_meta_Copyright] = "copyright",
+                [vlc_meta_Album] = "album",
+                //[vlc_meta_TrackNumber] -- TODO: parse number/total value
+                [vlc_meta_Description] = "comment",
+                //[vlc_meta_Rating]
+                [vlc_meta_Date] = "date",
+                [vlc_meta_Setting] = "encoder",
+                //[vlc_meta_URL]
+                [vlc_meta_Language] = "language",
+                //[vlc_meta_NowPlaying]
+                [vlc_meta_Publisher] = "publisher",
+                [vlc_meta_EncodedBy] = "encoded_by",
+                //[vlc_meta_ArtworkURL]
+                //[vlc_meta_TrackID]
+                //[vlc_meta_TrackTotal]
+            };
+            vlc_meta_t *p_meta = va_arg( args, vlc_meta_t * );
+            AVDictionary *dict = p_sys->ic->metadata;
 
-            AVDictionaryEntry *title = av_dict_get( p_sys->ic->metadata, "language", NULL, 0 );
-            AVDictionaryEntry *artist = av_dict_get( p_sys->ic->metadata, "artist", NULL, 0 );
-            AVDictionaryEntry *copyright = av_dict_get( p_sys->ic->metadata, "copyright", NULL, 0 );
-            AVDictionaryEntry *comment = av_dict_get( p_sys->ic->metadata, "comment", NULL, 0 );
-            AVDictionaryEntry *genre = av_dict_get( p_sys->ic->metadata, "genre", NULL, 0 );
+            for( unsigned i = 0; i < sizeof(names) / sizeof(*names); i++)
+            {
+                if( !names[i][0] )
+                    continue;
 
-            if( title && title->value )
-                vlc_meta_SetTitle( p_meta, title->value );
-            if( artist && artist->value )
-                vlc_meta_SetArtist( p_meta, artist->value );
-            if( copyright && copyright->value )
-                vlc_meta_SetCopyright( p_meta, copyright->value );
-            if( comment && comment->value )
-                vlc_meta_SetDescription( p_meta, comment->value );
-            if( genre && genre->value )
-                vlc_meta_SetGenre( p_meta, genre->value );
+                AVDictionaryEntry *e = av_dict_get( dict, names[i], NULL, 0 );
+                if( e != NULL && e->value != NULL )
+                    vlc_meta_Set( p_meta, i, e->value );
+            }
             return VLC_SUCCESS;
         }
 
