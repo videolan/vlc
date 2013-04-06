@@ -213,6 +213,7 @@ fi
     --disable-orc \
     --disable-schroedinger \
     --disable-libmpeg2 \
+    --disable-chromaprint \
     --disable-mad \
     --disable-taglib > ${out}
 
