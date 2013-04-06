@@ -296,7 +296,7 @@ void WindowManager::resize( GenericLayout &rLayout,
                          (*it)->getTop() );
         }
     }
-    if( m_direction == kResizeE ||
+    if( m_direction == kResizeS ||
         m_direction == kResizeSE )
     {
         for( it = m_resizeMovingS.begin(); it != m_resizeMovingS.end(); ++it )
