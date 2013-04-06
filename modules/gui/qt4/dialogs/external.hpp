@@ -27,7 +27,7 @@
 
 #include <QObject>
 #include <vlc_common.h>
-#include "variables.hpp"
+#include "adapters/variables.hpp"
 
 struct intf_thread_t;
 class QProgressDialog;

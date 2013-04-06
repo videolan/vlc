@@ -33,7 +33,7 @@
 
 #include "qt4.hpp"
 #include "util/singleton.hpp"
-#include "variables.hpp"
+#include "adapters/variables.hpp"
 
 #include <QObject>
 #include <QEvent>

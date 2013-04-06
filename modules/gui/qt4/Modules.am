@@ -24,7 +24,7 @@ nodist_SOURCES_qt4 = \
 		recents.moc.cpp \
 		adapters/seekpoints.moc.cpp \
 		adapters/chromaprint.moc.cpp \
-		variables.moc.cpp \
+		adapters/variables.moc.cpp \
 		dialogs/playlist.moc.cpp \
 		dialogs/bookmarks.moc.cpp \
 		dialogs/mediainfo.moc.cpp \
@@ -286,7 +286,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		recents.cpp \
 		adapters/seekpoints.cpp \
 		adapters/chromaprint.cpp \
-		variables.cpp \
+		adapters/variables.cpp \
 		dialogs/playlist.cpp \
 		dialogs/bookmarks.cpp \
 		dialogs/preferences.cpp \
@@ -365,7 +365,7 @@ noinst_HEADERS = \
 	recents.hpp \
 	adapters/seekpoints.hpp \
 	adapters/chromaprint.hpp \
-	variables.hpp \
+	adapters/variables.hpp \
 	dialogs/playlist.hpp \
 	dialogs/bookmarks.hpp \
 	dialogs/mediainfo.hpp \
