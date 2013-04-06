@@ -2,9 +2,11 @@ SOURCES_vod_rtsp = rtsp.c
 SOURCES_audioscrobbler = audioscrobbler.c
 SOURCES_fingerprinter = fingerprinter.c \
 	webservices/acoustid.c \
-	webservices/json_fixup.h \
+	webservices/acoustid.h \
+	webservices/use_json.h \
 	webservices/json.c \
 	webservices/json.h
+
 SOURCES_xml = xml/libxml.c
 
 libexport_plugin_la_SOURCES = \

@@ -3834,7 +3834,7 @@ PKG_ENABLE_MODULES_VLC([GOOM], [], [libgoom2], [goom visualization plugin], [aut
 dnl
 dnl  chromaprint audio track fingerprinter
 dnl
-PKG_ENABLE_MODULES_VLC([CHROMAPRINT], [stream_out_chromaprint], [libchromaprint >= 0.6.0], (Chromaprint based audio fingerprinter), [auto])
+PKG_ENABLE_MODULES_VLC([CHROMAPRINT], [stream_out_chromaprint], [libchromaprint >= 0.6.0], (Chromaprint based audio fingerprinter), [auto], [-I./webservices -I../stream_out])
 
 dnl
 dnl libprojectM visualization plugin

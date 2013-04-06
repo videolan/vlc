@@ -31,8 +31,8 @@
 #include <vlc/vlc.h>
 #include <vlc_input.h>
 #include <vlc_fingerprinter.h>
-#include "webservices/acoustid.h"
-#include "../stream_out/chromaprint_data.h"
+#include <webservices/acoustid.h>
+#include <../stream_out/chromaprint_data.h>
 
 /*****************************************************************************
  * Local prototypes
