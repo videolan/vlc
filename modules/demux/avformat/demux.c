@@ -897,7 +897,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     continue;
 
                 AVDictionaryEntry *e = av_dict_get( dict, names[i], NULL, 0 );
-                if( e != NULL && e->value != NULL )
+                if( e != NULL && e->value != NULL && IsUTF8(e->value) )
                     vlc_meta_Set( p_meta, i, e->value );
             }
             return VLC_SUCCESS;
