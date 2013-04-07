@@ -1,0 +1,17 @@
+--- upnp/upnp/src/api/upnpapi.c.orig	2013-04-08 00:23:46.000000000 +0200
++++ upnp/upnp/src/api/upnpapi.c	2013-04-08 00:25:49.000000000 +0200
+@@ -358,13 +358,13 @@
+ 		return retVal;
+ 	}
+ 
++#ifdef INTERNAL_WEB_SERVER
+ #ifdef INCLUDE_DEVICE_APIS
+ #if EXCLUDE_SOAP == 0
+ 	SetSoapCallback(soap_device_callback);
+ #endif
+ #endif /* INCLUDE_DEVICE_APIS */
+ 
+-#ifdef INTERNAL_WEB_SERVER
+ #if EXCLUDE_GENA == 0
+ 	SetGenaCallback(genaCallback);
+ #endif
