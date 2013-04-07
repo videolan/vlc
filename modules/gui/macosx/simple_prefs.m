@@ -400,7 +400,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
 - (void)setupButton: (NSButton *)object forBoolValue: (const char *)name
 {
     [object setState: config_GetInt(p_intf, name)];
-    [object setToolTip: _NS(config_GetLabel(p_intf, name) ?: "")];
+    [object setToolTip: _NS(config_GetLabel(p_intf, name))];
 }
 
 - (void)setupField:(NSTextField *)o_object forOption:(const char *)psz_option
