@@ -250,12 +250,6 @@ error:
 #define aout_FiltersPipelineCreate(obj,f,n,m,i,o) \
         aout_FiltersPipelineCreate(VLC_OBJECT(obj),f,n,m,i,o)
 
-static inline bool ChangeFiltersString (vlc_object_t *aout, const char *var,
-                                        const char *filter, bool add)
-{
-    return aout_ChangeFilterString (aout, aout, var, filter, add);
-}
-
 /**
  * Filters an audio buffer through a chain of filters.
  */
@@ -300,26 +294,21 @@ static int VisualizationCallback (vlc_object_t *obj, const char *var,
     return VLC_SUCCESS;
 }
 
-static int EqualizerCallback (vlc_object_t *obj, char const *var,
+static int EqualizerCallback (vlc_object_t *obj, const char *var,
                               vlc_value_t oldval, vlc_value_t newval,
                               void *data)
 {
-    audio_output_t *aout = (audio_output_t *)obj;
-    char *mode = newval.psz_string;
-    bool ret;
+    const char *val = newval.psz_string;
 
-    if (!*mode)
-        ret = ChangeFiltersString (obj, "audio-filter", "equalizer", false);
-    else
+    if (*val)
     {
         var_Create (obj, "equalizer-preset", VLC_VAR_STRING);
-        var_SetString (obj, "equalizer-preset", mode);
-        ret = ChangeFiltersString (obj, "audio-filter", "equalizer", true);
+        var_SetString (obj, "equalizer-preset", val);
     }
 
-    /* That sucks */
-    if (ret)
-        aout_InputRequestRestart (aout);
+    if (aout_ChangeFilterString (obj, obj, "audio-filter", "equalizer", *val))
+        aout_InputRequestRestart ((audio_output_t *)obj); /* <- That sucks! */
+
     (void) var; (void) oldval; (void) data;
     return VLC_SUCCESS;
 }
