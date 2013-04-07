@@ -662,13 +662,13 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                 HtmlCopy( &psz_html, &psz_subtitle, "<font " );
                 HtmlPut( &psz_tag, "f" );
 
-                /* <font       color= */
-                while (*psz_subtitle == ' ')
-                    psz_subtitle++;
-
                 while( *psz_subtitle != '>' )
                 {
                     int  k;
+
+                    /* <font       color= */
+                    while (*psz_subtitle == ' ')
+                        psz_subtitle++;
 
                     for( k=0; psz_attribs[ k ]; k++ )
                     {
