@@ -275,52 +275,27 @@ static block_t *aout_FiltersPipelinePlay(filter_t *const *filters,
 }
 
 /** Callback for visualization selection */
-static int VisualizationCallback (vlc_object_t *obj, char const *var,
+static int VisualizationCallback (vlc_object_t *obj, const char *var,
                                   vlc_value_t oldval, vlc_value_t newval,
                                   void *data)
 {
-    audio_output_t *aout = (audio_output_t *)obj;
     const char *mode = newval.psz_string;
 
     if (!*mode)
-    {
-        ChangeFiltersString (obj, "audio-visual", "goom", false);
-        ChangeFiltersString (obj, "audio-visual", "visual", false);
-        ChangeFiltersString (obj, "audio-visual", "projectm", false);
-        ChangeFiltersString (obj, "audio-visual", "vsxu", false);
-    }
-    else if (!strcmp ("goom", mode))
-    {
-        ChangeFiltersString (obj, "audio-visual", "visual", false );
-        ChangeFiltersString (obj, "audio-visual", "goom", true );
-        ChangeFiltersString (obj, "audio-visual", "projectm", false );
-        ChangeFiltersString (obj, "audio-visual", "vsxu", false);
-    }
-    else if (!strcmp ("projectm", mode))
-    {
-        ChangeFiltersString (obj, "audio-visual", "visual", false);
-        ChangeFiltersString (obj, "audio-visual", "goom", false);
-        ChangeFiltersString (obj, "audio-visual", "projectm", true);
-        ChangeFiltersString (obj, "audio-visual", "vsxu", false);
-    }
-    else if (!strcmp ("vsxu", mode))
-    {
-        ChangeFiltersString (obj, "audio-visual", "visual", false);
-        ChangeFiltersString (obj, "audio-visual", "goom", false);
-        ChangeFiltersString (obj, "audio-visual", "projectm", false);
-        ChangeFiltersString (obj, "audio-visual", "vsxu", true);
-    }
-    else
+        mode = "none";
+    /* FIXME: This ugly hack enforced by visual effect-list, as is the need for
+     * separate "visual" (external) and "audio-visual" (internal) variables...
+     * The visual plugin should have one submodule per effect instead. */
+    if (strcasecmp (mode, "none") && strcasecmp (mode, "goom")
+     && strcasecmp (mode, "projectm") && strcasecmp (mode, "vsxu"))
     {
         var_Create (obj, "effect-list", VLC_VAR_STRING);
         var_SetString (obj, "effect-list", mode);
-
-        ChangeFiltersString (obj, "audio-visual", "goom", false);
-        ChangeFiltersString (obj, "audio-visual", "visual", true);
-        ChangeFiltersString (obj, "audio-visual", "projectm", false);
+        mode = "visual";
     }
 
-    aout_InputRequestRestart (aout);
+    var_SetString (obj, "audio-visual", mode);
+    aout_InputRequestRestart ((audio_output_t *)obj);
     (void) var; (void) oldval; (void) data;
     return VLC_SUCCESS;
 }
