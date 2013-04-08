@@ -589,6 +589,9 @@ AC_SEARCH_LIBS([getaddrinfo], [nsl], [
 LIBS="${LIBS} ${SOCKET_LIBS}"
 AC_LINK_IFELSE([
     AC_LANG_PROGRAM([#ifdef WIN32
+        # if _WIN32_WINNT < 0x600
+        #  error Needs vista+
+        # endif
         #include <ws2tcpip.h>
         #else
         #include <sys/socket.h>
