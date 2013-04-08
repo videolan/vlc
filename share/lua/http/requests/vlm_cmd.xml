@@ -27,7 +27,7 @@
 if _GET["command"] then
   local msg = vlm:execute_command(_GET["command"])
   if msg.value then
-    print(msg.name,":",msg.value)
+    print(msg.name,":",vlc.strings.convert_xml_special_chars(msg.value))
   end
 else
 ?>No command<?vlc
