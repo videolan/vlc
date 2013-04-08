@@ -147,6 +147,9 @@ public:
     /// Handle an event
     virtual void handleEvent( EvtGeneric &rEvent );
 
+    /// Called when the position is set
+    virtual void onPositionChange();
+
     /// Method called when the control is resized
     virtual void onResize();
 
@@ -185,6 +188,9 @@ private:
 
     /// Method to compute the resize factors
     void getResizeFactors( float &rFactorX, float &rFactorY ) const;
+
+    /// Method to (re)set the current image
+    void setCurrentImage( );
 };
 
 

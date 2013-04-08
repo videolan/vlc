@@ -315,31 +315,18 @@ CtrlSliderBg::CtrlSliderBg( intf_thread_t *pIntf,
     CtrlGeneric( pIntf, rHelp, pVisible ), m_pCursor( NULL ),
     m_rVariable( rVariable ), m_thickness( thickness ), m_rCurve( rCurve ),
     m_width( rCurve.getWidth() ), m_height( rCurve.getHeight() ),
-    m_pImgSeq( pBackground ), m_pScaledBmp( NULL ), m_nbHoriz( nbHoriz ),
-    m_nbVert( nbVert ), m_padHoriz( padHoriz ), m_padVert( padVert ),
+    m_pImgSeq( pBackground ), m_pScaledBmp( NULL ),
+    m_nbHoriz( nbHoriz ), m_nbVert( nbVert ),
+    m_padHoriz( padHoriz ), m_padVert( padVert ),
     m_bgWidth( 0 ), m_bgHeight( 0 ), m_position( 0 )
 {
     if( m_pImgSeq )
     {
-        // Build the background image sequence
-        // Note: we suppose that the last padding is not included in the
-        // given image
-        // TODO: we should probably change this assumption, as it would make
-        // the code a bit simpler and it would be more natural for the skins
-        // designers
-        m_bgWidth = (pBackground->getWidth() + m_padHoriz) / m_nbHoriz;
-        m_bgHeight = (pBackground->getHeight() + m_padVert) / m_nbVert;
-
         // Observe the position variable
         m_rVariable.addObserver( this );
 
         // Initial position
         m_position = (int)( m_rVariable.get() * (m_nbHoriz * m_nbVert - 1) );
-
-        // Initialize the scaled image for the control
-        int width = m_bgWidth * m_nbHoriz - m_padHoriz;
-        int height = m_bgHeight * m_nbVert - m_padVert;
-        m_pScaledBmp = new ScaledBitmap( getIntf(), *m_pImgSeq, width, height );
     }
 }
 
@@ -359,18 +346,20 @@ bool CtrlSliderBg::mouseOver( int x, int y ) const
     float factorX, factorY;
     getResizeFactors( factorX, factorY );
 
-    bool b_isWithinCurve =
-        m_rCurve.getMinDist( (int)(x / factorX), (int)(y / factorY),
-                                      factorX, factorY ) < m_thickness;
-    bool b_isWithinBitmap =
-        m_pScaledBmp &&
-        x >= 0 && x < m_pScaledBmp->getWidth() &&
-        y >= 0 && y < m_pScaledBmp->getHeight();
+    if( m_pScaledBmp )
+    {
+        // background size that is displayed
+        int width = m_bgWidth - (int)(m_padHoriz * factorX);
+        int height = m_bgHeight - (int)(m_padVert * factorY);
 
-    return
-        m_pScaledBmp ?
-        b_isWithinCurve && b_isWithinBitmap :
-        b_isWithinCurve;
+        return x >= 0 && x < width &&
+               y >= 0 && y < height;
+    }
+    else
+    {
+        return m_rCurve.getMinDist( (int)(x / factorX), (int)(y / factorY),
+                                    factorX, factorY ) < m_thickness;
+    }
 }
 
 
@@ -442,29 +431,20 @@ void CtrlSliderBg::handleEvent( EvtGeneric &rEvent )
 }
 
 
+void CtrlSliderBg::onPositionChange()
+{
+    if( m_pImgSeq )
+    {
+        setCurrentImage();
+    }
+}
+
+
 void CtrlSliderBg::onResize()
 {
     if( m_pImgSeq )
     {
-        // Compute the resize factors
-        float factorX, factorY;
-        getResizeFactors( factorX, factorY );
-
-        // Size of one elementary background image (padding included)
-        m_bgWidth =
-           (int)((m_pImgSeq->getWidth() + m_padHoriz) * factorX / m_nbHoriz);
-        m_bgHeight =
-            (int)((m_pImgSeq->getHeight() + m_padVert) * factorY / m_nbVert);
-
-        // Rescale the image with the actual size of the control if needed
-        int width = m_bgWidth * m_nbHoriz - (int)(m_padHoriz * factorX);
-        int height = m_bgHeight * m_nbVert - (int)(m_padVert * factorY);
-        if( m_pScaledBmp->getWidth() != width ||
-            m_pScaledBmp->getHeight() != height )
-        {
-            delete m_pScaledBmp;
-            m_pScaledBmp = new ScaledBitmap( getIntf(), *m_pImgSeq, width, height );
-        }
+        setCurrentImage();
     }
 }
 
@@ -483,7 +463,15 @@ void CtrlSliderBg::onUpdate( Subject<VarPercent> &rVariable, void*arg )
         return;
 
     m_position = position;
-    notifyLayout( m_bgWidth, m_bgHeight );
+
+    // Compute the resize factors
+    float factorX, factorY;
+    getResizeFactors( factorX, factorY );
+    // real background size
+    int width = m_bgWidth - (int)(m_padHoriz * factorX);
+    int height = m_bgHeight - (int)(m_padVert * factorY);
+
+    notifyLayout( width, height );
 }
 
 
@@ -502,3 +490,34 @@ void CtrlSliderBg::getResizeFactors( float &rFactorX, float &rFactorY ) const
         rFactorY = (float)pPos->getHeight() / (float)m_height;
 }
 
+
+void CtrlSliderBg::setCurrentImage()
+{
+    // Compute the resize factors
+    float factorX, factorY;
+    getResizeFactors( factorX, factorY );
+
+    // Build the background image sequence
+    // Note: we suppose that the last padding is not included in the
+    // given image
+    // TODO: we should probably change this assumption, as it would make
+    // the code a bit simpler and it would be more natural for the skins
+    // designers
+    // Size of one elementary background image (padding included)
+    m_bgWidth =
+        (int)((m_pImgSeq->getWidth() + m_padHoriz) * factorX / m_nbHoriz);
+    m_bgHeight =
+        (int)((m_pImgSeq->getHeight() + m_padVert) * factorY / m_nbVert);
+
+    // Rescale the image accordingly
+    int width = m_bgWidth * m_nbHoriz - (int)(m_padHoriz * factorX);
+    int height = m_bgHeight * m_nbVert - (int)(m_padVert * factorY);
+    if( !m_pScaledBmp ||
+        m_pScaledBmp->getWidth() != width ||
+        m_pScaledBmp->getHeight() != height )
+    {
+        // scaled bitmap
+        delete m_pScaledBmp;
+        m_pScaledBmp = new ScaledBitmap( getIntf(), *m_pImgSeq, width, height );
+    }
+}
