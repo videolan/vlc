@@ -36,3 +36,5 @@ cleanmsi:
 
 distcleanmsi: cleanmsi
 	-rm -f $(MSIOUTFILE)
+
+.PHONY: heat candle light cleanmsi distcleanmsi package-msi
