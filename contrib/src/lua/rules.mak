@@ -67,4 +67,8 @@ ifdef HAVE_WIN32
 	mkdir -p -- "$(PREFIX)/lib/pkgconfig"
 	cp $</etc/lua.pc "$(PREFIX)/lib/pkgconfig/"
 endif
+ifdef HAVE_CROSS_COMPILE
+	cd $</src && $(MAKE) clean && $(MAKE) liblua.a && ranlib liblua.a && $(MAKE) luac
+	cp $</src/luac $(PREFIX)/bin
+endif
 	touch $@
