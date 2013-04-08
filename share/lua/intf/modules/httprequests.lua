@@ -31,13 +31,13 @@ local dkjson = require ("dkjson")
 
 --Round the number to the specified precision
 function round(what, precision)
-  if type(what) == "string" then
-    what = common.us_tonumber(what)
-  end
-  if type(what) == "number" then
-    return math.floor(what*math.pow(10,precision)+0.5) / math.pow(10,precision)
-  end
-  return nil
+    if type(what) == "string" then
+        what = common.us_tonumber(what)
+    end
+    if type(what) == "number" then
+        return math.floor(what*math.pow(10,precision)+0.5) / math.pow(10,precision)
+    end
+    return nil
 end
 
 --split text where it matches the delimiter
@@ -59,7 +59,7 @@ function strsplit(text, delimiter)
             pos = last+1
         else
             tinsert(list,i, strsub(text, pos))
-        break
+            break
         end
     end
     return list
@@ -76,125 +76,125 @@ processcommands = function ()
     local options = _GET['option']
     local band = tonumber(_GET['band'])
     if type(options) ~= "table" then -- Deal with the 0 or 1 option case
-      options = { options }
+        options = { options }
     end
 
     if command == "in_play" then
-      --[[
-      vlc.msg.err( "<options>" )
-      for a,b in ipairs(options) do
+        --[[
+        vlc.msg.err( "<options>" )
+        for a,b in ipairs(options) do
         vlc.msg.err(b)
-      end
-      vlc.msg.err( "</options>" )
-      --]]
-      vlc.playlist.add({{path=vlc.strings.make_uri(input),options=options}})
-    elseif command == "addsubtitle" then
-      vlc.input.add_subtitle (vlc.strings.make_uri(val))
-    elseif command == "in_enqueue" then
-      vlc.playlist.enqueue({{path=vlc.strings.make_uri(input),options=options}})
-    elseif command == "pl_play" then
-      if id == -1 then
-        vlc.playlist.play()
-      else
-        vlc.playlist.gotoitem(id)
-      end
-    elseif command == "pl_pause" then
-      if vlc.playlist.status() == "stopped" then
-        if id == -1 then
-          vlc.playlist.play()
-        else
-          vlc.playlist.gotoitem(id)
         end
-      else
-        vlc.playlist.pause()
-      end
+        vlc.msg.err( "</options>" )
+        --]]
+        vlc.playlist.add({{path=vlc.strings.make_uri(input),options=options}})
+    elseif command == "addsubtitle" then
+        vlc.input.add_subtitle (vlc.strings.make_uri(val))
+    elseif command == "in_enqueue" then
+        vlc.playlist.enqueue({{path=vlc.strings.make_uri(input),options=options}})
+    elseif command == "pl_play" then
+        if id == -1 then
+            vlc.playlist.play()
+        else
+            vlc.playlist.gotoitem(id)
+        end
+    elseif command == "pl_pause" then
+        if vlc.playlist.status() == "stopped" then
+            if id == -1 then
+                vlc.playlist.play()
+            else
+                vlc.playlist.gotoitem(id)
+            end
+        else
+            vlc.playlist.pause()
+        end
     elseif command == "pl_forcepause" then
-      if vlc.playlist.status() == "playing" then
-        vlc.playlist.pause()
-      end
+        if vlc.playlist.status() == "playing" then
+            vlc.playlist.pause()
+        end
     elseif command == "pl_forceresume" then
-      if vlc.playlist.status() == "paused" then
-        vlc.playlist.pause()
-      end
+        if vlc.playlist.status() == "paused" then
+            vlc.playlist.pause()
+        end
     elseif command == "pl_stop" then
-      vlc.playlist.stop()
+        vlc.playlist.stop()
     elseif command == "pl_next" then
-      vlc.playlist.next()
+        vlc.playlist.next()
     elseif command == "pl_previous" then
-      vlc.playlist.prev()
+        vlc.playlist.prev()
     elseif command == "pl_delete" then
-      vlc.playlist.delete(id)
+        vlc.playlist.delete(id)
     elseif command == "pl_empty" then
-      vlc.playlist.clear()
+        vlc.playlist.clear()
     elseif command == "pl_sort" then
-      vlc.playlist.sort( val, id > 0 )
+        vlc.playlist.sort( val, id > 0 )
     elseif command == "pl_random" then
-      vlc.playlist.random()
+        vlc.playlist.random()
     elseif command == "pl_loop" then
-    --if loop is set true, then repeat needs to be set false
-      if vlc.playlist.loop() then
-        vlc.playlist.repeat_("off")
-      end
+        --if loop is set true, then repeat needs to be set false
+        if vlc.playlist.loop() then
+            vlc.playlist.repeat_("off")
+        end
     elseif command == "pl_repeat" then
-    --if repeat is set true, then loop needs to be set false
-      if vlc.playlist.repeat_() then
-        vlc.playlist.loop("off")
-      end
+        --if repeat is set true, then loop needs to be set false
+        if vlc.playlist.repeat_() then
+            vlc.playlist.loop("off")
+        end
     elseif command == "pl_sd" then
-      if vlc.sd.is_loaded(val) then
-        vlc.sd.remove(val)
-      else
-        vlc.sd.add(val)
-      end
+        if vlc.sd.is_loaded(val) then
+            vlc.sd.remove(val)
+        else
+            vlc.sd.add(val)
+        end
     elseif command == "fullscreen" then
-      vlc.video.fullscreen()
+        vlc.video.fullscreen()
     elseif command == "snapshot" then
-      common.snapshot()
+        common.snapshot()
     elseif command == "volume" then
-      common.volume(val)
+        common.volume(val)
     elseif command == "seek" then
-      common.seek(val)
+        common.seek(val)
     elseif command == "key" then
-      common.hotkey("key-"..val)
+        common.hotkey("key-"..val)
     elseif command == "audiodelay" then
-      if vlc.object.input() and val then
-       val = common.us_tonumber(val)
-       vlc.var.set(vlc.object.input(),"audio-delay",val)
-      end
+        if vlc.object.input() and val then
+            val = common.us_tonumber(val)
+            vlc.var.set(vlc.object.input(),"audio-delay",val)
+        end
     elseif command == "rate" then
-      val = common.us_tonumber(val)
-      if vlc.object.input() and val >= 0 then
-       vlc.var.set(vlc.object.input(),"rate",val)
-      end
+        val = common.us_tonumber(val)
+        if vlc.object.input() and val >= 0 then
+            vlc.var.set(vlc.object.input(),"rate",val)
+        end
     elseif command == "subdelay" then
-      if vlc.object.input() then
-       val = common.us_tonumber(val)
-       vlc.var.set(vlc.object.input(),"spu-delay",val)
-      end
+        if vlc.object.input() then
+            val = common.us_tonumber(val)
+            vlc.var.set(vlc.object.input(),"spu-delay",val)
+        end
     elseif command == "aspectratio" then
-      if vlc.object.vout() then
-       vlc.var.set(vlc.object.vout(),"aspect-ratio",val)
-      end
+        if vlc.object.vout() then
+            vlc.var.set(vlc.object.vout(),"aspect-ratio",val)
+        end
     elseif command == "preamp" then
-      val = common.us_tonumber(val)
-      vlc.equalizer.preampset(val)
+        val = common.us_tonumber(val)
+        vlc.equalizer.preampset(val)
     elseif command == "equalizer" then
-      val = common.us_tonumber(val)
-      vlc.equalizer.equalizerset(band,val)
+        val = common.us_tonumber(val)
+        vlc.equalizer.equalizerset(band,val)
     elseif command == "enableeq" then
-      if val == '0' then vlc.equalizer.enable(false) else vlc.equalizer.enable(true) end
+        if val == '0' then vlc.equalizer.enable(false) else vlc.equalizer.enable(true) end
     elseif command == "setpreset" then
-      vlc.equalizer.setpreset(val)
+        vlc.equalizer.setpreset(val)
     elseif command == "title" then
-  	  vlc.var.set(vlc.object.input(), "title", val)
-	elseif command == "chapter" then
-  	  vlc.var.set(vlc.object.input(), "chapter", val)
-  	elseif command == "audio_track" then
-  	  vlc.var.set(vlc.object.input(), "audio-es", val)
-	elseif command == "video_track" then
-  	  vlc.var.set(vlc.object.input(), "video-es", val)
-	elseif command == "subtitle_track" then
-  	  vlc.var.set(vlc.object.input(), "spu-es", val)
+        vlc.var.set(vlc.object.input(), "title", val)
+    elseif command == "chapter" then
+        vlc.var.set(vlc.object.input(), "chapter", val)
+    elseif command == "audio_track" then
+        vlc.var.set(vlc.object.input(), "audio-es", val)
+    elseif command == "video_track" then
+        vlc.var.set(vlc.object.input(), "video-es", val)
+    elseif command == "subtitle_track" then
+        vlc.var.set(vlc.object.input(), "spu-es", val)
     end
 
     local input = nil
@@ -207,13 +207,13 @@ end
 --utilities for formatting output
 
 function xmlString(s)
-  if (type(s)=="string") then
-      return vlc.strings.convert_xml_special_chars(s)
-  elseif (type(s)=="number") then
-      return common.us_tostring(s)
-  else
-      return tostring(s)
-  end
+    if (type(s)=="string") then
+        return vlc.strings.convert_xml_special_chars(s)
+    elseif (type(s)=="number") then
+        return common.us_tostring(s)
+    else
+        return tostring(s)
+    end
 end
 
 --dkjson outputs numbered tables as arrays
@@ -275,13 +275,13 @@ end
 
 --[[
 function logTable(t,pre)
-  local pre = pre or ""
-  for k,v in pairs(t) do
-    vlc.msg.err(pre..tostring(k).." : "..tostring(v))
-    if type(v) == "table" then
-      a(v,pre.."  ")
-    end
-  end
+local pre = pre or ""
+for k,v in pairs(t) do
+vlc.msg.err(pre..tostring(k).." : "..tostring(v))
+if type(v) == "table" then
+a(v,pre.."  ")
+end
+end
 end
 --]]
 
@@ -291,15 +291,15 @@ getplaylist = function ()
     local p
 
     if _GET["search"] then
-      if _GET["search"] ~= "" then
-        _G.search_key = _GET["search"]
-      else
-        _G.search_key = nil
-      end
-      local key = vlc.strings.decode_uri(_GET["search"])
-      p = vlc.playlist.search(key)
+        if _GET["search"] ~= "" then
+            _G.search_key = _GET["search"]
+        else
+            _G.search_key = nil
+        end
+        local key = vlc.strings.decode_uri(_GET["search"])
+        p = vlc.playlist.search(key)
     else
-      p = vlc.playlist.get()
+        p = vlc.playlist.get()
     end
 
     --logTable(p) --Uncomment to debug
@@ -438,11 +438,11 @@ end
 getstatus = function (includecategories)
 
 
-local input = vlc.object.input()
-local item = vlc.input.item()
-local playlist = vlc.object.playlist()
-local vout = vlc.object.vout()
-local aout = vlc.object.aout()
+    local input = vlc.object.input()
+    local item = vlc.input.item()
+    local playlist = vlc.object.playlist()
+    local vout = vlc.object.vout()
+    local aout = vlc.object.aout()
 
     local s ={}
 
@@ -498,13 +498,13 @@ local aout = vlc.object.aout()
     s.loop=vlc.var.get(playlist,"loop")
     s["repeat"]=vlc.var.get(playlist,"repeat")
 
-        s.equalizer={}
-        s.equalizer.preamp=round(vlc.equalizer.preampget(),2)
-        s.equalizer.bands=vlc.equalizer.equalizerget()
-            if s.equalizer.bands ~= null then
-                for k,i in pairs(s.equalizer.bands) do s.equalizer.bands[k]=round(i,2) end
-                s.equalizer.presets=vlc.equalizer.presets()
-        end
+    s.equalizer={}
+    s.equalizer.preamp=round(vlc.equalizer.preampget(),2)
+    s.equalizer.bands=vlc.equalizer.equalizerget()
+    if s.equalizer.bands ~= null then
+        for k,i in pairs(s.equalizer.bands) do s.equalizer.bands[k]=round(i,2) end
+        s.equalizer.presets=vlc.equalizer.presets()
+    end
 
     if (includecategories and item) then
         s.information={}
@@ -525,16 +525,16 @@ local aout = vlc.object.aout()
         s.stats={}
 
         local statsdata = item:stats()
-          for k,v in pairs(statsdata) do
+        for k,v in pairs(statsdata) do
             local tag = string.gsub(k,"_","")
-        s.stats[tag]=v
-      end
+            s.stats[tag]=v
+        end
 
-      	s.information.chapter=vlc.var.get(input, "chapter")
-      	s.information.title=vlc.var.get(input, "title")
+        s.information.chapter=vlc.var.get(input, "chapter")
+        s.information.title=vlc.var.get(input, "title")
 
-      	s.information.chapters=vlc.var.get_list(input, "chapter")
-      	s.information.titles=vlc.var.get_list(input, "title")
+        s.information.chapters=vlc.var.get_list(input, "chapter")
+        s.information.titles=vlc.var.get_list(input, "title")
 
     end
     return s
