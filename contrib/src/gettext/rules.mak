@@ -32,10 +32,6 @@ else
 	(cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-java --disable-native-java --without-emacs)
 	(cd $< && $(MAKE) -C gettext-runtime install && $(MAKE) -C gettext-tools/intl && $(MAKE) -C gettext-tools/libgrep && $(MAKE) -C gettext-tools/gnulib-lib && $(MAKE) -C gettext-tools/src install && $(MAKE) -C gettext-tools/misc install && $(MAKE) -C gettext-tools/m4 install)
 endif
-# Work around another non-sense of autoconf.
-ifdef HAVE_WIN32
-	(cd $(PREFIX)/include; sed -i.orig '314 c #if 0' libintl.h)
-endif
 ifdef HAVE_MACOSX
 	# detect libintl correctly in configure for static library
 	(cd $(PREFIX)/share/aclocal; sed -i.orig  '184s/$$LIBINTL/$$LIBINTL $$INTL_MACOSX_LIBS/' gettext.m4)
