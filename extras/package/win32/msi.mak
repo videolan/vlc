@@ -24,7 +24,7 @@ heat: package-win-strip
 	$(HEAT) dir $(VLCDIR)/skins -cg CompSkinsGroup -gg -scom -sreg -sfrag -srd -dr SKINSDIR -out $(W_MSIBUILDDIR)/Skins.fragment.wxs
 
 candle:
-	$(am__cd) $(MSIBUILDDIR) && $(CANDLE) -ext WiXUtilExtension $(W_MSIDIR)\\product.wxs $(W_MSIDIR)\\axvlc.wxs $(W_MSIDIR)\\extensions.wxs $(W_MSIBUILDDIR)\\*.fragment.wxs
+	$(am__cd) $(MSIBUILDDIR) && $(CANDLE) -arch $(WINDOWS_ARCH) -ext WiXUtilExtension $(W_MSIDIR)\\product.wxs $(W_MSIDIR)\\axvlc.wxs $(W_MSIDIR)\\extensions.wxs $(W_MSIBUILDDIR)\\*.fragment.wxs
 
 light:
 	test ! -d "$(WINE_C)/v" -o ! -f "$(WINE_C)/v"
