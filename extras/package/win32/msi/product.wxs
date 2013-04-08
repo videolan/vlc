@@ -37,7 +37,7 @@
             InstallScope='perMachine'
             InstallerVersion='200'
             Compressed='yes'
-            Platforms='$(var.Platform)'/>
+            Platform='$(var.Platform)'/>
 
         <MajorUpgrade Schedule="afterInstallInitialize" DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."/>
 
