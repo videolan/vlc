@@ -14,9 +14,9 @@ MSIBUILDDIR=$(abs_top_builddir)/extras/package/win32/msi
 W_MSIBUILDDIR=`winepath -w '$(MSIBUILDDIR)'`
 MSIOUTFILE=vlc-$(VERSION).msi
 
-package-msi: heat candle light package-win-strip
+package-msi: heat candle light
 
-heat:
+heat: package-win-strip
 	$(HEAT) dir $(VLCDIR)/plugins -cg CompPluginsGroup -gg -scom -sreg -sfrag -srd -dr PLUGINSDIR -out $(W_MSIBUILDDIR)/Plugins.fragment.wxs
 	$(HEAT) dir $(VLCDIR)/locale -cg CompLocaleGroup -gg -scom -sreg -sfrag -srd -dr LOCALEDIR -out $(W_MSIBUILDDIR)/Locale.fragment.wxs
 	$(HEAT) dir $(VLCDIR)/lua -cg CompLuaGroup -gg -scom -sreg -sfrag -srd -dr LUADIR -out $(W_MSIBUILDDIR)/Lua.fragment.wxs
