@@ -6,6 +6,7 @@
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
+ *          Erwan Tulou      <erwan10 At videolan doT org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -334,6 +335,11 @@ CtrlSliderBg::CtrlSliderBg( intf_thread_t *pIntf,
 
         // Initial position
         m_position = (int)( m_rVariable.get() * (m_nbHoriz * m_nbVert - 1) );
+
+        // Initialize the scaled image for the control
+        int width = m_bgWidth * m_nbHoriz - m_padHoriz;
+        int height = m_bgHeight * m_nbVert - m_padVert;
+        m_pScaledBmp = new ScaledBitmap( getIntf(), *m_pImgSeq, width, height );
     }
 }
 
@@ -353,31 +359,29 @@ bool CtrlSliderBg::mouseOver( int x, int y ) const
     float factorX, factorY;
     getResizeFactors( factorX, factorY );
 
-    return (m_rCurve.getMinDist( (int)(x / factorX), (int)(y / factorY),
-                                 factorX, factorY ) < m_thickness );
+    bool b_isWithinCurve =
+        m_rCurve.getMinDist( (int)(x / factorX), (int)(y / factorY),
+                                      factorX, factorY ) < m_thickness;
+    bool b_isWithinBitmap =
+        m_pScaledBmp &&
+        x >= 0 && x < m_pScaledBmp->getWidth() &&
+        y >= 0 && y < m_pScaledBmp->getHeight();
+
+    return
+        m_pScaledBmp ?
+        b_isWithinCurve && b_isWithinBitmap :
+        b_isWithinCurve;
 }
 
 
 void CtrlSliderBg::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h )
 {
-    if( !m_pImgSeq || m_bgWidth <= 0 || m_bgHeight <= 0 )
+    if( !m_pScaledBmp || m_bgWidth <= 0 || m_bgHeight <= 0 )
         return;
 
     // Compute the resize factors
     float factorX, factorY;
     getResizeFactors( factorX, factorY );
-
-    int width = m_bgWidth * m_nbHoriz - (int)(m_padHoriz * factorX);
-    int height = m_bgHeight * m_nbVert - (int)(m_padVert * factorY);
-
-    // Rescale the image with the actual size of the control if needed
-    if( !m_pScaledBmp ||
-        m_pScaledBmp->getWidth() != width ||
-        m_pScaledBmp->getHeight() != height )
-    {
-        delete m_pScaledBmp;
-        m_pScaledBmp = new ScaledBitmap( getIntf(), *m_pImgSeq, width, height );
-    }
 
     // Locate the right image in the background bitmap
     int x = m_bgWidth * ( m_position % m_nbHoriz );
@@ -442,16 +446,25 @@ void CtrlSliderBg::onResize()
 {
     if( m_pImgSeq )
     {
-        // Compute only the new size of an elementary image.
-        // The actual resizing is done in the draw() method for now...
-
         // Compute the resize factors
         float factorX, factorY;
         getResizeFactors( factorX, factorY );
 
         // Size of one elementary background image (padding included)
-        m_bgWidth = (int)((m_pImgSeq->getWidth() + m_padHoriz) * factorX / m_nbHoriz);
-        m_bgHeight = (int)((m_pImgSeq->getHeight() + m_padVert) * factorY / m_nbVert);
+        m_bgWidth =
+           (int)((m_pImgSeq->getWidth() + m_padHoriz) * factorX / m_nbHoriz);
+        m_bgHeight =
+            (int)((m_pImgSeq->getHeight() + m_padVert) * factorY / m_nbVert);
+
+        // Rescale the image with the actual size of the control if needed
+        int width = m_bgWidth * m_nbHoriz - (int)(m_padHoriz * factorX);
+        int height = m_bgHeight * m_nbVert - (int)(m_padVert * factorY);
+        if( m_pScaledBmp->getWidth() != width ||
+            m_pScaledBmp->getHeight() != height )
+        {
+            delete m_pScaledBmp;
+            m_pScaledBmp = new ScaledBitmap( getIntf(), *m_pImgSeq, width, height );
+        }
     }
 }
 
