@@ -32,7 +32,6 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
-#include <poll.h>
 
 #include <vlc_common.h>
 #include <vlc_block.h>

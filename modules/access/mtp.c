@@ -36,7 +36,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <poll.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>

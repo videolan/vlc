@@ -38,7 +38,6 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <poll.h>
 
 /* DVB Card Drivers */
 #include <linux/dvb/version.h>
