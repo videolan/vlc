@@ -97,6 +97,11 @@ static void Close( vlc_object_t * );
 #define KEYFILE_TEXT N_("AES key file")
 #define KEYFILE_LONGTEXT N_("File containing the 16 bytes encryption key")
 
+#define KEYLOADFILE_TEXT N_("File where vlc reads key-uri and keyfile-location")
+#define KEYLOADFILE_LONGTEXT N_("File is read when segment starts and is assumet to be in format: "\
+                                "key-uri\\nkey-file. File is read on the segment opening and "\
+                                "values are used on that segment.")
+
 #define RANDOMIV_TEXT N_("Use randomized IV for encryption")
 #define RANDOMIV_LONGTEXT N_("Generate IV instead using segment-number as IV")
 
@@ -127,6 +132,8 @@ vlc_module_begin ()
                 KEYURI_TEXT, KEYURI_TEXT, true )
     add_loadfile( SOUT_CFG_PREFIX "key-file", NULL,
                 KEYFILE_TEXT, KEYFILE_LONGTEXT, true )
+    add_loadfile( SOUT_CFG_PREFIX "key-loadfile", NULL,
+                KEYLOADFILE_TEXT, KEYLOADFILE_LONGTEXT, true )
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -145,6 +152,7 @@ static const char *const ppsz_sout_options[] = {
     "caching",
     "key-uri",
     "key-file",
+    "key-loadfile",
     "generate-iv",
     NULL
 };
@@ -168,6 +176,8 @@ struct sout_access_out_sys_t
     char *psz_cursegPath;
     char *psz_indexPath;
     char *psz_indexUrl;
+    char *psz_keyfile;
+    mtime_t i_keyfile_modification;
     mtime_t i_opendts;
     mtime_t  i_seglenm;
     uint32_t i_segment;
@@ -189,7 +199,8 @@ struct sout_access_out_sys_t
     vlc_array_t *segments_t;
 };
 
-static int CryptSetup( sout_access_out_t *p_access );
+static int LoadCryptFile( sout_access_out_t *p_access);
+static int CryptSetup( sout_access_out_t *p_access, char *keyfile );
 /*****************************************************************************
  * Open: open the file
  *****************************************************************************/
@@ -244,10 +255,20 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys->psz_indexUrl = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "index-url" );
+    p_sys->psz_keyfile  = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "key-loadfile" );
+    p_sys->key_uri      = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "key-uri" );
 
     p_access->p_sys = p_sys;
 
-    if( CryptSetup( p_access ) < 0 )
+    if( p_sys->psz_keyfile && ( LoadCryptFile( p_access ) < 0 ) )
+    {
+        free( p_sys->psz_indexUrl );
+        free( p_sys->psz_indexPath );
+        free( p_sys );
+        msg_Err( p_access, "Encryption init failed" );
+        return VLC_EGENERIC;
+    }
+    else if( !p_sys->psz_keyfile && ( CryptSetup( p_access, NULL ) < 0 ) )
     {
         free( p_sys->psz_indexUrl );
         free( p_sys->psz_indexPath );
@@ -270,12 +291,17 @@ static int Open( vlc_object_t *p_this )
 /************************************************************************
  * CryptSetup: Initialize encryption
  ************************************************************************/
-static int CryptSetup( sout_access_out_t *p_access )
+static int CryptSetup( sout_access_out_t *p_access, char *key_file )
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     uint8_t key[16];
+    char *keyfile = NULL;
 
-    p_sys->key_uri = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "key-uri" );
+    if( key_file )
+        keyfile = strdup( key_file );
+    else
+        keyfile = var_InheritString( p_access, SOUT_CFG_PREFIX "key-file" );
+
     if( !p_sys->key_uri ) /*No key uri, assume no encryption wanted*/
     {
         msg_Dbg( p_access, "No key uri, no encryption");
@@ -292,7 +318,6 @@ static int CryptSetup( sout_access_out_t *p_access )
         return VLC_EGENERIC;
     }
 
-    char *keyfile = var_InheritString( p_access, SOUT_CFG_PREFIX "key-file" );
     if( unlikely(keyfile == NULL) )
     {
         msg_Err( p_access, "No key-file, no encryption" );
@@ -329,6 +354,68 @@ static int CryptSetup( sout_access_out_t *p_access )
         vlc_rand_bytes( p_sys->aes_ivs, sizeof(uint8_t)*16);
 
     return VLC_SUCCESS;
+}
+
+
+/************************************************************************
+ * LoadCryptFile: Try to parse key_uri and keyfile-location from file
+ ************************************************************************/
+static int LoadCryptFile( sout_access_out_t *p_access )
+{
+    sout_access_out_sys_t *p_sys = p_access->p_sys;
+
+    FILE *stream = vlc_fopen( p_sys->psz_keyfile, "rt" );
+    char *key_file=NULL,*key_uri=NULL;
+
+    if( unlikely( stream == NULL ) )
+    {
+        msg_Err( p_access, "Unable to open keyloadfile %s: %m", p_sys->psz_keyfile );
+        return VLC_EGENERIC;
+    }
+
+
+    //First read key_uri
+    ssize_t len = getline( &key_uri, &(size_t){0}, stream );
+    if( unlikely( len == -1 ) )
+    {
+        msg_Err( p_access, "Cannot read %s: %m", p_sys->psz_keyfile );
+        clearerr( stream );
+        fclose( stream );
+        free( key_uri );
+        return VLC_EGENERIC;
+    }
+    //Strip the newline from uri, maybe scanf would be better?
+    key_uri[len-1]='\0';
+
+    len = getline( &key_file, &(size_t){0}, stream );
+    if( unlikely( len == -1 ) )
+    {
+        msg_Err( p_access, "Cannot read %s: %m", p_sys->psz_keyfile );
+        clearerr( stream );
+        fclose( stream );
+
+        free( key_uri );
+        free( key_file );
+        return VLC_EGENERIC;
+    }
+    // Strip the last newline from filename
+    key_file[len-1]='\0';
+    fclose( stream );
+
+    int returncode = VLC_SUCCESS;
+    if( !p_sys->key_uri || strcmp( p_sys->key_uri, key_uri ) )
+    {
+        if( p_sys->key_uri )
+        {
+            free( p_sys->key_uri );
+            p_sys->key_uri = NULL;
+        }
+        p_sys->key_uri = strdup( key_uri );
+        returncode = CryptSetup( p_access, key_file );
+    }
+    free( key_file );
+    free( key_uri );
+    return returncode;
 }
 
 /************************************************************************
@@ -718,8 +805,6 @@ static ssize_t openNextFile( sout_access_out_t *p_access, sout_access_out_sys_t 
         return -1;
     }
 
-
-
     fd = vlc_open( segment->psz_filename, O_WRONLY | O_CREAT | O_LARGEFILE |
                      O_TRUNC, 0666 );
     if ( fd == -1 )
@@ -730,6 +815,11 @@ static ssize_t openNextFile( sout_access_out_t *p_access, sout_access_out_sys_t 
     }
 
     vlc_array_append( p_sys->segments_t, segment);
+
+    if( p_sys->psz_keyfile )
+    {
+        LoadCryptFile( p_access );
+    }
 
     if( p_sys->key_uri )
     {
