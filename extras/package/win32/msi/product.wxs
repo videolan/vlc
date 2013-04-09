@@ -352,6 +352,7 @@
                       Return        = "asyncNoWait" />
         <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT"
           Value="Launch VLC media player when setup exits." />
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
 
         <UI>
             <Publish Dialog  = "ExitDialog"
