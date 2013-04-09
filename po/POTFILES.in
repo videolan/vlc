@@ -200,7 +200,6 @@ modules/access/file.c
 modules/access/fs.c
 modules/access/ftp.c
 modules/access/gnomevfs.c
-modules/access/htcpcp.c
 modules/access/http.c
 modules/access/idummy.c
 modules/access/imem.c

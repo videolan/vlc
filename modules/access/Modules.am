@@ -286,7 +286,6 @@ EXTRA_LTLIBRARIES += libaccess_smb_plugin.la
 SOURCES_access_udp = udp.c
 SOURCES_access_tcp = tcp.c
 SOURCES_access_http = http.c
-SOURCES_htcpcp = htcpcp.c
 SOURCES_access_ftp = ftp.c
 SOURCES_access_sftp = sftp.c
 SOURCES_live555 = live555.cpp mms/asf.c mms/buffer.c

@@ -153,7 +153,6 @@ $Id$
  * headphone_channel_mixer:  headphone channel mixer with virtual spatialization effect
  * hotkeys: hotkeys control module
  * hqdn3d: High Quality denoising filter
- * htcpcp: HTCPCP access module
  * httplive: HTTP Live streaming for playback
  * i420_rgb: planar YUV to packed RGB conversion functions
  * i420_rgb_mmx: MMX accelerated version of i420_rgb
