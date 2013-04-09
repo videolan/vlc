@@ -160,6 +160,7 @@ typedef struct output_segment
     char *psz_key_uri;
     char *psz_duration;
     uint32_t i_segment_number;
+    uint8_t aes_ivs[16];
 } output_segment_t;
 
 struct sout_access_out_sys_t
@@ -441,33 +442,8 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
             fclose( fp );
             return -1;
         }
+        char *psz_current_uri=NULL;
 
-        if( p_sys->key_uri )
-        {
-            int ret = 0;
-            if( p_sys->b_generate_iv )
-            {
-                unsigned long long iv_hi = 0, iv_lo = 0;
-                for( unsigned short i = 0; i < 8; i++ )
-                {
-                    iv_hi |= p_sys->aes_ivs[i] & 0xff;
-                    iv_hi <<= 8;
-                    iv_lo |= p_sys->aes_ivs[8+i] & 0xff;
-                    iv_lo <<= 8;
-                }
-                ret = fprintf( fp, "#EXT-X-KEY:METHOD=AES-128,URI=\"%s\",IV=0X%16.16llx%16.16llx\n",
-                               p_sys->key_uri, iv_hi, iv_lo );
-
-            } else {
-                ret = fprintf( fp, "#EXT-X-KEY:METHOD=AES-128,URI=\"%s\"\n", p_sys->key_uri );
-            }
-            if( ret < 0 )
-            {
-                free( psz_idxTmp );
-                fclose( fp );
-                return -1;
-            }
-        }
 
         for ( uint32_t i = i_firstseg; i <= p_sys->i_segment; i++ )
         {
@@ -475,6 +451,36 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
             uint32_t index = i-i_firstseg;
 
             output_segment_t *segment = (output_segment_t *)vlc_array_item_at_index( p_sys->segments_t, index );
+            if( p_sys->key_uri &&
+                ( !psz_current_uri ||  strcmp( psz_current_uri, segment->psz_key_uri ) )
+              )
+            {
+                int ret = 0;
+                free( psz_current_uri );
+                psz_current_uri = strdup( segment->psz_key_uri );
+                if( p_sys->b_generate_iv )
+                {
+                    unsigned long long iv_hi = 0, iv_lo = 0;
+                    for( unsigned short i = 0; i < 8; i++ )
+                    {
+                        iv_hi |= segment->aes_ivs[i] & 0xff;
+                        iv_hi <<= 8;
+                        iv_lo |= segment->aes_ivs[8+i] & 0xff;
+                        iv_lo <<= 8;
+                    }
+                    ret = fprintf( fp, "#EXT-X-KEY:METHOD=AES-128,URI=\"%s\",IV=0X%16.16llx%16.16llx\n",
+                                   segment->psz_key_uri, iv_hi, iv_lo );
+
+                } else {
+                    ret = fprintf( fp, "#EXT-X-KEY:METHOD=AES-128,URI=\"%s\"\n", segment->psz_key_uri );
+                }
+                if( ret < 0 )
+                {
+                    free( psz_idxTmp );
+                    fclose( fp );
+                    return -1;
+                }
+            }
 
             val = fprintf( fp, "#EXTINF:%s,\n%s\n", segment->psz_duration, segment->psz_uri);
             if ( val < 0 )
@@ -483,6 +489,7 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
                 return -1;
             }
         }
+        free( psz_current_uri );
 
         if ( b_isend )
         {
@@ -728,6 +735,8 @@ static ssize_t openNextFile( sout_access_out_t *p_access, sout_access_out_sys_t 
     {
         segment->psz_key_uri = strdup( p_sys->key_uri );
         CryptKey( p_access, i_newseg );
+        if( p_sys->b_generate_iv )
+            memcpy( segment->aes_ivs, p_sys->aes_ivs, sizeof(uint8_t)*16 );
     }
     msg_Dbg( p_access, "Successfully opened livehttp file: %s (%"PRIu32")" , segment->psz_filename, i_newseg );
 
