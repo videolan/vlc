@@ -17373,7 +17373,7 @@ msgid "Audio track synchronization:"
 msgstr ""
 
 #: modules/gui/qt4/components/extended_panels.cpp:1545
-msgid "Subtitle track syncronization:"
+msgid "Subtitle track synchronization:"
 msgstr ""
 
 #: modules/gui/qt4/components/extended_panels.cpp:1552

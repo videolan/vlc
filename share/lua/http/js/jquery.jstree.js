@@ -507,7 +507,7 @@
 					});
 				}
 				if(done) { 
-					// TODO: find a more elegant approach to syncronizing returning requests
+					// TODO: find a more elegant approach to synchronizing returning requests
 					if(this.data.core.reopen) { clearTimeout(this.data.core.reopen); }
 					this.data.core.reopen = setTimeout(function () { _this.__callback({}, _this); }, 50);
 					this.data.core.refreshing = false;

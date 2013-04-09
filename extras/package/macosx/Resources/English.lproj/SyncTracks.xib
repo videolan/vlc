@@ -276,7 +276,7 @@
                       <object class="NSTextFieldCell" key="NSCell" id="53850351">
                         <int key="NSCellFlags">68288064</int>
                         <int key="NSCellFlags2">272761856</int>
-                        <string key="NSContents">Subtitle track syncronization:</string>
+                        <string key="NSContents">Subtitle track synchronization:</string>
                         <reference key="NSSupport" ref="26"/>
                         <reference key="NSControlView" ref="662764430"/>
                         <reference key="NSBackgroundColor" ref="592262308"/>

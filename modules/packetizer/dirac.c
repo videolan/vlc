@@ -735,7 +735,7 @@ static block_t *dirac_DoSync( decoder_t *p_dec )
             {
                 return NULL; /* retry later */
             }
-            /* attempt to syncronise backwards from pu.u_next_offset */
+            /* attempt to synchronise backwards from pu.u_next_offset */
             p_sys->i_offset = pu.u_next_offset;
             /* fall through */
         case TRY_SYNC: /* -> SYNCED | NOT_SYNCED */
@@ -851,7 +851,7 @@ static int dirac_InspectDataUnit( decoder_t *p_dec, block_t **pp_block, block_t 
         Actually, this is a bad idea:
          - It sets the discontinuity for every dirac EOS packet
            which doesnt imply a time discontinuity.
-         - When the syncronizer detects a real discontinuity, it
+         - When the synchronizer detects a real discontinuity, it
            should copy the flags through.
         p_eu->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         */
@@ -1227,7 +1227,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             if( p_block )
             {
                 p_block->p_next = dirac_EmitEOS( p_dec, 13 );
-                /* need two EOS to ensure it gets detected by syncro
+                /* need two EOS to ensure it gets detected by synchro
                  * duplicates get discarded in forming encapsulation unit */
             }
         }
@@ -1245,7 +1245,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
     }
 
     /* form as many encapsulation units as possible, give up
-     * when the syncronizer runs out of input data */
+     * when the synchronizer runs out of input data */
     while( ( p_block = dirac_DoSync( p_dec ) ) )
     {
         p_block = dirac_BuildEncapsulationUnit( p_dec, p_block );

@@ -1476,7 +1476,7 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     QGridLayout *subsLayout = new QGridLayout( subsBox );
 
     QLabel *subsLabel = new QLabel;
-    subsLabel->setText( qtr( "Subtitle track syncronization:" ) );
+    subsLabel->setText( qtr( "Subtitle track synchronization:" ) );
     subsLayout->addWidget( subsLabel, 0, 0, 1, 1 );
 
     subsSpin = new SyncWidget( this );
