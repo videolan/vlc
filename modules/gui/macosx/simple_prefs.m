@@ -1450,6 +1450,10 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
         [tempString appendString:@"Delete"];
     else if (key == NSBackspaceCharacter)
         [tempString appendString:@"Backspace"];
+    else if (key == 0x001B)
+        [tempString appendString:@"Esc"];
+    else if (key == ' ')
+        [tempString appendString:@"Space"];
     else if (![[[o_theEvent charactersIgnoringModifiers] lowercaseString] isEqualToString:@""]) //plain characters
         [tempString appendString:[[o_theEvent charactersIgnoringModifiers] lowercaseString]];
     else
