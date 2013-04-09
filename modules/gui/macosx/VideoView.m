@@ -133,12 +133,8 @@
             else if (key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask)
                 [[VLCCoreInteraction sharedInstance] toggleFullscreen];
             else if (p_vout) {
-                if (key == ' ')
-                    [[VLCCoreInteraction sharedInstance] playOrPause];
-                else {
-                    val.i_int |= (int)CocoaKeyToVLC(key);
-                    var_Set(p_vout->p_libvlc, "key-pressed", val);
-                }
+                val.i_int |= (int)CocoaKeyToVLC(key);
+                var_Set(p_vout->p_libvlc, "key-pressed", val);
             }
             else
                 msg_Dbg(VLCIntf, "could not send keyevent to VLC core");

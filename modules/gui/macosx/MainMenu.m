@@ -157,11 +157,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_quit setKeyEquivalentModifierMask: [o_vlcstringutility VLCModifiersToCocoa:o_key]];
     FREENULL(key);
 
-    key = config_GetPsz(p_intf, "key-play-pause");
-    o_key = [NSString stringWithFormat:@"%s", key];
-    [o_mi_play setKeyEquivalent: [o_vlcstringutility VLCKeyToString: o_key]];
-    [o_mi_play setKeyEquivalentModifierMask: [o_vlcstringutility VLCModifiersToCocoa:o_key]];
-    FREENULL(key);
+    // do not assign play/pause key
 
     key = config_GetPsz(p_intf, "key-stop");
     o_key = [NSString stringWithFormat:@"%s", key];

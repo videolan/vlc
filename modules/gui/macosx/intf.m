@@ -1202,11 +1202,6 @@ static VLCMain *_o_sharedMainInstance = nil;
             }
         }
 
-        if (key == 0x0020) { // space key
-            [[VLCCoreInteraction sharedInstance] playOrPause];
-            return YES;
-        }
-
         val.i_int |= CocoaKeyToVLC(key);
 
         BOOL b_found_key = NO;

@@ -2146,7 +2146,7 @@ vlc_module_begin ()
  */
 #   define KEY_TOGGLE_FULLSCREEN  "Command+f"
 #   define KEY_LEAVE_FULLSCREEN   "Esc"
-#   define KEY_PLAY_PAUSE         "Command+p"
+#   define KEY_PLAY_PAUSE         "Space"
 #   define KEY_PAUSE              NULL
 #   define KEY_PLAY               NULL
 #   define KEY_FASTER             "Command+="
