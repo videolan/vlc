@@ -151,10 +151,6 @@
                                 <RemoveFile Id="RemovePluginsCache" Name="plugins.dat" On="uninstall" />
                             </Component>
                         </Directory>
-                        <Directory Id='LOCALEDIR' Name='locale' />
-                        <Directory Id='LUADIR' Name='lua' />
-                        <!-- <Directory Id='OSDMENUDIR' Name='osdmenu' /> -->
-                        <Directory Id='SKINSDIR' Name='skins' />
 
                         <Component Id='CompPlayDiscs' Guid='b0d90296-b20c-4c74-a3b3-a7694e011f25' Win64="$(var.Win64)">
                             <!-- Audio CD -->

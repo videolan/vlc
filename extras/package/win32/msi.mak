@@ -18,10 +18,10 @@ WINE_C=`winepath c:`
 package-msi: heat candle light
 
 heat: package-win-strip
-	$(HEAT) dir $(VLCDIR)/plugins -cg CompPluginsGroup -gg -scom -sreg -sfrag -srd -dr PLUGINSDIR -out $(W_MSIBUILDDIR)/Plugins.fragment.wxs
-	$(HEAT) dir $(VLCDIR)/locale -cg CompLocaleGroup -gg -scom -sreg -sfrag -srd -dr LOCALEDIR -out $(W_MSIBUILDDIR)/Locale.fragment.wxs
-	$(HEAT) dir $(VLCDIR)/lua -cg CompLuaGroup -gg -scom -sreg -sfrag -srd -dr LUADIR -out $(W_MSIBUILDDIR)/Lua.fragment.wxs
-	$(HEAT) dir $(VLCDIR)/skins -cg CompSkinsGroup -gg -scom -sreg -sfrag -srd -dr SKINSDIR -out $(W_MSIBUILDDIR)/Skins.fragment.wxs
+	$(HEAT) dir $(VLCDIR)/plugins -cg CompPluginsGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER -out $(W_MSIBUILDDIR)/Plugins.fragment.wxs
+	$(HEAT) dir $(VLCDIR)/locale -cg CompLocaleGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER -out $(W_MSIBUILDDIR)/Locale.fragment.wxs
+	$(HEAT) dir $(VLCDIR)/lua -cg CompLuaGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER -out $(W_MSIBUILDDIR)/Lua.fragment.wxs
+	$(HEAT) dir $(VLCDIR)/skins -cg CompSkinsGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER -out $(W_MSIBUILDDIR)/Skins.fragment.wxs
 
 candle:
 	$(am__cd) $(MSIBUILDDIR) && $(CANDLE) -arch $(WINDOWS_ARCH) -ext WiXUtilExtension $(W_MSIDIR)\\product.wxs $(W_MSIDIR)\\axvlc.wxs $(W_MSIDIR)\\extensions.wxs $(W_MSIBUILDDIR)\\*.fragment.wxs
