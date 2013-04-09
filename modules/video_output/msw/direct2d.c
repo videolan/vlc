@@ -37,15 +37,11 @@
 
 #include <windows.h>
 #include <commctrl.h>
-
+#include <initguid.h>
 #include <d2d1.h>
 
 #include "common.h"
 
-#include <initguid.h>
-#undef GUID_EXT
-#define GUID_EXT
-DEFINE_GUID(IID_ID2D1Factory, 0x6152247, 0x6f50, 0x465a, 0x92, 0x45, 0x11, 0x8b, 0xfd, 0x3b, 0x60, 0x7);
 
 /*****************************************************************************
  * Module descriptor
