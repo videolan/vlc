@@ -62,7 +62,7 @@
             <RegistrySearch Id="FindInstallRegDir" Type="raw" Root="HKLM" Win64="$(var.Win64)" Key="Software\VideoLAN\VLC" Name="InstallDir" />
         </Property>
 
-        <WixVariable Id="WixUISupportPerUser" Value="0" />
+        <WixVariable Id="WixUISupportPerUser" Value="1" />
         <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
         <WixVariable Id="WixUIBannerBmp" Value="bannrbmp.bmp" />
 
