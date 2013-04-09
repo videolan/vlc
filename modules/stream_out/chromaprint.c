@@ -34,6 +34,10 @@
 
 #include <assert.h>
 
+#ifdef WIN32
+# define CHROMAPRINT_NODLL
+#endif
+
 #include <chromaprint.h> /* chromaprint lib */
 #include "chromaprint_data.h"
 
