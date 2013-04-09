@@ -13,7 +13,7 @@ SOURCES_stream_out_record = record.c
 SOURCES_stream_out_smem = smem.c
 SOURCES_stream_out_setid = setid.c
 SOURCES_stream_out_langfromtelx = langfromtelx.c
-SOURCES_stream_out_chromaprint = chromaprint.c chromaprint_data.h
+SOURCES_stream_out_chromaprint = chromaprint.c chromaprint_data.h dummy.cpp
 
 libstream_out_transcode_plugin_la_SOURCES = \
 	transcode/transcode.c transcode/transcode.h \
@@ -62,3 +62,7 @@ if HAVE_GCRYPT
 libvlc_LTLIBRARIES += libstream_out_raop_plugin.la
 endif
 
+BUILT_SOURCES += dummy.cpp
+
+dummy.cpp:
+	touch dummy.cpp
