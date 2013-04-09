@@ -38,6 +38,10 @@
             InstallerVersion='200'
             Compressed='yes' />
 
+        <Condition Message="This application is only supported on Windows XP or higher.">
+            <![CDATA[Installed OR (VersionNT >= 501)]]>
+        </Condition>
+
         <MajorUpgrade Schedule="afterInstallInitialize" DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."/>
 
         <Icon Id="vlc.ico" SourceFile="$(var.SourceDir)/vlc.ico"/>
